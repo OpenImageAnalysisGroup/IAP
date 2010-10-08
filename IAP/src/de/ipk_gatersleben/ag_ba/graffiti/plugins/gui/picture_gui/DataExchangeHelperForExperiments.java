@@ -1,5 +1,5 @@
 /* Copyright (c) 2003 IPK Gatersleben
- * $Id: DataExchangeHelperForExperiments.java,v 1.1 2010-10-05 12:11:17 klukas Exp $
+ * $Id: DataExchangeHelperForExperiments.java,v 1.2 2010-10-08 14:51:11 klukas Exp $
  */
 package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.picture_gui;
 
@@ -33,6 +33,8 @@ import de.ipk_gatersleben.ag_ba.mongo.RunnableOnDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.FileSystemHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
@@ -173,10 +175,10 @@ public class DataExchangeHelperForExperiments {
 				MappingDataEntity mde = mt.getTargetEntity();
 				if (mde instanceof ImageData) {
 					ImageData id = (ImageData) mde;
-					primary = new BinaryFileInfo(id.getURL().getFileName(), true, id);
+					primary = new BinaryFileInfo(id.getURL(), true, id);
 				} else if (mde instanceof VolumeData) {
 					VolumeData id = (VolumeData) mde;
-					primary = new BinaryFileInfo(id.getURL().getFileName(), true, id);
+					primary = new BinaryFileInfo(id.getURL(), true, id);
 				} else {
 					if (mde instanceof Sample3D) {
 						Sample3D s3d = (Sample3D) mde;
@@ -184,10 +186,10 @@ public class DataExchangeHelperForExperiments {
 						for (NumericMeasurementInterface nmi : s3d.getBinaryMeasurements()) {
 							if (nmi instanceof ImageData) {
 								ImageData id = (ImageData) nmi;
-								primary = new BinaryFileInfo(id.getURL().getFileName(), true, id);
+								primary = new BinaryFileInfo(id.getURL(), true, id);
 							} else if (nmi instanceof VolumeData) {
 								VolumeData id = (VolumeData) nmi;
-								primary = new BinaryFileInfo(id.getURL().getFileName(), true, id);
+								primary = new BinaryFileInfo(id.getURL(), true, id);
 							}
 							if (primary != null)
 								bbb.add(primary);
@@ -210,7 +212,7 @@ public class DataExchangeHelperForExperiments {
 					if (v != null && v instanceof String) {
 						String vs = (String) v;
 						String fileName = vs;
-						bbb.add(new BinaryFileInfo(fileName, false, mt.getTargetEntity()));
+						bbb.add(new BinaryFileInfo(new IOurl(fileName), false, mt.getTargetEntity()));
 					}
 				}
 			}
@@ -219,11 +221,11 @@ public class DataExchangeHelperForExperiments {
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
 
 				if (binaryFileInfo.getFileName() == null)
-					binaryFileInfo.setFileName("[null]");
+					binaryFileInfo.setFileName(null);
 				ImageIcon previewImage = null;
-				if (binaryFileInfo.getFileName().contains(File.separator)) {
+				if (FileSystemHandler.isFileUrl(binaryFileInfo.getFileName())) {
 					MyImageIcon myImage = new MyImageIcon(MainFrame.getInstance(), JMyPC2DBEbutton.ICON_WIDTH,
-							JMyPC2DBEbutton.ICON_HEIGHT, new File(binaryFileInfo.getFileName()), binaryFileInfo);
+							JMyPC2DBEbutton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
 					myImage.imageAvailable = 1;
 					previewImage = myImage;
 				} else {
@@ -236,7 +238,7 @@ public class DataExchangeHelperForExperiments {
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
 
-				imageButton.setDataBaseInfo(!binaryFileInfo.getFileName().contains(File.separator));
+				imageButton.setDownloadNeeded(!FileSystemHandler.isFileUrl(binaryFileInfo.getFileName()));
 				imageButton.setVerticalTextPosition(SwingConstants.BOTTOM);
 				imageButton.setHorizontalTextPosition(SwingConstants.CENTER);
 

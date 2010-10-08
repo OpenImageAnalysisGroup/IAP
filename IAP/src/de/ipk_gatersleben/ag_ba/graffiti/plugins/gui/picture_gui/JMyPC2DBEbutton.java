@@ -52,11 +52,13 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.AttributeHelper;
+import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.session.EditorSession;
 
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.webstart.AIPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.FileSystemHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
 import de.ipk_gatersleben.ag_pbi.vanted3d.mapping.MappingResultGraph;
@@ -237,8 +239,8 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 								public void run() {
 									try {
 										myImage = new MyImageIcon(MainFrame.getInstance(), JMyPC2DBEbutton.ICON_WIDTH,
-												JMyPC2DBEbutton.ICON_HEIGHT, tf, myImage != null ? myImage.getBinaryFileInfo()
-														: null);
+												JMyPC2DBEbutton.ICON_HEIGHT, FileSystemHandler.getURL(tf),
+												myImage != null ? myImage.getBinaryFileInfo() : null);
 									} catch (MalformedURLException e) {
 										downloadNeeded = true;
 										SupplementaryFilePanelMongoDB.showError("URL Format Error", e);
@@ -332,7 +334,12 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 			if (imageResult.getFileName().contains(File.separator))
 				i = new ImageIcon(imageResult.getFileName());
 			else
-				i = new ImageIcon(myImage.fileURL);
+				try {
+					i = new ImageIcon(ImageIO.read(ExperimentIOManager.getInputStream(myImage.fileURL)));
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+					i = null;
+				}
 
 			cp.add(new JScrollPane(new JLabel(i)));
 			myImageFrame.getContentPane().validate();

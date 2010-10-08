@@ -480,6 +480,8 @@ public class Other {
 		for (String k : group2ei.keySet()) {
 			for (Collection<ExperimentHeaderInterface> eil : group2ei.get(k).values()) {
 				for (ExperimentHeaderInterface ei : eil) {
+					if (ei.getStartdate() == null)
+						continue;
 					if (calEnt.isShowSpecificDay()) {
 						String dayA = DateUtils.getDayInfo(ei.getStartdate());
 						String dayB = DateUtils.getDayInfo(ei.getImportdate());

@@ -83,6 +83,8 @@ public class DayComponent extends JComponent {
 				for (ExperimentHeaderInterface ehi : group2ei.get(s).get(s2))
 					experiments.add(ehi);
 		for (ExperimentHeaderInterface ei : experiments) {
+			if (ei.getStartdate() == null)
+				continue;
 			String dateA = sdf.format(ei.getStartdate().getTime());
 			String dateB = sdf.format(ei.getImportdate().getTime());
 			boolean startOrEnd = false;

@@ -14,15 +14,17 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
-import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 import org.ErrorMsg;
-import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
+
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.FileSystemHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 
 /**
  * @author Christian Klukas
@@ -36,7 +38,7 @@ public class MyImageIcon extends ImageIcon {
 
 	// private int width, height;
 
-	URL fileURL;
+	IOurl fileURL;
 
 	int imageAvailable;
 
@@ -44,23 +46,23 @@ public class MyImageIcon extends ImageIcon {
 
 	// private File file;
 
-	public MyImageIcon(Component observer, int width, int height, File file, BinaryFileInfo bfi)
+	public MyImageIcon(Component observer, int width, int height, IOurl file, BinaryFileInfo bfi)
 			throws MalformedURLException {
 		initImageData(observer, width, height, file, bfi);
 	}
 
-	@SuppressWarnings("deprecation")
-	public synchronized void initImageData(Component observer, int width, int height, File file, BinaryFileInfo bfi)
+	@SuppressWarnings( { "deprecation", "restriction" })
+	public synchronized void initImageData(Component observer, int width, int height, IOurl file, BinaryFileInfo bfi)
 			throws MalformedURLException {
 		this.bfi = bfi;
-		String description = file.getName();
-		fileURL = file.toURL();
+		String description = file.getFileName();
+		fileURL = file;
 		// this.file = file;
 		setDescription(description);
 
 		try {
 			BufferedImage i = null;
-			i = GravistoService.getImage(fileURL);
+			i = ImageIO.read(ExperimentIOManager.getInputStream(fileURL));
 			// i = getPreviewImage((BufferedImage) i);
 			int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
 			double factor = 128 / (double) maxS;
@@ -74,14 +76,20 @@ public class MyImageIcon extends ImageIcon {
 			BufferedImage i = null;
 
 			try {
-				sun.awt.shell.ShellFolder sf = sun.awt.shell.ShellFolder.getShellFolder(file);
+				sun.awt.shell.ShellFolder sf = sun.awt.shell.ShellFolder.getShellFolder(FileSystemHandler.getFile(fileURL));
 				i = toBufferedImage(sf.getIcon(true));
 			} catch (Exception e) {
-				ImageIcon ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(file);
-				if (ic == null)
-					i = toBufferedImage(new ImageIcon(MainFrame.getInstance().getIconImage()).getImage());
-				else
-					i = toBufferedImage(ic.getImage());
+				ImageIcon ic;
+				try {
+					ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
+							FileSystemHandler.getFile(fileURL));
+					if (ic == null) {
+						i = toBufferedImage(new ImageIcon(MainFrame.getInstance().getIconImage()).getImage());
+					} else
+						i = toBufferedImage(ic.getImage());
+				} catch (Exception e2) {
+					i = null;
+				}
 
 			}
 

@@ -29,15 +29,10 @@ import org.ReleaseInfo;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.MainPanelComponent;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.MyNavigationPanel;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.PanelTarget;
-import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.nav.RimasNav;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.Home;
-import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.Other;
-import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.Phenotyping;
-import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.ShowVANTED;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.FlowLayoutImproved;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.ModelToGui;
-import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.WebFolder;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -91,110 +86,22 @@ public class AIPgui {
 		navigationPanel.setTheOther(actionPanel);
 		actionPanel.setTheOther(navigationPanel);
 
-		final ArrayList<NavigationGraphicalEntity> homeNavigation = new ArrayList<NavigationGraphicalEntity>();
+		Home home = new Home(myStatus);
+		final NavigationGraphicalEntity overView = new NavigationGraphicalEntity(home);
 
-		final ArrayList<NavigationGraphicalEntity> homeActions = new ArrayList<NavigationGraphicalEntity>();
+		overView.setTitle("Initialize");
+		overView.setProcessing(true);
 
-		final NavigationGraphicalEntity overView = new NavigationGraphicalEntity(new Home(homeActions, homeNavigation,
-				myStatus), "Initialize", "img/pattern_graffiti_logo.png");
-
+		ArrayList<NavigationGraphicalEntity> homeNavigation = new ArrayList<NavigationGraphicalEntity>();
 		homeNavigation.add(overView);
-
-		homeActions.add(new NavigationGraphicalEntity(new Phenotyping(), "Phenotyping", "img/000Grad_3.png"));
-
-		// homeActions.add(new NavigationGraphicalEntity(new DBElogin2(),
-		// "DBE Database", "img/dbelogo2.png"));
-
-		NavigationGraphicalEntity rimas = RimasNav.getRimas();
-		homeActions.add(rimas);
-
-		NavigationGraphicalEntity metaCrop = WebFolder
-				.getBrowserNavigationEntity(
-						null,
-						"MetaCrop",
-						"img/metacrop.png",
-						"http://pgrc-16.ipk-gatersleben.de/wgrp/nwg/metacrop/",
-						"Website",
-						"img/browser.png",
-						"http://metacrop.ipk-gatersleben.de",
-						new String[] { ".gml", ".graphml" },
-						""
-								+ "<h2>MetaCrop</h2>"
-								+ "MetaCrop is a web accessible database that summarizes diverse information about metabolic pathways "
-								+ "in crop plants and allows automatic export of information for the creation of detailed metabolic models.<br><br>"
-								+ "IAP as well as VANTED provide access to the exported MetaCrop pathways in a graphical and interactive way.<br>"
-								+ "For background information and further information please visit the MetaCrop website, accessible by using the "
-								+ "Website button, shown above.");
-		homeActions.add(metaCrop);
-
-		HashMap<String, String> folder2url = new HashMap<String, String>();
-		folder2url.put("", "SBGN Spec.:http://www.nature.com/nbt/journal/v27/n8/full/nbt.1558.html");
-		folder2url.put("Activity Flow", "Nat. Proc. (AF):http://precedings.nature.com/documents/3724/version/1");
-		folder2url.put("Entity Relationship", "Nat. Proc. (ER):http://precedings.nature.com/documents/3724/version/1");
-		folder2url.put("Process Description", "Nat. Proc. (PD):http://precedings.nature.com/documents/3724/version/1");
-		NavigationGraphicalEntity sbgn = WebFolder
-				.getBrowserNavigationEntity(
-						folder2url,
-						"SBGN-ED",
-						"img/sbgn.png",
-						"http://vanted.ipk-gatersleben.de/aip/sbgn-examples/",
-						"SBGN-ED",
-						"img/browser.png",
-						"http://vanted.ipk-gatersleben.de/addons/sbgn-ed/",
-						new String[] { ".gml", ".graphml" },
-						"<h2>SBGN-ED - Editing, Translating and Validating of SBGN Maps</h2>"
-								+ ""
-								+ "SBGN-ED is a VANTED Add-on which allows to create and edit all three types of SBGN maps, "
-								+ "that is Process Description, Entity Relationship and Activity Flow, to validate these "
-								+ "maps according to the SBGN specifications, to translate maps from the KEGG and MetaCrop "
-								+ "pathway databases into SBGN, and to export SBGN maps into several file and image formats.<br><br>"
-								+ "SBGN-ED editing, translation and validation functions are available from within VANTED and IAP as "
-								+ "soon as the SBGN-ED Add-on available from the mentioned website is downloaded and installed. "
-								+ "The SBGN-ED website additionally contains documentation and additional background information.");
-		homeActions.add(sbgn);
-
-		NavigationGraphicalEntity examples = WebFolder
-				.getBrowserNavigationEntity(
-						null,
-						"VANTED",
-						// "img/vanted_examples.png",
-						"img/vanted1_0.png",
-						"http://vanted.ipk-gatersleben.de/examplefiles/",
-						"Website",
-						"img/browser.png",
-						"http://vanted.ipk-gatersleben.de/",
-						new String[] { ".gml", ".graphml" },
-						"<h2>Welcome to VANTED - Visualization and Analysis of Networks containing Experimental Data</h2>"
-								+ "This system makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
-								+ "It is possible to map experimental datasets onto the graph elements and visualize time series data or data of different "
-								+ "genotypes or environmental conditions in the context of a the underlying biological processes. Built-in statistic "
-								+ "functions allow a fast evaluation of the data (e.g. t-Test or correlation analysis).");
-
-		NavigationGraphicalEntity startVanted = new NavigationGraphicalEntity(new ShowVANTED());
-
-		examples.getAction().addAdditionalEntity(startVanted);
-
-		homeActions.add(examples);
-
-		NavigationGraphicalEntity serverStatusEntity = Other.getServerStatusEntity(true);
-		homeActions.add(serverStatusEntity);
-
-		for (NavigationGraphicalEntity ne : homeNavigation)
-			ne.setProcessing(true);
-		// for (NavigationEntity ne : homeActions)
-		// ne.setProcessing(true);
-
 		navigationPanel.setEntitySet(homeNavigation);
-		actionPanel.setEntitySet(homeActions);
+		actionPanel.setEntitySet(home.getActionEntitySet());
 
 		ErrorMsg.addOnAppLoadingFinishedAction(new Runnable() {
 			// ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {
 			public void run() {
 				overView.setTitle("Overview");
-				for (NavigationGraphicalEntity ne : homeNavigation)
-					ne.setProcessing(false);
-				for (NavigationGraphicalEntity ne : homeActions)
-					ne.setProcessing(false);
+				overView.setProcessing(false);
 				HashMap<String, NavigationGraphicalEntity> knownEntities = new HashMap<String, NavigationGraphicalEntity>();
 				try {
 					JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());

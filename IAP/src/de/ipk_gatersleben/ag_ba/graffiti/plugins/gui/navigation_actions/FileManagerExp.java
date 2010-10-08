@@ -61,7 +61,7 @@ public class FileManagerExp extends AbstractNavigationAction {
 	public static NavigationGraphicalEntity getFileManagerEntity(final String login, final String pass,
 			final ExperimentReference experimentRef) {
 		NavigationAction fileManagerAction = new FileManagerExp(login, pass, experimentRef);
-		NavigationGraphicalEntity fileManager = new NavigationGraphicalEntity(fileManagerAction, "File Manager",
+		NavigationGraphicalEntity fileManager = new NavigationGraphicalEntity(fileManagerAction, "View Data",
 				"img/ext/applications-system.png");
 		return fileManager;
 	}

@@ -22,6 +22,7 @@ import de.ipk_gatersleben.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.FileSystemHandler;
 
 /**
  * @author Christian Klukas
@@ -181,12 +182,14 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		}
 
 		Thread t = new Thread(new Runnable() {
+			@SuppressWarnings("deprecation")
 			public void run() {
 				MyImageIcon iconA;
-				BinaryFileInfo bif = new BinaryFileInfo(file.getName(), false, targetTreeNode.getTargetEntity());
+				BinaryFileInfo bif = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode
+						.getTargetEntity());
 				try {
 					iconA = new MyImageIcon(panel.getParent(), JMyPC2DBEbutton.ICON_WIDTH, JMyPC2DBEbutton.ICON_HEIGHT,
-							file, bif);
+							FileSystemHandler.getURL(file), bif);
 				} catch (MalformedURLException e) {
 					SupplementaryFilePanelMongoDB.showError("Malformed URL Exception.", e);
 					iconA = null;
@@ -216,7 +219,8 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					imageButton.setDownloadNeeded(true);
 					imageButton.downloadInProgress = false;
 
-					BinaryFileInfo bfi = new BinaryFileInfo(file.getName(), false, targetTreeNode.getTargetEntity());
+					BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode
+							.getTargetEntity());
 
 					imageButton.imageResult = new ImageResult(icon, bfi);
 					imageButton.setProgressValue(100);
