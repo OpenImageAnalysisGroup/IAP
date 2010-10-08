@@ -11,8 +11,8 @@ package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.FileManagerExp;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.CloudUploadEntity;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.FileManagerExp;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.ThreeDreconstructionAction;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.ThreeDsegmentationAction;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
@@ -36,7 +36,8 @@ public class ImageAnalysisCommandManager {
 		actions.add(FileManagerExp.getFileManagerEntity(login, pass, experimentReference));
 
 		actions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass, experimentReference),
-				"Store Dataset", "img/ext/user-desktop.png"));
+				"Transfer to IAP Cloud", "img/ext/transfer2.png", "img/ext/transfer2.png"));
+
 		// "img/PoweredMongoDBgreenLeaf.png")); // PoweredMongoDBgreen.png"));
 
 		// actions.add(new NavigationGraphicalEntity(

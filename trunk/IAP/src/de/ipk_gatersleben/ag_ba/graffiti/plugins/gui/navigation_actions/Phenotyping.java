@@ -37,11 +37,16 @@ public class Phenotyping extends AbstractNavigationAction {
 				"img/ext/user-desktop.png", "img/ext/user-desktop.png");
 		phenoDBcommands.add(analyzeEntity);
 
+		NavigationAction lemnaExperiments = new LemnaTecNavigationAction();
+		NavigationGraphicalEntity lemnaEntity = new NavigationGraphicalEntity(lemnaExperiments);
+
+		phenoDBcommands.add(lemnaEntity);
+
 		String login = "";
 		String pass = "";
 		NavigationAction mongoExperiments = new MongoExperimentsNavigationAction(login, pass);
-		NavigationGraphicalEntity mongo = new NavigationGraphicalEntity(mongoExperiments, "DBE Cloud",
-				"img/ext/network-mongo.png", "img/ext/network-mongo.png");
+		NavigationGraphicalEntity mongo = new NavigationGraphicalEntity(mongoExperiments, "IAP Cloud",
+				"img/ext/network-mongo.png", "img/ext/network-mongo-gray.png");
 
 		phenoDBcommands.add(mongo);
 

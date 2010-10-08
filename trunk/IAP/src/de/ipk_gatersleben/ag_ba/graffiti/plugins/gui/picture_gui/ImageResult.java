@@ -27,7 +27,7 @@ public class ImageResult {
 	public File downloadedFile;
 
 	public String getFileName() {
-		return bfi.getFileName();
+		return bfi.getFileName().getFileName();
 	}
 
 	public MyImageIcon getPreviewIcon() {

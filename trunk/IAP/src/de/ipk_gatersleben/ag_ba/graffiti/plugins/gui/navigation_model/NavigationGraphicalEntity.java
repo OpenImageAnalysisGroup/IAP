@@ -230,14 +230,6 @@ public class NavigationGraphicalEntity implements StyleAware {
 		this.title = title;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.webstart.pheno_is.StyleAware
-	 * #setButtonStyle(de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.webstart.
-	 * ButtonDrawStyle)
-	 */
 	@Override
 	public void setButtonStyle(ButtonDrawStyle style) {
 		// empty, override if needed

@@ -101,8 +101,29 @@ public class MongoDB {
 		}
 	}
 
-	public MongoDBhandler getHandler() {
-		return new MongoDB.MongoDBhandler();
+	public class MongoDBpreviewHandler implements MeasurementIOHandler {
+
+		public static final String PREFIX = "mongo-preview";
+
+		@Override
+		public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, MeasurementIOConfigObject config)
+				throws Exception {
+			return null;
+		}
+
+		@Override
+		public InputStream getInputStream(IOurl url) throws Exception {
+			return null;
+		}
+
+		@Override
+		public String getPrefix() {
+			return PREFIX;
+		}
+	}
+
+	public MeasurementIOHandler[] getHandlers() {
+		return new MeasurementIOHandler[] { new MongoDB.MongoDBhandler(), new MongoDB.MongoDBpreviewHandler() };
 	}
 
 	private String defaultDBE = "dbe3";
@@ -380,7 +401,7 @@ public class MongoDB {
 				inputFilePreview.save();
 				iud.closeStreams();
 			}
-			image.getURL().setPrefix(new MongoDB().getHandler().getPrefix());
+			image.getURL().setPrefix(MongoDBhandler.PREFIX);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}

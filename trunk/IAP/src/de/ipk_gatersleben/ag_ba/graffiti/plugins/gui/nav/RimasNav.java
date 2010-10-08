@@ -88,7 +88,7 @@ public class RimasNav {
 		rimasDoku.put("", "Lit. Reference:http://www.cell.com/trends/plant-science/abstract/S1360-1385(10)00061-0");
 		NavigationGraphicalEntity rimas = WebFolder.getBrowserNavigationEntity(rimasDoku, "RIMAS", "img/rimas.png",
 				"http://rimas.ipk-gatersleben.de/Pathways/", "Website", "img/browser.png",
-				"http://rimas.ipk-gatersleben.de/", new String[] { ".gml", ".graphml" }, getIntroTxt());
+				"http://rimas.ipk-gatersleben.de/", new String[] { ".gml", ".graphml" }, getIntroTxt(), null);
 		return rimas;
 	}
 

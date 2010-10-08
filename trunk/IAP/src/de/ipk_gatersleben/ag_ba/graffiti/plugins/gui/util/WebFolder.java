@@ -68,7 +68,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class WebFolder {
 	public static NavigationGraphicalEntity getBrowserNavigationEntity(final HashMap<String, String> folder2url,
 			String title, String icon, final String url, final String referenceTitle, final String referenceImage,
-			final String referenceURL, final String[] valid, final String introTxt) {
+			final String referenceURL, final String[] valid, final String introTxt, final String optSubFolderForFolderItems) {
 
 		NavigationGraphicalEntity nav = new NavigationGraphicalEntity(new AbstractNavigationAction(
 				"Open web-folder content") {
@@ -114,28 +114,39 @@ public class WebFolder {
 				}
 
 				if (folder2url != null && folder2url.containsKey("")) {
-					NavigationAction action = new AbstractNavigationAction("Open web-folder") {
-						@Override
-						public void performActionCalculateResults(NavigationGraphicalEntity src) {
-							AttributeHelper.showInBrowser(folder2url.get("").split(":", 2)[1]);
-						}
+					for (String fpp : folder2url.get("").split("\\^")) {
+						final String fp = fpp;
+						NavigationAction action = new AbstractNavigationAction("Open web-ressource") {
+							@Override
+							public void performActionCalculateResults(NavigationGraphicalEntity src) {
+								AttributeHelper.showInBrowser(fp.split(":", 2)[1]);
+							}
 
-						@Override
-						public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-								ArrayList<NavigationGraphicalEntity> currentSet) {
-							return null;
-						}
+							@Override
+							public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
+									ArrayList<NavigationGraphicalEntity> currentSet) {
+								return null;
+							}
 
-						@Override
-						public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-							return null;
-						}
-					};
+							@Override
+							public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+								return null;
+							}
+						};
 
-					NavigationGraphicalEntity website = new NavigationGraphicalEntity(action,
-							folder2url.get("").split(":")[0], "img/dataset.png");
-					website.setToolTipText("Open " + folder2url.get("").split(":", 2)[1]);
-					actions.add(website);
+						NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, fp.split(":")[0],
+								"img/dataset.png");
+						website.setToolTipText("Open " + folder2url.get("").split(":", 2)[1]);
+						actions.add(website);
+					}
+				}
+
+				NavigationAction subFolderAction = null;
+				if (optSubFolderForFolderItems != null && optSubFolderForFolderItems.length() > 0) {
+					subFolderAction = new EmptyNavigationAction(optSubFolderForFolderItems, "Show List of Web-Ressources",
+							"img/ext/folder.png", "img/ext/folder-drag-accept.png");
+					NavigationGraphicalEntity subFolder = new NavigationGraphicalEntity(subFolderAction);
+					actions.add(subFolder);
 				}
 
 				TreeSet<String> folders = new TreeSet<String>();
@@ -224,8 +235,12 @@ public class WebFolder {
 
 							return res;
 						}
-					}, f, "img/ext/folder.png");
-					actions.add(ne);
+					}, f, "img/ext/folder-remote-open.png", "img/ext/folder-remote.png");
+
+					if (subFolderAction != null)
+						subFolderAction.addAdditionalEntity(ne);
+					else
+						actions.add(ne);
 				}
 				return actions;
 			}
@@ -552,5 +567,29 @@ public class WebFolder {
 			s.setEnabled(false);
 			lbl.setText("Zoom (not supported)");
 		}
+	}
+
+	public static NavigationGraphicalEntity getURLentity(String title, final String referenceURL, String image) {
+		NavigationAction action = new AbstractNavigationAction("Show in browser") {
+			@Override
+			public void performActionCalculateResults(NavigationGraphicalEntity src) {
+				AttributeHelper.showInBrowser(referenceURL);
+			}
+
+			@Override
+			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
+					ArrayList<NavigationGraphicalEntity> currentSet) {
+				return null;
+			}
+
+			@Override
+			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+				return null;
+			}
+		};
+		NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, title, image);
+		website.setToolTipText("Open " + referenceURL);
+
+		return website;
 	}
 }

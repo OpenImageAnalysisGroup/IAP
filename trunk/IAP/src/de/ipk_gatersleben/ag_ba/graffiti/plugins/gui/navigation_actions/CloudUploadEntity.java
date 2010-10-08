@@ -25,7 +25,7 @@ public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 
 	@Override
 	public String getDefaultTooltip() {
-		return "Upload data set to DBE Cloud";
+		return "Upload data set to IAP Cloud";
 	}
 
 	@Override

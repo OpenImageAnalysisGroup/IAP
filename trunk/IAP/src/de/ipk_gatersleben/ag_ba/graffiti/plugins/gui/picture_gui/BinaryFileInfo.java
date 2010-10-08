@@ -11,6 +11,7 @@ package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.picture_gui;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 
 /**
  * @author klukas
@@ -18,11 +19,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
  */
 public class BinaryFileInfo {
 
-	private String fileName;
+	private IOurl fileName;
 	private final boolean primary;
 	private final MappingDataEntity entity;
 
-	public BinaryFileInfo(String fileName, boolean primary, MappingDataEntity entity) {
+	public BinaryFileInfo(IOurl fileName, boolean primary, MappingDataEntity entity) {
 		this.fileName = fileName;
 		this.primary = primary;
 		this.entity = entity;
@@ -32,7 +33,7 @@ public class BinaryFileInfo {
 		return ((BinaryMeasurement) entity).getURL().getDetail();
 	}
 
-	public String getFileName() {
+	public IOurl getFileName() {
 		return fileName;
 	}
 
@@ -44,7 +45,7 @@ public class BinaryFileInfo {
 		return entity;
 	}
 
-	public void setFileName(String fileName) {
+	public void setFileName(IOurl fileName) {
 		this.fileName = fileName;
 	}
 }

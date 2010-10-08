@@ -40,11 +40,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImageHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOHandler;
 
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -126,7 +127,8 @@ public class AIPmain extends JApplet {
 
 	private void registerIOhandlers() {
 		ExperimentIOManager.registerIOHandler(new LoadedImageHandler());
-		ExperimentIOManager.registerIOHandler(new MongoDB().getHandler());
+		for (MeasurementIOHandler handler : new MongoDB().getHandlers())
+			ExperimentIOManager.registerIOHandler(handler);
 	}
 
 	@SuppressWarnings("unchecked")
