@@ -13,6 +13,7 @@ import info.clearthought.layout.TableLayout;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -152,6 +153,16 @@ public class Other {
 			public void performActionCalculateResults(NavigationGraphicalEntity src) {
 				this.src = src;
 				infoset.clear();
+
+				checkServerAvailabilityByPing(infoset, "NW-04", "IAP (de) Cloud Database Master Server NW-04",
+						"nw-04.ipk-gatersleben.de");
+
+				checkServerAvailabilityByPing(infoset, "BA-13", "IAP (de) Cloud Analysis Server BA-13",
+						"ba-13.ipk-gatersleben.de");
+
+				checkServerAvailabilityByPing(infoset, "BA-24", "IAP (de) Cloud Analysis Compute Workstation BA-24",
+						"ba-24.ipk-gatersleben.de");
+
 				// try {
 				// infoset.put("dbe", new ArrayList<String>());
 				// infoset.get("dbe").add("<h2>DBE Web Service</h2><hr>");
@@ -249,6 +260,7 @@ public class Other {
 					}
 					bufferedReader.close();
 					infoset.get("vanted").add("<br><b>Status result check: OK</b>");
+
 				} catch (Exception e) {
 					if (e.toString().indexOf("Read timed out") >= 0)
 						infoset.get("vanted").add(
@@ -499,5 +511,30 @@ public class Other {
 			}
 		}
 		return res;
+	}
+
+	private static void checkServerAvailabilityByPing(HashMap<String, ArrayList<String>> infoset, String name,
+			String role, String host) {
+		infoset.put(name, new ArrayList<String>());
+		InetAddress address;
+		try {
+			address = InetAddress.getByName(host);
+			boolean reachable = address.isReachable(1000);
+			if (!reachable)
+				throw new Exception("Host is not reachable within time limit of one second.");
+			infoset.get(name).add("<h2>" + role + "</h2><hr><br>" + "" + "The " + role + " is powered on.");
+			infoset.get(name).add("<br><b>Status result check: OK</b>");
+
+		} catch (Exception e1) {
+			infoset.get(name).add(
+					"<h2>" + role + "</h2><hr><br>" + "" + "The " + role + " was not reachable within time limits.<br>"
+							+ "The cause may be internet connectivity problems or server side<br>"
+							+ "problems which may take some time to be corrected.<br><br>"
+							+ "The availability of this server is monitored automatically.<br>"
+							+ "Effort will be put on improving reliability of the service.<br>");
+			infoset.get(name).add("Error-Details: " + e1.toString());
+			infoset.get(name).add("<br><b>Status result check: ERROR</b>");
+
+		}
 	}
 }
