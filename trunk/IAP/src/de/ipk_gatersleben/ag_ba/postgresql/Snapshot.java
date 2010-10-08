@@ -2,6 +2,9 @@ package de.ipk_gatersleben.ag_ba.postgresql;
 
 import java.sql.Timestamp;
 
+/**
+ * @author entzian
+ */
 public class Snapshot {
 
 	private String creator, measurement_label, id_tag, camera_label, path_image, path_null_image;
@@ -9,11 +12,6 @@ public class Snapshot {
 	private double weight_before, weight_after;
 	private int water_amount;
 
-	Snapshot()
-	{
-		
-	}
-	
 	public void setCreator(String creator) {
 		this.creator = creator;
 	}
@@ -93,5 +91,4 @@ public class Snapshot {
 	public int getWater_amount() {
 		return water_amount;
 	}
-	
 }
