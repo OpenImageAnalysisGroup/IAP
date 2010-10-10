@@ -45,6 +45,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.Mongo;
+import com.mongodb.MongoOptions;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
@@ -193,8 +194,9 @@ public class MongoDB {
 			if (optHosts == null || optHosts.length() == 0)
 				m = new Mongo();
 			else {
-
-				m = new Mongo(optHosts);
+				MongoOptions mo = new MongoOptions();
+				mo.autoConnectRetry = true;
+				m = new Mongo(optHosts, mo);
 			}
 		}
 		db = m.getDB(dataBase);
@@ -334,8 +336,9 @@ public class MongoDB {
 		}
 
 		if (errorCount > 0) {
-			MainFrame.showMessageDialog("<html>" + "The following files cound not be properly processed:<ul>"
-					+ errors.toString() + "</ul> " + "", "Errors");
+			MainFrame.showMessageDialog(
+					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
+							+ "", "Errors");
 		}
 	}
 
