@@ -16,7 +16,7 @@ import rmi_server.task_management.CloundManagerNavigationAction;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk_gatersleben.ag_ba.mongo.MongoDB;
-import de.ipk_gatersleben.ag_ba.mongo.MongoExperimentNavigationAction;
+import de.ipk_gatersleben.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -225,9 +225,8 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	}
 
 	public static NavigationGraphicalEntity getMongoExperimentButton(ExperimentHeaderInterface ei) {
-		NavigationAction action = new MongoExperimentNavigationAction(ei);
-		NavigationGraphicalEntity exp = new NavigationGraphicalEntity(action, ei.getExperimentname(),
-				"img/ext/image-x-generic.png", "img/ext/image-x-generic-off.png");
+		NavigationAction action = new MongoOrLemnaTecExperimentNavigationAction(ei);
+		NavigationGraphicalEntity exp = new NavigationGraphicalEntity(action);
 		exp.setToolTipText("<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentname() + "</td></tr>"
 				+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
 				+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()

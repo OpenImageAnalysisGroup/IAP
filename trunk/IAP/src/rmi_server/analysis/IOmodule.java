@@ -25,7 +25,6 @@ import org.ErrorMsg;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
@@ -34,6 +33,7 @@ import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.picture_gui.MongoCollection
 import de.ipk_gatersleben.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_ba.mongo.RunnableOnDB;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.CubeSide;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
@@ -55,25 +55,26 @@ public class IOmodule {
 	}
 
 	public static LoadedImage loadImageFromFileOrMongo(ImageData id, String login, String pass) throws Exception {
-		LoadedImage result = null;
-		if (id.getURL().getFileName().contains(File.separator) && new File(id.getURL().getFileName()).exists()) {
-			BufferedImage image = ImageIO.read(new File(id.getURL().getFileName()));
-			result = new LoadedImage(id, image);
-			result.setSourceFile(new File(id.getURL().getFileName()));
-		} else {
-			BufferedImage image = new MongoDB().getImage(login, pass, id.getURL().getDetail());
-			if (image == null) {
-				System.out.println("Not found: " + id.getURL().toString());
-				try {
-					// blo = CallDBE2WebService.getBlob(login, pass, id.getMD5());
-					// image = ImageIO.read(blo.getBinaryStream());
-				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
-					return null;
-				}
-			}
-			result = new LoadedImage(id, image);
-		}
+		// BufferedImage image = ImageIO.read(new
+		// File(id.getURL().getFileName()));
+		BufferedImage image = ImageIO.read(ExperimentIOManager.getInputStream(id.getURL()));
+		LoadedImage result = new LoadedImage(id, image);
+		// result.setSourceFile(new File(id.getURL().getFileName()));
+		// } else {
+		// BufferedImage image = new MongoDB().getImage(login, pass,
+		// id.getURL().getDetail());
+		// if (image == null) {
+		// System.out.println("Not found: " + id.getURL().toString());
+		// try {
+		// // blo = CallDBE2WebService.getBlob(login, pass, id.getMD5());
+		// // image = ImageIO.read(blo.getBinaryStream());
+		// } catch (Exception e) {
+		// ErrorMsg.addErrorMessage(e);
+		// return null;
+		// }
+		// }
+		// result = new LoadedImage(id, image);
+		// }
 
 		return result;
 	}

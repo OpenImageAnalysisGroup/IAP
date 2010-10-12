@@ -16,9 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.management.InstanceAlreadyExistsException;
@@ -31,6 +33,8 @@ import javax.management.ObjectName;
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.HomeFolder;
+import org.ObjectRef;
 import org.bson.types.ObjectId;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -45,7 +49,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.Mongo;
-import com.mongodb.MongoOptions;
+import com.mongodb.ServerAddress;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
@@ -60,6 +64,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverage;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
@@ -69,6 +74,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOConfigObject;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayInputStream;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NetworkData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
@@ -81,29 +88,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.loaders.MeasurementNodeType;
  */
 public class MongoDB {
 
-	public class MongoDBhandler implements MeasurementIOHandler {
-
-		public static final String PREFIX = "mongo";
-
-		@Override
-		public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, MeasurementIOConfigObject config)
-				throws Exception {
-			return null;
-		}
-
-		@Override
-		public InputStream getInputStream(IOurl url) throws Exception {
-			return null;
-		}
-
-		@Override
-		public String getPrefix() {
-			return PREFIX;
-		}
-	}
-
 	public class MongoDBpreviewHandler implements MeasurementIOHandler {
-
+		// mongo-preview://c3fd77bc7b74388d9dcff9d09d1c16fc/000Grad.png
 		public static final String PREFIX = "mongo-preview";
 
 		@Override
@@ -113,8 +99,32 @@ public class MongoDB {
 		}
 
 		@Override
-		public InputStream getInputStream(IOurl url) throws Exception {
-			return null;
+		public InputStream getInputStream(final IOurl url) throws Exception {
+			final ObjectRef or = new ObjectRef();
+
+			processDB(new RunnableOnDB() {
+				private DB db;
+
+				@Override
+				public void run() {
+					GridFS gridfs_preview_images = new GridFS(db, "preview_files");
+					GridFSDBFile fff = gridfs_preview_images.findOne(url.getDetail());
+					if (fff != null) {
+						try {
+							InputStream is = fff.getInputStream();
+							or.setObject(is);
+						} catch (Exception e) {
+							ErrorMsg.addErrorMessage(e);
+						}
+					}
+				}
+
+				@Override
+				public void setDB(DB db) {
+					this.db = db;
+				}
+			});
+			return (InputStream) or.getObject();
 		}
 
 		@Override
@@ -124,11 +134,11 @@ public class MongoDB {
 	}
 
 	public MeasurementIOHandler[] getHandlers() {
-		return new MeasurementIOHandler[] { new MongoDB.MongoDBhandler(), new MongoDB.MongoDBpreviewHandler() };
+		return new MeasurementIOHandler[] { new MongoDBhandler(), new MongoDB.MongoDBpreviewHandler() };
 	}
 
 	private String defaultDBE = "dbe3";
-	private String defaultHost = "nw-04.ipk-gatersleben.de";
+	private String defaultHost = "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
 	private String defaultLogin = null;
 	private String defaultPass = null;
 
@@ -194,9 +204,10 @@ public class MongoDB {
 			if (optHosts == null || optHosts.length() == 0)
 				m = new Mongo();
 			else {
-				MongoOptions mo = new MongoOptions();
-				mo.autoConnectRetry = true;
-				m = new Mongo(optHosts, mo);
+				List<ServerAddress> seeds = new ArrayList<ServerAddress>();
+				for (String h : optHosts.split(","))
+					seeds.add(new ServerAddress(h));
+				m = new Mongo(seeds);
 			}
 		}
 		db = m.getDB(dataBase);
@@ -216,7 +227,12 @@ public class MongoDB {
 
 	private void storeExperiment(ExperimentInterface experiment, DB db,
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
+
+		experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
+
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
+
+		ObjectRef overallFileSize = new ObjectRef();
 
 		DBCollection substances = db.getCollection("substances");
 
@@ -228,6 +244,8 @@ public class MongoDB {
 		List<DBObject> dbSubstances = new ArrayList<DBObject>();
 		ArrayList<String> substanceIDs = new ArrayList<String>();
 		for (SubstanceInterface s : experiment) {
+			if (status.wantsToStop())
+				break;
 			attributes.clear();
 			s.fillAttributeMap(attributes);
 			BasicDBObject substance = new BasicDBObject(filter(attributes));
@@ -236,6 +254,8 @@ public class MongoDB {
 			List<BasicDBObject> dbConditions = new ArrayList<BasicDBObject>();
 
 			for (ConditionInterface c : s) {
+				if (status.wantsToStop())
+					break;
 				attributes.clear();
 				c.fillAttributeMap(attributes);
 				BasicDBObject condition = new BasicDBObject(filter(attributes));
@@ -243,6 +263,8 @@ public class MongoDB {
 
 				List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
 				for (SampleInterface sa : c) {
+					if (status.wantsToStop())
+						break;
 					attributes.clear();
 					sa.fillAttributeMap(attributes);
 					BasicDBObject sample = new BasicDBObject(filter(attributes));
@@ -269,13 +291,10 @@ public class MongoDB {
 						for (NumericMeasurementInterface m : s3.getBinaryMeasurements()) {
 							if (m instanceof ImageData) {
 								attributes.clear();
-								m.fillAttributeMap(attributes);
-								BasicDBObject image = new BasicDBObject(filter(attributes));
-								dbImages.add(image);
 								ImageData id = (ImageData) m;
 								DatabaseStorageResult res;
 								try {
-									res = storeImageFile(db, id);
+									res = storeImageFile(db, id, overallFileSize);
 								} catch (Exception e) {
 									ErrorMsg.addErrorMessage(e);
 									res = DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
@@ -284,6 +303,12 @@ public class MongoDB {
 									errorCount++;
 									errors.append("<li>" + id.getURL().getFileName());
 								}
+								if (status != null) {
+									status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res.toString());
+								}
+								m.fillAttributeMap(attributes);
+								BasicDBObject image = new BasicDBObject(filter(attributes));
+								dbImages.add(image);
 								count++;
 							}
 							if (m instanceof VolumeData) {
@@ -296,13 +321,12 @@ public class MongoDB {
 								if (vd instanceof LoadedVolume)
 									vud = IOmodule.getThreeDvolumeInputStream((LoadedVolume) vd);
 
-								storeVolumeFile(db, vd, vud);
+								storeVolumeFile(db, vd, vud, overallFileSize);
 								count++;
 							}
 							double prog = count * (100d / numberOfBinaryData);
 							if (status != null) {
 								status.setCurrentStatusValueFine(prog);
-								status.setCurrentStatusText1("Stored File " + count + "/" + numberOfBinaryData);
 							}
 						} // binary measurement
 					}
@@ -318,27 +342,30 @@ public class MongoDB {
 			substance.put("conditions", dbConditions);
 		} // substance
 
-		substances.insert(dbSubstances);
+		if (!status.wantsToStop()) {
+			substances.insert(dbSubstances);
 
-		for (DBObject substance : dbSubstances)
-			substanceIDs.add(((BasicDBObject) substance).getString("_id"));
+			for (DBObject substance : dbSubstances)
+				substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 
-		experiment.fillAttributeMap(attributes);
-		BasicDBObject dbExperiment = new BasicDBObject(attributes);
-		dbExperiment.put("substance_ids", substanceIDs);
+			experiment.getHeader().setSizekb(overallFileSize.getLong() / 1024 + "");
 
-		DBCollection experiments = db.getCollection("experiments");
+			experiment.fillAttributeMap(attributes);
+			BasicDBObject dbExperiment = new BasicDBObject(attributes);
+			dbExperiment.put("substance_ids", substanceIDs);
 
-		experiments.insert(dbExperiment);
-		String id = dbExperiment.get("_id").toString();
-		for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
-			eh.setExcelfileid(id);
-		}
+			DBCollection experiments = db.getCollection("experiments");
 
-		if (errorCount > 0) {
-			MainFrame.showMessageDialog(
-					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
-							+ "", "Errors");
+			experiments.insert(dbExperiment);
+			String id = dbExperiment.get("_id").toString();
+			for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
+				eh.setExcelfileid(id);
+			}
+
+			if (errorCount > 0) {
+				MainFrame.showMessageDialog("<html>" + "The following files cound not be properly processed:<ul>"
+						+ errors.toString() + "</ul> " + "", "Errors");
+			}
 		}
 	}
 
@@ -369,8 +396,8 @@ public class MongoDB {
 		return file.length();
 	}
 
-	public long saveImageFile(GridFS gridfs_images, GridFS gridfs_preview_files, ImageData image, ImageUploadData optIUD)
-			throws IOException {
+	public long saveImageFile(GridFS gridfs_images, GridFS gridfs_preview_files, ImageData image,
+			ImageUploadData optIUD, String md5) throws IOException {
 		long result = -1;
 		ImageUploadData iud = null;
 
@@ -390,7 +417,6 @@ public class MongoDB {
 				System.out.println("Inputstream-lenght: " + iud.getLength());
 				inputFile = gridfs_images.createFile(iud.getInputStream());
 			}
-			String md5 = image.getURL().getDetail();
 
 			inputFile.setFilename(md5);
 			inputFile.save();
@@ -404,7 +430,6 @@ public class MongoDB {
 				inputFilePreview.save();
 				iud.closeStreams();
 			}
-			image.getURL().setPrefix(MongoDBhandler.PREFIX);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
@@ -413,11 +438,11 @@ public class MongoDB {
 	}
 
 	private long saveVolumeFile(GridFS gridfs_volumes, GridFS gridfs_preview, VolumeData volume,
-			VolumeUploadData threeDvolumeInputStream) throws Exception {
+			VolumeUploadData threeDvolumeInputStream, ObjectRef optFileSize) throws Exception {
 		LoadedVolume id = (LoadedVolume) volume;
 		VolumeUploadData vud = IOmodule.getThreeDvolumeInputStream(id);
 		InputStream is = vud.getStream();
-		String md5 = AttributeHelper.getMD5fromInputStream(is);
+		String md5 = AttributeHelper.getMD5fromInputStream(is, optFileSize);
 		is = vud.getStream();
 		GridFSInputFile inputFile = gridfs_volumes.createFile(is);
 		inputFile.setFilename(md5);
@@ -436,22 +461,30 @@ public class MongoDB {
 		return threeDvolumeInputStream.getLength();
 	}
 
-	public DatabaseStorageResult storeImageFile(DB db, ImageData id) throws Exception {
+	public DatabaseStorageResult storeImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
 		InputStream is;
 		ImageUploadData iud = null;
+		ImageData srcID = id;
 		if (id instanceof LoadedImage) {
 			LoadedImage li = (LoadedImage) id;
 			iud = li.getImageUploadData();
 			is = iud.getInputStream();
 		} else {
-			is = ExperimentIOManager.getInputStream(id.getURL());
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			HomeFolder.copyContent(ExperimentIOManager.getInputStream(id.getURL()), bos);
+			is = new MyByteArrayInputStream(bos.toByteArray());
+			BufferedImage image = ImageIO.read(is);
+			is = new MyByteArrayInputStream(((MyByteArrayInputStream) is).getBuff());
+			LoadedImage li = new LoadedImage(id, image);
+			id = li;
 		}
 		if (is == null) {
 			System.out.println("No input stream for source-URL: " + id.getURL());
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
-		String md5 = AttributeHelper.getMD5fromInputStream(is);
-		id.getURL().setDetail(md5);
+		String md5 = AttributeHelper.getMD5fromInputStream(is, fileSize);
+		if (is instanceof MyByteArrayInputStream)
+			is = new MyByteArrayInputStream(((MyByteArrayInputStream) is).getBuff());
 		GridFS gridfs_images = new GridFS(db, "images");
 		DBCollection collectionA = db.getCollection("images.files");
 		collectionA.ensureIndex("filename");
@@ -459,6 +492,10 @@ public class MongoDB {
 		DBCollection collectionB = db.getCollection("preview_files.files");
 		collectionB.ensureIndex("filename");
 		GridFSDBFile fff = gridfs_images.findOne(md5);
+
+		srcID.getURL().setPrefix(MongoDBhandler.PREFIX);
+		srcID.getURL().setDetail(md5);
+
 		if (fff != null && fff.getLength() <= 0) {
 			System.out.println("Found Zero-Size File.");
 			gridfs_images.remove(fff);
@@ -467,7 +504,7 @@ public class MongoDB {
 		if (fff != null) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
-			long res = saveImageFile(gridfs_images, gridfs_preview_files, id, iud);
+			long res = saveImageFile(gridfs_images, gridfs_preview_files, id, iud, md5);
 			if (res >= 0) {
 				return DatabaseStorageResult.STORED_IN_DB;
 			} else
@@ -475,7 +512,8 @@ public class MongoDB {
 		}
 	}
 
-	public DatabaseStorageResult storeVolumeFile(DB db, VolumeData volume, VolumeUploadData threeDvolumeInputStream) {
+	public DatabaseStorageResult storeVolumeFile(DB db, VolumeData volume, VolumeUploadData threeDvolumeInputStream,
+			ObjectRef optFileSize) {
 		GridFS gridfs_volumes = new GridFS(db, "volumes");
 		DBCollection collectionA = db.getCollection("volumes.files");
 		collectionA.ensureIndex("filename");
@@ -493,7 +531,7 @@ public class MongoDB {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
 			try {
-				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, threeDvolumeInputStream);
+				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, threeDvolumeInputStream, optFileSize);
 				return DatabaseStorageResult.STORED_IN_DB;
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
@@ -650,7 +688,14 @@ public class MongoDB {
 												if (imgList != null) {
 													for (Object m : imgList) {
 														DBObject img = (DBObject) m;
-														ImageData image = new ImageData(sample, img.toMap());
+														Map<Object, Object> map = img.toMap();
+														String fn = (String) map.get("filename");
+														String md5 = (String) map.get("md5sum");
+														if (md5 != null && fn != null) {
+															map.put("filename", "mongo://" + md5 + "/" + fn);
+														}
+
+														ImageData image = new ImageData(sample, map);
 														sample.add(image);
 													}
 												}
@@ -670,6 +715,14 @@ public class MongoDB {
 						}
 					}
 					experiment.setHeader(header);
+
+					int numberOfImagesAndVolumes = countMeasurementValues(experiment, new MeasurementNodeType[] {
+							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
+					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
+
+					if (numberOfImagesAndVolumes > 0) {
+						updateExperimentSize(db, experiment);
+					}
 				}
 
 				@Override
@@ -741,36 +794,84 @@ public class MongoDB {
 			throw new Exception("Experiment with ID " + header.getExcelfileid() + " not found!");
 	}
 
-	public BufferedImage getImage(String login, String pass, final String md5) {
-		final ThreadSafeOptions tso = new ThreadSafeOptions();
+	private void updateExperimentSize(DB db, ExperimentInterface experiment) {
+		boolean recalcSize = false;
 		try {
-			processDB(new RunnableOnDB() {
-				private DB db;
-
-				@Override
-				public void run() {
-					BufferedImage result = null;
-					GridFS gridfs_images = new GridFS(db, "images");
-					GridFSDBFile fff = gridfs_images.findOne(md5);
-					if (fff != null) {
-						try {
-							result = ImageIO.read(fff.getInputStream());
-						} catch (IOException e) {
-							ErrorMsg.addErrorMessage(e);
+			String sz = experiment.getHeader().getSizekb();
+			double szd = Double.parseDouble(sz);
+			if (szd <= 0) {
+				recalcSize = true;
+			}
+		} catch (Exception e) {
+			recalcSize = true;
+		}
+		if (recalcSize) {
+			try {
+				ObjectRef newSize = new ObjectRef();
+				newSize.addLong(0);
+				for (NumericMeasurementInterface nmd : Substance3D.getAllFiles(experiment)) {
+					IOurl url = null;
+					if (nmd instanceof ImageData) {
+						url = ((ImageData) nmd).getURL();
+					} else if (nmd instanceof VolumeData) {
+						url = ((VolumeData) nmd).getURL();
+					} else if (nmd instanceof NetworkData) {
+						url = ((NetworkData) nmd).getURL();
+					}
+					if (url != null) {
+						String md5 = url.getDetail();
+						Collection<String> gridFSnames = new ArrayList<String>();
+						gridFSnames.add("preview_files");
+						gridFSnames.add("volumes");
+						gridFSnames.add("images");
+						gridFSnames.add("annotations");
+						for (String s : gridFSnames) {
+							GridFS gridfs = new GridFS(db, s);
+							GridFSDBFile file = gridfs.findOne(md5);
+							if (file != null) {
+								newSize.addLong(file.getLength());
+							}
 						}
 					}
-					tso.setParam(0, result);
 				}
-
-				@Override
-				public void setDB(DB db) {
-					this.db = db;
-				}
-			});
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-			return null;
+				experiment.getHeader().setSizekb(newSize.getLong() / 1024 + "");
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+			}
 		}
-		return (BufferedImage) tso.getParam(0, null);
 	}
+
+	// public BufferedImage getImage(String login, String pass, final String md5)
+	// {
+	// final ThreadSafeOptions tso = new ThreadSafeOptions();
+	// try {
+	// processDB(new RunnableOnDB() {
+	// private DB db;
+	//
+	// @Override
+	// public void run() {
+	// BufferedImage result = null;
+	// GridFS gridfs_images = new GridFS(db, "images");
+	// GridFSDBFile fff = gridfs_images.findOne(md5);
+	// if (fff != null) {
+	// try {
+	// result = ImageIO.read(fff.getInputStream());
+	// } catch (IOException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// }
+	// }
+	// tso.setParam(0, result);
+	// }
+	//
+	// @Override
+	// public void setDB(DB db) {
+	// this.db = db;
+	// }
+	// });
+	// } catch (Exception e) {
+	// ErrorMsg.addErrorMessage(e);
+	// return null;
+	// }
+	// return (BufferedImage) tso.getParam(0, null);
+	// }
 }

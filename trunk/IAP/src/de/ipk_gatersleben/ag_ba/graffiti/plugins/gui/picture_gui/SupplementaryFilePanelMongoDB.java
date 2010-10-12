@@ -244,7 +244,8 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	}
 
 	public void setTitle(String message) {
-		currentFilePanel.setHeader(currentFilePanel.getIsButtonEnabled(), "<code>"
-				+ StringManipulationTools.UnicodeToHtml(message), currentFilePanel.getIsWarningDisplayed(), false);
+		if (currentFilePanel != null)
+			currentFilePanel.setHeader(currentFilePanel.getIsButtonEnabled(), "<code>"
+					+ StringManipulationTools.UnicodeToHtml(message), currentFilePanel.getIsWarningDisplayed(), false);
 	}
 }

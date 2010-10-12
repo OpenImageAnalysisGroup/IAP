@@ -92,11 +92,12 @@ public class MyImageIcon extends ImageIcon {
 				}
 
 			}
-
-			int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
-			double factor = 128 / maxS;
-			i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
-			setImage(i);
+			if (i != null) {
+				int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
+				double factor = 128 / maxS;
+				i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
+				setImage(i);
+			}
 		}
 	}
 

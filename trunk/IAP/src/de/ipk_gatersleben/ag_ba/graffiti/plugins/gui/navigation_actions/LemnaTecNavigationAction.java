@@ -10,10 +10,12 @@ package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeMap;
 
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk_gatersleben.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
@@ -22,6 +24,8 @@ import de.ipk_gatersleben.ag_ba.postgresql.LemnaTecDataExchange;
 public class LemnaTecNavigationAction extends AbstractNavigationAction implements NavigationAction {
 
 	private NavigationGraphicalEntity src;
+	private String login;
+	private String pass;
 
 	public LemnaTecNavigationAction() {
 		super("Access LemnaTec-DB");
@@ -39,17 +43,28 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
 		try {
 			result.add(new NavigationGraphicalEntity(new LemnaTecUserNavigationAction()));
+
+			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
+			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
+			allExperiments.get("").put("", new ArrayList<ExperimentHeaderInterface>());
 			for (String db : new LemnaTecDataExchange().getDatabases()) {
 				try {
-					Collection<String> experiments = new LemnaTecDataExchange().getExperimentInDatabase(db);
+					Collection<ExperimentHeaderInterface> experiments = new LemnaTecDataExchange()
+							.getExperimentInDatabase(db);
 					if (experiments.size() > 0)
 						result.add(new NavigationGraphicalEntity(new LemnaDbAction(db, experiments)));
 					else
 						System.out.println("Database " + db + " is empty.");
+					for (ExperimentHeaderInterface ehi : experiments) {
+						allExperiments.get("").get("").add(ehi);
+					}
+
 				} catch (Exception e) {
 					System.out.println("Database " + db + " could not be processed.");
 				}
 			}
+			result.add(1, Other.getCalendarEntity(allExperiments, login, pass));
+
 		} catch (Exception e) {
 			// error
 		}

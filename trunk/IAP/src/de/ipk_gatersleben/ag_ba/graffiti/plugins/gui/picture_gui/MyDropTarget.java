@@ -169,8 +169,8 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 	}
 
 	public void addImageToDatabase(final File file, final boolean deleteUponCompletion) {
-		final JMyPC2DBEbutton imageButton = new JMyPC2DBEbutton(user, pass, targetTreeNode,
-				"<html><body><b>" + JMyPC2DBEbutton.getMaxString(file.getName()) + //$NON-NLS-1$
+		final DataSetFileButton imageButton = new DataSetFileButton(user, pass, targetTreeNode,
+				"<html><body><b>" + DataSetFileButton.getMaxString(file.getName()) + //$NON-NLS-1$
 						"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null); //$NON-NLS-1$//$NON-NLS-2$
 		imageButton.setProgressValue(-1);
 		imageButton.showProgressbar();
@@ -188,7 +188,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 				BinaryFileInfo bif = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode
 						.getTargetEntity());
 				try {
-					iconA = new MyImageIcon(panel.getParent(), JMyPC2DBEbutton.ICON_WIDTH, JMyPC2DBEbutton.ICON_HEIGHT,
+					iconA = new MyImageIcon(panel.getParent(), DataSetFileButton.ICON_WIDTH, DataSetFileButton.ICON_HEIGHT,
 							FileSystemHandler.getURL(file), bif);
 				} catch (MalformedURLException e) {
 					SupplementaryFilePanelMongoDB.showError("Malformed URL Exception.", e);
@@ -202,7 +202,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 						imageButton.updateLayout(imageButton.mmlbl.getText(), icon, icon);
 					}
 				});
-				if (JMyPC2DBEbutton.getMaxString(file.getName()).endsWith("..."))
+				if (DataSetFileButton.getMaxString(file.getName()).endsWith("..."))
 					imageButton.setToolTipText(file.getName());
 
 				if (file.canRead()) {

@@ -22,6 +22,7 @@ import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.Trash;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.MyExperimentInfoPanel;
+import de.ipk_gatersleben.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
@@ -30,13 +31,14 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
  * @author klukas
  * 
  */
-public class MongoExperimentNavigationAction extends AbstractNavigationAction {
+public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigationAction {
 	private final ExperimentHeaderInterface header;
 	private NavigationGraphicalEntity src;
 	private ExperimentInterface experiment;
 
-	public MongoExperimentNavigationAction(ExperimentHeaderInterface ei) {
-		super("Access Systems Biology Cloud Data Set");
+	public MongoOrLemnaTecExperimentNavigationAction(ExperimentHeaderInterface ei) {
+		super(ei.getExcelfileid().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
+				: "Access Systems Biology Cloud Data Set");
 		header = ei;
 	}
 
@@ -46,7 +48,7 @@ public class MongoExperimentNavigationAction extends AbstractNavigationAction {
 		// actions.add(FileManager.getFileManagerEntity(login, pass,
 		// ei.experimentName));
 
-		if (header != null
+		if (header != null && !header.getExcelfileid().startsWith("lemnatec:")
 				&& (header.getImportusername() == null || header.getImportusername().equals(SystemAnalysis.getUserName()))) {
 			if (header.inTrash()) {
 				actions.add(Trash.getTrashEntity(header, DeletionCommand.UNTRASH));
@@ -68,6 +70,8 @@ public class MongoExperimentNavigationAction extends AbstractNavigationAction {
 
 	public static void getDefaultActions(ArrayList<NavigationGraphicalEntity> actions, ExperimentInterface experiment,
 			ExperimentHeaderInterface header, boolean imageAnalysis) {
+		if (experiment == null)
+			return;
 		try {
 			if (imageAnalysis)
 				for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
@@ -95,17 +99,26 @@ public class MongoExperimentNavigationAction extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
 		this.src = src;
-		experiment = new MongoDB().getExperiment(header);
+		if (header.getExcelfileid().startsWith("lemnatec:"))
+			experiment = new LemnaTecDataExchange().getExperiment(header);
+		else
+			experiment = new MongoDB().getExperiment(header);
 	}
 
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/image-x-generic-off.png";
+		if (header.getExcelfileid().startsWith("lemnatec:"))
+			return "img/000Grad_3-gray.png";
+		else
+			return "img/ext/image-x-generic-off.png";
 	}
 
 	@Override
 	public String getDefaultNavigationImage() {
-		return "img/ext/image-x-generic.png";
+		if (header.getExcelfileid().startsWith("lemnatec:"))
+			return "img/000Grad_3.png";
+		else
+			return "img/ext/image-x-generic.png";
 	}
 
 	@Override

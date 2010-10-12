@@ -26,7 +26,7 @@ import rmi_server.analysis.image_analysis_tasks.reconstruction3d.MyPicture;
 import rmi_server.analysis.image_analysis_tasks.reconstruction3d.TransparencyAnalysis;
 import rmi_server.databases.DBTable;
 import rmi_server.databases.DatabaseTarget;
-import de.ipk_gatersleben.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_ba.mongo.MongoDBhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -184,7 +184,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 									.getLength(), md5);
 
 							VolumeData volumeInDatabase = new VolumeData(s3d, volume);
-							volumeInDatabase.getURL().setPrefix(MongoDB.MongoDBhandler.PREFIX);
+							volumeInDatabase.getURL().setPrefix(MongoDBhandler.PREFIX);
 							output.add(volumeInDatabase);
 						} catch (Exception e) {
 							LoadedVolume v = new LoadedVolume(s3d, null);

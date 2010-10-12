@@ -46,7 +46,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 
 			public void run() {
 				try {
-					DatabaseStorageResult dsr = new MongoDB().storeImageFile(db, limg);
+					DatabaseStorageResult dsr = new MongoDB().storeImageFile(db, limg, null);
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
@@ -84,7 +84,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			private DB db;
 
 			public void run() {
-				new MongoDB().storeVolumeFile(db, volume, threeDvolumeInputStream);
+				new MongoDB().storeVolumeFile(db, volume, threeDvolumeInputStream, null);
 			}
 
 			public void setDB(DB db) {

@@ -13,7 +13,18 @@ package de.ipk_gatersleben.ag_ba.mongo;
  * @author klukas
  */
 public enum DatabaseStorageResult {
-	EXISITING_NO_STORAGE_NEEDED, IO_ERROR_SEE_ERRORMSG, STORED_IN_DB;
+	EXISITING_NO_STORAGE_NEEDED("known"), IO_ERROR_SEE_ERRORMSG("I/O error"), STORED_IN_DB("stored");
+
+	private String desc;
+
+	DatabaseStorageResult(String desc) {
+		this.desc = desc;
+	}
+
+	@Override
+	public String toString() {
+		return desc;
+	}
 
 	private String md5;
 

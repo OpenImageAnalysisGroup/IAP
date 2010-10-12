@@ -90,7 +90,7 @@ public class ExperimentInfo {
 		this.coordinator = header.getCoordinator();
 		this.excelFileMd5 = "";
 		try {
-			this.fileCount = header.getImagefiles();
+			this.fileCount = header.getNumberOfFiles();
 		} catch (Exception e) {
 			this.fileCount = 0;
 		}

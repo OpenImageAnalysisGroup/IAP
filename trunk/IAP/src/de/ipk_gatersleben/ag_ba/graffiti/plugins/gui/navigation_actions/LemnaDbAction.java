@@ -14,6 +14,7 @@ import java.util.Collection;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk_gatersleben.ag_ba.postgresql.LemnaExperimentNavigationAction;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
@@ -23,9 +24,9 @@ public class LemnaDbAction extends AbstractNavigationAction implements Navigatio
 
 	private NavigationGraphicalEntity src;
 	private final String db;
-	private final Collection<String> experiments;
+	private final Collection<ExperimentHeaderInterface> experiments;
 
-	public LemnaDbAction(String db, Collection<String> experiments) {
+	public LemnaDbAction(String db, Collection<ExperimentHeaderInterface> experiments) {
 		super("Open LemnaTec-DB " + db);
 		this.db = db;
 		this.experiments = experiments;
@@ -34,8 +35,8 @@ public class LemnaDbAction extends AbstractNavigationAction implements Navigatio
 	@Override
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
-		for (String experiment : experiments) {
-			result.add(new NavigationGraphicalEntity(new LemnaExperimentNavigationAction(db, experiment)));
+		for (ExperimentHeaderInterface experiment : experiments) {
+			result.add(new NavigationGraphicalEntity(new LemnaExperimentNavigationAction(experiment)));
 		}
 		return result;
 	}

@@ -21,6 +21,7 @@ import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk_gatersleben.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_ba.postgresql.Snapshot;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
@@ -33,7 +34,7 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 	}
 
 	private NavigationGraphicalEntity src;
-	private final TreeMap<String, TreeSet<String>> userName2dbAndExperiment = new TreeMap<String, TreeSet<String>>();
+	private final TreeMap<String, TreeSet<ExperimentHeaderInterface>> userName2dbAndExperiment = new TreeMap<String, TreeSet<ExperimentHeaderInterface>>();
 
 	private String message = "";
 
@@ -74,13 +75,14 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 		for (String db : dbs) {
 			boolean set = false;
 			try {
-				for (String experiment : new LemnaTecDataExchange().getExperimentInDatabase(db)) {
+				for (ExperimentHeaderInterface experiment : new LemnaTecDataExchange().getExperimentInDatabase(db)) {
 					if (!set) {
 						status.setCurrentStatusText1(db);
 						set = true;
 					}
-					String id = db + ":" + experiment;
-					for (Snapshot s : new LemnaTecDataExchange().getSnapshotsOfExperiment(db, experiment)) {
+					String id = experiment.getDatabase() + ":" + experiment.getExperimentname();
+					for (Snapshot s : new LemnaTecDataExchange().getSnapshotsOfExperiment(experiment.getDatabase(),
+							experiment.getExperimentname())) {
 						String c = s.getCreator();
 						if (c.length() == 0)
 							continue;
@@ -89,14 +91,16 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 							c = c.substring(0, 1).toUpperCase() + c.substring(1);
 						}
 						if (!userName2dbAndExperiment.containsKey(c)) {
-							userName2dbAndExperiment.put(c, new TreeSet<String>());
+							userName2dbAndExperiment.put(c, new TreeSet<ExperimentHeaderInterface>());
 						}
-						userName2dbAndExperiment.get(c).add(id);
+						userName2dbAndExperiment.get(c).add(experiment);
 						experimentNames.add(id);
 						snapshots++;
 					}
 				}
 			} catch (Exception e) {
+				System.out.println("Database " + db + " problem: " + e.getMessage());
+				e.printStackTrace();
 				// empty
 				errorList.add(db);
 				error++;
@@ -116,11 +120,8 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 				+ "</large>"
 				+ "<li>Snapshots: "
 				+ snapshots
-				+ "<li>Empty databases: "
-				+ error
-				+ " ("
-				+ StringManipulationTools.getStringList(errorList, ", ")
-				+ ")"
+				+ (error > 0 ? "<li>Empty databases: " + error + " ("
+						+ StringManipulationTools.getStringList(errorList, ", ") + ")" : "")
 				+ "</ul>"
 				+ "<br>Remark: Multiple users may contribute data to a single experiment. This depends on which user is logged-in into a LemnaTec PC, while imaging takes place.<br><br>"
 				+ "Complete list of snapshot-creators (" + usersUnformatted.size() + ", unformatted): "
