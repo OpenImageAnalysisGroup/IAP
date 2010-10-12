@@ -1,19 +1,3 @@
-/*******************************************************************************
- * The DBE2 Add-on is (c) 2009-2010 Plant Bioinformatics Group, IPK Gatersleben,
- * http://bioinformatics.ipk-gatersleben.de
- * 
- * The source code for this project which is developed by our group is available
- * under the GPL license v2.0 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
- * By using this Add-on and VANTED you need to accept the terms and conditions of
- * this license, the below stated disclaimer of warranties and the licenses of the used
- * libraries. For further details see license.txt in the root folder of this project.
- ******************************************************************************/
-/*
- * Created on 25.02.2004
- *
- * To change the template for this generated file go to
- * Window>Preferences>Java>Code Generation>Code and Comments
- */
 package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.picture_gui;
 
 import info.clearthought.layout.TableLayout;
@@ -31,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Stack;
 
@@ -53,6 +38,7 @@ import javax.swing.SwingUtilities;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
+import org.HomeFolder;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.session.EditorSession;
 
@@ -68,7 +54,7 @@ import de.ipk_gatersleben.ag_pbi.vanted3d.views.ThreeDview;
 /**
  * @author Christian Klukas
  */
-public class JMyPC2DBEbutton extends JButton implements ActionListener {
+public class DataSetFileButton extends JButton implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	protected static final int ICON_HEIGHT = 128;
 	protected static final int ICON_WIDTH = 128;
@@ -110,12 +96,14 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 	// this.pass = pass;
 	// }
 
-	public JMyPC2DBEbutton(String user, String pass, MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
+	public DataSetFileButton(String user, String pass, MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
 			ImageIcon previewImage) {
 		super();
 
 		progress = new JProgressBar(0, 100);
 		progress.setValue(-1);
+
+		progress.setVisible(false);
 
 		updateLayout(label, icon, previewImage);
 
@@ -141,7 +129,8 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 
 		double[][] size = {
 				{ border, TableLayout.FILL, border }, // Columns
-				{ border, JMyPC2DBEbutton.ICON_HEIGHT, border, TableLayout.PREFERRED, border, TableLayout.PREFERRED, border } }; // Rows
+				{ border, DataSetFileButton.ICON_HEIGHT, border, TableLayout.PREFERRED, border, TableLayout.PREFERRED,
+						border } }; // Rows
 
 		setLayout(new TableLayout(size));
 
@@ -151,18 +140,22 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 		add(ilbl, "1,1,c,c");
 
 		add(progress, "1,3,c,c");
-		mmlbl = new JLabel("<html><center>" + label);
-		mmlbl.setHorizontalAlignment(JLabel.CENTER);
+		if (label != null) {
+			mmlbl = new JLabel("<html><center>" + label);
+			mmlbl.setHorizontalAlignment(JLabel.CENTER);
+		}
 		add(mmlbl, "1,5,c,c");
 		myImage = icon;
 		validate();
 	}
 
-	public JMyPC2DBEbutton(String user, String pass, MongoTreeNode projectNode, ImageResult imageResult,
+	public DataSetFileButton(String user, String pass, MongoTreeNode projectNode, ImageResult imageResult,
 			ImageIcon previewImage, boolean readOnly) {
 		this(user, pass, projectNode, "<html><body><b>" + getMaxString(strip(imageResult.getFileName()))
 				+ "</b></body></html>", null, previewImage);
 		this.imageResult = imageResult;
+		if (imageResult == null)
+			System.out.println("Error: Image Reference Data is null!");
 		this.readOnly = readOnly;
 		if (getMaxString(imageResult.getFileName()).endsWith("..."))
 			setToolTipText(imageResult.getFileName());
@@ -204,7 +197,7 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 				tempItem.setEnabled(false);
 				myPopup.add(tempItem);
 
-				final JMyPC2DBEbutton thisInstance = this;
+				final DataSetFileButton thisInstance = this;
 				downloadNeeded = false;
 				setProgressValue(0);
 				showProgressbar();
@@ -222,15 +215,25 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 							return;
 						}
 
-						MappingDataEntity mde = targetTreeNode.getTargetEntity();
 						try {
-							VolumeData volume = (VolumeData) mde;
-							if (volume != null)
+							InputStream is = ExperimentIOManager.getInputStream(imageResult.getBinaryFileInfo().getFileName());
+							if (is == null)
+								System.out.println("Inputstream = null");
+							HomeFolder.copyFile(is, tf);
+						} catch (Exception e1) {
+							System.out.println("No valid input stream for "
+									+ imageResult.getBinaryFileInfo().getFileName().toString());
+
+							MappingDataEntity mde = targetTreeNode.getTargetEntity();
+							try {
+								VolumeData volume = (VolumeData) mde;
+								if (volume != null)
+									DataExchangeHelperForExperiments.downloadFile(user, pass, imageResult, tf, thisInstance,
+											MongoCollection.VOLUMES);
+							} catch (Exception e) {
 								DataExchangeHelperForExperiments.downloadFile(user, pass, imageResult, tf, thisInstance,
-										MongoCollection.VOLUMES);
-						} catch (Exception e) {
-							DataExchangeHelperForExperiments.downloadFile(user, pass, imageResult, tf, thisInstance,
-									MongoCollection.IMAGES);
+										MongoCollection.IMAGES);
+							}
 						}
 
 						if (tf != null) {
@@ -238,8 +241,8 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 							SwingUtilities.invokeLater(new Runnable() {
 								public void run() {
 									try {
-										myImage = new MyImageIcon(MainFrame.getInstance(), JMyPC2DBEbutton.ICON_WIDTH,
-												JMyPC2DBEbutton.ICON_HEIGHT, FileSystemHandler.getURL(tf),
+										myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
+												DataSetFileButton.ICON_HEIGHT, FileSystemHandler.getURL(tf),
 												myImage != null ? myImage.getBinaryFileInfo() : null);
 									} catch (MalformedURLException e) {
 										downloadNeeded = true;
@@ -362,13 +365,13 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 			// DataExchangeHelperForExperiments.removeSingleImageFromDataBase(user,
 			// pass, imageResult);
 			// clean up gui...
-			Stack<JMyPC2DBEbutton> toBeDeleted = new Stack<JMyPC2DBEbutton>();
+			Stack<DataSetFileButton> toBeDeleted = new Stack<DataSetFileButton>();
 			JMyFilePanel p = (JMyFilePanel) this.getParent();
 			String imageFileIDtoBeDeleted = imageResult.getMd5();
 			for (int i = 0; i < p.getComponentCount(); i++) {
 				Component o = p.getComponent(i);
-				if (o instanceof JMyPC2DBEbutton) {
-					JMyPC2DBEbutton checkButton = (JMyPC2DBEbutton) o;
+				if (o instanceof DataSetFileButton) {
+					DataSetFileButton checkButton = (DataSetFileButton) o;
 					if (checkButton.imageResult.getMd5() == imageFileIDtoBeDeleted)
 						toBeDeleted.add(checkButton);
 				}
@@ -554,8 +557,8 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 	class IconAdapter extends JComponent {
 		private static final long serialVersionUID = 1L;
 
-		int width = JMyPC2DBEbutton.ICON_WIDTH;
-		int height = JMyPC2DBEbutton.ICON_HEIGHT;
+		int width = DataSetFileButton.ICON_WIDTH;
+		int height = DataSetFileButton.ICON_HEIGHT;
 
 		public IconAdapter(Icon icon) {
 			this.icon = icon;
@@ -570,7 +573,7 @@ public class JMyPC2DBEbutton extends JButton implements ActionListener {
 
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(JMyPC2DBEbutton.ICON_WIDTH, JMyPC2DBEbutton.ICON_HEIGHT); // icon.getIconWidth(),
+			return new Dimension(DataSetFileButton.ICON_WIDTH, DataSetFileButton.ICON_HEIGHT); // icon.getIconWidth(),
 			// icon.getIconHeight());
 		}
 

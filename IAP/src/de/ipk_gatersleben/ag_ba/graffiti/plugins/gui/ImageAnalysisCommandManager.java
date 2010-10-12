@@ -11,6 +11,8 @@ package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.ErrorMsg;
+
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.CloudUploadEntity;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.FileManagerExp;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.ThreeDreconstructionAction;
@@ -35,8 +37,12 @@ public class ImageAnalysisCommandManager {
 
 		actions.add(FileManagerExp.getFileManagerEntity(login, pass, experimentReference));
 
-		actions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass, experimentReference),
-				"Transfer to IAP Cloud", "img/ext/transfer2.png", "img/ext/transfer2.png"));
+		try {
+			if (experimentReference.getData().getHeader().getExcelfileid().startsWith("lemnatec:"))
+				actions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass, experimentReference)));
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
 
 		// "img/PoweredMongoDBgreenLeaf.png")); // PoweredMongoDBgreen.png"));
 

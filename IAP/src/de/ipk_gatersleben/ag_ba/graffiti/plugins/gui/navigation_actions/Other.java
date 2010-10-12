@@ -297,6 +297,7 @@ public class Other {
 					String s = "<html>" + StringManipulationTools.getStringList(infoset.get(key), "<br>");
 					values.add(s);
 				}
+
 				return new MainPanelComponent(values);
 			}
 
@@ -468,7 +469,8 @@ public class Other {
 			}
 		};
 
-		if (!l.equals("internet")) { // dbeType == DBEtype.Phenotyping &&
+		if (l == null || !l.equals("internet")) { // dbeType ==
+			// DBEtype.Phenotyping &&
 			NavigationGraphicalEntity scheduleExperiment = new NavigationGraphicalEntity(scheduleExperimentAction,
 					"Schedule Experiment", "img/ext/image-loading.png");
 			res.add(scheduleExperiment);

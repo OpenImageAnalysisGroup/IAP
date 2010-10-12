@@ -179,7 +179,7 @@ public class ModelToGui {
 					if (n1.getText().indexOf("Please wait") >= 0)
 						BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
 					else
-						BackgroundTaskHelper.executeLaterOnSwingTask(50, (Runnable) rr.getObject());
+						BackgroundTaskHelper.executeLaterOnSwingTask(100, (Runnable) rr.getObject());
 				} else {
 					if (n1.isVisible())
 						n1.setText(n.getTitle());

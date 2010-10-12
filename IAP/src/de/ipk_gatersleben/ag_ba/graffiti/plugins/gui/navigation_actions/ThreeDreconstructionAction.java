@@ -19,7 +19,7 @@ import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.MyExperimentInfoPanel;
-import de.ipk_gatersleben.ag_ba.mongo.MongoExperimentNavigationAction;
+import de.ipk_gatersleben.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -152,7 +152,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			storedActions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass, new ExperimentReference(
 					statisticsResult)), "Store Dataset", "img/ext/user-desktop.png")); // PoweredMongoDBgreen.png"));
 
-			MongoExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult, statisticsResult
+			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult, statisticsResult
 					.getHeader(), false);
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();

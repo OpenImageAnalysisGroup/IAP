@@ -1,5 +1,5 @@
 /* Copyright (c) 2003 IPK Gatersleben
- * $Id: DataExchangeHelperForExperiments.java,v 1.2 2010-10-08 14:51:11 klukas Exp $
+ * $Id: DataExchangeHelperForExperiments.java,v 1.3 2010-10-12 12:10:35 klukas Exp $
  */
 package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.picture_gui;
 
@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ import com.mongodb.gridfs.GridFSDBFile;
 import de.ipk_gatersleben.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk_gatersleben.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_ba.mongo.RunnableOnDB;
+import de.ipk_gatersleben.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -49,7 +51,7 @@ public class DataExchangeHelperForExperiments {
 	}
 
 	public static void downloadFile(String user, String pass, final ImageResult imageResult, final File targetFile,
-			final JMyPC2DBEbutton button, final MongoCollection collection) {
+			final DataSetFileButton button, final MongoCollection collection) {
 		try {
 			new MongoDB().processDB(new RunnableOnDB() {
 
@@ -102,7 +104,7 @@ public class DataExchangeHelperForExperiments {
 	}
 
 	public static DatabaseStorageResult insertMD5checkedFile(String user, String pass, final File file,
-			File createTempPreviewImage, int isJavaImage, JMyPC2DBEbutton imageButton, MappingDataEntity tableName) {
+			File createTempPreviewImage, int isJavaImage, DataSetFileButton imageButton, MappingDataEntity tableName) {
 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		try {
@@ -217,23 +219,26 @@ public class DataExchangeHelperForExperiments {
 				}
 			}
 
-			for (BinaryFileInfo binaryFileInfo : bbb) {
+			for (final BinaryFileInfo binaryFileInfo : bbb) {
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
-
+				boolean lemna = false;
 				if (binaryFileInfo.getFileName() == null)
 					binaryFileInfo.setFileName(null);
 				ImageIcon previewImage = null;
 				if (FileSystemHandler.isFileUrl(binaryFileInfo.getFileName())) {
-					MyImageIcon myImage = new MyImageIcon(MainFrame.getInstance(), JMyPC2DBEbutton.ICON_WIDTH,
-							JMyPC2DBEbutton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
+					MyImageIcon myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
+							DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
 					myImage.imageAvailable = 1;
 					previewImage = myImage;
+				} else if (LemnaTecFTPhandler.isLemnaTecFtpUrl(binaryFileInfo.getFileName())) {
+					previewImage = null;
+					lemna = true;
 				} else {
 					byte[] pi = new MongoDB().getPreviewData(binaryFileInfo.getMD5());
 					if (pi != null)
 						previewImage = new ImageIcon(pi);
 				}
-				final JMyPC2DBEbutton imageButton = new JMyPC2DBEbutton(dbeUser, dbePass, mt, imageResult, previewImage, mt
+				final DataSetFileButton imageButton = new DataSetFileButton(dbeUser, dbePass, mt, imageResult, previewImage, mt
 						.isReadOnly());
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
@@ -247,6 +252,8 @@ public class DataExchangeHelperForExperiments {
 					clearPanel(filePanel, mt, expTree);
 				}
 
+				final boolean lemnaF = lemna;
+
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						// nur falls der Zielknoten immer noch ausgewählt ist,
@@ -256,6 +263,24 @@ public class DataExchangeHelperForExperiments {
 							filePanel.validate();
 							filePanel.repaint();
 							filePanel.scrollpane.validate();
+							if (lemnaF) {
+								BackgroundThreadDispatcher.addTask(new Thread(new Runnable() {
+									@Override
+									public void run() {
+										if (mt == expTree.getSelectionPath().getLastPathComponent()) {
+											MyImageIcon myImage;
+											try {
+												myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
+														DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
+												myImage.imageAvailable = 1;
+												imageButton.updateLayout(null, myImage, myImage);
+											} catch (MalformedURLException e) {
+												// empty
+											}
+										}
+									}
+								}), -1);
+							}
 						} else
 							stop.setStopWanted(true);
 					}

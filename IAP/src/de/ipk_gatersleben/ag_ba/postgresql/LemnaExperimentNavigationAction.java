@@ -31,12 +31,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 	private NavigationGraphicalEntity src;
 	private ExperimentInterface experiment = null;
-	private final String experimentName;
-	private final String db;
+	private final ExperimentHeaderInterface experimentName;
 
-	public LemnaExperimentNavigationAction(String db, String experimentName) {
-		super("Access LemnaTec Data Set");
-		this.db = db;
+	public LemnaExperimentNavigationAction(ExperimentHeaderInterface experimentName) {
+		super("<html>Access LemnaTec Data Set");
 		this.experimentName = experimentName;
 	}
 
@@ -82,7 +80,7 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
 		this.src = src;
 		if (experiment == null)
-			experiment = new LemnaTecDataExchange().getExperiment(db, experimentName);
+			experiment = new LemnaTecDataExchange().getExperiment(experimentName);
 	}
 
 	@Override
@@ -97,7 +95,7 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 
 	@Override
 	public String getDefaultTitle() {
-		return experimentName;
+		return experimentName.getExperimentname();
 	}
 
 	@Override

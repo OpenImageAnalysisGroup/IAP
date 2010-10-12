@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -42,13 +43,13 @@ public class DayComponent extends JComponent {
 	private static final long serialVersionUID = 1L;
 	private final Color color;
 	private Color color2;
-	static double colorInt = 0.25;
+	static double colorInt = 0.35;// 0.25;
 	private ArrayList<Color> colors = Colors.get(12, colorInt);
 	boolean compact = false;
 	private GregorianCalendar calendar;
 	private Calendar2 calEnt;
 
-	private static ArrayList<Color> userColors = Colors.get(20, colorInt * 1.3);
+	private static ArrayList<Color> userColors = Colors.get(9, colorInt * 2);
 
 	public DayComponent(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, boolean main,
 			boolean mark, GregorianCalendar calendar, Calendar2 calEnt) {
@@ -87,6 +88,7 @@ public class DayComponent extends JComponent {
 				continue;
 			String dateA = sdf.format(ei.getStartdate().getTime());
 			String dateB = sdf.format(ei.getImportdate().getTime());
+			String dateToday = sdf.format(new Date().getTime());
 			boolean startOrEnd = false;
 			if (date.equals(dateA)) {
 				if (!exp.containsKey(ei.getImportusername()))
@@ -97,7 +99,10 @@ public class DayComponent extends JComponent {
 			if (date.equals(dateB)) {
 				if (!exp.containsKey(ei.getImportusername()))
 					exp.put(ei.getImportusername(), new ArrayList<String>());
-				exp.get(ei.getImportusername()).add("experiment upload: " + ei.getExperimentname());
+				if (date.equals(dateToday))
+					exp.get(ei.getImportusername()).add("experiment in progress: " + ei.getExperimentname());
+				else
+					exp.get(ei.getImportusername()).add("experiment upload: " + ei.getExperimentname());
 				startOrEnd = true;
 			}
 			if (!startOrEnd) {
@@ -115,8 +120,12 @@ public class DayComponent extends JComponent {
 			if (n > 1) {
 				s += " (" + n + ")";
 			} else {
-				if (exp.get(user).iterator().next().indexOf("upload") >= 0)
-					s = "finished";
+				if (exp.get(user).iterator().next().indexOf("start") >= 0)
+					s = exp.get(user).iterator().next().split(":", 2)[1] + " started";
+				else if (exp.get(user).iterator().next().indexOf("progress") >= 0)
+					s = exp.get(user).iterator().next().split(":", 2)[1] + " in progress";
+				else if (exp.get(user).iterator().next().indexOf("upload") >= 0)
+					s = exp.get(user).iterator().next().split(":", 2)[1] + " finished";
 				else
 					s = exp.get(user).iterator().next().split(":", 2)[1];
 			}

@@ -33,6 +33,7 @@ import org.graffiti.options.GravistoPreferences;
 import org.graffiti.util.InstanceLoader;
 
 import de.ipk_gatersleben.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.DBEsplashScreen;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
@@ -45,7 +46,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOHandler;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -127,6 +128,7 @@ public class AIPmain extends JApplet {
 
 	private void registerIOhandlers() {
 		ExperimentIOManager.registerIOHandler(new LoadedImageHandler());
+		ExperimentIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (MeasurementIOHandler handler : new MongoDB().getHandlers())
 			ExperimentIOManager.registerIOHandler(handler);
 	}

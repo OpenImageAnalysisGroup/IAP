@@ -64,7 +64,7 @@ public class Snapshot {
 		this.time_stamp = time_stamp;
 	}
 
-	public Timestamp getTime_stamp() {
+	public Timestamp getTimestamp() {
 		return time_stamp;
 	}
 

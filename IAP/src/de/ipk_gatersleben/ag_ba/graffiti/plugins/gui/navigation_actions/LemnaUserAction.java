@@ -14,6 +14,7 @@ import java.util.Collection;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction;
 import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk_gatersleben.ag_ba.postgresql.LemnaExperimentNavigationAction;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
@@ -23,9 +24,9 @@ public class LemnaUserAction extends AbstractNavigationAction implements Navigat
 
 	private NavigationGraphicalEntity src;
 	private final String user;
-	private final Collection<String> ids;
+	private final Collection<ExperimentHeaderInterface> ids;
 
-	public LemnaUserAction(String user, Collection<String> ids) {
+	public LemnaUserAction(String user, Collection<ExperimentHeaderInterface> ids) {
 		super("Show experiments of user " + user);
 		this.user = user;
 		this.ids = ids;
@@ -34,10 +35,8 @@ public class LemnaUserAction extends AbstractNavigationAction implements Navigat
 	@Override
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
-		for (String id : ids) {
-			String db = id.split(":", 2)[0];
-			String experiment = id.split(":", 2)[1];
-			result.add(new NavigationGraphicalEntity(new LemnaExperimentNavigationAction(db, experiment)));
+		for (ExperimentHeaderInterface id : ids) {
+			result.add(new NavigationGraphicalEntity(new LemnaExperimentNavigationAction(id)));
 		}
 		return result;
 	}
