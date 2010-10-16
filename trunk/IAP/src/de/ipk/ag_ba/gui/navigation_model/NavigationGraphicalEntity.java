@@ -124,8 +124,8 @@ public class NavigationGraphicalEntity implements StyleAware {
 				line2 = action.getStatusProvider().getCurrentStatusMessage1();
 			if (statusServer != null) {
 				BackgroundTaskStatusProvider status = action.getStatusProvider();
-				String eta = statusServer.getRemainTime(status.getCurrentStatusValue() == -1, status
-						.getCurrentStatusValueFine());
+				String eta = statusServer.getRemainTime(status.getCurrentStatusValue() == -1,
+						status.getCurrentStatusValueFine());
 				if (eta.length() > 0) {
 					if (line2.length() > 0)
 						line2 += ", ";
@@ -158,7 +158,7 @@ public class NavigationGraphicalEntity implements StyleAware {
 		if (tooltipHint != null)
 			return tooltipHint;
 		else
-			return action.getDefaultTooltip();
+			return action != null ? action.getDefaultTooltip() : null;
 	}
 
 	public void setProcessing(boolean b) {

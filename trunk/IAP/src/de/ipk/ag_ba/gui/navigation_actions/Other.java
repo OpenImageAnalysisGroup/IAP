@@ -287,6 +287,10 @@ public class Other {
 				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
 				if (includeLemnaTecStatus)
 					res.add(LemnaCam.getLemnaCamButton());
+
+				res.add(new NavigationGraphicalEntity(null, "BA-13 Server R-810", "img/ext/dellR810.png"));
+				res.add(new NavigationGraphicalEntity(null, "BA-24 Workstation", "img/ext/macpro_side.png"));
+
 				return res;
 			}
 

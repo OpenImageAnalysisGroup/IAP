@@ -26,6 +26,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 	private NavigationGraphicalEntity src;
 	private String login;
 	private String pass;
+	ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
 
 	public LemnaTecNavigationAction() {
 		super("Access LemnaTec-DB");
@@ -40,7 +41,29 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 	 */
 	@Override
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction
+	 * #getResultNewNavigationSet(java.util.ArrayList)
+	 */
+	@Override
+	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
+		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>(currentSet);
+		result.add(src);
+		return result;
+	}
+
+	@Override
+	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+		// connect to db
+		this.src = src;
+		result.clear();
 		try {
 			result.add(new NavigationGraphicalEntity(new LemnaTecUserNavigationAction()));
 
@@ -68,27 +91,6 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		} catch (Exception e) {
 			// error
 		}
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction
-	 * #getResultNewNavigationSet(java.util.ArrayList)
-	 */
-	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>(currentSet);
-		result.add(src);
-		return result;
-	}
-
-	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
-		// connect to db
-		this.src = src;
 	}
 
 	@Override
