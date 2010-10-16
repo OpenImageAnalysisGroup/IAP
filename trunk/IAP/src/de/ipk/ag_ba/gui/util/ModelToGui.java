@@ -12,6 +12,7 @@ import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -58,7 +59,10 @@ public class ModelToGui {
 		int imgS = 48;
 
 		if (style == ButtonDrawStyle.COMPACT_LIST)
-			imgS = 32;
+			if (target == PanelTarget.NAVIGATION)
+				imgS = 24;// 32;
+			else
+				imgS = 48;
 
 		ImageIcon icon;
 		if (n.getIcon() != null) {
@@ -73,12 +77,18 @@ public class ModelToGui {
 		final JButton n1 = new JButton("" + n.getTitle());
 		switch (style) {
 		case FLAT:
+		case COMPACT_LIST:
 			n1.setBorderPainted(false);
 			n1.setContentAreaFilled(false);
+			int d = 1;
+			if (style == ButtonDrawStyle.COMPACT_LIST)
+				d = 2;
 			if (target == PanelTarget.NAVIGATION)
-				n1.setBorder(BorderFactory.createEmptyBorder(8, 4, 2, 4));
+				n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 4 / d, 2 / d, 4 / d));
+			else if (style == ButtonDrawStyle.FLAT)
+				n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 8 / d, 2 / d, 8 / d));
 			else
-				n1.setBorder(BorderFactory.createEmptyBorder(8, 8, 2, 8));
+				n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 0 / d, 2 / d, 16 / d));
 			break;
 		case TEXT:
 			icon = null;
@@ -143,9 +153,11 @@ public class ModelToGui {
 
 		n1.setOpaque(false);
 
-		if (style != ButtonDrawStyle.COMPACT_LIST) {
+		if (style != ButtonDrawStyle.COMPACT_LIST || target == PanelTarget.ACTION) {
 			n1.setVerticalTextPosition(SwingConstants.BOTTOM);
 			n1.setHorizontalTextPosition(SwingConstants.CENTER);
+		} else {
+			n1.setFont(new Font(n1.getFont().getName(), Font.PLAIN, 12));
 		}
 		n.setExecution(new Runnable() {
 			public void run() {
@@ -162,8 +174,8 @@ public class ModelToGui {
 			n1.setToolTipText(n.getToolTip());
 
 		if (n.getSideGui() != null)
-			return TableLayout.get3Split(n1, null, n.getSideGui(), TableLayout.PREFERRED, n.getSideGuiSpace(), n
-					.getSideGuiWidth());
+			return TableLayout.get3Split(n1, null, n.getSideGui(), TableLayout.PREFERRED, n.getSideGuiSpace(),
+					n.getSideGuiWidth());
 		else
 			return n1;
 	}
@@ -238,8 +250,8 @@ public class ModelToGui {
 							ArrayList<JComponent> errors = new ArrayList<JComponent>();
 							for (String s : ErrorMsg.getErrorMessages()) {
 								JLabel e = new JLabel("<html><table><tr><td>"
-										+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_")).replaceAll("_br_",
-												"<br>").replaceAll("\n", "<br>"));
+										+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
+												.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
 								e.setOpaque(true);
 								e.setBackground(new Color(255, 240, 240));
 								e.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -262,8 +274,8 @@ public class ModelToGui {
 							ArrayList<JComponent> errors = new ArrayList<JComponent>();
 							for (String s : ErrorMsg.getErrorMessages()) {
 								JLabel e = new JLabel("<html><table><tr><td>"
-										+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_")).replaceAll("_br_",
-												"<br>").replaceAll("\n", "<br>"));
+										+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
+												.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
 								e.setOpaque(true);
 								e.setBackground(new Color(255, 240, 240));
 								e.setBorder(BorderFactory.createLoweredBevelBorder());

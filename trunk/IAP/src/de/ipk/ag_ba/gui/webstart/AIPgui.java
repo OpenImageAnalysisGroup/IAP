@@ -48,7 +48,8 @@ public class AIPgui {
 	 * @param jtp
 	 * @return
 	 */
-	public static JComponent getNavigation(final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
+	public static JComponent getNavigation(final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
+			boolean secondWindow) {
 
 		final JPanel graphPanel = new JPanel();
 
@@ -57,7 +58,7 @@ public class AIPgui {
 		graphPanel.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 
 		JLabel lbl;
-		if (AIPmain.myClassKnown) {
+		if (!secondWindow && AIPmain.myClassKnown) {
 			lbl = new JLabel("<html><h2><font color='red'>IAP Reloading Not Supported!</font></h2>"
 					+ "<b>It is recommended to close any browser window and re-open this website,<br>"
 					+ "otherwise this information system may not work reliable.</b><br><br>"
@@ -121,9 +122,9 @@ public class AIPgui {
 			}
 		});
 
-		return TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionPanel, actionPanelRight,
-				TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED, TableLayout.PREFERRED,
-				TableLayout.FILL);
+		return TableLayout.get3SplitVertical(navigationPanel,
+				TableLayout.getSplit(actionPanel, actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel,
+				TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL);
 	}
 
 	public static String getIntroTxt() {

@@ -289,7 +289,8 @@ public class Other {
 					res.add(LemnaCam.getLemnaCamButton());
 
 				res.add(new NavigationGraphicalEntity(null, "BA-13 Server R-810", "img/ext/dellR810.png"));
-				res.add(new NavigationGraphicalEntity(null, "BA-24 Workstation", "img/ext/macpro_side.png"));
+				res.add(new NavigationGraphicalEntity(null, "BA-24 Workstation", "img/ext/computer.png"));// macpro_side.png"));
+				res.add(new NavigationGraphicalEntity(null, "NW-04 File Server", "img/ext/computer.png"));// pc.png"));
 
 				return res;
 			}

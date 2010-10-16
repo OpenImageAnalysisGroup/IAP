@@ -46,7 +46,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOHandler;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -95,7 +95,7 @@ public class AIPmain extends JApplet {
 
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				"", "");
-		JComponent advancedNavigation = AIPgui.getNavigation(myStatus);
+		JComponent advancedNavigation = AIPgui.getNavigation(myStatus, false);
 		add(advancedNavigation, "0,0");
 		validate();
 
@@ -113,7 +113,7 @@ public class AIPmain extends JApplet {
 				myAppletLoad(mainFrame, myStatus);
 			}
 		};
-
+		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();
 	}
 

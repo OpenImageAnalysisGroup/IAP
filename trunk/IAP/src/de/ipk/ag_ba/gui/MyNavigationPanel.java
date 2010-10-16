@@ -18,7 +18,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -26,11 +28,16 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.graffiti.editor.GravistoService;
+
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.ModelToGui;
 import de.ipk.ag_ba.gui.util.PopupListener;
+import de.ipk.ag_ba.gui.webstart.AIPgui;
+import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
  * @author klukas
@@ -42,7 +49,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	private MyNavigationPanel theOther;
 	private final PanelTarget target;
 	private final JPanel actionPanelRight;
-	private ButtonDrawStyle buttonStyle = ButtonDrawStyle.FLAT;
+	private ButtonDrawStyle buttonStyle = ButtonDrawStyle.COMPACT_LIST;
+	private final JCheckBoxMenuItem menuItemCompact;
+	private final JCheckBoxMenuItem menuItemFlat;
+	private final JCheckBoxMenuItem menuItemButtons;
 
 	public MyNavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
 		this.target = target;
@@ -51,24 +61,55 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 
 		JPopupMenu popup = new JPopupMenu("Button Style");
 
-		JMenuItem menuItem = new JMenuItem("Flat");
-		menuItem.putClientProperty("style", ButtonDrawStyle.FLAT);
-		menuItem.addActionListener(this);
+		JMenuItem menuItem = new JMenuItem("New Window");
+		menuItem.setIcon(GravistoService.loadIcon(AIPmain.class, "img/new_frame.png"));
+		menuItem.addActionListener(getNewWindowListener());
 		popup.add(menuItem);
-		menuItem = new JMenuItem("Buttons");
-		menuItem.putClientProperty("style", ButtonDrawStyle.BUTTONS);
-		menuItem.addActionListener(this);
-		popup.add(menuItem);
+
+		popup.addSeparator();
+
+		menuItemCompact = new JCheckBoxMenuItem("Compact", buttonStyle == ButtonDrawStyle.COMPACT_LIST);
+		menuItemCompact.putClientProperty("style", ButtonDrawStyle.COMPACT_LIST);
+		menuItemCompact.addActionListener(this);
+
+		popup.add(menuItemCompact);
+
+		menuItemFlat = new JCheckBoxMenuItem("Flat", buttonStyle == ButtonDrawStyle.FLAT);
+		menuItemFlat.putClientProperty("style", ButtonDrawStyle.FLAT);
+		menuItemFlat.addActionListener(this);
+		popup.add(menuItemFlat);
+
+		menuItemButtons = new JCheckBoxMenuItem("Buttons", buttonStyle == ButtonDrawStyle.BUTTONS);
+		menuItemButtons.putClientProperty("style", ButtonDrawStyle.BUTTONS);
+		menuItemButtons.addActionListener(this);
+		popup.add(menuItemButtons);
 		// menuItem = new JMenuItem("Text Only");
 		// menuItem.putClientProperty("style", ButtonDrawStyle.TEXT);
 		// menuItem.addActionListener(this);
 		// popup.add(menuItem);
-		menuItem = new JMenuItem("List");
-		menuItem.putClientProperty("style", ButtonDrawStyle.COMPACT_LIST);
-		menuItem.addActionListener(this);
-		popup.add(menuItem);
 
 		addMouseListener(new PopupListener(popup));
+	}
+
+	private ActionListener getNewWindowListener() {
+		ActionListener res = new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFrame jff = new JFrame("IAP Cloud Storage, Analysis and Visualization System");
+				jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
+				BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+						"", "");
+				jff.add(AIPgui.getNavigation(myStatus, true), "0,0");
+				jff.validate();
+				jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				jff.setLocationByPlatform(true);
+				jff.setSize(800, 600);
+				jff.setVisible(true);
+
+			}
+		};
+		return res;
 	}
 
 	public ArrayList<NavigationGraphicalEntity> getEntitySet() {
@@ -194,6 +235,9 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			theOther.buttonStyle = bds;
 			theOther.updateGUI();
 		}
+		menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
+		menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
+		menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
 	}
 
 }
