@@ -32,7 +32,6 @@ import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.navigation_actions.Home;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
-import de.ipk.ag_ba.gui.util.ModelToGui;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -145,7 +144,7 @@ public class AIPgui {
 				+ "in order to be able to quickly navigate again to the same information in the future.";
 	}
 
-	protected static void navigateTo(String target, final MyNavigationPanel navigationPanel,
+	public static void navigateTo(String target, final MyNavigationPanel navigationPanel,
 			final MyNavigationPanel actionPanel, final JComponent graphPanel,
 			final HashMap<String, NavigationGraphicalEntity> knownEntities) {
 
@@ -176,7 +175,7 @@ public class AIPgui {
 				}
 			};
 			action.getAction().setOneTimeFinishAction(rrr);
-			ModelToGui.executeNavigation(action, PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
+			action.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
 		}
 	}
 

@@ -43,4 +43,6 @@ public interface NavigationAction {
 	public String getDefaultNavigationImage();
 
 	public String getDefaultImage();
+
+	public boolean getProvidesActions();
 }

@@ -313,11 +313,16 @@ public class WebFolder {
 
 						return null;
 					}
+
+					@Override
+					public boolean getProvidesActions() {
+						return false;
+					}
+
 				};
 
 				NavigationGraphicalEntity editInVanted = new NavigationGraphicalEntity(action, "Edit in VANTED",
 						"img/vanted1_0.png");
-
 				result.add(editInVanted);
 
 				JComponent zoomSlider = getZoomSliderForGraph(scrollpaneRef);
@@ -545,10 +550,10 @@ public class WebFolder {
 	// ImageIcon icon = GravistoService.loadIcon(AIPmain.class, img, -48, 48);
 	// final JButton n1 = new JButton(title, icon);
 	// n1.setOpaque(false);
-	//		
+	//
 	// n1.setVerticalTextPosition(SwingConstants.BOTTOM);
 	// n1.setHorizontalTextPosition(SwingConstants.CENTER);
-	//		
+	//
 	// n1.addActionListener(new ActionListener() {
 	// public void actionPerformed(ActionEvent e) {
 	// MyUtility.navigate(title);
