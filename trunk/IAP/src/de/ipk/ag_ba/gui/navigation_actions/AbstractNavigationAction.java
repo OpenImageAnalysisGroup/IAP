@@ -76,4 +76,9 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	public String getDefaultTooltip() {
 		return tooltip;
 	}
+
+	@Override
+	public boolean getProvidesActions() {
+		return true;
+	}
 }

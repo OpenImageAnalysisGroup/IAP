@@ -16,7 +16,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -28,15 +32,17 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.ObjectRef;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
-import de.ipk.ag_ba.gui.util.ModelToGui;
 import de.ipk.ag_ba.gui.util.PopupListener;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
 import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -128,23 +134,43 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		if (set != null) {
 			ArrayList<JComponent> right = new ArrayList<JComponent>();
 			boolean first = true;
+			ObjectRef next = new ObjectRef();
 			for (NavigationGraphicalEntity ne : set) {
 				if (ne instanceof StyleAware) {
 					((StyleAware) ne).setButtonStyle(buttonStyle);
 				}
 				if (target == PanelTarget.NAVIGATION) {
 					if (!first) {
-						JLabel lbl = new JLabel("<html><small>&#9654;");
+						JLabel lbl = new JLabel("<html><small>" + Unicode.ARROW_RIGHT);
+						if (next != null) {
+							next.setObject(lbl);
+							next = new ObjectRef();
+						}
+						lbl.addMouseListener(getAddBookmarkActionListener(lbl, next, ne));
+						lbl.setToolTipText("Add bookmark");
+						HashMap<String, NavigationGraphicalEntity> knownEntities = new HashMap<String, NavigationGraphicalEntity>();
+						AIPgui.navigateTo("", this, theOther, lbl, knownEntities);
+						// if (ne.getAction() instanceof BookmarkAction ||
+						// Math.random() > 0.2) {
+						// lbl.setText("<html><font size='5'>" + Unicode.STAR);
+						// lbl.setToolTipText("Remove " + ne.getTitle() +
+						// " bookmark");
+						// lbl.addMouseListener(getDeleteBookmarkActionListener(lbl,
+						// next, ne.getAction()));
+						// }
 						lbl.setForeground(Color.GRAY);
 						add(lbl);
 					}
-					add(ModelToGui.getNavigationButton(buttonStyle, ne, target, this, getTheOther(), graphPanel));
+					add(NavigationGraphicalEntity.getNavigationButton(buttonStyle, ne, target, this, getTheOther(),
+							graphPanel));
 					first = false;
 				} else {
 					if (actionPanelRight != null && ne.isRightAligned())
-						right.add(ModelToGui.getNavigationButton(buttonStyle, ne, target, getTheOther(), this, graphPanel));
+						right.add(NavigationGraphicalEntity.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
+								graphPanel));
 					else
-						add(ModelToGui.getNavigationButton(buttonStyle, ne, target, getTheOther(), this, graphPanel));
+						add(NavigationGraphicalEntity.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
+								graphPanel));
 				}
 			}
 			if (actionPanelRight != null) {
@@ -174,6 +200,99 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			if (actionPanelRight != null)
 				actionPanelRight.validate();
 		}
+	}
+
+	private MouseListener getAddBookmarkActionListener(final JLabel lbl, final ObjectRef right,
+			final NavigationGraphicalEntity ne) {
+		MouseListener res = new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getClickCount() == 1) {
+					if (lbl.contains(e.getX(), e.getY())) {
+						System.out.println(ne.getTitle());
+						BufferedImage i;
+						if (ne.getIcon() != null)
+							i = GravistoService.getBufferedImage(ne.getIcon().getImage());
+						else
+							i = GravistoService.getBufferedImage(GravistoService.loadIcon(AIPmain.class,
+									ne.getNavigationImage()).getImage());
+						// add bookmark
+						Bookmark.add(ne.getTitle(), "target", i);
+					}
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				if (right.getObject() != null)
+					((JLabel) right.getObject()).setText("<html><font size='5'>" + Unicode.STAR);
+				if (lbl != null)
+					lbl.setText("<html><small>" + Unicode.ARROW_RIGHT);
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if (right.getObject() != null)
+					((JLabel) right.getObject()).setText("<html><font size='6'><b>" + Unicode.ARROW_LEFT_EMPTY);
+				if (lbl != null)
+					lbl.setText("<html><font size='4'>" + Unicode.PEN);
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		};
+		return res;
+	}
+
+	private MouseListener getDeleteBookmarkActionListener(final JLabel lbl, final ObjectRef right,
+			NavigationAction action) {
+		MouseListener res = new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				if (right.getObject() != null)
+					((JLabel) right.getObject()).setText("<html><font size='5'>" + Unicode.STAR);
+				if (lbl != null)
+					lbl.setText("<html><font size='5'>" + Unicode.STAR);
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if (right.getObject() != null)
+					((JLabel) right.getObject()).setText("<html><font size='6'><b>" + Unicode.ARROW_LEFT_EMPTY);
+				if (lbl != null)
+					lbl.setText("<html><font size='4'>" + Unicode.RECYCLE);
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		};
+		return res;
 	}
 
 	@Override
@@ -234,10 +353,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			updateGUI();
 			theOther.buttonStyle = bds;
 			theOther.updateGUI();
+			menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
+			menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
+			menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
 		}
-		menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
-		menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
-		menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
 	}
 
 }

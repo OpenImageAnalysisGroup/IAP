@@ -123,10 +123,13 @@ public class Other {
 				public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 					return null;
 				}
+
+				@Override
+				public boolean getProvidesActions() {
+					return false;
+				}
 			};
 			NavigationGraphicalEntity ne = new NavigationGraphicalEntity(action, pp.getShortName(), "img/vanted1_0.png");
-
-			ne.setProvidesActions(false);
 
 			ImageIcon i = pp.getIcon();
 			if (i != null) {
