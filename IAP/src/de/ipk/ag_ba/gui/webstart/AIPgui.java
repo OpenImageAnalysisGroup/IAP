@@ -121,17 +121,19 @@ public class AIPgui {
 			}
 		});
 
-		return TableLayout.get3SplitVertical(navigationPanel,
-				TableLayout.getSplit(actionPanel, actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel,
-				TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL);
+		return TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionPanel, actionPanelRight,
+				TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED, TableLayout.PREFERRED,
+				TableLayout.FILL);
 	}
 
 	public static String getIntroTxt() {
 		return "<html><h2>Welcome to IAP - the Integrated Analysis Platform!</h2>"
-				+ "This information system provides access to various bioinformatics ressources, "
+				+ "The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
+				+ "developed by the IPK research group Image Analysis.<br>"
+				+ "Additionally, it provides access to various bioinformatics ressources, "
 				+ "developed at the IPK. The included data sources and tools have been "
 				+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis, "
-				+ "with contributions from the group Bioinformatics and Information Technology.<br>"
+				+ "partly with contributions from the group Bioinformatics and Information Technology. To get details about the included data sources and information systems, click the included Website- and Reference-Links.<br>"
 				+ "<br>"
 				+ "This information system is in alpha-stage not meant for productive work. "
 				+ "It may not work reliable, only a small subset of future functions are implemented.<br>"
