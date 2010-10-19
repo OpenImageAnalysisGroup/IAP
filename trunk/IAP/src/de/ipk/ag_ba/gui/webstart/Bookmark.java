@@ -61,11 +61,12 @@ public class Bookmark {
 		ImageIO.write(icon, "png", ios);
 
 		// save link info
-		TextFile tf = new TextFile(getFileName());
+		TextFile tf = new TextFile();
 		tf.clear();
 		tf.add(title);
 		tf.add(target);
 		tf.write(new File(getFileName()));
+		System.out.println("Saved " + getFileName());
 	}
 
 	public boolean delete() {
@@ -115,6 +116,19 @@ public class Bookmark {
 	}
 
 	public static boolean add(String title, String target, BufferedImage icon) {
+		for (Bookmark b : getBookmarks()) {
+			if (b.getTarget().equals(target)) {
+				b.icon = icon;
+				b.title = title;
+				try {
+					b.save();
+					return true;
+				} catch (IOException e) {
+					ErrorMsg.addErrorMessage(e);
+					return false;
+				}
+			}
+		}
 		int pos = getNextFreePosition();
 		if (pos < 0)
 			return false;

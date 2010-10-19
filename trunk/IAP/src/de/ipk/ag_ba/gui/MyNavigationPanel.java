@@ -33,7 +33,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.ObjectRef;
+import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
+import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -218,7 +220,17 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							i = GravistoService.getBufferedImage(GravistoService.loadIcon(AIPmain.class,
 									ne.getNavigationImage()).getImage());
 						// add bookmark
-						Bookmark.add(ne.getTitle(), "target", i);
+						String target = getTargetPath();
+						if (target != null) {
+							if (Bookmark.add(ne.getTitle(), target, i)) {
+								if (!set.isEmpty())
+									set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
+											theOther, graphPanel, null, null);
+								MainFrame.getInstance().showMessageDialog("Bookmark has been created.");
+							} else
+								MainFrame.getInstance().showMessageDialog("Could not add bookmark.");
+						} else
+							MainFrame.getInstance().showMessageDialog("Could not determine target path (tasks are running).");
 					}
 				}
 			}
@@ -252,6 +264,16 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			}
 		};
 		return res;
+	}
+
+	private String getTargetPath() {
+		ArrayList<String> path = new ArrayList<String>();
+		for (NavigationGraphicalEntity ne : set) {
+			if (ne.isProcessing())
+				return null;
+			path.add(ne.getTitle());
+		}
+		return StringManipulationTools.getStringList(path, ".");
 	}
 
 	private MouseListener getDeleteBookmarkActionListener(final JLabel lbl, final ObjectRef right,
