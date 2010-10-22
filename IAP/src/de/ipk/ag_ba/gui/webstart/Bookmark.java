@@ -71,7 +71,7 @@ public class Bookmark {
 
 	public boolean delete() {
 		if (new File(getFileName()).exists()) {
-			return new File(getFileName()).delete();
+			return new File(getFileName(".png")).delete() && new File(getFileName()).delete();
 		} else
 			return false;
 	}
@@ -146,5 +146,13 @@ public class Bookmark {
 
 	public String getTarget() {
 		return target;
+	}
+
+	public BufferedImage getImage() {
+		return icon;
+	}
+
+	public String getTitle() {
+		return title;
 	}
 }

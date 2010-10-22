@@ -201,10 +201,13 @@ public class LemnaTecDataExchange {
 		Collection<Snapshot> result = new ArrayList<Snapshot>();
 		Connection connection = openConnectionToDatabase(database);
 
-		String sqlText = "SELECT creator, measurement_label, camera_label, id_tag, path, time_stamp, water_amount, weight_after, weight_before "
-				+ "FROM snapshot, tiled_image, tile, image_file_table "
-				+ "WHERE snapshot.measurement_label = ? and "
-				+ "snapshot.id = tiled_image.snapshot_id and tiled_image.id = tile.tiled_image_id and tile.image_oid = image_file_table.id";
+		String sqlText = "SELECT "
+				+ "creator, measurement_label, camera_label, id_tag, path, "
+				+ "time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor "
+				+ "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
+				+ "WHERE snapshot.measurement_label = ? and snapshot.id = tiled_image.snapshot_id and "
+				+ "tiled_image.id = tile.tiled_image_id and tile.image_oid = image_file_table.id and "
+				+ "snapshot.configuration_id = image_unit_configuration.compconfigid and tiled_image.camera_label = image_unit_configuration.gid";
 
 		PreparedStatement ps = connection.prepareStatement(sqlText);
 		ps.setString(1, experiment);
@@ -224,6 +227,10 @@ public class LemnaTecDataExchange {
 			snapshot.setWater_amount(rs.getInt(7));
 			snapshot.setWeight_after(rs.getDouble(8));
 			snapshot.setWeight_before(rs.getDouble(9));
+
+			snapshot.setCamera_label(rs.getString("compname"));
+			snapshot.setXfactor(rs.getDouble("xfactor"));
+			snapshot.setYfactor(rs.getDouble("yfactor"));
 
 			result.add(snapshot);
 		}
@@ -320,19 +327,25 @@ public class LemnaTecDataExchange {
 			{
 				String lbl = sn.getCamera_label();
 
-				if (lbl.endsWith("_HL2"))
-					lbl = lbl.substring(0, lbl.length() - "_HL2".length());
-				if (lbl.endsWith("HL2"))
-					lbl = lbl.substring(0, lbl.length() - "HL2".length());
+				if (lbl != null && lbl.startsWith("imagingunits."))
+					lbl = lbl.substring("imagingunits.".length());
+				if (lbl != null && lbl.contains("#"))
+					lbl = lbl.substring(0, lbl.indexOf("#"));
 
-				for (int d = 0; d <= 360; d += 5) {
-					if (lbl.endsWith("_" + d + "_Grad")) {
-						lbl = lbl.substring(0, lbl.length() - ("_" + d + "_Grad").length());
-						position = new Double(d);
-						break;
-					}
-				}
-				lbl = StringManipulationTools.stringReplace(lbl, "_", "");
+				// if (lbl.endsWith("_HL2"))
+				// lbl = lbl.substring(0, lbl.length() - "_HL2".length());
+				// if (lbl.endsWith("HL2"))
+				// lbl = lbl.substring(0, lbl.length() - "HL2".length());
+				//
+				// for (int d = 0; d <= 360; d += 5) {
+				// if (lbl.endsWith("_" + d + "_Grad")) {
+				// lbl = lbl.substring(0, lbl.length() - ("_" + d +
+				// "_Grad").length());
+				// position = new Double(d);
+				// break;
+				// }
+				// }
+				// lbl = StringManipulationTools.stringReplace(lbl, "_", "");
 
 				sn.setCamera_label(lbl);
 			}
@@ -444,8 +457,8 @@ public class LemnaTecDataExchange {
 					sample.setTimeUnit("day");
 
 					ImageData image = new ImageData(sample);
-					image.setPixelsizeX(1);
-					image.setPixelsizeY(1);
+					image.setPixelsizeX(sn.getXfactor());
+					image.setPixelsizeY(sn.getYfactor());
 					image.setReplicateID(replicateID);
 					image.setUnit("");
 

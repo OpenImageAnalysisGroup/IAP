@@ -466,8 +466,9 @@ public class MongoDB {
 		GridFSDBFile fff = gridfs_preview.findOne(volume.getURL().getDetail());
 		if (fff == null) {
 			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Render Preview Icon");
-			GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule.getThreeDvolumePreviewIcon(id));
+				optStatus.setCurrentStatusText1("Render Side View");
+			GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule
+					.getThreeDvolumePreviewIcon(id, optStatus));
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Save Preview Icon");
 			inputFilePreview.setFilename(md5);

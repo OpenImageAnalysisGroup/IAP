@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -77,13 +78,13 @@ public class IOmodule {
 		return result;
 	}
 
-	public static InputStream getThreeDvolumePreviewIcon(LoadedVolumeExtension volume) throws FileNotFoundException,
-			URISyntaxException {
+	public static InputStream getThreeDvolumePreviewIcon(LoadedVolumeExtension volume,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws FileNotFoundException, URISyntaxException {
 		try {
 			// return
 			// MyImageIOhelper.getPreviewImageStream(MyImageIOhelper.getPreviewImage(volume
 			// .getSideView(CubeSide.FRONT)));
-			return volume.getSideViewGif(128, 128);
+			return volume.getSideViewGif(128, 128, optStatus);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return new FileInputStream(new File(new URI(GravistoService.getResource(IOmodule.class,

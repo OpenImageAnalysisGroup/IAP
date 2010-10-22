@@ -29,7 +29,7 @@ import org.ReleaseInfo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
-import de.ipk.ag_ba.gui.navigation_actions.Home;
+import de.ipk.ag_ba.gui.navigation_actions.HomeAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
@@ -40,13 +40,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  */
 public class AIPgui {
 
-	private static MyNavigationPanel globalNavigationPanel;
-
-	/**
-	 * @param myStatus
-	 * @param jtp
-	 * @return
-	 */
 	public static JComponent getNavigation(final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
 			boolean secondWindow) {
 
@@ -74,7 +67,6 @@ public class AIPgui {
 		int hgap = 10;
 
 		final MyNavigationPanel navigationPanel = new MyNavigationPanel(PanelTarget.NAVIGATION, graphPanel, null);
-		AIPgui.globalNavigationPanel = navigationPanel;
 		navigationPanel.setOpaque(false);
 		navigationPanel.setLayout(new FlowLayoutImproved(FlowLayout.LEFT, hgap, vgap));
 
@@ -86,15 +78,15 @@ public class AIPgui {
 		navigationPanel.setTheOther(actionPanel);
 		actionPanel.setTheOther(navigationPanel);
 
-		Home home = new Home(myStatus);
+		HomeAction home = new HomeAction(myStatus);
 		final NavigationGraphicalEntity overView = new NavigationGraphicalEntity(home);
 
 		overView.setTitle("Initialize");
 		overView.setProcessing(true);
 
 		ArrayList<NavigationGraphicalEntity> homeNavigation = new ArrayList<NavigationGraphicalEntity>();
-		homeNavigation.add(overView);
-		navigationPanel.setEntitySet(homeNavigation);
+		home.performActionCalculateResults(overView);
+		navigationPanel.setEntitySet(home.getResultNewNavigationSet(homeNavigation));
 		actionPanel.setEntitySet(home.getActionEntitySet());
 
 		ErrorMsg.addOnAppLoadingFinishedAction(new Runnable() {
@@ -146,6 +138,14 @@ public class AIPgui {
 				+ "in order to be able to quickly navigate again to the same information in the future.";
 	}
 
+	public static void navigateTo(String target, NavigationGraphicalEntity src) {
+		HashMap<String, NavigationGraphicalEntity> knownEntities = new HashMap<String, NavigationGraphicalEntity>();
+		MyNavigationPanel navigationPanel = null;
+		MyNavigationPanel actionPanel = null;
+		JComponent graphPanel = null;
+		navigateTo(target, navigationPanel, actionPanel, graphPanel, knownEntities);
+	}
+
 	public static void navigateTo(String target, final MyNavigationPanel navigationPanel,
 			final MyNavigationPanel actionPanel, final JComponent graphPanel,
 			final HashMap<String, NavigationGraphicalEntity> knownEntities) {
@@ -160,7 +160,7 @@ public class AIPgui {
 		if (target.startsWith("."))
 			target = target.substring(".".length());
 
-		for (NavigationGraphicalEntity ne : actionPanel.getEntitySet()) {
+		for (NavigationGraphicalEntity ne : actionPanel.getEntitySet(target.length() > 0)) {
 			knownEntities.put(ne.getTitle(), ne);
 		}
 		String thisTarget = target.split("\\.", 2)[0];
@@ -180,25 +180,4 @@ public class AIPgui {
 			action.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
 		}
 	}
-
-	public static void removeNavigationInfo(int leaveIntactFromFront, int preserveFromEnd) {
-		preserveFromEnd = Math.abs(preserveFromEnd);
-		ArrayList<NavigationGraphicalEntity> ne = globalNavigationPanel.getEntitySet();
-		if (ne.size() > leaveIntactFromFront && ne.size() > preserveFromEnd) {
-			ArrayList<NavigationGraphicalEntity> remove = new ArrayList<NavigationGraphicalEntity>();
-			for (int i = 1; i <= ne.size(); i++) {
-				boolean rem = false;
-				if (i >= leaveIntactFromFront)
-					rem = true;
-				if (i >= ne.size() - preserveFromEnd)
-					rem = false;
-				if (rem)
-					remove.add(ne.get(i));
-			}
-			for (NavigationGraphicalEntity r : remove)
-				ne.remove(r);
-		}
-		globalNavigationPanel.setEntitySet(ne);
-	}
-
 }

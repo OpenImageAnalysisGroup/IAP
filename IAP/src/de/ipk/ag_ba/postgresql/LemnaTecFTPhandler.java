@@ -13,6 +13,12 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.UserInfo;
+
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOConfigObject;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOHandler;
@@ -32,12 +38,57 @@ public class LemnaTecFTPhandler implements MeasurementIOHandler {
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
 		if (url.isEqualPrefix(getPrefix())) {
-			String detail = url.getDetail();
-			detail = detail.split("/", 2)[0] + "/../../data0/pgftp/" + detail.split("/", 2)[1] + "/";
-			String ur = "ftp://lemnatec:LemnaTec@" + detail.substring(0, detail.length() - "/".length());
-			return new BufferedInputStream(new URL(ur).openStream());
+			boolean useSCP = false;
+			if (useSCP) {
+				ChannelSftp c = getChannel();
+				String detail = url.getDetail();
+				detail = "/data0/pgftp/" + detail.split("/", 2)[1];
+				c.cd(detail.substring(0, detail.lastIndexOf("/")));
+				// Vector<?> o = c.ls(detail.substring(0, detail.lastIndexOf("/")));
+				// for (Object i : o)
+				// System.out.println(i);
+				String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
+				InputStream is = c.get(fn);
+				return is;
+			} else {
+				boolean advancedFTP = false;
+				if (advancedFTP) {
+					// todo // MyAdvancedFTP.download();
+					return null;
+				} else {
+					String detail = url.getDetail();
+					detail = detail.split("/", 2)[0] + "/../../data0/pgftp/" + detail.split("/", 2)[1] + "/";
+					String ur = "ftp://lemnatec:LemnaTec@" + detail.substring(0, detail.length() - "/".length());
+					return new BufferedInputStream(new URL(ur).openStream());
+				}
+			}
 		} else
 			return null;
+	}
+
+	private Session session = null;
+	private Channel channel = null;
+
+	private ChannelSftp getChannel() throws Exception {
+		if (session == null || !session.isConnected()) {
+			JSch jsch = new JSch();
+			String host = "lemna-db.ipk-gatersleben.de";
+			String user = "root";
+			// final String password = "LemnaTec";
+			int port = 22;
+			session = jsch.getSession(user, host, port);
+			UserInfo ui = new MyStoredUserInfo();
+			session.setUserInfo(ui);
+			session.connect();
+		}
+
+		if (channel == null || !channel.isConnected()) {
+			channel = session.openChannel("sftp");
+			channel.connect(30);
+		}
+
+		ChannelSftp c = (ChannelSftp) channel;
+		return c;
 	}
 
 	public static IOurl getLemnaTecFTPurl(String host, String filename, String displayFileName) {

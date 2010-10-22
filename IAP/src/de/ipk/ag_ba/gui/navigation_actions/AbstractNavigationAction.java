@@ -62,7 +62,7 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	}
 
 	public String getDefaultTitle() {
-		throw new RuntimeException("not implemented");
+		return null;
 	}
 
 	public String getDefaultNavigationImage() {
@@ -70,7 +70,7 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	}
 
 	public String getDefaultImage() {
-		throw new RuntimeException("not implemented");
+		return null;
 	}
 
 	public String getDefaultTooltip() {
