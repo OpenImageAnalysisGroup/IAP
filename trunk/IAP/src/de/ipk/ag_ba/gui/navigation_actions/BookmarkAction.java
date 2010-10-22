@@ -9,9 +9,11 @@
 
 package de.ipk.ag_ba.gui.navigation_actions;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.webstart.AIPgui;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
 
 /**
@@ -20,13 +22,21 @@ import de.ipk.ag_ba.gui.webstart.Bookmark;
  */
 public class BookmarkAction extends AbstractNavigationAction {
 
+	private final Bookmark bookmark;
+
 	public BookmarkAction(Bookmark bookmark) {
 		super("Bookmark Navigation: " + bookmark.getTarget());
+		this.bookmark = bookmark;
+	}
+
+	@Override
+	public String getDefaultTitle() {
+		return bookmark.getTitle();
 	}
 
 	@Override
 	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
-		// todo
+		AIPgui.navigateTo(bookmark.getTarget(), src);
 	}
 
 	@Override
@@ -37,6 +47,14 @@ public class BookmarkAction extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 		return null;
+	}
+
+	public BufferedImage getImage() {
+		return bookmark.getImage();
+	}
+
+	public Bookmark getBookmark() {
+		return bookmark;
 	}
 
 }

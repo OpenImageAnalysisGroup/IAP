@@ -40,6 +40,7 @@ import org.graffiti.editor.MainFrame;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
+import de.ipk.ag_ba.gui.navigation_actions.BookmarkAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.PopupListener;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
@@ -120,8 +121,17 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		return res;
 	}
 
-	public ArrayList<NavigationGraphicalEntity> getEntitySet() {
-		return set;
+	public ArrayList<NavigationGraphicalEntity> getEntitySet(boolean includeBookmarks) {
+		if (includeBookmarks)
+			return set;
+		else {
+			ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+			for (NavigationGraphicalEntity n : set) {
+				if (!(n.getAction() instanceof BookmarkAction))
+					res.add(n);
+			}
+			return res;
+		}
 	}
 
 	public void setEntitySet(ArrayList<NavigationGraphicalEntity> set) {
@@ -148,18 +158,16 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							next.setObject(lbl);
 							next = new ObjectRef();
 						}
-						lbl.addMouseListener(getAddBookmarkActionListener(lbl, next, ne));
-						lbl.setToolTipText("Add bookmark");
 						HashMap<String, NavigationGraphicalEntity> knownEntities = new HashMap<String, NavigationGraphicalEntity>();
 						AIPgui.navigateTo("", this, theOther, lbl, knownEntities);
-						// if (ne.getAction() instanceof BookmarkAction ||
-						// Math.random() > 0.2) {
-						// lbl.setText("<html><font size='5'>" + Unicode.STAR);
-						// lbl.setToolTipText("Remove " + ne.getTitle() +
-						// " bookmark");
-						// lbl.addMouseListener(getDeleteBookmarkActionListener(lbl,
-						// next, ne.getAction()));
-						// }
+						if (ne.getAction() instanceof BookmarkAction) {
+							lbl.setText("<html><font size='5'>" + Unicode.STAR);
+							lbl.setToolTipText("Remove " + ne.getTitle() + " bookmark");
+							lbl.addMouseListener(getDeleteBookmarkActionListener(lbl, next, ne.getAction()));
+						} else {
+							lbl.addMouseListener(getAddBookmarkActionListener(lbl, next, ne));
+							lbl.setToolTipText("Add bookmark");
+						}
 						lbl.setForeground(Color.GRAY);
 						add(lbl);
 					}
@@ -226,7 +234,6 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 								if (!set.isEmpty())
 									set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
 											theOther, graphPanel, null, null);
-								MainFrame.getInstance().showMessageDialog("Bookmark has been created.");
 							} else
 								MainFrame.getInstance().showMessageDialog("Could not add bookmark.");
 						} else
@@ -277,13 +284,23 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	}
 
 	private MouseListener getDeleteBookmarkActionListener(final JLabel lbl, final ObjectRef right,
-			NavigationAction action) {
+			final NavigationAction action) {
 		MouseListener res = new MouseListener() {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-
+				if (e.getClickCount() == 1) {
+					if (lbl.contains(e.getX(), e.getY())) {
+						BookmarkAction ba = (BookmarkAction) action;
+						if (!ba.getBookmark().delete()) {
+							MainFrame.getInstance().showMessageDialog("Could not delete bookmark.");
+						} else {
+							if (!set.isEmpty())
+								set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
+										theOther, graphPanel, null, null);
+						}
+					}
+				}
 			}
 
 			@Override

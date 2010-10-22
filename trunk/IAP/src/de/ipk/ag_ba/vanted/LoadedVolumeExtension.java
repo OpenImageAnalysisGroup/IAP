@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingUtilities;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.ShowImage;
@@ -256,13 +257,16 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		}
 	}
 
-	public MyByteArrayInputStream getSideViewGif(int width, int height) throws Exception {
+	public MyByteArrayInputStream getSideViewGif(int width, int height,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 		ArrayList<String> delayTimes = new ArrayList<String>();
 
 		int degreeSteps = 2;
 		int degree = 0;
 		int delay = 3;
+		if (optStatus != null)
+			optStatus.setCurrentStatusValueFine(0);
 		while (degree < 360) {
 			BufferedImage result = new BufferedImage(getDimensionX(), getDimensionY(), BufferedImage.TYPE_INT_ARGB);
 			renderSideView(degree, result);
@@ -270,10 +274,14 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			images.add(result);
 			delayTimes.add("" + delay);
 			degree += degreeSteps;
+			if (optStatus != null)
+				optStatus.setCurrentStatusValueFine(degree * 100d / 360);
 		}
 
 		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
 		WriteAnimatedGif.saveAnimate(out, images.toArray(new BufferedImage[] {}), delayTimes.toArray(new String[] {}));
+		if (optStatus != null)
+			optStatus.setCurrentStatusValueFine(100);
 		return new MyByteArrayInputStream(out.getBuff());
 	}
 

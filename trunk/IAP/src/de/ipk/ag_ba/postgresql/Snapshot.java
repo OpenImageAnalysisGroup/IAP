@@ -11,6 +11,8 @@ public class Snapshot {
 	private Timestamp time_stamp;
 	private double weight_before, weight_after;
 	private int water_amount;
+	private double xFactor;
+	private double yFactor;
 
 	public void setCreator(String creator) {
 		this.creator = creator;
@@ -90,5 +92,21 @@ public class Snapshot {
 
 	public int getWater_amount() {
 		return water_amount;
+	}
+
+	public void setXfactor(double xfactor) {
+		this.xFactor = xfactor;
+	}
+
+	public void setYfactor(double yfactor) {
+		this.yFactor = yfactor;
+	}
+
+	public double getXfactor() {
+		return xFactor;
+	}
+
+	public double getYfactor() {
+		return yFactor;
 	}
 }

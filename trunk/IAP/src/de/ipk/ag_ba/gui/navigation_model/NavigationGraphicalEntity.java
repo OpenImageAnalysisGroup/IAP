@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -40,6 +41,7 @@ import de.ipk.ag_ba.gui.calendar.MyCalendarIcon;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
+import de.ipk.ag_ba.gui.navigation_actions.BookmarkAction;
 import de.ipk.ag_ba.gui.navigation_actions.Calendar2;
 import de.ipk.ag_ba.gui.util.MyUtility;
 import de.ipk.ag_ba.gui.webstart.AIPmain;
@@ -71,29 +73,36 @@ public class NavigationGraphicalEntity implements StyleAware {
 	private ProgressStatusService statusServer;
 
 	public NavigationGraphicalEntity(NavigationAction navigationAction) {
-		this.setTitle(navigationAction.getDefaultTitle());
-		this.navigationImage = navigationAction.getDefaultNavigationImage();
-		this.actionImage = navigationAction.getDefaultImage();
+		if (navigationAction != null) {
+			this.setTitle(navigationAction.getDefaultTitle());
+			this.navigationImage = navigationAction.getDefaultNavigationImage();
+			this.actionImage = navigationAction.getDefaultImage();
+		}
 		this.action = navigationAction;
 	}
 
 	public NavigationGraphicalEntity(NavigationAction navigationAction, String title, String image) {
+		this(navigationAction);
 		this.setTitle(title);
 		this.navigationImage = image;
 		this.actionImage = image;
-		this.action = navigationAction;
 	}
 
 	public NavigationGraphicalEntity(NavigationAction navigationAction, String title, String navigationImage,
 			String actionImage) {
+		this(navigationAction);
 		this.setTitle(title);
 		this.navigationImage = navigationImage;
 		this.actionImage = actionImage;
-		this.action = navigationAction;
 	}
 
 	public NavigationGraphicalEntity(JComponent gui) {
 		this.gui = gui;
+	}
+
+	public NavigationGraphicalEntity(BookmarkAction ba, BufferedImage image) {
+		this(ba);
+		this.icon = new ImageIcon(image);
 	}
 
 	public JComponent getGUI() {
@@ -151,8 +160,8 @@ public class NavigationGraphicalEntity implements StyleAware {
 				line2 = action.getStatusProvider().getCurrentStatusMessage1();
 			if (statusServer != null) {
 				BackgroundTaskStatusProvider status = action.getStatusProvider();
-				String eta = statusServer.getRemainTime(status.getCurrentStatusValue() == -1,
-						status.getCurrentStatusValueFine());
+				String eta = statusServer.getRemainTime(status.getCurrentStatusValue() == -1, status
+						.getCurrentStatusValueFine());
 				if (eta.length() > 0) {
 					if (line2.length() > 0)
 						line2 += ", ";
@@ -303,7 +312,7 @@ public class NavigationGraphicalEntity implements StyleAware {
 			srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(-1);
 			srcNavGraphicslEntity.setProcessing(true);
 			NavigationGraphicalEntity.checkButtonTitle(srcNavGraphicslEntity, n1);
-			MyUtility.navigate(navPanel.getEntitySet(), srcNavGraphicslEntity.getTitle());
+			MyUtility.navigate(navPanel.getEntitySet(false), srcNavGraphicslEntity.getTitle());
 			final NavigationAction na = srcNavGraphicslEntity.getAction();
 
 			BackgroundTaskHelper.issueSimpleTask(srcNavGraphicslEntity.getTitle(), "Please wait...", new Runnable() {
@@ -330,8 +339,8 @@ public class NavigationGraphicalEntity implements StyleAware {
 								ArrayList<JComponent> errors = new ArrayList<JComponent>();
 								for (String s : ErrorMsg.getErrorMessages()) {
 									JLabel e = new JLabel("<html><table><tr><td>"
-											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
-													.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
+											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_")).replaceAll(
+													"_br_", "<br>").replaceAll("\n", "<br>"));
 									e.setOpaque(true);
 									e.setBackground(new Color(255, 240, 240));
 									e.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -354,8 +363,8 @@ public class NavigationGraphicalEntity implements StyleAware {
 								ArrayList<JComponent> errors = new ArrayList<JComponent>();
 								for (String s : ErrorMsg.getErrorMessages()) {
 									JLabel e = new JLabel("<html><table><tr><td>"
-											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
-													.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
+											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_")).replaceAll(
+													"_br_", "<br>").replaceAll("\n", "<br>"));
 									e.setOpaque(true);
 									e.setBackground(new Color(255, 240, 240));
 									e.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -374,15 +383,11 @@ public class NavigationGraphicalEntity implements StyleAware {
 						}
 
 						if (target == PanelTarget.NAVIGATION) {
-							ArrayList<NavigationGraphicalEntity> set = new ArrayList<NavigationGraphicalEntity>();
-							for (NavigationGraphicalEntity ne : navPanel.getEntitySet()) {
-								set.add(ne);
-								if (ne == srcNavGraphicslEntity)
-									break;
-							}
-							navPanel.setEntitySet(set);
+							navPanel.setEntitySet(na.getResultNewNavigationSet(new ArrayList<NavigationGraphicalEntity>()));
 						} else {
-							ArrayList<NavigationGraphicalEntity> set = na.getResultNewNavigationSet(navPanel.getEntitySet());
+							boolean includeBookmarks = false;
+							ArrayList<NavigationGraphicalEntity> var = navPanel.getEntitySet(includeBookmarks);
+							ArrayList<NavigationGraphicalEntity> set = na.getResultNewNavigationSet(var);
 							boolean execute = false;
 							NavigationGraphicalEntity del = null;
 							if (set != null)
@@ -441,7 +446,7 @@ public class NavigationGraphicalEntity implements StyleAware {
 
 		ImageIcon icon;
 		if (n.getIcon() != null) {
-			icon = n.getIcon();
+			icon = new ImageIcon(GravistoService.getScaledImage(n.getIcon().getImage(), -imgS, imgS));
 		} else {
 			if (target == PanelTarget.NAVIGATION)
 				icon = GravistoService.loadIcon(AIPmain.class, n.getNavigationImage(), -imgS, imgS);
@@ -549,8 +554,8 @@ public class NavigationGraphicalEntity implements StyleAware {
 			n1.setToolTipText(n.getToolTip());
 
 		if (n.getSideGui() != null)
-			return TableLayout.get3Split(n1, null, n.getSideGui(), TableLayout.PREFERRED, n.getSideGuiSpace(),
-					n.getSideGuiWidth());
+			return TableLayout.get3Split(n1, null, n.getSideGui(), TableLayout.PREFERRED, n.getSideGuiSpace(), n
+					.getSideGuiWidth());
 		else
 			return n1;
 	}

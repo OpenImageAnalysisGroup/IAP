@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.BackgroundTaskStatusProvider;
+import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.nav.RimasNav;
@@ -11,16 +12,17 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
+import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
  * @author klukas
  */
-public final class Home extends AbstractNavigationAction {
+public final class HomeAction extends AbstractNavigationAction {
 	private final ArrayList<NavigationGraphicalEntity> homePrimaryActions;
 	private final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus;
 
-	public Home(BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
+	public HomeAction(BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
 		super("IAP Home");
 		homePrimaryActions = new ArrayList<NavigationGraphicalEntity>();
 		this.myStatus = myStatus;
@@ -130,9 +132,20 @@ public final class Home extends AbstractNavigationAction {
 		homePrimaryActions.add(new NavigationGraphicalEntity(ipkBioInf));
 	}
 
+	ArrayList<NavigationGraphicalEntity> bookmarks;
+
 	@Override
 	public void performActionCalculateResults(NavigationGraphicalEntity src) {
-		// no calculation needed
+		bookmarks = new ArrayList<NavigationGraphicalEntity>();
+		try {
+			for (Bookmark b : Bookmark.getBookmarks()) {
+				BookmarkAction ba = new BookmarkAction(b);
+				NavigationGraphicalEntity nge = new NavigationGraphicalEntity(ba, ba.getImage());
+				bookmarks.add(nge);
+			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
 	}
 
 	@Override
@@ -150,6 +163,10 @@ public final class Home extends AbstractNavigationAction {
 	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
 		ArrayList<NavigationGraphicalEntity> homeNavigation = new ArrayList<NavigationGraphicalEntity>();
 		homeNavigation.add(new NavigationGraphicalEntity(this));
+
+		for (NavigationGraphicalEntity n : bookmarks)
+			homeNavigation.add(n);
+
 		return homeNavigation;
 	}
 
