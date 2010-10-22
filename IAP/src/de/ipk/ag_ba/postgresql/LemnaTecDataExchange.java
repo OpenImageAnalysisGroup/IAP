@@ -5,6 +5,7 @@
  *************************************************************************/
 package de.ipk.ag_ba.postgresql;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -20,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.ErrorMsg;
 import org.StringManipulationTools;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
@@ -30,8 +32,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayInputStream;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayOutputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.loaders.MeasurementNodeType;
@@ -201,36 +207,70 @@ public class LemnaTecDataExchange {
 		Collection<Snapshot> result = new ArrayList<Snapshot>();
 		Connection connection = openConnectionToDatabase(database);
 
-		String sqlText = "SELECT "
-				+ "creator, measurement_label, camera_label, id_tag, path, "
-				+ "time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor "
-				+ "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
-				+ "WHERE snapshot.measurement_label = ? and snapshot.id = tiled_image.snapshot_id and "
-				+ "tiled_image.id = tile.tiled_image_id and tile.image_oid = image_file_table.id and "
-				+ "snapshot.configuration_id = image_unit_configuration.compconfigid and tiled_image.camera_label = image_unit_configuration.gid";
+		HashMap<Long, String> id2path = new HashMap<Long, String>();
+		String sqlReadImageFileTable = "SELECT "
+				+ "image_file_table.id as image_file_tableID, path FROM image_file_table";
+		//		
+		// +
+		// "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
+		// + "WHERE snapshot.measurement_label = ? and "
+		// + "("
+		// + "snapshot.id = tiled_image.snapshot_id and "
+		// + "tiled_image.id = tile.tiled_image_id and "
+		// +
+		// "(tile.image_oid = image_file_table.id OR tile.null_image_oid = image_file_table.id)) OR ("
+		// +
+		// "snapshot.configuration_id = image_unit_configuration.compconfigid and snapshot.id = tiled_image.snapshot_id and tiled_image.camera_label = image_unit_configuration.gid and image_unit_configuration.image_parameter_oid = image_file_table.id)";
 
-		PreparedStatement ps = connection.prepareStatement(sqlText);
-		ps.setString(1, experiment);
+		PreparedStatement ps = connection.prepareStatement(sqlReadImageFileTable);
+		// ps.setString(1, experiment);
 
 		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			id2path.put(rs.getLong("image_file_tableID"), rs.getString("path"));
+		}
+		rs.close();
+		ps.close();
+
+		String sqlText = "SELECT "
+				+ "creator, measurement_label, camera_label, id_tag, path, "
+				+ "time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
+				+ "image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, image_file_table.id as image_file_tableID "
+				+ "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
+				+ "WHERE snapshot.measurement_label = ? and snapshot.id = tiled_image.snapshot_id and "
+				+ "tiled_image.id = tile.tiled_image_id and "
+				+ "tile.image_oid = image_file_table.id and "
+				+ "snapshot.configuration_id = image_unit_configuration.compconfigid and tiled_image.camera_label = image_unit_configuration.gid";
+
+		ps = connection.prepareStatement(sqlText);
+		ps.setString(1, experiment);
+
+		rs = ps.executeQuery();
 
 		while (rs.next()) {
 			Snapshot snapshot = new Snapshot();
 
-			snapshot.setCreator(rs.getString(1));
-			snapshot.setMeasurement_label(rs.getString(2));
-			snapshot.setCamera_label(rs.getString(3));
-			snapshot.setId_tag(rs.getString(4));
-			snapshot.setPath_image(rs.getString(5));
-			// snapshot.setPath_null_image(rs.getString(6));
-			snapshot.setTime_stamp(rs.getTimestamp(6));
-			snapshot.setWater_amount(rs.getInt(7));
-			snapshot.setWeight_after(rs.getDouble(8));
-			snapshot.setWeight_before(rs.getDouble(9));
+			snapshot.setCreator(rs.getString("creator"));
+			snapshot.setMeasurement_label(rs.getString("measurement_label"));
+			snapshot.setUserDefinedCameraLabeL(rs.getString("camera_label"));
+			snapshot.setId_tag(rs.getString("id_tag"));
+
+			snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
+			snapshot.setWater_amount(rs.getInt("water_amount"));
+			snapshot.setWeight_after(rs.getDouble("weight_after"));
+			snapshot.setWeight_before(rs.getDouble("weight_before"));
 
 			snapshot.setCamera_label(rs.getString("compname"));
 			snapshot.setXfactor(rs.getDouble("xfactor"));
 			snapshot.setYfactor(rs.getDouble("yfactor"));
+
+			String s1 = id2path.get(rs.getLong("image_oid"));
+			snapshot.setPath_image(s1);
+			String s2 = id2path.get(rs.getLong("null_image_oid"));
+			snapshot.setPath_null_image(s2);
+			String s3 = id2path.get(rs.getLong("image_parameter_oid"));
+			System.out.println(s3);
+			snapshot.setPath_image_config_blob(s3);
 
 			result.add(snapshot);
 		}
@@ -308,6 +348,8 @@ public class LemnaTecDataExchange {
 		HashMap<String, Condition> idtag2condition = getPlantIdAnnotation(experimentReq);
 
 		System.out.println("Snapshots: " + snapshots.size());
+
+		HashMap<String, byte[]> blob2buf = new HashMap<String, byte[]>();
 
 		for (Snapshot sn : snapshots) {
 			if (sn.getId_tag().length() <= 0) {
@@ -473,6 +515,69 @@ public class LemnaTecDataExchange {
 					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
 							+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + position.intValue() + ")" : ""));
 					image.setURL(url);
+					fn = sn.getPath_null_image();
+					if (fn != null) {
+						if (fn.contains("/"))
+							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
+						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
+								+ sn.getPath_null_image(), sn.getId_tag()
+								+ (position != null ? " (" + position.intValue() + ")" : ""));
+						image.setURL(new IOurl(image.getURL().toString() + "," + url.toString()));
+					}
+					fn = sn.getPath_image_config_blob();
+					if (fn != null) {
+						if (fn.contains("/"))
+							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
+						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
+								+ sn.getPath_image_config_blob(), sn.getId_tag()
+								+ (position != null ? " (" + position.intValue() + ")" : ""));
+						try {
+							byte[] buf;
+							if (blob2buf.containsKey(url.toString()))
+								buf = blob2buf.get(url.toString());
+							else {
+								InputStream in = ExperimentIOManager.getInputStream(url);
+								// read config object in order to detect rotation angle
+								MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+								byte[] temp = new byte[1024];
+								int read = in.read(temp);
+								while (read > 0) {
+									out.write(temp, 0, read);
+									read = in.read(temp);
+								}
+								buf = out.getBuff();
+								blob2buf.put(url.toString(), buf);
+							}
+							TextFile tf = new TextFile(new MyByteArrayInputStream(buf), 0);
+							System.out.println(url.toString());
+							System.out.println("Config: " + sn.getCamera_label() + " / " + sn.getUserDefinedCameraLabel()
+									+ ", byte 3499: " + buf[3499]);
+							for (String ss : tf)
+								if (ss.indexOf("angle") > 0) {
+									ss = ss.substring(ss.indexOf("angle"));
+									if (ss.length() > 30)
+										ss = ss.substring(0, 30);
+									// System.out.println(ss);
+									ss = ss.substring("angle".length());
+									int idx = 0;
+									for (char c : ss.toCharArray()) {
+										System.out.print((byte) c + ",");
+										idx++;
+										if (idx == 6) {
+											if ((byte) c == -3)
+												System.out.println("90 Grad");
+											if ((byte) c == 0)
+												System.out.println("0 Grad");
+										}
+										if (idx > 10)
+											break;
+									}
+								}
+							System.out.println("");
+						} catch (Exception e) {
+							ErrorMsg.addErrorMessage(e);
+						}
+					}
 					measurements.add(image);
 				}
 			}

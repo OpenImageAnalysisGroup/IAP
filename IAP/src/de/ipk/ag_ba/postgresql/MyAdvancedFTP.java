@@ -162,8 +162,8 @@ public class MyAdvancedFTP {
 			status.setCurrentStatusText1("Download started..");
 			status.setCurrentStatusText2("Please Wait.");
 
-			OutputStream output = null; // TODO new MyOutputStream(lastStatus,
-													// status, target);
+			OutputStream output = null; // new MyOutputStream(lastStatus, status,
+													// target);
 			myoutputstream.setObject(output);
 			ftp.setRemoteVerificationEnabled(false);
 			boolean result = ftp.retrieveFile(remote, output);

@@ -13,6 +13,16 @@ public class Snapshot {
 	private int water_amount;
 	private double xFactor;
 	private double yFactor;
+	private String path_image_config_blob;
+	private String userDefinedCameraLabel;
+
+	@Override
+	public String toString() {
+		return "creator=" + creator + ", label=" + measurement_label + ", id_tag=" + id_tag + ", camera_label="
+				+ camera_label + ", user_camera_label=" + userDefinedCameraLabel + ", image=" + path_image
+				+ ", null_image=" + path_null_image + ", config_blob=" + path_image_config_blob;
+
+	}
 
 	public void setCreator(String creator) {
 		this.creator = creator;
@@ -62,6 +72,14 @@ public class Snapshot {
 		return path_null_image;
 	}
 
+	public void setPath_image_config_blob(String path_image_config_blob) {
+		this.path_image_config_blob = path_image_config_blob;
+	}
+
+	public String getPath_image_config_blob() {
+		return path_image_config_blob;
+	}
+
 	public void setTime_stamp(Timestamp time_stamp) {
 		this.time_stamp = time_stamp;
 	}
@@ -108,5 +126,13 @@ public class Snapshot {
 
 	public double getYfactor() {
 		return yFactor;
+	}
+
+	public void setUserDefinedCameraLabeL(String userDefinedCameraLabel) {
+		this.userDefinedCameraLabel = userDefinedCameraLabel;
+	}
+
+	public String getUserDefinedCameraLabel() {
+		return userDefinedCameraLabel;
 	}
 }
