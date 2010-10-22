@@ -53,7 +53,7 @@ public class LemnaTecFTPhandler implements MeasurementIOHandler {
 			} else {
 				boolean advancedFTP = false;
 				if (advancedFTP) {
-					// todo // MyAdvancedFTP.download();
+					// MyAdvancedFTP.download();
 					return null;
 				} else {
 					String detail = url.getDetail();
