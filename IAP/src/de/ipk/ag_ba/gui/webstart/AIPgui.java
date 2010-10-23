@@ -30,6 +30,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.navigation_actions.HomeAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
@@ -79,7 +80,8 @@ public class AIPgui {
 		actionPanel.setTheOther(navigationPanel);
 
 		HomeAction home = new HomeAction(myStatus);
-		final NavigationGraphicalEntity overView = new NavigationGraphicalEntity(home);
+		GUIsetting guiSetting = new GUIsetting(navigationPanel, actionPanel, graphPanel);
+		final NavigationGraphicalEntity overView = new NavigationGraphicalEntity(home, guiSetting);
 
 		overView.setTitle("Initialize");
 		overView.setProcessing(true);
@@ -113,9 +115,9 @@ public class AIPgui {
 			}
 		});
 
-		return TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionPanel, actionPanelRight,
-				TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED, TableLayout.PREFERRED,
-				TableLayout.FILL);
+		return TableLayout.get3SplitVertical(navigationPanel,
+				TableLayout.getSplit(actionPanel, actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel,
+				TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL);
 	}
 
 	public static String getIntroTxt() {
@@ -140,9 +142,9 @@ public class AIPgui {
 
 	public static void navigateTo(String target, NavigationGraphicalEntity src) {
 		HashMap<String, NavigationGraphicalEntity> knownEntities = new HashMap<String, NavigationGraphicalEntity>();
-		MyNavigationPanel navigationPanel = null;
-		MyNavigationPanel actionPanel = null;
-		JComponent graphPanel = null;
+		MyNavigationPanel navigationPanel = src.getGUIsetting().getNavigationPanel();
+		MyNavigationPanel actionPanel = src.getGUIsetting().getActionPanel();
+		JComponent graphPanel = src.getGUIsetting().getGraphPanel();
 		navigateTo(target, navigationPanel, actionPanel, graphPanel, knownEntities);
 	}
 
@@ -157,6 +159,8 @@ public class AIPgui {
 
 		if (target.startsWith("Overview"))
 			target = target.substring("Overview".length());
+		if (target.startsWith("IAP"))
+			target = target.substring("IAP".length());
 		if (target.startsWith("."))
 			target = target.substring(".".length());
 

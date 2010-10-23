@@ -19,6 +19,7 @@ import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.DeletionCommand;
 import de.ipk.ag_ba.gui.navigation_actions.Other;
 import de.ipk.ag_ba.gui.navigation_actions.Trash;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
@@ -51,10 +52,10 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		if (header != null && !header.getExcelfileid().startsWith("lemnatec:")
 				&& (header.getImportusername() == null || header.getImportusername().equals(SystemAnalysis.getUserName()))) {
 			if (header.inTrash()) {
-				actions.add(Trash.getTrashEntity(header, DeletionCommand.UNTRASH));
-				actions.add(Trash.getTrashEntity(header, DeletionCommand.DELETE));
+				actions.add(Trash.getTrashEntity(header, DeletionCommand.UNTRASH, src.getGUIsetting()));
+				actions.add(Trash.getTrashEntity(header, DeletionCommand.DELETE, src.getGUIsetting()));
 			} else
-				actions.add(Trash.getTrashEntity(header, DeletionCommand.TRASH));
+				actions.add(Trash.getTrashEntity(header, DeletionCommand.TRASH, src.getGUIsetting()));
 		}
 		boolean add = true;
 		if (header != null && header.inTrash())
@@ -63,25 +64,25 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			add = true;
 		}
 		if (add) {
-			getDefaultActions(actions, experiment, header, true);
+			getDefaultActions(actions, experiment, header, true, src.getGUIsetting());
 		}
 		return actions;
 	}
 
 	public static void getDefaultActions(ArrayList<NavigationGraphicalEntity> actions, ExperimentInterface experiment,
-			ExperimentHeaderInterface header, boolean imageAnalysis) {
+			ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting) {
 		if (experiment == null)
 			return;
 		try {
 			if (imageAnalysis)
 				for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
-						null, new ExperimentReference(experiment)))
+						null, new ExperimentReference(experiment), guiSetting))
 					actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		for (NavigationGraphicalEntity ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
-				new ExperimentReference(experiment))) {
+				new ExperimentReference(experiment), guiSetting)) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
 				actions.add(ne);

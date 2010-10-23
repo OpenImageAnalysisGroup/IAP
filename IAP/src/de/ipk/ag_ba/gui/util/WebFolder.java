@@ -55,6 +55,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.Other;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.webstart.AIPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
@@ -68,7 +69,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class WebFolder {
 	public static NavigationGraphicalEntity getBrowserNavigationEntity(final HashMap<String, String> folder2url,
 			String title, String icon, final String url, final String referenceTitle, final String referenceImage,
-			final String referenceURL, final String[] valid, final String introTxt, final String optSubFolderForFolderItems) {
+			final String referenceURL, final String[] valid, final String introTxt,
+			final String optSubFolderForFolderItems, GUIsetting guiSetting) {
 
 		NavigationGraphicalEntity nav = new NavigationGraphicalEntity(new AbstractNavigationAction(
 				"Open web-folder content") {
@@ -108,7 +110,8 @@ public class WebFolder {
 							return null;
 						}
 					};
-					NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, referenceTitle, referenceImage);
+					NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, referenceTitle,
+							referenceImage, src.getGUIsetting());
 					website.setToolTipText("Open " + referenceURL);
 					actions.add(website);
 				}
@@ -135,7 +138,7 @@ public class WebFolder {
 						};
 
 						NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, fp.split(":")[0],
-								"img/dataset.png");
+								"img/dataset.png", src.getGUIsetting());
 						website.setToolTipText("Open " + folder2url.get("").split(":", 2)[1]);
 						actions.add(website);
 					}
@@ -145,7 +148,7 @@ public class WebFolder {
 				if (optSubFolderForFolderItems != null && optSubFolderForFolderItems.length() > 0) {
 					subFolderAction = new EmptyNavigationAction(optSubFolderForFolderItems, "Show List of Web-Ressources",
 							"img/ext/folder.png", "img/ext/folder-drag-accept.png");
-					NavigationGraphicalEntity subFolder = new NavigationGraphicalEntity(subFolderAction);
+					NavigationGraphicalEntity subFolder = new NavigationGraphicalEntity(subFolderAction, src.getGUIsetting());
 					actions.add(subFolder);
 				}
 
@@ -167,12 +170,12 @@ public class WebFolder {
 
 					if (folders.size() == 0) {
 						for (PathwayWebLinkItem mc : mainList) {
-							NavigationGraphicalEntity ne = getPathwayViewEntity(mc);
+							NavigationGraphicalEntity ne = getPathwayViewEntity(mc, src.getGUIsetting());
 							actions.add(ne);
 						}
 					}
 				} catch (Exception e) {
-					NavigationGraphicalEntity ne = Other.getServerStatusEntity(false);
+					NavigationGraphicalEntity ne = Other.getServerStatusEntity(false, src.getGUIsetting());
 					ne.setTitle("- Connection Problem -");
 					actions.add(ne);
 					ErrorMsg.addErrorMessage(e);
@@ -221,7 +224,7 @@ public class WebFolder {
 									public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 										return null;
 									}
-								}, title, "img/dataset.png");
+								}, title, "img/dataset.png", src.getGUIsetting());
 								website.setToolTipText("Open " + url);
 								res.add(website);
 							}
@@ -229,13 +232,13 @@ public class WebFolder {
 							// "img/ext/folder-drag-accept.png"
 
 							for (PathwayWebLinkItem mc : folder2file.get(ff)) {
-								NavigationGraphicalEntity j = getPathwayViewEntity(mc);
+								NavigationGraphicalEntity j = getPathwayViewEntity(mc, src.getGUIsetting());
 								res.add(j);
 							}
 
 							return res;
 						}
-					}, f, "img/ext/folder-remote-open.png", "img/ext/folder-remote.png");
+					}, f, "img/ext/folder-remote-open.png", "img/ext/folder-remote.png", src.getGUIsetting());
 
 					if (subFolderAction != null)
 						subFolderAction.addAdditionalEntity(ne);
@@ -252,12 +255,12 @@ public class WebFolder {
 				else
 					return null;
 			}
-		}, title, icon);
+		}, title, icon, guiSetting);
 
 		return nav;
 	}
 
-	private static NavigationGraphicalEntity getPathwayViewEntity(final PathwayWebLinkItem mmc) {
+	private static NavigationGraphicalEntity getPathwayViewEntity(final PathwayWebLinkItem mmc, GUIsetting guiSettings) {
 		NavigationGraphicalEntity ne = new NavigationGraphicalEntity(new AbstractNavigationAction(
 				"Load web-folder content") {
 			private NavigationGraphicalEntity src = null;
@@ -322,11 +325,11 @@ public class WebFolder {
 				};
 
 				NavigationGraphicalEntity editInVanted = new NavigationGraphicalEntity(action, "Edit in VANTED",
-						"img/vanted1_0.png");
+						"img/vanted1_0.png", src.getGUIsetting());
 				result.add(editInVanted);
 
 				JComponent zoomSlider = getZoomSliderForGraph(scrollpaneRef);
-				result.add(new NavigationGraphicalEntity(zoomSlider));
+				result.add(new NavigationGraphicalEntity(zoomSlider, src.getGUIsetting()));
 
 				return result;
 			}
@@ -490,7 +493,7 @@ public class WebFolder {
 				}
 				return null;
 			}
-		}, mmc.toString(), "img/graphfile.png");
+		}, mmc.toString(), "img/graphfile.png", guiSettings);
 
 		return ne;
 	}
@@ -574,7 +577,8 @@ public class WebFolder {
 		}
 	}
 
-	public static NavigationGraphicalEntity getURLentity(String title, final String referenceURL, String image) {
+	public static NavigationGraphicalEntity getURLentity(String title, final String referenceURL, String image,
+			GUIsetting guiSetting) {
 		NavigationAction action = new AbstractNavigationAction("Show in browser") {
 			@Override
 			public void performActionCalculateResults(NavigationGraphicalEntity src) {
@@ -592,7 +596,7 @@ public class WebFolder {
 				return null;
 			}
 		};
-		NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, title, image);
+		NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, title, image, guiSetting);
 		website.setToolTipText("Open " + referenceURL);
 
 		return website;

@@ -17,6 +17,7 @@ import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.Other;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
@@ -45,23 +46,23 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 		// ei.experimentName));
 
 		if (experiment != null) {
-			getDefaultActions(actions, experiment, experiment.getHeader(), true);
+			getDefaultActions(actions, experiment, experiment.getHeader(), true, src.getGUIsetting());
 		}
 		return actions;
 	}
 
 	public static void getDefaultActions(ArrayList<NavigationGraphicalEntity> actions, ExperimentInterface experiment,
-			ExperimentHeaderInterface header, boolean imageAnalysis) {
+			ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting) {
 		try {
 			if (imageAnalysis)
 				for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
-						null, new ExperimentReference(experiment)))
+						null, new ExperimentReference(experiment), guiSetting))
 					actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		for (NavigationGraphicalEntity ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
-				new ExperimentReference(experiment))) {
+				new ExperimentReference(experiment), guiSetting)) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
 				actions.add(ne);

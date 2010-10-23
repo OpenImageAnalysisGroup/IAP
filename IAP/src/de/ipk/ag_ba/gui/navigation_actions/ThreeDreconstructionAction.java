@@ -11,6 +11,7 @@ import de.ipk.ag_ba.gui.ImageAnalysis3D;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
@@ -147,13 +148,14 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			ip.setExperimentInfo(login, pass, statisticsResult.getHeader(), true, statisticsResult);
 			mpc = new MainPanelComponent(ip, true);
 
-			storedActions.add(FileManagerExp.getFileManagerEntity(login, pass, new ExperimentReference(statisticsResult)));
+			storedActions.add(FileManagerExp.getFileManagerEntity(login, pass, new ExperimentReference(statisticsResult),
+					src.getGUIsetting()));
 
 			storedActions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass, new ExperimentReference(
-					statisticsResult)), "Store Dataset", "img/ext/user-desktop.png")); // PoweredMongoDBgreen.png"));
+					statisticsResult)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
-			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult, statisticsResult
-					.getHeader(), false);
+			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult,
+					statisticsResult.getHeader(), false, src.getGUIsetting());
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();
 			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
@@ -176,11 +178,12 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
 		if (!ImageAnalysis3D.isSaveInDatabase()) {
 			NavigationGraphicalEntity imageHistogram = new NavigationGraphicalEntity(TableLayout.get3Split(histogram,
-					histogramG, histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED));
+					histogramG, histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED),
+					src.getGUIsetting());
 			res.add(imageHistogram);
 
-			NavigationGraphicalEntity imageZoom = new NavigationGraphicalEntity(ImageAnalysis3D
-					.getImageZoomSlider(zoomedImages));
+			NavigationGraphicalEntity imageZoom = new NavigationGraphicalEntity(
+					ImageAnalysis3D.getImageZoomSlider(zoomedImages), src.getGUIsetting());
 			res.add(imageZoom);
 		}
 		res.addAll(storedActions);
@@ -193,11 +196,12 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 	}
 
 	public static NavigationGraphicalEntity getThreeDreconstructionTaskEntity(final String login, final String pass,
-			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2) {
+			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
+			GUIsetting guiSetting) {
 
 		NavigationAction clearBackgroundAction = new ThreeDreconstructionAction(login, pass, experiment);
 		NavigationGraphicalEntity resultTaskButton = new NavigationGraphicalEntity(clearBackgroundAction, title,
-				"img/RotationReconstruction.png");
+				"img/RotationReconstruction.png", guiSetting);
 		return resultTaskButton;
 	}
 }

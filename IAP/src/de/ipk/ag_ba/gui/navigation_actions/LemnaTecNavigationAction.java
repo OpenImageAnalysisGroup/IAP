@@ -65,7 +65,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		this.src = src;
 		result.clear();
 		try {
-			result.add(new NavigationGraphicalEntity(new LemnaTecUserNavigationAction()));
+			result.add(new NavigationGraphicalEntity(new LemnaTecUserNavigationAction(), src.getGUIsetting()));
 
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
@@ -75,7 +75,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 					Collection<ExperimentHeaderInterface> experiments = new LemnaTecDataExchange()
 							.getExperimentInDatabase(db);
 					if (experiments.size() > 0)
-						result.add(new NavigationGraphicalEntity(new LemnaDbAction(db, experiments)));
+						result.add(new NavigationGraphicalEntity(new LemnaDbAction(db, experiments), src.getGUIsetting()));
 					else
 						System.out.println("Database " + db + " is empty.");
 					for (ExperimentHeaderInterface ehi : experiments) {
@@ -86,7 +86,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 					System.out.println("Database " + db + " could not be processed.");
 				}
 			}
-			result.add(1, Other.getCalendarEntity(allExperiments, login, pass));
+			result.add(1, Other.getCalendarEntity(allExperiments, login, pass, src.getGUIsetting()));
 
 		} catch (Exception e) {
 			// error

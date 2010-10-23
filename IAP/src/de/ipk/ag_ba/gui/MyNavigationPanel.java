@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -147,6 +148,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			ArrayList<JComponent> right = new ArrayList<JComponent>();
 			boolean first = true;
 			ObjectRef next = new ObjectRef();
+			boolean firstStar = true;
 			for (NavigationGraphicalEntity ne : set) {
 				if (ne instanceof StyleAware) {
 					((StyleAware) ne).setButtonStyle(buttonStyle);
@@ -158,10 +160,14 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							next.setObject(lbl);
 							next = new ObjectRef();
 						}
-						HashMap<String, NavigationGraphicalEntity> knownEntities = new HashMap<String, NavigationGraphicalEntity>();
-						AIPgui.navigateTo("", this, theOther, lbl, knownEntities);
 						if (ne.getAction() instanceof BookmarkAction) {
+							if (firstStar)
+								lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+							else
+								lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+
 							lbl.setText("<html><font size='5'>" + Unicode.STAR);
+							firstStar = false;
 							lbl.setToolTipText("Remove " + ne.getTitle() + " bookmark");
 							lbl.addMouseListener(getDeleteBookmarkActionListener(lbl, next, ne.getAction()));
 						} else {
@@ -182,6 +188,15 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						add(NavigationGraphicalEntity.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
 								graphPanel));
 				}
+			}
+			if (!firstStar) {
+				JLabel lbl = new JLabel("<html><small>" + Unicode.ARROW_RIGHT);
+				if (next != null) {
+					next.setObject(lbl);
+				}
+				lbl.setText("<html><font size='5'>" + Unicode.STAR);
+				lbl.setForeground(Color.GRAY);
+				add(lbl);
 			}
 			if (actionPanelRight != null) {
 				if (right.size() > 0) {
@@ -232,8 +247,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						if (target != null) {
 							if (Bookmark.add(ne.getTitle(), target, i)) {
 								if (!set.isEmpty())
-									set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
-											theOther, graphPanel, null, null);
+									set.iterator()
+											.next()
+											.executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this, theOther,
+													graphPanel, null, null);
 							} else
 								MainFrame.getInstance().showMessageDialog("Could not add bookmark.");
 						} else
@@ -296,8 +313,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							MainFrame.getInstance().showMessageDialog("Could not delete bookmark.");
 						} else {
 							if (!set.isEmpty())
-								set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
-										theOther, graphPanel, null, null);
+								set.iterator()
+										.next()
+										.executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this, theOther, graphPanel,
+												null, null);
 						}
 					}
 				}

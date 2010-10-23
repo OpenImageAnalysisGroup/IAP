@@ -7,6 +7,7 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
@@ -95,12 +96,14 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 			ip.setExperimentInfo(login, pass, res.getHeader(), true, res);
 			mpc = new MainPanelComponent(ip, true);
 
-			storedActions.add(FileManagerExp.getFileManagerEntity(login, pass, new ExperimentReference(res)));
+			storedActions.add(FileManagerExp.getFileManagerEntity(login, pass, new ExperimentReference(res),
+					src.getGUIsetting()));
 
 			storedActions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass,
-					new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png")); // PoweredMongoDBgreen.png"));
+					new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
-			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, res, res.getHeader(), false);
+			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, res, res.getHeader(), false,
+					src.getGUIsetting());
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();
 			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
@@ -131,11 +134,12 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 	}
 
 	public static NavigationGraphicalEntity getThreeDsegmentationTaskEntity(final String login, final String pass,
-			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2) {
+			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
+			GUIsetting guiSetting) {
 
 		NavigationAction segmentationAction = new ThreeDsegmentationAction(login, pass, experiment);
 		NavigationGraphicalEntity resultTaskButton = new NavigationGraphicalEntity(segmentationAction, title,
-				"img/RotationReconstructionSegmentation.png");
+				"img/RotationReconstructionSegmentation.png", guiSetting);
 		return resultTaskButton;
 	}
 }

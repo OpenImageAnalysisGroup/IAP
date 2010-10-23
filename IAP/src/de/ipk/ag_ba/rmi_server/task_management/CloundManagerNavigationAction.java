@@ -42,7 +42,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
 		NavigationGraphicalEntity startOrStopServerMode = new NavigationGraphicalEntity(
-				new EnableOrDisableServerModeAction(login, pass));
+				new EnableOrDisableServerModeAction(login, pass), src.getGUIsetting());
 		res.add(startOrStopServerMode);
 		return res;
 	}

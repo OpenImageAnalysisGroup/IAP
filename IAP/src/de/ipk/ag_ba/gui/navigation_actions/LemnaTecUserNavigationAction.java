@@ -42,7 +42,8 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
 		for (String user : userName2dbAndExperiment.keySet()) {
-			result.add(new NavigationGraphicalEntity(new LemnaUserAction(user, userName2dbAndExperiment.get(user))));
+			result.add(new NavigationGraphicalEntity(new LemnaUserAction(user, userName2dbAndExperiment.get(user)), src
+					.getGUIsetting()));
 		}
 		return result;
 	}
