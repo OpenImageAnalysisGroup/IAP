@@ -52,7 +52,8 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 		ExperimentReference exp = experiment;
 		try {
 			exp.setExperimentData(experiment.getData());
-			for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(login, pass, exp))
+			for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(login, pass, exp,
+					src.getGUIsetting()))
 				actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);

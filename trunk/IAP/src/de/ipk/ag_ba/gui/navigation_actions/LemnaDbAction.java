@@ -36,7 +36,7 @@ public class LemnaDbAction extends AbstractNavigationAction implements Navigatio
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
 		for (ExperimentHeaderInterface experiment : experiments) {
-			result.add(new NavigationGraphicalEntity(new LemnaExperimentNavigationAction(experiment)));
+			result.add(new NavigationGraphicalEntity(new LemnaExperimentNavigationAction(experiment), src.getGUIsetting()));
 		}
 		return result;
 	}

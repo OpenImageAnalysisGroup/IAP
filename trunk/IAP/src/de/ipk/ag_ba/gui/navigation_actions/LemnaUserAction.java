@@ -36,7 +36,7 @@ public class LemnaUserAction extends AbstractNavigationAction implements Navigat
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
 		for (ExperimentHeaderInterface id : ids) {
-			result.add(new NavigationGraphicalEntity(new LemnaExperimentNavigationAction(id)));
+			result.add(new NavigationGraphicalEntity(new LemnaExperimentNavigationAction(id), src.getGUIsetting()));
 		}
 		return result;
 	}

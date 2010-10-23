@@ -7,6 +7,7 @@ import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.ExperimentInfo;
@@ -140,16 +141,19 @@ public class Trash extends AbstractNavigationAction {
 	}
 
 	public static NavigationGraphicalEntity getTrashEntity(final String login, final String pass,
-			final String experimentName) {
+			final String experimentName, GUIsetting guiSetting) {
 		NavigationAction trashAction = new Trash(pass, login, experimentName);
-		NavigationGraphicalEntity trash = new NavigationGraphicalEntity(trashAction, "Delete", "img/ext/edit-delete.png");
+		NavigationGraphicalEntity trash = new NavigationGraphicalEntity(trashAction, "Delete", "img/ext/edit-delete.png",
+				guiSetting);
 		trash.setRightAligned(true);
 		return trash;
 	}
 
-	public static NavigationGraphicalEntity getTrashEntity(ExperimentHeaderInterface header, DeletionCommand cmd) {
+	public static NavigationGraphicalEntity getTrashEntity(ExperimentHeaderInterface header, DeletionCommand cmd,
+			GUIsetting guiSetting) {
 		NavigationAction trashAction = new Trash(header, cmd);
-		NavigationGraphicalEntity trash = new NavigationGraphicalEntity(trashAction, cmd.toString(), cmd.getImg());
+		NavigationGraphicalEntity trash = new NavigationGraphicalEntity(trashAction, cmd.toString(), cmd.getImg(),
+				guiSetting);
 		trash.setRightAligned(cmd != DeletionCommand.UNTRASH);
 		return trash;
 	}

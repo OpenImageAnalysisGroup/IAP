@@ -17,6 +17,7 @@ import de.ipk.ag_ba.gui.navigation_actions.CloudUploadEntity;
 import de.ipk.ag_ba.gui.navigation_actions.FileManagerExp;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDsegmentationAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 
@@ -26,20 +27,21 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 public class ImageAnalysisCommandManager {
 
 	public static Collection<NavigationGraphicalEntity> getCommands(String login, String pass,
-			ExperimentReference experimentReference) {
-		return getCommands(login, pass, experimentReference, true);
+			ExperimentReference experimentReference, GUIsetting guiSetting) {
+		return getCommands(login, pass, experimentReference, true, guiSetting);
 	}
 
 	public static Collection<NavigationGraphicalEntity> getCommands(String login, String pass,
-			ExperimentReference experimentReference, boolean analysis) {
+			ExperimentReference experimentReference, boolean analysis, GUIsetting guiSettings) {
 
 		ArrayList<NavigationGraphicalEntity> actions = new ArrayList<NavigationGraphicalEntity>();
 
-		actions.add(FileManagerExp.getFileManagerEntity(login, pass, experimentReference));
+		actions.add(FileManagerExp.getFileManagerEntity(login, pass, experimentReference, guiSettings));
 
 		try {
 			if (experimentReference.getData().getHeader().getExcelfileid().startsWith("lemnatec:"))
-				actions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass, experimentReference)));
+				actions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass, experimentReference),
+						guiSettings));
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
@@ -54,11 +56,11 @@ public class ImageAnalysisCommandManager {
 		// CountColorsNavigation(login, pass, 40, experimentReference),
 		// "Hue Historam", "img/colorhistogram.png"));
 		if (analysis) {
-			actions.add(ImageAnalysis.getPhenotypingEntity(login, pass, experimentReference, 10, 15));
+			actions.add(ImageAnalysis.getPhenotypingEntity(login, pass, experimentReference, 10, 15, guiSettings));
 			actions.add(ThreeDreconstructionAction.getThreeDreconstructionTaskEntity(login, pass, experimentReference,
-					"3-D Reconstruction", 15, 25));
+					"3-D Reconstruction", 15, 25, guiSettings));
 			actions.add(ThreeDsegmentationAction.getThreeDsegmentationTaskEntity(login, pass, experimentReference,
-					"3-D Segmentation", 15, 25));
+					"3-D Segmentation", 15, 25, guiSettings));
 		}
 		return actions;
 	}

@@ -11,7 +11,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 
 /**
  * @author klukas
- *
+ * 
  */
 public final class DBEexperimentNavigation extends NavigationGraphicalEntity {
 	/**
@@ -34,10 +34,11 @@ public final class DBEexperimentNavigation extends NavigationGraphicalEntity {
 	 * @param login
 	 * @param publicLogin
 	 * @param pass
+	 * @param guiSettings
 	 */
 	public DBEexperimentNavigation(NavigationAction navigationAction, String title, String image, JTextField login,
-			boolean publicLogin, JTextField pass) {
-		super(navigationAction, title, image);
+			boolean publicLogin, JTextField pass, GUIsetting guiSettings) {
+		super(navigationAction, title, image, guiSettings);
 		this.login = login;
 		this.publicLogin = publicLogin;
 		this.pass = pass;
@@ -53,8 +54,8 @@ public final class DBEexperimentNavigation extends NavigationGraphicalEntity {
 			setSideGUI(loginFields, 5, TableLayout.PREFERRED);
 		} else {
 			JComponent loginFields = TableLayout.get3SplitVertical(TableLayout.get4SplitVertical(null, new JLabel(
-					"User/Password:"), null, login, 4, TableLayout.PREFERRED, 2, TableLayout.PREFERRED, 0, 0), null,
-					pass, TableLayout.PREFERRED, 1, TableLayout.PREFERRED);
+					"User/Password:"), null, login, 4, TableLayout.PREFERRED, 2, TableLayout.PREFERRED, 0, 0), null, pass,
+					TableLayout.PREFERRED, 1, TableLayout.PREFERRED);
 			setSideGUI(loginFields, 5, 100);
 		}
 	}

@@ -15,6 +15,7 @@ import java.util.GregorianCalendar;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 
 /**
@@ -27,10 +28,11 @@ public class Calendar2 extends NavigationGraphicalEntity implements StyleAware {
 	private boolean showSpecificDay = true;
 	private ButtonDrawStyle style;
 
-	public Calendar2(String title, String image, NavigationAction navigationAction) {
-		super(navigationAction, title, image);
+	public Calendar2(String title, String image, NavigationAction navigationAction, GUIsetting guiSettings) {
+		super(navigationAction, title, image, guiSettings);
 	}
 
+	@Override
 	public void setButtonStyle(ButtonDrawStyle style) {
 		this.style = style;
 	}

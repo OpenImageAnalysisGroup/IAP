@@ -6,6 +6,7 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -59,10 +60,10 @@ public class FileManagerExp extends AbstractNavigationAction {
 	}
 
 	public static NavigationGraphicalEntity getFileManagerEntity(final String login, final String pass,
-			final ExperimentReference experimentRef) {
+			final ExperimentReference experimentRef, GUIsetting guiSetting) {
 		NavigationAction fileManagerAction = new FileManagerExp(login, pass, experimentRef);
 		NavigationGraphicalEntity fileManager = new NavigationGraphicalEntity(fileManagerAction, "View Data",
-				"img/ext/applications-system.png");
+				"img/ext/applications-system.png", guiSetting);
 		return fileManager;
 	}
 }

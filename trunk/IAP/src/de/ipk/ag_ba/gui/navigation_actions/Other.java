@@ -41,6 +41,7 @@ import de.ipk.ag_ba.gui.calendar.Calendar;
 import de.ipk.ag_ba.gui.enums.DBEtype;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.DateUtils;
@@ -63,7 +64,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 public class Other {
 
 	public static ArrayList<NavigationGraphicalEntity> getProcessExperimentDataWithVantedEntities(final String login,
-			final String pass, final ExperimentReference experimentName) {
+			final String pass, final ExperimentReference experimentName, GUIsetting guIsetting) {
 		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
 
 		ArrayList<AbstractExperimentDataProcessor> validProcessors = new ArrayList<AbstractExperimentDataProcessor>();
@@ -129,7 +130,8 @@ public class Other {
 					return false;
 				}
 			};
-			NavigationGraphicalEntity ne = new NavigationGraphicalEntity(action, pp.getShortName(), "img/vanted1_0.png");
+			NavigationGraphicalEntity ne = new NavigationGraphicalEntity(action, pp.getShortName(), "img/vanted1_0.png",
+					guIsetting);
 
 			ImageIcon i = pp.getIcon();
 			if (i != null) {
@@ -143,11 +145,13 @@ public class Other {
 		return result;
 	}
 
-	public static NavigationGraphicalEntity getServerStatusEntity(final boolean includeLemnaTecStatus) {
-		return getServerStatusEntity(includeLemnaTecStatus, "Check Status");
+	public static NavigationGraphicalEntity getServerStatusEntity(final boolean includeLemnaTecStatus,
+			GUIsetting guIsetting) {
+		return getServerStatusEntity(includeLemnaTecStatus, "Check Status", guIsetting);
 	}
 
-	public static NavigationGraphicalEntity getServerStatusEntity(final boolean includeLemnaTecStatus, String title) {
+	public static NavigationGraphicalEntity getServerStatusEntity(final boolean includeLemnaTecStatus, String title,
+			GUIsetting guIsetting) {
 		NavigationAction serverStatusAction = new AbstractNavigationAction("Check service availability") {
 			private NavigationGraphicalEntity src;
 			private final HashMap<String, ArrayList<String>> infoset = new HashMap<String, ArrayList<String>>();
@@ -289,11 +293,14 @@ public class Other {
 			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
 				if (includeLemnaTecStatus)
-					res.add(LemnaCam.getLemnaCamButton());
+					res.add(LemnaCam.getLemnaCamButton(src.getGUIsetting()));
 
-				res.add(new NavigationGraphicalEntity(null, "BA-13 Server R-810", "img/ext/dellR810.png"));
-				res.add(new NavigationGraphicalEntity(null, "BA-24 Workstation", "img/ext/computer.png"));// macpro_side.png"));
-				res.add(new NavigationGraphicalEntity(null, "NW-04 File Server", "img/ext/computer.png"));// pc.png"));
+				res.add(new NavigationGraphicalEntity(null, "BA-13 Server R-810", "img/ext/dellR810.png", src
+						.getGUIsetting()));
+				res.add(new NavigationGraphicalEntity(null, "BA-24 Workstation", "img/ext/computer.png", src
+						.getGUIsetting()));// macpro_side.png"));
+				res.add(new NavigationGraphicalEntity(null, "NW-04 File Server", "img/ext/computer.png", src
+						.getGUIsetting()));// pc.png"));
 
 				return res;
 			}
@@ -311,13 +318,13 @@ public class Other {
 
 		};
 		NavigationGraphicalEntity serverStatusEntity = new NavigationGraphicalEntity(serverStatusAction, title,
-				"img/ext/network-server-status.png");
+				"img/ext/network-server-status.png", guIsetting);
 		return serverStatusEntity;
 	}
 
 	public static NavigationGraphicalEntity getCalendarEntity(
 			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
-			final String p) {
+			final String p, GUIsetting guiSettings) {
 
 		final ObjectRef refCalEnt = new ObjectRef();
 		final ObjectRef refCalGui = new ObjectRef();
@@ -342,7 +349,7 @@ public class Other {
 			@Override
 			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 				ArrayList<NavigationGraphicalEntity> res = getExperimentNavigationActions(DBEtype.Omics, group2ei, l, p,
-						refCalEnt, refCalGui);
+						refCalEnt, refCalGui, src.getGUIsetting());
 				return res;
 			}
 
@@ -359,7 +366,7 @@ public class Other {
 
 		};
 
-		Calendar2 calendarEntity = new Calendar2("Calendar", "img/ext/calendar48.png", calendarAction);
+		Calendar2 calendarEntity = new Calendar2("Calendar", "img/ext/calendar48.png", calendarAction, guiSettings);
 		calendarEntity.setShowSpecificDay(true);
 		refCalEnt.setObject(calendarEntity);
 		return calendarEntity;
@@ -370,7 +377,7 @@ public class Other {
 	protected static NavigationGraphicalEntity getCalendarNavigationEntitiy(final boolean nextMonth,
 			final ObjectRef refCalEnt, final ObjectRef refCalGui,
 			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
-			final String p) {
+			final String p, final GUIsetting guIsetting) {
 		// GregorianCalendar c = new GregorianCalendar();
 		// c.setTime(((Calendar) refCalGui.getObject()).getCalendar().getTime());
 		// if (nextMonth)
@@ -399,19 +406,19 @@ public class Other {
 					c.getCalendar().add(GregorianCalendar.MONTH, -1);
 				c.updateGUI(false);
 				ArrayList<NavigationGraphicalEntity> res = getExperimentNavigationActions(DBEtype.Phenotyping, group2ei, l,
-						p, refCalEnt, refCalGui);
+						p, refCalEnt, refCalGui, guIsetting);
 				return res;
 			}
-		}, nextMonth ? "Next" : "Previous", nextMonth ? "img/large_right.png" : "img/large_left.png");
+		}, nextMonth ? "Next" : "Previous", nextMonth ? "img/large_right.png" : "img/large_left.png", guIsetting);
 		return nav;
 	}
 
 	private static ArrayList<NavigationGraphicalEntity> getExperimentNavigationActions(DBEtype dbeType,
 			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
-			final String p, final ObjectRef refCalEnt, final ObjectRef refCalGui) {
+			final String p, final ObjectRef refCalEnt, final ObjectRef refCalGui, GUIsetting guIsetting) {
 		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
-		res.add(getCalendarNavigationEntitiy(false, refCalEnt, refCalGui, group2ei, l, p));
-		res.add(getCalendarNavigationEntitiy(true, refCalEnt, refCalGui, group2ei, l, p));
+		res.add(getCalendarNavigationEntitiy(false, refCalEnt, refCalGui, group2ei, l, p, guIsetting));
+		res.add(getCalendarNavigationEntitiy(true, refCalEnt, refCalGui, group2ei, l, p, guIsetting));
 
 		// image-loading.png
 
@@ -480,7 +487,7 @@ public class Other {
 		if (l == null || !l.equals("internet")) { // dbeType ==
 			// DBEtype.Phenotyping &&
 			NavigationGraphicalEntity scheduleExperiment = new NavigationGraphicalEntity(scheduleExperimentAction,
-					"Schedule Experiment", "img/ext/image-loading.png");
+					"Schedule Experiment", "img/ext/image-loading.png", guIsetting);
 			res.add(scheduleExperiment);
 		}
 
@@ -496,12 +503,14 @@ public class Other {
 						String dayA = DateUtils.getDayInfo(ei.getStartdate());
 						String dayB = DateUtils.getDayInfo(ei.getImportdate());
 						if (dayA.equals(dayInfo) || dayB.equals(dayInfo)) {
-							NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei);
+							NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
+									guIsetting);
 							res.add(exp);
 						} else {
 							if (calEnt.getCalendar().getTime().after(ei.getStartdate())
 									&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
-								NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei);
+								NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
+										guIsetting);
 								res.add(exp);
 							}
 						}
@@ -509,12 +518,14 @@ public class Other {
 						String mA = DateUtils.getMonthInfo(ei.getStartdate());
 						String mB = DateUtils.getMonthInfo(ei.getImportdate());
 						if (mA.equals(monthInfo) || mB.equals(monthInfo)) {
-							NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei);
+							NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
+									guIsetting);
 							res.add(exp);
 						} else {
 							if (calEnt.getCalendar().getTime().after(ei.getStartdate())
 									&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
-								NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei);
+								NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
+										guIsetting);
 								res.add(exp);
 							}
 						}

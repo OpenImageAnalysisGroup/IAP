@@ -34,11 +34,12 @@ public class Phenotyping extends AbstractNavigationAction {
 
 		NavigationAction analyzeAction = new UploadImagesToCloud(false);
 		NavigationGraphicalEntity analyzeEntity = new NavigationGraphicalEntity(analyzeAction, "Process Files",
-				"img/ext/user-desktop.png", "img/ext/user-desktop.png");
+				"img/ext/user-desktop.png", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null);
 		phenoDBcommands.add(analyzeEntity);
 
 		NavigationAction lemnaExperiments = new LemnaTecNavigationAction();
-		NavigationGraphicalEntity lemnaEntity = new NavigationGraphicalEntity(lemnaExperiments);
+		NavigationGraphicalEntity lemnaEntity = new NavigationGraphicalEntity(lemnaExperiments,
+				src != null ? src.getGUIsetting() : null);
 
 		phenoDBcommands.add(lemnaEntity);
 
@@ -46,7 +47,7 @@ public class Phenotyping extends AbstractNavigationAction {
 		String pass = "";
 		NavigationAction mongoExperiments = new MongoExperimentsNavigationAction(login, pass);
 		NavigationGraphicalEntity mongo = new NavigationGraphicalEntity(mongoExperiments, "IAP Cloud",
-				"img/ext/network-mongo.png", "img/ext/network-mongo-gray.png");
+				"img/ext/network-mongo.png", "img/ext/network-mongo-gray.png", src != null ? src.getGUIsetting() : null);
 
 		phenoDBcommands.add(mongo);
 

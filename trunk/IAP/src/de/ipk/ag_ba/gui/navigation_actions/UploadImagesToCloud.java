@@ -90,7 +90,8 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 						new MongoDB().storeExperiment("dbe3", null, null, null, newExperiment, status);
 					}
 					ExperimentReference exRef = new ExperimentReference(newExperiment);
-					for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(null, null, exRef))
+					for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(null, null, exRef,
+							src.getGUIsetting()))
 						res.add(ne);
 				} catch (Exception e1) {
 					newExperiment = null;
@@ -110,7 +111,8 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 		res.addAll(currentSet);
 		if (newExperiment != null) {
 			res.add(src);
-			res.add(MongoExperimentsNavigationAction.getMongoExperimentButton(newExperiment.getHeader()));
+			res.add(MongoExperimentsNavigationAction.getMongoExperimentButton(newExperiment.getHeader(),
+					src.getGUIsetting()));
 		}
 		return res;
 	}

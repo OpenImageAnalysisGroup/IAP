@@ -6,6 +6,7 @@ import org.AttributeHelper;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 
 /**
@@ -53,12 +54,13 @@ public final class LemnaCam extends AbstractNavigationAction {
 	}
 
 	/**
+	 * @param guiSetting
 	 * @return
 	 */
-	public static NavigationGraphicalEntity getLemnaCamButton() {
+	public static NavigationGraphicalEntity getLemnaCamButton(GUIsetting guiSetting) {
 		NavigationAction navigationAction = new LemnaCam();
 		NavigationGraphicalEntity res = new NavigationGraphicalEntity(navigationAction, "LemnaCam 1",
-				"img/ext/camera.png");
+				"img/ext/camera.png", guiSetting);
 		return res;
 	}
 }

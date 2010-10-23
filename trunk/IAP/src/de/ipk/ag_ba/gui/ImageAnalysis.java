@@ -39,6 +39,7 @@ import javax.swing.event.ChangeListener;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.PhenotypeAnalysisAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.rmi_server.databases.DataBaseTargetMongoDB;
@@ -57,14 +58,15 @@ public class ImageAnalysis {
 	/**
 	 * @param login
 	 * @param pass
+	 * @param guiSetting
 	 * @param experimentName
 	 * @return
 	 */
 	public static NavigationGraphicalEntity getPhenotypingEntity(final String login, final String pass,
-			final ExperimentReference experiment, final double epsilon, final double epsilon2) {
+			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 
 		NavigationAction phenotypeAnalysisAction = new PhenotypeAnalysisAction(login, epsilon, epsilon2, pass, experiment);
-		NavigationGraphicalEntity resultTaskButton = new NavigationGraphicalEntity(phenotypeAnalysisAction);
+		NavigationGraphicalEntity resultTaskButton = new NavigationGraphicalEntity(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}
 

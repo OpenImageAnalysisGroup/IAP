@@ -269,11 +269,11 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
 		for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(login, pass, new ExperimentReference(
-				experimentResult), false))
+				experimentResult), false, src.getGUIsetting()))
 			res.add(ne);
 
 		for (NavigationGraphicalEntity ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
-				new ExperimentReference(experimentResult))) {
+				new ExperimentReference(experimentResult), src.getGUIsetting())) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
 				res.add(ne);
