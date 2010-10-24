@@ -243,7 +243,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							i = GravistoService.getBufferedImage(GravistoService.loadIcon(AIPmain.class,
 									ne.getNavigationImage()).getImage());
 						// add bookmark
-						String target = getTargetPath();
+						String target = getTargetPath(ne);
 						if (target != null) {
 							if (Bookmark.add(ne.getTitle(), target, i)) {
 								if (!set.isEmpty())
@@ -290,12 +290,14 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		return res;
 	}
 
-	private String getTargetPath() {
+	private String getTargetPath(NavigationGraphicalEntity finalTarget) {
 		ArrayList<String> path = new ArrayList<String>();
 		for (NavigationGraphicalEntity ne : set) {
 			if (ne.isProcessing())
 				return null;
 			path.add(ne.getTitle());
+			if (ne == finalTarget)
+				break;
 		}
 		return StringManipulationTools.getStringList(path, ".");
 	}
