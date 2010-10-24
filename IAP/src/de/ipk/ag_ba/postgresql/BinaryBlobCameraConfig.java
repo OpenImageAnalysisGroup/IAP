@@ -39,7 +39,7 @@ public class BinaryBlobCameraConfig {
 		System.out.println("bb=" + arr2double(b2, 0));
 	}
 
-	private static byte[] reverse(byte[] bytes) {
+	public static byte[] reverse(byte[] bytes) {
 		byte[] res = new byte[bytes.length];
 		int j = bytes.length - 1;
 		for (int i = 0; i < bytes.length; i++)

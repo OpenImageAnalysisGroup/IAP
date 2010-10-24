@@ -12,6 +12,9 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import org.StringManipulationTools;
+
+import de.ipk.ag_ba.gui.Unicode;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
@@ -25,8 +28,12 @@ public class BookmarkAction extends AbstractNavigationAction {
 	private final Bookmark bookmark;
 
 	public BookmarkAction(Bookmark bookmark) {
-		super("Bookmark Navigation: " + bookmark.getTarget());
+		super(pretify(Unicode.STAR + " Bookmark " + Unicode.STAR + "<br>" + bookmark.getTarget()));
 		this.bookmark = bookmark;
+	}
+
+	private static String pretify(String target) {
+		return "<html>" + StringManipulationTools.stringReplace(target, ".", " " + Unicode.ARROW_RIGHT + " ");
 	}
 
 	@Override
