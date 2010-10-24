@@ -210,7 +210,7 @@ public class LemnaTecDataExchange {
 		HashMap<Long, String> id2path = new HashMap<Long, String>();
 		String sqlReadImageFileTable = "SELECT "
 				+ "image_file_table.id as image_file_tableID, path FROM image_file_table";
-		//		
+		//
 		// +
 		// "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
 		// + "WHERE snapshot.measurement_label = ? and "
@@ -324,8 +324,8 @@ public class LemnaTecDataExchange {
 		String growthconditions = "";
 		String treatment = "";
 
-		Collection<Snapshot> snapshots = getSnapshotsOfExperiment(experimentReq.getDatabase(), experimentReq
-				.getExperimentname());
+		Collection<Snapshot> snapshots = getSnapshotsOfExperiment(experimentReq.getDatabase(),
+				experimentReq.getExperimentname());
 		HashMap<String, Integer> idtag2replicateID = new HashMap<String, Integer>();
 
 		Timestamp earliest = null;
@@ -365,7 +365,6 @@ public class LemnaTecDataExchange {
 			growthconditions = conditionTemplate != null ? conditionTemplate.getGrowthconditions() : "not specified";
 			treatment = conditionTemplate != null ? conditionTemplate.getTreatment() : "not specified";
 
-			Double position = null;
 			{
 				String lbl = sn.getCamera_label();
 
@@ -504,80 +503,41 @@ public class LemnaTecDataExchange {
 					image.setReplicateID(replicateID);
 					image.setUnit("");
 
+					String fn = sn.getPath_image();
+					if (fn.contains("/"))
+						fn = fn.substring(fn.lastIndexOf("/") + "/".length());
+
+					Double position = null;
+
+					fn = sn.getPath_image_config_blob();
+					if (fn != null) {
+						if (fn.contains("/"))
+							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
+						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host,
+								experimentReq.getDatabase() + "/" + sn.getPath_image_config_blob(), sn.getId_tag()
+										+ (position != null ? " (" + position.intValue() + ")" : ""));
+						position = processConfigBlobToGetRotationAngle(blob2buf, sn, url);
+					}
+
 					if (position != null) {
 						image.setPosition(position);
 						image.setPositionUnit("degree");
 					}
 
-					String fn = sn.getPath_image();
-					if (fn.contains("/"))
-						fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-							+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + position.intValue() + ")" : ""));
+					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host,
+							experimentReq.getDatabase() + "/" + sn.getPath_image(), sn.getId_tag()
+									+ (position != null ? " (" + position.intValue() + ")" : ""));
 					image.setURL(url);
 					fn = sn.getPath_null_image();
 					if (fn != null) {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-								+ sn.getPath_null_image(), sn.getId_tag()
-								+ (position != null ? " (" + position.intValue() + ")" : ""));
+						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host,
+								experimentReq.getDatabase() + "/" + sn.getPath_null_image(), sn.getId_tag()
+										+ (position != null ? " (" + position.intValue() + ")" : ""));
 						image.setURL(new IOurl(image.getURL().toString() + "," + url.toString()));
 					}
-					fn = sn.getPath_image_config_blob();
-					if (fn != null) {
-						if (fn.contains("/"))
-							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-								+ sn.getPath_image_config_blob(), sn.getId_tag()
-								+ (position != null ? " (" + position.intValue() + ")" : ""));
-						try {
-							byte[] buf;
-							if (blob2buf.containsKey(url.toString()))
-								buf = blob2buf.get(url.toString());
-							else {
-								InputStream in = ExperimentIOManager.getInputStream(url);
-								// read config object in order to detect rotation angle
-								MyByteArrayOutputStream out = new MyByteArrayOutputStream();
-								byte[] temp = new byte[1024];
-								int read = in.read(temp);
-								while (read > 0) {
-									out.write(temp, 0, read);
-									read = in.read(temp);
-								}
-								buf = out.getBuff();
-								blob2buf.put(url.toString(), buf);
-							}
-							TextFile tf = new TextFile(new MyByteArrayInputStream(buf), 0);
-							System.out.println(url.toString());
-							System.out.println("Config: " + sn.getCamera_label() + " / " + sn.getUserDefinedCameraLabel()
-									+ ", byte 3499: " + buf[3499]);
-							for (String ss : tf)
-								if (ss.indexOf("angle") > 0) {
-									ss = ss.substring(ss.indexOf("angle"));
-									if (ss.length() > 30)
-										ss = ss.substring(0, 30);
-									// System.out.println(ss);
-									ss = ss.substring("angle".length());
-									int idx = 0;
-									for (char c : ss.toCharArray()) {
-										System.out.print((byte) c + ",");
-										idx++;
-										if (idx == 6) {
-											if ((byte) c == -3)
-												System.out.println("90 Grad");
-											if ((byte) c == 0)
-												System.out.println("0 Grad");
-										}
-										if (idx > 10)
-											break;
-									}
-								}
-							System.out.println("");
-						} catch (Exception e) {
-							ErrorMsg.addErrorMessage(e);
-						}
-					}
+
 					measurements.add(image);
 				}
 			}
@@ -593,6 +553,55 @@ public class LemnaTecDataExchange {
 
 		experiment.setHeader(new ExperimentHeader(experimentReq));
 		return experiment;
+	}
+
+	private double processConfigBlobToGetRotationAngle(HashMap<String, byte[]> blob2buf, Snapshot sn, IOurl url) {
+		try {
+			byte[] buf;
+			if (blob2buf.containsKey(url.toString()))
+				buf = blob2buf.get(url.toString());
+			else {
+				InputStream in = ExperimentIOManager.getInputStream(url);
+				// read configuration object in order to detect rotation angle
+				MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+				byte[] temp = new byte[1024];
+				int read = in.read(temp);
+				while (read > 0) {
+					out.write(temp, 0, read);
+					read = in.read(temp);
+				}
+				buf = out.getBuff();
+				blob2buf.put(url.toString(), buf);
+			}
+			TextFile tf = new TextFile(new MyByteArrayInputStream(buf), 0);
+			System.out.println(url.toString());
+			byte[] b = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+			double angle = 0;
+			for (String ss : tf) {
+				if (ss.indexOf("angle") > 0) {
+					ss = ss.substring(ss.indexOf("angle"));
+					if (ss.length() > 30)
+						ss = ss.substring(0, 30);
+					ss = ss.substring("angle".length());
+					int idx = 0;
+					for (char c : ss.toCharArray()) {
+						System.out.print((byte) c + ",");
+						b[idx] = (byte) c;
+						if (idx >= b.length) {
+							angle = BinaryBlobCameraConfig.arr2double(BinaryBlobCameraConfig.reverse(b), 0);
+							break;
+						}
+					}
+				}
+			}
+			System.out.println("Config: " + sn.getCamera_label() + " / " + sn.getUserDefinedCameraLabel() + ", angle: "
+					+ angle);
+			System.out.println("");
+			return angle;
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+			return 0;
+		}
 	}
 
 	private HashMap<String, Condition> getPlantIdAnnotation(ExperimentHeaderInterface header) throws SQLException,
@@ -642,5 +651,4 @@ public class LemnaTecDataExchange {
 		}
 		return res;
 	}
-
 }

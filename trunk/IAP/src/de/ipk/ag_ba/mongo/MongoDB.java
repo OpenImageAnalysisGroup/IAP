@@ -366,8 +366,9 @@ public class MongoDB {
 			}
 
 			if (errorCount > 0) {
-				MainFrame.showMessageDialog("<html>" + "The following files cound not be properly processed:<ul>"
-						+ errors.toString() + "</ul> " + "", "Errors");
+				MainFrame.showMessageDialog(
+						"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
+								+ "", "Errors");
 			}
 		}
 	}
@@ -732,6 +733,7 @@ public class MongoDB {
 												if (imgList != null) {
 													for (Object m : imgList) {
 														DBObject img = (DBObject) m;
+														@SuppressWarnings("unchecked")
 														Map<Object, Object> map = img.toMap();
 														String fn = (String) map.get("filename");
 														String md5 = (String) map.get("md5sum");
@@ -902,8 +904,7 @@ public class MongoDB {
 						BatchCmd batch = (BatchCmd) dbo;
 						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED
 								|| ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
-										.currentTimeMillis()
-										- batch.getLastUpdateTime() > maxUpdate))
+										.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
 							res.add(batch);
 					}
 				}
@@ -920,8 +921,8 @@ public class MongoDB {
 		return res;
 	}
 
-	public boolean batchClaim(final BatchCmd batch, String systemIP, CloudAnalysisStatus starting) {
-		// try to claim a batch cmd
+	public Collection<BatchCmd> batchGetWorkTasksScheduledForStart() {
+		final Collection<BatchCmd> res = new ArrayList<BatchCmd>();
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
@@ -930,8 +931,11 @@ public class MongoDB {
 				public void run() {
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
-					DBObject dbo = collection.findOne(batch);
-					collection.update(batch, batch, false, false);
+					for (DBObject dbo : collection.find()) {
+						BatchCmd batch = (BatchCmd) dbo;
+						if (batch.getRunStatus() == CloudAnalysisStatus.STARTING)
+							res.add(batch);
+					}
 				}
 
 				@Override
@@ -941,8 +945,36 @@ public class MongoDB {
 			});
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
-			return false;
+			return null;
 		}
-		return false;
+		return res;
+	}
+
+	public void batchClaim(final BatchCmd batch, String systemIP, final CloudAnalysisStatus starting) {
+		// try to claim a batch cmd
+		try {
+			processDB(new RunnableOnDB() {
+				private DB db;
+
+				@Override
+				public void run() {
+					DBCollection collection = db.getCollection("schedule");
+					collection.setObjectClass(BatchCmd.class);
+					DBObject dbo = new BasicDBObject();
+					dbo.put("_id", batch.get("_id"));
+					dbo.put("runstatus", batch.getString("runstatus"));
+					batch.put("runstatus", starting.toString());
+					batch.put("lastupdate", System.currentTimeMillis());
+					collection.update(dbo, batch, false, false);
+				}
+
+				@Override
+				public void setDB(DB db) {
+					this.db = db;
+				}
+			});
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
 	}
 }
