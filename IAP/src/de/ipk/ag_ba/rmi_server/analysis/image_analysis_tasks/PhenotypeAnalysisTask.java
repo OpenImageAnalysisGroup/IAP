@@ -173,6 +173,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 		BufferedImage img = limg.getLoadedImage();
 
+		BufferedImage imgNULL = limg.getLoadedImageLabelField();
+
 		if (img == null) {
 			System.out.println("Image is null: " + limg.toString());
 			return;
@@ -184,11 +186,16 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 		final int w = img.getWidth();
 		final int h = img.getHeight();
-		final int rgbArray[] = new int[w * h];
+		int rgbArray[] = new int[w * h];
 		img.getRGB(0, 0, w, h, rgbArray, 0, w);
 
+		int[] rgbArrayNULL = null;
+		if (imgNULL != null) {
+			rgbArrayNULL = new int[w * h];
+			imgNULL.getRGB(0, 0, w, h, rgbArrayNULL, 0, w);
+		}
 		for (ImagePreProcessor pre : preProcessors) {
-			pre.processImage(limg, rgbArray, w, h, iBackgroundFill);
+			pre.processImage(limg, rgbArray, rgbArrayNULL, w, h, iBackgroundFill);
 		}
 
 		final double sidepercent = 0.10;
@@ -200,9 +207,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		for (int ty = h - 1; ty >= 0; ty--) {
 			final int y = ty;
 			if (maximumThreadCount > 1)
-				run.submit(processData(limg, w, rgbArray, iBackgroundFill, sidepercent, progress, y));
+				run.submit(processData(limg, w, rgbArray, rgbArrayNULL, iBackgroundFill, sidepercent, progress, y));
 			else
-				processData(limg, w, rgbArray, iBackgroundFill, sidepercent, progress, y).run();
+				processData(limg, w, rgbArray, rgbArrayNULL, iBackgroundFill, sidepercent, progress, y).run();
 		}
 
 		if (maximumThreadCount > 1) {
@@ -252,14 +259,16 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		int redLine = Color.RED.getRGB();
 
 		int o = g.getTop() * w;
-		if (g.getTop() < 3)
-			o = 3 * w;
+		int lww = 20;
+		if (g.getTop() < lww + 1)
+			o = 8 * w;
 		for (int x = 0; x < w; x++) {
 			if (o + x + w >= rgbArray.length)
 				continue;
-			rgbArray[o + x - w] = redLine;
-			rgbArray[o + x] = redLine;
-			rgbArray[o + x + w] = redLine;
+			for (int ii = lww; ii > 0; ii--)
+				if (o + x - ii * w >= 0)
+					rgbArray[o + x - ii * w] = redLine;
+			// rgbArray[o + x] = redLine;
 		}
 		for (int y = 0; y < h; y++) {
 			o = g.getLeft() + y * w;
@@ -301,7 +310,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		}
 	}
 
-	private Runnable processData(final ImageData imageData, final int w, final int[] rgbArray,
+	private Runnable processData(final ImageData imageData, final int w, final int[] rgbArray, final int[] rgbArrayNULL,
 			final int iBackgroundFill, final double sidepercent, final ObjectRef progress, final int y) {
 		return new Runnable() {
 
@@ -313,7 +322,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					factor = 0.2;
 
 				boolean subNfluo = subN.contains("FLUO");
-				boolean subNrgb = subN.contains("RGB");
+				boolean subNrgb = subN.contains("RGB") || subN.contains("VIS");
 
 				ArrayList<Integer> backgroundPixelsArr = new ArrayList<Integer>();
 				ArrayList<Color> otherColor = new ArrayList<Color>();
@@ -334,6 +343,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				otherColor.add(new Color(0.9f, 0.75f, 0.9f)); // blue shadow //
 				otherColor.add(new Color(0.5f, 0.8f, 1f)); // blue shadow //
 				otherColor.add(new Color(0.5f, 0.8f, 1f)); // blue shadow //
+				otherColor.add(new Color(0.35f, 0.47f, 0.87f)); // blue shadow //
+				otherColor.add(new Color(0.3f, 0.4f, 0.8f)); // blue shadow //
 				otherColor.add(new Color(0.5f, 0.7f, 1f)); // blue shadow //
 				otherColor.add(new Color(0.25f, 0.36f, 0.73f)); // blue shadow //
 				// (top, stick?)
@@ -346,34 +357,45 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				otherColor.add(new Color(0.8f, 0.3f, 0.2f)); // side lanes (top,
 				// red)
 				otherColor.add(new Color(1f, 0.5f, 0.3f)); // side lanes
+
+				otherColor.add(new Color(0.7f, 0.7f, 0.65f)); // side lanes
 				// (top, // red dot)
 
 				int x = 0;
-				for (x = 0; x < w * sidepercent; x++) {
-					int bp = rgbArray[x + y * w];
-					rgbArray[x + y * w] = iBackgroundFill;
-					boolean newBackgroundColor = true;
-					for (Integer c : backgroundPixelsArr) {
-						if (ColorUtil.deltaE2000simu(c, bp) < epsilonA * factor) {
-							newBackgroundColor = false;
-							break;
+				boolean hasBackgroundImage = rgbArrayNULL != null && rgbArray.length == rgbArrayNULL.length;
+				if (hasBackgroundImage) {
+					for (int i = 0; i < rgbArray.length; i++) {
+						if (ColorUtil.deltaE2000simu(rgbArray[i], rgbArrayNULL[i]) < epsilonA * factor * 20) {
+							rgbArray[i] = iBackgroundFill;
 						}
 					}
-					if (newBackgroundColor)
-						backgroundPixelsArr.add(bp);
-				}
-				for (x = (int) (w - w * sidepercent); x < w; x++) {
-					int bp = rgbArray[x + y * w];
-					rgbArray[x + y * w] = iBackgroundFill;
-					boolean newBackgroundColor = true;
-					for (Integer c : backgroundPixelsArr) {
-						if (ColorUtil.deltaE2000simu(c, bp) < epsilonA * factor) {
-							newBackgroundColor = false;
-							break;
+				} else {
+					for (x = 0; x < w * sidepercent; x++) {
+						int bp = rgbArray[x + y * w];
+						rgbArray[x + y * w] = iBackgroundFill;
+						boolean newBackgroundColor = true;
+						for (Integer c : backgroundPixelsArr) {
+							if (ColorUtil.deltaE2000simu(c, bp) < epsilonA * factor) {
+								newBackgroundColor = false;
+								break;
+							}
 						}
+						if (newBackgroundColor)
+							backgroundPixelsArr.add(bp);
 					}
-					if (newBackgroundColor)
-						backgroundPixelsArr.add(bp);
+					for (x = (int) (w - w * sidepercent); x < w; x++) {
+						int bp = rgbArray[x + y * w];
+						rgbArray[x + y * w] = iBackgroundFill;
+						boolean newBackgroundColor = true;
+						for (Integer c : backgroundPixelsArr) {
+							if (ColorUtil.deltaE2000simu(c, bp) < epsilonA * factor) {
+								newBackgroundColor = false;
+								break;
+							}
+						}
+						if (newBackgroundColor)
+							backgroundPixelsArr.add(bp);
+					}
 				}
 				for (x = 0; x < w * sidepercent; x++) {
 					// empty
@@ -391,31 +413,34 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 							rgbArray[xyw] = iBackgroundFill;
 						}
 					}
-					if (rgbArray[xyw] != iBackgroundFill) {
-						Color cc = new Color(rgbArray[xyw]);
-						if (cc.getBlue() >= 235)
-							rgbArray[xyw] = iBackgroundFill;
-						else {
-							if (cc.getRed() <= 120 && cc.getGreen() <= 120 && cc.getBlue() <= 120)
-								if (Math.abs(Math.abs(cc.getRed() - cc.getGreen()) + Math.abs(cc.getGreen() - cc.getBlue())) < 20)
-									rgbArray[xyw] = iBackgroundFill;
-
-						}
-					}
-					if (rgbArray[xyw] != iBackgroundFill) {
-						/*
-						 * Color ct = new Color(rgbArray[xyw]); for (Color cBlue1 :
-						 * otherColor) { if (ColorUtil.deltaE2000(ct, cBlue1) < 15) {
-						 * rgbArray[xyw] = iBackgroundFill; break; } }
-						 */
-						int ct = p;
-						for (Color cBlue1 : otherColor) {
-							if (ColorUtil.deltaE2000simu(ct, cBlue1.getRGB()) < epsilonB * factor) {
-								rgbArray[xyw] = iBackgroundFill;
-								break;
-							}
-						}
-					}
+					// if (rgbArray[xyw] != iBackgroundFill) {
+					// Color cc = new Color(rgbArray[xyw]);
+					// if (cc.getBlue() >= 235)
+					// rgbArray[xyw] = iBackgroundFill;
+					// else {
+					// if (cc.getRed() <= 120 && cc.getGreen() <= 120 && cc.getBlue()
+					// <= 120)
+					// if (Math.abs(Math.abs(cc.getRed() - cc.getGreen()) +
+					// Math.abs(cc.getGreen() - cc.getBlue())) < 20)
+					// rgbArray[xyw] = iBackgroundFill;
+					//
+					// }
+					// }
+					// if (rgbArray[xyw] != iBackgroundFill) {
+					// /*
+					// * Color ct = new Color(rgbArray[xyw]); for (Color cBlue1 :
+					// * otherColor) { if (ColorUtil.deltaE2000(ct, cBlue1) < 15) {
+					// * rgbArray[xyw] = iBackgroundFill; break; } }
+					// */
+					// int ct = p;
+					// for (Color cBlue1 : otherColor) {
+					// if (ColorUtil.deltaE2000simu(ct, cBlue1.getRGB()) < epsilonB *
+					// factor) {
+					// rgbArray[xyw] = Color.PINK.getRGB();// iBackgroundFill;
+					// break;
+					// }
+					// }
+					// }
 					if (subNfluo)
 						if (rgbArray[xyw] != iBackgroundFill) {
 							Color c = new Color(rgbArray[xyw]);
@@ -429,9 +454,11 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 							Color c = new Color(rgbArray[xyw]);
 							float hsb[] = new float[3];
 							Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
-							if (Math.abs(hsb[0] - 0.7) < 0.2)
-								rgbArray[xyw] = iBackgroundFill;
-							else if (Math.abs(hsb[0] - 0.9) < 0.2)
+							// if (hsb[1] < 0.25 && hsb[2] > 0.5)
+							// rgbArray[xyw] = Color.YELLOW.getRGB();//
+							// iBackgroundFill;
+							// else
+							if (Math.abs(hsb[0] - 0.8) < 0.3)
 								rgbArray[xyw] = iBackgroundFill;
 						}
 				}
@@ -448,17 +475,17 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 	private Geometry removeSingleDotsAndDetectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill,
 			LoadedImage limg) {
-		int searchRadius = 3;
+		int searchRadius = 1;
 		String subN = limg.getSubstanceName();
-		if (subN.equalsIgnoreCase(ImageConfiguration.FluoTop.toString())) {
-			searchRadius = 5;
-		}
-		if (subN.equalsIgnoreCase(ImageConfiguration.RgbTop.toString())) {
-			searchRadius = 5;
-		}
-		if (subN.equalsIgnoreCase(ImageConfiguration.RgbSide.toString())) {
-			searchRadius = 5;
-		}
+		// if (subN.equalsIgnoreCase(ImageConfiguration.FluoTop.toString())) {
+		// searchRadius = 5;
+		// }
+		// if (subN.equalsIgnoreCase(ImageConfiguration.RgbTop.toString())) {
+		// searchRadius = 5;
+		// }
+		// if (subN.equalsIgnoreCase(ImageConfiguration.RgbSide.toString())) {
+		// searchRadius = 5;
+		// }
 		int left = w;
 		int right = 0;
 		int top = h;

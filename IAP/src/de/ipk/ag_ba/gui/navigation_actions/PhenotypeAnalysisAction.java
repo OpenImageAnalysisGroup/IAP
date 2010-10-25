@@ -85,27 +85,32 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 				for (ConditionInterface s : m3) {
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
+						if (workload.size() > 20)
+							break;
 						Sample3D sd3 = (Sample3D) sd;
 						for (Measurement md : sd3.getAllMeasurements()) {
 							workIndex++;
 							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
 								if (md instanceof ImageData) {
-									if (((ImageData) md).getSubstanceName().equalsIgnoreCase(
-											ImageConfiguration.FluoTop.toString())) {
+									ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
+									// if (((ImageData)
+									// md).getSubstanceName().equalsIgnoreCase(
+									// ImageConfiguration.FluoTop.toString())) {
+									// ImageData i = (ImageData) md;
+									// workload.add(i);
+									// } else if (((ImageData)
+									// md).getSubstanceName().equalsIgnoreCase(
+									// ImageConfiguration.FluoSide.toString())) {
+									// ImageData i = (ImageData) md;
+									// workload.add(i);
+									// } else
+									if (config == ImageConfiguration.RgbSide) {
 										ImageData i = (ImageData) md;
 										workload.add(i);
-									} else if (((ImageData) md).getSubstanceName().equalsIgnoreCase(
-											ImageConfiguration.FluoSide.toString())) {
-										ImageData i = (ImageData) md;
-										workload.add(i);
-									} else if (((ImageData) md).getSubstanceName().equalsIgnoreCase(
-											ImageConfiguration.RgbSide.toString())) {
-										ImageData i = (ImageData) md;
-										workload.add(i);
-									} else if (((ImageData) md).getSubstanceName().equalsIgnoreCase(
-											ImageConfiguration.RgbTop.toString())) {
-										ImageData i = (ImageData) md;
-										workload.add(i);
+										// } else if (config == ImageConfiguration.RgbTop)
+										// {
+										// ImageData i = (ImageData) md;
+										// workload.add(i);
 									} else
 										ignored.add(((ImageData) md).getSubstanceName());
 								}

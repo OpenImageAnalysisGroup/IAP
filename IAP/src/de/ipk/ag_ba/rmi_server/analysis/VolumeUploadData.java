@@ -11,7 +11,8 @@ package de.ipk.ag_ba.rmi_server.analysis;
 
 import java.io.ByteArrayInputStream;
 
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+
 
 /**
  * @author klukas

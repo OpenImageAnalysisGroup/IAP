@@ -14,14 +14,14 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 /**
  * @author klukas
  */
-public class FileManagerExp extends AbstractNavigationAction {
+public class FileManagerAction extends AbstractNavigationAction {
 	private final String login;
 	private final ExperimentReference experiment;
 	private final String pass;
 	NavigationGraphicalEntity src = null;
 	MainPanelComponent mpc;
 
-	public FileManagerExp(String login, String pass, ExperimentReference experiment) {
+	public FileManagerAction(String login, String pass, ExperimentReference experiment) {
 		super("Access primary and annotation files");
 		this.login = login;
 		this.experiment = experiment;
@@ -61,7 +61,7 @@ public class FileManagerExp extends AbstractNavigationAction {
 
 	public static NavigationGraphicalEntity getFileManagerEntity(final String login, final String pass,
 			final ExperimentReference experimentRef, GUIsetting guiSetting) {
-		NavigationAction fileManagerAction = new FileManagerExp(login, pass, experimentRef);
+		NavigationAction fileManagerAction = new FileManagerAction(login, pass, experimentRef);
 		NavigationGraphicalEntity fileManager = new NavigationGraphicalEntity(fileManagerAction, "View Data",
 				"img/ext/applications-system.png", guiSetting);
 		return fileManager;

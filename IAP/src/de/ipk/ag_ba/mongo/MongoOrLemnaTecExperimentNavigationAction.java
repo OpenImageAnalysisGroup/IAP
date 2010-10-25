@@ -101,7 +101,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
 		this.src = src;
 		if (header.getExcelfileid().startsWith("lemnatec:"))
-			experiment = new LemnaTecDataExchange().getExperiment(header);
+			experiment = new LemnaTecDataExchange().getExperiment(header, status);
 		else
 			experiment = new MongoDB().getExperiment(header);
 	}

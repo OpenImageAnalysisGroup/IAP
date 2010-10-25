@@ -21,8 +21,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
+import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -33,10 +37,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayInputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayOutputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
@@ -269,7 +270,7 @@ public class LemnaTecDataExchange {
 			String s2 = id2path.get(rs.getLong("null_image_oid"));
 			snapshot.setPath_null_image(s2);
 			String s3 = id2path.get(rs.getLong("image_parameter_oid"));
-			System.out.println(s3);
+			// System.out.println(s3);
 			snapshot.setPath_image_config_blob(s3);
 
 			result.add(snapshot);
@@ -314,8 +315,8 @@ public class LemnaTecDataExchange {
 		}
 	}
 
-	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq) throws SQLException,
-			ClassNotFoundException {
+	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
 
 		String species = "";
@@ -324,8 +325,13 @@ public class LemnaTecDataExchange {
 		String growthconditions = "";
 		String treatment = "";
 
-		Collection<Snapshot> snapshots = getSnapshotsOfExperiment(experimentReq.getDatabase(),
-				experimentReq.getExperimentname());
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Read database");
+		if (optStatus != null)
+			optStatus.setCurrentStatusValue(-1);
+
+		Collection<Snapshot> snapshots = getSnapshotsOfExperiment(experimentReq.getDatabase(), experimentReq
+				.getExperimentname());
 		HashMap<String, Integer> idtag2replicateID = new HashMap<String, Integer>();
 
 		Timestamp earliest = null;
@@ -347,15 +353,25 @@ public class LemnaTecDataExchange {
 
 		HashMap<String, Condition> idtag2condition = getPlantIdAnnotation(experimentReq);
 
-		System.out.println("Snapshots: " + snapshots.size());
-
 		HashMap<String, byte[]> blob2buf = new HashMap<String, byte[]>();
 
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Process snapshots (" + snapshots.size() + ")");
+
+		if (optStatus != null)
+			optStatus.setCurrentStatusValue(0);
+		int workload = snapshots.size();
+		int idxx = 0;
 		for (Snapshot sn : snapshots) {
 			if (sn.getId_tag().length() <= 0) {
 				System.out.println("Warning: snapshot with empty ID tag is ignored.");
 				continue;
 			}
+
+			if (optStatus != null)
+				optStatus.setCurrentStatusValueFine((double) idxx * 100 / workload);
+
+			idxx++;
 
 			Condition conditionTemplate = idtag2condition.get(sn.getId_tag());
 
@@ -513,10 +529,12 @@ public class LemnaTecDataExchange {
 					if (fn != null) {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host,
-								experimentReq.getDatabase() + "/" + sn.getPath_image_config_blob(), sn.getId_tag()
-										+ (position != null ? " (" + position.intValue() + ")" : ""));
+						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
+								+ sn.getPath_image_config_blob(), sn.getId_tag()
+								+ (position != null ? " (" + position.intValue() + ")" : ""));
 						position = processConfigBlobToGetRotationAngle(blob2buf, sn, url);
+						if (Math.abs(position) < 0.00001)
+							position = null;
 					}
 
 					if (position != null) {
@@ -524,18 +542,17 @@ public class LemnaTecDataExchange {
 						image.setPositionUnit("degree");
 					}
 
-					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host,
-							experimentReq.getDatabase() + "/" + sn.getPath_image(), sn.getId_tag()
-									+ (position != null ? " (" + position.intValue() + ")" : ""));
+					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
+							+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + position.intValue() + ")" : ""));
 					image.setURL(url);
 					fn = sn.getPath_null_image();
 					if (fn != null) {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host,
-								experimentReq.getDatabase() + "/" + sn.getPath_null_image(), sn.getId_tag()
-										+ (position != null ? " (" + position.intValue() + ")" : ""));
-						image.setURL(new IOurl(image.getURL().toString() + "," + url.toString()));
+						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
+								+ sn.getPath_null_image(), sn.getId_tag()
+								+ (position != null ? " (" + position.intValue() + ")" : ""));
+						image.setLabelURL(url);
 					}
 
 					measurements.add(image);
@@ -543,15 +560,20 @@ public class LemnaTecDataExchange {
 			}
 
 		}
+		if (optStatus != null)
+			optStatus.setCurrentStatusValue(-1);
 
-		System.out.println("Measurements: " + measurements.size());
-
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
 		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements);
 
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
-		System.out.println("Images: " + numberOfImages);
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Experiment created (" + numberOfImages + " images)");
 
 		experiment.setHeader(new ExperimentHeader(experimentReq));
+		if (optStatus != null)
+			optStatus.setCurrentStatusValue(100);
 		return experiment;
 	}
 
@@ -561,7 +583,7 @@ public class LemnaTecDataExchange {
 			if (blob2buf.containsKey(url.toString()))
 				buf = blob2buf.get(url.toString());
 			else {
-				InputStream in = ExperimentIOManager.getInputStream(url);
+				InputStream in = ResourceIOManager.getInputStream(url);
 				// read configuration object in order to detect rotation angle
 				MyByteArrayOutputStream out = new MyByteArrayOutputStream();
 				byte[] temp = new byte[1024];
@@ -574,7 +596,7 @@ public class LemnaTecDataExchange {
 				blob2buf.put(url.toString(), buf);
 			}
 			TextFile tf = new TextFile(new MyByteArrayInputStream(buf), 0);
-			System.out.println(url.toString());
+			// System.out.println(url.toString());
 			byte[] b = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 			double angle = 0;
 			for (String ss : tf) {
@@ -585,18 +607,20 @@ public class LemnaTecDataExchange {
 					ss = ss.substring("angle".length());
 					int idx = 0;
 					for (char c : ss.toCharArray()) {
-						System.out.print((byte) c + ",");
-						b[idx] = (byte) c;
+						// System.out.print((byte) c + ",");
+						b[idx++] = (byte) c;
 						if (idx >= b.length) {
-							angle = BinaryBlobCameraConfig.arr2double(BinaryBlobCameraConfig.reverse(b), 0);
+							// BinaryBlobCameraConfig.reverse(
+							angle = BinaryBlobCameraConfig.arr2double(b, 0);
 							break;
 						}
 					}
 				}
 			}
-			System.out.println("Config: " + sn.getCamera_label() + " / " + sn.getUserDefinedCameraLabel() + ", angle: "
-					+ angle);
-			System.out.println("");
+			// System.out.println("Config: " + sn.getCamera_label() + " / " +
+			// sn.getUserDefinedCameraLabel() + ", angle: "
+			// + angle);
+			// System.out.println("");
 			return angle;
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);

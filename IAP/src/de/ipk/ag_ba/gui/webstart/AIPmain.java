@@ -30,6 +30,8 @@ import org.graffiti.editor.MessageType;
 import org.graffiti.editor.SplashScreenInterface;
 import org.graffiti.managers.pluginmgr.PluginManagerException;
 import org.graffiti.options.GravistoPreferences;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -39,14 +41,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.DBEsplashScreen;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImageHandler;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOHandler;
 
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -127,10 +127,10 @@ public class AIPmain extends JApplet {
 	}
 
 	private void registerIOhandlers() {
-		ExperimentIOManager.registerIOHandler(new LoadedImageHandler());
-		ExperimentIOManager.registerIOHandler(new LemnaTecFTPhandler());
-		for (MeasurementIOHandler handler : new MongoDB().getHandlers())
-			ExperimentIOManager.registerIOHandler(handler);
+		ResourceIOManager.registerIOHandler(new LoadedImageHandler());
+		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
+		for (ResourceIOHandler handler : new MongoDB().getHandlers())
+			ResourceIOManager.registerIOHandler(handler);
 	}
 
 	@SuppressWarnings("unchecked")

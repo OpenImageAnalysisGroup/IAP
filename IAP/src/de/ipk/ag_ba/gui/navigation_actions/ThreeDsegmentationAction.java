@@ -96,7 +96,7 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 			ip.setExperimentInfo(login, pass, res.getHeader(), true, res);
 			mpc = new MainPanelComponent(ip, true);
 
-			storedActions.add(FileManagerExp.getFileManagerEntity(login, pass, new ExperimentReference(res),
+			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(res),
 					src.getGUIsetting()));
 
 			storedActions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass,

@@ -16,5 +16,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
  * 
  */
 public interface ImagePreProcessor {
-	public boolean processImage(LoadedImage loadedImage, int[] rgbArray, int w, int h, int iBackgroundFill);
+	public boolean processImage(LoadedImage loadedImage, int[] rgbArray, int[] rgbArrayNULL, int w, int h,
+			int iBackgroundFill);
 }

@@ -40,12 +40,12 @@ import org.AttributeHelper;
 import org.ErrorMsg;
 import org.HomeFolder;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.session.EditorSession;
 
 import de.ipk.ag_ba.gui.webstart.AIPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.FileSystemHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
 import de.ipk_gatersleben.ag_pbi.vanted3d.mapping.MappingResultGraph;
 import de.ipk_gatersleben.ag_pbi.vanted3d.mapping.MappingResultGraphNode;
@@ -216,7 +216,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 
 						try {
-							InputStream is = ExperimentIOManager.getInputStream(imageResult.getBinaryFileInfo().getFileName());
+							InputStream is = ResourceIOManager.getInputStream(imageResult.getBinaryFileInfo().getFileName());
 							if (is == null)
 								System.out.println("Inputstream = null");
 							HomeFolder.copyFile(is, tf);
@@ -338,7 +338,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				i = new ImageIcon(imageResult.getFileName());
 			else
 				try {
-					i = new ImageIcon(ImageIO.read(ExperimentIOManager.getInputStream(myImage.fileURL)));
+					i = new ImageIcon(ImageIO.read(ResourceIOManager.getInputStream(myImage.fileURL)));
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 					i = null;

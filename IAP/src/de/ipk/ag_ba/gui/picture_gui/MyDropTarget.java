@@ -17,12 +17,12 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.FileSystemHandler;
 
 /**
  * @author Christian Klukas
@@ -182,7 +182,6 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		}
 
 		Thread t = new Thread(new Runnable() {
-			@SuppressWarnings("deprecation")
 			public void run() {
 				MyImageIcon iconA;
 				BinaryFileInfo bif = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode

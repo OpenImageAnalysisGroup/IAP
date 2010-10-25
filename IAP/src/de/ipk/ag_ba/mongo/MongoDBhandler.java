@@ -12,22 +12,21 @@ import java.io.InputStream;
 
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
 
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOConfigObject;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOHandler;
-
-public class MongoDBhandler implements MeasurementIOHandler {
+public class MongoDBhandler implements ResourceIOHandler {
 
 	// mongo://c3fd77bc7b74388d9dcff9d09d1c16fc/000Grad.png
 	public static final String PREFIX = "mongo";
 
 	@Override
-	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, MeasurementIOConfigObject config)
+	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
 			throws Exception {
 		return null;
 	}
