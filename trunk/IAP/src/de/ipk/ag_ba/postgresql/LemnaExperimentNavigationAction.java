@@ -81,7 +81,7 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
 		this.src = src;
 		if (experiment == null)
-			experiment = new LemnaTecDataExchange().getExperiment(experimentName);
+			experiment = new LemnaTecDataExchange().getExperiment(experimentName, status);
 	}
 
 	@Override

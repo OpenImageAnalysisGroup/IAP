@@ -14,6 +14,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.mongo.MongoDBhandler;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
@@ -31,7 +32,6 @@ import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;

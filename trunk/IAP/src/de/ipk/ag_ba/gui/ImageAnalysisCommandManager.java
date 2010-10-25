@@ -14,7 +14,7 @@ import java.util.Collection;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.navigation_actions.CloudUploadEntity;
-import de.ipk.ag_ba.gui.navigation_actions.FileManagerExp;
+import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDsegmentationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -36,7 +36,7 @@ public class ImageAnalysisCommandManager {
 
 		ArrayList<NavigationGraphicalEntity> actions = new ArrayList<NavigationGraphicalEntity>();
 
-		actions.add(FileManagerExp.getFileManagerEntity(login, pass, experimentReference, guiSettings));
+		actions.add(FileManagerAction.getFileManagerEntity(login, pass, experimentReference, guiSettings));
 
 		try {
 			if (experimentReference.getData().getHeader().getExcelfileid().startsWith("lemnatec:"))

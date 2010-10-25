@@ -148,7 +148,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			ip.setExperimentInfo(login, pass, statisticsResult.getHeader(), true, statisticsResult);
 			mpc = new MainPanelComponent(ip, true);
 
-			storedActions.add(FileManagerExp.getFileManagerEntity(login, pass, new ExperimentReference(statisticsResult),
+			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(statisticsResult),
 					src.getGUIsetting()));
 
 			storedActions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass, new ExperimentReference(

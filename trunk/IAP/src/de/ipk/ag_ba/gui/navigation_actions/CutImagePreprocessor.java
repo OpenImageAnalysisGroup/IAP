@@ -24,7 +24,9 @@ public class CutImagePreprocessor implements ImagePreProcessor {
 	 * ImagePreProcessor#processImage(rmi_server.analysis.LoadedImage)
 	 */
 	@Override
-	public boolean processImage(LoadedImage loadedImage, int[] rgbArray, int w, int h, int iBackgroundFill) {
+	public boolean processImage(LoadedImage loadedImage, int[] rgbArray, int[] rgbArrayNULL, int w, int h,
+			int iBackgroundFill) {
+
 		if (loadedImage.getSubstanceName().equalsIgnoreCase(ImageConfiguration.RgbSide.toString())) {
 			// for (int y = 1700; y < h; y++) {
 			for (int y = 1530; y < h; y++) {

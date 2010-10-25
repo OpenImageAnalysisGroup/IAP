@@ -9,7 +9,6 @@
 
 package de.ipk.ag_ba.mongo;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
@@ -33,11 +31,15 @@ import javax.management.ObjectName;
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
-import org.HomeFolder;
 import org.ObjectRef;
 import org.bson.types.ObjectId;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -68,15 +70,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageUploadData;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOConfigObject;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOHandler;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayInputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NetworkData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -90,12 +85,12 @@ import de.ipk_gatersleben.ag_pbi.mmd.loaders.MeasurementNodeType;
  */
 public class MongoDB {
 
-	public class MongoDBpreviewHandler implements MeasurementIOHandler {
+	public class MongoDBpreviewHandler implements ResourceIOHandler {
 		// mongo-preview://c3fd77bc7b74388d9dcff9d09d1c16fc/000Grad.png
 		public static final String PREFIX = "mongo-preview";
 
 		@Override
-		public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, MeasurementIOConfigObject config)
+		public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
 				throws Exception {
 			return null;
 		}
@@ -135,12 +130,12 @@ public class MongoDB {
 		}
 	}
 
-	public MeasurementIOHandler[] getHandlers() {
-		return new MeasurementIOHandler[] { new MongoDBhandler(), new MongoDB.MongoDBpreviewHandler() };
+	public ResourceIOHandler[] getHandlers() {
+		return new ResourceIOHandler[] { new MongoDBhandler(), new MongoDB.MongoDBpreviewHandler() };
 	}
 
 	private String defaultDBE = "dbe3";
-	private String defaultHost = "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
+	private String defaultHost = "ba-13";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
 	// "ba-13.ipk-gatersleben.de:27017,nw-08.ipk-gatersleben.de:27018";
 	private String defaultLogin = null;
 	private String defaultPass = null;
@@ -366,9 +361,8 @@ public class MongoDB {
 			}
 
 			if (errorCount > 0) {
-				MainFrame.showMessageDialog(
-						"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
-								+ "", "Errors");
+				MainFrame.showMessageDialog("<html>" + "The following files cound not be properly processed:<ul>"
+						+ errors.toString() + "</ul> " + "", "Errors");
 			}
 		}
 	}
@@ -400,39 +394,38 @@ public class MongoDB {
 		return file.length();
 	}
 
-	public long saveImageFile(GridFS gridfs_images, GridFS gridfs_preview_files, ImageData image,
-			ImageUploadData optIUD, String md5) throws IOException {
+	public long saveImageFile(MyByteArrayInputStream isImage, GridFS gridfs_images, GridFS gridfs_label_images,
+			GridFS gridfs_preview_files, ImageData image, String md5) throws IOException {
 		long result = -1;
-		ImageUploadData iud = null;
 
 		try {
-			if (!(image instanceof LoadedImage))
-				image = IOmodule.loadImageFromFileOrMongo(image, null, null);
-			LoadedImage id = (LoadedImage) image;
-			if (optIUD != null)
-				iud = optIUD;
-			else
-				iud = id.getImageUploadData();
-
-			GridFSInputFile inputFile;
-			if (id.getSrcFile() != null)
-				inputFile = gridfs_images.createFile(id.getSrcFile());
-			else {
-				System.out.println("Inputstream-lenght: " + iud.getLength());
-				inputFile = gridfs_images.createFile(iud.getInputStream());
-			}
-
-			inputFile.setFilename(md5);
-			inputFile.save();
-			result = iud.getLength();
-			if (result < 0)
-				System.out.println("ERROR: NNN");
-			GridFSDBFile fff = gridfs_preview_files.findOne(md5);
-			if (fff == null) {
-				GridFSInputFile inputFilePreview = gridfs_preview_files.createFile(iud.getPreviewInputStream());
-				inputFilePreview.setFilename(md5);
-				inputFilePreview.save();
-				iud.closeStreams();
+			int idx = 0;
+			for (InputStream is : new InputStream[] { isImage, ResourceIOManager.getInputStream(image.getLabelURL()) }) {
+				idx++;
+				if (is == null)
+					continue;
+				GridFS fs = null;
+				switch (idx) {
+				case 1:
+					fs = gridfs_images;
+					break;
+				case 2:
+					fs = gridfs_label_images;
+					break;
+				case 3:
+					fs = gridfs_preview_files;
+					break;
+				}
+				GridFSDBFile fff = fs.findOne(md5);
+				if (fff == null) {
+					GridFSInputFile inputFile = fs.createFile(is);
+					inputFile.setFilename(md5);
+					inputFile.save();
+					result = inputFile.getLength();
+					if (result < 0)
+						ErrorMsg.addErrorMessage("Error during GridFS file save operation.");
+				}
+				is.close();
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
@@ -483,35 +476,29 @@ public class MongoDB {
 	}
 
 	public DatabaseStorageResult storeImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
-		InputStream is;
-		ImageUploadData iud = null;
+		MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
 		ImageData srcID = id;
-		if (id instanceof LoadedImage) {
-			LoadedImage li = (LoadedImage) id;
-			iud = li.getImageUploadData();
-			is = iud.getInputStream();
-		} else {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			HomeFolder.copyContent(ExperimentIOManager.getInputStream(id.getURL()), bos);
-			is = new MyByteArrayInputStream(bos.toByteArray());
-			BufferedImage image = ImageIO.read(is);
-			is = new MyByteArrayInputStream(((MyByteArrayInputStream) is).getBuff());
-			LoadedImage li = new LoadedImage(id, image);
-			id = li;
-		}
+
 		if (is == null) {
 			System.out.println("No input stream for source-URL: " + id.getURL());
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
+
 		String md5 = AttributeHelper.getMD5fromInputStream(is, fileSize);
 		if (is instanceof MyByteArrayInputStream)
-			is = new MyByteArrayInputStream(((MyByteArrayInputStream) is).getBuff());
+			is = new MyByteArrayInputStream((is).getBuff());
 		GridFS gridfs_images = new GridFS(db, "images");
 		DBCollection collectionA = db.getCollection("images.files");
 		collectionA.ensureIndex("filename");
-		GridFS gridfs_preview_files = new GridFS(db, "preview_files");
-		DBCollection collectionB = db.getCollection("preview_files.files");
+
+		GridFS gridfs_null_files = new GridFS(db, "null_images");
+		DBCollection collectionB = db.getCollection("null_images.files");
 		collectionB.ensureIndex("filename");
+
+		GridFS gridfs_preview_files = new GridFS(db, "preview_files");
+		DBCollection collectionC = db.getCollection("preview_files.files");
+		collectionC.ensureIndex("filename");
+
 		GridFSDBFile fff = gridfs_images.findOne(md5);
 
 		srcID.getURL().setPrefix(MongoDBhandler.PREFIX);
@@ -525,7 +512,7 @@ public class MongoDB {
 		if (fff != null) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
-			long res = saveImageFile(gridfs_images, gridfs_preview_files, id, iud, md5);
+			long res = saveImageFile(is, gridfs_images, gridfs_null_files, gridfs_preview_files, id, md5);
 			if (res >= 0) {
 				return DatabaseStorageResult.STORED_IN_DB;
 			} else
@@ -904,7 +891,8 @@ public class MongoDB {
 						BatchCmd batch = (BatchCmd) dbo;
 						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED
 								|| ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
-										.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
+										.currentTimeMillis()
+										- batch.getLastUpdateTime() > maxUpdate))
 							res.add(batch);
 					}
 				}

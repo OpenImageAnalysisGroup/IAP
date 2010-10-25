@@ -24,6 +24,8 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
@@ -33,11 +35,10 @@ import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ByteShortIntArray;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayInputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
 
 /**
@@ -54,27 +55,15 @@ public class IOmodule {
 	}
 
 	public static LoadedImage loadImageFromFileOrMongo(ImageData id, String login, String pass) throws Exception {
-		// BufferedImage image = ImageIO.read(new
-		// File(id.getURL().getFileName()));
-		BufferedImage image = ImageIO.read(ExperimentIOManager.getInputStream(id.getURL()));
-		LoadedImage result = new LoadedImage(id, image);
-		// result.setSourceFile(new File(id.getURL().getFileName()));
-		// } else {
-		// BufferedImage image = new MongoDB().getImage(login, pass,
-		// id.getURL().getDetail());
-		// if (image == null) {
-		// System.out.println("Not found: " + id.getURL().toString());
-		// try {
-		// // blo = CallDBE2WebService.getBlob(login, pass, id.getMD5());
-		// // image = ImageIO.read(blo.getBinaryStream());
-		// } catch (Exception e) {
-		// ErrorMsg.addErrorMessage(e);
-		// return null;
-		// }
-		// }
-		// result = new LoadedImage(id, image);
-		// }
-
+		BufferedImage image = ImageIO.read(ResourceIOManager.getInputStream(id.getURL()));
+		BufferedImage imageNULL = null;
+		try {
+			if (id.getLabelURL() != null)
+				imageNULL = ImageIO.read(ResourceIOManager.getInputStream(id.getLabelURL()));
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		LoadedImage result = new LoadedImage(id, image, imageNULL);
 		return result;
 	}
 
@@ -98,7 +87,7 @@ public class IOmodule {
 		System.out.println("Create InputStream representation for volume: " + volume.getDimensionX()
 				* volume.getDimensionY() * volume.getDimensionZ() * 4 / 1024 / 1024 + " MB");
 
-		byte[] cube = volume.getVolume();
+		byte[] cube = volume.getLoadedVolume().getByteArray();
 		return new VolumeUploadData(new MyByteArrayInputStream(cube), cube.length);
 	}
 
@@ -142,7 +131,7 @@ public class IOmodule {
 								offset += read;
 							}
 							System.out.println("Received " + offset + " / " + cube.length + " bytes");
-							result.setVolume(cube);
+							result.setVolume(new ByteShortIntArray(cube));
 
 						} catch (Exception e) {
 							result = null;

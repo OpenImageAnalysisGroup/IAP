@@ -37,7 +37,7 @@ public class MyAdvancedFTP {
 	private static int runIdx = 0;
 
 	public static boolean processFTPdownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
-			String downloadURL, MyByteArrayOutputStream target, ObjectRef lastStatus) {
+			String downloadURL, MyByteArrayOutputStream target) {
 		runIdx++;
 		final int thisRun = runIdx;
 		status.setCurrentStatusText1(downloadURL);
@@ -45,6 +45,8 @@ public class MyAdvancedFTP {
 		String server, remote;
 
 		server = downloadURL.substring("ftp://".length());
+		if (server.contains("@"))
+			server = server.substring(server.indexOf("@") + "@".length());
 		remote = server.substring(server.indexOf("/") + "/".length());
 		server = server.substring(0, server.indexOf("/"));
 
@@ -84,7 +86,7 @@ public class MyAdvancedFTP {
 			status.setCurrentStatusValue(-1);
 			status.setCurrentStatusText1(downloadURL);
 			status.setCurrentStatusText2("FTP DOWNLOAD...");
-			res = processDownload(status, downloadURL, target, lastStatus, thisRun, server, remote, ftp);
+			res = processDownload(status, downloadURL, target, thisRun, server, remote, ftp);
 		} finally {
 			tso.setBval(1, false);
 		}
@@ -92,12 +94,19 @@ public class MyAdvancedFTP {
 	}
 
 	private static boolean processDownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
-			String downloadURL, MyByteArrayOutputStream target, ObjectRef lastStatus, final int thisRun, String server,
-			String remote, final FTPClient ftp) {
+			String downloadURL, MyByteArrayOutputStream target, final int thisRun, final String server, String remote,
+			final FTPClient ftp) {
 		String username;
 		String password;
 		username = "anonymous@" + server;
 		password = "anonymous";
+		if (downloadURL.contains("@")) {
+			String s = downloadURL.substring("ftp://".length());
+			s = s.substring(0, s.indexOf("@"));
+			username = s.split(":")[0];
+			password = s.split(":")[1];
+			downloadURL = "ftp://" + downloadURL.substring(downloadURL.indexOf("@") + "@".length());
+		}
 
 		final ObjectRef myoutputstream = new ObjectRef();
 
@@ -122,7 +131,7 @@ public class MyAdvancedFTP {
 									MyOutputStream os = (MyOutputStream) myoutputstream.getObject();
 									os.setMaxBytes(max);
 								} catch (Exception e) {
-									System.out.println("Could not determine file length for detailed progress information");
+									// System.out.println("Could not determine file length for detailed progress information");
 								}
 							}
 						}
@@ -131,29 +140,32 @@ public class MyAdvancedFTP {
 			}
 		});
 
-		System.out.println("FTP DOWNLOAD: " + downloadURL);
+		// System.out.println("FTP DOWNLOAD: " + downloadURL);
 
 		try {
 			if (ftp.isConnected()) {
 				status.setCurrentStatusText2("Using open FTP connection");
-				System.out.println("Reusing open FTP connection");
+				// System.out.println("Reusing open FTP connection");
 			} else {
+				System.out.println("Connecting to FTP server: " + server);
 				ftp.connect(server);
 				int reply = ftp.getReplyCode();
 				if (!FTPReply.isPositiveCompletion(reply)) {
+					System.out.println("Disconnecting from FTP server: " + server);
 					ftp.disconnect();
 					status.setCurrentStatusText1("Can't connect to FTP server");
 					status.setCurrentStatusText2("ERROR");
 					return false;
 				}
-				if (!ftp.login("anonymous", "anonymous")) {
-					if (!ftp.login(username, password)) {
-						ftp.disconnect();
-						status.setCurrentStatusText1("Can't login to FTP server");
-						status.setCurrentStatusText2("ERROR");
-						return false;
-					}
+				// if (!ftp.login("anonymous", "anonymous")) {
+				if (!ftp.login(username, password)) {
+					System.out.println("Disconnecting from FTP server: " + server);
+					ftp.disconnect();
+					status.setCurrentStatusText1("Can't login to FTP server");
+					status.setCurrentStatusText2("ERROR");
+					return false;
 				}
+				// }
 				status.setCurrentStatusText1("Set Binary Transfer Mode");
 				ftp.setFileType(FTP.BINARY_FILE_TYPE);
 				status.setCurrentStatusText2("Activate Passive Transfer Mode");
@@ -162,8 +174,7 @@ public class MyAdvancedFTP {
 			status.setCurrentStatusText1("Download started..");
 			status.setCurrentStatusText2("Please Wait.");
 
-			OutputStream output = null; // new MyOutputStream(lastStatus, status,
-													// target);
+			OutputStream output = target;
 			myoutputstream.setObject(output);
 			ftp.setRemoteVerificationEnabled(false);
 			boolean result = ftp.retrieveFile(remote, output);
@@ -176,8 +187,10 @@ public class MyAdvancedFTP {
 				public void run() {
 					try {
 						synchronized (GUIhelper.class) {
-							if (runIdx == thisRun)
+							if (runIdx == thisRun) {
+								System.out.println("Disconnecting from FTP server: " + server);
 								ftp.disconnect();
+							}
 						}
 					} catch (Exception err) {
 						ErrorMsg.addErrorMessage(err);

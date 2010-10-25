@@ -9,9 +9,10 @@
 
 package de.ipk.ag_ba.gui.picture_gui;
 
+import org.graffiti.plugin.io.resources.IOurl;
+
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 
 /**
  * @author klukas

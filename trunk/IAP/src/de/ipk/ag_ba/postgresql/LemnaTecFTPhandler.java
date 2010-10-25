@@ -13,21 +13,25 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
+
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOConfigObject;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementIOHandler;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayOutputStream;
 
 /**
  * @author klukas
  * 
  */
-public class LemnaTecFTPhandler implements MeasurementIOHandler {
+public class LemnaTecFTPhandler implements ResourceIOHandler {
 
 	public static final String PREFIX = "lemnatec-ftp";
 
@@ -37,6 +41,9 @@ public class LemnaTecFTPhandler implements MeasurementIOHandler {
 
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
+		if (url.toString().contains(",")) {
+			url = new IOurl(url.toString().split(",")[0]);
+		}
 		if (url.isEqualPrefix(getPrefix())) {
 			boolean useSCP = false;
 			if (useSCP) {
@@ -51,14 +58,19 @@ public class LemnaTecFTPhandler implements MeasurementIOHandler {
 				InputStream is = c.get(fn);
 				return is;
 			} else {
-				boolean advancedFTP = false;
+				boolean advancedFTP = true;
+
+				String detail = url.getDetail();
+				detail = detail.split("/", 2)[0] + "/../../data0/pgftp/" + detail.split("/", 2)[1] + "/";
+				String ur = "ftp://lemnatec:LemnaTec@" + detail.substring(0, detail.length() - "/".length());
+
 				if (advancedFTP) {
-					// MyAdvancedFTP.download();
-					return null;
+					MyByteArrayOutputStream bos = new MyByteArrayOutputStream();
+					BackgroundTaskStatusProviderSupportingExternalCallImpl status = new CommandLineBackgroundTaskStatusProvider(
+							false);
+					MyAdvancedFTP.processFTPdownload(status, ur, bos);
+					return new MyByteArrayInputStream(bos.getBuff());
 				} else {
-					String detail = url.getDetail();
-					detail = detail.split("/", 2)[0] + "/../../data0/pgftp/" + detail.split("/", 2)[1] + "/";
-					String ur = "ftp://lemnatec:LemnaTec@" + detail.substring(0, detail.length() - "/".length());
 					return new BufferedInputStream(new URL(ur).openStream());
 				}
 			}
@@ -101,7 +113,7 @@ public class LemnaTecFTPhandler implements MeasurementIOHandler {
 	}
 
 	@Override
-	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, MeasurementIOConfigObject config)
+	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
 			throws Exception {
 		throw new Exception("LemnaTec FTP Output is not supported!");
 	}

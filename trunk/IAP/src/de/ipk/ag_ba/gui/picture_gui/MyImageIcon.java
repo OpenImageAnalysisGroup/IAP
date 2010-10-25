@@ -21,10 +21,9 @@ import javax.swing.ImageIcon;
 
 import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
-
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ExperimentIOManager;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.FileSystemHandler;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
+import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 /**
  * @author Christian Klukas
@@ -51,7 +50,7 @@ public class MyImageIcon extends ImageIcon {
 		initImageData(observer, width, height, file, bfi);
 	}
 
-	@SuppressWarnings( { "deprecation", "restriction" })
+	@SuppressWarnings( { "restriction" })
 	public synchronized void initImageData(Component observer, int width, int height, IOurl file, BinaryFileInfo bfi)
 			throws MalformedURLException {
 		this.bfi = bfi;
@@ -62,7 +61,7 @@ public class MyImageIcon extends ImageIcon {
 
 		try {
 			BufferedImage i = null;
-			i = ImageIO.read(ExperimentIOManager.getInputStream(fileURL));
+			i = ImageIO.read(ResourceIOManager.getInputStream(fileURL));
 			// i = getPreviewImage((BufferedImage) i);
 			int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
 			double factor = 128 / (double) maxS;

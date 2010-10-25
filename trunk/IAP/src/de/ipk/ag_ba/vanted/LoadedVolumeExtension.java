@@ -24,12 +24,13 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.ShowImage;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ByteShortIntArray;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.CubeSide;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayInputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayOutputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
 
@@ -39,7 +40,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
 public class LoadedVolumeExtension extends LoadedVolume {
 
 	public LoadedVolumeExtension(Sample parent, byte[] volume) {
-		super(parent, volume);
+		super(parent, new ByteShortIntArray(volume));
 	}
 
 	public LoadedVolumeExtension(VolumeData md) {
@@ -47,6 +48,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 	}
 
 	public BufferedImage getSideView(CubeSide side) {
+		byte[] volumeB = volume.getByteArray();
 		switch (side) {
 		case FRONT:
 			int width = getDimensionX();
@@ -60,10 +62,10 @@ public class LoadedVolumeExtension extends LoadedVolume {
 					result.getRaster().setPixel(x, y, iArray);
 					boolean solidFound = false;
 					for (int z = 0; z < getDimensionZ(); z++) {
-						byte a = volume[idx++];
-						byte r = volume[idx++];
-						byte g = volume[idx++];
-						byte b = volume[idx++];
+						byte a = volumeB[idx++];
+						byte r = volumeB[idx++];
+						byte g = volumeB[idx++];
+						byte b = volumeB[idx++];
 						if (!solidFound && a != 0 && (r < 250 || g < 250 || b < 250)) {
 							solidFound = true;
 							iArray[0] = r;
@@ -90,9 +92,10 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		int width = getDimensionX();
 		int height = getDimensionY();
 		int depth = getDimensionZ();
+		byte[] volumeB = volume.getByteArray();
 		// System.out.println(countNonZero() + " non zero");
-		if (volume2 == null || volume.length != volume2.length) {
-			volume2 = new byte[volume.length];
+		if (volume2 == null || volumeB.length != volume2.length) {
+			volume2 = new byte[volumeB.length];
 		}
 
 		boolean threaded = true;
@@ -172,6 +175,8 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			int dimensionxH = dimensionx / 2;
 			int dimensionzH = dimensionx / 2;
 
+			byte[] volumeB = volume.getByteArray();
+
 			for (int x = 0; x < dimensionx; x++) {
 				if (x % maxCPU == i)
 					for (int z = 0; z < dimensionz; z++) {
@@ -188,10 +193,10 @@ public class LoadedVolumeExtension extends LoadedVolume {
 							int offSrc = offA + offA + offA + offA;
 							int offTgt = offB + offB + offB + offB;
 							if (targetOK) {
-								volume2[offSrc++] = volume[offTgt++];
-								volume2[offSrc++] = volume[offTgt++];
-								volume2[offSrc++] = volume[offTgt++];
-								volume2[offSrc] = volume[offTgt];
+								volume2[offSrc++] = volumeB[offTgt++];
+								volume2[offSrc++] = volumeB[offTgt++];
+								volume2[offSrc++] = volumeB[offTgt++];
+								volume2[offSrc] = volumeB[offTgt];
 							}
 							offA += dimensiony;
 							offB += dimensiony;
@@ -218,9 +223,9 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			DataInputStream in = new DataInputStream(file);
 
 			LoadedVolumeExtension v = new LoadedVolumeExtension(null);
-			v.volume = new byte[res * res * res * 4];
+			v.volume = new ByteShortIntArray(new byte[res * res * res * 4]);
 			v.volume2 = new byte[res * res * res * 4];
-			in.readFully(v.volume);
+			in.readFully(v.volume.getByteArray());
 			in.close();
 
 			v.setDimensionX(res);

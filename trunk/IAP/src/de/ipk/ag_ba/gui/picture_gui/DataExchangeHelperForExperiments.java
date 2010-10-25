@@ -1,5 +1,5 @@
 /* Copyright (c) 2003 IPK Gatersleben
- * $Id: DataExchangeHelperForExperiments.java,v 1.1 2010-10-15 13:57:47 klukas Exp $
+ * $Id: DataExchangeHelperForExperiments.java,v 1.2 2010-10-25 17:38:52 klukas Exp $
  */
 package de.ipk.ag_ba.gui.picture_gui;
 
@@ -23,6 +23,8 @@ import org.AttributeHelper;
 import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
@@ -35,8 +37,6 @@ import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.FileSystemHandler;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IOurl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
@@ -238,8 +238,8 @@ public class DataExchangeHelperForExperiments {
 					if (pi != null)
 						previewImage = new ImageIcon(pi);
 				}
-				final DataSetFileButton imageButton = new DataSetFileButton(dbeUser, dbePass, mt, imageResult, previewImage, mt
-						.isReadOnly());
+				final DataSetFileButton imageButton = new DataSetFileButton(dbeUser, dbePass, mt, imageResult,
+						previewImage, mt.isReadOnly());
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
 

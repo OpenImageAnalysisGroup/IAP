@@ -102,7 +102,8 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 				status.setCurrentStatusText1("Load Volume");
 				LoadedVolume volume = IOmodule.loadVolumeFromMongo((VolumeData) in, login, pass);
 				int cnt = volume.countNonZero();
-				System.out.println("Volume Fill: " + volume.countNonZero() + " / " + volume.getVolume().length);
+				System.out.println("Volume Fill: " + volume.countNonZero() + " / "
+						+ volume.getLoadedVolume().getByteArray().length);
 				if (cnt == 0) {
 					ErrorMsg
 							.addErrorMessage("Can't segment empty (all zero) volume (empty volume is skipped and not processed)!");
@@ -110,8 +111,8 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 				}
 				volume.getURL().setFileName(volume.getURL().getFileName() + ".labelfield");
 				status.setCurrentStatusText1("Segmentation");
-				ThreeDsegmentationColored.segment(volume.getVolume(), somSize, status, volume.getDimensionX(), volume
-						.getDimensionY(), volume.getDimensionZ());
+				ThreeDsegmentationColored.segment(volume.getLoadedVolume().getByteArray(), somSize, status, volume
+						.getDimensionX(), volume.getDimensionY(), volume.getDimensionZ());
 
 				if (storeResultInDatabase != null) {
 					long bytes = volume.getDimensionX() * volume.getDimensionY() * volume.getDimensionZ() * 4;

@@ -107,7 +107,7 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 			}
 			if (md instanceof LoadedVolume) {
 				LoadedVolume lv = (LoadedVolume) md;
-				byte[] cube = lv.getVolume();
+				byte[] cube = lv.getLoadedVolume().getByteArray();
 				for (int i = 0; i < cube.length; i++) {
 					if (cube[i] != 0)
 						filled++;
