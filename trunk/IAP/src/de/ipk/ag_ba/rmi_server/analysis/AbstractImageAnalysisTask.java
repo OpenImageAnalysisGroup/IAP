@@ -8,12 +8,16 @@
  */
 package de.ipk.ag_ba.rmi_server.analysis;
 
-
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 /**
  * @author klukas
- *
+ * 
  */
 public abstract class AbstractImageAnalysisTask implements ImageAnalysisTask {
-	
+
+	@Override
+	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status) {
+		performAnalysis(1, 1, status);
+	}
 }

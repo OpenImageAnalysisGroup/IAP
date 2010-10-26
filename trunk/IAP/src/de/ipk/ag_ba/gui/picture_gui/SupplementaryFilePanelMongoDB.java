@@ -88,7 +88,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		}
 	}
 
-	JMyFilePanel currentFilePanel = null;
+	DataSetFilePanel currentFilePanel = null;
 
 	public SupplementaryFilePanelMongoDB(final String login, final String password, ExperimentInterface doc,
 			String experimentName) {
@@ -105,7 +105,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		});
 
 		final FilePanelHeader filePanelHeader = new FilePanelHeader(addButton);
-		final JMyFilePanel filePanel = new JMyFilePanel(filePanelHeader);
+		final DataSetFilePanel filePanel = new DataSetFilePanel(filePanelHeader);
 
 		currentFilePanel = filePanel;
 
@@ -123,51 +123,62 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 				if (e.getNewLeadSelectionPath() == null || e.getNewLeadSelectionPath().getLastPathComponent() == null)
 					return;
 
-				Object mt = e.getNewLeadSelectionPath().getLastPathComponent();
+				final Object mt = e.getNewLeadSelectionPath().getLastPathComponent();
 				if (mt instanceof MongoTreeNode && ((MongoTreeNode) mt).getTargetEntity() != null) {
-					MongoTreeNode mtdbe = (MongoTreeNode) mt;
+					final MongoTreeNode mtdbe = (MongoTreeNode) mt;
 					MongoTreeNode projectNode = mtdbe.getProjectNode();
 					projectNode.updateSizeInfo(login, password, thisPanel);
-					filePanel.removeAll();
-					filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
-					if (!((MongoTreeNodeBasis) mt).readOnly) {
-						String msg = "<font color='black'>You may also use drag+drop to upload files to the database and to assign them to this entry";
-						filePanel.setHeader(true, msg, false, true);
-					} else {
-						filePanel.setHeader(false, "<font color='black'>You don't have write access to this experiment",
-								true, true);
-					}
 
 					MyDropTarget myDropTarget = new MyDropTarget(login, password, filePanel, mtdbe, expTree);
+					currentDropTarget = myDropTarget;
 					filePanel.setDropTarget(myDropTarget);
 
-					currentDropTarget = myDropTarget;
+					filePanel.setFiller(new Runnable() {
+						public void run() {
+							filePanel.removeAll();
+							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
+							if (!((MongoTreeNodeBasis) mt).readOnly) {
+								String msg = "<font color='black'>You may also use drag+drop to upload files to the database and to assign them to this entry";
+								filePanel.setHeader(true, msg, false, true);
+							} else {
+								filePanel.setHeader(false,
+										"<font color='black'>You don't have write access to this experiment", true, true);
+							}
 
-					filePanel.validate();
-					filePanel.repaint();
+							filePanel.validate();
+							filePanel.repaint();
 
-					removeTempFiles();
+							removeTempFiles();
+							DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, login, password);
+						}
+					});
 
-					DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, login, password);
+					filePanel.fill();
 				} else {
-					filePanel.removeAll();
-					filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
-					if (!((MongoTreeNodeBasis) mt).readOnly)
-						filePanel
-								.setHeader(
-										false,
-										"<font color='black'>To assign data, please select the experiment-node, a condition, timepoint or measurement value",
-										true, true);
-					else
-						filePanel.setHeader(false, "<font color='black'>You don't have write access to this experiment",
-								true, true);
-
-					filePanel.setDropTarget(null);
-
 					currentDropTarget = null;
+					filePanel.setDropTarget(null);
+					filePanel.removeAll();
 
-					filePanel.validate();
-					filePanel.repaint();
+					filePanel.setFiller(new Runnable() {
+						@Override
+						public void run() {
+							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
+							if (!((MongoTreeNodeBasis) mt).readOnly)
+								filePanel
+										.setHeader(
+												false,
+												"<font color='black'>To assign data, please select the experiment-node, a condition, timepoint or measurement value",
+												true, true);
+							else
+								filePanel.setHeader(false,
+										"<font color='black'>You don't have write access to this experiment", true, true);
+
+							filePanel.validate();
+							filePanel.repaint();
+						}
+					});
+
+					filePanel.fill();
 				}
 			}
 		});

@@ -9,7 +9,6 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -62,9 +61,8 @@ public class MyImageIcon extends ImageIcon {
 		try {
 			BufferedImage i = null;
 			i = ImageIO.read(ResourceIOManager.getInputStream(fileURL));
-			// i = getPreviewImage((BufferedImage) i);
 			int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
-			double factor = 128 / (double) maxS;
+			double factor = DataSetFileButton.ICON_HEIGHT / (double) maxS;
 			i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
 			imageAvailable = 1;
 			setImage(i);
@@ -176,11 +174,11 @@ public class MyImageIcon extends ImageIcon {
 		Graphics2D g = resizedImage.createGraphics();
 		g.setComposite(AlphaComposite.Src);
 
-		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-
-		g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		// g.setRenderingHint(RenderingHints.KEY_RENDERING,
+		// RenderingHints.VALUE_RENDER_QUALITY);
+		//
+		// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		// RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g.drawImage(image, 0, 0, width, height, null);
 		g.dispose();

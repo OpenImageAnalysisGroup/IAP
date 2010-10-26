@@ -38,8 +38,8 @@ public class Phenotyping extends AbstractNavigationAction {
 		phenoDBcommands.add(analyzeEntity);
 
 		NavigationAction lemnaExperiments = new LemnaTecNavigationAction();
-		NavigationGraphicalEntity lemnaEntity = new NavigationGraphicalEntity(lemnaExperiments,
-				src != null ? src.getGUIsetting() : null);
+		NavigationGraphicalEntity lemnaEntity = new NavigationGraphicalEntity(lemnaExperiments, src != null ? src
+				.getGUIsetting() : null);
 
 		phenoDBcommands.add(lemnaEntity);
 

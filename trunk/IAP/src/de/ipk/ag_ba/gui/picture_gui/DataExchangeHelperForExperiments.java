@@ -1,5 +1,5 @@
 /* Copyright (c) 2003 IPK Gatersleben
- * $Id: DataExchangeHelperForExperiments.java,v 1.2 2010-10-25 17:38:52 klukas Exp $
+ * $Id: DataExchangeHelperForExperiments.java,v 1.3 2010-10-26 12:56:01 klukas Exp $
  */
 package de.ipk.ag_ba.gui.picture_gui;
 
@@ -37,6 +37,9 @@ import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
@@ -152,7 +155,7 @@ public class DataExchangeHelperForExperiments {
 		return (DatabaseStorageResult) tso.getParam(0, null);
 	}
 
-	public static void fillFilePanel(final JMyFilePanel filePanel, final MongoTreeNode mtdbe, final JTree expTree,
+	public static void fillFilePanel(final DataSetFilePanel filePanel, final MongoTreeNode mtdbe, final JTree expTree,
 			final String login, final String password) {
 		Thread r = new Thread(new Runnable() {
 			public void run() {
@@ -162,8 +165,8 @@ public class DataExchangeHelperForExperiments {
 		BackgroundThreadDispatcher.addTask(r, 0);
 	}
 
-	static synchronized void addFilesToPanel(final JMyFilePanel filePanel, final MongoTreeNode mt, final JTree expTree,
-			String dbeUser, String dbePass) {
+	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel, final MongoTreeNode mt,
+			final JTree expTree, String dbeUser, String dbePass) {
 		if (!mt.mayContainData())
 			return;
 		final StopObject stop = new StopObject(false);
@@ -197,6 +200,28 @@ public class DataExchangeHelperForExperiments {
 								bbb.add(primary);
 						}
 						primary = null;
+					} else {
+						if (mde instanceof Condition3D) {
+							Condition3D c3d = (Condition3D) mde;
+							primary = null;
+							for (SampleInterface si : c3d) {
+								Sample3D s3d = (Sample3D) si;
+								for (NumericMeasurementInterface nmi : s3d.getBinaryMeasurements()) {
+									if (nmi instanceof ImageData) {
+										ImageData id = (ImageData) nmi;
+										IOurl url = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
+										primary = new BinaryFileInfo(url, true, id);
+									} else if (nmi instanceof VolumeData) {
+										VolumeData id = (VolumeData) nmi;
+										IOurl url = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
+										primary = new BinaryFileInfo(url, true, id);
+									}
+									if (primary != null)
+										bbb.add(primary);
+								}
+							}
+							primary = null;
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -219,9 +244,13 @@ public class DataExchangeHelperForExperiments {
 				}
 			}
 
+			final ArrayList<Thread> executeLater = new ArrayList<Thread>();
+			BinaryFileInfo lastBBB = null;
+			if (bbb.size() > 0)
+				lastBBB = bbb.get(bbb.size() - 1);
 			for (final BinaryFileInfo binaryFileInfo : bbb) {
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
-				boolean lemna = false;
+				boolean previewLoadAndConstructNeeded = false;
 				if (binaryFileInfo.getFileName() == null)
 					binaryFileInfo.setFileName(null);
 				ImageIcon previewImage = null;
@@ -232,11 +261,13 @@ public class DataExchangeHelperForExperiments {
 					previewImage = myImage;
 				} else if (LemnaTecFTPhandler.isLemnaTecFtpUrl(binaryFileInfo.getFileName())) {
 					previewImage = null;
-					lemna = true;
+					previewLoadAndConstructNeeded = true;
 				} else {
 					byte[] pi = new MongoDB().getPreviewData(binaryFileInfo.getMD5());
 					if (pi != null)
 						previewImage = new ImageIcon(pi);
+					else
+						previewLoadAndConstructNeeded = true;
 				}
 				final DataSetFileButton imageButton = new DataSetFileButton(dbeUser, dbePass, mt, imageResult,
 						previewImage, mt.isReadOnly());
@@ -252,7 +283,9 @@ public class DataExchangeHelperForExperiments {
 					clearPanel(filePanel, mt, expTree);
 				}
 
-				final boolean lemnaF = lemna;
+				final boolean previewLoadAndConstructNeededF = previewLoadAndConstructNeeded;
+
+				final boolean fIsLast = binaryFileInfo == lastBBB;
 
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
@@ -263,35 +296,52 @@ public class DataExchangeHelperForExperiments {
 							filePanel.validate();
 							filePanel.repaint();
 							filePanel.scrollpane.validate();
-							if (lemnaF) {
-								BackgroundThreadDispatcher.addTask(new Thread(new Runnable() {
+							if (previewLoadAndConstructNeededF) {
+								Thread t = new Thread(new Runnable() {
 									@Override
 									public void run() {
 										if (mt == expTree.getSelectionPath().getLastPathComponent()) {
-											MyImageIcon myImage;
+											final MyImageIcon myImage;
 											try {
 												myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
 														DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
 												myImage.imageAvailable = 1;
-												imageButton.updateLayout(null, myImage, myImage);
+												SwingUtilities.invokeLater(new Runnable() {
+													@Override
+													public void run() {
+														imageButton.updateLayout(null, myImage, myImage);
+													}
+												});
 											} catch (MalformedURLException e) {
 												// empty
 											}
 										}
 									}
-								}), -1);
+								});
+								executeLater.add(t);
+
+								BackgroundTaskHelper.executeLaterOnSwingTask(10, new Runnable() {
+									@Override
+									public void run() {
+										boolean isLast = fIsLast;
+										if (isLast)
+											for (Thread ttt : executeLater)
+												BackgroundThreadDispatcher.addTask(ttt, -1);
+									}
+								});
 							}
 						} else
 							stop.setStopWanted(true);
 					}
 				});
 			}
+
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 	}
 
-	private static void clearPanel(final JMyFilePanel filePanel, final MongoTreeNode mt, final JTree expTree) {
+	private static void clearPanel(final DataSetFilePanel filePanel, final MongoTreeNode mt, final JTree expTree) {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() {

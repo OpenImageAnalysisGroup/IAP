@@ -51,7 +51,10 @@ public class FileManagerAction extends AbstractNavigationAction {
 
 	@Override
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		return new ArrayList<NavigationGraphicalEntity>();
+		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+		// todo add zoom slider (default, large, extra large)
+		// todo add plant filter (all, ID 1, ID 2, ID 3, ...)
+		return res;
 	}
 
 	@Override
