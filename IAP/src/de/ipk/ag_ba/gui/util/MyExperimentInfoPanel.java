@@ -221,9 +221,9 @@ public class MyExperimentInfoPanel extends JPanel {
 			enabled = true;
 
 		if (enabled)
-			editB.setText("<html><small>Cancel");
+			editB.setText("<html>Cancel");
 		else
-			editB.setText("<html><small>Edit");
+			editB.setText("<html>Edit");
 		saveB.setEnabled(savePossible);
 
 		editName.setEnabled(enabled);

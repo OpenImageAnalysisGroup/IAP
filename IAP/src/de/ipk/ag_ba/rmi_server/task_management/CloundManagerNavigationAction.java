@@ -11,6 +11,7 @@ package de.ipk.ag_ba.rmi_server.task_management;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 
 /**
@@ -41,8 +42,9 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
 		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+		GUIsetting guiS = src.getGUIsetting();
 		NavigationGraphicalEntity startOrStopServerMode = new NavigationGraphicalEntity(
-				new EnableOrDisableServerModeAction(login, pass), src.getGUIsetting());
+				new EnableOrDisableServerModeAction(login, pass), guiS);
 		res.add(startOrStopServerMode);
 		return res;
 	}

@@ -56,8 +56,8 @@ import de.ipk_gatersleben.ag_pbi.vanted3d.views.ThreeDview;
  */
 public class DataSetFileButton extends JButton implements ActionListener {
 	private static final long serialVersionUID = 1L;
-	protected static final int ICON_HEIGHT = 128;
-	protected static final int ICON_WIDTH = 128;
+	protected static int ICON_HEIGHT = 128;
+	protected static int ICON_WIDTH = 128;
 	private JMenuItem showImageCmd;
 	private JMenuItem showVolumeCmd;
 	private JMenuItem openFileCmd;
@@ -128,7 +128,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			ilbl = new JLabel(previewImage);
 
 		double[][] size = {
-				{ border, TableLayout.FILL, border }, // Columns
+				{ border, DataSetFileButton.ICON_WIDTH, border }, // Columns
 				{ border, DataSetFileButton.ICON_HEIGHT, border, TableLayout.PREFERRED, border, TableLayout.PREFERRED,
 						border } }; // Rows
 
@@ -180,7 +180,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	@Override
 	public Dimension getPreferredSize() {
 		Dimension d = super.getPreferredSize();
-		return new Dimension((int) d.getWidth() - 10, (int) d.getHeight());
+		return new Dimension((int) d.getWidth(), (int) d.getHeight());
 	}
 
 	/**
@@ -366,7 +366,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			// pass, imageResult);
 			// clean up gui...
 			Stack<DataSetFileButton> toBeDeleted = new Stack<DataSetFileButton>();
-			JMyFilePanel p = (JMyFilePanel) this.getParent();
+			DataSetFilePanel p = (DataSetFilePanel) this.getParent();
 			String imageFileIDtoBeDeleted = imageResult.getMd5();
 			for (int i = 0; i < p.getComponentCount(); i++) {
 				Component o = p.getComponent(i);
@@ -389,7 +389,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		if (evt.getSource() == removeAllFromDatabaseCmd) {
 			// DataExchangeHelperForExperiments.removeAllImagesForOneTargetNodeFromDataBase(user,
 			// pass, imageResult);
-			JMyFilePanel p = (JMyFilePanel) this.getParent();
+			DataSetFilePanel p = (DataSetFilePanel) this.getParent();
 			p.removeAll();
 			p.invalidate();
 			p.validate();

@@ -17,7 +17,6 @@ import org.color.ColorUtil;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
-import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
@@ -59,12 +58,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		this.storeResultInDatabase = storeResultInDatabase;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTasks#
-	 * setInputImage(java.awt.image.BufferedImage)
-	 */
 	public void setInput(Collection<NumericMeasurementInterface> input, String login, String pass) {
 		this.input = input;
 		this.login = login;
@@ -84,18 +77,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 	@Override
 	public String getTaskDescription() {
 		return "Analyse Plants Phenotype";
-	}
-
-	/**
-	 * @deprecated Use
-	 *             {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)}
-	 *             instead
-	 */
-	@Deprecated
-	@Override
-	public void performAnalysis(final int maximumThreadCount,
-			final BackgroundTaskStatusProviderSupportingExternalCall status) {
-		performAnalysis(maximumThreadCount, 1, status);
 	}
 
 	@Override
@@ -224,6 +205,22 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		Geometry g = removeSingleDotsAndDetectGeometry(w, h, rgbArray, iBackgroundFill, limg);
 
 		NumericMeasurement m;
+		{
+			ColorHistogram histogram = new ColorHistogram(20);
+			histogram.countColorPixels(rgbArray);
+			for (ColorHistogramEntry che : histogram.getColorEntries()) {
+				String sn = limg.getSubstanceName();
+				int pos = sn.indexOf(".");
+				if (pos > 0)
+					sn = sn.substring(0, pos);
+				m = new NumericMeasurement(limg, sn + ": " + che.getColorDisplayName(), limg.getParentSample()
+						.getParentCondition().getExperimentName()
+						+ " (" + getName() + ")");
+				m.setValue(che.getNumberOfPixels());
+				m.setUnit("pixels");
+				output.add(m);
+			}
+		}
 		if (!limg.getSubstanceName().toUpperCase().contains("TOP")) {
 			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
 					.getParentCondition().getExperimentName()
@@ -325,41 +322,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				boolean subNrgb = subN.contains("RGB") || subN.contains("VIS");
 
 				ArrayList<Integer> backgroundPixelsArr = new ArrayList<Integer>();
-				ArrayList<Color> otherColor = new ArrayList<Color>();
-
-				otherColor.add(new Color(0.25f, 0.36f, 0.75f)); // stick
-				otherColor.add(new Color(0.3f, 0.5f, 0.9f)); // cave
-				otherColor.add(new Color(0.2f, 0.5f, 0.9f)); // cave
-				otherColor.add(new Color(0.5f, 0.7f, 1f)); // stick
-				otherColor.add(new Color(0.7f, 0.9f, 1f)); // stick
-				otherColor.add(new Color(0.8f, 0.8f, 1f)); // stick
-				otherColor.add(new Color(0.1f, 0.2f, 0.4f)); // stick
-				otherColor.add(new Color(0.5f, 0.5f, 0.5f)); // cave
-				otherColor.add(new Color(0.5f, 0.5f, 0.5f)); // cave
-				otherColor.add(new Color(0.5f, 1f, 1f)); // cave
-				otherColor.add(new Color(0.8f, 0.8f, 0.8f)); // inner pot
-				otherColor.add(new Color(0.6f, 0.8f, 1f)); // blue shadow
-				otherColor.add(new Color(0.7f, 0.5f, 0.6f)); // blue shadow
-				otherColor.add(new Color(0.9f, 0.75f, 0.9f)); // blue shadow //
-				otherColor.add(new Color(0.5f, 0.8f, 1f)); // blue shadow //
-				otherColor.add(new Color(0.5f, 0.8f, 1f)); // blue shadow //
-				otherColor.add(new Color(0.35f, 0.47f, 0.87f)); // blue shadow //
-				otherColor.add(new Color(0.3f, 0.4f, 0.8f)); // blue shadow //
-				otherColor.add(new Color(0.5f, 0.7f, 1f)); // blue shadow //
-				otherColor.add(new Color(0.25f, 0.36f, 0.73f)); // blue shadow //
-				// (top, stick?)
-				otherColor.add(new Color(0.7f, 0.6f, 0.6f)); //
-				// inner pot
-				otherColor.add(new Color(0.1f, 0.1f, 0.1f)); // soil
-				otherColor.add(new Color(0.3f, 0.3f, 0.3f)); // soil
-				otherColor.add(new Color(0.25f, 0.28f, 0.3f)); // side lanes
-				otherColor.add(new Color(0.3f, 0.25f, 0.3f)); // side lanes
-				otherColor.add(new Color(0.8f, 0.3f, 0.2f)); // side lanes (top,
-				// red)
-				otherColor.add(new Color(1f, 0.5f, 0.3f)); // side lanes
-
-				otherColor.add(new Color(0.7f, 0.7f, 0.65f)); // side lanes
-				// (top, // red dot)
 
 				int x = 0;
 				boolean hasBackgroundImage = rgbArrayNULL != null && rgbArray.length == rgbArrayNULL.length;
@@ -413,34 +375,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 							rgbArray[xyw] = iBackgroundFill;
 						}
 					}
-					// if (rgbArray[xyw] != iBackgroundFill) {
-					// Color cc = new Color(rgbArray[xyw]);
-					// if (cc.getBlue() >= 235)
-					// rgbArray[xyw] = iBackgroundFill;
-					// else {
-					// if (cc.getRed() <= 120 && cc.getGreen() <= 120 && cc.getBlue()
-					// <= 120)
-					// if (Math.abs(Math.abs(cc.getRed() - cc.getGreen()) +
-					// Math.abs(cc.getGreen() - cc.getBlue())) < 20)
-					// rgbArray[xyw] = iBackgroundFill;
-					//
-					// }
-					// }
-					// if (rgbArray[xyw] != iBackgroundFill) {
-					// /*
-					// * Color ct = new Color(rgbArray[xyw]); for (Color cBlue1 :
-					// * otherColor) { if (ColorUtil.deltaE2000(ct, cBlue1) < 15) {
-					// * rgbArray[xyw] = iBackgroundFill; break; } }
-					// */
-					// int ct = p;
-					// for (Color cBlue1 : otherColor) {
-					// if (ColorUtil.deltaE2000simu(ct, cBlue1.getRGB()) < epsilonB *
-					// factor) {
-					// rgbArray[xyw] = Color.PINK.getRGB();// iBackgroundFill;
-					// break;
-					// }
-					// }
-					// }
+
 					if (subNfluo)
 						if (rgbArray[xyw] != iBackgroundFill) {
 							Color c = new Color(rgbArray[xyw]);
@@ -465,9 +400,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 				synchronized (progress) {
 					progress.setObject(new Integer((Integer) progress.getObject() + 1));
-					// status.setCurrentStatusValue((int) ((Integer) progress
-					// .getObject()
-					// / (double) h * 100d));
 				}
 			}
 		};
@@ -475,23 +407,13 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 	private Geometry removeSingleDotsAndDetectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill,
 			LoadedImage limg) {
-		int searchRadius = 1;
-		String subN = limg.getSubstanceName();
-		// if (subN.equalsIgnoreCase(ImageConfiguration.FluoTop.toString())) {
-		// searchRadius = 5;
-		// }
-		// if (subN.equalsIgnoreCase(ImageConfiguration.RgbTop.toString())) {
-		// searchRadius = 5;
-		// }
-		// if (subN.equalsIgnoreCase(ImageConfiguration.RgbSide.toString())) {
-		// searchRadius = 5;
-		// }
+
 		int left = w;
 		int right = 0;
 		int top = h;
 
-		for (int x = searchRadius; x < w - searchRadius; x++)
-			for (int y = h - searchRadius; y > searchRadius; y--) {
+		for (int x = 0; x < w; x++)
+			for (int y = h - 1; y > 0; y--) {
 				int o = x + y * w;
 				if (y > h * 0.95) {
 					rgbArray[o] = iBackgroundFill;
@@ -500,65 +422,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				if (rgbArray[o] == iBackgroundFill)
 					continue;
 
-				int brightness = 0;
-				int re = 0;
-				int gr = 0;
-				int bl = 0;
-				for (int a = -searchRadius; a <= searchRadius; a++)
-					for (int b = -searchRadius; b <= searchRadius; b++) {
-						if (a == 0 && b == 0)
-							continue;
-						int o2 = (x + a) + (y + b) * w;
-						int r2 = rgbArray[o2];
-						if (r2 != iBackgroundFill) {
-							int red = (r2 >> 16) & 0xff;
-							int green = (r2 >> 8) & 0xff;
-							int blue = (r2) & 0xff;
-							re += red;
-							gr += green;
-							bl += blue;
-							brightness += red + green + blue;
-						}
-					}
-
-				// if (subN.equalsIgnoreCase(ImageConfiguration.FluoTop.toString()))
-				// {
-				// if ((double) brightness / (double) (searchRadius * searchRadius *
-				// (120 * 3)) < 1) {
-				// for (int a = -searchRadius; a <= searchRadius; a++)
-				// for (int b = -searchRadius; b <= searchRadius; b++)
-				// rgbArray[o] = iBackgroundFill;
-				// } else {
-				// if (re * 0.1d < (gr + bl) / 2d) {
-				// for (int a = -searchRadius; a <= searchRadius; a++)
-				// for (int b = -searchRadius; b <= searchRadius; b++)
-				// rgbArray[o] = iBackgroundFill;
-				// }
-				// }
-				// }
-				// if
-				// (subN.equalsIgnoreCase(ImageConfiguration.FluoSide.toString())) {
-				// if ((double) brightness / (double) (searchRadius * searchRadius *
-				// (120 * 3)) < 1) {
-				// for (int a = -searchRadius; a <= searchRadius; a++)
-				// for (int b = -searchRadius; b <= searchRadius; b++)
-				// rgbArray[o] = iBackgroundFill;
-				// }
-				// }
-				if (subN.equalsIgnoreCase(ImageConfiguration.RgbTop.toString())) {
-					if (gr < (re + bl) / 2) {
-						for (int a = -searchRadius; a <= searchRadius; a++)
-							for (int b = -searchRadius; b <= searchRadius; b++)
-								rgbArray[o] = iBackgroundFill;
-					}
-				}
-				if (subN.equalsIgnoreCase(ImageConfiguration.RgbSide.toString())) {
-					if (gr * 0.95d < (re + bl) / 2d) {
-						for (int a = -searchRadius; a <= searchRadius; a++)
-							for (int b = -searchRadius; b <= searchRadius; b++)
-								rgbArray[o] = iBackgroundFill;
-					}
-				}
 				if (rgbArray[o] != iBackgroundFill) {
 					if (x < left)
 						left = x;
@@ -570,8 +433,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			}
 
 		long filled = 0;
-		for (int x = searchRadius; x < w - searchRadius; x++) {
-			for (int y = h - searchRadius; y > searchRadius; y--) {
+		for (int x = 0; x < w; x++) {
+			for (int y = h - 1; y > 0; y--) {
 				int o = x + y * w;
 				if (rgbArray[o] != iBackgroundFill) {
 					filled++;
@@ -582,13 +445,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		return new Geometry(top, left, right, filled);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#getOutput
-	 * ()
-	 */
 	@Override
 	public Collection<NumericMeasurementInterface> getOutput() {
 		Collection<NumericMeasurementInterface> result = output;
@@ -596,13 +452,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#getName
-	 * ()
-	 */
 	@Override
 	public String getName() {
 		return "Clear Background";

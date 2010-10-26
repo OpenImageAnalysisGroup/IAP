@@ -177,7 +177,7 @@ public class MongoDB {
 	public void storeExperiment(String dataBase, String optHosts, String optLogin, String optPass,
 			final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
-		processDB(dataBase, optHosts, optLogin, optPass, new RunnableOnDB() {
+		RunnableOnDB r = new RunnableOnDB() {
 
 			private DB db;
 
@@ -190,7 +190,12 @@ public class MongoDB {
 			public void run() {
 				storeExperiment(experiment, db, status);
 			}
-		});
+		};
+		if (optHosts != null)
+			processDB(dataBase, optHosts, optLogin, optPass, r);
+		else
+			processDB(r);
+
 	}
 
 	private static Mongo m;

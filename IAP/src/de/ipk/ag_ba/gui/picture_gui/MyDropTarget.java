@@ -29,13 +29,13 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
  */
 public class MyDropTarget extends DropTarget implements DropTargetListener {
 	private static final long serialVersionUID = 1L;
-	JMyFilePanel panel;
+	DataSetFilePanel panel;
 	MongoTreeNode targetTreeNode;
 	JTree expTree;
 	private final String user;
 	private final String pass;
 
-	public MyDropTarget(String user, String pass, JMyFilePanel panel, MongoTreeNode targetTreeNode, JTree expTree) {
+	public MyDropTarget(String user, String pass, DataSetFilePanel panel, MongoTreeNode targetTreeNode, JTree expTree) {
 		this.panel = panel;
 		this.targetTreeNode = targetTreeNode;
 		this.expTree = expTree;

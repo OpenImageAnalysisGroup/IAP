@@ -15,6 +15,7 @@ import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -85,32 +86,28 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 				for (ConditionInterface s : m3) {
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
-						if (workload.size() > 20)
-							break;
+						// if (workload.size() > 10)
+						// break;
 						Sample3D sd3 = (Sample3D) sd;
 						for (Measurement md : sd3.getAllMeasurements()) {
 							workIndex++;
 							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
 								if (md instanceof ImageData) {
 									ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
-									// if (((ImageData)
-									// md).getSubstanceName().equalsIgnoreCase(
-									// ImageConfiguration.FluoTop.toString())) {
-									// ImageData i = (ImageData) md;
-									// workload.add(i);
-									// } else if (((ImageData)
-									// md).getSubstanceName().equalsIgnoreCase(
-									// ImageConfiguration.FluoSide.toString())) {
-									// ImageData i = (ImageData) md;
-									// workload.add(i);
-									// } else
-									if (config == ImageConfiguration.RgbSide) {
+									if (((ImageData) md).getSubstanceName().equalsIgnoreCase(
+											ImageConfiguration.FluoTop.toString())) {
 										ImageData i = (ImageData) md;
 										workload.add(i);
-										// } else if (config == ImageConfiguration.RgbTop)
-										// {
-										// ImageData i = (ImageData) md;
-										// workload.add(i);
+									} else if (((ImageData) md).getSubstanceName().equalsIgnoreCase(
+											ImageConfiguration.FluoSide.toString())) {
+										ImageData i = (ImageData) md;
+										workload.add(i);
+									} else if (config == ImageConfiguration.RgbSide) {
+										ImageData i = (ImageData) md;
+										workload.add(i);
+									} else if (config == ImageConfiguration.RgbTop) {
+										ImageData i = (ImageData) md;
+										workload.add(i);
 									} else
 										ignored.add(((ImageData) md).getSubstanceName());
 								}
@@ -183,8 +180,9 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			// statisticsResult.getName());
 			statisticsResult.getHeader().setExcelfileid("");
 			if (resultReceiver == null) {
+				new MongoDB().storeExperiment("dbe3", null, null, null, statisticsResult, status);
 				MyExperimentInfoPanel info = new MyExperimentInfoPanel();
-				info.setExperimentInfo(login, pass, statisticsResult.getHeader(), true, statisticsResult);
+				info.setExperimentInfo(login, pass, statisticsResult.getHeader(), false, statisticsResult);
 				// mpc = new MainPanelComponent(TableLayout.getSplit(info, sfp,
 				// TableLayout.PREFERRED, TableLayout.FILL));
 				mpc = new MainPanelComponent(info, true);

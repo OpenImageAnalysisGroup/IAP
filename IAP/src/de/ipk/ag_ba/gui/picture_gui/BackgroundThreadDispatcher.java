@@ -25,6 +25,8 @@ import java.util.Stack;
 
 import javax.swing.Timer;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+
 /**
  * @author klukas
  * 
@@ -35,7 +37,7 @@ public class BackgroundThreadDispatcher {
 	Stack<Thread> todo = new Stack<Thread>();
 	Stack<Integer> todoPriorities = new Stack<Integer>();
 	LinkedList<Thread> runningTasks = new LinkedList<Thread>();
-	int maxTask = 2;
+	int maxTask = SystemAnalysis.getNumberOfCPUsMax(4);
 
 	int indicator = 0;
 

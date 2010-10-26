@@ -13,8 +13,6 @@ import java.util.HashMap;
 
 import org.ErrorMsg;
 import org.ObjectRef;
-import org.apache.commons.net.ProtocolCommandEvent;
-import org.apache.commons.net.ProtocolCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -23,7 +21,6 @@ import org.graffiti.editor.MessageType;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk_gatersleben.ag_nw.graffiti.services.GUIhelper;
-import de.ipk_gatersleben.ag_nw.graffiti.services.MyOutputStream;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayOutputStream;
@@ -110,35 +107,36 @@ public class MyAdvancedFTP {
 
 		final ObjectRef myoutputstream = new ObjectRef();
 
-		ftp.addProtocolCommandListener(new ProtocolCommandListener() {
-			public void protocolCommandSent(ProtocolCommandEvent arg0) {
-				// System.out.print("out: " + arg0.getMessage());
-				status.setCurrentStatusText1("Command: " + arg0.getMessage());
-			}
-
-			public void protocolReplyReceived(ProtocolCommandEvent arg0) {
-				// System.out.print("in : " + arg0.getMessage());
-				status.setCurrentStatusText2("Message: " + arg0.getMessage());
-				if (myoutputstream.getObject() != null) {
-					String msg = arg0.getMessage();
-					if (msg.indexOf("Opening BINARY mode") >= 0) {
-						if (msg.indexOf("(") > 0) {
-							msg = msg.substring(msg.indexOf("(") + "(".length());
-							if (msg.indexOf(" ") > 0) {
-								msg = msg.substring(0, msg.indexOf(" "));
-								try {
-									long max = Long.parseLong(msg);
-									MyOutputStream os = (MyOutputStream) myoutputstream.getObject();
-									os.setMaxBytes(max);
-								} catch (Exception e) {
-									// System.out.println("Could not determine file length for detailed progress information");
-								}
-							}
-						}
-					}
-				}
-			}
-		});
+		// ftp.addProtocolCommandListener(new ProtocolCommandListener() {
+		// public void protocolCommandSent(ProtocolCommandEvent arg0) {
+		// // System.out.print("out: " + arg0.getMessage());
+		// status.setCurrentStatusText1("Command: " + arg0.getMessage());
+		// }
+		//
+		// public void protocolReplyReceived(ProtocolCommandEvent arg0) {
+		// // System.out.print("in : " + arg0.getMessage());
+		// status.setCurrentStatusText2("Message: " + arg0.getMessage());
+		// if (myoutputstream.getObject() != null) {
+		// String msg = arg0.getMessage();
+		// if (msg.indexOf("Opening BINARY mode") >= 0) {
+		// if (msg.indexOf("(") > 0) {
+		// msg = msg.substring(msg.indexOf("(") + "(".length());
+		// if (msg.indexOf(" ") > 0) {
+		// msg = msg.substring(0, msg.indexOf(" "));
+		// try {
+		// long max = Long.parseLong(msg);
+		// MyOutputStream os = (MyOutputStream) myoutputstream.getObject();
+		// os.setMaxBytes(max);
+		// } catch (Exception e) {
+		// //
+		// System.out.println("Could not determine file length for detailed progress information");
+		// }
+		// }
+		// }
+		// }
+		// }
+		// }
+		// });
 
 		// System.out.println("FTP DOWNLOAD: " + downloadURL);
 
