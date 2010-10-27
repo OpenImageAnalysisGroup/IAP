@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.ColorHueStatistics;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -24,7 +24,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
  */
 public class CountColorsNavigation extends AbstractExperimentAnalysisNavigation {
 	private final int colorCount;
-	private NavigationGraphicalEntity src = null;
+	private NavigationButton src = null;
 
 	public CountColorsNavigation(String login, String pass, int colorCount, ExperimentReference experiment) {
 		super(login, pass, experiment);
@@ -32,7 +32,7 @@ public class CountColorsNavigation extends AbstractExperimentAnalysisNavigation 
 	}
 
 	@Override
-	public void performActionCalculateResults(final NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(final NavigationButton src) throws Exception {
 		this.src = src;
 
 		ExperimentInterface res = experiment.getData();
@@ -66,8 +66,8 @@ public class CountColorsNavigation extends AbstractExperimentAnalysisNavigation 
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}

@@ -6,7 +6,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.ImageAnalysis;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -36,7 +36,7 @@ public class ClearBackgroundNavigation extends AbstractExperimentAnalysisNavigat
 	}
 
 	@Override
-	public void performActionCalculateResults(final NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(final NavigationButton src) throws Exception {
 		super.performActionCalculateResults(src);
 
 		ExperimentInterface res = experiment.getData();
@@ -75,7 +75,7 @@ public class ClearBackgroundNavigation extends AbstractExperimentAnalysisNavigat
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		return new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		return new ArrayList<NavigationButton>();
 	}
 }

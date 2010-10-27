@@ -236,6 +236,7 @@ public class MongoDB {
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
 
 		ObjectRef overallFileSize = new ObjectRef();
+		overallFileSize.addLong(0);
 
 		DBCollection substances = db.getCollection("substances");
 

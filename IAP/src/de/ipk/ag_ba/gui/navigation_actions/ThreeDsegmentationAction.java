@@ -8,7 +8,7 @@ import org.ErrorMsg;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
@@ -35,9 +35,9 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 	private final String pass;
 	private final ExperimentReference experiment;
 
-	NavigationGraphicalEntity src = null;
+	NavigationButton src = null;
 	MainPanelComponent mpc;
-	ArrayList<NavigationGraphicalEntity> storedActions = new ArrayList<NavigationGraphicalEntity>();
+	ArrayList<NavigationButton> storedActions = new ArrayList<NavigationButton>();
 
 	public ThreeDsegmentationAction(String login, String pass, ExperimentReference experiment) {
 		super("Perform Color-based Volume Segmentation based on SOM");
@@ -47,10 +47,10 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public void performActionCalculateResults(final NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(final NavigationButton src) {
 		if (storedActions.size() > 0)
 			return;
-		storedActions = new ArrayList<NavigationGraphicalEntity>();
+		storedActions = new ArrayList<NavigationButton>();
 		this.src = src;
 
 		try {
@@ -99,7 +99,7 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(res),
 					src.getGUIsetting()));
 
-			storedActions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass,
+			storedActions.add(new NavigationButton(new CloudUploadEntity(login, pass,
 					new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
 			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, res, res.getHeader(), false,
@@ -115,15 +115,15 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		res.addAll(storedActions);
 		return res;
 	}
@@ -133,12 +133,12 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 		return mpc;
 	}
 
-	public static NavigationGraphicalEntity getThreeDsegmentationTaskEntity(final String login, final String pass,
+	public static NavigationButton getThreeDsegmentationTaskEntity(final String login, final String pass,
 			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
 			GUIsetting guiSetting) {
 
 		NavigationAction segmentationAction = new ThreeDsegmentationAction(login, pass, experiment);
-		NavigationGraphicalEntity resultTaskButton = new NavigationGraphicalEntity(segmentationAction, title,
+		NavigationButton resultTaskButton = new NavigationButton(segmentationAction, title,
 				"img/RotationReconstructionSegmentation.png", guiSetting);
 		return resultTaskButton;
 	}

@@ -12,7 +12,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
@@ -45,11 +45,11 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 	private final String pass;
 	private final ExperimentReference experiment;
 
-	NavigationGraphicalEntity src = null;
+	NavigationButton src = null;
 	MainPanelComponent mpc;
 	ArrayList<ZoomedImage> zoomedImages = new ArrayList<ZoomedImage>();
 	DisplayHistogram histogram, histogramG, histogramB;
-	ArrayList<NavigationGraphicalEntity> storedActions = new ArrayList<NavigationGraphicalEntity>();
+	ArrayList<NavigationButton> storedActions = new ArrayList<NavigationButton>();
 
 	public ThreeDreconstructionAction(String login, String pass, ExperimentReference experiment) {
 		super("Create 3-D Volumes using Space Carving Technology");
@@ -59,10 +59,10 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public void performActionCalculateResults(final NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(final NavigationButton src) {
 		if (storedActions.size() > 0)
 			return;
-		storedActions = new ArrayList<NavigationGraphicalEntity>();
+		storedActions = new ArrayList<NavigationButton>();
 		this.src = src;
 
 		histogram = null;
@@ -151,7 +151,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(statisticsResult),
 					src.getGUIsetting()));
 
-			storedActions.add(new NavigationGraphicalEntity(new CloudUploadEntity(login, pass, new ExperimentReference(
+			storedActions.add(new NavigationButton(new CloudUploadEntity(login, pass, new ExperimentReference(
 					statisticsResult)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
 			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult,
@@ -167,22 +167,22 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		if (!ImageAnalysis3D.isSaveInDatabase()) {
-			NavigationGraphicalEntity imageHistogram = new NavigationGraphicalEntity(TableLayout.get3Split(histogram,
+			NavigationButton imageHistogram = new NavigationButton(TableLayout.get3Split(histogram,
 					histogramG, histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED),
 					src.getGUIsetting());
 			res.add(imageHistogram);
 
-			NavigationGraphicalEntity imageZoom = new NavigationGraphicalEntity(
+			NavigationButton imageZoom = new NavigationButton(
 					ImageAnalysis3D.getImageZoomSlider(zoomedImages), src.getGUIsetting());
 			res.add(imageZoom);
 		}
@@ -195,12 +195,12 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 		return mpc;
 	}
 
-	public static NavigationGraphicalEntity getThreeDreconstructionTaskEntity(final String login, final String pass,
+	public static NavigationButton getThreeDreconstructionTaskEntity(final String login, final String pass,
 			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
 			GUIsetting guiSetting) {
 
 		NavigationAction clearBackgroundAction = new ThreeDreconstructionAction(login, pass, experiment);
-		NavigationGraphicalEntity resultTaskButton = new NavigationGraphicalEntity(clearBackgroundAction, title,
+		NavigationButton resultTaskButton = new NavigationButton(clearBackgroundAction, title,
 				"img/RotationReconstruction.png", guiSetting);
 		return resultTaskButton;
 	}

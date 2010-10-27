@@ -7,7 +7,7 @@ import org.ErrorMsg;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 
@@ -18,7 +18,7 @@ public class FileManagerAction extends AbstractNavigationAction {
 	private final String login;
 	private final ExperimentReference experiment;
 	private final String pass;
-	NavigationGraphicalEntity src = null;
+	NavigationButton src = null;
 	MainPanelComponent mpc;
 
 	public FileManagerAction(String login, String pass, ExperimentReference experiment) {
@@ -29,7 +29,7 @@ public class FileManagerAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
 
 		try {
@@ -43,15 +43,15 @@ public class FileManagerAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		// todo add zoom slider (default, large, extra large)
 		// todo add plant filter (all, ID 1, ID 2, ID 3, ...)
 		return res;
@@ -62,10 +62,10 @@ public class FileManagerAction extends AbstractNavigationAction {
 		return mpc;
 	}
 
-	public static NavigationGraphicalEntity getFileManagerEntity(final String login, final String pass,
+	public static NavigationButton getFileManagerEntity(final String login, final String pass,
 			final ExperimentReference experimentRef, GUIsetting guiSetting) {
 		NavigationAction fileManagerAction = new FileManagerAction(login, pass, experimentRef);
-		NavigationGraphicalEntity fileManager = new NavigationGraphicalEntity(fileManagerAction, "View Data",
+		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View Data",
 				"img/ext/applications-system.png", guiSetting);
 		return fileManager;
 	}

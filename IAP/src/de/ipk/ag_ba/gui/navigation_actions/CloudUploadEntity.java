@@ -9,7 +9,7 @@
 
 package de.ipk.ag_ba.gui.navigation_actions;
 
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 
@@ -31,7 +31,7 @@ public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		super.performActionCalculateResults(src);
 		try {
 			active = true;

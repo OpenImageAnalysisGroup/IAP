@@ -22,6 +22,7 @@ import javax.imageio.ImageIO;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.HomeFolder;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
@@ -39,6 +40,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ByteShortIntArray;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayOutputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
 
 /**
@@ -65,6 +67,13 @@ public class IOmodule {
 		}
 		LoadedImage result = new LoadedImage(id, image, imageNULL);
 		return result;
+	}
+
+	public static byte[] loadImageContentFromFileOrMongo(ImageData id, String login, String pass) throws Exception {
+		InputStream is = ResourceIOManager.getInputStream(id.getURL());
+		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+		HomeFolder.copyContent(is, out);
+		return out.getBuff();
 	}
 
 	public static InputStream getThreeDvolumePreviewIcon(LoadedVolumeExtension volume,

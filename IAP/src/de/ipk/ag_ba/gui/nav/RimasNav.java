@@ -14,7 +14,7 @@ import java.util.HashMap;
 import javax.swing.ImageIcon;
 
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.RimasTab;
 
@@ -84,10 +84,10 @@ public class RimasNav {
 		return s;
 	}
 
-	public static NavigationGraphicalEntity getRimas(GUIsetting guiSetting) {
+	public static NavigationButton getRimas(GUIsetting guiSetting) {
 		HashMap<String, String> rimasDoku = new HashMap<String, String>();
 		rimasDoku.put("", "Lit. Reference:http://www.cell.com/trends/plant-science/abstract/S1360-1385(10)00061-0");
-		NavigationGraphicalEntity rimas = WebFolder.getBrowserNavigationEntity(rimasDoku, "RIMAS", "img/rimas.png",
+		NavigationButton rimas = WebFolder.getBrowserNavigationEntity(rimasDoku, "RIMAS", "img/rimas.png",
 				"http://rimas.ipk-gatersleben.de/Pathways/", "Website", "img/browser.png",
 				"http://rimas.ipk-gatersleben.de/", new String[] { ".gml", ".graphml" }, getIntroTxt(), null, guiSetting);
 		return rimas;

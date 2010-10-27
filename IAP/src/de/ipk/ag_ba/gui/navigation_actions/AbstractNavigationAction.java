@@ -15,7 +15,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -23,7 +23,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  */
 public abstract class AbstractNavigationAction implements NavigationAction {
 
-	private final ArrayList<NavigationGraphicalEntity> additionalEntities = new ArrayList<NavigationGraphicalEntity>();
+	private final ArrayList<NavigationButton> additionalEntities = new ArrayList<NavigationButton>();
 	protected BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 			"", "");
 	private final String tooltip;
@@ -49,11 +49,11 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	}
 
 	@Override
-	public void addAdditionalEntity(NavigationGraphicalEntity ne) {
+	public void addAdditionalEntity(NavigationButton ne) {
 		additionalEntities.add(ne);
 	}
 
-	public ArrayList<NavigationGraphicalEntity> getAdditionalEntities() {
+	public ArrayList<NavigationButton> getAdditionalEntities() {
 		return additionalEntities;
 	}
 

@@ -31,7 +31,7 @@ import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.navigation_actions.HomeAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
@@ -81,12 +81,12 @@ public class AIPgui {
 
 		HomeAction home = new HomeAction(myStatus);
 		GUIsetting guiSetting = new GUIsetting(navigationPanel, actionPanel, graphPanel);
-		final NavigationGraphicalEntity overView = new NavigationGraphicalEntity(home, guiSetting);
+		final NavigationButton overView = new NavigationButton(home, guiSetting);
 
 		overView.setTitle("Initialize");
 		overView.setProcessing(true);
 
-		ArrayList<NavigationGraphicalEntity> homeNavigation = new ArrayList<NavigationGraphicalEntity>();
+		ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
 		home.performActionCalculateResults(overView);
 		navigationPanel.setEntitySet(home.getResultNewNavigationSet(homeNavigation));
 		actionPanel.setEntitySet(home.getActionEntitySet());
@@ -96,7 +96,7 @@ public class AIPgui {
 			public void run() {
 				overView.setTitle("Overview");
 				overView.setProcessing(false);
-				HashMap<String, NavigationGraphicalEntity> knownEntities = new HashMap<String, NavigationGraphicalEntity>();
+				HashMap<String, NavigationButton> knownEntities = new HashMap<String, NavigationButton>();
 				try {
 					JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());
 					Object o = win.eval("s = window.location.hash;");
@@ -140,8 +140,8 @@ public class AIPgui {
 				+ "in order to be able to quickly navigate again to the same information in the future.";
 	}
 
-	public static void navigateTo(String target, NavigationGraphicalEntity src) {
-		HashMap<String, NavigationGraphicalEntity> knownEntities = new HashMap<String, NavigationGraphicalEntity>();
+	public static void navigateTo(String target, NavigationButton src) {
+		HashMap<String, NavigationButton> knownEntities = new HashMap<String, NavigationButton>();
 		MyNavigationPanel navigationPanel = src.getGUIsetting().getNavigationPanel();
 		MyNavigationPanel actionPanel = src.getGUIsetting().getActionPanel();
 		JComponent graphPanel = src.getGUIsetting().getGraphPanel();
@@ -150,7 +150,7 @@ public class AIPgui {
 
 	public static void navigateTo(String target, final MyNavigationPanel navigationPanel,
 			final MyNavigationPanel actionPanel, final JComponent graphPanel,
-			final HashMap<String, NavigationGraphicalEntity> knownEntities) {
+			final HashMap<String, NavigationButton> knownEntities) {
 
 		if (target == null || target.length() == 0)
 			return;
@@ -164,13 +164,13 @@ public class AIPgui {
 		if (target.startsWith("."))
 			target = target.substring(".".length());
 
-		for (NavigationGraphicalEntity ne : actionPanel.getEntitySet(target.length() > 0)) {
+		for (NavigationButton ne : actionPanel.getEntitySet(target.length() > 0)) {
 			knownEntities.put(ne.getTitle(), ne);
 		}
 		String thisTarget = target.split("\\.", 2)[0];
 		final String nextTarget = target.length() - thisTarget.length() > 1 ? target.substring(thisTarget.length()
 				+ ".".length()) : "";
-		NavigationGraphicalEntity action = knownEntities.get(thisTarget);
+		NavigationButton action = knownEntities.get(thisTarget);
 		if (action != null) {
 			Runnable rrr = new Runnable() {
 				@Override

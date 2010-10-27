@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.postgresql.LemnaExperimentNavigationAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -22,7 +22,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class LemnaUserAction extends AbstractNavigationAction implements NavigationAction {
 
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 	private final String user;
 	private final Collection<ExperimentHeaderInterface> ids;
 
@@ -33,23 +33,23 @@ public class LemnaUserAction extends AbstractNavigationAction implements Navigat
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		for (ExperimentHeaderInterface id : ids) {
-			result.add(new NavigationGraphicalEntity(new LemnaExperimentNavigationAction(id), src.getGUIsetting()));
+			result.add(new NavigationButton(new LemnaExperimentNavigationAction(id), src.getGUIsetting()));
 		}
 		return result;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>(currentSet);
 		result.add(src);
 		return result;
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 	}
 

@@ -11,7 +11,7 @@ package de.ipk.ag_ba.gui.util;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
@@ -21,9 +21,9 @@ public class EmptyNavigationAction extends AbstractNavigationAction {
 
 	private final String image;
 	private final String activeImage;
-	private final ArrayList<NavigationGraphicalEntity> nelist;
+	private final ArrayList<NavigationButton> nelist;
 	private final String name;
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 	private boolean invisibleWhenActive = false;
 
 	public EmptyNavigationAction(String name, String tooltip, String image, String activeImage) {
@@ -31,11 +31,11 @@ public class EmptyNavigationAction extends AbstractNavigationAction {
 		this.name = name;
 		this.image = image;
 		this.activeImage = activeImage;
-		nelist = new ArrayList<NavigationGraphicalEntity>();
+		nelist = new ArrayList<NavigationButton>();
 	}
 
 	@Override
-	public void addAdditionalEntity(NavigationGraphicalEntity ne) {
+	public void addAdditionalEntity(NavigationButton ne) {
 		nelist.add(ne);
 	}
 
@@ -55,20 +55,20 @@ public class EmptyNavigationAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return nelist;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>(currentSet);
 		if (!invisibleWhenActive)
 			result.add(src);
 		return result;
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 	}
 

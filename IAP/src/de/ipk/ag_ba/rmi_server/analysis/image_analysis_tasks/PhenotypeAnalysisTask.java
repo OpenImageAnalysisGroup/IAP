@@ -208,6 +208,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		{
 			ColorHistogram histogram = new ColorHistogram(20);
 			histogram.countColorPixels(rgbArray);
+			double pixelCount = histogram.getNumberOfFilledPixels();
 			for (ColorHistogramEntry che : histogram.getColorEntries()) {
 				String sn = limg.getSubstanceName();
 				int pos = sn.indexOf(".");
@@ -216,7 +217,14 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				m = new NumericMeasurement(limg, sn + ": " + che.getColorDisplayName(), limg.getParentSample()
 						.getParentCondition().getExperimentName()
 						+ " (" + getName() + ")");
-				m.setValue(che.getNumberOfPixels());
+				m.setValue(che.getNumberOfPixels() / pixelCount);
+				m.setUnit("proportion");
+				output.add(m);
+
+				m = new NumericMeasurement(limg, sn + ": " + che.getColorDisplayName(), limg.getParentSample()
+						.getParentCondition().getExperimentName()
+						+ " (" + getName() + ")");
+				m.setValue(pixelCount);
 				m.setUnit("pixels");
 				output.add(m);
 			}

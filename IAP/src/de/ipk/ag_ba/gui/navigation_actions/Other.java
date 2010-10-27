@@ -42,7 +42,7 @@ import de.ipk.ag_ba.gui.enums.DBEtype;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.DateUtils;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -63,9 +63,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
  */
 public class Other {
 
-	public static ArrayList<NavigationGraphicalEntity> getProcessExperimentDataWithVantedEntities(final String login,
+	public static ArrayList<NavigationButton> getProcessExperimentDataWithVantedEntities(final String login,
 			final String pass, final ExperimentReference experimentName, GUIsetting guIsetting) {
-		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
+		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 
 		ArrayList<AbstractExperimentDataProcessor> validProcessors = new ArrayList<AbstractExperimentDataProcessor>();
 		ArrayList<AbstractExperimentDataProcessor> optIgnoredProcessors = null;
@@ -79,7 +79,7 @@ public class Other {
 			final AbstractExperimentDataProcessor pp = (AbstractExperimentDataProcessor) o;
 			NavigationAction action = new AbstractNavigationAction("Analyze Data") {
 				@Override
-				public void performActionCalculateResults(NavigationGraphicalEntity src) {
+				public void performActionCalculateResults(NavigationButton src) {
 					try {
 						if (experimentName.getData() != null) {
 							SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(login,
@@ -115,13 +115,13 @@ public class Other {
 				}
 
 				@Override
-				public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-						ArrayList<NavigationGraphicalEntity> currentSet) {
+				public ArrayList<NavigationButton> getResultNewNavigationSet(
+						ArrayList<NavigationButton> currentSet) {
 					return null;
 				}
 
 				@Override
-				public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+				public ArrayList<NavigationButton> getResultNewActionSet() {
 					return null;
 				}
 
@@ -130,7 +130,7 @@ public class Other {
 					return false;
 				}
 			};
-			NavigationGraphicalEntity ne = new NavigationGraphicalEntity(action, pp.getShortName(), "img/vanted1_0.png",
+			NavigationButton ne = new NavigationButton(action, pp.getShortName(), "img/vanted1_0.png",
 					guIsetting);
 
 			ImageIcon i = pp.getIcon();
@@ -145,19 +145,19 @@ public class Other {
 		return result;
 	}
 
-	public static NavigationGraphicalEntity getServerStatusEntity(final boolean includeLemnaTecStatus,
+	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus,
 			GUIsetting guIsetting) {
 		return getServerStatusEntity(includeLemnaTecStatus, "Check Status", guIsetting);
 	}
 
-	public static NavigationGraphicalEntity getServerStatusEntity(final boolean includeLemnaTecStatus, String title,
+	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus, String title,
 			GUIsetting guIsetting) {
 		NavigationAction serverStatusAction = new AbstractNavigationAction("Check service availability") {
-			private NavigationGraphicalEntity src;
+			private NavigationButton src;
 			private final HashMap<String, ArrayList<String>> infoset = new HashMap<String, ArrayList<String>>();
 
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) {
+			public void performActionCalculateResults(NavigationButton src) {
 				this.src = src;
 				infoset.clear();
 
@@ -283,23 +283,23 @@ public class Other {
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
 				currentSet.add(src);
 				return currentSet;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				if (includeLemnaTecStatus)
 					res.add(LemnaCam.getLemnaCamButton(src.getGUIsetting()));
 
-				res.add(new NavigationGraphicalEntity(null, "BA-13 Server R-810", "img/ext/dellR810.png", src
+				res.add(new NavigationButton(null, "BA-13 Server R-810", "img/ext/dellR810.png", src
 						.getGUIsetting()));
-				res.add(new NavigationGraphicalEntity(null, "BA-24 Workstation", "img/ext/computer.png", src
+				res.add(new NavigationButton(null, "BA-24 Workstation", "img/ext/computer.png", src
 						.getGUIsetting()));// macpro_side.png"));
-				res.add(new NavigationGraphicalEntity(null, "NW-04 File Server", "img/ext/computer.png", src
+				res.add(new NavigationButton(null, "NW-04 File Server", "img/ext/computer.png", src
 						.getGUIsetting()));// pc.png"));
 
 				return res;
@@ -317,12 +317,12 @@ public class Other {
 			}
 
 		};
-		NavigationGraphicalEntity serverStatusEntity = new NavigationGraphicalEntity(serverStatusAction, title,
+		NavigationButton serverStatusEntity = new NavigationButton(serverStatusAction, title,
 				"img/ext/network-server-status.png", guIsetting);
 		return serverStatusEntity;
 	}
 
-	public static NavigationGraphicalEntity getCalendarEntity(
+	public static NavigationButton getCalendarEntity(
 			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
 			final String p, GUIsetting guiSettings) {
 
@@ -330,25 +330,25 @@ public class Other {
 		final ObjectRef refCalGui = new ObjectRef();
 
 		NavigationAction calendarAction = new AbstractNavigationAction("Review or modify experiment plan calendar") {
-			NavigationGraphicalEntity src;
+			NavigationButton src;
 
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) {
+			public void performActionCalculateResults(NavigationButton src) {
 				this.src = src;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				res.addAll(currentSet);
 				res.add(src);
 				return res;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-				ArrayList<NavigationGraphicalEntity> res = getExperimentNavigationActions(DBEtype.Omics, group2ei, l, p,
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Omics, group2ei, l, p,
 						refCalEnt, refCalGui, src.getGUIsetting());
 				return res;
 			}
@@ -374,7 +374,7 @@ public class Other {
 
 	// private SimpleDateFormat sdf = new SimpleDateFormat("MMMM");
 
-	protected static NavigationGraphicalEntity getCalendarNavigationEntitiy(final boolean nextMonth,
+	protected static NavigationButton getCalendarNavigationEntitiy(final boolean nextMonth,
 			final ObjectRef refCalEnt, final ObjectRef refCalGui,
 			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
 			final String p, final GUIsetting guIsetting) {
@@ -385,19 +385,19 @@ public class Other {
 		// else
 		// c. add(GregorianCalendar.MONTH, -1);
 		// String m = sdf.format(c.getTime());
-		NavigationGraphicalEntity nav = new NavigationGraphicalEntity(new AbstractNavigationAction("Select month") {
+		NavigationButton nav = new NavigationButton(new AbstractNavigationAction("Select month") {
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) {
+			public void performActionCalculateResults(NavigationButton src) {
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
 				return currentSet;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+			public ArrayList<NavigationButton> getResultNewActionSet() {
 				((Calendar2) refCalEnt.getObject()).setShowSpecificDay(false);
 				Calendar c = (Calendar) refCalGui.getObject();
 				if (nextMonth)
@@ -405,7 +405,7 @@ public class Other {
 				else
 					c.getCalendar().add(GregorianCalendar.MONTH, -1);
 				c.updateGUI(false);
-				ArrayList<NavigationGraphicalEntity> res = getExperimentNavigationActions(DBEtype.Phenotyping, group2ei, l,
+				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Phenotyping, group2ei, l,
 						p, refCalEnt, refCalGui, guIsetting);
 				return res;
 			}
@@ -413,10 +413,10 @@ public class Other {
 		return nav;
 	}
 
-	private static ArrayList<NavigationGraphicalEntity> getExperimentNavigationActions(DBEtype dbeType,
+	private static ArrayList<NavigationButton> getExperimentNavigationActions(DBEtype dbeType,
 			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
 			final String p, final ObjectRef refCalEnt, final ObjectRef refCalGui, GUIsetting guIsetting) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		res.add(getCalendarNavigationEntitiy(false, refCalEnt, refCalGui, group2ei, l, p, guIsetting));
 		res.add(getCalendarNavigationEntitiy(true, refCalEnt, refCalGui, group2ei, l, p, guIsetting));
 
@@ -424,17 +424,17 @@ public class Other {
 
 		NavigationAction scheduleExperimentAction = new AbstractNavigationAction("Schedule a new experiment") {
 
-			private NavigationGraphicalEntity src;
+			private NavigationButton src;
 
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) {
+			public void performActionCalculateResults(NavigationButton src) {
 				this.src = src;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
@@ -479,14 +479,14 @@ public class Other {
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-				return new ArrayList<NavigationGraphicalEntity>();
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				return new ArrayList<NavigationButton>();
 			}
 		};
 
 		if (l == null || !l.equals("internet")) { // dbeType ==
 			// DBEtype.Phenotyping &&
-			NavigationGraphicalEntity scheduleExperiment = new NavigationGraphicalEntity(scheduleExperimentAction,
+			NavigationButton scheduleExperiment = new NavigationButton(scheduleExperimentAction,
 					"Schedule Experiment", "img/ext/image-loading.png", guIsetting);
 			res.add(scheduleExperiment);
 		}
@@ -503,13 +503,13 @@ public class Other {
 						String dayA = DateUtils.getDayInfo(ei.getStartdate());
 						String dayB = DateUtils.getDayInfo(ei.getImportdate());
 						if (dayA.equals(dayInfo) || dayB.equals(dayInfo)) {
-							NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
+							NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
 									guIsetting);
 							res.add(exp);
 						} else {
 							if (calEnt.getCalendar().getTime().after(ei.getStartdate())
 									&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
-								NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
+								NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
 										guIsetting);
 								res.add(exp);
 							}
@@ -518,13 +518,13 @@ public class Other {
 						String mA = DateUtils.getMonthInfo(ei.getStartdate());
 						String mB = DateUtils.getMonthInfo(ei.getImportdate());
 						if (mA.equals(monthInfo) || mB.equals(monthInfo)) {
-							NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
+							NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
 									guIsetting);
 							res.add(exp);
 						} else {
 							if (calEnt.getCalendar().getTime().after(ei.getStartdate())
 									&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
-								NavigationGraphicalEntity exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
+								NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
 										guIsetting);
 								res.add(exp);
 							}

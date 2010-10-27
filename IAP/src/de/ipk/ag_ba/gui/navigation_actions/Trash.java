@@ -8,7 +8,7 @@ import org.StringManipulationTools;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.ExperimentInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -41,7 +41,7 @@ public class Trash extends AbstractNavigationAction {
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(NavigationButton src) {
 		try {
 			ExperimentInfo ei = null;
 			if (header == null)
@@ -123,15 +123,15 @@ public class Trash extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		while (res.size() > 2)
 			res.remove(res.size() - 1);
 		return res;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return new Phenotyping().getResultNewActionSet();
 	}
 
@@ -140,19 +140,19 @@ public class Trash extends AbstractNavigationAction {
 		return new MainPanelComponent(message);
 	}
 
-	public static NavigationGraphicalEntity getTrashEntity(final String login, final String pass,
+	public static NavigationButton getTrashEntity(final String login, final String pass,
 			final String experimentName, GUIsetting guiSetting) {
 		NavigationAction trashAction = new Trash(pass, login, experimentName);
-		NavigationGraphicalEntity trash = new NavigationGraphicalEntity(trashAction, "Delete", "img/ext/edit-delete.png",
+		NavigationButton trash = new NavigationButton(trashAction, "Delete", "img/ext/edit-delete.png",
 				guiSetting);
 		trash.setRightAligned(true);
 		return trash;
 	}
 
-	public static NavigationGraphicalEntity getTrashEntity(ExperimentHeaderInterface header, DeletionCommand cmd,
+	public static NavigationButton getTrashEntity(ExperimentHeaderInterface header, DeletionCommand cmd,
 			GUIsetting guiSetting) {
 		NavigationAction trashAction = new Trash(header, cmd);
-		NavigationGraphicalEntity trash = new NavigationGraphicalEntity(trashAction, cmd.toString(), cmd.getImg(),
+		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(),
 				guiSetting);
 		trash.setRightAligned(cmd != DeletionCommand.UNTRASH);
 		return trash;

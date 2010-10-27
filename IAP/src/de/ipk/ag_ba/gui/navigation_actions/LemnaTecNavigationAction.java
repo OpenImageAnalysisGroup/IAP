@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.TreeMap;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -23,10 +23,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class LemnaTecNavigationAction extends AbstractNavigationAction implements NavigationAction {
 
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 	private String login;
 	private String pass;
-	ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
+	ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 
 	public LemnaTecNavigationAction() {
 		super("Access LemnaTec-DB");
@@ -40,7 +40,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 	 * #getResultNewActionSet()
 	 */
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 
 		return result;
 	}
@@ -53,19 +53,19 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 	 * #getResultNewNavigationSet(java.util.ArrayList)
 	 */
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>(currentSet);
 		result.add(src);
 		return result;
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		// connect to db
 		this.src = src;
 		result.clear();
 		try {
-			result.add(new NavigationGraphicalEntity(new LemnaTecUserNavigationAction(), src.getGUIsetting()));
+			result.add(new NavigationButton(new LemnaTecUserNavigationAction(), src.getGUIsetting()));
 
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
@@ -75,7 +75,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 					Collection<ExperimentHeaderInterface> experiments = new LemnaTecDataExchange()
 							.getExperimentInDatabase(db);
 					if (experiments.size() > 0)
-						result.add(new NavigationGraphicalEntity(new LemnaDbAction(db, experiments), src.getGUIsetting()));
+						result.add(new NavigationButton(new LemnaDbAction(db, experiments), src.getGUIsetting()));
 					else
 						System.out.println("Database " + db + " is empty.");
 					for (ExperimentHeaderInterface ehi : experiments) {

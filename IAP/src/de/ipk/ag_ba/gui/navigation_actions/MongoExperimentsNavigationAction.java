@@ -14,7 +14,7 @@ import java.util.TreeMap;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
 import de.ipk.ag_ba.rmi_server.task_management.CloundManagerNavigationAction;
@@ -25,7 +25,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 	private ArrayList<ExperimentHeaderInterface> experimentList;
 	private final String login;
 	private final String pass;
@@ -44,12 +44,12 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	 * #getResultNewActionSet()
 	 */
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 
 		NavigationAction analyzeAction = new UploadImagesToCloud(true);
 
-		NavigationGraphicalEntity analyzeEntity = new NavigationGraphicalEntity(analyzeAction, "Add Files",
+		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Add Files",
 				"img/ext/user-desktop.png", "img/ext/user-desktop.png", src.getGUIsetting());
 		res.add(analyzeEntity);
 
@@ -78,17 +78,17 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				experiments.get(group).get(user).add(eh);
 			}
 
-			res.add(new NavigationGraphicalEntity(new CloundManagerNavigationAction(login, pass), src.getGUIsetting()));
+			res.add(new NavigationButton(new CloundManagerNavigationAction(login, pass), src.getGUIsetting()));
 
 			res.add(Other.getCalendarEntity(experiments, login, pass, src.getGUIsetting()));
 
 			for (String group : experiments.keySet()) {
-				res.add(new NavigationGraphicalEntity(createMongoGroupNavigationAction(group, experiments.get(group)), src
+				res.add(new NavigationButton(createMongoGroupNavigationAction(group, experiments.get(group)), src
 						.getGUIsetting()));
 			}
 
 			if (trashed.size() > 0) {
-				res.add(new NavigationGraphicalEntity(getTrashedExperimentsAction(trashed), src.getGUIsetting()));
+				res.add(new NavigationButton(getTrashedExperimentsAction(trashed), src.getGUIsetting()));
 			}
 		}
 		return res;
@@ -97,7 +97,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	private NavigationAction getTrashedExperimentsAction(final ArrayList<ExperimentHeaderInterface> trashed) {
 		NavigationAction res = new AbstractNavigationAction("Show content of trash can") {
 
-			private NavigationGraphicalEntity src;
+			private NavigationButton src;
 
 			@Override
 			public String getDefaultImage() {
@@ -110,21 +110,21 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			}
 
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
 				this.src = src;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-				ArrayList<NavigationGraphicalEntity> actions = new ArrayList<NavigationGraphicalEntity>();
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 				for (ExperimentHeaderInterface exp : trashed)
 					actions.add(getMongoExperimentButton(exp, src.getGUIsetting()));
 				return actions;
@@ -136,28 +136,28 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	private NavigationAction createMongoGroupNavigationAction(final String group,
 			final TreeMap<String, ArrayList<ExperimentHeaderInterface>> user2exp) {
 		NavigationAction groupNav = new AbstractNavigationAction("Show User-Group Folder") {
-			private NavigationGraphicalEntity src;
+			private NavigationButton src;
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (String user : user2exp.keySet()) {
-					res.add(new NavigationGraphicalEntity(createMongoUserNavigationAction(user, user2exp.get(user)), src
+					res.add(new NavigationButton(createMongoUserNavigationAction(user, user2exp.get(user)), src
 							.getGUIsetting()));
 				}
 				return res;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
 
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
 				this.src = src;
 			}
 
@@ -183,11 +183,11 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	protected NavigationAction createMongoUserNavigationAction(final String user,
 			final ArrayList<ExperimentHeaderInterface> experiments) {
 		NavigationAction userNav = new AbstractNavigationAction("Show user folder") {
-			private NavigationGraphicalEntity src;
+			private NavigationButton src;
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (ExperimentHeaderInterface exp : experiments) {
 					res.add(getMongoExperimentButton(exp, src.getGUIsetting()));
 				}
@@ -195,15 +195,15 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
 
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
 				this.src = src;
 			}
 
@@ -226,9 +226,9 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 		return userNav;
 	}
 
-	public static NavigationGraphicalEntity getMongoExperimentButton(ExperimentHeaderInterface ei, GUIsetting guiSetting) {
+	public static NavigationButton getMongoExperimentButton(ExperimentHeaderInterface ei, GUIsetting guiSetting) {
 		NavigationAction action = new MongoOrLemnaTecExperimentNavigationAction(ei);
-		NavigationGraphicalEntity exp = new NavigationGraphicalEntity(action, guiSetting);
+		NavigationButton exp = new NavigationButton(action, guiSetting);
 		exp.setToolTipText("<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentname() + "</td></tr>"
 				+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
 				+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()
@@ -244,8 +244,8 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	 * #getResultNewNavigationSet(java.util.ArrayList)
 	 */
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
@@ -260,7 +260,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	 * .navigation_model.NavigationGraphicalEntity)
 	 */
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		status.setCurrentStatusText1("Establishing Connection");
 		experimentList = new MongoDB().getExperimentList();

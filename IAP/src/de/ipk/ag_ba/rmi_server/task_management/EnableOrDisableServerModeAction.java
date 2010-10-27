@@ -15,7 +15,7 @@ import org.ErrorMsg;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
@@ -25,7 +25,7 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 
 	private final String login;
 	private final String pass;
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 
 	public EnableOrDisableServerModeAction(String login, String pass) {
 		super("Start or stop server mode (cloud computing host)");
@@ -44,7 +44,7 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		NavigationAction cmna = new CloundManagerNavigationAction(login, pass);
 		try {
 			cmna.performActionCalculateResults(src);
@@ -52,16 +52,16 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		return new ArrayList<NavigationGraphicalEntity>();
+		return new ArrayList<NavigationButton>();
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		CloudComputingService.getInstance().switchStatus(login, pass);
 	}

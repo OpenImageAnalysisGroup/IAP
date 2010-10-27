@@ -50,10 +50,17 @@ public class ColorHistogram {
 			green = (rgb >> 8) & 0xFF;
 			blue = rgb & 0xFF;
 			float[] hsb = Color.RGBtoHSB(red, green, blue, null);
-			int hue = (int) (hsb[0] / numberOfColors);
+			int hue = (int) (hsb[0] * 360d / numberOfColors);
 			count[hue] = count[hue] + 1;
 		}
 		for (int i = 0; i < numberOfColors; i++)
 			colorEntries.get(i).addPixelCount(count[i]);
+	}
+
+	public long getNumberOfFilledPixels() {
+		long res = 0;
+		for (ColorHistogramEntry e : colorEntries)
+			res += e.getNumberOfPixels();
+		return res;
 	}
 }
