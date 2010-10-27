@@ -214,14 +214,14 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				int pos = sn.indexOf(".");
 				if (pos > 0)
 					sn = sn.substring(0, pos);
-				m = new NumericMeasurement(limg, sn + ": " + che.getColorDisplayName(), limg.getParentSample()
+				m = new NumericMeasurement(limg, sn + "-r: " + che.getColorDisplayName(), limg.getParentSample()
 						.getParentCondition().getExperimentName()
 						+ " (" + getName() + ")");
 				m.setValue(che.getNumberOfPixels() / pixelCount);
 				m.setUnit("proportion");
 				output.add(m);
 
-				m = new NumericMeasurement(limg, sn + ": " + che.getColorDisplayName(), limg.getParentSample()
+				m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
 						.getParentCondition().getExperimentName()
 						+ " (" + getName() + ")");
 				m.setValue(pixelCount);
