@@ -42,7 +42,7 @@ import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_actions.BookmarkAction;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.PopupListener;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
 import de.ipk.ag_ba.gui.webstart.AIPmain;
@@ -54,7 +54,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  */
 public class MyNavigationPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
-	private ArrayList<NavigationGraphicalEntity> set;
+	private ArrayList<NavigationButton> set;
 	private final JComponent graphPanel;
 	private MyNavigationPanel theOther;
 	private final PanelTarget target;
@@ -122,12 +122,12 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		return res;
 	}
 
-	public ArrayList<NavigationGraphicalEntity> getEntitySet(boolean includeBookmarks) {
+	public ArrayList<NavigationButton> getEntitySet(boolean includeBookmarks) {
 		if (includeBookmarks)
 			return set;
 		else {
-			ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
-			for (NavigationGraphicalEntity n : set) {
+			ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+			for (NavigationButton n : set) {
 				if (!(n.getAction() instanceof BookmarkAction))
 					res.add(n);
 			}
@@ -135,7 +135,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 	}
 
-	public void setEntitySet(ArrayList<NavigationGraphicalEntity> set) {
+	public void setEntitySet(ArrayList<NavigationButton> set) {
 		if (set == null)
 			return;
 		this.set = set;
@@ -149,7 +149,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			boolean first = true;
 			ObjectRef next = new ObjectRef();
 			boolean firstStar = true;
-			for (NavigationGraphicalEntity ne : set) {
+			for (NavigationButton ne : set) {
 				if (ne instanceof StyleAware) {
 					((StyleAware) ne).setButtonStyle(buttonStyle);
 				}
@@ -177,15 +177,15 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						lbl.setForeground(Color.GRAY);
 						add(lbl);
 					}
-					add(NavigationGraphicalEntity.getNavigationButton(buttonStyle, ne, target, this, getTheOther(),
+					add(NavigationButton.getNavigationButton(buttonStyle, ne, target, this, getTheOther(),
 							graphPanel));
 					first = false;
 				} else {
 					if (actionPanelRight != null && ne.isRightAligned())
-						right.add(NavigationGraphicalEntity.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
+						right.add(NavigationButton.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
 								graphPanel));
 					else
-						add(NavigationGraphicalEntity.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
+						add(NavigationButton.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
 								graphPanel));
 				}
 			}
@@ -228,7 +228,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	}
 
 	private MouseListener getAddBookmarkActionListener(final JLabel lbl, final ObjectRef right,
-			final NavigationGraphicalEntity ne) {
+			final NavigationButton ne) {
 		MouseListener res = new MouseListener() {
 
 			@Override
@@ -290,9 +290,9 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		return res;
 	}
 
-	private String getTargetPath(NavigationGraphicalEntity finalTarget) {
+	private String getTargetPath(NavigationButton finalTarget) {
 		ArrayList<String> path = new ArrayList<String>();
-		for (NavigationGraphicalEntity ne : set) {
+		for (NavigationButton ne : set) {
 			if (ne.isProcessing())
 				return null;
 			path.add(ne.getTitle());

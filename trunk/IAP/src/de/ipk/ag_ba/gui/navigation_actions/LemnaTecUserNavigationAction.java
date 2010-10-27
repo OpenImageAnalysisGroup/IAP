@@ -18,7 +18,7 @@ import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.Snapshot;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -33,30 +33,30 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 		super("Show user list and their experiments");
 	}
 
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 	private final TreeMap<String, TreeSet<ExperimentHeaderInterface>> userName2dbAndExperiment = new TreeMap<String, TreeSet<ExperimentHeaderInterface>>();
 
 	private String message = "";
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		for (String user : userName2dbAndExperiment.keySet()) {
-			result.add(new NavigationGraphicalEntity(new LemnaUserAction(user, userName2dbAndExperiment.get(user)), src
+			result.add(new NavigationButton(new LemnaUserAction(user, userName2dbAndExperiment.get(user)), src
 					.getGUIsetting()));
 		}
 		return result;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>(currentSet);
 		result.add(src);
 		return result;
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		// enumerate all experiment snapshots and detect users
 		this.src = src;
 		if (userName2dbAndExperiment.size() > 0)

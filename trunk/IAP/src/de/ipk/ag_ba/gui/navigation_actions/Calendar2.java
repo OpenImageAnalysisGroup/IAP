@@ -16,13 +16,13 @@ import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
  * 
  */
-public class Calendar2 extends NavigationGraphicalEntity implements StyleAware {
+public class Calendar2 extends NavigationButton implements StyleAware {
 	private final GregorianCalendar cal = new GregorianCalendar();
 	private Runnable postUpdateRunner;
 	private boolean showSpecificDay = true;

@@ -7,7 +7,7 @@ import org.AttributeHelper;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
@@ -24,17 +24,17 @@ public final class LemnaCam extends AbstractNavigationAction {
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(NavigationButton src) {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		AttributeHelper.showInBrowser("http://lemnacam.ipk-gatersleben.de/mjpg/video.mjpg");
 		return null;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}
 
@@ -44,12 +44,12 @@ public final class LemnaCam extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getAdditionalEntities() {
+	public ArrayList<NavigationButton> getAdditionalEntities() {
 		return null;
 	}
 
 	@Override
-	public void addAdditionalEntity(NavigationGraphicalEntity ne) {
+	public void addAdditionalEntity(NavigationButton ne) {
 
 	}
 
@@ -57,9 +57,9 @@ public final class LemnaCam extends AbstractNavigationAction {
 	 * @param guiSetting
 	 * @return
 	 */
-	public static NavigationGraphicalEntity getLemnaCamButton(GUIsetting guiSetting) {
+	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
 		NavigationAction navigationAction = new LemnaCam();
-		NavigationGraphicalEntity res = new NavigationGraphicalEntity(navigationAction, "LemnaCam 1",
+		NavigationButton res = new NavigationButton(navigationAction, "LemnaCam 1",
 				"img/ext/camera.png", guiSetting);
 		return res;
 	}

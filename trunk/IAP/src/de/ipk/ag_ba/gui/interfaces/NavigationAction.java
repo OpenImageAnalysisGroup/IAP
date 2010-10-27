@@ -13,26 +13,26 @@ import java.util.ArrayList;
 import org.BackgroundTaskStatusProvider;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
  * 
  */
 public interface NavigationAction {
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception;
+	public void performActionCalculateResults(NavigationButton src) throws Exception;
 
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet);
 
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet();
+	public ArrayList<NavigationButton> getResultNewActionSet();
 
 	public MainPanelComponent getResultMainPanel();
 
 	public void setOneTimeFinishAction(Runnable runnable);
 
-	public void addAdditionalEntity(NavigationGraphicalEntity ne);
+	public void addAdditionalEntity(NavigationButton ne);
 
-	public ArrayList<NavigationGraphicalEntity> getAdditionalEntities();
+	public ArrayList<NavigationButton> getAdditionalEntities();
 
 	public BackgroundTaskStatusProvider getStatusProvider();
 

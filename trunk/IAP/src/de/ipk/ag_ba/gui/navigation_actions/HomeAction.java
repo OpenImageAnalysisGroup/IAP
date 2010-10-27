@@ -9,7 +9,7 @@ import org.ErrorMsg;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.nav.RimasNav;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
@@ -20,7 +20,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  * @author klukas
  */
 public final class HomeAction extends AbstractNavigationAction {
-	private ArrayList<NavigationGraphicalEntity> homePrimaryActions;
+	private ArrayList<NavigationButton> homePrimaryActions;
 	private final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus;
 
 	public HomeAction(BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
@@ -30,21 +30,21 @@ public final class HomeAction extends AbstractNavigationAction {
 	}
 
 	private void initializeHomeActions(GUIsetting guIsetting) {
-		ArrayList<NavigationGraphicalEntity> homeActions = new ArrayList<NavigationGraphicalEntity>();
+		ArrayList<NavigationButton> homeActions = new ArrayList<NavigationButton>();
 		// homePrimaryActions.add(new NavigationGraphicalEntity(new Phenotyping(),
 		// "Phenotyping", "img/000Grad_3.png"));
-		homePrimaryActions = new ArrayList<NavigationGraphicalEntity>();
-		for (NavigationGraphicalEntity ne : new Phenotyping().getResultNewActionSet()) {
+		homePrimaryActions = new ArrayList<NavigationButton>();
+		for (NavigationButton ne : new Phenotyping().getResultNewActionSet()) {
 			homePrimaryActions.add(ne);
 		}
 
 		// homeActions.add(new NavigationGraphicalEntity(new DBElogin2(),
 		// "DBE Database", "img/dbelogo2.png"));
 
-		NavigationGraphicalEntity rimas = RimasNav.getRimas(src.getGUIsetting());
+		NavigationButton rimas = RimasNav.getRimas(src.getGUIsetting());
 		homeActions.add(rimas);
 
-		NavigationGraphicalEntity metaCrop = WebFolder
+		NavigationButton metaCrop = WebFolder
 				.getBrowserNavigationEntity(
 						null,
 						"MetaCrop",
@@ -69,7 +69,7 @@ public final class HomeAction extends AbstractNavigationAction {
 		folder2url.put("Activity Flow", "Nat. Proc. (AF):http://precedings.nature.com/documents/3724/version/1");
 		folder2url.put("Entity Relationship", "Nat. Proc. (ER):http://precedings.nature.com/documents/3724/version/1");
 		folder2url.put("Process Description", "Nat. Proc. (PD):http://precedings.nature.com/documents/3724/version/1");
-		NavigationGraphicalEntity sbgn = WebFolder
+		NavigationButton sbgn = WebFolder
 				.getBrowserNavigationEntity(
 						folder2url,
 						"SBGN-ED",
@@ -95,7 +95,7 @@ public final class HomeAction extends AbstractNavigationAction {
 		folder2urlVANTED
 				.put("",
 						"Source Code:http://vanted.ipk-gatersleben.de/#ui-tabs-9^Add-ons:http://vanted.ipk-gatersleben.de/#ui-tabs-11^Lit. References:http://vanted.ipk-gatersleben.de/#ui-tabs-13");
-		NavigationGraphicalEntity vanted = WebFolder
+		NavigationButton vanted = WebFolder
 				.getBrowserNavigationEntity(
 						folder2urlVANTED,
 						"VANTED",
@@ -113,36 +113,36 @@ public final class HomeAction extends AbstractNavigationAction {
 								+ "functions allow a fast evaluation of the data (e.g. t-Test or correlation analysis).",
 						"Examples", src.getGUIsetting());
 
-		NavigationGraphicalEntity startVanted = new NavigationGraphicalEntity(new ShowVANTED(), guIsetting);
+		NavigationButton startVanted = new NavigationButton(new ShowVANTED(), guIsetting);
 
 		vanted.getAction().addAdditionalEntity(startVanted);
 
 		homeActions.add(vanted);
 
-		NavigationGraphicalEntity serverStatusEntity = Other.getServerStatusEntity(true, src.getGUIsetting());
+		NavigationButton serverStatusEntity = Other.getServerStatusEntity(true, src.getGUIsetting());
 		homePrimaryActions.add(serverStatusEntity);
 
 		EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
 				"General Bioinformatics Ressources", "img/pattern_graffiti_logo.png", "img/pattern_graffiti_logo.png");
 		ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://bioinformatics.ipk-gatersleben.de",
 				"img/browser.png", src.getGUIsetting()));
-		for (NavigationGraphicalEntity nge : homeActions)
+		for (NavigationButton nge : homeActions)
 			ipkBioInf.addAdditionalEntity(nge);
-		homePrimaryActions.add(new NavigationGraphicalEntity(ipkBioInf, guIsetting));
+		homePrimaryActions.add(new NavigationButton(ipkBioInf, guIsetting));
 	}
 
-	ArrayList<NavigationGraphicalEntity> bookmarks;
-	private NavigationGraphicalEntity src;
+	ArrayList<NavigationButton> bookmarks;
+	private NavigationButton src;
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
 		initializeHomeActions(src.getGUIsetting());
-		bookmarks = new ArrayList<NavigationGraphicalEntity>();
+		bookmarks = new ArrayList<NavigationButton>();
 		try {
 			for (Bookmark b : Bookmark.getBookmarks()) {
 				BookmarkAction ba = new BookmarkAction(b);
-				NavigationGraphicalEntity nge = new NavigationGraphicalEntity(ba, ba.getImage(), src.getGUIsetting());
+				NavigationButton nge = new NavigationButton(ba, ba.getImage(), src.getGUIsetting());
 				bookmarks.add(nge);
 			}
 		} catch (Exception e) {
@@ -162,18 +162,18 @@ public final class HomeAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> homeNavigation = new ArrayList<NavigationGraphicalEntity>();
-		homeNavigation.add(new NavigationGraphicalEntity(this, src.getGUIsetting()));
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
+		homeNavigation.add(new NavigationButton(this, src.getGUIsetting()));
 
-		for (NavigationGraphicalEntity n : bookmarks)
+		for (NavigationButton n : bookmarks)
 			homeNavigation.add(n);
 
 		return homeNavigation;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return homePrimaryActions;
 	}
 
@@ -187,7 +187,7 @@ public final class HomeAction extends AbstractNavigationAction {
 		return myStatus;
 	}
 
-	public ArrayList<NavigationGraphicalEntity> getActionEntitySet() {
+	public ArrayList<NavigationButton> getActionEntitySet() {
 		return homePrimaryActions;
 	}
 }

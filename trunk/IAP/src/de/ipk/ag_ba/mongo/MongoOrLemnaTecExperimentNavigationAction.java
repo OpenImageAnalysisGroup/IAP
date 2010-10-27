@@ -20,7 +20,7 @@ import de.ipk.ag_ba.gui.navigation_actions.DeletionCommand;
 import de.ipk.ag_ba.gui.navigation_actions.Other;
 import de.ipk.ag_ba.gui.navigation_actions.Trash;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
@@ -34,7 +34,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
  */
 public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigationAction {
 	private final ExperimentHeaderInterface header;
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 	private ExperimentInterface experiment;
 
 	public MongoOrLemnaTecExperimentNavigationAction(ExperimentHeaderInterface ei) {
@@ -44,8 +44,8 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> actions = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		// actions.add(FileManager.getFileManagerEntity(login, pass,
 		// ei.experimentName));
 
@@ -69,19 +69,19 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		return actions;
 	}
 
-	public static void getDefaultActions(ArrayList<NavigationGraphicalEntity> actions, ExperimentInterface experiment,
+	public static void getDefaultActions(ArrayList<NavigationButton> actions, ExperimentInterface experiment,
 			ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting) {
 		if (experiment == null)
 			return;
 		try {
 			if (imageAnalysis)
-				for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
+				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
 						null, new ExperimentReference(experiment), guiSetting))
 					actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		for (NavigationGraphicalEntity ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
+		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
 				new ExperimentReference(experiment), guiSetting)) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
@@ -91,14 +91,14 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		if (header.getExcelfileid().startsWith("lemnatec:"))
 			experiment = new LemnaTecDataExchange().getExperiment(header, status);

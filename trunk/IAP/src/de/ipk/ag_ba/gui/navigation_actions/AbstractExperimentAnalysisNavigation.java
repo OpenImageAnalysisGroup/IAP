@@ -20,7 +20,7 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 
@@ -34,10 +34,10 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 	protected String login;
 	protected String pass;
 
-	protected final ArrayList<NavigationGraphicalEntity> actions = new ArrayList<NavigationGraphicalEntity>();
+	protected final ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 	protected ExperimentReference experiment;
 
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 
 	public AbstractExperimentAnalysisNavigation(String login, String pass, ExperimentReference experiment) {
 		super("Analyse Experiment Data Set");
@@ -47,12 +47,12 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 
 	}
 
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		actions.clear();
 		ExperimentReference exp = experiment;
 		try {
 			exp.setExperimentData(experiment.getData());
-			for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(login, pass, exp,
+			for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(login, pass, exp,
 					src.getGUIsetting()))
 				actions.add(ne);
 		} catch (Exception e) {
@@ -79,13 +79,13 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 
 	}
 
-	public void performActionCalculateResults(final NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(final NavigationButton src) throws Exception {
 		this.src = src;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}

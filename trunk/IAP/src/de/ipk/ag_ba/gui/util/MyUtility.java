@@ -16,18 +16,18 @@ import netscape.javascript.JSObject;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
  */
 public class MyUtility {
 
-	public static void navigate(ArrayList<NavigationGraphicalEntity> path, String target) {
+	public static void navigate(ArrayList<NavigationButton> path, String target) {
 		try {
 			String ft = clean(target);
 			StringBuilder sb = new StringBuilder();
-			for (NavigationGraphicalEntity ne : path) {
+			for (NavigationButton ne : path) {
 				if (ne.getTitle().equalsIgnoreCase(target))
 					break;
 				if (sb.length() > 0)

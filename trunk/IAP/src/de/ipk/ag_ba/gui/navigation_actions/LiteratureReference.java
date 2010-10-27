@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import org.AttributeHelper;
 
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
@@ -32,17 +32,17 @@ public class LiteratureReference extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return null;
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(NavigationButton src) {
 		AttributeHelper.showInBrowser(url);
 	}
 

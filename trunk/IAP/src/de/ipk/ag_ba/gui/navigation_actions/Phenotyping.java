@@ -3,42 +3,42 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
  * 
  */
 public class Phenotyping extends AbstractNavigationAction {
-	NavigationGraphicalEntity src = null;
+	NavigationButton src = null;
 
 	public Phenotyping() {
 		super("Access IAP Phenotyping Service Platform");
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> phenoDBcommands = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> phenoDBcommands = new ArrayList<NavigationButton>();
 
 		NavigationAction analyzeAction = new UploadImagesToCloud(false);
-		NavigationGraphicalEntity analyzeEntity = new NavigationGraphicalEntity(analyzeAction, "Process Files",
+		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Process Files",
 				"img/ext/user-desktop.png", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null);
 		phenoDBcommands.add(analyzeEntity);
 
 		NavigationAction lemnaExperiments = new LemnaTecNavigationAction();
-		NavigationGraphicalEntity lemnaEntity = new NavigationGraphicalEntity(lemnaExperiments, src != null ? src
+		NavigationButton lemnaEntity = new NavigationButton(lemnaExperiments, src != null ? src
 				.getGUIsetting() : null);
 
 		phenoDBcommands.add(lemnaEntity);
@@ -46,7 +46,7 @@ public class Phenotyping extends AbstractNavigationAction {
 		String login = "";
 		String pass = "";
 		NavigationAction mongoExperiments = new MongoExperimentsNavigationAction(login, pass);
-		NavigationGraphicalEntity mongo = new NavigationGraphicalEntity(mongoExperiments, "IAP Cloud",
+		NavigationButton mongo = new NavigationButton(mongoExperiments, "IAP Cloud",
 				"img/ext/network-mongo.png", "img/ext/network-mongo-gray.png", src != null ? src.getGUIsetting() : null);
 
 		phenoDBcommands.add(mongo);

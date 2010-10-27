@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
@@ -21,7 +21,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 
 	private final String login;
 	private final String pass;
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 
 	public CloundManagerNavigationAction(String login, String pass) {
 		super("Task- and Server-Management");
@@ -40,24 +40,24 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		GUIsetting guiS = src.getGUIsetting();
-		NavigationGraphicalEntity startOrStopServerMode = new NavigationGraphicalEntity(
+		NavigationButton startOrStopServerMode = new NavigationButton(
 				new EnableOrDisableServerModeAction(login, pass), guiS);
 		res.add(startOrStopServerMode);
 		return res;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 	}
 }

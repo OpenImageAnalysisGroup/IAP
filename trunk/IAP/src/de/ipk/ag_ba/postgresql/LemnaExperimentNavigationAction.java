@@ -18,7 +18,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.Other;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
  * 
  */
 public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 	private ExperimentInterface experiment = null;
 	private final ExperimentHeaderInterface experimentName;
 
@@ -40,8 +40,8 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-		ArrayList<NavigationGraphicalEntity> actions = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		// actions.add(FileManager.getFileManagerEntity(login, pass,
 		// ei.experimentName));
 
@@ -51,17 +51,17 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 		return actions;
 	}
 
-	public static void getDefaultActions(ArrayList<NavigationGraphicalEntity> actions, ExperimentInterface experiment,
+	public static void getDefaultActions(ArrayList<NavigationButton> actions, ExperimentInterface experiment,
 			ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting) {
 		try {
 			if (imageAnalysis)
-				for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
+				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
 						null, new ExperimentReference(experiment), guiSetting))
 					actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		for (NavigationGraphicalEntity ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
+		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
 				new ExperimentReference(experiment), guiSetting)) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
@@ -71,14 +71,14 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		if (experiment == null)
 			experiment = new LemnaTecDataExchange().getExperiment(experimentName, status);

@@ -16,7 +16,7 @@ import javax.swing.JFrame;
 import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
 
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 public class ShowVANTED extends AbstractNavigationAction {
 
@@ -25,16 +25,16 @@ public class ShowVANTED extends AbstractNavigationAction {
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(NavigationButton src) {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return null;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		JFrame jf = (JFrame) ErrorMsg.findParentComponent(MainFrame.getInstance(), JFrame.class);
 		if (jf != null && !jf.isVisible()) {
 			jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

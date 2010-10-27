@@ -13,7 +13,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
  * @author klukas
  * 
  */
-public final class DBEexperimentNavigation extends NavigationGraphicalEntity {
+public final class DBEexperimentNavigation extends NavigationButton {
 	/**
 	 * 
 	 */

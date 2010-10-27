@@ -17,7 +17,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -39,9 +39,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.loaders.MyScanner;
  * 
  */
 public class UploadImagesToCloud extends AbstractNavigationAction {
-	private NavigationGraphicalEntity src;
+	private NavigationButton src;
 
-	ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+	ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 
 	private final boolean storeInMongo;
 
@@ -53,7 +53,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
 		this.newExperiment = null;
 		res.clear();
@@ -90,7 +90,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 						new MongoDB().storeExperiment("dbe3", null, null, null, newExperiment, status);
 					}
 					ExperimentReference exRef = new ExperimentReference(newExperiment);
-					for (NavigationGraphicalEntity ne : ImageAnalysisCommandManager.getCommands(null, null, exRef,
+					for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(null, null, exRef,
 							src.getGUIsetting()))
 						res.add(ne);
 				} catch (Exception e1) {
@@ -106,8 +106,8 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
-		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		res.addAll(currentSet);
 		if (newExperiment != null) {
 			res.add(src);
@@ -118,7 +118,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return res;
 	}
 

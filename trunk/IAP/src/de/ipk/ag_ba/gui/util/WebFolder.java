@@ -56,7 +56,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.Other;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.AIPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.TabMetaCrop;
@@ -67,50 +67,50 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  * @author klukas
  */
 public class WebFolder {
-	public static NavigationGraphicalEntity getBrowserNavigationEntity(final HashMap<String, String> folder2url,
+	public static NavigationButton getBrowserNavigationEntity(final HashMap<String, String> folder2url,
 			String title, String icon, final String url, final String referenceTitle, final String referenceImage,
 			final String referenceURL, final String[] valid, final String introTxt,
 			final String optSubFolderForFolderItems, GUIsetting guiSetting) {
 
-		NavigationGraphicalEntity nav = new NavigationGraphicalEntity(new AbstractNavigationAction(
+		NavigationButton nav = new NavigationButton(new AbstractNavigationAction(
 				"Open web-folder content") {
-			private NavigationGraphicalEntity src;
+			private NavigationButton src;
 
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) {
+			public void performActionCalculateResults(NavigationButton src) {
 				this.src = src;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-				ArrayList<NavigationGraphicalEntity> actions = new ArrayList<NavigationGraphicalEntity>();
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 				if (referenceTitle != null) {
 					NavigationAction action = new AbstractNavigationAction("Show in browser") {
 						@Override
-						public void performActionCalculateResults(NavigationGraphicalEntity src) {
+						public void performActionCalculateResults(NavigationButton src) {
 							AttributeHelper.showInBrowser(referenceURL);
 						}
 
 						@Override
-						public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-								ArrayList<NavigationGraphicalEntity> currentSet) {
+						public ArrayList<NavigationButton> getResultNewNavigationSet(
+								ArrayList<NavigationButton> currentSet) {
 							return null;
 						}
 
 						@Override
-						public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+						public ArrayList<NavigationButton> getResultNewActionSet() {
 							return null;
 						}
 					};
-					NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, referenceTitle,
+					NavigationButton website = new NavigationButton(action, referenceTitle,
 							referenceImage, src.getGUIsetting());
 					website.setToolTipText("Open " + referenceURL);
 					actions.add(website);
@@ -121,23 +121,23 @@ public class WebFolder {
 						final String fp = fpp;
 						NavigationAction action = new AbstractNavigationAction("Open web-ressource") {
 							@Override
-							public void performActionCalculateResults(NavigationGraphicalEntity src) {
+							public void performActionCalculateResults(NavigationButton src) {
 								AttributeHelper.showInBrowser(fp.split(":", 2)[1]);
 							}
 
 							@Override
-							public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-									ArrayList<NavigationGraphicalEntity> currentSet) {
+							public ArrayList<NavigationButton> getResultNewNavigationSet(
+									ArrayList<NavigationButton> currentSet) {
 								return null;
 							}
 
 							@Override
-							public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+							public ArrayList<NavigationButton> getResultNewActionSet() {
 								return null;
 							}
 						};
 
-						NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, fp.split(":")[0],
+						NavigationButton website = new NavigationButton(action, fp.split(":")[0],
 								"img/dataset.png", src.getGUIsetting());
 						website.setToolTipText("Open " + folder2url.get("").split(":", 2)[1]);
 						actions.add(website);
@@ -148,7 +148,7 @@ public class WebFolder {
 				if (optSubFolderForFolderItems != null && optSubFolderForFolderItems.length() > 0) {
 					subFolderAction = new EmptyNavigationAction(optSubFolderForFolderItems, "Show List of Web-Ressources",
 							"img/ext/folder.png", "img/ext/folder-drag-accept.png");
-					NavigationGraphicalEntity subFolder = new NavigationGraphicalEntity(subFolderAction, src.getGUIsetting());
+					NavigationButton subFolder = new NavigationButton(subFolderAction, src.getGUIsetting());
 					actions.add(subFolder);
 				}
 
@@ -170,12 +170,12 @@ public class WebFolder {
 
 					if (folders.size() == 0) {
 						for (PathwayWebLinkItem mc : mainList) {
-							NavigationGraphicalEntity ne = getPathwayViewEntity(mc, src.getGUIsetting());
+							NavigationButton ne = getPathwayViewEntity(mc, src.getGUIsetting());
 							actions.add(ne);
 						}
 					}
 				} catch (Exception e) {
-					NavigationGraphicalEntity ne = Other.getServerStatusEntity(false, src.getGUIsetting());
+					NavigationButton ne = Other.getServerStatusEntity(false, src.getGUIsetting());
 					ne.setTitle("- Connection Problem -");
 					actions.add(ne);
 					ErrorMsg.addErrorMessage(e);
@@ -183,45 +183,45 @@ public class WebFolder {
 
 				for (String f : folders) {
 					final String ff = f;
-					NavigationGraphicalEntity ne = new NavigationGraphicalEntity(new AbstractNavigationAction(
+					NavigationButton ne = new NavigationButton(new AbstractNavigationAction(
 							"Open web-folder") {
-						private NavigationGraphicalEntity src2;
+						private NavigationButton src2;
 
 						@Override
-						public void performActionCalculateResults(NavigationGraphicalEntity src) {
+						public void performActionCalculateResults(NavigationButton src) {
 							this.src2 = src;
 						}
 
 						@Override
-						public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-								ArrayList<NavigationGraphicalEntity> currentSet) {
-							ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+						public ArrayList<NavigationButton> getResultNewNavigationSet(
+								ArrayList<NavigationButton> currentSet) {
+							ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 							res.add(src2);
 							return res;
 						}
 
 						@Override
-						public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-							ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+						public ArrayList<NavigationButton> getResultNewActionSet() {
+							ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 
 							if (folder2url != null && folder2url.containsKey(ff)) {
 								String title = folder2url.get(ff).split(":")[0];
 								final String url = folder2url.get(ff).split(":", 2)[1];
-								NavigationGraphicalEntity website = new NavigationGraphicalEntity(new AbstractNavigationAction(
+								NavigationButton website = new NavigationButton(new AbstractNavigationAction(
 										"Show web-resource") {
 									@Override
-									public void performActionCalculateResults(NavigationGraphicalEntity src) {
+									public void performActionCalculateResults(NavigationButton src) {
 										AttributeHelper.showInBrowser(url);
 									}
 
 									@Override
-									public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-											ArrayList<NavigationGraphicalEntity> currentSet) {
+									public ArrayList<NavigationButton> getResultNewNavigationSet(
+											ArrayList<NavigationButton> currentSet) {
 										return null;
 									}
 
 									@Override
-									public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+									public ArrayList<NavigationButton> getResultNewActionSet() {
 										return null;
 									}
 								}, title, "img/dataset.png", src.getGUIsetting());
@@ -232,7 +232,7 @@ public class WebFolder {
 							// "img/ext/folder-drag-accept.png"
 
 							for (PathwayWebLinkItem mc : folder2file.get(ff)) {
-								NavigationGraphicalEntity j = getPathwayViewEntity(mc, src.getGUIsetting());
+								NavigationButton j = getPathwayViewEntity(mc, src.getGUIsetting());
 								res.add(j);
 							}
 
@@ -260,15 +260,15 @@ public class WebFolder {
 		return nav;
 	}
 
-	private static NavigationGraphicalEntity getPathwayViewEntity(final PathwayWebLinkItem mmc, GUIsetting guiSettings) {
-		NavigationGraphicalEntity ne = new NavigationGraphicalEntity(new AbstractNavigationAction(
+	private static NavigationButton getPathwayViewEntity(final PathwayWebLinkItem mmc, GUIsetting guiSettings) {
+		NavigationButton ne = new NavigationButton(new AbstractNavigationAction(
 				"Load web-folder content") {
-			private NavigationGraphicalEntity src = null;
+			private NavigationButton src = null;
 			private final ObjectRef graphRef = new ObjectRef();
 			private final ObjectRef scrollpaneRef = new ObjectRef();
 
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) {
+			public void performActionCalculateResults(NavigationButton src) {
 				this.src = src;
 
 				URL url;
@@ -282,33 +282,33 @@ public class WebFolder {
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
-				ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
-				ArrayList<NavigationGraphicalEntity> result = new ArrayList<NavigationGraphicalEntity>();
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 
 				NavigationAction action = new AbstractNavigationAction("Show Graph in IAP Online-Version of VANTED") {
 					Graph g;
 
 					@Override
-					public void performActionCalculateResults(NavigationGraphicalEntity src) {
+					public void performActionCalculateResults(NavigationButton src) {
 						g = (Graph) graphRef.getObject();
 					}
 
 					@Override
-					public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-							ArrayList<NavigationGraphicalEntity> currentSet) {
+					public ArrayList<NavigationButton> getResultNewNavigationSet(
+							ArrayList<NavigationButton> currentSet) {
 						return null;
 					}
 
 					@Override
-					public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+					public ArrayList<NavigationButton> getResultNewActionSet() {
 
 						AIPmain.showVANTED();
 						if (g != null)
@@ -324,12 +324,12 @@ public class WebFolder {
 
 				};
 
-				NavigationGraphicalEntity editInVanted = new NavigationGraphicalEntity(action, "Edit in VANTED",
+				NavigationButton editInVanted = new NavigationButton(action, "Edit in VANTED",
 						"img/vanted1_0.png", src.getGUIsetting());
 				result.add(editInVanted);
 
 				JComponent zoomSlider = getZoomSliderForGraph(scrollpaneRef);
-				result.add(new NavigationGraphicalEntity(zoomSlider, src.getGUIsetting()));
+				result.add(new NavigationButton(zoomSlider, src.getGUIsetting()));
 
 				return result;
 			}
@@ -577,26 +577,26 @@ public class WebFolder {
 		}
 	}
 
-	public static NavigationGraphicalEntity getURLentity(String title, final String referenceURL, String image,
+	public static NavigationButton getURLentity(String title, final String referenceURL, String image,
 			GUIsetting guiSetting) {
 		NavigationAction action = new AbstractNavigationAction("Show in browser") {
 			@Override
-			public void performActionCalculateResults(NavigationGraphicalEntity src) {
+			public void performActionCalculateResults(NavigationButton src) {
 				AttributeHelper.showInBrowser(referenceURL);
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
-					ArrayList<NavigationGraphicalEntity> currentSet) {
+			public ArrayList<NavigationButton> getResultNewNavigationSet(
+					ArrayList<NavigationButton> currentSet) {
 				return null;
 			}
 
 			@Override
-			public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+			public ArrayList<NavigationButton> getResultNewActionSet() {
 				return null;
 			}
 		};
-		NavigationGraphicalEntity website = new NavigationGraphicalEntity(action, title, image, guiSetting);
+		NavigationButton website = new NavigationButton(action, title, image, guiSetting);
 		website.setToolTipText("Open " + referenceURL);
 
 		return website;

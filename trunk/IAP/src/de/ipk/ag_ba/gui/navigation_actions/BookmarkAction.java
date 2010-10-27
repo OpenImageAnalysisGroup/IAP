@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.Unicode;
-import de.ipk.ag_ba.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
 
@@ -42,17 +42,17 @@ public class BookmarkAction extends AbstractNavigationAction {
 	}
 
 	@Override
-	public void performActionCalculateResults(NavigationGraphicalEntity src) throws Exception {
+	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		AIPgui.navigateTo(bookmark.getTarget(), src);
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return null;
 	}
 
 	@Override
-	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}
 
