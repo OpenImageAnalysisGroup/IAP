@@ -39,6 +39,10 @@ public class pixel_segmentierung {
 //		int [][] eingabe_image = { { 0, 1 },
 //						   		   { 0, 0 } };
 		
+//		int [][] eingabe_image = { { 0, 1, 1 },
+//						   		   { 1, 0, 0 } };
+		
+		
 		
 		int [][] eingabe_image = { { 0, 1, 1, 0, 1, 0, 1, 0 },
 						   		   { 1, 1, 0, 0, 1, 1, 1, 0 },
@@ -65,10 +69,8 @@ public class pixel_segmentierung {
 		//die Ausgangscluster werden bestimmt 
 		ersterDurchlauf();
 		
-		System.out.println("HashMap");
-		printHashMap(clusterVerweis);
-		
-		
+//		System.out.println("HashMap");
+//		printHashMap(clusterVerweis);
 		
 		//es wird festgelegt welche Cluster einen großen Cluster zusammen ergeben
 		mergeHashMap();
@@ -355,42 +357,44 @@ public class pixel_segmentierung {
 
 		for( int clusterID : clusterVerweis.keySet() ){
 			keysByValue = getKeyByValue2(clusterVerweis, clusterID);
-			System.out.println("clusterID/keysByValue: " + clusterID + " " + keysByValue);
+			
 			if(!keysByValue.isEmpty()){
 			
 				//alle Cluster die zur "clusterID" gehören zum ersten Fund von "keysByValue" hinzufügen
 				temp = clusterVerweis.get(clusterID);
 				ersterFund = clusterVerweis.get(keysByValue.get(0));
 				
-				System.out.println("temp: " + temp);
-				System.out.println("ersterFund: " + ersterFund);
-				
-				
 				for(int i = 0; i < temp.size(); i++)
-					if(!ersterFund.contains(temp.get(i)))
+					if(!ersterFund.contains(temp.get(i)) && keysByValue.get(0) != temp.get(i)){
 						ersterFund.add(temp.get(i));
+						if(clusterVerweis_temp.containsKey(temp.get(i)))
+							clusterVerweis_temp.remove(temp.get(i));
+					}
 				
-				System.out.println("ersterFund2: " + ersterFund);	
 				//alle weiteren Cluster aus "keysByValue" ebenfalls zum ersten Fund hinzufügen
 				if(keysByValue.size() > 1)
 					for(int i = 1; i < keysByValue.size(); i++){
 						
 						temp = clusterVerweis.get(keysByValue.get(i));
-						
+
 						for(int j = 0; j < temp.size(); j++)
-							if(!ersterFund.contains(temp.get(j)))
+							if(!ersterFund.contains(temp.get(j)) && keysByValue.get(0) != temp.get(j)){
 								ersterFund.add(temp.get(j));
+								if(clusterVerweis_temp.containsKey(temp.get(j)))
+									clusterVerweis_temp.remove(temp.get(j));
+							}
 						
-						if(!ersterFund.contains(keysByValue.get(i)))
+						if(!ersterFund.contains(keysByValue.get(i)) && keysByValue.get(0) != keysByValue.get(i)){
 							ersterFund.add(keysByValue.get(i));
-												
+							if(clusterVerweis_temp.containsKey(keysByValue.get(i)))
+								clusterVerweis_temp.remove(keysByValue.get(i));
+						}					
 					}
-				System.out.println("##############: " + clusterVerweis);
+				clusterVerweis_temp.put(keysByValue.get(0), ersterFund);
 			} else 
 				clusterVerweis_temp.put(clusterID,clusterVerweis.get(clusterID));
 
 		}
-		System.out.println("##############2: " + clusterVerweis);
 		
 		clusterVerweis.clear();
 		clusterVerweis.putAll(clusterVerweis_temp);
