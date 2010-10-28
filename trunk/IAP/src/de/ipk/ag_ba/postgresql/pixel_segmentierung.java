@@ -7,11 +7,6 @@ package de.ipk.ag_ba.postgresql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * @author entzian
@@ -28,13 +23,7 @@ public class pixel_segmentierung {
 	private int [] zaehlerArray;
 	private int [][] image;
 	
-	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
 	
 //		int [][] eingabe_image = { { 0, 1 },
 //						   		   { 0, 0 } };
@@ -72,17 +61,17 @@ public class pixel_segmentierung {
 //		System.out.println("HashMap");
 //		printHashMap(clusterVerweis);
 		
-		//es wird festgelegt welche Cluster einen gro§en Cluster zusammen ergeben
+		//es wird festgelegt welche Cluster einen groï¿½en Cluster zusammen ergeben
 		mergeHashMap();
 		
-		//die Endcluster werden beschrieben und es wird die Grš§e der Cluster bestimmt
+		//die Endcluster werden beschrieben und es wird die Grï¿½ï¿½e der Cluster bestimmt
 		zweiterDurchlauf();
 		
 
 		System.out.println("neues Bild:");
 		printImage();
 		
-		System.out.println("Clustergrš§e:");
+		System.out.println("Clustergrï¿½ï¿½e:");
 		printArray(zaehlerArray);
 	}
 	
@@ -313,14 +302,14 @@ public class pixel_segmentierung {
 							image[i][j] = Pixel4;
 							hashMapFuellen(Pixel2, Pixel4);
 						
-						//Pixel1 und Pixel2 mŸssten immer im selben Cluster liegen
+						//Pixel1 und Pixel2 mï¿½ssten immer im selben Cluster liegen
 						} else if(Pixel2 > zaehlerK-1 && Pixel3 > zaehlerK-1 && Pixel4 < zaehlerK){
 							image[i][j] = Pixel3;
 							//hashMapFuellen(i-1, j, i-1, j-1);
 						
 						} else {	
-							//wenn alle dei Pixel zu einem Cluster gehšren, dann wird der linke Cluster fŸr den aktuellen Pixel genommen
-							//es muss keine hashMap zuweisung stattfinden, da bereits alle drei Pixel um den aktuellen Pixel verknŸpft wurden
+							//wenn alle dei Pixel zu einem Cluster gehï¿½ren, dann wird der linke Cluster fï¿½r den aktuellen Pixel genommen
+							//es muss keine hashMap zuweisung stattfinden, da bereits alle drei Pixel um den aktuellen Pixel verknï¿½pft wurden
 							image[i][j] = Pixel4;
 							//hashMapFuellen(i-1, j, i-1, j-1, i, j-1);
 						}
@@ -360,7 +349,7 @@ public class pixel_segmentierung {
 			
 			if(!keysByValue.isEmpty()){
 			
-				//alle Cluster die zur "clusterID" gehšren zum ersten Fund von "keysByValue" hinzufŸgen
+				//alle Cluster die zur "clusterID" gehï¿½ren zum ersten Fund von "keysByValue" hinzufï¿½gen
 				temp = clusterVerweis.get(clusterID);
 				ersterFund = clusterVerweis.get(keysByValue.get(0));
 				
@@ -371,7 +360,7 @@ public class pixel_segmentierung {
 							clusterVerweis_temp.remove(temp.get(i));
 					}
 				
-				//alle weiteren Cluster aus "keysByValue" ebenfalls zum ersten Fund hinzufŸgen
+				//alle weiteren Cluster aus "keysByValue" ebenfalls zum ersten Fund hinzufï¿½gen
 				if(keysByValue.size() > 1)
 					for(int i = 1; i < keysByValue.size(); i++){
 						
@@ -431,23 +420,23 @@ public class pixel_segmentierung {
 	public void printList(ArrayList<Integer> liste)
 	{
 		for(int i = zaehlerK; i < liste.size(); i++)
-			System.out.println("Cluster " + i + " enthŠlt " + liste.get(i) + " Pixel");
+			System.out.println("Cluster " + i + " enthï¿½lt " + liste.get(i) + " Pixel");
 	}
 	
 	public void printHashMap(HashMap<Integer, ArrayList<Integer>> hashM){
 		
 		if(!hashM.isEmpty())
 			for( int clusterID : hashM.keySet() )
-				System.out.println("Zu Cluster " + clusterID + " gehšren folgenden Cluster: " + hashM.get(clusterID));
+				System.out.println("Zu Cluster " + clusterID + " gehï¿½ren folgenden Cluster: " + hashM.get(clusterID));
 		else
-			System.out.println("Es mŸssen keine Cluster fusioniert werden!");
+			System.out.println("Es mï¿½ssen keine Cluster fusioniert werden!");
 	}
 	
 
 	public void printArray(int[] zaehlerArray2) {
 		
 		for( int arrayID = zaehlerK; arrayID < zaehlerArray2.length; arrayID++ )
-			System.out.println("Cluster " + arrayID + " enthŠlt " + zaehlerArray2[arrayID] + " Pixel");
+			System.out.println("Cluster " + arrayID + " enthï¿½lt " + zaehlerArray2[arrayID] + " Pixel");
 	
 	}
 
