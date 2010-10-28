@@ -10,7 +10,7 @@ package de.ipk.ag_ba.postgresql;
  */
 public class Debug {
 
-	public static final boolean TEST = false;
+	public static final boolean TEST = true;
 
 	public static final void print(String text) {
 		print("Executing this command: ", text);
