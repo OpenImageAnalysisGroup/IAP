@@ -139,6 +139,7 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 									setAnno(maximumThreadCountParallelImages, m);
 									m.setValue(mbs);
 									m.setUnit("MB/s");
+									m.setReplicateID(1);
 									output.add(m);
 								}
 								tsoTime.setParam(0, time);
@@ -148,9 +149,9 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 					}
 
 					private void setAnno(final int maximumThreadCountParallelImages, NumericMeasurement m) {
-						m.getParentSample().setTime(-1);
-						m.getParentSample().setTimeUnit("-1");
-						m.getParentSample().getParentCondition().setSpecies(maximumThreadCountParallelImages + " threads");
+						m.getParentSample().setTime(maximumThreadCountParallelImages);
+						m.getParentSample().setTimeUnit("Threads");
+						m.getParentSample().getParentCondition().setSpecies("Performance Test");
 						m.getParentSample().getParentCondition().setGenotype("");
 						m.getParentSample().getParentCondition().setVariety("");
 						m.getParentSample().getParentCondition().setTreatment("");

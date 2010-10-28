@@ -462,7 +462,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 	@Override
 	public String getName() {
-		return "Clear Background";
+		return "Phenotype Analysis";
 	}
 
 	public void addPreprocessor(CutImagePreprocessor pre) {

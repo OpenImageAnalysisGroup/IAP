@@ -103,7 +103,7 @@ public class PerformanceTestAction extends AbstractNavigationAction implements R
 			task.addPreprocessor(new CutImagePreprocessor());
 			TreeMap<Long, String> times = new TreeMap<Long, String>();
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
-			for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 1) {
+			for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 4) {
 				long t1 = System.currentTimeMillis();
 				task.setInput(workload, login, pass);
 				task.performAnalysis(pi, 1, status);
