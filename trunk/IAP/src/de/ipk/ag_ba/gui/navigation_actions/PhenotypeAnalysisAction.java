@@ -174,7 +174,8 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			}
 
 			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
-			statisticsResult.getHeader().setExperimentname(statisticsResult.getName() + " " + getDefaultTitle());
+			statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
+			statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
 			// Substance.addAndMerge(statisticsResult, experiment.getData());
 
 			// SupplementaryFilePanelMongoDB sfp = new
