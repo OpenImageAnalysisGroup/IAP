@@ -8,6 +8,8 @@ package de.ipk.ag_ba.postgresql;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.junit.Assert;
+
 /**
  * @author entzian
  *
@@ -25,25 +27,43 @@ public class pixel_segmentierung {
 	
 	public static void main(String[] args) {
 	
+		
 //		int [][] eingabe_image = { { 0, 1 },
 //						   		   { 0, 0 } };
-		
+//		
 //		int [][] eingabe_image = { { 0, 1, 1 },
 //						   		   { 1, 0, 0 } };
-		
-		
-		
+//		
+//		int [][] eingabe_image = { { 0, 0, 0 },
+//								   { 0, 0, 0 } };
+//		
+//		int [][] eingabe_image = { { 1, 1, 1 },
+//				   				   { 1, 1, 1 } };
+//		
 		int [][] eingabe_image = { { 0, 1, 1, 0, 1, 0, 1, 0 },
 						   		   { 1, 1, 0, 0, 1, 1, 1, 0 },
 						   		   { 0, 1, 1, 1, 1, 0, 1, 0 },
 						   		   { 0, 0, 0, 0, 0, 1, 1, 0 },
 						   		   { 0, 1, 1, 1, 0, 0, 0, 1 },
 						   		   { 1, 1, 1, 1, 1, 0, 0, 0 } };
-		
-		//boolean nachbarschaft = false; //true = 8er; false = 4er
-		
+//		
+//		//boolean nachbarschaft = false; //true = 8er; false = 4er
+//		
 		pixel_segmentierung test = new pixel_segmentierung(eingabe_image, false);
+		test.doPixelSegmentation();
+		test.printOriginalImage();
+		test.printImage();
+		test.printClusterArray();
+		System.out.println("Number of Clusters: " + test.getNumberOfCluster());
+		System.out.println("Number of Pixel: " + test.getNumberOfPixel());
+		
 		pixel_segmentierung test2 = new pixel_segmentierung(eingabe_image, true);
+		test2.doPixelSegmentation();
+		test2.printOriginalImage();
+		test2.printImage();
+		test2.printClusterArray();
+		System.out.println("Number of Clusters: " + test2.getNumberOfCluster());
+		System.out.println("Number of Pixel: " + test2.getNumberOfPixel());
 	}
 	
 	
@@ -51,50 +71,129 @@ public class pixel_segmentierung {
 		original_image = image;
 		this.image = new int[image.length][image[0].length];
 		this.nb = nb;
-		
-		System.out.println("Originalbild 1");
-		printImage(original_image);
-	
-		//die Ausgangscluster werden bestimmt 
-		ersterDurchlauf();
-		
-//		System.out.println("HashMap");
-//		printHashMap(clusterVerweis);
-		
-		//es wird festgelegt welche Cluster einen gro�en Cluster zusammen ergeben
-		mergeHashMap();
-		
-		//die Endcluster werden beschrieben und es wird die Gr��e der Cluster bestimmt
-		zweiterDurchlauf();
-		
-
-		System.out.println("neues Bild:");
-		printImage();
-		
-		System.out.println("Clustergr��e:");
-		printArray(zaehlerArray);
 	}
 	
-	private void ersterDurchlauf(){
+	
+	//###############  Public ####################
+	
+	public int [] getClusterCounts(){
+		return zaehlerArray;
+	}
+	
+	public int [][] getImageMask(){
+		return image;
+	}
+	
+	public int getNumberOfCluster(){
+		int clusterNumbers = 0;
+		for(int pixelIndex = 1; pixelIndex < zaehlerArray.length; pixelIndex++)
+			if(zaehlerArray[pixelIndex] != 0)
+				clusterNumbers++;
+		return clusterNumbers;
+	}
+	
+	public int getNumberOfPixel(){
+		int pixelNumbers = 0;
+		for(int pixelIndex = 1; pixelIndex < zaehlerArray.length; pixelIndex++)
+			pixelNumbers = pixelNumbers + zaehlerArray[pixelIndex];
+		return pixelNumbers;
+	}
+	
+	public void doPixelSegmentation(){
+		firstPass();
+		mergeHashMap();
+		secondPass();
+	}
+	
+	
+	//###############	Print-Methoden	######################
+	
+	public void printOriginalImage()
+	{
+		printOriginalImage(this.original_image);
+	}
+	
+	private void printOriginalImage(int[][] original_image) {
+		// TODO Auto-generated method stub
+		printImage(original_image, "OriginalImage");
+	}
+
+
+	public void printImage()
+	{
+		printImage(this.image);
+	}
+	
+	public void printImage(int [][] image)
+	{
+		printImage(image, "ClusterImage");
+	}
+	
+	public void printImage(int [][] image, String text){
+		System.out.println(text);
+		for(int i = 0; i < image.length; i++){ 
+			for(int j = 0; j < image[i].length; j++)
+				System.out.print(image[i][j] + "\t");
+			System.out.println("");
+		}
+	}
+	
+	public void printHashMap(){
+		printHashMap(this.clusterVerweis);
+	}
+	
+	public void printHashMap(HashMap<Integer, ArrayList<Integer>> hashM){
+		
+		if(!hashM.isEmpty())
+			for( int clusterID : hashM.keySet() )
+				System.out.println("To cluster " + clusterID + " belongs Cluster: " + hashM.get(clusterID));
+		else
+			System.out.println("No cluster has to be merge!");
+	}
+	
+	public void printClusterArray(){
+		printClusterArray(this.zaehlerArray);
+	}
+	
+	public void printClusterArray(int[] zaehlerArray2) {
+		
+		if(zaehlerArray2.length > zaehlerK)
+			for( int arrayID = zaehlerK; arrayID < zaehlerArray2.length; arrayID++ )
+				System.out.println("Cluster " + arrayID + " contains " + zaehlerArray2[arrayID] + " pixel");
+		else
+			System.out.println("No cluster available!");
+	}
+	
+	//kann eigentlich weg
+	public void printList(ArrayList<Integer> liste)
+	{
+		for(int i = zaehlerK; i < liste.size(); i++)
+			System.out.println("Cluster " + i + " contains " + liste.get(i) + " pixel");
+	}
+	
+	
+	//############# Private #################
+	
+	private void firstPass(){
 		
 		for (int i = 0; i < original_image.length; i++)
 			for (int j = 0; j < original_image[i].length; j++) {
 				if(original_image[i][j] == 1){
 					if (i == 0 && j == 0)
-						parse(1);
+						parse(Position.FIRST_FIELD);
 					else if (i == 0)
-						parse(2, 0, j);
+						parse(Position.FIRST_ROW, 0, j);
 					else if (j == 0)
-						parse(3, i);
+						parse(Position.FIRST_COLUMN, i);
 					else if (j == original_image[i].length-1 && nb)
-						parse(5, i, j);
+						parse(Position.LAST_COLUMN, i, j);
 					else
-						parse(4, i, j);
+						parse(Position.REMAINING, i, j);
 				}
 			}
 	}
 	
-	private void zweiterDurchlauf(){
+	private void secondPass(){
 		
 		int [] clusterMap = new int [zaehler];
 		zaehlerArray = new int [zaehler];
@@ -115,72 +214,69 @@ public class pixel_segmentierung {
 	}
 	
 
-	private void parse(int zahl){
+	private void parse(Position zahl){
 		parse(zahl, 0, 0);
 	}
 	
-	private void parse(int zahl, int i){
+	private void parse(Position zahl, int i){
 		parse(zahl, i, 0);
 	}
 	
-	private void parse(int zahl, int i, int j){
+	private void parse(Position position, int i, int j){
+		
+//		|pixel3|pixel2|pixel1|
+//		|pixel4|  x   |		 |
+		
+		int pixel1, pixel2, pixel3, pixel4;
 		
 		
-//		|Pixel3|Pixel2|Pixel1|
-//		|Pixel4|  x   |		 |	
-		
-		int Pixel1, Pixel2, Pixel3, Pixel4;
-		
-		
-		switch(zahl)
+		switch(position)
 		{		//Ecke links oben und rechts oben
-			case 1: 
+			case FIRST_FIELD: 
 					image[i][j]= zaehler; 
 					zaehler++;
 
 					break;
 				
 				//erste Zeile oben, nicht die Ecke links aber die Ecke rechts
-			case 2: 
-					Pixel4 = image[i][j-1];
+			case FIRST_ROW: 
+					pixel4 = image[i][j-1];
 				
-					if(Pixel4 < zaehlerK){
+					if(pixel4 < zaehlerK){
 						image[i][j] = zaehler; 
 						zaehler++;
 					}
 					else
-						image[i][j] = Pixel4;
+						image[i][j] = pixel4;
 						
 					break;
 			
 				//erste Spalte links, nicht die Ecke oben
-			case 3:					
+			case FIRST_COLUMN:					
 					if(!nb){	//4er
+						pixel2 = image[i-1][j];
 						
-						Pixel2 = image[i-1][j];
-						
-						if (Pixel2 < zaehlerK) {
+						if (pixel2 < zaehlerK) {
 							image[i][j] = zaehler;
 							zaehler++;
 						} else 
-							image[i][j] = Pixel2;
+							image[i][j] = pixel2;
 					} else {	//8er
+						pixel1 = image[i-1][j+1];
+						pixel2 = image[i-1][j];
 						
-						Pixel1 = image[i-1][j+1];
-						Pixel2 = image[i-1][j];
-						
-						if(Pixel2 < zaehlerK && Pixel1 < zaehlerK){
+						if(pixel2 < zaehlerK && pixel1 < zaehlerK){
 							image[i][j] = zaehler;
 							zaehler++;
 							
-						} else if(Pixel2 < zaehlerK && Pixel1 > zaehlerK-1){
-							image[i][j] = Pixel1;
+						} else if(pixel2 < zaehlerK && pixel1 > zaehlerK-1){
+							image[i][j] = pixel1;
 							
-						} else if(Pixel2 > zaehlerK-1 && Pixel1 < zaehlerK){
-							image[i][j] = Pixel2;
+						} else if(pixel2 > zaehlerK-1 && pixel1 < zaehlerK){
+							image[i][j] = pixel2;
 						
 						} else {
-							image[i][j] = Pixel2;
+							image[i][j] = pixel2;
 							
 							//hashMapFuellen(image[i-1][j], image[i-1][j+1]);
 						}
@@ -189,151 +285,240 @@ public class pixel_segmentierung {
 					break;
 			
 				//alles bis auf den linken, rechten (bei 8er Nachbarschaft) und oberen Rand
-			case 4: 				
+			case REMAINING: 				
 					if(!nb){		//4er
 						
-						Pixel2 = image[i-1][j];
-						Pixel4 = image[i][j-1];
+						pixel2 = image[i-1][j];
+						pixel4 = image[i][j-1];
 						
-						if (Pixel2 < zaehlerK && Pixel4 < zaehlerK) {
+						if (pixel2 < zaehlerK && pixel4 < zaehlerK) {
 							image[i][j] = zaehler;
 							zaehler++;
 						
-						} else if(Pixel2 < zaehlerK && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
+						} else if(pixel2 < zaehlerK && pixel4 > zaehlerK-1){
+							image[i][j] = pixel4;
 								
-						} else if(Pixel2 > zaehlerK-1 && Pixel4 < zaehlerK){
-							image[i][j] = Pixel2;
+						} else if(pixel2 > zaehlerK-1 && pixel4 < zaehlerK){
+							image[i][j] = pixel2;
 								
 						} else {	
-							image[i][j] = Pixel4;
-							hashMapFuellen(Pixel2, Pixel4);
+							image[i][j] = pixel4;
+							hashMapFuellen(pixel2, pixel4);
 						}
 					} else { //8er
 						
-						Pixel1 = image[i-1][j+1];
-						Pixel2 = image[i-1][j];
-						Pixel3 = image[i-1][j-1];
-						Pixel4 = image[i][j-1];
+						pixel1 = image[i-1][j+1];
+						pixel2 = image[i-1][j];
+						pixel3 = image[i-1][j-1];
+						pixel4 = image[i][j-1];
 						
-						if(Pixel1 < zaehlerK && Pixel2 < zaehlerK && Pixel3 < zaehlerK && Pixel4 < zaehlerK){
-							image[i][j] = zaehler;
-							zaehler++;
-						} else if(Pixel1 < zaehlerK && Pixel2 < zaehlerK && Pixel3 < zaehlerK && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-								
-						} else if(Pixel1 < zaehlerK && Pixel2 < zaehlerK && Pixel3 > zaehlerK-1 && Pixel4 < zaehlerK){
-							image[i][j] = Pixel3;
-								
-						} else if(Pixel1 < zaehlerK && Pixel2 > zaehlerK-1 && Pixel3 < zaehlerK && Pixel4 < zaehlerK){
-							image[i][j] = Pixel2;
-								
-						} else if(Pixel1 > zaehlerK-1 && Pixel2 < zaehlerK && Pixel3 < zaehlerK && Pixel4 < zaehlerK){
-							image[i][j] = Pixel1;
-						//###########  1er		
-						} else if(Pixel1 > zaehlerK-1 && Pixel2 > zaehlerK-1 && Pixel3 < zaehlerK && Pixel4 < zaehlerK){
-							image[i][j] = Pixel2;
-								
-						} else if(Pixel1 > zaehlerK-1 && Pixel2 < zaehlerK && Pixel3 > zaehlerK-1 && Pixel4 < zaehlerK){
-							image[i][j] = Pixel3;
-							hashMapFuellen(Pixel1, Pixel3);
-								
-						} else if(Pixel1 > zaehlerK-1 && Pixel2 < zaehlerK && Pixel3 < zaehlerK && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-							hashMapFuellen(Pixel1, Pixel4);
-						//#######	 2er P1	
-						} else if(Pixel1 < zaehlerK && Pixel2 > zaehlerK-1 && Pixel3 > zaehlerK-1 && Pixel4 < zaehlerK){
-							image[i][j] = Pixel3;
-								
-						} else if(Pixel1 < zaehlerK && Pixel2 > zaehlerK-1 && Pixel3 < zaehlerK && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-							hashMapFuellen(Pixel2, Pixel4);
-						//######## 2er P2		
-						} else if(Pixel1 < zaehlerK && Pixel2 < zaehlerK && Pixel3 > zaehlerK-1 && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-						//######## 2er P3		
-						} else if(Pixel1 > zaehlerK-1 && Pixel2 > zaehlerK-1 && Pixel3 < zaehlerK && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-							hashMapFuellen(Pixel2, Pixel4);
-								
-						} else if(Pixel1 > zaehlerK-1 && Pixel2 < zaehlerK && Pixel3 > zaehlerK-1 && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-							hashMapFuellen(Pixel1,Pixel4);
-								
-						} else if(Pixel1 > zaehlerK-1 && Pixel2 > zaehlerK-1 && Pixel3 > zaehlerK-1 && Pixel4 < zaehlerK){
-							image[i][j] = Pixel3;
-								
-						} else if(Pixel1 < zaehlerK && Pixel2 > zaehlerK-1 && Pixel3 > zaehlerK-1 && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-						//####### 3er		
+						if(pixel1 < zaehlerK){
+							if(pixel2 < zaehlerK){
+								if(pixel3 < zaehlerK){
+									if(pixel4 < zaehlerK){
+										image[i][j] = zaehler;
+										zaehler++;
+									} else {
+										image[i][j] = pixel4;
+									}
+								} else {
+									if(pixel4 < zaehlerK){
+										image[i][j] = pixel3;
+									} else {
+										image[i][j] = pixel4;
+									}
+								}
+							} else {
+								if(pixel3 < zaehlerK){
+									if(pixel4 < zaehlerK){
+										image[i][j] = pixel2;
+									} else {
+										image[i][j] = pixel4;
+										hashMapFuellen(pixel2, pixel4);
+									}
+								} else {
+									if(pixel4 < zaehlerK){
+										image[i][j] = pixel3;
+									} else {
+										image[i][j] = pixel4;
+									}
+								}
+							}
 						} else {
-							image[i][j] = Pixel4;
-						//####### 4er
+							if(pixel2 < zaehlerK){
+								if(pixel3 < zaehlerK){
+									if(pixel4 < zaehlerK){
+										image[i][j] = pixel1;
+									} else {
+										image[i][j] = pixel4;
+										hashMapFuellen(pixel1, pixel4);
+									}
+								} else {
+									if(pixel4 < zaehlerK){
+										image[i][j] = pixel3;
+										hashMapFuellen(pixel1, pixel3);
+									} else {
+										image[i][j] = pixel4;
+										hashMapFuellen(pixel1,pixel4);
+									}
+								}
+							} else {
+								if(pixel3 < zaehlerK){
+									if(pixel4 < zaehlerK){
+										image[i][j] = pixel2;
+									} else {
+										image[i][j] = pixel4;
+										hashMapFuellen(pixel2, pixel4);
+									}
+								} else {
+									if(pixel4 < zaehlerK){
+										image[i][j] = pixel3;
+									} else {
+										image[i][j] = pixel4;
+									}
+								}
+							}
 						}
+						
+						
+//						if(pixel1 < zaehlerK && pixel2 < zaehlerK && pixel3 < zaehlerK && pixel4 < zaehlerK){
+//							image[i][j] = zaehler;
+//							zaehler++;
+//						} else if(pixel1 < zaehlerK && pixel2 < zaehlerK && pixel3 < zaehlerK && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//								
+//						} else if(pixel1 < zaehlerK && pixel2 < zaehlerK && pixel3 > zaehlerK-1 && pixel4 < zaehlerK){
+//							image[i][j] = pixel3;
+//								
+//						} else if(pixel1 < zaehlerK && pixel2 > zaehlerK-1 && pixel3 < zaehlerK && pixel4 < zaehlerK){
+//							image[i][j] = pixel2;
+//								
+//						} else if(pixel1 > zaehlerK-1 && pixel2 < zaehlerK && pixel3 < zaehlerK && pixel4 < zaehlerK){
+//							image[i][j] = pixel1;
+//						//###########  1er		
+//						} else if(pixel1 > zaehlerK-1 && pixel2 > zaehlerK-1 && pixel3 < zaehlerK && pixel4 < zaehlerK){
+//							image[i][j] = pixel2;
+//								
+//						} else if(pixel1 > zaehlerK-1 && pixel2 < zaehlerK && pixel3 > zaehlerK-1 && pixel4 < zaehlerK){
+//							image[i][j] = pixel3;
+//							hashMapFuellen(pixel1, pixel3);
+//								
+//						} else if(pixel1 > zaehlerK-1 && pixel2 < zaehlerK && pixel3 < zaehlerK && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//							hashMapFuellen(pixel1, pixel4);
+//						//#######	 2er P1	
+//						} else if(pixel1 < zaehlerK && pixel2 > zaehlerK-1 && pixel3 > zaehlerK-1 && pixel4 < zaehlerK){
+//							image[i][j] = pixel3;
+//								
+//						} else if(pixel1 < zaehlerK && pixel2 > zaehlerK-1 && pixel3 < zaehlerK && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//							hashMapFuellen(pixel2, pixel4);
+//						//######## 2er P2		
+//						} else if(pixel1 < zaehlerK && pixel2 < zaehlerK && pixel3 > zaehlerK-1 && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//						//######## 2er P3		
+//						} else if(pixel1 > zaehlerK-1 && pixel2 > zaehlerK-1 && pixel3 < zaehlerK && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//							hashMapFuellen(pixel2, pixel4);
+//								
+//						} else if(pixel1 > zaehlerK-1 && pixel2 < zaehlerK && pixel3 > zaehlerK-1 && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//							hashMapFuellen(pixel1,pixel4);
+//								
+//						} else if(pixel1 > zaehlerK-1 && pixel2 > zaehlerK-1 && pixel3 > zaehlerK-1 && pixel4 < zaehlerK){
+//							image[i][j] = pixel3;
+//								
+//						} else if(pixel1 < zaehlerK && pixel2 > zaehlerK-1 && pixel3 > zaehlerK-1 && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//						//####### 3er		
+//						} else {
+//							image[i][j] = pixel4;
+//						//####### 4er
+//						}
 					}
 					
 					break;
 
 					
 			//letzte Spalte rechts, nicht die Ecke oben
-			case 5:
-					Pixel2 = image[i-1][j];
-					Pixel3 = image[i-1][j-1];
-					Pixel4 = image[i][j-1];
+			case LAST_COLUMN:
+					pixel2 = image[i-1][j];
+					pixel3 = image[i-1][j-1];
+					pixel4 = image[i][j-1];
 				
-						if(Pixel2 < zaehlerK && Pixel3 < zaehlerK && Pixel4 < zaehlerK){
-							image[i][j] = zaehler;
-							zaehler++;
-							
-						} else if(Pixel2 < zaehlerK && Pixel3 < zaehlerK && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-							
-						} else if(Pixel2 < zaehlerK && Pixel3 > zaehlerK-1 && Pixel4 < zaehlerK){
-							image[i][j] = Pixel3;
-						
-						} else if(Pixel2 > zaehlerK-1 && Pixel3 < zaehlerK && Pixel4 < zaehlerK){
-							image[i][j] = Pixel2;
-						
-						} else if(Pixel2 < zaehlerK && Pixel3 > zaehlerK-1 && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-							//hashMapFuellen(i-1, j-1, i, j-1);
-						
-						} else if(Pixel2 > zaehlerK-1 && Pixel3 < zaehlerK && Pixel4 > zaehlerK-1){
-							image[i][j] = Pixel4;
-							hashMapFuellen(Pixel2, Pixel4);
-						
-						//Pixel1 und Pixel2 m�ssten immer im selben Cluster liegen
-						} else if(Pixel2 > zaehlerK-1 && Pixel3 > zaehlerK-1 && Pixel4 < zaehlerK){
-							image[i][j] = Pixel3;
-							//hashMapFuellen(i-1, j, i-1, j-1);
-						
-						} else {	
-							//wenn alle dei Pixel zu einem Cluster geh�ren, dann wird der linke Cluster f�r den aktuellen Pixel genommen
-							//es muss keine hashMap zuweisung stattfinden, da bereits alle drei Pixel um den aktuellen Pixel verkn�pft wurden
-							image[i][j] = Pixel4;
-							//hashMapFuellen(i-1, j, i-1, j-1, i, j-1);
-						}
+						if(pixel2 < zaehlerK){
+							if(pixel3 < zaehlerK){
+								if(pixel4 < zaehlerK){
+									image[i][j] = zaehler;
+									zaehler++;
+								} else {
+									image[i][j] = pixel4;
+								}
+							} else {
+								if(pixel4 < zaehlerK){
+									image[i][j] = pixel3;
+								} else {
+									image[i][j] = pixel4;
+								}
+							}	
+						} else {
+							if(pixel3 < zaehlerK){
+								if(pixel4 < zaehlerK){
+									image[i][j] = pixel2;
+								} else {
+									image[i][j] = pixel4;
+									hashMapFuellen(pixel2, pixel4);
+								}
+							} else {
+								if(pixel4 < zaehlerK){
+									image[i][j] = pixel3;
+								} else {
+									image[i][j] = pixel4;
+								}
+							}
+						}		
+					
+//					
+//						if(pixel2 < zaehlerK && pixel3 < zaehlerK && pixel4 < zaehlerK){
+//							image[i][j] = zaehler;
+//							zaehler++;
+//							
+//						} else if(pixel2 < zaehlerK && pixel3 < zaehlerK && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//							
+//						} else if(pixel2 < zaehlerK && pixel3 > zaehlerK-1 && pixel4 < zaehlerK){
+//							image[i][j] = pixel3;
+//						
+//						} else if(pixel2 > zaehlerK-1 && pixel3 < zaehlerK && pixel4 < zaehlerK){
+//							image[i][j] = pixel2;
+//						
+//						} else if(pixel2 < zaehlerK && pixel3 > zaehlerK-1 && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//						
+//						} else if(pixel2 > zaehlerK-1 && pixel3 < zaehlerK && pixel4 > zaehlerK-1){
+//							image[i][j] = pixel4;
+//							hashMapFuellen(pixel2, pixel4);
+//						
+//						} else if(pixel2 > zaehlerK-1 && pixel3 > zaehlerK-1 && pixel4 < zaehlerK){
+//							image[i][j] = pixel3;
+//						
+//						} else {	
+//							image[i][j] = pixel4;
+//							
+//						}
 					break;
-				
-			default: break;
-		
 		}
 		
 	}
 	
 	
 	private void hashMapFuellen(int Pixel1, int Pixel2){
-			
 		if(Pixel1 != Pixel2){
-			
 			if (!clusterVerweis.containsKey(Pixel2)){
 				clusterVerweis.put(Pixel2, new ArrayList<Integer>());
 				clusterVerweis.get(Pixel2).add(Pixel1);
-					
-			}else if(!clusterVerweis.get(Pixel2).contains(Pixel1)){
-				ArrayList<Integer> temp = clusterVerweis.get(Pixel2);
-				temp.add(Pixel1);
-				
+			} else if (!clusterVerweis.get(Pixel2).contains(Pixel1)) {
+				clusterVerweis.get(Pixel2).add(Pixel1);
 			}
 		}
 	}
@@ -349,37 +534,39 @@ public class pixel_segmentierung {
 			
 			if(!keysByValue.isEmpty()){
 			
-				//alle Cluster die zur "clusterID" geh�ren zum ersten Fund von "keysByValue" hinzuf�gen
+				//alle Cluster die zur "clusterID" gehoeren zum ersten Fund von "keysByValue" hinzufuegen
 				temp = clusterVerweis.get(clusterID);
-				ersterFund = clusterVerweis.get(keysByValue.get(0));
+				Integer firstClusterID = keysByValue.get(0);
+				ersterFund = clusterVerweis.get(firstClusterID);
 				
 				for(int i = 0; i < temp.size(); i++)
-					if(!ersterFund.contains(temp.get(i)) && keysByValue.get(0) != temp.get(i)){
+					if(!ersterFund.contains(temp.get(i)) && firstClusterID != temp.get(i)){
 						ersterFund.add(temp.get(i));
 						if(clusterVerweis_temp.containsKey(temp.get(i)))
 							clusterVerweis_temp.remove(temp.get(i));
 					}
 				
-				//alle weiteren Cluster aus "keysByValue" ebenfalls zum ersten Fund hinzuf�gen
+				//alle weiteren Cluster aus "keysByValue" ebenfalls zum ersten Fund hinzufuegen
 				if(keysByValue.size() > 1)
 					for(int i = 1; i < keysByValue.size(); i++){
 						
 						temp = clusterVerweis.get(keysByValue.get(i));
 
-						for(int j = 0; j < temp.size(); j++)
-							if(!ersterFund.contains(temp.get(j)) && keysByValue.get(0) != temp.get(j)){
-								ersterFund.add(temp.get(j));
-								if(clusterVerweis_temp.containsKey(temp.get(j)))
-									clusterVerweis_temp.remove(temp.get(j));
+						for(int tempJ : temp) {
+							if(!ersterFund.contains(tempJ) && firstClusterID != tempJ){
+								ersterFund.add(tempJ);
+								if(clusterVerweis_temp.containsKey(tempJ))
+									clusterVerweis_temp.remove(tempJ);
 							}
+						}
 						
-						if(!ersterFund.contains(keysByValue.get(i)) && keysByValue.get(0) != keysByValue.get(i)){
+						if(!ersterFund.contains(keysByValue.get(i)) && firstClusterID != keysByValue.get(i)){
 							ersterFund.add(keysByValue.get(i));
 							if(clusterVerweis_temp.containsKey(keysByValue.get(i)))
 								clusterVerweis_temp.remove(keysByValue.get(i));
 						}					
 					}
-				clusterVerweis_temp.put(keysByValue.get(0), ersterFund);
+				clusterVerweis_temp.put(firstClusterID, ersterFund);
 			} else 
 				clusterVerweis_temp.put(clusterID,clusterVerweis.get(clusterID));
 
@@ -398,46 +585,4 @@ public class pixel_segmentierung {
 
 		return list;
 	}
-	
-	
-	//###############	Print-Methoden	######################
-	
-	public void printImage()
-	{
-		printImage(this.image);
-	}
-	
-	public void printImage(int [][] image)
-	{
-		for(int i = 0; i < image.length; i++){ 
-			for(int j = 0; j < image[i].length; j++)
-				System.out.print(image[i][j] + "\t");
-			System.out.println("");
-		}
-	}
-
-	
-	public void printList(ArrayList<Integer> liste)
-	{
-		for(int i = zaehlerK; i < liste.size(); i++)
-			System.out.println("Cluster " + i + " enth�lt " + liste.get(i) + " Pixel");
-	}
-	
-	public void printHashMap(HashMap<Integer, ArrayList<Integer>> hashM){
-		
-		if(!hashM.isEmpty())
-			for( int clusterID : hashM.keySet() )
-				System.out.println("Zu Cluster " + clusterID + " geh�ren folgenden Cluster: " + hashM.get(clusterID));
-		else
-			System.out.println("Es m�ssen keine Cluster fusioniert werden!");
-	}
-	
-
-	public void printArray(int[] zaehlerArray2) {
-		
-		for( int arrayID = zaehlerK; arrayID < zaehlerArray2.length; arrayID++ )
-			System.out.println("Cluster " + arrayID + " enth�lt " + zaehlerArray2[arrayID] + " Pixel");
-	
-	}
-
 }
