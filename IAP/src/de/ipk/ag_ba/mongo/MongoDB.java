@@ -346,9 +346,13 @@ public class MongoDB {
 			substance.put("conditions", dbConditions);
 		} // substance
 
-		if (!status.wantsToStop()) {
-			substances.insert(dbSubstances);
-
+		for (DBObject dbo : dbSubstances){  
+		if (!status.wantsToStop()) {try{ 
+			substances.insert(dbo);
+		} catch(Exception e) {
+			System.out.println("Error: "+e.getMessage());
+		}
+		}
 			for (DBObject substance : dbSubstances)
 				substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 
