@@ -118,7 +118,7 @@ public class LemnaTecDataExchange {
 			ehi.setDatabase(database);
 			ehi.setExcelfileid("lemnatec:" + database + ":" + ehi.getExperimentname());
 			ehi.setImportusername("todo import user name");
-			ehi.setImportusergroup("LemnaTec Users");
+			ehi.setImportusergroup("Imported");
 			ehi.setExperimenttype("Phenotyping"); // todo welches system?
 			ehi.setRemark("LemnaTec-DB dataset");
 			ehi.setSequence("");
