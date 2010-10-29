@@ -19,11 +19,11 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk_gatersleben.ag_nw.graffiti.services.GUIhelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayOutputStream;
 
 /**
  * @author klukas

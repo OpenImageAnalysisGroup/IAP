@@ -26,6 +26,7 @@ import org.HomeFolder;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.DB;
@@ -40,7 +41,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ByteShortIntArray;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayOutputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
 
 /**

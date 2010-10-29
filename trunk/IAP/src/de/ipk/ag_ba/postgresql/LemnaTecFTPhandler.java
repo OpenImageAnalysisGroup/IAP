@@ -15,6 +15,7 @@ import java.net.URL;
 
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 
@@ -25,7 +26,6 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MyByteArrayOutputStream;
 
 /**
  * @author klukas
