@@ -240,13 +240,15 @@ public class MongoDB {
 
 		DBCollection substances = db.getCollection("substances");
 
+		DBCollection conditions = db.getCollection("conditions");
+
 		int errorCount = 0;
 		int count = 0;
 		StringBuilder errors = new StringBuilder();
 		int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
 				MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 		List<DBObject> dbSubstances = new ArrayList<DBObject>();
-		ArrayList<String> substanceIDs = new ArrayList<String>();
+		HashMap<DBObject, List<BasicDBObject>> substtance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		for (SubstanceInterface s : experiment) {
 			if (status.wantsToStop())
 				break;
@@ -343,39 +345,46 @@ public class MongoDB {
 				} // sample
 				condition.put("samples", dbSamples);
 			} // condition
-			substance.put("conditions", dbConditions);
+				// substance.put("conditions", dbConditions);
+			substtance2conditions.put(substance, dbConditions);
 		} // substance
 
-		for (DBObject dbo : dbSubstances) {
+		for (DBObject dbSubstance : dbSubstances) {
+			ArrayList<String> conditionIDs = new ArrayList<String>();
+			for (DBObject dbc : substtance2conditions.get(dbSubstance)) {
+				conditions.insert(dbc);
+			}
+			for (DBObject dbCondition : substtance2conditions.get(dbSubstance))
+				conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
+			dbSubstance.put("condition_ids", conditionIDs);
 			if (!status.wantsToStop()) {
-				try {
-					substances.insert(dbo);
-				} catch (Exception e) {
-					System.out.println("Error: " + e.getMessage());
-				}
-			}
-			for (DBObject substance : dbSubstances)
-				substanceIDs.add(((BasicDBObject) substance).getString("_id"));
-
-			experiment.getHeader().setSizekb(overallFileSize.getLong() / 1024 + "");
-
-			experiment.fillAttributeMap(attributes);
-			BasicDBObject dbExperiment = new BasicDBObject(attributes);
-			dbExperiment.put("substance_ids", substanceIDs);
-
-			DBCollection experiments = db.getCollection("experiments");
-
-			experiments.insert(dbExperiment);
-			String id = dbExperiment.get("_id").toString();
-			for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
-				eh.setExcelfileid(id);
-			}
-
-			if (errorCount > 0) {
-				MainFrame.showMessageDialog("<html>" + "The following files cound not be properly processed:<ul>"
-						+ errors.toString() + "</ul> " + "", "Errors");
+				substances.insert(dbSubstance);
 			}
 		}
+		ArrayList<String> substanceIDs = new ArrayList<String>();
+		for (DBObject substance : dbSubstances)
+			substanceIDs.add(((BasicDBObject) substance).getString("_id"));
+
+		experiment.getHeader().setSizekb(overallFileSize.getLong() / 1024 + "");
+
+		experiment.fillAttributeMap(attributes);
+		BasicDBObject dbExperiment = new BasicDBObject(attributes);
+		dbExperiment.put("substance_ids", substanceIDs);
+
+		DBCollection experiments = db.getCollection("experiments");
+
+		experiments.insert(dbExperiment);
+		String id = dbExperiment.get("_id").toString();
+		for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
+			eh.setExcelfileid(id);
+		}
+
+		if (errorCount > 0) {
+			MainFrame.showMessageDialog(
+					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
+							+ "", "Errors");
+		}
+
 	}
 
 	private HashMap<String, Object> filter(HashMap<String, Object> attributes) {
@@ -697,64 +706,7 @@ public class MongoDB {
 							DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
 							DBObject substance = subr.fetch();
 							if (substance != null) {
-								Substance3D s3d = new Substance3D(substance.toMap());
-								experiment.add(s3d);
-								BasicDBList condList = (BasicDBList) substance.get("conditions");
-								if (condList != null)
-									for (Object co : condList) {
-										DBObject cond = (DBObject) co;
-										Condition3D condition = new Condition3D(s3d, cond.toMap());
-										s3d.add(condition);
-										BasicDBList sampList = (BasicDBList) cond.get("samples");
-										if (sampList != null)
-											for (Object so : sampList) {
-												DBObject sam = (DBObject) so;
-												Sample3D sample = new Sample3D(condition, sam.toMap());
-												condition.add(sample);
-												// average
-												BasicDBObject avg = (BasicDBObject) sam.get("average");
-												if (avg != null) {
-													SampleAverage average = new SampleAverage(sample, avg.toMap());
-													sample.setSampleAverage(average);
-												}
-												// measurements
-												BasicDBList measList = (BasicDBList) sam.get("measurements");
-												if (measList != null) {
-													for (Object m : measList) {
-														DBObject meas = (DBObject) m;
-														NumericMeasurement3D nm = new NumericMeasurement3D(sample, meas.toMap());
-														sample.add(nm);
-													}
-												}
-												// images
-												BasicDBList imgList = (BasicDBList) sam.get("images");
-												if (imgList != null) {
-													for (Object m : imgList) {
-														DBObject img = (DBObject) m;
-														@SuppressWarnings("unchecked")
-														Map<Object, Object> map = img.toMap();
-														String fn = (String) map.get("filename");
-														String md5 = (String) map.get("md5sum");
-														if (md5 != null && fn != null) {
-															map.put("filename", "mongo://" + md5 + "/" + fn);
-														}
-
-														ImageData image = new ImageData(sample, map);
-														sample.add(image);
-													}
-												}
-												// volumes
-												BasicDBList volList = (BasicDBList) sam.get("volumes");
-												if (volList != null) {
-													for (Object v : volList) {
-														DBObject vol = (DBObject) v;
-														VolumeData volume = new VolumeData(sample, vol.toMap());
-														volume.getURL().setPrefix(MongoDBhandler.PREFIX);
-														sample.add(volume);
-													}
-												}
-											}
-									}
+								processSubstance(db, experiment, substance);
 							}
 						}
 					}
@@ -902,8 +854,7 @@ public class MongoDB {
 						BatchCmd batch = (BatchCmd) dbo;
 						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED
 								|| ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
-										.currentTimeMillis()
-										- batch.getLastUpdateTime() > maxUpdate))
+										.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
 							res.add(batch);
 					}
 				}
@@ -975,5 +926,79 @@ public class MongoDB {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+	}
+
+	private void processSubstance(DB db, ExperimentInterface experiment, DBObject substance) {
+		Substance3D s3d = new Substance3D(substance.toMap());
+		experiment.add(s3d);
+		BasicDBList condList = (BasicDBList) substance.get("conditions");
+		if (condList != null)
+			for (Object co : condList) {
+				DBObject cond = (DBObject) co;
+				processCondition(s3d, cond);
+			}
+		BasicDBList l = (BasicDBList) substance.get("condition_ids");
+		if (l != null)
+			for (Object o : l) {
+				DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
+				DBObject cond = condr.fetch();
+				if (cond != null) {
+					processCondition(s3d, cond);
+				}
+			}
+	}
+
+	private void processCondition(Substance3D s3d, DBObject cond) {
+		Condition3D condition = new Condition3D(s3d, cond.toMap());
+		s3d.add(condition);
+		BasicDBList sampList = (BasicDBList) cond.get("samples");
+		if (sampList != null)
+			for (Object so : sampList) {
+				DBObject sam = (DBObject) so;
+				Sample3D sample = new Sample3D(condition, sam.toMap());
+				condition.add(sample);
+				// average
+				BasicDBObject avg = (BasicDBObject) sam.get("average");
+				if (avg != null) {
+					SampleAverage average = new SampleAverage(sample, avg.toMap());
+					sample.setSampleAverage(average);
+				}
+				// measurements
+				BasicDBList measList = (BasicDBList) sam.get("measurements");
+				if (measList != null) {
+					for (Object m : measList) {
+						DBObject meas = (DBObject) m;
+						NumericMeasurement3D nm = new NumericMeasurement3D(sample, meas.toMap());
+						sample.add(nm);
+					}
+				}
+				// images
+				BasicDBList imgList = (BasicDBList) sam.get("images");
+				if (imgList != null) {
+					for (Object m : imgList) {
+						DBObject img = (DBObject) m;
+						@SuppressWarnings("unchecked")
+						Map<Object, Object> map = img.toMap();
+						String fn = (String) map.get("filename");
+						String md5 = (String) map.get("md5sum");
+						if (md5 != null && fn != null) {
+							map.put("filename", "mongo://" + md5 + "/" + fn);
+						}
+
+						ImageData image = new ImageData(sample, map);
+						sample.add(image);
+					}
+				}
+				// volumes
+				BasicDBList volList = (BasicDBList) sam.get("volumes");
+				if (volList != null) {
+					for (Object v : volList) {
+						DBObject vol = (DBObject) v;
+						VolumeData volume = new VolumeData(sample, vol.toMap());
+						volume.getURL().setPrefix(MongoDBhandler.PREFIX);
+						sample.add(volume);
+					}
+				}
+			}
 	}
 }
