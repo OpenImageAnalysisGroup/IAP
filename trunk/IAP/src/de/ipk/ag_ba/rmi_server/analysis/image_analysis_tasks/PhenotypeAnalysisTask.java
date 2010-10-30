@@ -18,6 +18,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
+import de.ipk.ag_ba.postgresql.PixelSegmentation;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
@@ -71,7 +72,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 	@Override
 	public ImageAnalysisType[] getOutputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE };
+		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE, ImageAnalysisType.MEASUREMENT };
 	}
 
 	@Override
@@ -202,7 +203,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			}
 		}
 
-		Geometry g = removeSingleDotsAndDetectGeometry(w, h, rgbArray, iBackgroundFill, limg);
+		remoteSmallPartsOfImage(w, h, rgbArray, iBackgroundFill, limg, (int) (w * h * 0.005d));
+
+		Geometry g = detectGeometry(w, h, rgbArray, iBackgroundFill, limg);
 
 		NumericMeasurement m;
 		{
@@ -315,6 +318,32 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		}
 	}
 
+	private void remoteSmallPartsOfImage(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg, int cutOff) {
+		int[][] image = new int[w][h];
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				int off = x + y * w;
+				int color = rgbArray[off];
+				if (color != iBackgroundFill)
+					image[x][y] = 1;
+				else
+					image[x][y] = 0;
+			}
+		}
+		PixelSegmentation ps = new PixelSegmentation(image);
+		ps.doPixelSegmentation();
+		int[] clusterSize = ps.getClusterCounts();
+		int[][] result = ps.getImageMask();
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				int clusterID = result[x][y];
+				int size = clusterSize[clusterID];
+				if (size < cutOff)
+					rgbArray[x + y * w] = iBackgroundFill;
+			}
+		}
+	}
+
 	private Runnable processData(final ImageData imageData, final int w, final int[] rgbArray, final int[] rgbArrayNULL,
 			final int iBackgroundFill, final double sidepercent, final ObjectRef progress, final int y) {
 		return new Runnable() {
@@ -413,8 +442,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		};
 	}
 
-	private Geometry removeSingleDotsAndDetectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill,
-			LoadedImage limg) {
+	private Geometry detectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg) {
 
 		int left = w;
 		int right = 0;
