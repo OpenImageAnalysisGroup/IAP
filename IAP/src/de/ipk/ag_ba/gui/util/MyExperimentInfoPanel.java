@@ -49,7 +49,7 @@ public class MyExperimentInfoPanel extends JPanel {
 
 	JTextField editName;
 	JTextField coordinator;
-	JComboBox groupVisibility;
+	JTextField groupVisibility;
 	JComboBox experimentTypeSelection;
 	JDateChooser expStart;
 	JDateChooser expEnd;
@@ -212,7 +212,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		return res;
 	}
 
-	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JComboBox groupVisibility,
+	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
 			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField remark,
 			JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
 
@@ -302,9 +302,11 @@ public class MyExperimentInfoPanel extends JPanel {
 
 		setOpaque(false);
 
-		final boolean editPossible = experimentHeader.getExcelfileid() != null
-				&& experimentHeader.getExcelfileid().length() > 0 && experimentHeader.getImportusername() != null
-				&& experimentHeader.getImportusername().equals(login);
+		final boolean editPossible = true;
+		// experimentHeader.getExcelfileid() != null
+		// && experimentHeader.getExcelfileid().length() > 0 &&
+		// experimentHeader.getImportusername() != null
+		// && experimentHeader.getImportusername().equals(login);
 
 		if (!editPossible)
 			startEnabled = true;
@@ -315,7 +317,9 @@ public class MyExperimentInfoPanel extends JPanel {
 
 		editName = new JTextField(experimentHeader.getExperimentname());
 		coordinator = new JTextField(experimentHeader.getCoordinator());
-		groupVisibility = getGroups(login, pass, experimentHeader.getImportusergroup(), editPossible);
+		groupVisibility = new JTextField(experimentHeader.getImportusergroup());
+		// getGroups(login, pass, experimentHeader.getImportusergroup(),
+		// editPossible);
 		experimentTypeSelection = getExperimentTypes(login, pass, experimentHeader.getExperimentType(), editPossible);
 		expStart = new JDateChooser(experimentHeader.getStartdate());
 		expEnd = new JDateChooser(experimentHeader.getImportdate());
@@ -342,7 +346,8 @@ public class MyExperimentInfoPanel extends JPanel {
 		final JButton editB = new JMButton("Edit");
 		final JButton saveB = new JMButton("Save Changes");
 		if (!editPossible)
-			saveB.setText("Create Calendar Entry");
+			saveB.setEnabled(false);
+		// setText("Create Calendar Entry");
 
 		editB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -360,7 +365,8 @@ public class MyExperimentInfoPanel extends JPanel {
 				if (restore) {
 					saveB.setText("Save Changes");
 					editName.setText(experimentHeader.getExperimentname());
-					groupVisibility.setSelectedItem(experimentHeader.getImportusergroup());
+					groupVisibility.setText(experimentHeader.getImportusergroup());
+					// groupVisibility.setSelectedItem(experimentHeader.getImportusergroup());
 					if (experimentHeader.getExperimentType() != null)
 						experimentTypeSelection.setSelectedItem(experimentHeader.getExperimentType());
 					else
@@ -377,7 +383,9 @@ public class MyExperimentInfoPanel extends JPanel {
 				boolean editPossibleBBB = editPossible;
 				try {
 					experimentHeader.setExperimentname(editName.getText());
-					experimentHeader.setImportusergroup((String) groupVisibility.getSelectedItem());
+					// experimentHeader.setImportusergroup((String)
+					// groupVisibility.getSelectedItem());
+					experimentHeader.setImportusergroup(groupVisibility.getText());
 					experimentHeader.setExperimenttype((String) experimentTypeSelection.getSelectedItem());
 					experimentHeader.setStartdate(expStart.getDate());
 					experimentHeader.setImportdate(expEnd.getDate());
@@ -387,16 +395,21 @@ public class MyExperimentInfoPanel extends JPanel {
 						if (saveAction != null)
 							saveAction.run(experimentHeader);
 					} else {
-						if (editPossibleBBB)
-							new MongoDB().setExperimentInfo(experimentHeader);
-						else {
+						if (editPossibleBBB) {
+							if (experimentHeader.getExcelfileid().startsWith("lemnatec:")) {
+								saveB.setText("Updated (in memory)");
+							} else {
+								new MongoDB().setExperimentInfo(experimentHeader);
+								saveB.setText("Updated in Cloud DB");
+							}
+						} else {
 							Experiment exp = new Experiment();
 							exp.setHeader(experimentHeader);
 							new MongoDB().storeExperiment("dbe3", null, login, pass, exp, null);
+							saveB.setText("Experiment Saved in Cloud DB");
 							editPossibleBBB = false;
 						}
 					}
-					saveB.setText("Saved");
 					saveB.setEnabled(false);
 					editB.setText("Edit");
 				} catch (Exception err) {
