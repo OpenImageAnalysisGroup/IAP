@@ -22,13 +22,17 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 public interface NavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception;
 
+	/**
+	 * @param currentSet
+	 * @return List of resulting navigation buttons, shown after performing the
+	 *         action. Add "NULL" as the last entry in the collection, to perform
+	 *         a "reload", the same way as a bookmark action works.
+	 */
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet);
 
 	public ArrayList<NavigationButton> getResultNewActionSet();
 
 	public MainPanelComponent getResultMainPanel();
-
-	public void setOneTimeFinishAction(Runnable runnable);
 
 	public void addAdditionalEntity(NavigationButton ne);
 

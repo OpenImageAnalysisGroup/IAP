@@ -20,7 +20,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
@@ -128,6 +128,8 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		else {
 			ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 			for (NavigationButton n : set) {
+				if (n == null)
+					continue;
 				if (!(n.getAction() instanceof BookmarkAction))
 					res.add(n);
 			}
@@ -150,6 +152,8 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			ObjectRef next = new ObjectRef();
 			boolean firstStar = true;
 			for (NavigationButton ne : set) {
+				if (ne == null)
+					continue;
 				if (ne instanceof StyleAware) {
 					((StyleAware) ne).setButtonStyle(buttonStyle);
 				}
@@ -177,16 +181,14 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						lbl.setForeground(Color.GRAY);
 						add(lbl);
 					}
-					add(NavigationButton.getNavigationButton(buttonStyle, ne, target, this, getTheOther(),
-							graphPanel));
+					add(NavigationButton.getNavigationButton(buttonStyle, ne, target, this, getTheOther(), graphPanel));
 					first = false;
 				} else {
 					if (actionPanelRight != null && ne.isRightAligned())
 						right.add(NavigationButton.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
 								graphPanel));
 					else
-						add(NavigationButton.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
-								graphPanel));
+						add(NavigationButton.getNavigationButton(buttonStyle, ne, target, getTheOther(), this, graphPanel));
 				}
 			}
 			if (!firstStar) {
@@ -227,8 +229,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 	}
 
-	private MouseListener getAddBookmarkActionListener(final JLabel lbl, final ObjectRef right,
-			final NavigationButton ne) {
+	private MouseListener getAddBookmarkActionListener(final JLabel lbl, final ObjectRef right, final NavigationButton ne) {
 		MouseListener res = new MouseListener() {
 
 			@Override
@@ -268,7 +269,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			@Override
 			public void mouseExited(MouseEvent e) {
 				if (right.getObject() != null)
-					((JLabel) right.getObject()).setText("<html><font size='5'>" + Unicode.STAR);
+					((JLabel) right.getObject()).setText("<html><small>" + Unicode.ARROW_RIGHT);
 				if (lbl != null)
 					lbl.setText("<html><small>" + Unicode.ARROW_RIGHT);
 			}
@@ -298,6 +299,18 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			path.add(ne.getTitle());
 			if (ne == finalTarget)
 				break;
+		}
+		return StringManipulationTools.getStringList(path, ".");
+	}
+
+	public static String getTargetPath(Collection<NavigationButton> buttons) {
+		ArrayList<String> path = new ArrayList<String>();
+		for (NavigationButton ne : buttons) {
+			if (ne == null)
+				break;
+			if (ne.isProcessing())
+				return null;
+			path.add(ne.getTitle());
 		}
 		return StringManipulationTools.getStringList(path, ".");
 	}

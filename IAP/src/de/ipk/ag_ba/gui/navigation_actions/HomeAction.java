@@ -34,7 +34,7 @@ public final class HomeAction extends AbstractNavigationAction {
 		// homePrimaryActions.add(new NavigationGraphicalEntity(new Phenotyping(),
 		// "Phenotyping", "img/000Grad_3.png"));
 		homePrimaryActions = new ArrayList<NavigationButton>();
-		for (NavigationButton ne : new Phenotyping().getResultNewActionSet()) {
+		for (NavigationButton ne : new Phenotyping(guIsetting).getResultNewActionSet()) {
 			homePrimaryActions.add(ne);
 		}
 

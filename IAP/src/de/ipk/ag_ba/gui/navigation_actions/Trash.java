@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
@@ -23,7 +24,7 @@ public class Trash extends AbstractNavigationAction {
 	private String pass;
 	private String login;
 	private String experimentName;
-	private ExperimentHeaderInterface header;
+	private Collection<ExperimentHeaderInterface> header;
 	private String message = "";
 	private DeletionCommand cmd;
 
@@ -36,86 +37,76 @@ public class Trash extends AbstractNavigationAction {
 
 	public Trash(ExperimentHeaderInterface header, DeletionCommand cmd) {
 		super("Perform '" + cmd + "'-operation");
-		this.header = header;
+		this.setHeader(header);
+		this.cmd = cmd;
+	}
+
+	public Trash(Collection<ExperimentHeaderInterface> header, DeletionCommand cmd) {
+		super("Perform '" + cmd + "'-operation");
+		this.setHeader(header);
 		this.cmd = cmd;
 	}
 
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
+		message = "<html><ul>";
 		try {
-			ExperimentInfo ei = null;
-			if (header == null)
-				;
-			// ei = CallDBE2WebService.getExperimentInfos(login, pass,
-			// experimentName)[0];
-			else
-				ei = new ExperimentInfo(header);
-			if (cmd == DeletionCommand.DELETE) {
-				if (header != null) {
-					message = "<html><b>" + "Not Yet Implemented: Experiment " + experimentName + " has not been deleted.";
-				} else {
-					Object[] res = MyInputHelper.getInput("<html>"
-							+ "You are about to delete a dataset from the database.<br>"
-							+ "This action can not be undone.<br>"
-							+ "Connected binary files are not immediately removed, but only<br>"
-							+ "during the process of database maintanance procedures.", "Confirm final deletion operation",
-							new Object[] { "Remove experiment " + ei.experimentName + " from database?", false });
-					if (res != null && (Boolean) res[0]) {
-						// CallDBE2WebService.setDeleteExperiment(login, pass,
-						// experimentName);
-						// message = "<html><b>" + "Experiment " + experimentName +
-						// " has been removed from the database.";
-						message = "<html><b>" + "Internal Error";
-					} else {
-						message = "<html><b>" + "Experiment " + experimentName + " has not been deleted.";
+			if (getHeader() != null)
+				for (ExperimentHeaderInterface hhh : getHeader()) {
+					ExperimentInfo ei = null;
+					if (hhh == null)
+						return;
+					else
+						ei = new ExperimentInfo(hhh);
+					message += "<li>Process Experiment " + experimentName + ": ";
+					if (cmd == DeletionCommand.DELETE || cmd == DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST) {
+						if (getHeader() != null) {
+							new MongoDB().deleteExperiment(hhh.getExcelfileid());
+							message = "<html><b>" + "Experiment " + experimentName + " has been deleted.";
+						} else {
+							Object[] res = MyInputHelper.getInput("<html>"
+									+ "You are about to delete a dataset from the database.<br>"
+									+ "This action can not be undone.<br>"
+									+ "Connected binary files are not immediately removed, but only<br>"
+									+ "during the process of database maintanance procedures.",
+									"Confirm final deletion operation", new Object[] {
+											"Remove experiment " + ei.experimentName + " from database?", false });
+							if (res != null && (Boolean) res[0]) {
+								// CallDBE2WebService.setDeleteExperiment(login, pass,
+								// experimentName);
+								// message = "<html><b>" + "Experiment " +
+								// experimentName +
+								// " has been removed from the database.";
+								message = "Internal Error";
+							} else {
+								message = " has NOT been deleted.";
+							}
+						}
+					}
+					if (cmd == DeletionCommand.TRASH) {
+						try {
+							new MongoDB().setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+							experimentName = hhh.getExperimentname();
+							message += "has been marked as trashed!";
+						} catch (Exception e) {
+							message += "Error: " + e.getMessage();
+						}
+					}
+					if (cmd == DeletionCommand.UNTRASH) {
+						try {
+							String type = hhh.getExperimentType();
+							if (type.contains("Trash;"))
+								type = StringManipulationTools.stringReplace(type, "Trash;", "");
+							if (type.contains("Trash"))
+								type = StringManipulationTools.stringReplace(type, "Trash", "");
+							new MongoDB().setExperimentType(hhh, type);
+							experimentName = hhh.getExperimentname();
+							message += "Experiment " + experimentName + " has been put out of trash!";
+						} catch (Exception e) {
+							message += "Error: " + e.getMessage();
+						}
 					}
 				}
-			}
-			if (cmd == DeletionCommand.TRASH) {
-				try {
-					if (header != null) {
-						new MongoDB().setExperimentType(header, "Trash" + ";" + header.getExperimentType());
-						experimentName = header.getExperimentname();
-					} else {
-						// ExperimentInfo ni = new ExperimentInfo(ei.experimentName,
-						// ei.experimentID, ei.importUser,
-						// ei.importUser, "Trash", ei.dateExperimentStart,
-						// ei.dateExperimentImport, ei.remark,
-						// ei.coordinator, ei.excelFileMd5, ei.fileCount,
-						// ei.byteSize);
-						// CallDBE2WebService.setChangeExperimentMetaData(login, pass,
-						// experimentName, ni);
-					}
-					message = "<html><b>" + "Experiment " + experimentName + " has been marked as trashed!";
-				} catch (Exception e) {
-					message = "Error: " + e.getMessage();
-				}
-			}
-			if (cmd == DeletionCommand.UNTRASH) {
-				try {
-					if (header != null) {
-						String type = header.getExperimentType();
-						if (type.contains("Trash;"))
-							type = StringManipulationTools.stringReplace(type, "Trash;", "");
-						if (type.contains("Trash"))
-							type = StringManipulationTools.stringReplace(type, "Trash", "");
-						new MongoDB().setExperimentType(header, type);
-						experimentName = header.getExperimentname();
-					} else {
-						// ExperimentInfo ni = new ExperimentInfo(ei.experimentName,
-						// ei.experimentID, ei.importUser,
-						// ei.importUser, "Restored", ei.dateExperimentStart,
-						// ei.dateExperimentImport, ei.remark,
-						// ei.coordinator, ei.excelFileMd5, ei.fileCount,
-						// ei.byteSize);
-						// CallDBE2WebService.setChangeExperimentMetaData(login, pass,
-						// experimentName, ni);
-					}
-					message = "<html><b>" + "Experiment " + experimentName + " has been put out of trash!";
-				} catch (Exception e) {
-					message = "Error: " + e.getMessage();
-				}
-			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			message = "Error: " + e.getMessage();
@@ -125,14 +116,15 @@ public class Trash extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-		while (res.size() > 2)
+		if (res.size() > 1)
 			res.remove(res.size() - 1);
+		res.add(null);
 		return res;
 	}
 
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return new Phenotyping().getResultNewActionSet();
+		return null;
 	}
 
 	@Override
@@ -140,11 +132,10 @@ public class Trash extends AbstractNavigationAction {
 		return new MainPanelComponent(message);
 	}
 
-	public static NavigationButton getTrashEntity(final String login, final String pass,
-			final String experimentName, GUIsetting guiSetting) {
+	public static NavigationButton getTrashEntity(final String login, final String pass, final String experimentName,
+			GUIsetting guiSetting) {
 		NavigationAction trashAction = new Trash(pass, login, experimentName);
-		NavigationButton trash = new NavigationButton(trashAction, "Delete", "img/ext/edit-delete.png",
-				guiSetting);
+		NavigationButton trash = new NavigationButton(trashAction, "Delete", "img/ext/edit-delete.png", guiSetting);
 		trash.setRightAligned(true);
 		return trash;
 	}
@@ -152,9 +143,30 @@ public class Trash extends AbstractNavigationAction {
 	public static NavigationButton getTrashEntity(ExperimentHeaderInterface header, DeletionCommand cmd,
 			GUIsetting guiSetting) {
 		NavigationAction trashAction = new Trash(header, cmd);
-		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(),
-				guiSetting);
+		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guiSetting);
 		trash.setRightAligned(cmd != DeletionCommand.UNTRASH);
 		return trash;
+	}
+
+	public static NavigationButton getTrashEntity(ArrayList<ExperimentHeaderInterface> trashed, DeletionCommand cmd,
+			GUIsetting guIsetting) {
+		NavigationAction trashAction = new Trash(trashed, cmd);
+		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guIsetting);
+		trash.setRightAligned(true);
+		return trash;
+	}
+
+	private void setHeader(Collection<ExperimentHeaderInterface> header) {
+		this.header = header;
+	}
+
+	private void setHeader(ExperimentHeaderInterface header) {
+		Collection<ExperimentHeaderInterface> h = new ArrayList<ExperimentHeaderInterface>();
+		h.add(header);
+		this.header = h;
+	}
+
+	private Collection<ExperimentHeaderInterface> getHeader() {
+		return header;
 	}
 }

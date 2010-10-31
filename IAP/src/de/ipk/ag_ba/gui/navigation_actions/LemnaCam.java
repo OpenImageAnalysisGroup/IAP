@@ -20,10 +20,6 @@ public final class LemnaCam extends AbstractNavigationAction {
 	}
 
 	@Override
-	public void setOneTimeFinishAction(Runnable runnable) {
-	}
-
-	@Override
 	public void performActionCalculateResults(NavigationButton src) {
 	}
 
@@ -59,8 +55,7 @@ public final class LemnaCam extends AbstractNavigationAction {
 	 */
 	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
 		NavigationAction navigationAction = new LemnaCam();
-		NavigationButton res = new NavigationButton(navigationAction, "LemnaCam 1",
-				"img/ext/camera.png", guiSetting);
+		NavigationButton res = new NavigationButton(navigationAction, "LemnaCam 1", "img/ext/camera.png", guiSetting);
 		return res;
 	}
 }

@@ -96,14 +96,13 @@ public class AIPgui {
 			public void run() {
 				overView.setTitle("Overview");
 				overView.setProcessing(false);
-				HashMap<String, NavigationButton> knownEntities = new HashMap<String, NavigationButton>();
 				try {
 					JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());
 					Object o = win.eval("s = window.location.hash;");
 					String h = o + "";
 					h = URLDecoder.decode(h, "UTF-8");
 					System.out.println("HASH: " + h);
-					navigateTo(h, navigationPanel, actionPanel, graphPanel, knownEntities);
+					navigateTo(h, navigationPanel, actionPanel, graphPanel);
 				} catch (Exception e) {
 					System.out.println("JavaScript and Browser window not accessible.");
 
@@ -140,17 +139,31 @@ public class AIPgui {
 				+ "in order to be able to quickly navigate again to the same information in the future.";
 	}
 
-	public static void navigateTo(String target, NavigationButton src) {
-		HashMap<String, NavigationButton> knownEntities = new HashMap<String, NavigationButton>();
-		MyNavigationPanel navigationPanel = src.getGUIsetting().getNavigationPanel();
-		MyNavigationPanel actionPanel = src.getGUIsetting().getActionPanel();
-		JComponent graphPanel = src.getGUIsetting().getGraphPanel();
-		navigateTo(target, navigationPanel, actionPanel, graphPanel, knownEntities);
+	public static void navigateTo(final String target, NavigationButton src) {
+		System.out.println("NAVIGATE: " + target);
+		if (src == null)
+			System.out.println("ERRR");
+		if (src.getGUIsetting() == null)
+			System.out.println("ERRRRRR");
+		if (src.getGUIsetting().getNavigationPanel() == null)
+			System.out.println("ERRRRRRRRRRR");
+		NavigationButton button = src.getGUIsetting().getNavigationPanel().getEntitySet(false).iterator().next();
+
+		final MyNavigationPanel navigationPanel = src.getGUIsetting().getNavigationPanel();
+		final MyNavigationPanel actionPanel = src.getGUIsetting().getActionPanel();
+		final JComponent graphPanel = src.getGUIsetting().getGraphPanel();
+
+		Runnable rrr = new Runnable() {
+			@Override
+			public void run() {
+				navigateTo(target, navigationPanel, actionPanel, graphPanel);
+			}
+		};
+		button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
 	}
 
-	public static void navigateTo(String target, final MyNavigationPanel navigationPanel,
-			final MyNavigationPanel actionPanel, final JComponent graphPanel,
-			final HashMap<String, NavigationButton> knownEntities) {
+	private static void navigateTo(String target, final MyNavigationPanel navigationPanel,
+			final MyNavigationPanel actionPanel, final JComponent graphPanel) {
 
 		if (target == null || target.length() == 0)
 			return;
@@ -164,24 +177,27 @@ public class AIPgui {
 		if (target.startsWith("."))
 			target = target.substring(".".length());
 
+		HashMap<String, NavigationButton> knownEntities = new HashMap<String, NavigationButton>();
+
 		for (NavigationButton ne : actionPanel.getEntitySet(target.length() > 0)) {
 			knownEntities.put(ne.getTitle(), ne);
 		}
 		String thisTarget = target.split("\\.", 2)[0];
 		final String nextTarget = target.length() - thisTarget.length() > 1 ? target.substring(thisTarget.length()
 				+ ".".length()) : "";
-		NavigationButton action = knownEntities.get(thisTarget);
-		if (action != null) {
+		NavigationButton button = knownEntities.get(thisTarget);
+		if (button != null) {
 			Runnable rrr = new Runnable() {
 				@Override
 				public void run() {
 					if (nextTarget.length() > 0) {
-						navigateTo(nextTarget, navigationPanel, actionPanel, graphPanel, knownEntities);
+						navigateTo(nextTarget, navigationPanel, actionPanel, graphPanel);
 					}
 				}
 			};
-			action.getAction().setOneTimeFinishAction(rrr);
-			action.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
+			button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
+		} else {
+			System.out.println("Could not find target action " + thisTarget);
 		}
 	}
 }
