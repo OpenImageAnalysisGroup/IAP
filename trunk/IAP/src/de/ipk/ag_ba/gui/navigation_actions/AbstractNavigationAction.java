@@ -44,10 +44,6 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 		return null;
 	}
 
-	public void setOneTimeFinishAction(Runnable runnable) {
-		//
-	}
-
 	@Override
 	public void addAdditionalEntity(NavigationButton ne) {
 		additionalEntities.add(ne);

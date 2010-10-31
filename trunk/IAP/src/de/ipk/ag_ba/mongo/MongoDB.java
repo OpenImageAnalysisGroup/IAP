@@ -21,11 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
 import org.AttributeHelper;
@@ -49,6 +45,7 @@ import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.Mongo;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteResult;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
@@ -135,7 +132,7 @@ public class MongoDB {
 	}
 
 	private String defaultDBE = "dbe3";
-	private String defaultHost = "ba-13";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
+	private String defaultHost = "localhost";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
 	// "ba-13.ipk-gatersleben.de:27017,nw-08.ipk-gatersleben.de:27018";
 	private String defaultLogin = null;
 	private String defaultPass = null;
@@ -147,6 +144,7 @@ public class MongoDB {
 	// annotations
 	// experiments
 	// substances
+	// conditions
 
 	static boolean init = false;
 
@@ -161,16 +159,8 @@ public class MongoDB {
 			name = new ObjectName("de.ipk_gatersleben.ag_ba.mongo:type=Hello");
 			Hello mbean = new Hello();
 			mbs.registerMBean(mbean, name);
-		} catch (MalformedObjectNameException e) {
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		} catch (InstanceAlreadyExistsException e) {
-			e.printStackTrace();
-		} catch (MBeanRegistrationException e) {
-			e.printStackTrace();
-		} catch (NotCompliantMBeanException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
 		}
 	}
 
@@ -226,6 +216,40 @@ public class MongoDB {
 
 	public void processDB(RunnableOnDB runnableOnDB) throws Exception {
 		processDB(getDefaultDBE(), defaultHost, defaultLogin, defaultPass, runnableOnDB);
+	}
+
+	public void deleteUnusedBinaryFiles() {
+		// collections:
+		// preview_files
+		// volumes
+		// images
+		// annotations
+		// experiments
+		// substances
+		// conditions
+	}
+
+	public void deleteExperiment(final String experimentID) throws Exception {
+		processDB(new RunnableOnDB() {
+			private DB db;
+
+			@Override
+			public void run() {
+				DBObject obj = new BasicDBObject("_id", new ObjectId(experimentID));
+				if (db.collectionExists("experiments")) {
+					DBObject o = db.getCollection("experiments").findOne(obj);
+					if (o != null) {
+						WriteResult wr = db.getCollection("experiments").remove(o);
+						System.out.println(wr.toString());
+					}
+				}
+			}
+
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
 	}
 
 	private void storeExperiment(ExperimentInterface experiment, DB db,

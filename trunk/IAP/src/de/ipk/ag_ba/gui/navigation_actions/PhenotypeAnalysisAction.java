@@ -95,12 +95,10 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
 								if (md instanceof ImageData) {
 									ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
-									if (((ImageData) md).getSubstanceName().equalsIgnoreCase(
-											ImageConfiguration.FluoTop.toString())) {
+									if (config == ImageConfiguration.FluoTop) {
 										ImageData i = (ImageData) md;
 										workload.add(i);
-									} else if (((ImageData) md).getSubstanceName().equalsIgnoreCase(
-											ImageConfiguration.FluoSide.toString())) {
+									} else if (config == ImageConfiguration.FluoSide) {
 										ImageData i = (ImageData) md;
 										workload.add(i);
 									} else if (config == ImageConfiguration.RgbSide) {
@@ -140,8 +138,10 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			// for (int ti = SystemAnalysis.getNumberOfCPUs(); ti >= 1; ti -= 4) {
 			long t1 = System.currentTimeMillis();
 			task.setInput(workload, login, pass);
-			int pi = SystemAnalysis.getNumberOfCPUs() / 3;
-			int ti = 3;
+			int pi = SystemAnalysis.getNumberOfCPUs() / 2;
+			if (pi < 1)
+				pi = 1;
+			int ti = 2;
 			task.performAnalysis(pi, ti, status);
 			long t2 = System.currentTimeMillis();
 			String ss = "T(s)/PI/TI\t" + ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;

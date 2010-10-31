@@ -49,8 +49,8 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 
 		NavigationAction analyzeAction = new UploadImagesToCloud(true);
 
-		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Add Files",
-				"img/ext/user-desktop.png", "img/ext/user-desktop.png", src.getGUIsetting());
+		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Add Files", "img/ext/user-desktop.png",
+				"img/ext/user-desktop.png", src.getGUIsetting());
 		res.add(analyzeEntity);
 
 		// gruppe => user => experiment
@@ -101,7 +101,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 
 			@Override
 			public String getDefaultImage() {
-				return "img/ext/trash.png";
+				return "img/ext/trash2.png";
 			}
 
 			@Override
@@ -115,8 +115,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			}
 
 			@Override
-			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
@@ -125,6 +124,8 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
+				actions.add(Trash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
+						src.getGUIsetting()));
 				for (ExperimentHeaderInterface exp : trashed)
 					actions.add(getMongoExperimentButton(exp, src.getGUIsetting()));
 				return actions;
@@ -149,8 +150,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			}
 
 			@Override
-			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
@@ -195,8 +195,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			}
 
 			@Override
-			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
