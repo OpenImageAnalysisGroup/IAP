@@ -8,9 +8,7 @@
  */
 package de.ipk.ag_ba.gui.webstart;
 
-import java.awt.Dimension;
-
-import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 
@@ -18,22 +16,13 @@ import de.ipk.ag_ba.gui.MyNavigationPanel;
  * @author klukas
  * 
  */
-public class MyScrollPane extends JScrollPane {
+public class MyViewPort extends JViewport {
 	private static final long serialVersionUID = 1L;
 	private final MyNavigationPanel panel;
 
-	public MyScrollPane(MyNavigationPanel panel, boolean border) {
-		super(panel);
+	public MyViewPort(MyNavigationPanel panel) {
+		super();
 		this.panel = panel;
-		if (!border)
-			setBorder(null);
-	}
-
-	@Override
-	public Dimension getPreferredSize() {
-		Dimension res = super.getPreferredSize();
-		res.setSize(res.width, panel.getMaxYY() + 30);
-		return res;
 	}
 
 }

@@ -27,7 +27,9 @@ public class CutImagePreprocessor implements ImagePreProcessor {
 	public boolean processImage(LoadedImage loadedImage, int[] rgbArray, int[] rgbArrayNULL, int w, int h,
 			int iBackgroundFill) {
 
-		if (loadedImage.getSubstanceName().equalsIgnoreCase(ImageConfiguration.RgbSide.toString())) {
+		ImageConfiguration ic = ImageConfiguration.get(loadedImage.getSubstanceName());
+
+		if (ic == ImageConfiguration.RgbSide) {
 			// for (int y = 1700; y < h; y++) {
 			for (int y = 1530; y < h; y++) {
 				int o = y * w;
@@ -35,14 +37,14 @@ public class CutImagePreprocessor implements ImagePreProcessor {
 					rgbArray[o + x] = iBackgroundFill;
 				}
 			}
-		} else if (loadedImage.getSubstanceName().equals(ImageConfiguration.FluoSide.toString())) {
+		} else if (ic == ImageConfiguration.FluoSide) {
 			for (int y = 1080; y < h; y++) {
 				int o = y * w;
 				for (int x = 0; x < w; x++) {
 					rgbArray[o + x] = iBackgroundFill;
 				}
 			}
-		} else if (loadedImage.getSubstanceName().equalsIgnoreCase(ImageConfiguration.FluoTop.toString())) {
+		} else if (ic == ImageConfiguration.FluoTop) {
 			for (int y = 0; y < 50; y++) {
 				int o = y * w;
 				for (int x = 0; x < w; x++) {
@@ -56,7 +58,7 @@ public class CutImagePreprocessor implements ImagePreProcessor {
 				}
 			}
 		} else {
-			if (!loadedImage.getSubstanceName().equals("RgbTop"))
+			if (ic != ImageConfiguration.RgbTop)
 				System.out.println(loadedImage.getSubstanceName() + " <> " + ImageConfiguration.FluoSide.toString());
 		}
 		return true;

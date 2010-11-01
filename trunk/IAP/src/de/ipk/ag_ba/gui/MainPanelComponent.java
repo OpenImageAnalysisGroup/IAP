@@ -84,7 +84,7 @@ public class MainPanelComponent {
 		} else if (infos.size() == 1) {
 			JComponent jp = new JPanel(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.PREFERRED } }));
 			jp.setOpaque(false);
-			jp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+			jp.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
 
 			jp.add(infos.get(0), "0,0");
 
@@ -102,7 +102,7 @@ public class MainPanelComponent {
 	public MainPanelComponent(JComponent ip, boolean borderAroundTheComponent) {
 		if (borderAroundTheComponent) {
 			JComponent jp = TableLayout.getSplit(ip, null, TableLayout.PREFERRED, TableLayout.FILL);
-			jp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+			jp.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
 			jp = TableLayout.getSplitVertical(jp, null, TableLayout.PREFERRED, TableLayout.FILL);
 			jp = TableLayout.getSplitVertical(jp, null, TableLayout.PREFERRED, TableLayout.FILL);
 			this.component = jp;

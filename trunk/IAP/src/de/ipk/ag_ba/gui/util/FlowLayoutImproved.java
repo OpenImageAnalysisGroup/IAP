@@ -25,6 +25,7 @@ public class FlowLayoutImproved extends FlowLayout {
 
 	public FlowLayoutImproved(int left, int hgap, int vgap) {
 		super(left, hgap, vgap);
+		setAlignOnBaseline(true);
 	}
 
 	@Override
