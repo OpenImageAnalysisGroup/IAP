@@ -25,7 +25,7 @@ public class DataSetFilePanel extends JPanel {
 	 * Comment for <code>serialVersionUID</code>
 	 */
 	private static final long serialVersionUID = 1L;
-	public JScrollPane scrollpane;
+	private JScrollPane scrollpane;
 	private final FilePanelHeader header;
 	private PopupListener popupListener;
 
@@ -73,11 +73,6 @@ public class DataSetFilePanel extends JPanel {
 		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Component#getPreferredSize()
-	 */
 	@Override
 	public Dimension getPreferredSize() {
 		Component[] comps = getComponents();
@@ -86,7 +81,7 @@ public class DataSetFilePanel extends JPanel {
 			Component c = comps[i];
 			maxY = (c.getY() + c.getHeight() > maxY) ? c.getY() + c.getHeight() : maxY;
 		}
-		return new Dimension(scrollpane.getWidth() - 15, maxY);
+		return new Dimension(getScrollpane().getWidth() - 15, maxY);
 	}
 
 	boolean warning = false;
@@ -131,6 +126,14 @@ public class DataSetFilePanel extends JPanel {
 	public void fill() {
 		if (filler != null)
 			filler.run();
+	}
+
+	public void setScrollpane(JScrollPane scrollpane) {
+		this.scrollpane = scrollpane;
+	}
+
+	public JScrollPane getScrollpane() {
+		return scrollpane;
 	}
 
 }

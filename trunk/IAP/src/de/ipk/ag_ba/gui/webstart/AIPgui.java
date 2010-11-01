@@ -20,6 +20,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import netscape.javascript.JSObject;
 
@@ -114,9 +116,17 @@ public class AIPgui {
 			}
 		});
 
-		return TableLayout.get3SplitVertical(navigationPanel,
-				TableLayout.getSplit(actionPanel, actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel,
-				TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL);
+		JScrollPane navScroller = new MyScrollPane(navigationPanel, false);
+		navScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		navigationPanel.setScrollpane(navScroller);
+
+		JScrollPane actionScroller = new MyScrollPane(actionPanel, false);
+		actionScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		actionPanel.setScrollpane(actionScroller);
+
+		return TableLayout.get3SplitVertical(navScroller, TableLayout.getSplit(actionScroller, actionPanelRight,
+				TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED, TableLayout.PREFERRED,
+				TableLayout.FILL);
 	}
 
 	public static String getIntroTxt() {

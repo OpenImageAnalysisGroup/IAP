@@ -178,7 +178,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		if (targetTreeNode == expTree.getSelectionPath().getLastPathComponent()) {
 			panel.add(imageButton);
 			panel.validate();
-			panel.scrollpane.validate();
+			panel.getScrollpane().validate();
 		}
 
 		Thread t = new Thread(new Runnable() {

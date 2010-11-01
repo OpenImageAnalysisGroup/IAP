@@ -381,7 +381,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 
 			p.invalidate();
 			p.validate();
-			p.scrollpane.validate();
+			p.getScrollpane().validate();
 			p.repaint();
 			targetTreeNode.setSizeDirty(true);
 			targetTreeNode.updateSizeInfo(user, pass, sizeChangedListener);
@@ -393,7 +393,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			p.removeAll();
 			p.invalidate();
 			p.validate();
-			p.scrollpane.validate();
+			p.getScrollpane().validate();
 			p.repaint();
 			targetTreeNode.setSizeDirty(true);
 			targetTreeNode.updateSizeInfo(user, pass, sizeChangedListener);

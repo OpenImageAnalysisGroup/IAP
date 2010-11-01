@@ -11,6 +11,8 @@ package de.ipk.ag_ba.gui;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -30,7 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
+import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import org.ObjectRef;
@@ -63,6 +65,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	private final JCheckBoxMenuItem menuItemCompact;
 	private final JCheckBoxMenuItem menuItemFlat;
 	private final JCheckBoxMenuItem menuItemButtons;
+	private JScrollPane scrollpane;
 
 	public MyNavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
 		this.target = target;
@@ -214,18 +217,17 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 		if (getParent() != null) {
 			getParent().validate();
+			getParent().doLayout();
 			getParent().repaint();
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					getParent().validate();
-					getParent().repaint();
-				}
-			});
 		} else {
 			validate();
-			if (actionPanelRight != null)
+			doLayout();
+			repaint();
+			if (actionPanelRight != null) {
 				actionPanelRight.validate();
+				actionPanelRight.doLayout();
+				actionPanelRight.repaint();
+			}
 		}
 	}
 
@@ -248,10 +250,8 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						if (target != null) {
 							if (Bookmark.add(ne.getTitle(), target, i)) {
 								if (!set.isEmpty())
-									set.iterator()
-											.next()
-											.executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this, theOther,
-													graphPanel, null, null);
+									set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
+											theOther, graphPanel, null, null);
 							} else
 								MainFrame.getInstance().showMessageDialog("Could not add bookmark.");
 						} else
@@ -328,10 +328,8 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							MainFrame.getInstance().showMessageDialog("Could not delete bookmark.");
 						} else {
 							if (!set.isEmpty())
-								set.iterator()
-										.next()
-										.executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this, theOther, graphPanel,
-												null, null);
+								set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
+										theOther, graphPanel, null, null);
 						}
 					}
 				}
@@ -423,13 +421,32 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		if (o != null && o instanceof ButtonDrawStyle) {
 			ButtonDrawStyle bds = (ButtonDrawStyle) o;
 			buttonStyle = bds;
-			updateGUI();
 			theOther.buttonStyle = bds;
-			theOther.updateGUI();
 			menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 			menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
 			menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
+			updateGUI();
+			theOther.updateGUI();
 		}
+	}
+
+	public void setScrollpane(JScrollPane scrollpane) {
+		this.scrollpane = scrollpane;
+	}
+
+	public JScrollPane getScrollpane() {
+		return scrollpane;
+	}
+
+	@Override
+	public Dimension getPreferredSize() {
+		Component[] comps = getComponents();
+		int maxY = 0;
+		for (int i = 0; i < comps.length; i++) {
+			Component c = comps[i];
+			maxY = (c.getY() + c.getHeight() > maxY) ? c.getY() + c.getHeight() : maxY;
+		}
+		return new Dimension(getScrollpane().getWidth() - 15, maxY + 8);
 	}
 
 }
