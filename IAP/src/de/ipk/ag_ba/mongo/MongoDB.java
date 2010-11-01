@@ -726,10 +726,14 @@ public class MongoDB {
 					if (expref != null) {
 						BasicDBList l = (BasicDBList) expref.get("substance_ids");
 						for (Object o : l) {
+							if (o==null)
+								continue;
 							DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
+							if (subr!=null) {
 							DBObject substance = subr.fetch();
 							if (substance != null) {
 								processSubstance(db, experiment, substance);
+							}
 							}
 						}
 					}

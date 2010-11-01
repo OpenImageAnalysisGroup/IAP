@@ -116,17 +116,19 @@ public class AIPgui {
 			}
 		});
 
-		JScrollPane navScroller = new MyScrollPane(navigationPanel, false);
-		navScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		navigationPanel.setScrollpane(navScroller);
+		// JScrollPane navScroller = new MyScrollPane(navigationPanel, false);
+		// navScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		// navigationPanel.setScrollpane(navScroller);
 
 		JScrollPane actionScroller = new MyScrollPane(actionPanel, false);
 		actionScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		actionPanel.setScrollpane(actionScroller);
 
-		return TableLayout.get3SplitVertical(navScroller, TableLayout.getSplit(actionScroller, actionPanelRight,
-				TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED, TableLayout.PREFERRED,
-				TableLayout.FILL);
+		JComponent res = TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionScroller,
+				actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
+				TableLayout.PREFERRED, TableLayout.FILL);
+
+		return res;
 	}
 
 	public static String getIntroTxt() {

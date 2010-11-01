@@ -167,8 +167,8 @@ public class NavigationButton implements StyleAware {
 				line2 = action.getStatusProvider().getCurrentStatusMessage1();
 			if (statusServer != null) {
 				BackgroundTaskStatusProvider status = action.getStatusProvider();
-				String eta = statusServer.getRemainTime(status.getCurrentStatusValue() == -1,
-						status.getCurrentStatusValueFine());
+				String eta = statusServer.getRemainTime(status.getCurrentStatusValue() == -1, status
+						.getCurrentStatusValueFine());
 				if (eta.length() > 0) {
 					if (line2.length() > 0)
 						line2 += ", ";
@@ -176,9 +176,9 @@ public class NavigationButton implements StyleAware {
 				}
 			}
 			if (line2.length() > 0)
-				line2 = "<br>&nbsp;<small>" + line2 + "</small>&nbsp;";
+				line2 = "<br>&nbsp;" + line2 + "&nbsp;";
 			dots = "<code>" + dots + "</code>";
-			return "<html><b><center>" + dots + " " + title + progress + " " + dots + s + line2;
+			return "<html><small><b><center>" + dots + " " + title + progress + " " + dots + "" + s + line2;
 		}
 	}
 
@@ -374,8 +374,8 @@ public class NavigationButton implements StyleAware {
 								ArrayList<JComponent> errors = new ArrayList<JComponent>();
 								for (String s : ErrorMsg.getErrorMessages()) {
 									JLabel e = new JLabel("<html><table><tr><td>"
-											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
-													.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
+											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_")).replaceAll(
+													"_br_", "<br>").replaceAll("\n", "<br>"));
 									e.setOpaque(true);
 									e.setBackground(new Color(255, 240, 240));
 									e.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -398,8 +398,8 @@ public class NavigationButton implements StyleAware {
 								ArrayList<JComponent> errors = new ArrayList<JComponent>();
 								for (String s : ErrorMsg.getErrorMessages()) {
 									JLabel e = new JLabel("<html><table><tr><td>"
-											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
-													.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
+											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_")).replaceAll(
+													"_br_", "<br>").replaceAll("\n", "<br>"));
 									e.setOpaque(true);
 									e.setBackground(new Color(255, 240, 240));
 									e.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -615,8 +615,8 @@ public class NavigationButton implements StyleAware {
 			n1.setToolTipText(n.getToolTip());
 
 		if (n.getSideGui() != null)
-			return TableLayout.get3Split(n1, null, n.getSideGui(), TableLayout.PREFERRED, n.getSideGuiSpace(),
-					n.getSideGuiWidth());
+			return TableLayout.get3Split(n1, null, n.getSideGui(), TableLayout.PREFERRED, n.getSideGuiSpace(), n
+					.getSideGuiWidth());
 		else
 			return n1;
 	}

@@ -33,6 +33,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.ObjectRef;
@@ -66,6 +67,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	private final JCheckBoxMenuItem menuItemFlat;
 	private final JCheckBoxMenuItem menuItemButtons;
 	private JScrollPane scrollpane;
+	private int maxYY;
 
 	public MyNavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
 		this.target = target;
@@ -160,7 +162,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				if (ne instanceof StyleAware) {
 					((StyleAware) ne).setButtonStyle(buttonStyle);
 				}
-				if (target == PanelTarget.NAVIGATION) {
+				if (getTarget() == PanelTarget.NAVIGATION) {
 					if (!first) {
 						JLabel lbl = new JLabel("<html><small>" + Unicode.ARROW_RIGHT);
 						if (next != null) {
@@ -184,14 +186,15 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						lbl.setForeground(Color.GRAY);
 						add(lbl);
 					}
-					add(NavigationButton.getNavigationButton(buttonStyle, ne, target, this, getTheOther(), graphPanel));
+					add(NavigationButton.getNavigationButton(buttonStyle, ne, getTarget(), this, getTheOther(), graphPanel));
 					first = false;
 				} else {
 					if (actionPanelRight != null && ne.isRightAligned())
-						right.add(NavigationButton.getNavigationButton(buttonStyle, ne, target, getTheOther(), this,
+						right.add(NavigationButton.getNavigationButton(buttonStyle, ne, getTarget(), getTheOther(), this,
 								graphPanel));
 					else
-						add(NavigationButton.getNavigationButton(buttonStyle, ne, target, getTheOther(), this, graphPanel));
+						add(NavigationButton.getNavigationButton(buttonStyle, ne, getTarget(), getTheOther(), this,
+								graphPanel));
 				}
 			}
 			if (!firstStar) {
@@ -366,27 +369,6 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		return res;
 	}
 
-	@Override
-	protected void paintComponent(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-
-		int w = getWidth();
-		int h = getHeight();
-
-		// Paint a gradient from top to bottom
-		GradientPaint gp;
-		if (target == PanelTarget.NAVIGATION)
-			gp = new GradientPaint(0, 0, new Color(240, 240, 240), 0, h, new Color(210, 230, 210));
-		else {
-			Color c2;
-			c2 = getTabColor();
-
-			gp = new GradientPaint(0, 0, new Color(250, 250, 250), 0, h, c2);
-		}
-		g2d.setPaint(gp);
-		g2d.fillRect(0, 0, w, h);
-	}
-
 	public static Color getTabColor() {
 		Color c2;
 		if (UIManager.getBoolean("TabbedPane.contentOpaque")) {
@@ -425,8 +407,23 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 			menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
 			menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
-			updateGUI();
-			theOther.updateGUI();
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					setEntitySet(set);
+					theOther.setEntitySet(theOther.set);
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							JComponent jc = MyNavigationPanel.this;
+							while (jc.getParent() != null && jc.getParent() instanceof JComponent)
+								jc = (JComponent) jc.getParent();
+							jc.validate();
+							jc.repaint();
+						}
+					});
+				}
+			});
 		}
 	}
 
@@ -440,13 +437,57 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 
 	@Override
 	public Dimension getPreferredSize() {
+		if (target == PanelTarget.NAVIGATION)
+			return super.getPreferredSize();
 		Component[] comps = getComponents();
-		int maxY = 0;
+		int maxY = 0, lines = 0;
 		for (int i = 0; i < comps.length; i++) {
 			Component c = comps[i];
-			maxY = (c.getY() + c.getHeight() > maxY) ? c.getY() + c.getHeight() : maxY;
+			if (c.getY() + c.getHeight() > maxY)
+				maxY = c.getY() + c.getHeight();
+			else {
+				if (lines == 0)
+					setMaxYY(maxY);
+				lines++;
+			}
 		}
+		if (lines == 0)
+			setMaxYY(maxY);
 		return new Dimension(getScrollpane().getWidth() - 15, maxY + 8);
+	}
+
+	public PanelTarget getTarget() {
+		return target;
+	}
+
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D) g;
+
+		int w = getWidth();
+		int h = getHeight();
+
+		// Paint a gradient from top to bottom
+		GradientPaint gp;
+		if (getTarget() == PanelTarget.NAVIGATION)
+			gp = new GradientPaint(0, 0, new Color(240, 240, 240), 0, h, new Color(210, 230, 210));
+		else {
+			Color c2;
+			c2 = MyNavigationPanel.getTabColor();
+
+			gp = new GradientPaint(0, 0, new Color(250, 250, 250), 0, h, c2);
+		}
+		g2d.setPaint(gp);
+		g2d.fillRect(0, 0, w, h);
+	}
+
+	public void setMaxYY(int maxYY) {
+		this.maxYY = maxYY;
+	}
+
+	public int getMaxYY() {
+		return maxYY;
 	}
 
 }
