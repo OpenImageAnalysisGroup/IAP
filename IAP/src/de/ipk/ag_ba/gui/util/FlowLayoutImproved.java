@@ -17,16 +17,17 @@ import java.awt.Insets;
 
 /**
  * @author klukas
- *
+ * 
  */
 public class FlowLayoutImproved extends FlowLayout {
 
 	private static final long serialVersionUID = 1L;
 
-	public FlowLayoutImproved(int alignment, int hgap, int vgap) {
-		super(alignment, hgap, vgap);
+	public FlowLayoutImproved(int left, int hgap, int vgap) {
+		super(left, hgap, vgap);
 	}
 
+	@Override
 	public Dimension preferredLayoutSize(Container target) {
 		int gapH = getHgap();
 		int gapV = getVgap();
@@ -40,24 +41,24 @@ public class FlowLayoutImproved extends FlowLayout {
 			if (!c.isVisible())
 				continue;
 			comps++;
-			if (c.getPreferredSize().height>maxHeightInLine)
+			if (c.getPreferredSize().height > maxHeightInLine)
 				maxHeightInLine = c.getPreferredSize().height;
-			if (curX>0)
-				curX+=gapH;
-			if (curX+c.getPreferredSize().width+gapH>maxW) {
+			if (curX > 0)
+				curX += gapH;
+			if (curX + c.getPreferredSize().width + gapH > maxW) {
 				lines++;
 				curX = 0;
-				if (curY>0)
-					curY+=gapV;
-				curY+=maxHeightInLine;
-				maxHeightInLine=c.getPreferredSize().height;
+				if (curY > 0)
+					curY += gapV;
+				curY += maxHeightInLine;
+				maxHeightInLine = c.getPreferredSize().height;
 			}
-			curX+=c.getPreferredSize().width;
+			curX += c.getPreferredSize().width;
 		}
-		if (curX>0 && comps>lines)
-			curY+=maxHeightInLine+gapV;
+		if (curX > 0 && comps > lines)
+			curY += maxHeightInLine + gapV;
 		Insets insets = target.getInsets();
-      curY += insets.top + insets.bottom;
+		curY += insets.top + insets.bottom;
 		return new Dimension(maxW, curY);
 	}
 

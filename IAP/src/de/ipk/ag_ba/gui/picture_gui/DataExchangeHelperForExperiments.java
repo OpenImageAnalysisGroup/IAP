@@ -1,5 +1,5 @@
 /* Copyright (c) 2003 IPK Gatersleben
- * $Id: DataExchangeHelperForExperiments.java,v 1.3 2010-10-26 12:56:01 klukas Exp $
+ * $Id: DataExchangeHelperForExperiments.java,v 1.4 2010-11-01 11:09:40 klukas Exp $
  */
 package de.ipk.ag_ba.gui.picture_gui;
 
@@ -295,7 +295,7 @@ public class DataExchangeHelperForExperiments {
 							filePanel.add(imageButton);
 							filePanel.validate();
 							filePanel.repaint();
-							filePanel.scrollpane.validate();
+							filePanel.getScrollpane().validate();
 							if (previewLoadAndConstructNeededF) {
 								Thread t = new Thread(new Runnable() {
 									@Override
@@ -349,7 +349,7 @@ public class DataExchangeHelperForExperiments {
 						filePanel.removeAll();
 						filePanel.validate();
 						filePanel.repaint();
-						filePanel.scrollpane.validate();
+						filePanel.getScrollpane().validate();
 					}
 				}
 			});

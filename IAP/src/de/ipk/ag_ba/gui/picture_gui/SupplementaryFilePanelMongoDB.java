@@ -195,7 +195,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 
 		JScrollPane fileScroller = new JScrollPane(filePanel);
 		fileScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		filePanel.scrollpane = fileScroller;
+		filePanel.setScrollpane(fileScroller);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, new JScrollPane(expTree), TableLayout
 				.getSplitVertical(filePanelHeader, fileScroller, TableLayout.PREFERRED, TableLayout.FILL));
 		splitPane.setOneTouchExpandable(true);
