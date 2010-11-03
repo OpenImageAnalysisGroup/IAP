@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -184,7 +185,8 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 						Collection<NumericMeasurementInterface> inp = new ArrayList<NumericMeasurementInterface>();
 						inp.add(volume);
 						resultProcessor.setInput(inp, login, login);
-						resultProcessor.performAnalysis(maximumThreadCountParallelImages, 1, status);
+						resultProcessor.performAnalysis(maximumThreadCountParallelImages, maximumThreadCountParallelImages,
+								status);
 						if (additionalResults.get(resultProcessor) == null)
 							additionalResults.put(resultProcessor, new ArrayList<NumericMeasurementInterface>());
 						additionalResults.get(resultProcessor).addAll(resultProcessor.getOutput());
@@ -239,7 +241,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	private void processSampleCreateVolume(Sample3D sample, ArrayList<ImageData> loadedImages, int replicateID,
 			final int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
-		double maxPercent = 1; // maximum background color difference
+		double maxPercent = 2; // maximum background color difference
 
 		final boolean doBlur = true;
 
@@ -254,6 +256,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 
 			final TransparencyAnalysis taNorm = new TransparencyAnalysis(maxPercent / 100d);
 			taNorm.addColor(PhenotypeAnalysisTask.BACKGROUND_COLOR);
+			taNorm.addColors(new Color(255, 246, 245), new Color(235, 234, 210));
 
 			final TransparencyAnalysis taTop = new TransparencyAnalysis(maxPercent / 100d);
 			taTop.addColor(PhenotypeAnalysisTask.BACKGROUND_COLOR);

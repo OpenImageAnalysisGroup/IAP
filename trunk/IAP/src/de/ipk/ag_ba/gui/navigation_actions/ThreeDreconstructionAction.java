@@ -126,7 +126,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 
 				threeDreconstructionTask.addResultProcessor(volumeStatistics);
 
-				threeDreconstructionTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
+				threeDreconstructionTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 2, status);
 
 				HashMap<ImageAnalysisTask, ArrayList<NumericMeasurementInterface>> volumeStatisticsResults = threeDreconstructionTask
 						.getAdditionalResults();
@@ -145,8 +145,6 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 
 			Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
 			statisticsResult.getHeader().setExcelfileid("");
-
-			System.out.println(statisticsResult.toString());
 
 			MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
 			ip.setExperimentInfo(login, pass, statisticsResult.getHeader(), true, statisticsResult);
@@ -202,8 +200,8 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
 			GUIsetting guiSetting) {
 
-		NavigationAction clearBackgroundAction = new ThreeDreconstructionAction(login, pass, experiment);
-		NavigationButton resultTaskButton = new NavigationButton(clearBackgroundAction, title,
+		NavigationAction threeDreconstructionAction = new ThreeDreconstructionAction(login, pass, experiment);
+		NavigationButton resultTaskButton = new NavigationButton(threeDreconstructionAction, title,
 				"img/RotationReconstruction.png", guiSetting);
 		return resultTaskButton;
 	}
