@@ -453,7 +453,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 		if (lines == 0)
 			setMaxYY(maxY);
-		return new Dimension(getScrollpane().getWidth() - 15, maxY + 8);
+		if (maxY < 8)
+			return new Dimension(getScrollpane().getWidth() - 15, maxY + 8);
+		else
+			return new Dimension(getScrollpane().getWidth() - 15, maxY);
 	}
 
 	public PanelTarget getTarget() {

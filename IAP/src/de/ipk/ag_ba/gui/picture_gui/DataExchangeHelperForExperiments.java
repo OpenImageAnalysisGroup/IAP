@@ -1,5 +1,5 @@
 /* Copyright (c) 2003 IPK Gatersleben
- * $Id: DataExchangeHelperForExperiments.java,v 1.4 2010-11-01 11:09:40 klukas Exp $
+ * $Id: DataExchangeHelperForExperiments.java,v 1.5 2010-11-03 16:00:23 klukas Exp $
  */
 package de.ipk.ag_ba.gui.picture_gui;
 
@@ -287,58 +287,65 @@ public class DataExchangeHelperForExperiments {
 
 				final boolean fIsLast = binaryFileInfo == lastBBB;
 
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						// nur falls der Zielknoten immer noch ausgewählt ist,
-						// soll der Button hinzugefügt werden
-						if (mt == expTree.getSelectionPath().getLastPathComponent()) {
-							filePanel.add(imageButton);
-							filePanel.validate();
-							filePanel.repaint();
-							filePanel.getScrollpane().validate();
-							if (previewLoadAndConstructNeededF) {
-								Thread t = new Thread(new Runnable() {
-									@Override
-									public void run() {
-										if (mt == expTree.getSelectionPath().getLastPathComponent()) {
-											final MyImageIcon myImage;
-											try {
-												myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
-														DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
-												myImage.imageAvailable = 1;
-												SwingUtilities.invokeLater(new Runnable() {
-													@Override
-													public void run() {
-														imageButton.updateLayout(null, myImage, myImage);
-													}
-												});
-											} catch (MalformedURLException e) {
-												// empty
-											}
-										}
-									}
-								});
-								executeLater.add(t);
-
-								BackgroundTaskHelper.executeLaterOnSwingTask(10, new Runnable() {
-									@Override
-									public void run() {
-										boolean isLast = fIsLast;
-										if (isLast)
-											for (Thread ttt : executeLater)
-												BackgroundThreadDispatcher.addTask(ttt, -1);
-									}
-								});
-							}
-						} else
-							stop.setStopWanted(true);
-					}
-				});
+				SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree, stop, executeLater, binaryFileInfo,
+						imageButton, previewLoadAndConstructNeededF, fIsLast));
 			}
 
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+	}
+
+	private static Runnable processIcon(final DataSetFilePanel filePanel, final MongoTreeNode mt, final JTree expTree,
+			final StopObject stop, final ArrayList<Thread> executeLater, final BinaryFileInfo binaryFileInfo,
+			final DataSetFileButton imageButton, final boolean previewLoadAndConstructNeededF, final boolean fIsLast) {
+		return new Runnable() {
+			public void run() {
+				// nur falls der Zielknoten immer noch ausgewählt ist,
+				// soll der Button hinzugefügt werden
+				if (mt == expTree.getSelectionPath().getLastPathComponent()) {
+					filePanel.add(imageButton);
+					filePanel.validate();
+					filePanel.repaint();
+					filePanel.getScrollpane().validate();
+					if (previewLoadAndConstructNeededF) {
+						Thread t = new Thread(new Runnable() {
+							@Override
+							public void run() {
+								if (mt == expTree.getSelectionPath().getLastPathComponent()) {
+									final MyImageIcon myImage;
+									try {
+										myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
+												DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
+										myImage.imageAvailable = 1;
+										SwingUtilities.invokeLater(new Runnable() {
+											@Override
+											public void run() {
+												imageButton.updateLayout(null, myImage, myImage);
+											}
+										});
+									} catch (MalformedURLException e) {
+										// empty
+									}
+								}
+							}
+						});
+						executeLater.add(t);
+
+					}
+					BackgroundTaskHelper.executeLaterOnSwingTask(10, new Runnable() {
+						@Override
+						public void run() {
+							boolean isLast = fIsLast;
+							if (isLast)
+								for (Thread ttt : executeLater)
+									BackgroundThreadDispatcher.addTask(ttt, -1);
+						}
+					});
+				} else
+					stop.setStopWanted(true);
+			}
+		};
 	}
 
 	private static void clearPanel(final DataSetFilePanel filePanel, final MongoTreeNode mt, final JTree expTree) {

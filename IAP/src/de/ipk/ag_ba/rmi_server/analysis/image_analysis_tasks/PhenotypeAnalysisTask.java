@@ -377,7 +377,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				int x = 0;
 				boolean hasBackgroundImage = rgbArrayNULL != null && rgbArray.length == rgbArrayNULL.length;
 				if (hasBackgroundImage) {
-					double ef = epsilonA * factor * 20;
+					double ef = epsilonA * factor * 10;
 					for (int i = 0; i < rgbArray.length; i++) {
 						if (ColorUtil.deltaE2000simu(rgbArray[i], rgbArrayNULL[i]) < ef) {
 							rgbArray[i] = iBackgroundFill;
