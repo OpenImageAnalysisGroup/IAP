@@ -85,6 +85,9 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 						for (Measurement md : sd3.getAllMeasurements()) {
 							if (md instanceof ImageData) {
 								ImageData i = (ImageData) md;
+								ImageConfiguration ic = ImageConfiguration.get(i.getSubstanceName());
+								if (ic != ImageConfiguration.RgbSide)
+									continue;
 								if (workset.get(sd3) == null)
 									workset.put(sd3, new ArrayList<NumericMeasurementInterface>());
 								workset.get(sd3).add(i);
@@ -130,7 +133,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 
 				ArrayList<NumericMeasurementInterface> statRes = volumeStatisticsResults.get(volumeStatistics);
 				if (statRes == null) {
-					ErrorMsg.addErrorMessage("Error: no statistics result");
+					// ErrorMsg.addErrorMessage("Error: no statistics result");
 				} else {
 					// add volumes (if available)
 					statRes.addAll(threeDreconstructionTask.getOutput());
@@ -141,6 +144,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			}
 
 			Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
+			statisticsResult.getHeader().setExcelfileid("");
 
 			System.out.println(statisticsResult.toString());
 
@@ -148,14 +152,14 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			ip.setExperimentInfo(login, pass, statisticsResult.getHeader(), true, statisticsResult);
 			mpc = new MainPanelComponent(ip, true);
 
-			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(statisticsResult),
-					src.getGUIsetting()));
+			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass,
+					new ExperimentReference(statisticsResult), src.getGUIsetting()));
 
 			storedActions.add(new NavigationButton(new CloudUploadEntity(login, pass, new ExperimentReference(
-					statisticsResult)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+					statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
-			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult,
-					statisticsResult.getHeader(), false, src.getGUIsetting());
+			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult, statisticsResult
+					.getHeader(), false, src.getGUIsetting());
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();
 			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
@@ -177,13 +181,12 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		if (!ImageAnalysis3D.isSaveInDatabase()) {
-			NavigationButton imageHistogram = new NavigationButton(TableLayout.get3Split(histogram,
-					histogramG, histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED),
-					src.getGUIsetting());
+			NavigationButton imageHistogram = new NavigationButton(TableLayout.get3Split(histogram, histogramG,
+					histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED), src.getGUIsetting());
 			res.add(imageHistogram);
 
-			NavigationButton imageZoom = new NavigationButton(
-					ImageAnalysis3D.getImageZoomSlider(zoomedImages), src.getGUIsetting());
+			NavigationButton imageZoom = new NavigationButton(ImageAnalysis3D.getImageZoomSlider(zoomedImages), src
+					.getGUIsetting());
 			res.add(imageZoom);
 		}
 		res.addAll(storedActions);

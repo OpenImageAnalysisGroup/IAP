@@ -280,7 +280,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				if (right.getObject() != null)
-					((JLabel) right.getObject()).setText("<html><font size='6'><b>" + Unicode.ARROW_LEFT_EMPTY);
+					((JLabel) right.getObject()).setText("<html><font size='5'><b>" + Unicode.ARROW_LEFT_EMPTY);
 				if (lbl != null)
 					lbl.setText("<html><font size='4'>" + Unicode.PEN);
 			}
@@ -355,7 +355,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				if (right.getObject() != null)
-					((JLabel) right.getObject()).setText("<html><font size='6'><b>" + Unicode.ARROW_LEFT_EMPTY);
+					((JLabel) right.getObject()).setText("<html><font size='5'><b>" + Unicode.ARROW_LEFT_EMPTY);
 				if (lbl != null)
 					lbl.setText("<html><font size='4'>" + Unicode.RECYCLE);
 			}

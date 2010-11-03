@@ -16,6 +16,7 @@ import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.mongo.MongoDBhandler;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
@@ -153,6 +154,14 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 		}
 
 		for (Sample3D s3d : samples) {
+			ImageConfiguration ic = ImageConfiguration.get(s3d.getParentCondition().getParentSubstance().getName());
+			boolean ok = false;
+			if (ic == ImageConfiguration.RgbSide)
+				ok = true;
+			if (ic == ImageConfiguration.FluoSide)
+				ok = true;
+			if (!ok)
+				continue;
 			TreeSet<Integer> replicateIDs = new TreeSet<Integer>();
 			for (Measurement md : s3d.getMeasurements(MeasurementNodeType.IMAGE)) {
 				ImageData id = (ImageData) md;
@@ -162,7 +171,8 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 				ArrayList<ImageData> imageData = new ArrayList<ImageData>();
 				for (Measurement md : s3d.getMeasurements(MeasurementNodeType.IMAGE)) {
 					ImageData id = (ImageData) md;
-					imageData.add(id);
+					if (id.getPosition() != null)
+						imageData.add(id);
 				}
 				try {
 					if (imageData.size() == 0)
@@ -227,7 +237,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	}
 
 	private void processSampleCreateVolume(Sample3D sample, ArrayList<ImageData> loadedImages, int replicateID,
-			int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
 		double maxPercent = 1; // maximum background color difference
 
@@ -259,15 +269,15 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 			double workLoad = loadedImages.size();
 			final double workloadStep = 100d / workLoad;
 
-			status.setCurrentStatusText1("Loading images (" + (int) workLoad + ")");
+			status.setCurrentStatusText1("Processing images (" + (int) workLoad + ")");
 			status.setCurrentStatusText2("Please wait.");
 			status.setCurrentStatusValue(-1);
 
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// empty
-			}
+			// try {
+			// Thread.sleep(20);
+			// } catch (InterruptedException e) {
+			// // empty
+			// }
 
 			final ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 
@@ -289,6 +299,8 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 					public void run() {
 						MyPicture p = new MyPicture();
 
+						if (image.getPosition() == null)
+							ErrorMsg.addErrorMessage("ERROR: no position for image " + image.toString());
 						double angle = image.getPosition() / 180 * Math.PI;
 
 						if (Math.abs(angle) < 0.0001) {
@@ -301,12 +313,22 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 							LoadedImage limg;
 							try {
 								limg = IOmodule.loadImageFromFileOrMongo(image, login, pass);
-								if (getIsTopFromFileName(ffn)) {
-									p.setPictureData(limg.getLoadedImage(), angle, mg, taTop, getIsTopFromFileName(ffn), bf);
-								} else
-									p.setPictureData(limg.getLoadedImage(), angle, mg, taNorm, getIsTopFromFileName(ffn), bf);
-								synchronized (pictures) {
-									pictures.add(p);
+
+								limg = PhenotypeAnalysisTask.clearBackground(limg, maximumThreadCount, login, pass);
+
+								limg = storeResultInDatabase.saveImage(limg, login, pass);
+
+								if (limg == null) {
+									ErrorMsg.addErrorMessage("Could not store processed input image in database target.");
+								} else {
+									output.add(new ImageData(limg.getParentSample(), limg));
+									if (getIsTopFromFileName(ffn)) {
+										p.setPictureData(limg.getLoadedImage(), angle, mg, taTop, getIsTopFromFileName(ffn), bf);
+									} else
+										p.setPictureData(limg.getLoadedImage(), angle, mg, taNorm, getIsTopFromFileName(ffn), bf);
+									synchronized (pictures) {
+										pictures.add(p);
+									}
 								}
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);

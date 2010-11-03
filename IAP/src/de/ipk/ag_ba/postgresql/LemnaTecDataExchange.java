@@ -639,31 +639,34 @@ public class LemnaTecDataExchange {
 
 		PreparedStatement ps = connection.prepareStatement(sqlText);
 		ps.setString(1, header.getExperimentname());
+		try {
+			ResultSet rs = ps.executeQuery();
 
-		ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				String plantID = rs.getString(1);
 
-		while (rs.next()) {
-			String plantID = rs.getString(1);
+				String metaName = rs.getString(2);
+				String metaValue = rs.getString(3);
 
-			String metaName = rs.getString(2);
-			String metaValue = rs.getString(3);
+				if (!res.containsKey(plantID))
+					res.put(plantID, new Condition(null));
 
-			if (!res.containsKey(plantID))
-				res.put(plantID, new Condition(null));
+				if (metaName.equals("Pflanzenart"))
+					res.get(plantID).setSpecies(metaValue);
+				if (metaName.equals("Pflanzenname"))
+					res.get(plantID).setGenotype(metaValue);
+				if (metaName.equals("Typ"))
+					res.get(plantID).setTreatment(metaValue);
+				if (metaName.equals("SeedDate"))
+					res.get(plantID).setSequence("SeedDate: " + metaValue);
 
-			if (metaName.equals("Pflanzenart"))
-				res.get(plantID).setSpecies(metaValue);
-			if (metaName.equals("Pflanzenname"))
-				res.get(plantID).setGenotype(metaValue);
-			if (metaName.equals("Typ"))
-				res.get(plantID).setTreatment(metaValue);
-			if (metaName.equals("SeedDate"))
-				res.get(plantID).setSequence("SeedDate: " + metaValue);
-
+			}
+			rs.close();
+			ps.close();
+		} catch (Exception e) {
+			if (!e.getMessage().endsWith("does not exist"))
+				ErrorMsg.addErrorMessage(e);
 		}
-		rs.close();
-		ps.close();
-
 		return res;
 	}
 
