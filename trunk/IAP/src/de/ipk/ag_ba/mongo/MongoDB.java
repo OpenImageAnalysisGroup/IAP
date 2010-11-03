@@ -726,14 +726,14 @@ public class MongoDB {
 					if (expref != null) {
 						BasicDBList l = (BasicDBList) expref.get("substance_ids");
 						for (Object o : l) {
-							if (o==null)
+							if (o == null)
 								continue;
 							DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
-							if (subr!=null) {
-							DBObject substance = subr.fetch();
-							if (substance != null) {
-								processSubstance(db, experiment, substance);
-							}
+							if (subr != null) {
+								DBObject substance = subr.fetch();
+								if (substance != null) {
+									processSubstance(db, experiment, substance);
+								}
 							}
 						}
 					}
@@ -1023,8 +1023,11 @@ public class MongoDB {
 					for (Object v : volList) {
 						DBObject vol = (DBObject) v;
 						VolumeData volume = new VolumeData(sample, vol.toMap());
-						volume.getURL().setPrefix(MongoDBhandler.PREFIX);
-						sample.add(volume);
+						if (volume.getURL() != null) {
+							volume.getURL().setPrefix(MongoDBhandler.PREFIX);
+							sample.add(volume);
+						} else
+							ErrorMsg.addErrorMessage("No volume data URL found! Volume: " + volume.toString());
 					}
 				}
 			}
