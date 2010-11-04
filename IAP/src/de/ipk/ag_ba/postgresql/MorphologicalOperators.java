@@ -25,57 +25,6 @@ public class MorphologicalOperators {
 	private int positionMaskJ;
 	private int positionMaskI;
 
-	public static void main(String[] args) {
-
-		int[][] eingabe_image1 = { { 1, 0, 0, 0 }, { 1, 0, 0, 0 }, { 0, 1, 1, 0 }, { 0, 1, 0, 0 }, { 0, 1, 0, 0 },
-				{ 0, 1, 0, 0 } };
-		int[][] mask1 = { { 1, 1 } };
-
-		MorphologicalOperators testMethod = new MorphologicalOperators(eingabe_image1, mask1, 0, 0);
-		testMethod.doDilatation();
-		testMethod.printImage();
-
-		int[][] eingabe_image2 = { { 0, 1, 0 }, { 0, 1, 0 }, { 0, 1, 0 }, { 0, 0, 0 } };
-		int[][] mask2 = { { 1, 0, 1 } };
-
-		MorphologicalOperators testMethod2 = new MorphologicalOperators(eingabe_image2, mask2, 1, 0);
-		testMethod2.doDilatation();
-		testMethod2.printImage();
-
-		int[][] eingabe_image3 = { { 0, 0, 0, 0, 1, 0 }, { 0, 1, 1, 1, 1, 0 }, { 0, 1, 0, 0, 1, 0 },
-				{ 1, 1, 1, 1, 1, 0 }, { 0, 1, 0, 1, 1, 1 }, { 0, 1, 1, 1, 1, 0 } };
-		int[][] mask3 = { { 1, 1, 1 }, { 1, 0, 0 }, { 1, 1, 1 } };
-
-		MorphologicalOperators testMethod3 = new MorphologicalOperators(eingabe_image3, mask3, 1, 1);
-		testMethod3.doErosion();
-		testMethod3.printImage();
-
-		int[][] eingabe_image4 = { { 0, 1, 0, 0 }, { 1, 1, 1, 1 }, { 0, 1, 0, 0 }, { 0, 1, 0, 0 }, { 0, 1, 0, 0 } };
-		int[][] mask4 = { { 1, 1 } };
-
-		MorphologicalOperators testMethod4 = new MorphologicalOperators(eingabe_image4, mask4, 0, 0);
-		testMethod4.doErosion();
-		testMethod4.printImage();
-
-		int[][] eingabe_image5 = { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 0, 1, 1, 0 }, { 0, 1, 1, 1, 1, 0 },
-				{ 0, 0, 0, 1, 0, 0 }, { 0, 1, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0, 0 } };
-		int[][] mask5 = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
-
-		MorphologicalOperators testMethod5 = new MorphologicalOperators(eingabe_image5, mask5, 1, 1);
-		testMethod5.doClosing();
-		System.out.println("Closing Ergebnis:");
-		testMethod5.printImage();
-
-		int[][] eingabe_image6 = { { 0, 1, 1, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 1, 1, 1 },
-				{ 1, 1, 1, 1, 0, 0 }, { 1, 1, 1, 1, 0, 1 }, { 1, 1, 1, 1, 0, 0 } };
-		int[][] mask6 = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
-
-		MorphologicalOperators testMethod6 = new MorphologicalOperators(eingabe_image6, mask6, 1, 1);
-		testMethod6.doOpening();
-		System.out.println("Opening Ergebnis:");
-		testMethod6.printImage();
-
-	}
 
 	public MorphologicalOperators(int[][] src_image) {
 		this(src_image, new int[][] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }, 1, 1);
