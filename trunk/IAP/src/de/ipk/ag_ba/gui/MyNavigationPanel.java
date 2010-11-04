@@ -437,26 +437,30 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 
 	@Override
 	public Dimension getPreferredSize() {
-		if (target == PanelTarget.NAVIGATION)
+		if (getScrollpane() == null)
 			return super.getPreferredSize();
-		Component[] comps = getComponents();
-		int maxY = 0, lines = 0;
-		for (int i = 0; i < comps.length; i++) {
-			Component c = comps[i];
-			if (c.getY() + c.getHeight() > maxY)
-				maxY = c.getY() + c.getHeight();
-			else {
-				if (lines == 0)
-					setMaxYY(maxY);
-				lines++;
+		else {
+			if (target == PanelTarget.NAVIGATION)
+				return super.getPreferredSize();
+			Component[] comps = getComponents();
+			int maxY = 0, lines = 0;
+			for (int i = 0; i < comps.length; i++) {
+				Component c = comps[i];
+				if (c.getY() + c.getHeight() > maxY)
+					maxY = c.getY() + c.getHeight();
+				else {
+					if (lines == 0)
+						setMaxYY(maxY);
+					lines++;
+				}
 			}
+			if (lines == 0)
+				setMaxYY(maxY);
+			if (maxY < 8)
+				return new Dimension(getScrollpane().getWidth() - 15, maxY + 8);
+			else
+				return new Dimension(getScrollpane().getWidth() - 15, maxY);
 		}
-		if (lines == 0)
-			setMaxYY(maxY);
-		if (maxY < 8)
-			return new Dimension(getScrollpane().getWidth() - 15, maxY + 8);
-		else
-			return new Dimension(getScrollpane().getWidth() - 15, maxY);
 	}
 
 	public PanelTarget getTarget() {
