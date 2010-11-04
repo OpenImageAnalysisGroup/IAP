@@ -63,7 +63,7 @@ public class TestSegmentation {
 			Assert.assertEquals(test.getNumberOfCluster(), testCluster4er[i]);
 			Assert.assertEquals(test.getNumberOfPixel(), testPixel[i]);
 
-			test = new PixelSegmentation(image, NeighbourhoodSetting.NB4);
+			test = new PixelSegmentation(image, NeighbourhoodSetting.NB8);
 			test.doPixelSegmentation();
 			Assert.assertEquals(test.getNumberOfCluster(), testCluster8er[i]);
 			Assert.assertEquals(test.getNumberOfPixel(), testPixel[i]);

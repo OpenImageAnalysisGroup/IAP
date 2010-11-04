@@ -50,7 +50,7 @@ public class PixelSegmentation {
 			nb = false;
 		}
 	}
-
+	
 	// ############### Public ####################
 
 	public int[] getClusterCounts() {
