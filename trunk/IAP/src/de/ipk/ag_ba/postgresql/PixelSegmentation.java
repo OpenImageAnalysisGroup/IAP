@@ -31,7 +31,19 @@ public class PixelSegmentation {
 
 	private int[] image_cluster_size;
 	private final int[][] image_cluster_ids;
+	private int [] cluster_border_size;
+	
+	/**
+	 * Circuit ratio
+	 * lambda = (A/(U*U))*4*Pi
+	 */
+	private double [] cluster_lambda;
 
+	private int[][] perimeterMask = new int[][] { { 0, 1, 0 },
+												  { 1, 1, 1 },
+												  { 0, 1, 0 } };
+		
+	
 	public PixelSegmentation(int[][] image) {
 		this(image, NeighbourhoodSetting.NB4);
 	}
@@ -50,6 +62,7 @@ public class PixelSegmentation {
 			nb = false;
 		}
 	}
+	
 	
 	// ############### Public ####################
 
@@ -75,11 +88,49 @@ public class PixelSegmentation {
 			pixelNumbers = pixelNumbers + image_cluster_size[pixelIndex];
 		return pixelNumbers;
 	}
+	
+	public int[] getArea(){
+		return image_cluster_size;
+	}
+	
+	public int getArea(int position){
+		return image_cluster_size[position];
+	}
+	
+	public int[] getPerimeter(){
+		return cluster_border_size;
+	}
+	
+	public int getPerimeter(int position){
+		return cluster_border_size[position];
+	}
+	
+	
+	public double[] getCircuitRatio(){
+		return cluster_lambda;
+	}
+	
+	public double getCircuitRatio(int position){
+		return cluster_lambda[position];
+	}
+	
 
 	public void doPixelSegmentation() {
-		firstPass();
-		mergeHashMap();
-		secondPass();
+		firstPass();	//Each pixel is assigned to a cluster
+		mergeHashMap(); //same cluster with different numbers are merged
+		secondPass();   //Cluster are renumbered
+		calculatePerimeterOfEachCluster();
+		calculateCircuitRatio();
+	}
+
+	private void calculateCircuitRatio() {
+		cluster_lambda = new double [zaehler];
+		
+		for(int i = 0; i< zaehler; i++)
+			if(cluster_border_size[i] > 0){
+				cluster_lambda[i] = ((double)image_cluster_size[i]/(double)(cluster_border_size[i]*cluster_border_size[i]))*4*Math.PI;
+			}
+		
 	}
 
 	// ############### Print-Methoden ######################
@@ -92,6 +143,19 @@ public class PixelSegmentation {
 		printImage(original_image, "OriginalImage");
 	}
 
+	public void printArray(int[] array){
+		for (int i = 0; i < array.length; i++) {
+			System.out.println(array[i]);
+		}
+	}
+	
+	public void printArray(double[] array){
+		for (int i = 0; i < array.length; i++) {
+			System.out.println(array[i]);
+		}
+	}
+	
+	
 	public void printImage() {
 		printImage(this.image_cluster_ids);
 	}
@@ -172,6 +236,41 @@ public class PixelSegmentation {
 				image_cluster_size[image_cluster_ids[i][j]]++;
 			}
 	}
+	
+	private void calculatePerimeterOfEachCluster(){
+		
+		cluster_border_size = new int[zaehler];
+		
+		for (int i = 0; i < src_image.length; i++){
+			for (int j = 0; j < src_image[i].length; j++) {
+				if (!(src_image[i][j] < foreground)) {
+					controlEdges(i, j);
+				}
+			}
+		}
+	}	
+	
+	private void controlEdges(int currentPositionI, int currentPositionJ) {
+		
+		for (int l = 0; l < perimeterMask.length; l++) {
+			for (int k = 0; k < perimeterMask[l].length; k++) {
+				if(perimeterMask[l][k] == 1){
+					if (currentPositionI - 1 + l >= 0 && currentPositionJ - 1 + k >= 0
+							&& currentPositionI - 1 + l <= src_image.length - 1
+							&& currentPositionJ - 1 + k <= src_image[currentPositionI].length - 1){
+						if(image_cluster_ids[currentPositionI - 1 + l][currentPositionJ - 1 + k] != image_cluster_ids[currentPositionI][currentPositionJ]){
+							cluster_border_size[image_cluster_ids[currentPositionI][currentPositionJ]]++;
+							
+						}
+					} else {
+						cluster_border_size[image_cluster_ids[currentPositionI][currentPositionJ]]++;
+					}
+				}
+			}
+		}
+		
+	}
+	
 
 	private void parse(Position zahl) {
 		parse(zahl, 0, 0);

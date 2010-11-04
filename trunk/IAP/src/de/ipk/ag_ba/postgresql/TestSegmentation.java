@@ -51,7 +51,22 @@ public class TestSegmentation {
 		testPixel[2] = 0;
 		testPixel[3] = 6;
 		testPixel[4] = 25;
+		
+		double[] testCircuitRatio = new double[5];
+		testCircuitRatio[0] = 0.7853981633974483;
+		testCircuitRatio[1] = 0.6981317007977318;
+		testCircuitRatio[2] = 0.0;
+		testCircuitRatio[3] = 0.7539822368615503;
+		testCircuitRatio[4] = 0.17392900504303355;
 
+		int[] position = new int[5];
+		position[0] = 1;
+		position[1] = 1;
+		position[2] = 0;
+		position[3] = 1;
+		position[4] = 4;
+		
+		
 		PixelSegmentation test;
 		int[][] image;
 
@@ -62,21 +77,29 @@ public class TestSegmentation {
 			test.doPixelSegmentation();
 			Assert.assertEquals(test.getNumberOfCluster(), testCluster4er[i]);
 			Assert.assertEquals(test.getNumberOfPixel(), testPixel[i]);
+			Assert.assertEquals(test.getCircuitRatio(position[i]), testCircuitRatio[i], 15);
 
 			test = new PixelSegmentation(image, NeighbourhoodSetting.NB8);
 			test.doPixelSegmentation();
 			Assert.assertEquals(test.getNumberOfCluster(), testCluster8er[i]);
 			Assert.assertEquals(test.getNumberOfPixel(), testPixel[i]);
 
-			// PixelSegmentation test = new PixelSegmentation(eingabe_image,
-			// NeighbourhoodSetting.NB4);
-			// test.doPixelSegmentation();
-			// test.printOriginalImage();
-			// test.printImage();
-			// test.printClusterArray();
-			// System.out.println("Number of Clusters: " +
-			// test.getNumberOfCluster());
-			// System.out.println("Number of Pixel: " + test.getNumberOfPixel());
+//			public static void main(String[] args) { 
+//			 PixelSegmentation test = new PixelSegmentation(eingabe_image, NeighbourhoodSetting.NB4);
+//			 test.doPixelSegmentation();
+//			 test.printOriginalImage();
+//			 System.out.println("ClusterIds:");
+//			 test.printImage();
+//			 test.printClusterArray();
+//			 System.out.println("Number of Clusters: " + test.getNumberOfCluster());
+//			 System.out.println("Number of Pixel: " + test.getNumberOfPixel());
+//			 System.out.println("Area:");
+//			 test.printArray(test.getArea());
+//			 System.out.println("Perimeter: ");
+//			 test.printArray(test.getPerimeter());
+//			 System.out.println("Ratio: ");
+//			 test.printArray(test.getCircuitRatio());
+//			}
 		}
 	}
 }
