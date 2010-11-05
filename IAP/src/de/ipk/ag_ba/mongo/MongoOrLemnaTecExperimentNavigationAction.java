@@ -38,7 +38,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	private ExperimentInterface experiment;
 
 	public MongoOrLemnaTecExperimentNavigationAction(ExperimentHeaderInterface ei) {
-		super(ei.getExcelfileid().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
+		super(ei.getExcelfileid() != null && ei.getExcelfileid().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
 				: "Access Systems Biology Cloud Data Set");
 		header = ei;
 	}
@@ -75,14 +75,14 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			return;
 		try {
 			if (imageAnalysis)
-				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
-						null, new ExperimentReference(experiment), guiSetting))
+				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(), null,
+						new ExperimentReference(experiment), guiSetting))
 					actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
-				new ExperimentReference(experiment), guiSetting)) {
+		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null, new ExperimentReference(
+				experiment), guiSetting)) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
 				actions.add(ne);
@@ -100,7 +100,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		if (header.getExcelfileid().startsWith("lemnatec:"))
+		if (header.getExcelfileid() != null && header.getExcelfileid().startsWith("lemnatec:"))
 			experiment = new LemnaTecDataExchange().getExperiment(header, status);
 		else
 			experiment = new MongoDB().getExperiment(header);
@@ -108,7 +108,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 
 	@Override
 	public String getDefaultImage() {
-		if (header.getExcelfileid().startsWith("lemnatec:"))
+		if (header.getExcelfileid() != null && header.getExcelfileid().startsWith("lemnatec:"))
 			return "img/000Grad_3-gray.png";
 		else
 			return "img/ext/image-x-generic-off.png";
@@ -116,7 +116,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 
 	@Override
 	public String getDefaultNavigationImage() {
-		if (header.getExcelfileid().startsWith("lemnatec:"))
+		if (header.getExcelfileid() != null && header.getExcelfileid().startsWith("lemnatec:"))
 			return "img/000Grad_3.png";
 		else
 			return "img/ext/image-x-generic.png";
