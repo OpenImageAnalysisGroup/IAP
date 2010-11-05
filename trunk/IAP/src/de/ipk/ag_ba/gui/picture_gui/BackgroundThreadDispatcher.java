@@ -37,7 +37,7 @@ public class BackgroundThreadDispatcher {
 	Stack<Thread> todo = new Stack<Thread>();
 	Stack<Integer> todoPriorities = new Stack<Integer>();
 	LinkedList<Thread> runningTasks = new LinkedList<Thread>();
-	int maxTask = SystemAnalysis.getNumberOfCPUsMax(4);
+	int maxTask = SystemAnalysis.getNumberOfCPUs();
 
 	int indicator = 0;
 
@@ -146,7 +146,6 @@ public class BackgroundThreadDispatcher {
 						// kein Fehler! normal!
 					}
 					while (!todo.empty()) {
-						System.gc();
 						Thread t = null;
 						synchronized (todo) {
 							int maxPrio = Integer.MIN_VALUE;
@@ -186,7 +185,7 @@ public class BackgroundThreadDispatcher {
 						while (runningTasks.size() >= maxTask) {
 							int highestRunningPrio = Integer.MIN_VALUE;
 							try {
-								Thread.sleep(20);
+								Thread.sleep(5);
 							} catch (InterruptedException e) {
 								// PictureGUI.showError("Background thread dispatcher was interrupted (2).",
 								// e);
