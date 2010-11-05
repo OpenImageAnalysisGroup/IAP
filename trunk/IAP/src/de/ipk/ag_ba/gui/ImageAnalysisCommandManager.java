@@ -11,8 +11,6 @@ package de.ipk.ag_ba.gui;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.ErrorMsg;
-
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.CloudUploadEntity;
 import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
@@ -44,7 +42,7 @@ public class ImageAnalysisCommandManager {
 			if (experimentReference.getData().getHeader().getExcelfileid().startsWith("lemnatec:"))
 				actions.add(new NavigationButton(new CloudUploadEntity(login, pass, experimentReference), guiSettings));
 		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
+			// empty
 		}
 
 		// "img/PoweredMongoDBgreenLeaf.png")); // PoweredMongoDBgreen.png"));

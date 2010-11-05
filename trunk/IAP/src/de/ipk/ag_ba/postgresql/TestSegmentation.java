@@ -51,7 +51,7 @@ public class TestSegmentation {
 		testPixel[2] = 0;
 		testPixel[3] = 6;
 		testPixel[4] = 25;
-		
+
 		double[] testCircuitRatio = new double[5];
 		testCircuitRatio[0] = 0.7853981633974483;
 		testCircuitRatio[1] = 0.6981317007977318;
@@ -65,8 +65,7 @@ public class TestSegmentation {
 		position[2] = 0;
 		position[3] = 1;
 		position[4] = 4;
-		
-		
+
 		PixelSegmentation test;
 		int[][] image;
 
@@ -84,22 +83,24 @@ public class TestSegmentation {
 			Assert.assertEquals(test.getNumberOfCluster(), testCluster8er[i]);
 			Assert.assertEquals(test.getNumberOfPixel(), testPixel[i]);
 
-//			public static void main(String[] args) { 
-//			 PixelSegmentation test = new PixelSegmentation(eingabe_image, NeighbourhoodSetting.NB4);
-//			 test.doPixelSegmentation();
-//			 test.printOriginalImage();
-//			 System.out.println("ClusterIds:");
-//			 test.printImage();
-//			 test.printClusterArray();
-//			 System.out.println("Number of Clusters: " + test.getNumberOfCluster());
-//			 System.out.println("Number of Pixel: " + test.getNumberOfPixel());
-//			 System.out.println("Area:");
-//			 test.printArray(test.getArea());
-//			 System.out.println("Perimeter: ");
-//			 test.printArray(test.getPerimeter());
-//			 System.out.println("Ratio: ");
-//			 test.printArray(test.getCircuitRatio());
-//			}
+			// public static void main(String[] args) {
+			// PixelSegmentation test = new PixelSegmentation(eingabe_image,
+			// NeighbourhoodSetting.NB4);
+			// test.doPixelSegmentation();
+			// test.printOriginalImage();
+			// System.out.println("ClusterIds:");
+			// test.printImage();
+			// test.printClusterArray();
+			// System.out.println("Number of Clusters: " +
+			// test.getNumberOfCluster());
+			// System.out.println("Number of Pixel: " + test.getNumberOfPixel());
+			// System.out.println("Area:");
+			// test.printArray(test.getArea());
+			// System.out.println("Perimeter: ");
+			// test.printArray(test.getPerimeter());
+			// System.out.println("Ratio: ");
+			// test.printArray(test.getCircuitRatio());
+			// }
 		}
 	}
 }

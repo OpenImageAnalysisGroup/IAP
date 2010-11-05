@@ -131,7 +131,9 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			// }
 
 			PhenotypeAnalysisTask task = new PhenotypeAnalysisTask(epsilon, epsilon2, ImageAnalysis.isSaveInDatabase());
-			task.addPreprocessor(new CutImagePreprocessor());
+
+			// task.addPreprocessor(new CutImagePreprocessor());
+
 			TreeMap<Long, String> times = new TreeMap<Long, String>();
 			// for (int r = 1; r <= 3; r++)
 			// for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 4)

@@ -32,19 +32,15 @@ public class PixelSegmentation {
 
 	private int[] image_cluster_size;
 	private final int[][] image_cluster_ids;
-	private int [] cluster_border_size;
-	
-	/**
-	 * Circuit ratio
-	 * lambda = (A/(U*U))*4*Pi
-	 */
-	private double [] cluster_lambda;
+	private int[] cluster_border_size;
 
-	private int[][] perimeterMask = new int[][] { { 0, 1, 0 },
-												  { 1, 1, 1 },
-												  { 0, 1, 0 } };
-		
-	
+	/**
+	 * Circuit ratio lambda = (A/(U*U))*4*Pi
+	 */
+	private double[] cluster_lambda;
+
+	private final int[][] perimeterMask = new int[][] { { 0, 1, 0 }, { 1, 1, 1 }, { 0, 1, 0 } };
+
 	public PixelSegmentation(int[][] image) {
 		this(image, NeighbourhoodSetting.NB4);
 	}
@@ -63,8 +59,7 @@ public class PixelSegmentation {
 			nb = false;
 		}
 	}
-	
-	
+
 	// ############### Public ####################
 
 	public int[] getClusterCounts() {
@@ -89,49 +84,48 @@ public class PixelSegmentation {
 			pixelNumbers = pixelNumbers + image_cluster_size[pixelIndex];
 		return pixelNumbers;
 	}
-	
-	public int[] getArea(){
+
+	public int[] getArea() {
 		return image_cluster_size;
 	}
-	
-	public int getArea(int position){
+
+	public int getArea(int position) {
 		return image_cluster_size[position];
 	}
-	
-	public int[] getPerimeter(){
+
+	public int[] getPerimeter() {
 		return cluster_border_size;
 	}
-	
-	public int getPerimeter(int position){
+
+	public int getPerimeter(int position) {
 		return cluster_border_size[position];
 	}
-	
-	
-	public double[] getCircuitRatio(){
+
+	public double[] getCircuitRatio() {
 		return cluster_lambda;
 	}
-	
-	public double getCircuitRatio(int position){
+
+	public double getCircuitRatio(int position) {
 		return cluster_lambda[position];
 	}
-	
 
 	public void doPixelSegmentation() {
-		firstPass();	//Each pixel is assigned to a cluster
-		mergeHashMap(); //same cluster with different numbers are merged
-		secondPass();   //Cluster are renumbered
+		firstPass(); // Each pixel is assigned to a cluster
+		mergeHashMap();
+		secondPass(); // Cluster are renumbered
 		calculatePerimeterOfEachCluster();
 		calculateCircuitRatio();
 	}
 
 	private void calculateCircuitRatio() {
-		cluster_lambda = new double [zaehler];
-		
-		for(int i = 0; i< zaehler; i++)
-			if(cluster_border_size[i] > 0){
-				cluster_lambda[i] = ((double)image_cluster_size[i]/(double)(cluster_border_size[i]*cluster_border_size[i]))*4*Math.PI;
+		cluster_lambda = new double[zaehler];
+
+		for (int i = 0; i < zaehler; i++)
+			if (cluster_border_size[i] > 0) {
+				cluster_lambda[i] = (double) image_cluster_size[i] / (double) cluster_border_size[i]
+						/ cluster_border_size[i] * 4 * Math.PI;
 			}
-		
+
 	}
 
 	// ############### Print-Methoden ######################
@@ -144,19 +138,18 @@ public class PixelSegmentation {
 		printImage(original_image, "OriginalImage");
 	}
 
-	public void printArray(int[] array){
+	public void printArray(int[] array) {
 		for (int i = 0; i < array.length; i++) {
 			System.out.println(array[i]);
 		}
 	}
-	
-	public void printArray(double[] array){
+
+	public void printArray(double[] array) {
 		for (int i = 0; i < array.length; i++) {
 			System.out.println(array[i]);
 		}
 	}
-	
-	
+
 	public void printImage() {
 		printImage(this.image_cluster_ids);
 	}
@@ -237,31 +230,31 @@ public class PixelSegmentation {
 				image_cluster_size[image_cluster_ids[i][j]]++;
 			}
 	}
-	
-	private void calculatePerimeterOfEachCluster(){
-		
+
+	private void calculatePerimeterOfEachCluster() {
+
 		cluster_border_size = new int[zaehler];
-		
-		for (int i = 0; i < src_image.length; i++){
+
+		for (int i = 0; i < src_image.length; i++) {
 			for (int j = 0; j < src_image[i].length; j++) {
 				if (!(src_image[i][j] < foreground)) {
 					controlEdges(i, j);
 				}
 			}
 		}
-	}	
-	
+	}
+
 	private void controlEdges(int currentPositionI, int currentPositionJ) {
-		
+
 		for (int l = 0; l < perimeterMask.length; l++) {
 			for (int k = 0; k < perimeterMask[l].length; k++) {
-				if(perimeterMask[l][k] == 1){
+				if (perimeterMask[l][k] == 1) {
 					if (currentPositionI - 1 + l >= 0 && currentPositionJ - 1 + k >= 0
 							&& currentPositionI - 1 + l <= src_image.length - 1
-							&& currentPositionJ - 1 + k <= src_image[currentPositionI].length - 1){
-						if(image_cluster_ids[currentPositionI - 1 + l][currentPositionJ - 1 + k] != image_cluster_ids[currentPositionI][currentPositionJ]){
+							&& currentPositionJ - 1 + k <= src_image[currentPositionI].length - 1) {
+						if (image_cluster_ids[currentPositionI - 1 + l][currentPositionJ - 1 + k] != image_cluster_ids[currentPositionI][currentPositionJ]) {
 							cluster_border_size[image_cluster_ids[currentPositionI][currentPositionJ]]++;
-							
+
 						}
 					} else {
 						cluster_border_size[image_cluster_ids[currentPositionI][currentPositionJ]]++;
@@ -269,9 +262,8 @@ public class PixelSegmentation {
 				}
 			}
 		}
-		
+
 	}
-	
 
 	private void parse(Position zahl) {
 		parse(zahl, 0, 0);
@@ -491,77 +483,49 @@ public class PixelSegmentation {
 
 	private void mergeHashMap() {
 
-		HashMap<Integer, HashSet<Integer>> clusterVerweis_temp = new HashMap<Integer,  HashSet<Integer>>();
+		ArrayList<HashSet<Integer>> toepfe = new ArrayList<HashSet<Integer>>();
 
-		
 		for (int key : clusterMapping.keySet()) {
+			HashSet<Integer> topf = new HashSet<Integer>();
+			topf.add(key);
+			toepfe.add(topf);
 			for (int value : clusterMapping.get(key)) {
-				if (!clusterVerweis_temp.containsKey(value))
-					clusterVerweis_temp.put(value, new HashSet<Integer>());
-				clusterVerweis_temp.get(value).add(key);
+				topf.add(value);
 			}
 		}
 
+		// toepfe ineinander
+
+		for (int a = 0; a < toepfe.size(); a++) {
+			HashSet<Integer> topfA = toepfe.get(a);
+			if (!topfA.isEmpty())
+				for (int b = a; b < toepfe.size(); b++) {
+					HashSet<Integer> topfB = toepfe.get(b);
+					if (topfA != topfB && !topfB.isEmpty()) {
+						boolean foundInTopfB = false;
+						for (Integer inTopfA : topfA) {
+							if (topfB.contains(inTopfA)) {
+								foundInTopfB = true;
+								break;
+							}
+						}
+						if (foundInTopfB) {
+							// schuette in topfB
+							topfB.addAll(topfA);
+							topfA.clear();
+						}
+					}
+				}
+		}
+
 		clusterMapping.clear();
-		for (int key : clusterVerweis_temp.keySet())
-			for (int value : clusterVerweis_temp.get(key)) {
-				// clusterMapping.putAll(clusterVerweis_temp);
-				if (!clusterMapping.containsKey(key))
-					clusterMapping.put(key, new ArrayList<Integer>());
-				clusterMapping.get(key).add(value);
-			}
-//
-//		boolean my = true;
-//		if (my)
-//			return;
-//		
-//		for (int clusterID : clusterMapping.keySet()) {
-//			ArrayList<Integer> keysByValue = getKeyByValue2(clusterMapping, clusterID);
-//
-//			if (!keysByValue.isEmpty()) {
-//
-//				// alle Cluster die zur "clusterID" gehoeren zum ersten Fund von
-//				// "keysByValue" hinzufuegen
-//				ArrayList<Integer> temp = clusterMapping.get(clusterID);
-//				Integer firstClusterID = keysByValue.get(0);
-//				ArrayList<Integer> ersterFund = clusterMapping.get(firstClusterID);
-//
-//				for (int i = 0; i < temp.size(); i++)
-//					if (!ersterFund.contains(temp.get(i)) && firstClusterID != temp.get(i)) {
-//						ersterFund.add(temp.get(i));
-//						if (clusterVerweis_temp.containsKey(temp.get(i)))
-//							clusterVerweis_temp.remove(temp.get(i));
-//					}
-//
-//				// alle weiteren Cluster aus "keysByValue" ebenfalls zum ersten Fund
-//				// hinzufuegen
-//				if (keysByValue.size() > 1)
-//					for (int i = 1; i < keysByValue.size(); i++) {
-//
-//						temp = clusterMapping.get(keysByValue.get(i));
-//
-//						for (int tempJ : temp) {
-//							if (!ersterFund.contains(tempJ) && firstClusterID != tempJ) {
-//								ersterFund.add(tempJ);
-//								if (clusterVerweis_temp.containsKey(tempJ))
-//									clusterVerweis_temp.remove(tempJ);
-//							}
-//						}
-//
-//						if (!ersterFund.contains(keysByValue.get(i)) && firstClusterID != keysByValue.get(i)) {
-//							ersterFund.add(keysByValue.get(i));
-//							if (clusterVerweis_temp.containsKey(keysByValue.get(i)))
-//								clusterVerweis_temp.remove(keysByValue.get(i));
-//						}
-//					}
-//				clusterVerweis_temp.put(firstClusterID, ersterFund);
-//			} else
-//				clusterVerweis_temp.put(clusterID, clusterMapping.get(clusterID));
-//
-//		}
-//
-//		clusterMapping.clear();
-//		clusterMapping.putAll(clusterVerweis_temp);
+		for (HashSet<Integer> topf : toepfe) {
+			if (topf.isEmpty())
+				continue;
+			Integer key = topf.iterator().next();
+			topf.remove(key);
+			clusterMapping.put(key, new ArrayList<Integer>(topf));
+		}
 	}
 
 	private ArrayList<Integer> getKeyByValue2(HashMap<Integer, ArrayList<Integer>> hashM, Integer value) {

@@ -19,6 +19,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
+import de.ipk.ag_ba.postgresql.MorphologicalOperators;
 import de.ipk.ag_ba.postgresql.PixelSegmentation;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
@@ -176,6 +177,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		int rgbArray[] = new int[w * h];
 		img.getRGB(0, 0, w, h, rgbArray, 0, w);
 
+		int rgbArrayOriginal[] = new int[w * h];
+		img.getRGB(0, 0, w, h, rgbArrayOriginal, 0, w);
+
 		int[] rgbArrayNULL = null;
 		if (imgNULL != null) {
 			rgbArrayNULL = new int[w * h];
@@ -212,6 +216,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		}
 
 		removeSmallPartsOfImage(w, h, rgbArray, iBackgroundFill, limg, (int) (w * h * 0.005d));
+
+		closingOpening(w, h, rgbArray, rgbArrayOriginal, iBackgroundFill, limg);
 
 		if (dataAnalysis) {
 			Geometry g = detectGeometry(w, h, rgbArray, iBackgroundFill, limg);
@@ -273,32 +279,37 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			// m.setUnit("%");
 			// output.add(m);
 
-			int redLine = Color.RED.getRGB();
+			boolean red = false;
+			if (red) {
+				int redLine = Color.RED.getRGB();
 
-			int o = g.getTop() * w;
-			int lww = 20;
-			if (g.getTop() < lww + 1)
-				o = 8 * w;
-			for (int x = 0; x < w; x++) {
-				if (o + x + w >= rgbArray.length)
-					continue;
-				for (int ii = lww; ii > 0; ii--)
-					if (o + x - ii * w >= 0)
-						rgbArray[o + x - ii * w] = redLine;
-				// rgbArray[o + x] = redLine;
-			}
-			for (int y = 0; y < h; y++) {
-				o = g.getLeft() + y * w;
-				if (o + 1 >= h)
-					continue;
-				rgbArray[o - 1] = redLine;
-				rgbArray[o] = redLine;
-				rgbArray[o + 1] = redLine;
-				o = g.getRight() + y * w;
-				if (o - 1 >= 0)
+				int o = g.getTop() * w;
+				int lww = 20;
+				if (g.getTop() < lww + 1)
+					o = 8 * w;
+				for (int x = 0; x < w; x++) {
+					if (o + x + w >= rgbArray.length)
+						continue;
+					for (int ii = lww; ii > 0; ii--)
+						if (o + x - ii * w >= 0)
+							rgbArray[o + x - ii * w] = redLine;
+					// rgbArray[o + x] = redLine;
+				}
+				for (int y = 0; y < h; y++) {
+					o = g.getLeft() + y * w;
+					if (o - 1 < 0)
+						continue;
+					if (o + 1 >= h)
+						continue;
 					rgbArray[o - 1] = redLine;
-				rgbArray[o] = redLine;
-				rgbArray[o + 1] = redLine;
+					rgbArray[o] = redLine;
+					rgbArray[o + 1] = redLine;
+					o = g.getRight() + y * w;
+					if (o - 1 >= 0)
+						rgbArray[o - 1] = redLine;
+					rgbArray[o] = redLine;
+					rgbArray[o + 1] = redLine;
+				}
 			}
 		}
 		img.setRGB(0, 0, w, h, rgbArray, 0, w);
@@ -328,6 +339,34 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		}
 	}
 
+	private static void closingOpening(int w, int h, int[] rgbArray, int[] rgbNonModifiedArray, int iBackgroundFill,
+			LoadedImage limg) {
+		int[][] image = new int[w][h];
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				int off = x + y * w;
+				int color = rgbArray[off];
+				if (color != iBackgroundFill) {
+					image[x][y] = 1;
+				} else {
+					image[x][y] = 0;
+				}
+			}
+		}
+		MorphologicalOperators op = new MorphologicalOperators(image);
+		op.doClosing();
+		int[][] mask = image = op.getResultImage();
+
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (mask[x][y] == 0)
+					rgbArray[x + y * w] = iBackgroundFill;
+				else
+					rgbArray[x + y * w] = rgbNonModifiedArray[x + y * w];
+			}
+		}
+	}
+
 	private static void removeSmallPartsOfImage(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg,
 			int cutOff) {
 		int[][] image = new int[w][h];
@@ -335,22 +374,41 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			for (int y = 0; y < h; y++) {
 				int off = x + y * w;
 				int color = rgbArray[off];
-				if (color != iBackgroundFill)
+				if (color != iBackgroundFill) {
 					image[x][y] = 1;
-				else
+				} else {
 					image[x][y] = 0;
+				}
 			}
 		}
 		PixelSegmentation ps = new PixelSegmentation(image);
 		ps.doPixelSegmentation();
-		int[] clusterSize = ps.getClusterCounts();
-		int[][] result = ps.getImageMask();
+		int[] clusterSizes = ps.getClusterCounts();
+		int[] clusterPerimeter = ps.getPerimeter();
+		double[] clusterCircleSimilarity = ps.getCircuitRatio();
+
+		for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
+			if (clusterSizes[clusterID] > 50 * 50)
+				System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
+						+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
+						+ (clusterCircleSimilarity[clusterID] < 0.013));
+
+		int[][] mask = ps.getImageMask();
+		// ArrayList<Color> colors = Colors.get(cl);
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
-				int clusterID = result[x][y];
-				int size = clusterSize[clusterID];
-				if (size < cutOff)
+				int clusterID = mask[x][y];
+				// rgbArray[x + y * w] = clusterID != 0 ? clusterID :
+				// Color.YELLOW.getRGB();
+				// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
+
+				if (clusterSizes[clusterID] < cutOff || clusterCircleSimilarity[clusterID] > 0.013)
 					rgbArray[x + y * w] = iBackgroundFill;
+				// else if (clusterID != 0)
+				// System.out.println("ID: " + clusterID + ", SIZE: " +
+				// clusterSizes[clusterID] + ", PERIMETER: "
+				// + clusterPerimeter[clusterID] + ", CIRCLE? " +
+				// clusterCircleSimilarity[clusterID]);
 			}
 		}
 	}

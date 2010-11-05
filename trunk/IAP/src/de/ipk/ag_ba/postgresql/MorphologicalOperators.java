@@ -25,7 +25,6 @@ public class MorphologicalOperators {
 	private int positionMaskJ;
 	private int positionMaskI;
 
-
 	public MorphologicalOperators(int[][] src_image) {
 		this(src_image, new int[][] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }, 1, 1);
 	}
@@ -60,6 +59,18 @@ public class MorphologicalOperators {
 		erosion();
 		int[][] newSrcImage = cloneArray();
 		dilatation(newSrcImage);
+	}
+
+	public void doOpening(int repeat) {
+		erosion();
+		for (int i = 1; i < repeat; i++) {
+			int[][] newSrcImage = cloneArray();
+			erosion(newSrcImage);
+		}
+		for (int i = 0; i < repeat; i++) {
+			int[][] newSrcImage = cloneArray();
+			dilatation(newSrcImage);
+		}
 	}
 
 	public void doOpening(int[][] changeMask, int posJ, int posI) {
