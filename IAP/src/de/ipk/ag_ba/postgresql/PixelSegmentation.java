@@ -7,6 +7,7 @@ package de.ipk.ag_ba.postgresql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * @author entzian
@@ -489,55 +490,78 @@ public class PixelSegmentation {
 	}
 
 	private void mergeHashMap() {
-		HashMap<Integer, ArrayList<Integer>> clusterVerweis_temp = new HashMap<Integer, ArrayList<Integer>>();
 
-		for (int clusterID : clusterMapping.keySet()) {
-			ArrayList<Integer> keysByValue = getKeyByValue2(clusterMapping, clusterID);
+		HashMap<Integer, HashSet<Integer>> clusterVerweis_temp = new HashMap<Integer,  HashSet<Integer>>();
 
-			if (!keysByValue.isEmpty()) {
-
-				// alle Cluster die zur "clusterID" gehoeren zum ersten Fund von
-				// "keysByValue" hinzufuegen
-				ArrayList<Integer> temp = clusterMapping.get(clusterID);
-				Integer firstClusterID = keysByValue.get(0);
-				ArrayList<Integer> ersterFund = clusterMapping.get(firstClusterID);
-
-				for (int i = 0; i < temp.size(); i++)
-					if (!ersterFund.contains(temp.get(i)) && firstClusterID != temp.get(i)) {
-						ersterFund.add(temp.get(i));
-						if (clusterVerweis_temp.containsKey(temp.get(i)))
-							clusterVerweis_temp.remove(temp.get(i));
-					}
-
-				// alle weiteren Cluster aus "keysByValue" ebenfalls zum ersten Fund
-				// hinzufuegen
-				if (keysByValue.size() > 1)
-					for (int i = 1; i < keysByValue.size(); i++) {
-
-						temp = clusterMapping.get(keysByValue.get(i));
-
-						for (int tempJ : temp) {
-							if (!ersterFund.contains(tempJ) && firstClusterID != tempJ) {
-								ersterFund.add(tempJ);
-								if (clusterVerweis_temp.containsKey(tempJ))
-									clusterVerweis_temp.remove(tempJ);
-							}
-						}
-
-						if (!ersterFund.contains(keysByValue.get(i)) && firstClusterID != keysByValue.get(i)) {
-							ersterFund.add(keysByValue.get(i));
-							if (clusterVerweis_temp.containsKey(keysByValue.get(i)))
-								clusterVerweis_temp.remove(keysByValue.get(i));
-						}
-					}
-				clusterVerweis_temp.put(firstClusterID, ersterFund);
-			} else
-				clusterVerweis_temp.put(clusterID, clusterMapping.get(clusterID));
-
+		
+		for (int key : clusterMapping.keySet()) {
+			for (int value : clusterMapping.get(key)) {
+				if (!clusterVerweis_temp.containsKey(value))
+					clusterVerweis_temp.put(value, new HashSet<Integer>());
+				clusterVerweis_temp.get(value).add(key);
+			}
 		}
 
 		clusterMapping.clear();
-		clusterMapping.putAll(clusterVerweis_temp);
+		for (int key : clusterVerweis_temp.keySet())
+			for (int value : clusterVerweis_temp.get(key)) {
+				// clusterMapping.putAll(clusterVerweis_temp);
+				if (!clusterMapping.containsKey(key))
+					clusterMapping.put(key, new ArrayList<Integer>());
+				clusterMapping.get(key).add(value);
+			}
+//
+//		boolean my = true;
+//		if (my)
+//			return;
+//		
+//		for (int clusterID : clusterMapping.keySet()) {
+//			ArrayList<Integer> keysByValue = getKeyByValue2(clusterMapping, clusterID);
+//
+//			if (!keysByValue.isEmpty()) {
+//
+//				// alle Cluster die zur "clusterID" gehoeren zum ersten Fund von
+//				// "keysByValue" hinzufuegen
+//				ArrayList<Integer> temp = clusterMapping.get(clusterID);
+//				Integer firstClusterID = keysByValue.get(0);
+//				ArrayList<Integer> ersterFund = clusterMapping.get(firstClusterID);
+//
+//				for (int i = 0; i < temp.size(); i++)
+//					if (!ersterFund.contains(temp.get(i)) && firstClusterID != temp.get(i)) {
+//						ersterFund.add(temp.get(i));
+//						if (clusterVerweis_temp.containsKey(temp.get(i)))
+//							clusterVerweis_temp.remove(temp.get(i));
+//					}
+//
+//				// alle weiteren Cluster aus "keysByValue" ebenfalls zum ersten Fund
+//				// hinzufuegen
+//				if (keysByValue.size() > 1)
+//					for (int i = 1; i < keysByValue.size(); i++) {
+//
+//						temp = clusterMapping.get(keysByValue.get(i));
+//
+//						for (int tempJ : temp) {
+//							if (!ersterFund.contains(tempJ) && firstClusterID != tempJ) {
+//								ersterFund.add(tempJ);
+//								if (clusterVerweis_temp.containsKey(tempJ))
+//									clusterVerweis_temp.remove(tempJ);
+//							}
+//						}
+//
+//						if (!ersterFund.contains(keysByValue.get(i)) && firstClusterID != keysByValue.get(i)) {
+//							ersterFund.add(keysByValue.get(i));
+//							if (clusterVerweis_temp.containsKey(keysByValue.get(i)))
+//								clusterVerweis_temp.remove(keysByValue.get(i));
+//						}
+//					}
+//				clusterVerweis_temp.put(firstClusterID, ersterFund);
+//			} else
+//				clusterVerweis_temp.put(clusterID, clusterMapping.get(clusterID));
+//
+//		}
+//
+//		clusterMapping.clear();
+//		clusterMapping.putAll(clusterVerweis_temp);
 	}
 
 	private ArrayList<Integer> getKeyByValue2(HashMap<Integer, ArrayList<Integer>> hashM, Integer value) {
