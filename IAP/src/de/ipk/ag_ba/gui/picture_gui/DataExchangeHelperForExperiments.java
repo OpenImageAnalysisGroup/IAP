@@ -1,5 +1,5 @@
 /* Copyright (c) 2003 IPK Gatersleben
- * $Id: DataExchangeHelperForExperiments.java,v 1.5 2010-11-03 16:00:23 klukas Exp $
+ * $Id: DataExchangeHelperForExperiments.java,v 1.6 2010-11-05 09:46:50 klukas Exp $
  */
 package de.ipk.ag_ba.gui.picture_gui;
 
@@ -318,12 +318,16 @@ public class DataExchangeHelperForExperiments {
 										myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
 												DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
 										myImage.imageAvailable = 1;
-										SwingUtilities.invokeLater(new Runnable() {
-											@Override
-											public void run() {
-												imageButton.updateLayout(null, myImage, myImage);
-											}
-										});
+										try {
+											SwingUtilities.invokeAndWait(new Runnable() {
+												@Override
+												public void run() {
+													imageButton.updateLayout(null, myImage, myImage);
+												}
+											});
+										} catch (Exception e) {
+											ErrorMsg.addErrorMessage(e);
+										}
 									} catch (MalformedURLException e) {
 										// empty
 									}
