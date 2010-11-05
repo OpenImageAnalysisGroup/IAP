@@ -6,9 +6,9 @@
 package de.ipk.ag_ba.postgresql;
 
 /**
- * @author entzian, klukas
+ * @author entzian
  *
  */
-public enum Position {
-	FIRST_FIELD, FIRST_ROW, FIRST_COLUMN, LAST_COLUMN, REMAINING
+public enum Scaling {
+	NEAREST_NEIGHBOUR, BILINEAR, HERMITE, GAUSSIAN, BELL, BSPLINE, MITCHELL, LANCZOS
 }
