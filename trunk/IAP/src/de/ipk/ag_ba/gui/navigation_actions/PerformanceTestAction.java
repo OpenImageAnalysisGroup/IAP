@@ -100,10 +100,10 @@ public class PerformanceTestAction extends AbstractNavigationAction implements R
 			// }
 
 			PerformanceAnalysisTask task = new PerformanceAnalysisTask();
-			task.addPreprocessor(new CutImagePreprocessor());
+			// task.addPreprocessor(new CutImagePreprocessor());
 			TreeMap<Long, String> times = new TreeMap<Long, String>();
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
-			for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 4) {
+			for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 1) {
 				long t1 = System.currentTimeMillis();
 				task.setInput(workload, login, pass);
 				task.performAnalysis(pi, 1, status);
@@ -121,9 +121,7 @@ public class PerformanceTestAction extends AbstractNavigationAction implements R
 
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
 
-			if (statRes == null) {
-				ErrorMsg.addErrorMessage("Error: no statistics result");
-			} else {
+			{
 				for (NumericMeasurementInterface m : statRes) {
 					if (m == null)
 						System.out.println("ERROR NULL");

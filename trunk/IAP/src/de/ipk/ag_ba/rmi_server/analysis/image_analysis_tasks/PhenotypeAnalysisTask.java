@@ -402,7 +402,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				// Color.YELLOW.getRGB();
 				// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
 
-				if (clusterSizes[clusterID] < cutOff || clusterCircleSimilarity[clusterID] > 0.013)
+				if (clusterSizes[clusterID] < cutOff) // ||
+																	// clusterCircleSimilarity[clusterID]
+																	// > 0.013
 					rgbArray[x + y * w] = iBackgroundFill;
 				// else if (clusterID != 0)
 				// System.out.println("ID: " + clusterID + ", SIZE: " +
