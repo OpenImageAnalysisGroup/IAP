@@ -27,7 +27,6 @@ import org.StringManipulationTools;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
-import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -583,7 +582,7 @@ public class LemnaTecDataExchange {
 			if (blob2buf.containsKey(url.toString()))
 				buf = blob2buf.get(url.toString());
 			else {
-				InputStream in = ResourceIOManager.getInputStream(url);
+				InputStream in = url.getInputStream();
 				// read configuration object in order to detect rotation angle
 				MyByteArrayOutputStream out = new MyByteArrayOutputStream();
 				byte[] temp = new byte[1024];

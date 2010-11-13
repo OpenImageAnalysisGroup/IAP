@@ -14,6 +14,7 @@ import java.util.Collection;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.CloudUploadEntity;
 import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
+import de.ipk.ag_ba.gui.navigation_actions.NumericDataReportAction;
 import de.ipk.ag_ba.gui.navigation_actions.PerformanceTestAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDsegmentationAction;
@@ -58,6 +59,8 @@ public class ImageAnalysisCommandManager {
 			NavigationAction phenotypeAnalysisAction = new PerformanceTestAction(login, pass, experimentReference);
 			NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSettings);
 			actions.add(resultTaskButton);
+
+			actions.add(new NavigationButton(new NumericDataReportAction(login, pass, experimentReference), guiSettings));
 
 			actions.add(ImageAnalysis.getPhenotypingEntity(login, pass, experimentReference, 10, 15, guiSettings));
 			actions.add(ThreeDreconstructionAction.getThreeDreconstructionTaskEntity(login, pass, experimentReference,
