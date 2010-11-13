@@ -132,7 +132,7 @@ public class MongoDB {
 	}
 
 	private String defaultDBE = "dbe3";
-	private String defaultHost = "ba-13";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
+	private String defaultHost = "localhost";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
 	// "ba-13.ipk-gatersleben.de:27017,nw-08.ipk-gatersleben.de:27018";
 	private String defaultLogin = null;
 	private String defaultPass = null;
@@ -369,7 +369,7 @@ public class MongoDB {
 				} // sample
 				condition.put("samples", dbSamples);
 			} // condition
-			// substance.put("conditions", dbConditions);
+				// substance.put("conditions", dbConditions);
 			substtance2conditions.put(substance, dbConditions);
 		} // substance
 
@@ -404,8 +404,9 @@ public class MongoDB {
 		}
 
 		if (errorCount > 0) {
-			MainFrame.showMessageDialog("<html>" + "The following files cound not be properly processed:<ul>"
-					+ errors.toString() + "</ul> " + "", "Errors");
+			MainFrame.showMessageDialog(
+					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
+							+ "", "Errors");
 		}
 
 	}
@@ -882,8 +883,7 @@ public class MongoDB {
 						BatchCmd batch = (BatchCmd) dbo;
 						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED
 								|| ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
-										.currentTimeMillis()
-										- batch.getLastUpdateTime() > maxUpdate))
+										.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
 							res.add(batch);
 					}
 				}

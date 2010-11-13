@@ -85,10 +85,12 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
-		final ThreadSafeOptions tsoRead = new ThreadSafeOptions();
-		tsoRead.setInt(0);
-		final ThreadSafeOptions tsoTime = new ThreadSafeOptions();
-		tsoTime.setParam(0, System.currentTimeMillis());
+		final ThreadSafeOptions tsoBytesRead = new ThreadSafeOptions();
+		tsoBytesRead.setLong(0);
+		final ThreadSafeOptions tsoStartTime = new ThreadSafeOptions();
+		tsoStartTime.setLong(System.currentTimeMillis());
+		final ThreadSafeOptions tsoCurrentSecond = new ThreadSafeOptions();
+		tsoCurrentSecond.setInt(0);
 		for (Measurement md : workload) {
 			if (md instanceof ImageData) {
 				final ImageData id = (ImageData) md;
@@ -97,65 +99,70 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 					public void run() {
 						if (id != null) {
 							try {
-								// limg = IOmodule.loadImageFromFileOrMongo(id,
-								// login, pass);
 								long start = System.currentTimeMillis();
 								byte[] imgData = IOmodule.loadImageContentFromFileOrMongo(id, login, pass);
 								long end = System.currentTimeMillis();
-								tsoRead.addInt(imgData.length);
+								tsoBytesRead.addLong(imgData.length);
 								{
-									NumericMeasurement m = new NumericMeasurement(id, "read length", id.getParentSample()
+									NumericMeasurement m = new NumericMeasurement(id, "image size", id.getParentSample()
 											.getParentCondition().getExperimentName()
 											+ " (" + getName() + ")");
 									setAnno(maximumThreadCountParallelImages, m);
-									m.setValue(imgData.length);
-									m.setUnit("bytes");
+									m.setValue(((int) (imgData.length / 1024d * 10d)) / 10d);
+									m.setUnit("KB");
 									output.add(m);
 								}
 								{
-									NumericMeasurement m = new NumericMeasurement(id, "read performance (single image)", id
+									NumericMeasurement m = new NumericMeasurement(id, "read speed (single image)", id
 											.getParentSample().getParentCondition().getExperimentName()
 											+ " (" + getName() + ")");
 									setAnno(maximumThreadCountParallelImages, m);
-									m.setValue(imgData.length / 1024d / 1024d / (end - start) * 1000);
+									m.setValue(((int) (imgData.length * 10d / 1024d / 1024d / (end - start) * 1000)) / 10d);
 									m.setUnit("MB/s");
-									output.add(m);
+									m.getParentSample().setTime((int) ((end - tsoStartTime.getLong()) / 1000l));
+									m.getParentSample().setTimeUnit("sec");
+									if (end - start > 0)
+										output.add(m);
 								}
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 							}
 							tso.addInt(1);
-							long time = System.currentTimeMillis();
-							long startTime = (Long) tsoTime.getParam(0, null);
-							if (time - startTime > 5000) {
-								double mbs = tsoRead.getInt() / 1024d / 1024d / 5d;
-								status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
-								status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl + ", " + (int) mbs + " MB/s ("
-										+ maximumThreadCountParallelImages + " threads)");
-								{
-									NumericMeasurement m = new NumericMeasurement(id, "read performance (5 sek.)", id
-											.getParentSample().getParentCondition().getExperimentName()
-											+ " (" + getName() + ")");
-									setAnno(maximumThreadCountParallelImages, m);
-									m.setValue(mbs);
-									m.setUnit("MB/s");
-									m.setReplicateID(1);
-									output.add(m);
+							{
+								long time = System.currentTimeMillis();
+								int currentSecond = (int) (time / 2000 % 2);
+								if (tsoCurrentSecond.getInt() != currentSecond) {
+									tsoCurrentSecond.setInt(currentSecond);
+									double mbs = tsoBytesRead.getLong() / 1024d / 1024d * 1000d
+											/ (time - tsoStartTime.getLong());
+									status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
+									status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl + ", " + (int) mbs
+											+ " MB/s (" + maximumThreadCountParallelImages + " threads)");
+									{
+										NumericMeasurement m = new NumericMeasurement(id, "read speed", id.getParentSample()
+												.getParentCondition().getExperimentName()
+												+ " (" + getName() + ")");
+										setAnno(maximumThreadCountParallelImages, m);
+										m.setValue(mbs);
+										m.setUnit("MB/s");
+										m.setReplicateID(1);
+										m.getParentSample().setTime((int) ((time - tsoStartTime.getLong()) / 1000l));
+										m.getParentSample().setTimeUnit("sec");
+										output.add(m);
+									}
 								}
-								tsoTime.setParam(0, time);
-								tsoRead.setInt(0);
 							}
 						}
 					}
 
 					private void setAnno(final int maximumThreadCountParallelImages, NumericMeasurement m) {
-						m.getParentSample().setTime(maximumThreadCountParallelImages);
-						m.getParentSample().setTimeUnit("Threads");
-						m.getParentSample().getParentCondition().setSpecies("Performance Test");
-						m.getParentSample().getParentCondition().setGenotype("");
+						m.getParentSample().setTime(-1);
+						m.getParentSample().setTimeUnit("-1");
 						m.getParentSample().getParentCondition().setVariety("");
 						m.getParentSample().getParentCondition().setTreatment("");
 						m.getParentSample().getParentCondition().setSequence("");
+						m.getParentSample().getParentCondition().setSpecies("Performance Test");
+						m.getParentSample().getParentCondition().setGenotype(maximumThreadCountParallelImages + " threads");
 					}
 				});
 			}

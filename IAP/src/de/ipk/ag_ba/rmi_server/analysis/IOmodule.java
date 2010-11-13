@@ -27,7 +27,6 @@ import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
-import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
@@ -61,7 +60,7 @@ public class IOmodule {
 		BufferedImage imageNULL = null;
 		try {
 			if (id.getLabelURL() != null)
-				imageNULL = ImageIO.read(ResourceIOManager.getInputStream(id.getLabelURL()));
+				imageNULL = ImageIO.read(id.getLabelURL().getInputStream());
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
