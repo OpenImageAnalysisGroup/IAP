@@ -443,7 +443,8 @@ public class MongoDB {
 
 		try {
 			int idx = 0;
-			for (InputStream is : new InputStream[] { isImage, ResourceIOManager.getInputStream(image.getLabelURL()) }) {
+			for (InputStream is : new InputStream[] { isImage,
+					image.getLabelURL() != null ? image.getLabelURL().getInputStream() : null }) {
 				idx++;
 				if (is == null)
 					continue;

@@ -22,7 +22,6 @@ import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
-import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 /**
  * @author Christian Klukas
@@ -60,7 +59,7 @@ public class MyImageIcon extends ImageIcon {
 
 		try {
 			BufferedImage i = null;
-			i = ImageIO.read(ResourceIOManager.getInputStream(fileURL));
+			i = ImageIO.read(fileURL.getInputStream());
 			int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
 			double factor = DataSetFileButton.ICON_HEIGHT / (double) maxS;
 			i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));

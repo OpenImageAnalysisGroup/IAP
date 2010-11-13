@@ -57,7 +57,7 @@ public class IOmodule {
 	}
 
 	public static LoadedImage loadImageFromFileOrMongo(ImageData id, String login, String pass) throws Exception {
-		BufferedImage image = ImageIO.read(ResourceIOManager.getInputStream(id.getURL()));
+		BufferedImage image = ImageIO.read(id.getURL().getInputStream());
 		BufferedImage imageNULL = null;
 		try {
 			if (id.getLabelURL() != null)
@@ -70,7 +70,7 @@ public class IOmodule {
 	}
 
 	public static byte[] loadImageContentFromFileOrMongo(ImageData id, String login, String pass) throws Exception {
-		InputStream is = ResourceIOManager.getInputStream(id.getURL());
+		InputStream is = id.getURL().getInputStream();
 		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
 		HomeFolder.copyContent(is, out);
 		return out.getBuff();

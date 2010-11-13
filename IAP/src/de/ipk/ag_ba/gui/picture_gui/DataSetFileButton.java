@@ -216,7 +216,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 
 						try {
-							InputStream is = ResourceIOManager.getInputStream(imageResult.getBinaryFileInfo().getFileName());
+							InputStream is = imageResult.getBinaryFileInfo().getFileName() != null ? imageResult
+									.getBinaryFileInfo().getFileName().getInputStream() : null;
 							if (is == null)
 								System.out.println("Inputstream = null");
 							HomeFolder.copyFile(is, tf);
@@ -338,7 +339,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				i = new ImageIcon(imageResult.getFileName());
 			else
 				try {
-					i = new ImageIcon(ImageIO.read(ResourceIOManager.getInputStream(myImage.fileURL)));
+					i = new ImageIcon(ImageIO.read(myImage.fileURL.getInputStream()));
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 					i = null;
