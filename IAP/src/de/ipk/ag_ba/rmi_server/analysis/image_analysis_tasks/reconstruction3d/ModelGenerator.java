@@ -16,6 +16,7 @@ import org.ErrorMsg;
 import org.color.ColorUtil;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /*
@@ -199,43 +200,43 @@ public class ModelGenerator {
 					// determine color
 					ArrayList<Color> cc = new ArrayList<Color>();
 
-					// determine nearest 2 images for colorization
-					int zii = zi - maxVoxelPerSide / 2;
-					if (zii == 0)
-						zii = 1;
-					int yii = yi - maxVoxelPerSide / 2;
-					if (yii == 0)
-						yii = 1;
-					int xii = xi - maxVoxelPerSide / 2;
-					if (xii == 0)
-						xii = 1;
+					if (byteCube[xi][yi][zi] < 20) {
 
-					double voxelDegree = Math.PI - MathUtils3D.getAngle(zii, xii);
+						// determine nearest 2 images for colorization
+						int zii = zi - maxVoxelPerSide / 2;
+						if (zii == 0)
+							zii = 1;
+						int yii = yi - maxVoxelPerSide / 2;
+						if (yii == 0)
+							yii = 1;
+						int xii = xi - maxVoxelPerSide / 2;
+						if (xii == 0)
+							xii = 1;
 
-					MyPicture bestIdx = null;
-					MyPicture bestIdx2 = null;
-					double minDegreeDist = Double.MAX_VALUE;
-					for (MyPicture p : pictures) {
-						double angle = p.getAngle();
-						if (Math.abs(angle - voxelDegree) < minDegreeDist) {
-							bestIdx = p;
-							minDegreeDist = Math.abs(angle - voxelDegree);
-						}
-					}
-					if (bestIdx != null) {
-						minDegreeDist = Double.MAX_VALUE;
+						double voxelDegree = Math.PI - MathUtils3D.getAngle(zii, xii);
+
+						MyPicture bestIdx = null;
+						MyPicture bestIdx2 = null;
+						double minDegreeDist = Double.MAX_VALUE;
 						for (MyPicture p : pictures) {
-							if (p == bestIdx)
-								continue;
 							double angle = p.getAngle();
 							if (Math.abs(angle - voxelDegree) < minDegreeDist) {
-								bestIdx2 = p;
+								bestIdx = p;
 								minDegreeDist = Math.abs(angle - voxelDegree);
 							}
 						}
-					}
-
-					if (byteCube[xi][yi][zi] < 2)
+						if (bestIdx != null) {
+							minDegreeDist = Double.MAX_VALUE;
+							for (MyPicture p : pictures) {
+								if (p == bestIdx)
+									continue;
+								double angle = p.getAngle();
+								if (Math.abs(angle - voxelDegree) < minDegreeDist) {
+									bestIdx2 = p;
+									minDegreeDist = Math.abs(angle - voxelDegree);
+								}
+							}
+						}
 						for (MyPicture p : pictures) {
 							if (p != bestIdx && p != bestIdx2)
 								continue;
@@ -247,8 +248,21 @@ public class ModelGenerator {
 							Color c = p
 									.getPixelColor(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin, isTop)));
 							if (c != null)
+								if (ColorUtil.deltaE2000(c, PhenotypeAnalysisTask.BACKGROUND_COLOR) < 10)
+									c = null;
+							if (c == null) {
+								XYcubePointRelative rel = getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
+										isTop));
+								for (int sx = -20; sx <= 20; sx++)
+									for (int sy = -20; sy <= 20; sy++) {
+										c = p.getPixelColor(rel, sx, sy);
+										if (c != null)
+											cc.add(c);
+									}
+							} else
 								cc.add(c);
 						}
+					}
 					if (cc.size() == 0) {
 						byteCube[xi][yi][zi] = (byte) 0;
 						if (rgb) {
@@ -370,10 +384,10 @@ public class ModelGenerator {
 		double halfImageSizeX = cubeSideLengthX / 2 / (widthFactor / 100d);
 		double halfImageSizeY = cubeSideLengthY / 2;
 		cubePoint.z += cameraDistance;
-		// double xt = cubePoint.x * cubePoint.z / (cameraDistance);
-		// double yt = cubePoint.y * cubePoint.z / (cameraDistance);
-		double xt = cubePoint.x; // * p.z / (cameraDistance);
-		double yt = cubePoint.y; // * p.z / (cameraDistance);
+		double xt = cubePoint.x * cubePoint.z / (cameraDistance);
+		double yt = cubePoint.y * cubePoint.z / (cameraDistance);
+		// double xt = cubePoint.x; // * p.z / (cameraDistance);
+		// double yt = cubePoint.y; // * p.z / (cameraDistance);
 		xt /= halfImageSizeX * 2;
 		yt /= halfImageSizeY * 2;
 		return new XYcubePointRelative(xt, yt);

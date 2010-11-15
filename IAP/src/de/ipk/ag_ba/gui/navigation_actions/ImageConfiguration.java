@@ -15,21 +15,18 @@ package de.ipk.ag_ba.gui.navigation_actions;
  */
 public enum ImageConfiguration {
 	FluoSide("fluo.side", "fluo_side_image_unit", "FluoSide"), FluoTop("fluo.top", "fluo_top_image_unit", "FluoTop"), RgbSide(
-			"vis.side", "rgb.side", "rgb_side_image_unit"), RgbTop("vis.top", "rgb.top", "rgb_top_image_unit"), NirTop(
+			"vis.side", "rgb.side", "rgb_side_image_unit", "rgbside"), RgbTop("vis.top", "rgb.top", "rgb_top_image_unit"), NirTop(
 			"nir.top", "nir_top_image_unit"), NirSide("nir.side", "nir_side_image_unit"), Unknown("unknown");
 
-	private String name, name2, name3;
+	private String name, name2, name3, name4;
 
 	ImageConfiguration(String name) {
 		this.name = name;
-		this.name2 = name;
-		this.name3 = name;
 	}
 
 	ImageConfiguration(String name, String name2) {
 		this.name = name;
 		this.name2 = name2;
-		this.name3 = name2;
 	}
 
 	ImageConfiguration(String name, String name2, String name3) {
@@ -38,9 +35,17 @@ public enum ImageConfiguration {
 		this.name3 = name3;
 	}
 
+	ImageConfiguration(String name, String name2, String name3, String name4) {
+		this.name = name;
+		this.name2 = name2;
+		this.name3 = name3;
+		this.name4 = name4;
+	}
+
 	public static ImageConfiguration get(String name) {
 		for (ImageConfiguration i : values()) {
-			if (name.equalsIgnoreCase(i.name) || name.equalsIgnoreCase(i.name2) || name.equalsIgnoreCase(i.name3))
+			if (name.equalsIgnoreCase(i.name) || name.equalsIgnoreCase(i.name2) || name.equalsIgnoreCase(i.name3)
+					|| name.equalsIgnoreCase(i.name4))
 				return i;
 		}
 		return Unknown;

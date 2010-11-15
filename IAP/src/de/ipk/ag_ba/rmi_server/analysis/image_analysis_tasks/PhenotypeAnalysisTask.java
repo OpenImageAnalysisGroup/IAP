@@ -14,6 +14,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.color.ColorUtil;
+import org.color.Color_CIE_Lab;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
@@ -38,7 +39,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImageHandler;
  */
 public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
-	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255);
+	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);
 
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
@@ -156,6 +157,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			boolean dataAnalysis, String login, String pass, ArrayList<NumericMeasurementInterface> output,
 			ArrayList<ImagePreProcessor> preProcessors, double epsilonA, double epsilonB) {
 
+		epsilonA /= 10;
+		epsilonB /= 10;
+
 		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
 		final int iBackgroundFill = backgroundFill.getRGB();
 
@@ -192,6 +196,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 		final double sidepercent = 0.10;
 
+		ImageConfiguration config = ImageConfiguration.get(limg.getSubstanceName());
+
 		final ObjectRef progress = new ObjectRef("", new Integer(0));
 		ExecutorService run = null;
 		if (maximumThreadCount > 1)
@@ -199,11 +205,11 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		for (int ty = h - 1; ty >= 0; ty--) {
 			final int y = ty;
 			if (maximumThreadCount > 1)
-				run.submit(processData(limg, w, rgbArray, rgbArrayNULL, iBackgroundFill, sidepercent, progress, y,
-						epsilonA, epsilonB));
+				run.submit(processRowYofImage(limg, w, rgbArray, rgbArrayNULL, iBackgroundFill, sidepercent, progress, y,
+						epsilonA, epsilonB, config));
 			else
-				processData(limg, w, rgbArray, rgbArrayNULL, iBackgroundFill, sidepercent, progress, y, epsilonA, epsilonB)
-						.run();
+				processRowYofImage(limg, w, rgbArray, rgbArrayNULL, iBackgroundFill, sidepercent, progress, y, epsilonA,
+						epsilonB, config).run();
 		}
 
 		if (maximumThreadCount > 1) {
@@ -215,9 +221,13 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			}
 		}
 
-		removeSmallPartsOfImage(w, h, rgbArray, iBackgroundFill, limg, (int) (w * h * 0.005d));
+		if (config == ImageConfiguration.FluoTop)
+			removeSmallPartsOfImage(w, h, rgbArray, iBackgroundFill, limg, (int) (w * h * 0.005d));
+		else
+			removeSmallPartsOfImage(w, h, rgbArray, iBackgroundFill, limg, 50);//
 
-		closingOpening(w, h, rgbArray, rgbArrayOriginal, iBackgroundFill, limg);
+		// closingOpening(w, h, rgbArray, rgbArrayOriginal, iBackgroundFill, limg,
+		// 0);
 
 		if (dataAnalysis) {
 			Geometry g = detectGeometry(w, h, rgbArray, iBackgroundFill, limg);
@@ -340,7 +350,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 	}
 
 	private static void closingOpening(int w, int h, int[] rgbArray, int[] rgbNonModifiedArray, int iBackgroundFill,
-			LoadedImage limg) {
+			LoadedImage limg, int repeat) {
 		int[][] image = new int[w][h];
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -353,9 +363,15 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				}
 			}
 		}
-		MorphologicalOperators op = new MorphologicalOperators(image);
-		op.doClosing();
-		int[][] mask = image = op.getResultImage();
+		int[][] mask;
+		int cnt = 0;
+		do {
+			MorphologicalOperators op = new MorphologicalOperators(image);
+			op.doClosing();
+			mask = op.getResultImage();
+			image = op.getResultImage();
+			cnt++;
+		} while (cnt < repeat);
 
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -387,11 +403,13 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		int[] clusterPerimeter = ps.getPerimeter();
 		double[] clusterCircleSimilarity = ps.getCircuitRatio();
 
-		for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
-			if (clusterSizes[clusterID] > 50 * 50)
-				System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
-						+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
-						+ (clusterCircleSimilarity[clusterID] < 0.013));
+		boolean log = false;
+		if (log)
+			for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
+				if (clusterSizes[clusterID] > 25)
+					System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
+							+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
+							+ (clusterCircleSimilarity[clusterID] < 0.013));
 
 		int[][] mask = ps.getImageMask();
 		// ArrayList<Color> colors = Colors.get(cl);
@@ -415,9 +433,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		}
 	}
 
-	private static Runnable processData(final ImageData imageData, final int w, final int[] rgbArray,
+	private static Runnable processRowYofImage(final ImageData imageData, final int w, final int[] rgbArray,
 			final int[] rgbArrayNULL, final int iBackgroundFill, final double sidepercent, final ObjectRef progress,
-			final int y, final double epsilonA, final double epsilonB) {
+			final int y, final double epsilonA, final double epsilonB, final ImageConfiguration config) {
 		return new Runnable() {
 
 			@Override
@@ -427,89 +445,107 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				if (subN.contains("FLUO"))
 					factor = 0.2;
 
-				boolean subNfluo = ImageConfiguration.get(imageData.getSubstanceName()) == ImageConfiguration.FluoSide
-						|| ImageConfiguration.get(imageData.getSubstanceName()) == ImageConfiguration.FluoTop;
-				boolean subNrgb = ImageConfiguration.get(imageData.getSubstanceName()) == ImageConfiguration.RgbSide
-						|| ImageConfiguration.get(imageData.getSubstanceName()) == ImageConfiguration.RgbTop;
-
-				ArrayList<Integer> backgroundPixelsArr = new ArrayList<Integer>();
-
 				int x = 0;
-				boolean hasBackgroundImage = rgbArrayNULL != null && rgbArray.length == rgbArrayNULL.length;
-				if (hasBackgroundImage) {
-					double ef = epsilonA * factor * 10;
-					for (int i = 0; i < rgbArray.length; i++) {
-						if (ColorUtil.deltaE2000simu(rgbArray[i], rgbArrayNULL[i]) < ef) {
+				if (config == ImageConfiguration.RgbSide) {
+					if (y == 0)
+						System.out.println("LAB processing of RGB image..." + imageData.toString() + ")");
+
+					int i = x + y * w;
+					for (x = 0; x < w; x++) {
+						Color_CIE_Lab lab = new Color_CIE_Lab(rgbArray[i]);
+						if (!(lab.getA() < 5 && lab.getB() > 5)) {
+							rgbArray[i] = iBackgroundFill;
+						} else if (lab.getL() >= 80 && Math.abs(lab.getA()) <= 20 && Math.abs(lab.getB()) <= 20) {
 							rgbArray[i] = iBackgroundFill;
 						}
+
+						i++;
+					}
+				} else if (config == ImageConfiguration.FluoTop) {
+					if (y == 0)
+						System.out.println("LAB processing of FluoTop image..." + imageData.toString() + ")");
+
+					int i = x + y * w;
+					for (x = 0; x < w; x++) {
+						Color_CIE_Lab lab = new Color_CIE_Lab(rgbArray[i]);
+						if (!(lab.getL() >= 15 && lab.getA() >= 20 && lab.getB() >= 20)) {
+							rgbArray[i] = iBackgroundFill;
+						}
+
+						i++;
 					}
 				} else {
+					ArrayList<Integer> backgroundPixelsArr = new ArrayList<Integer>();
+					boolean hasBackgroundImage = rgbArrayNULL != null && rgbArray.length == rgbArrayNULL.length;
+					if (hasBackgroundImage) {
+						if (y == 0)
+							System.out.println("Has background image..." + imageData.toString() + ")");
+						double ef = epsilonA * factor * 10;
+						int i = x + y * w;
+						for (x = 0; x < w; x++) {
+							if (ColorUtil.deltaE2000(rgbArray[i], rgbArrayNULL[i]) < ef) {
+								rgbArray[i] = iBackgroundFill;
+							}
+							i++;
+						}
+					} else {
+						if (y == 0)
+							System.out.println("Has NO background image, interpreting side border colors as background..."
+									+ imageData.toString() + ")");
+						for (x = 0; x < w * sidepercent; x++) {
+							int bp = rgbArray[x + y * w];
+							rgbArray[x + y * w] = iBackgroundFill;
+							boolean newBackgroundColor = true;
+							for (Integer c : backgroundPixelsArr) {
+								if (ColorUtil.deltaE2000(c, bp) < epsilonA * factor) {
+									newBackgroundColor = false;
+									break;
+								}
+							}
+							if (newBackgroundColor)
+								backgroundPixelsArr.add(bp);
+						}
+						for (x = (int) (w - w * sidepercent); x < w; x++) {
+							int bp = rgbArray[x + y * w];
+							rgbArray[x + y * w] = iBackgroundFill;
+							boolean newBackgroundColor = true;
+							for (Integer c : backgroundPixelsArr) {
+								if (ColorUtil.deltaE2000(c, bp) < epsilonA * factor) {
+									newBackgroundColor = false;
+									break;
+								}
+							}
+							if (newBackgroundColor)
+								backgroundPixelsArr.add(bp);
+						}
+					}
 					for (x = 0; x < w * sidepercent; x++) {
-						int bp = rgbArray[x + y * w];
-						rgbArray[x + y * w] = iBackgroundFill;
-						boolean newBackgroundColor = true;
-						for (Integer c : backgroundPixelsArr) {
-							if (ColorUtil.deltaE2000simu(c, bp) < epsilonA * factor) {
-								newBackgroundColor = false;
-								break;
+						// empty
+					}
+					int[] backgroundPixels = new int[backgroundPixelsArr.size()];
+					int i = 0;
+					for (int b : backgroundPixelsArr)
+						backgroundPixels[i++] = b;
+					for (; x < (int) (w - w * sidepercent); x++) {
+						int xyw = x + y * w;
+						int p = rgbArray[xyw];
+
+						for (Integer c : backgroundPixels) {
+							if (y < w * 0.03 || ColorUtil.deltaE2000(c, p) < epsilonB * factor) {
+								rgbArray[xyw] = iBackgroundFill;
 							}
 						}
-						if (newBackgroundColor)
-							backgroundPixelsArr.add(bp);
-					}
-					for (x = (int) (w - w * sidepercent); x < w; x++) {
-						int bp = rgbArray[x + y * w];
-						rgbArray[x + y * w] = iBackgroundFill;
-						boolean newBackgroundColor = true;
-						for (Integer c : backgroundPixelsArr) {
-							if (ColorUtil.deltaE2000simu(c, bp) < epsilonA * factor) {
-								newBackgroundColor = false;
-								break;
+
+						if (config == ImageConfiguration.FluoTop)
+							if (rgbArray[xyw] != iBackgroundFill) {
+								Color c = new Color(rgbArray[xyw]);
+								float hsb[] = new float[3];
+								Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
+								if (hsb[2] < 0.5)
+									rgbArray[xyw] = iBackgroundFill;
 							}
-						}
-						if (newBackgroundColor)
-							backgroundPixelsArr.add(bp);
 					}
 				}
-				for (x = 0; x < w * sidepercent; x++) {
-					// empty
-				}
-				int[] backgroundPixels = new int[backgroundPixelsArr.size()];
-				int i = 0;
-				for (int b : backgroundPixelsArr)
-					backgroundPixels[i++] = b;
-				for (; x < (int) (w - w * sidepercent); x++) {
-					int xyw = x + y * w;
-					int p = rgbArray[xyw];
-
-					for (Integer c : backgroundPixels) {
-						if (y < w * 0.03 || ColorUtil.deltaE2000simu(c, p) < epsilonB * factor) {
-							rgbArray[xyw] = iBackgroundFill;
-						}
-					}
-
-					if (subNfluo)
-						if (rgbArray[xyw] != iBackgroundFill) {
-							Color c = new Color(rgbArray[xyw]);
-							float hsb[] = new float[3];
-							Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
-							if (hsb[2] < 0.5)
-								rgbArray[xyw] = iBackgroundFill;
-						}
-					if (subNrgb)
-						if (rgbArray[xyw] != iBackgroundFill) {
-							Color c = new Color(rgbArray[xyw]);
-							float hsb[] = new float[3];
-							Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
-							// if (hsb[1] < 0.25 && hsb[2] > 0.5)
-							// rgbArray[xyw] = Color.YELLOW.getRGB();//
-							// iBackgroundFill;
-							// else
-							if (Math.abs(hsb[0] - 0.8) < 0.3)
-								rgbArray[xyw] = iBackgroundFill;
-						}
-				}
-
 				synchronized (progress) {
 					progress.setObject(new Integer((Integer) progress.getObject() + 1));
 				}
