@@ -9,13 +9,12 @@ import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.ImageAnalysis;
-import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -89,8 +88,8 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
 						for (Measurement md : sd3.getAllMeasurements()) {
-//							if (workload.size() >= 10)
-//								break;
+							// if (workload.size() >= 10)
+							// break;
 							workIndex++;
 							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
 								if (md instanceof ImageData) {
@@ -150,7 +149,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			int pi = SystemAnalysis.getNumberOfCPUs() / 2;
 			if (pi < 1)
 				pi = 1;
-			int ti = 2;
+			int ti = 4;
 			task.performAnalysis(pi, ti, status);
 			long t2 = System.currentTimeMillis();
 			String ss = "T(s)/IMG/T(s)/PI/TI\t" + Math.round(((t2 - t1) / 100d / workload.size())) / 10d + "\t"
@@ -193,10 +192,11 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			// statisticsResult.getName());
 			statisticsResult.getHeader().setExcelfileid("");
 			if (resultReceiver == null) {
-				if (status != null)
-					status.setCurrentStatusText1("Store Result");
+				// if (status != null)
+				// status.setCurrentStatusText1("Store Result");
 
-				new MongoDB().storeExperiment("dbe3", null, null, null, statisticsResult, status);
+				// new MongoDB().storeExperiment("dbe3", null, null, null,
+				// statisticsResult, status);
 
 				if (status != null)
 					status.setCurrentStatusText1("Ready");
@@ -291,17 +291,31 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(login, pass, new ExperimentReference(
-				experimentResult), false, src.getGUIsetting()))
-			res.add(ne);
 
-		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null, new ExperimentReference(
-				experimentResult), src.getGUIsetting())) {
-			if (ne.getTitle().contains("Put data")) {
-				ne.setTitle("View in VANTED");
-				res.add(ne);
-			}
-		}
+		res.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(experimentResult),
+				src.getGUIsetting()));
+
+		res.add(new NavigationButton(new CloudUploadEntity(login, pass, new ExperimentReference(experimentResult)),
+				"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+
+		MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
+				false, src.getGUIsetting());
+		//
+		// for (NavigationButton ne :
+		// ImageAnalysisCommandManager.getCommands(login, pass, new
+		// ExperimentReference(
+		// experimentResult), false, src.getGUIsetting()))
+		// res.add(ne);
+		//
+		// for (NavigationButton ne :
+		// Other.getProcessExperimentDataWithVantedEntities(null, null, new
+		// ExperimentReference(
+		// experimentResult), src.getGUIsetting())) {
+		// if (ne.getTitle().contains("Put data")) {
+		// ne.setTitle("View in VANTED");
+		// res.add(ne);
+		// }
+		// }
 		return res;
 	}
 

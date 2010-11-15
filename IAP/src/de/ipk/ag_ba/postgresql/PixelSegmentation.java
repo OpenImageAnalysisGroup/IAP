@@ -483,8 +483,7 @@ public class PixelSegmentation {
 
 	private void mergeHashMap() {
 
-		ArrayList<HashSet<Integer>> toepfe = new ArrayList<HashSet<Integer>>();
-
+		ArrayList<HashSet<Integer>> toepfe = new ArrayList<HashSet<Integer>>(clusterMapping.size());
 		for (int key : clusterMapping.keySet()) {
 			HashSet<Integer> topf = new HashSet<Integer>();
 			topf.add(key);

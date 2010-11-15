@@ -209,6 +209,11 @@ public class ColorUtil {
 	// blue2);
 	// }
 
+	/**
+	 * Slow, try to pre-compute the LAB values and use the other overloaded
+	 * methods.
+	 */
+	@Deprecated
 	public static double deltaE2000(Color c1, Color c2) {
 		int rgb1 = c1.getRGB();
 		int rgb2 = c2.getRGB();
@@ -216,8 +221,12 @@ public class ColorUtil {
 		return deltaE2000(rgb1, rgb2);
 	}
 
+	/**
+	 * Slow, try to pre-compute the LAB values and use the other overloaded
+	 * methods.
+	 */
+	@Deprecated
 	public static double deltaE2000(int rgb1, int rgb2) {
-
 		// int alpha = (rgb1 >> 24) & 0xff;
 		int red = (rgb1 >> 16) & 0xff;
 		int green = (rgb1 >> 8) & 0xff;
@@ -231,6 +240,11 @@ public class ColorUtil {
 		return deltaE2000(red, green, blue, red2, green2, blue2);
 	}
 
+	/**
+	 * Slow, try to pre-compute the LAB values and use the other overloaded
+	 * methods.
+	 */
+	@Deprecated
 	public static double deltaE2000(int r1, int g1, int b1, int r2, int g2, int b2) {
 		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1));
 		Color_CIE_Lab cCL2 = colorXYZ2CIELAB(colorRGB2XYZ(r2, g2, b2));
@@ -242,6 +256,34 @@ public class ColorUtil {
 		double CIE_a2 = cCL2.getA();
 		double CIE_b2 = cCL2.getB(); // Color #2 CIE-L*ab values
 
+		return deltaE2000(CIE_L1, CIE_a1, CIE_b1, CIE_L2, CIE_a2, CIE_b2);
+	}
+
+	public static double deltaE2000(Color c1, double CIE_L2, double CIE_a2, double CIE_b2) {
+		int rgb1 = c1.getRGB();
+
+		return deltaE2000(rgb1, CIE_L2, CIE_a2, CIE_b2);
+	}
+
+	public static double deltaE2000(int rgb1, double CIE_L2, double CIE_a2, double CIE_b2) {
+		int red = (rgb1 >> 16) & 0xff;
+		int green = (rgb1 >> 8) & 0xff;
+		int blue = (rgb1) & 0xff;
+
+		return deltaE2000(red, green, blue, CIE_L2, CIE_a2, CIE_b2);
+	}
+
+	public static double deltaE2000(int r1, int g1, int b1, double CIE_L2, double CIE_a2, double CIE_b2) {
+		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1));
+		double CIE_L1 = cCL1.getL();
+		double CIE_a1 = cCL1.getA();
+		double CIE_b1 = cCL1.getB(); // Color #1 CIE-L*ab values
+
+		return deltaE2000(CIE_L1, CIE_a1, CIE_b1, CIE_L2, CIE_a2, CIE_b2);
+	}
+
+	private static double deltaE2000(double CIE_L1, double CIE_a1, double CIE_b1, double CIE_L2, double CIE_a2,
+			double CIE_b2) {
 		double WHT_L = 1;
 		double WHT_C = 1;
 		double WHT_H = 1; // Weight factor
@@ -303,7 +345,6 @@ public class ColorUtil {
 		xDH = xDH / (WHT_H * xSH);
 		double Delta_E00 = Math.sqrt(xDL * xDL + xDC * xDC + xDH * xDH + xRT * xDC * xDH);
 		return Delta_E00;
-
 	}
 
 	private static double deg2rad(double d) {
@@ -374,5 +415,14 @@ public class ColorUtil {
 	@Deprecated
 	public static Color getAvgColor(ArrayList<Color> cc) {
 		return getAvgColor(cc);
+	}
+
+	public static void getLABfromRGB(int[] rgbArray, double[] lArray, double[] aArray, double[] bArray) {
+		for (int i = 0; i < rgbArray.length; i++) {
+			Color_CIE_Lab lab = new Color_CIE_Lab(rgbArray[i]);
+			lArray[i] = lab.getL();
+			aArray[i] = lab.getA();
+			bArray[i] = lab.getB();
+		}
 	}
 }
