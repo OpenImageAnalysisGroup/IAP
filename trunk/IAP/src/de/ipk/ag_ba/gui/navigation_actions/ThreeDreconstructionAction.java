@@ -86,7 +86,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 							if (md instanceof ImageData) {
 								ImageData i = (ImageData) md;
 								ImageConfiguration ic = ImageConfiguration.get(i.getSubstanceName());
-								if (ic != ImageConfiguration.RgbSide)
+								if (!(ic == ImageConfiguration.RgbSide || ic == ImageConfiguration.FluoSide || ic == ImageConfiguration.NirSide))
 									continue;
 								if (workset.get(sd3) == null)
 									workset.put(sd3, new ArrayList<NumericMeasurementInterface>());
