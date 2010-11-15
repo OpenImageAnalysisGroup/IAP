@@ -89,8 +89,8 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
 						for (Measurement md : sd3.getAllMeasurements()) {
-							if (workload.size() >= 10)
-								break;
+//							if (workload.size() >= 10)
+//								break;
 							workIndex++;
 							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
 								if (md instanceof ImageData) {

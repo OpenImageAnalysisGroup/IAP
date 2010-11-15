@@ -446,14 +446,14 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					factor = 0.2;
 
 				int x = 0;
-				if (config == ImageConfiguration.RgbSide) {
+				if (config == ImageConfiguration.RgbSide  || config==ImageConfiguration.RgbTop) {
 					if (y == 0)
 						System.out.println("LAB processing of RGB image..." + imageData.toString() + ")");
 
 					int i = x + y * w;
 					for (x = 0; x < w; x++) {
 						Color_CIE_Lab lab = new Color_CIE_Lab(rgbArray[i]);
-						if (!(lab.getA() < 5 && lab.getB() > 5)) {
+						if (!(lab.getA() < -5 && lab.getB() > 5)) {
 							rgbArray[i] = iBackgroundFill;
 						} else if (lab.getL() >= 80 && Math.abs(lab.getA()) <= 20 && Math.abs(lab.getB()) <= 20) {
 							rgbArray[i] = iBackgroundFill;
@@ -461,7 +461,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 						i++;
 					}
-				} else if (config == ImageConfiguration.FluoTop) {
+				} else if (config == ImageConfiguration.FluoTop  || config==ImageConfiguration.FluoSide) {
 					if (y == 0)
 						System.out.println("LAB processing of FluoTop image..." + imageData.toString() + ")");
 
@@ -479,7 +479,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					boolean hasBackgroundImage = rgbArrayNULL != null && rgbArray.length == rgbArrayNULL.length;
 					if (hasBackgroundImage) {
 						if (y == 0)
-							System.out.println("Has background image..." + imageData.toString() + ")");
+							System.out.println("Has background image... (" + imageData.toString() + ", "+config.toString()+")");
 						double ef = epsilonA * factor * 10;
 						int i = x + y * w;
 						for (x = 0; x < w; x++) {
@@ -491,7 +491,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					} else {
 						if (y == 0)
 							System.out.println("Has NO background image, interpreting side border colors as background..."
-									+ imageData.toString() + ")");
+									+ imageData.toString() + ", "+config.toString()+")");
 						for (x = 0; x < w * sidepercent; x++) {
 							int bp = rgbArray[x + y * w];
 							rgbArray[x + y * w] = iBackgroundFill;
