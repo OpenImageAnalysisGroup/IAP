@@ -81,7 +81,7 @@ public class IOmodule {
 			// return
 			// MyImageIOhelper.getPreviewImageStream(MyImageIOhelper.getPreviewImage(volume
 			// .getSideView(CubeSide.FRONT)));
-			return volume.getSideViewGif(128, 128, optStatus);
+			return volume.getSideViewGif(256, 256, optStatus);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return new FileInputStream(new File(new URI(GravistoService.getResource(IOmodule.class,

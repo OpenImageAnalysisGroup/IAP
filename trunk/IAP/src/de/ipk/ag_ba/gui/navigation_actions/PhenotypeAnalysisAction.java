@@ -87,28 +87,35 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 				for (ConditionInterface s : m3) {
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
-						// if (workload.size() > 10)
-						// break;
 						Sample3D sd3 = (Sample3D) sd;
 						for (Measurement md : sd3.getAllMeasurements()) {
+							if (workload.size() >= 10)
+								break;
 							workIndex++;
 							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
 								if (md instanceof ImageData) {
-									ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
-									if (config == ImageConfiguration.FluoTop) {
-										ImageData i = (ImageData) md;
-										workload.add(i);
-									} else if (config == ImageConfiguration.FluoSide) {
-										ImageData i = (ImageData) md;
-										workload.add(i);
-									} else if (config == ImageConfiguration.RgbSide) {
-										ImageData i = (ImageData) md;
-										workload.add(i);
-									} else if (config == ImageConfiguration.RgbTop) {
-										ImageData i = (ImageData) md;
-										workload.add(i);
-									} else
-										ignored.add(((ImageData) md).getSubstanceName());
+									// ImageConfiguration config =
+									// ImageConfiguration.get(((ImageData)
+									// md).getSubstanceName());
+									ImageData i = (ImageData) md;
+									workload.add(i);
+									// if (config == ImageConfiguration.FluoTop) {
+									// ImageData i = (ImageData) md;
+									// workload.add(i);
+									// } else
+									// break;
+									// if (config == ImageConfiguration.FluoSide) {
+									// ImageData i = (ImageData) md;
+									// workload.add(i);
+									// } else if (config == ImageConfiguration.RgbSide) {
+									// ImageData i = (ImageData) md;
+									// workload.add(i);
+									// } else if (config == ImageConfiguration.RgbTop) {
+									// ImageData i = (ImageData) md;
+									// workload.add(i);
+									// } else
+									// workload.add((ImageData) md);
+									// ignored.add(((ImageData) md).getSubstanceName());
 								}
 						}
 					}
@@ -146,7 +153,8 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			int ti = 2;
 			task.performAnalysis(pi, ti, status);
 			long t2 = System.currentTimeMillis();
-			String ss = "T(s)/PI/TI\t" + ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;
+			String ss = "T(s)/IMG/T(s)/PI/TI\t" + Math.round(((t2 - t1) / 100d / workload.size())) / 10d + "\t"
+					+ ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;
 			times.put((t2 - t1), ss);
 			System.out.println("------------------------------------------------------------");
 			System.out.println("--- " + ss);
@@ -169,7 +177,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			} else {
 				for (NumericMeasurementInterface m : statRes) {
 					if (m == null)
-						System.out.println("ERROR NULL");
+						System.out.println("Error: null value in statistical result set");
 					else
 						newStatisticsData.add(new MappingData3DPath(m));
 				}

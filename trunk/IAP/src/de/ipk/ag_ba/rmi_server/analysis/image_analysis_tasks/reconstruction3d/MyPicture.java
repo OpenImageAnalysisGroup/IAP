@@ -83,6 +83,21 @@ public class MyPicture {
 		}
 	}
 
+	public Color getPixelColor(XYcubePointRelative cubeRelativePixel, int offX, int offY) {
+		double xr = cubeRelativePixel.xr + 0.5; // -0.5..0.5 --> 0..1
+		double yr = cubeRelativePixel.yr + 0.5; // -0.5..0.5 --> 0..1
+		int x = (int) (width * xr);
+		int y = (int) (height * yr);
+		if (x < 0 || y < 0 || x >= width || y >= height)
+			return null;
+		else {
+			if (isTransparentPixel(cubeRelativePixel))
+				return null;
+			int rgb = getRGB(x + offX, y + offY);
+			return new Color(rgb);
+		}
+	}
+
 	public int getRGB(int x, int y) {
 		int rgb = img.getRGB(x, y);
 		return rgb;
