@@ -369,7 +369,7 @@ public class MongoDB {
 				} // sample
 				condition.put("samples", dbSamples);
 			} // condition
-			// substance.put("conditions", dbConditions);
+				// substance.put("conditions", dbConditions);
 			substtance2conditions.put(substance, dbConditions);
 		} // substance
 
@@ -404,8 +404,9 @@ public class MongoDB {
 		}
 
 		if (errorCount > 0) {
-			MainFrame.showMessageDialog("<html>" + "The following files cound not be properly processed:<ul>"
-					+ errors.toString() + "</ul> " + "", "Errors");
+			MainFrame.showMessageDialog(
+					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
+							+ "", "Errors");
 		}
 
 	}
@@ -882,8 +883,7 @@ public class MongoDB {
 						BatchCmd batch = (BatchCmd) dbo;
 						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED
 								|| ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
-										.currentTimeMillis()
-										- batch.getLastUpdateTime() > maxUpdate))
+										.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
 							res.add(batch);
 					}
 				}
