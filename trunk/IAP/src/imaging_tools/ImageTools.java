@@ -9,14 +9,25 @@
 
 package imaging_tools;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.renderable.ParameterBlock;
+import ij.ImagePlus;
+import ij.process.ByteProcessor;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.media.jai.InterpolationBilinear;
 import javax.media.jai.JAI;
 import javax.media.jai.KernelJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.operator.ColorQuantizerDescriptor;
+
+import org.graffiti.editor.GravistoService;
+import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 /**
  * @author klukas
