@@ -153,15 +153,15 @@ public class MongoDB {
 			return;
 		init = true;
 
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		ObjectName name;
-		try {
-			name = new ObjectName("de.ipk_gatersleben.ag_ba.mongo:type=Hello");
-			Hello mbean = new Hello();
-			mbs.registerMBean(mbean, name);
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-		}
+//		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+//		ObjectName name;
+//		try {
+//			name = new ObjectName("de.ipk_gatersleben.ag_ba.mongo:type=Hello");
+//			Hello mbean = new Hello();
+//			mbs.registerMBean(mbean, name);
+//		} catch (Exception e) {
+//			ErrorMsg.addErrorMessage(e);
+//		}
 	}
 
 	public void storeExperiment(String dataBase, String optHosts, String optLogin, String optPass,

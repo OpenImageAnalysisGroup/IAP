@@ -488,11 +488,12 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					double l = arrayL[i];
 					double a = arrayA[i];
 					double b = arrayB[i];
-					if (a > 5 || b < 5) { // a < -5 &&
+					if (a > 21 || b < 5) { // a < -5 &&
 						rgbArray[i] = iBackgroundFill;
-					} else if (l >= 80 && Math.abs(a) <= 20 && Math.abs(b) <= 20) {
-						rgbArray[i] = Color.yellow.getRGB(); // iBackgroundFill;
 					}
+//					else if (l >= 80 && Math.abs(a) <= 20 && Math.abs(b) <= 20) {
+//						rgbArray[i] = Color.yellow.getRGB(); // iBackgroundFill;
+//					}
 
 					i++;
 				}
@@ -509,7 +510,14 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					double l = arrayL[i];
 					double a = arrayA[i];
 					double b = arrayB[i];
-					if (!(l >= 15 && a >= 20 && b >= 20)) {
+					if (
+							// rot
+							!((l >= 15 && a >= 20 && b >= 20)
+							||
+							// gelb
+							(l >= 15 && Math.abs(a) <= 25 && b >= 70))
+						)
+					{
 						rgbArray[i] = iBackgroundFill;
 					}
 
