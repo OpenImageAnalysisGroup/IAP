@@ -336,19 +336,20 @@ public class PixelSegmentation {
 				pixelT = image_cluster_ids[i - 1][j];
 				pixelL = image_cluster_ids[i][j - 1];
 
-				if (pixelT < foreground && pixelL < foreground) {
-					image_cluster_ids[i][j] = zaehler;
-					zaehler++;
-
-				} else if (pixelT < foreground && pixelL > foreground - 1) {
-					image_cluster_ids[i][j] = pixelL;
-
-				} else if (pixelT > foreground - 1 && pixelL < foreground) {
-					image_cluster_ids[i][j] = pixelT;
-
+				if (pixelT < foreground) {
+					if(pixelL < foreground){
+						image_cluster_ids[i][j] = zaehler;
+						zaehler++;
+					} else {
+						image_cluster_ids[i][j] = pixelL;
+					}
 				} else {
+					if (pixelL < foreground) {
+						image_cluster_ids[i][j] = pixelT;
+					} else {
 					image_cluster_ids[i][j] = pixelL;
 					addHashMapEntry(pixelT, pixelL);
+					}
 				}
 			} else { // 8er
 
