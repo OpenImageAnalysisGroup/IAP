@@ -34,7 +34,7 @@ public class ImageConverter {
 		
 	try {
 		IOurl url = new IOurl("http://www.spiegel.de/images/image-150632-panoV9free-hldq.jpg");
-		BufferedImage img = ImageIO.read(ResourceIOManager.getInputStream(url));
+		BufferedImage img = ImageIO.read(url.getInputStream());
 
 		//############  Skalierung Test ##############
 		GravistoService.showImage(img, "Ausgang");

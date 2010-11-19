@@ -26,7 +26,7 @@ public class MyStoredUserInfo implements UserInfo, UIKeyboardInteractive {
 
 	public boolean promptPassword(String message) {
 		System.out.println(message);
-		passwd = null; // specify password
+		passwd = "LemnaTec"; // specify password
 		return true;
 	}
 

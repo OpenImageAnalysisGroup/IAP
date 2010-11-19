@@ -58,7 +58,7 @@ public class LemnaTecFTPhandler implements ResourceIOHandler {
 				InputStream is = c.get(fn);
 				return is;
 			} else {
-				boolean advancedFTP = true;
+				boolean advancedFTP = false;
 
 				String detail = url.getDetail();
 				detail = detail.split("/", 2)[0] + "/../../data0/pgftp/" + detail.split("/", 2)[1] + "/";
@@ -86,18 +86,18 @@ public class LemnaTecFTPhandler implements ResourceIOHandler {
 			JSch jsch = new JSch();
 			String host = "lemna-db.ipk-gatersleben.de";
 			String user = "root";
-			// final String password = "LemnaTec";
 			int port = 22;
 			session = jsch.getSession(user, host, port);
 			UserInfo ui = new MyStoredUserInfo();
 			session.setUserInfo(ui);
+			session.setPassword("LemnaTec");
 			session.connect();
 		}
 
-		if (channel == null || !channel.isConnected()) {
-			channel = session.openChannel("sftp");
-			channel.connect(30);
-		}
+//		if (channel == null || !channel.isConnected()) {
+//			channel = session.openChannel("sftp");
+//			channel.connect(30);
+//		}
 
 		ChannelSftp c = (ChannelSftp) channel;
 		return c;
