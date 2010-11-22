@@ -43,52 +43,7 @@ public class CloudTaskManager {
 			timerThread = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					try {
-						do {
-							if (CloudTaskManager.this.process) {
-								ArrayList<TaskDescription> commands = new ArrayList<TaskDescription>();
-								long lastUpdate = 5000;
-								for (BatchCmd batch : new MongoDB().batchGetCommands(lastUpdate)) {
-									if (batch.getTargetIPs().contains(ip)) {
-										new MongoDB().batchClaim(batch, ip, CloudAnalysisStatus.STARTING);
-									}
-								}
-								for (BatchCmd batch : new MongoDB().batchGetWorkTasksScheduledForStart()) {
-									if (batch.getTargetIPs().contains(ip)) {
-										ExperimentHeaderInterface header = new MongoDB().getExperimentHeader(batch
-												.getExperimentMongoID());
-										TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
-										commands.add(task);
-									}
-								}
-								ArrayList<TaskDescription> del = new ArrayList<TaskDescription>();
-								for (TaskDescription td : runningTasks) {
-									if (td.analysisFinished()) {
-										td.getBatchCmd().updateRunningStatus(CloudAnalysisStatus.FINISHED);
-										del.add(td);
-									} else {
-										td.getBatchCmd().updateRunningStatus(CloudAnalysisStatus.IN_PROGRESS);
-									}
-								}
-								if (del.size() > 0)
-									runningTasks.removeAll(del);
-
-								for (TaskDescription td : commands) {
-									if (!runningTasks.contains(td)) {
-										try {
-											runningTasks.add(td);
-											td.startWork(td.getBatchCmd(), hostName, ip, login, pass);
-										} catch (Exception e) {
-											ErrorMsg.addErrorMessage(e);
-										}
-									}
-								}
-							}
-							Thread.sleep(1000);
-						} while (true);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					CloudTaskManager.this.run();
 				}
 			});
 			timerThread.setName("CloudTaskManager (" + (isProcess() ? "active" : "inactive") + ")");
@@ -119,5 +74,53 @@ public class CloudTaskManager {
 		this.login = null;
 		this.pass = null;
 		setProcess(false);
+	}
+
+	private void run() {
+		try {
+			do {
+				if (CloudTaskManager.this.process) {
+					ArrayList<TaskDescription> commands = new ArrayList<TaskDescription>();
+					long lastUpdate = 5000;
+					for (BatchCmd batch : new MongoDB().batchGetCommands(lastUpdate)) {
+						if (batch.getTargetIPs().contains(ip)) {
+							new MongoDB().batchClaim(batch, ip, CloudAnalysisStatus.STARTING);
+						}
+					}
+					for (BatchCmd batch : new MongoDB().batchGetWorkTasksScheduledForStart()) {
+						if (batch.getTargetIPs().contains(ip)) {
+							ExperimentHeaderInterface header = new MongoDB().getExperimentHeader(batch.getExperimentMongoID());
+							TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
+							commands.add(task);
+						}
+					}
+					ArrayList<TaskDescription> del = new ArrayList<TaskDescription>();
+					for (TaskDescription td : runningTasks) {
+						if (td.analysisFinished()) {
+							td.getBatchCmd().updateRunningStatus(CloudAnalysisStatus.FINISHED);
+							del.add(td);
+						} else {
+							td.getBatchCmd().updateRunningStatus(CloudAnalysisStatus.IN_PROGRESS);
+						}
+					}
+					if (del.size() > 0)
+						runningTasks.removeAll(del);
+
+					for (TaskDescription td : commands) {
+						if (!runningTasks.contains(td)) {
+							try {
+								runningTasks.add(td);
+								td.startWork(td.getBatchCmd(), hostName, ip, login, pass);
+							} catch (Exception e) {
+								ErrorMsg.addErrorMessage(e);
+							}
+						}
+					}
+				}
+				Thread.sleep(1000);
+			} while (true);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

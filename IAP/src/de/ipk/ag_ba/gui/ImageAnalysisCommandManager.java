@@ -16,6 +16,7 @@ import de.ipk.ag_ba.gui.navigation_actions.CloudUploadEntity;
 import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
 import de.ipk.ag_ba.gui.navigation_actions.NumericDataReportAction;
 import de.ipk.ag_ba.gui.navigation_actions.PerformanceTestAction;
+import de.ipk.ag_ba.gui.navigation_actions.ScheduleTestAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDsegmentationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -33,15 +34,15 @@ public class ImageAnalysisCommandManager {
 	}
 
 	public static Collection<NavigationButton> getCommands(String login, String pass,
-			ExperimentReference experimentReference, boolean analysis, GUIsetting guiSettings) {
+			ExperimentReference experimentReference, boolean analysis, GUIsetting guiSetting) {
 
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 
-		actions.add(FileManagerAction.getFileManagerEntity(login, pass, experimentReference, guiSettings));
+		actions.add(FileManagerAction.getFileManagerEntity(login, pass, experimentReference, guiSetting));
 
 		try {
 			if (experimentReference.getData().getHeader().getExcelfileid().startsWith("lemnatec:"))
-				actions.add(new NavigationButton(new CloudUploadEntity(login, pass, experimentReference), guiSettings));
+				actions.add(new NavigationButton(new CloudUploadEntity(login, pass, experimentReference), guiSetting));
 		} catch (Exception e) {
 			// empty
 		}
@@ -56,17 +57,19 @@ public class ImageAnalysisCommandManager {
 		// CountColorsNavigation(login, pass, 40, experimentReference),
 		// "Hue Historam", "img/colorhistogram.png"));
 		if (analysis) {
-			NavigationAction phenotypeAnalysisAction = new PerformanceTestAction(login, pass, experimentReference);
-			NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSettings);
-			actions.add(resultTaskButton);
+			NavigationAction performanceTestAction = new PerformanceTestAction(login, pass, experimentReference);
+			NavigationButton performanceTestButton = new NavigationButton(performanceTestAction, guiSetting);
+			actions.add(performanceTestButton);
 
-			actions.add(new NavigationButton(new NumericDataReportAction(login, pass, experimentReference), guiSettings));
+			actions.add(new NavigationButton(new ScheduleTestAction(login, pass, experimentReference), guiSetting));
 
-			actions.add(ImageAnalysis.getPhenotypingEntity(login, pass, experimentReference, 10, 15, guiSettings));
+			actions.add(new NavigationButton(new NumericDataReportAction(login, pass, experimentReference), guiSetting));
+
+			actions.add(ImageAnalysis.getPhenotypingEntity(login, pass, experimentReference, 10, 15, guiSetting));
 			actions.add(ThreeDreconstructionAction.getThreeDreconstructionTaskEntity(login, pass, experimentReference,
-					"3-D Reconstruction", 15, 25, guiSettings));
+					"3-D Reconstruction", 15, 25, guiSetting));
 			actions.add(ThreeDsegmentationAction.getThreeDsegmentationTaskEntity(login, pass, experimentReference,
-					"3-D Segmentation", 15, 25, guiSettings));
+					"3-D Segmentation", 15, 25, guiSetting));
 		}
 		return actions;
 	}

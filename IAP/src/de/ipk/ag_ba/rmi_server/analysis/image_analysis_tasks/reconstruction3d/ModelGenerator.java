@@ -483,99 +483,96 @@ public class ModelGenerator {
 		return maxVoxelPerSide;
 	}
 
-	// public void calculateModelMotionScan(final
-	// BackgroundTaskStatusProviderSupportingExternalCall status) {
-	// generateNormalizedByteCube(GenerationMode.COLORED_RGBA);
-	// final MyPicture p1 = pictures.get(0);
-	// final MyPicture p2 = pictures.get(1);
-	//
-	// // widthFactor
-	// // p1.width
-	// // maxVoxelPerSide
-	//
-	// final double scaleX = p1.width / (double) maxVoxelPerSide / (100 /
-	// widthFactor);
-	// final double scaleY = p1.height / (double) maxVoxelPerSide;
-	// final ThreadSafeOptions tso = new ThreadSafeOptions();
-	//
-	// ExecutorService run =
-	// Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
-	//
-	// status.setCurrentStatusValue(-1);
-	//
-	// status.setCurrentStatusText1("Finished scanline 0 / " + maxVoxelPerSide);
-	// status.setCurrentStatusText2("Reconstructing Motion Structure");
-	// for (int vvx = 0; vvx < maxVoxelPerSide; vvx++) {
-	// final int vx = vvx;
-	// run.submit(new Runnable() {
-	// public void run() {
-	// for (int vy = 0; vy < maxVoxelPerSide; vy++) {
-	// if (status.wantsToStop())
-	// return;
-	// int ix = (int) (vx * scaleX + vx * 50 / widthFactor);
-	// int iy = (int) (vy * scaleY);
-	// int depth = getDepthOfPoint(20, p1, p2, ix, iy, 150) / 2 + maxVoxelPerSide
-	// / 2;
-	// for (int vz = 0; vz < maxVoxelPerSide; vz++) {
-	// byteCube[vx][vx][vz] = vz < depth ? 0 : Byte.MAX_VALUE;
-	// try {
-	// rgbCube[vx][vy][vz] = vz < depth || depth == maxVoxelPerSide / 2 ?
-	// TRANSPARENT_COLOR
-	// : new Color(p1.getRGB(ix, iy));
-	// } catch (Exception e) {
-	// rgbCube[vx][vy][vz] = Color.BLUE;
-	// }
-	// }
-	// }
-	// tso.addInt(1);
-	// status.setCurrentStatusText1("Finished scanline " + vx + " / " +
-	// maxVoxelPerSide);
-	// status.setCurrentStatusValueFine(100d * ((tso.getInt()) / (double)
-	// maxVoxelPerSide));
-	// }
-	// });
-	// }
-	// run.shutdown();
-	// try {
-	// run.awaitTermination(7, TimeUnit.DAYS);
-	// } catch (InterruptedException e) {
-	// ErrorMsg.addErrorMessage(e);
-	// } // wait max 7 days for result
-	//
-	// status.setCurrentStatusValue(0);
-	//
-	// }
+	public void calculateModelMotionScan(final BackgroundTaskStatusProviderSupportingExternalCall status) {
+		generateNormalizedByteCube(GenerationMode.COLORED_RGBA);
+		final MyPicture p1 = pictures.get(0);
+		final MyPicture p2 = pictures.get(1);
+		//
+		final double scaleX = p1.width / (double) maxVoxelPerSide / (100 / widthFactor);
+		final double scaleY = p1.height / (double) maxVoxelPerSide;
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		//
+		ExecutorService run = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
+		//
+		status.setCurrentStatusValue(-1);
+		//
+		status.setCurrentStatusText1("Finished scanline 0 / " + maxVoxelPerSide);
+		status.setCurrentStatusText2("Reconstructing Motion Structure");
+		for (int vvx = 0; vvx < maxVoxelPerSide; vvx++) {
+			final int vx = vvx;
+			run.submit(new Runnable() {
+				public void run() {
+					for (int vy = 0; vy < maxVoxelPerSide; vy++) {
+						if (status.wantsToStop())
+							return;
+						int ix = (int) (vx * scaleX + vx * 50 / widthFactor);
+						int iy = (int) (vy * scaleY);
+						int depth = getDepthOfPoint(20, p1, p2, ix, iy, 50) / 2 + maxVoxelPerSide / 2;
+						for (int vz = 0; vz < maxVoxelPerSide; vz++) {
+							byteCube[vx][vx][vz] = vz < depth ? 0 : Byte.MAX_VALUE;
+							Color c;
+							try {
+								c = vz < depth || depth == maxVoxelPerSide / 2 ? TRANSPARENT_COLOR : new Color(p1
+										.getRGB(ix, iy));
+							} catch (Exception e) {
+								c = Color.BLUE;
+							}
+							rgbCube[(vx + maxVoxelPerSide * vy + vz * maxVoxelPerSide * maxVoxelPerSide) * 4 + 0] = (byte) c
+									.getAlpha();
+							rgbCube[(vx + maxVoxelPerSide * vy + vz * maxVoxelPerSide * maxVoxelPerSide) * 4 + 1] = (byte) c
+									.getRed();
+							rgbCube[(vx + maxVoxelPerSide * vy + vz * maxVoxelPerSide * maxVoxelPerSide) * 4 + 2] = (byte) c
+									.getGreen();
+							rgbCube[(vx + maxVoxelPerSide * vy + vz * maxVoxelPerSide * maxVoxelPerSide) * 4 + 3] = (byte) c
+									.getBlue();
+						}
+					}
+					tso.addInt(1);
+					status.setCurrentStatusText1("Finished scanline " + vx + " / " + maxVoxelPerSide);
+					status.setCurrentStatusValueFine(100d * ((tso.getInt()) / (double) maxVoxelPerSide));
+				}
+			});
+		}
+		run.shutdown();
+		try {
+			run.awaitTermination(7, TimeUnit.DAYS);
+		} catch (InterruptedException e) {
+			ErrorMsg.addErrorMessage(e);
+		} // wait max 7 days for result
+			//
+		status.setCurrentStatusValue(0);
+		//
+	}
 
-	// private static int getDepthOfPoint(final int rectWidth, final MyPicture
-	// p1, final MyPicture p2, int mx, int my,
-	// int scanRange) {
-	// double minDiff = Double.POSITIVE_INFINITY;
-	// int minI = 0;
-	// for (int i = -scanRange / 2; i < scanRange / 2; i++) {
-	// double diff = compareImageParts(p1, p2, mx, my, mx + i, my, rectWidth);
-	// diff += Math.abs(i / 20d);
-	// if (diff <= minDiff) {
-	// minDiff = diff;
-	// minI = i;
-	// }
-	// }
-	// return minI;
-	// }
+	private static int getDepthOfPoint(final int rectWidth, final MyPicture p1, final MyPicture p2, int mx, int my,
+			int scanRange) {
+		double minDiff = Double.POSITIVE_INFINITY;
+		int minI = 0;
+		for (int i = -scanRange / 2; i < scanRange / 2; i++) {
+			double diff = compareImageParts(p1, p2, mx, my, mx + i, my, rectWidth);
+			diff += Math.abs(i / 20d);
+			if (diff <= minDiff) {
+				minDiff = diff;
+				minI = i;
+			}
+		}
+		return minI;
+	}
+
 	//
-	// public static double compareImageParts(MyPicture p1, MyPicture p2, int x1,
-	// int y1, int x2, int y2, int wh) {
-	// double diff = 0;
-	// try {
-	// for (int scanX = 0; scanX < wh; scanX++) {
-	// for (int scanY = 0; scanY < wh; scanY++) {
-	// int c1 = p1.getRGB(x1 + scanX, y1 + scanY);
-	// int c2 = p2.getRGB(x2 + scanX, y2 + scanY);
-	// diff += ColorUtil.deltaE2000(new Color(c1), new Color(c2));
-	// }
-	// }
-	// } catch (ArrayIndexOutOfBoundsException e) {
-	// return 0;
-	// }
-	// return diff;
-	// }
+	public static double compareImageParts(MyPicture p1, MyPicture p2, int x1, int y1, int x2, int y2, int wh) {
+		double diff = 0;
+		try {
+			for (int scanX = 0; scanX < wh; scanX++) {
+				for (int scanY = 0; scanY < wh; scanY++) {
+					int c1 = p1.getRGB(x1 + scanX, y1 + scanY);
+					int c2 = p2.getRGB(x2 + scanX, y2 + scanY);
+					diff += ColorUtil.deltaE2000(new Color(c1), new Color(c2));
+				}
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return 0;
+		}
+		return diff;
+	}
 }
