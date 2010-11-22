@@ -127,10 +127,10 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	 */
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-			final BackgroundTaskStatusProviderSupportingExternalCall status) {
+						final BackgroundTaskStatusProviderSupportingExternalCall status) {
 
 		Object[] res = MyInputHelper.getInput("Please specify the cube resolution:", "3-D Reconstruction", new Object[] {
-				"Resolution (X=Y=Z)", voxelresolution, "Trim Width? (0..100)", widthFactor });
+							"Resolution (X=Y=Z)", voxelresolution, "Trim Width? (0..100)", widthFactor });
 		if (res == null)
 			return;
 
@@ -186,7 +186,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 						inp.add(volume);
 						resultProcessor.setInput(inp, login, login);
 						resultProcessor.performAnalysis(maximumThreadCountParallelImages, maximumThreadCountParallelImages,
-								status);
+											status);
 						if (additionalResults.get(resultProcessor) == null)
 							additionalResults.put(resultProcessor, new ArrayList<NumericMeasurementInterface>());
 						additionalResults.get(resultProcessor).addAll(resultProcessor.getOutput());
@@ -202,7 +202,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 							if (status != null)
 								status.setCurrentStatusText1("Storing result");
 							storeResultInDatabase.saveVolume(volume, s3d, login, pass, DBTable.SAMPLE, vud, null,
-									vud.getLength(), md5, status);
+												vud.getLength(), md5, status);
 							if (status != null)
 								status.setCurrentStatusValue(100);
 							if (status != null)
@@ -239,7 +239,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	}
 
 	private void processSampleCreateVolume(Sample3D sample, ArrayList<ImageData> loadedImages, int replicateID,
-			final int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) {
+						final int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
 		double maxPercent = 2; // maximum background color difference
 
@@ -343,7 +343,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 						else
 							status.setCurrentStatusText1("Image: " + ffn);
 						status.setCurrentStatusText2("Angle: " + (image.getPosition().intValue()) + " "
-								+ image.getPositionUnit() + ", is top: " + (getIsTopFromFileName(ffn)));
+											+ image.getPositionUnit() + ", is top: " + (getIsTopFromFileName(ffn)));
 						status.setCurrentStatusValueFineAdd(workloadStep);
 					}
 				});
@@ -357,7 +357,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 			status.setCurrentStatusValue(100);
 
 			mg.setRoundViewImages(pictures);
-			if (false)
+			if (true)
 				mg.calculateModel(status, modeOfOperation, 0);
 			else
 				mg.calculateModelMotionScan(status);
@@ -381,7 +381,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 			volume.setColorDepth(VolumeColorDepth.RGBA.toString());
 		} catch (OutOfMemoryError e) {
 			MainFrame.showMessageDialog("You have not enough memory! Please select a lower resolution",
-					"Out of Memory Error");
+								"Out of Memory Error");
 			LoadedVolume volume = new LoadedVolume(sample, null);
 			volume.setErrorMsg(new Exception(e.getMessage()));
 		}

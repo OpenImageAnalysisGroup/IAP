@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -62,7 +62,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	private MyNavigationPanel theOther;
 	private final PanelTarget target;
 	private final JPanel actionPanelRight;
-	private ButtonDrawStyle buttonStyle = ButtonDrawStyle.COMPACT_LIST;
+	private ButtonDrawStyle buttonStyle = ButtonDrawStyle.FLAT;
 	private final JCheckBoxMenuItem menuItemCompact;
 	private final JCheckBoxMenuItem menuItemFlat;
 	private final JCheckBoxMenuItem menuItemButtons;
@@ -114,7 +114,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				JFrame jff = new JFrame("IAP Cloud Storage, Analysis and Visualization System");
 				jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 				BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-						"", "");
+									"", "");
 				jff.add(AIPgui.getNavigation(myStatus, true), "0,0");
 				jff.validate();
 				jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -191,10 +191,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				} else {
 					if (actionPanelRight != null && ne.isRightAligned())
 						right.add(NavigationButton.getNavigationButton(buttonStyle, ne, getTarget(), getTheOther(), this,
-								graphPanel));
+											graphPanel));
 					else
 						add(NavigationButton.getNavigationButton(buttonStyle, ne, getTarget(), getTheOther(), this,
-								graphPanel));
+											graphPanel));
 				}
 			}
 			if (!firstStar) {
@@ -247,14 +247,14 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							i = GravistoService.getBufferedImage(ne.getIcon().getImage());
 						else
 							i = GravistoService.getBufferedImage(GravistoService.loadIcon(AIPmain.class,
-									ne.getNavigationImage()).getImage());
+												ne.getNavigationImage()).getImage());
 						// add bookmark
 						String target = getTargetPath(ne);
 						if (target != null) {
 							if (Bookmark.add(ne.getTitle(), target, i)) {
 								if (!set.isEmpty())
 									set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
-											theOther, graphPanel, null, null);
+														theOther, graphPanel, null, null);
 							} else
 								MainFrame.getInstance().showMessageDialog("Could not add bookmark.");
 						} else
@@ -319,7 +319,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	}
 
 	private MouseListener getDeleteBookmarkActionListener(final JLabel lbl, final ObjectRef right,
-			final NavigationAction action) {
+						final NavigationAction action) {
 		MouseListener res = new MouseListener() {
 
 			@Override
@@ -332,7 +332,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						} else {
 							if (!set.isEmpty())
 								set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
-										theOther, graphPanel, null, null);
+													theOther, graphPanel, null, null);
 						}
 					}
 				}
