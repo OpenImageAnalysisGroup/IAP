@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -47,4 +47,7 @@ public class ExperimentReference {
 		this.experiment = data;
 	}
 
+	public ExperimentHeaderInterface getHeader() {
+		return header;
+	}
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -47,6 +47,7 @@ import de.ipk.ag_ba.gui.navigation_actions.Calendar2;
 import de.ipk.ag_ba.gui.util.MyUtility;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
 import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.ProgressStatusService;
 
@@ -77,6 +78,9 @@ public class NavigationButton implements StyleAware {
 
 	public NavigationButton(NavigationAction navigationAction, GUIsetting guiSetting) {
 		if (navigationAction != null) {
+			if (navigationAction instanceof RemoteCapableAnalysisAction) {
+				navigationAction = new RemoteExecutionWrapperAction(navigationAction);
+			}
 			this.setTitle(navigationAction.getDefaultTitle());
 			this.navigationImage = navigationAction.getDefaultNavigationImage();
 			this.actionImage = navigationAction.getDefaultImage();
@@ -95,7 +99,7 @@ public class NavigationButton implements StyleAware {
 	}
 
 	public NavigationButton(NavigationAction navigationAction, String title, String navigationImage, String actionImage,
-			GUIsetting guiSetting) {
+						GUIsetting guiSetting) {
 		this(navigationAction, guiSetting);
 		this.setTitle(title);
 		this.navigationImage = navigationImage;
@@ -163,12 +167,12 @@ public class NavigationButton implements StyleAware {
 			}
 			String line2 = "";
 			if (action.getStatusProvider() != null && action.getStatusProvider().getCurrentStatusMessage1() != null
-					&& action.getStatusProvider().getCurrentStatusMessage1().length() > 0)
+								&& action.getStatusProvider().getCurrentStatusMessage1().length() > 0)
 				line2 = action.getStatusProvider().getCurrentStatusMessage1();
 			if (statusServer != null) {
 				BackgroundTaskStatusProvider status = action.getStatusProvider();
 				String eta = statusServer.getRemainTime(status.getCurrentStatusValue() == -1,
-						status.getCurrentStatusValueFine());
+									status.getCurrentStatusValueFine());
 				if (eta.length() > 0) {
 					if (line2.length() > 0)
 						line2 += ", ";
@@ -325,14 +329,14 @@ public class NavigationButton implements StyleAware {
 	}
 
 	public void executeNavigation(final PanelTarget target, final MyNavigationPanel navPanel,
-			final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
-			final Runnable optFinishAction) {
+						final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
+						final Runnable optFinishAction) {
 		executeNavigation(target, navPanel, actionPanel, graphPanel, n1, optFinishAction, false);
 	}
 
 	public void executeNavigation(final PanelTarget target, final MyNavigationPanel navPanel,
-			final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
-			final Runnable optFinishAction, final boolean recursive) {
+						final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
+						final Runnable optFinishAction, final boolean recursive) {
 		final NavigationButton srcNavGraphicslEntity = this;
 		if (n1 != null && srcNavGraphicslEntity.isProcessing()) {
 			if (n1.getText().equalsIgnoreCase("Please wait"))
@@ -374,8 +378,8 @@ public class NavigationButton implements StyleAware {
 								ArrayList<JComponent> errors = new ArrayList<JComponent>();
 								for (String s : ErrorMsg.getErrorMessages()) {
 									JLabel e = new JLabel("<html><table><tr><td>"
-											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
-													.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
+														+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
+																			.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
 									e.setOpaque(true);
 									e.setBackground(new Color(255, 240, 240));
 									e.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -383,7 +387,7 @@ public class NavigationButton implements StyleAware {
 								}
 								ErrorMsg.clearErrorMessages();
 								gui = TableLayout.getSplitVertical(TableLayout.getMultiSplitVertical(errors, 2), gui,
-										TableLayout.PREFERRED, TableLayout.FILL);
+													TableLayout.PREFERRED, TableLayout.FILL);
 							}
 							graphPanel.add(gui, "0,0");
 							graphPanel.validate();
@@ -398,8 +402,8 @@ public class NavigationButton implements StyleAware {
 								ArrayList<JComponent> errors = new ArrayList<JComponent>();
 								for (String s : ErrorMsg.getErrorMessages()) {
 									JLabel e = new JLabel("<html><table><tr><td>"
-											+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
-													.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
+														+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
+																			.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
 									e.setOpaque(true);
 									e.setBackground(new Color(255, 240, 240));
 									e.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -487,8 +491,8 @@ public class NavigationButton implements StyleAware {
 	}
 
 	public static JComponent getNavigationButton(ButtonDrawStyle style, final NavigationButton n,
-			final PanelTarget target, final MyNavigationPanel navPanel, final MyNavigationPanel actionPanel,
-			final JComponent graphPanel) {
+						final PanelTarget target, final MyNavigationPanel navPanel, final MyNavigationPanel actionPanel,
+						final JComponent graphPanel) {
 
 		if (n.getGUI() != null)
 			return n.getGUI();
@@ -513,26 +517,27 @@ public class NavigationButton implements StyleAware {
 
 		final JButton n1 = new JButton("" + n.getTitle());
 		switch (style) {
-		case FLAT:
-		case COMPACT_LIST:
-			n1.setBorderPainted(false);
-			n1.setContentAreaFilled(false);
-			int d = 1;
-			if (style == ButtonDrawStyle.COMPACT_LIST)
-				d = 2;
-			if (target == PanelTarget.NAVIGATION)
-				n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 4 / d, 2 / d, 4 / d));
-			else if (style == ButtonDrawStyle.FLAT)
-				n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 8 / d, 2 / d, 8 / d));
-			else
-				n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 0 / d, 2 / d, 16 / d));
-			break;
-		case TEXT:
-			icon = null;
-			// fall through
-		case BUTTONS:
-			n1.setBorderPainted(true);
-			n1.setContentAreaFilled(true);
+			case FLAT:
+			case COMPACT_LIST:
+				n1.setBorderPainted(false);
+				n1.setContentAreaFilled(false);
+				int d = 1;
+				if (style == ButtonDrawStyle.COMPACT_LIST)
+					d = 2;
+				if (target == PanelTarget.NAVIGATION)
+					n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 4 / d, 2 / d, 4 / d));
+				else
+					if (style == ButtonDrawStyle.FLAT)
+						n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 8 / d, 2 / d, 8 / d));
+					else
+						n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 0 / d, 2 / d, 16 / d));
+				break;
+			case TEXT:
+				icon = null;
+				// fall through
+			case BUTTONS:
+				n1.setBorderPainted(true);
+				n1.setContentAreaFilled(true);
 		}
 
 		n1.setToolTipText(n.getToolTip());
@@ -616,7 +621,7 @@ public class NavigationButton implements StyleAware {
 
 		if (n.getSideGui() != null)
 			return TableLayout.get3Split(n1, null, n.getSideGui(), TableLayout.PREFERRED, n.getSideGuiSpace(),
-					n.getSideGuiWidth());
+								n.getSideGuiWidth());
 		else
 			return n1;
 	}

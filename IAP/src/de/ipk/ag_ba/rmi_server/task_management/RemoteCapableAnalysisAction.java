@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -19,4 +19,6 @@ public interface RemoteCapableAnalysisAction extends NavigationAction {
 	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver);
 
 	public void setParams(ExperimentReference inputExperiment, String login, String pass, String params);
+
+	public String getMongoDatasetID();
 }

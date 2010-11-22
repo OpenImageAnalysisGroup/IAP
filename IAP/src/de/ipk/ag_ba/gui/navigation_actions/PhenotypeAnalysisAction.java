@@ -50,9 +50,10 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 	private RunnableWithMappingData resultReceiver;
 	private int workOnSubset;
 	private int numberOfSubsets;
+	private String mongoDatasetID;
 
 	public PhenotypeAnalysisAction(String login, double epsilon, double epsilon2, String pass,
-			ExperimentReference experiment) {
+						ExperimentReference experiment) {
 		super("Create phenotype data set");
 		this.login = login;
 		this.epsilon = epsilon;
@@ -60,6 +61,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		this.pass = pass;
 		this.experiment = experiment;
 		this.experimentResult = null;
+		this.mongoDatasetID = experiment.getHeader().getExcelfileid();
 	}
 
 	public PhenotypeAnalysisAction() {
@@ -153,7 +155,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			task.performAnalysis(pi, ti, status);
 			long t2 = System.currentTimeMillis();
 			String ss = "T(s)/IMG/T(s)/PI/TI\t" + Math.round(((t2 - t1) / 100d / workload.size())) / 10d + "\t"
-					+ ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;
+								+ ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;
 			times.put((t2 - t1), ss);
 			System.out.println("------------------------------------------------------------");
 			System.out.println("--- " + ss);
@@ -293,13 +295,13 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 
 		res.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(experimentResult),
-				src.getGUIsetting()));
+							src.getGUIsetting()));
 
 		res.add(new NavigationButton(new CloudUploadEntity(login, pass, new ExperimentReference(experimentResult)),
-				"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
 		MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
-				false, src.getGUIsetting());
+							false, src.getGUIsetting());
 		//
 		// for (NavigationButton ne :
 		// ImageAnalysisCommandManager.getCommands(login, pass, new
@@ -350,4 +352,8 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		this.epsilon2 = 15;
 	}
 
+	@Override
+	public String getMongoDatasetID() {
+		return mongoDatasetID;
+	}
 }

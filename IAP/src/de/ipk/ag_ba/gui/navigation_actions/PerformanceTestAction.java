@@ -14,7 +14,6 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
-import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -33,7 +32,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 /**
  * @author klukas
  */
-public class PerformanceTestAction extends AbstractNavigationAction implements RemoteCapableAnalysisAction {
+public class PerformanceTestAction extends AbstractNavigationAction {
 	private String login;
 	private String pass;
 	private ExperimentReference experiment;
@@ -172,11 +171,11 @@ public class PerformanceTestAction extends AbstractNavigationAction implements R
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(login, pass, new ExperimentReference(
-				experimentResult), false, src.getGUIsetting()))
+							experimentResult), false, src.getGUIsetting()))
 			res.add(ne);
 
 		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null, new ExperimentReference(
-				experimentResult), src.getGUIsetting())) {
+							experimentResult), src.getGUIsetting())) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
 				res.add(ne);
@@ -200,18 +199,20 @@ public class PerformanceTestAction extends AbstractNavigationAction implements R
 		return "Performance Test";
 	}
 
-	@Override
-	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver) {
-		this.resultReceiver = resultReceiver;
-		this.workOnSubset = workOnSubset;
-		this.numberOfSubsets = numberOfSubsets;
-	}
-
-	@Override
-	public void setParams(ExperimentReference experiment, String login, String pass, String params) {
-		this.experiment = experiment;
-		this.login = login;
-		this.pass = pass;
-	}
+	// @Override
+	// public void setWorkingSet(int workOnSubset, int numberOfSubsets,
+	// RunnableWithMappingData resultReceiver) {
+	// this.resultReceiver = resultReceiver;
+	// this.workOnSubset = workOnSubset;
+	// this.numberOfSubsets = numberOfSubsets;
+	// }
+	//
+	// @Override
+	// public void setParams(ExperimentReference experiment, String login, String
+	// pass, String params) {
+	// this.experiment = experiment;
+	// this.login = login;
+	// this.pass = pass;
+	// }
 
 }
