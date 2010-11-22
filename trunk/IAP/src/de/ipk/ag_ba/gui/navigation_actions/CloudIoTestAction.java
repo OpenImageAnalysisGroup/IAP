@@ -29,7 +29,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 /**
  * @author klukas
  */
-public class ScheduleTestAction extends AbstractNavigationAction implements RemoteCapableAnalysisAction {
+public class CloudIoTestAction extends AbstractNavigationAction implements RemoteCapableAnalysisAction {
 	private String login;
 	private String pass;
 	private ExperimentReference experiment;
@@ -40,15 +40,17 @@ public class ScheduleTestAction extends AbstractNavigationAction implements Remo
 	private RunnableWithMappingData resultReceiver;
 	private int workOnSubset;
 	private int numberOfSubsets;
+	private String datasetID;
 
-	public ScheduleTestAction(String login, String pass, ExperimentReference experiment) {
+	public CloudIoTestAction(String login, String pass, ExperimentReference experiment) {
 		super("Test performance by reading experiment content");
 		this.login = login;
 		this.pass = pass;
 		this.experiment = experiment;
+		this.datasetID = experiment.getHeader().getExcelfileid();
 	}
 
-	public ScheduleTestAction() {
+	public CloudIoTestAction() {
 		super("Test performance");
 	}
 
@@ -169,6 +171,11 @@ public class ScheduleTestAction extends AbstractNavigationAction implements Remo
 		this.experiment = experiment;
 		this.login = login;
 		this.pass = pass;
+	}
+
+	@Override
+	public String getMongoDatasetID() {
+		return datasetID;
 	}
 
 }

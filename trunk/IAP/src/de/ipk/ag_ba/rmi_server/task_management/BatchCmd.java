@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -15,6 +15,8 @@ import org.BackgroundTaskStatusProvider;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
+
+import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
@@ -31,6 +33,16 @@ public class BatchCmd extends BasicDBObject {
 				res.add((String) e.getValue());
 		}
 		return res;
+	}
+
+	public BatchCmd() {
+		// empty
+	}
+
+	public static void enqueueBatchCmd(HashSet<String> targetIPs, String remoteCapableAnalysisActionClassName,
+						String remoteCapableAnalysisActionParams, String experimentInputMongoID) {
+		// empty
+		new MongoDB().batchEnqueue(targetIPs, remoteCapableAnalysisActionClassName, remoteCapableAnalysisActionParams, experimentInputMongoID);
 	}
 
 	public String getRemoteCapableAnalysisActionClassName() {

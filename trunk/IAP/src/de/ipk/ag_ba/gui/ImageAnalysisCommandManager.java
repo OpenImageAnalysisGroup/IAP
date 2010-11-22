@@ -16,7 +16,7 @@ import de.ipk.ag_ba.gui.navigation_actions.CloudUploadEntity;
 import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
 import de.ipk.ag_ba.gui.navigation_actions.NumericDataReportAction;
 import de.ipk.ag_ba.gui.navigation_actions.PerformanceTestAction;
-import de.ipk.ag_ba.gui.navigation_actions.ScheduleTestAction;
+import de.ipk.ag_ba.gui.navigation_actions.CloudIoTestAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDsegmentationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -61,7 +61,7 @@ public class ImageAnalysisCommandManager {
 			NavigationButton performanceTestButton = new NavigationButton(performanceTestAction, guiSetting);
 			actions.add(performanceTestButton);
 
-			actions.add(new NavigationButton(new ScheduleTestAction(login, pass, experimentReference), guiSetting));
+			actions.add(new NavigationButton(new CloudIoTestAction(login, pass, experimentReference), guiSetting));
 
 			actions.add(new NavigationButton(new NumericDataReportAction(login, pass, experimentReference), guiSetting));
 

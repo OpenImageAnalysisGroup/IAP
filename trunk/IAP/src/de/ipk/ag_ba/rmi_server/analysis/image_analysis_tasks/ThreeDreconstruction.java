@@ -357,7 +357,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 			status.setCurrentStatusValue(100);
 
 			mg.setRoundViewImages(pictures);
-			if (true)
+			if (false)
 				mg.calculateModel(status, modeOfOperation, 0);
 			else
 				mg.calculateModelMotionScan(status);

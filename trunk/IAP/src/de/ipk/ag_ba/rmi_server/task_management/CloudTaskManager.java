@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -82,6 +82,7 @@ public class CloudTaskManager {
 				if (CloudTaskManager.this.process) {
 					ArrayList<TaskDescription> commands = new ArrayList<TaskDescription>();
 					long lastUpdate = 5000;
+					new MongoDB().batchPingHost(ip);
 					for (BatchCmd batch : new MongoDB().batchGetCommands(lastUpdate)) {
 						if (batch.getTargetIPs().contains(ip)) {
 							new MongoDB().batchClaim(batch, ip, CloudAnalysisStatus.STARTING);
