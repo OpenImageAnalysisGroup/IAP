@@ -13,16 +13,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -132,7 +128,7 @@ public class MongoDB {
 	}
 
 	private String defaultDBE = "dbe3";
-	private String defaultHost = "ba-13";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
+	private String defaultHost = "localhost";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
 	// "ba-13.ipk-gatersleben.de:27017,nw-08.ipk-gatersleben.de:27018";
 	private String defaultLogin = null;
 	private String defaultPass = null;
@@ -153,15 +149,15 @@ public class MongoDB {
 			return;
 		init = true;
 
-//		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-//		ObjectName name;
-//		try {
-//			name = new ObjectName("de.ipk_gatersleben.ag_ba.mongo:type=Hello");
-//			Hello mbean = new Hello();
-//			mbs.registerMBean(mbean, name);
-//		} catch (Exception e) {
-//			ErrorMsg.addErrorMessage(e);
-//		}
+		// MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		// ObjectName name;
+		// try {
+		// name = new ObjectName("de.ipk_gatersleben.ag_ba.mongo:type=Hello");
+		// Hello mbean = new Hello();
+		// mbs.registerMBean(mbean, name);
+		// } catch (Exception e) {
+		// ErrorMsg.addErrorMessage(e);
+		// }
 	}
 
 	public void storeExperiment(String dataBase, String optHosts, String optLogin, String optPass,

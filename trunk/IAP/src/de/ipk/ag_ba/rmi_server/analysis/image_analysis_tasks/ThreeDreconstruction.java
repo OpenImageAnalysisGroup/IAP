@@ -201,8 +201,8 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 								status.setCurrentStatusValue(-1);
 							if (status != null)
 								status.setCurrentStatusText1("Storing result");
-							storeResultInDatabase.saveVolume(volume, s3d, login, pass, DBTable.SAMPLE, vud, null, vud
-									.getLength(), md5, status);
+							storeResultInDatabase.saveVolume(volume, s3d, login, pass, DBTable.SAMPLE, vud, null,
+									vud.getLength(), md5, status);
 							if (status != null)
 								status.setCurrentStatusValue(100);
 							if (status != null)
@@ -357,7 +357,10 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 			status.setCurrentStatusValue(100);
 
 			mg.setRoundViewImages(pictures);
-			mg.calculateModel(status, modeOfOperation, 0);
+			if (true)
+				mg.calculateModel(status, modeOfOperation, 0);
+			else
+				mg.calculateModelMotionScan(status);
 
 			volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResult());
 
@@ -442,5 +445,4 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	public String getName() {
 		return "3D-Reconstruction";
 	}
-
 }
