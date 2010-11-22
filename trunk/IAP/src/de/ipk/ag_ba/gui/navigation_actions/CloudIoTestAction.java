@@ -47,7 +47,8 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 		this.login = login;
 		this.pass = pass;
 		this.experiment = experiment;
-		this.datasetID = experiment.getHeader().getExcelfileid();
+		if (experiment != null && experiment.getHeader() != null)
+			this.datasetID = experiment.getHeader().getExcelfileid();
 	}
 
 	public CloudIoTestAction() {

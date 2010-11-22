@@ -61,7 +61,8 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		this.pass = pass;
 		this.experiment = experiment;
 		this.experimentResult = null;
-		this.mongoDatasetID = experiment.getHeader().getExcelfileid();
+		if (experiment != null && experiment.getHeader() != null)
+			this.mongoDatasetID = experiment.getHeader().getExcelfileid();
 	}
 
 	public PhenotypeAnalysisAction() {
