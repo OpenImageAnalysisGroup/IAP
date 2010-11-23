@@ -35,7 +35,7 @@ public class ModelGenerator {
 	// Color[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 	byte[][][] transparentVoxels;
 	private int[][][] byteCube;
-	private byte[] rgbCube;
+	private byte[][][] rgbCube;
 
 	ArrayList<Color> palette = null;
 
@@ -267,10 +267,11 @@ public class ModelGenerator {
 						byteCube[xi][yi][zi] = (byte) 0;
 						if (rgb) {
 							// TRANSPARENT_COLOR;
-							rgbCube[idx++] = 0;
-							rgbCube[idx++] = 0;
-							rgbCube[idx++] = 0;
-							rgbCube[idx++] = 0;
+							idx = zi * 4;
+							rgbCube[xi][yi][idx++] = 0;
+							rgbCube[xi][yi][idx++] = 0;
+							rgbCube[xi][yi][idx++] = 0;
+							rgbCube[xi][yi][idx++] = 0;
 						}
 					} else {
 						if (rgb) {
@@ -278,10 +279,11 @@ public class ModelGenerator {
 							int tr = (int) (255d - 0.05d * byteCube[xi][yi][zi]);
 							if (tr < 0)
 								tr = 255;
-							rgbCube[idx++] = (byte) tr;
-							rgbCube[idx++] = (byte) c.getRed();
-							rgbCube[idx++] = (byte) c.getGreen();
-							rgbCube[idx++] = (byte) c.getBlue();
+							idx = zi * 4;
+							rgbCube[xi][yi][idx++] = (byte) tr;
+							rgbCube[xi][yi][idx++] = (byte) c.getRed();
+							rgbCube[xi][yi][idx++] = (byte) c.getGreen();
+							rgbCube[xi][yi][idx++] = (byte) c.getBlue();
 						} else {
 							Color c = ColorUtil.getMaxSaturationColor(cc);
 							int nearestColor = ColorUtil.findBestColorIndex(palette, c);
@@ -399,7 +401,7 @@ public class ModelGenerator {
 		this.byteCube = new int[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 
 		if (mode == GenerationMode.COLORED_RGBA) {
-			this.rgbCube = new byte[maxVoxelPerSide * maxVoxelPerSide * maxVoxelPerSide * 4];
+			this.rgbCube = new byte[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide * 4];
 		}
 
 		double max = 0;
@@ -420,7 +422,7 @@ public class ModelGenerator {
 		generated = true;
 	}
 
-	public byte[] getRGBcubeResult() {
+	public byte[][][] getRGBcubeResult() {
 		return rgbCube;
 	}
 
@@ -432,7 +434,9 @@ public class ModelGenerator {
 			generateNormalizedByteCube(mode);
 			if (mode == GenerationMode.COLORED_RGBA) {
 				status.setCurrentStatusText2("Writing Volume Data to File...");
-				inimg.write(rgbCube);
+				for (int x = 0; x < rgbCube.length; x++)
+					for (int y = 0; y < rgbCube[x].length; y++)
+						inimg.write(rgbCube[x][y]);
 				status.setCurrentStatusValueFine(100d);
 				status.setCurrentStatusText2("Volume File Created");
 			} else {
@@ -517,14 +521,10 @@ public class ModelGenerator {
 							} catch (Exception e) {
 								c = Color.BLUE;
 							}
-							rgbCube[(vx + maxVoxelPerSide * vy + vz * maxVoxelPerSide * maxVoxelPerSide) * 4 + 0] = (byte) c
-									.getAlpha();
-							rgbCube[(vx + maxVoxelPerSide * vy + vz * maxVoxelPerSide * maxVoxelPerSide) * 4 + 1] = (byte) c
-									.getRed();
-							rgbCube[(vx + maxVoxelPerSide * vy + vz * maxVoxelPerSide * maxVoxelPerSide) * 4 + 2] = (byte) c
-									.getGreen();
-							rgbCube[(vx + maxVoxelPerSide * vy + vz * maxVoxelPerSide * maxVoxelPerSide) * 4 + 3] = (byte) c
-									.getBlue();
+							rgbCube[vx][vy][vz * 4 + 0] = (byte) c.getAlpha();
+							rgbCube[vx][vy][vz * 4 + 1] = (byte) c.getRed();
+							rgbCube[vx][vy][vz * 4 + 2] = (byte) c.getGreen();
+							rgbCube[vx][vy][vz * 4 + 3] = (byte) c.getBlue();
 						}
 					}
 					tso.addInt(1);

@@ -39,7 +39,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
  */
 public class LoadedVolumeExtension extends LoadedVolume {
 
-	public LoadedVolumeExtension(Sample parent, byte[] volume) {
+	public LoadedVolumeExtension(Sample parent, byte[][][] volume) {
 		super(parent, new ByteShortIntArray(volume));
 	}
 
