@@ -147,6 +147,11 @@ public class ImageConverter {
 
 	// ########### Print Image #################
 
+	
+	public static void printImage(BufferedImage image){
+		printImage(ImageConverter.convertBIto2A(image));
+	}
+	
 	public static void printImage(int[][] image) {
 		printImage(image, "Image");
 	}
