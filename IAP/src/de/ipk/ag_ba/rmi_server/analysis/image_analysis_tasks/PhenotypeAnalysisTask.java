@@ -38,7 +38,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImageHandler;
  */
 public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
-	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);
+	public static final Color BACKGROUND_COLOR = new Color(0);
+	public static final int BACKGROUND_COLORint = BACKGROUND_COLOR.getRGB();
 
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
@@ -84,7 +85,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
-			final BackgroundTaskStatusProviderSupportingExternalCall status) {
+						final BackgroundTaskStatusProviderSupportingExternalCall status) {
 
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
@@ -125,8 +126,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 								try {
 									limg = IOmodule.loadImageFromFileOrMongo(id, login, pass);
 									clearBackgroundAndInterpretImage(limg, maximumThreadCountOnImageLevel,
-											storeResultInDatabase, status, true, login, pass, output, preProcessors, epsilonA,
-											epsilonB);
+														storeResultInDatabase, status, true, login, pass, output, preProcessors, epsilonA,
+														epsilonB);
 								} catch (Exception e) {
 									ErrorMsg.addErrorMessage(e);
 								}
@@ -152,9 +153,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 	}
 
 	public static void clearBackgroundAndInterpretImage(LoadedImage limg, int maximumThreadCount,
-			DatabaseTarget storeResultInDatabase, final BackgroundTaskStatusProviderSupportingExternalCall status,
-			boolean dataAnalysis, String login, String pass, ArrayList<NumericMeasurementInterface> output,
-			ArrayList<ImagePreProcessor> preProcessors, double epsilonA, double epsilonB) {
+						DatabaseTarget storeResultInDatabase, final BackgroundTaskStatusProviderSupportingExternalCall status,
+						boolean dataAnalysis, String login, String pass, ArrayList<NumericMeasurementInterface> output,
+						ArrayList<ImagePreProcessor> preProcessors, double epsilonA, double epsilonB) {
 
 		epsilonA /= 10;
 		epsilonB /= 10;
@@ -211,10 +212,10 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			final int y = ty;
 			if (maximumThreadCount > 1)
 				run.submit(processRowYofImage(limg, w, arrayRGB, arrayRGBnull, iBackgroundFill, sidepercent, progress, y,
-						epsilonA, epsilonB, config, arrayL, arrayA, arrayB));
+									epsilonA, epsilonB, config, arrayL, arrayA, arrayB));
 			else
 				processRowYofImage(limg, w, arrayRGB, arrayRGBnull, iBackgroundFill, sidepercent, progress, y, epsilonA,
-						epsilonB, config, arrayL, arrayA, arrayB).run();
+									epsilonB, config, arrayL, arrayA, arrayB).run();
 		}
 
 		if (maximumThreadCount > 1) {
@@ -251,15 +252,15 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					if (pos > 0)
 						sn = sn.substring(0, pos);
 					m = new NumericMeasurement(limg, sn + "-r: " + che.getColorDisplayName(), limg.getParentSample()
-							.getParentCondition().getExperimentName()
-							+ " (" + getNameStatic() + ")");
+										.getParentCondition().getExperimentName()
+										+ " (" + getNameStatic() + ")");
 					m.setValue(che.getNumberOfPixels() / pixelCount);
 					m.setUnit("proportion");
 					output.add(m);
 
 					m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
-							.getParentCondition().getExperimentName()
-							+ " (" + getNameStatic() + ")");
+										.getParentCondition().getExperimentName()
+										+ " (" + getNameStatic() + ")");
 					m.setValue(pixelCount);
 					m.setUnit("pixels");
 					output.add(m);
@@ -267,22 +268,22 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			}
 			if (!limg.getSubstanceName().toUpperCase().contains("TOP")) {
 				m = new NumericMeasurement(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
-						.getParentCondition().getExperimentName()
-						+ " (" + getNameStatic() + ")");
+									.getParentCondition().getExperimentName()
+									+ " (" + getNameStatic() + ")");
 				m.setValue(h - g.getTop());
 				m.setUnit("pixel");
 				output.add(m);
 
 				m = new NumericMeasurement(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
-						.getParentCondition().getExperimentName()
-						+ " (" + getNameStatic() + ")");
+									.getParentCondition().getExperimentName()
+									+ " (" + getNameStatic() + ")");
 				m.setValue(h - g.getLeft() - (h - g.getRight()));
 				m.setUnit("pixel");
 				output.add(m);
 			}
 			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
-					.getParentCondition().getExperimentName()
-					+ " (" + getNameStatic() + ")");
+								.getParentCondition().getExperimentName()
+								+ " (" + getNameStatic() + ")");
 			m.setValue(g.getFilledPixels());
 			m.setUnit("pixel");
 			output.add(m);
@@ -358,7 +359,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 	}
 
 	private static void closingOpening(int w, int h, int[] rgbArray, int[] rgbNonModifiedArray, int iBackgroundFill,
-			LoadedImage limg, int repeat) {
+						LoadedImage limg, int repeat) {
 		int[][] image = new int[w][h];
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -392,7 +393,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 	}
 
 	private static void removeSmallPartsOfImage(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg,
-			int cutOff) {
+						int cutOff) {
 		int[][] image = new int[w][h];
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -416,8 +417,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
 				if (clusterSizes[clusterID] > 25)
 					System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
-							+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
-							+ (clusterCircleSimilarity[clusterID] < 0.013));
+										+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
+										+ (clusterCircleSimilarity[clusterID] < 0.013));
 
 		int[][] mask = ps.getImageMask();
 		// ArrayList<Color> colors = Colors.get(cl);
@@ -442,9 +443,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 	}
 
 	private static Runnable processRowYofImage(final ImageData imageData, final int w, final int[] rgbArray,
-			final int[] rgbArrayNULL, final int iBackgroundFill, final double sidepercent, final ObjectRef progress,
-			final int y, final double epsilonA, final double epsilonB, final ImageConfiguration config,
-			final double arrayL[], final double arrayA[], final double arrayB[]) {
+						final int[] rgbArrayNULL, final int iBackgroundFill, final double sidepercent, final ObjectRef progress,
+						final int y, final double epsilonA, final double epsilonB, final ImageConfiguration config,
+						final double arrayL[], final double arrayA[], final double arrayB[]) {
 		return new Runnable() {
 
 			@Override
@@ -457,29 +458,30 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				int x = 0;
 				if (config == ImageConfiguration.RgbSide || config == ImageConfiguration.RgbTop) {
 					processRGBtopImageByLAB(imageData, w, rgbArray, iBackgroundFill, y, arrayL, arrayA, arrayB, x);
-				} else if (config == ImageConfiguration.FluoTop || config == ImageConfiguration.FluoSide) {
-					processFluoTopImageByLAB(imageData, w, rgbArray, iBackgroundFill, y, arrayL, arrayA, arrayB, x);
-				} else {
-					ArrayList<Integer> backgroundPixelsArr = new ArrayList<Integer>();
-					boolean hasBackgroundImage = rgbArrayNULL != null && rgbArray.length == rgbArrayNULL.length;
-					if (hasBackgroundImage) {
-						processImageWithBackgroundImage(imageData, w, rgbArray, rgbArrayNULL, iBackgroundFill, y, epsilonA,
-								config, arrayL, arrayA, arrayB, factor, x);
+				} else
+					if (config == ImageConfiguration.FluoTop || config == ImageConfiguration.FluoSide) {
+						processFluoTopImageByLAB(imageData, w, rgbArray, iBackgroundFill, y, arrayL, arrayA, arrayB, x);
 					} else {
-						processImageWithoutBackgroundImage(imageData, w, rgbArray, iBackgroundFill, sidepercent, y, epsilonA,
-								config, arrayL, arrayA, arrayB, factor, backgroundPixelsArr);
+						ArrayList<Integer> backgroundPixelsArr = new ArrayList<Integer>();
+						boolean hasBackgroundImage = rgbArrayNULL != null && rgbArray.length == rgbArrayNULL.length;
+						if (hasBackgroundImage) {
+							processImageWithBackgroundImage(imageData, w, rgbArray, rgbArrayNULL, iBackgroundFill, y, epsilonA,
+												config, arrayL, arrayA, arrayB, factor, x);
+						} else {
+							processImageWithoutBackgroundImage(imageData, w, rgbArray, iBackgroundFill, sidepercent, y, epsilonA,
+												config, arrayL, arrayA, arrayB, factor, backgroundPixelsArr);
+						}
+						postProcessThisIsUnclearCode(w, rgbArray, iBackgroundFill, sidepercent, y, epsilonB, factor,
+											backgroundPixelsArr);
 					}
-					postProcessThisIsUnclearCode(w, rgbArray, iBackgroundFill, sidepercent, y, epsilonB, factor,
-							backgroundPixelsArr);
-				}
 				synchronized (progress) {
 					progress.setObject(new Integer((Integer) progress.getObject() + 1));
 				}
 			}
 
 			private void processRGBtopImageByLAB(final ImageData imageData, final int w, final int[] rgbArray,
-					final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
-					final double[] arrayB, int x) {
+								final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
+								final double[] arrayB, int x) {
 				if (y == 0)
 					System.out.println("LAB processing of RGB image..." + imageData.toString() + "");
 
@@ -491,17 +493,17 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					if (a > 21 || b < 5) { // a < -5 &&
 						rgbArray[i] = iBackgroundFill;
 					}
-//					else if (l >= 80 && Math.abs(a) <= 20 && Math.abs(b) <= 20) {
-//						rgbArray[i] = Color.yellow.getRGB(); // iBackgroundFill;
-//					}
+					// else if (l >= 80 && Math.abs(a) <= 20 && Math.abs(b) <= 20) {
+					// rgbArray[i] = Color.yellow.getRGB(); // iBackgroundFill;
+					// }
 
 					i++;
 				}
 			}
 
 			private void processFluoTopImageByLAB(final ImageData imageData, final int w, final int[] rgbArray,
-					final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
-					final double[] arrayB, int x) {
+								final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
+								final double[] arrayB, int x) {
 				if (y == 0)
 					System.out.println("LAB processing of FluoTop image..." + imageData.toString() + "");
 
@@ -511,13 +513,10 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					double a = arrayA[i];
 					double b = arrayB[i];
 					if (
-							// rot
-							!((l >= 15 && a >= 20 && b >= 20)
-							||
-							// gelb
-							(l >= 15 && Math.abs(a) <= 25 && b >= 70))
-						)
-					{
+					// rot
+					!((l >= 15 && a >= 20 && b >= 20) ||
+					// gelb
+					(l >= 15 && Math.abs(a) <= 25 && b >= 70))) {
 						rgbArray[i] = iBackgroundFill;
 					}
 
@@ -526,8 +525,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			}
 
 			private void postProcessThisIsUnclearCode(final int w, final int[] rgbArray, final int iBackgroundFill,
-					final double sidepercent, final int y, final double epsilonB, double factor,
-					ArrayList<Integer> backgroundPixelsArr) {
+								final double sidepercent, final int y, final double epsilonB, double factor,
+								ArrayList<Integer> backgroundPixelsArr) {
 				int x;
 				for (x = 0; x < w * sidepercent; x++) {
 					// empty
@@ -549,9 +548,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			}
 
 			private void processImageWithBackgroundImage(final ImageData imageData, final int w, final int[] rgbArray,
-					final int[] rgbArrayNULL, final int iBackgroundFill, final int y, final double epsilonA,
-					final ImageConfiguration config, final double[] arrayL, final double[] arrayA, final double[] arrayB,
-					double factor, int x) {
+								final int[] rgbArrayNULL, final int iBackgroundFill, final int y, final double epsilonA,
+								final ImageConfiguration config, final double[] arrayL, final double[] arrayA, final double[] arrayB,
+								double factor, int x) {
 				if (y == 0)
 					System.out.println("Has background image... (" + imageData.toString() + ", " + config.toString() + ")");
 				double ef = epsilonA * factor * 10;
@@ -568,13 +567,13 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			}
 
 			private void processImageWithoutBackgroundImage(final ImageData imageData, final int w, final int[] rgbArray,
-					final int iBackgroundFill, final double sidepercent, final int y, final double epsilonA,
-					final ImageConfiguration config, final double[] arrayL, final double[] arrayA, final double[] arrayB,
-					double factor, ArrayList<Integer> backgroundPixelsArr) {
+								final int iBackgroundFill, final double sidepercent, final int y, final double epsilonA,
+								final ImageConfiguration config, final double[] arrayL, final double[] arrayA, final double[] arrayB,
+								double factor, ArrayList<Integer> backgroundPixelsArr) {
 				int x;
 				if (y == 0)
 					System.out.println("Has NO background image, interpreting side border colors as background..."
-							+ imageData.toString() + ", " + config.toString() + ")");
+										+ imageData.toString() + ", " + config.toString() + ")");
 				for (x = 0; x < w * sidepercent; x++) {
 					int xyw = x + y * w;
 					int bp = rgbArray[xyw];

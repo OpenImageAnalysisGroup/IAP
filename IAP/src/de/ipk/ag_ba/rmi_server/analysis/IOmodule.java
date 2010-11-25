@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -25,7 +25,6 @@ import org.ErrorMsg;
 import org.HomeFolder;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
-import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import com.mongodb.DB;
@@ -41,6 +40,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeInputStream;
 
 /**
  * @author klukas
@@ -76,7 +76,7 @@ public class IOmodule {
 	}
 
 	public static InputStream getThreeDvolumePreviewIcon(LoadedVolumeExtension volume,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws FileNotFoundException, URISyntaxException {
+						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws FileNotFoundException, URISyntaxException {
 		try {
 			// return
 			// MyImageIOhelper.getPreviewImageStream(MyImageIOhelper.getPreviewImage(volume
@@ -85,7 +85,7 @@ public class IOmodule {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return new FileInputStream(new File(new URI(GravistoService.getResource(IOmodule.class,
-					"img/RotationReconstruction.png").toString())));
+								"img/RotationReconstruction.png").toString())));
 		}
 	}
 
@@ -93,10 +93,9 @@ public class IOmodule {
 
 	public static VolumeUploadData getThreeDvolumeInputStream(LoadedVolume volume) {
 		System.out.println("Create InputStream representation for volume: " + volume.getDimensionX()
-				* volume.getDimensionY() * volume.getDimensionZ() * 4 / 1024 / 1024 + " MB");
-
-		byte[] cube = volume.getLoadedVolume().getByteArray();
-		return new VolumeUploadData(new MyByteArrayInputStream(cube), cube.length);
+							* volume.getDimensionY() * volume.getDimensionZ() * 4 / 1024 / 1024 + " MB");
+		VolumeInputStream stream = volume.getLoadedVolume().getInputStream();
+		return new VolumeUploadData(stream, stream.getSize());
 	}
 
 	// public static LoadedVolume loadVolumeFromDBE(VolumeData md, String login,

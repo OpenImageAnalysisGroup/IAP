@@ -22,9 +22,9 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataFileReader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.OpenExcelFileDialogService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
@@ -91,7 +91,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 					}
 					ExperimentReference exRef = new ExperimentReference(newExperiment);
 					for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(null, null, exRef,
-							src.getGUIsetting()))
+										src.getGUIsetting()))
 						res.add(ne);
 				} catch (Exception e1) {
 					newExperiment = null;
@@ -112,7 +112,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 		if (newExperiment != null) {
 			res.add(src);
 			res.add(MongoExperimentsNavigationAction.getMongoExperimentButton(newExperiment.getHeader(),
-					src.getGUIsetting()));
+								src.getGUIsetting()));
 		}
 		return res;
 	}
@@ -123,13 +123,13 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 	}
 
 	private static void processData(RunnableWithMappingData resultProcessor, ImageLoader il, ArrayList<File> fileList,
-			AnnotationFromGraphFileNameProvider provider) {
-		il.process(fileList, provider);
-		ExperimentInterface mdl = il.getProcessingResults();
-		if (mdl != null) {
-			if (resultProcessor != null) {
-				resultProcessor.setExperimenData(mdl);
-				resultProcessor.run();
+						AnnotationFromGraphFileNameProvider provider) {
+		for (ExperimentInterface mdl : il.process(fileList, provider)) {
+			if (mdl != null) {
+				if (resultProcessor != null) {
+					resultProcessor.setExperimenData(mdl);
+					resultProcessor.run();
+				}
 			}
 		}
 	}
@@ -149,11 +149,11 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 		HashMap<Integer, Condition> replicateNumber2conditionTemplate = null;
 
 		Object[] lm = MyInputHelper.getInput(
-				"[Yes;No]Load meta data (mapping from plant ID to condition annotation) from file?<br><br>"
-						+ "The provided table needs to contain at least two columns,<br>"
-						+ "the first needs to contain the plant ID, the following columns,<br>"
-						+ "need to contain annotation information about experiment conditions<br>"
-						+ "such as species, genotype or treatment.<br><br>", "Load Meta Data?", new Object[] {});
+							"[Yes;No]Load meta data (mapping from plant ID to condition annotation) from file?<br><br>"
+												+ "The provided table needs to contain at least two columns,<br>"
+												+ "the first needs to contain the plant ID, the following columns,<br>"
+												+ "need to contain annotation information about experiment conditions<br>"
+												+ "such as species, genotype or treatment.<br><br>", "Load Meta Data?", new Object[] {});
 		if (lm != null) {
 			// yes answered
 			// load meta data file
@@ -175,11 +175,11 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 						inp.add(val);
 					}
 					Object[] columnTypes = MyInputHelper
-							.getInput(
-									"<html>"
-											+ "Please specify the column contents:<br><br>"
-											+ "<b>Warning: Currently only the fields Species, Genotype and Treatment are processed correctly!</b><br><hl><br>",
-									"Meta Data / Condition Annotation", inp.toArray());
+										.getInput(
+															"<html>"
+																				+ "Please specify the column contents:<br><br>"
+																				+ "<b>Warning: Currently only the fields Species, Genotype and Treatment are processed correctly!</b><br><hl><br>",
+															"Meta Data / Condition Annotation", inp.toArray());
 					if (columnTypes != null) {
 						replicateNumber2conditionTemplate = new HashMap<Integer, Condition>();
 						for (int row = 1; row <= myData.getMaximumRow(); row++) {
@@ -197,7 +197,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 									}
 									if (replicateNumber2conditionTemplate.containsKey(replicateID))
 										ErrorMsg.addErrorMessage("Duplicate annotation information definition for replicate ID "
-												+ replicateID + " in row " + row + " - ignored!");
+															+ replicateID + " in row " + row + " - ignored!");
 									else
 										replicateNumber2conditionTemplate.put(replicateID, c);
 								}
@@ -212,78 +212,79 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 		}
 
 		MyScanner[] replicateIDs = AnnotationFromGraphFileNameProvider.getFileNameInfos(fileList, providedFileNameFormat,
-				replicateNumber2conditionTemplate);
+							replicateNumber2conditionTemplate);
 		HashSet<String> detectedConditions = getConditions(replicateIDs);
 		if (replicateIDs == null || replicateIDs.length == 0) {
 			processData(resultProcessor, il, fileList, null);
-		} else if (detectedConditions.size() > 0) {
-			HashMap<String, MyScanner> filename2scanner = new HashMap<String, MyScanner>();
-			for (MyScanner s : replicateIDs) {
-				filename2scanner.put(s.getFileName(), s);
-			}
-			HashMap<Integer, Condition> replId2ConditionInfo = new HashMap<Integer, Condition>();
-			for (MyScanner rId : filename2scanner.values())
-				replId2ConditionInfo.put(rId.getReplicateID(), getCondition(rId));
-			AnnotationFromGraphFileNameProvider provider = new AnnotationFromGraphFileNameProvider(replId2ConditionInfo,
-					filename2scanner);
-			processData(resultProcessor, il, fileList, provider);
-		} else {
-			Object[] con = MyInputHelper.getInput("Experiment condition specification:", "Number of conditions?",
-					new Object[] { "Number of conditions", 1 });
-			if (con != null) {
-				Integer conditionCount = (Integer) con[0];
-				ArrayList<Object> paramList = new ArrayList<Object>();
-				int first = lowestOrHighestReplicateID(true, replicateIDs);
-				int last = lowestOrHighestReplicateID(false, replicateIDs);
-				for (int n = 0; n < conditionCount; n++) {
-					paramList.add("Specify details of condition " + (n + 1) + ".<br>"
-							+ "The dataset contains replicate IDs ranging from " + first + " to " + last + ".");
-					paramList.add("Condition " + (n + 1));
-					ArrayList<Object> ppp = new ArrayList<Object>();
-					ppp.add("First replicate ID");
-					ppp.add(first);
-					ppp.add("Last replicate ID");
-					ppp.add(last);
-					ppp.add("Species");
-					ppp.add("");
-					ppp.add("Genotype");
-					ppp.add("");
-					ppp.add("Treatment");
-					ppp.add("");
-
-					paramList.add(ppp);
+		} else
+			if (detectedConditions.size() > 0) {
+				HashMap<String, MyScanner> filename2scanner = new HashMap<String, MyScanner>();
+				for (MyScanner s : replicateIDs) {
+					filename2scanner.put(s.getFileName(), s);
 				}
-
-				ArrayList<ArrayList<Object>> input = MyInputHelper.getMultipleInput(paramList.toArray());
-				if (input != null) {
-					HashMap<Integer, Condition> replId2ConditionInfo = new HashMap<Integer, Condition>();
+				HashMap<Integer, Condition> replId2ConditionInfo = new HashMap<Integer, Condition>();
+				for (MyScanner rId : filename2scanner.values())
+					replId2ConditionInfo.put(rId.getReplicateID(), getCondition(rId));
+				AnnotationFromGraphFileNameProvider provider = new AnnotationFromGraphFileNameProvider(replId2ConditionInfo,
+									filename2scanner);
+				processData(resultProcessor, il, fileList, provider);
+			} else {
+				Object[] con = MyInputHelper.getInput("Experiment condition specification:", "Number of conditions?",
+									new Object[] { "Number of conditions", 1 });
+				if (con != null) {
+					Integer conditionCount = (Integer) con[0];
+					ArrayList<Object> paramList = new ArrayList<Object>();
+					int first = lowestOrHighestReplicateID(true, replicateIDs);
+					int last = lowestOrHighestReplicateID(false, replicateIDs);
 					for (int n = 0; n < conditionCount; n++) {
-						ArrayList<Object> res = input.get(n);
-						int i = 0;
-						Integer fId = (Integer) res.get(i++);
-						Integer lId = (Integer) res.get(i++);
+						paramList.add("Specify details of condition " + (n + 1) + ".<br>"
+											+ "The dataset contains replicate IDs ranging from " + first + " to " + last + ".");
+						paramList.add("Condition " + (n + 1));
+						ArrayList<Object> ppp = new ArrayList<Object>();
+						ppp.add("First replicate ID");
+						ppp.add(first);
+						ppp.add("Last replicate ID");
+						ppp.add(last);
+						ppp.add("Species");
+						ppp.add("");
+						ppp.add("Genotype");
+						ppp.add("");
+						ppp.add("Treatment");
+						ppp.add("");
 
-						Condition c = new Condition(null);
-						c.setSpecies((String) res.get(i++));
-						c.setGenotype((String) res.get(i++));
-						c.setTreatment((String) res.get(i++));
-
-						int min = min(fId, lId);
-						int max = max(fId, lId);
-
-						for (int r = min; r <= max; r++)
-							replId2ConditionInfo.put(r, c);
+						paramList.add(ppp);
 					}
-					HashMap<String, MyScanner> rrr = new HashMap<String, MyScanner>();
-					for (MyScanner s : replicateIDs) {
-						rrr.put(s.getFileName(), s);
+
+					ArrayList<ArrayList<Object>> input = MyInputHelper.getMultipleInput(paramList.toArray());
+					if (input != null) {
+						HashMap<Integer, Condition> replId2ConditionInfo = new HashMap<Integer, Condition>();
+						for (int n = 0; n < conditionCount; n++) {
+							ArrayList<Object> res = input.get(n);
+							int i = 0;
+							Integer fId = (Integer) res.get(i++);
+							Integer lId = (Integer) res.get(i++);
+
+							Condition c = new Condition(null);
+							c.setSpecies((String) res.get(i++));
+							c.setGenotype((String) res.get(i++));
+							c.setTreatment((String) res.get(i++));
+
+							int min = min(fId, lId);
+							int max = max(fId, lId);
+
+							for (int r = min; r <= max; r++)
+								replId2ConditionInfo.put(r, c);
+						}
+						HashMap<String, MyScanner> rrr = new HashMap<String, MyScanner>();
+						for (MyScanner s : replicateIDs) {
+							rrr.put(s.getFileName(), s);
+						}
+						AnnotationFromGraphFileNameProvider provider = new AnnotationFromGraphFileNameProvider(
+											replId2ConditionInfo, rrr);
+						processData(resultProcessor, il, fileList, provider);
 					}
-					AnnotationFromGraphFileNameProvider provider = new AnnotationFromGraphFileNameProvider(
-							replId2ConditionInfo, rrr);
-					processData(resultProcessor, il, fileList, provider);
 				}
 			}
-		}
 	}
 
 	/**

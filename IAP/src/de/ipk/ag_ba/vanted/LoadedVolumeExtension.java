@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -27,10 +27,11 @@ import org.graffiti.editor.ShowImage;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
+import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ByteShortIntArray;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.CubeSide;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IntVolumeVisitor;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
 
@@ -39,7 +40,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
  */
 public class LoadedVolumeExtension extends LoadedVolume {
 
-	public LoadedVolumeExtension(Sample parent, byte[][][] volume) {
+	public LoadedVolumeExtension(Sample parent, int[][][] volume) {
 		super(parent, new ByteShortIntArray(volume));
 	}
 
@@ -47,68 +48,28 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		super(md);
 	}
 
-	public BufferedImage getSideView(CubeSide side) {
-		byte[] volumeB = volume.getByteArray();
-		switch (side) {
-		case FRONT:
-			int width = getDimensionX();
-			int height = getDimensionY();
-			BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-			int idx = 0;
-			System.out.println(countNonZero() + " non zero");
-			for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					int[] iArray = new int[] { 255, 255, 255, 0 };
-					result.getRaster().setPixel(x, y, iArray);
-					boolean solidFound = false;
-					for (int z = 0; z < getDimensionZ(); z++) {
-						byte a = volumeB[idx++];
-						byte r = volumeB[idx++];
-						byte g = volumeB[idx++];
-						byte b = volumeB[idx++];
-						if (!solidFound && a != 0 && (r < 250 || g < 250 || b < 250)) {
-							solidFound = true;
-							iArray[0] = r;
-							iArray[1] = g;
-							iArray[2] = b;
-							iArray[3] = 255;
-							result.getRaster().setPixel(x, y, iArray);
-						}
-					}
-				}
-			}
-			return result;
-		}
-		return null;
-	}
-
-	private byte[] volume2 = null;
-
-	public void resetRenderCubeCopy() {
-		volume2 = null;
-	}
-
-	public BufferedImage renderSideView(double rotation, BufferedImage result) {
-		int width = getDimensionX();
-		int height = getDimensionY();
-		int depth = getDimensionZ();
-		byte[] volumeB = volume.getByteArray();
-		// System.out.println(countNonZero() + " non zero");
-		if (volume2 == null || volumeB.length != volume2.length) {
-			volume2 = new byte[volumeB.length];
-		}
+	public BufferedImage renderSideView(double rotation, final BufferedImage result) {
+		final int width = getDimensionX();
+		final int height = getDimensionY();
+		final int depth = getDimensionZ();
 
 		boolean threaded = true;
 		if (threaded)
-			rotateVolumeThreaded(rotation);
+			rotateVolumeThreaded(rotation, new VolumeReceiver() {
+
+				@Override
+				public void processVolume(int[][][] volume) {
+					renderSideView(result, width, height, depth, volume);
+				}
+			});
 		else {
-			rotateVolume(rotation, 0, 1);
+			renderSideView(result, width, height, depth, rotateVolume(rotation, 0, 1, null));
 		}
-		renderSideView(result, width, height, depth);
+
 		return result;
 	}
 
-	private void renderSideView(BufferedImage result, int width, int height, int depth) {
+	private void renderSideView(BufferedImage result, int width, int height, int depth, int[][][] volume2) {
 		WritableRaster raster = result.getRaster();
 		int idx = 0;
 		for (int x = 0; x < width; x++) {
@@ -117,19 +78,12 @@ public class LoadedVolumeExtension extends LoadedVolume {
 				boolean solidFound = false;
 				for (int z = 0; z < depth; z++) {
 					if (solidFound) {
-						idx += 4;
+						idx++;
 					} else {
-						byte a = volume2[idx++];
-						byte r = volume2[idx++];
-						byte g = volume2[idx++];
-						byte b = volume2[idx++];
-						if (a != 0 && (r < 250 || g < 250 || b < 250)) {
+						int v = volume.getColorVoxel(x, y, z);
+						if (v != PhenotypeAnalysisTask.BACKGROUND_COLORint) {
 							solidFound = true;
-							iArray[0] = r;
-							iArray[1] = g;
-							iArray[2] = b;
-							iArray[3] = 255;
-							raster.setPixel(x, y, iArray);
+							raster.setPixel(x, y, new int[] { v });
 						}
 					}
 				}
@@ -139,14 +93,15 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		}
 	}
 
-	private void rotateVolumeThreaded(double rotation) {
+	private void rotateVolumeThreaded(double rotation, VolumeReceiver volumeReceiver) {
 		int maxCPU = SystemAnalysis.getNumberOfCPUs();
 		if (maxCPU > 8)
 			maxCPU = maxCPU / 2;
 		ExecutorService run = Executors.newFixedThreadPool(maxCPU);
 
+		int[][][] volume2 = new int[getDimensionX()][getDimensionY()][getDimensionZ()];
 		for (int i = 0; i < maxCPU; i++)
-			run.submit(getVolumeRotationRunnable(i, maxCPU, rotation));
+			run.submit(getVolumeRotationRunnable(i, maxCPU, rotation, volume2));
 
 		run.shutdown();
 		try {
@@ -156,54 +111,47 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		}
 	}
 
-	private Runnable getVolumeRotationRunnable(final int i, final int maxCPU, final double rotation) {
+	private Runnable getVolumeRotationRunnable(final int i, final int maxCPU, final double rotation, final int[][][] volume2) {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
-				rotateVolume(rotation, i, maxCPU);
+				rotateVolume(rotation, i, maxCPU, volume2);
 			}
 		};
 		return r;
 	}
 
-	private void rotateVolume(double rotation, int i, int maxCPU) {
-		{
-			double angle = rotation / 180d * Math.PI;
-			double cos = Math.cos(angle);
-			double sin = Math.sin(angle);
+	private int[][][] rotateVolume(double rotation, int i, int maxCPU, int[][][] volume2) {
 
-			int dimensionxH = dimensionx / 2;
-			int dimensionzH = dimensionx / 2;
+		if (volume2 == null)
+			volume2 = new int[getDimensionX()][getDimensionY()][getDimensionZ()];
 
-			byte[] volumeB = volume.getByteArray();
+		double angle = rotation / 180d * Math.PI;
+		double cos = Math.cos(angle);
+		double sin = Math.sin(angle);
 
-			for (int x = 0; x < dimensionx; x++) {
-				if (x % maxCPU == i)
-					for (int z = 0; z < dimensionz; z++) {
-						double a = z - dimensionzH;
-						double b = x - dimensionxH;
-						double zn = a * cos - b * sin;
-						double xn = a * sin + b * cos;
-						int zni = (int) zn + dimensionzH;
-						int xni = (int) xn + dimensionxH;
-						int offA = z + x * dimensiony * dimensionz;
-						int offB = zni + xni * dimensiony * dimensionz;
-						boolean targetOK = zni >= 0 && zni < dimensionz && xni >= 0 && xni < dimensionx;
-						for (int y = 0; y < dimensiony; y++) {
-							int offSrc = offA + offA + offA + offA;
-							int offTgt = offB + offB + offB + offB;
-							if (targetOK) {
-								volume2[offSrc++] = volumeB[offTgt++];
-								volume2[offSrc++] = volumeB[offTgt++];
-								volume2[offSrc++] = volumeB[offTgt++];
-								volume2[offSrc] = volumeB[offTgt];
-							}
-							offA += dimensiony;
-							offB += dimensiony;
+		int dimensionxH = dimensionx / 2;
+		int dimensionzH = dimensionx / 2;
+
+		for (int x = 0; x < dimensionx; x++) {
+			if (x % maxCPU == i)
+				for (int z = 0; z < dimensionz; z++) {
+					double a = z - dimensionzH;
+					double b = x - dimensionxH;
+					double zn = a * cos - b * sin;
+					double xn = a * sin + b * cos;
+					int zni = (int) zn + dimensionzH;
+					int xni = (int) xn + dimensionxH;
+					boolean targetOK = zni >= 0 && zni < dimensionz && xni >= 0 && xni < dimensionx;
+					for (int y = 0; y < dimensiony; y++) {
+						if (targetOK) {
+							volume2[x][y][z] = volume.getColorVoxel(xni, y, zni);
 						}
 					}
-			}
+				}
 		}
+
+		return volume2;
 	}
 
 	public static void main(String[] args) {
@@ -212,7 +160,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 
 			int res = 200;
 			FileInputStream file = new FileInputStream(
-					"/Users/klukas/Desktop/IAP_reconstruction_1284034033183.argb_volume");
+								"/Users/klukas/Desktop/IAP_reconstruction_1284034033183.argb_volume");
 
 			boolean high = false;
 			if (high) {
@@ -220,12 +168,19 @@ public class LoadedVolumeExtension extends LoadedVolume {
 				file = new FileInputStream("/Users/klukas/Desktop/IAP_reconstruction_1283948591567.argb_volume");
 			}
 
-			DataInputStream in = new DataInputStream(file);
+			final DataInputStream in = new DataInputStream(file);
 
 			LoadedVolumeExtension v = new LoadedVolumeExtension(null);
-			v.volume = new ByteShortIntArray(new byte[res * res * res * 4]);
-			v.volume2 = new byte[res * res * res * 4];
-			in.readFully(v.volume.getByteArray());
+			final int[][][] i1 = new int[res][res][res];
+			v.volume = new ByteShortIntArray(i1);
+			int[][][] i2 = new int[res][res][res];
+			v.volume.visitIntArray(new IntVolumeVisitor() {
+				@Override
+				public void visit(int x, int y, int z, int value) throws Exception {
+					i1[x][y][z] = in.read();
+				}
+			});
+
 			in.close();
 
 			v.setDimensionX(res);
@@ -259,11 +214,13 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	public MyByteArrayInputStream getSideViewGif(int width, int height,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 		ArrayList<String> delayTimes = new ArrayList<String>();
 
@@ -288,6 +245,10 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		if (optStatus != null)
 			optStatus.setCurrentStatusValueFine(100);
 		return new MyByteArrayInputStream(out.getBuff());
+	}
+
+	public long getVoxelCount() {
+		return (long) getDimensionX() * getDimensionY() * getDimensionZ();
 	}
 
 }

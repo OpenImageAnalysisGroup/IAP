@@ -54,7 +54,7 @@ public class ColorUtil {
 		int idx = 0;
 		for (Color check : palette) {
 			int diff = Math.abs(c.getRed() - check.getRed()) + Math.abs(c.getGreen() - check.getGreen())
-					+ Math.abs(c.getBlue() - check.getBlue());
+								+ Math.abs(c.getBlue() - check.getBlue());
 			if (diff < minDiff) {
 				minDiff = diff;
 				nearestColor = idx;
@@ -65,7 +65,7 @@ public class ColorUtil {
 	}
 
 	public static Color getMaxSaturationColor(ArrayList<Color> colorsOfGroup) {
-		boolean hsv = false;
+		boolean hsv = true;
 		if (hsv) {
 			float h = 0, s = 0, b = 0;
 			float maxS = -1;
@@ -85,7 +85,7 @@ public class ColorUtil {
 			for (Color c : colorsOfGroup) {
 				Color_CIE_Lab lab = new Color_CIE_Lab(c.getRGB());
 				if (res == null
-						|| (Math.abs(lab.getA()) + Math.abs(lab.getB()) > Math.abs(res.getA()) + Math.abs(res.getB())))
+									|| (Math.abs(lab.getA()) + Math.abs(lab.getB()) > Math.abs(res.getA()) + Math.abs(res.getB())))
 					res = lab;
 			}
 			return res.getColorXYZ().getColor();
@@ -165,6 +165,46 @@ public class ColorUtil {
 		return new ColorXYZ(X, Y, Z);
 	}
 
+	public static void colorRGB2XYZ(int rgb, ColorXYZ result) {
+
+		// int alpha = (rgb >> 24) & 0xff;
+		int red = (rgb >> 16) & 0xff;
+		int green = (rgb >> 8) & 0xff;
+		int blue = (rgb) & 0xff;
+
+		double R = red;
+		double G = green;
+		double B = blue;
+		double var_R = (R / 255); // R from 0 to 255
+		double var_G = (G / 255); // G from 0 to 255
+		double var_B = (B / 255); // B from 0 to 255
+
+		if (var_R > 0.04045)
+			var_R = Math.pow(((var_R + 0.055) / 1.055), 2.4);
+		else
+			var_R = var_R / 12.92;
+		if (var_G > 0.04045)
+			var_G = Math.pow(((var_G + 0.055) / 1.055), 2.4);
+		else
+			var_G = var_G / 12.92;
+		if (var_B > 0.04045)
+			var_B = Math.pow(((var_B + 0.055) / 1.055), 2.4);
+		else
+			var_B = var_B / 12.92;
+
+		var_R = var_R * 100;
+		var_G = var_G * 100;
+		var_B = var_B * 100;
+
+		// Observer. = 2°, Illuminant = D65
+		double X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
+		double Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
+		double Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+		result.x = X;
+		result.y = Y;
+		result.z = Z;
+	}
+
 	public static Color_CIE_Lab colorXYZ2CIELAB(ColorXYZ XYZ) {
 		double X = XYZ.getX();
 		double Y = XYZ.getY();
@@ -193,6 +233,39 @@ public class ColorUtil {
 		double CIE_a = 500 * (var_X - var_Y);
 		double CIE_b = 200 * (var_Y - var_Z);
 		return new Color_CIE_Lab(CIE_L, CIE_a, CIE_b);
+	}
+
+	public static void getLABfromRGB(int rgb, Color_CIE_Lab lab_result, ColorXYZ xyz_result) {
+		colorRGB2XYZ(rgb, xyz_result);
+		double X = xyz_result.getX();
+		double Y = xyz_result.getY();
+		double Z = xyz_result.getZ();
+		double ref_X = 95.047; // Observer= 2°, Illuminant= D65
+		double ref_Y = 100.000;
+		double ref_Z = 108.883;
+		double var_X = X / ref_X; //
+		double var_Y = Y / ref_Y; //
+		double var_Z = Z / ref_Z; //
+
+		if (var_X > 0.008856)
+			var_X = Math.pow(var_X, (1 / 3d));
+		else
+			var_X = (7.787 * var_X) + (16 / 116d);
+		if (var_Y > 0.008856)
+			var_Y = Math.pow(var_Y, (1 / 3d));
+		else
+			var_Y = (7.787 * var_Y) + (16 / 116d);
+		if (var_Z > 0.008856)
+			var_Z = Math.pow(var_Z, (1 / 3d));
+		else
+			var_Z = (7.787 * var_Z) + (16 / 116d);
+
+		double CIE_L = (116 * var_Y) - 16;
+		double CIE_a = 500 * (var_X - var_Y);
+		double CIE_b = 200 * (var_Y - var_Z);
+		lab_result.setL(CIE_L);
+		lab_result.setA(CIE_a);
+		lab_result.setA(CIE_b);
 	}
 
 	// public static double deltaE2000simu(int rgb1, int rgb2) {
@@ -283,7 +356,7 @@ public class ColorUtil {
 	}
 
 	private static double deltaE2000(double CIE_L1, double CIE_a1, double CIE_b1, double CIE_L2, double CIE_a2,
-			double CIE_b2) {
+						double CIE_b2) {
 		double WHT_L = 1;
 		double WHT_C = 1;
 		double WHT_H = 1; // Weight factor
@@ -333,7 +406,7 @@ public class ColorUtil {
 			xHX /= 2;
 		}
 		double xTX = 1 - 0.17 * Math.cos(dtor(xHX - 30)) + 0.24 * Math.cos(deg2rad(2 * xHX)) + 0.32
-				* Math.cos(deg2rad(3 * xHX + 6)) - 0.20 * Math.cos(dtor(4 * xHX - 63));
+							* Math.cos(deg2rad(3 * xHX + 6)) - 0.20 * Math.cos(dtor(4 * xHX - 63));
 		double xPH = 30 * Math.exp(-((xHX - 275) / 25) * ((xHX - 275) / 25));
 		double xRC = 2 * Math.sqrt((Math.pow(xCY, 7)) / ((Math.pow(xCY, 7)) + (Math.pow(25, 7))));
 		double xSL = 1 + ((0.015 * ((xLX - 50) * (xLX - 50))) / Math.sqrt(20 + ((xLX - 50) * (xLX - 50))));
@@ -425,4 +498,5 @@ public class ColorUtil {
 			bArray[i] = lab.getB();
 		}
 	}
+
 }

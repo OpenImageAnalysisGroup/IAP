@@ -9,6 +9,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
+import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -89,13 +90,13 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	 */
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-			BackgroundTaskStatusProviderSupportingExternalCall status) {
+						BackgroundTaskStatusProviderSupportingExternalCall status) {
 
 		output = new ArrayList<NumericMeasurementInterface>();
 
 		int background = new Color(PhenotypeAnalysisTask.BACKGROUND_COLOR.getRed(),
-				PhenotypeAnalysisTask.BACKGROUND_COLOR.getBlue(), PhenotypeAnalysisTask.BACKGROUND_COLOR.getRed(), 0)
-				.getRGB();
+							PhenotypeAnalysisTask.BACKGROUND_COLOR.getBlue(), PhenotypeAnalysisTask.BACKGROUND_COLOR.getRed(), 0)
+							.getRGB();
 		long filled = 0, voxels = 0;
 		for (Measurement md : input) {
 			if ((md instanceof VolumeData) && !(md instanceof LoadedVolume)) {
@@ -107,29 +108,25 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 			}
 			if (md instanceof LoadedVolume) {
 				LoadedVolume lv = (LoadedVolume) md;
-				byte[] cube = lv.getLoadedVolume().getByteArray();
-				for (int i = 0; i < cube.length; i++) {
-					if (cube[i] != 0)
-						filled++;
-					voxels++;
-					i += 3;
-				}
+
+				LoadedVolumeExtension lve = new LoadedVolumeExtension(lv);
+				voxels = lve.getVoxelCount();
 
 				NumericMeasurement m = new NumericMeasurement(lv, "filled (voxel)", md.getParentSample()
-						.getParentCondition().getExperimentName()
-						+ " (" + getName() + ")");
+									.getParentCondition().getExperimentName()
+									+ " (" + getName() + ")");
 				m.setValue(filled);
 				output.add(m);
 
 				m = new NumericMeasurement(lv, "cube volume (voxel)", md.getParentSample().getParentCondition()
-						.getExperimentName()
-						+ " (" + getName() + ")");
+									.getExperimentName()
+									+ " (" + getName() + ")");
 				m.setValue(voxels);
 				output.add(m);
 
 				m = new NumericMeasurement(lv, "filled (percent)", md.getParentSample().getParentCondition()
-						.getExperimentName()
-						+ " (" + getName() + ")");
+									.getExperimentName()
+									+ " (" + getName() + ")");
 				m.setValue((double) filled / (double) voxels * 100d);
 				output.add(m);
 			}

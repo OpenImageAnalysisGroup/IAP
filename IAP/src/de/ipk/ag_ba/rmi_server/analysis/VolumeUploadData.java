@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  * 
  *******************************************************************************/
 /*
@@ -9,10 +9,7 @@
 
 package de.ipk.ag_ba.rmi_server.analysis;
 
-import java.io.ByteArrayInputStream;
-
-import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
-
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeInputStream;
 
 /**
  * @author klukas
@@ -20,11 +17,11 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
  */
 public class VolumeUploadData {
 
-	private final MyByteArrayInputStream byteArrayInputStream;
+	private final VolumeInputStream inputStream;
 	private final long length;
 
-	public VolumeUploadData(MyByteArrayInputStream byteArrayInputStream, long length) {
-		this.byteArrayInputStream = byteArrayInputStream;
+	public VolumeUploadData(VolumeInputStream byteArrayInputStream, long length) {
+		this.inputStream = byteArrayInputStream;
 		this.length = length;
 	}
 
@@ -32,7 +29,8 @@ public class VolumeUploadData {
 		return length;
 	}
 
-	public ByteArrayInputStream getStream() {
-		return new MyByteArrayInputStream(byteArrayInputStream.getBuff());
+	public VolumeInputStream getStream() {
+		inputStream.seekToVoxel(0);
+		return inputStream;
 	}
 }
