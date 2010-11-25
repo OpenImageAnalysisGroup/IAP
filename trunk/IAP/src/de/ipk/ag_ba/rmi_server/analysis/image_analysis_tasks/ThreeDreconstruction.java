@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.AttributeHelper;
@@ -15,6 +16,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
@@ -23,7 +25,6 @@ import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
-import de.ipk.ag_ba.rmi_server.analysis.VolumeUploadData;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.reconstruction3d.GenerationMode;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.reconstruction3d.ModelGenerator;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.reconstruction3d.MyPicture;
@@ -31,7 +32,6 @@ import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.reconstruction3d.Tr
 import de.ipk.ag_ba.rmi_server.databases.DBTable;
 import de.ipk.ag_ba.rmi_server.databases.DatabaseTarget;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
-import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
@@ -129,14 +129,6 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
 
-		Object[] res = MyInputHelper.getInput("Please specify the cube resolution:", "3-D Reconstruction", new Object[] {
-							"Resolution (X=Y=Z)", voxelresolution, "Trim Width? (0..100)", widthFactor });
-		if (res == null)
-			return;
-
-		voxelresolution = (Integer) res[0];
-		widthFactor = (Integer) res[1];
-
 		output = new ArrayList<NumericMeasurementInterface>();
 
 		// for each sample
@@ -194,15 +186,15 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 
 					if (storeResultInDatabase != null) {
 						try {
-							VolumeUploadData vud = IOmodule.getThreeDvolumeInputStream(volume);
-							String md5 = AttributeHelper.getMD5fromInputStream(vud.getStream());
+
+							String md5 = AttributeHelper.getMD5fromInputStream(volume.getURL().getInputStream());
 							volume.getURL().setDetail(md5);
 							if (status != null)
 								status.setCurrentStatusValue(-1);
 							if (status != null)
 								status.setCurrentStatusText1("Storing result");
-							storeResultInDatabase.saveVolume(volume, s3d, login, pass, DBTable.SAMPLE, vud, null,
-												vud.getLength(), md5, status);
+
+							storeResultInDatabase.saveVolume(volume, s3d, login, pass, DBTable.SAMPLE, null, md5, status);
 							if (status != null)
 								status.setCurrentStatusValue(100);
 							if (status != null)
@@ -266,7 +258,21 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 			// taTop.addColors(new Color(70, 66, 50), new Color(90, 80, 60));
 			// taTop.addColors(new Color(117, 100, 77), new Color(85, 70, 50));
 
-			ExecutorService run = Executors.newFixedThreadPool(maximumThreadCount);
+			final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
+			ExecutorService run = Executors.newFixedThreadPool(maximumThreadCount, new ThreadFactory() {
+				@Override
+				public Thread newThread(Runnable r) {
+					Thread t = new Thread(r);
+					int i;
+					synchronized (tsoLA) {
+						tsoLA.addInt(1);
+						i = tsoLA.getInt();
+					}
+					t.setName("Analyse input images (" + i + ")");
+					return t;
+				}
+			});
+
 			status.setCurrentStatusValue(0);
 			double workLoad = loadedImages.size();
 			final double workloadStep = 100d / workLoad;
@@ -316,7 +322,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 							try {
 								limg = IOmodule.loadImageFromFileOrMongo(image, login, pass);
 
-								limg = PhenotypeAnalysisTask.clearBackground(limg, maximumThreadCount, login, pass);
+								limg = PhenotypeAnalysisTask.clearBackground(limg, 1, login, pass);
 
 								limg = storeResultInDatabase.saveImage(limg, login, pass);
 
@@ -374,7 +380,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 			volume.setDimensionZ(voxelresolution);
 
 			if (volume.getURL() == null)
-				volume.setURL(new IOurl("loaded", "", ""));
+				volume.setURL(new IOurl("loadedvolume", "", ""));
 			volume.getURL().setFileName("IAP_reconstruction_" + System.currentTimeMillis() + ".argb_volume");
 
 			volume.setColorDepth(VolumeColorDepth.RGBA.toString());
@@ -441,5 +447,10 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	@Override
 	public String getName() {
 		return "3D-Reconstruction";
+	}
+
+	public void setResolution(int voxelresolution, int widthFactor) {
+		this.voxelresolution = voxelresolution;
+		this.widthFactor = widthFactor;
 	}
 }

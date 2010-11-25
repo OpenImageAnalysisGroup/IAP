@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  * 
  *******************************************************************************/
 /*
@@ -13,7 +13,6 @@ import java.io.InputStream;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
-import de.ipk.ag_ba.rmi_server.analysis.VolumeUploadData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -27,6 +26,6 @@ public interface DatabaseTarget {
 	LoadedImage saveImage(LoadedImage limg, String login, String pass) throws Exception;
 
 	void saveVolume(final LoadedVolume volume, Sample3D s3d, String login, String pass, DBTable sample,
-			final VolumeUploadData threeDvolumeInputStream, InputStream threeDvolumePreviewIcon, long outputsize,
-			String md5, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception;
+						InputStream threeDvolumePreviewIcon,
+						String md5, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception;
 }

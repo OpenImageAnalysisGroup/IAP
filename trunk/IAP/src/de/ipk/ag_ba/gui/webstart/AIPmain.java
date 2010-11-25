@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
+ * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  * 
  *******************************************************************************/
 package de.ipk.ag_ba.gui.webstart;
@@ -42,11 +42,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImageHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolumeHandler;
 
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -94,7 +95,7 @@ public class AIPmain extends JApplet {
 		setLayout(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.FILL } }));
 
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-				"", "");
+							"", "");
 		JComponent advancedNavigation = AIPgui.getNavigation(myStatus, false);
 		add(advancedNavigation, "0,0");
 		validate();
@@ -127,7 +128,9 @@ public class AIPmain extends JApplet {
 	}
 
 	private void registerIOhandlers() {
-		ResourceIOManager.registerIOHandler(new LoadedImageHandler());
+
+		ResourceIOManager.registerIOHandler(LoadedVolumeHandler.getInstance());
+		ResourceIOManager.registerIOHandler(LoadedImageHandler.getInstance());
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (ResourceIOHandler handler : new MongoDB().getHandlers())
 			ResourceIOManager.registerIOHandler(handler);
@@ -138,13 +141,13 @@ public class AIPmain extends JApplet {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
 		String name = stS + "VANTED" + stE + " - " + stS + "V" + stE + "isualization and " + stS + "A" + stE
-				+ "nalysis of " + stS + "N" + stE + "e" + stS + "t" + stE + "works <br>containing " + stS + "E" + stE
-				+ "xperimental " + stS + "D" + stE + "ata";
+							+ "nalysis of " + stS + "N" + stE + "e" + stS + "t" + stE + "works <br>containing " + stS + "E" + stE
+							+ "xperimental " + stS + "D" + stE + "ata";
 		DBEgravistoHelper.DBE_GRAVISTO_VERSION = "VANTED V" + DBEgravistoHelper.DBE_GRAVISTO_VERSION_CODE;
 		DBEgravistoHelper.DBE_GRAVISTO_NAME = stS + "VANTED" + stE + "&nbsp;-&nbsp;" + stS + "V" + stE
-				+ "isualization&nbsp;and&nbsp;" + stS + "A" + stE + "nalysis&nbsp;of&nbsp;" + stS + "N" + stE + "e" + stS
-				+ "t" + stE + "works&nbsp;<br>containing&nbsp;" + stS + "E" + stE + "xperimental&nbsp;" + stS + "D" + stE
-				+ "ata<br>";
+							+ "isualization&nbsp;and&nbsp;" + stS + "A" + stE + "nalysis&nbsp;of&nbsp;" + stS + "N" + stE + "e" + stS
+							+ "t" + stE + "works&nbsp;<br>containing&nbsp;" + stS + "E" + stE + "xperimental&nbsp;" + stS + "D" + stE
+							+ "ata<br>";
 		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "VANTED";
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "Integrated Analysis Platform";
 
@@ -156,13 +159,13 @@ public class AIPmain extends JApplet {
 		result.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 
 		String s = ""
-				+ "<html><small><br>&nbsp;&nbsp;&nbsp;</small>Welcome to "
-				+ name
-				+ "!<br>"
-				+ "<small>"
-				+ "&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
-				+ "&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
-				+ "&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
+							+ "<html><small><br>&nbsp;&nbsp;&nbsp;</small>Welcome to "
+							+ name
+							+ "!<br>"
+							+ "<small>"
+							+ "&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
+							+ "&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
+							+ "&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
 
 		ReleaseInfo.setHelpIntroductionText(s);
 
@@ -276,7 +279,7 @@ public class AIPmain extends JApplet {
 			System.err.println("Internal error: Plugin Description files could not be loaded.");
 			System.err.println("-- Program needs to be stopped");
 			JOptionPane.showMessageDialog(null, "<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
-					+ "Program execution can not continue.<br>" + "The application needs to be closed.</html>");
+								+ "Program execution can not continue.<br>" + "The application needs to be closed.</html>");
 			System.err.println("EXIT");
 			System.exit(1);
 		}

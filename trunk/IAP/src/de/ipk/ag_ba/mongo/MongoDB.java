@@ -47,7 +47,6 @@ import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
-import de.ipk.ag_ba.rmi_server.analysis.VolumeUploadData;
 import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
 import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
@@ -64,12 +63,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NetworkData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeInputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.loaders.MeasurementNodeType;
 
 /**
@@ -343,11 +342,8 @@ public class MongoDB {
 								BasicDBObject volume = new BasicDBObject(filter(attributes));
 								dbVolumes.add(volume);
 								VolumeData vd = (VolumeData) m;
-								VolumeUploadData vud = null;
-								if (vd instanceof LoadedVolume)
-									vud = IOmodule.getThreeDvolumeInputStream((LoadedVolume) vd);
 
-								storeVolumeFile(db, vd, vud, overallFileSize, status);
+								storeVolumeFile(db, vd, overallFileSize, status);
 								count++;
 							}
 							double prog = count * (100d / numberOfBinaryData);
@@ -476,23 +472,20 @@ public class MongoDB {
 	}
 
 	private long saveVolumeFile(GridFS gridfs_volumes, GridFS gridfs_preview, VolumeData volume,
-						VolumeUploadData threeDvolumeInputStream, ObjectRef optFileSize,
+						ObjectRef optFileSize,
 						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create Outputstream");
 
 		LoadedVolumeExtension id = (LoadedVolumeExtension) volume;
-		VolumeUploadData vud = IOmodule.getThreeDvolumeInputStream(id);
-		InputStream is = vud.getStream();
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Calculate MD5");
-		String md5 = AttributeHelper.getMD5fromInputStream(is, optFileSize);
-		is = vud.getStream();
+		String md5 = AttributeHelper.getMD5fromInputStream(id.getURL().getInputStream(), optFileSize);
 
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Save Volume");
-		GridFSInputFile inputFile = gridfs_volumes.createFile(is);
+		GridFSInputFile inputFile = gridfs_volumes.createFile(id.getURL().getInputStream());
 		inputFile.setFilename(md5);
 		inputFile.getMetaData().put("md5", md5);
 		inputFile.getMetaData().put("name", id.getURL().getFileName());
@@ -512,8 +505,8 @@ public class MongoDB {
 			inputFilePreview.save();
 		}
 		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Saved Volume (" + threeDvolumeInputStream.getLength() / 1024 / 1024 + " MB)");
-		return threeDvolumeInputStream.getLength();
+			optStatus.setCurrentStatusText1("Saved Volume (" + ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
+		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
 	}
 
 	public DatabaseStorageResult storeImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
@@ -561,7 +554,7 @@ public class MongoDB {
 		}
 	}
 
-	public DatabaseStorageResult storeVolumeFile(DB db, VolumeData volume, VolumeUploadData threeDvolumeInputStream,
+	public DatabaseStorageResult storeVolumeFile(DB db, VolumeData volume,
 						ObjectRef optFileSize, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		GridFS gridfs_volumes = new GridFS(db, "volumes");
 		DBCollection collectionA = db.getCollection("volumes.files");
@@ -580,7 +573,7 @@ public class MongoDB {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
 			try {
-				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, threeDvolumeInputStream, optFileSize, optStatus);
+				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, optFileSize, optStatus);
 				return DatabaseStorageResult.STORED_IN_DB;
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
