@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -68,7 +69,35 @@ public class ModelGenerator {
 
 	public void calculateModel(final BackgroundTaskStatusProviderSupportingExternalCall status,
 						GenerationMode colorMode, int maxIndexedColorCount) {
-		ExecutorService run = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
+		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
+		ExecutorService run = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r);
+				int i;
+				synchronized (tsoLA) {
+					tsoLA.addInt(1);
+					i = tsoLA.getInt();
+				}
+				t.setName("Cube cut (" + i + ")");
+				return t;
+			}
+		});
+
+		final ThreadSafeOptions tsoCO = new ThreadSafeOptions();
+		ExecutorService runColor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r);
+				int i;
+				synchronized (tsoLA) {
+					tsoCO.addInt(1);
+					i = tsoCO.getInt();
+				}
+				t.setName("Cube Coloring (" + i + ")");
+				return t;
+			}
+		});
 
 		status.setCurrentStatusText1("Init cube cut (" + maxVoxelPerSide + "x" + maxVoxelPerSide + "x" + maxVoxelPerSide
 							+ ")");
@@ -111,7 +140,15 @@ public class ModelGenerator {
 				generateNormalizedByteCube(colorMode);
 				status.setCurrentStatusText1("Colorize Cube...");
 				status.setCurrentStatusText2("");
-				colorModelRGB(pictures, palette, status, colorMode == GenerationMode.COLORED_RGBA);
+				colorModelRGB(pictures, palette, status, colorMode == GenerationMode.COLORED_RGBA, runColor);
+
+				runColor.shutdown();
+				try {
+					runColor.awaitTermination(7, TimeUnit.DAYS);
+				} catch (InterruptedException e) {
+					ErrorMsg.addErrorMessage(e);
+				} // wait max 7 days for result
+
 			}
 
 		status.setCurrentStatusText1("Cube Construction Finished");
@@ -170,8 +207,8 @@ public class ModelGenerator {
 		};
 	}
 
-	private void colorModelRGB(ArrayList<MyPicture> pictures, ArrayList<Color> palette,
-						BackgroundTaskStatusProviderSupportingExternalCall status, boolean rgb) {
+	private void colorModelRGB(final ArrayList<MyPicture> pictures, final ArrayList<Color> palette,
+						BackgroundTaskStatusProviderSupportingExternalCall status, final boolean rgb, ExecutorService runColor) {
 		if (rgb)
 			System.out.println("Recolor Cube... (using true color RGBA generation mode)");
 		else
@@ -179,11 +216,11 @@ public class ModelGenerator {
 		double x, y, z;
 		double voxelSizeX = cubeSideLengthX / maxVoxelPerSide;
 		double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
-		double voxelSizeZ = cubeSideLengthZ / maxVoxelPerSide;
+		final double voxelSizeZ = cubeSideLengthZ / maxVoxelPerSide;
 		x = -cubeSideLengthX / 2d;
 		status.setCurrentStatusText1("Colorize Cube");
 		status.setCurrentStatusText2(rgb ? "RGBA Mode active" : "Indexed Color Mode active");
-		int idx = 0;
+
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
 			if (status.wantsToStop())
 				break;
@@ -191,108 +228,121 @@ public class ModelGenerator {
 			y = -cubeSideLengthY / 2d;
 			for (int yi = 0; yi < maxVoxelPerSide; yi++) {
 				z = -cubeSideLengthZ / 2d;
-
-				for (int zi = 0; zi < maxVoxelPerSide; zi++) {
-					// determine color
-					ArrayList<Color> cc = new ArrayList<Color>();
-
-					if (byteCube[xi][yi][zi] < 20) {
-
-						// determine nearest 2 images for colorization
-						int zii = zi - maxVoxelPerSide / 2;
-						if (zii == 0)
-							zii = 1;
-						int yii = yi - maxVoxelPerSide / 2;
-						if (yii == 0)
-							yii = 1;
-						int xii = xi - maxVoxelPerSide / 2;
-						if (xii == 0)
-							xii = 1;
-
-						double voxelDegree = Math.PI - MathUtils3D.getAngle(zii, xii);
-
-						MyPicture bestIdx = null;
-						MyPicture bestIdx2 = null;
-						double minDegreeDist = Double.MAX_VALUE;
-						for (MyPicture p : pictures) {
-							double angle = p.getAngle();
-							if (Math.abs(angle - voxelDegree) < minDegreeDist) {
-								bestIdx = p;
-								minDegreeDist = Math.abs(angle - voxelDegree);
-							}
-						}
-						if (bestIdx != null) {
-							minDegreeDist = Double.MAX_VALUE;
-							for (MyPicture p : pictures) {
-								if (p == bestIdx)
-									continue;
-								double angle = p.getAngle();
-								if (Math.abs(angle - voxelDegree) < minDegreeDist) {
-									bestIdx2 = p;
-									minDegreeDist = Math.abs(angle - voxelDegree);
-								}
-							}
-						}
-						for (MyPicture p : pictures) {
-							if (p != bestIdx && p != bestIdx2)
-								continue;
-
-							double angle = p.getAngle();
-							double cos = p.getCosAngle();
-							double sin = p.getSinAngle();
-							boolean isTop = p.getIsTop();
-							Color c = p
-												.getPixelColor(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin, isTop)));
-							if (c != null)
-								if (ColorUtil.deltaE2000(c, PhenotypeAnalysisTask.BACKGROUND_COLOR) < 10)
-									c = null;
-							if (c == null) {
-								XYcubePointRelative rel = getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
-													isTop));
-								for (int sx = -20; sx <= 20; sx++)
-									for (int sy = -20; sy <= 20; sy++) {
-										c = p.getPixelColor(rel, sx, sy);
-										if (c != null)
-											cc.add(c);
-									}
-							} else
-								cc.add(c);
-						}
+				final double xF = x;
+				final double yF = y;
+				final double zF = z;
+				final int xiF = xi;
+				final int yiF = yi;
+				runColor.submit(new Runnable() {
+					@Override
+					public void run() {
+						processOne(pictures, palette, rgb, xF, yF, zF, voxelSizeZ, xiF, yiF);
 					}
-					if (cc.size() == 0) {
-						byteCube[xi][yi][zi] = (byte) 0;
-						if (rgb) {
-							// TRANSPARENT_COLOR;
-							idx = zi * 4;
-							rgbCube[xi][yi][idx++] = 0;
-							rgbCube[xi][yi][idx++] = 0;
-							rgbCube[xi][yi][idx++] = 0;
-							rgbCube[xi][yi][idx++] = 0;
-						}
-					} else {
-						if (rgb) {
-							Color c = ColorUtil.getMaxSaturationColor(cc);
-							int tr = (int) (255d - 0.05d * byteCube[xi][yi][zi]);
-							if (tr < 0)
-								tr = 255;
-							idx = zi * 4;
-							rgbCube[xi][yi][idx++] = (byte) tr;
-							rgbCube[xi][yi][idx++] = (byte) c.getRed();
-							rgbCube[xi][yi][idx++] = (byte) c.getGreen();
-							rgbCube[xi][yi][idx++] = (byte) c.getBlue();
-						} else {
-							Color c = ColorUtil.getMaxSaturationColor(cc);
-							int nearestColor = ColorUtil.findBestColorIndex(palette, c);
-							byteCube[xi][yi][zi] = (byte) (nearestColor + byteCube[xi][yi][zi] * 255 / maxPossibleLevels);
-						}
-					}
-					z += voxelSizeZ;
-				}
+				});
 				y += voxelSizeY;
 			}
 			x += voxelSizeX;
 		}
-		System.out.println("RGBA Cube is colorized!");
+	}
+
+	private void processOne(ArrayList<MyPicture> pictures, ArrayList<Color> palette, boolean rgb, double x, double y, double z, double voxelSizeZ, int xi, int yi) {
+		int idx;
+		for (int zi = 0; zi < maxVoxelPerSide; zi++) {
+			// determine color
+			ArrayList<Color> cc = new ArrayList<Color>();
+
+			if (byteCube[xi][yi][zi] < 20) {
+
+				// determine nearest 2 images for colorization
+				int zii = zi - maxVoxelPerSide / 2;
+				if (zii == 0)
+					zii = 1;
+				int yii = yi - maxVoxelPerSide / 2;
+				if (yii == 0)
+					yii = 1;
+				int xii = xi - maxVoxelPerSide / 2;
+				if (xii == 0)
+					xii = 1;
+
+				double voxelDegree = Math.PI - MathUtils3D.getAngle(zii, xii);
+
+				MyPicture bestIdx = null;
+				MyPicture bestIdx2 = null;
+				double minDegreeDist = Double.MAX_VALUE;
+				for (MyPicture p : pictures) {
+					double angle = p.getAngle();
+					if (Math.abs(angle - voxelDegree) < minDegreeDist) {
+						bestIdx = p;
+						minDegreeDist = Math.abs(angle - voxelDegree);
+					}
+				}
+				if (bestIdx != null) {
+					minDegreeDist = Double.MAX_VALUE;
+					for (MyPicture p : pictures) {
+						if (p == bestIdx)
+							continue;
+						double angle = p.getAngle();
+						if (Math.abs(angle - voxelDegree) < minDegreeDist) {
+							bestIdx2 = p;
+							minDegreeDist = Math.abs(angle - voxelDegree);
+						}
+					}
+				}
+				for (MyPicture p : pictures) {
+					if (p != bestIdx && p != bestIdx2)
+						continue;
+
+					double angle = p.getAngle();
+					double cos = p.getCosAngle();
+					double sin = p.getSinAngle();
+					boolean isTop = p.getIsTop();
+					Color c = p
+										.getPixelColor(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin, isTop)));
+					if (c != null)
+						if (ColorUtil.deltaE2000(c, PhenotypeAnalysisTask.BACKGROUND_COLOR) < 10)
+							c = null;
+					if (c == null) {
+						XYcubePointRelative rel = getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
+											isTop));
+						for (int sx = -20; sx <= 20; sx++)
+							for (int sy = -20; sy <= 20; sy++) {
+								c = p.getPixelColor(rel, sx, sy);
+								if (c != null)
+									cc.add(c);
+							}
+					} else
+						cc.add(c);
+				}
+			}
+			if (cc.size() == 0) {
+				byteCube[xi][yi][zi] = (byte) 0;
+				if (rgb) {
+					// TRANSPARENT_COLOR;
+					idx = zi * 4;
+					rgbCube[xi][yi][idx++] = 0;
+					rgbCube[xi][yi][idx++] = 0;
+					rgbCube[xi][yi][idx++] = 0;
+					rgbCube[xi][yi][idx++] = 0;
+				}
+			} else {
+				if (rgb) {
+					Color c = ColorUtil.getMaxSaturationColor(cc);
+					int tr = (int) (255d - 0.05d * byteCube[xi][yi][zi]);
+					if (tr < 0)
+						tr = 255;
+					idx = zi * 4;
+					rgbCube[xi][yi][idx++] = (byte) tr;
+					rgbCube[xi][yi][idx++] = (byte) c.getRed();
+					rgbCube[xi][yi][idx++] = (byte) c.getGreen();
+					rgbCube[xi][yi][idx++] = (byte) c.getBlue();
+				} else {
+					Color c = ColorUtil.getMaxSaturationColor(cc);
+					int nearestColor = ColorUtil.findBestColorIndex(palette, c);
+					byteCube[xi][yi][zi] = (byte) (nearestColor + byteCube[xi][yi][zi] * 255 / maxPossibleLevels);
+				}
+			}
+			z += voxelSizeZ;
+		}
 	}
 
 	private void cutModel1(MyPicture p, BitSet transparentVoxels,

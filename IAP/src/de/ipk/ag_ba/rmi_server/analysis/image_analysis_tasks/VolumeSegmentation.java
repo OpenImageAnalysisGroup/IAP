@@ -19,7 +19,6 @@ import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.rmi_server.analysis.ThreeDsegmentationColored;
-import de.ipk.ag_ba.rmi_server.analysis.VolumeUploadData;
 import de.ipk.ag_ba.rmi_server.databases.DBTable;
 import de.ipk.ag_ba.rmi_server.databases.DatabaseTarget;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
@@ -112,13 +111,12 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 					if (storeResultInDatabase != null) {
 						long bytes = volume.getDimensionX() * volume.getDimensionY() * volume.getDimensionZ() * 4;
 						status.setCurrentStatusText1("Generate Stream (" + bytes / 1024 / 1024 + " MB)");
-						VolumeUploadData vud = IOmodule.getThreeDvolumeInputStream(volume);
 						try {
 							status.setCurrentStatusText1("Saving (" + bytes / 1024 / 1024 + " MB)");
 							long t1 = System.currentTimeMillis();
-							String md5 = AttributeHelper.getMD5fromInputStream(vud.getStream());
+							String md5 = AttributeHelper.getMD5fromInputStream(volume.getURL().getInputStream());
 							storeResultInDatabase.saveVolume(volume, (Sample3D) volume.getParentSample(), login, pass,
-												DBTable.SAMPLE, vud, null, vud.getLength(), md5, status);
+												DBTable.SAMPLE, null, md5, status);
 							long t2 = System.currentTimeMillis();
 							if (t2 > t1)
 								System.out.println("Saved Volume ("

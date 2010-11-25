@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingUtilities;
@@ -24,10 +25,10 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.ShowImage;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
-import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ByteShortIntArray;
@@ -52,8 +53,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		final int width = getDimensionX();
 		final int height = getDimensionY();
 		final int depth = getDimensionZ();
-
-		boolean threaded = true;
+		boolean threaded = false;
 		if (threaded)
 			rotateVolumeThreaded(rotation, new VolumeReceiver() {
 
@@ -65,7 +65,6 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		else {
 			renderSideView(result, width, height, depth, rotateVolume(rotation, 0, 1, null));
 		}
-
 		return result;
 	}
 
@@ -81,9 +80,16 @@ public class LoadedVolumeExtension extends LoadedVolume {
 						idx++;
 					} else {
 						int v = volume.getColorVoxel(x, y, z);
-						if (v != PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+						if (v != 0) {
 							solidFound = true;
-							raster.setPixel(x, y, new int[] { v });
+							int alpha = 255; // not supported by gif ?! (v >> 24) &
+													// 0xff;
+							int red = (v >> 16) & 0xff;
+							int green = (v >> 8) & 0xff;
+							int blue = (v) & 0xff;
+
+							int[] col = { alpha, red, green, blue };
+							raster.setPixel(x, y, col);
 						}
 					}
 				}
@@ -95,9 +101,20 @@ public class LoadedVolumeExtension extends LoadedVolume {
 
 	private void rotateVolumeThreaded(double rotation, VolumeReceiver volumeReceiver) {
 		int maxCPU = SystemAnalysis.getNumberOfCPUs();
-		if (maxCPU > 8)
-			maxCPU = maxCPU / 2;
-		ExecutorService run = Executors.newFixedThreadPool(maxCPU);
+		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
+		ExecutorService run = Executors.newFixedThreadPool(maxCPU, new ThreadFactory() {
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r);
+				int i;
+				synchronized (tsoLA) {
+					tsoLA.addInt(1);
+					i = tsoLA.getInt();
+				}
+				t.setName("Volume Rotation (" + i + ")");
+				return t;
+			}
+		});
 
 		int[][][] volume2 = new int[getDimensionX()][getDimensionY()][getDimensionZ()];
 		for (int i = 0; i < maxCPU; i++)
@@ -241,6 +258,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		}
 
 		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+		GravistoService.showImage(images.get(0), "Image");
 		WriteAnimatedGif.saveAnimate(out, images.toArray(new BufferedImage[] {}), delayTimes.toArray(new String[] {}));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValueFine(100);

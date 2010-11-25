@@ -38,7 +38,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImageHandler;
  */
 public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
-	public static final Color BACKGROUND_COLOR = new Color(0);
+	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);
 	public static final int BACKGROUND_COLORint = BACKGROUND_COLOR.getRGB();
 
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
@@ -206,8 +206,22 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 		final ObjectRef progress = new ObjectRef("", new Integer(0));
 		ExecutorService run = null;
+		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
 		if (maximumThreadCount > 1)
-			run = Executors.newFixedThreadPool(maximumThreadCount);
+			run = Executors.newFixedThreadPool(maximumThreadCount, new ThreadFactory() {
+				@Override
+				public Thread newThread(Runnable r) {
+					Thread t = new Thread(r);
+					int i;
+					synchronized (tsoLA) {
+						tsoLA.addInt(1);
+						i = tsoLA.getInt();
+					}
+					t.setName("Color classification (" + i + ")");
+					return t;
+				}
+			});
+
 		for (int ty = h - 1; ty >= 0; ty--) {
 			final int y = ty;
 			if (maximumThreadCount > 1)

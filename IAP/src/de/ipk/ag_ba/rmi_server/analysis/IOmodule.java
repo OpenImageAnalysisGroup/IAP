@@ -95,7 +95,7 @@ public class IOmodule {
 		System.out.println("Create InputStream representation for volume: " + volume.getDimensionX()
 							* volume.getDimensionY() * volume.getDimensionZ() * 4 / 1024 / 1024 + " MB");
 		VolumeInputStream stream = volume.getLoadedVolume().getInputStream();
-		return new VolumeUploadData(stream, stream.getSize());
+		return new VolumeUploadData(stream, stream.getNumberOfBytes());
 	}
 
 	// public static LoadedVolume loadVolumeFromDBE(VolumeData md, String login,

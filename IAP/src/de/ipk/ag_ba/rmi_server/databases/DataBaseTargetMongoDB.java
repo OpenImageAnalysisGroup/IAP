@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  * 
  *******************************************************************************/
 /*
@@ -20,7 +20,6 @@ import com.mongodb.DB;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
-import de.ipk.ag_ba.rmi_server.analysis.VolumeUploadData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -76,15 +75,15 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 	 */
 	@Override
 	public void saveVolume(final LoadedVolume volume, Sample3D s3d, String login, String pass, DBTable sample,
-			final VolumeUploadData threeDvolumeInputStream, InputStream threeDvolumePreviewIcon, long outputsize,
-			String md5, final BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+						InputStream threeDvolumePreviewIcon,
+						String md5, final BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		if (!store)
 			return;
 		new MongoDB().processDB("dbe3", null, login, pass, new RunnableOnDB() {
 			private DB db;
 
 			public void run() {
-				new MongoDB().storeVolumeFile(db, volume, threeDvolumeInputStream, null, optStatus);
+				new MongoDB().storeVolumeFile(db, volume, null, optStatus);
 			}
 
 			public void setDB(DB db) {

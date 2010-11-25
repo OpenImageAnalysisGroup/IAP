@@ -21,6 +21,7 @@ import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.ThreeDreconstructio
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.VolumeStatistics;
 import de.ipk.ag_ba.rmi_server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.rmi_server.databases.DatabaseTarget;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -50,6 +51,8 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 	ArrayList<ZoomedImage> zoomedImages = new ArrayList<ZoomedImage>();
 	DisplayHistogram histogram, histogramG, histogramB;
 	ArrayList<NavigationButton> storedActions = new ArrayList<NavigationButton>();
+	private int voxelresolution = 200;
+	private int widthFactor = 40;
 
 	public ThreeDreconstructionAction(String login, String pass, ExperimentReference experiment) {
 		super("Create 3-D Volumes using Space Carving Technology");
@@ -68,6 +71,13 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 		histogram = null;
 		histogramG = null;
 		histogramB = null;
+
+		Object[] inp = MyInputHelper.getInput("Please specify the cube resolution:", "3-D Reconstruction", new Object[] {
+							"Resolution (X=Y=Z)", voxelresolution, "Trim Width? (0..100)", widthFactor });
+		if (inp == null)
+			return;
+		voxelresolution = (Integer) inp[0];
+		widthFactor = (Integer) inp[1];
 
 		try {
 			ExperimentInterface res = experiment.getData();
@@ -123,13 +133,15 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 
 				ThreeDreconstruction threeDreconstructionTask = new ThreeDreconstruction(saveVolumesToDB);
 				threeDreconstructionTask.setInput(workload, login, pass);
-
+				threeDreconstructionTask.setResolution(voxelresolution, widthFactor);
 				threeDreconstructionTask.addResultProcessor(volumeStatistics);
 
 				threeDreconstructionTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 2, status);
 
+				System.out.println("Process Sample: " + s3d.toString());
+
 				HashMap<ImageAnalysisTask, ArrayList<NumericMeasurementInterface>> volumeStatisticsResults = threeDreconstructionTask
-						.getAdditionalResults();
+									.getAdditionalResults();
 
 				ArrayList<NumericMeasurementInterface> statRes = volumeStatisticsResults.get(volumeStatistics);
 				if (statRes == null) {
@@ -151,13 +163,13 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			mpc = new MainPanelComponent(ip, true);
 
 			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass,
-					new ExperimentReference(statisticsResult), src.getGUIsetting()));
+								new ExperimentReference(statisticsResult), src.getGUIsetting()));
 
 			storedActions.add(new NavigationButton(new CloudUploadEntity(login, pass, new ExperimentReference(
-					statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+								statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
 			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult, statisticsResult
-					.getHeader(), false, src.getGUIsetting());
+								.getHeader(), false, src.getGUIsetting());
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();
 			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
@@ -180,11 +192,11 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		if (!ImageAnalysis3D.isSaveInDatabase()) {
 			NavigationButton imageHistogram = new NavigationButton(TableLayout.get3Split(histogram, histogramG,
-					histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED), src.getGUIsetting());
+								histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED), src.getGUIsetting());
 			res.add(imageHistogram);
 
 			NavigationButton imageZoom = new NavigationButton(ImageAnalysis3D.getImageZoomSlider(zoomedImages), src
-					.getGUIsetting());
+								.getGUIsetting());
 			res.add(imageZoom);
 		}
 		res.addAll(storedActions);
@@ -197,12 +209,12 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 	}
 
 	public static NavigationButton getThreeDreconstructionTaskEntity(final String login, final String pass,
-			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
-			GUIsetting guiSetting) {
+						final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
+						GUIsetting guiSetting) {
 
 		NavigationAction threeDreconstructionAction = new ThreeDreconstructionAction(login, pass, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(threeDreconstructionAction, title,
-				"img/RotationReconstruction.png", guiSetting);
+							"img/RotationReconstruction.png", guiSetting);
 		return resultTaskButton;
 	}
 }
