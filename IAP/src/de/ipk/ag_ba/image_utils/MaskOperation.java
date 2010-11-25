@@ -5,6 +5,8 @@
  *************************************************************************/
 package de.ipk.ag_ba.image_utils;
 
+import java.awt.image.BufferedImage;
+
 /**
  * @author entzian
  *
@@ -20,84 +22,38 @@ public class MaskOperation {
 	}
 
 	private int[] rgbImage;
-	private int[] flourImage;
+	private int[] fluorImage;
 	private int background;
 	private int[] mask;
 	private int[] nearIfImage;
 	
-	public MaskOperation(int [] rgbImage, int [] flourImage, int [] nearIfImage, int background) {
+	public MaskOperation(int [] rgbImage, int [] fluorImage, int [] nearIfImage, int background) {
 		this.rgbImage = rgbImage;
-		this.flourImage = flourImage;
+		this.fluorImage = fluorImage;
 		this.background = background;
 		this.nearIfImage = nearIfImage;
 		mask = new int[rgbImage.length];
 	}
 	
-	public MaskOperation(int [] rgbImage, int [] flourImage, int background){
-		this(rgbImage, flourImage, new int [0], background);
+	public MaskOperation(BufferedImage rgbImage, BufferedImage fluorImage, int background){
+		this(ImageConverter.convertBIto1A(rgbImage), ImageConverter.convertBIto1A(fluorImage), new int[] {}, background);
+	}
+	
+	public MaskOperation(int [] rgbImage, int [] fluorImage, int background){
+		this(rgbImage, fluorImage, new int [] {}, background);
 	}
 
-//	public MaskOperation(int[][] rgbImage, int [][] flourImage, int [][] background){
-//		this(ImageConverter.convert2Ato1A(rgbImage), ImageConverter.convert2Ato1A(flourImage), new int [0], ImageConverter.convert2Ato1A(background));
-//	}
-//	
-//	public MaskOperation(int [] rgbImage, int [][] flourImage, int [][] background){
-//		this(rgbImage, ImageConverter.convert2Ato1A(flourImage), new int [0], ImageConverter.convert2Ato1A(background));
-//	}
-//	
-//	public MaskOperation(int[][] rgbImage, int [] flourImage, int [][] background){
-//		this(ImageConverter.convert2Ato1A(rgbImage), flourImage, new int [0], ImageConverter.convert2Ato1A(background));
-//	}
-//	
-//	public MaskOperation(int[][] rgbImage, int [][] flourImage, int [] background){
-//		this(ImageConverter.convert2Ato1A(rgbImage), ImageConverter.convert2Ato1A(flourImage), new int [0], background);
-//	}
-//	
-//	public MaskOperation(int[] rgbImage, int [] flourImage, int [][] background){
-//		this(rgbImage, flourImage, new int [0], ImageConverter.convert2Ato1A(background));
-//	}
-//	
-//	public MaskOperation(int[] rgbImage, int [][] flourImage, int [] background){
-//		this(rgbImage, ImageConverter.convert2Ato1A(flourImage), new int [0], background);
-//	}
-//	
-//	public MaskOperation(int[][] rgbImage, int [] flourImage, int [] background){
-//		this(ImageConverter.convert2Ato1A(rgbImage), flourImage, new int [0], background);
-//	}
-//	
-//	public MaskOperation(int[][] rgbImage, int [][] flourImage, int [][] nearIfImage, int [][] background){
-//		this(ImageConverter.convert2Ato1A(rgbImage), ImageConverter.convert2Ato1A(flourImage), ImageConverter.convert2Ato1A(nearIfImage), ImageConverter.convert2Ato1A(background));
-//	}
-//	
-//	public MaskOperation(int [] rgbImage, int [][] flourImage, int [][] nearIfImage, int [][] background){
-//		this(rgbImage, ImageConverter.convert2Ato1A(flourImage), ImageConverter.convert2Ato1A(nearIfImage), ImageConverter.convert2Ato1A(background));
-//	}
-//	
-//	public MaskOperation(int[][] rgbImage, int [] flourImage, int [][] nearIfImage, int [][] background){
-//		this(ImageConverter.convert2Ato1A(rgbImage), flourImage, ImageConverter.convert2Ato1A(nearIfImage), ImageConverter.convert2Ato1A(background));
-//	}
-//	
-//	public MaskOperation(int[][] rgbImage, int [][] flourImage, int [] nearIfImage, int [][] background){
-//		this(ImageConverter.convert2Ato1A(rgbImage), ImageConverter.convert2Ato1A(flourImage), nearIfImage, ImageConverter.convert2Ato1A(background));
-//	}
-//	
-//	public MaskOperation(int[][] rgbImage, int [][] flourImage, int [][] nearIfImage, int [] background){
-//		this(ImageConverter.convert2Ato1A(rgbImage), ImageConverter.convert2Ato1A(flourImage), ImageConverter.convert2Ato1A(nearIfImage), background);
-//	}
+	public MaskOperation(int[][] rgbImage, int [][] fluorImage, int background){
+		this(ImageConverter.convert2Ato1A(rgbImage), ImageConverter.convert2Ato1A(fluorImage), new int [] {}, background);
+	}
 	
-//	public MaskOperation(int[] rgbImage, int [] flourImage, int [][] nearIfImage, int [][] background){
-//		this(rgbImage, flourImage, new int [0], ImageConverter.convert2Ato1A(background));
-//	}
-//	
-//	public MaskOperation(int[] rgbImage, int [][] flourImage, int [][] nearIfImage, int [] background){
-//		this(rgbImage, ImageConverter.convert2Ato1A(flourImage), new int [0], background);
-//	}
-//	
-//	public MaskOperation(int[][] rgbImage, int [] flourImage, int [][] nearIfImage, int [] background){
-//		this(ImageConverter.convert2Ato1A(rgbImage), flourImage, new int [0], background);
-//	}
-//	
+	public MaskOperation(int[][] rgbImage, int [][] fluorImage, int [][] nearIfImage, int background){
+		this(ImageConverter.convert2Ato1A(rgbImage), ImageConverter.convert2Ato1A(fluorImage), ImageConverter.convert2Ato1A(nearIfImage), background);
+	}
 	
+	public MaskOperation(BufferedImage rgbImage, BufferedImage fluorImage, BufferedImage nearImage, int background){
+		this(ImageConverter.convertBIto1A(rgbImage), ImageConverter.convertBIto1A(fluorImage), ImageConverter.convertBIto1A(nearImage), background);
+	}
 	
 	public int [] getMaskAs1Array(){
 		return mask;
@@ -109,12 +65,21 @@ public class MaskOperation {
 	
 	public void doMerge(){
 		
-		if(flourImage.length == rgbImage.length)
-			for(int i = 0; i < flourImage.length; i++)
-				if(rgbImage[i] != background && flourImage[i] != background)
-					mask[i] = 1;
-				else
-					mask[i] = 0;
+		if(nearIfImage.length > 0){
+			if(fluorImage.length == rgbImage.length && fluorImage.length == nearIfImage.length)
+				for(int i = 0; i < fluorImage.length; i++)
+					if(rgbImage[i] != background && fluorImage[i] != background && nearIfImage[i] != background)
+						mask[i] = 1;
+					else
+						mask[i] = 0;
+		} else {	
+			if(fluorImage.length == rgbImage.length)
+				for(int i = 0; i < fluorImage.length; i++)
+					if(rgbImage[i] != background && fluorImage[i] != background)
+						mask[i] = 1;
+					else
+						mask[i] = 0;
+		}
 	}
 	
 	
