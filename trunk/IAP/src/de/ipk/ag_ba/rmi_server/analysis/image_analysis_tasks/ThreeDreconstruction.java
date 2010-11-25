@@ -213,7 +213,6 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 							output.add(volumeInDatabase);
 						} catch (Exception e) {
 							LoadedVolume v = new LoadedVolumeExtension(s3d, null);
-							v.setErrorMsg(e);
 							ErrorMsg.addErrorMessage(e);
 							output.add(v);
 						}
@@ -382,8 +381,6 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 		} catch (OutOfMemoryError e) {
 			MainFrame.showMessageDialog("You have not enough memory! Please select a lower resolution",
 								"Out of Memory Error");
-			LoadedVolume volume = new LoadedVolume(sample, null);
-			volume.setErrorMsg(new Exception(e.getMessage()));
 		}
 	}
 

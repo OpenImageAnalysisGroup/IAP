@@ -8,7 +8,7 @@ package de.ipk.ag_ba.util.color;
  * @author klukas
  */
 public class Color_CIE_Lab {
-	private final double l;
+	private double l;
 	private double a;
 	private double b;
 
@@ -28,39 +28,26 @@ public class Color_CIE_Lab {
 		b = c.b;
 	}
 
-	/**
-	 * @return the l
-	 */
+	public void setL(double l) {
+		this.l = l;
+	}
+
 	public double getL() {
 		return l;
 	}
 
-	/**
-	 * @param a
-	 *           the a to set
-	 */
 	public void setA(double a) {
 		this.a = a;
 	}
 
-	/**
-	 * @return the a
-	 */
 	public double getA() {
 		return a;
 	}
 
-	/**
-	 * @param b
-	 *           the b to set
-	 */
 	public void setB(double b) {
 		this.b = b;
 	}
 
-	/**
-	 * @return the b
-	 */
 	public double getB() {
 		return b;
 	}

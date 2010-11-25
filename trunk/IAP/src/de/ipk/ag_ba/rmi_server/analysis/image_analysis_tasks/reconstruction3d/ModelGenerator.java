@@ -1,10 +1,6 @@
 package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.reconstruction3d;
 
 import java.awt.Color;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.concurrent.ExecutorService;
@@ -35,7 +31,7 @@ public class ModelGenerator {
 	// Color[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 	byte[][][] transparentVoxels;
 	private int[][][] byteCube;
-	private byte[][][] rgbCube;
+	private int[][][] rgbCube;
 
 	ArrayList<Color> palette = null;
 
@@ -71,11 +67,11 @@ public class ModelGenerator {
 	}
 
 	public void calculateModel(final BackgroundTaskStatusProviderSupportingExternalCall status,
-			GenerationMode colorMode, int maxIndexedColorCount) {
+						GenerationMode colorMode, int maxIndexedColorCount) {
 		ExecutorService run = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
 
 		status.setCurrentStatusText1("Init cube cut (" + maxVoxelPerSide + "x" + maxVoxelPerSide + "x" + maxVoxelPerSide
-				+ ")");
+							+ ")");
 		status.setCurrentStatusText2("Using " + SystemAnalysis.getNumberOfCPUs() + " threads");
 		status.setCurrentStatusValueFine(0);
 		try {
@@ -127,7 +123,7 @@ public class ModelGenerator {
 
 	@SuppressWarnings("unused")
 	private Runnable cuttt1(final BackgroundTaskStatusProviderSupportingExternalCall status,
-			final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
+						final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
 		return new Runnable() {
 			public void run() {
 				tsoRunCount.addInt(1);
@@ -152,14 +148,14 @@ public class ModelGenerator {
 
 				tso.addInt(1);
 				status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
-						+ tsoRunCount.getInt() + " active)");
+									+ tsoRunCount.getInt() + " active)");
 				tsoRunCount.addInt(-1);
 			}
 		};
 	}
 
 	private Runnable cuttt2(final BackgroundTaskStatusProviderSupportingExternalCall status,
-			final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
+						final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
 		return new Runnable() {
 			public void run() {
 				tsoRunCount.addInt(1);
@@ -168,14 +164,14 @@ public class ModelGenerator {
 
 				tso.addInt(1);
 				status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
-						+ tsoRunCount.getInt() + " active)");
+									+ tsoRunCount.getInt() + " active)");
 				tsoRunCount.addInt(-1);
 			}
 		};
 	}
 
 	private void colorModelRGB(ArrayList<MyPicture> pictures, ArrayList<Color> palette,
-			BackgroundTaskStatusProviderSupportingExternalCall status, boolean rgb) {
+						BackgroundTaskStatusProviderSupportingExternalCall status, boolean rgb) {
 		if (rgb)
 			System.out.println("Recolor Cube... (using true color RGBA generation mode)");
 		else
@@ -246,13 +242,13 @@ public class ModelGenerator {
 							double sin = p.getSinAngle();
 							boolean isTop = p.getIsTop();
 							Color c = p
-									.getPixelColor(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin, isTop)));
+												.getPixelColor(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin, isTop)));
 							if (c != null)
 								if (ColorUtil.deltaE2000(c, PhenotypeAnalysisTask.BACKGROUND_COLOR) < 10)
 									c = null;
 							if (c == null) {
 								XYcubePointRelative rel = getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
-										isTop));
+													isTop));
 								for (int sx = -20; sx <= 20; sx++)
 									for (int sy = -20; sy <= 20; sy++) {
 										c = p.getPixelColor(rel, sx, sy);
@@ -300,7 +296,7 @@ public class ModelGenerator {
 	}
 
 	private void cutModel1(MyPicture p, BitSet transparentVoxels,
-			BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
+						BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
 
 		double angle = p.getAngle();
 
@@ -324,7 +320,7 @@ public class ModelGenerator {
 				z = -cubeSideLengthZ / 2d;
 				for (int zi = 0; zi < maxVoxelPerSide; zi++) {
 					if (p.isTransparentPixel(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
-							isTopViewPicture))))
+										isTopViewPicture))))
 						transparentVoxels.set(xi * maxVoxelPerSide * maxVoxelPerSide + yi * maxVoxelPerSide + zi);
 					z += voxelSizeZ;
 				}
@@ -336,7 +332,7 @@ public class ModelGenerator {
 	}
 
 	private void cutModel2(MyPicture p, byte[][][] transparentVoxels,
-			BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
+						BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
 
 		double angle = p.getAngle();
 
@@ -360,7 +356,7 @@ public class ModelGenerator {
 				z = -cubeSideLengthZ / 2d;
 				for (int zi = 0; zi < maxVoxelPerSide; zi++) {
 					if (p.isTransparentPixel(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
-							isTopViewPicture)))) {
+										isTopViewPicture)))) {
 						transparentVoxels[xi][yi][zi]++;
 					}
 					z += voxelSizeZ;
@@ -373,7 +369,7 @@ public class ModelGenerator {
 	}
 
 	private XYZpointRealDistance getRotatedPoint(double angle, double x, double y, double z, double cos, double sin,
-			boolean isTop) {
+						boolean isTop) {
 		XYZpointRealDistance p = new XYZpointRealDistance(x, y, z);
 		if (isTop)
 			p.rotateForTopView();
@@ -401,7 +397,7 @@ public class ModelGenerator {
 		this.byteCube = new int[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 
 		if (mode == GenerationMode.COLORED_RGBA) {
-			this.rgbCube = new byte[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide * 4];
+			this.rgbCube = new int[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide * 4];
 		}
 
 		double max = 0;
@@ -422,39 +418,8 @@ public class ModelGenerator {
 		generated = true;
 	}
 
-	public byte[][][] getRGBcubeResult() {
+	public int[][][] getRGBcubeResult() {
 		return rgbCube;
-	}
-
-	public boolean writeToFile(String outputFileName, GenerationMode mode,
-			final BackgroundTaskStatusProviderSupportingExternalCall status) {
-		try {
-			FileOutputStream fos = new FileOutputStream(outputFileName);
-			DataOutputStream inimg = new DataOutputStream(fos);
-			generateNormalizedByteCube(mode);
-			if (mode == GenerationMode.COLORED_RGBA) {
-				status.setCurrentStatusText2("Writing Volume Data to File...");
-				for (int x = 0; x < rgbCube.length; x++)
-					for (int y = 0; y < rgbCube[x].length; y++)
-						inimg.write(rgbCube[x][y]);
-				status.setCurrentStatusValueFine(100d);
-				status.setCurrentStatusText2("Volume File Created");
-			} else {
-				for (int x = 0; x < maxVoxelPerSide; x++)
-					for (int y = 0; y < maxVoxelPerSide; y++)
-						for (int z = 0; z < maxVoxelPerSide; z++) {
-							inimg.writeByte(byteCube[x][y][z]);
-						}
-			}
-			inimg.close();
-			return true;
-		} catch (FileNotFoundException e) {
-			ErrorMsg.addErrorMessage(e);
-			return false;
-		} catch (IOException e) {
-			ErrorMsg.addErrorMessage(e);
-			return false;
-		}
 	}
 
 	public String getPaletteString() {
@@ -517,7 +482,7 @@ public class ModelGenerator {
 							Color c;
 							try {
 								c = vz < depth || depth == maxVoxelPerSide / 2 ? TRANSPARENT_COLOR : new Color(p1
-										.getRGB(ix, iy));
+													.getRGB(ix, iy));
 							} catch (Exception e) {
 								c = Color.BLUE;
 							}
@@ -545,7 +510,7 @@ public class ModelGenerator {
 	}
 
 	private static int getDepthOfPoint(final int rectWidth, final MyPicture p1, final MyPicture p2, int mx, int my,
-			int scanRange) {
+						int scanRange) {
 		double minDiff = Double.POSITIVE_INFINITY;
 		int minI = 0;
 		for (int i = -scanRange / 2; i < scanRange / 2; i++) {
