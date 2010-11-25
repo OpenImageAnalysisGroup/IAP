@@ -83,7 +83,7 @@ public class MongoDB {
 
 		@Override
 		public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
-							throws Exception {
+				throws Exception {
 			return null;
 		}
 
@@ -127,7 +127,7 @@ public class MongoDB {
 	}
 
 	private String defaultDBE = "dbe3";
-	private String defaultHost = "ba-13";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
+	private String defaultHost = "localhost";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
 	// "ba-13.ipk-gatersleben.de:27017,nw-08.ipk-gatersleben.de:27018";
 	private String defaultLogin = null;
 	private String defaultPass = null;
@@ -160,8 +160,8 @@ public class MongoDB {
 	}
 
 	public void storeExperiment(String dataBase, String optHosts, String optLogin, String optPass,
-						final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
-						throws Exception {
+			final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
+			throws Exception {
 		RunnableOnDB r = new RunnableOnDB() {
 
 			private DB db;
@@ -186,7 +186,7 @@ public class MongoDB {
 	private static Mongo m;
 
 	public synchronized void processDB(String dataBase, String optHosts, String optLogin, String optPass,
-						RunnableOnDB runnableOnDB) throws Exception {
+			RunnableOnDB runnableOnDB) throws Exception {
 		DB db;
 		if (m == null) {
 			if (optHosts == null || optHosts.length() == 0)
@@ -248,7 +248,7 @@ public class MongoDB {
 	}
 
 	private void storeExperiment(ExperimentInterface experiment, DB db,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 
 		experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 
@@ -265,7 +265,7 @@ public class MongoDB {
 		int count = 0;
 		StringBuilder errors = new StringBuilder();
 		int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
-							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
+				MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 		List<DBObject> dbSubstances = new ArrayList<DBObject>();
 		HashMap<DBObject, List<BasicDBObject>> substtance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		for (SubstanceInterface s : experiment) {
@@ -397,8 +397,8 @@ public class MongoDB {
 
 		if (errorCount > 0) {
 			MainFrame.showMessageDialog(
-								"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
-													+ "", "Errors");
+					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
+							+ "", "Errors");
 		}
 
 	}
@@ -431,27 +431,27 @@ public class MongoDB {
 	}
 
 	public long saveImageFile(MyByteArrayInputStream isImage, GridFS gridfs_images, GridFS gridfs_label_images,
-						GridFS gridfs_preview_files, ImageData image, String md5) throws IOException {
+			GridFS gridfs_preview_files, ImageData image, String md5) throws IOException {
 		long result = -1;
 
 		try {
 			int idx = 0;
 			for (InputStream is : new InputStream[] { isImage,
-								image.getLabelURL() != null ? image.getLabelURL().getInputStream() : null }) {
+					image.getLabelURL() != null ? image.getLabelURL().getInputStream() : null }) {
 				idx++;
 				if (is == null)
 					continue;
 				GridFS fs = null;
 				switch (idx) {
-					case 1:
-						fs = gridfs_images;
-						break;
-					case 2:
-						fs = gridfs_label_images;
-						break;
-					case 3:
-						fs = gridfs_preview_files;
-						break;
+				case 1:
+					fs = gridfs_images;
+					break;
+				case 2:
+					fs = gridfs_label_images;
+					break;
+				case 3:
+					fs = gridfs_preview_files;
+					break;
 				}
 				GridFSDBFile fff = fs.findOne(md5);
 				if (fff == null) {
@@ -471,9 +471,8 @@ public class MongoDB {
 		return result;
 	}
 
-	private long saveVolumeFile(GridFS gridfs_volumes, GridFS gridfs_preview, VolumeData volume,
-						ObjectRef optFileSize,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+	private long saveVolumeFile(GridFS gridfs_volumes, GridFS gridfs_preview, VolumeData volume, ObjectRef optFileSize,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create Outputstream");
@@ -496,7 +495,7 @@ public class MongoDB {
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Render Side View");
 			GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule
-								.getThreeDvolumePreviewIcon(id, optStatus));
+					.getThreeDvolumePreviewIcon(id, optStatus));
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Save Preview Icon");
 			inputFilePreview.setFilename(md5);
@@ -505,7 +504,8 @@ public class MongoDB {
 			inputFilePreview.save();
 		}
 		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Saved Volume (" + ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
+			optStatus.setCurrentStatusText1("Saved Volume ("
+					+ ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
 		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
 	}
 
@@ -554,8 +554,8 @@ public class MongoDB {
 		}
 	}
 
-	public DatabaseStorageResult storeVolumeFile(DB db, VolumeData volume,
-						ObjectRef optFileSize, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+	public DatabaseStorageResult storeVolumeFile(DB db, VolumeData volume, ObjectRef optFileSize,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		GridFS gridfs_volumes = new GridFS(db, "volumes");
 		DBCollection collectionA = db.getCollection("volumes.files");
 		collectionA.ensureIndex("filename");
@@ -731,7 +731,7 @@ public class MongoDB {
 					experiment.setHeader(header);
 
 					int numberOfImagesAndVolumes = countMeasurementValues(experiment, new MeasurementNodeType[] {
-										MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
+							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
 
 					if (numberOfImagesAndVolumes > 0) {
@@ -827,13 +827,11 @@ public class MongoDB {
 					IOurl url = null;
 					if (nmd instanceof ImageData) {
 						url = ((ImageData) nmd).getURL();
-					} else
-						if (nmd instanceof VolumeData) {
-							url = ((VolumeData) nmd).getURL();
-						} else
-							if (nmd instanceof NetworkData) {
-								url = ((NetworkData) nmd).getURL();
-							}
+					} else if (nmd instanceof VolumeData) {
+						url = ((VolumeData) nmd).getURL();
+					} else if (nmd instanceof NetworkData) {
+						url = ((NetworkData) nmd).getURL();
+					}
 					if (url != null) {
 						String md5 = url.getDetail();
 						Collection<String> gridFSnames = new ArrayList<String>();
@@ -857,8 +855,8 @@ public class MongoDB {
 		}
 	}
 
-	public void batchEnqueue(HashSet<String> targetIPs, String remoteCapableAnalysisActionClassName, String remoteCapableAnalysisActionParams,
-						String experimentInputMongoID) {
+	public void batchEnqueue(HashSet<String> targetIPs, String remoteCapableAnalysisActionClassName,
+			String remoteCapableAnalysisActionParams, String experimentInputMongoID) {
 		// add task to "schedule" collection
 	}
 
@@ -887,8 +885,8 @@ public class MongoDB {
 					for (DBObject dbo : collection.find()) {
 						BatchCmd batch = (BatchCmd) dbo;
 						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED
-											|| ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
-																.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
+								|| ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
+										.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
 							res.add(batch);
 					}
 				}

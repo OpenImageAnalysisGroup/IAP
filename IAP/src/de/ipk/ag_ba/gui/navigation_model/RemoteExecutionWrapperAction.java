@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.BackgroundTaskStatusProvider;
+import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -27,7 +28,8 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 		String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
 		String remoteCapableAnalysisActionParams = null;
 		String experimentInputMongoID = remoteAction.getMongoDatasetID();
-		BatchCmd.enqueueBatchCmd(targetIPs, remoteCapableAnalysisActionClassName, remoteCapableAnalysisActionParams, experimentInputMongoID);
+		BatchCmd.enqueueBatchCmd(targetIPs, remoteCapableAnalysisActionClassName, remoteCapableAnalysisActionParams,
+				experimentInputMongoID);
 	}
 
 	@Override
@@ -56,6 +58,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 
 	@Override
 	public BackgroundTaskStatusProvider getStatusProvider() {
+		MainFrame.showMessageDialog("Remote execution not yet fully implemented!", "Internal Error");
 		return null;
 	}
 

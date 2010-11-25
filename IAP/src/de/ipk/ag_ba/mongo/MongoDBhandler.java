@@ -40,14 +40,25 @@ public class MongoDBhandler implements ResourceIOHandler {
 
 			@Override
 			public void run() {
-				GridFS gridfs_preview_images = new GridFS(db, "images");
-				GridFSDBFile fff = gridfs_preview_images.findOne(url.getDetail());
+				GridFS gridfs_images = new GridFS(db, "images");
+				GridFSDBFile fff = gridfs_images.findOne(url.getDetail());
 				if (fff != null) {
 					try {
 						InputStream is = fff.getInputStream();
 						or.setObject(is);
 					} catch (Exception e) {
 						ErrorMsg.addErrorMessage(e);
+					}
+				} else {
+					GridFS gridfs_volumes = new GridFS(db, "volumes");
+					fff = gridfs_volumes.findOne(url.getDetail());
+					if (fff != null) {
+						try {
+							InputStream is = fff.getInputStream();
+							or.setObject(is);
+						} catch (Exception e) {
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
 				}
 			}

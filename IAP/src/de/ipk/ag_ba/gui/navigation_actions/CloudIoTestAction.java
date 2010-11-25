@@ -152,7 +152,7 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/grid2.png";
+		return "img/ext/grid3.png";
 	}
 
 	@Override

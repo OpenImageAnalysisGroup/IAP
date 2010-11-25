@@ -41,6 +41,7 @@ import org.ErrorMsg;
 import org.HomeFolder;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
+import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.session.EditorSession;
 
@@ -216,8 +217,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 
 						try {
-							InputStream is = imageResult.getBinaryFileInfo().getFileName() != null ? imageResult
-									.getBinaryFileInfo().getFileName().getInputStream() : null;
+							IOurl url = imageResult.getBinaryFileInfo().getFileName();
+							System.out.println(url);
+							InputStream is = url != null ? url.getInputStream() : null;
 							if (is == null)
 								System.out.println("Inputstream = null");
 							HomeFolder.copyFile(is, tf);
