@@ -49,7 +49,7 @@ public final class HomeAction extends AbstractNavigationAction {
 						null,
 						"MetaCrop",
 						"img/metacrop.png",
-						"http://pgrc-16.ipk-gatersleben.de/wgrp/nwg/metacrop/",
+						"http://vanted.ipk-gatersleben.de/addons/metacrop/",
 						"Website",
 						"img/browser.png",
 						"http://metacrop.ipk-gatersleben.de",
