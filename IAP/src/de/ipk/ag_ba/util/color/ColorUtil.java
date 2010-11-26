@@ -332,12 +332,14 @@ public class ColorUtil {
 		return deltaE2000(CIE_L1, CIE_a1, CIE_b1, CIE_L2, CIE_a2, CIE_b2);
 	}
 
+	@Deprecated
 	public static double deltaE2000(Color c1, double CIE_L2, double CIE_a2, double CIE_b2) {
 		int rgb1 = c1.getRGB();
 
 		return deltaE2000(rgb1, CIE_L2, CIE_a2, CIE_b2);
 	}
 
+	@Deprecated
 	public static double deltaE2000(int rgb1, double CIE_L2, double CIE_a2, double CIE_b2) {
 		int red = (rgb1 >> 16) & 0xff;
 		int green = (rgb1 >> 8) & 0xff;
@@ -346,6 +348,7 @@ public class ColorUtil {
 		return deltaE2000(red, green, blue, CIE_L2, CIE_a2, CIE_b2);
 	}
 
+	@Deprecated
 	public static double deltaE2000(int r1, int g1, int b1, double CIE_L2, double CIE_a2, double CIE_b2) {
 		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1));
 		double CIE_L1 = cCL1.getL();
@@ -353,6 +356,14 @@ public class ColorUtil {
 		double CIE_b1 = cCL1.getB(); // Color #1 CIE-L*ab values
 
 		return deltaE2000(CIE_L1, CIE_a1, CIE_b1, CIE_L2, CIE_a2, CIE_b2);
+	}
+
+	public static double deltaE2000(Color_CIE_Lab a, Color_CIE_Lab b) {
+		return deltaE2000(a.getL(), a.getA(), a.getB(), b.getL(), b.getA(), b.getB());
+	}
+
+	public static double deltaE2000(Color_CIE_Lab a, double l2, double a2, double b2) {
+		return deltaE2000(a.getL(), a.getA(), a.getB(), l2, a2, b2);
 	}
 
 	private static double deltaE2000(double CIE_L1, double CIE_a1, double CIE_b1, double CIE_L2, double CIE_a2,
