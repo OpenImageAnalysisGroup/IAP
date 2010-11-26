@@ -331,7 +331,7 @@ public class WebFolder {
 					Graph g = (Graph) graphRef.getObject();
 					if (g != null) {
 						boolean isMetaCrop = mmc.getURL().toString()
-								.contains("http://pgrc-16.ipk-gatersleben.de/wgrp/nwg/metacrop");
+								.contains("http://vanted.ipk-gatersleben.de/addons/metacrop");
 						if (isMetaCrop) {
 							System.out.println("Adding MetaCrop links");
 							addAnnotationsToGraphElements(g);
