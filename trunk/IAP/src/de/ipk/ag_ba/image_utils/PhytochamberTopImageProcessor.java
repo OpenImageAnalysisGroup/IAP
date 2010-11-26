@@ -94,9 +94,10 @@ public class PhytochamberTopImageProcessor {
 
 		PhytochamberTopImageProcessor test = new PhytochamberTopImageProcessor(imgVisible, imgFluo, imgNIR);
 		test.doPhytoTopImageProcessor();
-		test.printImageJI(test.getResultRgbIMageAsBI(), "Result RGB-Image");
-		test.printImageJI(test.getResultFluorIMageAsBI(), "Result Fluor-Image");
-		test.printImageJI(test.getResultNearIMageAsBI(), "Result Near-Image");
+		PrintImage.printImage(test.getInitialFluorImageAsBI(), "Anfangsbild");
+		PrintImage.printImage(test.getResultRgbIMageAsBI(), "Result RGB-Image");
+		PrintImage.printImage(test.getResultFluorIMageAsBI(), "Result Fluor-Image");
+		PrintImage.printImage(test.getResultNearIMageAsBI(), "Result Near-Image");
 	}
 
 	public PhytochamberTopImageProcessor(BufferedImage rgbImage, BufferedImage fluorImage, BufferedImage nearIfImage) {
@@ -501,23 +502,23 @@ public class PhytochamberTopImageProcessor {
 
 	// ############## PRINT ##################
 
-	public void printImage(BufferedImage image) {
-		printImageGS(image, "Bild");
-	}
-
-	public void printImageGS(BufferedImage image, String text) {
-		GravistoService.showImage(image, text);
-	}
-
-	public void printImageJI(BufferedImage image) {
-		printImageJI(image, "Image");
-	}
-
-	public void printImageJI(BufferedImage image, String text) {
-
-		ImagePlus img = ImageConverter.convertBItoIJ(image);
-		img.show(text);
-	}
+//	public void printImage(BufferedImage image) {
+//		printImageGS(image, "Bild");
+//	}
+//
+//	public void printImageGS(BufferedImage image, String text) {
+//		GravistoService.showImage(image, text);
+//	}
+//
+//	public void printImageJI(BufferedImage image) {
+//		printImageJI(image, "Image");
+//	}
+//
+//	public void printImageJI(BufferedImage image, String text) {
+//
+//		ImagePlus img = ImageConverter.convertBItoIJ(image);
+//		img.show(text);
+//	}
 
 	// ########## PRIVATE ############
 

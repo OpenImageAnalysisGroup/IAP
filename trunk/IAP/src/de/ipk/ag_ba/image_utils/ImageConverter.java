@@ -18,9 +18,6 @@ import javax.media.jai.PlanarImage;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.postgresql.ImageScaling;
-import de.ipk.ag_ba.postgresql.Scaling;
-
 public class ImageConverter {
 	public static void main(String[] args) {
 
