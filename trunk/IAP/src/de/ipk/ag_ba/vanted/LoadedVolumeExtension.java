@@ -80,13 +80,13 @@ public class LoadedVolumeExtension extends LoadedVolume {
 						idx++;
 					} else {
 						int v = volume.getColorVoxel(x, y, z);
-						if (v != 0) {
+						int red = (v >> 16) & 0xff;
+						int green = (v >> 8) & 0xff;
+						int blue = (v) & 0xff;
+						if (v != 0 && (red < 255 || green < 255 || blue < 255)) {
 							solidFound = true;
 							int alpha = 255; // not supported by gif ?! (v >> 24) &
 													// 0xff;
-							int red = (v >> 16) & 0xff;
-							int green = (v >> 8) & 0xff;
-							int blue = (v) & 0xff;
 
 							int[] col = { alpha, red, green, blue };
 							raster.setPixel(x, y, col);
@@ -128,7 +128,8 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		}
 	}
 
-	private Runnable getVolumeRotationRunnable(final int i, final int maxCPU, final double rotation, final int[][][] volume2) {
+	private Runnable getVolumeRotationRunnable(final int i, final int maxCPU, final double rotation,
+			final int[][][] volume2) {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
@@ -177,7 +178,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 
 			int res = 200;
 			FileInputStream file = new FileInputStream(
-								"/Users/klukas/Desktop/IAP_reconstruction_1284034033183.argb_volume");
+					"/Users/klukas/Desktop/IAP_reconstruction_1284034033183.argb_volume");
 
 			boolean high = false;
 			if (high) {
@@ -237,7 +238,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 	}
 
 	public MyByteArrayInputStream getSideViewGif(int width, int height,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 		ArrayList<String> delayTimes = new ArrayList<String>();
 
