@@ -16,6 +16,8 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
+import de.ipk.ag_ba.image_utils.FlexibleImage;
+import de.ipk.ag_ba.image_utils.LayeringTyp;
 import de.ipk.ag_ba.image_utils.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
@@ -69,7 +71,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
-						final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final BackgroundTaskStatusProviderSupportingExternalCall status) {
 
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
@@ -92,8 +94,13 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 					is.setNir(id);
 			}
 		}
-		for (ImageSet is : replicateId2ImageSet.values())
-			workload.add(is);
+		for (ImageSet is : replicateId2ImageSet.values()) {
+			if (is.hasAllImageTypes()) {
+				workload.add(is);
+				if (workload.size() > 1)
+					break;
+			}
+		}
 
 		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
 		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCountParallelImages, new ThreadFactory() {
@@ -122,6 +129,14 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						ImageData vis = id.getVIS();
 						ImageData fluo = id.getFLUO();
 						ImageData nir = id.getNIR();
+						if (vis == null)
+							System.out.println("No VIS image in image set!");
+						if (fluo == null)
+							System.out.println("No FLUO image in image set!");
+						if (nir == null)
+							System.out.println("No NIR image in image set!");
+						if (vis == null || nir == null || fluo == null)
+							return;
 						if (vis instanceof LoadedImage) {
 							lVIS = (LoadedImage) vis;
 						} else {
@@ -138,18 +153,14 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							lNIR = IOmodule.loadImageFromFileOrMongo(nir, login, pass);
 						}
 						// process images
-						PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(lVIS.getLoadedImage(), lFLUO.getLoadedImage(), lNIR.getLoadedImage());
+						PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(new FlexibleImage(lVIS
+								.getLoadedImage()), new FlexibleImage(lFLUO.getLoadedImage()), new FlexibleImage(lNIR
+								.getLoadedImage()));
 						ptip.doPhytoTopImageProcessor();
-						{
-							PhytochamberTopImageProcessor ptip2 = new PhytochamberTopImageProcessor(lVIS.getLoadedImage(), lFLUO.getLoadedImage(), lNIR
-												.getLoadedImage());
-							BufferedImage bi = ptip2.tryFitFluoImageToRGBImage();
-							ptip2.doImageLayering(ptip.getInitialRgbImageAsBI(), bi, false);
-						}
 
-						lVIS = new LoadedImage(lVIS, ptip.getResultRgbImageAsBI());
-						lFLUO = new LoadedImage(lFLUO, ptip.getResultFluorImageAsBI());
-						lNIR = new LoadedImage(lNIR, ptip.getResultNearImageAsBI());
+						lVIS = new LoadedImage(lVIS, ptip.getResultRgbImage().getBufferedImage());
+						lFLUO = new LoadedImage(lFLUO, ptip.getResultFluorImage().getBufferedImage());
+						lNIR = new LoadedImage(lNIR, ptip.getResultNearImage().getBufferedImage());
 
 						vis = saveImageAndUpdateURL(lVIS, databaseTarget);
 						fluo = saveImageAndUpdateURL(lFLUO, databaseTarget);

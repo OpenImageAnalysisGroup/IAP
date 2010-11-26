@@ -13,7 +13,7 @@ import org.graffiti.editor.GravistoService;
 
 /**
  * @author entzian
- *
+ * 
  */
 public class PrintImage {
 
@@ -21,47 +21,46 @@ public class PrintImage {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+
 	}
 
-	//######### 1Array #######
-	public static void printImage(int [] image, int width, int height, PrintOption typ){
+	// ######### 1Array #######
+	public static void printImage(int[] image, int width, int height, PrintOption typ) {
 		printImage(ImageConverter.convert1AtoBI(width, height, image), typ);
 	}
-	
-	public static void printImage(int [] image, int width, int height){
+
+	public static void printImage(int[] image, int width, int height) {
 		printImage(ImageConverter.convert1AtoBI(width, height, image), PrintOption.IMAGEJ);
 	}
-	
-	public static void printImage(int [] image, int width, int height, String text, PrintOption typ){
+
+	public static void printImage(int[] image, int width, int height, String text, PrintOption typ) {
 		printImage(ImageConverter.convert1AtoBI(width, height, image), text, typ);
 	}
-	
-	public static void printImage(int [] image, int width, int height, String text){
+
+	public static void printImage(int[] image, int width, int height, String text) {
 		printImage(ImageConverter.convert1AtoBI(width, height, image), text, PrintOption.IMAGEJ);
 	}
-	
-	//######## 2Array ##########
-	
-	
-	public static void printImage(int [][] image, PrintOption typ){
+
+	// ######## 2Array ##########
+
+	public static void printImage(int[][] image, PrintOption typ) {
 		printImage(ImageConverter.convert2AtoBI(image), typ);
 	}
-	
-	public static void printImage(int [][] image){
+
+	public static void printImage(int[][] image) {
 		printImage(ImageConverter.convert2AtoBI(image), PrintOption.IMAGEJ);
 	}
-	
-	public static void printImage(int [][] image, String text, PrintOption typ){
+
+	public static void printImage(int[][] image, String text, PrintOption typ) {
 		printImage(ImageConverter.convert2AtoBI(image), text, typ);
 	}
-	
-	public static void printImage(int [][] image, String text){
+
+	public static void printImage(int[][] image, String text) {
 		printImage(ImageConverter.convert2AtoBI(image), text, PrintOption.IMAGEJ);
 	}
-	
-	//######### BufferedImage #########
-	
+
+	// ######### BufferedImage #########
+
 	public static void printImage(BufferedImage image, PrintOption typ) {
 		printImage(image, "Image", typ);
 	}
@@ -69,35 +68,35 @@ public class PrintImage {
 	public static void printImage(BufferedImage image) {
 		printImage(image, "Image", PrintOption.IMAGEJ);
 	}
-	
+
 	public static void printImage(BufferedImage image, String text) {
 		printImage(image, text, PrintOption.IMAGEJ);
 	}
-	
+
 	public static void printImage(BufferedImage image, String text, PrintOption typ) {
-		
-		switch(typ){
-		
-		case GRAVISTO_SERVICE: 
-			printGravistoService(image, text); 
+
+		switch (typ) {
+
+		case GRAVISTO_SERVICE:
+			printGravistoService(image, text);
 			break;
-		
+
 		case IMAGEJ:
 			printImagej(image, text);
 			break;
-			
+
 		case CONSOLE:
 			printImageConsole(ImageConverter.convertBIto2A(image), text);
 			break;
-		
-		default: 
+
+		default:
 			printImagej(image, text);
 			break;
-	
+
 		}
 	}
-	
-	private static void printImageConsole(int [][] image, String text) {
+
+	private static void printImageConsole(int[][] image, String text) {
 		System.out.println(text);
 		for (int i = 0; i < image.length; i++) {
 			for (int j = 0; j < image[i].length; j++)

@@ -52,7 +52,7 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 	private String mongoDatasetID;
 
 	public PhytochamberAnalysisAction(String login, double epsilon, double epsilon2, String pass,
-						ExperimentReference experiment) {
+			ExperimentReference experiment) {
 		super("Analyse Phytochamber Top-Images");
 		this.login = login;
 		this.epsilon = epsilon;
@@ -90,27 +90,21 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
 						for (Measurement md : sd3.getAllMeasurements()) {
-							// if (workload.size() >= 10)
-							// break;
 							workIndex++;
 							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
 								if (md instanceof ImageData) {
-									ImageConfiguration config =
-														ImageConfiguration.get(((ImageData)
-																			md).getSubstanceName());
+									ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
 									if (config == ImageConfiguration.FluoTop) {
 										ImageData i = (ImageData) md;
 										workload.add(i);
+									} else if (config == ImageConfiguration.RgbTop) {
+										ImageData i = (ImageData) md;
+										workload.add(i);
+									} else if (config == ImageConfiguration.NirTop) {
+										ImageData i = (ImageData) md;
+										workload.add(i);
 									} else
-										if (config == ImageConfiguration.RgbTop) {
-											ImageData i = (ImageData) md;
-											workload.add(i);
-										} else
-											if (config == ImageConfiguration.NirTop) {
-												ImageData i = (ImageData) md;
-												workload.add(i);
-											} else
-												ignored.add(((ImageData) md).getSubstanceName());
+										ignored.add(((ImageData) md).getSubstanceName());
 								}
 						}
 					}
@@ -149,7 +143,7 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 			task.performAnalysis(pi, ti, status);
 			long t2 = System.currentTimeMillis();
 			String ss = "T(s)/IMG/T(s)/PI/TI\t" + Math.round(((t2 - t1) / 100d / workload.size())) / 10d + "\t"
-								+ ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;
+					+ ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;
 			times.put((t2 - t1), ss);
 			System.out.println("------------------------------------------------------------");
 			System.out.println("--- " + ss);
@@ -209,13 +203,13 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 
 		res.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(experimentResult),
-							src.getGUIsetting()));
+				src.getGUIsetting()));
 
 		res.add(new NavigationButton(new CloudUploadEntity(login, pass, new ExperimentReference(experimentResult)),
-							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+				"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
 		MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
-							false, src.getGUIsetting());
+				false, src.getGUIsetting());
 		return res;
 	}
 

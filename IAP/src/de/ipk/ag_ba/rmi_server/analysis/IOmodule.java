@@ -76,7 +76,7 @@ public class IOmodule {
 	}
 
 	public static InputStream getThreeDvolumePreviewIcon(LoadedVolumeExtension volume,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws FileNotFoundException, URISyntaxException {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws FileNotFoundException, URISyntaxException {
 		try {
 			// return
 			// MyImageIOhelper.getPreviewImageStream(MyImageIOhelper.getPreviewImage(volume
@@ -85,7 +85,7 @@ public class IOmodule {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return new FileInputStream(new File(new URI(GravistoService.getResource(IOmodule.class,
-								"img/RotationReconstruction.png").toString())));
+					"img/RotationReconstruction.png").toString())));
 		}
 	}
 
@@ -93,7 +93,7 @@ public class IOmodule {
 
 	public static VolumeUploadData getThreeDvolumeInputStream(LoadedVolume volume) {
 		System.out.println("Create InputStream representation for volume: " + volume.getDimensionX()
-							* volume.getDimensionY() * volume.getDimensionZ() * 4 / 1024 / 1024 + " MB");
+				* volume.getDimensionY() * volume.getDimensionZ() * 4 / 1024 / 1024 + " MB");
 		VolumeInputStream stream = volume.getLoadedVolume().getInputStream();
 		return new VolumeUploadData(stream, stream.getNumberOfBytes());
 	}
