@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -39,6 +39,7 @@ import javax.swing.event.ChangeListener;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.PhenotypeAnalysisAction;
+import de.ipk.ag_ba.gui.navigation_actions.PhytochamberAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -55,17 +56,18 @@ public class ImageAnalysis {
 
 	private static DatabaseTarget saveInDatabase = new DataBaseTargetMongoDB(true);
 
-	/**
-	 * @param login
-	 * @param pass
-	 * @param guiSetting
-	 * @param experimentName
-	 * @return
-	 */
 	public static NavigationButton getPhenotypingEntity(final String login, final String pass,
-			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
+						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 
 		NavigationAction phenotypeAnalysisAction = new PhenotypeAnalysisAction(login, epsilon, epsilon2, pass, experiment);
+		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
+		return resultTaskButton;
+	}
+
+	public static NavigationButton getPhytochamberEntity(final String login, final String pass,
+						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
+
+		NavigationAction phenotypeAnalysisAction = new PhytochamberAnalysisAction(login, epsilon, epsilon2, pass, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}

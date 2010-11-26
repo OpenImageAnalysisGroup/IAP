@@ -5,8 +5,6 @@
  *************************************************************************/
 package de.ipk.ag_ba.image_utils;
 
-import ij.ImagePlus;
-
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -21,9 +19,13 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.mongo.MongoDBhandler;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.ColorHistogram;
+import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.ColorHistogramEntry;
+import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.Geometry;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
@@ -49,8 +51,6 @@ public class PhytochamberTopImageProcessor {
 	private double scaleY;
 	private int translateX;
 	private int translateY;
-
-	private ArrayList<NumericMeasurementInterface> output;
 
 	private double fluoEpsilonA;
 	private double fluoEpsilonB;
@@ -94,10 +94,13 @@ public class PhytochamberTopImageProcessor {
 
 		PhytochamberTopImageProcessor test = new PhytochamberTopImageProcessor(imgVisible, imgFluo, imgNIR);
 		test.doPhytoTopImageProcessor();
-		PrintImage.printImage(test.getInitialFluorImageAsBI(), "Anfangsbild");
-		PrintImage.printImage(test.getResultRgbIMageAsBI(), "Result RGB-Image");
-		PrintImage.printImage(test.getResultFluorIMageAsBI(), "Result Fluor-Image");
-		PrintImage.printImage(test.getResultNearIMageAsBI(), "Result Near-Image");
+		// PrintImage.printImage(test.getInitialFluorImageAsBI(), "Anfangsbild");
+		PrintImage.printImage(test.getResultRgbImageAsBI(),
+							"Result RGB-Image");
+		// PrintImage.printImage(test.getResultFluorIMageAsBI(),
+		// "Result Fluor-Image");
+		// PrintImage.printImage(test.getResultNearIMageAsBI(),
+		// "Result Near-Image");
 	}
 
 	public PhytochamberTopImageProcessor(BufferedImage rgbImage, BufferedImage fluorImage, BufferedImage nearIfImage) {
@@ -269,7 +272,7 @@ public class PhytochamberTopImageProcessor {
 	// SET Rest
 
 	public void setValuesToStandard() {
-		resetValues();
+		// empty
 	}
 
 	// ########## GET #############
@@ -418,7 +421,7 @@ public class PhytochamberTopImageProcessor {
 
 	// GET Result RGB IMage
 
-	public BufferedImage getResultRgbIMageAsBI() {
+	public BufferedImage getResultRgbImageAsBI() {
 		return newRGBImage;
 	}
 
@@ -432,7 +435,7 @@ public class PhytochamberTopImageProcessor {
 
 	// GET Result Fluo Image
 
-	public BufferedImage getResultFluorIMageAsBI() {
+	public BufferedImage getResultFluorImageAsBI() {
 		return newFluorImage;
 	}
 
@@ -446,7 +449,7 @@ public class PhytochamberTopImageProcessor {
 
 	// GET Result Near Image
 
-	public BufferedImage getResultNearIMageAsBI() {
+	public BufferedImage getResultNearImageAsBI() {
 		return newNearImage;
 	}
 
@@ -462,7 +465,7 @@ public class PhytochamberTopImageProcessor {
 
 	public void doPhytoTopImageProcessor() {
 		long t1 = System.currentTimeMillis();
-		resetValues();
+
 		newFluorImage = fitFluoImageToRGBImage();
 		BufferedImage newOriginalFluorImage = newFluorImage;
 
@@ -485,7 +488,6 @@ public class PhytochamberTopImageProcessor {
 
 		long t2 = System.currentTimeMillis();
 		System.out.println("Finished in " + (t2 - t1) + " ms");
-
 	}
 
 	public void doImageLayering() {
@@ -502,23 +504,23 @@ public class PhytochamberTopImageProcessor {
 
 	// ############## PRINT ##################
 
-//	public void printImage(BufferedImage image) {
-//		printImageGS(image, "Bild");
-//	}
-//
-//	public void printImageGS(BufferedImage image, String text) {
-//		GravistoService.showImage(image, text);
-//	}
-//
-//	public void printImageJI(BufferedImage image) {
-//		printImageJI(image, "Image");
-//	}
-//
-//	public void printImageJI(BufferedImage image, String text) {
-//
-//		ImagePlus img = ImageConverter.convertBItoIJ(image);
-//		img.show(text);
-//	}
+	// public void printImage(BufferedImage image) {
+	// printImageGS(image, "Bild");
+	// }
+	//
+	// public void printImageGS(BufferedImage image, String text) {
+	// GravistoService.showImage(image, text);
+	// }
+	//
+	// public void printImageJI(BufferedImage image) {
+	// printImageJI(image, "Image");
+	// }
+	//
+	// public void printImageJI(BufferedImage image, String text) {
+	//
+	// ImagePlus img = ImageConverter.convertBItoIJ(image);
+	// img.show(text);
+	// }
 
 	// ########## PRIVATE ############
 
@@ -550,10 +552,6 @@ public class PhytochamberTopImageProcessor {
 		setBackground(PhenotypeAnalysisTask.BACKGROUND_COLOR.getRGB());
 	}
 
-	private void resetValues() {
-		output = new ArrayList<NumericMeasurementInterface>();
-	}
-
 	private BufferedImage fitFluoImageToRGBImage() {
 		ImageOperation io = new ImageOperation(getInitialFluorImageAsBI());
 
@@ -574,6 +572,7 @@ public class PhytochamberTopImageProcessor {
 		Sample sample = new Sample(condition);
 		LoadedImage limg = new LoadedImage(sample, workImage);
 		limg.setURL(new IOurl(""));
+		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 		PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null, epsilonA, epsiolonB);
 
 		return workImage;
@@ -696,4 +695,145 @@ public class PhytochamberTopImageProcessor {
 		GravistoService.showImage(secondImage, "ImageLayering");
 	}
 
+	public ArrayList<NumericMeasurementInterface> doAnalyseResultImages(LoadedImage limg, String experimentNameExtension) {
+		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
+
+		BufferedImage b = limg.getLoadedImage();
+		int w = b.getWidth();
+		int h = b.getHeight();
+		int[] arrayRGB = ImageConverter.convertBIto1A(b);
+		int iBackgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		Geometry g = detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
+
+		NumericMeasurement m;
+		boolean calcHistogram = false;
+		if (calcHistogram) {
+			ColorHistogram histogram = new ColorHistogram(10);
+			histogram.countColorPixels(arrayRGB);
+			double pixelCount = histogram.getNumberOfFilledPixels();
+			for (ColorHistogramEntry che : histogram.getColorEntries()) {
+				String sn = limg.getSubstanceName();
+				int pos = sn.indexOf(".");
+				if (pos > 0)
+					sn = sn.substring(0, pos);
+				m = new NumericMeasurement(limg, sn + "-r: " + che.getColorDisplayName(), limg.getParentSample()
+									.getParentCondition().getExperimentName()
+									+ " (" + experimentNameExtension + ")");
+				m.setValue(che.getNumberOfPixels() / pixelCount);
+				m.setUnit("proportion");
+				output.add(m);
+
+				m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
+									.getParentCondition().getExperimentName()
+									+ " (" + experimentNameExtension + ")");
+				m.setValue(pixelCount);
+				m.setUnit("pixels");
+				output.add(m);
+			}
+		}
+		if (!limg.getSubstanceName().toUpperCase().contains("TOP")) {
+			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
+								.getParentCondition().getExperimentName()
+								+ " (" + experimentNameExtension + ")");
+			m.setValue(h - g.getTop());
+			m.setUnit("pixel");
+			output.add(m);
+
+			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
+								.getParentCondition().getExperimentName()
+								+ " (" + experimentNameExtension + ")");
+			m.setValue(h - g.getLeft() - (h - g.getRight()));
+			m.setUnit("pixel");
+			output.add(m);
+		}
+		m = new NumericMeasurement(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
+							.getParentCondition().getExperimentName()
+							+ " (" + experimentNameExtension + ")");
+		m.setValue(g.getFilledPixels());
+		m.setUnit("pixel");
+		output.add(m);
+
+		// m = new NumericMeasurement(limg, "filled (percent) ("
+		// +
+		// limg.getParentSample().getParentCondition().getParentSubstance().getName()
+		// + ")", limg.getParentSample()
+		// .getParentCondition().getExperimentName()
+		// + " (" + getName() + ")");
+		// m.setValue((double) g.getFilledPixels() / (w * h) * 100d);
+		// m.setUnit("%");
+		// output.add(m);
+
+		boolean red = false;
+		if (red) {
+			int redLine = Color.RED.getRGB();
+
+			int o = g.getTop() * w;
+			int lww = 20;
+			if (g.getTop() < lww + 1)
+				o = 8 * w;
+			for (int x = 0; x < w; x++) {
+				if (o + x + w >= arrayRGB.length)
+					continue;
+				for (int ii = lww; ii > 0; ii--)
+					if (o + x - ii * w >= 0)
+						arrayRGB[o + x - ii * w] = redLine;
+				// rgbArray[o + x] = redLine;
+			}
+			for (int y = 0; y < h; y++) {
+				o = g.getLeft() + y * w;
+				if (o - 1 < 0)
+					continue;
+				if (o + 1 >= h)
+					continue;
+				arrayRGB[o - 1] = redLine;
+				arrayRGB[o] = redLine;
+				arrayRGB[o + 1] = redLine;
+				o = g.getRight() + y * w;
+				if (o - 1 >= 0)
+					arrayRGB[o - 1] = redLine;
+				arrayRGB[o] = redLine;
+				arrayRGB[o + 1] = redLine;
+			}
+		}
+		return output;
+	}
+
+	private static Geometry detectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg) {
+
+		int left = w;
+		int right = 0;
+		int top = h;
+
+		for (int x = 0; x < w; x++)
+			for (int y = h - 1; y > 0; y--) {
+				int o = x + y * w;
+				if (y > h * 0.95) {
+					rgbArray[o] = iBackgroundFill;
+					continue;
+				}
+				if (rgbArray[o] == iBackgroundFill)
+					continue;
+
+				if (rgbArray[o] != iBackgroundFill) {
+					if (x < left)
+						left = x;
+					if (x > right)
+						right = x;
+					if (y < top)
+						top = y;
+				}
+			}
+
+		long filled = 0;
+		for (int x = 0; x < w; x++) {
+			for (int y = h - 1; y > 0; y--) {
+				int o = x + y * w;
+				if (rgbArray[o] != iBackgroundFill) {
+					filled++;
+				}
+			}
+		}
+
+		return new Geometry(top, left, right, filled);
+	}
 }

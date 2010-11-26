@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_actions.CloudIoTestAction;
 import de.ipk.ag_ba.gui.navigation_actions.CloudUploadEntity;
 import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
 import de.ipk.ag_ba.gui.navigation_actions.NumericDataReportAction;
 import de.ipk.ag_ba.gui.navigation_actions.PerformanceTestAction;
-import de.ipk.ag_ba.gui.navigation_actions.CloudIoTestAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDsegmentationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -29,12 +29,12 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 public class ImageAnalysisCommandManager {
 
 	public static Collection<NavigationButton> getCommands(String login, String pass,
-			ExperimentReference experimentReference, GUIsetting guiSetting) {
+						ExperimentReference experimentReference, GUIsetting guiSetting) {
 		return getCommands(login, pass, experimentReference, true, guiSetting);
 	}
 
 	public static Collection<NavigationButton> getCommands(String login, String pass,
-			ExperimentReference experimentReference, boolean analysis, GUIsetting guiSetting) {
+						ExperimentReference experimentReference, boolean analysis, GUIsetting guiSetting) {
 
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 
@@ -66,10 +66,12 @@ public class ImageAnalysisCommandManager {
 			actions.add(new NavigationButton(new NumericDataReportAction(login, pass, experimentReference), guiSetting));
 
 			actions.add(ImageAnalysis.getPhenotypingEntity(login, pass, experimentReference, 10, 15, guiSetting));
+			actions.add(ImageAnalysis.getPhytochamberEntity(login, pass, experimentReference, 10, 15, guiSetting));
+
 			actions.add(ThreeDreconstructionAction.getThreeDreconstructionTaskEntity(login, pass, experimentReference,
-					"3-D Reconstruction", 15, 25, guiSetting));
+								"3-D Reconstruction", 15, 25, guiSetting));
 			actions.add(ThreeDsegmentationAction.getThreeDsegmentationTaskEntity(login, pass, experimentReference,
-					"3-D Segmentation", 15, 25, guiSetting));
+								"3-D Segmentation", 15, 25, guiSetting));
 		}
 		return actions;
 	}

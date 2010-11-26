@@ -25,6 +25,7 @@ import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.rmi_server.databases.DatabaseTarget;
 import de.ipk.ag_ba.util.color.ColorUtil;
+import de.ipk.ag_ba.util.color.Color_CIE_Lab;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -248,8 +249,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		if (removeSmallSegments)
 			if (config == ImageConfiguration.FluoTop)
 				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, limg, (int) (w * h * 0.005d));
-			if (config == ImageConfiguration.NirTop)
-				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, limg, 4);//
 			else
 				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, limg, (int) (w * h * 0.005d));//
 
@@ -472,16 +471,13 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					factor = 0.2;
 
 				int x = 0;
-				if (config == ImageConfiguration.NirSide || config == ImageConfiguration.NirTop) {
-					processNIRtopImageByLAB(imageData, w, rgbArray, iBackgroundFill, y, arrayL, arrayA, arrayB, x);
-				} else
 				if (config == ImageConfiguration.RgbSide || config == ImageConfiguration.RgbTop) {
 					processRGBtopImageByLAB(imageData, w, rgbArray, iBackgroundFill, y, arrayL, arrayA, arrayB, x);
 				} else
 					if (config == ImageConfiguration.FluoTop || config == ImageConfiguration.FluoSide) {
 						processFluoTopImageByLAB(imageData, w, rgbArray, iBackgroundFill, y, arrayL, arrayA, arrayB, x);
 					} else {
-						ArrayList<Integer> backgroundPixelsArr = new ArrayList<Integer>();
+						ArrayList<Color_CIE_Lab> backgroundPixelsArr = new ArrayList<Color_CIE_Lab>();
 						boolean hasBackgroundImage = rgbArrayNULL != null && rgbArray.length == rgbArrayNULL.length;
 						if (hasBackgroundImage) {
 							processImageWithBackgroundImage(imageData, w, rgbArray, rgbArrayNULL, iBackgroundFill, y, epsilonA,
@@ -506,7 +502,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 				int i = x + y * w;
 				for (x = 0; x < w; x++) {
-					double l = arrayL[i];
+					// double l = arrayL[i];
 					double a = arrayA[i];
 					double b = arrayB[i];
 					if (a > 21 || b < 5) { // a < -5 &&
@@ -519,26 +515,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					i++;
 				}
 			}
-			
-			private void processNIRtopImageByLAB(final ImageData imageData, final int w, final int[] rgbArray,
-					final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
-					final double[] arrayB, int x) {
-				if (y == 0)
-					System.out.println("LAB processing of NIR image..." + imageData.toString() + "");
-
-				int i = x + y * w;
-				for (x = 0; x < w; x++) {
-					double l = arrayL[i];
-//					double a = arrayA[i];
-//					double b = arrayB[i];
-					if (l > 60 || l < 38) { // a < -5 &&
-						rgbArray[i] = iBackgroundFill;
-					}
-					i++;
-				}
-			}
-
-
 
 			private void processFluoTopImageByLAB(final ImageData imageData, final int w, final int[] rgbArray,
 								final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
@@ -565,21 +541,23 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 			private void postProcessThisIsUnclearCode(final int w, final int[] rgbArray, final int iBackgroundFill,
 								final double sidepercent, final int y, final double epsilonB, double factor,
-								ArrayList<Integer> backgroundPixelsArr) {
+								ArrayList<Color_CIE_Lab> backgroundPixelsArr) {
 				int x;
 				for (x = 0; x < w * sidepercent; x++) {
 					// empty
 				}
-				int[] backgroundPixels = new int[backgroundPixelsArr.size()];
+				Color_CIE_Lab[] backgroundPixels = new Color_CIE_Lab[backgroundPixelsArr.size()];
 				int i = 0;
-				for (int b : backgroundPixelsArr)
+				for (Color_CIE_Lab b : backgroundPixelsArr)
 					backgroundPixels[i++] = b;
 				for (; x < (int) (w - w * sidepercent); x++) {
 					int xyw = x + y * w;
-					int p = rgbArray[xyw];
+					double l = arrayL[xyw];
+					double a = arrayA[xyw];
+					double b = arrayB[xyw];
 
-					for (Integer c : backgroundPixels) {
-						if (y < w * 0.03 || ColorUtil.deltaE2000(c, p) < epsilonB * factor) {
+					for (Color_CIE_Lab c : backgroundPixels) {
+						if (y < w * 0.03 || ColorUtil.deltaE2000(c, l, a, b) < epsilonB * factor) {
 							rgbArray[xyw] = iBackgroundFill;
 						}
 					}
@@ -608,41 +586,43 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			private void processImageWithoutBackgroundImage(final ImageData imageData, final int w, final int[] rgbArray,
 								final int iBackgroundFill, final double sidepercent, final int y, final double epsilonA,
 								final ImageConfiguration config, final double[] arrayL, final double[] arrayA, final double[] arrayB,
-								double factor, ArrayList<Integer> backgroundPixelsArr) {
+								double factor, ArrayList<Color_CIE_Lab> backgroundPixelsArr) {
 				int x;
 				if (y == 0)
 					System.out.println("Has NO background image, interpreting side border colors as background..."
 										+ imageData.toString() + ", " + config.toString() + ")");
 				for (x = 0; x < w * sidepercent; x++) {
 					int xyw = x + y * w;
-					int bp = rgbArray[xyw];
 					double l = arrayL[xyw];
 					double a = arrayA[xyw];
 					double b = arrayB[xyw];
 
 					rgbArray[xyw] = iBackgroundFill;
 					boolean newBackgroundColor = true;
-					for (Integer c : backgroundPixelsArr) {
+					for (Color_CIE_Lab c : backgroundPixelsArr) {
 						if (ColorUtil.deltaE2000(c, l, a, b) < epsilonA * factor) {
 							newBackgroundColor = false;
 							break;
 						}
 					}
 					if (newBackgroundColor)
-						backgroundPixelsArr.add(bp);
+						backgroundPixelsArr.add(new Color_CIE_Lab(l, a, b));
 				}
 				for (x = (int) (w - w * sidepercent); x < w; x++) {
-					int bp = rgbArray[x + y * w];
+					int off = x + y * w;
+					double bpL = arrayL[off];
+					double bpA = arrayA[off];
+					double bpB = arrayB[off];
 					rgbArray[x + y * w] = iBackgroundFill;
 					boolean newBackgroundColor = true;
-					for (Integer c : backgroundPixelsArr) {
-						if (ColorUtil.deltaE2000(c, bp) < epsilonA * factor) {
+					for (Color_CIE_Lab c : backgroundPixelsArr) {
+						if (ColorUtil.deltaE2000(c, bpL, bpA, bpB) < epsilonA * factor) {
 							newBackgroundColor = false;
 							break;
 						}
 					}
 					if (newBackgroundColor)
-						backgroundPixelsArr.add(bp);
+						backgroundPixelsArr.add(new Color_CIE_Lab(bpL, bpA, bpB));
 				}
 			}
 		};
