@@ -3,12 +3,13 @@
  *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *
  *************************************************************************/
-package de.ipk.ag_ba.postgresql;
+package de.ipk.ag_ba.image_utils;
 
 /**
- * @author entzian, klukas
+ * @author entzian
  *
  */
-public enum Position {
-	FIRST_FIELD, FIRST_ROW, FIRST_COLUMN, LAST_COLUMN, REMAINING
+public enum PrintOption {
+	GRAVISTO_SERVICE, IMAGEJ, CONSOLE
+
 }

@@ -18,8 +18,8 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
-import de.ipk.ag_ba.postgresql.MorphologicalOperators;
-import de.ipk.ag_ba.postgresql.PixelSegmentation;
+import de.ipk.ag_ba.image_utils.MorphologicalOperators;
+import de.ipk.ag_ba.image_utils.PixelSegmentation;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
@@ -248,6 +248,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		if (removeSmallSegments)
 			if (config == ImageConfiguration.FluoTop)
 				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, limg, (int) (w * h * 0.005d));
+			if (config == ImageConfiguration.NirTop)
+				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, limg, 4);//
 			else
 				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, limg, (int) (w * h * 0.005d));//
 
@@ -470,6 +472,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					factor = 0.2;
 
 				int x = 0;
+				if (config == ImageConfiguration.NirSide || config == ImageConfiguration.NirTop) {
+					processNIRtopImageByLAB(imageData, w, rgbArray, iBackgroundFill, y, arrayL, arrayA, arrayB, x);
+				} else
 				if (config == ImageConfiguration.RgbSide || config == ImageConfiguration.RgbTop) {
 					processRGBtopImageByLAB(imageData, w, rgbArray, iBackgroundFill, y, arrayL, arrayA, arrayB, x);
 				} else
@@ -514,6 +519,26 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					i++;
 				}
 			}
+			
+			private void processNIRtopImageByLAB(final ImageData imageData, final int w, final int[] rgbArray,
+					final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
+					final double[] arrayB, int x) {
+				if (y == 0)
+					System.out.println("LAB processing of NIR image..." + imageData.toString() + "");
+
+				int i = x + y * w;
+				for (x = 0; x < w; x++) {
+					double l = arrayL[i];
+//					double a = arrayA[i];
+//					double b = arrayB[i];
+					if (l > 60 || l < 38) { // a < -5 &&
+						rgbArray[i] = iBackgroundFill;
+					}
+					i++;
+				}
+			}
+
+
 
 			private void processFluoTopImageByLAB(final ImageData imageData, final int w, final int[] rgbArray,
 								final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,

@@ -3,7 +3,7 @@
  *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *
  *************************************************************************/
-package de.ipk.ag_ba.postgresql;
+package de.ipk.ag_ba.image_utils;
 
 /**
  * @author entzian

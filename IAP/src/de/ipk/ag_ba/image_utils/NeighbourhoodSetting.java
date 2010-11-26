@@ -6,7 +6,7 @@
 /*
  * Created on Oct 29, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.postgresql;
+package de.ipk.ag_ba.image_utils;
 
 /**
  * @author klukas

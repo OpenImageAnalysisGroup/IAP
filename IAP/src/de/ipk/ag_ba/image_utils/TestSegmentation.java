@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.postgresql;
+package de.ipk.ag_ba.image_utils;
 
 import java.util.ArrayList;
 
