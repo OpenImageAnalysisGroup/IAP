@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
@@ -17,7 +16,6 @@ import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.image_utils.FlexibleImage;
-import de.ipk.ag_ba.image_utils.LayeringTyp;
 import de.ipk.ag_ba.image_utils.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
@@ -223,45 +221,6 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;
-	}
-
-	private static Geometry detectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg) {
-
-		int left = w;
-		int right = 0;
-		int top = h;
-
-		for (int x = 0; x < w; x++)
-			for (int y = h - 1; y > 0; y--) {
-				int o = x + y * w;
-				if (y > h * 0.95) {
-					rgbArray[o] = iBackgroundFill;
-					continue;
-				}
-				if (rgbArray[o] == iBackgroundFill)
-					continue;
-
-				if (rgbArray[o] != iBackgroundFill) {
-					if (x < left)
-						left = x;
-					if (x > right)
-						right = x;
-					if (y < top)
-						top = y;
-				}
-			}
-
-		long filled = 0;
-		for (int x = 0; x < w; x++) {
-			for (int y = h - 1; y > 0; y--) {
-				int o = x + y * w;
-				if (rgbArray[o] != iBackgroundFill) {
-					filled++;
-				}
-			}
-		}
-
-		return new Geometry(top, left, right, filled);
 	}
 
 	@Override
