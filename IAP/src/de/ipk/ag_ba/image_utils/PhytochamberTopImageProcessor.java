@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 
 /**
- * @author entzian
+ * @author entzian, klukas
  * 
  */
 public class PhytochamberTopImageProcessor {
@@ -43,7 +43,7 @@ public class PhytochamberTopImageProcessor {
 	private BufferedImage outputFluorImage;
 	private BufferedImage outputNearImage;
 
-	private final PhytopImageProcessorOptions options = new PhytopImageProcessorOptions();
+	private final PhytoTopImageProcessorOptions options = new PhytoTopImageProcessorOptions();
 
 	public static void main(String[] args) throws IOException, Exception {
 
