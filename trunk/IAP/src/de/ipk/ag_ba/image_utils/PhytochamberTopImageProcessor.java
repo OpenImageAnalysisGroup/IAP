@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
@@ -97,8 +96,8 @@ public class PhytochamberTopImageProcessor {
 		// PrintImage.printImage(test.getInitialFluorImageAsBI(), "Anfangsbild");
 		PrintImage.printImage(test.getResultRgbImageAsBI(),
 							"Result RGB-Image");
-		// PrintImage.printImage(test.getResultFluorIMageAsBI(),
-		// "Result Fluor-Image");
+		PrintImage.printImage(test.getResultFluorImageAsBI(),
+							"Result Fluor-Image");
 		// PrintImage.printImage(test.getResultNearIMageAsBI(),
 		// "Result Near-Image");
 	}
@@ -558,6 +557,23 @@ public class PhytochamberTopImageProcessor {
 		io.resize(rgbImage.getWidth(), rgbImage.getHeight());
 		io.scale(scaleX, scaleY);
 		io.translate(translateX, translateY);
+		// io.rotate(rotationAngle);
+
+		return io.getImageAsBufferedImage();
+
+	}
+
+	public BufferedImage tryFitFluoImageToRGBImage() {
+
+		rotationAngle = 0;
+		translateX = 0;
+		translateY = 0;
+
+		ImageOperation io = new ImageOperation(getInitialFluorImageAsBI());
+
+		io.resize(rgbImage.getWidth(), rgbImage.getHeight());
+		io.scale(scaleX, scaleY);
+		io.translate(translateX, translateY);
 		io.rotate(rotationAngle);
 
 		return io.getImageAsBufferedImage();
@@ -592,15 +608,85 @@ public class PhytochamberTopImageProcessor {
 
 	private BufferedImage mergeMask(BufferedImage rgbMask, BufferedImage fluoMask) {
 
-		int[] rgbImage1A = ImageConverter.convertBIto1A(newRGBImage);
-		int[] fluoImage1A = ImageConverter.convertBIto1A(newFluorImage);
+		// todo rotate and try...
+		int largestResultImageSize = -1;
+		double bestAngle = 0, bestScale = 1;
+		MaskOperation bestMask = null;
 
-		MaskOperation o = new MaskOperation(rgbMask, fluoMask, getBackground());
-		o.doMerge();
+		// try different rotations
+		for (double angle = -5; angle <= 5; angle += 0.5) {
+
+			ImageOperation io = new ImageOperation(fluoMask);
+			io.rotate(angle);
+			BufferedImage rotFluo = io.getImageAsBufferedImage();
+
+			MaskOperation o = new MaskOperation(rgbMask, rotFluo, getBackground());
+			o.doMerge();
+
+			if (o.getModifiedPixels() > largestResultImageSize) {
+				bestAngle = angle;
+				largestResultImageSize = o.getModifiedPixels();
+				bestMask = o;
+			}
+		}
+
+		if (bestMask == null) {
+			MaskOperation o = new MaskOperation(rgbMask, fluoMask, getBackground());
+			o.doMerge();
+			bestMask = o;
+		}
+
+		if (Math.abs(bestAngle) > 0.001) {
+			System.out.println("Detected plant rotation within snapshot: " + bestAngle + " degree");
+			{
+				// rotate modified source image
+				ImageOperation io = new ImageOperation(newFluorImage);
+				io.rotate(bestAngle);
+				newFluorImage = io.getImageAsBufferedImage();
+			}
+			{
+				// rotate mask
+				ImageOperation io = new ImageOperation(fluoMask);
+				io.rotate(bestAngle);
+				fluoMask = io.getImageAsBufferedImage();
+			}
+		}
+		largestResultImageSize = 0;
+		// try different scaling
+
+		// setScaleX(0.95);
+		// setScaleY(0.87);
+		double yscale = 0.915789473684211;
+		for (double scale = 0.7; scale <= 1.3; scale += 0.03) {
+
+			ImageOperation io = new ImageOperation(fluoMask);
+			io.scale(scale, scale * yscale);
+			// io.scale(scaleX * scale, scaleY * scale);
+			BufferedImage rotFluo = io.getImageAsBufferedImage();
+
+			MaskOperation o = new MaskOperation(rgbMask, rotFluo, getBackground());
+			o.doMerge();
+
+			if (o.getModifiedPixels() > largestResultImageSize) {
+				bestScale = scale;
+				largestResultImageSize = o.getModifiedPixels();
+				bestMask = o;
+			}
+		}
+		if (Math.abs(bestScale - 1) > 0.001) {
+			System.out.println("Detected difference of scaling in comparison to pre-defined scaling. Difference: " + (int) (bestScale * 100) + " %");
+			ImageOperation io = new ImageOperation(newFluorImage);
+			io.scale(bestScale, bestScale * yscale);
+			newFluorImage = io.getImageAsBufferedImage();
+		}
+
+		int[] rgbImage1A = ImageConverter.convertBIto1A(newRGBImage);
+
+		int[] fluoImage1A = ImageConverter.convertBIto1A(newFluorImage);
 
 		// modify source images according to merged mask
 		int i = 0;
-		for (int m : o.getMaskAs1Array()) {
+		for (int m : bestMask.getMaskAs1Array()) {
 			if (m == 0) {
 				rgbImage1A[i] = getBackground();
 				fluoImage1A[i] = getBackground();
@@ -692,7 +778,8 @@ public class PhytochamberTopImageProcessor {
 			}
 		}
 
-		GravistoService.showImage(secondImage, "ImageLayering");
+		// GravistoService.showImage(secondImage, "ImageLayering");
+		PrintImage.printImage(secondImage);
 	}
 
 	public ArrayList<NumericMeasurementInterface> doAnalyseResultImages(LoadedImage limg, String experimentNameExtension) {

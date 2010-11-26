@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
@@ -139,6 +140,12 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						// process images
 						PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(lVIS.getLoadedImage(), lFLUO.getLoadedImage(), lNIR.getLoadedImage());
 						ptip.doPhytoTopImageProcessor();
+						{
+							PhytochamberTopImageProcessor ptip2 = new PhytochamberTopImageProcessor(lVIS.getLoadedImage(), lFLUO.getLoadedImage(), lNIR
+												.getLoadedImage());
+							BufferedImage bi = ptip2.tryFitFluoImageToRGBImage();
+							ptip2.doImageLayering(ptip.getInitialRgbImageAsBI(), bi, false);
+						}
 
 						lVIS = new LoadedImage(lVIS, ptip.getResultRgbImageAsBI());
 						lFLUO = new LoadedImage(lFLUO, ptip.getResultFluorImageAsBI());
