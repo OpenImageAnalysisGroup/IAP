@@ -17,7 +17,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,6 +43,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.view.AttributeComponent;
 import org.graffiti.plugin.view.GraphElementComponent;
 import org.graffiti.plugin.view.View;
@@ -67,13 +67,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  * @author klukas
  */
 public class WebFolder {
-	public static NavigationButton getBrowserNavigationEntity(final HashMap<String, String> folder2url,
-			String title, String icon, final String url, final String referenceTitle, final String referenceImage,
+	public static NavigationButton getBrowserNavigationEntity(final HashMap<String, String> folder2url, String title,
+			String icon, final String url, final String referenceTitle, final String referenceImage,
 			final String referenceURL, final String[] valid, final String introTxt,
 			final String optSubFolderForFolderItems, GUIsetting guiSetting) {
 
-		NavigationButton nav = new NavigationButton(new AbstractNavigationAction(
-				"Open web-folder content") {
+		NavigationButton nav = new NavigationButton(new AbstractNavigationAction("Open web-folder content") {
 			private NavigationButton src;
 
 			@Override
@@ -82,8 +81,7 @@ public class WebFolder {
 			}
 
 			@Override
-			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
@@ -100,8 +98,7 @@ public class WebFolder {
 						}
 
 						@Override
-						public ArrayList<NavigationButton> getResultNewNavigationSet(
-								ArrayList<NavigationButton> currentSet) {
+						public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 							return null;
 						}
 
@@ -110,8 +107,8 @@ public class WebFolder {
 							return null;
 						}
 					};
-					NavigationButton website = new NavigationButton(action, referenceTitle,
-							referenceImage, src.getGUIsetting());
+					NavigationButton website = new NavigationButton(action, referenceTitle, referenceImage,
+							src.getGUIsetting());
 					website.setToolTipText("Open " + referenceURL);
 					actions.add(website);
 				}
@@ -126,8 +123,7 @@ public class WebFolder {
 							}
 
 							@Override
-							public ArrayList<NavigationButton> getResultNewNavigationSet(
-									ArrayList<NavigationButton> currentSet) {
+							public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 								return null;
 							}
 
@@ -137,8 +133,8 @@ public class WebFolder {
 							}
 						};
 
-						NavigationButton website = new NavigationButton(action, fp.split(":")[0],
-								"img/dataset.png", src.getGUIsetting());
+						NavigationButton website = new NavigationButton(action, fp.split(":")[0], "img/dataset.png",
+								src.getGUIsetting());
 						website.setToolTipText("Open " + folder2url.get("").split(":", 2)[1]);
 						actions.add(website);
 					}
@@ -183,8 +179,7 @@ public class WebFolder {
 
 				for (String f : folders) {
 					final String ff = f;
-					NavigationButton ne = new NavigationButton(new AbstractNavigationAction(
-							"Open web-folder") {
+					NavigationButton ne = new NavigationButton(new AbstractNavigationAction("Open web-folder") {
 						private NavigationButton src2;
 
 						@Override
@@ -193,8 +188,7 @@ public class WebFolder {
 						}
 
 						@Override
-						public ArrayList<NavigationButton> getResultNewNavigationSet(
-								ArrayList<NavigationButton> currentSet) {
+						public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 							ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 							res.add(src2);
 							return res;
@@ -261,8 +255,7 @@ public class WebFolder {
 	}
 
 	private static NavigationButton getPathwayViewEntity(final PathwayWebLinkItem mmc, GUIsetting guiSettings) {
-		NavigationButton ne = new NavigationButton(new AbstractNavigationAction(
-				"Load web-folder content") {
+		NavigationButton ne = new NavigationButton(new AbstractNavigationAction("Load web-folder content") {
 			private NavigationButton src = null;
 			private final ObjectRef graphRef = new ObjectRef();
 			private final ObjectRef scrollpaneRef = new ObjectRef();
@@ -271,10 +264,10 @@ public class WebFolder {
 			public void performActionCalculateResults(NavigationButton src) {
 				this.src = src;
 
-				URL url;
+				IOurl url;
 				try {
-					url = new URL(mmc.getURL());
-					final Graph g = MainFrame.getInstance().getGraph(mmc.getFileName(), url);
+					url = mmc.getURL();
+					final Graph g = MainFrame.getInstance().getGraph(url, url.getFileName());
 					graphRef.setObject(g);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
@@ -282,8 +275,7 @@ public class WebFolder {
 			}
 
 			@Override
-			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
@@ -302,8 +294,7 @@ public class WebFolder {
 					}
 
 					@Override
-					public ArrayList<NavigationButton> getResultNewNavigationSet(
-							ArrayList<NavigationButton> currentSet) {
+					public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 						return null;
 					}
 
@@ -324,8 +315,8 @@ public class WebFolder {
 
 				};
 
-				NavigationButton editInVanted = new NavigationButton(action, "Edit in VANTED",
-						"img/vanted1_0.png", src.getGUIsetting());
+				NavigationButton editInVanted = new NavigationButton(action, "Edit in VANTED", "img/vanted1_0.png",
+						src.getGUIsetting());
 				result.add(editInVanted);
 
 				JComponent zoomSlider = getZoomSliderForGraph(scrollpaneRef);
@@ -339,7 +330,8 @@ public class WebFolder {
 				try {
 					Graph g = (Graph) graphRef.getObject();
 					if (g != null) {
-						boolean isMetaCrop = mmc.getURL().contains("http://pgrc-16.ipk-gatersleben.de/wgrp/nwg/metacrop");
+						boolean isMetaCrop = mmc.getURL().toString()
+								.contains("http://pgrc-16.ipk-gatersleben.de/wgrp/nwg/metacrop");
 						if (isMetaCrop) {
 							System.out.println("Adding MetaCrop links");
 							addAnnotationsToGraphElements(g);
@@ -586,8 +578,7 @@ public class WebFolder {
 			}
 
 			@Override
-			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				return null;
 			}
 

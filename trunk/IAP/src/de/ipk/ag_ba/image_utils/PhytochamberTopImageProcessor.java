@@ -10,8 +10,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
@@ -37,35 +35,15 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
  */
 public class PhytochamberTopImageProcessor {
 
-	private BufferedImage rgbImage;
-	private BufferedImage fluorImage;
-	private BufferedImage nearImage;
+	private BufferedImage inputRGBImage;
+	private BufferedImage inputFluorImage;
+	private BufferedImage inputNearImage;
 
-	private BufferedImage newRGBImage;
-	private BufferedImage newFluorImage;
-	private BufferedImage newNearImage;
+	private BufferedImage outputRGBImage;
+	private BufferedImage outputFluorImage;
+	private BufferedImage outputNearImage;
 
-	private int rotationAngle;
-	private double scaleX;
-	private double scaleY;
-	private int translateX;
-	private int translateY;
-
-	private double fluoEpsilonA;
-	private double fluoEpsilonB;
-	private double rgbEpsilonB;
-	private double rgbEpsilonA;
-	private double nearEpsilonA;
-	private double nearEpsilonB;
-
-	private int rgbNumberOfErodeLoops;
-	private int rgbNumberOfDilateLoops;
-	private int fluoNumberOfErodeLoops;
-	private int fluoNumberOfDilateLoops;
-	private int nearNumberOfErodeLoops;
-	private int nearNumberOfDilateLoops;
-
-	private int background;
+	private final PhytopImageProcessorOptions options = new PhytopImageProcessorOptions();
 
 	public static void main(String[] args) throws IOException, Exception {
 
@@ -78,15 +56,15 @@ public class PhytochamberTopImageProcessor {
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		ResourceIOManager.registerIOHandler(new MongoDBhandler());
 
-		BufferedImage imgFluo = ImageIO.read(urlFlu.getInputStream());
-		BufferedImage imgVisible = ImageIO.read(urlVis.getInputStream());
-		BufferedImage imgNIR = ImageIO.read(urlNIR.getInputStream());
+		FlexibleImage imgFluo = new FlexibleImage(urlFlu);
+		FlexibleImage imgVisible = new FlexibleImage(urlVis);
+		FlexibleImage imgNIR = new FlexibleImage(urlNIR);
 
 		double scale = 1.0;
 		if (Math.abs(scale - 1) > 0.0001) {
 			System.out.println("Scaling!");
-			imgFluo = new ImageOperation(imgFluo).resize(scale).getImageAsBufferedImage();
-			imgVisible = new ImageOperation(imgVisible).resize(scale).getImageAsBufferedImage();
+			imgFluo = new ImageOperation(imgFluo).resize(scale).getImage();
+			imgVisible = new ImageOperation(imgVisible).resize(scale).getImage();
 		}
 
 		System.out.println("Process...");
@@ -94,178 +72,41 @@ public class PhytochamberTopImageProcessor {
 		PhytochamberTopImageProcessor test = new PhytochamberTopImageProcessor(imgVisible, imgFluo, imgNIR);
 		test.doPhytoTopImageProcessor();
 		// PrintImage.printImage(test.getInitialFluorImageAsBI(), "Anfangsbild");
-		PrintImage.printImage(test.getResultRgbImageAsBI(),
-							"Result RGB-Image");
-		PrintImage.printImage(test.getResultFluorImageAsBI(),
-							"Result Fluor-Image");
+		test.getResultRgbImage().print("Result RGB-Image");
+		test.getResultFluorImage().print("Result Fluor-Image");
 		// PrintImage.printImage(test.getResultNearIMageAsBI(),
 		// "Result Near-Image");
 	}
 
-	public PhytochamberTopImageProcessor(BufferedImage rgbImage, BufferedImage fluorImage, BufferedImage nearIfImage) {
+	public PhytochamberTopImageProcessor(FlexibleImage rgbImage, FlexibleImage fluorImage, FlexibleImage nearIfImage) {
 
-		setRgbImageFromIB(rgbImage);
-		setFluorImageFromIB(fluorImage);
-		setNearImageFromIB(nearIfImage);
+		setRgbImageFromIB(rgbImage.getBufferedImage());
+		setFluorImageFromIB(fluorImage.getBufferedImage());
+		setNearImageFromIB(nearIfImage.getBufferedImage());
 
-		initStandardValues();
+		options.initStandardValues();
 
-		long pixels = rgbImage.getWidth() * fluorImage.getHeight() + fluorImage.getWidth() * fluorImage.getHeight() + nearIfImage.getWidth()
-							* nearIfImage.getHeight();
+		long pixels = rgbImage.getWidth() * fluorImage.getHeight() + fluorImage.getWidth() * fluorImage.getHeight()
+				+ nearIfImage.getWidth() * nearIfImage.getHeight();
 		System.out.println("Pixels: " + pixels);
-	}
-
-	public PhytochamberTopImageProcessor(int[] rgbImage, int rgbWidth, int rgbHeight, int[] fluorImage, int fluoWidth, int fluoHeight, int[] nearIfImage,
-						int nearWidth, int nearHeight) {
-		this(ImageConverter.convert1AtoBI(rgbWidth, rgbHeight, rgbImage), ImageConverter.convert1AtoBI(fluoWidth, fluoHeight, fluorImage), ImageConverter
-							.convert1AtoBI(nearWidth, nearHeight, nearIfImage));
-	}
-
-	public PhytochamberTopImageProcessor(int[][] rgbImage, IOurl urlRGB, int[][] fluorImage, IOurl urlFluo, int[][] nearIfImage, IOurl urlNear) {
-		this(ImageConverter.convert2AtoBI(rgbImage), ImageConverter.convert2AtoBI(fluorImage), ImageConverter.convert2AtoBI(nearIfImage));
-	}
-
-	// ########## SET ###############
-
-	public void setRotationAngle(int rotationAngle) {
-		this.rotationAngle = rotationAngle;
-	}
-
-	public void setScaleX(double scaleX) {
-		this.scaleX = scaleX;
-	}
-
-	public void setScaleY(double scaleY) {
-		this.scaleY = scaleY;
-	}
-
-	public void setScaleXY(double scaleX, double scaleY) {
-		this.scaleX = scaleX;
-		this.scaleY = scaleY;
-	}
-
-	public void setTranslateX(int translateX) {
-		this.translateX = translateX;
-	}
-
-	public void setTranslateY(int translateY) {
-		this.translateY = translateY;
-	}
-
-	public void setTranslateXY(int translateX, int translateY) {
-		this.translateX = translateX;
-		this.translateY = translateY;
-	}
-
-	// SET Epsilon
-
-	public void setFluoEpsilonA(double fluoEpsilonA) {
-		this.fluoEpsilonA = fluoEpsilonA;
-	}
-
-	public void setFluoEpsilonB(double fluoEpsilonB) {
-		this.fluoEpsilonB = fluoEpsilonB;
-	}
-
-	public void setFluoEpsilonAB(double fluoEpsilonA, double fluoEpsilonB) {
-		this.fluoEpsilonA = fluoEpsilonA;
-		this.fluoEpsilonB = fluoEpsilonB;
-	}
-
-	public void setRgbEpsilonB(double rgbEpsilonB) {
-		this.rgbEpsilonB = rgbEpsilonB;
-	}
-
-	public void setRgbEpsilonA(double rgbEpsilonA) {
-		this.rgbEpsilonA = rgbEpsilonA;
-	}
-
-	public void setRgbEpsilonAB(double rgbEpsilonA, double rgbEpsilonB) {
-		this.rgbEpsilonA = rgbEpsilonA;
-		this.rgbEpsilonB = rgbEpsilonB;
-	}
-
-	public void setNearEpsilonA(double nearEpsilonA) {
-		this.nearEpsilonA = nearEpsilonA;
-	}
-
-	public void setNearEpsilonB(double nearEpsilonB) {
-		this.nearEpsilonB = nearEpsilonB;
-	}
-
-	public void setNearEpsilonAB(double nearEpsilonA, double nearEpsilonB) {
-		this.nearEpsilonA = nearEpsilonA;
-		this.nearEpsilonB = nearEpsilonB;
-	}
-
-	public void setRgbNumberOfErodeLoops(int rgbNumberOfErodeLoops) {
-		this.rgbNumberOfErodeLoops = rgbNumberOfErodeLoops;
-	}
-
-	public void setRgbNumberOfDilateLoops(int rgbNumberOfDilateLoops) {
-		this.rgbNumberOfDilateLoops = rgbNumberOfDilateLoops;
-	}
-
-	public void setFluoNumberOfErodeLoops(int fluoNumberOfErodeLoops) {
-		this.fluoNumberOfErodeLoops = fluoNumberOfErodeLoops;
-	}
-
-	public void setFluoNumberOfDilateLoops(int fluoNumberOfDilateLoops) {
-		this.fluoNumberOfDilateLoops = fluoNumberOfDilateLoops;
-	}
-
-	public void setNearNumberOfErodeLoops(int nearNumberOfErodeLoops) {
-		this.nearNumberOfErodeLoops = nearNumberOfErodeLoops;
-	}
-
-	public void setNearNumberOfDilateLoops(int nearNumberOfDilateLoops) {
-		this.nearNumberOfDilateLoops = nearNumberOfDilateLoops;
-	}
-
-	public void setBackground(int background) {
-		this.background = background;
 	}
 
 	// SET RGB
 
-	public void setRgbImageFromIB(BufferedImage rgbImage) {
-		this.rgbImage = rgbImage;
-	}
-
-	public void setRgbImageFrom1A(int[] rgbImage, int width, int height) {
-		this.rgbImage = ImageConverter.convert1AtoBI(width, height, rgbImage);
-	}
-
-	public void setRgbImageFrom2A(int[][] rgbImage) {
-		this.rgbImage = ImageConverter.convert2AtoBI(rgbImage);
+	private void setRgbImageFromIB(BufferedImage rgbImage) {
+		this.inputRGBImage = rgbImage;
 	}
 
 	// SET Fluor
 
-	public void setFluorImageFromIB(BufferedImage fluorImage) {
-		this.fluorImage = fluorImage;
-	}
-
-	public void setFluorImageFrom1A(int[] fluoImage, int width, int height) {
-		this.fluorImage = ImageConverter.convert1AtoBI(width, height, fluoImage);
-	}
-
-	public void setFluorImageFrom2A(int[][] fluoImage) {
-		this.fluorImage = ImageConverter.convert2AtoBI(fluoImage);
+	private void setFluorImageFromIB(BufferedImage fluorImage) {
+		this.inputFluorImage = fluorImage;
 	}
 
 	// SET Near
 
-	public void setNearImageFromIB(BufferedImage nearImage) {
-		this.nearImage = nearImage;
-	}
-
-	public void setNearImageFrom1A(int[] nearImage, int width, int height) {
-		this.nearImage = ImageConverter.convert1AtoBI(width, height, nearImage);
-	}
-
-	public void setNearImageFrom2A(int[][] nearImage) {
-		this.nearImage = ImageConverter.convert2AtoBI(nearImage);
+	private void setNearImageFromIB(BufferedImage nearImage) {
+		this.inputNearImage = nearImage;
 	}
 
 	// SET Rest
@@ -274,190 +115,28 @@ public class PhytochamberTopImageProcessor {
 		// empty
 	}
 
-	// ########## GET #############
-
-	public int getRotationAngle() {
-		return rotationAngle;
+	public FlexibleImage getInputRgbImage() {
+		return new FlexibleImage(inputRGBImage);
 	}
 
-	public double getScaleX() {
-		return scaleX;
+	public FlexibleImage getInputFluorImage() {
+		return new FlexibleImage(inputFluorImage);
 	}
 
-	public double getScaleY() {
-		return scaleY;
+	public FlexibleImage getInitialNearImageAsBI() {
+		return new FlexibleImage(inputNearImage);
 	}
 
-	public int getTranslateX() {
-		return translateX;
+	public FlexibleImage getResultRgbImage() {
+		return new FlexibleImage(outputRGBImage);
 	}
 
-	public int getTranslateY() {
-		return translateY;
+	public FlexibleImage getResultFluorImage() {
+		return new FlexibleImage(outputFluorImage);
 	}
 
-	// GET Epsilon
-
-	public double getRgbEpsilonA() {
-		return rgbEpsilonA;
-	}
-
-	public double getRgbEpsilonB() {
-		return rgbEpsilonB;
-	}
-
-	public double getFluoEpsilonB() {
-		return fluoEpsilonB;
-	}
-
-	public double getFluoEpsilonA() {
-		return fluoEpsilonA;
-	}
-
-	public double getNearEpsilonB() {
-		return nearEpsilonB;
-	}
-
-	public double getNearEpsilonA() {
-		return nearEpsilonA;
-	}
-
-	// GET Number of Erode und Dilate loops
-
-	public int getNearNumberOfDilateLoops() {
-		return nearNumberOfDilateLoops;
-	}
-
-	public int getNearNumberOfErodeLoops() {
-		return nearNumberOfErodeLoops;
-	}
-
-	public int getFluoNumberOfDilateLoops() {
-		return fluoNumberOfDilateLoops;
-	}
-
-	public int getFluoNumberOfErodeLoops() {
-		return fluoNumberOfErodeLoops;
-	}
-
-	public int getRgbNumberOfDilateLoops() {
-		return rgbNumberOfDilateLoops;
-	}
-
-	public int getRgbNumberOfErodeLoops() {
-		return rgbNumberOfErodeLoops;
-	}
-
-	public int getBackground() {
-		return background;
-	}
-
-	// GET Initial RGB Image
-
-	public int getInitialRgbImageWidth() {
-		return rgbImage.getWidth();
-	}
-
-	public int getInitialRgbImageHeight() {
-		return rgbImage.getHeight();
-	}
-
-	public int[] getInitialRgbImageAs1A() {
-		return ImageConverter.convertBIto1A(rgbImage);
-	}
-
-	public int[][] getInitialRgbImageAs2A() {
-		return ImageConverter.convertBIto2A(rgbImage);
-	}
-
-	public BufferedImage getInitialRgbImageAsBI() {
-		return rgbImage;
-	}
-
-	// GET Initial Fluo Image
-
-	public int getInitialFluoImageWidth() {
-		return fluorImage.getWidth();
-	}
-
-	public int getInitialFluoImageHeight() {
-		return fluorImage.getHeight();
-	}
-
-	public int[] getInitialFluorImageAs1A() {
-		return ImageConverter.convertBIto1A(fluorImage);
-	}
-
-	public int[][] getInitialFluorImageAs2A() {
-		return ImageConverter.convertBIto2A(fluorImage);
-	}
-
-	public BufferedImage getInitialFluorImageAsBI() {
-		return fluorImage;
-	}
-
-	// GET Initial Near Image
-
-	public int getInitialNearImageWidth() {
-		return nearImage.getWidth();
-	}
-
-	public int getInitialNearImageHeight() {
-		return nearImage.getHeight();
-	}
-
-	public int[] getInitialNearImageAs1A() {
-		return ImageConverter.convertBIto1A(nearImage);
-	}
-
-	public int[][] getInitialNearImageAs2A() {
-		return ImageConverter.convertBIto2A(nearImage);
-	}
-
-	public BufferedImage getInitialNearImageAsBI() {
-		return nearImage;
-	}
-
-	// GET Result RGB IMage
-
-	public BufferedImage getResultRgbImageAsBI() {
-		return newRGBImage;
-	}
-
-	public int[] getResultRgbIMageAs1A() {
-		return ImageConverter.convertBIto1A(newRGBImage);
-	}
-
-	public int[][] getResultRgbIMageAs2A() {
-		return ImageConverter.convertBIto2A(newRGBImage);
-	}
-
-	// GET Result Fluo Image
-
-	public BufferedImage getResultFluorImageAsBI() {
-		return newFluorImage;
-	}
-
-	public int[] getResultFluorIMageAs1A() {
-		return ImageConverter.convertBIto1A(newFluorImage);
-	}
-
-	public int[][] getResultFluorIMageAs2A() {
-		return ImageConverter.convertBIto2A(newFluorImage);
-	}
-
-	// GET Result Near Image
-
-	public BufferedImage getResultNearImageAsBI() {
-		return newNearImage;
-	}
-
-	public int[] getResultNearIMageAs1A() {
-		return ImageConverter.convertBIto1A(newNearImage);
-	}
-
-	public int[][] getResultNearIMageAs2A() {
-		return ImageConverter.convertBIto2A(newNearImage);
+	public FlexibleImage getResultNearImage() {
+		return new FlexibleImage(outputNearImage);
 	}
 
 	// ########## PUBLIC ##############
@@ -465,122 +144,63 @@ public class PhytochamberTopImageProcessor {
 	public void doPhytoTopImageProcessor() {
 		long t1 = System.currentTimeMillis();
 
-		newFluorImage = fitFluoImageToRGBImage();
-		BufferedImage newOriginalFluorImage = newFluorImage;
+		outputFluorImage = fitFluoImageToRGBImage();
+		BufferedImage newOriginalFluorImage = outputFluorImage;
 
-		newFluorImage = preliminaryWorkFluo(newFluorImage, ImageConfiguration.FluoTop, getFluoEpsilonA(), getFluoEpsilonB());
-		newRGBImage = preliminaryWorkFluo(rgbImage, ImageConfiguration.RgbTop, getRgbEpsilonA(), getRgbEpsilonB());
-		newNearImage = preliminaryWorkFluo(nearImage, ImageConfiguration.NirTop, getNearEpsilonA(), getNearEpsilonB());
+		outputFluorImage = preliminaryWorkFluo(outputFluorImage, ImageConfiguration.FluoTop, options.getFluoEpsilonA(),
+				options.getFluoEpsilonB());
+		outputRGBImage = preliminaryWorkFluo(inputRGBImage, ImageConfiguration.RgbTop, options.getRgbEpsilonA(),
+				options.getRgbEpsilonB());
+		outputNearImage = preliminaryWorkFluo(inputNearImage, ImageConfiguration.NirTop, options.getNearEpsilonA(),
+				options.getNearEpsilonB());
 
-		BufferedImage newRGBImageMask = modifyMask(newRGBImage, getRgbNumberOfErodeLoops(), getRgbNumberOfDilateLoops(), ImageConfiguration.RgbTop);
-		BufferedImage newFluorImageMask = modifyMask(newFluorImage, getFluoNumberOfErodeLoops(), getFluoNumberOfDilateLoops(), ImageConfiguration.FluoTop);
+		BufferedImage newRGBImageMask = modifyMask(outputRGBImage, options.getRgbNumberOfErodeLoops(),
+				options.getRgbNumberOfDilateLoops(), ImageConfiguration.RgbTop);
+		BufferedImage newFluorImageMask = modifyMask(outputFluorImage, options.getFluoNumberOfErodeLoops(),
+				options.getFluoNumberOfDilateLoops(), ImageConfiguration.FluoTop);
 		// BufferedImage nearMask = modifyMask(newNearImage,
 		// getNearNumberOfErodeLoops(), getNearNumberOfDilateLoops(),
 		// ImageConfiguration.NirTop);
 
 		BufferedImage mask = mergeMask(newRGBImageMask, newFluorImageMask);
 
-		newNearImage = fitMaskToNearImage(mask);
+		outputNearImage = fitMaskToNearImage(mask);
 
-		newFluorImage = removeImageNoise(newFluorImage, newOriginalFluorImage, ImageConfiguration.FluoTop);
-		newRGBImage = removeImageNoise(newRGBImage, rgbImage, ImageConfiguration.RgbTop);
+		outputFluorImage = removeImageNoise(outputFluorImage, newOriginalFluorImage, ImageConfiguration.FluoTop);
+		outputRGBImage = removeImageNoise(outputRGBImage, inputRGBImage, ImageConfiguration.RgbTop);
 
 		long t2 = System.currentTimeMillis();
 		System.out.println("Finished in " + (t2 - t1) + " ms");
 	}
 
 	public void doImageLayering() {
-		doImageLayering(getInitialFluorImageAsBI(), getInitialRgbImageAsBI(), LayeringTyp.ROW_IMAGE);
+		doImageLayering(inputFluorImage, inputRGBImage, LayeringTyp.ROW_IMAGE);
 	}
 
 	public void doImageLayering(LayeringTyp typ) {
-		doImageLayering(getInitialFluorImageAsBI(), getInitialRgbImageAsBI(), typ);
+		doImageLayering(inputFluorImage, inputRGBImage, typ);
 	}
 
-	public void doImageLayering(BufferedImage firstImage, BufferedImage secondImage, LayeringTyp typ) {
+	public static void doImageLayering(BufferedImage firstImage, BufferedImage secondImage, LayeringTyp typ) {
 		imageLayering(firstImage, secondImage, typ);
 	}
 
-	// ############## PRINT ##################
-
-	// public void printImage(BufferedImage image) {
-	// printImageGS(image, "Bild");
-	// }
-	//
-	// public void printImageGS(BufferedImage image, String text) {
-	// GravistoService.showImage(image, text);
-	// }
-	//
-	// public void printImageJI(BufferedImage image) {
-	// printImageJI(image, "Image");
-	// }
-	//
-	// public void printImageJI(BufferedImage image, String text) {
-	//
-	// ImagePlus img = ImageConverter.convertBItoIJ(image);
-	// img.show(text);
-	// }
-
 	// ########## PRIVATE ############
 
-	private void initStandardValues() {
-		setRotationAngle(-3);
-
-		setScaleX(0.95);
-		setScaleY(0.87);
-
-		setTranslateX(0);
-		setTranslateY(-15);
-
-		setRgbEpsilonA(2.5);
-		setRgbEpsilonB(2.5);
-
-		setFluoEpsilonA(0.5);
-		setFluoEpsilonB(0.5);
-
-		setNearEpsilonA(0.5);
-		setNearEpsilonB(1.0);
-
-		setRgbNumberOfErodeLoops(2);
-		setRgbNumberOfDilateLoops(5);
-		setFluoNumberOfErodeLoops(4);
-		setFluoNumberOfDilateLoops(20);
-		setNearNumberOfErodeLoops(0);
-		setNearNumberOfDilateLoops(0);
-
-		setBackground(PhenotypeAnalysisTask.BACKGROUND_COLOR.getRGB());
-	}
-
 	private BufferedImage fitFluoImageToRGBImage() {
-		ImageOperation io = new ImageOperation(getInitialFluorImageAsBI());
+		ImageOperation io = new ImageOperation(inputFluorImage);
 
-		io.resize(rgbImage.getWidth(), rgbImage.getHeight());
-		io.scale(scaleX, scaleY);
-		io.translate(translateX, translateY);
-		// io.rotate(rotationAngle);
-
-		return io.getImageAsBufferedImage();
-
-	}
-
-	public BufferedImage tryFitFluoImageToRGBImage() {
-
-		rotationAngle = 0;
-		translateX = 0;
-		translateY = 0;
-
-		ImageOperation io = new ImageOperation(getInitialFluorImageAsBI());
-
-		io.resize(rgbImage.getWidth(), rgbImage.getHeight());
-		io.scale(scaleX, scaleY);
-		io.translate(translateX, translateY);
-		io.rotate(rotationAngle);
+		io.resize(inputRGBImage.getWidth(), inputRGBImage.getHeight());
+		io.scale(options.getScaleX(), options.getScaleY());
+		io.translate(options.getTranslateX(), options.getTranslateY());
+		io.rotate(options.getRotationAngle());
 
 		return io.getImageAsBufferedImage();
 
 	}
 
-	private BufferedImage preliminaryWorkFluo(BufferedImage workImage, ImageConfiguration cameraTyp, double epsilonA, double epsiolonB) {
+	private BufferedImage preliminaryWorkFluo(BufferedImage workImage, ImageConfiguration cameraTyp, double epsilonA,
+			double epsiolonB) {
 
 		SubstanceInterface substance = new Substance();
 		substance.setName(cameraTyp.toString());
@@ -589,13 +209,15 @@ public class PhytochamberTopImageProcessor {
 		LoadedImage limg = new LoadedImage(sample, workImage);
 		limg.setURL(new IOurl(""));
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-		PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null, epsilonA, epsiolonB);
+		PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null,
+				epsilonA, epsiolonB);
 
 		return workImage;
 
 	}
 
-	private BufferedImage modifyMask(BufferedImage workImage, int NumberOfErodeLoops, int NumberOfDilateLoops, ImageConfiguration typ) {
+	private BufferedImage modifyMask(BufferedImage workImage, int NumberOfErodeLoops, int NumberOfDilateLoops,
+			ImageConfiguration typ) {
 
 		ImageOperation io = new ImageOperation(workImage);
 		for (int i = 0; i < NumberOfErodeLoops; i++)
@@ -620,7 +242,7 @@ public class PhytochamberTopImageProcessor {
 			io.rotate(angle);
 			BufferedImage rotFluo = io.getImageAsBufferedImage();
 
-			MaskOperation o = new MaskOperation(rgbMask, rotFluo, getBackground());
+			MaskOperation o = new MaskOperation(rgbMask, rotFluo, options.getBackground());
 			o.doMerge();
 
 			if (o.getModifiedPixels() > largestResultImageSize) {
@@ -631,7 +253,7 @@ public class PhytochamberTopImageProcessor {
 		}
 
 		if (bestMask == null) {
-			MaskOperation o = new MaskOperation(rgbMask, fluoMask, getBackground());
+			MaskOperation o = new MaskOperation(rgbMask, fluoMask, options.getBackground());
 			o.doMerge();
 			bestMask = o;
 		}
@@ -640,9 +262,9 @@ public class PhytochamberTopImageProcessor {
 			System.out.println("Detected plant rotation within snapshot: " + bestAngle + " degree");
 			{
 				// rotate modified source image
-				ImageOperation io = new ImageOperation(newFluorImage);
+				ImageOperation io = new ImageOperation(outputFluorImage);
 				io.rotate(bestAngle);
-				newFluorImage = io.getImageAsBufferedImage();
+				outputFluorImage = io.getImageAsBufferedImage();
 			}
 			{
 				// rotate mask
@@ -664,7 +286,7 @@ public class PhytochamberTopImageProcessor {
 			// io.scale(scaleX * scale, scaleY * scale);
 			BufferedImage rotFluo = io.getImageAsBufferedImage();
 
-			MaskOperation o = new MaskOperation(rgbMask, rotFluo, getBackground());
+			MaskOperation o = new MaskOperation(rgbMask, rotFluo, options.getBackground());
 			o.doMerge();
 
 			if (o.getModifiedPixels() > largestResultImageSize) {
@@ -674,41 +296,44 @@ public class PhytochamberTopImageProcessor {
 			}
 		}
 		if (Math.abs(bestScale - 1) > 0.001) {
-			System.out.println("Detected difference of scaling in comparison to pre-defined scaling. Difference: " + (int) (bestScale * 100) + " %");
-			ImageOperation io = new ImageOperation(newFluorImage);
+			System.out.println("Detected difference of scaling in comparison to pre-defined scaling. Difference: "
+					+ (int) (bestScale * 100) + " %");
+			ImageOperation io = new ImageOperation(outputFluorImage);
 			io.scale(bestScale, bestScale * yscale);
-			newFluorImage = io.getImageAsBufferedImage();
+			outputFluorImage = io.getImageAsBufferedImage();
 		}
 
-		int[] rgbImage1A = ImageConverter.convertBIto1A(newRGBImage);
+		int[] rgbImage1A = ImageConverter.convertBIto1A(outputRGBImage);
 
-		int[] fluoImage1A = ImageConverter.convertBIto1A(newFluorImage);
+		int[] fluoImage1A = ImageConverter.convertBIto1A(outputFluorImage);
 
 		// modify source images according to merged mask
 		int i = 0;
+		int background = options.getBackground();
 		for (int m : bestMask.getMaskAs1Array()) {
 			if (m == 0) {
-				rgbImage1A[i] = getBackground();
-				fluoImage1A[i] = getBackground();
+				rgbImage1A[i] = background;
+				fluoImage1A[i] = background;
 			}
 			i++;
 		}
 
-		newRGBImage = ImageConverter.convert1AtoBI(rgbMask.getWidth(), rgbMask.getHeight(), rgbImage1A);
-		newFluorImage = ImageConverter.convert1AtoBI(fluoMask.getWidth(), fluoMask.getHeight(), fluoImage1A);
+		outputRGBImage = ImageConverter.convert1AtoBI(rgbMask.getWidth(), rgbMask.getHeight(), rgbImage1A);
+		outputFluorImage = ImageConverter.convert1AtoBI(fluoMask.getWidth(), fluoMask.getHeight(), fluoImage1A);
 
-		return newRGBImage;
+		return outputRGBImage;
 	}
 
 	private BufferedImage fitMaskToNearImage(BufferedImage mask) {
 
-		int[] nearMask1A = ImageConverter.convertBIto1A(newNearImage);
+		int[] nearMask1A = ImageConverter.convertBIto1A(outputNearImage);
 
 		ImageOperation io = new ImageOperation(mask);
-		io.resize(newNearImage.getWidth(), newNearImage.getHeight());
+		io.resize(outputNearImage.getWidth(), outputNearImage.getHeight());
 		io.rotate(-9);
 
 		int i = 0;
+		int background = options.getBackground();
 		for (int m : io.getImageAs1array()) {
 			if (m == background) {
 				nearMask1A[i] = background;
@@ -716,7 +341,7 @@ public class PhytochamberTopImageProcessor {
 			i++;
 		}
 
-		return ImageConverter.convert1AtoBI(newNearImage.getWidth(), newNearImage.getHeight(), nearMask1A);
+		return ImageConverter.convert1AtoBI(outputNearImage.getWidth(), outputNearImage.getHeight(), nearMask1A);
 	}
 
 	private BufferedImage removeImageNoise(BufferedImage workImage, BufferedImage originalImage, ImageConfiguration typ) {
@@ -728,27 +353,28 @@ public class PhytochamberTopImageProcessor {
 
 		switch (typ) {
 
-			case RgbTop:
+		case RgbTop:
 
-				for (int ii = 0; ii < 6; ii++)
-					io.erode();
-				for (int ii = 0; ii < 8; ii++)
-					io.dilate();
-				for (int ii = 0; ii < 2; ii++)
-					io.erode();
-				break;
+			for (int ii = 0; ii < 6; ii++)
+				io.erode();
+			for (int ii = 0; ii < 8; ii++)
+				io.dilate();
+			for (int ii = 0; ii < 2; ii++)
+				io.erode();
+			break;
 
-			case FluoTop:
+		case FluoTop:
 
-				for (int ii = 0; ii < 5; ii++)
-					io.erode();
-				for (int ii = 0; ii < 5; ii++)
-					io.dilate();
-				io.closing();
-				break;
+			for (int ii = 0; ii < 5; ii++)
+				io.erode();
+			for (int ii = 0; ii < 5; ii++)
+				io.dilate();
+			io.closing();
+			break;
 		}
 
 		int idx = 0;
+		int background = options.getBackground();
 		for (int m : io.getImageAs1array()) {
 			if (m == background)
 				newImage1A[idx] = background;
@@ -760,7 +386,7 @@ public class PhytochamberTopImageProcessor {
 		return ImageConverter.convert1AtoBI(workImage.getWidth(), workImage.getHeight(), newImage1A);
 	}
 
-	private void imageLayering(BufferedImage firstImage, BufferedImage secondImage, LayeringTyp typ) {
+	private static void imageLayering(BufferedImage firstImage, BufferedImage secondImage, LayeringTyp typ) {
 
 		for (int x = 0; x < firstImage.getWidth(); x++) {
 			for (int y = 0; y < firstImage.getHeight(); y++) {
@@ -804,15 +430,15 @@ public class PhytochamberTopImageProcessor {
 				if (pos > 0)
 					sn = sn.substring(0, pos);
 				m = new NumericMeasurement(limg, sn + "-r: " + che.getColorDisplayName(), limg.getParentSample()
-									.getParentCondition().getExperimentName()
-									+ " (" + experimentNameExtension + ")");
+						.getParentCondition().getExperimentName()
+						+ " (" + experimentNameExtension + ")");
 				m.setValue(che.getNumberOfPixels() / pixelCount);
 				m.setUnit("proportion");
 				output.add(m);
 
 				m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
-									.getParentCondition().getExperimentName()
-									+ " (" + experimentNameExtension + ")");
+						.getParentCondition().getExperimentName()
+						+ " (" + experimentNameExtension + ")");
 				m.setValue(pixelCount);
 				m.setUnit("pixels");
 				output.add(m);
@@ -820,22 +446,22 @@ public class PhytochamberTopImageProcessor {
 		}
 		if (!limg.getSubstanceName().toUpperCase().contains("TOP")) {
 			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
-								.getParentCondition().getExperimentName()
-								+ " (" + experimentNameExtension + ")");
+					.getParentCondition().getExperimentName()
+					+ " (" + experimentNameExtension + ")");
 			m.setValue(h - g.getTop());
 			m.setUnit("pixel");
 			output.add(m);
 
 			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
-								.getParentCondition().getExperimentName()
-								+ " (" + experimentNameExtension + ")");
+					.getParentCondition().getExperimentName()
+					+ " (" + experimentNameExtension + ")");
 			m.setValue(h - g.getLeft() - (h - g.getRight()));
 			m.setUnit("pixel");
 			output.add(m);
 		}
 		m = new NumericMeasurement(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
-							.getParentCondition().getExperimentName()
-							+ " (" + experimentNameExtension + ")");
+				.getParentCondition().getExperimentName()
+				+ " (" + experimentNameExtension + ")");
 		m.setValue(g.getFilledPixels());
 		m.setUnit("pixel");
 		output.add(m);

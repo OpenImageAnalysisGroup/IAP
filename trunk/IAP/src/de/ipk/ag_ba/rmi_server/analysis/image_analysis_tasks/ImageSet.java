@@ -42,4 +42,8 @@ public class ImageSet {
 			System.err.println("Warning: Overriding NIR Image in ImageSet");
 		nir = id;
 	}
+
+	public boolean hasAllImageTypes() {
+		return vis != null && fluo != null && nir != null;
+	}
 }
