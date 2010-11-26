@@ -490,15 +490,15 @@ public class PhytochamberTopImageProcessor {
 	}
 
 	public void doImageLayering() {
-		doImageLayering(getInitialFluorImageAsBI(), getInitialRgbImageAsBI(), false);
+		doImageLayering(getInitialFluorImageAsBI(), getInitialRgbImageAsBI(), LayeringTyp.ROW_IMAGE);
 	}
 
-	public void doImageLayering(boolean representationTyp) {
-		doImageLayering(getInitialFluorImageAsBI(), getInitialRgbImageAsBI(), representationTyp);
+	public void doImageLayering(LayeringTyp typ) {
+		doImageLayering(getInitialFluorImageAsBI(), getInitialRgbImageAsBI(), typ);
 	}
 
-	public void doImageLayering(BufferedImage firstImage, BufferedImage secondImage, boolean representationTyp) {
-		imageLayering(firstImage, secondImage, representationTyp);
+	public void doImageLayering(BufferedImage firstImage, BufferedImage secondImage, LayeringTyp typ) {
+		imageLayering(firstImage, secondImage, typ);
 	}
 
 	// ############## PRINT ##################
@@ -760,11 +760,11 @@ public class PhytochamberTopImageProcessor {
 		return ImageConverter.convert1AtoBI(workImage.getWidth(), workImage.getHeight(), newImage1A);
 	}
 
-	private void imageLayering(BufferedImage firstImage, BufferedImage secondImage, boolean representationTyp) {
+	private void imageLayering(BufferedImage firstImage, BufferedImage secondImage, LayeringTyp typ) {
 
 		for (int x = 0; x < firstImage.getWidth(); x++) {
 			for (int y = 0; y < firstImage.getHeight(); y++) {
-				if (representationTyp) {
+				if (typ == LayeringTyp.RED_BLUE_IMAGE) {
 					Color f = new Color(firstImage.getRGB(x, y));
 					Color f2 = new Color(secondImage.getRGB(x, y));
 					Color f3 = new Color(f2.getRed(), 0, f.getBlue());
