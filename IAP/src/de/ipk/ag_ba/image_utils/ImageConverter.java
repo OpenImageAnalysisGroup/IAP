@@ -144,11 +144,10 @@ public class ImageConverter {
 
 	// ########### Print Image #################
 
-	
-	public static void printImage(BufferedImage image){
+	public static void printImage(BufferedImage image) {
 		printImage(ImageConverter.convertBIto2A(image));
 	}
-	
+
 	public static void printImage(int[][] image) {
 		printImage(image, "Image");
 	}
@@ -241,6 +240,11 @@ public class ImageConverter {
 
 		g.dispose();
 		return scalingAWT;
+	}
+
+	public static BufferedImage copy(BufferedImage image) {
+		int[][] img = convertBIto2A(image);
+		return convert2AtoBI(img);
 	}
 
 }

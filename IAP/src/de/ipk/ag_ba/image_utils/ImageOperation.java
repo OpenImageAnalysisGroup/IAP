@@ -104,6 +104,13 @@ public class ImageOperation extends ImageConverter {
 		image.setProcessor(processor2.convertToRGB());
 	}
 
+	/**
+	 * Enlarge area of mask.
+	 * <p>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png"
+	 * >
+	 */
 	public void dilate(int[][] mask) {
 		int jM = (mask.length - 1) / 2;
 		int iM = (mask[0].length - 1) / 2;
@@ -121,11 +128,25 @@ public class ImageOperation extends ImageConverter {
 		processor.copyBits(tempImage, 0, 0, Blitter.COPY);
 	}
 
+	/**
+	 * Enlarge area of mask.
+	 * <p>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png"
+	 * >
+	 */
 	public ImageOperation dilate() { // es wird der 3x3 Minimum-Filter genutzt
 		processor.dilate();
 		return this;
 	}
 
+	/**
+	 * Reduce area of mask.
+	 * <p>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
+	 * >
+	 */
 	public ImageOperation erode(ImageProcessor temp, int[][] mask) {
 		temp.invert();
 		dilate(mask);
@@ -133,11 +154,25 @@ public class ImageOperation extends ImageConverter {
 		return this;
 	}
 
+	/**
+	 * Reduce area of mask.
+	 * <p>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
+	 * >
+	 */
 	public ImageOperation erode(ImageProcessor temp) {
 		temp.erode();
 		return this;
 	}
 
+	/**
+	 * Reduce area of mask.
+	 * <p>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
+	 * >
+	 */
 	public ImageOperation erode(int[][] mask) {
 		return erode(processor, mask);
 	}
@@ -148,25 +183,68 @@ public class ImageOperation extends ImageConverter {
 	// processor.invert();
 	// }
 
+	/**
+	 * Reduce area of mask.
+	 * <p>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
+	 * >
+	 */
 	public ImageOperation erode() { // es wird der 3x3 Minimum-Filter genutzt
 		return erode(processor);
 	}
 
+	/**
+	 * Dilation, then erosion. Removes small holes in the image.
+	 * <p>
+	 * The closing of the dark-blue shape (union of two squares) by a disk,
+	 * resulting in the union of the dark-blue shape and the light-blue areas.:<br>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Closing.png/220px-Closing.png"
+	 * >
+	 */
 	public void closing(int[][] mask) {
 		dilate(mask);
 		erode(mask);
 	}
 
+	/**
+	 * Erosion, then dilation. Removes small objects in the mask.
+	 * <p>
+	 * The closing of the dark-blue shape (union of two squares) by a disk,
+	 * resulting in the union of the dark-blue shape and the light-blue areas:<br>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Closing.png/220px-Closing.png"
+	 * >
+	 */
 	public void closing() { // es wird der 3x3 Minimum-Filter genutzt
 		processor.dilate();
 		processor.erode();
 	}
 
+	/**
+	 * Erosion, then dilation. Removes small objects in the mask.
+	 * <p>
+	 * The erosion of the dark-blue square by a disk, resulting in the light-blue
+	 * square:<br>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png"
+	 * >
+	 */
 	public void opening(int[][] mask) {
 		erode(mask);
 		dilate(mask);
 	}
 
+	/**
+	 * Erosion, then dilation. Removes small objects in the mask.
+	 * <p>
+	 * The erosion of the dark-blue square by a disk, resulting in the light-blue
+	 * square:<br>
+	 * <img src=
+	 * "http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png"
+	 * >
+	 */
 	public void opening() { // es wird der 3x3 Minimum-Filter genutzt
 		processor.erode();
 		processor.dilate();
@@ -229,6 +307,225 @@ public class ImageOperation extends ImageConverter {
 	public void printImage() {
 		image.updateAndDraw();
 		image.show();
+	}
+
+	private void blur() {
+		ImageProcessor processor2 = processor.convertToByte(true);
+		ByteProcessor byteProcessor = new BinaryProcessor((ByteProcessor) processor2);
+
+		int w = byteProcessor.getWidth();
+		int h = byteProcessor.getHeight();
+		ByteProcessor copy = (ByteProcessor) processor2.duplicate();
+		for (int v = 1; v <= h - 2; v++) {
+			for (int u = 1; u <= w - 2; u++) {
+				// compute filter result for position (u,v)
+				int sum = 0;
+				for (int j = -1; j <= 1; j++) {
+					for (int i = -1; i <= 1; i++) {
+						int p = copy.getPixel(u + i, v + j);
+						sum = sum + p;
+					}
+				}
+				int q = (int) (sum / 9.0);
+				byteProcessor.putPixel(u, v, q);
+			}
+		}
+
+		image.setProcessor(processor2.convertToRGB());
+	}
+
+	private static void testPhytokammer(IOurl urlFlu, IOurl urlVis, IOurl urlNIR, BufferedImage imgFluo,
+						BufferedImage imgVisible, BufferedImage imgNIR) {
+
+		int[] fluoImageOriginal = ImageConverter.convertBIto1A(imgFluo);
+		int[] rgbImageOriginal = ImageConverter.convertBIto1A(imgVisible);
+		int[] nirImageOriginal = ImageConverter.convertBIto1A(imgNIR);
+
+		int[] fluoImage;
+		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
+		{
+			SubstanceInterface substance = new Substance();
+			substance.setName(ImageConfiguration.FluoTop.toString());
+			ConditionInterface condition = new Condition(substance);
+			Sample sample = new Sample(condition);
+			LoadedImage limg = new LoadedImage(sample, imgFluo);
+			limg.setURL(urlFlu);
+
+			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null,
+								0.5, 0.5);
+
+			// MainFrame
+			// .showMessageWindow("FluoTop Clean", new JLabel(
+			// new ImageIcon(limg.getLoadedImage())));
+		}
+		{
+			SubstanceInterface substance = new Substance();
+			substance.setName(ImageConfiguration.RgbTop.toString());
+			ConditionInterface condition = new Condition(substance);
+			Sample sample = new Sample(condition);
+			LoadedImage limg = new LoadedImage(sample, imgVisible);
+			limg.setURL(urlVis);
+			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null,
+								2.5, 2.5);
+
+			// MainFrame.showMessageWindow("RgbTop Clean", new JLabel(
+			// new ImageIcon(limg.getLoadedImage())));
+		}
+
+		int[] rgbImage = ImageConverter.convertBIto1A(imgVisible);
+		fluoImage = ImageConverter.convertBIto1A(imgFluo);
+
+		// modify masks
+		ImageOperation ioR = new ImageOperation(rgbImage, imgVisible.getWidth(), imgVisible.getHeight());
+		ioR.erode().erode();
+		ioR.dilate().dilate().dilate().dilate().dilate();
+
+		ImageOperation ioF = new ImageOperation(fluoImage, imgFluo.getWidth(), imgFluo.getHeight());
+		for (int i = 0; i < 4; i++)
+			ioF.erode();
+		for (int i = 0; i < 20; i++)
+			ioF.dilate();
+
+		int[] rgbImageM = ioR.getImageAs1array();
+		int[] fluoImageM = ioF.getImageAs1array();
+
+		BufferedImage imgFluoTest = ImageConverter.convert1AtoBI(imgFluo.getWidth(), imgFluo.getHeight(), fluoImageM);
+		ImagePlus imgFFTest = ImageConverter.convertBItoIJ(imgFluoTest);
+		imgFFTest.show("Fluorescence Vorstufe1");
+
+		// merge infos of both masks
+		int background = PhenotypeAnalysisTask.BACKGROUND_COLOR.getRGB();
+		MaskOperation o = new MaskOperation(rgbImageM, fluoImageM, background);
+		o.mergeMasks();
+
+		// modify source images according to merged mask
+		int i = 0;
+		for (int m : o.getMask()) {
+			if (m == 0) {
+				rgbImage[i] = background;
+				fluoImage[i] = background;
+			}
+			i++;
+		}
+
+		// BufferedImage imgFluoTest2 =
+		// ImageConverter.convert1AtoBI(imgFluo.getWidth(),imgFluo.getHeight(),
+		// fluoImage);
+		// ImagePlus imgFFTest2 = ImageConverter.convertBItoIJ(imgFluoTest2);
+		// imgFFTest2.show("Fluorescence Vorstufe2");
+
+		{
+
+			SubstanceInterface substance = new Substance();
+			substance.setName(ImageConfiguration.NirTop.toString());
+			ConditionInterface condition = new Condition(substance);
+			Sample sample = new Sample(condition);
+			LoadedImage limg = new LoadedImage(sample, imgNIR);
+			limg.setURL(urlNIR);
+			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null, 1,
+								0.5);
+
+			int[] nirImage = ImageConverter.convertBIto1A(imgNIR);
+
+			// process NIR
+
+			MainFrame.showMessageWindow("NIR Source", new JLabel(new ImageIcon(imgNIR)));
+
+			int[] mask = rgbImage;
+			// resize mask
+			ImageOperation ioo = new ImageOperation(mask, imgVisible.getWidth(), imgVisible.getHeight());
+			ioo.resize(imgNIR.getWidth(), imgNIR.getHeight());
+			ioo.rotate(-9);
+			i = 0;
+			for (int m : ioo.getImageAs1array()) {
+				if (m == background) {
+					nirImage[i] = background;
+				}
+				i++;
+			}
+			imgNIR = ImageConverter.convert1AtoBI(imgNIR.getWidth(), imgNIR.getHeight(), nirImage);
+		}
+
+		{ // fluo störungen beseitigen
+			ImageOperation ioFF = new ImageOperation(fluoImage, imgFluo.getWidth(), imgFluo.getHeight());
+			for (int ii = 0; ii < 5; ii++)
+				ioFF.erode();
+			for (int ii = 0; ii < 5; ii++)
+				ioFF.dilate();
+			ioFF.closing();
+
+			int idx = 0;
+			for (int m : ioFF.getImageAs1array()) {
+				if (m == background)
+					fluoImage[idx] = background;
+				else
+					fluoImage[idx] = fluoImageOriginal[idx];
+				idx++;
+			}
+		}
+
+		{ // rgb störungen beseitigen
+			ImageOperation ioFF = new ImageOperation(rgbImage, imgVisible.getWidth(), imgVisible.getHeight());
+			for (int ii = 0; ii < 6; ii++)
+				ioFF.erode();
+			for (int ii = 0; ii < 8; ii++)
+				ioFF.dilate();
+			for (int ii = 0; ii < 2; ii++)
+				ioFF.erode();
+			// for (int ii=0; ii<1; ii++)
+			// ioFF.erode(new int [][]
+			// {{0,0,1,0,0},{0,1,1,1,0},{1,1,1,1,1},{0,1,1,1,0},{0,0,1,0,0}});
+
+			int idx = 0;
+			for (int m : ioFF.getImageAs1array()) {
+				if (m == background)
+					rgbImage[idx] = background;
+				else
+					rgbImage[idx] = rgbImageOriginal[idx];
+				idx++;
+			}
+		}
+
+		imgVisible = ImageConverter.convert1AtoBI(imgVisible.getWidth(), imgVisible.getHeight(), rgbImage);
+		imgFluo = ImageConverter.convert1AtoBI(imgFluo.getWidth(), imgFluo.getHeight(), fluoImage);
+
+		ImagePlus imgVV = ImageConverter.convertBItoIJ(imgVisible);
+		ImagePlus imgFF = ImageConverter.convertBItoIJ(imgFluo);
+		ImagePlus imgNN = ImageConverter.convertBItoIJ(imgNIR);
+
+		imgVV.show("Visible");
+		imgFF.show("Fluorescence");
+		imgNN.show("NIR");
+	}
+
+	private static void showTwoImagesAsOne(BufferedImage imgF2, BufferedImage imgV2) {
+
+		imgF2 = ImageConverter.convert1AtoBI(imgF2.getWidth(), imgF2.getHeight(), ImageConverter.convertBIto1A(imgF2));
+		imgV2 = ImageConverter.convert1AtoBI(imgV2.getWidth(), imgV2.getHeight(), ImageConverter.convertBIto1A(imgV2));
+
+		for (int x = 0; x < imgV2.getWidth(); x++) {
+			for (int y = 0; y < imgV2.getHeight(); y++) {
+				boolean twoInOne = false;
+				if (twoInOne) {
+					Color f = new Color(imgV2.getRGB(x, y));
+					Color f2 = new Color(imgF2.getRGB(x, y));
+					Color f3 = new Color(f2.getRed(), 0, f.getBlue());
+
+					imgF2.setRGB(x, y, f3.getRGB());
+				} else {
+					if ((y / 3) % 2 == 0)
+						imgF2.setRGB(x, y, imgV2.getRGB(x, y));
+					else
+						imgF2.setRGB(x, y, imgF2.getRGB(x, y));
+				}
+			}
+		}
+
+		GravistoService.showImage(imgF2, "Vergleich");
+	}
+
+	public FlexibleImage getImage() {
+		return new FlexibleImage(image);
 	}
 
 	public static void main(String[] args) {
@@ -382,7 +679,7 @@ public class ImageOperation extends ImageConverter {
 				io.rotate(-3);
 
 				imgFluo = ImageConverter
-						.convert1AtoBI(imgVisible.getWidth(), imgVisible.getHeight(), io.getImageAs1array());
+									.convert1AtoBI(imgVisible.getWidth(), imgVisible.getHeight(), io.getImageAs1array());
 
 				boolean mergeImages = false;
 
@@ -398,224 +695,4 @@ public class ImageOperation extends ImageConverter {
 			}
 		}
 	}
-
-	private void blur() {
-		ImageProcessor processor2 = processor.convertToByte(true);
-		ByteProcessor byteProcessor = new BinaryProcessor((ByteProcessor) processor2);
-
-		int w = byteProcessor.getWidth();
-		int h = byteProcessor.getHeight();
-		ByteProcessor copy = (ByteProcessor) processor2.duplicate();
-		for (int v = 1; v <= h - 2; v++) {
-			for (int u = 1; u <= w - 2; u++) {
-				// compute filter result for position (u,v)
-				int sum = 0;
-				for (int j = -1; j <= 1; j++) {
-					for (int i = -1; i <= 1; i++) {
-						int p = copy.getPixel(u + i, v + j);
-						sum = sum + p;
-					}
-				}
-				int q = (int) (sum / 9.0);
-				byteProcessor.putPixel(u, v, q);
-			}
-		}
-
-		image.setProcessor(processor2.convertToRGB());
-	}
-
-	private static void testPhytokammer(IOurl urlFlu, IOurl urlVis, IOurl urlNIR, BufferedImage imgFluo,
-			BufferedImage imgVisible, BufferedImage imgNIR) {
-
-		int[] fluoImageOriginal = ImageConverter.convertBIto1A(imgFluo);
-		int[] rgbImageOriginal = ImageConverter.convertBIto1A(imgVisible);
-		int[] nirImageOriginal = ImageConverter.convertBIto1A(imgNIR);
-
-		int[] fluoImage;
-		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-		{
-			SubstanceInterface substance = new Substance();
-			substance.setName(ImageConfiguration.FluoTop.toString());
-			ConditionInterface condition = new Condition(substance);
-			Sample sample = new Sample(condition);
-			LoadedImage limg = new LoadedImage(sample, imgFluo);
-			limg.setURL(urlFlu);
-
-			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null,
-					0.5, 0.5);
-
-			// MainFrame
-			// .showMessageWindow("FluoTop Clean", new JLabel(
-			// new ImageIcon(limg.getLoadedImage())));
-		}
-		{
-			SubstanceInterface substance = new Substance();
-			substance.setName(ImageConfiguration.RgbTop.toString());
-			ConditionInterface condition = new Condition(substance);
-			Sample sample = new Sample(condition);
-			LoadedImage limg = new LoadedImage(sample, imgVisible);
-			limg.setURL(urlVis);
-			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null,
-					2.5, 2.5);
-
-			// MainFrame.showMessageWindow("RgbTop Clean", new JLabel(
-			// new ImageIcon(limg.getLoadedImage())));
-		}
-
-		int[] rgbImage = ImageConverter.convertBIto1A(imgVisible);
-		fluoImage = ImageConverter.convertBIto1A(imgFluo);
-
-		// modify masks
-		ImageOperation ioR = new ImageOperation(rgbImage, imgVisible.getWidth(), imgVisible.getHeight());
-		ioR.erode().erode();
-		ioR.dilate().dilate().dilate().dilate().dilate();
-
-		ImageOperation ioF = new ImageOperation(fluoImage, imgFluo.getWidth(), imgFluo.getHeight());
-		for (int i = 0; i < 4; i++)
-			ioF.erode();
-		for (int i = 0; i < 20; i++)
-			ioF.dilate();
-
-		int[] rgbImageM = ioR.getImageAs1array();
-		int[] fluoImageM = ioF.getImageAs1array();
-
-		BufferedImage imgFluoTest = ImageConverter.convert1AtoBI(imgFluo.getWidth(), imgFluo.getHeight(), fluoImageM);
-		ImagePlus imgFFTest = ImageConverter.convertBItoIJ(imgFluoTest);
-		imgFFTest.show("Fluorescence Vorstufe1");
-
-		// merge infos of both masks
-		int background = PhenotypeAnalysisTask.BACKGROUND_COLOR.getRGB();
-		MaskOperation o = new MaskOperation(rgbImageM, fluoImageM, background);
-		o.doMerge();
-
-		// modify source images according to merged mask
-		int i = 0;
-		for (int m : o.getMaskAs1Array()) {
-			if (m == 0) {
-				rgbImage[i] = background;
-				fluoImage[i] = background;
-			}
-			i++;
-		}
-
-		// BufferedImage imgFluoTest2 =
-		// ImageConverter.convert1AtoBI(imgFluo.getWidth(),imgFluo.getHeight(),
-		// fluoImage);
-		// ImagePlus imgFFTest2 = ImageConverter.convertBItoIJ(imgFluoTest2);
-		// imgFFTest2.show("Fluorescence Vorstufe2");
-
-		{
-
-			SubstanceInterface substance = new Substance();
-			substance.setName(ImageConfiguration.NirTop.toString());
-			ConditionInterface condition = new Condition(substance);
-			Sample sample = new Sample(condition);
-			LoadedImage limg = new LoadedImage(sample, imgNIR);
-			limg.setURL(urlNIR);
-			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null, 1,
-					0.5);
-
-			int[] nirImage = ImageConverter.convertBIto1A(imgNIR);
-
-			// process NIR
-
-			MainFrame.showMessageWindow("NIR Source", new JLabel(new ImageIcon(imgNIR)));
-
-			int[] mask = rgbImage;
-			// resize mask
-			ImageOperation ioo = new ImageOperation(mask, imgVisible.getWidth(), imgVisible.getHeight());
-			ioo.resize(imgNIR.getWidth(), imgNIR.getHeight());
-			ioo.rotate(-9);
-			i = 0;
-			for (int m : ioo.getImageAs1array()) {
-				if (m == background) {
-					nirImage[i] = background;
-				}
-				i++;
-			}
-			imgNIR = ImageConverter.convert1AtoBI(imgNIR.getWidth(), imgNIR.getHeight(), nirImage);
-		}
-
-		{ // fluo störungen beseitigen
-			ImageOperation ioFF = new ImageOperation(fluoImage, imgFluo.getWidth(), imgFluo.getHeight());
-			for (int ii = 0; ii < 5; ii++)
-				ioFF.erode();
-			for (int ii = 0; ii < 5; ii++)
-				ioFF.dilate();
-			ioFF.closing();
-
-			int idx = 0;
-			for (int m : ioFF.getImageAs1array()) {
-				if (m == background)
-					fluoImage[idx] = background;
-				else
-					fluoImage[idx] = fluoImageOriginal[idx];
-				idx++;
-			}
-		}
-
-		{ // rgb störungen beseitigen
-			ImageOperation ioFF = new ImageOperation(rgbImage, imgVisible.getWidth(), imgVisible.getHeight());
-			for (int ii = 0; ii < 6; ii++)
-				ioFF.erode();
-			for (int ii = 0; ii < 8; ii++)
-				ioFF.dilate();
-			for (int ii = 0; ii < 2; ii++)
-				ioFF.erode();
-			// for (int ii=0; ii<1; ii++)
-			// ioFF.erode(new int [][]
-			// {{0,0,1,0,0},{0,1,1,1,0},{1,1,1,1,1},{0,1,1,1,0},{0,0,1,0,0}});
-
-			int idx = 0;
-			for (int m : ioFF.getImageAs1array()) {
-				if (m == background)
-					rgbImage[idx] = background;
-				else
-					rgbImage[idx] = rgbImageOriginal[idx];
-				idx++;
-			}
-		}
-
-		imgVisible = ImageConverter.convert1AtoBI(imgVisible.getWidth(), imgVisible.getHeight(), rgbImage);
-		imgFluo = ImageConverter.convert1AtoBI(imgFluo.getWidth(), imgFluo.getHeight(), fluoImage);
-
-		ImagePlus imgVV = ImageConverter.convertBItoIJ(imgVisible);
-		ImagePlus imgFF = ImageConverter.convertBItoIJ(imgFluo);
-		ImagePlus imgNN = ImageConverter.convertBItoIJ(imgNIR);
-
-		imgVV.show("Visible");
-		imgFF.show("Fluorescence");
-		imgNN.show("NIR");
-	}
-
-	private static void showTwoImagesAsOne(BufferedImage imgF2, BufferedImage imgV2) {
-
-		imgF2 = ImageConverter.convert1AtoBI(imgF2.getWidth(), imgF2.getHeight(), ImageConverter.convertBIto1A(imgF2));
-		imgV2 = ImageConverter.convert1AtoBI(imgV2.getWidth(), imgV2.getHeight(), ImageConverter.convertBIto1A(imgV2));
-
-		for (int x = 0; x < imgV2.getWidth(); x++) {
-			for (int y = 0; y < imgV2.getHeight(); y++) {
-				boolean twoInOne = false;
-				if (twoInOne) {
-					Color f = new Color(imgV2.getRGB(x, y));
-					Color f2 = new Color(imgF2.getRGB(x, y));
-					Color f3 = new Color(f2.getRed(), 0, f.getBlue());
-
-					imgF2.setRGB(x, y, f3.getRGB());
-				} else {
-					if ((y / 3) % 2 == 0)
-						imgF2.setRGB(x, y, imgV2.getRGB(x, y));
-					else
-						imgF2.setRGB(x, y, imgF2.getRGB(x, y));
-				}
-			}
-		}
-
-		GravistoService.showImage(imgF2, "Vergleich");
-	}
-
-	public FlexibleImage getImage() {
-		return new FlexibleImage(image);
-	}
-
 }
