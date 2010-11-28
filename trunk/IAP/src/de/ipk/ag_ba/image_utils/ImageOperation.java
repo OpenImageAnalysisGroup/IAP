@@ -104,6 +104,10 @@ public class ImageOperation extends ImageConverter {
 		image.setProcessor(processor2.convertToRGB());
 	}
 
+	public ImageOperation applyMask(FlexibleImage mask) {
+		throw new UnsupportedOperationException("TODO");
+	}
+
 	/**
 	 * Enlarge area of mask.
 	 * <p>

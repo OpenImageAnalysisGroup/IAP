@@ -36,8 +36,6 @@ public class PhytoTopImageProcessorOptions {
 	private int nearNumberOfErodeLoops;
 	private int nearNumberOfDilateLoops;
 
-	private int background;
-
 	void initStandardValues() {
 		setRotationAngle(-3);
 
@@ -63,7 +61,6 @@ public class PhytoTopImageProcessorOptions {
 		setNearNumberOfErodeLoops(0);
 		setNearNumberOfDilateLoops(0);
 
-		setBackground(PhenotypeAnalysisTask.BACKGROUND_COLOR.getRGB());
 	}
 
 	// ########## SET ###############
@@ -163,10 +160,6 @@ public class PhytoTopImageProcessorOptions {
 		this.nearNumberOfDilateLoops = nearNumberOfDilateLoops;
 	}
 
-	public void setBackground(int background) {
-		this.background = background;
-	}
-
 	// ########## GET #############
 
 	public double getRotationAngle() {
@@ -242,6 +235,10 @@ public class PhytoTopImageProcessorOptions {
 	}
 
 	public int getBackground() {
-		return background;
+		return PhenotypeAnalysisTask.BACKGROUND_COLORint;
+	}
+
+	public double getRotationAngleNir() {
+		return 0;
 	}
 }
