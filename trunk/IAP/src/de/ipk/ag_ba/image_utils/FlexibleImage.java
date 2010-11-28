@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  * 
  *******************************************************************************/
 /*
@@ -41,6 +41,13 @@ public class FlexibleImage {
 		this.bufferedImage = ImageConverter.convertIJtoBI(image);
 	}
 
+	/**
+	 * The given image is converted to a BufferedImage.
+	 */
+	public FlexibleImage(int[] image, int w, int h) {
+		this.bufferedImage = ImageConverter.convert1AtoBI(w, h, image);
+	}
+
 	public BufferedImage getBufferedImage() {
 		return bufferedImage;
 	}
@@ -59,5 +66,19 @@ public class FlexibleImage {
 
 	public ImagePlus getConvertAsImagePlus() {
 		return ImageConverter.convertBItoIJ(bufferedImage);
+	}
+
+	public int[] getConvertAs1A() {
+		return ImageConverter.convertBIto1A(bufferedImage);
+	}
+
+	public FlexibleImage resize(int w, int h) {
+		if (w == getWidth() && h == getHeight()) {
+			return this;
+		} else {
+			ImageOperation io = new ImageOperation(this);
+			io.resize(w, h);
+			return io.getImage();
+		}
 	}
 }
