@@ -1,7 +1,5 @@
 /*************************************************************************
- * 
  * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
  *************************************************************************/
 package de.ipk.ag_ba.image_utils;
 
@@ -29,7 +27,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 /**
  * @author entzian, klukas
- * 
  */
 public class PhytochamberTopImageProcessor {
 
@@ -149,8 +146,7 @@ public class PhytochamberTopImageProcessor {
 	 *           background (see {@link #clearBackground(FlexibleImageSet)}).
 	 * @return A set of enlarged mask images.
 	 *         <p>
-	 *         <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png"
-	 *         >
+	 *         <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
 	private FlexibleImageSet enlargeMask(FlexibleImageSet mask) {
 		BufferedImage enlargedRgbMask = enlargeMask(mask.getVis(), options.getRgbNumberOfErodeLoops(),

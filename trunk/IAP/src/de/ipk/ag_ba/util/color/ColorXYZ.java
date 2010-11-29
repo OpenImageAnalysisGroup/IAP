@@ -4,7 +4,6 @@ import java.awt.Color;
 
 /**
  * @author klukas
- * 
  */
 public class ColorXYZ {
 

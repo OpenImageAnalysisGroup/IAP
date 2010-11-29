@@ -19,7 +19,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	private final ActionListener sizeChangedListener;
 
 	public MongoTreeNode(MongoTreeNode projectNode, ActionListener sizeChangedListener, ExperimentInterface doc,
-			MappingDataEntity tableName, String title, boolean readOnly) {
+						MappingDataEntity tableName, String title, boolean readOnly) {
 		super(readOnly);
 		this.experiment = doc;
 		this.projectNode = projectNode;

@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Oct 17, 2010 by Christian Klukas
@@ -11,7 +9,6 @@ package de.ipk.ag_ba.gui;
 
 /**
  * @author klukas
- * 
  */
 public class Unicode {
 

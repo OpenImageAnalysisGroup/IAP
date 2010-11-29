@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 13, 2010 by Christian Klukas
@@ -40,7 +38,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author klukas
- * 
  */
 public class ImageAnalysis3D {
 
@@ -54,7 +51,7 @@ public class ImageAnalysis3D {
 		return op.filter(source, null);
 	}
 
-	//	
+	//
 	// private static Histogram getHistogram(Image img, int band) {
 	// ParameterBlock pb1 = new ParameterBlock();
 	// BufferedImage bi = toBufferedImage(img);
@@ -72,7 +69,7 @@ public class ImageAnalysis3D {
 	// dummyImage1.getProperty("histogram");
 	// return histo1;
 	// }
-	//	
+	//
 
 	public static BufferedImage toBufferedImage(Image image) {
 		if (image instanceof BufferedImage) {

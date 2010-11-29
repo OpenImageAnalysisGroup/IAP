@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Nov 1, 2010 by Christian Klukas
@@ -16,7 +14,6 @@ import de.ipk.ag_ba.gui.MyNavigationPanel;
 
 /**
  * @author klukas
- * 
  */
 public class MyScrollPane extends JScrollPane {
 	private static final long serialVersionUID = 1L;

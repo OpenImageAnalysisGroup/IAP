@@ -4,7 +4,6 @@ import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTa
 
 /**
  * @author klukas
- * 
  */
 public class Voxel {
 

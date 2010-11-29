@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Nov 26, 2010 by Christian Klukas
@@ -20,7 +18,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
 
 /**
  * @author klukas
- * 
  */
 public class HTTPdataSourceLevel implements DataSourceLevel {
 

@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 8, 2010 by Christian Klukas
@@ -52,7 +50,7 @@ public class DayComponent extends JComponent {
 	private static ArrayList<Color> userColors = Colors.get(9, colorInt * 2);
 
 	public DayComponent(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, boolean main,
-			boolean mark, GregorianCalendar calendar, Calendar2 calEnt) {
+						boolean mark, GregorianCalendar calendar, Calendar2 calEnt) {
 		this.calEnt = calEnt;
 		addMouseListener(getMouseListener());
 		setLayout(TableLayout.getLayout(TableLayout.FILL, new double[] { TableLayout.FILL, TableLayout.PREFERRED }));
@@ -65,10 +63,11 @@ public class DayComponent extends JComponent {
 		}
 		if (mark)
 			colors = Colors.get(12, colorInt * 2);
-		else if (main && (dayOfWeek == 1 || dayOfWeek == 7)) {
-			// main = false;
-			colors = Colors.get(12, colorInt * 0.8);
-		}
+		else
+			if (main && (dayOfWeek == 1 || dayOfWeek == 7)) {
+				// main = false;
+				colors = Colors.get(12, colorInt * 0.8);
+			}
 		color = colors.get(month);
 		color2 = color.darker();
 		color2 = Colors.getColor((float) 0.4, 1, color, color2);
@@ -122,12 +121,14 @@ public class DayComponent extends JComponent {
 			} else {
 				if (exp.get(user).iterator().next().indexOf("start") >= 0)
 					s = exp.get(user).iterator().next().split(":", 2)[1] + " started";
-				else if (exp.get(user).iterator().next().indexOf("progress") >= 0)
-					s = exp.get(user).iterator().next().split(":", 2)[1] + " in progress";
-				else if (exp.get(user).iterator().next().indexOf("upload") >= 0)
-					s = exp.get(user).iterator().next().split(":", 2)[1] + " finished";
 				else
-					s = exp.get(user).iterator().next().split(":", 2)[1];
+					if (exp.get(user).iterator().next().indexOf("progress") >= 0)
+						s = exp.get(user).iterator().next().split(":", 2)[1] + " in progress";
+					else
+						if (exp.get(user).iterator().next().indexOf("upload") >= 0)
+							s = exp.get(user).iterator().next().split(":", 2)[1] + " finished";
+						else
+							s = exp.get(user).iterator().next().split(":", 2)[1];
 			}
 			JLabel lbl = new JLabel(s);
 			lbl.setToolTipText("<html>" + user + ": " + StringManipulationTools.getStringList(exp.get(user), "<br>"));
@@ -175,7 +176,7 @@ public class DayComponent extends JComponent {
 			public void mouseClicked(MouseEvent e) {
 				calEnt.setShowSpecificDay(true);
 				calEnt.getCalendar().set(calendar.get(GregorianCalendar.YEAR), calendar.get(GregorianCalendar.MONTH),
-						calendar.get(GregorianCalendar.DAY_OF_MONTH));
+									calendar.get(GregorianCalendar.DAY_OF_MONTH));
 				calEnt.updateGUI();
 				calEnt.performAction();
 				// calendarGUI.cal.set(

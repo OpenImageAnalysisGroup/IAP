@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 5, 2010 by Christian Klukas
@@ -31,7 +29,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.PatchedHTMLEditorKit;
 
 /**
  * @author klukas
- * 
  */
 public class MainPanelComponent {
 
@@ -81,18 +78,19 @@ public class MainPanelComponent {
 			jp.validate();
 
 			this.component = jp;
-		} else if (infos.size() == 1) {
-			JComponent jp = new JPanel(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.PREFERRED } }));
-			jp.setOpaque(false);
-			jp.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
+		} else
+			if (infos.size() == 1) {
+				JComponent jp = new JPanel(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.PREFERRED } }));
+				jp.setOpaque(false);
+				jp.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
 
-			jp.add(infos.get(0), "0,0");
+				jp.add(infos.get(0), "0,0");
 
-			jp.validate();
+				jp.validate();
 
-			this.component = jp;
+				this.component = jp;
 
-		}
+			}
 	}
 
 	public MainPanelComponent(String htmlTextPanel) {

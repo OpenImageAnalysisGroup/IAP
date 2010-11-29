@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 5, 2010 by Christian Klukas
@@ -17,7 +15,6 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
- * 
  */
 public interface NavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception;

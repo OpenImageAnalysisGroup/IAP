@@ -11,7 +11,6 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
- * 
  */
 public final class LemnaCam extends AbstractNavigationAction {
 

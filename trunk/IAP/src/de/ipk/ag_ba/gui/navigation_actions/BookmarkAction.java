@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Oct 17, 2010 by Christian Klukas
@@ -21,7 +19,6 @@ import de.ipk.ag_ba.gui.webstart.Bookmark;
 
 /**
  * @author klukas
- * 
  */
 public class BookmarkAction extends AbstractNavigationAction {
 

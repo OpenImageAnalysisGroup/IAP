@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Oct 8, 2010 by Christian Klukas
@@ -19,7 +17,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 /**
  * @author klukas
- * 
  */
 public class LemnaTecNavigationAction extends AbstractNavigationAction implements NavigationAction {
 
@@ -34,7 +31,6 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction
 	 * #getResultNewActionSet()
@@ -47,7 +43,6 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction
 	 * #getResultNewNavigationSet(java.util.ArrayList)
@@ -73,7 +68,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 			for (String db : new LemnaTecDataExchange().getDatabases()) {
 				try {
 					Collection<ExperimentHeaderInterface> experiments = new LemnaTecDataExchange()
-							.getExperimentInDatabase(db);
+										.getExperimentInDatabase(db);
 					if (experiments.size() > 0)
 						result.add(new NavigationButton(new LemnaDbAction(db, experiments), src.getGUIsetting()));
 					else

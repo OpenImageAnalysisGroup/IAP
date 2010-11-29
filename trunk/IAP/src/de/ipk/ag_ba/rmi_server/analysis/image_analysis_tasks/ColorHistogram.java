@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Oct 26, 2010 by Christian Klukas
@@ -14,7 +12,6 @@ import java.util.Collection;
 
 /**
  * @author klukas
- * 
  */
 public class ColorHistogram {
 

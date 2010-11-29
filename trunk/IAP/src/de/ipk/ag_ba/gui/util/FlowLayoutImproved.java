@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Apr 28, 2010 by Christian Klukas
@@ -17,7 +15,6 @@ import java.awt.Insets;
 
 /**
  * @author klukas
- * 
  */
 public class FlowLayoutImproved extends FlowLayout {
 

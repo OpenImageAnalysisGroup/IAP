@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Aug 13, 2010 by Christian Klukas
@@ -13,7 +11,6 @@ import com.mongodb.DB;
 
 /**
  * @author klukas
- * 
  */
 public interface RunnableOnDB extends Runnable {
 

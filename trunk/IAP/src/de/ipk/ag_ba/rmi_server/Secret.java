@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Jul 9, 2010 by Christian Klukas
@@ -16,7 +14,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 /**
  * @author klukas
- * 
  */
 public class Secret {
 	static String getDBurl() throws IOException {

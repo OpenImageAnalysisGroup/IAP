@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
  *******************************************************************************/
 /*
  * Created on Oct 11, 2010 by Christian Klukas
@@ -29,7 +27,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * 
  */
 public class LemnaTecFTPhandler implements ResourceIOHandler {
 

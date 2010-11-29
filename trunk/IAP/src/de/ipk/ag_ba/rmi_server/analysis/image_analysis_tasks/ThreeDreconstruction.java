@@ -67,7 +67,6 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * getTaskDescription()
 	 */
@@ -78,7 +77,6 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.AbstractImageAnalysisTask
 	 * #getInputType()
@@ -90,7 +88,6 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.AbstractImageAnalysisTask
 	 * #getResultType()
@@ -102,15 +99,12 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * performImageAnalysis(int,
 	 * org.BackgroundTaskStatusProviderSupportingExternalCall)
 	 */
 	/**
-	 * @deprecated Use
-	 *             {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)}
-	 *             instead
+	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
 	 */
 	@Deprecated
 	@Override
@@ -120,7 +114,6 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * performImageAnalysis(int,
 	 * org.BackgroundTaskStatusProviderSupportingExternalCall)
@@ -439,7 +432,6 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#getName
 	 * ()

@@ -35,7 +35,7 @@ public class MyStoredUserInfo implements UserInfo, UIKeyboardInteractive {
 	}
 
 	public String[] promptKeyboardInteractive(String destination, String name, String instruction, String[] prompt,
-			boolean[] echo) {
+						boolean[] echo) {
 		return new String[] { null }; // specify password
 	}
 }

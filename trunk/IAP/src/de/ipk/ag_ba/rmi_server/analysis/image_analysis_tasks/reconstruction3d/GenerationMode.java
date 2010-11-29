@@ -2,7 +2,6 @@ package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.reconstruction3d;
 
 /**
  * @author klukas
- * 
  */
 public enum GenerationMode {
 	GRAYSCALE_PROBABILITY("Gray Scale Probability"), COLORED("Colored, fixed cut off"),

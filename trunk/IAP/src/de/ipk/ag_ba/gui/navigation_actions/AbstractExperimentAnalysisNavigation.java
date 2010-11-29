@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Aug 5, 2010 by Christian Klukas
@@ -26,7 +24,6 @@ import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 
 /**
  * @author klukas
- * 
  */
 public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavigationAction {
 	private static final long serialVersionUID = 1L;
@@ -53,7 +50,7 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 		try {
 			exp.setExperimentData(experiment.getData());
 			for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(login, pass, exp,
-					src.getGUIsetting()))
+								src.getGUIsetting()))
 				actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);

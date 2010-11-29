@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Sep 23, 2010 by Christian Klukas
@@ -59,12 +57,11 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas
- * 
  */
 public class Other {
 
 	public static ArrayList<NavigationButton> getProcessExperimentDataWithVantedEntities(final String login,
-			final String pass, final ExperimentReference experimentName, GUIsetting guIsetting) {
+						final String pass, final ExperimentReference experimentName, GUIsetting guIsetting) {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 
 		ArrayList<AbstractExperimentDataProcessor> validProcessors = new ArrayList<AbstractExperimentDataProcessor>();
@@ -83,9 +80,9 @@ public class Other {
 					try {
 						if (experimentName.getData() != null) {
 							SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(login,
-									pass, experimentName.getData(), experimentName.getExperimentName());
+												pass, experimentName.getData(), experimentName.getExperimentName());
 							ExperimentDataProcessingManager.getInstance().processData(experimentName.getData(), pp, null,
-									optSupplementaryPanel, null);
+												optSupplementaryPanel, null);
 							AIPmain.showVANTED();
 						} else {
 							// final Document doc =
@@ -116,7 +113,7 @@ public class Other {
 
 				@Override
 				public ArrayList<NavigationButton> getResultNewNavigationSet(
-						ArrayList<NavigationButton> currentSet) {
+									ArrayList<NavigationButton> currentSet) {
 					return null;
 				}
 
@@ -131,7 +128,7 @@ public class Other {
 				}
 			};
 			NavigationButton ne = new NavigationButton(action, pp.getShortName(), "img/vanted1_0.png",
-					guIsetting);
+								guIsetting);
 
 			ImageIcon i = pp.getIcon();
 			if (i != null) {
@@ -146,12 +143,12 @@ public class Other {
 	}
 
 	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus,
-			GUIsetting guIsetting) {
+						GUIsetting guIsetting) {
 		return getServerStatusEntity(includeLemnaTecStatus, "Check Status", guIsetting);
 	}
 
 	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus, String title,
-			GUIsetting guIsetting) {
+						GUIsetting guIsetting) {
 		NavigationAction serverStatusAction = new AbstractNavigationAction("Check service availability") {
 			private NavigationButton src;
 			private final HashMap<String, ArrayList<String>> infoset = new HashMap<String, ArrayList<String>>();
@@ -162,13 +159,13 @@ public class Other {
 				infoset.clear();
 
 				checkServerAvailabilityByPing(infoset, "NW-04", "IAP (de) Cloud Database Master Server NW-04",
-						"nw-04.ipk-gatersleben.de");
+									"nw-04.ipk-gatersleben.de");
 
 				checkServerAvailabilityByPing(infoset, "BA-13", "IAP (de) Cloud Analysis Server BA-13",
-						"ba-13.ipk-gatersleben.de");
+									"ba-13.ipk-gatersleben.de");
 
 				checkServerAvailabilityByPing(infoset, "BA-24", "IAP (de) Cloud Analysis Compute Workstation BA-24",
-						"ba-24.ipk-gatersleben.de");
+									"ba-24.ipk-gatersleben.de");
 
 				// try {
 				// infoset.put("dbe", new ArrayList<String>());
@@ -271,11 +268,11 @@ public class Other {
 				} catch (Exception e) {
 					if (e.toString().indexOf("Read timed out") >= 0)
 						infoset.get("vanted").add(
-								"" + "The VANTED Web Site was not reachable within time limits.<br>"
-										+ "The cause may be internet connectivity problems or server side<br>"
-										+ "problems which may take some time to be corrected.<br><br>"
-										+ "The Web Server availability is monitored automatically.<br>"
-										+ "Effort will be put on improving reliability of the service.");
+											"" + "The VANTED Web Site was not reachable within time limits.<br>"
+																+ "The cause may be internet connectivity problems or server side<br>"
+																+ "problems which may take some time to be corrected.<br><br>"
+																+ "The Web Server availability is monitored automatically.<br>"
+																+ "Effort will be put on improving reliability of the service.");
 					else
 						infoset.get("vanted").add(e.toString());
 					infoset.get("vanted").add("<br><b>Status result check: ERROR</b>");
@@ -284,7 +281,7 @@ public class Other {
 
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+								ArrayList<NavigationButton> currentSet) {
 				currentSet.add(src);
 				return currentSet;
 			}
@@ -296,11 +293,11 @@ public class Other {
 					res.add(LemnaCam.getLemnaCamButton(src.getGUIsetting()));
 
 				res.add(new NavigationButton(null, "BA-13 Server R-810", "img/ext/dellR810.png", src
-						.getGUIsetting()));
+									.getGUIsetting()));
 				res.add(new NavigationButton(null, "BA-24 Workstation", "img/ext/computer.png", src
-						.getGUIsetting()));// macpro_side.png"));
+									.getGUIsetting()));// macpro_side.png"));
 				res.add(new NavigationButton(null, "NW-04 File Server", "img/ext/computer.png", src
-						.getGUIsetting()));// pc.png"));
+									.getGUIsetting()));// pc.png"));
 
 				return res;
 			}
@@ -318,13 +315,13 @@ public class Other {
 
 		};
 		NavigationButton serverStatusEntity = new NavigationButton(serverStatusAction, title,
-				"img/ext/network-server-status.png", guIsetting);
+							"img/ext/network-server-status.png", guIsetting);
 		return serverStatusEntity;
 	}
 
 	public static NavigationButton getCalendarEntity(
-			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
-			final String p, GUIsetting guiSettings) {
+						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
+						final String p, GUIsetting guiSettings) {
 
 		final ObjectRef refCalEnt = new ObjectRef();
 		final ObjectRef refCalGui = new ObjectRef();
@@ -339,7 +336,7 @@ public class Other {
 
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+								ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				res.addAll(currentSet);
 				res.add(src);
@@ -349,7 +346,7 @@ public class Other {
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Omics, group2ei, l, p,
-						refCalEnt, refCalGui, src.getGUIsetting());
+									refCalEnt, refCalGui, src.getGUIsetting());
 				return res;
 			}
 
@@ -375,9 +372,9 @@ public class Other {
 	// private SimpleDateFormat sdf = new SimpleDateFormat("MMMM");
 
 	protected static NavigationButton getCalendarNavigationEntitiy(final boolean nextMonth,
-			final ObjectRef refCalEnt, final ObjectRef refCalGui,
-			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
-			final String p, final GUIsetting guIsetting) {
+						final ObjectRef refCalEnt, final ObjectRef refCalGui,
+						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
+						final String p, final GUIsetting guIsetting) {
 		// GregorianCalendar c = new GregorianCalendar();
 		// c.setTime(((Calendar) refCalGui.getObject()).getCalendar().getTime());
 		// if (nextMonth)
@@ -392,7 +389,7 @@ public class Other {
 
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+								ArrayList<NavigationButton> currentSet) {
 				return currentSet;
 			}
 
@@ -406,7 +403,7 @@ public class Other {
 					c.getCalendar().add(GregorianCalendar.MONTH, -1);
 				c.updateGUI(false);
 				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Phenotyping, group2ei, l,
-						p, refCalEnt, refCalGui, guIsetting);
+									p, refCalEnt, refCalGui, guIsetting);
 				return res;
 			}
 		}, nextMonth ? "Next" : "Previous", nextMonth ? "img/large_right.png" : "img/large_left.png", guIsetting);
@@ -414,8 +411,8 @@ public class Other {
 	}
 
 	private static ArrayList<NavigationButton> getExperimentNavigationActions(DBEtype dbeType,
-			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
-			final String p, final ObjectRef refCalEnt, final ObjectRef refCalGui, GUIsetting guIsetting) {
+						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
+						final String p, final ObjectRef refCalEnt, final ObjectRef refCalGui, GUIsetting guIsetting) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		res.add(getCalendarNavigationEntitiy(false, refCalEnt, refCalGui, group2ei, l, p, guIsetting));
 		res.add(getCalendarNavigationEntitiy(true, refCalEnt, refCalGui, group2ei, l, p, guIsetting));
@@ -433,7 +430,7 @@ public class Other {
 
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(
-					ArrayList<NavigationButton> currentSet) {
+								ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
@@ -487,7 +484,7 @@ public class Other {
 		if (l == null || !l.equals("internet")) { // dbeType ==
 			// DBEtype.Phenotyping &&
 			NavigationButton scheduleExperiment = new NavigationButton(scheduleExperimentAction,
-					"Schedule Experiment", "img/ext/image-loading.png", guIsetting);
+								"Schedule Experiment", "img/ext/image-loading.png", guIsetting);
 			res.add(scheduleExperiment);
 		}
 
@@ -504,13 +501,13 @@ public class Other {
 						String dayB = DateUtils.getDayInfo(ei.getImportdate());
 						if (dayA.equals(dayInfo) || dayB.equals(dayInfo)) {
 							NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
-									guIsetting);
+												guIsetting);
 							res.add(exp);
 						} else {
 							if (calEnt.getCalendar().getTime().after(ei.getStartdate())
-									&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
+												&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
 								NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
-										guIsetting);
+													guIsetting);
 								res.add(exp);
 							}
 						}
@@ -519,13 +516,13 @@ public class Other {
 						String mB = DateUtils.getMonthInfo(ei.getImportdate());
 						if (mA.equals(monthInfo) || mB.equals(monthInfo)) {
 							NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
-									guIsetting);
+												guIsetting);
 							res.add(exp);
 						} else {
 							if (calEnt.getCalendar().getTime().after(ei.getStartdate())
-									&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
+												&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
 								NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
-										guIsetting);
+													guIsetting);
 								res.add(exp);
 							}
 						}
@@ -537,7 +534,7 @@ public class Other {
 	}
 
 	private static void checkServerAvailabilityByPing(HashMap<String, ArrayList<String>> infoset, String name,
-			String role, String host) {
+						String role, String host) {
 		infoset.put(name, new ArrayList<String>());
 		InetAddress address;
 		try {
@@ -550,11 +547,11 @@ public class Other {
 
 		} catch (Exception e1) {
 			infoset.get(name).add(
-					"<h2>" + role + "</h2><hr><br>" + "" + "The " + role + " was not reachable within time limits.<br>"
-							+ "The cause may be internet connectivity problems or server side<br>"
-							+ "problems which may take some time to be corrected.<br><br>"
-							+ "The availability of this server is monitored automatically.<br>"
-							+ "Effort will be put on improving reliability of the service.<br>");
+								"<h2>" + role + "</h2><hr><br>" + "" + "The " + role + " was not reachable within time limits.<br>"
+													+ "The cause may be internet connectivity problems or server side<br>"
+													+ "problems which may take some time to be corrected.<br><br>"
+													+ "The availability of this server is monitored automatically.<br>"
+													+ "Effort will be put on improving reliability of the service.<br>");
 			infoset.get(name).add("Error-Details: " + e1.toString());
 			infoset.get(name).add("<br><b>Status result check: ERROR</b>");
 

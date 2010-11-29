@@ -8,7 +8,6 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
- * 
  */
 public class Phenotyping extends AbstractNavigationAction {
 	NavigationButton src = null;
@@ -37,12 +36,12 @@ public class Phenotyping extends AbstractNavigationAction {
 
 		NavigationAction analyzeAction = new UploadImagesToCloud(false);
 		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Process Files", "img/ext/user-desktop.png",
-				"img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
+							"img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
 		phenoDBcommands.add(analyzeEntity);
 
 		NavigationAction lemnaExperiments = new LemnaTecNavigationAction();
 		NavigationButton lemnaEntity = new NavigationButton(lemnaExperiments, src != null ? src.getGUIsetting()
-				: guiSetting);
+							: guiSetting);
 
 		phenoDBcommands.add(lemnaEntity);
 
@@ -50,7 +49,7 @@ public class Phenotyping extends AbstractNavigationAction {
 		String pass = "";
 		NavigationAction mongoExperiments = new MongoExperimentsNavigationAction(login, pass);
 		NavigationButton mongo = new NavigationButton(mongoExperiments, "IAP Cloud", "img/ext/network-mongo.png",
-				"img/ext/network-mongo-gray.png", src != null ? src.getGUIsetting() : guiSetting);
+							"img/ext/network-mongo-gray.png", src != null ? src.getGUIsetting() : guiSetting);
 
 		phenoDBcommands.add(mongo);
 

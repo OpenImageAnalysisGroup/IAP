@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 31, 2010 by Christian Klukas
@@ -10,7 +8,6 @@ package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks;
 
 /**
  * @author klukas
- *
  */
 public class Geometry {
 
@@ -33,7 +30,7 @@ public class Geometry {
 	public long getFilledPixels() {
 		return filled;
 	}
-	
+
 	public int getTop() {
 		return top;
 	}

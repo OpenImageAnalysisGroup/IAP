@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Sep 30, 2010 by Christian Klukas
@@ -21,7 +19,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author klukas
- * 
  */
 public class TaskDescription {
 
@@ -66,9 +63,9 @@ public class TaskDescription {
 	}
 
 	public void startWork(BatchCmd batch, String hostName, String ip, final String login, final String pass)
-			throws ClassCastException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+						throws ClassCastException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		final RemoteCapableAnalysisAction action = RemoteAnalysisRepository.getInstance().getNewAnalysisAction(
-				analysisActionClassName);
+							analysisActionClassName);
 		action.setParams(experimentInput, login, pass, params);
 
 		Set<String> ips = cmd.getTargetIPs();
@@ -100,7 +97,7 @@ public class TaskDescription {
 				System.out.println("Received result:");
 				System.out.println(experiment.toString());
 				experiment.getHeader().setExperimentname(
-						cmd + "§" + FthisHostID + "§" + FnumberOfHosts + "§" + experiment.getName());
+									cmd + "§" + FthisHostID + "§" + FnumberOfHosts + "§" + experiment.getName());
 				try {
 					// todo: only store result if batch claim is still valid and
 					// connected to system IP
@@ -118,16 +115,16 @@ public class TaskDescription {
 		};
 		action.setWorkingSet(thisHostID, numberOfHosts, resultReceiver);
 		BackgroundTaskHelper.issueSimpleTask("Batch: " + analysisActionClassName + " (start: " + startTime + ")",
-				"Initializing", new Runnable() {
-					@Override
-					public void run() {
-						try {
-							action.performActionCalculateResults(null);
-						} catch (Exception e) {
-							ErrorMsg.addErrorMessage(e);
-						}
-					}
-				}, null, statusProvider, 0);
+							"Initializing", new Runnable() {
+								@Override
+								public void run() {
+									try {
+										action.performActionCalculateResults(null);
+									} catch (Exception e) {
+										ErrorMsg.addErrorMessage(e);
+									}
+								}
+							}, null, statusProvider, 0);
 	}
 
 	public boolean analysisFinished() {

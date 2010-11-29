@@ -35,7 +35,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
 
 /**
  * @author klukas
- * 
  */
 public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 

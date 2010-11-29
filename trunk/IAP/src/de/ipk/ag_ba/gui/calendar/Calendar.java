@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 8, 2010 by Christian Klukas
@@ -24,7 +22,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 /**
  * @author klukas
- * 
  */
 public class Calendar extends JComponent {
 	private static final long serialVersionUID = 1L;
@@ -57,9 +54,9 @@ public class Calendar extends JComponent {
 		GregorianCalendar today = cal;
 
 		int firstDay = new GregorianCalendar(cal.get(GregorianCalendar.YEAR), cal.get(GregorianCalendar.MONTH), 1)
-				.get(GregorianCalendar.DAY_OF_WEEK);
+							.get(GregorianCalendar.DAY_OF_WEEK);
 		GregorianCalendar pcal = new GregorianCalendar(cal.get(GregorianCalendar.YEAR), cal.get(GregorianCalendar.MONTH),
-				1);
+							1);
 		pcal.add(GregorianCalendar.DAY_OF_MONTH, -firstDay + 1);
 		if (firstDay == 2 || firstDay == 1)
 			pcal.add(GregorianCalendar.DAY_OF_MONTH, -7);
@@ -71,17 +68,16 @@ public class Calendar extends JComponent {
 		pcal = new GregorianCalendar(cal.get(GregorianCalendar.YEAR), cal.get(GregorianCalendar.MONTH), 1);
 		while (days.size() < 7 * 7) {
 			days.add(new DayComponent(group2ei, cal.get(GregorianCalendar.MONTH) == pcal.get(GregorianCalendar.MONTH),
-					doMark && sameDay(today, pcal), calCopy(pcal), calEnt));
+								doMark && sameDay(today, pcal), calCopy(pcal), calEnt));
 			pcal.add(GregorianCalendar.DAY_OF_MONTH, +1);
 		}
 
-		JPanel jp = new JPanel();
-		;
+		JPanel jp = new JPanel();;
 		jp.setLayout(new TableLayout(new double[][] {
-				{ TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL,
-						TableLayout.FILL, TableLayout.FILL },
-				{ TableLayout.PREFERRED, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL,
-						TableLayout.FILL, TableLayout.FILL } }));
+							{ TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL,
+												TableLayout.FILL, TableLayout.FILL },
+							{ TableLayout.PREFERRED, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL,
+												TableLayout.FILL, TableLayout.FILL } }));
 		int row = 0;
 		while (days.size() > 0) {
 			for (int day = 0; day < 7 && days.size() > 0; day++) {
@@ -147,7 +143,7 @@ public class Calendar extends JComponent {
 	// TableLayout.PREFERRED);
 	// int b = 4;
 	// nav.setBorder(BorderFactory.createEmptyBorder(b, b, b, b));
-	//		
+	//
 	// SimpleDateFormat sdf = new SimpleDateFormat("MMMMMMMMM yyyy");
 	// String date = sdf.format(cal.getTime());
 	// return TableLayout.getSplit(new

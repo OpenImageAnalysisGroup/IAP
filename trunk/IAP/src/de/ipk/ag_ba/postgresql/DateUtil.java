@@ -1,4 +1,5 @@
 package de.ipk.ag_ba.postgresql;
+
 /**
  * public domain code (http://forums.sun.com/thread.jspa?threadID=488668&forumID=4)
  */
@@ -18,7 +19,6 @@ public final class DateUtil {
 	 * 
 	 * @param date
 	 *           Date
-	 * 
 	 * @return int number of days
 	 */
 	public static int getElapsedDays(Date date) {
@@ -32,7 +32,6 @@ public final class DateUtil {
 	 *           Date
 	 * @param d2
 	 *           Date
-	 * 
 	 * @return int number of days
 	 */
 	public static int getElapsedDays(Date d1, Date d2) {
@@ -44,7 +43,6 @@ public final class DateUtil {
 	 * 
 	 * @param date
 	 *           Date
-	 * 
 	 * @return int number of months
 	 */
 	public static int getElapsedMonths(Date date) {
@@ -58,7 +56,6 @@ public final class DateUtil {
 	 *           Date
 	 * @param d2
 	 *           Date
-	 * 
 	 * @return int number of months
 	 */
 	public static int getElapsedMonths(Date d1, Date d2) {
@@ -70,7 +67,6 @@ public final class DateUtil {
 	 * 
 	 * @param date
 	 *           Date
-	 * 
 	 * @return int number of years
 	 */
 	public static int getElapsedYears(Date date) {
@@ -84,7 +80,6 @@ public final class DateUtil {
 	 *           Date
 	 * @param d2
 	 *           Date
-	 * 
 	 * @return int number of years
 	 */
 	public static int getElapsedYears(Date d1, Date d2) {
@@ -100,7 +95,6 @@ public final class DateUtil {
 	 *           GregorianCalendar
 	 * @param type
 	 *           int (Calendar.FIELD_NAME)
-	 * 
 	 * @return int number of elapsed "type"
 	 */
 	private static int elapsed(GregorianCalendar g1, GregorianCalendar g2, int type) {
@@ -136,7 +130,6 @@ public final class DateUtil {
 	 *           Date
 	 * @param type
 	 *           int (Calendar.FIELD_NAME)
-	 * 
 	 * @return int number of elapsed "type"
 	 */
 	private static int elapsed(Date date, int type) {
@@ -152,17 +145,16 @@ public final class DateUtil {
 	 *           Date
 	 * @param type
 	 *           int (Calendar.FIELD_NAME)
-	 * 
 	 * @return int number of elapsed "type"
 	 */
 	private static int elapsed(Date d1, Date d2, int type) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(d1);
 		GregorianCalendar g1 = new GregorianCalendar(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal
-				.get(Calendar.DATE));
+							.get(Calendar.DATE));
 		cal.setTime(d2);
 		GregorianCalendar g2 = new GregorianCalendar(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal
-				.get(Calendar.DATE));
+							.get(Calendar.DATE));
 		return elapsed(g1, g2, type);
 	}
 }

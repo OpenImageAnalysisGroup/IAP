@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Apr 28, 2010 by Christian Klukas
@@ -20,7 +18,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Rim
 
 /**
  * @author klukas
- * 
  */
 public class RimasNav {
 
@@ -75,12 +72,12 @@ public class RimasNav {
 
 	private static String getIntroTxt() {
 		String s = "<h2>RIMAS - Regulatory Interaction Maps of Arabidopsis Seed Development</h2>"
-				+ "RIMAS contains detailed SBGN conforming network diagrams which reflect the interactions "
-				+ "of transcription factor hierarchies, gene promoter elements, hormonal pathways, epigenetic "
-				+ "processes and chromatin remodelling and provides an easy access to the relevant references.<br><br>"
-				+ "IAP provides interactive access to the RIMAS pathways. RIMAS itself is a web-based information "
-				+ "portal with additional detailed descriptions and background information about the investigated "
-				+ "biological phenomena (please click the Website button above for access to detailed pathway descriptions).";
+							+ "RIMAS contains detailed SBGN conforming network diagrams which reflect the interactions "
+							+ "of transcription factor hierarchies, gene promoter elements, hormonal pathways, epigenetic "
+							+ "processes and chromatin remodelling and provides an easy access to the relevant references.<br><br>"
+							+ "IAP provides interactive access to the RIMAS pathways. RIMAS itself is a web-based information "
+							+ "portal with additional detailed descriptions and background information about the investigated "
+							+ "biological phenomena (please click the Website button above for access to detailed pathway descriptions).";
 		return s;
 	}
 
@@ -88,8 +85,8 @@ public class RimasNav {
 		HashMap<String, String> rimasDoku = new HashMap<String, String>();
 		rimasDoku.put("", "Lit. Reference:http://www.cell.com/trends/plant-science/abstract/S1360-1385(10)00061-0");
 		NavigationButton rimas = WebFolder.getBrowserNavigationEntity(rimasDoku, "RIMAS", "img/rimas.png",
-				"http://rimas.ipk-gatersleben.de/Pathways/", "Website", "img/browser.png",
-				"http://rimas.ipk-gatersleben.de/", new String[] { ".gml", ".graphml" }, getIntroTxt(), null, guiSetting);
+							"http://rimas.ipk-gatersleben.de/Pathways/", "Website", "img/browser.png",
+							"http://rimas.ipk-gatersleben.de/", new String[] { ".gml", ".graphml" }, getIntroTxt(), null, guiSetting);
 		return rimas;
 	}
 

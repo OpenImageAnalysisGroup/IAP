@@ -1,7 +1,5 @@
 /*************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- *
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *************************************************************************/
 package de.ipk.ag_ba.image_utils;
 
@@ -13,7 +11,6 @@ import org.graffiti.editor.GravistoService;
 
 /**
  * @author entzian
- * 
  */
 public class PrintImage {
 
@@ -77,21 +74,21 @@ public class PrintImage {
 
 		switch (typ) {
 
-		case GRAVISTO_SERVICE:
-			printGravistoService(image, text);
-			break;
+			case GRAVISTO_SERVICE:
+				printGravistoService(image, text);
+				break;
 
-		case IMAGEJ:
-			printImagej(image, text);
-			break;
+			case IMAGEJ:
+				printImagej(image, text);
+				break;
 
-		case CONSOLE:
-			printImageConsole(ImageConverter.convertBIto2A(image), text);
-			break;
+			case CONSOLE:
+				printImageConsole(ImageConverter.convertBIto2A(image), text);
+				break;
 
-		default:
-			printImagej(image, text);
-			break;
+			default:
+				printImagej(image, text);
+				break;
 
 		}
 	}

@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 8, 2010 by Christian Klukas
@@ -24,7 +22,6 @@ import de.ipk.ag_ba.gui.navigation_actions.Calendar2;
 
 /**
  * @author klukas
- * 
  */
 public class MyCalendarIcon extends ImageIcon {
 	private static final long serialVersionUID = 1L;

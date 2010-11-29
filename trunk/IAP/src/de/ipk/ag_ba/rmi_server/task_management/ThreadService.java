@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Nov 25, 2010 by Christian Klukas
@@ -19,7 +17,6 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 /**
  * @author klukas
- * 
  */
 public class ThreadService {
 	private static ThreadSafeOptions tsoTaskID = new ThreadSafeOptions();

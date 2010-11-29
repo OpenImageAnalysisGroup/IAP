@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Jul 9, 2010 by Christian Klukas
@@ -40,7 +38,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 /**
  * @author klukas
- * 
  */
 public class IAPdbConnection implements IAPdb {
 
@@ -82,7 +79,6 @@ public class IAPdbConnection implements IAPdb {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see rmi_server.IAPdb#getExperiment(java.lang.String, java.lang.String,
 	 * java.lang.String)
 	 */
@@ -92,7 +88,7 @@ public class IAPdbConnection implements IAPdb {
 		Experiment result = null;
 
 		String sqlCommand = "" + "SELECT excelFile " + "FROM importfile NATURAL JOIN experiment "
-				+ "WHERE experimentName=?";
+							+ "WHERE experimentName=?";
 
 		try {
 			if (conn == null || conn.isClosed())
@@ -144,19 +140,18 @@ public class IAPdbConnection implements IAPdb {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see rmi_server.IAPdb#getExperimentFiles(java.lang.String,
 	 * java.lang.String)
 	 */
 	@Override
 	public Collection<FileInfo> getExperimentFiles(String login, String pass, String experimentName)
-			throws RemoteException {
+						throws RemoteException {
 		Collection<FileInfo> result = new ArrayList<FileInfo>();
 
 		String sql = "SELECT imageFileID, fileName, md5, filesize " + "FROM imageFILE " + "NATURAL JOIN imageExperiment "
-				+ "NATURAL JOIN experiment " + "NATURAL JOIN account " + "NATURAL JOIN user2group "
-				+ "NATURAL JOIN usergroup " + "WHERE experimentName=? AND (userGroupID IN " + "	(SELECT usergroupid "
-				+ "	 FROM (user2group " + "		NATURAL JOIN account) " + "	 WHERE dbuser=? AND dbpass=?))";
+							+ "NATURAL JOIN experiment " + "NATURAL JOIN account " + "NATURAL JOIN user2group "
+							+ "NATURAL JOIN usergroup " + "WHERE experimentName=? AND (userGroupID IN " + "	(SELECT usergroupid "
+							+ "	 FROM (user2group " + "		NATURAL JOIN account) " + "	 WHERE dbuser=? AND dbpass=?))";
 
 		try {
 			if (conn == null || conn.isClosed())
@@ -202,23 +197,22 @@ public class IAPdbConnection implements IAPdb {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see rmi_server.IAPdb#getExperiments(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public Collection<ExperimentInfo> getExperiments(String login, String pass, boolean fromOwnerTruefromOthersFalse)
-			throws RemoteException {
+						throws RemoteException {
 
 		Collection<ExperimentInfo> result = new ArrayList<ExperimentInfo>();
 
 		String sqlW = "SELECT experimentName " + "FROM experiment " + "NATURAL JOIN account "
-				+ "NATURAL JOIN user2group " + "NATURAL JOIN usergroup "
-				+ "WHERE dbuser=? AND dbpass=? ORDER BY experimentName";
+							+ "NATURAL JOIN user2group " + "NATURAL JOIN usergroup "
+							+ "WHERE dbuser=? AND dbpass=? ORDER BY experimentName";
 
 		String sqlRO = "SELECT experimentName " + "FROM experiment " + "NATURAL JOIN account "
-				+ "NATURAL JOIN usergroup " + "WHERE userGroupID IN " + "	(SELECT usergroupid "
-				+ "	 FROM user2group NATURAL JOIN account "
-				+ "	 WHERE dbuser=? AND dbpass=?) AND dbuser!=? ORDER BY experimentName";
+							+ "NATURAL JOIN usergroup " + "WHERE userGroupID IN " + "	(SELECT usergroupid "
+							+ "	 FROM user2group NATURAL JOIN account "
+							+ "	 WHERE dbuser=? AND dbpass=?) AND dbuser!=? ORDER BY experimentName";
 
 		String sql = fromOwnerTruefromOthersFalse ? sqlW : sqlRO;
 
@@ -271,13 +265,12 @@ public class IAPdbConnection implements IAPdb {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see rmi_server.IAPdb#getImageFile(java.lang.String, java.lang.String,
 	 * java.lang.String)
 	 */
 	@Override
 	public RemoteInputStream getImageFile(String login, String pass, String md5, boolean returnPreview)
-			throws RemoteException {
+						throws RemoteException {
 
 		RemoteInputStream result = null;
 
@@ -301,14 +294,13 @@ public class IAPdbConnection implements IAPdb {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see rmi_server.IAPdb#storeExperiment(java.lang.String, java.lang.String,
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.
 	 * Experiment)
 	 */
 	@Override
 	public void storeExperiment(String login, String pass, String userGroup, Experiment experiment)
-			throws RemoteException {
+						throws RemoteException {
 
 		try {
 			if (conn == null || conn.isClosed())
@@ -334,8 +326,8 @@ public class IAPdbConnection implements IAPdb {
 			getGroupID(userGroup);
 
 			String sql = "INSERT INTO experiment " + "(experimentID, dateExperimentStart, dateImport, "
-					+ " remark, experimentName, coordinator, sequenceName, " + " excelFileID, userID, userGroupID, trash) "
-					+ "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+								+ " remark, experimentName, coordinator, sequenceName, " + " excelFileID, userID, userGroupID, trash) "
+								+ "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 			// setParameters(ps, new Object[] {
 			// newExperimentID, experiment.getStartDate(),
 			// experiment.getImportDate(),
@@ -346,7 +338,7 @@ public class IAPdbConnection implements IAPdb {
 				throw new RemoteException("Could not correctly execute SQL Query: " + sql);
 			if (ps.getWarnings() != null) {
 				throw new RemoteException("Could not correctly execute SQL Query (with warnings): " + sql + ". Warnings: "
-						+ ps.getWarnings().getMessage());
+									+ ps.getWarnings().getMessage());
 			}
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage(), e);
@@ -390,12 +382,12 @@ public class IAPdbConnection implements IAPdb {
 				} else {
 					ps.close();
 					throw new RemoteException("Empty result. SQL command: " + sqlCommand + ". "
-							+ ps.getWarnings().getLocalizedMessage());
+										+ ps.getWarnings().getLocalizedMessage());
 				}
 			} else {
 				ps.close();
 				throw new RemoteException("Error Executing SQL command: " + sqlCommand + ". "
-						+ ps.getWarnings().getLocalizedMessage());
+									+ ps.getWarnings().getLocalizedMessage());
 			}
 		} catch (SQLException e) {
 			throw new RemoteException("Error Executing SQL command: " + sqlCommand, e);

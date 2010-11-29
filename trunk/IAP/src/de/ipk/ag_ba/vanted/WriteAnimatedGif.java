@@ -21,7 +21,6 @@ import org.w3c.dom.Node;
  * other people, as documented on the thread on the Sun forums 'Create animated
  * GIF using imageio' http://forums.sun.com/thread.jspa?threadID=5395006 See the
  * printUsage() method for details on paramaters required.
- * 
  * Public Domain Code, taken from
  * http://forums.sun.com/thread.jspa?threadID=5395006
  * 
@@ -66,10 +65,10 @@ public class WriteAnimatedGif {
 			ae.setAttribute("applicationID", "NETSCAPE");
 			ae.setAttribute("authenticationCode", "2.0");
 			byte[] uo = new byte[] {
-			// last two bytes is an unsigned short (little endian) that
-					// indicates the the number of times to loop.
-					// 0 means loop forever.
-					0x1, 0x0, 0x0 };
+								// last two bytes is an unsigned short (little endian) that
+								// indicates the the number of times to loop.
+								// 0 means loop forever.
+								0x1, 0x0, 0x0 };
 			ae.setUserObject(uo);
 			aes.appendChild(ae);
 			root.appendChild(aes);
@@ -229,16 +228,17 @@ public class WriteAnimatedGif {
 			System.err.println(delays.length + " delays specified for " + names.length + " frames!");
 			printUsage();
 			System.exit(1);
-		} else if (delays.length == 1) {
-			for (int ii = 0; ii < delayTimes.length; ii++) {
-				// fill all values with the single delayTime
-				delayTimes[ii] = checkDelay(delays[0]);
+		} else
+			if (delays.length == 1) {
+				for (int ii = 0; ii < delayTimes.length; ii++) {
+					// fill all values with the single delayTime
+					delayTimes[ii] = checkDelay(delays[0]);
+				}
+			} else {
+				for (int ii = 0; ii < delayTimes.length; ii++) {
+					delayTimes[ii] = checkDelay(delays[ii]);
+				}
 			}
-		} else {
-			for (int ii = 0; ii < delayTimes.length; ii++) {
-				delayTimes[ii] = checkDelay(delays[ii]);
-			}
-		}
 
 		// save an animated GIF
 		saveAnimate(f, frames, delayTimes);

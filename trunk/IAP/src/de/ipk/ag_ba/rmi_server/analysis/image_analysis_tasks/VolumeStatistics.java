@@ -18,7 +18,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
  * @author klukas
- * 
  */
 public class VolumeStatistics extends AbstractImageAnalysisTask {
 
@@ -29,7 +28,6 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.AbstractImageAnalysisTask
 	 * #getInputType()
@@ -41,7 +39,6 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.AbstractImageAnalysisTask
 	 * #getResultType()
@@ -53,7 +50,6 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.AbstractImageAnalysisTask
 	 * #getTaskDescription()
@@ -65,15 +61,12 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * performImageAnalysis(int, boolean,
 	 * org.BackgroundTaskStatusProviderSupportingExternalCall)
 	 */
 	/**
-	 * @deprecated Use
-	 *             {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)}
-	 *             instead
+	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
 	 */
 	@Deprecated
 	@Override
@@ -83,7 +76,6 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * performImageAnalysis(int, boolean,
 	 * org.BackgroundTaskStatusProviderSupportingExternalCall)

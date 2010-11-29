@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Oct 25, 2010 by Christian Klukas
@@ -12,7 +10,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * 
  */
 public class CommandLineBackgroundTaskStatusProvider extends BackgroundTaskStatusProviderSupportingExternalCallImpl {
 

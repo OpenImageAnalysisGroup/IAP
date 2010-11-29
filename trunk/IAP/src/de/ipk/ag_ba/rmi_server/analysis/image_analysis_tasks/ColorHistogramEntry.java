@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Oct 26, 2010 by Christian Klukas
@@ -10,7 +8,6 @@ package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks;
 
 /**
  * @author klukas
- * 
  */
 public class ColorHistogramEntry {
 

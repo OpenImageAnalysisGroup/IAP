@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
  *******************************************************************************/
 /*
  * Created on Sep 7, 2010 by Christian Klukas
@@ -30,7 +28,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
  * @author klukas
- * 
  */
 public class VolumeSegmentation extends AbstractImageAnalysisTask {
 
@@ -74,9 +71,7 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 	}
 
 	/**
-	 * @deprecated Use
-	 *             {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)}
-	 *             instead
+	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
 	 */
 	@Deprecated
 	@Override

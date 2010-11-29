@@ -29,8 +29,8 @@ public class ImageConverter {
 			GravistoService.showImage(img, "Ausgang");
 			GravistoService.showImage(scalingIJ(img), "Scaling IJ Faktor 2");
 			GravistoService.showImage(
-					scalingJAI(new URL("http://www.spiegel.de/images/image-150632-panoV9free-hldq.jpg")),
-					"Scaling JAI Faktor 2");
+								scalingJAI(new URL("http://www.spiegel.de/images/image-150632-panoV9free-hldq.jpg")),
+								"Scaling JAI Faktor 2");
 			GravistoService.showImage(scalingOWN(img), "Scaling OWN Faktor 2");
 			GravistoService.showImage(scalingAWT(img), "Scaling AWT Faktor 2");
 
@@ -109,8 +109,7 @@ public class ImageConverter {
 
 	public static BufferedImage convertPItoBI(PlanarImage plImage1) {
 
-		BufferedImage fBufferedImage = plImage1.getAsBufferedImage();
-		;
+		BufferedImage fBufferedImage = plImage1.getAsBufferedImage();;
 		return fBufferedImage;
 	}
 
@@ -230,7 +229,7 @@ public class ImageConverter {
 		long startTime = System.currentTimeMillis();
 
 		Image scalingAWT_temp = img
-				.getScaledInstance(2 * img.getWidth(), 2 * img.getHeight(), Image.SCALE_AREA_AVERAGING);
+							.getScaledInstance(2 * img.getWidth(), 2 * img.getHeight(), Image.SCALE_AREA_AVERAGING);
 		BufferedImage scalingAWT = new BufferedImage(2 * img.getWidth(), 2 * img.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics g = scalingAWT.getGraphics();
 		g.drawImage(scalingAWT_temp, 0, 0, null);

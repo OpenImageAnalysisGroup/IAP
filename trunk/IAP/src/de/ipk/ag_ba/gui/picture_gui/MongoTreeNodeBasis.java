@@ -19,7 +19,6 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.expdb.application.picture_gui.DBEtreeNodeModelHelper
 	 * #getChild(int)
@@ -32,7 +31,6 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.expdb.application.picture_gui.DBEtreeNodeModelHelper
 	 * #getChildCount()
@@ -45,7 +43,6 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.expdb.application.picture_gui.DBEtreeNodeModelHelper
 	 * #setIndex(int)
@@ -56,7 +53,6 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.expdb.application.picture_gui.DBEtreeNodeModelHelper
 	 * #getIndex()
@@ -67,7 +63,6 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.expdb.application.picture_gui.DBEtreeNodeModelHelper
 	 * #isLeaf()
@@ -78,7 +73,6 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.expdb.application.picture_gui.DBEtreeNodeModelHelper
 	 * #setGetChildrenMethod(java.lang.Runnable)
@@ -89,7 +83,6 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.expdb.application.picture_gui.DBEtreeNodeModelHelper
 	 * #setChildren(de.ipk_gatersleben.ag_nw.expdb.application.picture_gui.
@@ -101,7 +94,6 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.expdb.application.picture_gui.DBEtreeNodeModelHelper
 	 * #setIsLeaf(boolean)

@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Nov 26, 2010 by Christian Klukas
@@ -13,7 +11,6 @@ import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTa
 
 /**
  * @author klukas
- * 
  */
 public class PhytoTopImageProcessorOptions {
 	private double rotationAngle;

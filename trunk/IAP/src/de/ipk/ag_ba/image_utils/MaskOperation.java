@@ -1,7 +1,5 @@
 /*************************************************************************
- * 
  * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
  *************************************************************************/
 package de.ipk.ag_ba.image_utils;
 
@@ -9,7 +7,6 @@ import java.awt.image.BufferedImage;
 
 /**
  * @author entzian
- * 
  */
 public class MaskOperation {
 

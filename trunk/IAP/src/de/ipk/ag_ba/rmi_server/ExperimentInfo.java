@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Jul 8, 2010 by Christian Klukas
@@ -16,7 +14,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 /**
  * @author klukas
- * 
  */
 public class ExperimentInfo {
 	// <Experiment experimentid="56">
@@ -50,8 +47,8 @@ public class ExperimentInfo {
 	public int byteSize;
 
 	public ExperimentInfo(String experimentName, int experimentID, String importUser, String userGroup,
-			String experimentType, Date dateExperimentStart, Date dateExperimentImport, String remark, String coordinator,
-			String excelFileMd5, int fileCount, int byteSize) {
+						String experimentType, Date dateExperimentStart, Date dateExperimentImport, String remark, String coordinator,
+						String excelFileMd5, int fileCount, int byteSize) {
 		this.experimentName = experimentName;
 		this.experimentID = experimentID;
 		this.importUser = importUser;
