@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Jun 2, 2010 by Christian Klukas
@@ -12,7 +10,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 /**
  * @author klukas
- * 
  */
 public interface RunnableWithExperimentInfo {
 

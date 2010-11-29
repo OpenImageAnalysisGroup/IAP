@@ -30,7 +30,7 @@ public class DBEtreeModel implements TreeModel {
 		private final ActionListener dataChangedListener;
 
 		private GetSubstances(MongoTreeNode projectNode, ExperimentInterface experiment, boolean readOnly,
-				ActionListener dataChangedListener) {
+							ActionListener dataChangedListener) {
 			this.readOnly = readOnly;
 			this.experiment = experiment;
 			this.projectNode = projectNode;
@@ -42,12 +42,12 @@ public class DBEtreeModel implements TreeModel {
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
 			for (SubstanceInterface substance : experiment) {
 				MongoTreeNode substNode = new MongoTreeNode(projectNode, dataChangedListener, experiment,
-						(MappingDataEntity) substance, substance.getName(), readOnly); //$NON-NLS-1$//$NON-NLS-2$
+									(MappingDataEntity) substance, substance.getName(), readOnly); //$NON-NLS-1$//$NON-NLS-2$
 
 				substNode.setIsLeaf(false);
 				substNode.setIndex(p++);
 				substNode.setGetChildrenMethod(new GetConditions(substNode, experiment, substance, readOnly,
-						dataChangedListener));
+									dataChangedListener));
 				children.add(substNode);
 			}
 			projectNode.setChildren(children.toArray(new DBEtreeNodeModelHelper[0]));
@@ -62,7 +62,7 @@ public class DBEtreeModel implements TreeModel {
 		private final ActionListener dataChangedListener;
 
 		private GetConditions(MongoTreeNode substNode, ExperimentInterface experiment, SubstanceInterface substance,
-				boolean readOnly, ActionListener dataChangedListener) {
+							boolean readOnly, ActionListener dataChangedListener) {
 			this.readOnly = readOnly;
 			this.substance = substance;
 			this.substNode = substNode;
@@ -75,12 +75,12 @@ public class DBEtreeModel implements TreeModel {
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
 			for (ConditionInterface condition : substance) {
 				final MongoTreeNode condNode = new MongoTreeNode(substNode, dataChangedListener, experiment, condition,
-						condition.getConditionName(), readOnly);
+									condition.getConditionName(), readOnly);
 
 				condNode.setIsLeaf(false);
 				condNode.setIndex(p++);
 				condNode
-						.setGetChildrenMethod(new GetSamples(condNode, experiment, condition, readOnly, dataChangedListener));
+									.setGetChildrenMethod(new GetSamples(condNode, experiment, condition, readOnly, dataChangedListener));
 				children.add(condNode);
 			}
 			substNode.setChildren(children.toArray(new DBEtreeNodeModelHelper[0]));
@@ -95,7 +95,7 @@ public class DBEtreeModel implements TreeModel {
 		private final ActionListener dataChangedListener;
 
 		private GetSamples(MongoTreeNode condNode, ExperimentInterface experiment, ConditionInterface condition,
-				boolean readOnly, ActionListener dataChangedListener) {
+							boolean readOnly, ActionListener dataChangedListener) {
 			this.readOnly = readOnly;
 			this.condition = condition;
 			this.condNode = condNode;
@@ -108,12 +108,12 @@ public class DBEtreeModel implements TreeModel {
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
 			for (SampleInterface sample : condition) {
 				final MongoTreeNode sampNode = new MongoTreeNode(condNode, dataChangedListener, experiment, sample, sample
-						.toString(), readOnly);
+									.toString(), readOnly);
 
 				sampNode.setIsLeaf(false);
 				sampNode.setIndex(p++);
 				sampNode.setGetChildrenMethod(new GetMeasurements(sampNode, experiment, sample, readOnly,
-						dataChangedListener));
+									dataChangedListener));
 				children.add(sampNode);
 			}
 			condNode.setChildren(children.toArray(new DBEtreeNodeModelHelper[0]));
@@ -128,7 +128,7 @@ public class DBEtreeModel implements TreeModel {
 		private final ActionListener dataChangedListener;
 
 		private GetMeasurements(MongoTreeNode sampNode, ExperimentInterface experiment, SampleInterface sample,
-				boolean readOnly, ActionListener dataChangedListener) {
+							boolean readOnly, ActionListener dataChangedListener) {
 			this.readOnly = readOnly;
 			this.sample = sample;
 			this.sampNode = sampNode;
@@ -141,7 +141,7 @@ public class DBEtreeModel implements TreeModel {
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
 			for (Measurement meas : sample) {
 				MongoTreeNode measNode = new MongoTreeNode(sampNode, dataChangedListener, experiment, meas,
-						meas.toString(), readOnly);
+									meas.toString(), readOnly);
 				measNode.setIsLeaf(true);
 				measNode.setIndex(p++);
 				children.add(measNode);
@@ -149,7 +149,7 @@ public class DBEtreeModel implements TreeModel {
 			if (sample instanceof Sample3D) {
 				for (Measurement meas : ((Sample3D) sample).getBinaryMeasurements()) {
 					MongoTreeNode measNode = new MongoTreeNode(sampNode, dataChangedListener, experiment, meas, meas
-							.toString(), readOnly);
+										.toString(), readOnly);
 					measNode.setIsLeaf(true);
 					measNode.setIndex(p++);
 					children.add(measNode);
@@ -166,7 +166,7 @@ public class DBEtreeModel implements TreeModel {
 	private final boolean isReadOnly;
 
 	public DBEtreeModel(ActionListener dataChangedListener, String login, String password, ExperimentInterface doc,
-			boolean readOnly) {
+						boolean readOnly) {
 		this.login = login;
 		this.password = password;
 		this.document = doc;
@@ -176,7 +176,7 @@ public class DBEtreeModel implements TreeModel {
 
 	public Object getRoot() {
 		final MongoTreeNode expNode = new MongoTreeNode(null, dataChangedListener, document, document,
-				document.getName(), isReadOnly);
+							document.getName(), isReadOnly);
 		expNode.setSizeDirty(true);
 		expNode.updateSizeInfo(login, password, dataChangedListener);
 		expNode.setIndex(0);

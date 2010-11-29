@@ -19,7 +19,7 @@ public class TestSegmentation {
 		int[][] eingabe_image4 = { { 1, 1, 1 }, { 1, 1, 1 } };
 
 		int[][] eingabe_image5 = { { 0, 1, 1, 0, 1, 0, 1, 0 }, { 1, 1, 0, 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 1, 0, 1, 0 },
-				{ 0, 0, 0, 0, 0, 1, 1, 0 }, { 0, 1, 1, 1, 0, 0, 0, 1 }, { 1, 1, 1, 1, 1, 0, 0, 0 } };
+							{ 0, 0, 0, 0, 0, 1, 1, 0 }, { 0, 1, 1, 1, 0, 0, 0, 1 }, { 1, 1, 1, 1, 1, 0, 0, 0 } };
 
 		ArrayList<int[][]> testImage = new ArrayList<int[][]>();
 		testImage.add(eingabe_image1);

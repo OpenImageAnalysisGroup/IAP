@@ -1,13 +1,10 @@
 /*************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- *
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *************************************************************************/
 package de.ipk.ag_ba.image_utils;
 
 /**
  * @author entzian
- * 
  */
 public class MorphologicalOperators {
 
@@ -150,8 +147,8 @@ public class MorphologicalOperators {
 		for (int l = 0; l < mask.length; l++) {
 			for (int k = 0; k < mask[l].length; k++) {
 				if (currentPositionI - positionMaskI + l >= 0 && currentPositionJ - positionMaskJ + k >= 0
-						&& currentPositionI - positionMaskI + l <= src_image.length - 1
-						&& currentPositionJ - positionMaskJ + k <= src_image[currentPositionI].length - 1)
+									&& currentPositionI - positionMaskI + l <= src_image.length - 1
+									&& currentPositionJ - positionMaskJ + k <= src_image[currentPositionI].length - 1)
 					image_result[currentPositionI - positionMaskI + l][currentPositionJ - positionMaskJ + k] = mask[l][k];
 			}
 		}
@@ -165,8 +162,8 @@ public class MorphologicalOperators {
 		for (int i = 0; i < src_image.length; i++) {
 			for (int j = 0; j < src_image[i].length; j++) {
 				if (i - positionMaskI >= 0 && j - positionMaskJ >= 0
-						&& i + (mask.length - positionMaskI - 1) <= src_image.length - 1
-						&& j + (mask[0].length - positionMaskJ - 1) <= src_image[i].length - 1) {
+									&& i + (mask.length - positionMaskI - 1) <= src_image.length - 1
+									&& j + (mask[0].length - positionMaskJ - 1) <= src_image[i].length - 1) {
 					mergeMask(i, j, src_image);
 				} else {
 					image_result[i][j] = background;
@@ -182,7 +179,7 @@ public class MorphologicalOperators {
 		mainloop: for (int l = 0; l < mask.length; l++) {
 			for (int k = 0; k < mask[l].length; k++) {
 				if (mask[l][k] == 1
-						&& src_image[currentPositionI - positionMaskI + l][currentPositionJ - positionMaskJ + k] != 1) {
+									&& src_image[currentPositionI - positionMaskI + l][currentPositionJ - positionMaskJ + k] != 1) {
 					agrees = false;
 					break mainloop;
 				}

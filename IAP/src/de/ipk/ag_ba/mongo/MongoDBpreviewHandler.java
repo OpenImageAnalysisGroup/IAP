@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Nov 26, 2010 by Christian Klukas
@@ -23,7 +21,6 @@ import com.mongodb.gridfs.GridFSDBFile;
 
 /**
  * @author klukas
- * 
  */
 public class MongoDBpreviewHandler implements ResourceIOHandler {
 	// mongo-preview://c3fd77bc7b74388d9dcff9d09d1c16fc/000Grad.png
@@ -31,7 +28,7 @@ public class MongoDBpreviewHandler implements ResourceIOHandler {
 
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
-			throws Exception {
+						throws Exception {
 		return null;
 	}
 

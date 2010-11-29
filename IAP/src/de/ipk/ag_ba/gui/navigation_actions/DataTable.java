@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Aug 14, 2010 by Christian Klukas
@@ -15,7 +13,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 /**
  * @author klukas
- * 
  */
 public class DataTable extends JComponent {
 	private static final long serialVersionUID = 1L;

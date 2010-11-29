@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Oct 8, 2010 by Christian Klukas
@@ -25,7 +23,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 /**
  * @author klukas
- * 
  */
 public class LemnaTecUserNavigationAction extends AbstractNavigationAction implements NavigationAction {
 
@@ -43,7 +40,7 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		for (String user : userName2dbAndExperiment.keySet()) {
 			result.add(new NavigationButton(new LemnaUserAction(user, userName2dbAndExperiment.get(user)), src
-					.getGUIsetting()));
+								.getGUIsetting()));
 		}
 		return result;
 	}
@@ -83,7 +80,7 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 					}
 					String id = experiment.getDatabase() + ":" + experiment.getExperimentname();
 					for (Snapshot s : new LemnaTecDataExchange().getSnapshotsOfExperiment(experiment.getDatabase(),
-							experiment.getExperimentname())) {
+										experiment.getExperimentname())) {
 						String c = s.getCreator();
 						if (c.length() == 0)
 							continue;
@@ -111,22 +108,22 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 		users = userName2dbAndExperiment.size();
 
 		message = "<html><h2>Database Content</h2>"
-				+ "<ul>"
-				+ "<li>Databases: "
-				+ dbs.size()
-				+ "<li>Users: "
-				+ users
-				+ "<li>Experiments: "
-				+ experimentNames.size()
-				+ "</large>"
-				+ "<li>Snapshots: "
-				+ snapshots
-				+ (error > 0 ? "<li>Empty databases: " + error + " ("
-						+ StringManipulationTools.getStringList(errorList, ", ") + ")" : "")
-				+ "</ul>"
-				+ "<br>Remark: Multiple users may contribute data to a single experiment. This depends on which user is logged-in into a LemnaTec PC, while imaging takes place.<br><br>"
-				+ "Complete list of snapshot-creators (" + usersUnformatted.size() + ", unformatted): "
-				+ StringManipulationTools.getStringList(getArray(usersUnformatted), ", ");
+							+ "<ul>"
+							+ "<li>Databases: "
+							+ dbs.size()
+							+ "<li>Users: "
+							+ users
+							+ "<li>Experiments: "
+							+ experimentNames.size()
+							+ "</large>"
+							+ "<li>Snapshots: "
+							+ snapshots
+							+ (error > 0 ? "<li>Empty databases: " + error + " ("
+												+ StringManipulationTools.getStringList(errorList, ", ") + ")" : "")
+							+ "</ul>"
+							+ "<br>Remark: Multiple users may contribute data to a single experiment. This depends on which user is logged-in into a LemnaTec PC, while imaging takes place.<br><br>"
+							+ "Complete list of snapshot-creators (" + usersUnformatted.size() + ", unformatted): "
+							+ StringManipulationTools.getStringList(getArray(usersUnformatted), ", ");
 
 		status.setCurrentStatusText1("");
 	}

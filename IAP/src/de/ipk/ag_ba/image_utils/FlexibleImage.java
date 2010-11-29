@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
  *******************************************************************************/
 /*
  * Created on Nov 26, 2010 by Christian Klukas
@@ -20,7 +18,6 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 /**
  * @author klukas
- * 
  */
 public class FlexibleImage {
 

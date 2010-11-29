@@ -34,7 +34,7 @@ public class FileManagerAction extends AbstractNavigationAction {
 
 		try {
 			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(login, pass, experiment.getData(),
-					experiment.getExperimentName());
+								experiment.getExperimentName());
 			mpc = new MainPanelComponent(sfp);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
@@ -63,10 +63,10 @@ public class FileManagerAction extends AbstractNavigationAction {
 	}
 
 	public static NavigationButton getFileManagerEntity(final String login, final String pass,
-			final ExperimentReference experimentRef, GUIsetting guiSetting) {
+						final ExperimentReference experimentRef, GUIsetting guiSetting) {
 		NavigationAction fileManagerAction = new FileManagerAction(login, pass, experimentRef);
 		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View Data",
-				"img/ext/applications-system.png", guiSetting);
+							"img/ext/applications-system.png", guiSetting);
 		return fileManager;
 	}
 }

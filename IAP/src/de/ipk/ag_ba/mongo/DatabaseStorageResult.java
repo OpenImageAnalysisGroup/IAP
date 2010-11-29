@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Aug 13, 2010 by Christian Klukas

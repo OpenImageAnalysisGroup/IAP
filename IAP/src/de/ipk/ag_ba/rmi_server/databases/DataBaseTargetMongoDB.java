@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
  *******************************************************************************/
 /*
  * Created on Aug 13, 2010 by Christian Klukas
@@ -65,7 +63,6 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seermi_server.databases.DatabaseTarget#saveVolume(rmi_server.analysis.
 	 * image_analysis_tasks.LoadedVolume,
 	 * de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D, java.lang.String,

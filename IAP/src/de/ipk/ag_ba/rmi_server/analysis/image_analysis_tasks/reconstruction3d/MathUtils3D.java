@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Apr 12, 2010 by Christian Klukas
@@ -21,7 +19,6 @@ import de.ipk.ag_ba.util.color.ColorUtil;
 
 /**
  * @author klukas
- * 
  */
 public class MathUtils3D {
 	private static double epsilon = 0.0001;
@@ -87,41 +84,42 @@ public class MathUtils3D {
 				err_2 = err_2 + diffZ2;
 				px = px + xStep;
 			}
-		} else if ((diffY >= diffX) & (diffY >= diffZ)) {
-			int err_1 = diffX2 - diffY;
-			int err_2 = diffZ2 - diffY;
-			for (int i = 1; i <= diffY; i++) {
-				result.add(new Voxel(px, py, pz));
-				if (err_1 > 0) {
-					px = px + xStep;
-					err_1 = err_1 - diffY2;
-				}
-				if (err_2 > 0) {
-					pz = pz + zStep;
-					err_2 = err_2 - diffY2;
-				}
-				err_1 = err_1 + diffX2;
-				err_2 = err_2 + diffZ2;
-				py = py + yStep;
-			}
-		} else {
-			int err_1 = diffY2 - diffZ;
-			int err_2 = diffX2 - diffZ;
-			for (int i = 1; i <= diffZ; i++) {
-				result.add(new Voxel(px, py, pz));
-				if (err_1 > 0) {
+		} else
+			if ((diffY >= diffX) & (diffY >= diffZ)) {
+				int err_1 = diffX2 - diffY;
+				int err_2 = diffZ2 - diffY;
+				for (int i = 1; i <= diffY; i++) {
+					result.add(new Voxel(px, py, pz));
+					if (err_1 > 0) {
+						px = px + xStep;
+						err_1 = err_1 - diffY2;
+					}
+					if (err_2 > 0) {
+						pz = pz + zStep;
+						err_2 = err_2 - diffY2;
+					}
+					err_1 = err_1 + diffX2;
+					err_2 = err_2 + diffZ2;
 					py = py + yStep;
-					err_1 = err_1 - diffZ2;
 				}
-				if (err_2 > 0) {
-					px = px + xStep;
-					err_2 = err_2 - diffZ2;
+			} else {
+				int err_1 = diffY2 - diffZ;
+				int err_2 = diffX2 - diffZ;
+				for (int i = 1; i <= diffZ; i++) {
+					result.add(new Voxel(px, py, pz));
+					if (err_1 > 0) {
+						py = py + yStep;
+						err_1 = err_1 - diffZ2;
+					}
+					if (err_2 > 0) {
+						px = px + xStep;
+						err_2 = err_2 - diffZ2;
+					}
+					err_1 = err_1 + diffY2;
+					err_2 = err_2 + diffX2;
+					pz = pz + zStep;
 				}
-				err_1 = err_1 + diffY2;
-				err_2 = err_2 + diffX2;
-				pz = pz + zStep;
 			}
-		}
 		result.add(new Voxel(px, py, pz));
 		return result.toArray(new Voxel[] {});
 	}

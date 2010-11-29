@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Sep 30, 2010 by Christian Klukas
@@ -10,7 +8,6 @@ package de.ipk.ag_ba.rmi_server.task_management;
 
 /**
  * @author klukas
- * 
  */
 public class RemoteAnalysisRepository {
 
@@ -27,7 +24,7 @@ public class RemoteAnalysisRepository {
 	}
 
 	public RemoteCapableAnalysisAction getNewAnalysisAction(String analysisActionClassName)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException, ClassCastException {
+						throws ClassNotFoundException, InstantiationException, IllegalAccessException, ClassCastException {
 		Object o = Class.forName(analysisActionClassName).newInstance();
 		RemoteCapableAnalysisAction res = (RemoteCapableAnalysisAction) o;
 		return res;

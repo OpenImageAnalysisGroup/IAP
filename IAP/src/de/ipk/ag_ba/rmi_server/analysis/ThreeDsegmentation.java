@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2001 Christian Klukas
- * 
+ * Copyright (c) 2001 Christian Klukas
  *******************************************************************************/
 package de.ipk.ag_ba.rmi_server.analysis;
 
@@ -17,10 +15,10 @@ import qmwi.kseg.som.Tools;
 public class ThreeDsegmentation {
 
 	public static void segment(byte[][][] threeDdata, int somSize,
-			BackgroundTaskStatusProviderSupportingExternalCall status) {
+						BackgroundTaskStatusProviderSupportingExternalCall status) {
 
 		byte[][][] threeDdataTest = new byte[][][] { new byte[][] { new byte[] { 2, 3, 5 }, new byte[] { 2, 3, 5 } },
-				new byte[][] { new byte[] { 4, 5, 6 }, new byte[] { 7, 8, 9 } } };
+							new byte[][] { new byte[] { 4, 5, 6 }, new byte[] { 7, 8, 9 } } };
 
 		if (threeDdata == null)
 			threeDdata = threeDdataTest;

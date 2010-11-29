@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Apr 27, 2010 by Christian Klukas
@@ -37,12 +35,11 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * 
  */
 public class AIPgui {
 
 	public static JComponent getNavigation(final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
-			boolean secondWindow) {
+						boolean secondWindow) {
 
 		final JPanel graphPanel = new JPanel();
 
@@ -53,9 +50,9 @@ public class AIPgui {
 		JLabel lbl;
 		if (!secondWindow && AIPmain.myClassKnown) {
 			lbl = new JLabel("<html><h2><font color='red'>IAP Reloading Not Supported!</font></h2>"
-					+ "<b>It is recommended to close any browser window and re-open this website,<br>"
-					+ "otherwise this information system may not work reliable.</b><br><br>"
-					+ "Technical background: reloading this applet is not yet supported");
+								+ "<b>It is recommended to close any browser window and re-open this website,<br>"
+								+ "otherwise this information system may not work reliable.</b><br><br>"
+								+ "Technical background: reloading this applet is not yet supported");
 		} else {
 			lbl = new JLabel(getIntroTxt());
 		}
@@ -123,30 +120,30 @@ public class AIPgui {
 		// actionPanel.setScrollpane(actionScroller);
 
 		JComponent res = TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionPanel,
-				actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
-				TableLayout.PREFERRED, TableLayout.FILL);
+							actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
+							TableLayout.PREFERRED, TableLayout.FILL);
 
 		return res;
 	}
 
 	public static String getIntroTxt() {
 		return "<html><h2>Welcome to IAP - the Integrated Analysis Platform!</h2>"
-				+ "The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
-				+ "developed by the IPK research group Image Analysis.<br>"
-				+ "Additionally, it provides access to various bioinformatics ressources, "
-				+ "developed at the IPK. The included data sources and tools have been "
-				+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis, "
-				+ "partly with contributions from the group Bioinformatics and Information Technology. To get details about the included data sources and information systems, click the included Website- and Reference-Links.<br>"
-				+ "<br>"
-				+ "This information system is in alpha-stage not meant for productive work. "
-				+ "It may not work reliable, only a small subset of future functions are implemented.<br>"
-				+ "<br>"
-				+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
-				+ "Dr Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a><br>"
-				+ "<br><small>"
-				+ "Hints: Before working with the system, please wait until the label of the Overview button "
-				+ "stops to spin. It is possible to copy or bookmark the URL from the browser window "
-				+ "in order to be able to quickly navigate again to the same information in the future.";
+							+ "The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
+							+ "developed by the IPK research group Image Analysis.<br>"
+							+ "Additionally, it provides access to various bioinformatics ressources, "
+							+ "developed at the IPK. The included data sources and tools have been "
+							+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis, "
+							+ "partly with contributions from the group Bioinformatics and Information Technology. To get details about the included data sources and information systems, click the included Website- and Reference-Links.<br>"
+							+ "<br>"
+							+ "This information system is in alpha-stage not meant for productive work. "
+							+ "It may not work reliable, only a small subset of future functions are implemented.<br>"
+							+ "<br>"
+							+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
+							+ "Dr Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a><br>"
+							+ "<br><small>"
+							+ "Hints: Before working with the system, please wait until the label of the Overview button "
+							+ "stops to spin. It is possible to copy or bookmark the URL from the browser window "
+							+ "in order to be able to quickly navigate again to the same information in the future.";
 	}
 
 	public static void navigateTo(final String target, NavigationButton src) {
@@ -173,7 +170,7 @@ public class AIPgui {
 	}
 
 	private static void navigateTo(String target, final MyNavigationPanel navigationPanel,
-			final MyNavigationPanel actionPanel, final JComponent graphPanel) {
+						final MyNavigationPanel actionPanel, final JComponent graphPanel) {
 
 		if (target == null || target.length() == 0)
 			return;
@@ -194,7 +191,7 @@ public class AIPgui {
 		}
 		String thisTarget = target.split("\\.", 2)[0];
 		final String nextTarget = target.length() - thisTarget.length() > 1 ? target.substring(thisTarget.length()
-				+ ".".length()) : "";
+							+ ".".length()) : "";
 		NavigationButton button = knownEntities.get(thisTarget);
 		if (button != null) {
 			Runnable rrr = new Runnable() {

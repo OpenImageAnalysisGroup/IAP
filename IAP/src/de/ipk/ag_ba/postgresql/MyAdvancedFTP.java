@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Oct 21, 2010 by Christian Klukas
@@ -27,14 +25,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * 
  */
 public class MyAdvancedFTP {
 	private static final HashMap<String, ThreadSafeOptions> host2ftp = new HashMap<String, ThreadSafeOptions>();
 	private static int runIdx = 0;
 
 	public static boolean processFTPdownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
-			String downloadURL, MyByteArrayOutputStream target) {
+						String downloadURL, MyByteArrayOutputStream target) {
 		runIdx++;
 		final int thisRun = runIdx;
 		status.setCurrentStatusText1(downloadURL);
@@ -91,8 +88,8 @@ public class MyAdvancedFTP {
 	}
 
 	private static boolean processDownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
-			String downloadURL, MyByteArrayOutputStream target, final int thisRun, final String server, String remote,
-			final FTPClient ftp) {
+						String downloadURL, MyByteArrayOutputStream target, final int thisRun, final String server, String remote,
+						final FTPClient ftp) {
 		String username;
 		String password;
 		username = "anonymous@" + server;

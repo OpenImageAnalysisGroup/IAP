@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
- * 
  *******************************************************************************/
 package de.ipk.ag_ba.gui.webstart;
 
@@ -47,7 +45,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolumeHandler;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;

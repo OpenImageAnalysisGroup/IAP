@@ -1,7 +1,5 @@
 /*************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- *
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *************************************************************************/
 package de.ipk.ag_ba.postgresql;
 

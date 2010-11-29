@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Jun 1, 2010 by Christian Klukas
@@ -42,7 +40,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Experime
 
 /**
  * @author klukas
- * 
  */
 public class MyExperimentInfoPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -213,8 +210,8 @@ public class MyExperimentInfoPanel extends JPanel {
 	}
 
 	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
-			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField remark,
-			JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
+						JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField remark,
+						JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
 
 		editB.setEnabled(editPossible);
 		if (!editPossible)
@@ -297,7 +294,7 @@ public class MyExperimentInfoPanel extends JPanel {
 	}
 
 	public void setExperimentInfo(final String login, final String pass,
-			final ExperimentHeaderInterface experimentHeader, boolean startEnabled, ExperimentInterface experiment) {
+						final ExperimentHeaderInterface experimentHeader, boolean startEnabled, ExperimentInterface experiment) {
 		setLayout(new TableLayout(new double[][] { { 0, 400, 0 }, { 0, TableLayout.PREFERRED, 0 } }));
 
 		setOpaque(false);
@@ -328,7 +325,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("Name"), editName, false);
 		fp.addGuiComponentRow(new JLabel("ID"), disable(new JTextField(experimentHeader.getExcelfileid() + "")), false);
 		fp.addGuiComponentRow(new JLabel("Import by"), disable(new JTextField(experimentHeader.getImportusername())),
-				false);
+							false);
 		fp.addGuiComponentRow(new JLabel("Coordinator"), coordinator, false);
 		fp.addGuiComponentRow(new JLabel("Visible for"), groupVisibility, false);
 		fp.addGuiComponentRow(new JLabel("Experiment-Type"), experimentTypeSelection, false);
@@ -336,8 +333,8 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(""
-				+ experimentHeader.getNumberOfFiles(), null)
-				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
+							+ experimentHeader.getNumberOfFiles(), null)
+							+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
 		fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(experiment), false);
 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
@@ -360,7 +357,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				b = !b;
 				tso.setBval(0, b);
 				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark, editB,
-						saveB, editPossible, true);
+									saveB, editPossible, true);
 
 				if (restore) {
 					saveB.setText("Save Changes");
@@ -422,16 +419,16 @@ public class MyExperimentInfoPanel extends JPanel {
 				b = !b;
 				tso.setBval(0, b);
 				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark, editB,
-						saveB, editPossibleBBB, false);
+									saveB, editPossibleBBB, false);
 			}
 		});
 
 		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark,
-				editB, saveB, editPossible, true);
+							editB, saveB, editPossible, true);
 
 		GuiRow gr = new GuiRow(TableLayout.getSplitVertical(null, TableLayout.get3Split(null, TableLayout.get3Split(
-				editB, null, saveB, TableLayout.PREFERRED, 10, TableLayout.PREFERRED), null, TableLayout.FILL,
-				TableLayout.PREFERRED, TableLayout.FILL), 5, TableLayout.PREFERRED), null);
+							editB, null, saveB, TableLayout.PREFERRED, 10, TableLayout.PREFERRED), null, TableLayout.FILL,
+							TableLayout.PREFERRED, TableLayout.FILL), 5, TableLayout.PREFERRED), null);
 		gr.span = true;
 
 		// if (editPossible)

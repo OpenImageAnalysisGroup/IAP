@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Aug 8, 2010 by Christian Klukas
@@ -15,7 +13,6 @@ import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
- * 
  */
 public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 

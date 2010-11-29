@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 14, 2010 by Christian Klukas
@@ -12,10 +10,10 @@ import java.util.ArrayList;
 
 /**
  * @author klukas
- * Image Analysis Module
+ *         Image Analysis Module
  */
 public class IAmodule {
-	
+
 	private ArrayList<AbstractImageAnalysisTask> todo = new ArrayList<AbstractImageAnalysisTask>();
 
 	public WorkerInfo getWorkerInfo() {

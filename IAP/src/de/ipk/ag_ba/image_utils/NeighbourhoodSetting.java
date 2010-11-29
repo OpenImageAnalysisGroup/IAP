@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Oct 29, 2010 by Christian Klukas
@@ -10,7 +8,6 @@ package de.ipk.ag_ba.image_utils;
 
 /**
  * @author klukas
- * 
  */
 public enum NeighbourhoodSetting {
 	NB4, NB8

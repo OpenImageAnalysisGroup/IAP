@@ -22,7 +22,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas
- * 
  */
 public class ModelGenerator {
 	private ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();

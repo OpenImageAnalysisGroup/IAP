@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
  *******************************************************************************/
 /*
  * Created on Oct 13, 2010 by Christian Klukas
@@ -20,7 +18,6 @@ import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
- * 
  */
 public class BatchCmd extends BasicDBObject {
 	private static final long serialVersionUID = 1L;

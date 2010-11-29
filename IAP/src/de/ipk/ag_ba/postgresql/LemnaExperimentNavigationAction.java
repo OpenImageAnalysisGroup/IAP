@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Aug 18, 2010 by Christian Klukas
@@ -27,7 +25,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas
- * 
  */
 public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 	private NavigationButton src;
@@ -52,17 +49,17 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 	}
 
 	public static void getDefaultActions(ArrayList<NavigationButton> actions, ExperimentInterface experiment,
-			ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting) {
+						ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting) {
 		try {
 			if (imageAnalysis)
 				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
-						null, new ExperimentReference(experiment), guiSetting))
+									null, new ExperimentReference(experiment), guiSetting))
 					actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
-				new ExperimentReference(experiment), guiSetting)) {
+							new ExperimentReference(experiment), guiSetting)) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
 				actions.add(ne);

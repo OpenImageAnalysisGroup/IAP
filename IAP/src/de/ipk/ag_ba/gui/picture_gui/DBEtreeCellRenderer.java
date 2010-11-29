@@ -1,7 +1,6 @@
 /*******************************************************************************
  * The DBE2 Add-on is (c) 2009-2010 Plant Bioinformatics Group, IPK Gatersleben,
  * http://bioinformatics.ipk-gatersleben.de
- * 
  * The source code for this project which is developed by our group is available
  * under the GPL license v2.0 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
  * By using this Add-on and VANTED you need to accept the terms and conditions of
@@ -21,9 +20,7 @@ import javax.swing.tree.TreeCellRenderer;
 
 /**
  * @author Christian Klukas
- * 
  *         (c) 2004 IPK-Gatersleben
- * 
  */
 public class DBEtreeCellRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
 
@@ -31,7 +28,7 @@ public class DBEtreeCellRenderer extends DefaultTreeCellRenderer implements Tree
 
 	@Override
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
-			int row, boolean hasFocus) {
+						int row, boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		if (leaf && !isValidDBEtreeNode(value)) {
 			setToolTipText(null); // no tool tip

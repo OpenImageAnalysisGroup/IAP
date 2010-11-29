@@ -1,7 +1,5 @@
 /*************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- *
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *************************************************************************/
 package de.ipk.ag_ba.image_utils;
 
@@ -11,7 +9,6 @@ import java.util.HashSet;
 
 /**
  * @author entzian
- * 
  */
 public class PixelSegmentation {
 
@@ -49,14 +46,14 @@ public class PixelSegmentation {
 		src_image = image;
 		this.image_cluster_ids = new int[image.length][image[0].length];
 		switch (setting) {
-		case NB4:
-			nb = false;
-			break;
-		case NB8:
-			nb = true;
-			break;
-		default:
-			nb = false;
+			case NB4:
+				nb = false;
+				break;
+			case NB8:
+				nb = true;
+				break;
+			default:
+				nb = false;
 		}
 	}
 
@@ -123,7 +120,7 @@ public class PixelSegmentation {
 		for (int i = 0; i < zaehler; i++)
 			if (cluster_border_size[i] > 0) {
 				cluster_lambda[i] = (double) image_cluster_size[i] / (double) cluster_border_size[i]
-						/ cluster_border_size[i] * 4 * Math.PI;
+									/ cluster_border_size[i] * 4 * Math.PI;
 			}
 
 	}
@@ -200,14 +197,17 @@ public class PixelSegmentation {
 				if (src_image[i][j] == 1) {
 					if (i == 0 && j == 0)
 						parse(Position.FIRST_FIELD);
-					else if (i == 0)
-						parse(Position.FIRST_ROW, 0, j);
-					else if (j == 0)
-						parse(Position.FIRST_COLUMN, i);
-					else if (j == src_image[i].length - 1 && nb)
-						parse(Position.LAST_COLUMN, i, j);
 					else
-						parse(Position.REMAINING, i, j);
+						if (i == 0)
+							parse(Position.FIRST_ROW, 0, j);
+						else
+							if (j == 0)
+								parse(Position.FIRST_COLUMN, i);
+							else
+								if (j == src_image[i].length - 1 && nb)
+									parse(Position.LAST_COLUMN, i, j);
+								else
+									parse(Position.REMAINING, i, j);
 				}
 			}
 		}
@@ -250,8 +250,8 @@ public class PixelSegmentation {
 			for (int k = 0; k < perimeterMask[l].length; k++) {
 				if (perimeterMask[l][k] == 1) {
 					if (currentPositionI - 1 + l >= 0 && currentPositionJ - 1 + k >= 0
-							&& currentPositionI - 1 + l <= src_image.length - 1
-							&& currentPositionJ - 1 + k <= src_image[currentPositionI].length - 1) {
+										&& currentPositionI - 1 + l <= src_image.length - 1
+										&& currentPositionJ - 1 + k <= src_image[currentPositionI].length - 1) {
 						if (image_cluster_ids[currentPositionI - 1 + l][currentPositionJ - 1 + k] != image_cluster_ids[currentPositionI][currentPositionJ]) {
 							cluster_border_size[image_cluster_ids[currentPositionI][currentPositionJ]]++;
 
@@ -277,196 +277,198 @@ public class PixelSegmentation {
 		int pixelTR, pixelT, pixelTL, pixelL;
 
 		switch (position) { // Ecke links oben und rechts oben
-		case FIRST_FIELD:
-			image_cluster_ids[i][j] = zaehler;
-			zaehler++;
-
-			break;
-
-		// erste Zeile oben, nicht die Ecke links aber die Ecke rechts
-		case FIRST_ROW:
-			pixelL = image_cluster_ids[i][j - 1];
-
-			if (pixelL < foreground) {
+			case FIRST_FIELD:
 				image_cluster_ids[i][j] = zaehler;
 				zaehler++;
-			} else
-				image_cluster_ids[i][j] = pixelL;
 
-			break;
+				break;
 
-		// erste Spalte links, nicht die Ecke oben
-		case FIRST_COLUMN:
-			if (!nb) { // 4er
-				pixelT = image_cluster_ids[i - 1][j];
+			// erste Zeile oben, nicht die Ecke links aber die Ecke rechts
+			case FIRST_ROW:
+				pixelL = image_cluster_ids[i][j - 1];
 
-				if (pixelT < foreground) {
+				if (pixelL < foreground) {
 					image_cluster_ids[i][j] = zaehler;
 					zaehler++;
 				} else
-					image_cluster_ids[i][j] = pixelT;
-			} else { // 8er
-				pixelTR = image_cluster_ids[i - 1][j + 1];
-				pixelT = image_cluster_ids[i - 1][j];
+					image_cluster_ids[i][j] = pixelL;
 
-				if (pixelT < foreground && pixelTR < foreground) {
-					image_cluster_ids[i][j] = zaehler;
-					zaehler++;
+				break;
 
-				} else if (pixelT < foreground && pixelTR > foreground - 1) {
-					image_cluster_ids[i][j] = pixelTR;
+			// erste Spalte links, nicht die Ecke oben
+			case FIRST_COLUMN:
+				if (!nb) { // 4er
+					pixelT = image_cluster_ids[i - 1][j];
 
-				} else if (pixelT > foreground - 1 && pixelTR < foreground) {
-					image_cluster_ids[i][j] = pixelT;
-
-				} else {
-					image_cluster_ids[i][j] = pixelT;
-
-					// hashMapFuellen(image[i-1][j], image[i-1][j+1]);
-				}
-			}
-
-			break;
-
-		// alles bis auf den linken, rechten (bei 8er Nachbarschaft) und oberen
-		// Rand
-		case REMAINING:
-			if (!nb) { // 4er
-
-				pixelT = image_cluster_ids[i - 1][j];
-				pixelL = image_cluster_ids[i][j - 1];
-
-				if (pixelT < foreground) {
-					if(pixelL < foreground){
+					if (pixelT < foreground) {
 						image_cluster_ids[i][j] = zaehler;
 						zaehler++;
-					} else {
-						image_cluster_ids[i][j] = pixelL;
-					}
-				} else {
-					if (pixelL < foreground) {
+					} else
 						image_cluster_ids[i][j] = pixelT;
+				} else { // 8er
+					pixelTR = image_cluster_ids[i - 1][j + 1];
+					pixelT = image_cluster_ids[i - 1][j];
+
+					if (pixelT < foreground && pixelTR < foreground) {
+						image_cluster_ids[i][j] = zaehler;
+						zaehler++;
+
+					} else
+						if (pixelT < foreground && pixelTR > foreground - 1) {
+							image_cluster_ids[i][j] = pixelTR;
+
+						} else
+							if (pixelT > foreground - 1 && pixelTR < foreground) {
+								image_cluster_ids[i][j] = pixelT;
+
+							} else {
+								image_cluster_ids[i][j] = pixelT;
+
+								// hashMapFuellen(image[i-1][j], image[i-1][j+1]);
+							}
+				}
+
+				break;
+
+			// alles bis auf den linken, rechten (bei 8er Nachbarschaft) und oberen
+			// Rand
+			case REMAINING:
+				if (!nb) { // 4er
+
+					pixelT = image_cluster_ids[i - 1][j];
+					pixelL = image_cluster_ids[i][j - 1];
+
+					if (pixelT < foreground) {
+						if (pixelL < foreground) {
+							image_cluster_ids[i][j] = zaehler;
+							zaehler++;
+						} else {
+							image_cluster_ids[i][j] = pixelL;
+						}
 					} else {
-					image_cluster_ids[i][j] = pixelL;
-					addHashMapEntry(pixelT, pixelL);
+						if (pixelL < foreground) {
+							image_cluster_ids[i][j] = pixelT;
+						} else {
+							image_cluster_ids[i][j] = pixelL;
+							addHashMapEntry(pixelT, pixelL);
+						}
+					}
+				} else { // 8er
+
+					pixelTR = image_cluster_ids[i - 1][j + 1];
+					pixelT = image_cluster_ids[i - 1][j];
+					pixelTL = image_cluster_ids[i - 1][j - 1];
+					pixelL = image_cluster_ids[i][j - 1];
+
+					if (pixelTR < foreground) {
+						if (pixelT < foreground) {
+							if (pixelTL < foreground) {
+								if (pixelL < foreground) {
+									image_cluster_ids[i][j] = zaehler;
+									zaehler++;
+								} else {
+									image_cluster_ids[i][j] = pixelL;
+								}
+							} else {
+								if (pixelL < foreground) {
+									image_cluster_ids[i][j] = pixelTL;
+								} else {
+									image_cluster_ids[i][j] = pixelL;
+								}
+							}
+						} else {
+							if (pixelTL < foreground) {
+								if (pixelL < foreground) {
+									image_cluster_ids[i][j] = pixelT;
+								} else {
+									image_cluster_ids[i][j] = pixelL;
+									addHashMapEntry(pixelT, pixelL);
+								}
+							} else {
+								if (pixelL < foreground) {
+									image_cluster_ids[i][j] = pixelTL;
+								} else {
+									image_cluster_ids[i][j] = pixelL;
+								}
+							}
+						}
+					} else {
+						if (pixelT < foreground) {
+							if (pixelTL < foreground) {
+								if (pixelL < foreground) {
+									image_cluster_ids[i][j] = pixelTR;
+								} else {
+									image_cluster_ids[i][j] = pixelL;
+									addHashMapEntry(pixelTR, pixelL);
+								}
+							} else {
+								if (pixelL < foreground) {
+									image_cluster_ids[i][j] = pixelTL;
+									addHashMapEntry(pixelTR, pixelTL);
+								} else {
+									image_cluster_ids[i][j] = pixelL;
+									addHashMapEntry(pixelTR, pixelL);
+								}
+							}
+						} else {
+							if (pixelTL < foreground) {
+								if (pixelL < foreground) {
+									image_cluster_ids[i][j] = pixelT;
+								} else {
+									image_cluster_ids[i][j] = pixelL;
+									addHashMapEntry(pixelT, pixelL);
+								}
+							} else {
+								if (pixelL < foreground) {
+									image_cluster_ids[i][j] = pixelTL;
+								} else {
+									image_cluster_ids[i][j] = pixelL;
+								}
+							}
+						}
 					}
 				}
-			} else { // 8er
 
-				pixelTR = image_cluster_ids[i - 1][j + 1];
+				break;
+
+			// letzte Spalte rechts, nicht die Ecke oben
+			case LAST_COLUMN:
 				pixelT = image_cluster_ids[i - 1][j];
 				pixelTL = image_cluster_ids[i - 1][j - 1];
 				pixelL = image_cluster_ids[i][j - 1];
 
-				if (pixelTR < foreground) {
-					if (pixelT < foreground) {
-						if (pixelTL < foreground) {
-							if (pixelL < foreground) {
-								image_cluster_ids[i][j] = zaehler;
-								zaehler++;
-							} else {
-								image_cluster_ids[i][j] = pixelL;
-							}
+				if (pixelT < foreground) {
+					if (pixelTL < foreground) {
+						if (pixelL < foreground) {
+							image_cluster_ids[i][j] = zaehler;
+							zaehler++;
 						} else {
-							if (pixelL < foreground) {
-								image_cluster_ids[i][j] = pixelTL;
-							} else {
-								image_cluster_ids[i][j] = pixelL;
-							}
+							image_cluster_ids[i][j] = pixelL;
 						}
 					} else {
-						if (pixelTL < foreground) {
-							if (pixelL < foreground) {
-								image_cluster_ids[i][j] = pixelT;
-							} else {
-								image_cluster_ids[i][j] = pixelL;
-								addHashMapEntry(pixelT, pixelL);
-							}
+						if (pixelL < foreground) {
+							image_cluster_ids[i][j] = pixelTL;
 						} else {
-							if (pixelL < foreground) {
-								image_cluster_ids[i][j] = pixelTL;
-							} else {
-								image_cluster_ids[i][j] = pixelL;
-							}
+							image_cluster_ids[i][j] = pixelL;
 						}
 					}
 				} else {
-					if (pixelT < foreground) {
-						if (pixelTL < foreground) {
-							if (pixelL < foreground) {
-								image_cluster_ids[i][j] = pixelTR;
-							} else {
-								image_cluster_ids[i][j] = pixelL;
-								addHashMapEntry(pixelTR, pixelL);
-							}
+					if (pixelTL < foreground) {
+						if (pixelL < foreground) {
+							image_cluster_ids[i][j] = pixelT;
 						} else {
-							if (pixelL < foreground) {
-								image_cluster_ids[i][j] = pixelTL;
-								addHashMapEntry(pixelTR, pixelTL);
-							} else {
-								image_cluster_ids[i][j] = pixelL;
-								addHashMapEntry(pixelTR, pixelL);
-							}
+							image_cluster_ids[i][j] = pixelL;
+							addHashMapEntry(pixelT, pixelL);
 						}
 					} else {
-						if (pixelTL < foreground) {
-							if (pixelL < foreground) {
-								image_cluster_ids[i][j] = pixelT;
-							} else {
-								image_cluster_ids[i][j] = pixelL;
-								addHashMapEntry(pixelT, pixelL);
-							}
+						if (pixelL < foreground) {
+							image_cluster_ids[i][j] = pixelTL;
 						} else {
-							if (pixelL < foreground) {
-								image_cluster_ids[i][j] = pixelTL;
-							} else {
-								image_cluster_ids[i][j] = pixelL;
-							}
+							image_cluster_ids[i][j] = pixelL;
 						}
 					}
 				}
-			}
-
-			break;
-
-		// letzte Spalte rechts, nicht die Ecke oben
-		case LAST_COLUMN:
-			pixelT = image_cluster_ids[i - 1][j];
-			pixelTL = image_cluster_ids[i - 1][j - 1];
-			pixelL = image_cluster_ids[i][j - 1];
-
-			if (pixelT < foreground) {
-				if (pixelTL < foreground) {
-					if (pixelL < foreground) {
-						image_cluster_ids[i][j] = zaehler;
-						zaehler++;
-					} else {
-						image_cluster_ids[i][j] = pixelL;
-					}
-				} else {
-					if (pixelL < foreground) {
-						image_cluster_ids[i][j] = pixelTL;
-					} else {
-						image_cluster_ids[i][j] = pixelL;
-					}
-				}
-			} else {
-				if (pixelTL < foreground) {
-					if (pixelL < foreground) {
-						image_cluster_ids[i][j] = pixelT;
-					} else {
-						image_cluster_ids[i][j] = pixelL;
-						addHashMapEntry(pixelT, pixelL);
-					}
-				} else {
-					if (pixelL < foreground) {
-						image_cluster_ids[i][j] = pixelTL;
-					} else {
-						image_cluster_ids[i][j] = pixelL;
-					}
-				}
-			}
-			break;
+				break;
 		}
 
 	}
@@ -476,9 +478,10 @@ public class PixelSegmentation {
 			if (!clusterMapping.containsKey(Pixel2)) {
 				clusterMapping.put(Pixel2, new ArrayList<Integer>());
 				clusterMapping.get(Pixel2).add(Pixel1);
-			} else if (!clusterMapping.get(Pixel2).contains(Pixel1)) {
-				clusterMapping.get(Pixel2).add(Pixel1);
-			}
+			} else
+				if (!clusterMapping.get(Pixel2).contains(Pixel1)) {
+					clusterMapping.get(Pixel2).add(Pixel1);
+				}
 		}
 	}
 

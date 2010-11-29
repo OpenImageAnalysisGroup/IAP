@@ -17,7 +17,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 /**
  * @author klukas
- * 
  */
 public class Trash extends AbstractNavigationAction {
 
@@ -65,12 +64,12 @@ public class Trash extends AbstractNavigationAction {
 							message = "<html><b>" + "Experiment " + experimentName + " has been deleted.";
 						} else {
 							Object[] res = MyInputHelper.getInput("<html>"
-									+ "You are about to delete a dataset from the database.<br>"
-									+ "This action can not be undone.<br>"
-									+ "Connected binary files are not immediately removed, but only<br>"
-									+ "during the process of database maintanance procedures.",
-									"Confirm final deletion operation", new Object[] {
-											"Remove experiment " + ei.experimentName + " from database?", false });
+												+ "You are about to delete a dataset from the database.<br>"
+												+ "This action can not be undone.<br>"
+												+ "Connected binary files are not immediately removed, but only<br>"
+												+ "during the process of database maintanance procedures.",
+												"Confirm final deletion operation", new Object[] {
+																	"Remove experiment " + ei.experimentName + " from database?", false });
 							if (res != null && (Boolean) res[0]) {
 								// CallDBE2WebService.setDeleteExperiment(login, pass,
 								// experimentName);
@@ -133,7 +132,7 @@ public class Trash extends AbstractNavigationAction {
 	}
 
 	public static NavigationButton getTrashEntity(final String login, final String pass, final String experimentName,
-			GUIsetting guiSetting) {
+						GUIsetting guiSetting) {
 		NavigationAction trashAction = new Trash(pass, login, experimentName);
 		NavigationButton trash = new NavigationButton(trashAction, "Delete", "img/ext/edit-delete.png", guiSetting);
 		trash.setRightAligned(true);
@@ -141,7 +140,7 @@ public class Trash extends AbstractNavigationAction {
 	}
 
 	public static NavigationButton getTrashEntity(ExperimentHeaderInterface header, DeletionCommand cmd,
-			GUIsetting guiSetting) {
+						GUIsetting guiSetting) {
 		NavigationAction trashAction = new Trash(header, cmd);
 		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guiSetting);
 		trash.setRightAligned(cmd != DeletionCommand.UNTRASH);
@@ -149,7 +148,7 @@ public class Trash extends AbstractNavigationAction {
 	}
 
 	public static NavigationButton getTrashEntity(ArrayList<ExperimentHeaderInterface> trashed, DeletionCommand cmd,
-			GUIsetting guIsetting) {
+						GUIsetting guIsetting) {
 		NavigationAction trashAction = new Trash(trashed, cmd);
 		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guIsetting);
 		trash.setRightAligned(true);

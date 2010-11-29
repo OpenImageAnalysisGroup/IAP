@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Sep 30, 2010 by Christian Klukas
@@ -44,7 +42,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		GUIsetting guiS = src.getGUIsetting();
 		NavigationButton startOrStopServerMode = new NavigationButton(
-				new EnableOrDisableServerModeAction(login, pass), guiS);
+							new EnableOrDisableServerModeAction(login, pass), guiS);
 		res.add(startOrStopServerMode);
 		return res;
 	}

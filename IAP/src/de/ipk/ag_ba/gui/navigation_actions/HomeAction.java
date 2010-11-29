@@ -45,22 +45,22 @@ public final class HomeAction extends AbstractNavigationAction {
 		homeActions.add(rimas);
 
 		NavigationButton metaCrop = WebFolder
-				.getBrowserNavigationEntity(
-						null,
-						"MetaCrop",
-						"img/metacrop.png",
-						"http://vanted.ipk-gatersleben.de/addons/metacrop/",
-						"Website",
-						"img/browser.png",
-						"http://metacrop.ipk-gatersleben.de",
-						new String[] { ".gml", ".graphml" },
-						""
-								+ "<h2>MetaCrop</h2>"
-								+ "MetaCrop is a web accessible database that summarizes diverse information about metabolic pathways "
-								+ "in crop plants and allows automatic export of information for the creation of detailed metabolic models.<br><br>"
-								+ "IAP as well as VANTED provide access to the exported MetaCrop pathways in a graphical and interactive way.<br>"
-								+ "For background information and further information please visit the MetaCrop website, accessible by using the "
-								+ "Website button, shown above.", null, src.getGUIsetting());
+							.getBrowserNavigationEntity(
+												null,
+												"MetaCrop",
+												"img/metacrop.png",
+												"http://vanted.ipk-gatersleben.de/addons/metacrop/",
+												"Website",
+												"img/browser.png",
+												"http://metacrop.ipk-gatersleben.de",
+												new String[] { ".gml", ".graphml" },
+												""
+																	+ "<h2>MetaCrop</h2>"
+																	+ "MetaCrop is a web accessible database that summarizes diverse information about metabolic pathways "
+																	+ "in crop plants and allows automatic export of information for the creation of detailed metabolic models.<br><br>"
+																	+ "IAP as well as VANTED provide access to the exported MetaCrop pathways in a graphical and interactive way.<br>"
+																	+ "For background information and further information please visit the MetaCrop website, accessible by using the "
+																	+ "Website button, shown above.", null, src.getGUIsetting());
 		homeActions.add(metaCrop);
 
 		HashMap<String, String> folder2url = new HashMap<String, String>();
@@ -70,48 +70,48 @@ public final class HomeAction extends AbstractNavigationAction {
 		folder2url.put("Entity Relationship", "Nat. Proc. (ER):http://precedings.nature.com/documents/3724/version/1");
 		folder2url.put("Process Description", "Nat. Proc. (PD):http://precedings.nature.com/documents/3724/version/1");
 		NavigationButton sbgn = WebFolder
-				.getBrowserNavigationEntity(
-						folder2url,
-						"SBGN-ED",
-						"img/sbgn.png",
-						"http://vanted.ipk-gatersleben.de/aip/sbgn-examples/",
-						"SBGN-ED",
-						"img/browser.png",
-						"http://vanted.ipk-gatersleben.de/addons/sbgn-ed/",
-						new String[] { ".gml", ".graphml" },
-						"<h2>SBGN-ED - Editing, Translating and Validating of SBGN Maps</h2>"
-								+ ""
-								+ "SBGN-ED is a VANTED Add-on which allows to create and edit all three types of SBGN maps, "
-								+ "that is Process Description, Entity Relationship and Activity Flow, to validate these "
-								+ "maps according to the SBGN specifications, to translate maps from the KEGG and MetaCrop "
-								+ "pathway databases into SBGN, and to export SBGN maps into several file and image formats.<br><br>"
-								+ "SBGN-ED editing, translation and validation functions are available from within VANTED and IAP as "
-								+ "soon as the SBGN-ED Add-on available from the mentioned website is downloaded and installed. "
-								+ "The SBGN-ED website additionally contains documentation and additional background information.",
-						null, src.getGUIsetting());
+							.getBrowserNavigationEntity(
+												folder2url,
+												"SBGN-ED",
+												"img/sbgn.png",
+												"http://vanted.ipk-gatersleben.de/aip/sbgn-examples/",
+												"SBGN-ED",
+												"img/browser.png",
+												"http://vanted.ipk-gatersleben.de/addons/sbgn-ed/",
+												new String[] { ".gml", ".graphml" },
+												"<h2>SBGN-ED - Editing, Translating and Validating of SBGN Maps</h2>"
+																	+ ""
+																	+ "SBGN-ED is a VANTED Add-on which allows to create and edit all three types of SBGN maps, "
+																	+ "that is Process Description, Entity Relationship and Activity Flow, to validate these "
+																	+ "maps according to the SBGN specifications, to translate maps from the KEGG and MetaCrop "
+																	+ "pathway databases into SBGN, and to export SBGN maps into several file and image formats.<br><br>"
+																	+ "SBGN-ED editing, translation and validation functions are available from within VANTED and IAP as "
+																	+ "soon as the SBGN-ED Add-on available from the mentioned website is downloaded and installed. "
+																	+ "The SBGN-ED website additionally contains documentation and additional background information.",
+												null, src.getGUIsetting());
 		homeActions.add(sbgn);
 
 		HashMap<String, String> folder2urlVANTED = new HashMap<String, String>();
 		folder2urlVANTED
-				.put("",
-						"Source Code:http://vanted.ipk-gatersleben.de/#ui-tabs-9^Add-ons:http://vanted.ipk-gatersleben.de/#ui-tabs-11^Lit. References:http://vanted.ipk-gatersleben.de/#ui-tabs-13");
+							.put("",
+												"Source Code:http://vanted.ipk-gatersleben.de/#ui-tabs-9^Add-ons:http://vanted.ipk-gatersleben.de/#ui-tabs-11^Lit. References:http://vanted.ipk-gatersleben.de/#ui-tabs-13");
 		NavigationButton vanted = WebFolder
-				.getBrowserNavigationEntity(
-						folder2urlVANTED,
-						"VANTED",
-						// "img/vanted_examples.png",
-						"img/vanted1_0.png",
-						"http://vanted.ipk-gatersleben.de/examplefiles/",
-						"Website",
-						"img/browser.png",
-						"http://vanted.ipk-gatersleben.de/",
-						new String[] { ".gml", ".graphml" },
-						"<h2>Welcome to VANTED - Visualization and Analysis of Networks containing Experimental Data</h2>"
-								+ "This system makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
-								+ "It is possible to map experimental datasets onto the graph elements and visualize time series data or data of different "
-								+ "genotypes or environmental conditions in the context of a the underlying biological processes. Built-in statistic "
-								+ "functions allow a fast evaluation of the data (e.g. t-Test or correlation analysis).",
-						"Examples", src.getGUIsetting());
+							.getBrowserNavigationEntity(
+												folder2urlVANTED,
+												"VANTED",
+												// "img/vanted_examples.png",
+												"img/vanted1_0.png",
+												"http://vanted.ipk-gatersleben.de/examplefiles/",
+												"Website",
+												"img/browser.png",
+												"http://vanted.ipk-gatersleben.de/",
+												new String[] { ".gml", ".graphml" },
+												"<h2>Welcome to VANTED - Visualization and Analysis of Networks containing Experimental Data</h2>"
+																	+ "This system makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
+																	+ "It is possible to map experimental datasets onto the graph elements and visualize time series data or data of different "
+																	+ "genotypes or environmental conditions in the context of a the underlying biological processes. Built-in statistic "
+																	+ "functions allow a fast evaluation of the data (e.g. t-Test or correlation analysis).",
+												"Examples", src.getGUIsetting());
 
 		NavigationButton startVanted = new NavigationButton(new ShowVANTED(), guIsetting);
 
@@ -123,9 +123,9 @@ public final class HomeAction extends AbstractNavigationAction {
 		homePrimaryActions.add(serverStatusEntity);
 
 		EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
-				"General Bioinformatics Ressources", "img/pattern_graffiti_logo.png", "img/pattern_graffiti_logo.png");
+							"General Bioinformatics Ressources", "img/pattern_graffiti_logo.png", "img/pattern_graffiti_logo.png");
 		ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://bioinformatics.ipk-gatersleben.de",
-				"img/browser.png", src.getGUIsetting()));
+							"img/browser.png", src.getGUIsetting()));
 		for (NavigationButton nge : homeActions)
 			ipkBioInf.addAdditionalEntity(nge);
 		homePrimaryActions.add(new NavigationButton(ipkBioInf, guIsetting));

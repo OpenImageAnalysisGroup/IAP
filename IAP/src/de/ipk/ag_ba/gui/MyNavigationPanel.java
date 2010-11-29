@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
  *******************************************************************************/
 /*
  * Created on May 5, 2010 by Christian Klukas
@@ -392,7 +390,6 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */

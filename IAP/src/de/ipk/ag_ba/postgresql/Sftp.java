@@ -34,7 +34,7 @@ public class Sftp {
 				host = arg[0];
 			} else {
 				host = JOptionPane.showInputDialog("Enter username@hostname", System.getProperty("user.name")
-						+ "@localhost");
+									+ "@localhost");
 			}
 			String user = host.substring(0, host.indexOf('@'));
 			host = host.substring(host.indexOf('@') + 1);
@@ -146,10 +146,11 @@ public class Sftp {
 					try {
 						if (cmd.equals("rm"))
 							c.rm(path);
-						else if (cmd.equals("rmdir"))
-							c.rmdir(path);
 						else
-							c.mkdir(path);
+							if (cmd.equals("rmdir"))
+								c.rmdir(path);
+							else
+								c.mkdir(path);
 					} catch (SftpException e) {
 						System.out.println(e.toString());
 					}
@@ -184,11 +185,13 @@ public class Sftp {
 					try {
 						if (cmd.equals("chgrp")) {
 							c.chgrp(foo, path);
-						} else if (cmd.equals("chown")) {
-							c.chown(foo, path);
-						} else if (cmd.equals("chmod")) {
-							c.chmod(foo, path);
-						}
+						} else
+							if (cmd.equals("chown")) {
+								c.chown(foo, path);
+							} else
+								if (cmd.equals("chmod")) {
+									c.chmod(foo, path);
+								}
 					} catch (SftpException e) {
 						System.out.println(e.toString());
 					}
@@ -250,7 +253,7 @@ public class Sftp {
 					continue;
 				}
 				if (cmd.equals("get") || cmd.equals("get-resume") || cmd.equals("get-append") || cmd.equals("put")
-						|| cmd.equals("put-resume") || cmd.equals("put-append")) {
+									|| cmd.equals("put-resume") || cmd.equals("put-append")) {
 					if (cmds.size() != 2 && cmds.size() != 3)
 						continue;
 					String p1 = cmds.elementAt(1);
@@ -264,17 +267,19 @@ public class Sftp {
 							int mode = ChannelSftp.OVERWRITE;
 							if (cmd.equals("get-resume")) {
 								mode = ChannelSftp.RESUME;
-							} else if (cmd.equals("get-append")) {
-								mode = ChannelSftp.APPEND;
-							}
+							} else
+								if (cmd.equals("get-append")) {
+									mode = ChannelSftp.APPEND;
+								}
 							c.get(p1, p2, monitor, mode);
 						} else {
 							int mode = ChannelSftp.OVERWRITE;
 							if (cmd.equals("put-resume")) {
 								mode = ChannelSftp.RESUME;
-							} else if (cmd.equals("put-append")) {
-								mode = ChannelSftp.APPEND;
-							}
+							} else
+								if (cmd.equals("put-append")) {
+									mode = ChannelSftp.APPEND;
+								}
 							c.put(p1, p2, monitor, mode);
 						}
 					} catch (SftpException e) {
@@ -367,7 +372,7 @@ public class Sftp {
 		public boolean promptYesNo(String str) {
 			Object[] options = { "yes", "no" };
 			int foo = JOptionPane.showOptionDialog(null, str, "Warning", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+								JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 			return foo == 0;
 		}
 
@@ -398,11 +403,11 @@ public class Sftp {
 		}
 
 		final GridBagConstraints gbc = new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0);
+							GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0);
 		private Container panel;
 
 		public String[] promptKeyboardInteractive(String destination, String name, String instruction, String[] prompt,
-				boolean[] echo) {
+							boolean[] echo) {
 			panel = new JPanel();
 			panel.setLayout(new GridBagLayout());
 
@@ -434,7 +439,7 @@ public class Sftp {
 			}
 
 			if (JOptionPane.showConfirmDialog(null, panel, destination + ": " + name, JOptionPane.OK_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION) {
+								JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION) {
 				String[] response = new String[prompt.length];
 				for (int i = 0; i < prompt.length; i++) {
 					response[i] = texts[i].getText();
@@ -450,15 +455,12 @@ public class Sftp {
 	 * public static class MyProgressMonitor implements
 	 * com.jcraft.jsch.ProgressMonitor{ JProgressBar progressBar; JFrame frame;
 	 * long count=0; long max=0;
-	 * 
 	 * public void init(String info, long max){ this.max=max; if(frame==null){
 	 * frame=new JFrame(); frame.setSize(200, 20); progressBar = new
 	 * JProgressBar(); } count=0;
-	 * 
 	 * frame.setTitle(info); progressBar.setMaximum((int)max);
 	 * progressBar.setMinimum((int)0); progressBar.setValue((int)count);
 	 * progressBar.setStringPainted(true);
-	 * 
 	 * JPanel p=new JPanel(); p.add(progressBar);
 	 * frame.getContentPane().add(progressBar); frame.setVisible(true);
 	 * System.out.println("!info:"+info+", max="+max+" "+progressBar); } public
@@ -477,7 +479,7 @@ public class Sftp {
 		public void init(int op, String src, String dest, long max) {
 			this.max = max;
 			monitor = new ProgressMonitor(null, ((op == SftpProgressMonitor.PUT) ? "put" : "get") + ": " + src, "", 0,
-					(int) max);
+								(int) max);
 			count = 0;
 			percent = -1;
 			monitor.setProgress((int) this.count);
@@ -506,31 +508,31 @@ public class Sftp {
 	}
 
 	private static String help = "      Available commands:\n" + "      * means unimplemented command.\n"
-			+ "cd path                       Change remote directory to 'path'\n"
-			+ "lcd path                      Change local directory to 'path'\n"
-			+ "chgrp grp path                Change group of file 'path' to 'grp'\n"
-			+ "chmod mode path               Change permissions of file 'path' to 'mode'\n"
-			+ "chown own path                Change owner of file 'path' to 'own'\n"
-			+ "help                          Display this help text\n" + "get remote-path [local-path]  Download file\n"
-			+ "get-resume remote-path [local-path]  Resume to download file.\n"
-			+ "get-append remote-path [local-path]  Append remote file to local file\n"
-			+ "*lls [ls-options [path]]      Display local directory listing\n"
-			+ "ln oldpath newpath            Symlink remote file\n"
-			+ "*lmkdir path                  Create local directory\n"
-			+ "lpwd                          Print local working directory\n"
-			+ "ls [path]                     Display remote directory listing\n"
-			+ "*lumask umask                 Set local umask to 'umask'\n"
-			+ "mkdir path                    Create remote directory\n" + "put local-path [remote-path]  Upload file\n"
-			+ "put-resume local-path [remote-path]  Resume to upload file\n"
-			+ "put-append local-path [remote-path]  Append local file to remote file.\n"
-			+ "pwd                           Display remote working directory\n"
-			+ "stat path                     Display info about path\n" + "exit                          Quit sftp\n"
-			+ "quit                          Quit sftp\n" + "rename oldpath newpath        Rename remote file\n"
-			+ "rmdir path                    Remove remote directory\n"
-			+ "rm path                       Delete remote file\n" + "symlink oldpath newpath       Symlink remote file\n"
-			+ "readlink path                 Check the target of a symbolic link\n"
-			+ "realpath path                 Canonicalize the path\n"
-			+ "rekey                         Key re-exchanging\n"
-			+ "compression level             Packet compression will be enabled\n"
-			+ "version                       Show SFTP version\n" + "?                             Synonym for help";
+						+ "cd path                       Change remote directory to 'path'\n"
+						+ "lcd path                      Change local directory to 'path'\n"
+						+ "chgrp grp path                Change group of file 'path' to 'grp'\n"
+						+ "chmod mode path               Change permissions of file 'path' to 'mode'\n"
+						+ "chown own path                Change owner of file 'path' to 'own'\n"
+						+ "help                          Display this help text\n" + "get remote-path [local-path]  Download file\n"
+						+ "get-resume remote-path [local-path]  Resume to download file.\n"
+						+ "get-append remote-path [local-path]  Append remote file to local file\n"
+						+ "*lls [ls-options [path]]      Display local directory listing\n"
+						+ "ln oldpath newpath            Symlink remote file\n"
+						+ "*lmkdir path                  Create local directory\n"
+						+ "lpwd                          Print local working directory\n"
+						+ "ls [path]                     Display remote directory listing\n"
+						+ "*lumask umask                 Set local umask to 'umask'\n"
+						+ "mkdir path                    Create remote directory\n" + "put local-path [remote-path]  Upload file\n"
+						+ "put-resume local-path [remote-path]  Resume to upload file\n"
+						+ "put-append local-path [remote-path]  Append local file to remote file.\n"
+						+ "pwd                           Display remote working directory\n"
+						+ "stat path                     Display info about path\n" + "exit                          Quit sftp\n"
+						+ "quit                          Quit sftp\n" + "rename oldpath newpath        Rename remote file\n"
+						+ "rmdir path                    Remove remote directory\n"
+						+ "rm path                       Delete remote file\n" + "symlink oldpath newpath       Symlink remote file\n"
+						+ "readlink path                 Check the target of a symbolic link\n"
+						+ "realpath path                 Canonicalize the path\n"
+						+ "rekey                         Key re-exchanging\n"
+						+ "compression level             Packet compression will be enabled\n"
+						+ "version                       Show SFTP version\n" + "?                             Synonym for help";
 }

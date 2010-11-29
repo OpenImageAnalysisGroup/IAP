@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
  *******************************************************************************/
 /*
  * Created on Nov 26, 2010 by Christian Klukas
@@ -24,8 +22,7 @@ public class StopWatch {
 
 	/**
 	 * @param desc
-	 *           This optional description is used by the {@link #printTime()}
-	 *           method to identify this stop watch.
+	 *           This optional description is used by the {@link #printTime()} method to identify this stop watch.
 	 */
 	public StopWatch(String desc) {
 		this.desc = desc;

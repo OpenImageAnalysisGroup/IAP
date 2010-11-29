@@ -7,7 +7,6 @@ import org.Colors;
 
 /**
  * @author klukas
- * 
  */
 public class TransparencyAnalysis {
 

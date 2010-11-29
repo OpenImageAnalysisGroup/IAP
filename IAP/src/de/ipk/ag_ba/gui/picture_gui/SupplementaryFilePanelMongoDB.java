@@ -45,8 +45,8 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		final MyDropTarget targetDropTarget = currentDropTarget;
 		if (targetDropTarget == null) {
 			JOptionPane.showMessageDialog(this, "Images can not be added to current database node.\n"
-					+ "Select an valid experiment-data node and try again.", "Image upload not possible",
-					JOptionPane.INFORMATION_MESSAGE);
+								+ "Select an valid experiment-data node and try again.", "Image upload not possible",
+								JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 
@@ -54,8 +54,8 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		// then reject drop
 		if (targetDropTarget.isTargetReadOnly()) {
 			JOptionPane.showMessageDialog(this, "Image can not be added to current database node.\n"
-					+ "This experiment is loaded in Read-Only Mode for your Accout!", "No write-access to experiment",
-					JOptionPane.INFORMATION_MESSAGE);
+								+ "This experiment is loaded in Read-Only Mode for your Accout!", "No write-access to experiment",
+								JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 
@@ -91,7 +91,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	DataSetFilePanel currentFilePanel = null;
 
 	public SupplementaryFilePanelMongoDB(final String login, final String password, ExperimentInterface doc,
-			String experimentName) {
+						String experimentName) {
 
 		final SupplementaryFilePanelMongoDB thisPanel = this;
 
@@ -142,7 +142,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 								filePanel.setHeader(true, msg, false, true);
 							} else {
 								filePanel.setHeader(false,
-										"<font color='black'>You don't have write access to this experiment", true, true);
+													"<font color='black'>You don't have write access to this experiment", true, true);
 							}
 
 							filePanel.validate();
@@ -165,13 +165,13 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
 							if (!((MongoTreeNodeBasis) mt).readOnly)
 								filePanel
-										.setHeader(
-												false,
-												"<font color='black'>To assign data, please select the experiment-node, a condition, timepoint or measurement value",
-												true, true);
+													.setHeader(
+																		false,
+																		"<font color='black'>To assign data, please select the experiment-node, a condition, timepoint or measurement value",
+																		true, true);
 							else
 								filePanel.setHeader(false,
-										"<font color='black'>You don't have write access to this experiment", true, true);
+													"<font color='black'>You don't have write access to this experiment", true, true);
 
 							filePanel.validate();
 							filePanel.repaint();
@@ -197,7 +197,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		fileScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		filePanel.setScrollpane(fileScroller);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, new JScrollPane(expTree), TableLayout
-				.getSplitVertical(filePanelHeader, fileScroller, TableLayout.PREFERRED, TableLayout.FILL));
+							.getSplitVertical(filePanelHeader, fileScroller, TableLayout.PREFERRED, TableLayout.FILL));
 		splitPane.setOneTouchExpandable(true);
 		splitPane.setLastDividerLocation(200);
 		splitPane.setDividerLocation(200);
@@ -257,6 +257,6 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	public void setTitle(String message) {
 		if (currentFilePanel != null)
 			currentFilePanel.setHeader(currentFilePanel.getIsButtonEnabled(), "<code>"
-					+ StringManipulationTools.UnicodeToHtml(message), currentFilePanel.getIsWarningDisplayed(), false);
+								+ StringManipulationTools.UnicodeToHtml(message), currentFilePanel.getIsWarningDisplayed(), false);
 	}
 }

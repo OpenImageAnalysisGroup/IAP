@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Aug 18, 2010 by Christian Klukas
@@ -38,7 +36,6 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction
 	 * #getResultNewActionSet()
@@ -50,7 +47,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 		NavigationAction analyzeAction = new UploadImagesToCloud(true);
 
 		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Add Files", "img/ext/user-desktop.png",
-				"img/ext/user-desktop.png", src.getGUIsetting());
+							"img/ext/user-desktop.png", src.getGUIsetting());
 		res.add(analyzeEntity);
 
 		// gruppe => user => experiment
@@ -84,7 +81,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 
 			for (String group : experiments.keySet()) {
 				res.add(new NavigationButton(createMongoGroupNavigationAction(group, experiments.get(group)), src
-						.getGUIsetting()));
+									.getGUIsetting()));
 			}
 
 			if (trashed.size() > 0) {
@@ -125,7 +122,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 				actions.add(Trash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
-						src.getGUIsetting()));
+									src.getGUIsetting()));
 				for (ExperimentHeaderInterface exp : trashed)
 					actions.add(getMongoExperimentButton(exp, src.getGUIsetting()));
 				return actions;
@@ -135,7 +132,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	}
 
 	private NavigationAction createMongoGroupNavigationAction(final String group,
-			final TreeMap<String, ArrayList<ExperimentHeaderInterface>> user2exp) {
+						final TreeMap<String, ArrayList<ExperimentHeaderInterface>> user2exp) {
 		NavigationAction groupNav = new AbstractNavigationAction("Show User-Group Folder") {
 			private NavigationButton src;
 
@@ -144,7 +141,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (String user : user2exp.keySet()) {
 					res.add(new NavigationButton(createMongoUserNavigationAction(user, user2exp.get(user)), src
-							.getGUIsetting()));
+										.getGUIsetting()));
 				}
 				return res;
 			}
@@ -181,7 +178,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	}
 
 	protected NavigationAction createMongoUserNavigationAction(final String user,
-			final ArrayList<ExperimentHeaderInterface> experiments) {
+						final ArrayList<ExperimentHeaderInterface> experiments) {
 		NavigationAction userNav = new AbstractNavigationAction("Show user folder") {
 			private NavigationButton src;
 
@@ -229,15 +226,14 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 		NavigationAction action = new MongoOrLemnaTecExperimentNavigationAction(ei);
 		NavigationButton exp = new NavigationButton(action, guiSetting);
 		exp.setToolTipText("<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentname() + "</td></tr>"
-				+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
-				+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()
-				+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark() + "</td></tr>");
+							+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
+							+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()
+							+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark() + "</td></tr>");
 		return exp;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction
 	 * #getResultNewNavigationSet(java.util.ArrayList)
@@ -251,7 +247,6 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction
 	 * #performActionCalculateResults

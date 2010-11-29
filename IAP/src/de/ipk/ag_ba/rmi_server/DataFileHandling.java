@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Jul 9, 2010 by Christian Klukas
@@ -24,12 +22,11 @@ import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
 /**
  * @author klukas
- * 
  */
 public class DataFileHandling {
 
 	public synchronized RemoteInputStream downloadFile(OracleConnection conn, String md5, boolean returnPreview)
-			throws RemoteException {
+						throws RemoteException {
 		String sqlCommand = "SELECT length(data) as len, data, databfile, filesize " + "FROM imageFile " + "WHERE md5=?";
 		if (returnPreview)
 			sqlCommand = "SELECT length(previewImage) as len, previewImage " + "FROM imageFile " + "WHERE md5=?";

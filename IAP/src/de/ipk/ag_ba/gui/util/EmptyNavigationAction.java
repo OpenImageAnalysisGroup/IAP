@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
- * 
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Oct 8, 2010 by Christian Klukas
@@ -15,7 +13,6 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
- * 
  */
 public class EmptyNavigationAction extends AbstractNavigationAction {
 

@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Oct 22, 2010 by Christian Klukas
@@ -15,7 +13,6 @@ import java.io.IOException;
 
 /**
  * @author klukas
- * 
  */
 public class BinaryBlobCameraConfig {
 	public static void main(String[] args) {

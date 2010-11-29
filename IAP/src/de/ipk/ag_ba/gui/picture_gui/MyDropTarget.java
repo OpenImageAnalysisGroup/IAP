@@ -68,7 +68,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		tso.setBval(0, false); // not yet finished
 
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-				"Drag & Drop in progress...", "please wait");
+							"Drag & Drop in progress...", "please wait");
 		BackgroundTaskHelper.issueSimpleTask("Drag & Drop", "Drag & Drop in progress...", new Runnable() {
 			public void run() {
 				while (!tso.getBval(0, false)) {
@@ -170,8 +170,8 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 
 	public void addImageToDatabase(final File file, final boolean deleteUponCompletion) {
 		final DataSetFileButton imageButton = new DataSetFileButton(user, pass, targetTreeNode,
-				"<html><body><b>" + DataSetFileButton.getMaxString(file.getName()) + //$NON-NLS-1$
-						"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null); //$NON-NLS-1$//$NON-NLS-2$
+							"<html><body><b>" + DataSetFileButton.getMaxString(file.getName()) + //$NON-NLS-1$
+												"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null); //$NON-NLS-1$//$NON-NLS-2$
 		imageButton.setProgressValue(-1);
 		imageButton.showProgressbar();
 
@@ -185,10 +185,10 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 			public void run() {
 				MyImageIcon iconA;
 				BinaryFileInfo bif = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode
-						.getTargetEntity());
+									.getTargetEntity());
 				try {
 					iconA = new MyImageIcon(panel.getParent(), DataSetFileButton.ICON_WIDTH, DataSetFileButton.ICON_HEIGHT,
-							FileSystemHandler.getURL(file), bif);
+										FileSystemHandler.getURL(file), bif);
 				} catch (MalformedURLException e) {
 					SupplementaryFilePanelMongoDB.showError("Malformed URL Exception.", e);
 					iconA = null;
@@ -207,19 +207,19 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 				if (file.canRead()) {
 					imageButton.setProgressValue(-1);
 					DatabaseStorageResult md5 = DataExchangeHelperForExperiments.insertMD5checkedFile(user, pass, file,
-							imageButton.createTempPreviewImage(), imageButton.getIsJavaImage(), imageButton, targetTreeNode
-									.getTargetEntity());
+										imageButton.createTempPreviewImage(), imageButton.getIsJavaImage(), imageButton, targetTreeNode
+															.getTargetEntity());
 					((BinaryMeasurement) bif.getEntity()).getURL().setDetail(md5.getMD5());
 					if (md5 == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 						SupplementaryFilePanelMongoDB.showError("The file " + file.getName()
-								+ " could not be stored to the Database (Target-Table " + targetTreeNode.getTargetEntity(),
-								null);
+											+ " could not be stored to the Database (Target-Table " + targetTreeNode.getTargetEntity(),
+											null);
 					}
 					imageButton.setDownloadNeeded(true);
 					imageButton.downloadInProgress = false;
 
 					BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode
-							.getTargetEntity());
+										.getTargetEntity());
 
 					imageButton.imageResult = new ImageResult(icon, bfi);
 					imageButton.setProgressValue(100);

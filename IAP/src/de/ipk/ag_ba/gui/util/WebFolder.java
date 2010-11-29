@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on Apr 28, 2010 by Christian Klukas
@@ -68,9 +66,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  */
 public class WebFolder {
 	public static NavigationButton getBrowserNavigationEntity(final HashMap<String, String> folder2url, String title,
-			String icon, final String url, final String referenceTitle, final String referenceImage,
-			final String referenceURL, final String[] valid, final String introTxt,
-			final String optSubFolderForFolderItems, GUIsetting guiSetting) {
+						String icon, final String url, final String referenceTitle, final String referenceImage,
+						final String referenceURL, final String[] valid, final String introTxt,
+						final String optSubFolderForFolderItems, GUIsetting guiSetting) {
 
 		NavigationButton nav = new NavigationButton(new AbstractNavigationAction("Open web-folder content") {
 			private NavigationButton src;
@@ -108,7 +106,7 @@ public class WebFolder {
 						}
 					};
 					NavigationButton website = new NavigationButton(action, referenceTitle, referenceImage,
-							src.getGUIsetting());
+										src.getGUIsetting());
 					website.setToolTipText("Open " + referenceURL);
 					actions.add(website);
 				}
@@ -134,7 +132,7 @@ public class WebFolder {
 						};
 
 						NavigationButton website = new NavigationButton(action, fp.split(":")[0], "img/dataset.png",
-								src.getGUIsetting());
+											src.getGUIsetting());
 						website.setToolTipText("Open " + folder2url.get("").split(":", 2)[1]);
 						actions.add(website);
 					}
@@ -143,7 +141,7 @@ public class WebFolder {
 				NavigationAction subFolderAction = null;
 				if (optSubFolderForFolderItems != null && optSubFolderForFolderItems.length() > 0) {
 					subFolderAction = new EmptyNavigationAction(optSubFolderForFolderItems, "Show List of Web-Ressources",
-							"img/ext/folder.png", "img/ext/folder-drag-accept.png");
+										"img/ext/folder.png", "img/ext/folder-drag-accept.png");
 					NavigationButton subFolder = new NavigationButton(subFolderAction, src.getGUIsetting());
 					actions.add(subFolder);
 				}
@@ -154,7 +152,7 @@ public class WebFolder {
 
 				try {
 					Collection<PathwayWebLinkItem> mainList = WebDirectoryFileListAccess.getWebDirectoryFileListItems(url,
-							valid, false);
+										valid, false);
 					for (PathwayWebLinkItem i : mainList) {
 						if (i.getGroup1() != null && i.getGroup1().length() > 0) {
 							folders.add(i.getGroup1());
@@ -202,7 +200,7 @@ public class WebFolder {
 								String title = folder2url.get(ff).split(":")[0];
 								final String url = folder2url.get(ff).split(":", 2)[1];
 								NavigationButton website = new NavigationButton(new AbstractNavigationAction(
-										"Show web-resource") {
+													"Show web-resource") {
 									@Override
 									public void performActionCalculateResults(NavigationButton src) {
 										AttributeHelper.showInBrowser(url);
@@ -210,7 +208,7 @@ public class WebFolder {
 
 									@Override
 									public ArrayList<NavigationButton> getResultNewNavigationSet(
-											ArrayList<NavigationButton> currentSet) {
+														ArrayList<NavigationButton> currentSet) {
 										return null;
 									}
 
@@ -316,7 +314,7 @@ public class WebFolder {
 				};
 
 				NavigationButton editInVanted = new NavigationButton(action, "Edit in VANTED", "img/vanted1_0.png",
-						src.getGUIsetting());
+									src.getGUIsetting());
 				result.add(editInVanted);
 
 				JComponent zoomSlider = getZoomSliderForGraph(scrollpaneRef);
@@ -331,7 +329,7 @@ public class WebFolder {
 					Graph g = (Graph) graphRef.getObject();
 					if (g != null) {
 						boolean isMetaCrop = mmc.getURL().toString()
-								.contains("http://vanted.ipk-gatersleben.de/addons/metacrop");
+											.contains("http://vanted.ipk-gatersleben.de/addons/metacrop");
 						if (isMetaCrop) {
 							System.out.println("Adding MetaCrop links");
 							addAnnotationsToGraphElements(g);
@@ -340,141 +338,141 @@ public class WebFolder {
 						final ObjectRef refLastURL = new ObjectRef();
 						final ObjectRef refLastDragPoint = new ObjectRef("", new Vector2d(0, 0));
 						JScrollPane graphViewScrollPane = MainFrame.getInstance().showViewChooserDialog(es, true, null,
-								LoadSetting.VIEW_CHOOSER_NEVER_DONT_ADD_VIEW_TO_EDITORSESSION, new ConfigureViewAction() {
-									View newView;
+											LoadSetting.VIEW_CHOOSER_NEVER_DONT_ADD_VIEW_TO_EDITORSESSION, new ConfigureViewAction() {
+												View newView;
 
-									public void storeView(View v) {
-										newView = v;
-									}
+												public void storeView(View v) {
+													newView = v;
+												}
 
-									public void run() {
-										final ObjectRef beingDragged = new ObjectRef("", false);
+												public void run() {
+													final ObjectRef beingDragged = new ObjectRef("", false);
 
-										final GraffitiView gv = (GraffitiView) newView;
-										// gv.setDrawMode(DrawMode.REDUCED); // REDUCED
-										gv.threadedRedraw = false;
+													final GraffitiView gv = (GraffitiView) newView;
+													// gv.setDrawMode(DrawMode.REDUCED); // REDUCED
+													gv.threadedRedraw = false;
 
-										final MouseMotionListener mml = new MouseMotionListener() {
-											public void mouseMoved(MouseEvent e) {
-												boolean urlFound = false;
-												try {
-													Component c = gv.findComponentAt(e.getX(), e.getY());
-													if (c != null) {
-														if (c instanceof GraphElementComponent) {
-															GraphElementComponent gc = (GraphElementComponent) c;
-															// String lbl =
-															// AttributeHelper.getLabel(gc.getGraphElement(),
-															// "no label");
-															String url = AttributeHelper.getReferenceURL(gc.getGraphElement());
-															urlFound = url != null && url.length() > 0;
-															if (urlFound) {
+													final MouseMotionListener mml = new MouseMotionListener() {
+														public void mouseMoved(MouseEvent e) {
+															boolean urlFound = false;
+															try {
+																Component c = gv.findComponentAt(e.getX(), e.getY());
+																if (c != null) {
+																	if (c instanceof GraphElementComponent) {
+																		GraphElementComponent gc = (GraphElementComponent) c;
+																		// String lbl =
+																		// AttributeHelper.getLabel(gc.getGraphElement(),
+																		// "no label");
+																		String url = AttributeHelper.getReferenceURL(gc.getGraphElement());
+																		urlFound = url != null && url.length() > 0;
+																		if (urlFound) {
+																			((Component) scrollpaneRef.getObject()).setCursor(Cursor
+																								.getPredefinedCursor(Cursor.HAND_CURSOR));
+																			refLastURL.setObject(url);
+																		}
+																	}
+																	if (c instanceof AttributeComponent) {
+																		AttributeComponent ac = (AttributeComponent) c;
+																		GraphElement ge = (GraphElement) ac.getAttribute().getAttributable();
+																		String url = AttributeHelper.getReferenceURL(ge);
+																		urlFound = url != null && url.length() > 0;
+																		if (urlFound) {
+																			((Component) scrollpaneRef.getObject()).setCursor(Cursor
+																								.getPredefinedCursor(Cursor.HAND_CURSOR));
+																			refLastURL.setObject(url);
+																		}
+																	}
+																}
+															} catch (Exception err) {
+																System.out.println("e");
+															}
+															if (!urlFound) {
 																((Component) scrollpaneRef.getObject()).setCursor(Cursor
-																		.getPredefinedCursor(Cursor.HAND_CURSOR));
-																refLastURL.setObject(url);
+																					.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+																refLastURL.setObject(null);
+															} else {
+
 															}
 														}
-														if (c instanceof AttributeComponent) {
-															AttributeComponent ac = (AttributeComponent) c;
-															GraphElement ge = (GraphElement) ac.getAttribute().getAttributable();
-															String url = AttributeHelper.getReferenceURL(ge);
-															urlFound = url != null && url.length() > 0;
-															if (urlFound) {
+
+														@Override
+														public void mouseDragged(MouseEvent e) {
+															JViewport viewPort = ((JScrollPane) scrollpaneRef.getObject()).getViewport();
+															if (!((Boolean) beingDragged.getObject())) {
 																((Component) scrollpaneRef.getObject()).setCursor(Cursor
-																		.getPredefinedCursor(Cursor.HAND_CURSOR));
-																refLastURL.setObject(url);
+																					.getPredefinedCursor(Cursor.MOVE_CURSOR));
+																beingDragged.setObject(true);
+																((Vector2d) refLastDragPoint.getObject()).x = e.getX();
+																((Vector2d) refLastDragPoint.getObject()).y = e.getY();
+															}
+															refLastURL.setObject(null);
+
+															Point scrollPosition = viewPort.getViewPosition();
+
+															double dx = e.getX() - ((Vector2d) refLastDragPoint.getObject()).x;
+															double dy = e.getY() - ((Vector2d) refLastDragPoint.getObject()).y;
+
+															scrollPosition.x -= dx;
+															scrollPosition.y -= dy;
+															if (scrollPosition.x < 0)
+																scrollPosition.x = 0;
+															if (scrollPosition.y < 0)
+																scrollPosition.y = 0;
+
+															viewPort.setViewPosition(scrollPosition);
+														}
+													};
+
+													gv.addMouseListener(new MouseListener() {
+														public void mouseReleased(MouseEvent e) {
+															e.consume();
+															if ((Boolean) beingDragged.getObject()) {
+																beingDragged.setObject(false);
+																((Component) scrollpaneRef.getObject()).setCursor(Cursor
+																					.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+															}
+															mml.mouseMoved(e);
+														}
+
+														public void mousePressed(MouseEvent e) {
+															e.consume();
+															if (!((Boolean) beingDragged.getObject())) {
+																((Component) scrollpaneRef.getObject()).setCursor(Cursor
+																					.getPredefinedCursor(Cursor.MOVE_CURSOR));
+																beingDragged.setObject(true);
+																((Vector2d) refLastDragPoint.getObject()).x = e.getX();
+																((Vector2d) refLastDragPoint.getObject()).y = e.getY();
 															}
 														}
-													}
-												} catch (Exception err) {
-													System.out.println("e");
+
+														public void mouseExited(MouseEvent e) {
+														}
+
+														public void mouseEntered(MouseEvent e) {
+														}
+
+														public void mouseClicked(MouseEvent e) {
+															e.consume();
+															String url = (String) refLastURL.getObject();
+															if (url != null && url.length() > 0) {
+																AttributeHelper.showInBrowser(url);
+															}
+														}
+													});
+													gv.addMouseMotionListener(mml);
+
+													SwingUtilities.invokeLater(new Runnable() {
+														public void run() {
+															BackgroundTaskHelper.executeLaterOnSwingTask(100, new Runnable() {
+																public void run() {
+																	ReleaseInfo.getApplet().repaint();
+																}
+															});
+														}
+													});
 												}
-												if (!urlFound) {
-													((Component) scrollpaneRef.getObject()).setCursor(Cursor
-															.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-													refLastURL.setObject(null);
-												} else {
 
-												}
-											}
-
-											@Override
-											public void mouseDragged(MouseEvent e) {
-												JViewport viewPort = ((JScrollPane) scrollpaneRef.getObject()).getViewport();
-												if (!((Boolean) beingDragged.getObject())) {
-													((Component) scrollpaneRef.getObject()).setCursor(Cursor
-															.getPredefinedCursor(Cursor.MOVE_CURSOR));
-													beingDragged.setObject(true);
-													((Vector2d) refLastDragPoint.getObject()).x = e.getX();
-													((Vector2d) refLastDragPoint.getObject()).y = e.getY();
-												}
-												refLastURL.setObject(null);
-
-												Point scrollPosition = viewPort.getViewPosition();
-
-												double dx = e.getX() - ((Vector2d) refLastDragPoint.getObject()).x;
-												double dy = e.getY() - ((Vector2d) refLastDragPoint.getObject()).y;
-
-												scrollPosition.x -= dx;
-												scrollPosition.y -= dy;
-												if (scrollPosition.x < 0)
-													scrollPosition.x = 0;
-												if (scrollPosition.y < 0)
-													scrollPosition.y = 0;
-
-												viewPort.setViewPosition(scrollPosition);
-											}
-										};
-
-										gv.addMouseListener(new MouseListener() {
-											public void mouseReleased(MouseEvent e) {
-												e.consume();
-												if ((Boolean) beingDragged.getObject()) {
-													beingDragged.setObject(false);
-													((Component) scrollpaneRef.getObject()).setCursor(Cursor
-															.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-												}
-												mml.mouseMoved(e);
-											}
-
-											public void mousePressed(MouseEvent e) {
-												e.consume();
-												if (!((Boolean) beingDragged.getObject())) {
-													((Component) scrollpaneRef.getObject()).setCursor(Cursor
-															.getPredefinedCursor(Cursor.MOVE_CURSOR));
-													beingDragged.setObject(true);
-													((Vector2d) refLastDragPoint.getObject()).x = e.getX();
-													((Vector2d) refLastDragPoint.getObject()).y = e.getY();
-												}
-											}
-
-											public void mouseExited(MouseEvent e) {
-											}
-
-											public void mouseEntered(MouseEvent e) {
-											}
-
-											public void mouseClicked(MouseEvent e) {
-												e.consume();
-												String url = (String) refLastURL.getObject();
-												if (url != null && url.length() > 0) {
-													AttributeHelper.showInBrowser(url);
-												}
-											}
-										});
-										gv.addMouseMotionListener(mml);
-
-										SwingUtilities.invokeLater(new Runnable() {
-											public void run() {
-												BackgroundTaskHelper.executeLaterOnSwingTask(100, new Runnable() {
-													public void run() {
-														ReleaseInfo.getApplet().repaint();
-													}
-												});
-											}
-										});
-									}
-
-								});
+											});
 						graphViewScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 						graphViewScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 						scrollpaneRef.setObject(graphViewScrollPane);
@@ -570,7 +568,7 @@ public class WebFolder {
 	}
 
 	public static NavigationButton getURLentity(String title, final String referenceURL, String image,
-			GUIsetting guiSetting) {
+						GUIsetting guiSetting) {
 		NavigationAction action = new AbstractNavigationAction("Show in browser") {
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {

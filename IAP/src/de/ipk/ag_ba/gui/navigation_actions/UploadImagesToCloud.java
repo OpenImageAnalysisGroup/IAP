@@ -36,7 +36,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.loaders.MyScanner;
 
 /**
  * @author klukas
- * 
  */
 public class UploadImagesToCloud extends AbstractNavigationAction {
 	private NavigationButton src;

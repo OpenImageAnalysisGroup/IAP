@@ -24,7 +24,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 /**
  * @author klukas
- * 
  */
 public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
@@ -40,7 +39,6 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * getInputTypes()
 	 */
@@ -51,7 +49,6 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * getOutputTypes()
 	 */
@@ -62,9 +59,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
-	 * 
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#getOutput
 	 * ()
 	 */
@@ -75,7 +70,6 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * getTaskDescription()
 	 */
@@ -86,15 +80,12 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * performAnalysis(int,
 	 * org.BackgroundTaskStatusProviderSupportingExternalCall)
 	 */
 	/**
-	 * @deprecated Use
-	 *             {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)}
-	 *             instead
+	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
 	 */
 	@Deprecated
 	@Override
@@ -104,7 +95,6 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
 	 * performAnalysis(int,
 	 * org.BackgroundTaskStatusProviderSupportingExternalCall)
@@ -177,9 +167,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
-	 * 
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#setInput
 	 * (java.util.Collection, java.lang.String, java.lang.String)
 	 */
@@ -192,7 +180,6 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#getName
 	 * ()

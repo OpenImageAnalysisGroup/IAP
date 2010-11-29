@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *******************************************************************************/
 /*
  * Created on Sep 12, 2010 by Christian Klukas
@@ -31,7 +29,6 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 /**
  * @author klukas
- * 
  */
 @SuppressWarnings("restriction")
 public class ImageTools {
@@ -41,7 +38,6 @@ public class ImageTools {
 	}
 
 	/**
-	 * 
 	 * @param image
 	 * @param maxColors
 	 *           "2","4","8","16","32","64","128"

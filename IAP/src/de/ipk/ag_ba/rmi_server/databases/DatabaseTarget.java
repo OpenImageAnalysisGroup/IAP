@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- * 
  *******************************************************************************/
 /*
  * Created on Aug 13, 2010 by Christian Klukas
@@ -19,7 +17,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 
 /**
  * @author klukas
- * 
  */
 public interface DatabaseTarget {
 

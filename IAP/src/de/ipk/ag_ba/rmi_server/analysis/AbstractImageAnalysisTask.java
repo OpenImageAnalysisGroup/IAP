@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 14, 2010 by Christian Klukas
@@ -12,7 +10,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 /**
  * @author klukas
- * 
  */
 public abstract class AbstractImageAnalysisTask implements ImageAnalysisTask {
 

@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
  * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
  *******************************************************************************/
 /*
  * Created on May 13, 2010 by Christian Klukas
@@ -49,7 +47,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author klukas
- * 
  */
 @SuppressWarnings("restriction")
 public class ImageAnalysis {

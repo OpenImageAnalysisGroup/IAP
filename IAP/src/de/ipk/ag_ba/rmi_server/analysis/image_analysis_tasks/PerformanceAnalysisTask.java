@@ -22,7 +22,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author klukas
- * 
  */
 public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 

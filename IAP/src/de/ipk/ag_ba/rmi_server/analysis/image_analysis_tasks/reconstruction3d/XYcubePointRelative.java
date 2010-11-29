@@ -1,11 +1,11 @@
 package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.reconstruction3d;
+
 /*
  * Created on Dec 17, 2009 by Christian Klukas
  */
 
 /**
  * @author klukas
- *
  */
 public class XYcubePointRelative {
 
