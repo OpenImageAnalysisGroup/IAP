@@ -41,13 +41,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.DBEsplashScreen;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImageHandler;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolumeHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolumeHandler;
 
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;

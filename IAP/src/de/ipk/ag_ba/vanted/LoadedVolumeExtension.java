@@ -31,10 +31,10 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ByteShortIntArray;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IntVolumeVisitor;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.ByteShortIntArray;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.IntVolumeVisitor;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
  * @author klukas
@@ -53,7 +53,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		final int width = getDimensionX();
 		final int height = getDimensionY();
 		final int depth = getDimensionZ();
-		boolean threaded = false;
+		boolean threaded = true;
 		if (threaded)
 			rotateVolumeThreaded(rotation, new VolumeReceiver() {
 
@@ -70,7 +70,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 
 	private void renderSideView(BufferedImage result, int width, int height, int depth, int[][][] volume2) {
 		WritableRaster raster = result.getRaster();
-		int idx = 0;
+		long idx = 0;
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				int[] iArray = new int[] { 255, 255, 255, 255 };
@@ -86,7 +86,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 						if (v != 0 && (red < 255 || green < 255 || blue < 255)) {
 							solidFound = true;
 							int alpha = 255; // not supported by gif ?! (v >> 24) &
-													// 0xff;
+							// 0xff;
 
 							int[] col = { alpha, red, green, blue };
 							raster.setPixel(x, y, col);
@@ -97,6 +97,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 					raster.setPixel(x, y, iArray);
 			}
 		}
+		System.out.println("Solid voxels: " + idx);
 	}
 
 	private void rotateVolumeThreaded(double rotation, VolumeReceiver volumeReceiver) {
@@ -129,7 +130,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 	}
 
 	private Runnable getVolumeRotationRunnable(final int i, final int maxCPU, final double rotation,
-			final int[][][] volume2) {
+						final int[][][] volume2) {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
@@ -178,7 +179,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 
 			int res = 200;
 			FileInputStream file = new FileInputStream(
-					"/Users/klukas/Desktop/IAP_reconstruction_1284034033183.argb_volume");
+								"/Users/klukas/Desktop/IAP_reconstruction_1284034033183.argb_volume");
 
 			boolean high = false;
 			if (high) {
@@ -191,7 +192,6 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			LoadedVolumeExtension v = new LoadedVolumeExtension(null);
 			final int[][][] i1 = new int[res][res][res];
 			v.volume = new ByteShortIntArray(i1);
-			int[][][] i2 = new int[res][res][res];
 			v.volume.visitIntArray(new IntVolumeVisitor() {
 				@Override
 				public void visit(int x, int y, int z, int value) throws Exception {
@@ -238,7 +238,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 	}
 
 	public MyByteArrayInputStream getSideViewGif(int width, int height,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 		ArrayList<String> delayTimes = new ArrayList<String>();
 

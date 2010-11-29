@@ -34,13 +34,13 @@ import de.ipk.ag_ba.rmi_server.databases.DatabaseTarget;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeColorDepth;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
-import de.ipk_gatersleben.ag_pbi.mmd.loaders.MeasurementNodeType;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeColorDepth;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
  * @author klukas

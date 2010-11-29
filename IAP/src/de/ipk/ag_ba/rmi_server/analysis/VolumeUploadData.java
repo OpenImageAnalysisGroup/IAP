@@ -9,7 +9,7 @@
 
 package de.ipk.ag_ba.rmi_server.analysis;
 
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeInputStream;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeInputStream;
 
 /**
  * @author klukas

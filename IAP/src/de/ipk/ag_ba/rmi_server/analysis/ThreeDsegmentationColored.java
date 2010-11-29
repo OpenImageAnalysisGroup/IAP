@@ -21,7 +21,7 @@ import de.ipk.ag_ba.util.color.ColorUtil;
 import de.ipk.ag_ba.util.color.ColorXYZ;
 import de.ipk.ag_ba.util.color.Color_CIE_Lab;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.IntVolumeVisitor;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.IntVolumeVisitor;
 
 public class ThreeDsegmentationColored {
 

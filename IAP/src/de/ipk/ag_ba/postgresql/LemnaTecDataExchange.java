@@ -1,7 +1,7 @@
 /*************************************************************************
  * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- *
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
+ * 
  *************************************************************************/
 package de.ipk.ag_ba.postgresql;
 
@@ -37,10 +37,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
-import de.ipk_gatersleben.ag_pbi.mmd.loaders.MeasurementNodeType;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author entzian, klukas
@@ -100,7 +100,7 @@ public class LemnaTecDataExchange {
 	}
 
 	public Collection<ExperimentHeaderInterface> getExperimentInDatabase(String database) throws SQLException,
-			ClassNotFoundException {
+						ClassNotFoundException {
 		String sqlText = "SELECT distinct(measurement_label) FROM snapshot ORDER BY measurement_label";
 
 		Connection connection = openConnectionToDatabase(database);
@@ -138,7 +138,7 @@ public class LemnaTecDataExchange {
 				Timestamp max = rs.getTimestamp(2);
 				if (min == null || max == null)
 					System.out.println("Warning: No snapshot times stored for experiment " + ehi.getExperimentname()
-							+ " in database " + ehi.getDatabase() + "!");
+										+ " in database " + ehi.getDatabase() + "!");
 				if (min != null)
 					ehi.setStartdate(new Date(min.getTime()));
 				else
@@ -203,13 +203,13 @@ public class LemnaTecDataExchange {
 	}
 
 	public Collection<Snapshot> getSnapshotsOfExperiment(String database, String experiment) throws SQLException,
-			ClassNotFoundException {
+						ClassNotFoundException {
 		Collection<Snapshot> result = new ArrayList<Snapshot>();
 		Connection connection = openConnectionToDatabase(database);
 
 		HashMap<Long, String> id2path = new HashMap<Long, String>();
 		String sqlReadImageFileTable = "SELECT "
-				+ "image_file_table.id as image_file_tableID, path FROM image_file_table";
+							+ "image_file_table.id as image_file_tableID, path FROM image_file_table";
 		//
 		// +
 		// "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
@@ -233,14 +233,14 @@ public class LemnaTecDataExchange {
 		ps.close();
 
 		String sqlText = "SELECT "
-				+ "creator, measurement_label, camera_label, id_tag, path, "
-				+ "time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
-				+ "image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, image_file_table.id as image_file_tableID "
-				+ "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
-				+ "WHERE snapshot.measurement_label = ? and snapshot.id = tiled_image.snapshot_id and "
-				+ "tiled_image.id = tile.tiled_image_id and "
-				+ "tile.image_oid = image_file_table.id and "
-				+ "snapshot.configuration_id = image_unit_configuration.compconfigid and tiled_image.camera_label = image_unit_configuration.gid";
+							+ "creator, measurement_label, camera_label, id_tag, path, "
+							+ "time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
+							+ "image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, image_file_table.id as image_file_tableID "
+							+ "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
+							+ "WHERE snapshot.measurement_label = ? and snapshot.id = tiled_image.snapshot_id and "
+							+ "tiled_image.id = tile.tiled_image_id and "
+							+ "tile.image_oid = image_file_table.id and "
+							+ "snapshot.configuration_id = image_unit_configuration.compconfigid and tiled_image.camera_label = image_unit_configuration.gid";
 
 		ps = connection.prepareStatement(sqlText);
 		ps.setString(1, experiment);
@@ -288,7 +288,7 @@ public class LemnaTecDataExchange {
 		loadJdbcDriver();
 
 		String path = "jdbc:postgresql:" + (host != null ? ("//" + host) + (port != null ? ":" + port : "") + "/" : "")
-				+ database;
+							+ database;
 		Connection connection = DriverManager.getConnection(path, user, password);
 
 		if (Debug.TEST) {
@@ -315,7 +315,7 @@ public class LemnaTecDataExchange {
 	}
 
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
+						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
 
 		String species = "";
@@ -330,7 +330,7 @@ public class LemnaTecDataExchange {
 			optStatus.setCurrentStatusValue(-1);
 
 		Collection<Snapshot> snapshots = getSnapshotsOfExperiment(experimentReq.getDatabase(), experimentReq
-				.getExperimentname());
+							.getExperimentname());
 		HashMap<String, Integer> idtag2replicateID = new HashMap<String, Integer>();
 
 		Timestamp earliest = null;
@@ -408,7 +408,7 @@ public class LemnaTecDataExchange {
 			Integer replicateID = idtag2replicateID.get(sn.getId_tag());
 			if (replicateID == null) {
 				System.out.println("Warning: internal IAP error. Could not create get replicate ID for ID tag '"
-						+ sn.getId_tag() + "'. Snapshot is ignored.");
+									+ sn.getId_tag() + "'. Snapshot is ignored.");
 				continue;
 			}
 
@@ -529,8 +529,8 @@ public class LemnaTecDataExchange {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-								+ sn.getPath_image_config_blob(), sn.getId_tag()
-								+ (position != null ? " (" + position.intValue() + ")" : ""));
+											+ sn.getPath_image_config_blob(), sn.getId_tag()
+											+ (position != null ? " (" + position.intValue() + ")" : ""));
 						position = processConfigBlobToGetRotationAngle(blob2buf, sn, url);
 						if (Math.abs(position) < 0.00001)
 							position = null;
@@ -542,15 +542,15 @@ public class LemnaTecDataExchange {
 					}
 
 					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-							+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + position.intValue() + ")" : ""));
+										+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + position.intValue() + ")" : ""));
 					image.setURL(url);
 					fn = sn.getPath_null_image();
 					if (fn != null) {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-								+ sn.getPath_null_image(), sn.getId_tag()
-								+ (position != null ? " (" + position.intValue() + ")" : ""));
+											+ sn.getPath_null_image(), sn.getId_tag()
+											+ (position != null ? " (" + position.intValue() + ")" : ""));
 						image.setLabelURL(url);
 					}
 
@@ -628,13 +628,13 @@ public class LemnaTecDataExchange {
 	}
 
 	private HashMap<String, Condition> getPlantIdAnnotation(ExperimentHeaderInterface header) throws SQLException,
-			ClassNotFoundException {
+						ClassNotFoundException {
 		HashMap<String, Condition> res = new HashMap<String, Condition>();
 
 		Connection connection = openConnectionToDatabase(header.getDatabase());
 
 		String sqlText = "SELECT id_tag, meta_data_name, meta_data_value, meta_data_type " + "FROM  meta_info_src "
-				+ "WHERE measure_label = ?";
+							+ "WHERE measure_label = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sqlText);
 		ps.setString(1, header.getExperimentname());

@@ -510,4 +510,13 @@ public class ColorUtil {
 		}
 	}
 
+	public static int getInt(int alpha, int red, int green, int blue) {
+		int i = 0;
+		i += alpha << 24;
+		i += red << 16;
+		i += green << 8;
+		i += blue << 0;
+		return i;
+	}
+
 }

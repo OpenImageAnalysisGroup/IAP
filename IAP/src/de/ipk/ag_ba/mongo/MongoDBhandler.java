@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
+ * Copyright (c) 2010 Image Analysis Group, IPK Gatersleben
  * 
  *******************************************************************************/
 /*
@@ -27,7 +27,7 @@ public class MongoDBhandler implements ResourceIOHandler {
 
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
-			throws Exception {
+						throws Exception {
 		return null;
 	}
 
@@ -54,6 +54,7 @@ public class MongoDBhandler implements ResourceIOHandler {
 					fff = gridfs_volumes.findOne(url.getDetail());
 					if (fff != null) {
 						try {
+							System.out.println("Input stream for " + url + ", length: " + fff.getLength());
 							InputStream is = fff.getInputStream();
 							or.setObject(is);
 						} catch (Exception e) {

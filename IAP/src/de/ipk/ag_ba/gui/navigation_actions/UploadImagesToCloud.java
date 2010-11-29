@@ -87,7 +87,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 						newExperiment.getHeader().setImportusergroup("Shared");
 						newExperiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 						System.out.println(newExperiment.toString());
-						new MongoDB().storeExperiment("dbe3", null, null, null, newExperiment, status);
+						new MongoDB().saveExperiment("dbe3", null, null, null, newExperiment, status);
 					}
 					ExperimentReference exRef = new ExperimentReference(newExperiment);
 					for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(null, null, exRef,

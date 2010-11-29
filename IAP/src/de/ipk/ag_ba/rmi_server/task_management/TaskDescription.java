@@ -104,7 +104,7 @@ public class TaskDescription {
 				try {
 					// todo: only store result if batch claim is still valid and
 					// connected to system IP
-					new MongoDB().storeExperiment("dbe3", null, login, pass, experiment, null);
+					new MongoDB().saveExperiment("dbe3", null, login, pass, experiment, null);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}

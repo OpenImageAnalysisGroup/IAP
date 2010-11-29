@@ -405,7 +405,7 @@ public class MyExperimentInfoPanel extends JPanel {
 						} else {
 							Experiment exp = new Experiment();
 							exp.setHeader(experimentHeader);
-							new MongoDB().storeExperiment("dbe3", null, login, pass, exp, null);
+							new MongoDB().saveExperiment("dbe3", null, login, pass, exp, null);
 							saveB.setText("Experiment Saved in Cloud DB");
 							editPossibleBBB = false;
 						}

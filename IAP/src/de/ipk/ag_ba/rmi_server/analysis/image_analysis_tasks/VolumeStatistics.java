@@ -13,8 +13,8 @@ import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
  * @author klukas

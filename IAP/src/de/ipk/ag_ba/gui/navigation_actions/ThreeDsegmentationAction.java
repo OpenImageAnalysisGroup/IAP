@@ -25,7 +25,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
  * @author klukas
@@ -97,13 +97,13 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 			mpc = new MainPanelComponent(ip, true);
 
 			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(res),
-					src.getGUIsetting()));
+								src.getGUIsetting()));
 
 			storedActions.add(new NavigationButton(new CloudUploadEntity(login, pass,
-					new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+								new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
 			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, res, res.getHeader(), false,
-					src.getGUIsetting());
+								src.getGUIsetting());
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();
 			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
@@ -134,12 +134,12 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 	}
 
 	public static NavigationButton getThreeDsegmentationTaskEntity(final String login, final String pass,
-			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
-			GUIsetting guiSetting) {
+						final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
+						GUIsetting guiSetting) {
 
 		NavigationAction segmentationAction = new ThreeDsegmentationAction(login, pass, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(segmentationAction, title,
-				"img/RotationReconstructionSegmentation.png", guiSetting);
+							"img/RotationReconstructionSegmentation.png", guiSetting);
 		return resultTaskButton;
 	}
 }

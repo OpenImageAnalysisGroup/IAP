@@ -29,9 +29,9 @@ import de.ipk.ag_ba.util.color.Color_CIE_Lab;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImageHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
 
 /**
  * @author klukas

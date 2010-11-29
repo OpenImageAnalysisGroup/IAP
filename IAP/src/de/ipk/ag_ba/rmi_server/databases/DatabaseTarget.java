@@ -13,9 +13,9 @@ import java.io.InputStream;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 
 /**
  * @author klukas

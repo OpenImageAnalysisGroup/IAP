@@ -20,9 +20,9 @@ import com.mongodb.DB;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 
 /**
  * @author klukas
@@ -45,7 +45,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 
 			public void run() {
 				try {
-					DatabaseStorageResult dsr = new MongoDB().storeImageFile(db, limg, null);
+					DatabaseStorageResult dsr = new MongoDB().saveImageFile(db, limg, null);
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
@@ -83,7 +83,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			private DB db;
 
 			public void run() {
-				new MongoDB().storeVolumeFile(db, volume, null, optStatus);
+				new MongoDB().saveVolumeFile(db, volume, null, optStatus);
 			}
 
 			public void setDB(DB db) {

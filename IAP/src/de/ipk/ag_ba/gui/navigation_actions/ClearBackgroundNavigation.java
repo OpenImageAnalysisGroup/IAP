@@ -17,9 +17,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author klukas
@@ -29,7 +29,7 @@ public class ClearBackgroundNavigation extends AbstractExperimentAnalysisNavigat
 	private final double epsilon2;
 
 	public ClearBackgroundNavigation(String login, double epsilon, double epsilon2, String pass,
-			ExperimentReference experiment) {
+						ExperimentReference experiment) {
 		super(login, pass, experiment);
 		this.epsilon = epsilon;
 		this.epsilon2 = epsilon2;

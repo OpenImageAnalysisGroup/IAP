@@ -1,7 +1,5 @@
 /*******************************************************************************
- * 
- *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
- * 
+ * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
  * Created on May 5, 2010 by Christian Klukas
@@ -25,7 +23,7 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 
 	private final ArrayList<NavigationButton> additionalEntities = new ArrayList<NavigationButton>();
 	protected BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-			"", "");
+						"", "");
 	private final String tooltip;
 
 	public AbstractNavigationAction(String tooltip) {
@@ -34,7 +32,6 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.webstart.NavigationAction
 	 * #getResultMainPanel()

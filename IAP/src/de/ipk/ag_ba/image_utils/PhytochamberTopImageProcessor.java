@@ -25,7 +25,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 /**
  * @author entzian, klukas
@@ -149,8 +149,7 @@ public class PhytochamberTopImageProcessor {
 	 *           background (see {@link #clearBackground(FlexibleImageSet)}).
 	 * @return A set of enlarged mask images.
 	 *         <p>
-	 *         <img src=
-	 *         "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png"
+	 *         <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png"
 	 *         >
 	 */
 	private FlexibleImageSet enlargeMask(FlexibleImageSet mask) {

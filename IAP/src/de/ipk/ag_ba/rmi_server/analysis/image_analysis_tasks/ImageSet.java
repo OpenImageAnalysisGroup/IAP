@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks;
 
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class ImageSet {
 	private ImageData vis;
