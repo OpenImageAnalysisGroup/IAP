@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 public class ImageOperation extends ImageConverter {
 
@@ -111,8 +111,7 @@ public class ImageOperation extends ImageConverter {
 	/**
 	 * Enlarge area of mask.
 	 * <p>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png"
 	 * >
 	 */
 	public void dilate(int[][] mask) {
@@ -135,8 +134,7 @@ public class ImageOperation extends ImageConverter {
 	/**
 	 * Enlarge area of mask.
 	 * <p>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png"
 	 * >
 	 */
 	public ImageOperation dilate() { // es wird der 3x3 Minimum-Filter genutzt
@@ -147,8 +145,7 @@ public class ImageOperation extends ImageConverter {
 	/**
 	 * Reduce area of mask.
 	 * <p>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
 	 * >
 	 */
 	public ImageOperation erode(ImageProcessor temp, int[][] mask) {
@@ -161,8 +158,7 @@ public class ImageOperation extends ImageConverter {
 	/**
 	 * Reduce area of mask.
 	 * <p>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
 	 * >
 	 */
 	public ImageOperation erode(ImageProcessor temp) {
@@ -173,8 +169,7 @@ public class ImageOperation extends ImageConverter {
 	/**
 	 * Reduce area of mask.
 	 * <p>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
 	 * >
 	 */
 	public ImageOperation erode(int[][] mask) {
@@ -190,8 +185,7 @@ public class ImageOperation extends ImageConverter {
 	/**
 	 * Reduce area of mask.
 	 * <p>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png"
 	 * >
 	 */
 	public ImageOperation erode() { // es wird der 3x3 Minimum-Filter genutzt
@@ -203,8 +197,7 @@ public class ImageOperation extends ImageConverter {
 	 * <p>
 	 * The closing of the dark-blue shape (union of two squares) by a disk,
 	 * resulting in the union of the dark-blue shape and the light-blue areas.:<br>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Closing.png/220px-Closing.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Closing.png/220px-Closing.png"
 	 * >
 	 */
 	public void closing(int[][] mask) {
@@ -217,8 +210,7 @@ public class ImageOperation extends ImageConverter {
 	 * <p>
 	 * The closing of the dark-blue shape (union of two squares) by a disk,
 	 * resulting in the union of the dark-blue shape and the light-blue areas:<br>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Closing.png/220px-Closing.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Closing.png/220px-Closing.png"
 	 * >
 	 */
 	public void closing() { // es wird der 3x3 Minimum-Filter genutzt
@@ -231,8 +223,7 @@ public class ImageOperation extends ImageConverter {
 	 * <p>
 	 * The erosion of the dark-blue square by a disk, resulting in the light-blue
 	 * square:<br>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png"
 	 * >
 	 */
 	public void opening(int[][] mask) {
@@ -245,8 +236,7 @@ public class ImageOperation extends ImageConverter {
 	 * <p>
 	 * The erosion of the dark-blue square by a disk, resulting in the light-blue
 	 * square:<br>
-	 * <img src=
-	 * "http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png"
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png"
 	 * >
 	 */
 	public void opening() { // es wird der 3x3 Minimum-Filter genutzt

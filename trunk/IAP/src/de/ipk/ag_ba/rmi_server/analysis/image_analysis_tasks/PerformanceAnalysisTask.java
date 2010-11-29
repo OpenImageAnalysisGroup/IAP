@@ -18,7 +18,7 @@ import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author klukas
@@ -58,7 +58,7 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages,
-			final BackgroundTaskStatusProviderSupportingExternalCall status) {
+						final BackgroundTaskStatusProviderSupportingExternalCall status) {
 
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
@@ -105,8 +105,8 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 								tsoBytesRead.addLong(imgData.length);
 								{
 									NumericMeasurement m = new NumericMeasurement(id, "image size", id.getParentSample()
-											.getParentCondition().getExperimentName()
-											+ " (" + getName() + ")");
+														.getParentCondition().getExperimentName()
+														+ " (" + getName() + ")");
 									setAnno(maximumThreadCountParallelImages, m);
 									m.setValue(((int) (imgData.length / 1024d * 10d)) / 10d);
 									m.setUnit("KB");
@@ -114,8 +114,8 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 								}
 								{
 									NumericMeasurement m = new NumericMeasurement(id, "read speed (single image)", id
-											.getParentSample().getParentCondition().getExperimentName()
-											+ " (" + getName() + ")");
+														.getParentSample().getParentCondition().getExperimentName()
+														+ " (" + getName() + ")");
 									setAnno(maximumThreadCountParallelImages, m);
 									m.setValue(((int) (imgData.length * 10d / 1024d / 1024d / (end - start) * 1000)) / 10d);
 									m.setUnit("MB/s");
@@ -134,14 +134,14 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 								if (tsoCurrentSecond.getInt() != currentSecond) {
 									tsoCurrentSecond.setInt(currentSecond);
 									double mbs = tsoBytesRead.getLong() / 1024d / 1024d * 1000d
-											/ (time - tsoStartTime.getLong());
+														/ (time - tsoStartTime.getLong());
 									status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 									status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl + ", " + (int) mbs
-											+ " MB/s (" + maximumThreadCountParallelImages + " threads)");
+														+ " MB/s (" + maximumThreadCountParallelImages + " threads)");
 									{
 										NumericMeasurement m = new NumericMeasurement(id, "read speed", id.getParentSample()
-												.getParentCondition().getExperimentName()
-												+ " (" + getName() + ")");
+															.getParentCondition().getExperimentName()
+															+ " (" + getName() + ")");
 										setAnno(maximumThreadCountParallelImages, m);
 										m.setValue(mbs);
 										m.setUnit("MB/s");
@@ -197,7 +197,7 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-			BackgroundTaskStatusProviderSupportingExternalCall status) {
+						BackgroundTaskStatusProviderSupportingExternalCall status) {
 		performAnalysis(maximumThreadCountParallelImages, status);
 	}
 }

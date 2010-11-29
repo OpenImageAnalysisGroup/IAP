@@ -35,7 +35,7 @@ public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 		super.performActionCalculateResults(src);
 		try {
 			active = true;
-			new MongoDB().storeExperiment("dbe3", null, null, null, experiment.getData(), status);
+			new MongoDB().saveExperiment("dbe3", null, null, null, experiment.getData(), status);
 		} finally {
 			active = false;
 		}

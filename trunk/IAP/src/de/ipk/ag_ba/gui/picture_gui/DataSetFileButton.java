@@ -42,12 +42,11 @@ import org.HomeFolder;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
-import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.session.EditorSession;
 
 import de.ipk.ag_ba.gui.webstart.AIPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.VolumeData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 import de.ipk_gatersleben.ag_pbi.vanted3d.mapping.MappingResultGraph;
 import de.ipk_gatersleben.ag_pbi.vanted3d.mapping.MappingResultGraphNode;
 import de.ipk_gatersleben.ag_pbi.vanted3d.views.ThreeDview;
@@ -98,7 +97,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	// }
 
 	public DataSetFileButton(String user, String pass, MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
-			ImageIcon previewImage) {
+						ImageIcon previewImage) {
 		super();
 
 		progress = new JProgressBar(0, 100);
@@ -129,9 +128,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			ilbl = new JLabel(previewImage);
 
 		double[][] size = {
-				{ border, DataSetFileButton.ICON_WIDTH, border }, // Columns
-				{ border, DataSetFileButton.ICON_HEIGHT, border, TableLayout.PREFERRED, border, TableLayout.PREFERRED,
-						border } }; // Rows
+							{ border, DataSetFileButton.ICON_WIDTH, border }, // Columns
+							{ border, DataSetFileButton.ICON_HEIGHT, border, TableLayout.PREFERRED, border, TableLayout.PREFERRED,
+												border } }; // Rows
 
 		setLayout(new TableLayout(size));
 
@@ -151,9 +150,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	}
 
 	public DataSetFileButton(String user, String pass, MongoTreeNode projectNode, ImageResult imageResult,
-			ImageIcon previewImage, boolean readOnly) {
+						ImageIcon previewImage, boolean readOnly) {
 		this(user, pass, projectNode, "<html><body><b>" + getMaxString(strip(imageResult.getFileName()))
-				+ "</b></body></html>", null, previewImage);
+							+ "</b></body></html>", null, previewImage);
 		this.imageResult = imageResult;
 		if (imageResult == null)
 			System.out.println("Error: Image Reference Data is null!");
@@ -211,7 +210,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							SupplementaryFilePanelMongoDB.addTempFileToBeDeletedLater(tf);
 						} catch (IOException e2) {
 							SupplementaryFilePanelMongoDB.showError("Could not create temp file for storing database image!",
-									e2);
+												e2);
 							downloadNeeded = true;
 							return;
 						}
@@ -225,17 +224,17 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							HomeFolder.copyFile(is, tf);
 						} catch (Exception e1) {
 							System.out.println("No valid input stream for "
-									+ imageResult.getBinaryFileInfo().getFileName().toString());
+												+ imageResult.getBinaryFileInfo().getFileName().toString());
 
 							MappingDataEntity mde = targetTreeNode.getTargetEntity();
 							try {
 								VolumeData volume = (VolumeData) mde;
 								if (volume != null)
 									DataExchangeHelperForExperiments.downloadFile(user, pass, imageResult, tf, thisInstance,
-											MongoCollection.VOLUMES);
+														MongoCollection.VOLUMES);
 							} catch (Exception e) {
 								DataExchangeHelperForExperiments.downloadFile(user, pass, imageResult, tf, thisInstance,
-										MongoCollection.IMAGES);
+													MongoCollection.IMAGES);
 							}
 						}
 
@@ -245,8 +244,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								public void run() {
 									try {
 										myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
-												DataSetFileButton.ICON_HEIGHT, FileSystemHandler.getURL(tf),
-												myImage != null ? myImage.getBinaryFileInfo() : null);
+															DataSetFileButton.ICON_HEIGHT, FileSystemHandler.getURL(tf),
+															myImage != null ? myImage.getBinaryFileInfo() : null);
 									} catch (MalformedURLException e) {
 										downloadNeeded = true;
 										SupplementaryFilePanelMongoDB.showError("URL Format Error", e);
@@ -271,13 +270,14 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					}
 				});
 				BackgroundThreadDispatcher.addTask(download, 1);
-			} else if (downloadInProgress) {
-				JMenuItem tempItem = new JMenuItem("Download in progress...");
-				tempItem.setEnabled(false);
-				myPopup.add(tempItem);
-			} else {
-				addDefaultCommands(myPopup);
-			}
+			} else
+				if (downloadInProgress) {
+					JMenuItem tempItem = new JMenuItem("Download in progress...");
+					tempItem.setEnabled(false);
+					myPopup.add(tempItem);
+				} else {
+					addDefaultCommands(myPopup);
+				}
 			myPopup.show(this, 5, 5);
 		}
 		if (evt.getSource() == saveFileCmd) {
@@ -331,7 +331,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			JComponent cp = (JComponent) myImageFrame.getContentPane();
 			if (myImage != null && this.myImage.imageAvailable != 1) {
 				JOptionPane.showMessageDialog(null, "Format of this file is unknown. Image can not be shown.",
-						"Unknown Image Format", JOptionPane.INFORMATION_MESSAGE);
+									"Unknown Image Format", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 			cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));

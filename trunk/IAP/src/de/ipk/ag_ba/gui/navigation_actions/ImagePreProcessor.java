@@ -1,6 +1,6 @@
 /*******************************************************************************
  * 
- *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
+ * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  * 
  *******************************************************************************/
 /*
@@ -9,7 +9,7 @@
 
 package de.ipk.ag_ba.gui.navigation_actions;
 
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 /**
  * @author klukas
@@ -17,5 +17,5 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
  */
 public interface ImagePreProcessor {
 	public boolean processImage(LoadedImage loadedImage, int[] rgbArray, int[] rgbArrayNULL, int w, int h,
-			int iBackgroundFill);
+						int iBackgroundFill);
 }

@@ -180,10 +180,14 @@ public class ModelGenerator {
 							for (int z = 0; z < maxVoxelPerSide; z++)
 								if (tpv.get(x * maxVoxelPerSide * maxVoxelPerSide + y * maxVoxelPerSide + z))
 									transparentVoxels[x][y][z]++;
+								else
+									System.out.println("Found solid voxel.");
 					}
 				}
 
 				tso.addInt(1);
+				System.out.println("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
+									+ tsoRunCount.getInt() + " active)");
 				status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
 									+ tsoRunCount.getInt() + " active)");
 				tsoRunCount.addInt(-1);
@@ -236,7 +240,7 @@ public class ModelGenerator {
 				runColor.submit(new Runnable() {
 					@Override
 					public void run() {
-						processOne(pictures, palette, rgb, xF, yF, zF, voxelSizeZ, xiF, yiF);
+						processOneSlice(pictures, palette, rgb, xF, yF, zF, voxelSizeZ, xiF, yiF);
 					}
 				});
 				y += voxelSizeY;
@@ -245,8 +249,8 @@ public class ModelGenerator {
 		}
 	}
 
-	private void processOne(ArrayList<MyPicture> pictures, ArrayList<Color> palette, boolean rgb, double x, double y, double z, double voxelSizeZ, int xi, int yi) {
-		int idx;
+	private void processOneSlice(ArrayList<MyPicture> pictures, ArrayList<Color> palette, boolean rgb, double x, double y, double z, double voxelSizeZ, int xi,
+						int yi) {
 		for (int zi = 0; zi < maxVoxelPerSide; zi++) {
 			// determine color
 			ArrayList<Color> cc = new ArrayList<Color>();
@@ -318,11 +322,7 @@ public class ModelGenerator {
 				byteCube[xi][yi][zi] = (byte) 0;
 				if (rgb) {
 					// TRANSPARENT_COLOR;
-					idx = zi * 4;
-					rgbCube[xi][yi][idx++] = 0;
-					rgbCube[xi][yi][idx++] = 0;
-					rgbCube[xi][yi][idx++] = 0;
-					rgbCube[xi][yi][idx++] = 0;
+					rgbCube[xi][yi][zi] = 0;
 				}
 			} else {
 				if (rgb) {
@@ -330,11 +330,7 @@ public class ModelGenerator {
 					int tr = (int) (255d - 0.05d * byteCube[xi][yi][zi]);
 					if (tr < 0)
 						tr = 255;
-					idx = zi * 4;
-					rgbCube[xi][yi][idx++] = (byte) tr;
-					rgbCube[xi][yi][idx++] = (byte) c.getRed();
-					rgbCube[xi][yi][idx++] = (byte) c.getGreen();
-					rgbCube[xi][yi][idx++] = (byte) c.getBlue();
+					rgbCube[xi][yi][zi] = ColorUtil.getInt(tr, c.getRed(), c.getGreen(), c.getBlue());
 				} else {
 					Color c = ColorUtil.getMaxSaturationColor(cc);
 					int nearestColor = ColorUtil.findBestColorIndex(palette, c);
@@ -397,6 +393,7 @@ public class ModelGenerator {
 		long vcnt = (maxVoxelPerSide * maxVoxelPerSide * maxVoxelPerSide);
 		double smallProgressStep = progressStep / maxVoxelPerSide;
 		boolean isTopViewPicture = p.getIsTop();
+		System.out.println("CUTTT 2... (angle: " + angle + ")");
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
 			if (status.wantsToStop())
 				break;
@@ -405,8 +402,7 @@ public class ModelGenerator {
 			for (int yi = 0; yi < maxVoxelPerSide; yi++) {
 				z = -cubeSideLengthZ / 2d;
 				for (int zi = 0; zi < maxVoxelPerSide; zi++) {
-					if (p.isTransparentPixel(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
-										isTopViewPicture)))) {
+					if (p.isTransparentPixel(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin, isTopViewPicture)))) {
 						transparentVoxels[xi][yi][zi]++;
 					}
 					z += voxelSizeZ;
@@ -447,7 +443,7 @@ public class ModelGenerator {
 		this.byteCube = new int[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 
 		if (mode == GenerationMode.COLORED_RGBA) {
-			this.rgbCube = new int[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide * 4];
+			this.rgbCube = new int[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 		}
 
 		double max = 0;
@@ -536,10 +532,7 @@ public class ModelGenerator {
 							} catch (Exception e) {
 								c = Color.BLUE;
 							}
-							rgbCube[vx][vy][vz * 4 + 0] = (byte) c.getAlpha();
-							rgbCube[vx][vy][vz * 4 + 1] = (byte) c.getRed();
-							rgbCube[vx][vy][vz * 4 + 2] = (byte) c.getGreen();
-							rgbCube[vx][vy][vz * 4 + 3] = (byte) c.getBlue();
+							rgbCube[vx][vy][vz] = c.getRGB();
 						}
 					}
 					tso.addInt(1);

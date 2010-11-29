@@ -18,9 +18,9 @@ import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 /**
  * @author klukas
@@ -64,6 +64,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * 
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#getOutput
 	 * ()
 	 */
@@ -110,7 +111,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	 */
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-			BackgroundTaskStatusProviderSupportingExternalCall status) {
+						BackgroundTaskStatusProviderSupportingExternalCall status) {
 		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCountParallelImages);
 
 		for (Measurement m : input) {
@@ -144,7 +145,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 							for (int c : rgbArray) {
 								Color c1 = new Color(c);
 								Color_CIE_Lab cCL1 = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(c1.getRed(), c1
-										.getGreen(), c1.getBlue()));
+													.getGreen(), c1.getBlue()));
 								double d = cCL1.getL();
 								int bin = (int) (d * colorCount);
 								histogram[bin]++;
@@ -178,6 +179,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * 
 	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#setInput
 	 * (java.util.Collection, java.lang.String, java.lang.String)
 	 */
