@@ -158,7 +158,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						FlexibleImageSet input = new FlexibleImageSet(new FlexibleImage(lVIS.getLoadedImage()),
 											new FlexibleImage(lFLUO.getLoadedImage()), new FlexibleImage(lNIR.getLoadedImage()));
 						PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(input);
-						FlexibleImageSet pres = ptip.process();
+						FlexibleImageSet pres = ptip.pipeline().getImages();
 
 						lVIS = new LoadedImage(lVIS, pres.getVis().getBufferedImage());
 						lFLUO = new LoadedImage(lFLUO, pres.getFluo().getBufferedImage());
