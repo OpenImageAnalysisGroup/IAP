@@ -50,22 +50,36 @@ public class PhytochamberTopImageProcessor {
 
 	// ########## PUBLIC ##############
 
-	public FlexibleImageSet process() {
+	public PhytochamberTopImageProcessor pipeline() {
 		long pixels = this.input.getPixelCount();
 
 		StopWatch watch = new StopWatch("Phytochamber snapshot analysis of " + pixels + " pixels");
 
-		FlexibleImageSet res = applyMasks(input, postProcessMask(mergeMask(enlargeMask(clearBackground(input.equalize())))));
+		FlexibleImage mask = equalize(input).clearBackground().enlargeMask().mergeMask();
+
+		PhytochamberTopImageProcessor result = postProcessMask(mask).applyMask(input);
 
 		watch.printTime();
 
-		return res;
+		return result;
+	}
+
+	public FlexibleImageSet getImages() {
+		return input;
+	}
+
+	private PhytochamberTopImageProcessor applyMask(FlexibleImageSet mask) {
+		return applyMasks(input, mask);
+	}
+
+	public PhytochamberTopImageProcessor equalize(FlexibleImageSet in) {
+		return new PhytochamberTopImageProcessor(in.equalize());
 	}
 
 	/**
 	 * @return Modified images according to the given masks.
 	 */
-	private FlexibleImageSet applyMasks(FlexibleImageSet images, FlexibleImageSet masks) {
+	private PhytochamberTopImageProcessor applyMasks(FlexibleImageSet images, FlexibleImageSet masks) {
 		ImageOperation io = new ImageOperation(images.getVis());
 		FlexibleImage vis = io.applyMask(masks.getVis()).getImage();
 
@@ -75,7 +89,7 @@ public class PhytochamberTopImageProcessor {
 		io = new ImageOperation(images.getNir());
 		FlexibleImage nir = io.applyMask(masks.getNir()).getImage();
 
-		return new FlexibleImageSet(vis, fluo, nir);
+		return new PhytochamberTopImageProcessor(new FlexibleImageSet(vis, fluo, nir));
 	}
 
 	/**
@@ -86,11 +100,11 @@ public class PhytochamberTopImageProcessor {
 	 * @return Creates a set of images, slightly different masks for each image
 	 *         type.
 	 */
-	private FlexibleImageSet postProcessMask(FlexibleImage mask) {
+	private PhytochamberTopImageProcessor postProcessMask(FlexibleImage mask) {
 		FlexibleImage vis = postProcess(mask, ImageConfiguration.RgbTop);
 		FlexibleImage fluo = postProcess(mask, ImageConfiguration.FluoTop);
 		FlexibleImage nir = input.getNir();
-		return new FlexibleImageSet(vis, fluo, nir);
+		return new PhytochamberTopImageProcessor(new FlexibleImageSet(vis, fluo, nir));
 	}
 
 	private FlexibleImage postProcess(FlexibleImage mask,
@@ -148,13 +162,13 @@ public class PhytochamberTopImageProcessor {
 	 *         <p>
 	 *         <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
-	private FlexibleImageSet enlargeMask(FlexibleImageSet mask) {
-		BufferedImage enlargedRgbMask = enlargeMask(mask.getVis(), options.getRgbNumberOfErodeLoops(),
+	private PhytochamberTopImageProcessor enlargeMask() {
+		BufferedImage enlargedRgbMask = enlargeMask(input.getVis(), options.getRgbNumberOfErodeLoops(),
 							options.getRgbNumberOfDilateLoops(), ImageConfiguration.RgbTop);
-		BufferedImage enlargedFluoMask = enlargeMask(mask.getFluo(), options.getFluoNumberOfErodeLoops(),
+		BufferedImage enlargedFluoMask = enlargeMask(input.getFluo(), options.getFluoNumberOfErodeLoops(),
 							options.getFluoNumberOfDilateLoops(), ImageConfiguration.FluoTop);
 
-		return new FlexibleImageSet(enlargedRgbMask, enlargedFluoMask, mask.getNir().getBufferedImage());
+		return new PhytochamberTopImageProcessor(new FlexibleImageSet(enlargedRgbMask, enlargedFluoMask, input.getNir().getBufferedImage()));
 	}
 
 	/**
@@ -166,14 +180,19 @@ public class PhytochamberTopImageProcessor {
 	 *           The set of input images (RGB images).
 	 * @return A set of images which may be used as a mask.
 	 */
-	private FlexibleImageSet clearBackground(FlexibleImageSet in) {
-		BufferedImage clrearRgbImage = clearBackground(in.getVis().getBufferedImage(), ImageConfiguration.RgbTop,
+	private PhytochamberTopImageProcessor clearBackground() {
+		BufferedImage clrearRgbImage = clearBackground(input.getVis().getBufferedImage(),
+							ImageConfiguration.RgbTop,
 							options.getRgbEpsilonA(), options.getRgbEpsilonB());
-		BufferedImage clearFluorImage = clearBackground(in.getFluo().getBufferedImage(), ImageConfiguration.FluoTop,
-							options.getFluoEpsilonA(), options.getFluoEpsilonB());
-		BufferedImage clearNirImage = clearBackground(in.getNir().getBufferedImage(), ImageConfiguration.NirTop,
-							options.getNearEpsilonA(), options.getNearEpsilonB());
-		return new FlexibleImageSet(clrearRgbImage, clearFluorImage, clearNirImage);
+		// BufferedImage clearFluorImage = clearBackground(input.getFluo().getBufferedImage(),
+		// ImageConfiguration.FluoTop,
+		// options.getFluoEpsilonA(), options.getFluoEpsilonB());
+		// BufferedImage clearNirImage = clearBackground(input.getNir().getBufferedImage(),
+		// ImageConfiguration.NirTop,
+		// options.getNearEpsilonA(), options.getNearEpsilonB());
+		// return new PhytochamberTopImageProcessor(new FlexibleImageSet(clrearRgbImage, clearFluorImage, clearNirImage));
+
+		return new PhytochamberTopImageProcessor(new FlexibleImageSet(clrearRgbImage, clrearRgbImage, clrearRgbImage));
 	}
 
 	public void debugOverlayImages() {
@@ -248,11 +267,11 @@ public class PhytochamberTopImageProcessor {
 	 *           The input masks (should contain cleared background).
 	 * @return A single 1/0 mask.
 	 */
-	private FlexibleImage mergeMask(FlexibleImageSet mask) {
-		MaskOperation o = new MaskOperation(mask.getVis(), mask.getFluo(), options.getBackground());
+	private FlexibleImage mergeMask() {
+		MaskOperation o = new MaskOperation(input.getVis(), input.getFluo(), options.getBackground());
 		o.mergeMasks();
 
-		return new FlexibleImage(o.getMask(), mask.getLargestWidth(), mask.getLargestHeight());
+		return new FlexibleImage(o.getMask(), input.getLargestWidth(), input.getLargestHeight());
 	}
 
 	// private FlexibleImageSet mergeEnlargedMasks(FlexibleImageSet mask) {
@@ -384,10 +403,14 @@ public class PhytochamberTopImageProcessor {
 
 		FlexibleImageSet input = new FlexibleImageSet(imgVisible, imgFluo, imgNIR);
 		PhytochamberTopImageProcessor test = new PhytochamberTopImageProcessor(input);
-		FlexibleImageSet res = test.process();
-		// PrintImage.printImage(test.getInitialFluorImageAsBI(), "Anfangsbild");
-		res.getVis().print("Result RGB-Image");
-		res.getFluo().print("Result Fluor-Image");
+
+		test.clearBackground().getImages().getVis().print("Visible Test 1");
+
+		// FlexibleImageSet res = test.pipeline().getImages();
+		//
+		// // PrintImage.printImage(test.getInitialFluorImageAsBI(), "Anfangsbild");
+		// res.getVis().print("Result RGB-Image");
+		// res.getFluo().print("Result Fluor-Image");
 		// PrintImage.printImage(test.getResultNearIMageAsBI(),
 		// "Result Near-Image");
 	}

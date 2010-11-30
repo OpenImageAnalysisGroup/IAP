@@ -26,6 +26,7 @@ public class StopWatch {
 	 */
 	public StopWatch(String desc) {
 		this.desc = desc;
+		System.out.println(desc + "...");
 	}
 
 	public void reset() {

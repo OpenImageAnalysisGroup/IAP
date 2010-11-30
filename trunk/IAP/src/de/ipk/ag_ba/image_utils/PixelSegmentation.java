@@ -3,9 +3,10 @@
  *************************************************************************/
 package de.ipk.ag_ba.image_utils;
 
+import info.StopWatch;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * @author entzian
@@ -37,6 +38,10 @@ public class PixelSegmentation {
 	private double[] cluster_lambda;
 
 	private final int[][] perimeterMask = new int[][] { { 0, 1, 0 }, { 1, 1, 1 }, { 0, 1, 0 } };
+
+	private int[][] tableLinks;
+	private int[] clusterMap;
+	private boolean[] linesRun;
 
 	public PixelSegmentation(int[][] image) {
 		this(image, NeighbourhoodSetting.NB4);
@@ -108,7 +113,9 @@ public class PixelSegmentation {
 
 	public void doPixelSegmentation() {
 		firstPass(); // Each pixel is assigned to a cluster
+		StopWatch s = new StopWatch("Merge ALEX");
 		mergeHashMap();
+		s.printTime();
 		secondPass(); // Cluster are renumbered
 		calculatePerimeterOfEachCluster();
 		calculateCircuitRatio();
@@ -214,15 +221,8 @@ public class PixelSegmentation {
 	}
 
 	private void secondPass() {
-		int[] clusterMap = new int[zaehler];
-		image_cluster_size = new int[zaehler];
-		for (int i = 0; i < zaehler; i++)
-			clusterMap[i] = i;
 
-		if (!clusterMapping.isEmpty())
-			for (int clusterID : clusterMapping.keySet())
-				for (int arrayID : clusterMapping.get(clusterID))
-					clusterMap[arrayID] = clusterID;
+		image_cluster_size = new int[zaehler];
 
 		for (int i = 0; i < src_image.length; i++)
 			for (int j = 0; j < src_image[i].length; j++) {
@@ -487,47 +487,53 @@ public class PixelSegmentation {
 
 	private void mergeHashMap() {
 
-		ArrayList<HashSet<Integer>> toepfe = new ArrayList<HashSet<Integer>>(clusterMapping.size());
+		tableLinks = new int[zaehler][zaehler];
+		clusterMap = new int[zaehler];
+		linesRun = new boolean[zaehler];
+
 		for (int key : clusterMapping.keySet()) {
-			HashSet<Integer> topf = new HashSet<Integer>();
-			topf.add(key);
-			toepfe.add(topf);
 			for (int value : clusterMapping.get(key)) {
-				topf.add(value);
+				tableLinks[key][value] = -1;
+				tableLinks[value][key] = -1;
 			}
 		}
 
-		// toepfe ineinander
-
-		for (int a = 0; a < toepfe.size(); a++) {
-			HashSet<Integer> topfA = toepfe.get(a);
-			if (!topfA.isEmpty())
-				for (int b = a; b < toepfe.size(); b++) {
-					HashSet<Integer> topfB = toepfe.get(b);
-					if (topfA != topfB && !topfB.isEmpty()) {
-						boolean foundInTopfB = false;
-						for (Integer inTopfA : topfA) {
-							if (topfB.contains(inTopfA)) {
-								foundInTopfB = true;
-								break;
-							}
-						}
-						if (foundInTopfB) {
-							// schuette in topfB
-							topfB.addAll(topfA);
-							topfA.clear();
-						}
-					}
-				}
+		for (int i = 0; i < zaehler; i++) {
+			clusterMap[i] = i;
+			linesRun[i] = true;
 		}
+		// long ersteZeit = System.currentTimeMillis();
+		recursiveMerge(1, 1, zaehler, 0, 0);
+		// long zweiteZeit = System.currentTimeMillis();
+		// System.out.println("Dauer: " + (zweiteZeit - ersteZeit));
+	}
 
-		clusterMapping.clear();
-		for (HashSet<Integer> topf : toepfe) {
-			if (topf.isEmpty())
-				continue;
-			Integer key = topf.iterator().next();
-			topf.remove(key);
-			clusterMapping.put(key, new ArrayList<Integer>(topf));
+	private void recursiveMerge(int zeile, int spalte, int zaehlerJ, int missachten, int aktuellerCluster) {
+
+		for (int j = zeile; j < zaehlerJ; j++) {
+			for (int i = spalte; i < zaehler && linesRun[j]; i++) {
+				// for(int i = spalte; i < zaehler; i++){
+				if (!(i == missachten)) {
+					if (tableLinks[i][j] == -1) {
+						if (missachten == 0)
+							aktuellerCluster = 0;
+
+						tableLinks[i][j] = -2;
+						if (aktuellerCluster == 0) {
+							clusterMap[i] = j;
+							aktuellerCluster = j;
+						} else {
+							clusterMap[i] = aktuellerCluster;
+						}
+
+						if (!(i == zaehler))
+							recursiveMerge(i, 1, i + 1, j, aktuellerCluster);
+					}
+				} else {
+					tableLinks[i][j] = -2;
+				}
+			}
+			linesRun[j] = false;
 		}
 	}
 
@@ -538,5 +544,43 @@ public class PixelSegmentation {
 				list.add(i);
 
 		return list;
+	}
+
+	public static void main(String[] args) {
+
+		// int [][] eingabe_image = new int [2000][2000];
+		// for(int i = 0; i<2000; i++)
+		// for(int j = 0; j<2000; j++)
+		// eingabe_image[i][j] = i;
+
+		int[][] eingabe_image = { { 0, 1, 1, 0, 1, 0, 1, 0 },
+									{ 1, 1, 0, 0, 1, 1, 1, 0 },
+									{ 0, 1, 1, 1, 1, 0, 1, 0 },
+									{ 0, 0, 0, 0, 0, 1, 1, 0 },
+									{ 0, 1, 1, 1, 0, 0, 0, 1 },
+									{ 1, 1, 1, 1, 1, 0, 0, 0 } };
+
+		// int[][] eingabe_image = { { 0, 1, 1, 0, 1, 1, 1 },
+		// { 1, 1, 1, 1, 1, 0, 1 },
+		// { 0, 0, 0, 0, 0, 0, 1 },
+		// { 0, 0, 0, 0, 0, 1, 1 },
+		// { 0, 1, 0, 0, 0, 0, 0 },
+		// { 1, 1, 0, 0, 0, 0, 0 } };
+
+		PixelSegmentation test = new PixelSegmentation(eingabe_image, NeighbourhoodSetting.NB4);
+		test.doPixelSegmentation();
+		test.printOriginalImage();
+		System.out.println("ClusterIds:");
+		test.printImage();
+		test.printClusterArray();
+		System.out.println("Number of Clusters: " +
+							test.getNumberOfCluster());
+		System.out.println("Number of Pixel: " + test.getNumberOfPixel());
+		// System.out.println("Area:");
+		// test.printArray(test.getArea());
+		// System.out.println("Perimeter: ");
+		// test.printArray(test.getPerimeter());
+		// System.out.println("Ratio: ");
+		// test.printArray(test.getCircuitRatio());
 	}
 }
