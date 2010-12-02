@@ -22,6 +22,18 @@ public class PrintImage {
 	}
 
 	// ######### 1Array #######
+	// public static void printBinarImage(int[] image, int width, int height) {
+	// printBinarImage(ImageConverter.convert1Ato2A(width, height, image), PrintOption.IMAGEJ);
+	// }
+	//
+	// public static void printBinarImage(int[] image, int width, int height, String text) {
+	// printBinarImage(ImageConverter.convert1Ato2A(width, height, image), text, PrintOption.IMAGEJ);
+	// }
+	//
+	// public static void printBinarImage(int[] image, int width, int height, String text, PrintOption typ) {
+	// printBinarImage(ImageConverter.convert1Ato2A(width, height, image), text, typ);
+	// }
+
 	public static void printImage(int[] image, int width, int height, PrintOption typ) {
 		printImage(ImageConverter.convert1AtoBI(width, height, image), typ);
 	}
@@ -39,6 +51,18 @@ public class PrintImage {
 	}
 
 	// ######## 2Array ##########
+
+	// public static void printBinarImage(int[][] image) {
+	// printBinaer(image, "Image", PrintOption.IMAGEJ);
+	// }
+	//
+	// public static void printBinarImage(int[][] image, PrintOption typ) {
+	// printBinaer(image, "Image", typ);
+	// }
+	//
+	// public static void printBinarImage(int[][] image, String text, PrintOption typ) {
+	// printBinaer(image, text, typ);
+	// }
 
 	public static void printImage(int[][] image, PrintOption typ) {
 		printImage(ImageConverter.convert2AtoBI(image), typ);
@@ -111,4 +135,15 @@ public class PrintImage {
 		GravistoService.showImage(image, text);
 	}
 
+	// private static void printBinaer(int[][] image, String text, PrintOption typ) {
+	// for (int i = 0; i < image.length; i++) {
+	// for (int j = 0; j < image[i].length; j++)
+	// if (image[i][j] == 0)
+	// image[i][j] = Color.WHITE.getRGB();
+	// else
+	// image[i][j] = Color.BLACK.getRGB();
+	// }
+	// printImage(ImageConverter.convert2ABtoBI(image), text, typ);
+	//
+	// }
 }

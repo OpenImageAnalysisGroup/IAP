@@ -5,8 +5,10 @@ package de.ipk.ag_ba.image_utils;
 
 import info.StopWatch;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * @author entzian
@@ -111,14 +113,36 @@ public class PixelSegmentation {
 		return cluster_lambda[position];
 	}
 
-	public void doPixelSegmentation() {
-		firstPass(); // Each pixel is assigned to a cluster
-		StopWatch s = new StopWatch("Merge ALEX");
-		mergeHashMap();
-		s.printTime();
-		secondPass(); // Cluster are renumbered
-		calculatePerimeterOfEachCluster();
-		calculateCircuitRatio();
+	public void doPixelSegmentation(int durchlauf) {
+
+		if (durchlauf == 3) {
+			firstPass(); // Each pixel is assigned to a cluster
+			StopWatch s = new StopWatch("Merge New");
+			mergeHashMapDritteVariante();
+			s.printTime();
+			// secondPass();
+			secondPassDritteVariante(); // Cluster are renumbered
+			calculatePerimeterOfEachCluster();
+			calculateCircuitRatio();
+		} else
+			if (durchlauf == 2) {
+				firstPass(); // Each pixel is assigned to a cluster
+				StopWatch s = new StopWatch("Merge ALEX");
+				mergeHashMapRecursive();
+				s.printTime();
+				secondPass(); // Cluster are renumbered
+				calculatePerimeterOfEachCluster();
+				calculateCircuitRatio();
+			} else {
+				firstPass(); // Each pixel is assigned to a cluster
+				StopWatch s = new StopWatch("Merge Chris");
+				mergeHashMapToepfe();
+				s.printTime();
+				secondPassToepfe(); // Cluster are renumbered
+				calculatePerimeterOfEachCluster();
+				calculateCircuitRatio();
+			}
+
 	}
 
 	private void calculateCircuitRatio() {
@@ -485,7 +509,7 @@ public class PixelSegmentation {
 		}
 	}
 
-	private void mergeHashMap() {
+	private void mergeHashMapRecursive() {
 
 		tableLinks = new int[zaehler][zaehler];
 		clusterMap = new int[zaehler];
@@ -509,11 +533,10 @@ public class PixelSegmentation {
 	}
 
 	private void recursiveMerge(int zeile, int spalte, int zaehlerJ, int missachten, int aktuellerCluster) {
-
 		for (int j = zeile; j < zaehlerJ; j++) {
 			for (int i = spalte; i < zaehler && linesRun[j]; i++) {
 				// for(int i = spalte; i < zaehler; i++){
-				if (!(i == missachten)) {
+				if (i != missachten) {
 					if (tableLinks[i][j] == -1) {
 						if (missachten == 0)
 							aktuellerCluster = 0;
@@ -522,16 +545,14 @@ public class PixelSegmentation {
 						if (aktuellerCluster == 0) {
 							clusterMap[i] = j;
 							aktuellerCluster = j;
-						} else {
+						} else
 							clusterMap[i] = aktuellerCluster;
-						}
 
-						if (!(i == zaehler))
+						if (i != zaehler)
 							recursiveMerge(i, 1, i + 1, j, aktuellerCluster);
 					}
-				} else {
+				} else
 					tableLinks[i][j] = -2;
-				}
 			}
 			linesRun[j] = false;
 		}
@@ -546,29 +567,42 @@ public class PixelSegmentation {
 		return list;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, Exception {
 
 		// int [][] eingabe_image = new int [2000][2000];
 		// for(int i = 0; i<2000; i++)
 		// for(int j = 0; j<2000; j++)
 		// eingabe_image[i][j] = i;
 
-		int[][] eingabe_image = { { 0, 1, 1, 0, 1, 0, 1, 0 },
-									{ 1, 1, 0, 0, 1, 1, 1, 0 },
-									{ 0, 1, 1, 1, 1, 0, 1, 0 },
-									{ 0, 0, 0, 0, 0, 1, 1, 0 },
-									{ 0, 1, 1, 1, 0, 0, 0, 1 },
-									{ 1, 1, 1, 1, 1, 0, 0, 0 } };
+		// int[][] eingabe_image = { { 0, 1, 1, 0, 1, 0, 1, 0 },
+		// { 1, 1, 0, 0, 1, 1, 1, 0 },
+		// { 0, 1, 1, 1, 1, 0, 1, 0 },
+		// { 0, 0, 0, 0, 0, 1, 1, 0 },
+		// { 0, 1, 1, 1, 0, 0, 0, 1 },
+		// { 1, 1, 1, 1, 1, 0, 0, 0 } };
 
-		// int[][] eingabe_image = { { 0, 1, 1, 0, 1, 1, 1 },
-		// { 1, 1, 1, 1, 1, 0, 1 },
-		// { 0, 0, 0, 0, 0, 0, 1 },
-		// { 0, 0, 0, 0, 0, 1, 1 },
-		// { 0, 1, 0, 0, 0, 0, 0 },
-		// { 1, 1, 0, 0, 0, 0, 0 } };
+		// IOurl testURL = new IOurl("file:///Users/entzian/Desktop/test.png");
+		// BufferedImage testBI = ImageIO.read(testURL.getInputStream());
+		// int[][] testArray = ImageConverter.convertBIto2A(testBI);
+		//
+		// for (int i = 0; i < testArray.length; i++)
+		// for (int j = 0; j < testArray[0].length; j++)
+		// if (testArray[i][j] == Color.WHITE.getRGB())
+		// testArray[i][j] = 0;
+		// else
+		// testArray[i][j] = 1;
 
+		int[][] eingabe_image = { { 0, 1, 1, 0, 1, 1, 1 },
+											{ 1, 1, 1, 1, 1, 0, 1 },
+											{ 0, 0, 0, 0, 0, 0, 1 },
+											{ 0, 0, 0, 0, 0, 1, 1 },
+											{ 0, 1, 0, 0, 0, 0, 0 },
+											{ 1, 1, 0, 0, 0, 0, 0 } };
+		//
 		PixelSegmentation test = new PixelSegmentation(eingabe_image, NeighbourhoodSetting.NB4);
-		test.doPixelSegmentation();
+		// PixelSegmentation test = new PixelSegmentation(testArray, NeighbourhoodSetting.NB4);
+		test.doPixelSegmentation(3);
+		// PrintImage.printImage(ImageConverter.convert2ABto2AcolorFull(test.getImageMask()));
 		test.printOriginalImage();
 		System.out.println("ClusterIds:");
 		test.printImage();
@@ -583,4 +617,156 @@ public class PixelSegmentation {
 		// System.out.println("Ratio: ");
 		// test.printArray(test.getCircuitRatio());
 	}
+
+	private void mergeHashMapDritteVariante() {
+
+		int[] fuellGrad = new int[zaehler]; // enspricht x
+		clusterMap = new int[zaehler]; // entspricht y
+		tableLinks = new int[zaehler][zaehler];// entspricht z
+
+		// for (int key : clusterMapping.keySet()) {
+		// for (int value : clusterMapping.get(key)) {
+		// tableLinks[key][value] = -1;
+		// tableLinks[value][key] = -1;
+		// }
+		// }
+
+		for (int i = 0; i < zaehler; i++) {
+			clusterMap[i] = -1; // überall wo -1 steht wird dann der Index als Cluster gesetzt
+		}
+
+		for (int key : clusterMapping.keySet()) {
+
+			if (clusterMap[key] != -1) {
+
+				fuellGrad = anpassen(key, key, fuellGrad);
+
+			} else {
+				clusterMap[key] = key;
+			}
+
+			for (int value : clusterMapping.get(key)) {
+
+				tableLinks[key][fuellGrad[key]] = value;
+				fuellGrad[key] += 1;
+
+				if (clusterMap[value] != -1) {
+					fuellGrad = anpassen(value, key, fuellGrad);
+				} else {
+					clusterMap[value] = key;
+					tableLinks[value][fuellGrad[value]] = key;
+					fuellGrad[value] += 1;
+				}
+				for (int value2 : clusterMapping.get(key))
+					if (value != value2) {
+						// System.out.println("value -> value2: " + value + " -> " + value2);
+						tableLinks[value][fuellGrad[value]] = value2;
+						fuellGrad[value] += 1;
+					}
+			}
+		}
+
+	}
+
+	private int[] anpassen(int value, int key, int[] fuellGrad) {
+
+		for (int i = 0; i < fuellGrad[value]; i++) {
+
+			clusterMap[tableLinks[value][i]] = key;
+			tableLinks[tableLinks[value][i]][fuellGrad[tableLinks[value][i]]] = key;
+			fuellGrad[tableLinks[value][i]] += 1;
+		}
+
+		clusterMap[value] = key;
+		tableLinks[value][fuellGrad[value]] = key;
+		fuellGrad[value] += 1;
+
+		// System.out.println("drausen");
+		// System.out.println("FuellGrad");
+		// printArray(fuellGrad);
+		// System.out.println("clusterMap");
+		// printArray(clusterMap);
+		// System.out.println("TableLinks");
+		// printImage(tableLinks);
+
+		return fuellGrad;
+	}
+
+	private void secondPassDritteVariante() {
+
+		image_cluster_size = new int[zaehler];
+
+		for (int i = 0; i < src_image.length; i++)
+			for (int j = 0; j < src_image[i].length; j++) {
+				if (clusterMap[image_cluster_ids[i][j]] != -1)
+					image_cluster_ids[i][j] = clusterMap[image_cluster_ids[i][j]];
+
+				image_cluster_size[image_cluster_ids[i][j]]++;
+			}
+	}
+
+	private void secondPassToepfe() {
+		int[] clusterMap = new int[zaehler];
+		image_cluster_size = new int[zaehler];
+		for (int i = 0; i < zaehler; i++)
+			clusterMap[i] = i;
+
+		if (!clusterMapping.isEmpty())
+			for (int clusterID : clusterMapping.keySet())
+				for (int arrayID : clusterMapping.get(clusterID))
+					clusterMap[arrayID] = clusterID;
+
+		for (int i = 0; i < src_image.length; i++)
+			for (int j = 0; j < src_image[i].length; j++) {
+				image_cluster_ids[i][j] = clusterMap[image_cluster_ids[i][j]];
+				image_cluster_size[image_cluster_ids[i][j]]++;
+			}
+	}
+
+	private void mergeHashMapToepfe() {
+
+		ArrayList<HashSet<Integer>> toepfe = new ArrayList<HashSet<Integer>>(clusterMapping.size());
+		for (int key : clusterMapping.keySet()) {
+			HashSet<Integer> topf = new HashSet<Integer>();
+			topf.add(key);
+			toepfe.add(topf);
+			for (int value : clusterMapping.get(key)) {
+				topf.add(value);
+			}
+		}
+
+		// toepfe ineinander
+
+		for (int a = 0; a < toepfe.size(); a++) {
+			HashSet<Integer> topfA = toepfe.get(a);
+			if (!topfA.isEmpty())
+				for (int b = a; b < toepfe.size(); b++) {
+					HashSet<Integer> topfB = toepfe.get(b);
+					if (topfA != topfB && !topfB.isEmpty()) {
+						boolean foundInTopfB = false;
+						for (Integer inTopfA : topfA) {
+							if (topfB.contains(inTopfA)) {
+								foundInTopfB = true;
+								break;
+							}
+						}
+						if (foundInTopfB) {
+							// schuette in topfB
+							topfB.addAll(topfA);
+							topfA.clear();
+						}
+					}
+				}
+		}
+
+		clusterMapping.clear();
+		for (HashSet<Integer> topf : toepfe) {
+			if (topf.isEmpty())
+				continue;
+			Integer key = topf.iterator().next();
+			topf.remove(key);
+			clusterMapping.put(key, new ArrayList<Integer>(topf));
+		}
+	}
+
 }

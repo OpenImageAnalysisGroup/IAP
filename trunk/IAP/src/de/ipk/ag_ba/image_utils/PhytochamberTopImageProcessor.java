@@ -45,7 +45,7 @@ public class PhytochamberTopImageProcessor {
 	}
 
 	public void setValuesToStandard() {
-		// empty
+		options.initStandardValues();
 	}
 
 	// ########## PUBLIC ##############
@@ -56,6 +56,11 @@ public class PhytochamberTopImageProcessor {
 		StopWatch watch = new StopWatch("Phytochamber snapshot analysis of " + pixels + " pixels");
 
 		FlexibleImage mask = equalize(input).clearBackground().enlargeMask().mergeMask();
+
+		PrintImage.printImage(mask.getBufferedImage());
+		System.out.println("Höhe :" + mask.getHeight());
+		System.out.println("Breite :" + mask.getWidth());
+		System.out.println("###########");
 
 		PhytochamberTopImageProcessor result = postProcessMask(mask).applyMask(input);
 
@@ -81,13 +86,13 @@ public class PhytochamberTopImageProcessor {
 	 */
 	private PhytochamberTopImageProcessor applyMasks(FlexibleImageSet images, FlexibleImageSet masks) {
 		ImageOperation io = new ImageOperation(images.getVis());
-		FlexibleImage vis = io.applyMask(masks.getVis()).getImage();
+		FlexibleImage vis = io.applyMask(masks.getVis(), options.getBackground()).getImage();
 
 		io = new ImageOperation(images.getFluo());
-		FlexibleImage fluo = io.applyMask(masks.getFluo()).getImage();
+		FlexibleImage fluo = io.applyMask(masks.getFluo(), options.getBackground()).getImage();
 
 		io = new ImageOperation(images.getNir());
-		FlexibleImage nir = io.applyMask(masks.getNir()).getImage();
+		FlexibleImage nir = io.applyMask(masks.getNir(), options.getBackground()).getImage();
 
 		return new PhytochamberTopImageProcessor(new FlexibleImageSet(vis, fluo, nir));
 	}
@@ -111,6 +116,8 @@ public class PhytochamberTopImageProcessor {
 						ImageConfiguration typ) {
 
 		int[] mask1A = mask.getConvertAs1A();
+
+		System.out.println("länge postprocess:" + mask1A.length);
 
 		ImageOperation maskIo = new ImageOperation(mask);
 
@@ -136,18 +143,19 @@ public class PhytochamberTopImageProcessor {
 				break;
 		}
 
-		int idx = 0;
-		int background = options.getBackground();
-		int foreground = Color.BLUE.getRGB();
-		for (int m : maskIo.getImageAs1array()) {
-			if (m == background)
-				mask1A[idx] = background;
-			else
-				mask1A[idx] = foreground;
-			idx++;
-		}
-
-		return new FlexibleImage(ImageConverter.convert1AtoBI(mask.getWidth(), mask.getHeight(), mask1A));
+		// int idx = 0;
+		// int background = options.getBackground();
+		// int foreground = Color.BLUE.getRGB();
+		// for (int m : maskIo.getImageAs1array()) {
+		// if (m == background)
+		// mask1A[idx] = background;
+		// else
+		// mask1A[idx] = foreground;
+		// idx++;
+		// }
+		//
+		// return new FlexibleImage(ImageConverter.convert1AtoBI(mask.getWidth(), mask.getHeight(), mask1A));
+		return new FlexibleImage(maskIo.getImageAsBufferedImage());
 	}
 
 	/**
@@ -168,6 +176,8 @@ public class PhytochamberTopImageProcessor {
 		BufferedImage enlargedFluoMask = enlargeMask(input.getFluo(), options.getFluoNumberOfErodeLoops(),
 							options.getFluoNumberOfDilateLoops(), ImageConfiguration.FluoTop);
 
+		PrintImage.printImage(enlargedRgbMask);
+		PrintImage.printImage(enlargedFluoMask);
 		return new PhytochamberTopImageProcessor(new FlexibleImageSet(enlargedRgbMask, enlargedFluoMask, input.getNir().getBufferedImage()));
 	}
 
@@ -191,7 +201,7 @@ public class PhytochamberTopImageProcessor {
 		// ImageConfiguration.NirTop,
 		// options.getNearEpsilonA(), options.getNearEpsilonB());
 		// return new PhytochamberTopImageProcessor(new FlexibleImageSet(clrearRgbImage, clearFluorImage, clearNirImage));
-
+		PrintImage.printImage(clrearRgbImage);
 		return new PhytochamberTopImageProcessor(new FlexibleImageSet(clrearRgbImage, clrearRgbImage, clrearRgbImage));
 	}
 
@@ -270,7 +280,7 @@ public class PhytochamberTopImageProcessor {
 	private FlexibleImage mergeMask() {
 		MaskOperation o = new MaskOperation(input.getVis(), input.getFluo(), options.getBackground());
 		o.mergeMasks();
-
+		PrintImage.printImage(ImageConverter.convert1AtoBI(input.getLargestWidth(), input.getLargestHeight(), o.getMask()));
 		return new FlexibleImage(o.getMask(), input.getLargestWidth(), input.getLargestHeight());
 	}
 
@@ -404,13 +414,13 @@ public class PhytochamberTopImageProcessor {
 		FlexibleImageSet input = new FlexibleImageSet(imgVisible, imgFluo, imgNIR);
 		PhytochamberTopImageProcessor test = new PhytochamberTopImageProcessor(input);
 
-		test.clearBackground().getImages().getVis().print("Visible Test 1");
+		// test.clearBackground().getImages().getVis().print("Visible Test 1");
 
-		// FlexibleImageSet res = test.pipeline().getImages();
+		FlexibleImageSet res = test.pipeline().getImages();
 		//
 		// // PrintImage.printImage(test.getInitialFluorImageAsBI(), "Anfangsbild");
-		// res.getVis().print("Result RGB-Image");
-		// res.getFluo().print("Result Fluor-Image");
+		res.getVis().print("Result RGB-Image");
+		res.getFluo().print("Result Fluor-Image");
 		// PrintImage.printImage(test.getResultNearIMageAsBI(),
 		// "Result Near-Image");
 	}

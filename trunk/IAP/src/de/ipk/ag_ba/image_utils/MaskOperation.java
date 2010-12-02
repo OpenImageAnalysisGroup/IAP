@@ -30,6 +30,10 @@ public class MaskOperation {
 		this(rgbImage.getConvertAs1A(), fluorImage.getConvertAs1A(), new int[] {}, background);
 	}
 
+	public MaskOperation(BufferedImage rgbImage, BufferedImage fluorImage, int background) {
+		this(ImageConverter.convertBIto1A(rgbImage), ImageConverter.convertBIto1A(fluorImage), new int[] {}, background);
+	}
+
 	public MaskOperation(int[] rgbImage, int[] fluorImage, int background) {
 		this(rgbImage, fluorImage, new int[] {}, background);
 	}
@@ -109,4 +113,5 @@ public class MaskOperation {
 
 		return new FlexibleImage(image1A, image.getWidth(), image.getHeight());
 	}
+
 }

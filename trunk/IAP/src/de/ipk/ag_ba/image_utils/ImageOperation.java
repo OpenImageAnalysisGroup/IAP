@@ -2,13 +2,16 @@ package de.ipk.ag_ba.image_utils;
 
 import ij.ImagePlus;
 import ij.gui.Roi;
+import ij.io.FileSaver;
 import ij.process.BinaryProcessor;
 import ij.process.Blitter;
 import ij.process.ByteProcessor;
-import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
 import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,20 +65,8 @@ public class ImageOperation extends ImageConverter {
 		this(ImageConverter.convert2AtoIJ(image));
 	}
 
-	public ImageOperation(float[][] image) {
-		this(new ImagePlus("JImage", new FloatProcessor(image)));
-	}
-
-	// ############# Operations ##############
-
-	// public void setFilter(filterTyp typ){
-	// switch(typ){
-	//
-	// case MEDIAN_FILTER: processor.m
-	//
-	//
-	// }
-	//
+	// public ImageOperation(float[][] image) {
+	// this(new ImagePlus("JImage", new FloatProcessor(image)));
 	// }
 
 	public void translate(double x, double y) {
@@ -108,8 +99,37 @@ public class ImageOperation extends ImageConverter {
 		image.setProcessor(processor2.convertToRGB());
 	}
 
-	public ImageOperation applyMask(FlexibleImage mask) {
-		throw new UnsupportedOperationException("TODO");
+	public ImageOperation applyMask(FlexibleImage mask, int background) {
+
+		int[] mask1A = mask.getConvertAs1A();
+		PrintImage.printImage(mask.getBufferedImage());
+		System.out.println("Länge von Mask: " + mask1A.length);
+
+		int[] originalImage = ImageConverter.convertIJto1A(image);
+		PrintImage.printImage(image.getBufferedImage());
+		System.out.println("Länge von Original: " + originalImage.length);
+
+		int idx = 0;
+		// int background = processor.getBackground();
+		// int foreground = Color.BLUE.getRGB();
+		for (int m : mask.getConvertAs1A()) {
+			if (m == background)
+				mask1A[idx] = background;
+			else
+				mask1A[idx] = originalImage[idx];
+			idx++;
+		}
+
+		// PrintImage.printImage(mask1A, image.getWidth(), image.getHeight());
+
+		return new ImageOperation(mask1A, image.getWidth(), image.getHeight());
+		// int idx = 0;
+		// for (int m : io.getImageAs1array()) {
+		// if (m == background)
+		// newImage1A[idx] = background;
+		// else
+		// newImage1A[idx] = originalImage1A[idx];
+		// idx++;
 	}
 
 	/**
@@ -273,18 +293,20 @@ public class ImageOperation extends ImageConverter {
 
 	}
 
-	public void drawAndFillRect(int leftX, int leftY, int width, int height, int fillValue) {
+	public ImageOperation drawAndFillRect(int leftX, int leftY, int width, int height, int fillValue) {
 		Roi rec = new Roi(leftX, leftY, width, height);
 		processor.setRoi(rec);
 		processor.setValue(fillValue);
 		processor.fill();
+		return new ImageOperation(processor.getBufferedImage());
 	}
 
-	public void setBackgroundValue(double background) {
+	public ImageOperation setBackgroundValue(double background) {
 		processor.setBackgroundValue(background);
+		return new ImageOperation(processor.getBufferedImage());
 	}
 
-	public Roi boundingBox() {
+	public Roi getBoundingBox() {
 		// public void boundingBox(int background){
 
 		int[][] img = ImageConverter.convertIJto2A(image);
@@ -312,11 +334,17 @@ public class ImageOperation extends ImageConverter {
 				}
 			}
 		}
-		System.out.println("BoundingBox");
-		System.out.println("top: " + top);
-		System.out.println("left: " + left);
-		System.out.println("down-top: " + (down - top));
-		System.out.println("right-left: " + (right - left));
+
+		if (right == -1)
+			right = img[0].length;
+		if (down == -1)
+			down = img.length;
+
+		// System.out.println("BoundingBox");
+		// System.out.println("top: " + top);
+		// System.out.println("left: " + left);
+		// System.out.println("down-top: " + (down - top));
+		// System.out.println("right-left: " + (right - left));
 
 		Roi boundingBox = new Roi(top, left, down - top, right - left);
 		// boundingBox = new Roi(top, left, down-top, right-left);
@@ -331,16 +359,12 @@ public class ImageOperation extends ImageConverter {
 		processor.draw(boundingBox);
 	}
 
-	public void cutArea(Roi boundingBox) {
-
-		ImageProcessor processor2;
-
+	public ImageOperation cutArea(Roi boundingBox) {
 		processor.setRoi(boundingBox);
-		processor2 = processor.crop();
-		image.setProcessor(image.getTitle(), processor2);
+		return new ImageOperation(processor.crop().getBufferedImage());
 	}
 
-	public void centerOfGravity() {
+	public Point2D centerOfGravity() {
 
 		int[][] img = ImageConverter.convertIJto2A(image);
 
@@ -422,11 +446,55 @@ public class ImageOperation extends ImageConverter {
 
 		}
 
-		drawAndFillRect((int) centreOfGravityI - 5, (int) centreOfGravityJ - 5, 10, 10, 200);
+		// drawAndFillRect((int) centreOfGravityI - 5, (int) centreOfGravityJ - 5, 10, 10, 200);
 
-		System.out.println("wertI: " + centreOfGravityI);
-		System.out.println("wertJ: " + centreOfGravityJ);
+		// System.out.println("SchwerpunktX: " + centreOfGravityI);
+		// System.out.println("SchwerpunktY: " + centreOfGravityJ);
 
+		return new Point2D.Double(centreOfGravityI, centreOfGravityJ);
+	}
+
+	public Dimension2D getDiameter() {
+
+		Dimension2D dimension = null;
+		double minArea = 1000000000000000.0;
+
+		double width = 0, hight = 0;
+
+		Roi boundingBox;
+
+		for (int i = 0; i < 1; i++) {
+			rotate(i);
+
+			Rectangle rect = getBoundingBox().getBounds();
+			width = rect.getWidth();
+			hight = rect.getHeight();
+			if (minArea > (width * hight)) {
+				// minArea = width*hight;
+				dimension.setSize(width, hight);
+			}
+
+		}
+
+		// System.out.println("minArea: " + minArea);
+
+		return dimension;
+	}
+
+	public ImageOperation enlarge() {
+
+		int[][] img = ImageConverter.convertIJto2A(image);
+		int[][] newImage = new int[2 * img.length][2 * img[0].length];
+
+		for (int i = 0; i < newImage.length; i++)
+			for (int j = 0; j < newImage[0].length; j++) {
+				if (i > (img.length * 0.5) && j > (img[0].length * 0.5) && i < (img.length * 1.5) && j < (img[0].length * 1.5)) {
+					newImage[i][j] = img[(i - (img.length / 2) - 1)][(j - (img[0].length / 2) - 1)];
+				} else
+					newImage[i][j] = (int) processor.getBackgroundValue();
+			}
+
+		return new ImageOperation(ImageConverter.convert2AtoBI(newImage));
 	}
 
 	// ################## get... ###################
@@ -454,59 +522,88 @@ public class ImageOperation extends ImageConverter {
 		image.show();
 	}
 
-	private void blur() {
-		ImageProcessor processor2 = processor.convertToByte(true);
-		ByteProcessor byteProcessor = new BinaryProcessor((ByteProcessor) processor2);
+	// ############# save ######################
 
-		boolean newTest = true;
-
-		if (newTest) {
-			IOurl test = new IOurl("file:///Users/entzian/Desktop/test.png");
-			try {
-				BufferedImage imgTest = ImageIO.read(test.getInputStream());
-				PrintImage.printImage(imgTest);
-				ImageOperation io = new ImageOperation(imgTest);
-				// io.drawRect(3, 3, 10, 10);
-				// io.drawAndFillRect(3, 3, 10, 10, 0);
-				// io.setBackgroundValue(-1);
-				// Roi testRoi = io.boundingBox();
-				// io.drawBoundingBox(testRoi);
-				// io.cutArea(testRoi);
-
-				io.centerOfGravity();
-				PrintImage.printImage(io.getImageAsBufferedImage());
-
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		} else {
-
-			int w = byteProcessor.getWidth();
-			int h = byteProcessor.getHeight();
-			ByteProcessor copy = (ByteProcessor) processor2.duplicate();
-			for (int v = 1; v <= h - 2; v++) {
-				for (int u = 1; u <= w - 2; u++) {
-					// compute filter result for position (u,v)
-					int sum = 0;
-					for (int j = -1; j <= 1; j++) {
-						for (int i = -1; i <= 1; i++) {
-							int p = copy.getPixel(u + i, v + j);
-							sum = sum + p;
-						}
-					}
-					int q = (int) (sum / 9.0);
-					byteProcessor.putPixel(u, v, q);
-				}
-			}
-
-			image.setProcessor(processor2.convertToRGB());
-		}
+	public void saveImage(String pfad) {
+		saveImage(pfad, SaveImage.PNG);
 	}
+
+	public void saveImage(String pfad, SaveImage typ) {
+
+		switch (typ) {
+			case TIFF:
+				new FileSaver(image).saveAsTiff(pfad);
+				break;
+
+			case PNG:
+				new FileSaver(image).saveAsPng(pfad);
+				break;
+			case JPG:
+				new FileSaver(image).saveAsJpeg(pfad);
+				break;
+			case GIF:
+				new FileSaver(image).saveAsGif(pfad);
+				break;
+			default:
+				new FileSaver(image).saveAsPng(pfad);
+				break;
+		}
+
+	}
+
+	// private void blur() {
+	// ImageProcessor processor2 = processor.convertToByte(true);
+	// ByteProcessor byteProcessor = new BinaryProcessor((ByteProcessor) processor2);
+	//
+	// boolean newTest = true;
+	//
+	// if (newTest) {
+	// IOurl test = new IOurl("file:///Users/entzian/Desktop/test.png");
+	// try {
+	// BufferedImage imgTest = ImageIO.read(test.getInputStream());
+	// PrintImage.printImage(imgTest);
+	// ImageOperation io = new ImageOperation(imgTest);
+	// // io.drawRect(3, 3, 10, 10);
+	// // io.drawAndFillRect(3, 3, 10, 10, 0);
+	// // io.setBackgroundValue(-1);
+	// // Roi testRoi = io.boundingBox();
+	// // io.drawBoundingBox(testRoi);
+	// // io.cutArea(testRoi);
+	//
+	// io.centerOfGravity();
+	// PrintImage.printImage(io.getImageAsBufferedImage());
+	//
+	// } catch (IOException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// } catch (Exception e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	//
+	// } else {
+	//
+	// int w = byteProcessor.getWidth();
+	// int h = byteProcessor.getHeight();
+	// ByteProcessor copy = (ByteProcessor) processor2.duplicate();
+	// for (int v = 1; v <= h - 2; v++) {
+	// for (int u = 1; u <= w - 2; u++) {
+	// // compute filter result for position (u,v)
+	// int sum = 0;
+	// for (int j = -1; j <= 1; j++) {
+	// for (int i = -1; i <= 1; i++) {
+	// int p = copy.getPixel(u + i, v + j);
+	// sum = sum + p;
+	// }
+	// }
+	// int q = (int) (sum / 9.0);
+	// byteProcessor.putPixel(u, v, q);
+	// }
+	// }
+	//
+	// image.setProcessor(processor2.convertToRGB());
+	// }
+	// }
 
 	private static void testPhytokammer(IOurl urlFlu, IOurl urlVis, IOurl urlNIR, BufferedImage imgFluo,
 						BufferedImage imgVisible, BufferedImage imgNIR) {
@@ -707,18 +804,32 @@ public class ImageOperation extends ImageConverter {
 		boolean newTest = true;
 
 		if (newTest) {
+
+			int[][] img = { { 1, 1, 1, 1, 1, 1, 1 },
+								{ 1, 1, 1, 1, 1, 1, 1 },
+								{ 1, 1, 1, 1, 1, 1, 1 },
+								{ 1, 1, 1, 1, 1, 1, 1 },
+								{ 1, 1, 1, 1, 1, 1, 1 } };
+
 			IOurl test = new IOurl("file:///Users/entzian/Desktop/test.png");
 			try {
 				BufferedImage imgTest = ImageIO.read(test.getInputStream());
+				// imgTest = ImageConverter.convert2AtoBI(img);
+				// PrintImage.printImage(imgTest, PrintOption.CONSOLE);
 				PrintImage.printImage(imgTest);
 				ImageOperation io = new ImageOperation(imgTest);
 				// io.drawRect(3, 3, 10, 10);
 				// io.drawAndFillRect(3, 3, 10, 10, 0);
 				// io.setBackgroundValue(-1);
-				Roi testRoi = io.boundingBox();
+				// Roi testRoi = io.boundingBox();
 				// io.drawBoundingBox(testRoi);
-				io.cutArea(testRoi);
+				// io.cutArea(testRoi);
+				// io.drawBoundingBox(io.getBoundingBox());
+				// PrintImage.printImage(io.getImageAsBufferedImage());
+				// Dimension2D testPoint = io.enlarge().getDiameter();
+				// io.cutArea(io.boundingBox());
 
+				PrintImage.printImage(io.enlarge().getImageAsBufferedImage());
 				// io.centerOfGravity();
 				PrintImage.printImage(io.getImageAsBufferedImage());
 

@@ -73,13 +73,13 @@ public class TestSegmentation {
 			image = testImage.get(i);
 
 			test = new PixelSegmentation(image, NeighbourhoodSetting.NB4);
-			test.doPixelSegmentation();
+			test.doPixelSegmentation(1);
 			Assert.assertEquals(test.getNumberOfCluster(), testCluster4er[i]);
 			Assert.assertEquals(test.getNumberOfPixel(), testPixel[i]);
 			Assert.assertEquals(test.getCircuitRatio(position[i]), testCircuitRatio[i], 15);
 
 			test = new PixelSegmentation(image, NeighbourhoodSetting.NB8);
-			test.doPixelSegmentation();
+			test.doPixelSegmentation(1);
 			Assert.assertEquals(test.getNumberOfCluster(), testCluster8er[i]);
 			Assert.assertEquals(test.getNumberOfPixel(), testPixel[i]);
 
