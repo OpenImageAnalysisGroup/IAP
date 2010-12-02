@@ -3,18 +3,23 @@ package de.ipk.ag_ba.image_utils;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
+import org.Colors;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -47,6 +52,12 @@ public class ImageConverter {
 		return jImage;
 	}
 
+	public static ImagePlus convert1ABtoIJ(int w, int h, int[] img) {
+		img = ImageConverter.convert1ABto1A(img);
+		ImagePlus jImage = new ImagePlus("JImage", convert1AtoBI(w, h, img));
+		return jImage;
+	}
+
 	public static ImagePlus convert1AtoIJ(int w, int h, int[] img) {
 		ImagePlus jImage = new ImagePlus("JImage", convert1AtoBI(w, h, img));
 		return jImage;
@@ -57,7 +68,28 @@ public class ImageConverter {
 		return jImage;
 	}
 
+	public static ImagePlus convert2ABtoIJ(int[][] img) {
+		img = ImageConverter.convert2ABto2A(img);
+		ImagePlus jImage = new ImagePlus("JImage", ImageConverter.convert2AtoBI(img));
+		return jImage;
+	}
+
 	// ########## Rückgabe int[] ###############
+
+	public static int[] convert1ABto1A(int[] img) {
+		for (int i = 0; i < img.length; i++) {
+			if (img[i] == 0)
+				img[i] = Color.WHITE.getRGB();
+			else
+				img[i] = Color.BLACK.getRGB();
+		}
+		return img;
+	}
+
+	public static int[] convert2ABto1A(int[][] img) {
+		img = convert2ABto2A(img);
+		return ImageConverter.convert2Ato1A(img);
+	}
 
 	public static int[] convertBIto1A(BufferedImage img) {
 		final int w = img.getWidth();
@@ -83,6 +115,49 @@ public class ImageConverter {
 
 	// ########## Rückgabe int[][] ###############
 
+	public static int[][] convert2ABto2A(int[][] img) {
+		for (int i = 0; i < img.length; i++) {
+			for (int j = 0; j < img[i].length; j++)
+				if (img[i][j] == 0)
+					img[i][j] = Color.WHITE.getRGB();
+				else
+					img[i][j] = Color.BLACK.getRGB();
+		}
+		return img;
+	}
+
+	public static int[][] convert2ABto2AcolorFull(int[][] img) {
+		TreeSet<Integer> values = new TreeSet<Integer>();
+		for (int i = 0; i < img.length; i++) {
+			for (int j = 0; j < img[i].length; j++)
+				if (img[i][j] != 0)
+					values.add(img[i][j]);
+		}
+
+		ArrayList<Color> colors = Colors.get(values.size(), 1);
+
+		HashMap<Integer, Integer> value2color = new HashMap<Integer, Integer>();
+
+		int idx = 0;
+		for (int value : values) {
+			value2color.put(value, colors.get(idx++).getRGB());
+		}
+
+		for (int i = 0; i < img.length; i++) {
+			for (int j = 0; j < img[i].length; j++)
+				if (img[i][j] == 0)
+					img[i][j] = Color.WHITE.getRGB();
+				else
+					img[i][j] = value2color.get(img[i][j]);
+		}
+		return img;
+	}
+
+	public static int[][] convert1ABto2A(int w, int h, int[] img) {
+		img = ImageConverter.convert1ABto1A(img);
+		return ImageConverter.convert1Ato2A(w, h, img);
+	}
+
 	public static int[][] convertBIto2A(BufferedImage img) {
 		int[][] image = convert1Ato2A(img.getWidth(), img.getHeight(), convertBIto1A(img));
 		return image;
@@ -106,6 +181,16 @@ public class ImageConverter {
 	}
 
 	// ######### Rückgabe BufferedImage ###########
+
+	public static BufferedImage convert1ABtoBI(int width, int height, int[] img) {
+		img = ImageConverter.convert1ABto1A(img);
+		return ImageConverter.convert1AtoBI(width, height, img);
+	}
+
+	public static BufferedImage convert2ABtoBI(int[][] img) {
+		img = ImageConverter.convert2ABto2A(img);
+		return ImageConverter.convert2AtoBI(img);
+	}
 
 	public static BufferedImage convertPItoBI(PlanarImage plImage1) {
 

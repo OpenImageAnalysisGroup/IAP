@@ -18,8 +18,10 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
+import de.ipk.ag_ba.image_utils.ImageOperation;
 import de.ipk.ag_ba.image_utils.MorphologicalOperators;
 import de.ipk.ag_ba.image_utils.PixelSegmentation;
+import de.ipk.ag_ba.image_utils.PrintImage;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
@@ -240,6 +242,11 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				ErrorMsg.addErrorMessage(e);
 			}
 		}
+		// PrintImage.printImage(arrayRGB, w, h);
+		//
+		ImageOperation save = new ImageOperation(arrayRGB, w, h);
+		// save.rotate(3);
+		save.saveImage("/Users/entzian/Desktop/sechsteBild.png");
 
 		closingOpening(w, h, arrayRGB, rgbArrayOriginal, iBackgroundFill, limg, 1);
 
@@ -404,11 +411,20 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					rgbArray[x + y * w] = rgbNonModifiedArray[x + y * w];
 			}
 		}
+		// PrintImage.printImage(rgbArray, w, h);
+		//
+		ImageOperation save = new ImageOperation(rgbArray, w, h);
+		// save.rotate(3);
+		save.saveImage("/Users/entzian/Desktop/siebenteBild.png");
+		//
+		// PrintImage.printImage(rgbArray, w, h);
+
 	}
 
 	private static void removeSmallPartsOfImage(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg,
 						int cutOff) {
 		int[][] image = new int[w][h];
+
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				int off = x + y * w;
@@ -420,39 +436,130 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				}
 			}
 		}
-		PixelSegmentation ps = new PixelSegmentation(image);
-		ps.doPixelSegmentation();
-		int[] clusterSizes = ps.getClusterCounts();
-		int[] clusterPerimeter = ps.getPerimeter();
-		double[] clusterCircleSimilarity = ps.getCircuitRatio();
 
-		boolean log = false;
-		if (log)
-			for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
-				if (clusterSizes[clusterID] > 25)
-					System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
-										+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
-										+ (clusterCircleSimilarity[clusterID] < 0.013));
+		// Variante 1
+		{
+			PixelSegmentation ps = new PixelSegmentation(image);
+			ps.doPixelSegmentation(1);
 
-		int[][] mask = ps.getImageMask();
-		// ArrayList<Color> colors = Colors.get(cl);
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				int clusterID = mask[x][y];
-				// rgbArray[x + y * w] = clusterID != 0 ? clusterID :
-				// Color.YELLOW.getRGB();
-				// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
+			int[] clusterSizes = ps.getClusterCounts();
+			int[] clusterPerimeter = ps.getPerimeter();
+			double[] clusterCircleSimilarity = ps.getCircuitRatio();
 
-				if (clusterSizes[clusterID] < cutOff) // ||
-					// clusterCircleSimilarity[clusterID]
-					// > 0.013
-					rgbArray[x + y * w] = iBackgroundFill;
-				// else if (clusterID != 0)
-				// System.out.println("ID: " + clusterID + ", SIZE: " +
-				// clusterSizes[clusterID] + ", PERIMETER: "
-				// + clusterPerimeter[clusterID] + ", CIRCLE? " +
-				// clusterCircleSimilarity[clusterID]);
+			boolean log = false;
+			if (log)
+				for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
+					if (clusterSizes[clusterID] > 25)
+						System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
+											+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
+											+ (clusterCircleSimilarity[clusterID] < 0.013));
+
+			int[][] mask = ps.getImageMask();
+			// ArrayList<Color> colors = Colors.get(cl);
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					int clusterID = mask[x][y];
+					// rgbArray[x + y * w] = clusterID != 0 ? clusterID :
+					// Color.YELLOW.getRGB();
+					// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
+
+					if (clusterSizes[clusterID] < cutOff) // ||
+						// clusterCircleSimilarity[clusterID]
+						// > 0.013
+						rgbArray[x + y * w] = iBackgroundFill;
+					// else if (clusterID != 0)
+					// System.out.println("ID: " + clusterID + ", SIZE: " +
+					// clusterSizes[clusterID] + ", PERIMETER: "
+					// + clusterPerimeter[clusterID] + ", CIRCLE? " +
+					// clusterCircleSimilarity[clusterID]);
+				}
 			}
+			PrintImage.printImage(rgbArray, w, h);
+
+		}
+
+		// Variante 2
+		{
+
+			PixelSegmentation ps = new PixelSegmentation(image);
+			ps.doPixelSegmentation(2);
+
+			int[] clusterSizes = ps.getClusterCounts();
+			int[] clusterPerimeter = ps.getPerimeter();
+			double[] clusterCircleSimilarity = ps.getCircuitRatio();
+
+			boolean log = false;
+			if (log)
+				for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
+					if (clusterSizes[clusterID] > 25)
+						System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
+											+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
+											+ (clusterCircleSimilarity[clusterID] < 0.013));
+
+			int[][] mask = ps.getImageMask();
+			// ArrayList<Color> colors = Colors.get(cl);
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					int clusterID = mask[x][y];
+					// rgbArray[x + y * w] = clusterID != 0 ? clusterID :
+					// Color.YELLOW.getRGB();
+					// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
+
+					if (clusterSizes[clusterID] < cutOff) // ||
+						// clusterCircleSimilarity[clusterID]
+						// > 0.013
+						rgbArray[x + y * w] = iBackgroundFill;
+					// else if (clusterID != 0)
+					// System.out.println("ID: " + clusterID + ", SIZE: " +
+					// clusterSizes[clusterID] + ", PERIMETER: "
+					// + clusterPerimeter[clusterID] + ", CIRCLE? " +
+					// clusterCircleSimilarity[clusterID]);
+				}
+			}
+			PrintImage.printImage(rgbArray, w, h);
+
+		}
+
+		// Variante 3
+		{
+			PixelSegmentation ps = new PixelSegmentation(image);
+			ps.doPixelSegmentation(3);
+
+			int[] clusterSizes = ps.getClusterCounts();
+			int[] clusterPerimeter = ps.getPerimeter();
+			double[] clusterCircleSimilarity = ps.getCircuitRatio();
+
+			boolean log = false;
+			if (log)
+				for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
+					if (clusterSizes[clusterID] > 25)
+						System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
+											+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
+											+ (clusterCircleSimilarity[clusterID] < 0.013));
+
+			int[][] mask = ps.getImageMask();
+			// ArrayList<Color> colors = Colors.get(cl);
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					int clusterID = mask[x][y];
+					// rgbArray[x + y * w] = clusterID != 0 ? clusterID :
+					// Color.YELLOW.getRGB();
+					// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
+
+					if (clusterSizes[clusterID] < cutOff) // ||
+						// clusterCircleSimilarity[clusterID]
+						// > 0.013
+						rgbArray[x + y * w] = iBackgroundFill;
+					// else if (clusterID != 0)
+					// System.out.println("ID: " + clusterID + ", SIZE: " +
+					// clusterSizes[clusterID] + ", PERIMETER: "
+					// + clusterPerimeter[clusterID] + ", CIRCLE? " +
+					// clusterCircleSimilarity[clusterID]);
+				}
+			}
+
+			PrintImage.printImage(rgbArray, w, h);
+
 		}
 	}
 
