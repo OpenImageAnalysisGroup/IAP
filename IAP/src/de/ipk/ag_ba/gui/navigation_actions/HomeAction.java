@@ -6,6 +6,7 @@ import java.util.HashMap;
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 
+import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.nav.RimasNav;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -13,6 +14,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
+import de.ipk.ag_ba.gui.webstart.AIPmain;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
@@ -29,12 +31,12 @@ public final class HomeAction extends AbstractNavigationAction {
 
 	}
 
-	private void initializeHomeActions(GUIsetting guIsetting) {
+	private void initializeHomeActions(GUIsetting guiSetting) {
 		ArrayList<NavigationButton> homeActions = new ArrayList<NavigationButton>();
 		// homePrimaryActions.add(new NavigationGraphicalEntity(new Phenotyping(),
 		// "Phenotyping", "img/000Grad_3.png"));
 		homePrimaryActions = new ArrayList<NavigationButton>();
-		for (NavigationButton ne : new Phenotyping(guIsetting).getResultNewActionSet()) {
+		for (NavigationButton ne : new Phenotyping(guiSetting).getResultNewActionSet()) {
 			homePrimaryActions.add(ne);
 		}
 
@@ -44,12 +46,20 @@ public final class HomeAction extends AbstractNavigationAction {
 		NavigationButton rimas = RimasNav.getRimas(src.getGUIsetting());
 		homeActions.add(rimas);
 
+		HTTPfolderSource dataSource = new HTTPfolderSource(
+							"MetaCrop NG", "http://vanted.ipk-gatersleben.de/addons/metacrop/gml/", new String[] { ".gml" },
+							AIPmain.loadIcon("img/metacrop.png"));
+
+		NavigationButton metaCropNG = new NavigationButton(
+							new DataSourceNavigationAction(dataSource)
+												, guiSetting);
+
 		NavigationButton metaCrop = WebFolder
 							.getBrowserNavigationEntity(
 												null,
 												"MetaCrop",
 												"img/metacrop.png",
-												"http://vanted.ipk-gatersleben.de/addons/metacrop/",
+												"http://vanted.ipk-gatersleben.de/addons/metacrop/gml/",
 												"Website",
 												"img/browser.png",
 												"http://metacrop.ipk-gatersleben.de",
@@ -61,6 +71,7 @@ public final class HomeAction extends AbstractNavigationAction {
 																	+ "IAP as well as VANTED provide access to the exported MetaCrop pathways in a graphical and interactive way.<br>"
 																	+ "For background information and further information please visit the MetaCrop website, accessible by using the "
 																	+ "Website button, shown above.", null, src.getGUIsetting());
+		homeActions.add(metaCropNG);
 		homeActions.add(metaCrop);
 
 		HashMap<String, String> folder2url = new HashMap<String, String>();
@@ -113,7 +124,7 @@ public final class HomeAction extends AbstractNavigationAction {
 																	+ "functions allow a fast evaluation of the data (e.g. t-Test or correlation analysis).",
 												"Examples", src.getGUIsetting());
 
-		NavigationButton startVanted = new NavigationButton(new ShowVANTED(), guIsetting);
+		NavigationButton startVanted = new NavigationButton(new ShowVANTED(), guiSetting);
 
 		vanted.getAction().addAdditionalEntity(startVanted);
 
@@ -128,7 +139,7 @@ public final class HomeAction extends AbstractNavigationAction {
 							"img/browser.png", src.getGUIsetting()));
 		for (NavigationButton nge : homeActions)
 			ipkBioInf.addAdditionalEntity(nge);
-		homePrimaryActions.add(new NavigationButton(ipkBioInf, guIsetting));
+		homePrimaryActions.add(new NavigationButton(ipkBioInf, guiSetting));
 	}
 
 	ArrayList<NavigationButton> bookmarks;

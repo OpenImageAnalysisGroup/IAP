@@ -17,9 +17,14 @@ import java.awt.image.BufferedImage;
  */
 public class FlexibleImageSet {
 
-	private final FlexibleImage vis;
-	private final FlexibleImage fluo;
-	private final FlexibleImage nir;
+	private FlexibleImage vis;
+	private FlexibleImage fluo;
+	private FlexibleImage nir;
+
+	public FlexibleImageSet() {
+		// empty
+		// use setVis, ...
+	}
 
 	public FlexibleImageSet(FlexibleImage vis, FlexibleImage fluo, FlexibleImage nir) {
 		this.vis = vis;
@@ -88,5 +93,37 @@ public class FlexibleImageSet {
 		int w = getLargestWidth();
 		int h = getLargestHeight();
 		return new FlexibleImageSet(vis.resize(w, h), fluo.resize(w, h), nir.resize(w, h));
+	}
+
+	public void setVis(FlexibleImage vis) {
+		this.vis = vis;
+	}
+
+	public void setFluo(FlexibleImage fluo) {
+		this.fluo = fluo;
+	}
+
+	public void setNir(FlexibleImage nir) {
+		this.nir = nir;
+	}
+
+	public boolean hasAllThreeImages() {
+		return vis != null && fluo != null && nir != null;
+	}
+
+	public void set(FlexibleImage flexibleImage) {
+		switch (flexibleImage.getType()) {
+			case VIS:
+				setVis(flexibleImage);
+				break;
+			case FLUO:
+				setFluo(flexibleImage);
+				break;
+			case NIR:
+				setNir(flexibleImage);
+				break;
+			case UNKNOWN:
+				throw new UnsupportedOperationException("FlexibleImage-Type is not set!");
+		}
 	}
 }

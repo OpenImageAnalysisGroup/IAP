@@ -99,15 +99,19 @@ public class ImageOperation extends ImageConverter {
 		image.setProcessor(processor2.convertToRGB());
 	}
 
+	// private static long iiii = 0;
+
 	public ImageOperation applyMask(FlexibleImage mask, int background) {
 
+		if (image.getWidth() != mask.getWidth() || image.getHeight() != mask.getHeight()) {
+			mask = new ImageOperation(mask).resize(image.getWidth(), image.getHeight()).getImage();
+		}
+
 		int[] mask1A = mask.getConvertAs1A();
-		PrintImage.printImage(mask.getBufferedImage());
-		System.out.println("Länge von Mask: " + mask1A.length);
 
 		int[] originalImage = ImageConverter.convertIJto1A(image);
-		PrintImage.printImage(image.getBufferedImage());
-		System.out.println("Länge von Original: " + originalImage.length);
+		// PrintImage.printImage(image.getBufferedImage(), "IMAGE " + iiii);
+		// PrintImage.printImage(mask.getBufferedImage(), "MASK FOR IMAGE " + iiii);
 
 		int idx = 0;
 		// int background = processor.getBackground();
@@ -122,7 +126,7 @@ public class ImageOperation extends ImageConverter {
 
 		// PrintImage.printImage(mask1A, image.getWidth(), image.getHeight());
 
-		return new ImageOperation(mask1A, image.getWidth(), image.getHeight());
+		return new ImageOperation(mask1A, mask.getWidth(), mask.getHeight());
 		// int idx = 0;
 		// for (int m : io.getImageAs1array()) {
 		// if (m == background)
@@ -434,7 +438,7 @@ public class ImageOperation extends ImageConverter {
 
 		for (int i = 0; i < img.length; i++) {
 			for (int j = 0; j < img[0].length; j++) {
-				area = area + (double) img[i][j];
+				area = area + img[i][j];
 				firstMomentOfAreaI = firstMomentOfAreaI + (double) (i + 1) * img[i][j];
 				firstMomentOfAreaJ = firstMomentOfAreaJ + (double) (j + 1) * img[i][j];
 			}
@@ -666,7 +670,7 @@ public class ImageOperation extends ImageConverter {
 
 		// merge infos of both masks
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLOR.getRGB();
-		MaskOperation o = new MaskOperation(rgbImageM, fluoImageM, background);
+		MaskOperation o = new MaskOperation(ioR.getImage(), ioF.getImage(), null, background, 1);
 		o.mergeMasks();
 
 		// modify source images according to merged mask
@@ -816,7 +820,7 @@ public class ImageOperation extends ImageConverter {
 				BufferedImage imgTest = ImageIO.read(test.getInputStream());
 				// imgTest = ImageConverter.convert2AtoBI(img);
 				// PrintImage.printImage(imgTest, PrintOption.CONSOLE);
-				PrintImage.printImage(imgTest);
+				PrintImage.printImage(imgTest, "entzian main 1");
 				ImageOperation io = new ImageOperation(imgTest);
 				// io.drawRect(3, 3, 10, 10);
 				// io.drawAndFillRect(3, 3, 10, 10, 0);
@@ -829,9 +833,9 @@ public class ImageOperation extends ImageConverter {
 				// Dimension2D testPoint = io.enlarge().getDiameter();
 				// io.cutArea(io.boundingBox());
 
-				PrintImage.printImage(io.enlarge().getImageAsBufferedImage());
+				PrintImage.printImage(io.enlarge().getImageAsBufferedImage(), "entzian main 2");
 				// io.centerOfGravity();
-				PrintImage.printImage(io.getImageAsBufferedImage());
+				PrintImage.printImage(io.getImageAsBufferedImage(), "entzian main 3");
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

@@ -51,7 +51,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		final int width = getDimensionX();
 		final int height = getDimensionY();
 		final int depth = getDimensionZ();
-		boolean threaded = true;
+		boolean threaded = false;
 		if (threaded)
 			rotateVolumeThreaded(rotation, new VolumeReceiver() {
 
@@ -68,14 +68,14 @@ public class LoadedVolumeExtension extends LoadedVolume {
 
 	private void renderSideView(BufferedImage result, int width, int height, int depth, int[][][] volume2) {
 		WritableRaster raster = result.getRaster();
-		long idx = 0;
+
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				int[] iArray = new int[] { 255, 255, 255, 255 };
 				boolean solidFound = false;
 				for (int z = 0; z < depth; z++) {
 					if (solidFound) {
-						idx++;
+						// empty
 					} else {
 						int v = volume.getColorVoxel(x, y, z);
 						int red = (v >> 16) & 0xff;
@@ -86,16 +86,21 @@ public class LoadedVolumeExtension extends LoadedVolume {
 							int alpha = 255; // not supported by gif ?! (v >> 24) &
 							// 0xff;
 
-							int[] col = { alpha, red, green, blue };
+							int[] col = { red, green, blue, alpha };
 							raster.setPixel(x, y, col);
 						}
 					}
 				}
 				if (!solidFound)
 					raster.setPixel(x, y, iArray);
+
+				// if (Math.random() < 0.01) {
+				// iArray = new int[] { (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), 255 };
+				// raster.setPixel(x, y, iArray);
+				// }
 			}
 		}
-		System.out.println("Solid voxels: " + idx);
+		// System.out.println("Solid voxels: " + idx);
 	}
 
 	private void rotateVolumeThreaded(double rotation, VolumeReceiver volumeReceiver) {
@@ -125,6 +130,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		} catch (InterruptedException e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+		volumeReceiver.processVolume(volume2);
 	}
 
 	private Runnable getVolumeRotationRunnable(final int i, final int maxCPU, final double rotation,
@@ -143,7 +149,9 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		if (volume2 == null)
 			volume2 = new int[getDimensionX()][getDimensionY()][getDimensionZ()];
 
+		System.out.println("Angle: " + (int) rotation + " degree");
 		double angle = rotation / 180d * Math.PI;
+		System.out.println("Angle: " + angle);
 		double cos = Math.cos(angle);
 		double sin = Math.sin(angle);
 
@@ -151,21 +159,21 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		int dimensionzH = dimensionx / 2;
 
 		for (int x = 0; x < dimensionx; x++) {
-			if (x % maxCPU == i)
-				for (int z = 0; z < dimensionz; z++) {
-					double a = z - dimensionzH;
-					double b = x - dimensionxH;
-					double zn = a * cos - b * sin;
-					double xn = a * sin + b * cos;
-					int zni = (int) zn + dimensionzH;
-					int xni = (int) xn + dimensionxH;
-					boolean targetOK = zni >= 0 && zni < dimensionz && xni >= 0 && xni < dimensionx;
-					for (int y = 0; y < dimensiony; y++) {
-						if (targetOK) {
-							volume2[x][y][z] = volume.getColorVoxel(xni, y, zni);
-						}
+			// if (x % maxCPU == i)
+			for (int z = 0; z < dimensionz; z++) {
+				double a = z - dimensionzH;
+				double b = x - dimensionxH;
+				double zn = a * cos - b * sin;
+				double xn = a * sin + b * cos;
+				int zni = (int) zn + dimensionzH;
+				int xni = (int) xn + dimensionxH;
+				boolean targetOK = zni >= 0 && zni < dimensionz && xni >= 0 && xni < dimensionx;
+				for (int y = 0; y < dimensiony; y++) {
+					if (targetOK) {
+						volume2[x][y][z] = volume.getColorVoxel(xni, y, zni);
 					}
 				}
+			}
 		}
 
 		return volume2;
@@ -210,6 +218,8 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			while (true) {
 				long t1 = System.currentTimeMillis();
 				v.renderSideView(rotation, result);
+
+				result.getGraphics().drawOval(10, 10, 50, 50);
 
 				final ShowImage imageDisplayF = imageDisplay;
 

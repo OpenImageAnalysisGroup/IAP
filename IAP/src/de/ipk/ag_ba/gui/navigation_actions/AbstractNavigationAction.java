@@ -8,6 +8,8 @@ package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
+
 import org.BackgroundTaskStatusProvider;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
@@ -73,5 +75,9 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	@Override
 	public boolean getProvidesActions() {
 		return true;
+	}
+
+	public ImageIcon getImageIcon() {
+		return null;
 	}
 }

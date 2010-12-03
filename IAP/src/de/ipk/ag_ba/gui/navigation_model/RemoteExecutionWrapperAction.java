@@ -3,6 +3,8 @@ package de.ipk.ag_ba.gui.navigation_model;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import javax.swing.ImageIcon;
+
 import org.BackgroundTaskStatusProvider;
 import org.graffiti.editor.MainFrame;
 
@@ -85,5 +87,10 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	@Override
 	public boolean getProvidesActions() {
 		return false;
+	}
+
+	@Override
+	public ImageIcon getImageIcon() {
+		return null;
 	}
 }

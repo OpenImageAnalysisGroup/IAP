@@ -139,9 +139,7 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 			long t1 = System.currentTimeMillis();
 			task.setInput(workload, login, pass);
 			int pi = SystemAnalysis.getNumberOfCPUs();
-			if (pi < 1)
-				pi = 1;
-			int ti = 1;
+			int ti = SystemAnalysis.getNumberOfCPUs() / 2;
 			task.performAnalysis(pi, ti, status);
 			long t2 = System.currentTimeMillis();
 			String ss = "T(s)/IMG/T(s)/PI/TI\t" + Math.round(((t2 - t1) / 100d / workload.size())) / 10d + "\t"

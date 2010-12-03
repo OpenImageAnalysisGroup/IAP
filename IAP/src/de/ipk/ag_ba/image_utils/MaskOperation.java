@@ -3,8 +3,6 @@
  *************************************************************************/
 package de.ipk.ag_ba.image_utils;
 
-import java.awt.image.BufferedImage;
-
 /**
  * @author entzian
  */
@@ -12,58 +10,35 @@ public class MaskOperation {
 
 	private final int[] rgbImage;
 	private final int[] fluorImage;
-	private final int background;
+	private final int background, foreground;
 	private final int[] nearIfImage;
 	private int filled = 0, deleted = 0;
 	private final int[] mask;
 
-	public MaskOperation(int[] rgbImage, int[] fluorImage, int[] nearIfImage, int background) {
-		this.rgbImage = rgbImage;
-		this.fluorImage = fluorImage;
+	public MaskOperation(FlexibleImage rgbImage, FlexibleImage fluorImage, FlexibleImage optNirImage, int background, int resForeground) {
+		this.rgbImage = rgbImage.getConvertAs1A();
+		this.fluorImage = fluorImage.getConvertAs1A();
+		if (optNirImage != null)
+			this.nearIfImage = optNirImage.getConvertAs1A();
+		else
+			this.nearIfImage = null;
 		this.background = background;
-		this.nearIfImage = nearIfImage;
+		this.foreground = resForeground;
 
-		mask = new int[rgbImage.length];
-	}
-
-	public MaskOperation(FlexibleImage rgbImage, FlexibleImage fluorImage, int background) {
-		this(rgbImage.getConvertAs1A(), fluorImage.getConvertAs1A(), new int[] {}, background);
-	}
-
-	public MaskOperation(BufferedImage rgbImage, BufferedImage fluorImage, int background) {
-		this(ImageConverter.convertBIto1A(rgbImage), ImageConverter.convertBIto1A(fluorImage), new int[] {}, background);
-	}
-
-	public MaskOperation(int[] rgbImage, int[] fluorImage, int background) {
-		this(rgbImage, fluorImage, new int[] {}, background);
-	}
-
-	public MaskOperation(int[][] rgbImage, int[][] fluorImage, int background) {
-		this(ImageConverter.convert2Ato1A(rgbImage), ImageConverter.convert2Ato1A(fluorImage), new int[] {}, background);
-	}
-
-	public MaskOperation(int[][] rgbImage, int[][] fluorImage, int[][] nearIfImage, int background) {
-		this(ImageConverter.convert2Ato1A(rgbImage), ImageConverter.convert2Ato1A(fluorImage), ImageConverter
-							.convert2Ato1A(nearIfImage), background);
-	}
-
-	public MaskOperation(BufferedImage rgbImage, BufferedImage fluorImage, BufferedImage nearImage, int background) {
-		this(ImageConverter.convertBIto1A(rgbImage), ImageConverter.convertBIto1A(fluorImage), ImageConverter
-							.convertBIto1A(nearImage), background);
+		mask = new int[this.rgbImage.length];
 	}
 
 	public void mergeMasks() {
 		filled = 0;
 		deleted = 0;
-
-		if (nearIfImage.length > 0) {
+		if (nearIfImage != null) {
 			if (fluorImage.length == rgbImage.length && fluorImage.length == nearIfImage.length)
 				for (int i = 0; i < fluorImage.length; i++) {
 					if (rgbImage[i] != background && fluorImage[i] != background && nearIfImage[i] != background) {
-						mask[i] = 1;
+						mask[i] = foreground;
 						filled++;
 					} else {
-						mask[i] = 0;
+						mask[i] = background;
 						if (rgbImage[i] != background || fluorImage[i] != background || nearIfImage[i] != background)
 							deleted++;
 					}
@@ -72,10 +47,10 @@ public class MaskOperation {
 			if (fluorImage.length == rgbImage.length)
 				for (int i = 0; i < fluorImage.length; i++) {
 					if (rgbImage[i] != background && fluorImage[i] != background) {
-						mask[i] = 1;
+						mask[i] = foreground;
 						filled++;
 					} else {
-						mask[i] = 0;
+						mask[i] = background;
 						if (rgbImage[i] != background || fluorImage[i] != background)
 							deleted++;
 					}

@@ -17,12 +17,25 @@ package de.ipk.ag_ba.gui.picture_gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.ThreadFactory;
 
 import javax.swing.Timer;
 
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+
+import de.ipk.ag_ba.image_utils.FlexibleImage;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
@@ -53,7 +66,7 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 
-	public static void addTask(Thread t, int userPriority) {
+	public static Thread addTask(Thread t, int userPriority) {
 		synchronized (myInstance) {
 			if (myInstance == null)
 				myInstance = new BackgroundThreadDispatcher();
@@ -63,6 +76,7 @@ public class BackgroundThreadDispatcher {
 				myInstance.sheduler.interrupt();
 			}
 		}
+		return t;
 	}
 
 	/**
@@ -126,7 +140,7 @@ public class BackgroundThreadDispatcher {
 					msg = " " + indicatorStr + " perform operations (" + (wl + exec) + " remaining) " + indicatorStr;
 				} else
 					msg = "";
-				if (frame.getTitle().indexOf(projectLoading) == -1)
+				if (frame != null && frame.getTitle().indexOf(projectLoading) == -1)
 					frame.setTitle(msg.trim());
 			}
 		});
@@ -217,5 +231,59 @@ public class BackgroundThreadDispatcher {
 			}
 		});
 		sheduler.start();
+	}
+
+	private static final ThreadSafeOptions tso = new ThreadSafeOptions();
+
+	private static ExecutorService execSvc = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
+		@Override
+		public Thread newThread(Runnable arg0) {
+			Thread t = new Thread(arg0);
+			t.setName("BackgroundThread " + tso.getNextLong());
+			return t;
+		}
+	});
+
+	public static ExecutorService getExecutorService() {
+		return execSvc;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Future<FlexibleImage>> invokeAll(Collection jobs) throws InterruptedException {
+		return invokeAll(execSvc, jobs);
+	}
+
+	private static <T> List<Future<T>> invokeAll(
+						ExecutorService threadPool, Collection<Callable<T>> tasks)
+						throws InterruptedException {
+		if (tasks == null)
+			throw new NullPointerException();
+		List<Future<T>> futures = new ArrayList<Future<T>>(tasks.size());
+		boolean done = false;
+		try {
+			for (Callable<T> t : tasks) {
+				FutureTask<T> f = new FutureTask<T>(t);
+				futures.add(f);
+				threadPool.execute(f);
+			}
+			// force unstarted futures to execute using the current thread
+			for (Future<T> f : futures)
+				((FutureTask) f).run();
+			for (Future<T> f : futures) {
+				if (!f.isDone()) {
+					try {
+						f.get();
+					} catch (CancellationException ignore) {
+					} catch (ExecutionException ignore) {
+					}
+				}
+			}
+			done = true;
+			return futures;
+		} finally {
+			if (!done)
+				for (Future<T> f : futures)
+					f.cancel(true);
+		}
 	}
 }
