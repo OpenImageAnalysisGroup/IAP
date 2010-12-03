@@ -98,44 +98,44 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
 
-		Collection jobs = new ArrayList();
+		// Collection jobs = new ArrayList();
 
 		for (Measurement md : workload) {
 			if (md instanceof ImageData) {
 				final ImageData id = (ImageData) md;
-				jobs.add(new Callable<Integer>() {
-					@Override
-					public Integer call() throws Exception {
-						LoadedImage limg = null;
-						if (id != null) {
-							if (id instanceof LoadedImage) {
-								limg = (LoadedImage) id;
-							} else {
-								try {
-									limg = IOmodule.loadImageFromFileOrMongo(id, login, pass);
-									clearBackgroundAndInterpretImage(limg, maximumThreadCountOnImageLevel,
-																		storeResultInDatabase, status, true, login, pass, output, preProcessors, epsilonA,
-																		epsilonB);
-								} catch (Exception e) {
-									ErrorMsg.addErrorMessage(e);
-								}
-							}
-							tso.addInt(1);
-							status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
-							status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl);
+				// jobs.add(new Callable<Integer>() {
+				// @Override
+				// public Integer call() throws Exception {
+				LoadedImage limg = null;
+				if (id != null) {
+					if (id instanceof LoadedImage) {
+						limg = (LoadedImage) id;
+					} else {
+						try {
+							limg = IOmodule.loadImageFromFileOrMongo(id, login, pass);
+						} catch (Exception e) {
+							ErrorMsg.addErrorMessage(e);
 						}
-						return tso.getInt();
 					}
-				});
+					clearBackgroundAndInterpretImage(limg, maximumThreadCountOnImageLevel,
+										storeResultInDatabase, status, true, login, pass, output, preProcessors, epsilonA,
+										epsilonB);
+					tso.addInt(1);
+					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
+					status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl);
+				}
+				// return tso.getInt();
+				// }
+				// });
 			}
 		}
 
-		try {
-			BackgroundThreadDispatcher.invokeAll(jobs);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			ErrorMsg.addErrorMessage(e);
-		}
+		// try {
+		// BackgroundThreadDispatcher.invokeAll(jobs);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// ErrorMsg.addErrorMessage(e);
+		// }
 
 		status.setCurrentStatusValueFine(100d);
 		input = null;

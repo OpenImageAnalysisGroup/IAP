@@ -179,6 +179,7 @@ public class PhytochamberTopImageProcessor {
 							options.getRgbNumberOfDilateLoops(), ImageConfiguration.RgbTop);
 		BufferedImage enlargedFluoMask = enlargeMask(input.getFluo(), options.getFluoNumberOfErodeLoops(),
 							options.getFluoNumberOfDilateLoops(), ImageConfiguration.FluoTop);
+
 		debugEnd(w);
 		// PrintImage.printImage(enlargedRgbMask, "enlarged RGB mask");
 		// PrintImage.printImage(enlargedFluoMask, "enlarged FLUO mask");
