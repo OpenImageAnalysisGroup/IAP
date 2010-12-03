@@ -13,8 +13,10 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.image_utils.FlexibleImage;
 import de.ipk.ag_ba.image_utils.FlexibleImageSet;
+import de.ipk.ag_ba.image_utils.FlexibleImageType;
 import de.ipk.ag_ba.image_utils.ImageConverter;
 import de.ipk.ag_ba.image_utils.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
@@ -105,100 +107,95 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
+		int idxxx = 0;
+		ArrayList<Thread> wait = new ArrayList<Thread>();
 		for (ImageSet md : workload) {
 			final ImageSet id = md;
-			// jobs.add(new Callable<Integer>() {
-			// @Override
-			// public Integer call() throws Exception {
-			try {
-				LoadedImage lVIS = null, lFLUO = null, lNIR = null;
-				ImageData vis = id.getVIS();
-				ImageData fluo = id.getFLUO();
-				ImageData nir = id.getNIR();
-				if (vis == null)
-					System.out.println("No VIS image in image set!");
-				if (fluo == null)
-					System.out.println("No FLUO image in image set!");
-				if (nir == null)
-					System.out.println("No NIR image in image set!");
-				if (vis == null || nir == null || fluo == null)
-					continue;
-				if (vis instanceof LoadedImage) {
-					lVIS = (LoadedImage) vis;
-				} else {
-					lVIS = IOmodule.loadImageFromFileOrMongo(vis, login, pass);
-				}
-				if (fluo instanceof LoadedImage) {
-					lFLUO = (LoadedImage) fluo;
-				} else {
-					lFLUO = IOmodule.loadImageFromFileOrMongo(fluo, login, pass);
-				}
-				if (nir instanceof LoadedImage) {
-					lNIR = (LoadedImage) nir;
-				} else {
-					lNIR = IOmodule.loadImageFromFileOrMongo(nir, login, pass);
-				}
-				// process images
-				FlexibleImageSet input = new FlexibleImageSet(new FlexibleImage(lVIS.getLoadedImage()),
-											new FlexibleImage(lFLUO.getLoadedImage()), new FlexibleImage(lNIR.getLoadedImage()));
-				if (input.hasAllThreeImages()) {
-					PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(input);
-					FlexibleImageSet pres = ptip.pipeline(maximumThreadCountOnImageLevel).getImages();
-					ptip = null;
-					lVIS = new LoadedImage(lVIS, pres.getVis().getBufferedImage());
-					lFLUO = new LoadedImage(lFLUO, pres.getFluo().getBufferedImage());
-					lNIR = new LoadedImage(lNIR, pres.getNir().getBufferedImage());
+			Thread t = BackgroundThreadDispatcher.addTask(new Runnable() {
 
-					vis = saveImageAndUpdateURL(lVIS, databaseTarget);
-					fluo = saveImageAndUpdateURL(lFLUO, databaseTarget);
-					nir = saveImageAndUpdateURL(lNIR, databaseTarget);
+				@Override
+				public void run() {
+					try {
+						final ImageData vis = id.getVIS();
+						final ImageData fluo = id.getFLUO();
+						final ImageData nir = id.getNIR();
 
-					{
-						ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(lVIS, getNameStatic());
-						lVIS.reset();
-						output.addAll(res);
-						output.add(vis);
+						if (vis == null || nir == null || fluo == null)
+							return;
+
+						final FlexibleImageSet input = new FlexibleImageSet();
+
+						if (vis instanceof LoadedImage) {
+							input.setVis(new FlexibleImage(((LoadedImage) vis).getLoadedImage()));
+						} else {
+							load(vis, input, FlexibleImageType.VIS);
+						}
+						if (fluo instanceof LoadedImage) {
+							input.setFluo(new FlexibleImage(((LoadedImage) fluo).getLoadedImage()));
+						} else {
+							load(fluo, input, FlexibleImageType.FLUO);
+						}
+						if (nir instanceof LoadedImage) {
+							input.setFluo(new FlexibleImage(((LoadedImage) nir).getLoadedImage()));
+						} else {
+							load(nir, input, FlexibleImageType.NIR);
+						}
+						// process images
+						input.waitForThreeImages();
+						if (input.hasAllThreeImages()) {
+							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(input);
+							final FlexibleImageSet pipelineResult = ptip.pipeline(maximumThreadCountOnImageLevel).getImages();
+
+							Thread a = statisticalAnalaysis(vis, pipelineResult.getVis());
+							Thread b = statisticalAnalaysis(fluo, pipelineResult.getFluo());
+							Thread c = statisticalAnalaysis(nir, pipelineResult.getNir());
+							BackgroundThreadDispatcher.waitFor(new Thread[] { a, b, c });
+						} else {
+							System.err.println("Warning: not all three image types available for snapshot!");
+						}
+
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
 					}
-					{
-						ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(lFLUO, getNameStatic());
-						lFLUO.reset();
-						output.addAll(res);
-						output.add(fluo);
-					}
-					{
-						ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(lNIR, getNameStatic());
-						lNIR.reset();
-						output.addAll(res);
-						output.add(nir);
-					}
-				} else {
-					System.err.println("Warning: not all three image types available for snapshot!");
+					tso.addInt(1);
+					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
+					status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + wl);
 				}
+			}, "process image " + idxxx, -100);
+			wait.add(t);
 
-				lVIS = null;
-				lFLUO = null;
-				lNIR = null;
-
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-			}
-			tso.addInt(1);
-			status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
-			status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + wl);
-			// return 1;
-			// }
-			// });
 		}
 
-		// try {
-		// BackgroundThreadDispatcher.invokeAll(jobs);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// ErrorMsg.addErrorMessage(e);
-		// }
+		BackgroundThreadDispatcher.waitFor(wait.toArray(new Thread[] {}));
 
 		status.setCurrentStatusValueFine(100d);
 		input = null;
+	}
+
+	private Thread statisticalAnalaysis(final ImageData id, final FlexibleImage image) {
+		return BackgroundThreadDispatcher.addTask(new Runnable() {
+			@Override
+			public void run() {
+				LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
+				ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(loadedImage, getNameStatic());
+				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
+				output.addAll(res);
+				output.add(imageRef);
+			}
+		}, "statistic image analysis", 0);
+	}
+
+	private void load(final ImageData id, final FlexibleImageSet input, final FlexibleImageType type) {
+		BackgroundThreadDispatcher.addTask(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					input.set(new FlexibleImage(IOmodule.loadImageFromFileOrMongo(id, login, pass).getLoadedImage(), type));
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+			}
+		}, "load " + type.name(), 0);
 	}
 
 	public static ArrayList<NumericMeasurementInterface> statisticalAnalysisOfResultImage(LoadedImage limg,

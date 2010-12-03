@@ -192,33 +192,26 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 		final ObjectRef progress = new ObjectRef("", new Integer(0));
 
-		Collection jobs = new ArrayList();
-
 		final int[] arrayRGBnullFF = arrayRGBnull;
-
+		ArrayList<Thread> wait = new ArrayList<Thread>();
 		for (int ty = h - 1; ty >= 0; ty--) {
 			final int y = ty;
-			if (maximumThreadCount > 1)
-				jobs.add(new Callable<Integer>() {
+			if (maximumThreadCount > 1) {
+				Thread t = BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
-					public Integer call() throws Exception {
+					public void run() {
 						processRowYofImage(limg, w, arrayRGB, arrayRGBnullFF, iBackgroundFill, sidepercent, progress, y,
-											epsilonA, epsilonB, config, arrayL, arrayA, arrayB).run();
-						return 1;
+												epsilonA, epsilonB, config, arrayL, arrayA, arrayB).run();
 					}
-				});
-			else
+				}, "process row " + y, 0);
+				wait.add(t);
+			} else
 				processRowYofImage(limg, w, arrayRGB, arrayRGBnull, iBackgroundFill, sidepercent, progress, y, epsilonA,
 									epsilonB, config, arrayL, arrayA, arrayB).run();
 		}
 
 		if (maximumThreadCount > 1) {
-			try {
-				BackgroundThreadDispatcher.invokeAll(jobs);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				ErrorMsg.addErrorMessage(e);
-			}
+			BackgroundThreadDispatcher.waitFor(wait.toArray(new Thread[] {}));
 		}
 		// PrintImage.printImage(arrayRGB, w, h);
 		//

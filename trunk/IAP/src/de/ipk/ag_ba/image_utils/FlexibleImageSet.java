@@ -20,6 +20,7 @@ public class FlexibleImageSet {
 	private FlexibleImage vis;
 	private FlexibleImage fluo;
 	private FlexibleImage nir;
+	private Thread waitThread;
 
 	public FlexibleImageSet() {
 		// empty
@@ -97,14 +98,20 @@ public class FlexibleImageSet {
 
 	public void setVis(FlexibleImage vis) {
 		this.vis = vis;
+		if (waitThread != null)
+			waitThread.interrupt();
 	}
 
 	public void setFluo(FlexibleImage fluo) {
 		this.fluo = fluo;
+		if (waitThread != null)
+			waitThread.interrupt();
 	}
 
 	public void setNir(FlexibleImage nir) {
 		this.nir = nir;
+		if (waitThread != null)
+			waitThread.interrupt();
 	}
 
 	public boolean hasAllThreeImages() {
@@ -124,6 +131,17 @@ public class FlexibleImageSet {
 				break;
 			case UNKNOWN:
 				throw new UnsupportedOperationException("FlexibleImage-Type is not set!");
+		}
+	}
+
+	public void waitForThreeImages() {
+		waitThread = Thread.currentThread();
+		while (!hasAllThreeImages()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// empty
+			}
 		}
 	}
 }
