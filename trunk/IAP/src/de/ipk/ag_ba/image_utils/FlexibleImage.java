@@ -22,9 +22,15 @@ import org.graffiti.plugin.io.resources.IOurl;
 public class FlexibleImage {
 
 	private final BufferedImage bufferedImage;
+	private FlexibleImageType type = FlexibleImageType.UNKNOWN;
 
 	public FlexibleImage(BufferedImage bufferedImage) {
 		this.bufferedImage = bufferedImage;
+	}
+
+	public FlexibleImage(BufferedImage bufferedImage, FlexibleImageType type) {
+		this.bufferedImage = bufferedImage;
+		this.type = type;
 	}
 
 	public FlexibleImage(IOurl url) throws IOException, Exception {
@@ -77,5 +83,9 @@ public class FlexibleImage {
 			io.resize(w, h);
 			return io.getImage();
 		}
+	}
+
+	public FlexibleImageType getType() {
+		return type;
 	}
 }

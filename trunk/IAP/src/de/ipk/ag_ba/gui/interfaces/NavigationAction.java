@@ -8,6 +8,8 @@ package de.ipk.ag_ba.gui.interfaces;
 
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
+
 import org.BackgroundTaskStatusProvider;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -46,4 +48,6 @@ public interface NavigationAction {
 	public String getDefaultImage();
 
 	public boolean getProvidesActions();
+
+	public ImageIcon getImageIcon();
 }

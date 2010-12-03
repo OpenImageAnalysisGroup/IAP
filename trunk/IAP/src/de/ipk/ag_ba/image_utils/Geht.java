@@ -649,7 +649,7 @@ public class Geht {
 		int[] rgbImage1A = ImageConverter.convertBIto1A(newRGBImage);
 		int[] fluoImage1A = ImageConverter.convertBIto1A(newFluorImage);
 
-		MaskOperation o = new MaskOperation(rgbMask, fluoMask, getBackground());
+		MaskOperation o = new MaskOperation(new FlexibleImage(newRGBImage), new FlexibleImage(fluoMask), null, getBackground(), 1);
 		o.mergeMasks();
 
 		// PrintImage.printImage(ImageConverter.convert1ABto1A(o.getMask()), rgbMask.getWidth(), rgbMask.getHeight());
@@ -847,7 +847,7 @@ public class Geht {
 		}
 
 		// GravistoService.showImage(secondImage, "ImageLayering");
-		PrintImage.printImage(secondImage);
+		PrintImage.printImage(secondImage, "imageLayering 'geht'");
 	}
 
 	public ArrayList<NumericMeasurementInterface> doAnalyseResultImages(LoadedImage limg, String experimentNameExtension) {

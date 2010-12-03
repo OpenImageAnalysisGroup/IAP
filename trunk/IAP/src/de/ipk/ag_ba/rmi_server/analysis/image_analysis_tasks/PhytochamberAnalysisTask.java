@@ -5,10 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Callable;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -17,6 +14,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.image_utils.FlexibleImage;
 import de.ipk.ag_ba.image_utils.FlexibleImageSet;
 import de.ipk.ag_ba.image_utils.ImageConverter;
@@ -71,6 +69,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		return "Analyse Plants Phenotype";
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
@@ -99,33 +98,20 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		for (ImageSet is : replicateId2ImageSet.values()) {
 			if (is.hasAllImageTypes()) {
 				workload.add(is);
-				if (workload.size() > 1)
-					break;
+				// if (workload.size() > 1)
+				// break;
 			}
 		}
 
-		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
-		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCountParallelImages, new ThreadFactory() {
-			@Override
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r);
-				int i;
-				synchronized (tsoLA) {
-					tsoLA.addInt(1);
-					i = tsoLA.getInt();
-				}
-				t.setName("Load and Analyse (" + i + ")");
-				return t;
-			}
-		});
+		Collection jobs = new ArrayList();
 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
 		for (ImageSet md : workload) {
 			final ImageSet id = md;
-			run.submit(new Runnable() {
+			jobs.add(new Callable<Integer>() {
 				@Override
-				public void run() {
+				public Integer call() throws Exception {
 					try {
 						LoadedImage lVIS = null, lFLUO = null, lNIR = null;
 						ImageData vis = id.getVIS();
@@ -138,7 +124,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						if (nir == null)
 							System.out.println("No NIR image in image set!");
 						if (vis == null || nir == null || fluo == null)
-							return;
+							return -1;
 						if (vis instanceof LoadedImage) {
 							lVIS = (LoadedImage) vis;
 						} else {
@@ -157,31 +143,36 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						// process images
 						FlexibleImageSet input = new FlexibleImageSet(new FlexibleImage(lVIS.getLoadedImage()),
 											new FlexibleImage(lFLUO.getLoadedImage()), new FlexibleImage(lNIR.getLoadedImage()));
-						PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(input);
-						FlexibleImageSet pres = ptip.pipeline().getImages();
+						if (input.hasAllThreeImages()) {
+							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(input);
+							FlexibleImageSet pres = ptip.pipeline(maximumThreadCountOnImageLevel).getImages();
 
-						lVIS = new LoadedImage(lVIS, pres.getVis().getBufferedImage());
-						lFLUO = new LoadedImage(lFLUO, pres.getFluo().getBufferedImage());
-						lNIR = new LoadedImage(lNIR, pres.getNir().getBufferedImage());
+							lVIS = new LoadedImage(lVIS, pres.getVis().getBufferedImage());
+							lFLUO = new LoadedImage(lFLUO, pres.getFluo().getBufferedImage());
+							lNIR = new LoadedImage(lNIR, pres.getNir().getBufferedImage());
 
-						vis = saveImageAndUpdateURL(lVIS, databaseTarget);
-						fluo = saveImageAndUpdateURL(lFLUO, databaseTarget);
-						nir = saveImageAndUpdateURL(lNIR, databaseTarget);
+							vis = saveImageAndUpdateURL(lVIS, databaseTarget);
+							fluo = saveImageAndUpdateURL(lFLUO, databaseTarget);
+							nir = saveImageAndUpdateURL(lNIR, databaseTarget);
 
-						{
-							ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(lVIS, getNameStatic());
-							output.addAll(res);
-							output.add(vis);
-						}
-						{
-							ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(lFLUO, getNameStatic());
-							output.addAll(res);
-							output.add(fluo);
-						}
-						{
-							ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(lNIR, getNameStatic());
-							output.addAll(res);
-							output.add(nir);
+							{
+								ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(lVIS, getNameStatic());
+								output.addAll(res);
+								output.add(vis);
+							}
+							{
+								ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(lFLUO, getNameStatic());
+								output.addAll(res);
+								output.add(fluo);
+							}
+							{
+								ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(lNIR, getNameStatic());
+								output.addAll(res);
+								output.add(nir);
+							}
+						} else {
+							System.err.println("Warning: not all three image types available for snapshot!");
+							return -2;
 						}
 
 						lVIS = null;
@@ -194,14 +185,15 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 					tso.addInt(1);
 					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 					status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + wl);
+					return 1;
 				}
 			});
 		}
 
-		run.shutdown();
 		try {
-			run.awaitTermination(365, TimeUnit.DAYS);
+			BackgroundThreadDispatcher.invokeAll(jobs);
 		} catch (InterruptedException e) {
+			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
 

@@ -6,6 +6,7 @@ package de.ipk.ag_ba.gui.webstart;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import org.ApplicationStatus;
 import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
 import org.graffiti.editor.SplashScreenInterface;
@@ -32,6 +34,7 @@ import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.util.InstanceLoader;
 
+import de.ipk.ag_ba.image_utils.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
@@ -45,7 +48,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolumeHandler;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -301,6 +304,10 @@ public class AIPmain extends JApplet {
 			jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			jf.setVisible(true);
 		}
+	}
+
+	public static BufferedImage loadIcon(String name) {
+		return ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(AIPmain.class, name).getImage());
 	}
 }
 

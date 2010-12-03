@@ -5,10 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Callable;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -18,7 +15,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
-import de.ipk.ag_ba.image_utils.ImageOperation;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.image_utils.MorphologicalOperators;
 import de.ipk.ag_ba.image_utils.PixelSegmentation;
 import de.ipk.ag_ba.image_utils.PrintImage;
@@ -85,6 +82,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		return "Analyse Plants Phenotype";
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
@@ -97,29 +95,17 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				workload.add((ImageData) md);
 			}
 
-		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
-		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCountParallelImages, new ThreadFactory() {
-			@Override
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r);
-				int i;
-				synchronized (tsoLA) {
-					tsoLA.addInt(1);
-					i = tsoLA.getInt();
-				}
-				t.setName("Load and Analyse (" + i + ")");
-				return t;
-			}
-		});
-
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
+
+		Collection jobs = new ArrayList();
+
 		for (Measurement md : workload) {
 			if (md instanceof ImageData) {
 				final ImageData id = (ImageData) md;
-				run.submit(new Runnable() {
+				jobs.add(new Callable<Integer>() {
 					@Override
-					public void run() {
+					public Integer call() throws Exception {
 						LoadedImage limg = null;
 						if (id != null) {
 							if (id instanceof LoadedImage) {
@@ -128,8 +114,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 								try {
 									limg = IOmodule.loadImageFromFileOrMongo(id, login, pass);
 									clearBackgroundAndInterpretImage(limg, maximumThreadCountOnImageLevel,
-														storeResultInDatabase, status, true, login, pass, output, preProcessors, epsilonA,
-														epsilonB);
+																		storeResultInDatabase, status, true, login, pass, output, preProcessors, epsilonA,
+																		epsilonB);
 								} catch (Exception e) {
 									ErrorMsg.addErrorMessage(e);
 								}
@@ -138,15 +124,16 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 							status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 							status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl);
 						}
+						return tso.getInt();
 					}
 				});
 			}
 		}
 
-		run.shutdown();
 		try {
-			run.awaitTermination(365, TimeUnit.DAYS);
+			BackgroundThreadDispatcher.invokeAll(jobs);
 		} catch (InterruptedException e) {
+			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
 
@@ -154,13 +141,10 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		input = null;
 	}
 
-	public static void clearBackgroundAndInterpretImage(LoadedImage limg, int maximumThreadCount,
+	public static void clearBackgroundAndInterpretImage(final LoadedImage limg, int maximumThreadCount,
 						DatabaseTarget storeResultInDatabase, final BackgroundTaskStatusProviderSupportingExternalCall status,
 						boolean dataAnalysis, String login, String pass, ArrayList<NumericMeasurementInterface> output,
-						ArrayList<ImagePreProcessor> preProcessors, double epsilonA, double epsilonB) {
-
-		epsilonA /= 10;
-		epsilonB /= 10;
+						ArrayList<ImagePreProcessor> preProcessors, final double epsilonA, final double epsilonB) {
 
 		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
 		final int iBackgroundFill = backgroundFill.getRGB();
@@ -180,12 +164,12 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 		final int w = img.getWidth();
 		final int h = img.getHeight();
-		int arrayRGB[] = new int[w * h];
+		final int arrayRGB[] = new int[w * h];
 		img.getRGB(0, 0, w, h, arrayRGB, 0, w);
 
-		double arrayL[] = new double[w * h];
-		double arrayA[] = new double[w * h];
-		double arrayB[] = new double[w * h];
+		final double arrayL[] = new double[w * h];
+		final double arrayA[] = new double[w * h];
+		final double arrayB[] = new double[w * h];
 
 		ColorUtil.getLABfromRGB(arrayRGB, arrayL, arrayA, arrayB);
 
@@ -204,49 +188,43 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 		final double sidepercent = 0.10;
 
-		ImageConfiguration config = ImageConfiguration.get(limg.getSubstanceName());
+		final ImageConfiguration config = ImageConfiguration.get(limg.getSubstanceName());
 
 		final ObjectRef progress = new ObjectRef("", new Integer(0));
-		ExecutorService run = null;
-		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
-		if (maximumThreadCount > 1)
-			run = Executors.newFixedThreadPool(maximumThreadCount, new ThreadFactory() {
-				@Override
-				public Thread newThread(Runnable r) {
-					Thread t = new Thread(r);
-					int i;
-					synchronized (tsoLA) {
-						tsoLA.addInt(1);
-						i = tsoLA.getInt();
-					}
-					t.setName("Color classification (" + i + ")");
-					return t;
-				}
-			});
+
+		Collection jobs = new ArrayList();
+
+		final int[] arrayRGBnullFF = arrayRGBnull;
 
 		for (int ty = h - 1; ty >= 0; ty--) {
 			final int y = ty;
 			if (maximumThreadCount > 1)
-				run.submit(processRowYofImage(limg, w, arrayRGB, arrayRGBnull, iBackgroundFill, sidepercent, progress, y,
-									epsilonA, epsilonB, config, arrayL, arrayA, arrayB));
+				jobs.add(new Callable<Integer>() {
+					@Override
+					public Integer call() throws Exception {
+						processRowYofImage(limg, w, arrayRGB, arrayRGBnullFF, iBackgroundFill, sidepercent, progress, y,
+											epsilonA, epsilonB, config, arrayL, arrayA, arrayB).run();
+						return 1;
+					}
+				});
 			else
 				processRowYofImage(limg, w, arrayRGB, arrayRGBnull, iBackgroundFill, sidepercent, progress, y, epsilonA,
 									epsilonB, config, arrayL, arrayA, arrayB).run();
 		}
 
 		if (maximumThreadCount > 1) {
-			run.shutdown();
 			try {
-				run.awaitTermination(60 * 60, TimeUnit.SECONDS);
+				BackgroundThreadDispatcher.invokeAll(jobs);
 			} catch (InterruptedException e) {
+				e.printStackTrace();
 				ErrorMsg.addErrorMessage(e);
 			}
 		}
 		// PrintImage.printImage(arrayRGB, w, h);
 		//
-		ImageOperation save = new ImageOperation(arrayRGB, w, h);
+		// ImageOperation save = new ImageOperation(arrayRGB, w, h);
 		// save.rotate(3);
-		save.saveImage("/Users/entzian/Desktop/sechsteBild.png");
+		// save.saveImage("/Users/entzian/Desktop/sechsteBild.png");
 
 		closingOpening(w, h, arrayRGB, rgbArrayOriginal, iBackgroundFill, limg, 1);
 
@@ -413,9 +391,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		}
 		// PrintImage.printImage(rgbArray, w, h);
 		//
-		ImageOperation save = new ImageOperation(rgbArray, w, h);
+		// ImageOperation save = new ImageOperation(rgbArray, w, h);
 		// save.rotate(3);
-		save.saveImage("/Users/entzian/Desktop/siebenteBild.png");
+		// save.saveImage("/Users/entzian/Desktop/siebenteBild.png");
 		//
 		// PrintImage.printImage(rgbArray, w, h);
 
@@ -437,8 +415,10 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			}
 		}
 
+		boolean useVariant1 = true, useVariant2 = false, useVariant3 = false;
+
 		// Variante 1
-		{
+		if (useVariant1) {
 			PixelSegmentation ps = new PixelSegmentation(image);
 			ps.doPixelSegmentation(1);
 
@@ -474,12 +454,12 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					// clusterCircleSimilarity[clusterID]);
 				}
 			}
-			PrintImage.printImage(rgbArray, w, h);
+			// PrintImage.printImage(rgbArray, w, h);
 
 		}
 
 		// Variante 2
-		{
+		if (useVariant2) {
 
 			PixelSegmentation ps = new PixelSegmentation(image);
 			ps.doPixelSegmentation(2);
@@ -516,12 +496,12 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					// clusterCircleSimilarity[clusterID]);
 				}
 			}
-			PrintImage.printImage(rgbArray, w, h);
+			PrintImage.printImage(rgbArray, w, h, "variante 2");
 
 		}
 
 		// Variante 3
-		{
+		if (useVariant3) {
 			PixelSegmentation ps = new PixelSegmentation(image);
 			ps.doPixelSegmentation(3);
 
@@ -558,7 +538,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				}
 			}
 
-			PrintImage.printImage(rgbArray, w, h);
+			PrintImage.printImage(rgbArray, w, h, "variante 3");
 
 		}
 	}

@@ -87,6 +87,7 @@ public class RimasNav {
 		NavigationButton rimas = WebFolder.getBrowserNavigationEntity(rimasDoku, "RIMAS", "img/rimas.png",
 							"http://rimas.ipk-gatersleben.de/Pathways/", "Website", "img/browser.png",
 							"http://rimas.ipk-gatersleben.de/", new String[] { ".gml", ".graphml" }, getIntroTxt(), null, guiSetting);
+
 		return rimas;
 	}
 
