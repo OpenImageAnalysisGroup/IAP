@@ -9,13 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
-import org.ErrorMsg;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
@@ -202,57 +196,41 @@ public class PhytochamberTopImageProcessor {
 	private PhytochamberTopImageProcessor clearBackground(final int maxThreadsPerImage) {
 		StopWatch w = debugStart("clearBackground");
 
-		@SuppressWarnings("rawtypes")
-		Collection jobs = new ArrayList();
-
-		jobs.add(new Callable<FlexibleImage>() {
+		final FlexibleImageSet res = new FlexibleImageSet();
+		BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
-			public FlexibleImage call() throws Exception {
+			public void run() {
 				BufferedImage clearNirImage = clearBackground(input.getNir().getBufferedImage(),
 									ImageConfiguration.NirTop,
 									options.getNearEpsilonA(), options.getNearEpsilonB(), maxThreadsPerImage);
-				return new FlexibleImage(clearNirImage, FlexibleImageType.NIR);
+				res.set(new FlexibleImage(clearNirImage, FlexibleImageType.NIR));
 			}
-		});
-		jobs.add(new Callable<FlexibleImage>() {
+		}, "clear NIR", 0);
+		BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
-			public FlexibleImage call() throws Exception {
+			public void run() {
 				BufferedImage clrearRgbImage = clearBackground(input.getVis().getBufferedImage(),
 									ImageConfiguration.RgbTop,
 									options.getRgbEpsilonA(), options.getRgbEpsilonB(), maxThreadsPerImage);
-				return new FlexibleImage(clrearRgbImage, FlexibleImageType.VIS);
+				res.set(new FlexibleImage(clrearRgbImage, FlexibleImageType.VIS));
 			}
-		});
-		jobs.add(new Callable<FlexibleImage>() {
+		}, "clear RGB", 0);
+		BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
-			public FlexibleImage call() throws Exception {
+			public void run() {
 				BufferedImage clearFluorImage = clearBackground(input.getFluo().getBufferedImage(),
 									ImageConfiguration.FluoTop,
 									options.getFluoEpsilonA(), options.getFluoEpsilonB(), maxThreadsPerImage);
-				return new FlexibleImage(clearFluorImage, FlexibleImageType.FLUO);
+				res.set(new FlexibleImage(clearFluorImage, FlexibleImageType.FLUO));
 			}
-		});
+		}, "clear FLUO", 0);
 
-		try {
-			FlexibleImageSet res = new FlexibleImageSet();
-			List<Future<FlexibleImage>> result = BackgroundThreadDispatcher.invokeAll(jobs);
-			for (Future<FlexibleImage> r : result) {
-				try {
-					res.set(r.get());
-				} catch (ExecutionException e) {
-					ErrorMsg.addErrorMessage(e);
-					e.printStackTrace();
-				}
-			}
-			debugEnd(w);
-			PhytochamberTopImageProcessor rrr = new PhytochamberTopImageProcessor(res);
-			input = null;
-			return rrr;
-		} catch (InterruptedException e) {
-			ErrorMsg.addErrorMessage(e);
-			e.printStackTrace();
-			return null;
-		}
+		res.waitForThreeImages();
+
+		debugEnd(w);
+		PhytochamberTopImageProcessor rrr = new PhytochamberTopImageProcessor(res);
+		input = null;
+		return rrr;
 	}
 
 	public void debugOverlayImages() {

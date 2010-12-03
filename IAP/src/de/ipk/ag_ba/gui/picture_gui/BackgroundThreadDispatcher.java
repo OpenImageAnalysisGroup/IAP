@@ -1,17 +1,3 @@
-/*******************************************************************************
- * The DBE2 Add-on is (c) 2009-2010 Plant Bioinformatics Group, IPK Gatersleben,
- * http://bioinformatics.ipk-gatersleben.de
- * The source code for this project which is developed by our group is available
- * under the GPL license v2.0 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
- * By using this Add-on and VANTED you need to accept the terms and conditions of
- * this license, the below stated disclaimer of warranties and the licenses of the used
- * libraries. For further details see license.txt in the root folder of this project.
- ******************************************************************************/
-/*
- * Created on 02.04.2004
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
- */
 package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.event.ActionEvent;
@@ -40,8 +26,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas
- *         To change the template for this generated type comment go to Window -
- *         Preferences - Java - Code Generation - Code and Comments
  */
 public class BackgroundThreadDispatcher {
 	Stack<Thread> todo = new Stack<Thread>();
@@ -57,6 +41,7 @@ public class BackgroundThreadDispatcher {
 
 	private Thread sheduler = null;
 	private StatusDisplay frame;
+	private static ArrayList<Thread> waitThreads = new ArrayList<Thread>();
 
 	public static void setFrameInstance(StatusDisplay mainFrame) {
 		synchronized (myInstance) {
@@ -64,6 +49,10 @@ public class BackgroundThreadDispatcher {
 				myInstance = new BackgroundThreadDispatcher();
 			myInstance.frame = mainFrame;
 		}
+	}
+
+	public static Thread addTask(Runnable r, String name, int userPriority) {
+		return addTask(new Thread(r, name), userPriority);
 	}
 
 	public static Thread addTask(Thread t, int userPriority) {
@@ -80,9 +69,9 @@ public class BackgroundThreadDispatcher {
 	}
 
 	/**
-	 * Get the number of running+sheduled tasks.
+	 * Get the number of running+scheduled tasks.
 	 * 
-	 * @return Number of sheduled+number of running tasks;
+	 * @return Number of scheduled+number of running tasks;
 	 */
 	public static int getWorkLoad() {
 		return myInstance.getCountSheduledTasks() + myInstance.getCurrentRunningTasks();
@@ -106,7 +95,7 @@ public class BackgroundThreadDispatcher {
 					toBeRemoved.add(t);
 			}
 			for (Iterator<Thread> it = toBeRemoved.iterator(); it.hasNext();)
-				runningTasks.remove(it.next());
+				myRemove(it.next());
 			load = runningTasks.size();
 		}
 		return load;
@@ -142,6 +131,9 @@ public class BackgroundThreadDispatcher {
 					msg = "";
 				if (frame != null && frame.getTitle().indexOf(projectLoading) == -1)
 					frame.setTitle(msg.trim());
+				else
+					if (frame == null && indicator % 2 == 0 && msg.trim().length() > 0)
+						System.out.println(msg.trim());
 			}
 		});
 		t.start();
@@ -150,7 +142,7 @@ public class BackgroundThreadDispatcher {
 			public void run() {
 				while (true) {
 					try {
-						Thread.sleep(Integer.MAX_VALUE);
+						Thread.sleep(50);
 					} catch (InterruptedException e) {
 						// PictureGUI.showError("Background thread dispatcher was interrupted.",
 						// e);
@@ -180,11 +172,14 @@ public class BackgroundThreadDispatcher {
 								}
 							}
 						}
+						int blocked = 0;
 						if (t != null) {
 							t.setPriority(Thread.MIN_PRIORITY);
 							t.start();
 							synchronized (runningTasks) {
 								runningTasks.add(t);
+								if (t.isInterrupted())
+									blocked++;
 							}
 						}
 						// wait until the number of running tasks gets below the
@@ -193,7 +188,7 @@ public class BackgroundThreadDispatcher {
 						// in case there is a higher priority task waiting
 						// (higher than all running tasks) then the loop is
 						// stopped, it can run, too
-						while (runningTasks.size() >= maxTask) {
+						while (runningTasks.size() - blocked >= maxTask) {
 							int highestRunningPrio = Integer.MIN_VALUE;
 							try {
 								Thread.sleep(5);
@@ -206,7 +201,7 @@ public class BackgroundThreadDispatcher {
 								for (int i = 0; i < runningTasks.size(); i++) {
 									Thread rt = runningTasks.get(i);
 									if (!rt.isAlive()) {
-										runningTasks.remove(rt);
+										myRemove(rt);
 										i--;
 									} else {
 										int thisPrio = Integer.parseInt(rt.getName());
@@ -233,57 +228,94 @@ public class BackgroundThreadDispatcher {
 		sheduler.start();
 	}
 
-	private static final ThreadSafeOptions tso = new ThreadSafeOptions();
-
-	private static ExecutorService execSvc = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
-		@Override
-		public Thread newThread(Runnable arg0) {
-			Thread t = new Thread(arg0);
-			t.setName("BackgroundThread " + tso.getNextLong());
-			return t;
+	protected void myRemove(Thread rt) {
+		synchronized (runningTasks) {
+			runningTasks.remove(rt);
 		}
-	});
-
-	public static ExecutorService getExecutorService() {
-		return execSvc;
+		synchronized (waitThreads) {
+			for (Thread t : waitThreads)
+				t.interrupt();
+		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public static List<Future<FlexibleImage>> invokeAll(Collection jobs) throws InterruptedException {
-		return invokeAll(execSvc, jobs);
-	}
-
-	private static <T> List<Future<T>> invokeAll(
-						ExecutorService threadPool, Collection<Callable<T>> tasks)
-						throws InterruptedException {
-		if (tasks == null)
-			throw new NullPointerException();
-		List<Future<T>> futures = new ArrayList<Future<T>>(tasks.size());
-		boolean done = false;
+	public static void waitFor(Thread[] threads) {
 		try {
-			for (Callable<T> t : tasks) {
-				FutureTask<T> f = new FutureTask<T>(t);
-				futures.add(f);
-				threadPool.execute(f);
+			synchronized (waitThreads) {
+				waitThreads.add(Thread.currentThread());
 			}
-			// force unstarted futures to execute using the current thread
-			for (Future<T> f : futures)
-				((FutureTask) f).run();
-			for (Future<T> f : futures) {
-				if (!f.isDone()) {
-					try {
-						f.get();
-					} catch (CancellationException ignore) {
-					} catch (ExecutionException ignore) {
+			boolean oneRunning = false;
+			do {
+				for (Thread t : threads) {
+					if (t.getState() != Thread.State.TERMINATED) {
+						oneRunning = true;
+						break;
 					}
 				}
-			}
-			done = true;
-			return futures;
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// empty
+				}
+			} while (oneRunning);
 		} finally {
-			if (!done)
-				for (Future<T> f : futures)
-					f.cancel(true);
+			synchronized (waitThreads) {
+				waitThreads.remove(Thread.currentThread());
+			}
 		}
 	}
+
+	// private static final ThreadSafeOptions tso = new ThreadSafeOptions();
+	//
+	// private static ExecutorService execSvc = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
+	// @Override
+	// public Thread newThread(Runnable arg0) {
+	// Thread t = new Thread(arg0);
+	// t.setName("BackgroundThread " + tso.getNextLong());
+	// return t;
+	// }
+	// });
+	//
+	// public static ExecutorService getExecutorService() {
+	// return execSvc;
+	// }
+	//
+	// @SuppressWarnings("unchecked")
+	// public static List<Future<FlexibleImage>> invokeAll(Collection jobs) throws InterruptedException {
+	// return invokeAll(execSvc, jobs);
+	// }
+	//
+	// private static <T> List<Future<T>> invokeAll(
+	// ExecutorService threadPool, Collection<Callable<T>> tasks)
+	// throws InterruptedException {
+	// if (tasks == null)
+	// throw new NullPointerException();
+	// List<Future<T>> futures = new ArrayList<Future<T>>(tasks.size());
+	// boolean done = false;
+	// try {
+	// for (Callable<T> t : tasks) {
+	// FutureTask<T> f = new FutureTask<T>(t);
+	// futures.add(f);
+	// threadPool.execute(f);
+	// }
+	// // force unstarted futures to execute using the current thread
+	// for (Future<T> f : futures)
+	// ((FutureTask) f).run();
+	// for (Future<T> f : futures) {
+	// if (!f.isDone()) {
+	// try {
+	// f.get();
+	// } catch (CancellationException ignore) {
+	// } catch (ExecutionException ignore) {
+	// }
+	// }
+	// }
+	// done = true;
+	// return futures;
+	// } finally {
+	// if (!done)
+	// for (Future<T> f : futures)
+	// f.cancel(true);
+	// }
+	// }
+	//
 }
