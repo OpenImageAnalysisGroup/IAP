@@ -178,10 +178,11 @@ public class BackgroundThreadDispatcher {
 							t.start();
 							synchronized (runningTasks) {
 								runningTasks.add(t);
-								if (t.isInterrupted())
+								if (!(t.getState()==Thread.State.RUNNABLE))
 									blocked++;
 							}
 						}
+						System.out.println("Blocked: "+blocked);
 						// wait until the number of running tasks gets below the
 						// maximum
 						// then a new one can be started above

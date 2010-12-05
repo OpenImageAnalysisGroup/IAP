@@ -205,7 +205,7 @@ public class PhytochamberTopImageProcessor {
 									options.getNearEpsilonA(), options.getNearEpsilonB(), maxThreadsPerImage);
 				res.set(new FlexibleImage(clearNirImage, FlexibleImageType.NIR));
 			}
-		}, "clear NIR", 0);
+		}, "clear NIR", 1);
 		BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
@@ -214,7 +214,7 @@ public class PhytochamberTopImageProcessor {
 									options.getRgbEpsilonA(), options.getRgbEpsilonB(), maxThreadsPerImage);
 				res.set(new FlexibleImage(clrearRgbImage, FlexibleImageType.VIS));
 			}
-		}, "clear RGB", 0);
+		}, "clear RGB", 1);
 		BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
@@ -223,7 +223,7 @@ public class PhytochamberTopImageProcessor {
 									options.getFluoEpsilonA(), options.getFluoEpsilonB(), maxThreadsPerImage);
 				res.set(new FlexibleImage(clearFluorImage, FlexibleImageType.FLUO));
 			}
-		}, "clear FLUO", 0);
+		}, "clear FLUO", 1);
 
 		res.waitForThreeImages();
 

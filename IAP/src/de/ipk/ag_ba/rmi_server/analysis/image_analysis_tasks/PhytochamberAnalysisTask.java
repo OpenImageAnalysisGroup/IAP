@@ -161,7 +161,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 					status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + wl);
 				}
-			}, "process image " + idxxx, -100);
+			}, "process image " + idxxx, -1);
 			wait.add(t);
 
 		}
@@ -182,7 +182,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				output.addAll(res);
 				output.add(imageRef);
 			}
-		}, "statistic image analysis", 0);
+		}, "statistic image analysis", 4);
 	}
 
 	private void load(final ImageData id, final FlexibleImageSet input, final FlexibleImageType type) {
