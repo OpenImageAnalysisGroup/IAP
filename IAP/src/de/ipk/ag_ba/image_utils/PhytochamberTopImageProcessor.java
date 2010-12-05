@@ -197,15 +197,20 @@ public class PhytochamberTopImageProcessor {
 		StopWatch w = debugStart("clearBackground");
 
 		final FlexibleImageSet res = new FlexibleImageSet();
-		MyThread a = BackgroundThreadDispatcher.addTask(new Runnable() {
-			@Override
-			public void run() {
-				BufferedImage clearNirImage = clearBackground(input.getNir().getBufferedImage(),
-									ImageConfiguration.NirTop,
-									options.getNearEpsilonA(), options.getNearEpsilonB(), maxThreadsPerImage);
-				res.set(new FlexibleImage(clearNirImage, FlexibleImageType.NIR));
-			}
-		}, "clear NIR", 1);
+		boolean clearFluo = false;
+		MyThread a = null;
+		if (!clearFluo)
+			res.set(new FlexibleImage(input.getNir().getBufferedImage(), FlexibleImageType.NIR));
+		else
+			a = BackgroundThreadDispatcher.addTask(new Runnable() {
+				@Override
+				public void run() {
+					BufferedImage clearNirImage = clearBackground(input.getNir().getBufferedImage(),
+										ImageConfiguration.NirTop,
+										options.getNearEpsilonA(), options.getNearEpsilonB(), maxThreadsPerImage);
+					res.set(new FlexibleImage(clearNirImage, FlexibleImageType.NIR));
+				}
+			}, "clear NIR", 1);
 		MyThread b = BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {

@@ -153,6 +153,8 @@ public class BackgroundThreadDispatcher {
 								if (curPrio == maxPrio) {
 									// use that thread and run it
 									t = todo.get(i);
+									System.out.println("Start thread " + t.getName() + ". blocked: " + waitThreads.size() + ", max run:" + maxTask + ", running: "
+														+ runningTasks.size() + ", todo:" + todo.size());
 									todo.remove(i);
 									Integer prio = todoPriorities.get(i);
 									todoPriorities.remove(i);
@@ -174,7 +176,7 @@ public class BackgroundThreadDispatcher {
 						// in case there is a higher priority task waiting
 						// (higher than all running tasks) then the loop is
 						// stopped, it can run, too
-						while (runningTasks.size() - waitThreads.size() >= maxTask) {
+						while (runningTasks.size() - waitThreads.size() + 1 >= maxTask) {
 							int highestRunningPrio = Integer.MIN_VALUE;
 							try {
 								Thread.sleep(5);
@@ -251,10 +253,9 @@ public class BackgroundThreadDispatcher {
 		} finally {
 			synchronized (waitThreads) {
 				waitThreads.remove(Thread.currentThread());
-				if (Thread.currentThread().getName().contains("wait;"))
-					Thread.currentThread().setName(Thread.currentThread().getName().substring("wait;".length()));
-
 			}
+			if (Thread.currentThread().getName().contains("wait;"))
+				Thread.currentThread().setName(Thread.currentThread().getName().substring("wait;".length()));
 		}
 	}
 
