@@ -203,7 +203,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 						processRowYofImage(limg, w, arrayRGB, arrayRGBnullFF, iBackgroundFill, sidepercent, progress, y,
 												epsilonA, epsilonB, config, arrayL, arrayA, arrayB).run();
 					}
-				}, "process row " + y, 0);
+				}, "process row " + y, 3);
 				wait.add(t);
 			} else
 				processRowYofImage(limg, w, arrayRGB, arrayRGBnull, iBackgroundFill, sidepercent, progress, y, epsilonA,
