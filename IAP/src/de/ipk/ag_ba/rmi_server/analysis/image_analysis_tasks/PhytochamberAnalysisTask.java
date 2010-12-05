@@ -14,6 +14,7 @@ import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image_utils.FlexibleImage;
 import de.ipk.ag_ba.image_utils.FlexibleImageSet;
 import de.ipk.ag_ba.image_utils.FlexibleImageType;
@@ -69,7 +70,6 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		return "Analyse Plants Phenotype";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
@@ -125,35 +125,36 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 
 						final FlexibleImageSet input = new FlexibleImageSet();
 
+						MyThread a = null, b = null, c = null;
+
 						if (vis instanceof LoadedImage) {
 							input.setVis(new FlexibleImage(((LoadedImage) vis).getLoadedImage()));
 						} else {
-							load(vis, input, FlexibleImageType.VIS);
+							a = load(vis, input, FlexibleImageType.VIS);
 						}
 						if (fluo instanceof LoadedImage) {
 							input.setFluo(new FlexibleImage(((LoadedImage) fluo).getLoadedImage()));
 						} else {
-							load(fluo, input, FlexibleImageType.FLUO);
+							b = load(fluo, input, FlexibleImageType.FLUO);
 						}
 						if (nir instanceof LoadedImage) {
 							input.setFluo(new FlexibleImage(((LoadedImage) nir).getLoadedImage()));
 						} else {
-							load(nir, input, FlexibleImageType.NIR);
+							c = load(nir, input, FlexibleImageType.NIR);
 						}
 						// process images
-						input.waitForThreeImages();
+						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages()) {
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(input);
 							final FlexibleImageSet pipelineResult = ptip.pipeline(maximumThreadCountOnImageLevel).getImages();
 
-							Thread a = statisticalAnalaysis(vis, pipelineResult.getVis());
-							Thread b = statisticalAnalaysis(fluo, pipelineResult.getFluo());
-							Thread c = statisticalAnalaysis(nir, pipelineResult.getNir());
-							BackgroundThreadDispatcher.waitFor(new Thread[] { a, b, c });
+							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
+							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
+							MyThread g = statisticalAnalaysis(nir, pipelineResult.getNir());
+							BackgroundThreadDispatcher.waitFor(new MyThread[] { e, f, g });
 						} else {
 							System.err.println("Warning: not all three image types available for snapshot!");
 						}
-
 					} catch (Exception e) {
 						ErrorMsg.addErrorMessage(e);
 					}
@@ -162,17 +163,18 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 					status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + wl);
 				}
 			}, "process image " + idxxx, -1);
+			idxxx++;
 			wait.add(t);
 
 		}
 
-		BackgroundThreadDispatcher.waitFor(wait.toArray(new Thread[] {}));
+		BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
 
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
 
-	private Thread statisticalAnalaysis(final ImageData id, final FlexibleImage image) {
+	private MyThread statisticalAnalaysis(final ImageData id, final FlexibleImage image) {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
@@ -185,15 +187,17 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		}, "statistic image analysis", 4);
 	}
 
-	private void load(final ImageData id, final FlexibleImageSet input, final FlexibleImageType type) {
-		BackgroundThreadDispatcher.addTask(new Runnable() {
+	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageType type) {
+		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
+				System.out.println("Load Image");
 				try {
 					input.set(new FlexibleImage(IOmodule.loadImageFromFileOrMongo(id, login, pass).getLoadedImage(), type));
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
+				System.out.println("Finished Load Image");
 			}
 		}, "load " + type.name(), 0);
 	}

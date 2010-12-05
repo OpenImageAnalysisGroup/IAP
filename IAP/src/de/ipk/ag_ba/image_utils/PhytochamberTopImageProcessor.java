@@ -15,6 +15,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.mongo.MongoDBhandler;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
@@ -192,12 +193,11 @@ public class PhytochamberTopImageProcessor {
 	 *           The set of input images (RGB images).
 	 * @return A set of images which may be used as a mask.
 	 */
-	@SuppressWarnings("unchecked")
 	private PhytochamberTopImageProcessor clearBackground(final int maxThreadsPerImage) {
 		StopWatch w = debugStart("clearBackground");
 
 		final FlexibleImageSet res = new FlexibleImageSet();
-		BackgroundThreadDispatcher.addTask(new Runnable() {
+		MyThread a = BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
 				BufferedImage clearNirImage = clearBackground(input.getNir().getBufferedImage(),
@@ -206,7 +206,7 @@ public class PhytochamberTopImageProcessor {
 				res.set(new FlexibleImage(clearNirImage, FlexibleImageType.NIR));
 			}
 		}, "clear NIR", 1);
-		BackgroundThreadDispatcher.addTask(new Runnable() {
+		MyThread b = BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
 				BufferedImage clrearRgbImage = clearBackground(input.getVis().getBufferedImage(),
@@ -215,7 +215,7 @@ public class PhytochamberTopImageProcessor {
 				res.set(new FlexibleImage(clrearRgbImage, FlexibleImageType.VIS));
 			}
 		}, "clear RGB", 1);
-		BackgroundThreadDispatcher.addTask(new Runnable() {
+		MyThread c = BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
 				BufferedImage clearFluorImage = clearBackground(input.getFluo().getBufferedImage(),
@@ -225,7 +225,7 @@ public class PhytochamberTopImageProcessor {
 			}
 		}, "clear FLUO", 1);
 
-		res.waitForThreeImages();
+		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 
 		debugEnd(w);
 		PhytochamberTopImageProcessor rrr = new PhytochamberTopImageProcessor(res);

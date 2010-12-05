@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.Callable;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -16,6 +15,7 @@ import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image_utils.MorphologicalOperators;
 import de.ipk.ag_ba.image_utils.PixelSegmentation;
 import de.ipk.ag_ba.image_utils.PrintImage;
@@ -193,11 +193,11 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		final ObjectRef progress = new ObjectRef("", new Integer(0));
 
 		final int[] arrayRGBnullFF = arrayRGBnull;
-		ArrayList<Thread> wait = new ArrayList<Thread>();
+		ArrayList<MyThread> wait = new ArrayList<MyThread>();
 		for (int ty = h - 1; ty >= 0; ty--) {
 			final int y = ty;
 			if (maximumThreadCount > 1) {
-				Thread t = BackgroundThreadDispatcher.addTask(new Runnable() {
+				MyThread t = BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
 						processRowYofImage(limg, w, arrayRGB, arrayRGBnullFF, iBackgroundFill, sidepercent, progress, y,
@@ -211,7 +211,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		}
 
 		if (maximumThreadCount > 1) {
-			BackgroundThreadDispatcher.waitFor(wait.toArray(new Thread[] {}));
+			BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
 		}
 		// PrintImage.printImage(arrayRGB, w, h);
 		//

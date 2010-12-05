@@ -201,7 +201,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				downloadNeeded = false;
 				setProgressValue(0);
 				showProgressbar();
-				Thread download = new Thread(new Runnable() {
+				MyThread download = new MyThread(new Runnable() {
 					public void run() {
 						downloadInProgress = true;
 						final File tf;
@@ -268,7 +268,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							}
 						});
 					}
-				});
+				}, "database download");
 				BackgroundThreadDispatcher.addTask(download, 1);
 			} else
 				if (downloadInProgress) {

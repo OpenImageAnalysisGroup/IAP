@@ -119,7 +119,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		final Object data = data0;
 
 		if (data != null) {
-			Thread t = new Thread(new Runnable() {
+			MyThread t = new MyThread(new Runnable() {
 				public void run() {
 					for (int i = 0; i < ((java.util.List) data).size(); i++) {
 						File file = (File) ((java.util.List) data).get(i);
@@ -135,10 +135,10 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					}
 					tso.setBval(0, true); // finished
 				}
-			});
+			}, "process dropped files");
 			BackgroundThreadDispatcher.addTask(t, 1);
 		}
-		Thread t = new Thread(new Runnable() {
+		MyThread t = new MyThread(new Runnable() {
 
 			public void run() {
 				if (s != null) {
@@ -163,7 +163,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					tso.setBval(0, true); // finished
 				}
 			}
-		});
+		}, "add image to database");
 		BackgroundThreadDispatcher.addTask(t, 1);
 		e.dropComplete(true);
 	}
@@ -181,7 +181,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 			panel.getScrollpane().validate();
 		}
 
-		Thread t = new Thread(new Runnable() {
+		MyThread t = new MyThread(new Runnable() {
 			public void run() {
 				MyImageIcon iconA;
 				BinaryFileInfo bif = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode
@@ -230,7 +230,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 				if (deleteUponCompletion)
 					file.delete();
 			}
-		});
+		}, "store image in database");
 		BackgroundThreadDispatcher.addTask(t, -1);
 	}
 
