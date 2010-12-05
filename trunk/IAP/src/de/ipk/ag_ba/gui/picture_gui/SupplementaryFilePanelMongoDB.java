@@ -67,7 +67,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 			final File files[] = fc.getSelectedFiles();
 
 			try {
-				Thread writeThread = new Thread(new Runnable() {
+				MyThread writeThread = new MyThread(new Runnable() {
 					public void run() {
 
 						for (int i = 0; i < files.length; i++) {
@@ -79,7 +79,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 						}
 
 					}
-				});
+				}, "database write thread");
 				writeThread.setPriority(Thread.MIN_PRIORITY);
 				BackgroundThreadDispatcher.addTask(writeThread, -1);
 			} catch (Exception err) {

@@ -71,13 +71,13 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		if (projectNode != null) {
 			projectNode.updateSizeInfo(user, pass, dataChangedListener);
 		} else {
-			Thread infoThread = new Thread(new Runnable() {
+			MyThread infoThread = new MyThread(new Runnable() {
 				public void run() {
 					getCurrentProjectSize(user, pass);
 					if (dataChangedListener != null)
 						dataChangedListener.actionPerformed(null);
 				}
-			});
+			}, "determine project node size");
 			infoThread.setPriority(Thread.MIN_PRIORITY);
 			BackgroundThreadDispatcher.addTask(infoThread, 1);
 		}

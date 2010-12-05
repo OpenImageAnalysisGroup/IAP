@@ -159,11 +159,11 @@ public class DataExchangeHelperForExperiments {
 
 	public static void fillFilePanel(final DataSetFilePanel filePanel, final MongoTreeNode mtdbe, final JTree expTree,
 						final String login, final String password) {
-		Thread r = new Thread(new Runnable() {
+		MyThread r = new MyThread(new Runnable() {
 			public void run() {
 				addFilesToPanel(filePanel, mtdbe, expTree, login, password);
 			}
-		});
+		}, "add files to panel");
 		BackgroundThreadDispatcher.addTask(r, 0);
 	}
 
@@ -249,7 +249,7 @@ public class DataExchangeHelperForExperiments {
 				}
 			}
 
-			final ArrayList<Thread> executeLater = new ArrayList<Thread>();
+			final ArrayList<MyThread> executeLater = new ArrayList<MyThread>();
 			BinaryFileInfo lastBBB = null;
 			if (bbb.size() > 0)
 				lastBBB = bbb.get(bbb.size() - 1);
@@ -303,7 +303,7 @@ public class DataExchangeHelperForExperiments {
 	}
 
 	private static Runnable processIcon(final DataSetFilePanel filePanel, final MongoTreeNode mt, final JTree expTree,
-						final StopObject stop, final ArrayList<Thread> executeLater, final BinaryFileInfo binaryFileInfo,
+						final StopObject stop, final ArrayList<MyThread> executeLater, final BinaryFileInfo binaryFileInfo,
 						final DataSetFileButton imageButton, final boolean previewLoadAndConstructNeededF, final boolean fIsLast) {
 		return new Runnable() {
 			public void run() {
@@ -315,7 +315,7 @@ public class DataExchangeHelperForExperiments {
 					filePanel.repaint();
 					filePanel.getScrollpane().validate();
 					if (previewLoadAndConstructNeededF) {
-						Thread t = new Thread(new Runnable() {
+						MyThread t = new MyThread(new Runnable() {
 							@Override
 							public void run() {
 								if (mt == expTree.getSelectionPath().getLastPathComponent()) {
@@ -339,7 +339,7 @@ public class DataExchangeHelperForExperiments {
 									}
 								}
 							}
-						});
+						}, "preview load and construct");
 						executeLater.add(t);
 
 					}
@@ -348,7 +348,7 @@ public class DataExchangeHelperForExperiments {
 						public void run() {
 							boolean isLast = fIsLast;
 							if (isLast)
-								for (Thread ttt : executeLater)
+								for (MyThread ttt : executeLater)
 									BackgroundThreadDispatcher.addTask(ttt, -1);
 						}
 					});

@@ -3,32 +3,20 @@ package de.ipk.ag_ba.gui.picture_gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Stack;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ThreadFactory;
 
 import javax.swing.Timer;
 
-import org.graffiti.plugin.algorithm.ThreadSafeOptions;
-
-import de.ipk.ag_ba.image_utils.FlexibleImage;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas
  */
 public class BackgroundThreadDispatcher {
-	Stack<Thread> todo = new Stack<Thread>();
+	Stack<MyThread> todo = new Stack<MyThread>();
 	Stack<Integer> todoPriorities = new Stack<Integer>();
 	LinkedList<Thread> runningTasks = new LinkedList<Thread>();
 	int maxTask = SystemAnalysis.getNumberOfCPUs();
@@ -41,7 +29,7 @@ public class BackgroundThreadDispatcher {
 
 	private Thread sheduler = null;
 	private StatusDisplay frame;
-	private static ArrayList<Thread> waitThreads = new ArrayList<Thread>();
+	private static HashSet<Thread> waitThreads = new HashSet<Thread>();
 
 	public static void setFrameInstance(StatusDisplay mainFrame) {
 		synchronized (myInstance) {
@@ -51,11 +39,12 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 
-	public static Thread addTask(Runnable r, String name, int userPriority) {
-		return addTask(new Thread(r, name), userPriority);
+	public static MyThread addTask(Runnable r, String name, int userPriority) {
+		return addTask(new MyThread(r, name), userPriority);
 	}
 
-	public static Thread addTask(Thread t, int userPriority) {
+	public static MyThread addTask(MyThread t, int userPriority) {
+		System.out.println("Add task " + t.getName() + ", Priority: " + userPriority);
 		synchronized (myInstance) {
 			if (myInstance == null)
 				myInstance = new BackgroundThreadDispatcher();
@@ -131,9 +120,9 @@ public class BackgroundThreadDispatcher {
 					msg = "";
 				if (frame != null && frame.getTitle().indexOf(projectLoading) == -1)
 					frame.setTitle(msg.trim());
-				else
-					if (frame == null && indicator % 2 == 0 && msg.trim().length() > 0)
-						System.out.println(msg.trim());
+				// else
+				// if (frame == null && indicator % 2 == 0 && msg.trim().length() > 0)
+				// System.out.println(msg.trim());
 			}
 		});
 		t.start();
@@ -158,8 +147,8 @@ public class BackgroundThreadDispatcher {
 								if (curPrio > maxPrio)
 									maxPrio = curPrio;
 							}
-							// search first thread with maximum priority
-							for (int i = 0; i < todo.size(); i++) {
+							// search newest thread with maximum priority
+							for (int i = todo.size() - 1; i >= 0; i--) {
 								int curPrio = (todoPriorities.get(i)).intValue();
 								if (curPrio == maxPrio) {
 									// use that thread and run it
@@ -167,29 +156,25 @@ public class BackgroundThreadDispatcher {
 									todo.remove(i);
 									Integer prio = todoPriorities.get(i);
 									todoPriorities.remove(i);
-									t.setName(prio.toString());
+									t.setName(t.getName() + ", priority:" + prio.toString());
 									break;
 								}
 							}
 						}
-						int blocked = 0;
 						if (t != null) {
 							t.setPriority(Thread.MIN_PRIORITY);
 							t.start();
 							synchronized (runningTasks) {
 								runningTasks.add(t);
-								if (!(t.getState()==Thread.State.RUNNABLE))
-									blocked++;
 							}
 						}
-						System.out.println("Blocked: "+blocked);
 						// wait until the number of running tasks gets below the
 						// maximum
 						// then a new one can be started above
 						// in case there is a higher priority task waiting
 						// (higher than all running tasks) then the loop is
 						// stopped, it can run, too
-						while (runningTasks.size() - blocked >= maxTask) {
+						while (runningTasks.size() - waitThreads.size() >= maxTask) {
 							int highestRunningPrio = Integer.MIN_VALUE;
 							try {
 								Thread.sleep(5);
@@ -205,7 +190,7 @@ public class BackgroundThreadDispatcher {
 										myRemove(rt);
 										i--;
 									} else {
-										int thisPrio = Integer.parseInt(rt.getName());
+										int thisPrio = Integer.parseInt(rt.getName().substring(rt.getName().indexOf(":") + ":".length()));
 										if (thisPrio > highestRunningPrio)
 											highestRunningPrio = thisPrio;
 									}
@@ -239,15 +224,20 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 
-	public static void waitFor(Thread[] threads) {
+	public static void waitFor(MyThread[] threads) {
 		try {
+			if (!Thread.currentThread().getName().contains("wait;"))
+				Thread.currentThread().setName("wait;" + Thread.currentThread().getName());
 			synchronized (waitThreads) {
 				waitThreads.add(Thread.currentThread());
 			}
-			boolean oneRunning = false;
+			boolean oneRunning;
 			do {
-				for (Thread t : threads) {
-					if (t.getState() != Thread.State.TERMINATED) {
+				oneRunning = false;
+				for (MyThread t : threads) {
+					if (t == null)
+						continue;
+					if (!t.isFinished()) {
 						oneRunning = true;
 						break;
 					}
@@ -261,6 +251,9 @@ public class BackgroundThreadDispatcher {
 		} finally {
 			synchronized (waitThreads) {
 				waitThreads.remove(Thread.currentThread());
+				if (Thread.currentThread().getName().contains("wait;"))
+					Thread.currentThread().setName(Thread.currentThread().getName().substring("wait;".length()));
+
 			}
 		}
 	}
