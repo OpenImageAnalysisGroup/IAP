@@ -81,7 +81,7 @@ public class MongoDB {
 	}
 
 	private String defaultDBE = "dbe3";
-	private String defaultHost = "localhost";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
+	private String defaultHost = "ba-13";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
 	// "ba-13.ipk-gatersleben.de:27017,nw-08.ipk-gatersleben.de:27018";
 	private String defaultLogin = null;
 	private String defaultPass = null;
