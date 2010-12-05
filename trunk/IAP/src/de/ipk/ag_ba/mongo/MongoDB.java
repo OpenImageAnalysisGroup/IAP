@@ -951,7 +951,7 @@ public class MongoDB {
 
 				@Override
 				public void run() {
-					System.out.println("---");
+//					System.out.println("---");
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
 					for (DBObject dbo : collection.find()) {
