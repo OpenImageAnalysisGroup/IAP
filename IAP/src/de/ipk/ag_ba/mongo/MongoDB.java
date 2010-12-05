@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.Mongo;
@@ -46,6 +48,7 @@ import com.mongodb.gridfs.GridFSInputFile;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
 import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
+import de.ipk.ag_ba.rmi_server.task_management.CloudHost;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -828,24 +831,119 @@ public class MongoDB {
 		}
 	}
 
-	public void batchEnqueue(HashSet<String> targetIPs, String remoteCapableAnalysisActionClassName,
-						String remoteCapableAnalysisActionParams, String experimentInputMongoID) {
-		// add task to "schedule" collection
+	/**
+	 * add task to "schedule" collection
+	 * 
+	 * @throws Exception
+	 */
+	public void batchEnqueue(final BatchCmd cmd) throws Exception {
+		// HashSet<String> targetIPs, String remoteCapableAnalysisActionClassName,
+		// String remoteCapableAnalysisActionParams, String experimentInputMongoID) {
+
+		processDB(new RunnableOnDB() {
+			private DB db;
+
+			@Override
+			public void run() {
+				DBCollection dbc = db.getCollection("schedule");
+				dbc.setObjectClass(BatchCmd.class);
+				dbc.insert(cmd);
+			}
+
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
 	}
 
-	public HashSet<String> batchGetAvailableHosts(final long maxUpdate) {
-		// return list of host names, with no too old ping update time
-		return null;
+	/**
+	 * get list of host names, with not too old ping update time
+	 */
+	public HashSet<String> batchGetAvailableHosts(final long maxUpdate) throws Exception {
+		final HashSet<String> res = new HashSet<String>();
+		final long curr = System.currentTimeMillis();
+		processDB(new RunnableOnDB() {
+			private DB db;
+
+			@Override
+			public void run() {
+				DBCollection dbc = db.getCollection("compute_hosts");
+				dbc.setObjectClass(CloudHost.class);
+
+				DBCursor cursor = dbc.find();
+				while (cursor.hasNext()) {
+					CloudHost h = (CloudHost) cursor.next();
+					// if (curr - h.getLastUpdateTime() < maxUpdate)
+					res.add(h.getHostName());
+				}
+			}
+
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+
+		return res;
 	}
 
-	public void batchPingHost(String ip) {
-		// todo update last update time of named host
+	public synchronized void batchPingHost(final String ip) throws Exception {
+		processDB(new RunnableOnDB() {
+			private DB db;
+
+			@Override
+			public void run() {
+				DBCollection dbc = db.getCollection("compute_hosts");
+				dbc.setObjectClass(CloudHost.class);
+
+				BasicDBObject query = new BasicDBObject();
+				query.put(CloudHost.getHostId(), ip);
+
+				CloudHost res = (CloudHost) dbc.findOne(query);
+				if (res != null) {
+					res.updateTime();
+					dbc.save(res);
+				} else {
+					try {
+						res = new CloudHost();
+						dbc.insert(res);
+					} catch (UnknownHostException e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
+			}
+
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
 	}
 
+	public void batchClearJobs() throws Exception {
+		processDB(new RunnableOnDB() {
+
+			private DB db;
+
+			@Override
+			public void run() {
+				db.getCollection("schedule").drop();
+			}
+
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+	}
+
+	/**
+	 * if a batch lastUpdate time is older then the provided limit, it is
+	 * returned in the result set and will most likely be re-claimed to
+	 * another host
+	 */
 	public Collection<BatchCmd> batchGetCommands(final long maxUpdate) {
-		// if a batch lastUpdate time is older then the provided limit, it is
-		// returned in the result set and will most likely be re-claimed to
-		// another host
 		final Collection<BatchCmd> res = new ArrayList<BatchCmd>();
 		try {
 			processDB(new RunnableOnDB() {
@@ -853,14 +951,16 @@ public class MongoDB {
 
 				@Override
 				public void run() {
+					System.out.println("---");
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
 					for (DBObject dbo : collection.find()) {
 						BatchCmd batch = (BatchCmd) dbo;
-						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED
-											|| ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
-																.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
+						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED)
+							// || ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
+							// .currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
 							res.add(batch);
+						// System.out.println(batch);
 					}
 				}
 
@@ -905,7 +1005,7 @@ public class MongoDB {
 		return res;
 	}
 
-	public void batchClaim(final BatchCmd batch, String systemIP, final CloudAnalysisStatus starting) {
+	public void batchClaim(final BatchCmd batch, final CloudAnalysisStatus starting) {
 		// try to claim a batch cmd
 		try {
 			processDB(new RunnableOnDB() {
@@ -917,10 +1017,12 @@ public class MongoDB {
 					collection.setObjectClass(BatchCmd.class);
 					DBObject dbo = new BasicDBObject();
 					dbo.put("_id", batch.get("_id"));
-					dbo.put("runstatus", batch.getString("runstatus"));
+					String rs = batch.getString("runstatus");
+					dbo.put("runstatus", rs);
 					batch.put("runstatus", starting.toString());
 					batch.put("lastupdate", System.currentTimeMillis());
-					collection.update(dbo, batch, false, false);
+					WriteResult r = collection.update(dbo, batch, false, false);
+					System.out.println("Tried to update status: " + rs + " --> " + starting.toString());
 				}
 
 				@Override

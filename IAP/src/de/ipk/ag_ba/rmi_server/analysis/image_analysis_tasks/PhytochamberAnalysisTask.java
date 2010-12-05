@@ -191,13 +191,13 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("Load Image");
+				// System.out.println("Load Image");
 				try {
 					input.set(new FlexibleImage(IOmodule.loadImageFromFileOrMongo(id, login, pass).getLoadedImage(), type));
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
-				System.out.println("Finished Load Image");
+				// System.out.println("Finished Load Image");
 			}
 		}, "load " + type.name(), 0);
 	}

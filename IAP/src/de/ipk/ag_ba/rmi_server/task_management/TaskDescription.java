@@ -12,7 +12,6 @@ import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -44,8 +43,8 @@ public class TaskDescription {
 		try {
 			analysisActionClassName = cmd.getRemoteCapableAnalysisActionClassName();
 			params = cmd.getRemoteCapableAnalysisActionParams();
-			startTime = cmd.getSubmissionTime();
 			this.experimentInput = experiment;
+			startTime = cmd.getSubmissionTime();
 		} catch (Exception e) {
 			System.out.println("Invalid task-description: " + cmd);
 			analysisActionClassName = null;
@@ -94,14 +93,14 @@ public class TaskDescription {
 			@Override
 			public void run() {
 				// store dataset in mongo
-				System.out.println("Received result:");
-				System.out.println(experiment.toString());
+				// System.out.println(experiment.toString());
 				experiment.getHeader().setExperimentname(
 									cmd + "§" + FthisHostID + "§" + FnumberOfHosts + "§" + experiment.getName());
+				System.out.println("Received result: " + experiment.getName());
 				try {
 					// todo: only store result if batch claim is still valid and
 					// connected to system IP
-					new MongoDB().saveExperiment("dbe3", null, login, pass, experiment, null);
+					// //////// new MongoDB().saveExperiment("dbe3", null, login, pass, experiment, null);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}

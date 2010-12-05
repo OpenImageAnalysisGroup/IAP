@@ -45,6 +45,12 @@ public class ExperimentReference {
 	}
 
 	public ExperimentHeaderInterface getHeader() {
-		return header;
+		if (header == null) {
+			if (experiment != null)
+				return experiment.getHeader();
+			else
+				return null;
+		} else
+			return header;
 	}
 }

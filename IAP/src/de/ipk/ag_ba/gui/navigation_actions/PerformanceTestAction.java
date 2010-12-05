@@ -108,14 +108,14 @@ public class PerformanceTestAction extends AbstractNavigationAction {
 				task.performAnalysis(pi, 1, status);
 				long t2 = System.currentTimeMillis();
 				statRes.addAll(task.getOutput());
-				String ss = "T(s)/PI/TI\t" + ((t2 - t1) / 1000) + "\t" + pi;
-				times.put((t2 - t1), ss);
-				System.out.println("------------------------------------------------------------");
-				System.out.println("--- " + ss);
-				System.out.println("------------------------------------------------------------");
-				for (String s : times.values()) {
-					System.out.println(s);
-				}
+				// String ss = "T(s)/PI/TI\t" + ((t2 - t1) / 1000) + "\t" + pi;
+				// times.put((t2 - t1), ss);
+				// System.out.println("------------------------------------------------------------");
+				// System.out.println("--- " + ss);
+				// System.out.println("------------------------------------------------------------");
+				// for (String s : times.values()) {
+				// System.out.println(s);
+				// }
 			}
 
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();

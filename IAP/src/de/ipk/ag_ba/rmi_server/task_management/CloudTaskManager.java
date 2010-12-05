@@ -40,7 +40,11 @@ public class CloudTaskManager {
 			timerThread = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					CloudTaskManager.this.run();
+					try {
+						CloudTaskManager.this.run();
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
 				}
 			});
 			timerThread.setName("CloudTaskManager (" + (isProcess() ? "active" : "inactive") + ")");
@@ -73,23 +77,30 @@ public class CloudTaskManager {
 		setProcess(false);
 	}
 
-	private void run() {
+	private void run() throws Exception {
 		try {
+			int idx_loop = 0;
 			do {
 				if (CloudTaskManager.this.process) {
-					ArrayList<TaskDescription> commands = new ArrayList<TaskDescription>();
+					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
 					long lastUpdate = 5000;
 					new MongoDB().batchPingHost(ip);
+					boolean claimNew = false;
 					for (BatchCmd batch : new MongoDB().batchGetCommands(lastUpdate)) {
-						if (batch.getTargetIPs().contains(ip)) {
-							new MongoDB().batchClaim(batch, ip, CloudAnalysisStatus.STARTING);
+						if (batch.getExperimentMongoID() != null && batch.getTargetIPs().contains(ip)) {
+							new MongoDB().batchClaim(batch, CloudAnalysisStatus.STARTING);
+							claimNew = true;
 						}
 					}
+					if (claimNew)
+						System.out.println("action!");
 					for (BatchCmd batch : new MongoDB().batchGetWorkTasksScheduledForStart()) {
 						if (batch.getTargetIPs().contains(ip)) {
-							ExperimentHeaderInterface header = new MongoDB().getExperimentHeader(batch.getExperimentMongoID());
-							TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
-							commands.add(task);
+							if (batch.getExperimentMongoID() != null) {
+								ExperimentHeaderInterface header = new MongoDB().getExperimentHeader(batch.getExperimentMongoID());
+								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
+								commands_to_start.add(task);
+							}
 						}
 					}
 					ArrayList<TaskDescription> del = new ArrayList<TaskDescription>();
@@ -104,9 +115,12 @@ public class CloudTaskManager {
 					if (del.size() > 0)
 						runningTasks.removeAll(del);
 
-					for (TaskDescription td : commands) {
+					for (TaskDescription td : commands_to_start) {
 						if (!runningTasks.contains(td)) {
 							try {
+								idx_loop++;
+								System.out.println("loop: " + idx_loop + ", start: " + td.toString() + ", status: " + td.getBatchCmd().getRunStatus());
+								td.getBatchCmd().updateRunningStatus(CloudAnalysisStatus.IN_PROGRESS);
 								runningTasks.add(td);
 								td.startWork(td.getBatchCmd(), hostName, ip, login, pass);
 							} catch (Exception e) {
