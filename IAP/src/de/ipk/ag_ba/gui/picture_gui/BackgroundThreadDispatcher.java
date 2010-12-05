@@ -44,7 +44,7 @@ public class BackgroundThreadDispatcher {
 	}
 
 	public static MyThread addTask(MyThread t, int userPriority) {
-		System.out.println("Add task " + t.getName() + ", Priority: " + userPriority);
+//		System.out.println("Add task " + t.getName() + ", Priority: " + userPriority);
 		synchronized (myInstance) {
 			if (myInstance == null)
 				myInstance = new BackgroundThreadDispatcher();

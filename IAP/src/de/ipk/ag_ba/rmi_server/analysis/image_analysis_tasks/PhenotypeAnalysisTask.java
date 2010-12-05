@@ -192,6 +192,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 		final ObjectRef progress = new ObjectRef("", new Integer(0));
 
+		maximumThreadCount = 1;
+		
 		final int[] arrayRGBnullFF = arrayRGBnull;
 		ArrayList<MyThread> wait = new ArrayList<MyThread>();
 		for (int ty = h - 1; ty >= 0; ty--) {
