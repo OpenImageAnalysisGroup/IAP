@@ -25,9 +25,13 @@ public class RemoteAnalysisRepository {
 
 	public RemoteCapableAnalysisAction getNewAnalysisAction(String analysisActionClassName)
 						throws ClassNotFoundException, InstantiationException, IllegalAccessException, ClassCastException {
-		Object o = Class.forName(analysisActionClassName).newInstance();
-		RemoteCapableAnalysisAction res = (RemoteCapableAnalysisAction) o;
-		return res;
+		System.out.println("Try to start cloud job: " + analysisActionClassName);
+		if (analysisActionClassName != null) {
+			Object o = Class.forName(analysisActionClassName).newInstance();
+			RemoteCapableAnalysisAction res = (RemoteCapableAnalysisAction) o;
+			return res;
+		} else
+			return null;
 	}
 
 }

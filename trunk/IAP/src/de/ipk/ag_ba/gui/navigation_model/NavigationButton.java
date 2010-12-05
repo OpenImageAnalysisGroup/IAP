@@ -45,6 +45,7 @@ import de.ipk.ag_ba.gui.navigation_actions.Calendar2;
 import de.ipk.ag_ba.gui.util.MyUtility;
 import de.ipk.ag_ba.gui.webstart.AIPgui;
 import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.ProgressStatusService;
 
@@ -74,10 +75,9 @@ public class NavigationButton implements StyleAware {
 
 	public NavigationButton(NavigationAction navigationAction, GUIsetting guiSetting) {
 		if (navigationAction != null) {
-			// if (navigationAction instanceof RemoteCapableAnalysisAction) {
-			// navigationAction = new
-			// RemoteExecutionWrapperAction(navigationAction);
-			// }
+			if (navigationAction instanceof RemoteCapableAnalysisAction) {
+				navigationAction = new RemoteExecutionWrapperAction(navigationAction);
+			}
 			this.setTitle(navigationAction.getDefaultTitle());
 			this.navigationImage = navigationAction.getDefaultNavigationImage();
 			this.actionImage = navigationAction.getDefaultImage();

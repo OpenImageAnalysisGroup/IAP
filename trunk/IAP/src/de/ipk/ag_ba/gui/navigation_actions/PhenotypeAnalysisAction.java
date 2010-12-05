@@ -124,9 +124,9 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 				}
 			}
 
-			for (String i : ignored) {
-				System.out.println("Ignored Image Input - Type: " + i);
-			}
+			// for (String i : ignored) {
+			// System.out.println("Ignored Image Input - Type: " + i);
+			// }
 
 			if (status != null)
 				status.setCurrentStatusText1("Workload: " + workload.size() + " images");
@@ -155,15 +155,15 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			int ti = 4;
 			task.performAnalysis(pi, ti, status);
 			long t2 = System.currentTimeMillis();
-			String ss = "T(s)/IMG/T(s)/PI/TI\t" + Math.round(((t2 - t1) / 100d / workload.size())) / 10d + "\t"
-								+ ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;
-			times.put((t2 - t1), ss);
-			System.out.println("------------------------------------------------------------");
-			System.out.println("--- " + ss);
-			System.out.println("------------------------------------------------------------");
-			for (String s : times.values()) {
-				System.out.println(s);
-			}
+			// String ss = "T(s)/IMG/T(s)/PI/TI\t" + Math.round(((t2 - t1) / 100d / workload.size())) / 10d + "\t"
+			// + ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;
+			// times.put((t2 - t1), ss);
+			// System.out.println("------------------------------------------------------------");
+			// System.out.println("--- " + ss);
+			// System.out.println("------------------------------------------------------------");
+			// for (String s : times.values()) {
+			// System.out.println(s);
+			// }
 			// }
 
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();

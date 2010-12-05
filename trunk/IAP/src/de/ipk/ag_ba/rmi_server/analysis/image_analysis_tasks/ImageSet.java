@@ -26,20 +26,14 @@ public class ImageSet {
 	}
 
 	public void setVis(ImageData id) {
-		if (vis != null)
-			System.err.println("Warning: Overriding Visible Image in ImageSet");
 		vis = id;
 	}
 
 	public void setFluo(ImageData id) {
-		if (fluo != null)
-			System.err.println("Warning: Overriding Fluo Image in ImageSet");
 		fluo = id;
 	}
 
 	public void setNir(ImageData id) {
-		if (nir != null)
-			System.err.println("Warning: Overriding NIR Image in ImageSet");
 		nir = id;
 	}
 

@@ -12,7 +12,9 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
+import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
 import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 public class RemoteExecutionWrapperAction implements NavigationAction {
 
@@ -27,11 +29,21 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		HashSet<String> targetIPs = new MongoDB().batchGetAvailableHosts(10000);
-		String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
-		String remoteCapableAnalysisActionParams = null;
-		String experimentInputMongoID = remoteAction.getMongoDatasetID();
-		BatchCmd.enqueueBatchCmd(targetIPs, remoteCapableAnalysisActionClassName, remoteCapableAnalysisActionParams,
-							experimentInputMongoID);
+		if (targetIPs.isEmpty()) {
+			MainFrame.showMessageDialog("No active compute host found.", "Information");
+		} else {
+			String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
+			String remoteCapableAnalysisActionParams = null;
+			String experimentInputMongoID = remoteAction.getMongoDatasetID();
+			BatchCmd cmd = new BatchCmd();
+			cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
+			cmd.setSubmissionTime(System.currentTimeMillis());
+			cmd.setTargetIPs(targetIPs);
+			cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
+			cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
+			cmd.setExperimentMongoID(experimentInputMongoID);
+			BatchCmd.enqueueBatchCmd(cmd);
+		}
 	}
 
 	@Override
@@ -60,8 +72,8 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 
 	@Override
 	public BackgroundTaskStatusProvider getStatusProvider() {
-		MainFrame.showMessageDialog("Remote execution not yet fully implemented!", "Internal Error");
-		return null;
+		// MainFrame.showMessageDialog("Remote execution not yet fully implemented!", "Internal Error");
+		return new BackgroundTaskStatusProviderSupportingExternalCallImpl("Remote", "Start");
 	}
 
 	@Override

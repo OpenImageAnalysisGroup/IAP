@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
 
 import org.ErrorMsg;
 
+import de.ipk.ag_ba.mongo.MongoDB;
+
 /**
  * @author klukas
  */
@@ -56,12 +58,15 @@ public class CloudComputingService {
 		if (!active) {
 			// enable server mode
 			try {
+				new MongoDB().batchClearJobs();
 				String hostName = InetAddress.getLocalHost().getHostName();
 				String ip = InetAddress.getLocalHost().getHostAddress();
 				cloudTaskManager.setHostName(hostName);
 				cloudTaskManager.setIp(ip);
 				cloudTaskManager.startWork(login, pass);
 			} catch (UnknownHostException e) {
+				ErrorMsg.addErrorMessage(e);
+			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
 		} else {

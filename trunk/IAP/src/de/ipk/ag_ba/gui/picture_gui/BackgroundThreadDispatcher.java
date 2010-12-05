@@ -44,7 +44,7 @@ public class BackgroundThreadDispatcher {
 	}
 
 	public static MyThread addTask(MyThread t, int userPriority) {
-//		System.out.println("Add task " + t.getName() + ", Priority: " + userPriority);
+		// System.out.println("Add task " + t.getName() + ", Priority: " + userPriority);
 		synchronized (myInstance) {
 			if (myInstance == null)
 				myInstance = new BackgroundThreadDispatcher();
@@ -153,8 +153,8 @@ public class BackgroundThreadDispatcher {
 								if (curPrio == maxPrio) {
 									// use that thread and run it
 									t = todo.get(i);
-									System.out.println("Start thread " + t.getName() + ". blocked: " + waitThreads.size() + ", max run:" + maxTask + ", running: "
-														+ runningTasks.size() + ", todo:" + todo.size());
+									// System.out.println("Start thread " + t.getName() + ". blocked: " + waitThreads.size() + ", max run:" + maxTask + ", running: "
+									// + runningTasks.size() + ", todo:" + todo.size());
 									todo.remove(i);
 									Integer prio = todoPriorities.get(i);
 									todoPriorities.remove(i);

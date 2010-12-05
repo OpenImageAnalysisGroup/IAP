@@ -97,14 +97,14 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 			task.performAnalysis(1, 1, status);
 			long t2 = System.currentTimeMillis();
 			statRes.addAll(task.getOutput());
-			String ss = "T(s)\t" + ((t2 - t1) / 1000);
-			times.put((t2 - t1), ss);
-			System.out.println("------------------------------------------------------------");
-			System.out.println("--- " + ss);
-			System.out.println("------------------------------------------------------------");
-			for (String s : times.values()) {
-				System.out.println(s);
-			}
+			// String ss = "T(s)\t" + ((t2 - t1) / 1000);
+			// times.put((t2 - t1), ss);
+			// System.out.println("------------------------------------------------------------");
+			// System.out.println("--- " + ss);
+			// System.out.println("------------------------------------------------------------");
+			// for (String s : times.values()) {
+			// System.out.println(s);
+			// }
 
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
 
