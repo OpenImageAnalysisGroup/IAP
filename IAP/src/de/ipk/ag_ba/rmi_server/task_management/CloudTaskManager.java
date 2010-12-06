@@ -83,23 +83,21 @@ public class CloudTaskManager {
 			do {
 				if (CloudTaskManager.this.process) {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
-					long lastUpdate = 5000;
+					long maxDelaySinceLastUpdate = 5000;
 					new MongoDB().batchPingHost(ip);
-					boolean claimNew = false;
-					for (BatchCmd batch : new MongoDB().batchGetCommands(lastUpdate)) {
+					for (BatchCmd batch : new MongoDB().batchGetCommands(maxDelaySinceLastUpdate)) {
 						if (batch.getExperimentMongoID() != null && batch.getTargetIPs().contains(ip)) {
 							new MongoDB().batchClaim(batch, CloudAnalysisStatus.STARTING);
-							claimNew = true;
+							break;
 						}
 					}
-					if (claimNew)
-						System.out.println("action!");
 					for (BatchCmd batch : new MongoDB().batchGetWorkTasksScheduledForStart()) {
 						if (batch.getTargetIPs().contains(ip)) {
 							if (batch.getExperimentMongoID() != null) {
 								ExperimentHeaderInterface header = new MongoDB().getExperimentHeader(batch.getExperimentMongoID());
 								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
 								commands_to_start.add(task);
+								break;
 							}
 						}
 					}

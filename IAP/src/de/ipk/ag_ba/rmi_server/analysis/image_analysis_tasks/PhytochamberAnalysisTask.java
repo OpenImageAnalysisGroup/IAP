@@ -10,7 +10,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
@@ -21,6 +20,7 @@ import de.ipk.ag_ba.image_utils.FlexibleImageType;
 import de.ipk.ag_ba.image_utils.ImageConverter;
 import de.ipk.ag_ba.image_utils.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
+import de.ipk.ag_ba.rmi_server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.rmi_server.databases.DataBaseTargetMongoDB;

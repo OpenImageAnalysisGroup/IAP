@@ -62,9 +62,4 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 		this.src = src;
 		CloudComputingService.getInstance().switchStatus(login, pass);
 	}
-
-	@Override
-	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent(new CloudTaskAndServerOverviewComponent(), true);
-	}
 }
