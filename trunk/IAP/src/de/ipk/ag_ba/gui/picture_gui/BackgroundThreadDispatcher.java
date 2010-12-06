@@ -192,9 +192,13 @@ public class BackgroundThreadDispatcher {
 										myRemove(rt);
 										i--;
 									} else {
-										int thisPrio = Integer.parseInt(rt.getName().substring(rt.getName().indexOf(":") + ":".length()));
-										if (thisPrio > highestRunningPrio)
-											highestRunningPrio = thisPrio;
+										try {
+											int thisPrio = Integer.parseInt(rt.getName().substring(rt.getName().indexOf(":") + ":".length()));
+											if (thisPrio > highestRunningPrio)
+												highestRunningPrio = thisPrio;
+										} catch (NumberFormatException nfe) {
+											System.err.println("Invalid thread name (priority can't be parsed): " + rt.getName());
+										}
 									}
 								}
 							}
