@@ -20,45 +20,56 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 
 	private final RemoteCapableAnalysisAction remoteAction;
 	private final NavigationAction action;
+	private final NavigationButton cm;
 
-	public RemoteExecutionWrapperAction(NavigationAction navigationAction) {
+	public RemoteExecutionWrapperAction(NavigationAction navigationAction, NavigationButton cm) {
 		this.remoteAction = (RemoteCapableAnalysisAction) navigationAction;
 		this.action = navigationAction;
+		this.cm = cm;
 	}
 
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		HashSet<String> targetIPs = new MongoDB().batchGetAvailableHosts(10000);
 		if (targetIPs.isEmpty()) {
-			MainFrame.showMessageDialog("No active compute host found.", "Information");
+			MainFrame.showMessageDialog("No active compute node found.", "Information");
 		} else {
 			String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
 			String remoteCapableAnalysisActionParams = null;
 			String experimentInputMongoID = remoteAction.getMongoDatasetID();
-			BatchCmd cmd = new BatchCmd();
-			cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
-			cmd.setSubmissionTime(System.currentTimeMillis());
-			cmd.setTargetIPs(targetIPs);
-			cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
-			cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
-			cmd.setExperimentMongoID(experimentInputMongoID);
-			BatchCmd.enqueueBatchCmd(cmd);
+			for (String ip : targetIPs) {
+				BatchCmd cmd = new BatchCmd();
+				cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
+				cmd.setSubmissionTime(System.currentTimeMillis());
+				HashSet<String> ipH = new HashSet<String>();
+				ipH.add(ip);
+				cmd.setTargetIPs(ipH);
+				cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
+				cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
+				cmd.setExperimentMongoID(experimentInputMongoID);
+				BatchCmd.enqueueBatchCmd(cmd);
+				cm.getAction().performActionCalculateResults(src);
+			}
 		}
 	}
 
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-		return null;
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+		res.add(currentSet.get(0));
+		res.add(currentSet.get(1));
+		res.add(cm);
+		return res;
 	}
 
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;
+		return cm.getAction().getResultNewActionSet();
 	}
 
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return null;
+		return cm.getAction().getResultMainPanel();
 	}
 
 	@Override
@@ -98,7 +109,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 
 	@Override
 	public boolean getProvidesActions() {
-		return false;
+		return true;
 	}
 
 	@Override

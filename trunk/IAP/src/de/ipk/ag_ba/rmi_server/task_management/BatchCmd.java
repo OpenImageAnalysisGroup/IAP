@@ -81,15 +81,16 @@ public class BatchCmd extends BasicDBObject {
 	}
 
 	public void updateRunningStatus(CloudAnalysisStatus status) {
+		if (statusProvider != null) {
+			put("progress", statusProvider.getCurrentStatusValueFine());
+			put("line1", statusProvider.getCurrentStatusMessage1());
+			put("line2", statusProvider.getCurrentStatusMessage2());
+			put("waitsForUser", statusProvider.pluginWaitsForUser());
+		}
 		new MongoDB().batchClaim(this, status);
 		setRunStatus(status);
-		// double progress = statusProvider.getCurrentStatusValueFine();
-		// statusProvider.getCurrentStatusMessage1();
-		// statusProvider.getCurrentStatusMessage2();
-		// statusProvider.pluginWaitsForUser();
 		// statusProvider.pleaseStop() -->
 		// statusProvider.pleaseContinueRun() -->
-
 	}
 
 	public ObjectId getExperimentMongoID() {
@@ -115,4 +116,19 @@ public class BatchCmd extends BasicDBObject {
 		put("runstatus", status.name());
 	}
 
+	public double getCurrentStatusValueFine() {
+		Double d = getDouble("progress");
+		if (d == null)
+			return -1;
+		else
+			return d;
+	}
+
+	public String getCurrentStatusMessage1() {
+		return getString("line1");
+	}
+
+	public String getCurrentStatusMessage2() {
+		return getString("line2");
+	}
 }

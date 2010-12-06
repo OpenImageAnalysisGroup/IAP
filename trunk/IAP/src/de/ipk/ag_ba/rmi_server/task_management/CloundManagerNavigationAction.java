@@ -8,9 +8,15 @@ package de.ipk.ag_ba.rmi_server.task_management;
 
 import java.util.ArrayList;
 
+import org.ErrorMsg;
+
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.navigation_actions.BatchInformationAction;
+import de.ipk.ag_ba.gui.navigation_actions.HostInformationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
@@ -40,10 +46,28 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		GUIsetting guiS = src.getGUIsetting();
+		GUIsetting guiSetting = src.getGUIsetting();
 		NavigationButton startOrStopServerMode = new NavigationButton(
-							new EnableOrDisableServerModeAction(login, pass), guiS);
+							new EnableOrDisableServerModeAction(login, pass), guiSetting);
 		res.add(startOrStopServerMode);
+		try {
+			for (String ip : new MongoDB().batchGetAvailableHosts(10000)) {
+				NavigationButton n = new NavigationButton(new HostInformationAction(ip), guiSetting);
+				res.add(n);
+			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		try {
+			for (BatchCmd b : new MongoDB().batchGetAllCommands()) {
+				NavigationButton n = new NavigationButton(new BatchInformationAction(b), guiSetting);
+				n.setProcessing(true);
+				n.setRightAligned(true);
+				res.add(n);
+			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
 		return res;
 	}
 
@@ -57,5 +81,10 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
+	}
+
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		return new MainPanelComponent(new CloudTaskAndServerOverviewComponent(), true);
 	}
 }

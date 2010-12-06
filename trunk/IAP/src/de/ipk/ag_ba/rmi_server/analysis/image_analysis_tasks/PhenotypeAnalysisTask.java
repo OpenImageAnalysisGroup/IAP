@@ -11,7 +11,6 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-import de.ipk.ag_ba.gui.navigation_actions.CutImagePreprocessor;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
@@ -20,6 +19,7 @@ import de.ipk.ag_ba.image_utils.MorphologicalOperators;
 import de.ipk.ag_ba.image_utils.PixelSegmentation;
 import de.ipk.ag_ba.image_utils.PrintImage;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
+import de.ipk.ag_ba.rmi_server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.rmi_server.databases.DatabaseTarget;

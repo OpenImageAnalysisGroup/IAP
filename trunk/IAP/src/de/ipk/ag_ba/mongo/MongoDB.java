@@ -874,8 +874,8 @@ public class MongoDB {
 				DBCursor cursor = dbc.find();
 				while (cursor.hasNext()) {
 					CloudHost h = (CloudHost) cursor.next();
-					// if (curr - h.getLastUpdateTime() < maxUpdate)
-					res.add(h.getHostName());
+					if (curr - h.getLastUpdateTime() < maxUpdate)
+						res.add(h.getHostName());
 				}
 			}
 
@@ -951,7 +951,7 @@ public class MongoDB {
 
 				@Override
 				public void run() {
-//					System.out.println("---");
+					// System.out.println("---");
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
 					for (DBObject dbo : collection.find()) {
@@ -961,6 +961,35 @@ public class MongoDB {
 							// .currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
 							res.add(batch);
 						// System.out.println(batch);
+					}
+				}
+
+				@Override
+				public void setDB(DB db) {
+					this.db = db;
+				}
+			});
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+			return null;
+		}
+		return res;
+	}
+
+	public Collection<BatchCmd> batchGetAllCommands() {
+		final Collection<BatchCmd> res = new ArrayList<BatchCmd>();
+		try {
+			processDB(new RunnableOnDB() {
+				private DB db;
+
+				@Override
+				public void run() {
+					// System.out.println("---");
+					DBCollection collection = db.getCollection("schedule");
+					collection.setObjectClass(BatchCmd.class);
+					for (DBObject dbo : collection.find()) {
+						BatchCmd batch = (BatchCmd) dbo;
+						res.add(batch);
 					}
 				}
 
@@ -1022,7 +1051,7 @@ public class MongoDB {
 					batch.put("runstatus", starting.toString());
 					batch.put("lastupdate", System.currentTimeMillis());
 					WriteResult r = collection.update(dbo, batch, false, false);
-					System.out.println("Tried to update status: " + rs + " --> " + starting.toString());
+					System.out.println("Update status: " + rs + " --> " + starting.toString() + ", res: " + r.toString());
 				}
 
 				@Override
@@ -1033,6 +1062,34 @@ public class MongoDB {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+	}
+
+	public BatchCmd batchGetCommand(final BatchCmd batch) {
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		// try to claim a batch cmd
+		try {
+			processDB(new RunnableOnDB() {
+				private DB db;
+
+				@Override
+				public void run() {
+					DBCollection collection = db.getCollection("schedule");
+					collection.setObjectClass(BatchCmd.class);
+					DBObject dbo = new BasicDBObject();
+					dbo.put("_id", batch.get("_id"));
+					BatchCmd res = (BatchCmd) collection.findOne(dbo);
+					tso.setParam(0, res);
+				}
+
+				@Override
+				public void setDB(DB db) {
+					this.db = db;
+				}
+			});
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		return (BatchCmd) tso.getParam(0, null);
 	}
 
 	private void processSubstance(DB db, ExperimentInterface experiment, DBObject substance) {
@@ -1111,4 +1168,5 @@ public class MongoDB {
 				}
 			}
 	}
+
 }
