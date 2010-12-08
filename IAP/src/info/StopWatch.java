@@ -50,4 +50,8 @@ public class StopWatch {
 		System.out.println(desc + " took " + getTime() + " ms");
 	}
 
+	public String getDescription() {
+		return desc;
+	}
+
 }

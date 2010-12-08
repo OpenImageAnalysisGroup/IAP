@@ -51,6 +51,10 @@ public class FlexibleImage {
 		this.bufferedImage = ImageConverter.convert1AtoBI(w, h, image);
 	}
 
+	public FlexibleImage(int[][] img) {
+		this.bufferedImage = ImageConverter.convert2AtoBI(img);
+	}
+
 	public BufferedImage getBufferedImage() {
 		return bufferedImage;
 	}
@@ -76,16 +80,24 @@ public class FlexibleImage {
 	}
 
 	public FlexibleImage resize(int w, int h) {
-		if (w == getWidth() && h == getHeight()) {
-			return this;
-		} else {
-			ImageOperation io = new ImageOperation(this);
-			io.resize(w, h);
-			return io.getImage();
-		}
+		// if (w == getWidth() && h == getHeight()) {
+		// return new FlexibleImage(getConvertAs2A());
+		// } else {
+		ImageOperation io = new ImageOperation(getConvertAs2A());
+		io.resize(w, h);
+		return io.getImage();
+		// }
+	}
+
+	private int[][] getConvertAs2A() {
+		return ImageConverter.convertBIto2A(bufferedImage);
 	}
 
 	public FlexibleImageType getType() {
 		return type;
+	}
+
+	public FlexibleImage copy() {
+		return new FlexibleImage(getConvertAs2A());
 	}
 }

@@ -196,7 +196,7 @@ public class BackgroundThreadDispatcher {
 											int thisPrio = Integer.parseInt(rt.getName().substring(rt.getName().indexOf(":") + ":".length()));
 											if (thisPrio > highestRunningPrio)
 												highestRunningPrio = thisPrio;
-										} catch (NumberFormatException nfe) {
+										} catch (Exception nfe) {
 											System.err.println("Invalid thread name (priority can't be parsed): " + rt.getName());
 										}
 									}

@@ -193,7 +193,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		final ObjectRef progress = new ObjectRef("", new Integer(0));
 
 		maximumThreadCount = 1;
-		
+
 		final int[] arrayRGBnullFF = arrayRGBnull;
 		ArrayList<MyThread> wait = new ArrayList<MyThread>();
 		for (int ty = h - 1; ty >= 0; ty--) {
@@ -221,15 +221,16 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		// save.rotate(3);
 		// save.saveImage("/Users/entzian/Desktop/sechsteBild.png");
 
-		closingOpening(w, h, arrayRGB, rgbArrayOriginal, iBackgroundFill, limg, 1);
+		if (false)
+			closingOpening(w, h, arrayRGB, rgbArrayOriginal, iBackgroundFill, limg, 1);
 
 		boolean removeSmallSegments = true;
 
 		if (removeSmallSegments)
 			if (config == ImageConfiguration.FluoTop)
-				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, limg, (int) (w * h * 0.005d));
+				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.005d));
 			else
-				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, limg, (int) (w * h * 0.005d));//
+				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.005d));//
 
 		if (dataAnalysis) {
 			Geometry g = detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
@@ -394,8 +395,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 	}
 
-	private static void removeSmallPartsOfImage(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg,
-						int cutOff) {
+	public static void removeSmallPartsOfImage(int w, int h, int[] rgbArray, int iBackgroundFill, int cutOff) {
 		int[][] image = new int[w][h];
 
 		for (int x = 0; x < w; x++) {
@@ -430,27 +430,14 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 											+ (clusterCircleSimilarity[clusterID] < 0.013));
 
 			int[][] mask = ps.getImageMask();
-			// ArrayList<Color> colors = Colors.get(cl);
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
 					int clusterID = mask[x][y];
-					// rgbArray[x + y * w] = clusterID != 0 ? clusterID :
-					// Color.YELLOW.getRGB();
-					// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
 
-					if (clusterSizes[clusterID] < cutOff) // ||
-						// clusterCircleSimilarity[clusterID]
-						// > 0.013
+					if (clusterSizes[clusterID] < cutOff)
 						rgbArray[x + y * w] = iBackgroundFill;
-					// else if (clusterID != 0)
-					// System.out.println("ID: " + clusterID + ", SIZE: " +
-					// clusterSizes[clusterID] + ", PERIMETER: "
-					// + clusterPerimeter[clusterID] + ", CIRCLE? " +
-					// clusterCircleSimilarity[clusterID]);
 				}
 			}
-			// PrintImage.printImage(rgbArray, w, h);
-
 		}
 
 		// Variante 2
@@ -567,8 +554,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 							processImageWithoutBackgroundImage(imageData, w, rgbArray, iBackgroundFill, sidepercent, y, epsilonA,
 												config, arrayL, arrayA, arrayB, factor, backgroundPixelsArr);
 						}
-						postProcessThisIsUnclearCode(w, rgbArray, iBackgroundFill, sidepercent, y, epsilonB, factor,
-											backgroundPixelsArr);
+						if (false)
+							postProcessThisIsUnclearCode(w, rgbArray, iBackgroundFill, sidepercent, y, epsilonB, factor,
+												backgroundPixelsArr);
 					}
 				synchronized (progress) {
 					progress.setObject(new Integer((Integer) progress.getObject() + 1));
