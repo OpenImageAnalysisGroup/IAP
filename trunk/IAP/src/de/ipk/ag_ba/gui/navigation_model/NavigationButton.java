@@ -76,7 +76,8 @@ public class NavigationButton implements StyleAware {
 
 	public NavigationButton(NavigationAction navigationAction, GUIsetting guiSetting) {
 		if (navigationAction != null) {
-			if (navigationAction instanceof RemoteCapableAnalysisAction) {
+			boolean enableRemoteTaskExecution = false;
+			if (enableRemoteTaskExecution && navigationAction instanceof RemoteCapableAnalysisAction) {
 				CloundManagerNavigationAction ra = new CloundManagerNavigationAction(null, null);
 				navigationAction = new RemoteExecutionWrapperAction(navigationAction,
 									new NavigationButton(ra, guiSetting));

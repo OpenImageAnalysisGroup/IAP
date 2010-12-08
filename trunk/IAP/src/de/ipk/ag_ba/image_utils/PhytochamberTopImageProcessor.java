@@ -40,7 +40,7 @@ public class PhytochamberTopImageProcessor {
 
 	private final PhytoTopImageProcessorOptions options;
 
-	private final boolean takeTimes = true;
+	private final boolean takeTimes = false;
 
 	public PhytochamberTopImageProcessor(FlexibleImageSet input) {
 		this.input = input;
@@ -57,14 +57,28 @@ public class PhytochamberTopImageProcessor {
 		long pixels = this.input.getPixelCount();
 
 		StopWatch w = debugStart("Phytochamber snapshot analysis of " + pixels + " pixels");
+		FlexibleImageSet copy = input.copy();
 
-		FlexibleImage mask = new PhytochamberTopImageProcessor(input).equalize().clearBackground(maxThreadsPerImage).enlargeMask().mergeMask();
+		PhytochamberTopImageProcessor clearedImageProcessor = new PhytochamberTopImageProcessor(input).clearBackground(maxThreadsPerImage);
+		FlexibleImageSet clearedImages = clearedImageProcessor.getImages();
+		FlexibleImageSet mask = clearedImageProcessor.equalize().enlargeMask().mergeMask();
+		boolean alex = true;
+		PhytochamberTopImageProcessor result = new PhytochamberTopImageProcessor(mask).applyMaskTo(alex ? copy : clearedImages)
+							.postProcessResultImages(false).removeSmallClusters().postProcessResultImages(true);
 
-		PhytochamberTopImageProcessor result = new PhytochamberTopImageProcessor(input).postProcessMask(mask).applyMaskTo(input);
-
-		debugEnd(w);
+		debugEnd(w, result.getImages());
 		input = null;
 		return result;
+	}
+
+	private PhytochamberTopImageProcessor removeSmallClusters() {
+		StopWatch w = debugStart("removeSmallClusters");
+		FlexibleImage vis = new ImageOperation(input.getVis()).removeSmallClusters().getImage();
+		FlexibleImage fluo = new ImageOperation(input.getFluo()).removeSmallClusters().getImage();
+		FlexibleImage nir = new ImageOperation(input.getNir()).removeSmallClusters().getImage();
+		FlexibleImageSet res = new FlexibleImageSet(vis, fluo, nir);
+		debugEnd(w, res);
+		return new PhytochamberTopImageProcessor(res);
 	}
 
 	public FlexibleImageSet getImages() {
@@ -91,44 +105,47 @@ public class PhytochamberTopImageProcessor {
 		FlexibleImage vis = new ImageOperation(images.getVis()).applyMask(masks.getVis(), options.getBackground()).getImage();
 		FlexibleImage fluo = new ImageOperation(images.getFluo()).applyMask(masks.getFluo(), options.getBackground()).getImage();
 		FlexibleImage nir = new ImageOperation(images.getNir()).applyMask(masks.getNir(), options.getBackground()).getImage();
-		debugEnd(w);
-		return new PhytochamberTopImageProcessor(new FlexibleImageSet(vis, fluo, nir));
+		FlexibleImageSet res = new FlexibleImageSet(vis, fluo, nir);
+		debugEnd(w, res);
+		return new PhytochamberTopImageProcessor(res);
 	}
 
 	/**
 	 * Erode/delate/erode several times, depending on image type.
-	 * 
-	 * @param mask
-	 *           A single mask, used as input.
-	 * @return Creates a set of images, slightly different masks for each image
-	 *         type.
 	 */
-	private PhytochamberTopImageProcessor postProcessMask(FlexibleImage mask) {
+	private PhytochamberTopImageProcessor postProcessResultImages(boolean enlarge) {
 		StopWatch w = debugStart("postProcessMask");
-		FlexibleImage maskVis = postProcessMask(mask, ImageConfiguration.RgbTop);
-		FlexibleImage maskFluo = postProcessMask(mask, ImageConfiguration.FluoTop);
-		FlexibleImage maskNir = mask;// input.getNir();
-		debugEnd(w);
-		PhytochamberTopImageProcessor res = new PhytochamberTopImageProcessor(new FlexibleImageSet(maskVis, maskFluo, maskNir));
+		FlexibleImage resVis = postProcessResultImage(input.getVis(), ImageConfiguration.RgbTop, enlarge);
+		FlexibleImage resFluo = postProcessResultImage(input.getFluo(), ImageConfiguration.FluoTop, enlarge);
+		FlexibleImage resNir = input.getNir();
+		FlexibleImageSet img = new FlexibleImageSet(resVis, resFluo, resNir);
+		debugEnd(w, img);
+		PhytochamberTopImageProcessor res = new PhytochamberTopImageProcessor(img);
 		input = null;
 		return res;
 	}
 
-	private FlexibleImage postProcessMask(FlexibleImage mask,
-						ImageConfiguration typ) {
+	private FlexibleImage postProcessResultImage(FlexibleImage finalImage,
+						ImageConfiguration typ, boolean enlarge) {
 
-		ImageOperation maskIo = new ImageOperation(mask);
+		ImageOperation maskIo = new ImageOperation(finalImage);
 
 		switch (typ) {
 
 			case RgbTop:
+				if (enlarge)
+					for (int ii = 0; ii < 30; ii++)
+						maskIo.dilate();
+				if (!enlarge)
+					for (int ii = 0; ii < 3; ii++)
+						maskIo.erode();
 
-				for (int ii = 0; ii < 6; ii++)
-					maskIo.erode();
-				for (int ii = 0; ii < 8; ii++)
-					maskIo.dilate();
-				for (int ii = 0; ii < 2; ii++)
-					maskIo.erode();
+				// for (int ii = 0; ii < 6; ii++)
+				// maskIo.erode();
+				// for (int ii = 0; ii < 8; ii++)
+				// maskIo.dilate();
+				// for (int ii = 0; ii < 2; ii++)
+				// maskIo.erode();
 				break;
 
 			case FluoTop:
@@ -141,19 +158,8 @@ public class PhytochamberTopImageProcessor {
 				break;
 		}
 
-		// int idx = 0;
-		// int background = options.getBackground();
-		// int foreground = Color.BLUE.getRGB();
-		// for (int m : maskIo.getImageAs1array()) {
-		// if (m == background)
-		// mask1A[idx] = background;
-		// else
-		// mask1A[idx] = foreground;
-		// idx++;
-		// }
-		//
-		// return new FlexibleImage(ImageConverter.convert1AtoBI(mask.getWidth(), mask.getHeight(), mask1A));
-		return new FlexibleImage(maskIo.getImageAsBufferedImage());
+		// return new ImageOperation(finalImage).applyMask(maskIo.getImage(), options.getBackground()).getImage();
+		return new ImageOperation(finalImage).applyMask2(maskIo.getImage(), options.getBackground()).getImage();
 	}
 
 	/**
@@ -174,12 +180,12 @@ public class PhytochamberTopImageProcessor {
 							options.getRgbNumberOfDilateLoops(), ImageConfiguration.RgbTop);
 		BufferedImage enlargedFluoMask = enlargeMask(input.getFluo(), options.getFluoNumberOfErodeLoops(),
 							options.getFluoNumberOfDilateLoops(), ImageConfiguration.FluoTop);
-
-		debugEnd(w);
+		FlexibleImageSet img = new FlexibleImageSet(enlargedRgbMask, enlargedFluoMask, input.getNir()
+							.getBufferedImage());
+		debugEnd(w, img);
 		// PrintImage.printImage(enlargedRgbMask, "enlarged RGB mask");
 		// PrintImage.printImage(enlargedFluoMask, "enlarged FLUO mask");
-		PhytochamberTopImageProcessor res = new PhytochamberTopImageProcessor(new FlexibleImageSet(enlargedRgbMask, enlargedFluoMask, input.getNir()
-							.getBufferedImage()));
+		PhytochamberTopImageProcessor res = new PhytochamberTopImageProcessor(img);
 		input = null;
 		return res;
 	}
@@ -232,7 +238,7 @@ public class PhytochamberTopImageProcessor {
 
 		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 
-		debugEnd(w);
+		debugEnd(w, res);
 		PhytochamberTopImageProcessor rrr = new PhytochamberTopImageProcessor(res);
 		input = null;
 		return rrr;
@@ -310,11 +316,13 @@ public class PhytochamberTopImageProcessor {
 	 *           The input masks (should contain cleared background).
 	 * @return A single 1/0 mask.
 	 */
-	private FlexibleImage mergeMask() {
+	private FlexibleImageSet mergeMask() {
+		StopWatch w = debugStart("mergeMask");
 		MaskOperation o = new MaskOperation(input.getVis(), input.getFluo(), null, options.getBackground(), Color.GRAY.getRGB());
 		o.mergeMasks();
-		// PrintImage.printImage(ImageConverter.convert1AtoBI(input.getLargestWidth(), input.getLargestHeight(), o.getMask()), "merged mask");
-		FlexibleImage res = new FlexibleImage(o.getMask(), input.getLargestWidth(), input.getLargestHeight());
+		FlexibleImage img = new FlexibleImage(o.getMask(), input.getLargestWidth(), input.getLargestHeight());
+		FlexibleImageSet res = new FlexibleImageSet(img, img, img);
+		debugEnd(w, res);
 		input = null;
 		return res;
 	}
@@ -427,9 +435,12 @@ public class PhytochamberTopImageProcessor {
 			return null;
 	}
 
-	private void debugEnd(StopWatch w) {
-		if (w != null)
+	private void debugEnd(StopWatch w, FlexibleImageSet img) {
+		if (w != null) {
 			w.printTime();
+			if (img != null)
+				new ImageOperation(img.getVis()).getImage().print(w.getDescription());
+		}
 	}
 
 	public static void main(String[] args) throws IOException, Exception {

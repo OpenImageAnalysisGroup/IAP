@@ -136,6 +136,41 @@ public class ImageOperation extends ImageConverter {
 		// idx++;
 	}
 
+	public ImageOperation applyMask2(FlexibleImage mask, int background) {
+
+		if (image.getWidth() != mask.getWidth() || image.getHeight() != mask.getHeight()) {
+			mask = new ImageOperation(mask).resize(image.getWidth(), image.getHeight()).getImage();
+		}
+
+		int[] mask1A = mask.getConvertAs1A();
+
+		int[] originalImage = ImageConverter.convertIJto1A(image);
+		// PrintImage.printImage(image.getBufferedImage(), "IMAGE " + iiii);
+		// PrintImage.printImage(mask.getBufferedImage(), "MASK FOR IMAGE " + iiii);
+
+		int idx = 0;
+		// int background = processor.getBackground();
+		// int foreground = Color.BLUE.getRGB();
+		for (int m : mask.getConvertAs1A()) {
+			if (m == background)
+				mask1A[idx] = background;
+			else
+				mask1A[idx] = originalImage[idx];
+			idx++;
+		}
+
+		// PrintImage.printImage(mask1A, image.getWidth(), image.getHeight());
+
+		return new ImageOperation(mask1A, mask.getWidth(), mask.getHeight());
+		// int idx = 0;
+		// for (int m : io.getImageAs1array()) {
+		// if (m == background)
+		// newImage1A[idx] = background;
+		// else
+		// newImage1A[idx] = originalImage1A[idx];
+		// idx++;
+	}
+
 	/**
 	 * Enlarge area of mask.
 	 * <p>
@@ -499,6 +534,13 @@ public class ImageOperation extends ImageConverter {
 			}
 
 		return new ImageOperation(ImageConverter.convert2AtoBI(newImage));
+	}
+
+	public ImageOperation removeSmallClusters() {
+		int[] arrayRGB = ImageConverter.convertIJto1A(image);
+		PhenotypeAnalysisTask.removeSmallPartsOfImage(image.getWidth(), image.getHeight(), arrayRGB, PhenotypeAnalysisTask.BACKGROUND_COLORint,
+							(int) (image.getWidth() * image.getHeight() * 0.005d));
+		return new ImageOperation(arrayRGB, image.getWidth(), image.getHeight());
 	}
 
 	// ################## get... ###################

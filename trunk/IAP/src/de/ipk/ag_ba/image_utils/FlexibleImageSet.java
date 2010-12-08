@@ -126,4 +126,8 @@ public class FlexibleImageSet {
 				throw new UnsupportedOperationException("FlexibleImage-Type is not set!");
 		}
 	}
+
+	public FlexibleImageSet copy() {
+		return new FlexibleImageSet(vis.copy(), fluo.copy(), nir.copy());
+	}
 }
