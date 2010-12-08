@@ -34,13 +34,13 @@ public class PrintImage {
 	// printBinarImage(ImageConverter.convert1Ato2A(width, height, image), text, typ);
 	// }
 
-	// public static void printImage(int[] image, int width, int height, PrintOption typ) {
-	// printImage(ImageConverter.convert1AtoBI(width, height, image), typ);
-	// }
-	//
-	// public static void printImage(int[] image, int width, int height) {
-	// printImage(ImageConverter.convert1AtoBI(width, height, image), PrintOption.IMAGEJ);
-	// }
+	public static void printImage(int[] image, int width, int height, PrintOption typ) {
+		printImage(ImageConverter.convert1AtoBI(width, height, image), typ);
+	}
+
+	public static void printImage(int[] image, int width, int height) {
+		printImage(ImageConverter.convert1AtoBI(width, height, image), PrintOption.IMAGEJ);
+	}
 
 	public static void printImage(int[] image, int width, int height, String text, PrintOption typ) {
 		printImage(ImageConverter.convert1AtoBI(width, height, image), text, typ);
@@ -64,13 +64,13 @@ public class PrintImage {
 	// printBinaer(image, text, typ);
 	// }
 
-	// public static void printImage(int[][] image, PrintOption typ) {
-	// printImage(ImageConverter.convert2AtoBI(image), typ);
-	// }
-	//
-	// public static void printImage(int[][] image) {
-	// printImage(ImageConverter.convert2AtoBI(image), PrintOption.IMAGEJ);
-	// }
+	public static void printImage(int[][] image, PrintOption typ) {
+		printImage(ImageConverter.convert2AtoBI(image), typ);
+	}
+
+	public static void printImage(int[][] image) {
+		printImage(ImageConverter.convert2AtoBI(image), PrintOption.IMAGEJ);
+	}
 
 	public static void printImage(int[][] image, String text, PrintOption typ) {
 		printImage(ImageConverter.convert2AtoBI(image), text, typ);
@@ -80,15 +80,33 @@ public class PrintImage {
 		printImage(ImageConverter.convert2AtoBI(image), text, PrintOption.IMAGEJ);
 	}
 
+	// ############# FlexibleImage ############
+
+	public static void printImage(FlexibleImage fluo) {
+		printImage(fluo.getBufferedImage());
+	}
+
+	public static void printImage(FlexibleImage fluo, String text) {
+		printImage(fluo.getBufferedImage(), text);
+	}
+
+	public static void printImage(FlexibleImage fluo, PrintOption typ) {
+		printImage(fluo.getBufferedImage(), typ);
+	}
+
+	public static void printImage(FlexibleImage fluo, String text, PrintOption typ) {
+		printImage(fluo.getBufferedImage(), text, typ);
+	}
+
 	// ######### BufferedImage #########
 
-	// public static void printImage(BufferedImage image, PrintOption typ) {
-	// printImage(image, "Image", typ);
-	// }
+	public static void printImage(BufferedImage image, PrintOption typ) {
+		printImage(image, "Image", typ);
+	}
 
-	// public static void printImage(BufferedImage image) {
-	// printImage(image, "Image", PrintOption.IMAGEJ);
-	// }
+	public static void printImage(BufferedImage image) {
+		printImage(image, "Image", PrintOption.IMAGEJ);
+	}
 
 	public static void printImage(BufferedImage image, String text) {
 		printImage(image, text, PrintOption.IMAGEJ);
