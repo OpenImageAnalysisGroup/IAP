@@ -8,6 +8,7 @@ package de.ipk.ag_ba.rmi_server.analysis;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,16 +23,8 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.HomeFolder;
 import org.graffiti.editor.GravistoService;
-import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
-import com.mongodb.DB;
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSDBFile;
-
-import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
-import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
@@ -53,7 +46,7 @@ public class IOmodule {
 		return new WorkerInfo(todo.size(), 0, processed, lastKBperSecTransferSpeed, "KB/s");
 	}
 
-	public static LoadedImage loadImageFromFileOrMongo(ImageData id, String login, String pass) throws Exception {
+	public static LoadedImage loadImageFromFileOrMongo(ImageData id) throws Exception {
 		BufferedImage image = ImageIO.read(id.getURL().getInputStream());
 		BufferedImage imageNULL = null;
 		try {
@@ -66,7 +59,7 @@ public class IOmodule {
 		return result;
 	}
 
-	public static byte[] loadImageContentFromFileOrMongo(ImageData id, String login, String pass) throws Exception {
+	public static byte[] loadImageContentFromFileOrMongo(ImageData id) throws Exception {
 		InputStream is = id.getURL().getInputStream();
 		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
 		HomeFolder.copyContent(is, out);
@@ -115,47 +108,20 @@ public class IOmodule {
 	// return result;
 	// }
 
-	public static LoadedVolume loadVolumeFromMongo(final VolumeData md, String login, String pass) {
-		final ThreadSafeOptions tso = new ThreadSafeOptions();
-		try {
-			new MongoDB().processDB(new RunnableOnDB() {
-				private DB db;
+	public static LoadedVolume loadVolume(final VolumeData md) throws Exception {
+		DataInputStream is = new DataInputStream(md.getURL().getInputStream());
 
-				@Override
-				public void run() {
-					LoadedVolume result = new LoadedVolume(md);
-					GridFS gridfs_images = new GridFS(db, MongoCollection.VOLUMES.toString());
-					GridFSDBFile fff = gridfs_images.findOne(md.getURL().getDetail());
-					if (fff != null) {
-						try {
-							InputStream is = fff.getInputStream();
-							byte[] cube = new byte[md.getDimensionX() * md.getDimensionY() * md.getDimensionZ() * 4];
-							int offset = 0;
-							int read = 0;
-							while ((read = is.read(cube, offset, cube.length - offset)) > 0) {
-								offset += read;
-							}
-							System.out.println("Received " + offset + " / " + cube.length + " bytes");
-							result.setVolume(new ByteShortIntArray(cube));
-
-						} catch (Exception e) {
-							result = null;
-							ErrorMsg.addErrorMessage(e);
-						}
-					}
-					tso.setParam(0, result);
+		int xx = md.getDimensionX();
+		int yy = md.getDimensionY();
+		int zz = md.getDimensionZ();
+		int[][][] imageDataRGBA = new int[xx][yy][zz];
+		for (int z = 0; z < zz; z++)
+			for (int y = 0; y < yy; y++)
+				for (int x = 0; x < xx; x++) {
+					imageDataRGBA[x][y][z] = is.readInt();
 				}
 
-				@Override
-				public void setDB(DB db) {
-					this.db = db;
-				}
-			});
-
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		return (LoadedVolume) tso.getParam(0, null);
+		return new LoadedVolume(md, new ByteShortIntArray(imageDataRGBA));
 	}
 
 	public static final int makeIntFromByte4(byte[] b) {

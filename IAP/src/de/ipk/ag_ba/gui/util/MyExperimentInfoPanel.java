@@ -232,17 +232,17 @@ public class MyExperimentInfoPanel extends JPanel {
 		remark.setEnabled(enabled);
 	}
 
-	private JComboBox getExperimentTypes(String user, String pass, String experimentType, boolean editPossible) {
+	private JComboBox getExperimentTypes(MongoDB m, String experimentType, boolean editPossible) {
 		String[] types = new String[] { experimentType };
-		if (user != null && !user.equalsIgnoreCase("internet") && editPossible) {
-			// try {
-			// if (pass != null)
-			// types = CallDBE2WebService.metaBasisGet(user, pass,
-			// DBTable.EXPTYPE);
-			// } catch (Exception e) {
-			// ErrorMsg.addErrorMessage(e);
-			// }
-		}
+		// if (user != null && !user.equalsIgnoreCase("internet") && editPossible) {
+		// // try {
+		// // if (pass != null)
+		// // types = CallDBE2WebService.metaBasisGet(user, pass,
+		// // DBTable.EXPTYPE);
+		// // } catch (Exception e) {
+		// // ErrorMsg.addErrorMessage(e);
+		// // }
+		// }
 		JComboBox res = new JComboBox(types);
 		if (experimentType != null)
 			res.setSelectedItem(experimentType);
@@ -293,7 +293,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		saveAction = runnable;
 	}
 
-	public void setExperimentInfo(final String login, final String pass,
+	public void setExperimentInfo(final MongoDB m,
 						final ExperimentHeaderInterface experimentHeader, boolean startEnabled, ExperimentInterface experiment) {
 		setLayout(new TableLayout(new double[][] { { 0, 400, 0 }, { 0, TableLayout.PREFERRED, 0 } }));
 
@@ -317,7 +317,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		groupVisibility = new JTextField(experimentHeader.getImportusergroup());
 		// getGroups(login, pass, experimentHeader.getImportusergroup(),
 		// editPossible);
-		experimentTypeSelection = getExperimentTypes(login, pass, experimentHeader.getExperimentType(), editPossible);
+		experimentTypeSelection = getExperimentTypes(m, experimentHeader.getExperimentType(), editPossible);
 		expStart = new JDateChooser(experimentHeader.getStartdate());
 		expEnd = new JDateChooser(experimentHeader.getImportdate());
 		remark = new JTextField(experimentHeader.getRemark());
@@ -396,13 +396,13 @@ public class MyExperimentInfoPanel extends JPanel {
 							if (experimentHeader.getExcelfileid().startsWith("lemnatec:")) {
 								saveB.setText("Updated (in memory)");
 							} else {
-								new MongoDB().setExperimentInfo(experimentHeader);
+								m.setExperimentInfo(experimentHeader);
 								saveB.setText("Updated in Cloud DB");
 							}
 						} else {
 							Experiment exp = new Experiment();
 							exp.setHeader(experimentHeader);
-							new MongoDB().saveExperiment("dbe3", null, login, pass, exp, null);
+							m.saveExperiment(exp, null);
 							saveB.setText("Experiment Saved in Cloud DB");
 							editPossibleBBB = false;
 						}

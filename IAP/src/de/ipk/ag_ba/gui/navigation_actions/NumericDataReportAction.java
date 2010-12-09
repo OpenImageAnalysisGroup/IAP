@@ -13,6 +13,7 @@ import javax.swing.JTable;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
@@ -25,8 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class NumericDataReportAction extends AbstractNavigationAction {
 
-	private String login;
-	private String pass;
+	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	private JTable table;
@@ -35,10 +35,9 @@ public class NumericDataReportAction extends AbstractNavigationAction {
 		super(tooltip);
 	}
 
-	public NumericDataReportAction(String login, String pass, ExperimentReference experimentReference) {
+	public NumericDataReportAction(MongoDB m, ExperimentReference experimentReference) {
 		this("Show/export numeric data report");
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 		this.experimentReference = experimentReference;
 	}
 
@@ -67,7 +66,7 @@ public class NumericDataReportAction extends AbstractNavigationAction {
 		cols.add("Water");
 		Object[] columns = cols.toArray();
 
-		ExperimentInterface experiment = experimentReference.getData();
+		ExperimentInterface experiment = experimentReference.getData(m);
 		ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
 		for (SubstanceInterface su : experiment) {
 			if (su.getSubstanceName() == null)

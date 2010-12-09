@@ -10,24 +10,22 @@ import java.util.ArrayList;
 
 import org.ErrorMsg;
 
-import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
  */
 public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 
-	private final String login;
-	private final String pass;
 	private NavigationButton src;
+	private final MongoDB m;
 
-	public EnableOrDisableServerModeAction(String login, String pass) {
+	public EnableOrDisableServerModeAction(MongoDB m) {
 		super("Start or stop server mode (cloud computing host)");
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 	}
 
 	@Override
@@ -42,7 +40,7 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		NavigationAction cmna = new CloundManagerNavigationAction(login, pass);
+		NavigationAction cmna = new CloundManagerNavigationAction(m);
 		try {
 			cmna.performActionCalculateResults(src);
 			return cmna.getResultNewActionSet();
@@ -60,6 +58,6 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		CloudComputingService.getInstance().switchStatus(login, pass);
+		CloudComputingService.getInstance().switchStatus(m);
 	}
 }

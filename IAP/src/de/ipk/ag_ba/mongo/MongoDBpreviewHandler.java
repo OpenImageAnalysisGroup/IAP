@@ -24,7 +24,16 @@ import com.mongodb.gridfs.GridFSDBFile;
  */
 public class MongoDBpreviewHandler implements ResourceIOHandler {
 	// mongo-preview://c3fd77bc7b74388d9dcff9d09d1c16fc/000Grad.png
-	public static final String PREFIX = "mongo-preview";
+	private String PREFIX = "mongo-preview";
+	private final String ip;
+	private final MongoDB m;
+
+	public MongoDBpreviewHandler(String ip, MongoDB m) {
+		this.ip = ip;
+		this.m = m;
+		if (ip != null && ip.length() > 0)
+			PREFIX = "mongo-preview_" + ip;
+	}
 
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
@@ -36,7 +45,7 @@ public class MongoDBpreviewHandler implements ResourceIOHandler {
 	public InputStream getInputStream(final IOurl url) throws Exception {
 		final ObjectRef or = new ObjectRef();
 
-		new MongoDB().processDB(new RunnableOnDB() {
+		m.processDB(new RunnableOnDB() {
 			private DB db;
 
 			@Override

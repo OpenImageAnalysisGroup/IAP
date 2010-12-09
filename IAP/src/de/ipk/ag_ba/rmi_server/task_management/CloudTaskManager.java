@@ -22,8 +22,6 @@ public class CloudTaskManager {
 
 	private String hostName;
 	private String ip;
-	private String login;
-	private String pass;
 
 	private boolean process = false;
 
@@ -33,6 +31,7 @@ public class CloudTaskManager {
 	}
 
 	Thread timerThread;
+	private MongoDB m;
 
 	private void setProcess(boolean process) {
 		this.process = process;
@@ -65,15 +64,13 @@ public class CloudTaskManager {
 		this.ip = ip;
 	}
 
-	public void startWork(String login, String pass) {
-		this.login = login;
-		this.pass = pass;
+	public void startWork(MongoDB m) {
+		this.m = m;
 		setProcess(true);
 	}
 
 	public void stopWork() {
-		this.login = null;
-		this.pass = null;
+		this.m = null;
 		setProcess(false);
 	}
 
@@ -84,17 +81,17 @@ public class CloudTaskManager {
 				if (CloudTaskManager.this.process) {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
 					long maxDelaySinceLastUpdate = 5000;
-					new MongoDB().batchPingHost(ip);
-					for (BatchCmd batch : new MongoDB().batchGetCommands(maxDelaySinceLastUpdate)) {
+					m.batchPingHost(ip);
+					for (BatchCmd batch : m.batchGetCommands(maxDelaySinceLastUpdate)) {
 						if (batch.getExperimentMongoID() != null && batch.getTargetIPs().contains(ip)) {
-							new MongoDB().batchClaim(batch, CloudAnalysisStatus.STARTING);
+							m.batchClaim(batch, CloudAnalysisStatus.STARTING);
 							break;
 						}
 					}
-					for (BatchCmd batch : new MongoDB().batchGetWorkTasksScheduledForStart()) {
+					for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart()) {
 						if (batch.getTargetIPs().contains(ip)) {
 							if (batch.getExperimentMongoID() != null) {
-								ExperimentHeaderInterface header = new MongoDB().getExperimentHeader(batch.getExperimentMongoID());
+								ExperimentHeaderInterface header = m.getExperimentHeader(batch.getExperimentMongoID());
 								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
 								commands_to_start.add(task);
 								break;
@@ -104,10 +101,10 @@ public class CloudTaskManager {
 					ArrayList<TaskDescription> del = new ArrayList<TaskDescription>();
 					for (TaskDescription td : runningTasks) {
 						if (td.analysisFinished()) {
-							td.getBatchCmd().updateRunningStatus(CloudAnalysisStatus.FINISHED);
+							td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.FINISHED);
 							del.add(td);
 						} else {
-							td.getBatchCmd().updateRunningStatus(CloudAnalysisStatus.IN_PROGRESS);
+							td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS);
 						}
 					}
 					if (del.size() > 0)
@@ -118,9 +115,9 @@ public class CloudTaskManager {
 							try {
 								idx_loop++;
 								System.out.println("loop: " + idx_loop + ", start: " + td.toString() + ", status: " + td.getBatchCmd().getRunStatus());
-								td.getBatchCmd().updateRunningStatus(CloudAnalysisStatus.IN_PROGRESS);
+								td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS);
 								runningTasks.add(td);
-								td.startWork(td.getBatchCmd(), hostName, ip, login, pass);
+								td.startWork(td.getBatchCmd(), hostName, ip, m);
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 							}

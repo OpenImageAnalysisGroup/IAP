@@ -11,6 +11,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
@@ -28,16 +29,15 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 
-	private String login, pass;
+	private MongoDB m;
 
 	public PerformanceAnalysisTask() {
 		// empty
 	}
 
-	public void setInput(Collection<NumericMeasurementInterface> input, String login, String pass) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 						if (id != null) {
 							try {
 								long start = System.currentTimeMillis();
-								byte[] imgData = IOmodule.loadImageContentFromFileOrMongo(id, login, pass);
+								byte[] imgData = IOmodule.loadImageContentFromFileOrMongo(id);
 								long end = System.currentTimeMillis();
 								tsoBytesRead.addLong(imgData.length);
 								{

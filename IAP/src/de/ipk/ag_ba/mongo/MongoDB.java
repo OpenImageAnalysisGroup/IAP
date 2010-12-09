@@ -76,15 +76,40 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeInputStream;
  */
 public class MongoDB {
 
-	public ResourceIOHandler[] getHandlers() {
-		return new ResourceIOHandler[] { new MongoDBhandler(), new MongoDBpreviewHandler() };
+	private static final ArrayList<MongoDB> mongos = initMongoList();
+
+	public static ArrayList<MongoDB> getMongos() {
+		return mongos;
 	}
 
-	private String defaultDBE = "dbe3";
-	private String defaultHost = "ba-13";// "nw-04.ipk-gatersleben.de,ba-24.ipk-gatersleben.de";
-	// "ba-13.ipk-gatersleben.de:27017,nw-08.ipk-gatersleben.de:27018";
-	private String defaultLogin = null;
-	private String defaultPass = null;
+	@Override
+	public String toString() {
+		return displayName + " (" + defaultHost + ", db " + defaultDBE + ")";
+	}
+
+	private static ArrayList<MongoDB> initMongoList() {
+		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
+		res.add(new MongoDB("IAP Cloud", "dbe3", "ba-13.ipk-gatersleben.de", null, null));
+		res.add(new MongoDB("IAP NG", "IAP1", "ba-13.ipk-gatersleben.de", null, null));
+		res.add(new MongoDB("localhost", "iapLocal1", "localhost", null, null));
+		return res;
+	}
+
+	private MongoDBhandler mh;
+	private MongoDBpreviewHandler mp;
+
+	public ResourceIOHandler[] getHandlers() {
+		String serverIP = defaultHost;
+		this.mh = new MongoDBhandler(serverIP, this);
+		this.mp = new MongoDBpreviewHandler(serverIP, this);
+		return new ResourceIOHandler[] { mh, mp };
+	}
+
+	private final String displayName;
+	private final String defaultDBE;
+	private final String defaultHost;
+	private final String defaultLogin;
+	private final String defaultPass;
 
 	// collections:
 	// preview_files
@@ -95,26 +120,15 @@ public class MongoDB {
 	// substances
 	// conditions
 
-	static boolean init = false;
-
-	public MongoDB() {
-		if (init)
-			return;
-		init = true;
-
-		// MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		// ObjectName name;
-		// try {
-		// name = new ObjectName("de.ipk_gatersleben.ag_ba.mongo:type=Hello");
-		// Hello mbean = new Hello();
-		// mbs.registerMBean(mbean, name);
-		// } catch (Exception e) {
-		// ErrorMsg.addErrorMessage(e);
-		// }
+	public MongoDB(String displayName, String databaseName, String hostName, String login, String password) {
+		this.displayName = displayName;
+		this.defaultDBE = databaseName;
+		this.defaultHost = hostName;
+		this.defaultLogin = login;
+		this.defaultPass = password;
 	}
 
-	public void saveExperiment(String dataBase, String optHosts, String optLogin, String optPass,
-						final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
+	public void saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
 						throws Exception {
 		RunnableOnDB r = new RunnableOnDB() {
 
@@ -130,16 +144,13 @@ public class MongoDB {
 				storeExperiment(experiment, db, status);
 			}
 		};
-		if (optHosts != null)
-			processDB(dataBase, optHosts, optLogin, optPass, r);
-		else
-			processDB(r);
+		processDB(r);
 
 	}
 
 	private static Mongo m;
 
-	public synchronized void processDB(String dataBase, String optHosts, String optLogin, String optPass,
+	private synchronized void processDB(String dataBase, String optHosts, String optLogin, String optPass,
 						RunnableOnDB runnableOnDB) throws Exception {
 		DB db;
 		if (m == null) {
@@ -508,7 +519,7 @@ public class MongoDB {
 
 		GridFSDBFile fff = gridfs_images.findOne(md5);
 
-		srcID.getURL().setPrefix(MongoDBhandler.PREFIX);
+		srcID.getURL().setPrefix(mh.getPrefix());
 		srcID.getURL().setDetail(md5);
 
 		if (fff != null && fff.getLength() <= 0) {
@@ -556,9 +567,9 @@ public class MongoDB {
 		// }
 	}
 
-	public void setDefaultDBE(String defaultDBE) {
-		this.defaultDBE = defaultDBE;
-	}
+	// public void setDefaultDBE(String defaultDBE) {
+	// this.defaultDBE = defaultDBE;
+	// }
 
 	public String getDefaultDBE() {
 		return defaultDBE;
@@ -568,25 +579,25 @@ public class MongoDB {
 		return defaultHost;
 	}
 
-	public void setDefaultHost(String defaultHost) {
-		this.defaultHost = defaultHost;
-	}
+	// public void setDefaultHost(String defaultHost) {
+	// this.defaultHost = defaultHost;
+	// }
 
 	public String getDefaultLogin() {
 		return defaultLogin;
 	}
 
-	public void setDefaultLogin(String defaultLogin) {
-		this.defaultLogin = defaultLogin;
-	}
+	// public void setDefaultLogin(String defaultLogin) {
+	// this.defaultLogin = defaultLogin;
+	// }
 
 	public String getDefaultPass() {
 		return defaultPass;
 	}
 
-	public void setDefaultPass(String defaultPass) {
-		this.defaultPass = defaultPass;
-	}
+	// public void setDefaultPass(String defaultPass) {
+	// this.defaultPass = defaultPass;
+	// }
 
 	public byte[] getPreviewData(final String md5) {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
@@ -1160,7 +1171,7 @@ public class MongoDB {
 						DBObject vol = (DBObject) v;
 						VolumeData volume = new VolumeData(sample, vol.toMap());
 						if (volume.getURL() != null) {
-							volume.getURL().setPrefix(MongoDBhandler.PREFIX);
+							volume.getURL().setPrefix(mh.getPrefix());
 							sample.add(volume);
 						} else
 							ErrorMsg.addErrorMessage("No volume data URL found! Volume: " + volume.toString());
@@ -1169,4 +1180,11 @@ public class MongoDB {
 			}
 	}
 
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public MongoDBhandler getPrimaryHandler() {
+		return mh;
+	}
 }

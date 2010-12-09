@@ -46,6 +46,7 @@ import de.ipk.ag_ba.gui.util.DateUtils;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -60,8 +61,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
  */
 public class Other {
 
-	public static ArrayList<NavigationButton> getProcessExperimentDataWithVantedEntities(final String login,
-						final String pass, final ExperimentReference experimentName, GUIsetting guIsetting) {
+	public static ArrayList<NavigationButton> getProcessExperimentDataWithVantedEntities(final MongoDB m, final ExperimentReference experimentName,
+						GUIsetting guIsetting) {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 
 		ArrayList<AbstractExperimentDataProcessor> validProcessors = new ArrayList<AbstractExperimentDataProcessor>();
@@ -78,10 +79,10 @@ public class Other {
 				@Override
 				public void performActionCalculateResults(NavigationButton src) {
 					try {
-						if (experimentName.getData() != null) {
-							SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(login,
-												pass, experimentName.getData(), experimentName.getExperimentName());
-							ExperimentDataProcessingManager.getInstance().processData(experimentName.getData(), pp, null,
+						if (experimentName.getData(m) != null) {
+							SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(m, experimentName.getData(m),
+												experimentName.getExperimentName());
+							ExperimentDataProcessingManager.getInstance().processData(experimentName.getData(m), pp, null,
 												optSupplementaryPanel, null);
 							AIPmain.showVANTED();
 						} else {
@@ -320,8 +321,7 @@ public class Other {
 	}
 
 	public static NavigationButton getCalendarEntity(
-						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
-						final String p, GUIsetting guiSettings) {
+						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final MongoDB m, GUIsetting guiSettings) {
 
 		final ObjectRef refCalEnt = new ObjectRef();
 		final ObjectRef refCalGui = new ObjectRef();
@@ -345,7 +345,7 @@ public class Other {
 
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
-				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Omics, group2ei, l, p,
+				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Omics, group2ei, m,
 									refCalEnt, refCalGui, src.getGUIsetting());
 				return res;
 			}
@@ -373,8 +373,7 @@ public class Other {
 
 	protected static NavigationButton getCalendarNavigationEntitiy(final boolean nextMonth,
 						final ObjectRef refCalEnt, final ObjectRef refCalGui,
-						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
-						final String p, final GUIsetting guIsetting) {
+						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final MongoDB m, final GUIsetting guIsetting) {
 		// GregorianCalendar c = new GregorianCalendar();
 		// c.setTime(((Calendar) refCalGui.getObject()).getCalendar().getTime());
 		// if (nextMonth)
@@ -402,8 +401,7 @@ public class Other {
 				else
 					c.getCalendar().add(GregorianCalendar.MONTH, -1);
 				c.updateGUI(false);
-				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Phenotyping, group2ei, l,
-									p, refCalEnt, refCalGui, guIsetting);
+				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Phenotyping, group2ei, m, refCalEnt, refCalGui, guIsetting);
 				return res;
 			}
 		}, nextMonth ? "Next" : "Previous", nextMonth ? "img/large_right.png" : "img/large_left.png", guIsetting);
@@ -411,11 +409,11 @@ public class Other {
 	}
 
 	private static ArrayList<NavigationButton> getExperimentNavigationActions(DBEtype dbeType,
-						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final String l,
-						final String p, final ObjectRef refCalEnt, final ObjectRef refCalGui, GUIsetting guIsetting) {
+						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final MongoDB m, final ObjectRef refCalEnt,
+						final ObjectRef refCalGui, GUIsetting guIsetting) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		res.add(getCalendarNavigationEntitiy(false, refCalEnt, refCalGui, group2ei, l, p, guIsetting));
-		res.add(getCalendarNavigationEntitiy(true, refCalEnt, refCalGui, group2ei, l, p, guIsetting));
+		res.add(getCalendarNavigationEntitiy(false, refCalEnt, refCalGui, group2ei, m, guIsetting));
+		res.add(getCalendarNavigationEntitiy(true, refCalEnt, refCalGui, group2ei, m, guIsetting));
 
 		// image-loading.png
 
@@ -446,7 +444,7 @@ public class Other {
 				ei.setStartdate(new Date());
 				ei.setImportdate(new Date());
 				final MyExperimentInfoPanel info = new MyExperimentInfoPanel();
-				info.setExperimentInfo(l, p, ei, true, null);
+				info.setExperimentInfo(m, ei, true, null);
 
 				Substance md = new Substance();
 				final Condition experimentInfo = new Condition(md);
@@ -481,7 +479,7 @@ public class Other {
 			}
 		};
 
-		if (l == null || !l.equals("internet")) { // dbeType ==
+		if (m != null) { // dbeType ==
 			// DBEtype.Phenotyping &&
 			NavigationButton scheduleExperiment = new NavigationButton(scheduleExperimentAction,
 								"Schedule Experiment", "img/ext/image-loading.png", guIsetting);
@@ -500,14 +498,12 @@ public class Other {
 						String dayA = DateUtils.getDayInfo(ei.getStartdate());
 						String dayB = DateUtils.getDayInfo(ei.getImportdate());
 						if (dayA.equals(dayInfo) || dayB.equals(dayInfo)) {
-							NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
-												guIsetting);
+							NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei, guIsetting, m);
 							res.add(exp);
 						} else {
 							if (calEnt.getCalendar().getTime().after(ei.getStartdate())
 												&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
-								NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
-													guIsetting);
+								NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei, guIsetting, m);
 								res.add(exp);
 							}
 						}
@@ -515,14 +511,12 @@ public class Other {
 						String mA = DateUtils.getMonthInfo(ei.getStartdate());
 						String mB = DateUtils.getMonthInfo(ei.getImportdate());
 						if (mA.equals(monthInfo) || mB.equals(monthInfo)) {
-							NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
-												guIsetting);
+							NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei, guIsetting, m);
 							res.add(exp);
 						} else {
 							if (calEnt.getCalendar().getTime().after(ei.getStartdate())
 												&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
-								NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei,
-													guIsetting);
+								NavigationButton exp = MongoExperimentsNavigationAction.getMongoExperimentButton(ei, guIsetting, m);
 								res.add(exp);
 							}
 						}

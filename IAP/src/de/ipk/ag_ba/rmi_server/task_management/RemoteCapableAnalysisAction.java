@@ -8,6 +8,7 @@ package de.ipk.ag_ba.rmi_server.task_management;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 
 /**
@@ -16,7 +17,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Runnable
 public interface RemoteCapableAnalysisAction extends NavigationAction {
 	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver);
 
-	public void setParams(ExperimentReference inputExperiment, String login, String pass, String params);
+	public void setParams(ExperimentReference inputExperiment, MongoDB m, String params);
 
 	public String getMongoDatasetID();
+
+	public MongoDB getMongoDB();
 }

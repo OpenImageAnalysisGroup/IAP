@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ErrorMsg;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
@@ -23,8 +25,7 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 
 	private Collection<NumericMeasurementInterface> input;
 	private Collection<NumericMeasurementInterface> output;
-	private String login;
-	private String pass;
+	private MongoDB m;
 
 	/*
 	 * (non-Javadoc)
@@ -93,10 +94,13 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 		for (Measurement md : input) {
 			if ((md instanceof VolumeData) && !(md instanceof LoadedVolume)) {
 				// load volume
-				LoadedVolume lv = IOmodule.loadVolumeFromMongo((VolumeData) md, login, pass);
-				// LoadedVolume lv = IOmodule.loadVolumeFromDBE((VolumeData) md,
-				// login, pass);
-				md = lv;
+				LoadedVolume lv;
+				try {
+					lv = IOmodule.loadVolume((VolumeData) md);
+					md = lv;
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+				}
 			}
 			if (md instanceof LoadedVolume) {
 				LoadedVolume lv = (LoadedVolume) md;
@@ -137,10 +141,9 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	}
 
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, String login, String pass) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 	}
 
 }

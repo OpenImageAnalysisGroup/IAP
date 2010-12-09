@@ -81,7 +81,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 					System.out.println("Database " + db + " could not be processed.");
 				}
 			}
-			result.add(1, Other.getCalendarEntity(allExperiments, login, pass, src.getGUIsetting()));
+			result.add(1, Other.getCalendarEntity(allExperiments, null, src.getGUIsetting()));
 
 		} catch (Exception e) {
 			// error

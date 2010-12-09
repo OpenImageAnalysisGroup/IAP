@@ -78,7 +78,8 @@ public class NavigationButton implements StyleAware {
 		if (navigationAction != null) {
 			boolean enableRemoteTaskExecution = false;
 			if (enableRemoteTaskExecution && navigationAction instanceof RemoteCapableAnalysisAction) {
-				CloundManagerNavigationAction ra = new CloundManagerNavigationAction(null, null);
+				RemoteCapableAnalysisAction rca = (RemoteCapableAnalysisAction) navigationAction;
+				CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB());
 				navigationAction = new RemoteExecutionWrapperAction(navigationAction,
 									new NavigationButton(ra, guiSetting));
 			}

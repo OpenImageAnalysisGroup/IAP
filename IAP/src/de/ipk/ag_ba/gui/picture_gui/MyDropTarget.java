@@ -20,6 +20,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
@@ -32,15 +33,13 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 	DataSetFilePanel panel;
 	MongoTreeNode targetTreeNode;
 	JTree expTree;
-	private final String user;
-	private final String pass;
+	private final MongoDB m;
 
-	public MyDropTarget(String user, String pass, DataSetFilePanel panel, MongoTreeNode targetTreeNode, JTree expTree) {
+	public MyDropTarget(MongoDB m, DataSetFilePanel panel, MongoTreeNode targetTreeNode, JTree expTree) {
 		this.panel = panel;
 		this.targetTreeNode = targetTreeNode;
 		this.expTree = expTree;
-		this.user = user;
-		this.pass = pass;
+		this.m = m;
 	}
 
 	public boolean isTargetReadOnly() {
@@ -169,7 +168,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 	}
 
 	public void addImageToDatabase(final File file, final boolean deleteUponCompletion) {
-		final DataSetFileButton imageButton = new DataSetFileButton(user, pass, targetTreeNode,
+		final DataSetFileButton imageButton = new DataSetFileButton(m, targetTreeNode,
 							"<html><body><b>" + DataSetFileButton.getMaxString(file.getName()) + //$NON-NLS-1$
 												"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null); //$NON-NLS-1$//$NON-NLS-2$
 		imageButton.setProgressValue(-1);
@@ -206,7 +205,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 
 				if (file.canRead()) {
 					imageButton.setProgressValue(-1);
-					DatabaseStorageResult md5 = DataExchangeHelperForExperiments.insertMD5checkedFile(user, pass, file,
+					DatabaseStorageResult md5 = DataExchangeHelperForExperiments.insertMD5checkedFile(m, file,
 										imageButton.createTempPreviewImage(), imageButton.getIsJavaImage(), imageButton, targetTreeNode
 															.getTargetEntity());
 					((BinaryMeasurement) bif.getEntity()).getURL().setDetail(md5.getMD5());
@@ -224,7 +223,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					imageButton.imageResult = new ImageResult(icon, bfi);
 					imageButton.setProgressValue(100);
 					targetTreeNode.setSizeDirty(true);
-					targetTreeNode.updateSizeInfo(user, pass, targetTreeNode.getSizeChangedListener());
+					targetTreeNode.updateSizeInfo(m, targetTreeNode.getSizeChangedListener());
 					imageButton.hideProgressbar();
 				}
 				if (deleteUponCompletion)

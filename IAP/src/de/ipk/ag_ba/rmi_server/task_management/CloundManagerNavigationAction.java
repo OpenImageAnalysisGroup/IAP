@@ -23,14 +23,12 @@ import de.ipk.ag_ba.mongo.MongoDB;
  */
 public class CloundManagerNavigationAction extends AbstractNavigationAction {
 
-	private final String login;
-	private final String pass;
 	private NavigationButton src;
+	private final MongoDB m;
 
-	public CloundManagerNavigationAction(String login, String pass) {
+	public CloundManagerNavigationAction(MongoDB m) {
 		super("Task- and Server-Management");
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 	}
 
 	@Override
@@ -48,10 +46,10 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		GUIsetting guiSetting = src.getGUIsetting();
 		NavigationButton startOrStopServerMode = new NavigationButton(
-							new EnableOrDisableServerModeAction(login, pass), guiSetting);
+							new EnableOrDisableServerModeAction(m), guiSetting);
 		res.add(startOrStopServerMode);
 		try {
-			for (String ip : new MongoDB().batchGetAvailableHosts(10000)) {
+			for (String ip : m.batchGetAvailableHosts(10000)) {
 				NavigationButton n = new NavigationButton(new HostInformationAction(ip), guiSetting);
 				res.add(n);
 			}
@@ -59,8 +57,8 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			ErrorMsg.addErrorMessage(e);
 		}
 		try {
-			for (BatchCmd b : new MongoDB().batchGetAllCommands()) {
-				NavigationButton n = new NavigationButton(new BatchInformationAction(b), guiSetting);
+			for (BatchCmd b : m.batchGetAllCommands()) {
+				NavigationButton n = new NavigationButton(new BatchInformationAction(b, m), guiSetting);
 				n.setProcessing(true);
 				n.setRightAligned(true);
 				res.add(n);

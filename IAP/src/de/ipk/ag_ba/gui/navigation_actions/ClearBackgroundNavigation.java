@@ -4,11 +4,12 @@ import java.util.ArrayList;
 
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-import de.ipk.ag_ba.gui.ImageAnalysis;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
+import de.ipk.ag_ba.rmi_server.databases.DataBaseTargetMongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
@@ -28,9 +29,9 @@ public class ClearBackgroundNavigation extends AbstractExperimentAnalysisNavigat
 	private final double epsilon;
 	private final double epsilon2;
 
-	public ClearBackgroundNavigation(String login, double epsilon, double epsilon2, String pass,
+	public ClearBackgroundNavigation(MongoDB m, double epsilon, double epsilon2,
 						ExperimentReference experiment) {
-		super(login, pass, experiment);
+		super(m, experiment);
 		this.epsilon = epsilon;
 		this.epsilon2 = epsilon2;
 	}
@@ -39,7 +40,7 @@ public class ClearBackgroundNavigation extends AbstractExperimentAnalysisNavigat
 	public void performActionCalculateResults(final NavigationButton src) throws Exception {
 		super.performActionCalculateResults(src);
 
-		ExperimentInterface res = experiment.getData();
+		ExperimentInterface res = experiment.getData(m);
 
 		// src.title = src.title + ": processing";
 
@@ -63,8 +64,8 @@ public class ClearBackgroundNavigation extends AbstractExperimentAnalysisNavigat
 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setInt(1);
-		PhenotypeAnalysisTask task = new PhenotypeAnalysisTask(epsilon, epsilon2, ImageAnalysis.isSaveInDatabase());
-		task.setInput(workload, login, pass);
+		PhenotypeAnalysisTask task = new PhenotypeAnalysisTask(epsilon, epsilon2, new DataBaseTargetMongoDB(true, m));
+		task.setInput(workload, m);
 		task.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 		// src.title = src.title.split("\\:")[0];
 	}

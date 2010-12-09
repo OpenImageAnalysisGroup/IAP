@@ -10,22 +10,21 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
  */
 public class FileManagerAction extends AbstractNavigationAction {
-	private final String login;
+	private final MongoDB m;
 	private final ExperimentReference experiment;
-	private final String pass;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
 
-	public FileManagerAction(String login, String pass, ExperimentReference experiment) {
+	public FileManagerAction(MongoDB m, ExperimentReference experiment) {
 		super("Access primary and annotation files");
-		this.login = login;
+		this.m = m;
 		this.experiment = experiment;
-		this.pass = pass;
 	}
 
 	@Override
@@ -33,7 +32,7 @@ public class FileManagerAction extends AbstractNavigationAction {
 		this.src = src;
 
 		try {
-			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(login, pass, experiment.getData(),
+			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(m, experiment.getData(m),
 								experiment.getExperimentName());
 			mpc = new MainPanelComponent(sfp);
 		} catch (Exception e) {
@@ -62,9 +61,9 @@ public class FileManagerAction extends AbstractNavigationAction {
 		return mpc;
 	}
 
-	public static NavigationButton getFileManagerEntity(final String login, final String pass,
+	public static NavigationButton getFileManagerEntity(MongoDB m,
 						final ExperimentReference experimentRef, GUIsetting guiSetting) {
-		NavigationAction fileManagerAction = new FileManagerAction(login, pass, experimentRef);
+		NavigationAction fileManagerAction = new FileManagerAction(m, experimentRef);
 		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View Data",
 							"img/ext/applications-system.png", guiSetting);
 		return fileManager;

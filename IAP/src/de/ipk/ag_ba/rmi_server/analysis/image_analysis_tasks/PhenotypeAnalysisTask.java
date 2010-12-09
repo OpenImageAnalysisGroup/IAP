@@ -18,6 +18,7 @@ import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image_utils.MorphologicalOperators;
 import de.ipk.ag_ba.image_utils.PixelSegmentation;
 import de.ipk.ag_ba.image_utils.PrintImage;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
@@ -45,7 +46,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 	private double epsilonA;
 	private double epsilonB;
 
-	private String login, pass;
+	private MongoDB m;
 
 	private final DatabaseTarget storeResultInDatabase;
 
@@ -61,10 +62,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		this.storeResultInDatabase = storeResultInDatabase;
 	}
 
-	public void setInput(Collection<NumericMeasurementInterface> input, String login, String pass) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 	}
 
 	@Override
@@ -112,13 +112,13 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 						limg = (LoadedImage) id;
 					} else {
 						try {
-							limg = IOmodule.loadImageFromFileOrMongo(id, login, pass);
+							limg = IOmodule.loadImageFromFileOrMongo(id);
 						} catch (Exception e) {
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
 					clearBackgroundAndInterpretImage(limg, maximumThreadCountOnImageLevel,
-										storeResultInDatabase, status, true, login, pass, output, preProcessors, epsilonA,
+										storeResultInDatabase, status, true, output, preProcessors, epsilonA,
 										epsilonB);
 					tso.addInt(1);
 					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
@@ -143,7 +143,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 
 	public static void clearBackgroundAndInterpretImage(final LoadedImage limg, int maximumThreadCount,
 						DatabaseTarget storeResultInDatabase, final BackgroundTaskStatusProviderSupportingExternalCall status,
-						boolean dataAnalysis, String login, String pass, ArrayList<NumericMeasurementInterface> output,
+						boolean dataAnalysis, ArrayList<NumericMeasurementInterface> output,
 						ArrayList<ImagePreProcessor> preProcessors, final double epsilonA, final double epsilonB) {
 
 		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
@@ -338,7 +338,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		if (dataAnalysis && storeResultInDatabase != null) {
 			try {
 				LoadedImage lib = result;
-				result = storeResultInDatabase.saveImage(result, login, pass);
+				result = storeResultInDatabase.saveImage(result);
 				// add processed image to result
 				if (result != null)
 					output.add(new ImageData(result.getParentSample(), result));
@@ -756,9 +756,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		preProcessors.add(pre);
 	}
 
-	public static LoadedImage clearBackground(LoadedImage image, int maximumThreadCount, String login, String pass) {
+	public static LoadedImage clearBackground(LoadedImage image, int maximumThreadCount) {
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-		clearBackgroundAndInterpretImage(image, maximumThreadCount, null, null, false, login, pass, output, null, 5d, 10d);
+		clearBackgroundAndInterpretImage(image, maximumThreadCount, null, null, false, output, null, 5d, 10d);
 		LoadedImage res = (LoadedImage) output.iterator().next();
 		return res;
 	}

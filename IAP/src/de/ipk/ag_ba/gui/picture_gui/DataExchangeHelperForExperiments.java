@@ -51,14 +51,14 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  */
 public class DataExchangeHelperForExperiments {
 
-	public static int getSizeOfExperiment(String user, String pass, ExperimentInterface experimentName) {
+	public static int getSizeOfExperiment(MongoDB m, ExperimentInterface experimentName) {
 		return -1;
 	}
 
-	public static void downloadFile(String user, String pass, final ImageResult imageResult, final File targetFile,
+	public static void downloadFile(MongoDB m, final ImageResult imageResult, final File targetFile,
 						final DataSetFileButton button, final MongoCollection collection) {
 		try {
-			new MongoDB().processDB(new RunnableOnDB() {
+			m.processDB(new RunnableOnDB() {
 
 				private DB db;
 
@@ -108,12 +108,12 @@ public class DataExchangeHelperForExperiments {
 		}
 	}
 
-	public static DatabaseStorageResult insertMD5checkedFile(String user, String pass, final File file,
+	public static DatabaseStorageResult insertMD5checkedFile(final MongoDB m, final File file,
 						File createTempPreviewImage, int isJavaImage, DataSetFileButton imageButton, MappingDataEntity tableName) {
 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		try {
-			new MongoDB().processDB(new RunnableOnDB() {
+			m.processDB(new RunnableOnDB() {
 				private DB db;
 
 				public void run() {
@@ -121,7 +121,7 @@ public class DataExchangeHelperForExperiments {
 					try {
 						md5 = AttributeHelper.getMD5fromFile(file);
 						GridFS gridfs_annotation = new GridFS(db, "annotations");
-						new MongoDB().saveAnnotationFile(gridfs_annotation, md5, file);
+						m.saveAnnotationFile(gridfs_annotation, md5, file);
 						// GridFS gridfs_images = new GridFS(db, "images");
 						GridFSDBFile fff = gridfs_annotation.findOne(md5);
 						if (fff != null) {
@@ -130,7 +130,7 @@ public class DataExchangeHelperForExperiments {
 							return;
 						} else {
 							try {
-								new MongoDB().saveAnnotationFile(gridfs_annotation, md5, file);
+								m.saveAnnotationFile(gridfs_annotation, md5, file);
 								tso.setParam(0, DatabaseStorageResult.STORED_IN_DB);
 								tso.setParam(1, md5);
 								return;
@@ -158,17 +158,17 @@ public class DataExchangeHelperForExperiments {
 	}
 
 	public static void fillFilePanel(final DataSetFilePanel filePanel, final MongoTreeNode mtdbe, final JTree expTree,
-						final String login, final String password) {
+						final MongoDB m) {
 		MyThread r = new MyThread(new Runnable() {
 			public void run() {
-				addFilesToPanel(filePanel, mtdbe, expTree, login, password);
+				addFilesToPanel(filePanel, mtdbe, expTree, m);
 			}
 		}, "add files to panel");
 		BackgroundThreadDispatcher.addTask(r, 0);
 	}
 
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel, final MongoTreeNode mt,
-						final JTree expTree, String dbeUser, String dbePass) {
+						final JTree expTree, MongoDB m) {
 		if (!mt.mayContainData())
 			return;
 		final StopObject stop = new StopObject(false);
@@ -269,13 +269,13 @@ public class DataExchangeHelperForExperiments {
 						previewImage = null;
 						previewLoadAndConstructNeeded = true;
 					} else {
-						byte[] pi = new MongoDB().getPreviewData(binaryFileInfo.getMD5());
+						byte[] pi = m.getPreviewData(binaryFileInfo.getMD5());
 						if (pi != null)
 							previewImage = new ImageIcon(pi);
 						else
 							previewLoadAndConstructNeeded = true;
 					}
-				final DataSetFileButton imageButton = new DataSetFileButton(dbeUser, dbePass, mt, imageResult,
+				final DataSetFileButton imageButton = new DataSetFileButton(m, mt, imageResult,
 									previewImage, mt.isReadOnly());
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();

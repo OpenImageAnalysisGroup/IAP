@@ -13,6 +13,7 @@ import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
@@ -33,8 +34,7 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 
 	private static int somSize = 4;
 	protected Collection<NumericMeasurementInterface> input;
-	protected String login;
-	protected String pass;
+	protected MongoDB m;
 	protected Collection<NumericMeasurementInterface> output;
 
 	private final DatabaseTarget storeResultInDatabase;
@@ -96,7 +96,7 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 			for (NumericMeasurementInterface in : input) {
 				if (in instanceof VolumeData) {
 					status.setCurrentStatusText1("Load Volume");
-					LoadedVolume volume = IOmodule.loadVolumeFromMongo((VolumeData) in, login, pass);
+					LoadedVolume volume = IOmodule.loadVolume((VolumeData) in);
 
 					volume.getURL().setFileName(volume.getURL().getFileName() + ".labelfield");
 					status.setCurrentStatusText1("Segmentation");
@@ -110,7 +110,7 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 							status.setCurrentStatusText1("Saving (" + bytes / 1024 / 1024 + " MB)");
 							long t1 = System.currentTimeMillis();
 							String md5 = AttributeHelper.getMD5fromInputStream(volume.getURL().getInputStream());
-							storeResultInDatabase.saveVolume(volume, (Sample3D) volume.getParentSample(), login, pass,
+							storeResultInDatabase.saveVolume(volume, (Sample3D) volume.getParentSample(), m,
 												DBTable.SAMPLE, null, md5, status);
 							long t2 = System.currentTimeMillis();
 							if (t2 > t1)
@@ -138,9 +138,8 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 	}
 
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, String login, String pass) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 	}
 }

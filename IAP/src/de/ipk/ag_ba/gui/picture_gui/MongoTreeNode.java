@@ -2,6 +2,7 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.event.ActionListener;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 
@@ -61,7 +62,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		}
 	}
 
-	public void updateSizeInfo(final String user, final String pass, final ActionListener dataChangedListener) {
+	public void updateSizeInfo(final MongoDB m, final ActionListener dataChangedListener) {
 		if (getExperimentName() == null)
 			return;
 		if (!sizeDirty)
@@ -69,11 +70,11 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		sizeDirty = false;
 
 		if (projectNode != null) {
-			projectNode.updateSizeInfo(user, pass, dataChangedListener);
+			projectNode.updateSizeInfo(m, dataChangedListener);
 		} else {
 			MyThread infoThread = new MyThread(new Runnable() {
 				public void run() {
-					getCurrentProjectSize(user, pass);
+					getCurrentProjectSize(m);
 					if (dataChangedListener != null)
 						dataChangedListener.actionPerformed(null);
 				}
@@ -83,9 +84,9 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		}
 	}
 
-	void getCurrentProjectSize(String user, String pass) {
+	void getCurrentProjectSize(MongoDB m) {
 		try {
-			int sz = DataExchangeHelperForExperiments.getSizeOfExperiment(user, pass, experiment);
+			int sz = DataExchangeHelperForExperiments.getSizeOfExperiment(m, experiment);
 			if (sz != -1) {
 				if (sz < 1024)
 					size = sz + " KB";

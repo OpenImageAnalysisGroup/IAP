@@ -11,6 +11,7 @@ import java.io.InputStream;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
@@ -20,9 +21,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
  */
 public interface DatabaseTarget {
 
-	LoadedImage saveImage(LoadedImage limg, String login, String pass) throws Exception;
+	LoadedImage saveImage(LoadedImage limg) throws Exception;
 
-	void saveVolume(final LoadedVolume volume, Sample3D s3d, String login, String pass, DBTable sample,
+	void saveVolume(final LoadedVolume volume, Sample3D s3d, MongoDB m, DBTable sample,
 						InputStream threeDvolumePreviewIcon,
 						String md5, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception;
+
+	String getPrefix();
 }

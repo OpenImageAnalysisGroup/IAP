@@ -26,6 +26,7 @@ import org.JMButton;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
 public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListener, StatusDisplay {
@@ -90,7 +91,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 
 	DataSetFilePanel currentFilePanel = null;
 
-	public SupplementaryFilePanelMongoDB(final String login, final String password, ExperimentInterface doc,
+	public SupplementaryFilePanelMongoDB(final MongoDB m, ExperimentInterface doc,
 						String experimentName) {
 
 		final SupplementaryFilePanelMongoDB thisPanel = this;
@@ -114,7 +115,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		// todo if mongo knows this ID as an experiment ID
 		boolean readOnly = doc.getHeader().getExcelfileid() != null;
 
-		expTree = new JTree(new DBEtreeModel(this, login, password, doc, readOnly));
+		expTree = new JTree(new DBEtreeModel(this, m, doc, readOnly));
 		expTree.setCellRenderer(new DBEtreeCellRenderer());
 		// myTrees.add(new WeakReference<JTree>(expTree));
 
@@ -127,9 +128,9 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 				if (mt instanceof MongoTreeNode && ((MongoTreeNode) mt).getTargetEntity() != null) {
 					final MongoTreeNode mtdbe = (MongoTreeNode) mt;
 					MongoTreeNode projectNode = mtdbe.getProjectNode();
-					projectNode.updateSizeInfo(login, password, thisPanel);
+					projectNode.updateSizeInfo(m, thisPanel);
 
-					MyDropTarget myDropTarget = new MyDropTarget(login, password, filePanel, mtdbe, expTree);
+					MyDropTarget myDropTarget = new MyDropTarget(m, filePanel, mtdbe, expTree);
 					currentDropTarget = myDropTarget;
 					filePanel.setDropTarget(myDropTarget);
 
@@ -149,7 +150,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							filePanel.repaint();
 
 							removeTempFiles();
-							DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, login, password);
+							DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, m);
 						}
 					});
 

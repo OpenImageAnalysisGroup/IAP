@@ -45,6 +45,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.session.EditorSession;
 
 import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 import de.ipk_gatersleben.ag_pbi.vanted3d.mapping.MappingResultGraph;
@@ -65,7 +66,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	private JMenuItem removeOneFromDatabaseCmd;
 	private JMenuItem removeAllFromDatabaseCmd;
 
-	String user, pass;
+	MongoDB m;
 
 	JProgressBar progress;
 	private final MongoTreeNode targetTreeNode;
@@ -96,7 +97,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	// this.pass = pass;
 	// }
 
-	public DataSetFileButton(String user, String pass, MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
+	public DataSetFileButton(MongoDB m, MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
 						ImageIcon previewImage) {
 		super();
 
@@ -112,8 +113,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 
 		this.targetTreeNode = targetTreeNode;
 
-		this.user = user;
-		this.pass = pass;
+		this.m = m;
 	}
 
 	JLabel mmlbl;
@@ -149,9 +149,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		validate();
 	}
 
-	public DataSetFileButton(String user, String pass, MongoTreeNode projectNode, ImageResult imageResult,
+	public DataSetFileButton(MongoDB m, MongoTreeNode projectNode, ImageResult imageResult,
 						ImageIcon previewImage, boolean readOnly) {
-		this(user, pass, projectNode, "<html><body><b>" + getMaxString(strip(imageResult.getFileName()))
+		this(m, projectNode, "<html><body><b>" + getMaxString(strip(imageResult.getFileName()))
 							+ "</b></body></html>", null, previewImage);
 		this.imageResult = imageResult;
 		if (imageResult == null)
@@ -230,10 +230,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							try {
 								VolumeData volume = (VolumeData) mde;
 								if (volume != null)
-									DataExchangeHelperForExperiments.downloadFile(user, pass, imageResult, tf, thisInstance,
+									DataExchangeHelperForExperiments.downloadFile(m, imageResult, tf, thisInstance,
 														MongoCollection.VOLUMES);
 							} catch (Exception e) {
-								DataExchangeHelperForExperiments.downloadFile(user, pass, imageResult, tf, thisInstance,
+								DataExchangeHelperForExperiments.downloadFile(m, imageResult, tf, thisInstance,
 													MongoCollection.IMAGES);
 							}
 						}
@@ -387,7 +387,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			p.getScrollpane().validate();
 			p.repaint();
 			targetTreeNode.setSizeDirty(true);
-			targetTreeNode.updateSizeInfo(user, pass, sizeChangedListener);
+			targetTreeNode.updateSizeInfo(m, sizeChangedListener);
 		}
 		if (evt.getSource() == removeAllFromDatabaseCmd) {
 			// DataExchangeHelperForExperiments.removeAllImagesForOneTargetNodeFromDataBase(user,
@@ -399,7 +399,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			p.getScrollpane().validate();
 			p.repaint();
 			targetTreeNode.setSizeDirty(true);
-			targetTreeNode.updateSizeInfo(user, pass, sizeChangedListener);
+			targetTreeNode.updateSizeInfo(m, sizeChangedListener);
 			// if (user.equals(Consts.ROOTUSERNAME.toString())) { // TODO
 			Thread t = new Thread(new Runnable() {
 				public void run() {

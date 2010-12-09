@@ -12,6 +12,7 @@ import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -61,11 +62,11 @@ public class TaskDescription {
 		return cmd != null && cmd.getTargetIPs().contains(systemIP);
 	}
 
-	public void startWork(BatchCmd batch, String hostName, String ip, final String login, final String pass)
+	public void startWork(BatchCmd batch, String hostName, String ip, final MongoDB m)
 						throws ClassCastException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		final RemoteCapableAnalysisAction action = RemoteAnalysisRepository.getInstance().getNewAnalysisAction(
 							analysisActionClassName);
-		action.setParams(experimentInput, login, pass, params);
+		action.setParams(experimentInput, m, params);
 
 		Set<String> ips = cmd.getTargetIPs();
 		int thisHostID = 0;

@@ -54,16 +54,16 @@ public class CloudComputingService {
 			return "Join Compute Cloud";
 	}
 
-	public void switchStatus(String login, String pass) {
+	public void switchStatus(MongoDB m) {
 		if (!active) {
 			// enable server mode
 			try {
-				new MongoDB().batchClearJobs();
+				m.batchClearJobs();
 				String hostName = InetAddress.getLocalHost().getHostName();
 				String ip = InetAddress.getLocalHost().getHostAddress();
 				cloudTaskManager.setHostName(hostName);
 				cloudTaskManager.setIp(ip);
-				cloudTaskManager.startWork(login, pass);
+				cloudTaskManager.startWork(m);
 			} catch (UnknownHostException e) {
 				ErrorMsg.addErrorMessage(e);
 			} catch (Exception e) {
