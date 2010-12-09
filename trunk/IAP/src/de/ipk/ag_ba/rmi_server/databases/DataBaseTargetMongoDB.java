@@ -28,22 +28,24 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 public class DataBaseTargetMongoDB implements DatabaseTarget {
 
 	private final boolean store;
+	private final MongoDB m;
 
-	public DataBaseTargetMongoDB(boolean store) {
+	public DataBaseTargetMongoDB(boolean store, MongoDB m) {
 		this.store = store;
+		this.m = m;
 	}
 
 	@Override
-	public LoadedImage saveImage(final LoadedImage limg, String login, String pass) throws Exception {
+	public LoadedImage saveImage(final LoadedImage limg) throws Exception {
 		if (!store)
 			return null;
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
-		new MongoDB().processDB("dbe3", null, login, pass, new RunnableOnDB() {
+		m.processDB(new RunnableOnDB() {
 			private DB db;
 
 			public void run() {
 				try {
-					DatabaseStorageResult dsr = new MongoDB().saveImageFile(db, limg, null);
+					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null);
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
@@ -71,21 +73,26 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 	 * java.io.InputStream)
 	 */
 	@Override
-	public void saveVolume(final LoadedVolume volume, Sample3D s3d, String login, String pass, DBTable sample,
+	public void saveVolume(final LoadedVolume volume, Sample3D s3d, final MongoDB m, DBTable sample,
 						InputStream threeDvolumePreviewIcon,
 						String md5, final BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		if (!store)
 			return;
-		new MongoDB().processDB("dbe3", null, login, pass, new RunnableOnDB() {
+		m.processDB(new RunnableOnDB() {
 			private DB db;
 
 			public void run() {
-				new MongoDB().saveVolumeFile(db, volume, null, optStatus);
+				m.saveVolumeFile(db, volume, null, optStatus);
 			}
 
 			public void setDB(DB db) {
 				this.db = db;
 			}
 		});
+	}
+
+	@Override
+	public String getPrefix() {
+		return m.getPrimaryHandler().getPrefix();
 	}
 }

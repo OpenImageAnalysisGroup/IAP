@@ -19,6 +19,7 @@ import de.ipk.ag_ba.image_utils.FlexibleImageSet;
 import de.ipk.ag_ba.image_utils.FlexibleImageType;
 import de.ipk.ag_ba.image_utils.ImageConverter;
 import de.ipk.ag_ba.image_utils.PhytochamberTopImageProcessor;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
@@ -40,19 +41,15 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 
-	private String login, pass;
-
 	ArrayList<ImagePreProcessor> preProcessors = new ArrayList<ImagePreProcessor>();
 	protected DatabaseTarget databaseTarget;
 
 	public PhytochamberAnalysisTask() {
-		databaseTarget = new DataBaseTargetMongoDB(true);
 	}
 
-	public void setInput(Collection<NumericMeasurementInterface> input, String login, String pass) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
-		this.login = login;
-		this.pass = pass;
+		databaseTarget = new DataBaseTargetMongoDB(true, m);
 	}
 
 	@Override
@@ -193,7 +190,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			public void run() {
 				// System.out.println("Load Image");
 				try {
-					input.set(new FlexibleImage(IOmodule.loadImageFromFileOrMongo(id, login, pass).getLoadedImage(), type));
+					input.set(new FlexibleImage(IOmodule.loadImageFromFileOrMongo(id).getLoadedImage(), type));
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
@@ -351,7 +348,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 
 		try {
 			LoadedImage lib = result;
-			result = storeResultInDatabase.saveImage(result, login, pass);
+			result = storeResultInDatabase.saveImage(result);
 			// add processed image to result
 			if (result != null)
 				return new ImageData(result.getParentSample(), result);

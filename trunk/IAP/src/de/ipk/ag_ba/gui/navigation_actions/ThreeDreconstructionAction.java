@@ -15,6 +15,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.ThreeDreconstruction;
@@ -42,8 +43,7 @@ import display.DisplayHistogram;
  */
 public class ThreeDreconstructionAction extends AbstractNavigationAction {
 
-	private final String login;
-	private final String pass;
+	private final MongoDB m;
 	private final ExperimentReference experiment;
 
 	NavigationButton src = null;
@@ -54,10 +54,9 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 	private int voxelresolution = 200;
 	private int widthFactor = 40;
 
-	public ThreeDreconstructionAction(String login, String pass, ExperimentReference experiment) {
+	public ThreeDreconstructionAction(MongoDB m, ExperimentReference experiment) {
 		super("Create 3-D Volumes using Space Carving Technology");
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 		this.experiment = experiment;
 	}
 
@@ -80,7 +79,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 		widthFactor = (Integer) inp[1];
 
 		try {
-			ExperimentInterface res = experiment.getData();
+			ExperimentInterface res = experiment.getData(m);
 
 			// src.title = src.title + ": processing";
 
@@ -129,10 +128,10 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 
 				VolumeStatistics volumeStatistics = new VolumeStatistics();
 
-				DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true);
+				DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
 
 				ThreeDreconstruction threeDreconstructionTask = new ThreeDreconstruction(saveVolumesToDB);
-				threeDreconstructionTask.setInput(workload, login, pass);
+				threeDreconstructionTask.setInput(workload, m);
 				threeDreconstructionTask.setResolution(voxelresolution, widthFactor);
 				threeDreconstructionTask.addResultProcessor(volumeStatistics);
 
@@ -159,17 +158,17 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			statisticsResult.getHeader().setExcelfileid("");
 
 			MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
-			ip.setExperimentInfo(login, pass, statisticsResult.getHeader(), true, statisticsResult);
+			ip.setExperimentInfo(m, statisticsResult.getHeader(), true, statisticsResult);
 			mpc = new MainPanelComponent(ip, true);
 
-			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass,
+			storedActions.add(FileManagerAction.getFileManagerEntity(m,
 								new ExperimentReference(statisticsResult), src.getGUIsetting()));
 
-			storedActions.add(new NavigationButton(new CloudUploadEntity(login, pass, new ExperimentReference(
+			storedActions.add(new NavigationButton(new CloudUploadEntity(m, new ExperimentReference(
 								statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
 			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult, statisticsResult
-								.getHeader(), false, src.getGUIsetting());
+								.getHeader(), false, src.getGUIsetting(), m);
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();
 			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
@@ -208,11 +207,11 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 		return mpc;
 	}
 
-	public static NavigationButton getThreeDreconstructionTaskEntity(final String login, final String pass,
+	public static NavigationButton getThreeDreconstructionTaskEntity(MongoDB m,
 						final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
 						GUIsetting guiSetting) {
 
-		NavigationAction threeDreconstructionAction = new ThreeDreconstructionAction(login, pass, experiment);
+		NavigationAction threeDreconstructionAction = new ThreeDreconstructionAction(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(threeDreconstructionAction, title,
 							"img/RotationReconstruction.png", guiSetting);
 		return resultTaskButton;

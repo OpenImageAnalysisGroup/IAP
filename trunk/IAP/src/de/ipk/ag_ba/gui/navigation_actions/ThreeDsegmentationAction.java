@@ -11,6 +11,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.VolumeSegmentation;
 import de.ipk.ag_ba.rmi_server.databases.DataBaseTargetMongoDB;
@@ -31,18 +32,16 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  * @author klukas
  */
 public class ThreeDsegmentationAction extends AbstractNavigationAction {
-	private final String login;
-	private final String pass;
+	private final MongoDB m;
 	private final ExperimentReference experiment;
 
 	NavigationButton src = null;
 	MainPanelComponent mpc;
 	ArrayList<NavigationButton> storedActions = new ArrayList<NavigationButton>();
 
-	public ThreeDsegmentationAction(String login, String pass, ExperimentReference experiment) {
+	public ThreeDsegmentationAction(MongoDB m, ExperimentReference experiment) {
 		super("Perform Color-based Volume Segmentation based on SOM");
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 		this.experiment = experiment;
 	}
 
@@ -54,7 +53,7 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 		this.src = src;
 
 		try {
-			ExperimentInterface res = experiment.getData();
+			ExperimentInterface res = experiment.getData(m);
 			res = res.clone();
 
 			// src.title = src.title + ": processing";
@@ -77,9 +76,9 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 				}
 			}
 
-			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true);
+			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
 			VolumeSegmentation segmentationTask = new VolumeSegmentation(saveVolumesToDB);
-			segmentationTask.setInput(workset, login, pass);
+			segmentationTask.setInput(workset, m);
 
 			segmentationTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 
@@ -93,17 +92,17 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 					ci.setExperimentName(ci.getExperimentName() + " (segmented)");
 
 			MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
-			ip.setExperimentInfo(login, pass, res.getHeader(), true, res);
+			ip.setExperimentInfo(m, res.getHeader(), true, res);
 			mpc = new MainPanelComponent(ip, true);
 
-			storedActions.add(FileManagerAction.getFileManagerEntity(login, pass, new ExperimentReference(res),
+			storedActions.add(FileManagerAction.getFileManagerEntity(m, new ExperimentReference(res),
 								src.getGUIsetting()));
 
-			storedActions.add(new NavigationButton(new CloudUploadEntity(login, pass,
+			storedActions.add(new NavigationButton(new CloudUploadEntity(m,
 								new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 
 			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, res, res.getHeader(), false,
-								src.getGUIsetting());
+								src.getGUIsetting(), m);
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();
 			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
@@ -133,11 +132,11 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 		return mpc;
 	}
 
-	public static NavigationButton getThreeDsegmentationTaskEntity(final String login, final String pass,
+	public static NavigationButton getThreeDsegmentationTaskEntity(final MongoDB m,
 						final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
 						GUIsetting guiSetting) {
 
-		NavigationAction segmentationAction = new ThreeDsegmentationAction(login, pass, experiment);
+		NavigationAction segmentationAction = new ThreeDsegmentationAction(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(segmentationAction, title,
 							"img/RotationReconstructionSegmentation.png", guiSetting);
 		return resultTaskButton;

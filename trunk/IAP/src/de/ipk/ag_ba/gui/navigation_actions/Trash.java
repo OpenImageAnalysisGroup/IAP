@@ -20,17 +20,15 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class Trash extends AbstractNavigationAction {
 
-	private String pass;
-	private String login;
+	private MongoDB m;
 	private String experimentName;
 	private Collection<ExperimentHeaderInterface> header;
 	private String message = "";
 	private DeletionCommand cmd;
 
-	public Trash(String pass, String login, String experimentName) {
+	public Trash(MongoDB m, String experimentName) {
 		super("Mark experiment as deleted");
-		this.pass = pass;
-		this.login = login;
+		this.m = m;
 		this.experimentName = experimentName;
 	}
 
@@ -60,7 +58,7 @@ public class Trash extends AbstractNavigationAction {
 					message += "<li>Process Experiment " + experimentName + ": ";
 					if (cmd == DeletionCommand.DELETE || cmd == DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST) {
 						if (getHeader() != null) {
-							new MongoDB().deleteExperiment(hhh.getExcelfileid());
+							m.deleteExperiment(hhh.getExcelfileid());
 							message = "<html><b>" + "Experiment " + experimentName + " has been deleted.";
 						} else {
 							Object[] res = MyInputHelper.getInput("<html>"
@@ -84,7 +82,7 @@ public class Trash extends AbstractNavigationAction {
 					}
 					if (cmd == DeletionCommand.TRASH) {
 						try {
-							new MongoDB().setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+							m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
 							experimentName = hhh.getExperimentname();
 							message += "has been marked as trashed!";
 						} catch (Exception e) {
@@ -98,7 +96,7 @@ public class Trash extends AbstractNavigationAction {
 								type = StringManipulationTools.stringReplace(type, "Trash;", "");
 							if (type.contains("Trash"))
 								type = StringManipulationTools.stringReplace(type, "Trash", "");
-							new MongoDB().setExperimentType(hhh, type);
+							m.setExperimentType(hhh, type);
 							experimentName = hhh.getExperimentname();
 							message += "Experiment " + experimentName + " has been put out of trash!";
 						} catch (Exception e) {
@@ -131,9 +129,9 @@ public class Trash extends AbstractNavigationAction {
 		return new MainPanelComponent(message);
 	}
 
-	public static NavigationButton getTrashEntity(final String login, final String pass, final String experimentName,
+	public static NavigationButton getTrashEntity(final MongoDB m, final String experimentName,
 						GUIsetting guiSetting) {
-		NavigationAction trashAction = new Trash(pass, login, experimentName);
+		NavigationAction trashAction = new Trash(m, experimentName);
 		NavigationButton trash = new NavigationButton(trashAction, "Delete", "img/ext/edit-delete.png", guiSetting);
 		trash.setRightAligned(true);
 		return trash;

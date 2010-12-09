@@ -10,9 +10,9 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
@@ -42,7 +42,7 @@ public class DBEtreeModel implements TreeModel {
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
 			for (SubstanceInterface substance : experiment) {
 				MongoTreeNode substNode = new MongoTreeNode(projectNode, dataChangedListener, experiment,
-									(MappingDataEntity) substance, substance.getName(), readOnly); //$NON-NLS-1$//$NON-NLS-2$
+									substance, substance.getName(), readOnly); //$NON-NLS-1$//$NON-NLS-2$
 
 				substNode.setIsLeaf(false);
 				substNode.setIndex(p++);
@@ -160,15 +160,14 @@ public class DBEtreeModel implements TreeModel {
 		}
 	}
 
-	String login, password;
+	MongoDB m;
 	private final ExperimentInterface document;
 	private final ActionListener dataChangedListener;
 	private final boolean isReadOnly;
 
-	public DBEtreeModel(ActionListener dataChangedListener, String login, String password, ExperimentInterface doc,
+	public DBEtreeModel(ActionListener dataChangedListener, MongoDB m, ExperimentInterface doc,
 						boolean readOnly) {
-		this.login = login;
-		this.password = password;
+		this.m = m;
 		this.document = doc;
 		this.dataChangedListener = dataChangedListener;
 		this.isReadOnly = readOnly;
@@ -178,7 +177,7 @@ public class DBEtreeModel implements TreeModel {
 		final MongoTreeNode expNode = new MongoTreeNode(null, dataChangedListener, document, document,
 							document.getName(), isReadOnly);
 		expNode.setSizeDirty(true);
-		expNode.updateSizeInfo(login, password, dataChangedListener);
+		expNode.updateSizeInfo(m, dataChangedListener);
 		expNode.setIndex(0);
 		expNode.setIsLeaf(false);
 

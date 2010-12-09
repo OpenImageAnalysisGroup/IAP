@@ -46,6 +46,8 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 
 	private Experiment newExperiment;
 
+	private MongoDB m;
+
 	UploadImagesToCloud(boolean storeInMongo) {
 		super("Upload data set to the IAP Systems Biology Cloud database service");
 		this.storeInMongo = storeInMongo;
@@ -53,6 +55,16 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
+
+		Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
+							"Target", MongoDB.getMongos()
+		});
+
+		if (sel == null)
+			return;
+
+		this.m = (MongoDB) sel[0];
+
 		this.src = src;
 		this.newExperiment = null;
 		res.clear();
@@ -86,10 +98,10 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 						newExperiment.getHeader().setImportusergroup("Shared");
 						newExperiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 						System.out.println(newExperiment.toString());
-						new MongoDB().saveExperiment("dbe3", null, null, null, newExperiment, status);
+						m.saveExperiment(newExperiment, status);
 					}
 					ExperimentReference exRef = new ExperimentReference(newExperiment);
-					for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(null, null, exRef,
+					for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, exRef,
 										src.getGUIsetting()))
 						res.add(ne);
 				} catch (Exception e1) {
@@ -111,7 +123,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 		if (newExperiment != null) {
 			res.add(src);
 			res.add(MongoExperimentsNavigationAction.getMongoExperimentButton(newExperiment.getHeader(),
-								src.getGUIsetting()));
+								src.getGUIsetting(), m));
 		}
 		return res;
 	}

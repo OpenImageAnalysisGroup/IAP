@@ -20,7 +20,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
-import de.ipk.ag_ba.mongo.MongoDBhandler;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisTask;
@@ -49,8 +49,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 
 	private Collection<NumericMeasurementInterface> output;
 	private Collection<NumericMeasurementInterface> input;
-	private String login;
-	private String pass;
+	private MongoDB m;
 
 	private int voxelresolution = 200;
 	private int widthFactor = 40;
@@ -169,7 +168,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 					for (ImageAnalysisTask resultProcessor : resultProcessors) {
 						Collection<NumericMeasurementInterface> inp = new ArrayList<NumericMeasurementInterface>();
 						inp.add(volume);
-						resultProcessor.setInput(inp, login, login);
+						resultProcessor.setInput(inp, m);
 						resultProcessor.performAnalysis(maximumThreadCountParallelImages, maximumThreadCountParallelImages,
 											status);
 						if (additionalResults.get(resultProcessor) == null)
@@ -187,14 +186,14 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 							if (status != null)
 								status.setCurrentStatusText1("Storing result");
 
-							storeResultInDatabase.saveVolume(volume, s3d, login, pass, DBTable.SAMPLE, null, md5, status);
+							storeResultInDatabase.saveVolume(volume, s3d, m, DBTable.SAMPLE, null, md5, status);
 							if (status != null)
 								status.setCurrentStatusValue(100);
 							if (status != null)
 								status.setCurrentStatusText1("Finished");
 
 							VolumeData volumeInDatabase = new VolumeData(s3d, volume);
-							volumeInDatabase.getURL().setPrefix(MongoDBhandler.PREFIX);
+							volumeInDatabase.getURL().setPrefix(storeResultInDatabase.getPrefix());
 							output.add(volumeInDatabase);
 						} catch (Exception e) {
 							LoadedVolume v = new LoadedVolumeExtension(s3d, null);
@@ -313,11 +312,11 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 						{
 							LoadedImage limg;
 							try {
-								limg = IOmodule.loadImageFromFileOrMongo(image, login, pass);
+								limg = IOmodule.loadImageFromFileOrMongo(image);
 
-								limg = PhenotypeAnalysisTask.clearBackground(limg, 1, login, pass);
+								limg = PhenotypeAnalysisTask.clearBackground(limg, 1);
 
-								limg = storeResultInDatabase.saveImage(limg, login, pass);
+								limg = storeResultInDatabase.saveImage(limg);
 
 								if (limg == null) {
 									ErrorMsg.addErrorMessage("Could not store processed input image in database target.");
@@ -384,10 +383,9 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	}
 
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, String login, String pass) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 	}
 
 	private boolean getIsTopFromFileName(String fileName) {

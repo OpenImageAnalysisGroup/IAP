@@ -33,8 +33,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas
  */
 public class PerformanceTestAction extends AbstractNavigationAction {
-	private String login;
-	private String pass;
+	private MongoDB m;
 	private ExperimentReference experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
@@ -45,10 +44,9 @@ public class PerformanceTestAction extends AbstractNavigationAction {
 	private int workOnSubset;
 	private int numberOfSubsets;
 
-	public PerformanceTestAction(String login, String pass, ExperimentReference experiment) {
+	public PerformanceTestAction(MongoDB m, ExperimentReference experiment) {
 		super("Test performance by reading experiment content");
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 		this.experiment = experiment;
 		this.experimentResult = null;
 	}
@@ -65,7 +63,7 @@ public class PerformanceTestAction extends AbstractNavigationAction {
 			return;
 
 		try {
-			ExperimentInterface res = experiment.getData();
+			ExperimentInterface res = experiment.getData(m);
 
 			ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
 
@@ -104,7 +102,7 @@ public class PerformanceTestAction extends AbstractNavigationAction {
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
 			for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 1) {
 				long t1 = System.currentTimeMillis();
-				task.setInput(workload, login, pass);
+				task.setInput(workload, m);
 				task.performAnalysis(pi, 1, status);
 				long t2 = System.currentTimeMillis();
 				statRes.addAll(task.getOutput());
@@ -137,13 +135,13 @@ public class PerformanceTestAction extends AbstractNavigationAction {
 				if (status != null)
 					status.setCurrentStatusText1("Store Result");
 
-				new MongoDB().saveExperiment("dbe3", null, null, null, statisticsResult, status);
+				m.saveExperiment(statisticsResult, status);
 
 				if (status != null)
 					status.setCurrentStatusText1("Ready");
 
 				MyExperimentInfoPanel info = new MyExperimentInfoPanel();
-				info.setExperimentInfo(login, pass, statisticsResult.getHeader(), false, statisticsResult);
+				info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
 				// mpc = new MainPanelComponent(TableLayout.getSplit(info, sfp,
 				// TableLayout.PREFERRED, TableLayout.FILL));
 				mpc = new MainPanelComponent(info, true);
@@ -170,11 +168,11 @@ public class PerformanceTestAction extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(login, pass, new ExperimentReference(
+		for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, new ExperimentReference(
 							experimentResult), false, src.getGUIsetting()))
 			res.add(ne);
 
-		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null, new ExperimentReference(
+		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m, new ExperimentReference(
 							experimentResult), src.getGUIsetting())) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");

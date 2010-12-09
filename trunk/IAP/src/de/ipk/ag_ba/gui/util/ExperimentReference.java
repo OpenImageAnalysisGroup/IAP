@@ -29,11 +29,11 @@ public class ExperimentReference {
 		this.experiment = experiment;
 	}
 
-	public ExperimentInterface getData() throws Exception {
+	public ExperimentInterface getData(MongoDB m) throws Exception {
 		if (experiment != null)
 			return experiment;
 		else
-			return new MongoDB().getExperiment(header);
+			return m.getExperiment(header);
 	}
 
 	public String getExperimentName() {

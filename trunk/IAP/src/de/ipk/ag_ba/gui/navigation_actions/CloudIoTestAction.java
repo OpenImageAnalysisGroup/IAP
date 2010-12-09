@@ -10,6 +10,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
 import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -30,8 +31,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas
  */
 public class CloudIoTestAction extends AbstractNavigationAction implements RemoteCapableAnalysisAction {
-	private String login;
-	private String pass;
+	private MongoDB m;
 	private ExperimentReference experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
@@ -42,10 +42,9 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 	private int numberOfSubsets;
 	private String datasetID;
 
-	public CloudIoTestAction(String login, String pass, ExperimentReference experiment) {
+	public CloudIoTestAction(MongoDB m, ExperimentReference experiment) {
 		super("Test performance by reading experiment content");
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 		this.experiment = experiment;
 		if (experiment != null && experiment.getHeader() != null)
 			this.datasetID = experiment.getHeader().getExcelfileid();
@@ -60,7 +59,7 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 		this.src = src;
 
 		try {
-			ExperimentInterface res = experiment.getData();
+			ExperimentInterface res = experiment.getData(m);
 
 			ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
 
@@ -93,7 +92,7 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
 
 			long t1 = System.currentTimeMillis();
-			task.setInput(workload, login, pass);
+			task.setInput(workload, m);
 			task.performAnalysis(1, 1, status);
 			long t2 = System.currentTimeMillis();
 			statRes.addAll(task.getOutput());
@@ -168,15 +167,19 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 	}
 
 	@Override
-	public void setParams(ExperimentReference experiment, String login, String pass, String params) {
+	public void setParams(ExperimentReference experiment, MongoDB m, String params) {
 		this.experiment = experiment;
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 	}
 
 	@Override
 	public String getMongoDatasetID() {
 		return datasetID;
+	}
+
+	@Override
+	public MongoDB getMongoDB() {
+		return m;
 	}
 
 }

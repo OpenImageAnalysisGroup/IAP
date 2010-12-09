@@ -44,9 +44,8 @@ public class BatchCmd extends BasicDBObject {
 		// empty
 	}
 
-	public static void enqueueBatchCmd(BatchCmd cmd) throws Exception {
-		// empty
-		new MongoDB().batchEnqueue(cmd);
+	public static void enqueueBatchCmd(MongoDB m, BatchCmd cmd) throws Exception {
+		m.batchEnqueue(cmd);
 	}
 
 	public String getRemoteCapableAnalysisActionClassName() {
@@ -80,14 +79,14 @@ public class BatchCmd extends BasicDBObject {
 		this.statusProvider = statusProvider;
 	}
 
-	public void updateRunningStatus(CloudAnalysisStatus status) {
+	public void updateRunningStatus(MongoDB m, CloudAnalysisStatus status) {
 		if (statusProvider != null) {
 			put("progress", statusProvider.getCurrentStatusValueFine());
 			put("line1", statusProvider.getCurrentStatusMessage1());
 			put("line2", statusProvider.getCurrentStatusMessage2());
 			put("waitsForUser", statusProvider.pluginWaitsForUser());
 		}
-		new MongoDB().batchClaim(this, status);
+		m.batchClaim(this, status);
 		setRunStatus(status);
 		// statusProvider.pleaseStop() -->
 		// statusProvider.pleaseContinueRun() -->

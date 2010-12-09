@@ -19,9 +19,9 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas
@@ -43,22 +43,21 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 		// ei.experimentName));
 
 		if (experiment != null) {
-			getDefaultActions(actions, experiment, experiment.getHeader(), true, src.getGUIsetting());
+			getDefaultActions(actions, experiment, experiment.getHeader(), true, src.getGUIsetting(), null);
 		}
 		return actions;
 	}
 
 	public static void getDefaultActions(ArrayList<NavigationButton> actions, ExperimentInterface experiment,
-						ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting) {
+						ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting, MongoDB m) {
 		try {
 			if (imageAnalysis)
-				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(),
-									null, new ExperimentReference(experiment), guiSetting))
+				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, new ExperimentReference(experiment), guiSetting))
 					actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null,
+		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m,
 							new ExperimentReference(experiment), guiSetting)) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
@@ -99,7 +98,7 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
-		ip.setExperimentInfo(SystemAnalysis.getUserName(), null, experiment.getHeader(), false, experiment);
+		ip.setExperimentInfo(null, experiment.getHeader(), false, experiment);
 		return new MainPanelComponent(ip, true);
 	}
 }

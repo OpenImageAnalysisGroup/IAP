@@ -33,11 +33,13 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	private final ExperimentHeaderInterface header;
 	private NavigationButton src;
 	private ExperimentInterface experiment;
+	private final MongoDB m;
 
-	public MongoOrLemnaTecExperimentNavigationAction(ExperimentHeaderInterface ei) {
+	public MongoOrLemnaTecExperimentNavigationAction(ExperimentHeaderInterface ei, MongoDB m) {
 		super(ei.getExcelfileid() != null && ei.getExcelfileid().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
 							: "Access Systems Biology Cloud Data Set");
 		header = ei;
+		this.m = m;
 	}
 
 	@Override
@@ -61,24 +63,23 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			add = true;
 		}
 		if (add) {
-			getDefaultActions(actions, experiment, header, true, src.getGUIsetting());
+			getDefaultActions(actions, experiment, header, true, src.getGUIsetting(), m);
 		}
 		return actions;
 	}
 
 	public static void getDefaultActions(ArrayList<NavigationButton> actions, ExperimentInterface experiment,
-						ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting) {
+						ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting, MongoDB m) {
 		if (experiment == null)
 			return;
 		try {
 			if (imageAnalysis)
-				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(SystemAnalysis.getUserName(), null,
-									new ExperimentReference(experiment), guiSetting))
+				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, new ExperimentReference(experiment), guiSetting))
 					actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(null, null, new ExperimentReference(
+		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m, new ExperimentReference(
 							experiment), guiSetting)) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("View in VANTED");
@@ -100,7 +101,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		if (header.getExcelfileid() != null && header.getExcelfileid().startsWith("lemnatec:"))
 			experiment = new LemnaTecDataExchange().getExperiment(header, status);
 		else
-			experiment = new MongoDB().getExperiment(header);
+			experiment = m.getExperiment(header);
 	}
 
 	@Override
@@ -127,7 +128,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
-		ip.setExperimentInfo(SystemAnalysis.getUserName(), null, header, true, experiment);
+		ip.setExperimentInfo(m, header, true, experiment);
 		return new MainPanelComponent(ip, true);
 	}
 }

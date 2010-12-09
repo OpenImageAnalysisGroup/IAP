@@ -12,6 +12,7 @@ import org.ErrorMsg;
 import org.color.ColorUtil;
 import org.color.Color_CIE_Lab;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
@@ -29,8 +30,6 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 
 	private Collection<NumericMeasurementInterface> output;
 	private final int colorCount;
-	private String login;
-	private String pass;
 	private Collection<NumericMeasurementInterface> input;
 
 	public ColorHueStatistics(int colorCount) {
@@ -104,9 +103,9 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 						BackgroundTaskStatusProviderSupportingExternalCall status) {
 		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCountParallelImages);
 
-		for (Measurement m : input) {
-			if (m instanceof ImageData) {
-				final ImageData i = (ImageData) m;
+		for (Measurement meas : input) {
+			if (meas instanceof ImageData) {
+				final ImageData i = (ImageData) meas;
 				run.submit(new Runnable() {
 					@Override
 					public void run() {
@@ -116,7 +115,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 						else {
 							// load image
 							try {
-								li = IOmodule.loadImageFromFileOrMongo(i, login, pass);
+								li = IOmodule.loadImageFromFileOrMongo(i);
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 								System.out.println("Error loading file: " + i.getURL().toString());
@@ -172,9 +171,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	 * (java.util.Collection, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, String login, String pass) {
-		this.login = login;
-		this.pass = pass;
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
 	}
 

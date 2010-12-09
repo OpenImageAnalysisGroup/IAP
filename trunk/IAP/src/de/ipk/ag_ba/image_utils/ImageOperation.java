@@ -23,10 +23,11 @@ import javax.swing.JLabel;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
-import de.ipk.ag_ba.mongo.MongoDBhandler;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
@@ -668,7 +669,7 @@ public class ImageOperation extends ImageConverter {
 			LoadedImage limg = new LoadedImage(sample, imgFluo);
 			limg.setURL(urlFlu);
 
-			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null,
+			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null,
 								0.5, 0.5);
 
 			// MainFrame
@@ -682,7 +683,7 @@ public class ImageOperation extends ImageConverter {
 			Sample sample = new Sample(condition);
 			LoadedImage limg = new LoadedImage(sample, imgVisible);
 			limg.setURL(urlVis);
-			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null,
+			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null,
 								2.5, 2.5);
 
 			// MainFrame.showMessageWindow("RgbTop Clean", new JLabel(
@@ -739,7 +740,7 @@ public class ImageOperation extends ImageConverter {
 			Sample sample = new Sample(condition);
 			LoadedImage limg = new LoadedImage(sample, imgNIR);
 			limg.setURL(urlNIR);
-			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, null, null, output, null, 1,
+			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null, 1,
 								0.5);
 
 			int[] nirImage = ImageConverter.convertBIto1A(imgNIR);
@@ -1011,12 +1012,16 @@ public class ImageOperation extends ImageConverter {
 			} else {
 
 				try {
-					IOurl urlFlu = new IOurl("mongo://26b7e285fae43dac107016afb4dc2841/WT01_1385");
-					IOurl urlVis = new IOurl("mongo://12b6db018fddf651b414b652fc8f3d8d/WT01_1385");
-					IOurl urlNIR = new IOurl("mongo://c72e4fcc141b8b2a97851ab2fde8106a/WT01_1385");
+					IOurl urlFlu = new IOurl("mongo_ba-13.ipk-gatersleben.de://26b7e285fae43dac107016afb4dc2841/WT01_1385");
+					IOurl urlVis = new IOurl("mongo_ba-13.ipk-gatersleben.de://12b6db018fddf651b414b652fc8f3d8d/WT01_1385");
+					IOurl urlNIR = new IOurl("mongo_ba-13.ipk-gatersleben.de://c72e4fcc141b8b2a97851ab2fde8106a/WT01_1385");
 
 					ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
-					ResourceIOManager.registerIOHandler(new MongoDBhandler());
+
+					for (MongoDB m : MongoDB.getMongos())
+						for (ResourceIOHandler io : m.getHandlers())
+							ResourceIOManager.registerIOHandler(io);
+
 					BufferedImage imgFluo = ImageIO.read(urlFlu.getInputStream());
 					BufferedImage imgVisible = ImageIO.read(urlVis.getInputStream());
 					BufferedImage imgNIR = ImageIO.read(urlNIR.getInputStream());

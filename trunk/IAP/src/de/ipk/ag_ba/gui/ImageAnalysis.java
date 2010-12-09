@@ -41,8 +41,7 @@ import de.ipk.ag_ba.gui.navigation_actions.PhytochamberAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.rmi_server.databases.DataBaseTargetMongoDB;
-import de.ipk.ag_ba.rmi_server.databases.DatabaseTarget;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -51,20 +50,18 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 @SuppressWarnings("restriction")
 public class ImageAnalysis {
 
-	private static DatabaseTarget saveInDatabase = new DataBaseTargetMongoDB(true);
-
-	public static NavigationButton getPhenotypingEntity(final String login, final String pass,
+	public static NavigationButton getPhenotypingEntity(final MongoDB m,
 						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 
-		NavigationAction phenotypeAnalysisAction = new PhenotypeAnalysisAction(login, epsilon, epsilon2, pass, experiment);
+		NavigationAction phenotypeAnalysisAction = new PhenotypeAnalysisAction(m, epsilon, epsilon2, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}
 
-	public static NavigationButton getPhytochamberEntity(final String login, final String pass,
+	public static NavigationButton getPhytochamberEntity(final MongoDB m,
 						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 
-		NavigationAction phenotypeAnalysisAction = new PhytochamberAnalysisAction(login, epsilon, epsilon2, pass, experiment);
+		NavigationAction phenotypeAnalysisAction = new PhytochamberAnalysisAction(m, epsilon, epsilon2, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}
@@ -231,13 +228,4 @@ public class ImageAnalysis {
 		lbl.setText("Zoom (" + val + "%)");
 		zoomedImage.setInt(val);
 	}
-
-	public static void setSaveInDatabase(DatabaseTarget saveInDatabase) {
-		ImageAnalysis.saveInDatabase = saveInDatabase;
-	}
-
-	public static DatabaseTarget isSaveInDatabase() {
-		return saveInDatabase;
-	}
-
 }

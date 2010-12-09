@@ -48,7 +48,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolumeHandler;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -133,11 +133,11 @@ public class AIPmain extends JApplet {
 		ResourceIOManager.registerIOHandler(LoadedVolumeHandler.getInstance());
 		ResourceIOManager.registerIOHandler(LoadedImageHandler.getInstance());
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
-		for (ResourceIOHandler handler : new MongoDB().getHandlers())
-			ResourceIOManager.registerIOHandler(handler);
+		for (MongoDB m : MongoDB.getMongos())
+			for (ResourceIOHandler handler : m.getHandlers())
+				ResourceIOManager.registerIOHandler(handler);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void myAppletLoad(MainFrame statusPanel, final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
@@ -251,12 +251,12 @@ public class AIPmain extends JApplet {
 
 			}
 
-			for (Iterator it = locations_exclude.iterator(); it.hasNext();) {
-				String remove = (String) it.next();
+			for (Iterator<String> it = locations_exclude.iterator(); it.hasNext();) {
+				String remove = it.next();
 				if (!locations.remove(remove)) {
 					// windows compatibility remove also not exact matches
-					for (Iterator itl = locations.iterator(); itl.hasNext();) {
-						String loc = (String) itl.next();
+					for (Iterator<String> itl = locations.iterator(); itl.hasNext();) {
+						String loc = itl.next();
 						remove = remove.toUpperCase();
 						remove = StringManipulationTools.stringReplace(remove, "./", "");
 						remove = StringManipulationTools.stringReplace(remove, "\"", "");

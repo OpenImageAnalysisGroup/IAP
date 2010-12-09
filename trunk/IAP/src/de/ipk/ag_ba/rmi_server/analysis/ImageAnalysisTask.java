@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 
 /**
@@ -16,6 +17,7 @@ public interface ImageAnalysisTask {
 	/**
 	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
 	 */
+	@Deprecated
 	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status);
 
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
@@ -27,7 +29,7 @@ public interface ImageAnalysisTask {
 
 	public ImageAnalysisType[] getOutputTypes();
 
-	public void setInput(Collection<NumericMeasurementInterface> input, String login, String pass);
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m);
 
 	public Collection<NumericMeasurementInterface> getOutput();
 }

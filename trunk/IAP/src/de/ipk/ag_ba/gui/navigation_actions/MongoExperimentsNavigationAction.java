@@ -25,13 +25,11 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 
 	private NavigationButton src;
 	private ArrayList<ExperimentHeaderInterface> experimentList;
-	private final String login;
-	private final String pass;
+	private final MongoDB m;
 
-	public MongoExperimentsNavigationAction(String login, String pass) {
-		super("Access IAP Systems Biology Cloud Service");
-		this.login = login;
-		this.pass = pass;
+	public MongoExperimentsNavigationAction(MongoDB m) {
+		super("Access " + m.getDisplayName());
+		this.m = m;
 	}
 
 	/*
@@ -75,9 +73,9 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				experiments.get(group).get(user).add(eh);
 			}
 
-			res.add(new NavigationButton(new CloundManagerNavigationAction(login, pass), src.getGUIsetting()));
+			res.add(new NavigationButton(new CloundManagerNavigationAction(m), src.getGUIsetting()));
 
-			res.add(Other.getCalendarEntity(experiments, login, pass, src.getGUIsetting()));
+			res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
 
 			for (String group : experiments.keySet()) {
 				res.add(new NavigationButton(createMongoGroupNavigationAction(group, experiments.get(group)), src
@@ -85,13 +83,13 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			}
 
 			if (trashed.size() > 0) {
-				res.add(new NavigationButton(getTrashedExperimentsAction(trashed), src.getGUIsetting()));
+				res.add(new NavigationButton(getTrashedExperimentsAction(trashed, m), src.getGUIsetting()));
 			}
 		}
 		return res;
 	}
 
-	private NavigationAction getTrashedExperimentsAction(final ArrayList<ExperimentHeaderInterface> trashed) {
+	private NavigationAction getTrashedExperimentsAction(final ArrayList<ExperimentHeaderInterface> trashed, final MongoDB m) {
 		NavigationAction res = new AbstractNavigationAction("Show content of trash can") {
 
 			private NavigationButton src;
@@ -124,7 +122,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				actions.add(Trash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
 									src.getGUIsetting()));
 				for (ExperimentHeaderInterface exp : trashed)
-					actions.add(getMongoExperimentButton(exp, src.getGUIsetting()));
+					actions.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
 				return actions;
 			}
 		};
@@ -186,7 +184,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (ExperimentHeaderInterface exp : experiments) {
-					res.add(getMongoExperimentButton(exp, src.getGUIsetting()));
+					res.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
 				}
 				return res;
 			}
@@ -222,8 +220,8 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 		return userNav;
 	}
 
-	public static NavigationButton getMongoExperimentButton(ExperimentHeaderInterface ei, GUIsetting guiSetting) {
-		NavigationAction action = new MongoOrLemnaTecExperimentNavigationAction(ei);
+	public static NavigationButton getMongoExperimentButton(ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
+		NavigationAction action = new MongoOrLemnaTecExperimentNavigationAction(ei, m);
 		NavigationButton exp = new NavigationButton(action, guiSetting);
 		exp.setToolTipText("<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentname() + "</td></tr>"
 							+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
@@ -257,7 +255,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		status.setCurrentStatusText1("Establishing Connection");
-		experimentList = new MongoDB().getExperimentList();
+		experimentList = m.getExperimentList();
 		status.setCurrentStatusText1("");
 	}
 }

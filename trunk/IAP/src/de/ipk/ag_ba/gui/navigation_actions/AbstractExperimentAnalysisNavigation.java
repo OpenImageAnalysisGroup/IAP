@@ -21,6 +21,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
@@ -28,18 +29,16 @@ import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavigationAction {
 	private static final long serialVersionUID = 1L;
 
-	protected String login;
-	protected String pass;
+	protected MongoDB m;
 
 	protected final ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 	protected ExperimentReference experiment;
 
 	private NavigationButton src;
 
-	public AbstractExperimentAnalysisNavigation(String login, String pass, ExperimentReference experiment) {
+	public AbstractExperimentAnalysisNavigation(MongoDB m, ExperimentReference experiment) {
 		super("Analyse Experiment Data Set");
-		this.login = login;
-		this.pass = pass;
+		this.m = m;
 		this.experiment = experiment;
 
 	}
@@ -48,8 +47,8 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 		actions.clear();
 		ExperimentReference exp = experiment;
 		try {
-			exp.setExperimentData(experiment.getData());
-			for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(login, pass, exp,
+			exp.setExperimentData(experiment.getData(m));
+			for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, exp,
 								src.getGUIsetting()))
 				actions.add(ne);
 		} catch (Exception e) {
@@ -62,7 +61,7 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 	public MainPanelComponent getResultMainPanel() {
 		try {
 			MyExperimentInfoPanel info = new MyExperimentInfoPanel();
-			info.setExperimentInfo(login, pass, experiment.getData().getHeader(), true, experiment.getData());
+			info.setExperimentInfo(m, experiment.getData(m).getHeader(), true, experiment.getData(m));
 			JComponent jp = TableLayout.getSplit(info, null, TableLayout.PREFERRED, TableLayout.FILL);
 			jp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 			jp = TableLayout.getSplitVertical(jp, null, TableLayout.PREFERRED, TableLayout.FILL);

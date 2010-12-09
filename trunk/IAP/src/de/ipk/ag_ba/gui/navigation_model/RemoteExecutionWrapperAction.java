@@ -10,7 +10,6 @@ import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
 import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
 import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
@@ -30,7 +29,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		HashSet<String> targetIPs = new MongoDB().batchGetAvailableHosts(10000);
+		HashSet<String> targetIPs = remoteAction.getMongoDB().batchGetAvailableHosts(10000);
 		if (targetIPs.isEmpty()) {
 			MainFrame.showMessageDialog("No active compute node found.", "Information");
 		} else {
@@ -47,7 +46,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 				cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
 				cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
 				cmd.setExperimentMongoID(experimentInputMongoID);
-				BatchCmd.enqueueBatchCmd(cmd);
+				BatchCmd.enqueueBatchCmd(remoteAction.getMongoDB(), cmd);
 				cm.getAction().performActionCalculateResults(src);
 			}
 		}

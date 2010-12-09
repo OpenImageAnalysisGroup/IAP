@@ -10,6 +10,7 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 /**
  * @author klukas
@@ -18,8 +19,8 @@ public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 
 	private boolean active;
 
-	public CloudUploadEntity(String login, String pass, ExperimentReference experiment) {
-		super(login, pass, experiment);
+	public CloudUploadEntity(MongoDB m, ExperimentReference experiment) {
+		super(m, experiment);
 	}
 
 	@Override
@@ -29,10 +30,19 @@ public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
+							"Target", MongoDB.getMongos()
+		});
+
+		if (sel == null)
+			return;
+
+		this.m = (MongoDB) sel[0];
 		super.performActionCalculateResults(src);
+
 		try {
 			active = true;
-			new MongoDB().saveExperiment("dbe3", null, null, null, experiment.getData(), status);
+			m.saveExperiment(experiment.getData(m), status);
 		} finally {
 			active = false;
 		}

@@ -6,6 +6,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.ColorHueStatistics;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -26,8 +27,8 @@ public class CountColorsNavigation extends AbstractExperimentAnalysisNavigation 
 	private final int colorCount;
 	private NavigationButton src = null;
 
-	public CountColorsNavigation(String login, String pass, int colorCount, ExperimentReference experiment) {
-		super(login, pass, experiment);
+	public CountColorsNavigation(MongoDB m, int colorCount, ExperimentReference experiment) {
+		super(m, experiment);
 		this.colorCount = colorCount;
 	}
 
@@ -35,7 +36,7 @@ public class CountColorsNavigation extends AbstractExperimentAnalysisNavigation 
 	public void performActionCalculateResults(final NavigationButton src) throws Exception {
 		this.src = src;
 
-		ExperimentInterface res = experiment.getData();
+		ExperimentInterface res = experiment.getData(m);
 
 		// src.title = src.title + ": processing";
 
@@ -60,7 +61,7 @@ public class CountColorsNavigation extends AbstractExperimentAnalysisNavigation 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setInt(1);
 		ColorHueStatistics task = new ColorHueStatistics(colorCount);
-		task.setInput(workload, login, pass);
+		task.setInput(workload, m);
 		task.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 		// src.title = src.title.split("\\:")[0];
 	}

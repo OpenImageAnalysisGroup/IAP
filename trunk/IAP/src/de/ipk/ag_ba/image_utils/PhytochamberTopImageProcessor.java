@@ -11,12 +11,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
-import de.ipk.ag_ba.mongo.MongoDBhandler;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
@@ -289,7 +290,7 @@ public class PhytochamberTopImageProcessor {
 		LoadedImage limg = new LoadedImage(sample, workImage);
 		limg.setURL(new IOurl(""));
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-		PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, maxThreadsPerImage, null, null, true, null, null, output, null,
+		PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, maxThreadsPerImage, null, null, true, output, null,
 							epsilonA, epsiolonB);
 
 		return workImage;
@@ -449,12 +450,14 @@ public class PhytochamberTopImageProcessor {
 
 		System.out.println("Phytochamber Test");
 
-		IOurl urlFlu = new IOurl("mongo://26b7e285fae43dac107016afb4dc2841/WT01_1385");
-		IOurl urlVis = new IOurl("mongo://12b6db018fddf651b414b652fc8f3d8d/WT01_1385");
-		IOurl urlNIR = new IOurl("mongo://c72e4fcc141b8b2a97851ab2fde8106a/WT01_1385");
+		IOurl urlFlu = new IOurl("mongo_ba-13.ipk-gatersleben.de://26b7e285fae43dac107016afb4dc2841/WT01_1385");
+		IOurl urlVis = new IOurl("mongo_ba-13.ipk-gatersleben.de://12b6db018fddf651b414b652fc8f3d8d/WT01_1385");
+		IOurl urlNIR = new IOurl("mongo_ba-13.ipk-gatersleben.de://c72e4fcc141b8b2a97851ab2fde8106a/WT01_1385");
 
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
-		ResourceIOManager.registerIOHandler(new MongoDBhandler());
+		for (MongoDB m : MongoDB.getMongos())
+			for (ResourceIOHandler io : m.getHandlers())
+				ResourceIOManager.registerIOHandler(io);
 
 		FlexibleImage imgFluo = new FlexibleImage(urlFlu);
 		FlexibleImage imgVisible = new FlexibleImage(urlVis);

@@ -18,9 +18,11 @@ import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
 public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
 
 	private BatchCmd cmd;
+	private final MongoDB m;
 
-	public MongoJobStatusProvider(BatchCmd cmd) {
+	public MongoJobStatusProvider(BatchCmd cmd, MongoDB m) {
 		this.cmd = cmd;
+		this.m = m;
 	}
 
 	@Override
@@ -35,7 +37,7 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
 
 	@Override
 	public double getCurrentStatusValueFine() {
-		cmd = new MongoDB().batchGetCommand(cmd);
+		cmd = m.batchGetCommand(cmd);
 		return cmd.getCurrentStatusValueFine();
 	}
 
