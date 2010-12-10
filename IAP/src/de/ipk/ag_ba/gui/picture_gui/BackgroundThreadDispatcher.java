@@ -171,7 +171,7 @@ public class BackgroundThreadDispatcher {
 								runningTasks.add(t);
 							}
 						}
-						System.out.println("Running tasks: "+runningTasks.size()+"/"+maxTask+" max");
+						System.out.println("Running tasks: " + runningTasks.size() + "/" + maxTask + " max");
 						// wait until the number of running tasks gets below the
 						// maximum
 						// then a new one can be started above
@@ -218,24 +218,39 @@ public class BackgroundThreadDispatcher {
 					}
 				}
 			}
-
-			private boolean highMemoryLoad(LinkedList<Thread> runningTasks) {
-				if (runningTasks.size() < 1)
-					return false;
-				int mbFree = (int) (Runtime.getRuntime().freeMemory() / 1024 / 1024);
-				int mbTotal = (int) (Runtime.getRuntime().totalMemory() / 1024 / 1024);
-				int mbMax = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
-				if (mbTotal<(int)(mbMax*0.9))
-					return false;
-				if ( mbFree < (int) (mbMax * 0.1d)) {
-					System.out.println("high memory load: "+mbFree+" MB free, max: "+mbMax+" MB");
-					return true;
-				} else
-					return false;
-			}
 		});
 		sheduler.start();
 	}
+
+	private boolean highMemoryLoad(LinkedList<Thread> runningTasks) {
+		if (runningTasks.size() < 1)
+			return false;
+		int mbFree = (int) (Runtime.getRuntime().freeMemory() / 1024 / 1024);
+		int mbTotal = (int) (Runtime.getRuntime().totalMemory() / 1024 / 1024);
+		int mbMax = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
+		if (mbTotal < (int) (mbMax * 0.7))
+			return false;
+		if (mbFree < (int) (mbMax * 0.3d)) {
+			if (System.currentTimeMillis() - lastPrint > 1000) {
+				lastPrint = System.currentTimeMillis();
+				System.out.println("high memory load: " + mbFree + " MB free, max: " + mbMax + " MB");
+			}
+			if (System.currentTimeMillis() - lastGC > 1000 * 60) {
+				lastGC = System.currentTimeMillis();
+				System.out.println("high memory load: " + mbFree + " MB free, max: " + mbMax + " MB --- GARBAGE COLLECTION");
+				System.gc();
+				mbFree = (int) (Runtime.getRuntime().freeMemory() / 1024 / 1024);
+				mbTotal = (int) (Runtime.getRuntime().totalMemory() / 1024 / 1024);
+				mbMax = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
+				System.out.println("new memory load: " + mbFree + " MB free, max: " + mbMax + " MB");
+			}
+			return true;
+		} else
+			return false;
+	}
+
+	private static long lastPrint = 0;
+	private static long lastGC = 0;
 
 	protected void myRemove(Thread rt) {
 		synchronized (runningTasks) {

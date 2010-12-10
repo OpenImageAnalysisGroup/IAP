@@ -569,7 +569,7 @@ public class NavigationButton implements StyleAware {
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				if (n1 != null && n1.getText().startsWith("<html><u>"))
+				if (n1 != null && n1.getText() != null && n1.getText().startsWith("<html><u>"))
 					n1.setText(n1.getText().substring("<html><u>".length()));
 			}
 
