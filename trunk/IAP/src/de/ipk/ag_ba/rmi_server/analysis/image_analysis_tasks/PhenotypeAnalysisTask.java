@@ -128,7 +128,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 							status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 							status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl);
 						}
-						System.out.println("Total Memory: " + Runtime.getRuntime().totalMemory() / 1024 / 1024 + " MB, " + Runtime.getRuntime().freeMemory()
+						System.out.println("Memory: "+Runtime.getRuntime().maxMemory()/1024/1024+" MB max, " + Runtime.getRuntime().totalMemory() / 1024 / 1024 + " MB total, " + Runtime.getRuntime().freeMemory()
 												/ 1024
 												/ 1024 + " MB free");
 						// }

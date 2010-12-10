@@ -171,6 +171,7 @@ public class BackgroundThreadDispatcher {
 								runningTasks.add(t);
 							}
 						}
+						System.out.println("Running tasks: "+runningTasks.size()+"/"+maxTask+" max");
 						// wait until the number of running tasks gets below the
 						// maximum
 						// then a new one can be started above
@@ -222,8 +223,15 @@ public class BackgroundThreadDispatcher {
 				if (runningTasks.size() < 1)
 					return false;
 				int mbFree = (int) (Runtime.getRuntime().freeMemory() / 1024 / 1024);
+				int mbTotal = (int) (Runtime.getRuntime().totalMemory() / 1024 / 1024);
 				int mbMax = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
-				return mbFree < (int) (mbMax * 0.3);
+				if (mbTotal<(int)(mbMax*0.9))
+					return false;
+				if ( mbFree < (int) (mbMax * 0.1d)) {
+					System.out.println("high memory load: "+mbFree+" MB free, max: "+mbMax+" MB");
+					return true;
+				} else
+					return false;
 			}
 		});
 		sheduler.start();
