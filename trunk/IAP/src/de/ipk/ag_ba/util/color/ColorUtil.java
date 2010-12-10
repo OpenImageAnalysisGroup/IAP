@@ -205,9 +205,9 @@ public class ColorUtil {
 	}
 
 	public static Color_CIE_Lab colorXYZ2CIELAB(ColorXYZ XYZ) {
-		double X = XYZ.getX();
-		double Y = XYZ.getY();
-		double Z = XYZ.getZ();
+		double X = XYZ.x;
+		double Y = XYZ.y;
+		double Z = XYZ.z;
 		double ref_X = 95.047; // Observer= 2°, Illuminant= D65
 		double ref_Y = 100.000;
 		double ref_Z = 108.883;
@@ -236,9 +236,9 @@ public class ColorUtil {
 
 	public static void getLABfromRGB(int rgb, Color_CIE_Lab lab_result, ColorXYZ xyz_result) {
 		colorRGB2XYZ(rgb, xyz_result);
-		double X = xyz_result.getX();
-		double Y = xyz_result.getY();
-		double Z = xyz_result.getZ();
+		double X = xyz_result.x;
+		double Y = xyz_result.y;
+		double Z = xyz_result.z;
 		double ref_X = 95.047; // Observer= 2°, Illuminant= D65
 		double ref_Y = 100.000;
 		double ref_Z = 108.883;

@@ -7,7 +7,7 @@ import java.awt.Color;
  */
 public class ColorXYZ {
 
-	double x, y, z;
+	public double x, y, z;
 
 	/**
 	 * @param x
