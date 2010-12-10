@@ -3,6 +3,7 @@ package de.ipk.ag_ba.gui.picture_gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -176,7 +177,7 @@ public class BackgroundThreadDispatcher {
 						// in case there is a higher priority task waiting
 						// (higher than all running tasks) then the loop is
 						// stopped, it can run, too
-						while (runningTasks.size() - waitThreads.size() + 1 >= maxTask) {
+						while (runningTasks.size() - waitThreads.size() + 1 >= maxTask || highMemoryLoad(runningTasks)) {
 							int highestRunningPrio = Integer.MIN_VALUE;
 							try {
 								Thread.sleep(5);
@@ -216,6 +217,14 @@ public class BackgroundThreadDispatcher {
 					}
 				}
 			}
+
+			private boolean highMemoryLoad(LinkedList<Thread> runningTasks) {
+				if (runningTasks.size() < 1)
+					return false;
+				int mbFree = (int) (Runtime.getRuntime().freeMemory() / 1024 / 1024);
+				int mbMax = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
+				return mbFree < (int) (mbMax * 0.3);
+			}
 		});
 		sheduler.start();
 	}
@@ -230,7 +239,7 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 
-	public static void waitFor(MyThread[] threads) {
+	private static void waitFor(HashSet<MyThread> threads) {
 		try {
 			if (!Thread.currentThread().getName().contains("wait;"))
 				Thread.currentThread().setName("wait;" + Thread.currentThread().getName());
@@ -240,14 +249,21 @@ public class BackgroundThreadDispatcher {
 			boolean oneRunning;
 			do {
 				oneRunning = false;
+				ArrayList<MyThread> del = null;
 				for (MyThread t : threads) {
 					if (t == null)
 						continue;
-					if (!t.isFinished()) {
+					if (!t.isFinished())
 						oneRunning = true;
-						break;
+					else {
+						if (del == null)
+							del = new ArrayList<MyThread>();
+						del.add(t);
 					}
 				}
+				if (del != null)
+					for (MyThread d : del)
+						threads.remove(d);
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
@@ -261,6 +277,22 @@ public class BackgroundThreadDispatcher {
 			if (Thread.currentThread().getName().contains("wait;"))
 				Thread.currentThread().setName(Thread.currentThread().getName().substring("wait;".length()));
 		}
+
+	}
+
+	public static void waitFor(MyThread[] threads) {
+		HashSet<MyThread> t = new HashSet<MyThread>();
+		for (MyThread m : threads)
+			t.add(m);
+		waitFor(t);
+	}
+
+	public static void waitFor(Collection<MyThread> threads) {
+		HashSet<MyThread> t = new HashSet<MyThread>();
+		for (MyThread m : threads)
+			t.add(m);
+		threads.clear();
+		waitFor(t);
 	}
 
 	// private static final ThreadSafeOptions tso = new ThreadSafeOptions();

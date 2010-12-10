@@ -1161,6 +1161,7 @@ public class MongoDB {
 						}
 
 						ImageData image = new ImageData(sample, map);
+						image.getURL().setPrefix(mh.getPrefix());
 						sample.add(image);
 					}
 				}

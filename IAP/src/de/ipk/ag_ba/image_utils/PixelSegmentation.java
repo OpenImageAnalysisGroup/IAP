@@ -135,9 +135,9 @@ public class PixelSegmentation {
 				calculateCircuitRatio();
 			} else {
 				firstPass(); // Each pixel is assigned to a cluster
-				StopWatch s = new StopWatch("Merge Chris");
+				// StopWatch s = new StopWatch("Merge Chris");
 				mergeHashMapToepfe();
-				s.printTime();
+				// s.printTime();
 				secondPassToepfe(); // Cluster are renumbered
 				calculatePerimeterOfEachCluster();
 				calculateCircuitRatio();

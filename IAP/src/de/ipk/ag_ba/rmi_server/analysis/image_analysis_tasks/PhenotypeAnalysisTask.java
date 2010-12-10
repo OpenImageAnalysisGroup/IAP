@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Stack;
+import java.util.concurrent.Callable;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -98,44 +100,59 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
 
-		// Collection jobs = new ArrayList();
+		final Stack<Callable<Integer>> jobs = new Stack<Callable<Integer>>();
 
 		for (Measurement md : workload) {
 			if (md instanceof ImageData) {
 				final ImageData id = (ImageData) md;
-				// jobs.add(new Callable<Integer>() {
-				// @Override
-				// public Integer call() throws Exception {
-				LoadedImage limg = null;
-				if (id != null) {
-					if (id instanceof LoadedImage) {
-						limg = (LoadedImage) id;
-					} else {
-						try {
-							limg = IOmodule.loadImageFromFileOrMongo(id);
-						} catch (Exception e) {
-							ErrorMsg.addErrorMessage(e);
+				jobs.add(new Callable<Integer>() {
+					@Override
+					public Integer call() throws Exception {
+						// synchronized (jobs) {
+						LoadedImage limg = null;
+						if (id != null) {
+							if (id instanceof LoadedImage) {
+								limg = (LoadedImage) id;
+							} else {
+								try {
+									limg = IOmodule.loadImageFromFileOrMongo(id);
+								} catch (Exception e) {
+									ErrorMsg.addErrorMessage(e);
+								}
+							}
+							clearBackgroundAndInterpretImage(limg, maximumThreadCountOnImageLevel,
+													storeResultInDatabase, status, true, output, preProcessors, epsilonA,
+													epsilonB);
+							limg = null;
+							tso.addInt(1);
+							status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
+							status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl);
 						}
+						System.out.println("Total Memory: " + Runtime.getRuntime().totalMemory() / 1024 / 1024 + " MB, " + Runtime.getRuntime().freeMemory()
+												/ 1024
+												/ 1024 + " MB free");
+						// }
+						return tso.getInt();
 					}
-					clearBackgroundAndInterpretImage(limg, maximumThreadCountOnImageLevel,
-										storeResultInDatabase, status, true, output, preProcessors, epsilonA,
-										epsilonB);
-					tso.addInt(1);
-					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
-					status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl);
-				}
-				// return tso.getInt();
-				// }
-				// });
+				});
 			}
 		}
-
-		// try {
-		// BackgroundThreadDispatcher.invokeAll(jobs);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// ErrorMsg.addErrorMessage(e);
-		// }
+		int idx = 1, maxJob = jobs.size();
+		ArrayList<MyThread> threads = new ArrayList<MyThread>();
+		while (!jobs.empty()) {
+			final Callable<Integer> call = jobs.pop();
+			threads.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						call.call();
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
+			}, getName() + " job " + (idx++) + "/" + maxJob, -1));
+		}
+		BackgroundThreadDispatcher.waitFor(threads);
 
 		status.setCurrentStatusValueFine(100d);
 		input = null;
