@@ -6,6 +6,8 @@
  */
 package de.ipk.ag_ba.rmi_server.analysis;
 
+import info.StopWatch;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
@@ -46,7 +48,8 @@ public class IOmodule {
 		return new WorkerInfo(todo.size(), 0, processed, lastKBperSecTransferSpeed, "KB/s");
 	}
 
-	public static LoadedImage loadImageFromFileOrMongo(ImageData id) throws Exception {
+	public static synchronized LoadedImage loadImageFromFileOrMongo(ImageData id) throws Exception {
+		StopWatch s = new StopWatch("Load image and null-image", false);
 		BufferedImage image = ImageIO.read(id.getURL().getInputStream());
 		BufferedImage imageNULL = null;
 		try {
@@ -56,6 +59,7 @@ public class IOmodule {
 			ErrorMsg.addErrorMessage(e);
 		}
 		LoadedImage result = new LoadedImage(id, image, imageNULL);
+		s.printTime(200);
 		return result;
 	}
 

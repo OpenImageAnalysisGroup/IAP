@@ -29,6 +29,12 @@ public class StopWatch {
 		System.out.println(desc + "...");
 	}
 
+	public StopWatch(String desc, boolean printStart) {
+		this.desc = desc;
+		if (printStart)
+		System.out.println(desc + "...");
+	}
+
 	public void reset() {
 		start = System.currentTimeMillis();
 	}
@@ -52,6 +58,11 @@ public class StopWatch {
 
 	public String getDescription() {
 		return desc;
+	}
+
+	public void printTime(int minTime) {
+		if (minTime==0 || getTime()-start>minTime)
+			System.out.println(desc + " took " + getTime() + " ms");
 	}
 
 }
