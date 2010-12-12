@@ -54,7 +54,7 @@ public final class LemnaCam extends AbstractNavigationAction {
 	 */
 	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
 		NavigationAction navigationAction = new LemnaCam();
-		NavigationButton res = new NavigationButton(navigationAction, "LemnaCam 1", "img/ext/camera.png", guiSetting);
+		NavigationButton res = new NavigationButton(navigationAction, "LemnaCam 1", "img/ext/cctv.png", guiSetting);
 		return res;
 	}
 }

@@ -7,12 +7,13 @@
 
 package de.ipk.ag_ba.datasources.http_folder;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 
 import de.ipk.ag_ba.datasources.DataSourceLevel;
+import de.ipk.ag_ba.gui.navigation_actions.Book;
+import de.ipk.ag_ba.gui.navigation_actions.Library;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 
@@ -22,8 +23,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
 public class HTTPdataSourceLevel implements DataSourceLevel {
 
 	private final Collection<PathwayWebLinkItem> mainList;
-	private final BufferedImage icon;
 	private final String name;
+	private final NavigationImage icon;
+	private final NavigationImage folderIcon;
+	private final Library lib;
 
 	private class DataSourceLevelsAndPathways {
 		Collection<DataSourceLevel> levels;
@@ -35,14 +38,17 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 		}
 	}
 
-	public HTTPdataSourceLevel(String name, Collection<PathwayWebLinkItem> mainList, BufferedImage icon) {
+	public HTTPdataSourceLevel(Library lib, String name, Collection<PathwayWebLinkItem> mainList,
+						NavigationImage icon, NavigationImage folderIcon) {
+		this.lib = lib;
 		this.mainList = mainList;
 		this.icon = icon;
+		this.folderIcon = folderIcon;
 		this.name = name;
 	}
 
 	@Override
-	public Collection<DataSourceLevel> getSubDataSourceLevels() {
+	public Collection<DataSourceLevel> getSubLevels() {
 		DataSourceLevelsAndPathways res = getSubLevelsAndPathways();
 		return res.levels;
 	}
@@ -50,7 +56,8 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 	private DataSourceLevelsAndPathways getSubLevelsAndPathways() {
 		TreeSet<String> groups = new TreeSet<String>();
 		for (PathwayWebLinkItem item : mainList)
-			groups.add(item.getGroup1());
+			if (item.getGroup1() != null)
+				groups.add(item.getGroup1());
 
 		Collection<DataSourceLevel> levels = new ArrayList<DataSourceLevel>();
 		Collection<PathwayWebLinkItem> pathways = new ArrayList<PathwayWebLinkItem>();
@@ -65,12 +72,13 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 						else
 							subLevel.add(item);
 					}
-				levels.add(new HTTPdataSourceLevel(group, subLevel, icon));
+				levels.add(new HTTPdataSourceLevel(lib, group, subLevel, folderIcon, folderIcon));
 			}
 		} else {
 			groups.clear();
 			for (PathwayWebLinkItem item : mainList)
-				groups.add(item.getGroup2());
+				if (item != null && item.getGroup2() != null)
+					groups.add(item.getGroup2());
 
 			if (groups.size() >= 2) {
 				for (String group : groups) {
@@ -82,7 +90,7 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 							else
 								subLevel.add(item);
 						}
-					levels.add(new HTTPdataSourceLevel(group, subLevel, icon));
+					levels.add(new HTTPdataSourceLevel(lib, group, subLevel, folderIcon, folderIcon));
 				}
 			} else {
 				// return all items as pathways at primary level (no grouping
@@ -94,27 +102,37 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 	}
 
 	@Override
-	public Collection<ExperimentReference> getExperimentsAtThisLevel() {
+	public Collection<ExperimentReference> getExperiments() {
 		return new ArrayList<ExperimentReference>();
 	}
 
 	@Override
-	public Collection<PathwayWebLinkItem> getPathwaysAtThisLevel() {
+	public Collection<PathwayWebLinkItem> getPathways() {
 		return getSubLevelsAndPathways().pathways;
 	}
 
 	@Override
-	public BufferedImage getIconForThisLevel() {
-		return icon;
-	}
-
-	@Override
-	public BufferedImage getOpenedIconForThisLevel() {
+	public NavigationImage getIcon() {
 		return icon;
 	}
 
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public ArrayList<Book> getReferenceInfos() {
+		return lib.getBooksInFolder(name);
+	}
+
+	@Override
+	public void setDescription(String description) {
+		// empty
+	}
+
+	@Override
+	public String getDescription() {
+		return null;
 	}
 }

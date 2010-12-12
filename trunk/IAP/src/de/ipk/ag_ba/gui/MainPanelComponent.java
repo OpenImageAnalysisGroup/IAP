@@ -82,7 +82,7 @@ public class MainPanelComponent {
 			if (infos.size() == 1) {
 				JComponent jp = new JPanel(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.PREFERRED } }));
 				jp.setOpaque(false);
-				jp.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
+				jp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
 				jp.add(infos.get(0), "0,0");
 

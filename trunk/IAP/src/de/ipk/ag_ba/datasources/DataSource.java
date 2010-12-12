@@ -12,7 +12,7 @@ import org.graffiti.plugin.io.resources.ResourceIOHandler;
 /**
  * @author klukas
  */
-public interface DataSource extends ResourceIOHandler {
+public interface DataSource extends ResourceIOHandler, DataSourceLevel {
 
 	public void setLogin(String login, String password);
 
@@ -23,9 +23,4 @@ public interface DataSource extends ResourceIOHandler {
 	 * @throws Exception
 	 */
 	public void readDataSource() throws Exception;
-
-	/**
-	 * First call readDataSource(), then this method.
-	 */
-	public DataSourceLevel getMainLevelInfo();
 }

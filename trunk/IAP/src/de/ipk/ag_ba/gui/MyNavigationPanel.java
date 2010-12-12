@@ -401,9 +401,15 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			ButtonDrawStyle bds = (ButtonDrawStyle) o;
 			buttonStyle = bds;
 			theOther.buttonStyle = bds;
+
 			menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 			menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
 			menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
+
+			theOther.menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
+			theOther.menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
+			theOther.menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
+
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {

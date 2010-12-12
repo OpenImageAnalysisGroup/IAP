@@ -89,9 +89,13 @@ public class MongoDB {
 
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
-		res.add(new MongoDB("IAP Cloud", "dbe3", "ba-13.ipk-gatersleben.de", null, null));
-		res.add(new MongoDB("IAP NG", "IAP1", "ba-13.ipk-gatersleben.de", null, null));
-		res.add(new MongoDB("localhost", "iapLocal1", "localhost", null, null));
+		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de")) {
+			res.add(new MongoDB("IAP Cloud", "dbe3", "ba-13.ipk-gatersleben.de", null, null));
+			res.add(new MongoDB("IAP NG", "IAP1", "ba-13.ipk-gatersleben.de", null, null));
+		}
+
+		if (IAPservice.isReachable("localhost"))
+			res.add(new MongoDB("localhost", "dbe3", "localhost", null, null));
 		return res;
 	}
 
@@ -967,9 +971,10 @@ public class MongoDB {
 					collection.setObjectClass(BatchCmd.class);
 					for (DBObject dbo : collection.find()) {
 						BatchCmd batch = (BatchCmd) dbo;
-						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED)
-							// || ((batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING) && System
-							// .currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
+						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED
+											|| (
+											(batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING)
+											&& System.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
 							res.add(batch);
 						// System.out.println(batch);
 					}
@@ -1024,12 +1029,19 @@ public class MongoDB {
 
 				@Override
 				public void run() {
-					DBCollection collection = db.getCollection("schedule");
-					collection.setObjectClass(BatchCmd.class);
-					for (DBObject dbo : collection.find()) {
-						BatchCmd batch = (BatchCmd) dbo;
-						if (batch.getRunStatus() == CloudAnalysisStatus.STARTING)
-							res.add(batch);
+					String hostName;
+					try {
+						hostName = SystemAnalysis.getHostName();
+						DBCollection collection = db.getCollection("schedule");
+						collection.setObjectClass(BatchCmd.class);
+						for (DBObject dbo : collection.find()) {
+							BatchCmd batch = (BatchCmd) dbo;
+							if (batch.getRunStatus() == CloudAnalysisStatus.STARTING)
+								if (hostName.equals(batch.getOwner()))
+									res.add(batch);
+						}
+					} catch (UnknownHostException e) {
+						ErrorMsg.addErrorMessage(e);
 					}
 				}
 
@@ -1045,7 +1057,7 @@ public class MongoDB {
 		return res;
 	}
 
-	public void batchClaim(final BatchCmd batch, final CloudAnalysisStatus starting) {
+	public void batchClaim(final BatchCmd batch, final CloudAnalysisStatus starting, final boolean requireOwnership) {
 		// try to claim a batch cmd
 		try {
 			processDB(new RunnableOnDB() {
@@ -1053,16 +1065,23 @@ public class MongoDB {
 
 				@Override
 				public void run() {
-					DBCollection collection = db.getCollection("schedule");
-					collection.setObjectClass(BatchCmd.class);
-					DBObject dbo = new BasicDBObject();
-					dbo.put("_id", batch.get("_id"));
-					String rs = batch.getString("runstatus");
-					dbo.put("runstatus", rs);
-					batch.put("runstatus", starting.toString());
-					batch.put("lastupdate", System.currentTimeMillis());
-					WriteResult r = collection.update(dbo, batch, false, false);
-					System.out.println("Update status: " + rs + " --> " + starting.toString() + ", res: " + r.toString());
+					try {
+						batch.setOwner(SystemAnalysis.getHostName());
+						DBCollection collection = db.getCollection("schedule");
+						collection.setObjectClass(BatchCmd.class);
+						DBObject dbo = new BasicDBObject();
+						dbo.put("_id", batch.get("_id"));
+						String rs = batch.getString("runstatus");
+						dbo.put("runstatus", rs);
+						if (requireOwnership)
+							dbo.put("owner", SystemAnalysis.getHostName());
+						batch.put("runstatus", starting.toString());
+						batch.put("lastupdate", System.currentTimeMillis());
+						WriteResult r = collection.update(dbo, batch, false, false);
+						System.out.println("Update status: " + rs + " --> " + starting.toString() + ", res: " + r.toString());
+					} catch (UnknownHostException e) {
+						ErrorMsg.addErrorMessage(e);
+					}
 				}
 
 				@Override

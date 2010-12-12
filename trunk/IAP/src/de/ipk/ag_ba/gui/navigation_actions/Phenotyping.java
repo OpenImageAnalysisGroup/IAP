@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
@@ -43,12 +44,10 @@ public class Phenotyping extends AbstractNavigationAction {
 		NavigationAction lemnaExperiments = new LemnaTecNavigationAction();
 		NavigationButton lemnaEntity = new NavigationButton(lemnaExperiments, src != null ? src.getGUIsetting()
 							: guiSetting);
-
-		phenoDBcommands.add(lemnaEntity);
+		if (IAPservice.isReachable("lemna-db.ipk-gatersleben.de"))
+			phenoDBcommands.add(lemnaEntity);
 
 		for (MongoDB m : MongoDB.getMongos()) {
-			String login = "";
-			String pass = "";
 			NavigationAction mongoExperiments = new MongoExperimentsNavigationAction(m);
 			NavigationButton mongo = new NavigationButton(mongoExperiments, m.getDisplayName(), "img/ext/network-mongo.png",
 								"img/ext/network-mongo-gray.png", src != null ? src.getGUIsetting() : guiSetting);

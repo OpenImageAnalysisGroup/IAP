@@ -82,19 +82,21 @@ public class CloudTaskManager {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
 					long maxDelaySinceLastUpdate = 5000;
 					m.batchPingHost(ip);
-					for (BatchCmd batch : m.batchGetCommands(maxDelaySinceLastUpdate)) {
-						if (batch.getExperimentMongoID() != null && batch.getTargetIPs().contains(ip)) {
-							m.batchClaim(batch, CloudAnalysisStatus.STARTING);
-							break;
-						}
-					}
-					for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart()) {
-						if (batch.getTargetIPs().contains(ip)) {
-							if (batch.getExperimentMongoID() != null) {
-								ExperimentHeaderInterface header = m.getExperimentHeader(batch.getExperimentMongoID());
-								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
-								commands_to_start.add(task);
+					if (runningTasks.size() == 0) {
+						for (BatchCmd batch : m.batchGetCommands(maxDelaySinceLastUpdate)) {
+							if (batch.getExperimentMongoID() != null && (batch.getTargetIPs().isEmpty() || batch.getTargetIPs().contains(ip))) {
+								m.batchClaim(batch, CloudAnalysisStatus.STARTING, false);
 								break;
+							}
+						}
+						for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart()) {
+							if (batch.getTargetIPs().isEmpty() || batch.getTargetIPs().contains(ip)) {
+								if (batch.getExperimentMongoID() != null) {
+									ExperimentHeaderInterface header = m.getExperimentHeader(batch.getExperimentMongoID());
+									TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
+									commands_to_start.add(task);
+									break;
+								}
 							}
 						}
 					}
