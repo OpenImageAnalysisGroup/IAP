@@ -7,9 +7,11 @@
 
 package de.ipk.ag_ba.datasources;
 
-import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collection;
 
+import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
+import de.ipk.ag_ba.gui.navigation_actions.Book;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 
@@ -18,15 +20,19 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
  */
 public interface DataSourceLevel {
 
-	public Collection<DataSourceLevel> getSubDataSourceLevels();
+	public Collection<DataSourceLevel> getSubLevels();
 
-	public Collection<ExperimentReference> getExperimentsAtThisLevel();
+	public Collection<ExperimentReference> getExperiments();
 
-	public Collection<PathwayWebLinkItem> getPathwaysAtThisLevel();
+	public Collection<PathwayWebLinkItem> getPathways();
 
-	public BufferedImage getIconForThisLevel();
-
-	public BufferedImage getOpenedIconForThisLevel();
+	public NavigationImage getIcon();
 
 	public String getName();
+
+	public ArrayList<Book> getReferenceInfos();
+
+	public void setDescription(String description);
+
+	public String getDescription();
 }

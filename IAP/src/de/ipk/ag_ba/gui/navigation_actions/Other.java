@@ -8,21 +8,12 @@ package de.ipk.ag_ba.gui.navigation_actions;
 
 import info.clearthought.layout.TableLayout;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
@@ -31,7 +22,6 @@ import javax.swing.JComponent;
 
 import org.ErrorMsg;
 import org.ObjectRef;
-import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -46,6 +36,7 @@ import de.ipk.ag_ba.gui.util.DateUtils;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -153,131 +144,59 @@ public class Other {
 		NavigationAction serverStatusAction = new AbstractNavigationAction("Check service availability") {
 			private NavigationButton src;
 			private final HashMap<String, ArrayList<String>> infoset = new HashMap<String, ArrayList<String>>();
+			ArrayList<NavigationButton> resultNavigationButtons = new ArrayList<NavigationButton>();
 
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
 				this.src = src;
 				infoset.clear();
-
-				checkServerAvailabilityByPing(infoset, "NW-04", "IAP (de) Cloud Database Master Server NW-04",
-									"nw-04.ipk-gatersleben.de");
-
-				checkServerAvailabilityByPing(infoset, "BA-13", "IAP (de) Cloud Analysis Server BA-13",
-									"ba-13.ipk-gatersleben.de");
-
-				checkServerAvailabilityByPing(infoset, "BA-24", "IAP (de) Cloud Analysis Compute Workstation BA-24",
-									"ba-24.ipk-gatersleben.de");
-
-				// try {
-				// infoset.put("dbe", new ArrayList<String>());
-				// infoset.get("dbe").add("<h2>DBE Web Service</h2><hr>");
-				// URL url = new URL(CallDBE2WebService.urlString);
-				// URLConnection urlConnection = url.openConnection();
-				// urlConnection.setConnectTimeout(1000);
-				// urlConnection.setReadTimeout(1000);
-				//
-				// HashSet<String> validHeaders = new HashSet<String>();
-				// validHeaders.add("Date");
-				// validHeaders.add("Via");
-				// validHeaders.add("Server");
-				// validHeaders.add("X-Powered-By");
-				//
-				// Map<String, List<String>> headers =
-				// urlConnection.getHeaderFields();
-				// Set<Map.Entry<String, List<String>>> entrySet =
-				// headers.entrySet();
-				// for (Map.Entry<String, List<String>> entry : entrySet) {
-				// String headerName = entry.getKey();
-				//
-				// if (!validHeaders.contains(headerName))
-				// continue;
-				//
-				// StringBuilder sb = new StringBuilder();
-				// if (headerName != null)
-				// sb.append(headerName + ": ");
-				// List<String> headerValues = entry.getValue();
-				// for (String value : headerValues) {
-				// sb.append(value + " ");
-				// }
-				// infoset.get("dbe").add(sb.toString());
-				// }
-				// if (entrySet.size() == 0)
-				// throw new
-				// Exception("Read timed out: Headers could not be retrieved within time bounds.");
-				// infoset.get("dbe").add("<br><b>Status result check: OK</b>");
-				// } catch (Exception e) {
-				// if (e.toString().indexOf("Read timed out") >= 0)
-				// infoset
-				// .get("dbe")
-				// .add(
-				// ""
-				// + "DBE2 Web Service was not reachable within time limits.<br>"
-				// +
-				// "The cause may be internet connectivity problems or server side<br>"
-				// + "problems which may take some time to be corrected.<br>"
-				// +
-				// "Please write an E-Mail to <a href=\"mailto:mehlhorn@ipk-gatersleben.de\">mehlhorn@ipk-gatersleben.de</a> if this<br>"
-				// + "problem persists.<br><br>"
-				// + "The Web Service availability is monitored automatically.<br>"
-				// + "Effort will be put on improving reliability of the service.");
-				// else
-				// infoset.get("dbe").add(e.toString());
-				// infoset.get("dbe").add("<br><b>Status result check: ERROR</b>");
-				// }
-
-				try {
-					infoset.put("vanted", new ArrayList<String>());
-					infoset.get("vanted").add("<h2>http://vanted.ipk-gatersleben.de</h2><hr>");
-					URL url = new URL("http://vanted.ipk-gatersleben.de");
-					URLConnection urlConnection = url.openConnection();
-					urlConnection.setConnectTimeout(1000);
-					urlConnection.setReadTimeout(1000);
-					Map<String, List<String>> headers = urlConnection.getHeaderFields();
-					Set<Map.Entry<String, List<String>>> entrySet = headers.entrySet();
-
-					HashSet<String> validHeaders = new HashSet<String>();
-					validHeaders.add("Date");
-					validHeaders.add("Via");
-					validHeaders.add("Server");
-					validHeaders.add("X-Powered-By");
-
-					for (Map.Entry<String, List<String>> entry : entrySet) {
-						String headerName = entry.getKey();
-
-						if (!validHeaders.contains(headerName))
-							continue;
-
-						StringBuilder sb = new StringBuilder();
-						if (headerName != null)
-							sb.append(headerName + ": ");
-						List<String> headerValues = entry.getValue();
-						for (String value : headerValues) {
-							sb.append(value + " ");
-						}
-						infoset.get("vanted").add(sb.toString());
-					}
-					InputStream inputStream = urlConnection.getInputStream();
-					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-					String line = bufferedReader.readLine();
-					while (line != null) {
-						// infoset.get("vanted").add(line);
-						line = bufferedReader.readLine();
-					}
-					bufferedReader.close();
-					infoset.get("vanted").add("<br><b>Status result check: OK</b>");
-
-				} catch (Exception e) {
-					if (e.toString().indexOf("Read timed out") >= 0)
-						infoset.get("vanted").add(
-											"" + "The VANTED Web Site was not reachable within time limits.<br>"
-																+ "The cause may be internet connectivity problems or server side<br>"
-																+ "problems which may take some time to be corrected.<br><br>"
-																+ "The Web Server availability is monitored automatically.<br>"
-																+ "Effort will be put on improving reliability of the service.");
-					else
-						infoset.get("vanted").add(e.toString());
-					infoset.get("vanted").add("<br><b>Status result check: ERROR</b>");
+				resultNavigationButtons.clear();
+				if (includeLemnaTecStatus) {
+					resultNavigationButtons.add(LemnaCam.getLemnaCamButton(src.getGUIsetting()));
+					if (!IAPservice.isReachable("http://lemnacam.ipk-gatersleben.de"))
+						resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				}
+
+				boolean simpleIcons = true;
+
+				String pc = "img/ext/network-workgroup-power.png";
+				String pcOff = "img/ext/network-workgroup.png";
+
+				boolean rLocal = IAPservice.isReachable("localhost");
+				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("localhost",
+									simpleIcons ? "img/ext/computer.png" : "img/ext/computer.png"), src
+									.getGUIsetting()));
+				if (!rLocal)
+					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+
+				boolean rBA13 = IAPservice.isReachable("ba-13.ipk-gatersleben.de");
+				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("BA-13",
+									simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
+									.getGUIsetting()));
+				if (!rBA13)
+					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+
+				boolean rBA24 = IAPservice.isReachable("ba-24.ipk-gatersleben.de");
+				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("BA-24",
+									simpleIcons ? (rBA24 ? pc : pcOff) : "img/ext/macPro.png"), src
+									.getGUIsetting()));
+				if (!rBA24)
+					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+
+				boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
+				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("BA-03",
+									simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src
+									.getGUIsetting()));
+				if (!rBA03)
+					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+
+				boolean rNW04 = IAPservice.isReachable("nw-04.ipk-gatersleben.de");
+				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("NW-04",
+									simpleIcons ? (rNW04 ? pc : pcOff) : "img/ext/pc.png"), src
+									.getGUIsetting()));
+				if (!rNW04)
+					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+
 			}
 
 			@Override
@@ -289,29 +208,12 @@ public class Other {
 
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
-				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-				if (includeLemnaTecStatus)
-					res.add(LemnaCam.getLemnaCamButton(src.getGUIsetting()));
-
-				res.add(new NavigationButton(null, "BA-13 Server R-810", "img/ext/dellR810.png", src
-									.getGUIsetting()));
-				res.add(new NavigationButton(null, "BA-24 Workstation", "img/ext/computer.png", src
-									.getGUIsetting()));// macpro_side.png"));
-				res.add(new NavigationButton(null, "NW-04 File Server", "img/ext/computer.png", src
-									.getGUIsetting()));// pc.png"));
-
-				return res;
+				return resultNavigationButtons;
 			}
 
 			@Override
 			public MainPanelComponent getResultMainPanel() {
-				ArrayList<String> values = new ArrayList<String>();
-				for (String key : infoset.keySet()) {
-					String s = "<html>" + StringManipulationTools.getStringList(infoset.get(key), "<br>");
-					values.add(s);
-				}
-
-				return new MainPanelComponent(values);
+				return null;
 			}
 
 		};

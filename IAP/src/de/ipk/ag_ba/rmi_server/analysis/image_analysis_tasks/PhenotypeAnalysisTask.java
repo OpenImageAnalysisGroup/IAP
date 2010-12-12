@@ -84,7 +84,6 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		return "Analyse Plants Phenotype";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
@@ -128,7 +127,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 							status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 							status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl);
 						}
-						System.out.println("Memory: "+Runtime.getRuntime().maxMemory()/1024/1024+" MB max, " + Runtime.getRuntime().totalMemory() / 1024 / 1024 + " MB total, " + Runtime.getRuntime().freeMemory()
+						System.out.println("Memory: " + Runtime.getRuntime().maxMemory() / 1024 / 1024 + " MB max, " + Runtime.getRuntime().totalMemory() / 1024
+											/ 1024 + " MB total, " + Runtime.getRuntime().freeMemory()
 												/ 1024
 												/ 1024 + " MB free");
 						// }
@@ -238,7 +238,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		// save.rotate(3);
 		// save.saveImage("/Users/entzian/Desktop/sechsteBild.png");
 
-		if (false)
+		if (true)
 			closingOpening(w, h, arrayRGB, rgbArrayOriginal, iBackgroundFill, limg, 1);
 
 		boolean removeSmallSegments = true;
@@ -587,12 +587,22 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					System.out.println("LAB processing of RGB image..." + imageData.toString() + "");
 
 				int i = x + y * w;
+				double[] bd = new double[] { 2, 2, 3, 4, 4, 4 };
+				double[] bl = new double[] { 42, 42, 34, 57, 28, 83 };
+				double[] ba = new double[] { -9, -4, -1, 11, -7, 0 };
+				double[] bb = new double[] { 14, 9, 12, 33, 7, 12 };
 				for (x = 0; x < w; x++) {
-					// double l = arrayL[i];
+					double l = arrayL[i];
 					double a = arrayA[i];
 					double b = arrayB[i];
-					if (a > 21 || b < 5) { // a < -5 &&
+					if (a > 21 || b < 5 || a > -6) { // a < -5 &&
 						rgbArray[i] = iBackgroundFill;
+					} else {
+						for (int idx = 0; idx < ba.length; idx++) {
+							double dist = Math.pow((ba[idx] - a) * (ba[idx] - a) + (bb[idx] - b) * (bb[idx] - b) + (bl[idx] - l) * (bl[idx] - l), 1 / 3d);
+							if (dist < bd[idx])
+								rgbArray[i] = iBackgroundFill;
+						}
 					}
 					// else if (l >= 80 && Math.abs(a) <= 20 && Math.abs(b) <= 20) {
 					// rgbArray[i] = Color.yellow.getRGB(); // iBackgroundFill;

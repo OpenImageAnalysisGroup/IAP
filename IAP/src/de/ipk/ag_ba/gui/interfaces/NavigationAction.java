@@ -8,10 +8,9 @@ package de.ipk.ag_ba.gui.interfaces;
 
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
-
 import org.BackgroundTaskStatusProvider;
 
+import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
@@ -49,5 +48,5 @@ public interface NavigationAction {
 
 	public boolean getProvidesActions();
 
-	public ImageIcon getImageIcon();
+	public NavigationImage getImageIcon();
 }

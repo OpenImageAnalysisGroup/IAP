@@ -34,6 +34,7 @@ import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.util.InstanceLoader;
 
+import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.image_utils.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
@@ -48,7 +49,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolumeHandler;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -306,8 +307,9 @@ public class AIPmain extends JApplet {
 		}
 	}
 
-	public static BufferedImage loadIcon(String name) {
-		return ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(AIPmain.class, name).getImage());
+	public static NavigationImage loadIcon(String name) {
+		return new NavigationImage(
+							ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(AIPmain.class, name).getImage()));
 	}
 }
 

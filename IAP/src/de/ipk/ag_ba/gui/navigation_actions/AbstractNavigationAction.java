@@ -8,11 +8,10 @@ package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
-
 import org.BackgroundTaskStatusProvider;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -77,7 +76,7 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 		return true;
 	}
 
-	public ImageIcon getImageIcon() {
+	public NavigationImage getImageIcon() {
 		return null;
 	}
 }

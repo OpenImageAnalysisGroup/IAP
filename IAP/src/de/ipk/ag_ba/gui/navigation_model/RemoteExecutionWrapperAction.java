@@ -2,12 +2,12 @@ package de.ipk.ag_ba.gui.navigation_model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-
-import javax.swing.ImageIcon;
+import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProvider;
 import org.graffiti.editor.MainFrame;
 
+import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
@@ -36,13 +36,18 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
 			String remoteCapableAnalysisActionParams = null;
 			String experimentInputMongoID = remoteAction.getMongoDatasetID();
-			for (String ip : targetIPs) {
+			TreeSet<Integer> jobIDs = new TreeSet<Integer>();
+			{
+				int idx = 0;
+				while (jobIDs.size() < 20)
+					jobIDs.add(idx++);
+			}
+			for (int id : jobIDs) {
 				BatchCmd cmd = new BatchCmd();
 				cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
 				cmd.setSubmissionTime(System.currentTimeMillis());
-				HashSet<String> ipH = new HashSet<String>();
-				ipH.add(ip);
-				cmd.setTargetIPs(ipH);
+				cmd.setTargetIPs(targetIPs);
+				cmd.setSubTaskInfo(id, jobIDs.size());
 				cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
 				cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
 				cmd.setExperimentMongoID(experimentInputMongoID);
@@ -112,7 +117,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	}
 
 	@Override
-	public ImageIcon getImageIcon() {
+	public NavigationImage getImageIcon() {
 		return null;
 	}
 }

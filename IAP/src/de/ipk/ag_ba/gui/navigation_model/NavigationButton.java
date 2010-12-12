@@ -246,7 +246,7 @@ public class NavigationButton implements StyleAware {
 	public ImageIcon getIcon() {
 		if (action != null) {
 			if (action.getImageIcon() != null)
-				return action.getImageIcon();
+				return action.getImageIcon().getImageIcon();
 		}
 		return icon;
 	}
@@ -569,13 +569,13 @@ public class NavigationButton implements StyleAware {
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				if (n1 != null && n1.getText() != null && n1.getText().startsWith("<html><u>"))
-					n1.setText(n1.getText().substring("<html><u>".length()));
+				// if (n1 != null && n1.getText() != null && n1.getText().startsWith("<html><u>"))
+				// n1.setText(n1.getText().substring("<html><u>".length()));
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				n1.setText("<html><u>" + n1.getText());
+				// n1.setText("<html><u>" + n1.getText());
 			}
 
 			@Override

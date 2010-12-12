@@ -6,8 +6,6 @@
  */
 package de.ipk.ag_ba.rmi_server.task_management;
 
-import java.util.Set;
-
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 
@@ -59,30 +57,14 @@ public class TaskDescription {
 	}
 
 	public boolean isValid() {
-		return cmd != null && cmd.getTargetIPs().contains(systemIP);
+		return cmd != null && (cmd.getTargetIPs().isEmpty() || cmd.getTargetIPs().contains(systemIP));
 	}
 
-	public void startWork(BatchCmd batch, String hostName, String ip, final MongoDB m)
+	public void startWork(final BatchCmd batch, String hostName, String ip, final MongoDB m)
 						throws ClassCastException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		final RemoteCapableAnalysisAction action = RemoteAnalysisRepository.getInstance().getNewAnalysisAction(
 							analysisActionClassName);
 		action.setParams(experimentInput, m, params);
-
-		Set<String> ips = cmd.getTargetIPs();
-		int thisHostID = 0;
-		int numberOfHosts = 0;
-		int ii = 0;
-		for (String s : ips) {
-			if (systemIP.equals(s)) {
-				thisHostID = ii;
-			}
-			if (s.length() > 0)
-				numberOfHosts++;
-			ii++;
-		}
-
-		final int FthisHostID = thisHostID;
-		final int FnumberOfHosts = numberOfHosts;
 
 		final BackgroundTaskStatusProvider statusProvider = action.getStatusProvider();
 
@@ -96,9 +78,20 @@ public class TaskDescription {
 				// store dataset in mongo
 				// System.out.println(experiment.toString());
 				experiment.getHeader().setExperimentname(
-									cmd + "§" + FthisHostID + "§" + FnumberOfHosts + "§" + experiment.getName());
+									cmd + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§" + experiment.getName());
+				experiment.getHeader().setImportusergroup("Temp");
 				System.out.println("Received result: " + experiment.getName());
 				try {
+
+					// todo:
+					// check if last batch update is less than some time
+					// check if owner of batch is still the same and equal to system ip
+					// save experiment
+					// check if all parts are available as an experiment
+					// load all sub-experiments
+					// merge these
+					// save unified experiment
+
 					// todo: only store result if batch claim is still valid and
 					// connected to system IP
 					// //////// new MongoDB().saveExperiment("dbe3", null, login, pass, experiment, null);
@@ -113,7 +106,7 @@ public class TaskDescription {
 				this.experiment = experiment;
 			}
 		};
-		action.setWorkingSet(thisHostID, numberOfHosts, resultReceiver);
+		action.setWorkingSet(cmd.getPartIdx(), cmd.getPartCnt(), resultReceiver);
 		BackgroundTaskHelper.issueSimpleTask("Batch: " + analysisActionClassName + " (start: " + startTime + ")",
 							"Initializing", new Runnable() {
 								@Override
