@@ -218,15 +218,17 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 		if (getParent() != null) {
 			getParent().validate();
-			getParent().doLayout();
 			getParent().repaint();
+			if (getParent() != null) {
+				getParent().getParent().validate();
+				getParent().getParent().repaint();
+			}
+
 		} else {
 			validate();
-			doLayout();
 			repaint();
 			if (actionPanelRight != null) {
 				actionPanelRight.validate();
-				actionPanelRight.doLayout();
 				actionPanelRight.repaint();
 			}
 		}
