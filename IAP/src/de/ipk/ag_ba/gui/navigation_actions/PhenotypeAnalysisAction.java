@@ -329,12 +329,12 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 
 	@Override
 	public String getDefaultImage() {
-		return "img/colorhistogram.png";
+		return "img/000Grad_3.png";
 	}
 
 	@Override
 	public String getDefaultTitle() {
-		return "Phenotype Analysis";
+		return "Barley/Maize Analysis";
 	}
 
 	@Override

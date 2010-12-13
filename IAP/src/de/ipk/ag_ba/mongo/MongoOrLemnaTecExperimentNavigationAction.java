@@ -21,6 +21,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.webstart.AIPmain;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -51,10 +52,10 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		if (header != null && !header.getExcelfileid().startsWith("lemnatec:")
 							&& (header.getImportusername() == null || header.getImportusername().equals(SystemAnalysis.getUserName()))) {
 			if (header.inTrash()) {
-				actions.add(Trash.getTrashEntity(header, DeletionCommand.UNTRASH, src.getGUIsetting()));
-				actions.add(Trash.getTrashEntity(header, DeletionCommand.DELETE, src.getGUIsetting()));
+				actions.add(Trash.getTrashEntity(header, DeletionCommand.UNTRASH, src.getGUIsetting(), m));
+				actions.add(Trash.getTrashEntity(header, DeletionCommand.DELETE, src.getGUIsetting(), m));
 			} else
-				actions.add(Trash.getTrashEntity(header, DeletionCommand.TRASH, src.getGUIsetting()));
+				actions.add(Trash.getTrashEntity(header, DeletionCommand.TRASH, src.getGUIsetting(), m));
 		}
 		boolean add = true;
 		if (header != null && header.inTrash())

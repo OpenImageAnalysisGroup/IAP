@@ -15,6 +15,7 @@ import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.webstart.AIPmain;
 
 public class ShowVANTED extends AbstractNavigationAction {
 
@@ -33,11 +34,7 @@ public class ShowVANTED extends AbstractNavigationAction {
 
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		JFrame jf = (JFrame) ErrorMsg.findParentComponent(MainFrame.getInstance(), JFrame.class);
-		if (jf != null && !jf.isVisible()) {
-			jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			jf.setVisible(true);
-		}
+		AIPmain.showVANTED();
 
 		return null;
 	}

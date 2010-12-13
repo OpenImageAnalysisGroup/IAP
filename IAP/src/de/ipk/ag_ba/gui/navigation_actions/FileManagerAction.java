@@ -65,7 +65,9 @@ public class FileManagerAction extends AbstractNavigationAction {
 						final ExperimentReference experimentRef, GUIsetting guiSetting) {
 		NavigationAction fileManagerAction = new FileManagerAction(m, experimentRef);
 		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View Data",
-							"img/ext/applications-system.png", guiSetting);
+							"img/ext/user-desktop.png",
+							// "img/ext/applications-system.png",
+							guiSetting);
 		return fileManager;
 	}
 }
