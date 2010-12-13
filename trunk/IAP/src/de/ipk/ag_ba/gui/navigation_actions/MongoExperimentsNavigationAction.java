@@ -96,7 +96,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 
 			@Override
 			public String getDefaultImage() {
-				return "img/ext/trash2.png";
+				return "img/ext/trash-delete2.png";
 			}
 
 			@Override
@@ -120,7 +120,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 				actions.add(Trash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
-									src.getGUIsetting()));
+									src.getGUIsetting(), m));
 				for (ExperimentHeaderInterface exp : trashed)
 					actions.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
 				return actions;

@@ -6,7 +6,6 @@ package de.ipk.ag_ba.gui.webstart;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,6 +31,9 @@ import org.graffiti.managers.pluginmgr.PluginManagerException;
 import org.graffiti.options.GravistoPreferences;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
+import org.graffiti.selection.SelectionEvent;
+import org.graffiti.session.EditorSession;
+import org.graffiti.session.Session;
 import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
@@ -49,7 +51,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolumeHandler;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class AIPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -106,7 +108,6 @@ public class AIPmain extends JApplet {
 
 			@Override
 			public void run() {
-
 				if (AIPmain.myClassKnown) {
 					System.out.println("Reload Classes, Problems may occur");
 					ErrorMsg.addErrorMessage("Reload Classes, Problems may occur");
@@ -304,6 +305,7 @@ public class AIPmain extends JApplet {
 		if (jf != null && !jf.isVisible()) {
 			jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			jf.setVisible(true);
+			MainFrame.getInstance().getViewManager().viewChanged(null);
 		}
 	}
 

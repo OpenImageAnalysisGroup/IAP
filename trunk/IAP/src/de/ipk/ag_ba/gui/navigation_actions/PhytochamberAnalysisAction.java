@@ -224,7 +224,7 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 
 	@Override
 	public String getDefaultTitle() {
-		return "Phytochamber Analysis";
+		return "Arabidopsis Analysis";
 	}
 
 	@Override

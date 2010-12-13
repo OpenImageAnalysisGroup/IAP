@@ -20,7 +20,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class Trash extends AbstractNavigationAction {
 
-	private MongoDB m;
+	private final MongoDB m;
 	private String experimentName;
 	private Collection<ExperimentHeaderInterface> header;
 	private String message = "";
@@ -32,14 +32,16 @@ public class Trash extends AbstractNavigationAction {
 		this.experimentName = experimentName;
 	}
 
-	public Trash(ExperimentHeaderInterface header, DeletionCommand cmd) {
+	public Trash(ExperimentHeaderInterface header, DeletionCommand cmd, MongoDB m) {
 		super("Perform '" + cmd + "'-operation");
+		this.m = m;
 		this.setHeader(header);
 		this.cmd = cmd;
 	}
 
-	public Trash(Collection<ExperimentHeaderInterface> header, DeletionCommand cmd) {
+	public Trash(Collection<ExperimentHeaderInterface> header, DeletionCommand cmd, MongoDB m) {
 		super("Perform '" + cmd + "'-operation");
+		this.m = m;
 		this.setHeader(header);
 		this.cmd = cmd;
 	}
@@ -138,16 +140,16 @@ public class Trash extends AbstractNavigationAction {
 	}
 
 	public static NavigationButton getTrashEntity(ExperimentHeaderInterface header, DeletionCommand cmd,
-						GUIsetting guiSetting) {
-		NavigationAction trashAction = new Trash(header, cmd);
+						GUIsetting guiSetting, MongoDB m) {
+		NavigationAction trashAction = new Trash(header, cmd, m);
 		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guiSetting);
 		trash.setRightAligned(cmd != DeletionCommand.UNTRASH);
 		return trash;
 	}
 
 	public static NavigationButton getTrashEntity(ArrayList<ExperimentHeaderInterface> trashed, DeletionCommand cmd,
-						GUIsetting guIsetting) {
-		NavigationAction trashAction = new Trash(trashed, cmd);
+						GUIsetting guIsetting, MongoDB m) {
+		NavigationAction trashAction = new Trash(trashed, cmd, m);
 		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guIsetting);
 		trash.setRightAligned(true);
 		return trash;

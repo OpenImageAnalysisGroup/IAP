@@ -56,11 +56,14 @@ public class ImageAnalysisCommandManager {
 		// CountColorsNavigation(m, 40, experimentReference),
 		// "Hue Historam", "img/colorhistogram.png"));
 		if (analysis) {
-			NavigationAction performanceTestAction = new PerformanceTestAction(m, experimentReference);
-			NavigationButton performanceTestButton = new NavigationButton(performanceTestAction, guiSetting);
-			actions.add(performanceTestButton);
+			// NavigationAction performanceTestAction = new PerformanceTestAction(m, experimentReference);
+			// NavigationButton performanceTestButton = new NavigationButton(performanceTestAction, guiSetting);
+			// actions.add(performanceTestButton);
 
-			actions.add(new NavigationButton(new CloudIoTestAction(m, experimentReference), guiSetting));
+			boolean showTestActions = false;
+
+			if (showTestActions)
+				actions.add(new NavigationButton(new CloudIoTestAction(m, experimentReference), guiSetting));
 
 			actions.add(new NavigationButton(new NumericDataReportAction(m, experimentReference), guiSetting));
 
