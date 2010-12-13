@@ -148,8 +148,8 @@ public class BackgroundThreadDispatcher {
 								if (curPrio > maxPrio)
 									maxPrio = curPrio;
 							}
-							// search newest thread with maximum priority
-							for (int i = todo.size() - 1; i >= 0; i--) {
+							// search oldest thread with maximum priority
+							for (int i = 0; i < todo.size(); i++) {
 								int curPrio = (todoPriorities.get(i)).intValue();
 								if (curPrio == maxPrio) {
 									// use that thread and run it
