@@ -305,11 +305,13 @@ public class DataExchangeHelperForExperiments {
 	private static Runnable processIcon(final DataSetFilePanel filePanel, final MongoTreeNode mt, final JTree expTree,
 						final StopObject stop, final ArrayList<MyThread> executeLater, final BinaryFileInfo binaryFileInfo,
 						final DataSetFileButton imageButton, final boolean previewLoadAndConstructNeededF, final boolean fIsLast) {
+		final int tw = DataSetFileButton.ICON_WIDTH;
 		return new Runnable() {
 			public void run() {
 				// nur falls der Zielknoten immer noch ausgewählt ist,
 				// soll der Button hinzugefügt werden
-				if (mt == expTree.getSelectionPath().getLastPathComponent()) {
+				if (mt == expTree.getSelectionPath().getLastPathComponent() &&
+									DataSetFileButton.ICON_WIDTH == tw) {
 					filePanel.add(imageButton);
 					filePanel.validate();
 					filePanel.repaint();
@@ -318,7 +320,8 @@ public class DataExchangeHelperForExperiments {
 						MyThread t = new MyThread(new Runnable() {
 							@Override
 							public void run() {
-								if (mt == expTree.getSelectionPath().getLastPathComponent()) {
+								if (mt == expTree.getSelectionPath().getLastPathComponent() &&
+													DataSetFileButton.ICON_WIDTH == tw) {
 									final MyImageIcon myImage;
 									try {
 										myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,

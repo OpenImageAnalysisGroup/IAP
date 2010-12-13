@@ -48,7 +48,7 @@ public class IOmodule {
 		return new WorkerInfo(todo.size(), 0, processed, lastKBperSecTransferSpeed, "KB/s");
 	}
 
-	public static synchronized LoadedImage loadImageFromFileOrMongo(ImageData id) throws Exception {
+	public static LoadedImage loadImageFromFileOrMongo(ImageData id) throws Exception {
 		StopWatch s = new StopWatch("Load image and null-image", false);
 		BufferedImage image = ImageIO.read(id.getURL().getInputStream());
 		BufferedImage imageNULL = null;
