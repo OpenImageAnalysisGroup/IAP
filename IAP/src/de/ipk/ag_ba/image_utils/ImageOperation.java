@@ -11,7 +11,6 @@ import ij.process.ImageProcessor;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,23 +69,27 @@ public class ImageOperation extends ImageConverter {
 	// this(new ImagePlus("JImage", new FloatProcessor(image)));
 	// }
 
-	public void translate(double x, double y) {
+	public ImageOperation translate(double x, double y) {
 		processor.translate(x, y);
+		return new ImageOperation(getImage());
 	}
 
-	public void rotate(double degree) {
+	public ImageOperation rotate(double degree) {
 		processor.rotate(degree);
-
+		return new ImageOperation(getImage());
 	}
 
-	public void scale(double xScale, double yScale) {
+	public ImageOperation scale(double xScale, double yScale) {
 		processor.scale(xScale, yScale);
+		return new ImageOperation(getImage());
 	}
 
 	public ImageOperation resize(int width, int height) {
 		processor = processor.resize(width, height);
 		image.setProcessor(processor);
-		return this;
+
+		return new ImageOperation(getImage());
+		// return this;
 	}
 
 	public ImageOperation resize(double factor) {
@@ -333,6 +336,20 @@ public class ImageOperation extends ImageConverter {
 
 	}
 
+	public ImageOperation drawAndFillRect(int leftX, int leftY, int[][] fillValue) {
+
+		int width = fillValue.length;
+		int height = fillValue[0].length;
+
+		int[][] bigImage = ImageConverter.convertIJto2A(image);
+
+		for (int x = leftX; x < leftX + width && x < bigImage.length; x++)
+			for (int y = leftY; y < leftY + height && y < bigImage[0].length; y++)
+				bigImage[x][y] = fillValue[x - leftX][y - leftY];
+
+		return new ImageOperation(ImageConverter.convert2AtoIJ(bigImage));
+	}
+
 	public ImageOperation drawAndFillRect(int leftX, int leftY, int width, int height, int fillValue) {
 		Roi rec = new Roi(leftX, leftY, width, height);
 		processor.setRoi(rec);
@@ -404,7 +421,7 @@ public class ImageOperation extends ImageConverter {
 		return new ImageOperation(processor.crop().getBufferedImage());
 	}
 
-	public Point2D centerOfGravity() {
+	public Dimension2D centerOfGravity() {
 
 		int[][] img = ImageConverter.convertIJto2A(image);
 
@@ -471,6 +488,7 @@ public class ImageOperation extends ImageConverter {
 		double firstMomentOfAreaI = 0;
 		double centreOfGravityJ = 0;
 		double centreOfGravityI = 0;
+		Dimension2D centerPoint = null;
 
 		for (int i = 0; i < img.length; i++) {
 			for (int j = 0; j < img[0].length; j++) {
@@ -491,7 +509,10 @@ public class ImageOperation extends ImageConverter {
 		// System.out.println("SchwerpunktX: " + centreOfGravityI);
 		// System.out.println("SchwerpunktY: " + centreOfGravityJ);
 
-		return new Point2D.Double(centreOfGravityI, centreOfGravityJ);
+		centerPoint.setSize(centreOfGravityI, centreOfGravityJ);
+		return centerPoint;
+		// return new Dimension2D(centreOfGravityI, centreOfGravityJ);
+		// return new Point2D.Double(centreOfGravityI, centreOfGravityJ);
 	}
 
 	public Dimension2D getDiameter() {
@@ -581,7 +602,9 @@ public class ImageOperation extends ImageConverter {
 			case TIFF:
 				new FileSaver(image).saveAsTiff(pfad);
 				break;
-
+			case TIFF_STACK:
+				new FileSaver(image).saveAsTiffStack(pfad);
+				break;
 			case PNG:
 				new FileSaver(image).saveAsPng(pfad);
 				break;
@@ -1059,5 +1082,22 @@ public class ImageOperation extends ImageConverter {
 				}
 			}
 		}
+	}
+
+	public ImageOperation invert() {
+		processor.invert();
+		return new ImageOperation(getImage());
+	}
+
+	public FlexibleImage draw(FlexibleImage fi, int background) {
+		int[] img = getImageAs1array();
+		int[] over = fi.getConvertAs1A();
+		int idx = 0;
+		for (int o : over)
+			if (o != background)
+				img[idx++] = o;
+			else
+				idx++;
+		return new FlexibleImage(img, image.getWidth(), image.getHeight());
 	}
 }

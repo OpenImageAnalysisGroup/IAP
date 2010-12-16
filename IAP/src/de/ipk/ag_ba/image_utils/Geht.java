@@ -475,7 +475,7 @@ public class Geht {
 
 		newFluorImage = preliminaryWorkFluo(newFluorImage, ImageConfiguration.FluoTop, getFluoEpsilonA(), getFluoEpsilonB());
 		// PrintImage.printImage(newFluorImage);
-		ImageOperation save = new ImageOperation(newFluorImage);
+		// ImageOperation save = new ImageOperation(newFluorImage);
 		// save.rotate(3);
 		// save.saveImage("/Users/entzian/Desktop/zweiteBild.png");
 
@@ -497,7 +497,8 @@ public class Geht {
 		// save = new ImageOperation(newRGBImageMask);
 		// save.saveImage("/Users/entzian/Desktop/dritteRGBBild.png");
 
-		// PrintImage.printImage(newFluorImageMask);
+		PrintImage.printImage(newRGBImageMask);
+		PrintImage.printImage(newFluorImageMask);
 		// BufferedImage nearMask = modifyMask(newNearImage,
 		// getNearNumberOfErodeLoops(), getNearNumberOfDilateLoops(),
 		// ImageConfiguration.NirTop);

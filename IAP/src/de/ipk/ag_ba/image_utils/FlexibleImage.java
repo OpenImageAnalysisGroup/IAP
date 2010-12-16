@@ -89,7 +89,7 @@ public class FlexibleImage {
 		// }
 	}
 
-	private int[][] getConvertAs2A() {
+	int[][] getConvertAs2A() {
 		return ImageConverter.convertBIto2A(bufferedImage);
 	}
 

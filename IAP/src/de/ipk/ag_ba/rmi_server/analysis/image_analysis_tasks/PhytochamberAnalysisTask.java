@@ -17,6 +17,7 @@ import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image_utils.FlexibleImage;
 import de.ipk.ag_ba.image_utils.FlexibleImageSet;
 import de.ipk.ag_ba.image_utils.FlexibleImageType;
+import de.ipk.ag_ba.image_utils.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.image_utils.ImageConverter;
 import de.ipk.ag_ba.image_utils.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -142,7 +143,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages()) {
-							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(input);
+							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(new FlexibleMaskAndImageSet(input, input));
 							final FlexibleImageSet pipelineResult = ptip.pipeline(maximumThreadCountOnImageLevel).getImages();
 
 							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());

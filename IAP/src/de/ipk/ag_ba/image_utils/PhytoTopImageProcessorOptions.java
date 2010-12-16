@@ -53,10 +53,10 @@ public class PhytoTopImageProcessorOptions {
 
 		setRgbNumberOfErodeLoops(2);
 		setRgbNumberOfDilateLoops(5);
-		setFluoNumberOfErodeLoops(4);
-		setFluoNumberOfDilateLoops(20);
-		setNearNumberOfErodeLoops(0);
-		setNearNumberOfDilateLoops(0);
+		setFluoNumberOfErodeLoops(2);
+		setFluoNumberOfDilateLoops(5);
+		setNearNumberOfErodeLoops(1);
+		setNearNumberOfDilateLoops(2);
 
 	}
 
