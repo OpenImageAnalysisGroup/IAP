@@ -92,6 +92,7 @@ public class FlexibleImageSet {
 	public FlexibleImageSet equalize() {
 		int w = getLargestWidth();
 		int h = getLargestHeight();
+		// PrintImage.printImage(fluo);
 		return new FlexibleImageSet(vis.resize(w, h), fluo.resize(w, h), nir.resize(w, h));
 	}
 
@@ -129,5 +130,26 @@ public class FlexibleImageSet {
 
 	public FlexibleImageSet copy() {
 		return new FlexibleImageSet(vis.copy(), fluo.copy(), nir.copy());
+	}
+
+	public FlexibleImageSet resize(double scaleVis, double scaleFluo, double scaleNir) {
+		FlexibleImage scaledVis = new ImageOperation(vis).resize(scaleVis).getImage();
+		FlexibleImage scaledFluo = new ImageOperation(fluo).resize(scaleFluo).getImage();
+		FlexibleImage scaledNir = new ImageOperation(nir).resize(scaleNir).getImage();
+		return new FlexibleImageSet(scaledVis, scaledFluo, scaledNir);
+	}
+
+	public FlexibleImageSet invert() {
+		FlexibleImage v = new ImageOperation(vis).invert().getImage();
+		FlexibleImage f = new ImageOperation(fluo).invert().getImage();
+		FlexibleImage n = new ImageOperation(nir).invert().getImage();
+		return new FlexibleImageSet(v, f, n);
+	}
+
+	public FlexibleImageSet draw(FlexibleImageSet masks, int background) {
+		FlexibleImage v = new ImageOperation(vis).draw(masks.getVis(), background);
+		FlexibleImage f = new ImageOperation(fluo).draw(masks.getFluo(), background);
+		FlexibleImage n = new ImageOperation(nir).draw(masks.getNir(), background);
+		return new FlexibleImageSet(v, f, n);
 	}
 }

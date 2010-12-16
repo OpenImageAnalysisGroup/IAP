@@ -64,7 +64,7 @@ public class MaskOperation {
 		return mask;
 	}
 
-	public int getModifiedPixels() {
+	public int getUnknownMeasurementValuePixels() {
 		return filled - deleted;
 	}
 
