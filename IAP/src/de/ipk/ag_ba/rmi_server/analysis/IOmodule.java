@@ -49,6 +49,7 @@ public class IOmodule {
 	}
 
 	public static LoadedImage loadImageFromFileOrMongo(ImageData id) throws Exception {
+		LoadedImage result = null;
 		StopWatch s = new StopWatch("Load image and null-image", false);
 		BufferedImage image = ImageIO.read(id.getURL().getInputStream());
 		BufferedImage imageNULL = null;
@@ -58,7 +59,7 @@ public class IOmodule {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		LoadedImage result = new LoadedImage(id, image, imageNULL);
+		result = new LoadedImage(id, image, imageNULL);
 		s.printTime(200);
 		return result;
 	}

@@ -9,12 +9,10 @@ package de.ipk.ag_ba.gui;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.CloudIoTestAction;
 import de.ipk.ag_ba.gui.navigation_actions.CloudUploadEntity;
 import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
 import de.ipk.ag_ba.gui.navigation_actions.NumericDataReportAction;
-import de.ipk.ag_ba.gui.navigation_actions.PerformanceTestAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDsegmentationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -40,8 +38,8 @@ public class ImageAnalysisCommandManager {
 		actions.add(FileManagerAction.getFileManagerEntity(m, experimentReference, guiSetting));
 
 		try {
-			if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
-				actions.add(new NavigationButton(new CloudUploadEntity(m, experimentReference), guiSetting));
+			// if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
+			actions.add(new NavigationButton(new CloudUploadEntity(m, experimentReference), guiSetting));
 		} catch (Exception e) {
 			// empty
 		}

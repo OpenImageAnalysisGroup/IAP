@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -95,7 +96,9 @@ public class MongoDB {
 		}
 
 		if (IAPservice.isReachable("localhost"))
-			res.add(new MongoDB("localhost", "dbe3", "localhost", null, null));
+			res.add(new MongoDB("localhost (dbe3)", "dbe3", "localhost", null, null));
+		if (IAPservice.isReachable("localhost"))
+			res.add(new MongoDB("localhost (iap_local)", "iap_local", "localhost", null, null));
 		return res;
 	}
 
@@ -154,28 +157,36 @@ public class MongoDB {
 
 	private static Mongo m;
 
-	private synchronized void processDB(String dataBase, String optHosts, String optLogin, String optPass,
+	private static Semaphore maxLoad = new Semaphore(4, true);
+
+	private void processDB(String dataBase, String optHosts, String optLogin, String optPass,
 						RunnableOnDB runnableOnDB) throws Exception {
-		DB db;
-		if (m == null) {
-			if (optHosts == null || optHosts.length() == 0)
-				m = new Mongo();
-			else {
-				List<ServerAddress> seeds = new ArrayList<ServerAddress>();
-				for (String h : optHosts.split(","))
-					seeds.add(new ServerAddress(h));
-				m = new Mongo(seeds);
+
+		try {
+			maxLoad.acquire();
+			DB db;
+			if (m == null) {
+				if (optHosts == null || optHosts.length() == 0)
+					m = new Mongo();
+				else {
+					List<ServerAddress> seeds = new ArrayList<ServerAddress>();
+					for (String h : optHosts.split(","))
+						seeds.add(new ServerAddress(h));
+					m = new Mongo(seeds);
+				}
 			}
-		}
-		db = m.getDB(dataBase);
-		if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
-			boolean auth = db.authenticate(optLogin, optPass.toCharArray());
-			if (!auth) {
-				throw new Exception("Invalid MongoDB login data provided!");
+			db = m.getDB(dataBase);
+			if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
+				boolean auth = db.authenticate(optLogin, optPass.toCharArray());
+				if (!auth) {
+					throw new Exception("Invalid MongoDB login data provided!");
+				}
 			}
+			runnableOnDB.setDB(db);
+			runnableOnDB.run();
+		} finally {
+			maxLoad.release();
 		}
-		runnableOnDB.setDB(db);
-		runnableOnDB.run();
 	}
 
 	public void processDB(RunnableOnDB runnableOnDB) throws Exception {
