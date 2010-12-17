@@ -393,7 +393,7 @@ public class MyExperimentInfoPanel extends JPanel {
 							saveAction.run(experimentHeader);
 					} else {
 						if (editPossibleBBB) {
-							if (experimentHeader.getExcelfileid().startsWith("lemnatec:")) {
+							if (experimentHeader.getExcelfileid().isEmpty() || experimentHeader.getExcelfileid().startsWith("lemnatec:")) {
 								saveB.setText("Updated (in memory)");
 							} else {
 								m.setExperimentInfo(experimentHeader);
