@@ -75,7 +75,8 @@ public class PhytochamberTopImageProcessor {
 			// result = new PhytochamberTopImageProcessor(workset).clearBackground(maxThreadsPerImage).equalize().automaticRotation().automaticTranslation()
 			// .automaticScalation().enlargeMask().mergeMask().applyMask()
 			// .resetMasksToNull().postProcessResultImages(false).removeSmallClusters().postProcessResultImages(true);
-			result = new PhytochamberTopImageProcessor(workset).clearBackground(maxThreadsPerImage).equalize().automaticTranslation().automaticScale()
+			result = new PhytochamberTopImageProcessor(workset).clearBackground(maxThreadsPerImage).morpholigicOperatorsToInitinalImage().equalize()
+					.automaticTranslation().automaticScale()
 									.automaticRotation()
 					.enlargeMask().mergeMask()
 								.applyMask().postProcessResultImages(false).postProcessResultImages(true).transferMaskToImageSet(); // removeSmallClusters().
@@ -165,6 +166,50 @@ public class PhytochamberTopImageProcessor {
 		PhytochamberTopImageProcessor res = new PhytochamberTopImageProcessor(new FlexibleMaskAndImageSet(input.getImages(), processedMasks));
 		input = null;
 		return res;
+	}
+
+	private PhytochamberTopImageProcessor morpholigicOperatorsToInitinalImage() {
+		StopWatch w = debugStart("morpholigicOperatorsToInitinalImage");
+		FlexibleImage resVis = morpholigicOperatorsToInitinalImageProcess(input.getImages().getVis(), input.getMasks().getVis(), ImageConfiguration.RgbTop);
+		FlexibleImage resFluo = morpholigicOperatorsToInitinalImageProcess(input.getImages().getFluo(), input.getMasks().getFluo(), ImageConfiguration.FluoTop);
+		FlexibleImage resNir = morpholigicOperatorsToInitinalImageProcess(input.getImages().getNir(), input.getMasks().getNir(), ImageConfiguration.NirTop);
+		FlexibleImageSet processedMasks = new FlexibleImageSet(resVis, resFluo, resNir);
+		debugEnd(w, processedMasks);
+		PhytochamberTopImageProcessor res = new PhytochamberTopImageProcessor(new FlexibleMaskAndImageSet(input.getImages(), processedMasks));
+		input = null;
+		return res;
+	}
+
+	private FlexibleImage morpholigicOperatorsToInitinalImageProcess(FlexibleImage srcImage, FlexibleImage workImage, ImageConfiguration typ) {
+
+		ImageOperation maskIo = new ImageOperation(workImage);
+
+		switch (typ) {
+
+			case RgbTop:
+				for (int ii = 0; ii < 20; ii++)
+					maskIo.dilate();
+
+				for (int ii = 0; ii < 3; ii++)
+					maskIo.erode();
+
+				break;
+
+			case FluoTop:
+				for (int ii = 0; ii < 2; ii++)
+					maskIo.dilate();
+
+				for (int ii = 0; ii < 1; ii++)
+					maskIo.erode();
+
+			case NirTop:
+				for (int ii = 0; ii < 1; ii++)
+					maskIo.closing();
+				break;
+
+		}
+		return new ImageOperation(srcImage).applyMask2(maskIo.getImage(), options.getBackground()).getImage();
+		// return new ImageOperation(workImage).getImage();
 	}
 
 	private FlexibleImage postProcessResultImage(FlexibleImage srcImage, FlexibleImage finalImage,
@@ -470,14 +515,16 @@ public class PhytochamberTopImageProcessor {
 		StopWatch w = debugStart("automatic rotate");
 
 		ObjectRef rotationResult = new ObjectRef();
-		FlexibleImage rotatedFluoMask = automaticRotationProcess(input.getMasks().getFluo(), input.getMasks().getVis(), rotationResult);
+		// FlexibleImage rotatedFluoMask = automaticRotationProcess(input.getMasks().getFluo(), input.getMasks().getVis(), rotationResult);
+		FlexibleImage rotatedFluoMask = automaticRotationProcessIntervallSearch(input.getMasks().getFluo(), input.getMasks().getVis(), rotationResult);
 		Double t = (Double) rotationResult.getObject();
 		// input.getImages().getFluo().print("ABOUT TO ROTATE FLUO " + t + " degrees");
 		FlexibleImage rotatedFluoImage = new ImageOperation(input.getImages().getFluo()).rotate(t).getImage();
 		// rotatedFluoImage.print("RESULT OF ROTATION FLUO " + t + " degrees");
 
 		rotationResult = new ObjectRef();
-		FlexibleImage rotatedNirMask = automaticRotationProcess(input.getMasks().getNir(), input.getMasks().getVis(), rotationResult);
+		// FlexibleImage rotatedNirMask = automaticRotationProcess(input.getMasks().getNir(), input.getMasks().getVis(), rotationResult);
+		FlexibleImage rotatedNirMask = automaticRotationProcessIntervallSearch(input.getMasks().getNir(), input.getMasks().getVis(), rotationResult);
 		t = (Double) rotationResult.getObject();
 		FlexibleImage rotatedNirImage = new ImageOperation(input.getImages().getNir()).rotate(t).getImage();
 
@@ -692,6 +739,76 @@ public class PhytochamberTopImageProcessor {
 			return workMask;
 		}
 
+	}
+
+	private FlexibleImage automaticRotationProcessIntervallSearch(FlexibleImage workMask, FlexibleImage visImage, ObjectRef rotationResult) {
+
+		int borderLeft = -3;
+		int borderRight = 3;
+		double angle = 0;
+
+		angle = rotationRecursive(workMask, visImage, borderLeft, borderRight, angle, -100000000000.0);
+
+		if (angle != 0) {
+			ImageOperation io = new ImageOperation(workMask);
+			io.rotate(angle);
+			debugOverlayImages(io.getImage(), visImage, LayeringTyp.ROW_IMAGE);
+			rotationResult.setObject(angle);
+			return io.getImage();
+		} else {
+			System.out.println("Best rotation is 0.");
+			rotationResult.setObject(0d);
+			return workMask;
+		}
+	}
+
+	private double rotationRecursive(FlexibleImage workMask, FlexibleImage visImage, double borderLeft, double borderRight, double bestAngle, double bestValue) {
+
+		double intervallLaenge = Math.ceil(Math.abs(borderLeft - borderRight));
+		double value = -1;
+
+		for (double angle = borderLeft; angle <= borderRight; angle += intervallLaenge / 10) {
+
+			value = searchSuitableValue(workMask, visImage, angle, 0, MorphologicalOperationEnumeration.rotation);
+			if (value > bestValue) {
+				bestValue = value;
+				bestAngle = angle;
+			}
+		}
+		if (intervallLaenge / 10 < 0.01)
+			return bestAngle;
+		else
+			return rotationRecursive(workMask, visImage, bestValue - ((intervallLaenge / 10) + (intervallLaenge / 10 / 10)), bestValue
+					+ ((intervallLaenge / 10) + (intervallLaenge / 10 / 10)), bestAngle, bestValue);
+	}
+
+	private double searchSuitableValue(FlexibleImage workMask, FlexibleImage visImage, double valueX, double valueY, MorphologicalOperationEnumeration typ) {
+		ImageOperation io = new ImageOperation(workMask);
+		FlexibleImage changedMask = null;
+
+		switch (typ) {
+			case translation:
+				io.translate(valueX, valueY);
+				break;
+
+			case scale:
+				io.scale(valueX, valueY);
+				break;
+
+			case rotation:
+				io.rotate(valueX);
+				break;
+
+			default:
+				break;
+		}
+
+		changedMask = io.getImage();
+
+		MaskOperation o = new MaskOperation(visImage, changedMask, null,
+							options.getBackground(), Color.GRAY.getRGB());
+		o.mergeMasks();
+		return o.getUnknownMeasurementValuePixels();
 	}
 
 	// private void test() {
