@@ -167,6 +167,13 @@ public class Other {
 				if (!rBA24)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
+				boolean rLemnaDB = IAPservice.isReachable("lemna-db.ipk-gatersleben.de");
+				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("lemna-db",
+						simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
+									.getGUIsetting()));
+				if (!rLemnaDB)
+					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+				
 				boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
 				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("BA-03",
 									simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src
