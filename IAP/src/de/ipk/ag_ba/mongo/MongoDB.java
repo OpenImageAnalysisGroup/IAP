@@ -330,7 +330,7 @@ public class MongoDB {
 										errorCount++;
 										errors.append("<li>" + nd.getURL().getFileName());
 									} else
-										dbNetworks.add(volume);
+										dbNetworks.add(dbo);
 								}
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
@@ -671,7 +671,7 @@ public class MongoDB {
 		try {
 			hash = GravistoService.getHashFromInputStream(network.getURL().getInputStream(), optFileSize, DataExchangeHelperForExperiments.DEFAULT_HASH);
 			
-			GridFSDBFile fff = gridfs_volumes.findOne(hash);
+			GridFSDBFile fff = gridfs_networks.findOne(hash);
 			if (fff != null && fff.getLength() <= 0) {
 				System.out.println("Found Zero-Size File.");
 				System.out.println("Delete Existing Network.");
