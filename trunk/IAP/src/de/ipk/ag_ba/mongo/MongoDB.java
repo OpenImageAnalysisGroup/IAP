@@ -99,8 +99,8 @@ public class MongoDB {
 		}
 		
 		if (IAPservice.isReachable("localhost")) {
-			res.add(new MongoDB("local dbe3", "dbe3", "localhost", null, null, HashType.SHA512));
-			res.add(new MongoDB("local dbe4", "dbe4", "localhost", null, null, HashType.SHA512));
+			res.add(new MongoDB("local dbe3", "local_dbe3", "localhost", null, null, HashType.SHA512));
+			res.add(new MongoDB("local dbe4", "local_dbe4", "localhost", null, null, HashType.SHA512));
 		}
 		return res;
 	}

@@ -60,7 +60,7 @@ public class IAPservice {
 		InetAddress address;
 		try {
 			address = InetAddress.getByName(host);
-			boolean reachable = address.isReachable(200);
+			boolean reachable = address.isReachable(10000);
 			if (!reachable)
 				return false;
 			else
@@ -166,10 +166,12 @@ public class IAPservice {
 											LoadSetting.VIEW_CHOOSER_NEVER_DONT_ADD_VIEW_TO_EDITORSESSION, new ConfigureViewAction() {
 												View newView;
 												
+												@Override
 												public void storeView(View v) {
 													newView = v;
 												}
 												
+												@Override
 												public void run() {
 													final ObjectRef beingDragged = new ObjectRef("", false);
 													
@@ -178,6 +180,7 @@ public class IAPservice {
 													gv.threadedRedraw = false;
 													
 													final MouseMotionListener mml = new MouseMotionListener() {
+														@Override
 														public void mouseMoved(MouseEvent e) {
 															boolean urlFound = false;
 															try {
@@ -249,6 +252,7 @@ public class IAPservice {
 													};
 													
 													gv.addMouseListener(new MouseListener() {
+														@Override
 														public void mouseReleased(MouseEvent e) {
 															e.consume();
 															if ((Boolean) beingDragged.getObject()) {
@@ -259,6 +263,7 @@ public class IAPservice {
 															mml.mouseMoved(e);
 														}
 														
+														@Override
 														public void mousePressed(MouseEvent e) {
 															e.consume();
 															if (!((Boolean) beingDragged.getObject())) {
@@ -270,12 +275,15 @@ public class IAPservice {
 															}
 														}
 														
+														@Override
 														public void mouseExited(MouseEvent e) {
 														}
 														
+														@Override
 														public void mouseEntered(MouseEvent e) {
 														}
 														
+														@Override
 														public void mouseClicked(MouseEvent e) {
 															e.consume();
 															String url = (String) refLastURL.getObject();
@@ -287,8 +295,10 @@ public class IAPservice {
 													gv.addMouseMotionListener(mml);
 													
 													SwingUtilities.invokeLater(new Runnable() {
+														@Override
 														public void run() {
 															BackgroundTaskHelper.executeLaterOnSwingTask(100, new Runnable() {
+																@Override
 																public void run() {
 																	ReleaseInfo.getApplet().repaint();
 																}
