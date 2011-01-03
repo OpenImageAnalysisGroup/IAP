@@ -23,7 +23,6 @@ import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
 import org.graffiti.editor.GravistoService;
-import org.graffiti.editor.HashType;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
@@ -54,8 +53,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  * @author Klukas
  */
 public class DataExchangeHelperForExperiments {
-	
-	public static final HashType DEFAULT_HASH = HashType.MD5;
 	
 	public static int getSizeOfExperiment(MongoDB m, ExperimentInterface experimentName) {
 		return -1;
@@ -125,7 +122,7 @@ public class DataExchangeHelperForExperiments {
 				public void run() {
 					String hash;
 					try {
-						hash = GravistoService.getHashFromFile(file, DEFAULT_HASH);
+						hash = GravistoService.getHashFromFile(file, m.getHashType());
 						GridFS gridfs_annotation = new GridFS(db, "annotations");
 						m.saveAnnotationFile(gridfs_annotation, hash, file);
 						// GridFS gridfs_images = new GridFS(db, "images");
