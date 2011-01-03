@@ -8,5 +8,5 @@ package de.ipk.ag_ba.image_utils;
  */
 public enum MorphologicalOperationEnumeration {
 	translation, scale, rotation
-
+	
 }

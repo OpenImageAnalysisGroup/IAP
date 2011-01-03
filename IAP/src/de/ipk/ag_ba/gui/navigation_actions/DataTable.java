@@ -16,14 +16,14 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class DataTable extends JComponent {
 	private static final long serialVersionUID = 1L;
-
+	
 	public DataTable(Experiment experiment) {
 		// TODO Auto-generated constructor stub
 	}
-
+	
 	public void setImageViewer(ImageViewer imageViewer) {
-		// TODO Auto-generated method stub
-
+		//
+		
 	}
-
+	
 }

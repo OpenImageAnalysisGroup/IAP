@@ -17,22 +17,22 @@ import de.ipk.ag_ba.mongo.IAPservice;
  * @author klukas
  */
 public class CheckAvailabilityAction extends AbstractNavigationAction {
-
+	
 	private final String hostname;
 	private ArrayList<String> scanResult;
 	private final String image;
-
+	
 	public CheckAvailabilityAction(String hostname, String image) {
 		super("Port-Scan");
 		this.hostname = hostname;
 		this.image = image;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		scanResult = IAPservice.portScan(hostname, status);
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		StringBuilder htmlTextPanel = new StringBuilder("<html><b>Result of port-scan:</b><br>");
@@ -43,27 +43,27 @@ public class CheckAvailabilityAction extends AbstractNavigationAction {
 		htmlTextPanel.append("</ul>");
 		return new MainPanelComponent(htmlTextPanel.toString());
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return null;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}
-
+	
 	@Override
 	public boolean getProvidesActions() {
 		return false;
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return hostname;
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return image;

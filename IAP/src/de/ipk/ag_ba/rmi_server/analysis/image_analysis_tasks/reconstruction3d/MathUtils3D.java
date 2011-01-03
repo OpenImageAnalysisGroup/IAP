@@ -22,7 +22,7 @@ import de.ipk.ag_ba.util.color.ColorUtil;
  */
 public class MathUtils3D {
 	private static double epsilon = 0.0001;
-
+	
 	/**
 	 * @param x
 	 * @param y
@@ -34,39 +34,39 @@ public class MathUtils3D {
 		if (Math.abs(y) < epsilon && x < 0)
 			return Math.PI;
 		double angle = Math.atan(y / x);
-
+		
 		if (x >= 0 && y >= 0)
 			return angle;
-
+		
 		if (x < 0)
 			return angle + Math.PI;
-
+		
 		return Math.PI * 2 + angle;
 	}
-
+	
 	public Voxel[] scanline3d(Voxel start, Voxel end) {
 		Collection<Voxel> result = new LinkedList<Voxel>();
-
+		
 		int px = start.x;
 		int py = start.y;
 		int pz = start.z;
-
+		
 		int dx = end.x - start.x;
 		int dy = end.y - start.y;
 		int dz = end.z - start.z;
-
+		
 		int diffX = Math.abs(dx);
 		int diffY = Math.abs(dy);
 		int diffZ = Math.abs(dz);
-
+		
 		int diffX2 = diffX / 2;
 		int diffY2 = diffY / 2;
 		int diffZ2 = diffZ / 2;
-
+		
 		int xStep = (dx < 0 ? -1 : 1);
 		int yStep = (dy < 0 ? -1 : 1);
 		int zStep = (dz < 0 ? -1 : 1);
-
+		
 		if ((diffX >= diffY) & (diffX >= diffZ)) {
 			int err_1 = diffY2 - diffX;
 			int err_2 = diffZ2 - diffX;
@@ -123,7 +123,7 @@ public class MathUtils3D {
 		result.add(new Voxel(px, py, pz));
 		return result.toArray(new Voxel[] {});
 	}
-
+	
 	public static double compareImageParts(MyPicture p1, MyPicture p2, int x1, int y1, int x2, int y2, int wh) {
 		wh = wh / 2;
 		double diff = 0;
@@ -136,7 +136,7 @@ public class MathUtils3D {
 		}
 		return diff;
 	}
-
+	
 	@Test
 	public void test() {
 		assertEquals("angle 4,0 = 0°", 0, getAngle(4, 0), epsilon);

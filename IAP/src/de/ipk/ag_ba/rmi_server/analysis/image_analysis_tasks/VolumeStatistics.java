@@ -22,11 +22,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  * @author klukas
  */
 public class VolumeStatistics extends AbstractImageAnalysisTask {
-
+	
 	private Collection<NumericMeasurementInterface> input;
 	private Collection<NumericMeasurementInterface> output;
 	private MongoDB m;
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -37,7 +37,7 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	public ImageAnalysisType[] getInputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_VOLUME };
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -48,7 +48,7 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	public ImageAnalysisType[] getOutputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.MEASUREMENT };
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -59,7 +59,7 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	public String getTaskDescription() {
 		return "Creates an Voxel-Color-Histogramm (counts number of voxels for different colors)";
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
@@ -74,7 +74,7 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status) {
 		performAnalysis(maximumThreadCount, 1, status);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
@@ -84,9 +84,9 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
 						BackgroundTaskStatusProviderSupportingExternalCall status) {
-
+		
 		output = new ArrayList<NumericMeasurementInterface>();
-
+		
 		int background = new Color(PhenotypeAnalysisTask.BACKGROUND_COLOR.getRed(),
 							PhenotypeAnalysisTask.BACKGROUND_COLOR.getBlue(), PhenotypeAnalysisTask.BACKGROUND_COLOR.getRed(), 0)
 							.getRGB();
@@ -104,22 +104,22 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 			}
 			if (md instanceof LoadedVolume) {
 				LoadedVolume lv = (LoadedVolume) md;
-
+				
 				LoadedVolumeExtension lve = new LoadedVolumeExtension(lv);
 				voxels = lve.getVoxelCount();
-
+				
 				NumericMeasurement m = new NumericMeasurement(lv, "filled (voxel)", md.getParentSample()
 									.getParentCondition().getExperimentName()
 									+ " (" + getName() + ")");
 				m.setValue(filled);
 				output.add(m);
-
+				
 				m = new NumericMeasurement(lv, "cube volume (voxel)", md.getParentSample().getParentCondition()
 									.getExperimentName()
 									+ " (" + getName() + ")");
 				m.setValue(voxels);
 				output.add(m);
-
+				
 				m = new NumericMeasurement(lv, "filled (percent)", md.getParentSample().getParentCondition()
 									.getExperimentName()
 									+ " (" + getName() + ")");
@@ -129,21 +129,21 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 		}
 		input = null;
 	}
-
+	
 	@Override
 	public String getName() {
 		return "Volume Statistic";
 	}
-
+	
 	@Override
 	public Collection<NumericMeasurementInterface> getOutput() {
 		return output;
 	}
-
+	
 	@Override
 	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
 		this.m = m;
 	}
-
+	
 }

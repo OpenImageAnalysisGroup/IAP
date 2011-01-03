@@ -5,5 +5,5 @@ package de.ipk.ag_ba.gui.enums;
  */
 public enum DBEtype {
 	Phenotyping, Omics
-
+	
 }

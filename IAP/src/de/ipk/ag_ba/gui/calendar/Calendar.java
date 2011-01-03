@@ -28,21 +28,21 @@ public class Calendar extends JComponent {
 	GregorianCalendar cal;
 	private final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei;
 	private final Calendar2 calEnt;
-
+	
 	public Calendar(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, Calendar2 action) {
 		setOpaque(false);
 		calEnt = action;
 		cal = action.getCalendar();
-
+		
 		this.group2ei = group2ei;
 		GregorianCalendar gc = new GregorianCalendar();
 		updateGUI(sameDay(gc, cal));
 	}
-
+	
 	public void updateGUI(boolean doMark) {
 		removeAll();
 		ArrayList<DayComponent> days = new ArrayList<DayComponent>();
-
+		
 		days.add(new DayComponent("Sunday"));
 		days.add(new DayComponent("Monday"));
 		days.add(new DayComponent("Tuesday"));
@@ -50,9 +50,9 @@ public class Calendar extends JComponent {
 		days.add(new DayComponent("Thursday"));
 		days.add(new DayComponent("Friday"));
 		days.add(new DayComponent("Saturday"));
-
+		
 		GregorianCalendar today = cal;
-
+		
 		int firstDay = new GregorianCalendar(cal.get(GregorianCalendar.YEAR), cal.get(GregorianCalendar.MONTH), 1)
 							.get(GregorianCalendar.DAY_OF_WEEK);
 		GregorianCalendar pcal = new GregorianCalendar(cal.get(GregorianCalendar.YEAR), cal.get(GregorianCalendar.MONTH),
@@ -64,14 +64,14 @@ public class Calendar extends JComponent {
 			days.add(new DayComponent(group2ei, false, false, calCopy(pcal), calEnt));
 			pcal.add(GregorianCalendar.DAY_OF_MONTH, 1);
 		}
-
+		
 		pcal = new GregorianCalendar(cal.get(GregorianCalendar.YEAR), cal.get(GregorianCalendar.MONTH), 1);
 		while (days.size() < 7 * 7) {
 			days.add(new DayComponent(group2ei, cal.get(GregorianCalendar.MONTH) == pcal.get(GregorianCalendar.MONTH),
 								doMark && sameDay(today, pcal), calCopy(pcal), calEnt));
 			pcal.add(GregorianCalendar.DAY_OF_MONTH, +1);
 		}
-
+		
 		JPanel jp = new JPanel();;
 		jp.setLayout(new TableLayout(new double[][] {
 							{ TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL,
@@ -86,23 +86,23 @@ public class Calendar extends JComponent {
 			}
 			row++;
 		}
-
+		
 		jp.setOpaque(false);
-
+		
 		setLayout(TableLayout.getLayout(TableLayout.FILL, new double[] { TableLayout.FILL }));
 		add(jp, "0,0");
-
+		
 		validate();
-
+		
 		calEnt.updateGUI();
 	}
-
+	
 	private GregorianCalendar calCopy(GregorianCalendar pcal) {
 		GregorianCalendar c = new GregorianCalendar();
 		c.setTime(pcal.getTime());
 		return c;
 	}
-
+	
 	/**
 	 * @param cal2
 	 * @param pcal
@@ -112,14 +112,14 @@ public class Calendar extends JComponent {
 		SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy");
 		String dateA = sdf.format(a.getTime());
 		String dateB = sdf.format(b.getTime());
-
+		
 		return dateA.equals(dateB);
 	}
-
+	
 	public GregorianCalendar getCalendar() {
 		return cal;
 	}
-
+	
 	// private JComponent getNavBar(final Calendar calendar) {
 	// JButton left = new JButton();
 	// left.setIcon(FolderPanel.getLeftRightIcon(Iconsize.MIDDLE, true));

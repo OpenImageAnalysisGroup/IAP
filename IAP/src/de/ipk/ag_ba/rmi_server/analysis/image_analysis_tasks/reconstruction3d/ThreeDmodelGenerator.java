@@ -12,7 +12,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk.ag_ba.util.color.ColorUtil;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
@@ -23,49 +22,52 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 /**
  * @author klukas
  */
-public class ModelGenerator {
+public class ThreeDmodelGenerator {
+	
+	private static int PROBABILITY_THRESHOLD = 30;
+	
 	private ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
-
+	
 	private int maxVoxelPerSide = 203; // 1624/2=812 1624/4=406 1624/8=203
 	// Color[][][] colorCube = new
 	// Color[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 	byte[][][] transparentVoxels;
 	private int[][][] byteCube;
 	private int[][][] rgbCube;
-
+	
 	ArrayList<Color> palette = null;
-
+	
 	private double cameraDistance;
 	public double cubeSideLengthX, cubeSideLengthY, cubeSideLengthZ;
-
+	
 	private int widthFactor = 100;
-
+	
 	private boolean generated;
-
+	
 	private int maxPossibleLevels;
-
+	
 	public static final Color TRANSPARENT_COLOR = new Color(0, 0, 0, 0);
-
-	public ModelGenerator(int voxelresolution, int widthFactor) {
+	
+	public ThreeDmodelGenerator(int voxelresolution, int widthFactor) {
 		this.maxVoxelPerSide = voxelresolution;
 		transparentVoxels = new byte[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 		this.widthFactor = widthFactor;
 	}
-
+	
 	public void setRoundViewImages(ArrayList<MyPicture> pictures) {
 		this.pictures = pictures;
 	}
-
+	
 	public void setCameraDistance(double dist) {
 		this.cameraDistance = dist;
 	}
-
+	
 	public void setCubeSideLength(double sizeX, double sizeY, double sizeZ) {
 		this.cubeSideLengthX = sizeX;
 		this.cubeSideLengthY = sizeY;
 		this.cubeSideLengthZ = sizeZ;
 	}
-
+	
 	public void calculateModel(final BackgroundTaskStatusProviderSupportingExternalCall status,
 						GenerationMode colorMode, int maxIndexedColorCount) {
 		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
@@ -82,7 +84,7 @@ public class ModelGenerator {
 				return t;
 			}
 		});
-
+		
 		final ThreadSafeOptions tsoCO = new ThreadSafeOptions();
 		ExecutorService runColor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
 			@Override
@@ -97,15 +99,12 @@ public class ModelGenerator {
 				return t;
 			}
 		});
-
+		
 		status.setCurrentStatusText1("Init cube cut (" + maxVoxelPerSide + "x" + maxVoxelPerSide + "x" + maxVoxelPerSide
 							+ ")");
 		status.setCurrentStatusText2("Using " + SystemAnalysis.getNumberOfCPUs() + " threads");
 		status.setCurrentStatusValueFine(0);
-		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e1) {
-		}
+		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final ThreadSafeOptions tsoRunCount = new ThreadSafeOptions();
 		tso.setInt(0);
@@ -113,7 +112,7 @@ public class ModelGenerator {
 		for (MyPicture p : pictures) {
 			final MyPicture fp = p;
 			run.execute(cuttt2(status, tso, tsoRunCount, fp));
-
+			
 			if (status.wantsToStop())
 				break;
 		}
@@ -123,9 +122,9 @@ public class ModelGenerator {
 		} catch (InterruptedException e) {
 			ErrorMsg.addErrorMessage(e);
 		} // wait max 7 days for result
-
+		
 		status.setCurrentStatusValue(0);
-
+		
 		if (colorMode != GenerationMode.GRAYSCALE_PROBABILITY)
 			if (pictures != null && pictures.size() > 0) {
 				// colorize cube
@@ -140,34 +139,34 @@ public class ModelGenerator {
 				status.setCurrentStatusText1("Colorize Cube...");
 				status.setCurrentStatusText2("");
 				colorModelRGB(pictures, palette, status, colorMode == GenerationMode.COLORED_RGBA, runColor);
-
+				
 				runColor.shutdown();
 				try {
 					runColor.awaitTermination(7, TimeUnit.DAYS);
 				} catch (InterruptedException e) {
 					ErrorMsg.addErrorMessage(e);
 				} // wait max 7 days for result
-
+				
 			}
-
+		
 		status.setCurrentStatusText1("Cube Construction Finished");
 		status.setCurrentStatusText2("");
-
+		
 		if (!status.wantsToStop())
 			status.setCurrentStatusValueFine(100d);
 	}
-
+	
 	@SuppressWarnings("unused")
 	private Runnable cuttt1(final BackgroundTaskStatusProviderSupportingExternalCall status,
 						final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
 		return new Runnable() {
 			public void run() {
 				tsoRunCount.addInt(1);
-
+				
 				BitSet bestTpv = null;
-
+				
 				fp.setAngle(fp.getAngle());
-
+				
 				BitSet tpv = new BitSet(maxVoxelPerSide * maxVoxelPerSide * maxVoxelPerSide);
 				cutModel1(fp, tpv, status, 100d * 1 / pictures.size() / 11);
 				long cutVolume = 0;
@@ -183,7 +182,7 @@ public class ModelGenerator {
 									System.out.println("Found solid voxel.");
 					}
 				}
-
+				
 				tso.addInt(1);
 				System.out.println("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
 									+ tsoRunCount.getInt() + " active)");
@@ -193,15 +192,15 @@ public class ModelGenerator {
 			}
 		};
 	}
-
+	
 	private Runnable cuttt2(final BackgroundTaskStatusProviderSupportingExternalCall status,
 						final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
 		return new Runnable() {
 			public void run() {
 				tsoRunCount.addInt(1);
-
+				
 				cutModel2(fp, transparentVoxels, status, 100d * 1 / pictures.size());
-
+				
 				tso.addInt(1);
 				status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
 									+ tsoRunCount.getInt() + " active)");
@@ -209,7 +208,7 @@ public class ModelGenerator {
 			}
 		};
 	}
-
+	
 	private void colorModelRGB(final ArrayList<MyPicture> pictures, final ArrayList<Color> palette,
 						BackgroundTaskStatusProviderSupportingExternalCall status, final boolean rgb, ExecutorService runColor) {
 		if (rgb)
@@ -223,7 +222,7 @@ public class ModelGenerator {
 		x = -cubeSideLengthX / 2d;
 		status.setCurrentStatusText1("Colorize Cube");
 		status.setCurrentStatusText2(rgb ? "RGBA Mode active" : "Indexed Color Mode active");
-
+		
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
 			if (status.wantsToStop())
 				break;
@@ -247,15 +246,15 @@ public class ModelGenerator {
 			x += voxelSizeX;
 		}
 	}
-
+	
 	private void processOneSlice(ArrayList<MyPicture> pictures, ArrayList<Color> palette, boolean rgb, double x, double y, double z, double voxelSizeZ, int xi,
 						int yi) {
 		for (int zi = 0; zi < maxVoxelPerSide; zi++) {
 			// determine color
 			ArrayList<Color> cc = new ArrayList<Color>();
-
-			if (byteCube[xi][yi][zi] < 20) {
-
+			
+			if (byteCube[xi][yi][zi] < PROBABILITY_THRESHOLD) {
+				
 				// determine nearest 2 images for colorization
 				int zii = zi - maxVoxelPerSide / 2;
 				if (zii == 0)
@@ -266,9 +265,9 @@ public class ModelGenerator {
 				int xii = xi - maxVoxelPerSide / 2;
 				if (xii == 0)
 					xii = 1;
-
+				
 				double voxelDegree = Math.PI - MathUtils3D.getAngle(zii, xii);
-
+				
 				MyPicture bestIdx = null;
 				MyPicture bestIdx2 = null;
 				double minDegreeDist = Double.MAX_VALUE;
@@ -294,16 +293,15 @@ public class ModelGenerator {
 				for (MyPicture p : pictures) {
 					if (p != bestIdx && p != bestIdx2)
 						continue;
-
+					
 					double angle = p.getAngle();
 					double cos = p.getCosAngle();
 					double sin = p.getSinAngle();
 					boolean isTop = p.getIsTop();
-					Color c = p
-										.getPixelColor(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin, isTop)));
-					if (c != null)
-						if (ColorUtil.deltaE2000(c, PhenotypeAnalysisTask.BACKGROUND_COLOR) < 10)
-							c = null;
+					Color c = p.getPixelColor(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin, isTop)));
+					// if (c != null)
+					// if (ColorUtil.deltaE2000(c, PhenotypeAnalysisTask.BACKGROUND_COLOR) < 10)
+					// c = null;
 					if (c == null) {
 						XYcubePointRelative rel = getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
 											isTop));
@@ -326,9 +324,10 @@ public class ModelGenerator {
 			} else {
 				if (rgb) {
 					Color c = ColorUtil.getMaxSaturationColor(cc);
-					int tr = (int) (255d - 0.05d * byteCube[xi][yi][zi]);
-					if (tr < 0)
-						tr = 255;
+					// int tr = (int) (255d - 0.05d * byteCube[xi][yi][zi]);
+					// if (tr < 0)
+					// tr = 255;
+					int tr = 255;
 					rgbCube[xi][yi][zi] = ColorUtil.getInt(tr, c.getRed(), c.getGreen(), c.getBlue());
 				} else {
 					Color c = ColorUtil.getMaxSaturationColor(cc);
@@ -339,15 +338,15 @@ public class ModelGenerator {
 			z += voxelSizeZ;
 		}
 	}
-
+	
 	private void cutModel1(MyPicture p, BitSet transparentVoxels,
 						BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
-
+		
 		double angle = p.getAngle();
-
+		
 		double cos = p.getCosAngle();
 		double sin = p.getSinAngle();
-
+		
 		double x, y, z;
 		double voxelSizeX = cubeSideLengthX / maxVoxelPerSide;
 		double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
@@ -375,15 +374,15 @@ public class ModelGenerator {
 			status.setCurrentStatusValueFineAdd(smallProgressStep);
 		}
 	}
-
+	
 	private void cutModel2(MyPicture p, byte[][][] transparentVoxels,
 						BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
-
+		
 		double angle = p.getAngle();
-
+		
 		double cos = p.getCosAngle();
 		double sin = p.getSinAngle();
-
+		
 		double x, y, z;
 		double voxelSizeX = cubeSideLengthX / maxVoxelPerSide;
 		double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
@@ -412,7 +411,7 @@ public class ModelGenerator {
 			status.setCurrentStatusValueFineAdd(smallProgressStep);
 		}
 	}
-
+	
 	private XYZpointRealDistance getRotatedPoint(double angle, double x, double y, double z, double cos, double sin,
 						boolean isTop) {
 		XYZpointRealDistance p = new XYZpointRealDistance(x, y, z);
@@ -422,7 +421,7 @@ public class ModelGenerator {
 			p.rotateY(angle, cos, sin);
 		return p;
 	}
-
+	
 	private XYcubePointRelative getTargetRelativePixel(XYZpointRealDistance cubePoint) {
 		double halfImageSizeX = cubeSideLengthX / 2 / (widthFactor / 100d);
 		double halfImageSizeY = cubeSideLengthY / 2;
@@ -435,16 +434,16 @@ public class ModelGenerator {
 		yt /= halfImageSizeY * 2;
 		return new XYcubePointRelative(xt, yt);
 	}
-
+	
 	private void generateNormalizedByteCube(GenerationMode mode) {
 		if (generated)
 			return;
 		this.byteCube = new int[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
-
+		
 		if (mode == GenerationMode.COLORED_RGBA) {
 			this.rgbCube = new int[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 		}
-
+		
 		double max = 0;
 		for (int x = 0; x < maxVoxelPerSide; x++)
 			for (int y = 0; y < maxVoxelPerSide; y++)
@@ -462,11 +461,11 @@ public class ModelGenerator {
 				}
 		generated = true;
 	}
-
+	
 	public int[][][] getRGBcubeResult() {
 		return rgbCube;
 	}
-
+	
 	public String getPaletteString() {
 		// "0 0 0|0 3 0|..."
 		StringBuilder sb = new StringBuilder();
@@ -476,11 +475,11 @@ public class ModelGenerator {
 		sb.append(getColorString(Color.WHITE) + "|");
 		return sb.toString();
 	}
-
+	
 	private String getColorString(Color color) {
 		return color.getRed() + " " + color.getGreen() + " " + color.getBlue();
 	}
-
+	
 	public String getTransferFunctionString() {
 		// "0|0|0|1|1|..."
 		StringBuilder sb = new StringBuilder();
@@ -492,11 +491,11 @@ public class ModelGenerator {
 		}
 		return sb.toString();
 	}
-
+	
 	public int getResolution() {
 		return maxVoxelPerSide;
 	}
-
+	
 	public void calculateModelMotionScan(final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		generateNormalizedByteCube(GenerationMode.COLORED_RGBA);
 		final MyPicture p1 = pictures.get(0);
@@ -550,7 +549,7 @@ public class ModelGenerator {
 		status.setCurrentStatusValue(0);
 		//
 	}
-
+	
 	private static int getDepthOfPoint(final int rectWidth, final MyPicture p1, final MyPicture p2, int mx, int my,
 						int scanRange) {
 		double minDiff = Double.POSITIVE_INFINITY;
@@ -565,7 +564,7 @@ public class ModelGenerator {
 		}
 		return minI;
 	}
-
+	
 	//
 	public static double compareImageParts(MyPicture p1, MyPicture p2, int x1, int y1, int x2, int y2, int wh) {
 		double diff = 0;

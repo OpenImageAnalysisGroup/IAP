@@ -21,12 +21,12 @@ import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
  * @author klukas
  */
 public class BatchInformationAction extends AbstractNavigationAction {
-
+	
 	private final BatchCmd cmd;
 	private final RemoteCapableAnalysisAction actionProxy;
 	private final BackgroundTaskStatusProvider jobStatus;
 	private final MongoDB m;
-
+	
 	public BatchInformationAction(final BatchCmd cmd, MongoDB m) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		super("Cloud Compute Job: " + cmd.getRemoteCapableAnalysisActionClassName());
 		this.cmd = cmd;
@@ -34,17 +34,17 @@ public class BatchInformationAction extends AbstractNavigationAction {
 		actionProxy = (RemoteCapableAnalysisAction) Class.forName(cmd.getRemoteCapableAnalysisActionClassName()).newInstance();
 		jobStatus = new MongoJobStatusProvider(cmd, m);
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return actionProxy.getDefaultNavigationImage();
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return actionProxy.getDefaultTitle();
 	}
-
+	
 	@Override
 	public String getDefaultTooltip() {
 		StringBuilder sb = new StringBuilder();
@@ -55,30 +55,30 @@ public class BatchInformationAction extends AbstractNavigationAction {
 		sb.append("Processing Experiment: " + m.getExperimentHeader(cmd.getExperimentMongoID()).getExperimentname());
 		return sb.toString();
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-
+		
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;
 	}
-
+	
 	@Override
 	public boolean getProvidesActions() {
 		return false;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}
-
+	
 	@Override
 	public BackgroundTaskStatusProvider getStatusProvider() {
 		return jobStatus;
 	}
-
+	
 }

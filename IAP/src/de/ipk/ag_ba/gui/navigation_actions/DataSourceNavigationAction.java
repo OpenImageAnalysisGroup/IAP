@@ -11,31 +11,31 @@ import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 
 public class DataSourceNavigationAction extends AbstractNavigationAction {
-
+	
 	private NavigationButton src;
 	private final DataSourceLevel dataSourceLevel;
 	private ArrayList<NavigationButton> actions;
-
+	
 	public DataSourceNavigationAction(DataSourceLevel dataSourceLevel) {
 		super("Open " + dataSourceLevel.getName());
 		this.dataSourceLevel = dataSourceLevel;
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return dataSourceLevel.getName();
 	}
-
+	
 	@Override
 	public NavigationImage getImageIcon() {
 		return dataSourceLevel.getIcon();
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return null;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
@@ -55,7 +55,7 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 			actions.add(ne);
 		}
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		if (dataSourceLevel.getDescription() != null)
@@ -63,17 +63,17 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 		else
 			return null;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return actions;
 	}
-
+	
 }

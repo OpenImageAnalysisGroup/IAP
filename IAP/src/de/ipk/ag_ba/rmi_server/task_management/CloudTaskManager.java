@@ -19,20 +19,20 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  * @author klukas
  */
 public class CloudTaskManager {
-
+	
 	private String hostName;
 	private String ip;
-
+	
 	private boolean process = false;
-
+	
 	LinkedHashSet<TaskDescription> runningTasks = new LinkedHashSet<TaskDescription>();
-
+	
 	public CloudTaskManager() {
 	}
-
+	
 	Thread timerThread;
 	private MongoDB m;
-
+	
 	private void setProcess(boolean process) {
 		this.process = process;
 		if (timerThread == null) {
@@ -51,29 +51,29 @@ public class CloudTaskManager {
 		}
 		timerThread.setName("CloudTaskManager (" + (isProcess() ? "active" : "inactive") + ")");
 	}
-
+	
 	private boolean isProcess() {
 		return process;
 	}
-
+	
 	public void setHostName(String hostName) {
 		this.hostName = hostName;
 	}
-
+	
 	public void setIp(String ip) {
 		this.ip = ip;
 	}
-
+	
 	public void startWork(MongoDB m) {
 		this.m = m;
 		setProcess(true);
 	}
-
+	
 	public void stopWork() {
 		this.m = null;
 		setProcess(false);
 	}
-
+	
 	private void run() throws Exception {
 		try {
 			int idx_loop = 0;
@@ -111,7 +111,7 @@ public class CloudTaskManager {
 					}
 					if (del.size() > 0)
 						runningTasks.removeAll(del);
-
+					
 					for (TaskDescription td : commands_to_start) {
 						if (!runningTasks.contains(td)) {
 							try {

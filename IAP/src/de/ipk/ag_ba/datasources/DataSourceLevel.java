@@ -19,20 +19,20 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
  * @author klukas
  */
 public interface DataSourceLevel {
-
+	
 	public Collection<DataSourceLevel> getSubLevels();
-
+	
 	public Collection<ExperimentReference> getExperiments();
-
+	
 	public Collection<PathwayWebLinkItem> getPathways();
-
+	
 	public NavigationImage getIcon();
-
+	
 	public String getName();
-
+	
 	public ArrayList<Book> getReferenceInfos();
-
+	
 	public void setDescription(String description);
-
+	
 	public String getDescription();
 }

@@ -17,27 +17,27 @@ import de.ipk.ag_ba.mongo.MongoDB;
  * @author klukas
  */
 public class CloudComputingService {
-
+	
 	static CloudComputingService instance = null;
-
+	
 	boolean active = false;
-
+	
 	private final CloudTaskManager cloudTaskManager;
-
+	
 	private CloudComputingService() {
 		cloudTaskManager = new CloudTaskManager();
 	}
-
+	
 	public synchronized static CloudComputingService getInstance() {
 		if (instance == null)
 			instance = new CloudComputingService();
 		return instance;
 	}
-
+	
 	private void checkStatus() {
 		// todo
 	}
-
+	
 	public String getStatusImageName() {
 		checkStatus();
 		if (active)
@@ -45,7 +45,7 @@ public class CloudComputingService {
 		else
 			return "img/ext/network-workgroup.png";
 	}
-
+	
 	public String getTaskNameEnableOrDisableActionText() {
 		checkStatus();
 		if (active)
@@ -53,7 +53,7 @@ public class CloudComputingService {
 		else
 			return "Join Compute Cloud";
 	}
-
+	
 	public void switchStatus(MongoDB m) {
 		if (!active) {
 			// enable server mode
@@ -75,5 +75,5 @@ public class CloudComputingService {
 		}
 		this.active = !active;
 	}
-
+	
 }

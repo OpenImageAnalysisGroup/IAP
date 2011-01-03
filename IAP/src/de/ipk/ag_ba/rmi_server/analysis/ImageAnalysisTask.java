@@ -11,25 +11,25 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  * @author klukas
  */
 public interface ImageAnalysisTask {
-
+	
 	public String getTaskDescription();
-
+	
 	/**
 	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
 	 */
 	@Deprecated
 	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status);
-
+	
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
 						BackgroundTaskStatusProviderSupportingExternalCall status);
-
+	
 	public String getName();
-
+	
 	public ImageAnalysisType[] getInputTypes();
-
+	
 	public ImageAnalysisType[] getOutputTypes();
-
+	
 	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m);
-
+	
 	public Collection<NumericMeasurementInterface> getOutput();
 }

@@ -17,14 +17,14 @@ import java.awt.Insets;
  * @author klukas
  */
 public class FlowLayoutImproved extends FlowLayout {
-
+	
 	private static final long serialVersionUID = 1L;
-
+	
 	public FlowLayoutImproved(int left, int hgap, int vgap) {
 		super(left, hgap, vgap);
 		// setAlignOnBaseline(true);
 	}
-
+	
 	@Override
 	public Dimension preferredLayoutSize(Container target) {
 		int gapH = getHgap();
@@ -59,5 +59,5 @@ public class FlowLayoutImproved extends FlowLayout {
 		curY += insets.top + insets.bottom;
 		return new Dimension(maxW, curY);
 	}
-
+	
 }

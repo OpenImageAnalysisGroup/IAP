@@ -28,21 +28,21 @@ import de.ipk.ag_ba.mongo.MongoDB;
  */
 public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavigationAction {
 	private static final long serialVersionUID = 1L;
-
+	
 	protected MongoDB m;
-
+	
 	protected final ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 	protected ExperimentReference experiment;
-
+	
 	private NavigationButton src;
-
+	
 	public AbstractExperimentAnalysisNavigation(MongoDB m, ExperimentReference experiment) {
 		super("Analyse Experiment Data Set");
 		this.m = m;
 		this.experiment = experiment;
-
+		
 	}
-
+	
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		actions.clear();
 		ExperimentReference exp = experiment;
@@ -56,7 +56,7 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 		}
 		return actions;
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		try {
@@ -66,19 +66,19 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 			jp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 			jp = TableLayout.getSplitVertical(jp, null, TableLayout.PREFERRED, TableLayout.FILL);
 			jp = TableLayout.getSplitVertical(jp, null, TableLayout.PREFERRED, TableLayout.FILL);
-
+			
 			return new MainPanelComponent(jp);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return null;
 		}
-
+		
 	}
-
+	
 	public void performActionCalculateResults(final NavigationButton src) throws Exception {
 		this.src = src;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);

@@ -43,7 +43,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Experime
  */
 public class MyExperimentInfoPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
-
+	
 	JTextField editName;
 	JTextField coordinator;
 	JTextField groupVisibility;
@@ -51,9 +51,9 @@ public class MyExperimentInfoPanel extends JPanel {
 	JDateChooser expStart;
 	JDateChooser expEnd;
 	JTextField remark;
-
+	
 	private RunnableWithExperimentInfo saveAction;
-
+	
 	// public void setExperimentInfo(final String login, final String pass, final
 	// ExperimentInfo ei, boolean startEnabled,
 	// ExperimentInterface experiment) {
@@ -193,7 +193,7 @@ public class MyExperimentInfoPanel extends JPanel {
 	// // setBorder(BorderFactory.createEtchedBorder());
 	// setBorder(BorderFactory.createLoweredBevelBorder());
 	// }
-
+	
 	/**
 	 * @param experiment
 	 * @return
@@ -208,21 +208,21 @@ public class MyExperimentInfoPanel extends JPanel {
 		});
 		return res;
 	}
-
+	
 	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
 						JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField remark,
 						JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
-
+		
 		editB.setEnabled(editPossible);
 		if (!editPossible)
 			enabled = true;
-
+		
 		if (enabled)
 			editB.setText("<html>Cancel");
 		else
 			editB.setText("<html>Edit");
 		saveB.setEnabled(savePossible);
-
+		
 		editName.setEnabled(enabled);
 		coordinator.setEnabled(enabled);
 		groupVisibility.setEnabled(enabled);
@@ -231,7 +231,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		expEnd.setEnabled(enabled);
 		remark.setEnabled(enabled);
 	}
-
+	
 	private JComboBox getExperimentTypes(MongoDB m, String experimentType, boolean editPossible) {
 		String[] types = new String[] { experimentType };
 		// if (user != null && !user.equalsIgnoreCase("internet") && editPossible) {
@@ -250,7 +250,7 @@ public class MyExperimentInfoPanel extends JPanel {
 			res.setSelectedIndex(0);
 		return res;
 	}
-
+	
 	private JComboBox getGroups(String user, String pass, String userGroup, boolean editPossible) {
 		String[] groups = new String[] { userGroup };
 		if (user != null && !user.equalsIgnoreCase("internet") && editPossible) {
@@ -265,7 +265,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		res.setSelectedItem(userGroup);
 		return res;
 	}
-
+	
 	private JComponent style(JComponent jTextField) {
 		return jTextField;
 		// return TableLayout.getSplitVertical(
@@ -274,44 +274,44 @@ public class MyExperimentInfoPanel extends JPanel {
 		// TableLayout.PREFERRED,
 		// 6);
 	}
-
+	
 	private JComponent disable(JComponent jTextField) {
 		if (jTextField instanceof JTextField)
 			((JTextField) jTextField).setEditable(false);
 		return style(jTextField);
 	}
-
+	
 	public String getUserGroupVisibility() {
 		return editName.getText();
 	}
-
+	
 	public void updateSeriesData(Condition experimentInfo) {
 		experimentInfo.setExperimentName(editName.getText());
 	}
-
+	
 	public void setSaveAction(RunnableWithExperimentInfo runnable) {
 		saveAction = runnable;
 	}
-
+	
 	public void setExperimentInfo(final MongoDB m,
 						final ExperimentHeaderInterface experimentHeader, boolean startEnabled, ExperimentInterface experiment) {
 		setLayout(new TableLayout(new double[][] { { 0, 400, 0 }, { 0, TableLayout.PREFERRED, 0 } }));
-
+		
 		setOpaque(false);
-
+		
 		final boolean editPossible = true;
 		// experimentHeader.getExcelfileid() != null
 		// && experimentHeader.getExcelfileid().length() > 0 &&
 		// experimentHeader.getImportusername() != null
 		// && experimentHeader.getImportusername().equals(login);
-
+		
 		if (!editPossible)
 			startEnabled = true;
-
+		
 		FolderPanel fp = new FolderPanel("Experiment " + experimentHeader.getExperimentname(), false, false, false, null);
 		Color c = new Color(220, 220, 220);
 		fp.setFrameColor(c, Color.BLACK, 4, 8);
-
+		
 		editName = new JTextField(experimentHeader.getExperimentname());
 		coordinator = new JTextField(experimentHeader.getCoordinator());
 		groupVisibility = new JTextField(experimentHeader.getImportusergroup());
@@ -321,13 +321,13 @@ public class MyExperimentInfoPanel extends JPanel {
 		expStart = new JDateChooser(experimentHeader.getStartdate());
 		expEnd = new JDateChooser(experimentHeader.getImportdate());
 		remark = new JTextField(experimentHeader.getRemark());
-
+		
 		fp.addGuiComponentRow(new JLabel("Name"), editName, false);
 		fp.addGuiComponentRow(new JLabel("ID"), disable(new JTextField(experimentHeader.getExcelfileid() + "")), false);
 		fp.addGuiComponentRow(new JLabel("Import by"), disable(new JTextField(experimentHeader.getImportusername())),
 							false);
 		fp.addGuiComponentRow(new JLabel("Coordinator"), coordinator, false);
-		fp.addGuiComponentRow(new JLabel("Visible for"), groupVisibility, false);
+		fp.addGuiComponentRow(new JLabel("Group"), groupVisibility, false);
 		fp.addGuiComponentRow(new JLabel("Experiment-Type"), experimentTypeSelection, false);
 		fp.addGuiComponentRow(new JLabel("Start-Time"), expStart, false);
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
@@ -336,29 +336,29 @@ public class MyExperimentInfoPanel extends JPanel {
 							+ experimentHeader.getNumberOfFiles(), null)
 							+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
 		fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(experiment), false);
-
+		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setBval(0, startEnabled);
-
+		
 		final JButton editB = new JMButton("Edit");
 		final JButton saveB = new JMButton("Save Changes");
 		if (!editPossible)
 			saveB.setEnabled(false);
 		// setText("Create Calendar Entry");
-
+		
 		editB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				boolean restore = false;
-
+				
 				if (editB.getText().contains("Cancel"))
 					restore = true;
-
+				
 				boolean b = tso.getBval(0, false);
 				b = !b;
 				tso.setBval(0, b);
 				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark, editB,
 									saveB, editPossible, true);
-
+				
 				if (restore) {
 					saveB.setText("Save Changes");
 					editName.setText(experimentHeader.getExperimentname());
@@ -374,7 +374,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				}
 			}
 		});
-
+		
 		saveB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				boolean editPossibleBBB = editPossible;
@@ -393,7 +393,7 @@ public class MyExperimentInfoPanel extends JPanel {
 							saveAction.run(experimentHeader);
 					} else {
 						if (editPossibleBBB) {
-							if (experimentHeader.getExcelfileid().isEmpty() || experimentHeader.getExcelfileid().startsWith("lemnatec:")) {
+							if (experimentHeader.getExcelfileid().startsWith("lemnatec:") || experimentHeader.getExcelfileid().isEmpty()) {
 								saveB.setText("Updated (in memory)");
 							} else {
 								m.setExperimentInfo(experimentHeader);
@@ -422,29 +422,29 @@ public class MyExperimentInfoPanel extends JPanel {
 									saveB, editPossibleBBB, false);
 			}
 		});
-
+		
 		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark,
 							editB, saveB, editPossible, true);
-
+		
 		GuiRow gr = new GuiRow(TableLayout.getSplitVertical(null, TableLayout.get3Split(null, TableLayout.get3Split(
 							editB, null, saveB, TableLayout.PREFERRED, 10, TableLayout.PREFERRED), null, TableLayout.FILL,
 							TableLayout.PREFERRED, TableLayout.FILL), 5, TableLayout.PREFERRED), null);
 		gr.span = true;
-
+		
 		// if (editPossible)
 		fp.addGuiComponentRow(gr, false);
-
+		
 		fp.setRowColSpacing(5, 15);
-
+		
 		fp.layoutRows();
-
+		
 		add(fp, "1,1");
 		validate();
-
+		
 		// setBorder(BorderFactory.createEtchedBorder());
 		setBorder(BorderFactory.createLoweredBevelBorder());
 	}
-
+	
 	private String niceValue(String sizekb, String unit) {
 		try {
 			Double d = Double.valueOf(sizekb);
@@ -475,5 +475,5 @@ public class MyExperimentInfoPanel extends JPanel {
 				return sizekb;
 		}
 	}
-
+	
 }

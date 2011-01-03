@@ -13,13 +13,13 @@ import java.util.ArrayList;
  * @author klukas
  */
 public class Library {
-
+	
 	private final ArrayList<Book> books = new ArrayList<Book>();
-
+	
 	public void add(Book book) {
 		books.add(book);
 	}
-
+	
 	public ArrayList<Book> getBooksInFolder(String folder) {
 		ArrayList<Book> res = new ArrayList<Book>();
 		for (Book book : books) {

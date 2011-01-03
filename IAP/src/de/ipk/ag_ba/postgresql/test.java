@@ -9,24 +9,24 @@ import java.io.*;
  * @author entzian
  */
 public class test {
-
+	
 	/**
 	 * @param args
 	 */
-
+	
 	public static void main(String[] args) {
-
+		
 		// create file object
 		File file = new File("C://FileIO//ReadString.txt");
-
+		
 		int ch;
-
+		
 		StringBuffer strContent = new StringBuffer("");
-
+		
 		FileInputStream fin = null;
-
+		
 		try {
-
+			
 			/*
 			 * #
 			 * Create new FileInputStream object. Constructor of FileInputStream throws
@@ -36,7 +36,7 @@ public class test {
 			 */
 
 			fin = new FileInputStream(file);
-
+			
 			/*
 			 * #
 			 * To read bytes from stream use,
@@ -54,9 +54,9 @@ public class test {
 			 */
 
 			while ((ch = fin.read()) != -1)
-
+				
 				strContent.append((char) ch);
-
+			
 			/*
 			 * #
 			 * To close the FileInputStream, use
@@ -69,31 +69,31 @@ public class test {
 			 */
 
 			fin.close();
-
+			
 		}
 
 		catch (FileNotFoundException e)
 
 		{
-
+			
 			System.out.println("File " + file.getAbsolutePath() +
 
 			" could not be found on filesystem");
-
+			
 		}
 
 		catch (IOException ioe)
 
 		{
-
+			
 			System.out.println("Exception while reading the file" + ioe);
-
+			
 		}
-
+		
 		System.out.println("File contents :");
-
+		
 		System.out.println(strContent);
-
+		
 		/*
 		 * #
 		 * Please note that, FileInputStream SHOULD NOT BE USED to read
@@ -108,5 +108,5 @@ public class test {
 		 */
 
 	}
-
+	
 }

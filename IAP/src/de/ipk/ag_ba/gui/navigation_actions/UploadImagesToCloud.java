@@ -39,32 +39,32 @@ import de.ipk_gatersleben.ag_pbi.mmd.loaders.MyScanner;
  */
 public class UploadImagesToCloud extends AbstractNavigationAction {
 	private NavigationButton src;
-
+	
 	ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-
+	
 	private final boolean storeInMongo;
-
+	
 	private Experiment newExperiment;
-
+	
 	private MongoDB m;
-
+	
 	UploadImagesToCloud(boolean storeInMongo) {
 		super("Upload data set to the IAP Systems Biology Cloud database service");
 		this.storeInMongo = storeInMongo;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
-
+		
 		Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
 							"Target", MongoDB.getMongos()
 		});
-
+		
 		if (sel == null)
 			return;
-
+		
 		this.m = (MongoDB) sel[0];
-
+		
 		this.src = src;
 		this.newExperiment = null;
 		res.clear();
@@ -77,7 +77,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 						@Override
 						public void run() {
 						}
-
+						
 						@Override
 						public void setExperimenData(ExperimentInterface experiment) {
 							tso.setParam(0, experiment);
@@ -115,7 +115,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 			ErrorMsg.addErrorMessage(e);
 		}
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
@@ -127,12 +127,12 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 		}
 		return res;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return res;
 	}
-
+	
 	private static void processData(RunnableWithMappingData resultProcessor, ImageLoader il, ArrayList<File> fileList,
 						AnnotationFromGraphFileNameProvider provider) {
 		for (ExperimentInterface mdl : il.process(fileList, provider)) {
@@ -144,7 +144,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 			}
 		}
 	}
-
+	
 	public static void prepareDataSetFromFileList(RunnableWithMappingData resultProcessor) {
 		ImageLoader il = new ImageLoader();
 		ArrayList<File> fileList = OpenFileDialogService.getFiles(il.getValidExtensions(), "Images");
@@ -155,10 +155,10 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 				return o1.getName().compareTo(o2.getName());
 			}
 		});
-
+		
 		String providedFileNameFormat = null;
 		HashMap<Integer, Condition> replicateNumber2conditionTemplate = null;
-
+		
 		Object[] lm = MyInputHelper.getInput(
 							"[Yes;No]Load meta data (mapping from plant ID to condition annotation) from file?<br><br>"
 												+ "The provided table needs to contain at least two columns,<br>"
@@ -221,7 +221,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 				}
 			}
 		}
-
+		
 		MyScanner[] replicateIDs = AnnotationFromGraphFileNameProvider.getFileNameInfos(fileList, providedFileNameFormat,
 							replicateNumber2conditionTemplate);
 		HashSet<String> detectedConditions = getConditions(replicateIDs);
@@ -262,10 +262,10 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 						ppp.add("");
 						ppp.add("Treatment");
 						ppp.add("");
-
+						
 						paramList.add(ppp);
 					}
-
+					
 					ArrayList<ArrayList<Object>> input = MyInputHelper.getMultipleInput(paramList.toArray());
 					if (input != null) {
 						HashMap<Integer, Condition> replId2ConditionInfo = new HashMap<Integer, Condition>();
@@ -274,15 +274,15 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 							int i = 0;
 							Integer fId = (Integer) res.get(i++);
 							Integer lId = (Integer) res.get(i++);
-
+							
 							Condition c = new Condition(null);
 							c.setSpecies((String) res.get(i++));
 							c.setGenotype((String) res.get(i++));
 							c.setTreatment((String) res.get(i++));
-
+							
 							int min = min(fId, lId);
 							int max = max(fId, lId);
-
+							
 							for (int r = min; r <= max; r++)
 								replId2ConditionInfo.put(r, c);
 						}
@@ -297,7 +297,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 				}
 			}
 	}
-
+	
 	/**
 	 * @param rId
 	 * @return
@@ -308,7 +308,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 		c.setGenotype(rId.getCondition());
 		return c;
 	}
-
+	
 	private static HashSet<String> getConditions(MyScanner[] replicateIDs) {
 		HashSet<String> res = new HashSet<String>();
 		for (MyScanner s : replicateIDs) {
@@ -320,7 +320,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 		}
 		return res;
 	}
-
+	
 	private static int lowestOrHighestReplicateID(boolean lowestTrue, MyScanner[] replicateIDs) {
 		int res;
 		if (lowestTrue) {
@@ -340,13 +340,13 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 		}
 		return res;
 	}
-
+	
 	private static int max(int fId, int lId) {
 		return fId > lId ? fId : lId;
 	}
-
+	
 	private static int min(int fId, int lId) {
 		return fId < lId ? fId : lId;
 	}
-
+	
 }

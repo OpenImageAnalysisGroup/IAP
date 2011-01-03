@@ -4,19 +4,19 @@ package de.ipk.ag_ba.gui.picture_gui;
  * @author klukas
  */
 public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
-
+	
 	DBEtreeNodeModelHelper[] children;
 	int index;
-
+	
 	public boolean readOnly = true;
 	boolean isLeaf;
-
+	
 	Runnable getChildsMethod = null;
-
+	
 	public MongoTreeNodeBasis(boolean readOnly) {
 		this.readOnly = readOnly;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -28,7 +28,7 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 			getChildsMethod.run();
 		return children[index];
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -40,7 +40,7 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 			getChildsMethod.run();
 		return children.length;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -50,7 +50,7 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 	public void setIndex(int index) {
 		this.index = index;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -60,7 +60,7 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 	public int getIndex() {
 		return index;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -70,7 +70,7 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 	public boolean isLeaf() {
 		return isLeaf;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -80,7 +80,7 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 	public void setGetChildrenMethod(Runnable r) {
 		getChildsMethod = r;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -91,7 +91,7 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 	public void setChildren(DBEtreeNodeModelHelper[] children) {
 		this.children = children;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see

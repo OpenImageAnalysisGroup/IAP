@@ -35,7 +35,7 @@ public class BinaryBlobCameraConfig {
 		System.out.println("b2=" + arr2double(b2, 0));
 		System.out.println("bb=" + arr2double(b2, 0));
 	}
-
+	
 	public static byte[] reverse(byte[] bytes) {
 		byte[] res = new byte[bytes.length];
 		int j = bytes.length - 1;
@@ -43,7 +43,7 @@ public class BinaryBlobCameraConfig {
 			res[j--] = bytes[i];
 		return res;
 	}
-
+	
 	public static String toHexString(byte bytes[]) {
 		StringBuffer retString = new StringBuffer();
 		for (int i = bytes.length - 1; i >= 0; i--) {
@@ -51,7 +51,7 @@ public class BinaryBlobCameraConfig {
 		}
 		return retString.toString();
 	}
-
+	
 	public static double arr2double(byte[] arr, int start) {
 		int i = 0;
 		int len = 8;

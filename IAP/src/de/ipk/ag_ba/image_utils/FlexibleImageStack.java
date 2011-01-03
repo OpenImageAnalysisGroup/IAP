@@ -9,15 +9,15 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 public class FlexibleImageStack {
-
+	
 	ImageStack stack;
-
+	
 	boolean sizeKnown = false;
-
+	
 	private int w;
-
+	
 	private int h;
-
+	
 	public void addImage(String label, FlexibleImage image) {
 		if (!sizeKnown) {
 			sizeKnown = true;
@@ -33,18 +33,18 @@ public class FlexibleImageStack {
 		}
 		stack.addSlice(label, image.getConvertAsImagePlus().getProcessor());
 	}
-
+	
 	public void saveAsLayeredTif(File file) throws FileNotFoundException {
 		saveAsLayeredTif(new FileOutputStream(file));
 	}
-
+	
 	public void saveAsLayeredTif(OutputStream os) {
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);
-
+		
 		new MyFileSaver(image).saveAsTiffStack(os);
 	}
-
+	
 	public void print(String title) {
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);

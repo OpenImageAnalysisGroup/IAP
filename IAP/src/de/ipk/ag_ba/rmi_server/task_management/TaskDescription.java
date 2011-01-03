@@ -13,28 +13,29 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author klukas
  */
 public class TaskDescription {
-
+	
 	private final BatchCmd cmd;
-
+	
 	private String analysisActionClassName, params;
 	private long startTime;
-
+	
 	private boolean finished = false;
-
+	
 	private ExperimentReference experimentInput;
-
+	
 	private final String systemIP;
-
+	
 	public static String getTaskDescriptionText(String hostIPs, String task, String params, String startTime) {
 		return task + "$" + params + "$" + startTime;
 	}
-
+	
 	public TaskDescription(BatchCmd cmd, ExperimentReference experiment, String systemIP) {
 		this.cmd = cmd;
 		this.systemIP = systemIP;
@@ -50,29 +51,29 @@ public class TaskDescription {
 			params = null;
 		}
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		return cmd.equals(((TaskDescription) obj).cmd);
 	}
-
+	
 	public boolean isValid() {
 		return cmd != null && (cmd.getTargetIPs().isEmpty() || cmd.getTargetIPs().contains(systemIP));
 	}
-
+	
 	public void startWork(final BatchCmd batch, String hostName, String ip, final MongoDB m)
 						throws ClassCastException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		final RemoteCapableAnalysisAction action = RemoteAnalysisRepository.getInstance().getNewAnalysisAction(
 							analysisActionClassName);
 		action.setParams(experimentInput, m, params);
-
+		
 		final BackgroundTaskStatusProvider statusProvider = action.getStatusProvider();
-
+		
 		batch.setStatusProvider(statusProvider);
-
+		
 		RunnableWithMappingData resultReceiver = new RunnableWithMappingData() {
 			private ExperimentInterface experiment;
-
+			
 			@Override
 			public void run() {
 				// store dataset in mongo
@@ -82,25 +83,18 @@ public class TaskDescription {
 				experiment.getHeader().setImportusergroup("Temp");
 				System.out.println("Received result: " + experiment.getName());
 				try {
-
-					// todo:
-					// check if last batch update is less than some time
-					// check if owner of batch is still the same and equal to system ip
-					// save experiment
-					// check if all parts are available as an experiment
-					// load all sub-experiments
-					// merge these
-					// save unified experiment
-
-					// todo: only store result if batch claim is still valid and
-					// connected to system IP
-					// //////// new MongoDB().saveExperiment("dbe3", null, login, pass, experiment, null);
+					if (m.batchGetCommand(batch).getOwner().equals(SystemAnalysis.getHostName()))
+						m.saveExperiment(experiment, null);
+					else
+						System.out.println("Information: Batch command, processed by " + SystemAnalysis.getHostName()
+								+ " has been claimed by " + batch.getOwner()
+								+ ". Therefore analysis result is not saved.");
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
 				finished = true;
 			}
-
+			
 			@Override
 			public void setExperimenData(ExperimentInterface experiment) {
 				this.experiment = experiment;
@@ -119,11 +113,11 @@ public class TaskDescription {
 								}
 							}, null, statusProvider, 0);
 	}
-
+	
 	public boolean analysisFinished() {
 		return finished;
 	}
-
+	
 	public BatchCmd getBatchCmd() {
 		return cmd;
 	}

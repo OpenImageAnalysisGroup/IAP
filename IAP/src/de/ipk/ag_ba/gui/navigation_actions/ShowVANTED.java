@@ -9,41 +9,57 @@ package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.util.ArrayList;
 
-import javax.swing.JFrame;
+import javax.swing.JComponent;
 
-import org.ErrorMsg;
-import org.graffiti.editor.MainFrame;
-
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 public class ShowVANTED extends AbstractNavigationAction {
-
+	
+	private boolean showInline = true;
+	private NavigationButton src;
+	
 	public ShowVANTED() {
 		super("Show IAP Online-Version of VANTED");
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
+		this.src = src;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-		return null;
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
+		res.add(src);
+		return res;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		AIPmain.showVANTED();
-
-		return null;
+		if (!showInline) {
+			return null;
+		} else
+			return new ArrayList<NavigationButton>();
 	}
-
+	
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		JComponent gui = IAPmain.showVANTED(showInline);
+		return gui != null ? new MainPanelComponent(gui) : null;
+	}
+	
 	@Override
 	public String getDefaultImage() {
 		return "img/vanted1_0.png";
 	}
-
+	
+	@Override
+	public boolean getProvidesActions() {
+		return showInline;
+	}
+	
 	@Override
 	public String getDefaultTitle() {
 		return "Show VANTED";

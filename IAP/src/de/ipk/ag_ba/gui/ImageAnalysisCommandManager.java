@@ -24,28 +24,28 @@ import de.ipk.ag_ba.mongo.MongoDB;
  * @author klukas
  */
 public class ImageAnalysisCommandManager {
-
+	
 	public static Collection<NavigationButton> getCommands(MongoDB m,
 						ExperimentReference experimentReference, GUIsetting guiSetting) {
 		return getCommands(m, experimentReference, true, guiSetting);
 	}
-
+	
 	public static Collection<NavigationButton> getCommands(MongoDB m,
 						ExperimentReference experimentReference, boolean analysis, GUIsetting guiSetting) {
-
+		
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
-
+		
 		actions.add(FileManagerAction.getFileManagerEntity(m, experimentReference, guiSetting));
-
+		
 		try {
 			// if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
 			actions.add(new NavigationButton(new CloudUploadEntity(m, experimentReference), guiSetting));
 		} catch (Exception e) {
 			// empty
 		}
-
+		
 		// "img/PoweredMongoDBgreenLeaf.png")); // PoweredMongoDBgreen.png"));
-
+		
 		// actions.add(new NavigationGraphicalEntity(
 		// new ClearBackgroundNavigation(login, 15, 25, pass,
 		// experimentReference), "Clear Background",
@@ -57,17 +57,17 @@ public class ImageAnalysisCommandManager {
 			// NavigationAction performanceTestAction = new PerformanceTestAction(m, experimentReference);
 			// NavigationButton performanceTestButton = new NavigationButton(performanceTestAction, guiSetting);
 			// actions.add(performanceTestButton);
-
+			
 			boolean showTestActions = false;
-
+			
 			if (showTestActions)
 				actions.add(new NavigationButton(new CloudIoTestAction(m, experimentReference), guiSetting));
-
+			
 			actions.add(new NavigationButton(new NumericDataReportAction(m, experimentReference), guiSetting));
-
-			actions.add(ImageAnalysis.getPhenotypingEntity(m, experimentReference, 10, 15, guiSetting));
+			
+			actions.add(ImageAnalysis.getPhenotypingEntity(m, experimentReference, 2.5, 5, guiSetting));
 			actions.add(ImageAnalysis.getPhytochamberEntity(m, experimentReference, 10, 15, guiSetting));
-
+			
 			actions.add(ThreeDreconstructionAction.getThreeDreconstructionTaskEntity(m, experimentReference,
 								"3-D Reconstruction", 15, 25, guiSetting));
 			actions.add(ThreeDsegmentationAction.getThreeDsegmentationTaskEntity(m, experimentReference,

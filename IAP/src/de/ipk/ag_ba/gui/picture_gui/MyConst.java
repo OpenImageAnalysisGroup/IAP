@@ -20,6 +20,6 @@ package de.ipk.ag_ba.gui.picture_gui;
  *         Preferences - Java - Code Generation - Code and Comments
  */
 public class MyConst {
-
+	
 	public static final String readOnly = "[Read Only] ";
 }

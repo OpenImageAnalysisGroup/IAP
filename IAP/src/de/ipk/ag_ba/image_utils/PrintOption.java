@@ -8,5 +8,5 @@ package de.ipk.ag_ba.image_utils;
  */
 public enum PrintOption {
 	GRAVISTO_SERVICE, IMAGEJ, CONSOLE
-
+	
 }

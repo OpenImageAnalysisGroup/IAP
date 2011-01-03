@@ -20,11 +20,11 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
  */
 public class ThreadService {
 	private static ThreadSafeOptions tsoTaskID = new ThreadSafeOptions();
-
+	
 	public long getTaskGroupID() {
 		return tsoTaskID.getNextLong();
 	}
-
+	
 	public static ExecutorService getService(final String name, int maximumThreadCount) {
 		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
 		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCount, new ThreadFactory() {
@@ -42,7 +42,7 @@ public class ThreadService {
 		});
 		return run;
 	}
-
+	
 	public boolean waitToFinish(ExecutorService run) {
 		run.shutdown();
 		try {
@@ -52,6 +52,6 @@ public class ThreadService {
 			ErrorMsg.addErrorMessage(e);
 			return false;
 		}
-
+		
 	}
 }

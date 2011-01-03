@@ -25,7 +25,7 @@ public final class DBEexperimentNavigation extends NavigationButton {
 	 * 
 	 */
 	private final JTextField pass;
-
+	
 	/**
 	 * @param navigationAction
 	 * @param title
@@ -42,7 +42,7 @@ public final class DBEexperimentNavigation extends NavigationButton {
 		this.publicLogin = publicLogin;
 		this.pass = pass;
 	}
-
+	
 	@Override
 	public void setButtonStyle(ButtonDrawStyle style) {
 		if (publicLogin)

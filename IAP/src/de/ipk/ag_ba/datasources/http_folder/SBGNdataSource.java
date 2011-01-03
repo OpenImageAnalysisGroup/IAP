@@ -9,16 +9,16 @@ package de.ipk.ag_ba.datasources.http_folder;
 
 import de.ipk.ag_ba.gui.navigation_actions.Book;
 import de.ipk.ag_ba.gui.navigation_actions.Library;
-import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 /**
  * @author klukas
  */
 public class SBGNdataSource extends HTTPfolderSource {
-
+	
 	public SBGNdataSource() {
 		super(getLibrary(), "SBGN-ED", "http://vanted.ipk-gatersleben.de/aip/sbgn-examples/",
-							new String[] { ".gml", ".graphml" }, AIPmain.loadIcon("img/sbgn.png"), AIPmain.loadIcon("img/ext/folder-remote.png"));
+							new String[] { ".gml", ".graphml" }, IAPmain.loadIcon("img/sbgn.png"), IAPmain.loadIcon("img/ext/folder-remote.png"));
 		setDescription("<h2>SBGN-ED - Editing, Translating and Validating of SBGN Maps</h2>"
 																	+ ""
 																	+ "SBGN-ED is a VANTED Add-on which allows to create and edit all three types of SBGN maps, "
@@ -29,7 +29,7 @@ public class SBGNdataSource extends HTTPfolderSource {
 																	+ "soon as the SBGN-ED Add-on available from the mentioned website is downloaded and installed. "
 																	+ "The SBGN-ED website additionally contains documentation and additional background information.");
 	}
-
+	
 	private static Library getLibrary() {
 		Library lib = new Library();
 		lib.add(new Book("SBGN-ED", "SBGN-ED", "http://vanted.ipk-gatersleben.de/addons/sbgn-ed/", "img/browser.png"));

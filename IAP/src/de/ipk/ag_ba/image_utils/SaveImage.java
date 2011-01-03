@@ -8,5 +8,5 @@ package de.ipk.ag_ba.image_utils;
  */
 public enum SaveImage {
 	TIFF, PNG, JPG, GIF, TIFF_STACK;
-
+	
 }

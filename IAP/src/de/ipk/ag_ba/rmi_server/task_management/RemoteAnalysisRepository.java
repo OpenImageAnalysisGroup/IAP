@@ -10,19 +10,19 @@ package de.ipk.ag_ba.rmi_server.task_management;
  * @author klukas
  */
 public class RemoteAnalysisRepository {
-
+	
 	private static RemoteAnalysisRepository instance;
-
+	
 	private RemoteAnalysisRepository() {
-
+		
 	}
-
+	
 	public static RemoteAnalysisRepository getInstance() {
 		if (instance == null)
 			instance = new RemoteAnalysisRepository();
 		return instance;
 	}
-
+	
 	public RemoteCapableAnalysisAction getNewAnalysisAction(String analysisActionClassName)
 						throws ClassNotFoundException, InstantiationException, IllegalAccessException, ClassCastException {
 		System.out.println("Try to start cloud job: " + analysisActionClassName);
@@ -33,5 +33,5 @@ public class RemoteAnalysisRepository {
 		} else
 			return null;
 	}
-
+	
 }

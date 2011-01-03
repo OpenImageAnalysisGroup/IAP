@@ -36,58 +36,44 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 /**
  * @author klukas
  */
-public class AIPgui {
-
+public class IAPgui {
+	
 	public static JComponent getNavigation(final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
 						boolean secondWindow) {
-
+		
 		final JPanel graphPanel = new JPanel();
-
+		
 		graphPanel.setBackground(MyNavigationPanel.getTabColor());
 		graphPanel.setOpaque(true);
 		graphPanel.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
-
-		JLabel lbl;
-		if (!secondWindow && AIPmain.myClassKnown) {
-			lbl = new JLabel("<html><h2><font color='red'>IAP Reloading Not Supported!</font></h2>"
-								+ "<b>It is recommended to close any browser window and re-open this website,<br>"
-								+ "otherwise this information system may not work reliable.</b><br><br>"
-								+ "Technical background: reloading this applet is not yet supported");
-		} else {
-			lbl = new JLabel(getIntroTxt());
-		}
-		lbl.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-		graphPanel.add(new MainPanelComponent(lbl.getText()).getGUI(), "0,0");
-		// graphPanel.add(lbl, "0,0");
-		graphPanel.validate();
-
+		
 		int vgap = 5;
 		int hgap = 10;
-
+		
 		final MyNavigationPanel navigationPanel = new MyNavigationPanel(PanelTarget.NAVIGATION, graphPanel, null);
 		navigationPanel.setOpaque(false);
 		navigationPanel.setLayout(new FlowLayoutImproved(FlowLayout.LEFT, hgap, vgap));
-
+		
 		JPanel actionPanelRight = new JPanel();
 		final MyNavigationPanel actionPanel = new MyNavigationPanel(PanelTarget.ACTION, graphPanel, actionPanelRight);
 		actionPanel.setOpaque(false);
 		actionPanel.setLayout(new FlowLayoutImproved(FlowLayout.LEFT, hgap, vgap));
-
+		
 		navigationPanel.setTheOther(actionPanel);
 		actionPanel.setTheOther(navigationPanel);
-
+		
 		HomeAction home = new HomeAction(myStatus);
 		GUIsetting guiSetting = new GUIsetting(navigationPanel, actionPanel, graphPanel);
 		final NavigationButton overView = new NavigationButton(home, guiSetting);
-
+		
 		overView.setTitle("Initialize");
 		overView.setProcessing(true);
-
+		
 		ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
 		home.performActionCalculateResults(overView);
 		navigationPanel.setEntitySet(home.getResultNewNavigationSet(homeNavigation));
 		actionPanel.setEntitySet(home.getActionEntitySet());
-
+		
 		ErrorMsg.addOnAppLoadingFinishedAction(new Runnable() {
 			// ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {
 			public void run() {
@@ -102,7 +88,6 @@ public class AIPgui {
 					navigateTo(h, navigationPanel, actionPanel, graphPanel);
 				} catch (Exception e) {
 					System.out.println("JavaScript and Browser window not accessible.");
-
 					// navigateTo("Overview.MetaCrop.Carbohydrate Metabolism.Ascorbate biosynthesis",
 					// navigationPanel, actionPanel, graphPanel, knownEntities);
 					// navigateTo("Overview.DBE Database.User Login.AG PBI.klukas.AAT-Juniproben2004 (test)",
@@ -110,22 +95,37 @@ public class AIPgui {
 				}
 			}
 		});
-
+		
 		// JScrollPane navScroller = new MyScrollPane(navigationPanel, false);
 		// navScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		// navigationPanel.setScrollpane(navScroller);
-
+		
 		// JScrollPane actionScroller = new MyScrollPane(actionPanel, false);
 		// actionScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		// actionPanel.setScrollpane(actionScroller);
-
+		
+		JLabel lbl;
+		if (!secondWindow && IAPmain.myClassKnown) {
+			lbl = new JLabel("<html><h2><font color='red'>IAP Reloading Not Supported!</font></h2>"
+					+ "<b>It is recommended to close any browser window and re-open this website,<br>"
+					+ "otherwise this information system may not work reliable.</b><br><br>"
+					+ "Technical background: reloading this applet is not yet supported");
+		} else {
+			lbl = new JLabel(getIntroTxt());
+		}
+		lbl.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+		graphPanel.add(new MainPanelComponent(lbl.getText()).getGUI(), "0,0");
+		graphPanel.validate();
+		
 		JComponent res = TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionPanel,
 							actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
 							TableLayout.PREFERRED, TableLayout.FILL);
-
+		
+		navigateTo("IAP", navigationPanel, actionPanel, graphPanel);
+		
 		return res;
 	}
-
+	
 	public static String getIntroTxt() {
 		return "<html><h2>Welcome to IAP - the Integrated Analysis Platform!</h2>"
 							+ "The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
@@ -145,7 +145,7 @@ public class AIPgui {
 							+ "stops to spin. It is possible to copy or bookmark the URL from the browser window "
 							+ "in order to be able to quickly navigate again to the same information in the future.";
 	}
-
+	
 	public static void navigateTo(final String target, NavigationButton src) {
 		System.out.println("NAVIGATE: " + target);
 		if (src == null)
@@ -155,11 +155,11 @@ public class AIPgui {
 		if (src.getGUIsetting().getNavigationPanel() == null)
 			System.out.println("ERRRRRRRRRRR");
 		NavigationButton button = src.getGUIsetting().getNavigationPanel().getEntitySet(false).iterator().next();
-
+		
 		final MyNavigationPanel navigationPanel = src.getGUIsetting().getNavigationPanel();
 		final MyNavigationPanel actionPanel = src.getGUIsetting().getActionPanel();
 		final JComponent graphPanel = src.getGUIsetting().getGraphPanel();
-
+		
 		Runnable rrr = new Runnable() {
 			@Override
 			public void run() {
@@ -168,24 +168,24 @@ public class AIPgui {
 		};
 		button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
 	}
-
+	
 	private static void navigateTo(String target, final MyNavigationPanel navigationPanel,
 						final MyNavigationPanel actionPanel, final JComponent graphPanel) {
-
+		
 		if (target == null || target.length() == 0)
 			return;
 		if (target.startsWith("#"))
 			target = target.substring("#".length());
-
+		
 		if (target.startsWith("Overview"))
 			target = target.substring("Overview".length());
 		if (target.startsWith("IAP"))
 			target = target.substring("IAP".length());
 		if (target.startsWith("."))
 			target = target.substring(".".length());
-
+		
 		HashMap<String, NavigationButton> knownEntities = new HashMap<String, NavigationButton>();
-
+		
 		for (NavigationButton ne : actionPanel.getEntitySet(target.length() > 0)) {
 			knownEntities.put(ne.getTitle(), ne);
 		}
@@ -205,6 +205,8 @@ public class AIPgui {
 			button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
 		} else {
 			System.out.println("Could not find target action " + thisTarget);
+			navigationPanel.getEntitySet(false).iterator().next().executeNavigation(
+					PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, null);
 		}
 	}
 }

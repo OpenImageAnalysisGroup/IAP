@@ -15,9 +15,9 @@ import javax.swing.JPanel;
  */
 public class CloudTaskAndServerOverviewComponent extends JPanel {
 	private static final long serialVersionUID = 1L;
-
+	
 	public CloudTaskAndServerOverviewComponent() {
 		setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
-
+		
 	}
 }

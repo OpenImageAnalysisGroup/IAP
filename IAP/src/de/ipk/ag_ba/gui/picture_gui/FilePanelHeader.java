@@ -19,43 +19,42 @@ import javax.swing.JPanel;
 
 public class FilePanelHeader extends JPanel {
 	private static final long serialVersionUID = 6358431643283288603L;
-
+	
 	JLabel header;
 	JButton button;
-
+	
 	public FilePanelHeader(JButton button) {
-
 		setBackground(new Color(240, 245, 240));
 		setOpaque(true);
-
+		
 		this.button = button;
-
+		
 		double[][] size = new double[][] { { 3, TableLayout.PREFERRED, 6, TableLayout.FILL, 3 },
 							{ 3, TableLayout.PREFERRED, 3 } };
-
+		
 		setLayout(new TableLayout(size));
-
+		
 		add(button, "1,1");
-
+		
 		header = new JLabel();
 		header.setText("");
 		header.validate();
 		header.repaint();
 		// header.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-
+		
 		add(header, "3,1");
 	}
-
+	
 	public void setText(String msg) {
 		header.setText(msg);
 		header.validate();
 		header.repaint();
 	}
-
+	
 	public void enableButton(boolean enableButton) {
 		button.setEnabled(enableButton);
 	}
-
+	
 	public boolean isButtonEnabled() {
 		return button.isEnabled();
 	}

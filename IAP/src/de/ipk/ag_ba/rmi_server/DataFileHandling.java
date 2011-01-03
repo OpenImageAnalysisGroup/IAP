@@ -24,7 +24,7 @@ import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
  * @author klukas
  */
 public class DataFileHandling {
-
+	
 	public synchronized RemoteInputStream downloadFile(OracleConnection conn, String md5, boolean returnPreview)
 						throws RemoteException {
 		String sqlCommand = "SELECT length(data) as len, data, databfile, filesize " + "FROM imageFile " + "WHERE md5=?";
@@ -41,7 +41,7 @@ public class DataFileHandling {
 			if (ps.getWarnings() == null) {
 				OracleResultSet rs = (OracleResultSet) ps.getResultSet();
 				ps.close();
-
+				
 				if (rs.next()) {
 					int maxBytes = rs.getInt("len");
 					result = readBlob(rs, maxBytes);
@@ -56,18 +56,18 @@ public class DataFileHandling {
 		}
 		return result;
 	}
-
+	
 	private RemoteInputStream readBlob(OracleResultSet rs, int maxBytes) throws SQLException {
 		final BLOB b = (BLOB) rs.getBlob("data");
 		return new SimpleRemoteInputStream(b.getBinaryStream(), new RemoteStreamMonitor<RemoteInputStreamServer>() {
 			@Override
 			public void localBytesSkipped(RemoteInputStreamServer stream, long numBytes) {
 			}
-
+			
 			@Override
 			public void localBytesMoved(RemoteInputStreamServer stream, int numBytes) {
 			}
-
+			
 			@Override
 			public void failure(RemoteInputStreamServer stream, Exception e) {
 				try {
@@ -76,7 +76,7 @@ public class DataFileHandling {
 					e1.printStackTrace();
 				}
 			}
-
+			
 			@Override
 			public void closed(RemoteInputStreamServer stream, boolean clean) {
 				try {
@@ -85,17 +85,17 @@ public class DataFileHandling {
 					e.printStackTrace();
 				}
 			}
-
+			
 			@Override
 			public void bytesSkipped(RemoteInputStreamServer stream, long numBytes, boolean isReattempt) {
 			}
-
+			
 			@Override
 			public void bytesMoved(RemoteInputStreamServer stream, int numBytes, boolean isReattempt) {
 			}
 		});
 	}
-
+	
 	private RemoteInputStream readBFile(OracleResultSet rs, int maxBytes) throws SQLException {
 		final BFILE bfile = rs.getBFILE("databfile");
 		bfile.openFile();
@@ -103,11 +103,11 @@ public class DataFileHandling {
 			@Override
 			public void localBytesSkipped(RemoteInputStreamServer stream, long numBytes) {
 			}
-
+			
 			@Override
 			public void localBytesMoved(RemoteInputStreamServer stream, int numBytes) {
 			}
-
+			
 			@Override
 			public void failure(RemoteInputStreamServer stream, Exception e) {
 				try {
@@ -116,7 +116,7 @@ public class DataFileHandling {
 					e1.printStackTrace();
 				}
 			}
-
+			
 			@Override
 			public void closed(RemoteInputStreamServer stream, boolean clean) {
 				try {
@@ -125,11 +125,11 @@ public class DataFileHandling {
 					e.printStackTrace();
 				}
 			}
-
+			
 			@Override
 			public void bytesSkipped(RemoteInputStreamServer stream, long numBytes, boolean isReattempt) {
 			}
-
+			
 			@Override
 			public void bytesMoved(RemoteInputStreamServer stream, int numBytes, boolean isReattempt) {
 			}

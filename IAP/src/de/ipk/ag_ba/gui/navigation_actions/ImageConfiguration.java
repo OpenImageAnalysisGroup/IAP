@@ -15,31 +15,31 @@ public enum ImageConfiguration {
 						"vis.side", "rgb.side", "rgb_side_image_unit", "rgbside"), RgbTop("vis.top", "rgb.top", "rgb_top_image_unit",
 						"RgbTop"), NirTop("nir.top", "nir_top_image_unit", "NirTop"), NirSide("nir.side", "nir_side_image_unit"), Unknown(
 						"unknown");
-
+	
 	private String name, name2, name3, name4;
-
+	
 	ImageConfiguration(String name) {
 		this.name = name;
 	}
-
+	
 	ImageConfiguration(String name, String name2) {
 		this.name = name;
 		this.name2 = name2;
 	}
-
+	
 	ImageConfiguration(String name, String name2, String name3) {
 		this.name = name;
 		this.name2 = name2;
 		this.name3 = name3;
 	}
-
+	
 	ImageConfiguration(String name, String name2, String name3, String name4) {
 		this.name = name;
 		this.name2 = name2;
 		this.name3 = name3;
 		this.name4 = name4;
 	}
-
+	
 	public static ImageConfiguration get(String name) {
 		for (ImageConfiguration i : values()) {
 			if (name.equalsIgnoreCase(i.name) || name.equalsIgnoreCase(i.name2) || name.equalsIgnoreCase(i.name3)
@@ -48,7 +48,7 @@ public enum ImageConfiguration {
 		}
 		return Unknown;
 	}
-
+	
 	@Override
 	public String toString() {
 		return name;

@@ -19,25 +19,25 @@ import de.ipk.ag_ba.mongo.MongoDB;
  * @author klukas
  */
 public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
-
+	
 	private NavigationButton src;
 	private final MongoDB m;
-
+	
 	public EnableOrDisableServerModeAction(MongoDB m) {
 		super("Start or stop server mode (cloud computing host)");
 		this.m = m;
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return CloudComputingService.getInstance().getStatusImageName();
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return CloudComputingService.getInstance().getTaskNameEnableOrDisableActionText();
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		NavigationAction cmna = new CloundManagerNavigationAction(m);
@@ -49,12 +49,12 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 		}
 		return new ArrayList<NavigationButton>();
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;

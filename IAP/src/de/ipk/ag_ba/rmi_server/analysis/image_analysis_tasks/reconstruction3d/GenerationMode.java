@@ -7,13 +7,13 @@ public enum GenerationMode {
 	GRAYSCALE_PROBABILITY("Gray Scale Probability"), COLORED("Colored, fixed cut off"),
 	// BINARY("Binary, fixed cut off"),
 	COLORED_RGBA("Colored, RGBA");
-
+	
 	String v;
-
+	
 	GenerationMode(String t) {
 		this.v = t;
 	}
-
+	
 	@Override
 	public String toString() {
 		return v;

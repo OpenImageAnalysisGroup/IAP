@@ -20,13 +20,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ExperimentViewer extends JComponent {
 	private static final long serialVersionUID = 1L;
 	private final Experiment experiment;
-
+	
 	public ExperimentViewer(Experiment statisticsResult) {
 		this.experiment = statisticsResult;
-
+		
 		initGui();
 	}
-
+	
 	private void initGui() {
 		DataTable dataTable = new DataTable(experiment);
 		ImageViewer imageViewer = new ImageViewer();
@@ -36,5 +36,5 @@ public class ExperimentViewer extends JComponent {
 		add(jsp, "0,0");
 		validate();
 	}
-
+	
 }

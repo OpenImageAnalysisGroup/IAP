@@ -33,6 +33,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -42,10 +43,10 @@ import display.DisplayHistogram;
  * @author klukas
  */
 public class ThreeDreconstructionAction extends AbstractNavigationAction {
-
+	
 	private final MongoDB m;
 	private final ExperimentReference experiment;
-
+	
 	NavigationButton src = null;
 	MainPanelComponent mpc;
 	ArrayList<ZoomedImage> zoomedImages = new ArrayList<ZoomedImage>();
@@ -53,45 +54,41 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 	ArrayList<NavigationButton> storedActions = new ArrayList<NavigationButton>();
 	private int voxelresolution = 200;
 	private int widthFactor = 40;
-
+	
 	public ThreeDreconstructionAction(MongoDB m, ExperimentReference experiment) {
 		super("Create 3-D Volumes using Space Carving Technology");
 		this.m = m;
 		this.experiment = experiment;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(final NavigationButton src) {
 		if (storedActions.size() > 0)
 			return;
 		storedActions = new ArrayList<NavigationButton>();
 		this.src = src;
-
-		histogram = null;
-		histogramG = null;
-		histogramB = null;
-
+		
 		Object[] inp = MyInputHelper.getInput("Please specify the cube resolution:", "3-D Reconstruction", new Object[] {
 							"Resolution (X=Y=Z)", voxelresolution, "Trim Width? (0..100)", widthFactor });
 		if (inp == null)
 			return;
 		voxelresolution = (Integer) inp[0];
 		widthFactor = (Integer) inp[1];
-
+		
 		try {
-			ExperimentInterface res = experiment.getData(m);
-
+			ExperimentInterface res = experiment.getData(m).clone();
+			
 			// src.title = src.title + ": processing";
-
+			
 			HashMap<Sample3D, ArrayList<NumericMeasurementInterface>> workset = new HashMap<Sample3D, ArrayList<NumericMeasurementInterface>>();
-
+			
 			for (SubstanceInterface m : res) {
 				Substance3D m3 = (Substance3D) m;
 				for (ConditionInterface s : m3) {
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						for (Measurement md : sd3.getAllMeasurements()) {
+						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.IMAGE)) {
 							if (md instanceof ImageData) {
 								ImageData i = (ImageData) md;
 								ImageConfiguration ic = ImageConfiguration.get(i.getSubstanceName());
@@ -105,43 +102,32 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 					}
 				}
 			}
-
+			
 			ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
-
+			
 			for (Sample3D s3d : workset.keySet()) {
-
+				
 				ArrayList<NumericMeasurementInterface> workload = workset.get(s3d);
-
+				
 				if (workload.size() < 1)
 					continue;
-
-				// DatabaseTarget saveClearedImagesToDB = null;
-				// ClearAndCalcStatsBackground clearTask = new
-				// ClearAndCalcStatsBackground(epsilon, epsilon2,
-				// saveClearedImagesToDB);
-				// clearTask.setInput(workload, login, pass);
-				// clearTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(),
-				// status);
-				//
-				// Collection<NumericMeasurementInterface> clearedImages =
-				// clearTask.getOutput();
-
+				
 				VolumeStatistics volumeStatistics = new VolumeStatistics();
-
+				
 				DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
-
+				
 				ThreeDreconstruction threeDreconstructionTask = new ThreeDreconstruction(saveVolumesToDB);
 				threeDreconstructionTask.setInput(workload, m);
 				threeDreconstructionTask.setResolution(voxelresolution, widthFactor);
 				threeDreconstructionTask.addResultProcessor(volumeStatistics);
-
+				
 				threeDreconstructionTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 2, status);
-
+				
 				System.out.println("Process Sample: " + s3d.toString() + " Substance: " + s3d.getParentCondition().getParentSubstance().getName());
-
-				HashMap<ImageAnalysisTask, ArrayList<NumericMeasurementInterface>> volumeStatisticsResults = threeDreconstructionTask
-									.getAdditionalResults();
-
+				
+				HashMap<ImageAnalysisTask, ArrayList<NumericMeasurementInterface>> volumeStatisticsResults =
+						threeDreconstructionTask.getAdditionalResults();
+				
 				ArrayList<NumericMeasurementInterface> statRes = volumeStatisticsResults.get(volumeStatistics);
 				if (statRes == null) {
 					// ErrorMsg.addErrorMessage("Error: no statistics result");
@@ -153,39 +139,36 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 					}
 				}
 			}
-
+			
 			Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
 			statisticsResult.getHeader().setExcelfileid("");
-
+			
 			MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
 			ip.setExperimentInfo(m, statisticsResult.getHeader(), true, statisticsResult);
 			mpc = new MainPanelComponent(ip, true);
-
+			
 			storedActions.add(FileManagerAction.getFileManagerEntity(m,
 								new ExperimentReference(statisticsResult), src.getGUIsetting()));
-
+			
 			storedActions.add(new NavigationButton(new CloudUploadEntity(m, new ExperimentReference(
 								statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
-
+			
 			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult, statisticsResult
 								.getHeader(), false, src.getGUIsetting(), m);
-			// TODO: create show with VANTED action with these action commands:
-			// AIPmain.showVANTED();
-			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			mpc = null;
 		}
 		// src.title = src.title.split("\\:")[0];
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
@@ -193,7 +176,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			NavigationButton imageHistogram = new NavigationButton(TableLayout.get3Split(histogram, histogramG,
 								histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED), src.getGUIsetting());
 			res.add(imageHistogram);
-
+			
 			NavigationButton imageZoom = new NavigationButton(ImageAnalysis3D.getImageZoomSlider(zoomedImages), src
 								.getGUIsetting());
 			res.add(imageZoom);
@@ -201,16 +184,16 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 		res.addAll(storedActions);
 		return res;
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return mpc;
 	}
-
+	
 	public static NavigationButton getThreeDreconstructionTaskEntity(MongoDB m,
 						final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
 						GUIsetting guiSetting) {
-
+		
 		NavigationAction threeDreconstructionAction = new ThreeDreconstructionAction(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(threeDreconstructionAction, title,
 							"img/RotationReconstruction.png", guiSetting);

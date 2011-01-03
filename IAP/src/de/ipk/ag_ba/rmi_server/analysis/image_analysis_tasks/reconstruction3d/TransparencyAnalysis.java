@@ -9,18 +9,18 @@ import org.Colors;
  * @author klukas
  */
 public class TransparencyAnalysis {
-
+	
 	ArrayList<Color> transparentColors = new ArrayList<Color>();
 	ArrayList<Float> transparentColorsH = new ArrayList<Float>();
 	ArrayList<Float> transparentColorsS = new ArrayList<Float>();
 	ArrayList<Float> transparentColorsB = new ArrayList<Float>();
-
+	
 	private double maxDiffHSV = 0.3;
-
+	
 	public TransparencyAnalysis(double backgroundDiff) {
 		maxDiffHSV = backgroundDiff;
 	}
-
+	
 	public void addColor(Color t) {
 		if (isTransparent(t))
 			return;
@@ -31,18 +31,18 @@ public class TransparencyAnalysis {
 		transparentColorsS.add(hsb[1]);
 		transparentColorsB.add(hsb[2]);
 	}
-
+	
 	public void reset() {
 		transparentColors.clear();
 	}
-
+	
 	public boolean isTransparent(Color c) {
 		int cr = c.getRed();
 		int cg = c.getGreen();
 		int cb = c.getBlue();
 		return isTransparent(cr, cg, cb);
 	}
-
+	
 	public boolean isTransparent(int cr, int cg, int cb) {
 		float[] hsb = new float[3];
 		Color.RGBtoHSB(cr, cg, cb, hsb);
@@ -59,7 +59,7 @@ public class TransparencyAnalysis {
 		}
 		return false;
 	}
-
+	
 	public void addColors(Color start, Color end) {
 		float f = 0;
 		for (int i = 1; i <= 30; i++) {
@@ -68,5 +68,5 @@ public class TransparencyAnalysis {
 			f += 1f / 30f;
 		}
 	}
-
+	
 }

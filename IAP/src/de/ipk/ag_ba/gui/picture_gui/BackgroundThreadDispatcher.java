@@ -21,17 +21,17 @@ public class BackgroundThreadDispatcher {
 	Stack<Integer> todoPriorities = new Stack<Integer>();
 	LinkedList<Thread> runningTasks = new LinkedList<Thread>();
 	int maxTask = SystemAnalysis.getNumberOfCPUs();
-
+	
 	int indicator = 0;
-
+	
 	public static String projectLoading = " PLEASE WAIT - Loading Experimental Data";
-
+	
 	private static BackgroundThreadDispatcher myInstance = new BackgroundThreadDispatcher();
-
+	
 	private Thread sheduler = null;
 	private StatusDisplay frame;
 	private static HashSet<Thread> waitThreads = new HashSet<Thread>();
-
+	
 	public static void setFrameInstance(StatusDisplay mainFrame) {
 		synchronized (myInstance) {
 			if (myInstance == null)
@@ -39,11 +39,11 @@ public class BackgroundThreadDispatcher {
 			myInstance.frame = mainFrame;
 		}
 	}
-
+	
 	public static MyThread addTask(Runnable r, String name, int userPriority) {
 		return addTask(new MyThread(r, name), userPriority);
 	}
-
+	
 	public static MyThread addTask(MyThread t, int userPriority) {
 		// System.out.println("Add task " + t.getName() + ", Priority: " + userPriority);
 		synchronized (myInstance) {
@@ -57,7 +57,7 @@ public class BackgroundThreadDispatcher {
 		}
 		return t;
 	}
-
+	
 	/**
 	 * Get the number of running+scheduled tasks.
 	 * 
@@ -66,7 +66,7 @@ public class BackgroundThreadDispatcher {
 	public static int getWorkLoad() {
 		return myInstance.getCountSheduledTasks() + myInstance.getCurrentRunningTasks();
 	}
-
+	
 	int getCountSheduledTasks() {
 		int load;
 		synchronized (todo) {
@@ -74,7 +74,7 @@ public class BackgroundThreadDispatcher {
 		}
 		return load;
 	}
-
+	
 	int getCurrentRunningTasks() {
 		int load;
 		synchronized (runningTasks) {
@@ -90,11 +90,11 @@ public class BackgroundThreadDispatcher {
 		}
 		return load;
 	}
-
+	
 	public BackgroundThreadDispatcher() {
 		if (myInstance != null)
 			return;
-
+		
 		final Timer t = new Timer(500, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String msg;
@@ -107,12 +107,12 @@ public class BackgroundThreadDispatcher {
 					indicatorStr = "\\\\\\";
 				if (indicator == 3)
 					indicatorStr = "|||";
-
+				
 				indicator++;
-
+				
 				if (indicator >= 4 || indicator < 0)
 					indicator = 0;
-
+				
 				int exec = getCurrentRunningTasks();
 				int wl = getCountSheduledTasks();
 				if (exec > 0 || wl > 0) {
@@ -127,7 +127,7 @@ public class BackgroundThreadDispatcher {
 			}
 		});
 		t.start();
-
+		
 		sheduler = new Thread(new Runnable() {
 			public void run() {
 				while (true) {
@@ -222,7 +222,7 @@ public class BackgroundThreadDispatcher {
 		});
 		sheduler.start();
 	}
-
+	
 	private boolean highMemoryLoad(LinkedList<Thread> runningTasks) {
 		if (runningTasks.size() < 1)
 			return false;
@@ -249,10 +249,10 @@ public class BackgroundThreadDispatcher {
 		} else
 			return false;
 	}
-
+	
 	private static long lastPrint = 0;
 	private static long lastGC = 0;
-
+	
 	protected void myRemove(Thread rt) {
 		synchronized (runningTasks) {
 			runningTasks.remove(rt);
@@ -262,7 +262,7 @@ public class BackgroundThreadDispatcher {
 				t.interrupt();
 		}
 	}
-
+	
 	private static void waitFor(HashSet<MyThread> threads) {
 		try {
 			if (!Thread.currentThread().getName().contains("wait;"))
@@ -301,16 +301,16 @@ public class BackgroundThreadDispatcher {
 			if (Thread.currentThread().getName().contains("wait;"))
 				Thread.currentThread().setName(Thread.currentThread().getName().substring("wait;".length()));
 		}
-
+		
 	}
-
+	
 	public static void waitFor(MyThread[] threads) {
 		HashSet<MyThread> t = new HashSet<MyThread>();
 		for (MyThread m : threads)
 			t.add(m);
 		waitFor(t);
 	}
-
+	
 	public static void waitFor(Collection<MyThread> threads) {
 		HashSet<MyThread> t = new HashSet<MyThread>();
 		for (MyThread m : threads)
@@ -318,7 +318,7 @@ public class BackgroundThreadDispatcher {
 		threads.clear();
 		waitFor(t);
 	}
-
+	
 	// private static final ThreadSafeOptions tso = new ThreadSafeOptions();
 	//
 	// private static ExecutorService execSvc = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {

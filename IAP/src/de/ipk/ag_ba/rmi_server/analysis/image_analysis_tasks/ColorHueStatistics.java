@@ -3,6 +3,7 @@ package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,6 @@ import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -27,15 +27,15 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  * @author klukas
  */
 public class ColorHueStatistics extends AbstractImageAnalysisTask {
-
+	
 	private Collection<NumericMeasurementInterface> output;
 	private final int colorCount;
 	private Collection<NumericMeasurementInterface> input;
-
+	
 	public ColorHueStatistics(int colorCount) {
 		this.colorCount = colorCount;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
@@ -45,7 +45,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	public ImageAnalysisType[] getInputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE, ImageAnalysisType.COLORED_VOLUME };
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
@@ -55,7 +55,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	public ImageAnalysisType[] getOutputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.MEASUREMENT };
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -66,7 +66,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	public Collection<NumericMeasurementInterface> getOutput() {
 		return output;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
@@ -76,7 +76,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	public String getTaskDescription() {
 		return "Calculates a Color-Hue Histogram";
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
@@ -91,7 +91,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status) {
 		performAnalysis(maximumThreadCount, 1, status);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
@@ -102,7 +102,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
 						BackgroundTaskStatusProviderSupportingExternalCall status) {
 		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCountParallelImages);
-
+		
 		for (Measurement meas : input) {
 			if (meas instanceof ImageData) {
 				final ImageData i = (ImageData) meas;
@@ -128,9 +128,9 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 							final int h = img.getHeight();
 							final int rgbArray[] = new int[w * h];
 							img.getRGB(0, 0, w, h, rgbArray, 0, w);
-
+							
 							int[] histogram = new int[colorCount];
-
+							
 							for (int c : rgbArray) {
 								Color c1 = new Color(c);
 								Color_CIE_Lab cCL1 = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(c1.getRed(), c1
@@ -140,8 +140,10 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 								histogram[bin]++;
 							}
 							for (int bin = 0; bin < colorCount; bin++) {
-								NumericMeasurement nnn = li.copyDataAndPath();
-								NumericMeasurement3D nm = new NumericMeasurement3D(nnn.getParentSample(), nnn);
+								NumericMeasurementInterface nnn = li.copyDataAndPath();
+								HashMap<String, Object> m = new HashMap<String, Object>();
+								nnn.fillAttributeMap(m);
+								NumericMeasurement3D nm = new NumericMeasurement3D(nnn.getParentSample(), m);
 								double b = 1d / colorCount * bin;
 								nm.setUnit("CIE_Lab");
 								nm.setPosition(b);
@@ -154,16 +156,16 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 				});
 			}
 		}
-
+		
 		try {
 			run.shutdown();
 			run.awaitTermination(1, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-
+		
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -174,7 +176,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -185,5 +187,5 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	public String getName() {
 		return "Color Hue Statistics";
 	}
-
+	
 }

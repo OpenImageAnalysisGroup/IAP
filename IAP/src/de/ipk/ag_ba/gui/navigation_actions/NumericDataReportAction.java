@@ -25,34 +25,34 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  * @author klukas
  */
 public class NumericDataReportAction extends AbstractNavigationAction {
-
+	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	private JTable table;
-
+	
 	public NumericDataReportAction(String tooltip) {
 		super(tooltip);
 	}
-
+	
 	public NumericDataReportAction(MongoDB m, ExperimentReference experimentReference) {
 		this("Show/export numeric data report");
 		this.m = m;
 		this.experimentReference = experimentReference;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
@@ -65,21 +65,21 @@ public class NumericDataReportAction extends AbstractNavigationAction {
 		cols.add("Weight (after watering)");
 		cols.add("Water");
 		Object[] columns = cols.toArray();
-
+		
 		ExperimentInterface experiment = experimentReference.getData(m);
 		ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
 		for (SubstanceInterface su : experiment) {
 			if (su.getSubstanceName() == null)
 				continue;
-
+			
 			if (su.getSubstanceName().equals("weight_before")) {
-
+				
 			}
 			if (su.getSubstanceName().equals("water_weight")) {
-
+				
 			}
 			if (su.getSubstanceName().equals("water_amount")) {
-
+				
 			}
 			for (ConditionInterface c : su) {
 				for (SampleInterface sa : c) {
@@ -93,14 +93,14 @@ public class NumericDataReportAction extends AbstractNavigationAction {
 				}
 			}
 		}
-
+		
 		ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
-
+		
 		Object[][] rowdata = new Object[rows.size()][cols.size()];
-
+		
 		table = new JTable(rowdata, columns);
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return new MainPanelComponent(table);

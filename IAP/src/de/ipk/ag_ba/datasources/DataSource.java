@@ -13,9 +13,9 @@ import org.graffiti.plugin.io.resources.ResourceIOHandler;
  * @author klukas
  */
 public interface DataSource extends ResourceIOHandler, DataSourceLevel {
-
+	
 	public void setLogin(String login, String password);
-
+	
 	/**
 	 * Used to prepare calls to any methods that need to return data from the
 	 * data source.

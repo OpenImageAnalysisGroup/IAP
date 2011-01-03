@@ -27,27 +27,27 @@ public class MongoDBpreviewHandler implements ResourceIOHandler {
 	private String PREFIX = "mongo-preview";
 	private final String ip;
 	private final MongoDB m;
-
+	
 	public MongoDBpreviewHandler(String ip, MongoDB m) {
 		this.ip = ip;
 		this.m = m;
 		if (ip != null && ip.length() > 0)
 			PREFIX = "mongo-preview_" + ip;
 	}
-
+	
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
 						throws Exception {
 		return null;
 	}
-
+	
 	@Override
 	public InputStream getInputStream(final IOurl url) throws Exception {
 		final ObjectRef or = new ObjectRef();
-
+		
 		m.processDB(new RunnableOnDB() {
 			private DB db;
-
+			
 			@Override
 			public void run() {
 				GridFS gridfs_preview_images = new GridFS(db, "preview_files");
@@ -61,7 +61,7 @@ public class MongoDBpreviewHandler implements ResourceIOHandler {
 					}
 				}
 			}
-
+			
 			@Override
 			public void setDB(DB db) {
 				this.db = db;
@@ -69,7 +69,7 @@ public class MongoDBpreviewHandler implements ResourceIOHandler {
 		});
 		return (InputStream) or.getObject();
 	}
-
+	
 	@Override
 	public String getPrefix() {
 		return PREFIX;

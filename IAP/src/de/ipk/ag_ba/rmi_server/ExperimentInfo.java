@@ -31,7 +31,7 @@ public class ExperimentInfo {
 	// public int id, excelfileid, imagefiles;
 	// public String name, remark, coordinator, owner, group;
 	// public Date start, end;
-
+	
 	public String experimentName;
 	public int experimentID;
 	public String importUser;
@@ -41,14 +41,14 @@ public class ExperimentInfo {
 	public Date dateExperimentImport;
 	public String remark;
 	public String coordinator;
-	public String excelFileMd5;
-
+	public String excelFileId;
+	
 	public int fileCount;
 	public int byteSize;
-
+	
 	public ExperimentInfo(String experimentName, int experimentID, String importUser, String userGroup,
 						String experimentType, Date dateExperimentStart, Date dateExperimentImport, String remark, String coordinator,
-						String excelFileMd5, int fileCount, int byteSize) {
+						String excelFileId, int fileCount, int byteSize) {
 		this.experimentName = experimentName;
 		this.experimentID = experimentID;
 		this.importUser = importUser;
@@ -58,11 +58,11 @@ public class ExperimentInfo {
 		this.dateExperimentImport = dateExperimentImport;
 		this.remark = remark;
 		this.coordinator = coordinator;
-		this.excelFileMd5 = excelFileMd5;
+		this.excelFileId = excelFileId;
 		this.fileCount = fileCount;
 		this.byteSize = byteSize;
 	}
-
+	
 	public ExperimentInfo(ExperimentHeaderInterface header) {
 		this.experimentName = header.getExperimentname();
 		try {
@@ -85,7 +85,7 @@ public class ExperimentInfo {
 		}
 		this.remark = header.getRemark();
 		this.coordinator = header.getCoordinator();
-		this.excelFileMd5 = "";
+		this.excelFileId = "";
 		try {
 			this.fileCount = header.getNumberOfFiles();
 		} catch (Exception e) {
@@ -97,9 +97,9 @@ public class ExperimentInfo {
 			this.byteSize = 0;
 		}
 	}
-
+	
 	public ExperimentInfo() {
 		// empty
 	}
-
+	
 }

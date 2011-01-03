@@ -20,27 +20,27 @@ package de.ipk.ag_ba.gui.picture_gui;
  *         Preferences - Java - Code Generation - Code and Comments
  */
 public interface DBEtreeNodeModelHelper {
-
+	
 	/**
 	 * @param index
 	 * @return Returns a children with given index (0..getChildCount()-1)
 	 */
 	public DBEtreeNodeModelHelper getChild(int index);
-
+	
 	/**
 	 * Memorize given index (index of child in parent node).
 	 * 
 	 * @param index
 	 */
 	public void setIndex(int index);
-
+	
 	/**
 	 * Set the information if this node is a leaf
 	 * 
 	 * @param isLeaf
 	 */
 	public void setIsLeaf(boolean isLeaf);
-
+	
 	/**
 	 * The given method will be run in order to enumerate the children. The
 	 * Runnable should get a reference to this interface-object and store the
@@ -49,25 +49,25 @@ public interface DBEtreeNodeModelHelper {
 	 * @param r
 	 */
 	public void setGetChildrenMethod(Runnable r);
-
+	
 	/**
 	 * Memorize the children.
 	 * 
 	 * @param children
 	 */
 	public void setChildren(DBEtreeNodeModelHelper[] children);
-
+	
 	/**
 	 * @return Index of child in parent node, needs to be saved before
 	 *         (setIndex).
 	 */
 	public int getIndex();
-
+	
 	/**
 	 * @return Number of children
 	 */
 	public int getChildCount();
-
+	
 	/**
 	 * @return True, if no children are possible
 	 */

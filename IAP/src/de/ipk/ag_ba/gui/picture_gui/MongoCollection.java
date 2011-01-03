@@ -11,13 +11,13 @@ package de.ipk.ag_ba.gui.picture_gui;
  */
 public enum MongoCollection {
 	IMAGES("images"), VOLUMES("volumes");
-
+	
 	String col;
-
+	
 	MongoCollection(String col) {
 		this.col = col;
 	}
-
+	
 	@Override
 	public String toString() {
 		return col;

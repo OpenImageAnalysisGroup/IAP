@@ -43,8 +43,8 @@ import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_actions.BookmarkAction;
 import de.ipk.ag_ba.gui.navigation_actions.Calendar2;
 import de.ipk.ag_ba.gui.util.MyUtility;
-import de.ipk.ag_ba.gui.webstart.AIPgui;
-import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.gui.webstart.IAPgui;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.rmi_server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -54,26 +54,26 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.ProgressStatusService;
  * @author klukas
  */
 public class NavigationButton implements StyleAware {
-
+	
 	private String title;
 	private String navigationImage, actionImage;
 	private NavigationAction action;
 	private String tooltipHint;
 	private JComponent gui;
 	private boolean processing;
-
+	
 	private long processingStart = 0;
 	private JComponent sideGui;
 	private double sideGuiSpace;
 	private double sideGuiWidth;
 	private ImageIcon icon;
-
+	
 	protected Runnable optFinishAction = null;
 	private Runnable execution;
 	private boolean rightAligned;
 	private ProgressStatusService statusServer;
 	private final GUIsetting guiSetting;
-
+	
 	public NavigationButton(NavigationAction navigationAction, GUIsetting guiSetting) {
 		if (navigationAction != null) {
 			boolean enableRemoteTaskExecution = false;
@@ -92,14 +92,14 @@ public class NavigationButton implements StyleAware {
 		this.guiSetting = guiSetting;
 		this.action = navigationAction;
 	}
-
+	
 	public NavigationButton(NavigationAction navigationAction, String title, String image, GUIsetting guiSetting) {
 		this(navigationAction, guiSetting);
 		this.setTitle(title);
 		this.navigationImage = image;
 		this.actionImage = image;
 	}
-
+	
 	public NavigationButton(NavigationAction navigationAction, String title, String navigationImage, String actionImage,
 						GUIsetting guiSetting) {
 		this(navigationAction, guiSetting);
@@ -107,33 +107,33 @@ public class NavigationButton implements StyleAware {
 		this.navigationImage = navigationImage;
 		this.actionImage = actionImage;
 	}
-
+	
 	public NavigationButton(JComponent gui, GUIsetting guiSetting) {
 		this.gui = gui;
 		this.guiSetting = guiSetting;
 	}
-
+	
 	public NavigationButton(BookmarkAction ba, BufferedImage image, GUIsetting guiSetting) {
 		this(ba, guiSetting);
 		this.icon = image != null ? new ImageIcon(image) : null;
 	}
-
+	
 	public JComponent getGUI() {
 		return gui;
 	}
-
+	
 	public void setToolTipText(String hint) {
 		this.tooltipHint = hint;
 	}
-
+	
 	public String getNavigationImage() {
 		return navigationImage;
 	}
-
+	
 	public String getActionImage() {
 		return actionImage;
 	}
-
+	
 	public String getTitle() {
 		long compTime = System.currentTimeMillis() - processingStart;
 		if (!processing || compTime < 1000)
@@ -150,10 +150,10 @@ public class NavigationButton implements StyleAware {
 				cc = "/";
 			if (ndots == 3)
 				cc = "-";
-
+			
 			while (dots.length() < 1)
 				dots += cc;
-
+			
 			String progress = "";
 			String s = "";
 			if (action.getStatusProvider().getCurrentStatusValueFine() > 0) {
@@ -162,10 +162,10 @@ public class NavigationButton implements StyleAware {
 				while (progress.length() < 5)
 					progress = "_" + progress;
 				progress = "";
-
+				
 				s = "<br>";
 				int len = (dots + " " + title + progress).length();
-				s += getProgress("-", "..", len + 5, action.getStatusProvider().getCurrentStatusValueFine());
+				s += "<code>[" + getProgress("#", "-", len + 5, action.getStatusProvider().getCurrentStatusValueFine()) + "]</code>";
 			}
 			String line2 = "";
 			if (action.getStatusProvider() != null && action.getStatusProvider().getCurrentStatusMessage1() != null
@@ -187,7 +187,7 @@ public class NavigationButton implements StyleAware {
 			return "<html><small><b><center>" + dots + " " + title + progress + " " + dots + "" + s + line2;
 		}
 	}
-
+	
 	private String getProgress(String c, String o, int len, double currentStatusValue) {
 		StringBuilder s = new StringBuilder();
 		while (s.length() < len) {
@@ -199,50 +199,50 @@ public class NavigationButton implements StyleAware {
 		}
 		return s.toString();
 	}
-
+	
 	public NavigationAction getAction() {
 		return action;
 	}
-
+	
 	public String getToolTip() {
 		if (tooltipHint != null)
 			return tooltipHint;
 		else
 			return action != null ? action.getDefaultTooltip() : null;
 	}
-
+	
 	public void setProcessing(boolean b) {
 		this.processing = b;
 		this.processingStart = System.currentTimeMillis();
 		statusServer = new ProgressStatusService();
 	}
-
+	
 	public boolean isProcessing() {
 		return processing;
 	}
-
+	
 	public void setSideGUI(JComponent sideGui, double sideGuiSpace, double sideGuiWidth) {
 		this.sideGui = sideGui;
 		this.sideGuiSpace = sideGuiSpace;
 		this.sideGuiWidth = sideGuiWidth;
 	}
-
+	
 	public JComponent getSideGui() {
 		return sideGui;
 	}
-
+	
 	public double getSideGuiSpace() {
 		return sideGuiSpace;
 	}
-
+	
 	public double getSideGuiWidth() {
 		return sideGuiWidth;
 	}
-
+	
 	public void setIcon(ImageIcon i) {
 		this.icon = i;
 	}
-
+	
 	public ImageIcon getIcon() {
 		if (action != null) {
 			if (action.getImageIcon() != null)
@@ -250,41 +250,41 @@ public class NavigationButton implements StyleAware {
 		}
 		return icon;
 	}
-
+	
 	public boolean willProvideActions() {
 		return action != null ? action.getProvidesActions() : false;
 	}
-
+	
 	public void performAction() {
 		if (execution != null)
 			execution.run();
 	}
-
+	
 	public Runnable getExecution() {
 		return execution;
 	}
-
+	
 	public void setExecution(Runnable execution) {
 		this.execution = execution;
 	}
-
+	
 	public void setRightAligned(boolean b) {
 		this.rightAligned = b;
 	}
-
+	
 	public boolean isRightAligned() {
 		return rightAligned;
 	}
-
+	
 	public void setTitle(String title) {
 		this.title = title;
 	}
-
+	
 	@Override
 	public void setButtonStyle(ButtonDrawStyle style) {
 		// empty, override if needed
 	}
-
+	
 	public static void checkButtonTitle(final NavigationButton n, final JButton n1) {
 		if (n1 == null)
 			return;
@@ -306,7 +306,7 @@ public class NavigationButton implements StyleAware {
 		rr.setObject(r);
 		r.run();
 	}
-
+	
 	public static void checkButtonTitle(final WeakReference<NavigationButton> wn, final WeakReference<JButton> wn1) {
 		if (wn1 == null || wn == null)
 			return;
@@ -333,13 +333,13 @@ public class NavigationButton implements StyleAware {
 		rr.setObject(r);
 		r.run();
 	}
-
+	
 	public void executeNavigation(final PanelTarget target, final MyNavigationPanel navPanel,
 						final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
 						final Runnable optFinishAction) {
 		executeNavigation(target, navPanel, actionPanel, graphPanel, n1, optFinishAction, false);
 	}
-
+	
 	public void executeNavigation(final PanelTarget target, final MyNavigationPanel navPanel,
 						final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
 						final Runnable optFinishAction, final boolean recursive) {
@@ -351,20 +351,20 @@ public class NavigationButton implements StyleAware {
 				n1.setText("Please wait");
 			return;
 		}
-
+		
 		if (srcNavGraphicslEntity.getAction() != null) {
 			if (srcNavGraphicslEntity.getAction().getStatusProvider() == null) {
 				System.err.println("Internal Error: No Status-Provider available! Action: "
 									+ srcNavGraphicslEntity.getAction().getDefaultTitle());
 				return;
 			}
-
+			
 			srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(-1);
 			srcNavGraphicslEntity.setProcessing(true);
 			NavigationButton.checkButtonTitle(srcNavGraphicslEntity, n1);
 			MyUtility.navigate(navPanel.getEntitySet(false), srcNavGraphicslEntity.getTitle());
 			final NavigationAction na = srcNavGraphicslEntity.getAction();
-
+			
 			BackgroundTaskHelper.issueSimpleTask(srcNavGraphicslEntity.getTitle(), "Please wait...", new Runnable() {
 				public void run() {
 					try {
@@ -422,9 +422,9 @@ public class NavigationButton implements StyleAware {
 									errors.add(e);
 								}
 								ErrorMsg.clearErrorMessages();
-
+								
 								JComponent gui = TableLayout.getMultiSplitVertical(errors, 2);
-
+								
 								graphPanel.add(gui, "0,0");
 								graphPanel.validate();
 								graphPanel.setEnabled(true);
@@ -432,7 +432,7 @@ public class NavigationButton implements StyleAware {
 								graphPanel.repaint();
 							}
 						}
-
+						
 						if (target == PanelTarget.NAVIGATION) {
 							ArrayList<NavigationButton> prior = new ArrayList<NavigationButton>();
 							boolean includeBookmarks = false;
@@ -447,7 +447,7 @@ public class NavigationButton implements StyleAware {
 							ArrayList<NavigationButton> res = na.getResultNewNavigationSet(prior);
 							if (res != null && res.size() > 0 && res.get(res.size() - 1) == null) {
 								String path = MyNavigationPanel.getTargetPath(res);
-								AIPgui.navigateTo(path, NavigationButton.this);
+								IAPgui.navigateTo(path, NavigationButton.this);
 							} else
 								navPanel.setEntitySet(res);
 						} else {
@@ -459,7 +459,7 @@ public class NavigationButton implements StyleAware {
 							if (set != null)
 								if (set != null && set.size() > 0 && set.get(set.size() - 1) == null) {
 									String path = MyNavigationPanel.getTargetPath(set);
-									AIPgui.navigateTo(path, NavigationButton.this);
+									IAPgui.navigateTo(path, NavigationButton.this);
 									reload = true;
 								} else {
 									for (final NavigationButton src : set) {
@@ -490,7 +490,7 @@ public class NavigationButton implements StyleAware {
 						if (optFinishAction != null) {
 							BackgroundTaskHelper.executeLaterOnSwingTask(10, optFinishAction);
 						}
-
+						
 					} finally {
 						srcNavGraphicslEntity.setProcessing(false);
 						if (n1 != null)
@@ -501,32 +501,32 @@ public class NavigationButton implements StyleAware {
 			}, srcNavGraphicslEntity.getAction().getStatusProvider());
 		}
 	}
-
+	
 	public static JComponent getNavigationButton(ButtonDrawStyle style, final NavigationButton n,
 						final PanelTarget target, final MyNavigationPanel navPanel, final MyNavigationPanel actionPanel,
 						final JComponent graphPanel) {
-
+		
 		if (n.getGUI() != null)
 			return n.getGUI();
-
+		
 		int imgS = 48;
-
+		
 		if (style == ButtonDrawStyle.COMPACT_LIST)
 			if (target == PanelTarget.NAVIGATION)
 				imgS = 25;// 32;
 			else
 				imgS = 48;
-
+		
 		ImageIcon icon;
 		if (n.getIcon() != null) {
 			icon = new ImageIcon(GravistoService.getScaledImage(n.getIcon().getImage(), -imgS, imgS));
 		} else {
 			if (target == PanelTarget.NAVIGATION)
-				icon = GravistoService.loadIcon(AIPmain.class, n.getNavigationImage(), -imgS, imgS);
+				icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS);
 			else
-				icon = GravistoService.loadIcon(AIPmain.class, n.getActionImage(), -imgS, imgS);
+				icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS);
 		}
-
+		
 		final JButton n1 = new JButton("" + n.getTitle());
 		switch (style) {
 			case FLAT:
@@ -551,40 +551,40 @@ public class NavigationButton implements StyleAware {
 				n1.setBorderPainted(true);
 				n1.setContentAreaFilled(true);
 		}
-
+		
 		n1.setToolTipText(n.getToolTip());
 		n1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		n1.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-
+				//
+				
 			}
-
+			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-
+				//
+				
 			}
-
+			
 			@Override
 			public void mouseExited(MouseEvent e) {
 				// if (n1 != null && n1.getText() != null && n1.getText().startsWith("<html><u>"))
 				// n1.setText(n1.getText().substring("<html><u>".length()));
 			}
-
+			
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				// n1.setText("<html><u>" + n1.getText());
 			}
-
+			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-
+				//
+				
 			}
 		});
-
+		
 		if (n instanceof Calendar2) {
 			if (style != ButtonDrawStyle.TEXT) {
 				icon = new MyCalendarIcon(icon, (Calendar2) n, imgS);
@@ -597,10 +597,10 @@ public class NavigationButton implements StyleAware {
 			} else
 				icon = null;
 		}
-
+		
 		if (icon != null)
 			n1.setIcon(icon);
-
+		
 		if (n.isProcessing()) {
 			NavigationButton.checkButtonTitle(n, n1);
 		} else {
@@ -608,9 +608,9 @@ public class NavigationButton implements StyleAware {
 			WeakReference<NavigationButton> wn = new WeakReference<NavigationButton>(n);
 			NavigationButton.checkButtonTitle(wn, wn1);
 		}
-
+		
 		n1.setOpaque(false);
-
+		
 		if (style != ButtonDrawStyle.COMPACT_LIST || target == PanelTarget.ACTION) {
 			n1.setVerticalTextPosition(SwingConstants.BOTTOM);
 			n1.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -627,17 +627,17 @@ public class NavigationButton implements StyleAware {
 				n.performAction();
 			}
 		});
-
+		
 		if (n.getToolTip() != null && n.getToolTip().length() > 0)
 			n1.setToolTipText(n.getToolTip());
-
+		
 		if (n.getSideGui() != null)
 			return TableLayout.get3Split(n1, null, n.getSideGui(), TableLayout.PREFERRED, n.getSideGuiSpace(),
 								n.getSideGuiWidth());
 		else
 			return n1;
 	}
-
+	
 	public GUIsetting getGUIsetting() {
 		return guiSetting;
 	}

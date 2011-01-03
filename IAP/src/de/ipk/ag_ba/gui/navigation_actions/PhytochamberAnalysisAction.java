@@ -28,6 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Runnable
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -44,13 +45,13 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 	MainPanelComponent mpc;
 	ArrayList<ZoomedImage> zoomedImages = new ArrayList<ZoomedImage>();
 	private Experiment experimentResult;
-
+	
 	// used when started as remote analysis task
 	private RunnableWithMappingData resultReceiver;
 	private int workOnSubset;
 	private int numberOfSubsets;
 	private String mongoDatasetID;
-
+	
 	public PhytochamberAnalysisAction(MongoDB m, double epsilon, double epsilon2,
 						ExperimentReference experiment) {
 		super("Analyse Phytochamber Top-Images");
@@ -62,25 +63,25 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 		if (experiment != null && experiment.getHeader() != null)
 			this.mongoDatasetID = experiment.getHeader().getExcelfileid();
 	}
-
+	
 	public PhytochamberAnalysisAction() {
 		super("Analyse phytochamber top-images");
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(final NavigationButton src) {
 		this.src = src;
-
+		
 		if (experimentResult != null)
 			return;
-
+		
 		try {
 			ExperimentInterface res = experiment.getData(m);
-
+			
 			ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
-
+			
 			HashSet<String> ignored = new HashSet<String>();
-
+			
 			int workIndex = 0;
 			for (SubstanceInterface m : res) {
 				Substance3D m3 = (Substance3D) m;
@@ -88,7 +89,7 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						for (Measurement md : sd3.getAllMeasurements()) {
+						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.IMAGE)) {
 							workIndex++;
 							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
 								if (md instanceof ImageData) {
@@ -111,26 +112,26 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 					}
 				}
 			}
-
+			
 			// for (String i : ignored) {
 			// System.out.println("Ignored Image Input - Type: " + i);
 			// }
-
+			
 			if (status != null)
 				status.setCurrentStatusText1("Workload: " + workload.size() + " images");
-
+			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setInt(1);
-
+			
 			// for (NumericMeasurementInterface id : workload) {
 			// System.out.println("Input: " + (((ImageData)
 			// id).getURL()).getDetail());
 			// }
-
+			
 			PhytochamberAnalysisTask task = new PhytochamberAnalysisTask();
-
+			
 			// task.addPreprocessor(new CutImagePreprocessor());
-
+			
 			TreeMap<Long, String> times = new TreeMap<Long, String>();
 			// for (int r = 1; r <= 3; r++)
 			// for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 4)
@@ -151,10 +152,10 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 			// System.out.println(s);
 			// }
 			// }
-
+			
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
 			Collection<NumericMeasurementInterface> statRes = task.getOutput();
-
+			
 			if (statRes == null) {
 				ErrorMsg.addErrorMessage("Error: no statistics result");
 			} else {
@@ -165,16 +166,16 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 						newStatisticsData.add(new MappingData3DPath(m));
 				}
 			}
-
+			
 			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 			statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
-
+			
 			statisticsResult.getHeader().setExcelfileid("");
 			if (resultReceiver == null) {
 				if (status != null)
 					status.setCurrentStatusText1("Ready");
-
+				
 				MyExperimentInfoPanel info = new MyExperimentInfoPanel();
 				info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
 				mpc = new MainPanelComponent(info, true);
@@ -189,51 +190,51 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 			mpc = null;
 		}
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-
+		
 		res.add(FileManagerAction.getFileManagerEntity(m, new ExperimentReference(experimentResult),
 							src.getGUIsetting()));
-
+		
 		res.add(new NavigationButton(new CloudUploadEntity(m, new ExperimentReference(experimentResult)),
 							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
-
+		
 		MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
 							false, src.getGUIsetting(), m);
 		return res;
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return mpc;
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return "img/ext/phyto.png";
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return "Arabidopsis Analysis";
 	}
-
+	
 	@Override
 	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver) {
 		this.resultReceiver = resultReceiver;
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
 	}
-
+	
 	@Override
 	public void setParams(ExperimentReference experiment, MongoDB m, String params) {
 		this.experiment = experiment;
@@ -241,12 +242,12 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 		this.epsilon = 10;
 		this.epsilon2 = 15;
 	}
-
+	
 	@Override
 	public String getMongoDatasetID() {
 		return mongoDatasetID;
 	}
-
+	
 	@Override
 	public MongoDB getMongoDB() {
 		return m;

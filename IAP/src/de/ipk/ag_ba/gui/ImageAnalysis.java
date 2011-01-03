@@ -49,29 +49,29 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  */
 @SuppressWarnings("restriction")
 public class ImageAnalysis {
-
+	
 	public static NavigationButton getPhenotypingEntity(final MongoDB m,
 						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
-
+		
 		NavigationAction phenotypeAnalysisAction = new PhenotypeAnalysisAction(m, epsilon, epsilon2, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}
-
+	
 	public static NavigationButton getPhytochamberEntity(final MongoDB m,
 						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
-
+		
 		NavigationAction phenotypeAnalysisAction = new PhytochamberAnalysisAction(m, epsilon, epsilon2, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}
-
+	
 	// public static BufferedImage convertToGrayscale(BufferedImage source) {
 	// BufferedImageOp op = new
 	// ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
 	// return op.filter(source, null);
 	// }
-
+	
 	public static Histogram getHistogram(Image img, int band) {
 		ParameterBlock pb1 = new ParameterBlock();
 		BufferedImage bi = toBufferedImage(img);
@@ -88,19 +88,19 @@ public class ImageAnalysis {
 		javax.media.jai.Histogram histo1 = (javax.media.jai.Histogram) dummyImage1.getProperty("histogram");
 		return histo1;
 	}
-
+	
 	public static BufferedImage toBufferedImage(Image image) {
 		if (image instanceof BufferedImage) {
 			return (BufferedImage) image;
 		}
-
+		
 		// This code ensures that all the pixels in the image are loaded
 		image = new ImageIcon(image).getImage();
-
+		
 		// Determine if the image has transparent pixels; for this method's
 		// implementation, see Determining If an Image Has Transparent Pixels
 		boolean hasAlpha = false;
-
+		
 		// Create a buffered image with a format that's compatible with the screen
 		BufferedImage bimage = null;
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -110,7 +110,7 @@ public class ImageAnalysis {
 			if (hasAlpha) {
 				transparency = Transparency.BITMASK;
 			}
-
+			
 			// Create the buffered image
 			GraphicsDevice gs = ge.getDefaultScreenDevice();
 			GraphicsConfiguration gc = gs.getDefaultConfiguration();
@@ -118,7 +118,7 @@ public class ImageAnalysis {
 		} catch (HeadlessException e) {
 			// The system does not have a screen
 		}
-
+		
 		if (bimage == null) {
 			// Create a buffered image using the default color model
 			int type = BufferedImage.TYPE_INT_RGB;
@@ -127,17 +127,17 @@ public class ImageAnalysis {
 			}
 			bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), type);
 		}
-
+		
 		// Copy image to buffered image
 		Graphics g = bimage.createGraphics();
-
+		
 		// Paint the image onto the buffered image
 		g.drawImage(image, 0, 0, null);
 		g.dispose();
-
+		
 		return bimage;
 	}
-
+	
 	public static Image convertToGreen(BufferedImage source) {
 		ImageFilter filter = new RGBImageFilter() {
 			@Override
@@ -145,11 +145,11 @@ public class ImageAnalysis {
 				return rgb & 0xFF00FF00;
 			}
 		};
-
+		
 		ImageProducer ip = new FilteredImageSource(source.getSource(), filter);
 		return Toolkit.getDefaultToolkit().createImage(ip);
 	}
-
+	
 	public static Image convertToRed(BufferedImage source) {
 		ImageFilter filter = new RGBImageFilter() {
 			@Override
@@ -157,11 +157,11 @@ public class ImageAnalysis {
 				return rgb & 0xFFFF0000;
 			}
 		};
-
+		
 		ImageProducer ip = new FilteredImageSource(source.getSource(), filter);
 		return Toolkit.getDefaultToolkit().createImage(ip);
 	}
-
+	
 	public static Image convertToBlue(BufferedImage source) {
 		ImageFilter filter = new RGBImageFilter() {
 			@Override
@@ -169,21 +169,21 @@ public class ImageAnalysis {
 				return rgb & 0xFF0000FF;
 			}
 		};
-
+		
 		ImageProducer ip = new FilteredImageSource(source.getSource(), filter);
 		return Toolkit.getDefaultToolkit().createImage(ip);
 	}
-
+	
 	public static JComponent getImageZoomSlider(final ArrayList<ZoomedImage> zoomedImages) {
-
+		
 		int FPS_MIN = 0;
 		int FPS_MAX = 400;
 		int FPS_INIT = 100;
-
+		
 		final JSlider sliderZoom = new JSlider(JSlider.HORIZONTAL, FPS_MIN, FPS_MAX, FPS_INIT);
-
+		
 		final JLabel lbl = new JLabel("Zoom (100%)");
-
+		
 		// Turn on labels at major tick marks.
 		sliderZoom.setMajorTickSpacing(100);
 		sliderZoom.setMinorTickSpacing(10);
@@ -196,7 +196,7 @@ public class ImageAnalysis {
 				sliderZoom.setVisible(true);
 			}
 		});
-
+		
 		for (ZoomedImage zoomedImage : zoomedImages) {
 			if (zoomedImage.getInt() == 0)
 				zoomedImage.setInt(100);
@@ -205,7 +205,7 @@ public class ImageAnalysis {
 				sliderZoom.setValue(zoomedImage.getInt());
 			}
 		}
-
+		
 		sliderZoom.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				JSlider s = (JSlider) e.getSource();
@@ -220,10 +220,10 @@ public class ImageAnalysis {
 				}
 			}
 		});
-
+		
 		return TableLayout.getSplitVertical(lbl, sliderZoom, TableLayout.PREFERRED, TableLayout.PREFERRED);
 	}
-
+	
 	private static void updateZoom(final ZoomedImage zoomedImage, final JLabel lbl, JSlider s, int val) {
 		lbl.setText("Zoom (" + val + "%)");
 		zoomedImage.setInt(val);

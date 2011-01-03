@@ -25,10 +25,10 @@ import com.jcraft.jsch.UserInfo;
 
 public class Sftp {
 	public static void main(String[] arg) {
-
+		
 		try {
 			JSch jsch = new JSch();
-
+			
 			String host = null;
 			if (arg.length > 0) {
 				host = arg[0];
@@ -39,35 +39,35 @@ public class Sftp {
 			String user = host.substring(0, host.indexOf('@'));
 			host = host.substring(host.indexOf('@') + 1);
 			int port = 22;
-
+			
 			Session session = jsch.getSession(user, host, port);
-
+			
 			// username and password will be given via UserInfo interface.
 			UserInfo ui = new MyUserInfo();
 			session.setUserInfo(ui);
-
+			
 			session.connect();
-
+			
 			Channel channel = session.openChannel("sftp");
 			channel.connect();
 			ChannelSftp c = (ChannelSftp) channel;
-
+			
 			java.io.InputStream in = System.in;
 			java.io.PrintStream out = System.out;
-
+			
 			java.util.Vector<String> cmds = new java.util.Vector<String>();
 			byte[] buf = new byte[1024];
 			int i;
 			String str;
 			int level = 0;
-
+			
 			while (true) {
 				out.print("sftp> ");
 				cmds.removeAllElements();
 				i = in.read(buf, 0, 1024);
 				if (i <= 0)
 					break;
-
+				
 				i--;
 				if (i > 0 && buf[i - 1] == 0x0d)
 					i--;
@@ -92,7 +92,7 @@ public class Sftp {
 				}
 				if (cmds.size() == 0)
 					continue;
-
+				
 				String cmd = cmds.elementAt(0);
 				if (cmd.equals("quit")) {
 					c.quit();
@@ -216,12 +216,12 @@ public class Sftp {
 						if (vv != null) {
 							for (int ii = 0; ii < vv.size(); ii++) {
 								// out.println(vv.elementAt(ii).toString());
-
+								
 								Object obj = vv.elementAt(ii);
 								if (obj instanceof com.jcraft.jsch.ChannelSftp.LsEntry) {
 									out.println(((com.jcraft.jsch.ChannelSftp.LsEntry) obj).getLongname());
 								}
-
+								
 							}
 						}
 					} catch (SftpException e) {
@@ -363,30 +363,30 @@ public class Sftp {
 		}
 		System.exit(0);
 	}
-
+	
 	public static class MyUserInfo implements UserInfo, UIKeyboardInteractive {
 		public String getPassword() {
 			return passwd;
 		}
-
+		
 		public boolean promptYesNo(String str) {
 			Object[] options = { "yes", "no" };
 			int foo = JOptionPane.showOptionDialog(null, str, "Warning", JOptionPane.DEFAULT_OPTION,
 								JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 			return foo == 0;
 		}
-
+		
 		String passwd;
 		JTextField passwordField = new JPasswordField(20);
-
+		
 		public String getPassphrase() {
 			return null;
 		}
-
+		
 		public boolean promptPassphrase(String message) {
 			return true;
 		}
-
+		
 		public boolean promptPassword(String message) {
 			Object[] ob = { passwordField };
 			int result = JOptionPane.showConfirmDialog(null, ob, message, JOptionPane.OK_CANCEL_OPTION);
@@ -397,35 +397,35 @@ public class Sftp {
 				return false;
 			}
 		}
-
+		
 		public void showMessage(String message) {
 			JOptionPane.showMessageDialog(null, message);
 		}
-
+		
 		final GridBagConstraints gbc = new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST,
 							GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0);
 		private Container panel;
-
+		
 		public String[] promptKeyboardInteractive(String destination, String name, String instruction, String[] prompt,
 							boolean[] echo) {
 			panel = new JPanel();
 			panel.setLayout(new GridBagLayout());
-
+			
 			gbc.weightx = 1.0;
 			gbc.gridwidth = GridBagConstraints.REMAINDER;
 			gbc.gridx = 0;
 			panel.add(new JLabel(instruction), gbc);
 			gbc.gridy++;
-
+			
 			gbc.gridwidth = GridBagConstraints.RELATIVE;
-
+			
 			JTextField[] texts = new JTextField[prompt.length];
 			for (int i = 0; i < prompt.length; i++) {
 				gbc.fill = GridBagConstraints.NONE;
 				gbc.gridx = 0;
 				gbc.weightx = 1;
 				panel.add(new JLabel(prompt[i]), gbc);
-
+				
 				gbc.gridx = 1;
 				gbc.fill = GridBagConstraints.HORIZONTAL;
 				gbc.weighty = 1;
@@ -437,7 +437,7 @@ public class Sftp {
 				panel.add(texts[i], gbc);
 				gbc.gridy++;
 			}
-
+			
 			if (JOptionPane.showConfirmDialog(null, panel, destination + ": " + name, JOptionPane.OK_CANCEL_OPTION,
 								JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION) {
 				String[] response = new String[prompt.length];
@@ -450,7 +450,7 @@ public class Sftp {
 			}
 		}
 	}
-
+	
 	/*
 	 * public static class MyProgressMonitor implements
 	 * com.jcraft.jsch.ProgressMonitor{ JProgressBar progressBar; JFrame frame;
@@ -475,7 +475,7 @@ public class Sftp {
 		ProgressMonitor monitor;
 		long count = 0;
 		long max = 0;
-
+		
 		public void init(int op, String src, String dest, long max) {
 			this.max = max;
 			monitor = new ProgressMonitor(null, ((op == SftpProgressMonitor.PUT) ? "put" : "get") + ": " + src, "", 0,
@@ -485,28 +485,28 @@ public class Sftp {
 			monitor.setProgress((int) this.count);
 			monitor.setMillisToDecideToPopup(1000);
 		}
-
+		
 		private long percent = -1;
-
+		
 		public boolean count(long count) {
 			this.count += count;
-
+			
 			if (percent >= this.count * 100 / max) {
 				return true;
 			}
 			percent = this.count * 100 / max;
-
+			
 			monitor.setNote("Completed " + this.count + "(" + percent + "%) out of " + max + ".");
 			monitor.setProgress((int) this.count);
-
+			
 			return !(monitor.isCanceled());
 		}
-
+		
 		public void end() {
 			monitor.close();
 		}
 	}
-
+	
 	private static String help = "      Available commands:\n" + "      * means unimplemented command.\n"
 						+ "cd path                       Change remote directory to 'path'\n"
 						+ "lcd path                      Change local directory to 'path'\n"

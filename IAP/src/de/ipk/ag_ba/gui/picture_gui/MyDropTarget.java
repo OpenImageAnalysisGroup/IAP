@@ -34,21 +34,21 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 	MongoTreeNode targetTreeNode;
 	JTree expTree;
 	private final MongoDB m;
-
+	
 	public MyDropTarget(MongoDB m, DataSetFilePanel panel, MongoTreeNode targetTreeNode, JTree expTree) {
 		this.panel = panel;
 		this.targetTreeNode = targetTreeNode;
 		this.expTree = expTree;
 		this.m = m;
 	}
-
+	
 	public boolean isTargetReadOnly() {
 		// in case it is no DBE-TreeNode or if it is one and it is Read-Only
 		// then reject drop
 		// in case it is null, it is also readOnly
 		return targetTreeNode == null || (targetTreeNode != null && targetTreeNode.isReadOnly());
 	}
-
+	
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -60,12 +60,12 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 			e.rejectDrop();
 			return;
 		}
-
+		
 		e.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-
+		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setBval(0, false); // not yet finished
-
+		
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 							"Drag & Drop in progress...", "please wait");
 		BackgroundTaskHelper.issueSimpleTask("Drag & Drop", "Drag & Drop in progress...", new Runnable() {
@@ -87,7 +87,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 				}
 			}
 		}, null);
-
+		
 		String s0 = null;
 		if (e.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 			try {
@@ -102,7 +102,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 			s0 = MyTools.stringReplace(s0, "" + "\n", "" + "\r");
 		}
 		final String s = s0;
-
+		
 		Object data0 = null;
 		if (e.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 			try {
@@ -116,7 +116,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 			}
 		}
 		final Object data = data0;
-
+		
 		if (data != null) {
 			MyThread t = new MyThread(new Runnable() {
 				public void run() {
@@ -138,7 +138,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 			BackgroundThreadDispatcher.addTask(t, 1);
 		}
 		MyThread t = new MyThread(new Runnable() {
-
+			
 			public void run() {
 				if (s != null) {
 					System.out.println(e.getCurrentDataFlavorsAsList().toString());
@@ -166,20 +166,20 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		BackgroundThreadDispatcher.addTask(t, 1);
 		e.dropComplete(true);
 	}
-
+	
 	public void addImageToDatabase(final File file, final boolean deleteUponCompletion) {
 		final DataSetFileButton imageButton = new DataSetFileButton(m, targetTreeNode,
 							"<html><body><b>" + DataSetFileButton.getMaxString(file.getName()) + //$NON-NLS-1$
-												"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null); //$NON-NLS-1$//$NON-NLS-2$
+									"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null); //$NON-NLS-1$//$NON-NLS-2$
 		imageButton.setProgressValue(-1);
 		imageButton.showProgressbar();
-
+		
 		if (targetTreeNode == expTree.getSelectionPath().getLastPathComponent()) {
 			panel.add(imageButton);
 			panel.validate();
 			panel.getScrollpane().validate();
 		}
-
+		
 		MyThread t = new MyThread(new Runnable() {
 			public void run() {
 				MyImageIcon iconA;
@@ -202,10 +202,10 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 				});
 				if (DataSetFileButton.getMaxString(file.getName()).endsWith("..."))
 					imageButton.setToolTipText(file.getName());
-
+				
 				if (file.canRead()) {
 					imageButton.setProgressValue(-1);
-					DatabaseStorageResult md5 = DataExchangeHelperForExperiments.insertMD5checkedFile(m, file,
+					DatabaseStorageResult md5 = DataExchangeHelperForExperiments.insertHashedFile(m, file,
 										imageButton.createTempPreviewImage(), imageButton.getIsJavaImage(), imageButton, targetTreeNode
 															.getTargetEntity());
 					((BinaryMeasurement) bif.getEntity()).getURL().setDetail(md5.getMD5());
@@ -216,10 +216,10 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					}
 					imageButton.setDownloadNeeded(true);
 					imageButton.downloadInProgress = false;
-
+					
 					BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode
 										.getTargetEntity());
-
+					
 					imageButton.imageResult = new ImageResult(icon, bfi);
 					imageButton.setProgressValue(100);
 					targetTreeNode.setSizeDirty(true);
@@ -232,7 +232,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		}, "store image in database");
 		BackgroundThreadDispatcher.addTask(t, -1);
 	}
-
+	
 	public void processDirectory(File file) {
 		File[] list = file.listFiles();
 		for (int j = 0; j < list.length; j++) {
@@ -243,7 +243,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 				addImageToDatabase(currentFile, false);
 		}
 	}
-
+	
 	@Override
 	public void dragExit(DropTargetEvent arg0) {
 		System.out.println("DRAG EXIT " + arg0); //$NON-NLS-1$

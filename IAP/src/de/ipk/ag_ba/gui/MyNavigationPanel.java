@@ -45,9 +45,9 @@ import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_actions.BookmarkAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.PopupListener;
-import de.ipk.ag_ba.gui.webstart.AIPgui;
-import de.ipk.ag_ba.gui.webstart.AIPmain;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
+import de.ipk.ag_ba.gui.webstart.IAPgui;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -66,32 +66,32 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	private final JCheckBoxMenuItem menuItemButtons;
 	private JScrollPane scrollpane;
 	private int maxYY;
-
+	
 	public MyNavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
 		this.target = target;
 		this.graphPanel = graphPanel;
 		this.actionPanelRight = actionPanelRight;
-
+		
 		JPopupMenu popup = new JPopupMenu("Button Style");
-
+		
 		JMenuItem menuItem = new JMenuItem("New Window");
-		menuItem.setIcon(GravistoService.loadIcon(AIPmain.class, "img/new_frame.png"));
+		menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, "img/new_frame.png"));
 		menuItem.addActionListener(getNewWindowListener());
 		popup.add(menuItem);
-
+		
 		popup.addSeparator();
-
+		
 		menuItemCompact = new JCheckBoxMenuItem("Compact", buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 		menuItemCompact.putClientProperty("style", ButtonDrawStyle.COMPACT_LIST);
 		menuItemCompact.addActionListener(this);
-
+		
 		popup.add(menuItemCompact);
-
+		
 		menuItemFlat = new JCheckBoxMenuItem("Flat", buttonStyle == ButtonDrawStyle.FLAT);
 		menuItemFlat.putClientProperty("style", ButtonDrawStyle.FLAT);
 		menuItemFlat.addActionListener(this);
 		popup.add(menuItemFlat);
-
+		
 		menuItemButtons = new JCheckBoxMenuItem("Buttons", buttonStyle == ButtonDrawStyle.BUTTONS);
 		menuItemButtons.putClientProperty("style", ButtonDrawStyle.BUTTONS);
 		menuItemButtons.addActionListener(this);
@@ -100,31 +100,31 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		// menuItem.putClientProperty("style", ButtonDrawStyle.TEXT);
 		// menuItem.addActionListener(this);
 		// popup.add(menuItem);
-
+		
 		addMouseListener(new PopupListener(popup));
 	}
-
+	
 	private ActionListener getNewWindowListener() {
 		ActionListener res = new ActionListener() {
-
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFrame jff = new JFrame("IAP Cloud Storage, Analysis and Visualization System");
 				jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 				BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 									"", "");
-				jff.add(AIPgui.getNavigation(myStatus, true), "0,0");
+				jff.add(IAPgui.getNavigation(myStatus, true), "0,0");
 				jff.validate();
 				jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				jff.setLocationByPlatform(true);
 				jff.setSize(800, 600);
 				jff.setVisible(true);
-
+				
 			}
 		};
 		return res;
 	}
-
+	
 	public ArrayList<NavigationButton> getEntitySet(boolean includeBookmarks) {
 		if (includeBookmarks)
 			return set;
@@ -139,17 +139,18 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			return res;
 		}
 	}
-
+	
 	public void setEntitySet(ArrayList<NavigationButton> set) {
 		if (set == null)
 			return;
 		this.set = set;
 		updateGUI();
 	}
-
+	
 	private void updateGUI() {
 		removeAll();
 		if (set != null) {
+			ButtonDrawStyle buttonStyleToUse = buttonStyle;
 			ArrayList<JComponent> right = new ArrayList<JComponent>();
 			boolean first = true;
 			ObjectRef next = new ObjectRef();
@@ -158,7 +159,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				if (ne == null)
 					continue;
 				if (ne instanceof StyleAware) {
-					((StyleAware) ne).setButtonStyle(buttonStyle);
+					((StyleAware) ne).setButtonStyle(buttonStyleToUse);
 				}
 				if (getTarget() == PanelTarget.NAVIGATION) {
 					if (!first) {
@@ -172,7 +173,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 								lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 							else
 								lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
+							
 							lbl.setText("<html><font size='5'>" + Unicode.STAR);
 							firstStar = false;
 							lbl.setToolTipText("Remove " + ne.getTitle() + " bookmark");
@@ -184,14 +185,14 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						lbl.setForeground(Color.GRAY);
 						add(lbl);
 					}
-					add(NavigationButton.getNavigationButton(buttonStyle, ne, getTarget(), this, getTheOther(), graphPanel));
+					add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), this, getTheOther(), graphPanel));
 					first = false;
 				} else {
 					if (actionPanelRight != null && ne.isRightAligned())
-						right.add(NavigationButton.getNavigationButton(buttonStyle, ne, getTarget(), getTheOther(), this,
+						right.add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), getTheOther(), this,
 											graphPanel));
 					else
-						add(NavigationButton.getNavigationButton(buttonStyle, ne, getTarget(), getTheOther(), this,
+						add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), getTheOther(), this,
 											graphPanel));
 				}
 			}
@@ -223,7 +224,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				getParent().getParent().validate();
 				getParent().getParent().repaint();
 			}
-
+			
 		} else {
 			validate();
 			repaint();
@@ -233,10 +234,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			}
 		}
 	}
-
+	
 	private MouseListener getAddBookmarkActionListener(final JLabel lbl, final ObjectRef right, final NavigationButton ne) {
 		MouseListener res = new MouseListener() {
-
+			
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getClickCount() == 1) {
@@ -246,7 +247,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						if (ne.getIcon() != null)
 							i = GravistoService.getBufferedImage(ne.getIcon().getImage());
 						else
-							i = GravistoService.getBufferedImage(GravistoService.loadIcon(AIPmain.class,
+							i = GravistoService.getBufferedImage(GravistoService.loadIcon(IAPmain.class,
 												ne.getNavigationImage()).getImage());
 						// add bookmark
 						String target = getTargetPath(ne);
@@ -262,13 +263,13 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 					}
 				}
 			}
-
+			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-
+				//
+				
 			}
-
+			
 			@Override
 			public void mouseExited(MouseEvent e) {
 				if (right.getObject() != null)
@@ -276,7 +277,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				if (lbl != null)
 					lbl.setText("<html><small>" + Unicode.ARROW_RIGHT);
 			}
-
+			
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				if (right.getObject() != null)
@@ -284,16 +285,16 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				if (lbl != null)
 					lbl.setText("<html><font size='4'>" + Unicode.PEN);
 			}
-
+			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-
+				//
+				
 			}
 		};
 		return res;
 	}
-
+	
 	private String getTargetPath(NavigationButton finalTarget) {
 		ArrayList<String> path = new ArrayList<String>();
 		for (NavigationButton ne : set) {
@@ -305,7 +306,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 		return StringManipulationTools.getStringList(path, ".");
 	}
-
+	
 	public static String getTargetPath(Collection<NavigationButton> buttons) {
 		ArrayList<String> path = new ArrayList<String>();
 		for (NavigationButton ne : buttons) {
@@ -317,11 +318,11 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 		return StringManipulationTools.getStringList(path, ".");
 	}
-
+	
 	private MouseListener getDeleteBookmarkActionListener(final JLabel lbl, final ObjectRef right,
 						final NavigationAction action) {
 		MouseListener res = new MouseListener() {
-
+			
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getClickCount() == 1) {
@@ -337,13 +338,13 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 					}
 				}
 			}
-
+			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-
+				//
+				
 			}
-
+			
 			@Override
 			public void mouseExited(MouseEvent e) {
 				if (right.getObject() != null)
@@ -351,7 +352,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				if (lbl != null)
 					lbl.setText("<html><font size='5'>" + Unicode.STAR);
 			}
-
+			
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				if (right.getObject() != null)
@@ -359,37 +360,39 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				if (lbl != null)
 					lbl.setText("<html><font size='4'>" + Unicode.RECYCLE);
 			}
-
+			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-
+				//
+				
 			}
 		};
 		return res;
 	}
-
+	
 	public static Color getTabColor() {
 		Color c2;
-		if (UIManager.getBoolean("TabbedPane.contentOpaque")) {
-			c2 = UIManager.getColor("TabbedPane.contentAreaColor");
-			if (c2 == null)
-				c2 = UIManager.getColor("TabbedPane.background");
-		} else
-			c2 = UIManager.getColor("TabbedPane.background"); // UIManager.getColor("TabbedPane.contentAreaColor");
+		c2 = UIManager.getColor("MenuBar.background");
+		if (c2 == null)
+			if (UIManager.getBoolean("TabbedPane.contentOpaque")) {
+				c2 = UIManager.getColor("TabbedPane.contentAreaColor");
+				if (c2 == null)
+					c2 = UIManager.getColor("TabbedPane.background");
+			} else
+				c2 = UIManager.getColor("TabbedPane.background"); // UIManager.getColor("TabbedPane.contentAreaColor");
 		if (c2 == null)
 			c2 = new Color(200, 200, 255);
 		return c2;
 	}
-
+	
 	public void setTheOther(MyNavigationPanel theOther) {
 		this.theOther = theOther;
 	}
-
+	
 	public MyNavigationPanel getTheOther() {
 		return theOther;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -403,15 +406,15 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			ButtonDrawStyle bds = (ButtonDrawStyle) o;
 			buttonStyle = bds;
 			theOther.buttonStyle = bds;
-
+			
 			menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 			menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
 			menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
-
+			
 			theOther.menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 			theOther.menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
 			theOther.menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
-
+			
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
@@ -431,20 +434,23 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			});
 		}
 	}
-
+	
 	public void setScrollpane(JScrollPane scrollpane) {
 		this.scrollpane = scrollpane;
 	}
-
+	
 	public JScrollPane getScrollpane() {
 		return scrollpane;
 	}
-
+	
 	@Override
 	public Dimension getPreferredSize() {
-		if (getScrollpane() == null)
-			return super.getPreferredSize();
-		else {
+		if (getScrollpane() == null) {
+			Dimension d = super.getPreferredSize();
+			if (set.isEmpty())
+				d.height = 0;
+			return d;
+		} else {
 			if (target == PanelTarget.NAVIGATION)
 				return super.getPreferredSize();
 			Component[] comps = getComponents();
@@ -467,39 +473,39 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				return new Dimension(getScrollpane().getWidth() - 15, maxY);
 		}
 	}
-
+	
 	public PanelTarget getTarget() {
 		return target;
 	}
-
+	
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
-
+		
 		int w = getWidth();
 		int h = getHeight();
-
+		
 		// Paint a gradient from top to bottom
 		GradientPaint gp;
-		if (getTarget() == PanelTarget.NAVIGATION)
+		if (getTarget() == PanelTarget.NAVIGATION && !theOther.set.isEmpty())
 			gp = new GradientPaint(0, 0, new Color(240, 240, 240), 0, h, new Color(210, 230, 210));
 		else {
 			Color c2;
 			c2 = MyNavigationPanel.getTabColor();
-
+			
 			gp = new GradientPaint(0, 0, new Color(250, 250, 250), 0, h, c2);
 		}
 		g2d.setPaint(gp);
 		g2d.fillRect(0, 0, w, h);
 	}
-
+	
 	public void setMaxYY(int maxYY) {
 		this.maxYY = maxYY;
 	}
-
+	
 	public int getMaxYY() {
 		return maxYY;
 	}
-
+	
 }

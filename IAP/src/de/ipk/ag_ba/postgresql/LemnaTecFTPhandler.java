@@ -29,13 +29,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  * @author klukas
  */
 public class LemnaTecFTPhandler implements ResourceIOHandler {
-
+	
 	public static final String PREFIX = "lemnatec-ftp";
-
+	
 	public String getPrefix() {
 		return PREFIX;
 	}
-
+	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
 		if (url.toString().contains(",")) {
@@ -56,11 +56,11 @@ public class LemnaTecFTPhandler implements ResourceIOHandler {
 				return is;
 			} else {
 				boolean advancedFTP = true;
-
+				
 				String detail = url.getDetail();
 				detail = detail.split("/", 2)[0] + "/../../data0/pgftp/" + detail.split("/", 2)[1] + "/";
 				String ur = "ftp://lemnatec:LemnaTec@" + detail.substring(0, detail.length() - "/".length());
-
+				
 				if (advancedFTP) {
 					MyByteArrayOutputStream bos = new MyByteArrayOutputStream();
 					BackgroundTaskStatusProviderSupportingExternalCallImpl status = new CommandLineBackgroundTaskStatusProvider(
@@ -74,10 +74,10 @@ public class LemnaTecFTPhandler implements ResourceIOHandler {
 		} else
 			return null;
 	}
-
+	
 	private Session session = null;
 	private final Channel channel = null;
-
+	
 	private ChannelSftp getChannel() throws Exception {
 		if (session == null || !session.isConnected()) {
 			JSch jsch = new JSch();
@@ -90,16 +90,16 @@ public class LemnaTecFTPhandler implements ResourceIOHandler {
 			session.setPassword("LemnaTec");
 			session.connect();
 		}
-
+		
 		// if (channel == null || !channel.isConnected()) {
 		// channel = session.openChannel("sftp");
 		// channel.connect(30);
 		// }
-
+		
 		ChannelSftp c = (ChannelSftp) channel;
 		return c;
 	}
-
+	
 	public static IOurl getLemnaTecFTPurl(String host, String filename, String displayFileName) {
 		if (filename.contains("/")) {
 			host += "/" + filename.substring(0, filename.lastIndexOf("/"));
@@ -108,17 +108,17 @@ public class LemnaTecFTPhandler implements ResourceIOHandler {
 		}
 		return new IOurl(PREFIX, host, displayFileName);
 	}
-
+	
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
 						throws Exception {
 		throw new Exception("LemnaTec FTP Output is not supported!");
 	}
-
+	
 	public static IOurl getURL(File file) {
 		return new IOurl(PREFIX, file.getParent() + "/", file.getName());
 	}
-
+	
 	public static boolean isLemnaTecFtpUrl(IOurl fileName) {
 		if (fileName != null && fileName.getPrefix() != null)
 			return fileName.getPrefix().equals(PREFIX);

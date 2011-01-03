@@ -31,17 +31,17 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.PatchedHTMLEditorKit;
  * @author klukas
  */
 public class MainPanelComponent {
-
+	
 	HashMap<String, Object> properties = new HashMap<String, Object>();
 	private JComponent component;
-
+	
 	public MainPanelComponent(JComponent gui) {
 		this.component = gui;
 	}
-
+	
 	public MainPanelComponent(Collection<String> htmlTextPanels) {
 		ArrayList<JComponent> infos = new ArrayList<JComponent>();
-
+		
 		for (String txt : htmlTextPanels) {
 			final JEditorPane jep;
 			jep = new JEditorPane();
@@ -52,7 +52,7 @@ public class MainPanelComponent {
 			jep.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 			jep.setOpaque(true);
 			jep.setBackground(Colors.brighten(MyNavigationPanel.getTabColor(), 0.8, 1.2));
-
+			
 			jep.addHyperlinkListener(new HyperlinkListener() {
 				public void hyperlinkUpdate(HyperlinkEvent e) {
 					if (e.getEventType() == HyperlinkEvent.EventType.ENTERED)
@@ -65,38 +65,38 @@ public class MainPanelComponent {
 					}
 				}
 			});
-
+			
 			infos.add(jep);
 		}
 		if (infos.size() > 1) {
 			JComponent jp = new JPanel(new FlowLayoutImproved(FlowLayout.LEFT, 20, 20));
 			jp.setOpaque(false);
-
+			
 			for (JComponent jc : infos)
 				jp.add(jc);
-
+			
 			jp.validate();
-
+			
 			this.component = jp;
 		} else
 			if (infos.size() == 1) {
 				JComponent jp = new JPanel(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.PREFERRED } }));
 				jp.setOpaque(false);
 				jp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
+				
 				jp.add(infos.get(0), "0,0");
-
+				
 				jp.validate();
-
+				
 				this.component = jp;
-
+				
 			}
 	}
-
+	
 	public MainPanelComponent(String htmlTextPanel) {
 		this(getList(htmlTextPanel));
 	}
-
+	
 	public MainPanelComponent(JComponent ip, boolean borderAroundTheComponent) {
 		if (borderAroundTheComponent) {
 			JComponent jp = TableLayout.getSplit(ip, null, TableLayout.PREFERRED, TableLayout.FILL);
@@ -108,25 +108,25 @@ public class MainPanelComponent {
 			this.component = ip;
 		}
 	}
-
+	
 	private static ArrayList<String> getList(String htmlTextPanel) {
 		ArrayList<String> txt = new ArrayList<String>();
 		txt.add(htmlTextPanel);
 		return txt;
 	}
-
+	
 	public JComponent getGUI() {
 		return component;
 	}
-
+	
 	public void setProperty(String p, Object o) {
 		properties.put(p, o);
 	}
-
+	
 	public Object getProperty(String p) {
 		return properties.get(p);
 	}
-
+	
 	public void setGUI(JComponent gui) {
 		this.component = gui;
 	}

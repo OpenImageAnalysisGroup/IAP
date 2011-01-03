@@ -10,24 +10,24 @@ package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks;
  * @author klukas
  */
 public class ColorHistogramEntry {
-
+	
 	private int pixels = 0;
 	private final int hueMiddle;
-
+	
 	public ColorHistogramEntry(int hueMiddle) {
 		this.hueMiddle = hueMiddle;
 	}
-
+	
 	public int getNumberOfPixels() {
 		return pixels;
 	}
-
+	
 	public String getColorDisplayName() {
 		return "hue=" + hueMiddle;
 	}
-
+	
 	public void addPixelCount(int i) {
 		pixels += i;
 	}
-
+	
 }

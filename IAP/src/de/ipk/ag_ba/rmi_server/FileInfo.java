@@ -10,7 +10,7 @@ package de.ipk.ag_ba.rmi_server;
  * @author klukas
  */
 public class FileInfo {
-	String filename, md5;
+	String filename, hash;
 	long fileSize;
 	int rowID;
 }

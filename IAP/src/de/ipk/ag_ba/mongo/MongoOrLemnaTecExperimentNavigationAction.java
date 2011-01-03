@@ -21,7 +21,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -35,20 +35,20 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	private NavigationButton src;
 	private ExperimentInterface experiment;
 	private final MongoDB m;
-
+	
 	public MongoOrLemnaTecExperimentNavigationAction(ExperimentHeaderInterface ei, MongoDB m) {
 		super(ei.getExcelfileid() != null && ei.getExcelfileid().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
 							: "Access Systems Biology Cloud Data Set");
 		header = ei;
 		this.m = m;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		// actions.add(FileManager.getFileManagerEntity(login, pass,
 		// ei.experimentName));
-
+		
 		if (header != null && !header.getExcelfileid().startsWith("lemnatec:")
 							&& (header.getImportusername() == null || header.getImportusername().equals(SystemAnalysis.getUserName()))) {
 			if (header.inTrash()) {
@@ -68,7 +68,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		}
 		return actions;
 	}
-
+	
 	public static void getDefaultActions(ArrayList<NavigationButton> actions, ExperimentInterface experiment,
 						ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting, MongoDB m) {
 		if (experiment == null)
@@ -88,14 +88,14 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			}
 		}
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
@@ -104,7 +104,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		else
 			experiment = m.getExperiment(header);
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		if (header.getExcelfileid() != null && header.getExcelfileid().startsWith("lemnatec:"))
@@ -112,7 +112,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		else
 			return "img/ext/image-x-generic-off.png";
 	}
-
+	
 	@Override
 	public String getDefaultNavigationImage() {
 		if (header.getExcelfileid() != null && header.getExcelfileid().startsWith("lemnatec:"))
@@ -120,12 +120,12 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		else
 			return "img/ext/image-x-generic.png";
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return "" + header.getExperimentname();
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		MyExperimentInfoPanel ip = new MyExperimentInfoPanel();

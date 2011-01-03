@@ -18,30 +18,30 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
  */
 public class CloudHost extends BasicDBObject {
 	private static final long serialVersionUID = 1L;
-
+	
 	public CloudHost() throws UnknownHostException {
 		setHostName(SystemAnalysis.getHostName());
 		updateTime();
 	}
-
+	
 	public void setHostName(String host) {
 		put("host", host);
 	}
-
+	
 	public String getHostName() {
 		return (String) get("host");
 	}
-
+	
 	public void updateTime() {
 		put("ping", System.currentTimeMillis());
 	}
-
+	
 	public long getLastUpdateTime() {
 		return (Long) get("ping");
 	}
-
+	
 	public static String getHostId() {
 		return "host";
 	}
-
+	
 }

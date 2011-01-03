@@ -1,23 +1,24 @@
 package ij.plugin.filter;
+
 import ij.*;
 import ij.process.*;
 import ij.plugin.Duplicator;
 
 /**
-* @deprecated
-* replaced by Duplicator class
-*/
+ * @deprecated
+ *             replaced by Duplicator class
+ */
 public class Duplicater implements PlugInFilter {
 	ImagePlus imp;
-
+	
 	public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
-		return DOES_ALL+NO_CHANGES;
+		return DOES_ALL + NO_CHANGES;
 	}
-
+	
 	public void run(ImageProcessor ip) {
 	}
-
+	
 	public ImagePlus duplicateStack(ImagePlus imp, String newTitle) {
 		ImagePlus imp2 = (new Duplicator()).run(imp);
 		imp2.setTitle(newTitle);
@@ -29,5 +30,5 @@ public class Duplicater implements PlugInFilter {
 		imp2.setTitle(newTitle);
 		return imp2;
 	}
-
+	
 }

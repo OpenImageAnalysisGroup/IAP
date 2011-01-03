@@ -44,7 +44,7 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.session.EditorSession;
 
-import de.ipk.ag_ba.gui.webstart.AIPmain;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
@@ -65,27 +65,27 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	private JMenuItem saveFileCmd;
 	private JMenuItem removeOneFromDatabaseCmd;
 	private JMenuItem removeAllFromDatabaseCmd;
-
+	
 	MongoDB m;
-
+	
 	JProgressBar progress;
 	private final MongoTreeNode targetTreeNode;
 	public MyImageIcon myImage;
-
+	
 	ImageResult imageResult = null;
-
+	
 	private boolean readOnly;
-
+	
 	volatile boolean downloadInProgress = false;
 	boolean downloadNeeded = false;
 	private ActionListener sizeChangedListener;
-
+	
 	public int getIsJavaImage() {
 		if (myImage == null)
 			return 0;
 		return myImage.imageAvailable;
 	}
-
+	
 	// public JMyPC2DBEbutton(String user, String pass, DBEtreeNode projectNode,
 	// ImageResult imageResult, ActionListener sizeChangedListener) {
 	// this(user, pas, projectNode, imageResult.getFileName(),
@@ -96,28 +96,28 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	// this.user = user;
 	// this.pass = pass;
 	// }
-
+	
 	public DataSetFileButton(MongoDB m, MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
 						ImageIcon previewImage) {
 		super();
-
+		
 		progress = new JProgressBar(0, 100);
 		progress.setValue(-1);
-
+		
 		progress.setVisible(false);
-
+		
 		updateLayout(label, icon, previewImage);
-
+		
 		addActionListener(this);
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
+		
 		this.targetTreeNode = targetTreeNode;
-
+		
 		this.m = m;
 	}
-
+	
 	JLabel mmlbl;
-
+	
 	public void updateLayout(String label, MyImageIcon icon, ImageIcon previewImage) {
 		double border = 2;
 		removeAll();
@@ -126,19 +126,19 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			ilbl = new JLabel(icon);
 		else
 			ilbl = new JLabel(previewImage);
-
+		
 		double[][] size = {
 							{ border, DataSetFileButton.ICON_WIDTH, border }, // Columns
-							{ border, DataSetFileButton.ICON_HEIGHT, border, TableLayout.PREFERRED, border, TableLayout.PREFERRED,
+				{ border, DataSetFileButton.ICON_HEIGHT, border, TableLayout.PREFERRED, border, TableLayout.PREFERRED,
 												border } }; // Rows
-
+		
 		setLayout(new TableLayout(size));
-
+		
 		ilbl.setHorizontalAlignment(JLabel.CENTER);
 		ilbl.setVerticalAlignment(JLabel.CENTER);
 		// new IconAdapter(icon)
 		add(ilbl, "1,1,c,c");
-
+		
 		add(progress, "1,3,c,c");
 		if (label != null) {
 			mmlbl = new JLabel("<html><center>" + label);
@@ -148,26 +148,24 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		myImage = icon;
 		validate();
 	}
-
+	
 	public DataSetFileButton(MongoDB m, MongoTreeNode projectNode, ImageResult imageResult,
 						ImageIcon previewImage, boolean readOnly) {
 		this(m, projectNode, "<html><body><b>" + getMaxString(strip(imageResult.getFileName()))
 							+ "</b></body></html>", null, previewImage);
 		this.imageResult = imageResult;
-		if (imageResult == null)
-			System.out.println("Error: Image Reference Data is null!");
 		this.readOnly = readOnly;
 		if (getMaxString(imageResult.getFileName()).endsWith("..."))
 			setToolTipText(imageResult.getFileName());
 	}
-
+	
 	private static String strip(String fileName) {
 		if (fileName.contains(File.separator))
 			return fileName.substring(fileName.lastIndexOf(File.separator) + File.separator.length());
 		else
 			return fileName;
 	}
-
+	
 	public static String getMaxString(String fileName) {
 		int maxlen = 20;
 		if (fileName.length() < maxlen)
@@ -176,27 +174,27 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			return fileName.substring(0, maxlen - 3) + "...";
 		}
 	}
-
+	
 	@Override
 	public Dimension getPreferredSize() {
 		Dimension d = super.getPreferredSize();
 		return new Dimension((int) d.getWidth(), (int) d.getHeight());
 	}
-
+	
 	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(final ActionEvent evt) {
-
+		
 		if (evt.getSource() == this) {
 			final JPopupMenu myPopup = new JPopupMenu();
 			if (downloadNeeded) {
 				JMenuItem tempItem = new JMenuItem("Download file...");
 				tempItem.setEnabled(false);
 				myPopup.add(tempItem);
-
+				
 				final DataSetFileButton thisInstance = this;
 				downloadNeeded = false;
 				setProgressValue(0);
@@ -214,7 +212,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							downloadNeeded = true;
 							return;
 						}
-
+						
 						try {
 							IOurl url = imageResult.getBinaryFileInfo().getFileName();
 							System.out.println(url);
@@ -225,7 +223,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						} catch (Exception e1) {
 							System.out.println("No valid input stream for "
 												+ imageResult.getBinaryFileInfo().getFileName().toString());
-
+							
 							MappingDataEntity mde = targetTreeNode.getTargetEntity();
 							try {
 								VolumeData volume = (VolumeData) mde;
@@ -237,7 +235,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 													MongoCollection.IMAGES);
 							}
 						}
-
+						
 						if (tf != null) {
 							imageResult.downloadedFile = tf;
 							SwingUtilities.invokeLater(new Runnable() {
@@ -253,7 +251,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								}
 							});
 						}
-
+						
 						downloadInProgress = false;
 						hideProgressbar();
 						SwingUtilities.invokeLater(new Runnable() {
@@ -286,12 +284,12 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			SupplementaryFilePanelMongoDB.fileChooser.setSelectedFile(new File(imageResult.getFileName()));
 			if (SupplementaryFilePanelMongoDB.fileChooser.showSaveDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 				File outputFile = SupplementaryFilePanelMongoDB.fileChooser.getSelectedFile();
-
+				
 				FileInputStream in;
 				try {
 					in = new FileInputStream(imageResult.downloadedFile);
 					FileOutputStream out = new FileOutputStream(outputFile);
-
+					
 					byte[] buffer = new byte[1024];
 					int bytes_read;
 					while (true) {
@@ -300,7 +298,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							break;
 						out.write(buffer, 0, bytes_read);
 					}
-
+					
 					in.close();
 					out.close();
 				} catch (FileNotFoundException e) {
@@ -315,12 +313,12 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			VolumeData volume = (VolumeData) imageResult.getBinaryFileInfo().getEntity();
 			MappingResultGraphNode mrgn = mrg.createVolumeNode(volume, null);
 			mrgn.getParams().setURL(FileSystemHandler.getURL(imageResult.getDownloadedFile()));
-
+			
 			EditorSession session = MainFrame.getInstance().createNewSession(mrg.getGraph());
-
+			
 			MainFrame.getInstance().createInternalFrame(ThreeDview.class.getCanonicalName(), session, false);
-
-			AIPmain.showVANTED();
+			
+			IAPmain.showVANTED(false);
 			//
 			// MainFrame.showMessageWindow("3D-Volume " +
 			// imageResult.getDownloadedFile().getAbsolutePath(), view
@@ -335,7 +333,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				return;
 			}
 			cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
-
+			
 			ImageIcon i;
 			if (imageResult.getFileName().contains(File.separator))
 				i = new ImageIcon(imageResult.getFileName());
@@ -346,7 +344,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					ErrorMsg.addErrorMessage(e);
 					i = null;
 				}
-
+			
 			cp.add(new JScrollPane(new JLabel(i)));
 			myImageFrame.getContentPane().validate();
 			myImageFrame.setSize(new Dimension(i.getImage().getWidth(cp) + 30, i.getImage().getHeight(cp) + 40));
@@ -361,7 +359,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				AttributeHelper.showInBrowser(imageResult.getFileName());
 			else
 				AttributeHelper.showInBrowser(myImage.fileURL.toString());
-
+			
 		}
 		if (evt.getSource() == removeOneFromDatabaseCmd) {
 			// remove image with given (this) imageFileID
@@ -370,18 +368,18 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			// clean up gui...
 			Stack<DataSetFileButton> toBeDeleted = new Stack<DataSetFileButton>();
 			DataSetFilePanel p = (DataSetFilePanel) this.getParent();
-			String imageFileIDtoBeDeleted = imageResult.getMd5();
+			String imageFileIDtoBeDeleted = imageResult.getHash();
 			for (int i = 0; i < p.getComponentCount(); i++) {
 				Component o = p.getComponent(i);
 				if (o instanceof DataSetFileButton) {
 					DataSetFileButton checkButton = (DataSetFileButton) o;
-					if (checkButton.imageResult.getMd5() == imageFileIDtoBeDeleted)
+					if (checkButton.imageResult.getHash() == imageFileIDtoBeDeleted)
 						toBeDeleted.add(checkButton);
 				}
 			}
 			while (!toBeDeleted.empty())
 				p.remove(toBeDeleted.pop());
-
+			
 			p.invalidate();
 			p.validate();
 			p.getScrollpane().validate();
@@ -414,7 +412,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			// }
 		}
 	}
-
+	
 	void addDefaultCommands(final JPopupMenu myPopup) {
 		showImageCmd = new JMenuItem("Show Image");
 		showVolumeCmd = new JMenuItem("Show 3D-Volume");
@@ -422,14 +420,14 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		openFileCmd = new JMenuItem("View/Open with system default application");
 		removeOneFromDatabaseCmd = new JMenuItem("! Delete this file !");
 		removeAllFromDatabaseCmd = new JMenuItem("! Delete all files in view !");
-
+		
 		showImageCmd.addActionListener(this);
 		showVolumeCmd.addActionListener(this);
 		openFileCmd.addActionListener(this);
 		saveFileCmd.addActionListener(this);
 		removeOneFromDatabaseCmd.addActionListener(this);
 		removeAllFromDatabaseCmd.addActionListener(this);
-
+		
 		if (imageResult != null && imageResult.downloadedFile != null) {
 			if (getIsJavaImage() > 0 || imageResult.getFileName().contains(File.separator))
 				myPopup.add(showImageCmd);
@@ -448,7 +446,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			myPopup.add(err);
 		}
 	}
-
+	
 	/**
 	 * Sets the progress status to the value specified. Uses
 	 * SwingUtilities.invokeLater (if needed).
@@ -473,7 +471,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			});
 		}
 	}
-
+	
 	/**
 	 * Hides the progressbar. Runs from a thread by using
 	 * SwingUtilities.invokeLater (if needed).
@@ -488,7 +486,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				}
 			});
 	}
-
+	
 	/**
 	 * Shows the progressbar. Runs from a thread by using
 	 * SwingUtilities.invokeLater (if needed).
@@ -509,14 +507,14 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				}
 			});
 	}
-
+	
 	public void setDataBaseInfo(boolean downloadNeeded) {
 		this.downloadNeeded = downloadNeeded;
 		if (!downloadNeeded)
 			imageResult.downloadedFile = new File(imageResult.getFileName());
 		hideProgressbar();
 	}
-
+	
 	/**
 	 * Creates an temporary preview file that can be used for storage in the
 	 * database.
@@ -541,7 +539,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		}
 		return tf;
 	}
-
+	
 	// /**
 	// * @param imageID
 	// */
@@ -556,33 +554,33 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	// targetTablePrimaryKeyValue);
 	// downloadNeeded=true;
 	// }
-
+	
 	class IconAdapter extends JComponent {
 		private static final long serialVersionUID = 1L;
-
+		
 		int width = DataSetFileButton.ICON_WIDTH;
 		int height = DataSetFileButton.ICON_HEIGHT;
-
+		
 		public IconAdapter(Icon icon) {
 			this.icon = icon;
 			height = icon.getIconHeight();
 			width = icon.getIconWidth();
 		}
-
+		
 		@Override
 		public void paintComponent(Graphics g) {
 			icon.paintIcon(this, g, (getWidth() - width) / 2, (getHeight() - height) / 2);
 		}
-
+		
 		@Override
 		public Dimension getPreferredSize() {
 			return new Dimension(DataSetFileButton.ICON_WIDTH, DataSetFileButton.ICON_HEIGHT); // icon.getIconWidth(),
 			// icon.getIconHeight());
 		}
-
+		
 		private final Icon icon;
 	}
-
+	
 	public void setIsPrimaryDatabaseEntity() {
 		this.readOnly = true;
 		if (mmlbl != null) {
@@ -591,7 +589,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			mmlbl.setText(mmlbl.getText());
 		}
 	}
-
+	
 	public void setDownloadNeeded(boolean b) {
 		this.downloadNeeded = true;
 		myImage = null;

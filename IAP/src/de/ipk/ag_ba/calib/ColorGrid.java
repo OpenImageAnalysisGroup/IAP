@@ -19,9 +19,9 @@ import javax.swing.JPanel;
  */
 public class ColorGrid extends JPanel {
 	private static final long serialVersionUID = 1L;
-
+	
 	private final ColorTile[][] tiles;
-
+	
 	public ColorGrid(int nx, int ny) {
 		tiles = new ColorTile[nx][ny];
 		double as = (150 + 100) / nx;
@@ -42,11 +42,11 @@ public class ColorGrid extends JPanel {
 			}
 		}
 	}
-
+	
 	public static void main(String args[]) {
 		ColorGrid cg = new ColorGrid(50, 50);
 		cg.setPreferredSize(new Dimension(300, 300));
-
+		
 		JFrame w = new JFrame();
 		w.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		w.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));

@@ -57,7 +57,7 @@ public class MyTools {
 			replace = ""; //$NON-NLS-1$
 		}
 		int replaceLength = replace.length();
-
+		
 		// We need to figure out how long our resulting string will be.
 		// This is required because without it, the possible resizing
 		// and copying of memory structures could lead to an unacceptable runtime.
@@ -72,7 +72,7 @@ public class MyTools {
 			int count;
 			int start;
 			int end;
-
+			
 			// Scan s and count the number of times we find our target.
 			count = 0;
 			start = 0;
@@ -88,7 +88,7 @@ public class MyTools {
 			}
 			length = stringLength - (count * (findLength - replaceLength));
 		}
-
+		
 		int start = 0;
 		int end = s.indexOf(find, start);
 		if (end == -1) {
@@ -101,7 +101,7 @@ public class MyTools {
 		// it looks like we actually have something to replace
 		// *sigh* allocate memory for it.
 		StringBuffer sb = new StringBuffer(length);
-
+		
 		// Scan s and do the replacements
 		while (end != -1) {
 			sb.append(s.substring(start, end).toString());
@@ -111,10 +111,10 @@ public class MyTools {
 		}
 		end = stringLength;
 		sb.append(s.substring(start, end).toString());
-
+		
 		return (sb.toString());
 	}
-
+	
 	/**
 	 * @param g
 	 * @param color
@@ -132,5 +132,5 @@ public class MyTools {
 		g.drawLine(x1, y1, x1 + w, y1);
 		g.drawLine(x1, y1, x1, y1 + h);
 	}
-
+	
 }

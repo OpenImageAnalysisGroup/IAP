@@ -1,21 +1,18 @@
 /*
- *  Copyright (C) 2004 Kai Toedter
- *  kai@toedter.com
- *  www.toedter.com
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Copyright (C) 2004 Kai Toedter
+ * kai@toedter.com
+ * www.toedter.com
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 package com.toedter.plaf;
 
@@ -47,81 +44,81 @@ public class JCalendarTheme extends DefaultMetalTheme {
 	static final ColorUIResource WHITE = new ColorUIResource(255, 255, 255);
 	static final FontUIResource standardFont = new FontUIResource(
 			new Font("Tahoma", Font.PLAIN, 11));
-
+	
 	/**
 	 * Creates a new JCalendarTheme object.
 	 */
 	public JCalendarTheme() {
 	}
-
+	
 	public String getName() {
 		return "JCalendar Theme";
 	}
-
+	
 	protected Font getFont() {
 		return new Font("Dialog", Font.PLAIN, 12);
 	}
-
+	
 	public FontUIResource getSystemTextFont() {
 		return standardFont;
 	}
-
+	
 	public FontUIResource getUserTextFont() {
 		return standardFont;
 	}
-
+	
 	public FontUIResource getControlTextFont() {
 		return standardFont;
 	}
-
+	
 	public FontUIResource getMenuTextFont() {
 		return standardFont;
 	}
-
+	
 	protected ColorUIResource getPrimary1() {
 		return BLUE_MEDIUM_DARK;
 	}
-
+	
 	protected ColorUIResource getPrimary2() {
 		return BLUE_LOW_MEDIUM;
 	}
-
+	
 	protected ColorUIResource getPrimary3() {
 		return BLUE_LOW_LIGHTEST;
 	}
-
+	
 	protected ColorUIResource getSecondary1() {
 		return secondary1;
 	}
-
+	
 	protected ColorUIResource getSecondary2() {
 		return secondary2;
 	}
-
+	
 	protected ColorUIResource getSecondary3() {
 		return secondary3;
 	}
-
+	
 	public ColorUIResource getFocusColor() {
 		return ORANGE_FOCUS;
 	}
-
+	
 	public ColorUIResource getPrimaryControlShadow() {
 		return getPrimary3();
 	}
-
+	
 	public ColorUIResource getMenuSelectedBackground() {
 		return getPrimary1();
 	}
-
+	
 	public ColorUIResource getMenuSelectedForeground() {
 		return WHITE;
 	}
-
+	
 	public ColorUIResource getMenuItemBackground() {
 		return WHITE;
 	}
-
+	
 	public ColorUIResource getToggleButtonCheckColor() {
 		return GREEN_CHECK;
 	}

@@ -21,11 +21,11 @@ import javax.media.jai.operator.ColorQuantizerDescriptor;
  */
 @SuppressWarnings("restriction")
 public class ImageTools {
-
+	
 	public PlanarImage getPlanarImage(BufferedImage image) {
 		return PlanarImage.wrapRenderedImage(image);
 	}
-
+	
 	/**
 	 * @param image
 	 * @param maxColors
@@ -48,11 +48,11 @@ public class ImageTools {
 		PlanarImage quantizedImage = JAI.create("colorquantizer", pb);
 		return quantizedImage;
 	}
-
+	
 	public BufferedImage reduceColors(BufferedImage image, int maxColors) {
 		return reduceColors(getPlanarImage(image), maxColors).getAsBufferedImage();
 	}
-
+	
 	public PlanarImage rotate(PlanarImage image, double radian) {
 		float angle = (float) radian;
 		float centerX = image.getWidth() / 2f;
@@ -66,7 +66,7 @@ public class ImageTools {
 		PlanarImage scaledImage = JAI.create("rotate", pb);
 		return scaledImage;
 	}
-
+	
 	public PlanarImage smooth(PlanarImage input, int kernelSize) {
 		float[] kernelMatrix = new float[kernelSize * kernelSize];
 		for (int k = 0; k < kernelMatrix.length; k++)
@@ -75,14 +75,14 @@ public class ImageTools {
 		PlanarImage output = JAI.create("convolve", input, kernel);
 		return output;
 	}
-
+	
 	public PlanarImage edgeDetectionSoebel(PlanarImage input) {
 		float[] kernelMatrix = { -1, -2, -1, 0, 0, 0, 1, 2, 1 };
 		KernelJAI kernel = new KernelJAI(3, 3, kernelMatrix);
 		PlanarImage output = JAI.create("convolve", input, kernel);
 		return output;
 	}
-
+	
 	public PlanarImage invertRGBimage(PlanarImage input) {
 		PlanarImage output = JAI.create("bandselect", input, new int[] { 2, 1, 0 });
 		return output;

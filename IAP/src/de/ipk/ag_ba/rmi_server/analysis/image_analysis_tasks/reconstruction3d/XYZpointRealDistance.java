@@ -4,11 +4,11 @@ package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.reconstruction3d;
  * @author klukas
  */
 public class XYZpointRealDistance {
-
+	
 	public double x;
 	public double y;
 	public double z;
-
+	
 	/**
 	 * @param x
 	 * @param y
@@ -19,7 +19,7 @@ public class XYZpointRealDistance {
 		this.y = y;
 		this.z = z;
 	}
-
+	
 	/**
 	 * @param angle
 	 */
@@ -28,18 +28,18 @@ public class XYZpointRealDistance {
 		// double yn = z*sin+x*cos; // Z-Axis Rot
 		// x = xn;
 		// y = yn;
-
+		
 		// double yn = y*cos-z*sin; // X-Axis Rot
 		// double zn = -y*sin+z*cos; // X-Axis Rot
 		// y = yn;
 		// z = zn;
-
+		
 		double zn = z * cos - x * sin; // Y-Axis Rot
 		double xn = z * sin + x * cos; // Y-Axis Rot
 		z = zn;
 		x = xn;
 	}
-
+	
 	/**
 	 * 
 	 */
@@ -48,5 +48,5 @@ public class XYZpointRealDistance {
 		this.y = this.z;
 		this.z = t;
 	}
-
+	
 }

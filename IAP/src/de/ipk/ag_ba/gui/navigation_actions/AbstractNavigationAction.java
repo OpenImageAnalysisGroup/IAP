@@ -21,16 +21,16 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  * @author klukas
  */
 public abstract class AbstractNavigationAction implements NavigationAction {
-
+	
 	private final ArrayList<NavigationButton> additionalEntities = new ArrayList<NavigationButton>();
 	protected BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 						"", "");
 	private final String tooltip;
-
+	
 	public AbstractNavigationAction(String tooltip) {
 		this.tooltip = tooltip;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -41,41 +41,41 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	public MainPanelComponent getResultMainPanel() {
 		return null;
 	}
-
+	
 	@Override
 	public void addAdditionalEntity(NavigationButton ne) {
 		additionalEntities.add(ne);
 	}
-
+	
 	public ArrayList<NavigationButton> getAdditionalEntities() {
 		return additionalEntities;
 	}
-
+	
 	public BackgroundTaskStatusProvider getStatusProvider() {
 		return status;
 	}
-
+	
 	public String getDefaultTitle() {
 		return null;
 	}
-
+	
 	public String getDefaultNavigationImage() {
 		return getDefaultImage();
 	}
-
+	
 	public String getDefaultImage() {
 		return null;
 	}
-
+	
 	public String getDefaultTooltip() {
 		return tooltip;
 	}
-
+	
 	@Override
 	public boolean getProvidesActions() {
 		return true;
 	}
-
+	
 	public NavigationImage getImageIcon() {
 		return null;
 	}

@@ -27,27 +27,27 @@ import org.graffiti.plugin.io.resources.IOurl;
  * @author Christian Klukas
  */
 public class MyImageIcon extends ImageIcon {
-
+	
 	/**
 	 * Comment for <code>serialVersionUID</code>
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
 	// private int width, height;
-
+	
 	IOurl fileURL;
-
+	
 	int imageAvailable;
-
+	
 	private BinaryFileInfo bfi;
-
+	
 	// private File file;
-
+	
 	public MyImageIcon(Component observer, int width, int height, IOurl file, BinaryFileInfo bfi)
 						throws MalformedURLException {
 		initImageData(observer, width, height, file, bfi);
 	}
-
+	
 	@SuppressWarnings({ "restriction" })
 	public synchronized void initImageData(Component observer, int width, int height, IOurl file, BinaryFileInfo bfi)
 						throws MalformedURLException {
@@ -56,7 +56,7 @@ public class MyImageIcon extends ImageIcon {
 		fileURL = file;
 		// this.file = file;
 		setDescription(description);
-
+		
 		try {
 			BufferedImage i = null;
 			i = ImageIO.read(fileURL.getInputStream());
@@ -65,12 +65,12 @@ public class MyImageIcon extends ImageIcon {
 			i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
 			imageAvailable = 1;
 			setImage(i);
-
+			
 		} catch (Exception e1) {
 			imageAvailable = 0;
-
+			
 			BufferedImage i = null;
-
+			
 			try {
 				sun.awt.shell.ShellFolder sf = sun.awt.shell.ShellFolder.getShellFolder(FileSystemHandler.getFile(fileURL));
 				i = toBufferedImage(sf.getIcon(true));
@@ -86,7 +86,7 @@ public class MyImageIcon extends ImageIcon {
 				} catch (Exception e2) {
 					i = null;
 				}
-
+				
 			}
 			if (i != null) {
 				int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
@@ -96,19 +96,19 @@ public class MyImageIcon extends ImageIcon {
 			}
 		}
 	}
-
+	
 	public static BufferedImage toBufferedImage(Image image) {
 		if (image instanceof BufferedImage) {
 			return (BufferedImage) image;
 		}
-
+		
 		// This code ensures that all the pixels in the image are loaded
 		image = new ImageIcon(image).getImage();
-
+		
 		// Determine if the image has transparent pixels; for this method's
 		// implementation, see Determining If an Image Has Transparent Pixels
 		boolean hasAlpha = hasAlpha(image);
-
+		
 		// Create a buffered image with a format that's compatible with the screen
 		BufferedImage bimage = null;
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -118,7 +118,7 @@ public class MyImageIcon extends ImageIcon {
 			if (hasAlpha) {
 				transparency = Transparency.BITMASK;
 			}
-
+			
 			// Create the buffered image
 			GraphicsDevice gs = ge.getDefaultScreenDevice();
 			GraphicsConfiguration gc = gs.getDefaultConfiguration();
@@ -127,7 +127,7 @@ public class MyImageIcon extends ImageIcon {
 			// The system does not have a screen
 			ErrorMsg.addErrorMessage(e);
 		}
-
+		
 		if (bimage == null) {
 			// Create a buffered image using the default color model
 			int type = BufferedImage.TYPE_INT_RGB;
@@ -136,24 +136,24 @@ public class MyImageIcon extends ImageIcon {
 			}
 			bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), type);
 		}
-
+		
 		// Copy image to buffered image
 		Graphics g = bimage.createGraphics();
-
+		
 		// Paint the image onto the buffered image
 		g.drawImage(image, 0, 0, null);
 		g.dispose();
-
+		
 		return bimage;
 	}
-
+	
 	public static boolean hasAlpha(Image image) {
 		// If buffered image, the color model is readily available
 		if (image instanceof BufferedImage) {
 			BufferedImage bimage = (BufferedImage) image;
 			return bimage.getColorModel().hasAlpha();
 		}
-
+		
 		// Use a pixel grabber to retrieve the image's color model;
 		// grabbing a single pixel is usually sufficient
 		PixelGrabber pg = new PixelGrabber(image, 0, 0, 1, 1, false);
@@ -161,29 +161,29 @@ public class MyImageIcon extends ImageIcon {
 			pg.grabPixels();
 		} catch (InterruptedException e) {
 		}
-
+		
 		// Get the image's color model
 		ColorModel cm = pg.getColorModel();
 		return cm.hasAlpha();
 	}
-
+	
 	public static BufferedImage resize(BufferedImage image, int width, int height) {
 		int type = image.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : image.getType();
 		BufferedImage resizedImage = new BufferedImage(width, height, type);
 		Graphics2D g = resizedImage.createGraphics();
 		g.setComposite(AlphaComposite.Src);
-
+		
 		// g.setRenderingHint(RenderingHints.KEY_RENDERING,
 		// RenderingHints.VALUE_RENDER_QUALITY);
 		//
 		// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 		// RenderingHints.VALUE_ANTIALIAS_ON);
-
+		
 		g.drawImage(image, 0, 0, width, height, null);
 		g.dispose();
 		return resizedImage;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.swing.Icon#paintIcon(java.awt.Component, java.awt.Graphics,
@@ -193,7 +193,7 @@ public class MyImageIcon extends ImageIcon {
 	public synchronized void paintIcon(Component c, Graphics g, int x, int y) {
 		g.drawImage(getImage(), x, y, c);
 	}
-
+	
 	public BinaryFileInfo getBinaryFileInfo() {
 		return bfi;
 	}
