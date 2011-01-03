@@ -50,22 +50,22 @@ public class WebFolder {
 						String icon, final String url, final String referenceTitle, final String referenceImage,
 						final String referenceURL, final String[] valid, final String introTxt,
 						final String optSubFolderForFolderItems, GUIsetting guiSetting) {
-
+		
 		NavigationButton nav = new NavigationButton(new AbstractNavigationAction("Open web-folder content") {
 			private NavigationButton src;
-
+			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
 				this.src = src;
 			}
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
@@ -75,12 +75,12 @@ public class WebFolder {
 						public void performActionCalculateResults(NavigationButton src) {
 							AttributeHelper.showInBrowser(referenceURL);
 						}
-
+						
 						@Override
 						public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 							return null;
 						}
-
+						
 						@Override
 						public ArrayList<NavigationButton> getResultNewActionSet() {
 							return null;
@@ -91,7 +91,7 @@ public class WebFolder {
 					website.setToolTipText("Open " + referenceURL);
 					actions.add(website);
 				}
-
+				
 				if (lib != null) {
 					for (Book fpp : lib.getBooksInFolder("")) {
 						final Book fp = fpp;
@@ -100,25 +100,25 @@ public class WebFolder {
 							public void performActionCalculateResults(NavigationButton src) {
 								AttributeHelper.showInBrowser(fp.getUrl());
 							}
-
+							
 							@Override
 							public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 								return null;
 							}
-
+							
 							@Override
 							public ArrayList<NavigationButton> getResultNewActionSet() {
 								return null;
 							}
 						};
-
+						
 						NavigationButton website = new NavigationButton(action, fp.getTitle(), "img/dataset.png",
 											src.getGUIsetting());
 						website.setToolTipText("Open " + fp.getUrl());
 						actions.add(website);
 					}
 				}
-
+				
 				NavigationAction subFolderAction = null;
 				if (optSubFolderForFolderItems != null && optSubFolderForFolderItems.length() > 0) {
 					subFolderAction = new EmptyNavigationAction(optSubFolderForFolderItems, "Show List of Web-Ressources",
@@ -126,11 +126,11 @@ public class WebFolder {
 					NavigationButton subFolder = new NavigationButton(subFolderAction, src.getGUIsetting());
 					actions.add(subFolder);
 				}
-
+				
 				TreeSet<String> folders = new TreeSet<String>();
-
+				
 				final HashMap<String, TreeSet<PathwayWebLinkItem>> folder2file = new HashMap<String, TreeSet<PathwayWebLinkItem>>();
-
+				
 				try {
 					Collection<PathwayWebLinkItem> mainList = WebDirectoryFileListAccess.getWebDirectoryFileListItems(url,
 										valid, false);
@@ -142,7 +142,7 @@ public class WebFolder {
 							folder2file.get(i.getGroup1()).add(i);
 						}
 					}
-
+					
 					if (folders.size() == 0) {
 						for (PathwayWebLinkItem mc : mainList) {
 							NavigationButton ne = IAPservice.getPathwayViewEntity(mc, src.getGUIsetting());
@@ -155,41 +155,41 @@ public class WebFolder {
 					actions.add(ne);
 					ErrorMsg.addErrorMessage(e);
 				}
-
+				
 				for (String f : folders) {
 					final String ff = f;
 					NavigationButton ne = new NavigationButton(new AbstractNavigationAction("Open web-folder") {
 						private NavigationButton src2;
-
+						
 						@Override
 						public void performActionCalculateResults(NavigationButton src) {
 							this.src2 = src;
 						}
-
+						
 						@Override
 						public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 							ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 							res.add(src2);
 							return res;
 						}
-
+						
 						@Override
 						public ArrayList<NavigationButton> getResultNewActionSet() {
 							ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-
+							
 							NavigationButton website = new NavigationButton(new AbstractNavigationAction(
 													"Show web-resource") {
 								@Override
 								public void performActionCalculateResults(NavigationButton src) {
 									AttributeHelper.showInBrowser(url);
 								}
-
+								
 								@Override
 								public ArrayList<NavigationButton> getResultNewNavigationSet(
 														ArrayList<NavigationButton> currentSet) {
 									return null;
 								}
-
+								
 								@Override
 								public ArrayList<NavigationButton> getResultNewActionSet() {
 									return null;
@@ -197,18 +197,18 @@ public class WebFolder {
 							}, referenceTitle, "img/dataset.png", src.getGUIsetting());
 							website.setToolTipText("Open " + url);
 							res.add(website);
-
+							
 							// "img/ext/folder-drag-accept.png"
-
+							
 							for (PathwayWebLinkItem mc : folder2file.get(ff)) {
 								NavigationButton j = IAPservice.getPathwayViewEntity(mc, src.getGUIsetting());
 								res.add(j);
 							}
-
+							
 							return res;
 						}
 					}, f, "img/ext/folder-remote-open.png", "img/ext/folder-remote.png", src.getGUIsetting());
-
+					
 					if (subFolderAction != null)
 						subFolderAction.addAdditionalEntity(ne);
 					else
@@ -216,7 +216,7 @@ public class WebFolder {
 				}
 				return actions;
 			}
-
+			
 			@Override
 			public MainPanelComponent getResultMainPanel() {
 				if (introTxt != null)
@@ -225,10 +225,10 @@ public class WebFolder {
 					return null;
 			}
 		}, title, icon, guiSetting);
-
+		
 		return nav;
 	}
-
+	
 	/**
 	 * @deprecated Use {@link IAPservice#getPathwayViewEntity(PathwayWebLinkItem,GUIsetting)} instead
 	 */
@@ -236,23 +236,23 @@ public class WebFolder {
 	private static NavigationButton getPathwayViewEntity(final PathwayWebLinkItem mmc, GUIsetting guiSettings) {
 		return IAPservice.getPathwayViewEntity(mmc, guiSettings);
 	}
-
+	
 	public static void addAnnotationsToGraphElements(Graph graph) {
 		new TabMetaCrop().addAnnotationsToGraphElements(graph);
 	}
-
+	
 	static ThreadSafeOptions currentZoom = new ThreadSafeOptions();
-
+	
 	public static JComponent getZoomSliderForGraph(final ObjectRef scrollpaneRef) {
-
+		
 		int FPS_MIN = 0;
 		int FPS_MAX = 200;
 		int FPS_INIT = 100;
-
+		
 		final JSlider sliderZoom = new JSlider(JSlider.HORIZONTAL, FPS_MIN, FPS_MAX, FPS_INIT);
-
+		
 		final JLabel lbl = new JLabel("Zoom (100%)");
-
+		
 		// Turn on labels at major tick marks.
 		sliderZoom.setMajorTickSpacing(50);
 		sliderZoom.setMinorTickSpacing(10);
@@ -265,14 +265,14 @@ public class WebFolder {
 				sliderZoom.setVisible(true);
 			}
 		});
-
+		
 		if (currentZoom.getInt() == 0)
 			currentZoom.setInt(100);
 		else {
 			updateZoom((JScrollPane) scrollpaneRef.getObject(), lbl, sliderZoom, currentZoom.getInt());
 			sliderZoom.setValue(currentZoom.getInt());
 		}
-
+		
 		sliderZoom.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				JSlider s = (JSlider) e.getSource();
@@ -285,10 +285,10 @@ public class WebFolder {
 				}
 			}
 		});
-
+		
 		return TableLayout.getSplitVertical(lbl, sliderZoom, TableLayout.PREFERRED, TableLayout.PREFERRED);
 	}
-
+	
 	// ImageIcon icon = GravistoService.loadIcon(AIPmain.class, img, -48, 48);
 	// final JButton n1 = new JButton(title, icon);
 	// n1.setOpaque(false);
@@ -302,7 +302,7 @@ public class WebFolder {
 	// SwingUtilities.invokeLater(r);
 	// }
 	// });
-
+	
 	private static void updateZoom(final JScrollPane graphViewScrollPane, final JLabel lbl, JSlider s, int val) {
 		lbl.setText("Zoom (" + val + "%)");
 		AffineTransform at = new AffineTransform();
@@ -315,7 +315,7 @@ public class WebFolder {
 			lbl.setText("Zoom (not supported)");
 		}
 	}
-
+	
 	public static NavigationButton getURLentity(String title, final String referenceURL, String image,
 						GUIsetting guiSetting) {
 		NavigationAction action = new AbstractNavigationAction("Show in browser") {
@@ -323,12 +323,12 @@ public class WebFolder {
 			public void performActionCalculateResults(NavigationButton src) {
 				AttributeHelper.showInBrowser(referenceURL);
 			}
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				return null;
 			}
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				return null;
@@ -336,7 +336,7 @@ public class WebFolder {
 		};
 		NavigationButton website = new NavigationButton(action, title, image, guiSetting);
 		website.setToolTipText("Open " + referenceURL);
-
+		
 		return website;
 	}
 }

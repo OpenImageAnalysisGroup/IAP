@@ -16,33 +16,33 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
  * @author klukas
  */
 public class BinaryFileInfo {
-
+	
 	private IOurl fileName;
 	private final boolean primary;
 	private final MappingDataEntity entity;
-
+	
 	public BinaryFileInfo(IOurl fileName, boolean primary, MappingDataEntity entity) {
 		this.fileName = fileName;
 		this.primary = primary;
 		this.entity = entity;
 	}
-
-	public String getMD5() {
+	
+	public String getHash() {
 		return ((BinaryMeasurement) entity).getURL().getDetail();
 	}
-
+	
 	public IOurl getFileName() {
 		return fileName;
 	}
-
+	
 	public boolean isPrimary() {
 		return primary;
 	}
-
+	
 	public MappingDataEntity getEntity() {
 		return entity;
 	}
-
+	
 	public void setFileName(IOurl fileName) {
 		this.fileName = fileName;
 	}

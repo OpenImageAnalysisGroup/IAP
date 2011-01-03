@@ -16,10 +16,10 @@ package info;
  * @author klukas
  */
 public class StopWatch {
-
+	
 	private long start = System.currentTimeMillis();
 	private final String desc;
-
+	
 	/**
 	 * @param desc
 	 *           This optional description is used by the {@link #printTime()} method to identify this stop watch.
@@ -28,17 +28,17 @@ public class StopWatch {
 		this.desc = desc;
 		System.out.println(desc + "...");
 	}
-
+	
 	public StopWatch(String desc, boolean printStart) {
 		this.desc = desc;
 		if (printStart)
-		System.out.println(desc + "...");
+			System.out.println(desc + "...");
 	}
-
+	
 	public void reset() {
 		start = System.currentTimeMillis();
 	}
-
+	
 	/**
 	 * @return The time, elapsed since the construction of the object or since
 	 *         the
@@ -47,7 +47,7 @@ public class StopWatch {
 	public long getTime() {
 		return System.currentTimeMillis() - start;
 	}
-
+	
 	/**
 	 * Prints the time, elapsed since the construction of the object or since the
 	 * last {@link #reset()} operation.
@@ -55,14 +55,14 @@ public class StopWatch {
 	public void printTime() {
 		System.out.println(desc + " took " + getTime() + " ms");
 	}
-
+	
 	public String getDescription() {
 		return desc;
 	}
-
+	
 	public void printTime(int minTime) {
-		if (minTime==0 || getTime()-start>minTime)
+		if (minTime == 0 || getTime() - start > minTime)
 			System.out.println(desc + " took " + getTime() + " ms");
 	}
-
+	
 }

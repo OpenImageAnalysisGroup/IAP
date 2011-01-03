@@ -1,42 +1,48 @@
 package ij.plugin;
+
 import ij.*;
 import ij.gui.*;
 import ij.process.*;
 
-
-
-/** Implements the "Stack to HyperStack", "RGB to HyperStack" 
-	and "HyperStack to Stack" commands. */
+/**
+ * Implements the "Stack to HyperStack", "RGB to HyperStack"
+ * and "HyperStack to Stack" commands.
+ */
 public class HyperStackConverter implements PlugIn {
-	static final int C=0, Z=1, T=2;
-	static final int CZT=0, CTZ=1, ZCT=2, ZTC=3, TCZ=4, TZC=5;
-    static final String[] orders = {"xyczt(default)", "xyctz", "xyzct", "xyztc", "xytcz", "xytzc"};
-    static int order = CZT;
-    static boolean splitRGB = true;
-
+	static final int C = 0, Z = 1, T = 2;
+	static final int CZT = 0, CTZ = 1, ZCT = 2, ZTC = 3, TCZ = 4, TZC = 5;
+	static final String[] orders = { "xyczt(default)", "xyctz", "xyzct", "xyztc", "xytcz", "xytzc" };
+	static int order = CZT;
+	static boolean splitRGB = true;
+	
 	public void run(String arg) {
-		if (arg.equals("new"))
-		{newHyperStack(); return;}
+		if (arg.equals("new")) {
+			newHyperStack();
+			return;
+		}
 		ImagePlus imp = IJ.getImage();
-    	if (arg.equals("stacktohs"))
-    		convertStackToHS(imp);
-    	else if (arg.equals("hstostack"))
-    		convertHSToStack(imp);
+		if (arg.equals("stacktohs"))
+			convertStackToHS(imp);
+		else
+			if (arg.equals("hstostack"))
+				convertHSToStack(imp);
 	}
 	
-	/** Displays the current stack in a HyperStack window. Based on the 
-		Stack_to_Image5D class in Joachim Walter's Image5D plugin. */
+	/**
+	 * Displays the current stack in a HyperStack window. Based on the
+	 * Stack_to_Image5D class in Joachim Walter's Image5D plugin.
+	 */
 	void convertStackToHS(ImagePlus imp) {
-        int nChannels = imp.getNChannels();
-        int nSlices = imp.getNSlices();
-        int nFrames = imp.getNFrames();
+		int nChannels = imp.getNChannels();
+		int nSlices = imp.getNSlices();
+		int nFrames = imp.getNFrames();
 		int stackSize = imp.getImageStackSize();
-		if (stackSize==1) {
+		if (stackSize == 1) {
 			IJ.error("Stack to HyperStack", "Stack required");
 			return;
 		}
-		boolean rgb = imp.getBitDepth()==24;
-		String[] modes = {"Composite", "Color", "Grayscale"};
+		boolean rgb = imp.getBitDepth() == 24;
+		String[] modes = { "Composite", "Color", "Grayscale" };
 		GenericDialog gd = new GenericDialog("Convert to HyperStack");
 		gd.addChoice("Order:", orders, orders[order]);
 		gd.addNumericField("Channels (c):", nChannels, 0);
@@ -48,7 +54,8 @@ public class HyperStackConverter implements PlugIn {
 			gd.addCheckbox("Convert RGB to 3 Channel Hyperstack", splitRGB);
 		}
 		gd.showDialog();
-		if (gd.wasCanceled()) return;
+		if (gd.wasCanceled())
+			return;
 		order = gd.getNextChoiceIndex();
 		nChannels = (int) gd.getNextNumber();
 		nSlices = (int) gd.getNextNumber();
@@ -56,72 +63,96 @@ public class HyperStackConverter implements PlugIn {
 		int mode = gd.getNextChoiceIndex();
 		if (rgb)
 			splitRGB = gd.getNextBoolean();
-		if (rgb && splitRGB==true) {
-			new CompositeConverter().run(mode==0?"composite":"color");
+		if (rgb && splitRGB == true) {
+			new CompositeConverter().run(mode == 0 ? "composite" : "color");
 			return;
 		}
-		if (rgb && nChannels>1) {
+		if (rgb && nChannels > 1) {
 			IJ.error("HyperStack Converter", "RGB stacks are limited to one channel");
 			return;
 		}
-		if (nChannels*nSlices*nFrames!=stackSize) {
+		if (nChannels * nSlices * nFrames != stackSize) {
 			IJ.error("HyperStack Converter", "channels x slices x frames <> stack size");
 			return;
 		}
 		imp.setDimensions(nChannels, nSlices, nFrames);
-		if (order!=CZT && imp.getStack().isVirtual())
+		if (order != CZT && imp.getStack().isVirtual())
 			IJ.error("HyperStack Converter", "Virtual stacks must by in XYCZT order.");
 		else {
 			shuffle(imp, order);
 			ImagePlus imp2 = imp;
-			if (nChannels>1 && imp.getBitDepth()!=24) {
+			if (nChannels > 1 && imp.getBitDepth() != 24) {
 				LUT[] luts = imp.getLuts();
-				if (luts!=null && luts.length<nChannels) luts = null;
-				imp2 = new CompositeImage(imp, mode+1);
-				if (luts!=null)
-					((CompositeImage)imp2).setLuts(luts);
-			} else if (imp.getClass().getName().indexOf("Image5D")!=-1) {
-				imp2 = imp.createImagePlus();
-				imp2.setStack(imp.getTitle(), imp.getImageStack());
-				imp2.setDimensions(imp.getNChannels(), imp.getNSlices(), imp.getNFrames());
-				imp2.getProcessor().resetMinAndMax();
-			}
+				if (luts != null && luts.length < nChannels)
+					luts = null;
+				imp2 = new CompositeImage(imp, mode + 1);
+				if (luts != null)
+					((CompositeImage) imp2).setLuts(luts);
+			} else
+				if (imp.getClass().getName().indexOf("Image5D") != -1) {
+					imp2 = imp.createImagePlus();
+					imp2.setStack(imp.getTitle(), imp.getImageStack());
+					imp2.setDimensions(imp.getNChannels(), imp.getNSlices(), imp.getNFrames());
+					imp2.getProcessor().resetMinAndMax();
+				}
 			imp2.setOpenAsHyperStack(true);
 			new StackWindow(imp2);
-			if (imp!=imp2) {
+			if (imp != imp2) {
 				imp.hide();
 				WindowManager.setCurrentWindow(imp2.getWindow());
 			}
 		}
 	}
-
-	/** Changes the dimension order of a 4D or 5D stack from 
-		the specified order (CTZ, ZCT, ZTC, TCZ or TZC) to 
-		the XYCZT order used by ImageJ. */
+	
+	/**
+	 * Changes the dimension order of a 4D or 5D stack from
+	 * the specified order (CTZ, ZCT, ZTC, TCZ or TZC) to
+	 * the XYCZT order used by ImageJ.
+	 */
 	public void shuffle(ImagePlus imp, int order) {
-        int nChannels = imp.getNChannels();
-        int nSlices = imp.getNSlices();
-        int nFrames = imp.getNFrames();
-		int first=C, middle=Z, last=T;
-		int nFirst=nChannels, nMiddle=nSlices;
+		int nChannels = imp.getNChannels();
+		int nSlices = imp.getNSlices();
+		int nFrames = imp.getNFrames();
+		int first = C, middle = Z, last = T;
+		int nFirst = nChannels, nMiddle = nSlices;
 		switch (order) {
-			case CTZ: first=C; middle=T; last=Z;
-				nFirst=nChannels; nMiddle=nFrames; 
+			case CTZ:
+				first = C;
+				middle = T;
+				last = Z;
+				nFirst = nChannels;
+				nMiddle = nFrames;
 				break;
-			case ZCT: first=Z; middle=C; last=T;
-				nFirst=nSlices; nMiddle=nChannels; 
+			case ZCT:
+				first = Z;
+				middle = C;
+				last = T;
+				nFirst = nSlices;
+				nMiddle = nChannels;
 				break;
-			case ZTC: first=Z; middle=T; last=C;
-				nFirst=nSlices; nMiddle=nFrames; 
+			case ZTC:
+				first = Z;
+				middle = T;
+				last = C;
+				nFirst = nSlices;
+				nMiddle = nFrames;
 				break;
-			case TCZ: first=T; middle=C; last=Z;
-				nFirst=nFrames; nMiddle=nChannels; 
+			case TCZ:
+				first = T;
+				middle = C;
+				last = Z;
+				nFirst = nFrames;
+				nMiddle = nChannels;
 				break;
-			case TZC: first=T; middle=Z; last=C;
-				nFirst=nFrames; nMiddle=nSlices; 
+			case TZC:
+				first = T;
+				middle = Z;
+				last = C;
+				nFirst = nFrames;
+				nMiddle = nSlices;
 				break;
 		}
-		if (order!=CZT) {
+		if (order != CZT) {
 			ImageStack stack = imp.getImageStack();
 			Object[] images1 = stack.getImageArray();
 			Object[] images2 = new Object[images1.length];
@@ -130,11 +161,11 @@ public class HyperStackConverter implements PlugIn {
 			String[] labels2 = new String[labels1.length];
 			System.arraycopy(labels1, 0, labels2, 0, labels1.length);
 			int[] index = new int[3];
-			for (index[2]=0; index[2]<nFrames; ++index[2]) {
-				for (index[1]=0; index[1]<nSlices; ++index[1]) {
-					for (index[0]=0; index[0]<nChannels; ++index[0]) {
-						int dstIndex = index[0] + index[1]*nChannels + index[2]*nChannels*nSlices;
-						int srcIndex = index[first] + index[middle]*nFirst + index[last]*nFirst*nMiddle;
+			for (index[2] = 0; index[2] < nFrames; ++index[2]) {
+				for (index[1] = 0; index[1] < nSlices; ++index[1]) {
+					for (index[0] = 0; index[0] < nChannels; ++index[0]) {
+						int dstIndex = index[0] + index[1] * nChannels + index[2] * nChannels * nSlices;
+						int srcIndex = index[first] + index[middle] * nFirst + index[last] * nFirst * nMiddle;
 						images1[dstIndex] = images2[srcIndex];
 						labels1[dstIndex] = labels2[srcIndex];
 					}
@@ -142,9 +173,10 @@ public class HyperStackConverter implements PlugIn {
 			}
 		}
 	}
-
+	
 	void convertHSToStack(ImagePlus imp) {
-		if (!imp.isHyperStack()) return;
+		if (!imp.isHyperStack())
+			return;
 		ImagePlus imp2 = imp;
 		if (imp.isComposite()) {
 			ImageStack stack = imp.getStack();
@@ -157,7 +189,8 @@ public class HyperStackConverter implements PlugIn {
 		}
 		imp2.setOpenAsHyperStack(false);
 		new StackWindow(imp2);
-		if (imp!=imp2) imp.hide();
+		if (imp != imp2)
+			imp.hide();
 	}
 	
 	void newHyperStack() {
@@ -165,4 +198,3 @@ public class HyperStackConverter implements PlugIn {
 	}
 	
 }
-

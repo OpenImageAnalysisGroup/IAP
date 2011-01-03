@@ -21,8 +21,9 @@ import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import org.AttributeHelper;
 import org.ErrorMsg;
+import org.graffiti.editor.GravistoService;
+import org.graffiti.editor.HashType;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
@@ -36,13 +37,16 @@ import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
@@ -50,33 +54,35 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  * @author Klukas
  */
 public class DataExchangeHelperForExperiments {
-
+	
+	public static final HashType DEFAULT_HASH = HashType.MD5;
+	
 	public static int getSizeOfExperiment(MongoDB m, ExperimentInterface experimentName) {
 		return -1;
 	}
-
+	
 	public static void downloadFile(MongoDB m, final ImageResult imageResult, final File targetFile,
 						final DataSetFileButton button, final MongoCollection collection) {
 		try {
 			m.processDB(new RunnableOnDB() {
-
+				
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					try {
 						// Blob b = CallDBE2WebService.getBlob(user, pass,
 						// imageResult.getMd5());
-
+						
 						GridFS gridfs_images = new GridFS(db, collection.toString());
-						System.out.println("Look for " + collection.toString() + "-MD5: " + imageResult.getMd5());
-						GridFSDBFile fff = gridfs_images.findOne(imageResult.getMd5());
+						System.out.println("Look for " + collection.toString() + "-HASH: " + imageResult.getHash());
+						GridFSDBFile fff = gridfs_images.findOne(imageResult.getHash());
 						if (fff == null)
 							System.out.println("NOT FOUND");
 						if (fff != null) {
 							System.out.println("FOUND, LENGTH=" + fff.getLength());
 							InputStream bis = fff.getInputStream();
-
+							
 							FileOutputStream fos = new FileOutputStream(targetFile);
 							int readBytes = 0;
 							int pos = 0;
@@ -97,7 +103,7 @@ public class DataExchangeHelperForExperiments {
 						SupplementaryFilePanelMongoDB.showError("IOException", e1);
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -107,32 +113,32 @@ public class DataExchangeHelperForExperiments {
 			SupplementaryFilePanelMongoDB.showError("IOException", e);
 		}
 	}
-
-	public static DatabaseStorageResult insertMD5checkedFile(final MongoDB m, final File file,
+	
+	public static DatabaseStorageResult insertHashedFile(final MongoDB m, final File file,
 						File createTempPreviewImage, int isJavaImage, DataSetFileButton imageButton, MappingDataEntity tableName) {
-
+		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		try {
 			m.processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				public void run() {
-					String md5;
+					String hash;
 					try {
-						md5 = AttributeHelper.getMD5fromFile(file);
+						hash = GravistoService.getHashFromFile(file, DEFAULT_HASH);
 						GridFS gridfs_annotation = new GridFS(db, "annotations");
-						m.saveAnnotationFile(gridfs_annotation, md5, file);
+						m.saveAnnotationFile(gridfs_annotation, hash, file);
 						// GridFS gridfs_images = new GridFS(db, "images");
-						GridFSDBFile fff = gridfs_annotation.findOne(md5);
+						GridFSDBFile fff = gridfs_annotation.findOne(hash);
 						if (fff != null) {
 							tso.setParam(0, DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED);
-							tso.setParam(1, md5);
+							tso.setParam(1, hash);
 							return;
 						} else {
 							try {
-								m.saveAnnotationFile(gridfs_annotation, md5, file);
+								m.saveAnnotationFile(gridfs_annotation, hash, file);
 								tso.setParam(0, DatabaseStorageResult.STORED_IN_DB);
-								tso.setParam(1, md5);
+								tso.setParam(1, hash);
 								return;
 							} catch (IOException e) {
 								ErrorMsg.addErrorMessage(e);
@@ -144,7 +150,7 @@ public class DataExchangeHelperForExperiments {
 						e1.printStackTrace();
 					}
 				}
-
+				
 				public void setDB(DB db) {
 					this.db = db;
 				}
@@ -156,7 +162,7 @@ public class DataExchangeHelperForExperiments {
 		((DatabaseStorageResult) tso.getParam(0, null)).setMD5((String) tso.getParam(1, ""));
 		return (DatabaseStorageResult) tso.getParam(0, null);
 	}
-
+	
 	public static void fillFilePanel(final DataSetFilePanel filePanel, final MongoTreeNode mtdbe, final JTree expTree,
 						final MongoDB m) {
 		MyThread r = new MyThread(new Runnable() {
@@ -166,15 +172,15 @@ public class DataExchangeHelperForExperiments {
 		}, "add files to panel");
 		BackgroundThreadDispatcher.addTask(r, 0);
 	}
-
+	
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel, final MongoTreeNode mt,
 						final JTree expTree, MongoDB m) {
 		if (!mt.mayContainData())
 			return;
 		final StopObject stop = new StopObject(false);
-
+		
 		boolean cleared = false;
-
+		
 		try {
 			ArrayList<BinaryFileInfo> bbb = new ArrayList<BinaryFileInfo>();
 			BinaryFileInfo primary = null;
@@ -188,56 +194,79 @@ public class DataExchangeHelperForExperiments {
 						VolumeData id = (VolumeData) mde;
 						primary = new BinaryFileInfo(id.getURL(), true, id);
 					} else {
-						if (mde instanceof Sample3D) {
-							Sample3D s3d = (Sample3D) mde;
+						if (mde instanceof Substance3D) {
+							Substance3D sub = (Substance3D) mde;
 							primary = null;
-							for (NumericMeasurementInterface nmi : s3d.getBinaryMeasurements()) {
-								if (nmi instanceof ImageData) {
-									ImageData id = (ImageData) nmi;
-									primary = new BinaryFileInfo(id.getURL(), true, id);
-								} else
-									if (nmi instanceof VolumeData) {
-										VolumeData id = (VolumeData) nmi;
-										primary = new BinaryFileInfo(id.getURL(), true, id);
-									}
-								if (primary != null)
-									bbb.add(primary);
-							}
-							primary = null;
-						} else {
-							if (mde instanceof Condition3D) {
-								Condition3D c3d = (Condition3D) mde;
-								primary = null;
-								for (SampleInterface si : c3d) {
-									Sample3D s3d = (Sample3D) si;
-									for (NumericMeasurementInterface nmi : s3d.getBinaryMeasurements()) {
-										if (nmi instanceof ImageData) {
-											ImageData id = (ImageData) nmi;
-											IOurl url = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
-											primary = new BinaryFileInfo(url, true, id);
-										} else
-											if (nmi instanceof VolumeData) {
-												VolumeData id = (VolumeData) nmi;
-												IOurl url = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
-												primary = new BinaryFileInfo(url, true, id);
-											}
-										if (primary != null)
-											bbb.add(primary);
+							for (ConditionInterface c : sub)
+								for (SampleInterface si : c) {
+									if (si instanceof Sample3D) {
+										Sample3D s3d = (Sample3D) si;
+										for (NumericMeasurementInterface nmi : s3d.getMeasurements((MeasurementNodeType) null)) {
+											if (nmi instanceof ImageData) {
+												ImageData id = (ImageData) nmi;
+												primary = new BinaryFileInfo(id.getURL(), true, id);
+											} else
+												if (nmi instanceof VolumeData) {
+													VolumeData id = (VolumeData) nmi;
+													primary = new BinaryFileInfo(id.getURL(), true, id);
+												}
+											if (primary != null)
+												bbb.add(primary);
+										}
 									}
 								}
+							primary = null;
+						} else
+							if (mde instanceof Sample3D) {
+								Sample3D s3d = (Sample3D) mde;
 								primary = null;
+								for (NumericMeasurementInterface nmi : s3d.getMeasurements((MeasurementNodeType) null)) {
+									if (nmi instanceof ImageData) {
+										ImageData id = (ImageData) nmi;
+										primary = new BinaryFileInfo(id.getURL(), true, id);
+									} else
+										if (nmi instanceof VolumeData) {
+											VolumeData id = (VolumeData) nmi;
+											primary = new BinaryFileInfo(id.getURL(), true, id);
+										}
+									if (primary != null)
+										bbb.add(primary);
+								}
+								primary = null;
+							} else {
+								if (mde instanceof Condition3D) {
+									Condition3D c3d = (Condition3D) mde;
+									primary = null;
+									for (SampleInterface si : c3d) {
+										Sample3D s3d = (Sample3D) si;
+										for (NumericMeasurementInterface nmi : s3d.getMeasurements((MeasurementNodeType) null)) {
+											if (nmi instanceof ImageData) {
+												ImageData id = (ImageData) nmi;
+												IOurl url = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
+												primary = new BinaryFileInfo(url, true, id);
+											} else
+												if (nmi instanceof VolumeData) {
+													VolumeData id = (VolumeData) nmi;
+													IOurl url = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
+													primary = new BinaryFileInfo(url, true, id);
+												}
+											if (primary != null)
+												bbb.add(primary);
+										}
+									}
+									primary = null;
+								}
 							}
-						}
 					}
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
 			if (primary != null)
 				bbb.add(primary);
-
+			
 			Map<String, Object> properties = new HashMap<String, Object>();
 			mt.getTargetEntity().fillAttributeMap(properties);
-
+			
 			for (Entry<String, Object> e : properties.entrySet()) {
 				if (e.getKey().startsWith("anno")) {
 					Object v = e.getValue();
@@ -248,7 +277,7 @@ public class DataExchangeHelperForExperiments {
 					}
 				}
 			}
-
+			
 			final ArrayList<MyThread> executeLater = new ArrayList<MyThread>();
 			BinaryFileInfo lastBBB = null;
 			if (bbb.size() > 0)
@@ -269,7 +298,7 @@ public class DataExchangeHelperForExperiments {
 						previewImage = null;
 						previewLoadAndConstructNeeded = true;
 					} else {
-						byte[] pi = m.getPreviewData(binaryFileInfo.getMD5());
+						byte[] pi = m.getPreviewData(binaryFileInfo.getHash());
 						if (pi != null)
 							previewImage = new ImageIcon(pi);
 						else
@@ -279,29 +308,29 @@ public class DataExchangeHelperForExperiments {
 									previewImage, mt.isReadOnly());
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
-
+				
 				imageButton.setDownloadNeeded(!FileSystemHandler.isFileUrl(binaryFileInfo.getFileName()));
 				imageButton.setVerticalTextPosition(SwingConstants.BOTTOM);
 				imageButton.setHorizontalTextPosition(SwingConstants.CENTER);
-
+				
 				if (!cleared) {
 					cleared = true;
 					clearPanel(filePanel, mt, expTree);
 				}
-
+				
 				final boolean previewLoadAndConstructNeededF = previewLoadAndConstructNeeded;
-
+				
 				final boolean fIsLast = binaryFileInfo == lastBBB;
-
+				
 				SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree, stop, executeLater, binaryFileInfo,
 									imageButton, previewLoadAndConstructNeededF, fIsLast));
 			}
-
+			
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 	}
-
+	
 	private static Runnable processIcon(final DataSetFilePanel filePanel, final MongoTreeNode mt, final JTree expTree,
 						final StopObject stop, final ArrayList<MyThread> executeLater, final BinaryFileInfo binaryFileInfo,
 						final DataSetFileButton imageButton, final boolean previewLoadAndConstructNeededF, final boolean fIsLast) {
@@ -344,7 +373,7 @@ public class DataExchangeHelperForExperiments {
 							}
 						}, "preview load and construct");
 						executeLater.add(t);
-
+						
 					}
 					BackgroundTaskHelper.executeLaterOnSwingTask(10, new Runnable() {
 						@Override
@@ -360,7 +389,7 @@ public class DataExchangeHelperForExperiments {
 			}
 		};
 	}
-
+	
 	private static void clearPanel(final DataSetFilePanel filePanel, final MongoTreeNode mt, final JTree expTree) {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
@@ -379,7 +408,7 @@ public class DataExchangeHelperForExperiments {
 			SupplementaryFilePanelMongoDB.showError("InvocationTargetException", e2);
 		}
 	}
-
+	
 	// private static File getPreviewFileFromDatabase(BlobPropertyExtended
 	// blobInfo) {
 	//

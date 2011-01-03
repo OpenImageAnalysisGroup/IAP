@@ -1,4 +1,5 @@
 package ij.plugin.frame;
+
 import java.awt.*;
 import java.awt.event.*;
 import ij.*;
@@ -8,13 +9,13 @@ import ij.process.*;
 
 /** Implements ImageJ's Paste Control window. */
 public class PasteController extends PlugInFrame implements PlugIn, ItemListener {
-
+	
 	private Choice pasteMode;
 	private static Frame instance;
 	
 	public PasteController() {
 		super("Paste Control");
-		if (instance!=null) {
+		if (instance != null) {
 			instance.toFront();
 			return;
 		}
@@ -43,7 +44,7 @@ public class PasteController extends PlugInFrame implements PlugIn, ItemListener
 		pasteMode.addItemListener(this);
 		add(pasteMode);
 		Roi.setPasteMode(Blitter.COPY);
-
+		
 		pack();
 		GUI.center(this);
 		setResizable(false);
@@ -54,20 +55,48 @@ public class PasteController extends PlugInFrame implements PlugIn, ItemListener
 		int index = pasteMode.getSelectedIndex();
 		int mode = Blitter.COPY;
 		switch (index) {
-			case 0: mode = Blitter.COPY; break;
-			case 1: mode = Blitter.AVERAGE; break;
-			case 2: mode = Blitter.DIFFERENCE; break;
-			case 3: mode = Blitter.COPY_TRANSPARENT; break;
-			case 4: mode = Blitter.COPY_ZERO_TRANSPARENT; break;
-			case 5: mode = Blitter.AND; break;
-			case 6: mode = Blitter.OR; break;
-			case 7: mode = Blitter.XOR; break;
-			case 8: mode = Blitter.ADD; break;
-			case 9: mode = Blitter.SUBTRACT; break;
-			case 10: mode = Blitter.MULTIPLY; break;
-			case 11: mode = Blitter.DIVIDE; break;
-			case 12: mode = Blitter.MIN; break;
-			case 13: mode = Blitter.MAX; break;
+			case 0:
+				mode = Blitter.COPY;
+				break;
+			case 1:
+				mode = Blitter.AVERAGE;
+				break;
+			case 2:
+				mode = Blitter.DIFFERENCE;
+				break;
+			case 3:
+				mode = Blitter.COPY_TRANSPARENT;
+				break;
+			case 4:
+				mode = Blitter.COPY_ZERO_TRANSPARENT;
+				break;
+			case 5:
+				mode = Blitter.AND;
+				break;
+			case 6:
+				mode = Blitter.OR;
+				break;
+			case 7:
+				mode = Blitter.XOR;
+				break;
+			case 8:
+				mode = Blitter.ADD;
+				break;
+			case 9:
+				mode = Blitter.SUBTRACT;
+				break;
+			case 10:
+				mode = Blitter.MULTIPLY;
+				break;
+			case 11:
+				mode = Blitter.DIVIDE;
+				break;
+			case 12:
+				mode = Blitter.MIN;
+				break;
+			case 13:
+				mode = Blitter.MAX;
+				break;
 		}
 		Roi.setPasteMode(mode);
 		if (Recorder.record)
@@ -75,10 +104,10 @@ public class PasteController extends PlugInFrame implements PlugIn, ItemListener
 		WindowManager.getCurrentImage();
 	}
 	
-    public void windowClosing(WindowEvent e) {
-    	close();
+	public void windowClosing(WindowEvent e) {
+		close();
 	}
-
+	
 	public void close() {
 		super.close();
 		instance = null;

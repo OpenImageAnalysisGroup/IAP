@@ -26,25 +26,25 @@ import javax.swing.SwingConstants;
  */
 public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
-
+	
 	BufferedImage image;
 	double scale = 1.0;
-
+	
 	private int maxUnitIncrement = 20;
-
+	
 	public void setScale(double scale) {
 		this.scale = scale;
 	}
-
+	
 	public double getScale() {
 		return scale;
 	}
-
+	
 	public ZoomedImage(BufferedImage image) {
 		this.image = image;
 		setAutoscrolls(true);
 	}
-
+	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
@@ -56,17 +56,17 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		at.scale(scale, scale);
 		g2.drawRenderedImage(image, at);
 	}
-
+	
 	public Dimension getPreferredSize() {
 		int w = (int) (scale * image.getWidth());
 		int h = (int) (scale * image.getHeight());
 		return new Dimension(w, h);
 	}
-
+	
 	public int getInt() {
 		return (int) (scale * 100d);
 	}
-
+	
 	public void setInt(int i) {
 		this.scale = i / 100d;
 		revalidate();
@@ -76,7 +76,7 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		// jsp.setView(this);
 		// }
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.swing.Scrollable#getPreferredScrollableViewportSize()
@@ -85,12 +85,12 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 	public Dimension getPreferredScrollableViewportSize() {
 		return getPreferredSize();
 	}
-
+	
 	public void mouseDragged(MouseEvent e) {
 		Rectangle r = new Rectangle(e.getX(), e.getY(), 1, 1);
 		scrollRectToVisible(r);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.swing.Scrollable#getScrollableBlockIncrement(java.awt.Rectangle, int, int)
@@ -103,27 +103,27 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		else
 			return visibleRect.height - maxUnitIncrement;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.swing.Scrollable#getScrollableTracksViewportHeight()
 	 */
 	@Override
 	public boolean getScrollableTracksViewportHeight() {
-		// TODO Auto-generated method stub
+		//
 		return false;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.swing.Scrollable#getScrollableTracksViewportWidth()
 	 */
 	@Override
 	public boolean getScrollableTracksViewportWidth() {
-		// TODO Auto-generated method stub
+		//
 		return false;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.swing.Scrollable#getScrollableUnitIncrement(java.awt.Rectangle, int, int)
@@ -138,7 +138,7 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		} else {
 			currentPosition = visibleRect.y;
 		}
-
+		
 		// Return the number of pixels between currentPosition
 		// and the nearest tick mark in the indicated direction.
 		if (direction < 0) {
@@ -152,14 +152,14 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 								- currentPosition;
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
 	 */
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+		//
+		
 	}
 }

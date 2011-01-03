@@ -13,11 +13,11 @@ import java.util.ArrayList;
  *         Image Analysis Module
  */
 public class IAmodule {
-
+	
 	private ArrayList<AbstractImageAnalysisTask> todo = new ArrayList<AbstractImageAnalysisTask>();
-
+	
 	public WorkerInfo getWorkerInfo() {
 		return new WorkerInfo(todo.size(), 0, 0, 0, "Images / Min");
 	}
-
+	
 }

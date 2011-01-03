@@ -16,47 +16,47 @@ import java.awt.image.BufferedImage;
  * @author klukas
  */
 public class FlexibleImageSet {
-
+	
 	private FlexibleImage vis;
 	private FlexibleImage fluo;
 	private FlexibleImage nir;
-
+	
 	public FlexibleImageSet() {
 		// empty
 		// use setVis, ...
 	}
-
+	
 	public FlexibleImageSet(FlexibleImage vis, FlexibleImage fluo, FlexibleImage nir) {
 		this.vis = vis;
 		this.fluo = fluo;
 		this.nir = nir;
 	}
-
+	
 	public FlexibleImageSet(BufferedImage vis, BufferedImage fluo, BufferedImage nir) {
 		this.vis = new FlexibleImage(vis);
 		this.fluo = new FlexibleImage(fluo);
 		this.nir = new FlexibleImage(nir);
 	}
-
+	
 	public FlexibleImage getVis() {
 		return vis;
 	}
-
+	
 	public FlexibleImage getFluo() {
 		return fluo;
 	}
-
+	
 	public FlexibleImage getNir() {
 		return nir;
 	}
-
+	
 	/**
 	 * @return The sum of the pixel count of the input images.
 	 */
 	public long getPixelCount() {
 		return vis.getWidth() * vis.getHeight() + fluo.getWidth() * fluo.getHeight() + nir.getWidth() * nir.getHeight();
 	}
-
+	
 	public int getLargestWidth() {
 		int largest = 0;
 		if (vis != null)
@@ -69,7 +69,7 @@ public class FlexibleImageSet {
 				largest = nir.getWidth();
 		return largest;
 	}
-
+	
 	public int getLargestHeight() {
 		int largest = 0;
 		if (vis != null)
@@ -82,7 +82,7 @@ public class FlexibleImageSet {
 				largest = nir.getHeight();
 		return largest;
 	}
-
+	
 	/**
 	 * Enlarge the images so that they all share the same size.
 	 * 
@@ -95,23 +95,23 @@ public class FlexibleImageSet {
 		// PrintImage.printImage(fluo);
 		return new FlexibleImageSet(vis.resize(w, h), fluo.resize(w, h), nir.resize(w, h));
 	}
-
+	
 	public void setVis(FlexibleImage vis) {
 		this.vis = vis;
 	}
-
+	
 	public void setFluo(FlexibleImage fluo) {
 		this.fluo = fluo;
 	}
-
+	
 	public void setNir(FlexibleImage nir) {
 		this.nir = nir;
 	}
-
+	
 	public boolean hasAllThreeImages() {
 		return vis != null && fluo != null && nir != null;
 	}
-
+	
 	public void set(FlexibleImage flexibleImage) {
 		switch (flexibleImage.getType()) {
 			case VIS:
@@ -127,25 +127,25 @@ public class FlexibleImageSet {
 				throw new UnsupportedOperationException("FlexibleImage-Type is not set!");
 		}
 	}
-
+	
 	public FlexibleImageSet copy() {
 		return new FlexibleImageSet(vis.copy(), fluo.copy(), nir.copy());
 	}
-
+	
 	public FlexibleImageSet resize(double scaleVis, double scaleFluo, double scaleNir) {
 		FlexibleImage scaledVis = new ImageOperation(vis).resize(scaleVis).getImage();
 		FlexibleImage scaledFluo = new ImageOperation(fluo).resize(scaleFluo).getImage();
 		FlexibleImage scaledNir = new ImageOperation(nir).resize(scaleNir).getImage();
 		return new FlexibleImageSet(scaledVis, scaledFluo, scaledNir);
 	}
-
+	
 	public FlexibleImageSet invert() {
 		FlexibleImage v = new ImageOperation(vis).invert().getImage();
 		FlexibleImage f = new ImageOperation(fluo).invert().getImage();
 		FlexibleImage n = new ImageOperation(nir).invert().getImage();
 		return new FlexibleImageSet(v, f, n);
 	}
-
+	
 	public FlexibleImageSet draw(FlexibleImageSet masks, int background) {
 		FlexibleImage v = new ImageOperation(vis).draw(masks.getVis(), background);
 		FlexibleImage f = new ImageOperation(fluo).draw(masks.getFluo(), background);

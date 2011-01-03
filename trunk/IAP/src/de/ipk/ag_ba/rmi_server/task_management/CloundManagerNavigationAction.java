@@ -22,25 +22,25 @@ import de.ipk.ag_ba.mongo.MongoDB;
  * @author klukas
  */
 public class CloundManagerNavigationAction extends AbstractNavigationAction {
-
+	
 	private NavigationButton src;
 	private final MongoDB m;
-
+	
 	public CloundManagerNavigationAction(MongoDB m) {
 		super("Task- and Server-Management");
 		this.m = m;
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return "img/ext/preferences-desktop-screensaver.png";
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return "Task Management";
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
@@ -68,19 +68,19 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		}
 		return res;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return new MainPanelComponent(new CloudTaskAndServerOverviewComponent(), true);

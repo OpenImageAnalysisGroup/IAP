@@ -36,40 +36,40 @@ public enum DBTable {
 						"<html>table storing networks as binaries</html>"), ALTSUBSTID("alt. substance-IDs",
 						"<html>table storing alternative substance-identifier</html>"), SUPPLEMENTARYFILE("supplementary-file",
 						"<html>table storing optional binary-data</html>");
-
+	
 	private final String desc;
 	private final String naturalName;
 	private final String[] ontologies;
-
+	
 	private DBTable(String naturalName, String desc, String... ontologies) {
 		this.naturalName = naturalName;
 		this.desc = desc;
 		this.ontologies = ontologies;
 	}
-
+	
 	/**
 	 * @return the description of the table
 	 */
 	public String getDescription() {
 		return this.desc;
 	}
-
+	
 	@Override
 	public String toString() {
 		return this.naturalName;
 	}
-
+	
 	public String[] getRelevantOntologies() {
 		return this.ontologies;
 	}
-
+	
 	/**
 	 * @return account, userGroup
 	 */
 	public static DBTable[] getUserManagementTables() {
 		return new DBTable[] { DBTable.ACCOUNT, DBTable.USERGROUP };
 	}
-
+	
 	/**
 	 * @return all basis data tables
 	 */
@@ -77,7 +77,7 @@ public enum DBTable {
 		return new DBTable[] { DBTable.EXPTYPE, DBTable.SPECIES, DBTable.MEASUREMENTINDEXUNIT, DBTable.MEASUREMENTUNIT,
 							DBTable.POSITIONUNIT, DBTable.SUBSTANCEGROUP, DBTable.SUBSTANCE };
 	}
-
+	
 	/**
 	 * @return experiment-tables and altSubstID + supplementaryFile
 	 */

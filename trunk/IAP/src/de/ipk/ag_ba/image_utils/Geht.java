@@ -34,67 +34,67 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  * @author entzian
  */
 public class Geht {
-
+	
 	private BufferedImage rgbImage;
 	private BufferedImage fluorImage;
 	private BufferedImage nearImage;
-
+	
 	private BufferedImage newRGBImage;
 	private BufferedImage newFluorImage;
 	private BufferedImage newNearImage;
-
+	
 	private int rotationAngle;
 	private double scaleX;
 	private double scaleY;
 	private int translateX;
 	private int translateY;
-
+	
 	private double fluoEpsilonA;
 	private double fluoEpsilonB;
 	private double rgbEpsilonB;
 	private double rgbEpsilonA;
 	private double nearEpsilonA;
 	private double nearEpsilonB;
-
+	
 	private int rgbNumberOfErodeLoops;
 	private int rgbNumberOfDilateLoops;
 	private int fluoNumberOfErodeLoops;
 	private int fluoNumberOfDilateLoops;
 	private int nearNumberOfErodeLoops;
 	private int nearNumberOfDilateLoops;
-
+	
 	private int background;
-
+	
 	public static void main(String[] args) throws IOException, Exception {
-
+		
 		System.out.println("Phytochamber Test");
-
+		
 		IOurl urlFlu = new IOurl("mongo_ba-13.ipk-gatersleben.de://26b7e285fae43dac107016afb4dc2841/WT01_1385");
 		IOurl urlVis = new IOurl("mongo_ba-13.ipk-gatersleben.de://12b6db018fddf651b414b652fc8f3d8d/WT01_1385");
 		IOurl urlNIR = new IOurl("mongo_ba-13.ipk-gatersleben.de://c72e4fcc141b8b2a97851ab2fde8106a/WT01_1385");
-
+		
 		// IOurl urlFlu = new IOurl("file:///Users/entzian/Desktop/test.png");
 		// IOurl urlVis = new IOurl("file:///Users/entzian/Desktop/test.png");
 		// IOurl urlNIR = new IOurl("file:///Users/entzian/Desktop/test.png");
-
+		
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (MongoDB m : MongoDB.getMongos())
 			for (ResourceIOHandler io : m.getHandlers())
 				ResourceIOManager.registerIOHandler(io);
-
+		
 		BufferedImage imgFluo = ImageIO.read(urlFlu.getInputStream());
 		BufferedImage imgVisible = ImageIO.read(urlVis.getInputStream());
 		BufferedImage imgNIR = ImageIO.read(urlNIR.getInputStream());
-
+		
 		double scale = 1.0;
 		if (Math.abs(scale - 1) > 0.0001) {
 			System.out.println("Scaling!");
 			imgFluo = new ImageOperation(imgFluo).resize(scale).getImageAsBufferedImage();
 			imgVisible = new ImageOperation(imgVisible).resize(scale).getImageAsBufferedImage();
 		}
-
+		
 		System.out.println("Process...");
-
+		
 		Geht test = new Geht(imgVisible, imgFluo, imgNIR);
 		test.doPhytoTopImageProcessor();
 		System.out.println("fertig!");
@@ -106,444 +106,444 @@ public class Geht {
 		// PrintImage.printImage(test.getResultNearIMageAsBI(),
 		// "Result Near-Image");
 	}
-
+	
 	public Geht(BufferedImage rgbImage, BufferedImage fluorImage, BufferedImage nearIfImage) {
-
+		
 		setRgbImageFromIB(rgbImage);
 		setFluorImageFromIB(fluorImage);
 		setNearImageFromIB(nearIfImage);
-
+		
 		initStandardValues();
-
+		
 		long pixels = rgbImage.getWidth() * fluorImage.getHeight() + fluorImage.getWidth() * fluorImage.getHeight() + nearIfImage.getWidth()
 							* nearIfImage.getHeight();
 		System.out.println("Pixels: " + pixels);
 	}
-
+	
 	public Geht(int[] rgbImage, int rgbWidth, int rgbHeight, int[] fluorImage, int fluoWidth, int fluoHeight, int[] nearIfImage,
 						int nearWidth, int nearHeight) {
 		this(ImageConverter.convert1AtoBI(rgbWidth, rgbHeight, rgbImage), ImageConverter.convert1AtoBI(fluoWidth, fluoHeight, fluorImage), ImageConverter
 							.convert1AtoBI(nearWidth, nearHeight, nearIfImage));
 	}
-
+	
 	public Geht(int[][] rgbImage, IOurl urlRGB, int[][] fluorImage, IOurl urlFluo, int[][] nearIfImage, IOurl urlNear) {
 		this(ImageConverter.convert2AtoBI(rgbImage), ImageConverter.convert2AtoBI(fluorImage), ImageConverter.convert2AtoBI(nearIfImage));
 	}
-
+	
 	// ########## SET ###############
-
+	
 	public void setRotationAngle(int rotationAngle) {
 		this.rotationAngle = rotationAngle;
 	}
-
+	
 	public void setScaleX(double scaleX) {
 		this.scaleX = scaleX;
 	}
-
+	
 	public void setScaleY(double scaleY) {
 		this.scaleY = scaleY;
 	}
-
+	
 	public void setScaleXY(double scaleX, double scaleY) {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
 	}
-
+	
 	public void setTranslateX(int translateX) {
 		this.translateX = translateX;
 	}
-
+	
 	public void setTranslateY(int translateY) {
 		this.translateY = translateY;
 	}
-
+	
 	public void setTranslateXY(int translateX, int translateY) {
 		this.translateX = translateX;
 		this.translateY = translateY;
 	}
-
+	
 	// SET Epsilon
-
+	
 	public void setFluoEpsilonA(double fluoEpsilonA) {
 		this.fluoEpsilonA = fluoEpsilonA;
 	}
-
+	
 	public void setFluoEpsilonB(double fluoEpsilonB) {
 		this.fluoEpsilonB = fluoEpsilonB;
 	}
-
+	
 	public void setFluoEpsilonAB(double fluoEpsilonA, double fluoEpsilonB) {
 		this.fluoEpsilonA = fluoEpsilonA;
 		this.fluoEpsilonB = fluoEpsilonB;
 	}
-
+	
 	public void setRgbEpsilonB(double rgbEpsilonB) {
 		this.rgbEpsilonB = rgbEpsilonB;
 	}
-
+	
 	public void setRgbEpsilonA(double rgbEpsilonA) {
 		this.rgbEpsilonA = rgbEpsilonA;
 	}
-
+	
 	public void setRgbEpsilonAB(double rgbEpsilonA, double rgbEpsilonB) {
 		this.rgbEpsilonA = rgbEpsilonA;
 		this.rgbEpsilonB = rgbEpsilonB;
 	}
-
+	
 	public void setNearEpsilonA(double nearEpsilonA) {
 		this.nearEpsilonA = nearEpsilonA;
 	}
-
+	
 	public void setNearEpsilonB(double nearEpsilonB) {
 		this.nearEpsilonB = nearEpsilonB;
 	}
-
+	
 	public void setNearEpsilonAB(double nearEpsilonA, double nearEpsilonB) {
 		this.nearEpsilonA = nearEpsilonA;
 		this.nearEpsilonB = nearEpsilonB;
 	}
-
+	
 	public void setRgbNumberOfErodeLoops(int rgbNumberOfErodeLoops) {
 		this.rgbNumberOfErodeLoops = rgbNumberOfErodeLoops;
 	}
-
+	
 	public void setRgbNumberOfDilateLoops(int rgbNumberOfDilateLoops) {
 		this.rgbNumberOfDilateLoops = rgbNumberOfDilateLoops;
 	}
-
+	
 	public void setFluoNumberOfErodeLoops(int fluoNumberOfErodeLoops) {
 		this.fluoNumberOfErodeLoops = fluoNumberOfErodeLoops;
 	}
-
+	
 	public void setFluoNumberOfDilateLoops(int fluoNumberOfDilateLoops) {
 		this.fluoNumberOfDilateLoops = fluoNumberOfDilateLoops;
 	}
-
+	
 	public void setNearNumberOfErodeLoops(int nearNumberOfErodeLoops) {
 		this.nearNumberOfErodeLoops = nearNumberOfErodeLoops;
 	}
-
+	
 	public void setNearNumberOfDilateLoops(int nearNumberOfDilateLoops) {
 		this.nearNumberOfDilateLoops = nearNumberOfDilateLoops;
 	}
-
+	
 	public void setBackground(int background) {
 		this.background = background;
 	}
-
+	
 	// SET RGB
-
+	
 	public void setRgbImageFromIB(BufferedImage rgbImage) {
 		this.rgbImage = rgbImage;
 	}
-
+	
 	public void setRgbImageFrom1A(int[] rgbImage, int width, int height) {
 		this.rgbImage = ImageConverter.convert1AtoBI(width, height, rgbImage);
 	}
-
+	
 	public void setRgbImageFrom2A(int[][] rgbImage) {
 		this.rgbImage = ImageConverter.convert2AtoBI(rgbImage);
 	}
-
+	
 	// SET Fluor
-
+	
 	public void setFluorImageFromIB(BufferedImage fluorImage) {
 		this.fluorImage = fluorImage;
 	}
-
+	
 	public void setFluorImageFrom1A(int[] fluoImage, int width, int height) {
 		this.fluorImage = ImageConverter.convert1AtoBI(width, height, fluoImage);
 	}
-
+	
 	public void setFluorImageFrom2A(int[][] fluoImage) {
 		this.fluorImage = ImageConverter.convert2AtoBI(fluoImage);
 	}
-
+	
 	// SET Near
-
+	
 	public void setNearImageFromIB(BufferedImage nearImage) {
 		this.nearImage = nearImage;
 	}
-
+	
 	public void setNearImageFrom1A(int[] nearImage, int width, int height) {
 		this.nearImage = ImageConverter.convert1AtoBI(width, height, nearImage);
 	}
-
+	
 	public void setNearImageFrom2A(int[][] nearImage) {
 		this.nearImage = ImageConverter.convert2AtoBI(nearImage);
 	}
-
+	
 	// SET Rest
-
+	
 	public void setValuesToStandard() {
 		// empty
 	}
-
+	
 	// ########## GET #############
-
+	
 	public int getRotationAngle() {
 		return rotationAngle;
 	}
-
+	
 	public double getScaleX() {
 		return scaleX;
 	}
-
+	
 	public double getScaleY() {
 		return scaleY;
 	}
-
+	
 	public int getTranslateX() {
 		return translateX;
 	}
-
+	
 	public int getTranslateY() {
 		return translateY;
 	}
-
+	
 	// GET Epsilon
-
+	
 	public double getRgbEpsilonA() {
 		return rgbEpsilonA;
 	}
-
+	
 	public double getRgbEpsilonB() {
 		return rgbEpsilonB;
 	}
-
+	
 	public double getFluoEpsilonB() {
 		return fluoEpsilonB;
 	}
-
+	
 	public double getFluoEpsilonA() {
 		return fluoEpsilonA;
 	}
-
+	
 	public double getNearEpsilonB() {
 		return nearEpsilonB;
 	}
-
+	
 	public double getNearEpsilonA() {
 		return nearEpsilonA;
 	}
-
+	
 	// GET Number of Erode und Dilate loops
-
+	
 	public int getNearNumberOfDilateLoops() {
 		return nearNumberOfDilateLoops;
 	}
-
+	
 	public int getNearNumberOfErodeLoops() {
 		return nearNumberOfErodeLoops;
 	}
-
+	
 	public int getFluoNumberOfDilateLoops() {
 		return fluoNumberOfDilateLoops;
 	}
-
+	
 	public int getFluoNumberOfErodeLoops() {
 		return fluoNumberOfErodeLoops;
 	}
-
+	
 	public int getRgbNumberOfDilateLoops() {
 		return rgbNumberOfDilateLoops;
 	}
-
+	
 	public int getRgbNumberOfErodeLoops() {
 		return rgbNumberOfErodeLoops;
 	}
-
+	
 	public int getBackground() {
 		return background;
 	}
-
+	
 	// GET Initial RGB Image
-
+	
 	public int getInitialRgbImageWidth() {
 		return rgbImage.getWidth();
 	}
-
+	
 	public int getInitialRgbImageHeight() {
 		return rgbImage.getHeight();
 	}
-
+	
 	public int[] getInitialRgbImageAs1A() {
 		return ImageConverter.convertBIto1A(rgbImage);
 	}
-
+	
 	public int[][] getInitialRgbImageAs2A() {
 		return ImageConverter.convertBIto2A(rgbImage);
 	}
-
+	
 	public BufferedImage getInitialRgbImageAsBI() {
 		return rgbImage;
 	}
-
+	
 	// GET Initial Fluo Image
-
+	
 	public int getInitialFluoImageWidth() {
 		return fluorImage.getWidth();
 	}
-
+	
 	public int getInitialFluoImageHeight() {
 		return fluorImage.getHeight();
 	}
-
+	
 	public int[] getInitialFluorImageAs1A() {
 		return ImageConverter.convertBIto1A(fluorImage);
 	}
-
+	
 	public int[][] getInitialFluorImageAs2A() {
 		return ImageConverter.convertBIto2A(fluorImage);
 	}
-
+	
 	public BufferedImage getInitialFluorImageAsBI() {
 		return fluorImage;
 	}
-
+	
 	// GET Initial Near Image
-
+	
 	public int getInitialNearImageWidth() {
 		return nearImage.getWidth();
 	}
-
+	
 	public int getInitialNearImageHeight() {
 		return nearImage.getHeight();
 	}
-
+	
 	public int[] getInitialNearImageAs1A() {
 		return ImageConverter.convertBIto1A(nearImage);
 	}
-
+	
 	public int[][] getInitialNearImageAs2A() {
 		return ImageConverter.convertBIto2A(nearImage);
 	}
-
+	
 	public BufferedImage getInitialNearImageAsBI() {
 		return nearImage;
 	}
-
+	
 	// GET Result RGB IMage
-
+	
 	public BufferedImage getResultRgbImageAsBI() {
 		return newRGBImage;
 	}
-
+	
 	public int[] getResultRgbIMageAs1A() {
 		return ImageConverter.convertBIto1A(newRGBImage);
 	}
-
+	
 	public int[][] getResultRgbIMageAs2A() {
 		return ImageConverter.convertBIto2A(newRGBImage);
 	}
-
+	
 	// GET Result Fluo Image
-
+	
 	public BufferedImage getResultFluorImageAsBI() {
 		return newFluorImage;
 	}
-
+	
 	public int[] getResultFluorIMageAs1A() {
 		return ImageConverter.convertBIto1A(newFluorImage);
 	}
-
+	
 	public int[][] getResultFluorIMageAs2A() {
 		return ImageConverter.convertBIto2A(newFluorImage);
 	}
-
+	
 	// GET Result Near Image
-
+	
 	public BufferedImage getResultNearImageAsBI() {
 		return newNearImage;
 	}
-
+	
 	public int[] getResultNearIMageAs1A() {
 		return ImageConverter.convertBIto1A(newNearImage);
 	}
-
+	
 	public int[][] getResultNearIMageAs2A() {
 		return ImageConverter.convertBIto2A(newNearImage);
 	}
-
+	
 	// ########## PUBLIC ##############
-
+	
 	public void doPhytoTopImageProcessor() {
 		long t1 = System.currentTimeMillis();
-
+		
 		newFluorImage = fitFluoImageToRGBImage();
 		BufferedImage newOriginalFluorImage = newFluorImage;
-
+		
 		newFluorImage = preliminaryWorkFluo(newFluorImage, ImageConfiguration.FluoTop, getFluoEpsilonA(), getFluoEpsilonB());
 		// PrintImage.printImage(newFluorImage);
 		// ImageOperation save = new ImageOperation(newFluorImage);
 		// save.rotate(3);
 		// save.saveImage("/Users/entzian/Desktop/zweiteBild.png");
-
+		
 		// save = new ImageOperation(rgbImage);
 		// save.saveImage("/Users/entzian/Desktop/ersteRGBBild.png");
-
+		
 		newRGBImage = preliminaryWorkFluo(rgbImage, ImageConfiguration.RgbTop, getRgbEpsilonA(), getRgbEpsilonB());
 		// newNearImage = preliminaryWorkFluo(nearImage, ImageConfiguration.NirTop, getNearEpsilonA(), getNearEpsilonB());
-
+		
 		// save = new ImageOperation(newRGBImage);
 		// save.saveImage("/Users/entzian/Desktop/zweiteRGBBild.png");
-
+		
 		BufferedImage newRGBImageMask = modifyMask(newRGBImage, getRgbNumberOfErodeLoops(), getRgbNumberOfDilateLoops(), ImageConfiguration.RgbTop);
 		BufferedImage newFluorImageMask = modifyMask(newFluorImage, getFluoNumberOfErodeLoops(), getFluoNumberOfDilateLoops(), ImageConfiguration.FluoTop);
 		// save = new ImageOperation(newFluorImageMask);
 		// save.rotate(3);
 		// save.saveImage("/Users/entzian/Desktop/dritteBild.png");
-
+		
 		// save = new ImageOperation(newRGBImageMask);
 		// save.saveImage("/Users/entzian/Desktop/dritteRGBBild.png");
-
+		
 		PrintImage.printImage(newRGBImageMask);
 		PrintImage.printImage(newFluorImageMask);
 		// BufferedImage nearMask = modifyMask(newNearImage,
 		// getNearNumberOfErodeLoops(), getNearNumberOfDilateLoops(),
 		// ImageConfiguration.NirTop);
-
+		
 		BufferedImage mask = mergeMask(newRGBImageMask, newFluorImageMask);
 		// PrintImage.printImage(mask);
-
+		
 		// save = new ImageOperation(newFluorImage);
 		// save.rotate(3);
 		// save.saveImage("/Users/entzian/Desktop/viertesBild.png");
-
+		
 		// save = new ImageOperation(newRGBImage);
 		// save.saveImage("/Users/entzian/Desktop/viertesRGBBild.png");
-
+		
 		// newNearImage = fitMaskToNearImage(mask);
-
+		
 		newFluorImage = removeImageNoise(newFluorImage, newOriginalFluorImage, ImageConfiguration.FluoTop);
 		// save = new ImageOperation(newFluorImage);
 		// save.rotate(3);
 		// save.saveImage("/Users/entzian/Desktop/fuenftesBild.png");
-
+		
 		// PrintImage.printImage(newFluorImage);
 		newRGBImage = removeImageNoise(newRGBImage, rgbImage, ImageConfiguration.RgbTop);
-
+		
 		// save = new ImageOperation(newRGBImage);
 		// save.saveImage("/Users/entzian/Desktop/fuenftesRGBBild.png");
-
+		
 		long t2 = System.currentTimeMillis();
 		System.out.println("Finished in " + (t2 - t1) + " ms");
 	}
-
+	
 	public void doImageLayering() {
 		doImageLayering(getInitialFluorImageAsBI(), getInitialRgbImageAsBI(), LayeringTyp.ROW_IMAGE);
 	}
-
+	
 	public void doImageLayering(LayeringTyp typ) {
 		doImageLayering(getInitialFluorImageAsBI(), getInitialRgbImageAsBI(), typ);
 	}
-
+	
 	public void doImageLayering(BufferedImage firstImage, BufferedImage secondImage, LayeringTyp typ) {
 		imageLayering(firstImage, secondImage, typ);
 	}
-
+	
 	// ############## PRINT ##################
-
+	
 	// public void printImage(BufferedImage image) {
 	// printImageGS(image, "Bild");
 	// }
@@ -561,69 +561,69 @@ public class Geht {
 	// ImagePlus img = ImageConverter.convertBItoIJ(image);
 	// img.show(text);
 	// }
-
+	
 	// ########## PRIVATE ############
-
+	
 	private void initStandardValues() {
 		setRotationAngle(-3);
-
+		
 		setScaleX(0.95);
 		setScaleY(0.87);
-
+		
 		setTranslateX(0);
 		setTranslateY(-15);
-
+		
 		setRgbEpsilonA(2.5);
 		setRgbEpsilonB(2.5);
-
+		
 		setFluoEpsilonA(0.5);
 		setFluoEpsilonB(0.5);
-
+		
 		setNearEpsilonA(0.5);
 		setNearEpsilonB(1.0);
-
+		
 		setRgbNumberOfErodeLoops(2);
 		setRgbNumberOfDilateLoops(5);
 		setFluoNumberOfErodeLoops(4);
 		setFluoNumberOfDilateLoops(20);
 		setNearNumberOfErodeLoops(0);
 		setNearNumberOfDilateLoops(0);
-
+		
 		setBackground(PhenotypeAnalysisTask.BACKGROUND_COLOR.getRGB());
 	}
-
+	
 	private BufferedImage fitFluoImageToRGBImage() {
 		ImageOperation io = new ImageOperation(getInitialFluorImageAsBI());
-
+		
 		io.resize(rgbImage.getWidth(), rgbImage.getHeight());
 		io.scale(scaleX, scaleY);
 		io.translate(translateX, translateY);
 		// io.saveImage("/Users/entzian/Desktop/ersteBild.png");
 		io.rotate(rotationAngle);
-
+		
 		return io.getImageAsBufferedImage();
-
+		
 	}
-
+	
 	public BufferedImage tryFitFluoImageToRGBImage() {
-
+		
 		rotationAngle = 0;
 		translateX = 0;
 		translateY = 0;
 		// PrintImage.printImage(getInitialFluorImageAsBI());
 		ImageOperation io = new ImageOperation(getInitialFluorImageAsBI());
-
+		
 		io.resize(rgbImage.getWidth(), rgbImage.getHeight());
 		io.scale(scaleX, scaleY);
 		io.translate(translateX, translateY);
 		io.rotate(rotationAngle);
-
+		
 		return io.getImageAsBufferedImage();
-
+		
 	}
-
+	
 	private BufferedImage preliminaryWorkFluo(BufferedImage workImage, ImageConfiguration cameraTyp, double epsilonA, double epsiolonB) {
-
+		
 		SubstanceInterface substance = new Substance();
 		substance.setName(cameraTyp.toString());
 		ConditionInterface condition = new Condition(substance);
@@ -632,36 +632,36 @@ public class Geht {
 		limg.setURL(new IOurl(""));
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 		PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null, epsilonA, epsiolonB);
-
+		
 		return workImage;
-
+		
 	}
-
+	
 	private BufferedImage modifyMask(BufferedImage workImage, int NumberOfErodeLoops, int NumberOfDilateLoops, ImageConfiguration typ) {
-
+		
 		ImageOperation io = new ImageOperation(workImage);
 		for (int i = 0; i < NumberOfErodeLoops; i++)
 			io.erode();
 		for (int i = 0; i < NumberOfDilateLoops; i++)
 			io.dilate();
-
+		
 		return io.getImageAsBufferedImage();
 	}
-
+	
 	private BufferedImage mergeMask(BufferedImage rgbMask, BufferedImage fluoMask) {
-
+		
 		int[] rgbImage1A = ImageConverter.convertBIto1A(newRGBImage);
 		int[] fluoImage1A = ImageConverter.convertBIto1A(newFluorImage);
-
+		
 		MaskOperation o = new MaskOperation(new FlexibleImage(newRGBImage), new FlexibleImage(fluoMask), null, getBackground(), 1);
 		o.mergeMasks();
-
+		
 		// PrintImage.printImage(ImageConverter.convert1ABto1A(o.getMask()), rgbMask.getWidth(), rgbMask.getHeight());
-
+		
 		// ImageOperation save = new ImageOperation(ImageConverter.convert1ABtoBI(rgbMask.getWidth(), rgbMask.getHeight(), o.getMask()));
 		// save.rotate(3);
 		// save.saveImage("/Users/entzian/Desktop/beideMaskenBild.png");
-
+		
 		// modify source images according to merged mask
 		int i = 0;
 		for (int m : o.getMask()) {
@@ -671,17 +671,17 @@ public class Geht {
 			}
 			i++;
 		}
-
+		
 		newRGBImage = ImageConverter.convert1AtoBI(rgbMask.getWidth(), rgbMask.getHeight(), rgbImage1A);
 		newFluorImage = ImageConverter.convert1AtoBI(fluoMask.getWidth(), fluoMask.getHeight(), fluoImage1A);
-
+		
 		return newRGBImage;
-
+		
 		// todo rotate and try...
 		// int largestResultImageSize = -1;
 		// double bestAngle = 0, bestScale = 1;
 		// MaskOperation bestMask = null;
-
+		
 		// // try different rotations
 		// for (double angle = -5; angle <= 5; angle += 0.5) {
 		//
@@ -748,7 +748,7 @@ public class Geht {
 		// io.scale(bestScale, bestScale * yscale);
 		// newFluorImage = io.getImageAsBufferedImage();
 		// }
-
+		
 		// MaskOperation o = new MaskOperation(rgbMask, rotFluo, getBackground());
 		// o.mergeMasks();
 		//
@@ -771,15 +771,15 @@ public class Geht {
 		//
 		// return newRGBImage;
 	}
-
+	
 	private BufferedImage fitMaskToNearImage(BufferedImage mask) {
-
+		
 		int[] nearMask1A = ImageConverter.convertBIto1A(newNearImage);
-
+		
 		ImageOperation io = new ImageOperation(mask);
 		io.resize(newNearImage.getWidth(), newNearImage.getHeight());
 		io.rotate(-9);
-
+		
 		int i = 0;
 		for (int m : io.getImageAs1array()) {
 			if (m == background) {
@@ -787,19 +787,19 @@ public class Geht {
 			}
 			i++;
 		}
-
+		
 		return ImageConverter.convert1AtoBI(newNearImage.getWidth(), newNearImage.getHeight(), nearMask1A);
 	}
-
+	
 	private BufferedImage removeImageNoise(BufferedImage workImage, BufferedImage originalImage, ImageConfiguration typ) {
-
+		
 		int[] newImage1A = ImageConverter.convertBIto1A(workImage);
 		int[] originalImage1A = ImageConverter.convertBIto1A(originalImage);
-
+		
 		ImageOperation io = new ImageOperation(workImage);
-
+		
 		switch (typ) {
-
+			
 			case RgbTop:
 
 				for (int ii = 0; ii < 6; ii++)
@@ -809,7 +809,7 @@ public class Geht {
 				for (int ii = 0; ii < 2; ii++)
 					io.erode();
 				break;
-
+			
 			case FluoTop:
 
 				for (int ii = 0; ii < 5; ii++)
@@ -819,7 +819,7 @@ public class Geht {
 				io.closing();
 				break;
 		}
-
+		
 		int idx = 0;
 		for (int m : io.getImageAs1array()) {
 			if (m == background)
@@ -828,12 +828,12 @@ public class Geht {
 				newImage1A[idx] = originalImage1A[idx];
 			idx++;
 		}
-
+		
 		return ImageConverter.convert1AtoBI(workImage.getWidth(), workImage.getHeight(), newImage1A);
 	}
-
+	
 	private void imageLayering(BufferedImage firstImage, BufferedImage secondImage, LayeringTyp typ) {
-
+		
 		for (int x = 0; x < firstImage.getWidth(); x++) {
 			for (int y = 0; y < firstImage.getHeight(); y++) {
 				if (typ == LayeringTyp.RED_BLUE_IMAGE) {
@@ -849,21 +849,21 @@ public class Geht {
 				}
 			}
 		}
-
+		
 		// GravistoService.showImage(secondImage, "ImageLayering");
 		PrintImage.printImage(secondImage, "imageLayering 'geht'");
 	}
-
+	
 	public ArrayList<NumericMeasurementInterface> doAnalyseResultImages(LoadedImage limg, String experimentNameExtension) {
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-
+		
 		BufferedImage b = limg.getLoadedImage();
 		int w = b.getWidth();
 		int h = b.getHeight();
 		int[] arrayRGB = ImageConverter.convertBIto1A(b);
 		int iBackgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		Geometry g = detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
-
+		
 		NumericMeasurement m;
 		boolean calcHistogram = false;
 		if (calcHistogram) {
@@ -881,7 +881,7 @@ public class Geht {
 				m.setValue(che.getNumberOfPixels() / pixelCount);
 				m.setUnit("proportion");
 				output.add(m);
-
+				
 				m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
 									.getParentCondition().getExperimentName()
 									+ " (" + experimentNameExtension + ")");
@@ -897,7 +897,7 @@ public class Geht {
 			m.setValue(h - g.getTop());
 			m.setUnit("pixel");
 			output.add(m);
-
+			
 			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
 								.getParentCondition().getExperimentName()
 								+ " (" + experimentNameExtension + ")");
@@ -911,7 +911,7 @@ public class Geht {
 		m.setValue(g.getFilledPixels());
 		m.setUnit("pixel");
 		output.add(m);
-
+		
 		// m = new NumericMeasurement(limg, "filled (percent) ("
 		// +
 		// limg.getParentSample().getParentCondition().getParentSubstance().getName()
@@ -921,11 +921,11 @@ public class Geht {
 		// m.setValue((double) g.getFilledPixels() / (w * h) * 100d);
 		// m.setUnit("%");
 		// output.add(m);
-
+		
 		boolean red = false;
 		if (red) {
 			int redLine = Color.RED.getRGB();
-
+			
 			int o = g.getTop() * w;
 			int lww = 20;
 			if (g.getTop() < lww + 1)
@@ -956,13 +956,13 @@ public class Geht {
 		}
 		return output;
 	}
-
+	
 	private static Geometry detectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg) {
-
+		
 		int left = w;
 		int right = 0;
 		int top = h;
-
+		
 		for (int x = 0; x < w; x++)
 			for (int y = h - 1; y > 0; y--) {
 				int o = x + y * w;
@@ -972,7 +972,7 @@ public class Geht {
 				}
 				if (rgbArray[o] == iBackgroundFill)
 					continue;
-
+				
 				if (rgbArray[o] != iBackgroundFill) {
 					if (x < left)
 						left = x;
@@ -982,7 +982,7 @@ public class Geht {
 						top = y;
 				}
 			}
-
+		
 		long filled = 0;
 		for (int x = 0; x < w; x++) {
 			for (int y = h - 1; y > 0; y--) {
@@ -992,7 +992,7 @@ public class Geht {
 				}
 			}
 		}
-
+		
 		return new Geometry(top, left, right, filled);
 	}
 }

@@ -38,40 +38,40 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
  * @author klukas
  */
 public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
-
+	
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-
+	
 	ArrayList<ImagePreProcessor> preProcessors = new ArrayList<ImagePreProcessor>();
 	protected DatabaseTarget databaseTarget;
-
+	
 	public PhytochamberAnalysisTask() {
 	}
-
+	
 	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
 		databaseTarget = new DataBaseTargetMongoDB(true, m);
 	}
-
+	
 	@Override
 	public ImageAnalysisType[] getInputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE };
 	}
-
+	
 	@Override
 	public ImageAnalysisType[] getOutputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE, ImageAnalysisType.MEASUREMENT };
 	}
-
+	
 	@Override
 	public String getTaskDescription() {
 		return "Analyse Plants Phenotype";
 	}
-
+	
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
-
+		
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
 		ArrayList<ImageSet> workload = new ArrayList<ImageSet>();
@@ -100,9 +100,9 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				// break;
 			}
 		}
-
+		
 		// Collection jobs = new ArrayList();
-
+		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
 		int idxxx = 0;
@@ -110,21 +110,21 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		for (ImageSet md : workload) {
 			final ImageSet id = md;
 			Thread t = BackgroundThreadDispatcher.addTask(new Runnable() {
-
+				
 				@Override
 				public void run() {
 					try {
 						final ImageData vis = id.getVIS();
 						final ImageData fluo = id.getFLUO();
 						final ImageData nir = id.getNIR();
-
+						
 						if (vis == null || nir == null || fluo == null)
 							return;
-
+						
 						final FlexibleImageSet input = new FlexibleImageSet();
-
+						
 						MyThread a = null, b = null, c = null;
-
+						
 						if (vis instanceof LoadedImage) {
 							input.setVis(new FlexibleImage(((LoadedImage) vis).getLoadedImage()));
 						} else {
@@ -145,7 +145,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						if (input.hasAllThreeImages()) {
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(new FlexibleMaskAndImageSet(input, input));
 							final FlexibleImageSet pipelineResult = ptip.pipeline(maximumThreadCountOnImageLevel).getImages();
-
+							
 							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
 							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
 							MyThread g = statisticalAnalaysis(nir, pipelineResult.getNir());
@@ -163,15 +163,15 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			}, "process image " + idxxx, -1);
 			idxxx++;
 			wait.add(t);
-
+			
 		}
-
+		
 		BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
-
+		
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
-
+	
 	private MyThread statisticalAnalaysis(final ImageData id, final FlexibleImage image) {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
@@ -184,7 +184,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			}
 		}, "statistic image analysis", 4);
 	}
-
+	
 	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageType type) {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
@@ -199,18 +199,18 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			}
 		}, "load " + type.name(), 0);
 	}
-
+	
 	public static ArrayList<NumericMeasurementInterface> statisticalAnalysisOfResultImage(LoadedImage limg,
 						String experimentNameExtension) {
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-
+		
 		BufferedImage b = limg.getLoadedImage();
 		int w = b.getWidth();
 		int h = b.getHeight();
 		int[] arrayRGB = ImageConverter.convertBIto1A(b);
 		int iBackgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		Geometry g = detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
-
+		
 		NumericMeasurement m;
 		boolean calcHistogram = false;
 		if (calcHistogram) {
@@ -228,7 +228,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				m.setValue(che.getNumberOfPixels() / pixelCount);
 				m.setUnit("proportion");
 				output.add(m);
-
+				
 				m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
 									.getParentCondition().getExperimentName()
 									+ " (" + experimentNameExtension + ")");
@@ -244,7 +244,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			m.setValue(h - g.getTop());
 			m.setUnit("pixel");
 			output.add(m);
-
+			
 			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
 								.getParentCondition().getExperimentName()
 								+ " (" + experimentNameExtension + ")");
@@ -258,7 +258,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		m.setValue(g.getFilledPixels());
 		m.setUnit("pixel");
 		output.add(m);
-
+		
 		// m = new NumericMeasurement(limg, "filled (percent) ("
 		// +
 		// limg.getParentSample().getParentCondition().getParentSubstance().getName()
@@ -268,11 +268,11 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		// m.setValue((double) g.getFilledPixels() / (w * h) * 100d);
 		// m.setUnit("%");
 		// output.add(m);
-
+		
 		boolean red = false;
 		if (red) {
 			int redLine = Color.RED.getRGB();
-
+			
 			int o = g.getTop() * w;
 			int lww = 20;
 			if (g.getTop() < lww + 1)
@@ -303,13 +303,13 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		}
 		return output;
 	}
-
+	
 	private static Geometry detectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg) {
-
+		
 		int left = w;
 		int right = 0;
 		int top = h;
-
+		
 		for (int x = 0; x < w; x++)
 			for (int y = h - 1; y > 0; y--) {
 				int o = x + y * w;
@@ -319,7 +319,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				}
 				if (rgbArray[o] == iBackgroundFill)
 					continue;
-
+				
 				if (rgbArray[o] != iBackgroundFill) {
 					if (x < left)
 						left = x;
@@ -329,7 +329,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						top = y;
 				}
 			}
-
+		
 		long filled = 0;
 		for (int x = 0; x < w; x++) {
 			for (int y = h - 1; y > 0; y--) {
@@ -339,14 +339,14 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				}
 			}
 		}
-
+		
 		return new Geometry(top, left, right, filled);
 	}
-
+	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result, DatabaseTarget storeResultInDatabase) {
 		result.getURL().setFileName("cleared_" + result.getURL().getFileName());
 		result.getURL().setPrefix(LoadedImageHandler.PREFIX);
-
+		
 		try {
 			LoadedImage lib = result;
 			result = storeResultInDatabase.saveImage(result);
@@ -360,23 +360,23 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public Collection<NumericMeasurementInterface> getOutput() {
 		Collection<NumericMeasurementInterface> result = output;
 		output = null;
 		return result;
 	}
-
+	
 	private static String getNameStatic() {
 		return "Phytochamber Image Analysis";
 	}
-
+	
 	@Override
 	public String getName() {
 		return getNameStatic();
 	}
-
+	
 	public void addPreprocessor(CutImagePreprocessor pre) {
 		preProcessors.add(pre);
 	}

@@ -25,40 +25,40 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas
  */
 public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
-
+	
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-
+	
 	private MongoDB m;
-
+	
 	public PerformanceAnalysisTask() {
 		// empty
 	}
-
+	
 	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
 		this.m = m;
 	}
-
+	
 	@Override
 	public ImageAnalysisType[] getInputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE };
 	}
-
+	
 	@Override
 	public ImageAnalysisType[] getOutputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE };
 	}
-
+	
 	@Override
 	public String getTaskDescription() {
 		return "Test input read performance";
 	}
-
+	
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
-
+		
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
 		ArrayList<ImageData> workload = new ArrayList<ImageData>();
@@ -66,7 +66,7 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 			if (md instanceof ImageData) {
 				workload.add((ImageData) md);
 			}
-
+		
 		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
 		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCountParallelImages, new ThreadFactory() {
 			@Override
@@ -81,7 +81,7 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 				return t;
 			}
 		});
-
+		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
 		final ThreadSafeOptions tsoBytesRead = new ThreadSafeOptions();
@@ -153,7 +153,7 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 							}
 						}
 					}
-
+					
 					private void setAnno(final int maximumThreadCountParallelImages, NumericMeasurement m) {
 						m.getParentSample().setTime(-1);
 						m.getParentSample().setTimeUnit("-1");
@@ -166,34 +166,34 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 				});
 			}
 		}
-
+		
 		run.shutdown();
 		try {
 			run.awaitTermination(365, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-
+		
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
-
+	
 	@Override
 	public Collection<NumericMeasurementInterface> getOutput() {
 		Collection<NumericMeasurementInterface> result = output;
 		output = null;
 		return result;
 	}
-
+	
 	@Override
 	public String getName() {
 		return "Performance Test";
 	}
-
+	
 	public void addPreprocessor(CutImagePreprocessor pre) {
 		// empty
 	}
-
+	
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
 						BackgroundTaskStatusProviderSupportingExternalCall status) {

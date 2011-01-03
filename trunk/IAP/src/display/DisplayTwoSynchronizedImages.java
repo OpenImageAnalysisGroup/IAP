@@ -1,12 +1,9 @@
 /*
  * Created on May 22, 2005
  * @author Rafael Santos (rafael.santos@lac.inpe.br)
- * 
  * Part of the Java Advanced Imaging Stuff site
  * (http://www.lac.inpe.br/~rafael.santos/Java/JAI)
- * 
  * STATUS: Complete.
- * 
  * Redistribution and usage conditions must be done under the
  * Creative Commons license:
  * English: http://creativecommons.org/licenses/by-nc-sa/2.0/br/deed.en
@@ -40,7 +37,7 @@ public class DisplayTwoSynchronizedImages extends JPanel implements AdjustmentLi
 	protected JScrollPane jsp1;
 	/** The JScrollPane which will contain the second of the images */
 	protected JScrollPane jsp2;
-
+	
 	/**
 	 * Creates an instance of this class, setting the components' layout,
 	 * creating two instances of DisplayJAIWithPixelInfo for the two images and
@@ -71,7 +68,7 @@ public class DisplayTwoSynchronizedImages extends JPanel implements AdjustmentLi
 		// Vertical scroll bar of the second image.
 		jsp2.getVerticalScrollBar().addAdjustmentListener(this);
 	}
-
+	
 	/**
 	 * This method changes the first image to be displayed.
 	 * 
@@ -82,7 +79,7 @@ public class DisplayTwoSynchronizedImages extends JPanel implements AdjustmentLi
 		dj1.set(newimage);
 		repaint();
 	}
-
+	
 	/**
 	 * This method changes the second image to be displayed.
 	 * 
@@ -93,7 +90,7 @@ public class DisplayTwoSynchronizedImages extends JPanel implements AdjustmentLi
 		dj2.set(newimage);
 		repaint();
 	}
-
+	
 	/**
 	 * This method returns the first image.
 	 * 
@@ -102,7 +99,7 @@ public class DisplayTwoSynchronizedImages extends JPanel implements AdjustmentLi
 	public RenderedImage getImage1() {
 		return dj1.getSource();
 	}
-
+	
 	/**
 	 * This method returns the second image.
 	 * 
@@ -111,7 +108,7 @@ public class DisplayTwoSynchronizedImages extends JPanel implements AdjustmentLi
 	public RenderedImage getImage2() {
 		return dj2.getSource();
 	}
-
+	
 	/**
 	 * This method returns the first DisplayJAIWithPixelInfo component.
 	 * 
@@ -120,7 +117,7 @@ public class DisplayTwoSynchronizedImages extends JPanel implements AdjustmentLi
 	public DisplayJAIWithPixelInfo getDisplayJAIComponent1() {
 		return dj1;
 	}
-
+	
 	/**
 	 * This method returns the second DisplayJAIWithPixelInfo component.
 	 * 
@@ -129,7 +126,7 @@ public class DisplayTwoSynchronizedImages extends JPanel implements AdjustmentLi
 	public DisplayJAIWithPixelInfo getDisplayJAIComponent2() {
 		return dj2;
 	}
-
+	
 	/**
 	 * This method will be called when any of the scroll bars of the instances of
 	 * DisplayJAIWithPixelInfo are changed. The method will adjust the scroll bar
@@ -161,5 +158,5 @@ public class DisplayTwoSynchronizedImages extends JPanel implements AdjustmentLi
 			jsp1.getVerticalScrollBar().setValue(e.getValue());
 		}
 	} // end adjustmentValueChanged
-
+	
 } // end class

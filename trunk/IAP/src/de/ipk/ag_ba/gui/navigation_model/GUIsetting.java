@@ -16,27 +16,27 @@ import de.ipk.ag_ba.gui.MyNavigationPanel;
  * @author klukas
  */
 public class GUIsetting {
-
+	
 	private final MyNavigationPanel navigationPanel;
 	private final MyNavigationPanel actionPanel;
 	private final JPanel graphPanel;
-
+	
 	public GUIsetting(MyNavigationPanel navigationPanel, MyNavigationPanel actionPanel, JPanel graphPanel) {
 		this.navigationPanel = navigationPanel;
 		this.actionPanel = actionPanel;
 		this.graphPanel = graphPanel;
 	}
-
+	
 	public MyNavigationPanel getNavigationPanel() {
 		return navigationPanel;
 	}
-
+	
 	public MyNavigationPanel getActionPanel() {
 		return actionPanel;
 	}
-
+	
 	public JComponent getGraphPanel() {
 		return graphPanel;
 	}
-
+	
 }

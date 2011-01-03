@@ -16,30 +16,30 @@ import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
  * @author klukas
  */
 public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
-
+	
 	private boolean active;
-
+	
 	public CloudUploadEntity(MongoDB m, ExperimentReference experiment) {
 		super(m, experiment);
 	}
-
+	
 	@Override
 	public String getDefaultTooltip() {
 		return "Upload data set to IAP Cloud";
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
 							"Target", MongoDB.getMongos()
 		});
-
+		
 		if (sel == null)
 			return;
-
+		
 		this.m = (MongoDB) sel[0];
 		super.performActionCalculateResults(src);
-
+		
 		try {
 			active = true;
 			m.saveExperiment(experiment.getData(m), status);
@@ -47,7 +47,7 @@ public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 			active = false;
 		}
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		if (active) {
@@ -56,18 +56,18 @@ public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 			else
 				return "img/ext/transfer22.png";
 		} else
-
+			
 			return "img/ext/transfer2.png";
 	}
-
+	
 	@Override
 	public String getDefaultNavigationImage() {
 		return getDefaultImage();
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy into IAP Cloud";
+		return "Copy";
 	}
-
+	
 }

@@ -16,10 +16,10 @@ import de.ipk.ag_ba.gui.MyNavigationPanel;
 public class MyViewPort extends JViewport {
 	private static final long serialVersionUID = 1L;
 	private final MyNavigationPanel panel;
-
+	
 	public MyViewPort(MyNavigationPanel panel) {
 		super();
 		this.panel = panel;
 	}
-
+	
 }

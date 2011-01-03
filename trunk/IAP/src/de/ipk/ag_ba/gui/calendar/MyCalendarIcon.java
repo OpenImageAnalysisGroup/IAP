@@ -27,13 +27,13 @@ public class MyCalendarIcon extends ImageIcon {
 	private static final long serialVersionUID = 1L;
 	private final Calendar2 calendarEntity;
 	private final int imgS;
-
+	
 	public MyCalendarIcon(ImageIcon icon, Calendar2 n, int imgS) {
 		super(icon.getImage());
 		this.calendarEntity = n;
 		this.imgS = imgS;
 	}
-
+	
 	private static SimpleDateFormat sdfD = new SimpleDateFormat("d");
 	private static SimpleDateFormat sdfM = new SimpleDateFormat("MMM");
 	private static SimpleDateFormat sdfMMM = new SimpleDateFormat("MMM");
@@ -42,21 +42,21 @@ public class MyCalendarIcon extends ImageIcon {
 	private static Font flarge = new Font("SansSerif", Font.BOLD, 17);
 	private static Font flargeM = new Font("SansSerif", Font.BOLD, 14);
 	private static Font fsmall = new Font("SansSerif", Font.BOLD, 8);
-
+	
 	@Override
 	public synchronized void paintIcon(Component c, Graphics g, int x, int y) {
 		super.paintIcon(c, g, x, y);
 		Graphics2D g2d = (Graphics2D) g.create();
-
+		
 		if (imgS < 48) {
 			g2d.scale(imgS / 48d, imgS / 48d);
 			g2d.translate((48 - imgS) / 2, (48 - imgS) / 3);
 		}
-
+		
 		GregorianCalendar cal = calendarEntity.getCalendar();
 		String dateD = sdfD.format(cal.getTime());
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+		
 		if (calendarEntity.isShowSpecificDay()) {
 			String dateM = sdfM.format(cal.getTime()).toUpperCase();
 			String dateY = sdfY.format(cal.getTime());

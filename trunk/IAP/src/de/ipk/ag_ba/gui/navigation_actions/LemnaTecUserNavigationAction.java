@@ -25,16 +25,16 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  * @author klukas
  */
 public class LemnaTecUserNavigationAction extends AbstractNavigationAction implements NavigationAction {
-
+	
 	public LemnaTecUserNavigationAction() {
 		super("Show user list and their experiments");
 	}
-
+	
 	private NavigationButton src;
 	private final TreeMap<String, TreeSet<ExperimentHeaderInterface>> userName2dbAndExperiment = new TreeMap<String, TreeSet<ExperimentHeaderInterface>>();
-
+	
 	private String message = "";
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
@@ -44,14 +44,14 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 		}
 		return result;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>(currentSet);
 		result.add(src);
 		return result;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		// enumerate all experiment snapshots and detect users
@@ -64,9 +64,9 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 		status.setCurrentStatusValueFine(0);
 		long snapshots = 0;
 		int users = 0;
-
+		
 		int error = 0;
-
+		
 		ArrayList<String> errorList = new ArrayList<String>();
 		HashSet<String> experimentNames = new HashSet<String>();
 		TreeSet<String> usersUnformatted = new TreeSet<String>();
@@ -104,9 +104,9 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 				error++;
 			}
 		}
-
+		
 		users = userName2dbAndExperiment.size();
-
+		
 		message = "<html><h2>Database Content</h2>"
 							+ "<ul>"
 							+ "<li>Databases: "
@@ -124,10 +124,10 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 							+ "<br>Remark: Multiple users may contribute data to a single experiment. This depends on which user is logged-in into a LemnaTec PC, while imaging takes place.<br><br>"
 							+ "Complete list of snapshot-creators (" + usersUnformatted.size() + ", unformatted): "
 							+ StringManipulationTools.getStringList(getArray(usersUnformatted), ", ");
-
+		
 		status.setCurrentStatusText1("");
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private ArrayList getArray(TreeSet<String> usersUnformatted) {
 		ArrayList result = new ArrayList();
@@ -135,25 +135,25 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 			result.add(s);
 		return result;
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return new MainPanelComponent(message);
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return "img/ext/user-user.png";
 	}
-
+	
 	@Override
 	public String getDefaultNavigationImage() {
 		return "img/ext/user-user.png";
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return "User List";
 	}
-
+	
 }

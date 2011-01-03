@@ -31,14 +31,14 @@ public class Bookmark {
 	private final int position;
 	private BufferedImage icon;
 	private boolean valid = true;
-
+	
 	public Bookmark(int position, String title, String target, BufferedImage icon) {
 		this.position = position;
 		this.title = title;
 		this.target = target;
 		this.icon = icon;
 	}
-
+	
 	public Bookmark(int position) {
 		this.position = position;
 		try {
@@ -51,13 +51,13 @@ public class Bookmark {
 			System.out.println("Could not process bookmark " + position + " (" + getFileName() + ")");
 		}
 	}
-
+	
 	public void save() throws IOException {
 		// save icon
 		OutputStream fos = new FileOutputStream(getFileName(".png"));
 		MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(fos);
 		ImageIO.write(icon, "png", ios);
-
+		
 		// save link info
 		TextFile tf = new TextFile();
 		tf.clear();
@@ -66,32 +66,32 @@ public class Bookmark {
 		tf.write(new File(getFileName()));
 		System.out.println("Saved " + getFileName());
 	}
-
+	
 	public boolean delete() {
 		if (new File(getFileName()).exists()) {
 			return new File(getFileName(".png")).delete() && new File(getFileName()).delete();
 		} else
 			return false;
 	}
-
+	
 	private String getFileName() {
 		return getFileName(".txt");
 	}
-
+	
 	private String getFileName(String extension) {
 		return getFileName(extension, position);
 	}
-
+	
 	private static String getFileName(String extension, int position) {
 		String folder = ReleaseInfo.getAppSubdirFolderWithFinalSep("iap-bookmarks");
 		String filename = folder + "bookmark" + position + extension;
 		return filename;
 	}
-
+	
 	public boolean isValid() {
 		return valid;
 	}
-
+	
 	public static ArrayList<Bookmark> getBookmarks() {
 		ArrayList<Bookmark> res = new ArrayList<Bookmark>();
 		for (int i = 0; i < 99; i++) {
@@ -100,7 +100,7 @@ public class Bookmark {
 		}
 		return res;
 	}
-
+	
 	private static int getNextFreePosition() {
 		int res = 0;
 		for (int i = 0; i < 99; i++) {
@@ -112,7 +112,7 @@ public class Bookmark {
 		else
 			return -1;
 	}
-
+	
 	public static boolean add(String title, String target, BufferedImage icon) {
 		for (Bookmark b : getBookmarks()) {
 			if (b.getTarget().equals(target)) {
@@ -141,15 +141,15 @@ public class Bookmark {
 			return false;
 		}
 	}
-
+	
 	public String getTarget() {
 		return target;
 	}
-
+	
 	public BufferedImage getImage() {
 		return icon;
 	}
-
+	
 	public String getTitle() {
 		return title;
 	}

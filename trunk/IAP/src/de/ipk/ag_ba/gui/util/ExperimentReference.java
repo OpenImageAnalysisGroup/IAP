@@ -14,36 +14,36 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  * @author klukas
  */
 public class ExperimentReference {
-
+	
 	private final String experimentName;
 	private ExperimentInterface experiment;
 	private ExperimentHeaderInterface header;
-
+	
 	public ExperimentReference(ExperimentHeaderInterface header) {
 		this.experimentName = header.getExperimentname();
 		this.header = header;
 	}
-
+	
 	public ExperimentReference(ExperimentInterface experiment) {
 		this.experimentName = experiment.getName();
 		this.experiment = experiment;
 	}
-
+	
 	public ExperimentInterface getData(MongoDB m) throws Exception {
 		if (experiment != null)
 			return experiment;
 		else
 			return m.getExperiment(header);
 	}
-
+	
 	public String getExperimentName() {
 		return experimentName;
 	}
-
+	
 	public void setExperimentData(ExperimentInterface data) {
 		this.experiment = data;
 	}
-
+	
 	public ExperimentHeaderInterface getHeader() {
 		if (header == null) {
 			if (experiment != null)

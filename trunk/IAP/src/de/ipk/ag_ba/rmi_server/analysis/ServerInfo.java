@@ -12,17 +12,17 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
  * @author klukas
  */
 public class ServerInfo {
-
+	
 	public WorkerInfo imageAnalysis, inputOutput;
 	public int cpuCount;
-
+	
 	public ServerInfo() {
 		this.cpuCount = SystemAnalysis.getNumberOfCPUs();
 	}
-
+	
 	public void getInfoFrom(IOmodule io, IAmodule ia) {
 		inputOutput = io.getWorkerInfo();
 		imageAnalysis = ia.getWorkerInfo();
 	}
-
+	
 }

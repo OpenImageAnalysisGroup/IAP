@@ -25,7 +25,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Web
  * @author klukas
  */
 public class HTTPfolderSource extends HTTPhandler implements DataSource {
-
+	
 	private final String url;
 	private final String[] validExtensions;
 	private Collection<PathwayWebLinkItem> mainList;
@@ -36,7 +36,7 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 	private HTTPdataSourceLevel thisLevel;
 	private final Library lib;
 	private String description;
-
+	
 	public HTTPfolderSource(Library lib, String dataSourceName, String url, String[] validExtensions,
 						NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
 		this.lib = lib;
@@ -46,19 +46,19 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 		this.folderIcon = folderIcon;
 		this.dataSourceName = dataSourceName;
 	}
-
+	
 	@Override
 	public void setLogin(String login, String password) {
 		// empty
 	}
-
+	
 	@Override
 	public void readDataSource() throws Exception {
 		mainList = WebDirectoryFileListAccess.getWebDirectoryFileListItems(url, validExtensions, false);
 		thisLevel = new HTTPdataSourceLevel(lib, dataSourceName, mainList, mainDataSourceIcon, folderIcon);
 		read = true;
 	}
-
+	
 	@Override
 	public Collection<DataSourceLevel> getSubLevels() {
 		try {
@@ -70,7 +70,7 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 			return new ArrayList<DataSourceLevel>();
 		}
 	}
-
+	
 	@Override
 	public Collection<ExperimentReference> getExperiments() {
 		try {
@@ -82,7 +82,7 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 			return new ArrayList<ExperimentReference>();
 		}
 	}
-
+	
 	@Override
 	public Collection<PathwayWebLinkItem> getPathways() {
 		try {
@@ -94,17 +94,17 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 			return new ArrayList<PathwayWebLinkItem>();
 		}
 	}
-
+	
 	@Override
 	public NavigationImage getIcon() {
 		return mainDataSourceIcon;
 	}
-
+	
 	@Override
 	public String getName() {
 		return dataSourceName;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see de.ipk.ag_ba.datasources.DataSourceLevel#getBookReferencesAtThisLevel()
@@ -120,11 +120,11 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 			return new ArrayList<Book>();
 		}
 	}
-
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
+	
 	public String getDescription() {
 		return description;
 	}

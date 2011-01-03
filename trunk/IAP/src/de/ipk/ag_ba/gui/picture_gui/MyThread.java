@@ -11,13 +11,13 @@ package de.ipk.ag_ba.gui.picture_gui;
  * @author klukas
  */
 public class MyThread extends Thread {
-
+	
 	private boolean finished = false;
-
+	
 	public MyThread(Runnable r, String name) {
 		super(r, name);
 	}
-
+	
 	@Override
 	public void run() {
 		try {
@@ -26,7 +26,7 @@ public class MyThread extends Thread {
 			finished = true;
 		}
 	}
-
+	
 	public boolean isFinished() {
 		return finished;
 	}

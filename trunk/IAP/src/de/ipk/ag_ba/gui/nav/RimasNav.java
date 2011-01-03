@@ -22,7 +22,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Rim
  * @author klukas
  */
 public class RimasNav {
-
+	
 	// private JComponent getRIMASdownloadGUI() {
 	// String i = "<font color='gray'>@";
 	// ArrayList<JComponent> pathways = new ArrayList<JComponent>();
@@ -60,7 +60,7 @@ public class RimasNav {
 	// 5, TableLayout.PREFERRED));
 	// return TableLayout.getMultiSplitVertical(pathways, 5);
 	// }
-
+	
 	public static ImageIcon getIcon(String fn) {
 		ClassLoader cl = RimasTab.class.getClassLoader();
 		String path = RimasTab.class.getPackage().getName().replace('.', '/');
@@ -71,7 +71,7 @@ public class RimasNav {
 			return null;
 		}
 	}
-
+	
 	private static String getIntroTxt() {
 		String s = "<h2>RIMAS - Regulatory Interaction Maps of Arabidopsis Seed Development</h2>"
 							+ "RIMAS contains detailed SBGN conforming network diagrams which reflect the interactions "
@@ -82,17 +82,17 @@ public class RimasNav {
 							+ "biological phenomena (please click the Website button above for access to detailed pathway descriptions).";
 		return s;
 	}
-
+	
 	public static NavigationButton getRimas(GUIsetting guiSetting) {
 		Library rimasDoku = new Library();
 		rimasDoku.add(new Book("", "Lit. Reference", "http://www.cell.com/trends/plant-science/abstract/S1360-1385(10)00061-0"));
 		NavigationButton rimas = WebFolder.getBrowserNavigationEntity(rimasDoku, "RIMAS", "img/rimas.png",
 							"http://rimas.ipk-gatersleben.de/Pathways/", "Website", "img/browser.png",
 							"http://rimas.ipk-gatersleben.de/", new String[] { ".gml", ".graphml" }, getIntroTxt(), null, guiSetting);
-
+		
 		return rimas;
 	}
-
+	
 	//
 	// protected JComponent getPathwayButton(final String url, final String
 	// title, String image) {

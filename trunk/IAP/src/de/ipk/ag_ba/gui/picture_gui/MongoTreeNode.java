@@ -14,11 +14,11 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	private final String title;
 	private final MongoTreeNode projectNode;
 	private boolean sizeDirty = true;
-
+	
 	private String size = "????????? kb";
 	private final ExperimentInterface experiment;
 	private final ActionListener sizeChangedListener;
-
+	
 	public MongoTreeNode(MongoTreeNode projectNode, ActionListener sizeChangedListener, ExperimentInterface doc,
 						MappingDataEntity tableName, String title, boolean readOnly) {
 		super(readOnly);
@@ -28,25 +28,25 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		this.title = title;
 		this.sizeChangedListener = sizeChangedListener;
 	}
-
+	
 	public MongoTreeNode getProjectNode() {
 		if (projectNode == null)
 			return this;
 		return projectNode;
 	}
-
+	
 	public MappingDataEntity getTargetEntity() {
 		return tableName;
 	}
-
+	
 	public String getExperimentName() {
 		return experiment.getHeader().getExperimentname();
 	}
-
+	
 	public boolean isReadOnly() {
 		return readOnly;
 	}
-
+	
 	@Override
 	public String toString() {
 		if (projectNode == null && !(getExperimentName() == null)) {
@@ -61,14 +61,14 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 				return title;
 		}
 	}
-
+	
 	public void updateSizeInfo(final MongoDB m, final ActionListener dataChangedListener) {
 		if (getExperimentName() == null)
 			return;
 		if (!sizeDirty)
 			return;
 		sizeDirty = false;
-
+		
 		if (projectNode != null) {
 			projectNode.updateSizeInfo(m, dataChangedListener);
 		} else {
@@ -83,7 +83,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 			BackgroundThreadDispatcher.addTask(infoThread, 1);
 		}
 	}
-
+	
 	void getCurrentProjectSize(MongoDB m) {
 		try {
 			int sz = DataExchangeHelperForExperiments.getSizeOfExperiment(m, experiment);
@@ -97,9 +97,9 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		} catch (Exception e) {
 			size = "ERR     ";
 		}
-
+		
 	}
-
+	
 	/**
 	 * Set the "need size info update flag" of the project node to the value
 	 * specified.
@@ -110,29 +110,29 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		else
 			projectNode.setSizeDirty(true);
 	}
-
+	
 	@Override
 	public int getChildCount() {
 		if (getExperimentName() == null)
 			return 0;
 		return super.getChildCount();
 	}
-
+	
 	@Override
 	public boolean isLeaf() {
 		if (getExperimentName() == null)
 			return true;
 		return super.isLeaf();
 	}
-
+	
 	public ExperimentInterface getExperiment() {
 		return experiment;
 	}
-
+	
 	public ActionListener getSizeChangedListener() {
 		return sizeChangedListener;
 	}
-
+	
 	public boolean mayContainData() {
 		return true;
 	}

@@ -11,5 +11,5 @@ package de.ipk.ag_ba.rmi_server.task_management;
  */
 public enum CloudAnalysisStatus {
 	SCHEDULED, STARTING, IN_PROGRESS, FINISHED
-
+	
 }

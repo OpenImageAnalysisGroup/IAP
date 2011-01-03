@@ -25,14 +25,14 @@ import java.util.ResourceBundle;
 public class Messages {
 	private static final String BUNDLE_NAME = "de.ipk_gatersleben.ag_nw.dbe2.picture_gui.dbegui";//$NON-NLS-1$
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
-
+	
 	/**
 	 * 
 	 */
 	private Messages() {
 		// empty
 	}
-
+	
 	/**
 	 * @param key
 	 * @return

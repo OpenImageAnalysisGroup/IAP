@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
-import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.bson.types.ObjectId;
+import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -46,6 +46,7 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
+import de.ipk.ag_ba.gui.picture_gui.DataExchangeHelperForExperiments;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
 import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
@@ -68,7 +69,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.networks.LoadedNetwork;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.networks.NetworkData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.IntVolumeInputStream;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeInputStream;
 
@@ -76,48 +79,48 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeInputStream;
  * @author klukas
  */
 public class MongoDB {
-
+	
 	private static final ArrayList<MongoDB> mongos = initMongoList();
-
+	
 	public static ArrayList<MongoDB> getMongos() {
 		return mongos;
 	}
-
+	
 	@Override
 	public String toString() {
 		return displayName + " (" + defaultHost + ", db " + defaultDBE + ")";
 	}
-
+	
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de")) {
 			res.add(new MongoDB("IAP Cloud", "dbe3", "ba-13.ipk-gatersleben.de", null, null));
 			res.add(new MongoDB("IAP NG", "IAP1", "ba-13.ipk-gatersleben.de", null, null));
 		}
-
-		if (IAPservice.isReachable("localhost"))
-			res.add(new MongoDB("localhost (dbe3)", "dbe3", "localhost", null, null));
-		if (IAPservice.isReachable("localhost"))
-			res.add(new MongoDB("localhost (iap_local)", "iap_local", "localhost", null, null));
+		
+		if (IAPservice.isReachable("localhost")) {
+			res.add(new MongoDB("local dbe3", "dbe3", "localhost", null, null));
+			res.add(new MongoDB("local dbe4", "dbe4", "localhost", null, null));
+		}
 		return res;
 	}
-
+	
 	private MongoDBhandler mh;
 	private MongoDBpreviewHandler mp;
-
+	
 	public ResourceIOHandler[] getHandlers() {
 		String serverIP = defaultHost;
 		this.mh = new MongoDBhandler(serverIP, this);
 		this.mp = new MongoDBpreviewHandler(serverIP, this);
 		return new ResourceIOHandler[] { mh, mp };
 	}
-
+	
 	private final String displayName;
 	private final String defaultDBE;
 	private final String defaultHost;
 	private final String defaultLogin;
 	private final String defaultPass;
-
+	
 	// collections:
 	// preview_files
 	// volumes
@@ -126,7 +129,7 @@ public class MongoDB {
 	// experiments
 	// substances
 	// conditions
-
+	
 	public MongoDB(String displayName, String databaseName, String hostName, String login, String password) {
 		this.displayName = displayName;
 		this.defaultDBE = databaseName;
@@ -134,34 +137,34 @@ public class MongoDB {
 		this.defaultLogin = login;
 		this.defaultPass = password;
 	}
-
+	
 	public void saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
 						throws Exception {
 		RunnableOnDB r = new RunnableOnDB() {
-
+			
 			private DB db;
-
+			
 			@Override
 			public void setDB(DB db) {
 				this.db = db;
 			}
-
+			
 			@Override
 			public void run() {
 				storeExperiment(experiment, db, status);
 			}
 		};
 		processDB(r);
-
+		
 	}
-
-	private static Mongo m;
-
+	
 	private static Semaphore maxLoad = new Semaphore(4, true);
-
+	
+	private static Mongo m;
+	
 	private void processDB(String dataBase, String optHosts, String optLogin, String optPass,
 						RunnableOnDB runnableOnDB) throws Exception {
-
+		
 		try {
 			maxLoad.acquire();
 			DB db;
@@ -188,11 +191,11 @@ public class MongoDB {
 			maxLoad.release();
 		}
 	}
-
+	
 	public void processDB(RunnableOnDB runnableOnDB) throws Exception {
 		processDB(getDefaultDBE(), defaultHost, defaultLogin, defaultPass, runnableOnDB);
 	}
-
+	
 	public void deleteUnusedBinaryFiles() {
 		// collections:
 		// preview_files
@@ -203,11 +206,11 @@ public class MongoDB {
 		// substances
 		// conditions
 	}
-
+	
 	public void deleteExperiment(final String experimentID) throws Exception {
 		processDB(new RunnableOnDB() {
 			private DB db;
-
+			
 			@Override
 			public void run() {
 				DBObject obj = new BasicDBObject("_id", new ObjectId(experimentID));
@@ -219,35 +222,35 @@ public class MongoDB {
 					}
 				}
 			}
-
+			
 			@Override
 			public void setDB(DB db) {
 				this.db = db;
 			}
 		});
 	}
-
+	
 	private void storeExperiment(ExperimentInterface experiment, DB db,
 						BackgroundTaskStatusProviderSupportingExternalCall status) {
-
+		
 		experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
-
+		
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
-
+		
 		ObjectRef overallFileSize = new ObjectRef();
 		overallFileSize.addLong(0);
-
+		
 		DBCollection substances = db.getCollection("substances");
-
+		
 		DBCollection conditions = db.getCollection("conditions");
-
+		
 		int errorCount = 0;
 		int count = 0;
 		StringBuilder errors = new StringBuilder();
 		int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
-							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
+							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK });
 		List<DBObject> dbSubstances = new ArrayList<DBObject>();
-		HashMap<DBObject, List<BasicDBObject>> substtance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
+		HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		for (SubstanceInterface s : experiment) {
 			if (status.wantsToStop())
 				break;
@@ -255,9 +258,9 @@ public class MongoDB {
 			s.fillAttributeMap(attributes);
 			BasicDBObject substance = new BasicDBObject(filter(attributes));
 			dbSubstances.add(substance);
-
+			
 			List<BasicDBObject> dbConditions = new ArrayList<BasicDBObject>();
-
+			
 			for (ConditionInterface c : s) {
 				if (status.wantsToStop())
 					break;
@@ -265,7 +268,7 @@ public class MongoDB {
 				c.fillAttributeMap(attributes);
 				BasicDBObject condition = new BasicDBObject(filter(attributes));
 				dbConditions.add(condition);
-
+				
 				List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
 				for (SampleInterface sa : c) {
 					if (status.wantsToStop())
@@ -274,17 +277,18 @@ public class MongoDB {
 					sa.fillAttributeMap(attributes);
 					BasicDBObject sample = new BasicDBObject(filter(attributes));
 					dbSamples.add(sample);
-
+					
 					attributes.clear();
 					sa.getSampleAverage().fillAttributeMap(attributes);
 					BasicDBObject dbSampleAverage = new BasicDBObject(filter(attributes));
 					if (sa.size() > 0)
 						sample.put("average", dbSampleAverage);
-
+					
 					List<BasicDBObject> dbMeasurements = new ArrayList<BasicDBObject>();
 					List<BasicDBObject> dbImages = new ArrayList<BasicDBObject>();
 					List<BasicDBObject> dbVolumes = new ArrayList<BasicDBObject>();
-
+					List<BasicDBObject> dbNetworks = new ArrayList<BasicDBObject>();
+					
 					for (Measurement m : sa) {
 						attributes.clear();
 						m.fillAttributeMap(attributes);
@@ -293,41 +297,49 @@ public class MongoDB {
 					} // measurement
 					if (sa instanceof Sample3D) {
 						Sample3D s3 = (Sample3D) sa;
-						for (NumericMeasurementInterface m : s3.getBinaryMeasurements()) {
-							if (m instanceof ImageData) {
-								attributes.clear();
-								ImageData id = (ImageData) m;
-								DatabaseStorageResult res;
-								try {
+						for (NumericMeasurementInterface m : s3.getMeasurements(new MeasurementNodeType[] {
+								MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK })) {
+							DatabaseStorageResult res = null;
+							attributes.clear();
+							m.fillAttributeMap(attributes);
+							BasicDBObject dbo = new BasicDBObject(filter(attributes));
+							try {
+								if (m instanceof ImageData) {
+									ImageData id = (ImageData) m;
 									res = saveImageFile(db, id, overallFileSize);
-								} catch (Exception e) {
-									ErrorMsg.addErrorMessage(e);
-									res = DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
+									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
+										errorCount++;
+										errors.append("<li>" + id.getURL().getFileName());
+									} else
+										dbImages.add(dbo);
+									count++;
 								}
-								if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
-									errorCount++;
-									errors.append("<li>" + id.getURL().getFileName());
+								if (m instanceof VolumeData) {
+									VolumeData vd = (VolumeData) m;
+									res = saveVolumeFile(db, vd, overallFileSize, status);
+									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
+										errorCount++;
+										errors.append("<li>" + vd.getURL().getFileName());
+									} else
+										dbVolumes.add(dbo);
 								}
-								if (status != null) {
-									status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res.toString());
+								if (m instanceof NetworkData) {
+									NetworkData nd = (NetworkData) m;
+									res = saveNetworkFile(db, nd, overallFileSize, status);
+									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
+										errorCount++;
+										errors.append("<li>" + nd.getURL().getFileName());
+									} else
+										dbNetworks.add(volume);
 								}
-								m.fillAttributeMap(attributes);
-								BasicDBObject image = new BasicDBObject(filter(attributes));
-								dbImages.add(image);
-								count++;
+							} catch (Exception e) {
+								ErrorMsg.addErrorMessage(e);
+								res = DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 							}
-							if (m instanceof VolumeData) {
-								attributes.clear();
-								m.fillAttributeMap(attributes);
-								BasicDBObject volume = new BasicDBObject(filter(attributes));
-								dbVolumes.add(volume);
-								VolumeData vd = (VolumeData) m;
-
-								saveVolumeFile(db, vd, overallFileSize, status);
-								count++;
-							}
-							double prog = count * (100d / numberOfBinaryData);
 							if (status != null) {
+								count++;
+								double prog = count * (100d / numberOfBinaryData);
+								status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
 								status.setCurrentStatusValueFine(prog);
 							}
 						} // binary measurement
@@ -338,19 +350,21 @@ public class MongoDB {
 						sample.put("images", dbImages);
 					if (dbVolumes.size() > 0)
 						sample.put("volumes", dbVolumes);
+					if (dbNetworks.size() > 0)
+						sample.put("networks", dbVolumes);
 				} // sample
 				condition.put("samples", dbSamples);
 			} // condition
 				// substance.put("conditions", dbConditions);
-			substtance2conditions.put(substance, dbConditions);
+			substance2conditions.put(substance, dbConditions);
 		} // substance
-
+		
 		for (DBObject dbSubstance : dbSubstances) {
 			ArrayList<String> conditionIDs = new ArrayList<String>();
-			for (DBObject dbc : substtance2conditions.get(dbSubstance)) {
+			for (DBObject dbc : substance2conditions.get(dbSubstance)) {
 				conditions.insert(dbc);
 			}
-			for (DBObject dbCondition : substtance2conditions.get(dbSubstance))
+			for (DBObject dbCondition : substance2conditions.get(dbSubstance))
 				conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
 			dbSubstance.put("condition_ids", conditionIDs);
 			if (!status.wantsToStop()) {
@@ -360,29 +374,29 @@ public class MongoDB {
 		ArrayList<String> substanceIDs = new ArrayList<String>();
 		for (DBObject substance : dbSubstances)
 			substanceIDs.add(((BasicDBObject) substance).getString("_id"));
-
+		
 		experiment.getHeader().setSizekb(overallFileSize.getLong() / 1024 + "");
-
+		
 		experiment.fillAttributeMap(attributes);
 		BasicDBObject dbExperiment = new BasicDBObject(attributes);
 		dbExperiment.put("substance_ids", substanceIDs);
-
+		
 		DBCollection experiments = db.getCollection("experiments");
-
+		
 		experiments.insert(dbExperiment);
 		String id = dbExperiment.get("_id").toString();
 		for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
 			eh.setExcelfileid(id);
 		}
-
+		
 		if (errorCount > 0) {
 			MainFrame.showMessageDialog(
 								"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
 													+ "", "Errors");
 		}
-
+		
 	}
-
+	
 	private HashMap<String, Object> filter(HashMap<String, Object> attributes) {
 		HashSet<String> keys = new HashSet<String>();
 		keys.addAll(attributes.keySet());
@@ -392,7 +406,7 @@ public class MongoDB {
 		}
 		return attributes;
 	}
-
+	
 	private int countMeasurementValues(ExperimentInterface experiment, MeasurementNodeType[] measurementNodeTypes) {
 		int res = 0;
 		for (MeasurementNodeType m : measurementNodeTypes) {
@@ -400,20 +414,19 @@ public class MongoDB {
 		}
 		return res;
 	}
-
-	public long saveAnnotationFile(GridFS gridfs_annotation, String md5, File file) throws IOException {
+	
+	public long saveAnnotationFile(GridFS gridfs_annotation, String hash, File file) throws IOException {
 		GridFSInputFile inputFile = gridfs_annotation.createFile(file);
-		inputFile.setFilename(md5);
-		inputFile.getMetaData().put("md5", md5);
+		inputFile.setFilename(hash);
 		inputFile.getMetaData().put("name", file.getName());
 		inputFile.save();
 		return file.length();
 	}
-
+	
 	public long saveImageFile(MyByteArrayInputStream isImage, GridFS gridfs_images, GridFS gridfs_label_images,
-						GridFS gridfs_preview_files, ImageData image, String md5) throws IOException {
+						GridFS gridfs_preview_files, ImageData image, String hash) throws IOException {
 		long result = -1;
-
+		
 		try {
 			int idx = 0;
 			for (InputStream is : new InputStream[] { isImage,
@@ -433,10 +446,10 @@ public class MongoDB {
 						fs = gridfs_preview_files;
 						break;
 				}
-				GridFSDBFile fff = fs.findOne(md5);
+				GridFSDBFile fff = fs.findOne(hash);
 				if (fff == null) {
 					GridFSInputFile inputFile = fs.createFile(is);
-					inputFile.setFilename(md5);
+					inputFile.setFilename(hash);
 					inputFile.save();
 					result = inputFile.getLength();
 					if (result < 0)
@@ -447,37 +460,38 @@ public class MongoDB {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-
+		
 		return result;
 	}
-
-	private long saveVolumeFile(GridFS gridfs_volumes, GridFS gridfs_preview, VolumeData volume, ObjectRef optFileSize,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
-
+	
+	private long saveVolumeFile(GridFS gridfs_volumes, GridFS gridfs_preview, VolumeData id, ObjectRef optFileSize,
+						BackgroundTaskStatusProviderSupportingExternalCall optStatus, String hash) throws Exception {
+		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create Outputstream");
-
-		LoadedVolumeExtension id = (LoadedVolumeExtension) volume;
+		
 		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Calculate MD5");
-		String md5 = AttributeHelper.getMD5fromInputStream(id.getURL().getInputStream(), optFileSize);
-
-		System.out.println("Saving volume with MD5: " + md5);
-
+			optStatus.setCurrentStatusText1("Calculate hash");
+		
+		System.out.println("Saving volume with hash: " + hash);
+		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Save Volume");
-		GridFSDBFile vvv = gridfs_volumes.findOne(md5);
+		GridFSDBFile vvv = gridfs_volumes.findOne(hash);
 		if (vvv != null) {
 			gridfs_preview.remove(vvv);
 			vvv = null;
 		}
-		GridFSInputFile inputFile = gridfs_volumes.createFile(id.getURL().getInputStream());
-		inputFile.setFilename(md5);
-		inputFile.getMetaData().put("md5", md5);
+		IntVolumeInputStream is = (IntVolumeInputStream) id.getURL().getInputStream();
+		System.out.println("AVAIL: " + is.available());
+		System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
+		GridFSInputFile inputFile = gridfs_volumes.createFile(is);
+		inputFile.setFilename(hash);
 		inputFile.getMetaData().put("name", id.getURL().getFileName());
 		inputFile.save();
-
-		GridFSDBFile fff = gridfs_preview.findOne(volume.getURL().getDetail());
+		System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
+		
+		GridFSDBFile fff = gridfs_preview.findOne(id.getURL().getDetail());
 		if (fff != null) {
 			gridfs_preview.remove(fff);
 			fff = null;
@@ -485,20 +499,21 @@ public class MongoDB {
 		if (fff == null) {
 			try {
 				if (optStatus != null)
-					optStatus.setCurrentStatusText1("Render Side View");
+					optStatus.setCurrentStatusText1("Render Side Views");
 				System.out.println("Render side view GIF...");
+				LoadedVolumeExtension lv;
+				if (id instanceof LoadedVolumeExtension)
+					lv = (LoadedVolumeExtension) id;
+				else
+					lv = new LoadedVolumeExtension(IOmodule.loadVolume(id));
 				GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule
-									.getThreeDvolumePreviewIcon(id, optStatus));
+									.getThreeDvolumePreviewIcon(lv, optStatus));
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Save Preview Icon");
-				inputFilePreview.setFilename(md5);
-				inputFilePreview.getMetaData().put("md5", md5);
+				inputFilePreview.setFilename(hash);
 				inputFilePreview.getMetaData().put("name", id.getURL().getFileName());
 				inputFilePreview.save();
-				System.out.println("Preview stored.");
 			} catch (Exception e) {
-				System.out.println("Preview could not be generated and/or stored:");
-				e.printStackTrace();
 				ErrorMsg.addErrorMessage(e);
 			}
 		}
@@ -507,36 +522,94 @@ public class MongoDB {
 								+ ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
 		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
 	}
-
+	
+	private long saveNetworkFile(GridFS gridfs_networks, GridFS gridfs_preview, NetworkData id, ObjectRef optFileSize,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, String hash) throws Exception {
+		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Create Outputstream");
+		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Calculate hash");
+		
+		System.out.println("Saving network with hash: " + hash);
+		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Save Network");
+		GridFSDBFile vvv = gridfs_networks.findOne(hash);
+		if (vvv != null) {
+			gridfs_preview.remove(vvv);
+			vvv = null;
+		}
+		InputStream is = id.getURL().getInputStream();
+		
+		GridFSInputFile inputFile = gridfs_networks.createFile(is);
+		inputFile.setFilename(hash);
+		inputFile.getMetaData().put("name", id.getURL().getFileName());
+		inputFile.save();
+		System.out.println("SAVED NETWORK: " + id.toString() + " // SIZE: " + inputFile.getLength());
+		
+		GridFSDBFile fff = gridfs_preview.findOne(id.getURL().getDetail());
+		if (fff != null) {
+			gridfs_preview.remove(fff);
+			fff = null;
+		}
+		if (fff == null) {
+			try {
+				if (optStatus != null)
+					optStatus.setCurrentStatusText1("Render Side Views");
+				System.out.println("Render side view GIF...");
+				LoadedNetwork ln;
+				if (id instanceof LoadedNetwork)
+					ln = (LoadedNetwork) id;
+				else
+					ln = IOmodule.loadNetwork(id);
+				GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule
+						.getNetworkPreviewIcon(ln, optStatus));
+				if (optStatus != null)
+					optStatus.setCurrentStatusText1("Save Preview Icon");
+				inputFilePreview.setFilename(hash);
+				inputFilePreview.getMetaData().put("name", id.getURL().getFileName());
+				inputFilePreview.save();
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+			}
+		}
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Saved Network ("
+					+ ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
+		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
+	}
+	
 	public DatabaseStorageResult saveImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
 		MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
 		ImageData srcID = id;
-
+		
 		if (is == null) {
 			System.out.println("No input stream for source-URL: " + id.getURL());
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
-
-		String md5 = AttributeHelper.getMD5fromInputStream(is, fileSize);
+		
+		String hash = GravistoService.getHashFromInputStream(is, fileSize, DataExchangeHelperForExperiments.DEFAULT_HASH);
 		if (is instanceof MyByteArrayInputStream)
 			is = new MyByteArrayInputStream((is).getBuff());
 		GridFS gridfs_images = new GridFS(db, "images");
 		DBCollection collectionA = db.getCollection("images.files");
 		collectionA.ensureIndex("filename");
-
+		
 		GridFS gridfs_null_files = new GridFS(db, "null_images");
 		DBCollection collectionB = db.getCollection("null_images.files");
 		collectionB.ensureIndex("filename");
-
+		
 		GridFS gridfs_preview_files = new GridFS(db, "preview_files");
 		DBCollection collectionC = db.getCollection("preview_files.files");
 		collectionC.ensureIndex("filename");
-
-		GridFSDBFile fff = gridfs_images.findOne(md5);
-
+		
+		GridFSDBFile fff = gridfs_images.findOne(hash);
+		
 		srcID.getURL().setPrefix(mh.getPrefix());
-		srcID.getURL().setDetail(md5);
-
+		srcID.getURL().setDetail(hash);
+		
 		if (fff != null && fff.getLength() <= 0) {
 			System.out.println("Found Zero-Size File.");
 			gridfs_images.remove(fff);
@@ -545,14 +618,14 @@ public class MongoDB {
 		if (fff != null) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
-			long res = saveImageFile(is, gridfs_images, gridfs_null_files, gridfs_preview_files, id, md5);
+			long res = saveImageFile(is, gridfs_images, gridfs_null_files, gridfs_preview_files, id, hash);
 			if (res >= 0) {
 				return DatabaseStorageResult.STORED_IN_DB;
 			} else
 				return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 	}
-
+	
 	public DatabaseStorageResult saveVolumeFile(DB db, VolumeData volume, ObjectRef optFileSize,
 						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		GridFS gridfs_volumes = new GridFS(db, "volumes");
@@ -561,79 +634,114 @@ public class MongoDB {
 		GridFS gridfs_preview = new GridFS(db, "preview_files");
 		DBCollection collectionB = db.getCollection("preview_files.files");
 		collectionB.ensureIndex("filename");
-		GridFSDBFile fff = gridfs_volumes.findOne(volume.getURL().getDetail());
-		if (fff != null) { // && fff.getLength() <= 0
-			// System.out.println("Found Zero-Size File.");
-			System.out.println("Delete Existing Volume.");
-			gridfs_volumes.remove(fff);
-			fff = null;
-		}
-
-		// if (fff != null) {
-		// return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
-		// } else {
+		
+		String hash;
 		try {
-			saveVolumeFile(gridfs_volumes, gridfs_preview, volume, optFileSize, optStatus);
-			return DatabaseStorageResult.STORED_IN_DB;
+			hash = GravistoService.getHashFromInputStream(volume.getURL().getInputStream(), optFileSize, DataExchangeHelperForExperiments.DEFAULT_HASH);
+			
+			GridFSDBFile fff = gridfs_volumes.findOne(hash);
+			if (fff != null && fff.getLength() <= 0) {
+				System.out.println("Found Zero-Size File.");
+				System.out.println("Delete Existing Volume.");
+				gridfs_volumes.remove(fff);
+				fff = null;
+			}
+			if (fff != null) {
+				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+			} else {
+				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, optFileSize, optStatus, hash);
+				return DatabaseStorageResult.STORED_IN_DB;
+			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
-		// }
 	}
-
+	
+	public DatabaseStorageResult saveNetworkFile(DB db, NetworkData network, ObjectRef optFileSize,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		GridFS gridfs_networks = new GridFS(db, "networks");
+		DBCollection collectionA = db.getCollection("networks.files");
+		collectionA.ensureIndex("filename");
+		GridFS gridfs_preview = new GridFS(db, "preview_files");
+		DBCollection collectionB = db.getCollection("preview_files.files");
+		collectionB.ensureIndex("filename");
+		
+		String hash;
+		try {
+			hash = GravistoService.getHashFromInputStream(network.getURL().getInputStream(), optFileSize, DataExchangeHelperForExperiments.DEFAULT_HASH);
+			
+			GridFSDBFile fff = gridfs_volumes.findOne(hash);
+			if (fff != null && fff.getLength() <= 0) {
+				System.out.println("Found Zero-Size File.");
+				System.out.println("Delete Existing Network.");
+				gridfs_networks.remove(fff);
+				fff = null;
+			}
+			if (fff != null) {
+				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+			} else {
+				saveNetworkFile(gridfs_networks, gridfs_preview, network, optFileSize, optStatus, hash);
+				return DatabaseStorageResult.STORED_IN_DB;
+			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
+		}
+	}
+	
 	// public void setDefaultDBE(String defaultDBE) {
 	// this.defaultDBE = defaultDBE;
 	// }
-
+	
 	public String getDefaultDBE() {
 		return defaultDBE;
 	}
-
+	
 	public String getDefaultHost() {
 		return defaultHost;
 	}
-
+	
 	// public void setDefaultHost(String defaultHost) {
 	// this.defaultHost = defaultHost;
 	// }
-
+	
 	public String getDefaultLogin() {
 		return defaultLogin;
 	}
-
+	
 	// public void setDefaultLogin(String defaultLogin) {
 	// this.defaultLogin = defaultLogin;
 	// }
-
+	
 	public String getDefaultPass() {
 		return defaultPass;
 	}
-
+	
 	// public void setDefaultPass(String defaultPass) {
 	// this.defaultPass = defaultPass;
 	// }
-
-	public byte[] getPreviewData(final String md5) {
+	
+	public byte[] getPreviewData(final String hash) {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					GridFS gridfs_preview_images = new GridFS(db, "preview_files");
-					GridFSDBFile fff = gridfs_preview_images.findOne(md5);
+					GridFSDBFile fff = gridfs_preview_images.findOne(hash);
 					if (fff != null) {
 						try {
 							ByteArrayOutputStream bos = new ByteArrayOutputStream((int) fff.getLength());
-
+							
 							byte[] buffer = new byte[1024];
 							int read;
 							InputStream is = fff.getInputStream();
 							while ((read = is.read(buffer)) != -1)
 								bos.write(buffer, 0, read);
-
+							
 							byte[] bytes = bos.toByteArray();
 							tso.setParam(0, bytes);
 						} catch (IOException e) {
@@ -642,7 +750,7 @@ public class MongoDB {
 						}
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -654,19 +762,19 @@ public class MongoDB {
 			return null;
 		}
 	}
-
+	
 	public ExperimentHeaderInterface getExperimentHeader(final ObjectId experimentMongoID) {
 		final ObjectRef res = new ObjectRef();
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					DBObject header = db.getCollection("experiments").findOne(experimentMongoID);
 					res.setObject(new ExperimentHeader(header.toMap()));
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -678,20 +786,20 @@ public class MongoDB {
 		}
 		return (ExperimentHeaderInterface) res.getObject();
 	}
-
+	
 	public ArrayList<ExperimentHeaderInterface> getExperimentList() {
 		final ArrayList<ExperimentHeaderInterface> res = new ArrayList<ExperimentHeaderInterface>();
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					for (DBObject header : db.getCollection("experiments").find()) {
 						res.add(new ExperimentHeader(header.toMap()));
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -703,13 +811,13 @@ public class MongoDB {
 		}
 		return res;
 	}
-
+	
 	public ExperimentInterface getExperiment(final ExperimentHeaderInterface header) {
 		final ExperimentInterface experiment = new Experiment();
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					DBRef dbr = new DBRef(db, "experiments", new ObjectId(header.getExcelfileid()));
@@ -729,16 +837,16 @@ public class MongoDB {
 						}
 					}
 					experiment.setHeader(header);
-
+					
 					int numberOfImagesAndVolumes = countMeasurementValues(experiment, new MeasurementNodeType[] {
 										MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
-
+					
 					if (numberOfImagesAndVolumes > 0) {
 						updateExperimentSize(db, experiment);
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -749,12 +857,12 @@ public class MongoDB {
 		}
 		return experiment;
 	}
-
+	
 	public void setExperimentType(final ExperimentHeaderInterface header, final String experimentType) throws Exception {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		processDB(new RunnableOnDB() {
 			private DB db;
-
+			
 			@Override
 			public void run() {
 				ObjectId id = new ObjectId(header.getExcelfileid());
@@ -766,7 +874,7 @@ public class MongoDB {
 				} else
 					tso.setBval(0, true);
 			}
-
+			
 			@Override
 			public void setDB(DB db) {
 				this.db = db;
@@ -775,12 +883,12 @@ public class MongoDB {
 		if (tso.getBval(0, false))
 			throw new Exception("Experiment with ID " + header.getExcelfileid() + " not found!");
 	}
-
+	
 	public void setExperimentInfo(final ExperimentHeaderInterface header) throws Exception {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		processDB(new RunnableOnDB() {
 			private DB db;
-
+			
 			@Override
 			public void run() {
 				ObjectId id = new ObjectId(header.getExcelfileid());
@@ -793,12 +901,12 @@ public class MongoDB {
 						if (attributes.get(key) != null)
 							expref.put(key, attributes.get(key));
 					}
-
+					
 					db.getCollection("experiments").save(expref);
 				} else
 					tso.setBval(0, true);
 			}
-
+			
 			@Override
 			public void setDB(DB db) {
 				this.db = db;
@@ -807,7 +915,7 @@ public class MongoDB {
 		if (tso.getBval(0, false))
 			throw new Exception("Experiment with ID " + header.getExcelfileid() + " not found!");
 	}
-
+	
 	private void updateExperimentSize(DB db, ExperimentInterface experiment) {
 		boolean recalcSize = false;
 		try {
@@ -835,7 +943,7 @@ public class MongoDB {
 								url = ((NetworkData) nmd).getURL();
 							}
 					if (url != null) {
-						String md5 = url.getDetail();
+						String hash = url.getDetail();
 						Collection<String> gridFSnames = new ArrayList<String>();
 						gridFSnames.add("preview_files");
 						gridFSnames.add("volumes");
@@ -843,7 +951,7 @@ public class MongoDB {
 						gridFSnames.add("annotations");
 						for (String s : gridFSnames) {
 							GridFS gridfs = new GridFS(db, s);
-							GridFSDBFile file = gridfs.findOne(md5);
+							GridFSDBFile file = gridfs.findOne(hash);
 							if (file != null) {
 								newSize.addLong(file.getLength());
 							}
@@ -856,7 +964,7 @@ public class MongoDB {
 			}
 		}
 	}
-
+	
 	/**
 	 * add task to "schedule" collection
 	 * 
@@ -865,24 +973,24 @@ public class MongoDB {
 	public void batchEnqueue(final BatchCmd cmd) throws Exception {
 		// HashSet<String> targetIPs, String remoteCapableAnalysisActionClassName,
 		// String remoteCapableAnalysisActionParams, String experimentInputMongoID) {
-
+		
 		processDB(new RunnableOnDB() {
 			private DB db;
-
+			
 			@Override
 			public void run() {
 				DBCollection dbc = db.getCollection("schedule");
 				dbc.setObjectClass(BatchCmd.class);
 				dbc.insert(cmd);
 			}
-
+			
 			@Override
 			public void setDB(DB db) {
 				this.db = db;
 			}
 		});
 	}
-
+	
 	/**
 	 * get list of host names, with not too old ping update time
 	 */
@@ -891,12 +999,12 @@ public class MongoDB {
 		final long curr = System.currentTimeMillis();
 		processDB(new RunnableOnDB() {
 			private DB db;
-
+			
 			@Override
 			public void run() {
 				DBCollection dbc = db.getCollection("compute_hosts");
 				dbc.setObjectClass(CloudHost.class);
-
+				
 				DBCursor cursor = dbc.find();
 				while (cursor.hasNext()) {
 					CloudHost h = (CloudHost) cursor.next();
@@ -904,28 +1012,28 @@ public class MongoDB {
 						res.add(h.getHostName());
 				}
 			}
-
+			
 			@Override
 			public void setDB(DB db) {
 				this.db = db;
 			}
 		});
-
+		
 		return res;
 	}
-
+	
 	public synchronized void batchPingHost(final String ip) throws Exception {
 		processDB(new RunnableOnDB() {
 			private DB db;
-
+			
 			@Override
 			public void run() {
 				DBCollection dbc = db.getCollection("compute_hosts");
 				dbc.setObjectClass(CloudHost.class);
-
+				
 				BasicDBObject query = new BasicDBObject();
 				query.put(CloudHost.getHostId(), ip);
-
+				
 				CloudHost res = (CloudHost) dbc.findOne(query);
 				if (res != null) {
 					res.updateTime();
@@ -939,31 +1047,31 @@ public class MongoDB {
 					}
 				}
 			}
-
+			
 			@Override
 			public void setDB(DB db) {
 				this.db = db;
 			}
 		});
 	}
-
+	
 	public void batchClearJobs() throws Exception {
 		processDB(new RunnableOnDB() {
-
+			
 			private DB db;
-
+			
 			@Override
 			public void run() {
 				db.getCollection("schedule").drop();
 			}
-
+			
 			@Override
 			public void setDB(DB db) {
 				this.db = db;
 			}
 		});
 	}
-
+	
 	/**
 	 * if a batch lastUpdate time is older then the provided limit, it is
 	 * returned in the result set and will most likely be re-claimed to
@@ -974,7 +1082,7 @@ public class MongoDB {
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					// System.out.println("---");
@@ -990,7 +1098,7 @@ public class MongoDB {
 						// System.out.println(batch);
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -1002,13 +1110,13 @@ public class MongoDB {
 		}
 		return res;
 	}
-
+	
 	public Collection<BatchCmd> batchGetAllCommands() {
 		final Collection<BatchCmd> res = new ArrayList<BatchCmd>();
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					// System.out.println("---");
@@ -1019,7 +1127,7 @@ public class MongoDB {
 						res.add(batch);
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -1031,13 +1139,13 @@ public class MongoDB {
 		}
 		return res;
 	}
-
+	
 	public Collection<BatchCmd> batchGetWorkTasksScheduledForStart() {
 		final Collection<BatchCmd> res = new ArrayList<BatchCmd>();
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					String hostName;
@@ -1055,7 +1163,7 @@ public class MongoDB {
 						ErrorMsg.addErrorMessage(e);
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -1067,13 +1175,13 @@ public class MongoDB {
 		}
 		return res;
 	}
-
+	
 	public void batchClaim(final BatchCmd batch, final CloudAnalysisStatus starting, final boolean requireOwnership) {
 		// try to claim a batch cmd
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					try {
@@ -1094,7 +1202,7 @@ public class MongoDB {
 						ErrorMsg.addErrorMessage(e);
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -1104,14 +1212,14 @@ public class MongoDB {
 			ErrorMsg.addErrorMessage(e);
 		}
 	}
-
+	
 	public BatchCmd batchGetCommand(final BatchCmd batch) {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		// try to claim a batch cmd
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					DBCollection collection = db.getCollection("schedule");
@@ -1121,7 +1229,7 @@ public class MongoDB {
 					BatchCmd res = (BatchCmd) collection.findOne(dbo);
 					tso.setParam(0, res);
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -1132,7 +1240,7 @@ public class MongoDB {
 		}
 		return (BatchCmd) tso.getParam(0, null);
 	}
-
+	
 	private void processSubstance(DB db, ExperimentInterface experiment, DBObject substance) {
 		Substance3D s3d = new Substance3D(substance.toMap());
 		experiment.add(s3d);
@@ -1152,7 +1260,7 @@ public class MongoDB {
 				}
 			}
 	}
-
+	
 	private void processCondition(Substance3D s3d, DBObject cond) {
 		Condition3D condition = new Condition3D(s3d, cond.toMap());
 		s3d.add(condition);
@@ -1183,13 +1291,14 @@ public class MongoDB {
 					for (Object m : imgList) {
 						DBObject img = (DBObject) m;
 						@SuppressWarnings("unchecked")
-						Map<Object, Object> map = img.toMap();
+						Map<String, Object> map = img.toMap();
 						String fn = (String) map.get("filename");
-						String md5 = (String) map.get("md5sum");
-						if (md5 != null && fn != null) {
-							map.put("filename", "mongo://" + md5 + "/" + fn);
+						String hash = (String) map.get("md5sum");
+						if (hash != null && fn != null) {
+							map.remove("md5sum");
+							map.put("filename", "mongo://" + hash + "/" + fn);
 						}
-
+						
 						ImageData image = new ImageData(sample, map);
 						image.getURL().setPrefix(mh.getPrefix());
 						sample.add(image);
@@ -1200,7 +1309,15 @@ public class MongoDB {
 				if (volList != null) {
 					for (Object v : volList) {
 						DBObject vol = (DBObject) v;
-						VolumeData volume = new VolumeData(sample, vol.toMap());
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = vol.toMap();
+						String fn = (String) map.get("filename");
+						String hash = (String) map.get("md5sum");
+						if (hash != null && fn != null) {
+							map.remove("md5sum");
+							map.put("filename", "mongo://" + hash + "/" + fn);
+						}
+						VolumeData volume = new VolumeData(sample, map);
 						if (volume.getURL() != null) {
 							volume.getURL().setPrefix(mh.getPrefix());
 							sample.add(volume);
@@ -1208,13 +1325,34 @@ public class MongoDB {
 							ErrorMsg.addErrorMessage("No volume data URL found! Volume: " + volume.toString());
 					}
 				}
+				// networks
+				BasicDBList netList = (BasicDBList) sam.get("networks");
+				if (netList != null) {
+					for (Object n : netList) {
+						DBObject net = (DBObject) n;
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = net.toMap();
+						String fn = (String) map.get("filename");
+						String hash = (String) map.get("md5sum");
+						if (hash != null && fn != null) {
+							map.remove("md5sum");
+							map.put("filename", "mongo://" + hash + "/" + fn);
+						}
+						NetworkData network = new NetworkData(sample, map);
+						if (network.getURL() != null) {
+							network.getURL().setPrefix(mh.getPrefix());
+							sample.add(network);
+						} else
+							ErrorMsg.addErrorMessage("No network data URL found! Network: " + network.toString());
+					}
+				}
 			}
 	}
-
+	
 	public String getDisplayName() {
 		return displayName;
 	}
-
+	
 	public MongoDBhandler getPrimaryHandler() {
 		return mh;
 	}

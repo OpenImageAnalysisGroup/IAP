@@ -20,9 +20,9 @@ package de.ipk.ag_ba.gui.picture_gui;
  *         Preferences - Java - Code Generation - Code and Comments
  */
 public class DBEtreeNodeWithNoUpload extends MongoTreeNodeBasis {
-
+	
 	private final String name;
-
+	
 	/**
 	 * @param string
 	 */
@@ -30,7 +30,7 @@ public class DBEtreeNodeWithNoUpload extends MongoTreeNodeBasis {
 		super(readOnly);
 		this.name = name;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()

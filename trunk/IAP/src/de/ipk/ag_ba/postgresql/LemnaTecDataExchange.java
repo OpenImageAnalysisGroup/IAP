@@ -48,16 +48,16 @@ public class LemnaTecDataExchange {
 	private final String password;
 	private final String port;
 	private final String host;
-
+	
 	private static final String driver = "org.postgresql.Driver";
-
+	
 	public LemnaTecDataExchange() {
 		user = "postgres";
 		password = "LemnaTec";
 		port = "5432";
 		host = "lemna-db.ipk-gatersleben.de";
 	}
-
+	
 	public Collection<String> getDatabases() throws SQLException, ClassNotFoundException {
 		HashSet<String> invalidDBs = new HashSet<String>();
 		invalidDBs.add("template1");
@@ -67,47 +67,47 @@ public class LemnaTecDataExchange {
 		invalidDBs.add("bacula");
 		invalidDBs.add("LTTestDB");
 		invalidDBs.add("LemnaTest");
-
+		
 		String sqlText = "SELECT datname FROM pg_database";
-
+		
 		Connection connection = openConnectionToDatabase("postgres");
-
+		
 		PreparedStatement ps = connection.prepareStatement(sqlText);
-
+		
 		if (Debug.TEST)
 			Debug.print(sqlText);
-
+		
 		ResultSet rs = ps.executeQuery();
-
+		
 		Collection<String> result = new TreeSet<String>();
-
+		
 		while (rs.next()) {
 			if (Debug.TEST)
 				Debug.print("aktuelle Zeile: ", rs.getString(1));
-
+			
 			String dbName = rs.getString(1);
-
+			
 			if (!invalidDBs.contains(dbName))
 				result.add(dbName);
-
+			
 		}
 		rs.close();
 		ps.close();
-
+		
 		return result;
 	}
-
+	
 	public Collection<ExperimentHeaderInterface> getExperimentInDatabase(String database) throws SQLException,
 						ClassNotFoundException {
 		String sqlText = "SELECT distinct(measurement_label) FROM snapshot ORDER BY measurement_label";
-
+		
 		Connection connection = openConnectionToDatabase(database);
 		PreparedStatement ps = connection.prepareStatement(sqlText);
-
+		
 		ResultSet rs = ps.executeQuery();
-
+		
 		// Collection<String> result = new TreeSet<String>();
-
+		
 		Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
 		while (rs.next()) {
 			ExperimentHeaderInterface ehi = new ExperimentHeader();
@@ -122,10 +122,10 @@ public class LemnaTecDataExchange {
 			ehi.setSizekb("?");
 			result.add(ehi);
 		}
-
+		
 		rs.close();
 		ps.close();
-
+		
 		sqlText = "SELECT min(time_stamp), max(time_stamp), count(*) FROM snapshot,tiled_image WHERE measurement_label=? AND tiled_image.snapshot_id=snapshot.id";
 		ps = connection.prepareStatement(sqlText);
 		for (ExperimentHeaderInterface ehi : result) {
@@ -150,7 +150,7 @@ public class LemnaTecDataExchange {
 			}
 			rs.close();
 		}
-
+		
 		ArrayList<String> names = new ArrayList<String>();
 		try {
 			sqlText = "SELECT distinct(creator) FROM import_data WHERE measurement_label=?";
@@ -171,7 +171,7 @@ public class LemnaTecDataExchange {
 				ehi.setCoordinator(null);
 			}
 		}
-
+		
 		sqlText = "SELECT distinct(creator) FROM snapshot WHERE measurement_label=?";
 		ps = connection.prepareStatement(sqlText);
 		for (ExperimentHeaderInterface ehi : result) {
@@ -187,24 +187,24 @@ public class LemnaTecDataExchange {
 			if (ehi.getCoordinator() == null)
 				ehi.setCoordinator(importers);
 		}
-
+		
 		// ArrayList experimentatorsArray = new ArrayList();
 		// for (String s : experimentators)
 		// experimentatorsArray.add(s);
 		// String experimentator =
 		// StringManipulationTools.getStringList(experimentatorsArray, ",");
-
+		
 		ps.close();
 		closeDatabaseConnection(connection);
-
+		
 		return result;
 	}
-
+	
 	public Collection<Snapshot> getSnapshotsOfExperiment(String database, String experiment) throws SQLException,
 						ClassNotFoundException {
 		Collection<Snapshot> result = new ArrayList<Snapshot>();
 		Connection connection = openConnectionToDatabase(database);
-
+		
 		HashMap<Long, String> id2path = new HashMap<Long, String>();
 		String sqlReadImageFileTable = "SELECT "
 							+ "image_file_table.id as image_file_tableID, path FROM image_file_table";
@@ -219,17 +219,17 @@ public class LemnaTecDataExchange {
 		// "(tile.image_oid = image_file_table.id OR tile.null_image_oid = image_file_table.id)) OR ("
 		// +
 		// "snapshot.configuration_id = image_unit_configuration.compconfigid and snapshot.id = tiled_image.snapshot_id and tiled_image.camera_label = image_unit_configuration.gid and image_unit_configuration.image_parameter_oid = image_file_table.id)";
-
+		
 		PreparedStatement ps = connection.prepareStatement(sqlReadImageFileTable);
 		// ps.setString(1, experiment);
-
+		
 		ResultSet rs = ps.executeQuery();
 		while (rs.next()) {
 			id2path.put(rs.getLong("image_file_tableID"), rs.getString("path"));
 		}
 		rs.close();
 		ps.close();
-
+		
 		String sqlText = "SELECT "
 							+ "creator, measurement_label, camera_label, id_tag, path, "
 							+ "time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
@@ -239,29 +239,29 @@ public class LemnaTecDataExchange {
 							+ "tiled_image.id = tile.tiled_image_id and "
 							+ "tile.image_oid = image_file_table.id and "
 							+ "snapshot.configuration_id = image_unit_configuration.compconfigid and tiled_image.camera_label = image_unit_configuration.gid";
-
+		
 		ps = connection.prepareStatement(sqlText);
 		ps.setString(1, experiment);
-
+		
 		rs = ps.executeQuery();
-
+		
 		while (rs.next()) {
 			Snapshot snapshot = new Snapshot();
-
+			
 			snapshot.setCreator(rs.getString("creator"));
 			snapshot.setMeasurement_label(rs.getString("measurement_label"));
 			snapshot.setUserDefinedCameraLabeL(rs.getString("camera_label"));
 			snapshot.setId_tag(rs.getString("id_tag"));
-
+			
 			snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
 			snapshot.setWater_amount(rs.getInt("water_amount"));
 			snapshot.setWeight_after(rs.getDouble("weight_after"));
 			snapshot.setWeight_before(rs.getDouble("weight_before"));
-
+			
 			snapshot.setCamera_label(rs.getString("compname"));
 			snapshot.setXfactor(rs.getDouble("xfactor"));
 			snapshot.setYfactor(rs.getDouble("yfactor"));
-
+			
 			String s1 = id2path.get(rs.getLong("image_oid"));
 			snapshot.setPath_image(s1);
 			String s2 = id2path.get(rs.getLong("null_image_oid"));
@@ -269,38 +269,38 @@ public class LemnaTecDataExchange {
 			String s3 = id2path.get(rs.getLong("image_parameter_oid"));
 			// System.out.println(s3);
 			snapshot.setPath_image_config_blob(s3);
-
+			
 			result.add(snapshot);
 		}
 		rs.close();
 		ps.close();
 		return result;
 	}
-
+	
 	private static void loadJdbcDriver() throws ClassNotFoundException {
 		Class.forName(driver);
 	}
-
+	
 	private Connection openConnectionToDatabase(String database) throws SQLException, ClassNotFoundException {
-
+		
 		loadJdbcDriver();
-
+		
 		String path = "jdbc:postgresql:" + (host != null ? ("//" + host) + (port != null ? ":" + port : "") + "/" : "")
 							+ database;
 		Connection connection = DriverManager.getConnection(path, user, password);
-
+		
 		if (Debug.TEST) {
 			DatabaseMetaData meta = connection.getMetaData(); // Metadata
 			Debug.print("Connection successful:", meta.getDatabaseProductName() + " " + meta.getDatabaseProductVersion());
 		}
-
+		
 		return connection;
 	}
-
+	
 	private void closeDatabaseConnection(Connection connection) throws SQLException {
 		connection.close();
 	}
-
+	
 	public static void main(String[] args) {
 		try {
 			for (Snapshot snapshot : new LemnaTecDataExchange().getSnapshotsOfExperiment("DH-MB1", "DH-MB_Reihe_01"))
@@ -311,26 +311,26 @@ public class LemnaTecDataExchange {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
 						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
-
+		
 		String species = "";
 		String genotype = "";
 		String variety = "";
 		String growthconditions = "";
 		String treatment = "";
-
+		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Read database");
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(-1);
-
+		
 		Collection<Snapshot> snapshots = getSnapshotsOfExperiment(experimentReq.getDatabase(), experimentReq
 							.getExperimentname());
 		HashMap<String, Integer> idtag2replicateID = new HashMap<String, Integer>();
-
+		
 		Timestamp earliest = null;
 		{
 			Timestamp ts = null;
@@ -347,45 +347,46 @@ public class LemnaTecDataExchange {
 				idtag2replicateID.put(id, replID);
 			}
 		}
-
+		
 		HashMap<String, Condition> idtag2condition = getPlantIdAnnotation(experimentReq);
-
+		
 		HashMap<String, byte[]> blob2buf = new HashMap<String, byte[]>();
-
+		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Process snapshots (" + snapshots.size() + ")");
-
+		
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(0);
 		int workload = snapshots.size();
+		HashMap<String, NumericMeasurement> knownDayAndReplicateIDs = new HashMap<String, NumericMeasurement>();
 		int idxx = 0;
 		for (Snapshot sn : snapshots) {
 			if (sn.getId_tag().length() <= 0) {
 				System.out.println("Warning: snapshot with empty ID tag is ignored.");
 				continue;
 			}
-
+			
 			if (optStatus != null)
 				optStatus.setCurrentStatusValueFine((double) idxx * 100 / workload);
-
+			
 			idxx++;
-
+			
 			Condition conditionTemplate = idtag2condition.get(sn.getId_tag());
-
+			
 			species = conditionTemplate != null ? conditionTemplate.getSpecies() : "not specified";
 			genotype = conditionTemplate != null ? conditionTemplate.getGenotype() : "not specified";
 			variety = conditionTemplate != null ? conditionTemplate.getVariety() : "not specified";
 			growthconditions = conditionTemplate != null ? conditionTemplate.getGrowthconditions() : "not specified";
 			treatment = conditionTemplate != null ? conditionTemplate.getTreatment() : "not specified";
-
+			
 			{
 				String lbl = sn.getCamera_label();
-
+				
 				if (lbl != null && lbl.startsWith("imagingunits."))
 					lbl = lbl.substring("imagingunits.".length());
 				if (lbl != null && lbl.contains("#"))
 					lbl = lbl.substring(0, lbl.indexOf("#"));
-
+				
 				// if (lbl.endsWith("_HL2"))
 				// lbl = lbl.substring(0, lbl.length() - "_HL2".length());
 				// if (lbl.endsWith("HL2"))
@@ -400,7 +401,7 @@ public class LemnaTecDataExchange {
 				// }
 				// }
 				// lbl = StringManipulationTools.stringReplace(lbl, "_", "");
-
+				
 				sn.setCamera_label(lbl);
 			}
 			Integer replicateID = idtag2replicateID.get(sn.getId_tag());
@@ -409,68 +410,74 @@ public class LemnaTecDataExchange {
 									+ sn.getId_tag() + "'. Snapshot is ignored.");
 				continue;
 			}
-
+			
 			int day = DateUtil.getElapsedDays(earliest, new Date(sn.getTimestamp().getTime()));
-
+			
 			{
-				if (sn.getWeight_before() > 0) {
-					// process weight_before
-					Substance s = new Substance();
-					s.setSubstanceName("weight_before");
-
-					Condition condition = new Condition(s);
-					condition.setExperimentInfo(experimentReq);
-					condition.setSpecies(species);
-					condition.setGenotype(genotype);
-					condition.setVariety(variety);
-					condition.setGrowthconditions(growthconditions);
-					condition.setTreatment(treatment);
-
-					Sample sample = new Sample(condition);
-					sample.setTime(day);
-
-					sample.setTimeUnit("day");
-
-					NumericMeasurement weightBefore = new NumericMeasurement(sample);
-					weightBefore.setReplicateID(replicateID);
-					weightBefore.setUnit("g");
-					weightBefore.setValue(sn.getWeight_before());
-
-					measurements.add(weightBefore);
-				}
+				// if (sn.getWeight_before() > 0) {
+				// process weight_before
+				Substance s = new Substance();
+				s.setSubstanceName("weight_before");
+				
+				Condition condition = new Condition(s);
+				condition.setExperimentInfo(experimentReq);
+				condition.setSpecies(species);
+				condition.setGenotype(genotype);
+				condition.setVariety(variety);
+				condition.setGrowthconditions(growthconditions);
+				condition.setTreatment(treatment);
+				
+				Sample sample = new Sample(condition);
+				sample.setTime(day);
+				
+				sample.setTimeUnit("day");
+				
+				NumericMeasurement weightBefore = new NumericMeasurement(sample);
+				weightBefore.setReplicateID(replicateID);
+				weightBefore.setUnit("g");
+				weightBefore.setValue(sn.getWeight_before());
+				
+				measurements.add(weightBefore);
+				// }
 			}
 			{
-				if (sn.getWeight_after() > sn.getWeight_before()) {
-					// process water_weight
-					Substance s = new Substance();
-					s.setSubstanceName("water_weight");
-
-					Condition condition = new Condition(s);
-					condition.setExperimentInfo(experimentReq);
-					condition.setSpecies(species);
-					condition.setGenotype(genotype);
-					condition.setVariety(variety);
-					condition.setGrowthconditions(growthconditions);
-					condition.setTreatment(treatment);
-
-					Sample sample = new Sample(condition);
-					sample.setTime(day);
-					sample.setTimeUnit("day");
-
-					NumericMeasurement weightBefore = new NumericMeasurement(sample);
-					weightBefore.setReplicateID(replicateID);
-					weightBefore.setUnit("g");
-					weightBefore.setValue(sn.getWeight_after() - sn.getWeight_before());
-
-					measurements.add(weightBefore);
-				}
+				// if (sn.getWeight_after() > sn.getWeight_before()) {
+				// process water_weight
+				Substance s = new Substance();
+				s.setSubstanceName("water_weight");
+				
+				Condition condition = new Condition(s);
+				condition.setExperimentInfo(experimentReq);
+				condition.setSpecies(species);
+				condition.setGenotype(genotype);
+				condition.setVariety(variety);
+				condition.setGrowthconditions(growthconditions);
+				condition.setTreatment(treatment);
+				
+				Sample sample = new Sample(condition);
+				sample.setTime(day);
+				sample.setTimeUnit("day");
+				
+				NumericMeasurement weightBefore = new NumericMeasurement(sample);
+				weightBefore.setReplicateID(replicateID);
+				weightBefore.setUnit("g");
+				weightBefore.setValue(sn.getWeight_after() - sn.getWeight_before());
+				
+				measurements.add(weightBefore);
+				// }
 			}
 			{
-				if (sn.getWater_amount() > 0) {
-					// process water_amount
+				// if (sn.getWater_amount() > 0) {
+				// process water_amount
+				String iidd = day + "/" + replicateID;
+				
+				if (knownDayAndReplicateIDs.containsKey(iidd)) {
+					NumericMeasurement water = knownDayAndReplicateIDs.get(iidd);
+					water.setValue(water.getValue() + sn.getWater_amount());
+				} else {
 					Substance s = new Substance();
-					s.setSubstanceName("water_amount");
-
+					s.setSubstanceName("water_sum");
+					
 					Condition condition = new Condition(s);
 					condition.setExperimentInfo(experimentReq);
 					condition.setSpecies(species);
@@ -478,26 +485,29 @@ public class LemnaTecDataExchange {
 					condition.setVariety(variety);
 					condition.setGrowthconditions(growthconditions);
 					condition.setTreatment(treatment);
-
+					
 					Sample sample = new Sample(condition);
 					sample.setTime(day);
 					sample.setTimeUnit("day");
-
+					
 					NumericMeasurement water = new NumericMeasurement(sample);
 					water.setReplicateID(replicateID);
 					water.setUnit("ml");
 					water.setValue(sn.getWater_amount());
-
+					
 					measurements.add(water);
+					
+					knownDayAndReplicateIDs.put(iidd, water);
 				}
+				// }
 			}
 			{
 				// process image
 				if (sn.getCamera_label() != null) {
-
+					
 					Substance s = new Substance();
 					s.setSubstanceName(sn.getCamera_label());
-
+					
 					Condition condition = new Condition(s);
 					condition.setExperimentInfo(experimentReq);
 					condition.setSpecies(species);
@@ -505,23 +515,23 @@ public class LemnaTecDataExchange {
 					condition.setVariety(variety);
 					condition.setGrowthconditions(growthconditions);
 					condition.setTreatment(treatment);
-
+					
 					Sample sample = new Sample(condition);
 					sample.setTime(day);
 					sample.setTimeUnit("day");
-
+					
 					ImageData image = new ImageData(sample);
 					image.setPixelsizeX(sn.getXfactor());
 					image.setPixelsizeY(sn.getYfactor());
 					image.setReplicateID(replicateID);
 					image.setUnit("");
-
+					
 					String fn = sn.getPath_image();
 					if (fn.contains("/"))
 						fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-
+					
 					Double position = null;
-
+					
 					fn = sn.getPath_image_config_blob();
 					if (fn != null) {
 						if (fn.contains("/"))
@@ -533,12 +543,12 @@ public class LemnaTecDataExchange {
 						if (Math.abs(position) < 0.00001)
 							position = null;
 					}
-
+					
 					if (position != null) {
 						image.setPosition(position);
 						image.setPositionUnit("degree");
 					}
-
+					
 					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
 										+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + position.intValue() + ")" : ""));
 					image.setURL(url);
@@ -551,29 +561,29 @@ public class LemnaTecDataExchange {
 											+ (position != null ? " (" + position.intValue() + ")" : ""));
 						image.setLabelURL(url);
 					}
-
+					
 					measurements.add(image);
 				}
 			}
-
+			
 		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(-1);
-
+		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
 		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements);
-
+		
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Experiment created (" + numberOfImages + " images)");
-
+		
 		experiment.setHeader(new ExperimentHeader(experimentReq));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(100);
 		return experiment;
 	}
-
+	
 	private double processConfigBlobToGetRotationAngle(HashMap<String, byte[]> blob2buf, Snapshot sn, IOurl url) {
 		try {
 			byte[] buf;
@@ -624,30 +634,30 @@ public class LemnaTecDataExchange {
 			return 0;
 		}
 	}
-
+	
 	private HashMap<String, Condition> getPlantIdAnnotation(ExperimentHeaderInterface header) throws SQLException,
 						ClassNotFoundException {
 		HashMap<String, Condition> res = new HashMap<String, Condition>();
-
+		
 		Connection connection = openConnectionToDatabase(header.getDatabase());
-
+		
 		String sqlText = "SELECT id_tag, meta_data_name, meta_data_value, meta_data_type " + "FROM  meta_info_src "
 							+ "WHERE measure_label = ?";
-
+		
 		PreparedStatement ps = connection.prepareStatement(sqlText);
 		ps.setString(1, header.getExperimentname());
 		try {
 			ResultSet rs = ps.executeQuery();
-
+			
 			while (rs.next()) {
 				String plantID = rs.getString(1);
-
+				
 				String metaName = rs.getString(2);
 				String metaValue = rs.getString(3);
-
+				
 				if (!res.containsKey(plantID))
 					res.put(plantID, new Condition(null));
-
+				
 				if (metaName.equals("Pflanzenart"))
 					res.get(plantID).setSpecies(metaValue);
 				if (metaName.equals("Pflanzenname"))
@@ -656,7 +666,7 @@ public class LemnaTecDataExchange {
 					res.get(plantID).setTreatment(metaValue);
 				if (metaName.equals("SeedDate"))
 					res.get(plantID).setSequence("SeedDate: " + metaValue);
-
+				
 			}
 			rs.close();
 			ps.close();
@@ -666,7 +676,7 @@ public class LemnaTecDataExchange {
 		}
 		return res;
 	}
-
+	
 	private int countMeasurementValues(ExperimentInterface experiment, MeasurementNodeType[] measurementNodeTypes) {
 		int res = 0;
 		for (MeasurementNodeType m : measurementNodeTypes) {

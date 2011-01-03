@@ -2,7 +2,6 @@ package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.TreeMap;
 
 import org.ErrorMsg;
@@ -29,6 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Runnable
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -37,7 +37,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas
  */
 public class PhenotypeAnalysisAction extends AbstractNavigationAction implements RemoteCapableAnalysisAction {
-
+	
 	private double epsilon;
 	private double epsilon2;
 	private ExperimentReference experiment;
@@ -45,14 +45,14 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 	MainPanelComponent mpc;
 	ArrayList<ZoomedImage> zoomedImages = new ArrayList<ZoomedImage>();
 	private Experiment experimentResult;
-
+	
 	// used when started as remote analysis task
 	private RunnableWithMappingData resultReceiver;
 	private int workOnSubset;
 	private int numberOfSubsets;
 	private String mongoDatasetID;
 	private MongoDB m;
-
+	
 	public PhenotypeAnalysisAction(MongoDB m, double epsilon, double epsilon2,
 						ExperimentReference experiment) {
 		super("Create phenotype data set");
@@ -64,25 +64,24 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		if (experiment != null && experiment.getHeader() != null)
 			this.mongoDatasetID = experiment.getHeader().getExcelfileid();
 	}
-
+	
 	public PhenotypeAnalysisAction() {
 		super("Create phenotype data set");
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(final NavigationButton src) {
 		this.src = src;
-
+		
 		if (experimentResult != null)
 			return;
-
+		
 		try {
-			ExperimentInterface res = experiment.getData(m);
-
+			ExperimentInterface res = experiment.getData(m).clone();
+			experiment = null;
+			
 			ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
-
-			HashSet<String> ignored = new HashSet<String>();
-
+			
 			int workIndex = 0;
 			for (SubstanceInterface m : res) {
 				Substance3D m3 = (Substance3D) m;
@@ -90,59 +89,28 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						for (Measurement md : sd3.getAllMeasurements()) {
-							// if (workload.size() >= 10)
-							// break;
+						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.IMAGE)) {
 							workIndex++;
 							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
 								if (md instanceof ImageData) {
-									// ImageConfiguration config =
-									// ImageConfiguration.get(((ImageData)
-									// md).getSubstanceName());
 									ImageData i = (ImageData) md;
 									workload.add(i);
-									// if (config == ImageConfiguration.FluoTop) {
-									// ImageData i = (ImageData) md;
-									// workload.add(i);
-									// } else
-									// break;
-									// if (config == ImageConfiguration.FluoSide) {
-									// ImageData i = (ImageData) md;
-									// workload.add(i);
-									// } else if (config == ImageConfiguration.RgbSide) {
-									// ImageData i = (ImageData) md;
-									// workload.add(i);
-									// } else if (config == ImageConfiguration.RgbTop) {
-									// ImageData i = (ImageData) md;
-									// workload.add(i);
-									// } else
-									// workload.add((ImageData) md);
-									// ignored.add(((ImageData) md).getSubstanceName());
 								}
 						}
 					}
 				}
 			}
-
-			// for (String i : ignored) {
-			// System.out.println("Ignored Image Input - Type: " + i);
-			// }
-
+			
 			if (status != null)
 				status.setCurrentStatusText1("Workload: " + workload.size() + " images");
-
+			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setInt(1);
-
-			// for (NumericMeasurementInterface id : workload) {
-			// System.out.println("Input: " + (((ImageData)
-			// id).getURL()).getDetail());
-			// }
-
+			
 			PhenotypeAnalysisTask task = new PhenotypeAnalysisTask(epsilon, epsilon2, new DataBaseTargetMongoDB(true, m));
-
+			
 			// task.addPreprocessor(new CutImagePreprocessor());
-
+			
 			TreeMap<Long, String> times = new TreeMap<Long, String>();
 			// for (int r = 1; r <= 3; r++)
 			// for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 4)
@@ -165,7 +133,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			// System.out.println(s);
 			// }
 			// }
-
+			
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
 			Collection<NumericMeasurementInterface> statRes = task.getOutput();
 			// for (NumericMeasurementInterface id : statRes) {
@@ -173,7 +141,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			// System.out.println("Output: " + (((ImageData)
 			// id).getURL()).getDetail());
 			// }
-
+			
 			if (statRes == null) {
 				ErrorMsg.addErrorMessage("Error: no statistics result");
 			} else {
@@ -184,12 +152,12 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 						newStatisticsData.add(new MappingData3DPath(m));
 				}
 			}
-
+			
 			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 			statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
 			// Substance.addAndMerge(statisticsResult, experiment.getData());
-
+			
 			// SupplementaryFilePanelMongoDB sfp = new
 			// SupplementaryFilePanelMongoDB(login, pass, statisticsResult,
 			// statisticsResult.getName());
@@ -197,13 +165,13 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			if (resultReceiver == null) {
 				// if (status != null)
 				// status.setCurrentStatusText1("Store Result");
-
+				
 				// new MongoDB().storeExperiment("dbe3", null, null, null,
 				// statisticsResult, status);
-
+				
 				if (status != null)
 					status.setCurrentStatusText1("Ready");
-
+				
 				MyExperimentInfoPanel info = new MyExperimentInfoPanel();
 				info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
 				// mpc = new MainPanelComponent(TableLayout.getSplit(info, sfp,
@@ -221,7 +189,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		}
 		// src.title = src.title.split("\\:")[0];
 	}
-
+	
 	// private void loadAndShowResultImages(final ArrayList<JComponent> results,
 	// final HashMap<JComponent, String> names,
 	// final HashMap<String, Histogram> histosR, final HashMap<String, Histogram>
@@ -283,24 +251,24 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 	// jtp.add(names.get(jc), new JScrollPane(jc));
 	// mpc = new MainPanelComponent(jtp);
 	// }
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-
+		
 		res.add(FileManagerAction.getFileManagerEntity(m, new ExperimentReference(experimentResult),
 							src.getGUIsetting()));
-
+		
 		res.add(new NavigationButton(new CloudUploadEntity(m, new ExperimentReference(experimentResult)),
 							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
-
+		
 		MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
 							false, src.getGUIsetting(), m);
 		//
@@ -321,29 +289,29 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		// }
 		return res;
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return mpc;
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return "img/000Grad_3.png";
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return "Barley/Maize Analysis";
 	}
-
+	
 	@Override
 	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver) {
 		this.resultReceiver = resultReceiver;
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
 	}
-
+	
 	@Override
 	public void setParams(ExperimentReference experiment, MongoDB m, String params) {
 		this.experiment = experiment;
@@ -351,12 +319,12 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		this.epsilon = 10;
 		this.epsilon2 = 15;
 	}
-
+	
 	@Override
 	public String getMongoDatasetID() {
 		return mongoDatasetID;
 	}
-
+	
 	@Override
 	public MongoDB getMongoDB() {
 		return m;

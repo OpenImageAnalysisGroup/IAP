@@ -8,13 +8,13 @@ package de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.reconstruction3d;
  * @author klukas
  */
 public class XYcubePointRelative {
-
+	
 	public double xr;
 	public double yr;
-
+	
 	public XYcubePointRelative(double xt, double yt) {
 		xr = xt;
 		yr = yt;
 	}
-
+	
 }

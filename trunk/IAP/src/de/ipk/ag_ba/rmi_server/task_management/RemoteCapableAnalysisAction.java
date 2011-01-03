@@ -16,10 +16,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Runnable
  */
 public interface RemoteCapableAnalysisAction extends NavigationAction {
 	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver);
-
+	
 	public void setParams(ExperimentReference inputExperiment, MongoDB m, String params);
-
+	
 	public String getMongoDatasetID();
-
+	
 	public MongoDB getMongoDB();
 }

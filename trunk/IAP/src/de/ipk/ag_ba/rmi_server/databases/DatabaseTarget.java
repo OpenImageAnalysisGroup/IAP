@@ -20,12 +20,12 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
  * @author klukas
  */
 public interface DatabaseTarget {
-
+	
 	LoadedImage saveImage(LoadedImage limg) throws Exception;
-
+	
 	void saveVolume(final LoadedVolume volume, Sample3D s3d, MongoDB m, DBTable sample,
 						InputStream threeDvolumePreviewIcon,
-						String md5, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception;
-
+						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception;
+	
 	String getPrefix();
 }

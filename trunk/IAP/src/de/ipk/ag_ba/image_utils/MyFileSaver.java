@@ -15,11 +15,11 @@ import java.io.OutputStream;
 import org.ErrorMsg;
 
 public class MyFileSaver extends FileSaver {
-
+	
 	public MyFileSaver(ImagePlus imp) {
 		super(imp);
 	}
-
+	
 	public boolean saveAsTiffStack(OutputStream os) {
 		if (fi.nImages == 1) {
 			ErrorMsg.addErrorMessage("This is not a stack");

@@ -22,16 +22,16 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  * @author klukas
  */
 public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
-
+	
 	private NavigationButton src;
 	private ArrayList<ExperimentHeaderInterface> experimentList;
 	private final MongoDB m;
-
+	
 	public MongoExperimentsNavigationAction(MongoDB m) {
 		super("Access " + m.getDisplayName());
 		this.m = m;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -41,15 +41,15 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-
+		
 		NavigationAction analyzeAction = new UploadImagesToCloud(true);
-
+		
 		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Add Files", "img/ext/user-desktop.png",
 							"img/ext/user-desktop.png", src.getGUIsetting());
 		res.add(analyzeEntity);
-
+		
 		// gruppe => user => experiment
-
+		
 		if (experimentList == null) {
 			res.add(Other.getServerStatusEntity(true, "Error Status", src.getGUIsetting()));
 		} else {
@@ -72,50 +72,50 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 					experiments.get(group).put(user, new ArrayList<ExperimentHeaderInterface>());
 				experiments.get(group).get(user).add(eh);
 			}
-
+			
 			res.add(new NavigationButton(new CloundManagerNavigationAction(m), src.getGUIsetting()));
-
+			
 			res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
-
+			
 			for (String group : experiments.keySet()) {
 				res.add(new NavigationButton(createMongoGroupNavigationAction(group, experiments.get(group)), src
 									.getGUIsetting()));
 			}
-
+			
 			if (trashed.size() > 0) {
 				res.add(new NavigationButton(getTrashedExperimentsAction(trashed, m), src.getGUIsetting()));
 			}
 		}
 		return res;
 	}
-
+	
 	private NavigationAction getTrashedExperimentsAction(final ArrayList<ExperimentHeaderInterface> trashed, final MongoDB m) {
 		NavigationAction res = new AbstractNavigationAction("Show content of trash can") {
-
+			
 			private NavigationButton src;
-
+			
 			@Override
 			public String getDefaultImage() {
 				return "img/ext/trash-delete2.png";
 			}
-
+			
 			@Override
 			public String getDefaultTitle() {
 				return "Trash";
 			}
-
+			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) throws Exception {
 				this.src = src;
 			}
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
@@ -128,12 +128,12 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 		};
 		return res;
 	}
-
+	
 	private NavigationAction createMongoGroupNavigationAction(final String group,
 						final TreeMap<String, ArrayList<ExperimentHeaderInterface>> user2exp) {
 		NavigationAction groupNav = new AbstractNavigationAction("Show User-Group Folder") {
 			private NavigationButton src;
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
@@ -143,43 +143,43 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				}
 				return res;
 			}
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
-
+			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) throws Exception {
 				this.src = src;
 			}
-
+			
 			@Override
 			public String getDefaultImage() {
 				return "img/ext/network-workgroup.png";
 			}
-
+			
 			@Override
 			public String getDefaultNavigationImage() {
 				return "img/ext/network-workgroup-power.png";
 			}
-
+			
 			@Override
 			public String getDefaultTitle() {
 				return group;
 			}
-
+			
 		};
 		return groupNav;
 	}
-
+	
 	protected NavigationAction createMongoUserNavigationAction(final String user,
 						final ArrayList<ExperimentHeaderInterface> experiments) {
 		NavigationAction userNav = new AbstractNavigationAction("Show user folder") {
 			private NavigationButton src;
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
@@ -188,38 +188,38 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				}
 				return res;
 			}
-
+			
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 				res.add(src);
 				return res;
 			}
-
+			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) throws Exception {
 				this.src = src;
 			}
-
+			
 			@Override
 			public String getDefaultImage() {
 				return "img/ext/folder-remote.png";
 			}
-
+			
 			@Override
 			public String getDefaultNavigationImage() {
 				return "img/ext/folder-remote-open.png";
 			}
-
+			
 			@Override
 			public String getDefaultTitle() {
 				return user;
 			}
-
+			
 		};
 		return userNav;
 	}
-
+	
 	public static NavigationButton getMongoExperimentButton(ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
 		NavigationAction action = new MongoOrLemnaTecExperimentNavigationAction(ei, m);
 		NavigationButton exp = new NavigationButton(action, guiSetting);
@@ -229,7 +229,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 							+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark() + "</td></tr>");
 		return exp;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -242,7 +242,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 		res.add(src);
 		return res;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see

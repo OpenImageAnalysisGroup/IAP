@@ -1,4 +1,5 @@
 package ij.plugin;
+
 import ij.*;
 
 /** Implements the Image/Transform/Flip Z command. */
@@ -6,7 +7,7 @@ public class StackReverser implements PlugIn {
 	
 	public void run(String arg) {
 		ImagePlus imp = IJ.getImage();
-		if (imp.getStackSize()==1) {
+		if (imp.getStackSize() == 1) {
 			IJ.error("Flip Z", "This command requires a stack");
 			return;
 		}
@@ -19,13 +20,13 @@ public class StackReverser implements PlugIn {
 	
 	public void flipStack(ImagePlus imp) {
 		ImageStack stack = imp.getStack();
- 		ImageStack stack2 = imp.createEmptyStack();
- 		int n;
-		while ((n=stack.getSize())>0) { 
+		ImageStack stack2 = imp.createEmptyStack();
+		int n;
+		while ((n = stack.getSize()) > 0) {
 			stack2.addSlice(stack.getSliceLabel(n), stack.getProcessor(n));
 			stack.deleteLastSlice();
 		}
 		imp.setStack(null, stack2);
 	}
-
+	
 }

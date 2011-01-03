@@ -31,17 +31,17 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListener, StatusDisplay {
 	private static final long serialVersionUID = 2171413300210427409L;
-
+	
 	private static Stack<File> tempFiles;
-
+	
 	static JFileChooser fileChooser = new JFileChooser();
-
+	
 	final JTree expTree;
-
+	
 	private MyDropTarget currentDropTarget;
-
+	
 	// private static List<WeakReference<JTree>> myTrees;
-
+	
 	private void processEditAddFile() {
 		final MyDropTarget targetDropTarget = currentDropTarget;
 		if (targetDropTarget == null) {
@@ -50,7 +50,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 								JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-
+		
 		// in case it is no DBE-TreeNode or if it is one and it is Read-Only
 		// then reject drop
 		if (targetDropTarget.isTargetReadOnly()) {
@@ -59,18 +59,18 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 								JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-
+		
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle("Add File(s) to Database");
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		fc.setMultiSelectionEnabled(true);
 		if (fc.showDialog(this, "Add File(s) to Database") == JFileChooser.APPROVE_OPTION) {
 			final File files[] = fc.getSelectedFiles();
-
+			
 			try {
 				MyThread writeThread = new MyThread(new Runnable() {
 					public void run() {
-
+						
 						for (int i = 0; i < files.length; i++) {
 							File file = files[i];
 							if (file.isDirectory())
@@ -78,7 +78,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							else
 								targetDropTarget.addImageToDatabase(file, false);
 						}
-
+						
 					}
 				}, "database write thread");
 				writeThread.setPriority(Thread.MIN_PRIORITY);
@@ -88,52 +88,52 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 			}
 		}
 	}
-
+	
 	DataSetFilePanel currentFilePanel = null;
-
+	
 	public SupplementaryFilePanelMongoDB(final MongoDB m, ExperimentInterface doc,
 						String experimentName) {
-
+		
 		final SupplementaryFilePanelMongoDB thisPanel = this;
-
+		
 		BackgroundThreadDispatcher.setFrameInstance(this);
-
+		
 		JButton addButton = new JMButton("Add Files...");
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				processEditAddFile();
 			}
 		});
-
+		
 		final FilePanelHeader filePanelHeader = new FilePanelHeader(addButton);
 		final DataSetFilePanel filePanel = new DataSetFilePanel(filePanelHeader);
-
+		
 		currentFilePanel = filePanel;
-
+		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
+		
 		// todo if mongo knows this ID as an experiment ID
 		boolean readOnly = doc.getHeader().getExcelfileid() != null;
-
+		
 		expTree = new JTree(new DBEtreeModel(this, m, doc, readOnly));
 		expTree.setCellRenderer(new DBEtreeCellRenderer());
 		// myTrees.add(new WeakReference<JTree>(expTree));
-
+		
 		expTree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 				if (e.getNewLeadSelectionPath() == null || e.getNewLeadSelectionPath().getLastPathComponent() == null)
 					return;
-
+				
 				final Object mt = e.getNewLeadSelectionPath().getLastPathComponent();
 				if (mt instanceof MongoTreeNode && ((MongoTreeNode) mt).getTargetEntity() != null) {
 					final MongoTreeNode mtdbe = (MongoTreeNode) mt;
 					MongoTreeNode projectNode = mtdbe.getProjectNode();
 					projectNode.updateSizeInfo(m, thisPanel);
-
+					
 					MyDropTarget myDropTarget = new MyDropTarget(m, filePanel, mtdbe, expTree);
 					currentDropTarget = myDropTarget;
 					filePanel.setDropTarget(myDropTarget);
-
+					
 					filePanel.setFiller(new Runnable() {
 						public void run() {
 							filePanel.removeAll();
@@ -145,45 +145,45 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 								filePanel.setHeader(false,
 													"<font color='black'>You don't have write access to this experiment", true, true);
 							}
-
+							
 							filePanel.validate();
 							filePanel.repaint();
-
+							
 							removeTempFiles();
 							DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, m);
 						}
 					});
-
+					
 					filePanel.fill();
 				} else {
 					currentDropTarget = null;
 					filePanel.setDropTarget(null);
 					filePanel.removeAll();
-
+					
 					filePanel.setFiller(new Runnable() {
 						@Override
 						public void run() {
 							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
 							if (!((MongoTreeNodeBasis) mt).readOnly)
 								filePanel
-													.setHeader(
+										.setHeader(
 																		false,
 																		"<font color='black'>To assign data, please select the experiment-node, a condition, timepoint or measurement value",
 																		true, true);
 							else
 								filePanel.setHeader(false,
 													"<font color='black'>You don't have write access to this experiment", true, true);
-
+							
 							filePanel.validate();
 							filePanel.repaint();
 						}
 					});
-
+					
 					filePanel.fill();
 				}
 			}
 		});
-
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -193,7 +193,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 				}
 			}
 		});
-
+		
 		JScrollPane fileScroller = new JScrollPane(filePanel);
 		fileScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		filePanel.setScrollpane(fileScroller);
@@ -202,18 +202,18 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		splitPane.setOneTouchExpandable(true);
 		splitPane.setLastDividerLocation(200);
 		splitPane.setDividerLocation(200);
-
+		
 		add(splitPane);
-
+		
 		validate();
 	}
-
+	
 	public static void addTempFileToBeDeletedLater(File tempFile) {
 		if (tempFiles == null)
 			tempFiles = new Stack<File>();
 		tempFiles.add(tempFile);
 	}
-
+	
 	void removeTempFiles() {
 		if (tempFiles == null)
 			return;
@@ -224,7 +224,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 			tempFile.delete();
 		}
 	}
-
+	
 	public void repaintTree() {
 		if (SwingUtilities.isEventDispatchThread()) {
 			if (expTree != null) {
@@ -241,20 +241,20 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 				}
 			});
 	}
-
+	
 	public static void showError(String string, Exception e) {
 		String s = e != null ? e.getMessage() : "";
 		MainFrame.showMessageDialogWithScrollBars2(s, "Error: " + string);
 	}
-
+	
 	public void actionPerformed(ActionEvent e) {
 		repaintTree();
 	}
-
+	
 	public String getTitle() {
 		return "";
 	}
-
+	
 	public void setTitle(String message) {
 		if (currentFilePanel != null)
 			currentFilePanel.setHeader(currentFilePanel.getIsButtonEnabled(), "<code>"

@@ -20,7 +20,7 @@ import de.ipk.ag_ba.gui.util.PopupListener;
  * @author Christian Klukas
  */
 public class DataSetFilePanel extends JPanel {
-
+	
 	/**
 	 * Comment for <code>serialVersionUID</code>
 	 */
@@ -28,34 +28,34 @@ public class DataSetFilePanel extends JPanel {
 	private JScrollPane scrollpane;
 	private final FilePanelHeader header;
 	private PopupListener popupListener;
-
+	
 	public DataSetFilePanel(FilePanelHeader filePanelHeader) {
 		this.header = filePanelHeader;
-
+		
 		JPopupMenu popup = getPopupMenu();
-
+		
 		popupListener = new PopupListener(popup);
 		addMouseListener(popupListener);
 	}
-
+	
 	private JPopupMenu getPopupMenu() {
 		int sz = DataSetFileButton.ICON_WIDTH;
 		JPopupMenu popup = new JPopupMenu("Button Size");
-
+		
 		JMenuItem menuItemCompact = new JCheckBoxMenuItem("Default Size", sz == 128);
 		menuItemCompact.addActionListener(getModifyButtonSize(128));
 		popup.add(menuItemCompact);
-
+		
 		JMenuItem menuItemLarge = new JCheckBoxMenuItem("Large Buttons", sz == 256);
 		menuItemLarge.addActionListener(getModifyButtonSize(256));
 		popup.add(menuItemLarge);
-
+		
 		JMenuItem menuItemExtraLarge = new JCheckBoxMenuItem("Extra Large Buttons", sz == 512);
 		menuItemExtraLarge.addActionListener(getModifyButtonSize(512));
 		popup.add(menuItemExtraLarge);
 		return popup;
 	}
-
+	
 	protected ActionListener getModifyButtonSize(final int size) {
 		return new ActionListener() {
 			@Override
@@ -63,16 +63,16 @@ public class DataSetFilePanel extends JPanel {
 				DataSetFileButton.ICON_HEIGHT = size;
 				DataSetFileButton.ICON_WIDTH = size;
 				fill();
-
+				
 				JPopupMenu popup = getPopupMenu();
-
+				
 				removeMouseListener(DataSetFilePanel.this.popupListener);
 				DataSetFilePanel.this.popupListener = new PopupListener(popup);
 				addMouseListener(DataSetFilePanel.this.popupListener);
 			}
 		};
 	}
-
+	
 	@Override
 	public Dimension getPreferredSize() {
 		Component[] comps = getComponents();
@@ -83,17 +83,17 @@ public class DataSetFilePanel extends JPanel {
 		}
 		return new Dimension(getScrollpane().getWidth() - 15, maxY);
 	}
-
+	
 	boolean warning = false;
-
+	
 	public void setHeader(boolean enableButton, String msg, boolean warning, boolean isDefault) {
-
+		
 		if (isDefault)
 			setDefaultMessage(msg);
-
+		
 		if (msg == null || StringManipulationTools.removeHTMLtags(msg).length() <= 0)
 			msg = defaultMessage;
-
+		
 		header.setText("<html>" + msg);
 		header.enableButton(enableButton);
 		this.warning = warning;
@@ -103,37 +103,37 @@ public class DataSetFilePanel extends JPanel {
 			header.setBackground(new Color(240, 245, 240));
 		}
 	}
-
+	
 	private String defaultMessage;
 	private Runnable filler;
-
+	
 	private void setDefaultMessage(String msg) {
 		this.defaultMessage = msg;
 	}
-
+	
 	public boolean getIsButtonEnabled() {
 		return header.isButtonEnabled();
 	}
-
+	
 	public boolean getIsWarningDisplayed() {
 		return warning;
 	}
-
+	
 	public void setFiller(Runnable runnable) {
 		this.filler = runnable;
 	}
-
+	
 	public void fill() {
 		if (filler != null)
 			filler.run();
 	}
-
+	
 	public void setScrollpane(JScrollPane scrollpane) {
 		this.scrollpane = scrollpane;
 	}
-
+	
 	public JScrollPane getScrollpane() {
 		return scrollpane;
 	}
-
+	
 }

@@ -16,12 +16,12 @@ import javax.swing.ImageIcon;
  */
 public class NavigationImage {
 	BufferedImage imageDefault, imageNavigation;
-
+	
 	public NavigationImage(BufferedImage image) {
 		imageDefault = image;
 		imageNavigation = image;
 	}
-
+	
 	public ImageIcon getImageIcon() {
 		return new ImageIcon(imageDefault);
 	}

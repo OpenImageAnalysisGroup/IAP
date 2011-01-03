@@ -15,13 +15,13 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  * @author klukas
  */
 public class CutImagePreprocessor implements ImagePreProcessor {
-
+	
 	@Override
 	public boolean processImage(LoadedImage loadedImage, int[] rgbArray, int[] rgbArrayNULL, int w, int h,
 						int iBackgroundFill) {
-
+		
 		ImageConfiguration ic = ImageConfiguration.get(loadedImage.getSubstanceName());
-
+		
 		if (ic == ImageConfiguration.RgbSide) {
 			// for (int y = 1700; y < h; y++) {
 			for (int y = 1530; y < h; y++) {
@@ -58,5 +58,5 @@ public class CutImagePreprocessor implements ImagePreProcessor {
 				}
 		return true;
 	}
-
+	
 }

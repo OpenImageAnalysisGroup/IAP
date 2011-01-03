@@ -19,16 +19,16 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  * @author klukas
  */
 public class LemnaTecNavigationAction extends AbstractNavigationAction implements NavigationAction {
-
+	
 	private NavigationButton src;
 	private String login;
 	private String pass;
 	ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
-
+	
 	public LemnaTecNavigationAction() {
 		super("Access LemnaTec-DB");
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -37,10 +37,10 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 	 */
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-
+		
 		return result;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -53,7 +53,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		result.add(src);
 		return result;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		// connect to db
@@ -61,7 +61,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		result.clear();
 		try {
 			result.add(new NavigationButton(new LemnaTecUserNavigationAction(), src.getGUIsetting()));
-
+			
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
 			allExperiments.get("").put("", new ArrayList<ExperimentHeaderInterface>());
@@ -76,31 +76,31 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 					for (ExperimentHeaderInterface ehi : experiments) {
 						allExperiments.get("").get("").add(ehi);
 					}
-
+					
 				} catch (Exception e) {
 					System.out.println("Database " + db + " could not be processed.");
 				}
 			}
 			result.add(1, Other.getCalendarEntity(allExperiments, null, src.getGUIsetting()));
-
+			
 		} catch (Exception e) {
 			// error
 		}
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return "img/ext/lemna.png";
 	}
-
+	
 	@Override
 	public String getDefaultNavigationImage() {
 		return "img/ext/lemna-active.png";
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return "LemnaTec-DB";
 	}
-
+	
 }

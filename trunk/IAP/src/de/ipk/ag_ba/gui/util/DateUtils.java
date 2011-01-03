@@ -17,17 +17,17 @@ public class DateUtils {
 	public static String getDayInfo(GregorianCalendar calendar) {
 		return calendar.get(GregorianCalendar.YEAR) + " " + calendar.get(GregorianCalendar.MONTH) + " " + calendar.get(GregorianCalendar.DAY_OF_MONTH);
 	}
-
+	
 	public static String getMonthInfo(GregorianCalendar calendar) {
 		return calendar.get(GregorianCalendar.YEAR) + " " + calendar.get(GregorianCalendar.MONTH);
 	}
-
+	
 	public static String getDayInfo(Date date) {
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(date);
 		return getDayInfo(cal);
 	}
-
+	
 	public static String getMonthInfo(Date date) {
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(date);

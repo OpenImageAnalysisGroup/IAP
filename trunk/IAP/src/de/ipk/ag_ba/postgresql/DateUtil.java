@@ -13,7 +13,7 @@ public final class DateUtil {
 	 */
 	private DateUtil() {
 	}
-
+	
 	/**
 	 * Elapsed days based on current time
 	 * 
@@ -24,7 +24,7 @@ public final class DateUtil {
 	public static int getElapsedDays(Date date) {
 		return elapsed(date, Calendar.DATE);
 	}
-
+	
 	/**
 	 * Elapsed days based on two Date objects
 	 * 
@@ -37,7 +37,7 @@ public final class DateUtil {
 	public static int getElapsedDays(Date d1, Date d2) {
 		return elapsed(d1, d2, Calendar.DATE);
 	}
-
+	
 	/**
 	 * Elapsed months based on current time
 	 * 
@@ -48,7 +48,7 @@ public final class DateUtil {
 	public static int getElapsedMonths(Date date) {
 		return elapsed(date, Calendar.MONTH);
 	}
-
+	
 	/**
 	 * Elapsed months based on two Date objects
 	 * 
@@ -61,7 +61,7 @@ public final class DateUtil {
 	public static int getElapsedMonths(Date d1, Date d2) {
 		return elapsed(d1, d2, Calendar.MONTH);
 	}
-
+	
 	/**
 	 * Elapsed years based on current time
 	 * 
@@ -72,7 +72,7 @@ public final class DateUtil {
 	public static int getElapsedYears(Date date) {
 		return elapsed(date, Calendar.YEAR);
 	}
-
+	
 	/**
 	 * Elapsed years based on two Date objects
 	 * 
@@ -85,7 +85,7 @@ public final class DateUtil {
 	public static int getElapsedYears(Date d1, Date d2) {
 		return elapsed(d1, d2, Calendar.YEAR);
 	}
-
+	
 	/**
 	 * All elaspsed types
 	 * 
@@ -122,7 +122,7 @@ public final class DateUtil {
 		}
 		return elapsed;
 	}
-
+	
 	/**
 	 * All elaspsed types based on date and current Date
 	 * 
@@ -135,7 +135,7 @@ public final class DateUtil {
 	private static int elapsed(Date date, int type) {
 		return elapsed(date, new Date(), type);
 	}
-
+	
 	/**
 	 * All elaspsed types
 	 * 

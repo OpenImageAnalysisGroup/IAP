@@ -46,9 +46,9 @@ public class DayComponent extends JComponent {
 	boolean compact = false;
 	private GregorianCalendar calendar;
 	private Calendar2 calEnt;
-
+	
 	private static ArrayList<Color> userColors = Colors.get(9, colorInt * 2);
-
+	
 	public DayComponent(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, boolean main,
 						boolean mark, GregorianCalendar calendar, Calendar2 calEnt) {
 		this.calEnt = calEnt;
@@ -115,7 +115,7 @@ public class DayComponent extends JComponent {
 		for (String user : exp.keySet()) {
 			int n = exp.get(user).size();
 			String s = user;
-
+			
 			if (n > 1) {
 				s += " (" + n + ")";
 			} else {
@@ -135,43 +135,43 @@ public class DayComponent extends JComponent {
 			lbl.addMouseListener(getMouseListener());
 			reservations.add(center2(main, lbl, 1, 1, userColors.get(Math.abs(user.hashCode()) % userColors.size())));
 		}
-
+		
 		add(TableLayout.getMultiSplitVertical(reservations), "0,1");
 		// setBorder(BorderFactory.createRaisedBevelBorder());
 		setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, color2.darker()));
 		validate();
 	}
-
+	
 	/**
 	 * @return
 	 */
 	private MouseListener getMouseListener() {
 		MouseListener m = new MouseListener() {
 			Border oldBorder = null;
-
+			
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				setBorder(BorderFactory.createRaisedBevelBorder());
 			}
-
+			
 			@Override
 			public void mousePressed(MouseEvent e) {
 				setBorder(BorderFactory.createLoweredBevelBorder());
 			}
-
+			
 			@Override
 			public void mouseExited(MouseEvent e) {
 				if (oldBorder != null)
 					setBorder(oldBorder);
 			}
-
+			
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				if (oldBorder == null)
 					oldBorder = getBorder();
 				setBorder(BorderFactory.createRaisedBevelBorder());
 			}
-
+			
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				calEnt.setShowSpecificDay(true);
@@ -188,7 +188,7 @@ public class DayComponent extends JComponent {
 		};
 		return m;
 	}
-
+	
 	public DayComponent(String day) {
 		compact = true;
 		color = Color.LIGHT_GRAY.brighter();
@@ -199,22 +199,22 @@ public class DayComponent extends JComponent {
 		setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
 		validate();
 	}
-
+	
 	@Override
 	protected void paintComponent(Graphics g) {
 		// super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
-
+		
 		int w = getWidth();
 		int h = getHeight();
-
+		
 		// Paint a gradient from top to bottom
 		GradientPaint gp = new GradientPaint(0, 0, color, compact ? 0 : (int) (h / 8 * 0), h, compact ? color : color2);
-
+		
 		g2d.setPaint(gp);
 		g2d.fillRect(0, 0, w, h);
 	}
-
+	
 	private JComponent center(boolean main, JLabel jLabel) {
 		jLabel.setHorizontalAlignment(JLabel.CENTER);
 		jLabel.setFont(new Font(jLabel.getFont().getName(), Font.PLAIN, compact ? 15 : 20));
@@ -225,7 +225,7 @@ public class DayComponent extends JComponent {
 		// jLabel.setForeground(c);
 		return jLabel;
 	}
-
+	
 	private JComponent center2(boolean main, JLabel jLabel, int i, int max, Color color3) {
 		jLabel.setHorizontalAlignment(JLabel.CENTER);
 		jLabel.setFont(new Font(jLabel.getFont().getName(), Font.PLAIN, compact ? 11 : 11));
@@ -247,5 +247,5 @@ public class DayComponent extends JComponent {
 		// jLabel.setForeground(c);
 		return jLabel;
 	}
-
+	
 }

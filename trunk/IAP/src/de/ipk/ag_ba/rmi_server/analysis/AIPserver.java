@@ -12,7 +12,7 @@ package de.ipk.ag_ba.rmi_server.analysis;
 public class AIPserver {
 	private IOmodule io = new IOmodule();
 	private IAmodule ia = new IAmodule();
-
+	
 	public ServerInfo getServerInfo() {
 		ServerInfo info = new ServerInfo();
 		info.getInfoFrom(io, ia);

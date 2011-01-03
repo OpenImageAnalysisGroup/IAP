@@ -24,7 +24,7 @@ public class Secret {
 			return "";
 		}
 	}
-
+	
 	static String getDBuser() throws IOException {
 		try {
 			return new TextFile(ReleaseInfo.getAppFolderWithFinalSep() + "database_secret").get(2);
@@ -33,7 +33,7 @@ public class Secret {
 			return "";
 		}
 	}
-
+	
 	static String getDBpass() throws IOException {
 		try {
 			return new TextFile(getSecretFileName()).get(3);
@@ -42,7 +42,7 @@ public class Secret {
 			return "";
 		}
 	}
-
+	
 	static void initSecret() throws IOException {
 		TextFile tf = new TextFile();
 		tf.add("#following lines: url, login, pass");
@@ -51,7 +51,7 @@ public class Secret {
 		tf.add("password");
 		tf.write(getSecretFileName());
 	}
-
+	
 	private static String getSecretFileName() {
 		return ReleaseInfo.getAppFolderWithFinalSep() + "database_secret";
 	}

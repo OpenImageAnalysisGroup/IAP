@@ -29,7 +29,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class MyAdvancedFTP {
 	private static final HashMap<String, ThreadSafeOptions> host2ftp = new HashMap<String, ThreadSafeOptions>();
 	private static int runIdx = 0;
-
+	
 	public static boolean processFTPdownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
 						String downloadURL, MyByteArrayOutputStream target) {
 		runIdx++;
@@ -37,13 +37,13 @@ public class MyAdvancedFTP {
 		status.setCurrentStatusText1(downloadURL);
 		status.setCurrentStatusText2("FTP DOWNLOAD...");
 		String server, remote;
-
+		
 		server = downloadURL.substring("ftp://".length());
 		if (server.contains("@"))
 			server = server.substring(server.indexOf("@") + "@".length());
 		remote = server.substring(server.indexOf("/") + "/".length());
 		server = server.substring(0, server.indexOf("/"));
-
+		
 		final FTPClient ftp;
 		ThreadSafeOptions tso;
 		synchronized (host2ftp) {
@@ -57,7 +57,7 @@ public class MyAdvancedFTP {
 		}
 		status.setCurrentStatusValue(0);
 		boolean res;
-
+		
 		try {
 			boolean wait = false;
 			synchronized (tso) {
@@ -86,7 +86,7 @@ public class MyAdvancedFTP {
 		}
 		return res;
 	}
-
+	
 	private static boolean processDownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
 						String downloadURL, MyByteArrayOutputStream target, final int thisRun, final String server, String remote,
 						final FTPClient ftp) {
@@ -101,9 +101,9 @@ public class MyAdvancedFTP {
 			password = s.split(":")[1];
 			downloadURL = "ftp://" + downloadURL.substring(downloadURL.indexOf("@") + "@".length());
 		}
-
+		
 		final ObjectRef myoutputstream = new ObjectRef();
-
+		
 		// ftp.addProtocolCommandListener(new ProtocolCommandListener() {
 		// public void protocolCommandSent(ProtocolCommandEvent arg0) {
 		// // System.out.print("out: " + arg0.getMessage());
@@ -134,9 +134,9 @@ public class MyAdvancedFTP {
 		// }
 		// }
 		// });
-
+		
 		// System.out.println("FTP DOWNLOAD: " + downloadURL);
-
+		
 		try {
 			if (ftp.isConnected()) {
 				status.setCurrentStatusText2("Using open FTP connection");
@@ -168,7 +168,7 @@ public class MyAdvancedFTP {
 			}
 			status.setCurrentStatusText1("Download started..");
 			status.setCurrentStatusText2("Please Wait.");
-
+			
 			OutputStream output = target;
 			myoutputstream.setObject(output);
 			ftp.setRemoteVerificationEnabled(false);

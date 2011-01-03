@@ -20,7 +20,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
  * @author klukas
  */
 public class MyUtility {
-
+	
 	public static void navigate(ArrayList<NavigationButton> path, String target) {
 		try {
 			String ft = clean(target);
@@ -37,7 +37,7 @@ public class MyUtility {
 			sb.append(target);
 			target = sb.toString();
 			target = clean(target);
-
+			
 			if (target.startsWith("Initialize"))
 				target = target.substring("Initialize".length());
 			if (target.startsWith("Overview"))
@@ -52,7 +52,7 @@ public class MyUtility {
 			// empty
 		}
 	}
-
+	
 	private static String clean(String target) {
 		target = StringManipulationTools.stringReplace(target, "<html><b><code>", "");
 		target = StringManipulationTools.stringReplace(target, "\\\\ ", "");
@@ -65,5 +65,5 @@ public class MyUtility {
 		target = StringManipulationTools.stringReplace(target, " ||", "");
 		return target;
 	}
-
+	
 }

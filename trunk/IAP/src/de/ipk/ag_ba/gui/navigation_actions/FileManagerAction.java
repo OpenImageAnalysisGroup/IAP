@@ -20,17 +20,17 @@ public class FileManagerAction extends AbstractNavigationAction {
 	private final ExperimentReference experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
-
+	
 	public FileManagerAction(MongoDB m, ExperimentReference experiment) {
 		super("Access primary and annotation files");
 		this.m = m;
 		this.experiment = experiment;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
-
+		
 		try {
 			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(m, experiment.getData(m),
 								experiment.getExperimentName());
@@ -40,14 +40,14 @@ public class FileManagerAction extends AbstractNavigationAction {
 			mpc = null;
 		}
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
@@ -55,19 +55,19 @@ public class FileManagerAction extends AbstractNavigationAction {
 		// todo add plant filter (all, ID 1, ID 2, ID 3, ...)
 		return res;
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return mpc;
 	}
-
+	
 	public static NavigationButton getFileManagerEntity(MongoDB m,
 						final ExperimentReference experimentRef, GUIsetting guiSetting) {
 		NavigationAction fileManagerAction = new FileManagerAction(m, experimentRef);
 		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View Data",
 							"img/ext/user-desktop.png",
 							// "img/ext/applications-system.png",
-							guiSetting);
+				guiSetting);
 		return fileManager;
 	}
 }

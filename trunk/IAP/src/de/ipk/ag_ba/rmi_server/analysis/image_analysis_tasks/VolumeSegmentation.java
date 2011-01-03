@@ -31,45 +31,45 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  * @author klukas
  */
 public class VolumeSegmentation extends AbstractImageAnalysisTask {
-
+	
 	private static int somSize = 4;
 	protected Collection<NumericMeasurementInterface> input;
 	protected MongoDB m;
 	protected Collection<NumericMeasurementInterface> output;
-
+	
 	private final DatabaseTarget storeResultInDatabase;
-
+	
 	public VolumeSegmentation(DatabaseTarget storeResultInDatabase) {
 		this.storeResultInDatabase = storeResultInDatabase;
 	}
-
+	
 	@Override
 	public ImageAnalysisType[] getInputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_IMAGE, ImageAnalysisType.GRAY_VOLUME,
 							ImageAnalysisType.IMAGE };
 	}
-
+	
 	@Override
 	public String getName() {
 		return "Segmentation";
 	}
-
+	
 	@Override
 	public Collection<NumericMeasurementInterface> getOutput() {
 		return output;
 	}
-
+	
 	@Override
 	public ImageAnalysisType[] getOutputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_IMAGE, ImageAnalysisType.GRAY_VOLUME,
 							ImageAnalysisType.IMAGE };
 	}
-
+	
 	@Override
 	public String getTaskDescription() {
 		return "Color- and SOM-based Volume Segmentation";
 	}
-
+	
 	/**
 	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
 	 */
@@ -78,7 +78,7 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status) {
 		performAnalysis(maximumThreadCount, 1, status);
 	}
-
+	
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
 						BackgroundTaskStatusProviderSupportingExternalCall status) {
@@ -97,21 +97,20 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 				if (in instanceof VolumeData) {
 					status.setCurrentStatusText1("Load Volume");
 					LoadedVolume volume = IOmodule.loadVolume((VolumeData) in);
-
+					
 					volume.getURL().setFileName(volume.getURL().getFileName() + ".labelfield");
 					status.setCurrentStatusText1("Segmentation");
 					ThreeDsegmentationColored.segment(new LoadedVolumeExtension(volume), somSize, status, volume
 										.getDimensionX(), volume.getDimensionY(), volume.getDimensionZ());
-
+					
 					if (storeResultInDatabase != null) {
 						long bytes = volume.getDimensionX() * volume.getDimensionY() * volume.getDimensionZ() * 4;
 						status.setCurrentStatusText1("Generate Stream (" + bytes / 1024 / 1024 + " MB)");
 						try {
 							status.setCurrentStatusText1("Saving (" + bytes / 1024 / 1024 + " MB)");
 							long t1 = System.currentTimeMillis();
-							String md5 = AttributeHelper.getMD5fromInputStream(volume.getURL().getInputStream());
 							storeResultInDatabase.saveVolume(volume, (Sample3D) volume.getParentSample(), m,
-												DBTable.SAMPLE, null, md5, status);
+												DBTable.SAMPLE, null, status);
 							long t2 = System.currentTimeMillis();
 							if (t2 > t1)
 								System.out.println("Saved Volume ("
@@ -136,7 +135,7 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 		}
 		input = null;
 	}
-
+	
 	@Override
 	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;

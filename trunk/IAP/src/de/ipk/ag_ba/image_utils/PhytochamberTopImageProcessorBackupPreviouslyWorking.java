@@ -33,59 +33,59 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  * @author entzian, klukas
  */
 public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
-
+	
 	/**
 	 * The unmodified input images.
 	 */
 	private FlexibleImageSet input;
-
+	
 	private final PhytoTopImageProcessorOptions options;
-
+	
 	private final boolean takeTimes = false;
-
+	
 	public PhytochamberTopImageProcessorBackupPreviouslyWorking(FlexibleImageSet input) {
 		this.input = input;
-
+		
 		options = new PhytoTopImageProcessorOptions();
 		options.initStandardValues();
 	}
-
+	
 	public void setValuesToStandard() {
 		options.initStandardValues();
 	}
-
+	
 	public PhytochamberTopImageProcessorBackupPreviouslyWorking pipeline(int maxThreadsPerImage) {
 		long pixels = this.input.getPixelCount();
-
+		
 		StopWatch w = debugStart("Phytochamber snapshot analysis of " + pixels + " pixels");
-
+		
 		PhytochamberTopImageProcessorBackupPreviouslyWorking clearedImageProcessor = new PhytochamberTopImageProcessorBackupPreviouslyWorking(input.copy())
 							.clearBackground(maxThreadsPerImage);
-
+		
 		boolean alex = true;
-
+		
 		FlexibleImageSet srcSet = alex ? input : clearedImageProcessor.getImages();
-
+		
 		PhytochamberTopImageProcessorBackupPreviouslyWorking result = null;
-
+		
 		boolean automaticRTS = true;
 		if (automaticRTS) {
 			FlexibleImageSet mask = clearedImageProcessor.equalize().automaticRotation().automaticTranslation().automaticScalation().mergeMask();
 			result = new PhytochamberTopImageProcessorBackupPreviouslyWorking(mask).applyMaskTo(srcSet)
 								.postProcessResultImages(false).removeSmallClusters().postProcessResultImages(true);
-
+			
 		} else {
 			FlexibleImageSet mask = clearedImageProcessor.equalize().enlargeMask().mergeMask();
 			result = new PhytochamberTopImageProcessorBackupPreviouslyWorking(mask).applyMaskTo(srcSet)
 								.postProcessResultImages(false).removeSmallClusters().postProcessResultImages(true);
-
+			
 		}
-
+		
 		debugEnd(w, result.getImages());
 		input = null;
 		return result;
 	}
-
+	
 	private PhytochamberTopImageProcessorBackupPreviouslyWorking removeSmallClusters() {
 		StopWatch w = debugStart("removeSmallClusters");
 		FlexibleImage vis = new ImageOperation(input.getVis()).removeSmallClusters().getImage();
@@ -95,23 +95,23 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 		debugEnd(w, res);
 		return new PhytochamberTopImageProcessorBackupPreviouslyWorking(res);
 	}
-
+	
 	public FlexibleImageSet getImages() {
 		return input;
 	}
-
+	
 	private PhytochamberTopImageProcessorBackupPreviouslyWorking applyMaskTo(FlexibleImageSet images) {
 		PhytochamberTopImageProcessorBackupPreviouslyWorking res = applyMasks(images, input);
 		input = null;
 		return res;
 	}
-
+	
 	public PhytochamberTopImageProcessorBackupPreviouslyWorking equalize() {
 		PhytochamberTopImageProcessorBackupPreviouslyWorking res = new PhytochamberTopImageProcessorBackupPreviouslyWorking(input.equalize());
 		input = null;
 		return res;
 	}
-
+	
 	/**
 	 * @return Modified images according to the given masks.
 	 */
@@ -124,7 +124,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 		debugEnd(w, res);
 		return new PhytochamberTopImageProcessorBackupPreviouslyWorking(res);
 	}
-
+	
 	/**
 	 * Erode/delate/erode several times, depending on image type.
 	 */
@@ -139,14 +139,14 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 		input = null;
 		return res;
 	}
-
+	
 	private FlexibleImage postProcessResultImage(FlexibleImage finalImage,
 						ImageConfiguration typ, boolean enlarge) {
-
+		
 		ImageOperation maskIo = new ImageOperation(finalImage);
-
+		
 		switch (typ) {
-
+			
 			case RgbTop:
 				if (enlarge)
 					for (int ii = 0; ii < 30; ii++)
@@ -154,7 +154,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 				if (!enlarge)
 					for (int ii = 0; ii < 3; ii++)
 						maskIo.erode();
-
+				
 				// for (int ii = 0; ii < 6; ii++)
 				// maskIo.erode();
 				// for (int ii = 0; ii < 8; ii++)
@@ -162,7 +162,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 				// for (int ii = 0; ii < 2; ii++)
 				// maskIo.erode();
 				break;
-
+			
 			case FluoTop:
 
 				for (int ii = 0; ii < 5; ii++)
@@ -172,11 +172,11 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 				maskIo.closing();
 				break;
 		}
-
+		
 		// return new ImageOperation(finalImage).applyMask(maskIo.getImage(), options.getBackground()).getImage();
 		return new ImageOperation(finalImage).applyMask2(maskIo.getImage(), options.getBackground()).getImage();
 	}
-
+	
 	/**
 	 * Enlarges the given masks (using several erode/dilate operations).
 	 * These operations modify the images, so that the result images may only be
@@ -204,7 +204,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 		input = null;
 		return res;
 	}
-
+	
 	/**
 	 * Uses LAB color classification, to categorize the input as foreground /
 	 * background. Then small parts
@@ -216,7 +216,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 	 */
 	private PhytochamberTopImageProcessorBackupPreviouslyWorking clearBackground(final int maxThreadsPerImage) {
 		StopWatch w = debugStart("clearBackground");
-
+		
 		final FlexibleImageSet res = new FlexibleImageSet();
 		boolean clearFluo = false;
 		MyThread a = null;
@@ -250,31 +250,31 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 				res.set(new FlexibleImage(clearFluorImage, FlexibleImageType.FLUO));
 			}
 		}, "clear FLUO", 1);
-
+		
 		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
-
+		
 		debugEnd(w, res);
-
+		
 		// PrintImage.printImage(res.getVis());
-
+		
 		PhytochamberTopImageProcessorBackupPreviouslyWorking rrr = new PhytochamberTopImageProcessorBackupPreviouslyWorking(res);
 		input = null;
 		return rrr;
 	}
-
+	
 	public void debugOverlayImages() {
 		debugOverlayImages(input.getVis(), input.getFluo(), LayeringTyp.ROW_IMAGE);
 	}
-
+	
 	public void debugOverlayImages(LayeringTyp typ) {
 		debugOverlayImages(input.getVis(), input.getFluo(), typ);
 	}
-
+	
 	private static void debugOverlayImages(FlexibleImage a, FlexibleImage b, LayeringTyp typ) {
-
+		
 		BufferedImage firstImage = a.getBufferedImage();
 		BufferedImage secondImage = ImageConverter.copy(b.getBufferedImage());
-
+		
 		for (int x = 0; x < firstImage.getWidth(); x++) {
 			for (int y = 0; y < firstImage.getHeight(); y++) {
 				if (typ == LayeringTyp.RED_BLUE_IMAGE) {
@@ -290,16 +290,16 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 				}
 			}
 		}
-
+		
 		// GravistoService.showImage(secondImage, "ImageLayering");
 		// PrintImage.printImage(secondImage, "debug overlay images, secondImage");
 	}
-
+	
 	// ########## PRIVATE ############
-
+	
 	private BufferedImage clearBackground(BufferedImage workImage, ImageConfiguration cameraTyp, double epsilonA,
 						double epsiolonB, int maxThreadsPerImage) {
-
+		
 		SubstanceInterface substance = new Substance();
 		substance.setName(cameraTyp.toString());
 		ConditionInterface condition = new Condition(substance);
@@ -309,23 +309,23 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 		PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, maxThreadsPerImage, null, null, true, output, null,
 							epsilonA, epsiolonB);
-
+		
 		return workImage;
-
+		
 	}
-
+	
 	private BufferedImage enlargeMask(FlexibleImage workImage, int numberOfErodeLoops, int numberOfDilateLoops,
 						ImageConfiguration typ) {
-
+		
 		ImageOperation io = new ImageOperation(workImage);
 		for (int i = 0; i < numberOfErodeLoops; i++)
 			io.erode();
 		for (int i = 0; i < numberOfDilateLoops; i++)
 			io.dilate();
-
+		
 		return io.getImageAsBufferedImage();
 	}
-
+	
 	/**
 	 * Merges the given masks. Only parts which are confirmed as non-background
 	 * in all input images are retained in the result 1/0 mask.
@@ -344,7 +344,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 		input = null;
 		return res;
 	}
-
+	
 	// private PhytochamberTopImageProcessor mergeEnlargedMasks() {
 	//
 	// PhytochamberTopImageProcessor newMaskImage = automaticRotation().automaticTranslation().automaticScalation();
@@ -371,7 +371,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 	// return null;
 	//
 	// }
-
+	
 	private PhytochamberTopImageProcessorBackupPreviouslyWorking automaticScalation() {
 		System.out.println("automaticScaling...");
 		StopWatch w = debugStart("atomaticRotation");
@@ -380,12 +380,12 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 		FlexibleImage rotatedNirImage = automaticScalationProcess(input.getNir(), input.getVis());
 		debugEnd(w, null);
 		FlexibleImageSet res = new FlexibleImageSet(input.getVis(), rotatedFluoImage, rotatedNirImage);
-
+		
 		PhytochamberTopImageProcessorBackupPreviouslyWorking rrr = new PhytochamberTopImageProcessorBackupPreviouslyWorking(res);
 		input = null;
 		return rrr;
 	}
-
+	
 	private PhytochamberTopImageProcessorBackupPreviouslyWorking automaticTranslation() {
 		System.out.println("automaticTranslation...");
 		StopWatch w = debugStart("atomaticRotation");
@@ -394,12 +394,12 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 		FlexibleImage rotatedNirImage = automaticTranslationProcess(input.getNir(), input.getVis());
 		debugEnd(w, null);
 		FlexibleImageSet res = new FlexibleImageSet(input.getVis(), rotatedFluoImage, rotatedNirImage);
-
+		
 		PhytochamberTopImageProcessorBackupPreviouslyWorking rrr = new PhytochamberTopImageProcessorBackupPreviouslyWorking(res);
 		input = null;
 		return rrr;
 	}
-
+	
 	private PhytochamberTopImageProcessorBackupPreviouslyWorking automaticRotation() {
 		System.out.println("automaticRotation...");
 		StopWatch w = debugStart("atomaticRotation");
@@ -408,19 +408,19 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 		FlexibleImage rotatedNirImage = automaticRotationProcess(input.getNir(), input.getVis());
 		debugEnd(w, null);
 		FlexibleImageSet res = new FlexibleImageSet(input.getVis(), rotatedFluoImage, rotatedNirImage);
-
+		
 		PhytochamberTopImageProcessorBackupPreviouslyWorking rrr = new PhytochamberTopImageProcessorBackupPreviouslyWorking(res);
 		input = null;
 		return rrr;
 	}
-
+	
 	private FlexibleImage automaticScalationProcess(FlexibleImage workImage, FlexibleImage visImage) {
-
+		
 		int largestResultImageSize = -1;
 		double bestValueX = 0, bestValueY = 0;
 		MaskOperation bestMask = null;
 		FlexibleImage transImage = null;
-
+		
 		// try different rotations
 		for (double x = 0.9; x <= 1.1; x += 0.1)
 			for (double y = 0.9; y <= 1.1; y += 0.1) {
@@ -430,7 +430,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 				MaskOperation o = new MaskOperation(visImage, transImage, null,
 									options.getBackground(), Color.GRAY.getRGB());
 				o.mergeMasks();
-
+				
 				if (o.getUnknownMeasurementValuePixels() > largestResultImageSize) {
 					bestValueX = x;
 					bestValueY = y;
@@ -438,34 +438,34 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 					bestMask = o;
 				}
 			}
-
+		
 		if (bestMask == null) {
 			MaskOperation o = new MaskOperation(visImage, workImage, null,
 								options.getBackground(), Color.gray.getRGB());
 			o.mergeMasks();
 			bestMask = o;
 		}
-
+		
 		if (Math.abs(bestValueX) > 0.001 && Math.abs(bestValueY) > 0.001) {
 			System.out.println("Detected plant rotation within snapshot: " + bestValueX
 								+ " x " + bestValueY + " y");
-
+			
 			ImageOperation io = new ImageOperation(workImage);
 			io.scale(bestValueX, bestValueY);
 			transImage = io.getImage();
 		}
-
+		
 		return transImage;
-
+		
 	}
-
+	
 	private FlexibleImage automaticTranslationProcess(FlexibleImage workImage, FlexibleImage visImage) {
-
+		
 		int largestResultImageSize = -1;
 		double bestValueX = 0, bestValueY = 0;
 		MaskOperation bestMask = null;
 		FlexibleImage transImage = null;
-
+		
 		// try different rotations
 		for (double x = -20; x <= 20; x += 5)
 			for (double y = -20; y <= 20; y += 5) {
@@ -475,7 +475,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 				MaskOperation o = new MaskOperation(visImage, transImage, null,
 									options.getBackground(), Color.GRAY.getRGB());
 				o.mergeMasks();
-
+				
 				if (o.getUnknownMeasurementValuePixels() > largestResultImageSize) {
 					bestValueX = x;
 					bestValueY = y;
@@ -483,71 +483,71 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 					bestMask = o;
 				}
 			}
-
+		
 		if (bestMask == null) {
 			MaskOperation o = new MaskOperation(visImage, workImage, null,
 								options.getBackground(), Color.gray.getRGB());
 			o.mergeMasks();
 			bestMask = o;
 		}
-
+		
 		if (Math.abs(bestValueX) > 0.001 && Math.abs(bestValueY) > 0.001) {
 			System.out.println("Detected plant rotation within snapshot: " + bestValueX
 								+ " x " + bestValueY + " y");
-
+			
 			ImageOperation io = new ImageOperation(workImage);
 			io.translate(bestValueX, bestValueY);
 			transImage = io.getImage();
 		}
-
+		
 		return transImage;
-
+		
 	}
-
+	
 	private FlexibleImage automaticRotationProcess(FlexibleImage workImage, FlexibleImage visImage) {
-
+		
 		int largestResultImageSize = -1;
 		double bestAngle = 0;
 		MaskOperation bestMask = null;
 		FlexibleImage rotImage = null;
-
+		
 		// try different rotations
 		for (double angle = -5; angle <= 5; angle += 0.5) {
-
+			
 			ImageOperation io = new ImageOperation(workImage);
 			io.rotate(angle);
 			rotImage = io.getImage();
 			MaskOperation o = new MaskOperation(visImage, rotImage, null,
 								options.getBackground(), Color.GRAY.getRGB());
 			o.mergeMasks();
-
+			
 			if (o.getUnknownMeasurementValuePixels() > largestResultImageSize) {
 				bestAngle = angle;
 				largestResultImageSize = o.getUnknownMeasurementValuePixels();
 				bestMask = o;
 			}
 		}
-
+		
 		if (bestMask == null) {
 			MaskOperation o = new MaskOperation(visImage, workImage, null,
 								options.getBackground(), Color.gray.getRGB());
 			o.mergeMasks();
 			bestMask = o;
 		}
-
+		
 		if (Math.abs(bestAngle) > 0.001) {
 			System.out.println("Detected plant rotation within snapshot: " + bestAngle
 								+ " degree");
-
+			
 			ImageOperation io = new ImageOperation(workImage);
 			io.rotate(bestAngle);
 			rotImage = io.getImage();
 		}
-
+		
 		return rotImage;
-
+		
 	}
-
+	
 	// private void test() {
 	//
 	// BufferedImage rotatedFluoImage = fluoMask;
@@ -618,7 +618,7 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 	// rgbMask.getHeight(), bestMask.getMask())), new
 	// FlexibleImage(rotatedFluoImage), mask.getNir());
 	// }
-
+	
 	//
 	//
 	// int largestResultImageSize = -1;
@@ -718,14 +718,14 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 	// FlexibleImage(ImageConverter.convert1AtoBI(rgbMask.getWidth(),
 	// rgbMask.getHeight(), bestMask.getMask())), new
 	// FlexibleImage(rotatedFluoImage), mask.getNir());
-
+	
 	private StopWatch debugStart(String task) {
 		if (takeTimes)
 			return new StopWatch("phytochamberTopImageProcessor: " + task);
 		else
 			return null;
 	}
-
+	
 	private void debugEnd(StopWatch w, FlexibleImageSet img) {
 		if (w != null) {
 			w.printTime();
@@ -733,40 +733,40 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 				new ImageOperation(img.getVis()).getImage().print(w.getDescription());
 		}
 	}
-
+	
 	public static void main(String[] args) throws IOException, Exception {
-
+		
 		// ToDo move to Unit test
-
+		
 		System.out.println("Phytochamber Test");
-
+		
 		IOurl urlFlu = new IOurl("mongo_ba-13.ipk-gatersleben.de://26b7e285fae43dac107016afb4dc2841/WT01_1385");
 		IOurl urlVis = new IOurl("mongo_ba-13.ipk-gatersleben.de://12b6db018fddf651b414b652fc8f3d8d/WT01_1385");
 		IOurl urlNIR = new IOurl("mongo_ba-13.ipk-gatersleben.de://c72e4fcc141b8b2a97851ab2fde8106a/WT01_1385");
-
+		
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (MongoDB m : MongoDB.getMongos())
 			for (ResourceIOHandler io : m.getHandlers())
 				ResourceIOManager.registerIOHandler(io);
-
+		
 		FlexibleImage imgFluo = new FlexibleImage(urlFlu);
 		FlexibleImage imgVisible = new FlexibleImage(urlVis);
 		FlexibleImage imgNIR = new FlexibleImage(urlNIR);
-
+		
 		double scale = 1.0;
 		if (Math.abs(scale - 1) > 0.0001) {
 			System.out.println("Scaling!");
 			imgFluo = new ImageOperation(imgFluo).resize(scale).getImage();
 			imgVisible = new ImageOperation(imgVisible).resize(scale).getImage();
 		}
-
+		
 		System.out.println("Process...");
-
+		
 		FlexibleImageSet input = new FlexibleImageSet(imgVisible, imgFluo, imgNIR);
 		PhytochamberTopImageProcessorBackupPreviouslyWorking test = new PhytochamberTopImageProcessorBackupPreviouslyWorking(input);
-
+		
 		// test.clearBackground().getImages().getVis().print("Visible Test 1");
-
+		
 		FlexibleImageSet res = test.pipeline(SystemAnalysis.getNumberOfCPUs()).getImages();
 		//
 		// // PrintImage.printImage(test.getInitialFluorImageAsBI(), "Anfangsbild");

@@ -10,9 +10,9 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 public interface StatusDisplay {
-
+	
 	String getTitle();
-
+	
 	void setTitle(String message);
-
+	
 }

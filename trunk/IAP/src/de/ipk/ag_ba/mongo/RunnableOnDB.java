@@ -13,7 +13,7 @@ import com.mongodb.DB;
  * @author klukas
  */
 public interface RunnableOnDB extends Runnable {
-
+	
 	void setDB(DB db);
-
+	
 }

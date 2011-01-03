@@ -16,17 +16,17 @@ import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 public class RemoteExecutionWrapperAction implements NavigationAction {
-
+	
 	private final RemoteCapableAnalysisAction remoteAction;
 	private final NavigationAction action;
 	private final NavigationButton cm;
-
+	
 	public RemoteExecutionWrapperAction(NavigationAction navigationAction, NavigationButton cm) {
 		this.remoteAction = (RemoteCapableAnalysisAction) navigationAction;
 		this.action = navigationAction;
 		this.cm = cm;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		HashSet<String> targetIPs = remoteAction.getMongoDB().batchGetAvailableHosts(10000);
@@ -56,7 +56,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			}
 		}
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
@@ -65,57 +65,57 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 		res.add(cm);
 		return res;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return cm.getAction().getResultNewActionSet();
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return cm.getAction().getResultMainPanel();
 	}
-
+	
 	@Override
 	public void addAdditionalEntity(NavigationButton ne) {
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getAdditionalEntities() {
 		return null;
 	}
-
+	
 	@Override
 	public BackgroundTaskStatusProvider getStatusProvider() {
 		// MainFrame.showMessageDialog("Remote execution not yet fully implemented!", "Internal Error");
 		return new BackgroundTaskStatusProviderSupportingExternalCallImpl("Remote", "Start");
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return action.getDefaultTitle();
 	}
-
+	
 	@Override
 	public String getDefaultTooltip() {
 		return action.getDefaultTooltip();
 	}
-
+	
 	@Override
 	public String getDefaultNavigationImage() {
 		return action.getDefaultNavigationImage();
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return action.getDefaultImage();
 	}
-
+	
 	@Override
 	public boolean getProvidesActions() {
 		return true;
 	}
-
+	
 	@Override
 	public NavigationImage getImageIcon() {
 		return null;

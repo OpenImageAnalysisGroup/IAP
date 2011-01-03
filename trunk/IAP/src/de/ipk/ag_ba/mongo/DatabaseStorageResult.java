@@ -12,24 +12,24 @@ package de.ipk.ag_ba.mongo;
  */
 public enum DatabaseStorageResult {
 	EXISITING_NO_STORAGE_NEEDED("known"), IO_ERROR_SEE_ERRORMSG("I/O error"), STORED_IN_DB("stored");
-
+	
 	private String desc;
-
+	
 	DatabaseStorageResult(String desc) {
 		this.desc = desc;
 	}
-
+	
 	@Override
 	public String toString() {
 		return desc;
 	}
-
+	
 	private String md5;
-
+	
 	public void setMD5(String md5) {
 		this.md5 = md5;
 	}
-
+	
 	public String getMD5() {
 		return md5;
 	}

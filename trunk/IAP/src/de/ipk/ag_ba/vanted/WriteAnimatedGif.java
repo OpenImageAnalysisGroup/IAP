@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
  * @author Andrew Thompson
  */
 public class WriteAnimatedGif {
-
+	
 	/**
 	 * See http://forums.sun.com/thread.jspa?messageID=10755673#10755673
 	 * 
@@ -36,15 +36,15 @@ public class WriteAnimatedGif {
 	 *           String Frame delay for this frame.
 	 */
 	public static void configure(IIOMetadata meta, String delayTime, int imageIndex) {
-
+		
 		String metaFormat = meta.getNativeMetadataFormatName();
-
+		
 		if (!"javax_imageio_gif_image_1.0".equals(metaFormat)) {
 			throw new IllegalArgumentException("Unfamiliar gif metadata format: " + metaFormat);
 		}
-
+		
 		Node root = meta.getAsTree(metaFormat);
-
+		
 		// find the GraphicControlExtension node
 		Node child = root.getFirstChild();
 		while (child != null) {
@@ -53,11 +53,11 @@ public class WriteAnimatedGif {
 			}
 			child = child.getNextSibling();
 		}
-
+		
 		IIOMetadataNode gce = (IIOMetadataNode) child;
 		gce.setAttribute("userDelay", "FALSE");
 		gce.setAttribute("delayTime", delayTime);
-
+		
 		// only the first node needs the ApplicationExtensions node
 		if (imageIndex == 0) {
 			IIOMetadataNode aes = new IIOMetadataNode("ApplicationExtensions");
@@ -68,12 +68,12 @@ public class WriteAnimatedGif {
 								// last two bytes is an unsigned short (little endian) that
 								// indicates the the number of times to loop.
 								// 0 means loop forever.
-								0x1, 0x0, 0x0 };
+					0x1, 0x0, 0x0 };
 			ae.setUserObject(uo);
 			aes.appendChild(ae);
 			root.appendChild(aes);
 		}
-
+		
 		try {
 			meta.setFromTree(metaFormat, root);
 		} catch (IIOInvalidTreeException e) {
@@ -81,7 +81,7 @@ public class WriteAnimatedGif {
 			throw new Error(e);
 		}
 	}
-
+	
 	/**
 	 * See http://forums.sun.com/thread.jspa?messageID=9988198
 	 * 
@@ -95,28 +95,28 @@ public class WriteAnimatedGif {
 	 *           String[] Array of Strings, representing the frame delay times.
 	 */
 	public static void saveAnimate(OutputStream out, BufferedImage[] frames, String[] delayTimes) throws Exception {
-
+		
 		ImageWriter iw = ImageIO.getImageWritersByFormatName("gif").next();
-
+		
 		ImageOutputStream ios = ImageIO.createImageOutputStream(out);
 		iw.setOutput(ios);
 		iw.prepareWriteSequence(null);
-
+		
 		for (int i = 0; i < frames.length; i++) {
 			BufferedImage src = frames[i];
 			ImageWriteParam iwp = iw.getDefaultWriteParam();
 			IIOMetadata metadata = iw.getDefaultImageMetadata(new ImageTypeSpecifier(src), iwp);
-
+			
 			configure(metadata, delayTimes[i], i);
-
+			
 			IIOImage ii = new IIOImage(src, null, metadata);
 			iw.writeToSequence(ii, null);
 		}
-
+		
 		iw.endWriteSequence();
 		ios.close();
 	}
-
+	
 	/**
 	 * See http://forums.sun.com/thread.jspa?messageID=9988198
 	 * 
@@ -130,28 +130,28 @@ public class WriteAnimatedGif {
 	 *           String[] Array of Strings, representing the frame delay times.
 	 */
 	public static void saveAnimate(File file, BufferedImage[] frames, String[] delayTimes) throws Exception {
-
+		
 		ImageWriter iw = ImageIO.getImageWritersByFormatName("gif").next();
-
+		
 		ImageOutputStream ios = ImageIO.createImageOutputStream(file);
 		iw.setOutput(ios);
 		iw.prepareWriteSequence(null);
-
+		
 		for (int i = 0; i < frames.length; i++) {
 			BufferedImage src = frames[i];
 			ImageWriteParam iwp = iw.getDefaultWriteParam();
 			IIOMetadata metadata = iw.getDefaultImageMetadata(new ImageTypeSpecifier(src), iwp);
-
+			
 			configure(metadata, delayTimes[i], i);
-
+			
 			IIOImage ii = new IIOImage(src, null, metadata);
 			iw.writeToSequence(ii, null);
 		}
-
+		
 		iw.endWriteSequence();
 		ios.close();
 	}
-
+	
 	/** Dump the usage to the System.err stream. */
 	public static void printUsage() {
 		StringBuffer sb = new StringBuffer();
@@ -172,10 +172,10 @@ public class WriteAnimatedGif {
 		sb.append(eol);
 		sb.append("Frame rates are specified in increments of 1/100th second, NOT milliseconds.");
 		sb.append(eol);
-
+		
 		System.err.print(sb);
 	}
-
+	
 	/**
 	 * Checks that a String intended as a delayTime is an integer>0. If not,
 	 * dumps a warning message and the usage, then exits. If successful, returns
@@ -196,18 +196,18 @@ public class WriteAnimatedGif {
 		}
 		return delay;
 	}
-
+	
 	/** Parse the arguments and if successful, attempt to write the animated GIF. */
 	public static void main(String[] args) throws Exception {
-
+		
 		if (args.length != 3) {
 			printUsage();
 			System.exit(1);
 		}
-
+		
 		// deal with the output file name
 		File f = new File(args[0]);
-
+		
 		// deal with the input file names
 		String[] names = args[1].split(",");
 		if (names.length < 2) {
@@ -219,7 +219,7 @@ public class WriteAnimatedGif {
 		for (int ii = 0; ii < names.length; ii++) {
 			frames[ii] = ImageIO.read(new File(names[ii]));
 		}
-
+		
 		// deal with the frame rates
 		String[] delays = args[2].split(",");
 		// note: length of names, not delays
@@ -239,7 +239,7 @@ public class WriteAnimatedGif {
 					delayTimes[ii] = checkDelay(delays[ii]);
 				}
 			}
-
+		
 		// save an animated GIF
 		saveAnimate(f, frames, delayTimes);
 	}

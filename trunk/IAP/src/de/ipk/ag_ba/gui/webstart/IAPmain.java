@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
+ * Copyright (c) 2009 Image Analysis Group, IPK Gatersleben
  *******************************************************************************/
 package de.ipk.ag_ba.gui.webstart;
 
@@ -31,9 +31,6 @@ import org.graffiti.managers.pluginmgr.PluginManagerException;
 import org.graffiti.options.GravistoPreferences;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
-import org.graffiti.selection.SelectionEvent;
-import org.graffiti.session.EditorSession;
-import org.graffiti.session.Session;
 import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
@@ -49,19 +46,17 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolumeHandler;
 
 /**
- * Contains the graffiti editor.
- * 
- * @version $Revision: 1.10 $
+ * @author klukas
  */
-public class AIPmain extends JApplet {
+public class IAPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
-
+	
 	MainFrame mainFrame;
-
+	
 	public void setAppletCloseListener(ActionListener l) {
 		// empty
 	}
-
+	
 	public void appletDragStarted() {
 		final JFrame jf = (JFrame) ErrorMsg.findParentComponent(ReleaseInfo.getApplet(), JFrame.class);
 		if (jf != null) {
@@ -74,45 +69,45 @@ public class AIPmain extends JApplet {
 		} else
 			System.out.println("Drag detected, but frame not found.");
 	}
-
+	
 	static boolean myClassKnown = false;
-
-	public AIPmain() {
+	
+	public IAPmain() {
 		ReleaseInfo.setRunningAsApplet(this);
-
+		
 		registerIOhandlers();
-
+		
 		GravistoMainHelper.setLookAndFeel();
-
+		
 		checkServerMode();
-
+		
 		// construct and open the editor's main frame
-		GravistoPreferences prefs = GravistoPreferences.userNodeForPackage(AIPmain.class);
-
+		GravistoPreferences prefs = GravistoPreferences.userNodeForPackage(IAPmain.class);
+		
 		GravistoPreferences uiPrefs = prefs.node("ui");
 		uiPrefs.put("showPluginManagerMenuOptions", "false");
 		uiPrefs.put("showPluginMenu", "false");
 		JPanel statusPanel = new JPanel();
-
+		
 		mainFrame = new MainFrame(GravistoMainHelper.getPluginManager(), uiPrefs, statusPanel, true);
-
+		
 		setLayout(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.FILL } }));
-
+		
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 							"", "");
-		JComponent advancedNavigation = AIPgui.getNavigation(myStatus, false);
+		JComponent advancedNavigation = IAPgui.getNavigation(myStatus, false);
 		add(advancedNavigation, "0,0");
 		validate();
-
+		
 		Thread t = new Thread() {
-
+			
 			@Override
 			public void run() {
-				if (AIPmain.myClassKnown) {
+				if (IAPmain.myClassKnown) {
 					System.out.println("Reload Classes, Problems may occur");
 					ErrorMsg.addErrorMessage("Reload Classes, Problems may occur");
 				}
-				AIPmain.myClassKnown = true;
+				IAPmain.myClassKnown = true;
 				System.out.println("Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
 				myAppletLoad(mainFrame, myStatus);
 			}
@@ -120,18 +115,17 @@ public class AIPmain extends JApplet {
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();
 	}
-
+	
 	private void checkServerMode() {
 		boolean serverMode = true;
-
+		
 		if (!serverMode)
 			return;
-
+		
 		RepaintManager.setCurrentManager(new RemotingRepaintManager());
 	}
-
+	
 	private void registerIOhandlers() {
-
 		ResourceIOManager.registerIOHandler(LoadedVolumeHandler.getInstance());
 		ResourceIOManager.registerIOHandler(LoadedImageHandler.getInstance());
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
@@ -139,7 +133,7 @@ public class AIPmain extends JApplet {
 			for (ResourceIOHandler handler : m.getHandlers())
 				ResourceIOManager.registerIOHandler(handler);
 	}
-
+	
 	public void myAppletLoad(MainFrame statusPanel, final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
@@ -153,14 +147,14 @@ public class AIPmain extends JApplet {
 							+ "ata<br>";
 		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "VANTED";
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "Integrated Analysis Platform";
-
+		
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "";
-
+		
 		// AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
-
+		
 		JComponent result = new JPanel();
 		result.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
-
+		
 		String s = ""
 							+ "<html><small><br>&nbsp;&nbsp;&nbsp;</small>Welcome to "
 							+ name
@@ -169,67 +163,67 @@ public class AIPmain extends JApplet {
 							+ "&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
 							+ "&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
 							+ "&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
-
+		
 		ReleaseInfo.setHelpIntroductionText(s);
-
+		
 		// URL config,
 		final SplashScreenInterface splashScreen = new SplashScreenInterface() {
-
+			
 			private int max, val;
-
+			
 			public void setVisible(boolean b) {
 			}
-
+			
 			public void setValue(int value) {
 				this.val = value;
 				double progress = val / (double) max * 100d;
 				myStatus.setCurrentStatusValueFine(progress);
 			}
-
+			
 			public void setText(String text) {
 				MainFrame.showMessage(text, MessageType.PERMANENT_INFO);
 			}
-
+			
 			public void setMaximum(int maximum) {
 				this.max = maximum;
 			}
-
+			
 			public void setInitialisationFinished() {
 				MainFrame.showMessage("", MessageType.INFO);
 			}
-
+			
 			public int getValue() {
 				return val;
 			}
-
+			
 			@Override
 			public int getMaximum() {
 				return max;
 			}
 		};
 		ClassLoader cl = this.getClass().getClassLoader();
-
+		
 		String path = // this.getClass().getPackage().getName()
 		"de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart".replace('.', '/');
 		ImageIcon icon = new ImageIcon(cl.getResource(path + "/ipklogo16x16_5.png"));
 		if (splashScreen instanceof DBEsplashScreen)
 			((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
 		// splashScreen.setVisible(true);
-
+		
 		GravistoMainHelper.createApplicationSettingsFolder(splashScreen);
-
+		
 		splashScreen.setText("Read plugin information");
-
+		
 		// ClassLoader cl = GravistoMain.class.getClassLoader();
 		URL r1 = cl.getResource("plugins1.txt");
 		URL r2 = cl.getResource("plugins2.txt");
 		URL r3 = cl.getResource("plugins3.txt");
 		URL r4 = cl.getResource("plugins4.txt");
-
+		
 		URL rExcl = cl.getResource("plugins_exclude.txt");
-
+		
 		splashScreen.setText("Read plugin information...");
-
+		
 		ArrayList<String> locations = new ArrayList<String>();
 		try {
 			locations.addAll(new TextFile(r1));
@@ -243,16 +237,16 @@ public class AIPmain extends JApplet {
 			locations.remove("");
 			ArrayList<String> locations_exclude = new ArrayList<String>();
 			locations_exclude.addAll(new TextFile(rExcl));
-
+			
 			for (String ss : locations) {
 				// System.out.println(ss);
 				if (ss.indexOf("addon") >= 0) {
 					locations_exclude.add(ss);
 					System.out.println("Disable plugin " + ss);
 				}
-
+				
 			}
-
+			
 			for (Iterator<String> it = locations_exclude.iterator(); it.hasNext();) {
 				String remove = it.next();
 				if (!locations.remove(remove)) {
@@ -286,32 +280,44 @@ public class AIPmain extends JApplet {
 			System.err.println("EXIT");
 			System.exit(1);
 		}
-
+		
 		splashScreen.setText("Load plugins...");
 		try {
 			GravistoMainHelper.loadPlugins(locations, splashScreen);
 		} catch (PluginManagerException pme) {
 			ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
 		}
-
+		
 		splashScreen.setText("Initialize GUI...");
 		splashScreen.setVisible(false);
 		splashScreen.setInitialisationFinished();
 		ErrorMsg.setAppLoadingCompleted(ApplicationStatus.PROGRAM_LOADING_FINISHED);
 	}
-
-	public static void showVANTED() {
+	
+	public static JComponent showVANTED(boolean inline) {
 		JFrame jf = (JFrame) ErrorMsg.findParentComponent(MainFrame.getInstance(), JFrame.class);
 		if (jf != null && !jf.isVisible()) {
-			jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			jf.setVisible(true);
-			MainFrame.getInstance().getViewManager().viewChanged(null);
+			if (inline) {
+				MainFrame.getInstance().getViewManager().viewChanged(null);
+				JComponent gui = jf.getRootPane();
+				return gui;
+			} else {
+				jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+				jf.setVisible(true);
+				MainFrame.getInstance().getViewManager().viewChanged(null);
+			}
+		} else {
+			if (jf != null) {
+				jf.setVisible(false);
+				jf.setVisible(true);
+			}
 		}
+		return null;
 	}
-
+	
 	public static NavigationImage loadIcon(String name) {
 		return new NavigationImage(
-							ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(AIPmain.class, name).getImage()));
+							ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()));
 	}
 }
 
