@@ -25,6 +25,7 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.bson.types.ObjectId;
 import org.graffiti.editor.GravistoService;
+import org.graffiti.editor.HashType;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -46,7 +47,6 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
-import de.ipk.ag_ba.gui.picture_gui.DataExchangeHelperForExperiments;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
 import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
@@ -94,13 +94,13 @@ public class MongoDB {
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de")) {
-			res.add(new MongoDB("IAP Cloud", "dbe3", "ba-13.ipk-gatersleben.de", null, null));
-			res.add(new MongoDB("IAP NG", "IAP1", "ba-13.ipk-gatersleben.de", null, null));
+			res.add(new MongoDB("IAP Cloud", "dbe3", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
+			res.add(new MongoDB("IAP NG", "IAP1", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
 		}
 		
 		if (IAPservice.isReachable("localhost")) {
-			res.add(new MongoDB("local dbe3", "dbe3", "localhost", null, null));
-			res.add(new MongoDB("local dbe4", "dbe4", "localhost", null, null));
+			res.add(new MongoDB("local dbe3", "dbe3", "localhost", null, null, HashType.SHA512));
+			res.add(new MongoDB("local dbe4", "dbe4", "localhost", null, null, HashType.SHA512));
 		}
 		return res;
 	}
@@ -120,6 +120,7 @@ public class MongoDB {
 	private final String defaultHost;
 	private final String defaultLogin;
 	private final String defaultPass;
+	private final HashType hashType;
 	
 	// collections:
 	// preview_files
@@ -130,12 +131,13 @@ public class MongoDB {
 	// substances
 	// conditions
 	
-	public MongoDB(String displayName, String databaseName, String hostName, String login, String password) {
+	public MongoDB(String displayName, String databaseName, String hostName, String login, String password, HashType hashType) {
 		this.displayName = displayName;
 		this.defaultDBE = databaseName;
 		this.defaultHost = hostName;
 		this.defaultLogin = login;
 		this.defaultPass = password;
+		this.hashType = hashType;
 	}
 	
 	public void saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
@@ -590,7 +592,7 @@ public class MongoDB {
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		
-		String hash = GravistoService.getHashFromInputStream(is, fileSize, DataExchangeHelperForExperiments.DEFAULT_HASH);
+		String hash = GravistoService.getHashFromInputStream(is, fileSize, getHashType());
 		if (is instanceof MyByteArrayInputStream)
 			is = new MyByteArrayInputStream((is).getBuff());
 		GridFS gridfs_images = new GridFS(db, "images");
@@ -637,7 +639,7 @@ public class MongoDB {
 		
 		String hash;
 		try {
-			hash = GravistoService.getHashFromInputStream(volume.getURL().getInputStream(), optFileSize, DataExchangeHelperForExperiments.DEFAULT_HASH);
+			hash = GravistoService.getHashFromInputStream(volume.getURL().getInputStream(), optFileSize, getHashType());
 			
 			GridFSDBFile fff = gridfs_volumes.findOne(hash);
 			if (fff != null && fff.getLength() <= 0) {
@@ -669,7 +671,7 @@ public class MongoDB {
 		
 		String hash;
 		try {
-			hash = GravistoService.getHashFromInputStream(network.getURL().getInputStream(), optFileSize, DataExchangeHelperForExperiments.DEFAULT_HASH);
+			hash = GravistoService.getHashFromInputStream(network.getURL().getInputStream(), optFileSize, getHashType());
 			
 			GridFSDBFile fff = gridfs_networks.findOne(hash);
 			if (fff != null && fff.getLength() <= 0) {
@@ -1355,5 +1357,9 @@ public class MongoDB {
 	
 	public MongoDBhandler getPrimaryHandler() {
 		return mh;
+	}
+	
+	public HashType getHashType() {
+		return hashType;
 	}
 }
