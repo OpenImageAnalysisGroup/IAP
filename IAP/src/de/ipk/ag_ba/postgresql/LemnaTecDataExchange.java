@@ -572,7 +572,7 @@ public class LemnaTecDataExchange {
 		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
-		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements);
+		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements, true);
 		
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
 		if (optStatus != null)
@@ -659,7 +659,7 @@ public class LemnaTecDataExchange {
 					res.put(plantID, new Condition(null));
 				
 				if (metaName.equals("Pflanzenart"))
-					res.get(plantID).setSpecies(metaValue);
+					res.get(plantID).setSpecies(filterName(metaValue));
 				if (metaName.equals("Pflanzenname"))
 					res.get(plantID).setGenotype(metaValue);
 				if (metaName.equals("Typ"))
@@ -675,6 +675,13 @@ public class LemnaTecDataExchange {
 				ErrorMsg.addErrorMessage(e);
 		}
 		return res;
+	}
+	
+	private String filterName(String metaValue) {
+		String result = metaValue;
+		if (result.indexOf("_") > 0)
+			result = result.substring(0, result.indexOf("_"));
+		return result;
 	}
 	
 	private int countMeasurementValues(ExperimentInterface experiment, MeasurementNodeType[] measurementNodeTypes) {
