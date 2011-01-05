@@ -25,7 +25,7 @@ public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 	
 	@Override
 	public String getDefaultTooltip() {
-		return "Upload data set to IAP Cloud";
+		return "Copy Dataset";
 	}
 	
 	@Override
