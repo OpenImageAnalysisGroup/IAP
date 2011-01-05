@@ -1063,7 +1063,7 @@ public class PhytochamberTopImageProcessor {
 		FlexibleImage imgVisible = new FlexibleImage(urlVis);
 		FlexibleImage imgNIR = new FlexibleImage(urlNIR);
 		
-		double scale = 1;
+		double scale = 0.5;
 		if (Math.abs(scale - 1) > 0.0001) {
 			System.out.println("Debug: Using Scale-Factor of " + scale + " to improve performance!");
 			imgFluo = new ImageOperation(imgFluo).resize(scale).getImage();
