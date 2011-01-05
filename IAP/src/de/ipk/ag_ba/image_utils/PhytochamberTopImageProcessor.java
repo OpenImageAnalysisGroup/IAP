@@ -435,7 +435,13 @@ public class PhytochamberTopImageProcessor {
 		MaskOperation o = new MaskOperation(input.getMasks().getVis(), input.getMasks().getFluo(), null, options.getBackground(), Color.GRAY.getRGB());
 		o.mergeMasks();
 		FlexibleImage img = new FlexibleImage(o.getMask(), input.getMasks().getLargestWidth(), input.getMasks().getLargestHeight());
-		FlexibleImageSet mergedMasks = new FlexibleImageSet(input.getMasks().getVis(), img, input.getMasks().getVis());
+		FlexibleImageSet mergedMasks;
+		
+		if (options.isProcessNir())
+			mergedMasks = new FlexibleImageSet(input.getMasks().getVis(), img, img);
+		else
+			mergedMasks = new FlexibleImageSet(input.getMasks().getVis(), img, input.getMasks().getVis());
+		
 		debugEnd(w, mergedMasks);
 		PhytochamberTopImageProcessor res = new PhytochamberTopImageProcessor(new FlexibleMaskAndImageSet(input.getImages(), mergedMasks), options);
 		input = null;
@@ -446,7 +452,6 @@ public class PhytochamberTopImageProcessor {
 		
 		ObjectRef resultValues = new ObjectRef();
 		Vector2d t;
-		Double t2;
 		FlexibleImage fluoMask = null;
 		FlexibleImage fluoImage = null;
 		FlexibleImage nirMask = null;
@@ -454,33 +459,39 @@ public class PhytochamberTopImageProcessor {
 		
 		switch (typ) {
 			case translation:
-				fluoMask = automaticTranslationProcessIntervallSearch(input.getMasks().getFluo(), input.getMasks().getVis(), resultValues);
+				fluoMask = automaticProcessIntervallSearch(input.getMasks().getFluo(), input.getMasks().getVis(), resultValues, typ);
 				t = (Vector2d) resultValues.getObject();
 				fluoImage = new ImageOperation(input.getImages().getFluo()).translate(t.x, t.y).getImage();
 				
-				nirMask = automaticTranslationProcessIntervallSearch(input.getMasks().getNir(), input.getMasks().getVis(), resultValues);
-				t = (Vector2d) resultValues.getObject();
-				nirImage = new ImageOperation(input.getImages().getNir()).translate(t.x, t.y).getImage();
+				if (options.isProcessNir()) {
+					nirMask = automaticProcessIntervallSearch(input.getMasks().getNir(), input.getMasks().getVis(), resultValues, typ);
+					t = (Vector2d) resultValues.getObject();
+					nirImage = new ImageOperation(input.getImages().getNir()).translate(t.x, t.y).getImage();
+				}
 				break;
 			
 			case rotation:
-				fluoMask = automaticRotationProcessIntervallSearch(input.getMasks().getFluo(), input.getMasks().getVis(), resultValues);
-				t2 = (Double) resultValues.getObject();
-				fluoImage = new ImageOperation(input.getImages().getFluo()).rotate(t2).getImage();
+				fluoMask = automaticProcessIntervallSearch(input.getMasks().getFluo(), input.getMasks().getVis(), resultValues, typ);
+				t = (Vector2d) resultValues.getObject();
+				fluoImage = new ImageOperation(input.getImages().getFluo()).rotate(t.x).getImage();
 				
-				nirMask = automaticRotationProcessIntervallSearch(input.getMasks().getNir(), input.getMasks().getVis(), resultValues);
-				t2 = (Double) resultValues.getObject();
-				nirImage = new ImageOperation(input.getImages().getNir()).rotate(t2).getImage();
+				if (options.isProcessNir()) {
+					nirMask = automaticProcessIntervallSearch(input.getMasks().getNir(), input.getMasks().getVis(), resultValues, typ);
+					t = (Vector2d) resultValues.getObject();
+					nirImage = new ImageOperation(input.getImages().getNir()).rotate(t.x).getImage();
+				}
 				break;
 			
 			case scale:
-				fluoMask = automaticScaleProcessIntervallSearch(input.getMasks().getFluo(), input.getMasks().getVis(), resultValues);
+				fluoMask = automaticProcessIntervallSearch(input.getMasks().getFluo(), input.getMasks().getVis(), resultValues, typ);
 				t = (Vector2d) resultValues.getObject();
 				fluoImage = new ImageOperation(input.getImages().getFluo()).scale(t.x, t.y).getImage();
 				
-				nirMask = automaticScaleProcessIntervallSearch(input.getMasks().getNir(), input.getMasks().getVis(), resultValues);
-				t = (Vector2d) resultValues.getObject();
-				nirImage = new ImageOperation(input.getImages().getNir()).scale(t.x, t.y).getImage();
+				if (options.isProcessNir()) {
+					nirMask = automaticProcessIntervallSearch(input.getMasks().getNir(), input.getMasks().getVis(), resultValues, typ);
+					t = (Vector2d) resultValues.getObject();
+					nirImage = new ImageOperation(input.getImages().getNir()).scale(t.x, t.y).getImage();
+				}
 				break;
 		}
 		
@@ -514,72 +525,172 @@ public class PhytochamberTopImageProcessor {
 		return rrr;
 	}
 	
-	private FlexibleImage automaticScaleProcessIntervallSearch(FlexibleImage workMask, FlexibleImage visImage, ObjectRef scaleResult) {
+	private FlexibleImage automaticProcessIntervallSearch(FlexibleImage workMask, FlexibleImage visImage, ObjectRef resultValue,
+			MorphologicalOperationEnumeration typ) {
 		
-		double bestValueX = automaticScaleProcessIntervallSearchPartly(workMask, visImage, 0, true);
-		double bestValueY = automaticScaleProcessIntervallSearchPartly(workMask, visImage, bestValueX, false);
+		double bestValueX = 0;
+		double bestValueY = 0;
 		
-		if (bestValueX != 0 && bestValueY != 0) {
-			ImageOperation io = new ImageOperation(workMask);
-			io.scale(bestValueX, bestValueY);
-			debugOverlayImages(io.getImage(), visImage, LayeringTyp.ROW_IMAGE);
-			Vector2d t = new Vector2d(bestValueX, bestValueY);
-			scaleResult.setObject(t);
-			
-			System.out.println("Best scal is X = " + bestValueX + ", Y = " + bestValueY);
-			return io.getImage();
+		if (typ == MorphologicalOperationEnumeration.rotation) {
+			bestValueX = automaticIntervallSearchPartly(workMask, visImage, typ);
 		} else {
-			System.out.println("Best scale is X = 0 und Y = 0");
-			Vector2d t = new Vector2d(0d, 0d);
-			scaleResult.setObject(t);
-			return workMask;
+			bestValueX = automaticIntervallSearchPartly(workMask, visImage, 0, true, typ);
+			bestValueY = automaticIntervallSearchPartly(workMask, visImage, bestValueX, false, typ);
+			
 		}
+		
+		return automaticSearchValueApplyToMaskAndReturn(workMask, visImage, resultValue, bestValueX, bestValueY, typ);
 	}
 	
-	private double automaticIntervallSearchPartly(FlexibleImage workMask, FlexibleImage visImage, double bestValueOfOtherTranslation,
-			boolean typOfTranslatiion, MorphologicalOperationEnumeration typ) {
+	private double automaticIntervallSearchPartly(FlexibleImage workMask, FlexibleImage visImage, MorphologicalOperationEnumeration typ) {
+		
+		return automaticIntervallSearchPartly(workMask, visImage, 0, true, typ);
+	}
+	
+	private double automaticIntervallSearchPartly(FlexibleImage workMask, FlexibleImage visImage, double bestOtherValue,
+			boolean typOfProcess, MorphologicalOperationEnumeration typ) {
+		
+		double borderLeft = 0;
+		double borderRight = 0;
+		double intervallTeiler = 1.0;
 		
 		switch (typ) {
 			case translation:
-
+				borderLeft = -20;
+				borderRight = 20;
+				intervallTeiler = 0.2;
 				break;
 			
 			case scale:
-
+				borderLeft = 0.8;
+				borderRight = 1.2;
+				intervallTeiler = 0.1;
+				break;
+			
+			case rotation:
+				borderLeft = -5.0;
+				borderRight = 5.0;
+				intervallTeiler = 0.1;
 				break;
 		}
 		
+		double intervallLength = Math.abs(borderLeft - borderRight);
+		double intervallSteps = intervallLength * intervallTeiler;
+		
+		switch (typ) {
+			case translation:
+				return translationRecursive(workMask, visImage, borderLeft, borderRight, 0.0, -100000000000.0, intervallTeiler, intervallSteps, 0,
+						bestOtherValue, typOfProcess);
+				
+			case scale:
+				return scaleRecursive(workMask, visImage, borderLeft, borderRight, 0.0, -100000000000.0, intervallTeiler, intervallSteps, 0,
+						bestOtherValue, typOfProcess);
+				
+			case rotation:
+				return rotationRecursive(workMask, visImage, borderLeft, borderRight, 0.0, -100000000000.0, intervallTeiler, intervallSteps, 0);
+				
+			default:
+				return 0.0;
+		}
+	}
+	
+	private FlexibleImage automaticSearchValueApplyToMaskAndReturn(FlexibleImage workMask, FlexibleImage visImage, ObjectRef resultValue, double bestValueX,
+			double bestValueY, MorphologicalOperationEnumeration typ) {
+		
+		if (bestValueX != 0 && bestValueY != 0) {
+			ImageOperation io = new ImageOperation(workMask);
+			
+			switch (typ) {
+				case scale:
+					io.scale(bestValueX, bestValueY);
+					System.out.println("Best scal is X = " + bestValueX + ", Y = " + bestValueY);
+					break;
+				
+				case translation:
+					io.translate(bestValueX, bestValueY);
+					System.out.println("Best translation is X = " + bestValueX + ", Y = " + bestValueY);
+					break;
+				
+				case rotation:
+					io.rotate(bestValueX);
+					System.out.println("Best rotation is X = " + bestValueX);
+					break;
+				
+				default:
+					break;
+			}
+			
+			debugOverlayImages(io.getImage(), visImage, LayeringTyp.ROW_IMAGE);
+			Vector2d t = new Vector2d(bestValueX, bestValueY);
+			resultValue.setObject(t);
+			
+			return io.getImage();
+		} else {
+			switch (typ) {
+				case scale:
+					System.out.println("Best scal is X = 0, Y = 0");
+					break;
+				
+				case translation:
+					System.out.println("Best translation is X = 0, Y = 0");
+					break;
+				
+				case rotation:
+					System.out.println("Best rotation is X = 0");
+					break;
+				
+				default:
+					break;
+			}
+			
+			Vector2d t = new Vector2d(0d, 0d);
+			resultValue.setObject(t);
+			return workMask;
+		}
+		
+	}
+	
+	// ############################### HIer weiter !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	
+	private double recursivePass(FlexibleImage workMask, FlexibleImage visImage, double borderLeft, double borderRight, double bestSearchValue,
+			double bestValue, double intervallTeiler, double intervallSteps, int zaehler, double bestValueOfOtherScale, boolean isFirstValue,
+			MorphologicalOperationEnumeration typ) {
+		
+		double value = -1;
+		
+		for (double pass = borderLeft; pass <= borderRight; pass += intervallSteps) {
+			
+			if (typ == MorphologicalOperationEnumeration.rotation) {
+				if (Math.ceil(pass - 1) > 0.00001) // if(pass == 0) break;
+					break;
+				searchSuitableValue(workMask, visImage, pass, 0, typ);
+				
+			} else {
+				
+				if (typ == MorphologicalOperationEnumeration.scale) {
+					if (Math.ceil(pass - 1) > 0.00001) // if(pass == 1) break;
+						break;
+				} else {
+					if (Math.ceil(pass - 1) > 0.00001) // if(pass == 0) break;
+						break;
+				}
+				
+				if (isFirstValue)
+					value = searchSuitableValue(workMask, visImage, pass, 0, typ);
+				else
+					value = searchSuitableValue(workMask, visImage, bestValueOfOtherScale, pass, typ);
+				break;
+			}
+			
+			zaehler++;
+			
+			if (value > bestValue) {
+				bestValue = value;
+				bestSearchValue = pass;
+			}
+		}
+		
 		return 0.0;
-	}
-	
-	private double automaticTranslationProcessIntervallSearchPartly(FlexibleImage workMask, FlexibleImage visImage, double bestValueOfOtherTranslation,
-			boolean typOfTranslatiion) {
-		int borderLeft = -20;
-		int borderRight = 20;
-		double intervallTeiler = 0.2;
-		
-		double intervallLength = Math.abs(borderLeft - borderRight);
-		double intervallSteps = intervallLength * intervallTeiler;
-		
-		return translationRecursive(workMask, visImage, borderLeft, borderRight, 0.0, -100000000000.0, intervallTeiler, intervallSteps, 0,
-				bestValueOfOtherTranslation, typOfTranslatiion);
-	}
-	
-	private double automaticScaleProcessIntervallSearchPartly(FlexibleImage workMask, FlexibleImage visImage, double bestValueOfOtherScale,
-			boolean typOfScale) {
-		double borderLeft = 0.8;
-		double borderRight = 1.2;
-		double intervallTeiler = 0.1;
-		
-		// double intervallLength = Math.ceil(Math.abs(borderLeft - borderRight));
-		double intervallLength = Math.abs(borderLeft - borderRight);
-		double intervallSteps = intervallLength * intervallTeiler;
-		
-		// System.out.println("Länge: " + intervallLength);
-		// System.out.println("Steps: " + intervallSteps);
-		
-		return scaleRecursive(workMask, visImage, borderLeft, borderRight, 0.0, -100000000000.0, intervallTeiler, intervallSteps, 0,
-				bestValueOfOtherScale, typOfScale);
 	}
 	
 	private double scaleRecursive(FlexibleImage workMask, FlexibleImage visImage, double borderLeft, double borderRight, double bestScale,
@@ -621,28 +732,6 @@ public class PhytochamberTopImageProcessor {
 		
 	}
 	
-	private FlexibleImage automaticTranslationProcessIntervallSearch(FlexibleImage workMask, FlexibleImage visImage, ObjectRef translationResult) {
-		
-		double bestValueX = automaticTranslationProcessIntervallSearchPartly(workMask, visImage, 0, true);
-		double bestValueY = automaticTranslationProcessIntervallSearchPartly(workMask, visImage, bestValueX, false);
-		
-		if (bestValueX != 0 && bestValueY != 0) {
-			ImageOperation io = new ImageOperation(workMask);
-			io.translate(bestValueX, bestValueY);
-			debugOverlayImages(io.getImage(), visImage, LayeringTyp.ROW_IMAGE);
-			Vector2d t = new Vector2d(bestValueX, bestValueY);
-			translationResult.setObject(t);
-			
-			System.out.println("Best translation is X = " + bestValueX + ", Y = " + bestValueY);
-			return io.getImage();
-		} else {
-			System.out.println("Best translation is X = 0 und Y = 0");
-			Vector2d t = new Vector2d(0d, 0d);
-			translationResult.setObject(t);
-			return workMask;
-		}
-	}
-	
 	private double translationRecursive(FlexibleImage workMask, FlexibleImage visImage, double borderLeft, double borderRight, double bestTranslation,
 			double bestValue, double intervallTeiler, double intervallSteps, int zaehler, double bestValueOfOtherTranslation, boolean typOfTranslatiion) {
 		
@@ -678,37 +767,6 @@ public class PhytochamberTopImageProcessor {
 			return translationRecursive(workMask, visImage, newBorderLeft + newIntervallSteps, newBorderRight - newIntervallSteps, bestTranslation, bestValue,
 					newIntervallTeiler, newIntervallSteps, zaehler, bestValueOfOtherTranslation, typOfTranslatiion);
 		
-	}
-	
-	private FlexibleImage automaticRotationProcessIntervallSearch(FlexibleImage workMask, FlexibleImage visImage, ObjectRef rotationResult) {
-		
-		double borderLeft = -5.0;
-		double borderRight = 5.0;
-		double intervallTeiler = 0.1;
-		
-		// double intervallLength = Math.ceil(Math.abs(borderLeft - borderRight));
-		double intervallLength = Math.abs(borderLeft - borderRight);
-		double intervallSteps = intervallLength * intervallTeiler;
-		
-		// System.out.println("Länge: " + intervallLength);
-		// System.out.println("Steps: " + intervallSteps);
-		
-		double angle = 0;
-		
-		angle = rotationRecursive(workMask, visImage, borderLeft, borderRight, angle, -100000000000.0, intervallTeiler, intervallSteps, 0);
-		
-		if (angle != 0) {
-			ImageOperation io = new ImageOperation(workMask);
-			io.rotate(angle);
-			debugOverlayImages(io.getImage(), visImage, LayeringTyp.ROW_IMAGE);
-			rotationResult.setObject(angle);
-			System.out.println("Best rotation is " + angle);
-			return io.getImage();
-		} else {
-			System.out.println("Best rotation is 0.");
-			rotationResult.setObject(0d);
-			return workMask;
-		}
 	}
 	
 	private double rotationRecursive(FlexibleImage workMask, FlexibleImage visImage, double borderLeft, double borderRight, double bestAngle, double bestValue,
@@ -788,177 +846,6 @@ public class PhytochamberTopImageProcessor {
 		return o.getUnknownMeasurementValuePixels();
 	}
 	
-	// private void test() {
-	//
-	// BufferedImage rotatedFluoImage = fluoMask;
-	//
-	// if (Math.abs(bestAngle) > 0.001) {
-	// System.out.println("Detected plant rotation within snapshot: " + bestAngle
-	// + " degree");
-	//
-	// ImageOperation io = new ImageOperation(fluoMask);
-	// io.rotate(bestAngle);
-	// rotatedFluoImage = io.getImageAsBufferedImage();
-	// }
-	//
-	// FlexibleImage resNIR = applyMergedMaskToNIRimage(input.getNir(),
-	// combinedMask);
-	//
-	// largestResultImageSize = 0;
-	// // try different scaling
-	//
-	// // setScaleX(0.95);
-	// // setScaleY(0.87);
-	// double yscale = 0.915789473684211;
-	// for (double scale = 0.7; scale <= 1.3; scale += 0.03) {
-	//
-	// ImageOperation io = new ImageOperation(fluoMask);
-	// io.scale(scale, scale * yscale);
-	// // io.scale(scaleX * scale, scaleY * scale);
-	// BufferedImage rotFluo = io.getImageAsBufferedImage();
-	//
-	// MaskOperation o = new MaskOperation(rgbMask, rotFluo,
-	// options.getBackground());
-	// o.mergeMasks();
-	//
-	// if (o.getModifiedPixels() > largestResultImageSize) {
-	// bestScale = scale;
-	// largestResultImageSize = o.getModifiedPixels();
-	// bestMask = o;
-	// }
-	// }
-	// if (Math.abs(bestScale - 1) > 0.001) {
-	// System.out.println("Detected difference of scaling in comparison to pre-defined scaling. Difference: "
-	// + (int) (bestScale * 100) + " %");
-	// ImageOperation io = new ImageOperation(outputFluorImage);
-	// io.scale(bestScale, bestScale * yscale);
-	// outputFluorImage = io.getImageAsBufferedImage();
-	// }
-	//
-	// int[] rgbImage1A = ImageConverter.convertBIto1A(outputRGBImage);
-	//
-	// int[] fluoImage1A = ImageConverter.convertBIto1A(outputFluorImage);
-	//
-	// // modify source images according to merged mask
-	// int i = 0;
-	// int background = options.getBackground();
-	// for (int m : bestMask.getMaskAs1Array()) {
-	// if (m == 0) {
-	// rgbImage1A[i] = background;
-	// fluoImage1A[i] = background;
-	// }
-	// i++;
-	// }
-	//
-	// output = rgbImage1A;
-	// output = fluoImage1A;
-	//
-	// return new FlexibleImageSet(new
-	// FlexibleImage(ImageConverter.convert1AtoBI(rgbMask.getWidth(),
-	// rgbMask.getHeight(), bestMask.getMask())), new
-	// FlexibleImage(rotatedFluoImage), mask.getNir());
-	// }
-	
-	//
-	//
-	// int largestResultImageSize = -1;
-	// double bestAngle = 0, bestScale = 1;
-	// MaskOperation bestMask = null;
-	//
-	// FlexibleImage rotImage = null;
-	//
-	// // try different rotations
-	// for (double angle = -5; angle <= 5; angle += 0.1) {
-	//
-	// ImageOperation io = new ImageOperation(image);
-	// io.rotate(angle);
-	//
-	// MaskOperation o = new MaskOperation(input.getVis(), rotImage, null,
-	// options.getBackground(), Color.GRAY.getRGB());
-	// o.mergeMasks();
-	//
-	// if (o.getModifiedPixels() > largestResultImageSize) {
-	// bestAngle = angle;
-	// largestResultImageSize = o.getModifiedPixels();
-	// bestMask = o;
-	// }
-	// }
-	//
-	// if (bestMask == null) {
-	// MaskOperation o = new MaskOperation(mask.getVis(), mask.getFluo(),
-	// options.getBackground());
-	// o.mergeMasks();
-	// bestMask = o;
-	// }
-	//
-	// BufferedImage rotatedFluoImage = fluoMask;
-	//
-	// if (Math.abs(bestAngle) > 0.001) {
-	// System.out.println("Detected plant rotation within snapshot: " + bestAngle
-	// + " degree");
-	//
-	// ImageOperation io = new ImageOperation(fluoMask);
-	// io.rotate(bestAngle);
-	// rotatedFluoImage = io.getImageAsBufferedImage();
-	// }
-	//
-	// FlexibleImage resNIR = applyMergedMaskToNIRimage(input.getNir(),
-	// combinedMask);
-	//
-	// largestResultImageSize = 0;
-	// // try different scaling
-	//
-	// // setScaleX(0.95);
-	// // setScaleY(0.87);
-	// double yscale = 0.915789473684211;
-	// for (double scale = 0.7; scale <= 1.3; scale += 0.03) {
-	//
-	// ImageOperation io = new ImageOperation(fluoMask);
-	// io.scale(scale, scale * yscale);
-	// // io.scale(scaleX * scale, scaleY * scale);
-	// BufferedImage rotFluo = io.getImageAsBufferedImage();
-	//
-	// MaskOperation o = new MaskOperation(rgbMask, rotFluo,
-	// options.getBackground());
-	// o.mergeMasks();
-	//
-	// if (o.getModifiedPixels() > largestResultImageSize) {
-	// bestScale = scale;
-	// largestResultImageSize = o.getModifiedPixels();
-	// bestMask = o;
-	// }
-	// }
-	// if (Math.abs(bestScale - 1) > 0.001) {
-	// System.out.println("Detected difference of scaling in comparison to pre-defined scaling. Difference: "
-	// + (int) (bestScale * 100) + " %");
-	// ImageOperation io = new ImageOperation(outputFluorImage);
-	// io.scale(bestScale, bestScale * yscale);
-	// outputFluorImage = io.getImageAsBufferedImage();
-	// }
-	//
-	// int[] rgbImage1A = ImageConverter.convertBIto1A(outputRGBImage);
-	//
-	// int[] fluoImage1A = ImageConverter.convertBIto1A(outputFluorImage);
-	//
-	// // modify source images according to merged mask
-	// int i = 0;
-	// int background = options.getBackground();
-	// for (int m : bestMask.getMaskAs1Array()) {
-	// if (m == 0) {
-	// rgbImage1A[i] = background;
-	// fluoImage1A[i] = background;
-	// }
-	// i++;
-	// }
-	//
-	// output = rgbImage1A;
-	// output = fluoImage1A;
-	//
-	// return new FlexibleImageSet(new
-	// FlexibleImage(ImageConverter.convert1AtoBI(rgbMask.getWidth(),
-	// rgbMask.getHeight(), bestMask.getMask())), new
-	// FlexibleImage(rotatedFluoImage), mask.getNir());
-	
 	private StopWatch debugStart(String task) {
 		if (debugStack != null)
 			debugStack.addImage("Input for " + task, input.getOverviewImage(debugStackWidth));
@@ -993,9 +880,16 @@ public class PhytochamberTopImageProcessor {
 		
 		System.out.println("Phytochamber Test");
 		
-		IOurl urlFlu = new IOurl("mongo_ba-13.ipk-gatersleben.de://26b7e285fae43dac107016afb4dc2841/WT01_1385");
-		IOurl urlVis = new IOurl("mongo_ba-13.ipk-gatersleben.de://12b6db018fddf651b414b652fc8f3d8d/WT01_1385");
-		IOurl urlNIR = new IOurl("mongo_ba-13.ipk-gatersleben.de://c72e4fcc141b8b2a97851ab2fde8106a/WT01_1385");
+		// IOurl urlFlu = new IOurl("mongo_ba-13.ipk-gatersleben.de://26b7e285fae43dac107016afb4dc2841/WT01_1385");
+		// IOurl urlVis = new IOurl("mongo_ba-13.ipk-gatersleben.de://12b6db018fddf651b414b652fc8f3d8d/WT01_1385");
+		// IOurl urlNIR = new IOurl("mongo_ba-13.ipk-gatersleben.de://c72e4fcc141b8b2a97851ab2fde8106a/WT01_1385");
+		
+		IOurl urlFlu = new IOurl(
+				"mongo_ba-13.ipk-gatersleben.de_cloud1://996cfdd21a46131d6ea1c4e083fdadbf63d9f736dd83de1828b03a452f2a1e787c3da9939cd4b1f7a1d86aa5a524df1d2b6c4ce4e86ae0c41c53f62db589a1ce/flu_top_day_0_WT01_1385.png");
+		IOurl urlVis = new IOurl(
+				"mongo_ba-13.ipk-gatersleben.de_cloud1://6ca4ff9c5def146d4bfa7c8e60fd2d201a2bbeb81df4bf82100179a5b6d9edfa90e07151f847647ea8b5c64a6515fe95ee8d4510268aaa2708a0a572b1d5531b/rgb_top_day_0_WT01_1385.png");
+		IOurl urlNIR = new IOurl(
+				"mongo_ba-13.ipk-gatersleben.de_cloud1://84ba53b9380344ab33bef908e78274e4fbb1d3381519e95e0a8b0c3b27c617de608c4e6ade3123a6140070251cac75205979a398bff7a06510cbf2239750c5cd/nir_top_day_0_WT01_1385.png");
 		
 		// IOurl urlVis = new IOurl("file:///E:/austausch/Desktop/Bilder5/ersteRGBBild.png");
 		// IOurl urlFlu = new IOurl("file:///E:/austausch/Desktop/bilder2/ersteBild.png");

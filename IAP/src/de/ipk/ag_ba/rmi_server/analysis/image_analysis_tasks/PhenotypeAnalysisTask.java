@@ -246,9 +246,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		
 		if (removeSmallSegments)
 			if (config == ImageConfiguration.FluoTop)
-				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.005d));
+				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.002d));
 			else
-				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.005d));//
+				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.002d));//
 				
 		if (dataAnalysis) {
 			Geometry g = detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
