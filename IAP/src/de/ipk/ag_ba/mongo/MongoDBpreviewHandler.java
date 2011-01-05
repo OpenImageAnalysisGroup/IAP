@@ -11,9 +11,9 @@ import java.io.InputStream;
 
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
-import org.graffiti.plugin.io.resources.ResourceIOHandler;
 
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
@@ -22,17 +22,13 @@ import com.mongodb.gridfs.GridFSDBFile;
 /**
  * @author klukas
  */
-public class MongoDBpreviewHandler implements ResourceIOHandler {
-	// mongo-preview://c3fd77bc7b74388d9dcff9d09d1c16fc/000Grad.png
+public class MongoDBpreviewHandler extends AbstractResourceIOHandler {
 	private String PREFIX = "mongo-preview";
-	private final String ip;
 	private final MongoDB m;
 	
 	public MongoDBpreviewHandler(String ip, MongoDB m) {
-		this.ip = ip;
 		this.m = m;
-		if (ip != null && ip.length() > 0)
-			PREFIX = "mongo-preview_" + ip;
+		PREFIX = "mongo-preview_" + ip + "_" + m.getDatabaseName();
 	}
 	
 	@Override
