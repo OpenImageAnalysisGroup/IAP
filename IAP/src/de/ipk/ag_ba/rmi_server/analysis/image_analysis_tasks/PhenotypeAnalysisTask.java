@@ -585,8 +585,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 								final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
 								final double[] arrayB, int x) {
 				simple = false;
-				if (y == 0)
-					System.out.println("LAB processing of RGB image..." + imageData.toString() + " - simple white mode: " + simple);
+				// if (y == 0)
+				// System.out.println("LAB processing of RGB image..." + imageData.toString() + " - simple white mode: " + simple);
 				if (simple) {
 					int i = x + y * w;
 					for (x = 0; x < w; x++) {
@@ -629,8 +629,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			private void processFluoTopImageByLAB(final ImageData imageData, final int w, final int[] rgbArray,
 								final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
 								final double[] arrayB, int x) {
-				if (y == 0)
-					System.out.println("LAB processing of FluoTop image..." + imageData.toString() + "");
+				// if (y == 0)
+				// System.out.println("LAB processing of FluoTop image..." + imageData.toString() + "");
 				
 				int i = x + y * w;
 				for (x = 0; x < w; x++) {

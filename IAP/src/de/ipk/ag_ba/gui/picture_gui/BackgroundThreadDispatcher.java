@@ -171,7 +171,7 @@ public class BackgroundThreadDispatcher {
 								runningTasks.add(t);
 							}
 						}
-						System.out.println("Running tasks: " + runningTasks.size() + "/" + maxTask + " max");
+						// System.out.println("Running tasks: " + runningTasks.size() + "/" + maxTask + " max");
 						// wait until the number of running tasks gets below the
 						// maximum
 						// then a new one can be started above

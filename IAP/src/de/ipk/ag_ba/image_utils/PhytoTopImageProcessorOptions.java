@@ -49,6 +49,10 @@ public class PhytoTopImageProcessorOptions {
 	
 	private boolean processNir;
 	
+	private boolean debugTakeTimes;
+	
+	private boolean debugOverlayResultImage;
+	
 	public PhytoTopImageProcessorOptions() {
 		this(1.0);
 	}
@@ -100,6 +104,9 @@ public class PhytoTopImageProcessorOptions {
 		setPostProcessErodeNirTop((int) Math.ceil(1 * scale));
 		
 		setProcessNir(false);
+		
+		setDebugTakeTimes(false);
+		setDebugOverlayResult(false);
 	}
 	
 	// ########## SET ###############
@@ -384,5 +391,25 @@ public class PhytoTopImageProcessorOptions {
 	
 	public boolean isProcessNir() {
 		return processNir;
+	}
+	
+	public void setDebugTakeTimes(boolean enable) {
+		debugTakeTimes = enable;
+	}
+	
+	public boolean isDebugTakeTimes() {
+		return debugTakeTimes;
+	}
+	
+	public double getEpsilon() {
+		return 0.00001;
+	}
+	
+	public void setDebugOverlayResult(boolean enable) {
+		this.debugOverlayResultImage = enable;
+	}
+	
+	public boolean isDebugOverlayResult() {
+		return debugOverlayResultImage;
 	}
 }
