@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -88,14 +87,14 @@ public class MongoDB {
 	
 	@Override
 	public String toString() {
-		return displayName + " (" + defaultHost + ", db " + defaultDBE + ")";
+		return displayName + " (" + databaseHost + ", db " + databaseName + ")";
 	}
 	
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de")) {
-			res.add(new MongoDB("IAP MD5", "dbe3", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
-			res.add(new MongoDB("IAP SHA-512", "IAP1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
+			res.add(new MongoDB("Cloud Storage 1", "cloud1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
+			res.add(new MongoDB("Cloud Storage 2", "cloud2", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
 		}
 		
 		// if (IAPservice.isReachable("localhost")) {
@@ -109,17 +108,17 @@ public class MongoDB {
 	private MongoDBpreviewHandler mp;
 	
 	public ResourceIOHandler[] getHandlers() {
-		String serverIP = defaultHost;
+		String serverIP = databaseHost;
 		this.mh = new MongoDBhandler(serverIP, this);
 		this.mp = new MongoDBpreviewHandler(serverIP, this);
 		return new ResourceIOHandler[] { mh, mp };
 	}
 	
 	private final String displayName;
-	private final String defaultDBE;
-	private final String defaultHost;
-	private final String defaultLogin;
-	private final String defaultPass;
+	private final String databaseName;
+	private final String databaseHost;
+	private final String databaseLogin;
+	private final String databasePass;
 	private final HashType hashType;
 	
 	// collections:
@@ -135,10 +134,10 @@ public class MongoDB {
 		if (databaseName == null || databaseName.contains("_") || databaseName.contains("/"))
 			throw new UnsupportedOperationException("Database name may not be NULL and may not contain special characters!");
 		this.displayName = displayName;
-		this.defaultDBE = databaseName;
-		this.defaultHost = hostName;
-		this.defaultLogin = login;
-		this.defaultPass = password;
+		this.databaseName = databaseName;
+		this.databaseHost = hostName;
+		this.databaseLogin = login;
+		this.databasePass = password;
 		this.hashType = hashType;
 	}
 	
@@ -173,9 +172,9 @@ public class MongoDB {
 			maxLoad.acquire();
 			DB db;
 			if (m == null) {
-				if (optHosts == null || optHosts.length() == 0)
+				if (optHosts == null || optHosts.length() == 0) {
 					m = new Mongo();
-				else {
+				} else {
 					List<ServerAddress> seeds = new ArrayList<ServerAddress>();
 					for (String h : optHosts.split(","))
 						seeds.add(new ServerAddress(h));
@@ -197,7 +196,7 @@ public class MongoDB {
 	}
 	
 	public void processDB(RunnableOnDB runnableOnDB) throws Exception {
-		processDB(getDatabaseName(), defaultHost, defaultLogin, defaultPass, runnableOnDB);
+		processDB(getDatabaseName(), databaseHost, databaseLogin, databasePass, runnableOnDB);
 	}
 	
 	public void deleteUnusedBinaryFiles() {
@@ -305,8 +304,6 @@ public class MongoDB {
 								MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK })) {
 							DatabaseStorageResult res = null;
 							attributes.clear();
-							m.fillAttributeMap(attributes);
-							BasicDBObject dbo = new BasicDBObject(filter(attributes));
 							try {
 								if (m instanceof ImageData) {
 									ImageData id = (ImageData) m;
@@ -314,8 +311,11 @@ public class MongoDB {
 									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 										errorCount++;
 										errors.append("<li>" + id.getURL().getFileName());
-									} else
+									} else {
+										m.fillAttributeMap(attributes);
+										BasicDBObject dbo = new BasicDBObject(filter(attributes));
 										dbImages.add(dbo);
+									}
 									count++;
 								}
 								if (m instanceof VolumeData) {
@@ -324,8 +324,11 @@ public class MongoDB {
 									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 										errorCount++;
 										errors.append("<li>" + vd.getURL().getFileName());
-									} else
+									} else {
+										m.fillAttributeMap(attributes);
+										BasicDBObject dbo = new BasicDBObject(filter(attributes));
 										dbVolumes.add(dbo);
+									}
 								}
 								if (m instanceof NetworkData) {
 									NetworkData nd = (NetworkData) m;
@@ -333,8 +336,11 @@ public class MongoDB {
 									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 										errorCount++;
 										errors.append("<li>" + nd.getURL().getFileName());
-									} else
+									} else {
+										m.fillAttributeMap(attributes);
+										BasicDBObject dbo = new BasicDBObject(filter(attributes));
 										dbNetworks.add(dbo);
+									}
 								}
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
@@ -587,7 +593,7 @@ public class MongoDB {
 	
 	public DatabaseStorageResult saveImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
 		MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
-		ImageData srcID = id;
+		ImageData image = id;
 		
 		if (is == null) {
 			System.out.println("No input stream for source-URL: " + id.getURL());
@@ -611,10 +617,10 @@ public class MongoDB {
 		
 		GridFSDBFile fff = gridfs_images.findOne(hash);
 		
-		srcID.getURL().setPrefix(mh.getPrefix());
-		srcID.getURL().setDetail(hash);
+		image.getURL().setPrefix(mh.getPrefix());
+		image.getURL().setDetail(hash);
 		
-		if (fff != null && fff.getLength() <= 0) {
+		if (fff != null) { // && fff.getLength() <= 0
 			System.out.println("Found Zero-Size File.");
 			gridfs_images.remove(fff);
 			fff = null;
@@ -699,11 +705,11 @@ public class MongoDB {
 	// }
 	
 	public String getDatabaseName() {
-		return defaultDBE;
+		return databaseName;
 	}
 	
 	public String getDefaultHost() {
-		return defaultHost;
+		return databaseHost;
 	}
 	
 	// public void setDefaultHost(String defaultHost) {
@@ -711,7 +717,7 @@ public class MongoDB {
 	// }
 	
 	public String getDefaultLogin() {
-		return defaultLogin;
+		return databaseLogin;
 	}
 	
 	// public void setDefaultLogin(String defaultLogin) {
@@ -719,7 +725,7 @@ public class MongoDB {
 	// }
 	
 	public String getDefaultPass() {
-		return defaultPass;
+		return databasePass;
 	}
 	
 	// public void setDefaultPass(String defaultPass) {
@@ -1295,15 +1301,7 @@ public class MongoDB {
 					for (Object m : imgList) {
 						DBObject img = (DBObject) m;
 						@SuppressWarnings("unchecked")
-						Map<String, Object> map = img.toMap();
-						String fn = (String) map.get("filename");
-						String hash = (String) map.get("md5sum");
-						if (hash != null && fn != null) {
-							map.remove("md5sum");
-							map.put("filename", mh.getPrefix() + "://" + hash + "/" + fn);
-						}
-						
-						ImageData image = new ImageData(sample, map);
+						ImageData image = new ImageData(sample, img.toMap());
 						image.getURL().setPrefix(mh.getPrefix());
 						sample.add(image);
 					}
@@ -1314,14 +1312,7 @@ public class MongoDB {
 					for (Object v : volList) {
 						DBObject vol = (DBObject) v;
 						@SuppressWarnings("unchecked")
-						Map<String, Object> map = vol.toMap();
-						String fn = (String) map.get("filename");
-						String hash = (String) map.get("md5sum");
-						if (hash != null && fn != null) {
-							map.remove("md5sum");
-							map.put("filename", mh.getPrefix() + "://" + hash + "/" + fn);
-						}
-						VolumeData volume = new VolumeData(sample, map);
+						VolumeData volume = new VolumeData(sample, vol.toMap());
 						if (volume.getURL() != null) {
 							volume.getURL().setPrefix(mh.getPrefix());
 							sample.add(volume);
@@ -1335,14 +1326,7 @@ public class MongoDB {
 					for (Object n : netList) {
 						DBObject net = (DBObject) n;
 						@SuppressWarnings("unchecked")
-						Map<String, Object> map = net.toMap();
-						String fn = (String) map.get("filename");
-						String hash = (String) map.get("md5sum");
-						if (hash != null && fn != null) {
-							map.remove("md5sum");
-							map.put("filename", mh.getPrefix() + "://" + hash + "/" + fn);
-						}
-						NetworkData network = new NetworkData(sample, map);
+						NetworkData network = new NetworkData(sample, net.toMap());
 						if (network.getURL() != null) {
 							network.getURL().setPrefix(mh.getPrefix());
 							sample.add(network);

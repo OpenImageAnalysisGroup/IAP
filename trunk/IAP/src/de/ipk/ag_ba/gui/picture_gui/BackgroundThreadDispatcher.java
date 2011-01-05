@@ -229,7 +229,7 @@ public class BackgroundThreadDispatcher {
 		int mbFree = (int) (Runtime.getRuntime().freeMemory() / 1024 / 1024);
 		int mbTotal = (int) (Runtime.getRuntime().totalMemory() / 1024 / 1024);
 		int mbMax = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
-		if (mbTotal < (int) (mbMax * 0.7))
+		if (mbTotal < (int) (mbMax * 0.6))
 			return false;
 		if (mbFree < (int) (mbMax * 0.3d)) {
 			if (System.currentTimeMillis() - lastPrint > 1000) {

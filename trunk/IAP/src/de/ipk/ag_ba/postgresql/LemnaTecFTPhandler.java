@@ -11,11 +11,11 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
-import org.graffiti.plugin.io.resources.ResourceIOHandler;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -28,7 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 /**
  * @author klukas
  */
-public class LemnaTecFTPhandler implements ResourceIOHandler {
+public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	
 	public static final String PREFIX = "lemnatec-ftp";
 	

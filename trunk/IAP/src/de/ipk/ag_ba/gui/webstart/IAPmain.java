@@ -42,8 +42,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.DBEsplashScreen;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolumeHandler;
 
 /**
  * @author klukas
@@ -126,8 +124,8 @@ public class IAPmain extends JApplet {
 	}
 	
 	private void registerIOhandlers() {
-		ResourceIOManager.registerIOHandler(LoadedVolumeHandler.getInstance());
-		ResourceIOManager.registerIOHandler(LoadedImageHandler.getInstance());
+		// ResourceIOManager.registerIOHandler(LoadedVolumeHandler.getInstance());
+		// ResourceIOManager.registerIOHandler(LoadedImageHandler.getInstance());
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (MongoDB m : MongoDB.getMongos())
 			for (ResourceIOHandler handler : m.getHandlers())
