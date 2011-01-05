@@ -347,7 +347,8 @@ public class MongoDB {
 								res = DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 							}
 							if (status != null) {
-								count++;
+								if (res != null)
+									count++;
 								double prog = count * (100d / numberOfBinaryData);
 								status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
 								status.setCurrentStatusValueFine(prog);
@@ -533,7 +534,7 @@ public class MongoDB {
 		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
-	private long saveNetworkFile(GridFS gridfs_networks, GridFS gridfs_preview, NetworkData id, ObjectRef optFileSize,
+	private long saveNetworkFile(GridFS gridfs_networks, GridFS gridfs_preview, NetworkData network, ObjectRef optFileSize,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus, String hash) throws Exception {
 		
 		if (optStatus != null)
@@ -547,19 +548,20 @@ public class MongoDB {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Save Network");
 		GridFSDBFile vvv = gridfs_networks.findOne(hash);
+		
 		if (vvv != null) {
 			gridfs_preview.remove(vvv);
 			vvv = null;
 		}
-		InputStream is = id.getURL().getInputStream();
+		InputStream is = network.getURL().getInputStream();
 		
 		GridFSInputFile inputFile = gridfs_networks.createFile(is);
 		inputFile.setFilename(hash);
-		inputFile.getMetaData().put("name", id.getURL().getFileName());
+		inputFile.getMetaData().put("name", network.getURL().getFileName());
 		inputFile.save();
-		System.out.println("SAVED NETWORK: " + id.toString() + " // SIZE: " + inputFile.getLength());
+		System.out.println("SAVED NETWORK: " + network.toString() + " // SIZE: " + inputFile.getLength());
 		
-		GridFSDBFile fff = gridfs_preview.findOne(id.getURL().getDetail());
+		GridFSDBFile fff = gridfs_preview.findOne(network.getURL().getDetail());
 		if (fff != null) {
 			gridfs_preview.remove(fff);
 			fff = null;
@@ -570,16 +572,16 @@ public class MongoDB {
 					optStatus.setCurrentStatusText1("Render Side Views");
 				System.out.println("Render side view GIF...");
 				LoadedNetwork ln;
-				if (id instanceof LoadedNetwork)
-					ln = (LoadedNetwork) id;
+				if (network instanceof LoadedNetwork)
+					ln = (LoadedNetwork) network;
 				else
-					ln = IOmodule.loadNetwork(id);
+					ln = IOmodule.loadNetwork(network);
 				GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule
 						.getNetworkPreviewIcon(ln, optStatus));
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Save Preview Icon");
 				inputFilePreview.setFilename(hash);
-				inputFilePreview.getMetaData().put("name", id.getURL().getFileName());
+				inputFilePreview.getMetaData().put("name", network.getURL().getFileName());
 				inputFilePreview.save();
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
@@ -587,8 +589,8 @@ public class MongoDB {
 		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved Network ("
-					+ ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
-		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
+					+ ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
+		return ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
 	public DatabaseStorageResult saveImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
@@ -620,7 +622,7 @@ public class MongoDB {
 		image.getURL().setPrefix(mh.getPrefix());
 		image.getURL().setDetail(hash);
 		
-		if (fff != null) { // && fff.getLength() <= 0
+		if (fff != null && fff.getLength() <= 0) {
 			System.out.println("Found Zero-Size File.");
 			gridfs_images.remove(fff);
 			fff = null;
@@ -680,6 +682,9 @@ public class MongoDB {
 		String hash;
 		try {
 			hash = GravistoService.getHashFromInputStream(network.getURL().getInputStream(), optFileSize, getHashType());
+			
+			network.getURL().setPrefix(mh.getPrefix());
+			network.getURL().setDetail(hash);
 			
 			GridFSDBFile fff = gridfs_networks.findOne(hash);
 			if (fff != null && fff.getLength() <= 0) {
