@@ -47,6 +47,8 @@ public class PhytoTopImageProcessorOptions {
 	private int postProcessDilateNirTop;
 	private int postProcessErodeNirTop;
 	
+	private boolean processNir;
+	
 	public PhytoTopImageProcessorOptions() {
 		this(1.0);
 	}
@@ -56,7 +58,6 @@ public class PhytoTopImageProcessorOptions {
 	}
 	
 	void initStandardValues(double scale) {
-		System.out.println("aktueller scale-Wert: " + scale);
 		
 		setScale(scale);
 		
@@ -84,8 +85,8 @@ public class PhytoTopImageProcessorOptions {
 		setNearNumberOfErodeLoops((int) Math.ceil(1 * scale));
 		setNearNumberOfDilateLoops((int) Math.ceil(2 * scale));
 		
-		setDilateRgbTop((int) Math.ceil(20 * scale));
-		setErodeRgbTop((int) Math.ceil(3 * scale));
+		setDilateRgbTop((int) Math.ceil(15 * scale));
+		setErodeRgbTop((int) Math.ceil(10 * scale));
 		setDilateFluoTop((int) Math.ceil(2 * scale));
 		setErodeFluoTop((int) Math.ceil(1 * scale));
 		
@@ -97,6 +98,8 @@ public class PhytoTopImageProcessorOptions {
 		setPostProcessErodeFluoTop((int) Math.ceil(1 * scale));
 		setPostProcessDilateNirTop((int) Math.ceil(1 * scale));
 		setPostProcessErodeNirTop((int) Math.ceil(1 * scale));
+		
+		setProcessNir(false);
 	}
 	
 	// ########## SET ###############
@@ -373,5 +376,13 @@ public class PhytoTopImageProcessorOptions {
 	
 	public int getPostProcessErodeNirTop() {
 		return postProcessErodeNirTop;
+	}
+	
+	public void setProcessNir(boolean processNir) {
+		this.processNir = processNir;
+	}
+	
+	public boolean isProcessNir() {
+		return processNir;
 	}
 }
