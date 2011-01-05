@@ -64,6 +64,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		this.storeResultInDatabase = storeResultInDatabase;
 	}
 	
+	@Override
 	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
 		this.input = input;
 		this.m = m;
@@ -583,6 +584,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			private void processRGBtopImageByLAB(boolean simple, final ImageData imageData, final int w, final int[] rgbArray,
 								final int iBackgroundFill, final int y, final double[] arrayL, final double[] arrayA,
 								final double[] arrayB, int x) {
+				simple = false;
 				if (y == 0)
 					System.out.println("LAB processing of RGB image..." + imageData.toString() + " - simple white mode: " + simple);
 				if (simple) {

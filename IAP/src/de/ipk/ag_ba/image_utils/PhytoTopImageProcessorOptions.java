@@ -13,6 +13,8 @@ import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTa
  * @author klukas
  */
 public class PhytoTopImageProcessorOptions {
+	private double scale;
+	
 	private double rotationAngle;
 	private double scaleX;
 	private double scaleY;
@@ -32,8 +34,32 @@ public class PhytoTopImageProcessorOptions {
 	private int fluoNumberOfDilateLoops;
 	private int nearNumberOfErodeLoops;
 	private int nearNumberOfDilateLoops;
+	private int dilateRgbTop;
+	private int erodeRgbTop;
+	private int dilateFluoTop;
+	private int erodeFluoTop;
+	private int closingNirTop;
 	
-	void initStandardValues() {
+	private int postProcessDilateRgbTop;
+	private int postProcessErodeRgbTop;
+	private int postProcessDilateFluoTop;
+	private int postProcessErodeFluoTop;
+	private int postProcessDilateNirTop;
+	private int postProcessErodeNirTop;
+	
+	public PhytoTopImageProcessorOptions() {
+		this(1.0);
+	}
+	
+	public PhytoTopImageProcessorOptions(double scale) {
+		initStandardValues(scale);
+	}
+	
+	void initStandardValues(double scale) {
+		System.out.println("aktueller scale-Wert: " + scale);
+		
+		setScale(scale);
+		
 		setRotationAngle(-3);
 		
 		setScaleX(0.95);
@@ -51,16 +77,34 @@ public class PhytoTopImageProcessorOptions {
 		setNearEpsilonA(0.5);
 		setNearEpsilonB(1.0);
 		
-		setRgbNumberOfErodeLoops(2);
-		setRgbNumberOfDilateLoops(5);
-		setFluoNumberOfErodeLoops(2);
-		setFluoNumberOfDilateLoops(5);
-		setNearNumberOfErodeLoops(1);
-		setNearNumberOfDilateLoops(2);
+		setRgbNumberOfErodeLoops((int) Math.ceil(2 * scale));
+		setRgbNumberOfDilateLoops((int) Math.ceil(5 * scale));
+		setFluoNumberOfErodeLoops((int) Math.ceil(2 * scale));
+		setFluoNumberOfDilateLoops((int) Math.ceil(5 * scale));
+		setNearNumberOfErodeLoops((int) Math.ceil(1 * scale));
+		setNearNumberOfDilateLoops((int) Math.ceil(2 * scale));
 		
+		setDilateRgbTop((int) Math.ceil(20 * scale));
+		setErodeRgbTop((int) Math.ceil(3 * scale));
+		setDilateFluoTop((int) Math.ceil(2 * scale));
+		setErodeFluoTop((int) Math.ceil(1 * scale));
+		
+		setClosingNirTop((int) Math.ceil(1 * scale));
+		
+		setPostProcessDilateRgbTop((int) Math.ceil(1 * scale));
+		setPostProcessErodeRgbTop((int) Math.ceil(1 * scale));
+		setPostProcessDilateFluoTop((int) Math.ceil(1 * scale));
+		setPostProcessErodeFluoTop((int) Math.ceil(1 * scale));
+		setPostProcessDilateNirTop((int) Math.ceil(1 * scale));
+		setPostProcessErodeNirTop((int) Math.ceil(1 * scale));
 	}
 	
 	// ########## SET ###############
+	
+	private void setScale(double scale) {
+		this.scale = scale;
+		
+	}
 	
 	public void setRotationAngle(int rotationAngle) {
 		this.rotationAngle = rotationAngle;
@@ -159,6 +203,10 @@ public class PhytoTopImageProcessorOptions {
 	
 	// ########## GET #############
 	
+	public double getScale() {
+		return scale;
+	}
+	
 	public double getRotationAngle() {
 		return rotationAngle;
 	}
@@ -237,5 +285,93 @@ public class PhytoTopImageProcessorOptions {
 	
 	public double getRotationAngleNir() {
 		return 0;
+	}
+	
+	public void setDilateRgbTop(int dilateRgbTop) {
+		this.dilateRgbTop = dilateRgbTop;
+	}
+	
+	public int getDilateRgbTop() {
+		return dilateRgbTop;
+	}
+	
+	public void setErodeRgbTop(int erodeRgbTop) {
+		this.erodeRgbTop = erodeRgbTop;
+	}
+	
+	public int getErodeRgbTop() {
+		return erodeRgbTop;
+	}
+	
+	public void setDilateFluoTop(int dilateFluoTop) {
+		this.dilateFluoTop = dilateFluoTop;
+	}
+	
+	public int getDilateFluoTop() {
+		return dilateFluoTop;
+	}
+	
+	public void setErodeFluoTop(int erodeFluoTop) {
+		this.erodeFluoTop = erodeFluoTop;
+	}
+	
+	public int getErodeFluoTop() {
+		return erodeFluoTop;
+	}
+	
+	public void setClosingNirTop(int closingNirTop) {
+		this.closingNirTop = closingNirTop;
+	}
+	
+	public int getClosingNirTop() {
+		return closingNirTop;
+	}
+	
+	public void setPostProcessDilateRgbTop(int postProcessDilateRgbTop) {
+		this.postProcessDilateRgbTop = postProcessDilateRgbTop;
+	}
+	
+	public int getPostProcessDilateRgbTop() {
+		return postProcessDilateRgbTop;
+	}
+	
+	public void setPostProcessErodeRgbTop(int postProcessErodeRgbTop) {
+		this.postProcessErodeRgbTop = postProcessErodeRgbTop;
+	}
+	
+	public int getPostProcessErodeRgbTop() {
+		return postProcessErodeRgbTop;
+	}
+	
+	public void setPostProcessDilateFluoTop(int postProcessDilateFluoTop) {
+		this.postProcessDilateFluoTop = postProcessDilateFluoTop;
+	}
+	
+	public int getPostProcessDilateFluoTop() {
+		return postProcessDilateFluoTop;
+	}
+	
+	public void setPostProcessErodeFluoTop(int postProcessErodeFluoTop) {
+		this.postProcessErodeFluoTop = postProcessErodeFluoTop;
+	}
+	
+	public int getPostProcessErodeFluoTop() {
+		return postProcessErodeFluoTop;
+	}
+	
+	public void setPostProcessDilateNirTop(int postProcessDilateNirTop) {
+		this.postProcessDilateNirTop = postProcessDilateNirTop;
+	}
+	
+	public int getPostProcessDilateNirTop() {
+		return postProcessDilateNirTop;
+	}
+	
+	public void setPostProcessErodeNirTop(int postProcessErodeNirTop) {
+		this.postProcessErodeNirTop = postProcessErodeNirTop;
+	}
+	
+	public int getPostProcessErodeNirTop() {
+		return postProcessErodeNirTop;
 	}
 }

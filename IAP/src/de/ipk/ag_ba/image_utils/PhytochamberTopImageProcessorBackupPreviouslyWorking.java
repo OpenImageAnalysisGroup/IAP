@@ -41,17 +41,17 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 	
 	private final PhytoTopImageProcessorOptions options;
 	
-	private final boolean takeTimes = false;
+	private final boolean takeTimes = true;
 	
 	public PhytochamberTopImageProcessorBackupPreviouslyWorking(FlexibleImageSet input) {
 		this.input = input;
 		
 		options = new PhytoTopImageProcessorOptions();
-		options.initStandardValues();
+		options.initStandardValues(1);
 	}
 	
 	public void setValuesToStandard() {
-		options.initStandardValues();
+		options.initStandardValues(1);
 	}
 	
 	public PhytochamberTopImageProcessorBackupPreviouslyWorking pipeline(int maxThreadsPerImage) {
@@ -387,7 +387,6 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 	}
 	
 	private PhytochamberTopImageProcessorBackupPreviouslyWorking automaticTranslation() {
-		System.out.println("automaticTranslation...");
 		StopWatch w = debugStart("atomaticRotation");
 		FlexibleImage rotatedFluoImage = automaticTranslationProcess(input.getFluo(), input.getVis());
 		debugEnd(w, null);
@@ -401,7 +400,6 @@ public class PhytochamberTopImageProcessorBackupPreviouslyWorking {
 	}
 	
 	private PhytochamberTopImageProcessorBackupPreviouslyWorking automaticRotation() {
-		System.out.println("automaticRotation...");
 		StopWatch w = debugStart("atomaticRotation");
 		FlexibleImage rotatedFluoImage = automaticRotationProcess(input.getFluo(), input.getVis());
 		debugEnd(w, null);
