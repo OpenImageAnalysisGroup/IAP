@@ -10,26 +10,21 @@ import java.io.InputStream;
 
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
-import org.graffiti.plugin.io.resources.ResourceIOHandler;
 
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
-public class MongoDBhandler implements ResourceIOHandler {
-	
-	// mongo://c3fd77bc7b74388d9dcff9d09d1c16fc/000Grad.png
-	private String PREFIX = "mongo";
-	private final String id;
+public class MongoDBhandler extends AbstractResourceIOHandler {
+	private final String PREFIX;
 	private final MongoDB m;
 	
 	public MongoDBhandler(String ip, MongoDB m) {
-		this.id = ip;
 		this.m = m;
-		if (id != null && id.length() > 0)
-			PREFIX = "mongo_" + ip;
+		PREFIX = "mongo_" + ip + "_" + m.getDatabaseName();
 	}
 	
 	@Override

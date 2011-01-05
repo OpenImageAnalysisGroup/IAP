@@ -94,14 +94,14 @@ public class MongoDB {
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de")) {
-			res.add(new MongoDB("IAP Cloud", "dbe3", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
-			res.add(new MongoDB("IAP NG", "IAP1", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
+			res.add(new MongoDB("IAP MD5", "dbe3", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
+			res.add(new MongoDB("IAP SHA-512", "IAP1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
 		}
 		
-		if (IAPservice.isReachable("localhost")) {
-			res.add(new MongoDB("local dbe3", "local_dbe3", "localhost", null, null, HashType.SHA512));
-			res.add(new MongoDB("local dbe4", "local_dbe4", "localhost", null, null, HashType.SHA512));
-		}
+		// if (IAPservice.isReachable("localhost")) {
+		// res.add(new MongoDB("local dbe3", "local_dbe3", "localhost", null, null, HashType.SHA512));
+		// res.add(new MongoDB("local dbe4", "local_dbe4", "localhost", null, null, HashType.SHA512));
+		// }
 		return res;
 	}
 	
@@ -132,6 +132,8 @@ public class MongoDB {
 	// conditions
 	
 	public MongoDB(String displayName, String databaseName, String hostName, String login, String password, HashType hashType) {
+		if (databaseName == null || databaseName.contains("_") || databaseName.contains("/"))
+			throw new UnsupportedOperationException("Database name may not be NULL and may not contain special characters!");
 		this.displayName = displayName;
 		this.defaultDBE = databaseName;
 		this.defaultHost = hostName;
@@ -195,7 +197,7 @@ public class MongoDB {
 	}
 	
 	public void processDB(RunnableOnDB runnableOnDB) throws Exception {
-		processDB(getDefaultDBE(), defaultHost, defaultLogin, defaultPass, runnableOnDB);
+		processDB(getDatabaseName(), defaultHost, defaultLogin, defaultPass, runnableOnDB);
 	}
 	
 	public void deleteUnusedBinaryFiles() {
@@ -696,7 +698,7 @@ public class MongoDB {
 	// this.defaultDBE = defaultDBE;
 	// }
 	
-	public String getDefaultDBE() {
+	public String getDatabaseName() {
 		return defaultDBE;
 	}
 	
@@ -1298,7 +1300,7 @@ public class MongoDB {
 						String hash = (String) map.get("md5sum");
 						if (hash != null && fn != null) {
 							map.remove("md5sum");
-							map.put("filename", "mongo://" + hash + "/" + fn);
+							map.put("filename", mh.getPrefix() + "://" + hash + "/" + fn);
 						}
 						
 						ImageData image = new ImageData(sample, map);
@@ -1317,7 +1319,7 @@ public class MongoDB {
 						String hash = (String) map.get("md5sum");
 						if (hash != null && fn != null) {
 							map.remove("md5sum");
-							map.put("filename", "mongo://" + hash + "/" + fn);
+							map.put("filename", mh.getPrefix() + "://" + hash + "/" + fn);
 						}
 						VolumeData volume = new VolumeData(sample, map);
 						if (volume.getURL() != null) {
@@ -1338,7 +1340,7 @@ public class MongoDB {
 						String hash = (String) map.get("md5sum");
 						if (hash != null && fn != null) {
 							map.remove("md5sum");
-							map.put("filename", "mongo://" + hash + "/" + fn);
+							map.put("filename", mh.getPrefix() + "://" + hash + "/" + fn);
 						}
 						NetworkData network = new NetworkData(sample, map);
 						if (network.getURL() != null) {
