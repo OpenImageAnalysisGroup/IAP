@@ -26,7 +26,6 @@ public class StopWatch {
 	 */
 	public StopWatch(String desc) {
 		this.desc = desc;
-		System.out.println(desc + "...");
 	}
 	
 	public StopWatch(String desc, boolean printStart) {
