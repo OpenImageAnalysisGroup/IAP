@@ -10,7 +10,7 @@ package de.ipk.ag_ba.gui.picture_gui;
  * @author klukas
  */
 public enum MongoCollection {
-	IMAGES("images"), VOLUMES("volumes");
+	IMAGES("images"), VOLUMES("volumes"), NETWORKS("networks");
 	
 	String col;
 	

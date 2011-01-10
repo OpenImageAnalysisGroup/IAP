@@ -12,7 +12,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-import de.ipk.ag_ba.util.color.ColorUtil;
+import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /*

@@ -60,7 +60,7 @@ public class IAPservice {
 		InetAddress address;
 		try {
 			address = InetAddress.getByName(host);
-			boolean reachable = address.isReachable(10000);
+			boolean reachable = address.isReachable(200);
 			if (!reachable)
 				return false;
 			else

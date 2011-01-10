@@ -14,10 +14,10 @@ import org.Colors;
 import qmwi.kseg.som.DataSet;
 import qmwi.kseg.som.SOMdataEntry;
 import qmwi.kseg.som.Tools;
+import de.ipk.ag_ba.image.color.ColorUtil;
+import de.ipk.ag_ba.image.color.ColorXYZ;
+import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
-import de.ipk.ag_ba.util.color.ColorUtil;
-import de.ipk.ag_ba.util.color.ColorXYZ;
-import de.ipk.ag_ba.util.color.Color_CIE_Lab;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.IntVolumeVisitor;
 
