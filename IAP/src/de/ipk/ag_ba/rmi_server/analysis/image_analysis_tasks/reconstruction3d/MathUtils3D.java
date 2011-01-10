@@ -15,7 +15,7 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
-import de.ipk.ag_ba.util.color.ColorUtil;
+import de.ipk.ag_ba.image.color.ColorUtil;
 
 /**
  * @author klukas

@@ -14,13 +14,12 @@ import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
-import de.ipk.ag_ba.image_utils.FlexibleImage;
-import de.ipk.ag_ba.image_utils.FlexibleImageSet;
-import de.ipk.ag_ba.image_utils.FlexibleImageType;
-import de.ipk.ag_ba.image_utils.FlexibleMaskAndImageSet;
-import de.ipk.ag_ba.image_utils.ImageConverter;
-import de.ipk.ag_ba.image_utils.PhytoTopImageProcessorOptions;
-import de.ipk.ag_ba.image_utils.PhytochamberTopImageProcessor;
+import de.ipk.ag_ba.image.analysis.phytochamber.PhytoTopImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.phytochamber.PhytochamberTopImageProcessor;
+import de.ipk.ag_ba.image.operations.ImageConverter;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
+import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.CutImagePreprocessor;
@@ -29,8 +28,8 @@ import de.ipk.ag_ba.rmi_server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.rmi_server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.rmi_server.databases.DatabaseTarget;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
@@ -145,9 +144,11 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages()) {
-							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(new FlexibleMaskAndImageSet(input, input),
+							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(
 									new PhytoTopImageProcessorOptions());
-							final FlexibleImageSet pipelineResult = ptip.pipeline(maximumThreadCountOnImageLevel).getImages();
+							final FlexibleImageSet pipelineResult = ptip.pipeline(
+									input,
+									maximumThreadCountOnImageLevel, null, false).getImages();
 							
 							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
 							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
@@ -214,10 +215,10 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		int iBackgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		Geometry g = detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
 		
-		NumericMeasurement m;
-		boolean calcHistogram = false;
+		NumericMeasurement3D m;
+		boolean calcHistogram = true;
 		if (calcHistogram) {
-			ColorHistogram histogram = new ColorHistogram(10);
+			ColorHistogram histogram = new ColorHistogram(500);
 			histogram.countColorPixels(arrayRGB);
 			double pixelCount = histogram.getNumberOfFilledPixels();
 			for (ColorHistogramEntry che : histogram.getColorEntries()) {
@@ -225,37 +226,40 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				int pos = sn.indexOf(".");
 				if (pos > 0)
 					sn = sn.substring(0, pos);
-				m = new NumericMeasurement(limg, sn + "-r: " + che.getColorDisplayName(), limg.getParentSample()
+				m = new NumericMeasurement3D(limg, sn + "-relative", limg.getParentSample()
 									.getParentCondition().getExperimentName()
 									+ " (" + experimentNameExtension + ")");
 				m.setValue(che.getNumberOfPixels() / pixelCount);
 				m.setUnit("proportion");
-				output.add(m);
+				m.setPosition((double) che.getHue());
+				m.setPositionUnit("hue");
+				if (m.getValue() >= 0.01 / 5)
+					output.add(m);
 				
-				m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
-									.getParentCondition().getExperimentName()
-									+ " (" + experimentNameExtension + ")");
-				m.setValue(pixelCount);
-				m.setUnit("pixels");
-				output.add(m);
+				// m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
+				// .getParentCondition().getExperimentName()
+				// + " (" + experimentNameExtension + ")");
+				// m.setValue(pixelCount);
+				// m.setUnit("pixels");
+				// output.add(m);
 			}
 		}
 		if (!limg.getSubstanceName().toUpperCase().contains("TOP")) {
-			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
+			m = new NumericMeasurement3D(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
 								.getParentCondition().getExperimentName()
 								+ " (" + experimentNameExtension + ")");
 			m.setValue(h - g.getTop());
 			m.setUnit("pixel");
 			output.add(m);
 			
-			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
+			m = new NumericMeasurement3D(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
 								.getParentCondition().getExperimentName()
 								+ " (" + experimentNameExtension + ")");
 			m.setValue(h - g.getLeft() - (h - g.getRight()));
 			m.setUnit("pixel");
 			output.add(m);
 		}
-		m = new NumericMeasurement(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
+		m = new NumericMeasurement3D(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
 							.getParentCondition().getExperimentName()
 							+ " (" + experimentNameExtension + ")");
 		m.setValue(g.getFilledPixels());

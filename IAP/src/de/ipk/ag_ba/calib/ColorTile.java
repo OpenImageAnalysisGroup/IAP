@@ -18,7 +18,7 @@ import javax.swing.JComponent;
 
 import org.color.Color_CIE_Lab;
 
-import de.ipk.ag_ba.image_utils.ImageConverter;
+import de.ipk.ag_ba.image.operations.ImageConverter;
 
 /**
  * @author klukas

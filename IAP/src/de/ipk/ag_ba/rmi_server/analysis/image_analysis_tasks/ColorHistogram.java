@@ -14,10 +14,10 @@ import java.util.Collection;
  * @author klukas
  */
 public class ColorHistogram {
-	
+
 	private final ArrayList<ColorHistogramEntry> colorEntries;
 	private final int numberOfColors;
-	
+
 	public ColorHistogram(int colors) {
 		this.colorEntries = new ArrayList<ColorHistogramEntry>();
 		this.numberOfColors = colors;
@@ -28,11 +28,11 @@ public class ColorHistogram {
 			hueMiddle += hueStepSize;
 		}
 	}
-	
+
 	public Collection<ColorHistogramEntry> getColorEntries() {
 		return colorEntries;
 	}
-	
+
 	public void countColorPixels(int[] rgbArray) {
 		int red, green, blue;
 		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
@@ -47,13 +47,13 @@ public class ColorHistogram {
 			green = (rgb >> 8) & 0xFF;
 			blue = rgb & 0xFF;
 			float[] hsb = Color.RGBtoHSB(red, green, blue, null);
-			int hue = (int) (hsb[0] * 360d / numberOfColors);
+			int hue = (int) (hsb[0] * numberOfColors);
 			count[hue] = count[hue] + 1;
 		}
 		for (int i = 0; i < numberOfColors; i++)
 			colorEntries.get(i).addPixelCount(count[i]);
 	}
-	
+
 	public long getNumberOfFilledPixels() {
 		long res = 0;
 		for (ColorHistogramEntry e : colorEntries)

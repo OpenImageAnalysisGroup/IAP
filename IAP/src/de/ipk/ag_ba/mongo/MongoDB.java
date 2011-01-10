@@ -46,6 +46,7 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
+import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
 import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
 import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
@@ -62,6 +63,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -96,6 +98,7 @@ public class MongoDB {
 			res.add(new MongoDB("Cloud Storage 1", "cloud1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
 			res.add(new MongoDB("Cloud Storage 2", "cloud2", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
 		}
+		res.add(new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512));
 		
 		// if (IAPservice.isReachable("localhost")) {
 		// res.add(new MongoDB("local dbe3", "local_dbe3", "localhost", null, null, HashType.SHA512));
@@ -217,10 +220,10 @@ public class MongoDB {
 			@Override
 			public void run() {
 				DBObject obj = new BasicDBObject("_id", new ObjectId(experimentID));
-				if (db.collectionExists("experiments")) {
-					DBObject o = db.getCollection("experiments").findOne(obj);
+				if (db.collectionExists(MongoExperimentCollections.EXPERIMENTS.toString())) {
+					DBObject o = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).findOne(obj);
 					if (o != null) {
-						WriteResult wr = db.getCollection("experiments").remove(o);
+						WriteResult wr = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).remove(o);
 						System.out.println(wr.toString());
 					}
 				}
@@ -392,7 +395,7 @@ public class MongoDB {
 		BasicDBObject dbExperiment = new BasicDBObject(attributes);
 		dbExperiment.put("substance_ids", substanceIDs);
 		
-		DBCollection experiments = db.getCollection("experiments");
+		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
 		experiments.insert(dbExperiment);
 		String id = dbExperiment.get("_id").toString();
@@ -434,9 +437,9 @@ public class MongoDB {
 		return file.length();
 	}
 	
-	public long saveImageFile(MyByteArrayInputStream isImage, GridFS gridfs_images, GridFS gridfs_label_images,
+	public boolean saveImageFile(MyByteArrayInputStream isImage, GridFS gridfs_images, GridFS gridfs_label_images,
 						GridFS gridfs_preview_files, ImageData image, String hash) throws IOException {
-		long result = -1;
+		boolean allOK = true;
 		
 		try {
 			int idx = 0;
@@ -457,20 +460,32 @@ public class MongoDB {
 						fs = gridfs_preview_files;
 						break;
 				}
-				GridFSDBFile fff = fs.findOne(hash);
-				if (fff == null) {
-					GridFSInputFile inputFile = fs.createFile(is);
-					inputFile.setFilename(hash);
-					inputFile.save();
-					result = inputFile.getLength();
-					if (result < 0)
-						ErrorMsg.addErrorMessage("Error during GridFS file save operation.");
-				}
-				is.close();
+				if (saveStream(hash, is, fs) < 0)
+					allOK = false;
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+		
+		return allOK;
+	}
+	
+	/**
+	 * @return -1 in case of error, 0 in case of existing storage, > 0 in case of new storage
+	 * @throws IOException
+	 */
+	public long saveStream(String hash, InputStream is, GridFS fs) throws IOException {
+		long result = -1;
+		
+		GridFSDBFile fff = fs.findOne(hash);
+		if (fff == null) {
+			GridFSInputFile inputFile = fs.createFile(is);
+			inputFile.setFilename(hash);
+			inputFile.save();
+			result = inputFile.getLength();
+		} else
+			result = 0;
+		is.close();
 		
 		return result;
 	}
@@ -488,11 +503,13 @@ public class MongoDB {
 		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Save Volume");
+		
 		GridFSDBFile vvv = gridfs_volumes.findOne(hash);
 		if (vvv != null) {
 			gridfs_preview.remove(vvv);
 			vvv = null;
 		}
+		
 		IntVolumeInputStream is = (IntVolumeInputStream) id.getURL().getInputStream();
 		System.out.println("AVAIL: " + is.available());
 		System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
@@ -507,6 +524,7 @@ public class MongoDB {
 			gridfs_preview.remove(fff);
 			fff = null;
 		}
+		
 		if (fff == null) {
 			try {
 				if (optStatus != null)
@@ -605,17 +623,17 @@ public class MongoDB {
 		String hash = GravistoService.getHashFromInputStream(is, fileSize, getHashType());
 		if (is instanceof MyByteArrayInputStream)
 			is = new MyByteArrayInputStream((is).getBuff());
-		GridFS gridfs_images = new GridFS(db, "images");
-		DBCollection collectionA = db.getCollection("images.files");
-		collectionA.ensureIndex("filename");
+		GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
+		DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
+		collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 		
-		GridFS gridfs_null_files = new GridFS(db, "null_images");
-		DBCollection collectionB = db.getCollection("null_images.files");
-		collectionB.ensureIndex("filename");
+		GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_IMAGE_LABELS.toString());
+		DBCollection collectionB = db.getCollection(MongoGridFS.FS_IMAGE_LABELS_FILES.toString());
+		collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 		
-		GridFS gridfs_preview_files = new GridFS(db, "preview_files");
-		DBCollection collectionC = db.getCollection("preview_files.files");
-		collectionC.ensureIndex("filename");
+		GridFS gridfs_preview_files = new GridFS(db, MongoGridFS.FS_PREVIEW.toString());
+		DBCollection collectionC = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
+		collectionC.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 		
 		GridFSDBFile fff = gridfs_images.findOne(hash);
 		
@@ -630,8 +648,8 @@ public class MongoDB {
 		if (fff != null) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
-			long res = saveImageFile(is, gridfs_images, gridfs_null_files, gridfs_preview_files, id, hash);
-			if (res >= 0) {
+			boolean saved = saveImageFile(is, gridfs_images, gridfs_null_files, gridfs_preview_files, id, hash);
+			if (saved) {
 				return DatabaseStorageResult.STORED_IN_DB;
 			} else
 				return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
@@ -640,12 +658,12 @@ public class MongoDB {
 	
 	public DatabaseStorageResult saveVolumeFile(DB db, VolumeData volume, ObjectRef optFileSize,
 						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
-		GridFS gridfs_volumes = new GridFS(db, "volumes");
-		DBCollection collectionA = db.getCollection("volumes.files");
-		collectionA.ensureIndex("filename");
-		GridFS gridfs_preview = new GridFS(db, "preview_files");
-		DBCollection collectionB = db.getCollection("preview_files.files");
-		collectionB.ensureIndex("filename");
+		GridFS gridfs_volumes = new GridFS(db, MongoGridFS.FS_VOLUMES.toString());
+		DBCollection collectionA = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString());
+		collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+		GridFS gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW_FILES.toString());
+		DBCollection collectionB = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
+		collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 		
 		String hash;
 		try {
@@ -672,12 +690,12 @@ public class MongoDB {
 	
 	public DatabaseStorageResult saveNetworkFile(DB db, NetworkData network, ObjectRef optFileSize,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
-		GridFS gridfs_networks = new GridFS(db, "networks");
-		DBCollection collectionA = db.getCollection("networks.files");
-		collectionA.ensureIndex("filename");
-		GridFS gridfs_preview = new GridFS(db, "preview_files");
-		DBCollection collectionB = db.getCollection("preview_files.files");
-		collectionB.ensureIndex("filename");
+		GridFS gridfs_networks = new GridFS(db, MongoGridFS.FS_NETWORKS.toString());
+		DBCollection collectionA = db.getCollection(MongoGridFS.FS_NETWORKS_FILES.toString());
+		collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+		GridFS gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW.toString());
+		DBCollection collectionB = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
+		collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 		
 		String hash;
 		try {
@@ -705,10 +723,6 @@ public class MongoDB {
 		}
 	}
 	
-	// public void setDefaultDBE(String defaultDBE) {
-	// this.defaultDBE = defaultDBE;
-	// }
-	
 	public String getDatabaseName() {
 		return databaseName;
 	}
@@ -717,25 +731,13 @@ public class MongoDB {
 		return databaseHost;
 	}
 	
-	// public void setDefaultHost(String defaultHost) {
-	// this.defaultHost = defaultHost;
-	// }
-	
 	public String getDefaultLogin() {
 		return databaseLogin;
 	}
 	
-	// public void setDefaultLogin(String defaultLogin) {
-	// this.defaultLogin = defaultLogin;
-	// }
-	
 	public String getDefaultPass() {
 		return databasePass;
 	}
-	
-	// public void setDefaultPass(String defaultPass) {
-	// this.defaultPass = defaultPass;
-	// }
 	
 	public byte[] getPreviewData(final String hash) {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
@@ -745,7 +747,7 @@ public class MongoDB {
 				
 				@Override
 				public void run() {
-					GridFS gridfs_preview_images = new GridFS(db, "preview_files");
+					GridFS gridfs_preview_images = new GridFS(db, MongoGridFS.FS_PREVIEW.toString());
 					GridFSDBFile fff = gridfs_preview_images.findOne(hash);
 					if (fff != null) {
 						try {
@@ -786,7 +788,7 @@ public class MongoDB {
 				
 				@Override
 				public void run() {
-					DBObject header = db.getCollection("experiments").findOne(experimentMongoID);
+					DBObject header = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).findOne(experimentMongoID);
 					res.setObject(new ExperimentHeader(header.toMap()));
 				}
 				
@@ -810,7 +812,7 @@ public class MongoDB {
 				
 				@Override
 				public void run() {
-					for (DBObject header : db.getCollection("experiments").find()) {
+					for (DBObject header : db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).find()) {
 						res.add(new ExperimentHeader(header.toMap()));
 					}
 				}
@@ -835,7 +837,7 @@ public class MongoDB {
 				
 				@Override
 				public void run() {
-					DBRef dbr = new DBRef(db, "experiments", new ObjectId(header.getExcelfileid()));
+					DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getExcelfileid()));
 					DBObject expref = dbr.fetch();
 					if (expref != null) {
 						BasicDBList l = (BasicDBList) expref.get("substance_ids");
@@ -881,11 +883,11 @@ public class MongoDB {
 			@Override
 			public void run() {
 				ObjectId id = new ObjectId(header.getExcelfileid());
-				DBRef dbr = new DBRef(db, "experiments", id);
+				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), id);
 				DBObject expref = dbr.fetch();
 				if (expref != null) {
 					expref.put("experimenttype", experimentType);
-					db.getCollection("experiments").save(expref);
+					db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).save(expref);
 				} else
 					tso.setBval(0, true);
 			}
@@ -907,7 +909,7 @@ public class MongoDB {
 			@Override
 			public void run() {
 				ObjectId id = new ObjectId(header.getExcelfileid());
-				DBRef dbr = new DBRef(db, "experiments", id);
+				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), id);
 				DBObject expref = dbr.fetch();
 				if (expref != null) {
 					HashMap<String, Object> attributes = new HashMap<String, Object>();
@@ -917,7 +919,7 @@ public class MongoDB {
 							expref.put(key, attributes.get(key));
 					}
 					
-					db.getCollection("experiments").save(expref);
+					db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).save(expref);
 				} else
 					tso.setBval(0, true);
 			}
@@ -947,24 +949,10 @@ public class MongoDB {
 				ObjectRef newSize = new ObjectRef();
 				newSize.addLong(0);
 				for (NumericMeasurementInterface nmd : Substance3D.getAllFiles(experiment)) {
-					IOurl url = null;
-					if (nmd instanceof ImageData) {
-						url = ((ImageData) nmd).getURL();
-					} else
-						if (nmd instanceof VolumeData) {
-							url = ((VolumeData) nmd).getURL();
-						} else
-							if (nmd instanceof NetworkData) {
-								url = ((NetworkData) nmd).getURL();
-							}
+					IOurl url = ((BinaryMeasurement) nmd).getURL();
 					if (url != null) {
 						String hash = url.getDetail();
-						Collection<String> gridFSnames = new ArrayList<String>();
-						gridFSnames.add("preview_files");
-						gridFSnames.add("volumes");
-						gridFSnames.add("images");
-						gridFSnames.add("annotations");
-						for (String s : gridFSnames) {
+						for (String s : MongoGridFS.getFileCollectionsFor(nmd)) {
 							GridFS gridfs = new GridFS(db, s);
 							GridFSDBFile file = gridfs.findOne(hash);
 							if (file != null) {
@@ -1301,7 +1289,7 @@ public class MongoDB {
 					}
 				}
 				// images
-				BasicDBList imgList = (BasicDBList) sam.get("images");
+				BasicDBList imgList = (BasicDBList) sam.get(MongoCollection.IMAGES.toString());
 				if (imgList != null) {
 					for (Object m : imgList) {
 						DBObject img = (DBObject) m;
@@ -1312,7 +1300,7 @@ public class MongoDB {
 					}
 				}
 				// volumes
-				BasicDBList volList = (BasicDBList) sam.get("volumes");
+				BasicDBList volList = (BasicDBList) sam.get(MongoCollection.VOLUMES.toString());
 				if (volList != null) {
 					for (Object v : volList) {
 						DBObject vol = (DBObject) v;
@@ -1326,7 +1314,7 @@ public class MongoDB {
 					}
 				}
 				// networks
-				BasicDBList netList = (BasicDBList) sam.get("networks");
+				BasicDBList netList = (BasicDBList) sam.get(MongoCollection.NETWORKS.toString());
 				if (netList != null) {
 					for (Object n : netList) {
 						DBObject net = (DBObject) n;
@@ -1352,5 +1340,84 @@ public class MongoDB {
 	
 	public HashType getHashType() {
 		return hashType;
+	}
+	
+	public GridFS getGridFS(final MongoResourceIOConfigObject c) throws Exception {
+		
+		if (c.getDatatype() == MeasurementNodeType.OMICS)
+			throw new UnsupportedOperationException("Omics data can't be saved in GridFS!");
+		
+		final ObjectRef result = new ObjectRef();
+		
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				if (c.getStorageType() == DataStorageType.PREVIEW_ICON) {
+					GridFS gridfs_preview_files = new GridFS(db, "fs_preview_files");
+					DBCollection collectionC = db.getCollection("fs_preview_files.files");
+					collectionC.ensureIndex("filename");
+					result.setObject(gridfs_preview_files);
+				} else
+					switch (c.getDatatype()) {
+						case IMAGE:
+							switch (c.getStorageType()) {
+								case MAIN_STREAM:
+									GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
+									DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
+									collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									result.setObject(gridfs_images);
+									break;
+								case LABEL_FIELD:
+									GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_IMAGE_LABELS.toString());
+									DBCollection collectionB = db.getCollection(MongoGridFS.FS_IMAGE_LABELS_FILES.toString());
+									collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									result.setObject(gridfs_null_files);
+									break;
+							}
+							break;
+						case VOLUME:
+							switch (c.getStorageType()) {
+								case MAIN_STREAM:
+									GridFS gridfs_volumes = new GridFS(db, MongoGridFS.FS_VOLUMES.toString());
+									DBCollection collectionA = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString());
+									collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									result.setObject(gridfs_volumes);
+									break;
+								case LABEL_FIELD:
+									GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_VOLUME_LABELS.toString());
+									DBCollection collectionB = db.getCollection("fs_volume_labels.files");
+									collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									result.setObject(gridfs_null_files);
+									break;
+							}
+							break;
+						case NETWORK:
+							switch (c.getStorageType()) {
+								case MAIN_STREAM:
+									GridFS gridfs_networks = new GridFS(db, MongoGridFS.FS_NETWORKS.toString());
+									DBCollection collectionA = db.getCollection(MongoGridFS.FS_NETWORKS_FILES.toString());
+									collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									result.setObject(gridfs_networks);
+									break;
+								case LABEL_FIELD:
+									GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_NETWORK_LABELS.toString());
+									DBCollection collectionB = db.getCollection(MongoGridFS.fs_networks_labels_files.toString());
+									collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									result.setObject(gridfs_null_files);
+									break;
+							}
+							break;
+					}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		
+		return (GridFS) result.getObject();
 	}
 }
