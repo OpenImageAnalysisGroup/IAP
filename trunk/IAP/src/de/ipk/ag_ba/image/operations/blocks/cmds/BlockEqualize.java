@@ -16,7 +16,6 @@ public class BlockEqualize extends AbstractSnapshotAnalysisBlockFIS {
 	protected void prepare() {
 		w = getInput().getMasks().getLargestWidth();
 		h = getInput().getMasks().getLargestHeight();
-		
 	}
 	
 	@Override
