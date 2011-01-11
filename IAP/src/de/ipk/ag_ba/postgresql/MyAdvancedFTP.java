@@ -45,6 +45,7 @@ public class MyAdvancedFTP {
 		server = server.substring(0, server.indexOf("/"));
 		
 		final FTPClient ftp;
+		
 		ThreadSafeOptions tso;
 		synchronized (host2ftp) {
 			if (!host2ftp.containsKey(server)) {
@@ -59,35 +60,17 @@ public class MyAdvancedFTP {
 		boolean res;
 		
 		try {
-			boolean wait = false;
-			synchronized (tso) {
-				wait = tso.getBval(1, false);
-				tso.setBval(1, true);
-			}
-			if (wait) {
-				while (wait) {
-					status.setCurrentStatusText1("Waiting for shared FTP connection");
-					status.setCurrentStatusText2("Server: " + server);
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-					}
-					synchronized (tso) {
-						wait = tso.getBval(1, false);
-					}
-				}
-			}
 			status.setCurrentStatusValue(-1);
 			status.setCurrentStatusText1(downloadURL);
 			status.setCurrentStatusText2("FTP DOWNLOAD...");
 			res = processDownload(status, downloadURL, target, thisRun, server, remote, ftp);
 		} finally {
-			tso.setBval(1, false);
+			BackgroundTaskHelper.lockRelease(server);
 		}
 		return res;
 	}
 	
-	private static boolean processDownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
+	private synchronized static boolean processDownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
 						String downloadURL, MyByteArrayOutputStream target, final int thisRun, final String server, String remote,
 						final FTPClient ftp) {
 		String username;
@@ -103,44 +86,25 @@ public class MyAdvancedFTP {
 		}
 		
 		final ObjectRef myoutputstream = new ObjectRef();
-		
-		// ftp.addProtocolCommandListener(new ProtocolCommandListener() {
-		// public void protocolCommandSent(ProtocolCommandEvent arg0) {
-		// // System.out.print("out: " + arg0.getMessage());
-		// status.setCurrentStatusText1("Command: " + arg0.getMessage());
-		// }
-		//
-		// public void protocolReplyReceived(ProtocolCommandEvent arg0) {
-		// // System.out.print("in : " + arg0.getMessage());
-		// status.setCurrentStatusText2("Message: " + arg0.getMessage());
-		// if (myoutputstream.getObject() != null) {
-		// String msg = arg0.getMessage();
-		// if (msg.indexOf("Opening BINARY mode") >= 0) {
-		// if (msg.indexOf("(") > 0) {
-		// msg = msg.substring(msg.indexOf("(") + "(".length());
-		// if (msg.indexOf(" ") > 0) {
-		// msg = msg.substring(0, msg.indexOf(" "));
-		// try {
-		// long max = Long.parseLong(msg);
-		// MyOutputStream os = (MyOutputStream) myoutputstream.getObject();
-		// os.setMaxBytes(max);
-		// } catch (Exception e) {
-		// //
-		// System.out.println("Could not determine file length for detailed progress information");
-		// }
-		// }
-		// }
-		// }
-		// }
-		// }
-		// });
-		
-		// System.out.println("FTP DOWNLOAD: " + downloadURL);
-		
+		try {
+			status.setCurrentStatusText1("Waiting for shared FTP connection");
+			status.setCurrentStatusText2("Server: " + server);
+			status.setCurrentStatusValue(-1);
+			
+			BackgroundTaskHelper.lockGetSemaphore(server, 1);
+			return performDownload(status, downloadURL, target, thisRun, server, remote, ftp, username, password, myoutputstream);
+			
+		} finally {
+			BackgroundTaskHelper.lockRelease(server);
+		}
+	}
+	
+	private static boolean performDownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status, String downloadURL,
+			MyByteArrayOutputStream target, final int thisRun, final String server, String remote, final FTPClient ftp, String username, String password,
+			final ObjectRef myoutputstream) {
 		try {
 			if (ftp.isConnected()) {
 				status.setCurrentStatusText2("Using open FTP connection");
-				// System.out.println("Reusing open FTP connection");
 			} else {
 				System.out.println("Connecting to FTP server: " + server);
 				ftp.connect(server);

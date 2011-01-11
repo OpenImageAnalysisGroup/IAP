@@ -429,8 +429,8 @@ public class LemnaTecDataExchange {
 				
 				Sample sample = new Sample(condition);
 				sample.setTime(day);
-				
 				sample.setTimeUnit("day");
+				sample.setRowId(sn.getTimestamp().getTime());
 				
 				NumericMeasurement weightBefore = new NumericMeasurement(sample);
 				weightBefore.setReplicateID(replicateID);
@@ -457,6 +457,7 @@ public class LemnaTecDataExchange {
 				Sample sample = new Sample(condition);
 				sample.setTime(day);
 				sample.setTimeUnit("day");
+				sample.setRowId(sn.getTimestamp().getTime());
 				
 				NumericMeasurement weightBefore = new NumericMeasurement(sample);
 				weightBefore.setReplicateID(replicateID);
@@ -489,6 +490,7 @@ public class LemnaTecDataExchange {
 					Sample sample = new Sample(condition);
 					sample.setTime(day);
 					sample.setTimeUnit("day");
+					sample.setRowId(sn.getTimestamp().getTime());
 					
 					NumericMeasurement water = new NumericMeasurement(sample);
 					water.setReplicateID(replicateID);
@@ -519,6 +521,7 @@ public class LemnaTecDataExchange {
 					Sample sample = new Sample(condition);
 					sample.setTime(day);
 					sample.setTimeUnit("day");
+					sample.setRowId(sn.getTimestamp().getTime());
 					
 					ImageData image = new ImageData(sample);
 					image.setPixelsizeX(sn.getXfactor());

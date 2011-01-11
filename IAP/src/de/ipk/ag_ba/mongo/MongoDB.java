@@ -352,8 +352,8 @@ public class MongoDB {
 							if (status != null) {
 								if (res != null)
 									count++;
-								double prog = count * (100d / numberOfBinaryData);
-								status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
+								double prog = count * (100d / numberOfBinaryData / 2d);
+								status.setCurrentStatusText1(count + "/" + numberOfBinaryData * 2 + ": " + res);
 								status.setCurrentStatusValueFine(prog);
 							}
 						} // binary measurement
