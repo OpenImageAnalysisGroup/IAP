@@ -26,6 +26,8 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	private Collection<NumericMeasurementInterface> input;
 	private Collection<NumericMeasurementInterface> output;
 	private MongoDB m;
+	private int workLoadIndex;
+	private int workLoadSize;
 	
 	/*
 	 * (non-Javadoc)
@@ -141,9 +143,11 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;
 		this.m = m;
+		this.workLoadIndex = workLoadIndex;
+		this.workLoadSize = workLoadSize;
 	}
 	
 }

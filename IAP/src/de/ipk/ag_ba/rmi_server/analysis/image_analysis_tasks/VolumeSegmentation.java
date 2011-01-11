@@ -38,6 +38,8 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 	protected Collection<NumericMeasurementInterface> output;
 	
 	private final DatabaseTarget storeResultInDatabase;
+	private int workLoadIndex;
+	private int workLoadSize;
 	
 	public VolumeSegmentation(DatabaseTarget storeResultInDatabase) {
 		this.storeResultInDatabase = storeResultInDatabase;
@@ -137,8 +139,10 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;
 		this.m = m;
+		this.workLoadIndex = workLoadIndex;
+		this.workLoadSize = workLoadSize;
 	}
 }
