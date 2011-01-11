@@ -258,7 +258,7 @@ public class MongoDB {
 		List<DBObject> dbSubstances = new ArrayList<DBObject>();
 		HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		for (SubstanceInterface s : experiment) {
-			if (status.wantsToStop())
+			if (status != null && status.wantsToStop())
 				break;
 			attributes.clear();
 			s.fillAttributeMap(attributes);
@@ -268,7 +268,7 @@ public class MongoDB {
 			List<BasicDBObject> dbConditions = new ArrayList<BasicDBObject>();
 			
 			for (ConditionInterface c : s) {
-				if (status.wantsToStop())
+				if (status != null && status.wantsToStop())
 					break;
 				attributes.clear();
 				c.fillAttributeMap(attributes);
@@ -277,7 +277,7 @@ public class MongoDB {
 				
 				List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
 				for (SampleInterface sa : c) {
-					if (status.wantsToStop())
+					if (status != null && status.wantsToStop())
 						break;
 					attributes.clear();
 					sa.fillAttributeMap(attributes);
