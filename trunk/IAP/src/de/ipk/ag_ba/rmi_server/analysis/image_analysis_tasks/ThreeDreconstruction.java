@@ -56,6 +56,8 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	private HashMap<ImageAnalysisTask, ArrayList<NumericMeasurementInterface>> additionalResults = new HashMap<ImageAnalysisTask, ArrayList<NumericMeasurementInterface>>();
 	
 	private final DatabaseTarget storeResultInDatabase;
+	private int workLoadIndex;
+	private int workLoadSize;
 	
 	public ThreeDreconstruction(DatabaseTarget storeResultInDatabase) {
 		this.storeResultInDatabase = storeResultInDatabase;
@@ -165,7 +167,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 					for (ImageAnalysisTask resultProcessor : resultProcessors) {
 						Collection<NumericMeasurementInterface> inp = new ArrayList<NumericMeasurementInterface>();
 						inp.add(volume);
-						resultProcessor.setInput(inp, m);
+						resultProcessor.setInput(inp, m, 0, 1);
 						resultProcessor.performAnalysis(maximumThreadCountParallelImages, maximumThreadCountParallelImages,
 											status);
 						if (additionalResults.get(resultProcessor) == null)
@@ -353,9 +355,11 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;
 		this.m = m;
+		this.workLoadIndex = workLoadIndex;
+		this.workLoadSize = workLoadSize;
 	}
 	
 	private boolean getIsTopFromFileName(String fileName) {

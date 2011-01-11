@@ -22,6 +22,7 @@ import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.MorphologicalOperators;
 import de.ipk.ag_ba.image.operations.PrintImage;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.CutImagePreprocessor;

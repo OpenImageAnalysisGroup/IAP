@@ -98,8 +98,14 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 					is.setNir(id);
 			}
 		}
+		int workLoadIndex = 0;
 		for (ImageSet is : replicateId2ImageSet.values()) {
 			if (is.hasAllImageTypes()) {
+				if (workLoadIndex % numberOfSubsets != 0) {
+					workLoadIndex++;
+					continue;
+				} else
+					workLoadIndex++;
 				workload.add(is);
 				// if (workload.size() > 1)
 				// break;
@@ -113,13 +119,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		int idxxx = 0;
 		ArrayList<Thread> wait = new ArrayList<Thread>();
 		
-		int workLoadIndex = 0;
 		for (ImageSet md : workload) {
-			if (workLoadIndex % numberOfSubsets != 0) {
-				workLoadIndex++;
-				continue;
-			} else
-				workLoadIndex++;
 			final ImageSet id = md;
 			Thread t = BackgroundThreadDispatcher.addTask(new Runnable() {
 				
