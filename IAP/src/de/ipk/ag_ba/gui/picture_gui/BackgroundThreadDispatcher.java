@@ -228,20 +228,21 @@ public class BackgroundThreadDispatcher {
 			return false;
 		int mbFree = (int) (Runtime.getRuntime().freeMemory() / 1024 / 1024);
 		int mbTotal = (int) (Runtime.getRuntime().totalMemory() / 1024 / 1024);
+		int mbUsed = mbTotal-mbFree;
 		int mbMax = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
-		if (mbTotal > (int) (mbMax * 0.9d)) {
+		if (mbUsed > (int) (mbMax * 0.9d)) {
 			if (System.currentTimeMillis() - lastPrint > 1000) {
 				lastPrint = System.currentTimeMillis();
-				System.out.println("high memory load: " + mbTotal + " MB used, max: " + mbMax + " MB");
+				System.out.println("high memory load: " + mbUsed + " MB used, max: " + mbMax + " MB");
 			}
 			if (System.currentTimeMillis() - lastGC > 1000 * 30) {
 				lastGC = System.currentTimeMillis();
-				System.out.println("high memory load: " + mbTotal + " MB used, max: " + mbMax + " MB --- GARBAGE COLLECTION");
+				System.out.println("high memory load: " + mbUsed + " MB used, max: " + mbMax + " MB --- GARBAGE COLLECTION");
 				System.gc();
 				mbFree = (int) (Runtime.getRuntime().freeMemory() / 1024 / 1024);
 				mbTotal = (int) (Runtime.getRuntime().totalMemory() / 1024 / 1024);
 				mbMax = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024);
-				System.out.println("new memory load: " + mbTotal + " MB used, max: " + mbMax + " MB");
+				System.out.println("new memory load: " + mbUsed + " MB used, max: " + mbMax + " MB");
 			}
 			return true;
 		} else
