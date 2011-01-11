@@ -10,7 +10,7 @@ package de.ipk.ag_ba.image.analysis.phytochamber;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
- * @author klukas
+ * @author klukas, entzian
  */
 public class PhytoTopImageProcessorOptions {
 	private double scale;
@@ -61,7 +61,7 @@ public class PhytoTopImageProcessorOptions {
 		initStandardValues(scale);
 	}
 	
-	void initStandardValues(double scale) {
+	public void initStandardValues(double scale) {
 		
 		setScale(scale);
 		

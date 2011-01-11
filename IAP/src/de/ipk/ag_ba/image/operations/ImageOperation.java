@@ -560,10 +560,14 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	public ImageOperation removeSmallClusters() {
-		int[] arrayRGB = ImageConverter.convertIJto1A(image);
-		PhenotypeAnalysisTask.removeSmallPartsOfImage(image.getWidth(), image.getHeight(), arrayRGB, PhenotypeAnalysisTask.BACKGROUND_COLORint,
-							(int) (image.getWidth() * image.getHeight() * 0.005d));
-		return new ImageOperation(arrayRGB, image.getWidth(), image.getHeight());
+		return removeSmallClusters(0.005d);
+	}
+	
+	public ImageOperation removeSmallClusters(double factor) {
+		FlexibleImage workImage = new FlexibleImage(image);
+		workImage = PhenotypeAnalysisTask.removeSmallPartsOfImage(workImage, PhenotypeAnalysisTask.BACKGROUND_COLORint,
+							(int) (image.getWidth() * image.getHeight() * factor));
+		return new ImageOperation(workImage);
 	}
 	
 	// ################## get... ###################

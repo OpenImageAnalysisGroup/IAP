@@ -22,6 +22,7 @@ import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.MorphologicalOperators;
 import de.ipk.ag_ba.image.operations.PrintImage;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.rmi_server.analysis.CutImagePreprocessor;
@@ -161,7 +162,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 	
 	public static void clearBackgroundAndInterpretImage(final LoadedImage limg, int maximumThreadCount,
 						DatabaseTarget storeResultInDatabase, final BackgroundTaskStatusProviderSupportingExternalCall status,
-						boolean dataAnalysis, ArrayList<NumericMeasurementInterface> output,
+						boolean isDataAnalysis, ArrayList<NumericMeasurementInterface> output,
 						ArrayList<ImagePreProcessor> preProcessors, final double epsilonA, final double epsilonB) {
 		
 		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
@@ -185,72 +186,72 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		final int arrayRGB[] = new int[w * h];
 		img.getRGB(0, 0, w, h, arrayRGB, 0, w);
 		
-		final double arrayL[] = new double[w * h];
-		final double arrayA[] = new double[w * h];
-		final double arrayB[] = new double[w * h];
-		
-		ColorUtil.getLABfromRGB(arrayRGB, arrayL, arrayA, arrayB);
-		
-		int rgbArrayOriginal[] = new int[w * h];
-		img.getRGB(0, 0, w, h, rgbArrayOriginal, 0, w);
-		
-		int[] arrayRGBnull = null;
-		if (imgNULL != null) {
-			arrayRGBnull = new int[w * h];
-			imgNULL.getRGB(0, 0, w, h, arrayRGBnull, 0, w);
-		}
-		if (preProcessors != null)
-			for (ImagePreProcessor pre : preProcessors) {
-				pre.processImage(limg, arrayRGB, arrayRGBnull, w, h, iBackgroundFill);
+		if (!isDataAnalysis) {
+			final double arrayL[] = new double[w * h];
+			final double arrayA[] = new double[w * h];
+			final double arrayB[] = new double[w * h];
+			
+			ColorUtil.getLABfromRGB(arrayRGB, arrayL, arrayA, arrayB);
+			
+			int rgbArrayOriginal[] = new int[w * h];
+			img.getRGB(0, 0, w, h, rgbArrayOriginal, 0, w);
+			
+			int[] arrayRGBnull = null;
+			if (imgNULL != null) {
+				arrayRGBnull = new int[w * h];
+				imgNULL.getRGB(0, 0, w, h, arrayRGBnull, 0, w);
 			}
-		
-		final double sidepercent = 0.10;
-		
-		final ImageConfiguration config = ImageConfiguration.get(limg.getSubstanceName());
-		
-		final ObjectRef progress = new ObjectRef("", new Integer(0));
-		
-		maximumThreadCount = 1;
-		
-		final int[] arrayRGBnullFF = arrayRGBnull;
-		ArrayList<MyThread> wait = new ArrayList<MyThread>();
-		for (int ty = h - 1; ty >= 0; ty--) {
-			final int y = ty;
-			if (maximumThreadCount > 1) {
-				MyThread t = BackgroundThreadDispatcher.addTask(new Runnable() {
-					@Override
-					public void run() {
-						processRowYofImage(limg, w, arrayRGB, arrayRGBnullFF, iBackgroundFill, sidepercent, progress, y,
+			if (preProcessors != null)
+				for (ImagePreProcessor pre : preProcessors) {
+					pre.processImage(limg, arrayRGB, arrayRGBnull, w, h, iBackgroundFill);
+				}
+			
+			final double sidepercent = 0.10;
+			
+			final ImageConfiguration config = ImageConfiguration.get(limg.getSubstanceName());
+			
+			final ObjectRef progress = new ObjectRef("", new Integer(0));
+			
+			maximumThreadCount = 1;
+			
+			final int[] arrayRGBnullFF = arrayRGBnull;
+			ArrayList<MyThread> wait = new ArrayList<MyThread>();
+			for (int ty = h - 1; ty >= 0; ty--) {
+				final int y = ty;
+				if (maximumThreadCount > 1) {
+					MyThread t = BackgroundThreadDispatcher.addTask(new Runnable() {
+						@Override
+						public void run() {
+							processRowYofImage(limg, w, arrayRGB, arrayRGBnullFF, iBackgroundFill, sidepercent, progress, y,
 												epsilonA, epsilonB, config, arrayL, arrayA, arrayB).run();
-					}
-				}, "process row " + y, 3);
-				wait.add(t);
-			} else
-				processRowYofImage(limg, w, arrayRGB, arrayRGBnull, iBackgroundFill, sidepercent, progress, y, epsilonA,
+						}
+					}, "process row " + y, 3);
+					wait.add(t);
+				} else
+					processRowYofImage(limg, w, arrayRGB, arrayRGBnull, iBackgroundFill, sidepercent, progress, y, epsilonA,
 									epsilonB, config, arrayL, arrayA, arrayB).run();
-		}
-		
-		if (maximumThreadCount > 1) {
-			BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
-		}
-		// PrintImage.printImage(arrayRGB, w, h);
-		//
-		// ImageOperation save = new ImageOperation(arrayRGB, w, h);
-		// save.rotate(3);
-		// save.saveImage("/Users/entzian/Desktop/sechsteBild.png");
-		
-		if (true)
-			closingOpening(w, h, arrayRGB, rgbArrayOriginal, iBackgroundFill, limg, 1);
-		
-		boolean removeSmallSegments = true;
-		
-		if (removeSmallSegments)
-			if (config == ImageConfiguration.FluoTop)
-				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.002d));
-			else
-				removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.002d));//
-				
-		if (dataAnalysis) {
+			}
+			
+			if (maximumThreadCount > 1) {
+				BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
+			}
+			// PrintImage.printImage(arrayRGB, w, h);
+			//
+			// ImageOperation save = new ImageOperation(arrayRGB, w, h);
+			// save.rotate(3);
+			// save.saveImage("/Users/entzian/Desktop/sechsteBild.png");
+			
+			if (true)
+				closingOpening(w, h, arrayRGB, rgbArrayOriginal, iBackgroundFill, limg, 1);
+			
+			// boolean removeSmallSegments = true;
+			//
+			// if (removeSmallSegments)
+			// if (config == ImageConfiguration.FluoTop)
+			// removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.002d));
+			// else
+			// removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.002d));//
+		} else {
 			Geometry g = detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
 			
 			NumericMeasurement m;
@@ -265,15 +266,15 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					if (pos > 0)
 						sn = sn.substring(0, pos);
 					m = new NumericMeasurement(limg, sn + "-r: " + che.getColorDisplayName(), limg.getParentSample()
-										.getParentCondition().getExperimentName()
-										+ " (" + getNameStatic() + ")");
+							.getParentCondition().getExperimentName()
+							+ " (" + getNameStatic() + ")");
 					m.setValue(che.getNumberOfPixels() / pixelCount);
 					m.setUnit("proportion");
 					output.add(m);
 					
 					m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
-										.getParentCondition().getExperimentName()
-										+ " (" + getNameStatic() + ")");
+							.getParentCondition().getExperimentName()
+							+ " (" + getNameStatic() + ")");
 					m.setValue(pixelCount);
 					m.setUnit("pixels");
 					output.add(m);
@@ -281,22 +282,22 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			}
 			if (!limg.getSubstanceName().toUpperCase().contains("TOP")) {
 				m = new NumericMeasurement(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
-									.getParentCondition().getExperimentName()
-									+ " (" + getNameStatic() + ")");
+						.getParentCondition().getExperimentName()
+						+ " (" + getNameStatic() + ")");
 				m.setValue(h - g.getTop());
 				m.setUnit("pixel");
 				output.add(m);
 				
 				m = new NumericMeasurement(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
-									.getParentCondition().getExperimentName()
-									+ " (" + getNameStatic() + ")");
+						.getParentCondition().getExperimentName()
+						+ " (" + getNameStatic() + ")");
 				m.setValue(h - g.getLeft() - (h - g.getRight()));
 				m.setUnit("pixel");
 				output.add(m);
 			}
 			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
-								.getParentCondition().getExperimentName()
-								+ " (" + getNameStatic() + ")");
+					.getParentCondition().getExperimentName()
+					+ " (" + getNameStatic() + ")");
 			m.setValue(g.getFilledPixels());
 			m.setUnit("pixel");
 			output.add(m);
@@ -348,12 +349,12 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
 		res.setRGB(0, 0, w, h, arrayRGB, 0, w);
 		LoadedImage result = new LoadedImage(limg, res);
-		result.getURL().setFileName("cleared_" + new File(limg.getURL().getFileName()));
+		result.getURL().setFileName("ColorCleared_" + new File(limg.getURL().getFileName()));
 		result.getURL().setPrefix(LoadedImageHandler.PREFIX);
 		// result.showImageWindow();
 		// result.getParentSample().getParentCondition().getParentSubstance().setName(
 		// "Processed Images (" + limg.getExperimentName() + ")");
-		if (dataAnalysis && storeResultInDatabase != null) {
+		if (isDataAnalysis && storeResultInDatabase != null) {
 			try {
 				LoadedImage lib = result;
 				result = storeResultInDatabase.saveImage(result);
@@ -413,7 +414,12 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		
 	}
 	
-	public static void removeSmallPartsOfImage(int w, int h, int[] rgbArray, int iBackgroundFill, int cutOff) {
+	public static FlexibleImage removeSmallPartsOfImage(FlexibleImage workImage, int iBackgroundFill, int cutOff) {
+		
+		int[] rgbArray = workImage.getConvertAs1A();
+		int w = workImage.getWidth();
+		int h = workImage.getHeight();
+		
 		int[][] image = new int[w][h];
 		
 		for (int x = 0; x < w; x++) {
@@ -541,6 +547,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			PrintImage.printImage(rgbArray, w, h, "variante 3");
 			
 		}
+		return new FlexibleImage(rgbArray, w, h);
 	}
 	
 	private static Runnable processRowYofImage(final ImageData imageData, final int w, final int[] rgbArray,
@@ -736,6 +743,10 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				}
 			}
 		};
+	}
+	
+	private static Geometry detectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill) {
+		return detectGeometry(w, h, rgbArray, iBackgroundFill, null);
 	}
 	
 	private static Geometry detectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg) {
