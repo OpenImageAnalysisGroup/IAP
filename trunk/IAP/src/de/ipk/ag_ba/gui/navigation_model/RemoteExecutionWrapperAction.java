@@ -39,7 +39,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			TreeSet<Integer> jobIDs = new TreeSet<Integer>();
 			{
 				int idx = 0;
-				while (jobIDs.size() < 20)
+				while (jobIDs.size() < 50)
 					jobIDs.add(idx++);
 			}
 			for (int id : jobIDs) {
