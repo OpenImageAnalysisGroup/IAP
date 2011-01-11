@@ -103,7 +103,7 @@ public class PerformanceTestAction extends AbstractNavigationAction {
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
 			for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 1) {
 				long t1 = System.currentTimeMillis();
-				task.setInput(workload, m);
+				task.setInput(workload, m, 0, 1);
 				task.performAnalysis(pi, 1, status);
 				long t2 = System.currentTimeMillis();
 				statRes.addAll(task.getOutput());

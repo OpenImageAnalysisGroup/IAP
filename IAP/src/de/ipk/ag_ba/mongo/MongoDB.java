@@ -1093,7 +1093,8 @@ public class MongoDB {
 					collection.setObjectClass(BatchCmd.class);
 					for (DBObject dbo : collection.find()) {
 						BatchCmd batch = (BatchCmd) dbo;
-						if (batch.getRunStatus() == CloudAnalysisStatus.SCHEDULED
+						CloudAnalysisStatus s = batch.getRunStatus();
+						if (s == CloudAnalysisStatus.SCHEDULED
 											|| (
 											(batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING)
 											&& System.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
@@ -1173,8 +1174,7 @@ public class MongoDB {
 				}
 			});
 		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-			return null;
+			return new ArrayList<BatchCmd>();
 		}
 		return res;
 	}
@@ -1200,7 +1200,7 @@ public class MongoDB {
 						batch.put("runstatus", starting.toString());
 						batch.put("lastupdate", System.currentTimeMillis());
 						WriteResult r = collection.update(dbo, batch, false, false);
-						System.out.println("Update status: " + rs + " --> " + starting.toString() + ", res: " + r.toString());
+						// System.out.println("Update status: " + rs + " --> " + starting.toString() + ", res: " + r.toString());
 					} catch (UnknownHostException e) {
 						ErrorMsg.addErrorMessage(e);
 					}
@@ -1239,7 +1239,7 @@ public class MongoDB {
 				}
 			});
 		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
+			// ErrorMsg.addErrorMessage(e);
 		}
 		return (BatchCmd) tso.getParam(0, null);
 	}

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProvider;
+import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
@@ -20,6 +21,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	private final RemoteCapableAnalysisAction remoteAction;
 	private final NavigationAction action;
 	private final NavigationButton cm;
+	private NavigationButton src;
 	
 	public RemoteExecutionWrapperAction(NavigationAction navigationAction, NavigationButton cm) {
 		this.remoteAction = (RemoteCapableAnalysisAction) navigationAction;
@@ -29,6 +31,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		this.src = src;
 		HashSet<String> targetIPs = remoteAction.getMongoDB().batchGetAvailableHosts(10000);
 		if (targetIPs.isEmpty()) {
 			MainFrame.showMessageDialog("No active compute node found.", "Information");
@@ -39,7 +42,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			TreeSet<Integer> jobIDs = new TreeSet<Integer>();
 			{
 				int idx = 0;
-				while (jobIDs.size() < 50)
+				while (jobIDs.size() < 10)
 					jobIDs.add(idx++);
 			}
 			for (int id : jobIDs) {
@@ -68,7 +71,13 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return cm.getAction().getResultNewActionSet();
+		try {
+			cm.getAction().performActionCalculateResults(src);
+			return cm.getAction().getResultNewActionSet();
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		return new ArrayList<NavigationButton>();
 	}
 	
 	@Override

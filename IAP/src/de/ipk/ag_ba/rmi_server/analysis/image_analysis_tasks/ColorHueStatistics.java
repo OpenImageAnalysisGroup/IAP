@@ -173,7 +173,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	 * (java.util.Collection, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;
 	}
 	

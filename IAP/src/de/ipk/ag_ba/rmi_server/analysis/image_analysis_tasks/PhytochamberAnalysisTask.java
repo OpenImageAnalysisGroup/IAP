@@ -44,13 +44,17 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 	
 	ArrayList<ImagePreProcessor> preProcessors = new ArrayList<ImagePreProcessor>();
 	protected DatabaseTarget databaseTarget;
+	private int workOnSubset;
+	private int numberOfSubsets;
 	
 	public PhytochamberAnalysisTask() {
 	}
 	
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workOnSubset, int numberOfSubsets) {
 		this.input = input;
+		this.workOnSubset = workOnSubset;
+		this.numberOfSubsets = numberOfSubsets;
 		databaseTarget = new DataBaseTargetMongoDB(true, m);
 	}
 	
@@ -108,7 +112,14 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		final int wl = workload.size();
 		int idxxx = 0;
 		ArrayList<Thread> wait = new ArrayList<Thread>();
+		
+		int workLoadIndex = 0;
 		for (ImageSet md : workload) {
+			if (workLoadIndex % numberOfSubsets != 0) {
+				workLoadIndex++;
+				continue;
+			} else
+				workLoadIndex++;
 			final ImageSet id = md;
 			Thread t = BackgroundThreadDispatcher.addTask(new Runnable() {
 				

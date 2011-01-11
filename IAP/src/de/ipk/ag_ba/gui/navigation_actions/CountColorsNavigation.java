@@ -27,6 +27,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public class CountColorsNavigation extends AbstractExperimentAnalysisNavigation {
 	private final int colorCount;
 	private NavigationButton src = null;
+	private int workLoadIndex;
+	private int workloadSize;
 	
 	public CountColorsNavigation(MongoDB m, int colorCount, ExperimentReference experiment) {
 		super(m, experiment);
@@ -62,7 +64,7 @@ public class CountColorsNavigation extends AbstractExperimentAnalysisNavigation 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setInt(1);
 		ColorHueStatistics task = new ColorHueStatistics(colorCount);
-		task.setInput(workload, m);
+		task.setInput(workload, m, workLoadIndex, workloadSize);
 		task.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 		// src.title = src.title.split("\\:")[0];
 	}

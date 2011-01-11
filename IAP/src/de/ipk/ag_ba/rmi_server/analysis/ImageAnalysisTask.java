@@ -29,7 +29,7 @@ public interface ImageAnalysisTask {
 	
 	public ImageAnalysisType[] getOutputTypes();
 	
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m);
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workOnSubset, int numberOfSubsets);
 	
 	public Collection<NumericMeasurementInterface> getOutput();
 }

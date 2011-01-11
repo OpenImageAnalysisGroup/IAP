@@ -79,7 +79,7 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 			
 			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
 			VolumeSegmentation segmentationTask = new VolumeSegmentation(saveVolumesToDB);
-			segmentationTask.setInput(workset, m);
+			segmentationTask.setInput(workset, m, 0, 1);
 			
 			segmentationTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 			

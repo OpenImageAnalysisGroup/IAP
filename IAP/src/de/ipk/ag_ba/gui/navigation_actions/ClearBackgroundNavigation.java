@@ -66,7 +66,7 @@ public class ClearBackgroundNavigation extends AbstractExperimentAnalysisNavigat
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setInt(1);
 		PhenotypeAnalysisTask task = new PhenotypeAnalysisTask(epsilon, epsilon2, new DataBaseTargetMongoDB(true, m));
-		task.setInput(workload, m);
+		task.setInput(workload, m, 0, 1);
 		task.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 		// src.title = src.title.split("\\:")[0];
 	}
