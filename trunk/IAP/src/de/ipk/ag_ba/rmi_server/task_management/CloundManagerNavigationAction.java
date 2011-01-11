@@ -60,7 +60,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			for (BatchCmd b : m.batchGetAllCommands()) {
 				NavigationButton n = new NavigationButton(new BatchInformationAction(b, m), guiSetting);
 				n.setProcessing(true);
-				n.setRightAligned(true);
+				// n.setRightAligned(true);
 				res.add(n);
 			}
 		} catch (Exception e) {

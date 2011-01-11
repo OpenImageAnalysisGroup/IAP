@@ -83,6 +83,8 @@ public class CloudTaskManager {
 					long maxDelaySinceLastUpdate = 5000;
 					m.batchPingHost(ip);
 					if (runningTasks.size() == 0) {
+						if (m == null)
+							return;
 						for (BatchCmd batch : m.batchGetCommands(maxDelaySinceLastUpdate)) {
 							if (batch.getExperimentMongoID() != null && (batch.getTargetIPs().isEmpty() || batch.getTargetIPs().contains(ip))) {
 								m.batchClaim(batch, CloudAnalysisStatus.STARTING, false);
@@ -126,6 +128,7 @@ public class CloudTaskManager {
 						}
 					}
 				}
+				Thread.sleep(100);
 			} while (true);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

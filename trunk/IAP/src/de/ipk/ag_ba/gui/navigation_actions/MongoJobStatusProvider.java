@@ -38,17 +38,29 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
 	@Override
 	public double getCurrentStatusValueFine() {
 		cmd = m.batchGetCommand(cmd);
-		return cmd.getCurrentStatusValueFine();
+		try {
+			return cmd.getCurrentStatusValueFine();
+		} catch (NullPointerException npe) {
+			return -1;
+		}
 	}
 	
 	@Override
 	public String getCurrentStatusMessage1() {
-		return cmd.getCurrentStatusMessage1();
+		try {
+			return cmd.getCurrentStatusMessage1();
+		} catch (NullPointerException npe) {
+			return "";
+		}
 	}
 	
 	@Override
 	public String getCurrentStatusMessage2() {
-		return cmd.getCurrentStatusMessage2();
+		try {
+			return cmd.getCurrentStatusMessage2();
+		} catch (NullPointerException npe) {
+			return "";
+		}
 	}
 	
 	@Override

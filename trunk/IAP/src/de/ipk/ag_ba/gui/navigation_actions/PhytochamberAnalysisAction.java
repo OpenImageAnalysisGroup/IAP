@@ -3,7 +3,6 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.TreeMap;
 
 import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -82,7 +81,6 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 			
 			HashSet<String> ignored = new HashSet<String>();
 			
-			int workIndex = 0;
 			for (SubstanceInterface m : res) {
 				Substance3D m3 = (Substance3D) m;
 				for (ConditionInterface s : m3) {
@@ -90,68 +88,39 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
 						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.IMAGE)) {
-							workIndex++;
-							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
-								if (md instanceof ImageData) {
-									ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
-									if (config == ImageConfiguration.FluoTop) {
+							if (md instanceof ImageData) {
+								ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
+								if (config == ImageConfiguration.FluoTop) {
+									ImageData i = (ImageData) md;
+									workload.add(i);
+								} else
+									if (config == ImageConfiguration.RgbTop) {
 										ImageData i = (ImageData) md;
 										workload.add(i);
 									} else
-										if (config == ImageConfiguration.RgbTop) {
+										if (config == ImageConfiguration.NirTop) {
 											ImageData i = (ImageData) md;
 											workload.add(i);
 										} else
-											if (config == ImageConfiguration.NirTop) {
-												ImageData i = (ImageData) md;
-												workload.add(i);
-											} else
-												ignored.add(((ImageData) md).getSubstanceName());
-								}
+											ignored.add(((ImageData) md).getSubstanceName());
+							}
 						}
 					}
 				}
 			}
 			
-			// for (String i : ignored) {
-			// System.out.println("Ignored Image Input - Type: " + i);
-			// }
-			
 			if (status != null)
-				status.setCurrentStatusText1("Workload: " + workload.size() + " images");
+				status.setCurrentStatusText1("Experiment: " + workload.size() + " images");
 			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setInt(1);
 			
-			// for (NumericMeasurementInterface id : workload) {
-			// System.out.println("Input: " + (((ImageData)
-			// id).getURL()).getDetail());
-			// }
-			
 			PhytochamberAnalysisTask task = new PhytochamberAnalysisTask();
 			
-			// task.addPreprocessor(new CutImagePreprocessor());
-			
-			TreeMap<Long, String> times = new TreeMap<Long, String>();
-			// for (int r = 1; r <= 3; r++)
-			// for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 4)
-			// for (int ti = SystemAnalysis.getNumberOfCPUs(); ti >= 1; ti -= 4) {
-			long t1 = System.currentTimeMillis();
-			task.setInput(workload, m);
+			task.setInput(workload, m, workOnSubset, numberOfSubsets);
 			int pi = SystemAnalysis.getNumberOfCPUs();
 			int ti = SystemAnalysis.getNumberOfCPUs() / 2;
 			task.performAnalysis(pi, ti, status);
-			long t2 = System.currentTimeMillis();
-			// String ss = "T(s)/IMG/T(s)/PI/TI\t" + Math.round(((t2 - t1) / 100d / workload.size())) / 10d + "\t"
-			// + ((t2 - t1) / 1000) + "\t" + pi + "\t" + ti;
-			// times.put((t2 - t1), ss);
-			// System.out.println("------------------------------------------------------------");
-			// System.out.println("--- " + ss);
-			// System.out.println("------------------------------------------------------------");
-			// for (String s : times.values()) {
-			// System.out.println(s);
-			// }
-			// }
 			
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
 			Collection<NumericMeasurementInterface> statRes = task.getOutput();

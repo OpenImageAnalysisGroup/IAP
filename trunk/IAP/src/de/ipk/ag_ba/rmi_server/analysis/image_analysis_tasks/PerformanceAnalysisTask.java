@@ -30,14 +30,18 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 	
 	private MongoDB m;
+	private int workLoadIndex;
+	private int workLoadSize;
 	
 	public PerformanceAnalysisTask() {
 		// empty
 	}
 	
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m) {
+	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;
 		this.m = m;
+		this.workLoadIndex = workLoadIndex;
+		this.workLoadSize = workLoadSize;
 	}
 	
 	@Override

@@ -93,7 +93,7 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
 			
 			long t1 = System.currentTimeMillis();
-			task.setInput(workload, m);
+			task.setInput(workload, m, workOnSubset, numberOfSubsets);
 			task.performAnalysis(1, 1, status);
 			long t2 = System.currentTimeMillis();
 			statRes.addAll(task.getOutput());

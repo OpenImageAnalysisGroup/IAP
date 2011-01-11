@@ -117,7 +117,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 				DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
 				
 				ThreeDreconstruction threeDreconstructionTask = new ThreeDreconstruction(saveVolumesToDB);
-				threeDreconstructionTask.setInput(workload, m);
+				threeDreconstructionTask.setInput(workload, m, 0, 1);
 				threeDreconstructionTask.setResolution(voxelresolution, widthFactor);
 				threeDreconstructionTask.addResultProcessor(volumeStatistics);
 				

@@ -116,11 +116,15 @@ public class BatchCmd extends BasicDBObject {
 	}
 	
 	public double getCurrentStatusValueFine() {
-		Double d = getDouble("progress");
-		if (d == null)
+		try {
+			Double d = getDouble("progress");
+			if (d == null)
+				return -1;
+			else
+				return d;
+		} catch (NullPointerException npe) {
 			return -1;
-		else
-			return d;
+		}
 	}
 	
 	public String getCurrentStatusMessage1() {

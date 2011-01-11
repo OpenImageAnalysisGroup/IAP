@@ -116,7 +116,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			// for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 4)
 			// for (int ti = SystemAnalysis.getNumberOfCPUs(); ti >= 1; ti -= 4) {
 			long t1 = System.currentTimeMillis();
-			task.setInput(workload, m);
+			task.setInput(workload, m, workOnSubset, numberOfSubsets);
 			int pi = SystemAnalysis.getNumberOfCPUs();
 			if (pi < 1)
 				pi = 1;
