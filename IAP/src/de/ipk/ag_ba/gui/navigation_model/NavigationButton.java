@@ -33,6 +33,7 @@ import org.ObjectRef;
 import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 
+import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
@@ -76,7 +77,7 @@ public class NavigationButton implements StyleAware {
 	
 	public NavigationButton(NavigationAction navigationAction, GUIsetting guiSetting) {
 		if (navigationAction != null) {
-			boolean enableRemoteTaskExecution = false;
+			boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
 			if (enableRemoteTaskExecution && navigationAction instanceof RemoteCapableAnalysisAction) {
 				RemoteCapableAnalysisAction rca = (RemoteCapableAnalysisAction) navigationAction;
 				CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB());

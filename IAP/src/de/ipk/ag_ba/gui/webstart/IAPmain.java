@@ -34,6 +34,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
+import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
@@ -316,6 +317,14 @@ public class IAPmain extends JApplet {
 	public static NavigationImage loadIcon(String name) {
 		return new NavigationImage(
 							ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()));
+	}
+	
+	public static boolean isSettingEnabled(IAPfeature feature) {
+		switch (feature) {
+			case REMOTE_EXECUTION:
+				return true;
+		}
+		return false;
 	}
 }
 

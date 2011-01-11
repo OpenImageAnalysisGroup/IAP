@@ -126,7 +126,6 @@ public class CloudTaskManager {
 						}
 					}
 				}
-				Thread.sleep(1000);
 			} while (true);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

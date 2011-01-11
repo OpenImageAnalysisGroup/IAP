@@ -6,14 +6,19 @@
  */
 package de.ipk.ag_ba.rmi_server.task_management;
 
+import java.util.ArrayList;
+
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -83,9 +88,28 @@ public class TaskDescription {
 				experiment.getHeader().setImportusergroup("Temp");
 				System.out.println("Received result: " + experiment.getName());
 				try {
-					if (m.batchGetCommand(batch).getOwner().equals(SystemAnalysis.getHostName()))
+					if (m.batchGetCommand(batch).getOwner().equals(SystemAnalysis.getHostName())) {
 						m.saveExperiment(experiment, null);
-					else
+						ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
+						for (ExperimentHeaderInterface i : m.getExperimentList()) {
+							if (i.getExperimentname() != null && i.getExperimentname().contains("§")) {
+								String c = i.getExperimentname().substring(0, i.getExperimentname().indexOf("§"));
+								if (c.equals(cmd))
+									knownResults.add(i);
+							}
+						}
+						if (knownResults.size() == batch.getPartCnt()) {
+							Experiment e = new Experiment();
+							for (ExperimentHeaderInterface i : knownResults) {
+								ExperimentInterface ei = m.getExperiment(i);
+								e.addAll(ei);
+							}
+							m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
+							for (ExperimentHeaderInterface i : knownResults) {
+								m.deleteExperiment(i.getExcelfileid());
+							}
+						}
+					} else
 						System.out.println("Information: Batch command, processed by " + SystemAnalysis.getHostName()
 								+ " has been claimed by " + batch.getOwner()
 								+ ". Therefore analysis result is not saved.");
