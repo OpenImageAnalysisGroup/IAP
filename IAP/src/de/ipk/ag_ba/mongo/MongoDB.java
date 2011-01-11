@@ -381,7 +381,7 @@ public class MongoDB {
 			for (DBObject dbCondition : substance2conditions.get(dbSubstance))
 				conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
 			dbSubstance.put("condition_ids", conditionIDs);
-			if (!status.wantsToStop()) {
+			if (status!=null && !status.wantsToStop()) {
 				substances.insert(dbSubstance);
 			}
 		}
