@@ -14,6 +14,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * @return A single 1/0 mask.
  */
 public class BlockMergeMask extends AbstractSnapshotAnalysisBlockFIS {
+	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		MaskOperation o = new MaskOperation(getInput().getMasks().getVis(), getInput().getMasks().getFluo(), null, options.getBackground(), Color.GRAY.getRGB());
