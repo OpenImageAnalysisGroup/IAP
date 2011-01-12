@@ -34,6 +34,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -182,6 +183,7 @@ public class MongoDB {
 					for (String h : optHosts.split(","))
 						seeds.add(new ServerAddress(h));
 					m = new Mongo(seeds);
+					// m.slaveOk();
 				}
 			}
 			db = m.getDB(dataBase);
@@ -381,7 +383,7 @@ public class MongoDB {
 			for (DBObject dbCondition : substance2conditions.get(dbSubstance))
 				conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
 			dbSubstance.put("condition_ids", conditionIDs);
-			if (status!=null && !status.wantsToStop()) {
+			if (status != null && !status.wantsToStop()) {
 				substances.insert(dbSubstance);
 			}
 		}
@@ -482,7 +484,12 @@ public class MongoDB {
 			GridFSInputFile inputFile = fs.createFile(is);
 			inputFile.setFilename(hash);
 			inputFile.save();
+			fs.getDB().requestStart();
 			result = inputFile.getLength();
+			CommandResult res = fs.getDB().getLastError(2, 180000, false);
+			if (!res.ok())
+				result = -1;
+			fs.getDB().requestDone();
 		} else
 			result = 0;
 		is.close();
