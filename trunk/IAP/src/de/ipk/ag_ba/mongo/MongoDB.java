@@ -241,6 +241,7 @@ public class MongoDB {
 	private void storeExperiment(ExperimentInterface experiment, DB db,
 						BackgroundTaskStatusProviderSupportingExternalCall status) {
 		
+		System.out.println("STORE EXPERIMENT: " + experiment.getName());
 		experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 		
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
@@ -399,7 +400,10 @@ public class MongoDB {
 		
 		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
-		experiments.insert(dbExperiment);
+		WriteResult wr = experiments.insert(dbExperiment);
+		System.out.println("Write Result:" + wr.toString());
+		CommandResult cr = db.getLastError(2, 180000, true);
+		System.out.println("Command Result:" + cr.toString());
 		String id = dbExperiment.get("_id").toString();
 		for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
 			eh.setExcelfileid(id);
@@ -1237,6 +1241,35 @@ public class MongoDB {
 					DBObject dbo = new BasicDBObject();
 					dbo.put("_id", batch.get("_id"));
 					BatchCmd res = (BatchCmd) collection.findOne(dbo);
+					tso.setParam(0, res);
+				}
+				
+				@Override
+				public void setDB(DB db) {
+					this.db = db;
+				}
+			});
+		} catch (Exception e) {
+			// ErrorMsg.addErrorMessage(e);
+		}
+		return (BatchCmd) tso.getParam(0, null);
+	}
+	
+	public BatchCmd batchClearJob(final BatchCmd batch) {
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		// try to claim a batch cmd
+		try {
+			processDB(new RunnableOnDB() {
+				private DB db;
+				
+				@Override
+				public void run() {
+					DBCollection collection = db.getCollection("schedule");
+					collection.setObjectClass(BatchCmd.class);
+					DBObject dbo = new BasicDBObject();
+					dbo.put("_id", batch.get("_id"));
+					BatchCmd res = (BatchCmd) collection.findOne(dbo);
+					collection.remove(dbo);
 					tso.setParam(0, res);
 				}
 				

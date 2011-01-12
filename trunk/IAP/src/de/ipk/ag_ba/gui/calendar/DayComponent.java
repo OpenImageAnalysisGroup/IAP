@@ -90,25 +90,25 @@ public class DayComponent extends JComponent {
 			String dateToday = sdf.format(new Date().getTime());
 			boolean startOrEnd = false;
 			if (date.equals(dateA)) {
-				if (!exp.containsKey(ei.getImportusername()))
-					exp.put(ei.getImportusername(), new ArrayList<String>());
-				exp.get(ei.getImportusername()).add("experiment start: " + ei.getExperimentname());
+				if (!exp.containsKey(filter(ei.getImportusername(), "[unknown]")))
+					exp.put(filter(ei.getImportusername(), "[unknown]"), new ArrayList<String>());
+				exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment start: " + ei.getExperimentname());
 				startOrEnd = true;
 			}
 			if (date.equals(dateB)) {
-				if (!exp.containsKey(ei.getImportusername()))
-					exp.put(ei.getImportusername(), new ArrayList<String>());
+				if (!exp.containsKey(filter(ei.getImportusername(), "[unknown]")))
+					exp.put(filter(ei.getImportusername(), "[unknown]"), new ArrayList<String>());
 				if (date.equals(dateToday))
-					exp.get(ei.getImportusername()).add("experiment in progress: " + ei.getExperimentname());
+					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment in progress: " + ei.getExperimentname());
 				else
-					exp.get(ei.getImportusername()).add("experiment upload: " + ei.getExperimentname());
+					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment upload: " + ei.getExperimentname());
 				startOrEnd = true;
 			}
 			if (!startOrEnd) {
 				if (calendar.getTime().after(ei.getStartdate()) && calendar.getTime().before(ei.getImportdate())) {
-					if (!exp.containsKey(ei.getImportusername()))
-						exp.put(ei.getImportusername(), new ArrayList<String>());
-					exp.get(ei.getImportusername()).add("experiment running: " + ei.getExperimentname());
+					if (!exp.containsKey(filter(ei.getImportusername(), "[unknown]")))
+						exp.put(filter(ei.getImportusername(), "[unknown]"), new ArrayList<String>());
+					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment running: " + ei.getExperimentname());
 				}
 			}
 		}
@@ -140,6 +140,10 @@ public class DayComponent extends JComponent {
 		// setBorder(BorderFactory.createRaisedBevelBorder());
 		setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, color2.darker()));
 		validate();
+	}
+	
+	private String filter(String value, String returnIfNull) {
+		return value != null ? value : returnIfNull;
 	}
 	
 	/**
