@@ -11,6 +11,7 @@ import org.BackgroundTaskStatusProvider;
 
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
+import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
 
 /**
  * @author klukas
@@ -39,6 +40,8 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
 	public double getCurrentStatusValueFine() {
 		cmd = m.batchGetCommand(cmd);
 		try {
+			if (cmd.getRunStatus() == CloudAnalysisStatus.SCHEDULED)
+				return -1;
 			return cmd.getCurrentStatusValueFine();
 		} catch (NullPointerException npe) {
 			return -1;
@@ -48,7 +51,9 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
 	@Override
 	public String getCurrentStatusMessage1() {
 		try {
-			return "<html>" + cmd.getOwner() + "<br>" + cmd.getCurrentStatusMessage1();
+			return "<html>Owner: " + (cmd.getOwner() != null ? cmd.getOwner() : "(unclaimed)") + "<br>" +
+					"Status: " + cmd.getRunStatus().toString() + "" +
+					"<br>" + cmd.getCurrentStatusMessage1();
 		} catch (NullPointerException npe) {
 			return "";
 		}

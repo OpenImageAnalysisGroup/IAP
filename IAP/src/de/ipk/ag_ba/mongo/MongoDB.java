@@ -96,10 +96,10 @@ public class MongoDB {
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de")) {
-			res.add(new MongoDB("Cloud Storage 1", "cloud1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
-			res.add(new MongoDB("Cloud Storage 2", "cloud2", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
+			res.add(new MongoDB("IAP Cloud", "cloud1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
+			res.add(new MongoDB("IAP Cloud 2 (md5)", "cloud2", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
 		}
-		res.add(new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512));
+		// res.add(new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512));
 		
 		// if (IAPservice.isReachable("localhost")) {
 		// res.add(new MongoDB("local dbe3", "local_dbe3", "localhost", null, null, HashType.SHA512));
@@ -1177,12 +1177,13 @@ public class MongoDB {
 									added = true;
 								}
 							
-							// if (!added)
-							// if ((batch.getRunStatus() != CloudAnalysisStatus.FINISHED && System.currentTimeMillis() - batch.getLastUpdateTime() > 20000)) {
-							// res.add(batch);
-							//
-							// batchClaim(batch, CloudAnalysisStatus.STARTING, false);
-							// }
+							if (!added)
+								if (batch.getRunStatus() != null)
+									if ((batch.getRunStatus() != CloudAnalysisStatus.FINISHED && System.currentTimeMillis() - batch.getLastUpdateTime() > 20000)) {
+										res.add(batch);
+										
+										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
+									}
 						}
 					} catch (UnknownHostException e) {
 						ErrorMsg.addErrorMessage(e);
