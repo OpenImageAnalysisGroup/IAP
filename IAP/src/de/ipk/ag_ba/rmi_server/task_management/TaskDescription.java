@@ -13,9 +13,11 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
@@ -84,30 +86,47 @@ public class TaskDescription {
 				// store dataset in mongo
 				// System.out.println(experiment.toString());
 				experiment.getHeader().setExperimentname(
-									cmd + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§" + experiment.getName());
+									cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§" + experiment.getName());
 				experiment.getHeader().setImportusergroup("Temp");
 				System.out.println("Received result: " + experiment.getName());
 				try {
 					if (m.batchGetCommand(batch).getOwner().equals(SystemAnalysis.getHostName())) {
+						m.batchClearJob(batch);
 						m.saveExperiment(experiment, null);
 						ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 						for (ExperimentHeaderInterface i : m.getExperimentList()) {
 							if (i.getExperimentname() != null && i.getExperimentname().contains("§")) {
 								String c = i.getExperimentname().substring(0, i.getExperimentname().indexOf("§"));
-								if (c.equals(cmd))
+								if (c.equals(cmd.getRemoteCapableAnalysisActionClassName()))
 									knownResults.add(i);
 							}
 						}
 						if (knownResults.size() == batch.getPartCnt()) {
+							System.out.println("*****************************");
+							System.out.println("MERGE RESULTS:");
 							Experiment e = new Experiment();
 							for (ExperimentHeaderInterface i : knownResults) {
 								ExperimentInterface ei = m.getExperiment(i);
 								e.addAll(ei);
-							}
-							m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
-							for (ExperimentHeaderInterface i : knownResults) {
 								m.deleteExperiment(i.getExcelfileid());
+								System.out.println("Measurements: " + Experiment.getNumberOfMeasurementValues(ei));
+								System.out.println("*****************************");
 							}
+							String sn = cmd.getRemoteCapableAnalysisActionClassName();
+							if (sn.indexOf(".") > 0)
+								sn = sn.substring(sn.lastIndexOf(".") + 1);
+							e.getHeader().setExperimentname(sn + ": " + experimentInput.getExperimentName());
+							e.getHeader().setImportusergroup("Cloud Analysis Results");
+							e.getHeader().setExcelfileid("");
+							for (SubstanceInterface si : e) {
+								for (ConditionInterface ci : si) {
+									ci.setExperimentName(e.getHeader().getExperimentname());
+								}
+							}
+							System.out.println("*****************************");
+							System.out.println("Merged Experiment: " + e.getName());
+							System.out.println("Merged Measurements: " + Experiment.getNumberOfMeasurementValues(e));
+							m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
 						}
 					} else
 						System.out.println("Information: Batch command, processed by " + SystemAnalysis.getHostName()
