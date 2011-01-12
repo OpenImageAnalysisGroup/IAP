@@ -245,9 +245,9 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 			// save.rotate(3);
 			// save.saveImage("/Users/entzian/Desktop/sechsteBild.png");
 			
-			if (true)
-				closingOpening(w, h, arrayRGB, rgbArrayOriginal, iBackgroundFill, limg, 1);
-			
+			// if (true)
+			// closingOpening(w, h, arrayRGB, rgbArrayOriginal, iBackgroundFill, limg, 1);
+			//
 			// boolean removeSmallSegments = true;
 			//
 			// if (removeSmallSegments)
@@ -376,8 +376,13 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		}
 	}
 	
-	private static void closingOpening(int w, int h, int[] rgbArray, int[] rgbNonModifiedArray, int iBackgroundFill,
-						LoadedImage limg, int repeat) {
+	public static FlexibleImage closingOpening(FlexibleImage flMask, FlexibleImage flImage, int iBackgroundFill, int repeat) {
+		int[] rgbArray = flMask.getConvertAs1A();
+		int h = flMask.getHeight();
+		int w = flMask.getWidth();
+		
+		int[] rgbNonModifiedArray = flImage.getConvertAs1A();
+		
 		int[][] image = new int[w][h];
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -408,6 +413,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 					rgbArray[x + y * w] = rgbNonModifiedArray[x + y * w];
 			}
 		}
+		
+		return new FlexibleImage(rgbArray, w, h);
 		// PrintImage.printImage(rgbArray, w, h);
 		//
 		// ImageOperation save = new ImageOperation(rgbArray, w, h);
@@ -619,7 +626,8 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 						double l = arrayL[i];
 						double a = arrayA[i];
 						double b = arrayB[i];
-						if (a > 21 || b < 5 || a > -6) { // a < -5 &&
+						if (a > 21 || b < 5) {
+							// if (a > 21 || b < 5 || a > -6) { // a < -5 &&
 							rgbArray[i] = iBackgroundFill;
 						} else {
 							for (int idx = 0; idx < ba.length; idx++) {
