@@ -1170,8 +1170,15 @@ public class MongoDB {
 						collection.setObjectClass(BatchCmd.class);
 						for (DBObject dbo : collection.find()) {
 							BatchCmd batch = (BatchCmd) dbo;
+							boolean added = false;
 							if (batch.getRunStatus() == CloudAnalysisStatus.STARTING)
-								if (hostName.equals(batch.getOwner()))
+								if (hostName.equals(batch.getOwner())) {
+									res.add(batch);
+									added = true;
+								}
+							
+							if (!added)
+								if ((batch.getRunStatus() != CloudAnalysisStatus.FINISHED && System.currentTimeMillis() - batch.getLastUpdateTime() > 20000))
 									res.add(batch);
 						}
 					} catch (UnknownHostException e) {

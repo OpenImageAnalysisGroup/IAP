@@ -12,7 +12,6 @@ import java.net.UnknownHostException;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
@@ -59,11 +58,11 @@ public class CloudComputingService {
 		if (!active) {
 			// enable server mode
 			try {
-				m.batchClearJobs();
-				for (ExperimentHeaderInterface ei : m.getExperimentList()) {
-					if (ei.getExperimentname() == null || ei.getExperimentname().length() == 0 || ei.getExperimentname().contains("§"))
-						m.deleteExperiment(ei.getExcelfileid());
-				}
+				// m.batchClearJobs();
+				// for (ExperimentHeaderInterface ei : m.getExperimentList()) {
+				// if (ei.getExperimentname() == null || ei.getExperimentname().length() == 0 || ei.getExperimentname().contains("§"))
+				// m.deleteExperiment(ei.getExcelfileid());
+				// }
 				String hostName = InetAddress.getLocalHost().getHostName();
 				String ip = InetAddress.getLocalHost().getHostAddress();
 				cloudTaskManager.setHostName(hostName);
