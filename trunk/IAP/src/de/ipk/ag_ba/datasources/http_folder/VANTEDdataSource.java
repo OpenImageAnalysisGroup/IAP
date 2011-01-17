@@ -21,13 +21,15 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
  * @author klukas
  */
 public class VANTEDdataSource extends HTTPfolderSource {
+	private static final String VANTED = "VANTED Resources";
+	
 	public VANTEDdataSource() {
 		super(getLibrary(),
-							"VANTED",
+							VANTED,
 							"http://vanted.ipk-gatersleben.de/examplefiles/",
 							new String[] { ".gml", ".graphml" },
-							IAPmain.loadIcon("img/vanted1_0.png"),
-							IAPmain.loadIcon("img/ext/folder-remote.png"));
+							IAPmain.loadIcon("img/vanted1_0_doku.png"), // vanted1_0.png"),
+				IAPmain.loadIcon("img/ext/folder-remote.png"));
 		setDescription("<h2>Welcome to VANTED - Visualization and Analysis of Networks containing Experimental Data</h2>"
 							+ "This system makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
 							+ "It is possible to map experimental datasets onto the graph elements and visualize time series data or data of different "
@@ -89,10 +91,10 @@ public class VANTEDdataSource extends HTTPfolderSource {
 	
 	private static Library getLibrary() {
 		Library liblVANTED = new Library();
-		liblVANTED.add(new Book("VANTED", "Website", "http://vanted.ipk-gatersleben.de/", "img/browser.png"));
-		liblVANTED.add(new Book("VANTED", "Source Code", "http://vanted.ipk-gatersleben.de/#ui-tabs-9"));
-		liblVANTED.add(new Book("VANTED", "Add-ons", "http://vanted.ipk-gatersleben.de/#ui-tabs-11"));
-		liblVANTED.add(new Book("VANTED", "Lit. References", "http://vanted.ipk-gatersleben.de/#ui-tabs-13"));
+		liblVANTED.add(new Book(VANTED, "Website", "http://vanted.ipk-gatersleben.de/", "img/browser.png"));
+		liblVANTED.add(new Book(VANTED, "Source Code", "http://vanted.ipk-gatersleben.de/#ui-tabs-9"));
+		liblVANTED.add(new Book(VANTED, "Add-ons", "http://vanted.ipk-gatersleben.de/#ui-tabs-11"));
+		liblVANTED.add(new Book(VANTED, "Lit. References", "http://vanted.ipk-gatersleben.de/#ui-tabs-13"));
 		return liblVANTED;
 	}
 	

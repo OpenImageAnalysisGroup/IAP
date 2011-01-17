@@ -67,15 +67,22 @@ public class Other {
 		for (Object o : validProcessors) {
 			final AbstractExperimentDataProcessor pp = (AbstractExperimentDataProcessor) o;
 			NavigationAction action = new AbstractNavigationAction("Analyze Data") {
+				MainPanelComponent mpc;
+				private NavigationButton src;
+				
 				@Override
 				public void performActionCalculateResults(NavigationButton src) {
+					this.src = src;
 					try {
 						if (experimentName.getData(m) != null) {
 							SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(m, experimentName.getData(m),
 												experimentName.getExperimentName());
 							ExperimentDataProcessingManager.getInstance().processData(experimentName.getData(m), pp, null,
 												optSupplementaryPanel, null);
-							IAPmain.showVANTED(false);
+							JComponent gui = IAPmain.showVANTED(true);
+							gui.setBorder(BorderFactory.createLoweredBevelBorder());
+							mpc = new MainPanelComponent(gui);
+							
 						}
 					} catch (Exception err) {
 						ErrorMsg.addErrorMessage(err);
@@ -84,18 +91,20 @@ public class Other {
 				
 				@Override
 				public MainPanelComponent getResultMainPanel() {
-					return null;
+					return mpc;
 				}
 				
 				@Override
 				public ArrayList<NavigationButton> getResultNewNavigationSet(
 									ArrayList<NavigationButton> currentSet) {
-					return null;
+					ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
+					res.add(src);
+					return res;
 				}
 				
 				@Override
 				public ArrayList<NavigationButton> getResultNewActionSet() {
-					return null;
+					return new ArrayList<NavigationButton>();
 				}
 				
 				@Override

@@ -37,8 +37,10 @@ import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.mongo.SaveInDatabaseDataProcessor;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessingManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.DBEsplashScreen;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
@@ -50,7 +52,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class IAPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
 	
-	MainFrame mainFrame;
+	static MainFrame mainFrame1;
+	
+	static MainFrame mainFrame2;
 	
 	public void setAppletCloseListener(ActionListener l) {
 		// empty
@@ -88,7 +92,8 @@ public class IAPmain extends JApplet {
 		uiPrefs.put("showPluginMenu", "false");
 		JPanel statusPanel = new JPanel();
 		
-		mainFrame = new MainFrame(GravistoMainHelper.getPluginManager(), uiPrefs, statusPanel, true);
+		mainFrame1 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
+		mainFrame2 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
 		
 		setLayout(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.FILL } }));
 		
@@ -108,7 +113,8 @@ public class IAPmain extends JApplet {
 				}
 				IAPmain.myClassKnown = true;
 				System.out.println("Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
-				myAppletLoad(mainFrame, myStatus);
+				myAppletLoad(mainFrame1, myStatus);
+				myAppletLoad(mainFrame2, myStatus);
 			}
 		};
 		t.setPriority(Thread.MIN_PRIORITY);
@@ -282,10 +288,12 @@ public class IAPmain extends JApplet {
 		
 		splashScreen.setText("Load plugins...");
 		try {
-			GravistoMainHelper.loadPlugins(locations, splashScreen);
+			GravistoMainHelper.loadPlugins(statusPanel.getPluginManager(), locations, splashScreen);
 		} catch (PluginManagerException pme) {
 			ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
 		}
+		
+		ExperimentDataProcessingManager.addExperimentDataProcessor(new SaveInDatabaseDataProcessor());
 		
 		splashScreen.setText("Initialize GUI...");
 		splashScreen.setVisible(false);
@@ -294,21 +302,26 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static JComponent showVANTED(boolean inline) {
-		JFrame jf = (JFrame) ErrorMsg.findParentComponent(MainFrame.getInstance(), JFrame.class);
-		if (jf != null && !jf.isVisible()) {
-			if (inline) {
-				MainFrame.getInstance().getViewManager().viewChanged(null);
-				JComponent gui = jf.getRootPane();
-				return gui;
+		inline = false;
+		// JFrame jf = (JFrame) ErrorMsg.findParentComponent(MainFrame.getInstance(), JFrame.class);
+		
+		for (MainFrame jc : new MainFrame[] { mainFrame1, mainFrame2 }) {
+			JFrame jf = (JFrame) ErrorMsg.findParentComponent(jc, JFrame.class);
+			if (jf != null && !jf.isVisible()) {
+				if (inline) {
+					MainFrame.getInstance().getViewManager().viewChanged(null);
+					JComponent gui = jf.getRootPane();
+					return gui;
+				} else {
+					jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+					jf.setVisible(true);
+					MainFrame.getInstance().getViewManager().viewChanged(null);
+				}
 			} else {
-				jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-				jf.setVisible(true);
-				MainFrame.getInstance().getViewManager().viewChanged(null);
-			}
-		} else {
-			if (jf != null) {
-				jf.setVisible(false);
-				jf.setVisible(true);
+				if (jf != null) {
+					jf.setVisible(false);
+					jf.setVisible(true);
+				}
 			}
 		}
 		return null;

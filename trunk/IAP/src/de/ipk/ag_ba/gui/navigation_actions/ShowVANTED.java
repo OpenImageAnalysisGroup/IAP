@@ -9,6 +9,7 @@ package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -47,6 +48,7 @@ public class ShowVANTED extends AbstractNavigationAction {
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		JComponent gui = IAPmain.showVANTED(showInline);
+		gui.setBorder(BorderFactory.createLoweredBevelBorder());
 		return gui != null ? new MainPanelComponent(gui) : null;
 	}
 	
@@ -62,6 +64,6 @@ public class ShowVANTED extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Show VANTED";
+		return "VANTED";
 	}
 }
