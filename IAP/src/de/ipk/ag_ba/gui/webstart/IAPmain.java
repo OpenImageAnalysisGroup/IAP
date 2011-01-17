@@ -54,7 +54,7 @@ public class IAPmain extends JApplet {
 	
 	static MainFrame mainFrame1;
 	
-	static MainFrame mainFrame2;
+	// static MainFrame mainFrame2;
 	
 	public void setAppletCloseListener(ActionListener l) {
 		// empty
@@ -93,7 +93,7 @@ public class IAPmain extends JApplet {
 		JPanel statusPanel = new JPanel();
 		
 		mainFrame1 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
-		mainFrame2 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
+		// mainFrame2 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
 		
 		setLayout(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.FILL } }));
 		
@@ -114,7 +114,7 @@ public class IAPmain extends JApplet {
 				IAPmain.myClassKnown = true;
 				System.out.println("Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
 				myAppletLoad(mainFrame1, myStatus);
-				myAppletLoad(mainFrame2, myStatus);
+				// myAppletLoad(mainFrame2, myStatus);
 			}
 		};
 		t.setPriority(Thread.MIN_PRIORITY);
@@ -305,7 +305,8 @@ public class IAPmain extends JApplet {
 		inline = false;
 		// JFrame jf = (JFrame) ErrorMsg.findParentComponent(MainFrame.getInstance(), JFrame.class);
 		
-		for (MainFrame jc : new MainFrame[] { mainFrame1, mainFrame2 }) {
+		// mainFrame2
+		for (MainFrame jc : new MainFrame[] { mainFrame1 }) {
 			JFrame jf = (JFrame) ErrorMsg.findParentComponent(jc, JFrame.class);
 			if (jf != null && !jf.isVisible()) {
 				if (inline) {
