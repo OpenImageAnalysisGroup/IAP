@@ -176,27 +176,33 @@ public class IAPmain extends JApplet {
 			
 			private int max, val;
 			
+			@Override
 			public void setVisible(boolean b) {
 			}
 			
+			@Override
 			public void setValue(int value) {
 				this.val = value;
 				double progress = val / (double) max * 100d;
 				myStatus.setCurrentStatusValueFine(progress);
 			}
 			
+			@Override
 			public void setText(String text) {
 				MainFrame.showMessage(text, MessageType.PERMANENT_INFO);
 			}
 			
+			@Override
 			public void setMaximum(int maximum) {
 				this.max = maximum;
 			}
 			
+			@Override
 			public void setInitialisationFinished() {
 				MainFrame.showMessage("", MessageType.INFO);
 			}
 			
+			@Override
 			public int getValue() {
 				return val;
 			}
@@ -302,7 +308,7 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static JComponent showVANTED(boolean inline) {
-		inline = false;
+		// inline = false;
 		// JFrame jf = (JFrame) ErrorMsg.findParentComponent(MainFrame.getInstance(), JFrame.class);
 		
 		// mainFrame2
