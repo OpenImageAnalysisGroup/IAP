@@ -205,7 +205,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		res.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ExperimentDataInfoPane.showXMLdata(null, experiment);
+				ExperimentDataInfoPane.showXMLdata(experiment);
 			}
 		});
 		return res;

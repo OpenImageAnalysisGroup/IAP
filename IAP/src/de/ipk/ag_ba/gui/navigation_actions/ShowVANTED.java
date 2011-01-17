@@ -18,7 +18,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 public class ShowVANTED extends AbstractNavigationAction {
 	
-	private boolean showInline = true;
+	private final boolean showInline = true;
 	private NavigationButton src;
 	
 	public ShowVANTED() {
@@ -48,7 +48,8 @@ public class ShowVANTED extends AbstractNavigationAction {
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		JComponent gui = IAPmain.showVANTED(showInline);
-		gui.setBorder(BorderFactory.createLoweredBevelBorder());
+		if (gui != null)
+			gui.setBorder(BorderFactory.createLoweredBevelBorder());
 		return gui != null ? new MainPanelComponent(gui) : null;
 	}
 	
