@@ -42,6 +42,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Experime
  * @author klukas
  */
 public class MyExperimentInfoPanel extends JPanel {
+	private static String CANCEL = "Cancel";
+	
 	private static final long serialVersionUID = 1L;
 	
 	JTextField editName;
@@ -218,7 +220,7 @@ public class MyExperimentInfoPanel extends JPanel {
 			enabled = true;
 		
 		if (enabled)
-			editB.setText("<html>Cancel");
+			editB.setText("<html>" + CANCEL);
 		else
 			editB.setText("<html>Edit");
 		saveB.setEnabled(savePossible);
@@ -350,7 +352,7 @@ public class MyExperimentInfoPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				boolean restore = false;
 				
-				if (editB.getText().contains("Cancel"))
+				if (editB.getText().contains(CANCEL))
 					restore = true;
 				
 				boolean b = tso.getBval(0, false);
@@ -362,6 +364,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				if (restore) {
 					saveB.setText("Save Changes");
 					editName.setText(experimentHeader.getExperimentname());
+					coordinator.setText(experimentHeader.getCoordinator());
 					groupVisibility.setText(experimentHeader.getImportusergroup());
 					// groupVisibility.setSelectedItem(experimentHeader.getImportusergroup());
 					if (experimentHeader.getExperimentType() != null)
@@ -474,6 +477,10 @@ public class MyExperimentInfoPanel extends JPanel {
 			else
 				return sizekb;
 		}
+	}
+	
+	public void setCancelText(String text) {
+		CANCEL = text;
 	}
 	
 }

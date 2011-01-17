@@ -19,7 +19,6 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -61,7 +60,7 @@ public class LemnaExperimentNavigationAction extends AbstractNavigationAction {
 		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m,
 							new ExperimentReference(experiment), guiSetting)) {
 			if (ne.getTitle().contains("Put data")) {
-				ne.setTitle("View in VANTED");
+				ne.setTitle("Analyze with VANTED");
 				actions.add(ne);
 			}
 		}

@@ -29,7 +29,10 @@ public class MyScrollPane extends JScrollPane {
 	@Override
 	public Dimension getPreferredSize() {
 		Dimension res = super.getPreferredSize();
-		res.setSize(res.width, panel.getMaxYY() + 30);
+		if (panel.getEntitySet(true).size() > 0)
+			res.setSize(res.width, panel.getMaxYY() + 10);
+		else
+			res.setSize(res.width, panel.getMaxYY());
 		return res;
 	}
 	

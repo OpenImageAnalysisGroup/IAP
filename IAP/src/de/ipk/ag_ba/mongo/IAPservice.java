@@ -18,6 +18,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
@@ -60,7 +61,7 @@ public class IAPservice {
 		InetAddress address;
 		try {
 			address = InetAddress.getByName(host);
-			boolean reachable = address.isReachable(2000);
+			boolean reachable = address.isReachable(200);
 			if (!reachable)
 				return false;
 			else
@@ -126,6 +127,7 @@ public class IAPservice {
 					@Override
 					public MainPanelComponent getResultMainPanel() {
 						JComponent gui = IAPmain.showVANTED(true);
+						gui.setBorder(BorderFactory.createLoweredBevelBorder());
 						if (g != null)
 							MainFrame.getInstance().showGraph(g, null, LoadSetting.VIEW_CHOOSER_NEVER);
 						return gui != null ? new MainPanelComponent(gui) : null;
@@ -138,7 +140,7 @@ public class IAPservice {
 					
 				};
 				
-				NavigationButton editInVanted = new NavigationButton(editInVantedAction, "Edit Network", "img/vanted1_0.png",
+				NavigationButton editInVanted = new NavigationButton(editInVantedAction, "Edit", "img/vanted1_0.png",
 									src.getGUIsetting());
 				result.add(editInVanted);
 				

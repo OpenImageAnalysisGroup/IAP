@@ -151,6 +151,19 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		removeAll();
 		if (set != null) {
 			ButtonDrawStyle buttonStyleToUse = buttonStyle;
+			if (target == PanelTarget.ACTION) {
+				if (theOther != null && getEntitySet(true).size() == 0) {
+					theOther.buttonStyle = ButtonDrawStyle.COMPACT_LIST;
+					theOther.updateGUI();
+					theOther.disableContextMenu();
+				} else {
+					if (theOther.buttonStyle != buttonStyle) {
+						theOther.buttonStyle = buttonStyle;
+						theOther.updateGUI();
+						theOther.enableContextMenu();
+					}
+				}
+			}
 			ArrayList<JComponent> right = new ArrayList<JComponent>();
 			boolean first = true;
 			ObjectRef next = new ObjectRef();
@@ -233,6 +246,18 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				actionPanelRight.repaint();
 			}
 		}
+	}
+	
+	private void enableContextMenu() {
+		menuItemCompact.setEnabled(true);
+		menuItemFlat.setEnabled(true);
+		menuItemButtons.setEnabled(true);
+	}
+	
+	private void disableContextMenu() {
+		menuItemCompact.setEnabled(false);
+		menuItemFlat.setEnabled(false);
+		menuItemButtons.setEnabled(false);
 	}
 	
 	private MouseListener getAddBookmarkActionListener(final JLabel lbl, final ObjectRef right, final NavigationButton ne) {

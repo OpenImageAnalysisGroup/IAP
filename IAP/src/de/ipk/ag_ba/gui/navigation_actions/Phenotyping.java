@@ -36,7 +36,7 @@ public class Phenotyping extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> phenoDBcommands = new ArrayList<NavigationButton>();
 		
-		NavigationAction analyzeAction = new UploadImagesToCloud(false);
+		NavigationAction analyzeAction = new SaveExperimentInCloud(false);
 		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Process Files", "img/ext/user-desktop.png",
 							"img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
 		phenoDBcommands.add(analyzeEntity);

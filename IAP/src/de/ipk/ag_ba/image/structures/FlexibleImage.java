@@ -9,11 +9,13 @@ package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.image.operations.ImageConverter;
@@ -57,6 +59,10 @@ public class FlexibleImage {
 	
 	public FlexibleImage(int[][] img) {
 		this.bufferedImage = ImageConverter.convert2AtoBI(img);
+	}
+	
+	public FlexibleImage(Image image) {
+		this(GravistoService.getBufferedImage(image));
 	}
 	
 	public BufferedImage getBufferedImage() {

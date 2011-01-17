@@ -15,8 +15,8 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
-import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
+import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -53,12 +53,13 @@ public final class HomeAction extends AbstractNavigationAction {
 		
 		HTTPfolderSource van = new VANTEDdataSource();
 		NavigationButton vantedNB = new NavigationButton(new DataSourceNavigationAction(van), guiSetting);
-		NavigationButton startVanted0 = new NavigationButton(new ShowVANTED(), guiSetting);
-		vantedNB.getAction().addAdditionalEntity(startVanted0);
+		// NavigationButton startVanted0 = new NavigationButton(new ShowVANTED(), guiSetting);
+		// vantedNB.getAction().addAdditionalEntity(startVanted0);
 		homeActions.add(vantedNB);
 		
 		NavigationButton serverStatusEntity = Other.getServerStatusEntity(true, src.getGUIsetting());
 		homePrimaryActions.add(serverStatusEntity);
+		
 		{
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
 								"General Bioinformatics Ressources", "img/pattern_graffiti_logo.png", "img/pattern_graffiti_logo.png");
@@ -77,6 +78,8 @@ public final class HomeAction extends AbstractNavigationAction {
 			// ipkBioInf.addAdditionalEntity(nge);
 			homePrimaryActions.add(new NavigationButton(ipkBioInf, guiSetting));
 		}
+		
+		homePrimaryActions.add(new NavigationButton(new ShowVANTED(), guiSetting));
 	}
 	
 	ArrayList<NavigationButton> bookmarks;

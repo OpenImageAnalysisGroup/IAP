@@ -37,7 +37,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.loaders.MyScanner;
 /**
  * @author klukas
  */
-public class UploadImagesToCloud extends AbstractNavigationAction {
+public class SaveExperimentInCloud extends AbstractNavigationAction {
 	private NavigationButton src;
 	
 	ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
@@ -48,7 +48,7 @@ public class UploadImagesToCloud extends AbstractNavigationAction {
 	
 	private MongoDB m;
 	
-	UploadImagesToCloud(boolean storeInMongo) {
+	SaveExperimentInCloud(boolean storeInMongo) {
 		super("Upload data set to the IAP Systems Biology Cloud database service");
 		this.storeInMongo = storeInMongo;
 	}
