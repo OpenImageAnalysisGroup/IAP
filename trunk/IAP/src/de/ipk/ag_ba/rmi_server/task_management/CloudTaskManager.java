@@ -82,7 +82,7 @@ public class CloudTaskManager {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
 					long maxDelaySinceLastUpdate = 5000;
 					m.batchPingHost(ip);
-					if (runningTasks.size() == 0) {
+					if (runningTasks.size() <= 1) {
 						if (m == null)
 							return;
 						for (BatchCmd batch : m.batchGetCommands(maxDelaySinceLastUpdate)) {
