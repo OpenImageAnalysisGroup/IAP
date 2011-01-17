@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 
 public class BlockPipeline {
 	
-	private ArrayList<Class<? extends ImageAnalysisBlockFIS>> blocks = new ArrayList<Class<? extends ImageAnalysisBlockFIS>>();
+	private final ArrayList<Class<? extends ImageAnalysisBlockFIS>> blocks = new ArrayList<Class<? extends ImageAnalysisBlockFIS>>();
 	private final PhytoTopImageProcessorOptions options;
 	
 	public BlockPipeline(PhytoTopImageProcessorOptions options) {
@@ -22,7 +22,8 @@ public class BlockPipeline {
 	}
 	
 	public FlexibleMaskAndImageSet execute(FlexibleMaskAndImageSet input, FlexibleImageStack debugStack) throws InstantiationException, IllegalAccessException {
-		System.out.println("Execute BLOCK pipeline...");
+		// System.out.println("Execute BLOCK pipeline...");
+		System.out.print(".");
 		long a = System.currentTimeMillis();
 		nullPointerCheck(input, "PIPELINE INPUT ");
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
