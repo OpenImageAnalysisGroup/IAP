@@ -76,7 +76,7 @@ public class TestPhytoTopAnalysis {
 		FlexibleImage imgVisible = new FlexibleImage(urlVis);
 		FlexibleImage imgNIR = new FlexibleImage(urlNIR);
 		
-		double scale = 1;
+		double scale = 0.2;
 		if (Math.abs(scale - 1) > 0.0001) {
 			System.out.println("Debug: Using Scale-Factor of " + scale + " to improve performance!");
 			imgFluo = new ImageOperation(imgFluo).resize(scale).getImage();
@@ -97,7 +97,7 @@ public class TestPhytoTopAnalysis {
 				input, SystemAnalysis.getNumberOfCPUs(), debug ? new FlexibleImageStack() : null, parameterSearch);
 		
 		res.print("PIPELINE RESULT");
-		
+		System.out.println("test");
 	}
 	
 	@Test
@@ -116,23 +116,23 @@ public class TestPhytoTopAnalysis {
 		System.out.println("Small-Phytochamber Test");
 		
 		urlVis = new IOurl(
-					"mongo_ba-13.ipk-gatersleben.de_cloud1://bcc5acb0f93b36e5ca20e7c3e6820ac15c136957ffd216d8d751e9ad98ce89f4af2728c6a1326856d7b0404654be8fdfd023d7dbf775bc013cd275969fff39c0/H31_02_1229.png");
+				"mongo_ba-13.ipk-gatersleben.de_cloud1://bcc5acb0f93b36e5ca20e7c3e6820ac15c136957ffd216d8d751e9ad98ce89f4af2728c6a1326856d7b0404654be8fdfd023d7dbf775bc013cd275969fff39c0/H31_02_1229.png");
 		urlFlu = new IOurl(
-					"mongo_ba-13.ipk-gatersleben.de_cloud1://978b5eca5217382462b2b5b6485a684115d81788526998cb9421715285c904b854d43c3b38a09050e080525d10ad890dd5a272e2861ee1e13d6b88450d09e867/H31_02_1229.png");
+				"mongo_ba-13.ipk-gatersleben.de_cloud1://978b5eca5217382462b2b5b6485a684115d81788526998cb9421715285c904b854d43c3b38a09050e080525d10ad890dd5a272e2861ee1e13d6b88450d09e867/H31_02_1229.png");
 		urlNIR = new IOurl(
-					"mongo_ba-13.ipk-gatersleben.de_cloud1://e433e4462175d185e8444c5b106d703162ccd30852510421c52bf1bcda6a5ed98767dc3af3e81f9d5ae1f3a8cb7abbf7a8778b9395dda08ff4fc15d61072f200/H31_02_1229.png");
+				"mongo_ba-13.ipk-gatersleben.de_cloud1://e433e4462175d185e8444c5b106d703162ccd30852510421c52bf1bcda6a5ed98767dc3af3e81f9d5ae1f3a8cb7abbf7a8778b9395dda08ff4fc15d61072f200/H31_02_1229.png");
 		
 		String target = "mongo_localhost_localCloud1";
 		if (urlFlu.getInputStream() == null) {
 			urlVis = new IOurl(
-						target
-								+ "://bcc5acb0f93b36e5ca20e7c3e6820ac15c136957ffd216d8d751e9ad98ce89f4af2728c6a1326856d7b0404654be8fdfd023d7dbf775bc013cd275969fff39c0/H31_02_1229.png");
+					target
+							+ "://bcc5acb0f93b36e5ca20e7c3e6820ac15c136957ffd216d8d751e9ad98ce89f4af2728c6a1326856d7b0404654be8fdfd023d7dbf775bc013cd275969fff39c0/H31_02_1229.png");
 			urlFlu = new IOurl(
-						target
-								+ "://978b5eca5217382462b2b5b6485a684115d81788526998cb9421715285c904b854d43c3b38a09050e080525d10ad890dd5a272e2861ee1e13d6b88450d09e867/H31_02_1229.png");
+					target
+							+ "://978b5eca5217382462b2b5b6485a684115d81788526998cb9421715285c904b854d43c3b38a09050e080525d10ad890dd5a272e2861ee1e13d6b88450d09e867/H31_02_1229.png");
 			urlNIR = new IOurl(
-						target
-								+ "://e433e4462175d185e8444c5b106d703162ccd30852510421c52bf1bcda6a5ed98767dc3af3e81f9d5ae1f3a8cb7abbf7a8778b9395dda08ff4fc15d61072f200/H31_02_1229.png");
+					target
+							+ "://e433e4462175d185e8444c5b106d703162ccd30852510421c52bf1bcda6a5ed98767dc3af3e81f9d5ae1f3a8cb7abbf7a8778b9395dda08ff4fc15d61072f200/H31_02_1229.png");
 		}
 		// if not available, store files in DB
 		if (urlFlu.getInputStream() == null) {
@@ -152,7 +152,7 @@ public class TestPhytoTopAnalysis {
 		FlexibleImage imgVisible = new FlexibleImage(urlVis);
 		FlexibleImage imgNIR = new FlexibleImage(urlNIR);
 		
-		double scale = 1;
+		double scale = 0.2;
 		if (Math.abs(scale - 1) > 0.0001) {
 			System.out.println("Debug: Using Scale-Factor of " + scale + " to improve performance!");
 			imgFluo = new ImageOperation(imgFluo).resize(scale).getImage();
@@ -173,7 +173,7 @@ public class TestPhytoTopAnalysis {
 				input, SystemAnalysis.getNumberOfCPUs(), debug ? new FlexibleImageStack() : null, parameterSearch);
 		
 		res.print("PIPELINE RESULT");
-		
+		System.out.println("test");
 	}
 	
 }

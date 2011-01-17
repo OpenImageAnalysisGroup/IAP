@@ -236,7 +236,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 						value = getMatchResultValue(workMask, visMaskImage, stepF, noOperationValue, operation);
 					else
 						value = getMatchResultValue(workMask, visMaskImage, bestValueOfOtherTranslation, stepF, operation);
-					System.out.println("" + operation + " mit dem Wert: " + stepF + " mit dem value: " + value);
+					// System.out.println("" + operation + " mit dem Wert: " + stepF + " mit dem value: " + value);
 					synchronized (bestValueTS) {
 						if (value > bestValueTS.getDouble()) {
 							bestValueTS.setDouble(value);
@@ -249,13 +249,13 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 									case TRANSLATION:
 									if (Math.abs(stepF) < Math.abs(bestParameterTS.getDouble())) {
 										bestParameterTS.setDouble(stepF);
-										System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen! " + stepF);
+										// System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen! " + stepF);
 									}
 									break;
 								case SCALING:
 									if (Math.abs(stepF - 1) < Math.abs(bestParameterTS.getDouble() - 1)) {
 										bestParameterTS.setDouble(stepF);
-										System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen!" + stepF);
+										// System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen!" + stepF);
 									}
 								default:
 									break;
@@ -295,7 +295,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		}
 		
 		if (stopping) {
-			System.out.println("Calculation steps: " + zaehler);
+			// System.out.println("Calculation steps: " + zaehler);
 			return bestParameterTS.getDouble();
 		} else
 			return recursiveParameterSearch(workMask, visMaskImage, newBorderLeft, newBorderRight,
