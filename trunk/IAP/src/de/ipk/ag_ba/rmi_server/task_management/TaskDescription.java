@@ -101,6 +101,7 @@ public class TaskDescription {
 									knownResults.add(i);
 							}
 						}
+						System.out.println("TODO: " + batch.getPartCnt() + ", FINISHED: " + knownResults.size());
 						if (knownResults.size() == batch.getPartCnt()) {
 							System.out.println("*****************************");
 							System.out.println("MERGE RESULTS:");
