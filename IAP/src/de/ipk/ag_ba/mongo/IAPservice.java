@@ -51,6 +51,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -61,7 +62,12 @@ public class IAPservice {
 		InetAddress address;
 		try {
 			address = InetAddress.getByName(host);
-			boolean reachable = address.isReachable(200);
+			int time;
+			if (SystemAnalysis.isWindowsRunning())
+				time = 2000;
+			else
+				time = 200;
+			boolean reachable = address.isReachable(time);
 			if (!reachable)
 				return false;
 			else

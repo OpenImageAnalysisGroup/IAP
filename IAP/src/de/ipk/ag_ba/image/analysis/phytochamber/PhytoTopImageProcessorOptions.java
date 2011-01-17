@@ -89,8 +89,8 @@ public class PhytoTopImageProcessorOptions {
 		setNearNumberOfErodeLoops((int) Math.ceil(1 * scale));
 		setNearNumberOfDilateLoops((int) Math.ceil(2 * scale));
 		
-		setDilateRgbTop((int) Math.ceil(15 * scale));
-		setErodeRgbTop((int) Math.ceil(10 * scale));
+		setDilateRgbTop((int) Math.ceil(10 * scale));
+		setErodeRgbTop((int) Math.ceil(7 * scale));
 		setDilateFluoTop((int) Math.ceil(2 * scale));
 		setErodeFluoTop((int) Math.ceil(1 * scale));
 		

@@ -92,26 +92,26 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		return new FlexibleMaskAndImageSet(processedImages, processedMasks);
 	}
 	
-	private FlexibleImage automaticProcessIntervallSearch(FlexibleImage workMask, FlexibleImage visImage, ObjectRef resultValue,
+	private FlexibleImage automaticProcessIntervallSearch(FlexibleImage workMask, FlexibleImage visMaskImage, ObjectRef resultValue,
 			MorphologicalOperationSearchType typ) {
 		
 		double bestValueX = 0;
 		double bestValueY = 0;
 		
 		if (typ == MorphologicalOperationSearchType.ROTATION) {
-			bestValueX = automaticIntervallSearchPartly(workMask, visImage, typ);
+			bestValueX = automaticIntervallSearchPartly(workMask, visMaskImage, typ);
 		} else {
 			// scan X direction
-			bestValueX = automaticIntervallSearchPartly(workMask, visImage, 0, true, typ);
+			bestValueX = automaticIntervallSearchPartly(workMask, visMaskImage, 0, true, typ);
 			// scan Y direction
-			bestValueY = automaticIntervallSearchPartly(workMask, visImage, bestValueX, false, typ);
+			bestValueY = automaticIntervallSearchPartly(workMask, visMaskImage, bestValueX, false, typ);
 			
 		}
 		
-		return automaticSearchValueApplyToMaskAndReturn(workMask, visImage, resultValue, bestValueX, bestValueY, typ);
+		return automaticSearchValueApplyToMaskAndReturn(workMask, resultValue, bestValueX, bestValueY, typ);
 	}
 	
-	private FlexibleImage automaticSearchValueApplyToMaskAndReturn(FlexibleImage workMask, FlexibleImage visImage, ObjectRef resultValue, double bestValueX,
+	private FlexibleImage automaticSearchValueApplyToMaskAndReturn(FlexibleImage workMask, ObjectRef resultValue, double bestValueX,
 			double bestValueY, MorphologicalOperationSearchType typ) {
 		
 		if (bestValueX != 0 || bestValueY != 0) {
@@ -167,108 +167,95 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		
 	}
 	
-	private double automaticIntervallSearchPartly(FlexibleImage workMask, FlexibleImage visImage, MorphologicalOperationSearchType typ) {
+	private double automaticIntervallSearchPartly(FlexibleImage workMask, FlexibleImage visMaskImage, MorphologicalOperationSearchType typ) {
 		
-		return automaticIntervallSearchPartly(workMask, visImage, 0, true, typ);
+		return automaticIntervallSearchPartly(workMask, visMaskImage, 0, true, typ);
 	}
 	
-	private double automaticIntervallSearchPartly(FlexibleImage workMask, FlexibleImage visImage, double bestOtherValue,
+	private double automaticIntervallSearchPartly(FlexibleImage workMask, FlexibleImage visMaskImage, double bestOtherValue,
 			boolean scanParameterX, MorphologicalOperationSearchType operationType) {
 		
 		double borderLeft = 0;
 		double borderRight = 0;
-		double intervallTeiler = 1.0;
-		double nullPointValue = -10000000.0;
 		
 		switch (operationType) {
 			case TRANSLATION:
 				borderLeft = -50;
 				borderRight = 50;
-				intervallTeiler = 0.1;
-				nullPointValue = getMatchResultValue(workMask, visImage, 0, 0, operationType);
 				break;
 			
 			case SCALING:
-				borderLeft = 0.5;
-				borderRight = 1.5;
-				intervallTeiler = 0.2;
-				nullPointValue = getMatchResultValue(workMask, visImage, 1.0, 1.0, operationType);
+				borderLeft = 0.8;
+				borderRight = 1.2;
 				break;
 			
 			case ROTATION:
-				borderLeft = -15.0;
-				borderRight = 15.0;
-				intervallTeiler = 0.1;
-				nullPointValue = getMatchResultValue(workMask, visImage, 1, 0, operationType);
+				borderLeft = -5.0;
+				borderRight = 5.0;
 				break;
 		}
 		
-		System.out.println("NullPointValue: " + nullPointValue);
-		double intervallLength = Math.abs(borderLeft - borderRight);
-		double intervallSteps = intervallLength * intervallTeiler;
-		
-		return recursiveParameterSearch(workMask, visImage, borderLeft, borderRight, 0.0, -100000000000.0, intervallTeiler, intervallSteps, 0,
-				bestOtherValue, operationType, scanParameterX, nullPointValue);
+		return recursiveParameterSearch(workMask, visMaskImage, borderLeft, borderRight, 5, 0, scanParameterX, bestOtherValue, operationType);
 	}
 	
-	private double recursiveParameterSearch(final FlexibleImage workMask, final FlexibleImage visImage, double borderLeft, double borderRight,
-			double bestTranslation,
-			double bestValue, double intervallTeiler, double intervallSteps, int zaehler, final double bestValueOfOtherTranslation,
-			final MorphologicalOperationSearchType operation, final boolean scanParameterX, double nullPointValue) {
+	private double recursiveParameterSearch(
+			final FlexibleImage workMask, final FlexibleImage visMaskImage,
+			double borderLeft, double borderRight,
+			int n,
+			int zaehler,
+			final boolean scanParameterX,
+			final double bestValueOfOtherTranslation,
+			final MorphologicalOperationSearchType operation
+			) {
 		
+		double intervallSteps = Math.abs(borderLeft - borderRight) / n;
 		ArrayList<MyThread> threads = new ArrayList<MyThread>();
 		
 		final ThreadSafeOptions bestValueTS = new ThreadSafeOptions();
-		bestValueTS.setDouble(bestValue);
+		bestValueTS.setDouble(-Double.MAX_VALUE);
 		
-		final ThreadSafeOptions bestTranslationTS = new ThreadSafeOptions();
-		bestTranslationTS.setDouble(bestTranslation);
+		final ThreadSafeOptions bestParameterTS = new ThreadSafeOptions();
+		bestParameterTS.setDouble(Double.NaN);
 		
-		for (double translation = borderLeft; translation <= borderRight; translation += intervallSteps) {
-			
-			switch (operation) {
-				case TRANSLATION:
-					if (translation == 0.0)
-						break;
-					break;
-				
-				case ROTATION:
-				case SCALING:
-					if (Math.abs(translation - 1) > 0.0001)
-						break;
-					break;
-			}
-			
+		for (double step = borderLeft; step <= borderRight; step += intervallSteps) {
 			zaehler++;
-			final double translationF = translation;
+			final double stepF = step;
 			threads.add(BackgroundThreadDispatcher.addTask(new Runnable() {
 				@Override
 				public void run() {
 					double value = -1;
+					double noOperationValue = Double.NaN;
+					switch (operation) {
+						case TRANSLATION:
+						case ROTATION:
+							noOperationValue = 0;
+						case SCALING:
+							noOperationValue = 1;
+					}
 					if (scanParameterX)
-						value = getMatchResultValue(workMask, visImage, translationF, 0, operation);
+						value = getMatchResultValue(workMask, visMaskImage, stepF, noOperationValue, operation);
 					else
-						value = getMatchResultValue(workMask, visImage, bestValueOfOtherTranslation, translationF, operation);
-					System.out.println("aktueller bester Wert bei " + operation + " mit dem Wert: " + translationF + " mit dem value: " + value);
+						value = getMatchResultValue(workMask, visMaskImage, bestValueOfOtherTranslation, stepF, operation);
+					System.out.println("" + operation + " mit dem Wert: " + stepF + " mit dem value: " + value);
 					synchronized (bestValueTS) {
 						if (value > bestValueTS.getDouble()) {
 							bestValueTS.setDouble(value);
-							bestTranslationTS.setDouble(translationF);
+							bestParameterTS.setDouble(stepF);
 						} else
 							if (value == bestValueTS.getDouble()) {
 								
 								switch (operation) {
 									case ROTATION:
 									case TRANSLATION:
-									if (Math.abs(translationF) < Math.abs(bestTranslationTS.getDouble())) {
-										bestTranslationTS.setDouble(translationF);
-										System.out.println("Wert der näher am NullPoint liegt wird genommen! " + translationF);
+									if (Math.abs(stepF) < Math.abs(bestParameterTS.getDouble())) {
+										bestParameterTS.setDouble(stepF);
+										System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen! " + stepF);
 									}
 									break;
 								case SCALING:
-									if (Math.abs(translationF - 1) < Math.abs(bestTranslationTS.getDouble() - 1)) {
-										bestTranslationTS.setDouble(translationF);
-										System.out.println("Wert der näher am NullPoint liegt wird genommen!" + translationF);
+									if (Math.abs(stepF - 1) < Math.abs(bestParameterTS.getDouble() - 1)) {
+										bestParameterTS.setDouble(stepF);
+										System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen!" + stepF);
 									}
 								default:
 									break;
@@ -287,59 +274,39 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		
 		BackgroundThreadDispatcher.waitFor(threads);
 		
-		if (nullPointValue >= bestValueTS.getDouble()) {
-			System.out.println("AutomaticParameterSearch - NullValue is set!");
-			bestValueTS.setDouble(nullPointValue);
-			switch (operation) {
-				
-				case ROTATION:
-				case TRANSLATION:
-					bestTranslationTS.setDouble(0d);
-					bestValueTS.setDouble(nullPointValue);
-					break;
-				case SCALING:
-					bestTranslationTS.setDouble(1d);
-					bestValueTS.setDouble(nullPointValue);
-					
-			}
-		}
-		
-		double newBorderLeft = bestTranslationTS.getDouble() - intervallSteps;
-		double newBorderRight = bestTranslationTS.getDouble() + intervallSteps;
-		double newIntervallTeiler = intervallTeiler * 2;
-		double newIntervallLength = Math.abs(newBorderLeft - newBorderRight);
-		double newIntervallSteps = newIntervallLength * newIntervallTeiler;
+		double newBorderLeft = bestParameterTS.getDouble() - intervallSteps;
+		double newBorderRight = bestParameterTS.getDouble() + intervallSteps;
 		
 		boolean stopping = false;
 		
 		switch (operation) {
 			case ROTATION:
+				if (intervallSteps < 0.1)
+					stopping = true;
+				break;
 			case TRANSLATION:
-				if (newIntervallSteps < 1.0 || newIntervallTeiler > 1.0)
+				if (intervallSteps < 1)
 					stopping = true;
 				break;
 			case SCALING:
-				if (newIntervallSteps < 0.01 || newIntervallTeiler > 1.0)
+				if (intervallSteps < 0.1)
 					stopping = true;
-				break;
-			default:
 				break;
 		}
 		
 		if (stopping) {
 			System.out.println("Calculation steps: " + zaehler);
-			return bestTranslationTS.getDouble();
+			return bestParameterTS.getDouble();
 		} else
-			return recursiveParameterSearch(workMask, visImage, newBorderLeft + newIntervallSteps, newBorderRight - newIntervallSteps,
-					bestTranslationTS.getDouble(),
-					bestValueTS.getDouble(),
-					newIntervallTeiler, newIntervallSteps, zaehler, bestValueOfOtherTranslation, operation, scanParameterX, nullPointValue);
-		
+			return recursiveParameterSearch(workMask, visMaskImage, newBorderLeft, newBorderRight,
+					n, zaehler, scanParameterX, bestValueOfOtherTranslation, operation);
 	}
 	
-	private double getMatchResultValue(FlexibleImage workMask, FlexibleImage visImage, double valueX, double valueY, MorphologicalOperationSearchType typ) {
+	// //////AAAAAAAAAAAAAAAAAAAAAAAAA
+	
+	private double getMatchResultValue(FlexibleImage workMask, FlexibleImage visMaskImage, double valueX, double valueY, MorphologicalOperationSearchType typ) {
 		ImageOperation io = new ImageOperation(workMask);
-		FlexibleImage changedMask = null;
+		// FlexibleImage changedMask = null;
 		
 		switch (typ) {
 			case TRANSLATION:
@@ -358,11 +325,16 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 				break;
 		}
 		
-		changedMask = io.getImage();
+		// changedMask = io.getImage();
 		
-		MaskOperation o = new MaskOperation(visImage, changedMask, null,
+		MaskOperation o = new MaskOperation(visMaskImage, io.getImage(), null,
 							options.getBackground(), Color.GRAY.getRGB());
 		o.mergeMasks();
-		return o.getUnknownMeasurementValuePixels();
+		double correctionForDeletedArea = 1;
+		if (typ == MorphologicalOperationSearchType.SCALING) {
+			correctionForDeletedArea = 1 / valueX;
+			correctionForDeletedArea = correctionForDeletedArea / valueY;
+		}
+		return o.getUnknownMeasurementValuePixels(correctionForDeletedArea);
 	}
 }
