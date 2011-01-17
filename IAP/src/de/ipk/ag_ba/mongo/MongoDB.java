@@ -1179,7 +1179,7 @@ public class MongoDB {
 							
 							if (!added)
 								if (batch.getRunStatus() != null)
-									if ((batch.getRunStatus() != CloudAnalysisStatus.FINISHED && System.currentTimeMillis() - batch.getLastUpdateTime() > 20000)) {
+									if ((System.currentTimeMillis() - batch.getLastUpdateTime() > 60000)) {
 										res.add(batch);
 										
 										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
