@@ -157,6 +157,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						if (input.hasAllThreeImages()) {
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(
 									new PhytoTopImageProcessorOptions());
+							
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input,
 									maximumThreadCountOnImageLevel, null, false).getImages();

@@ -102,9 +102,10 @@ public class TaskDescription {
 							}
 						}
 						System.out.println("TODO: " + batch.getPartCnt() + ", FINISHED: " + knownResults.size());
-						if (knownResults.size() == batch.getPartCnt()) {
+						if (knownResults.size() >= batch.getPartCnt()) {
 							System.out.println("*****************************");
 							System.out.println("MERGE RESULTS:");
+							System.out.println("TODO: " + batch.getPartCnt() + ", RESULTS FINISHED: " + knownResults.size());
 							Experiment e = new Experiment();
 							for (ExperimentHeaderInterface i : knownResults) {
 								ExperimentInterface ei = m.getExperiment(i);
