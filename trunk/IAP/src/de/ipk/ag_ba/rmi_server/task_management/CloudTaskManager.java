@@ -92,14 +92,14 @@ public class CloudTaskManager {
 							}
 						}
 						for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart()) {
-							if (batch.getTargetIPs().isEmpty() || batch.getTargetIPs().contains(ip)) {
-								if (batch.getExperimentMongoID() != null) {
-									ExperimentHeaderInterface header = m.getExperimentHeader(batch.getExperimentMongoID());
-									TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
-									commands_to_start.add(task);
-									break;
-								}
+							// if (batch.getTargetIPs().isEmpty() || batch.getTargetIPs().contains(ip)) {
+							if (batch.getExperimentMongoID() != null) {
+								ExperimentHeaderInterface header = m.getExperimentHeader(batch.getExperimentMongoID());
+								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
+								commands_to_start.add(task);
+								break;
 							}
+							// }
 						}
 					}
 					ArrayList<TaskDescription> del = new ArrayList<TaskDescription>();
