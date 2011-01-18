@@ -382,8 +382,9 @@ public class MongoDB {
 				for (DBObject dbc : substance2conditions.get(dbSubstance)) {
 					conditions.insert(dbc);
 				}
-			for (DBObject dbCondition : substance2conditions.get(dbSubstance))
-				conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
+			if (substance2conditions.get(dbSubstance)!=null)
+				for (DBObject dbCondition : substance2conditions.get(dbSubstance))
+					conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
 			dbSubstance.put("condition_ids", conditionIDs);
 			if (status == null || (status != null && !status.wantsToStop())) {
 				substances.insert(dbSubstance);
