@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import info.StopWatch;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytoTopImageProcessorOptions;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 
@@ -10,20 +11,27 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	private FlexibleImageStack debugStack;
 	PhytoTopImageProcessorOptions options;
 	private FlexibleMaskAndImageSet input;
+	private BlockProperties properties;
+	private int blockPositionInPipeline;
 	
 	public AbstractImageAnalysisBlockFIS() {
 		// empty
 	}
 	
-	public void setInputAndOptions(FlexibleMaskAndImageSet input, PhytoTopImageProcessorOptions options, FlexibleImageStack debugStack) {
+	public void setInputAndOptions(FlexibleMaskAndImageSet input, PhytoTopImageProcessorOptions options, BlockProperties properties,
+			int blockPositionInPipeline,
+			FlexibleImageStack debugStack) {
 		this.input = input;
 		this.options = options;
+		this.properties = properties;
+		this.blockPositionInPipeline = blockPositionInPipeline;
 		this.debugStack = debugStack;
 	}
 	
 	public void reset() {
 		input = null;
 		options = null;
+		properties = null;
 		debugStack = null;
 	}
 	
@@ -59,5 +67,15 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	public FlexibleMaskAndImageSet getInput() {
 		return input;
+	}
+	
+	@Override
+	public BlockProperties getProperties() {
+		return properties;
+	}
+	
+	@Override
+	public int getBlockPosition() {
+		return blockPositionInPipeline;
 	}
 }
