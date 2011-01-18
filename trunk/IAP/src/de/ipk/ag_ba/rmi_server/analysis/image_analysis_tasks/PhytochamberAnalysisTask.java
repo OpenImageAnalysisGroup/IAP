@@ -98,7 +98,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 					is.setNir(id);
 			}
 		}
-		int workLoadIndex = 0;
+		int workLoadIndex = workOnSubset;
 		for (ImageSet is : replicateId2ImageSet.values()) {
 			if (is.hasAllImageTypes()) {
 				if (workLoadIndex % numberOfSubsets != 0) {
@@ -196,6 +196,8 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(loadedImage, getNameStatic());
 				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
 				output.addAll(res);
+				if (res.size() > 0)
+					System.out.println("STAT RESULTS: " + res.size());
 				output.add(imageRef);
 			}
 		}, "statistic image analysis", 4);

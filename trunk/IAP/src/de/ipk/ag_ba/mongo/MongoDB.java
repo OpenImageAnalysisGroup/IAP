@@ -98,8 +98,8 @@ public class MongoDB {
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de")) {
 			res.add(new MongoDB("IAP Cloud", "cloud1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
 			res.add(new MongoDB("IAP Cloud 2 (md5)", "cloud2", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
-		}
-		// res.add(new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512));
+		} else
+			res.add(new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512));
 		
 		// if (IAPservice.isReachable("localhost")) {
 		// res.add(new MongoDB("local dbe3", "local_dbe3", "localhost", null, null, HashType.SHA512));
@@ -241,7 +241,7 @@ public class MongoDB {
 	private void storeExperiment(ExperimentInterface experiment, DB db,
 						BackgroundTaskStatusProviderSupportingExternalCall status) {
 		
-		System.out.println("STORE EXPERIMENT: " + experiment.getName());
+		// System.out.println("STORE EXPERIMENT: " + experiment.getName());
 		experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 		
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
@@ -401,9 +401,9 @@ public class MongoDB {
 		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
 		WriteResult wr = experiments.insert(dbExperiment);
-		System.out.println("Write Result:" + wr.toString());
-		CommandResult cr = db.getLastError(2, 180000, true);
-		System.out.println("Command Result:" + cr.toString());
+		// System.out.println("Write Result:" + wr.toString());
+		CommandResult cr = db.getLastError(1, 180000, true);
+		// System.out.println("Command Result:" + cr.toString());
 		String id = dbExperiment.get("_id").toString();
 		for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
 			eh.setExcelfileid(id);
@@ -1171,15 +1171,15 @@ public class MongoDB {
 						for (DBObject dbo : collection.find()) {
 							BatchCmd batch = (BatchCmd) dbo;
 							boolean added = false;
-							if (batch.getRunStatus() == CloudAnalysisStatus.STARTING)
-								if (hostName.equals(batch.getOwner())) {
+							if (batch.getRunStatus() != null && batch.getRunStatus() == CloudAnalysisStatus.STARTING)
+								if (hostName.equals("" + batch.getOwner())) {
 									res.add(batch);
 									added = true;
 								}
 							
 							if (!added)
 								if (batch.getRunStatus() != null)
-									if ((System.currentTimeMillis() - batch.getLastUpdateTime() > 60000)) {
+									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 60000)) {
 										res.add(batch);
 										
 										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
@@ -1198,6 +1198,8 @@ public class MongoDB {
 		} catch (Exception e) {
 			return new ArrayList<BatchCmd>();
 		}
+		if (res.size() > 0)
+			System.out.println("SCHEDULED FOR START: " + res.size());
 		return res;
 	}
 	

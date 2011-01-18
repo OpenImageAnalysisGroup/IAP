@@ -45,10 +45,11 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 				while (jobIDs.size() < 15)
 					jobIDs.add(idx++);
 			}
+			long st = System.currentTimeMillis();
 			for (int id : jobIDs) {
 				BatchCmd cmd = new BatchCmd();
 				cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
-				cmd.setSubmissionTime(System.currentTimeMillis());
+				cmd.setSubmissionTime(st);
 				cmd.setTargetIPs(targetIPs);
 				cmd.setSubTaskInfo(id, jobIDs.size());
 				cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
@@ -57,6 +58,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 				BatchCmd.enqueueBatchCmd(remoteAction.getMongoDB(), cmd);
 				cm.getAction().performActionCalculateResults(src);
 			}
+			System.out.println("Enqueued " + jobIDs.size() + " new jobs!");
 		}
 	}
 	

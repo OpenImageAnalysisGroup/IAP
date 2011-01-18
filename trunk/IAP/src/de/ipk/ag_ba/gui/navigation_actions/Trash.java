@@ -22,7 +22,7 @@ public class Trash extends AbstractNavigationAction {
 	
 	private final MongoDB m;
 	private String experimentName;
-	private Collection<ExperimentHeaderInterface> header;
+	private Collection<ExperimentHeaderInterface> headers;
 	private String message = "";
 	private DeletionCommand cmd;
 	
@@ -39,11 +39,21 @@ public class Trash extends AbstractNavigationAction {
 		this.cmd = cmd;
 	}
 	
-	public Trash(Collection<ExperimentHeaderInterface> header, DeletionCommand cmd, MongoDB m) {
+	public Trash(Collection<ExperimentHeaderInterface> headers, DeletionCommand cmd, MongoDB m) {
 		super("Perform '" + cmd + "'-operation");
 		this.m = m;
-		this.setHeader(header);
+		this.setHeader(headers);
 		this.cmd = cmd;
+	}
+	
+	@Override
+	public String getDefaultTitle() {
+		return cmd.toString();
+	}
+	
+	@Override
+	public String getDefaultImage() {
+		return cmd.getImg();
 	}
 	
 	@Override
@@ -82,7 +92,7 @@ public class Trash extends AbstractNavigationAction {
 							}
 						}
 					}
-					if (cmd == DeletionCommand.TRASH) {
+					if (cmd == DeletionCommand.TRASH || cmd == DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS) {
 						try {
 							m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
 							experimentName = hhh.getExperimentname();
@@ -148,24 +158,24 @@ public class Trash extends AbstractNavigationAction {
 	}
 	
 	public static NavigationButton getTrashEntity(ArrayList<ExperimentHeaderInterface> trashed, DeletionCommand cmd,
-						GUIsetting guIsetting, MongoDB m) {
+						GUIsetting guiSetting, MongoDB m) {
 		NavigationAction trashAction = new Trash(trashed, cmd, m);
-		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guIsetting);
+		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guiSetting);
 		trash.setRightAligned(true);
 		return trash;
 	}
 	
-	private void setHeader(Collection<ExperimentHeaderInterface> header) {
-		this.header = header;
+	private void setHeader(Collection<ExperimentHeaderInterface> headers) {
+		this.headers = headers;
 	}
 	
 	private void setHeader(ExperimentHeaderInterface header) {
 		Collection<ExperimentHeaderInterface> h = new ArrayList<ExperimentHeaderInterface>();
 		h.add(header);
-		this.header = h;
+		this.headers = h;
 	}
 	
 	private Collection<ExperimentHeaderInterface> getHeader() {
-		return header;
+		return headers;
 	}
 }

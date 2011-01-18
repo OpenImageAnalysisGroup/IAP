@@ -37,8 +37,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class PhytochamberAnalysisAction extends AbstractNavigationAction implements RemoteCapableAnalysisAction {
 	private MongoDB m;
-	private double epsilon;
-	private double epsilon2;
 	private ExperimentReference experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
@@ -55,8 +53,6 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 						ExperimentReference experiment) {
 		super("Analyse Phytochamber Top-Images");
 		this.m = m;
-		this.epsilon = epsilon;
-		this.epsilon2 = epsilon2;
 		this.experiment = experiment;
 		this.experimentResult = null;
 		if (experiment != null && experiment.getHeader() != null)
@@ -139,6 +135,11 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 			statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
+			for (SubstanceInterface s : statisticsResult) {
+				for (ConditionInterface c : s) {
+					c.setExperimentInfo(statisticsResult.getHeader());
+				}
+			}
 			
 			statisticsResult.getHeader().setExcelfileid("");
 			if (resultReceiver == null) {
@@ -208,8 +209,6 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 	public void setParams(ExperimentReference experiment, MongoDB m, String params) {
 		this.experiment = experiment;
 		this.m = m;
-		this.epsilon = 10;
-		this.epsilon2 = 15;
 	}
 	
 	@Override

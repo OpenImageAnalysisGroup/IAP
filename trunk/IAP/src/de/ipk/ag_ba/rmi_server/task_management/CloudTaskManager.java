@@ -82,7 +82,7 @@ public class CloudTaskManager {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
 					long maxDelaySinceLastUpdate = 5000;
 					m.batchPingHost(ip);
-					if (runningTasks.size() <= 1) {
+					if (runningTasks.size() == 0) {
 						if (m == null)
 							return;
 						for (BatchCmd batch : m.batchGetCommands(maxDelaySinceLastUpdate)) {
@@ -118,7 +118,7 @@ public class CloudTaskManager {
 						if (!runningTasks.contains(td)) {
 							try {
 								idx_loop++;
-								System.out.println("loop: " + idx_loop + ", start: " + td.toString() + ", status: " + td.getBatchCmd().getRunStatus());
+								// System.out.println("loop: " + idx_loop + ", start: " + td.toString() + ", status: " + td.getBatchCmd().getRunStatus());
 								td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS);
 								runningTasks.add(td);
 								td.startWork(td.getBatchCmd(), hostName, ip, m);
@@ -128,7 +128,7 @@ public class CloudTaskManager {
 						}
 					}
 				}
-				Thread.sleep(100);
+				Thread.sleep(1000);
 			} while (true);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
