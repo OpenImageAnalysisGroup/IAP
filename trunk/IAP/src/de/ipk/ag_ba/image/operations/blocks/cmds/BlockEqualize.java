@@ -32,4 +32,19 @@ public class BlockEqualize extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processNIRmask() {
 		return getInput().getMasks().getNir().resize(w, h);
 	}
+	
+	@Override
+	protected FlexibleImage processVISimage() {
+		return getInput().getImages().getVis().resize(w, h);
+	}
+	
+	@Override
+	protected FlexibleImage processFLUOimage() {
+		return getInput().getImages().getFluo().resize(w, h);
+	}
+	
+	@Override
+	protected FlexibleImage processNIRimage() {
+		return getInput().getImages().getNir().resize(w, h);
+	}
 }
