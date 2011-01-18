@@ -60,4 +60,9 @@ public class BlockPropertiesImpl implements BlockProperties {
 		
 		return sb.toString();
 	}
+	
+	@Override
+	public int getNumberOfBlocksWithPropertyResults() {
+		return store.size();
+	}
 }

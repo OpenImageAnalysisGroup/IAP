@@ -94,63 +94,69 @@ public class TaskDescription {
 				// System.out.println("Received result: " + experiment.getName());
 				try {
 					BatchCmd bcmd = m.batchGetCommand(batch);
-					if (SystemAnalysis.getHostName().equals(bcmd.getOwner())) {
-						m.batchClearJob(batch);
-						m.saveExperiment(experiment, null);
-						ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
-						for (ExperimentHeaderInterface i : m.getExperimentList()) {
-							if (i.getExperimentname() != null && i.getExperimentname().contains("§")) {
-								String[] cc = i.getExperimentname().split("§");
-								if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
-									String className = cc[0];
-									String partCnt = cc[2];
-									String submTime = cc[3];
-									String bcn = cmd.getRemoteCapableAnalysisActionClassName();
-									String bpn = cmd.getPartCnt() + "";
-									String bst = batch.getSubmissionTime() + "";
-									if (className.equals(bcn)
+					if (bcmd != null)
+						if (SystemAnalysis.getHostName().equals(bcmd.getOwner())) {
+							m.batchClearJob(batch);
+							m.saveExperiment(experiment, null);
+							
+							ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
+							
+							System.out.println("MV a=" + experiment.getNumberOfMeasurementValues() + ". b=" + experiment2.getNumberOfMeasurementValues());
+							
+							ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
+							for (ExperimentHeaderInterface i : m.getExperimentList()) {
+								if (i.getExperimentname() != null && i.getExperimentname().contains("§")) {
+									String[] cc = i.getExperimentname().split("§");
+									if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
+										String className = cc[0];
+										String partCnt = cc[2];
+										String submTime = cc[3];
+										String bcn = cmd.getRemoteCapableAnalysisActionClassName();
+										String bpn = cmd.getPartCnt() + "";
+										String bst = batch.getSubmissionTime() + "";
+										if (className.equals(bcn)
 												&& partCnt.equals(bpn)
 												&& submTime.equals(bst))
-										knownResults.add(i);
-									else
-										System.out.println("NO FIT: " + i.toString());
+											knownResults.add(i);
+										else
+											System.out.println("NO FIT: " + i.toString());
+									}
 								}
 							}
-						}
-						System.out.println("TODO: " + batch.getPartCnt() + ", FINISHED: " + knownResults.size());
-						if (knownResults.size() >= batch.getPartCnt()) {
-							System.out.println("*****************************");
-							System.out.println("MERGE RESULTS:");
-							System.out.println("TODO: " + batch.getPartCnt() + ", RESULTS FINISHED: " + knownResults.size());
-							Experiment e = new Experiment();
-							for (ExperimentHeaderInterface i : knownResults) {
-								ExperimentInterface ei = m.getExperiment(i);
-								if (Experiment.getNumberOfMeasurementValues(ei) > 0)
-									System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
-								e.addAll(ei);
-								m.deleteExperiment(i.getExcelfileid());
+							System.out.println("TODO: " + batch.getPartCnt() + ", FINISHED: " + knownResults.size());
+							if (knownResults.size() >= batch.getPartCnt()) {
 								System.out.println("*****************************");
-							}
-							String sn = cmd.getRemoteCapableAnalysisActionClassName();
-							if (sn.indexOf(".") > 0)
-								sn = sn.substring(sn.lastIndexOf(".") + 1);
-							e.getHeader().setExperimentname(sn + ": " + experimentInput.getExperimentName());
-							e.getHeader().setImportusergroup("Cloud Analysis Results");
-							e.getHeader().setExcelfileid("");
-							for (SubstanceInterface si : e) {
-								for (ConditionInterface ci : si) {
-									ci.setExperimentName(e.getHeader().getExperimentname());
+								System.out.println("MERGE RESULTS:");
+								System.out.println("TODO: " + batch.getPartCnt() + ", RESULTS FINISHED: " + knownResults.size());
+								Experiment e = new Experiment();
+								for (ExperimentHeaderInterface i : knownResults) {
+									ExperimentInterface ei = m.getExperiment(i);
+									if (ei.getNumberOfMeasurementValues() > 0)
+										System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
+									e.addAll(ei);
+									m.deleteExperiment(i.getExcelfileid());
+									System.out.println("*****************************");
 								}
+								String sn = cmd.getRemoteCapableAnalysisActionClassName();
+								if (sn.indexOf(".") > 0)
+									sn = sn.substring(sn.lastIndexOf(".") + 1);
+								e.getHeader().setExperimentname(sn + ": " + experimentInput.getExperimentName());
+								e.getHeader().setImportusergroup("Cloud Analysis Results");
+								e.getHeader().setExcelfileid("");
+								for (SubstanceInterface si : e) {
+									for (ConditionInterface ci : si) {
+										ci.setExperimentName(e.getHeader().getExperimentname());
+									}
+								}
+								System.out.println("*****************************");
+								System.out.println("Merged Experiment: " + e.getName());
+								System.out.println("Merged Measurements: " + Experiment.getNumberOfMeasurementValues(e));
+								m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
 							}
-							System.out.println("*****************************");
-							System.out.println("Merged Experiment: " + e.getName());
-							System.out.println("Merged Measurements: " + Experiment.getNumberOfMeasurementValues(e));
-							m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
-						}
-					} else
-						System.out.println("Information: Batch command, processed by " + SystemAnalysis.getHostName()
-								+ " has been claimed by " + batch.getOwner()
-								+ ". Therefore analysis result is not saved.");
+						} else
+							System.out.println("Information: Batch command, processed by " + SystemAnalysis.getHostName()
+									+ " has been claimed by " + batch.getOwner()
+									+ ". Therefore analysis result is not saved.");
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
