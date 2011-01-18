@@ -2,11 +2,17 @@ package tests;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import tests.images.phyto1.TestImagePhyto;
@@ -24,20 +30,71 @@ import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 
+/**
+ * @author Entzian, Klukas
+ */
+
 public class TestPhytoTopAnalysis {
 	
-	@Test
-	public void testBigPlants() throws IOException, Exception {
-		System.out.println("Phytochamber Test");
+	private static IOurl urlVis;
+	private static IOurl urlFlu;
+	private static IOurl urlNIR;
+	
+	private static double scale;
+	
+	private static FlexibleMaskAndImageSet res;
+	
+	private static boolean debug;
+	private static boolean parameterSearch;
+	private static boolean debugTakeTimes;
+	private static boolean debugOverlayResult;
+	
+	private static long sleepTime;
+	
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
 		
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (MongoDB m : MongoDB.getMongos())
 			for (ResourceIOHandler io : m.getHandlers())
 				ResourceIOManager.registerIOHandler(io);
 		
-		IOurl urlVis = null;
-		IOurl urlFlu = null;
-		IOurl urlNIR = null;
+		scale = 1.0;
+		sleepTime = 1;
+		
+		debug = true;
+		parameterSearch = true;
+		debugTakeTimes = true;
+		debugOverlayResult = false;
+	}
+	
+	@AfterClass
+	public static void setUpAfterClass() throws Exception {
+		try {
+			System.out.println("Sleep " + sleepTime + " hours");
+			TimeUnit.HOURS.sleep(sleepTime);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Before
+	public void setUpBeforeEveryTest() throws Exception {
+		urlVis = null;
+		urlFlu = null;
+		urlNIR = null;
+		res = null;
+	}
+	
+	@After
+	public void doAfterEveryTest() throws Exception {
+		res.print("PIPELINE RESULT");
+	}
+	
+	@Test
+	public void testBigPlants() throws IOException, Exception {
+		
+		System.out.println("Big-Phytochamber Test");
 		
 		urlVis = new IOurl(
 					"mongo_ba-13.ipk-gatersleben.de_cloud1://6ca4ff9c5def146d4bfa7c8e60fd2d201a2bbeb81df4bf82100179a5b6d9edfa90e07151f847647ea8b5c64a6515fe95ee8d4510268aaa2708a0a572b1d5531b/rgb_top_day_0_WT01_1385.png");
@@ -76,7 +133,6 @@ public class TestPhytoTopAnalysis {
 		FlexibleImage imgVisible = new FlexibleImage(urlVis);
 		FlexibleImage imgNIR = new FlexibleImage(urlNIR);
 		
-		double scale = 0.2;
 		if (Math.abs(scale - 1) > 0.0001) {
 			System.out.println("Debug: Using Scale-Factor of " + scale + " to improve performance!");
 			imgFluo = new ImageOperation(imgFluo).resize(scale).getImage();
@@ -86,32 +142,20 @@ public class TestPhytoTopAnalysis {
 		FlexibleImageSet input = new FlexibleImageSet(imgVisible, imgFluo, imgNIR);
 		
 		PhytoTopImageProcessorOptions options = new PhytoTopImageProcessorOptions(scale);
-		options.setDebugTakeTimes(true);
-		options.setDebugOverlayResult(false);
+		
+		options.setDebugTakeTimes(debugTakeTimes);
+		options.setDebugOverlayResult(debugOverlayResult);
 		
 		PhytochamberTopImageProcessor phytoTop = new PhytochamberTopImageProcessor(options);
 		
-		boolean debug = true;
-		boolean parameterSearch = true;
-		FlexibleMaskAndImageSet res = phytoTop.pipeline(
+		res = phytoTop.pipeline(
 				input, SystemAnalysis.getNumberOfCPUs(), debug ? new FlexibleImageStack() : null, parameterSearch);
 		
-		res.print("PIPELINE RESULT");
-		System.out.println("test");
 	}
 	
+	@Ignore
 	@Test
 	public void testSmallPlants() throws IOException, Exception {
-		System.out.println("Phytochamber Test");
-		
-		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
-		for (MongoDB m : MongoDB.getMongos())
-			for (ResourceIOHandler io : m.getHandlers())
-				ResourceIOManager.registerIOHandler(io);
-		
-		IOurl urlVis = null;
-		IOurl urlFlu = null;
-		IOurl urlNIR = null;
 		
 		System.out.println("Small-Phytochamber Test");
 		
@@ -152,7 +196,6 @@ public class TestPhytoTopAnalysis {
 		FlexibleImage imgVisible = new FlexibleImage(urlVis);
 		FlexibleImage imgNIR = new FlexibleImage(urlNIR);
 		
-		double scale = 0.2;
 		if (Math.abs(scale - 1) > 0.0001) {
 			System.out.println("Debug: Using Scale-Factor of " + scale + " to improve performance!");
 			imgFluo = new ImageOperation(imgFluo).resize(scale).getImage();
@@ -162,18 +205,13 @@ public class TestPhytoTopAnalysis {
 		FlexibleImageSet input = new FlexibleImageSet(imgVisible, imgFluo, imgNIR);
 		
 		PhytoTopImageProcessorOptions options = new PhytoTopImageProcessorOptions(scale);
-		options.setDebugTakeTimes(true);
-		options.setDebugOverlayResult(false);
+		options.setDebugTakeTimes(debugTakeTimes);
+		options.setDebugOverlayResult(debugOverlayResult);
 		
 		PhytochamberTopImageProcessor phytoTop = new PhytochamberTopImageProcessor(options);
 		
-		boolean debug = true;
-		boolean parameterSearch = true;
-		FlexibleMaskAndImageSet res = phytoTop.pipeline(
-				input, SystemAnalysis.getNumberOfCPUs(), debug ? new FlexibleImageStack() : null, parameterSearch);
+		res = phytoTop.pipeline(input, SystemAnalysis.getNumberOfCPUs(), debug ? new FlexibleImageStack() : null, parameterSearch);
 		
-		res.print("PIPELINE RESULT");
-		System.out.println("test");
 	}
 	
 }
