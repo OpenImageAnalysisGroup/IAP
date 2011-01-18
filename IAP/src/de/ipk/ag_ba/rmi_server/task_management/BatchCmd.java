@@ -153,6 +153,9 @@ public class BatchCmd extends BasicDBObject {
 	}
 	
 	public String getOwner() {
-		return getString("owner");
+		if (get("owner") != null)
+			return getString("owner");
+		else
+			return null;
 	}
 }

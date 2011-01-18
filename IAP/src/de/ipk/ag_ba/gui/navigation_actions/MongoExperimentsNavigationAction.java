@@ -186,6 +186,11 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				for (ExperimentHeaderInterface exp : experiments) {
 					res.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
 				}
+				NavigationButton tb = new NavigationButton(
+						new Trash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
+						src.getGUIsetting());
+				tb.setRightAligned(true);
+				res.add(tb);
 				return res;
 			}
 			

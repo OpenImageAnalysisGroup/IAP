@@ -6,7 +6,9 @@
  */
 package de.ipk.ag_ba.rmi_server.task_management;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
@@ -84,21 +86,35 @@ public class TaskDescription {
 			@Override
 			public void run() {
 				// store dataset in mongo
-				// System.out.println(experiment.toString());
 				experiment.getHeader().setExperimentname(
-									cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§" + experiment.getName());
+									cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§"
+											+ batch.getSubmissionTime());
+				System.out.println("SUB-T: " + batch.getSubmissionTime());
 				experiment.getHeader().setImportusergroup("Temp");
-				System.out.println("Received result: " + experiment.getName());
+				// System.out.println("Received result: " + experiment.getName());
 				try {
-					if (m.batchGetCommand(batch).getOwner().equals(SystemAnalysis.getHostName())) {
+					BatchCmd bcmd = m.batchGetCommand(batch);
+					if (SystemAnalysis.getHostName().equals(bcmd.getOwner())) {
 						m.batchClearJob(batch);
 						m.saveExperiment(experiment, null);
 						ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 						for (ExperimentHeaderInterface i : m.getExperimentList()) {
 							if (i.getExperimentname() != null && i.getExperimentname().contains("§")) {
-								String c = i.getExperimentname().substring(0, i.getExperimentname().indexOf("§"));
-								if (c.equals(cmd.getRemoteCapableAnalysisActionClassName()))
-									knownResults.add(i);
+								String[] cc = i.getExperimentname().split("§");
+								if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
+									String className = cc[0];
+									String partCnt = cc[2];
+									String submTime = cc[3];
+									String bcn = cmd.getRemoteCapableAnalysisActionClassName();
+									String bpn = cmd.getPartCnt() + "";
+									String bst = batch.getSubmissionTime() + "";
+									if (className.equals(bcn)
+												&& partCnt.equals(bpn)
+												&& submTime.equals(bst))
+										knownResults.add(i);
+									else
+										System.out.println("NO FIT: " + i.toString());
+								}
 							}
 						}
 						System.out.println("TODO: " + batch.getPartCnt() + ", FINISHED: " + knownResults.size());
@@ -109,9 +125,10 @@ public class TaskDescription {
 							Experiment e = new Experiment();
 							for (ExperimentHeaderInterface i : knownResults) {
 								ExperimentInterface ei = m.getExperiment(i);
+								if (Experiment.getNumberOfMeasurementValues(ei) > 0)
+									System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
 								e.addAll(ei);
 								m.deleteExperiment(i.getExcelfileid());
-								System.out.println("Measurements: " + Experiment.getNumberOfMeasurementValues(ei));
 								System.out.println("*****************************");
 							}
 							String sn = cmd.getRemoteCapableAnalysisActionClassName();
@@ -146,7 +163,8 @@ public class TaskDescription {
 			}
 		};
 		action.setWorkingSet(cmd.getPartIdx(), cmd.getPartCnt(), resultReceiver);
-		BackgroundTaskHelper.issueSimpleTask("Batch: " + analysisActionClassName + " (start: " + startTime + ")",
+		String st = new SimpleDateFormat().format(new Date(startTime));
+		BackgroundTaskHelper.issueSimpleTask("Batch: " + analysisActionClassName + " (start: " + st + ")",
 							"Initializing", new Runnable() {
 								@Override
 								public void run() {
