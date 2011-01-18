@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytoTopImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.cmds.ImageAnalysisBlockFIS;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 
@@ -26,17 +27,26 @@ public class BlockPipeline {
 		System.out.print(".");
 		long a = System.currentTimeMillis();
 		nullPointerCheck(input, "PIPELINE INPUT ");
+		
+		BlockProperties settings = new BlockPropertiesImpl();
+		
+		int index = 0;
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			
-			block.setInputAndOptions(input, options, debugStack);
+			block.setInputAndOptions(input, options, settings, index++, debugStack);
+			
 			nullPointerCheck(input, "INPUT for " + blockClass.getSimpleName());
+			
 			input = block.process();
+			
 			nullPointerCheck(input, "OUTPUT of " + blockClass.getSimpleName());
+			
 			block.reset();
 		}
 		long b = System.currentTimeMillis();
-		System.out.println("BLOCK execution time: " + (b - a) / 1000 + "s");
+		System.out.println("PIPELINE execution time: " + (b - a) / 1000 + "s");
+		System.out.println("Results: " + settings.toString());
 		return input;
 	}
 	
