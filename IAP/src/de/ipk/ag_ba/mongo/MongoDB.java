@@ -99,13 +99,17 @@ public class MongoDB {
 			res.add(new MongoDB("IAP Cloud", "cloud1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
 			res.add(new MongoDB("IAP Cloud 2 (md5)", "cloud2", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
 		} else
-			res.add(new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512));
+			res.add(getLocalDB());
 		
 		// if (IAPservice.isReachable("localhost")) {
 		// res.add(new MongoDB("local dbe3", "local_dbe3", "localhost", null, null, HashType.SHA512));
 		// res.add(new MongoDB("local dbe4", "local_dbe4", "localhost", null, null, HashType.SHA512));
 		// }
 		return res;
+	}
+	
+	public static MongoDB getLocalDB() {
+		return new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512);
 	}
 	
 	private MongoDBhandler mh;
@@ -382,7 +386,7 @@ public class MongoDB {
 				for (DBObject dbc : substance2conditions.get(dbSubstance)) {
 					conditions.insert(dbc);
 				}
-			if (substance2conditions.get(dbSubstance)!=null)
+			if (substance2conditions.get(dbSubstance) != null)
 				for (DBObject dbCondition : substance2conditions.get(dbSubstance))
 					conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
 			dbSubstance.put("condition_ids", conditionIDs);
