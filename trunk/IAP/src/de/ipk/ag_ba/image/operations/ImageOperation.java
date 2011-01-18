@@ -141,13 +141,15 @@ public class ImageOperation extends ImageConverter {
 	
 	public ImageOperation applyMask2(FlexibleImage mask, int background) {
 		
-		if (image.getWidth() != mask.getWidth() || image.getHeight() != mask.getHeight()) {
-			mask = new ImageOperation(mask).resize(image.getWidth(), image.getHeight()).getImage();
+		FlexibleImage srcImage = new FlexibleImage(image);
+		
+		if (srcImage.getWidth() != mask.getWidth() || srcImage.getHeight() != mask.getHeight()) {
+			srcImage = new ImageOperation(srcImage).resize(mask.getWidth(), mask.getHeight()).getImage();
 		}
 		
 		int[] mask1A = mask.getConvertAs1A();
 		
-		int[] originalImage = ImageConverter.convertIJto1A(image);
+		int[] originalImage = srcImage.getConvertAs1A();
 		// PrintImage.printImage(image.getBufferedImage(), "IMAGE " + iiii);
 		// PrintImage.printImage(mask.getBufferedImage(), "MASK FOR IMAGE " + iiii);
 		

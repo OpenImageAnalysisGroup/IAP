@@ -21,36 +21,16 @@ public class BlockPrintInfos extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		
 		printInfo(getInput().getMasks().getVis(), BlockPrintInfosTyp.VisMask);
-		printInfo(getInput().getImages().getVis(), BlockPrintInfosTyp.VisImage);
+		// printInfo(getInput().getImages().getVis(), BlockPrintInfosTyp.VisImage);
 		
 		printInfo(getInput().getMasks().getFluo(), BlockPrintInfosTyp.FluoMask);
-		printInfo(getInput().getImages().getFluo(), BlockPrintInfosTyp.FluoImage);
+		// printInfo(getInput().getImages().getFluo(), BlockPrintInfosTyp.FluoImage);
 		
 		printInfo(getInput().getMasks().getNir(), BlockPrintInfosTyp.NirMask);
-		printInfo(getInput().getImages().getNir(), BlockPrintInfosTyp.NirImage);
+		// printInfo(getInput().getImages().getNir(), BlockPrintInfosTyp.NirImage);
 		
 		return getInput().getMasks().getVis();
 	}
-	
-	// @Override
-	// protected FlexibleImage processFLUOmask() {
-	// System.out.println("FluoMask - Infos: Start");
-	//
-	// printInfo(getInput().getMasks().getFluo());
-	//
-	// System.out.println("FluoMask - Infos: End");
-	// return getInput().getMasks().getFluo();
-	// }
-	//
-	// @Override
-	// protected FlexibleImage processNIRmask() {
-	// System.out.println("NirMask - Infos: Start");
-	//
-	// printInfo(getInput().getMasks().getNir());
-	//
-	// System.out.println("NirMask - Infos: End");
-	// return getInput().getMasks().getNir();
-	// }
 	
 	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp typ) {
 		System.out.println(typ + " - Infos: ##### Start #####");
