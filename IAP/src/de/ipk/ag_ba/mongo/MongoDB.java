@@ -378,13 +378,14 @@ public class MongoDB {
 		
 		for (DBObject dbSubstance : dbSubstances) {
 			ArrayList<String> conditionIDs = new ArrayList<String>();
-			for (DBObject dbc : substance2conditions.get(dbSubstance)) {
-				conditions.insert(dbc);
-			}
+			if (substance2conditions.get(dbSubstance) != null)
+				for (DBObject dbc : substance2conditions.get(dbSubstance)) {
+					conditions.insert(dbc);
+				}
 			for (DBObject dbCondition : substance2conditions.get(dbSubstance))
 				conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
 			dbSubstance.put("condition_ids", conditionIDs);
-			if (status != null && !status.wantsToStop()) {
+			if (status == null || (status != null && !status.wantsToStop())) {
 				substances.insert(dbSubstance);
 			}
 		}
@@ -400,10 +401,8 @@ public class MongoDB {
 		
 		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
-		WriteResult wr = experiments.insert(dbExperiment);
-		// System.out.println("Write Result:" + wr.toString());
-		CommandResult cr = db.getLastError(1, 180000, true);
-		// System.out.println("Command Result:" + cr.toString());
+		experiments.insert(dbExperiment);
+		
 		String id = dbExperiment.get("_id").toString();
 		for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
 			eh.setExcelfileid(id);

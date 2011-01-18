@@ -14,4 +14,6 @@ public interface BlockProperties {
 	
 	public void setNumericProperty(int position, String name, double value);
 	
+	public int getNumberOfBlocksWithPropertyResults();
+	
 }

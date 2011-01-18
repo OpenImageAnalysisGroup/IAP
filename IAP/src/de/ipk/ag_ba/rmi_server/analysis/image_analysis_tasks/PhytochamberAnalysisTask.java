@@ -17,6 +17,7 @@ import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytoTopImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.image.operations.ImageConverter;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
@@ -158,6 +159,9 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(
 									new PhytoTopImageProcessorOptions());
 							
+							input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
+							input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
+							
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input,
 									maximumThreadCountOnImageLevel, null, false).getImages();
@@ -196,8 +200,8 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(loadedImage, getNameStatic());
 				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
 				output.addAll(res);
-				if (res.size() > 0)
-					System.out.println("STAT RESULTS: " + res.size());
+				// if (res.size() > 0)
+				// System.out.println("STAT RESULTS: " + res.size());
 				output.add(imageRef);
 			}
 		}, "statistic image analysis", 4);

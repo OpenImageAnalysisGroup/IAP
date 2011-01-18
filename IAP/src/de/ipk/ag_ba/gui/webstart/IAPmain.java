@@ -23,6 +23,10 @@ import org.ApplicationStatus;
 import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
@@ -78,6 +82,8 @@ public class IAPmain extends JApplet {
 	public IAPmain() {
 		ReleaseInfo.setRunningAsApplet(this);
 		
+		setupLogger();
+		
 		registerIOhandlers();
 		
 		GravistoMainHelper.setLookAndFeel();
@@ -119,6 +125,18 @@ public class IAPmain extends JApplet {
 		};
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();
+	}
+	
+	private void setupLogger() {
+		Logger rootLogger = Logger.getRootLogger();
+		if (!rootLogger.getAllAppenders().hasMoreElements()) {
+			rootLogger.setLevel(Level.ERROR);
+			rootLogger.addAppender(new ConsoleAppender(new PatternLayout("%-5p [%t]: %m%n")));
+			
+			Logger pkgLogger = rootLogger.getLoggerRepository().getLogger("com.mongodb");
+			pkgLogger.setLevel(Level.ERROR);
+			pkgLogger.addAppender(new ConsoleAppender(new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN)));
+		}
 	}
 	
 	private void checkServerMode() {

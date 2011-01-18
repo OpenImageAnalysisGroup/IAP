@@ -89,7 +89,7 @@ public class IAPgui {
 					System.out.println("HASH: " + h);
 					navigateTo(h, navigationPanel, actionPanel, graphPanel);
 				} catch (Exception e) {
-					System.out.println("JavaScript and Browser window not accessible.");
+					// System.out.println("JavaScript and Browser window not accessible.");
 					// navigateTo("Overview.MetaCrop.Carbohydrate Metabolism.Ascorbate biosynthesis",
 					// navigationPanel, actionPanel, graphPanel, knownEntities);
 					// navigateTo("Overview.DBE Database.User Login.AG PBI.klukas.AAT-Juniproben2004 (test)",
