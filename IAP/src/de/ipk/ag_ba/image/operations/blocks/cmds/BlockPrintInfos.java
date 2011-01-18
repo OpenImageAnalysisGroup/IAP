@@ -4,6 +4,10 @@ import java.util.HashMap;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
+/**
+ * @author Entzian
+ */
+
 public class BlockPrintInfos extends AbstractSnapshotAnalysisBlockFIS {
 	
 	HashMap<String, Boolean> infoMap = new HashMap<String, Boolean>() {
@@ -15,40 +19,48 @@ public class BlockPrintInfos extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		System.out.println("VisMask - Infos: Start");
 		
-		printInfo(getInput().getMasks().getVis());
+		printInfo(getInput().getMasks().getVis(), BlockPrintInfosTyp.VisMask);
+		printInfo(getInput().getImages().getVis(), BlockPrintInfosTyp.VisImage);
 		
-		System.out.println("VisMask - Infos: End");
+		printInfo(getInput().getMasks().getFluo(), BlockPrintInfosTyp.FluoMask);
+		printInfo(getInput().getImages().getFluo(), BlockPrintInfosTyp.FluoImage);
+		
+		printInfo(getInput().getMasks().getNir(), BlockPrintInfosTyp.NirMask);
+		printInfo(getInput().getImages().getNir(), BlockPrintInfosTyp.NirImage);
+		
 		return getInput().getMasks().getVis();
 	}
 	
-	@Override
-	protected FlexibleImage processFLUOmask() {
-		System.out.println("FluoMask - Infos: Start");
-		
-		printInfo(getInput().getMasks().getFluo());
-		
-		System.out.println("FluoMask - Infos: End");
-		return getInput().getMasks().getFluo();
-	}
+	// @Override
+	// protected FlexibleImage processFLUOmask() {
+	// System.out.println("FluoMask - Infos: Start");
+	//
+	// printInfo(getInput().getMasks().getFluo());
+	//
+	// System.out.println("FluoMask - Infos: End");
+	// return getInput().getMasks().getFluo();
+	// }
+	//
+	// @Override
+	// protected FlexibleImage processNIRmask() {
+	// System.out.println("NirMask - Infos: Start");
+	//
+	// printInfo(getInput().getMasks().getNir());
+	//
+	// System.out.println("NirMask - Infos: End");
+	// return getInput().getMasks().getNir();
+	// }
 	
-	@Override
-	protected FlexibleImage processNIRmask() {
-		System.out.println("NirMask - Infos: Start");
+	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp typ) {
+		System.out.println(typ + " - Infos: ##### Start #####");
 		
-		printInfo(getInput().getMasks().getNir());
-		
-		System.out.println("NirMask - Infos: End");
-		return getInput().getMasks().getNir();
-	}
-	
-	private void printInfo(FlexibleImage workImage) {
 		if (infoMap.get("height"))
 			System.out.println("height: " + workImage.getHeight());
 		if (infoMap.get("width"))
 			System.out.println("width: " + workImage.getWidth());
 		
+		System.out.println(typ + " - Infos: **** End ****");
 	}
 	
 }

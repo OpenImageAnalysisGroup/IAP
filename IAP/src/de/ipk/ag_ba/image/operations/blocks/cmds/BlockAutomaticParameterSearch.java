@@ -312,7 +312,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 					n, zaehler, scanParameterX, bestValueOfOtherTranslation, operation);
 	}
 	
-	// //////AAAAAAAAAAAAAAAAAAAAAAAAA
+	//
 	
 	private double getMatchResultValue(FlexibleImage workMask, FlexibleImage visMaskImage, double valueX, double valueY, MorphologicalOperationSearchType typ) {
 		ImageOperation io = new ImageOperation(workMask);
