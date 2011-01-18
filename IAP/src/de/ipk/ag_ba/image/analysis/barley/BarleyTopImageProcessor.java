@@ -11,6 +11,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import tests.images.phyto1.TestImagePhyto;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytoTopImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -32,7 +33,6 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
-import de.ipk.ag_ba.image.utils.tests.images.phyto1.TestImagePhyto;
 import de.ipk.ag_ba.mongo.DataStorageType;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.MongoResourceIOConfigObject;

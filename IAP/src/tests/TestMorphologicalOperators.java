@@ -1,7 +1,7 @@
 /*************************************************************************
  * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *************************************************************************/
-package de.ipk.ag_ba.image.utils.tests;
+package tests;
 
 import org.junit.Assert;
 import org.junit.Test;
