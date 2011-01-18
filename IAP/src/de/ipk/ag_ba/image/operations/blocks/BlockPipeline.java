@@ -46,7 +46,7 @@ public class BlockPipeline {
 		}
 		long b = System.currentTimeMillis();
 		System.out.println("PIPELINE execution time: " + (b - a) / 1000 + "s");
-		System.out.println("Results: " + settings.toString());
+		System.out.println("Results:\n" + settings.toString());
 		return input;
 	}
 	
