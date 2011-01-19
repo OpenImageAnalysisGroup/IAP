@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import de.ipk.ag_ba.image.operations.MorphologicalOperators;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -22,7 +22,56 @@ public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private FlexibleImage closingOpening(FlexibleImage mask, FlexibleImage image) {
 		
-		FlexibleImage workImage = PhenotypeAnalysisTask.closingOpening(mask, image, options.getBackground(), 1);
+		FlexibleImage workImage = closingOpening(mask, image, options.getBackground(), 1);
 		return workImage;
+	}
+	
+	private static FlexibleImage closingOpening(FlexibleImage flMask, FlexibleImage flImage, int iBackgroundFill, int repeat) {
+		int[] rgbArray = flMask.getConvertAs1A();
+		int h = flMask.getHeight();
+		int w = flMask.getWidth();
+		
+		int[] rgbNonModifiedArray = flImage.getConvertAs1A();
+		
+		int[][] image = new int[w][h];
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				int off = x + y * w;
+				int color = rgbArray[off];
+				if (color != iBackgroundFill) {
+					image[x][y] = 1;
+				} else {
+					image[x][y] = 0;
+				}
+			}
+		}
+		int[][] mask;
+		int cnt = 0;
+		do {
+			MorphologicalOperators op = new MorphologicalOperators(image);
+			op.doClosing();
+			mask = op.getResultImage();
+			image = op.getResultImage();
+			cnt++;
+		} while (cnt < repeat);
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (mask[x][y] == 0)
+					rgbArray[x + y * w] = iBackgroundFill;
+				else
+					rgbArray[x + y * w] = rgbNonModifiedArray[x + y * w];
+			}
+		}
+		
+		return new FlexibleImage(rgbArray, w, h);
+		// PrintImage.printImage(rgbArray, w, h);
+		//
+		// ImageOperation save = new ImageOperation(rgbArray, w, h);
+		// save.rotate(3);
+		// save.saveImage("/Users/entzian/Desktop/siebenteBild.png");
+		//
+		// PrintImage.printImage(rgbArray, w, h);
+		
 	}
 }

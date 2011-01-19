@@ -49,6 +49,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 	private int numberOfSubsets;
 	
 	public PhytochamberAnalysisTask() {
+		// empty
 	}
 	
 	@Override
@@ -164,7 +165,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input,
-									maximumThreadCountOnImageLevel, null, false).getImages();
+									maximumThreadCountOnImageLevel, null, true, true).getImages();
 							
 							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
 							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
@@ -197,7 +198,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			@Override
 			public void run() {
 				LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
-				ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(loadedImage, getNameStatic());
+				ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(loadedImage, PhytochamberAnalysisTask.this.getName());
 				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
 				output.addAll(res);
 				// if (res.size() > 0)
@@ -393,13 +394,9 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		return result;
 	}
 	
-	private static String getNameStatic() {
-		return "Phytochamber Image Analysis";
-	}
-	
 	@Override
 	public String getName() {
-		return getNameStatic();
+		return "Phytochamber Image Analysis";
 	}
 	
 	public void addPreprocessor(CutImagePreprocessor pre) {

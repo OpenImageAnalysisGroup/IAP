@@ -90,7 +90,7 @@ public class BarleyTopImageProcessor {
 			p.add(BlockTransferImageSet.class);
 		}
 		
-		result = p.execute(workset, debugStack);
+		result = p.execute(workset, debugStack, cropResult);
 		
 		if (debugStack != null) {
 			debugStack.addImage("RESULT", result.getOverviewImage(options.getDebugStackWidth()));
@@ -209,8 +209,10 @@ public class BarleyTopImageProcessor {
 		
 		boolean debug = true;
 		boolean parameterSearch = false;
+		boolean cropResult = false;
 		FlexibleMaskAndImageSet res = imageProcessorTop.pipeline(
-				input, SystemAnalysis.getNumberOfCPUs(), debug ? new FlexibleImageStack() : null, parameterSearch);
+				input, SystemAnalysis.getNumberOfCPUs(), debug ? new FlexibleImageStack() : null, parameterSearch,
+						cropResult);
 		
 		res.print("PIPELINE RESULT");
 	}

@@ -26,6 +26,8 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
+import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
@@ -565,7 +567,7 @@ public class ImageOperation extends ImageConverter {
 	
 	public ImageOperation removeSmallClusters(double factor) {
 		FlexibleImage workImage = new FlexibleImage(image);
-		workImage = PhenotypeAnalysisTask.removeSmallPartsOfImage(workImage, PhenotypeAnalysisTask.BACKGROUND_COLORint,
+		workImage = removeSmallPartsOfImage(workImage, PhenotypeAnalysisTask.BACKGROUND_COLORint,
 							(int) (image.getWidth() * image.getHeight() * factor));
 		return new ImageOperation(workImage);
 	}
@@ -697,7 +699,7 @@ public class ImageOperation extends ImageConverter {
 			LoadedImage limg = new LoadedImage(sample, imgFluo);
 			limg.setURL(urlFlu);
 			
-			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null,
+			BlockClearBackground.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null,
 								0.5, 0.5);
 			
 			// MainFrame
@@ -711,7 +713,7 @@ public class ImageOperation extends ImageConverter {
 			Sample sample = new Sample(condition);
 			LoadedImage limg = new LoadedImage(sample, imgVisible);
 			limg.setURL(urlVis);
-			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null,
+			BlockClearBackground.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null,
 								2.5, 2.5);
 			
 			// MainFrame.showMessageWindow("RgbTop Clean", new JLabel(
@@ -768,7 +770,7 @@ public class ImageOperation extends ImageConverter {
 			Sample sample = new Sample(condition);
 			LoadedImage limg = new LoadedImage(sample, imgNIR);
 			limg.setURL(urlNIR);
-			PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null, 1,
+			BlockClearBackground.clearBackgroundAndInterpretImage(limg, 2, null, null, true, output, null, 1,
 								0.5);
 			
 			int[] nirImage = ImageConverter.convertBIto1A(imgNIR);
@@ -897,6 +899,142 @@ public class ImageOperation extends ImageConverter {
 		return new ImageOperation(getImage());
 	}
 	
+	public static FlexibleImage removeSmallPartsOfImage(FlexibleImage workImage, int iBackgroundFill, int cutOff) {
+		
+		int[] rgbArray = workImage.getConvertAs1A();
+		int w = workImage.getWidth();
+		int h = workImage.getHeight();
+		
+		int[][] image = new int[w][h];
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				int off = x + y * w;
+				int color = rgbArray[off];
+				if (color != iBackgroundFill) {
+					image[x][y] = 1;
+				} else {
+					image[x][y] = 0;
+				}
+			}
+		}
+		
+		boolean useVariant1 = true, useVariant2 = false, useVariant3 = false;
+		
+		// Variante 1
+		if (useVariant1) {
+			PixelSegmentation ps = new PixelSegmentation(image);
+			ps.doPixelSegmentation(1);
+			
+			int[] clusterSizes = ps.getClusterCounts();
+			int[] clusterPerimeter = ps.getPerimeter();
+			double[] clusterCircleSimilarity = ps.getCircuitRatio();
+			
+			boolean log = false;
+			if (log)
+				for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
+					if (clusterSizes[clusterID] > 25)
+						System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
+											+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
+											+ (clusterCircleSimilarity[clusterID] < 0.013));
+			
+			int[][] mask = ps.getImageMask();
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					int clusterID = mask[x][y];
+					
+					if (clusterSizes[clusterID] < cutOff)
+						rgbArray[x + y * w] = iBackgroundFill;
+				}
+			}
+		}
+		
+		// Variante 2
+		if (useVariant2) {
+			
+			PixelSegmentation ps = new PixelSegmentation(image);
+			ps.doPixelSegmentation(2);
+			
+			int[] clusterSizes = ps.getClusterCounts();
+			int[] clusterPerimeter = ps.getPerimeter();
+			double[] clusterCircleSimilarity = ps.getCircuitRatio();
+			
+			boolean log = false;
+			if (log)
+				for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
+					if (clusterSizes[clusterID] > 25)
+						System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
+											+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
+											+ (clusterCircleSimilarity[clusterID] < 0.013));
+			
+			int[][] mask = ps.getImageMask();
+			// ArrayList<Color> colors = Colors.get(cl);
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					int clusterID = mask[x][y];
+					// rgbArray[x + y * w] = clusterID != 0 ? clusterID :
+					// Color.YELLOW.getRGB();
+					// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
+					
+					if (clusterSizes[clusterID] < cutOff) // ||
+						// clusterCircleSimilarity[clusterID]
+						// > 0.013
+						rgbArray[x + y * w] = iBackgroundFill;
+					// else if (clusterID != 0)
+					// System.out.println("ID: " + clusterID + ", SIZE: " +
+					// clusterSizes[clusterID] + ", PERIMETER: "
+					// + clusterPerimeter[clusterID] + ", CIRCLE? " +
+					// clusterCircleSimilarity[clusterID]);
+				}
+			}
+			PrintImage.printImage(rgbArray, w, h, "variante 2");
+			
+		}
+		
+		// Variante 3
+		if (useVariant3) {
+			PixelSegmentation ps = new PixelSegmentation(image);
+			ps.doPixelSegmentation(3);
+			
+			int[] clusterSizes = ps.getClusterCounts();
+			int[] clusterPerimeter = ps.getPerimeter();
+			double[] clusterCircleSimilarity = ps.getCircuitRatio();
+			
+			boolean log = false;
+			if (log)
+				for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
+					if (clusterSizes[clusterID] > 25)
+						System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
+											+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
+											+ (clusterCircleSimilarity[clusterID] < 0.013));
+			
+			int[][] mask = ps.getImageMask();
+			// ArrayList<Color> colors = Colors.get(cl);
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					int clusterID = mask[x][y];
+					// rgbArray[x + y * w] = clusterID != 0 ? clusterID :
+					// Color.YELLOW.getRGB();
+					// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
+					
+					if (clusterSizes[clusterID] < cutOff) // ||
+						// clusterCircleSimilarity[clusterID]
+						// > 0.013
+						rgbArray[x + y * w] = iBackgroundFill;
+					// else if (clusterID != 0)
+					// System.out.println("ID: " + clusterID + ", SIZE: " +
+					// clusterSizes[clusterID] + ", PERIMETER: "
+					// + clusterPerimeter[clusterID] + ", CIRCLE? " +
+					// clusterCircleSimilarity[clusterID]);
+				}
+			}
+			
+			PrintImage.printImage(rgbArray, w, h, "variante 3");
+			
+		}
+		return new FlexibleImage(rgbArray, w, h);
+	}
+	
 	/**
 	 * Supports transparent background (ImageJ does not support it).
 	 */
@@ -920,5 +1058,42 @@ public class ImageOperation extends ImageConverter {
 		// img = op.filter(img, null);
 		
 		return img;
+	}
+	
+	public ImageOperation crop() {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		
+		int smallestX = Integer.MAX_VALUE;
+		int largestX = 0;
+		int smallestY = Integer.MAX_VALUE;
+		int largestY = 0;
+		
+		int[][] img = getImageAs2array();
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (img[x][y] != PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+					if (x < smallestX)
+						smallestX = x;
+					if (x > largestX)
+						largestX = x;
+					if (y < smallestY)
+						smallestY = y;
+					if (y > largestY)
+						largestY = y;
+				}
+			}
+		}
+		if (largestX > 0) {
+			int[][] res = new int[largestX - smallestX + 1][largestY - smallestY + 1];
+			for (int x = smallestX; x <= largestX; x++) {
+				for (int y = smallestY; y <= largestY; y++) {
+					res[x - smallestX][y - smallestY] = img[x][y];
+				}
+			}
+			return new ImageOperation(ImageConverter.convert2ABtoIJ(res));
+		} else
+			return this;
 	}
 }

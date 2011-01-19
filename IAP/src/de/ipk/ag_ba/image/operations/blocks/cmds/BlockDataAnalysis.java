@@ -11,7 +11,6 @@ import org.graffiti.plugin.io.resources.IOurl;
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
-import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -63,7 +62,7 @@ public class BlockDataAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		LoadedImage limg = new LoadedImage(sample, workImage);
 		limg.setURL(new IOurl(""));
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-		PhenotypeAnalysisTask.clearBackgroundAndInterpretImage(limg, maxThreadsPerImage, null, null, true, output, null,
+		BlockClearBackground.clearBackgroundAndInterpretImage(limg, maxThreadsPerImage, null, null, true, output, null,
 				epsilonA, epsiolonB);
 		
 		return workImage;
