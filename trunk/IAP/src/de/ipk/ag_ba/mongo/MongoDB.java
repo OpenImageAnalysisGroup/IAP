@@ -112,6 +112,10 @@ public class MongoDB {
 		return new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512);
 	}
 	
+	public static MongoDB getLocalUnitTestsDB() {
+		return new MongoDB("Unit Tests local", "localUnitTests", "localhost", null, null, HashType.SHA512);
+	}
+	
 	private MongoDBhandler mh;
 	private MongoDBpreviewHandler mp;
 	
@@ -267,6 +271,9 @@ public class MongoDB {
 		for (SubstanceInterface s : experiment) {
 			if (status != null && status.wantsToStop())
 				break;
+			if (s.getName() == null || s.getName().isEmpty()) {
+				System.out.println("ERRRRRR");
+			}
 			attributes.clear();
 			s.fillAttributeMap(attributes);
 			BasicDBObject substance = new BasicDBObject(filter(attributes));
@@ -292,10 +299,12 @@ public class MongoDB {
 					dbSamples.add(sample);
 					
 					attributes.clear();
-					sa.getSampleAverage().fillAttributeMap(attributes);
-					BasicDBObject dbSampleAverage = new BasicDBObject(filter(attributes));
-					if (sa.size() > 0)
+					if (sa.size() > 0) {
+						sa.getSampleAverage().fillAttributeMap(attributes);
+						BasicDBObject dbSampleAverage = new BasicDBObject(filter(attributes));
+						
 						sample.put("average", dbSampleAverage);
+					}
 					
 					List<BasicDBObject> dbMeasurements = new ArrayList<BasicDBObject>();
 					List<BasicDBObject> dbImages = new ArrayList<BasicDBObject>();
