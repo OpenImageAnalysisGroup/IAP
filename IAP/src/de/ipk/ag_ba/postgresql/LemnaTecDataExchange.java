@@ -113,13 +113,13 @@ public class LemnaTecDataExchange {
 			ExperimentHeaderInterface ehi = new ExperimentHeader();
 			ehi.setExperimentname(rs.getString(1));
 			ehi.setDatabase(database);
-			ehi.setExcelfileid("lemnatec:" + database + ":" + ehi.getExperimentname());
+			ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentname());
 			ehi.setImportusername("todo import user name");
 			ehi.setImportusergroup("Imported");
 			ehi.setExperimenttype("Phenotyping"); // todo welches system?
 			ehi.setRemark("LemnaTec-DB dataset");
 			ehi.setSequence("");
-			ehi.setSizekb("?");
+			ehi.setSizekb(-1);
 			result.add(ehi);
 		}
 		
