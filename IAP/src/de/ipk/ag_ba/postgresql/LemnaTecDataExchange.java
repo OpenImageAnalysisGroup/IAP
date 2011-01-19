@@ -417,7 +417,7 @@ public class LemnaTecDataExchange {
 				// if (sn.getWeight_before() > 0) {
 				// process weight_before
 				Substance s = new Substance();
-				s.setSubstanceName("weight_before");
+				s.setName("weight_before");
 				
 				Condition condition = new Condition(s);
 				condition.setExperimentInfo(experimentReq);
@@ -444,7 +444,7 @@ public class LemnaTecDataExchange {
 				// if (sn.getWeight_after() > sn.getWeight_before()) {
 				// process water_weight
 				Substance s = new Substance();
-				s.setSubstanceName("water_weight");
+				s.setName("water_weight");
 				
 				Condition condition = new Condition(s);
 				condition.setExperimentInfo(experimentReq);
@@ -477,7 +477,7 @@ public class LemnaTecDataExchange {
 					water.setValue(water.getValue() + sn.getWater_amount());
 				} else {
 					Substance s = new Substance();
-					s.setSubstanceName("water_sum");
+					s.setName("water_sum");
 					
 					Condition condition = new Condition(s);
 					condition.setExperimentInfo(experimentReq);
@@ -508,7 +508,7 @@ public class LemnaTecDataExchange {
 				if (sn.getCamera_label() != null) {
 					
 					Substance s = new Substance();
-					s.setSubstanceName(sn.getCamera_label());
+					s.setName(sn.getCamera_label());
 					
 					Condition condition = new Condition(s);
 					condition.setExperimentInfo(experimentReq);

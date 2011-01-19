@@ -4,6 +4,7 @@
 package de.ipk.ag_ba.image.analysis.phytochamber;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
+import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockAutomaticParameterSearchRotation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockAutomaticParameterSearchScaling;
@@ -17,8 +18,10 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMorphologicalOperations;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockOpeningClosing;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPostProcessEdgeErodeEnlarge;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPostProcessEdgeErodeReduce;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPrintInfos;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockTransferImageSet;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -29,9 +32,15 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 public class PhytochamberTopImageProcessor {
 	
 	private final PhytoTopImageProcessorOptions options;
+	private final BlockProperties settings;
 	
 	public PhytochamberTopImageProcessor(PhytoTopImageProcessorOptions options) {
+		this(options, new BlockPropertiesImpl());
+	}
+	
+	public PhytochamberTopImageProcessor(PhytoTopImageProcessorOptions options, BlockPropertiesImpl settings) {
 		this.options = options;
+		this.settings = settings;
 	}
 	
 	public void setValuesToStandard(double scale) {
@@ -50,6 +59,7 @@ public class PhytochamberTopImageProcessor {
 		BlockPipeline p = new BlockPipeline(options);
 		
 		if (automaticParameterSearch) {
+			p.add(BlockPrintInfos.class);
 			p.add(BlockClearBackground.class);
 			p.add(BlockOpeningClosing.class);
 			p.add(BlockRemoveSmallClusters.class);
@@ -63,16 +73,23 @@ public class PhytochamberTopImageProcessor {
 			p.add(BlockAutomaticParameterSearchScaling.class);
 			p.add(BlockAutomaticParameterSearchRotation.class);
 			// p.add(BlockPrintInfos.class);
-			p.add(BlockMorphologicalOperations.class);
+			// p.add(BlockMorphologicalOperations.class);
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockEnlargeMask.class);
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockMergeMask.class);
+			// p.add(BlockPrintInfos.class);
 			p.add(BlockApplyMask.class);
+			// p.add(BlockPrintInfos.class);
 			p.add(BlockPostProcessEdgeErodeReduce.class);
+			// p.add(BlockPrintInfos.class);
 			p.add(BlockRemoveSmallClusters.class);
+			// p.add(BlockPrintInfos.class);
 			p.add(BlockPostProcessEdgeErodeEnlarge.class);
+			p.add(BlockPrintInfos.class);
 			p.add(BlockTransferImageSet.class);
+			// p.add(BlockPrintInfosEND.class);
+			
 		} else {
 			p.add(BlockClearBackground.class);
 			p.add(BlockOpeningClosing.class);
@@ -88,7 +105,7 @@ public class PhytochamberTopImageProcessor {
 			p.add(BlockTransferImageSet.class);
 		}
 		
-		result = p.execute(workset, debugStack);
+		result = p.execute(workset, debugStack, settings);
 		
 		if (debugStack != null) {
 			debugStack.addImage("RESULT", result.getOverviewImage(options.getDebugStackWidth()));
@@ -96,5 +113,9 @@ public class PhytochamberTopImageProcessor {
 		}
 		
 		return result;
+	}
+	
+	public BlockProperties getSettings() {
+		return settings;
 	}
 }
