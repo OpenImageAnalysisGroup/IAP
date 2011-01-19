@@ -22,13 +22,14 @@ public class BlockPipeline {
 		blocks.add(blockClass);
 	}
 	
-	public FlexibleMaskAndImageSet execute(FlexibleMaskAndImageSet input, FlexibleImageStack debugStack) throws InstantiationException, IllegalAccessException {
+	public FlexibleMaskAndImageSet execute(FlexibleMaskAndImageSet input, FlexibleImageStack debugStack, BlockProperties settings)
+			throws InstantiationException, IllegalAccessException {
 		// System.out.println("Execute BLOCK pipeline...");
 		System.out.print(".");
 		long a = System.currentTimeMillis();
 		nullPointerCheck(input, "PIPELINE INPUT ");
 		
-		BlockProperties settings = new BlockPropertiesImpl();
+		// BlockProperties settings = new BlockPropertiesImpl();
 		
 		int index = 0;
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
@@ -46,6 +47,7 @@ public class BlockPipeline {
 		}
 		long b = System.currentTimeMillis();
 		System.out.println("PIPELINE execution time: " + (b - a) / 1000 + "s");
+		// System.out.println("Results:\n" + settings.toString());
 		if (settings.getNumberOfBlocksWithPropertyResults() > 0)
 			System.out.println("Results:\n" + settings.toString());
 		return input;

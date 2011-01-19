@@ -69,16 +69,16 @@ public class NumericDataReportAction extends AbstractNavigationAction {
 		ExperimentInterface experiment = experimentReference.getData(m);
 		ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
 		for (SubstanceInterface su : experiment) {
-			if (su.getSubstanceName() == null)
+			if (su.getName() == null)
 				continue;
 			
-			if (su.getSubstanceName().equals("weight_before")) {
+			if (su.getName().equals("weight_before")) {
 				
 			}
-			if (su.getSubstanceName().equals("water_weight")) {
+			if (su.getName().equals("water_weight")) {
 				
 			}
-			if (su.getSubstanceName().equals("water_amount")) {
+			if (su.getName().equals("water_amount")) {
 				
 			}
 			for (ConditionInterface c : su) {

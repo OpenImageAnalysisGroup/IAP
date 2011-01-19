@@ -10,10 +10,14 @@ public interface BlockProperties {
 	 *           property name
 	 * @return value NULL if no previous value is available, otherwise according value.
 	 */
-	public BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, String name);
+	public BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, Enum<?> name);
 	
-	public void setNumericProperty(int position, String name, double value);
+	public void setNumericProperty(int position, Enum<?> name, double value);
+	
+	public int getBlockPosition();
 	
 	public int getNumberOfBlocksWithPropertyResults();
+	
+	public int getNumberOfBlocksWithThisProperty(Enum<?> pName);
 	
 }

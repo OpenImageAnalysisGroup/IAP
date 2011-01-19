@@ -10,7 +10,8 @@ public class BlockPropertiesImpl implements BlockProperties {
 	private final TreeMap<Integer, TreeMap<String, Double>> store = new TreeMap<Integer, TreeMap<String, Double>>();
 	
 	@Override
-	public BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, String name) {
+	public BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, Enum<?> pName) {
+		String name = pName.name();
 		if (searchIndex <= 0 && !store.containsKey(currentPositionInPipeline + searchIndex))
 			return null;
 		else {
@@ -40,11 +41,11 @@ public class BlockPropertiesImpl implements BlockProperties {
 	}
 	
 	@Override
-	public void setNumericProperty(int position, String name, double value) {
+	public void setNumericProperty(int position, Enum<?> name, double value) {
 		if (!store.containsKey(position))
 			store.put(position, new TreeMap<String, Double>());
 		
-		store.get(position).put(name, value);
+		store.get(position).put(name.name(), value);
 	}
 	
 	@Override
@@ -62,7 +63,26 @@ public class BlockPropertiesImpl implements BlockProperties {
 	}
 	
 	@Override
+	public int getBlockPosition() {
+		return store.lastKey();
+	}
+	
+	@Override
 	public int getNumberOfBlocksWithPropertyResults() {
 		return store.size();
+	}
+	
+	@Override
+	public int getNumberOfBlocksWithThisProperty(Enum<?> pName) {
+		String name = pName.name();
+		int foundCount = 0;
+		for (int index = getBlockPosition(); index >= 0; index--) {
+			if (store.containsKey(index)) {
+				if (store.get(index).containsKey(name)) {
+					foundCount++;
+				}
+			}
+		}
+		return foundCount;
 	}
 }
