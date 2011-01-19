@@ -398,7 +398,7 @@ public class MongoDB {
 		for (DBObject substance : dbSubstances)
 			substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 		
-		experiment.getHeader().setSizekb(overallFileSize.getLong() / 1024 + "");
+		experiment.getHeader().setSizekb(overallFileSize.getLong() / 1024);
 		
 		experiment.fillAttributeMap(attributes);
 		BasicDBObject dbExperiment = new BasicDBObject(attributes);
@@ -945,15 +945,14 @@ public class MongoDB {
 			}
 		});
 		if (tso.getBval(0, false))
-			throw new Exception("Experiment with ID " + header.getExcelfileid() + " not found!");
+			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found!");
 	}
 	
 	private void updateExperimentSize(DB db, ExperimentInterface experiment) {
 		boolean recalcSize = false;
 		try {
-			String sz = experiment.getHeader().getSizekb();
-			double szd = Double.parseDouble(sz);
-			if (szd <= 0) {
+			long sz = experiment.getHeader().getSizekb();
+			if (sz <= 0) {
 				recalcSize = true;
 			}
 		} catch (Exception e) {
@@ -976,7 +975,7 @@ public class MongoDB {
 						}
 					}
 				}
-				experiment.getHeader().setSizekb(newSize.getLong() / 1024 + "");
+				experiment.getHeader().setSizekb(newSize.getLong() / 1024);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}

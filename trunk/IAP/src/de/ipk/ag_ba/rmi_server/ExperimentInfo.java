@@ -44,11 +44,11 @@ public class ExperimentInfo {
 	public String excelFileId;
 	
 	public int fileCount;
-	public int byteSize;
+	public long sizeKB;
 	
 	public ExperimentInfo(String experimentName, int experimentID, String importUser, String userGroup,
 						String experimentType, Date dateExperimentStart, Date dateExperimentImport, String remark, String coordinator,
-						String excelFileId, int fileCount, int byteSize) {
+						String excelFileId, int fileCount, long sizeKB) {
 		this.experimentName = experimentName;
 		this.experimentID = experimentID;
 		this.importUser = importUser;
@@ -60,7 +60,7 @@ public class ExperimentInfo {
 		this.coordinator = coordinator;
 		this.excelFileId = excelFileId;
 		this.fileCount = fileCount;
-		this.byteSize = byteSize;
+		this.sizeKB = sizeKB;
 	}
 	
 	public ExperimentInfo(ExperimentHeaderInterface header) {
@@ -92,9 +92,9 @@ public class ExperimentInfo {
 			this.fileCount = 0;
 		}
 		try {
-			this.byteSize = Integer.parseInt(header.getSizekb());
+			this.sizeKB = header.getSizekb();
 		} catch (Exception e) {
-			this.byteSize = 0;
+			this.sizeKB = 0;
 		}
 	}
 	

@@ -334,8 +334,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("Start-Time"), expStart, false);
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
-		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(""
-							+ experimentHeader.getNumberOfFiles(), null)
+		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
 							+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
 		fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(experiment), false);
 		
@@ -448,9 +447,8 @@ public class MyExperimentInfoPanel extends JPanel {
 		setBorder(BorderFactory.createLoweredBevelBorder());
 	}
 	
-	private String niceValue(String sizekb, String unit) {
+	private String niceValue(long d, String unit) {
 		try {
-			Double d = Double.valueOf(sizekb);
 			if (unit != null && d > 10000) {
 				d = d / 1024;
 				Locale locale = Locale.US;
@@ -473,9 +471,9 @@ public class MyExperimentInfoPanel extends JPanel {
 			}
 		} catch (Exception e) {
 			if (unit != null)
-				return sizekb + " " + unit;
+				return d + " " + unit;
 			else
-				return sizekb;
+				return d + "";
 		}
 	}
 	
