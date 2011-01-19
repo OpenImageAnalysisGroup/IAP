@@ -10,6 +10,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockAutomaticParameterSearchRo
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockAutomaticParameterSearchScaling;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockAutomaticParameterSearchTranslation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCrop;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDataAnalysis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEqualize;
@@ -47,7 +48,9 @@ public class PhytochamberTopImageProcessor {
 		options.initStandardValues(scale);
 	}
 	
-	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, int maxThreadsPerImage, FlexibleImageStack debugStack, boolean automaticParameterSearch)
+	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, int maxThreadsPerImage, FlexibleImageStack debugStack,
+			boolean automaticParameterSearch,
+			boolean cropResult)
 			throws InstantiationException, IllegalAccessException {
 		if (debugStack != null)
 			options.setDebugTakeTimes(true);
@@ -104,6 +107,9 @@ public class PhytochamberTopImageProcessor {
 			p.add(BlockPostProcessEdgeErodeEnlarge.class);
 			p.add(BlockTransferImageSet.class);
 		}
+		
+		if (cropResult)
+			p.add(BlockCrop.class);
 		
 		result = p.execute(workset, debugStack, settings);
 		

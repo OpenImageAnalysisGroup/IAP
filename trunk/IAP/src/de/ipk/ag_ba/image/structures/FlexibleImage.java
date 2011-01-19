@@ -114,4 +114,10 @@ public class FlexibleImage {
 	public void setType(FlexibleImageType type) {
 		this.type = type;
 	}
+	
+	public FlexibleImage crop() {
+		ImageOperation io = new ImageOperation(bufferedImage);
+		io.crop();
+		return io.getImage();
+	}
 }
