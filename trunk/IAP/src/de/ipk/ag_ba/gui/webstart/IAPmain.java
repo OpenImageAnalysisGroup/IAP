@@ -259,10 +259,10 @@ public class IAPmain extends JApplet {
 			locations.addAll(new TextFile(r2));
 			locations.addAll(new TextFile(r3));
 			locations.addAll(new TextFile(r4));
-			// locations.add("./Vanted_AddOn_DBE2.xml");
+			
 			locations.add("./MultimodalDataHandling.xml");
-			locations.add("./HIVE.xml");
-			// locations.add("./VIMPED.xml");
+			// locations.add("./HIVE.xml");
+			
 			locations.remove("");
 			ArrayList<String> locations_exclude = new ArrayList<String>();
 			locations_exclude.addAll(new TextFile(rExcl));
