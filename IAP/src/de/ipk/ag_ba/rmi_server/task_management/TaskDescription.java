@@ -133,8 +133,8 @@ public class TaskDescription {
 									ExperimentInterface ei = m.getExperiment(i);
 									if (ei.getNumberOfMeasurementValues() > 0)
 										System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
-									e.addAll(ei);
-									m.deleteExperiment(i.getExcelfileid());
+									e.addAndMerge(ei);
+									m.deleteExperiment(i.getDatabaseId());
 									System.out.println("*****************************");
 								}
 								String sn = cmd.getRemoteCapableAnalysisActionClassName();
@@ -142,7 +142,7 @@ public class TaskDescription {
 									sn = sn.substring(sn.lastIndexOf(".") + 1);
 								e.getHeader().setExperimentname(sn + ": " + experimentInput.getExperimentName());
 								e.getHeader().setImportusergroup("Cloud Analysis Results");
-								e.getHeader().setExcelfileid("");
+								e.getHeader().setDatabaseId("");
 								for (SubstanceInterface si : e) {
 									for (ConditionInterface ci : si) {
 										ci.setExperimentName(e.getHeader().getExperimentname());
@@ -150,7 +150,7 @@ public class TaskDescription {
 								}
 								System.out.println("*****************************");
 								System.out.println("Merged Experiment: " + e.getName());
-								System.out.println("Merged Measurements: " + Experiment.getNumberOfMeasurementValues(e));
+								System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
 								m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
 							}
 						} else
