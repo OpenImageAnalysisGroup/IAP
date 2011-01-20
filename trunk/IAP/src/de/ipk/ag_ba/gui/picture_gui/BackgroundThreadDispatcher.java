@@ -3,7 +3,9 @@ package de.ipk.ag_ba.gui.picture_gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -11,6 +13,7 @@ import java.util.Stack;
 
 import javax.swing.Timer;
 
+import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
@@ -282,6 +285,7 @@ public class BackgroundThreadDispatcher {
 						if (del == null)
 							del = new ArrayList<MyThread>();
 						del.add(t);
+						updateTaskStatistics();
 					}
 				}
 				if (del != null)
@@ -317,6 +321,27 @@ public class BackgroundThreadDispatcher {
 		threads.clear();
 		waitFor(t);
 	}
+	
+	private static void updateTaskStatistics() {
+		Calendar calendar = new GregorianCalendar();
+		int minute = calendar.get(Calendar.MINUTE);
+		synchronized (BlockPipeline.class) {
+			taskExecutionsWithinCurrentMinute++;
+			if (currentMinute != minute) {
+				taskExecutionsWithinLastMinute = taskExecutionsWithinCurrentMinute;
+				taskExecutionsWithinCurrentMinute = 0;
+				currentMinute = minute;
+			}
+		}
+	}
+	
+	public static int getTaskExecutionsWithinLastMinute() {
+		return taskExecutionsWithinLastMinute;
+	}
+	
+	private static int taskExecutionsWithinLastMinute = 0;
+	private static int taskExecutionsWithinCurrentMinute = 0;
+	private static int currentMinute = -1;
 	
 	// private static final ThreadSafeOptions tso = new ThreadSafeOptions();
 	//

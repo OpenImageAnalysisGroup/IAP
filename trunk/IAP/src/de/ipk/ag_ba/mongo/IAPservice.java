@@ -16,7 +16,9 @@ import java.awt.event.MouseMotionListener;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -350,5 +352,9 @@ public class IAPservice {
 			}
 		}
 		return res;
+	}
+	
+	public static String getCurrentTimeAsNiceString() {
+		return new SimpleDateFormat().format(new Date());
 	}
 }

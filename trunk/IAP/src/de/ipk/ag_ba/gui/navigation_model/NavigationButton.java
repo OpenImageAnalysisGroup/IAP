@@ -46,8 +46,8 @@ import de.ipk.ag_ba.gui.navigation_actions.Calendar2;
 import de.ipk.ag_ba.gui.util.MyUtility;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.rmi_server.task_management.CloundManagerNavigationAction;
-import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
+import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
+import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.ProgressStatusService;
 
@@ -172,6 +172,9 @@ public class NavigationButton implements StyleAware {
 			if (action.getStatusProvider() != null && action.getStatusProvider().getCurrentStatusMessage1() != null
 								&& action.getStatusProvider().getCurrentStatusMessage1().length() > 0)
 				line2 = action.getStatusProvider().getCurrentStatusMessage1();
+			if (action.getStatusProvider() != null && action.getStatusProvider().getCurrentStatusMessage2() != null
+					&& action.getStatusProvider().getCurrentStatusMessage2().length() > 0)
+				line2 += "<p>" + action.getStatusProvider().getCurrentStatusMessage2();
 			if (statusServer != null) {
 				BackgroundTaskStatusProvider status = action.getStatusProvider();
 				String eta = statusServer.getRemainTime(status.getCurrentStatusValue() == -1,

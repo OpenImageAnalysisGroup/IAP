@@ -15,7 +15,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
-import de.ipk.ag_ba.rmi_server.task_management.CloundManagerNavigationAction;
+import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**

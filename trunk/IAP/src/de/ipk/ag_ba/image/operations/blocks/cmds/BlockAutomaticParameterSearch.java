@@ -135,17 +135,17 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 			switch (typ) {
 				case SCALING:
 					io.scale(bestValueX, bestValueY);
-					System.out.println("Scale X = " + bestValueX + ", Y = " + bestValueY);
+					// System.out.println("Scale X = " + bestValueX + ", Y = " + bestValueY);
 					break;
 				
 				case TRANSLATION:
 					io.translate(bestValueX, bestValueY);
-					System.out.println("Translate X = " + bestValueX + ", Y = " + bestValueY);
+					// System.out.println("Translate X = " + bestValueX + ", Y = " + bestValueY);
 					break;
 				
 				case ROTATION:
 					io.rotate(bestValueX);
-					System.out.println("Rotate X = " + bestValueX);
+					// System.out.println("Rotate X = " + bestValueX);
 					break;
 				
 				default:
@@ -160,15 +160,15 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		} else {
 			switch (typ) {
 				case SCALING:
-					System.out.println("No scaling.");
+					// System.out.println("No scaling.");
 					break;
 				
 				case TRANSLATION:
-					System.out.println("No translation.");
+					// System.out.println("No translation.");
 					break;
 				
 				case ROTATION:
-					System.out.println("No rotation.");
+					// System.out.println("No rotation.");
 					break;
 				
 				default:

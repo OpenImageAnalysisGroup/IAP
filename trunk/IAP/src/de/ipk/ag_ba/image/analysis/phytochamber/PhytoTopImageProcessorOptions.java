@@ -7,7 +7,7 @@
 
 package de.ipk.ag_ba.image.analysis.phytochamber;
 
-import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * @author klukas, entzian

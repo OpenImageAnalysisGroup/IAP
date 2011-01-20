@@ -1,6 +1,8 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytoTopImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.cmds.ImageAnalysisBlockFIS;
@@ -44,14 +46,37 @@ public class BlockPipeline {
 			nullPointerCheck(input, "OUTPUT of " + blockClass.getSimpleName());
 			
 			block.reset();
+			
+			updateBlockStatistics();
 		}
 		long b = System.currentTimeMillis();
 		System.out.println("PIPELINE execution time: " + (b - a) / 1000 + "s");
+		
+		// if (settings.getNumberOfBlocksWithPropertyResults() > 0)
 		// System.out.println("Results:\n" + settings.toString());
-		if (settings.getNumberOfBlocksWithPropertyResults() > 0)
-			System.out.println("Results:\n" + settings.toString());
 		return input;
 	}
+	
+	private void updateBlockStatistics() {
+		Calendar calendar = new GregorianCalendar();
+		int minute = calendar.get(Calendar.MINUTE);
+		synchronized (BlockPipeline.class) {
+			blockExecutionsWithinCurrentMinute++;
+			if (currentMinute != minute) {
+				blockExecutionWithinLastMinute = blockExecutionsWithinCurrentMinute;
+				blockExecutionsWithinCurrentMinute = 0;
+				currentMinute = minute;
+			}
+		}
+	}
+	
+	public static int getBlockExecutionsWithinLastMinute() {
+		return blockExecutionWithinLastMinute;
+	}
+	
+	private static int blockExecutionWithinLastMinute = 0;
+	private static int blockExecutionsWithinCurrentMinute = 0;
+	private static int currentMinute = -1;
 	
 	private void nullPointerCheck(FlexibleMaskAndImageSet input, String name) {
 		if (input.getImages() != null) {

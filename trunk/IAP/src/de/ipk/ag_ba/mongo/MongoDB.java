@@ -48,10 +48,10 @@ import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
-import de.ipk.ag_ba.rmi_server.analysis.IOmodule;
-import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
-import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
-import de.ipk.ag_ba.rmi_server.task_management.CloudHost;
+import de.ipk.ag_ba.server.analysis.IOmodule;
+import de.ipk.ag_ba.server.task_management.BatchCmd;
+import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
+import de.ipk.ag_ba.server.task_management.CloudHost;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -96,7 +96,7 @@ public class MongoDB {
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de")) {
-			res.add(new MongoDB("IAP Cloud", "cloud1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512));
+			res.add(getDefaultCloud());
 			res.add(new MongoDB("IAP Cloud 2 (md5)", "cloud2", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
 		} else
 			res.add(getLocalDB());
@@ -110,6 +110,10 @@ public class MongoDB {
 	
 	public static MongoDB getLocalDB() {
 		return new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512);
+	}
+	
+	public static MongoDB getDefaultCloud() {
+		return new MongoDB("IAP Cloud", "cloud1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512);
 	}
 	
 	public static MongoDB getLocalUnitTestsDB() {
@@ -1020,8 +1024,8 @@ public class MongoDB {
 	/**
 	 * get list of host names, with not too old ping update time
 	 */
-	public HashSet<String> batchGetAvailableHosts(final long maxUpdate) throws Exception {
-		final HashSet<String> res = new HashSet<String>();
+	public ArrayList<CloudHost> batchGetAvailableHosts(final long maxUpdate) throws Exception {
+		final ArrayList<CloudHost> res = new ArrayList<CloudHost>();
 		final long curr = System.currentTimeMillis();
 		processDB(new RunnableOnDB() {
 			private DB db;
@@ -1035,7 +1039,8 @@ public class MongoDB {
 				while (cursor.hasNext()) {
 					CloudHost h = (CloudHost) cursor.next();
 					if (curr - h.getLastUpdateTime() < maxUpdate)
-						res.add(h.getHostName());
+						res.add(h);
+					
 				}
 			}
 			
@@ -1048,7 +1053,9 @@ public class MongoDB {
 		return res;
 	}
 	
-	public synchronized void batchPingHost(final String ip) throws Exception {
+	public synchronized void batchPingHost(final String ip,
+			final int blocksExecutedWithinLastMinute,
+			final int tasksExecutedWithinLastMinute) throws Exception {
 		processDB(new RunnableOnDB() {
 			private DB db;
 			
@@ -1063,6 +1070,8 @@ public class MongoDB {
 				CloudHost res = (CloudHost) dbc.findOne(query);
 				if (res != null) {
 					res.updateTime();
+					res.setBlocksExecutedWithinLastMinute(blocksExecutedWithinLastMinute);
+					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
 					dbc.save(res);
 				} else {
 					try {
@@ -1079,6 +1088,33 @@ public class MongoDB {
 				this.db = db;
 			}
 		});
+	}
+	
+	public synchronized CloudHost batchGetUpdatedHostInfo(final CloudHost h) throws Exception {
+		final ObjectRef r = new ObjectRef();
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				DBCollection dbc = db.getCollection("compute_hosts");
+				dbc.setObjectClass(CloudHost.class);
+				
+				BasicDBObject query = new BasicDBObject();
+				query.put("_id", h.get("_id"));
+				
+				CloudHost res = (CloudHost) dbc.findOne(query);
+				if (res != null) {
+					r.setObject(res);
+				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		return (CloudHost) r.getObject();
 	}
 	
 	public void batchClearJobs() throws Exception {

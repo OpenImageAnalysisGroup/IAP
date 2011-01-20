@@ -13,7 +13,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.rmi_server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;

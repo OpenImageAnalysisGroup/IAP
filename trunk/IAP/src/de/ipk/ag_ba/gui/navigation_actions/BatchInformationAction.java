@@ -14,8 +14,8 @@ import org.BackgroundTaskStatusProvider;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
-import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
+import de.ipk.ag_ba.server.task_management.BatchCmd;
+import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 
 /**
  * @author klukas
