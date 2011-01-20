@@ -42,15 +42,11 @@ import org.HomeFolder;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
-import org.graffiti.session.EditorSession;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
-import de.ipk_gatersleben.ag_pbi.vanted3d.mapping.MappingResultGraph;
-import de.ipk_gatersleben.ag_pbi.vanted3d.mapping.MappingResultGraphNode;
-import de.ipk_gatersleben.ag_pbi.vanted3d.views.ThreeDview;
 
 /**
  * @author Christian Klukas
@@ -309,20 +305,16 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			}
 		}
 		if (evt.getSource() == showVolumeCmd) {
-			MappingResultGraph mrg = new MappingResultGraph();
-			VolumeData volume = (VolumeData) imageResult.getBinaryFileInfo().getEntity();
-			MappingResultGraphNode mrgn = mrg.createVolumeNode(volume, null);
-			mrgn.getParams().setURL(FileSystemHandler.getURL(imageResult.getDownloadedFile()));
-			
-			EditorSession session = MainFrame.getInstance().createNewSession(mrg.getGraph());
-			
-			MainFrame.getInstance().createInternalFrame(ThreeDview.class.getCanonicalName(), session, false);
+			// MappingResultGraph mrg = new MappingResultGraph();
+			// VolumeData volume = (VolumeData) imageResult.getBinaryFileInfo().getEntity();
+			// MappingResultGraphNode mrgn = mrg.createVolumeNode(volume, null);
+			// mrgn.getParams().setURL(FileSystemHandler.getURL(imageResult.getDownloadedFile()));
+			//
+			// EditorSession session = MainFrame.getInstance().createNewSession(mrg.getGraph());
+			//
+			// MainFrame.getInstance().createInternalFrame(ThreeDview.class.getCanonicalName(), session, false);
 			
 			IAPmain.showVANTED(false);
-			//
-			// MainFrame.showMessageWindow("3D-Volume " +
-			// imageResult.getDownloadedFile().getAbsolutePath(), view
-			// .getViewComponent());
 		}
 		if (evt.getSource() == showImageCmd) {
 			JFrame myImageFrame = new JFrame("Image View");
