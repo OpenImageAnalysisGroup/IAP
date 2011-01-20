@@ -9,7 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/IPK-Plugins"/>
 	<classpathentry kind="lib" path="lib/plugin.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Hive Add-on"/>
 	<classpathentry kind="lib" path="lib/postgresql-9.0-801.jdbc4.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-net-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/ojdbc14.jar"/>
