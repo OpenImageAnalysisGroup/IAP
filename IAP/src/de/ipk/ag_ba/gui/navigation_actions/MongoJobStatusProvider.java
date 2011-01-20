@@ -10,8 +10,8 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import org.BackgroundTaskStatusProvider;
 
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
-import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
+import de.ipk.ag_ba.server.task_management.BatchCmd;
+import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
 
 /**
  * @author klukas

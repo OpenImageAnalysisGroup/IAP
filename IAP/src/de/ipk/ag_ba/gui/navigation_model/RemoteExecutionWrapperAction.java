@@ -11,9 +11,10 @@ import org.graffiti.editor.MainFrame;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.rmi_server.task_management.BatchCmd;
-import de.ipk.ag_ba.rmi_server.task_management.CloudAnalysisStatus;
-import de.ipk.ag_ba.rmi_server.task_management.RemoteCapableAnalysisAction;
+import de.ipk.ag_ba.server.task_management.BatchCmd;
+import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
+import de.ipk.ag_ba.server.task_management.CloudHost;
+import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 public class RemoteExecutionWrapperAction implements NavigationAction {
@@ -32,7 +33,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		HashSet<String> targetIPs = remoteAction.getMongoDB().batchGetAvailableHosts(10000);
+		ArrayList<CloudHost> targetIPs = remoteAction.getMongoDB().batchGetAvailableHosts(10000);
 		if (targetIPs.isEmpty()) {
 			MainFrame.showMessageDialog("No active compute node found.", "Information");
 		} else {
@@ -50,7 +51,10 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 				BatchCmd cmd = new BatchCmd();
 				cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
 				cmd.setSubmissionTime(st);
-				cmd.setTargetIPs(targetIPs);
+				HashSet<String> ips = new HashSet<String>();
+				for (CloudHost h : targetIPs)
+					ips.add(h.getHostName());
+				cmd.setTargetIPs(ips);
 				cmd.setSubTaskInfo(id, jobIDs.size());
 				cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
 				cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
