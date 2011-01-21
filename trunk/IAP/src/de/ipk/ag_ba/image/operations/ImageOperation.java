@@ -1092,7 +1092,11 @@ public class ImageOperation extends ImageConverter {
 					res[x - smallestX][y - smallestY] = img[x][y];
 				}
 			}
-			return new ImageOperation(ImageConverter.convert2ABtoIJ(res));
+			// FlexibleImage a = new FlexibleImage(image);
+			// FlexibleImage b = new FlexibleImage(res);
+			// a.print("A");
+			// b.print("B");
+			return new ImageOperation(new FlexibleImage(res));
 		} else
 			return this;
 	}

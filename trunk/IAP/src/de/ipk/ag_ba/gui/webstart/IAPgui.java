@@ -18,8 +18,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 
 import netscape.javascript.JSObject;
 
@@ -102,9 +100,9 @@ public class IAPgui {
 		// navScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		// navigationPanel.setScrollpane(navScroller);
 		
-		JScrollPane actionScroller = new MyScrollPane(actionPanel, false);
-		actionScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		actionPanel.setScrollpane(actionScroller);
+		// JScrollPane actionScroller = new MyScrollPane(actionPanel, false);
+		// actionScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		// actionPanel.setScrollpane(actionScroller);
 		
 		JLabel lbl;
 		if (!secondWindow && IAPmain.myClassKnown) {
@@ -119,7 +117,7 @@ public class IAPgui {
 		graphPanel.add(new MainPanelComponent(lbl.getText()).getGUI(), "0,0");
 		graphPanel.validate();
 		
-		JComponent res = TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionScroller,
+		JComponent res = TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionPanel,
 							actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
 							TableLayout.PREFERRED, TableLayout.FILL);
 		

@@ -12,8 +12,8 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.BatchInformationAction;
 import de.ipk.ag_ba.gui.navigation_actions.HostInformationAction;
+import de.ipk.ag_ba.gui.navigation_actions.JobStatusAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -51,19 +51,14 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		try {
 			for (CloudHost ip : m.batchGetAvailableHosts(5000)) {
 				NavigationButton n = new NavigationButton(new HostInformationAction(m, ip), guiSetting);
-				n.setProcessing(true);
 				res.add(n);
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		try {
-			for (BatchCmd b : m.batchGetAllCommands()) {
-				NavigationButton n = new NavigationButton(new BatchInformationAction(b, m), guiSetting);
-				n.setProcessing(true);
-				// n.setRightAligned(true);
-				res.add(n);
-			}
+			NavigationButton jobStatus = new NavigationButton(new JobStatusAction(m), src.getGUIsetting());
+			res.add(jobStatus);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}

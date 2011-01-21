@@ -76,7 +76,7 @@ public class CloudComputingService {
 			SystemAnalysis.setUseFullCpuPower(true);
 		}
 		System.out.println("CPUs: " + SystemAnalysis.getRealNumberOfCPUs() + ", using " + SystemAnalysis.getNumberOfCPUs());
-		System.out.println("MEMORY: " + SystemAnalysis.getRealSystemMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryGB() + " GB");
+		System.out.println("MEMORY: " + SystemAnalysis.getRealSystemMemoryInMB() / 1024 + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
 		System.out.println(">");
 		System.out.println("> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
 		

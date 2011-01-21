@@ -31,6 +31,10 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 		this.tooltip = tooltip;
 	}
 	
+	public boolean requestTitleUpdates() {
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see

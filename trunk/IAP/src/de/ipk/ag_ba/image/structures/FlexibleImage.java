@@ -117,7 +117,7 @@ public class FlexibleImage {
 	
 	public FlexibleImage crop() {
 		ImageOperation io = new ImageOperation(bufferedImage);
-		io.crop();
+		io = io.crop();
 		return io.getImage();
 	}
 }

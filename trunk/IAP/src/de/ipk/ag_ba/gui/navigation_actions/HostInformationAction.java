@@ -10,9 +10,11 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProvider;
+import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudHost;
 
 /**
@@ -20,14 +22,20 @@ import de.ipk.ag_ba.server.task_management.CloudHost;
  */
 public class HostInformationAction extends AbstractNavigationAction {
 	
-	private final CloudHost ip;
+	private CloudHost ip;
 	private BackgroundTaskStatusProvider hostStatus;
+	protected int maxPipelines;
+	private NavigationButton src;
+	private MongoDB m;
 	
 	public HostInformationAction(final MongoDB m, final CloudHost ip) {
 		super("Compute Node: " + ip.getHostName());
 		this.ip = ip;
+		this.m = m;
+		this.maxPipelines = 0;
 		
 		this.hostStatus = new BackgroundTaskStatusProvider() {
+			private String hostInfo;
 			
 			@Override
 			public int getCurrentStatusValue() {
@@ -48,10 +56,22 @@ public class HostInformationAction extends AbstractNavigationAction {
 				CloudHost ch;
 				try {
 					ch = m.batchGetUpdatedHostInfo(ip);
+					if (ch != null)
+						HostInformationAction.this.ip = ch;
+					hostInfo = ch.getHostInfo();
+					String rA = "";
 					if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
-						return ch.getBlocksExecutedWithinLastMinute() + " bpm, " + ch.getTasksWithinLastMinute() + " tpm";
+						rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
 					else
-						return "idle";
+						return "idle, ";
+					String record = "";
+					if (ch.getPipelineExecutedWithinLast5Minutes() > maxPipelines)
+						maxPipelines = ch.getPipelineExecutedWithinLast5Minutes();
+					if (ch.getPipelineExecutedWithinLast5Minutes() < HostInformationAction.this.maxPipelines) {
+						record = ", " + maxPipelines + " max";
+					}
+					return rA + "t_p=" + ch.getLastPipelineTime() + " s" + (record.length() > 0 ? "<br>" : ", ") +
+							ch.getPipelineExecutedWithinLast5Minutes() + " p./5 min" + record;
 				} catch (Exception e) {
 					// empty
 					return "unavailable";
@@ -60,7 +80,7 @@ public class HostInformationAction extends AbstractNavigationAction {
 			
 			@Override
 			public String getCurrentStatusMessage2() {
-				return null;
+				return hostInfo;
 			}
 			
 			@Override
@@ -80,6 +100,17 @@ public class HostInformationAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
+		if (ip != null) {
+			if (ip.getOperatingSystem() != null) {
+				if (ip.getOperatingSystem().toUpperCase().contains("WINDOWS"))
+					return "img/ext/windows-pc.png";
+				if (ip.getOperatingSystem().toUpperCase().contains("MAC"))
+					return "img/ext/macpro_side.png";
+				if (ip.getOperatingSystem().toUpperCase().contains("LINUX"))
+					return "img/ext/dellR810.png";
+				return "img/ext/network-server-status.png";
+			}
+		}
 		return "img/ext/network-server.png";
 	}
 	
@@ -95,23 +126,43 @@ public class HostInformationAction extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		
+		this.src = src;
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-		return currentSet;
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
+		res.add(src);
+		return res;
 	}
 	
 	@Override
 	public boolean getProvidesActions() {
-		return false;
+		return true;
+	}
+	
+	@Override
+	public boolean requestTitleUpdates() {
+		return true;
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		//
-		return null;
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+		try {
+			for (BatchCmd b : m.batchGetAllCommands()) {
+				if (b.getOwner() != null && b.getOwner().equals(ip.getHostName())) {
+					NavigationButton n;
+					n = new NavigationButton(new BatchInformationAction(b, m), src.getGUIsetting());
+					n.setProcessing(true);
+					// n.setRightAligned(true);
+					res.add(n);
+				}
+			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		return res;
 	}
 	
 }
