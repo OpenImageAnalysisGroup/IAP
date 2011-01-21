@@ -85,6 +85,7 @@ public class CloudTaskManager {
 					long maxDelaySinceLastUpdate = 5000;
 					m.batchPingHost(ip,
 							BlockPipeline.getBlockExecutionsWithinLastMinute(),
+							BlockPipeline.getPipelineExecutionsWithinLast5Minutes(),
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute());
 					if (runningTasks.size() == 0) {
 						if (m == null)

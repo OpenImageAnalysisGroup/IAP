@@ -55,6 +55,17 @@ public class CloudHost extends BasicDBObject {
 			return 0;
 	}
 	
+	public void setPipelineExecutedWithinLast5Minutes(int pipelineExecutedWithinLast5Minutes) {
+		put("pipelinesWithin5Minutes", pipelineExecutedWithinLast5Minutes);
+	}
+	
+	public int getPipelineExecutedWithinLast5Minutes() {
+		if (get("pipelinesWithin5Minutes") != null)
+			return (Integer) get("pipelinesWithin5Minutes");
+		else
+			return 0;
+	}
+	
 	public void setTasksExecutedWithinLastMinute(int tasksExecutedWithinLastMinute) {
 		put("tasksPerMinute", tasksExecutedWithinLastMinute);
 	}
@@ -66,4 +77,30 @@ public class CloudHost extends BasicDBObject {
 			return 0;
 	}
 	
+	public void setHostInfo(String info) {
+		put("hostInfo", info);
+	}
+	
+	public String getHostInfo() {
+		return (String) get("hostInfo");
+	}
+	
+	public void setLastPipelineTime(int lastPipelineTime) {
+		put("lastPipelineTimeInSec", lastPipelineTime);
+	}
+	
+	public int getLastPipelineTime() {
+		if (get("lastPipelineTimeInSec") != null)
+			return (Integer) get("lastPipelineTimeInSec");
+		else
+			return 0;
+	}
+	
+	public void setOperatingSystem(String operatingSystem) {
+		put("operatingSystem", operatingSystem);
+	}
+	
+	public String getOperatingSystem() {
+		return (String) get("operatingSystem");
+	}
 }

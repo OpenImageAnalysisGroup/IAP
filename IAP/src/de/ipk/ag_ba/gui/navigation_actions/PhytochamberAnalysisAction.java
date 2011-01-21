@@ -56,7 +56,7 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 		this.experiment = experiment;
 		this.experimentResult = null;
 		if (experiment != null && experiment.getHeader() != null)
-			this.mongoDatasetID = experiment.getHeader().getExcelfileid();
+			this.mongoDatasetID = experiment.getHeader().getDatabaseId();
 	}
 	
 	public PhytochamberAnalysisAction() {
@@ -144,7 +144,7 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 			System.out.println("Statistics results :                  " + newStatisticsData.size());
 			System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
 			
-			statisticsResult.getHeader().setExcelfileid("");
+			statisticsResult.getHeader().setDatabaseId("");
 			if (resultReceiver == null) {
 				if (status != null)
 					status.setCurrentStatusText1("Ready");

@@ -47,7 +47,9 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
+import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
@@ -1055,6 +1057,7 @@ public class MongoDB {
 	
 	public synchronized void batchPingHost(final String ip,
 			final int blocksExecutedWithinLastMinute,
+			final int pipelineExecutedWithinLast5Minutes,
 			final int tasksExecutedWithinLastMinute) throws Exception {
 		processDB(new RunnableOnDB() {
 			private DB db;
@@ -1070,8 +1073,14 @@ public class MongoDB {
 				CloudHost res = (CloudHost) dbc.findOne(query);
 				if (res != null) {
 					res.updateTime();
+					res.setOperatingSystem(SystemAnalysis.getOperatingSystem());
 					res.setBlocksExecutedWithinLastMinute(blocksExecutedWithinLastMinute);
+					res.setPipelineExecutedWithinLast5Minutes(pipelineExecutedWithinLast5Minutes);
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
+					res.setHostInfo(SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
+							SystemAnalysis.getRealSystemMemoryInMB() / 1024 + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
+							"/" + SystemAnalysis.getRealNumberOfCPUs() + " CPUs, queued: " + BackgroundThreadDispatcher.getWorkLoad());
+					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
 					dbc.save(res);
 				} else {
 					try {

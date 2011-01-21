@@ -49,4 +49,6 @@ public interface NavigationAction {
 	public boolean getProvidesActions();
 	
 	public NavigationImage getImageIcon();
+	
+	public boolean requestTitleUpdates();
 }

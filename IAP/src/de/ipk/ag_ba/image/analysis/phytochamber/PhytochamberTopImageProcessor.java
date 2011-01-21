@@ -108,7 +108,7 @@ public class PhytochamberTopImageProcessor {
 			p.add(BlockTransferImageSet.class);
 		}
 		
-		boolean cropWorking = false;
+		boolean cropWorking = true;
 		
 		if (cropResult && cropWorking)
 			p.add(BlockCrop.class);

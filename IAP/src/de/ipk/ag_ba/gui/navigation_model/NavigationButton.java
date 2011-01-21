@@ -137,12 +137,13 @@ public class NavigationButton implements StyleAware {
 	
 	public String getTitle() {
 		long compTime = System.currentTimeMillis() - processingStart;
-		if (!processing || compTime < 1000)
+		if (!(isProcessing() || requestsTitleUpdates()) || compTime < 1000)
 			return title;
 		else {
 			String dots = "";
-			int ndots = (int) ((compTime % 1000) / 250);
-			String cc = "";
+			int speed = 500;
+			int ndots = (int) ((compTime % (speed * 4)) / speed);
+			String cc = "*";
 			if (ndots == 0)
 				cc = "\\";
 			if (ndots == 1)
@@ -151,6 +152,13 @@ public class NavigationButton implements StyleAware {
 				cc = "/";
 			if (ndots == 3)
 				cc = "-";
+			
+			if (requestsTitleUpdates()) {
+				if (ndots < 2)
+					cc = "&nbsp;";
+				else
+					cc = "&nbsp;";
+			}
 			
 			while (dots.length() < 1)
 				dots += cc;
@@ -225,6 +233,10 @@ public class NavigationButton implements StyleAware {
 		return processing;
 	}
 	
+	public boolean requestsTitleUpdates() {
+		return action != null && action.requestTitleUpdates();
+	}
+	
 	public void setSideGUI(JComponent sideGui, double sideGuiSpace, double sideGuiWidth) {
 		this.sideGui = sideGui;
 		this.sideGuiSpace = sideGuiSpace;
@@ -295,12 +307,12 @@ public class NavigationButton implements StyleAware {
 		final ObjectRef rr = new ObjectRef();
 		Runnable r = new Runnable() {
 			public void run() {
-				if (n.isProcessing() && n1.isVisible()) {
+				if ((n.isProcessing() || n.requestsTitleUpdates()) && n1.isVisible()) {
 					n1.setText(n.getTitle());
 					if (n1.getText().indexOf("Please wait") >= 0)
-						BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
+						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
 					else
-						BackgroundTaskHelper.executeLaterOnSwingTask(100, (Runnable) rr.getObject());
+						BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
 				} else {
 					if (n1.isVisible())
 						n1.setText(n.getTitle());
@@ -321,16 +333,16 @@ public class NavigationButton implements StyleAware {
 				JButton n1 = wn1.get();
 				if (n1 == null || n == null)
 					return;
-				if (n.isProcessing() && n1.isVisible()) {
+				if ((n.isProcessing() || n.requestsTitleUpdates()) && n1.isVisible()) {
 					n1.setText(n.getTitle());
 					if (n1.getText().indexOf("Please wait") >= 0)
-						BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
+						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
 					else
-						BackgroundTaskHelper.executeLaterOnSwingTask(100, (Runnable) rr.getObject());
+						BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
 				} else {
 					if (n1.isVisible())
 						n1.setText(n.getTitle());
-					BackgroundTaskHelper.executeLaterOnSwingTask(100, (Runnable) rr.getObject());
+					BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
 				}
 			}
 		};
@@ -605,7 +617,7 @@ public class NavigationButton implements StyleAware {
 		if (icon != null)
 			n1.setIcon(icon);
 		
-		if (n.isProcessing()) {
+		if (n.isProcessing() || n.requestsTitleUpdates()) {
 			NavigationButton.checkButtonTitle(n, n1);
 		} else {
 			WeakReference<JButton> wn1 = new WeakReference<JButton>(n1);
