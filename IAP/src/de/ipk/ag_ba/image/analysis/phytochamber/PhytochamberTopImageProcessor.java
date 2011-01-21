@@ -89,7 +89,7 @@ public class PhytochamberTopImageProcessor {
 			p.add(BlockRemoveSmallClusters.class);
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockPostProcessEdgeErodeEnlarge.class);
-			p.add(BlockPrintInfos.class);
+			// p.add(BlockPrintInfos.class);
 			p.add(BlockTransferImageSet.class);
 			// p.add(BlockPrintInfosEND.class);
 			
