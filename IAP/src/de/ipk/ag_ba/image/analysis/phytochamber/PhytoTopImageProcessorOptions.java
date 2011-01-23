@@ -96,12 +96,13 @@ public class PhytoTopImageProcessorOptions {
 		
 		setClosingNirTop((int) Math.ceil(1 * scale));
 		
-		setPostProcessDilateRgbTop((int) Math.ceil(1 * scale));
-		setPostProcessErodeRgbTop((int) Math.ceil(1 * scale));
-		setPostProcessDilateFluoTop((int) Math.ceil(1 * scale));
-		setPostProcessErodeFluoTop((int) Math.ceil(1 * scale));
-		setPostProcessDilateNirTop((int) Math.ceil(1 * scale));
-		setPostProcessErodeNirTop((int) Math.ceil(1 * scale));
+		double d = 1;
+		setPostProcessDilateRgbTop((int) Math.ceil(d * scale));
+		setPostProcessErodeRgbTop((int) Math.ceil(d * scale));
+		setPostProcessDilateFluoTop((int) Math.ceil(d * scale));
+		setPostProcessErodeFluoTop((int) Math.ceil(d * scale));
+		setPostProcessDilateNirTop((int) Math.ceil(d * scale));
+		setPostProcessErodeNirTop((int) Math.ceil(d * scale));
 		
 		setProcessNir(false);
 		

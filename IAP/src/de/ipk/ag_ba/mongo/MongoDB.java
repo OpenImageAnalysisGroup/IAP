@@ -34,7 +34,6 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -509,9 +508,9 @@ public class MongoDB {
 			inputFile.save();
 			fs.getDB().requestStart();
 			result = inputFile.getLength();
-			CommandResult res = fs.getDB().getLastError(2, 180000, false);
-			if (!res.ok())
-				result = -1;
+			// CommandResult res = fs.getDB().getLastError(2, 180000, false);
+			// if (!res.ok())
+			// result = -1;
 			fs.getDB().requestDone();
 		} else
 			result = 0;
