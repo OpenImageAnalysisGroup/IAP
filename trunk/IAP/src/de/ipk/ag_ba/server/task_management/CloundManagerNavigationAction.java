@@ -48,6 +48,14 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		NavigationButton startOrStopServerMode = new NavigationButton(
 							new EnableOrDisableServerModeAction(m), guiSetting);
 		res.add(startOrStopServerMode);
+		
+		try {
+			NavigationButton jobStatus = new NavigationButton(new JobStatusAction(m), src.getGUIsetting());
+			res.add(jobStatus);
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		
 		try {
 			for (CloudHost ip : m.batchGetAvailableHosts(5000)) {
 				NavigationButton n = new NavigationButton(new HostInformationAction(m, ip), guiSetting);
@@ -56,12 +64,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		try {
-			NavigationButton jobStatus = new NavigationButton(new JobStatusAction(m), src.getGUIsetting());
-			res.add(jobStatus);
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-		}
+		
 		return res;
 	}
 	

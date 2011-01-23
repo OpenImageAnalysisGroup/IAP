@@ -17,7 +17,6 @@ import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytoTopImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.image.operations.ImageConverter;
-import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
@@ -160,8 +159,8 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(
 									new PhytoTopImageProcessorOptions());
 							
-							input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
-							input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
+							// input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
+							// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
 							
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input,
@@ -171,6 +170,10 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
 							MyThread g = statisticalAnalaysis(nir, pipelineResult.getNir());
 							BackgroundThreadDispatcher.waitFor(new MyThread[] { e, f, g });
+							MyThread h = saveImage(vis, pipelineResult.getVis());
+							MyThread i = saveImage(fluo, pipelineResult.getFluo());
+							MyThread j = saveImage(nir, pipelineResult.getNir());
+							BackgroundThreadDispatcher.waitFor(new MyThread[] { h, i, j });
 						} else {
 							System.err.println("Warning: not all three image types available for snapshot!");
 						}
@@ -199,13 +202,20 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			public void run() {
 				LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
 				ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(loadedImage, PhytochamberAnalysisTask.this.getName());
-				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
 				output.addAll(res);
-				// if (res.size() > 0)
-				// System.out.println("STAT RESULTS: " + res.size());
-				output.add(imageRef);
 			}
 		}, "statistic image analysis", 4);
+	}
+	
+	private MyThread saveImage(final ImageData id, final FlexibleImage image) {
+		return BackgroundThreadDispatcher.addTask(new Runnable() {
+			@Override
+			public void run() {
+				LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
+				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
+				output.add(imageRef);
+			}
+		}, "save image to database", 5);
 	}
 	
 	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageType type) {

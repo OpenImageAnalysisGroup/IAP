@@ -6,6 +6,7 @@ import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
+import org.bson.types.ObjectId;
 import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
@@ -15,6 +16,7 @@ import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
 import de.ipk.ag_ba.server.task_management.CloudHost;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 public class RemoteExecutionWrapperAction implements NavigationAction {
@@ -40,10 +42,18 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
 			String remoteCapableAnalysisActionParams = null;
 			String experimentInputMongoID = remoteAction.getMongoDatasetID();
+			ExperimentHeaderInterface header = remoteAction.getMongoDB().getExperimentHeader(new ObjectId(experimentInputMongoID));
+			int n = 1;
+			int nPerJob = 10;
+			if (header.getNumberOfFiles() / 3 > nPerJob) {
+				n = header.getNumberOfFiles() / nPerJob / 3;
+			}
+			if (n < 1)
+				n = 1;
 			TreeSet<Integer> jobIDs = new TreeSet<Integer>();
 			{
 				int idx = 0;
-				while (jobIDs.size() < 15)
+				while (jobIDs.size() < n)
 					jobIDs.add(idx++);
 			}
 			long st = System.currentTimeMillis();
