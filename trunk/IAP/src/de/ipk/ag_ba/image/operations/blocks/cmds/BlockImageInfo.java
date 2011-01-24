@@ -9,13 +9,15 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * @author Entzian
  */
 
-public class BlockPrintInfos extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockImageInfo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	public enum BlockInfoProperty {
 		CONSOLE_OUTPUT, HEIGHT, WIDTH, CONSOLE_OUTPUT_VIS, CONSOLE_OUTPUT_FLUO, CONSOLE_OUTPUT_NIR
 	}
 	
 	HashMap<BlockInfoProperty, Boolean> infoMap = new HashMap<BlockInfoProperty, Boolean>() {
+		private static final long serialVersionUID = 1L;
+		
 		{
 			put(BlockInfoProperty.CONSOLE_OUTPUT, false);
 			put(BlockInfoProperty.CONSOLE_OUTPUT_VIS, false);
@@ -27,8 +29,7 @@ public class BlockPrintInfos extends AbstractSnapshotAnalysisBlockFIS {
 	};
 	
 	@Override
-	protected FlexibleImage processVISmask() {
-		
+	protected void prepare() {
 		printInfo(getInput().getMasks().getVis(), BlockPrintInfosTyp.VisMask);
 		printInfo(getInput().getImages().getVis(), BlockPrintInfosTyp.VisImage);
 		
@@ -37,8 +38,6 @@ public class BlockPrintInfos extends AbstractSnapshotAnalysisBlockFIS {
 		
 		printInfo(getInput().getMasks().getNir(), BlockPrintInfosTyp.NirMask);
 		printInfo(getInput().getImages().getNir(), BlockPrintInfosTyp.NirImage);
-		
-		return getInput().getMasks().getVis();
 	}
 	
 	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp typ) {
