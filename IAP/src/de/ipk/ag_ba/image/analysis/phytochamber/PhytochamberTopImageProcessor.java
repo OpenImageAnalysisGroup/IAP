@@ -19,7 +19,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMorphologicalOperations;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockOpeningClosing;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPostProcessEdgeErodeEnlarge;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPostProcessEdgeErodeReduce;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPrintInfos;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockTransferImageSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
@@ -62,7 +62,7 @@ public class PhytochamberTopImageProcessor {
 		BlockPipeline p = new BlockPipeline(options);
 		
 		if (automaticParameterSearch) {
-			p.add(BlockPrintInfos.class);
+			p.add(BlockImageInfo.class);
 			p.add(BlockClearBackground.class);
 			p.add(BlockOpeningClosing.class);
 			p.add(BlockRemoveSmallClusters.class);
@@ -89,7 +89,7 @@ public class PhytochamberTopImageProcessor {
 			p.add(BlockRemoveSmallClusters.class);
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockPostProcessEdgeErodeEnlarge.class);
-			// p.add(BlockPrintInfos.class);
+			p.add(BlockImageInfo.class);
 			p.add(BlockTransferImageSet.class);
 			// p.add(BlockPrintInfosEND.class);
 			
