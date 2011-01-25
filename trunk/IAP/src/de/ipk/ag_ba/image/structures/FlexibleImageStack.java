@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
+import org.ErrorMsg;
+
 import de.ipk.ag_ba.image.utils.MyFileSaver;
 
 public class FlexibleImageStack {
@@ -29,9 +31,9 @@ public class FlexibleImageStack {
 		} else {
 			image = image.resize(w, h);
 			if (image.getWidth() != w)
-				System.out.println("naja...: " + w + " <> " + image.getWidth());
+				ErrorMsg.addErrorMessage("mismatching image size: " + w + " <> " + image.getWidth());
 			if (image.getHeight() != h)
-				System.out.println("naja, naja..." + h + " <!> " + image.getHeight());
+				ErrorMsg.addErrorMessage("mismatching image size: " + h + " <!> " + image.getHeight());
 		}
 		stack.addSlice(label, image.getConvertAsImagePlus().getProcessor());
 	}

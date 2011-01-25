@@ -424,7 +424,7 @@ public class MongoDB {
 		
 		String id = dbExperiment.get("_id").toString();
 		for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
-			eh.setExcelfileid(id);
+			eh.setDatabaseId(id);
 		}
 		
 		if (errorCount > 0) {
@@ -461,14 +461,13 @@ public class MongoDB {
 		return file.length();
 	}
 	
-	public boolean saveImageFile(MyByteArrayInputStream isImage, GridFS gridfs_images, GridFS gridfs_label_images,
+	public boolean saveImageFile(InputStream[] isImages, GridFS gridfs_images, GridFS gridfs_label_images,
 						GridFS gridfs_preview_files, ImageData image, String hash) throws IOException {
 		boolean allOK = true;
 		
 		try {
 			int idx = 0;
-			for (InputStream is : new InputStream[] { isImage,
-								image.getLabelURL() != null ? image.getLabelURL().getInputStream() : null }) {
+			for (InputStream is : isImages) {
 				idx++;
 				if (is == null)
 					continue;
@@ -641,17 +640,21 @@ public class MongoDB {
 	}
 	
 	public DatabaseStorageResult saveImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
-		MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
+		MyByteArrayInputStream isMain = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
+		MyByteArrayInputStream isLabel = id.getLabelURL() == null ? null : ResourceIOManager.getInputStreamMemoryCached(id.getLabelURL());
 		ImageData image = id;
 		
-		if (is == null) {
+		if (isMain == null) {
 			System.out.println("No input stream for source-URL: " + id.getURL());
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		
-		String hash = GravistoService.getHashFromInputStream(is, fileSize, getHashType());
-		if (is instanceof MyByteArrayInputStream)
-			is = new MyByteArrayInputStream((is).getBuff());
+		String hash = GravistoService.getHashFromInputStream(new InputStream[] { isMain, isLabel }, fileSize, getHashType());
+		if (isMain instanceof MyByteArrayInputStream)
+			isMain = new MyByteArrayInputStream((isMain).getBuff());
+		if (isLabel != null)
+			if (isLabel instanceof MyByteArrayInputStream)
+				isLabel = new MyByteArrayInputStream((isLabel).getBuff());
 		GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
 		DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
 		collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
@@ -677,7 +680,7 @@ public class MongoDB {
 		if (fff != null) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
-			boolean saved = saveImageFile(is, gridfs_images, gridfs_null_files, gridfs_preview_files, id, hash);
+			boolean saved = saveImageFile(new InputStream[] { isMain, isLabel }, gridfs_images, gridfs_null_files, gridfs_preview_files, id, hash);
 			if (saved) {
 				return DatabaseStorageResult.STORED_IN_DB;
 			} else
