@@ -134,7 +134,8 @@ public class IOmodule {
 	
 	public static LoadedNetwork loadNetwork(NetworkData nd) throws Exception {
 		Graph graph = MainFrame.getInstance().getGraph(nd.getURL());
-		return new LoadedNetwork(nd, graph);
+		Graph graphLabelField = MainFrame.getInstance().getGraph(nd.getLabelURL());
+		return new LoadedNetwork(nd, graph, graphLabelField);
 	}
 	
 	public static final int makeIntFromByte4(byte[] b) {

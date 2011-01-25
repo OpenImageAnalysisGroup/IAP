@@ -9,6 +9,8 @@ import java.util.TreeMap;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
@@ -19,6 +21,7 @@ import de.ipk.ag_ba.image.analysis.phytochamber.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
+import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
@@ -27,12 +30,13 @@ import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
+import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
 
 /**
  * @author klukas
@@ -127,9 +131,9 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				@Override
 				public void run() {
 					try {
-						final ImageData vis = id.getVIS();
-						final ImageData fluo = id.getFLUO();
-						final ImageData nir = id.getNIR();
+						ImageData vis = id.getVIS();
+						ImageData fluo = id.getFLUO();
+						ImageData nir = id.getNIR();
 						
 						if (vis == null || nir == null || fluo == null)
 							return;
@@ -159,20 +163,30 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(
 									new PhytoTopImageProcessorOptions());
 							
+							FlexibleImageStack debugImageStack = new FlexibleImageStack();
+							
 							// input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
 							// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
 							
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input,
-									maximumThreadCountOnImageLevel, null, true, true).getImages();
+									maximumThreadCountOnImageLevel, debugImageStack, true, true).getImages();
 							
 							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
 							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
 							MyThread g = statisticalAnalaysis(nir, pipelineResult.getNir());
 							BackgroundThreadDispatcher.waitFor(new MyThread[] { e, f, g });
-							MyThread h = saveImage(vis, pipelineResult.getVis());
-							MyThread i = saveImage(fluo, pipelineResult.getFluo());
-							MyThread j = saveImage(nir, pipelineResult.getNir());
+							
+							byte[] buf = null;
+							if (debugImageStack != null) {
+								MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
+								debugImageStack.saveAsLayeredTif(mos);
+								buf = mos.getBuff();
+							}
+							
+							MyThread h = saveImage(vis, pipelineResult.getVis(), buf);
+							MyThread i = saveImage(fluo, pipelineResult.getFluo(), buf);
+							MyThread j = saveImage(nir, pipelineResult.getNir(), buf);
 							BackgroundThreadDispatcher.waitFor(new MyThread[] { h, i, j });
 						} else {
 							System.err.println("Warning: not all three image types available for snapshot!");
@@ -214,6 +228,24 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
 				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
 				output.add(imageRef);
+			}
+		}, "save image to database", 5);
+	}
+	
+	private MyThread saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent) {
+		return BackgroundThreadDispatcher.addTask(new Runnable() {
+			@Override
+			public void run() {
+				if (optLabelImageContent == null) {
+					LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
+					ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
+					output.add(imageRef);
+				} else {
+					LoadedImageStream loadedImage = new LoadedImageStream(id, image.getBufferedImage(), optLabelImageContent);
+					loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "debug_" + id.getURL().getFileName()));
+					ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
+					output.add(imageRef);
+				}
 			}
 		}, "save image to database", 5);
 	}
@@ -381,7 +413,12 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result, DatabaseTarget storeResultInDatabase) {
 		result.getURL().setFileName("cleared_" + result.getURL().getFileName());
-		result.getURL().setPrefix(LoadedImageHandler.PREFIX);
+		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
+		
+		if (result.getLabelURL() != null) {
+			result.getLabelURL().setFileName("cleared_" + result.getLabelURL().getFileName());
+			result.getLabelURL().setPrefix(LoadedDataHandler.PREFIX);
+		}
 		
 		try {
 			LoadedImage lib = result;

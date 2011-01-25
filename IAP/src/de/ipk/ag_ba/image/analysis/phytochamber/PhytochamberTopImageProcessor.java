@@ -14,12 +14,12 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCrop;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDataAnalysis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEqualize;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMergeMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMorphologicalOperations;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockOpeningClosing;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPostProcessEdgeErodeEnlarge;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPostProcessEdgeErodeReduce;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockTransferImageSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
@@ -117,7 +117,7 @@ public class PhytochamberTopImageProcessor {
 		
 		if (debugStack != null) {
 			debugStack.addImage("RESULT", result.getOverviewImage(options.getDebugStackWidth()));
-			debugStack.print("Debug Result Overview");
+			// debugStack.print("Debug Result Overview");
 		}
 		
 		return result;
