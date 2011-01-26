@@ -17,6 +17,7 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -72,17 +73,31 @@ public class ImageOperation extends ImageConverter {
 	
 	public ImageOperation translate(double x, double y) {
 		processor.translate(x, y);
-		return new ImageOperation(getImage());
+		return new ImageOperation(getImage()).replaceColors(Color.BLACK.getRGB(), PhenotypeAnalysisTask.BACKGROUND_COLORint);
+	}
+	
+	public ImageOperation replaceColors(int search, int replace) {
+		int[] a = getImageAs1array();
+		int[] b = new int[a.length];
+		
+		int idx = 0;
+		for (int v : a) {
+			if (v != search)
+				b[idx++] = v;
+			else
+				b[idx++] = replace;
+		}
+		return new ImageOperation(b, getImage().getWidth(), getImage().getHeight());
 	}
 	
 	public ImageOperation rotate(double degree) {
 		processor.rotate(degree);
-		return new ImageOperation(getImage());
+		return new ImageOperation(getImage()).replaceColors(Color.BLACK.getRGB(), PhenotypeAnalysisTask.BACKGROUND_COLORint);
 	}
 	
 	public ImageOperation scale(double xScale, double yScale) {
 		processor.scale(xScale, yScale);
-		return new ImageOperation(getImage());
+		return new ImageOperation(getImage()).replaceColors(Color.BLACK.getRGB(), PhenotypeAnalysisTask.BACKGROUND_COLORint);
 	}
 	
 	public ImageOperation resize(int width, int height) {
@@ -846,7 +861,7 @@ public class ImageOperation extends ImageConverter {
 		imgNN.show("NIR");
 	}
 	
-	static void showTwoImagesAsOne(BufferedImage imgF2, BufferedImage imgV2) {
+	public static void showTwoImagesAsOne(BufferedImage imgF2, BufferedImage imgV2) {
 		
 		imgF2 = ImageConverter.convert1AtoBI(imgF2.getWidth(), imgF2.getHeight(), ImageConverter.convertBIto1A(imgF2));
 		imgV2 = ImageConverter.convert1AtoBI(imgV2.getWidth(), imgV2.getHeight(), ImageConverter.convertBIto1A(imgV2));
@@ -870,6 +885,17 @@ public class ImageOperation extends ImageConverter {
 		}
 		
 		GravistoService.showImage(imgF2, "Vergleich");
+		// waitTime(1, TimeUnit.SECONDS);
+		
+	}
+	
+	public static void waitTime(int sleepTime, TimeUnit typ) {
+		try {
+			System.out.println("Sleep " + sleepTime + " " + typ.name());
+			typ.sleep(sleepTime);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public FlexibleImage getImage() {

@@ -3,6 +3,8 @@
  *************************************************************************/
 package de.ipk.ag_ba.image.operations;
 
+import java.awt.image.BufferedImage;
+
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
@@ -16,6 +18,8 @@ public class MaskOperation {
 	private final int[] nearIfImage;
 	private int filled = 0, deleted = 0;
 	private final int[] mask;
+	private final int heightMask;
+	private final int widthMask;
 	
 	public MaskOperation(FlexibleImage rgbImage, FlexibleImage fluorImage, FlexibleImage optNirImage, int background, int resForeground) {
 		this.rgbImage = rgbImage.getConvertAs1A();
@@ -28,6 +32,8 @@ public class MaskOperation {
 		this.foreground = resForeground;
 		
 		mask = new int[this.rgbImage.length];
+		heightMask = rgbImage.getHeight();
+		widthMask = rgbImage.getWidth();
 	}
 	
 	public void mergeMasks() {
@@ -64,6 +70,22 @@ public class MaskOperation {
 	
 	public int[] getMask() {
 		return mask;
+	}
+	
+	public int getMaskHeigth() {
+		return heightMask;
+	}
+	
+	public int getMaskWidt() {
+		return widthMask;
+	}
+	
+	public FlexibleImage getMaskAsFlexibleImage() {
+		return new FlexibleImage(mask, widthMask, heightMask);
+	}
+	
+	public BufferedImage getMaskAsBufferedImage() {
+		return ImageConverter.convert1AtoBI(widthMask, heightMask, mask);
 	}
 	
 	public double getUnknownMeasurementValuePixels(double correctionForDeletedArea) {
