@@ -115,7 +115,7 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 						else {
 							// load image
 							try {
-								li = IOmodule.loadImageFromFileOrMongo(i);
+								li = IOmodule.loadImageFromFileOrMongo(i, true, false);
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 								System.out.println("Error loading file: " + i.getURL().toString());

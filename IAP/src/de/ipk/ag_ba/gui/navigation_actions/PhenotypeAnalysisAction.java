@@ -266,7 +266,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		res.add(FileManagerAction.getFileManagerEntity(m, new ExperimentReference(experimentResult),
 							src.getGUIsetting()));
 		
-		res.add(new NavigationButton(new CloudUploadEntity(m, new ExperimentReference(experimentResult)),
+		res.add(new NavigationButton(new CopyEntity(m, new ExperimentReference(experimentResult)),
 							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 		
 		MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(res, experimentResult, experimentResult.getHeader(),

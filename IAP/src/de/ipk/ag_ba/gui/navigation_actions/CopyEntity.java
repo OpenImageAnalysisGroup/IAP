@@ -15,11 +15,11 @@ import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 /**
  * @author klukas
  */
-public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
+public class CopyEntity extends AbstractExperimentAnalysisNavigation {
 	
 	private boolean active;
 	
-	public CloudUploadEntity(MongoDB m, ExperimentReference experiment) {
+	public CopyEntity(MongoDB m, ExperimentReference experiment) {
 		super(m, experiment);
 	}
 	
@@ -37,8 +37,9 @@ public class CloudUploadEntity extends AbstractExperimentAnalysisNavigation {
 		if (sel == null)
 			return;
 		
-		this.m = (MongoDB) sel[0];
 		super.performActionCalculateResults(src);
+		
+		this.m = (MongoDB) sel[0];
 		
 		try {
 			active = true;
