@@ -20,6 +20,9 @@ public class CutImagePreprocessor implements ImagePreProcessor {
 	public boolean processImage(LoadedImage loadedImage, int[] rgbArray, int[] rgbArrayNULL, int w, int h,
 						int iBackgroundFill) {
 		
+		if (true)
+			return true;
+		
 		ImageConfiguration ic = ImageConfiguration.get(loadedImage.getSubstanceName());
 		
 		if (ic == ImageConfiguration.RgbSide) {
