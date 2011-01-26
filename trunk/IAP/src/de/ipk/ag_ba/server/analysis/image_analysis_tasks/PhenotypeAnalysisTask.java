@@ -102,7 +102,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 								limg = (LoadedImage) id;
 							} else {
 								try {
-									limg = IOmodule.loadImageFromFileOrMongo(id);
+									limg = IOmodule.loadImageFromFileOrMongo(id, true, true);
 								} catch (Exception e) {
 									ErrorMsg.addErrorMessage(e);
 								}

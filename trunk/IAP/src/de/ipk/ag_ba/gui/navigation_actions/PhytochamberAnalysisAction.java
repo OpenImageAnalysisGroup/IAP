@@ -111,11 +111,12 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setInt(1);
 			
+			int pi = SystemAnalysis.getNumberOfCPUs();
+			int ti = SystemAnalysis.getNumberOfCPUs() / 2;
+			
 			PhytochamberAnalysisTask task = new PhytochamberAnalysisTask();
 			
 			task.setInput(workload, m, workOnSubset, numberOfSubsets);
-			int pi = SystemAnalysis.getNumberOfCPUs();
-			int ti = SystemAnalysis.getNumberOfCPUs() / 2;
 			task.performAnalysis(pi, ti, status);
 			
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
@@ -178,7 +179,7 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 		res.add(FileManagerAction.getFileManagerEntity(m, new ExperimentReference(experimentResult),
 							src.getGUIsetting()));
 		
-		res.add(new NavigationButton(new CloudUploadEntity(m, new ExperimentReference(experimentResult)),
+		res.add(new NavigationButton(new CopyEntity(m, new ExperimentReference(experimentResult)),
 							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 		
 		MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(res, experimentResult, experimentResult.getHeader(),

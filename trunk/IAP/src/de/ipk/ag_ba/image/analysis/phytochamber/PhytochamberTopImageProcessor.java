@@ -52,8 +52,8 @@ public class PhytochamberTopImageProcessor {
 			boolean automaticParameterSearch,
 			boolean cropResult)
 			throws InstantiationException, IllegalAccessException {
-		if (debugStack != null)
-			options.setDebugTakeTimes(true);
+		// if (debugStack != null)
+		// options.setDebugTakeTimes(true);
 		
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, input.copy());
 		

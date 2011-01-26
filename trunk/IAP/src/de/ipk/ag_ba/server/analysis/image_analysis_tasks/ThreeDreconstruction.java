@@ -284,7 +284,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 						{
 							LoadedImage limg;
 							try {
-								limg = IOmodule.loadImageFromFileOrMongo(image);
+								limg = IOmodule.loadImageFromFileOrMongo(image, true, true);
 								
 								limg = PhenotypeAnalysisTask.clearBackground(limg, 1);
 								

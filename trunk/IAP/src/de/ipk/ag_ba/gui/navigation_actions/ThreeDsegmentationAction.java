@@ -99,7 +99,7 @@ public class ThreeDsegmentationAction extends AbstractNavigationAction {
 			storedActions.add(FileManagerAction.getFileManagerEntity(m, new ExperimentReference(res),
 								src.getGUIsetting()));
 			
-			storedActions.add(new NavigationButton(new CloudUploadEntity(m,
+			storedActions.add(new NavigationButton(new CopyEntity(m,
 								new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
 			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, res, res.getHeader(), false,

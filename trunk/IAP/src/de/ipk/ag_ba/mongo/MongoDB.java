@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -30,7 +29,6 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
-import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -65,6 +63,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -96,9 +95,9 @@ public class MongoDB {
 	
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
-		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de")) {
+		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
 			res.add(getDefaultCloud());
-			res.add(new MongoDB("IAP Cloud 2 (md5)", "cloud2", "ba-13.ipk-gatersleben.de", null, null, HashType.MD5));
+			res.add(new MongoDB("IAP Cloud 2 (md5)", "cloud2", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", null, null, HashType.MD5));
 		} else
 			res.add(getLocalDB());
 		
@@ -114,7 +113,7 @@ public class MongoDB {
 	}
 	
 	public static MongoDB getDefaultCloud() {
-		return new MongoDB("IAP Cloud", "cloud1", "ba-13.ipk-gatersleben.de", null, null, HashType.SHA512);
+		return new MongoDB("IAP Cloud", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", null, null, HashType.SHA512);
 	}
 	
 	public static MongoDB getLocalUnitTestsDB() {
@@ -178,15 +177,13 @@ public class MongoDB {
 		
 	}
 	
-	private static Semaphore maxLoad = new Semaphore(4, true);
-	
 	private static Mongo m;
 	
 	private void processDB(String dataBase, String optHosts, String optLogin, String optPass,
 						RunnableOnDB runnableOnDB) throws Exception {
 		
 		try {
-			maxLoad.acquire();
+			BackgroundTaskHelper.lockAquire(dataBase, 4);
 			DB db;
 			if (m == null) {
 				if (optHosts == null || optHosts.length() == 0) {
@@ -209,7 +206,7 @@ public class MongoDB {
 			runnableOnDB.setDB(db);
 			runnableOnDB.run();
 		} finally {
-			maxLoad.release();
+			BackgroundTaskHelper.lockRelease(dataBase);
 		}
 	}
 	
@@ -266,6 +263,13 @@ public class MongoDB {
 		
 		DBCollection conditions = db.getCollection("conditions");
 		
+		boolean inline = false;
+		
+		if (inline) {
+			substances = null;
+			conditions = null;
+		}
+		
 		int errorCount = 0;
 		int count = 0;
 		StringBuilder errors = new StringBuilder();
@@ -276,9 +280,7 @@ public class MongoDB {
 		for (SubstanceInterface s : experiment) {
 			if (status != null && status.wantsToStop())
 				break;
-			if (s.getName() == null || s.getName().isEmpty()) {
-				System.out.println("ERRRRRR");
-			}
+			
 			attributes.clear();
 			s.fillAttributeMap(attributes);
 			BasicDBObject substance = new BasicDBObject(filter(attributes));
@@ -317,10 +319,12 @@ public class MongoDB {
 					List<BasicDBObject> dbNetworks = new ArrayList<BasicDBObject>();
 					
 					for (Measurement m : sa) {
-						attributes.clear();
-						m.fillAttributeMap(attributes);
-						BasicDBObject measurement = new BasicDBObject(filter(attributes));
-						dbMeasurements.add(measurement);
+						if (!(m instanceof BinaryMeasurement)) {
+							attributes.clear();
+							m.fillAttributeMap(attributes);
+							BasicDBObject measurement = new BasicDBObject(filter(attributes));
+							dbMeasurements.add(measurement);
+						}
 					} // measurement
 					if (sa instanceof Sample3D) {
 						Sample3D s3 = (Sample3D) sa;
@@ -390,33 +394,40 @@ public class MongoDB {
 				} // sample
 				condition.put("samples", dbSamples);
 			} // condition
-				// substance.put("conditions", dbConditions);
-			substance2conditions.put(substance, dbConditions);
+			if (inline)
+				substance.put("conditions", dbConditions);
+			else
+				substance2conditions.put(substance, dbConditions);
 		} // substance
 		
-		for (DBObject dbSubstance : dbSubstances) {
-			ArrayList<String> conditionIDs = new ArrayList<String>();
-			if (substance2conditions.get(dbSubstance) != null)
-				for (DBObject dbc : substance2conditions.get(dbSubstance)) {
-					conditions.insert(dbc);
+		if (substances != null)
+			for (DBObject dbSubstance : dbSubstances) {
+				ArrayList<String> conditionIDs = new ArrayList<String>();
+				if (substance2conditions.get(dbSubstance) != null)
+					for (DBObject dbc : substance2conditions.get(dbSubstance)) {
+						conditions.insert(dbc);
+					}
+				if (substance2conditions.get(dbSubstance) != null)
+					for (DBObject dbCondition : substance2conditions.get(dbSubstance))
+						conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
+				dbSubstance.put("condition_ids", conditionIDs);
+				if (status == null || (status != null && !status.wantsToStop())) {
+					substances.insert(dbSubstance);
 				}
-			if (substance2conditions.get(dbSubstance) != null)
-				for (DBObject dbCondition : substance2conditions.get(dbSubstance))
-					conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
-			dbSubstance.put("condition_ids", conditionIDs);
-			if (status == null || (status != null && !status.wantsToStop())) {
-				substances.insert(dbSubstance);
 			}
-		}
 		ArrayList<String> substanceIDs = new ArrayList<String>();
-		for (DBObject substance : dbSubstances)
-			substanceIDs.add(((BasicDBObject) substance).getString("_id"));
+		if (dbSubstances != null)
+			for (DBObject substance : dbSubstances)
+				substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 		
 		experiment.getHeader().setSizekb(overallFileSize.getLong() / 1024);
 		
 		experiment.fillAttributeMap(attributes);
 		BasicDBObject dbExperiment = new BasicDBObject(attributes);
-		dbExperiment.put("substance_ids", substanceIDs);
+		if (inline)
+			dbExperiment.put("substances", dbSubstances);
+		else
+			dbExperiment.put("substance_ids", substanceIDs);
 		
 		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
@@ -505,12 +516,12 @@ public class MongoDB {
 			GridFSInputFile inputFile = fs.createFile(is);
 			inputFile.setFilename(hash);
 			inputFile.save();
-			fs.getDB().requestStart();
+			// fs.getDB().requestStart();
 			result = inputFile.getLength();
 			// CommandResult res = fs.getDB().getLastError(2, 180000, false);
 			// if (!res.ok())
 			// result = -1;
-			fs.getDB().requestDone();
+			// fs.getDB().requestDone();
 		} else
 			result = 0;
 		is.close();
@@ -640,21 +651,32 @@ public class MongoDB {
 	}
 	
 	public DatabaseStorageResult saveImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
-		MyByteArrayInputStream isMain = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
-		MyByteArrayInputStream isLabel = id.getLabelURL() == null ? null : ResourceIOManager.getInputStreamMemoryCached(id.getLabelURL());
+		InputStream isMain = id.getURL().getInputStream();
+		InputStream isLabel = id.getLabelURL() == null ? null : id.getLabelURL().getInputStream();
 		ImageData image = id;
 		
 		if (isMain == null) {
-			System.out.println("No input stream for source-URL: " + id.getURL());
+			System.out.println("No input stream for source-URL:  " + id.getURL());
+			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
+		}
+		if (id.getLabelURL() != null && isLabel == null) {
+			System.out.println("No input stream for source-URL (label):  " + id.getURL());
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		
 		String hash = GravistoService.getHashFromInputStream(new InputStream[] { isMain, isLabel }, fileSize, getHashType());
 		if (isMain instanceof MyByteArrayInputStream)
-			isMain = new MyByteArrayInputStream((isMain).getBuff());
-		if (isLabel != null)
+			isMain = new MyByteArrayInputStream(((MyByteArrayInputStream) isMain).getBuff());
+		else
+			isMain = id.getURL().getInputStream();
+		
+		if (isLabel != null) {
 			if (isLabel instanceof MyByteArrayInputStream)
-				isLabel = new MyByteArrayInputStream((isLabel).getBuff());
+				isLabel = new MyByteArrayInputStream(((MyByteArrayInputStream) isLabel).getBuff());
+			else
+				isLabel = id.getLabelURL().getInputStream();
+		}
+		
 		GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
 		DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
 		collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
@@ -671,6 +693,11 @@ public class MongoDB {
 		
 		image.getURL().setPrefix(mh.getPrefix());
 		image.getURL().setDetail(hash);
+		
+		if (image.getLabelURL() != null) {
+			image.getLabelURL().setPrefix(mh.getPrefix());
+			image.getLabelURL().setDetail(hash);
+		}
 		
 		if (fff != null && fff.getLength() <= 0) {
 			System.out.println("Found Zero-Size File.");
@@ -869,21 +896,28 @@ public class MongoDB {
 				
 				@Override
 				public void run() {
-					DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getExcelfileid()));
+					DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
 					DBObject expref = dbr.fetch();
 					if (expref != null) {
+						BasicDBList subList = (BasicDBList) expref.get("substances");
+						if (subList != null)
+							for (Object co : subList) {
+								DBObject substance = (DBObject) co;
+								processSubstance(db, experiment, substance);
+							}
 						BasicDBList l = (BasicDBList) expref.get("substance_ids");
-						for (Object o : l) {
-							if (o == null)
-								continue;
-							DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
-							if (subr != null) {
-								DBObject substance = subr.fetch();
-								if (substance != null) {
-									processSubstance(db, experiment, substance);
+						if (l != null)
+							for (Object o : l) {
+								if (o == null)
+									continue;
+								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
+								if (subr != null) {
+									DBObject substance = subr.fetch();
+									if (substance != null) {
+										processSubstance(db, experiment, substance);
+									}
 								}
 							}
-						}
 					}
 					experiment.setHeader(header);
 					
@@ -1357,6 +1391,7 @@ public class MongoDB {
 	}
 	
 	private void processSubstance(DB db, ExperimentInterface experiment, DBObject substance) {
+		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
 		experiment.add(s3d);
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
@@ -1408,6 +1443,8 @@ public class MongoDB {
 						@SuppressWarnings("unchecked")
 						ImageData image = new ImageData(sample, img.toMap());
 						image.getURL().setPrefix(mh.getPrefix());
+						if (image.getLabelURL() != null)
+							image.getLabelURL().setPrefix(mh.getPrefix());
 						sample.add(image);
 					}
 				}
@@ -1418,11 +1455,11 @@ public class MongoDB {
 						DBObject vol = (DBObject) v;
 						@SuppressWarnings("unchecked")
 						VolumeData volume = new VolumeData(sample, vol.toMap());
-						if (volume.getURL() != null) {
+						if (volume.getURL() != null)
 							volume.getURL().setPrefix(mh.getPrefix());
-							sample.add(volume);
-						} else
-							ErrorMsg.addErrorMessage("No volume data URL found! Volume: " + volume.toString());
+						if (volume.getLabelURL() != null)
+							volume.getLabelURL().setPrefix(mh.getPrefix());
+						sample.add(volume);
 					}
 				}
 				// networks
@@ -1432,11 +1469,11 @@ public class MongoDB {
 						DBObject net = (DBObject) n;
 						@SuppressWarnings("unchecked")
 						NetworkData network = new NetworkData(sample, net.toMap());
-						if (network.getURL() != null) {
+						if (network.getURL() != null)
 							network.getURL().setPrefix(mh.getPrefix());
-							sample.add(network);
-						} else
-							ErrorMsg.addErrorMessage("No network data URL found! Network: " + network.toString());
+						if (network.getLabelURL() != null)
+							network.getLabelURL().setPrefix(mh.getPrefix());
+						sample.add(network);
 					}
 				}
 			}

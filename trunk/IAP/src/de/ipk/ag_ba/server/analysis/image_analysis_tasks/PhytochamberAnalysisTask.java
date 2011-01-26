@@ -122,7 +122,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
 		int idxxx = 0;
-		ArrayList<Thread> wait = new ArrayList<Thread>();
+		final ArrayList<Thread> wait = new ArrayList<Thread>();
 		
 		for (ImageSet md : workload) {
 			final ImageSet id = md;
@@ -170,7 +170,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input,
-									maximumThreadCountOnImageLevel, debugImageStack, true, true).getImages();
+									maximumThreadCountOnImageLevel, debugImageStack, false, true).getImages();
 							
 							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
 							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
@@ -184,10 +184,9 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 								buf = mos.getBuff();
 							}
 							
-							MyThread h = saveImage(vis, pipelineResult.getVis(), buf);
-							MyThread i = saveImage(fluo, pipelineResult.getFluo(), buf);
-							MyThread j = saveImage(nir, pipelineResult.getNir(), buf);
-							BackgroundThreadDispatcher.waitFor(new MyThread[] { h, i, j });
+							saveImage(vis, pipelineResult.getVis(), buf);
+							saveImage(fluo, pipelineResult.getFluo(), buf);
+							saveImage(nir, pipelineResult.getNir(), buf);
 						} else {
 							System.err.println("Warning: not all three image types available for snapshot!");
 						}
@@ -216,47 +215,38 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			public void run() {
 				LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
 				ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(loadedImage, PhytochamberAnalysisTask.this.getName());
-				output.addAll(res);
+				synchronized (output) {
+					output.addAll(res);
+				}
 			}
 		}, "statistic image analysis", 4);
 	}
 	
-	private MyThread saveImage(final ImageData id, final FlexibleImage image) {
-		return BackgroundThreadDispatcher.addTask(new Runnable() {
-			@Override
-			public void run() {
-				LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
-				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
+	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent) {
+		if (optLabelImageContent == null) {
+			LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
+			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
+			output.add(imageRef);
+		} else {
+			LoadedImageStream loadedImage = new LoadedImageStream(id, image.getBufferedImage(), optLabelImageContent);
+			loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "debug_" + id.getURL().getFileName()));
+			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
+			if (imageRef == null) {
+				System.out.println("ERROR #1");
+			} else
 				output.add(imageRef);
-			}
-		}, "save image to database", 5);
+		}
 	}
 	
-	private MyThread saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent) {
-		return BackgroundThreadDispatcher.addTask(new Runnable() {
-			@Override
-			public void run() {
-				if (optLabelImageContent == null) {
-					LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
-					ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
-					output.add(imageRef);
-				} else {
-					LoadedImageStream loadedImage = new LoadedImageStream(id, image.getBufferedImage(), optLabelImageContent);
-					loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "debug_" + id.getURL().getFileName()));
-					ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
-					output.add(imageRef);
-				}
-			}
-		}, "save image to database", 5);
-	}
-	
-	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageType type) {
+	private MyThread load(final ImageData id, final FlexibleImageSet input,
+			final FlexibleImageType type) {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
 				// System.out.println("Load Image");
 				try {
-					input.set(new FlexibleImage(IOmodule.loadImageFromFileOrMongo(id).getLoadedImage(), type));
+					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, false);
+					input.set(new FlexibleImage(li.getLoadedImage(), type));
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
@@ -429,6 +419,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			else
 				System.out.println("Could not save in DB: " + lib.getURL().toString());
 		} catch (Exception e) {
+			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;

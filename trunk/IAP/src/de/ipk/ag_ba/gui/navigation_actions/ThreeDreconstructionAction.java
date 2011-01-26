@@ -150,7 +150,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			storedActions.add(FileManagerAction.getFileManagerEntity(m,
 								new ExperimentReference(statisticsResult), src.getGUIsetting()));
 			
-			storedActions.add(new NavigationButton(new CloudUploadEntity(m, new ExperimentReference(
+			storedActions.add(new NavigationButton(new CopyEntity(m, new ExperimentReference(
 								statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
 			MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(storedActions, statisticsResult, statisticsResult

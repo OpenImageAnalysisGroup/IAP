@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.ipk.ag_ba.gui.navigation_actions.CloudIoTestAction;
-import de.ipk.ag_ba.gui.navigation_actions.CloudUploadEntity;
+import de.ipk.ag_ba.gui.navigation_actions.CopyEntity;
 import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
 import de.ipk.ag_ba.gui.navigation_actions.NumericDataReportAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
@@ -39,7 +39,7 @@ public class ImageAnalysisCommandManager {
 		
 		try {
 			// if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
-			actions.add(new NavigationButton(new CloudUploadEntity(m, experimentReference), guiSetting));
+			actions.add(new NavigationButton(new CopyEntity(m, experimentReference), guiSetting));
 		} catch (Exception e) {
 			// empty
 		}
