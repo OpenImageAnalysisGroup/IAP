@@ -56,7 +56,7 @@ public class IOmodule {
 		StopWatch s = new StopWatch("Load image and null-image", false);
 		BufferedImage image = null;
 		if (loadImage)
-			ImageIO.read(id.getURL().getInputStream());
+			image = ImageIO.read(id.getURL().getInputStream());
 		BufferedImage imageNULL = null;
 		try {
 			if (loadLabelField)

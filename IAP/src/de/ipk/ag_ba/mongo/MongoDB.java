@@ -848,7 +848,8 @@ public class MongoDB {
 				@Override
 				public void run() {
 					DBObject header = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).findOne(experimentMongoID);
-					res.setObject(new ExperimentHeader(header.toMap()));
+					if (header != null)
+						res.setObject(new ExperimentHeader(header.toMap()));
 				}
 				
 				@Override
