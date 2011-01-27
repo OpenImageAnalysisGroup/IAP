@@ -170,7 +170,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input,
-									maximumThreadCountOnImageLevel, debugImageStack, false, true).getImages();
+									maximumThreadCountOnImageLevel, debugImageStack, true, true).getImages();
 							
 							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
 							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
@@ -184,9 +184,9 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 								buf = mos.getBuff();
 							}
 							
-							saveImage(vis, pipelineResult.getVis(), buf);
-							saveImage(fluo, pipelineResult.getFluo(), buf);
-							saveImage(nir, pipelineResult.getNir(), buf);
+							saveImage(vis, pipelineResult.getVis(), buf, ".tiff");
+							saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
+							saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
 						} else {
 							System.err.println("Warning: not all three image types available for snapshot!");
 						}
@@ -222,14 +222,14 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		}, "statistic image analysis", 4);
 	}
 	
-	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent) {
+	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
 		if (optLabelImageContent == null) {
 			LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
 			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
 			output.add(imageRef);
 		} else {
 			LoadedImageStream loadedImage = new LoadedImageStream(id, image.getBufferedImage(), optLabelImageContent);
-			loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "debug_" + id.getURL().getFileName()));
+			loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "d_" + id.getURL().getFileName() + labelFileExtension));
 			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
 			if (imageRef == null) {
 				System.out.println("ERROR #1");
@@ -402,11 +402,11 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 	}
 	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result, DatabaseTarget storeResultInDatabase) {
-		result.getURL().setFileName("cleared_" + result.getURL().getFileName());
+		result.getURL().setFileName("c_" + result.getURL().getFileName());
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
 		
 		if (result.getLabelURL() != null) {
-			result.getLabelURL().setFileName("cleared_" + result.getLabelURL().getFileName());
+			result.getLabelURL().setFileName("c_" + result.getLabelURL().getFileName());
 			result.getLabelURL().setPrefix(LoadedDataHandler.PREFIX);
 		}
 		

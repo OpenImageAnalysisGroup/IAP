@@ -705,6 +705,11 @@ public class MongoDB {
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		
+		if (id.getURL() != null && id.getLabelURL() != null) {
+			if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix()))
+				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+		}
+		
 		String[] hashes = GravistoService.getHashFromInputStream(new InputStream[] { isMain, isLabel },
 				new ObjectRef[] { fileSize, fileSize }, getHashType());
 		
