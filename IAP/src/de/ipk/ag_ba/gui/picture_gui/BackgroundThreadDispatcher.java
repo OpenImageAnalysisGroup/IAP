@@ -343,6 +343,14 @@ public class BackgroundThreadDispatcher {
 	private static int taskExecutionsWithinCurrentMinute = 0;
 	private static int currentMinute = -1;
 	
+	public static void waitSec(int secondsDelay) {
+		try {
+			Thread.sleep(1000 * secondsDelay);
+		} catch (InterruptedException e) {
+			// empty
+		}
+	}
+	
 	// private static final ThreadSafeOptions tso = new ThreadSafeOptions();
 	//
 	// private static ExecutorService execSvc = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {

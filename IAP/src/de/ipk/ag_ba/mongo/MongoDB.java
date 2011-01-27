@@ -204,7 +204,21 @@ public class MongoDB {
 				}
 			}
 			runnableOnDB.setDB(db);
-			runnableOnDB.run();
+			try {
+				runnableOnDB.run();
+			} catch (Exception err) {
+				System.out.println("ERROR: " + err.getLocalizedMessage());
+				System.out.println("RE-TRY LAST DATABASE COMMAND IN 10 SEC.");
+				try {
+					BackgroundThreadDispatcher.waitSec(10);
+					runnableOnDB.run();
+				} catch (Exception err2) {
+					System.out.println("ERROR 2: " + err2.getLocalizedMessage());
+					System.out.println("RE-TRY SECOND AND LAST TIME LAST DATABASE COMMAND IN 5 MIN.");
+					BackgroundThreadDispatcher.waitSec(5 * 60);
+					runnableOnDB.run();
+				}
+			}
 		} finally {
 			BackgroundTaskHelper.lockRelease(dataBase);
 		}
@@ -473,7 +487,7 @@ public class MongoDB {
 	}
 	
 	public boolean saveImageFile(InputStream[] isImages, GridFS gridfs_images, GridFS gridfs_label_images,
-						GridFS gridfs_preview_files, ImageData image, String hash) throws IOException {
+						GridFS gridfs_preview_files, ImageData image, String hashMain, String hashLabel, boolean storeMain, boolean storeLabel) throws IOException {
 		boolean allOK = true;
 		
 		try {
@@ -483,18 +497,28 @@ public class MongoDB {
 				if (is == null)
 					continue;
 				GridFS fs = null;
+				String hash = null;
 				switch (idx) {
 					case 1:
-						fs = gridfs_images;
+						if (storeMain) {
+							fs = gridfs_images;
+							hash = hashMain;
+						}
 						break;
 					case 2:
-						fs = gridfs_label_images;
+						if (storeLabel) {
+							fs = gridfs_label_images;
+							hash = hashLabel;
+						}
 						break;
 					case 3:
-						fs = gridfs_preview_files;
+						if (storeMain) {
+							fs = gridfs_preview_files;
+							hash = hashMain;
+						}
 						break;
 				}
-				if (saveStream(hash, is, fs) < 0)
+				if (fs != null && saveStream(hash, is, fs) < 0)
 					allOK = false;
 			}
 		} catch (Exception e) {
@@ -664,7 +688,8 @@ public class MongoDB {
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		
-		String hash = GravistoService.getHashFromInputStream(new InputStream[] { isMain, isLabel }, fileSize, getHashType());
+		String hashMain = GravistoService.getHashFromInputStream(new InputStream[] { isMain }, fileSize, getHashType());
+		String hashLabel = isLabel != null ? GravistoService.getHashFromInputStream(new InputStream[] { isLabel }, fileSize, getHashType()) : null;
 		if (isMain instanceof MyByteArrayInputStream)
 			isMain = new MyByteArrayInputStream(((MyByteArrayInputStream) isMain).getBuff());
 		else
@@ -689,25 +714,30 @@ public class MongoDB {
 		DBCollection collectionC = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
 		collectionC.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 		
-		GridFSDBFile fff = gridfs_images.findOne(hash);
-		
+		GridFSDBFile fffMain = gridfs_images.findOne(hashMain);
 		image.getURL().setPrefix(mh.getPrefix());
-		image.getURL().setDetail(hash);
+		image.getURL().setDetail(hashMain);
 		
+		GridFSDBFile fffLabel = gridfs_images.findOne(hashLabel);
 		if (image.getLabelURL() != null) {
 			image.getLabelURL().setPrefix(mh.getPrefix());
-			image.getLabelURL().setDetail(hash);
+			image.getLabelURL().setDetail(hashLabel);
 		}
 		
-		if (fff != null && fff.getLength() <= 0) {
-			System.out.println("Found Zero-Size File.");
-			gridfs_images.remove(fff);
-			fff = null;
+		if (fffMain != null && fffMain.getLength() <= 0) {
+			gridfs_images.remove(fffMain);
+			fffMain = null;
 		}
-		if (fff != null) {
+		if (fffLabel != null && fffLabel.getLength() <= 0) {
+			gridfs_images.remove(fffLabel);
+			fffLabel = null;
+		}
+		
+		if (fffMain != null && fffLabel != null) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
-			boolean saved = saveImageFile(new InputStream[] { isMain, isLabel }, gridfs_images, gridfs_null_files, gridfs_preview_files, id, hash);
+			boolean saved = saveImageFile(new InputStream[] { isMain, isLabel }, gridfs_images, gridfs_null_files, gridfs_preview_files, id, hashMain, hashLabel,
+					fffMain != null, fffLabel != null);
 			if (saved) {
 				return DatabaseStorageResult.STORED_IN_DB;
 			} else
