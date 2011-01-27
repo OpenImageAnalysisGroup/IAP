@@ -10,9 +10,11 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
@@ -59,7 +61,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				String group = eh.getImportusergroup();
 				if (group == null || group.length() == 0)
 					group = "[no group]";
-				String user = eh.getImportusername();
+				String user = IAPservice.getSetting(IAPoptions.GROUP_BY_COORDINATOR) ? eh.getCoordinator() : eh.getImportusername();
 				if (user == null || user.length() == 0)
 					user = "[no user]";
 				if (eh.inTrash()) {
