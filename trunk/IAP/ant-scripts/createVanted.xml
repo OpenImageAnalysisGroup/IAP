@@ -11,6 +11,7 @@
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jdom.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/java-cup-v11a-runtime.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jh.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/log4j-1.2.13.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-logging-1.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-collections-3.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/activation.jar"/>
@@ -77,7 +78,7 @@
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/j3dcore.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/j3dutils.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/vecmath.jar"/>
-<!--            <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/swingx.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/swingx.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/postgresql-9.0-801.jdbc4.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/mongo-2.4-rc0.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jai_codec.jar"/>
