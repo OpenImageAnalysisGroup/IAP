@@ -471,7 +471,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 		BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
 		res.setRGB(0, 0, w, h, arrayRGB, 0, w);
 		LoadedImage result = new LoadedImage(limg, res);
-		result.getURL().setFileName("ColorCleared_" + new File(limg.getURL().getFileName()));
+		result.getURL().setFileName("cc_" + new File(limg.getURL().getFileName()));
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
 		// result.showImageWindow();
 		// result.getParentSample().getParentCondition().getParentSubstance().setName(
