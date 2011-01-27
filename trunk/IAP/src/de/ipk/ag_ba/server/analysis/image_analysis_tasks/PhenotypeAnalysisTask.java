@@ -148,10 +148,13 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		int right = 0;
 		int top = h;
 		
+		double cutline = 1.0; // 0.95
+		
 		for (int x = 0; x < w; x++)
 			for (int y = h - 1; y > 0; y--) {
 				int o = x + y * w;
-				if (y > h * 0.95) {
+				
+				if (y > h * cutline) {
 					rgbArray[o] = iBackgroundFill;
 					continue;
 				}
