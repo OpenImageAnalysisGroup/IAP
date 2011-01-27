@@ -30,9 +30,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
 
 /**
  * Uses LAB color classification, to categorize the input as foreground /
@@ -85,7 +85,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 		
 		return workImage;
 	}
-
+	
 	public static Runnable processRowYofImage(final ImageData imageData, final int w, final int[] rgbArray,
 						final int[] rgbArrayNULL, final int iBackgroundFill, final double sidepercent, final ObjectRef progress,
 						final int y, final double epsilonA, final double epsilonB, final ImageConfiguration config,
@@ -281,7 +281,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 			}
 		};
 	}
-
+	
 	public static void clearBackgroundAndInterpretImage(final LoadedImage limg, int maximumThreadCount,
 						DatabaseTarget storeResultInDatabase, final BackgroundTaskStatusProviderSupportingExternalCall status,
 						boolean isDataAnalysis, ArrayList<NumericMeasurementInterface> output,
@@ -374,7 +374,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 			// else
 			// removeSmallPartsOfImage(w, h, arrayRGB, iBackgroundFill, (int) (w * h * 0.002d));//
 		} else {
-			Geometry g = PhenotypeAnalysisTask.detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
+			Geometry geo = PhenotypeAnalysisTask.detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
 			
 			NumericMeasurement m;
 			boolean calcHistogram = false;
@@ -406,21 +406,21 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 				m = new NumericMeasurement(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
 						.getParentCondition().getExperimentName()
 						+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
-				m.setValue(h - g.getTop());
+				m.setValue(h - geo.getTop());
 				m.setUnit("pixel");
 				output.add(m);
 				
 				m = new NumericMeasurement(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
 						.getParentCondition().getExperimentName()
 						+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
-				m.setValue(h - g.getLeft() - (h - g.getRight()));
+				m.setValue(h - geo.getLeft() - (h - geo.getRight()));
 				m.setUnit("pixel");
 				output.add(m);
 			}
 			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
 					.getParentCondition().getExperimentName()
 					+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
-			m.setValue(g.getFilledPixels());
+			m.setValue(geo.getFilledPixels());
 			m.setUnit("pixel");
 			output.add(m);
 			
@@ -438,9 +438,9 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 			if (red) {
 				int redLine = Color.RED.getRGB();
 				
-				int o = g.getTop() * w;
+				int o = geo.getTop() * w;
 				int lww = 20;
-				if (g.getTop() < lww + 1)
+				if (geo.getTop() < lww + 1)
 					o = 8 * w;
 				for (int x = 0; x < w; x++) {
 					if (o + x + w >= arrayRGB.length)
@@ -451,7 +451,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 					// rgbArray[o + x] = redLine;
 				}
 				for (int y = 0; y < h; y++) {
-					o = g.getLeft() + y * w;
+					o = geo.getLeft() + y * w;
 					if (o - 1 < 0)
 						continue;
 					if (o + 1 >= h)
@@ -459,7 +459,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 					arrayRGB[o - 1] = redLine;
 					arrayRGB[o] = redLine;
 					arrayRGB[o + 1] = redLine;
-					o = g.getRight() + y * w;
+					o = geo.getRight() + y * w;
 					if (o - 1 >= 0)
 						arrayRGB[o - 1] = redLine;
 					arrayRGB[o] = redLine;
@@ -472,7 +472,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 		res.setRGB(0, 0, w, h, arrayRGB, 0, w);
 		LoadedImage result = new LoadedImage(limg, res);
 		result.getURL().setFileName("ColorCleared_" + new File(limg.getURL().getFileName()));
-		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
+		result.getURL().setPrefix(LoadedImageHandler.PREFIX);
 		// result.showImageWindow();
 		// result.getParentSample().getParentCondition().getParentSubstance().setName(
 		// "Processed Images (" + limg.getExperimentName() + ")");

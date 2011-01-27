@@ -72,9 +72,11 @@ public class PhytochamberTopImageProcessor {
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockEqualize.class);
 			// p.add(BlockPrintInfos.class);
+			// #################
 			p.add(BlockAutomaticParameterSearchTranslation.class);
 			p.add(BlockAutomaticParameterSearchScaling.class);
 			p.add(BlockAutomaticParameterSearchRotation.class);
+			// #################
 			// p.add(BlockPrintInfos.class);
 			// p.add(BlockMorphologicalOperations.class);
 			// p.add(BlockPrintInfos.class);
