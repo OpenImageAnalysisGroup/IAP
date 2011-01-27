@@ -24,10 +24,14 @@ public class ImageResult {
 	 * for the <code>MyImageButton</code>. This might be NULL if it is not yet
 	 * downloaded or unavailable.
 	 */
-	public File downloadedFile;
+	public File downloadedFileMain, downloadedFileLabel;
 	
-	public String getFileName() {
-		return bfi.getFileName().getFileName();
+	public String getFileNameMain() {
+		return bfi.getFileNameMain().getFileName();
+	}
+	
+	public String getFileNameLabel() {
+		return (bfi != null && bfi.getFileNameLabel() != null) ? bfi.getFileNameLabel().getFileName() : null;
 	}
 	
 	public MyImageIcon getPreviewIcon() {
@@ -38,15 +42,23 @@ public class ImageResult {
 		return bfi.getEntity();
 	}
 	
-	public String getHash() {
-		return bfi.getHash();
+	public String getHashMain() {
+		return bfi.getHashMain();
+	}
+	
+	public String getHashLabel() {
+		return bfi.getHashLabel();
 	}
 	
 	public BinaryFileInfo getBinaryFileInfo() {
 		return bfi;
 	}
 	
-	public File getDownloadedFile() {
-		return downloadedFile;
+	public File getDownloadedFileMain() {
+		return downloadedFileMain;
+	}
+	
+	public File getDownloadedFileLabel() {
+		return downloadedFileLabel;
 	}
 }

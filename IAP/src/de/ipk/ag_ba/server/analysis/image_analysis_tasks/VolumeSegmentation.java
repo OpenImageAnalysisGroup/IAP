@@ -9,9 +9,9 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.StringManipulationTools;
 
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
@@ -116,7 +116,7 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 							long t2 = System.currentTimeMillis();
 							if (t2 > t1)
 								System.out.println("Saved Volume ("
-													+ AttributeHelper.formatNumber(bytes / (t2 - t1) * 1000d / 1024 / 1024, "#.##")
+													+ StringManipulationTools.formatNumber(bytes / (t2 - t1) * 1000d / 1024 / 1024, "#.##")
 													+ " MB/s, if already in DB, save is skipped)");
 							else
 								System.out.println("Volume saved in 0 ms, saving was not needed or error occured.");

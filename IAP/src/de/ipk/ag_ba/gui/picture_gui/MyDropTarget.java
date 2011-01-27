@@ -183,11 +183,11 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		MyThread t = new MyThread(new Runnable() {
 			public void run() {
 				MyImageIcon iconA;
-				BinaryFileInfo bif = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode
+				BinaryFileInfo bif = new BinaryFileInfo(FileSystemHandler.getURL(file), null, false, targetTreeNode
 									.getTargetEntity());
 				try {
 					iconA = new MyImageIcon(panel.getParent(), DataSetFileButton.ICON_WIDTH, DataSetFileButton.ICON_HEIGHT,
-										FileSystemHandler.getURL(file), bif);
+										FileSystemHandler.getURL(file), null, bif);
 				} catch (MalformedURLException e) {
 					SupplementaryFilePanelMongoDB.showError("Malformed URL Exception.", e);
 					iconA = null;
@@ -217,7 +217,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					imageButton.setDownloadNeeded(true);
 					imageButton.downloadInProgress = false;
 					
-					BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), false, targetTreeNode
+					BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), null, false, targetTreeNode
 										.getTargetEntity());
 					
 					imageButton.imageResult = new ImageResult(icon, bfi);
