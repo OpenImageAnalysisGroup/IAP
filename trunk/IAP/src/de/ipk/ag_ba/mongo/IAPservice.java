@@ -45,6 +45,7 @@ import org.graffiti.plugin.view.View;
 import org.graffiti.plugins.views.defaults.GraffitiView;
 import org.graffiti.session.EditorSession;
 
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
@@ -356,5 +357,13 @@ public class IAPservice {
 	
 	public static String getCurrentTimeAsNiceString() {
 		return new SimpleDateFormat().format(new Date());
+	}
+	
+	public static boolean getSetting(IAPoptions groupByCoordinator) {
+		switch (groupByCoordinator) {
+			case GROUP_BY_COORDINATOR:
+				return true;
+		}
+		return false;
 	}
 }
