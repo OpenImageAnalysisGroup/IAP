@@ -33,10 +33,10 @@ import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
 
 /**
  * @author klukas
@@ -403,11 +403,11 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result, DatabaseTarget storeResultInDatabase) {
 		result.getURL().setFileName("cleared_" + result.getURL().getFileName());
-		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
+		result.getURL().setPrefix(LoadedImageHandler.PREFIX);
 		
 		if (result.getLabelURL() != null) {
 			result.getLabelURL().setFileName("cleared_" + result.getLabelURL().getFileName());
-			result.getLabelURL().setPrefix(LoadedDataHandler.PREFIX);
+			result.getLabelURL().setPrefix(LoadedImageHandler.PREFIX);
 		}
 		
 		try {
