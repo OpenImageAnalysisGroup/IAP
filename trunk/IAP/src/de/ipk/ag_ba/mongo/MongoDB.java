@@ -23,6 +23,7 @@ import java.util.List;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.StringManipulationTools;
 import org.bson.types.ObjectId;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.HashType;
@@ -1165,7 +1166,10 @@ public class MongoDB {
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
 					res.setHostInfo(SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 							SystemAnalysis.getRealSystemMemoryInMB() / 1024 + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
-							"/" + SystemAnalysis.getRealNumberOfCPUs() + " CPUs, queued: " + BackgroundThreadDispatcher.getWorkLoad());
+							"/" + SystemAnalysis.getRealNumberOfCPUs() + " CPUs, load: "
+							+ StringManipulationTools.formatNumber(SystemAnalysis.getRealSystemCpuLoad(), "#.#")
+							+ ", queued: "
+							+ BackgroundThreadDispatcher.getWorkLoad());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
 					dbc.save(res);
 				} else {
@@ -1324,8 +1328,8 @@ public class MongoDB {
 								if (batch.getRunStatus() != null)
 									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 60000)) {
 										res.add(batch);
-										
 										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
+										break;
 									}
 						}
 					} catch (UnknownHostException e) {

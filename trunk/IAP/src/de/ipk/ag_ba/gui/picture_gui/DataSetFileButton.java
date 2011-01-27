@@ -21,19 +21,16 @@ import java.util.Stack;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.AttributeHelper;
@@ -44,6 +41,7 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
@@ -55,10 +53,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	protected static int ICON_HEIGHT = 128;
 	protected static int ICON_WIDTH = 128;
-	private JMenuItem showImageCmd;
+	private JMenuItem showImageCmdMain;
+	private JMenuItem showImageCmdLabel;
 	private JMenuItem showVolumeCmd;
-	private JMenuItem openFileCmd;
-	private JMenuItem saveFileCmd;
+	private JMenuItem openFileCmdMain;
+	private JMenuItem openFileCmdLabel;
+	private JMenuItem saveFileCmdMain;
+	private JMenuItem saveFileCmdLabel;
 	private JMenuItem removeOneFromDatabaseCmd;
 	private JMenuItem removeAllFromDatabaseCmd;
 	
@@ -147,12 +148,12 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	public DataSetFileButton(MongoDB m, MongoTreeNode projectNode, ImageResult imageResult,
 						ImageIcon previewImage, boolean readOnly) {
-		this(m, projectNode, "<html><body><b>" + getMaxString(strip(imageResult.getFileName()))
+		this(m, projectNode, "<html><body><b>" + getMaxString(strip(imageResult.getFileNameMain()))
 							+ "</b></body></html>", null, previewImage);
 		this.imageResult = imageResult;
 		this.readOnly = readOnly;
-		if (getMaxString(imageResult.getFileName()).endsWith("..."))
-			setToolTipText(imageResult.getFileName());
+		if (getMaxString(imageResult.getFileNameMain()).endsWith("..."))
+			setToolTipText(imageResult.getFileNameMain());
 	}
 	
 	private static String strip(String fileName) {
@@ -184,24 +185,49 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	 */
 	public void actionPerformed(final ActionEvent evt) {
 		
-		if (evt.getSource() == this) {
+		if (evt.getSource() instanceof JButton) {
+			
+			// SwingUtilities.invokeLater(new Runnable() {
+			// public void run() {
+			JPopupMenu myPopup2 = new JPopupMenu();
+			addDefaultCommands(myPopup2);
+			myPopup2.validate();
+			myPopup2.show(DataSetFileButton.this, 5, 5);
+			// }
+			// });
+		}
+		
+		if (evt.getSource() == openFileCmdMain ||
+				evt.getSource() == openFileCmdLabel ||
+				evt.getSource() == saveFileCmdMain ||
+				evt.getSource() == saveFileCmdLabel) {
 			final JPopupMenu myPopup = new JPopupMenu();
+			
 			if (downloadNeeded) {
 				JMenuItem tempItem = new JMenuItem("Download file...");
 				tempItem.setEnabled(false);
 				myPopup.add(tempItem);
 				
-				final DataSetFileButton thisInstance = this;
 				downloadNeeded = false;
 				setProgressValue(0);
 				showProgressbar();
 				MyThread download = new MyThread(new Runnable() {
 					public void run() {
 						downloadInProgress = true;
-						final File tf;
+						final File tfMain;
 						try {
-							tf = File.createTempFile("dbe_", "." + imageResult.getFileName());
-							SupplementaryFilePanelMongoDB.addTempFileToBeDeletedLater(tf);
+							tfMain = File.createTempFile("dbe_", "." + imageResult.getFileNameMain());
+							SupplementaryFilePanelMongoDB.addTempFileToBeDeletedLater(tfMain);
+						} catch (IOException e2) {
+							SupplementaryFilePanelMongoDB.showError("Could not create temp file for storing database image!",
+												e2);
+							downloadNeeded = true;
+							return;
+						}
+						final File tfLabel;
+						try {
+							tfLabel = File.createTempFile("dbe_", "." + imageResult.getFileNameLabel());
+							SupplementaryFilePanelMongoDB.addTempFileToBeDeletedLater(tfLabel);
 						} catch (IOException e2) {
 							SupplementaryFilePanelMongoDB.showError("Could not create temp file for storing database image!",
 												e2);
@@ -210,35 +236,47 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 						
 						try {
-							IOurl url = imageResult.getBinaryFileInfo().getFileName();
-							System.out.println(url);
-							InputStream is = url != null ? url.getInputStream() : null;
-							if (is == null)
+							IOurl urlMain = imageResult.getBinaryFileInfo().getFileNameMain();
+							System.out.println(urlMain);
+							InputStream isMain = urlMain != null ? urlMain.getInputStream() : null;
+							if (isMain == null)
 								System.out.println("Inputstream = null");
-							HomeFolder.copyFile(is, tf);
+							HomeFolder.copyFile(isMain, tfMain);
+							
+							IOurl urlLabel = imageResult.getBinaryFileInfo().getFileNameLabel();
+							System.out.println(urlLabel);
+							InputStream isLabel = urlLabel != null ? urlLabel.getInputStream() : null;
+							if (isLabel == null)
+								System.out.println("Inputstream = null");
+							HomeFolder.copyFile(isLabel, tfLabel);
 						} catch (Exception e1) {
 							System.out.println("No valid input stream for "
-												+ imageResult.getBinaryFileInfo().getFileName().toString());
+												+ imageResult.getBinaryFileInfo().getFileNameMain().toString() + " and/or label.");
 							
 							MappingDataEntity mde = targetTreeNode.getTargetEntity();
 							try {
 								VolumeData volume = (VolumeData) mde;
 								if (volume != null)
-									DataExchangeHelperForExperiments.downloadFile(m, imageResult, tf, thisInstance,
+									DataExchangeHelperForExperiments.downloadFile(m, imageResult.getHashMain(), tfMain, DataSetFileButton.this,
 														MongoCollection.VOLUMES);
 							} catch (Exception e) {
-								DataExchangeHelperForExperiments.downloadFile(m, imageResult, tf, thisInstance,
+								DataExchangeHelperForExperiments.downloadFile(m, imageResult.getHashMain(), tfMain, DataSetFileButton.this,
 													MongoCollection.IMAGES);
+								DataExchangeHelperForExperiments.downloadFile(m, imageResult.getFileNameLabel(), tfLabel, DataSetFileButton.this,
+										MongoCollection.IMAGES);
 							}
 						}
 						
-						if (tf != null) {
-							imageResult.downloadedFile = tf;
+						if (tfMain != null || tfLabel != null) {
+							imageResult.downloadedFileMain = tfMain;
+							imageResult.downloadedFileLabel = tfLabel;
 							SwingUtilities.invokeLater(new Runnable() {
 								public void run() {
 									try {
 										myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
-															DataSetFileButton.ICON_HEIGHT, FileSystemHandler.getURL(tf),
+															DataSetFileButton.ICON_HEIGHT,
+															FileSystemHandler.getURL(tfMain),
+															FileSystemHandler.getURL(tfLabel),
 															myImage != null ? myImage.getBinaryFileInfo() : null);
 									} catch (MalformedURLException e) {
 										downloadNeeded = true;
@@ -257,13 +295,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									JPopupMenu myPopup2 = new JPopupMenu();
 									addDefaultCommands(myPopup2);
 									myPopup2.validate();
-									myPopup2.show(thisInstance, 5, 5);
+									myPopup2.show(DataSetFileButton.this, 5, 5);
 								}
 							}
 						});
 					}
 				}, "database download");
-				BackgroundThreadDispatcher.addTask(download, 1);
+				BackgroundThreadDispatcher.addTask(download, 1 + 1000);
 			} else
 				if (downloadInProgress) {
 					JMenuItem tempItem = new JMenuItem("Download in progress...");
@@ -273,17 +311,48 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					addDefaultCommands(myPopup);
 				}
 			myPopup.show(this, 5, 5);
+			
 		}
-		if (evt.getSource() == saveFileCmd) {
+		if (evt.getSource() == saveFileCmdMain) {
 			// imageResult.fileName
 			// myImage.fileURL
-			SupplementaryFilePanelMongoDB.fileChooser.setSelectedFile(new File(imageResult.getFileName()));
+			SupplementaryFilePanelMongoDB.fileChooser.setSelectedFile(new File(imageResult.getFileNameMain()));
 			if (SupplementaryFilePanelMongoDB.fileChooser.showSaveDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
 				File outputFile = SupplementaryFilePanelMongoDB.fileChooser.getSelectedFile();
 				
 				FileInputStream in;
 				try {
-					in = new FileInputStream(imageResult.downloadedFile);
+					in = new FileInputStream(imageResult.downloadedFileMain);
+					FileOutputStream out = new FileOutputStream(outputFile);
+					
+					byte[] buffer = new byte[1024];
+					int bytes_read;
+					while (true) {
+						bytes_read = in.read(buffer);
+						if (bytes_read == -1)
+							break;
+						out.write(buffer, 0, bytes_read);
+					}
+					
+					in.close();
+					out.close();
+				} catch (FileNotFoundException e) {
+					SupplementaryFilePanelMongoDB.showError("File not found.", e);
+				} catch (IOException e) {
+					SupplementaryFilePanelMongoDB.showError("IO Exception", e);
+				}
+			}
+		}
+		if (evt.getSource() == saveFileCmdLabel) {
+			// imageResult.fileName
+			// myImage.fileURL
+			SupplementaryFilePanelMongoDB.fileChooser.setSelectedFile(new File(imageResult.getFileNameLabel()));
+			if (SupplementaryFilePanelMongoDB.fileChooser.showSaveDialog(MainFrame.getInstance()) == JFileChooser.APPROVE_OPTION) {
+				File outputFile = SupplementaryFilePanelMongoDB.fileChooser.getSelectedFile();
+				
+				FileInputStream in;
+				try {
+					in = new FileInputStream(imageResult.downloadedFileLabel);
 					FileOutputStream out = new FileOutputStream(outputFile);
 					
 					byte[] buffer = new byte[1024];
@@ -316,41 +385,40 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			
 			IAPmain.showVANTED(false);
 		}
-		if (evt.getSource() == showImageCmd) {
-			JFrame myImageFrame = new JFrame("Image View");
-			JComponent cp = (JComponent) myImageFrame.getContentPane();
-			if (myImage != null && this.myImage.imageAvailable != 1) {
-				JOptionPane.showMessageDialog(null, "Format of this file is unknown. Image can not be shown.",
-									"Unknown Image Format", JOptionPane.INFORMATION_MESSAGE);
+		if (evt.getSource() == showImageCmdMain) {
+			try {
+				FlexibleImage fi = new FlexibleImage(myImage.fileURLmain);
+				fi.print("Image View - " + myImage.fileURLmain.getFileNameDecoded());
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, "Error: " + e.getLocalizedMessage() + ". Image can not be shown.",
+						"Unknown Image Format", JOptionPane.INFORMATION_MESSAGE);
+				ErrorMsg.addErrorMessage(e);
 				return;
 			}
-			cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
-			
-			ImageIcon i;
-			if (imageResult.getFileName().contains(File.separator))
-				i = new ImageIcon(imageResult.getFileName());
-			else
-				try {
-					i = new ImageIcon(ImageIO.read(myImage.fileURL.getInputStream()));
-				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
-					i = null;
-				}
-			
-			cp.add(new JScrollPane(new JLabel(i)));
-			myImageFrame.getContentPane().validate();
-			myImageFrame.setSize(new Dimension(i.getImage().getWidth(cp) + 30, i.getImage().getHeight(cp) + 40));
-			if (imageResult.getFileName().contains(File.separator))
-				myImageFrame.setTitle("Image View - " + imageResult.getFileName());
-			else
-				myImageFrame.setTitle("Image View - " + myImage.fileURL);
-			myImageFrame.setVisible(true);
 		}
-		if (evt.getSource() == openFileCmd) {
-			if (imageResult.getFileName().contains(File.separator))
-				AttributeHelper.showInBrowser(imageResult.getFileName());
+		if (evt.getSource() == showImageCmdLabel) {
+			try {
+				FlexibleImage fi = new FlexibleImage(myImage.fileURLlabel);
+				fi.print("Image Label View - " + myImage.fileURLlabel.getFileNameDecoded());
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, "Error: " + e.getLocalizedMessage() + ". Image can not be shown.",
+						"Unknown Image Format", JOptionPane.INFORMATION_MESSAGE);
+				ErrorMsg.addErrorMessage(e);
+				return;
+			}
+		}
+		if (evt.getSource() == openFileCmdMain) {
+			if (imageResult.getFileNameMain().contains(File.separator))
+				AttributeHelper.showInBrowser(imageResult.getFileNameMain());
 			else
-				AttributeHelper.showInBrowser(myImage.fileURL.toString());
+				AttributeHelper.showInBrowser(myImage.fileURLmain.toString());
+			
+		}
+		if (evt.getSource() == openFileCmdLabel) {
+			if (imageResult.getFileNameLabel().contains(File.separator))
+				AttributeHelper.showInBrowser(imageResult.getFileNameLabel());
+			else
+				AttributeHelper.showInBrowser(myImage.fileURLlabel.toString());
 			
 		}
 		if (evt.getSource() == removeOneFromDatabaseCmd) {
@@ -360,12 +428,12 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			// clean up gui...
 			Stack<DataSetFileButton> toBeDeleted = new Stack<DataSetFileButton>();
 			DataSetFilePanel p = (DataSetFilePanel) this.getParent();
-			String imageFileIDtoBeDeleted = imageResult.getHash();
+			String imageFileIDtoBeDeleted = imageResult.getHashMain();
 			for (int i = 0; i < p.getComponentCount(); i++) {
 				Component o = p.getComponent(i);
 				if (o instanceof DataSetFileButton) {
 					DataSetFileButton checkButton = (DataSetFileButton) o;
-					if (checkButton.imageResult.getHash() == imageFileIDtoBeDeleted)
+					if (checkButton.imageResult.getHashMain() == imageFileIDtoBeDeleted)
 						toBeDeleted.add(checkButton);
 				}
 			}
@@ -406,37 +474,53 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	}
 	
 	void addDefaultCommands(final JPopupMenu myPopup) {
-		showImageCmd = new JMenuItem("Show Image");
+		showImageCmdMain = new JMenuItem("Show Image");
+		showImageCmdLabel = new JMenuItem("Show Image (Reference)");
 		showVolumeCmd = new JMenuItem("Show 3D-Volume");
-		saveFileCmd = new JMenuItem("Save File As...");
-		openFileCmd = new JMenuItem("View/Open with system default application");
-		removeOneFromDatabaseCmd = new JMenuItem("! Delete this file !");
-		removeAllFromDatabaseCmd = new JMenuItem("! Delete all files in view !");
+		saveFileCmdMain = new JMenuItem("Save File As...");
+		saveFileCmdLabel = new JMenuItem("Save Reference File As...");
+		openFileCmdMain = new JMenuItem("View/Open with system default application");
+		openFileCmdLabel = new JMenuItem("View/Open Reference file with system default application");
+		removeOneFromDatabaseCmd = new JMenuItem("! Delete this item !");
+		removeAllFromDatabaseCmd = new JMenuItem("! Delete all items in view !");
 		
-		showImageCmd.addActionListener(this);
+		showImageCmdMain.addActionListener(this);
+		showImageCmdLabel.addActionListener(this);
 		showVolumeCmd.addActionListener(this);
-		openFileCmd.addActionListener(this);
-		saveFileCmd.addActionListener(this);
+		openFileCmdMain.addActionListener(this);
+		saveFileCmdMain.addActionListener(this);
+		
+		openFileCmdLabel.addActionListener(this);
+		saveFileCmdLabel.addActionListener(this);
 		removeOneFromDatabaseCmd.addActionListener(this);
 		removeAllFromDatabaseCmd.addActionListener(this);
 		
-		if (imageResult != null && imageResult.downloadedFile != null) {
-			if (getIsJavaImage() > 0 || imageResult.getFileName().contains(File.separator))
-				myPopup.add(showImageCmd);
-			if (imageResult.getBinaryFileInfo().getEntity() instanceof VolumeData)
-				myPopup.add(showVolumeCmd);
-			myPopup.add(openFileCmd);
-			myPopup.add(saveFileCmd);
-			if (!readOnly) {
-				// myPopup.add(new JSeparator());
-				// myPopup.add(removeOneFromDatabaseCmd);
-				// myPopup.add(removeAllFromDatabaseCmd);
-			}
-		} else {
-			final JMenuItem err = new JMenuItem("Upload in progress");
-			err.setEnabled(false);
-			myPopup.add(err);
+		// if (imageResult != null && imageResult.downloadedFileMain != null) {
+		if (getIsJavaImage() > 0 || imageResult.getFileNameMain().contains(File.separator))
+			myPopup.add(showImageCmdMain);
+		if ((getIsJavaImage() > 0 && imageResult.getFileNameLabel() != null) ||
+					(imageResult.getFileNameLabel() != null &&
+					imageResult.getFileNameLabel().contains(File.separator)))
+			myPopup.add(showImageCmdLabel);
+		if (imageResult.getBinaryFileInfo().getEntity() instanceof VolumeData)
+			myPopup.add(showVolumeCmd);
+		myPopup.add(openFileCmdMain);
+		if (imageResult.getBinaryFileInfo().getHashLabel() != null)
+			myPopup.add(openFileCmdLabel);
+		myPopup.add(saveFileCmdMain);
+		if (imageResult.getBinaryFileInfo().getHashLabel() != null)
+			myPopup.add(saveFileCmdLabel);
+		if (!readOnly) {
+			// myPopup.add(new JSeparator());
+			// myPopup.add(removeOneFromDatabaseCmd);
+			// myPopup.add(removeAllFromDatabaseCmd);
 		}
+		// }
+		// else {
+		// final JMenuItem err = new JMenuItem("Upload in progress");
+		// err.setEnabled(false);
+		// myPopup.add(err);
+		// }
 	}
 	
 	/**
@@ -502,8 +586,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	public void setDataBaseInfo(boolean downloadNeeded) {
 		this.downloadNeeded = downloadNeeded;
-		if (!downloadNeeded)
-			imageResult.downloadedFile = new File(imageResult.getFileName());
+		if (!downloadNeeded) {
+			imageResult.downloadedFileMain = new File(imageResult.getFileNameMain());
+			imageResult.downloadedFileLabel = new File(imageResult.getFileNameLabel());
+		}
 		hideProgressbar();
 	}
 	

@@ -17,22 +17,31 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
  */
 public class BinaryFileInfo {
 	
-	private IOurl fileName;
+	private IOurl fileNameMain, fileNameLabel;
 	private final boolean primary;
 	private final MappingDataEntity entity;
 	
-	public BinaryFileInfo(IOurl fileName, boolean primary, MappingDataEntity entity) {
-		this.fileName = fileName;
+	public BinaryFileInfo(IOurl fileNameMain, IOurl fileNameLabel, boolean primary, MappingDataEntity entity) {
+		this.fileNameMain = fileNameMain;
+		this.fileNameLabel = fileNameLabel;
 		this.primary = primary;
 		this.entity = entity;
 	}
 	
-	public String getHash() {
+	public String getHashMain() {
 		return ((BinaryMeasurement) entity).getURL().getDetail();
 	}
 	
-	public IOurl getFileName() {
-		return fileName;
+	public String getHashLabel() {
+		return ((BinaryMeasurement) entity).getLabelURL().getDetail();
+	}
+	
+	public IOurl getFileNameMain() {
+		return fileNameMain;
+	}
+	
+	public IOurl getFileNameLabel() {
+		return fileNameLabel;
 	}
 	
 	public boolean isPrimary() {
@@ -43,7 +52,11 @@ public class BinaryFileInfo {
 		return entity;
 	}
 	
-	public void setFileName(IOurl fileName) {
-		this.fileName = fileName;
+	public void setFileNameMain(IOurl fileName) {
+		this.fileNameMain = fileName;
+	}
+	
+	public void setFileNameLabel(IOurl fileName) {
+		this.fileNameLabel = fileName;
 	}
 }

@@ -113,7 +113,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		// todo if mongo knows this ID as an experiment ID
-		boolean readOnly = doc.getHeader().getExcelfileid() != null;
+		boolean readOnly = doc.getHeader().getDatabaseId() != null;
 		
 		expTree = new JTree(new DBEtreeModel(this, m, doc, readOnly));
 		expTree.setCellRenderer(new DBEtreeCellRenderer());

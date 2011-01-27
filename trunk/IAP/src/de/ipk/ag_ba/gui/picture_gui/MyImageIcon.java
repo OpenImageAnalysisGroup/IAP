@@ -35,7 +35,7 @@ public class MyImageIcon extends ImageIcon {
 	
 	// private int width, height;
 	
-	IOurl fileURL;
+	IOurl fileURLmain, fileURLlabel;
 	
 	int imageAvailable;
 	
@@ -43,23 +43,24 @@ public class MyImageIcon extends ImageIcon {
 	
 	// private File file;
 	
-	public MyImageIcon(Component observer, int width, int height, IOurl file, BinaryFileInfo bfi)
+	public MyImageIcon(Component observer, int width, int height, IOurl fileMain, IOurl fileLabel, BinaryFileInfo bfi)
 						throws MalformedURLException {
-		initImageData(observer, width, height, file, bfi);
+		initImageData(observer, width, height, fileMain, fileLabel, bfi);
 	}
 	
 	@SuppressWarnings({ "restriction" })
-	public synchronized void initImageData(Component observer, int width, int height, IOurl file, BinaryFileInfo bfi)
+	public synchronized void initImageData(Component observer, int width, int height, IOurl fileMain, IOurl fileLabel, BinaryFileInfo bfi)
 						throws MalformedURLException {
 		this.bfi = bfi;
-		String description = file.getFileName();
-		fileURL = file;
+		String description = fileMain.getFileName();
+		fileURLmain = fileMain;
+		fileURLlabel = fileLabel;
 		// this.file = file;
 		setDescription(description);
 		
 		try {
 			BufferedImage i = null;
-			i = ImageIO.read(fileURL.getInputStream());
+			i = ImageIO.read(fileURLmain.getInputStream());
 			int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
 			double factor = DataSetFileButton.ICON_HEIGHT / (double) maxS;
 			i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
@@ -72,13 +73,13 @@ public class MyImageIcon extends ImageIcon {
 			BufferedImage i = null;
 			
 			try {
-				sun.awt.shell.ShellFolder sf = sun.awt.shell.ShellFolder.getShellFolder(FileSystemHandler.getFile(fileURL));
+				sun.awt.shell.ShellFolder sf = sun.awt.shell.ShellFolder.getShellFolder(FileSystemHandler.getFile(fileURLmain));
 				i = toBufferedImage(sf.getIcon(true));
 			} catch (Exception e) {
 				ImageIcon ic;
 				try {
 					ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
-										FileSystemHandler.getFile(fileURL));
+										FileSystemHandler.getFile(fileURLmain));
 					if (ic == null) {
 						i = toBufferedImage(new ImageIcon(MainFrame.getInstance().getIconImage()).getImage());
 					} else

@@ -58,7 +58,7 @@ public class DataExchangeHelperForExperiments {
 		return -1;
 	}
 	
-	public static void downloadFile(MongoDB m, final ImageResult imageResult, final File targetFile,
+	public static void downloadFile(MongoDB m, final String hash, final File targetFile,
 						final DataSetFileButton button, final MongoCollection collection) {
 		try {
 			m.processDB(new RunnableOnDB() {
@@ -72,8 +72,8 @@ public class DataExchangeHelperForExperiments {
 						// imageResult.getMd5());
 						
 						GridFS gridfs_images = new GridFS(db, collection.toString());
-						System.out.println("Look for " + collection.toString() + "-HASH: " + imageResult.getHash());
-						GridFSDBFile fff = gridfs_images.findOne(imageResult.getHash());
+						System.out.println("Look for " + collection.toString() + "-HASH: " + hash);
+						GridFSDBFile fff = gridfs_images.findOne(hash);
 						if (fff == null)
 							System.out.println("NOT FOUND");
 						if (fff != null) {
@@ -167,7 +167,7 @@ public class DataExchangeHelperForExperiments {
 				addFilesToPanel(filePanel, mtdbe, expTree, m);
 			}
 		}, "add files to panel");
-		BackgroundThreadDispatcher.addTask(r, 0);
+		BackgroundThreadDispatcher.addTask(r, 0 + 1000);
 	}
 	
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel, final MongoTreeNode mt,
@@ -185,11 +185,11 @@ public class DataExchangeHelperForExperiments {
 				MappingDataEntity mde = mt.getTargetEntity();
 				if (mde instanceof ImageData) {
 					ImageData id = (ImageData) mde;
-					primary = new BinaryFileInfo(id.getURL(), true, id);
+					primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(), true, id);
 				} else
 					if (mde instanceof VolumeData) {
 						VolumeData id = (VolumeData) mde;
-						primary = new BinaryFileInfo(id.getURL(), true, id);
+						primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(), true, id);
 					} else {
 						if (mde instanceof Substance3D) {
 							Substance3D sub = (Substance3D) mde;
@@ -201,11 +201,11 @@ public class DataExchangeHelperForExperiments {
 										for (NumericMeasurementInterface nmi : s3d.getMeasurements((MeasurementNodeType) null)) {
 											if (nmi instanceof ImageData) {
 												ImageData id = (ImageData) nmi;
-												primary = new BinaryFileInfo(id.getURL(), true, id);
+												primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(), true, id);
 											} else
 												if (nmi instanceof VolumeData) {
 													VolumeData id = (VolumeData) nmi;
-													primary = new BinaryFileInfo(id.getURL(), true, id);
+													primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(), true, id);
 												}
 											if (primary != null)
 												bbb.add(primary);
@@ -220,11 +220,11 @@ public class DataExchangeHelperForExperiments {
 								for (NumericMeasurementInterface nmi : s3d.getMeasurements((MeasurementNodeType) null)) {
 									if (nmi instanceof ImageData) {
 										ImageData id = (ImageData) nmi;
-										primary = new BinaryFileInfo(id.getURL(), true, id);
+										primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(), true, id);
 									} else
 										if (nmi instanceof VolumeData) {
 											VolumeData id = (VolumeData) nmi;
-											primary = new BinaryFileInfo(id.getURL(), true, id);
+											primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(), true, id);
 										}
 									if (primary != null)
 										bbb.add(primary);
@@ -239,13 +239,15 @@ public class DataExchangeHelperForExperiments {
 										for (NumericMeasurementInterface nmi : s3d.getMeasurements((MeasurementNodeType) null)) {
 											if (nmi instanceof ImageData) {
 												ImageData id = (ImageData) nmi;
-												IOurl url = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
-												primary = new BinaryFileInfo(url, true, id);
+												IOurl urlMain = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
+												IOurl urlLabel = new IOurl(id.getLabelURL().toString() + " (" + s3d.toString() + ")");
+												primary = new BinaryFileInfo(urlMain, urlLabel, true, id);
 											} else
 												if (nmi instanceof VolumeData) {
 													VolumeData id = (VolumeData) nmi;
-													IOurl url = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
-													primary = new BinaryFileInfo(url, true, id);
+													IOurl urlMain = new IOurl(id.getURL().toString() + " (" + s3d.toString() + ")");
+													IOurl urlLabel = new IOurl(id.getLabelURL().toString() + " (" + s3d.toString() + ")");
+													primary = new BinaryFileInfo(urlMain, urlLabel, true, id);
 												}
 											if (primary != null)
 												bbb.add(primary);
@@ -270,7 +272,7 @@ public class DataExchangeHelperForExperiments {
 					if (v != null && v instanceof String) {
 						String vs = (String) v;
 						String fileName = vs;
-						bbb.add(new BinaryFileInfo(new IOurl(fileName), false, mt.getTargetEntity()));
+						bbb.add(new BinaryFileInfo(new IOurl(fileName), null, false, mt.getTargetEntity()));
 					}
 				}
 			}
@@ -282,20 +284,20 @@ public class DataExchangeHelperForExperiments {
 			for (final BinaryFileInfo binaryFileInfo : bbb) {
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
 				boolean previewLoadAndConstructNeeded = false;
-				if (binaryFileInfo.getFileName() == null)
-					binaryFileInfo.setFileName(null);
+				
 				ImageIcon previewImage = null;
-				if (FileSystemHandler.isFileUrl(binaryFileInfo.getFileName())) {
+				if (FileSystemHandler.isFileUrl(binaryFileInfo.getFileNameMain())) {
 					MyImageIcon myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
-										DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
+										DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileNameMain(),
+										binaryFileInfo.getFileNameLabel(), binaryFileInfo);
 					myImage.imageAvailable = 1;
 					previewImage = myImage;
 				} else
-					if (LemnaTecFTPhandler.isLemnaTecFtpUrl(binaryFileInfo.getFileName())) {
+					if (LemnaTecFTPhandler.isLemnaTecFtpUrl(binaryFileInfo.getFileNameMain())) {
 						previewImage = null;
 						previewLoadAndConstructNeeded = true;
 					} else {
-						byte[] pi = m.getPreviewData(binaryFileInfo.getHash());
+						byte[] pi = m.getPreviewData(binaryFileInfo.getHashMain());
 						if (pi != null)
 							previewImage = new ImageIcon(pi);
 						else
@@ -306,7 +308,7 @@ public class DataExchangeHelperForExperiments {
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
 				
-				imageButton.setDownloadNeeded(!FileSystemHandler.isFileUrl(binaryFileInfo.getFileName()));
+				imageButton.setDownloadNeeded(!FileSystemHandler.isFileUrl(binaryFileInfo.getFileNameMain()));
 				imageButton.setVerticalTextPosition(SwingConstants.BOTTOM);
 				imageButton.setHorizontalTextPosition(SwingConstants.CENTER);
 				
@@ -351,7 +353,9 @@ public class DataExchangeHelperForExperiments {
 									final MyImageIcon myImage;
 									try {
 										myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
-															DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileName(), binaryFileInfo);
+															DataSetFileButton.ICON_HEIGHT,
+															binaryFileInfo.getFileNameMain(),
+															binaryFileInfo.getFileNameLabel(), binaryFileInfo);
 										myImage.imageAvailable = 1;
 										try {
 											SwingUtilities.invokeAndWait(new Runnable() {
@@ -378,7 +382,7 @@ public class DataExchangeHelperForExperiments {
 							boolean isLast = fIsLast;
 							if (isLast)
 								for (MyThread ttt : executeLater)
-									BackgroundThreadDispatcher.addTask(ttt, -1);
+									BackgroundThreadDispatcher.addTask(ttt, -1 + 1000);
 						}
 					});
 				} else
