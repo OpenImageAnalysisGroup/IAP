@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -97,7 +99,7 @@ public class MongoDB {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
 			res.add(getDefaultCloud());
-			res.add(new MongoDB("IAP Cloud 2 (md5)", "cloud2", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", null, null, HashType.MD5));
+			res.add(new MongoDB("Backup (md5)", "cloud2", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", null, null, HashType.MD5));
 		} else
 			res.add(getLocalDB());
 		
@@ -109,11 +111,11 @@ public class MongoDB {
 	}
 	
 	public static MongoDB getLocalDB() {
-		return new MongoDB("Cloud Storage 1 local", "localCloud1", "localhost", null, null, HashType.SHA512);
+		return new MongoDB("Local DB", "localCloud1", "localhost", null, null, HashType.SHA512);
 	}
 	
 	public static MongoDB getDefaultCloud() {
-		return new MongoDB("IAP Cloud", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", null, null, HashType.SHA512);
+		return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", null, null, HashType.SHA512);
 	}
 	
 	public static MongoDB getLocalUnitTestsDB() {
@@ -285,6 +287,10 @@ public class MongoDB {
 		}
 		
 		int errorCount = 0;
+		
+		long lastTransferSum = 0;
+		int lastSecond = -1;
+		
 		int count = 0;
 		StringBuilder errors = new StringBuilder();
 		int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
@@ -394,6 +400,16 @@ public class MongoDB {
 								double prog = count * (100d / numberOfBinaryData / 2d);
 								status.setCurrentStatusText1(count + "/" + numberOfBinaryData * 2 + ": " + res);
 								status.setCurrentStatusValueFine(prog);
+								int currentSecond = new GregorianCalendar().get(Calendar.SECOND);
+								if (currentSecond != lastSecond) {
+									if (lastSecond >= 0) {
+										long transfered = overallFileSize.getLong() - lastTransferSum;
+										long mbps = transfered / 1024 / 1024;
+										status.setCurrentStatusText2(mbps + " MB/s");
+									}
+									lastSecond = currentSecond;
+									lastTransferSum = overallFileSize.getLong();
+								}
 							}
 						} // binary measurement
 					}
@@ -688,8 +704,11 @@ public class MongoDB {
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		
-		String hashMain = GravistoService.getHashFromInputStream(new InputStream[] { isMain }, fileSize, getHashType());
-		String hashLabel = isLabel != null ? GravistoService.getHashFromInputStream(new InputStream[] { isLabel }, fileSize, getHashType()) : null;
+		String[] hashes = GravistoService.getHashFromInputStream(new InputStream[] { isMain, isLabel },
+				new ObjectRef[] { fileSize, fileSize }, getHashType());
+		
+		String hashMain = hashes[0];
+		String hashLabel = hashes[1];
 		if (isMain instanceof MyByteArrayInputStream)
 			isMain = new MyByteArrayInputStream(((MyByteArrayInputStream) isMain).getBuff());
 		else
@@ -737,7 +756,7 @@ public class MongoDB {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
 			boolean saved = saveImageFile(new InputStream[] { isMain, isLabel }, gridfs_images, gridfs_null_files, gridfs_preview_files, id, hashMain, hashLabel,
-					fffMain != null, fffLabel != null);
+					fffMain == null, fffLabel == null);
 			if (saved) {
 				return DatabaseStorageResult.STORED_IN_DB;
 			} else

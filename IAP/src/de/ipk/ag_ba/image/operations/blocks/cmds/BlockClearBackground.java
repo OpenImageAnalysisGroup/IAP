@@ -30,9 +30,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImageHandler;
 
 /**
  * Uses LAB color classification, to categorize the input as foreground /
@@ -472,7 +472,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 		res.setRGB(0, 0, w, h, arrayRGB, 0, w);
 		LoadedImage result = new LoadedImage(limg, res);
 		result.getURL().setFileName("ColorCleared_" + new File(limg.getURL().getFileName()));
-		result.getURL().setPrefix(LoadedImageHandler.PREFIX);
+		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
 		// result.showImageWindow();
 		// result.getParentSample().getParentCondition().getParentSubstance().setName(
 		// "Processed Images (" + limg.getExperimentName() + ")");
