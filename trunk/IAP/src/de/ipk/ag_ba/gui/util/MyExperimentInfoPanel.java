@@ -325,7 +325,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		remark = new JTextField(experimentHeader.getRemark());
 		
 		fp.addGuiComponentRow(new JLabel("Name"), editName, false);
-		fp.addGuiComponentRow(new JLabel("ID"), disable(new JTextField(experimentHeader.getExcelfileid() + "")), false);
+		fp.addGuiComponentRow(new JLabel("ID"), disable(new JTextField(experimentHeader.getDatabaseId() + "")), false);
 		fp.addGuiComponentRow(new JLabel("Import by"), disable(new JTextField(experimentHeader.getImportusername())),
 							false);
 		fp.addGuiComponentRow(new JLabel("Coordinator"), coordinator, false);

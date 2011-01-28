@@ -186,42 +186,40 @@ public class MongoDB {
 						RunnableOnDB runnableOnDB) throws Exception {
 		
 		try {
-			BackgroundTaskHelper.lockAquire(dataBase, 4);
-			DB db;
-			if (m == null) {
-				if (optHosts == null || optHosts.length() == 0) {
-					m = new Mongo();
-				} else {
-					List<ServerAddress> seeds = new ArrayList<ServerAddress>();
-					for (String h : optHosts.split(","))
-						seeds.add(new ServerAddress(h));
-					m = new Mongo(seeds);
-					// m.slaveOk();
-				}
-			}
-			db = m.getDB(dataBase);
-			if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
-				boolean auth = db.authenticate(optLogin, optPass.toCharArray());
-				if (!auth) {
-					throw new Exception("Invalid MongoDB login data provided!");
-				}
-			}
-			runnableOnDB.setDB(db);
-			try {
-				runnableOnDB.run();
-			} catch (Exception err) {
-				System.out.println("ERROR: " + err.getLocalizedMessage());
-				System.out.println("RE-TRY LAST DATABASE COMMAND IN 10 SEC.");
+			boolean ok = false;
+			int nrep = 30;
+			int repeats = 30;
+			do {
 				try {
-					BackgroundThreadDispatcher.waitSec(10);
+					BackgroundTaskHelper.lockAquire(dataBase, 4);
+					DB db;
+					if (m == null) {
+						if (optHosts == null || optHosts.length() == 0) {
+							m = new Mongo();
+						} else {
+							List<ServerAddress> seeds = new ArrayList<ServerAddress>();
+							for (String h : optHosts.split(","))
+								seeds.add(new ServerAddress(h));
+							m = new Mongo(seeds);
+							// m.slaveOk();
+						}
+					}
+					db = m.getDB(dataBase);
+					if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
+						boolean auth = db.authenticate(optLogin, optPass.toCharArray());
+						if (!auth) {
+							throw new Exception("Invalid MongoDB login data provided!");
+						}
+					}
+					runnableOnDB.setDB(db);
 					runnableOnDB.run();
-				} catch (Exception err2) {
-					System.out.println("ERROR 2: " + err2.getLocalizedMessage());
-					System.out.println("RE-TRY SECOND AND LAST TIME LAST DATABASE COMMAND IN 5 MIN.");
-					BackgroundThreadDispatcher.waitSec(5 * 60);
-					runnableOnDB.run();
+					ok = true;
+				} catch (Exception err) {
+					System.out.println("EXEC " + (nrep - repeats + 1) + " ERROR: " + err.getLocalizedMessage() + " T=" + IAPservice.getCurrentTimeAsNiceString());
+					BackgroundThreadDispatcher.waitSec(30);
 				}
-			}
+				repeats--;
+			} while (!ok && repeats > 0);
 		} finally {
 			BackgroundTaskHelper.lockRelease(dataBase);
 		}

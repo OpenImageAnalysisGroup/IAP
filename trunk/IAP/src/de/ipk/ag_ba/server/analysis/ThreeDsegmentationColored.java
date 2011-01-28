@@ -139,7 +139,7 @@ public class ThreeDsegmentationColored {
 		result.setGroupDescription("L;A;B");
 		
 		final ColorXYZ xyz = new ColorXYZ(0, 0, 0);
-		final Color_CIE_Lab lab = new Color_CIE_Lab(0);
+		final Color_CIE_Lab lab = new Color_CIE_Lab(0, false);
 		
 		threeDdata.getLoadedVolume().visitIntArray(new IntVolumeVisitor() {
 			@Override

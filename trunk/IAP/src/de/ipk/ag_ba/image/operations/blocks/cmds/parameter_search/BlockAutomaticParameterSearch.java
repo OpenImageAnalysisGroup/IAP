@@ -1,11 +1,14 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import org.ObjectRef;
 import org.Vector2d;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MaskOperation;
 import de.ipk.ag_ba.image.operations.MorphologicalOperationSearchType;
@@ -204,29 +207,25 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		
 		double borderLeft = 0;
 		double borderRight = 0;
-		double accuracy = 0;
 		
 		switch (operationType) {
 			case TRANSLATION:
-				borderLeft = -20;
-				borderRight = 20;
-				accuracy = 0;
+				borderLeft = -10;
+				borderRight = 10;
 				break;
 			
 			case SCALING:
 				borderLeft = 0.85;
 				borderRight = 1.15;
-				accuracy = 2;
 				break;
 			
 			case ROTATION:
 				borderLeft = -3.0;
 				borderRight = 3.0;
-				accuracy = 2;
 				break;
 		}
-		accuracy = Math.pow(10, accuracy);
-		return recursiveParameterSearch(workMask, visMaskImage, borderLeft, borderRight, 10, 0, scanParameterX, bestOtherValue, operationType, accuracy);
+		
+		return recursiveParameterSearch(workMask, visMaskImage, borderLeft, borderRight, 10, 0, scanParameterX, bestOtherValue, operationType);
 	}
 	
 	private double recursiveParameterSearch(
@@ -236,9 +235,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 			int zaehler,
 			final boolean scanParameterX,
 			final double bestValueOfOtherTranslation,
-			final MorphologicalOperationSearchType operation,
-			double accuracy
-			) {
+			final MorphologicalOperationSearchType operation) {
 		
 		double intervallSteps = Math.abs(borderLeft - borderRight) / n;
 		// ArrayList<MyThread> threads = new ArrayList<MyThread>();
@@ -249,108 +246,20 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		final ThreadSafeOptions bestParameterTS = new ThreadSafeOptions();
 		bestParameterTS.setDouble(Double.NaN);
 		
-		for (double step = borderLeft; step <= borderRight; step = Math.round((intervallSteps + step) * accuracy) / accuracy) {
+		ArrayList<MyThread> tl = new ArrayList<MyThread>();
+		for (double step = borderLeft; step <= borderRight; step += intervallSteps) {// step = Math.round((intervallSteps + step) * accuracy) / accuracy) {
 			zaehler++;
-			double value = -1;
-			double noOperationValue = Double.NaN;
-			switch (operation) {
-				case TRANSLATION:
-				case ROTATION:
-					noOperationValue = 0;
-					break;
-				case SCALING:
-					noOperationValue = 1;
-					break;
-			}
-			if (scanParameterX)
-				value = getMatchResultValue(workMask, visMaskImage, step, noOperationValue, operation);
-			else
-				value = getMatchResultValue(workMask, visMaskImage, bestValueOfOtherTranslation, step, operation);
-			// System.out.println("" + operation + " mit dem Wert: " + step + " mit dem value: " + value);
-			
-			if (value > bestValueTS.getDouble()) {
-				bestValueTS.setDouble(value);
-				bestParameterTS.setDouble(step);
-			} else
-				if (value == bestValueTS.getDouble()) {
-					
-					switch (operation) {
-						case ROTATION:
-						case TRANSLATION:
-							if (Math.abs(step) < Math.abs(bestParameterTS.getDouble())) {
-								bestParameterTS.setDouble(step);
-								// System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen! " + stepF);
-							}
-							break;
-						case SCALING:
-							if (Math.abs(step - 1) < Math.abs(bestParameterTS.getDouble() - 1)) {
-								bestParameterTS.setDouble(step);
-								// System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen!" + stepF);
-							}
-						default:
-							break;
-					}
-					
-				}
+			final double fstep = step;
+			tl.add(
+					BackgroundThreadDispatcher.addTask(new Runnable() {
+						@Override
+						public void run() {
+							innerLoop(workMask, visMaskImage, scanParameterX, bestValueOfOtherTranslation, operation, bestValueTS, bestParameterTS, fstep);
+						}
+					}, "Inner loop " + operation, 3));
 		}
 		
-		// for (double step = borderLeft; step <= borderRight; step += intervallSteps) {
-		// zaehler++;
-		// final double stepF = step;
-		// threads.add(BackgroundThreadDispatcher.addTask(new Runnable() {
-		// @Override
-		// public void run() {
-		// double value = -1;
-		// double noOperationValue = Double.NaN;
-		// switch (operation) {
-		// case TRANSLATION:
-		// case ROTATION:
-		// noOperationValue = 0;
-		// case SCALING:
-		// noOperationValue = 1;
-		// }
-		// if (scanParameterX)
-		// value = getMatchResultValue(workMask, visMaskImage, stepF, noOperationValue, operation);
-		// else
-		// value = getMatchResultValue(workMask, visMaskImage, bestValueOfOtherTranslation, stepF, operation);
-		// System.out.println("" + operation + " mit dem Wert: " + stepF + " mit dem value: " + value);
-		//
-		// synchronized (bestValueTS) {
-		// if (value > bestValueTS.getDouble()) {
-		// bestValueTS.setDouble(value);
-		// bestParameterTS.setDouble(stepF);
-		// } else
-		// if (value == bestValueTS.getDouble()) {
-		//
-		// switch (operation) {
-		// case ROTATION:
-		// case TRANSLATION:
-		// if (Math.abs(stepF) < Math.abs(bestParameterTS.getDouble())) {
-		// bestParameterTS.setDouble(stepF);
-		// // System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen! " + stepF);
-		// }
-		// break;
-		// case SCALING:
-		// if (Math.abs(stepF - 1) < Math.abs(bestParameterTS.getDouble() - 1)) {
-		// bestParameterTS.setDouble(stepF);
-		// // System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen!" + stepF);
-		// }
-		// default:
-		// break;
-		// }
-		//
-		// }
-		//
-		// // if (value > bestValueTS.getDouble()) {
-		// // bestValueTS.setDouble(value);
-		// // bestTranslationTS.setDouble(translationF);
-		// // }
-		// }
-		// }
-		// }, "parameter search (step " + zaehler + ")", 0));
-		// }
-		//
-		// BackgroundThreadDispatcher.waitFor(threads);
+		BackgroundThreadDispatcher.waitFor(tl);
 		
 		double newBorderLeft = bestParameterTS.getDouble() - intervallSteps;
 		double newBorderRight = bestParameterTS.getDouble() + intervallSteps;
@@ -367,7 +276,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 					stopping = true;
 				break;
 			case SCALING:
-				if (intervallSteps < 0.05) // 0.1
+				if (intervallSteps < 0.1) // 0.1
 					stopping = true;
 				break;
 		}
@@ -377,7 +286,53 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 			return bestParameterTS.getDouble();
 		} else
 			return recursiveParameterSearch(workMask, visMaskImage, newBorderLeft, newBorderRight,
-					n, zaehler, scanParameterX, bestValueOfOtherTranslation, operation, accuracy);
+					n, zaehler, scanParameterX, bestValueOfOtherTranslation, operation);
+	}
+	
+	private void innerLoop(final FlexibleImage workMask, final FlexibleImage visMaskImage, final boolean scanParameterX,
+			final double bestValueOfOtherTranslation, final MorphologicalOperationSearchType operation, final ThreadSafeOptions bestValueTS,
+			final ThreadSafeOptions bestParameterTS, double step) {
+		double value = -1;
+		double noOperationValue = Double.NaN;
+		switch (operation) {
+			case TRANSLATION:
+			case ROTATION:
+				noOperationValue = 0;
+				break;
+			case SCALING:
+				noOperationValue = 1;
+				break;
+		}
+		if (scanParameterX)
+			value = getMatchResultValue(workMask, visMaskImage, step, noOperationValue, operation);
+		else
+			value = getMatchResultValue(workMask, visMaskImage, bestValueOfOtherTranslation, step, operation);
+		// System.out.println("" + operation + " mit dem Wert: " + step + " mit dem value: " + value);
+		
+		synchronized (bestParameterTS) {
+			if (value > bestValueTS.getDouble()) {
+				bestValueTS.setDouble(value);
+				bestParameterTS.setDouble(step);
+			} else
+				if (value == bestValueTS.getDouble()) {
+					switch (operation) {
+						case ROTATION:
+						case TRANSLATION:
+							if (Math.abs(step) < Math.abs(bestParameterTS.getDouble())) {
+								bestParameterTS.setDouble(step);
+								// System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen! " + stepF);
+							}
+							break;
+						case SCALING:
+							if (Math.abs(step - 1) < Math.abs(bestParameterTS.getDouble() - 1)) {
+								bestParameterTS.setDouble(step);
+								// System.out.println("Wert der näher am Ausgangspunkt liegt wird genommen!" + stepF);
+							}
+						default:
+							break;
+					}
+				}
+		}
 	}
 	
 	//
