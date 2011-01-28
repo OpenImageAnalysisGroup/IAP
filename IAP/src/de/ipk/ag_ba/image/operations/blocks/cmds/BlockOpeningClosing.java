@@ -46,15 +46,14 @@ public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			}
 		}
-		int[][] mask;
 		int cnt = 0;
 		do {
 			MorphologicalOperators op = new MorphologicalOperators(image);
 			op.doClosing();
-			mask = op.getResultImage();
 			image = op.getResultImage();
 			cnt++;
 		} while (cnt < repeat);
+		int[][] mask = image;
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {

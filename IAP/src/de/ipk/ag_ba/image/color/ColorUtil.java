@@ -63,7 +63,7 @@ public class ColorUtil {
 		return nearestColor;
 	}
 	
-	public static Color getMaxSaturationColor(ArrayList<Color> colorsOfGroup) {
+	public static Color getMaxSaturationColor(ArrayList<Color> colorsOfGroup, boolean exactAndSlow) {
 		if (colorsOfGroup.size() == 1)
 			return colorsOfGroup.get(0);
 		boolean hsv = true;
@@ -84,7 +84,7 @@ public class ColorUtil {
 		} else {
 			Color_CIE_Lab res = null;
 			for (Color c : colorsOfGroup) {
-				Color_CIE_Lab lab = new Color_CIE_Lab(c.getRGB());
+				Color_CIE_Lab lab = new Color_CIE_Lab(c.getRGB(), exactAndSlow);
 				if (res == null
 									|| (Math.abs(lab.getA()) + Math.abs(lab.getB()) > Math.abs(res.getA()) + Math.abs(res.getB())))
 					res = lab;
@@ -137,24 +137,44 @@ public class ColorUtil {
 		return "#" + (r + g + b);
 	}
 	
-	public static ColorXYZ colorRGB2XYZ(double R, double G, double B) {
+	public static ColorXYZ colorRGB2XYZ(double R, double G, double B, boolean exactAndSlow) {
 		double var_R = (R / 255); // R from 0 to 255
 		double var_G = (G / 255); // G from 0 to 255
 		double var_B = (B / 255); // B from 0 to 255
 		
-		if (var_R > 0.04045)
-			var_R = Math.pow(((var_R + 0.055) / 1.055), 2.4);
-		else
-			var_R = var_R / 12.92;
-		if (var_G > 0.04045)
-			var_G = Math.pow(((var_G + 0.055) / 1.055), 2.4);
-		else
-			var_G = var_G / 12.92;
-		if (var_B > 0.04045)
-			var_B = Math.pow(((var_B + 0.055) / 1.055), 2.4);
-		else
-			var_B = var_B / 12.92;
-		
+		if (exactAndSlow) {
+			if (var_R > 0.04045) {
+				double a = ((var_R + 0.055) / 1.055);
+				var_R = Math.pow(a, 2.4);
+			} else
+				var_R = var_R / 12.92;
+			if (var_G > 0.04045) {
+				double a = ((var_G + 0.055) / 1.055);
+				var_G = Math.pow(a, 2.4);
+			} else
+				var_G = var_G / 12.92;
+			if (var_B > 0.04045) {
+				double a = ((var_B + 0.055) / 1.055);
+				var_B = Math.pow(a, 2.4);
+			} else
+				var_B = var_B / 12.92;
+		} else {
+			if (var_R > 0.04045) {
+				double a = ((var_R + 0.055) / 1.055);
+				var_R = a * a * 1.2; // ~ Math.pow(a, 2.4);
+			} else
+				var_R = var_R / 12.92;
+			if (var_G > 0.04045) {
+				double a = ((var_G + 0.055) / 1.055);
+				var_G = a * a * 1.2; // ~ Math.pow(b, 2.4);
+			} else
+				var_G = var_G / 12.92;
+			if (var_B > 0.04045) {
+				double a = ((var_B + 0.055) / 1.055);
+				var_B = a * a * 1.2; // ~ Math.pow(c, 2.4);
+			} else
+				var_B = var_B / 12.92;
+		}
 		var_R = var_R * 100;
 		var_G = var_G * 100;
 		var_B = var_B * 100;
@@ -319,9 +339,9 @@ public class ColorUtil {
 	 * methods.
 	 */
 	@Deprecated
-	public static double deltaE2000(int r1, int g1, int b1, int r2, int g2, int b2) {
-		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1));
-		Color_CIE_Lab cCL2 = colorXYZ2CIELAB(colorRGB2XYZ(r2, g2, b2));
+	public static double deltaE2000(int r1, int g1, int b1, int r2, int g2, int b2, boolean exactAndSlow) {
+		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1, exactAndSlow));
+		Color_CIE_Lab cCL2 = colorXYZ2CIELAB(colorRGB2XYZ(r2, g2, b2, exactAndSlow));
 		double CIE_L1 = cCL1.getL();
 		double CIE_a1 = cCL1.getA();
 		double CIE_b1 = cCL1.getB(); // Color #1 CIE-L*ab values
@@ -350,8 +370,8 @@ public class ColorUtil {
 	}
 	
 	@Deprecated
-	public static double deltaE2000(int r1, int g1, int b1, double CIE_L2, double CIE_a2, double CIE_b2) {
-		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1));
+	public static double deltaE2000(int r1, int g1, int b1, double CIE_L2, double CIE_a2, double CIE_b2, boolean exactAndSlow) {
+		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1, exactAndSlow));
 		double CIE_L1 = cCL1.getL();
 		double CIE_a1 = cCL1.getA();
 		double CIE_b1 = cCL1.getB(); // Color #1 CIE-L*ab values
@@ -502,9 +522,9 @@ public class ColorUtil {
 		return getAvgColor(cc);
 	}
 	
-	public static void getLABfromRGB(int[] rgbArray, double[] lArray, double[] aArray, double[] bArray) {
+	public static void getLABfromRGB(int[] rgbArray, double[] lArray, double[] aArray, double[] bArray, boolean exactAndSlow) {
 		for (int i = 0; i < rgbArray.length; i++) {
-			Color_CIE_Lab lab = new Color_CIE_Lab(rgbArray[i]);
+			Color_CIE_Lab lab = new Color_CIE_Lab(rgbArray[i], exactAndSlow);
 			lArray[i] = lab.getL();
 			aArray[i] = lab.getA();
 			bArray[i] = lab.getB();

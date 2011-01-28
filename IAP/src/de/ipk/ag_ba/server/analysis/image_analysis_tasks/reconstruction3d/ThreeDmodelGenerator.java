@@ -323,14 +323,14 @@ public class ThreeDmodelGenerator {
 				}
 			} else {
 				if (rgb) {
-					Color c = ColorUtil.getMaxSaturationColor(cc);
+					Color c = ColorUtil.getMaxSaturationColor(cc, false);
 					// int tr = (int) (255d - 0.05d * byteCube[xi][yi][zi]);
 					// if (tr < 0)
 					// tr = 255;
 					int tr = 255;
 					rgbCube[xi][yi][zi] = ColorUtil.getInt(tr, c.getRed(), c.getGreen(), c.getBlue());
 				} else {
-					Color c = ColorUtil.getMaxSaturationColor(cc);
+					Color c = ColorUtil.getMaxSaturationColor(cc, false);
 					int nearestColor = ColorUtil.findBestColorIndex(palette, c);
 					byteCube[xi][yi][zi] = (byte) (nearestColor + byteCube[xi][yi][zi] * 255 / maxPossibleLevels);
 				}

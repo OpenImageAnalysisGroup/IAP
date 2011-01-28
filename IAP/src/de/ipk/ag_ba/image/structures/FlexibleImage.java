@@ -93,7 +93,7 @@ public class FlexibleImage {
 		// if (w == getWidth() && h == getHeight()) {
 		// return new FlexibleImage(getConvertAs2A());
 		// } else {
-		ImageOperation io = new ImageOperation(getConvertAs2A());
+		ImageOperation io = new ImageOperation(this);
 		io.resize(w, h);
 		return io.getImage();
 		// }

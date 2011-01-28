@@ -18,11 +18,11 @@ public class Color_CIE_Lab {
 		this.b = b;
 	}
 	
-	public Color_CIE_Lab(int rgb) {
+	public Color_CIE_Lab(int rgb, boolean exactAndSlow) {
 		int red = (rgb >> 16) & 0xff;
 		int green = (rgb >> 8) & 0xff;
 		int blue = (rgb) & 0xff;
-		Color_CIE_Lab c = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(red, green, blue));
+		Color_CIE_Lab c = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(red, green, blue, exactAndSlow));
 		l = c.l;
 		a = c.a;
 		b = c.b;

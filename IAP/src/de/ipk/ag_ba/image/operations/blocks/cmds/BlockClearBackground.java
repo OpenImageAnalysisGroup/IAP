@@ -314,7 +314,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 			final double arrayA[] = new double[w * h];
 			final double arrayB[] = new double[w * h];
 			
-			ColorUtil.getLABfromRGB(arrayRGB, arrayL, arrayA, arrayB);
+			ColorUtil.getLABfromRGB(arrayRGB, arrayL, arrayA, arrayB, false);
 			
 			int rgbArrayOriginal[] = new int[w * h];
 			img.getRGB(0, 0, w, h, rgbArrayOriginal, 0, w);
