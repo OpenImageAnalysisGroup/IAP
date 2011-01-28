@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operations.blocks.cmds;
+package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;

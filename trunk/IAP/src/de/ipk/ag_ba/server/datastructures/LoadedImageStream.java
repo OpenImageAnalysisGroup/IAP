@@ -29,7 +29,6 @@ public class LoadedImageStream extends LoadedImage {
 				"This variant of the LoadedImage class can't return the loaded image as an BufferedImage (only as a data stream).");
 	}
 	
-	@Override
 	public InputStream getInputStreamLabelField() {
 		MyByteArrayInputStream isLabel = null;
 		if (bufferOfLabelImage != null)

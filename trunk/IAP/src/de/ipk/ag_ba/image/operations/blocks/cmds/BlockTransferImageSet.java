@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 
 public class BlockTransferImageSet extends AbstractImageAnalysisBlockFIS {

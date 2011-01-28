@@ -952,7 +952,7 @@ public class ImageOperation extends ImageConverter {
 			PixelSegmentation ps = new PixelSegmentation(image);
 			ps.doPixelSegmentation(1);
 			
-			int[] clusterSizes = ps.getClusterCounts();
+			int[] clusterSizes = ps.getClusterSizeNormalized(w, h);
 			int[] clusterPerimeter = ps.getPerimeter();
 			double[] clusterCircleSimilarity = ps.getCircuitRatio();
 			
@@ -968,7 +968,6 @@ public class ImageOperation extends ImageConverter {
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
 					int clusterID = mask[x][y];
-					
 					if (clusterSizes[clusterID] < cutOff)
 						rgbArray[x + y * w] = iBackgroundFill;
 				}
@@ -981,7 +980,7 @@ public class ImageOperation extends ImageConverter {
 			PixelSegmentation ps = new PixelSegmentation(image);
 			ps.doPixelSegmentation(2);
 			
-			int[] clusterSizes = ps.getClusterCounts();
+			int[] clusterSizes = ps.getClusterSize();
 			int[] clusterPerimeter = ps.getPerimeter();
 			double[] clusterCircleSimilarity = ps.getCircuitRatio();
 			
@@ -1022,7 +1021,7 @@ public class ImageOperation extends ImageConverter {
 			PixelSegmentation ps = new PixelSegmentation(image);
 			ps.doPixelSegmentation(3);
 			
-			int[] clusterSizes = ps.getClusterCounts();
+			int[] clusterSizes = ps.getClusterSize();
 			int[] clusterPerimeter = ps.getPerimeter();
 			double[] clusterCircleSimilarity = ps.getCircuitRatio();
 			

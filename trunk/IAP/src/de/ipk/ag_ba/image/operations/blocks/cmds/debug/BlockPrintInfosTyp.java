@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.ipk.ag_ba.image.operations.blocks.cmds;
+package de.ipk.ag_ba.image.operations.blocks.cmds.debug;
 
 /**
  * @author Entzian

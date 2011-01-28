@@ -12,21 +12,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  *           The set of input images (RGB images).
  * @return A set of images which may be used as a mask.
  */
-public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
-	
-	@Override
-	protected FlexibleImage processVISmask() {
-		return new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(0.001d).getImage();
-	}
+public class BlockRemoveSmallClustersOnFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(0.001d).getImage();
 	}
-	
-	// @Override
-	// protected FlexibleImage processNIRmask() {
-	// return new ImageOperation(getInput().getMasks().getNir()).removeSmallClusters(0.002d).getImage();
-	// }
 	
 }

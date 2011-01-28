@@ -3,25 +3,26 @@
  *************************************************************************/
 package de.ipk.ag_ba.image.analysis.phytochamber;
 
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMask;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockAutomaticParameterSearchRotation;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockAutomaticParameterSearchScaling;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockAutomaticParameterSearchTranslation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCrop;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDataAnalysis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEqualize;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMergeMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMorphologicalOperations;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockOpeningClosing;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPostProcessEdgeErodeEnlarge;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockPostProcessEdgeErodeReduce;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockTransferImageSet;
+import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchRotation;
+import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchScaling;
+import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchTranslation;
+import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockPostProcessEdgeErodeEnlarge;
+import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockPostProcessEdgeErodeReduce;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -32,14 +33,14 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
  */
 public class PhytochamberTopImageProcessor {
 	
-	private final PhytoTopImageProcessorOptions options;
+	private final ImageProcessorOptions options;
 	private final BlockProperties settings;
 	
-	public PhytochamberTopImageProcessor(PhytoTopImageProcessorOptions options) {
+	public PhytochamberTopImageProcessor(ImageProcessorOptions options) {
 		this(options, new BlockPropertiesImpl());
 	}
 	
-	public PhytochamberTopImageProcessor(PhytoTopImageProcessorOptions options, BlockPropertiesImpl settings) {
+	public PhytochamberTopImageProcessor(ImageProcessorOptions options, BlockPropertiesImpl settings) {
 		this.options = options;
 		this.settings = settings;
 	}
