@@ -8,7 +8,9 @@ import java.awt.image.BufferedImage;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
- * @author entzian
+ * Merges mask A with B. If the result is filled below 1/1000 of the area, not the nearly empty result mask is used but mask A (e.g. RGB).
+ * 
+ * @author entzian,klukas
  */
 public class MaskOperation {
 	
@@ -66,6 +68,10 @@ public class MaskOperation {
 			else
 				throw new UnsupportedOperationException();
 		
+		if (filled < fluorImage.length * 0.001) {
+			for (int i = 0; i < fluorImage.length; i++)
+				mask[i] = rgbImage[i];
+		}
 	}
 	
 	public int[] getMask() {

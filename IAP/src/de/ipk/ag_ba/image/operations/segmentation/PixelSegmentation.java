@@ -7,11 +7,13 @@ import info.StopWatch;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.operations.Position;
+import org.Vector2d;
 
+import de.ipk.ag_ba.image.operations.Position;
 
 /**
  * @author entzian
@@ -37,6 +39,11 @@ public class PixelSegmentation {
 	private final int[][] image_cluster_ids;
 	private int[] cluster_border_size;
 	
+	private int[] cluster_min_x;
+	private int[] cluster_max_x;
+	private int[] cluster_min_y;
+	private int[] cluster_max_y;
+	
 	/**
 	 * Circuit ratio lambda = (A/(U*U))*4*Pi
 	 */
@@ -47,6 +54,8 @@ public class PixelSegmentation {
 	private int[][] tableLinks;
 	private int[] clusterMap;
 	private boolean[] linesRun;
+	
+	private boolean calculatePerimeterAndRatio;
 	
 	public PixelSegmentation(int[][] image) {
 		this(image, NeighbourhoodSetting.NB4);
@@ -69,7 +78,7 @@ public class PixelSegmentation {
 	
 	// ############### Public ####################
 	
-	public int[] getClusterCounts() {
+	public int[] getClusterSize() {
 		return image_cluster_size;
 	}
 	
@@ -125,8 +134,11 @@ public class PixelSegmentation {
 			s.printTime();
 			// secondPass();
 			secondPassDritteVariante(); // Cluster are renumbered
-			calculatePerimeterOfEachCluster();
-			calculateCircuitRatio();
+			if (calculatePerimeterAndRatio) {
+				calculatePerimeterOfEachCluster();
+				calculateCircuitRatio();
+			}
+			calculateCenter();
 		} else
 			if (durchlauf == 2) {
 				firstPass(); // Each pixel is assigned to a cluster
@@ -134,18 +146,58 @@ public class PixelSegmentation {
 				mergeHashMapRecursive();
 				s.printTime();
 				secondPass(); // Cluster are renumbered
-				calculatePerimeterOfEachCluster();
-				calculateCircuitRatio();
+				if (calculatePerimeterAndRatio) {
+					calculatePerimeterOfEachCluster();
+					calculateCircuitRatio();
+				}
+				calculateCenter();
 			} else {
 				firstPass(); // Each pixel is assigned to a cluster
 				// StopWatch s = new StopWatch("Merge Chris");
 				mergeHashMapToepfe();
 				// s.printTime();
 				secondPassToepfe(); // Cluster are renumbered
-				calculatePerimeterOfEachCluster();
-				calculateCircuitRatio();
+				if (calculatePerimeterAndRatio) {
+					calculatePerimeterOfEachCluster();
+					calculateCircuitRatio();
+				}
+				calculateCenter();
 			}
 		
+	}
+	
+	private void calculateCenter() {
+		
+		cluster_min_x = new int[zaehler];
+		cluster_max_x = new int[zaehler];
+		cluster_min_y = new int[zaehler];
+		cluster_max_y = new int[zaehler];
+		
+		Arrays.fill(cluster_min_x, src_image.length);
+		Arrays.fill(cluster_min_y, src_image[0].length);
+		Arrays.fill(cluster_max_x, 0);
+		Arrays.fill(cluster_max_y, 0);
+		
+		for (int i = 0; i < src_image.length; i++) {
+			for (int j = 0; j < src_image[i].length; j++) {
+				if (!(src_image[i][j] < foreground)) {
+					int clusterId = image_cluster_ids[i][j];
+					
+					int x = i;
+					int y = j;
+					
+					if (x < cluster_min_x[clusterId])
+						cluster_min_x[clusterId] = x;
+					if (y < cluster_min_y[clusterId])
+						cluster_min_y[clusterId] = y;
+					
+					if (x > cluster_max_x[clusterId])
+						cluster_max_x[clusterId] = x;
+					if (y > cluster_max_y[clusterId])
+						cluster_max_x[clusterId] = y;
+				}
+			}
+		}
 	}
 	
 	private void calculateCircuitRatio() {
@@ -770,6 +822,36 @@ public class PixelSegmentation {
 			topf.remove(key);
 			clusterMapping.put(key, new ArrayList<Integer>(topf));
 		}
+	}
+	
+	public Vector2d[] getClusterCenterPoints() {
+		Vector2d[] res = new Vector2d[cluster_min_x.length];
+		for (int i = 0; i < cluster_min_x.length; i++) {
+			int w = cluster_max_x[i] - cluster_min_x[i];
+			int h = cluster_max_y[i] - cluster_min_y[i];
+			
+			int cx = cluster_min_x[i] + w / 2;
+			int cy = cluster_min_y[i] + h / 2;
+			
+			res[i] = new Vector2d(cx, cy);
+		}
+		return res;
+	}
+	
+	public int[] getClusterSizeNormalized(int w, int h) {
+		Vector2d[] clusterCenters = getClusterCenterPoints();
+		int[] res = getClusterSize();
+		
+		Vector2d imageCenter = new Vector2d(w / 2, h / 2);
+		
+		for (int cluster = 0; cluster < res.length; cluster++) {
+			Vector2d center = clusterCenters[cluster];
+			double d = imageCenter.distance(center);
+			
+			res[cluster] = (int) (res[cluster] * (imageCenter.x - d) / imageCenter.x);
+		}
+		
+		return res;
 	}
 	
 }

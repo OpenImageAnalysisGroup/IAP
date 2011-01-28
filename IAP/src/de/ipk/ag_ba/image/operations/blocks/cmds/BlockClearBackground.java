@@ -16,6 +16,7 @@ import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
+import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ColorHistogram;

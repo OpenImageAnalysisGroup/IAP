@@ -1,7 +1,9 @@
-package de.ipk.ag_ba.image.operations.blocks.cmds;
+package de.ipk.ag_ba.image.operations.blocks.cmds.post_process;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public abstract class BlockPostProcessEdgeErode extends AbstractSnapshotAnalysisBlockFIS {
@@ -18,20 +20,20 @@ public abstract class BlockPostProcessEdgeErode extends AbstractSnapshotAnalysis
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return postProcessResultImage(getInput().getImages().getVis(), getInput().getMasks().getVis(), ImageConfiguration.RgbTop, enlarge);
+		return postProcessResultImage(options, getInput().getImages().getVis(), getInput().getMasks().getVis(), ImageConfiguration.RgbTop, enlarge);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return postProcessResultImage(getInput().getImages().getFluo(), getInput().getMasks().getFluo(), ImageConfiguration.FluoTop, enlarge);
+		return postProcessResultImage(options, getInput().getImages().getFluo(), getInput().getMasks().getFluo(), ImageConfiguration.FluoTop, enlarge);
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		return postProcessResultImage(getInput().getImages().getNir(), getInput().getMasks().getNir(), ImageConfiguration.NirTop, enlarge);
+		return postProcessResultImage(options, getInput().getImages().getNir(), getInput().getMasks().getNir(), ImageConfiguration.NirTop, enlarge);
 	}
 	
-	private FlexibleImage postProcessResultImage(FlexibleImage srcImage, FlexibleImage finalImage,
+	public static FlexibleImage postProcessResultImage(ImageProcessorOptions options, FlexibleImage srcImage, FlexibleImage finalImage,
 			ImageConfiguration typ, boolean enlarge) {
 		
 		ImageOperation maskIo = new ImageOperation(finalImage);

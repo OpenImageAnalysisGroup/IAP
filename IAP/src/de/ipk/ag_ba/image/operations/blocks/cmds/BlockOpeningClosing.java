@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import de.ipk.ag_ba.image.operations.MorphologicalOperators;
+import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {

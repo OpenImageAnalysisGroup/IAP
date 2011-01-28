@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import de.ipk.ag_ba.image.analysis.phytochamber.PhytoTopImageProcessorOptions;
-import de.ipk.ag_ba.image.operations.blocks.cmds.ImageAnalysisBlockFIS;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
+import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -13,10 +13,10 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 public class BlockPipeline {
 	
 	private final ArrayList<Class<? extends ImageAnalysisBlockFIS>> blocks = new ArrayList<Class<? extends ImageAnalysisBlockFIS>>();
-	private final PhytoTopImageProcessorOptions options;
+	private final ImageProcessorOptions options;
 	private static int lastPipelineExecutionTimeInSec = -1;
 	
-	public BlockPipeline(PhytoTopImageProcessorOptions options) {
+	public BlockPipeline(ImageProcessorOptions options) {
 		this.options = options;
 		
 	}

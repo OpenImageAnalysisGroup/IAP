@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operations.blocks.cmds;
+package de.ipk.ag_ba.image.operations.blocks.cmds.post_process;
 
 public class BlockPostProcessEdgeErodeEnlarge extends BlockPostProcessEdgeErode {
 	

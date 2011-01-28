@@ -16,7 +16,7 @@ import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
-import de.ipk.ag_ba.image.analysis.phytochamber.PhytoTopImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -161,7 +161,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages()) {
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(
-									new PhytoTopImageProcessorOptions());
+									new ImageProcessorOptions());
 							
 							FlexibleImageStack debugImageStack = new FlexibleImageStack();
 							

@@ -5,14 +5,14 @@
  * Created on Nov 26, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.image.analysis.phytochamber;
+package de.ipk.ag_ba.image.analysis.gernally;
 
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * @author klukas, entzian
  */
-public class PhytoTopImageProcessorOptions {
+public class ImageProcessorOptions {
 	private double scale;
 	
 	private double rotationAngle;
@@ -53,11 +53,11 @@ public class PhytoTopImageProcessorOptions {
 	
 	private boolean debugOverlayResultImage;
 	
-	public PhytoTopImageProcessorOptions() {
+	public ImageProcessorOptions() {
 		this(1.0);
 	}
 	
-	public PhytoTopImageProcessorOptions(double scale) {
+	public ImageProcessorOptions(double scale) {
 		initStandardValues(scale);
 	}
 	

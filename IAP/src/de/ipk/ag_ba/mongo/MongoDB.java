@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
-import org.StringManipulationTools;
 import org.bson.types.ObjectId;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.HashType;
@@ -1174,7 +1174,7 @@ public class MongoDB {
 					res.setHostInfo(SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 							SystemAnalysis.getRealSystemMemoryInMB() / 1024 + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
 							"/" + SystemAnalysis.getRealNumberOfCPUs() + " CPUs, load: "
-							+ StringManipulationTools.formatNumber(SystemAnalysis.getRealSystemCpuLoad(), "#.#")
+							+ AttributeHelper.formatNumber(SystemAnalysis.getRealSystemCpuLoad(), "#.#")
 							+ ", queued: "
 							+ BackgroundThreadDispatcher.getWorkLoad());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());

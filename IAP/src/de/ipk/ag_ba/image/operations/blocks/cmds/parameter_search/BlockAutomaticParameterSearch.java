@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operations.blocks.cmds;
+package de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search;
 
 import java.awt.Color;
 
@@ -9,6 +9,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MaskOperation;
 import de.ipk.ag_ba.image.operations.MorphologicalOperationSearchType;
+import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
