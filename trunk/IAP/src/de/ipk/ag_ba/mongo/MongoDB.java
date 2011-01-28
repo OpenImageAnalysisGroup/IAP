@@ -1070,14 +1070,16 @@ public class MongoDB {
 				ObjectRef newSize = new ObjectRef();
 				newSize.addLong(0);
 				for (NumericMeasurementInterface nmd : Substance3D.getAllFiles(experiment)) {
-					IOurl url = ((BinaryMeasurement) nmd).getURL();
-					if (url != null) {
-						String hash = url.getDetail();
-						for (String s : MongoGridFS.getFileCollectionsFor(nmd)) {
-							GridFS gridfs = new GridFS(db, s);
-							GridFSDBFile file = gridfs.findOne(hash);
-							if (file != null) {
-								newSize.addLong(file.getLength());
+					if (nmd instanceof BinaryMeasurement) {
+						IOurl url = ((BinaryMeasurement) nmd).getURL();
+						if (url != null) {
+							String hash = url.getDetail();
+							for (String s : MongoGridFS.getFileCollectionsFor(nmd)) {
+								GridFS gridfs = new GridFS(db, s);
+								GridFSDBFile file = gridfs.findOne(hash);
+								if (file != null) {
+									newSize.addLong(file.getLength());
+								}
 							}
 						}
 					}
