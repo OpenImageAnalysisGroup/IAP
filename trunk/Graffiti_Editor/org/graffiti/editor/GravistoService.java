@@ -425,6 +425,7 @@ public class GravistoService implements HelperClass {
 					runAlgorithm(algo, event);
 			} else
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						Algorithm algo = new GravistoService().getAlgorithmInstanceFromFriendlyName(pluginNameOrClassName);
 						MainFrame.showMessage("Execute plugin " + pluginNameOrClassName + "", MessageType.INFO);
@@ -570,6 +571,7 @@ public class GravistoService implements HelperClass {
 						final ThreadSafeOptions tsoParamDialogReturn) {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.executeThreadSafe(new Runnable() {
+			@Override
 			public void run() {
 				boolean res = doThreadSafeDoIt(algorithm, selection, enableMultipleSessionProcessing, parameters, doReturn,
 									tsoParamDialogReturn);
@@ -873,23 +875,29 @@ public class GravistoService implements HelperClass {
 		final JLabel memLabel = new JLabel(getCurrentMemoryInfo(false));
 		memLabel.setToolTipText("Click for memory garbage collection (incl. Database Flush)<br>Shift-Click for pure GC.");
 		memLabel.addMouseListener(new MouseListener() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				freeMemory(!e.isShiftDown());
 			}
 			
+			@Override
 			public void mouseEntered(MouseEvent e) {
 			}
 			
+			@Override
 			public void mouseExited(MouseEvent e) {
 			}
 			
+			@Override
 			public void mousePressed(MouseEvent e) {
 			}
 			
+			@Override
 			public void mouseReleased(MouseEvent e) {
 			}
 		});
 		Timer t = new Timer(1000, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				memLabel.setText(getCurrentMemoryInfo(shortInfo));
 				if (shortInfo)
@@ -957,8 +965,7 @@ public class GravistoService implements HelperClass {
 	public static IOurl getIOurl(Class location, String filename, String optExt) throws IOException {
 		File f;
 		
-		URL r = getResource(location, filename);
-		URL preURL = new URL(r.toExternalForm());
+		URL preURL = new URL(getResource(location, filename).toExternalForm());
 		try {
 			f = new File(preURL.toURI());
 		} catch (URISyntaxException e) {
