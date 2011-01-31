@@ -30,7 +30,7 @@ public class BlockPipeline {
 	}
 	
 	public FlexibleMaskAndImageSet execute(FlexibleMaskAndImageSet input, FlexibleImageStack debugStack, BlockProperties settings)
-			throws InstantiationException, IllegalAccessException {
+			throws InstantiationException, IllegalAccessException, InterruptedException {
 		// System.out.println("Execute BLOCK pipeline...");
 		System.out.print(".");
 		long a = System.currentTimeMillis();
@@ -85,25 +85,24 @@ public class BlockPipeline {
 	private static int currentMinuteB = -1;
 	
 	private void updatePipelineStatistics() {
-		Calendar calendar = new GregorianCalendar();
-		int minute5 = calendar.get(Calendar.MINUTE) / 5;
+		// Calendar calendar = new GregorianCalendar();
+		// int hour = calendar.get(Calendar.HOUR);
 		synchronized (BlockPipeline.class) {
-			pipelineExecutionsWithinCurrent5Minutes++;
-			if (current5MinuteP != minute5) {
-				pipelineExecutionWithinLast5Minutes = pipelineExecutionsWithinCurrent5Minutes;
-				pipelineExecutionsWithinCurrent5Minutes = 0;
-				current5MinuteP = minute5;
-			}
+			pipelineExecutionsWithinCurrentHour++;
+			// if (currentHourP != hour) {
+			// pipelineExecutionsWithinCurrentHour = 0;
+			// currentHourP = hour;
+			// }
 		}
 	}
 	
-	public static int getPipelineExecutionsWithinLast5Minutes() {
-		return pipelineExecutionWithinLast5Minutes;
+	public static int getPipelineExecutionsWithinCurrentHour() {
+		return pipelineExecutionsWithinCurrentHour;
 	}
 	
-	private static int pipelineExecutionWithinLast5Minutes = 0;
-	private static int pipelineExecutionsWithinCurrent5Minutes = 0;
-	private static int current5MinuteP = -1;
+	private static int pipelineExecutionsWithinCurrentHour = 0;
+	
+	// private static int currentHourP = -1;
 	
 	private void nullPointerCheck(FlexibleMaskAndImageSet input, String name) {
 		if (input.getImages() != null) {

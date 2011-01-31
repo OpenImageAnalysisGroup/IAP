@@ -66,7 +66,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -184,14 +183,14 @@ public class MongoDB {
 	
 	private void processDB(String dataBase, String optHosts, String optLogin, String optPass,
 						RunnableOnDB runnableOnDB) throws Exception {
-		
+		Exception e = null;
 		try {
 			boolean ok = false;
-			int nrep = 30;
-			int repeats = 30;
+			int nrep = 0;
+			int repeats = 0;
+			// BackgroundTaskHelper.lockAquire(dataBase, 2);
 			do {
 				try {
-					BackgroundTaskHelper.lockAquire(dataBase, 4);
 					DB db;
 					if (m == null) {
 						if (optHosts == null || optHosts.length() == 0) {
@@ -214,15 +213,19 @@ public class MongoDB {
 					runnableOnDB.setDB(db);
 					runnableOnDB.run();
 					ok = true;
+					e = null;
 				} catch (Exception err) {
 					System.out.println("EXEC " + (nrep - repeats + 1) + " ERROR: " + err.getLocalizedMessage() + " T=" + IAPservice.getCurrentTimeAsNiceString());
-					BackgroundThreadDispatcher.waitSec(30);
+					e = err;
+					BackgroundThreadDispatcher.waitSec(5);
 				}
 				repeats--;
 			} while (!ok && repeats > 0);
 		} finally {
-			BackgroundTaskHelper.lockRelease(dataBase);
+			// BackgroundTaskHelper.lockRelease(dataBase);
 		}
+		if (e != null)
+			throw e;
 	}
 	
 	public void processDB(RunnableOnDB runnableOnDB) throws Exception {
@@ -1149,7 +1152,7 @@ public class MongoDB {
 	
 	public synchronized void batchPingHost(final String ip,
 			final int blocksExecutedWithinLastMinute,
-			final int pipelineExecutedWithinLast5Minutes,
+			final int pipelineExecutedWithinCurrentHour,
 			final int tasksExecutedWithinLastMinute) throws Exception {
 		processDB(new RunnableOnDB() {
 			private DB db;
@@ -1167,7 +1170,7 @@ public class MongoDB {
 					res.updateTime();
 					res.setOperatingSystem(SystemAnalysis.getOperatingSystem());
 					res.setBlocksExecutedWithinLastMinute(blocksExecutedWithinLastMinute);
-					res.setPipelineExecutedWithinLast5Minutes(pipelineExecutedWithinLast5Minutes);
+					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
 					res.setHostInfo(SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 							SystemAnalysis.getRealSystemMemoryInMB() / 1024 + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
@@ -1332,7 +1335,7 @@ public class MongoDB {
 							if (!added)
 								if (batch.getRunStatus() != null)
 									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 60000)) {
-										res.add(batch);
+										// res.add(batch);
 										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
 										break;
 									}

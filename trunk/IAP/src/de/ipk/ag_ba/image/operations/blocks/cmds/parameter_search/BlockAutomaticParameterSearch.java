@@ -3,6 +3,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import org.ErrorMsg;
 import org.ObjectRef;
 import org.Vector2d;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -215,8 +216,8 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 				break;
 			
 			case SCALING:
-				borderLeft = 0.85;
-				borderRight = 1.15;
+				borderLeft = 0.95;
+				borderRight = 1.05;
 				break;
 			
 			case ROTATION:
@@ -259,7 +260,12 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 					}, "Inner loop " + operation, 3));
 		}
 		
-		BackgroundThreadDispatcher.waitFor(tl);
+		try {
+			BackgroundThreadDispatcher.waitFor(tl);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
 		
 		double newBorderLeft = bestParameterTS.getDouble() - intervallSteps;
 		double newBorderRight = bestParameterTS.getDouble() + intervallSteps;

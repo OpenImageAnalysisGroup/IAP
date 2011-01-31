@@ -52,7 +52,7 @@ public class PhytochamberTopImageProcessor {
 	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, int maxThreadsPerImage, FlexibleImageStack debugStack,
 			boolean automaticParameterSearch,
 			boolean cropResult)
-			throws InstantiationException, IllegalAccessException {
+			throws InstantiationException, IllegalAccessException, InterruptedException {
 		// if (debugStack != null)
 		// options.setDebugTakeTimes(true);
 		

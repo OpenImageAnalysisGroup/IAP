@@ -848,7 +848,8 @@ public class PixelSegmentation {
 			Vector2d center = clusterCenters[cluster];
 			double d = imageCenter.distance(center);
 			
-			res[cluster] = (int) (res[cluster] * (imageCenter.x - d) / imageCenter.x);
+			res[cluster] = (int) (res[cluster] *
+					(1 - Math.max(imageCenter.y - d * 1.5, 0) / imageCenter.y));
 		}
 		
 		return res;

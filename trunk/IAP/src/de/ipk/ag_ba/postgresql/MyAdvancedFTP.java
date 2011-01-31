@@ -59,14 +59,10 @@ public class MyAdvancedFTP {
 		status.setCurrentStatusValue(0);
 		boolean res;
 		
-		try {
-			status.setCurrentStatusValue(-1);
-			status.setCurrentStatusText1(downloadURL);
-			status.setCurrentStatusText2("FTP DOWNLOAD...");
-			res = processDownload(status, downloadURL, target, thisRun, server, remote, ftp);
-		} finally {
-			BackgroundTaskHelper.lockRelease(server);
-		}
+		status.setCurrentStatusValue(-1);
+		status.setCurrentStatusText1(downloadURL);
+		status.setCurrentStatusText2("FTP DOWNLOAD...");
+		res = processDownload(status, downloadURL, target, thisRun, server, remote, ftp);
 		return res;
 	}
 	
@@ -86,12 +82,12 @@ public class MyAdvancedFTP {
 		}
 		
 		final ObjectRef myoutputstream = new ObjectRef();
+		BackgroundTaskHelper.lockAquire(server, 1);
 		try {
 			status.setCurrentStatusText1("Waiting for shared FTP connection");
 			status.setCurrentStatusText2("Server: " + server);
 			status.setCurrentStatusValue(-1);
 			
-			BackgroundTaskHelper.lockGetSemaphore(server, 1);
 			return performDownload(status, downloadURL, target, thisRun, server, remote, ftp, username, password, myoutputstream);
 			
 		} finally {

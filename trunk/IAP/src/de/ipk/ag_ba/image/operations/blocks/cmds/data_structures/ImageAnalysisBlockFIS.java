@@ -12,7 +12,7 @@ public interface ImageAnalysisBlockFIS {
 	
 	public void reset();
 	
-	public FlexibleMaskAndImageSet process();
+	public FlexibleMaskAndImageSet process() throws InterruptedException;
 	
 	public BlockProperties getProperties();
 	

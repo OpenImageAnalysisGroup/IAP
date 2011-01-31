@@ -55,13 +55,13 @@ public class CloudHost extends BasicDBObject {
 			return 0;
 	}
 	
-	public void setPipelineExecutedWithinLast5Minutes(int pipelineExecutedWithinLast5Minutes) {
-		put("pipelinesWithin5Minutes", pipelineExecutedWithinLast5Minutes);
+	public void setPipelineExecutedWithinCurrentHour(int pipelineExecutedWithinCurrentHour) {
+		put("pipelinesWithinCurrentHour", pipelineExecutedWithinCurrentHour);
 	}
 	
-	public int getPipelineExecutedWithinLast5Minutes() {
-		if (get("pipelinesWithin5Minutes") != null)
-			return (Integer) get("pipelinesWithin5Minutes");
+	public int getPipelineExecutedWithinCurrentHour() {
+		if (get("pipelinesWithinCurrentHour") != null)
+			return (Integer) get("pipelinesWithinCurrentHour");
 		else
 			return 0;
 	}
