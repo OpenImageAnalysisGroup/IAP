@@ -698,7 +698,7 @@ public class ImageOperation extends ImageConverter {
 	// }
 	
 	static void testPhytokammer(IOurl urlFlu, IOurl urlVis, IOurl urlNIR, BufferedImage imgFluo,
-						BufferedImage imgVisible, BufferedImage imgNIR) {
+						BufferedImage imgVisible, BufferedImage imgNIR) throws InterruptedException {
 		
 		int[] fluoImageOriginal = ImageConverter.convertBIto1A(imgFluo);
 		int[] rgbImageOriginal = ImageConverter.convertBIto1A(imgVisible);

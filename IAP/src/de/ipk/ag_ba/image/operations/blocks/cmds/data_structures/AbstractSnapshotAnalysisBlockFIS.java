@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
+import org.ErrorMsg;
+
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -13,7 +15,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	}
 	
 	@Override
-	protected FlexibleMaskAndImageSet run() {
+	protected FlexibleMaskAndImageSet run() throws InterruptedException {
 		final FlexibleImageSet processedImages = new FlexibleImageSet();
 		final FlexibleImageSet processedMasks = new FlexibleImageSet();
 		
@@ -25,36 +27,66 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
-						processedImages.setVis(processVISimage());
+						try {
+							processedImages.setVis(processVISimage());
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
 				}, name + " process VIS image", 1),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
-						processedImages.setFluo(processFLUOimage());
+						try {
+							processedImages.setFluo(processFLUOimage());
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
 				}, name + "process FLU image", 1),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
-						processedImages.setNir(processNIRimage());
+						try {
+							processedImages.setNir(processNIRimage());
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
 				}, name + "process NIR image", 1),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
-						processedMasks.setVis(processVISmask());
+						try {
+							processedMasks.setVis(processVISmask());
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
 				}, name + "process VIS mask", 1),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
-						processedMasks.setFluo(processFLUOmask());
+						try {
+							processedMasks.setFluo(processFLUOmask());
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
 				}, name + "process FLU mask", 1), BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
-						processedMasks.setNir(processNIRmask());
+						try {
+							processedMasks.setNir(processNIRmask());
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
 				}, name + "process NIR mask", 1) });
 		
@@ -65,27 +97,27 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		// empty
 	}
 	
-	protected FlexibleImage processVISimage() {
+	protected FlexibleImage processVISimage() throws InterruptedException {
 		return getInput().getImages().getVis();
 	}
 	
-	protected FlexibleImage processFLUOimage() {
+	protected FlexibleImage processFLUOimage() throws InterruptedException {
 		return getInput().getImages().getFluo();
 	}
 	
-	protected FlexibleImage processNIRimage() {
+	protected FlexibleImage processNIRimage() throws InterruptedException {
 		return getInput().getImages().getNir();
 	}
 	
-	protected FlexibleImage processVISmask() {
+	protected FlexibleImage processVISmask() throws InterruptedException {
 		return getInput().getMasks().getVis();
 	}
 	
-	protected FlexibleImage processFLUOmask() {
+	protected FlexibleImage processFLUOmask() throws InterruptedException {
 		return getInput().getMasks().getFluo();
 	}
 	
-	protected FlexibleImage processNIRmask() {
+	protected FlexibleImage processNIRmask() throws InterruptedException {
 		return getInput().getMasks().getNir();
 	}
 	

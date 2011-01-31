@@ -203,7 +203,12 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 			
 		}
 		
-		BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
+		try {
+			BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
 		
 		status.setCurrentStatusValueFine(100d);
 		input = null;

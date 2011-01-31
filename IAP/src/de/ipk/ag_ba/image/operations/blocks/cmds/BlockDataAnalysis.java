@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 public class BlockDataAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected FlexibleImage processVISmask() throws InterruptedException {
 		BufferedImage clrearRgbImage = dataAnalysis(getInput().getMasks().getVis().getBufferedImage(),
 				ImageConfiguration.RgbTop,
 				options.getRgbEpsilonA(), options.getRgbEpsilonB(), options.getMaxThreadsPerImage());
@@ -38,7 +38,7 @@ public class BlockDataAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected FlexibleImage processFLUOmask() throws InterruptedException {
 		BufferedImage clearFluorImage = dataAnalysis(getInput().getMasks().getFluo().getBufferedImage(),
 				ImageConfiguration.FluoTop,
 				options.getRgbEpsilonA(), options.getRgbEpsilonB(), options.getMaxThreadsPerImage());
@@ -54,7 +54,7 @@ public class BlockDataAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	// }
 	
 	private BufferedImage dataAnalysis(BufferedImage workImage, ImageConfiguration cameraTyp, double epsilonA,
-			double epsiolonB, int maxThreadsPerImage) {
+			double epsiolonB, int maxThreadsPerImage) throws InterruptedException {
 		
 		SubstanceInterface substance = new Substance();
 		substance.setName(cameraTyp.toString());

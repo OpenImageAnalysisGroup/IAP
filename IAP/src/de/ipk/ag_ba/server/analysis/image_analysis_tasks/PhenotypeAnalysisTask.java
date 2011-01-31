@@ -136,7 +136,12 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 				}
 			}, getName() + " job " + (idx++) + "/" + maxJob, -1));
 		}
-		BackgroundThreadDispatcher.waitFor(threads);
+		try {
+			BackgroundThreadDispatcher.waitFor(threads);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
 		
 		status.setCurrentStatusValueFine(100d);
 		input = null;
@@ -204,7 +209,7 @@ public class PhenotypeAnalysisTask extends AbstractImageAnalysisTask {
 		preProcessors.add(pre);
 	}
 	
-	public static LoadedImage clearBackground(LoadedImage image, int maximumThreadCount) {
+	public static LoadedImage clearBackground(LoadedImage image, int maximumThreadCount) throws InterruptedException {
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 		BlockClearBackground.clearBackgroundAndInterpretImage(image, maximumThreadCount, null, null, false, output, null, 2.5d, 5d);
 		LoadedImage res = (LoadedImage) output.iterator().next();

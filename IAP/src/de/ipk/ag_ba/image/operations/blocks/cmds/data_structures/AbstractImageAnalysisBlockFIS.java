@@ -38,14 +38,14 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	@Override
-	public final FlexibleMaskAndImageSet process() {
+	public final FlexibleMaskAndImageSet process() throws InterruptedException {
 		StopWatch w = debugStart(this.getClass().getSimpleName());
 		FlexibleMaskAndImageSet res = run();
 		debugEnd(w);
 		return res;
 	}
 	
-	protected abstract FlexibleMaskAndImageSet run();
+	protected abstract FlexibleMaskAndImageSet run() throws InterruptedException;
 	
 	protected StopWatch debugStart(String task) {
 		if (debugStack != null)

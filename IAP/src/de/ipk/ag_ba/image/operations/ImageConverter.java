@@ -30,7 +30,6 @@ import org.Colors;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
 
-
 public class ImageConverter {
 	public static void main(String[] args) {
 		
@@ -222,6 +221,9 @@ public class ImageConverter {
 	}
 	
 	public static BufferedImage convert2AtoBI(int[][] img) {
+		
+		if (img.length == 0)
+			return null;
 		
 		int width = img.length;
 		int height = img[0].length;

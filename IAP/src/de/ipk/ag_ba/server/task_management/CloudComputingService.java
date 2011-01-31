@@ -71,9 +71,13 @@ public class CloudComputingService {
 		System.out.println("*                                                 *");
 		System.out.println("***************************************************");
 		System.out.println("> SYSTEM ANALYSIS");
-		if (args.length > 0) {
+		if (args.length > 0 && args[0].contains("full")) {
 			System.out.println(": detected command line parameter - enabling full CPU utilization");
 			SystemAnalysis.setUseFullCpuPower(true);
+		}
+		if (args.length > 0 && args[0].contains("half")) {
+			System.out.println(": detected command line parameter - enabling half CPU utilization");
+			SystemAnalysis.setUseHalfCpuPower(true);
 		}
 		System.out.println("CPUs: " + SystemAnalysis.getRealNumberOfCPUs() + ", using " + SystemAnalysis.getNumberOfCPUs());
 		System.out.println("MEMORY: " + SystemAnalysis.getRealSystemMemoryInMB() / 1024 + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");

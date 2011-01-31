@@ -47,7 +47,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected FlexibleImage processVISmask() throws InterruptedException {
 		BufferedImage clrearRgbImage = clearBackground(getInput().getMasks().getVis().getBufferedImage(),
 				ImageConfiguration.RgbTop,
 				options.getRgbEpsilonA(), options.getRgbEpsilonB(), options.getMaxThreadsPerImage());
@@ -55,7 +55,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected FlexibleImage processFLUOmask() throws InterruptedException {
 		BufferedImage clearFluorImage = clearBackground(getInput().getMasks().getFluo().getBufferedImage(),
 				ImageConfiguration.FluoTop,
 				options.getFluoEpsilonA(), options.getFluoEpsilonB(), options.getMaxThreadsPerImage());
@@ -72,7 +72,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	// }
 	
 	private BufferedImage clearBackground(BufferedImage workImage, ImageConfiguration cameraTyp, double epsilonA,
-			double epsiolonB, int maxThreadsPerImage) {
+			double epsiolonB, int maxThreadsPerImage) throws InterruptedException {
 		
 		SubstanceInterface substance = new Substance();
 		substance.setName(cameraTyp.toString());
@@ -286,7 +286,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	public static void clearBackgroundAndInterpretImage(final LoadedImage limg, int maximumThreadCount,
 						DatabaseTarget storeResultInDatabase, final BackgroundTaskStatusProviderSupportingExternalCall status,
 						boolean isDataAnalysis, ArrayList<NumericMeasurementInterface> output,
-						ArrayList<ImagePreProcessor> preProcessors, final double epsilonA, final double epsilonB) {
+						ArrayList<ImagePreProcessor> preProcessors, final double epsilonA, final double epsilonB) throws InterruptedException {
 		
 		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
 		final int iBackgroundFill = backgroundFill.getRGB();

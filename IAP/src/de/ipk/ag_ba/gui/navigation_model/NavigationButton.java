@@ -309,6 +309,7 @@ public class NavigationButton implements StyleAware {
 			public void run() {
 				if ((n.isProcessing() || n.requestsTitleUpdates()) && n1.isVisible()) {
 					n1.setText(n.getTitle());
+					// System.out.println(n.getTitle());
 					if (n1.getText().indexOf("Please wait") >= 0)
 						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
 					else

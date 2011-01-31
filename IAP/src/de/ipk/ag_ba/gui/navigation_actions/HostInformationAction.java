@@ -24,7 +24,6 @@ public class HostInformationAction extends AbstractNavigationAction {
 	
 	private CloudHost ip;
 	private BackgroundTaskStatusProvider hostStatus;
-	protected int maxPipelines;
 	private NavigationButton src;
 	private MongoDB m;
 	
@@ -32,7 +31,6 @@ public class HostInformationAction extends AbstractNavigationAction {
 		super("Compute Node: " + ip.getHostName());
 		this.ip = ip;
 		this.m = m;
-		this.maxPipelines = 0;
 		
 		this.hostStatus = new BackgroundTaskStatusProvider() {
 			private String hostInfo;
@@ -64,14 +62,8 @@ public class HostInformationAction extends AbstractNavigationAction {
 						rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
 					else
 						return "idle, ";
-					String record = "";
-					if (ch.getPipelineExecutedWithinLast5Minutes() > maxPipelines)
-						maxPipelines = ch.getPipelineExecutedWithinLast5Minutes();
-					if (ch.getPipelineExecutedWithinLast5Minutes() < HostInformationAction.this.maxPipelines) {
-						record = ", " + maxPipelines + " max";
-					}
-					return rA + "t_p=" + ch.getLastPipelineTime() + " s" + (record.length() > 0 ? "<br>" : ", ") +
-							ch.getPipelineExecutedWithinLast5Minutes() + " p./5 min" + record;
+					return rA + "t_p=" + ch.getLastPipelineTime() + " s, " +
+							ch.getPipelineExecutedWithinCurrentHour() + " p.e.";
 				} catch (Exception e) {
 					// empty
 					return "unavailable";
