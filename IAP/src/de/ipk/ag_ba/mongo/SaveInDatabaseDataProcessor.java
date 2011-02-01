@@ -34,7 +34,7 @@ public class SaveInDatabaseDataProcessor extends AbstractExperimentDataProcessor
 		MongoDB m;
 		
 		mappingData = mappingData.clone();
-		mappingData.getHeader().setExcelfileid("");
+		mappingData.getHeader().setDatabaseId("");
 		
 		Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
 				"Target", MongoDB.getMongos()
