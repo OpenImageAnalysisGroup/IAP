@@ -119,7 +119,7 @@ public class MongoDB {
 	}
 	
 	public static MongoDB getLocalUnitTestsDB() {
-		return new MongoDB("Unit Tests local", "localUnitTests", "localhost", null, null, HashType.SHA512);
+		return new MongoDB("Unit Tests local", "localUnitTests", "ba-13", null, null, HashType.SHA512);
 	}
 	
 	private MongoDBhandler mh;
