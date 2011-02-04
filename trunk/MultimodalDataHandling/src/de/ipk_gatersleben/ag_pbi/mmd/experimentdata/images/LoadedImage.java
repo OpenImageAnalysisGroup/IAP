@@ -99,7 +99,7 @@ public class LoadedImage extends ImageData implements LoadedData {
 		MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(bos);
 		ImageIO.write(img, "png", ios);
 		byte[] content = bos.toByteArray();
-		MyByteArrayInputStream is = new MyByteArrayInputStream(content);
+		MyByteArrayInputStream is = new MyByteArrayInputStream(content, content.length);
 		return is;
 	}
 	
@@ -158,7 +158,7 @@ public class LoadedImage extends ImageData implements LoadedData {
 			MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
 			try {
 				ImageIO.write(image, "png", mos);
-				return new MyByteArrayInputStream(mos.getBuff());
+				return new MyByteArrayInputStream(mos.getBuff(), mos.size());
 			} catch (IOException e) {
 				e.printStackTrace();
 				ErrorMsg.addErrorMessage(e);

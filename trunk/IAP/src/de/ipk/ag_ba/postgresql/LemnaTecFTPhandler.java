@@ -66,7 +66,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					BackgroundTaskStatusProviderSupportingExternalCallImpl status = new CommandLineBackgroundTaskStatusProvider(
 										false);
 					MyAdvancedFTP.processFTPdownload(status, ur, bos);
-					return new MyByteArrayInputStream(bos.getBuff());
+					return new MyByteArrayInputStream(bos.getBuff(), bos.size());
 				} else {
 					return new BufferedInputStream(new URL(ur).openStream());
 				}

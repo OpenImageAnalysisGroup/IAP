@@ -63,7 +63,7 @@ public class MyImageIOhelper {
 		
 		ImageIO.write(previewImage, "png", ios);
 		byte[] content = bos.toByteArray();
-		MyByteArrayInputStream is = new MyByteArrayInputStream(content);
+		MyByteArrayInputStream is = new MyByteArrayInputStream(content, content.length);
 		return is;
 	}
 	

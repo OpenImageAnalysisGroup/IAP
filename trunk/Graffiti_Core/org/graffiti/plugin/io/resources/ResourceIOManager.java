@@ -100,14 +100,14 @@ public class ResourceIOManager {
 			return (MyByteArrayInputStream) is;
 		} else {
 			ResourceIOManager.copyContent(is, bos);
-			return new MyByteArrayInputStream(bos.toByteArray());
+			return new MyByteArrayInputStream(bos.toByteArray(), bos.size());
 		}
 	}
 	
 	public static MyByteArrayInputStream getInputStreamMemoryCached(InputStream is) throws IOException, Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ResourceIOManager.copyContent(is, bos);
-		return new MyByteArrayInputStream(bos.toByteArray());
+		return new MyByteArrayInputStream(bos.toByteArray(), bos.size());
 	}
 	
 	public static void copyContent(InputStream intemp, OutputStream out) throws IOException {

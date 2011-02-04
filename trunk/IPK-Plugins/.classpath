@@ -8,8 +8,6 @@
 	<classpathentry exported="true" kind="src" path="/Graffiti_Plugins"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/IPK_lib"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/jdom.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/activation.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/axis.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/batik-awt-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/batik-bridge.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/batik-css.jar"/>
@@ -36,10 +34,8 @@
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/jaxen-full.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/jcommon-0.9.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/jh.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/jruby.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/keggapi.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/mail.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/optional.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/parser.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/pdf-transcoder.jar"/>
@@ -50,8 +46,6 @@
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/soap.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/vecmath1.2-1.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/wsdl4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/xercesImpl.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/xmlParserAPIs.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-net-2.0.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-net-ftp-2.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>

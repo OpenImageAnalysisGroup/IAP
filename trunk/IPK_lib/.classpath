@@ -31,8 +31,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/soap.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/vecmath1.2-1.14.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/wsdl4j.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/xmlParserAPIs.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/batik-anim.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/batik-svggen.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/batik-awt-util.jar"/>

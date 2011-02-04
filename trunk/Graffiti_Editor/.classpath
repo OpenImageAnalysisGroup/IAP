@@ -4,6 +4,5 @@
 	<classpathentry excluding="build/|javadoc/|.classpath|.project|create_javadoc.xml|create_jarfile.jardesc|graffiti_editor.jar" kind="src" path=""/>
 	<classpathentry exported="true" kind="src" path="/Graffiti_Core"/>
 	<classpathentry kind="src" path="/Graffiti_lib"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/jh.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

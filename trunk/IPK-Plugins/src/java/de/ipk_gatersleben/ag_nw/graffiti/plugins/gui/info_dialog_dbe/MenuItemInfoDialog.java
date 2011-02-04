@@ -23,9 +23,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import javax.help.CSH;
-import javax.help.HelpBroker;
-import javax.help.HelpSet;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -280,32 +277,32 @@ public class MenuItemInfoDialog
 			}
 		}
 		
-		JMenuItem jMenuItemJavaHelp = new JMenuItem("Help Contents");
-		
-		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.GravistoJavaHelp)) {
-			try {
-				String helpHS = "main.hs";
-				HelpSet hs;
-				URL hsURL = HelpSet.findHelpSet(cl, helpHS);
-				if (hsURL != null) {
-					hs = new HelpSet(this.getClass().getClassLoader(), hsURL);
-					HelpBroker hb = hs.createHelpBroker();
-					hb.setCurrentID("main");
-					jMenuItemJavaHelp.addActionListener(new CSH.DisplayHelpFromSource(hb));
-				} else {
-					jMenuItemJavaHelp.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0) {
-							MainFrame.showMessageDialog(
-												"Help Function not fully accessible.", "Missing Help Topic"
-												);
-						}
-					});
-				}
-			} catch (Exception ee) {
-				ErrorMsg.addErrorMessage(ee);
-				return;
-			}
-		}
+		// JMenuItem jMenuItemJavaHelp = new JMenuItem("Help Contents");
+		//
+		// if (ReleaseInfo.getIsAllowedFeature(FeatureSet.GravistoJavaHelp)) {
+		// try {
+		// String helpHS = "main.hs";
+		// HelpSet hs;
+		// URL hsURL = HelpSet.findHelpSet(cl, helpHS);
+		// if (hsURL != null) {
+		// hs = new HelpSet(this.getClass().getClassLoader(), hsURL);
+		// HelpBroker hb = hs.createHelpBroker();
+		// hb.setCurrentID("main");
+		// jMenuItemJavaHelp.addActionListener(new CSH.DisplayHelpFromSource(hb));
+		// } else {
+		// jMenuItemJavaHelp.addActionListener(new ActionListener() {
+		// public void actionPerformed(ActionEvent arg0) {
+		// MainFrame.showMessageDialog(
+		// "Help Function not fully accessible.", "Missing Help Topic"
+		// );
+		// }
+		// });
+		// }
+		// } catch (Exception ee) {
+		// ErrorMsg.addErrorMessage(ee);
+		// return;
+		// }
+		// }
 		JMenuItem jMenuItemJavaHelpPDF = new JMenuItem("Help Contents (PDF)");
 		jMenuItemJavaHelpPDF.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -568,8 +565,8 @@ public class MenuItemInfoDialog
 		
 		int pos = 1;
 		insert(error, pos++);
-		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.GravistoJavaHelp))
-			insert(jMenuItemJavaHelp, pos++);
+		// if (ReleaseInfo.getIsAllowedFeature(FeatureSet.GravistoJavaHelp))
+		// insert(jMenuItemJavaHelp, pos++);
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.GravistoJavaHelp))
 			insert(jMenuItemJavaHelpPDF, pos++);
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.URL_HELPTEXT))

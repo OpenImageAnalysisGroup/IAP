@@ -37,7 +37,7 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 		MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(srcIS);
 		ObjectRef resultFileSize = new ObjectRef();
 		String hash = GravistoService.getHashFromInputStream(is, resultFileSize, m.getHashType());
-		is = new MyByteArrayInputStream((is).getBuff());
+		is = new MyByteArrayInputStream(is.getBuff(), is.available());
 		
 		GridFS fs = m.getGridFS(c);
 		long res = m.saveStream(hash, is, fs);

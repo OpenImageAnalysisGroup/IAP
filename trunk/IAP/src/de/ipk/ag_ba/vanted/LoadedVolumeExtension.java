@@ -275,7 +275,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		WriteAnimatedGif.saveAnimate(out, images.toArray(new BufferedImage[] {}), delayTimes.toArray(new String[] {}));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValueFine(100);
-		return new MyByteArrayInputStream(out.getBuff());
+		return new MyByteArrayInputStream(out.getBuff(), out.size());
 	}
 	
 	public long getVoxelCount() {

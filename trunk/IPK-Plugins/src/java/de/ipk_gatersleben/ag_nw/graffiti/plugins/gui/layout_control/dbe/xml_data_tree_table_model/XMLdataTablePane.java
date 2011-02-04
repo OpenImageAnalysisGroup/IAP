@@ -28,6 +28,7 @@ import org.jdom.JDOMException;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.JDOM2DOM;
 
 /**
  * @author Christian Klukas
@@ -92,7 +93,7 @@ public class XMLdataTablePane extends JComponent {
 		JEditorPane jep = null;
 		try {
 			org.w3c.dom.Document doc = XMLHelper.getDocumentFromXMLstring(n.getXMLstring());
-			jep = new JEditorPane("text/plain", XMLHelper.getOuterXmlPretty(doc.getFirstChild()));
+			jep = new JEditorPane("text/plain", JDOM2DOM.getOuterXmlPretty(doc.getFirstChild()));
 		} catch (IOException e) {
 			ErrorMsg.addErrorMessage(e);
 		} catch (TransformerException e) {

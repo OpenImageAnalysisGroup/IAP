@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: PluginXMLParser.java,v 1.1 2011-01-31 09:04:51 klukas Exp $
+// $Id: PluginXMLParser.java,v 1.2 2011-02-04 15:41:35 klukas Exp $
 
 package org.graffiti.managers.pluginmgr;
 
@@ -14,7 +14,6 @@ import java.io.InputStream;
 
 import org.ErrorMsg;
 import org.apache.commons.digester.Digester;
-import org.apache.commons.logging.impl.NoOpLog;
 import org.graffiti.core.StringBundle;
 import org.xml.sax.SAXException;
 
@@ -22,7 +21,7 @@ import org.xml.sax.SAXException;
  * The XML parser for the plugin descriptions. The plugin description
  * (<tt>plugin.xml</tt>) file is validated by the <tt>plugin.dtd</tt>.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class PluginXMLParser {
 	// ~ Static fields/initializers =============================================
@@ -41,7 +40,7 @@ public class PluginXMLParser {
 	// ~ Instance fields ========================================================
 	
 	/** The parser instance. */
-	private Digester parser;
+	private final Digester parser;
 	
 	/** A temporary plugin description, which is used by the xml parser. */
 	private PluginDescription description;
@@ -57,7 +56,7 @@ public class PluginXMLParser {
 		parser.setValidating(true);
 		parser.setErrorHandler(new PluginXMLParserErrorHandler());
 		
-		parser.setLogger(new NoOpLog());
+		// parser.setLogger(new NoOpLog());
 		
 		// register an alternative plugin.dtd URL
 		parser.register(PUBLIC_DTD_IDENTIFIER, PLUGIN_DTD_LOCAL);

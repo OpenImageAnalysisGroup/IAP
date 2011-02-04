@@ -67,7 +67,7 @@ public class ImageUploadData {
 				return null;
 			}
 		else
-			return new MyByteArrayInputStream(is.getBuff());
+			return new MyByteArrayInputStream(is.getBuff(), is.available());
 	}
 	
 	public InputStream getPreviewInputStream() {
