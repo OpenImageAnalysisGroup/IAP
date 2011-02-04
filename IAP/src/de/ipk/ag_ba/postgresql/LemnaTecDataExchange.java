@@ -605,7 +605,7 @@ public class LemnaTecDataExchange {
 				buf = out.getBuff();
 				blob2buf.put(url.toString(), buf);
 			}
-			TextFile tf = new TextFile(new MyByteArrayInputStream(buf), 0);
+			TextFile tf = new TextFile(new MyByteArrayInputStream(buf, buf.length), 0);
 			// System.out.println(url.toString());
 			byte[] b = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 			double angle = 0;

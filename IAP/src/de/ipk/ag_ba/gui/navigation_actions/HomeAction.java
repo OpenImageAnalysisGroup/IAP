@@ -40,7 +40,7 @@ public final class HomeAction extends AbstractNavigationAction {
 			homePrimaryActions.add(ne);
 		}
 		
-		NavigationButton rimas = RimasNav.getRimas(src.getGUIsetting());
+		NavigationButton rimas = RimasNav.getRimas(src != null ? src.getGUIsetting() : null);
 		homeActions.add(rimas);
 		
 		HTTPfolderSource dataSource = new MetaCropDataSource();
@@ -57,14 +57,14 @@ public final class HomeAction extends AbstractNavigationAction {
 		// vantedNB.getAction().addAdditionalEntity(startVanted0);
 		homeActions.add(vantedNB);
 		
-		NavigationButton serverStatusEntity = Other.getServerStatusEntity(true, src.getGUIsetting());
+		NavigationButton serverStatusEntity = Other.getServerStatusEntity(true, src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
 		
 		{
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
 								"General Bioinformatics Ressources", "img/pattern_graffiti_logo.png", "img/pattern_graffiti_logo.png");
 			ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://bioinformatics.ipk-gatersleben.de",
-								"img/browser.png", src.getGUIsetting()));
+								"img/browser.png", src != null ? src.getGUIsetting() : null));
 			for (NavigationButton nge : homeActions)
 				ipkBioInf.addAdditionalEntity(nge);
 			homePrimaryActions.add(new NavigationButton(ipkBioInf, guiSetting));
@@ -73,7 +73,7 @@ public final class HomeAction extends AbstractNavigationAction {
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Sino/German Network",
 								"Sino/German Network of Computational & Integrative Biology", "img/CIB_logo.png", "img/CIB_logo.png");
 			ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://www.imbio.de/forschung2/",
-								"img/browser.png", src.getGUIsetting()));
+								"img/browser.png", src != null ? src.getGUIsetting() : null));
 			// for (NavigationButton nge : homeActions)
 			// ipkBioInf.addAdditionalEntity(nge);
 			homePrimaryActions.add(new NavigationButton(ipkBioInf, guiSetting));
@@ -88,16 +88,18 @@ public final class HomeAction extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
-		initializeHomeActions(src.getGUIsetting());
+		initializeHomeActions(src != null ? src.getGUIsetting() : null);
 		bookmarks = new ArrayList<NavigationButton>();
-		try {
-			for (Bookmark b : Bookmark.getBookmarks()) {
-				BookmarkAction ba = new BookmarkAction(b);
-				NavigationButton nge = new NavigationButton(ba, ba.getImage(), src.getGUIsetting());
-				bookmarks.add(nge);
+		if (src != null) {
+			try {
+				for (Bookmark b : Bookmark.getBookmarks()) {
+					BookmarkAction ba = new BookmarkAction(b);
+					NavigationButton nge = new NavigationButton(ba, ba.getImage(), src.getGUIsetting());
+					bookmarks.add(nge);
+				}
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
 			}
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
 		}
 	}
 	
@@ -115,7 +117,7 @@ public final class HomeAction extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
-		homeNavigation.add(new NavigationButton(this, src.getGUIsetting()));
+		homeNavigation.add(new NavigationButton(this, src != null ? src.getGUIsetting() : null));
 		
 		for (NavigationButton n : bookmarks)
 			homeNavigation.add(n);

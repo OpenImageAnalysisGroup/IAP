@@ -30,7 +30,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.HelperClass;
 import org.StringManipulationTools;
-import org.apache.axis.AxisFault;
 import org.graffiti.graph.Node;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
@@ -39,7 +38,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
  * HTML Parser
  * 
  * @author Christian Klukas
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class KeggHelper implements HelperClass {
 	
@@ -343,8 +342,8 @@ public class KeggHelper implements HelperClass {
 			Definition[] def = serv.list_organisms();
 			for (int i = 0; i < def.length; i++)
 				result.add(new OrganismEntry(def[i].getEntry_id(), def[i].getDefinition()));
-		} catch (AxisFault e) {
-			ErrorMsg.addErrorMessage(StringManipulationTools.stringReplace(e.getFaultString(), "java.net.", ""));
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(StringManipulationTools.stringReplace(e.getMessage(), "java.net.", ""));
 		}
 		cachedOrganismList.clear();
 		cachedOrganismList.addAll(result);
@@ -362,8 +361,8 @@ public class KeggHelper implements HelperClass {
 			String[] links = serv.get_linked_pathways(pathway_id);
 			for (String l : links)
 				result.add(l.replaceFirst("path:", ""));
-		} catch (AxisFault e) {
-			ErrorMsg.addErrorMessage(StringManipulationTools.stringReplace(e.getFaultString(), "java.net.", ""));
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(StringManipulationTools.stringReplace(e.getMessage(), "java.net.", ""));
 		}
 		return result;
 	}

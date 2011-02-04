@@ -18,7 +18,7 @@ public class FTPhandler extends AbstractResourceIOHandler {
 		if (url.isEqualPrefix(getPrefix())) {
 			MyByteArrayOutputStream out = new MyByteArrayOutputStream();
 			HomeFolder.copyContent(new URL(url.toString()).openStream(), out);
-			return new MyByteArrayInputStream(out.getBuff());
+			return new MyByteArrayInputStream(out.getBuff(), out.size());
 		} else
 			return null;
 	}

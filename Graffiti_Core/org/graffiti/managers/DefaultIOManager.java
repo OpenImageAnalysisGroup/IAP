@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: DefaultIOManager.java,v 1.1 2011-01-31 09:04:56 klukas Exp $
+// $Id: DefaultIOManager.java,v 1.2 2011-02-04 15:41:35 klukas Exp $
 
 package org.graffiti.managers;
 
@@ -38,7 +38,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 /**
  * Handles the editor's IO serializers.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class DefaultIOManager implements IOManager {
 	
@@ -181,7 +181,7 @@ public class DefaultIOManager implements IOManager {
 			ResourceIOManager.copyContent(in, out, 5000);
 			for (InputSerializer is : ins) {
 				try {
-					InputStream inps = new MyByteArrayInputStream(out.getBuff());
+					InputStream inps = new MyByteArrayInputStream(out.getBuff(), out.size());
 					if (is.validFor(inps)) {
 						// System.out.println(ins.size() + " input serializers for file extension " + extSearch + ". Selected "
 						// + is.getClass().getCanonicalName());

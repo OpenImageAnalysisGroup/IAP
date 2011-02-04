@@ -52,7 +52,6 @@ import org.SystemInfo;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
-import org.graffiti.plugin.XMLHelper;
 import org.graffiti.plugin.view.View;
 import org.graffiti.session.Session;
 import org.graffiti.session.SessionListener;
@@ -1170,7 +1169,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 				try {
 					if (!ok)
 						xml += validationResult + "\n\n";
-					xml += document != null ? XMLHelper.getOuterXmlPretty(document) : "(XML == null)";
+					xml += document != null ? JDOM2DOM.getOuterXmlPretty(document) : "(XML == null)";
 				} catch (IOException e1) {
 					xml = "(" + e1.getMessage() + ")";
 				} catch (TransformerException e1) {

@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: ParameterEditPanel.java,v 1.1 2011-01-31 09:04:30 klukas Exp $
+// $Id: ParameterEditPanel.java,v 1.2 2011-02-04 15:41:29 klukas Exp $
 
 package org.graffiti.editor.dialog;
 
@@ -32,7 +32,6 @@ import javax.swing.SwingConstants;
 import org.AttributeHelper;
 import org.ErrorMsg;
 import org.FolderPanel;
-import org.JLabelJavaHelpLink;
 import org.graffiti.plugin.ToolTipHelper;
 import org.graffiti.plugin.editcomponent.StandardValueEditComponent;
 import org.graffiti.plugin.editcomponent.ValueEditComponent;
@@ -46,7 +45,7 @@ import org.graffiti.util.InstanceLoader;
 /**
  * Represents a parameter edit panel.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ParameterEditPanel extends JPanel {
 	// ~ Instance fields ========================================================
@@ -93,8 +92,8 @@ public class ParameterEditPanel extends JPanel {
 		String helpTopic = AttributeHelper.getHelpTopicFor(title, "parameter dialog");
 		if (helpTopic == null)
 			helpTopic = AttributeHelper.getHelpTopicFor(heading, "parameter dialog");
-		if (helpTopic != null)
-			helpL = JLabelJavaHelpLink.getHelpActionListener(helpTopic);
+		// if (helpTopic != null)
+		// helpL = JLabelJavaHelpLink.getHelpActionListener(helpTopic);
 		FolderPanel myPanel = new FolderPanel(title, false, false, false, helpL);
 		
 		int paramCnt = 0;
@@ -175,7 +174,7 @@ public class ParameterEditPanel extends JPanel {
 	 */
 	public Parameter[] getUpdatedParameters() {
 		for (Iterator<ValueEditComponent> it = displayedVEC.iterator(); it.hasNext();) {
-			((ValueEditComponent) it.next()).setValue();
+			(it.next()).setValue();
 		}
 		
 		return this.parameters;

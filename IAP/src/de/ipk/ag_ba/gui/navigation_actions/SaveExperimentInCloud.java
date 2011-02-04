@@ -349,4 +349,14 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		return fId < lId ? fId : lId;
 	}
 	
+	@Override
+	public String getDefaultTitle() {
+		return "Add Files";
+	}
+	
+	@Override
+	public String getDefaultImage() {
+		return "img/ext/user-desktop.png";
+	}
+	
 }

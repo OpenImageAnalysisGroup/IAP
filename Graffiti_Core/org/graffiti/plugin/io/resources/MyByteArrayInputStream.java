@@ -13,8 +13,8 @@ import java.io.ByteArrayInputStream;
  */
 public class MyByteArrayInputStream extends ByteArrayInputStream {
 	
-	public MyByteArrayInputStream(byte[] buf) {
-		super(buf);
+	public MyByteArrayInputStream(byte[] buf, int validLen) {
+		super(buf, 0, validLen);
 	}
 	
 	public MyByteArrayInputStream() {

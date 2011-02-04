@@ -5,12 +5,11 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: XMLHelper.java,v 1.1 2011-01-31 09:05:04 klukas Exp $
+// $Id: XMLHelper.java,v 1.2 2011-02-04 15:41:35 klukas Exp $
 
 package org.graffiti.plugin;
 
 // Java imports
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,10 +34,6 @@ import javax.xml.validation.Validator;
 import org.ErrorMsg;
 import org.HelperClass;
 import org.StringManipulationTools;
-import org.jdom.JDOMException;
-import org.jdom.input.DOMBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -106,22 +101,22 @@ public class XMLHelper implements HelperClass {
 		return result;
 	}
 	
-	public static String getOuterXmlPretty(Node n) throws IOException, TransformerException, JDOMException {
-		ByteArrayInputStream is = new ByteArrayInputStream(getOuterXml(n).getBytes("UTF-8"));
-		Document doc = getDocument(is);
-		StringWriter resultStringWriter = new StringWriter();
-		XMLOutputter serializer = new XMLOutputter();
-		serializer.setFormat(Format.getPrettyFormat());
-		serializer.output(getJDOMfromDOM(doc), resultStringWriter);
-		String result = resultStringWriter.toString();
-		result = StringManipulationTools.stringReplace(result, "'", "&apos;");
-		return result;
-	}
-	
-	public static org.jdom.Document getJDOMfromDOM(org.w3c.dom.Document doc) {
-		DOMBuilder db = new DOMBuilder();
-		return db.build(doc);
-	}
+	// public static String getOuterXmlPretty(Node n) throws IOException, TransformerException, JDOMException {
+	// ByteArrayInputStream is = new ByteArrayInputStream(getOuterXml(n).getBytes("UTF-8"));
+	// Document doc = getDocument(is);
+	// StringWriter resultStringWriter = new StringWriter();
+	// XMLOutputter serializer = new XMLOutputter();
+	// serializer.setFormat(Format.getPrettyFormat());
+	// serializer.output(getJDOMfromDOM(doc), resultStringWriter);
+	// String result = resultStringWriter.toString();
+	// result = StringManipulationTools.stringReplace(result, "'", "&apos;");
+	// return result;
+	// }
+	//
+	// public static org.jdom.Document getJDOMfromDOM(org.w3c.dom.Document doc) {
+	// DOMBuilder db = new DOMBuilder();
+	// return db.build(doc);
+	// }
 	
 	/**
 	 * @param xmlString

@@ -717,13 +717,15 @@ public class MongoDB {
 		String hashMain = hashes[0];
 		String hashLabel = hashes[1];
 		if (isMain instanceof MyByteArrayInputStream)
-			isMain = new MyByteArrayInputStream(((MyByteArrayInputStream) isMain).getBuff());
+			isMain = new MyByteArrayInputStream(((MyByteArrayInputStream) isMain).getBuff(),
+					((MyByteArrayInputStream) isMain).available());
 		else
 			isMain = id.getURL().getInputStream();
 		
 		if (isLabel != null) {
 			if (isLabel instanceof MyByteArrayInputStream)
-				isLabel = new MyByteArrayInputStream(((MyByteArrayInputStream) isLabel).getBuff());
+				isLabel = new MyByteArrayInputStream(((MyByteArrayInputStream) isLabel).getBuff(),
+						((MyByteArrayInputStream) isLabel).available());
 			else
 				isLabel = id.getLabelURL().getInputStream();
 		}
