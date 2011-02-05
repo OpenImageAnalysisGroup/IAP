@@ -15,6 +15,8 @@ import javax.swing.Timer;
 public class SettingsHelperDefaultIsTrue implements HelperClass {
 	
 	public boolean isEnabled(String name) {
+		if (ReleaseInfo.isRunningAsApplet())
+			return true;
 		return !new File(ReleaseInfo.getAppFolderWithFinalSep() + "feature_disabled_" + encode(name)).exists();
 	}
 	

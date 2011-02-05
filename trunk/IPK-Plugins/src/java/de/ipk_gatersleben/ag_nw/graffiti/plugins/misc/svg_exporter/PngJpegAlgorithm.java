@@ -96,7 +96,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					NeedsSwingThread {
@@ -432,6 +432,12 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		a.attach(g, null);
 		a.execute(g, replaceExtension(g.getName(true), "png"), "png",
 							BufferedImage.TYPE_INT_RGB, resultView, null);
+	}
+	
+	public static BufferedImage createPNGimageFromGraphGetBI(Graph g, int maxW, int maxH) {
+		PngJpegAlgorithmParams settings = new PngJpegAlgorithmParams();
+		settings.setScaleFixedUseWidthOrHeightValue(maxW);
+		return PngJpegAlgorithm.getActiveGraphViewImage(g, BufferedImage.TYPE_INT_RGB, "png", settings, null, false);
 	}
 	
 	public static void createPNGimageFromGraph(Graph g,

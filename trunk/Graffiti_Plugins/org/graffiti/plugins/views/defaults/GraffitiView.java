@@ -6,7 +6,7 @@
 // Copyright (c) 2003-2009 IPK-Gatersleben
 //
 // ==============================================================================
-// $Id: GraffitiView.java,v 1.1 2011-01-31 09:03:28 klukas Exp $
+// $Id: GraffitiView.java,v 1.2 2011-02-05 20:33:32 klukas Exp $
 
 package org.graffiti.plugins.views.defaults;
 
@@ -53,6 +53,7 @@ import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.ReleaseInfo;
 import org.color.ColorUtil;
 import org.graffiti.attributes.Attributable;
 import org.graffiti.attributes.Attribute;
@@ -130,7 +131,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	
 	private boolean blockEdges = false;
 	
-	public boolean threadedRedraw = true;
+	public boolean threadedRedraw = !ReleaseInfo.isRunningAsApplet();
 	
 	protected CoordinateSystem coordinateSystem = CoordinateSystem.XY;
 	
@@ -417,7 +418,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		
 		final JComponent finishElement = new JLabel("Ende...");
 		
-		final Thread t = new Thread(new Runnable() {
+		Runnable r = new Runnable() {
 			public void run() {
 				if (getGraph() == null)
 					return;
@@ -489,8 +490,10 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 						}
 					}
 					try {
-						run.shutdown();
-						run.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+						if (threadedRedraw) {
+							run.shutdown();
+							run.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+						}
 						JComponent sp2 = (JComponent) ErrorMsg.findParentComponent(getViewComponent(), JInternalFrame.class);
 						if (sp2 != null)
 							sp2.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -532,13 +535,15 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 				}
 				MainFrame.showMessage("", MessageType.INFO);
 			}
-		});
-		t.setName("Attribute GUI Component Creation");
-		t.setPriority(Thread.NORM_PRIORITY);
-		if (threadedRedraw)
+		};
+		if (threadedRedraw) {
+			final Thread t = new Thread(r);
+			t.setName("Attribute GUI Component Creation");
+			t.setPriority(Thread.NORM_PRIORITY);
 			t.start();
-		else
-			t.run();
+		} else {
+			r.run();
+		}
 		if (!isThreadedF) {
 			addElements(result, finishElement, startTime, isThreadedF);
 		}
@@ -1701,7 +1706,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * DOCUMENT ME!
 	 * 
 	 * @author $Author: klukas $
-	 * @version $Revision: 1.1 $ $Date: 2011-01-31 09:03:28 $
+	 * @version $Revision: 1.2 $ $Date: 2011-02-05 20:33:32 $
 	 */
 	class ZoomedMouseListener implements MouseListener {
 		/** DOCUMENT ME! */
@@ -1757,7 +1762,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * DOCUMENT ME!
 	 * 
 	 * @author $Author: klukas $
-	 * @version $Revision: 1.1 $ $Date: 2011-01-31 09:03:28 $
+	 * @version $Revision: 1.2 $ $Date: 2011-02-05 20:33:32 $
 	 */
 	class ZoomedMouseMotionListener implements MouseMotionListener {
 		/** DOCUMENT ME! */

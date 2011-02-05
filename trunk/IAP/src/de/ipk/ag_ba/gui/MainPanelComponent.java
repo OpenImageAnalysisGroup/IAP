@@ -34,14 +34,20 @@ public class MainPanelComponent {
 	
 	HashMap<String, Object> properties = new HashMap<String, Object>();
 	private JComponent component;
+	private Collection<String> htmlTextPanels;
 	
 	public MainPanelComponent(JComponent gui) {
 		this.component = gui;
 	}
 	
+	public Collection<String> getHTML() {
+		return htmlTextPanels;
+	}
+	
 	public MainPanelComponent(Collection<String> htmlTextPanels) {
-		ArrayList<JComponent> infos = new ArrayList<JComponent>();
+		this.htmlTextPanels = htmlTextPanels;
 		
+		ArrayList<JComponent> infos = new ArrayList<JComponent>();
 		for (String txt : htmlTextPanels) {
 			final JEditorPane jep;
 			jep = new JEditorPane();

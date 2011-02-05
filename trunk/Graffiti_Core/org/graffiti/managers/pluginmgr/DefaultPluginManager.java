@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: DefaultPluginManager.java,v 1.1 2011-01-31 09:04:51 klukas Exp $
+// $Id: DefaultPluginManager.java,v 1.2 2011-02-05 20:33:31 klukas Exp $
 
 package org.graffiti.managers.pluginmgr;
 
@@ -38,7 +38,7 @@ import org.graffiti.util.StringSplitter;
 /**
  * Manages the list of plugins.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class DefaultPluginManager
 					implements PluginManager {
@@ -303,7 +303,8 @@ public class DefaultPluginManager
 			runVIP = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		
 		loadSetOfPlugins(plugins, progressViewer, runVIP, loading, true);
-		runVIP.shutdown();
+		if (!ReleaseInfo.isRunningAsApplet())
+			runVIP.shutdown();
 		
 		if (progressViewer != null)
 			progressViewer.setText("Load plugins...");
@@ -315,26 +316,29 @@ public class DefaultPluginManager
 			run = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		
 		loadSetOfPlugins(plugins, progressViewer, run, loading, false);
-		run.shutdown();
+		if (!ReleaseInfo.isRunningAsApplet())
+			run.shutdown();
 		
-		int maxTime = 60;
-		try {
-			if (run.awaitTermination(maxTime, TimeUnit.SECONDS)) {
-				if (progressViewer != null)
-					progressViewer.setText("All plugins loaded!");
-			} else {
-				synchronized (loading) {
-					System.err.println("Loading of plugin " + loading.size() + " not finished (time-out).");
-					System.err.println("Possible error causes (intialization time over " + maxTime + " seconds):");
-					System.err.println("* Plugin implementation errors");
-					System.err.println("* A very slow computer, or starting the application under high system load");
+		if (!ReleaseInfo.isRunningAsApplet()) {
+			int maxTime = 60;
+			try {
+				if (run.awaitTermination(maxTime, TimeUnit.SECONDS)) {
 					if (progressViewer != null)
-						progressViewer.setText("Time-out: " + loading.size() + " plugins not initialized!");
+						progressViewer.setText("All plugins loaded!");
+				} else {
+					synchronized (loading) {
+						System.err.println("Loading of plugin " + loading.size() + " not finished (time-out).");
+						System.err.println("Possible error causes (intialization time over " + maxTime + " seconds):");
+						System.err.println("* Plugin implementation errors");
+						System.err.println("* A very slow computer, or starting the application under high system load");
+						if (progressViewer != null)
+							progressViewer.setText("Time-out: " + loading.size() + " plugins not initialized!");
+					}
+					Thread.sleep(5000);
 				}
-				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				ErrorMsg.addErrorMessage(e);
 			}
-		} catch (InterruptedException e) {
-			ErrorMsg.addErrorMessage(e);
 		}
 		synchronized (loading) {
 			for (String s : loading)
@@ -358,8 +362,8 @@ public class DefaultPluginManager
 			if (desc == null)
 				System.err.println("Invalid plugin description for file " + pluginUrl.toString());
 			else
-				if ((loadPriorityPlugins && desc.isPriorityPlugin()) || (!loadPriorityPlugins && !desc.isPriorityPlugin()))
-					run.submit(new Runnable() {
+				if ((loadPriorityPlugins && desc.isPriorityPlugin()) || (!loadPriorityPlugins && !desc.isPriorityPlugin())) {
+					Runnable r = new Runnable() {
 						public void run() {
 							try {
 								if (desc.getDependencies().size() > 0)
@@ -409,7 +413,12 @@ public class DefaultPluginManager
 							}
 							
 						}
-					});
+					};
+					if (!ReleaseInfo.isRunningAsApplet())
+						run.submit(r);
+					else
+						r.run();
+				}
 		}
 	}
 	
@@ -719,8 +728,11 @@ public class DefaultPluginManager
 			System.out.println("No Class Definition Found: " + description.getMain());
 			throw new PluginManagerException(nce.getMessage() + " (cause: " + nce.getCause().getMessage() + ") ",
 								description.toString());
+		} catch (Throwable tre) {
+			System.out.println("Instance Creation Exception: " + description.getMain());
+			throw new PluginManagerException(tre.getMessage() + " (cause: " + tre.getCause().getMessage() + ") ",
+												description.toString());
 		}
-		
 		// update status (if available).
 		if (progressViewer != null) {
 			progressViewer.setText("Loading " + description.getName() + ": OK");

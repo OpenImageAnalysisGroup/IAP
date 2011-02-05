@@ -39,7 +39,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.MenuItemInf
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class Main {
 	// ~ Static fields/initializers =============================================
@@ -128,49 +128,52 @@ public class Main {
 		
 		splashScreen.setVisible(showMainFrame);
 		
-		GravistoMainHelper.createApplicationSettingsFolder(splashScreen);
+		if (!ReleaseInfo.isRunningAsApplet())
+			GravistoMainHelper.createApplicationSettingsFolder(splashScreen);
 		
-		if (!showMainFrame && !(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted")).exists() &&
+		if (!ReleaseInfo.isRunningAsApplet())
+			if (!showMainFrame && !(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted")).exists() &&
 							!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected")).exists()) { // command line version automatically rejects
-			// kegg
-			try {
-				new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected").createNewFile();
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		}
-		
-		if (!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted")).exists() &&
-							!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected")).exists()) {
-			
-			ReleaseInfo.setIsFirstRun(true);
-			
-			splashScreen.setVisible(false);
-			splashScreen.setText("Request KEGG License Status");
-			int result = askForEnablingKEGG();
-			if (result == JOptionPane.YES_OPTION) {
-				try {
-					new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted").createNewFile();
-				} catch (IOException e) {
-					ErrorMsg.addErrorMessage(e);
-				}
-			}
-			if (result == JOptionPane.NO_OPTION) {
+				// kegg
 				try {
 					new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected").createNewFile();
-				} catch (IOException e) {
-					ErrorMsg.addErrorMessage(e);
+				} catch (Exception e1) {
+					e1.printStackTrace();
 				}
 			}
-			if (result == JOptionPane.CANCEL_OPTION) {
-				JOptionPane.showMessageDialog(
+		
+		if (!ReleaseInfo.isRunningAsApplet())
+			if (!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted")).exists() &&
+							!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected")).exists()) {
+				
+				ReleaseInfo.setIsFirstRun(true);
+				
+				splashScreen.setVisible(false);
+				splashScreen.setText("Request KEGG License Status");
+				int result = askForEnablingKEGG();
+				if (result == JOptionPane.YES_OPTION) {
+					try {
+						new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted").createNewFile();
+					} catch (IOException e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
+				if (result == JOptionPane.NO_OPTION) {
+					try {
+						new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected").createNewFile();
+					} catch (IOException e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
+				if (result == JOptionPane.CANCEL_OPTION) {
+					JOptionPane.showMessageDialog(
 									null,
 									"Startup of VANTED is aborted.", "VANTED Program Features Initialization",
 									JOptionPane.INFORMATION_MESSAGE);
-				System.exit(0);
+					System.exit(0);
+				}
+				splashScreen.setVisible(true);
 			}
-			splashScreen.setVisible(true);
-		}
 		
 		GravistoMainHelper.initApplicationExt(GravistoMainHelper.getNewPluginManager(), args, splashScreen, cl, null, addon);
 	}

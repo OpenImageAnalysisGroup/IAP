@@ -52,10 +52,10 @@ public class Book {
 	}
 	
 	public NavigationButton getNavigationButton(NavigationButton src) {
-		NavigationAction action = new AbstractNavigationAction("Show in browser") {
+		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
-				AttributeHelper.showInBrowser(getUrl());
+				AttributeHelper.showInBrowser(Book.this.getUrl());
 			}
 			
 			@Override
@@ -66,6 +66,11 @@ public class Book {
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				return null;
+			}
+			
+			@Override
+			public String getURL() {
+				return Book.this.getUrl();
 			}
 		};
 		NavigationButton website = new NavigationButton(action, getTitle(), getIcon(),

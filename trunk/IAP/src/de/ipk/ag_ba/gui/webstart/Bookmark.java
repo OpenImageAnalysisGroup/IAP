@@ -94,10 +94,11 @@ public class Bookmark {
 	
 	public static ArrayList<Bookmark> getBookmarks() {
 		ArrayList<Bookmark> res = new ArrayList<Bookmark>();
-		for (int i = 0; i < 99; i++) {
-			if (new File(getFileName(".txt", i)).exists())
-				res.add(new Bookmark(i));
-		}
+		if (!ReleaseInfo.isRunningAsApplet())
+			for (int i = 0; i < 99; i++) {
+				if (new File(getFileName(".txt", i)).exists())
+					res.add(new Bookmark(i));
+			}
 		return res;
 	}
 	

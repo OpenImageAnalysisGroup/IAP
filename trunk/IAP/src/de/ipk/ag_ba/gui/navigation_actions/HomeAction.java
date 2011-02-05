@@ -3,7 +3,6 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProvider;
-import org.ErrorMsg;
 
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
@@ -97,8 +96,9 @@ public final class HomeAction extends AbstractNavigationAction {
 					NavigationButton nge = new NavigationButton(ba, ba.getImage(), src.getGUIsetting());
 					bookmarks.add(nge);
 				}
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
+			} catch (Throwable e) {
+				// ErrorMsg.addErrorMessage(e);
+				System.out.println("Can't access bookmarks: " + e.getMessage());
 			}
 		}
 	}

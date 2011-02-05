@@ -48,6 +48,7 @@ import org.graffiti.session.EditorSession;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_actions.AbstractGraphUrlNavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -81,10 +82,15 @@ public class IAPservice {
 	}
 	
 	public static NavigationButton getPathwayViewEntity(final PathwayWebLinkItem mmc, GUIsetting guiSettings) {
-		NavigationButton ne = new NavigationButton(new AbstractNavigationAction("Load web-folder content") {
+		NavigationButton ne = new NavigationButton(new AbstractGraphUrlNavigationAction("Load web-folder content") {
 			private NavigationButton src = null;
 			private final ObjectRef graphRef = new ObjectRef();
 			private final ObjectRef scrollpaneRef = new ObjectRef();
+			
+			@Override
+			public String getURL() {
+				return mmc.getURL().toString();
+			}
 			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
@@ -311,7 +317,8 @@ public class IAPservice {
 															BackgroundTaskHelper.executeLaterOnSwingTask(100, new Runnable() {
 																@Override
 																public void run() {
-																	ReleaseInfo.getApplet().repaint();
+																	if (ReleaseInfo.getApplet() != null)
+																		ReleaseInfo.getApplet().repaint();
 																}
 															});
 														}
@@ -329,6 +336,7 @@ public class IAPservice {
 				}
 				return null;
 			}
+			
 		}, mmc.toString(), "img/graphfile.png", guiSettings);
 		
 		return ne;
