@@ -5,13 +5,12 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: GenericBundle.java,v 1.1 2011-01-31 09:04:46 klukas Exp $
+// $Id: GenericBundle.java,v 1.2 2011-02-05 20:33:31 klukas Exp $
 
 package org.graffiti.core;
 
 import java.net.URL;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -32,7 +31,7 @@ public abstract class GenericBundle {
 		try {
 			resources = ResourceBundle.getBundle(getBundleLocation(),
 								Locale.getDefault());
-		} catch (MissingResourceException mre) {
+		} catch (Throwable mre) {
 			System.err.println(getBundleLocation() + ".properties not found.");
 			mre.printStackTrace(System.err);
 		}
@@ -72,7 +71,7 @@ public abstract class GenericBundle {
 	public String getString(String id) {
 		try {
 			return resources.getString(id);
-		} catch (MissingResourceException mre) {
+		} catch (Throwable mre) {
 			return null;
 		}
 	}

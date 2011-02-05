@@ -115,7 +115,7 @@ public class GravistoMainHelper implements HelperClass {
 		for (String pluginLocation : pluginLocations) {
 			if (pluginLocation != null && pluginLocation.length() > 0) {
 				final String fpluginLocation = pluginLocation.substring(2);
-				run.submit(new Runnable() {
+				Runnable r = new Runnable() {
 					public void run() {
 						try {
 							String pluginLocation = StringManipulationTools.stringReplace(fpluginLocation, "\\", "/");
@@ -146,16 +146,22 @@ public class GravistoMainHelper implements HelperClass {
 							messages.add(err.getLocalizedMessage());
 						}
 					}
-				});
+				};
+				if (!ReleaseInfo.isRunningAsApplet())
+					run.submit(r);
+				else
+					r.run();
 				
 			}
 		}
 		
-		run.shutdown();
-		try {
-			run.awaitTermination(120, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			ErrorMsg.addErrorMessage(e);
+		if (!ReleaseInfo.isRunningAsApplet()) {
+			run.shutdown();
+			try {
+				run.awaitTermination(120, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				ErrorMsg.addErrorMessage(e);
+			}
 		}
 		
 		int loaded = pluginEntries.size();
@@ -228,8 +234,6 @@ public class GravistoMainHelper implements HelperClass {
 	}
 	
 	public static void createApplicationSettingsFolder(SplashScreenInterface splashScreen) {
-		if (ReleaseInfo.isRunningAsApplet())
-			return;
 		if (!new File(ReleaseInfo.getAppFolder()).isDirectory()) {
 			splashScreen.setVisible(false);
 			boolean success = (new File(ReleaseInfo.getAppFolder())).mkdirs();
@@ -393,14 +397,16 @@ public class GravistoMainHelper implements HelperClass {
 			ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
 		}
 		
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				JMenu dummyScipt = new JMenu("Dummy Script");
-				DefaultContextMenuManager.returnScriptMenu(dummyScipt);
-			}
-		});
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
+		if (!ReleaseInfo.isRunningAsApplet()) {
+			Thread t = new Thread(new Runnable() {
+				public void run() {
+					JMenu dummyScipt = new JMenu("Dummy Script");
+					DefaultContextMenuManager.returnScriptMenu(dummyScipt);
+				}
+			});
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.start();
+		}
 		
 		splashScreen.setText("Processing finished");
 		
@@ -437,17 +443,18 @@ public class GravistoMainHelper implements HelperClass {
 		
 		GravistoService.loadFiles();
 		
-		if (ReleaseInfo.isFirstRun()) {
-			Runnable r = new Runnable() {
-				public void run() {
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						ErrorMsg.addErrorMessage(e);
-					}
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							int res = JOptionPane
+		if (!ReleaseInfo.isRunningAsApplet())
+			if (ReleaseInfo.isFirstRun()) {
+				Runnable r = new Runnable() {
+					public void run() {
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+							ErrorMsg.addErrorMessage(e);
+						}
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								int res = JOptionPane
 												.showConfirmDialog(
 																	mainFrame,
 																	"<html>"
@@ -459,40 +466,9 @@ public class GravistoMainHelper implements HelperClass {
 																						+ "Click 'Yes' to open the download command window. You may use the menu command<br>"
 																						+ "'Help/Database Status' at a later time to download or update the database files.",
 																	"Show database download window?", JOptionPane.YES_NO_OPTION);
-							if (res == 0) {
-								DatabaseFileStatusService.showStatusDialog();
-							}
-						}
-					});
-				}
-				
-			};
-			Thread tt = new Thread(r);
-			tt.setName("Ask for database download");
-			tt.start();
-		} else {
-			final String lastVersion = ReleaseInfo
-								.getOldVersionIfAppHasBeenUpdated(DBEgravistoHelper.DBE_GRAVISTO_VERSION);
-			if (lastVersion != null) {
-				Runnable r = new Runnable() {
-					public void run() {
-						try {
-							Thread.sleep(2000);
-						} catch (InterruptedException e) {
-							ErrorMsg.addErrorMessage(e);
-						}
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								if (!ReleaseInfo.getIsAllowedFeature(FeatureSet.ADDON_LOADING))
-									return;
-								if (AddonManagerPlugin.getInstance() == null
-													|| AddonManagerPlugin.getInstance().getAddons().size() <= 0) // &&
-									// AddonManagerPlugin.getInstance().getDeactivatedAddons().size()<=0)
-									JOptionPane.showMessageDialog(mainFrame, "<html>" + "<h3>Application has been updated!</h3>"
-														+ "Previous installation of " + lastVersion + " is replaced by "
-														+ DBEgravistoHelper.DBE_GRAVISTO_VERSION + ".<br><br>"
-														+ "Side panel 'Help'/'News' contains information about updates.", "Information",
-														JOptionPane.INFORMATION_MESSAGE);
+								if (res == 0) {
+									DatabaseFileStatusService.showStatusDialog();
+								}
 							}
 						});
 					}
@@ -501,8 +477,39 @@ public class GravistoMainHelper implements HelperClass {
 				Thread tt = new Thread(r);
 				tt.setName("Ask for database download");
 				tt.start();
+			} else {
+				final String lastVersion = ReleaseInfo
+								.getOldVersionIfAppHasBeenUpdated(DBEgravistoHelper.DBE_GRAVISTO_VERSION);
+				if (lastVersion != null) {
+					Runnable r = new Runnable() {
+						public void run() {
+							try {
+								Thread.sleep(2000);
+							} catch (InterruptedException e) {
+								ErrorMsg.addErrorMessage(e);
+							}
+							SwingUtilities.invokeLater(new Runnable() {
+								public void run() {
+									if (!ReleaseInfo.getIsAllowedFeature(FeatureSet.ADDON_LOADING))
+										return;
+									if (AddonManagerPlugin.getInstance() == null
+													|| AddonManagerPlugin.getInstance().getAddons().size() <= 0) // &&
+										// AddonManagerPlugin.getInstance().getDeactivatedAddons().size()<=0)
+										JOptionPane.showMessageDialog(mainFrame, "<html>" + "<h3>Application has been updated!</h3>"
+														+ "Previous installation of " + lastVersion + " is replaced by "
+														+ DBEgravistoHelper.DBE_GRAVISTO_VERSION + ".<br><br>"
+														+ "Side panel 'Help'/'News' contains information about updates.", "Information",
+														JOptionPane.INFORMATION_MESSAGE);
+								}
+							});
+						}
+						
+					};
+					Thread tt = new Thread(r);
+					tt.setName("Ask for database download");
+					tt.start();
+				}
 			}
-		}
 		
 		return mainFrame;
 	}

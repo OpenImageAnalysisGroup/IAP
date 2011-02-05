@@ -31,6 +31,7 @@ import org.graffiti.plugin.view.ZoomListener;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.navigation_actions.AbstractUrlNavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.Book;
 import de.ipk.ag_ba.gui.navigation_actions.Library;
 import de.ipk.ag_ba.gui.navigation_actions.Other;
@@ -318,7 +319,7 @@ public class WebFolder {
 	
 	public static NavigationButton getURLentity(String title, final String referenceURL, String image,
 						GUIsetting guiSetting) {
-		NavigationAction action = new AbstractNavigationAction("Show in browser") {
+		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
 				AttributeHelper.showInBrowser(referenceURL);
@@ -332,6 +333,11 @@ public class WebFolder {
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				return null;
+			}
+			
+			@Override
+			public String getURL() {
+				return referenceURL;
 			}
 		};
 		NavigationButton website = new NavigationButton(action, title, image, guiSetting);

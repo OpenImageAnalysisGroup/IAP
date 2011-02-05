@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MainFrame.java,v 1.1 2011-01-31 09:04:28 klukas Exp $
+// $Id: MainFrame.java,v 1.2 2011-02-05 20:33:38 klukas Exp $
 
 package org.graffiti.editor;
 
@@ -193,7 +193,7 @@ import scenario.ScenarioService;
 /**
  * Constructs a new graffiti frame, which contains the main gui components.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class MainFrame extends JFrame implements SessionManager, SessionListener, PluginManagerListener,
 					UndoableEditListener, EditorDefaultValues, IOManager.IOManagerListener, ViewManager.ViewManagerListener,
@@ -420,7 +420,16 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	// for the recentfilelist
 	private RecentEntry[] recentfileslist;
 	private Component enclosingseparator;
-	private final File recentlist = new File(ReleaseInfo.getAppFolderWithFinalSep() + "recentfiles.txt");
+	private final File recentlist = ReleaseInfo.isRunningAsApplet() ? null : getRecentFile();
+	
+	private File getRecentFile() {
+		try {
+			return new File(ReleaseInfo.getAppFolderWithFinalSep() + "recentfiles.txt");
+		} catch (Throwable t) {
+			// e.g. security exceptions
+			return null;
+		}
+	}
 	
 	// ~ Constructors ===========================================================
 	
@@ -2821,55 +2830,55 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 		fileMenu.add(createMenuItem(fileSave));
 		fileMenu.add(createMenuItem(fileSaveAs));
 		
-		fileMenu.addSeparator();
-		
-		// get recentfile-list from previous run(s)
-		if (!recentlist.exists())
+		if (!ReleaseInfo.isRunningAsApplet()) {
+			fileMenu.addSeparator();
+			
+			// get recentfile-list from previous run(s)
+			if (!recentlist.exists())
+				try {
+					recentlist.createNewFile();
+				} catch (IOException e1) {
+					ErrorMsg.addErrorMessage(e1);
+				}
+			
+			String[] sb = { "", "", "", "", "" };
+			int cnt = 0;
+			
 			try {
-				recentlist.createNewFile();
+				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(getRecentFile())));
+				String s;
+				while ((s = in.readLine()) != null && cnt < 5) {
+					sb[cnt++] = s;
+				}
+				in.close();
 			} catch (IOException e1) {
 				ErrorMsg.addErrorMessage(e1);
+				e1.printStackTrace();
 			}
-		
-		String[] sb = { "", "", "", "", "" };
-		int cnt = 0;
-		
-		try {
-			BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(
-								ReleaseInfo.getAppFolderWithFinalSep() + "recentfiles.txt"))));
-			String s;
-			while ((s = in.readLine()) != null && cnt < 5) {
-				sb[cnt++] = s;
-			}
-			in.close();
-		} catch (IOException e1) {
-			ErrorMsg.addErrorMessage(e1);
-			e1.printStackTrace();
+			
+			fileMenu.addSeparator();
+			enclosingseparator = fileMenu.getMenuComponent(fileMenu.getMenuComponentCount() - 1);
+			if (cnt > 0 && !sb[0].equalsIgnoreCase(""))
+				enclosingseparator.setVisible(true);
+			else
+				enclosingseparator.setVisible(false);
+			
+			recentfileslist = new RecentEntry[5];
+			
+			recentfileslist[0] = new RecentEntry(sb[0], cnt > 0, iBundle.getImageIcon("menu.file.open.icon"));
+			fileMenu.add(recentfileslist[0]);
+			// recentfileslist[0].setAccelerator(KeyStroke.getKeyStroke(
+			// KeyEvent.VK_1, ActionEvent.C));
+			
+			recentfileslist[1] = new RecentEntry(sb[1], cnt > 1, iBundle.getImageIcon("menu.file.open.icon"));
+			fileMenu.add(recentfileslist[1]);
+			recentfileslist[2] = new RecentEntry(sb[2], cnt > 2, iBundle.getImageIcon("menu.file.open.icon"));
+			fileMenu.add(recentfileslist[2]);
+			recentfileslist[3] = new RecentEntry(sb[3], cnt > 3, iBundle.getImageIcon("menu.file.open.icon"));
+			fileMenu.add(recentfileslist[3]);
+			recentfileslist[4] = new RecentEntry(sb[4], cnt > 4, iBundle.getImageIcon("menu.file.open.icon"));
+			fileMenu.add(recentfileslist[4]);
 		}
-		
-		fileMenu.addSeparator();
-		enclosingseparator = fileMenu.getMenuComponent(fileMenu.getMenuComponentCount() - 1);
-		if (cnt > 0 && !sb[0].equalsIgnoreCase(""))
-			enclosingseparator.setVisible(true);
-		else
-			enclosingseparator.setVisible(false);
-		
-		recentfileslist = new RecentEntry[5];
-		
-		recentfileslist[0] = new RecentEntry(sb[0], cnt > 0, iBundle.getImageIcon("menu.file.open.icon"));
-		fileMenu.add(recentfileslist[0]);
-		// recentfileslist[0].setAccelerator(KeyStroke.getKeyStroke(
-		// KeyEvent.VK_1, ActionEvent.C));
-		
-		recentfileslist[1] = new RecentEntry(sb[1], cnt > 1, iBundle.getImageIcon("menu.file.open.icon"));
-		fileMenu.add(recentfileslist[1]);
-		recentfileslist[2] = new RecentEntry(sb[2], cnt > 2, iBundle.getImageIcon("menu.file.open.icon"));
-		fileMenu.add(recentfileslist[2]);
-		recentfileslist[3] = new RecentEntry(sb[3], cnt > 3, iBundle.getImageIcon("menu.file.open.icon"));
-		fileMenu.add(recentfileslist[3]);
-		recentfileslist[4] = new RecentEntry(sb[4], cnt > 4, iBundle.getImageIcon("menu.file.open.icon"));
-		fileMenu.add(recentfileslist[4]);
-		
 		fileMenu.addSeparator();
 		
 		fileMenu.add(createMenuItem(fileClose));

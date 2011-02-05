@@ -9,6 +9,8 @@ import java.io.IOException;
 public class SettingsHelperDefaultIsFalse extends SettingsHelperDefaultIsTrue {
 	
 	public boolean isEnabled(String name) {
+		if (ReleaseInfo.isRunningAsApplet())
+			return false;
 		return new File(ReleaseInfo.getAppFolderWithFinalSep() + "feature_enabled_" + encode(name)).exists();
 	}
 	

@@ -13,6 +13,8 @@ import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
+import org.ReleaseInfo;
+
 public class MyJLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
 	private String fullText = "";
@@ -35,37 +37,38 @@ public class MyJLabel extends JLabel {
 			}
 		};
 		
-		GlobalHotkeyManager hotkeyManager = GlobalHotkeyManager.getInstance();
-		hotkeyManager.getInputMap().put(statusHotkey, STATUS_KEY);
-		hotkeyManager.getActionMap().put(STATUS_KEY, uirobot);
-		
-		this.addMouseListener(new MouseListener() {
+		if (!ReleaseInfo.isRunningAsApplet()) {
+			GlobalHotkeyManager hotkeyManager = GlobalHotkeyManager.getInstance();
+			hotkeyManager.getInputMap().put(statusHotkey, STATUS_KEY);
+			hotkeyManager.getActionMap().put(STATUS_KEY, uirobot);
 			
-			public void mouseClicked(MouseEvent e) {
-				if (fullText != null && fullText.trim().length() > 0)
-					MainFrame.showMessageDialogWithScrollBars(fullText, "Status Message");
-			}
-			
-			public void mousePressed(MouseEvent e) {
-				//
+			this.addMouseListener(new MouseListener() {
+				public void mouseClicked(MouseEvent e) {
+					if (fullText != null && fullText.trim().length() > 0)
+						MainFrame.showMessageDialogWithScrollBars(fullText, "Status Message");
+				}
 				
-			}
-			
-			public void mouseReleased(MouseEvent e) {
-				//
+				public void mousePressed(MouseEvent e) {
+					//
+					
+				}
 				
-			}
-			
-			public void mouseEntered(MouseEvent e) {
-				//
+				public void mouseReleased(MouseEvent e) {
+					//
+					
+				}
 				
-			}
-			
-			public void mouseExited(MouseEvent e) {
-				//
+				public void mouseEntered(MouseEvent e) {
+					//
+					
+				}
 				
-			}
-		});
+				public void mouseExited(MouseEvent e) {
+					//
+					
+				}
+			});
+		}
 	}
 	
 	@Override

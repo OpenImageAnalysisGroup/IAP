@@ -217,7 +217,7 @@ public class MongoDB {
 				} catch (Exception err) {
 					System.out.println("EXEC " + (nrep - repeats + 1) + " ERROR: " + err.getLocalizedMessage() + " T=" + IAPservice.getCurrentTimeAsNiceString());
 					e = err;
-					BackgroundThreadDispatcher.waitSec(5);
+					Thread.sleep(5000);
 				}
 				repeats--;
 			} while (!ok && repeats > 0);

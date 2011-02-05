@@ -139,11 +139,7 @@ public class IAPgui {
 							+ "It may not work reliable, only a small subset of future functions are implemented.<br>"
 							+ "<br>"
 							+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
-							+ "Dr Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a><br>"
-							+ "<br><small>"
-							+ "Hints: Before working with the system, please wait until the label of the Overview button "
-							+ "stops to spin. It is possible to copy or bookmark the URL from the browser window "
-							+ "in order to be able to quickly navigate again to the same information in the future.";
+							+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>";
 	}
 	
 	public static void navigateTo(final String target, NavigationButton src) {

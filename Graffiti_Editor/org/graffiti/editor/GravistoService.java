@@ -69,7 +69,6 @@ import org.graffiti.plugin.algorithm.ProvidesAccessToOtherAlgorithms;
 import org.graffiti.plugin.algorithm.ProvidesGeneralContextMenu;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
-import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.parameter.Parameter;
 import org.graffiti.plugin.view.View;
 import org.graffiti.selection.Selection;
@@ -945,20 +944,6 @@ public class GravistoService implements HelperClass {
 			return null;
 		else
 			return new ImageIcon(GravistoService.getScaledImage(new ImageIcon(url).getImage(), w, h));
-	}
-	
-	public static byte[] loadImageSaveAsPNG(@SuppressWarnings("rawtypes") Class class1, String name, int w, int h) throws Exception {
-		URL url = getResource(class1, name);
-		if (url == null)
-			return null;
-		else {
-			BufferedImage bi = GravistoService.getScaledImage(new ImageIcon(url).getImage(), w, h);
-			MyByteArrayOutputStream bos = new MyByteArrayOutputStream();
-			
-			ImageIO.write(bi, "png", bos);
-			
-			return bos.getBuffTrimmed();
-		}
 	}
 	
 	public static BufferedImage loadImage(@SuppressWarnings("rawtypes") Class class1, String name, int w, int h) throws Exception {
