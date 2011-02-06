@@ -96,7 +96,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					NeedsSwingThread {
@@ -436,7 +436,10 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	
 	public static BufferedImage createPNGimageFromGraphGetBI(Graph g, int maxW, int maxH) {
 		PngJpegAlgorithmParams settings = new PngJpegAlgorithmParams();
-		settings.setScaleFixedUseWidthOrHeightValue(maxW);
+		settings.setWithBorder(true);
+		settings.setScaleSetting(SizeSetting.FIXED);
+		settings.setMaxWidth(maxW);
+		settings.setMaxHeight(maxW);
 		return PngJpegAlgorithm.getActiveGraphViewImage(g, BufferedImage.TYPE_INT_RGB, "png", settings, null, false);
 	}
 	
@@ -1088,7 +1091,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			if (mf == null)
 				mf = new MainFrame();
 			JScrollPane sp = mf.showViewChooserDialog(session, true, null,
-								LoadSetting.VIEW_CHOOSER_NEVER_DONT_ADD_VIEW_TO_EDITORSESSION,
+								LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION,
 								new ConfigureViewAction() {
 									private View v;
 									
