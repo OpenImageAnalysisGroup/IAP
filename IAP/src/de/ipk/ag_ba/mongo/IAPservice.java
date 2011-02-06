@@ -180,7 +180,7 @@ public class IAPservice {
 						final ObjectRef refLastURL = new ObjectRef();
 						final ObjectRef refLastDragPoint = new ObjectRef("", new Vector2d(0, 0));
 						JScrollPane graphViewScrollPane = MainFrame.getInstance().showViewChooserDialog(es, true, null,
-											LoadSetting.VIEW_CHOOSER_NEVER_DONT_ADD_VIEW_TO_EDITORSESSION, new ConfigureViewAction() {
+											LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION, new ConfigureViewAction() {
 												View newView;
 												
 												@Override

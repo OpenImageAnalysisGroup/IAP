@@ -15,7 +15,7 @@ public class PDFSVGAlgorithm extends AbstractAlgorithm {
 	public Parameter[] getParameters() {
 		return new Parameter[] {
 							new ObjectListParameter(type, "Vectorgraphics type", "Choose the type of vector graphics to be used", ExportType.values()),
-							new BooleanParameter(addBorder, "Add image border",
+							new BooleanParameter(addBorder, "Add image border (empty space around the image)",
 												"<html>"
 																	+ "If enabled, the graph will be surrounded by a border. The size of the border<br>" +
 																	"will be the distance between the origin (0,0) and the most top-left graphelement.<br>" +
