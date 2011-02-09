@@ -16,7 +16,7 @@ public class BlockRemoveSmallClustersOnFluo extends AbstractSnapshotAnalysisBloc
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(0.001d).getImage();
+		return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getRemoveSmallClusterSize()).getImage();
 	}
 	
 }

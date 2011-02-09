@@ -39,6 +39,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
+/**
+ * @author Entzian, Klukas
+ */
+
 public class ImageOperation extends ImageConverter {
 	
 	private final ImagePlus image;
@@ -540,7 +544,7 @@ public class ImageOperation extends ImageConverter {
 		
 		double width = 0, hight = 0;
 		
-		Roi boundingBox;
+		// Roi boundingBox;
 		
 		for (int i = 0; i < 1; i++) {
 			rotate(i);
@@ -956,8 +960,8 @@ public class ImageOperation extends ImageConverter {
 			int[] clusterPerimeter = ps.getPerimeter();
 			double[] clusterCircleSimilarity = ps.getCircuitRatio();
 			
-			boolean log = false;
-			if (log)
+			boolean log2 = false;
+			if (log2)
 				for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
 					if (clusterSizes[clusterID] > 25)
 						System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "

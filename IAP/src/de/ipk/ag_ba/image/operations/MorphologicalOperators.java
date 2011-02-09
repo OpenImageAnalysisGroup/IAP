@@ -3,6 +3,7 @@
  *************************************************************************/
 package de.ipk.ag_ba.image.operations;
 
+
 /**
  * @author entzian
  */
