@@ -211,13 +211,13 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		
 		switch (operationType) {
 			case TRANSLATION:
-				borderLeft = -10;
-				borderRight = 10;
+				borderLeft = -20;
+				borderRight = 20;
 				break;
 			
 			case SCALING:
-				borderLeft = 0.95;
-				borderRight = 1.05;
+				borderLeft = 0.85;
+				borderRight = 1.15;
 				break;
 			
 			case ROTATION:
