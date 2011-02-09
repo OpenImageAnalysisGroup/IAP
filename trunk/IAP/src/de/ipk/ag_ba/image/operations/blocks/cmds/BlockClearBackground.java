@@ -152,7 +152,9 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 						double l = arrayL[i];
 						double a = arrayA[i];
 						double b = arrayB[i];
-						if (a > 21 || b < 5) {
+						
+						// if (a > 21 || b < 2) {
+						if (a > 21 || b < 5) { // geht für arabidopsis
 							// if (a > 21 || b < 5 || a > -6) { // a < -5 &&
 							rgbArray[i] = iBackgroundFill;
 						} else {

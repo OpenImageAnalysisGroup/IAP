@@ -16,12 +16,13 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(0.001d).getImage();
+		
+		return new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(options.getRemoveSmallClusterSize()).getImage();
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(0.001d).getImage();
+		return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getRemoveSmallClusterSize()).getImage();
 	}
 	
 	// @Override

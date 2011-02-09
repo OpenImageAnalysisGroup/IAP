@@ -40,6 +40,12 @@ public class ImageProcessorOptions {
 	private int erodeFluoTop;
 	private int closingNirTop;
 	
+	private int dilateRgbSide;
+	private int erodeRgbSide;
+	private int dilateFluoSide;
+	private int erodeFluoSide;
+	private int closingNirSide;
+	
 	private int postProcessDilateRgbTop;
 	private int postProcessErodeRgbTop;
 	private int postProcessDilateFluoTop;
@@ -53,6 +59,15 @@ public class ImageProcessorOptions {
 	
 	private boolean debugOverlayResultImage;
 	
+	private double removeSmallClusterSize;
+	
+	private CameraTyp camerTyp;
+	
+	public enum CameraTyp {
+		TOP, SIDE
+		
+	}
+	
 	public ImageProcessorOptions() {
 		this(1.0);
 	}
@@ -62,6 +77,10 @@ public class ImageProcessorOptions {
 	}
 	
 	public void initStandardValues(double scale) {
+		
+		setCameraTyp(CameraTyp.TOP);
+		
+		setRemoveSmallClusterSize(0.001d);
 		
 		setScale(scale);
 		
@@ -96,6 +115,13 @@ public class ImageProcessorOptions {
 		
 		setClosingNirTop((int) Math.ceil(1 * scale));
 		
+		setDilateRgbSide((int) Math.ceil(3 * scale));
+		setErodeRgbSide((int) Math.ceil(2 * scale));
+		setDilateFluoSide((int) Math.ceil(1 * scale));
+		setErodeFluoSide((int) Math.ceil(1 * scale));
+		
+		setClosingNirSide((int) Math.ceil(1 * scale));
+		
 		double d = 1;
 		setPostProcessDilateRgbTop((int) Math.ceil(d * scale));
 		setPostProcessErodeRgbTop((int) Math.ceil(d * scale));
@@ -111,6 +137,11 @@ public class ImageProcessorOptions {
 	}
 	
 	// ########## SET ###############
+	
+	public void setRemoveSmallClusterSize(double removeSmallClusterSize) {
+		this.removeSmallClusterSize = removeSmallClusterSize;
+		
+	}
 	
 	private void setScale(double scale) {
 		this.scale = scale;
@@ -212,7 +243,37 @@ public class ImageProcessorOptions {
 		this.nearNumberOfDilateLoops = nearNumberOfDilateLoops;
 	}
 	
+	public void setCameraTyp(CameraTyp top) {
+		this.camerTyp = top;
+		
+	}
+	
+	public void setDilateRgbSide(int dilateRgbSide) {
+		this.dilateRgbSide = dilateRgbSide;
+	}
+	
+	public void setErodeRgbSide(int erodeRgbSide) {
+		this.erodeRgbSide = erodeRgbSide;
+	}
+	
+	public void setDilateFluoSide(int dilateFluoSide) {
+		this.dilateFluoSide = dilateFluoSide;
+	}
+	
+	public void setErodeFluoSide(int erodeFluoSide) {
+		this.erodeFluoSide = erodeFluoSide;
+	}
+	
+	public void setClosingNirSide(int closingNirSide) {
+		this.closingNirSide = closingNirSide;
+	}
+	
 	// ########## GET #############
+	
+	public double getRemoveSmallClusterSize() {
+		return removeSmallClusterSize;
+		
+	}
 	
 	public double getScale() {
 		return scale;
@@ -437,4 +498,30 @@ public class ImageProcessorOptions {
 	public int getMaxThreadsPerImage() {
 		return 2;
 	}
+	
+	public CameraTyp getCameraTyp() {
+		return camerTyp;
+		
+	}
+	
+	public int getDilateRgbSide() {
+		return dilateRgbSide;
+	}
+	
+	public int getErodeRgbSide() {
+		return erodeRgbSide;
+	}
+	
+	public int getDilateFluoSide() {
+		return dilateFluoSide;
+	}
+	
+	public int getErodeFluoSide() {
+		return erodeFluoSide;
+	}
+	
+	public int getClosingNirSide() {
+		return closingNirSide;
+	}
+	
 }

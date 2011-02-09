@@ -23,11 +23,17 @@ public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private FlexibleImage closingOpening(FlexibleImage mask, FlexibleImage image) {
 		
-		FlexibleImage workImage = closingOpening(mask, image, options.getBackground(), 1);
+		FlexibleImage workImage = closingOpening(mask, image, options.getBackground(), 2);
 		return workImage;
 	}
 	
 	private static FlexibleImage closingOpening(FlexibleImage flMask, FlexibleImage flImage, int iBackgroundFill, int repeat) {
+		
+		// dauert länger
+		// ImageOperation maskIo = new ImageOperation(flMask);
+		// maskIo.closing();
+		// return new FlexibleImage(maskIo.getImageAs2array());
+		
 		int[] rgbArray = flMask.getConvertAs1A();
 		int h = flMask.getHeight();
 		int w = flMask.getWidth();
@@ -65,6 +71,7 @@ public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		
 		return new FlexibleImage(rgbArray, w, h);
+		
 		// PrintImage.printImage(rgbArray, w, h);
 		//
 		// ImageOperation save = new ImageOperation(rgbArray, w, h);

@@ -55,7 +55,7 @@ public class PixelSegmentation {
 	private int[] clusterMap;
 	private boolean[] linesRun;
 	
-	private boolean calculatePerimeterAndRatio;
+	private final boolean calculatePerimeterAndRatio;
 	
 	public PixelSegmentation(int[][] image) {
 		this(image, NeighbourhoodSetting.NB4);
@@ -74,6 +74,8 @@ public class PixelSegmentation {
 			default:
 				nb = false;
 		}
+		
+		calculatePerimeterAndRatio = true;
 	}
 	
 	// ############### Public ####################
@@ -142,25 +144,33 @@ public class PixelSegmentation {
 		} else
 			if (durchlauf == 2) {
 				firstPass(); // Each pixel is assigned to a cluster
+				
 				StopWatch s = new StopWatch("Merge ALEX");
 				mergeHashMapRecursive();
+				
 				s.printTime();
 				secondPass(); // Cluster are renumbered
+				
 				if (calculatePerimeterAndRatio) {
 					calculatePerimeterOfEachCluster();
 					calculateCircuitRatio();
 				}
+				
 				calculateCenter();
 			} else {
 				firstPass(); // Each pixel is assigned to a cluster
 				// StopWatch s = new StopWatch("Merge Chris");
+				
 				mergeHashMapToepfe();
+				
 				// s.printTime();
 				secondPassToepfe(); // Cluster are renumbered
+				
 				if (calculatePerimeterAndRatio) {
 					calculatePerimeterOfEachCluster();
 					calculateCircuitRatio();
 				}
+				
 				calculateCenter();
 			}
 		
@@ -194,10 +204,20 @@ public class PixelSegmentation {
 					if (x > cluster_max_x[clusterId])
 						cluster_max_x[clusterId] = x;
 					if (y > cluster_max_y[clusterId])
-						cluster_max_x[clusterId] = y;
+						cluster_max_y[clusterId] = y;
 				}
 			}
 		}
+		
+		// System.out.println("Länge von cluster_min_x: " + cluster_min_x.length);
+		// System.out.println("Länge von cluster_max_x: " + cluster_max_x.length);
+		// System.out.println("Länge von cluster_min_y: " + cluster_min_y.length);
+		// System.out.println("Länge von cluster_max_y: " + cluster_max_y.length);
+		
+		// for (int i = 0; i <= cluster_min_x.length; i++)
+		// System.out.println("Cluster: " + i + " min_x: " + cluster_min_x[i] + " min_y: " + cluster_min_y[i] + " max_x: " + cluster_max_x[i] + " max_y: "
+		// + cluster_max_y[i]);
+		
 	}
 	
 	private void calculateCircuitRatio() {
@@ -264,7 +284,7 @@ public class PixelSegmentation {
 	}
 	
 	public void printClusterArray() {
-		printClusterArray(this.image_cluster_size);
+		printClusterArray(image_cluster_size);
 	}
 	
 	public void printClusterArray(int[] zaehlerArray2) {
@@ -825,6 +845,7 @@ public class PixelSegmentation {
 	}
 	
 	public Vector2d[] getClusterCenterPoints() {
+		
 		Vector2d[] res = new Vector2d[cluster_min_x.length];
 		for (int i = 0; i < cluster_min_x.length; i++) {
 			int w = cluster_max_x[i] - cluster_min_x[i];
@@ -834,25 +855,30 @@ public class PixelSegmentation {
 			int cy = cluster_min_y[i] + h / 2;
 			
 			res[i] = new Vector2d(cx, cy);
+			
+			// System.out.println("Center of Cluster = " + i + " Point X = " + cx + " Y = " + cy);
 		}
+		
 		return res;
 	}
 	
 	public int[] getClusterSizeNormalized(int w, int h) {
 		Vector2d[] clusterCenters = getClusterCenterPoints();
-		int[] res = getClusterSize();
+		int[] output = new int[getClusterSize().length];
+		int[] input = getClusterSize();
 		
-		Vector2d imageCenter = new Vector2d(w / 2, h / 2);
-		
-		for (int cluster = 0; cluster < res.length; cluster++) {
+		for (int cluster = 1; cluster < input.length; cluster++) {
 			Vector2d center = clusterCenters[cluster];
-			double d = imageCenter.distance(center);
+			double distanceFromCenterToCluster = clusterCenters[0].distance(center);
+			double distanceFromCenterToLeftTopEdge = clusterCenters[0].distance(new Vector2d(0, 0));
 			
-			res[cluster] = (int) (res[cluster] *
-					(1 - Math.max(imageCenter.y - d * 1.5, 0) / imageCenter.y));
+			output[cluster] = (int) (input[cluster] * ((distanceFromCenterToLeftTopEdge - distanceFromCenterToCluster) / distanceFromCenterToLeftTopEdge));
+			
+			// System.out.println("cluster = " + cluster + " newPixel = " + output[cluster] + " oldPixel = " + input[cluster] + " Abstand zum Zentrum: " +
+			// distanceFromCenterToCluster);
 		}
 		
-		return res;
+		return output;
 	}
 	
 }
