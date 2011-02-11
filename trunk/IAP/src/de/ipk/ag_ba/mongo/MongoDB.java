@@ -97,12 +97,13 @@ public class MongoDB {
 	
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
-		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
-			res.add(getDefaultCloud());
-			res.add(new MongoDB("Backup (md5)", "cloud2", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", null, null, HashType.MD5));
-		} else
-			res.add(getLocalDB());
 		
+		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
+		res.add(getDefaultCloud());
+		// res.add(new MongoDB("Backup (md5)", "cloud2", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", null, null, HashType.MD5));
+		// } else
+		// res.add(getLocalDB());
+		// }
 		// if (IAPservice.isReachable("localhost")) {
 		// res.add(new MongoDB("local dbe3", "local_dbe3", "localhost", null, null, HashType.SHA512));
 		// res.add(new MongoDB("local dbe4", "local_dbe4", "localhost", null, null, HashType.SHA512));

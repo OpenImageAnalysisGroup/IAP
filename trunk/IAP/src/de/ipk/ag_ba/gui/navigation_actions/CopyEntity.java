@@ -30,9 +30,13 @@ public class CopyEntity extends AbstractExperimentAnalysisNavigation {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
+		Object[] sel = null;
+		if (MongoDB.getMongos().size() > 1) {
+			sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
 							"Target", MongoDB.getMongos()
-		});
+			});
+		} else
+			sel = new Object[] { MongoDB.getMongos().iterator().next() };
 		
 		if (sel == null)
 			return;
