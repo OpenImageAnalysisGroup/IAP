@@ -218,7 +218,7 @@ public class MongoDB {
 				} catch (Exception err) {
 					System.out.println("EXEC " + (nrep - repeats + 1) + " ERROR: " + err.getLocalizedMessage() + " T=" + IAPservice.getCurrentTimeAsNiceString());
 					e = err;
-					Thread.sleep(5000);
+					// Thread.sleep(5000);
 				}
 				repeats--;
 			} while (!ok && repeats > 0);
@@ -1410,9 +1410,11 @@ public class MongoDB {
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
 					DBObject dbo = new BasicDBObject();
-					dbo.put("_id", batch.get("_id"));
-					BatchCmd res = (BatchCmd) collection.findOne(dbo);
-					tso.setParam(0, res);
+					if (batch.get("_id") != null) {
+						dbo.put("_id", batch.get("_id"));
+						BatchCmd res = (BatchCmd) collection.findOne(dbo);
+						tso.setParam(0, res);
+					}
 				}
 				
 				@Override

@@ -21,7 +21,6 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -37,7 +36,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	private final MongoDB m;
 	
 	public MongoOrLemnaTecExperimentNavigationAction(ExperimentHeaderInterface ei, MongoDB m) {
-		super(ei.getExcelfileid() != null && ei.getExcelfileid().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
+		super(ei.getDatabaseId() != null && ei.getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
 							: "Access Systems Biology Cloud Data Set");
 		header = ei;
 		this.m = m;
@@ -49,7 +48,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		// actions.add(FileManager.getFileManagerEntity(login, pass,
 		// ei.experimentName));
 		
-		if (header != null && !header.getExcelfileid().startsWith("lemnatec:")
+		if (header != null && !header.getDatabaseId().startsWith("lemnatec:")
 							&& (header.getImportusername() == null || header.getImportusername().equals(SystemAnalysis.getUserName()))) {
 			if (header.inTrash()) {
 				actions.add(Trash.getTrashEntity(header, DeletionCommand.UNTRASH, src.getGUIsetting(), m));
@@ -99,7 +98,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		if (header.getExcelfileid() != null && header.getExcelfileid().startsWith("lemnatec:"))
+		if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("lemnatec:"))
 			experiment = new LemnaTecDataExchange().getExperiment(header, status);
 		else
 			experiment = m.getExperiment(header);
@@ -107,7 +106,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	
 	@Override
 	public String getDefaultImage() {
-		if (header.getExcelfileid() != null && header.getExcelfileid().startsWith("lemnatec:"))
+		if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("lemnatec:"))
 			return "img/000Grad_3-gray.png";
 		else
 			return "img/ext/image-x-generic-off.png";
@@ -115,7 +114,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		if (header.getExcelfileid() != null && header.getExcelfileid().startsWith("lemnatec:"))
+		if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("lemnatec:"))
 			return "img/000Grad_3.png";
 		else
 			return "img/ext/image-x-generic.png";
