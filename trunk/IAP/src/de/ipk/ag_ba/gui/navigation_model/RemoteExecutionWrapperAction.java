@@ -36,7 +36,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		ArrayList<CloudHost> targetIPs = remoteAction.getMongoDB().batchGetAvailableHosts(10000);
-		if (targetIPs.isEmpty()) {
+		if (false && targetIPs.isEmpty()) {
 			MainFrame.showMessageDialog("No active compute node found.", "Information");
 		} else {
 			String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
