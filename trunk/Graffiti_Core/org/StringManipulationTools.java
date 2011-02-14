@@ -668,7 +668,14 @@ public class StringManipulationTools implements HelperClass {
 			out.append(in.charAt(i));
 		return out.toString();
 	}
-
+	
+	/**
+	 * @param d
+	 *           e.g. 3.14159
+	 * @param pattern
+	 *           e.g. #.##
+	 * @return e.g. 3.14
+	 */
 	public static String formatNumber(double d, String pattern) {
 		return ErrorMsg.getDecimalFormat(pattern).format(d);
 	}

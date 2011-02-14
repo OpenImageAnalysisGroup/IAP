@@ -14,6 +14,7 @@ import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -123,12 +124,14 @@ public class TaskDescription {
 									}
 								}
 							}
-							System.out.println("TODO: " + batch.getPartCnt() + ", FINISHED: " + knownResults.size());
+							System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
+							System.out.println("> TODO: " + batch.getPartCnt() + ", FINISHED: " + knownResults.size());
 							if (knownResults.size() >= batch.getPartCnt()) {
 								System.out.println("*****************************");
 								System.out.println("MERGE RESULTS:");
 								System.out.println("TODO: " + batch.getPartCnt() + ", RESULTS FINISHED: " + knownResults.size());
 								Experiment e = new Experiment();
+								long tFinish = System.currentTimeMillis();
 								for (ExperimentHeaderInterface i : knownResults) {
 									ExperimentInterface ei = m.getExperiment(i);
 									if (ei.getNumberOfMeasurementValues() > 0)
@@ -148,6 +151,12 @@ public class TaskDescription {
 										ci.setExperimentName(e.getHeader().getExperimentname());
 									}
 								}
+								long tStart = cmd.getSubmissionTime();
+								long tProcessing = tFinish - tStart;
+								long minutes = tProcessing / 1000 / 60;
+								e.getHeader().setRemark(e.getHeader().getRemark() + " // processing time (min): " + minutes);
+								System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
+								System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
 								System.out.println("*****************************");
 								System.out.println("Merged Experiment: " + e.getName());
 								System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
