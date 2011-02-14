@@ -62,7 +62,7 @@ public class SystemAnalysisExt {
 			 * reg04: base=0x800000000 (32768MB), size=32768MB, count=1: write-back
 			 * reg05: base=0x1000000000 (65536MB), size= 2048MB, count=1: write-back
 			 */
-			return getLinuxLastLineInfo("/proc/mtrr", "(", "MB)") / 1024;
+			return getLinuxLastLineInfo("/proc/mtrr", "(", "MB)")/1024;
 		} else {
 			if (SystemInfo.isMac()) {
 				return getMacSysctl("hw.memsize") / 1024 / 1024 / 1024;
@@ -110,7 +110,7 @@ public class SystemAnalysisExt {
 					s = s.substring(s.indexOf(tagA) + tagA.length());
 					if (s.contains(tagB)) {
 						s = s.substring(0, s.indexOf(tagB));
-						long l = Long.parseLong(s.trim()) / 1024;
+						long l = Long.parseLong(s.trim());
 						result = l;
 					}
 				}
