@@ -79,8 +79,11 @@ public class CloudComputingService {
 			System.out.println(": detected command line parameter - enabling half CPU utilization");
 			SystemAnalysis.setUseHalfCpuPower(true);
 		}
-		System.out.println("CPUs: " + SystemAnalysis.getRealNumberOfCPUs() + ", using " + SystemAnalysis.getNumberOfCPUs());
-		System.out.println("MEMORY: " + SystemAnalysis.getRealSystemMemoryInMB() / 1024 + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
+		SystemInfoExt si = new SystemInfoExt();
+		System.out.println("CPUs (sockets,physical,logical): " +
+				si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
+				si.getCpuLogicalCores() + ", using " + SystemAnalysis.getNumberOfCPUs());
+		System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
 		System.out.println(">");
 		System.out.println("> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
 		
