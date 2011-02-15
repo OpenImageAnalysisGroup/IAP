@@ -11,8 +11,6 @@ import java.net.UnknownHostException;
 
 import com.mongodb.BasicDBObject;
 
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
-
 /**
  * @author klukas
  */
@@ -20,7 +18,7 @@ public class CloudHost extends BasicDBObject {
 	private static final long serialVersionUID = 1L;
 	
 	public CloudHost() throws UnknownHostException {
-		setHostName(SystemAnalysis.getHostName());
+		setHostName(SystemAnalysisExt.getHostName());
 		updateTime();
 	}
 	

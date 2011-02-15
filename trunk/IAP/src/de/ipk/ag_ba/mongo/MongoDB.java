@@ -54,6 +54,7 @@ import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
 import de.ipk.ag_ba.server.task_management.CloudHost;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -1323,7 +1324,7 @@ public class MongoDB {
 				public void run() {
 					String hostName;
 					try {
-						hostName = SystemAnalysis.getHostName();
+						hostName = SystemAnalysisExt.getHostName();
 						DBCollection collection = db.getCollection("schedule");
 						collection.setObjectClass(BatchCmd.class);
 						for (DBObject dbo : collection.find()) {
@@ -1370,7 +1371,7 @@ public class MongoDB {
 				@Override
 				public void run() {
 					try {
-						batch.setOwner(SystemAnalysis.getHostName());
+						batch.setOwner(SystemAnalysisExt.getHostName());
 						DBCollection collection = db.getCollection("schedule");
 						collection.setObjectClass(BatchCmd.class);
 						DBObject dbo = new BasicDBObject();
@@ -1378,7 +1379,7 @@ public class MongoDB {
 						String rs = batch.getString("runstatus");
 						dbo.put("runstatus", rs);
 						if (requireOwnership)
-							dbo.put("owner", SystemAnalysis.getHostName());
+							dbo.put("owner", SystemAnalysisExt.getHostName());
 						batch.put("runstatus", starting.toString());
 						batch.put("lastupdate", System.currentTimeMillis());
 						WriteResult r = collection.update(dbo, batch, false, false);

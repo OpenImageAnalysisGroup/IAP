@@ -4,8 +4,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.AttributeHelper;
 import org.junit.Test;
@@ -67,18 +65,6 @@ public class SystemAnalysis {
 			return res;
 		else
 			return maximum;
-	}
-	
-	public static String getHostName() throws UnknownHostException {
-		String hostName = InetAddress.getLocalHost().getHostName();
-		String ip = InetAddress.getLocalHost().getHostAddress();
-		
-		boolean retIP = true;
-		if (retIP)
-			return ip;
-		else
-			return hostName;
-		
 	}
 	
 	public static boolean isWindowsRunning() {
@@ -157,4 +143,5 @@ public class SystemAnalysis {
 			return "mac";
 		return "other";
 	}
+	
 }
