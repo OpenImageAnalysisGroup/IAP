@@ -5,12 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashSet;
 
 import org.ErrorMsg;
@@ -117,7 +111,8 @@ public class SystemAnalysisExt {
 					if (s.contains(tagB)) {
 						s = s.substring(0, s.indexOf(tagB));
 						long l = Long.parseLong(s.trim());
-						result = l;
+						if (l > result)
+							result = l;
 					}
 				}
 			}
