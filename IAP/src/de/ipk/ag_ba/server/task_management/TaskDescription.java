@@ -22,7 +22,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
@@ -96,7 +95,7 @@ public class TaskDescription {
 				try {
 					BatchCmd bcmd = m.batchGetCommand(batch);
 					if (bcmd != null)
-						if (SystemAnalysis.getHostName().equals(bcmd.getOwner())) {
+						if (SystemAnalysisExt.getHostName().equals(bcmd.getOwner())) {
 							m.batchClearJob(batch);
 							m.saveExperiment(experiment, null);
 							
@@ -163,7 +162,7 @@ public class TaskDescription {
 								m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
 							}
 						} else
-							System.out.println("Information: Batch command, processed by " + SystemAnalysis.getHostName()
+							System.out.println("Information: Batch command, processed by " + SystemAnalysisExt.getHostName()
 									+ " has been claimed by " + batch.getOwner()
 									+ ". Therefore analysis result is not saved.");
 				} catch (Exception e) {
