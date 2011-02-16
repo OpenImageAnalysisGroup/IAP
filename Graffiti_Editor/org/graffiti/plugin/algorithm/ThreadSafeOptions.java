@@ -25,7 +25,7 @@ import org.graffiti.selection.Selection;
  * and plugins.
  * 
  * @author Christian Klukas, IPK Gatersleben
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ThreadSafeOptions implements HelperClass {
 	
@@ -383,8 +383,9 @@ public class ThreadSafeOptions implements HelperClass {
 	
 	private int iv = 0;
 	
-	public synchronized void addInt(int i) {
+	public synchronized int addInt(int i) {
 		iv += i;
+		return iv;
 	}
 	
 	public synchronized void setInt(int i) {

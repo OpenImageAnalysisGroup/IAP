@@ -123,6 +123,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		final int wl = workload.size();
 		int idxxx = 0;
 		final ArrayList<Thread> wait = new ArrayList<Thread>();
+		System.out.println("Workload: " + wl);
 		
 		for (ImageSet md : workload) {
 			final ImageSet id = md;
@@ -163,7 +164,10 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(
 									new ImageProcessorOptions());
 							
-							FlexibleImageStack debugImageStack = new FlexibleImageStack();
+							FlexibleImageStack debugImageStack = null;
+							boolean addDebugImages = false;
+							if (addDebugImages)
+								debugImageStack = new FlexibleImageStack();
 							
 							// input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
 							// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
@@ -175,18 +179,24 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
 							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
 							MyThread g = statisticalAnalaysis(nir, pipelineResult.getNir());
-							BackgroundThreadDispatcher.waitFor(new MyThread[] { e, f, g });
+							boolean multiThreaded = true;
+							if (!multiThreaded) {
+								e.run();
+								f.run();
+								g.run();
+							} else
+								BackgroundThreadDispatcher.waitFor(new MyThread[] { e, f, g });
 							
 							byte[] buf = null;
 							if (debugImageStack != null) {
 								MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
 								debugImageStack.saveAsLayeredTif(mos);
 								buf = mos.getBuff();
+								
+								saveImage(vis, pipelineResult.getVis(), buf, ".tiff");
+								saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
+								saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
 							}
-							
-							saveImage(vis, pipelineResult.getVis(), buf, ".tiff");
-							saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
-							saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
 						} else {
 							System.err.println("Warning: not all three image types available for snapshot!");
 						}
@@ -197,7 +207,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 					status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + wl);
 				}
-			}, "process image " + idxxx, -1);
+			}, "process image " + idxxx, -10);
 			idxxx++;
 			wait.add(t);
 			
@@ -218,7 +228,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
-				LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
+				LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
 				ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(loadedImage, PhytochamberAnalysisTask.this.getName());
 				synchronized (output) {
 					output.addAll(res);
@@ -229,11 +239,11 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 	
 	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
 		if (optLabelImageContent == null) {
-			LoadedImage loadedImage = new LoadedImage(id, image.getBufferedImage());
+			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
 			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
 			output.add(imageRef);
 		} else {
-			LoadedImageStream loadedImage = new LoadedImageStream(id, image.getBufferedImage(), optLabelImageContent);
+			LoadedImageStream loadedImage = new LoadedImageStream(id, image.getAsBufferedImage(), optLabelImageContent);
 			loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "d_" + id.getURL().getFileName() + labelFileExtension));
 			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
 			if (imageRef == null) {

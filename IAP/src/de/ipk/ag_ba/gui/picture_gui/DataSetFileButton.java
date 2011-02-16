@@ -403,7 +403,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		if (evt.getSource() == showImageCmdLabel) {
 			try {
 				FlexibleImage fi = new FlexibleImage(myImage.fileURLlabel);
-				if (fi.getBufferedImage() == null) {
+				if (fi.getAsBufferedImage() == null) {
 					TiffDecoder tid = new TiffDecoder(myImage.fileURLlabel.getInputStream(), myImage.fileURLlabel.getFileName());
 					FileInfo[] info = tid.getTiffInfo();
 					Opener o = new Opener();

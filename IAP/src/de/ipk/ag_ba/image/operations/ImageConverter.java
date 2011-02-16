@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations;
 
 import ij.ImagePlus;
+import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
 import java.awt.Color;
@@ -66,13 +67,18 @@ public class ImageConverter {
 	}
 	
 	public static ImagePlus convert1AtoIJ(int w, int h, int[] img) {
-		ImagePlus jImage = new ImagePlus("JImage", convert1AtoBI(w, h, img));
-		return jImage;
+		return new ImagePlus("JImage", new ColorProcessor(w, h, img));
+		// ImagePlus jImage = new ImagePlus("JImage", convert1AtoBI(w, h, img));
+		// return jImage;
 	}
 	
 	public static ImagePlus convert2AtoIJ(int[][] img) {
-		ImagePlus jImage = new ImagePlus("JImage", ImageConverter.convert2AtoBI(img));
-		return jImage;
+		int w = img.length;
+		int h = img[0].length;
+		int[] i1 = convert2Ato1A(img);
+		return new ImagePlus("JImage", ImageConverter.convert1AtoBI(w, h, i1));
+		// ImagePlus jImage = new ImagePlus("JImage", ImageConverter.convert2AtoBI(img));
+		// return jImage;
 	}
 	
 	public static ImagePlus convert2ABtoIJ(int[][] img) {
@@ -116,8 +122,9 @@ public class ImageConverter {
 	}
 	
 	public static int[] convertIJto1A(ImagePlus img) {
-		BufferedImage image = ImageConverter.convertIJtoBI(img);
-		return convertBIto1A(image);
+		return (int[]) img.getProcessor().getPixels();
+		// BufferedImage image = ImageConverter.convertIJtoBI(img);
+		// return convertBIto1A(image);
 	}
 	
 	// ########## Rückgabe int[][] ###############

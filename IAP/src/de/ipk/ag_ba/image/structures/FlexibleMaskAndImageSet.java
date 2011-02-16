@@ -67,9 +67,9 @@ public class FlexibleMaskAndImageSet {
 		
 		resizedImages = resizedImages.resize(s, s, s);
 		
-		int[][] imgVis = resizedImages.getVis() != null ? resizedImages.getVis().getConvertAs2A() : null;
-		int[][] imgFluo = resizedImages.getFluo() != null ? resizedImages.getFluo().getConvertAs2A() : null;
-		int[][] imgNir = resizedImages.getNir() != null ? resizedImages.getNir().getConvertAs2A() : null;
+		int[][] imgVis = resizedImages.getVis() != null ? resizedImages.getVis().getAs2A() : null;
+		int[][] imgFluo = resizedImages.getFluo() != null ? resizedImages.getFluo().getAs2A() : null;
+		int[][] imgNir = resizedImages.getNir() != null ? resizedImages.getNir().getAs2A() : null;
 		
 		ImageOperation io = new ImageOperation(image);
 		
@@ -89,9 +89,9 @@ public class FlexibleMaskAndImageSet {
 			
 			resizedMasks = resizedMasks.resize(s, s, s);
 			
-			int[][] imgVisMask = resizedMasks.getVis() != null ? resizedMasks.getVis().getConvertAs2A() : null;
-			int[][] imgFluoMask = resizedMasks.getFluo() != null ? resizedMasks.getFluo().getConvertAs2A() : null;
-			int[][] imgNirMask = resizedMasks.getNir() != null ? resizedMasks.getNir().getConvertAs2A() : null;
+			int[][] imgVisMask = resizedMasks.getVis() != null ? resizedMasks.getVis().getAs2A() : null;
+			int[][] imgFluoMask = resizedMasks.getFluo() != null ? resizedMasks.getFluo().getAs2A() : null;
+			int[][] imgNirMask = resizedMasks.getNir() != null ? resizedMasks.getNir().getAs2A() : null;
 			
 			if (imgVisMask != null)
 				io = io.drawAndFillRect(0 * wn, hn, imgVisMask);

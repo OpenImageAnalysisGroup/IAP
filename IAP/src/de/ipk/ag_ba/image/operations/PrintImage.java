@@ -82,22 +82,26 @@ public class PrintImage {
 		printImage(ImageConverter.convert2AtoBI(image), text, PrintOption.IMAGEJ);
 	}
 	
+	public static void printImage(ImagePlus image, String text) {
+		printImage(image, text);
+	}
+	
 	// ############# FlexibleImage ############
 	
 	public static void printImage(FlexibleImage fluo) {
-		printImage(fluo.getBufferedImage());
+		printImage(fluo.getAsBufferedImage());
 	}
 	
 	public static void printImage(FlexibleImage fluo, String text) {
-		printImage(fluo.getBufferedImage(), text);
+		printImage(fluo.getAsBufferedImage(), text);
 	}
 	
 	public static void printImage(FlexibleImage fluo, PrintOption typ) {
-		printImage(fluo.getBufferedImage(), typ);
+		printImage(fluo.getAsBufferedImage(), typ);
 	}
 	
 	public static void printImage(FlexibleImage fluo, String text, PrintOption typ) {
-		printImage(fluo.getBufferedImage(), text, typ);
+		printImage(fluo.getAsBufferedImage(), text, typ);
 	}
 	
 	// ######### BufferedImage #########

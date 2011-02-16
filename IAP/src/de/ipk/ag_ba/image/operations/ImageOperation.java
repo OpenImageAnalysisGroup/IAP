@@ -46,13 +46,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 public class ImageOperation extends ImageConverter {
 	
 	private final ImagePlus image;
-	private ImageProcessor processor;
 	
 	// private Roi boundingBox;
 	
 	public ImageOperation(ImagePlus image) {
 		this.image = image;
-		this.processor = image.getProcessor();
 	}
 	
 	public ImageOperation(BufferedImage image) {
@@ -60,7 +58,7 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	public ImageOperation(FlexibleImage image) {
-		this(image.getConvertAsImagePlus());
+		this(image.getAsImagePlus());
 	}
 	
 	public ImageOperation(int[] image, int width, int height) {
@@ -76,7 +74,7 @@ public class ImageOperation extends ImageConverter {
 	// }
 	
 	public ImageOperation translate(double x, double y) {
-		processor.translate(x, y);
+		image.getProcessor().translate(x, y);
 		return new ImageOperation(getImage()).replaceColors(Color.BLACK.getRGB(), PhenotypeAnalysisTask.BACKGROUND_COLORint);
 	}
 	
@@ -95,21 +93,20 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	public ImageOperation rotate(double degree) {
-		processor.rotate(degree);
+		image.getProcessor().rotate(degree);
 		return new ImageOperation(getImage()).replaceColors(Color.BLACK.getRGB(), PhenotypeAnalysisTask.BACKGROUND_COLORint);
 	}
 	
 	public ImageOperation scale(double xScale, double yScale) {
-		processor.scale(xScale, yScale);
+		image.getProcessor().scale(xScale, yScale);
 		return new ImageOperation(getImage()).replaceColors(Color.BLACK.getRGB(), PhenotypeAnalysisTask.BACKGROUND_COLORint);
 	}
 	
 	public ImageOperation resize(int width, int height) {
-		processor = processor.resize(width, height);
-		image.setProcessor(processor);
+		ImageProcessor p = image.getProcessor().resize(width, height);
+		image.setProcessor(p);
 		
 		return new ImageOperation(getImage());
-		// return this;
 	}
 	
 	public ImageOperation resize(double factor) {
@@ -117,7 +114,7 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	public void threshold(int cutValue) {
-		ImageProcessor processor2 = processor.convertToByte(true);
+		ImageProcessor processor2 = image.getProcessor().convertToByte(true);
 		ByteProcessor byteProcessor = new BinaryProcessor((ByteProcessor) processor2);
 		byteProcessor.threshold(cutValue);
 		image.setProcessor(processor2.convertToRGB());
@@ -131,16 +128,16 @@ public class ImageOperation extends ImageConverter {
 			mask = new ImageOperation(mask).resize(image.getWidth(), image.getHeight()).getImage();
 		}
 		
-		int[] mask1A = mask.getConvertAs1A();
+		int[] mask1A = mask.getAs1A();
 		
 		int[] originalImage = ImageConverter.convertIJto1A(image);
 		// PrintImage.printImage(image.getBufferedImage(), "IMAGE " + iiii);
 		// PrintImage.printImage(mask.getBufferedImage(), "MASK FOR IMAGE " + iiii);
 		
 		int idx = 0;
-		// int background = processor.getBackground();
+		// int background = image.getProcessor().getBackground();
 		// int foreground = Color.BLUE.getRGB();
-		for (int m : mask.getConvertAs1A()) {
+		for (int m : mask.getAs1A()) {
 			if (m == background)
 				mask1A[idx] = background;
 			else
@@ -168,16 +165,16 @@ public class ImageOperation extends ImageConverter {
 			srcImage = new ImageOperation(srcImage).resize(mask.getWidth(), mask.getHeight()).getImage();
 		}
 		
-		int[] mask1A = mask.getConvertAs1A();
+		int[] mask1A = mask.getAs1A();
 		
-		int[] originalImage = srcImage.getConvertAs1A();
+		int[] originalImage = srcImage.getAs1A();
 		// PrintImage.printImage(image.getBufferedImage(), "IMAGE " + iiii);
 		// PrintImage.printImage(mask.getBufferedImage(), "MASK FOR IMAGE " + iiii);
 		
 		int idx = 0;
-		// int background = processor.getBackground();
+		// int background = image.getProcessor().getBackground();
 		// int foreground = Color.BLUE.getRGB();
-		for (int m : mask.getConvertAs1A()) {
+		for (int m : mask.getAs1A()) {
 			if (m == background)
 				mask1A[idx] = background;
 			else
@@ -206,17 +203,17 @@ public class ImageOperation extends ImageConverter {
 		int jM = (mask.length - 1) / 2;
 		int iM = (mask[0].length - 1) / 2;
 		
-		ImageProcessor tempImage = processor.createProcessor(processor.getWidth(), processor.getHeight());
-		
+		ImageProcessor tempImage = image.getProcessor().createProcessor(image.getProcessor().getWidth(), image.getProcessor().getHeight());
+		ImageProcessor p = image.getProcessor();
 		for (int j = 0; j < mask.length; j++)
 			for (int i = 0; i < mask[j].length; i++)
-				tempImage.copyBits(processor, i - iM, j - jM, Blitter.MAX);
+				tempImage.copyBits(p, i - iM, j - jM, Blitter.MAX);
 		
 		// for (int i = 0; i < mask.length; i++)
 		// for (int j = 0; j < mask[i].length; j++)
 		// tempImage.copyBits(processor, j - jM, i - iM, Blitter.MAX);
 		
-		processor.copyBits(tempImage, 0, 0, Blitter.COPY);
+		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.COPY);
 	}
 	
 	/**
@@ -225,7 +222,7 @@ public class ImageOperation extends ImageConverter {
 	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
 	public ImageOperation dilate() { // es wird der 3x3 Minimum-Filter genutzt
-		processor.dilate();
+		image.getProcessor().dilate();
 		return this;
 	}
 	
@@ -257,13 +254,13 @@ public class ImageOperation extends ImageConverter {
 	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
 	 */
 	public ImageOperation erode(int[][] mask) {
-		return erode(processor, mask);
+		return erode(image.getProcessor(), mask);
 	}
 	
 	// public void erode2(int [][] mask){
-	// processor.invert();
+	// image.getProcessor().invert();
 	// dilate(mask);
-	// processor.invert();
+	// image.getProcessor().invert();
 	// }
 	
 	/**
@@ -272,7 +269,7 @@ public class ImageOperation extends ImageConverter {
 	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
 	 */
 	public ImageOperation erode() { // es wird der 3x3 Minimum-Filter genutzt
-		return erode(processor);
+		return erode(image.getProcessor());
 	}
 	
 	/**
@@ -293,8 +290,8 @@ public class ImageOperation extends ImageConverter {
 	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Closing.png/220px-Closing.png" >
 	 */
 	public void closing() { // es wird der 3x3 Minimum-Filter genutzt
-		processor.dilate();
-		processor.erode();
+		image.getProcessor().dilate();
+		image.getProcessor().erode();
 	}
 	
 	/**
@@ -315,12 +312,12 @@ public class ImageOperation extends ImageConverter {
 	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png" >
 	 */
 	public void opening() { // es wird der 3x3 Minimum-Filter genutzt
-		processor.erode();
-		processor.dilate();
+		image.getProcessor().erode();
+		image.getProcessor().dilate();
 	}
 	
 	public void skeletonize() {
-		ImageProcessor processor2 = processor.convertToByte(true);
+		ImageProcessor processor2 = image.getProcessor().convertToByte(true);
 		ByteProcessor byteProcessor = new BinaryProcessor((ByteProcessor) processor2);
 		byteProcessor.skeletonize();
 		image.setProcessor(processor2.convertToRGB());
@@ -328,33 +325,33 @@ public class ImageOperation extends ImageConverter {
 	
 	public void outline(int[][] mask) { // starke Farbübergänge werden als Kante
 		// erkannt
-		ImageProcessor tempImage = processor.duplicate();
+		ImageProcessor tempImage = image.getProcessor().duplicate();
 		erode(tempImage, mask);
-		processor.copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
-		processor.invert();
+		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
+		image.getProcessor().invert();
 	}
 	
 	public void outline() {
-		ImageProcessor processor2 = processor.convertToByte(true);
+		ImageProcessor processor2 = image.getProcessor().convertToByte(true);
 		ByteProcessor byteProcessor = new BinaryProcessor((ByteProcessor) processor2);
 		byteProcessor.outline();
 		image.setProcessor(processor2.convertToRGB());
 	}
 	
 	public void outline2() {
-		ImageProcessor tempImage = processor.duplicate();
+		ImageProcessor tempImage = image.getProcessor().duplicate();
 		erode(tempImage);
-		processor.copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
-		processor.invert();
+		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
+		image.getProcessor().invert();
 		
 	}
 	
 	public void gamma(double value) {
-		processor.gamma(value);
+		image.getProcessor().gamma(value);
 	}
 	
 	public void drawRect(int leftX, int leftY, int width, int heigh) {
-		processor.drawRect(leftX, leftY, width, heigh);
+		image.getProcessor().drawRect(leftX, leftY, width, heigh);
 		
 	}
 	
@@ -374,15 +371,15 @@ public class ImageOperation extends ImageConverter {
 	
 	public ImageOperation drawAndFillRect(int leftX, int leftY, int width, int height, int fillValue) {
 		Roi rec = new Roi(leftX, leftY, width, height);
-		processor.setRoi(rec);
-		processor.setValue(fillValue);
-		processor.fill();
-		return new ImageOperation(processor.getBufferedImage());
+		image.getProcessor().setRoi(rec);
+		image.getProcessor().setValue(fillValue);
+		image.getProcessor().fill();
+		return new ImageOperation(image.getProcessor().getBufferedImage());
 	}
 	
 	public ImageOperation setBackgroundValue(double background) {
-		processor.setBackgroundValue(background);
-		return new ImageOperation(processor.getBufferedImage());
+		image.getProcessor().setBackgroundValue(background);
+		return new ImageOperation(image.getProcessor().getBufferedImage());
 	}
 	
 	public Roi getBoundingBox() {
@@ -391,7 +388,7 @@ public class ImageOperation extends ImageConverter {
 		int[][] img = ImageConverter.convertIJto2A(image);
 		int top = img.length, left = img[0].length, right = -1, down = -1;
 		
-		double background = processor.getBackgroundValue();
+		double background = image.getProcessor().getBackgroundValue();
 		
 		for (int i = 0; i < img.length; i++) {
 			for (int j = 0; j < img[0].length; j++) {
@@ -427,20 +424,20 @@ public class ImageOperation extends ImageConverter {
 		
 		Roi boundingBox = new Roi(top, left, down - top, right - left);
 		// boundingBox = new Roi(top, left, down-top, right-left);
-		// processor.setRoi(boundingBox);
+		// image.getProcessor().setRoi(boundingBox);
 		
 		return boundingBox;
 	}
 	
 	// public void drawBoundingBox(){
 	public void drawBoundingBox(Roi boundingBox) {
-		processor.setRoi(boundingBox);
-		processor.draw(boundingBox);
+		image.getProcessor().setRoi(boundingBox);
+		image.getProcessor().draw(boundingBox);
 	}
 	
 	public ImageOperation cutArea(Roi boundingBox) {
-		processor.setRoi(boundingBox);
-		return new ImageOperation(processor.crop().getBufferedImage());
+		image.getProcessor().setRoi(boundingBox);
+		return new ImageOperation(image.getProcessor().crop().getBufferedImage());
 	}
 	
 	public Dimension2D centerOfGravity() {
@@ -574,7 +571,7 @@ public class ImageOperation extends ImageConverter {
 				if (i > (img.length * 0.5) && j > (img[0].length * 0.5) && i < (img.length * 1.5) && j < (img[0].length * 1.5)) {
 					newImage[i][j] = img[(i - (img.length / 2) - 1)][(j - (img[0].length / 2) - 1)];
 				} else
-					newImage[i][j] = (int) processor.getBackgroundValue();
+					newImage[i][j] = (int) image.getProcessor().getBackgroundValue();
 			}
 		
 		return new ImageOperation(ImageConverter.convert2AtoBI(newImage));
@@ -648,7 +645,7 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	// private void blur() {
-	// ImageProcessor processor2 = processor.convertToByte(true);
+	// ImageProcessor processor2 = image.getProcessor().convertToByte(true);
 	// ByteProcessor byteProcessor = new BinaryProcessor((ByteProcessor) processor2);
 	//
 	// boolean newTest = true;
@@ -679,8 +676,8 @@ public class ImageOperation extends ImageConverter {
 	//
 	// } else {
 	//
-	// int w = byteProcessor.getWidth();
-	// int h = byteProcessor.getHeight();
+	// int w = byteimage.getProcessor().getWidth();
+	// int h = byteimage.getProcessor().getHeight();
 	// ByteProcessor copy = (ByteProcessor) processor2.duplicate();
 	// for (int v = 1; v <= h - 2; v++) {
 	// for (int u = 1; u <= w - 2; u++) {
@@ -693,7 +690,7 @@ public class ImageOperation extends ImageConverter {
 	// }
 	// }
 	// int q = (int) (sum / 9.0);
-	// byteProcessor.putPixel(u, v, q);
+	// byteimage.getProcessor().putPixel(u, v, q);
 	// }
 	// }
 	//
@@ -907,13 +904,13 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	public ImageOperation invert() {
-		processor.invert();
+		image.getProcessor().invert();
 		return new ImageOperation(getImage());
 	}
 	
 	public FlexibleImage draw(FlexibleImage fi, int background) {
 		int[] img = getImageAs1array();
-		int[] over = fi.getConvertAs1A();
+		int[] over = fi.getAs1A();
 		int idx = 0;
 		for (int o : over)
 			if (o != background)
@@ -925,13 +922,13 @@ public class ImageOperation extends ImageConverter {
 	
 	public ImageOperation blur(double radius) {
 		GaussianBlur gb = new GaussianBlur();
-		gb.blurGaussian(processor, radius, radius, 0.001);
+		gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
 		return new ImageOperation(getImage());
 	}
 	
 	public static FlexibleImage removeSmallPartsOfImage(FlexibleImage workImage, int iBackgroundFill, int cutOff) {
 		
-		int[] rgbArray = workImage.getConvertAs1A();
+		int[] rgbArray = workImage.getAs1A();
 		int w = workImage.getWidth();
 		int h = workImage.getHeight();
 		

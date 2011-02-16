@@ -31,7 +31,7 @@ public class BlockDataAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() throws InterruptedException {
-		BufferedImage clrearRgbImage = dataAnalysis(getInput().getMasks().getVis().getBufferedImage(),
+		BufferedImage clrearRgbImage = dataAnalysis(getInput().getMasks().getVis().getAsBufferedImage(),
 				ImageConfiguration.RgbTop,
 				options.getRgbEpsilonA(), options.getRgbEpsilonB(), options.getMaxThreadsPerImage());
 		return new FlexibleImage(clrearRgbImage, FlexibleImageType.VIS);
@@ -39,7 +39,7 @@ public class BlockDataAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() throws InterruptedException {
-		BufferedImage clearFluorImage = dataAnalysis(getInput().getMasks().getFluo().getBufferedImage(),
+		BufferedImage clearFluorImage = dataAnalysis(getInput().getMasks().getFluo().getAsBufferedImage(),
 				ImageConfiguration.FluoTop,
 				options.getRgbEpsilonA(), options.getRgbEpsilonB(), options.getMaxThreadsPerImage());
 		return new FlexibleImage(clearFluorImage, FlexibleImageType.FLUO);

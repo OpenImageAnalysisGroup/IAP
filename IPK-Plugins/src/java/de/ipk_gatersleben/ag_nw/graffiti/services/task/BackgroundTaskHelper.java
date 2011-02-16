@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Semaphore;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -236,7 +237,7 @@ public class BackgroundTaskHelper implements HelperClass {
 		t.start();
 	}
 	
-	private static HashMap<Object, BoundedSemaphore> device2sema = new HashMap<Object, BoundedSemaphore>();
+	private static HashMap<Object, Semaphore> device2sema = new HashMap<Object, Semaphore>();
 	
 	/**
 	 * @param device
@@ -247,13 +248,13 @@ public class BackgroundTaskHelper implements HelperClass {
 	 *           Max semaphore load.
 	 * @return The desired semaphore.
 	 */
-	public static synchronized BoundedSemaphore lockGetSemaphore(Object device, int maxLoad) {
-		// boolean fair = true;
+	public static synchronized Semaphore lockGetSemaphore(Object device, int maxLoad) {
+		boolean fair = true;
 		if (device == null)
-			return new BoundedSemaphore(maxLoad);// , fair);
+			return new Semaphore(maxLoad, fair);
 		if (maxLoad > 0) {
 			if (!device2sema.containsKey(device)) {
-				device2sema.put(device, new BoundedSemaphore(maxLoad));// , fair));
+				device2sema.put(device, new Semaphore(maxLoad, fair));
 			}
 		}
 		return device2sema.get(device);
@@ -262,9 +263,9 @@ public class BackgroundTaskHelper implements HelperClass {
 	public static void lockAquire(Object device, int maxLoad) {
 		if (device == null)
 			throw new UnsupportedOperationException("When using this method, a device needs to be specified!");
-		BoundedSemaphore s = lockGetSemaphore(device, maxLoad);
+		Semaphore s = lockGetSemaphore(device, maxLoad);
 		try {
-			s.take(Thread.currentThread().getName());// acquire();
+			s.acquire();
 		} catch (InterruptedException e) {
 			// ErrorMsg.addErrorMessage(e);
 			System.out.println("Information: Semaphore " + device + " InterruptedException (take)");
@@ -274,13 +275,8 @@ public class BackgroundTaskHelper implements HelperClass {
 	public static void lockRelease(Object device) {
 		if (device == null)
 			throw new UnsupportedOperationException("When using this method, a device needs to be specified!");
-		BoundedSemaphore s = lockGetSemaphore(device, -1);
-		try {
-			s.release(Thread.currentThread().getName());
-		} catch (InterruptedException e) {
-			// ErrorMsg.addErrorMessage(e);
-			System.out.println("Information: Semaphore " + device + " InterruptedException (release)");
-		}
+		Semaphore s = lockGetSemaphore(device, -1);
+		s.release();
 	}
 }
 

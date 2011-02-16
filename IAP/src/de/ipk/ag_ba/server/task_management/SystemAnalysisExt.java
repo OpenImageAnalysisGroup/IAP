@@ -5,6 +5,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
 
 import org.ErrorMsg;
@@ -247,8 +253,8 @@ public class SystemAnalysisExt {
 	private static InetAddress[]
 			getAllLocalUsingNetworkInterface() throws
 					UnknownHostException {
-		ArrayList addresses = new ArrayList();
-		Enumeration e = null;
+		ArrayList<InetAddress> addresses = new ArrayList<InetAddress>();
+		Enumeration<NetworkInterface> e = null;
 		try {
 			e =
 					NetworkInterface.getNetworkInterfaces();
@@ -257,18 +263,14 @@ public class SystemAnalysisExt {
 		}
 		while (e.hasMoreElements()) {
 			NetworkInterface ni =
-					(NetworkInterface) e.nextElement();
-			for (Enumeration e2 =
-					ni.getInetAddresses(); e2.hasMoreElements();) {
-				addresses.add
-						(e2.nextElement());
+					e.nextElement();
+			for (Enumeration<InetAddress> e2 = ni.getInetAddresses(); e2.hasMoreElements();) {
+				addresses.add(e2.nextElement());
 			}
 		}
-		InetAddress[] iAddresses = new
-				InetAddress[addresses.size()];
+		InetAddress[] iAddresses = new InetAddress[addresses.size()];
 		for (int i = 0; i < iAddresses.length; i++) {
-			iAddresses[i] = (InetAddress)
-					addresses.get(i);
+			iAddresses[i] = addresses.get(i);
 		}
 		return iAddresses;
 	}

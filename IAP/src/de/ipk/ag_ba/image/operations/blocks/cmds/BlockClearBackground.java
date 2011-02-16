@@ -48,7 +48,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() throws InterruptedException {
-		BufferedImage clrearRgbImage = clearBackground(getInput().getMasks().getVis().getBufferedImage(),
+		BufferedImage clrearRgbImage = clearBackground(getInput().getMasks().getVis().getAsBufferedImage(),
 				ImageConfiguration.RgbTop,
 				options.getRgbEpsilonA(), options.getRgbEpsilonB(), options.getMaxThreadsPerImage());
 		return new FlexibleImage(clrearRgbImage, FlexibleImageType.VIS);
@@ -56,7 +56,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() throws InterruptedException {
-		BufferedImage clearFluorImage = clearBackground(getInput().getMasks().getFluo().getBufferedImage(),
+		BufferedImage clearFluorImage = clearBackground(getInput().getMasks().getFluo().getAsBufferedImage(),
 				ImageConfiguration.FluoTop,
 				options.getFluoEpsilonA(), options.getFluoEpsilonB(), options.getMaxThreadsPerImage());
 		return new FlexibleImage(clearFluorImage, FlexibleImageType.FLUO);

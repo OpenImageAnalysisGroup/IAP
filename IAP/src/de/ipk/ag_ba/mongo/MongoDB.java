@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.StringManipulationTools;
 import org.bson.types.ObjectId;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.HashType;
@@ -1176,10 +1176,12 @@ public class MongoDB {
 					res.setBlocksExecutedWithinLastMinute(blocksExecutedWithinLastMinute);
 					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
+					double load = SystemAnalysis.getRealSystemCpuLoad();
 					res.setHostInfo(SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
-							SystemAnalysis.getRealSystemMemoryInMB() / 1024 + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
-							"/" + SystemAnalysis.getRealNumberOfCPUs() + " CPUs, load: "
-							+ AttributeHelper.formatNumber(SystemAnalysis.getRealSystemCpuLoad(), "#.#")
+							SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
+							"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
+							(load > 0 ? ", load: "
+									+ StringManipulationTools.formatNumber(load, "#.#") : "")
 							+ ", queued: "
 							+ BackgroundThreadDispatcher.getWorkLoad());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
@@ -1187,6 +1189,8 @@ public class MongoDB {
 				} else {
 					try {
 						res = new CloudHost();
+						res.updateTime();
+						res.setHostName(SystemAnalysisExt.getHostName()); // + "//" + System.currentTimeMillis()
 						dbc.insert(res);
 					} catch (UnknownHostException e) {
 						ErrorMsg.addErrorMessage(e);
