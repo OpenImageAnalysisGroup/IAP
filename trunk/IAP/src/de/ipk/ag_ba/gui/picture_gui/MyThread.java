@@ -7,10 +7,11 @@
 
 package de.ipk.ag_ba.gui.picture_gui;
 
+import java.util.concurrent.Semaphore;
+
 import org.ErrorMsg;
 
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BoundedSemaphore;
 
 /**
  * @author klukas
@@ -19,13 +20,13 @@ public class MyThread extends Thread {
 	
 	private boolean finished = false;
 	private final Runnable r;
-	private final BoundedSemaphore sem;
+	private final Semaphore sem;
 	
 	public MyThread(Runnable r, String name) {
 		super(r, name);
 		sem = BackgroundTaskHelper.lockGetSemaphore(null, 1);
 		try {
-			sem.take(name);
+			sem.acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
@@ -39,12 +40,7 @@ public class MyThread extends Thread {
 			super.run();
 		} finally {
 			finished = true;
-			try {
-				sem.release(Thread.currentThread().getName());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				ErrorMsg.addErrorMessage(e);
-			}
+			sem.release();
 		}
 	}
 	
@@ -54,15 +50,15 @@ public class MyThread extends Thread {
 	
 	public Object getResult() throws InterruptedException {
 		if (r instanceof RunnableForResult) {
-			sem.take(Thread.currentThread().getName());
-			sem.release(Thread.currentThread().getName());
+			sem.acquire();
+			sem.release();
 			RunnableForResult rc = (RunnableForResult) r;
 			if (!finished)
 				System.out.println("ERRRRRRR");
 			return rc.getResult();
 		} else {
-			sem.take(Thread.currentThread().getName());
-			sem.release(Thread.currentThread().getName());
+			sem.acquire();
+			sem.release();
 			if (!finished)
 				System.out.println("ERRRRRRR");
 			return null;

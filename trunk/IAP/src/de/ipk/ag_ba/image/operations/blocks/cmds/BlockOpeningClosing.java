@@ -34,11 +34,11 @@ public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
 		// maskIo.closing();
 		// return new FlexibleImage(maskIo.getImageAs2array());
 		
-		int[] rgbArray = flMask.getConvertAs1A();
+		int[] rgbArray = flMask.getAs1A();
 		int h = flMask.getHeight();
 		int w = flMask.getWidth();
 		
-		int[] rgbNonModifiedArray = flImage.getConvertAs1A();
+		int[] rgbNonModifiedArray = flImage.getAs1A();
 		
 		int[][] image = new int[w][h];
 		for (int x = 0; x < w; x++) {

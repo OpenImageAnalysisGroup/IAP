@@ -27,66 +27,85 @@ import de.ipk.ag_ba.image.operations.PrintImage;
  */
 public class FlexibleImage {
 	
-	private final BufferedImage bufferedImage;
+	private final ImagePlus image;
+	private final int w, h;
 	private FlexibleImageType type = FlexibleImageType.UNKNOWN;
 	
+	@Override
+	public String toString() {
+		return image != null ? image.getWidth() + " x " + image.getHeight() + " " + image.getBitDepth() + " bit" : "NULL IMAGE";
+	}
+	
 	public FlexibleImage(BufferedImage bufferedImage) {
-		this.bufferedImage = bufferedImage;
+		this(ImageConverter.convertBItoIJ(bufferedImage));
 	}
 	
 	public FlexibleImage(BufferedImage bufferedImage, FlexibleImageType type) {
-		this.bufferedImage = bufferedImage;
+		this(ImageConverter.convertBItoIJ(bufferedImage));
 		this.type = type;
 	}
 	
 	public FlexibleImage(IOurl url) throws IOException, Exception {
-		bufferedImage = ImageIO.read(url.getInputStream());
+		this(ImageConverter.convertBItoIJ(ImageIO.read(url.getInputStream())));
 	}
 	
 	/**
 	 * The given image is converted to a BufferedImage.
 	 */
 	public FlexibleImage(ImagePlus image) {
-		this.bufferedImage = ImageConverter.convertIJtoBI(image);
+		this.image = image;
+		this.w = image.getWidth();
+		this.h = image.getHeight();
 	}
 	
 	/**
 	 * The given image is converted to a BufferedImage.
 	 */
 	public FlexibleImage(int[] image, int w, int h) {
-		this.bufferedImage = ImageConverter.convert1AtoBI(w, h, image);
+		this(ImageConverter.convert1AtoIJ(w, h, image));
 	}
 	
 	public FlexibleImage(int[][] img) {
-		this.bufferedImage = ImageConverter.convert2AtoBI(img);
+		this(ImageConverter.convert2AtoIJ(img));
 	}
 	
 	public FlexibleImage(Image image) {
 		this(GravistoService.getBufferedImage(image));
 	}
 	
-	public BufferedImage getBufferedImage() {
-		return bufferedImage;
+	public BufferedImage getAsBufferedImage() {
+		return image.getBufferedImage();
 	}
 	
 	public int getWidth() {
-		return bufferedImage.getWidth();
+		return w;
 	}
 	
 	public int getHeight() {
-		return bufferedImage.getHeight();
+		return h;
 	}
 	
 	public void print(String title) {
-		PrintImage.printImage(bufferedImage, title);
+		PrintImage.printImage(image, title);
 	}
 	
-	public ImagePlus getConvertAsImagePlus() {
-		return ImageConverter.convertBItoIJ(bufferedImage);
+	public ImagePlus getAsImagePlus() {
+		ImagePlus result = image.createImagePlus();
+		result.setProcessor(image.getProcessor().duplicate());
+		return result;
 	}
 	
-	public int[] getConvertAs1A() {
-		return ImageConverter.convertBIto1A(bufferedImage);
+	int[] cache = null;
+	
+	public int[] getAs1A() {
+		boolean useCache = true;
+		if (!useCache)
+			return ImageConverter.convertIJto1A(image);
+		if (cache == null)
+			cache = ImageConverter.convertIJto1A(image);
+		// else
+		// System.out.println("CACHED 1A");
+		return cache;
 	}
 	
 	public FlexibleImage resize(int w, int h) {
@@ -99,8 +118,18 @@ public class FlexibleImage {
 		// }
 	}
 	
-	int[][] getConvertAs2A() {
-		return ImageConverter.convertBIto2A(bufferedImage);
+	int[][] cache2A = null;
+	
+	public int[][] getAs2A() {
+		boolean useCache = true;
+		if (!useCache)
+			return ImageConverter.convertIJto2A(image);
+		
+		if (cache2A == null)
+			cache2A = ImageConverter.convertIJto2A(image);
+		// else
+		// System.out.println("CACHED 2A");
+		return cache2A;
 	}
 	
 	public FlexibleImageType getType() {
@@ -108,7 +137,7 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage copy() {
-		return new FlexibleImage(getConvertAs2A());
+		return new FlexibleImage(getAsImagePlus());
 	}
 	
 	public void setType(FlexibleImageType type) {
@@ -116,7 +145,7 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage crop() {
-		ImageOperation io = new ImageOperation(bufferedImage);
+		ImageOperation io = new ImageOperation(image);
 		io = io.crop();
 		return io.getImage();
 	}

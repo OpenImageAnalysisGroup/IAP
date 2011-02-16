@@ -24,7 +24,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -111,8 +110,8 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setInt(1);
 			
-			int pi = SystemAnalysis.getNumberOfCPUs();
-			int ti = SystemAnalysis.getNumberOfCPUs() / 2;
+			int pi = 1;// SystemAnalysis.getNumberOfCPUs();
+			int ti = 1;// SystemAnalysis.getNumberOfCPUs() / 2;
 			
 			PhytochamberAnalysisTask task = new PhytochamberAnalysisTask();
 			

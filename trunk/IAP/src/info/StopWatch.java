@@ -7,6 +7,8 @@
 
 package info;
 
+import de.ipk.ag_ba.mongo.IAPservice;
+
 /**
  * This convenience class makes it easy to stop times.
  * Just construct it with a description and later call {@link #printTime()} to
@@ -62,6 +64,10 @@ public class StopWatch {
 	public void printTime(int minTime) {
 		if (minTime == 0 || getTime() - start > minTime)
 			System.out.println(desc + " took " + getTime() + " ms");
+	}
+	
+	public static String getNiceTime() {
+		return IAPservice.getCurrentTimeAsNiceString();
 	}
 	
 }

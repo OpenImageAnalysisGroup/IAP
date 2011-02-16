@@ -3,8 +3,6 @@
  *************************************************************************/
 package de.ipk.ag_ba.image.operations;
 
-import java.awt.image.BufferedImage;
-
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
@@ -12,35 +10,33 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author entzian, klukas
  */
-public class MaskOperation {
+public class MaskOperationDirect {
 	
-	private final int[] rgbImage;
-	private final int[] fluorImage;
 	private final int background, foreground;
-	private final int[] nearIfImage;
 	private int filled = 0, deleted = 0;
-	private final int[] mask;
-	private final int heightMask;
-	private final int widthMask;
 	
-	public MaskOperation(FlexibleImage rgbImage, FlexibleImage fluorImage, FlexibleImage optNirImage, int background, int resForeground) {
-		this.rgbImage = rgbImage.getAs1A();
-		this.fluorImage = fluorImage.getAs1A();
-		if (optNirImage != null)
-			this.nearIfImage = optNirImage.getAs1A();
-		else
-			this.nearIfImage = null;
+	int[] mask = null;
+	int heightMask = -1;
+	int widthMask = -1;
+	
+	public MaskOperationDirect(int background, int resForeground) {
 		this.background = background;
 		this.foreground = resForeground;
-		
-		mask = new int[this.rgbImage.length];
-		heightMask = rgbImage.getHeight();
-		widthMask = rgbImage.getWidth();
 	}
 	
-	public void mergeMasks() {
+	public void mergeMasks(int[] rgbImage,
+			int[] fluorImage,
+			int[] nearIfImage, int rgbW, int rgbH) {
+		
+		if (mask == null || widthMask != rgbW || heightMask != rgbH) {
+			mask = new int[rgbImage.length];
+			heightMask = rgbW;
+			widthMask = rgbH;
+		}
+		
 		filled = 0;
 		deleted = 0;
+		
 		if (nearIfImage != null) {
 			if (fluorImage.length == rgbImage.length && fluorImage.length == nearIfImage.length)
 				for (int i = 0; i < fluorImage.length; i++) {
@@ -74,26 +70,6 @@ public class MaskOperation {
 		}
 	}
 	
-	public int[] getMask() {
-		return mask;
-	}
-	
-	public int getMaskHeigth() {
-		return heightMask;
-	}
-	
-	public int getMaskWidt() {
-		return widthMask;
-	}
-	
-	public FlexibleImage getMaskAsFlexibleImage() {
-		return new FlexibleImage(mask, widthMask, heightMask);
-	}
-	
-	public BufferedImage getMaskAsBufferedImage() {
-		return ImageConverter.convert1AtoBI(widthMask, heightMask, mask);
-	}
-	
 	public double getUnknownMeasurementValuePixels(double correctionForDeletedArea) {
 		return filled - deleted * correctionForDeletedArea;
 	}
@@ -106,7 +82,7 @@ public class MaskOperation {
 		return deleted;
 	}
 	
-	public FlexibleImage apply(FlexibleImage image) {
+	public FlexibleImage apply(int[] mask, FlexibleImage image) {
 		int[] image1A = image.getAs1A();
 		
 		int i = 0;

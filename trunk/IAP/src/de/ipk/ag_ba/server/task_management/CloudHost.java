@@ -7,8 +7,6 @@
 
 package de.ipk.ag_ba.server.task_management;
 
-import java.net.UnknownHostException;
-
 import com.mongodb.BasicDBObject;
 
 /**
@@ -17,9 +15,8 @@ import com.mongodb.BasicDBObject;
 public class CloudHost extends BasicDBObject {
 	private static final long serialVersionUID = 1L;
 	
-	public CloudHost() throws UnknownHostException {
-		setHostName(SystemAnalysisExt.getHostName());
-		updateTime();
+	public CloudHost() {
+		// empty
 	}
 	
 	public void setHostName(String host) {

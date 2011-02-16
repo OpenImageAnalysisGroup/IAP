@@ -16,6 +16,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas
@@ -87,7 +88,7 @@ public class CloudTaskManager {
 							BlockPipeline.getBlockExecutionsWithinLastMinute(),
 							BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute());
-					if (runningTasks.size() < 2) {
+					if (runningTasks.size() < SystemAnalysis.getNumberOfCPUs() / 5 + 1) {
 						if (m == null)
 							return;
 						for (BatchCmd batch : m.batchGetCommands(maxDelaySinceLastUpdate)) {

@@ -35,7 +35,7 @@ public class FlexibleImageStack {
 			if (image.getHeight() != h)
 				ErrorMsg.addErrorMessage("mismatching image size: " + h + " <!> " + image.getHeight());
 		}
-		stack.addSlice(label, image.getConvertAsImagePlus().getProcessor());
+		stack.addSlice(label, image.getAsImagePlus().getProcessor());
 	}
 	
 	public void saveAsLayeredTif(File file) throws FileNotFoundException {

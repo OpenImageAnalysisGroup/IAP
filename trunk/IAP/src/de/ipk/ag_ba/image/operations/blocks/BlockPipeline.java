@@ -1,8 +1,12 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
+import info.StopWatch;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
@@ -29,12 +33,16 @@ public class BlockPipeline {
 		return lastPipelineExecutionTimeInSec;
 	}
 	
+	private static ThreadSafeOptions pipelineID = new ThreadSafeOptions();
+	
 	public FlexibleMaskAndImageSet execute(FlexibleMaskAndImageSet input, FlexibleImageStack debugStack, BlockProperties settings)
 			throws InstantiationException, IllegalAccessException, InterruptedException {
 		// System.out.println("Execute BLOCK pipeline...");
 		System.out.print(".");
 		long a = System.currentTimeMillis();
 		nullPointerCheck(input, "PIPELINE INPUT ");
+		
+		int id = pipelineID.addInt(1);
 		
 		// BlockProperties settings = new BlockPropertiesImpl();
 		
@@ -43,10 +51,14 @@ public class BlockPipeline {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			
 			block.setInputAndOptions(input, options, settings, index++, debugStack);
-			
 			// nullPointerCheck(input, "INPUT for " + blockClass.getSimpleName());
-			
+			long ta = System.currentTimeMillis();
 			input = block.process();
+			long tb = System.currentTimeMillis();
+			int seconds = (int) ((tb - ta) / 1000);
+			if (!options.isDebugTakeTimes())
+				System.out.println("Pipeline " + id + ": finished block " + index + "/" + blocks.size() + ", took " + seconds + " sec., time: "
+						+ StopWatch.getNiceTime() + " (" + block.getClass().getSimpleName() + ")");
 			
 			// nullPointerCheck(input, "OUTPUT of " + blockClass.getSimpleName());
 			

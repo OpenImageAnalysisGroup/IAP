@@ -12,6 +12,7 @@ import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MaskOperation;
+import de.ipk.ag_ba.image.operations.MaskOperationDirect;
 import de.ipk.ag_ba.image.operations.MorphologicalOperationSearchType;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
@@ -128,11 +129,11 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 			// scan X direction
 			bestValueX = automaticIntervallSearchPartly(workMask, visMaskImage, 0, true, typ);
 			// bestValueX = 1.0;
-			System.out.println("bestValueX: " + bestValueX + " next Process is Y-Value!");
+			// System.out.println("bestValueX: " + bestValueX + " next Process is Y-Value!");
 			// scan Y direction
 			bestValueY = automaticIntervallSearchPartly(workMask, visMaskImage, bestValueX, false, typ);
 			// bestValueY = 1.0;
-			System.out.println("bestValueY: " + bestValueY + " next Process is next Block!");
+			// System.out.println("bestValueY: " + bestValueY + " next Process is next Block!");
 			// System.out.println("bestValueY: " + bestValueY);
 		}
 		
@@ -148,7 +149,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 			switch (typ) {
 				case SCALING:
 					io.scale(bestValueX, bestValueY);
-					System.out.println("Scale X = " + bestValueX + ", Y = " + bestValueY);
+					// System.out.println("Scale X = " + bestValueX + ", Y = " + bestValueY);
 					break;
 				
 				case TRANSLATION:
@@ -156,12 +157,12 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 					// bestValueY = Math.round(bestValueY);
 					
 					io.translate(bestValueX, bestValueY);
-					System.out.println("Translate X = " + bestValueX + ", Y = " + bestValueY);
+					// System.out.println("Translate X = " + bestValueX + ", Y = " + bestValueY);
 					break;
 				
 				case ROTATION:
 					io.rotate(bestValueX);
-					System.out.println("Rotate X = " + bestValueX);
+					// System.out.println("Rotate X = " + bestValueX);
 					break;
 				
 				default:
@@ -247,24 +248,14 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		final ThreadSafeOptions bestParameterTS = new ThreadSafeOptions();
 		bestParameterTS.setDouble(Double.NaN);
 		
-		ArrayList<MyThread> tl = new ArrayList<MyThread>();
-		for (double step = borderLeft; step <= borderRight; step += intervallSteps) {// step = Math.round((intervallSteps + step) * accuracy) / accuracy) {
-			zaehler++;
-			final double fstep = step;
-			tl.add(
-					BackgroundThreadDispatcher.addTask(new Runnable() {
-						@Override
-						public void run() {
-							innerLoop(workMask, visMaskImage, scanParameterX, bestValueOfOtherTranslation, operation, bestValueTS, bestParameterTS, fstep);
-						}
-					}, "Inner loop " + operation, 3));
-		}
+		boolean threaded = false;
 		
-		try {
-			BackgroundThreadDispatcher.waitFor(tl);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			ErrorMsg.addErrorMessage(e);
+		if (threaded) {
+			zaehler = searchMultiThreaded(workMask, visMaskImage, borderLeft, borderRight, zaehler, scanParameterX, bestValueOfOtherTranslation, operation,
+					intervallSteps, bestValueTS, bestParameterTS);
+		} else {
+			zaehler = searchSingleThreaded(workMask, visMaskImage, borderLeft, borderRight, zaehler, scanParameterX, bestValueOfOtherTranslation, operation,
+					intervallSteps, bestValueTS, bestParameterTS);
 		}
 		
 		double newBorderLeft = bestParameterTS.getDouble() - intervallSteps;
@@ -295,9 +286,47 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 					n, zaehler, scanParameterX, bestValueOfOtherTranslation, operation);
 	}
 	
+	private int searchMultiThreaded(final FlexibleImage workMask, final FlexibleImage visMaskImage, double borderLeft, double borderRight, int zaehler,
+			final boolean scanParameterX, final double bestValueOfOtherTranslation, final MorphologicalOperationSearchType operation, double intervallSteps,
+			final ThreadSafeOptions bestValueTS, final ThreadSafeOptions bestParameterTS) {
+		ArrayList<MyThread> tl = new ArrayList<MyThread>();
+		for (double step = borderLeft; step <= borderRight; step += intervallSteps) {// step = Math.round((intervallSteps + step) * accuracy) / accuracy) {
+			zaehler++;
+			final double fstep = step;
+			tl.add(
+					BackgroundThreadDispatcher.addTask(new Runnable() {
+						@Override
+						public void run() {
+							innerLoop(workMask, visMaskImage, scanParameterX, bestValueOfOtherTranslation, operation, bestValueTS, bestParameterTS, fstep, null);
+						}
+					}, "Inner loop " + operation, 3));
+		}
+		
+		try {
+			BackgroundThreadDispatcher.waitFor(tl);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
+		return zaehler;
+	}
+	
+	private int searchSingleThreaded(final FlexibleImage workMask, final FlexibleImage visMaskImage, double borderLeft, double borderRight, int zaehler,
+			final boolean scanParameterX, final double bestValueOfOtherTranslation, final MorphologicalOperationSearchType operation, double intervallSteps,
+			final ThreadSafeOptions bestValueTS, final ThreadSafeOptions bestParameterTS) {
+		for (double step = borderLeft; step <= borderRight; step += intervallSteps) {// step = Math.round((intervallSteps + step) * accuracy) / accuracy) {
+			zaehler++;
+			final double fstep = step;
+			innerLoop(workMask, visMaskImage, scanParameterX, bestValueOfOtherTranslation, operation, bestValueTS, bestParameterTS, fstep,
+					new MaskOperationDirect(options.getBackground(), Color.GRAY.getRGB()));
+		}
+		
+		return zaehler;
+	}
+	
 	private void innerLoop(final FlexibleImage workMask, final FlexibleImage visMaskImage, final boolean scanParameterX,
 			final double bestValueOfOtherTranslation, final MorphologicalOperationSearchType operation, final ThreadSafeOptions bestValueTS,
-			final ThreadSafeOptions bestParameterTS, double step) {
+			final ThreadSafeOptions bestParameterTS, double step, MaskOperationDirect optUseSingleMaskOperationObject) {
 		double value = -1;
 		double noOperationValue = Double.NaN;
 		switch (operation) {
@@ -310,9 +339,9 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 				break;
 		}
 		if (scanParameterX)
-			value = getMatchResultValue(workMask, visMaskImage, step, noOperationValue, operation);
+			value = getMatchResultValue(workMask, visMaskImage, step, noOperationValue, operation, optUseSingleMaskOperationObject);
 		else
-			value = getMatchResultValue(workMask, visMaskImage, bestValueOfOtherTranslation, step, operation);
+			value = getMatchResultValue(workMask, visMaskImage, bestValueOfOtherTranslation, step, operation, optUseSingleMaskOperationObject);
 		// System.out.println("" + operation + " mit dem Wert: " + step + " mit dem value: " + value);
 		
 		synchronized (bestParameterTS) {
@@ -343,7 +372,9 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 	
 	//
 	
-	private double getMatchResultValue(FlexibleImage workMask, FlexibleImage visMaskImage, double valueX, double valueY, MorphologicalOperationSearchType typ) {
+	private double getMatchResultValue(FlexibleImage workMask, FlexibleImage visMaskImage, double valueX, double valueY,
+			MorphologicalOperationSearchType typ, MaskOperationDirect optUseSingleMaskOperationObject) {
+		
 		ImageOperation io = new ImageOperation(workMask);
 		// FlexibleImage changedMask = null;
 		switch (typ) {
@@ -363,18 +394,26 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 				break;
 		}
 		
-		// changedMask = io.getImage();
-		// ImageOperation.showTwoImagesAsOne(visMaskImage.getBufferedImage(), io.getImageAsBufferedImage());
-		MaskOperation o = new MaskOperation(visMaskImage, io.getImage(), null,
-							options.getBackground(), Color.GRAY.getRGB());
-		o.mergeMasks();
 		double correctionForDeletedArea = 1;
-		// if (typ == MorphologicalOperationSearchType.SCALING) {
-		// correctionForDeletedArea = 1 / valueX;
-		// correctionForDeletedArea = correctionForDeletedArea / valueY;
-		// }
-		// ImageOperation.showTwoImagesAsOne(workMask.getBufferedImage(), o.getMaskAsBufferedImage());
 		
-		return o.getUnknownMeasurementValuePixels(correctionForDeletedArea);
+		if (optUseSingleMaskOperationObject == null) {
+			// changedMask = io.getImage();
+			// ImageOperation.showTwoImagesAsOne(visMaskImage.getBufferedImage(), io.getImageAsBufferedImage());
+			MaskOperation o = new MaskOperation(visMaskImage, io.getImage(), null,
+							options.getBackground(), Color.GRAY.getRGB());
+			o.mergeMasks();
+			// if (typ == MorphologicalOperationSearchType.SCALING) {
+			// correctionForDeletedArea = 1 / valueX;
+			// correctionForDeletedArea = correctionForDeletedArea / valueY;
+			// }
+			// ImageOperation.showTwoImagesAsOne(workMask.getBufferedImage(), o.getMaskAsBufferedImage());
+			
+			return o.getUnknownMeasurementValuePixels(correctionForDeletedArea);
+		} else {
+			optUseSingleMaskOperationObject.mergeMasks(visMaskImage.getAs1A(), io.getImageAs1array(), null,
+					visMaskImage.getWidth(),
+					visMaskImage.getHeight());
+			return optUseSingleMaskOperationObject.getUnknownMeasurementValuePixels(correctionForDeletedArea);
+		}
 	}
 }

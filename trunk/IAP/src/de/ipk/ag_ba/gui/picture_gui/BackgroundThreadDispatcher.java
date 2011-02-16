@@ -133,92 +133,7 @@ public class BackgroundThreadDispatcher {
 		
 		sheduler = new Thread(new Runnable() {
 			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e) {
-						// PictureGUI.showError("Background thread dispatcher was interrupted.",
-						// e);
-						// kein Fehler! normal!
-					}
-					while (!todo.empty()) {
-						Thread t = null;
-						synchronized (todo) {
-							int maxPrio = Integer.MIN_VALUE;
-							// search maximum priority
-							for (int i = 0; i < todo.size(); i++) {
-								int curPrio = (todoPriorities.get(i)).intValue();
-								if (curPrio > maxPrio)
-									maxPrio = curPrio;
-							}
-							// search oldest thread with maximum priority
-							for (int i = 0; i < todo.size(); i++) {
-								int curPrio = (todoPriorities.get(i)).intValue();
-								if (curPrio == maxPrio) {
-									// use that thread and run it
-									t = todo.get(i);
-									// System.out.println("Start thread " + t.getName() + ". blocked: " + waitThreads.size() + ", max run:" + maxTask + ", running: "
-									// + runningTasks.size() + ", todo:" + todo.size());
-									todo.remove(i);
-									Integer prio = todoPriorities.get(i);
-									todoPriorities.remove(i);
-									t.setName(t.getName() + ", priority:" + prio.toString());
-									break;
-								}
-							}
-						}
-						if (t != null) {
-							t.setPriority(Thread.MIN_PRIORITY);
-							t.start();
-							synchronized (runningTasks) {
-								runningTasks.add(t);
-							}
-						}
-						// System.out.println("Running tasks: " + runningTasks.size() + "/" + maxTask + " max");
-						// wait until the number of running tasks gets below the
-						// maximum
-						// then a new one can be started above
-						// in case there is a higher priority task waiting
-						// (higher than all running tasks) then the loop is
-						// stopped, it can run, too
-						while (runningTasks.size() - waitThreads.size() + 1 >= maxTask || highMemoryLoad(runningTasks)) {
-							int highestRunningPrio = Integer.MIN_VALUE;
-							try {
-								Thread.sleep(5);
-							} catch (InterruptedException e) {
-								// kein Fehler, normal!
-							}
-							synchronized (runningTasks) {
-								for (int i = 0; i < runningTasks.size(); i++) {
-									Thread rt = runningTasks.get(i);
-									if (!rt.isAlive()) {
-										myRemove(rt);
-										i--;
-									} else {
-										String name = rt.getName();
-										try {
-											int thisPrio = Integer.parseInt(name.substring(name.indexOf(":") + ":".length()));
-											if (thisPrio > highestRunningPrio)
-												highestRunningPrio = thisPrio;
-										} catch (Exception nfe) {
-											System.err.println("Invalid thread name (priority can't be parsed): " + name);
-										}
-									}
-								}
-							}
-							int highestNOTrunningPrio = Integer.MIN_VALUE;
-							synchronized (todo) {
-								for (int i = 0; i < todo.size(); i++) {
-									int curPrio = (todoPriorities.get(i)).intValue();
-									if (curPrio > highestNOTrunningPrio)
-										highestNOTrunningPrio = curPrio;
-								}
-							}
-							if (highestNOTrunningPrio > highestRunningPrio)
-								break;
-						}
-					}
-				}
+				schedulerCode();
 			}
 		});
 		sheduler.start();
@@ -261,6 +176,95 @@ public class BackgroundThreadDispatcher {
 		// for (Thread t : waitThreads)
 		// t.interrupt();
 		// }
+	}
+	
+	private void schedulerCode() {
+		while (true) {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				// PictureGUI.showError("Background thread dispatcher was interrupted.",
+				// e);
+				// kein Fehler! normal!
+			}
+			while (!todo.empty()) {
+				Thread t = null;
+				synchronized (todo) {
+					int maxPrio = Integer.MIN_VALUE;
+					// search maximum priority
+					for (int i = 0; i < todo.size(); i++) {
+						int curPrio = (todoPriorities.get(i)).intValue();
+						if (curPrio > maxPrio)
+							maxPrio = curPrio;
+					}
+					// search oldest thread with maximum priority
+					for (int i = 0; i < todo.size(); i++) {
+						int curPrio = (todoPriorities.get(i)).intValue();
+						if (curPrio == maxPrio) {
+							// use that thread and run it
+							t = todo.get(i);
+							// System.out.println("Start thread " + t.getName() + ". blocked: " + waitThreads.size() + ", max run:" + maxTask + ", running: "
+							// + runningTasks.size() + ", todo:" + todo.size());
+							todo.remove(i);
+							Integer prio = todoPriorities.get(i);
+							todoPriorities.remove(i);
+							t.setName(t.getName() + ", priority:" + prio.toString());
+							break;
+						}
+					}
+				}
+				if (t != null) {
+					t.setPriority(Thread.MIN_PRIORITY);
+					t.start();
+					synchronized (runningTasks) {
+						runningTasks.add(t);
+					}
+				}
+				// System.out.println("Running tasks: " + runningTasks.size() + "/" + maxTask + " max");
+				// wait until the number of running tasks gets below the
+				// maximum
+				// then a new one can be started above
+				// in case there is a higher priority task waiting
+				// (higher than all running tasks) then the loop is
+				// stopped, it can run, too
+				while (runningTasks.size() - waitThreads.size() + 1 >= maxTask || highMemoryLoad(runningTasks)) {
+					int highestRunningPrio = Integer.MIN_VALUE;
+					try {
+						Thread.sleep(5);
+					} catch (InterruptedException e) {
+						// kein Fehler, normal!
+					}
+					synchronized (runningTasks) {
+						for (int i = 0; i < runningTasks.size(); i++) {
+							Thread rt = runningTasks.get(i);
+							if (!rt.isAlive()) {
+								myRemove(rt);
+								i--;
+							} else {
+								String name = rt.getName();
+								try {
+									int thisPrio = Integer.parseInt(name.substring(name.indexOf(":") + ":".length()));
+									if (thisPrio > highestRunningPrio)
+										highestRunningPrio = thisPrio;
+								} catch (Exception nfe) {
+									System.err.println("Invalid thread name (priority can't be parsed): " + name);
+								}
+							}
+						}
+					}
+					int highestNOTrunningPrio = Integer.MIN_VALUE;
+					synchronized (todo) {
+						for (int i = 0; i < todo.size(); i++) {
+							int curPrio = (todoPriorities.get(i)).intValue();
+							if (curPrio > highestNOTrunningPrio)
+								highestNOTrunningPrio = curPrio;
+						}
+					}
+					if (highestNOTrunningPrio > highestRunningPrio)
+						break;
+				}
+			}
+		}
 	}
 	
 	private static void waitFor(HashSet<MyThread> threads) throws InterruptedException {
