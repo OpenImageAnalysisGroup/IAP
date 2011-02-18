@@ -54,6 +54,16 @@ public class NumericDataReportAction extends AbstractNavigationAction {
 	}
 	
 	@Override
+	public String getDefaultTitle() {
+		return "Tabular Report";
+	}
+	
+	@Override
+	public String getDefaultImage() {
+		return "img/ext/applications-office.png";
+	}
+	
+	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		ArrayList<String> cols = new ArrayList<String>();

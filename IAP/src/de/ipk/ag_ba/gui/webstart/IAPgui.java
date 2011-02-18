@@ -135,11 +135,11 @@ public class IAPgui {
 							+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis, "
 							+ "partly with contributions from the group Bioinformatics and Information Technology. To get details about the included data sources and information systems, click the included Website- and Reference-Links.<br>"
 							+ "<br>"
-							+ "This information system is in alpha-stage not meant for productive work. "
+							+ "This information system is in alpha-stage. "
 							+ "It may not work reliable, only a small subset of future functions are implemented.<br>"
 							+ "<br>"
 							+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
-							+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>";
+							+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>";
 	}
 	
 	public static void navigateTo(final String target, NavigationButton src) {

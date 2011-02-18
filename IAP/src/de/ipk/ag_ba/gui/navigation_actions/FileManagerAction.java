@@ -70,4 +70,8 @@ public class FileManagerAction extends AbstractNavigationAction {
 				guiSetting);
 		return fileManager;
 	}
+	
+	public ExperimentReference getExperimentReference() {
+		return experiment;
+	}
 }
