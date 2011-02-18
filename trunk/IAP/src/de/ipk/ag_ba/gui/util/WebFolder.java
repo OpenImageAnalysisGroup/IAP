@@ -71,7 +71,7 @@ public class WebFolder {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 				if (referenceTitle != null) {
-					NavigationAction action = new AbstractNavigationAction("Show in browser") {
+					NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
 						@Override
 						public void performActionCalculateResults(NavigationButton src) {
 							AttributeHelper.showInBrowser(referenceURL);
@@ -86,6 +86,11 @@ public class WebFolder {
 						public ArrayList<NavigationButton> getResultNewActionSet() {
 							return null;
 						}
+						
+						@Override
+						public String getURL() {
+							return referenceURL;
+						}
 					};
 					NavigationButton website = new NavigationButton(action, referenceTitle, referenceImage,
 										src.getGUIsetting());
@@ -96,7 +101,7 @@ public class WebFolder {
 				if (lib != null) {
 					for (Book fpp : lib.getBooksInFolder("")) {
 						final Book fp = fpp;
-						NavigationAction action = new AbstractNavigationAction("Open web-ressource") {
+						NavigationAction action = new AbstractUrlNavigationAction("Open web-ressource") {
 							@Override
 							public void performActionCalculateResults(NavigationButton src) {
 								AttributeHelper.showInBrowser(fp.getUrl());
@@ -110,6 +115,11 @@ public class WebFolder {
 							@Override
 							public ArrayList<NavigationButton> getResultNewActionSet() {
 								return null;
+							}
+							
+							@Override
+							public String getURL() {
+								return fp.getUrl();
 							}
 						};
 						
