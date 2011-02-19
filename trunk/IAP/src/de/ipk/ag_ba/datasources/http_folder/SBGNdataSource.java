@@ -35,9 +35,9 @@ public class SBGNdataSource extends HTTPfolderSource {
 		lib.add(new Book("SBGN-ED", "SBGN-ED", "http://vanted.ipk-gatersleben.de/addons/sbgn-ed/", "img/browser.png"));
 		lib.add(new Book("", "SBGN Specification", "http://www.nature.com/nbt/journal/v27/n8/full/nbt.1558.html", "img/dataset.png"));
 		lib.add(new Book("", "Reference", "http://bioinformatics.oxfordjournals.org/content/26/18/2340.short", "img/dataset.png"));
-		lib.add(new Book("Activity Flow", "Nat. Proc. (AF)", "http://precedings.nature.com/documents/3724/version/1"));
-		lib.add(new Book("Entity Relationship", "Nat. Proc. (ER)", "http://precedings.nature.com/documents/3719/version/1", "img/dataset.png"));
-		lib.add(new Book("Process Description", "Nat. Proc. (PD)", "http://precedings.nature.com/documents/2320/version/1", "img/dataset.png"));
+		lib.add(new Book("Activity Flow", "Nat. Proc. (AF)", "http://precedings.nature.com/documents/3724"));
+		lib.add(new Book("Entity Relationship", "Nat. Proc. (ER)", "http://precedings.nature.com/documents/3719", "img/dataset.png"));
+		lib.add(new Book("Process Description", "Nat. Proc. (PD)", "http://precedings.nature.com/documents/3721", "img/dataset.png"));
 		return lib;
 	}
 }
