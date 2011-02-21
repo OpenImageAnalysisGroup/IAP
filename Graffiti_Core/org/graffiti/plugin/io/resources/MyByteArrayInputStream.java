@@ -7,6 +7,7 @@
 package org.graffiti.plugin.io.resources;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 
 /**
  * @author klukas
@@ -23,5 +24,9 @@ public class MyByteArrayInputStream extends ByteArrayInputStream {
 	
 	public byte[] getBuff() {
 		return buf;
+	}
+	
+	public byte[] getBuffTrimmed() {
+		return Arrays.copyOfRange(buf, 0, count);
 	}
 }
