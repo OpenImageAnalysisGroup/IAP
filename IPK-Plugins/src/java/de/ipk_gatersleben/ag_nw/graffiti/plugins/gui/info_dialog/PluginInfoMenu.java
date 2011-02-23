@@ -8,7 +8,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: PluginInfoMenu.java,v 1.1 2011-01-31 09:00:31 klukas Exp $
+// $Id: PluginInfoMenu.java,v 1.2 2011-02-23 14:41:29 klukas Exp $
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog;
 
@@ -32,7 +32,9 @@ public class PluginInfoMenu
 	 */
 	public PluginInfoMenu() {
 		
-		GravistoService.getInstance()
+		if (GravistoService.getInstance()
+							.getMainFrame() != null)
+			GravistoService.getInstance()
 							.getMainFrame()
 							.setTitle(PatternGraffitiHelper.PATTERN_GRAFFITI_VERSION);
 		/*

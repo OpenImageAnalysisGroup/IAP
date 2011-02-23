@@ -29,7 +29,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.editor.ManagerManager;
 import org.graffiti.editor.SplashScreenInterface;
+import org.graffiti.managers.pluginmgr.PluginManager;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter;
@@ -39,7 +41,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.MenuItemInf
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Main {
 	// ~ Static fields/initializers =============================================
@@ -73,13 +75,14 @@ public class Main {
 	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon) {
 		
 		setupLogger();
-		
-		final ThreadSafeOptions tso = new ThreadSafeOptions();
-		SplashScreenInterface splashScreen = new DBEsplashScreen(applicationName,
+		final ClassLoader cl = this.getClass().getClassLoader();
+		SplashScreenInterface splashScreen = null;
+		if (showMainFrame) {
+			final ThreadSafeOptions tso = new ThreadSafeOptions();
+			splashScreen = new DBEsplashScreen(applicationName,
 							"", new Runnable() {
 								public void run() {
 									if (showMainFrame) {
-										ClassLoader cl = this.getClass().getClassLoader();
 										String path = this.getClass().getPackage().getName()
 															.replace('.', '/');
 										ImageIcon icon = new ImageIcon(cl.getResource(path
@@ -117,19 +120,19 @@ public class Main {
 									}
 								}
 							});
-		
-		tso.setParam(0, splashScreen);
-		ClassLoader cl = this.getClass().getClassLoader();
-		String path = this.getClass().getPackage().getName()
+			
+			tso.setParam(0, splashScreen);
+			String path = this.getClass().getPackage().getName()
 							.replace('.', '/');
-		ImageIcon icon = new ImageIcon(cl.getResource(path
+			ImageIcon icon = new ImageIcon(cl.getResource(path
 							+ "/ipklogo16x16_5.png"));
-		((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
-		
-		splashScreen.setVisible(showMainFrame);
-		
+			((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
+			
+			splashScreen.setVisible(showMainFrame);
+		}
 		if (!ReleaseInfo.isRunningAsApplet())
-			GravistoMainHelper.createApplicationSettingsFolder(splashScreen);
+			if (splashScreen != null)
+				GravistoMainHelper.createApplicationSettingsFolder(splashScreen);
 		
 		if (!ReleaseInfo.isRunningAsApplet())
 			if (!showMainFrame && !(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted")).exists() &&
@@ -148,8 +151,10 @@ public class Main {
 				
 				ReleaseInfo.setIsFirstRun(true);
 				
-				splashScreen.setVisible(false);
-				splashScreen.setText("Request KEGG License Status");
+				if (splashScreen != null) {
+					splashScreen.setVisible(false);
+					splashScreen.setText("Request KEGG License Status");
+				}
 				int result = askForEnablingKEGG();
 				if (result == JOptionPane.YES_OPTION) {
 					try {
@@ -172,10 +177,13 @@ public class Main {
 									JOptionPane.INFORMATION_MESSAGE);
 					System.exit(0);
 				}
-				splashScreen.setVisible(true);
+				if (splashScreen != null)
+					splashScreen.setVisible(true);
 			}
 		
-		GravistoMainHelper.initApplicationExt(GravistoMainHelper.getNewPluginManager(), args, splashScreen, cl, null, addon);
+		PluginManager pm = GravistoMainHelper.getNewPluginManager();
+		ManagerManager.getInstance(pm);
+		GravistoMainHelper.initApplicationExt(pm, args, splashScreen, cl, null, addon);
 	}
 	
 	public static boolean doEnableKEGGaskUser() {
@@ -288,10 +296,8 @@ public class Main {
 		
 		AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
-		Main e = new Main(true,
+		new Main(true,
 							DBEgravistoHelper.DBE_GRAVISTO_VERSION, args, developerAddon);
-		if (e == null)
-			System.err.println("MainFrame not created.");
 	}
 	
 	public static void startVanted(String[] args, String adn) {

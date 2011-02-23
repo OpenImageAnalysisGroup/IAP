@@ -10,6 +10,7 @@ import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
 
 import java.awt.Color;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -100,7 +101,9 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		else
 			this.title = "Help";
 		nh = new NewsHelper(this);
-		initComponents();
+		
+		if (!GraphicsEnvironment.isHeadless())
+			initComponents();
 	}
 	
 	private void initComponents() {

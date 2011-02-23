@@ -124,13 +124,10 @@ public class MongoDB {
 		return new MongoDB("Unit Tests local", "localUnitTests", "ba-13", null, null, HashType.SHA512);
 	}
 	
-	private MongoDBhandler mh;
-	private MongoDBpreviewHandler mp;
+	private final MongoDBhandler mh;
+	private final MongoDBpreviewHandler mp;
 	
 	public ResourceIOHandler[] getHandlers() {
-		String serverIP = databaseHost;
-		this.mh = new MongoDBhandler(serverIP, this);
-		this.mp = new MongoDBpreviewHandler(serverIP, this);
 		return new ResourceIOHandler[] { mh, mp };
 	}
 	
@@ -159,6 +156,10 @@ public class MongoDB {
 		this.databaseLogin = login;
 		this.databasePass = password;
 		this.hashType = hashType;
+		
+		mh = new MongoDBhandler(databaseHost, this);
+		mp = new MongoDBpreviewHandler(databaseHost, this);
+		
 	}
 	
 	public void saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
