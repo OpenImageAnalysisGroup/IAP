@@ -1,5 +1,6 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileReader;
@@ -107,7 +108,8 @@ public class GravistoMainHelper implements HelperClass {
 		// }
 		
 		int nnc = pluginLocations.size();
-		progressViewer.setText("Read Plugin-Description Files... (" + nnc + ")");
+		if (progressViewer != null)
+			progressViewer.setText("Read Plugin-Description Files... (" + nnc + ")");
 		final ClassLoader cl = Main.class.getClassLoader();
 		
 		ExecutorService run = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
@@ -295,21 +297,26 @@ public class GravistoMainHelper implements HelperClass {
 	
 	public static MainFrame initApplicationExt(PluginManager pluginmanager, String[] args, SplashScreenInterface splashScreen, ClassLoader cl,
 						String addPluginFile, String[] addPlugins) {
-		splashScreen.setText("Read plugin information");
+		if (splashScreen != null)
+			splashScreen.setText("Read plugin information");
 		
 		// construct and open the editor's main frame
 		GravistoPreferences uiPrefs = getPreferences().node("ui");
 		uiPrefs.put("showPluginManagerMenuOptions", "false");
 		uiPrefs.put("showPluginMenu", "false");
 		
-		splashScreen.setText("Read plugin information..");
+		if (splashScreen != null)
+			splashScreen.setText("Read plugin information..");
 		
 		JPanel statusPanel = new JPanel();
 		// statusPanel.
-		final MainFrame mainFrame = new MainFrame(pluginmanager, uiPrefs, statusPanel, true);
 		
-		installDragAndDropHandler(mainFrame);
-		
+		final MainFrame mainFrame;
+		if (!GraphicsEnvironment.isHeadless()) {
+			mainFrame = new MainFrame(pluginmanager, uiPrefs, statusPanel, true);
+			installDragAndDropHandler(mainFrame);
+		} else
+			mainFrame = null;
 		// ClassLoader cl = Main.class.getClassLoader();
 		URL r1 = cl.getResource("plugins1.txt");
 		URL r2 = cl.getResource("plugins2.txt");
@@ -334,7 +341,8 @@ public class GravistoMainHelper implements HelperClass {
 		// System.out.println("Plugins5 (opt.): "+(r5!=null ? r5.toExternalForm()
 		// : "null"));
 		
-		splashScreen.setText("Read plugin information...");
+		if (splashScreen != null)
+			splashScreen.setText("Read plugin information...");
 		
 		ArrayList<String> locations = new ArrayList<String>();
 		try {
@@ -373,7 +381,8 @@ public class GravistoMainHelper implements HelperClass {
 					}
 				}
 			}
-			splashScreen.setMaximum(locations.size() - 1);
+			if (splashScreen != null)
+				splashScreen.setMaximum(locations.size() - 1);
 		} catch (IOException e) {
 			ErrorMsg.addErrorMessage(e);
 		} catch (NullPointerException npe) {
@@ -381,7 +390,8 @@ public class GravistoMainHelper implements HelperClass {
 			System.err.println("Don't forget to start createfilelist from the make folder.");
 			System.err.println("See make - intro.txt for details.");
 			System.err.println("-- Program needs to be stopped");
-			JOptionPane.showMessageDialog(null, "<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
+			if (!GraphicsEnvironment.isHeadless())
+				JOptionPane.showMessageDialog(null, "<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
 								+ "Program execution can not continue.<br>"
 								+ "Don't forget to start createfilelist from the make folder.<br>"
 								+ "See make - intro.txt for details.<br>" + "The application needs to be closed.</html>");
@@ -390,7 +400,8 @@ public class GravistoMainHelper implements HelperClass {
 		}
 		
 		// printLocations(locations, "info");
-		splashScreen.setText("Load plugins...");
+		if (splashScreen != null)
+			splashScreen.setText("Load plugins...");
 		try {
 			loadPlugins(pluginmanager, locations, splashScreen);
 		} catch (PluginManagerException pme) {
@@ -408,9 +419,11 @@ public class GravistoMainHelper implements HelperClass {
 			t.start();
 		}
 		
-		splashScreen.setText("Processing finished");
+		if (splashScreen != null)
+			splashScreen.setText("Processing finished");
 		
-		splashScreen.setInitialisationFinished();
+		if (splashScreen != null)
+			splashScreen.setInitialisationFinished();
 		ErrorMsg.setAppLoadingCompleted(ApplicationStatus.PROGRAM_LOADING_FINISHED);
 		if (args != null) {
 			for (String resource : args) {
@@ -421,18 +434,19 @@ public class GravistoMainHelper implements HelperClass {
 							BSHinfo info = new BSHinfo(url);
 							BSHscriptMenuEntry.executeScript(info, url.getFileName());
 						} else {
-							for (String ext : MainFrame.getInstance().getIoManager().getGraphFileExtensions())
-								if (url.getFileName().toLowerCase().endsWith(ext)) {
-									final Graph g = mainFrame.getGraph(url, url.getFileName());
-									SwingUtilities.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											mainFrame.showGraph(g, new ActionEvent(mainFrame, 1,
+							if (MainFrame.getInstance() != null)
+								for (String ext : MainFrame.getInstance().getIoManager().getGraphFileExtensions())
+									if (url.getFileName().toLowerCase().endsWith(ext)) {
+										final Graph g = mainFrame.getGraph(url, url.getFileName());
+										SwingUtilities.invokeLater(new Runnable() {
+											@Override
+											public void run() {
+												mainFrame.showGraph(g, new ActionEvent(mainFrame, 1,
 																"load graph passed with arguments"));
-										}
-									});
-									break;
-								}
+											}
+										});
+										break;
+									}
 						}
 					}
 				} catch (Exception e) {

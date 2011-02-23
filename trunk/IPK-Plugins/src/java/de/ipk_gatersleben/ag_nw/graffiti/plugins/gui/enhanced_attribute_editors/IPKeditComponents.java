@@ -3,6 +3,7 @@
  *******************************************************************************/
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.enhanced_attribute_editors;
 
+import org.ErrorMsg;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.managers.EditComponentManager;
 import org.graffiti.managers.pluginmgr.PluginDescription;
@@ -15,7 +16,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.IPK_EditorPluginAdapter;
 /**
  * This class is a plugin providing some default value edit components.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * @see org.graffiti.plugin.editcomponent.ValueEditComponent
  * @see org.graffiti.plugin.GenericPlugin
  */
@@ -40,7 +41,7 @@ public class IPKeditComponents
 	 * org.graffiti.managers.pluginmgr.PluginDescription)
 	 */
 	public void pluginAdded(GenericPlugin plugin, PluginDescription desc) {
-		if (plugin == null)
+		if (plugin == null || GravistoService.getInstance().getMainFrame() == null)
 			return;
 		try {
 			if (plugin instanceof EditorPluginAdapter) {
@@ -49,7 +50,7 @@ public class IPKeditComponents
 			}
 			// System.out.println("IPK Parameter Plugin overrides Default Parameter Editors.");
 		} catch (Exception e) {
-			System.err.println("ERR: " + e.getLocalizedMessage());
+			ErrorMsg.addErrorMessage(e);
 		}
 	}
 }

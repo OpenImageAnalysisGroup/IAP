@@ -7,6 +7,8 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
 
+import java.awt.GraphicsEnvironment;
+
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
@@ -24,7 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.plugin_settings.Preferences
  * Represents the tab, which contains the functionality to edit the attributes
  * of the current graph object.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TabPluginControl
 					extends InspectorTab {
@@ -69,7 +71,8 @@ public class TabPluginControl
 	public TabPluginControl() {
 		super();
 		this.title = "Layout";
-		initComponents();
+		if (!GraphicsEnvironment.isHeadless())
+			initComponents();
 	}
 	
 	/*

@@ -1,5 +1,6 @@
 package org.graffiti.editor;
 
+import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -42,6 +43,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -736,7 +738,8 @@ public class GravistoService implements HelperClass {
 			fileNames.clear();
 		}
 		try {
-			MainFrame.getInstance().loadGraphInBackground(toDo.toArray(new File[] {}), null, true);
+			if (MainFrame.getInstance() != null)
+				MainFrame.getInstance().loadGraphInBackground(toDo.toArray(new File[] {}), null, true);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
@@ -1214,5 +1217,118 @@ public class GravistoService implements HelperClass {
 		for (int i = 0; i < iss.length; i++)
 			res[i] = (String) resultList.get(i).getObject();
 		return res;
+	}
+	
+	/**
+	 * Method <code>showViewChooserDialog </code> invokes a view chooser dialog
+	 * for choosing view types. The parameter withNewSession specifies whether
+	 * the new view starts within an existing session or within a new session.
+	 * 
+	 * @param session
+	 *           the session in which to open the new view.
+	 * @param returnScrollPane
+	 *           DOCUMENT ME!
+	 * @param e
+	 * @param interaction
+	 * @return DOCUMENT ME!
+	 */
+	public JScrollPane showViewChooserDialog(final EditorSession session, boolean returnScrollPane, ActionEvent e,
+						LoadSetting interaction, final ConfigureViewAction configNewView) {
+		if (!returnScrollPane && !SwingUtilities.isEventDispatchThread())
+			ErrorMsg.addErrorMessage("Internal Error: showViewChooserDialog not on event dispatch thread");
+		String[] views;
+		if (ManagerManager.getInstance(null).viewManager != null)
+			views = ManagerManager.getInstance(null).viewManager.getViewNames();
+		else
+			views = new String[] { "org.graffiti.plugins.views.defaults.GraffitiView" };
+		if (views.length == 0) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), MainFrame.getInstance().sBundle.getString("viewchooser.pluginNotAdded"),
+					MainFrame.getInstance().sBundle.getString("viewchooser.errorDialog.title"), JOptionPane.ERROR_MESSAGE);
+		} else
+			if (views.length == 1) {
+				if (MainFrame.getInstance().sessions.contains(session)) {
+					return MainFrame.getInstance().createInternalFrame(views[0], session.getGraph().getName(), returnScrollPane, false);
+				} else {
+					JScrollPane jsp = (JScrollPane) MainFrame.getInstance().createInternalFrame(views[0], session.getGraph().getName(), session,
+										returnScrollPane, false, false, configNewView, true);
+					return jsp;
+				}
+			} else {
+				if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR) {
+					if (interaction == LoadSetting.VIEW_CHOOSER_FOR_LARGE_GRAPHS_ONLY
+										&& session.getGraph() != null
+										&& ((session.getGraph().getNumberOfNodes() + session.getGraph().getNumberOfEdges() > 1000) || ((e != null && (e
+															.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK))))
+						interaction = LoadSetting.VIEW_CHOOSER_ALWAYS; // show view
+					// chooser dialog
+					// in case the
+					// graph size is
+					// large
+				}
+				if (interaction == LoadSetting.VIEW_CHOOSER_FOR_LARGE_GRAPHS_ONLY)
+					interaction = LoadSetting.VIEW_CHOOSER_NEVER;
+				
+				// from here on only VIEW_CHOOSER_ALWAYS or
+				// VIEW_CHOOSER_NEVER_ALWAYS_DEFAULT should be set
+				
+				if (interaction == LoadSetting.VIEW_CHOOSER_NEVER
+									|| interaction == LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION) {
+					String defaultView = ManagerManager.getInstance(null).viewManager.getDefaultView();
+					if (MainFrame.getInstance() != null && MainFrame.getInstance().sessions.contains(session)) {
+						return MainFrame.getInstance().createInternalFrame(defaultView, session.getGraph().getName(), session, returnScrollPane, false,
+											configNewView);
+					} else {
+						Graph g = session.getGraph();
+						String name = null;
+						if (g != null)
+							name = g.getName();
+						if (name == null)
+							name = "[NULL]";
+						JScrollPane jsp = (JScrollPane) MainFrame.getInstance().createInternalFrame(defaultView, name, session, returnScrollPane, false,
+											false, configNewView, interaction != LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION);
+						return jsp;
+					}
+				} else {
+					// interaction is VIEW_CHOOSER_ALWAYS
+					ViewTypeChooser viewChooser = new ViewTypeChooser(MainFrame.getInstance(), MainFrame.getInstance().sBundle.getString("viewchooser.title") + " ("
+										+ session.getGraph().getNumberOfNodes() + " nodes, " + session.getGraph().getNumberOfEdges()
+										+ " edges)", ManagerManager.getInstance(null).viewManager.getViewDescriptions());
+					
+					viewChooser.setLocationRelativeTo(MainFrame.getInstance());
+					viewChooser.setVisible(true);
+					
+					// The user did not select a view.
+					if (viewChooser.getSelectedView() == -1) {
+						return null;
+					}
+					
+					final String selectedView = views[viewChooser.getSelectedView()];
+					
+					if (viewChooser.getUserSelectionCreateInternalFrame()) {
+						if (selectedView != null) {
+							if (MainFrame.getInstance().sessions.contains(session)) {
+								return MainFrame.getInstance().createInternalFrame(selectedView, session.getGraph().getName(), session, returnScrollPane,
+													false, configNewView);
+							} else {
+								return (JScrollPane) MainFrame.getInstance().createInternalFrame(selectedView, session.getGraph().getName(), session,
+													returnScrollPane, false, false, configNewView, true);
+							}
+						}
+					} else {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								GraffitiInternalFrame gif = (GraffitiInternalFrame) MainFrame.getInstance().createInternalFrame(selectedView, session
+													.getGraph().getName(), session, false, true, false, configNewView, true);
+								GraffitiFrame gf = new GraffitiFrame(gif, false);
+								gf.setExtendedState(Frame.MAXIMIZED_BOTH);
+								gf.setVisible(true);
+								MainFrame.getInstance().addDetachedFrame(gf);
+							}
+						});
+					}
+				}
+			}
+		
+		return null;
 	}
 }

@@ -9,6 +9,7 @@ import info.clearthought.layout.TableLayoutConstants;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -220,7 +221,8 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 	public TabDBE() {
 		super();
 		this.title = "Experiments";
-		initComponents();
+		if (!GraphicsEnvironment.isHeadless())
+			initComponents();
 	}
 	
 	public void installDragNDrop(final JButton target) {
