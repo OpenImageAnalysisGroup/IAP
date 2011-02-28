@@ -100,7 +100,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 	
 	@Override
 	public String getDefaultTitle() {
-		return "LemnaTec FTP/DB";
+		return "LemnaTec";
 	}
 	
 }

@@ -139,6 +139,7 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 		
 		for (Sample3D s3d : samples) {
 			ImageConfiguration ic = ImageConfiguration.get(s3d.getParentCondition().getParentSubstance().getName());
+			
 			boolean ok = false;
 			if (ic == ImageConfiguration.RgbSide)
 				ok = true;

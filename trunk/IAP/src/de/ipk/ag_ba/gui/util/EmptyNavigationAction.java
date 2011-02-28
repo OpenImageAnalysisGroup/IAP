@@ -8,6 +8,7 @@ package de.ipk.ag_ba.gui.util;
 
 import java.util.ArrayList;
 
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
@@ -22,6 +23,7 @@ public class EmptyNavigationAction extends AbstractNavigationAction {
 	private final String name;
 	private NavigationButton src;
 	private boolean invisibleWhenActive = false;
+	private String desc;
 	
 	public EmptyNavigationAction(String name, String tooltip, String image, String activeImage) {
 		super(tooltip);
@@ -72,4 +74,17 @@ public class EmptyNavigationAction extends AbstractNavigationAction {
 	public void setInvisibleWhenActive(boolean active) {
 		this.invisibleWhenActive = active;
 	}
+	
+	public void setIntroductionText(String desc) {
+		this.desc = desc;
+	}
+	
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		if (desc != null)
+			return new MainPanelComponent(desc);
+		else
+			return null;
+	}
+	
 }

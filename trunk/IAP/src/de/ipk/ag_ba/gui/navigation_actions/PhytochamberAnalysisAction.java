@@ -85,6 +85,9 @@ public class PhytochamberAnalysisAction extends AbstractNavigationAction impleme
 						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.IMAGE)) {
 							if (md instanceof ImageData) {
 								ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
+								if (config == ImageConfiguration.Unknown)
+									config = ImageConfiguration.get(((ImageData) md).getURL().getFileName());
+								
 								if (config == ImageConfiguration.FluoTop) {
 									ImageData i = (ImageData) md;
 									workload.add(i);

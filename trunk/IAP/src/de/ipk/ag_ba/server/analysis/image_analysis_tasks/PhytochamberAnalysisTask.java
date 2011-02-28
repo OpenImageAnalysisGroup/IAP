@@ -95,6 +95,9 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				}
 				ImageSet is = replicateId2ImageSet.get(key);
 				ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
+				if (ic == ImageConfiguration.Unknown)
+					ic = ImageConfiguration.get(id.getURL().getFileName());
+				
 				if (ic == ImageConfiguration.RgbTop)
 					is.setVis(id);
 				if (ic == ImageConfiguration.FluoTop)

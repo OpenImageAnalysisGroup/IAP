@@ -115,7 +115,6 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 							+ users
 							+ "<li>Experiments: "
 							+ experimentNames.size()
-							+ "</large>"
 							+ "<li>Snapshots: "
 							+ snapshots
 							+ (error > 0 ? "<li>Empty databases: " + error + " ("

@@ -24,6 +24,8 @@ public class CutImagePreprocessor implements ImagePreProcessor {
 			return true;
 		
 		ImageConfiguration ic = ImageConfiguration.get(loadedImage.getSubstanceName());
+		if (ic == ImageConfiguration.Unknown)
+			ic = ImageConfiguration.get(loadedImage.getURL().getFileName());
 		
 		if (ic == ImageConfiguration.RgbSide) {
 			// for (int y = 1700; y < h; y++) {
