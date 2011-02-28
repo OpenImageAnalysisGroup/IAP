@@ -49,11 +49,38 @@ public enum ImageConfiguration {
 								|| name.equalsIgnoreCase(i.name4))
 				return i;
 		}
-		return Unknown;
+		return guess(name);
 	}
 	
 	@Override
 	public String toString() {
 		return name;
+	}
+	
+	private static ImageConfiguration guess(String name) {
+		if (name == null || name.length() == 0)
+			return Unknown;
+		name = name.toUpperCase();
+		
+		if (name.contains("FLU") && name.contains("TOP"))
+			return ImageConfiguration.FluoTop;
+		if (name.contains("FLU"))
+			return ImageConfiguration.FluoSide;
+		
+		if (name.contains("VIS") && name.contains("TOP"))
+			return ImageConfiguration.RgbTop;
+		if (name.contains("VIS"))
+			return ImageConfiguration.RgbSide;
+		if (name.contains("RGB") && name.contains("TOP"))
+			return ImageConfiguration.RgbTop;
+		if (name.contains("RGB"))
+			return ImageConfiguration.RgbSide;
+		
+		if (name.contains("NIR") && name.contains("TOP"))
+			return ImageConfiguration.NirTop;
+		if (name.contains("NIR"))
+			return ImageConfiguration.NirSide;
+		
+		return Unknown;
 	}
 }

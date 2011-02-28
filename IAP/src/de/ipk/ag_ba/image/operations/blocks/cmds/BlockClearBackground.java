@@ -333,7 +333,10 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 			
 			final double sidepercent = 0.10;
 			
-			final ImageConfiguration config = ImageConfiguration.get(limg.getSubstanceName());
+			ImageConfiguration conf = ImageConfiguration.get(limg.getSubstanceName());
+			if (conf == ImageConfiguration.Unknown)
+				conf = ImageConfiguration.get(limg.getURL().getFileName());
+			final ImageConfiguration config = conf;
 			
 			final ObjectRef progress = new ObjectRef("", new Integer(0));
 			

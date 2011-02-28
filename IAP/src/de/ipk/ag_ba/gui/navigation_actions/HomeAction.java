@@ -62,6 +62,13 @@ public final class HomeAction extends AbstractNavigationAction {
 		{
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
 								"General Bioinformatics Ressources", "img/pattern_graffiti_logo.png", "img/pattern_graffiti_logo.png");
+			ipkBioInf.setIntroductionText(
+						"<h2>Bioinformatics@IPK</h2>IAP additionally provides access and links to various bioinformatics ressources, "
+								+ "developed at the IPK. The included data sources and tools have been "
+								+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis, "
+								+ "partly with contributions from the group Bioinformatics and Information Technology. "
+								+ "To get details about the included data sources and information systems, click the included Website- and Reference-Links."
+						);
 			ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://bioinformatics.ipk-gatersleben.de",
 								"img/browser.png", src != null ? src.getGUIsetting() : null));
 			for (NavigationButton nge : homeActions)

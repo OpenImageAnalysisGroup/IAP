@@ -131,4 +131,8 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		ip.setExperimentInfo(m, header, true, experiment);
 		return new MainPanelComponent(ip, true);
 	}
+	
+	public ExperimentInterface getExperimentReference() {
+		return experiment;
+	}
 }

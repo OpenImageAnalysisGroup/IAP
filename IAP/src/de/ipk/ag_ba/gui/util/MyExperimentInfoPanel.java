@@ -156,7 +156,8 @@ public class MyExperimentInfoPanel extends JPanel {
 	}
 	
 	public void setExperimentInfo(final MongoDB m,
-						final ExperimentHeaderInterface experimentHeader, boolean startEnabled, ExperimentInterface experiment) {
+						final ExperimentHeaderInterface experimentHeader,
+						boolean startEnabled, ExperimentInterface optExperiment) {
 		setLayout(new TableLayout(new double[][] { { 0, 400, 0 }, { 0, TableLayout.PREFERRED, 0 } }));
 		
 		setOpaque(false);
@@ -196,7 +197,8 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
 							+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
-		fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(experiment), false);
+		if (optExperiment != null)
+			fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(optExperiment), false);
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setBval(0, startEnabled);
