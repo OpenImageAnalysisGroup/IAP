@@ -88,8 +88,8 @@ public class NavigationButton implements StyleAware {
 			this.navigationImage = navigationAction.getDefaultNavigationImage();
 			this.actionImage = navigationAction.getDefaultImage();
 		}
-		if (guiSetting == null)
-			System.out.println("ERROR: GUI-SETTING VARIABLE NOT ASSIGNED (INTERNAL ERROR)");
+		// if (guiSetting == null)
+		// System.out.println("ERROR: GUI-SETTING VARIABLE NOT ASSIGNED (INTERNAL ERROR)");
 		this.guiSetting = guiSetting;
 		this.action = navigationAction;
 	}
@@ -136,8 +136,12 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public String getTitle() {
+		return getTitle(false);
+	}
+	
+	public String getTitle(boolean forceProgressText) {
 		long compTime = System.currentTimeMillis() - processingStart;
-		if (!(isProcessing() || requestsTitleUpdates()) || compTime < 1000)
+		if (!forceProgressText && !(isProcessing() || requestsTitleUpdates()) || compTime < 1000)
 			return title;
 		else {
 			String dots = "";
