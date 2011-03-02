@@ -50,11 +50,12 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		
 		if (header != null && !header.getDatabaseId().startsWith("lemnatec:")
 							&& (header.getImportusername() == null || header.getImportusername().equals(SystemAnalysis.getUserName()))) {
-			if (header.inTrash()) {
-				actions.add(Trash.getTrashEntity(header, DeletionCommand.UNTRASH, src.getGUIsetting(), m));
-				actions.add(Trash.getTrashEntity(header, DeletionCommand.DELETE, src.getGUIsetting(), m));
-			} else
-				actions.add(Trash.getTrashEntity(header, DeletionCommand.TRASH, src.getGUIsetting(), m));
+			if (m != null)
+				if (header.inTrash()) {
+					actions.add(Trash.getTrashEntity(header, DeletionCommand.UNTRASH, src.getGUIsetting(), m));
+					actions.add(Trash.getTrashEntity(header, DeletionCommand.DELETE, src.getGUIsetting(), m));
+				} else
+					actions.add(Trash.getTrashEntity(header, DeletionCommand.TRASH, src.getGUIsetting(), m));
 		}
 		boolean add = true;
 		if (header != null && header.inTrash())
@@ -63,7 +64,8 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			add = true;
 		}
 		if (add) {
-			getDefaultActions(actions, experiment, header, true, src.getGUIsetting(), m);
+			boolean imageAnalysis = m != null;
+			getDefaultActions(actions, experiment, header, imageAnalysis, src.getGUIsetting(), m);
 		}
 		return actions;
 	}
@@ -73,19 +75,19 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 		if (experiment == null)
 			return;
 		try {
-			if (imageAnalysis)
-				for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, new ExperimentReference(experiment), guiSetting))
-					actions.add(ne);
+			for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, new ExperimentReference(experiment), imageAnalysis, guiSetting))
+				actions.add(ne);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m, new ExperimentReference(
+		if (imageAnalysis)
+			for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m, new ExperimentReference(
 							experiment), guiSetting)) {
-			if (ne.getTitle().contains("Put data")) {
-				ne.setTitle("View in VANTED");
-				actions.add(ne);
+				if (ne.getTitle().contains("Put data")) {
+					ne.setTitle("View in VANTED");
+					actions.add(ne);
+				}
 			}
-		}
 	}
 	
 	@Override

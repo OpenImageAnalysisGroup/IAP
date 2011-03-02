@@ -11,7 +11,7 @@ import java.util.Collection;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.postgresql.LemnaExperimentNavigationAction;
+import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
@@ -33,7 +33,7 @@ public class LemnaDbAction extends AbstractNavigationAction implements Navigatio
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		for (ExperimentHeaderInterface experiment : experiments) {
-			result.add(new NavigationButton(new LemnaExperimentNavigationAction(experiment), src.getGUIsetting()));
+			result.add(new NavigationButton(new MongoOrLemnaTecExperimentNavigationAction(experiment, null), src.getGUIsetting()));
 		}
 		return result;
 	}

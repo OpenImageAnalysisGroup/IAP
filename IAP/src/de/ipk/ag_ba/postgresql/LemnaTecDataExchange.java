@@ -580,7 +580,7 @@ public class LemnaTecDataExchange {
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Experiment created (" + numberOfImages + " images)");
-		
+		experimentReq.setNumberOfFiles(numberOfImages);
 		experiment.setHeader(new ExperimentHeader(experimentReq));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(100);
