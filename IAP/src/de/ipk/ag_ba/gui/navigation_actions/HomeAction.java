@@ -56,6 +56,16 @@ public final class HomeAction extends AbstractNavigationAction {
 		// vantedNB.getAction().addAdditionalEntity(startVanted0);
 		homeActions.add(vantedNB);
 		
+		{
+			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Sino/German Network",
+								"Sino/German Network of Computational & Integrative Biology", "img/CIB_logo.png", "img/CIB_logo.png");
+			ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://www.imbio.de/forschung2/",
+								"img/browser.png", src != null ? src.getGUIsetting() : null));
+			// for (NavigationButton nge : homeActions)
+			// ipkBioInf.addAdditionalEntity(nge);
+			homeActions.add(new NavigationButton(ipkBioInf, guiSetting));
+		}
+		
 		NavigationButton serverStatusEntity = Other.getServerStatusEntity(true, src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
 		
@@ -73,15 +83,6 @@ public final class HomeAction extends AbstractNavigationAction {
 								"img/browser.png", src != null ? src.getGUIsetting() : null));
 			for (NavigationButton nge : homeActions)
 				ipkBioInf.addAdditionalEntity(nge);
-			homePrimaryActions.add(new NavigationButton(ipkBioInf, guiSetting));
-		}
-		{
-			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Sino/German Network",
-								"Sino/German Network of Computational & Integrative Biology", "img/CIB_logo.png", "img/CIB_logo.png");
-			ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://www.imbio.de/forschung2/",
-								"img/browser.png", src != null ? src.getGUIsetting() : null));
-			// for (NavigationButton nge : homeActions)
-			// ipkBioInf.addAdditionalEntity(nge);
 			homePrimaryActions.add(new NavigationButton(ipkBioInf, guiSetting));
 		}
 		

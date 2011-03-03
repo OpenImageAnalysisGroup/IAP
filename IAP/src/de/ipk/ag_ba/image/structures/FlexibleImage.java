@@ -12,11 +12,15 @@ import ij.ImagePlus;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -46,7 +50,14 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage(IOurl url) throws IOException, Exception {
-		this(ImageConverter.convertBItoIJ(ImageIO.read(url.getInputStream())));
+		InputStream is = url.getInputStream();
+		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+		ResourceIOManager.copyContent(is, out);
+		MyByteArrayInputStream in = new MyByteArrayInputStream(out.getBuff(), out.size());
+		image = new ImagePlus("JImage", ImageIO.read(in));
+		w = image.getWidth();
+		h = image.getHeight();
+		// this(ImageConverter.convertBItoIJ(ImageIO.read(in)));
 	}
 	
 	/**

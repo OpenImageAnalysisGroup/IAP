@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -61,6 +62,7 @@ import org.graffiti.editor.ConfigureViewAction;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.LoadSetting;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.editor.ManagerManager;
 import org.graffiti.editor.MessageType;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
@@ -78,6 +80,7 @@ import org.graffiti.plugin.view.ZoomListener;
 import org.graffiti.plugins.modes.defaults.MegaTools;
 import org.graffiti.plugins.views.defaults.GraffitiView;
 import org.graffiti.session.EditorSession;
+import org.graffiti.util.InstanceCreationException;
 import org.w3c.dom.NodeList;
 
 import com.sun.image.codec.jpeg.JPEGCodec;
@@ -96,7 +99,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					NeedsSwingThread {
@@ -440,7 +443,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		settings.setScaleSetting(SizeSetting.FIXED);
 		settings.setMaxWidth(maxW);
 		settings.setMaxHeight(maxW);
-		return PngJpegAlgorithm.getActiveGraphViewImage(g, BufferedImage.TYPE_INT_RGB, "png", settings, null, false);
+		return PngJpegAlgorithm.getActiveGraphViewImage(g, BufferedImage.TYPE_INT_ARGB, "png", settings, null, false);
 	}
 	
 	public static void createPNGimageFromGraph(Graph g,
@@ -1084,13 +1087,33 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		
 		EditorSession session = GravistoService.getInstance()
 							.getSessionFromGraph(targetGraph);
-		View view;
+		View view = null;
 		if (session == null) {
 			session = new EditorSession(targetGraph);
 			MainFrame mf = MainFrame.getInstance();
-			if (mf == null)
+			if (mf == null) {
+				if (GraphicsEnvironment.isHeadless()) {
+					session = GravistoService.getInstance().getSessionFromGraph(targetGraph);
+					if (session == null) {
+						String[] views = new String[] { "org.graffiti.plugins.views.defaults.GraffitiView" };
+						
+						String viewName = views[0];
+						try {
+							view = ManagerManager.getInstance(null).viewManager.createView(viewName);
+							view.setAttributeComponentManager(ManagerManager.getInstance(null).attributeComponentManager);
+							view.setGraph(targetGraph);
+						} catch (InstanceCreationException e) {
+							ErrorMsg.addErrorMessage("Could not create view " + viewName + ". Error: " + e.getLocalizedMessage());
+							return null;
+						}
+					} else {
+						view = session.getActiveView();
+					}
+				}
+			} else
 				mf = new MainFrame();
-			JScrollPane sp = mf.showViewChooserDialog(session, true, null,
+			if (mf != null) {
+				JScrollPane sp = mf.showViewChooserDialog(session, true, null,
 								LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION,
 								new ConfigureViewAction() {
 									private View v;
@@ -1103,7 +1126,8 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 										this.v = v;
 									}
 								});
-			view = (View) sp.getViewport().getView();
+				view = (View) sp.getViewport().getView();
+			}
 		} else {
 			view = session.getActiveView();
 		}
@@ -1122,7 +1146,9 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		
 		for (View vi : views) {
 			Container v = ((JComponent) vi).getParent();
-			Color backCol = v.getBackground();
+			Color backCol = new Color(-1);
+			if (v != null)
+				backCol = v.getBackground();
 			
 			ObjectRef scale = new ObjectRef();
 			BufferedImage bi = createImageFromView(imageType, fileExtension, vi,

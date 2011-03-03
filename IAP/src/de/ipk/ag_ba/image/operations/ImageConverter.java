@@ -56,8 +56,7 @@ public class ImageConverter {
 	// ########## Rückgabe ImagePlus ##############
 	
 	public static ImagePlus convertBItoIJ(BufferedImage img) {
-		ImagePlus jImage = new ImagePlus("JImage", img);
-		return jImage;
+		return img != null ? new ImagePlus("JImage", img) : null;
 	}
 	
 	public static ImagePlus convert1ABtoIJ(int w, int h, int[] img) {
