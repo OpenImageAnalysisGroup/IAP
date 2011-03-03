@@ -404,17 +404,21 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			try {
 				FlexibleImage fi = new FlexibleImage(myImage.fileURLlabel);
 				if (fi.getAsBufferedImage() == null) {
-					TiffDecoder tid = new TiffDecoder(myImage.fileURLlabel.getInputStream(), myImage.fileURLlabel.getFileName());
-					FileInfo[] info = tid.getTiffInfo();
-					Opener o = new Opener();
-					ImagePlus imp = o.openTiffStack(info);
-					imp.show("Image Label View - " + myImage.fileURLlabel.getFileNameDecoded());
+					try {
+						TiffDecoder tid = new TiffDecoder(myImage.fileURLlabel.getInputStream(), myImage.fileURLlabel.getFileName());
+						FileInfo[] info = tid.getTiffInfo();
+						Opener o = new Opener();
+						ImagePlus imp = o.openTiffStack(info);
+						imp.show("Image Label View - " + myImage.fileURLlabel.getFileNameDecoded());
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null, "Error: " + e.getLocalizedMessage() + ". Image can not be shown.",
+								"Unknown Image Format", JOptionPane.INFORMATION_MESSAGE);
+					}
 				} else
 					fi.print("Image Label View - " + myImage.fileURLlabel.getFileNameDecoded());
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Error: " + e.getLocalizedMessage() + ". Image can not be shown.",
 						"Unknown Image Format", JOptionPane.INFORMATION_MESSAGE);
-				ErrorMsg.addErrorMessage(e);
 				return;
 			}
 		}

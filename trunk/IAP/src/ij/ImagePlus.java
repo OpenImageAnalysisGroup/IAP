@@ -495,7 +495,7 @@ public class ImagePlus implements ImageObserver, Measurements {
 		if (isComposite())
 			return (new ColorProcessor(getImage())).getBufferedImage();
 		else
-			return ip.getBufferedImage();
+			return ip != null ? ip.getBufferedImage() : null;
 	}
 	
 	/** Returns this image's unique numeric ID. */

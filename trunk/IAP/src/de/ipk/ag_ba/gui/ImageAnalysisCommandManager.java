@@ -39,7 +39,8 @@ public class ImageAnalysisCommandManager {
 		
 		try {
 			// if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
-			actions.add(new NavigationButton(new CopyEntity(m, experimentReference), guiSetting));
+			if (!analysis)
+				actions.add(new NavigationButton(new CopyEntity(m, experimentReference), guiSetting));
 		} catch (Exception e) {
 			// empty
 		}
@@ -53,6 +54,9 @@ public class ImageAnalysisCommandManager {
 		// actions.add(new NavigationGraphicalEntity(new
 		// CountColorsNavigation(m, 40, experimentReference),
 		// "Hue Historam", "img/colorhistogram.png"));
+		
+		actions.add(new NavigationButton(new NumericDataReportAction(m, experimentReference), guiSetting));
+		
 		if (analysis) {
 			// NavigationAction performanceTestAction = new PerformanceTestAction(m, experimentReference);
 			// NavigationButton performanceTestButton = new NavigationButton(performanceTestAction, guiSetting);
@@ -62,8 +66,6 @@ public class ImageAnalysisCommandManager {
 			
 			if (showTestActions)
 				actions.add(new NavigationButton(new CloudIoTestAction(m, experimentReference), guiSetting));
-			
-			actions.add(new NavigationButton(new NumericDataReportAction(m, experimentReference), guiSetting));
 			
 			actions.add(ImageAnalysis.getPhenotypingEntity(m, experimentReference, 2.5, 5, guiSetting));
 			actions.add(ImageAnalysis.getPhytochamberEntity(m, experimentReference, 10, 15, guiSetting));

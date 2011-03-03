@@ -115,4 +115,12 @@ public class NumericDataReportAction extends AbstractNavigationAction {
 	public MainPanelComponent getResultMainPanel() {
 		return new MainPanelComponent(table);
 	}
+	
+	public ExperimentReference getExperimentReference() {
+		return experimentReference;
+	}
+	
+	public MongoDB getMongoInstance() {
+		return m;
+	}
 }

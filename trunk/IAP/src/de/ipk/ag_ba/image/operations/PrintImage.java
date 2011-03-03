@@ -83,7 +83,7 @@ public class PrintImage {
 	}
 	
 	public static void printImage(ImagePlus image, String text) {
-		printImage(image, text);
+		image.show(text);
 	}
 	
 	// ############# FlexibleImage ############

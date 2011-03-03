@@ -12,12 +12,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.StringManipulationTools;
 import org.graffiti.plugin.XMLHelper;
 import org.jdom.Attribute;
 import org.jdom.Element;
@@ -794,6 +796,59 @@ public class Experiment implements ExperimentInterface {
 		for (SubstanceInterface m : this) {
 			res += m.getSum();
 		}
+		return res;
+	}
+	
+	@Override
+	public String toHTMLstring() {
+		StringBuilder sb = new StringBuilder();
+		String tableRowBreak = "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
+		sb.append("<table class='experimentInfo'>" +
+				"<tr><th>Experiment</th><th>" + StringManipulationTools.removeHTMLtags(getName()) + "</th></tr>" +
+						tableRowBreak);
+		
+		Map<String, Object> attributeValueMap = new HashMap<String, Object>();
+		header.fillAttributeMap(attributeValueMap, getNumberOfMeasurementValues());
+		TreeMap<String, String> niceProperties = new TreeMap<String, String>();
+		HashMap<String, String> field2niceName = getNiceHTMLfieldNameMapping();
+		for (String key : attributeValueMap.keySet()) {
+			Object o = attributeValueMap.get(key);
+			if (o == null)
+				continue;
+			String value = StringManipulationTools.removeHTMLtags(o.toString());
+			String keyName = field2niceName.get(key);
+			if (keyName == null)
+				continue;
+			niceProperties.put(keyName, value);
+		}
+		for (String n : niceProperties.keySet()) {
+			sb.append("<tr><td>" + n + "</td><td>" + niceProperties.get(n) + "</td></tr>");
+			if (n.indexOf(" BR -->") > 0)
+				sb.append(tableRowBreak);
+		}
+		sb.append("</table>");
+		return sb.toString();
+	}
+	
+	private HashMap<String, String> getNiceHTMLfieldNameMapping() {
+		HashMap<String, String> res = new HashMap<String, String>();
+		
+		res.put("experimenttype", "<!-- A -->Type of Experiment");
+		res.put("startdate", "<!-- C BR -->Experiment Start");
+		
+		res.put("database", "<!-- D-->Source");
+		res.put("importdate", "<!-- E -->Import Date");
+		res.put("excelfileid", "<!-- F BR -->Experiment ID");
+		
+		res.put("importusername", "<!-- G -->Owner");
+		res.put("coordinator", "<!-- H -->Coordinator");
+		res.put("importusergroup", "<!-- I BR -->Data Visibility");
+		
+		res.put("remark", "<!-- J -->Remark");
+		res.put("sequence", "<!-- K BR -->Sequence");
+		
+		res.put("measurements", "<!-- L -->Numeric Measurements");
+		res.put("imagefiles", "<!-- M -->Binary Files");
 		return res;
 	}
 }

@@ -106,4 +106,6 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	
 	public void addAndMerge(ExperimentInterface toBeAdded);
 	
+	public String toHTMLstring();
+	
 }
