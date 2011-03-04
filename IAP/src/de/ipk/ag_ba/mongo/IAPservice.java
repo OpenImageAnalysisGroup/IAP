@@ -99,7 +99,7 @@ public class IAPservice {
 				IOurl url;
 				try {
 					url = mmc.getURL();
-					final Graph g = MainFrame.getInstance().getGraph(url, url.getFileName());
+					final Graph g = MainFrame.getGraph(url, url.getFileName());
 					graphRef.setObject(g);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);

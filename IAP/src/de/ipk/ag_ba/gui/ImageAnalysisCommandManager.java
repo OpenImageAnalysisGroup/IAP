@@ -37,14 +37,6 @@ public class ImageAnalysisCommandManager {
 		
 		actions.add(FileManagerAction.getFileManagerEntity(m, experimentReference, guiSetting));
 		
-		try {
-			// if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
-			if (!analysis)
-				actions.add(new NavigationButton(new CopyEntity(m, experimentReference), guiSetting));
-		} catch (Exception e) {
-			// empty
-		}
-		
 		// "img/PoweredMongoDBgreenLeaf.png")); // PoweredMongoDBgreen.png"));
 		
 		// actions.add(new NavigationGraphicalEntity(
@@ -75,6 +67,15 @@ public class ImageAnalysisCommandManager {
 			actions.add(ThreeDsegmentationAction.getThreeDsegmentationTaskEntity(m, experimentReference,
 								"3-D Segmentation", 15, 25, guiSetting));
 		}
+		
+		try {
+			// if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
+			if (!analysis)
+				actions.add(new NavigationButton(new CopyEntity(m, experimentReference), guiSetting));
+		} catch (Exception e) {
+			// empty
+		}
+		
 		return actions;
 	}
 }

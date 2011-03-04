@@ -8,6 +8,8 @@ package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeMap;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -65,7 +67,18 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
 			allExperiments.get("").put("", new ArrayList<ExperimentHeaderInterface>());
-			for (String db : new LemnaTecDataExchange().getDatabases()) {
+			ArrayList<String> list = new ArrayList<String>(new LemnaTecDataExchange().getDatabases());
+			Collections.sort(list, new Comparator<String>() {
+				@Override
+				public int compare(String arg0, String arg1) {
+					if (known(arg0) && !known(arg1))
+						return -1;
+					if (!known(arg0) && known(arg1))
+						return 1;
+					return arg0.compareTo(arg1);
+				}
+			});
+			for (String db : list) {
 				try {
 					Collection<ExperimentHeaderInterface> experiments = new LemnaTecDataExchange()
 										.getExperimentInDatabase(db);
@@ -86,6 +99,10 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		} catch (Exception e) {
 			// error
 		}
+	}
+	
+	protected boolean known(String arg1) {
+		return arg1 != null && (arg1.startsWith("CGH_") || arg1.startsWith("BGH_"));
 	}
 	
 	@Override

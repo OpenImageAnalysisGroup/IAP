@@ -8,6 +8,7 @@ import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
 import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
+import de.ipk.ag_ba.datasources.http_folder.VantedNewsLinksSource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.nav.RimasNav;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -66,12 +67,16 @@ public final class HomeAction extends AbstractNavigationAction {
 			homeActions.add(new NavigationButton(ipkBioInf, guiSetting));
 		}
 		
+		HTTPfolderSource news = new VantedNewsLinksSource();
+		NavigationButton newsButton = new NavigationButton(new DataSourceNavigationAction(news), guiSetting);
+		homeActions.add(newsButton);
+		
 		NavigationButton serverStatusEntity = Other.getServerStatusEntity(true, src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
 		
 		{
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
-								"General Bioinformatics Ressources", "img/pattern_graffiti_logo.png", "img/pattern_graffiti_logo.png");
+								"General Bioinformatics Ressources", "img/dbelogo2.png", "img/dbelogo2.png");
 			ipkBioInf.setIntroductionText(
 						"<h2>Bioinformatics@IPK</h2>IAP additionally provides access and links to various bioinformatics ressources, "
 								+ "developed at the IPK. The included data sources and tools have been "

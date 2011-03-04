@@ -404,7 +404,11 @@ public class LemnaTecDataExchange {
 				
 				sn.setCamera_label(lbl);
 			}
-			Integer replicateID = idtag2replicateID.get(sn.getId_tag());
+			
+			String idTag = sn.getId_tag();
+			
+			Integer replicateID = idtag2replicateID.get(idTag);
+			
 			if (replicateID == null) {
 				System.out.println("Warning: internal IAP error. Could not create get replicate ID for ID tag '"
 									+ sn.getId_tag() + "'. Snapshot is ignored.");
@@ -436,6 +440,7 @@ public class LemnaTecDataExchange {
 				weightBefore.setReplicateID(replicateID);
 				weightBefore.setUnit("g");
 				weightBefore.setValue(sn.getWeight_before());
+				weightBefore.setQualityAnnotation(idTag);
 				
 				measurements.add(weightBefore);
 				// }
@@ -463,6 +468,7 @@ public class LemnaTecDataExchange {
 				weightBefore.setReplicateID(replicateID);
 				weightBefore.setUnit("g");
 				weightBefore.setValue(sn.getWeight_after() - sn.getWeight_before());
+				weightBefore.setQualityAnnotation(idTag);
 				
 				measurements.add(weightBefore);
 				// }
@@ -496,6 +502,7 @@ public class LemnaTecDataExchange {
 					water.setReplicateID(replicateID);
 					water.setUnit("ml");
 					water.setValue(sn.getWater_amount());
+					water.setQualityAnnotation(idTag);
 					
 					measurements.add(water);
 					
@@ -528,6 +535,7 @@ public class LemnaTecDataExchange {
 					image.setPixelsizeY(sn.getYfactor());
 					image.setReplicateID(replicateID);
 					image.setUnit("");
+					image.setQualityAnnotation(idTag);
 					
 					String fn = sn.getPath_image();
 					if (fn.contains("/"))
