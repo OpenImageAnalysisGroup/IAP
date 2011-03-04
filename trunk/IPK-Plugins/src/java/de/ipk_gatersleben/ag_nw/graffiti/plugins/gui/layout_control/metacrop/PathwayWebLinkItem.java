@@ -29,6 +29,7 @@ public class PathwayWebLinkItem implements Comparable<PathwayWebLinkItem> {
 			s = StringManipulationTools.stringReplace(s, ".gml", "");
 			s = StringManipulationTools.stringReplace(s, ".graphml.gz", "");
 			s = StringManipulationTools.stringReplace(s, ".graphml", "");
+			s = StringManipulationTools.stringReplace(s, ".webloc", "");
 		}
 		group1 = "";
 		group2 = null;
@@ -39,7 +40,6 @@ public class PathwayWebLinkItem implements Comparable<PathwayWebLinkItem> {
 			else
 				group1 = null;
 		} else {
-			
 			if (s.indexOf(";;") > 0) {// only one group
 				group1 = s.substring(0, s.indexOf(";"));
 				group2 = null;
@@ -54,6 +54,7 @@ public class PathwayWebLinkItem implements Comparable<PathwayWebLinkItem> {
 				}
 			}
 		}
+		this.pathwayName = this.pathwayName.replaceAll(";;", "");
 	}
 	
 	public IOurl getURL() {
@@ -76,6 +77,7 @@ public class PathwayWebLinkItem implements Comparable<PathwayWebLinkItem> {
 			s = StringManipulationTools.stringReplace(s, ".graphml.gz", "");
 			s = StringManipulationTools.stringReplace(s, ".gml", "");
 			s = StringManipulationTools.stringReplace(s, ".graphml", "");
+			s = StringManipulationTools.stringReplace(s, ".webloc", "");
 		}
 		if (group1 != null)
 			s = StringManipulationTools.stringReplace(s, group1, "");
@@ -96,6 +98,14 @@ public class PathwayWebLinkItem implements Comparable<PathwayWebLinkItem> {
 	}
 	
 	public int compareTo(PathwayWebLinkItem o) {
+		if (isBookmark() && !o.isBookmark())
+			return -1;
+		if (!isBookmark() && o.isBookmark())
+			return 1;
 		return pathwayName.compareTo(o.getFileName());
+	}
+	
+	public boolean isBookmark() {
+		return pathwayURL.getFileName().endsWith(".webloc");
 	}
 }

@@ -63,16 +63,18 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 		Collection<PathwayWebLinkItem> pathways = new ArrayList<PathwayWebLinkItem>();
 		
 		if (groups.size() >= 2) {
-			for (String group : groups) {
+			for (String groupName : groups) {
+				
 				ArrayList<PathwayWebLinkItem> subLevel = new ArrayList<PathwayWebLinkItem>();
 				for (PathwayWebLinkItem item : mainList)
-					if (group.equals(item.getGroup1())) {
-						if (group.isEmpty())
+					if (groupName.equals(item.getGroup1())) {
+						if (groupName.isEmpty())
 							pathways.add(item);
 						else
 							subLevel.add(item);
 					}
-				levels.add(new HTTPdataSourceLevel(lib, group, subLevel, folderIcon, folderIcon));
+				if (!groupName.isEmpty())
+					levels.add(new HTTPdataSourceLevel(lib, groupName, subLevel, folderIcon, folderIcon));
 			}
 		} else {
 			groups.clear();
@@ -81,16 +83,18 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 					groups.add(item.getGroup2());
 			
 			if (groups.size() >= 2) {
-				for (String group : groups) {
+				for (String groupName : groups) {
+					if (groupName == null || groupName.isEmpty())
+						continue;
 					ArrayList<PathwayWebLinkItem> subLevel = new ArrayList<PathwayWebLinkItem>();
 					for (PathwayWebLinkItem item : mainList)
-						if (group.equals(item.getGroup2())) {
-							if (group.isEmpty())
+						if (groupName.equals(item.getGroup2())) {
+							if (groupName.isEmpty())
 								pathways.add(item);
 							else
 								subLevel.add(item);
 						}
-					levels.add(new HTTPdataSourceLevel(lib, group, subLevel, folderIcon, folderIcon));
+					levels.add(new HTTPdataSourceLevel(lib, groupName, subLevel, folderIcon, folderIcon));
 				}
 			} else {
 				// return all items as pathways at primary level (no grouping

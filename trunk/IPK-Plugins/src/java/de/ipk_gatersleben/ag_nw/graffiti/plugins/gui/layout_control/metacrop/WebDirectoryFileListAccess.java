@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -51,22 +53,41 @@ public class WebDirectoryFileListAccess {
 		// Read all the text returned by the server
 		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
 		String str;
+		HashSet<String> knownImages = new HashSet<String>();
+		HashMap<String, PathwayWebLinkItem> knownPWL = new HashMap<String, PathwayWebLinkItem>();
 		while ((str = in.readLine()) != null) {
 			// str is one line of text; readLine() strips the newline character(s)
 			String a = "<a href=\"";
 			String b = "\">";
-			boolean containsExtension = false;
-			for (String ext : validExtensions)
-				if (str.contains(ext + "\">")) {
-					containsExtension = true;
-					break;
+			{
+				boolean containsExtension = false;
+				for (String ext : new String[] { ".png" })
+					if (str.contains(ext + "\">")) {
+						containsExtension = true;
+						break;
+					}
+				if (!(!str.contains(a) || !str.substring(str.indexOf(a)).contains(b) || !containsExtension)) {
+					String fileName = str.substring(str.indexOf(a) + a.length());
+					fileName = fileName.substring(0, fileName.indexOf(b));
+					knownImages.add(fileName);
 				}
-			if (!str.contains(a) || !str.substring(str.indexOf(a)).contains(b) || !containsExtension)
-				continue;
-			String fileName = str.substring(str.indexOf(a) + a.length());
-			fileName = fileName.substring(0, fileName.indexOf(b));
-			PathwayWebLinkItem pwl = new PathwayWebLinkItem(fileName, new IOurl(pref + fileName), showGraphExtensions);
-			result.add(pwl);
+			}
+			{
+				boolean containsExtension = false;
+				for (String ext : validExtensions)
+					if (str.contains(ext + "\">")) {
+						containsExtension = true;
+						break;
+					}
+				if (!str.contains(a) || !str.substring(str.indexOf(a)).contains(b) || !containsExtension)
+					continue;
+				String fileName = str.substring(str.indexOf(a) + a.length());
+				fileName = fileName.substring(0, fileName.indexOf(b));
+				PathwayWebLinkItem pwl = new PathwayWebLinkItem(fileName, new IOurl(pref + fileName), showGraphExtensions);
+				result.add(pwl);
+				
+				knownPWL.put(fileName, pwl);
+			}
 		}
 		in.close();
 		

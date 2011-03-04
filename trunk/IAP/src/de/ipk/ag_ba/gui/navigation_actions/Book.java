@@ -30,9 +30,13 @@ public class Book {
 	
 	public Book(String folder, String title, String url, String icon) {
 		this.folder = folder;
-		this.title = title;
+		this.title = prettify(title);
 		this.url = url;
 		this.icon = icon;
+	}
+	
+	private String prettify(String title) {
+		return title; // StringManipulationTools.stringReplace(title, ",,", ".");
 	}
 	
 	public String getFolder() {
@@ -52,6 +56,10 @@ public class Book {
 	}
 	
 	public NavigationButton getNavigationButton(NavigationButton src) {
+		return getNavigationButton(src, getIcon());
+	}
+	
+	public NavigationButton getNavigationButton(NavigationButton src, String icon) {
 		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
@@ -73,9 +81,10 @@ public class Book {
 				return Book.this.getUrl();
 			}
 		};
-		NavigationButton website = new NavigationButton(action, getTitle(), getIcon(),
+		NavigationButton website = new NavigationButton(action, getTitle(), icon,
 							src.getGUIsetting());
 		website.setToolTipText("Open " + getUrl());
 		return website;
 	}
+	
 }
