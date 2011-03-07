@@ -118,11 +118,38 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 			throw (Exception) err.getObject();
 		InputStream res = (InputStream) or.getObject();
 		if (res != null) {
-			System.out.println("Return: Cached Preview Image");
 			return res;
 		} else {
-			System.out.println("Return: No Cache / New Image");
-			return super.getPreviewInputStream(url);
+			System.out.println("Return: No Cache / Create and save new image");
+			
+			final byte[] rrr = ((MyByteArrayInputStream) super.getPreviewInputStream(url)).getBuffTrimmed();
+			
+			m.processDB(new RunnableOnDB() {
+				
+				private DB db;
+				
+				@Override
+				public void run() {
+					try {
+						m.saveStream(
+								url.getDetail(),
+								new MyByteArrayInputStream(rrr, rrr.length),
+								new GridFS(db, MongoGridFS.getPreviewFileCollections().get(0)));
+					} catch (Exception e) {
+						err.setObject(e);
+					}
+				}
+				
+				@Override
+				public void setDB(DB db) {
+					this.db = db;
+				}
+			});
+			
+			if (err.getObject() != null)
+				throw (Exception) err.getObject();
+			
+			return new MyByteArrayInputStream(rrr, rrr.length);
 		}
 	}
 	
