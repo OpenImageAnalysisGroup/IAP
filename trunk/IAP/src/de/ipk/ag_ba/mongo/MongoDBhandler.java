@@ -84,6 +84,49 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 	}
 	
 	@Override
+	public InputStream getPreviewInputStream(final IOurl url) throws Exception {
+		final ObjectRef or = new ObjectRef();
+		final ObjectRef err = new ObjectRef();
+		
+		m.processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				// check all gridFS file collections and look for matching hash value...
+				for (String fs : MongoGridFS.getPreviewFileCollections()) {
+					GridFS gridfs = new GridFS(db, fs);
+					GridFSDBFile fff = gridfs.findOne(url.getDetail());
+					if (fff != null) {
+						try {
+							InputStream is = fff.getInputStream();
+							or.setObject(is);
+							return;
+						} catch (Exception e) {
+							err.setObject(e);
+						}
+					}
+				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		if (err.getObject() != null)
+			throw (Exception) err.getObject();
+		InputStream res = (InputStream) or.getObject();
+		if (res != null) {
+			System.out.println("Return: Cached Preview Image");
+			return res;
+		} else {
+			System.out.println("Return: No Cache / New Image");
+			return super.getPreviewInputStream(url);
+		}
+	}
+	
+	@Override
 	public String getPrefix() {
 		return prefix;
 	}
