@@ -38,6 +38,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -559,15 +560,18 @@ public class MongoDB {
 		long result = -1;
 		
 		GridFSDBFile fff = fs.findOne(hash);
+		if (fff != null) {
+			fs.remove(fff);
+			fff = null;
+		}
 		if (fff == null) {
-			GridFSInputFile inputFile = fs.createFile(is);
-			inputFile.setFilename(hash);
+			GridFSInputFile inputFile = fs.createFile(is, hash);
 			inputFile.save();
 			// fs.getDB().requestStart();
 			result = inputFile.getLength();
-			// CommandResult res = fs.getDB().getLastError(2, 180000, false);
-			// if (!res.ok())
-			// result = -1;
+			CommandResult res = fs.getDB().getLastError(2, 180000, false);
+			if (!res.ok())
+				result = -1;
 			// fs.getDB().requestDone();
 		} else
 			result = 0;
@@ -698,41 +702,33 @@ public class MongoDB {
 	}
 	
 	public DatabaseStorageResult saveImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
-		MyByteArrayInputStream isMain = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
-		
-		InputStream isLabel = id.getLabelURL() == null ? null : id.getLabelURL().getInputStream();
 		ImageData image = id;
 		
+		byte[] isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
+		byte[] isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
+		
 		if (isMain == null) {
-			System.out.println("No input stream for source-URL:  " + id.getURL());
+			System.out.println("No input stream for source-URL:  " + image.getURL());
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
-		if (id.getLabelURL() != null && isLabel == null) {
-			System.out.println("No input stream for source-URL (label):  " + id.getURL());
+		if (image.getLabelURL() != null && isLabel == null) {
+			System.out.println("No input stream for source-URL (label):  " + image.getURL());
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		
-		if (id.getURL() != null && id.getLabelURL() != null) {
+		if (image.getURL() != null && image.getLabelURL() != null) {
 			if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix()))
 				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		}
 		
-		String[] hashes = GravistoService.getHashFromInputStream(new InputStream[] { isMain, isLabel },
+		String[] hashes = GravistoService.getHashFromInputStream(new InputStream[] {
+				new MyByteArrayInputStream(isMain),
+				new MyByteArrayInputStream(isLabel)
+				},
 				new ObjectRef[] { fileSize, fileSize }, getHashType());
 		
 		String hashMain = hashes[0];
 		String hashLabel = hashes[1];
-		
-		isMain = new MyByteArrayInputStream((isMain).getBuff(),
-				(isMain).available());
-		
-		if (isLabel != null) {
-			if (isLabel instanceof MyByteArrayInputStream)
-				isLabel = new MyByteArrayInputStream(((MyByteArrayInputStream) isLabel).getBuff(),
-						((MyByteArrayInputStream) isLabel).available());
-			else
-				isLabel = id.getLabelURL().getInputStream();
-		}
 		
 		GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
 		DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
@@ -788,11 +784,11 @@ public class MongoDB {
 				fffPreview = null;
 			}
 			
-			MyByteArrayInputStream isMainCopy = new MyByteArrayInputStream((isMain).getBuff(),
-					(isMain).available());
-			isMain = new MyByteArrayInputStream((isMain).getBuff(),
-								(isMain).available());
-			boolean saved = saveImageFile(new InputStream[] { isMain, isLabel, getPreviewImageStream(isMainCopy) }, gridfs_images, gridfs_null_files,
+			boolean saved = saveImageFile(new InputStream[] {
+					new MyByteArrayInputStream(isMain),
+					new MyByteArrayInputStream(isLabel),
+					getPreviewImageStream(new MyByteArrayInputStream(isMain))
+					}, gridfs_images, gridfs_null_files,
 					gridfs_preview_files, id, hashMain,
 					hashLabel,
 					fffMain == null, fffLabel == null);

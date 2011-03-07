@@ -22,6 +22,10 @@ public class MyByteArrayInputStream extends ByteArrayInputStream {
 		super(new byte[] {});
 	}
 	
+	public MyByteArrayInputStream(byte[] buf) {
+		this(buf, buf.length);
+	}
+	
 	public byte[] getBuff() {
 		return buf;
 	}

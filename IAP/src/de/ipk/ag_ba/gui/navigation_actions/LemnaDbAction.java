@@ -52,24 +52,30 @@ public class LemnaDbAction extends AbstractNavigationAction implements Navigatio
 	
 	@Override
 	public String getDefaultImage() {
-		if (db.startsWith("CGH_"))
-			return "img/mais.png";
+		if (db.startsWith("APH_"))
+			return "img/ext/phyto.png";
 		else
-			if (db.startsWith("BGH_"))
-				return "img/000Grad_3_.png";
+			if (db.startsWith("CGH_"))
+				return "img/maisMultiple.png";
 			else
-				return "img/DBE2_logo-gray_s.png";
+				if (db.startsWith("BGH_"))
+					return "img/000Grad_3_.png";
+				else
+					return "img/DBE2_logo-gray_s.png";
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		if (db.startsWith("CGH_"))
-			return "img/mais.png";
+		if (db.startsWith("APH_"))
+			return "img/ext/phyto.png";
 		else
-			if (db.startsWith("BGH_"))
-				return "img/000Grad_3_.png";
+			if (db.startsWith("CGH_"))
+				return "img/maisMultiple.png";
 			else
-				return "img/DBE2_logo_s.png";
+				if (db.startsWith("BGH_"))
+					return "img/000Grad_3_.png";
+				else
+					return "img/DBE2_logo_s.png";
 	}
 	
 	@Override
