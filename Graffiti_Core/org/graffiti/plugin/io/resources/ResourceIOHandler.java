@@ -8,6 +8,8 @@ public interface ResourceIOHandler {
 	
 	public InputStream getInputStream(IOurl url) throws Exception;
 	
+	public InputStream getPreviewInputStream(IOurl url) throws Exception;
+	
 	/**
 	 * @return new url, or null, if not copied
 	 * @throws Exception

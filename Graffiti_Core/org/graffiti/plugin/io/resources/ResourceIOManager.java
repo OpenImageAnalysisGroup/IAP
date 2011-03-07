@@ -146,4 +146,11 @@ public class ResourceIOManager {
 				return mh;
 		return null;
 	}
+	
+	public static byte[] getPreviewImageContent(IOurl ioUrl) throws Exception {
+		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
+		copyContent(getHandlerFromPrefix(ioUrl.getPrefix()).getPreviewInputStream(ioUrl), output);
+		byte[] imageContent = output.getBuffTrimmed();
+		return imageContent;
+	}
 }

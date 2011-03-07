@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
@@ -32,6 +34,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -74,6 +77,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.networks.LoadedNetwork;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.networks.NetworkData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.IntVolumeInputStream;
@@ -125,10 +129,9 @@ public class MongoDB {
 	}
 	
 	private final MongoDBhandler mh;
-	private final MongoDBpreviewHandler mp;
 	
 	public ResourceIOHandler[] getHandlers() {
-		return new ResourceIOHandler[] { mh, mp };
+		return new ResourceIOHandler[] { mh };
 	}
 	
 	private final String displayName;
@@ -158,7 +161,6 @@ public class MongoDB {
 		this.hashType = hashType;
 		
 		mh = new MongoDBhandler(databaseHost, this);
-		mp = new MongoDBpreviewHandler(databaseHost, this);
 		
 	}
 	
@@ -696,7 +698,8 @@ public class MongoDB {
 	}
 	
 	public DatabaseStorageResult saveImageFile(DB db, ImageData id, ObjectRef fileSize) throws Exception {
-		InputStream isMain = id.getURL().getInputStream();
+		MyByteArrayInputStream isMain = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
+		
 		InputStream isLabel = id.getLabelURL() == null ? null : id.getLabelURL().getInputStream();
 		ImageData image = id;
 		
@@ -719,11 +722,9 @@ public class MongoDB {
 		
 		String hashMain = hashes[0];
 		String hashLabel = hashes[1];
-		if (isMain instanceof MyByteArrayInputStream)
-			isMain = new MyByteArrayInputStream(((MyByteArrayInputStream) isMain).getBuff(),
-					((MyByteArrayInputStream) isMain).available());
-		else
-			isMain = id.getURL().getInputStream();
+		
+		isMain = new MyByteArrayInputStream((isMain).getBuff(),
+				(isMain).available());
 		
 		if (isLabel != null) {
 			if (isLabel instanceof MyByteArrayInputStream)
@@ -755,6 +756,8 @@ public class MongoDB {
 			image.getLabelURL().setDetail(hashLabel);
 		}
 		
+		GridFSDBFile fffPreview = gridfs_preview_files.findOne(hashMain);
+		
 		if (fffMain != null && fffMain.getLength() <= 0) {
 			gridfs_images.remove(fffMain);
 			fffMain = null;
@@ -763,16 +766,48 @@ public class MongoDB {
 			gridfs_images.remove(fffLabel);
 			fffLabel = null;
 		}
+		if (fffPreview != null && fffPreview.getLength() <= 0) {
+			gridfs_images.remove(fffPreview);
+			fffPreview = null;
+		}
 		
-		if (fffMain != null && fffLabel != null) {
+		if (fffMain != null && fffLabel != null && fffPreview != null) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
-			boolean saved = saveImageFile(new InputStream[] { isMain, isLabel }, gridfs_images, gridfs_null_files, gridfs_preview_files, id, hashMain, hashLabel,
+			
+			if (fffMain != null) {
+				gridfs_images.remove(fffMain);
+				fffMain = null;
+			}
+			if (fffLabel != null) {
+				gridfs_images.remove(fffLabel);
+				fffLabel = null;
+			}
+			if (fffPreview != null) {
+				gridfs_images.remove(fffPreview);
+				fffPreview = null;
+			}
+			
+			MyByteArrayInputStream isMainCopy = new MyByteArrayInputStream((isMain).getBuff(),
+					(isMain).available());
+			isMain = new MyByteArrayInputStream((isMain).getBuff(),
+								(isMain).available());
+			boolean saved = saveImageFile(new InputStream[] { isMain, isLabel, getPreviewImageStream(isMainCopy) }, gridfs_images, gridfs_null_files,
+					gridfs_preview_files, id, hashMain,
+					hashLabel,
 					fffMain == null, fffLabel == null);
 			if (saved) {
 				return DatabaseStorageResult.STORED_IN_DB;
 			} else
 				return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
+		}
+	}
+	
+	private InputStream getPreviewImageStream(InputStream in) {
+		try {
+			return MyImageIOhelper.getPreviewImageStream(ImageIO.read(in));
+		} catch (Exception e) {
+			return null;
 		}
 	}
 	

@@ -23,6 +23,7 @@ public enum MongoGridFS {
 		this.collection_or_field = collection_or_filed;
 	}
 	
+	@Override
 	public String toString() {
 		return collection_or_field;
 	}
@@ -32,7 +33,8 @@ public enum MongoGridFS {
 		for (MongoGridFS fs : values()) {
 			if (fs != FIELD_FILENAME)
 				if (!fs.toString().contains("."))
-					res.add(fs.toString());
+					if (!fs.toString().contains("preview"))
+						res.add(fs.toString());
 		}
 		return res;
 	}
@@ -52,6 +54,17 @@ public enum MongoGridFS {
 					res.add(FS_NETWORK_LABELS.toString());
 				} else
 					res.addAll(getFileCollections());
+		return res;
+	}
+	
+	public static ArrayList<String> getPreviewFileCollections() {
+		ArrayList<String> res = new ArrayList<String>();
+		for (MongoGridFS fs : values()) {
+			if (fs != FIELD_FILENAME)
+				if (!fs.toString().contains("."))
+					if (fs.toString().contains("preview"))
+						res.add(fs.toString());
+		}
 		return res;
 	}
 }
