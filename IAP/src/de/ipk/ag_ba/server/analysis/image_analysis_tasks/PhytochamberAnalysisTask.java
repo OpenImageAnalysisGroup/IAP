@@ -168,7 +168,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 									new ImageProcessorOptions());
 							
 							FlexibleImageStack debugImageStack = null;
-							boolean addDebugImages = false;
+							boolean addDebugImages = true;
 							if (addDebugImages)
 								debugImageStack = new FlexibleImageStack();
 							
