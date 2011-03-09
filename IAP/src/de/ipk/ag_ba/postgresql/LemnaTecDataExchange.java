@@ -703,4 +703,33 @@ public class LemnaTecDataExchange {
 		}
 		return res;
 	}
+	
+	public boolean isUserKnown(String u, String p) throws Exception {
+		Connection connection = openConnectionToDatabase("LTSystem");
+		
+		String sqlText = "SELECT role, db_ids, removed " + "FROM  ltuser "
+							+ "WHERE name = ? AND passwd = ?";
+		
+		PreparedStatement ps = connection.prepareStatement(sqlText);
+		ps.setString(1, u);
+		ps.setString(2, p);
+		
+		ResultSet rs = ps.executeQuery();
+		
+		boolean ok = false;
+		
+		while (rs.next()) {
+			int role = rs.getInt(1);
+			String db_ids = rs.getString(2);
+			boolean removed = rs.getBoolean(3);
+			
+			if (!removed) {
+				ok = true;
+			}
+		}
+		rs.close();
+		ps.close();
+		
+		return ok;
+	}
 }

@@ -98,7 +98,7 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 				}
 			} catch (Exception e) {
 				System.out.println("Database " + db + " problem: " + e.getMessage());
-				e.printStackTrace();
+				// e.printStackTrace();
 				// empty
 				errorList.add(db);
 				error++;

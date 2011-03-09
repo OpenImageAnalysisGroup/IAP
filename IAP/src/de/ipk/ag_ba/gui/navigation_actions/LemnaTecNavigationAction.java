@@ -62,6 +62,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		this.src = src;
 		result.clear();
 		try {
+			result.add(new NavigationButton(new LemnaTecLogoutAction(), src.getGUIsetting()));
 			result.add(new NavigationButton(new LemnaTecUserNavigationAction(), src.getGUIsetting()));
 			
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();

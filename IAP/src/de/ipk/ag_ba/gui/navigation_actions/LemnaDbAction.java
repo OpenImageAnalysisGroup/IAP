@@ -80,13 +80,16 @@ public class LemnaDbAction extends AbstractNavigationAction implements Navigatio
 	
 	@Override
 	public String getDefaultTitle() {
-		if (db.startsWith("CGH_"))
-			return "Maize Greenhouse (20" + db.substring("CGH_".length()) + ")";
+		if (db.startsWith("APH_"))
+			return "Phytoch. (20" + db.substring("APH_".length()) + ")";
 		else
-			if (db.startsWith("BGH_"))
-				return "Barley Greenhouse (20" + db.substring("BGH_".length()) + ")";
+			if (db.startsWith("CGH_"))
+				return "Maize Greenh. (20" + db.substring("CGH_".length()) + ")";
 			else
-				return db;
+				if (db.startsWith("BGH_"))
+					return "Barley Greenh. (20" + db.substring("BGH_".length()) + ")";
+				else
+					return db;
 	}
 	
 }
