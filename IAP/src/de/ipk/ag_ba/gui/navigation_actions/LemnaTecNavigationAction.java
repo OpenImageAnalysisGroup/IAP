@@ -26,6 +26,8 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 	private String login;
 	private String pass;
 	ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
+	private ArrayList<String> listOfDatabases = null;
+	private final TreeMap<String, Collection<ExperimentHeaderInterface>> experimentMap = new TreeMap<String, Collection<ExperimentHeaderInterface>>();
 	
 	public LemnaTecNavigationAction() {
 		super("Access LemnaTec-DB");
@@ -68,8 +70,8 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
 			allExperiments.get("").put("", new ArrayList<ExperimentHeaderInterface>());
-			ArrayList<String> list = new ArrayList<String>(new LemnaTecDataExchange().getDatabases());
-			Collections.sort(list, new Comparator<String>() {
+			listOfDatabases = listOfDatabases != null ? listOfDatabases : new ArrayList<String>(new LemnaTecDataExchange().getDatabases());
+			Collections.sort(listOfDatabases, new Comparator<String>() {
 				@Override
 				public int compare(String arg0, String arg1) {
 					if (known(arg0) && !known(arg1))
@@ -79,13 +81,20 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 					return arg0.compareTo(arg1);
 				}
 			});
-			for (String db : list) {
+			ArrayList<NavigationButton> unsorted = new ArrayList<NavigationButton>();
+			NavigationButton nb = new NavigationButton(new LemnaTecDatabaseCollectionAction(unsorted), src.getGUIsetting());
+			for (String db : listOfDatabases) {
 				try {
-					Collection<ExperimentHeaderInterface> experiments = new LemnaTecDataExchange()
-										.getExperimentInDatabase(db);
-					if (experiments.size() > 0)
-						result.add(new NavigationButton(new LemnaDbAction(db, experiments), src.getGUIsetting()));
-					else
+					if (!experimentMap.containsKey(db))
+						experimentMap.put(db, new LemnaTecDataExchange()
+										.getExperimentInDatabase(db));
+					Collection<ExperimentHeaderInterface> experiments = experimentMap.get(db);
+					if (experiments.size() > 0) {
+						if (!known(db))
+							unsorted.add(new NavigationButton(new LemnaDbAction(db, experiments), src.getGUIsetting()));
+						else
+							result.add(new NavigationButton(new LemnaDbAction(db, experiments), src.getGUIsetting()));
+					} else
 						System.out.println("Database " + db + " is empty.");
 					for (ExperimentHeaderInterface ehi : experiments) {
 						allExperiments.get("").get("").add(ehi);
@@ -95,6 +104,8 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 					System.out.println("Database " + db + " could not be processed.");
 				}
 			}
+			if (unsorted.size() > 0)
+				result.add(nb);
 			result.add(1, Other.getCalendarEntity(allExperiments, null, src.getGUIsetting()));
 			
 		} catch (Exception e) {
@@ -103,7 +114,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 	}
 	
 	protected boolean known(String arg1) {
-		return arg1 != null && (arg1.startsWith("CGH_") || arg1.startsWith("BGH_"));
+		return arg1 != null && (arg1.startsWith("CGH_") || arg1.startsWith("BGH_") || arg1.startsWith("APH_"));
 	}
 	
 	@Override

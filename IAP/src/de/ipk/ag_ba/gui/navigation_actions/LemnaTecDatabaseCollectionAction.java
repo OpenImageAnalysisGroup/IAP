@@ -8,25 +8,25 @@ package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.util.ArrayList;
 
-import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
  */
-public class LemnaTecLogoutAction extends AbstractNavigationAction implements NavigationAction {
-	
-	public LemnaTecLogoutAction() {
-		super("Logout");
-	}
+public class LemnaTecDatabaseCollectionAction extends AbstractNavigationAction implements NavigationAction {
 	
 	private NavigationButton src;
+	private final ArrayList<NavigationButton> prepared;
+	
+	public LemnaTecDatabaseCollectionAction(ArrayList<NavigationButton> prepared) {
+		super("Show list of unsorted (old) experiments");
+		this.prepared = prepared;
+	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
-		return result;
+		return prepared;
 	}
 	
 	@Override
@@ -42,23 +42,18 @@ public class LemnaTecLogoutAction extends AbstractNavigationAction implements Na
 	}
 	
 	@Override
-	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("This command has no function when using the applet version of IAP.");
-	}
-	
-	@Override
 	public String getDefaultImage() {
-		return "img/ext/system-lock-screen.png";
+		return "img/DBE2_logo-gray_s.png";
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return "img/ext/system-lock-screen.png";
+		return "img/DBE2_logo_s.png";
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Logout";
+		return "Unsorted Data";
 	}
 	
 }

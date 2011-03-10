@@ -100,23 +100,33 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("lemnatec:"))
-			experiment = new LemnaTecDataExchange().getExperiment(header, status);
-		else
-			experiment = m.getExperiment(header);
+		if (experiment == null) {
+			if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("lemnatec:"))
+				experiment = new LemnaTecDataExchange().getExperiment(header, status);
+			else
+				experiment = m.getExperiment(header);
+		}
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("lemnatec:"))
-			return "img/000Grad_3-gray.png";
+		if (header.getDatabaseId() != null && header.getDatabaseId().contains("APH_"))
+			return "img/ext/phyto.png";
+		if (header.getDatabaseId() != null && header.getDatabaseId().contains("CGH_"))
+			return "img/maisMultipleScaled.png";
+		if (header.getDatabaseId() != null && header.getDatabaseId().contains("BGH_"))
+			return "img/000Grad_3.png";
 		else
 			return "img/ext/image-x-generic-off.png";
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("lemnatec:"))
+		if (header.getDatabaseId() != null && header.getDatabaseId().contains("APH_"))
+			return "img/ext/phyto.png";
+		if (header.getDatabaseId() != null && header.getDatabaseId().contains("CGH_"))
+			return "img/maisMultipleScaled.png";
+		if (header.getDatabaseId() != null && header.getDatabaseId().contains("BGH_"))
 			return "img/000Grad_3.png";
 		else
 			return "img/ext/image-x-generic.png";

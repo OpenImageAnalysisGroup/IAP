@@ -666,16 +666,28 @@ public class LemnaTecDataExchange {
 				String metaName = rs.getString(2);
 				String metaValue = rs.getString(3);
 				
-				if (!res.containsKey(plantID))
+				if (!res.containsKey(plantID)) {
 					res.put(plantID, new Condition(null));
+					if (header.getDatabase().contains("BGH_"))
+						res.get(plantID).setSpecies("Barley");
+					if (header.getDatabase().contains("APH_"))
+						res.get(plantID).setSpecies("Arabidopsis");
+					if (header.getDatabase().contains("CGH_"))
+						res.get(plantID).setSpecies("Maize");
+				}
 				
-				if (metaName.equals("Pflanzenart"))
+				if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart"))
 					res.get(plantID).setSpecies(filterName(metaValue));
-				if (metaName.equals("Pflanzenname"))
+				if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname") || metaName.equalsIgnoreCase("Name")
+						|| metaName.equalsIgnoreCase("GENOTYP"))
 					res.get(plantID).setGenotype(metaValue);
-				if (metaName.equals("Typ"))
+				if (metaName.equalsIgnoreCase("Variety"))
+					res.get(plantID).setVariety(metaValue);
+				if (metaName.equalsIgnoreCase("Treatment") || metaName.equalsIgnoreCase("Typ"))
 					res.get(plantID).setTreatment(metaValue);
-				if (metaName.equals("SeedDate"))
+				if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot"))
+					res.get(plantID).setGrowthconditions(metaValue);
+				if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date"))
 					res.get(plantID).setSequence("SeedDate: " + metaValue);
 				
 			}
