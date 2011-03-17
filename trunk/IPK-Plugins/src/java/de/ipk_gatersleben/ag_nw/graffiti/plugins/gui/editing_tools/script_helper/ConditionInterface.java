@@ -12,7 +12,8 @@ import org.jdom.Element;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawComponent.MyComparableDataPoint;
 
-public interface ConditionInterface extends MappingDataEntity, Comparable<ConditionInterface>, Set<SampleInterface> {
+public interface ConditionInterface extends MappingDataEntity, Comparable<ConditionInterface>,
+		Set<SampleInterface> {
 	
 	public void getString(StringBuilder r);
 	

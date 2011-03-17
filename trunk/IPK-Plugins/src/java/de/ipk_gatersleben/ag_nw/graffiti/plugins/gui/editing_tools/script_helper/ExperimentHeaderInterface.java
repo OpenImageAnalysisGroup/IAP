@@ -22,23 +22,23 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	
 	public String getCoordinator();
 	
-	/**
-	 * Use setDatabaseId instead (both methods set the same property).
-	 * 
-	 * @param excelfileid
-	 */
-	@Deprecated
-	public void setExcelfileid(String excelfileid);
+	// /**
+	// * Use setDatabaseId instead (both methods set the same property).
+	// *
+	// * @param excelfileid
+	// */
+	// @Deprecated
+	// public void setExcelfileid(String excelfileid);
 	
 	public void setDatabaseId(String excelfileid);
 	
-	/**
-	 * Use getDatabaseId instead (both methods return the same value).
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	public String getExcelfileid();
+	// /**
+	// * Use getDatabaseId instead (both methods return the same value).
+	// *
+	// * @return
+	// */
+	// @Deprecated
+	// public String getExcelfileid();
 	
 	public String getDatabaseId();
 	

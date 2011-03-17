@@ -38,7 +38,6 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -546,7 +545,7 @@ public class MongoDB {
 					allOK = false;
 			}
 		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
+			System.err.println("Error: " + e.getMessage());
 		}
 		
 		return allOK;
@@ -569,9 +568,9 @@ public class MongoDB {
 			inputFile.save();
 			// fs.getDB().requestStart();
 			result = inputFile.getLength();
-			CommandResult res = fs.getDB().getLastError(2, 180000, false);
-			if (!res.ok())
-				result = -1;
+			// CommandResult res = fs.getDB().getLastError(2, 180000, false);
+			// if (!res.ok())
+			// result = -1;
 			// fs.getDB().requestDone();
 		} else
 			result = 0;
@@ -771,18 +770,18 @@ public class MongoDB {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
 			
-			if (fffMain != null) {
-				gridfs_images.remove(fffMain);
-				fffMain = null;
-			}
-			if (fffLabel != null) {
-				gridfs_images.remove(fffLabel);
-				fffLabel = null;
-			}
-			if (fffPreview != null) {
-				gridfs_images.remove(fffPreview);
-				fffPreview = null;
-			}
+			// if (fffMain != null) {
+			// gridfs_images.remove(fffMain);
+			// fffMain = null;
+			// }
+			// if (fffLabel != null) {
+			// gridfs_images.remove(fffLabel);
+			// fffLabel = null;
+			// }
+			// if (fffPreview != null) {
+			// gridfs_images.remove(fffPreview);
+			// fffPreview = null;
+			// }
 			
 			boolean saved = saveImageFile(new InputStream[] {
 					new MyByteArrayInputStream(isMain),
@@ -1041,7 +1040,7 @@ public class MongoDB {
 			
 			@Override
 			public void run() {
-				ObjectId id = new ObjectId(header.getExcelfileid());
+				ObjectId id = new ObjectId(header.getDatabaseId());
 				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), id);
 				DBObject expref = dbr.fetch();
 				if (expref != null) {
@@ -1057,7 +1056,7 @@ public class MongoDB {
 			}
 		});
 		if (tso.getBval(0, false))
-			throw new Exception("Experiment with ID " + header.getExcelfileid() + " not found!");
+			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found!");
 	}
 	
 	public void setExperimentInfo(final ExperimentHeaderInterface header) throws Exception {
@@ -1067,7 +1066,7 @@ public class MongoDB {
 			
 			@Override
 			public void run() {
-				ObjectId id = new ObjectId(header.getExcelfileid());
+				ObjectId id = new ObjectId(header.getDatabaseId());
 				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), id);
 				DBObject expref = dbr.fetch();
 				if (expref != null) {

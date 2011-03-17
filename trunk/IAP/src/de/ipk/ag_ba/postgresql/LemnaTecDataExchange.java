@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -97,8 +99,9 @@ public class LemnaTecDataExchange {
 		return result;
 	}
 	
-	public Collection<ExperimentHeaderInterface> getExperimentInDatabase(String database) throws SQLException,
-						ClassNotFoundException {
+	public Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database)
+			throws SQLException, ClassNotFoundException {
+		
 		String sqlText = "SELECT distinct(measurement_label) FROM snapshot ORDER BY measurement_label";
 		
 		Connection connection = openConnectionToDatabase(database);
@@ -116,7 +119,18 @@ public class LemnaTecDataExchange {
 			ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentname());
 			ehi.setImportusername("todo import user name");
 			ehi.setImportusergroup("Imported");
-			ehi.setExperimenttype("Phenotyping"); // todo welches system?
+			LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
+			if (system == LemnaTecSystem.Barley) {
+				ehi.setExperimenttype("Barley Greenhouse Experiment");
+			} else
+				if (system == LemnaTecSystem.Maize) {
+					ehi.setExperimenttype("Maize Greenhouse Experiment");
+				} else
+					if (system == LemnaTecSystem.Phytochamber) {
+						ehi.setExperimenttype("Phytochamber Experiment");
+					} else {
+						ehi.setExperimenttype("Phenotyping Experiment (unknown greenhouse)");
+					}
 			ehi.setRemark("LemnaTec-DB dataset");
 			ehi.setSequence("");
 			ehi.setSizekb(-1);
@@ -151,16 +165,21 @@ public class LemnaTecDataExchange {
 			rs.close();
 		}
 		
+		HashMap<ExperimentHeaderInterface, HashSet<String>> people = new HashMap<ExperimentHeaderInterface, HashSet<String>>();
+		
 		ArrayList<String> names = new ArrayList<String>();
 		try {
 			sqlText = "SELECT distinct(creator) FROM import_data WHERE measurement_label=?";
 			ps = connection.prepareStatement(sqlText);
 			for (ExperimentHeaderInterface ehi : result) {
+				if (!people.containsKey(ehi))
+					people.put(ehi, new HashSet<String>());
 				ps.setString(1, ehi.getExperimentname());
 				rs = ps.executeQuery();
 				names.clear();
 				while (rs.next()) {
 					names.add(rs.getString(1));
+					people.get(ehi).add(rs.getString(1));
 				}
 				rs.close();
 				ehi.setCoordinator(StringManipulationTools.getStringList(names, ","));
@@ -175,11 +194,14 @@ public class LemnaTecDataExchange {
 		sqlText = "SELECT distinct(creator) FROM snapshot WHERE measurement_label=?";
 		ps = connection.prepareStatement(sqlText);
 		for (ExperimentHeaderInterface ehi : result) {
+			if (!people.containsKey(ehi))
+				people.put(ehi, new HashSet<String>());
 			ps.setString(1, ehi.getExperimentname());
 			rs = ps.executeQuery();
 			names.clear();
 			while (rs.next()) {
 				names.add(rs.getString(1));
+				people.get(ehi).add(rs.getString(1));
 			}
 			rs.close();
 			String importers = StringManipulationTools.getStringList(names, ",");
@@ -188,16 +210,29 @@ public class LemnaTecDataExchange {
 				ehi.setCoordinator(importers);
 		}
 		
-		// ArrayList experimentatorsArray = new ArrayList();
-		// for (String s : experimentators)
-		// experimentatorsArray.add(s);
-		// String experimentator =
-		// StringManipulationTools.getStringList(experimentatorsArray, ",");
-		
+		if (user != null && !getAdministrators().contains(user)) {
+			// remove experiments from result which should not be visible to users
+			LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
+			if (system != LemnaTecSystem.Unknown)
+				for (ExperimentHeaderInterface ehi : people.keySet()) {
+					if (!people.get(ehi).contains(user)) {
+						result.remove(ehi);
+					}
+				}
+		}
 		ps.close();
 		closeDatabaseConnection(connection);
 		
 		return result;
+	}
+	
+	private HashSet<String> getAdministrators() {
+		HashSet<String> res = new HashSet<String>();
+		res.add("klukas");
+		res.add("entzian");
+		res.add("muecke");
+		res.add("Muecke");
+		return res;
 	}
 	
 	public Collection<Snapshot> getSnapshotsOfExperiment(String database, String experiment) throws SQLException,
@@ -583,7 +618,20 @@ public class LemnaTecDataExchange {
 		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
-		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements, true);
+		
+		Collections.sort(measurements, new Comparator<NumericMeasurementInterface>() {
+			@Override
+			public int compare(NumericMeasurementInterface arg0, NumericMeasurementInterface arg1) {
+				int timeComparison = arg0.getParentSample().getRowId() < arg1.getParentSample().getRowId() ? -1 : (arg0.getParentSample().getRowId() > arg1
+						.getParentSample().getRowId() ? 1 : 0);
+				if (timeComparison != 0)
+					return timeComparison;
+				else
+					return arg0.getQualityAnnotation().compareTo(arg1.getQualityAnnotation());
+			}
+		});
+		
+		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements, false);
 		
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
 		if (optStatus != null)
@@ -592,6 +640,20 @@ public class LemnaTecDataExchange {
 		experiment.setHeader(new ExperimentHeader(experimentReq));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(100);
+		// Collections.sort(experiment, new Comparator<SubstanceInterface>() {
+		// @Override
+		// public int compare(SubstanceInterface arg0, SubstanceInterface arg1) {
+		// return arg0.getName().compareTo(arg1.getName());
+		// }
+		// });
+		// for (SubstanceInterface si : experiment) {
+		// Collections.sort(si, new Comparator<ConditionInterface>() {
+		// @Override
+		// public int compare(ConditionInterface o1, ConditionInterface o2) {
+		// return o1.toString().compareTo(o2.toString());
+		// }
+		// });
+		// }
 		return experiment;
 	}
 	

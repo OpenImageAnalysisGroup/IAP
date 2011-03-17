@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -30,7 +31,7 @@ public class Substance implements SubstanceInterface {
 	
 	HashMap<Integer, String> synonyms = null; // new HashMap<Integer, String>()
 	
-	private final Collection<ConditionInterface> conditions = new ArrayList<ConditionInterface>();
+	private final ArrayList<ConditionInterface> conditions = new ArrayList<ConditionInterface>();
 	
 	public Substance() {
 		// empty
@@ -751,6 +752,56 @@ public class Substance implements SubstanceInterface {
 		String s1 = rowId + ";" + name + ";" + funcat + ";" + info + ";" + formula + ";" + substancegroup + ";" + cluster_id + ";" + spot + ";" +
 				new_blast + ";" + new_blast_e_val + ";" + new_blast_score + ";" + affy_hit + ";" + score + ";" + secure;
 		return s1.hashCode();
+	}
+	
+	@Override
+	public void add(int index, ConditionInterface element) {
+		conditions.add(index, element);
+	}
+	
+	@Override
+	public boolean addAll(int index, Collection<? extends ConditionInterface> c) {
+		return conditions.addAll(index, c);
+	}
+	
+	@Override
+	public ConditionInterface get(int index) {
+		return conditions.get(index);
+	}
+	
+	@Override
+	public int indexOf(Object o) {
+		return conditions.indexOf(o);
+	}
+	
+	@Override
+	public int lastIndexOf(Object o) {
+		return conditions.lastIndexOf(o);
+	}
+	
+	@Override
+	public ListIterator<ConditionInterface> listIterator() {
+		return conditions.listIterator();
+	}
+	
+	@Override
+	public ListIterator<ConditionInterface> listIterator(int index) {
+		return conditions.listIterator(index);
+	}
+	
+	@Override
+	public ConditionInterface remove(int index) {
+		return conditions.remove(index);
+	}
+	
+	@Override
+	public ConditionInterface set(int index, ConditionInterface element) {
+		return conditions.set(index, element);
+	}
+	
+	@Override
+	public List<ConditionInterface> subList(int fromIndex, int toIndex) {
+		return subList(fromIndex, toIndex);
 	}
 	
 }

@@ -48,7 +48,7 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 		this.m = m;
 		this.experiment = experiment;
 		if (experiment != null && experiment.getHeader() != null)
-			this.datasetID = experiment.getHeader().getExcelfileid();
+			this.datasetID = experiment.getHeader().getDatabaseId();
 	}
 	
 	public CloudIoTestAction() {
@@ -120,7 +120,7 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName() + " " + getDefaultTitle());
 			
-			statisticsResult.getHeader().setExcelfileid("");
+			statisticsResult.getHeader().setDatabaseId("");
 			
 			mpc = new MainPanelComponent("Running in batch-mode. Partial result is not shown at this place.");
 			if (resultReceiver != null) {

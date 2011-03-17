@@ -16,6 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/MultimodalDataHandling"/>
 	<classpathentry kind="lib" path="lib/jai_codec.jar"/>
 	<classpathentry kind="lib" path="lib/jai_core.jar"/>
-	<classpathentry kind="lib" path="lib/mongo-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/mongo-2.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

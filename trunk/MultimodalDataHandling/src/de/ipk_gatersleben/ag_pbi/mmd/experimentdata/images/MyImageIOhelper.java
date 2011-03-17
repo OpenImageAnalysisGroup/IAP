@@ -56,15 +56,20 @@ public class MyImageIOhelper {
 	}
 	
 	public static MyByteArrayInputStream getPreviewImageStream(BufferedImage image) throws IOException {
-		BufferedImage previewImage = getPreviewImage(image);
-		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(bos);
-		
-		ImageIO.write(previewImage, "png", ios);
-		byte[] content = bos.toByteArray();
-		MyByteArrayInputStream is = new MyByteArrayInputStream(content, content.length);
-		return is;
+		try {
+			BufferedImage previewImage = getPreviewImage(image);
+			
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(bos);
+			
+			ImageIO.write(previewImage, "png", ios);
+			byte[] content = bos.toByteArray();
+			MyByteArrayInputStream is = new MyByteArrayInputStream(content, content.length);
+			return is;
+		} catch (Exception e) {
+			System.out.println("Warning: Couldn't create preview image for a certain image.");
+			return null;
+		}
 	}
 	
 	private static BufferedImage resize(BufferedImage image, int width, int height, int blur) {

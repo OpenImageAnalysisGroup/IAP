@@ -70,7 +70,7 @@ public class Trash extends AbstractNavigationAction {
 					message += "<li>Process Experiment " + experimentName + ": ";
 					if (cmd == DeletionCommand.DELETE || cmd == DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST) {
 						if (getHeader() != null) {
-							m.deleteExperiment(hhh.getExcelfileid());
+							m.deleteExperiment(hhh.getDatabaseId());
 							message = "<html><b>" + "Experiment " + experimentName + " has been deleted.";
 						} else {
 							Object[] res = MyInputHelper.getInput("<html>"

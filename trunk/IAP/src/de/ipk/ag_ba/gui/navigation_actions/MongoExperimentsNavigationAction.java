@@ -44,6 +44,8 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
+		res.add(new NavigationButton(new DomainLogoutAction(), src.getGUIsetting()));
+		
 		NavigationAction analyzeAction = new SaveExperimentInCloud(true);
 		
 		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Add Files", "img/ext/user-desktop.png",

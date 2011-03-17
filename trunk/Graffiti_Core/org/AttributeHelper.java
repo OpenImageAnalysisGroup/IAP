@@ -75,7 +75,7 @@ import org.graffiti.graphics.NodeLabelAttribute;
  * attributes.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class AttributeHelper implements HelperClass {
 	
@@ -145,7 +145,7 @@ public class AttributeHelper implements HelperClass {
 			} catch (Exception e2) {
 				try {
 					String osName = System.getProperty("os.name");
-					if (osName.startsWith("Mac OS")) {
+					if (osName.startsWith("Mac OS") || osName.startsWith("Darwin")) {
 						String cmd = "open";
 						String par = url;
 						r.exec(new String[] { cmd, par });
@@ -170,6 +170,9 @@ public class AttributeHelper implements HelperClass {
 	
 	public static boolean macOSrunning() {
 		try {
+			String osName = System.getProperty("os.name");
+			if (osName.startsWith("Mac OS") || osName.startsWith("Darwin"))
+				return true;
 			return System.getProperty("mrj.version") != null;
 		} catch (Exception ace) {
 			return false;
@@ -2616,6 +2619,7 @@ public class AttributeHelper implements HelperClass {
 	/**
 	 * @deprecated Use {@link StringManipulationTools#formatNumber(double,String)} instead
 	 */
+	@Deprecated
 	public static String formatNumber(double d, String pattern) {
 		return StringManipulationTools.formatNumber(d, pattern);
 	}

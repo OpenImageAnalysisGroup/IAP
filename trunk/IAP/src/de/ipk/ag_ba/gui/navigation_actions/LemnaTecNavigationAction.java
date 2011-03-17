@@ -33,6 +33,10 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		super("Access LemnaTec-DB");
 	}
 	
+	public void setLogin(String user) {
+		this.login = user;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -65,7 +69,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		result.clear();
 		try {
 			result.add(new NavigationButton(new LemnaTecLogoutAction(), src.getGUIsetting()));
-			result.add(new NavigationButton(new LemnaTecUserNavigationAction(), src.getGUIsetting()));
+			result.add(new NavigationButton(new LemnaTecUserNavigationAction(login), src.getGUIsetting()));
 			
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
@@ -87,7 +91,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 				try {
 					if (!experimentMap.containsKey(db))
 						experimentMap.put(db, new LemnaTecDataExchange()
-										.getExperimentInDatabase(db));
+										.getExperimentsInDatabase(login, db));
 					Collection<ExperimentHeaderInterface> experiments = experimentMap.get(db);
 					if (experiments.size() > 0) {
 						if (!known(db))
@@ -101,7 +105,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 					}
 					
 				} catch (Exception e) {
-					System.out.println("Database " + db + " could not be processed.");
+					System.out.println("Database " + db + " could not be processed. (" + e.getMessage() + ")");
 				}
 			}
 			if (unsorted.size() > 0)
