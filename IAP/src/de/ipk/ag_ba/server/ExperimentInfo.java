@@ -66,7 +66,7 @@ public class ExperimentInfo {
 	public ExperimentInfo(ExperimentHeaderInterface header) {
 		this.experimentName = header.getExperimentname();
 		try {
-			this.experimentID = Integer.parseInt(header.getExcelfileid());
+			this.experimentID = Integer.parseInt(header.getDatabaseId());
 		} catch (Exception e) {
 			this.experimentID = -1;
 		}

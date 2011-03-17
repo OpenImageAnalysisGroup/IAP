@@ -62,7 +62,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 		this.experiment = experiment;
 		this.experimentResult = null;
 		if (experiment != null && experiment.getHeader() != null)
-			this.mongoDatasetID = experiment.getHeader().getExcelfileid();
+			this.mongoDatasetID = experiment.getHeader().getDatabaseId();
 	}
 	
 	public PhenotypeAnalysisAction() {
@@ -161,7 +161,7 @@ public class PhenotypeAnalysisAction extends AbstractNavigationAction implements
 			// SupplementaryFilePanelMongoDB sfp = new
 			// SupplementaryFilePanelMongoDB(login, pass, statisticsResult,
 			// statisticsResult.getName());
-			statisticsResult.getHeader().setExcelfileid("");
+			statisticsResult.getHeader().setDatabaseId("");
 			if (resultReceiver == null) {
 				// if (status != null)
 				// status.setCurrentStatusText1("Store Result");

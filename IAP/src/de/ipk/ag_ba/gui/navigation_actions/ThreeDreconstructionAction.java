@@ -143,7 +143,7 @@ public class ThreeDreconstructionAction extends AbstractNavigationAction {
 			}
 			
 			Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
-			statisticsResult.getHeader().setExcelfileid("");
+			statisticsResult.getHeader().setDatabaseId("");
 			
 			MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
 			ip.setExperimentInfo(m, statisticsResult.getHeader(), true, statisticsResult);

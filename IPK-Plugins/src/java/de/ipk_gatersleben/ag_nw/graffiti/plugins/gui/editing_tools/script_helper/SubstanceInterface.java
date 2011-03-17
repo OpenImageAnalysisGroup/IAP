@@ -3,6 +3,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.HelperClass;
@@ -14,7 +15,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
 
 @TestValueRequired("name")
 public interface SubstanceInterface extends MappingDataEntity, Comparable<SubstanceInterface>,
-					Collection<ConditionInterface>, HelperClass {
+					List<ConditionInterface>, HelperClass {
 	
 	/**
 	 * Dataset, transformed for data mapping: <substance id="" name=""> <line

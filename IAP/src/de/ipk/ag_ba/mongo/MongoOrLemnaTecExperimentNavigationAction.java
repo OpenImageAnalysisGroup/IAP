@@ -34,6 +34,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	private NavigationButton src;
 	private ExperimentInterface experiment;
 	private final MongoDB m;
+	private String domainUser;
 	
 	public MongoOrLemnaTecExperimentNavigationAction(ExperimentHeaderInterface ei, MongoDB m) {
 		super(ei.getDatabaseId() != null && ei.getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
@@ -146,5 +147,9 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	
 	public ExperimentInterface getExperimentReference() {
 		return experiment;
+	}
+	
+	public void setLogin(String domainUser) {
+		this.domainUser = domainUser;
 	}
 }

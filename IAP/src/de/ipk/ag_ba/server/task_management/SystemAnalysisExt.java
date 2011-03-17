@@ -11,6 +11,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.ErrorMsg;
@@ -24,40 +25,63 @@ public class SystemAnalysisExt {
 		return new SystemInfoExt();
 	}
 	
+	private static int cpuSockets = -1;
+	
 	public static int getNumberOfCpuSockets() {
+		if (cpuSockets > 0)
+			return cpuSockets;
+		int res = -1;
 		if (new File("/proc/cpuinfo").exists()) {
-			return getLinuxCpuInfoSetInfo("/proc/cpuinfo", "physical id");
+			res = getLinuxCpuInfoSetInfo("/proc/cpuinfo", "physical id");
 		} else {
 			if (SystemInfo.isMac()) {
-				return (int) getMacSysctl("hw.packages");
+				res = (int) getMacSysctl("hw.packages");
 			}
 		}
+		cpuSockets = res;
 		return -1;
 	}
+	
+	private static int physicalCores = -1;
 	
 	public static int getNumberOfCpuPhysicalCores() {
+		if (physicalCores > 0)
+			return physicalCores;
+		int res = -1;
 		if (new File("/proc/cpuinfo").exists()) {
-			return getLinuxCpuInfoSetInfo("/proc/cpuinfo", "physical id", "core id");
+			res = getLinuxCpuInfoSetInfo("/proc/cpuinfo", "physical id", "core id");
 		} else {
 			if (SystemInfo.isMac()) {
-				return (int) getMacSysctl("hw.physicalcpu");
+				res = (int) getMacSysctl("hw.physicalcpu");
 			}
 		}
-		return -1;
+		physicalCores = res;
+		return res;
 	}
+	
+	private static int logicCpuCount = -1;
 	
 	public static int getNumberOfCpuLogicalCores() {
+		if (logicCpuCount > 0)
+			return logicCpuCount;
+		int res = -1;
 		if (new File("/proc/cpuinfo").exists()) {
-			return getLinuxCpuInfoSetInfo("/proc/cpuinfo", "processor");
+			res = getLinuxCpuInfoSetInfo("/proc/cpuinfo", "processor");
 		} else {
 			if (SystemInfo.isMac()) {
-				return (int) getMacSysctl("hw.logicalcpu");
+				res = (int) getMacSysctl("hw.logicalcpu");
 			}
 		}
-		return -1;
+		logicCpuCount = res;
+		return res;
 	}
 	
+	private static long physicalMemoryInGB = -1;
+	
 	public static long getPhysicalMemoryInGB() {
+		if (physicalMemoryInGB > 0)
+			return physicalMemoryInGB;
+		long res = -1;
 		if (new File("/proc/mtrr").exists()) {
 			/*
 			 * [klukas@ba-13 ~]$ cat /proc/mtrr
@@ -68,19 +92,24 @@ public class SystemAnalysisExt {
 			 * reg04: base=0x800000000 (32768MB), size=32768MB, count=1: write-back
 			 * reg05: base=0x1000000000 (65536MB), size= 2048MB, count=1: write-back
 			 */
-			return getLinuxLastLineInfo("/proc/mtrr", "(", "MB)") / 1024;
+			res = getLinuxLastLineInfo("/proc/mtrr", "(", "MB)") / 1024;
 		} else {
 			if (SystemInfo.isMac()) {
-				return getMacSysctl("hw.memsize") / 1024 / 1024 / 1024;
+				res = getMacSysctl("hw.memsize") / 1024 / 1024 / 1024;
 			}
 		}
-		return -1;
+		physicalMemoryInGB = res;
+		return res;
 	}
+	
+	private static HashMap<String, Long> setting2result = new HashMap<String, Long>();
 	
 	/**
 	 * see > sysctl -a hw / sysctl -a
 	 */
 	private static long getMacSysctl(String setting) {
+		if (setting2result.containsKey(setting))
+			return setting2result.get(setting);
 		long result = -1;
 		try {
 			Process p = Runtime.getRuntime().exec(new String[] {
@@ -104,6 +133,7 @@ public class SystemAnalysisExt {
 		} catch (IOException e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+		setting2result.put(setting, result);
 		return result;
 	}
 	
@@ -169,17 +199,24 @@ public class SystemAnalysisExt {
 		return result;
 	}
 	
+	private static String hostName = null;
+	
 	public static String getHostName() throws UnknownHostException {
+		if (hostName != null)
+			return hostName;
 		InetAddress local = getLocalHost();
-		String hostName = local.getHostName();
+		String hostNameR = local.getHostName();
 		String ip = local.getHostAddress();
+		
+		String res = null;
 		
 		boolean retIP = true;
 		if (retIP)
-			return ip;
+			res = ip;
 		else
-			return hostName;
-		
+			res = hostNameR;
+		hostName = res;
+		return res;
 	}
 	
 	// public domain source: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4665037 //

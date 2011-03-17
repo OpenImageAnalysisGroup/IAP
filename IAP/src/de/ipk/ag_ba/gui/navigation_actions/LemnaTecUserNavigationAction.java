@@ -26,8 +26,11 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class LemnaTecUserNavigationAction extends AbstractNavigationAction implements NavigationAction {
 	
-	public LemnaTecUserNavigationAction() {
+	private final String user;
+	
+	public LemnaTecUserNavigationAction(String user) {
 		super("Show user list and their experiments");
+		this.user = user;
 	}
 	
 	private NavigationButton src;
@@ -73,7 +76,7 @@ public class LemnaTecUserNavigationAction extends AbstractNavigationAction imple
 		for (String db : dbs) {
 			boolean set = false;
 			try {
-				for (ExperimentHeaderInterface experiment : new LemnaTecDataExchange().getExperimentInDatabase(db)) {
+				for (ExperimentHeaderInterface experiment : new LemnaTecDataExchange().getExperimentsInDatabase(user, db)) {
 					if (!set) {
 						status.setCurrentStatusText1(db);
 						set = true;

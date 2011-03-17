@@ -171,7 +171,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			setExperimentname(ExperimentInterface.UNSPECIFIED_EXPERIMENTNAME);
 		setDatabase((String) map.get("database"));
 		setRemark((String) map.get("remark"));
-		setExcelfileid(map.get("_id").toString()); // (String)
+		setDatabaseId(map.get("_id").toString()); // (String)
 		// map.get("excelfileid"));
 		setCoordinator((String) map.get("coordinator"));
 		setExperimenttype((String) map.get("experimenttype"));
@@ -269,23 +269,24 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	
 	@Override
 	public int hashCode() {
-		String s1 = experimentName + ";" + remark + ";" + coordinator + ";" + databaseId + ";" + importUserName + ";"
-							+ importUserGroup + ";" + imageFiles + ";" + sizekb + ";" + experimentType + ";" + sequence + ";"
-							+ experimentID + ";" + database + ";" + (importDate != null ? importDate.getTime() : "") + ";"
-				+ (startDate != null ? startDate.getTime() : "");
-		return s1.hashCode();
+		// String s1 = experimentName + ";" + remark + ";" + coordinator + ";" + databaseId + ";" + importUserName + ";"
+		// + importUserGroup + ";" + imageFiles + ";" + sizekb + ";" + experimentType + ";" + sequence + ";"
+		// + experimentID + ";" + database + ";" + (importDate != null ? importDate.getTime() : "") + ";"
+		// + (startDate != null ? startDate.getTime() : "");
+		// return s1.hashCode();
+		return super.hashCode();
 	}
 	
-	@Deprecated
-	public void setExcelfileid(String excelfileid) {
-		setDatabaseId(excelfileid);
-	}
-	
-	@Deprecated
-	public String getExcelfileid() {
-		return getDatabaseId();
-	}
-	
+	// @Deprecated
+	// public void setExcelfileid(String excelfileid) {
+	// setDatabaseId(excelfileid);
+	// }
+	//
+	// @Deprecated
+	// public String getExcelfileid() {
+	// return getDatabaseId();
+	// }
+	//
 	@Override
 	public void setDatabaseId(String excelfileid) {
 		databaseId = excelfileid;

@@ -131,7 +131,7 @@ public class PerformanceTestAction extends AbstractNavigationAction {
 			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName() + " " + getDefaultTitle());
 			
-			statisticsResult.getHeader().setExcelfileid("");
+			statisticsResult.getHeader().setDatabaseId("");
 			if (resultReceiver == null) {
 				if (status != null)
 					status.setCurrentStatusText1("Store Result");
