@@ -355,9 +355,16 @@ public class Sample implements SampleInterface {
 			return false;
 		if (!(obj instanceof Sample))
 			return false;
-		String s1 = measurementtool + ";" + rowId + ";" + time + ";" + timeUnit + ";" + ttestInfo.name();
 		Sample s = (Sample) obj;
-		String s2 = s.measurementtool + ";" + s.rowId + ";" + s.time + ";" + s.timeUnit + ";" + s.ttestInfo.name();
+		
+		if (rowId != s.rowId || time != s.time)
+			return false;
+		
+		if (ttestInfo != s.ttestInfo)
+			return false;
+		
+		String s1 = measurementtool + ";" + timeUnit;
+		String s2 = s.measurementtool + ";" + s.timeUnit;
 		return s1.equals(s2);
 	}
 	

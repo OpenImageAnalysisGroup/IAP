@@ -120,8 +120,6 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 		if (res != null) {
 			return res;
 		} else {
-			System.out.println("Return: No Cache / Create and save new image");
-			
 			final byte[] rrr = ((MyByteArrayInputStream) super.getPreviewInputStream(url)).getBuffTrimmed();
 			
 			m.processDB(new RunnableOnDB() {

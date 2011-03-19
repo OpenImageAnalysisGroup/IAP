@@ -30,6 +30,7 @@ public class PathwayWebLinkItem implements Comparable<PathwayWebLinkItem> {
 			s = StringManipulationTools.stringReplace(s, ".graphml.gz", "");
 			s = StringManipulationTools.stringReplace(s, ".graphml", "");
 			s = StringManipulationTools.stringReplace(s, ".webloc", "");
+			s = StringManipulationTools.stringReplace(s, ".pdf", "");
 		}
 		group1 = "";
 		group2 = null;
@@ -78,6 +79,7 @@ public class PathwayWebLinkItem implements Comparable<PathwayWebLinkItem> {
 			s = StringManipulationTools.stringReplace(s, ".gml", "");
 			s = StringManipulationTools.stringReplace(s, ".graphml", "");
 			s = StringManipulationTools.stringReplace(s, ".webloc", "");
+			s = StringManipulationTools.stringReplace(s, ".pdf", "");
 		}
 		if (group1 != null)
 			s = StringManipulationTools.stringReplace(s, group1, "");
@@ -107,5 +109,9 @@ public class PathwayWebLinkItem implements Comparable<PathwayWebLinkItem> {
 	
 	public boolean isBookmark() {
 		return pathwayURL.getFileName().endsWith(".webloc");
+	}
+	
+	public boolean isPDF() {
+		return pathwayURL.getFileName().endsWith(".pdf");
 	}
 }
