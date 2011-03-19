@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeMap;
 
+import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
+import de.ipk.ag_ba.datasources.http_folder.LemnaTecDokuSource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
@@ -69,6 +71,7 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 		result.clear();
 		try {
 			result.add(new NavigationButton(new LemnaTecLogoutAction(), src.getGUIsetting()));
+			
 			result.add(new NavigationButton(new LemnaTecUserNavigationAction(login), src.getGUIsetting()));
 			
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
@@ -111,6 +114,10 @@ public class LemnaTecNavigationAction extends AbstractNavigationAction implement
 			if (unsorted.size() > 0)
 				result.add(nb);
 			result.add(1, Other.getCalendarEntity(allExperiments, null, src.getGUIsetting()));
+			
+			HTTPfolderSource doku = new LemnaTecDokuSource();
+			NavigationButton dokuButton = new NavigationButton(new DataSourceNavigationAction(doku), src.getGUIsetting());
+			result.add(dokuButton);
 			
 		} catch (Exception e) {
 			// error

@@ -10,6 +10,7 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import java.util.ArrayList;
 
 import org.AttributeHelper;
+import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -36,7 +37,10 @@ public class Book {
 	}
 	
 	private String prettify(String title) {
-		return title; // StringManipulationTools.stringReplace(title, ",,", ".");
+		String nice = StringManipulationTools.stringReplace(title, "u%cc%88", "ü");
+		nice = StringManipulationTools.stringReplace(nice, "%c3%bc", "ü");
+		nice = StringManipulationTools.stringReplace(nice, "%c3%9c", "Ü");
+		return StringManipulationTools.stringReplace(nice, "U%cc%88", "Ü");
 	}
 	
 	public String getFolder() {

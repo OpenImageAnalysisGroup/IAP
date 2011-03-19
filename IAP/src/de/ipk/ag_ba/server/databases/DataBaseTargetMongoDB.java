@@ -10,7 +10,6 @@ package de.ipk.ag_ba.server.databases;
 import java.io.InputStream;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import com.mongodb.DB;
@@ -45,10 +44,10 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			
 			public void run() {
 				try {
-					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null);
+					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null).get();
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
+					tso.setParam(1, e);
 				}
 			}
 			
@@ -56,6 +55,8 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 				this.db = db;
 			}
 		});
+		if (tso.getParam(1, null) != null)
+			throw (Exception) tso.getParam(1, null);
 		DatabaseStorageResult dsr = (DatabaseStorageResult) tso.getParam(0, DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG);
 		if (dsr == DatabaseStorageResult.STORED_IN_DB || dsr == DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED)
 			return limg;

@@ -80,7 +80,7 @@
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/vecmath.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/swingx.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/postgresql-9.0-801.jdbc4.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/mongo-2.4.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/mongo-2.5.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jai_codec.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jai_core.jar"/>
             <manifest>
@@ -95,7 +95,8 @@
     	<zip destfile="vanted_without_doublettes.jar" basedir="vanted_temp" />
         <delete dir="vanted_temp"/>
     	<!-- sign jarfile for webstart -->
-      <signjar jar="vanted_without_doublettes.jar" signedjar="release/iap.jar" keystore="ant-scripts/pbikeystore" alias="ipk_pbi" storepass="253f7d26709117ff8f28f95666de1e72"/>
+	<copy file="vanted_without_doublettes.jar" tofile="release/iap.jar"/>
+<!--        <signjar jar="vanted_without_doublettes.jar" signedjar="release/iap.jar" keystore="ant-scripts/pbikeystore" alias="ipk_pbi" storepass="253f7d26709117ff8f28f95666de1e72"/> -->
     	<delete file="vanted_without_doublettes.jar"/>
     </target>
 </project>

@@ -73,7 +73,7 @@ public class MyImageIOhelper {
 	}
 	
 	private static BufferedImage resize(BufferedImage image, int width, int height, int blur) {
-		image = createCompatibleImage(image);
+		// image = createCompatibleImage(image);
 		boolean goodQuality = false;
 		if (goodQuality && image.getWidth() > width && image.getHeight() > height) {
 			image = blurImage(image, blur);

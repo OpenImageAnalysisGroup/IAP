@@ -52,12 +52,18 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 						wl.getURL().toString());
 				actions.add(b.getNavigationButton(src, "img/browser.png"));
 			}
+			if (wl.isPDF()) {
+				Book b = new Book(wl.getGroup1(),
+						makePretty(wl.getFileName()),
+						wl.getURL().toString());
+				actions.add(b.getNavigationButton(src, "img/ext/paper.png"));
+			}
 		}
 		for (DataSourceLevel dsl : dataSourceLevel.getSubLevels()) {
 			actions.add(new NavigationButton(new DataSourceNavigationAction(dsl), src.getGUIsetting()));
 		}
 		for (PathwayWebLinkItem wl : dataSourceLevel.getPathways()) {
-			if (!wl.isBookmark()) {
+			if (!wl.isBookmark() && !wl.isPDF()) {
 				NavigationButton ne = IAPservice.getPathwayViewEntity(wl, src.getGUIsetting());
 				actions.add(ne);
 			}
@@ -70,6 +76,7 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 	
 	private String makePretty(String fileName) {
 		String s = StringManipulationTools.stringReplace(fileName, ".webloc", "");
+		s = StringManipulationTools.stringReplace(fileName, ".pdf", "");
 		for (int i = 0; i < 2; i++) {
 			if (!(s.indexOf(";") >= 0))
 				break;
