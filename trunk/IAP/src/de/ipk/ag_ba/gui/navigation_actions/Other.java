@@ -27,6 +27,7 @@ import org.graffiti.editor.GravistoService;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.calendar.Calendar;
 import de.ipk.ag_ba.gui.enums.DBEtype;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -152,46 +153,46 @@ public class Other {
 				
 				boolean simpleIcons = true;
 				
-				String pc = "img/ext/network-workgroup-power.png";
-				String pcOff = "img/ext/network-workgroup.png";
+				String pc = IAPimages.getNetworkPConline();
+				String pcOff = IAPimages.getNetworkPCoffline();
 				
 				boolean rLocal = IAPservice.isReachable("localhost");
-				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("localhost",
+				resultNavigationButtons.add(new NavigationButton(new PortScanAction("localhost",
 									simpleIcons ? "img/ext/computer.png" : "img/ext/computer.png"), src
 									.getGUIsetting()));
 				if (!rLocal)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA13 = IAPservice.isReachable("ba-13.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("BA-13",
+				resultNavigationButtons.add(new NavigationButton(new PortScanAction("BA-13",
 									simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
 									.getGUIsetting()));
 				if (!rBA13)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA24 = IAPservice.isReachable("ba-24.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("BA-24",
+				resultNavigationButtons.add(new NavigationButton(new PortScanAction("BA-24",
 									simpleIcons ? (rBA24 ? pc : pcOff) : "img/ext/macPro.png"), src
 									.getGUIsetting()));
 				if (!rBA24)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rLemnaDB = IAPservice.isReachable("lemna-db.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("lemna-db",
+				resultNavigationButtons.add(new NavigationButton(new PortScanAction("lemna-db",
 						simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
 									.getGUIsetting()));
 				if (!rLemnaDB)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("BA-03",
+				resultNavigationButtons.add(new NavigationButton(new PortScanAction("BA-03",
 									simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src
 									.getGUIsetting()));
 				if (!rBA03)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rNW04 = IAPservice.isReachable("nw-04.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new CheckAvailabilityAction("NW-04",
+				resultNavigationButtons.add(new NavigationButton(new PortScanAction("NW-04",
 									simpleIcons ? (rNW04 ? pc : pcOff) : "img/ext/pc.png"), src
 									.getGUIsetting()));
 				if (!rNW04)
@@ -218,7 +219,8 @@ public class Other {
 			
 		};
 		NavigationButton serverStatusEntity = new NavigationButton(serverStatusAction, title,
-							"img/ext/network-server-status.png", guIsetting);
+							IAPimages.getCheckstatus(),
+							guIsetting);
 		return serverStatusEntity;
 	}
 	

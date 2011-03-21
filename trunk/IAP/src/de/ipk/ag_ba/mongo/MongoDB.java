@@ -236,13 +236,17 @@ public class MongoDB {
 					
 					if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains(database))
 						if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
-							boolean auth = db.authenticate(optLogin, optPass.toCharArray());
-							if (!auth) {
-								throw new Exception("Invalid MongoDB login data provided!");
-							} else {
-								if (authenticatedDBs.get(m) == null)
-									authenticatedDBs.put(m, new HashSet<String>());
-								authenticatedDBs.get(m).add(database);
+							try {
+								boolean auth = db.authenticate(optLogin, optPass.toCharArray());
+								if (!auth) {
+									throw new Exception("Invalid MongoDB login data provided!");
+								} else {
+									if (authenticatedDBs.get(m) == null)
+										authenticatedDBs.put(m, new HashSet<String>());
+									authenticatedDBs.get(m).add(database);
+								}
+							} catch (Exception err) {
+								System.err.println("ERROR: " + err.getMessage());
 							}
 						}
 					runnableOnDB.setDB(db);

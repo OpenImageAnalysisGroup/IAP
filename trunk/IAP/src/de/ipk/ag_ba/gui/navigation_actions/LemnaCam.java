@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.AttributeHelper;
 
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -23,7 +24,9 @@ public final class LemnaCam extends AbstractUrlNavigationAction {
 	 */
 	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
 		NavigationAction navigationAction = new LemnaCam();
-		NavigationButton res = new NavigationButton(navigationAction, "LemnaCam 1", "img/ext/cctv.png", guiSetting);
+		NavigationButton res = new NavigationButton(navigationAction, "LemnaCam 1",
+				IAPimages.getWebCam(),
+				guiSetting);
 		return res;
 	}
 	

@@ -11,6 +11,7 @@ import java.util.Collection;
 
 import de.ipk.ag_ba.gui.navigation_actions.CloudIoTestAction;
 import de.ipk.ag_ba.gui.navigation_actions.CopyEntity;
+import de.ipk.ag_ba.gui.navigation_actions.DataExportAction;
 import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
 import de.ipk.ag_ba.gui.navigation_actions.NumericDataReportAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
@@ -48,6 +49,8 @@ public class ImageAnalysisCommandManager {
 		// "Hue Historam", "img/colorhistogram.png"));
 		
 		actions.add(new NavigationButton(new NumericDataReportAction(m, experimentReference), guiSetting));
+		
+		actions.add(new NavigationButton(new DataExportAction(m, experimentReference), guiSetting));
 		
 		if (analysis) {
 			// NavigationAction performanceTestAction = new PerformanceTestAction(m, experimentReference);

@@ -9,6 +9,7 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
@@ -48,12 +49,12 @@ public class LemnaTecLogoutAction extends AbstractNavigationAction implements Na
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/system-lock-screen.png";
+		return IAPimages.getLogout();
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return "img/ext/system-lock-screen.png";
+		return IAPimages.getLogout();
 	}
 	
 	@Override
