@@ -26,7 +26,6 @@
 	<classpathentry kind="lib" path="bsh-2.0b4.jar"/>
 	<classpathentry kind="lib" path="commons-cli-1.0.jar"/>
 	<classpathentry kind="lib" path="commons-discovery.jar"/>
-	<classpathentry kind="lib" path="commons-math-1.0.jar"/>
 	<classpathentry kind="lib" path="itext-1.4.5.jar"/>
 	<classpathentry kind="lib" path="jaxen-full.jar"/>
 	<classpathentry kind="lib" path="jaxrpc.jar"/>
