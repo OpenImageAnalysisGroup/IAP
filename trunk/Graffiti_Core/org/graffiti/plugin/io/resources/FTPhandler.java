@@ -32,4 +32,9 @@ public class FTPhandler extends AbstractResourceIOHandler {
 	public static IOurl getURL(String httpurl) {
 		return new IOurl(httpurl);
 	}
+	
+	@Override
+	public Long getStreamLength(IOurl url) throws Exception {
+		return null;
+	}
 }

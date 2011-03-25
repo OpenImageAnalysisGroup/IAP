@@ -12,9 +12,13 @@
 package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.jdom.Attribute;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -199,6 +203,37 @@ public class Substance3D extends Substance {
 							: ExperimentInterface.UNSPECIFIED_SUBSTANCE));
 		md.setAttribute(new Attribute("id", "column 0"));
 		return md;
+	}
+	
+	public static Long getFileSize(List<NumericMeasurementInterface> files) {
+		long size = 0;
+		HashMap<String, ResourceIOHandler> map = new HashMap<String, ResourceIOHandler>();
+		for (NumericMeasurementInterface nmi : files) {
+			if (nmi instanceof BinaryMeasurement) {
+				BinaryMeasurement binaryMeasurement = (BinaryMeasurement) nmi;
+				IOurl u = binaryMeasurement.getURL();
+				if (u != null) {
+					String prefix = u.getPrefix();
+					if (!map.containsKey(prefix)) {
+						map.put(prefix, ResourceIOManager.getHandlerFromPrefix(prefix));
+					}
+					ResourceIOHandler h = map.get(prefix);
+					if (h != null) {
+						try {
+							long fs = h.getStreamLength(u);
+							if (fs > 0)
+								size += fs;
+						} catch (Exception e) {
+							// empty
+						}
+					}
+				}
+			}
+		}
+		if (size > 0)
+			return size;
+		else
+			return -1l;
 	}
 	
 }

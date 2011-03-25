@@ -20,4 +20,11 @@ public interface ResourceIOHandler {
 	public IOurl saveAs(IOurl source, String targetFilename) throws Exception;
 	
 	public IOurl save(IOurl source) throws Exception;
+	
+	/**
+	 * @param url
+	 *           IOurl
+	 * @return The size of the resource, or Null if size can't be determined.
+	 */
+	public Long getStreamLength(IOurl url) throws Exception;
 }

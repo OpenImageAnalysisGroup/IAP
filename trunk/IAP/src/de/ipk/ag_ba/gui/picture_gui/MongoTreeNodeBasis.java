@@ -36,7 +36,7 @@ public abstract class MongoTreeNodeBasis implements DBEtreeNodeModelHelper {
 	 * #getChildCount()
 	 */
 	public int getChildCount() {
-		if (children == null)
+		if (children == null && getChildsMethod != null)
 			getChildsMethod.run();
 		return children.length;
 	}

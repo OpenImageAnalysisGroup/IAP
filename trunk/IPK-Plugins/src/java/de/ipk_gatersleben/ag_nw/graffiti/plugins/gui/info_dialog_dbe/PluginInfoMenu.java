@@ -8,9 +8,11 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: PluginInfoMenu.java,v 1.2 2011-02-23 14:41:28 klukas Exp $
+// $Id: PluginInfoMenu.java,v 1.3 2011-03-25 16:09:17 klukas Exp $
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe;
+
+import java.awt.GraphicsEnvironment;
 
 import org.graffiti.editor.GraffitiInternalFrame;
 import org.graffiti.editor.GravistoService;
@@ -32,6 +34,9 @@ public class PluginInfoMenu
 	 * Creates a new GuiComponentsPlugin object.
 	 */
 	public PluginInfoMenu() {
+		
+		if (GraphicsEnvironment.isHeadless())
+			return;
 		
 		if (GravistoService.getInstance()
 				.getMainFrame() != null)

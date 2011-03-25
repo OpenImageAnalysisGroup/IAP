@@ -52,4 +52,13 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 			throw new UnsupportedOperationException("Details are missing!");
 	}
 	
+	@Override
+	public Long getStreamLength(IOurl url) {
+		File f = getFile(url);
+		if (f == null || !f.exists())
+			return null;
+		else
+			return f.length();
+	}
+	
 }

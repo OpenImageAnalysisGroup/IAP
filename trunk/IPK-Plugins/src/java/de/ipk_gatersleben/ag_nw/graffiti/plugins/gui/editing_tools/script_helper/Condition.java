@@ -21,7 +21,7 @@ public class Condition implements ConditionInterface {
 	
 	public enum ConditionInfo {
 		IGNORED_FIELD("---"), SPECIES("Species"), GENOTYPE("Genotype"), VARIETY("Variety"), GROWTHCONDITIONS(
-							"Growth Condititions"), TREATMENT("Treatment");
+							"Growth Condititions"), TREATMENT("Treatment"), SEQUENCE("Sequence");
 		
 		private String desc;
 		
@@ -116,7 +116,7 @@ public class Condition implements ConditionInterface {
 	public String getConditionName(boolean oldStyleIgnoringGrowthcondition) {
 		if (!oldStyleIgnoringGrowthcondition)
 			return getExperimentName() + ": " + getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
-								+ getGrowthconditions() + " / " + getVariety();
+								+ getGrowthconditions() + " / " + getVariety() + "/" + getSequence();
 		else {
 			String serie;
 			
@@ -676,6 +676,8 @@ public class Condition implements ConditionInterface {
 				break;
 			case TREATMENT:
 				setTreatment(value);
+			case SEQUENCE:
+				setSequence(value);
 			case IGNORED_FIELD:
 				// intentionally empty
 				break;

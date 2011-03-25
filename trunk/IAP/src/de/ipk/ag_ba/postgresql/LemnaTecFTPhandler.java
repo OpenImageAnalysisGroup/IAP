@@ -125,4 +125,9 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		else
 			return false;
 	}
+	
+	@Override
+	public Long getStreamLength(IOurl url) throws Exception {
+		return null;
+	}
 }

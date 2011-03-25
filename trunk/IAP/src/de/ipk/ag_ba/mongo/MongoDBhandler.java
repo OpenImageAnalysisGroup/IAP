@@ -155,4 +155,39 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 	public String getPrefix() {
 		return prefix;
 	}
+	
+	@Override
+	public Long getStreamLength(final IOurl url) throws Exception {
+		final ObjectRef orSize = new ObjectRef();
+		final ObjectRef err = new ObjectRef();
+		
+		m.processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				// check all gridFS file collections and look for matching hash value...
+				for (String fs : MongoGridFS.getFileCollections()) {
+					GridFS gridfs = new GridFS(db, fs);
+					GridFSDBFile fff = gridfs.findOne(url.getDetail());
+					if (fff != null) {
+						try {
+							orSize.setObject(fff.getLength());
+							return;
+						} catch (Exception e) {
+							err.setObject(e);
+						}
+					}
+				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		if (err.getObject() != null)
+			throw (Exception) err.getObject();
+		return (Long) orSize.getObject();
+	}
 }
