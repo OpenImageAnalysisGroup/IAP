@@ -224,7 +224,7 @@ public class Sample3D extends Sample {
 		
 		if (component == null && ((Sample3D) obj).component == null)
 			return true;
-		if (component != null || ((Sample3D) obj).component != null)
+		if (component == null || ((Sample3D) obj).component == null)
 			return false;
 		return component.equals(((Sample3D) obj).component);
 	}

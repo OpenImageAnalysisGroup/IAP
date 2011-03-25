@@ -740,26 +740,40 @@ public class LemnaTecDataExchange {
 				
 				if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart"))
 					res.get(plantID).setSpecies(filterName(metaValue));
-				if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname") || metaName.equalsIgnoreCase("Name")
-						|| metaName.equalsIgnoreCase("GENOTYP"))
-					res.get(plantID).setGenotype(metaValue);
-				if (metaName.equalsIgnoreCase("Variety"))
-					res.get(plantID).setVariety(metaValue);
-				if (metaName.equalsIgnoreCase("Treatment") || metaName.equalsIgnoreCase("Typ"))
-					res.get(plantID).setTreatment(metaValue);
-				if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot"))
-					res.get(plantID).setGrowthconditions(metaValue);
-				if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date"))
-					res.get(plantID).setSequence("SeedDate: " + metaValue);
+				else
+					if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname") || metaName.equalsIgnoreCase("Name")
+							|| metaName.equalsIgnoreCase("GENOTYP"))
+						res.get(plantID).setGenotype(metaValue);
+					else
+						if (metaName.equalsIgnoreCase("Variety"))
+							res.get(plantID).setVariety(metaValue);
+						else
+							if (metaName.equalsIgnoreCase("Treatment") || metaName.equalsIgnoreCase("Typ"))
+								res.get(plantID).setTreatment(metaValue);
+							else
+								if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot"))
+									res.get(plantID).setGrowthconditions(metaValue);
+								else
+									if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date"))
+										addSequenceInfo(res.get(plantID), "SeedDate: " + metaValue);
+									else
+										addSequenceInfo(res.get(plantID), metaName + ": " + metaValue);
 				
 			}
 			rs.close();
 			ps.close();
 		} catch (Exception e) {
-			if (!e.getMessage().endsWith("does not exist"))
-				ErrorMsg.addErrorMessage(e);
+			System.err.println("ERROR: " + e.getMessage());
 		}
 		return res;
+	}
+	
+	private void addSequenceInfo(Condition condition, String value) {
+		String current = condition.getSequence();
+		if (current.length() > 0)
+			current += ";";
+		current += value;
+		condition.setSequence(current);
 	}
 	
 	private String filterName(String metaValue) {

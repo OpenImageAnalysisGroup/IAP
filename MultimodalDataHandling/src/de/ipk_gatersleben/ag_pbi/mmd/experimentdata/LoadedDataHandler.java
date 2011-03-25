@@ -15,12 +15,15 @@
  */
 package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import org.ObjectRef;
 import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
 
 /**
@@ -50,10 +53,22 @@ public class LoadedDataHandler extends AbstractResourceIOHandler {
 	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
+		ObjectRef useLabelURLref = new ObjectRef("false", false);
+		LoadedData result = getEntry(url, useLabelURLref);
+		
+		if (result != null) {
+			if (!(Boolean) useLabelURLref.getObject())
+				return result.getInputStream();
+			else
+				return result.getInputStreamLabelField();
+		}
+		return null;
+	}
+	
+	private LoadedData getEntry(IOurl url, ObjectRef useLabelURLref) {
 		synchronized (known) {
-			ArrayList<WeakReference<LoadedData>> del = null;
 			LoadedData result = null;
-			boolean useLabelURL = false;
+			ArrayList<WeakReference<LoadedData>> del = null;
 			for (WeakReference<LoadedData> wr : known) {
 				LoadedData li = wr.get();
 				if (li == null) {
@@ -68,22 +83,15 @@ public class LoadedDataHandler extends AbstractResourceIOHandler {
 					if (li.getLabelURL() != null)
 						if (li.getLabelURL() == url || li.getLabelURL().toString().equals(url.toString())) {
 							result = li;
-							useLabelURL = true;
+							useLabelURLref.setObject(true);
 							break;
 						}
 				}
 			}
 			if (del != null)
 				known.removeAll(del);
-			
-			if (result != null) {
-				if (!useLabelURL)
-					return result.getInputStream();
-				else
-					return result.getInputStreamLabelField();
-			}
+			return result;
 		}
-		return null;
 	}
 	
 	@Override
@@ -110,6 +118,28 @@ public class LoadedDataHandler extends AbstractResourceIOHandler {
 	
 	public static IOurl getURL(IOurl remoteImageUrl) {
 		return new IOurl(PREFIX, remoteImageUrl.getFileName());
+	}
+	
+	@Override
+	public Long getStreamLength(IOurl url) throws IOException {
+		ObjectRef useLabelURLref = new ObjectRef("false", false);
+		LoadedData result = getEntry(url, useLabelURLref);
+		
+		if (result != null) {
+			InputStream is = null;
+			if (!(Boolean) useLabelURLref.getObject())
+				is = result.getInputStream();
+			else
+				is = result.getInputStreamLabelField();
+			if (is != null) {
+				if (is instanceof MyByteArrayInputStream)
+					return (long) ((MyByteArrayInputStream) is).getCount();
+				else
+					return (long) is.available();
+			}
+		}
+		
+		return null;
 	}
 	
 }

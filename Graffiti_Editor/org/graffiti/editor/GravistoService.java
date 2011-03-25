@@ -844,10 +844,10 @@ public class GravistoService implements HelperClass {
 			int destWidth = (int) (srcWidth * multiplier);
 			int destHeight = (int) (srcHeight * multiplier);
 			
-			double abc = 0.6d;
+			double abc = 2d;
 			if (Math.abs(w) < 32)
-				abc = 1.2;
-			int blur = (int) (abc / multiplier) + 1;
+				abc = 2;
+			int blur = (int) (abc / multiplier);
 			
 			icon = blurImage(icon, blur);
 			

@@ -2,6 +2,7 @@ package org.graffiti.plugin.io.resources;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class HTTPhandler extends AbstractResourceIOHandler {
 	
@@ -27,5 +28,16 @@ public class HTTPhandler extends AbstractResourceIOHandler {
 	
 	public static IOurl getURL(String httpurl) {
 		return new IOurl(httpurl);
+	}
+	
+	@Override
+	public Long getStreamLength(IOurl url) throws Exception {
+		URLConnection conn = new URL(url.toString()).openConnection();
+		int size = conn.getContentLength();
+		conn.setConnectTimeout(1);
+		if (size < 0)
+			return null;
+		else
+			return (long) size;
 	}
 }

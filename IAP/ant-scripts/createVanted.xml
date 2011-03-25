@@ -33,7 +33,7 @@
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/bsh-2.0b4.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-cli-1.0.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-discovery.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-math-1.0.jar"/>
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-math-1.0.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/dom4j-1.6.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/itext-1.4.5.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jaxen-full.jar"/>

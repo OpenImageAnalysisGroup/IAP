@@ -482,7 +482,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 		// result.showImageWindow();
 		// result.getParentSample().getParentCondition().getParentSubstance().setName(
 		// "Processed Images (" + limg.getExperimentName() + ")");
-		if (isDataAnalysis && storeResultInDatabase != null) {
+		if (isDataAnalysis && storeResultInDatabase != null && result != null) {
 			try {
 				LoadedImage lib = result;
 				result = storeResultInDatabase.saveImage(result);

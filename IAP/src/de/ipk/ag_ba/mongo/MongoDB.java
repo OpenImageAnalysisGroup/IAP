@@ -130,7 +130,8 @@ public class MongoDB {
 	}
 	
 	public static MongoDB getDefaultCloud() {
-		return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", "cloud1", "iap#2011", HashType.MD5);
+		return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
+		// return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
 	}
 	
 	public static MongoDB getLocalUnitTestsDB() {
@@ -222,14 +223,18 @@ public class MongoDB {
 							for (String h : optHosts.split(","))
 								seeds.add(new ServerAddress(h));
 							m = new Mongo(seeds);
-							// m.slaveOk();
+							m.slaveOk();
 						}
 						if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains("admin")) {
 							DB dbAdmin = m.getDB("admin");
-							dbAdmin.authenticate("iap", "iap#2011".toCharArray());
-							if (authenticatedDBs.get(m) == null)
-								authenticatedDBs.put(m, new HashSet<String>());
-							authenticatedDBs.get(m).add(database);
+							try {
+								dbAdmin.authenticate("iap", "iap#2011".toCharArray());
+								if (authenticatedDBs.get(m) == null)
+									authenticatedDBs.put(m, new HashSet<String>());
+								authenticatedDBs.get(m).add(database);
+							} catch (Exception err) {
+								System.err.println("ERROR: " + err.getMessage());
+							}
 						}
 					}
 					db = m.getDB(database);
@@ -458,7 +463,7 @@ public class MongoDB {
 							Future<DatabaseStorageResult> fres = storageResults.poll();
 							ImageData id = imageDataQueue.poll();
 							DatabaseStorageResult res = fres.get();
-							if (res != null)
+							if (res != null && status != null)
 								status.setCurrentStatusText1(count + "/" + numberOfBinaryData * 2 + ": " + res);
 							if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 								errorCount++;

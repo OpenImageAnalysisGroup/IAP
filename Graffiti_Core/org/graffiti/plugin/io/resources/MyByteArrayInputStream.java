@@ -33,4 +33,8 @@ public class MyByteArrayInputStream extends ByteArrayInputStream {
 	public byte[] getBuffTrimmed() {
 		return Arrays.copyOfRange(buf, 0, count);
 	}
+	
+	public int getCount() {
+		return count;
+	}
 }

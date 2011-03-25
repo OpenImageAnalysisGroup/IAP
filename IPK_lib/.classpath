@@ -10,7 +10,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-cli-1.0.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-digester.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/commons-math-1.0.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/itext-1.4.5.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/java-cup-v11a-runtime.jar" sourcepath="/home/klukas/workspace/grav/src/develop/src"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/jaxen-full.jar"/>
