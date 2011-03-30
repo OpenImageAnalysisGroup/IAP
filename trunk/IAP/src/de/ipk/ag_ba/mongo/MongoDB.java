@@ -791,7 +791,7 @@ public class MongoDB {
 				
 				String[] hashes = GravistoService.getHashFromInputStream(new InputStream[] {
 						new MyByteArrayInputStream(isMain),
-						new MyByteArrayInputStream(isLabel)
+						isLabel != null ? new MyByteArrayInputStream(isLabel) : null
 						},
 						new ObjectRef[] { fileSize, fileSize }, getHashType());
 				
@@ -854,7 +854,7 @@ public class MongoDB {
 					
 					boolean saved = saveImageFile(new InputStream[] {
 							new MyByteArrayInputStream(isMain),
-							new MyByteArrayInputStream(isLabel),
+							isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
 							getPreviewImageStream(new MyByteArrayInputStream(isMain))
 							}, gridfs_images, gridfs_null_files,
 							gridfs_preview_files, id, hashMain,
