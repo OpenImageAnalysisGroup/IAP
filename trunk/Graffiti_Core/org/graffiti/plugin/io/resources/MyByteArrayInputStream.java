@@ -8,6 +8,7 @@ package org.graffiti.plugin.io.resources;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.zip.CRC32;
 
 /**
  * @author klukas
@@ -36,5 +37,11 @@ public class MyByteArrayInputStream extends ByteArrayInputStream {
 	
 	public int getCount() {
 		return count;
+	}
+	
+	public long getCRC32() {
+		CRC32 crc = new CRC32();
+		crc.update(getBuff(), 0, getCount());
+		return crc.getValue();
 	}
 }

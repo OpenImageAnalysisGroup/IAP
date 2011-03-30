@@ -7,20 +7,24 @@
 package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.awt.GraphicsEnvironment;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 import java.util.WeakHashMap;
-import java.util.zip.ZipEntry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -195,9 +199,14 @@ public class DataExportAction extends AbstractNavigationAction {
 				return;
 			status.setCurrentStatusText1("Data Export@MSG:Download initiated..." + fsinfo);
 			Thread.sleep(1000);
-			ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(os));
+			
+			// ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(os));
+			
+			final ZipOutputStream out = new ZipOutputStream(os);
+			
 			out.setLevel(0);
 			out.setComment("Created with IAP by user " + SystemAnalysis.getUserName() + ".");
+			out.setMethod(ZipOutputStream.DEFLATED);
 			
 			status.setCurrentStatusText1("Create ZIP");
 			
@@ -207,7 +216,7 @@ public class DataExportAction extends AbstractNavigationAction {
 			
 			GregorianCalendar gc = new GregorianCalendar();
 			
-			long written = 0;
+			final ThreadSafeOptions written = new ThreadSafeOptions();
 			
 			this.files = 0;
 			for (SubstanceInterface su : experiment)
@@ -226,7 +235,7 @@ public class DataExportAction extends AbstractNavigationAction {
 			
 			long startTime = System.currentTimeMillis();
 			
-			byte[] buf = new byte[1024 * 1024 * 100];
+			ExecutorService es = Executors.newFixedThreadPool(1);
 			
 			for (SubstanceInterface su : experiment)
 				for (ConditionInterface co : su)
@@ -242,59 +251,88 @@ public class DataExportAction extends AbstractNavigationAction {
 								Date t = new Date(nm.getParentSample().getRowId());
 								gc.setTime(t);
 								
-								String zefn;
+								final String zefn;
 								ImageData id = (ImageData) bm;
-								if (bm instanceof ImageData) {
-									id = (ImageData) bm;
-									zefn =
-											(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : "") +
-													nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
-													(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad " : "0Grad") : "") + " " +
-													nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
-													gc.get(GregorianCalendar.YEAR) + "-" +
-													gc.get(GregorianCalendar.MONTH) + "-" +
-													gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
-													gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
-													gc.get(GregorianCalendar.MINUTE) + "_" +
-													gc.get(GregorianCalendar.SECOND) + ".png";
+								try {
+									if (bm instanceof ImageData) {
+										id = (ImageData) bm;
+										zefn =
+												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : "") +
+														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
+														(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad " : "0Grad") : "") + " " +
+														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
+														gc.get(GregorianCalendar.YEAR) + "-" +
+														gc.get(GregorianCalendar.MONTH) + "-" +
+														gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
+														gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
+														gc.get(GregorianCalendar.MINUTE) + "_" +
+														gc.get(GregorianCalendar.SECOND) + ".png";
+										
+									} else {
+										zefn = bm.getURL().getFileName();
+									}
+									// bm.getURL().getFileName();
 									
-								} else {
-									zefn = bm.getURL().getFileName();
+									final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
+									
+									// out.putNextEntry(new ZipEntry(zefn));
+									while (written.getInt() > 0)
+										Thread.sleep(5);
+									written.addInt(1);
+									es.submit(new Runnable() {
+										@Override
+										public void run() {
+											synchronized (out) {
+												try {
+													ZipArchiveEntry entry = new ZipArchiveEntry(zefn);
+													entry.setSize(in.getCount());
+													entry.setCrc(in.getCRC32());
+													out.putNextEntry(entry);
+													out.write(in.getBuff(), 0, in.getCount());
+													out.closeEntry();
+												} catch (IOException e) {
+													System.err.println("ERROR: " + e.getMessage());
+												}
+												written.addLong(in.getCount());
+												written.addInt(-1);
+											}
+										}
+									});
+									
+									// int len;
+									// while ((len = in.read(buf)) > 0) {
+									// out.write(buf, 0, len);
+									// written += len;
+									// }
+									// Complete the entry
+									// out.closeEntry();
+									in.close();
+								} catch (Exception e) {
+									System.err.println("ERROR: " + e.getMessage());
 								}
-								// bm.getURL().getFileName();
-								out.putNextEntry(new ZipEntry(zefn));
-								
-								InputStream in = bm.getURL().getInputStream();
-								
-								int len;
-								while ((len = in.read(buf)) > 0) {
-									out.write(buf, 0, len);
-									written += len;
-								}
-								
-								// Complete the entry
-								out.closeEntry();
-								in.close();
-								status.setCurrentStatusText1("Create ZIP: " + (written / 1024 / 1024) + " MB");
+								status.setCurrentStatusText1("Create ZIP: " + (written.getLong() / 1024 / 1024) + " MB");
 								
 								long currTime = System.currentTimeMillis();
 								
-								double speed = written * 1000 / (currTime - startTime) / 1024 / 1024;
+								double speed = written.getLong() * 1000 / (currTime - startTime) / 1024 / 1024;
 								status.setCurrentStatusText2("" + (int) speed + " MB/s");
 							}
 						}
 					}
 			
+			es.shutdown();
+			es.awaitTermination(31, TimeUnit.DAYS);
+			out.flush();
 			out.close();
 			status.setCurrentStatusValueFine(100d);
 			
-			this.mb = (written / 1024 / 1024) + "";
+			this.mb = (written.getLong() / 1024 / 1024) + "";
 			tso.setParam(2, true);
 		} catch (Exception e) {
 			
 			tso.setParam(2, true);
 			
-			if (fn != null && new File(fn).exists())
+			if (fn != null && fn.trim().length() > 0 && new File(fn).exists())
 				new File(fn).delete();
 			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
 		}

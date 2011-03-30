@@ -754,7 +754,7 @@ public class MongoDB {
 		return ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
-	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(4, new ThreadFactory() {
+	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(8, new ThreadFactory() {
 		int n = 1;
 		
 		@Override
@@ -769,26 +769,25 @@ public class MongoDB {
 	public Future<DatabaseStorageResult> saveImageFile(final DB db, final ImageData id, final ObjectRef fileSize) throws Exception {
 		final ImageData image = id;
 		
-		final byte[] isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
-		final byte[] isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
-		
-		if (isMain == null) {
-			System.out.println("No input stream for source-URL:  " + image.getURL());
-			return new FutureResult<DatabaseStorageResult>(DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG);
-		}
-		if (image.getLabelURL() != null && isLabel == null) {
-			System.out.println("No input stream for source-URL (label):  " + image.getURL());
-			return new FutureResult<DatabaseStorageResult>(DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG);
-		}
-		
-		if (image.getURL() != null && image.getLabelURL() != null) {
-			if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix()))
-				return new FutureResult<DatabaseStorageResult>(DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED);
-		}
-		
 		return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
 			@Override
 			public DatabaseStorageResult call() throws Exception {
+				final byte[] isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
+				final byte[] isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
+				
+				if (isMain == null) {
+					System.out.println("No input stream for source-URL:  " + image.getURL());
+					return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
+				}
+				if (image.getLabelURL() != null && isLabel == null) {
+					System.out.println("No input stream for source-URL (label):  " + image.getURL());
+					return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
+				}
+				
+				if (image.getURL() != null && image.getLabelURL() != null) {
+					if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix()))
+						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+				}
 				
 				String[] hashes = GravistoService.getHashFromInputStream(new InputStream[] {
 						new MyByteArrayInputStream(isMain),
