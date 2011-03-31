@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
@@ -33,7 +34,8 @@ public class BlockDataAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() throws InterruptedException {
 		BufferedImage clrearRgbImage = dataAnalysis(getInput().getMasks().getVis().getAsBufferedImage(),
 				ImageConfiguration.RgbTop,
-				options.getRgbEpsilonA(), options.getRgbEpsilonB(), options.getMaxThreadsPerImage());
+				options.getDoubleSetting(Setting.RGB_EPSILON_A), options.getDoubleSetting(Setting.RGB_EPSILON_B),
+				options.getIntSetting(Setting.MAX_THREADS_PER_IMAGE));
 		return new FlexibleImage(clrearRgbImage, FlexibleImageType.VIS);
 	}
 	
@@ -41,7 +43,8 @@ public class BlockDataAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processFLUOmask() throws InterruptedException {
 		BufferedImage clearFluorImage = dataAnalysis(getInput().getMasks().getFluo().getAsBufferedImage(),
 				ImageConfiguration.FluoTop,
-				options.getRgbEpsilonA(), options.getRgbEpsilonB(), options.getMaxThreadsPerImage());
+				options.getDoubleSetting(Setting.RGB_EPSILON_A), options.getDoubleSetting(Setting.RGB_EPSILON_B),
+				options.getIntSetting(Setting.MAX_THREADS_PER_IMAGE));
 		return new FlexibleImage(clearFluorImage, FlexibleImageType.FLUO);
 		
 	}

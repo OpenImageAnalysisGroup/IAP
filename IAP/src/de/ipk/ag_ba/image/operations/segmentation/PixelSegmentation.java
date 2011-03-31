@@ -140,7 +140,7 @@ public class PixelSegmentation {
 				calculatePerimeterOfEachCluster();
 				calculateCircuitRatio();
 			}
-			calculateCenter();
+			calculateClusterDimension();
 		} else
 			if (durchlauf == 2) {
 				firstPass(); // Each pixel is assigned to a cluster
@@ -156,7 +156,7 @@ public class PixelSegmentation {
 					calculateCircuitRatio();
 				}
 				
-				calculateCenter();
+				calculateClusterDimension();
 			} else {
 				firstPass(); // Each pixel is assigned to a cluster
 				// StopWatch s = new StopWatch("Merge Chris");
@@ -171,12 +171,12 @@ public class PixelSegmentation {
 					calculateCircuitRatio();
 				}
 				
-				calculateCenter();
+				calculateClusterDimension();
 			}
 		
 	}
 	
-	private void calculateCenter() {
+	private void calculateClusterDimension() {
 		
 		cluster_min_x = new int[zaehler];
 		cluster_max_x = new int[zaehler];
@@ -863,22 +863,48 @@ public class PixelSegmentation {
 	}
 	
 	public int[] getClusterSizeNormalized(int w, int h) {
+		
 		Vector2d[] clusterCenters = getClusterCenterPoints();
-		int[] output = new int[getClusterSize().length];
-		int[] input = getClusterSize();
+		int[] normalizedClusterAreaSizes = new int[getClusterSize().length];
+		int[] clusterAreaSizes = getClusterSize();
 		
-		for (int cluster = 1; cluster < input.length; cluster++) {
-			Vector2d center = clusterCenters[cluster];
-			double distanceFromCenterToCluster = clusterCenters[0].distance(center);
-			double distanceFromCenterToLeftTopEdge = clusterCenters[0].distance(new Vector2d(0, 0));
-			
-			output[cluster] = (int) (input[cluster] * ((distanceFromCenterToLeftTopEdge - distanceFromCenterToCluster) / distanceFromCenterToLeftTopEdge));
-			
-			// System.out.println("cluster = " + cluster + " newPixel = " + output[cluster] + " oldPixel = " + input[cluster] + " Abstand zum Zentrum: " +
-			// distanceFromCenterToCluster);
-		}
+		// maximum acceptible circle has size of half of circle around the complete image
+		double distanceFromCenterToLeftTopEdge = new Vector2d(0, 0).distance(w / 2d, h / 2d) / 2;
 		
-		return output;
+		if (true)
+			for (int cluster = 1; cluster < clusterAreaSizes.length; cluster++) {
+				Vector2d centerOfCluster = clusterCenters[cluster];
+				
+				double distanceFromCenterOfClusterToCenterOfImage = centerOfCluster.distance(w / 2d, h / 2d);
+				
+				double d = distanceFromCenterToLeftTopEdge - distanceFromCenterOfClusterToCenterOfImage;
+				
+				// if outside of maximum acceptable circle
+				if (d < 0)
+					d = 0;
+				
+				normalizedClusterAreaSizes[cluster] = (int) (clusterAreaSizes[cluster] *
+						(d / distanceFromCenterToLeftTopEdge));
+				
+				// System.out.println("cluster = " + cluster + " newPixel = " + output[cluster] + " oldPixel = " + input[cluster] + " Abstand zum Zentrum: " +
+				// distanceFromCenterToCluster);
+			}
+		
+		if (false)
+			for (int cluster = 1; cluster < clusterAreaSizes.length; cluster++) {
+				Vector2d center = clusterCenters[cluster];
+				
+				double distanceFromCenterToCluster = clusterCenters[0].distance(center);
+				
+				distanceFromCenterToLeftTopEdge = clusterCenters[0].distance(new Vector2d(0, 0));
+				
+				normalizedClusterAreaSizes[cluster] = (int) (clusterAreaSizes[cluster] * ((distanceFromCenterToLeftTopEdge - distanceFromCenterToCluster) / distanceFromCenterToLeftTopEdge));
+				
+				// System.out.println("cluster = " + cluster + " newPixel = " + output[cluster] + " oldPixel = " + input[cluster] + " Abstand zum Zentrum: " +
+				// distanceFromCenterToCluster);
+			}
+		
+		return normalizedClusterAreaSizes;
 	}
 	
 }

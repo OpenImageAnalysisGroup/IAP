@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
 import info.StopWatch;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -49,9 +50,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected StopWatch debugStart(String task) {
 		if (debugStack != null)
-			debugStack.addImage("Input for " + task, getInput().getOverviewImage(options.getDebugStackWidth()));
-		if (options.isDebugTakeTimes()) {
-			if (options.isDebugPrintEachStep())
+			debugStack.addImage("Input for " + task, getInput().getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
+		if (options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES)) {
+			if (options.getBooleanSetting(Setting.IS_DEBUG_PRINT_EACH_STEP))
 				if (getInput().getMasks() != null)
 					getInput().getMasks().getFluo().print("Mask-Input for step: " + task);
 				else

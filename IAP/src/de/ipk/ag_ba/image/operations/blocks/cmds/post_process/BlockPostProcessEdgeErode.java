@@ -1,7 +1,9 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.post_process;
 
-import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.ImageTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -20,53 +22,86 @@ public abstract class BlockPostProcessEdgeErode extends AbstractSnapshotAnalysis
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return postProcessResultImage(options, getInput().getImages().getVis(), getInput().getMasks().getVis(), ImageConfiguration.RgbTop, enlarge);
+		return postProcessResultImage(getInput().getImages().getVis(), getInput().getMasks().getVis(), options, options.getCameraTyp(), ImageTyp.RGB, enlarge);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return postProcessResultImage(options, getInput().getImages().getFluo(), getInput().getMasks().getFluo(), ImageConfiguration.FluoTop, enlarge);
+		return postProcessResultImage(getInput().getImages().getFluo(), getInput().getMasks().getFluo(), options, options.getCameraTyp(), ImageTyp.FLUO, enlarge);
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		return postProcessResultImage(options, getInput().getImages().getNir(), getInput().getMasks().getNir(), ImageConfiguration.NirTop, enlarge);
+		return postProcessResultImage(getInput().getImages().getNir(), getInput().getMasks().getNir(), options, options.getCameraTyp(), ImageTyp.NIR, enlarge);
 	}
 	
-	public static FlexibleImage postProcessResultImage(ImageProcessorOptions options, FlexibleImage srcImage, FlexibleImage finalImage,
-			ImageConfiguration typ, boolean enlarge) {
+	static FlexibleImage postProcessResultImage(FlexibleImage srcImage, FlexibleImage finalImage, ImageProcessorOptions options, CameraTyp cameraTyp,
+			ImageTyp imageTyp, boolean enlarge) {
 		
 		ImageOperation maskIo = new ImageOperation(finalImage);
 		
-		switch (typ) {
-			
-			case RgbTop:
-				if (enlarge)
-					for (int ii = 0; ii < options.getPostProcessDilateRgbTop(); ii++)
-						maskIo.dilate();
-				if (!enlarge)
-					for (int ii = 0; ii < options.getPostProcessErodeRgbTop(); ii++)
-						maskIo.erode();
-				break;
-			
-			case FluoTop:
-				if (enlarge)
-					for (int ii = 0; ii < options.getPostProcessDilateFluoTop(); ii++)
-						maskIo.dilate();
-				if (!enlarge)
-					for (int ii = 0; ii < options.getPostProcessErodeFluoTop(); ii++)
-						maskIo.erode();
-				break;
-			
-			case NirTop:
-				if (enlarge)
-					for (int ii = 0; ii < options.getPostProcessDilateNirTop(); ii++)
-						maskIo.dilate();
-				if (!enlarge)
-					for (int ii = 0; ii < options.getPostProcessErodeNirTop(); ii++)
-						maskIo.erode();
-				break;
-			
+		switch (cameraTyp) {
+			case SIDE:
+
+				switch (imageTyp) {
+					case RGB:
+						if (enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_DILATE_RGB_SIDE); ii++)
+								maskIo.dilate();
+						if (!enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_ERODE_RGB_SIDE); ii++)
+								maskIo.erode();
+						break;
+					
+					case FLUO:
+						if (enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_DILATE_FLUO_SIDE); ii++)
+								maskIo.dilate();
+						if (!enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_ERODE_FLUO_SIDE); ii++)
+								maskIo.erode();
+						break;
+					
+					case NIR:
+						if (enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_DILATE_NIR_SIDE); ii++)
+								maskIo.dilate();
+						if (!enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_ERODE_NIR_SIDE); ii++)
+								maskIo.erode();
+						break;
+				}
+				
+			case TOP:
+
+				switch (imageTyp) {
+					case RGB:
+						if (enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_DILATE_RGB_TOP); ii++)
+								maskIo.dilate();
+						if (!enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_ERODE_RGB_TOP); ii++)
+								maskIo.erode();
+						break;
+					
+					case FLUO:
+						if (enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_DILATE_FLUO_TOP); ii++)
+								maskIo.dilate();
+						if (!enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_ERODE_FLUO_TOP); ii++)
+								maskIo.erode();
+						break;
+					
+					case NIR:
+						if (enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_DILATE_NIR_TOP); ii++)
+								maskIo.dilate();
+						if (!enlarge)
+							for (int ii = 0; ii < options.getIntSetting(Setting.POST_PROCESS_ERODE_NIR_TOP); ii++)
+								maskIo.erode();
+						break;
+				}
 		}
 		
 		return new ImageOperation(srcImage).applyMask2(maskIo.getImage(), options.getBackground()).getImage();

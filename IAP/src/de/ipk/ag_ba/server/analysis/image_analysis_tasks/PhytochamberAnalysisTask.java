@@ -175,9 +175,12 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							// input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
 							// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
 							
+							final boolean cropResult = true;
+							final boolean parameterSearch = true;
+							
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input,
-									maximumThreadCountOnImageLevel, debugImageStack, true, true).getImages();
+									maximumThreadCountOnImageLevel, debugImageStack, parameterSearch, cropResult).getImages();
 							
 							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
 							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());

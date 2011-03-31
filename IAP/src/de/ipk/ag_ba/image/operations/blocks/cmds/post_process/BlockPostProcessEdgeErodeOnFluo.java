@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.post_process;
 
-import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.ImageTyp;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -18,9 +18,8 @@ public abstract class BlockPostProcessEdgeErodeOnFluo extends AbstractSnapshotAn
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return BlockPostProcessEdgeErode.postProcessResultImage(options, getInput().getImages().getFluo(), getInput().getMasks().getFluo(),
-				ImageConfiguration.FluoTop,
-				enlarge);
+		return BlockPostProcessEdgeErode.postProcessResultImage(getInput().getImages().getFluo(), getInput().getMasks().getFluo(), options,
+				options.getCameraTyp(), ImageTyp.FLUO, enlarge);
 	}
 	
 }

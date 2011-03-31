@@ -14,6 +14,7 @@ import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -50,7 +51,17 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() throws InterruptedException {
 		BufferedImage clrearRgbImage = clearBackground(getInput().getMasks().getVis().getAsBufferedImage(),
 				ImageConfiguration.RgbTop,
-				options.getRgbEpsilonA(), options.getRgbEpsilonB(), options.getMaxThreadsPerImage());
+				options.getDoubleSetting(Setting.RGB_EPSILON_A), options.getDoubleSetting(Setting.RGB_EPSILON_B),
+				options.getIntSetting(Setting.MAX_THREADS_PER_IMAGE));
+		
+		// FlexibleImage test = new FlexibleImage(clrearRgbImage, FlexibleImageType.VIS);
+		// ImageOperation test2 = new ImageOperation(test);
+		// test2.saveImage("/Users/" + System.getProperty("user.name") + "/Desktop/test4.png");
+		
+		// ImageOperation test3 = new ImageOperation(getInput().getImages().getVis());
+		// test3.saveImage("/Users/" + System.getProperty("user.name") + "/Desktop/test3.png");
+		
+		// return test;
 		return new FlexibleImage(clrearRgbImage, FlexibleImageType.VIS);
 	}
 	
@@ -58,7 +69,8 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processFLUOmask() throws InterruptedException {
 		BufferedImage clearFluorImage = clearBackground(getInput().getMasks().getFluo().getAsBufferedImage(),
 				ImageConfiguration.FluoTop,
-				options.getFluoEpsilonA(), options.getFluoEpsilonB(), options.getMaxThreadsPerImage());
+				options.getDoubleSetting(Setting.RGB_EPSILON_A), options.getDoubleSetting(Setting.RGB_EPSILON_B),
+				options.getIntSetting(Setting.MAX_THREADS_PER_IMAGE));
 		return new FlexibleImage(clearFluorImage, FlexibleImageType.FLUO);
 		
 	}
@@ -153,6 +165,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 						double a = arrayA[i];
 						double b = arrayB[i];
 						
+						// if (!(b > 0) && !(a < 0)) { //test für gerste
 						// if (a > 21 || b < 2) {
 						if (a > 21 || b < 5) { // geht für arabidopsis
 							// if (a > 21 || b < 5 || a > -6) { // a < -5 &&

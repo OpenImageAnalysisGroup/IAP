@@ -1,33 +1,38 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.MorphologicalOperators;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
-public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockClosing extends AbstractSnapshotAnalysisBlockFIS {
+	protected int closeOperations = -1;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return closingOpening(getInput().getMasks().getVis(), getInput().getImages().getVis());
+		// System.out.println("typ: RGB");
+		return closing(getInput().getMasks().getVis(), getInput().getImages().getVis());
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return closingOpening(getInput().getMasks().getFluo(), getInput().getImages().getFluo());
+		// System.out.println("typ: FLUO");
+		return closing(getInput().getMasks().getFluo(), getInput().getImages().getFluo());
 	}
 	
 	// @Override
 	// protected FlexibleImage processNIRmask() {
-	// return new ImageOperation(getInput().getMasks().getNir(), getInput().getImages().getNIr());
+	// System.out.println("typ: NIR");
+	// return closing(getInput().getMasks().getNir(), getInput().getImages().getNir());
 	// }
 	
-	private FlexibleImage closingOpening(FlexibleImage mask, FlexibleImage image) {
+	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
 		
-		FlexibleImage workImage = closingOpening(mask, image, options.getBackground(), 2);
+		FlexibleImage workImage = closing(mask, image, options.getBackground(), options.getIntSetting(Setting.CLOSING_REPEAT));
 		return workImage;
 	}
 	
-	private static FlexibleImage closingOpening(FlexibleImage flMask, FlexibleImage flImage, int iBackgroundFill, int repeat) {
+	private static FlexibleImage closing(FlexibleImage flMask, FlexibleImage flImage, int iBackgroundFill, int closingRepeat) {
 		
 		// dauert länger
 		// ImageOperation maskIo = new ImageOperation(flMask);
@@ -37,6 +42,14 @@ public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
 		int[] rgbArray = flMask.getAs1A();
 		int h = flMask.getHeight();
 		int w = flMask.getWidth();
+		
+		int hImage = flImage.getHeight();
+		int wImage = flImage.getWidth();
+		
+		if (hImage != h)
+			flImage.resize(w, h);
+		if (wImage != w)
+			flImage.resize(w, h);
 		
 		int[] rgbNonModifiedArray = flImage.getAs1A();
 		
@@ -58,7 +71,7 @@ public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
 			op.doClosing();
 			image = op.getResultImage();
 			cnt++;
-		} while (cnt < repeat);
+		} while (cnt < closingRepeat);
 		int[][] mask = image;
 		
 		for (int x = 0; x < w; x++) {
@@ -69,7 +82,7 @@ public class BlockOpeningClosing extends AbstractSnapshotAnalysisBlockFIS {
 					rgbArray[x + y * w] = rgbNonModifiedArray[x + y * w];
 			}
 		}
-		
+		// System.out.println("test");
 		return new FlexibleImage(rgbArray, w, h);
 		
 		// PrintImage.printImage(rgbArray, w, h);

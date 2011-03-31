@@ -216,7 +216,7 @@ public class ImageOperationTest {
 					boolean mergeImages = false;
 					
 					if (mergeImages)
-						ImageOperation.showTwoImagesAsOne(imgFluo, imgVisible);
+						ImageOperation.showTwoImagesAsOne(imgFluo, imgVisible, false);
 					
 					boolean test = true;
 					if (test) {

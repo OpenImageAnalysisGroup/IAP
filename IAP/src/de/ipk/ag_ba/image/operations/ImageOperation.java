@@ -27,7 +27,9 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
+import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
@@ -165,26 +167,22 @@ public class ImageOperation extends ImageConverter {
 			srcImage = new ImageOperation(srcImage).resize(mask.getWidth(), mask.getHeight()).getImage();
 		}
 		
-		int[] mask1A = mask.getAs1A();
+		int[] result = new int[mask.getWidth() * mask.getHeight()];;
 		
 		int[] originalImage = srcImage.getAs1A();
-		// PrintImage.printImage(image.getBufferedImage(), "IMAGE " + iiii);
-		// PrintImage.printImage(mask.getBufferedImage(), "MASK FOR IMAGE " + iiii);
+		// PrintImage.printImage(image.getBufferedImage(), "IMAGE ");
+		// PrintImage.printImage(mask.getAsBufferedImage(), "MASK FOR IMAGE ");
 		
 		int idx = 0;
-		// int background = image.getProcessor().getBackground();
-		// int foreground = Color.BLUE.getRGB();
+		
 		for (int m : mask.getAs1A()) {
-			if (m == background)
-				mask1A[idx] = background;
-			else
-				mask1A[idx] = originalImage[idx];
+			result[idx] = m == background ? background : originalImage[idx];
 			idx++;
 		}
 		
 		// PrintImage.printImage(mask1A, image.getWidth(), image.getHeight());
 		
-		return new ImageOperation(mask1A, mask.getWidth(), mask.getHeight());
+		return new ImageOperation(result, mask.getWidth(), mask.getHeight());
 		// int idx = 0;
 		// for (int m : io.getImageAs1array()) {
 		// if (m == background)
@@ -195,11 +193,11 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	/**
-	 * Enlarge area of mask.
+	 * Reduce area of mask.
 	 * <p>
-	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
 	 */
-	public void dilate(int[][] mask) {
+	public void erode(int[][] mask) {
 		int jM = (mask.length - 1) / 2;
 		int iM = (mask[0].length - 1) / 2;
 		
@@ -227,13 +225,13 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	/**
-	 * Reduce area of mask.
+	 * Enlarge area of mask.
 	 * <p>
-	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
-	public ImageOperation erode(ImageProcessor temp, int[][] mask) {
+	public ImageOperation dilate(ImageProcessor temp, int[][] mask) {
 		temp.invert();
-		dilate(mask);
+		erode(mask);
 		temp.invert();
 		return this;
 	}
@@ -249,12 +247,12 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	/**
-	 * Reduce area of mask.
+	 * Enlarge area of mask.
 	 * <p>
-	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
+	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
-	public ImageOperation erode(int[][] mask) {
-		return erode(image.getProcessor(), mask);
+	public ImageOperation dilate(int[][] mask) {
+		return dilate(image.getProcessor(), mask);
 	}
 	
 	// public void erode2(int [][] mask){
@@ -326,7 +324,7 @@ public class ImageOperation extends ImageConverter {
 	public void outline(int[][] mask) { // starke Farbübergänge werden als Kante
 		// erkannt
 		ImageProcessor tempImage = image.getProcessor().duplicate();
-		erode(tempImage, mask);
+		dilate(tempImage, mask);
 		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
 		image.getProcessor().invert();
 	}
@@ -578,13 +576,17 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	public ImageOperation removeSmallClusters() {
-		return removeSmallClusters(0.005d);
+		return removeSmallClusters(0.005d, CameraTyp.TOP);
 	}
 	
-	public ImageOperation removeSmallClusters(double factor) {
+	public ImageOperation removeSmallClusters(double factor, CameraTyp typ) {
+		return removeSmallClusters(factor, NeighbourhoodSetting.NB4, typ);
+	}
+	
+	public ImageOperation removeSmallClusters(double factor, NeighbourhoodSetting nb, CameraTyp typ) {
 		FlexibleImage workImage = new FlexibleImage(image);
 		workImage = removeSmallPartsOfImage(workImage, PhenotypeAnalysisTask.BACKGROUND_COLORint,
-							(int) (image.getWidth() * image.getHeight() * factor));
+							(int) (image.getWidth() * image.getHeight() * factor), nb, typ);
 		return new ImageOperation(workImage);
 	}
 	
@@ -614,6 +616,10 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	// ############# save ######################
+	
+	public void saveImage() {
+		saveImage("/Users/" + System.getProperty("user.name") + "/Desktop/test.png");
+	}
 	
 	public void saveImage(String pfad) {
 		saveImage(pfad, SaveImage.PNG);
@@ -862,10 +868,21 @@ public class ImageOperation extends ImageConverter {
 		imgNN.show("NIR");
 	}
 	
-	public static void showTwoImagesAsOne(BufferedImage imgF2, BufferedImage imgV2) {
+	public static void showTwoImagesAsOne_resize(BufferedImage imgF2, BufferedImage imgV2, boolean saveImage) {
+		ImageOperation resizeImage1 = new ImageOperation(imgF2);
+		resizeImage1.resize(0.7);
+		imgF2 = resizeImage1.getImageAsBufferedImage();
 		
-		imgF2 = ImageConverter.convert1AtoBI(imgF2.getWidth(), imgF2.getHeight(), ImageConverter.convertBIto1A(imgF2));
-		imgV2 = ImageConverter.convert1AtoBI(imgV2.getWidth(), imgV2.getHeight(), ImageConverter.convertBIto1A(imgV2));
+		ImageOperation resizeImage2 = new ImageOperation(imgV2);
+		resizeImage2.resize(0.7);
+		imgV2 = resizeImage2.getImageAsBufferedImage();
+		showTwoImagesAsOne(imgF2, imgV2, saveImage);
+	}
+	
+	public static void showTwoImagesAsOne(BufferedImage imgF2, BufferedImage imgV2, boolean saveImage) {
+		
+		// imgF2 = ImageConverter.convert1AtoBI(imgF2.getWidth(), imgF2.getHeight(), ImageConverter.convertBIto1A(imgF2));
+		// imgV2 = ImageConverter.convert1AtoBI(imgV2.getWidth(), imgV2.getHeight(), ImageConverter.convertBIto1A(imgV2));
 		
 		for (int x = 0; x < imgV2.getWidth(); x++) {
 			for (int y = 0; y < imgV2.getHeight(); y++) {
@@ -883,6 +900,10 @@ public class ImageOperation extends ImageConverter {
 						imgF2.setRGB(x, y, imgF2.getRGB(x, y));
 				}
 			}
+		}
+		if (saveImage) {
+			ImageOperation save = new ImageOperation(imgF2);
+			save.saveImage("/Users/" + System.getProperty("user.name") + "/Desktop/overlayImage.png");
 		}
 		
 		GravistoService.showImage(imgF2, "Vergleich");
@@ -926,7 +947,7 @@ public class ImageOperation extends ImageConverter {
 		return new ImageOperation(getImage());
 	}
 	
-	public static FlexibleImage removeSmallPartsOfImage(FlexibleImage workImage, int iBackgroundFill, int cutOff) {
+	public static FlexibleImage removeSmallPartsOfImage(FlexibleImage workImage, int iBackgroundFill, int cutOffMinimumArea, NeighbourhoodSetting nb, CameraTyp typ) {
 		
 		int[] rgbArray = workImage.getAs1A();
 		int w = workImage.getWidth();
@@ -948,28 +969,39 @@ public class ImageOperation extends ImageConverter {
 		
 		boolean useVariant1 = true, useVariant2 = false, useVariant3 = false;
 		
-		// Variante 1
 		if (useVariant1) {
-			PixelSegmentation ps = new PixelSegmentation(image);
+			PixelSegmentation ps = new PixelSegmentation(image, nb);
 			ps.doPixelSegmentation(1);
 			
-			int[] clusterSizes = ps.getClusterSizeNormalized(w, h);
-			int[] clusterPerimeter = ps.getPerimeter();
-			double[] clusterCircleSimilarity = ps.getCircuitRatio();
+			int[] clusterSizes = new int[ps.getClusterSize().length];
+			
+			switch (typ) {
+				case TOP:
+					clusterSizes = ps.getClusterSizeNormalized(w, h);
+					break;
+				
+				case SIDE:
+					clusterSizes = ps.getClusterSize();
+					break;
+			}
 			
 			boolean log2 = false;
-			if (log2)
+			if (log2) {
+				int[] clusterPerimeter = ps.getPerimeter();
+				double[] clusterCircleSimilarity = ps.getCircuitRatio();
+				
 				for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
 					if (clusterSizes[clusterID] > 25)
 						System.out.println("ID: " + clusterID + ", SIZE: " + clusterSizes[clusterID] + ", PERIMETER: "
 											+ clusterPerimeter[clusterID] + ", CIRCLE? " + clusterCircleSimilarity[clusterID] + ", PFLANZE? "
 											+ (clusterCircleSimilarity[clusterID] < 0.013));
+			}
 			
 			int[][] mask = ps.getImageMask();
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
 					int clusterID = mask[x][y];
-					if (clusterSizes[clusterID] < cutOff)
+					if (clusterSizes[clusterID] < cutOffMinimumArea)
 						rgbArray[x + y * w] = iBackgroundFill;
 				}
 			}
@@ -978,7 +1010,7 @@ public class ImageOperation extends ImageConverter {
 		// Variante 2
 		if (useVariant2) {
 			
-			PixelSegmentation ps = new PixelSegmentation(image);
+			PixelSegmentation ps = new PixelSegmentation(image, nb);
 			ps.doPixelSegmentation(2);
 			
 			int[] clusterSizes = ps.getClusterSize();
@@ -1002,7 +1034,7 @@ public class ImageOperation extends ImageConverter {
 					// Color.YELLOW.getRGB();
 					// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
 					
-					if (clusterSizes[clusterID] < cutOff) // ||
+					if (clusterSizes[clusterID] < cutOffMinimumArea) // ||
 						// clusterCircleSimilarity[clusterID]
 						// > 0.013
 						rgbArray[x + y * w] = iBackgroundFill;
@@ -1019,7 +1051,7 @@ public class ImageOperation extends ImageConverter {
 		
 		// Variante 3
 		if (useVariant3) {
-			PixelSegmentation ps = new PixelSegmentation(image);
+			PixelSegmentation ps = new PixelSegmentation(image, nb);
 			ps.doPixelSegmentation(3);
 			
 			int[] clusterSizes = ps.getClusterSize();
@@ -1043,7 +1075,7 @@ public class ImageOperation extends ImageConverter {
 					// Color.YELLOW.getRGB();
 					// rgbArray[x + y * w] = colors.get(clusterID).getRGB();
 					
-					if (clusterSizes[clusterID] < cutOff) // ||
+					if (clusterSizes[clusterID] < cutOffMinimumArea) // ||
 						// clusterCircleSimilarity[clusterID]
 						// > 0.013
 						rgbArray[x + y * w] = iBackgroundFill;
