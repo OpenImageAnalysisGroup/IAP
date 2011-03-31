@@ -33,7 +33,10 @@ public class BinaryFileInfo {
 	}
 	
 	public String getHashLabel() {
-		return ((BinaryMeasurement) entity).getLabelURL().getDetail();
+		if (((BinaryMeasurement) entity).getLabelURL() != null)
+			return ((BinaryMeasurement) entity).getLabelURL().getDetail();
+		else
+			return null;
 	}
 	
 	public IOurl getFileNameMain() {

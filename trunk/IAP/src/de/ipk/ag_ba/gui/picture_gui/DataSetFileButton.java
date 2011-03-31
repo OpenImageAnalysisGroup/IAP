@@ -189,7 +189,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	 */
 	public void actionPerformed(final ActionEvent evt) {
 		
-		if (evt.getSource() instanceof JButton) {
+		if (!downloadNeeded && evt.getSource() instanceof JButton) {
 			
 			// SwingUtilities.invokeLater(new Runnable() {
 			// public void run() {
@@ -201,9 +201,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			// });
 		}
 		
-		if (evt.getSource() == openFileCmdMain ||
-				evt.getSource() == openFileCmdLabel ||
-				evt.getSource() == saveFileCmdMain ||
+		if (downloadNeeded || evt.getSource() == openFileCmdMain ||
+						evt.getSource() == openFileCmdLabel ||
+						evt.getSource() == saveFileCmdMain ||
 				evt.getSource() == saveFileCmdLabel) {
 			final JPopupMenu myPopup = new JPopupMenu();
 			
