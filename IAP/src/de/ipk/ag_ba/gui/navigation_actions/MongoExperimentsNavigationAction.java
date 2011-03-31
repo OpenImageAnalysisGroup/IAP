@@ -46,11 +46,11 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 		
 		res.add(new NavigationButton(new DomainLogoutAction(), src.getGUIsetting()));
 		
-		NavigationAction analyzeAction = new SaveExperimentInCloud(true);
+		NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
 		
-		NavigationButton analyzeEntity = new NavigationButton(analyzeAction, "Add Files", "img/ext/user-desktop.png",
+		NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Add Files", "img/ext/user-desktop.png",
 							"img/ext/user-desktop.png", src.getGUIsetting());
-		res.add(analyzeEntity);
+		res.add(uploadFilesEntity);
 		
 		// gruppe => user => experiment
 		

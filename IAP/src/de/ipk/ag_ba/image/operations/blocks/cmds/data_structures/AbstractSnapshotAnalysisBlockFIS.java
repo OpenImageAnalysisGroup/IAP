@@ -90,6 +90,8 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					}
 				}, name + "process NIR mask", 1) });
 		
+		postProcess(processedImages, processedMasks);
+		
 		return new FlexibleMaskAndImageSet(processedImages, processedMasks);
 	}
 	
@@ -121,4 +123,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		return getInput().getMasks().getNir();
 	}
 	
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		// empty
+	}
 }

@@ -17,8 +17,10 @@ import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ColorHistogram;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ColorHistogramEntry;
@@ -513,4 +515,60 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 		}
 	}
 	
+	@Override
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		FlexibleImage fluoMask = processedMasks.getFluo();
+		
+		int filled = 0;
+		
+		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
+		final int iBackgroundFill = backgroundFill.getRGB();
+		
+		int[] pixel = fluoMask.getAs1A();
+		for (int p : pixel)
+			if (p != iBackgroundFill)
+				filled++;
+		
+		if (filled < pixel.length * 0.1d) {
+			
+			// for (FlexibleImage fi : processedImages.getImages()) {
+			// FlexibleImageType type = fi.getType();
+			//
+			// int x = (int) (fi.getWidth() * 0.25d);
+			// int y = (int) (fi.getHeight() * 0.25d);
+			// int w = (int) (fi.getWidth() * 0.5d);
+			// int h = (int) (fi.getHeight() * 0.5d);
+			//
+			// y-=h/5;
+			//
+			// FlexibleImage res = new ImageOperation(fi).cutAreaWorking(x, y, w, h, iBackgroundFill).getImage();
+			// res.setType(type);
+			// processedImages.set(res);
+			// }
+			
+			for (FlexibleImage fi : processedMasks.getImages()) {
+				FlexibleImageType type = fi.getType();
+				
+				int x = (int) (fi.getWidth() * 0.3d);
+				int y = (int) (fi.getHeight() * 0.3d);
+				int w = (int) (fi.getWidth() * 0.4d);
+				int h = (int) (fi.getHeight() * 0.4d);
+				
+				int diff = w - h;
+				w -= diff;
+				x += diff / 2;
+				
+				y -= h / 5;
+				
+				FlexibleImage res = new ImageOperation(fi).cutAreaWorking(x, y, w, h, iBackgroundFill).getImage();
+				
+				new ImageOperation(res).drawRect(x + 1, y + 1, w - 1, w - 1);
+				
+				res.setType(type);
+				processedMasks.set(res);
+			}
+			
+		}
+		// super.postProcess();
+	}
 }

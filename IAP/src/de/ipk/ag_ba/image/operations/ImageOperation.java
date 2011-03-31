@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import org.ObjectRef;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -438,6 +439,19 @@ public class ImageOperation extends ImageConverter {
 		return new ImageOperation(image.getProcessor().crop().getBufferedImage());
 	}
 	
+	public ImageOperation cutAreaWorking(int bx, int by, int bw, int bh, int iBackgroundFill) {
+		int[][] imgArr = new FlexibleImage(image).getAs2A();
+		int bx2 = bx + bw;
+		int by2 = by + bh;
+		for (int x = 0; x < image.getWidth(); x++)
+			for (int y = 0; y < image.getHeight(); y++) {
+				boolean inside = x >= bx && x < bx2 && y >= by && y < by2;
+				if (!inside)
+					imgArr[x][y] = iBackgroundFill;
+			}
+		return new ImageOperation(imgArr);
+	}
+	
 	public Dimension2D centerOfGravity() {
 		
 		int[][] img = ImageConverter.convertIJto2A(image);
@@ -575,18 +589,18 @@ public class ImageOperation extends ImageConverter {
 		return new ImageOperation(ImageConverter.convert2AtoBI(newImage));
 	}
 	
-	public ImageOperation removeSmallClusters() {
-		return removeSmallClusters(0.005d, CameraTyp.TOP);
+	public ImageOperation removeSmallClusters(ObjectRef optClusterSizeReturn) {
+		return removeSmallClusters(0.005d, CameraTyp.TOP, optClusterSizeReturn);
 	}
 	
-	public ImageOperation removeSmallClusters(double factor, CameraTyp typ) {
-		return removeSmallClusters(factor, NeighbourhoodSetting.NB4, typ);
+	public ImageOperation removeSmallClusters(double factor, CameraTyp typ, ObjectRef optClusterSizeReturn) {
+		return removeSmallClusters(factor, NeighbourhoodSetting.NB4, typ, optClusterSizeReturn);
 	}
 	
-	public ImageOperation removeSmallClusters(double factor, NeighbourhoodSetting nb, CameraTyp typ) {
+	public ImageOperation removeSmallClusters(double factor, NeighbourhoodSetting nb, CameraTyp typ, ObjectRef optClusterSizeReturn) {
 		FlexibleImage workImage = new FlexibleImage(image);
 		workImage = removeSmallPartsOfImage(workImage, PhenotypeAnalysisTask.BACKGROUND_COLORint,
-							(int) (image.getWidth() * image.getHeight() * factor), nb, typ);
+							(int) (image.getWidth() * image.getHeight() * factor), nb, typ, optClusterSizeReturn);
 		return new ImageOperation(workImage);
 	}
 	
@@ -947,7 +961,8 @@ public class ImageOperation extends ImageConverter {
 		return new ImageOperation(getImage());
 	}
 	
-	public static FlexibleImage removeSmallPartsOfImage(FlexibleImage workImage, int iBackgroundFill, int cutOffMinimumArea, NeighbourhoodSetting nb, CameraTyp typ) {
+	public static FlexibleImage removeSmallPartsOfImage(FlexibleImage workImage, int iBackgroundFill, int cutOffMinimumArea, NeighbourhoodSetting nb,
+			CameraTyp typ, ObjectRef optClusterSizeReturn) {
 		
 		int[] rgbArray = workImage.getAs1A();
 		int w = workImage.getWidth();
@@ -974,6 +989,9 @@ public class ImageOperation extends ImageConverter {
 			ps.doPixelSegmentation(1);
 			
 			int[] clusterSizes = new int[ps.getClusterSize().length];
+			
+			if (optClusterSizeReturn != null)
+				optClusterSizeReturn.setObject(clusterSizes);
 			
 			switch (typ) {
 				case TOP:
