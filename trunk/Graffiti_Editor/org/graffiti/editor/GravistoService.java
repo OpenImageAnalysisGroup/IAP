@@ -1181,6 +1181,8 @@ public class GravistoService implements HelperClass {
 						throw new Error(e1);
 					}
 					InputStream is = iss[iii];
+					if (is == null)
+						return;
 					byte[] buffer = new byte[1024 * 1024];
 					int read = 0;
 					long len = 0;
@@ -1316,6 +1318,7 @@ public class GravistoService implements HelperClass {
 						}
 					} else {
 						SwingUtilities.invokeLater(new Runnable() {
+							@Override
 							public void run() {
 								GraffitiInternalFrame gif = (GraffitiInternalFrame) MainFrame.getInstance().createInternalFrame(selectedView, session
 													.getGraph().getName(), session, false, true, false, configNewView, true);

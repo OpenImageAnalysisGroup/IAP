@@ -27,7 +27,7 @@ public class DataMappingId implements Comparable<DataMappingId> {
 		this.timeP = timeP;
 		this.timeU = timeU;
 		this.replicateId = replicateId;
-		String d = "_�_";
+		String d = "_¤_";
 		this.sid = expName + d + seriesName + d + timeP + d + timeU + d + replicateId;
 	}
 	
@@ -87,6 +87,7 @@ public class DataMappingId implements Comparable<DataMappingId> {
 		return genotype;
 	}
 	
+	@Override
 	public int compareTo(DataMappingId dmi) {
 		if (dmi.seriesId > seriesId)
 			return -1;

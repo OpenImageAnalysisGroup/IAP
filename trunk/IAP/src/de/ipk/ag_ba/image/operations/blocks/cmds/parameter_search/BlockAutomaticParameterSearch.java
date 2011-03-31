@@ -10,10 +10,12 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MaskOperation;
 import de.ipk.ag_ba.image.operations.MaskOperationDirect;
 import de.ipk.ag_ba.image.operations.MorphologicalOperationSearchType;
+import de.ipk.ag_ba.image.operations.blocks.cmds.WorkingImageTyp;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -27,17 +29,30 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 	// }
 	
 	private final MorphologicalOperationSearchType typeOfSearch;
+	private final WorkingImageTyp workingOnWhichImage;
 	
-	public BlockAutomaticParameterSearch(MorphologicalOperationSearchType typeOfSearch) {
+	public BlockAutomaticParameterSearch(MorphologicalOperationSearchType typeOfSearch, WorkingImageTyp workingOnWhichImage) {
 		this.typeOfSearch = typeOfSearch;
+		this.workingOnWhichImage = workingOnWhichImage;
+		
 	}
 	
 	@Override
 	protected FlexibleMaskAndImageSet run() {
-		return automaticSearch(typeOfSearch);
+		return automaticSearch(typeOfSearch, workingOnWhichImage);
 	}
 	
-	private FlexibleMaskAndImageSet automaticSearch(MorphologicalOperationSearchType typ) {
+	private FlexibleMaskAndImageSet automaticSearch(MorphologicalOperationSearchType typ, WorkingImageTyp workingOnWhichImage) {
+		
+		switch (workingOnWhichImage) {
+			case FLUO_AND_NIR:
+				options.clearAndAddBooleanSetting(Setting.PROCESS_NIR, true);
+				break;
+			
+			case ONLY_FLUO:
+				options.clearAndAddBooleanSetting(Setting.PROCESS_NIR, false);
+				break;
+		}
 		
 		ObjectRef resultValues = new ObjectRef();
 		Vector2d t = null;
@@ -58,7 +73,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 				// System.out.println("translation des Originalbildes: " + t.x + " " + t.y);
 				fluoImage = new ImageOperation(getInput().getImages().getFluo()).translate(t.x, t.y).getImage();
 				
-				if (options.isProcessNir()) {
+				if (options.getBooleanSetting(Setting.PROCESS_NIR)) {
 					nirMask = automaticProcessIntervallSearch(getInput().getMasks().getNir(), getInput().getMasks().getVis(), resultValues, typ);
 					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.TRANSLATION_NIR_X, t.x);
 					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.TRANSLATION_NIR_Y, t.y);
@@ -77,7 +92,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.ROTATION_FLUO, t.x);
 				fluoImage = new ImageOperation(getInput().getImages().getFluo()).rotate(t.x).getImage();
 				
-				if (options.isProcessNir()) {
+				if (options.getBooleanSetting(Setting.PROCESS_NIR)) {
 					nirMask = automaticProcessIntervallSearch(getInput().getMasks().getNir(), getInput().getMasks().getVis(), resultValues, typ);
 					t = (Vector2d) resultValues.getObject();
 					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.ROTATION_NIR, t.x);
@@ -95,7 +110,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.SCALING_FLUO_Y, t.y);
 				fluoImage = new ImageOperation(getInput().getImages().getFluo()).scale(t.x, t.y).getImage();
 				
-				if (options.isProcessNir()) {
+				if (options.getBooleanSetting(Setting.PROCESS_NIR)) {
 					nirMask = automaticProcessIntervallSearch(getInput().getMasks().getNir(), getInput().getMasks().getVis(), resultValues, typ);
 					t = (Vector2d) resultValues.getObject();
 					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.SCALING_NIR_X, t.x);

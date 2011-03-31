@@ -1,6 +1,8 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.ImageTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -10,31 +12,31 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockMorphologicalOperations extends AbstractSnapshotAnalysisBlockFIS {
 	
-	enum BlockMorphologicalOperationsTyp {
-		VIS, FLUO, NIR
-		
-	}
+	// enum BlockMorphologicalOperationsTyp {
+	// VIS, FLUO, NIR
+	//
+	// }
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		return morphologicalOperatorsToInitinalImageProcess(getInput().getImages().getVis(), getInput().getMasks().getVis(), options.getCameraTyp(),
-				BlockMorphologicalOperationsTyp.VIS);
+				ImageTyp.RGB);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		return morphologicalOperatorsToInitinalImageProcess(getInput().getImages().getFluo(), getInput().getMasks().getFluo(), options.getCameraTyp(),
-				BlockMorphologicalOperationsTyp.FLUO);
+				ImageTyp.FLUO);
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
 		return morphologicalOperatorsToInitinalImageProcess(getInput().getImages().getNir(), getInput().getMasks().getNir(), options.getCameraTyp(),
-				BlockMorphologicalOperationsTyp.NIR);
+				ImageTyp.NIR);
 	}
 	
 	private FlexibleImage morphologicalOperatorsToInitinalImageProcess(FlexibleImage srcImage, FlexibleImage workImage, ImageProcessorOptions.CameraTyp camera,
-			BlockMorphologicalOperationsTyp typ) {
+			ImageTyp typ) {
 		
 		ImageOperation maskIo = null;
 		
@@ -54,29 +56,33 @@ public class BlockMorphologicalOperations extends AbstractSnapshotAnalysisBlockF
 		return new ImageOperation(srcImage).applyMask2(maskIo.getImage(), options.getBackground()).getImage();
 	}
 	
-	private ImageOperation doMorphologicalOperationsOnSide(FlexibleImage srcImage, FlexibleImage workImage, BlockMorphologicalOperationsTyp typ) {
+	private ImageOperation doMorphologicalOperationsOnSide(FlexibleImage srcImage, FlexibleImage workImage, ImageTyp typ) {
 		ImageOperation maskIo = new ImageOperation(workImage);
 		
 		switch (typ) {
 			
-			case VIS:
-				for (int ii = 0; ii < options.getDilateRgbSide(); ii++)
+			case RGB:
+				for (int ii = 0; ii < options.getIntSetting(Setting.DILATE_RGB_SIDE); ii++)
 					maskIo.dilate();
+				// maskIo.dilate(new int[][] { { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 } });
+				// maskIo.dilate(new int[][] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } });
+				// maskIo.dilate(new int[][] { { 1, 1 }, { 1, 1 }, { 1, 1 } });
+				// maskIo.dilate(new int[][] { { 0, 0, 0 }, { 1, 1, 1 }, { 0, 0, 0 } });
 				
-				for (int ii = 0; ii < options.getErodeRgbSide(); ii++)
+				for (int ii = 0; ii < options.getIntSetting(Setting.ERODE_RGB_SIDE); ii++)
 					maskIo.erode();
 				
 				break;
 			
 			case FLUO:
-				for (int ii = 0; ii < options.getDilateFluoSide(); ii++)
+				for (int ii = 0; ii < options.getIntSetting(Setting.DILATE_FLUO_SIDE); ii++)
 					maskIo.dilate();
 				
-				for (int ii = 0; ii < options.getErodeFluoSide(); ii++)
+				for (int ii = 0; ii < options.getIntSetting(Setting.ERODE_FLUO_SIDE); ii++)
 					maskIo.erode();
 				
 			case NIR:
-				for (int ii = 0; ii < options.getClosingNirSide(); ii++)
+				for (int ii = 0; ii < options.getIntSetting(Setting.CLOSING_NIR_SIDE); ii++)
 					maskIo.closing();
 				break;
 			
@@ -85,30 +91,30 @@ public class BlockMorphologicalOperations extends AbstractSnapshotAnalysisBlockF
 		return maskIo;
 	}
 	
-	private ImageOperation doMorphologicalOperationsOnTop(FlexibleImage srcImage, FlexibleImage workImage, BlockMorphologicalOperationsTyp typ) {
+	private ImageOperation doMorphologicalOperationsOnTop(FlexibleImage srcImage, FlexibleImage workImage, ImageTyp typ) {
 		
 		ImageOperation maskIo = new ImageOperation(workImage);
 		
 		switch (typ) {
 			
-			case VIS:
-				for (int ii = 0; ii < options.getDilateRgbTop(); ii++)
+			case RGB:
+				for (int ii = 0; ii < options.getIntSetting(Setting.DILATE_RGB_TOP); ii++)
 					maskIo.dilate();
 				
-				for (int ii = 0; ii < options.getErodeRgbTop(); ii++)
+				for (int ii = 0; ii < options.getIntSetting(Setting.ERODE_RGB_TOP); ii++)
 					maskIo.erode();
 				
 				break;
 			
 			case FLUO:
-				for (int ii = 0; ii < options.getDilateFluoTop(); ii++)
+				for (int ii = 0; ii < options.getIntSetting(Setting.DILATE_FLUO_TOP); ii++)
 					maskIo.dilate();
 				
-				for (int ii = 0; ii < options.getErodeFluoTop(); ii++)
+				for (int ii = 0; ii < options.getIntSetting(Setting.ERODE_FLUO_TOP); ii++)
 					maskIo.erode();
 				
 			case NIR:
-				for (int ii = 0; ii < options.getClosingNirTop(); ii++)
+				for (int ii = 0; ii < options.getIntSetting(Setting.CLOSING_NIR_TOP); ii++)
 					maskIo.closing();
 				break;
 			

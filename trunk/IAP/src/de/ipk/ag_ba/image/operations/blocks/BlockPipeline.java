@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -56,7 +57,7 @@ public class BlockPipeline {
 			input = block.process();
 			long tb = System.currentTimeMillis();
 			int seconds = (int) ((tb - ta) / 1000);
-			if (!options.isDebugTakeTimes())
+			if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 				System.out.println("Pipeline " + id + ": finished block " + index + "/" + blocks.size() + ", took " + seconds + " sec., time: "
 						+ StopWatch.getNiceTime() + " (" + block.getClass().getSimpleName() + ")");
 			

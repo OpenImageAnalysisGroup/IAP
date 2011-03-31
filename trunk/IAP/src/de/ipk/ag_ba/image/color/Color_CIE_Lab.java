@@ -80,4 +80,8 @@ public class Color_CIE_Lab {
 		
 		return new ColorXYZ(X, Y, Z);
 	}
+	
+	public int getRGB() {
+		return getColorXYZ().getColor().getRGB();
+	}
 }

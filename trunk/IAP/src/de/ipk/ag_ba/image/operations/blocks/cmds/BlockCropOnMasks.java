@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author klukas
  */
-public class BlockCrop extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockCropOnMasks extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
@@ -34,27 +34,27 @@ public class BlockCrop extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 	}
 	
-	@Override
-	protected FlexibleImage processVISimage() {
-		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getVis() != null)
-			return getInput().getImages().getVis().crop();
-		else
-			return null;
-	}
-	
-	@Override
-	protected FlexibleImage processFLUOimage() {
-		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getFluo() != null)
-			return getInput().getImages().getFluo().crop();
-		else
-			return null;
-	}
-	
-	@Override
-	protected FlexibleImage processNIRimage() {
-		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getNir() != null)
-			return getInput().getImages().getNir().crop();
-		else
-			return null;
-	}
+//	@Override
+//	protected FlexibleImage processVISimage() {
+//		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getVis() != null)
+//			return getInput().getImages().getVis().crop();
+//		else
+//			return null;
+//	}
+//	
+//	@Override
+//	protected FlexibleImage processFLUOimage() {
+//		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getFluo() != null)
+//			return getInput().getImages().getFluo().crop();
+//		else
+//			return null;
+//	}
+//	
+//	@Override
+//	protected FlexibleImage processNIRimage() {
+//		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getNir() != null)
+//			return getInput().getImages().getNir().crop();
+//		else
+//			return null;
+//	}
 }
