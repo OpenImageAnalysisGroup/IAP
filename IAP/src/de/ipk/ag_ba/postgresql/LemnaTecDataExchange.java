@@ -37,6 +37,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
@@ -117,21 +118,24 @@ public class LemnaTecDataExchange {
 			ehi.setExperimentname(rs.getString(1));
 			ehi.setDatabase(database);
 			ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentname());
-			ehi.setImportusername("todo import user name");
-			ehi.setImportusergroup("Imported");
+			ehi.setImportusername(user != null ? user : SystemAnalysis.getUserName());
+			ehi.setImportusergroup("LemnaTec");
 			LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
 			if (system == LemnaTecSystem.Barley) {
 				ehi.setExperimenttype("Barley Greenhouse Experiment");
+				ehi.setImportusergroup("LemnaTec (BGH)");
 			} else
 				if (system == LemnaTecSystem.Maize) {
 					ehi.setExperimenttype("Maize Greenhouse Experiment");
+					ehi.setImportusergroup("LemnaTec (CGH)");
 				} else
 					if (system == LemnaTecSystem.Phytochamber) {
 						ehi.setExperimenttype("Phytochamber Experiment");
+						ehi.setImportusergroup("LemnaTec (APH)");
 					} else {
 						ehi.setExperimenttype("Phenotyping Experiment (unknown greenhouse)");
+						ehi.setImportusergroup("LemnaTec");
 					}
-			ehi.setRemark("LemnaTec-DB dataset");
 			ehi.setSequence("");
 			ehi.setSizekb(-1);
 			result.add(ehi);
@@ -182,7 +186,10 @@ public class LemnaTecDataExchange {
 					people.get(ehi).add(rs.getString(1));
 				}
 				rs.close();
-				ehi.setCoordinator(StringManipulationTools.getStringList(names, ","));
+				if (names.size() > 1) {
+					names.remove("muecke");
+				}
+				ehi.setCoordinator(StringManipulationTools.getStringList(names, ", "));
 			}
 		} catch (Exception e) {
 			System.out.println("Info: Database " + database + " has no import_data table (" + e.getMessage() + ")");
@@ -204,8 +211,8 @@ public class LemnaTecDataExchange {
 				people.get(ehi).add(rs.getString(1));
 			}
 			rs.close();
-			String importers = StringManipulationTools.getStringList(names, ",");
-			ehi.setImportusername(importers);
+			String importers = StringManipulationTools.getStringList(names, ", ");
+			ehi.setRemark("Snapshot creator(s): " + importers);
 			if (ehi.getCoordinator() == null)
 				ehi.setCoordinator(importers);
 		}
