@@ -29,7 +29,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Experime
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.OpenExcelFileDialogService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableData;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.loaders.AnnotationFromGraphFileNameProvider;
 import de.ipk_gatersleben.ag_pbi.mmd.loaders.ImageLoader;
 import de.ipk_gatersleben.ag_pbi.mmd.loaders.MyScanner;
@@ -94,10 +93,6 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 				// for (Experiment e : experiments) {
 				try {
 					if (storeInMongo) {
-						newExperiment.getHeader().setExperimenttype("Phenotyping");
-						newExperiment.getHeader().setImportusergroup("Shared");
-						newExperiment.getHeader().setImportusername(SystemAnalysis.getUserName());
-						System.out.println(newExperiment.toString());
 						m.saveExperiment(newExperiment, status);
 					}
 					ExperimentReference exRef = new ExperimentReference(newExperiment);

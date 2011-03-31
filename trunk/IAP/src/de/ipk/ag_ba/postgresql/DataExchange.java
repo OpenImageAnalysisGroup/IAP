@@ -32,6 +32,7 @@ public class DataExchange {
 	
 	public synchronized boolean isValidDomainUser(String user, String pass) throws Exception {
 		boolean result = false;
+		String groupName = "";
 		
 		if (!isConnected())
 			connectDB();
@@ -44,6 +45,34 @@ public class DataExchange {
 			ResultSet r = ps.getResultSet();
 			if (r.next())
 				result = r.getInt(1) == 1;
+			r.close();
+		}
+		if (ps.getWarnings() != null) {
+			ps.close();
+			throw new Exception(ps.getWarnings().getMessage());
+		} else {
+			ps.close();
+		}
+		
+		ps = conn.prepareStatement("select pdw_secure.secure_util.getCurrGroupName() from dual");
+		if (ps.execute()) {
+			ResultSet r = ps.getResultSet();
+			if (r.next())
+				groupName = r.getString(1);
+			r.close();
+		}
+		if (ps.getWarnings() != null) {
+			ps.close();
+			throw new Exception(ps.getWarnings().getMessage());
+		} else {
+			ps.close();
+		}
+		
+		ps = conn.prepareStatement("select * from table(secure_util.getAllGroupsforCurrUser()");
+		if (ps.execute()) {
+			ResultSet r = ps.getResultSet();
+			if (r.next())
+				groupName = r.getString(1);
 			r.close();
 		}
 		if (ps.getWarnings() != null) {

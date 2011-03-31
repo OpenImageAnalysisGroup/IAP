@@ -314,7 +314,7 @@ public class MongoDB {
 						BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException, ExecutionException {
 		
 		// System.out.println("STORE EXPERIMENT: " + experiment.getName());
-		experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
+		// experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 		
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
 		
@@ -617,17 +617,10 @@ public class MongoDB {
 			fs.remove(fff);
 			fff = null;
 		}
-		if (fff == null) {
-			GridFSInputFile inputFile = fs.createFile(is, hash);
-			inputFile.save();
-			// fs.getDB().requestStart();
-			result = inputFile.getLength();
-			// CommandResult res = fs.getDB().getLastError(2, 180000, false);
-			// if (!res.ok())
-			// result = -1;
-			// fs.getDB().requestDone();
-		} else
-			result = 0;
+		
+		GridFSInputFile inputFile = fs.createFile(is, hash);
+		inputFile.save();
+		result = inputFile.getLength();
 		is.close();
 		
 		return result;
@@ -772,6 +765,7 @@ public class MongoDB {
 		return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
 			@Override
 			public DatabaseStorageResult call() throws Exception {
+				
 				final byte[] isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
 				final byte[] isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
 				
@@ -784,12 +778,16 @@ public class MongoDB {
 					return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 				}
 				
+				// if the image data source is equal to the target (determined by the prefix),
+				// the image content does not need to be copied (assumption valid while using MongoDB data storage)
 				if (image.getURL() != null && image.getLabelURL() != null) {
 					if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix()))
 						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				}
 				
-				String[] hashes = GravistoService.getHashFromInputStream(new InputStream[] {
+				String[] hashes;
+				
+				hashes = GravistoService.getHashFromInputStream(new InputStream[] {
 						new MyByteArrayInputStream(isMain),
 						isLabel != null ? new MyByteArrayInputStream(isLabel) : null
 						},
@@ -802,7 +800,7 @@ public class MongoDB {
 				DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
 				collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 				
-				GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_IMAGE_LABELS.toString());
+				GridFS gridfs_label_files = new GridFS(db, MongoGridFS.FS_IMAGE_LABELS.toString());
 				DBCollection collectionB = db.getCollection(MongoGridFS.FS_IMAGE_LABELS_FILES.toString());
 				collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 				
@@ -814,7 +812,7 @@ public class MongoDB {
 				image.getURL().setPrefix(mh.getPrefix());
 				image.getURL().setDetail(hashMain);
 				
-				GridFSDBFile fffLabel = gridfs_images.findOne(hashLabel);
+				GridFSDBFile fffLabel = gridfs_label_files.findOne(hashLabel);
 				if (image.getLabelURL() != null) {
 					image.getLabelURL().setPrefix(mh.getPrefix());
 					image.getLabelURL().setDetail(hashLabel);
@@ -838,25 +836,11 @@ public class MongoDB {
 				if (fffMain != null && fffLabel != null && fffPreview != null) {
 					return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				} else {
-					
-					// if (fffMain != null) {
-					// gridfs_images.remove(fffMain);
-					// fffMain = null;
-					// }
-					// if (fffLabel != null) {
-					// gridfs_images.remove(fffLabel);
-					// fffLabel = null;
-					// }
-					// if (fffPreview != null) {
-					// gridfs_images.remove(fffPreview);
-					// fffPreview = null;
-					// }
-					
 					boolean saved = saveImageFile(new InputStream[] {
 							new MyByteArrayInputStream(isMain),
 							isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
 							getPreviewImageStream(new MyByteArrayInputStream(isMain))
-							}, gridfs_images, gridfs_null_files,
+							}, gridfs_images, gridfs_label_files,
 							gridfs_preview_files, id, hashMain,
 							hashLabel,
 							fffMain == null, fffLabel == null);
