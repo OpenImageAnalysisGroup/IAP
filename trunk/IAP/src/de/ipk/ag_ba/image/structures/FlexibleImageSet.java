@@ -8,6 +8,7 @@
 package de.ipk.ag_ba.image.structures;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.operations.ImageOperation;
 
@@ -48,14 +49,20 @@ public class FlexibleImageSet {
 	}
 	
 	public FlexibleImage getVis() {
+		if (vis != null)
+			vis.setType(FlexibleImageType.VIS);
 		return vis;
 	}
 	
 	public FlexibleImage getFluo() {
+		if (fluo != null)
+			fluo.setType(FlexibleImageType.FLUO);
 		return fluo;
 	}
 	
 	public FlexibleImage getNir() {
+		if (nir != null)
+			nir.setType(FlexibleImageType.NIR);
 		return nir;
 	}
 	
@@ -172,5 +179,22 @@ public class FlexibleImageSet {
 		FlexibleImage f = new ImageOperation(fluo).draw(masks.getFluo(), background);
 		FlexibleImage n = new ImageOperation(nir).draw(masks.getNir(), background);
 		return new FlexibleImageSet(v, f, n);
+	}
+	
+	public ArrayList<FlexibleImage> getImages() {
+		ArrayList<FlexibleImage> res = new ArrayList<FlexibleImage>();
+		if (vis != null) {
+			vis.setType(FlexibleImageType.VIS);
+			res.add(vis);
+		}
+		if (fluo != null) {
+			fluo.setType(FlexibleImageType.FLUO);
+			res.add(fluo);
+		}
+		if (nir != null) {
+			nir.setType(FlexibleImageType.NIR);
+			res.add(nir);
+		}
+		return res;
 	}
 }

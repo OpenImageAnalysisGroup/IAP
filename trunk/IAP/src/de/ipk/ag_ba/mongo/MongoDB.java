@@ -114,7 +114,7 @@ public class MongoDB {
 		
 		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
 		res.add(getDefaultCloud());
-		// res.add(new MongoDB("Backup (md5)", "cloud2", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", null, null, HashType.MD5));
+		res.add(new MongoDB("Data Processing 2", "cloud2", "ba-13.ipk-gatersleben.de,", null, null, HashType.MD5));
 		// } else
 		// res.add(getLocalDB());
 		// }
@@ -766,6 +766,13 @@ public class MongoDB {
 			@Override
 			public DatabaseStorageResult call() throws Exception {
 				
+				// if the image data source is equal to the target (determined by the prefix),
+				// the image content does not need to be copied (assumption valid while using MongoDB data storage)
+				if (image.getURL() != null && image.getLabelURL() != null) {
+					if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix()))
+						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+				}
+				
 				final byte[] isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
 				final byte[] isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
 				
@@ -776,13 +783,6 @@ public class MongoDB {
 				if (image.getLabelURL() != null && isLabel == null) {
 					System.out.println("No input stream for source-URL (label):  " + image.getURL());
 					return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
-				}
-				
-				// if the image data source is equal to the target (determined by the prefix),
-				// the image content does not need to be copied (assumption valid while using MongoDB data storage)
-				if (image.getURL() != null && image.getLabelURL() != null) {
-					if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix()))
-						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				}
 				
 				String[] hashes;
@@ -1358,8 +1358,10 @@ public class MongoDB {
 						if (s == CloudAnalysisStatus.SCHEDULED
 											|| (
 											(batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING)
-											&& System.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate))
+											&& System.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate)) {
 							res.add(batch);
+							break;
+						}
 						// System.out.println(batch);
 					}
 				}
@@ -1425,6 +1427,7 @@ public class MongoDB {
 								if (hostName.equals("" + batch.getOwner())) {
 									res.add(batch);
 									added = true;
+									break;
 								}
 							
 							if (!added)

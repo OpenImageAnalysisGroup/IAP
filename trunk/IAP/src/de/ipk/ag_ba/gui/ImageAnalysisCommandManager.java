@@ -73,8 +73,8 @@ public class ImageAnalysisCommandManager {
 		
 		try {
 			// if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
-			if (!analysis)
-				actions.add(new NavigationButton(new CopyEntity(m, experimentReference), guiSetting));
+			// if (!analysis)
+			actions.add(new NavigationButton(new CopyEntity(m, experimentReference), guiSetting));
 		} catch (Exception e) {
 			// empty
 		}
