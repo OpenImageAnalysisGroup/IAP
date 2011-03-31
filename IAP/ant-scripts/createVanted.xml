@@ -83,6 +83,7 @@
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/mongo-2.5.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jai_codec.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jai_core.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/commons-compress-1.1.jar"/>
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="de.ipk.ag_ba.server.task_management.CloudComputingService"/>

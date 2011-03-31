@@ -5,10 +5,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import oracle.jdbc.driver.OracleConnection;
 
-public class DataExchange {
+public class DatabaseDataExchange {
 	
 	OracleConnection conn;
 	
@@ -30,9 +31,8 @@ public class DataExchange {
 		conn.setAutoCommit(false);
 	}
 	
-	public synchronized boolean isValidDomainUser(String user, String pass) throws Exception {
+	public synchronized ArrayList<String> getUserGroups(String user, String pass) throws Exception {
 		boolean result = false;
-		String groupName = "";
 		
 		if (!isConnected())
 			connectDB();
@@ -54,11 +54,16 @@ public class DataExchange {
 			ps.close();
 		}
 		
-		ps = conn.prepareStatement("select pdw_secure.secure_util.getCurrGroupName() from dual");
+		if (result == false)
+			return new ArrayList<String>();
+		
+		ArrayList<String> groups = new ArrayList<String>();
+		
+		ps = conn.prepareStatement("select * from table(secure_util.getallgroupsforcurruser)");
 		if (ps.execute()) {
 			ResultSet r = ps.getResultSet();
-			if (r.next())
-				groupName = r.getString(1);
+			while (r.next())
+				groups.add(r.getString(1));
 			r.close();
 		}
 		if (ps.getWarnings() != null) {
@@ -68,11 +73,25 @@ public class DataExchange {
 			ps.close();
 		}
 		
-		ps = conn.prepareStatement("select * from table(secure_util.getAllGroupsforCurrUser()");
+		disconnectDB();
+		
+		return groups;
+	}
+	
+	public synchronized ArrayList<String> getAllKnownUserGroups(String user, String pass) throws Exception {
+		boolean result = false;
+		
+		if (!isConnected())
+			connectDB();
+		
+		PreparedStatement ps;
+		ps = conn.prepareStatement("select pdw_secure.check_password(?,?) from dual");
+		ps.setString(1, user);
+		ps.setString(2, pass);
 		if (ps.execute()) {
 			ResultSet r = ps.getResultSet();
 			if (r.next())
-				groupName = r.getString(1);
+				result = r.getInt(1) == 1;
 			r.close();
 		}
 		if (ps.getWarnings() != null) {
@@ -82,7 +101,54 @@ public class DataExchange {
 			ps.close();
 		}
 		
-		closeDB();
+		if (result == false)
+			return new ArrayList<String>();
+		
+		ArrayList<String> groups = new ArrayList<String>();
+		
+		ps = conn.prepareStatement("select * from table(secure_util.getallgroups)");
+		if (ps.execute()) {
+			ResultSet r = ps.getResultSet();
+			while (r.next())
+				groups.add(r.getString(1));
+			r.close();
+		}
+		if (ps.getWarnings() != null) {
+			ps.close();
+			throw new Exception(ps.getWarnings().getMessage());
+		} else {
+			ps.close();
+		}
+		
+		disconnectDB();
+		
+		return groups;
+	}
+	
+	public synchronized boolean isValidDomainUser(String user, String pass) throws Exception {
+		boolean result = false;
+		
+		if (!isConnected())
+			connectDB();
+		
+		PreparedStatement ps;
+		ps = conn.prepareStatement("select pdw_secure.check_password(?,?) from dual");
+		ps.setString(1, user);
+		ps.setString(2, pass);
+		if (ps.execute()) {
+			ResultSet r = ps.getResultSet();
+			if (r.next())
+				result = r.getInt(1) == 1;
+			r.close();
+		}
+		if (ps.getWarnings() != null) {
+			ps.close();
+			throw new Exception(ps.getWarnings().getMessage());
+		} else {
+			ps.close();
+		}
+		
+		disconnectDB();
 		
 		return result;
 	}
