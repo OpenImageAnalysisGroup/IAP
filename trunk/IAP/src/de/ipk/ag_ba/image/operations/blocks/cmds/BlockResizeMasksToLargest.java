@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author klukas
  */
-public class BlockEqualize extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockResizeMasksToLargest extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private int w;
 	private int h;

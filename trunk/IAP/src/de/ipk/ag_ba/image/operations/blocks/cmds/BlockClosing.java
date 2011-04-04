@@ -10,21 +10,13 @@ public class BlockClosing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		// System.out.println("typ: RGB");
 		return closing(getInput().getMasks().getVis(), getInput().getImages().getVis());
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		// System.out.println("typ: FLUO");
 		return closing(getInput().getMasks().getFluo(), getInput().getImages().getFluo());
 	}
-	
-	// @Override
-	// protected FlexibleImage processNIRmask() {
-	// System.out.println("typ: NIR");
-	// return closing(getInput().getMasks().getNir(), getInput().getImages().getNir());
-	// }
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
 		
@@ -33,12 +25,6 @@ public class BlockClosing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private static FlexibleImage closing(FlexibleImage flMask, FlexibleImage flImage, int iBackgroundFill, int closingRepeat) {
-		
-		// dauert länger
-		// ImageOperation maskIo = new ImageOperation(flMask);
-		// maskIo.closing();
-		// return new FlexibleImage(maskIo.getImageAs2array());
-		
 		int[] rgbArray = flMask.getAs1A();
 		int h = flMask.getHeight();
 		int w = flMask.getWidth();
@@ -82,16 +68,7 @@ public class BlockClosing extends AbstractSnapshotAnalysisBlockFIS {
 					rgbArray[x + y * w] = rgbNonModifiedArray[x + y * w];
 			}
 		}
-		// System.out.println("test");
+		
 		return new FlexibleImage(rgbArray, w, h);
-		
-		// PrintImage.printImage(rgbArray, w, h);
-		//
-		// ImageOperation save = new ImageOperation(rgbArray, w, h);
-		// save.rotate(3);
-		// save.saveImage("/Users/entzian/Desktop/siebenteBild.png");
-		//
-		// PrintImage.printImage(rgbArray, w, h);
-		
 	}
 }

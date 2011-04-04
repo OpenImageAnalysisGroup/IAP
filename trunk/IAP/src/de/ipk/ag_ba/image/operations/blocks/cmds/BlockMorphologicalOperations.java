@@ -53,7 +53,7 @@ public class BlockMorphologicalOperations extends AbstractSnapshotAnalysisBlockF
 				break;
 		}
 		
-		return new ImageOperation(srcImage).applyMask2(maskIo.getImage(), options.getBackground()).getImage();
+		return new ImageOperation(srcImage).applyMask_ResizeSourceIfNeeded(maskIo.getImage(), options.getBackground()).getImage();
 	}
 	
 	private ImageOperation doMorphologicalOperationsOnSide(FlexibleImage srcImage, FlexibleImage workImage, ImageTyp typ) {

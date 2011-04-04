@@ -875,7 +875,7 @@ public class PixelSegmentation {
 			for (int cluster = 1; cluster < clusterAreaSizes.length; cluster++) {
 				Vector2d centerOfCluster = clusterCenters[cluster];
 				
-				double distanceFromCenterOfClusterToCenterOfImage = centerOfCluster.distance(w / 2d, h / 2d);
+				double distanceFromCenterOfClusterToCenterOfImage = centerOfCluster.distance(w / 2.5d, h / 2.5d);
 				
 				double d = distanceFromCenterToLeftTopEdge - distanceFromCenterOfClusterToCenterOfImage;
 				

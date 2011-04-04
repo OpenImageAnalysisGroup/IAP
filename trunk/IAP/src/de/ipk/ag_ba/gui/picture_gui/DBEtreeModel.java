@@ -5,6 +5,7 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -16,7 +17,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 
 /**
  * @author klukas
@@ -106,31 +106,46 @@ public class DBEtreeModel implements TreeModel {
 		public void run() {
 			int p = 0;
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
-			for (SampleInterface sample : condition) {
-				final MongoTreeNode sampNode = new MongoTreeNode(condNode, dataChangedListener, experiment, sample, sample
-									.toString(), readOnly);
+			
+			TreeMap<String, ArrayList<SampleInterface>> samples = new TreeMap<String, ArrayList<SampleInterface>>();
+			
+			for (SampleInterface sample : condition.getSortedSamples()) {
+				MongoTreeNode sampNode = new MongoTreeNode(condNode, dataChangedListener,
+						experiment, sample, sample.toString(), readOnly);
 				
 				sampNode.setIsLeaf(false);
 				sampNode.setIndex(p++);
-				sampNode.setGetChildrenMethod(new GetMeasurements(sampNode, experiment, sample, readOnly,
-									dataChangedListener));
-				children.add(sampNode);
+				String key = sample.getTime() + " / " + sample.getTimeUnit();
+				if (!samples.containsKey(key)) {
+					samples.put(key, new ArrayList<SampleInterface>());
+					
+					ArrayList<SampleInterface> sampleArray = samples.get(key);
+					sampleArray.add(sample);
+					
+					sampNode.setGetChildrenMethod(new GetMeasurements(sampNode, experiment, sampleArray, readOnly,
+							dataChangedListener));
+					children.add(sampNode);
+				} else {
+					ArrayList<SampleInterface> sampleArray = samples.get(key);
+					sampleArray.add(sample);
+				}
 			}
+			
 			condNode.setChildren(children.toArray(new DBEtreeNodeModelHelper[0]));
 		}
 	}
 	
 	private final class GetMeasurements implements Runnable {
 		boolean readOnly;
-		private final SampleInterface sample;
+		private final ArrayList<SampleInterface> samples;
 		private final MongoTreeNode sampNode;
 		private final ExperimentInterface experiment;
 		private final ActionListener dataChangedListener;
 		
-		private GetMeasurements(MongoTreeNode sampNode, ExperimentInterface experiment, SampleInterface sample,
+		private GetMeasurements(MongoTreeNode sampNode, ExperimentInterface experiment, ArrayList<SampleInterface> samples,
 							boolean readOnly, ActionListener dataChangedListener) {
 			this.readOnly = readOnly;
-			this.sample = sample;
+			this.samples = samples;
 			this.sampNode = sampNode;
 			this.experiment = experiment;
 			this.dataChangedListener = dataChangedListener;
@@ -139,18 +154,10 @@ public class DBEtreeModel implements TreeModel {
 		public void run() {
 			int p = 0;
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
-			if (sample instanceof Sample3D) {
-				for (Measurement meas : ((Sample3D) sample).getMeasurements(null)) {
-					MongoTreeNode measNode = new MongoTreeNode(sampNode, dataChangedListener, experiment, meas, meas
-										.toString(), readOnly);
-					measNode.setIsLeaf(true);
-					measNode.setIndex(p++);
-					children.add(measNode);
-				}
-			} else {
+			for (SampleInterface sample : samples) {
 				for (Measurement meas : sample) {
 					MongoTreeNode measNode = new MongoTreeNode(sampNode, dataChangedListener, experiment, meas,
-							meas.toString(), readOnly);
+								meas.toString(), readOnly);
 					measNode.setIsLeaf(true);
 					measNode.setIndex(p++);
 					children.add(measNode);
