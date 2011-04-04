@@ -38,4 +38,33 @@ public class IAPimages {
 		else
 			return "img/ext/network-workgroup-power.png";
 	}
+	
+	public static String getFolderRemoteOpen() {
+		return "img/ext/folder-remote-open.png";
+	}
+	
+	public static String getFolderRemoteClosed() {
+		return "img/ext/folder-remote.png";
+	}
+	
+	public static String getCloudResult() {
+		return "img/ext/applications-office.png";
+	}
+	
+	public static String getCloudResultActive() {
+		return "img/ext/applications-office.png";
+	}
+	
+	public static String getPhytochamber() {
+		return "img/ext/phyto.png";
+	}
+	
+	public static String getBarleyGreenhouse() {
+		return "img/000Grad_3_.png";
+	}
+	
+	public static String getMaizeGreenhouse() {
+		return "img/maisMultiple.png";
+	}
+	
 }

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -28,9 +29,13 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	private NavigationButton src;
 	private ArrayList<ExperimentHeaderInterface> experimentList;
 	private final MongoDB m;
+	private final boolean limitToResuls;
+	private final boolean limitToData;
 	
-	public MongoExperimentsNavigationAction(MongoDB m) {
+	public MongoExperimentsNavigationAction(MongoDB m, boolean limitToData, boolean limitToResults) {
 		super("Access " + m.getDisplayName());
+		this.limitToData = limitToData;
+		this.limitToResuls = limitToResults;
 		this.m = m;
 	}
 	
@@ -44,14 +49,15 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
-		res.add(new NavigationButton(new DomainLogoutAction(), src.getGUIsetting()));
-		
-		NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
-		
-		NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Add Files", "img/ext/user-desktop.png",
+		if (!limitToResuls) {
+			res.add(new NavigationButton(new DomainLogoutAction(), src.getGUIsetting()));
+			
+			NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
+			
+			NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Add Files", "img/ext/user-desktop.png",
 							"img/ext/user-desktop.png", src.getGUIsetting());
-		res.add(uploadFilesEntity);
-		
+			res.add(uploadFilesEntity);
+		}
 		// gruppe => user => experiment
 		
 		if (experimentList == null) {
@@ -77,18 +83,27 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				experiments.get(group).get(user).add(eh);
 			}
 			
-			res.add(new NavigationButton(new CloundManagerNavigationAction(m), src.getGUIsetting()));
+			if (!limitToResuls)
+				res.add(new NavigationButton(
+						new CloundManagerNavigationAction(m, new MongoExperimentsNavigationAction(m, false, true)), src.getGUIsetting()));
 			
-			res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
+			if (!limitToResuls)
+				res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
 			
 			for (String group : experiments.keySet()) {
+				if (limitToResuls && !group.toUpperCase().contains("ANALYSIS RESULTS"))
+					continue;
+				if (limitToData && group.toUpperCase().contains("ANALYSIS RESULTS"))
+					continue;
+				
 				res.add(new NavigationButton(createMongoGroupNavigationAction(group, experiments.get(group)), src
 									.getGUIsetting()));
 			}
 			
-			if (trashed.size() > 0) {
-				res.add(new NavigationButton(getTrashedExperimentsAction(trashed, m), src.getGUIsetting()));
-			}
+			if (!limitToResuls)
+				if (trashed.size() > 0) {
+					res.add(new NavigationButton(getTrashedExperimentsAction(trashed, m), src.getGUIsetting()));
+				}
 		}
 		return res;
 	}
@@ -162,17 +177,49 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			
 			@Override
 			public String getDefaultImage() {
-				return "img/ext/network-workgroup.png";
+				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
+					return IAPimages.getCloudResult();
+				if (group.toUpperCase().startsWith("APH_"))
+					return IAPimages.getPhytochamber();
+				else
+					if (group.toUpperCase().startsWith("BGH_"))
+						return IAPimages.getBarleyGreenhouse();
+					else
+						if (group.toUpperCase().startsWith("CGH_"))
+							return IAPimages.getMaizeGreenhouse();
+						else
+							return "img/ext/network-workgroup.png";
 			}
 			
 			@Override
 			public String getDefaultNavigationImage() {
-				return "img/ext/network-workgroup-power.png";
+				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
+					return IAPimages.getCloudResultActive();
+				if (group.toUpperCase().startsWith("APH_"))
+					return IAPimages.getPhytochamber();
+				else
+					if (group.toUpperCase().startsWith("BGH_"))
+						return IAPimages.getBarleyGreenhouse();
+					else
+						if (group.toUpperCase().startsWith("CGH_"))
+							return IAPimages.getMaizeGreenhouse();
+						else
+							return "img/ext/network-workgroup-power.png";
 			}
 			
 			@Override
 			public String getDefaultTitle() {
-				return group;
+				String db = group;
+				if (db.startsWith("APH_"))
+					return "Phytoch. (20" + db.substring("APH_".length()) + ")";
+				else
+					if (db.startsWith("CGH_"))
+						return "Maize Greenh. (20" + db.substring("CGH_".length()) + ")";
+					else
+						if (db.startsWith("BGH_"))
+							return "Barley Greenh. (20" + db.substring("BGH_".length()) + ")";
+						else
+							return db;
 			}
 			
 		};
@@ -212,12 +259,12 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			
 			@Override
 			public String getDefaultImage() {
-				return "img/ext/folder-remote.png";
+				return IAPimages.getFolderRemoteClosed();
 			}
 			
 			@Override
 			public String getDefaultNavigationImage() {
-				return "img/ext/folder-remote-open.png";
+				return IAPimages.getFolderRemoteOpen();
 			}
 			
 			@Override

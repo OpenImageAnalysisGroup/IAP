@@ -48,7 +48,7 @@ public class Phenotyping extends AbstractNavigationAction {
 			phenoDBcommands.add(lemnaEntity);
 		
 		for (MongoDB m : MongoDB.getMongos()) {
-			NavigationAction mongoExperiments = new MongoExperimentsNavigationAction(m);
+			NavigationAction mongoExperiments = new MongoExperimentsNavigationAction(m, true, false);
 			NavigationButton mongo = new NavigationButton(mongoExperiments, m.getDisplayName(), "img/ext/network-mongo.png",
 								"img/ext/network-mongo-gray.png", src != null ? src.getGUIsetting() : guiSetting);
 			

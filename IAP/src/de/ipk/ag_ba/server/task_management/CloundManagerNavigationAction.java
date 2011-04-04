@@ -14,6 +14,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.HostInformationAction;
 import de.ipk.ag_ba.gui.navigation_actions.JobStatusAction;
+import de.ipk.ag_ba.gui.navigation_actions.MongoExperimentsNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -25,10 +26,12 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	private NavigationButton src;
 	private final MongoDB m;
+	private final MongoExperimentsNavigationAction en;
 	
-	public CloundManagerNavigationAction(MongoDB m) {
+	public CloundManagerNavigationAction(MongoDB m, MongoExperimentsNavigationAction mongoExperimentsNavigationAction) {
 		super("Task- and Server-Management");
 		this.m = m;
+		this.en = mongoExperimentsNavigationAction;
 	}
 	
 	@Override
@@ -56,6 +59,11 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			ErrorMsg.addErrorMessage(e);
 		}
 		
+		if (en != null) {
+			for (NavigationButton r : en.getResultNewActionSet())
+				res.add(r);
+		}
+		
 		try {
 			for (CloudHost ip : m.batchGetAvailableHosts(150000)) {
 				NavigationButton n = new NavigationButton(new HostInformationAction(m, ip), guiSetting);
@@ -78,6 +86,9 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
+		if (en != null) {
+			en.performActionCalculateResults(src);
+		}
 	}
 	
 	@Override

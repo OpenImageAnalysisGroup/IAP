@@ -114,7 +114,7 @@ public class MongoDB {
 		
 		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
 		res.add(getDefaultCloud());
-		res.add(new MongoDB("Data Processing 2", "cloud2", "ba-13.ipk-gatersleben.de,", null, null, HashType.MD5));
+		// res.add(new MongoDB("Data Processing 2", "cloud2", "ba-13.ipk-gatersleben.de,", null, null, HashType.MD5));
 		// } else
 		// res.add(getLocalDB());
 		// }
