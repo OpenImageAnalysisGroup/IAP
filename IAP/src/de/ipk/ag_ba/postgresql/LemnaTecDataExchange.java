@@ -730,11 +730,12 @@ public class LemnaTecDataExchange {
 			ResultSet rs = ps.executeQuery();
 			
 			while (rs.next()) {
+				
 				String plantID = rs.getString(1);
 				
 				String metaName = rs.getString(2);
 				String metaValue = rs.getString(3);
-				
+				// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 				if (!res.containsKey(plantID)) {
 					res.put(plantID, new Condition(null));
 					if (header.getDatabase().contains("BGH_"))
@@ -746,7 +747,8 @@ public class LemnaTecDataExchange {
 				}
 				
 				if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart"))
-					res.get(plantID).setSpecies(filterName(metaValue));
+					// res.get(plantID).setSpecies(filterName(metaValue));
+					res.get(plantID).setSpecies(metaValue);
 				else
 					if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname") || metaName.equalsIgnoreCase("Name")
 							|| metaName.equalsIgnoreCase("GENOTYP"))
@@ -776,7 +778,7 @@ public class LemnaTecDataExchange {
 	}
 	
 	private void addSequenceInfo(Condition condition, String value) {
-		String current = condition.getSequence();
+		String current = (condition.getSequence() != null) ? condition.getSequence() : "";
 		if (current.length() > 0)
 			current += ";";
 		current += value;
