@@ -79,6 +79,15 @@ public class CloudComputingService {
 			System.out.println(": detected command line parameter - enabling half CPU utilization");
 			SystemAnalysis.setUseHalfCpuPower(true);
 		}
+		if (args.length > 0) {
+			try {
+				Integer i = Integer.parseInt(args[0]);
+				System.out.println(": detected command line parameter - using " + i + " CPUs");
+				SystemAnalysis.setUseCpu(i);
+			} catch (Exception e) {
+				System.out.println(": unknown command line parameter");
+			}
+		}
 		SystemInfoExt si = new SystemInfoExt();
 		System.out.println("CPUs (sockets,physical,logical): " +
 				si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +

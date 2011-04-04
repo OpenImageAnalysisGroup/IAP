@@ -12,6 +12,7 @@ public class SystemAnalysis {
 	
 	private static boolean fullPower = false;
 	private static boolean halfPower = false;
+	private static int fixedCPUload = 0;
 	
 	/**
 	 * Use getNumberOfCPUs to determine the number of CPUs to be used for
@@ -32,6 +33,8 @@ public class SystemAnalysis {
 	}
 	
 	public static int getNumberOfCPUs() {
+		if (fixedCPUload > 0)
+			return fixedCPUload;
 		boolean useHalfCPUpower = Runtime.getRuntime().availableProcessors() > 8;
 		if (fullPower)
 			useHalfCPUpower = false;
@@ -142,6 +145,10 @@ public class SystemAnalysis {
 		if (AttributeHelper.macOSrunning())
 			return "mac";
 		return "other";
+	}
+	
+	public static void setUseCpu(int cpus) {
+		fixedCPUload = cpus;
 	}
 	
 }

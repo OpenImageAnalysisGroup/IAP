@@ -143,7 +143,7 @@ public class TaskDescription {
 								if (sn.indexOf(".") > 0)
 									sn = sn.substring(sn.lastIndexOf(".") + 1);
 								e.getHeader().setExperimentname(sn + ": " + experimentInput.getExperimentName());
-								e.getHeader().setImportusergroup("Cloud Analysis Results");
+								e.getHeader().setImportusergroup("Analysis Results");
 								e.getHeader().setDatabaseId("");
 								for (SubstanceInterface si : e) {
 									for (ConditionInterface ci : si) {

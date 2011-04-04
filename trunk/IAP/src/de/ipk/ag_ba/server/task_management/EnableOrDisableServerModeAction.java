@@ -40,7 +40,7 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		NavigationAction cmna = new CloundManagerNavigationAction(m);
+		NavigationAction cmna = new CloundManagerNavigationAction(m, null);
 		try {
 			cmna.performActionCalculateResults(src);
 			return cmna.getResultNewActionSet();
