@@ -413,6 +413,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 							+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
 					m.setValue(che.getNumberOfPixels() / pixelCount);
 					m.setUnit("proportion");
+					m.getParentSample().setRowId(0);
 					output.add(m);
 					
 					m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
@@ -420,6 +421,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 							+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
 					m.setValue(pixelCount);
 					m.setUnit("pixels");
+					m.getParentSample().setRowId(0);
 					output.add(m);
 				}
 			}
@@ -429,6 +431,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 						+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
 				m.setValue(h - geo.getTop());
 				m.setUnit("pixel");
+				m.getParentSample().setRowId(0);
 				output.add(m);
 				
 				m = new NumericMeasurement(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
@@ -436,6 +439,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 						+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
 				m.setValue(h - geo.getLeft() - (h - geo.getRight()));
 				m.setUnit("pixel");
+				m.getParentSample().setRowId(0);
 				output.add(m);
 			}
 			m = new NumericMeasurement(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
@@ -443,6 +447,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 					+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
 			m.setValue(geo.getFilledPixels());
 			m.setUnit("pixel");
+			m.getParentSample().setRowId(0);
 			output.add(m);
 			
 			// m = new NumericMeasurement(limg, "filled (percent) ("
