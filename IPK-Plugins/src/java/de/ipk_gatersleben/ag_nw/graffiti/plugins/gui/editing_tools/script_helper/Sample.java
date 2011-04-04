@@ -349,31 +349,31 @@ public class Sample implements SampleInterface {
 			return getTime() < sd.getTime() ? -1 : (getTime() == sd.getTime() ? 0 : 1);
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Sample))
-			return false;
-		Sample s = (Sample) obj;
-		
-		if (rowId != s.rowId || time != s.time)
-			return false;
-		
-		if (ttestInfo != s.ttestInfo)
-			return false;
-		
-		String s1 = measurementtool + ";" + timeUnit;
-		String s2 = s.measurementtool + ";" + s.timeUnit;
-		return s1.equals(s2);
-	}
-	
-	@Override
-	public int hashCode() {
-		String s1 = measurementtool + ";" + rowId + ";" + time + ";" + timeUnit + ";" + ttestInfo.name();
-		return s1.hashCode();
-	}
-	
+	// @Override
+	// public boolean equals(Object obj) {
+	// if (obj == null)
+	// return false;
+	// if (!(obj instanceof Sample))
+	// return false;
+	// Sample s = (Sample) obj;
+	//
+	// if (rowId != s.rowId || time != s.time)
+	// return false;
+	//
+	// if (ttestInfo != s.ttestInfo)
+	// return false;
+	//
+	// String s1 = measurementtool + ";" + timeUnit;
+	// String s2 = s.measurementtool + ";" + s.timeUnit;
+	// return s1.equals(s2);
+	// }
+	//
+	// @Override
+	// public int hashCode() {
+	// String s1 = measurementtool + ";" + rowId + ";" + time + ";" + timeUnit + ";" + ttestInfo.name();
+	// return s1.hashCode();
+	// }
+	//
 	public SampleInterface clone(ConditionInterface parent) {
 		SampleInterface s = Experiment.getTypeManager().getNewSample(parent);
 		s.setMeasurementtool(getMeasurementtool());

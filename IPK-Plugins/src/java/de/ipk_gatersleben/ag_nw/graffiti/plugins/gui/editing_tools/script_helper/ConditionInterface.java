@@ -171,4 +171,6 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public ConditionInterface clone(SubstanceInterface parent);
 	
+	public ArrayList<SampleInterface> getSortedSamples();
+	
 }

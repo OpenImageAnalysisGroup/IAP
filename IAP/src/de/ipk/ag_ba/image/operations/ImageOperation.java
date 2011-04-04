@@ -23,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import org.ObjectRef;
+import org.Vector2d;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -82,17 +83,17 @@ public class ImageOperation extends ImageConverter {
 	}
 	
 	public ImageOperation replaceColors(int search, int replace) {
-		int[] a = getImageAs1array();
-		int[] b = new int[a.length];
+		int[] source = getImageAs1array();
+		int[] target = new int[source.length];
 		
 		int idx = 0;
-		for (int v : a) {
+		for (int v : source) {
 			if (v != search)
-				b[idx++] = v;
+				target[idx++] = v;
 			else
-				b[idx++] = replace;
+				target[idx++] = replace;
 		}
-		return new ImageOperation(b, getImage().getWidth(), getImage().getHeight());
+		return new ImageOperation(target, getImage().getWidth(), getImage().getHeight());
 	}
 	
 	public ImageOperation rotate(double degree) {
@@ -123,74 +124,70 @@ public class ImageOperation extends ImageConverter {
 		image.setProcessor(processor2.convertToRGB());
 	}
 	
-	// private static long iiii = 0;
-	
-	public ImageOperation applyMask(FlexibleImage mask, int background) {
+	/**
+	 * Copies the content of the stored image of this operation onto the given mask (and returns the result).
+	 * Pixels where the mask has not the background color are set according to the source image.
+	 * Pixels with background color are not modified.
+	 * 
+	 * @param mask
+	 *           The mask which is used as a template.
+	 * @param background
+	 *           The color which is used to determine which parts of the mask are considered as
+	 *           background (empty), all other pixels are considered as foreground.
+	 * @return The source image, filtered by the given mask.
+	 */
+	public ImageOperation applyMask_ResizeMaskIfNeeded(FlexibleImage mask, int background) {
 		
 		if (image.getWidth() != mask.getWidth() || image.getHeight() != mask.getHeight()) {
 			mask = new ImageOperation(mask).resize(image.getWidth(), image.getHeight()).getImage();
 		}
 		
-		int[] mask1A = mask.getAs1A();
-		
+		int[] maskPixels = mask.getAs1A();
 		int[] originalImage = ImageConverter.convertIJto1A(image);
-		// PrintImage.printImage(image.getBufferedImage(), "IMAGE " + iiii);
-		// PrintImage.printImage(mask.getBufferedImage(), "MASK FOR IMAGE " + iiii);
 		
 		int idx = 0;
-		// int background = image.getProcessor().getBackground();
-		// int foreground = Color.BLUE.getRGB();
-		for (int m : mask.getAs1A()) {
-			if (m == background)
-				mask1A[idx] = background;
-			else
-				mask1A[idx] = originalImage[idx];
+		for (int maskPixel : maskPixels) {
+			if (maskPixel != background)
+				maskPixels[idx] = originalImage[idx];
 			idx++;
 		}
 		
-		// PrintImage.printImage(mask1A, image.getWidth(), image.getHeight());
-		
-		return new ImageOperation(mask1A, mask.getWidth(), mask.getHeight());
-		// int idx = 0;
-		// for (int m : io.getImageAs1array()) {
-		// if (m == background)
-		// newImage1A[idx] = background;
-		// else
-		// newImage1A[idx] = originalImage1A[idx];
-		// idx++;
+		return new ImageOperation(maskPixels, mask.getWidth(), mask.getHeight());
 	}
 	
-	public ImageOperation applyMask2(FlexibleImage mask, int background) {
+	/**
+	 * Copies the content of the stored image of this operation onto the given mask (and returns the result).
+	 * Pixels where the mask has not the background color are set according to the source image.
+	 * Pixels with background color are not modified.
+	 * 
+	 * @param mask
+	 *           The mask which is used as a template.
+	 * @param background
+	 *           The color which is used to determine which parts of the mask are considered as
+	 *           background (empty), all other pixels are considered as foreground.
+	 * @return The source image, filtered by the given mask.
+	 */
+	public ImageOperation applyMask_ResizeSourceIfNeeded(FlexibleImage mask, int background) {
 		
 		FlexibleImage srcImage = new FlexibleImage(image);
 		
+		// if the source image size is not equal to the given mask, the source image is resized
+		// ToDo: think or tests, shouldn't the mask be resized?
 		if (srcImage.getWidth() != mask.getWidth() || srcImage.getHeight() != mask.getHeight()) {
 			srcImage = new ImageOperation(srcImage).resize(mask.getWidth(), mask.getHeight()).getImage();
 		}
 		
-		int[] result = new int[mask.getWidth() * mask.getHeight()];;
-		
+		int[] maskPixels = mask.getAs1A();
 		int[] originalImage = srcImage.getAs1A();
-		// PrintImage.printImage(image.getBufferedImage(), "IMAGE ");
-		// PrintImage.printImage(mask.getAsBufferedImage(), "MASK FOR IMAGE ");
 		
 		int idx = 0;
-		
-		for (int m : mask.getAs1A()) {
-			result[idx] = m == background ? background : originalImage[idx];
+		for (int maskPixel : maskPixels) {
+			if (maskPixel != background)
+				maskPixels[idx] = originalImage[idx];
 			idx++;
 		}
 		
-		// PrintImage.printImage(mask1A, image.getWidth(), image.getHeight());
-		
-		return new ImageOperation(result, mask.getWidth(), mask.getHeight());
-		// int idx = 0;
-		// for (int m : io.getImageAs1array()) {
-		// if (m == background)
-		// newImage1A[idx] = background;
-		// else
-		// newImage1A[idx] = originalImage1A[idx];
-		// idx++;
+		return new ImageOperation(maskPixels, mask.getWidth(), mask.getHeight());
 	}
 	
 	/**
@@ -217,10 +214,11 @@ public class ImageOperation extends ImageConverter {
 	
 	/**
 	 * Enlarge area of mask.
+	 * es wird der 3x3 Minimum-Filter genutzt
 	 * <p>
 	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
-	public ImageOperation dilate() { // es wird der 3x3 Minimum-Filter genutzt
+	public ImageOperation dilate() {
 		image.getProcessor().dilate();
 		return this;
 	}
@@ -306,11 +304,12 @@ public class ImageOperation extends ImageConverter {
 	
 	/**
 	 * Erosion, then dilation. Removes small objects in the mask.
+	 * es wird der 3x3 Minimum-Filter genutzt
 	 * <p>
 	 * The erosion of the dark-blue square by a disk, resulting in the light-blue square:<br>
 	 * <img src="http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png" >
 	 */
-	public void opening() { // es wird der 3x3 Minimum-Filter genutzt
+	public void opening() {
 		image.getProcessor().erode();
 		image.getProcessor().dilate();
 	}
@@ -452,6 +451,22 @@ public class ImageOperation extends ImageConverter {
 		return new ImageOperation(imgArr);
 	}
 	
+	public ImageOperation cutAreaCircle(int bx, int by, int d, int iBackgroundFill) {
+		int[][] imgArr = new FlexibleImage(image).getAs2A();
+		Vector2d center = new Vector2d(bx, by);
+		for (int x = 0; x < image.getWidth(); x++)
+			for (int y = 0; y < image.getHeight(); y++) {
+				boolean inside = center.distance(x, y) < d;
+				if (!inside)
+					imgArr[x][y] = iBackgroundFill;
+			}
+		return new ImageOperation(imgArr);
+	}
+	
+	/**
+	 * TODO: not yet implemented
+	 */
+	@Deprecated
 	public Dimension2D centerOfGravity() {
 		
 		int[][] img = ImageConverter.convertIJto2A(image);
@@ -546,6 +561,10 @@ public class ImageOperation extends ImageConverter {
 		// return new Point2D.Double(centreOfGravityI, centreOfGravityJ);
 	}
 	
+	/**
+	 * TODO: not yet implemented
+	 */
+	@Deprecated
 	public Dimension2D getDiameter() {
 		
 		Dimension2D dimension = null;
@@ -1175,5 +1194,44 @@ public class ImageOperation extends ImageConverter {
 			return new ImageOperation(new FlexibleImage(res));
 		} else
 			return this;
+	}
+	
+	public ImageOperation crop(double pLeft, double pRight, double pTop, double pBottom) {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		
+		int smallestX = (int) (w * pLeft);
+		int largestX = (int) (w * (1 - pRight));
+		int smallestY = (int) (h * pTop);
+		int largestY = (int) (h * (1 - pBottom));
+		
+		int[][] img = getImageAs2array();
+		
+		int[][] res = new int[largestX - smallestX + 1][largestY - smallestY + 1];
+		for (int x = smallestX; x <= largestX; x++) {
+			for (int y = smallestY; y <= largestY; y++) {
+				res[x - smallestX][y - smallestY] = img[x][y];
+			}
+		}
+		
+		return new ImageOperation(new FlexibleImage(res));
+	}
+	
+	public ImageOperation filterByHSV_value(double t, int clearColor) {
+		int[] pixels = getImageAs1array();
+		float[] hsb = new float[3];
+		for (int index = 0; index < pixels.length; index++) {
+			int rgb = pixels[index];
+			// int a = ((rgb >> 24) & 0xff);
+			int r = ((rgb >> 16) & 0xff);
+			int g = ((rgb >> 8) & 0xff);
+			int b = (rgb & 0xff);
+			
+			Color.RGBtoHSB(r, g, b, hsb);
+			
+			if (hsb[2] < t)
+				pixels[index] = clearColor;
+		}
+		return new ImageOperation(pixels, getImage().getWidth(), getImage().getHeight());
 	}
 }

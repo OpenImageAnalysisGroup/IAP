@@ -2,6 +2,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -714,6 +715,13 @@ public class Condition implements ConditionInterface {
 		c.setVariety(getVariety());
 		c.setRowId(getRowId());
 		return c;
+	}
+	
+	@Override
+	public ArrayList<SampleInterface> getSortedSamples() {
+		ArrayList<SampleInterface> res = new ArrayList<SampleInterface>(samples);
+		Collections.sort(res);
+		return res;
 	}
 	
 }

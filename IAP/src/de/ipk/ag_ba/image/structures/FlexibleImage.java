@@ -160,4 +160,21 @@ public class FlexibleImage {
 		io = io.crop();
 		return io.getImage();
 	}
+	
+	/**
+	 * @param pLeft
+	 *           0..1 percentage cut left
+	 * @param pRight
+	 *           0..1 percentage cut right
+	 * @param pTop
+	 *           0..1 percentage cut top
+	 * @param pBottom
+	 *           0..1 percentage cut bottom
+	 * @return
+	 */
+	public FlexibleImage crop(double pLeft, double pRight, double pTop, double pBottom) {
+		ImageOperation io = new ImageOperation(image);
+		io = io.crop(pLeft, pRight, pTop, pBottom);
+		return io.getImage();
+	}
 }

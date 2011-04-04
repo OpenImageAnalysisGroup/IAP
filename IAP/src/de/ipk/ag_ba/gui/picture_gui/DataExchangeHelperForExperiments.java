@@ -215,19 +215,26 @@ public class DataExchangeHelperForExperiments {
 							primary = null;
 						} else
 							if (mde instanceof Sample3D) {
-								Sample3D s3d = (Sample3D) mde;
+								Sample3D s3dXX = (Sample3D) mde;
+								String a = s3dXX.getTime() + "/" + s3dXX.getTimeUnit();
 								primary = null;
-								for (NumericMeasurementInterface nmi : s3d.getMeasurements((MeasurementNodeType) null)) {
-									if (nmi instanceof ImageData) {
-										ImageData id = (ImageData) nmi;
-										primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(), true, id);
-									} else
-										if (nmi instanceof VolumeData) {
-											VolumeData id = (VolumeData) nmi;
+								for (SampleInterface s3dI : s3dXX.getParentCondition().getSortedSamples()) {
+									String b = s3dI.getTime() + "/" + s3dI.getTimeUnit();
+									if (!a.equals(b))
+										continue;
+									Sample3D s3d = (Sample3D) s3dI;
+									for (NumericMeasurementInterface nmi : s3d.getMeasurements((MeasurementNodeType) null)) {
+										if (nmi instanceof ImageData) {
+											ImageData id = (ImageData) nmi;
 											primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(), true, id);
-										}
-									if (primary != null)
-										bbb.add(primary);
+										} else
+											if (nmi instanceof VolumeData) {
+												VolumeData id = (VolumeData) nmi;
+												primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(), true, id);
+											}
+										if (primary != null)
+											bbb.add(primary);
+									}
 								}
 								primary = null;
 							} else {

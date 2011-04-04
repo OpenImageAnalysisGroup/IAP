@@ -290,7 +290,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		NumericMeasurement3D m;
 		boolean calcHistogram = true;
 		if (calcHistogram) {
-			ColorHistogram histogram = new ColorHistogram(500);
+			ColorHistogram histogram = new ColorHistogram(10);
 			histogram.countColorPixels(arrayRGB);
 			double pixelCount = histogram.getNumberOfFilledPixels();
 			for (ColorHistogramEntry che : histogram.getColorEntries()) {
@@ -298,7 +298,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 				int pos = sn.indexOf(".");
 				if (pos > 0)
 					sn = sn.substring(0, pos);
-				m = new NumericMeasurement3D(limg, sn + "-relative", limg.getParentSample()
+				m = new NumericMeasurement3D(limg, sn + "-relative hue=" + che.getHue(), limg.getParentSample()
 									.getParentCondition().getExperimentName()
 									+ " (" + experimentNameExtension + ")");
 				m.setValue(che.getNumberOfPixels() / pixelCount);

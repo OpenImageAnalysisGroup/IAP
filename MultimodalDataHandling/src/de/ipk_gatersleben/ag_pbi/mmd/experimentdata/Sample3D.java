@@ -212,28 +212,28 @@ public class Sample3D extends Sample {
 		attributeValueMap.put("component", component);
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Sample3D))
-			return false;
-		boolean s = super.equals(obj);
-		if (!s)
-			return false;
-		
-		if (component == null && ((Sample3D) obj).component == null)
-			return true;
-		if (component == null || ((Sample3D) obj).component == null)
-			return false;
-		return component.equals(((Sample3D) obj).component);
-	}
-	
-	@Override
-	public int hashCode() {
-		return (super.hashCode() + component).hashCode();
-	}
-	
+	// @Override
+	// public boolean equals(Object obj) {
+	// if (obj == null)
+	// return false;
+	// if (!(obj instanceof Sample3D))
+	// return false;
+	// boolean s = super.equals(obj);
+	// if (!s)
+	// return false;
+	//
+	// if (component == null && ((Sample3D) obj).component == null)
+	// return true;
+	// if (component == null || ((Sample3D) obj).component == null)
+	// return false;
+	// return component.equals(((Sample3D) obj).component);
+	// }
+	//
+	// @Override
+	// public int hashCode() {
+	// return (super.hashCode() + component).hashCode();
+	// }
+	//
 	@Override
 	public String toString() {
 		if (component != null && component.length() > 0)

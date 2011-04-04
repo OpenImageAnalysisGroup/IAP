@@ -104,6 +104,6 @@ public abstract class BlockPostProcessEdgeErode extends AbstractSnapshotAnalysis
 				}
 		}
 		
-		return new ImageOperation(srcImage).applyMask2(maskIo.getImage(), options.getBackground()).getImage();
+		return new ImageOperation(srcImage).applyMask_ResizeSourceIfNeeded(maskIo.getImage(), options.getBackground()).getImage();
 	}
 }

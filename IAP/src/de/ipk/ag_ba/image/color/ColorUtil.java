@@ -558,6 +558,36 @@ public class ColorUtil {
 		return labList;
 	}
 	
+	public static LinkedList<double[][]> getLABfromRGB(FlexibleImage workImage, boolean exactAndSlow, int iBackgroundColor) {
+		LinkedList<double[][]> labList = new LinkedList<double[][]>();
+		
+		int[][] workArray = workImage.getAs2A();
+		double[][] lArray = new double[workArray.length][workArray[0].length];
+		double[][] aArray = new double[workArray.length][workArray[0].length];
+		double[][] bArray = new double[workArray.length][workArray[0].length];
+		
+		for (int i = 0; i < workArray.length; i++) {
+			for (int j = 0; j < workArray[0].length; j++) {
+				if (workArray[i][j] == iBackgroundColor) {
+					lArray[i][j] = 0;
+					aArray[i][j] = 0;
+					bArray[i][j] = 0;
+				} else {
+					Color_CIE_Lab lab = new Color_CIE_Lab(workArray[i][j], exactAndSlow);
+					lArray[i][j] = lab.getL();
+					aArray[i][j] = lab.getA();
+					bArray[i][j] = lab.getB();
+				}
+			}
+		}
+		
+		labList.add(lArray);
+		labList.add(aArray);
+		labList.add(bArray);
+		
+		return labList;
+	}
+	
 	public static int getInt(int alpha, int red, int green, int blue) {
 		int i = 0;
 		i += alpha << 24;

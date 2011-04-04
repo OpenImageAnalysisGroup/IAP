@@ -7,11 +7,12 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 /**
  * @return Modified images according to the given masks.
  */
-public class BlockApplyMaskOnFluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockCopyVisContentOnFluoMask extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return new ImageOperation(getInput().getImages().getFluo()).applyMask2(getInput().getMasks().getFluo(), options.getBackground()).getImage();
+		return new ImageOperation(getInput().getImages().getVis()).applyMask_ResizeSourceIfNeeded(
+				getInput().getMasks().getFluo(), options.getBackground()).getImage();
 	}
 	
 }

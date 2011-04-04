@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MainFrame.java,v 1.4 2011-02-23 14:41:29 klukas Exp $
+// $Id: MainFrame.java,v 1.5 2011-04-04 06:46:20 klukas Exp $
 
 package org.graffiti.editor;
 
@@ -186,7 +186,7 @@ import scenario.ScenarioService;
 /**
  * Constructs a new graffiti frame, which contains the main gui components.
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class MainFrame extends JFrame implements SessionManager, SessionListener, PluginManagerListener,
 					UndoableEditListener, EditorDefaultValues, IOManager.IOManagerListener, ViewManager.ViewManagerListener,
@@ -1431,6 +1431,8 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	
 	public void addNewRecentFileMenuItem(final File file) {
 		if (!file.exists())
+			return;
+		if (enclosingseparator == null)
 			return;
 		enclosingseparator.setVisible(true);
 		// check if entry already in list

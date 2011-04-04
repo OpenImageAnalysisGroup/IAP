@@ -145,7 +145,7 @@ public class ImageProcessorOptions {
 		setCameraTyp(CameraTyp.TOP);
 		setNeighbourhood(NeighbourhoodSetting.NB4);
 		
-		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB, (0.001d) / 2);
+		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB, (0.001d) / 3);
 		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, (0.001d) / 2);
 		addDoubleSetting(Setting.SCALE, scale);
 		addIntSetting(Setting.ROTATION_ANGLE, -3);
