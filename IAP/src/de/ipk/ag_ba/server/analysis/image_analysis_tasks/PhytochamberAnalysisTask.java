@@ -290,23 +290,23 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 		NumericMeasurement3D m;
 		boolean calcHistogram = true;
 		if (calcHistogram) {
-			ColorHistogram histogram = new ColorHistogram(10);
+			String sn = limg.getSubstanceName();
+			ColorHistogram histogram = new ColorHistogram(sn.startsWith("fluo") ? 100 : 10);
 			histogram.countColorPixels(arrayRGB);
 			double pixelCount = histogram.getNumberOfFilledPixels();
 			for (ColorHistogramEntry che : histogram.getColorEntries()) {
-				String sn = limg.getSubstanceName();
 				int pos = sn.indexOf(".");
 				if (pos > 0)
 					sn = sn.substring(0, pos);
-				m = new NumericMeasurement3D(limg, sn + "-relative hue=" + che.getHue(), limg.getParentSample()
+				m = new NumericMeasurement3D(limg, sn + ": hue=" + che.getHue(), limg.getParentSample()
 									.getParentCondition().getExperimentName()
 									+ " (" + experimentNameExtension + ")");
 				m.setValue(che.getNumberOfPixels() / pixelCount);
 				m.setUnit("proportion");
-				m.setPosition((double) che.getHue());
-				m.setPositionUnit("hue");
-				if (m.getValue() >= 0.01 / 5)
-					output.add(m);
+				// m.setPosition((double) che.getHue());
+				// m.setPositionUnit("hue");
+				// if (m.getValue() >= 0.01 / 5)
+				output.add(m);
 				
 				// m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
 				// .getParentCondition().getExperimentName()
