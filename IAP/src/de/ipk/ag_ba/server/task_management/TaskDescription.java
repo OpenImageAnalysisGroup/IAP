@@ -104,7 +104,7 @@ public class TaskDescription {
 							System.out.println("MV a=" + experiment.getNumberOfMeasurementValues() + ". b=" + experiment2.getNumberOfMeasurementValues());
 							
 							ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
-							for (ExperimentHeaderInterface i : m.getExperimentList()) {
+							for (ExperimentHeaderInterface i : m.getExperimentList(null)) {
 								if (i.getExperimentname() != null && i.getExperimentname().contains("§")) {
 									String[] cc = i.getExperimentname().split("§");
 									if (i.getImportusergroup().equals("Temp") && cc.length == 4) {

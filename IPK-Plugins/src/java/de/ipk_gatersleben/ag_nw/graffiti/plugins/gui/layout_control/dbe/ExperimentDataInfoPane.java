@@ -15,9 +15,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,7 +33,6 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -1141,15 +1143,15 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 	
 	public static void showXMLdata(final ExperimentInterface md) {
 		
-		if (((Experiment) md).getAllMeasurements().size() > 50000) {
-			Object[] res = MyInputHelper.getInput("<html>[Show anyway;Cancel]The experiment contains more than 50000 measurement values.<br>" +
-													"It is not adviced to show such large datasets as xml.",
-													"Warning",
-													new Object[] {});
-			if (res == null)
-				return;
-		}
-		
+		// if (((Experiment) md).getAllMeasurements().size() > 50000) {
+		// Object[] res = MyInputHelper.getInput("<html>[Show;Cancel]This dataset contains more than 50.000 measurement values.<br>" +
+		// "It may take a few moments to create the view.",
+		// "Warning",
+		// new Object[] {});
+		// if (res == null)
+		// return; // cancel operation
+		// }
+		//
 		BackgroundTaskStatusProviderSupportingExternalCallImpl status =
 				new BackgroundTaskStatusProviderSupportingExternalCallImpl("Generating XML", "of experiment \"" + md.getName() + "\"");
 		BackgroundTaskHelper.issueSimpleTask("Generating XML", "Generating XML of \"" + md.getName(), new Runnable() {
@@ -1177,13 +1179,26 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 				} catch (JDOMException e1) {
 					xml = "(" + e1.getMessage() + ")";
 				}
-				final String xmlf = xml;
+				try {
+					File f = File.createTempFile(md.getName(), ".xml");
+					OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+					os.write(xml.getBytes("UTF-8"));
+					os.close();
+					AttributeHelper.showInBrowser(f.getAbsolutePath());
+				} catch (IOException e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+				// final String xmlf = xml;
 				final boolean okf = ok;
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						JEditorPane jep = new JEditorPane("text/plain", xmlf);
-						MainFrame.showMessageDialog((okf ? "XML XSD validation successful!" : "XML invalid"), new JScrollPane(jep));
+						// JEditorPane jep = new JEditorPane("text/plain", xmlf);
+						// new JScrollPane(jep)
+						MainFrame.showMessageDialog((okf ?
+								"XML has been created. Opening file. Remark: XML validation successful!" :
+								"XML has been created. Opening file. Remark: XML XSD validation found problems."),
+								"Validation");
 					}
 				});
 			}

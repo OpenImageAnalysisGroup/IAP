@@ -233,7 +233,7 @@ public class LemnaTecDataExchange {
 		return result;
 	}
 	
-	private HashSet<String> getAdministrators() {
+	public static HashSet<String> getAdministrators() {
 		HashSet<String> res = new HashSet<String>();
 		res.add("klukas");
 		res.add("entzian");

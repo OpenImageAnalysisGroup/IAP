@@ -64,7 +64,7 @@ public class DataExportAction extends AbstractNavigationAction {
 	}
 	
 	public DataExportAction(MongoDB m, ExperimentReference experimentReference) {
-		this("Export Data");
+		this("Create ZIP file");
 		this.m = m;
 		this.experimentReference = experimentReference;
 	}
@@ -83,7 +83,7 @@ public class DataExportAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Export Data";
+		return "Create ZIP File";
 	}
 	
 	@Override
@@ -206,7 +206,7 @@ public class DataExportAction extends AbstractNavigationAction {
 			
 			out.setLevel(0);
 			out.setComment("Created with IAP by user " + SystemAnalysis.getUserName() + ".");
-			out.setMethod(ZipOutputStream.DEFLATED);
+			out.setMethod(ZipOutputStream.STORED);
 			
 			status.setCurrentStatusText1("Create ZIP");
 			

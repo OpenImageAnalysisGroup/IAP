@@ -14,8 +14,8 @@ public class IAPimages {
 	}
 	
 	public static String getLogout() {
-		return "img/ext/gpl2/Gnome-Dialog-Password-64.png";
-		// "img/ext/system-lock-screen.png"
+		// return "img/ext/gpl2/Gnome-Dialog-Password-64.png";
+		return "img/ext/system-lock-screen.png";
 	}
 	
 	public static String getCheckstatus() {
