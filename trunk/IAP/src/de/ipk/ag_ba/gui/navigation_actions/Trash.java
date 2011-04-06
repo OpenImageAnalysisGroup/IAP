@@ -67,11 +67,12 @@ public class Trash extends AbstractNavigationAction {
 						return;
 					else
 						ei = new ExperimentInfo(hhh);
+					experimentName = hhh.getExperimentname();
 					message += "<li>Process Experiment " + experimentName + ": ";
 					if (cmd == DeletionCommand.DELETE || cmd == DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST) {
 						if (getHeader() != null) {
 							m.deleteExperiment(hhh.getDatabaseId());
-							message = "<html><b>" + "Experiment " + experimentName + " has been deleted.";
+							message += "<html><b>" + "Experiment " + experimentName + " has been deleted.";
 						} else {
 							Object[] res = MyInputHelper.getInput("<html>"
 												+ "You are about to delete a dataset from the database.<br>"
@@ -86,16 +87,15 @@ public class Trash extends AbstractNavigationAction {
 								// message = "<html><b>" + "Experiment " +
 								// experimentName +
 								// " has been removed from the database.";
-								message = "Internal Error";
+								message += " Internal Error";
 							} else {
-								message = " has NOT been deleted.";
+								message += " has NOT been deleted.";
 							}
 						}
 					}
 					if (cmd == DeletionCommand.TRASH || cmd == DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS) {
 						try {
 							m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
-							experimentName = hhh.getExperimentname();
 							message += "has been marked as trashed!";
 						} catch (Exception e) {
 							message += "Error: " + e.getMessage();
@@ -109,7 +109,6 @@ public class Trash extends AbstractNavigationAction {
 							if (type.contains("Trash"))
 								type = StringManipulationTools.stringReplace(type, "Trash", "");
 							m.setExperimentType(hhh, type);
-							experimentName = hhh.getExperimentname();
 							message += "Experiment " + experimentName + " has been put out of trash!";
 						} catch (Exception e) {
 							message += "Error: " + e.getMessage();

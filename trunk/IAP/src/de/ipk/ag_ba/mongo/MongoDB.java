@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
@@ -62,6 +63,8 @@ import com.mongodb.gridfs.GridFSInputFile;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
+import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
@@ -773,6 +776,33 @@ public class MongoDB {
 						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				}
 				
+				// check if the source URL has been imported before, it is assumed that the source URL content
+				// is not modified
+				if (image.getURL() != null && image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) {
+					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
+					
+					if (image.getLabelURL() != null) {
+						DBObject knownLabelURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
+						if (knownURL != null && knownLabelURL != null) {
+							GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
+							GridFS gridfs_label_files = new GridFS(db, MongoGridFS.FS_IMAGE_LABELS.toString());
+							
+							String hashMain = (String) knownURL.get("hash");
+							GridFSDBFile fffMain = gridfs_images.findOne(hashMain);
+							
+							String hashLabel = (String) knownLabelURL.get("hash");
+							GridFSDBFile fffLabel = gridfs_label_files.findOne(hashLabel);
+							if (fffMain != null && fffLabel != null && hashMain != null && hashLabel != null) {
+								image.getURL().setPrefix(mh.getPrefix());
+								image.getURL().setDetail(hashMain);
+								image.getLabelURL().setPrefix(mh.getPrefix());
+								image.getLabelURL().setDetail(hashLabel);
+								return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+							}
+						}
+					}
+				}
+				
 				final byte[] isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
 				final byte[] isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
 				
@@ -795,6 +825,25 @@ public class MongoDB {
 				
 				String hashMain = hashes[0];
 				String hashLabel = hashes[1];
+				
+				if (image.getURL() != null && image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) {
+					db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
+					
+					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
+					if (knownURL == null) {
+						Map<String, String> m1 = new HashMap<String, String>();
+						m1.put("srcUrl", image.getURL().toString());
+						m1.put("hash", hashMain);
+						db.getCollection("constantSrc2hash").insert(new BasicDBObject(m1));
+					}
+					DBObject knownLabelURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
+					if (knownLabelURL == null) {
+						Map<String, String> m1 = new HashMap<String, String>();
+						m1.put("srcUrl", image.getLabelURL().toString());
+						m1.put("hash", hashLabel);
+						db.getCollection("constantSrc2hash").insert(new BasicDBObject(m1));
+					}
+				}
 				
 				GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
 				DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
@@ -1011,7 +1060,7 @@ public class MongoDB {
 		return (ExperimentHeaderInterface) res.getObject();
 	}
 	
-	public ArrayList<ExperimentHeaderInterface> getExperimentList() {
+	public ArrayList<ExperimentHeaderInterface> getExperimentList(final String user) {
 		final ArrayList<ExperimentHeaderInterface> res = new ArrayList<ExperimentHeaderInterface>();
 		try {
 			processDB(new RunnableOnDB() {
@@ -1020,7 +1069,11 @@ public class MongoDB {
 				@Override
 				public void run() {
 					for (DBObject header : db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).find()) {
-						res.add(new ExperimentHeader(header.toMap()));
+						ExperimentHeader h = new ExperimentHeader(header.toMap());
+						if (user == null ||
+								h.getImportusername() != null && h.getImportusername().equals(user) ||
+								LemnaTecDataExchange.getAdministrators().contains(user))
+							res.add(h);
 					}
 				}
 				
@@ -1033,7 +1086,28 @@ public class MongoDB {
 			ErrorMsg.addErrorMessage(e);
 			return null;
 		}
-		return res;
+		return filterNewest(res);
+	}
+	
+	private ArrayList<ExperimentHeaderInterface> filterNewest(ArrayList<ExperimentHeaderInterface> in) {
+		HashMap<String, Long> known = new HashMap<String, Long>();
+		ArrayList<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
+		for (ExperimentHeaderInterface ehi : in) {
+			String key = ehi.getImportusername() + "//" + ehi.getDatabase() + "//" + ehi.getExperimentname();
+			if (!known.containsKey(key)) {
+				known.put(key, ehi.getImportdate().getTime());
+				result.add(ehi);
+			} else {
+				Long prevTime = known.get(key);
+				if (ehi.getImportdate().getTime() > prevTime) {
+					result.remove(known.get(key));
+					result.add(ehi);
+					known.remove(key);
+					known.put(key, ehi.getImportdate().getTime());
+				}
+			}
+		}
+		return result;
 	}
 	
 	public ExperimentInterface getExperiment(final ExperimentHeaderInterface header) {

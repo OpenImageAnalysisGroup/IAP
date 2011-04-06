@@ -31,6 +31,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	private final MongoDB m;
 	private final boolean limitToResuls;
 	private final boolean limitToData;
+	private String currentUser;
 	
 	public MongoExperimentsNavigationAction(MongoDB m, boolean limitToData, boolean limitToResults) {
 		super("Access " + m.getDisplayName());
@@ -84,11 +85,13 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			}
 			
 			if (!limitToResuls)
-				res.add(new NavigationButton(
-						new CloundManagerNavigationAction(m, new MongoExperimentsNavigationAction(m, false, true)), src.getGUIsetting()));
+				if (currentUser == null || !currentUser.equals("public"))
+					res.add(new NavigationButton(
+							new CloundManagerNavigationAction(m, new MongoExperimentsNavigationAction(m, false, true)), src.getGUIsetting()));
 			
 			if (!limitToResuls)
-				res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
+				if (currentUser == null || !currentUser.equals("public"))
+					res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
 			
 			for (String group : experiments.keySet()) {
 				if (limitToResuls && !group.toUpperCase().contains("ANALYSIS RESULTS"))
@@ -179,13 +182,13 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			public String getDefaultImage() {
 				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
 					return IAPimages.getCloudResult();
-				if (group.toUpperCase().startsWith("APH_"))
+				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)"))
 					return IAPimages.getPhytochamber();
 				else
-					if (group.toUpperCase().startsWith("BGH_"))
+					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)"))
 						return IAPimages.getBarleyGreenhouse();
 					else
-						if (group.toUpperCase().startsWith("CGH_"))
+						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)"))
 							return IAPimages.getMaizeGreenhouse();
 						else
 							return "img/ext/network-workgroup.png";
@@ -195,13 +198,13 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			public String getDefaultNavigationImage() {
 				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
 					return IAPimages.getCloudResultActive();
-				if (group.toUpperCase().startsWith("APH_"))
+				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)"))
 					return IAPimages.getPhytochamber();
 				else
-					if (group.toUpperCase().startsWith("BGH_"))
+					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)"))
 						return IAPimages.getBarleyGreenhouse();
 					else
-						if (group.toUpperCase().startsWith("CGH_"))
+						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)"))
 							return IAPimages.getMaizeGreenhouse();
 						else
 							return "img/ext/network-workgroup-power.png";
@@ -311,7 +314,11 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		status.setCurrentStatusText1("Establishing Connection");
-		experimentList = m.getExperimentList();
+		experimentList = m.getExperimentList(currentUser);
 		status.setCurrentStatusText1("");
+	}
+	
+	public void setLogin(String user) {
+		this.currentUser = user;
 	}
 }
