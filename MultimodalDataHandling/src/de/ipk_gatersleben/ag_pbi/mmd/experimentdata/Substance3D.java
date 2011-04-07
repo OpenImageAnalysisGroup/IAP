@@ -220,8 +220,8 @@ public class Substance3D extends Substance {
 					ResourceIOHandler h = map.get(prefix);
 					if (h != null) {
 						try {
-							long fs = h.getStreamLength(u);
-							if (fs > 0)
+							Long fs = h.getStreamLength(u);
+							if (fs != null && fs > 0)
 								size += fs;
 						} catch (Exception e) {
 							// empty

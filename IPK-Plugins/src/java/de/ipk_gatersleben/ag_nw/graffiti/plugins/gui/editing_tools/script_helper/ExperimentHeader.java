@@ -1,6 +1,7 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.AttributeHelper;
@@ -212,6 +213,19 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("measurements", measurementcount);
 		attributeValueMap.put("imagefiles", (imageFiles == null ? 0 : imageFiles));
 		attributeValueMap.put("sizekb", sizekb);
+	}
+	
+	public String toStringLines() {
+		StringBuilder sb = new StringBuilder();
+		LinkedHashMap<String, Object> val = new LinkedHashMap<String, Object>();
+		fillAttributeMap(val, -1);
+		
+		for (String key : val.keySet()) {
+			if (val.get(key) != null)
+				sb.append(key + ": " + val.get(key) + "<br>");
+		}
+		
+		return sb.toString();
 	}
 	
 	public int getExperimentId() {

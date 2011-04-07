@@ -62,7 +62,7 @@ public class LemnaUserAction extends AbstractNavigationAction implements Navigat
 	
 	@Override
 	public String getDefaultTitle() {
-		return user;
+		return user + " (" + ids.size() + ")";
 	}
 	
 }

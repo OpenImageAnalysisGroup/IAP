@@ -31,7 +31,7 @@ public class DatabaseDataExchange {
 		conn.setAutoCommit(false);
 	}
 	
-	public synchronized ArrayList<String> getUserGroups(String user, String pass) throws Exception {
+	public synchronized String[] getUserGroups(String user, String pass) throws Exception {
 		boolean result = false;
 		
 		if (!isConnected())
@@ -55,11 +55,11 @@ public class DatabaseDataExchange {
 		}
 		
 		if (result == false)
-			return new ArrayList<String>();
+			return new String[] {};
 		
 		ArrayList<String> groups = new ArrayList<String>();
 		
-		ps = conn.prepareStatement("select * from table(secure_util.getallgroupsforcurruser)");
+		ps = conn.prepareStatement("select * from table(secure_util.getallgroups)");// select * from table(secure_util.getallgroupsforcurruser)");
 		if (ps.execute()) {
 			ResultSet r = ps.getResultSet();
 			while (r.next())
@@ -75,7 +75,7 @@ public class DatabaseDataExchange {
 		
 		disconnectDB();
 		
-		return groups;
+		return groups.toArray(new String[] {});
 	}
 	
 	public synchronized ArrayList<String> getAllKnownUserGroups(String user, String pass) throws Exception {

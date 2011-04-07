@@ -17,18 +17,50 @@ public class ReportRow {
 	private String sampleTime;
 	
 	public void setCarrier(int replicateID) {
-		this.replicateID = replicateID;
+		this.setReplicateID(replicateID);
 	}
 	
 	public void setPlant(String condition) {
-		this.condition = condition;
+		this.setCondition(condition);
 	}
 	
 	public void setExperiment(String experimentname) {
-		this.experimentname = experimentname;
+		this.setExperimentname(experimentname);
 	}
 	
 	public void setTime(String sampleTime) {
+		this.setSampleTime(sampleTime);
+	}
+
+	public void setReplicateID(int replicateID) {
+		this.replicateID = replicateID;
+	}
+
+	public int getReplicateID() {
+		return replicateID;
+	}
+
+	public void setCondition(String condition) {
+		this.condition = condition;
+	}
+
+	public String getCondition() {
+		return condition;
+	}
+
+	public void setExperimentname(String experimentname) {
+		this.experimentname = experimentname;
+	}
+
+	public String getExperimentname() {
+		return experimentname;
+	}
+
+	public void setSampleTime(String sampleTime) {
 		this.sampleTime = sampleTime;
+	}
+
+	public String getSampleTime() {
+		return sampleTime;
 	}
 }

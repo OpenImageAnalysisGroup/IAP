@@ -201,11 +201,11 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 					add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), this, getTheOther(), graphPanel));
 					first = false;
 				} else {
-					if (actionPanelRight != null && ne.isRightAligned())
-						right.add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), getTheOther(), this,
-											graphPanel));
-					else
-						add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), getTheOther(), this,
+					// if (actionPanelRight != null && ne.isRightAligned())
+					// right.add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), getTheOther(), this,
+					// graphPanel));
+					// else
+					add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), getTheOther(), this,
 											graphPanel));
 				}
 			}

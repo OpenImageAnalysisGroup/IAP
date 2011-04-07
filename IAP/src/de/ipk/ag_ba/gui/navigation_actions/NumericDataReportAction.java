@@ -6,7 +6,9 @@
  */
 package de.ipk.ag_ba.gui.navigation_actions;
 
+import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JTable;
 
@@ -17,7 +19,6 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
@@ -67,48 +68,86 @@ public class NumericDataReportAction extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		ArrayList<String> cols = new ArrayList<String>();
-		cols.add("Plant");
-		cols.add("Carrier");
-		cols.add("Experiment");
-		cols.add("Time");
-		cols.add("Weight (before watering)");
-		cols.add("Weight (after watering)");
-		cols.add("Water");
-		Object[] columns = cols.toArray();
-		
+		Object[] columns;
 		ExperimentInterface experiment = experimentReference.getData(m);
 		ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
-		for (SubstanceInterface su : experiment) {
-			if (su.getName() == null)
-				continue;
+		if (GraphicsEnvironment.isHeadless()) {
+			// cols.add("Plant");
+			// cols.add("Carrier");
+			// cols.add("Experiment");
+			// cols.add("Time");
+			// cols.add("Weight (before watering)");
+			// cols.add("Weight (after watering)");
+			// cols.add("Water");
+			columns = cols.toArray();
+			//
+			// for (SubstanceInterface su : experiment) {
+			// if (su.getName() == null)
+			// continue;
+			//
+			// if (su.getName().equals("weight_before")) {
+			//
+			// }
+			// if (su.getName().equals("water_weight")) {
+			//
+			// }
+			// if (su.getName().equals("water_amount")) {
+			//
+			// }
+			// for (ConditionInterface c : su) {
+			// for (SampleInterface sa : c) {
+			// for (Measurement m : sa) {
+			// ReportRow r = new ReportRow();
+			// r.setPlant(c.getConditionId() + ": " + c.getConditionName());
+			// r.setCarrier(m.getReplicateID());
+			// r.setExperiment(experiment.getHeader().getExperimentname());
+			// r.setTime(sa.getSampleTime());
+			// }
+			// }
+			// }
+			// }
+		} else {
+			cols.add("Condition");
+			cols.add("Time");
+			cols.add("Plant ID");
+			cols.add("Measurement"); // substance
+			cols.add("Replicate ID"); // substance
+			cols.add("Value");
+			columns = cols.toArray();
 			
-			if (su.getName().equals("weight_before")) {
-				
-			}
-			if (su.getName().equals("water_weight")) {
-				
-			}
-			if (su.getName().equals("water_amount")) {
-				
-			}
-			for (ConditionInterface c : su) {
-				for (SampleInterface sa : c) {
-					for (Measurement m : sa) {
-						ReportRow r = new ReportRow();
-						r.setPlant(c.getConditionId() + ": " + c.getConditionName());
-						r.setCarrier(m.getReplicateID());
-						r.setExperiment(experiment.getHeader().getExperimentname());
-						r.setTime(sa.getSampleTime());
+			HashMap<String, Integer> id2row = new HashMap<String, Integer>();
+			for (SubstanceInterface su : experiment) {
+				String sid = su.getName();
+				String hue;
+				int hueVal = 0;
+				if (sid.contains("hue=")) {
+					hue = sid.substring(sid.indexOf("hue=") + "hue=".length()).trim();
+					try {
+						hueVal = Integer.parseInt(hue);
+					} catch (Exception e) {
+						// empty
+					}
+				} else
+					continue;
+				for (ConditionInterface c : su) {
+					String cid = sid + ";" + c.getConditionId() + "-" + c.getConditionName();
+					for (SampleInterface sa : c) {
+						String said = cid + ";" + sa.getSampleTime();
+						for (Measurement m : sa) {
+							String mid = said + ";" + m.getReplicateID();
+							if (m.getValue() > 0)
+								System.out.println(mid + ";" + hueVal + ";" + m.getValue());
+						}
 					}
 				}
 			}
+			
 		}
-		
-		ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
 		
 		Object[][] rowdata = new Object[rows.size()][cols.size()];
 		
 		table = new JTable(rowdata, columns);
+		
 	}
 	
 	@Override

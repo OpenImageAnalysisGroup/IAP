@@ -242,6 +242,14 @@ public class LemnaTecDataExchange {
 		return res;
 	}
 	
+	public static HashSet<String> getGroupLock() {
+		HashSet<String> res = new HashSet<String>();
+		res.add("PBI");
+		res.add("SYS");
+		res.add("BIT");
+		return res;
+	}
+	
 	public Collection<Snapshot> getSnapshotsOfExperiment(String database, String experiment) throws SQLException,
 						ClassNotFoundException {
 		Collection<Snapshot> result = new ArrayList<Snapshot>();
