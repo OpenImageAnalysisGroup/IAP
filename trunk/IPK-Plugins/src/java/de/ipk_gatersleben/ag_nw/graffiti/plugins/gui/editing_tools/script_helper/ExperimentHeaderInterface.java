@@ -87,6 +87,8 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	
 	public void fillAttributeMap(Map<String, Object> attributeValueMap, int measurementcount);
 	
+	public String toStringLines();
+	
 	public boolean inTrash();
 	
 	public String getDatabase();

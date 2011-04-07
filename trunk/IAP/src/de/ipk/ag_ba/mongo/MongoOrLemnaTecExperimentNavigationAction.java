@@ -35,12 +35,24 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 	private ExperimentInterface experiment;
 	private final MongoDB m;
 	private String domainUser;
+	private final String tt;
 	
 	public MongoOrLemnaTecExperimentNavigationAction(ExperimentHeaderInterface ei, MongoDB m) {
 		super(ei.getDatabaseId() != null && ei.getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
 							: "Access Systems Biology Cloud Data Set");
+		
+		this.tt = "<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentname() + "</td></tr>"
+				+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
+				+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()
+				+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark() + "</td></tr>";
+		
 		header = ei;
 		this.m = m;
+	}
+	
+	@Override
+	public String getDefaultTooltip() {
+		return tt;
 	}
 	
 	@Override

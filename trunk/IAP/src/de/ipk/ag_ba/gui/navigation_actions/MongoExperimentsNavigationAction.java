@@ -99,7 +99,8 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				if (limitToData && group.toUpperCase().contains("ANALYSIS RESULTS"))
 					continue;
 				
-				res.add(new NavigationButton(createMongoGroupNavigationAction(group, experiments.get(group)), src
+				res.add(new NavigationButton(createMongoGroupNavigationAction(group
+						+ " (" + experiments.get(group).size() + ")", experiments.get(group)), src
 									.getGUIsetting()));
 			}
 			
@@ -272,7 +273,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			
 			@Override
 			public String getDefaultTitle() {
-				return user;
+				return user + " (" + experiments.size() + ")";
 			}
 			
 		};
@@ -282,10 +283,6 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	public static NavigationButton getMongoExperimentButton(ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
 		NavigationAction action = new MongoOrLemnaTecExperimentNavigationAction(ei, m);
 		NavigationButton exp = new NavigationButton(action, guiSetting);
-		exp.setToolTipText("<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentname() + "</td></tr>"
-							+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
-							+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()
-							+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark() + "</td></tr>");
 		return exp;
 	}
 	
