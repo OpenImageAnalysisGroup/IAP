@@ -13,4 +13,23 @@ public enum LemnaTecSystem {
 		return Unknown;
 	}
 	
+	public boolean isPreAuthenticated(String user) {
+		if (user == null)
+			return false;
+		if (this == Maize)
+			return user.equals("Muraya") ||
+					user.equalsIgnoreCase("Altmann");
+		if (this == Unknown)
+			return user.equals("Neumannk");
+		if (this == Barley)
+			return user.equals("Neumannk");
+		if (this == Phytochamber)
+			return user.equals("Fernando") ||
+					user.equals("weigelt") ||
+					user.equals("mary") ||
+					user.equals("meyer") ||
+					user.equalsIgnoreCase("Altmann");
+		return false;
+	}
+	
 }

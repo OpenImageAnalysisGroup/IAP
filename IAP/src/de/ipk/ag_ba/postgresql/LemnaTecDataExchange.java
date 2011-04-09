@@ -223,7 +223,7 @@ public class LemnaTecDataExchange {
 		if (user != null && !getAdministrators().contains(user)) {
 			// remove experiments from result which should not be visible to users
 			LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
-			if (system != LemnaTecSystem.Unknown)
+			if (!system.isPreAuthenticated(user))
 				for (ExperimentHeaderInterface ehi : people.keySet()) {
 					if (!people.get(ehi).contains(user)) {
 						result.remove(ehi);
