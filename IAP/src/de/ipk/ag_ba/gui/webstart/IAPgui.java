@@ -135,7 +135,10 @@ public class IAPgui {
 							+ "It may not work reliable, only a small subset of future functions are implemented.<br>"
 							+ "<br>"
 							+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
-							+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>";
+							+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
+							new LogService().getLatestNews(5,
+									"<br>Latest changes:<ul>",
+									"<li>", "", "<br><br>");
 	}
 	
 	public static void navigateTo(final String target, NavigationButton src) {

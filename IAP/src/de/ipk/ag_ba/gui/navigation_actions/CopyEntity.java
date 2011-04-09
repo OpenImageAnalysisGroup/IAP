@@ -11,6 +11,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
@@ -25,7 +26,12 @@ public class CopyEntity extends AbstractExperimentAnalysisNavigation {
 	
 	@Override
 	public String getDefaultTooltip() {
-		return "Copy Dataset";
+		ExperimentHeaderInterface ei = experiment.getHeader();
+		return "<html>Copy Dataset:" +
+				"<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentname() + "</td></tr>"
+				+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
+				+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()
+				+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark() + "</td></tr>";
 	}
 	
 	@Override
@@ -72,7 +78,7 @@ public class CopyEntity extends AbstractExperimentAnalysisNavigation {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy";
+		return "Copy " + experiment.getExperimentName();
 	}
 	
 }
