@@ -144,7 +144,10 @@ public class LemnaTecDataExchange {
 		rs.close();
 		ps.close();
 		
-		sqlText = "SELECT min(time_stamp), max(time_stamp), count(*) FROM snapshot,tiled_image WHERE measurement_label=? AND tiled_image.snapshot_id=snapshot.id";
+		sqlText = "" +
+				"SELECT min(time_stamp), max(time_stamp), count(*) " +
+				"FROM snapshot,tiled_image " +
+				"WHERE measurement_label=? AND tiled_image.snapshot_id=snapshot.id";
 		ps = connection.prepareStatement(sqlText);
 		for (ExperimentHeaderInterface ehi : result) {
 			ps.setString(1, ehi.getExperimentname());
@@ -279,51 +282,99 @@ public class LemnaTecDataExchange {
 		}
 		rs.close();
 		ps.close();
-		
-		String sqlText = "SELECT "
-							+ "creator, measurement_label, camera_label, id_tag, path, "
-							+ "time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
-							+ "image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, image_file_table.id as image_file_tableID "
-							+ "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
-							+ "WHERE snapshot.measurement_label = ? and snapshot.id = tiled_image.snapshot_id and "
-							+ "tiled_image.id = tile.tiled_image_id and "
-							+ "tile.image_oid = image_file_table.id and "
-							+ "snapshot.configuration_id = image_unit_configuration.compconfigid and tiled_image.camera_label = image_unit_configuration.gid";
-		
-		ps = connection.prepareStatement(sqlText);
-		ps.setString(1, experiment);
-		
-		rs = ps.executeQuery();
-		
-		while (rs.next()) {
-			Snapshot snapshot = new Snapshot();
+		HashSet<Long> knownSnaphotIds = new HashSet<Long>();
+		{
+			// load snapshots with images
+			String sqlText = "SELECT "
+							+ "	creator, measurement_label, camera_label, id_tag, path, "
+							+ "	time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
+							+ "	image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, "
+							+ "	image_file_table.id as image_file_tableID "
+							+ "FROM "
+							+ "	snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
+							+ "WHERE "
+							+ "	snapshot.measurement_label = ? and "
+							+ "	snapshot.id = tiled_image.snapshot_id and "
+							+ "	tiled_image.id = tile.tiled_image_id and "
+							+ "	tile.image_oid = image_file_table.id and "
+							+ "	snapshot.configuration_id = image_unit_configuration.compconfigid and "
+							+ "	tiled_image.camera_label = image_unit_configuration.gid";
 			
-			snapshot.setCreator(rs.getString("creator"));
-			snapshot.setMeasurement_label(rs.getString("measurement_label"));
-			snapshot.setUserDefinedCameraLabeL(rs.getString("camera_label"));
-			snapshot.setId_tag(rs.getString("id_tag"));
+			ps = connection.prepareStatement(sqlText);
+			ps.setString(1, experiment);
 			
-			snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
-			snapshot.setWater_amount(rs.getInt("water_amount"));
-			snapshot.setWeight_after(rs.getDouble("weight_after"));
-			snapshot.setWeight_before(rs.getDouble("weight_before"));
+			rs = ps.executeQuery();
 			
-			snapshot.setCamera_label(rs.getString("compname"));
-			snapshot.setXfactor(rs.getDouble("xfactor"));
-			snapshot.setYfactor(rs.getDouble("yfactor"));
-			
-			String s1 = id2path.get(rs.getLong("image_oid"));
-			snapshot.setPath_image(s1);
-			String s2 = id2path.get(rs.getLong("null_image_oid"));
-			snapshot.setPath_null_image(s2);
-			String s3 = id2path.get(rs.getLong("image_parameter_oid"));
-			// System.out.println(s3);
-			snapshot.setPath_image_config_blob(s3);
-			
-			result.add(snapshot);
+			while (rs.next()) {
+				Snapshot snapshot = new Snapshot();
+				
+				knownSnaphotIds.add(rs.getLong("snapshotID"));
+				
+				snapshot.setCreator(rs.getString("creator"));
+				snapshot.setMeasurement_label(rs.getString("measurement_label"));
+				snapshot.setUserDefinedCameraLabeL(rs.getString("camera_label"));
+				snapshot.setId_tag(rs.getString("id_tag"));
+				
+				snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
+				snapshot.setWater_amount(rs.getInt("water_amount"));
+				snapshot.setWeight_after(rs.getDouble("weight_after"));
+				snapshot.setWeight_before(rs.getDouble("weight_before"));
+				
+				snapshot.setCamera_label(rs.getString("compname"));
+				snapshot.setXfactor(rs.getDouble("xfactor"));
+				snapshot.setYfactor(rs.getDouble("yfactor"));
+				
+				String s1 = id2path.get(rs.getLong("image_oid"));
+				snapshot.setPath_image(s1);
+				String s2 = id2path.get(rs.getLong("null_image_oid"));
+				snapshot.setPath_null_image(s2);
+				String s3 = id2path.get(rs.getLong("image_parameter_oid"));
+				// System.out.println(s3);
+				snapshot.setPath_image_config_blob(s3);
+				
+				result.add(snapshot);
+			}
+			rs.close();
+			ps.close();
 		}
-		rs.close();
-		ps.close();
+		{
+			// load snapshots without images
+			String sqlText = "SELECT "
+					+ "	creator, measurement_label, id_tag, "
+					+ "	time_stamp, water_amount, weight_after, weight_before, "
+					+ "	snapshot.id as snapshotID "
+					+ "FROM "
+					+ "	snapshot "
+					+ "WHERE "
+					+ "	snapshot.measurement_label = ?";
+			
+			ps = connection.prepareStatement(sqlText);
+			ps.setString(1, experiment);
+			
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				Snapshot snapshot = new Snapshot();
+				
+				Long id = rs.getLong("snapshotID");
+				
+				if (knownSnaphotIds.contains(id))
+					continue;
+				
+				snapshot.setCreator(rs.getString("creator"));
+				snapshot.setMeasurement_label(rs.getString("measurement_label"));
+				snapshot.setId_tag(rs.getString("id_tag"));
+				
+				snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
+				snapshot.setWater_amount(rs.getInt("water_amount"));
+				snapshot.setWeight_after(rs.getDouble("weight_after"));
+				snapshot.setWeight_before(rs.getDouble("weight_before"));
+				
+				result.add(snapshot);
+			}
+			rs.close();
+			ps.close();
+		}
 		return result;
 	}
 	
@@ -362,6 +413,8 @@ public class LemnaTecDataExchange {
 		}
 	}
 	
+	private static final HashMap<String, byte[]> blob2buf = new HashMap<String, byte[]>();
+	
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
 						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
@@ -399,8 +452,6 @@ public class LemnaTecDataExchange {
 		}
 		
 		HashMap<String, Condition> idtag2condition = getPlantIdAnnotation(experimentReq);
-		
-		HashMap<String, byte[]> blob2buf = new HashMap<String, byte[]>();
 		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Process snapshots (" + snapshots.size() + ")");
@@ -465,7 +516,7 @@ public class LemnaTecDataExchange {
 				continue;
 			}
 			
-			int day = DateUtil.getElapsedDays(earliest, new Date(sn.getTimestamp().getTime()));
+			int day = DateUtil.getElapsedDays(earliest, new Date(sn.getTimestamp().getTime())) + 1;
 			
 			{
 				// if (sn.getWeight_before() > 0) {

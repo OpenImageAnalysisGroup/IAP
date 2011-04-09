@@ -67,4 +67,8 @@ public class IAPimages {
 		return "img/maisMultiple.png";
 	}
 	
+	public static String getAddNews() {
+		return "img/ext/gpl2/Gnome-User-Desktop-64.png";
+	}
+	
 }

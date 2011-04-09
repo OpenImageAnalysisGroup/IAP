@@ -7,6 +7,7 @@
 
 package de.ipk.ag_ba.gui.navigation_actions;
 
+import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -52,6 +53,9 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 		
 		if (!limitToResuls) {
 			res.add(new NavigationButton(new DomainLogoutAction(), src.getGUIsetting()));
+			
+			if (!GraphicsEnvironment.isHeadless())
+				res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
 			
 			NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
 			

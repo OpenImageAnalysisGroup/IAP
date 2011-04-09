@@ -6,6 +6,7 @@
  */
 package de.ipk.ag_ba.gui;
 
+import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -49,7 +50,8 @@ public class ImageAnalysisCommandManager {
 		// CountColorsNavigation(m, 40, experimentReference),
 		// "Hue Historam", "img/colorhistogram.png"));
 		
-		actions.add(new NavigationButton(new NumericDataReportAction(m, experimentReference), guiSetting));
+		if (GraphicsEnvironment.isHeadless())
+			actions.add(new NavigationButton(new NumericDataReportAction(m, experimentReference), guiSetting));
 		
 		actions.add(new NavigationButton(new DataExportAction(m, experimentReference), guiSetting));
 		

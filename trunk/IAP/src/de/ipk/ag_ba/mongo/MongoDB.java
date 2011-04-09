@@ -12,9 +12,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1804,5 +1806,57 @@ public class MongoDB {
 		});
 		
 		return (GridFS) result.getObject();
+	}
+	
+	public Collection<String> getNews(final int i) {
+		final LinkedList<String> res = new LinkedList<String>();
+		try {
+			processDB(new RunnableOnDB() {
+				private DB db;
+				
+				@Override
+				public void run() {
+					SimpleDateFormat sdf = new SimpleDateFormat();
+					for (DBObject newsItem : db.getCollection("news").find()) {
+						Date l = (Date) newsItem.get("date");
+						String text = (String) newsItem.get("text");
+						String user = (String) newsItem.get("user");
+						res.add(sdf.format(l) + ": " + text + " (" + user + ")");
+					}
+				}
+				
+				@Override
+				public void setDB(DB db) {
+					this.db = db;
+				}
+			});
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+			return null;
+		}
+		while (i > 0 && res.size() > i)
+			res.remove(0);
+		return res;
+	}
+	
+	public void addNewsItem(final String text, final String user) throws Exception {
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				Map<String, Object> map = new HashMap<String, Object>();
+				BasicDBObject ni = new BasicDBObject(map);
+				ni.put("date", new Date());
+				ni.put("text", text);
+				ni.put("user", user);
+				db.getCollection("news").insert(ni);
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
 	}
 }

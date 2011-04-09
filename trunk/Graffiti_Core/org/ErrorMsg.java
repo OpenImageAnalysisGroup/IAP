@@ -6,6 +6,7 @@ package org;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.GraphicsEnvironment;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -304,6 +305,8 @@ public class ErrorMsg implements HelperClass {
 	}
 	
 	public static void addErrorMessage(Exception e) {
+		if (GraphicsEnvironment.isHeadless() && e != null)
+			System.out.println("ERROR-MSG: " + e.getMessage());
 		if (rethrowErrorMessages)
 			throw new Error(e);
 		
