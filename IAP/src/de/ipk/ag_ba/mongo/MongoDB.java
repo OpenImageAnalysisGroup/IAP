@@ -134,8 +134,13 @@ public class MongoDB {
 		return new MongoDB("Local DB", "localCloud1", "localhost", null, null, HashType.MD5);
 	}
 	
+	private static MongoDB dc = null;
+	
 	public static MongoDB getDefaultCloud() {
-		return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
+		if (dc == null) {
+			dc = new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
+		}
+		return dc;
 		// return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
 	}
 	
@@ -238,7 +243,7 @@ public class MongoDB {
 									authenticatedDBs.put(m, new HashSet<String>());
 								authenticatedDBs.get(m).add(database);
 							} catch (Exception err) {
-								System.err.println("ERROR: " + err.getMessage());
+								// System.err.println("ERROR: " + err.getMessage());
 							}
 						}
 					}
@@ -249,14 +254,14 @@ public class MongoDB {
 							try {
 								boolean auth = db.authenticate(optLogin, optPass.toCharArray());
 								if (!auth) {
-									throw new Exception("Invalid MongoDB login data provided!");
+									// throw new Exception("Invalid MongoDB login data provided!");
 								} else {
 									if (authenticatedDBs.get(m) == null)
 										authenticatedDBs.put(m, new HashSet<String>());
 									authenticatedDBs.get(m).add(database);
 								}
 							} catch (Exception err) {
-								System.err.println("ERROR: " + err.getMessage());
+								// System.err.println("ERROR: " + err.getMessage());
 							}
 						}
 					runnableOnDB.setDB(db);
@@ -1092,20 +1097,20 @@ public class MongoDB {
 	}
 	
 	private ArrayList<ExperimentHeaderInterface> filterNewest(ArrayList<ExperimentHeaderInterface> in) {
-		HashMap<String, Long> known = new HashMap<String, Long>();
+		HashMap<String, ExperimentHeaderInterface> known = new HashMap<String, ExperimentHeaderInterface>();
 		ArrayList<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
 		for (ExperimentHeaderInterface ehi : in) {
 			String key = ehi.getImportusername() + "//" + ehi.getDatabase() + "//" + ehi.getExperimentname();
 			if (!known.containsKey(key)) {
-				known.put(key, ehi.getImportdate().getTime());
+				known.put(key, ehi);
 				result.add(ehi);
 			} else {
-				Long prevTime = known.get(key);
-				if (ehi.getImportdate().getTime() > prevTime) {
+				ExperimentHeaderInterface prevTime = known.get(key);
+				if (ehi.getImportdate().getTime() > prevTime.getImportdate().getTime()) {
 					result.remove(known.get(key));
 					result.add(ehi);
 					known.remove(key);
-					known.put(key, ehi.getImportdate().getTime());
+					known.put(key, ehi);
 				}
 			}
 		}
@@ -1858,5 +1863,69 @@ public class MongoDB {
 				this.db = db;
 			}
 		});
+	}
+	
+	public IOurl getURLforStoredData(final IOurl url) throws Exception {
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				if (url != null && url.getPrefix().equals(LemnaTecFTPhandler.PREFIX)) {
+					db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
+					
+					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", url.toString()));
+					if (knownURL != null) {
+						String knownHash = (String) knownURL.get("hash");
+						tso.setParam(0, knownHash);
+					}
+				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		String hash = (String) tso.getParam(0, null);
+		if (hash == null)
+			return null;
+		
+		MongoDBhandler h = (MongoDBhandler) getHandlers()[0];
+		String prefix = h.getPrefix();
+		return new IOurl(prefix, hash, url.getFileName());
+	}
+	
+	public InputStream getURLforStoredData_PreviewStream(final IOurl url) throws Exception {
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				if (url != null && url.getPrefix().equals(LemnaTecFTPhandler.PREFIX)) {
+					db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
+					
+					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", url.toString()));
+					if (knownURL != null) {
+						String knownHash = (String) knownURL.get("hash");
+						tso.setParam(0, knownHash);
+					}
+				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		String hash = (String) tso.getParam(0, null);
+		if (hash == null)
+			return null;
+		
+		MongoDBhandler h = (MongoDBhandler) getHandlers()[0];
+		String prefix = h.getPrefix();
+		return h.getPreviewInputStream(new IOurl(prefix, hash, url.getFileName()));
 	}
 }

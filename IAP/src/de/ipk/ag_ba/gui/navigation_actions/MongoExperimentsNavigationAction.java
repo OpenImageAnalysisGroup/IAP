@@ -104,7 +104,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 					continue;
 				
 				res.add(new NavigationButton(createMongoGroupNavigationAction(group
-						+ " (" + experiments.get(group).size() + ")", experiments.get(group)), src
+						+ " (" + count(experiments.get(group)) + ")", experiments.get(group)), src
 									.getGUIsetting()));
 			}
 			
@@ -112,6 +112,16 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				if (trashed.size() > 0) {
 					res.add(new NavigationButton(getTrashedExperimentsAction(trashed, m), src.getGUIsetting()));
 				}
+		}
+		return res;
+	}
+	
+	private int count(TreeMap<String, ArrayList<ExperimentHeaderInterface>> treeMap) {
+		int res = 0;
+		if (treeMap != null) {
+			for (ArrayList<ExperimentHeaderInterface> tm : treeMap.values()) {
+				res += tm.size();
+			}
 		}
 		return res;
 	}

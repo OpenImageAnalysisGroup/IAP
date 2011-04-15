@@ -8,7 +8,7 @@ import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
 import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
-import de.ipk.ag_ba.datasources.http_folder.VantedNewsLinksSource;
+import de.ipk.ag_ba.datasources.http_folder.IAPnewsLinksSource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.nav.RimasNav;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -57,20 +57,6 @@ public final class HomeAction extends AbstractNavigationAction {
 		// vantedNB.getAction().addAdditionalEntity(startVanted0);
 		homeActions.add(vantedNB);
 		
-		{
-			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Sino/German Network",
-								"Sino/German Network of Computational & Integrative Biology", "img/CIB_logo.png", "img/CIB_logo.png");
-			ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://www.imbio.de/forschung2/",
-								"img/browser.png", src != null ? src.getGUIsetting() : null));
-			// for (NavigationButton nge : homeActions)
-			// ipkBioInf.addAdditionalEntity(nge);
-			homeActions.add(new NavigationButton(ipkBioInf, guiSetting));
-		}
-		
-		HTTPfolderSource news = new VantedNewsLinksSource();
-		NavigationButton newsButton = new NavigationButton(new DataSourceNavigationAction(news), guiSetting);
-		homeActions.add(newsButton);
-		
 		NavigationButton serverStatusEntity = Other.getServerStatusEntity(true, src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
 		
@@ -92,6 +78,10 @@ public final class HomeAction extends AbstractNavigationAction {
 		}
 		
 		homePrimaryActions.add(new NavigationButton(new ShowVANTED(), guiSetting));
+		
+		HTTPfolderSource news = new IAPnewsLinksSource();
+		NavigationButton newsButton = new NavigationButton(new DataSourceNavigationAction(news), guiSetting);
+		homePrimaryActions.add(newsButton);
 	}
 	
 	ArrayList<NavigationButton> bookmarks;

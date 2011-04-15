@@ -413,7 +413,7 @@ public class LemnaTecDataExchange {
 		}
 	}
 	
-	private static final HashMap<String, byte[]> blob2buf = new HashMap<String, byte[]>();
+	private static final HashMap<String, Double> blob2angle = new HashMap<String, Double>();
 	
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
 						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
@@ -651,7 +651,7 @@ public class LemnaTecDataExchange {
 						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
 											+ sn.getPath_image_config_blob(), sn.getId_tag()
 											+ (position != null ? " (" + position.intValue() + ")" : ""));
-						position = processConfigBlobToGetRotationAngle(blob2buf, sn, url);
+						position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
 						if (Math.abs(position) < 0.00001)
 							position = null;
 					}
@@ -723,11 +723,11 @@ public class LemnaTecDataExchange {
 		return experiment;
 	}
 	
-	private double processConfigBlobToGetRotationAngle(HashMap<String, byte[]> blob2buf, Snapshot sn, IOurl url) {
+	private double processConfigBlobToGetRotationAngle(HashMap<String, Double> blob2angle, Snapshot sn, IOurl url) {
 		try {
 			byte[] buf;
-			if (blob2buf.containsKey(url.toString()))
-				buf = blob2buf.get(url.toString());
+			if (blob2angle.containsKey(url.toString()))
+				return blob2angle.get(url.toString());
 			else {
 				InputStream in = url.getInputStream();
 				// read configuration object in order to detect rotation angle
@@ -739,7 +739,6 @@ public class LemnaTecDataExchange {
 					read = in.read(temp);
 				}
 				buf = out.getBuff();
-				blob2buf.put(url.toString(), buf);
 			}
 			TextFile tf = new TextFile(new MyByteArrayInputStream(buf, buf.length), 0);
 			// System.out.println(url.toString());
@@ -767,6 +766,7 @@ public class LemnaTecDataExchange {
 			// sn.getUserDefinedCameraLabel() + ", angle: "
 			// + angle);
 			// System.out.println("");
+			blob2angle.put(url.toString(), angle);
 			return angle;
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);

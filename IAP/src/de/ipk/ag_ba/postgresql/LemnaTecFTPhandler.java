@@ -23,6 +23,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -36,10 +37,24 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		return PREFIX;
 	}
 	
+	private final boolean useCachedCloudDataIfAvailable = true;
+	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
 		if (url.toString().contains(",")) {
 			url = new IOurl(url.toString().split(",")[0]);
+		}
+		if (useCachedCloudDataIfAvailable) {
+			try {
+				if (MongoDB.getDefaultCloud() != null) {
+					MongoDB dc = MongoDB.getDefaultCloud();
+					IOurl urlForCopiedData = dc.getURLforStoredData(url);
+					if (urlForCopiedData != null)
+						return urlForCopiedData.getInputStream();
+				}
+			} catch (Exception e) {
+				System.out.println("ERROR: Could not check default cloud for cached input stream data url: " + e.getMessage());
+			}
 		}
 		if (url.isEqualPrefix(getPrefix())) {
 			boolean useSCP = false;
@@ -48,9 +63,6 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 				String detail = url.getDetail();
 				detail = "/data0/pgftp/" + detail.split("/", 2)[1];
 				c.cd(detail.substring(0, detail.lastIndexOf("/")));
-				// Vector<?> o = c.ls(detail.substring(0, detail.lastIndexOf("/")));
-				// for (Object i : o)
-				// System.out.println(i);
 				String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
 				InputStream is = c.get(fn);
 				return is;
@@ -74,6 +86,27 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 			}
 		} else
 			return null;
+	}
+	
+	@Override
+	public InputStream getPreviewInputStream(IOurl url) throws Exception {
+		
+		if (url.toString().contains(",")) {
+			url = new IOurl(url.toString().split(",")[0]);
+		}
+		if (useCachedCloudDataIfAvailable) {
+			try {
+				if (MongoDB.getDefaultCloud() != null) {
+					MongoDB dc = MongoDB.getDefaultCloud();
+					InputStream urlForCopiedDataStream = dc.getURLforStoredData_PreviewStream(url);
+					if (urlForCopiedDataStream != null)
+						return urlForCopiedDataStream;
+				}
+			} catch (Exception e) {
+				System.out.println("ERROR: Could not check default cloud for cached input stream data url: " + e.getMessage());
+			}
+		}
+		return super.getPreviewInputStream(url);
 	}
 	
 	private Session session = null;

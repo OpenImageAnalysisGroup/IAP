@@ -12,6 +12,7 @@ import java.util.Collection;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.navigation_actions.Book;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 
@@ -35,4 +36,6 @@ public interface DataSourceLevel {
 	public void setDescription(String description);
 	
 	public String getDescription();
+	
+	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src);
 }

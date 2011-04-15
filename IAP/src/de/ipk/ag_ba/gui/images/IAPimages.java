@@ -71,4 +71,7 @@ public class IAPimages {
 		return "img/ext/gpl2/Gnome-User-Desktop-64.png";
 	}
 	
+	public static String getArchive() {
+		return "img/ext/gpl2/Gnome-System-File-Manager-64.png";
+	}
 }

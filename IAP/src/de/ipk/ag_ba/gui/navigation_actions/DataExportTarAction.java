@@ -7,7 +7,6 @@
 package de.ipk.ag_ba.gui.navigation_actions;
 
 import java.awt.GraphicsEnvironment;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,9 +19,9 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -38,7 +37,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
@@ -47,7 +45,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author klukas
  */
-public class DataExportAction extends AbstractNavigationAction {
+public class DataExportTarAction extends AbstractNavigationAction {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
@@ -60,12 +58,12 @@ public class DataExportAction extends AbstractNavigationAction {
 	
 	// private JTable table;
 	
-	public DataExportAction(String tooltip) {
+	public DataExportTarAction(String tooltip) {
 		super(tooltip);
 	}
 	
-	public DataExportAction(MongoDB m, ExperimentReference experimentReference) {
-		this("Create ZIP file");
+	public DataExportTarAction(MongoDB m, ExperimentReference experimentReference) {
+		this("Create TAR file");
 		this.m = m;
 		this.experimentReference = experimentReference;
 	}
@@ -84,7 +82,7 @@ public class DataExportAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Create ZIP file";
+		return "Create TAR File";
 	}
 	
 	@Override
@@ -92,10 +90,10 @@ public class DataExportAction extends AbstractNavigationAction {
 		return IAPimages.saveAsArchive();
 	}
 	
-	private static WeakHashMap<String, DataExportAction> validLinks2action = new WeakHashMap<String, DataExportAction>();
+	private static WeakHashMap<String, DataExportTarAction> validLinks2action = new WeakHashMap<String, DataExportTarAction>();
 	
 	public static void setOutputStreamForAction(String uiid, OutputStream os) throws Exception {
-		DataExportAction da = validLinks2action.get(uiid);
+		DataExportTarAction da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -105,7 +103,7 @@ public class DataExportAction extends AbstractNavigationAction {
 	}
 	
 	public static String getFileNameForAction(String uiid) throws Exception {
-		DataExportAction da = validLinks2action.get(uiid);
+		DataExportTarAction da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -114,7 +112,7 @@ public class DataExportAction extends AbstractNavigationAction {
 	}
 	
 	public static Long getExperimentSizeForAction(String uiid) throws Exception {
-		DataExportAction da = validLinks2action.get(uiid);
+		DataExportTarAction da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -123,7 +121,7 @@ public class DataExportAction extends AbstractNavigationAction {
 	}
 	
 	public static void waitForFinishedDownloadAction(String uiid) throws Exception {
-		DataExportAction da = validLinks2action.get(uiid);
+		DataExportTarAction da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -152,15 +150,15 @@ public class DataExportAction extends AbstractNavigationAction {
 			String fsinfo = "";
 			
 			if (!GraphicsEnvironment.isHeadless()) {
-				this.fn = FileHelper.getFileName(".zip", "Dataset Export", experimentReference.getExperimentName() + ".zip");
+				this.fn = FileHelper.getFileName(".tar", "TAR File Export", experimentReference.getExperimentName() + ".tar");
 				if (fn == null)
 					return;
 				String outFilename = fn;
 				
 				os = new FileOutputStream(outFilename);
 			} else {
-				fn = experimentReference.getExperimentName() + ".zip";
-				tso.setParam(1, experimentReference.getExperimentName() + ".zip");
+				fn = experimentReference.getExperimentName() + ".tar";
+				tso.setParam(1, experimentReference.getExperimentName() + ".tar");
 				String id = UUID.randomUUID().toString();
 				
 				status.setCurrentStatusText2(null);
@@ -176,7 +174,7 @@ public class DataExportAction extends AbstractNavigationAction {
 				
 				removeLostEntries();
 				long s = System.currentTimeMillis();
-				status.setCurrentStatusText1("Download Ready" + fsinfo + "@OTL:iap_gwt/img?zi=" + id);
+				status.setCurrentStatusText1("Download Ready" + fsinfo + "@OTL:iap_gwt/img?ti=" + id);
 				try {
 					validLinks2action.put(id, this);
 					do {
@@ -186,7 +184,7 @@ public class DataExportAction extends AbstractNavigationAction {
 						if (t - s > 60000)
 							break;
 						if (t - s > 10000) {
-							status.setCurrentStatusText1("Download Ready (" + (60 - (t - s) / 1000) + " s)@OTL:iap_gwt/img?zi=" + id);
+							status.setCurrentStatusText1("Download Ready (" + (60 - (t - s) / 1000) + " s)@OTL:iap_gwt/img?ti=" + id);
 						}
 					} while (os == null);
 					if (os == null)
@@ -201,13 +199,11 @@ public class DataExportAction extends AbstractNavigationAction {
 			status.setCurrentStatusText1("Data Export@MSG:Download initiated..." + fsinfo);
 			Thread.sleep(1000);
 			
-			final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(os));
+			// ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(os));
 			
-			out.setLevel(0);
-			out.setComment("Created with IAP by user " + SystemAnalysis.getUserName() + ".");
-			// out.setMethod(ZipOutputStream.STORED);
+			final TarArchiveOutputStream out = new TarArchiveOutputStream(os);
 			
-			status.setCurrentStatusText1("Create ZIP");
+			status.setCurrentStatusText1("Create TAR");
 			
 			// filename:
 			// SNAPSHOTNAME=Image Config_[GRAD]Grad
@@ -238,7 +234,7 @@ public class DataExportAction extends AbstractNavigationAction {
 			
 			for (SubstanceInterface su : experiment)
 				for (ConditionInterface co : su)
-					for (SampleInterface sa : co) {
+					for (final SampleInterface sa : co) {
 						for (NumericMeasurementInterface nm : sa) {
 							if (nm instanceof BinaryMeasurement) {
 								BinaryMeasurement bm = (BinaryMeasurement) nm;
@@ -274,6 +270,7 @@ public class DataExportAction extends AbstractNavigationAction {
 									
 									final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
 									
+									// out.putNextEntry(new ZipEntry(zefn));
 									while (written.getInt() > 0)
 										Thread.sleep(5);
 									written.addInt(1);
@@ -283,12 +280,12 @@ public class DataExportAction extends AbstractNavigationAction {
 											synchronized (out) {
 												try {
 													if (in.getCount() > 0) {
-														ZipArchiveEntry entry = new ZipArchiveEntry(zefn);
+														TarArchiveEntry entry = new TarArchiveEntry(zefn);
 														entry.setSize(in.getCount());
-														entry.setCrc(in.getCRC32());
-														out.putNextEntry(entry);
+														entry.setModTime(sa.getRowId());
+														out.putArchiveEntry(entry);
 														out.write(in.getBuff(), 0, in.getCount());
-														out.closeEntry();
+														out.closeArchiveEntry();
 													}
 												} catch (IOException e) {
 													System.out.println("ERROR: " + e.getMessage());
@@ -299,19 +296,11 @@ public class DataExportAction extends AbstractNavigationAction {
 										}
 									});
 									
-									// int len;
-									// while ((len = in.read(buf)) > 0) {
-									// out.write(buf, 0, len);
-									// written += len;
-									// }
-									// Complete the entry
-									// out.closeEntry();
 									in.close();
 								} catch (Exception e) {
 									System.out.println("ERROR: " + e.getMessage());
 								}
-								String pre = "Create ZIP: ";
-								status.setCurrentStatusText1(pre + (written.getLong() / 1024 / 1024) + " MB");
+								status.setCurrentStatusText1("Create TAR: " + (written.getLong() / 1024 / 1024) + " MB");
 								
 								long currTime = System.currentTimeMillis();
 								
