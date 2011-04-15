@@ -5,7 +5,7 @@
  * Created on Nov 26, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.datasources.http_folder;
+package de.ipk.ag_ba.datasources.file_system;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,17 +15,18 @@ import org.graffiti.plugin.io.resources.HTTPhandler;
 
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
+import de.ipk.ag_ba.datasources.http_folder.HTTPdataSourceLevel;
+import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.navigation_actions.Book;
 import de.ipk.ag_ba.gui.navigation_actions.Library;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.WebDirectoryFileListAccess;
 
 /**
  * @author klukas
  */
-public class HTTPfolderSource extends HTTPhandler implements DataSource {
+public class FileSystemSource extends HTTPhandler implements DataSource {
 	
 	private final String url;
 	private final String[] validExtensions;
@@ -38,7 +39,7 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 	private final Library lib;
 	private String description;
 	
-	public HTTPfolderSource(Library lib, String dataSourceName, String url, String[] validExtensions,
+	public FileSystemSource(Library lib, String dataSourceName, String url, String[] validExtensions,
 						NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
 		this.lib = lib;
 		this.url = url;
@@ -55,7 +56,7 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 	
 	@Override
 	public void readDataSource() throws Exception {
-		mainList = WebDirectoryFileListAccess.getWebDirectoryFileListItems(url, validExtensions, false);
+		mainList = FileSystemAccess.getWebDirectoryFileListItems(url, validExtensions, false);
 		thisLevel = new HTTPdataSourceLevel(lib, dataSourceName, mainList, mainDataSourceIcon, folderIcon);
 		read = true;
 	}

@@ -137,7 +137,8 @@ public class IAPgui {
 							+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
 							+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
 							new LogService().getLatestNews(5,
-									"<br>Latest changes:<ul>",
+									"<br>" +
+											"<p>Latest changes:<br><br><ul>",
 									"<li>", "", "<br><br>");
 	}
 	

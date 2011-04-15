@@ -29,7 +29,6 @@ import javax.swing.SwingUtilities;
 
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
-import org.MarkComponent;
 import org.ObjectRef;
 import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
@@ -660,16 +659,16 @@ public class NavigationButton implements StyleAware {
 		else
 			rr = n1;
 		
-		if (n.isRightAligned()) {
-			MarkComponent mc = new MarkComponent(rr, true, TableLayout.PREFERRED, false);
-			int r = 255;
-			int g = 180;
-			int b = 180;
-			mc.setMarkColor(new Color(r, g, b), null);
-			mc.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
-			return mc;
-		} else
-			return rr;
+		// if (n.isRightAligned()) {
+		// MarkComponent mc = new MarkComponent(rr, true, TableLayout.PREFERRED, false);
+		// int r = 255;
+		// int g = 180;
+		// int b = 180;
+		// mc.setMarkColor(new Color(r, g, b), null);
+		// mc.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
+		// return mc;
+		// } else
+		return rr;
 	}
 	
 	public GUIsetting getGUIsetting() {

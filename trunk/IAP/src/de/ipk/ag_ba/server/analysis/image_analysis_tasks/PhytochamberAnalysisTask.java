@@ -164,8 +164,10 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages()) {
-							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(
-									new ImageProcessorOptions());
+							
+							ImageProcessorOptions options = new ImageProcessorOptions();
+							
+							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(options);
 							
 							FlexibleImageStack debugImageStack = null;
 							boolean addDebugImages = true;

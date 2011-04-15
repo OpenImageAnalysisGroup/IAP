@@ -13,6 +13,7 @@ import java.util.Collection;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.gui.navigation_actions.Book;
 import de.ipk.ag_ba.gui.navigation_actions.Library;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
@@ -84,6 +85,11 @@ public class VANTEDdataSource extends HTTPfolderSource {
 			@Override
 			public String getDescription() {
 				return null;
+			}
+			
+			@Override
+			public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
+				return new ArrayList<NavigationButton>();
 			}
 		});
 		return res;

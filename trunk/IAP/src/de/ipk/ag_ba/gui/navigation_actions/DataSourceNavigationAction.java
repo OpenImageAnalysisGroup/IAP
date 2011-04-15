@@ -42,6 +42,11 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		actions = new ArrayList<NavigationButton>();
+		
+		for (NavigationButton nb : dataSourceLevel.getAdditionalEntities(src)) {
+			actions.add(nb);
+		}
+		
 		for (Book b : dataSourceLevel.getReferenceInfos()) {
 			actions.add(b.getNavigationButton(src));
 		}

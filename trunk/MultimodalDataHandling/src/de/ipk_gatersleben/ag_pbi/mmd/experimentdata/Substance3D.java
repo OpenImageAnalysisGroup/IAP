@@ -208,7 +208,7 @@ public class Substance3D extends Substance {
 	public static Long getFileSize(List<NumericMeasurementInterface> files) {
 		long size = 0;
 		HashMap<String, ResourceIOHandler> map = new HashMap<String, ResourceIOHandler>();
-		for (NumericMeasurementInterface nmi : files) {
+		mainLoop: for (NumericMeasurementInterface nmi : files) {
 			if (nmi instanceof BinaryMeasurement) {
 				BinaryMeasurement binaryMeasurement = (BinaryMeasurement) nmi;
 				IOurl u = binaryMeasurement.getURL();
@@ -223,6 +223,10 @@ public class Substance3D extends Substance {
 							Long fs = h.getStreamLength(u);
 							if (fs != null && fs > 0)
 								size += fs;
+							else {
+								size = -1;
+								break mainLoop;
+							}
 						} catch (Exception e) {
 							// empty
 						}
