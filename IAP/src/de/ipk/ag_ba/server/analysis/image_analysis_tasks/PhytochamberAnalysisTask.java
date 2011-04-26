@@ -170,9 +170,10 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(options);
 							
 							FlexibleImageStack debugImageStack = null;
-							boolean addDebugImages = true;
-							if (addDebugImages)
+							boolean addDebugImages = false;
+							if (addDebugImages) {
 								debugImageStack = new FlexibleImageStack();
+							}
 							
 							// input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
 							// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());

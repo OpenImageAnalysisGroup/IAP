@@ -117,7 +117,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("lemnatec:"))
 				experiment = new LemnaTecDataExchange().getExperiment(header, status);
 			else
-				experiment = m.getExperiment(header);
+				experiment = m.getExperiment(header, true);
 		}
 	}
 	
