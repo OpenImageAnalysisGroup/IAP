@@ -30,10 +30,14 @@ public class ExperimentReference {
 	}
 	
 	public ExperimentInterface getData(MongoDB m) throws Exception {
+		return getData(m, false);
+	}
+	
+	public ExperimentInterface getData(MongoDB m, boolean interactiveGetExperimentSize) throws Exception {
 		if (experiment != null)
 			return experiment;
 		else
-			return m.getExperiment(header);
+			return m.getExperiment(header, interactiveGetExperimentSize);
 	}
 	
 	public String getExperimentName() {

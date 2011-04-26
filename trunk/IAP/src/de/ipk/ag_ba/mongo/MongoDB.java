@@ -1118,6 +1118,10 @@ public class MongoDB {
 	}
 	
 	public ExperimentInterface getExperiment(final ExperimentHeaderInterface header) {
+		return getExperiment(header, false);
+	}
+	
+	public ExperimentInterface getExperiment(final ExperimentHeaderInterface header, final boolean interactiveCalculateExperimentSize) {
 		final ExperimentInterface experiment = new Experiment();
 		try {
 			processDB(new RunnableOnDB() {
@@ -1154,7 +1158,7 @@ public class MongoDB {
 										MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
 					
-					if (numberOfImagesAndVolumes > 0) {
+					if (numberOfImagesAndVolumes > 0 && interactiveCalculateExperimentSize) {
 						updateExperimentSize(db, experiment);
 					}
 				}
@@ -1513,7 +1517,7 @@ public class MongoDB {
 							
 							if (!added)
 								if (batch.getRunStatus() != null)
-									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 60000)) {
+									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5000)) {
 										// res.add(batch);
 										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
 										break;
@@ -1551,10 +1555,11 @@ public class MongoDB {
 						collection.setObjectClass(BatchCmd.class);
 						DBObject dbo = new BasicDBObject();
 						dbo.put("_id", batch.get("_id"));
-						String rs = batch.getString("runstatus");
-						dbo.put("runstatus", rs);
-						if (requireOwnership)
+						// String rs = batch.getString("runstatus");
+						// dbo.put("runstatus", rs);
+						if (requireOwnership) {
 							dbo.put("owner", SystemAnalysisExt.getHostName());
+						}
 						batch.put("runstatus", starting.toString());
 						batch.put("lastupdate", System.currentTimeMillis());
 						WriteResult r = collection.update(dbo, batch, false, false);
