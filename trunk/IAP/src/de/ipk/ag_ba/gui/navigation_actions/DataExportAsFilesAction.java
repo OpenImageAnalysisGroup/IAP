@@ -210,7 +210,7 @@ public class DataExportAsFilesAction extends AbstractNavigationAction {
 														(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad " : "0Grad") : "") + " " +
 														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
 														gc.get(GregorianCalendar.YEAR) + "-" +
-														gc.get(GregorianCalendar.MONTH) + "-" +
+														(gc.get(GregorianCalendar.MONTH) + 1) + "-" +
 														gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
 														gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
 														gc.get(GregorianCalendar.MINUTE) + "_" +
