@@ -6,7 +6,6 @@
  */
 package de.ipk.ag_ba.server.task_management;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.ErrorMsg;
@@ -120,10 +119,7 @@ public class CloudComputingService {
 				// if (ei.getExperimentname() == null || ei.getExperimentname().length() == 0 || ei.getExperimentname().contains("§"))
 				// m.deleteExperiment(ei.getExcelfileid());
 				// }
-				String hostName = InetAddress.getLocalHost().getHostName();
-				String ip = InetAddress.getLocalHost().getHostAddress();
-				cloudTaskManager.setHostName(hostName);
-				cloudTaskManager.setIp(ip);
+				cloudTaskManager.setHostName(SystemAnalysisExt.getHostName());
 				cloudTaskManager.startWork(m);
 			} catch (UnknownHostException e) {
 				ErrorMsg.addErrorMessage(e);

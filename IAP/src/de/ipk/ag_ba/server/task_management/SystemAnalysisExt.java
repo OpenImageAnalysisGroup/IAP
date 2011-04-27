@@ -203,6 +203,8 @@ public class SystemAnalysisExt {
 	
 	private static String hostName = null;
 	
+	private static long startupTime = System.currentTimeMillis();
+	
 	public static String getHostName() throws UnknownHostException {
 		if (hostName != null)
 			return hostName;
@@ -214,7 +216,7 @@ public class SystemAnalysisExt {
 		
 		boolean retIP = true;
 		if (retIP)
-			res = ip;
+			res = ip + "_" + startupTime;
 		else
 			res = hostNameR;
 		hostName = res;

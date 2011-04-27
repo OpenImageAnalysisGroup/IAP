@@ -1492,7 +1492,7 @@ public class MongoDB {
 		return res;
 	}
 	
-	public Collection<BatchCmd> batchGetWorkTasksScheduledForStart() {
+	public Collection<BatchCmd> batchGetWorkTasksScheduledForStart(final int maxTasks) {
 		final Collection<BatchCmd> res = new ArrayList<BatchCmd>();
 		try {
 			processDB(new RunnableOnDB() {
@@ -1505,24 +1505,44 @@ public class MongoDB {
 						hostName = SystemAnalysisExt.getHostName();
 						DBCollection collection = db.getCollection("schedule");
 						collection.setObjectClass(BatchCmd.class);
-						for (DBObject dbo : collection.find()) {
+						boolean added = false;
+						int addCnt = 0;
+						for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.SCHEDULED))) {
 							BatchCmd batch = (BatchCmd) dbo;
-							boolean added = false;
-							if (batch.getRunStatus() != null && batch.getRunStatus() == CloudAnalysisStatus.STARTING)
-								if (hostName.equals("" + batch.getOwner())) {
-									res.add(batch);
-									added = true;
+							if (batch.getOwner() == null)
+								batchClaim(batch, CloudAnalysisStatus.STARTING, false);
+							if (hostName.equals("" + batch.getOwner())) {
+								res.add(batch);
+								added = true;
+								addCnt++;
+								if (addCnt >= maxTasks)
 									break;
-								}
-							
-							if (!added)
-								if (batch.getRunStatus() != null)
+							}
+						}
+						int claimed = 0;
+						if (addCnt < maxTasks)
+							for (DBObject dbo : collection.find()) {
+								BatchCmd batch = (BatchCmd) dbo;
+								if (!added)
 									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5000)) {
 										// res.add(batch);
 										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
-										break;
+										claimed++;
+										if (claimed >= maxTasks)
+											break;
 									}
-						}
+							}
+						if (addCnt < maxTasks)
+							for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.STARTING))) {
+								BatchCmd batch = (BatchCmd) dbo;
+								if (hostName.equals("" + batch.getOwner())) {
+									res.add(batch);
+									addCnt++;
+									if (addCnt >= maxTasks)
+										added = true;
+									break;
+								}
+							}
 					} catch (UnknownHostException e) {
 						ErrorMsg.addErrorMessage(e);
 					}
@@ -1550,7 +1570,6 @@ public class MongoDB {
 				@Override
 				public void run() {
 					try {
-						batch.setOwner(SystemAnalysisExt.getHostName());
 						DBCollection collection = db.getCollection("schedule");
 						collection.setObjectClass(BatchCmd.class);
 						DBObject dbo = new BasicDBObject();
@@ -1562,7 +1581,9 @@ public class MongoDB {
 						}
 						batch.put("runstatus", starting.toString());
 						batch.put("lastupdate", System.currentTimeMillis());
-						WriteResult r = collection.update(dbo, batch, false, false);
+						batch.put("owner", SystemAnalysisExt.getHostName());
+						// WriteResult r =
+						collection.update(dbo, batch, false, false);
 						// System.out.println("Update status: " + rs + " --> " + starting.toString() + ", res: " + r.toString());
 					} catch (UnknownHostException e) {
 						ErrorMsg.addErrorMessage(e);
