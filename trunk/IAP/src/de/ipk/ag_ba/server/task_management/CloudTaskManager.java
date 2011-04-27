@@ -24,7 +24,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 public class CloudTaskManager {
 	
 	private String hostName;
-	private String ip;
 	
 	private boolean process = false;
 	
@@ -63,10 +62,6 @@ public class CloudTaskManager {
 		this.hostName = hostName;
 	}
 	
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
-	
 	public void startWork(MongoDB m) {
 		this.m = m;
 		setProcess(true);
@@ -79,35 +74,31 @@ public class CloudTaskManager {
 	
 	private void run() throws Exception {
 		try {
-			// int idx_loop = 0;
 			do {
 				if (CloudTaskManager.this.process) {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
-					long maxDelaySinceLastUpdate = 5000;
-					m.batchPingHost(ip,
+					
+					m.batchPingHost(hostName,
 							BlockPipeline.getBlockExecutionsWithinLastMinute(),
 							BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute());
-					if (runningTasks.size() < SystemAnalysis.getNumberOfCPUs() / 5 + 1) {
+					
+					int maxTasks = SystemAnalysis.getNumberOfCPUs() / 2;
+					if (maxTasks < 1)
+						maxTasks = 1;
+					
+					if (runningTasks.size() < maxTasks) {
 						if (m == null)
 							return;
-						for (BatchCmd batch : m.batchGetCommands(maxDelaySinceLastUpdate)) {
-							if (batch.getExperimentMongoID() != null && (batch.getTargetIPs().isEmpty() || batch.getTargetIPs().contains(ip))) {
-								m.batchClaim(batch, CloudAnalysisStatus.STARTING, false);
-								break;
-							}
-						}
-						for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart()) {
-							// if (batch.getTargetIPs().isEmpty() || batch.getTargetIPs().contains(ip)) {
+						for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart(maxTasks - runningTasks.size())) {
 							if (batch.getExperimentMongoID() != null) {
 								ExperimentHeaderInterface header = m.getExperimentHeader(batch.getExperimentMongoID());
-								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), ip);
+								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), hostName);
 								commands_to_start.add(task);
-								break;
 							}
-							// }
 						}
 					}
+					
 					ArrayList<TaskDescription> del = new ArrayList<TaskDescription>();
 					for (TaskDescription td : runningTasks) {
 						if (td.analysisFinished()) {
@@ -127,7 +118,7 @@ public class CloudTaskManager {
 								// System.out.println("loop: " + idx_loop + ", start: " + td.toString() + ", status: " + td.getBatchCmd().getRunStatus());
 								td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS);
 								runningTasks.add(td);
-								td.startWork(td.getBatchCmd(), hostName, ip, m);
+								td.startWork(td.getBatchCmd(), hostName, hostName, m);
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 							}

@@ -13,6 +13,7 @@ import org.BackgroundTaskStatusProvider;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 import de.ipk.ag_ba.mongo.MongoDB;
 
@@ -154,5 +155,9 @@ public class BatchCmd extends BasicDBObject {
 	
 	public String getOwner() {
 		return getString("owner");
+	}
+	
+	public static DBObject getRunstatusMatcher(CloudAnalysisStatus starting) {
+		return new BasicDBObject("runstatus", starting.toString());
 	}
 }

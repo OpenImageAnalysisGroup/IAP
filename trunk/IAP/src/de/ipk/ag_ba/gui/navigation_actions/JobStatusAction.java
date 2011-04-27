@@ -62,7 +62,7 @@ public class JobStatusAction extends AbstractNavigationAction {
 					if (remainingJobs == 0)
 						jobIds.clear();
 				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
+					System.out.println("ERROR: " + e.getMessage());
 				}
 				if (jobIds.size() > 0)
 					return 100d / jobIds.size() * finishedJobs;

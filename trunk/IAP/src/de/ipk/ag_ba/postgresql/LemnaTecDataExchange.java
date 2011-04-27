@@ -97,6 +97,8 @@ public class LemnaTecDataExchange {
 		rs.close();
 		ps.close();
 		
+		closeDatabaseConnection(connection);
+		
 		return result;
 	}
 	
@@ -375,6 +377,9 @@ public class LemnaTecDataExchange {
 			rs.close();
 			ps.close();
 		}
+		
+		closeDatabaseConnection(connection);
+		
 		return result;
 	}
 	
@@ -833,6 +838,9 @@ public class LemnaTecDataExchange {
 		} catch (Exception e) {
 			System.err.println("ERROR: " + e.getMessage());
 		}
+		
+		closeDatabaseConnection(connection);
+		
 		return res;
 	}
 	
@@ -885,6 +893,8 @@ public class LemnaTecDataExchange {
 		}
 		rs.close();
 		ps.close();
+		
+		closeDatabaseConnection(connection);
 		
 		return ok;
 	}

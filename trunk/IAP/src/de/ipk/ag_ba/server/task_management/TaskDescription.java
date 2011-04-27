@@ -118,8 +118,8 @@ public class TaskDescription {
 												&& partCnt.equals(bpn)
 												&& submTime.equals(bst))
 											knownResults.add(i);
-										else
-											System.out.println("NO FIT: " + i.toString());
+										// else
+										// System.out.println("NO FIT: " + i.getExperimentname());
 									}
 								}
 							}
