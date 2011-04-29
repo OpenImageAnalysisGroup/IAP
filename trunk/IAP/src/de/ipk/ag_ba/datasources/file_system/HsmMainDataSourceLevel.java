@@ -18,9 +18,12 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 	
 	private final HashMap<String, TreeMap<Long, ExperimentHeader>> experimentName2saveTime2data;
 	private String description;
+	private int n = 0;
 	
 	public HsmMainDataSourceLevel(HashMap<String, TreeMap<Long, ExperimentHeader>> experimentName2saveTime2data) {
 		this.experimentName2saveTime2data = experimentName2saveTime2data;
+		for (TreeMap<Long, ExperimentHeader> tmm : experimentName2saveTime2data.values())
+			n += 1; // tmm.values().size(); // only one item is counted (the remaining are older exp. versions)
 	}
 	
 	@Override
@@ -56,7 +59,10 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 	
 	@Override
 	public String getName() {
-		return "HSM Archive";
+		if (n > 0)
+			return "HSM Archive (" + n + ")";
+		else
+			return "HSM Archive";
 	}
 	
 	@Override
@@ -78,5 +84,4 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
 		return new ArrayList<NavigationButton>();
 	}
-	
 }

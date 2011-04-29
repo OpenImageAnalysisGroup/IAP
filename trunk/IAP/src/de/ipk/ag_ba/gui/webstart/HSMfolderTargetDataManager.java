@@ -60,7 +60,7 @@ public class HSMfolderTargetDataManager {
 		return res + File.separator + zefn;
 	}
 	
-	public String prepareAndGetDataFileNameAndPath(ExperimentHeaderInterface experimentHeader, Date optSnapshotTime, String zefn) {
+	public String prepareAndGetDataFileNameAndPath(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime, String zefn) {
 		String subPath = getTargetDirectory(experimentHeader, optSnapshotTime);
 		if (subPath.startsWith(DIRECTORY_FOLDER_NAME) || subPath.startsWith("bbb_"))
 			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentname()
@@ -71,7 +71,7 @@ public class HSMfolderTargetDataManager {
 		return res + File.separator + filterBadChars(zefn);
 	}
 	
-	public String prepareAndGetPreviewFileNameAndPath(ExperimentHeaderInterface experimentHeader, Date optSnapshotTime, String zefn) {
+	public String prepareAndGetPreviewFileNameAndPath(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime, String zefn) {
 		String subPath = getTargetDirectory(experimentHeader, optSnapshotTime);
 		if (subPath.startsWith(DIRECTORY_FOLDER_NAME) || subPath.startsWith(CONDITION_FOLDER_NAME))
 			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentname()
@@ -94,11 +94,10 @@ public class HSMfolderTargetDataManager {
 		return s;
 	}
 	
-	private static GregorianCalendar cal = new GregorianCalendar();
-	
-	private String getTargetDirectory(ExperimentHeaderInterface experimentHeader, Date optSnapshotTime) {
+	private String getTargetDirectory(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime) {
+		GregorianCalendar cal = new GregorianCalendar();
 		if (optSnapshotTime != null)
-			cal.setTime(optSnapshotTime);
+			cal.setTime(new Date(optSnapshotTime));
 		String pre = "";
 		if (experimentHeader.getExperimentType() != null && experimentHeader.getExperimentType().length() > 0)
 			pre = experimentHeader.getExperimentType() + File.separator;

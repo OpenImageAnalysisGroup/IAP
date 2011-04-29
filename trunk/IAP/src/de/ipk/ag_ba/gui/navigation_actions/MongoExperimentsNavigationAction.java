@@ -34,12 +34,21 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	private final boolean limitToResuls;
 	private final boolean limitToData;
 	private String currentUser;
+	private int nVis, nAvail = 0;
 	
 	public MongoExperimentsNavigationAction(MongoDB m, boolean limitToData, boolean limitToResults) {
 		super("Access " + m.getDisplayName());
 		this.limitToData = limitToData;
 		this.limitToResuls = limitToResults;
 		this.m = m;
+	}
+	
+	@Override
+	public String getDefaultTitle() {
+		if (nAvail > 0)
+			return m.getDisplayName() + " (" + nVis + "/" + nAvail + ")";
+		else
+			return m.getDisplayName();
 	}
 	
 	/*
@@ -51,7 +60,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		
+		nVis = 0;
 		if (!limitToResuls) {
 			res.add(new NavigationButton(new DomainLogoutAction(), src.getGUIsetting()));
 			
@@ -80,6 +89,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 					user = "[no user]";
 				if (eh.inTrash()) {
 					trashed.add(eh);
+					nVis++;
 					continue;
 				}
 				if (!experiments.containsKey(type))
@@ -113,7 +123,12 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 				if (trashed.size() > 0) {
 					res.add(new NavigationButton(getTrashedExperimentsAction(trashed, m), src.getGUIsetting()));
 				}
+			
+			for (TreeMap<String, ArrayList<ExperimentHeaderInterface>> tm : experiments.values())
+				for (ArrayList<ExperimentHeaderInterface> al : tm.values())
+					nVis += al.size();
 		}
+		
 		return res;
 	}
 	
@@ -327,6 +342,7 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 		this.src = src;
 		status.setCurrentStatusText1("Establishing Connection");
 		experimentList = m.getExperimentList(currentUser);
+		nAvail = experimentList.size();
 		status.setCurrentStatusText1("");
 	}
 	

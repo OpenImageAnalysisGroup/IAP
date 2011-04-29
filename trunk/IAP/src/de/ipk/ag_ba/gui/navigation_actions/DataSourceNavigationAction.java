@@ -25,12 +25,13 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return dataSourceLevel.getName();
+		String n = getDataSourceLevel().getName();
+		return n;
 	}
 	
 	@Override
 	public NavigationImage getImageIcon() {
-		return dataSourceLevel.getIcon();
+		return getDataSourceLevel().getIcon();
 	}
 	
 	@Override
@@ -43,14 +44,14 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 		this.src = src;
 		actions = new ArrayList<NavigationButton>();
 		
-		for (NavigationButton nb : dataSourceLevel.getAdditionalEntities(src)) {
+		for (NavigationButton nb : getDataSourceLevel().getAdditionalEntities(src)) {
 			actions.add(nb);
 		}
 		
-		for (Book b : dataSourceLevel.getReferenceInfos()) {
+		for (Book b : getDataSourceLevel().getReferenceInfos()) {
 			actions.add(b.getNavigationButton(src));
 		}
-		for (PathwayWebLinkItem wl : dataSourceLevel.getPathways()) {
+		for (PathwayWebLinkItem wl : getDataSourceLevel().getPathways()) {
 			if (wl.isBookmark()) {
 				Book b = new Book(wl.getGroup1(),
 						makePretty(wl.getFileName()),
@@ -64,16 +65,16 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 				actions.add(b.getNavigationButton(src, "img/ext/paper.png"));
 			}
 		}
-		for (DataSourceLevel dsl : dataSourceLevel.getSubLevels()) {
+		for (DataSourceLevel dsl : getDataSourceLevel().getSubLevels()) {
 			actions.add(new NavigationButton(new DataSourceNavigationAction(dsl), src.getGUIsetting()));
 		}
-		for (PathwayWebLinkItem wl : dataSourceLevel.getPathways()) {
+		for (PathwayWebLinkItem wl : getDataSourceLevel().getPathways()) {
 			if (!wl.isBookmark() && !wl.isPDF()) {
 				NavigationButton ne = IAPservice.getPathwayViewEntity(wl, src.getGUIsetting());
 				actions.add(ne);
 			}
 		}
-		for (ExperimentReference er : dataSourceLevel.getExperiments()) {
+		for (ExperimentReference er : getDataSourceLevel().getExperiments()) {
 			NavigationButton ne = MongoExperimentsNavigationAction.getMongoExperimentButton(er.getHeader(), src.getGUIsetting(), null);
 			actions.add(ne);
 		}
@@ -92,8 +93,8 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		if (dataSourceLevel.getDescription() != null)
-			return new MainPanelComponent(dataSourceLevel.getDescription());
+		if (getDataSourceLevel().getDescription() != null)
+			return new MainPanelComponent(getDataSourceLevel().getDescription());
 		else
 			return null;
 	}
@@ -108,6 +109,10 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return actions;
+	}
+
+	public DataSourceLevel getDataSourceLevel() {
+		return dataSourceLevel;
 	}
 	
 }

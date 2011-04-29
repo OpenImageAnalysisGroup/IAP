@@ -140,6 +140,9 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public String getTitle(boolean forceProgressText) {
+		if (action != null && action.getDefaultTitle() != null && action.getDefaultTitle().length() > 0)
+			title = action.getDefaultTitle();
+		
 		long compTime = System.currentTimeMillis() - processingStart;
 		if (!forceProgressText && !(isProcessing() || requestsTitleUpdates()) || compTime < 1000)
 			return title;
