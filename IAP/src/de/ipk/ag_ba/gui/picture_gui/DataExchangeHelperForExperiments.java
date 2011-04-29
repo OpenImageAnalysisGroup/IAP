@@ -304,11 +304,16 @@ public class DataExchangeHelperForExperiments {
 						previewImage = null;
 						previewLoadAndConstructNeeded = true;
 					} else {
-						byte[] pi = m.getPreviewData(binaryFileInfo.getHashMain());
-						if (pi != null)
-							previewImage = new ImageIcon(pi);
-						else
+						if (binaryFileInfo.getFileNameMain().getPrefix().startsWith("mongo_")) {
+							byte[] pi = m.getPreviewData(binaryFileInfo.getHashMain());
+							if (pi != null)
+								previewImage = new ImageIcon(pi);
+							else
+								previewLoadAndConstructNeeded = true;
+						} else {
+							previewImage = null;
 							previewLoadAndConstructNeeded = true;
+						}
 					}
 				final DataSetFileButton imageButton = new DataSetFileButton(m, mt, imageResult,
 									previewImage, mt.isReadOnly());

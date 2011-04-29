@@ -21,6 +21,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -77,7 +78,7 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			add = true;
 		}
 		if (add) {
-			boolean imageAnalysis = m != null;
+			boolean imageAnalysis = m != null || header.getDatabaseId().startsWith("hsm:");
 			getDefaultActions(actions, experiment, header, imageAnalysis, src.getGUIsetting(), m);
 		}
 		return actions;
@@ -117,7 +118,12 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("lemnatec:"))
 				experiment = new LemnaTecDataExchange().getExperiment(header, status);
 			else
-				experiment = m.getExperiment(header, true);
+				if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("hsm:"))
+					experiment = HSMfolderTargetDataManager.getExperiment(header, status);
+				else
+					experiment = m.getExperiment(header, true);
+			if (experiment != null)
+				experiment.setHeader(header);
 		}
 	}
 	

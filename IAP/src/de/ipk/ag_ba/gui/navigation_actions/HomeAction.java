@@ -1,14 +1,17 @@
 package de.ipk.ag_ba.gui.navigation_actions;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProvider;
 
+import de.ipk.ag_ba.datasources.DataSource;
+import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
+import de.ipk.ag_ba.datasources.http_folder.IAPnewsLinksSource;
 import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
 import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
-import de.ipk.ag_ba.datasources.http_folder.IAPnewsLinksSource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.nav.RimasNav;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -17,6 +20,7 @@ import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -38,6 +42,18 @@ public final class HomeAction extends AbstractNavigationAction {
 		homePrimaryActions = new ArrayList<NavigationButton>();
 		for (NavigationButton ne : new Phenotyping(guiSetting).getResultNewActionSet()) {
 			homePrimaryActions.add(ne);
+		}
+		
+		String hsm = IAPmain.getHSMfolder();
+		if (hsm != null && new File(hsm).exists()) {
+			// add HSM entry
+			Library lib = new Library();
+			DataSource dataSource = new HsmFileSystemSource(lib, "HSM Archive", hsm,
+					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+					IAPmain.loadIcon("img/ext/folder-remote.png"));
+			NavigationButton hsmSrc = new NavigationButton(new DataSourceNavigationAction(dataSource), guiSetting);
+			hsmSrc.setToolTipText("Target: " + hsm);
+			homePrimaryActions.add(hsmSrc);
 		}
 		
 		NavigationButton rimas = RimasNav.getRimas(src != null ? src.getGUIsetting() : null);

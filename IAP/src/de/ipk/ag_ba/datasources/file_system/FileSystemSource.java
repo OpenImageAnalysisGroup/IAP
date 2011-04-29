@@ -28,14 +28,14 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
  */
 public class FileSystemSource extends HTTPhandler implements DataSource {
 	
-	private final String url;
+	protected final String url;
 	private final String[] validExtensions;
-	private Collection<PathwayWebLinkItem> mainList;
+	protected Collection<PathwayWebLinkItem> mainList;
 	private final NavigationImage mainDataSourceIcon;
 	private final String dataSourceName;
 	private final NavigationImage folderIcon;
-	private boolean read;
-	private HTTPdataSourceLevel thisLevel;
+	protected boolean read;
+	protected DataSourceLevel thisLevel;
 	private final Library lib;
 	private String description;
 	

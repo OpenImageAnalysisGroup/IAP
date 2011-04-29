@@ -371,6 +371,8 @@ public class IAPservice {
 		switch (groupByCoordinator) {
 			case GROUP_BY_COORDINATOR:
 				return true;
+			case GROUP_BY_EXPERIMENT_TYPE:
+				return true;
 		}
 		return false;
 	}

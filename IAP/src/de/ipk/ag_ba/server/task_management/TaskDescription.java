@@ -13,6 +13,7 @@ import java.util.Date;
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 
+import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -143,7 +144,7 @@ public class TaskDescription {
 								if (sn.indexOf(".") > 0)
 									sn = sn.substring(sn.lastIndexOf(".") + 1);
 								e.getHeader().setExperimentname(sn + ": " + experimentInput.getExperimentName());
-								e.getHeader().setImportusergroup("Analysis Results");
+								e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
 								e.getHeader().setDatabaseId("");
 								for (SubstanceInterface si : e) {
 									for (ConditionInterface ci : si) {
@@ -153,7 +154,8 @@ public class TaskDescription {
 								long tStart = cmd.getSubmissionTime();
 								long tProcessing = tFinish - tStart;
 								long minutes = tProcessing / 1000 / 60;
-								e.getHeader().setRemark(e.getHeader().getRemark() + " // processing time (min): " + minutes);
+								e.getHeader().setRemark(
+										e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " + SystemAnalysisExt.getCurrentTime());
 								System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 								System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
 								System.out.println("*****************************");

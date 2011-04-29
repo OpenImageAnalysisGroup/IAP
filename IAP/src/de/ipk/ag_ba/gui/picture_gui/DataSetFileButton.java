@@ -211,9 +211,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				JMenuItem tempItem = new JMenuItem("Download file...");
 				tempItem.setEnabled(false);
 				myPopup.add(tempItem);
+				myPopup.show(this, 5, 5);
 				
 				downloadNeeded = false;
-				setProgressValue(0);
+				setProgressValue(-1);
 				showProgressbar();
 				MyThread download = new MyThread(new Runnable() {
 					public void run() {
@@ -311,10 +312,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					JMenuItem tempItem = new JMenuItem("Download in progress...");
 					tempItem.setEnabled(false);
 					myPopup.add(tempItem);
+					myPopup.show(this, 5, 5);
 				} else {
 					addDefaultCommands(myPopup);
+					myPopup.show(this, 5, 5);
 				}
-			myPopup.show(this, 5, 5);
 			
 		}
 		if (evt.getSource() == saveFileCmdMain) {
