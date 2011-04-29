@@ -333,10 +333,10 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 							+
 							(id != null ? (id.getPosition() != null ? "DEG_" + HSMfolderTargetDataManager.digit3(id.getPosition().intValue())
 									: "DEG_000") : "") + " " +
-							"REPL_" + id.getReplicateID() + " " +
+							"REPL_" + HSMfolderTargetDataManager.digit3(id.getReplicateID()) + " " +
 							id.getURL().getFileName().split(" ")[0]
 							+ " " +
-							nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
+							nm.getParentSample().getTimeUnit() + "_" + HSMfolderTargetDataManager.digit3(nm.getParentSample().getTime()) + " " +
 							HSMfolderTargetDataManager.digit2(gc.get(GregorianCalendar.YEAR)) + "-" +
 							HSMfolderTargetDataManager.digit2((gc.get(GregorianCalendar.MONTH) + 1)) + "-" +
 							HSMfolderTargetDataManager.digit2(gc.get(GregorianCalendar.DAY_OF_MONTH)) + " " +
