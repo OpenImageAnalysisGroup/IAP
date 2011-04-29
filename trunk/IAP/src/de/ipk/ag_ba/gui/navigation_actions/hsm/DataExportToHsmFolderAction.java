@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
@@ -192,6 +193,9 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 						}
 					}
 			}
+			
+			es.shutdown();
+			es.awaitTermination(1, TimeUnit.DAYS);
 			
 			if (errorCount == 0) {
 				status.setCurrentStatusText1("Finalize storage");
