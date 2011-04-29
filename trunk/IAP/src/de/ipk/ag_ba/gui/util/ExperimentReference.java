@@ -17,7 +17,7 @@ public class ExperimentReference {
 	
 	private final String experimentName;
 	private ExperimentInterface experiment;
-	private ExperimentHeaderInterface header;
+	private final ExperimentHeaderInterface header;
 	
 	public ExperimentReference(ExperimentHeaderInterface header) {
 		this.experimentName = header.getExperimentname();
@@ -27,6 +27,7 @@ public class ExperimentReference {
 	public ExperimentReference(ExperimentInterface experiment) {
 		this.experimentName = experiment.getName();
 		this.experiment = experiment;
+		this.header = experiment.getHeader();
 	}
 	
 	public ExperimentInterface getData(MongoDB m) throws Exception {

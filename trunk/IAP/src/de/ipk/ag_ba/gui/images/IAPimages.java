@@ -74,4 +74,8 @@ public class IAPimages {
 	public static String getArchive() {
 		return "img/ext/gpl2/Gnome-System-File-Manager-64.png";
 	}
+	
+	public static String saveToHsmArchive() {
+		return "img/ext/gpl2/Gnome-Media-Tape-64.png";
+	}
 }

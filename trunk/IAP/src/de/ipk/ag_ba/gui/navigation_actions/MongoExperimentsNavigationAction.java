@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -71,9 +72,9 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> experiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			ArrayList<ExperimentHeaderInterface> trashed = new ArrayList<ExperimentHeaderInterface>();
 			for (ExperimentHeaderInterface eh : experimentList) {
-				String group = eh.getImportusergroup();
-				if (group == null || group.length() == 0)
-					group = "[no group]";
+				String type = IAPservice.getSetting(IAPoptions.GROUP_BY_EXPERIMENT_TYPE) ? eh.getExperimentType() : eh.getImportusergroup();
+				if (type == null || type.length() == 0)
+					type = "[no type]";
 				String user = IAPservice.getSetting(IAPoptions.GROUP_BY_COORDINATOR) ? eh.getCoordinator() : eh.getImportusername();
 				if (user == null || user.length() == 0)
 					user = "[no user]";
@@ -81,11 +82,11 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 					trashed.add(eh);
 					continue;
 				}
-				if (!experiments.containsKey(group))
-					experiments.put(group, new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
-				if (!experiments.get(group).containsKey(user))
-					experiments.get(group).put(user, new ArrayList<ExperimentHeaderInterface>());
-				experiments.get(group).get(user).add(eh);
+				if (!experiments.containsKey(type))
+					experiments.put(type, new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
+				if (!experiments.get(type).containsKey(user))
+					experiments.get(type).put(user, new ArrayList<ExperimentHeaderInterface>());
+				experiments.get(type).get(user).add(eh);
 			}
 			
 			if (!limitToResuls)
@@ -197,13 +198,13 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			public String getDefaultImage() {
 				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
 					return IAPimages.getCloudResult();
-				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)"))
+				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.startsWith(IAPexperimentTypes.Phytochamber))
 					return IAPimages.getPhytochamber();
 				else
-					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)"))
+					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)") || group.startsWith(IAPexperimentTypes.BarleyGreenhouse))
 						return IAPimages.getBarleyGreenhouse();
 					else
-						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)"))
+						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)") || group.startsWith(IAPexperimentTypes.MaizeGreenhouse))
 							return IAPimages.getMaizeGreenhouse();
 						else
 							return "img/ext/network-workgroup.png";
@@ -213,13 +214,13 @@ public class MongoExperimentsNavigationAction extends AbstractNavigationAction {
 			public String getDefaultNavigationImage() {
 				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
 					return IAPimages.getCloudResultActive();
-				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)"))
+				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.startsWith(IAPexperimentTypes.Phytochamber))
 					return IAPimages.getPhytochamber();
 				else
-					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)"))
+					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)") || group.startsWith(IAPexperimentTypes.BarleyGreenhouse))
 						return IAPimages.getBarleyGreenhouse();
 					else
-						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)"))
+						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)") || group.startsWith(IAPexperimentTypes.MaizeGreenhouse))
 							return IAPimages.getMaizeGreenhouse();
 						else
 							return "img/ext/network-workgroup-power.png";

@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -30,6 +31,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import com.toedter.calendar.JDateChooser;
 
+import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
@@ -95,7 +97,16 @@ public class MyExperimentInfoPanel extends JPanel {
 	}
 	
 	private JComboBox getExperimentTypes(MongoDB m, String experimentType, boolean editPossible) {
-		String[] types = new String[] { experimentType };
+		TreeSet<String> typeset = new TreeSet<String>();
+		typeset.add(experimentType);
+		typeset.add(IAPexperimentTypes.Phytochamber);
+		typeset.add(IAPexperimentTypes.BarleyGreenhouse);
+		typeset.add(IAPexperimentTypes.MaizeGreenhouse);
+		typeset.add("Analysis Results");
+		typeset.add("Imported Analysis Results");
+		typeset.add("Imported Dataset");
+		typeset.add("Test (Delete OK)");
+		String[] types = typeset.toArray(new String[] {});
 		// if (user != null && !user.equalsIgnoreCase("internet") && editPossible) {
 		// // try {
 		// // if (pass != null)
@@ -257,7 +268,8 @@ public class MyExperimentInfoPanel extends JPanel {
 							saveAction.run(experimentHeader);
 					} else {
 						if (editPossibleBBB) {
-							if (experimentHeader.getDatabaseId().startsWith("lemnatec:") || experimentHeader.getDatabaseId().isEmpty()) {
+							if (experimentHeader.getDatabaseId().startsWith("lemnatec:") || experimentHeader.getDatabaseId().startsWith("hsm:")
+									|| experimentHeader.getDatabaseId().isEmpty()) {
 								saveB.setText("Updated (in memory)");
 							} else {
 								m.setExperimentInfo(experimentHeader);

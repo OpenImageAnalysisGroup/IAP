@@ -19,9 +19,11 @@ import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
 import de.ipk.ag_ba.gui.navigation_actions.NumericDataReportAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
 import de.ipk.ag_ba.gui.navigation_actions.ThreeDsegmentationAction;
+import de.ipk.ag_ba.gui.navigation_actions.hsm.DataExportToHsmFolderAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
@@ -53,6 +55,8 @@ public class ImageAnalysisCommandManager {
 		
 		if (GraphicsEnvironment.isHeadless())
 			actions.add(new NavigationButton(new NumericDataReportAction(m, experimentReference), guiSetting));
+		
+		actions.add(new NavigationButton(new DataExportToHsmFolderAction(m, experimentReference, IAPmain.getHSMfolder()), guiSetting));
 		
 		actions.add(new NavigationButton(new DataExportAction(m, experimentReference), guiSetting));
 		

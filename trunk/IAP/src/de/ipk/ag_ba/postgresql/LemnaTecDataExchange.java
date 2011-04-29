@@ -28,6 +28,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
+import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -124,19 +125,19 @@ public class LemnaTecDataExchange {
 			ehi.setImportusergroup("LemnaTec");
 			LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
 			if (system == LemnaTecSystem.Barley) {
-				ehi.setExperimenttype("Barley Greenhouse Experiment");
+				ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse);
 				ehi.setImportusergroup("LemnaTec (BGH)");
 			} else
 				if (system == LemnaTecSystem.Maize) {
-					ehi.setExperimenttype("Maize Greenhouse Experiment");
+					ehi.setExperimenttype(IAPexperimentTypes.MaizeGreenhouse);
 					ehi.setImportusergroup("LemnaTec (CGH)");
 				} else
 					if (system == LemnaTecSystem.Phytochamber) {
-						ehi.setExperimenttype("Phytochamber Experiment");
+						ehi.setExperimenttype(IAPexperimentTypes.Phytochamber);
 						ehi.setImportusergroup("LemnaTec (APH)");
 					} else {
-						ehi.setExperimenttype("Phenotyping Experiment (unknown greenhouse)");
-						ehi.setImportusergroup("LemnaTec");
+						ehi.setExperimenttype(IAPexperimentTypes.UnknownGreenhouse);
+						ehi.setImportusergroup("LemnaTec (Other)");
 					}
 			ehi.setSequence("");
 			ehi.setSizekb(-1);
@@ -216,8 +217,8 @@ public class LemnaTecDataExchange {
 				people.get(ehi).add(rs.getString(1));
 			}
 			rs.close();
-			String importers = StringManipulationTools.getStringList(names, ", ");
-			ehi.setRemark("Snapshot creator(s): " + importers);
+			String importers = StringManipulationTools.getStringList(names, ";");
+			ehi.setRemark("Snapshot creators: " + importers);
 			if (ehi.getCoordinator() == null)
 				ehi.setCoordinator(importers);
 		}
@@ -655,7 +656,7 @@ public class LemnaTecDataExchange {
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
 											+ sn.getPath_image_config_blob(), sn.getId_tag()
-											+ (position != null ? " (" + position.intValue() + ")" : ""));
+											+ (position != null ? " (" + position.intValue() + ").png" : ".png"));
 						position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
 						if (Math.abs(position) < 0.00001)
 							position = null;
@@ -667,7 +668,7 @@ public class LemnaTecDataExchange {
 					}
 					
 					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-										+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + position.intValue() + ")" : ""));
+										+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + position.intValue() + ").png" : ".png"));
 					image.setURL(url);
 					fn = sn.getPath_null_image();
 					if (fn != null) {
@@ -675,7 +676,7 @@ public class LemnaTecDataExchange {
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
 											+ sn.getPath_null_image(), sn.getId_tag()
-											+ (position != null ? " (" + position.intValue() + ")" : ""));
+											+ (position != null ? " (" + position.intValue() + ").png" : ".png"));
 						image.setLabelURL(url);
 					}
 					

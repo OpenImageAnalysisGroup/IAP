@@ -1,10 +1,14 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.AttributeHelper;
+import org.ErrorMsg;
 
 public class ExperimentHeader implements ExperimentHeaderInterface {
 	
@@ -179,8 +183,28 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		setSequence((String) map.get("sequence"));
 		setImportusername((String) map.get("importusername"));
 		setImportusergroup((String) map.get("importusergroup"));
-		setImportdate((Date) map.get("importdate"));
-		setStartdate((Date) map.get("startdate"));
+		if (map.get("importdate") != null && map.get("importdate") instanceof String) {
+			try {
+				DateFormat format = new SimpleDateFormat("E MMM d HH:mm:ss z yyyy", new Locale("en"));
+				Date aDate = format.parse((String) map.get("importdate"));
+				setImportdate(aDate);
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+				System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("importdate"));
+			}
+		} else
+			setImportdate((Date) map.get("importdate"));
+		if (map.get("startdate") != null && map.get("startdate") instanceof String) {
+			try {
+				DateFormat format = new SimpleDateFormat("E MMM d HH:mm:ss z yyyy", new Locale("en"));
+				Date aDate = format.parse((String) map.get("startdate"));
+				setStartdate(aDate);
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+				System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("startdate"));
+			}
+		} else
+			setStartdate((Date) map.get("startdate"));
 		if (map.get("imagefiles") != null && map.get("imagefiles") instanceof String)
 			setNumberOfFiles(Integer.parseInt(((String) map.get("imagefiles"))));
 		else
