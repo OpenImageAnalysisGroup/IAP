@@ -17,10 +17,12 @@ public class HsmDataSourceLevelForUser implements DataSourceLevel {
 	private final String user;
 	private final ArrayList<ExperimentHeader> experiments;
 	private String description;
+	private final int n;
 	
 	public HsmDataSourceLevelForUser(String user, ArrayList<ExperimentHeader> experiments) {
 		this.user = user;
 		this.experiments = experiments;
+		this.n = experiments.size();
 	}
 	
 	@Override
@@ -49,7 +51,7 @@ public class HsmDataSourceLevelForUser implements DataSourceLevel {
 	
 	@Override
 	public String getName() {
-		return user;
+		return user + " (" + n + ")";
 	}
 	
 	@Override

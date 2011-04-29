@@ -10,6 +10,7 @@ package de.ipk.ag_ba.datasources.file_system;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
@@ -17,7 +18,9 @@ import java.util.TreeMap;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
+import de.ipk.ag_ba.gui.navigation_actions.DomainLogoutAction;
 import de.ipk.ag_ba.gui.navigation_actions.Library;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
@@ -30,9 +33,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
  */
 public class HsmFileSystemSource extends FileSystemSource {
 	
-	private String login;
-	private String password;
 	private static HashSet<String> registeredFolders = new HashSet<String>();
+	private String login;
 	
 	public HsmFileSystemSource(Library lib, String dataSourceName, String folder, NavigationImage mainDataSourceIcon,
 			NavigationImage folderIcon) {
@@ -42,6 +44,14 @@ public class HsmFileSystemSource extends FileSystemSource {
 			ResourceIOManager.registerIOHandler(new HsmResourceIoHandler(folder));
 			registeredFolders.add(folder);
 		}
+	}
+	
+	@Override
+	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
+		Collection<NavigationButton> res = new ArrayList<NavigationButton>();
+		res.add(new NavigationButton(new DomainLogoutAction(), src.getGUIsetting()));
+		
+		return res;
 	}
 	
 	@Override
@@ -74,7 +84,7 @@ public class HsmFileSystemSource extends FileSystemSource {
 				}
 				ExperimentHeader eh = new ExperimentHeader(properties);
 				
-				if (accessOK(eh, login, password)) {
+				if (accessOK(eh)) {
 					String experimentName = eh.getExperimentname();
 					if (!experimentName2saveTime2data.containsKey(experimentName))
 						experimentName2saveTime2data.put(experimentName, new TreeMap<Long, ExperimentHeader>());
@@ -85,8 +95,22 @@ public class HsmFileSystemSource extends FileSystemSource {
 		this.thisLevel = new HsmMainDataSourceLevel(experimentName2saveTime2data);
 	}
 	
-	private boolean accessOK(ExperimentHeader eh, String login, String password) {
-		if (login == null && password == null)
+	@Override
+	public String getName() {
+		if (thisLevel == null)
+			return super.getName();
+		else
+			return thisLevel.getName();
+	}
+	
+	@Override
+	public void setLogin(String login, String password) {
+		super.setLogin(login, password);
+		this.login = login;
+	}
+	
+	private boolean accessOK(ExperimentHeader eh) {
+		if (login == null)
 			return true;
 		else {
 			if (LemnaTecDataExchange.getAdministrators().contains(login))
@@ -101,12 +125,4 @@ public class HsmFileSystemSource extends FileSystemSource {
 			}
 		}
 	}
-	
-	@Override
-	public void setLogin(String login, String password) {
-		super.setLogin(login, password);
-		this.login = login;
-		this.password = password;
-	}
-	
 }

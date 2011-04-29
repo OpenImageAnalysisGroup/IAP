@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -103,8 +102,6 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 			
 			experiment.setHeader(experimentReference.getHeader().clone());
 			
-			GregorianCalendar gc = new GregorianCalendar();
-			
 			final ThreadSafeOptions written = new ThreadSafeOptions();
 			
 			this.files = determineNumberOfFilesInDataset(experiment);
@@ -134,12 +131,11 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 								
 								status.setCurrentStatusValueFine(100d * (idx++) / files);
 								
-								final Date t = new Date(nm.getParentSample().getRowId());
-								gc.setTime(t);
+								final Long t = nm.getParentSample().getRowId();
 								
 								final String zefn;
 								try {
-									zefn = determineBinaryFileName(gc, substanceName, nm, bm);
+									zefn = determineBinaryFileName(t, substanceName, nm, bm);
 									final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
 									boolean exists = targetFile.exists();
 									copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), t, targetFile, exists);
@@ -169,15 +165,14 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 								if (bm.getLabelURL() == null)
 									continue;
 								
-								final Date t = new Date(nm.getParentSample().getRowId());
-								gc.setTime(t);
+								long t = nm.getParentSample().getRowId();
 								
 								final String zefn;
 								try {
 									if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
 										zefn = "label_" + substanceName + "_" + bm.getLabelURL().getDetail() + getFileExtension(bm.getLabelURL().getFileName());
 									else
-										zefn = determineBinaryFileName(gc, substanceName, nm, bm);
+										zefn = determineBinaryFileName(t, substanceName, nm, bm);
 									
 									final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
 									
@@ -185,6 +180,7 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 									
 								} catch (Exception e) {
 									System.out.println("ERROR: " + e.getMessage());
+									e.printStackTrace();
 									errorCount++;
 								}
 								long currTime = System.currentTimeMillis();
@@ -278,7 +274,7 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 	}
 	
 	private void copyBinaryFileContentToTarget(final ExperimentInterface experiment, final ThreadSafeOptions written,
-			final HSMfolderTargetDataManager hsmManager, ExecutorService es, final IOurl url, final Date t, final File targetFile, final boolean targetExists)
+			final HSMfolderTargetDataManager hsmManager, ExecutorService es, final IOurl url, final Long t, final File targetFile, final boolean targetExists)
 			throws InterruptedException {
 		while (written.getInt() > 0)
 			Thread.sleep(5);
@@ -299,7 +295,8 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 							bos.close();
 							written.addLong(in.getCount());
 							in.close();
-							f.setLastModified(t.getTime());
+							if (t != null)
+								f.setLastModified(t);
 							f.setWritable(false);
 							f.setExecutable(false);
 							f.renameTo(targetFile);
@@ -320,8 +317,11 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 		});
 	}
 	
-	private String determineBinaryFileName(GregorianCalendar gc, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm) {
+	private String determineBinaryFileName(long t, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm) {
 		final String zefn;
+		GregorianCalendar gc = new GregorianCalendar();
+		gc.setTimeInMillis(t);
+		
 		ImageData id;
 		if (bm instanceof ImageData) {
 			id = (ImageData) bm;

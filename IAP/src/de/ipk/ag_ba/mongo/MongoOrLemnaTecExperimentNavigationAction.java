@@ -13,6 +13,7 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.DeletionCommand;
 import de.ipk.ag_ba.gui.navigation_actions.Other;
@@ -135,8 +136,15 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			return "img/maisMultipleScaled.png";
 		if (header.getDatabaseId() != null && header.getDatabaseId().contains("BGH_"))
 			return "img/000Grad_3.png";
-		else
+		else {
+			if (header.getExperimentType() != null && header.getExperimentType().equals(IAPexperimentTypes.Phytochamber))
+				return "img/ext/phyto.png";
+			if (header.getExperimentType() != null && header.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse))
+				return "img/maisMultipleScaled.png";
+			if (header.getExperimentType() != null && header.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse))
+				return "img/000Grad_3.png";
 			return "img/ext/image-x-generic-off.png";
+		}
 	}
 	
 	@Override
@@ -147,8 +155,15 @@ public class MongoOrLemnaTecExperimentNavigationAction extends AbstractNavigatio
 			return "img/maisMultipleScaled.png";
 		if (header.getDatabaseId() != null && header.getDatabaseId().contains("BGH_"))
 			return "img/000Grad_3.png";
-		else
+		else {
+			if (header.getExperimentType() != null && header.getExperimentType().equals(IAPexperimentTypes.Phytochamber))
+				return "img/ext/phyto.png";
+			if (header.getExperimentType() != null && header.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse))
+				return "img/maisMultipleScaled.png";
+			if (header.getExperimentType() != null && header.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse))
+				return "img/000Grad_3.png";
 			return "img/ext/image-x-generic.png";
+		}
 	}
 	
 	@Override

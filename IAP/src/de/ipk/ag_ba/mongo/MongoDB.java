@@ -84,6 +84,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -451,7 +452,7 @@ public class MongoDB {
 									count++;
 								double prog = count * (100d / numberOfBinaryData / 2d);
 								if (res != null)
-									status.setCurrentStatusText1(count + "/" + numberOfBinaryData * 2 + ": " + res);
+									status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
 								status.setCurrentStatusValueFine(prog);
 								int currentSecond = new GregorianCalendar().get(Calendar.SECOND);
 								if (currentSecond != lastSecond) {
@@ -474,7 +475,7 @@ public class MongoDB {
 							ImageData id = imageDataQueue.poll();
 							DatabaseStorageResult res = fres.get();
 							if (res != null && status != null)
-								status.setCurrentStatusText1(count + "/" + numberOfBinaryData * 2 + ": " + res);
+								status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
 							if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 								errorCount++;
 								errors.append("<li>" + id.getURL().getFileName());
@@ -521,7 +522,14 @@ public class MongoDB {
 			for (DBObject substance : dbSubstances)
 				substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 		
-		experiment.getHeader().setSizekb(overallFileSize.getLong() / 1024);
+		if (status == null || (status != null && !status.wantsToStop()))
+			status.setCurrentStatusText1("Determine Size");
+		long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
+		if (status == null || (status != null && !status.wantsToStop()))
+			status.setCurrentStatusText1("Finalize Storage");
+		
+		// l = overallFileSize.getLong(); // in case of update the written bytes are not the right size
+		experiment.getHeader().setSizekb(l / 1024);
 		
 		experiment.fillAttributeMap(attributes);
 		BasicDBObject dbExperiment = new BasicDBObject(attributes);
@@ -532,11 +540,13 @@ public class MongoDB {
 		
 		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
-		experiments.insert(dbExperiment);
-		
-		String id = dbExperiment.get("_id").toString();
-		for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
-			eh.setDatabaseId(id);
+		if (status == null || (status != null && !status.wantsToStop())) {
+			experiments.insert(dbExperiment);
+			
+			String id = dbExperiment.get("_id").toString();
+			for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
+				eh.setDatabaseId(id);
+			}
 		}
 		
 		if (errorCount > 0) {
@@ -757,7 +767,7 @@ public class MongoDB {
 		return ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
-	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(8, new ThreadFactory() {
+	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(1, new ThreadFactory() {
 		int n = 1;
 		
 		@Override
@@ -785,7 +795,9 @@ public class MongoDB {
 				
 				// check if the source URL has been imported before, it is assumed that the source URL content
 				// is not modified
-				if (image.getURL() != null && image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) {
+				if (image.getURL() != null &&
+						(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) ||
+						image.getURL().getPrefix().startsWith("hsm_"))) {
 					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
 					
 					if (image.getLabelURL() != null) {
@@ -810,9 +822,14 @@ public class MongoDB {
 					}
 				}
 				
-				final byte[] isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
-				final byte[] isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
-				
+				BackgroundTaskHelper.lockGetSemaphore(image.getURL() != null ? image.getURL().getPrefix() : "in", 1);
+				final byte[] isMain, isLabel;
+				try {
+					isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
+					isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
+				} finally {
+					BackgroundTaskHelper.lockRelease(image.getURL() != null ? image.getURL().getPrefix() : "in");
+				}
 				if (isMain == null) {
 					System.out.println("No input stream for source-URL:  " + image.getURL());
 					return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
@@ -833,7 +850,9 @@ public class MongoDB {
 				String hashMain = hashes[0];
 				String hashLabel = hashes[1];
 				
-				if (image.getURL() != null && image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) {
+				if (image.getURL() != null &&
+						(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) ||
+						image.getURL().getPrefix().startsWith("hsm_")) {
 					db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
 					
 					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
@@ -892,14 +911,20 @@ public class MongoDB {
 				if (fffMain != null && fffLabel != null && fffPreview != null) {
 					return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				} else {
-					boolean saved = saveImageFile(new InputStream[] {
-							new MyByteArrayInputStream(isMain),
-							isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
-							getPreviewImageStream(new MyByteArrayInputStream(isMain))
+					BackgroundTaskHelper.lockGetSemaphore(m, 1);
+					boolean saved;
+					try {
+						saved = saveImageFile(new InputStream[] {
+								new MyByteArrayInputStream(isMain),
+								isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
+								getPreviewImageStream(new MyByteArrayInputStream(isMain))
 							}, gridfs_images, gridfs_label_files,
-							gridfs_preview_files, id, hashMain,
-							hashLabel,
-							fffMain == null, fffLabel == null);
+								gridfs_preview_files, id, hashMain,
+								hashLabel,
+								fffMain == null, fffLabel == null);
+					} finally {
+						BackgroundTaskHelper.lockRelease(m);
+					}
 					if (saved) {
 						return DatabaseStorageResult.STORED_IN_DB;
 					} else

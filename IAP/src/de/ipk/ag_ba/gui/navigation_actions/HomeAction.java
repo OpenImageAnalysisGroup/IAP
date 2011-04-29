@@ -44,17 +44,9 @@ public final class HomeAction extends AbstractNavigationAction {
 			homePrimaryActions.add(ne);
 		}
 		
-		String hsm = IAPmain.getHSMfolder();
-		if (hsm != null && new File(hsm).exists()) {
-			// add HSM entry
-			Library lib = new Library();
-			DataSource dataSource = new HsmFileSystemSource(lib, "HSM Archive", hsm,
-					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-					IAPmain.loadIcon("img/ext/folder-remote.png"));
-			NavigationButton hsmSrc = new NavigationButton(new DataSourceNavigationAction(dataSource), guiSetting);
-			hsmSrc.setToolTipText("Target: " + hsm);
-			homePrimaryActions.add(hsmSrc);
-		}
+		HTTPfolderSource news = new IAPnewsLinksSource();
+		NavigationButton newsButton = new NavigationButton(new DataSourceNavigationAction(news), guiSetting);
+		homeActions.add(newsButton);
 		
 		NavigationButton rimas = RimasNav.getRimas(src != null ? src.getGUIsetting() : null);
 		homeActions.add(rimas);
@@ -76,6 +68,18 @@ public final class HomeAction extends AbstractNavigationAction {
 		NavigationButton serverStatusEntity = Other.getServerStatusEntity(true, src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
 		
+		String hsm = IAPmain.getHSMfolder();
+		if (hsm != null && new File(hsm).exists()) {
+			// add HSM entry
+			Library lib = new Library();
+			DataSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsm,
+					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+					IAPmain.loadIcon("img/ext/folder-remote.png"));
+			NavigationButton hsmSrc = new NavigationButton(new DataSourceNavigationAction(dataSourceHsm), guiSetting);
+			hsmSrc.setToolTipText("Target: " + hsm);
+			homePrimaryActions.add(hsmSrc);
+		}
+		
 		{
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
 								"General Bioinformatics Ressources", "img/dbelogo2.png", "img/dbelogo2.png");
@@ -94,10 +98,6 @@ public final class HomeAction extends AbstractNavigationAction {
 		}
 		
 		homePrimaryActions.add(new NavigationButton(new ShowVANTED(), guiSetting));
-		
-		HTTPfolderSource news = new IAPnewsLinksSource();
-		NavigationButton newsButton = new NavigationButton(new DataSourceNavigationAction(news), guiSetting);
-		homePrimaryActions.add(newsButton);
 	}
 	
 	ArrayList<NavigationButton> bookmarks;

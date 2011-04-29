@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
+import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.Book;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -19,10 +20,12 @@ public class HsmDataSourceLevelForExperimentType implements DataSourceLevel {
 	private final String type;
 	private String description;
 	private final TreeMap<String, ArrayList<ExperimentHeader>> user2experimentList;
+	private int n;
 	
 	public HsmDataSourceLevelForExperimentType(String type) {
 		this.type = type;
 		this.user2experimentList = new TreeMap<String, ArrayList<ExperimentHeader>>();
+		n = 0;
 	}
 	
 	@Override
@@ -47,13 +50,13 @@ public class HsmDataSourceLevelForExperimentType implements DataSourceLevel {
 	@Override
 	public NavigationImage getIcon() {
 		String group = type;
-		if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.toUpperCase().contains("ARABIDOPSIS"))
+		if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.equals(IAPexperimentTypes.Phytochamber))
 			return IAPmain.loadIcon(IAPimages.getPhytochamber());
 		else
-			if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)") || group.toUpperCase().contains("BARLEY"))
+			if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)") || group.equals(IAPexperimentTypes.BarleyGreenhouse))
 				return IAPmain.loadIcon(IAPimages.getBarleyGreenhouse());
 			else
-				if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)") || group.toUpperCase().contains("MAIZE"))
+				if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)") || group.equals(IAPexperimentTypes.MaizeGreenhouse))
 					return IAPmain.loadIcon(IAPimages.getMaizeGreenhouse());
 				else
 					return IAPmain.loadIcon(IAPimages.getFolderRemoteClosed());
@@ -61,7 +64,7 @@ public class HsmDataSourceLevelForExperimentType implements DataSourceLevel {
 	
 	@Override
 	public String getName() {
-		return type;
+		return type + " (" + n + ")";
 	}
 	
 	@Override
@@ -91,6 +94,8 @@ public class HsmDataSourceLevelForExperimentType implements DataSourceLevel {
 		if (!user2experimentList.containsKey(user))
 			user2experimentList.put(user, new ArrayList<ExperimentHeader>());
 		user2experimentList.get(user).add(newestExp);
+		
+		n++;
 	}
 	
 }
