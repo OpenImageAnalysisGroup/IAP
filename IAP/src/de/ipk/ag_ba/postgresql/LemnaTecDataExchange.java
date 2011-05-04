@@ -76,30 +76,31 @@ public class LemnaTecDataExchange {
 		
 		Connection connection = openConnectionToDatabase("postgres");
 		
-		PreparedStatement ps = connection.prepareStatement(sqlText);
-		
-		if (Debug.TEST)
-			Debug.print(sqlText);
-		
-		ResultSet rs = ps.executeQuery();
-		
 		Collection<String> result = new TreeSet<String>();
 		
-		while (rs.next()) {
+		try {
+			PreparedStatement ps = connection.prepareStatement(sqlText);
+			
 			if (Debug.TEST)
-				Debug.print("aktuelle Zeile: ", rs.getString(1));
+				Debug.print(sqlText);
 			
-			String dbName = rs.getString(1);
+			ResultSet rs = ps.executeQuery();
 			
-			if (!invalidDBs.contains(dbName))
-				result.add(dbName);
-			
+			while (rs.next()) {
+				if (Debug.TEST)
+					Debug.print("aktuelle Zeile: ", rs.getString(1));
+				
+				String dbName = rs.getString(1);
+				
+				if (!invalidDBs.contains(dbName))
+					result.add(dbName);
+				
+			}
+			rs.close();
+			ps.close();
+		} finally {
+			closeDatabaseConnection(connection);
 		}
-		rs.close();
-		ps.close();
-		
-		closeDatabaseConnection(connection);
-		
 		return result;
 	}
 	
@@ -108,78 +109,111 @@ public class LemnaTecDataExchange {
 		
 		String sqlText = "SELECT distinct(measurement_label) FROM snapshot ORDER BY measurement_label";
 		
-		Connection connection = openConnectionToDatabase(database);
-		PreparedStatement ps = connection.prepareStatement(sqlText);
-		
-		ResultSet rs = ps.executeQuery();
-		
-		// Collection<String> result = new TreeSet<String>();
-		
 		Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
-		while (rs.next()) {
-			ExperimentHeaderInterface ehi = new ExperimentHeader();
-			ehi.setExperimentname(rs.getString(1));
-			ehi.setDatabase(database);
-			ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentname());
-			ehi.setImportusername(user != null ? user : SystemAnalysis.getUserName());
-			ehi.setImportusergroup("LemnaTec");
-			LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
-			if (system == LemnaTecSystem.Barley) {
-				ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse);
-				ehi.setImportusergroup("LemnaTec (BGH)");
-			} else
-				if (system == LemnaTecSystem.Maize) {
-					ehi.setExperimenttype(IAPexperimentTypes.MaizeGreenhouse);
-					ehi.setImportusergroup("LemnaTec (CGH)");
-				} else
-					if (system == LemnaTecSystem.Phytochamber) {
-						ehi.setExperimenttype(IAPexperimentTypes.Phytochamber);
-						ehi.setImportusergroup("LemnaTec (APH)");
-					} else {
-						ehi.setExperimenttype(IAPexperimentTypes.UnknownGreenhouse);
-						ehi.setImportusergroup("LemnaTec (Other)");
-					}
-			ehi.setSequence("");
-			ehi.setSizekb(-1);
-			result.add(ehi);
-		}
 		
-		rs.close();
-		ps.close();
-		
-		sqlText = "" +
-				"SELECT min(time_stamp), max(time_stamp), count(*) " +
-				"FROM snapshot,tiled_image " +
-				"WHERE measurement_label=? AND tiled_image.snapshot_id=snapshot.id";
-		ps = connection.prepareStatement(sqlText);
-		for (ExperimentHeaderInterface ehi : result) {
-			ps.setString(1, ehi.getExperimentname());
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				Timestamp min = rs.getTimestamp(1);
-				Timestamp max = rs.getTimestamp(2);
-				if (min == null || max == null)
-					System.out.println("Warning: No snapshot times stored for experiment " + ehi.getExperimentname()
-										+ " in database " + ehi.getDatabase() + "!");
-				if (min != null)
-					ehi.setStartdate(new Date(min.getTime()));
-				else
-					ehi.setStartdate(new Date());
-				if (max != null)
-					ehi.setImportdate(new Date(max.getTime()));
-				else
-					ehi.setImportdate(new Date());
-				ehi.setNumberOfFiles(rs.getInt(3));
-				break;
-			}
-			rs.close();
-		}
-		
-		HashMap<ExperimentHeaderInterface, HashSet<String>> people = new HashMap<ExperimentHeaderInterface, HashSet<String>>();
-		
-		ArrayList<String> names = new ArrayList<String>();
+		Connection connection = openConnectionToDatabase(database);
 		try {
-			sqlText = "SELECT distinct(creator) FROM import_data WHERE measurement_label=?";
+			PreparedStatement ps = connection.prepareStatement(sqlText);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			// Collection<String> result = new TreeSet<String>();
+			
+			while (rs.next()) {
+				ExperimentHeaderInterface ehi = new ExperimentHeader();
+				ehi.setExperimentname(rs.getString(1));
+				ehi.setDatabase(database);
+				ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentname());
+				ehi.setImportusername(user != null ? user : SystemAnalysis.getUserName());
+				ehi.setImportusergroup("LemnaTec");
+				LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
+				if (system == LemnaTecSystem.Barley) {
+					ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse);
+					ehi.setImportusergroup("LemnaTec (BGH)");
+				} else
+					if (system == LemnaTecSystem.Maize) {
+						ehi.setExperimenttype(IAPexperimentTypes.MaizeGreenhouse);
+						ehi.setImportusergroup("LemnaTec (CGH)");
+					} else
+						if (system == LemnaTecSystem.Phytochamber) {
+							ehi.setExperimenttype(IAPexperimentTypes.Phytochamber);
+							ehi.setImportusergroup("LemnaTec (APH)");
+						} else {
+							ehi.setExperimenttype(IAPexperimentTypes.UnknownGreenhouse);
+							ehi.setImportusergroup("LemnaTec (Other)");
+						}
+				ehi.setSequence("");
+				ehi.setSizekb(-1);
+				result.add(ehi);
+			}
+			
+			rs.close();
+			ps.close();
+			
+			sqlText = "" +
+					"SELECT min(time_stamp), max(time_stamp), count(*) " +
+					"FROM snapshot,tiled_image " +
+					"WHERE measurement_label=? AND tiled_image.snapshot_id=snapshot.id";
+			ps = connection.prepareStatement(sqlText);
+			for (ExperimentHeaderInterface ehi : result) {
+				ps.setString(1, ehi.getExperimentname());
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					Timestamp min = rs.getTimestamp(1);
+					Timestamp max = rs.getTimestamp(2);
+					if (min == null || max == null)
+						System.out.println("Warning: No snapshot times stored for experiment " + ehi.getExperimentname()
+										+ " in database " + ehi.getDatabase() + "!");
+					if (min != null)
+						ehi.setStartdate(new Date(min.getTime()));
+					else
+						ehi.setStartdate(new Date());
+					if (max != null)
+						ehi.setImportdate(new Date(max.getTime()));
+					else
+						ehi.setImportdate(new Date());
+					ehi.setNumberOfFiles(rs.getInt(3));
+					break;
+				}
+				rs.close();
+			}
+			
+			HashMap<ExperimentHeaderInterface, HashSet<String>> people = new HashMap<ExperimentHeaderInterface, HashSet<String>>();
+			
+			ArrayList<String> names = new ArrayList<String>();
+			try {
+				sqlText = "SELECT distinct(creator) FROM import_data WHERE measurement_label=?";
+				ps = connection.prepareStatement(sqlText);
+				for (ExperimentHeaderInterface ehi : result) {
+					if (getCoordinatorFromExperimentName(ehi.getExperimentname()) != null) {
+						ehi.setCoordinator(getCoordinatorFromExperimentName(ehi.getExperimentname()));
+					} else {
+						if (!people.containsKey(ehi))
+							people.put(ehi, new HashSet<String>());
+						ps.setString(1, ehi.getExperimentname());
+						rs = ps.executeQuery();
+						names.clear();
+						while (rs.next()) {
+							String name = rs.getString(1);
+							names.add(getNiceNameFromLoginName(name));
+							people.get(ehi).add(rs.getString(1));
+						}
+						rs.close();
+						if (names.size() > 1) {
+							names.remove(getNiceNameFromLoginName("muecke"));
+						}
+						if (names.size() > 0)
+							ehi.setCoordinator(names.iterator().next());
+					}
+				}
+			} catch (Exception e) {
+				System.out.println("Info: Database " + database + " has no import_data table (" + e.getMessage() + ")");
+				for (ExperimentHeaderInterface ehi : result) {
+					ehi.setCoordinator(null);
+				}
+			}
+			
+			sqlText = "SELECT distinct(creator) FROM snapshot WHERE measurement_label=?";
 			ps = connection.prepareStatement(sqlText);
 			for (ExperimentHeaderInterface ehi : result) {
 				if (!people.containsKey(ehi))
@@ -188,55 +222,94 @@ public class LemnaTecDataExchange {
 				rs = ps.executeQuery();
 				names.clear();
 				while (rs.next()) {
-					names.add(rs.getString(1));
-					people.get(ehi).add(rs.getString(1));
+					String name = rs.getString(1);
+					names.add(name);
+					people.get(ehi).add(name);
 				}
 				rs.close();
-				if (names.size() > 1) {
-					names.remove("muecke");
+				String importers = StringManipulationTools.getStringList(names, ";");
+				ehi.setRemark("Snapshot creators: " + importers);
+				if (ehi.getCoordinator() == null)
+					ehi.setCoordinator(importers);
+			}
+			
+			if (user != null && !getAdministrators().contains(user)) {
+				// remove experiments from result which should not be visible to users
+				LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
+				if (!system.isPreAuthenticated(user))
+					for (ExperimentHeaderInterface ehi : people.keySet()) {
+						if (!people.get(ehi).contains(user)) {
+							result.remove(ehi);
+						}
+					}
+			}
+			ps.close();
+		} finally {
+			closeDatabaseConnection(connection);
+		}
+		return result;
+	}
+	
+	private HashMap<String, String> login2niceName = null;
+	
+	private String getNiceNameFromLoginName(String name) {
+		if (login2niceName == null) {
+			login2niceName = new HashMap<String, String>();
+			login2niceName.put("Fernando", "Arana, Fernando (HET)");
+			login2niceName.put("Gramel-Eikenroth", "Gramel-Eikenroth (LemnaTec)");
+			login2niceName.put("LTAdmin", "LTAdmin (LemnaTec)");
+			login2niceName.put("LemnaTec Support", "LemnaTec Support (LemnaTec)");
+			login2niceName.put("entzian", "Entzian, Alexander (BA)");
+			login2niceName.put("neumannk", "Neumann, Kerstin (GD)");
+			login2niceName.put("hartmann", "Hartmann, Anja (PBI)");
+			login2niceName.put("mary", "Ziems, Mary (GD");
+			login2niceName.put("Ziems", "Ziems, Mary (GD");
+			login2niceName.put("stein", "Stein, Dr. Nils (GD");
+			login2niceName.put("altmann", "Altmann, Prof. Dr. Thomas (MOG)");
+			login2niceName.put("meyer", "Meyer, Dr. Rhonda (HET)");
+			login2niceName.put("muraya", "Muraya, Moses Mahugu (HET)");
+			login2niceName.put("weigelt", "Weigelt, Dr. Kathleen (HET)");
+			login2niceName.put("Muecke", "Muecke, Ingo (BA)");
+			login2niceName.put("muecke", "Muecke, Ingo (BA)");
+			login2niceName.put("seyfarth", "Seyfarth, Monique (HET)");
+			login2niceName.put("klukas", "Klukas, Dr. Christian (BA)");
+		}
+		String res = login2niceName.get(name);
+		if (res != null)
+			return res;
+		else
+			return name;
+	}
+	
+	private String getCoordinatorFromExperimentName(String experimentname) {
+		try {
+			if (experimentname == null || experimentname.isEmpty())
+				return null;
+			else {
+				if (experimentname.length() >= 6) {
+					int id = Integer.parseInt(experimentname.substring(0, 4));
+					String kuerzel = experimentname.substring(4, 6);
+					String coor = getCoordinatorFromNameID(kuerzel);
+					return coor;
 				}
-				ehi.setCoordinator(StringManipulationTools.getStringList(names, ", "));
+				return null;
 			}
 		} catch (Exception e) {
-			System.out.println("Info: Database " + database + " has no import_data table (" + e.getMessage() + ")");
-			for (ExperimentHeaderInterface ehi : result) {
-				ehi.setCoordinator(null);
-			}
+			return null;
 		}
-		
-		sqlText = "SELECT distinct(creator) FROM snapshot WHERE measurement_label=?";
-		ps = connection.prepareStatement(sqlText);
-		for (ExperimentHeaderInterface ehi : result) {
-			if (!people.containsKey(ehi))
-				people.put(ehi, new HashSet<String>());
-			ps.setString(1, ehi.getExperimentname());
-			rs = ps.executeQuery();
-			names.clear();
-			while (rs.next()) {
-				names.add(rs.getString(1));
-				people.get(ehi).add(rs.getString(1));
-			}
-			rs.close();
-			String importers = StringManipulationTools.getStringList(names, ";");
-			ehi.setRemark("Snapshot creators: " + importers);
-			if (ehi.getCoordinator() == null)
-				ehi.setCoordinator(importers);
+	}
+	
+	private HashMap<String, String> id2coo = null;
+	
+	private String getCoordinatorFromNameID(String kuerzel) {
+		if (id2coo == null) {
+			id2coo = new HashMap<String, String>();
+			id2coo.put("AC", "Arana, Fernando (HET)");
+			id2coo.put("MM", "Muraya, Moses Mahugu (HET)");
+			id2coo.put("KN", "Neumann, Kerstin (GD)");
+			id2coo.put("BA", "Klukas, Christian (BA)");
 		}
-		
-		if (user != null && !getAdministrators().contains(user)) {
-			// remove experiments from result which should not be visible to users
-			LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
-			if (!system.isPreAuthenticated(user))
-				for (ExperimentHeaderInterface ehi : people.keySet()) {
-					if (!people.get(ehi).contains(user)) {
-						result.remove(ehi);
-					}
-				}
-		}
-		ps.close();
-		closeDatabaseConnection(connection);
-		
-		return result;
+		return id2coo.get(kuerzel);
 	}
 	
 	public static HashSet<String> getAdministrators() {
@@ -260,35 +333,35 @@ public class LemnaTecDataExchange {
 						ClassNotFoundException {
 		Collection<Snapshot> result = new ArrayList<Snapshot>();
 		Connection connection = openConnectionToDatabase(database);
-		
-		HashMap<Long, String> id2path = new HashMap<Long, String>();
-		String sqlReadImageFileTable = "SELECT "
+		try {
+			HashMap<Long, String> id2path = new HashMap<Long, String>();
+			String sqlReadImageFileTable = "SELECT "
 							+ "image_file_table.id as image_file_tableID, path FROM image_file_table";
-		//
-		// +
-		// "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
-		// + "WHERE snapshot.measurement_label = ? and "
-		// + "("
-		// + "snapshot.id = tiled_image.snapshot_id and "
-		// + "tiled_image.id = tile.tiled_image_id and "
-		// +
-		// "(tile.image_oid = image_file_table.id OR tile.null_image_oid = image_file_table.id)) OR ("
-		// +
-		// "snapshot.configuration_id = image_unit_configuration.compconfigid and snapshot.id = tiled_image.snapshot_id and tiled_image.camera_label = image_unit_configuration.gid and image_unit_configuration.image_parameter_oid = image_file_table.id)";
-		
-		PreparedStatement ps = connection.prepareStatement(sqlReadImageFileTable);
-		// ps.setString(1, experiment);
-		
-		ResultSet rs = ps.executeQuery();
-		while (rs.next()) {
-			id2path.put(rs.getLong("image_file_tableID"), rs.getString("path"));
-		}
-		rs.close();
-		ps.close();
-		HashSet<Long> knownSnaphotIds = new HashSet<Long>();
-		{
-			// load snapshots with images
-			String sqlText = "SELECT "
+			//
+			// +
+			// "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
+			// + "WHERE snapshot.measurement_label = ? and "
+			// + "("
+			// + "snapshot.id = tiled_image.snapshot_id and "
+			// + "tiled_image.id = tile.tiled_image_id and "
+			// +
+			// "(tile.image_oid = image_file_table.id OR tile.null_image_oid = image_file_table.id)) OR ("
+			// +
+			// "snapshot.configuration_id = image_unit_configuration.compconfigid and snapshot.id = tiled_image.snapshot_id and tiled_image.camera_label = image_unit_configuration.gid and image_unit_configuration.image_parameter_oid = image_file_table.id)";
+			
+			PreparedStatement ps = connection.prepareStatement(sqlReadImageFileTable);
+			// ps.setString(1, experiment);
+			
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				id2path.put(rs.getLong("image_file_tableID"), rs.getString("path"));
+			}
+			rs.close();
+			ps.close();
+			HashSet<Long> knownSnaphotIds = new HashSet<Long>();
+			{
+				// load snapshots with images
+				String sqlText = "SELECT "
 							+ "	creator, measurement_label, camera_label, id_tag, path, "
 							+ "	time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
 							+ "	image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, "
@@ -302,85 +375,85 @@ public class LemnaTecDataExchange {
 							+ "	tile.image_oid = image_file_table.id and "
 							+ "	snapshot.configuration_id = image_unit_configuration.compconfigid and "
 							+ "	tiled_image.camera_label = image_unit_configuration.gid";
-			
-			ps = connection.prepareStatement(sqlText);
-			ps.setString(1, experiment);
-			
-			rs = ps.executeQuery();
-			
-			while (rs.next()) {
-				Snapshot snapshot = new Snapshot();
 				
-				knownSnaphotIds.add(rs.getLong("snapshotID"));
+				ps = connection.prepareStatement(sqlText);
+				ps.setString(1, experiment);
 				
-				snapshot.setCreator(rs.getString("creator"));
-				snapshot.setMeasurement_label(rs.getString("measurement_label"));
-				snapshot.setUserDefinedCameraLabeL(rs.getString("camera_label"));
-				snapshot.setId_tag(rs.getString("id_tag"));
+				rs = ps.executeQuery();
 				
-				snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
-				snapshot.setWater_amount(rs.getInt("water_amount"));
-				snapshot.setWeight_after(rs.getDouble("weight_after"));
-				snapshot.setWeight_before(rs.getDouble("weight_before"));
-				
-				snapshot.setCamera_label(rs.getString("compname"));
-				snapshot.setXfactor(rs.getDouble("xfactor"));
-				snapshot.setYfactor(rs.getDouble("yfactor"));
-				
-				String s1 = id2path.get(rs.getLong("image_oid"));
-				snapshot.setPath_image(s1);
-				String s2 = id2path.get(rs.getLong("null_image_oid"));
-				snapshot.setPath_null_image(s2);
-				String s3 = id2path.get(rs.getLong("image_parameter_oid"));
-				// System.out.println(s3);
-				snapshot.setPath_image_config_blob(s3);
-				
-				result.add(snapshot);
+				while (rs.next()) {
+					Snapshot snapshot = new Snapshot();
+					
+					knownSnaphotIds.add(rs.getLong("snapshotID"));
+					
+					snapshot.setCreator(rs.getString("creator"));
+					snapshot.setMeasurement_label(rs.getString("measurement_label"));
+					snapshot.setUserDefinedCameraLabeL(rs.getString("camera_label"));
+					snapshot.setId_tag(rs.getString("id_tag"));
+					
+					snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
+					snapshot.setWater_amount(rs.getInt("water_amount"));
+					snapshot.setWeight_after(rs.getDouble("weight_after"));
+					snapshot.setWeight_before(rs.getDouble("weight_before"));
+					
+					snapshot.setCamera_label(rs.getString("compname"));
+					snapshot.setXfactor(rs.getDouble("xfactor"));
+					snapshot.setYfactor(rs.getDouble("yfactor"));
+					
+					String s1 = id2path.get(rs.getLong("image_oid"));
+					snapshot.setPath_image(s1);
+					String s2 = id2path.get(rs.getLong("null_image_oid"));
+					snapshot.setPath_null_image(s2);
+					String s3 = id2path.get(rs.getLong("image_parameter_oid"));
+					// System.out.println(s3);
+					snapshot.setPath_image_config_blob(s3);
+					
+					result.add(snapshot);
+				}
+				rs.close();
+				ps.close();
 			}
-			rs.close();
-			ps.close();
-		}
-		{
-			// load snapshots without images
-			String sqlText = "SELECT "
-					+ "	creator, measurement_label, id_tag, "
-					+ "	time_stamp, water_amount, weight_after, weight_before, "
-					+ "	snapshot.id as snapshotID "
-					+ "FROM "
-					+ "	snapshot "
-					+ "WHERE "
-					+ "	snapshot.measurement_label = ?";
-			
-			ps = connection.prepareStatement(sqlText);
-			ps.setString(1, experiment);
-			
-			rs = ps.executeQuery();
-			
-			while (rs.next()) {
-				Snapshot snapshot = new Snapshot();
+			{
+				// load snapshots without images
+				String sqlText = "SELECT "
+						+ "	creator, measurement_label, id_tag, "
+						+ "	time_stamp, water_amount, weight_after, weight_before, "
+						+ "	snapshot.id as snapshotID "
+						+ "FROM "
+						+ "	snapshot "
+						+ "WHERE "
+						+ "	snapshot.measurement_label = ?";
 				
-				Long id = rs.getLong("snapshotID");
+				ps = connection.prepareStatement(sqlText);
+				ps.setString(1, experiment);
 				
-				if (knownSnaphotIds.contains(id))
-					continue;
+				rs = ps.executeQuery();
 				
-				snapshot.setCreator(rs.getString("creator"));
-				snapshot.setMeasurement_label(rs.getString("measurement_label"));
-				snapshot.setId_tag(rs.getString("id_tag"));
-				
-				snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
-				snapshot.setWater_amount(rs.getInt("water_amount"));
-				snapshot.setWeight_after(rs.getDouble("weight_after"));
-				snapshot.setWeight_before(rs.getDouble("weight_before"));
-				
-				result.add(snapshot);
+				while (rs.next()) {
+					Snapshot snapshot = new Snapshot();
+					
+					Long id = rs.getLong("snapshotID");
+					
+					if (knownSnaphotIds.contains(id))
+						continue;
+					
+					snapshot.setCreator(rs.getString("creator"));
+					snapshot.setMeasurement_label(rs.getString("measurement_label"));
+					snapshot.setId_tag(rs.getString("id_tag"));
+					
+					snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
+					snapshot.setWater_amount(rs.getInt("water_amount"));
+					snapshot.setWeight_after(rs.getDouble("weight_after"));
+					snapshot.setWeight_before(rs.getDouble("weight_before"));
+					
+					result.add(snapshot);
+				}
+				rs.close();
+				ps.close();
 			}
-			rs.close();
-			ps.close();
+		} finally {
+			closeDatabaseConnection(connection);
 		}
-		
-		closeDatabaseConnection(connection);
-		
 		return result;
 	}
 	
@@ -656,7 +729,7 @@ public class LemnaTecDataExchange {
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
 											+ sn.getPath_image_config_blob(), sn.getId_tag()
-											+ (position != null ? " (" + position.intValue() + ").png" : ".png"));
+											+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 						position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
 						if (Math.abs(position) < 0.00001)
 							position = null;
@@ -668,7 +741,7 @@ public class LemnaTecDataExchange {
 					}
 					
 					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-										+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + position.intValue() + ").png" : ".png"));
+										+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 					image.setURL(url);
 					fn = sn.getPath_null_image();
 					if (fn != null) {
@@ -676,7 +749,7 @@ public class LemnaTecDataExchange {
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
 											+ sn.getPath_null_image(), sn.getId_tag()
-											+ (position != null ? " (" + position.intValue() + ").png" : ".png"));
+											+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 						image.setLabelURL(url);
 					}
 					
@@ -727,6 +800,16 @@ public class LemnaTecDataExchange {
 		// });
 		// }
 		return experiment;
+	}
+	
+	private static String digit3(int i) {
+		if (i < 10)
+			return "00" + i;
+		else
+			if (i < 100)
+				return "0" + i;
+			else
+				return "" + i;
 	}
 	
 	private double processConfigBlobToGetRotationAngle(HashMap<String, Double> blob2angle, Snapshot sn, IOurl url) {
@@ -785,63 +868,63 @@ public class LemnaTecDataExchange {
 		HashMap<String, Condition> res = new HashMap<String, Condition>();
 		
 		Connection connection = openConnectionToDatabase(header.getDatabase());
-		
-		String sqlText = "SELECT id_tag, meta_data_name, meta_data_value, meta_data_type " + "FROM  meta_info_src "
-							+ "WHERE measure_label = ?";
-		
-		PreparedStatement ps = connection.prepareStatement(sqlText);
-		ps.setString(1, header.getExperimentname());
 		try {
-			ResultSet rs = ps.executeQuery();
+			String sqlText = "SELECT id_tag, meta_data_name, meta_data_value, meta_data_type " + "FROM  meta_info_src "
+							+ "WHERE measure_label = ?";
 			
-			while (rs.next()) {
+			PreparedStatement ps = connection.prepareStatement(sqlText);
+			ps.setString(1, header.getExperimentname());
+			try {
+				ResultSet rs = ps.executeQuery();
 				
-				String plantID = rs.getString(1);
-				
-				String metaName = rs.getString(2);
-				String metaValue = rs.getString(3);
-				// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
-				if (!res.containsKey(plantID)) {
-					res.put(plantID, new Condition(null));
-					if (header.getDatabase().contains("BGH_"))
-						res.get(plantID).setSpecies("Barley");
-					if (header.getDatabase().contains("APH_"))
-						res.get(plantID).setSpecies("Arabidopsis");
-					if (header.getDatabase().contains("CGH_"))
-						res.get(plantID).setSpecies("Maize");
-				}
-				
-				if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart"))
-					// res.get(plantID).setSpecies(filterName(metaValue));
-					res.get(plantID).setSpecies(metaValue);
-				else
-					if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname") || metaName.equalsIgnoreCase("Name")
-							|| metaName.equalsIgnoreCase("GENOTYP"))
-						res.get(plantID).setGenotype(metaValue);
+				while (rs.next()) {
+					
+					String plantID = rs.getString(1);
+					
+					String metaName = rs.getString(2);
+					String metaValue = rs.getString(3);
+					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					if (!res.containsKey(plantID)) {
+						res.put(plantID, new Condition(null));
+						if (header.getDatabase().contains("BGH_"))
+							res.get(plantID).setSpecies("Barley");
+						if (header.getDatabase().contains("APH_"))
+							res.get(plantID).setSpecies("Arabidopsis");
+						if (header.getDatabase().contains("CGH_"))
+							res.get(plantID).setSpecies("Maize");
+					}
+					
+					if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart"))
+						// res.get(plantID).setSpecies(filterName(metaValue));
+						res.get(plantID).setSpecies(metaValue);
 					else
-						if (metaName.equalsIgnoreCase("Variety"))
-							res.get(plantID).setVariety(metaValue);
+						if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname") || metaName.equalsIgnoreCase("Name")
+								|| metaName.equalsIgnoreCase("GENOTYP"))
+							res.get(plantID).setGenotype(metaValue);
 						else
-							if (metaName.equalsIgnoreCase("Treatment") || metaName.equalsIgnoreCase("Typ"))
-								res.get(plantID).setTreatment(metaValue);
+							if (metaName.equalsIgnoreCase("Variety"))
+								res.get(plantID).setVariety(metaValue);
 							else
-								if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot"))
-									res.get(plantID).setGrowthconditions(metaValue);
+								if (metaName.equalsIgnoreCase("Treatment") || metaName.equalsIgnoreCase("Typ"))
+									res.get(plantID).setTreatment(metaValue);
 								else
-									if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date"))
-										addSequenceInfo(res.get(plantID), "SeedDate: " + metaValue);
+									if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot"))
+										res.get(plantID).setGrowthconditions(metaValue);
 									else
-										addSequenceInfo(res.get(plantID), metaName + ": " + metaValue);
-				
+										if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date"))
+											addSequenceInfo(res.get(plantID), "SeedDate: " + metaValue);
+										else
+											addSequenceInfo(res.get(plantID), metaName + ": " + metaValue);
+					
+				}
+				rs.close();
+				ps.close();
+			} catch (Exception e) {
+				System.err.println("ERROR: " + e.getMessage());
 			}
-			rs.close();
-			ps.close();
-		} catch (Exception e) {
-			System.err.println("ERROR: " + e.getMessage());
+		} finally {
+			closeDatabaseConnection(connection);
 		}
-		
-		closeDatabaseConnection(connection);
-		
 		return res;
 	}
 	
@@ -871,32 +954,31 @@ public class LemnaTecDataExchange {
 	
 	public boolean isUserKnown(String u, String p) throws Exception {
 		Connection connection = openConnectionToDatabase("LTSystem");
-		
-		String sqlText = "SELECT role, db_ids, removed " + "FROM  ltuser "
-							+ "WHERE name = ? AND passwd = ?";
-		
-		PreparedStatement ps = connection.prepareStatement(sqlText);
-		ps.setString(1, u);
-		ps.setString(2, p);
-		
-		ResultSet rs = ps.executeQuery();
-		
 		boolean ok = false;
-		
-		while (rs.next()) {
-			int role = rs.getInt(1);
-			String db_ids = rs.getString(2);
-			boolean removed = rs.getBoolean(3);
+		try {
+			String sqlText = "SELECT role, db_ids, removed " + "FROM  ltuser "
+							+ "WHERE name = ? AND passwd = ?";
 			
-			if (!removed) {
-				ok = true;
+			PreparedStatement ps = connection.prepareStatement(sqlText);
+			ps.setString(1, u);
+			ps.setString(2, p);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				int role = rs.getInt(1);
+				String db_ids = rs.getString(2);
+				boolean removed = rs.getBoolean(3);
+				
+				if (!removed) {
+					ok = true;
+				}
 			}
+			rs.close();
+			ps.close();
+		} finally {
+			closeDatabaseConnection(connection);
 		}
-		rs.close();
-		ps.close();
-		
-		closeDatabaseConnection(connection);
-		
 		return ok;
 	}
 }

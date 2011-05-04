@@ -14,6 +14,7 @@ import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.nav.RimasNav;
+import de.ipk.ag_ba.gui.navigation_actions.hsm.HsmDataSourceNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
@@ -75,7 +76,7 @@ public final class HomeAction extends AbstractNavigationAction {
 			DataSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsm,
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 					IAPmain.loadIcon("img/ext/folder-remote.png"));
-			NavigationButton hsmSrc = new NavigationButton(new DataSourceNavigationAction(dataSourceHsm), guiSetting);
+			NavigationButton hsmSrc = new NavigationButton(new HsmDataSourceNavigationAction(dataSourceHsm), guiSetting);
 			hsmSrc.setToolTipText("Target: " + hsm);
 			homePrimaryActions.add(hsmSrc);
 		}

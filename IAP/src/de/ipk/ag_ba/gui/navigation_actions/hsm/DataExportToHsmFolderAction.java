@@ -136,7 +136,7 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 								
 								final String zefn;
 								try {
-									zefn = determineBinaryFileName(t, substanceName, nm, bm);
+									zefn = determineBinaryFileNameV1(t, substanceName, nm, bm);
 									final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
 									boolean exists = targetFile.exists();
 									copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), t, targetFile, exists);
@@ -173,7 +173,7 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 									if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
 										zefn = "label_" + substanceName + "_" + bm.getLabelURL().getDetail() + getFileExtension(bm.getLabelURL().getFileName());
 									else
-										zefn = determineBinaryFileName(t, substanceName, nm, bm);
+										zefn = determineBinaryFileNameV1(t, substanceName, nm, bm);
 									
 									final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
 									
@@ -321,7 +321,7 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 		});
 	}
 	
-	private String determineBinaryFileName(long t, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm) {
+	private String determineBinaryFileNameV1(long t, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm) {
 		final String zefn;
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.setTimeInMillis(t);
@@ -337,16 +337,16 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 							+
 							(id != null ? (id.getPosition() != null ? "DEG_" + HSMfolderTargetDataManager.digit3(id.getPosition().intValue())
 									: "DEG_000") : "") + " " +
-							"REPL_" + HSMfolderTargetDataManager.digit3(id.getReplicateID()) + " " +
-							id.getURL().getFileName().split(" ")[0]
-							+ " " +
+							"REPL_" + HSMfolderTargetDataManager.digit3(id.getReplicateID()) +
+							" " +
 							nm.getParentSample().getTimeUnit() + "_" + HSMfolderTargetDataManager.digit3(nm.getParentSample().getTime()) + " " +
 							HSMfolderTargetDataManager.digit2(gc.get(GregorianCalendar.YEAR)) + "-" +
 							HSMfolderTargetDataManager.digit2((gc.get(GregorianCalendar.MONTH) + 1)) + "-" +
 							HSMfolderTargetDataManager.digit2(gc.get(GregorianCalendar.DAY_OF_MONTH)) + " " +
 							HSMfolderTargetDataManager.digit2(gc.get(GregorianCalendar.HOUR_OF_DAY)) + "_" +
 							HSMfolderTargetDataManager.digit2(gc.get(GregorianCalendar.MINUTE)) + "_" +
-							HSMfolderTargetDataManager.digit2(gc.get(GregorianCalendar.SECOND)) + ".png";
+							HSMfolderTargetDataManager.digit2(gc.get(GregorianCalendar.SECOND)) + " " +
+							id.getURL().getFileName();
 			
 		} else {
 			zefn = bm.getURL().getFileName();
