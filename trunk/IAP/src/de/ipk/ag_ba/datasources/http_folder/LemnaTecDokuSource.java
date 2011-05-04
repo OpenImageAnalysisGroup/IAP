@@ -24,6 +24,11 @@ public class LemnaTecDokuSource extends HTTPfolderSource {
 							+ "This function provides access to the dokumentation delivered with the LemnaTec systems.");
 	}
 	
+	@Override
+	public void readDataSource() throws Exception {
+		super.readDataSource();
+	}
+	
 	private static Library getLib() {
 		Library libLemnaTecDocu = new Library();
 		libLemnaTecDocu.add(new Book("Documentation", "IPK Naming Standards", "http://ba-13.ipk-gatersleben.de/standards.pdf", "img/ext/paper.png"));

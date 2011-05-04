@@ -88,6 +88,7 @@ public class HSMfolderTargetDataManager {
 		s = StringManipulationTools.stringReplace(s, "%95", "_");
 		s = StringManipulationTools.stringReplace(s, "%40", "(");
 		s = StringManipulationTools.stringReplace(s, "%41", ")");
+		s = StringManipulationTools.stringReplace(s, "%44", ",");
 		s = StringManipulationTools.stringReplace(s, "%45", "-");
 		s = StringManipulationTools.stringReplace(s, "%46", ".");
 		s = StringManipulationTools.stringReplace(s, "..", "%46%46");
