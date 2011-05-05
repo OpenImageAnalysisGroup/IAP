@@ -35,6 +35,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -136,7 +137,7 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 								
 								final String zefn;
 								try {
-									zefn = determineBinaryFileNameV1(t, substanceName, nm, bm);
+									zefn = determineBinaryFileName(t, substanceName, nm, bm);
 									final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
 									boolean exists = targetFile.exists();
 									copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), t, targetFile, exists);
@@ -173,7 +174,12 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 									if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
 										zefn = "label_" + substanceName + "_" + bm.getLabelURL().getDetail() + getFileExtension(bm.getLabelURL().getFileName());
 									else
-										zefn = determineBinaryFileNameV1(t, substanceName, nm, bm);
+										if (bm.getLabelURL().getPrefix().startsWith(LemnaTecFTPhandler.PREFIX)) {
+											String fn = bm.getLabelURL().getDetail();
+											zefn = "label_" + substanceName + "_" + fn.substring(fn.lastIndexOf("/") + "/".length())
+													+ getFileExtension(bm.getLabelURL().getFileName());;
+										} else
+											zefn = "label_" + determineBinaryFileName(t, substanceName, nm, bm);
 									
 									final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
 									
@@ -306,8 +312,9 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 							f.renameTo(targetFile);
 						}
 						String fullPath = targetFile.getAbsolutePath();
-						String subPath = fullPath.substring(hsmFolder.length() + File.separator.length());
+						String subPath = fullPath.substring(hsmFolder.length());
 						url.setPrefix(HsmResourceIoHandler.getPrefix(hsmFolder));
+						url.setDetail("");
 						url.setFileName(subPath + "#" + extractLastFileName(url.getFileName()));
 					} catch (Exception e) {
 						System.out.println("ERROR: " + e.getMessage());
@@ -321,7 +328,7 @@ public class DataExportToHsmFolderAction extends AbstractNavigationAction {
 		});
 	}
 	
-	private String determineBinaryFileNameV1(long t, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm) {
+	private String determineBinaryFileName(long t, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm) {
 		final String zefn;
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.setTimeInMillis(t);

@@ -823,10 +823,19 @@ public class MongoDB {
 				}
 				
 				BackgroundTaskHelper.lockGetSemaphore(image.getURL() != null ? image.getURL().getPrefix() : "in", 1);
-				final byte[] isMain, isLabel;
+				byte[] isMain = null;
+				byte[] isLabel = null;
 				try {
-					isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
-					isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
+					try {
+						isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
+					} catch (Exception e) {
+						System.out.println("Error: No Inputstream for " + id.getURL() + ". " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
+					}
+					try {
+						isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
+					} catch (Exception e) {
+						System.out.println("Error: No Inputstream for " + id.getLabelURL() + ". " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
+					}
 				} finally {
 					BackgroundTaskHelper.lockRelease(image.getURL() != null ? image.getURL().getPrefix() : "in");
 				}
@@ -871,7 +880,7 @@ public class MongoDB {
 					}
 				}
 				
-				GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
+				GridFS gridfs_images = new GridFS(db, "" + MongoGridFS.FS_IMAGES.toString());
 				DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
 				collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 				

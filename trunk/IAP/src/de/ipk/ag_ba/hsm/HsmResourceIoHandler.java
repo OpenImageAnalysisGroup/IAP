@@ -53,6 +53,8 @@ public class HsmResourceIoHandler extends AbstractResourceIOHandler {
 		String fn = url.getFileName();
 		String path = url.getDetail().substring(url.getDetail().indexOf(File.separator) + File.separator.length());
 		fn = folder + File.separator + path + File.separator + fn.substring(0, fn.lastIndexOf("#"));
+		if (!new File(fn).exists())
+			System.out.println("Error: Can't find HSM file: " + fn);
 		return new FileInputStream(new File(fn));
 	}
 	
