@@ -113,7 +113,7 @@ public final class HomeAction extends AbstractNavigationAction {
 			try {
 				for (Bookmark b : Bookmark.getBookmarks()) {
 					BookmarkAction ba = new BookmarkAction(b);
-					NavigationButton nge = new NavigationButton(ba, ba.getImage(), src.getGUIsetting());
+					NavigationButton nge = new NavigationButton(ba, ba.getImage(), src.getGUIsetting(), ba.getStaticIconId());
 					bookmarks.add(nge);
 				}
 			} catch (Throwable e) {

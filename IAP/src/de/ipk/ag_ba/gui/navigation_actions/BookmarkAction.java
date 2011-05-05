@@ -14,8 +14,8 @@ import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.Unicode;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
+import de.ipk.ag_ba.gui.webstart.IAPgui;
 
 /**
  * @author klukas
@@ -59,6 +59,10 @@ public class BookmarkAction extends AbstractNavigationAction {
 	
 	public Bookmark getBookmark() {
 		return bookmark;
+	}
+	
+	public String getStaticIconId() {
+		return bookmark.getStaticIconId();
 	}
 	
 }

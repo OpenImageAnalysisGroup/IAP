@@ -16,13 +16,19 @@ import javax.swing.ImageIcon;
  */
 public class NavigationImage {
 	BufferedImage imageDefault, imageNavigation;
+	private final String staticID;
 	
-	public NavigationImage(BufferedImage image) {
+	public NavigationImage(BufferedImage image, String optStaticId) {
 		imageDefault = image;
 		imageNavigation = image;
+		staticID = optStaticId;
 	}
 	
 	public ImageIcon getImageIcon() {
 		return new ImageIcon(imageDefault);
+	}
+	
+	public String optGetStaticId() {
+		return staticID;
 	}
 }

@@ -355,7 +355,7 @@ public class IAPmain extends JApplet {
 	
 	public static NavigationImage loadIcon(String name) {
 		return new NavigationImage(
-							ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()));
+							ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()), name);
 	}
 	
 	public static boolean isSettingEnabled(IAPfeature feature) {

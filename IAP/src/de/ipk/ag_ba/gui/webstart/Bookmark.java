@@ -31,12 +31,14 @@ public class Bookmark {
 	private final int position;
 	private BufferedImage icon;
 	private boolean valid = true;
+	private String optStaticIconId;
 	
-	public Bookmark(int position, String title, String target, BufferedImage icon) {
+	public Bookmark(int position, String title, String target, BufferedImage icon, String optStaticIconId) {
 		this.position = position;
 		this.title = title;
 		this.target = target;
 		this.icon = icon;
+		this.optStaticIconId = optStaticIconId;
 	}
 	
 	public Bookmark(int position) {
@@ -46,6 +48,7 @@ public class Bookmark {
 			title = tf.get(0);
 			target = tf.get(1);
 			icon = ImageIO.read(new File(getFileName(".png")));
+			optStaticIconId = getFileName(".png");
 		} catch (IOException e) {
 			valid = false;
 			System.out.println("Could not process bookmark " + position + " (" + getFileName() + ")");
@@ -131,7 +134,7 @@ public class Bookmark {
 		int pos = getNextFreePosition();
 		if (pos < 0)
 			return false;
-		Bookmark b = new Bookmark(pos, title, target, icon);
+		Bookmark b = new Bookmark(pos, title, target, icon, title + "/" + target);
 		if (!b.isValid())
 			return false;
 		try {
@@ -153,5 +156,9 @@ public class Bookmark {
 	
 	public String getTitle() {
 		return title;
+	}
+	
+	public String getStaticIconId() {
+		return optStaticIconId;
 	}
 }

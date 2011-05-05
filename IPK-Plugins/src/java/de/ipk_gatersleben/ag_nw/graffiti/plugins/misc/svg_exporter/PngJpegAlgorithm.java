@@ -99,7 +99,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					NeedsSwingThread {
@@ -1095,7 +1095,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 				if (GraphicsEnvironment.isHeadless()) {
 					session = GravistoService.getInstance().getSessionFromGraph(targetGraph);
 					if (session == null) {
-						String[] views = new String[] { "org.graffiti.plugins.views.defaults.GraffitiView" };
+						String[] views = new String[] { "de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.IPKGraffitiView" };
 						
 						String viewName = views[0];
 						try {

@@ -119,7 +119,7 @@ public class Other {
 			ImageIcon i = pp.getIcon();
 			if (i != null) {
 				i = new ImageIcon(GravistoService.getScaledImage(i.getImage(), -48, 48));
-				ne.setIcon(i);
+				ne.setIcon(i, "img/vanted1_0.png");
 			}
 			
 			result.add(ne);

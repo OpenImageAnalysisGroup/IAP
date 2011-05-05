@@ -3,6 +3,7 @@ package de.ipk.ag_ba.gui.webstart;
 import java.io.File;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -12,9 +13,11 @@ import org.StringManipulationTools;
 import org.w3c.dom.Document;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
@@ -144,14 +147,37 @@ public class HSMfolderTargetDataManager {
 		String loadFile = hsmFolder + File.separator + "data" + File.separator + experimentDirectory + File.separator + fileNameOfExperimentFile;
 		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm/Phenotyping\ Experiment\ \(unknown\ greenhouse\)/LemnaTec\
 		// \(APH\)/klukas/WT_H3/1303994908266_0_klukas_WT_H3.iap.vanted.bin
-		
+		if (status != null)
+			status.setCurrentStatusText1("Create XML DOM...");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document w3Doc = builder.parse(new File(loadFile));
+		if (status != null)
+			status.setCurrentStatusText1("Convert DOM to Experiment....");
 		Experiment md = Experiment.getExperimentFromDOM(w3Doc);
+		if (status != null)
+			status.setCurrentStatusText1("Update URLs...");
 		updateFileUrls(md);
 		md.setHeader(header);
+		if (status != null)
+			status.setCurrentStatusText1("Experiment created");
 		return md;
+	}
+	
+	public static ExperimentInterface getExperiment(String databaseID) throws Exception {
+		// hsm:/Users/klukas/Library/Preferences/VANTED/local-iap-hsm/aaa_directory/1303994908266_0_klukas_WT_H3.iap.index.csv
+		String indexFileName = databaseID.substring("hsm:".length());
+		
+		HashMap<String, String> properties = new HashMap<String, String>();
+		TextFile tf = new TextFile(indexFileName);
+		properties.put("_id", "hsm:" + indexFileName);
+		for (String p : tf) {
+			String[] entry = p.split(",", 3);
+			properties.put(entry[1], entry[2]);
+		}
+		ExperimentHeader eh = new ExperimentHeader(properties);
+		
+		return getExperiment(eh, null);
 	}
 	
 	private static void updateFileUrls(Experiment md) {

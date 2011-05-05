@@ -74,6 +74,7 @@ public class NavigationButton implements StyleAware {
 	private boolean rightAligned;
 	private ProgressStatusService statusServer;
 	private final GUIsetting guiSetting;
+	private String optStaticIconId;
 	
 	public NavigationButton(NavigationAction navigationAction, GUIsetting guiSetting) {
 		if (navigationAction != null) {
@@ -114,8 +115,9 @@ public class NavigationButton implements StyleAware {
 		this.guiSetting = guiSetting;
 	}
 	
-	public NavigationButton(BookmarkAction ba, BufferedImage image, GUIsetting guiSetting) {
+	public NavigationButton(BookmarkAction ba, BufferedImage image, GUIsetting guiSetting, String optStaticIconId) {
 		this(ba, guiSetting);
+		this.optStaticIconId = optStaticIconId;
 		this.icon = image != null ? new ImageIcon(image) : null;
 	}
 	
@@ -262,8 +264,9 @@ public class NavigationButton implements StyleAware {
 		return sideGuiWidth;
 	}
 	
-	public void setIcon(ImageIcon i) {
+	public void setIcon(ImageIcon i, String optStaticIconId) {
 		this.icon = i;
+		this.optStaticIconId = optStaticIconId;
 	}
 	
 	public ImageIcon getIcon() {
@@ -676,5 +679,9 @@ public class NavigationButton implements StyleAware {
 	
 	public GUIsetting getGUIsetting() {
 		return guiSetting;
+	}
+	
+	public String getIconStaticId() {
+		return optStaticIconId;
 	}
 }
