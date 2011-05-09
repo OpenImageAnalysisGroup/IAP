@@ -1,17 +1,14 @@
 package ij.gui;
-
 import ij.IJ;
 import java.awt.*;
 import java.awt.event.*;
 
-/**
- * A modal dialog box with a one line message and
- * "Don't Save", "Cancel" and "Save" buttons.
- */
+/** A modal dialog box with a one line message and
+	"Don't Save", "Cancel" and "Save" buttons. */
 public class SaveChangesDialog extends Dialog implements ActionListener, KeyListener {
 	private Button dontSave, cancel, save;
 	private boolean cancelPressed, savePressed;
-	
+
 	public SaveChangesDialog(Frame parent, String fileName) {
 		super(parent, "Save?", true);
 		setLayout(new BorderLayout());
@@ -21,7 +18,7 @@ public class SaveChangesDialog extends Dialog implements ActionListener, KeyList
 		if (fileName.startsWith("Save "))
 			message = new Label(fileName);
 		else {
-			if (fileName.length() > 22)
+			if (fileName.length()>22)
 				message = new MultiLineLabel("Save changes to\n" + "\"" + fileName + "\"?");
 			else
 				message = new Label("Save changes to \"" + fileName + "\"?");
@@ -57,13 +54,12 @@ public class SaveChangesDialog extends Dialog implements ActionListener, KeyList
 		GUI.center(this);
 		show();
 	}
-	
+    
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == cancel)
+		if (e.getSource()==cancel)
 			cancelPressed = true;
-		else
-			if (e.getSource() == save)
-				savePressed = true;
+		else if (e.getSource()==save)
+			savePressed = true;
 		closeDialog();
 	}
 	
@@ -80,27 +76,23 @@ public class SaveChangesDialog extends Dialog implements ActionListener, KeyList
 	}
 	
 	void closeDialog() {
-		setVisible(false);
+		//setVisible(false);
 		dispose();
 	}
-	
-	public void keyPressed(KeyEvent e) {
-		int keyCode = e.getKeyCode();
-		IJ.setKeyDown(keyCode);
-		if (keyCode == KeyEvent.VK_ENTER)
-			closeDialog();
-		else
-			if (keyCode == KeyEvent.VK_ESCAPE) {
-				cancelPressed = true;
-				closeDialog();
-				IJ.resetEscape();
-			}
-	}
-	
-	public void keyReleased(KeyEvent e) {
-	}
-	
-	public void keyTyped(KeyEvent e) {
-	}
-	
+
+	public void keyPressed(KeyEvent e) { 
+		int keyCode = e.getKeyCode(); 
+		IJ.setKeyDown(keyCode); 
+		if (keyCode==KeyEvent.VK_ENTER) 
+			closeDialog(); 
+		else if (keyCode==KeyEvent.VK_ESCAPE) { 
+			cancelPressed = true; 
+			closeDialog(); 
+			IJ.resetEscape();
+		} 
+	} 
+
+	public void keyReleased(KeyEvent e) {}
+	public void keyTyped(KeyEvent e) {}
+
 }

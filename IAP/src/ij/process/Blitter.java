@@ -1,10 +1,9 @@
 package ij.process;
-
 import java.awt.Color;
 
 /** ImageJ bit blitting classes must implement this interface. */
 public interface Blitter {
-	
+
 	/** dst=src */
 	public static final int COPY = 0;
 	
@@ -19,7 +18,7 @@ public interface Blitter {
 	
 	/** dst=dst-src */
 	public static final int SUBTRACT = 4;
-	
+		
 	/** dst=src*src */
 	public static final int MULTIPLY = 5;
 	
@@ -49,14 +48,13 @@ public interface Blitter {
 	
 	/** Copies with zero pixels transparent. */
 	public static final int COPY_ZERO_TRANSPARENT = 14;
-	
-	/**
-	 * Sets the transparent color used in the COPY_TRANSPARENT
-	 * mode (default is Color.white).
-	 */
+
+
+	/** Sets the transparent color used in the COPY_TRANSPARENT
+		mode (default is Color.white). */
 	public void setTransparentColor(Color c);
-	
+
 	/** Copies the image in 'src' to (x,y) using the specified mode. */
 	public void copyBits(ImageProcessor src, int x, int y, int mode);
-	
+
 }

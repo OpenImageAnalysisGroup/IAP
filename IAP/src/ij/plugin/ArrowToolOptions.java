@@ -1,5 +1,4 @@
 package ij.plugin;
-
 import ij.*;
 import ij.gui.*;
 import java.awt.*;
@@ -8,14 +7,14 @@ import java.awt.*;
 public class ArrowToolOptions implements PlugIn, DialogListener {
 	private String colorName;
 	private static GenericDialog gd;
-	
-	public void run(String arg) {
-		if (gd != null && gd.isVisible())
-			gd.toFront();
-		else
+
+ 	public void run(String arg) {
+ 		if (gd!=null && gd.isVisible())
+ 			gd.toFront();
+ 		else
 			arrowToolOptions();
 	}
-	
+				
 	void arrowToolOptions() {
 		if (!Toolbar.getToolName().equals("arrow"))
 			IJ.setTool("arrow");
@@ -25,7 +24,7 @@ public class ArrowToolOptions implements PlugIn, DialogListener {
 		colorName = Colors.getColorName(color, "red");
 		int style = Arrow.getDefaultStyle();
 		gd = new NonBlockingGenericDialog("Arrow Tool");
-		gd.addSlider("Width:", 1, 50, (int) width);
+		gd.addSlider("Width:", 1, 50, (int)width);
 		gd.addSlider("Size:", 0, 30, headSize);
 		gd.addChoice("Color:", Colors.colors, colorName);
 		gd.addChoice("Style:", Arrow.styles, Arrow.styles[style]);
@@ -33,14 +32,14 @@ public class ArrowToolOptions implements PlugIn, DialogListener {
 		gd.addDialogListener(this);
 		gd.showDialog();
 	}
-	
+
 	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
 		double width2 = gd.getNextNumber();
 		double headSize2 = gd.getNextNumber();
 		String colorName2 = gd.getNextChoice();
 		int style2 = gd.getNextChoiceIndex();
 		boolean doubleHeaded2 = gd.getNextBoolean();
-		if (colorName != null && !colorName2.equals(colorName)) {
+		if (colorName!=null && !colorName2.equals(colorName)) {
 			Color color = Colors.getColor(colorName2, Color.black);
 			Toolbar.setForegroundColor(color);
 		}
@@ -50,14 +49,12 @@ public class ArrowToolOptions implements PlugIn, DialogListener {
 		Arrow.setDefaultStyle(style2);
 		Arrow.setDefaultDoubleHeaded(doubleHeaded2);
 		ImagePlus imp = WindowManager.getCurrentImage();
-		if (imp == null)
-			return true;
+		if (imp==null) return true;
 		Roi roi = imp.getRoi();
-		if (roi == null)
-			return true;
+		if (roi==null) return true;
 		if (roi instanceof Arrow) {
-			Arrow arrow = (Arrow) roi;
-			roi.setStrokeWidth((float) width2);
+			Arrow arrow = (Arrow)roi;
+			roi.setStrokeWidth((float)width2);
 			arrow.setHeadSize(headSize2);
 			arrow.setStyle(style2);
 			arrow.setDoubleHeaded(doubleHeaded2);
@@ -70,4 +67,4 @@ public class ArrowToolOptions implements PlugIn, DialogListener {
 		return true;
 	}
 	
-}
+} 

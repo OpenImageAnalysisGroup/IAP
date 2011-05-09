@@ -1,5 +1,4 @@
 package ij.gui;
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -12,8 +11,7 @@ public class HTMLDialog extends JDialog implements ActionListener {
 		ij.util.Java2.setSystemLookAndFeel();
 		Container container = getContentPane();
 		container.setLayout(new BorderLayout());
-		if (message == null)
-			message = "";
+		if (message==null) message = "";
 		JLabel label = new JLabel(message);
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 15));
@@ -31,7 +29,7 @@ public class HTMLDialog extends JDialog implements ActionListener {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		setVisible(false);
+		//setVisible(false);
 		dispose();
 	}
 }

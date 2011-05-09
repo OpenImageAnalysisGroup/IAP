@@ -1,24 +1,14 @@
 package ij.plugin;
-import ij.IJ;
-import ij.ImageJ;
-import ij.ImagePlus;
-import ij.Macro;
-import ij.Menus;
-import ij.Prefs;
-import ij.WindowManager;
-import ij.gui.GenericDialog;
-import ij.io.OpenDialog;
+import java.awt.*;
+import java.io.*;
+import java.util.*;
+import ij.*;
+import ij.gui.*;
+import ij.io.*;
+import ij.util.*;
 import ij.plugin.frame.Editor;
-
-import java.awt.Font;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.PrintWriter;
-import java.util.Locale;
-import java.util.Vector;
-
-import com.sun.tools.javac.Main;
+import ij.text.TextWindow;
+import java.awt.event.KeyEvent;
 
 /** Compiles and runs plugins using the javac compiler. */
 public class Compiler implements PlugIn, FilenameFilter {
@@ -26,7 +16,6 @@ public class Compiler implements PlugIn, FilenameFilter {
 	private static final int TARGET14=0, TARGET15=1, TARGET16=2,  TARGET17=3;
 	private static final String[] targets = {"1.4", "1.5", "1.6", "1.7"};
 	private static final String TARGET_KEY = "javac.target";
-	@SuppressWarnings("restriction")
 	private static com.sun.tools.javac.Main javac;
 	private static ByteArrayOutputStream output;
 	private static String dir, name;
@@ -83,7 +72,7 @@ public class Compiler implements PlugIn, FilenameFilter {
 		IJ.showStatus("compiling: "+path);
 		output.reset();
 		String classpath = getClassPath(path);
-		Vector<String> v = new Vector<String>();
+		Vector v = new Vector();
 		if (generateDebuggingInfo)
 			v.addElement("-g");
 		if (IJ.isJava15()) {
@@ -106,7 +95,7 @@ public class Compiler implements PlugIn, FilenameFilter {
 				str += " "+arguments[i];
 			IJ.log(str);
 		}
-		boolean compiled = Main.compile(arguments, new PrintWriter(output))==0;
+		boolean compiled = javac.compile(arguments, new PrintWriter(output))==0;
 		String s = output.toString();
 		boolean errors = (!compiled || areErrors(s));
 		if (errors)
@@ -120,7 +109,7 @@ public class Compiler implements PlugIn, FilenameFilter {
 	 // the path to the directory containing the plugin, 
 	 // and paths to any .jar files in the plugins folder.
 	 String getClassPath(String path) {
-		System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 	 	StringBuffer sb = new StringBuffer();
 		sb.append(System.getProperty("java.class.path"));
 		File f = new File(path);
@@ -145,7 +134,7 @@ public class Compiler implements PlugIn, FilenameFilter {
 			File f2 = new File(path+list[i]);
 			if (f2.isDirectory())
 				addJars(path+list[i], sb);
-			else if (list[i].endsWith(".jar")&& list[i].indexOf("_")==-1) {
+			else if (list[i].endsWith(".jar")&&(list[i].indexOf("_")==-1||list[i].equals("loci_tools.jar"))) {
 				sb.append(File.pathSeparator+path+list[i]);
 				if (IJ.debugMode) IJ.log("javac: "+path+list[i]);
 			}
