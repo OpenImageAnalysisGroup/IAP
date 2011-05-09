@@ -898,7 +898,10 @@ public class PixelSegmentation {
 				
 				distanceFromCenterToLeftTopEdge = clusterCenters[0].distance(new Vector2d(0, 0));
 				
-				normalizedClusterAreaSizes[cluster] = (int) (clusterAreaSizes[cluster] * ((distanceFromCenterToLeftTopEdge - distanceFromCenterToCluster) / distanceFromCenterToLeftTopEdge));
+				double d = ((distanceFromCenterToLeftTopEdge - distanceFromCenterToCluster) < 0) ? 0
+						: (distanceFromCenterToLeftTopEdge - distanceFromCenterToCluster);
+				
+				normalizedClusterAreaSizes[cluster] = (int) (clusterAreaSizes[cluster] * (d / distanceFromCenterToLeftTopEdge));
 				
 				// System.out.println("cluster = " + cluster + " newPixel = " + output[cluster] + " oldPixel = " + input[cluster] + " Abstand zum Zentrum: " +
 				// distanceFromCenterToCluster);

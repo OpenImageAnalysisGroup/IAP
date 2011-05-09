@@ -25,6 +25,6 @@ public class BlockFindMaxium extends AbstractSnapshotAnalysisBlockFIS {
 		double nMaxima = numericResult.getValue("Count", numericResult.getCounter() - 1);
 		getProperties().setNumericProperty(0, PropertyNames.RESULT_MAXIMUM_SEARCH, nMaxima);
 		
-		return new ImageOperation(getInput().getMasks().getVis()).getImage();
+		return new ImageOperation(res.getImage()).getImage();
 	}
 }
