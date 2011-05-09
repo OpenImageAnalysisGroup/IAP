@@ -4,6 +4,7 @@ import ij.CompositeImage;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.LookUpTable;
 import ij.Prefs;
 import ij.VirtualStack;
@@ -36,8 +37,9 @@ public class FileSaver {
 		setJpegQuality(ij.Prefs.getInt(ij.Prefs.JPEG, DEFAULT_JPEG_QUALITY));
 	}
 	
-	public ImagePlus imp;
-	public FileInfo fi;
+	private static String defaultDirectory = null;
+	protected final ImagePlus imp;
+	protected FileInfo fi;
 	private String name;
 	private String directory;
 	
@@ -131,7 +133,7 @@ public class FileSaver {
 		return true;
 	}
 	
-	protected byte[][] getOverlay(ImagePlus imp) {
+	public byte[][] getOverlay(ImagePlus imp) {
 		if (imp.getHideOverlay())
 			return null;
 		Overlay overlay = imp.getOverlay();
@@ -162,13 +164,33 @@ public class FileSaver {
 			IJ.error("This is not a stack");
 			return false;
 		}
-		if (imp.getStack().isVirtual())
+		boolean virtualStack = imp.getStack().isVirtual();
+		if (virtualStack)
 			fi.virtualStack = (VirtualStack) imp.getStack();
 		Object info = imp.getProperty("Info");
 		if (info != null && (info instanceof String))
 			fi.info = (String) info;
 		fi.description = getDescriptionString();
-		fi.sliceLabels = imp.getStack().getSliceLabels();
+		if (virtualStack) {
+			FileInfo fi = imp.getOriginalFileInfo();
+			if (path != null && path.equals(fi.directory + fi.fileName)) {
+				IJ.error("TIFF virtual stacks cannot be saved in place.");
+				return false;
+			}
+			String[] labels = null;
+			ImageStack vs = imp.getStack();
+			for (int i = 1; i <= vs.getSize(); i++) {
+				ImageProcessor ip = vs.getProcessor(i);
+				String label = vs.getSliceLabel(i);
+				if (i == 1 && (label == null || label.length() < 200))
+					break;
+				if (labels == null)
+					labels = new String[vs.getSize()];
+				labels[i - 1] = label;
+			}
+			fi.sliceLabels = labels;
+		} else
+			fi.sliceLabels = imp.getStack().getSliceLabels();
 		fi.roi = RoiEncoder.saveAsByteArray(imp.getRoi());
 		fi.overlay = getOverlay(imp);
 		if (imp.isComposite())
@@ -186,7 +208,7 @@ public class FileSaver {
 		return true;
 	}
 	
-	protected void saveDisplayRangesAndLuts(ImagePlus imp, FileInfo fi) {
+	public void saveDisplayRangesAndLuts(ImagePlus imp, FileInfo fi) {
 		CompositeImage ci = (CompositeImage) imp;
 		int channels = imp.getNChannels();
 		fi.displayRanges = new double[channels * 2];
@@ -465,12 +487,11 @@ public class FileSaver {
 			for (int i = 0; i < n; i++)
 				pixels[i] = (short) (pixels[i] + 32768);
 		}
-		updateImp(fi, FileInfo.RAW);
+		updateImp(fi, fi.RAW);
 		return true;
 	}
 	
 	/** Save the stack as raw data using the specified path. */
-	@SuppressWarnings("deprecation")
 	public boolean saveAsRawStack(String path) {
 		if (fi.nImages == 1) {
 			IJ.write("This is not a stack");
@@ -512,7 +533,7 @@ public class FileSaver {
 					pixels[i] = (short) (pixels[i] + 32768);
 			}
 		}
-		updateImp(fi, FileInfo.RAW);
+		updateImp(fi, fi.RAW);
 		return true;
 	}
 	
@@ -596,10 +617,20 @@ public class FileSaver {
 		return true;
 	}
 	
-	protected void updateImp(FileInfo fi, int fileFormat) {
+	public void updateImp(FileInfo fi, int fileFormat) {
 		imp.changes = false;
 		if (name != null) {
 			fi.fileFormat = fileFormat;
+			FileInfo ofi = imp.getOriginalFileInfo();
+			if (ofi != null) {
+				if (ofi.openNextName == null) {
+					fi.openNextName = ofi.fileName;
+					fi.openNextDir = ofi.directory;
+				} else {
+					fi.openNextName = ofi.openNextName;
+					fi.openNextDir = ofi.openNextDir;
+				}
+			}
 			fi.fileName = name;
 			fi.directory = directory;
 			// if (fileFormat==fi.TIFF)
