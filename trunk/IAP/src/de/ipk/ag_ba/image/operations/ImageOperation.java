@@ -1324,21 +1324,21 @@ public class ImageOperation extends ImageConverter {
 	/**
 	 * converts RGB image into the Lab colorspace under conditions:
 	 * 
-	 * @param Ll
+	 * @param lowerValueOfL
 	 *           - lower border L
-	 * @param Lu
+	 * @param upperValueOfL
 	 *           - upper border L
-	 * @param al
+	 * @param lowerValueOfA
 	 *           - ...
-	 * @param au
-	 * @param bl
-	 * @param bu
-	 * @param clearcolor
-	 *           - Backgroundcolor
+	 * @param upperValueOfA
+	 * @param lowerValueOfB
+	 * @param upperValueOfB
+	 * @param background
+	 *           - Background-Color
 	 * @return
 	 */
-	public ImageOperation thresholdLAB(int Ll, int Lu, int al, int au, int bl,
-			int bu, int clearcolor) {
+	public ImageOperation thresholdLAB(int lowerValueOfL, int upperValueOfL, int lowerValueOfA, int upperValueOfA, int lowerValueOfB,
+			int upperValueOfB, int background) {
 		
 		int xe = image.getProcessor().getWidth();
 		int ye = image.getProcessor().getHeight();
@@ -1397,19 +1397,18 @@ public class ImageOperation extends ImageConverter {
 				ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
 				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
 				
-				if ((Li > Ll) && (Li < Lu) && (ai > al) && (ai < au)
-						&& (bi > bl) && (bi < bu)) {
+				if ((Li > lowerValueOfL) && (Li < upperValueOfL) && (ai > lowerValueOfA) && (ai < upperValueOfA)
+						&& (bi > lowerValueOfB) && (bi < upperValueOfB)) {
 					image.getProcessor().putPixel(
 							x,
 							y,
 							((Li & 0xff) << 16) + ((ai & 0xff) << 8)
 									+ (bi & 0xff));
 				} else {
-					image.getProcessor().putPixel(x, y, clearcolor);
+					image.getProcessor().putPixel(x, y, background);
 				}
 			}
 		}
-		
 		return new ImageOperation(getImage());
 	}
 	
