@@ -1445,29 +1445,42 @@ public class ImageOperation extends ImageConverter {
 	 * @param excludeOnEdges
 	 * @param isEDM
 	 * @return Binary Image
-	 * @author pape
 	 */
 	public ImageOperation findMax(double tolerance, double threshold,
 			int outputType, boolean excludeOnEdges, boolean isEDM) {
 		
+		if (outputType < 0 || outputType > 5) {
+			outputType = 0;
+			System.out.println("the varaible \"outputTyp\" in \"ImageOperation.findMax(...)\" must be \">=  0\" or \"<= 5\" -> Now it works with 0!");
+		}
+		
 		MaximumFinder find = new MaximumFinder();
 		ResultsTable rt = ResultsTable.getResultsTable();
+		
 		synchronized (rt) {
-			
+			rt.reset();
 			ByteProcessor p = find.findMaxima(image.getProcessor(), tolerance,
 					threshold, outputType, excludeOnEdges, isEDM);
 			
 			if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
 				return new ImageOperation(p.getBufferedImage(), (ResultsTable) rt.clone());
 			} else {
+				setResultsTable((ResultsTable) rt.clone());
 				return this;
 			}
-			
 		}
 	}
 	
 	public ImageOperation findMax() {
-		return findMax(50, ImageProcessor.NO_THRESHOLD, MaximumFinder.COUNT, true, false);
+		return findMax(50);
+	}
+	
+	public ImageOperation findMax(double tolerance) {
+		return findMax(tolerance, MaximumFinder.COUNT);
+	}
+	
+	public ImageOperation findMax(double tolerance, int outputType) {
+		return findMax(tolerance, ImageProcessor.NO_THRESHOLD, outputType, false, false);
 	}
 	
 	// public ImageOperation maxium() {
