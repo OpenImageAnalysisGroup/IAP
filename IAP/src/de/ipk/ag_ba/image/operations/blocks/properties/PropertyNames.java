@@ -8,24 +8,61 @@ public enum PropertyNames {
 	END_WIDTH_FLUO_IMAGE, END_HEIGHT_FLUO_MASK, END_WIDTH_FLUO_MASK, END_HEIGHT_NIR_IMAGE, END_WIDTH_NIR_IMAGE,
 	END_HEIGHT_NIR_MASK, END_WIDTH_NIR_MASK, END_HEIGHT_VIS_IMAGE, END_WIDTH_VIS_IMAGE, END_HEIGHT_VIS_MASK, END_WIDTH_VIS_MASK,
 
-	VIS_MARKER_POS_LEFT_1, VIS_MARKER_POS_LEFT_2, VIS_MARKER_POS_LEFT_3,
-	VIS_MARKER_POS_RIGHT_1, VIS_MARKER_POS_RIGHT_2, VIS_MARKER_POS_RIGHT_3,
-
-	RESULT_MAXIMUM_SEARCH;
+	// VIS_MARKER_POS_LEFT_1, VIS_MARKER_POS_LEFT_2, VIS_MARKER_POS_LEFT_3,
+	// VIS_MARKER_POS_RIGHT_1, VIS_MARKER_POS_RIGHT_2, VIS_MARKER_POS_RIGHT_3,
 	
-	public boolean storeAsResult() {
-		switch (this) {
-			case VIS_MARKER_POS_LEFT_1:
-			case VIS_MARKER_POS_LEFT_2:
-			case VIS_MARKER_POS_LEFT_3:
-			case VIS_MARKER_POS_RIGHT_1:
-			case VIS_MARKER_POS_RIGHT_2:
-			case VIS_MARKER_POS_RIGHT_3:
-				return true;
+	RESULT_MAXIMUM_SEARCH_COUNT,
+	VIS_MARKER_POS_1_X, VIS_MARKER_POS_1_Y, VIS_MARKER_POS_2_X, VIS_MARKER_POS_2_Y, VIS_MARKER_POS_3_X, VIS_MARKER_POS_3_Y,
+	VIS_MARKER_POS_4_X, VIS_MARKER_POS_4_Y, VIS_MARKER_POS_5_X, VIS_MARKER_POS_5_Y, VIS_MARKER_POS_6_X, VIS_MARKER_POS_6_Y;
+	
+	// public boolean storeAsResult() {
+	// switch (this) {
+	// case VIS_MARKER_POS_LEFT_1:
+	// case VIS_MARKER_POS_LEFT_2:
+	// case VIS_MARKER_POS_LEFT_3:
+	// case VIS_MARKER_POS_RIGHT_1:
+	// case VIS_MARKER_POS_RIGHT_2:
+	// case VIS_MARKER_POS_RIGHT_3:
+	// return true;
+	//
+	// default:
+	// return false;
+	// }
+	// }
+	//
+	
+	public static PropertyNames getPropertyName(int i) {
+		
+		switch (i) {
+			case 1:
+				return VIS_MARKER_POS_1_X;
+			case 2:
+				return VIS_MARKER_POS_1_Y;
+			case 3:
+				return VIS_MARKER_POS_2_X;
+			case 4:
+				return VIS_MARKER_POS_2_Y;
+			case 5:
+				return VIS_MARKER_POS_3_X;
+			case 6:
+				return VIS_MARKER_POS_3_Y;
+			case 7:
+				return VIS_MARKER_POS_4_X;
+			case 8:
+				return VIS_MARKER_POS_4_Y;
+			case 9:
+				return VIS_MARKER_POS_5_X;
+			case 10:
+				return VIS_MARKER_POS_5_Y;
+			case 11:
+				return VIS_MARKER_POS_6_X;
+			case 12:
+				return VIS_MARKER_POS_6_Y;
 				
-			default:
-				return false;
 		}
+		
+		return null;
+		
 	}
 	
 }

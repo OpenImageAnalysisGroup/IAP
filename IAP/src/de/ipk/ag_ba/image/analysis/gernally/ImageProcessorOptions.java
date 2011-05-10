@@ -7,6 +7,8 @@
 
 package de.ipk.ag_ba.image.analysis.gernally;
 
+import ij.plugin.filter.MaximumFinder;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -14,6 +16,9 @@ import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
+ * First: add a enumeration which describe the descriptor
+ * Second: add the new Value to initStandardValues() -> Attention: choose the right method (add...Setting())
+ * 
  * @author klukas, entzian
  */
 public class ImageProcessorOptions {
@@ -41,11 +46,14 @@ public class ImageProcessorOptions {
 			CLOSING_REPEAT,
 			CLOSING_NIR_TOP, CLOSING_NIR_SIDE,
 			DEBUG_STACK_WIDTH, MAX_THREADS_PER_IMAGE,
-		// double
-		SCALE, ROTATION_ANGLE, SCALE_X, SCALE_Y, FLUO_EPSILON_A, FLUO_EPSILON_B, RGB_EPSILON_A, RGB_EPSILON_B, NIR_EPSILON_A, NIR_EPSILON_B,
+			FIND_MAXIMUM_TYP,
 
-		// boolean
-		PROCESS_NIR, DEBUG_TAKE_TIMES, DEBUG_OVERLAY_RESULT_IMAGE, IS_DEBUG_PRINT_EACH_STEP, IS_DEBUG_VIS, IS_DEBUG_FLUO, IS_DEBUG_NIR, REMOVE_SMALL_CLUSTER_SIZE_FLUO, REMOVE_SMALL_CLUSTER_SIZE_RGB
+			// double
+			SCALE, ROTATION_ANGLE, SCALE_X, SCALE_Y, FLUO_EPSILON_A, FLUO_EPSILON_B, RGB_EPSILON_A, RGB_EPSILON_B, NIR_EPSILON_A, NIR_EPSILON_B, FIND_MAXIMUM_TOLERANCE,
+
+			// boolean
+			PROCESS_NIR, DEBUG_TAKE_TIMES, DEBUG_OVERLAY_RESULT_IMAGE, IS_DEBUG_PRINT_EACH_STEP, IS_DEBUG_VIS, IS_DEBUG_FLUO, IS_DEBUG_NIR, REMOVE_SMALL_CLUSTER_SIZE_FLUO, REMOVE_SMALL_CLUSTER_SIZE_RGB
+		
 	}
 	
 	// HashMap<IntSetting, Queue<Integer>> integerOptions = new HashMap<ImageProcessorOptions.IntSetting, Queue<Integer>>();
@@ -214,6 +222,10 @@ public class ImageProcessorOptions {
 		
 		addIntSetting(Setting.DEBUG_STACK_WIDTH, 1680);
 		addIntSetting(Setting.MAX_THREADS_PER_IMAGE, 2);
+		
+		addDoubleSetting(Setting.FIND_MAXIMUM_TOLERANCE, 50.0);
+		addIntSetting(Setting.FIND_MAXIMUM_TYP, MaximumFinder.COUNT);
+		
 	}
 	
 	// ########## SET ###############
