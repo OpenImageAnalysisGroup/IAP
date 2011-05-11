@@ -52,7 +52,12 @@ public class ImageProcessorOptions {
 			SCALE, ROTATION_ANGLE, SCALE_X, SCALE_Y, FLUO_EPSILON_A, FLUO_EPSILON_B, RGB_EPSILON_A, RGB_EPSILON_B, NIR_EPSILON_A, NIR_EPSILON_B, FIND_MAXIMUM_TOLERANCE,
 
 			// boolean
-			PROCESS_NIR, DEBUG_TAKE_TIMES, DEBUG_OVERLAY_RESULT_IMAGE, IS_DEBUG_PRINT_EACH_STEP, IS_DEBUG_VIS, IS_DEBUG_FLUO, IS_DEBUG_NIR, REMOVE_SMALL_CLUSTER_SIZE_FLUO, REMOVE_SMALL_CLUSTER_SIZE_RGB
+			PROCESS_NIR, DEBUG_TAKE_TIMES, DEBUG_OVERLAY_RESULT_IMAGE, IS_DEBUG_PRINT_EACH_STEP, IS_DEBUG_VIS, IS_DEBUG_FLUO, IS_DEBUG_NIR, REMOVE_SMALL_CLUSTER_SIZE_FLUO,
+			REMOVE_SMALL_CLUSTER_SIZE_RGB,
+
+			LAB_MIN_L_VALUE_VIS, LAB_MAX_L_VALUE_VIS, LAB_MIN_A_VALUE_VIS, LAB_MAX_A_VALUE_VIS, LAB_MIN_B_VALUE_VIS, LAB_MAX_B_VALUE_VIS, LAB_MIN_L_VALUE_FLUO,
+			LAB_MAX_L_VALUE_FLUO, LAB_MIN_A_VALUE_FLUO, LAB_MAX_A_VALUE_FLUO, LAB_MIN_B_VALUE_FLUO, LAB_MAX_B_VALUE_FLUO, LAB_MIN_L_VALUE_NIR, LAB_MAX_L_VALUE_NIR,
+			LAB_MIN_A_VALUE_NIR, LAB_MAX_A_VALUE_NIR, LAB_MIN_B_VALUE_NIR, LAB_MAX_B_VALUE_NIR;
 		
 	}
 	
@@ -118,8 +123,9 @@ public class ImageProcessorOptions {
 	}
 	
 	public void clearSetting(Setting s) {
-		if (!doubleOptions.containsKey(s))
+		if (doubleOptions.containsKey(s)) {
 			doubleOptions.remove(s);
+		}
 	}
 	
 	public void clearAndAddIntSetting(Setting s, int value) {
@@ -225,6 +231,27 @@ public class ImageProcessorOptions {
 		
 		addDoubleSetting(Setting.FIND_MAXIMUM_TOLERANCE, 50.0);
 		addIntSetting(Setting.FIND_MAXIMUM_TYP, MaximumFinder.COUNT);
+		
+		addIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
+		addIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
+		addIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0);
+		addIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 255);
+		addIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 0);
+		addIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255);
+		
+		addIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 0);
+		addIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
+		addIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 0);
+		addIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
+		addIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 0);
+		addIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
+		
+		addIntSetting(Setting.LAB_MIN_L_VALUE_NIR, 0);
+		addIntSetting(Setting.LAB_MAX_L_VALUE_NIR, 255);
+		addIntSetting(Setting.LAB_MIN_A_VALUE_NIR, 0);
+		addIntSetting(Setting.LAB_MAX_A_VALUE_NIR, 255);
+		addIntSetting(Setting.LAB_MIN_B_VALUE_NIR, 0);
+		addIntSetting(Setting.LAB_MAX_B_VALUE_NIR, 255);
 		
 	}
 	

@@ -46,7 +46,10 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  * @param in
  *           The set of input images (RGB images).
  * @return A set of images which may be used as a mask.
+ *         -> is replaced by BlockLabFit
  */
+
+@Deprecated
 public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
