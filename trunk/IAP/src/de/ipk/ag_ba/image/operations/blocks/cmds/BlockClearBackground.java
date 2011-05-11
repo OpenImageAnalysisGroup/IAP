@@ -38,7 +38,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
+@Deprecated
 /**
+ * <b>Is replaced by BlockLabFit.</b>
  * Uses LAB color classification, to categorize the input as foreground /
  * background. Then small parts
  * of the image are removed (noise), using the PixelSegmentation algorithm.
@@ -46,10 +48,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  * @param in
  *           The set of input images (RGB images).
  * @return A set of images which may be used as a mask.
- *         -> is replaced by BlockLabFit
  */
-
-@Deprecated
 public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
