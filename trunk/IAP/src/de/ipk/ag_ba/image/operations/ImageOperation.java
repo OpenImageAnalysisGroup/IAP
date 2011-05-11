@@ -11,7 +11,9 @@ import ij.process.Blitter;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
@@ -341,6 +343,21 @@ public class ImageOperation extends ImageConverter {
 	public void opening() {
 		image.getProcessor().erode();
 		image.getProcessor().dilate();
+	}
+	
+	/**
+	 * Erosion, then dilation. Removes small objects in the mask. es wird der
+	 * 3x3 Minimum-Filter genutzt
+	 * <p>
+	 * The erosion of the dark-blue square by a disk, resulting in the light-blue square:<br>
+	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png" >
+	 */
+	public ImageOperation opening(int n) {
+		for (int i = 0; i < n; i++)
+			image.getProcessor().erode();
+		for (int i = 0; i < n; i++)
+			image.getProcessor().dilate();
+		return this;
 	}
 	
 	public void skeletonize() {
@@ -1444,18 +1461,13 @@ public class ImageOperation extends ImageConverter {
 	 * @param excludeOnEdges
 	 * @param isEDM
 	 * @return Binary Image
+	 * @author pape
 	 */
 	public ImageOperation findMax(double tolerance, double threshold,
 			int outputType, boolean excludeOnEdges, boolean isEDM) {
 		
-		if (outputType < 0 || outputType > 5) {
-			outputType = 0;
-			System.out.println("the varaible \"outputTyp\" in \"ImageOperation.findMax(...)\" must be \">=  0\" or \"<= 5\" -> Now it works with 0!");
-		}
-		
 		MaximumFinder find = new MaximumFinder();
 		ResultsTable rt = ResultsTable.getResultsTable();
-		
 		synchronized (rt) {
 			rt.reset();
 			ByteProcessor p = find.findMaxima(image.getProcessor(), tolerance,
@@ -1467,6 +1479,7 @@ public class ImageOperation extends ImageConverter {
 				setResultsTable((ResultsTable) rt.clone());
 				return this;
 			}
+			
 		}
 	}
 	
@@ -1485,11 +1498,15 @@ public class ImageOperation extends ImageConverter {
 	// public ImageOperation maxium() {
 	// MaximumFinder mf = new MaximumFinder();
 	//
-	// mf.findMaxima(image.getProcessor(), 50, ImageProcessor.NO_THRESHOLD, MaximumFinder.COUNT, true, false);
+	// mf.findMaxima(image.getProcessor(), 50, ImageProcessor.NO_THRESHOLD,
+	// MaximumFinder.COUNT, true, false);
 	//
-	// // System.out.println("resultTable2: " + rt.getValue("Count", rt.getCounter() - 1));
+	// // System.out.println("resultTable2: " + rt.getValue("Count",
+	// rt.getCounter() - 1));
 	//
-	// return new ImageOperation(mf.findMaxima(image.getProcessor(), 50, ImageProcessor.NO_THRESHOLD, MaximumFinder.SEGMENTED, true, false).getBufferedImage());
+	// return new ImageOperation(mf.findMaxima(image.getProcessor(), 50,
+	// ImageProcessor.NO_THRESHOLD, MaximumFinder.SEGMENTED, true,
+	// false).getBufferedImage());
 	//
 	// }
 	
@@ -1535,5 +1552,31 @@ public class ImageOperation extends ImageConverter {
 	
 	public ResultsTable getResultsTable() {
 		return rt;
+	}
+	
+	public ImageOperation drawLine(Vector2d centroid, double resultAngle,
+			int subX, int addX, Color color, float width) {
+		BufferedImage bi = getImage().getAsBufferedImage();
+		Graphics2D g2 = (Graphics2D) bi.getGraphics();
+		
+		g2.translate(centroid.x, centroid.y);
+		g2.rotate(resultAngle / 180 * Math.PI);
+		g2.setStroke(new BasicStroke(width));
+		g2.setColor(color);
+		
+		g2.drawLine(subX, 0, addX, 0);
+		
+		return new ImageOperation(bi);
+	}
+	
+	public ArrayList<MarkerPair> searchBlueMarkers() {
+		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage());
+		
+		bmf.findCoordinates();
+		
+		ArrayList<MarkerPair> mergedCoordinates = bmf
+				.getResultCoordinates((int) (getImage().getHeight() * 0.05d));
+		
+		return mergedCoordinates;
 	}
 }
