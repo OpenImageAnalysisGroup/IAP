@@ -3,6 +3,7 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -14,21 +15,30 @@ public class BlockLabFit extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		
-		return labFit(getInput().getMasks().getVis(), getInput().getImages().getVis(), 0, 255, 0, 255, 132, 255);
+		return labFit(getInput().getMasks().getVis(), getInput().getImages().getVis(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS), options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS), options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS));
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		
-		return labFit(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), 0, 255, 0, 255, 132, 255);
+		return labFit(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO),
+				options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO), options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO),
+				options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO), options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO),
+				options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO));
 	}
 	
 	// @Override
 	// protected FlexibleImage processNIRmask() {
 	//
-	// return labFit(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), ImageTyp.FLUO, 0, 255, 0, 255, 132, 255);
+	// return labFit(getInput().getMasks().getNir(), getInput().getImages().getNir(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_NIR),
+	// options.getIntSetting(Setting.LAB_MAX_L_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_A_VALUE_NIR),
+	// options.getIntSetting(Setting.LAB_MAX_A_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_B_VALUE_NIR),
+	// options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR));
 	// }
-	//
+	
 	private FlexibleImage labFit(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB) {
 		
