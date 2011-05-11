@@ -38,6 +38,7 @@ import javax.swing.event.ChangeListener;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.PhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.PhytochamberAnalysisAction;
+import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -63,6 +64,14 @@ public class ImageAnalysis {
 		
 		NavigationAction phenotypeAnalysisAction = new PhytochamberAnalysisAction(m, epsilon, epsilon2, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
+		return resultTaskButton;
+	}
+	
+	public static NavigationButton getMaizeEntity(final MongoDB m,
+			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
+		
+		NavigationAction maizeAnalysisAction = new MaizeAnalysisAction(m, epsilon, epsilon2, experiment);
+		NavigationButton resultTaskButton = new NavigationButton(maizeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}
 	
@@ -192,6 +201,7 @@ public class ImageAnalysis {
 		sliderZoom.setOpaque(false);
 		sliderZoom.setVisible(false);
 		BackgroundTaskHelper.executeLaterOnSwingTask(200, new Runnable() {
+			@Override
 			public void run() {
 				sliderZoom.setVisible(true);
 			}
@@ -207,6 +217,7 @@ public class ImageAnalysis {
 		}
 		
 		sliderZoom.addChangeListener(new ChangeListener() {
+			@Override
 			public void stateChanged(ChangeEvent e) {
 				JSlider s = (JSlider) e.getSource();
 				int val = s.getValue() - s.getValue() % 5;

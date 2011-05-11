@@ -77,6 +77,8 @@ public class ImageAnalysisCommandManager {
 			actions.add(ImageAnalysis.getPhenotypingEntity(m, experimentReference, 2.5, 5, guiSetting));
 			actions.add(ImageAnalysis.getPhytochamberEntity(m, experimentReference, 10, 15, guiSetting));
 			
+			actions.add(ImageAnalysis.getMaizeEntity(m, experimentReference, 10, 15, guiSetting));
+			
 			actions.add(ThreeDreconstructionAction.getThreeDreconstructionTaskEntity(m, experimentReference,
 								"3-D Reconstruction", 15, 25, guiSetting));
 			actions.add(ThreeDsegmentationAction.getThreeDsegmentationTaskEntity(m, experimentReference,

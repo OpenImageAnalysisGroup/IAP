@@ -16,6 +16,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Dimension2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Line2D.Double;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
@@ -1578,5 +1580,81 @@ public class ImageOperation extends ImageConverter {
 				.getResultCoordinates((int) (getImage().getHeight() * 0.05d));
 		
 		return mergedCoordinates;
+	}
+	
+	public FlexibleImage calculateTopMainAxis(Vector2d centroid, int step,
+			ObjectRef returnRotationAngle, int background) {
+		
+		int[][] img = getImageAs2array();
+		
+		double minDist = java.lang.Double.MAX_VALUE;
+		
+		for (int angle = 0; angle <= 180; angle += step) {
+			double m = Math.tan(angle / 180d * Math.PI);
+			
+			Line2D.Double line = null;
+			
+			if (angle != 90)
+				line = new Line2D.Double(centroid.x, centroid.y,
+						centroid.x + 1, centroid.y + m);
+			else
+				line = new Line2D.Double(centroid.x, centroid.y, centroid.x,
+						centroid.y + m);
+			
+			double dist = distancePointsToLine(img, line, background);
+			if (dist < minDist) {
+				minDist = dist;
+				returnRotationAngle.setObject(angle);
+			}
+		}
+		return new FlexibleImage(img);
+	}
+	
+	private double distancePointsToLine(int[][] img, Double line, int background) {
+		double dist = 0;
+		for (int x = 0; x < img.length; x++) {
+			for (int y = 0; y < img[0].length; y++) {
+				if (img[x][y] != background) {
+					dist += line.ptLineDist(x, y);
+				}
+			}
+		}
+		return dist;
+	}
+	
+	/**
+	 * Calculates the center of mass. Works only on binary source images.
+	 * 
+	 * @param backgroundColor
+	 * @return Center of mass.
+	 */
+	public Vector2d getCentroid(int backgroundColor) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+		
+		int[][] image2d = getImageAs2array();
+		
+		int black = backgroundColor;
+		
+		int area = 0;
+		int positionx = 0;
+		int positiony = 0;
+		
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				if (image2d[x][y] != black) {
+					positionx = positionx + x;
+					positiony = positiony + y;
+					area++;
+				}
+			}
+		}
+		return new Vector2d(positionx / area, positiony / area);
+	}
+	
+	public int calculateTopMainAxis(int background) {
+		ObjectRef returnRotationAngle = new ObjectRef();
+		calculateTopMainAxis(getCentroid(background), 20, returnRotationAngle, background);
+		return (Integer) returnRotationAngle.getObject();
 	}
 }
