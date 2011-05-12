@@ -44,4 +44,8 @@ public class MyByteArrayInputStream extends ByteArrayInputStream {
 		crc.update(getBuff(), 0, getCount());
 		return crc.getValue();
 	}
+	
+	public MyByteArrayInputStream getNewStream() {
+		return new MyByteArrayInputStream(buf, count);
+	}
 }
