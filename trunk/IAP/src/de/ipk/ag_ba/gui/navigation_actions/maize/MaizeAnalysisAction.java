@@ -104,7 +104,19 @@ public class MaizeAnalysisAction extends AbstractNavigationAction implements Rem
 											ImageData i = (ImageData) md;
 											workload.add(i);
 										} else
-											ignored.add(((ImageData) md).getSubstanceName());
+											if (config == ImageConfiguration.FluoSide) {
+												ImageData i = (ImageData) md;
+												workload.add(i);
+											} else
+												if (config == ImageConfiguration.RgbSide) {
+													ImageData i = (ImageData) md;
+													workload.add(i);
+												} else
+													if (config == ImageConfiguration.NirSide) {
+														ImageData i = (ImageData) md;
+														workload.add(i);
+													} else
+														ignored.add(((ImageData) md).getSubstanceName());
 							}
 						}
 					}

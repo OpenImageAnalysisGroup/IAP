@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
@@ -17,8 +15,10 @@ import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.analysis.maize.MaizeImageProcessor;
-import de.ipk.ag_ba.image.operations.ImageConverter;
+import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -28,11 +28,7 @@ import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ColorHistogram;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ColorHistogramEntry;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.Geometry;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ImageSet;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
@@ -89,39 +85,85 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 		
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
+		
 		ArrayList<ImageSet> workload = new ArrayList<ImageSet>();
-		TreeMap<String, ImageSet> replicateId2ImageSet = new TreeMap<String, ImageSet>();
-		for (Measurement md : input) {
-			if (md instanceof ImageData) {
-				ImageData id = (ImageData) md;
-				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
-				if (!replicateId2ImageSet.containsKey(key)) {
-					replicateId2ImageSet.put(key, new ImageSet(null, null, null));
+		
+		boolean top = false;
+		if (top) {
+			TreeMap<String, ImageSet> replicateId2ImageSetTop = new TreeMap<String, ImageSet>();
+			for (Measurement md : input) {
+				if (md instanceof ImageData) {
+					ImageData id = (ImageData) md;
+					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
+					if (!replicateId2ImageSetTop.containsKey(key)) {
+						replicateId2ImageSetTop.put(key, new ImageSet(null, null, null));
+					}
+					ImageSet is = replicateId2ImageSetTop.get(key);
+					is.setSide(false);
+					ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
+					if (ic == ImageConfiguration.Unknown)
+						ic = ImageConfiguration.get(id.getURL().getFileName());
+					
+					if (ic == ImageConfiguration.RgbTop)
+						is.setVis(id);
+					if (ic == ImageConfiguration.FluoTop)
+						is.setFluo(id);
+					if (ic == ImageConfiguration.NirTop)
+						is.setNir(id);
 				}
-				ImageSet is = replicateId2ImageSet.get(key);
-				ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
-				if (ic == ImageConfiguration.Unknown)
-					ic = ImageConfiguration.get(id.getURL().getFileName());
-				
-				if (ic == ImageConfiguration.RgbTop)
-					is.setVis(id);
-				if (ic == ImageConfiguration.FluoTop)
-					is.setFluo(id);
-				if (ic == ImageConfiguration.NirTop)
-					is.setNir(id);
+			}
+			int workLoadIndex = workOnSubset;
+			for (ImageSet is : replicateId2ImageSetTop.values()) {
+				if (is.hasAllImageTypes()) {
+					if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0) {
+						workLoadIndex++;
+						continue;
+					} else
+						workLoadIndex++;
+					workload.add(is);
+					if (workload.size() > 10)
+						break;
+				}
 			}
 		}
-		int workLoadIndex = workOnSubset;
-		for (ImageSet is : replicateId2ImageSet.values()) {
-			if (is.hasAllImageTypes()) {
-				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0) {
-					workLoadIndex++;
-					continue;
-				} else
-					workLoadIndex++;
-				workload.add(is);
-				if (workload.size() > 5)
-					break;
+		
+		boolean side = true;
+		if (side) {
+			TreeMap<String, ImageSet> replicateId2ImageSetSide = new TreeMap<String, ImageSet>();
+			for (Measurement md : input) {
+				if (md instanceof ImageData) {
+					ImageData id = (ImageData) md;
+					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
+					if (!replicateId2ImageSetSide.containsKey(key)) {
+						replicateId2ImageSetSide.put(key, new ImageSet(null, null, null));
+					}
+					ImageSet is = replicateId2ImageSetSide.get(key);
+					is.setSide(true);
+					
+					ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
+					if (ic == ImageConfiguration.Unknown)
+						ic = ImageConfiguration.get(id.getURL().getFileName());
+					
+					if (ic == ImageConfiguration.RgbSide)
+						is.setVis(id);
+					if (ic == ImageConfiguration.FluoSide)
+						is.setFluo(id);
+					if (ic == ImageConfiguration.NirSide)
+						is.setNir(id);
+				}
+			}
+			int workLoadIndex = workOnSubset;
+			for (ImageSet is : replicateId2ImageSetSide.values()) {
+				if (is.hasAllImageTypes()) {
+					if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0) {
+						workLoadIndex++;
+						continue;
+					} else
+						workLoadIndex++;
+					workload.add(is);
+					if (workload.size() > 20)
+						break;
+				}
 			}
 		}
 		
@@ -140,21 +182,21 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 				@Override
 				public void run() {
 					try {
-						ImageData vis = id.getVIS();
+						ImageData visInputImage = id.getVIS();
 						ImageData fluo = id.getFLUO();
 						ImageData nir = id.getNIR();
 						
-						if (vis == null || nir == null || fluo == null)
+						if (visInputImage == null || nir == null || fluo == null)
 							return;
 						
 						final FlexibleImageSet input = new FlexibleImageSet();
 						
 						MyThread a = null, b = null, c = null;
 						
-						if (vis instanceof LoadedImage) {
-							input.setVis(new FlexibleImage(((LoadedImage) vis).getLoadedImage()));
+						if (visInputImage instanceof LoadedImage) {
+							input.setVis(new FlexibleImage(((LoadedImage) visInputImage).getLoadedImage()));
 						} else {
-							a = load(vis, input, FlexibleImageType.VIS);
+							a = load(visInputImage, input, FlexibleImageType.VIS);
 						}
 						if (fluo instanceof LoadedImage) {
 							input.setFluo(new FlexibleImage(((LoadedImage) fluo).getLoadedImage()));
@@ -169,9 +211,13 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages()) {
+							boolean side = id.isSide();
 							
 							ImageProcessorOptions options = new ImageProcessorOptions();
-							
+							if (side)
+								options.setCameraTyp(CameraTyp.SIDE);
+							else
+								options.setCameraTyp(CameraTyp.TOP);
 							MaizeImageProcessor ptip = new MaizeImageProcessor(options);
 							
 							FlexibleImageStack debugImageStack = null;
@@ -190,16 +236,21 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 									input,
 									maximumThreadCountOnImageLevel, debugImageStack, parameterSearch, cropResult).getImages();
 							
-							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
-							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
-							MyThread g = statisticalAnalaysis(nir, pipelineResult.getNir());
-							boolean multiThreaded = true;
-							if (!multiThreaded) {
-								e.run();
-								f.run();
-								g.run();
-							} else
-								BackgroundThreadDispatcher.waitFor(new MyThread[] { e, f, g });
+							BlockProperties analysisResults = ptip.getSettings();
+							
+							for (BlockPropertyValue bpv : analysisResults.getProperties("RESULT_")) {
+								if (bpv.getName() == null)
+									continue;
+								
+								NumericMeasurement3D m = new NumericMeasurement3D(visInputImage, bpv.getName(), visInputImage.getParentSample()
+										.getParentCondition().getExperimentName()
+										+ " (" + getName() + ")");
+								
+								m.setValue(bpv.getValue());
+								m.setUnit(bpv.getUnit());
+								
+								output.add(m);
+							}
 							
 							byte[] buf = null;
 							if (debugImageStack != null) {
@@ -207,7 +258,7 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 								debugImageStack.saveAsLayeredTif(mos);
 								buf = mos.getBuff();
 								
-								saveImage(vis, pipelineResult.getVis(), buf, ".tiff");
+								saveImage(visInputImage, pipelineResult.getVis(), buf, ".tiff");
 								saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
 								saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
 							}
@@ -236,19 +287,6 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 		
 		status.setCurrentStatusValueFine(100d);
 		input = null;
-	}
-	
-	private MyThread statisticalAnalaysis(final ImageData id, final FlexibleImage image) {
-		return BackgroundThreadDispatcher.addTask(new Runnable() {
-			@Override
-			public void run() {
-				LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
-				ArrayList<NumericMeasurementInterface> res = statisticalAnalysisOfResultImage(loadedImage, MaizeAnalysisTask.this.getName());
-				synchronized (output) {
-					output.addAll(res);
-				}
-			}
-		}, "statistic image analysis", 4);
 	}
 	
 	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
@@ -284,152 +322,6 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 		}, "load " + type.name(), 0);
 	}
 	
-	public static ArrayList<NumericMeasurementInterface> statisticalAnalysisOfResultImage(LoadedImage limg,
-						String experimentNameExtension) {
-		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-		
-		BufferedImage b = limg.getLoadedImage();
-		int w = b.getWidth();
-		int h = b.getHeight();
-		int[] arrayRGB = ImageConverter.convertBIto1A(b);
-		int iBackgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLORint;
-		Geometry g = detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
-		
-		NumericMeasurement3D m;
-		boolean calcHistogram = true;
-		if (calcHistogram) {
-			String sn = limg.getSubstanceName();
-			ColorHistogram histogram = new ColorHistogram(sn.startsWith("fluo") ? 100 : 10);
-			histogram.countColorPixels(arrayRGB);
-			double pixelCount = histogram.getNumberOfFilledPixels();
-			for (ColorHistogramEntry che : histogram.getColorEntries()) {
-				int pos = sn.indexOf(".");
-				if (pos > 0)
-					sn = sn.substring(0, pos);
-				m = new NumericMeasurement3D(limg, sn + ": hue=" + che.getHue(), limg.getParentSample()
-									.getParentCondition().getExperimentName()
-									+ " (" + experimentNameExtension + ")");
-				m.setValue(che.getNumberOfPixels() / pixelCount);
-				m.setUnit("proportion");
-				// m.setPosition((double) che.getHue());
-				// m.setPositionUnit("hue");
-				// if (m.getValue() >= 0.01 / 5)
-				output.add(m);
-				
-				// m = new NumericMeasurement(limg, sn + "-a: " + che.getColorDisplayName(), limg.getParentSample()
-				// .getParentCondition().getExperimentName()
-				// + " (" + experimentNameExtension + ")");
-				// m.setValue(pixelCount);
-				// m.setUnit("pixels");
-				// output.add(m);
-			}
-		}
-		if (!limg.getSubstanceName().toUpperCase().contains("TOP")) {
-			m = new NumericMeasurement3D(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
-								.getParentCondition().getExperimentName()
-								+ " (" + experimentNameExtension + ")");
-			m.setValue(h - g.getTop());
-			m.setUnit("pixel");
-			output.add(m);
-			
-			m = new NumericMeasurement3D(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
-								.getParentCondition().getExperimentName()
-								+ " (" + experimentNameExtension + ")");
-			m.setValue(h - g.getLeft() - (h - g.getRight()));
-			m.setUnit("pixel");
-			output.add(m);
-		}
-		m = new NumericMeasurement3D(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
-							.getParentCondition().getExperimentName()
-							+ " (" + experimentNameExtension + ")");
-		m.setValue(g.getFilledPixels());
-		m.setUnit("pixel");
-		output.add(m);
-		
-		// m = new NumericMeasurement(limg, "filled (percent) ("
-		// +
-		// limg.getParentSample().getParentCondition().getParentSubstance().getName()
-		// + ")", limg.getParentSample()
-		// .getParentCondition().getExperimentName()
-		// + " (" + getName() + ")");
-		// m.setValue((double) g.getFilledPixels() / (w * h) * 100d);
-		// m.setUnit("%");
-		// output.add(m);
-		
-		boolean red = false;
-		if (red) {
-			int redLine = Color.RED.getRGB();
-			
-			int o = g.getTop() * w;
-			int lww = 20;
-			if (g.getTop() < lww + 1)
-				o = 8 * w;
-			for (int x = 0; x < w; x++) {
-				if (o + x + w >= arrayRGB.length)
-					continue;
-				for (int ii = lww; ii > 0; ii--)
-					if (o + x - ii * w >= 0)
-						arrayRGB[o + x - ii * w] = redLine;
-				// rgbArray[o + x] = redLine;
-			}
-			for (int y = 0; y < h; y++) {
-				o = g.getLeft() + y * w;
-				if (o - 1 < 0)
-					continue;
-				if (o + 1 >= h)
-					continue;
-				arrayRGB[o - 1] = redLine;
-				arrayRGB[o] = redLine;
-				arrayRGB[o + 1] = redLine;
-				o = g.getRight() + y * w;
-				if (o - 1 >= 0)
-					arrayRGB[o - 1] = redLine;
-				arrayRGB[o] = redLine;
-				arrayRGB[o + 1] = redLine;
-			}
-		}
-		return output;
-	}
-	
-	private static Geometry detectGeometry(int w, int h, int[] rgbArray, int iBackgroundFill, LoadedImage limg) {
-		
-		int left = w;
-		int right = 0;
-		int top = h;
-		
-		for (int x = 0; x < w; x++)
-			for (int y = h - 1; y > 0; y--) {
-				int o = x + y * w;
-				if (y > h * 0.95) {
-					rgbArray[o] = iBackgroundFill;
-					continue;
-				}
-				if (rgbArray[o] == iBackgroundFill)
-					continue;
-				
-				if (rgbArray[o] != iBackgroundFill) {
-					if (x < left)
-						left = x;
-					if (x > right)
-						right = x;
-					if (y < top)
-						top = y;
-				}
-			}
-		
-		long filled = 0;
-		for (int x = 0; x < w; x++) {
-			for (int y = h - 1; y > 0; y--) {
-				int o = x + y * w;
-				if (rgbArray[o] != iBackgroundFill) {
-					filled++;
-				}
-			}
-		}
-		
-		return new Geometry(top, left, right, filled);
-	}
-	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result, DatabaseTarget storeResultInDatabase) {
 		result.getURL().setFileName("c_" + result.getURL().getFileName());
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
@@ -463,7 +355,7 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 	
 	@Override
 	public String getName() {
-		return "Phytochamber Image Analysis";
+		return "Maize Phenotyping";
 	}
 	
 	public void addPreprocessor(CutImagePreprocessor pre) {

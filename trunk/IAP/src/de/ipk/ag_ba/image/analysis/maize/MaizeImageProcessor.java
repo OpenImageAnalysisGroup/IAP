@@ -8,6 +8,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -42,6 +43,7 @@ public class MaizeImageProcessor {
 		BlockPipeline p = new BlockPipeline(options);
 		
 		p.add(BlockCalculateMainAxis.class);
+		p.add(BlockFindBlueMarkers.class);
 		
 		// p.add(BlockCropAllFixedPhytoOne.class);
 		// p.add(BlockClearBackground.class);

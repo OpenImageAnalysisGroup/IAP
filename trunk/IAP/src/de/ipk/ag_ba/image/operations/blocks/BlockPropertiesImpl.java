@@ -1,9 +1,11 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 
 public class BlockPropertiesImpl implements BlockProperties {
 	
@@ -84,5 +86,24 @@ public class BlockPropertiesImpl implements BlockProperties {
 			}
 		}
 		return foundCount;
+	}
+	
+	@Override
+	public ArrayList<BlockPropertyValue> getProperties(String search) {
+		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
+		
+		for (TreeMap<String, Double> tm : store.values()) {
+			for (String key : tm.keySet()) {
+				if (key.startsWith(search)) {
+					PropertyNames pn = PropertyNames.valueOf(key);
+					if (pn == null)
+						continue;
+					
+					BlockPropertyValue p = new BlockPropertyValue(pn.getName(), pn.getUnit(), tm.get(key));
+					result.add(p);
+				}
+			}
+		}
+		return result;
 	}
 }

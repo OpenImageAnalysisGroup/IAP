@@ -35,9 +35,9 @@ public class BlockCountMaximas extends AbstractSnapshotAnalysisBlockFIS {
 		//
 		// case MaximumFinder.LIST:
 		//
-		// ... Funktion für Blaupunkte
-		//
-		// dann Zeug in die Properties speichern
+		// // ... Funktion für Blaupunkte
+		// //
+		// // dann Zeug in die Properties speichern
 		//
 		// for (int i = 1; i < numericResult.getCounter(); i = i + 2) {
 		// getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), numericResult.getValue("X", numericResult.getCounter() - i));
@@ -51,8 +51,8 @@ public class BlockCountMaximas extends AbstractSnapshotAnalysisBlockFIS {
 		// System.out.println("getCounter: " + numericResult.getCounter());
 		// System.out.println("Toleranz: " + options.getDoubleSetting(Setting.FIND_MAXIMUM_TOLERANCE));
 		// System.out.println("Typ: " + options.getDoubleSetting(Setting.FIND_MAXIMUM_TYP));
-		
-		// double nMaxima = numericResult.getValue("Count", numericResult.getCounter() - 1);
+		//
+		// // double nMaxima = numericResult.getValue("Count", numericResult.getCounter() - 1);
 		
 		return new ImageOperation(res.getImage()).getImage();
 	}
