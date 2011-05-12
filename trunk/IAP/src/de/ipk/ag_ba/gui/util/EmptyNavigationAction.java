@@ -9,7 +9,7 @@ package de.ipk.ag_ba.gui.util;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**

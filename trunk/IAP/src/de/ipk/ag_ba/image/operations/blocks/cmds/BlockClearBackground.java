@@ -10,8 +10,8 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
-import de.ipk.ag_ba.gui.navigation_actions.ImagePreProcessor;
+import de.ipk.ag_ba.gui.actions.ImageConfiguration;
+import de.ipk.ag_ba.gui.actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
@@ -40,7 +40,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 @Deprecated
 /**
- * <b>Is replaced by BlockLabFit.</b>
  * Uses LAB color classification, to categorize the input as foreground /
  * background. Then small parts
  * of the image are removed (noise), using the PixelSegmentation algorithm.

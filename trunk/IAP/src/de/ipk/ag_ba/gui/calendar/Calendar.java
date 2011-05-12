@@ -17,7 +17,7 @@ import java.util.TreeMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import de.ipk.ag_ba.gui.navigation_actions.Calendar2;
+import de.ipk.ag_ba.gui.actions.Calendar2;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**

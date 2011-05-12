@@ -29,12 +29,12 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.view.ZoomListener;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.actions.AbstractUrlNavigationAction;
+import de.ipk.ag_ba.gui.actions.Book;
+import de.ipk.ag_ba.gui.actions.Library;
+import de.ipk.ag_ba.gui.actions.Other;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.AbstractUrlNavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.Book;
-import de.ipk.ag_ba.gui.navigation_actions.Library;
-import de.ipk.ag_ba.gui.navigation_actions.Other;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.IAPservice;

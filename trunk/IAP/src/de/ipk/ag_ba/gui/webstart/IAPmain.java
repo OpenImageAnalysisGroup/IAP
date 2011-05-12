@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.ImageIcon;
@@ -353,9 +354,15 @@ public class IAPmain extends JApplet {
 		return null;
 	}
 	
-	public static NavigationImage loadIcon(String name) {
-		return new NavigationImage(
+	private static HashMap<String, NavigationImage> cachedImages = new HashMap<String, NavigationImage>();
+	
+	public static synchronized NavigationImage loadIcon(String name) {
+		if (cachedImages.containsKey(name))
+			return cachedImages.get(name);
+		NavigationImage res = new NavigationImage(
 							ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()), name);
+		cachedImages.put(name, res);
+		return res;
 	}
 	
 	public static boolean isSettingEnabled(IAPfeature feature) {

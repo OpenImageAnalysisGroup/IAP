@@ -10,16 +10,16 @@ import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.ipk.ag_ba.gui.navigation_actions.CloudIoTestAction;
-import de.ipk.ag_ba.gui.navigation_actions.CopyEntity;
-import de.ipk.ag_ba.gui.navigation_actions.DataExportAction;
-import de.ipk.ag_ba.gui.navigation_actions.DataExportAsFilesAction;
-import de.ipk.ag_ba.gui.navigation_actions.DataExportTarAction;
-import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
-import de.ipk.ag_ba.gui.navigation_actions.NumericDataReportAction;
-import de.ipk.ag_ba.gui.navigation_actions.ThreeDreconstructionAction;
-import de.ipk.ag_ba.gui.navigation_actions.ThreeDsegmentationAction;
-import de.ipk.ag_ba.gui.navigation_actions.hsm.DataExportToHsmFolderAction;
+import de.ipk.ag_ba.gui.actions.ActionDataExport;
+import de.ipk.ag_ba.gui.actions.ActionDataExportTar;
+import de.ipk.ag_ba.gui.actions.ActionFileManager;
+import de.ipk.ag_ba.gui.actions.ActionNumericDataReport;
+import de.ipk.ag_ba.gui.actions.CloudIoTestAction;
+import de.ipk.ag_ba.gui.actions.CopyEntity;
+import de.ipk.ag_ba.gui.actions.DataExportAsFilesAction;
+import de.ipk.ag_ba.gui.actions.analysis.ActionThreeDreconstruction;
+import de.ipk.ag_ba.gui.actions.analysis.ActionThreeDsegmentation;
+import de.ipk.ag_ba.gui.actions.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -41,7 +41,7 @@ public class ImageAnalysisCommandManager {
 		
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		
-		actions.add(FileManagerAction.getFileManagerEntity(m, experimentReference, guiSetting));
+		actions.add(ActionFileManager.getFileManagerEntity(m, experimentReference, guiSetting));
 		
 		// "img/PoweredMongoDBgreenLeaf.png")); // PoweredMongoDBgreen.png"));
 		
@@ -54,13 +54,13 @@ public class ImageAnalysisCommandManager {
 		// "Hue Historam", "img/colorhistogram.png"));
 		
 		if (GraphicsEnvironment.isHeadless())
-			actions.add(new NavigationButton(new NumericDataReportAction(m, experimentReference), guiSetting));
+			actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 		
-		actions.add(new NavigationButton(new DataExportToHsmFolderAction(m, experimentReference, IAPmain.getHSMfolder()), guiSetting));
+		actions.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReference, IAPmain.getHSMfolder()), guiSetting));
 		
-		actions.add(new NavigationButton(new DataExportAction(m, experimentReference), guiSetting));
+		actions.add(new NavigationButton(new ActionDataExport(m, experimentReference), guiSetting));
 		
-		actions.add(new NavigationButton(new DataExportTarAction(m, experimentReference), guiSetting));
+		actions.add(new NavigationButton(new ActionDataExportTar(m, experimentReference), guiSetting));
 		
 		actions.add(new NavigationButton(new DataExportAsFilesAction(m, experimentReference), guiSetting));
 		
@@ -79,9 +79,9 @@ public class ImageAnalysisCommandManager {
 			
 			actions.add(ImageAnalysis.getMaizeEntity(m, experimentReference, 10, 15, guiSetting));
 			
-			actions.add(ThreeDreconstructionAction.getThreeDreconstructionTaskEntity(m, experimentReference,
+			actions.add(ActionThreeDreconstruction.getThreeDreconstructionTaskEntity(m, experimentReference,
 								"3-D Reconstruction", 15, 25, guiSetting));
-			actions.add(ThreeDsegmentationAction.getThreeDsegmentationTaskEntity(m, experimentReference,
+			actions.add(ActionThreeDsegmentation.getThreeDsegmentationTaskEntity(m, experimentReference,
 								"3-D Segmentation", 15, 25, guiSetting));
 		}
 		

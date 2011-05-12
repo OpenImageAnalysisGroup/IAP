@@ -52,7 +52,7 @@ public class HsmResourceIoHandler extends AbstractResourceIOHandler {
 	public InputStream getInputStream(final IOurl url) throws Exception {
 		String fn = url.getFileName();
 		String path = url.getDetail().substring(url.getDetail().indexOf(File.separator) + File.separator.length());
-		fn = folder + File.separator + path + File.separator + fn.substring(0, fn.lastIndexOf("#"));
+		fn = folder + path + File.separator + fn.substring(0, fn.lastIndexOf("#"));
 		if (!new File(fn).exists())
 			System.out.println("Error: Can't find HSM file: " + fn);
 		return new FileInputStream(new File(fn));
@@ -60,13 +60,16 @@ public class HsmResourceIoHandler extends AbstractResourceIOHandler {
 	
 	@Override
 	public InputStream getPreviewInputStream(final IOurl url) throws Exception {
-		// InputStream res = null; // TODO open Icon data file
-		// if (res != null) {
-		// return res;
-		// } else {
-		final byte[] rrr = ((MyByteArrayInputStream) super.getPreviewInputStream(url)).getBuffTrimmed();
-		return new MyByteArrayInputStream(rrr, rrr.length);
-		// }
+		String fn = url.getFileName();
+		String path = url.getDetail().substring(url.getDetail().indexOf(File.separator) + File.separator.length());
+		path = StringManipulationTools.stringReplace(path, File.separator + "data" + File.separator, File.separator + "icons" + File.separator);
+		fn = folder + path + File.separator + fn.substring(0, fn.lastIndexOf("#"));
+		if (!new File(fn).exists()) {
+			final byte[] rrr = ((MyByteArrayInputStream) super.getPreviewInputStream(url)).getBuffTrimmed();
+			return new MyByteArrayInputStream(rrr, rrr.length);
+		} else {
+			return new FileInputStream(new File(fn));
+		}
 	}
 	
 	@Override

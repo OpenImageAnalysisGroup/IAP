@@ -18,7 +18,7 @@ import java.util.GregorianCalendar;
 
 import javax.swing.ImageIcon;
 
-import de.ipk.ag_ba.gui.navigation_actions.Calendar2;
+import de.ipk.ag_ba.gui.actions.Calendar2;
 
 /**
  * @author klukas
