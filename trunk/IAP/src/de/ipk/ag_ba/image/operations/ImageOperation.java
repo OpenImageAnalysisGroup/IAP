@@ -4,6 +4,7 @@ import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.io.FileSaver;
 import ij.measure.ResultsTable;
+import ij.plugin.ImageCalculator;
 import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.MaximumFinder;
 import ij.process.BinaryProcessor;
@@ -1439,7 +1440,7 @@ public class ImageOperation extends ImageConverter {
 	
 	public ImageOperation medianFilter8Bit() {
 		ByteProcessor byteProcessor = new BinaryProcessor(
-				(ByteProcessor) image.getProcessor());
+				(ByteProcessor) image.getProcessor().convertToByte(false));
 		byteProcessor.medianFilter();
 		
 		return new ImageOperation(getImage());
@@ -1526,7 +1527,12 @@ public class ImageOperation extends ImageConverter {
 				(ByteProcessor) image.getProcessor());
 		byteProcessor.threshold(cutValue);
 		
-		return new ImageOperation(image.getProcessor().getBufferedImage());
+		return new ImageOperation(byteProcessor.getBufferedImage());
+	}
+	
+	public ImageOperation convertBinary2rgb() {
+		int[][] bi = ImageConverter.convertBIto2A(image.getProcessor().getBufferedImage());
+		return new ImageOperation(new FlexibleImage(bi));
 	}
 	
 	public ImageOperation threshold(int threshold, int rgbForeground,
@@ -1656,5 +1662,19 @@ public class ImageOperation extends ImageConverter {
 		ObjectRef returnRotationAngle = new ObjectRef();
 		calculateTopMainAxis(getCentroid(background), 20, returnRotationAngle, background);
 		return (Integer) returnRotationAngle.getObject();
+	}
+	
+	/**
+	 * logical operations with two images
+	 * 
+	 * @param input
+	 * @param param
+	 *           "Subtract create" = image - input
+	 * @return
+	 */
+	public ImageOperation subtractImages(FlexibleImage input, String param) {
+		ImageCalculator ic = new ImageCalculator();
+		ImagePlus result = ic.run(param, image, input.getAsImagePlus());
+		return new ImageOperation(result);
 	}
 }

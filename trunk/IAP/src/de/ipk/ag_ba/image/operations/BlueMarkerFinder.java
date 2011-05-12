@@ -1,19 +1,19 @@
 package de.ipk.ag_ba.image.operations;
 
-import ij.process.ImageProcessor;
+import ij.measure.ResultsTable;
+import ij.plugin.filter.MaximumFinder;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.importers.kgml.Vector2d;
 
 public class BlueMarkerFinder {
 	
 	private final FlexibleImage input;
-	private FlexibleImage result;
+	private ResultsTable resultTable;
 	
 	public BlueMarkerFinder(FlexibleImage image) {
 		this.input = image;
@@ -22,34 +22,22 @@ public class BlueMarkerFinder {
 	public void findCoordinates() {
 		ImageOperation io1 = new ImageOperation(input);
 		
-		result = io1.thresholdLAB(120, 190, 105, 138, 10, 95, 0)
+		resultTable = io1.thresholdLAB(120, 190, 105, 138, 10, 95, 0)
 				.convert2Grayscale().medianFilter8Bit()
 				.threshold(40, Color.WHITE.getRGB(), Color.BLACK.getRGB())
-				.findMax(10.0, ImageProcessor.NO_THRESHOLD, 0, false, false)
-				.getImage();
+				.findMax(10.0, MaximumFinder.LIST).getResultsTable();
 		
 	}
 	
 	private ArrayList<Vector2d> getCoordinates() {
-		
-		int[][] image2d = result.getAs2A();
-		
 		ArrayList<Vector2d> result = new ArrayList<Vector2d>();
 		
-		int black = Color.BLACK.getRGB();
-		
-		int width = input.getWidth();
-		int height = input.getHeight();
-		
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				int color = image2d[x][y];
-				if (color != black) {
-					Vector2d temp = new Vector2d(x, y);
-					System.out.println(temp);
-					result.add(temp);
-				}
-			}
+		for (int i = 0; i < resultTable.getCounter(); i++) {
+			int a = (int) resultTable.getValueAsDouble(0, i);
+			int b = (int) resultTable.getValueAsDouble(1, i);
+			
+			Vector2d temp = new Vector2d(a, b);
+			result.add(temp);
 		}
 		return result;
 	}
@@ -164,14 +152,4 @@ public class BlueMarkerFinder {
 		}
 		return result;
 	}
-	
-	public void printResults() {
-		FlexibleImageStack fis = new FlexibleImageStack();
-		fis.addImage("result", result);
-		fis.addImage("input", input);
-		
-		fis.print("Pipeline Result");
-		
-	}
-	
 }
