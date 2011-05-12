@@ -1,5 +1,9 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
+import java.util.ArrayList;
+
+import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+
 public interface BlockProperties {
 	
 	/**
@@ -12,6 +16,10 @@ public interface BlockProperties {
 	 */
 	public BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, Enum<?> name);
 	
+	/**
+	 * @param position
+	 *           0 == current block property
+	 */
 	public void setNumericProperty(int position, Enum<?> name, double value);
 	
 	public int getBlockPosition();
@@ -19,5 +27,10 @@ public interface BlockProperties {
 	public int getNumberOfBlocksWithPropertyResults();
 	
 	public int getNumberOfBlocksWithThisProperty(Enum<?> pName);
+	
+	/**
+	 * @see PropertyNames
+	 */
+	public ArrayList<BlockPropertyValue> getProperties(String search);
 	
 }

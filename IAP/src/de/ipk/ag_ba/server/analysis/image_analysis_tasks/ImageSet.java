@@ -6,6 +6,7 @@ public class ImageSet {
 	private ImageData vis;
 	private ImageData fluo;
 	private ImageData nir;
+	private boolean isSide;
 	
 	public ImageSet(ImageData vis, ImageData fluo, ImageData nir) {
 		this.vis = vis;
@@ -39,5 +40,13 @@ public class ImageSet {
 	
 	public boolean hasAllImageTypes() {
 		return vis != null && fluo != null && nir != null;
+	}
+	
+	public boolean isSide() {
+		return isSide;
+	}
+	
+	public void setSide(boolean isSide) {
+		this.isSide = isSide;
 	}
 }

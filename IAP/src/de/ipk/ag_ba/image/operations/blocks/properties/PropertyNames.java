@@ -12,8 +12,8 @@ public enum PropertyNames {
 	// VIS_MARKER_POS_RIGHT_1, VIS_MARKER_POS_RIGHT_2, VIS_MARKER_POS_RIGHT_3,
 	
 	RESULT_MAXIMUM_SEARCH_COUNT,
-	VIS_MARKER_POS_1_X, VIS_MARKER_POS_1_Y, VIS_MARKER_POS_2_X, VIS_MARKER_POS_2_Y, VIS_MARKER_POS_3_X, VIS_MARKER_POS_3_Y,
-	VIS_MARKER_POS_4_X, VIS_MARKER_POS_4_Y, VIS_MARKER_POS_5_X, VIS_MARKER_POS_5_Y, VIS_MARKER_POS_6_X, VIS_MARKER_POS_6_Y,
+	RESULT_VIS_MARKER_POS_1_LEFT_X, RESULT_VIS_MARKER_POS_1_LEFT_Y, RESULT_VIS_MARKER_POS_1_RIGHT_X, RESULT_VIS_MARKER_POS_1_RIGHT_Y, RESULT_VIS_MARKER_POS_2_LEFT_X, RESULT_VIS_MARKER_POS_2_LEFT_Y,
+	RESULT_VIS_MARKER_POS_3_LEFT_X, RESULT_VIS_MARKER_POS_3_LEFT_Y, RESULT_VIS_MARKER_POS_3_RIGHT_X, RESULT_VIS_MARKER_POS_3_RIGHT_Y, RESULT_VIS_MARKER_POS_2_RIGHT_X, RESULT_VIS_MARKER_POS_2_RIGHT_Y,
 
 	COUNT_PIXEL_VIS, COUNT_PIXEL_FLUO, COUNT_PIXEL_NIR, RESULT_TOP_MAIN_AXIS_ROTATION;
 	
@@ -37,29 +37,29 @@ public enum PropertyNames {
 		
 		switch (i) {
 			case 1:
-				return VIS_MARKER_POS_1_X;
+				return RESULT_VIS_MARKER_POS_1_LEFT_X;
 			case 2:
-				return VIS_MARKER_POS_1_Y;
+				return RESULT_VIS_MARKER_POS_1_LEFT_Y;
 			case 3:
-				return VIS_MARKER_POS_2_X;
+				return RESULT_VIS_MARKER_POS_1_RIGHT_X;
 			case 4:
-				return VIS_MARKER_POS_2_Y;
+				return RESULT_VIS_MARKER_POS_1_RIGHT_Y;
 			case 5:
-				return VIS_MARKER_POS_3_X;
+				return RESULT_VIS_MARKER_POS_2_LEFT_X;
 			case 6:
-				return VIS_MARKER_POS_3_Y;
+				return RESULT_VIS_MARKER_POS_2_LEFT_Y;
 			case 7:
-				return VIS_MARKER_POS_4_X;
+				return RESULT_VIS_MARKER_POS_2_RIGHT_X;
 			case 8:
-				return VIS_MARKER_POS_4_Y;
+				return RESULT_VIS_MARKER_POS_2_RIGHT_Y;
 			case 9:
-				return VIS_MARKER_POS_5_X;
+				return RESULT_VIS_MARKER_POS_3_LEFT_X;
 			case 10:
-				return VIS_MARKER_POS_5_Y;
+				return RESULT_VIS_MARKER_POS_3_LEFT_Y;
 			case 11:
-				return VIS_MARKER_POS_6_X;
+				return RESULT_VIS_MARKER_POS_3_RIGHT_X;
 			case 12:
-				return VIS_MARKER_POS_6_Y;
+				return RESULT_VIS_MARKER_POS_3_RIGHT_Y;
 				
 		}
 		
@@ -67,4 +67,48 @@ public enum PropertyNames {
 		
 	}
 	
+	public String getName() {
+		switch (this) {
+			case RESULT_MAXIMUM_SEARCH_COUNT:
+				return "pollen count";
+			case RESULT_TOP_MAIN_AXIS_ROTATION:
+				return "orientation";
+				
+			case RESULT_VIS_MARKER_POS_1_LEFT_Y:
+			case RESULT_VIS_MARKER_POS_1_RIGHT_Y:
+				return "mark1.y";
+				
+			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
+			case RESULT_VIS_MARKER_POS_2_RIGHT_Y:
+				return "mark2.y";
+				
+			case RESULT_VIS_MARKER_POS_3_LEFT_Y:
+			case RESULT_VIS_MARKER_POS_3_RIGHT_Y:
+				return "mark3.y";
+		}
+		return null;
+	}
+	
+	public String getUnit() {
+		switch (this) {
+			case RESULT_MAXIMUM_SEARCH_COUNT:
+				return "maxima";
+			case RESULT_TOP_MAIN_AXIS_ROTATION:
+				return "degree";
+				
+			case RESULT_VIS_MARKER_POS_1_LEFT_Y:
+			case RESULT_VIS_MARKER_POS_1_RIGHT_Y:
+				return "pixel";
+				
+			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
+			case RESULT_VIS_MARKER_POS_2_RIGHT_Y:
+				return "pixel";
+				
+			case RESULT_VIS_MARKER_POS_3_LEFT_Y:
+			case RESULT_VIS_MARKER_POS_3_RIGHT_Y:
+				return "pixel";
+				
+		}
+		return null;
+	}
 }
