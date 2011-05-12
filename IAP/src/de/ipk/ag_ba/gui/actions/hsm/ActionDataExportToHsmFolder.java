@@ -141,6 +141,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 								
 								final Long t = nm.getParentSample().getRowId();
 								Future<MyByteArrayInputStream> fileContent = null;
+								boolean targetExists = false;
 								{
 									// store data
 									String zefn = null;
@@ -148,7 +149,13 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 										zefn = determineBinaryFileName(t, substanceName, nm, bm);
 										final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
 										boolean exists = targetFile.exists();
-										fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
+										targetExists = exists;
+										try {
+											fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
+										} catch (Exception e) {
+											// try 2nd time
+											fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
+										}
 										if (exists) {
 											files--;
 											idx--;
@@ -159,29 +166,35 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 										errorCount++;
 									}
 								}
-								if (nm instanceof ImageData) {
-									// store preview icon
-									String zefn = null;
-									try {
-										zefn = determineBinaryFileName(t, substanceName, nm, bm);
-										final File targetFile = new File(hsmManager.prepareAndGetPreviewFileNameAndPath(experiment.getHeader(), t, zefn));
-										boolean exists = targetFile.exists();
-										if (!exists) {
-											InputStream is = null;
-											if (fileContent != null) {
-												MyByteArrayInputStream bis = fileContent.get();
-												if (bis != null)
-													is = bis.getNewStream();
+								if (!targetExists)
+									if (nm instanceof ImageData) {
+										// store preview icon
+										String zefn = null;
+										try {
+											zefn = determineBinaryFileName(t, substanceName, nm, bm);
+											final File targetFile = new File(hsmManager.prepareAndGetPreviewFileNameAndPath(experiment.getHeader(), t, zefn));
+											boolean exists = targetFile.exists();
+											targetExists = exists;
+											if (!exists) {
+												InputStream is = null;
+												if (fileContent != null) {
+													MyByteArrayInputStream bis = fileContent.get();
+													if (bis != null)
+														is = bis.getNewStream();
+												}
+												if (is == null)
+													is = bm.getURL().getInputStream();
+												try {
+													MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(ImageIO.read(is));
+													copyBinaryFileContentToTarget(experiment, written, hsmManager, es, null, previewStream, t, targetFile, exists);
+												} finally {
+													is.close();
+												}
 											}
-											if (is == null)
-												is = bm.getURL().getInputStream();
-											MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(ImageIO.read(is));
-											copyBinaryFileContentToTarget(experiment, written, hsmManager, es, null, previewStream, t, targetFile, exists);
+										} catch (Exception e) {
+											System.out.println("ERROR PREVIEW STORAGE: " + e.getMessage() + " // " + zefn + " // - error is ignored");
 										}
-									} catch (Exception e) {
-										System.out.println("ERROR PREVIEW STORAGE: " + e.getMessage() + " // " + zefn + " // - error is ignored");
 									}
-								}
 								String pre = "";
 								status.setCurrentStatusText1(pre + "files: " + (knownFiles + files)
 										+ ", copied: " + idx
@@ -241,7 +254,6 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				// save XML and header
 				System.out.println("OK: File transfer of experiment " + experimentReference.getExperimentName() + " to HSM complete (saved " + idx
 						+ " files). Saving XML... // " + SystemAnalysisExt.getCurrentTime());
-				createIndexFiles(experiment, hsmManager);
 				status.setCurrentStatusText1("Finalize storage");
 				status.setCurrentStatusText1("Index Created");
 			} else {
@@ -250,6 +262,8 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				System.out.println("ERROR: File transfer of experiment " + experimentReference.getExperimentName() + " to HSM incomplete (" + errorCount
 						+ " errors). // " + SystemAnalysisExt.getCurrentTime());
 			}
+			experiment.getHeader().setRemark(experiment.getHeader().getRemark() + " // HSM transfer errors: " + errorCount);
+			createIndexFiles(experiment, hsmManager);
 			status.setCurrentStatusValueFine(100d);
 			
 			this.mb = (written.getLong() / 1024 / 1024) + "";
@@ -334,9 +348,12 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 							File f = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, "in_progress_"
 										+ UUID.randomUUID().toString()));
 							BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f));
-							if (in.getCount() > 0)
-								bos.write(in.getBuff(), 0, in.getCount());
-							bos.close();
+							try {
+								if (in.getCount() > 0)
+									bos.write(in.getBuff(), 0, in.getCount());
+							} finally {
+								bos.close();
+							}
 							written.addLong(in.getCount());
 							in.close();
 							if (t != null)

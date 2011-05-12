@@ -314,8 +314,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					myPopup.add(tempItem);
 					myPopup.show(this, 5, 5);
 				} else {
-					addDefaultCommands(myPopup);
-					myPopup.show(this, 5, 5);
+					if (evt.getSource() != saveFileCmdMain && evt.getSource() != saveFileCmdLabel
+							&& evt.getSource() != openFileCmdMain && evt.getSource() != openFileCmdLabel) {
+						addDefaultCommands(myPopup);
+						myPopup.show(this, 5, 5);
+					}
 				}
 			
 		}
