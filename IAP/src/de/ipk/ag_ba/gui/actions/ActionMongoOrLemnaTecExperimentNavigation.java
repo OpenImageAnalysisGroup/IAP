@@ -119,7 +119,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 				if (header.getDatabaseId() != null && header.getDatabaseId().startsWith("hsm:"))
 					experiment = HSMfolderTargetDataManager.getExperiment(header, status);
 				else
-					experiment = m.getExperiment(header, true);
+					experiment = m.getExperiment(header, true, status);
 			if (experiment != null)
 				experiment.setHeader(header);
 		}

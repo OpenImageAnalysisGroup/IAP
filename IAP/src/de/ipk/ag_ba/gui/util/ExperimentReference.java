@@ -38,7 +38,7 @@ public class ExperimentReference {
 		if (experiment != null)
 			return experiment;
 		else
-			return m.getExperiment(header, interactiveGetExperimentSize);
+			return m.getExperiment(header, interactiveGetExperimentSize, null);
 	}
 	
 	public String getExperimentName() {
