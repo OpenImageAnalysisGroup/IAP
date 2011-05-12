@@ -35,9 +35,9 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.ipk.ag_ba.gui.actions.analysis.ActionPhenotypeAnalysis;
+import de.ipk.ag_ba.gui.actions.analysis.ActionPhytochamberAnalysis;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.PhenotypeAnalysisAction;
-import de.ipk.ag_ba.gui.navigation_actions.PhytochamberAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -54,7 +54,7 @@ public class ImageAnalysis {
 	public static NavigationButton getPhenotypingEntity(final MongoDB m,
 						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 		
-		NavigationAction phenotypeAnalysisAction = new PhenotypeAnalysisAction(m, epsilon, epsilon2, experiment);
+		NavigationAction phenotypeAnalysisAction = new ActionPhenotypeAnalysis(m, epsilon, epsilon2, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}
@@ -62,7 +62,7 @@ public class ImageAnalysis {
 	public static NavigationButton getPhytochamberEntity(final MongoDB m,
 						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 		
-		NavigationAction phenotypeAnalysisAction = new PhytochamberAnalysisAction(m, epsilon, epsilon2, experiment);
+		NavigationAction phenotypeAnalysisAction = new ActionPhytochamberAnalysis(m, epsilon, epsilon2, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}

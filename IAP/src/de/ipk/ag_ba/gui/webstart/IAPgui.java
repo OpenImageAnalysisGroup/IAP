@@ -27,7 +27,7 @@ import org.ReleaseInfo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
-import de.ipk.ag_ba.gui.navigation_actions.HomeAction;
+import de.ipk.ag_ba.gui.actions.ActionIapHome;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
@@ -62,7 +62,7 @@ public class IAPgui {
 		navigationPanel.setTheOther(actionPanel);
 		actionPanel.setTheOther(navigationPanel);
 		
-		HomeAction home = new HomeAction(myStatus);
+		ActionIapHome home = new ActionIapHome(myStatus);
 		GUIsetting guiSetting = new GUIsetting(navigationPanel, actionPanel, graphPanel);
 		final NavigationButton overView = new NavigationButton(home, guiSetting);
 		

@@ -15,8 +15,8 @@ import org.graffiti.plugin.io.resources.HTTPhandler;
 
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
-import de.ipk.ag_ba.gui.navigation_actions.Book;
-import de.ipk.ag_ba.gui.navigation_actions.Library;
+import de.ipk.ag_ba.gui.actions.Book;
+import de.ipk.ag_ba.gui.actions.Library;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;

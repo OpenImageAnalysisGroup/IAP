@@ -18,8 +18,8 @@ import java.util.TreeMap;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
-import de.ipk.ag_ba.gui.navigation_actions.DomainLogoutAction;
-import de.ipk.ag_ba.gui.navigation_actions.Library;
+import de.ipk.ag_ba.gui.actions.ActionDomainLogout;
+import de.ipk.ag_ba.gui.actions.Library;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
@@ -49,7 +49,7 @@ public class HsmFileSystemSource extends FileSystemSource {
 	@Override
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
 		Collection<NavigationButton> res = new ArrayList<NavigationButton>();
-		res.add(new NavigationButton(new DomainLogoutAction(), src.getGUIsetting()));
+		res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
 		
 		return res;
 	}

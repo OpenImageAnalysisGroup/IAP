@@ -10,7 +10,7 @@ package de.ipk.ag_ba.datasources.http_folder;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.ipk.ag_ba.gui.navigation_actions.Library;
+import de.ipk.ag_ba.gui.actions.Library;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;

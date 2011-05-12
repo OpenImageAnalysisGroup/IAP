@@ -9,15 +9,14 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
-import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.CopyEntity;
-import de.ipk.ag_ba.gui.navigation_actions.FileManagerAction;
-import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
+import de.ipk.ag_ba.gui.actions.ActionFileManager;
+import de.ipk.ag_ba.gui.actions.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.gui.actions.CopyEntity;
+import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.mongo.MongoOrLemnaTecExperimentNavigationAction;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -38,7 +37,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author klukas
  */
-public class MaizeAnalysisAction extends AbstractNavigationAction implements RemoteCapableAnalysisAction {
+public class MaizeAnalysisAction extends de.ipk.ag_ba.gui.actions.AbstractNavigationAction implements RemoteCapableAnalysisAction {
 	private MongoDB m;
 	private ExperimentReference experiment;
 	NavigationButton src = null;
@@ -194,13 +193,13 @@ public class MaizeAnalysisAction extends AbstractNavigationAction implements Rem
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
-		res.add(FileManagerAction.getFileManagerEntity(m, new ExperimentReference(experimentResult),
+		res.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(experimentResult),
 							src.getGUIsetting()));
 		
 		res.add(new NavigationButton(new CopyEntity(m, new ExperimentReference(experimentResult)),
 							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 		
-		MongoOrLemnaTecExperimentNavigationAction.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
+		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
 							false, src.getGUIsetting(), m);
 		return res;
 	}

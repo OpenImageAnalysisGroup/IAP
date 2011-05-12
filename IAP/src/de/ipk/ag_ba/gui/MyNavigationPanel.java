@@ -39,10 +39,10 @@ import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 
+import de.ipk.ag_ba.gui.actions.BookmarkAction;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
-import de.ipk.ag_ba.gui.navigation_actions.BookmarkAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.PopupListener;
 import de.ipk.ag_ba.gui.webstart.Bookmark;

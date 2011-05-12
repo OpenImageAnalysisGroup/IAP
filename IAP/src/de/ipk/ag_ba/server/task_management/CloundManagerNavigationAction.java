@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.navigation_actions.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.HostInformationAction;
-import de.ipk.ag_ba.gui.navigation_actions.JobStatusAction;
-import de.ipk.ag_ba.gui.navigation_actions.MongoExperimentsNavigationAction;
+import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.actions.ActionHostInformation;
+import de.ipk.ag_ba.gui.actions.ActionJobStatus;
+import de.ipk.ag_ba.gui.actions.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -26,9 +26,9 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	private NavigationButton src;
 	private final MongoDB m;
-	private final MongoExperimentsNavigationAction en;
+	private final ActionMongoExperimentsNavigation en;
 	
-	public CloundManagerNavigationAction(MongoDB m, MongoExperimentsNavigationAction mongoExperimentsNavigationAction) {
+	public CloundManagerNavigationAction(MongoDB m, ActionMongoExperimentsNavigation mongoExperimentsNavigationAction) {
 		super("Task- and Server-Management");
 		this.m = m;
 		this.en = mongoExperimentsNavigationAction;
@@ -53,7 +53,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		res.add(startOrStopServerMode);
 		
 		try {
-			NavigationButton jobStatus = new NavigationButton(new JobStatusAction(m), src.getGUIsetting());
+			NavigationButton jobStatus = new NavigationButton(new ActionJobStatus(m), src.getGUIsetting());
 			res.add(jobStatus);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
@@ -66,7 +66,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		
 		try {
 			for (CloudHost ip : m.batchGetAvailableHosts(150000)) {
-				NavigationButton n = new NavigationButton(new HostInformationAction(m, ip), guiSetting);
+				NavigationButton n = new NavigationButton(new ActionHostInformation(m, ip), guiSetting);
 				res.add(n);
 			}
 		} catch (Exception e) {

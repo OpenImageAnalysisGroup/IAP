@@ -17,7 +17,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.gui.navigation_actions.ImageConfiguration;
+import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.IOmodule;
