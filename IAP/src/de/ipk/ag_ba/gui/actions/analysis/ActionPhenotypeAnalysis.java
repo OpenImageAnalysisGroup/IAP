@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.TreeMap;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -28,7 +29,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;

@@ -7,7 +7,6 @@ import info.clearthought.layout.SingleFiledLayout;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
-import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -36,6 +35,7 @@ import org.MarkComponent;
 import org.Release;
 import org.ReleaseInfo;
 import org.SearchFilter;
+import org.SystemAnalysis;
 import org.Vector2d;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
@@ -91,7 +91,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author $author$
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TabKegg2 extends InspectorTab
 					implements SessionListener, AttributeListener {
@@ -1073,7 +1073,7 @@ public class TabKegg2 extends InspectorTab
 		else
 			this.title = "Node Processing";
 		
-		if (!GraphicsEnvironment.isHeadless())
+		if (!SystemAnalysis.isHeadless())
 			initComponents();
 	}
 	

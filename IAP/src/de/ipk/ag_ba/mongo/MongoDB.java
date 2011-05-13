@@ -38,6 +38,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.HashType;
@@ -83,7 +84,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverage;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
@@ -1152,11 +1152,14 @@ public class MongoDB {
 	}
 	
 	public ExperimentInterface getExperiment(final ExperimentHeaderInterface header) {
-		return getExperiment(header, false);
+		return getExperiment(header, false, null);
 	}
 	
-	public ExperimentInterface getExperiment(final ExperimentHeaderInterface header, final boolean interactiveCalculateExperimentSize) {
+	public ExperimentInterface getExperiment(final ExperimentHeaderInterface header, final boolean interactiveCalculateExperimentSize,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider) {
 		final ExperimentInterface experiment = new Experiment();
+		if (optStatusProvider != null)
+			optStatusProvider.setCurrentStatusValue(0);
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
@@ -1170,8 +1173,9 @@ public class MongoDB {
 						if (subList != null)
 							for (Object co : subList) {
 								DBObject substance = (DBObject) co;
-								processSubstance(db, experiment, substance);
+								processSubstance(db, experiment, substance, optStatusProvider, 100d / subList.size());
 							}
+						db.getCollection("substances").ensureIndex("_id");
 						BasicDBList l = (BasicDBList) expref.get("substance_ids");
 						if (l != null)
 							for (Object o : l) {
@@ -1181,7 +1185,7 @@ public class MongoDB {
 								if (subr != null) {
 									DBObject substance = subr.fetch();
 									if (substance != null) {
-										processSubstance(db, experiment, substance);
+										processSubstance(db, experiment, substance, optStatusProvider, 100d / l.size());
 									}
 								}
 							}
@@ -1193,7 +1197,7 @@ public class MongoDB {
 					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
 					
 					if (numberOfImagesAndVolumes > 0 && interactiveCalculateExperimentSize) {
-						updateExperimentSize(db, experiment);
+						updateExperimentSize(db, experiment, optStatusProvider);
 					}
 				}
 				
@@ -1266,7 +1270,7 @@ public class MongoDB {
 			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found!");
 	}
 	
-	private void updateExperimentSize(DB db, ExperimentInterface experiment) {
+	private void updateExperimentSize(DB db, ExperimentInterface experiment, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider) {
 		boolean recalcSize = false;
 		try {
 			long sz = experiment.getHeader().getSizekb();
@@ -1280,7 +1284,17 @@ public class MongoDB {
 			try {
 				ObjectRef newSize = new ObjectRef();
 				newSize.addLong(0);
-				for (NumericMeasurementInterface nmd : Substance3D.getAllFiles(experiment)) {
+				if (optStatusProvider != null) {
+					optStatusProvider.setCurrentStatusValue(0);
+					optStatusProvider.setCurrentStatusText1("Update Experiment Size Info");
+				}
+				double n = 0;
+				List<NumericMeasurementInterface> abc = Substance3D.getAllFiles(experiment);
+				double max = abc.size();
+				for (NumericMeasurementInterface nmd : abc) {
+					if (optStatusProvider != null)
+						optStatusProvider.setCurrentStatusValueFineAdd(100d / max * n);
+					n += 1;
 					if (nmd instanceof BinaryMeasurement) {
 						IOurl url = ((BinaryMeasurement) nmd).getURL();
 						if (url != null) {
@@ -1296,6 +1310,11 @@ public class MongoDB {
 					}
 				}
 				experiment.getHeader().setSizekb(newSize.getLong() / 1024);
+				setExperimentInfo(experiment.getHeader());
+				if (optStatusProvider != null) {
+					optStatusProvider.setCurrentStatusValue(100);
+					optStatusProvider.setCurrentStatusText1("Finished");
+				}
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -1693,7 +1712,8 @@ public class MongoDB {
 		return (BatchCmd) tso.getParam(0, null);
 	}
 	
-	private void processSubstance(DB db, ExperimentInterface experiment, DBObject substance) {
+	private void processSubstance(DB db, ExperimentInterface experiment, DBObject substance,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep) {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
 		experiment.add(s3d);
@@ -1703,15 +1723,22 @@ public class MongoDB {
 				DBObject cond = (DBObject) co;
 				processCondition(s3d, cond);
 			}
+		db.getCollection("conditions").ensureIndex("_id");
 		BasicDBList l = (BasicDBList) substance.get("condition_ids");
-		if (l != null)
+		if (l != null) {
+			double n = 0;
+			double max = l.size();
 			for (Object o : l) {
 				DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
 				DBObject cond = condr.fetch();
 				if (cond != null) {
 					processCondition(s3d, cond);
 				}
+				if (optStatusProvider != null)
+					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * n / max);
+				n += 1;
 			}
+		}
 	}
 	
 	private void processCondition(Substance3D s3d, DBObject cond) {

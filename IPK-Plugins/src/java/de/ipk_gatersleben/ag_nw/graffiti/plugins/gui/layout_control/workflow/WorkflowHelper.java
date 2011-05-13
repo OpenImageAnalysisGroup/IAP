@@ -10,7 +10,6 @@ import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
 
 import java.awt.Color;
-import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -50,6 +49,7 @@ import org.Release;
 import org.ReleaseInfo;
 import org.SettingsHelperDefaultIsFalse;
 import org.SettingsHelperDefaultIsTrue;
+import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.event.AttributeEvent;
@@ -102,7 +102,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 			this.title = "Help";
 		nh = new NewsHelper(this);
 		
-		if (!GraphicsEnvironment.isHeadless())
+		if (!SystemAnalysis.isHeadless())
 			initComponents();
 	}
 	

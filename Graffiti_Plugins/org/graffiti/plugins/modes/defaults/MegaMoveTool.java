@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MegaMoveTool.java,v 1.1 2011-01-31 09:03:34 klukas Exp $
+// $Id: MegaMoveTool.java,v 1.2 2011-05-13 09:07:32 klukas Exp $
 
 package org.graffiti.plugins.modes.defaults;
 
@@ -72,7 +72,7 @@ import org.graffiti.undo.GraphElementsDeletionEdit;
  * A tool for creating and editing a graph.
  * 
  * @author Holleis, Klukas
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class MegaMoveTool extends MegaTools {
 	// ~ Static fields/initializers =============================================
@@ -162,8 +162,8 @@ public class MegaMoveTool extends MegaTools {
 	public MegaMoveTool() {
 		super();
 		
-		if (!knownTools.contains(this))
-			knownTools.add(this);
+		if (!getKnownTools().contains(this))
+			getKnownTools().add(this);
 		
 		thisInstance = this;
 		

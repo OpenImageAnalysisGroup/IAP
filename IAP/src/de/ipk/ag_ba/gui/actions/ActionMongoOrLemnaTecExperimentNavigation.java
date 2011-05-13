@@ -10,6 +10,7 @@ package de.ipk.ag_ba.gui.actions;
 import java.util.ArrayList;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -23,7 +24,6 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas

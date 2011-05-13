@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MainFrame.java,v 1.5 2011-04-04 06:46:20 klukas Exp $
+// $Id: MainFrame.java,v 1.6 2011-05-13 09:07:25 klukas Exp $
 
 package org.graffiti.editor;
 
@@ -18,7 +18,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -106,6 +105,7 @@ import org.FolderPanel;
 import org.Java_1_5_compatibility;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.core.ImageBundle;
 import org.graffiti.core.StringBundle;
 import org.graffiti.editor.actions.CopyAction;
@@ -186,7 +186,7 @@ import scenario.ScenarioService;
 /**
  * Constructs a new graffiti frame, which contains the main gui components.
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class MainFrame extends JFrame implements SessionManager, SessionListener, PluginManagerListener,
 					UndoableEditListener, EditorDefaultValues, IOManager.IOManagerListener, ViewManager.ViewManagerListener,
@@ -2878,7 +2878,7 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	 *           the message to be shown.
 	 */
 	public static void showMessageDialog(final String msg, final String title) {
-		if (GraphicsEnvironment.isHeadless()) {
+		if (SystemAnalysis.isHeadless()) {
 			System.out.println("*** Message ***");
 			System.out.println("Title  : " + title);
 			System.out.println("Content: " + msg);

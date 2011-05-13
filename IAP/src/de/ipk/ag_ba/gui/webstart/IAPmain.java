@@ -82,6 +82,7 @@ public class IAPmain extends JApplet {
 	static boolean myClassKnown = false;
 	
 	public IAPmain() {
+		System.out.println("Initialize IAP applet start...");
 		ReleaseInfo.setRunningAsApplet(this);
 		
 		setupLogger();
@@ -210,6 +211,7 @@ public class IAPmain extends JApplet {
 			@Override
 			public void setText(String text) {
 				MainFrame.showMessage(text, MessageType.PERMANENT_INFO);
+				System.out.println(text);
 			}
 			
 			@Override
@@ -368,7 +370,7 @@ public class IAPmain extends JApplet {
 	public static boolean isSettingEnabled(IAPfeature feature) {
 		switch (feature) {
 			case REMOTE_EXECUTION:
-				return false;
+				return true;
 		}
 		return false;
 	}

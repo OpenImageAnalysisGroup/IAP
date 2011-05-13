@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
@@ -25,7 +26,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;

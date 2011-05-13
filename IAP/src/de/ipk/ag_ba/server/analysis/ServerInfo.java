@@ -6,7 +6,7 @@
  */
 package de.ipk.ag_ba.server.analysis;
 
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+import org.SystemAnalysis;
 
 /**
  * @author klukas

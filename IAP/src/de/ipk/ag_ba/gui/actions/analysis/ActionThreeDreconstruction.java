@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.ImageAnalysis3D;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -34,7 +35,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;

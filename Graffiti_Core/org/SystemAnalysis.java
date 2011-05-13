@@ -1,11 +1,11 @@
-package de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading;
+package org;
 
+import java.awt.GraphicsEnvironment;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.AttributeHelper;
 import org.junit.Test;
 
 public class SystemAnalysis {
@@ -149,6 +149,25 @@ public class SystemAnalysis {
 	
 	public static void setUseCpu(int cpus) {
 		fixedCPUload = cpus;
+	}
+	
+	private static boolean first = true;
+	
+	public static boolean simulateHeadless = false;
+	
+	public static boolean isHeadless() {
+		if (simulateHeadless) {
+			if (first) {
+				System.out.println("GUI AVAILABILITY SIMULATED=true, TRUE HEADLESS=" + GraphicsEnvironment.isHeadless());
+				first = false;
+			}
+			return true;
+		}
+		if (first) {
+			System.out.println("GUI AVAILABILITY: HEADLESS=" + GraphicsEnvironment.isHeadless());
+			first = false;
+		}
+		return GraphicsEnvironment.isHeadless();
 	}
 	
 }

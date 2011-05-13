@@ -6,7 +6,6 @@
  */
 package de.ipk.ag_ba.gui.actions;
 
-import java.awt.GraphicsEnvironment;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,6 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.OpenFileDialogService;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -143,7 +143,7 @@ public class DataExportAsFilesAction extends AbstractNavigationAction {
 			
 			String fsinfo = "";
 			
-			if (!GraphicsEnvironment.isHeadless()) {
+			if (!SystemAnalysis.isHeadless()) {
 				
 				this.targetDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Directory");
 				if (targetDirectory == null)

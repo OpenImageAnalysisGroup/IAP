@@ -8,12 +8,11 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: PluginInfoMenu.java,v 1.3 2011-03-25 16:09:17 klukas Exp $
+// $Id: PluginInfoMenu.java,v 1.4 2011-05-13 09:07:41 klukas Exp $
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe;
 
-import java.awt.GraphicsEnvironment;
-
+import org.SystemAnalysis;
 import org.graffiti.editor.GraffitiInternalFrame;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.gui.GraffitiComponent;
@@ -35,7 +34,7 @@ public class PluginInfoMenu
 	 */
 	public PluginInfoMenu() {
 		
-		if (GraphicsEnvironment.isHeadless())
+		if (SystemAnalysis.isHeadless())
 			return;
 		
 		if (GravistoService.getInstance()

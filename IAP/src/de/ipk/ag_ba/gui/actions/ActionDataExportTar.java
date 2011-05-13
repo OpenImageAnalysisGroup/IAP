@@ -6,7 +6,6 @@
  */
 package de.ipk.ag_ba.gui.actions;
 
-import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.SystemAnalysis;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -149,7 +149,7 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 			
 			String fsinfo = "";
 			
-			if (!GraphicsEnvironment.isHeadless()) {
+			if (!SystemAnalysis.isHeadless()) {
 				this.fn = FileHelper.getFileName(".tar", "TAR File Export", experimentReference.getExperimentName() + ".tar");
 				if (fn == null)
 					return;

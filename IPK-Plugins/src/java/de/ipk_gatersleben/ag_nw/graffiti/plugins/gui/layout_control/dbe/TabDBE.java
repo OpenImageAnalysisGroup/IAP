@@ -9,7 +9,6 @@ import info.clearthought.layout.TableLayoutConstants;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -32,6 +31,7 @@ import org.FolderPanel;
 import org.JLabelJavaHelpLink;
 import org.JMButton;
 import org.ReleaseInfo;
+import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
 import org.graffiti.event.AttributeEvent;
@@ -221,7 +221,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 	public TabDBE() {
 		super();
 		this.title = "Experiments";
-		if (!GraphicsEnvironment.isHeadless())
+		if (!SystemAnalysis.isHeadless())
 			initComponents();
 	}
 	

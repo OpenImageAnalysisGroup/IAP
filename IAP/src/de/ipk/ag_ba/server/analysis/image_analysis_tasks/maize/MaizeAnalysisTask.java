@@ -190,23 +190,27 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 							return;
 						
 						final FlexibleImageSet input = new FlexibleImageSet();
+						final FlexibleImageSet inputMasks = new FlexibleImageSet();
 						
 						MyThread a = null, b = null, c = null;
 						
 						if (visInputImage instanceof LoadedImage) {
 							input.setVis(new FlexibleImage(((LoadedImage) visInputImage).getLoadedImage()));
+							inputMasks.setVis(new FlexibleImage(((LoadedImage) visInputImage).getLoadedImageLabelField()));
 						} else {
-							a = load(visInputImage, input, FlexibleImageType.VIS);
+							a = load(visInputImage, input, inputMasks, FlexibleImageType.VIS);
 						}
 						if (fluo instanceof LoadedImage) {
 							input.setFluo(new FlexibleImage(((LoadedImage) fluo).getLoadedImage()));
+							inputMasks.setFluo(new FlexibleImage(((LoadedImage) fluo).getLoadedImageLabelField()));
 						} else {
-							b = load(fluo, input, FlexibleImageType.FLUO);
+							b = load(fluo, input, inputMasks, FlexibleImageType.FLUO);
 						}
 						if (nir instanceof LoadedImage) {
 							input.setFluo(new FlexibleImage(((LoadedImage) nir).getLoadedImage()));
+							inputMasks.setFluo(new FlexibleImage(((LoadedImage) nir).getLoadedImageLabelField()));
 						} else {
-							c = load(nir, input, FlexibleImageType.NIR);
+							c = load(nir, input, inputMasks, FlexibleImageType.NIR);
 						}
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
@@ -233,7 +237,7 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 							final boolean parameterSearch = true;
 							
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
-									input,
+									input, inputMasks,
 									maximumThreadCountOnImageLevel, debugImageStack, parameterSearch, cropResult).getImages();
 							
 							BlockProperties analysisResults = ptip.getSettings();
@@ -305,15 +309,17 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 		}
 	}
 	
-	private MyThread load(final ImageData id, final FlexibleImageSet input,
+	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageSet optInputMasks,
 			final FlexibleImageType type) {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
 				// System.out.println("Load Image");
 				try {
-					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, false);
+					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, optInputMasks != null);
 					input.set(new FlexibleImage(li.getLoadedImage(), type));
+					if (optInputMasks != null)
+						optInputMasks.set(new FlexibleImage(li.getLoadedImageLabelField(), type));
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
