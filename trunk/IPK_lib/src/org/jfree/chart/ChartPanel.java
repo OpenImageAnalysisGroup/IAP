@@ -29,7 +29,7 @@
  * David M O'Donnell;
  * Arnaud Lelievre;
  * Matthias Rose;
- * $Id: ChartPanel.java,v 1.2 2011-02-23 14:42:28 klukas Exp $
+ * $Id: ChartPanel.java,v 1.3 2011-05-13 09:16:54 klukas Exp $
  * Changes (from 28-Jun-2001)
  * --------------------------
  * 28-Jun-2001 : Integrated buffering code contributed by S�ren Caspersen (DG);
@@ -87,7 +87,6 @@ import java.awt.AWTEvent;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -123,6 +122,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import org.SystemAnalysis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.EntityCollection;
@@ -449,7 +449,7 @@ public class ChartPanel extends JPanel
 		this.chartMouseListeners = new java.util.ArrayList<ChartMouseListener>();
 		this.info = new ChartRenderingInfo();
 		setPreferredSize(new Dimension(width, height));
-		this.useBuffer = useBuffer && !GraphicsEnvironment.isHeadless();
+		this.useBuffer = useBuffer && !SystemAnalysis.isHeadless();
 		this.refreshBuffer = false;
 		this.chart.addChangeListener(this);
 		this.minimumDrawWidth = minimumDrawWidth;
