@@ -47,5 +47,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/batik-xml.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="src" path="/Graffiti_Core"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

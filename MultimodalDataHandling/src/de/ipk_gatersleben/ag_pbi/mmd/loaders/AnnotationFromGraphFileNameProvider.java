@@ -23,13 +23,13 @@ import java.util.LinkedHashSet;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.plugin.view.View;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.AbstractExperimentDataProcessor;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataAnnotation;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas
