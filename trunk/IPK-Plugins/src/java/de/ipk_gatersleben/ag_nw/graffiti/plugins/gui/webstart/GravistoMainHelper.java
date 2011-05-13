@@ -1,6 +1,5 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart;
 
-import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileReader;
@@ -35,6 +34,7 @@ import org.FeatureSet;
 import org.HelperClass;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.attributes.AttributeTypesManager;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
@@ -64,7 +64,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Experime
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessingManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessor;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableData;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.muntjak.tinylookandfeel.Theme;
 
@@ -312,7 +311,7 @@ public class GravistoMainHelper implements HelperClass {
 		// statusPanel.
 		
 		final MainFrame mainFrame;
-		if (!GraphicsEnvironment.isHeadless()) {
+		if (!SystemAnalysis.isHeadless()) {
 			mainFrame = new MainFrame(pluginmanager, uiPrefs, statusPanel, true);
 			installDragAndDropHandler(mainFrame);
 		} else
@@ -390,7 +389,7 @@ public class GravistoMainHelper implements HelperClass {
 			System.err.println("Don't forget to start createfilelist from the make folder.");
 			System.err.println("See make - intro.txt for details.");
 			System.err.println("-- Program needs to be stopped");
-			if (!GraphicsEnvironment.isHeadless())
+			if (!SystemAnalysis.isHeadless())
 				JOptionPane.showMessageDialog(null, "<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
 								+ "Program execution can not continue.<br>"
 								+ "Don't forget to start createfilelist from the make folder.<br>"

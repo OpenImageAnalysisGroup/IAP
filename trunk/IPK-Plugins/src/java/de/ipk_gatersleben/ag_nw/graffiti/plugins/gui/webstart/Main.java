@@ -41,7 +41,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.MenuItemInf
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class Main {
 	// ~ Static fields/initializers =============================================
@@ -129,7 +129,42 @@ public class Main {
 			((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
 			
 			splashScreen.setVisible(showMainFrame);
-		}
+		} else
+			splashScreen = new SplashScreenInterface() {
+				
+				@Override
+				public int getMaximum() {
+					return 10;
+				}
+				
+				@Override
+				public void setVisible(boolean b) {
+				}
+				
+				@Override
+				public void setValue(int value) {
+				}
+				
+				@Override
+				public void setText(String text) {
+					System.out.println(text);
+				}
+				
+				@Override
+				public void setMaximum(int maximum) {
+					
+				}
+				
+				@Override
+				public void setInitialisationFinished() {
+					
+				}
+				
+				@Override
+				public int getValue() {
+					return 0;
+				}
+			};
 		if (!ReleaseInfo.isRunningAsApplet())
 			if (splashScreen != null)
 				GravistoMainHelper.createApplicationSettingsFolder(splashScreen);

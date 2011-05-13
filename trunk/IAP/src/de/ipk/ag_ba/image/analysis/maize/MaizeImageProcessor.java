@@ -39,6 +39,13 @@ public class MaizeImageProcessor {
 			boolean automaticParameterSearch,
 			boolean cropResult)
 			throws InstantiationException, IllegalAccessException, InterruptedException {
+		return pipeline(input, null, maxThreadsPerImage, debugStack, automaticParameterSearch, cropResult);
+	}
+	
+	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, FlexibleImageSet optInputMasks, int maxThreadsPerImage, FlexibleImageStack debugStack,
+			boolean automaticParameterSearch,
+			boolean cropResult)
+			throws InstantiationException, IllegalAccessException, InterruptedException {
 		
 		BlockPipeline p = new BlockPipeline(options);
 		
@@ -67,7 +74,7 @@ public class MaizeImageProcessor {
 		// if (cropResult)
 		// p.add(BlockCropImages.class);
 		
-		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, input);
+		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
 		FlexibleMaskAndImageSet result = p.execute(workset, debugStack, settings);
 		
 		if (debugStack != null)

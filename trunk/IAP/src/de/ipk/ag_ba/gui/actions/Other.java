@@ -22,6 +22,7 @@ import javax.swing.JComponent;
 
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -47,7 +48,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.AbstractExperimentDataProcessor;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessingManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessor;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas

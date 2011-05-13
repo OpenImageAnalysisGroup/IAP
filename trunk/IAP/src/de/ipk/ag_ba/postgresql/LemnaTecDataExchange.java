@@ -24,6 +24,7 @@ import java.util.TreeSet;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -38,7 +39,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
@@ -255,7 +255,7 @@ public class LemnaTecDataExchange {
 	private String getNiceNameFromLoginName(String name) {
 		if (login2niceName == null) {
 			login2niceName = new HashMap<String, String>();
-			login2niceName.put("Fernando", "Arana, Fernando (HET)");
+			login2niceName.put("Fernando", "Arana, Dr. Fernando (HET)");
 			login2niceName.put("Gramel-Eikenroth", "Gramel-Eikenroth (LemnaTec)");
 			login2niceName.put("LTAdmin", "LTAdmin (LemnaTec)");
 			login2niceName.put("LemnaTec Support", "LemnaTec Support (LemnaTec)");
@@ -268,6 +268,7 @@ public class LemnaTecDataExchange {
 			login2niceName.put("altmann", "Altmann, Prof. Dr. Thomas (MOG)");
 			login2niceName.put("meyer", "Meyer, Dr. Rhonda (HET)");
 			login2niceName.put("muraya", "Muraya, Moses Mahugu (HET)");
+			login2niceName.put("Muraya", "Muraya, Moses Mahugu (HET)");
 			login2niceName.put("weigelt", "Weigelt, Dr. Kathleen (HET)");
 			login2niceName.put("Muecke", "Muecke, Ingo (BA)");
 			login2niceName.put("muecke", "Muecke, Ingo (BA)");

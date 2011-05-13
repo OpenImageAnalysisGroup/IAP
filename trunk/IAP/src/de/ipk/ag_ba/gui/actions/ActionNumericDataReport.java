@@ -6,11 +6,12 @@
  */
 package de.ipk.ag_ba.gui.actions;
 
-import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JTable;
+
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -71,7 +72,7 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 		Object[] columns;
 		ExperimentInterface experiment = experimentReference.getData(m);
 		ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
-		if (GraphicsEnvironment.isHeadless()) {
+		if (SystemAnalysis.isHeadless()) {
 			// cols.add("Plant");
 			// cols.add("Carrier");
 			// cols.add("Experiment");

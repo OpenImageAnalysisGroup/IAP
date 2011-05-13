@@ -48,6 +48,7 @@ import org.JLabelJavaHelpLink;
 import org.JMButton;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.SystemInfo;
 import org.Vector2d;
 import org.graffiti.editor.GravistoService;
@@ -75,7 +76,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.random.RandomLayouter
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.AttributePathNameSearchType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.SearchAndSelecAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.SearchType;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 // bValues: 0 = RotatePattern?

@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: AbstractTool.java,v 1.1 2011-01-31 09:04:34 klukas Exp $
+// $Id: AbstractTool.java,v 1.2 2011-05-13 09:07:25 klukas Exp $
 
 package org.graffiti.plugin.tool;
 
@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -92,18 +93,22 @@ public abstract class AbstractTool
 	/** DOCUMENT ME! */
 	private static final Border border = new NodeBorder(Color.RED.brighter().brighter(), BORDERSIZE);
 	
+	private static List<Tool> knownTools;
+	
 	private static Timer checkActivationTimer = new Timer(500, new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			boolean isOneActive = false;
-			for (Tool t : knownTools) {
-				if (t.isActive()) {
-					isOneActive = true;
-					lastActiveTool = t;
-					break;
+			synchronized (getKnownTools()) {
+				boolean isOneActive = false;
+				for (Tool t : getKnownTools()) {
+					if (t.isActive()) {
+						isOneActive = true;
+						lastActiveTool = t;
+						break;
+					}
 				}
-			}
-			if (!isOneActive && lastActiveTool != null) {
-				lastActiveTool.activate();
+				if (!isOneActive && lastActiveTool != null) {
+					lastActiveTool.activate();
+				}
 			}
 		}
 	});
@@ -122,9 +127,13 @@ public abstract class AbstractTool
 	/** Border for unmarked graph elements. */
 	private static final EmptyBorder empty = new EmptyBorder(0, 0, 0, 0); // 3, 3, 3, 3 ?
 	
-	protected static List<Tool> knownTools = new LinkedList<Tool>();
-	
 	// ~ Methods ================================================================
+	
+	protected static List<Tool> getKnownTools() {
+		if (knownTools == null)
+			knownTools = new ArrayList<Tool>();
+		return knownTools;
+	}
 	
 	public AbstractTool() {
 		synchronized (checkActivationTimer) {
@@ -140,7 +149,7 @@ public abstract class AbstractTool
 	}
 	
 	public static Tool getActiveTool() {
-		for (Tool at : knownTools) {
+		for (Tool at : getKnownTools()) {
 			if (at.isActive())
 				return at;
 		}
@@ -198,7 +207,7 @@ public abstract class AbstractTool
 	}
 	
 	public static boolean activateTool(String id) {
-		for (Tool t : knownTools) {
+		for (Tool t : getKnownTools()) {
 			if (t.getToolName().equals(id)) {
 				t.activate();
 				return t.isActive();
@@ -243,8 +252,8 @@ public abstract class AbstractTool
 	}
 	
 	public void deactivateAll() {
-		for (Iterator<Tool> it = knownTools.iterator(); it.hasNext();) {
-			Tool t = (Tool) it.next();
+		for (Iterator<Tool> it = getKnownTools().iterator(); it.hasNext();) {
+			Tool t = it.next();
 			t.deactivate();
 		}
 		SwingUtilities.invokeLater(new Runnable() {
@@ -322,7 +331,7 @@ public abstract class AbstractTool
 	 */
 	public void displayAsMarked(List<GraphElementComponent> comps) {
 		for (Iterator<GraphElementComponent> it = comps.iterator(); it.hasNext();) {
-			displayAsMarked((GraphElementComponent) (it.next()));
+			displayAsMarked((it.next()));
 		}
 	}
 	

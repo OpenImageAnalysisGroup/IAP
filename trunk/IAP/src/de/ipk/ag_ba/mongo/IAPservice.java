@@ -32,6 +32,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.ReleaseInfo;
+import org.SystemAnalysis;
 import org.Vector2d;
 import org.graffiti.editor.ConfigureViewAction;
 import org.graffiti.editor.LoadSetting;
@@ -55,7 +56,6 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -179,7 +179,10 @@ public class IAPservice {
 						EditorSession es = new EditorSession(g);
 						final ObjectRef refLastURL = new ObjectRef();
 						final ObjectRef refLastDragPoint = new ObjectRef("", new Vector2d(0, 0));
-						JScrollPane graphViewScrollPane = MainFrame.getInstance().showViewChooserDialog(es, true, null,
+						MainFrame mf = MainFrame.getInstance();
+						if (mf == null)
+							return null;
+						JScrollPane graphViewScrollPane = mf.showViewChooserDialog(es, true, null,
 											LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION, new ConfigureViewAction() {
 												View newView;
 												

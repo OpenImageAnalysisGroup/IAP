@@ -7,9 +7,10 @@
 
 package de.ipk.ag_ba.gui.actions;
 
-import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.TreeMap;
+
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
@@ -63,7 +64,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		if (!limitToResuls) {
 			res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
 			
-			if (!GraphicsEnvironment.isHeadless())
+			if (!SystemAnalysis.isHeadless())
 				res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
 			
 			NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);

@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MegaCreateTool.java,v 1.1 2011-01-31 09:03:34 klukas Exp $
+// $Id: MegaCreateTool.java,v 1.2 2011-05-13 09:07:32 klukas Exp $
 
 package org.graffiti.plugins.modes.defaults;
 
@@ -134,8 +134,8 @@ public class MegaCreateTool
 	public MegaCreateTool() {
 		super();
 		
-		if (!knownTools.contains(this))
-			knownTools.add(this);
+		if (!getKnownTools().contains(this))
+			getKnownTools().add(this);
 		
 		normCursor = new Cursor(Cursor.HAND_CURSOR);
 		// protected Cursor edgeCursor = new Cursor(Cursor.HAND_CURSOR);

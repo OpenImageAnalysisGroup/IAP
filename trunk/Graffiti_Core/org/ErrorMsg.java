@@ -305,8 +305,11 @@ public class ErrorMsg implements HelperClass {
 	}
 	
 	public static void addErrorMessage(Exception e) {
-		if (GraphicsEnvironment.isHeadless() && e != null)
+		if (SystemAnalysis.isHeadless() && e != null) {
 			System.out.println("ERROR-MSG: " + e.getMessage());
+			e.printStackTrace();
+			throw new Error(e);
+		}
 		if (rethrowErrorMessages)
 			throw new Error(e);
 		

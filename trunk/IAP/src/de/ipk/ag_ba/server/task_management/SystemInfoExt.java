@@ -1,8 +1,8 @@
 package de.ipk.ag_ba.server.task_management;
 
+import org.SystemAnalysis;
 import org.SystemInfo;
 
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 public class SystemInfoExt extends SystemInfo {
 	

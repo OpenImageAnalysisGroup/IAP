@@ -2,13 +2,12 @@
  * Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: InvertSelectionPlugin.java,v 1.2 2011-02-23 14:41:28 klukas Exp $
+ * $Id: InvertSelectionPlugin.java,v 1.3 2011-05-13 09:07:41 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection;
 
-import java.awt.GraphicsEnvironment;
-
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.Algorithm;
 import org.graffiti.plugin.gui.GraffitiComponent;
 
@@ -30,7 +29,7 @@ public class InvertSelectionPlugin
 							new FindReplaceDialog()
 		};
 		
-		if (!GraphicsEnvironment.isHeadless())
+		if (!SystemAnalysis.isHeadless())
 			guiComponents = new GraffitiComponent[] {
 							new SelectNodesComponent("defaultToolbar"), // defaultToolbar // toolbarPanel
 							};

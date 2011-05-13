@@ -29,12 +29,12 @@ import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.gui.GraffitiContainer;
 import org.graffiti.plugin.gui.GraffitiMenu;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * Shows the info dialog for PatternGraffiti

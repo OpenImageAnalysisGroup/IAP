@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -56,6 +55,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.Vector2d;
 import org.graffiti.attributes.Attributable;
 import org.graffiti.editor.ConfigureViewAction;
@@ -99,7 +99,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					NeedsSwingThread {
@@ -1092,7 +1092,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			session = new EditorSession(targetGraph);
 			MainFrame mf = MainFrame.getInstance();
 			if (mf == null) {
-				if (GraphicsEnvironment.isHeadless()) {
+				if (SystemAnalysis.isHeadless()) {
 					session = GravistoService.getInstance().getSessionFromGraph(targetGraph);
 					if (session == null) {
 						String[] views = new String[] { "de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.IPKGraffitiView" };

@@ -13,8 +13,9 @@ import java.util.Stack;
 
 import javax.swing.Timer;
 
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author klukas
