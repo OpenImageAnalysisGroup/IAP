@@ -11,11 +11,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 /**
  * @author Entzian
  */
-public class BlockLabFit extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		
-		return labFit(getInput().getMasks().getVis(), getInput().getImages().getVis(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
+		return labFilter(getInput().getMasks().getVis(), getInput().getImages().getVis(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS), options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS), options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS));
@@ -24,7 +24,7 @@ public class BlockLabFit extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		
-		return labFit(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO),
+		return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO),
 				options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO), options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO),
 				options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO), options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO),
 				options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO));
@@ -39,7 +39,7 @@ public class BlockLabFit extends AbstractSnapshotAnalysisBlockFIS {
 	// options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR));
 	// }
 	
-	private FlexibleImage labFit(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
+	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB) {
 		
 		int[][] originalArray = originalImage.getAs2A();

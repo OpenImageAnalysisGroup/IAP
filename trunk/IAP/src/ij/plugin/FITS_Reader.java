@@ -20,7 +20,7 @@ public class FITS_Reader extends ImagePlus implements PlugIn {
             return;
         IJ.showStatus("Opening: " + directory + fileName);
         FitsDecoder fd = new FitsDecoder(directory, fileName);
-        FileInfo fi = null;
+        FileInfoXYZ fi = null;
         try {fi = fd.getInfo();}
         catch (IOException e) {}
         if (fi!=null && fi.width>0 && fi.height>0 && fi.offset>0) {
@@ -37,7 +37,7 @@ public class FITS_Reader extends ImagePlus implements PlugIn {
               setStack(fileName, stack);
             }
             Calibration cal = imp.getCalibration();
-            if (fi.fileType==FileInfo.GRAY16_SIGNED && fd.bscale==1.0 && fd.bzero==32768.0)
+            if (fi.fileType==FileInfoXYZ.GRAY16_SIGNED && fd.bscale==1.0 && fd.bzero==32768.0)
                 cal.setFunction(Calibration.NONE, null, "Gray Value");
             setCalibration(cal);
             setProperty("Info", fd.getHeaderInfo());
@@ -61,9 +61,9 @@ class FitsDecoder {
         this.fileName = fileName;
     }
 
-    FileInfo getInfo() throws IOException {
-        FileInfo fi = new FileInfo();
-        fi.fileFormat = FileInfo.FITS;
+    FileInfoXYZ getInfo() throws IOException {
+        FileInfoXYZ fi = new FileInfoXYZ();
+        fi.fileFormat = FileInfoXYZ.FITS;
         fi.fileName = fileName;
         fi.directory = directory;
         fi.width = 0;
@@ -109,15 +109,15 @@ class FitsDecoder {
             if (key.equals("BITPIX")) {
                 int bitsPerPixel = Integer.parseInt ( value );
                if (bitsPerPixel==8)
-                    fi.fileType = FileInfo.GRAY8;
+                    fi.fileType = FileInfoXYZ.GRAY8;
                 else if (bitsPerPixel==16)
-                    fi.fileType = FileInfo.GRAY16_SIGNED;
+                    fi.fileType = FileInfoXYZ.GRAY16_SIGNED;
                 else if (bitsPerPixel==32)
-                    fi.fileType = FileInfo.GRAY32_INT;
+                    fi.fileType = FileInfoXYZ.GRAY32_INT;
                 else if (bitsPerPixel==-32)
-                    fi.fileType = FileInfo.GRAY32_FLOAT;
+                    fi.fileType = FileInfoXYZ.GRAY32_FLOAT;
                 else if (bitsPerPixel==-64)
-                    fi.fileType = FileInfo.GRAY64_FLOAT;
+                    fi.fileType = FileInfoXYZ.GRAY64_FLOAT;
                 else {
                     IJ.error("BITPIX must be 8, 16, 32, -32 (float) or -64 (double).");
                     f.close();

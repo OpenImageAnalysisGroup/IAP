@@ -10,23 +10,23 @@ import java.util.Properties;
 /** This plugin opens a multi-page TIFF file as a virtual stack. It
 	implements the File/Import/TIFF Virtual Stack command. */
 public class FileInfoVirtualStack extends VirtualStack implements PlugIn {
-	FileInfo[] info;
+	FileInfoXYZ[] info;
 	int nImages;
 	
 	/* Default constructor. */
 	public FileInfoVirtualStack() {}
 
 	/* Constructs a FileInfoVirtualStack from a FileInfo object. */
-	public FileInfoVirtualStack(FileInfo fi) {
-		info = new FileInfo[1];
+	public FileInfoVirtualStack(FileInfoXYZ fi) {
+		info = new FileInfoXYZ[1];
 		info[0] = fi;
 		open(true);
 	}
 
 	/* Constructs a FileInfoVirtualStack from a FileInfo 
 		object and displays it if 'show' is true. */
-	public FileInfoVirtualStack(FileInfo fi, boolean show) {
-		info = new FileInfo[1];
+	public FileInfoVirtualStack(FileInfoXYZ fi, boolean show) {
+		info = new FileInfoXYZ[1];
 		info[0] = fi;
 		open(show);
 	}
@@ -60,13 +60,13 @@ public class FileInfoVirtualStack extends VirtualStack implements PlugIn {
 	}
 	
 	void open(boolean show) {
-		FileInfo fi = info[0];
+		FileInfoXYZ fi = info[0];
 		int n = fi.nImages;
 		if (info.length==1 && n>1) {
-			info = new FileInfo[n];
+			info = new FileInfoXYZ[n];
 			long size = fi.width*fi.height*fi.getBytesPerPixel();
 			for (int i=0; i<n; i++) {
-				info[i] = (FileInfo)fi.clone();
+				info[i] = (FileInfoXYZ)fi.clone();
 				info[i].nImages = 1;
 				info[i].longOffset = fi.getOffset() + i*(size + fi.gapBetweenImages);
 			}

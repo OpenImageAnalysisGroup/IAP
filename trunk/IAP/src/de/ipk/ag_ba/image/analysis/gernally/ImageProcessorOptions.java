@@ -14,6 +14,7 @@ import java.util.LinkedList;
 
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * First: add a enumeration which describe the descriptor
@@ -59,17 +60,25 @@ public class ImageProcessorOptions {
 			LAB_MAX_L_VALUE_FLUO, LAB_MIN_A_VALUE_FLUO, LAB_MAX_A_VALUE_FLUO, LAB_MIN_B_VALUE_FLUO, LAB_MAX_B_VALUE_FLUO, LAB_MIN_L_VALUE_NIR, LAB_MAX_L_VALUE_NIR,
 			LAB_MIN_A_VALUE_NIR, LAB_MAX_A_VALUE_NIR, LAB_MIN_B_VALUE_NIR, LAB_MAX_B_VALUE_NIR,
 
+			L_Diff_VIS, abDiff_VIS, L_Diff_FLOU, abDiff_FLOU, L_Diff_NIR, abDiff_NIR,
+
 			IS_PARAMETER_SEARCH, IS_CROP_RESULT;
 		
 	}
 	
 	// HashMap<IntSetting, Queue<Integer>> integerOptions = new HashMap<ImageProcessorOptions.IntSetting, Queue<Integer>>();
 	HashMap<Setting, LinkedList<Double>> doubleOptions = new HashMap<ImageProcessorOptions.Setting, LinkedList<Double>>();
+	private ImageData vis;
+	private ImageData fluo;
+	private ImageData nir;
 	
 	// HashMap<BooleanSetting, Queue<Boolean>> booleanOptions = new HashMap<ImageProcessorOptions.BooleanSetting, Queue<Boolean>>();
 	
-	public ImageProcessorOptions() {
+	public ImageProcessorOptions(ImageData vis, ImageData fluo, ImageData nir) {
 		this(1.0);
+		this.vis = vis;
+		this.fluo = fluo;
+		this.nir = nir;
 	}
 	
 	public ImageProcessorOptions(double scale) {
@@ -255,6 +264,13 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.LAB_MIN_B_VALUE_NIR, 0);
 		addIntSetting(Setting.LAB_MAX_B_VALUE_NIR, 255);
 		
+		addIntSetting(Setting.L_Diff_VIS, 20);
+		addIntSetting(Setting.abDiff_VIS, 40);
+		addIntSetting(Setting.L_Diff_FLOU, 20);
+		addIntSetting(Setting.abDiff_FLOU, 30);
+		addIntSetting(Setting.L_Diff_NIR, 14);
+		addIntSetting(Setting.abDiff_NIR, 20);
+		
 		addBooleanSetting(Setting.IS_PARAMETER_SEARCH, false);
 		addBooleanSetting(Setting.IS_CROP_RESULT, false);
 		
@@ -282,6 +298,18 @@ public class ImageProcessorOptions {
 	
 	public NeighbourhoodSetting getNeighbourhood() {
 		return neighbourhood;
+	}
+	
+	public ImageData getVis() {
+		return vis;
+	}
+	
+	public ImageData getFluo() {
+		return fluo;
+	}
+	
+	public ImageData getNir() {
+		return nir;
 	}
 	
 }

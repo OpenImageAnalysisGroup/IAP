@@ -1588,12 +1588,11 @@ public class ImageOperation extends ImageConverter {
 		return mergedCoordinates;
 	}
 	
-	public FlexibleImage calculateTopMainAxis(Vector2d centroid, int step,
-			ObjectRef returnRotationAngle, int background) {
+	public MainAxisCalculationResult calculateTopMainAxis(Vector2d centroid, int step, int background) {
 		
 		int[][] img = getImageAs2array();
 		
-		double minDist = java.lang.Double.MAX_VALUE;
+		DistanceSumAndPixelCount minResult = new DistanceSumAndPixelCount(java.lang.Double.MAX_VALUE, 0);
 		
 		for (int angle = 0; angle <= 180; angle += step) {
 			double m = Math.tan(angle / 180d * Math.PI);
@@ -1606,26 +1605,27 @@ public class ImageOperation extends ImageConverter {
 			else
 				line = new Line2D.Double(centroid.x, centroid.y, centroid.x,
 						centroid.y + m);
-			
-			double dist = distancePointsToLine(img, line, background);
-			if (dist < minDist) {
-				minDist = dist;
-				returnRotationAngle.setObject(angle);
-			}
+			DistanceSumAndPixelCount r = distancePointsToLine(img, line, background);
+			r.setAngle(angle);
+			if (r.getDistanceSum() < minResult.getDistanceSum())
+				minResult = r;
 		}
-		return new FlexibleImage(img);
+		FlexibleImage imageResult = new FlexibleImage(img);
+		return new MainAxisCalculationResult(imageResult, minResult);
 	}
 	
-	private double distancePointsToLine(int[][] img, Double line, int background) {
+	private DistanceSumAndPixelCount distancePointsToLine(int[][] img, Double line, int background) {
 		double dist = 0;
+		int pixelCount = 0;
 		for (int x = 0; x < img.length; x++) {
 			for (int y = 0; y < img[0].length; y++) {
 				if (img[x][y] != background) {
 					dist += line.ptLineDist(x, y);
+					pixelCount++;
 				}
 			}
 		}
-		return dist;
+		return new DistanceSumAndPixelCount(dist, pixelCount);
 	}
 	
 	/**
@@ -1658,10 +1658,8 @@ public class ImageOperation extends ImageConverter {
 		return new Vector2d(positionx / area, positiony / area);
 	}
 	
-	public int calculateTopMainAxis(int background) {
-		ObjectRef returnRotationAngle = new ObjectRef();
-		calculateTopMainAxis(getCentroid(background), 20, returnRotationAngle, background);
-		return (Integer) returnRotationAngle.getObject();
+	public MainAxisCalculationResult calculateTopMainAxis(int background) {
+		return calculateTopMainAxis(getCentroid(background), 20, background);
 	}
 	
 	/**

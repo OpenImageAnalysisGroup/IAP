@@ -31,13 +31,13 @@ import ij.plugin.frame.ThresholdAdjuster;
  */
 public class FileOpener {
 
-	private FileInfo fi;
+	private FileInfoXYZ fi;
 	private int width, height;
 	private static boolean showConflictMessage = true;
 	private double minValue, maxValue;
 	private static boolean silentMode;
 
-	public FileOpener(FileInfo fi) {
+	public FileOpener(FileInfoXYZ fi) {
 		this.fi = fi;
 		if (fi!=null) {
 			width = fi.width;
@@ -63,46 +63,46 @@ public class FileOpener {
 		if (fi.nImages>1)
 			{return openStack(cm, show);}
 		switch (fi.fileType) {
-			case FileInfo.GRAY8:
-			case FileInfo.COLOR8:
-			case FileInfo.BITMAP:
+			case FileInfoXYZ.GRAY8:
+			case FileInfoXYZ.COLOR8:
+			case FileInfoXYZ.BITMAP:
 				pixels = readPixels(fi);
 				if (pixels==null) return null;
 				ip = new ByteProcessor(width, height, (byte[])pixels, cm);
     			imp = new ImagePlus(fi.fileName, ip);
 				break;
-			case FileInfo.GRAY16_SIGNED:
-			case FileInfo.GRAY16_UNSIGNED:
-			case FileInfo.GRAY12_UNSIGNED:
+			case FileInfoXYZ.GRAY16_SIGNED:
+			case FileInfoXYZ.GRAY16_UNSIGNED:
+			case FileInfoXYZ.GRAY12_UNSIGNED:
 				pixels = readPixels(fi);
 				if (pixels==null) return null;
 	    		ip = new ShortProcessor(width, height, (short[])pixels, cm);
        			imp = new ImagePlus(fi.fileName, ip);
 				break;
-			case FileInfo.GRAY32_INT:
-			case FileInfo.GRAY32_UNSIGNED:
-			case FileInfo.GRAY32_FLOAT:
-			case FileInfo.GRAY24_UNSIGNED:
-			case FileInfo.GRAY64_FLOAT:
+			case FileInfoXYZ.GRAY32_INT:
+			case FileInfoXYZ.GRAY32_UNSIGNED:
+			case FileInfoXYZ.GRAY32_FLOAT:
+			case FileInfoXYZ.GRAY24_UNSIGNED:
+			case FileInfoXYZ.GRAY64_FLOAT:
 				pixels = readPixels(fi);
 				if (pixels==null) return null;
 	    		ip = new FloatProcessor(width, height, (float[])pixels, cm);
        			imp = new ImagePlus(fi.fileName, ip);
 				break;
-			case FileInfo.RGB:
-			case FileInfo.BGR:
-			case FileInfo.ARGB:
-			case FileInfo.ABGR:
-			case FileInfo.BARG:
-			case FileInfo.RGB_PLANAR:
+			case FileInfoXYZ.RGB:
+			case FileInfoXYZ.BGR:
+			case FileInfoXYZ.ARGB:
+			case FileInfoXYZ.ABGR:
+			case FileInfoXYZ.BARG:
+			case FileInfoXYZ.RGB_PLANAR:
 				pixels = readPixels(fi);
 				if (pixels==null) return null;
 	    		ip = new ColorProcessor(width, height, (int[])pixels);
         		imp = new ImagePlus(fi.fileName, ip);
 				break;
-			case FileInfo.RGB48:
-			case FileInfo.RGB48_PLANAR:
-				boolean planar = fi.fileType==FileInfo.RGB48_PLANAR;
+			case FileInfoXYZ.RGB48:
+			case FileInfoXYZ.RGB48_PLANAR:
+				boolean planar = fi.fileType==FileInfoXYZ.RGB48_PLANAR;
 				Object[] pixelArray = (Object[])readPixels(fi);
 				if (pixelArray==null) return null;
 				ImageStack stack = new ImageStack(width, height);
@@ -254,7 +254,7 @@ public class FileOpener {
 			ImagePlus imp2 = (ImagePlus)IJ.runPlugIn("ij.plugin.DICOM", path);
 			if (imp2!=null)
 				imp.setProcessor(null, imp2.getProcessor());
-			if (fi.fileType==FileInfo.GRAY16_UNSIGNED || fi.fileType==FileInfo.GRAY32_FLOAT)
+			if (fi.fileType==FileInfoXYZ.GRAY16_UNSIGNED || fi.fileType==FileInfoXYZ.GRAY32_FLOAT)
 				ThresholdAdjuster.update();
 	    	return;
 		}
@@ -310,28 +310,28 @@ public class FileOpener {
 		if (pixels==null) return;
 		cm = createColorModel(fi);
 		switch (fi.fileType) {
-			case FileInfo.GRAY8:
-			case FileInfo.COLOR8:
-			case FileInfo.BITMAP:
+			case FileInfoXYZ.GRAY8:
+			case FileInfoXYZ.COLOR8:
+			case FileInfoXYZ.BITMAP:
 				ip = new ByteProcessor(width, height, (byte[])pixels, cm);
 		        imp.setProcessor(null, ip);
 				break;
-			case FileInfo.GRAY16_SIGNED:
-			case FileInfo.GRAY16_UNSIGNED:
-			case FileInfo.GRAY12_UNSIGNED:
+			case FileInfoXYZ.GRAY16_SIGNED:
+			case FileInfoXYZ.GRAY16_UNSIGNED:
+			case FileInfoXYZ.GRAY12_UNSIGNED:
 	    		ip = new ShortProcessor(width, height, (short[])pixels, cm);
         		imp.setProcessor(null, ip);
 				break;
-			case FileInfo.GRAY32_INT:
-			case FileInfo.GRAY32_FLOAT:
+			case FileInfoXYZ.GRAY32_INT:
+			case FileInfoXYZ.GRAY32_FLOAT:
 	    		ip = new FloatProcessor(width, height, (float[])pixels, cm);
         		imp.setProcessor(null, ip);
 				break;
-			case FileInfo.RGB:
-			case FileInfo.BGR:
-			case FileInfo.ARGB:
-			case FileInfo.ABGR:
-			case FileInfo.RGB_PLANAR:
+			case FileInfoXYZ.RGB:
+			case FileInfoXYZ.BGR:
+			case FileInfoXYZ.ARGB:
+			case FileInfoXYZ.ABGR:
+			case FileInfoXYZ.RGB_PLANAR:
 	    		img = Toolkit.getDefaultToolkit().createImage(new MemoryImageSource(width, height, (int[])pixels, 0, width));
 		        imp.setImage(img);
 				break;
@@ -339,7 +339,7 @@ public class FileOpener {
 	}
 	
 	void setCalibration(ImagePlus imp) {
-		if (fi.fileType==FileInfo.GRAY16_SIGNED) {
+		if (fi.fileType==FileInfoXYZ.GRAY16_SIGNED) {
 			if (IJ.debugMode) IJ.log("16-bit signed");
  			imp.getLocalCalibration().setSigned16BitCalibration();
 		}
@@ -438,15 +438,15 @@ public class FileOpener {
 	}
 
 	/** Returns an IndexColorModel for the image specified by this FileInfo. */
-	public ColorModel createColorModel(FileInfo fi) {
-		if (fi.fileType==FileInfo.COLOR8 && fi.lutSize>0)
+	public ColorModel createColorModel(FileInfoXYZ fi) {
+		if (fi.fileType==FileInfoXYZ.COLOR8 && fi.lutSize>0)
 			return new IndexColorModel(8, fi.lutSize, fi.reds, fi.greens, fi.blues);
 		else
 			return LookUpTable.createGrayscaleColorModel(fi.whiteIsZero);
 	}
 
 	/** Returns an InputStream for the image described by this FileInfo. */
-	public InputStream createInputStream(FileInfo fi) throws IOException, MalformedURLException {
+	public InputStream createInputStream(FileInfoXYZ fi) throws IOException, MalformedURLException {
 		InputStream is = null;
 		boolean gzip = fi.fileName!=null && (fi.fileName.endsWith(".gz")||fi.fileName.endsWith(".GZ"));
 		if (fi.inputStream!=null)
@@ -457,14 +457,14 @@ public class FileOpener {
 			if (fi.directory.length()>0 && !fi.directory.endsWith(Prefs.separator))
 				fi.directory += Prefs.separator;
 		    File f = new File(fi.directory + fi.fileName);
-		    if (gzip) fi.compression = FileInfo.COMPRESSION_UNKNOWN;
+		    if (gzip) fi.compression = FileInfoXYZ.COMPRESSION_UNKNOWN;
 		    if (f==null || f.isDirectory() || !validateFileInfo(f, fi))
 		    	is = null;
 		    else
 				is = new FileInputStream(f);
 		}
 		if (is!=null) {
-		    if (fi.compression>=FileInfo.LZW)
+		    if (fi.compression>=FileInfoXYZ.LZW)
 				is = new RandomAccessStream(is);
 			else if (gzip)
 				is = new GZIPInputStream(is, 50000);
@@ -472,7 +472,7 @@ public class FileOpener {
 		return is;
 	}
 	
-	static boolean validateFileInfo(File f, FileInfo fi) {
+	static boolean validateFileInfo(File f, FileInfoXYZ fi) {
 		long offset = fi.getOffset();
 		long length = 0;
 		if (fi.width<=0 || fi.height<=0) {
@@ -485,7 +485,7 @@ public class FileOpener {
 		   error("Offset is negative.", fi, offset, length);
 		   return false;
 		}
-		if (fi.fileType==FileInfo.BITMAP || fi.compression!=FileInfo.COMPRESSION_NONE)
+		if (fi.fileType==FileInfoXYZ.BITMAP || fi.compression!=FileInfoXYZ.COMPRESSION_NONE)
 			return true;
 		length = f.length();
 		long size = fi.width*fi.height*fi.getBytesPerPixel();
@@ -498,7 +498,7 @@ public class FileOpener {
 		return true;
 	}
 
-	static void error(String msg, FileInfo fi, long offset, long length) {
+	static void error(String msg, FileInfoXYZ fi, long offset, long length) {
 		String msg2 = "FileInfo parameter error. \n"
 			+msg + "\n \n"
 			+"  Width: " + fi.width + "\n"
@@ -515,7 +515,7 @@ public class FileOpener {
 
 
 	/** Reads the pixel data from an image described by a FileInfo object. */
-	Object readPixels(FileInfo fi) {
+	Object readPixels(FileInfoXYZ fi) {
 		Object pixels = null;
 		try {
 			InputStream is = createInputStream(fi);
@@ -534,7 +534,7 @@ public class FileOpener {
 		return pixels;
 	}
 
-	public Properties decodeDescriptionString(FileInfo fi) {
+	public Properties decodeDescriptionString(FileInfoXYZ fi) {
 		if (fi.description==null || fi.description.length()<7)
 			return null;
 		if (IJ.debugMode)

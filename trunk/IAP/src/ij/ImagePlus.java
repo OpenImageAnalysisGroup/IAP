@@ -17,7 +17,7 @@ import ij.gui.ShapeRoi;
 import ij.gui.StackWindow;
 import ij.gui.TextRoi;
 import ij.gui.Toolbar;
-import ij.io.FileInfo;
+import ij.io.FileInfoXYZ;
 import ij.io.FileOpener;
 import ij.io.Opener;
 import ij.macro.Interpreter;
@@ -100,7 +100,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	private final ImageJ ij = IJ.getInstance();
 	private String title;
 	private String url;
-	private FileInfo fileInfo;
+	private FileInfoXYZ fileInfo;
 	private int imageType = GRAY8;
 	private ImageStack stack;
 	private static int currentID = -1;
@@ -711,7 +711,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	 * Saves this image's FileInfo so it can be later
 	 * retieved using getOriginalFileInfo().
 	 */
-	public void setFileInfo(FileInfo fi) {
+	public void setFileInfo(FileInfoXYZ fi) {
 		if (fi != null)
 			fi.pixels = null;
 		fileInfo = fi;
@@ -1671,8 +1671,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	public void revert() {
 		if (getStackSize() > 1 && getStack().isVirtual())
 			return;
-		FileInfo fi = getOriginalFileInfo();
-		boolean isFileInfo = fi != null && fi.fileFormat != FileInfo.UNKNOWN;
+		FileInfoXYZ fi = getOriginalFileInfo();
+		boolean isFileInfo = fi != null && fi.fileFormat != FileInfoXYZ.UNKNOWN;
 		if (!(isFileInfo || url != null))
 			return;
 		if (ij != null && changes && isFileInfo && !Interpreter.isBatchMode() && !IJ.isMacro() && !IJ.altKeyDown()) {
@@ -1722,7 +1722,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		notifyListeners(UPDATED);
 	}
 	
-	void revertStack(FileInfo fi) {
+	void revertStack(FileInfoXYZ fi) {
 		String path = null;
 		String url2 = null;
 		if (url != null && !url.equals("")) {
@@ -1755,7 +1755,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 					loc = win.getLocation();
 				changes = false;
 				close();
-				FileInfo fi2 = imp.getOriginalFileInfo();
+				FileInfoXYZ fi2 = imp.getOriginalFileInfo();
 				if (fi2 != null && (fi2.url == null || fi2.url.length() == 0)) {
 					fi2.url = url2;
 					imp.setFileInfo(fi2);
@@ -1771,12 +1771,12 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	 * pixel array, needed to save this image. Use getOriginalFileInfo()
 	 * to get a copy of the FileInfo object used to open the image.
 	 * 
-	 * @see ij.io.FileInfo
+	 * @see ij.io.FileInfoXYZ
 	 * @see #getOriginalFileInfo
 	 * @see #setFileInfo
 	 */
-	public FileInfo getFileInfo() {
-		FileInfo fi = new FileInfo();
+	public FileInfoXYZ getFileInfo() {
+		FileInfoXYZ fi = new FileInfoXYZ();
 		fi.width = width;
 		fi.height = height;
 		fi.nImages = getStackSize();
@@ -1808,9 +1808,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			case COLOR_256:
 				LookUpTable lut = createLut();
 				if (imageType == COLOR_256 || !lut.isGrayscale())
-					fi.fileType = FileInfo.COLOR8;
+					fi.fileType = FileInfoXYZ.COLOR8;
 				else
-					fi.fileType = FileInfo.GRAY8;
+					fi.fileType = FileInfoXYZ.GRAY8;
 				fi.lutSize = lut.getMapSize();
 				fi.reds = lut.getReds();
 				fi.greens = lut.getGreens();
@@ -1837,12 +1837,12 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	 * Returns the FileInfo object that was used to open this image.
 	 * Returns null for images created using the File/New command.
 	 * 
-	 * @see ij.io.FileInfo
+	 * @see ij.io.FileInfoXYZ
 	 * @see #getFileInfo
 	 */
-	public FileInfo getOriginalFileInfo() {
+	public FileInfoXYZ getOriginalFileInfo() {
 		if (fileInfo == null & url != null) {
-			fileInfo = new FileInfo();
+			fileInfo = new FileInfoXYZ();
 			fileInfo.width = width;
 			fileInfo.height = height;
 			fileInfo.url = url;

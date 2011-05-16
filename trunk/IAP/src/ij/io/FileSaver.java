@@ -39,7 +39,7 @@ public class FileSaver {
 	
 	private static String defaultDirectory = null;
 	protected final ImagePlus imp;
-	protected FileInfo fi;
+	protected FileInfoXYZ fi;
 	private String name;
 	private String directory;
 	
@@ -55,11 +55,11 @@ public class FileSaver {
 	 * called and the user selects cancel in the file save dialog box.
 	 */
 	public boolean save() {
-		FileInfo ofi = null;
+		FileInfoXYZ ofi = null;
 		if (imp != null)
 			ofi = imp.getOriginalFileInfo();
 		boolean validName = ofi != null && imp.getTitle().equals(ofi.fileName);
-		if (validName && ofi.fileFormat == FileInfo.TIFF && ofi.directory != null && !ofi.directory.equals("") && (ofi.url == null || ofi.url.equals(""))) {
+		if (validName && ofi.fileFormat == FileInfoXYZ.TIFF && ofi.directory != null && !ofi.directory.equals("") && (ofi.url == null || ofi.url.equals(""))) {
 			name = imp.getTitle();
 			directory = ofi.directory;
 			String path = directory + name;
@@ -129,7 +129,7 @@ public class FileSaver {
 			showErrorMessage(e);
 			return false;
 		}
-		updateImp(fi, FileInfo.TIFF);
+		updateImp(fi, FileInfoXYZ.TIFF);
 		return true;
 	}
 	
@@ -166,13 +166,13 @@ public class FileSaver {
 		}
 		boolean virtualStack = imp.getStack().isVirtual();
 		if (virtualStack)
-			fi.virtualStack = (VirtualStack) imp.getStack();
+			fi.virtualStackXYZ = (VirtualStack) imp.getStack();
 		Object info = imp.getProperty("Info");
 		if (info != null && (info instanceof String))
 			fi.info = (String) info;
 		fi.description = getDescriptionString();
 		if (virtualStack) {
-			FileInfo fi = imp.getOriginalFileInfo();
+			FileInfoXYZ fi = imp.getOriginalFileInfo();
 			if (path != null && path.equals(fi.directory + fi.fileName)) {
 				IJ.error("TIFF virtual stacks cannot be saved in place.");
 				return false;
@@ -204,11 +204,11 @@ public class FileSaver {
 			showErrorMessage(e);
 			return false;
 		}
-		updateImp(fi, FileInfo.TIFF);
+		updateImp(fi, FileInfoXYZ.TIFF);
 		return true;
 	}
 	
-	public void saveDisplayRangesAndLuts(ImagePlus imp, FileInfo fi) {
+	public void saveDisplayRangesAndLuts(ImagePlus imp, FileInfoXYZ fi) {
 		CompositeImage ci = (CompositeImage) imp;
 		int channels = imp.getNChannels();
 		fi.displayRanges = new double[channels * 2];
@@ -264,7 +264,7 @@ public class FileSaver {
 		if (imp.isComposite())
 			saveDisplayRangesAndLuts(imp, fi);
 		if (fi.nImages > 1 && imp.getStack().isVirtual())
-			fi.virtualStack = (VirtualStack) imp.getStack();
+			fi.virtualStackXYZ = (VirtualStack) imp.getStack();
 		try {
 			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path));
 			DataOutputStream out = new DataOutputStream(new BufferedOutputStream(zos));
@@ -276,7 +276,7 @@ public class FileSaver {
 			showErrorMessage(e);
 			return false;
 		}
-		updateImp(fi, FileInfo.TIFF);
+		updateImp(fi, FileInfoXYZ.TIFF);
 		return true;
 	}
 	
@@ -312,7 +312,7 @@ public class FileSaver {
 		if (!okForGif(imp))
 			return false;
 		IJ.runPlugIn(imp, "ij.plugin.GifWriter", path);
-		updateImp(fi, FileInfo.GIF_OR_JPG);
+		updateImp(fi, FileInfoXYZ.GIF_OR_JPG);
 		return true;
 	}
 	
@@ -346,7 +346,7 @@ public class FileSaver {
 	public boolean saveAsJpeg(String path) {
 		String err = JpegWriter.save(imp, path, jpegQuality);
 		if (err == null && !(imp.getType() == ImagePlus.GRAY16 || imp.getType() == ImagePlus.GRAY32))
-			updateImp(fi, FileInfo.GIF_OR_JPG);
+			updateImp(fi, FileInfoXYZ.GIF_OR_JPG);
 		return true;
 	}
 	
@@ -365,7 +365,7 @@ public class FileSaver {
 	/** Save the image in BMP format using the specified path. */
 	public boolean saveAsBmp(String path) {
 		IJ.runPlugIn(imp, "ij.plugin.BMP_Writer", path);
-		updateImp(fi, FileInfo.BMP);
+		updateImp(fi, FileInfoXYZ.BMP);
 		return true;
 	}
 	
@@ -391,7 +391,7 @@ public class FileSaver {
 	 */
 	public boolean saveAsPgm(String path) {
 		IJ.runPlugIn(imp, "ij.plugin.PNM_Writer", path);
-		updateImp(fi, FileInfo.PGM);
+		updateImp(fi, FileInfoXYZ.PGM);
 		return true;
 	}
 	
@@ -410,7 +410,7 @@ public class FileSaver {
 	/** Save the image in PNG format using the specified path. */
 	public boolean saveAsPng(String path) {
 		IJ.runPlugIn(imp, "ij.plugin.PNG_Writer", path);
-		updateImp(fi, FileInfo.IMAGEIO);
+		updateImp(fi, FileInfoXYZ.IMAGEIO);
 		return true;
 	}
 	
@@ -433,7 +433,7 @@ public class FileSaver {
 		if (!okForFits(imp))
 			return false;
 		IJ.runPlugIn(imp, "ij.plugin.FITS_Writer", path);
-		updateImp(fi, FileInfo.FITS);
+		updateImp(fi, FileInfoXYZ.FITS);
 		return true;
 	}
 	
@@ -503,7 +503,7 @@ public class FileSaver {
 		int n = 0;
 		boolean virtualStack = imp.getStackSize() > 1 && imp.getStack().isVirtual();
 		if (virtualStack) {
-			fi.virtualStack = (VirtualStack) imp.getStack();
+			fi.virtualStackXYZ = (VirtualStack) imp.getStack();
 			if (imp.getProperty("AnalyzeFormat") != null)
 				fi.fileName = "FlipTheseImages";
 		}
@@ -600,7 +600,7 @@ public class FileSaver {
 			pixels[i + 256] = greens[i];
 			pixels[i + 512] = blues[i];
 		}
-		FileInfo fi = new FileInfo();
+		FileInfoXYZ fi = new FileInfoXYZ();
 		fi.width = 768;
 		fi.height = 1;
 		fi.pixels = pixels;
@@ -617,11 +617,11 @@ public class FileSaver {
 		return true;
 	}
 	
-	public void updateImp(FileInfo fi, int fileFormat) {
+	public void updateImp(FileInfoXYZ fi, int fileFormat) {
 		imp.changes = false;
 		if (name != null) {
 			fi.fileFormat = fileFormat;
-			FileInfo ofi = imp.getOriginalFileInfo();
+			FileInfoXYZ ofi = imp.getOriginalFileInfo();
 			if (ofi != null) {
 				if (ofi.openNextName == null) {
 					fi.openNextName = ofi.fileName;
@@ -653,7 +653,7 @@ public class FileSaver {
 		Calibration cal = imp.getCalibration();
 		StringBuffer sb = new StringBuffer(100);
 		sb.append("ImageJ=" + ImageJ.VERSION + "\n");
-		if (fi.nImages > 1 && fi.fileType != FileInfo.RGB48)
+		if (fi.nImages > 1 && fi.fileType != FileInfoXYZ.RGB48)
 			sb.append("images=" + fi.nImages + "\n");
 		int channels = imp.getNChannels();
 		if (channels > 1)

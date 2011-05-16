@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Properties;
 
 /** This class consists of public fields that describe an image file. */
-public class FileInfo implements Cloneable {
+public class FileInfoXYZ implements Cloneable {
 
 	/** 8-bit unsigned integer (0-255). */
 	public static final int GRAY8 = 0;
@@ -116,7 +116,7 @@ public class FileInfo implements Cloneable {
 	public String[] sliceLabels;
 	public String info;
 	public InputStream inputStream;
-	public VirtualStack virtualStack;
+	public VirtualStack virtualStackXYZ;
 	
 	public double pixelWidth=1.0;
 	public double pixelHeight=1.0;
@@ -140,7 +140,7 @@ public class FileInfo implements Cloneable {
 	public String openNextDir, openNextName;
     
 	/** Creates a FileInfo object with all of its fields set to their default value. */
-     public FileInfo() {
+     public FileInfoXYZ() {
     	// assign default values
     	fileFormat = UNKNOWN;
     	fileType = GRAY8;

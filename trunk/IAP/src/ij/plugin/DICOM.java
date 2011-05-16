@@ -87,7 +87,7 @@ public class DICOM extends ImagePlus implements PlugIn {
 		//IJ.showStatus("Opening: " + directory + fileName);
 		DicomDecoder dd = new DicomDecoder(directory, fileName);
 		dd.inputStream = inputStream;
-		FileInfo fi = null;
+		FileInfoXYZ fi = null;
 		try {fi = dd.getFileInfo();}
 		catch (IOException e) {
 			String msg = e.getMessage();
@@ -118,10 +118,10 @@ public class DICOM extends ImagePlus implements PlugIn {
 				if (dd.rescaleIntercept!=0.0)
 					ip.add(dd.rescaleIntercept);
 				imp.setProcessor(ip);
-			} else if (fi.fileType==FileInfo.GRAY16_SIGNED) {
+			} else if (fi.fileType==FileInfoXYZ.GRAY16_SIGNED) {
 				if (dd.rescaleIntercept!=0.0 && dd.rescaleSlope==1.0)
 					ip.add(dd.rescaleIntercept);
-			} else if (dd.rescaleIntercept!=0.0 && (dd.rescaleSlope==1.0||fi.fileType==FileInfo.GRAY8)) {
+			} else if (dd.rescaleIntercept!=0.0 && (dd.rescaleSlope==1.0||fi.fileType==FileInfoXYZ.GRAY8)) {
 				double[] coeff = new double[2];
 				coeff[0] = dd.rescaleIntercept;
 				coeff[1] = dd.rescaleSlope;
@@ -180,7 +180,7 @@ public class DICOM extends ImagePlus implements PlugIn {
 	}
 
 	/** Convert 16-bit signed to unsigned if all pixels>=0. */
-	void convertToUnsigned(ImagePlus imp, FileInfo fi) {
+	void convertToUnsigned(ImagePlus imp, FileInfoXYZ fi) {
 		ImageProcessor ip = imp.getProcessor();
 		short[] pixels = (short[])ip.getPixels();
 		int min = Integer.MAX_VALUE;
@@ -197,7 +197,7 @@ public class DICOM extends ImagePlus implements PlugIn {
 			ip.resetMinAndMax();
 			Calibration cal = imp.getCalibration();
 			cal.setFunction(Calibration.NONE, null, "Gray Value");
-			fi.fileType = FileInfo.GRAY16_UNSIGNED;
+			fi.fileType = FileInfoXYZ.GRAY16_UNSIGNED;
 		}
 	}
 
@@ -458,9 +458,9 @@ class DicomDecoder {
 		return tag;
 	}
   
-	FileInfo getFileInfo() throws IOException {
+	FileInfoXYZ getFileInfo() throws IOException {
 		long skipCount;
-		FileInfo fi = new FileInfo();
+		FileInfoXYZ fi = new FileInfoXYZ();
 		int bitsAllocated = 16;
 		fi.fileFormat = fi.RAW;
 		fi.fileName = fileName;
@@ -476,8 +476,8 @@ class DicomDecoder {
 		fi.height = 0;
 		fi.offset = 0;
 		fi.intelByteOrder = true;
-		fi.fileType = FileInfo.GRAY16_UNSIGNED;
-		fi.fileFormat = FileInfo.DICOM;
+		fi.fileType = FileInfoXYZ.GRAY16_UNSIGNED;
+		fi.fileFormat = FileInfoXYZ.DICOM;
 		int samplesPerPixel = 1;
 		int planarConfiguration = 0;
 		String photoInterpretation = "";
@@ -579,15 +579,15 @@ class DicomDecoder {
 				case BITS_ALLOCATED:
 					bitsAllocated = getShort();
 					if (bitsAllocated==8)
-						fi.fileType = FileInfo.GRAY8;
+						fi.fileType = FileInfoXYZ.GRAY8;
 					else if (bitsAllocated==32)
-						fi.fileType = FileInfo.GRAY32_UNSIGNED;
+						fi.fileType = FileInfoXYZ.GRAY32_UNSIGNED;
 					addInfo(tag, bitsAllocated);
 					break;
 				case PIXEL_REPRESENTATION:
 					int pixelRepresentation = getShort();
 					if (pixelRepresentation==1) {
-						fi.fileType = FileInfo.GRAY16_SIGNED;
+						fi.fileType = FileInfoXYZ.GRAY16_SIGNED;
 						signed = true;
 					}
 					addInfo(tag, pixelRepresentation);
@@ -650,24 +650,24 @@ class DicomDecoder {
 			}
 		} // while(decodingTags)
 		
-		if (fi.fileType==FileInfo.GRAY8) {
+		if (fi.fileType==FileInfoXYZ.GRAY8) {
 			if (fi.reds!=null && fi.greens!=null && fi.blues!=null
 			&& fi.reds.length==fi.greens.length
 			&& fi.reds.length==fi.blues.length) {
-				fi.fileType = FileInfo.COLOR8;
+				fi.fileType = FileInfoXYZ.COLOR8;
 				fi.lutSize = fi.reds.length;
 				
 			}
 		}
 				
-		if (fi.fileType==FileInfo.GRAY32_UNSIGNED && signed)
-			fi.fileType = FileInfo.GRAY32_INT;
+		if (fi.fileType==FileInfoXYZ.GRAY32_UNSIGNED && signed)
+			fi.fileType = FileInfoXYZ.GRAY32_INT;
 
 		if (samplesPerPixel==3 && photoInterpretation.startsWith("RGB")) {
 			if (planarConfiguration==0)
-				fi.fileType = FileInfo.RGB;
+				fi.fileType = FileInfoXYZ.RGB;
 			else if (planarConfiguration==1)
-				fi.fileType = FileInfo.RGB_PLANAR;
+				fi.fileType = FileInfoXYZ.RGB_PLANAR;
 		} else if (photoInterpretation.endsWith("1 "))
 				fi.whiteIsZero = true;
 				
@@ -840,7 +840,7 @@ class DicomDecoder {
 			return(0.0);
 	}
   
-	void getSpatialScale(FileInfo fi, String scale) {
+	void getSpatialScale(FileInfoXYZ fi, String scale) {
 		double xscale=0, yscale=0;
 		int i = scale.indexOf('\\');
 		if (i>0) {

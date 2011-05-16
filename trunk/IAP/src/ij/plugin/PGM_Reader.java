@@ -88,8 +88,8 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
             return;
         }
         setStack(name, stack);
-        FileInfo fi = new FileInfo();
-        fi.fileFormat = FileInfo.PGM;
+        FileInfoXYZ fi = new FileInfoXYZ();
+        fi.fileFormat = FileInfoXYZ.PGM;
         fi.directory = directory;
         fi.fileName = name;
         setFileInfo(fi);

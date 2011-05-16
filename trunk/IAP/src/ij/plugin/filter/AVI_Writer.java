@@ -67,7 +67,7 @@ public class AVI_Writer implements PlugInFilter {
         if (fileName == null)
             return;
         String fileDir = sd.getDirectory();
-        FileInfo fi = imp.getOriginalFileInfo();
+        FileInfoXYZ fi = imp.getOriginalFileInfo();
         if (imp.getStack().isVirtual() && fileDir.equals(fi.directory)&& fileName.equals(fi.fileName)) {
             IJ.error("AVI Writer", "Virtual stacks cannot be saved in place.");
             return;
