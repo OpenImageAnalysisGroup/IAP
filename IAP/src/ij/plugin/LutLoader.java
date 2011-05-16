@@ -19,7 +19,7 @@ public class LutLoader extends ImagePlus implements PlugIn {
 		LUT. If 'arg' is a path, opens the LUT specified by the path. If
 		'arg'="fire", "ice", etc., uses a method to generate the LUT. */
 	public void run(String arg) {
-		FileInfo fi = new FileInfo();
+		FileInfoXYZ fi = new FileInfoXYZ();
 		fi.reds = new byte[256]; 
 		fi.greens = new byte[256]; 
 		fi.blues = new byte[256];
@@ -70,7 +70,7 @@ public class LutLoader extends ImagePlus implements PlugIn {
 		IJ.showStatus("");
 	}
 	
-	void showLut(FileInfo fi, boolean showImage) {
+	void showLut(FileInfoXYZ fi, boolean showImage) {
 		ImagePlus imp = WindowManager.getCurrentImage();
 		if (imp!=null) {
 			if (imp.getType()==ImagePlus.COLOR_RGB)
@@ -213,7 +213,7 @@ public class LutLoader extends ImagePlus implements PlugIn {
 	}
 	
 	/** Opens an NIH Image LUT, 768 byte binary LUT or text LUT from a file or URL. */
-	boolean openLut(FileInfo fi) {
+	boolean openLut(FileInfoXYZ fi) {
 		//IJ.showStatus("Opening: " + fi.directory + fi.fileName);
 		boolean isURL = fi.url!=null && !fi.url.equals("");
 		int length = 0;
@@ -246,7 +246,7 @@ public class LutLoader extends ImagePlus implements PlugIn {
 	}
 
 	/** Opens an NIH Image LUT or a 768 byte binary LUT. */
-	int openBinaryLut(FileInfo fi, boolean isURL, boolean raw) throws IOException {
+	int openBinaryLut(FileInfoXYZ fi, boolean isURL, boolean raw) throws IOException {
 		InputStream is;
 		if (isURL)
 			is = new URL(fi.url+fi.fileName).openStream();
@@ -279,7 +279,7 @@ public class LutLoader extends ImagePlus implements PlugIn {
 		return 256;
 	}
 	
-	int openTextLut(FileInfo fi) throws IOException {
+	int openTextLut(FileInfoXYZ fi) throws IOException {
 		TextReader tr = new TextReader();
 		tr.hideErrorMessages();
 		ImageProcessor ip = tr.open(fi.directory+fi.fileName);
@@ -301,7 +301,7 @@ public class LutLoader extends ImagePlus implements PlugIn {
 		return 256;
 	}
 
-	void createImage(FileInfo fi, boolean show) {
+	void createImage(FileInfoXYZ fi, boolean show) {
 		IndexColorModel cm = new IndexColorModel(8, 256, fi.reds, fi.greens, fi.blues);
 		ByteProcessor bp = createImage(cm);
     	setProcessor(fi.fileName, bp);

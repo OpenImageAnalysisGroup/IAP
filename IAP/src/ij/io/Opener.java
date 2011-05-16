@@ -404,9 +404,9 @@ public class Opener {
 		}
 		imp = (ImagePlus)IJ.runPlugIn("HandleExtraFileTypes", path);
 		if (imp==null) return null;
-		FileInfo fi = imp.getOriginalFileInfo();
+		FileInfoXYZ fi = imp.getOriginalFileInfo();
 		if (fi==null) {
-			fi = new FileInfo();
+			fi = new FileInfoXYZ();
 			fi.width = imp.getWidth();
 			fi.height = imp.getHeight();
 			fi.directory = getDir(path);
@@ -523,7 +523,7 @@ public class Opener {
 			}				
 			if (imp.getType()==ImagePlus.COLOR_RGB)
 				convertGrayJpegTo8Bits(imp);
-			FileInfo fi = new FileInfo();
+			FileInfoXYZ fi = new FileInfoXYZ();
 			fi.fileFormat = fi.GIF_OR_JPG;
 			fi.fileName = name;
 			fi.directory = dir;
@@ -543,7 +543,7 @@ public class Opener {
 		} 
 		if (img==null) return null;
 		imp = new ImagePlus(f.getName(), img);
-		FileInfo fi = new FileInfo();
+		FileInfoXYZ fi = new FileInfoXYZ();
 		fi.fileFormat = fi.IMAGEIO;
 		fi.fileName = f.getName();
 		fi.directory = f.getParent()+File.separator;
@@ -573,7 +573,7 @@ public class Opener {
 	}
 
 	/** Are all the images in this file the same size and type? */
-	boolean allSameSizeAndType(FileInfo[] info) {
+	boolean allSameSizeAndType(FileInfoXYZ[] info) {
 		boolean sameSizeAndType = true;
 		boolean contiguous = true;
 		long startingOffset = info[0].getOffset();
@@ -584,7 +584,7 @@ public class Opener {
 				&& info[i].height==info[0].height;
 			contiguous &= info[i].getOffset()==startingOffset+i*size;
 		}
-		if (contiguous &&  info[0].fileType!=FileInfo.RGB48)
+		if (contiguous &&  info[0].fileType!=FileInfoXYZ.RGB48)
 			info[0].nImages = info.length;
 		//if (IJ.debugMode) {
 		//	IJ.log("sameSizeAndType: " + sameSizeAndType);
@@ -595,10 +595,10 @@ public class Opener {
 	
 	/** Attemps to open a tiff file as a stack. Returns 
 		an ImagePlus object if successful. */
-	public ImagePlus openTiffStack(FileInfo[] info) {
+	public ImagePlus openTiffStack(FileInfoXYZ[] info) {
 		if (info.length>1 && !allSameSizeAndType(info))
 			return null;
-		FileInfo fi = info[0];
+		FileInfoXYZ fi = info[0];
 		if (fi.nImages>1)
 			return new FileOpener(fi).open(false); // open contiguous images as stack
 		else {
@@ -607,10 +607,10 @@ public class Opener {
 			Object pixels = null;
 			long skip = fi.getOffset();
 			int imageSize = fi.width*fi.height*fi.getBytesPerPixel();
-			if (info[0].fileType==FileInfo.GRAY12_UNSIGNED) {
+			if (info[0].fileType==FileInfoXYZ.GRAY12_UNSIGNED) {
 				imageSize = (int)(fi.width*fi.height*1.5);
 				if ((imageSize&1)==1) imageSize++; // add 1 if odd
-			} if (info[0].fileType==FileInfo.BITMAP) {
+			} if (info[0].fileType==FileInfoXYZ.BITMAP) {
 				int scan=(int)Math.ceil(fi.width/8.0);
 				imageSize = scan*fi.height;
 			}
@@ -630,7 +630,7 @@ public class Opener {
 						IJ.showProgress(1.0);
 						return null;
 					}
-					if (info[i].compression>=FileInfo.LZW) {
+					if (info[i].compression>=FileInfoXYZ.LZW) {
 						fi.stripOffsets = info[i].stripOffsets;
 						fi.stripLengths = info[i].stripLengths;
 					}
@@ -647,13 +647,13 @@ public class Opener {
 					loc += imageSize*nChannels+skip;
 					if (i<(info.length-1)) {
 						skip = info[i+1].getOffset()-loc;
-						if (info[i+1].compression>=FileInfo.LZW) skip = 0;
+						if (info[i+1].compression>=FileInfoXYZ.LZW) skip = 0;
 						if (skip<0L) {
 							IJ.error("Opener", "Unexpected image offset");
 							break;
 						}
 					}
-					if (fi.fileType==FileInfo.RGB48) {
+					if (fi.fileType==FileInfoXYZ.RGB48) {
 						Object[] pixels2 = (Object[])pixels;
 						stack.addSlice(null, pixels2[0]);					
 						stack.addSlice(null, pixels2[1]);					
@@ -681,8 +681,8 @@ public class Opener {
 			IJ.showProgress(1.0);
 			if (stack.getSize()==0)
 				return null;
-			if (fi.fileType==FileInfo.GRAY16_UNSIGNED||fi.fileType==FileInfo.GRAY12_UNSIGNED
-			||fi.fileType==FileInfo.GRAY32_FLOAT||fi.fileType==FileInfo.RGB48) {
+			if (fi.fileType==FileInfoXYZ.GRAY16_UNSIGNED||fi.fileType==FileInfoXYZ.GRAY12_UNSIGNED
+			||fi.fileType==FileInfoXYZ.GRAY32_FLOAT||fi.fileType==FileInfoXYZ.RGB48) {
 				ImageProcessor ip = stack.getProcessor(1);
 				ip.resetMinAndMax();
 				stack.update(ip);
@@ -708,7 +708,7 @@ public class Opener {
 	public ImagePlus openTiff(String directory, String name) {
 		TiffDecoder td = new TiffDecoder(directory, name);
 		if (IJ.debugMode) td.enableDebugging();
-		FileInfo[] info=null;
+		FileInfoXYZ[] info=null;
 		try {info = td.getTiffInfo();}
 		catch (IOException e) {
 			String msg = e.getMessage();
@@ -725,7 +725,7 @@ public class Opener {
 	public ImagePlus openTiff(String path, int n) {
 		TiffDecoder td = new TiffDecoder(getDir(path), getName(path));
 		if (IJ.debugMode) td.enableDebugging();
-		FileInfo[] info=null;
+		FileInfoXYZ[] info=null;
 		try {info = td.getTiffInfo();}
 		catch (IOException e) {
 			String msg = e.getMessage();
@@ -734,7 +734,7 @@ public class Opener {
 			return null;
 		}
 		if (info==null) return null;
-		FileInfo fi = info[0];
+		FileInfoXYZ fi = info[0];
 		if (info.length==1 && fi.nImages>1) {
 			if (n<1 || n>fi.nImages)
 				throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
@@ -757,7 +757,7 @@ public class Opener {
 	/** Attempts to open the specified inputStream as a
 		TIFF, returning an ImagePlus object if successful. */
 	public ImagePlus openTiff(InputStream in, String name) {
-		FileInfo[] info = null;
+		FileInfoXYZ[] info = null;
 		try {
 			TiffDecoder td = new TiffDecoder(in, name);
 			if (IJ.debugMode) td.enableDebugging();
@@ -803,8 +803,8 @@ public class Opener {
 			return null;
 		}
 		File f = new File(path);
-		FileInfo fi = imp.getOriginalFileInfo();
-		fi.fileFormat = FileInfo.ZIP_ARCHIVE;
+		FileInfoXYZ fi = imp.getOriginalFileInfo();
+		fi.fileFormat = FileInfoXYZ.ZIP_ARCHIVE;
 		fi.fileName = f.getName();
 		fi.directory = f.getParent()+File.separator;
 		return imp;
@@ -830,7 +830,7 @@ public class Opener {
 			return "";
 	}
 
-	ImagePlus openTiff2(FileInfo[] info) {
+	ImagePlus openTiff2(FileInfoXYZ[] info) {
 		if (info==null)
 			return null;
 		ImagePlus imp = null;
@@ -1007,15 +1007,15 @@ public class Opener {
 	}
 
 	/** Returns an IndexColorModel for the image specified by this FileInfo. */
-	ColorModel createColorModel(FileInfo fi) {
-		if (fi.fileType==FileInfo.COLOR8 && fi.lutSize>0)
+	ColorModel createColorModel(FileInfoXYZ fi) {
+		if (fi.fileType==FileInfoXYZ.COLOR8 && fi.lutSize>0)
 			return new IndexColorModel(8, fi.lutSize, fi.reds, fi.greens, fi.blues);
 		else
 			return LookUpTable.createGrayscaleColorModel(fi.whiteIsZero);
 	}
 
 	/** Returns an InputStream for the image described by this FileInfo. */
-	InputStream createInputStream(FileInfo fi) throws IOException, MalformedURLException {
+	InputStream createInputStream(FileInfoXYZ fi) throws IOException, MalformedURLException {
 		if (fi.inputStream!=null)
 			return fi.inputStream;
 		else if (fi.url!=null && !fi.url.equals(""))
@@ -1026,7 +1026,7 @@ public class Opener {
 				return null;
 			else {
 				InputStream is = new FileInputStream(f);
-				if (fi.compression>=FileInfo.LZW)
+				if (fi.compression>=FileInfoXYZ.LZW)
 					is = new RandomAccessStream(is);
 				return is;
 			}

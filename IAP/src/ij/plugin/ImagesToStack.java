@@ -4,7 +4,7 @@ import ij.gui.*;
 import ij.process.*;
 import ij.measure.Calibration;
 import ij.macro.Interpreter;
-import ij.io.FileInfo;
+import ij.io.FileInfoXYZ;
 
 
 /** Implements the Image/Stacks/Images to Stack" command. */
@@ -108,7 +108,7 @@ public class ImagesToStack implements PlugIn {
 		double min = Double.MAX_VALUE;
 		double max = -Double.MAX_VALUE;
 		ImageStack stack = new ImageStack(width, height);
-		FileInfo fi = image[0].getOriginalFileInfo();
+		FileInfoXYZ fi = image[0].getOriginalFileInfo();
 		if (fi!=null && fi.directory==null) fi = null;
 		for (int i=0; i<count; i++) {
 			ImageProcessor ip = image[i].getProcessor();
@@ -121,7 +121,7 @@ public class ImagesToStack implements PlugIn {
 				if (info!=null) label += "\n" + info;
 			}
             if (fi!=null) {
-				FileInfo fi2 = image[i].getOriginalFileInfo();
+				FileInfoXYZ fi2 = image[i].getOriginalFileInfo();
 				if (fi2!=null && !fi.directory.equals(fi2.directory))
 					fi = null;
             }

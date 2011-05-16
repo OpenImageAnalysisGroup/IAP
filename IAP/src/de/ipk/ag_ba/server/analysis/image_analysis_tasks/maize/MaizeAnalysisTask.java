@@ -217,7 +217,7 @@ public class MaizeAnalysisTask extends AbstractImageAnalysisTask {
 						if (input.hasAllThreeImages()) {
 							boolean side = id.isSide();
 							
-							ImageProcessorOptions options = new ImageProcessorOptions();
+							ImageProcessorOptions options = new ImageProcessorOptions(visInputImage, fluo, nir);
 							if (side)
 								options.setCameraTyp(CameraTyp.SIDE);
 							else

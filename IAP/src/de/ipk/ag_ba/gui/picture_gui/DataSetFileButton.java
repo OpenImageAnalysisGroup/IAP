@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import ij.ImagePlus;
-import ij.io.FileInfo;
+import ij.io.FileInfoXYZ;
 import ij.io.Opener;
 import ij.io.TiffDecoder;
 import info.clearthought.layout.TableLayout;
@@ -411,7 +411,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				if (fi.getAsBufferedImage() == null) {
 					try {
 						TiffDecoder tid = new TiffDecoder(myImage.fileURLlabel.getInputStream(), myImage.fileURLlabel.getFileName());
-						FileInfo[] info = tid.getTiffInfo();
+						FileInfoXYZ[] info = tid.getTiffInfo();
 						Opener o = new Opener();
 						ImagePlus imp = o.openTiffStack(info);
 						imp.show("Image Label View - " + myImage.fileURLlabel.getFileNameDecoded());

@@ -22,6 +22,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.PrintImage;
@@ -179,6 +180,19 @@ public class FlexibleImage {
 		ImageOperation io = new ImageOperation(image);
 		io = io.crop(pLeft, pRight, pTop, pBottom);
 		return io.getImage();
+	}
+	
+	public double[][] getLab() {
+		final int w = getWidth();
+		final int h = getHeight();
+		final int arrayRGB[] = new int[w * h];
+		getAsBufferedImage().getRGB(0, 0, w, h, arrayRGB, 0, w);
+		double arrayL[] = new double[w * h];
+		double arrayA[] = new double[w * h];
+		double arrayB[] = new double[w * h];
+		ColorUtil.getLABfromRGB(arrayRGB, arrayL, arrayA, arrayB, false);
+		return new double[][] {
+				arrayL, arrayA, arrayB };
 	}
 	
 }

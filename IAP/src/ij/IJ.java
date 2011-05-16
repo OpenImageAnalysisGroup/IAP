@@ -16,7 +16,7 @@ import ij.gui.Toolbar;
 import ij.gui.Wand;
 import ij.gui.YesNoCancelDialog;
 import ij.io.DirectoryChooser;
-import ij.io.FileInfo;
+import ij.io.FileInfoXYZ;
 import ij.io.OpenDialog;
 import ij.io.Opener;
 import ij.io.PluginClassLoader;
@@ -68,8 +68,6 @@ import java.text.DecimalFormatSymbols;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Vector;
-
-import org.SystemAnalysis;
 
 /** This class consists of static utility methods. */
 public class IJ {
@@ -1569,7 +1567,7 @@ public class IJ {
 									} else
 										if (title.equals("image")) {
 											ImagePlus imp = WindowManager.getCurrentImage();
-											FileInfo fi = imp != null ? imp.getOriginalFileInfo() : null;
+											FileInfoXYZ fi = imp != null ? imp.getOriginalFileInfo() : null;
 											if (fi != null && fi.directory != null)
 												return fi.directory;
 											else
@@ -2005,7 +2003,7 @@ public class IJ {
 	public static Dimension getScreenSize() {
 		if (isWindows()) // GraphicsEnvironment.getConfigurations is *very* slow on Windows
 			return Toolkit.getDefaultToolkit().getScreenSize();
-		if (SystemAnalysis.isHeadless())
+		if (GraphicsEnvironment.isHeadless())
 			return new Dimension(0, 0);
 		// Can't use Toolkit.getScreenSize() on Linux because it returns
 		// size of all displays rather than just the primary display.

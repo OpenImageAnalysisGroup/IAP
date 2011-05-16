@@ -22,7 +22,7 @@ public class FolderOpener implements PlugIn {
 	private int n, start, increment;
 	private String filter;
 	private boolean isRegex;
-	private FileInfo fi;
+	private FileInfoXYZ fi;
 	private String info1;
 	private ImagePlus image;
 	
@@ -231,8 +231,8 @@ public class FolderOpener implements PlugIn {
 			if (imp2.getType()==ImagePlus.GRAY16 || imp2.getType()==ImagePlus.GRAY32)
 				imp2.getProcessor().setMinAndMax(min, max);
 			if (fi==null)
-				fi = new FileInfo();
-			fi.fileFormat = FileInfo.UNKNOWN;
+				fi = new FileInfoXYZ();
+			fi.fileFormat = FileInfoXYZ.UNKNOWN;
 			fi.fileName = "";
 			fi.directory = directory;
 			imp2.setFileInfo(fi); // saves FileInfo of the first image

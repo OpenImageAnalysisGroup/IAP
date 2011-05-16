@@ -8,6 +8,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
@@ -49,6 +50,7 @@ public class MaizeImageProcessor {
 		
 		BlockPipeline p = new BlockPipeline(options);
 		
+		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
 		p.add(BlockCalculateMainAxis.class);
 		p.add(BlockFindBlueMarkers.class);
 		

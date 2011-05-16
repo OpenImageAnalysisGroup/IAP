@@ -5,10 +5,10 @@ import ij.process.ImageProcessor;
 
 /** Writes a raw image described by a FileInfo object to an OutputStream. */
 public class ImageWriter {
-	private FileInfo fi;
+	private FileInfoXYZ fi;
 	private boolean showProgressBar=true;
 	
-	public ImageWriter (FileInfo fi) {
+	public ImageWriter (FileInfoXYZ fi) {
 		this.fi = fi;
 	}
 	
@@ -256,43 +256,43 @@ public class ImageWriter {
  		array of images returned by ImageStack.getImageArray()).
  		The fi.offset field is ignored. */
 	public void write(OutputStream out) throws IOException {
-		if (fi.pixels==null && fi.virtualStack==null)
+		if (fi.pixels==null && fi.virtualStackXYZ==null)
 				throw new IOException("ImageWriter: fi.pixels==null");
-		if (fi.nImages>1 && fi.virtualStack==null && !(fi.pixels instanceof Object[]))
+		if (fi.nImages>1 && fi.virtualStackXYZ==null && !(fi.pixels instanceof Object[]))
 				throw new IOException("ImageWriter: fi.pixels not a stack");
 		switch (fi.fileType) {
-			case FileInfo.GRAY8:
-			case FileInfo.COLOR8:
-				if (fi.nImages>1 && fi.virtualStack!=null)
-					write8BitVirtualStack(out, fi.virtualStack);
+			case FileInfoXYZ.GRAY8:
+			case FileInfoXYZ.COLOR8:
+				if (fi.nImages>1 && fi.virtualStackXYZ!=null)
+					write8BitVirtualStack(out, fi.virtualStackXYZ);
 				else if (fi.nImages>1)
 					write8BitStack(out, (Object[])fi.pixels);
 				else
 					write8BitImage(out, (byte[])fi.pixels);
 				break;
-			case FileInfo.GRAY16_SIGNED:
-			case FileInfo.GRAY16_UNSIGNED:
-				if (fi.nImages>1 && fi.virtualStack!=null)
-					write16BitVirtualStack(out, fi.virtualStack);
+			case FileInfoXYZ.GRAY16_SIGNED:
+			case FileInfoXYZ.GRAY16_UNSIGNED:
+				if (fi.nImages>1 && fi.virtualStackXYZ!=null)
+					write16BitVirtualStack(out, fi.virtualStackXYZ);
 				else if (fi.nImages>1)
 					write16BitStack(out, (Object[])fi.pixels);
 				else
 					write16BitImage(out, (short[])fi.pixels);
 				break;
-			case FileInfo.RGB48:
+			case FileInfoXYZ.RGB48:
 				writeRGB48Image(out, (Object[])fi.pixels);
 				break;
-			case FileInfo.GRAY32_FLOAT:
-				if (fi.nImages>1 && fi.virtualStack!=null)
-					writeFloatVirtualStack(out, fi.virtualStack);
+			case FileInfoXYZ.GRAY32_FLOAT:
+				if (fi.nImages>1 && fi.virtualStackXYZ!=null)
+					writeFloatVirtualStack(out, fi.virtualStackXYZ);
 				else if (fi.nImages>1)
 					writeFloatStack(out, (Object[])fi.pixels);
 				else
 					writeFloatImage(out, (float[])fi.pixels);
 				break;
-			case FileInfo.RGB:
-				if (fi.nImages>1 && fi.virtualStack!=null)
-					writeRGBVirtualStack(out, fi.virtualStack);
+			case FileInfoXYZ.RGB:
+				if (fi.nImages>1 && fi.virtualStackXYZ!=null)
+					writeRGBVirtualStack(out, fi.virtualStackXYZ);
 				else if (fi.nImages>1)
 					writeRGBStack(out, (Object[])fi.pixels);
 				else

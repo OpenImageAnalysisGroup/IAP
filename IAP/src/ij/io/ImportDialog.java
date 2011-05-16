@@ -40,7 +40,7 @@ public class ImportDialog {
     private static boolean whiteIsZero,intelByteOrder;
     private static boolean virtual;
     private boolean openAll;
-    private static FileInfo lastFileInfo;
+    private static FileInfoXYZ lastFileInfo;
     private static String[] types = {"8-bit", "16-bit Signed", "16-bit Unsigned",
 		"32-bit Signed", "32-bit Unsigned", "32-bit Real", "64-bit Real", "24-bit RGB", 
 		"24-bit RGB Planar", "24-bit BGR", "24-bit Integer", "32-bit ARGB", "32-bit ABGR", "1-bit Bitmap"};
@@ -94,7 +94,7 @@ public class ImportDialog {
 	}
 	
 	/** Opens all the images in the directory. */
-	void openAll(String[] list, FileInfo fi) {
+	void openAll(String[] list, FileInfoXYZ fi) {
 		//StringSorter.sort(list);
 		FolderOpener fo = new FolderOpener();
 		list = fo.trimFileList(list);
@@ -133,7 +133,7 @@ public class ImportDialog {
 			if (imp.getBitDepth()==16 || imp.getBitDepth()==32)
 				imp.getProcessor().setMinAndMax(min, max);
                 Calibration cal = imp.getCalibration();
-                if (fi.fileType==FileInfo.GRAY16_SIGNED)
+                if (fi.fileType==FileInfoXYZ.GRAY16_SIGNED)
                 	cal.setSigned16BitCalibration();
 			imp.show();
 		}
@@ -142,7 +142,7 @@ public class ImportDialog {
 	/** Displays the dialog and opens the specified image or images.
 		Does nothing if the dialog is canceled. */
 	public void openImage() {
-		FileInfo fi = getFileInfo();
+		FileInfoXYZ fi = getFileInfo();
 		if (fi==null) return;
 		if (openAll) {
 			if (virtual) {
@@ -174,11 +174,11 @@ public class ImportDialog {
 	/** Displays the dialog and returns a FileInfo object that can be used to
 		open the image. Returns null if the dialog is canceled. The fileName 
 		and directory fields are null if the no argument constructor was used. */
-	public FileInfo getFileInfo() {
+	public FileInfoXYZ getFileInfo() {
 		if (!showDialog())
 			return null;
 		String imageType = types[choiceSelection];
-		FileInfo fi = new FileInfo();
+		FileInfoXYZ fi = new FileInfoXYZ();
 		fi.fileFormat = fi.RAW;
 		fi.fileName = fileName;
 		fi.directory = directory;
@@ -193,37 +193,37 @@ public class ImportDialog {
 		fi.intelByteOrder = intelByteOrder;
 		fi.whiteIsZero = whiteIsZero;
 		if (imageType.equals("8-bit"))
-			fi.fileType = FileInfo.GRAY8;
+			fi.fileType = FileInfoXYZ.GRAY8;
 		else if (imageType.equals("16-bit Signed"))
-			fi.fileType = FileInfo.GRAY16_SIGNED;
+			fi.fileType = FileInfoXYZ.GRAY16_SIGNED;
 		else if (imageType.equals("16-bit Unsigned"))
-			fi.fileType = FileInfo.GRAY16_UNSIGNED;
+			fi.fileType = FileInfoXYZ.GRAY16_UNSIGNED;
 		else if (imageType.equals("32-bit Signed"))
-			fi.fileType = FileInfo.GRAY32_INT;
+			fi.fileType = FileInfoXYZ.GRAY32_INT;
 		else if (imageType.equals("32-bit Unsigned"))
-			fi.fileType = FileInfo.GRAY32_UNSIGNED;
+			fi.fileType = FileInfoXYZ.GRAY32_UNSIGNED;
 		else if (imageType.equals("32-bit Real"))
-			fi.fileType = FileInfo.GRAY32_FLOAT;
+			fi.fileType = FileInfoXYZ.GRAY32_FLOAT;
 		else if (imageType.equals("64-bit Real"))
-			fi.fileType = FileInfo.GRAY64_FLOAT;
+			fi.fileType = FileInfoXYZ.GRAY64_FLOAT;
 		else if (imageType.equals("24-bit RGB"))
-			fi.fileType = FileInfo.RGB;
+			fi.fileType = FileInfoXYZ.RGB;
 		else if (imageType.equals("24-bit RGB Planar"))
-			fi.fileType = FileInfo.RGB_PLANAR;
+			fi.fileType = FileInfoXYZ.RGB_PLANAR;
 		else if (imageType.equals("24-bit BGR"))
-			fi.fileType = FileInfo.BGR;
+			fi.fileType = FileInfoXYZ.BGR;
 		else if (imageType.equals("24-bit Integer"))
-			fi.fileType = FileInfo.GRAY24_UNSIGNED;
+			fi.fileType = FileInfoXYZ.GRAY24_UNSIGNED;
 		else if (imageType.equals("32-bit ARGB"))
-			fi.fileType = FileInfo.ARGB;
+			fi.fileType = FileInfoXYZ.ARGB;
 		else if (imageType.equals("32-bit ABGR"))
-			fi.fileType = FileInfo.ABGR;
+			fi.fileType = FileInfoXYZ.ABGR;
 		else if (imageType.equals("1-bit Bitmap"))
-			fi.fileType = FileInfo.BITMAP;
+			fi.fileType = FileInfoXYZ.BITMAP;
 		else
-			fi.fileType = FileInfo.GRAY8;
+			fi.fileType = FileInfoXYZ.GRAY8;
 		if (IJ.debugMode) IJ.log("ImportDialog: "+fi);
-		lastFileInfo = (FileInfo)fi.clone();
+		lastFileInfo = (FileInfoXYZ)fi.clone();
 		return fi;
 	}
 
@@ -247,7 +247,7 @@ public class ImportDialog {
 	
 	/** Returns the FileInfo object used to import the last raw image,
 		or null if a raw image has not been imported. */
-	public static FileInfo getLastFileInfo() {
+	public static FileInfoXYZ getLastFileInfo() {
 		return lastFileInfo;
 	}
 

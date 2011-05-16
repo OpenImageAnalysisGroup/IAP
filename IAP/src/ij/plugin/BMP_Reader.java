@@ -46,8 +46,8 @@ public class BMP_Reader extends ImagePlus implements PlugIn {
                 MemoryImageSource mis = bmp.makeImageSource();
                 if (mis==null) IJ.write("mis=null");
                 Image img = Toolkit.getDefaultToolkit().createImage(mis);
-                FileInfo fi = new FileInfo();
-                fi.fileFormat = FileInfo.BMP;
+                FileInfoXYZ fi = new FileInfoXYZ();
+                fi.fileFormat = FileInfoXYZ.BMP;
                 fi.fileName = name;
                 fi.directory = directory;
                 setImage(img);

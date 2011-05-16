@@ -1378,18 +1378,18 @@ public class Functions implements MacroConstants, Measurements {
 				return getWindowContents();
 			} else if (key.equals("image.description")) {
 				String description = "";
-				FileInfo fi = getImage().getOriginalFileInfo();
+				FileInfoXYZ fi = getImage().getOriginalFileInfo();
 				if (fi!=null) description = fi.description;
 				if  (description==null) description = "";
 				return description;
 			} else if (key.equals("image.filename")) {
 				String name= "";
-				FileInfo fi = getImage().getOriginalFileInfo();
+				FileInfoXYZ fi = getImage().getOriginalFileInfo();
 				if (fi!=null && fi.fileName!=null) name= fi.fileName;
 				return name;
 			} else if (key.equals("image.directory")) {
 				String dir= "";
-				FileInfo fi = getImage().getOriginalFileInfo();
+				FileInfoXYZ fi = getImage().getOriginalFileInfo();
 				if (fi!=null && fi.directory!=null) dir= fi.directory;
 				return dir;
 			} else if (key.equals("selection.name")||key.equals("roi.name")) {

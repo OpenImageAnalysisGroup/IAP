@@ -198,7 +198,7 @@ public class Info implements PlugInFilter {
 	    } else
 	    	s += "Uncalibrated\n";
 
-	    FileInfo fi = imp.getOriginalFileInfo();
+	    FileInfoXYZ fi = imp.getOriginalFileInfo();
 		if (fi!=null) {
 			if (fi.url!=null && !fi.url.equals(""))
 				s += "URL: " + fi.url + "\n";

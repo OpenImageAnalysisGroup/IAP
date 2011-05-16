@@ -3,7 +3,7 @@ import ij.process.*;
 import ij.gui.*;
 import ij.plugin.*;
 import ij.plugin.frame.*;
-import ij.io.FileInfo;
+import ij.io.FileInfoXYZ;
 import java.awt.*;
 import java.awt.image.*;
 
@@ -73,7 +73,7 @@ public class CompositeImage extends ImagePlus {
 			setDimensions(channels, z, t);
 		setStack(imp.getTitle(), stack2);
 		setCalibration(imp.getCalibration());
-		FileInfo fi = imp.getOriginalFileInfo();
+		FileInfoXYZ fi = imp.getOriginalFileInfo();
 		if (fi!=null) {
 			displayRanges = fi.displayRanges; 
 			channelLuts = fi.channelLuts;

@@ -2,7 +2,7 @@ package de.ipk.ag_ba.image.utils;
 
 import ij.ImagePlus;
 import ij.VirtualStack;
-import ij.io.FileInfo;
+import ij.io.FileInfoXYZ;
 import ij.io.FileSaver;
 import ij.io.RoiEncoder;
 import ij.io.TiffEncoder;
@@ -26,7 +26,7 @@ public class MyFileSaver extends FileSaver {
 			return false;
 		}
 		if (imp.getStack().isVirtual())
-			fi.virtualStack = (VirtualStack) imp.getStack();
+			fi.virtualStackXYZ = (VirtualStack) imp.getStack();
 		Object info = imp.getProperty("Info");
 		if (info != null && (info instanceof String))
 			fi.info = (String) info;
@@ -45,7 +45,7 @@ public class MyFileSaver extends FileSaver {
 			ErrorMsg.addErrorMessage(e);
 			return false;
 		}
-		updateImp(fi, FileInfo.TIFF);
+		updateImp(fi, FileInfoXYZ.TIFF);
 		return true;
 	}
 }

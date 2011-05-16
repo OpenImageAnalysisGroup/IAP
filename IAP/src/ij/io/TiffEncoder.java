@@ -8,7 +8,7 @@ public class TiffEncoder {
 	static final int BPS_DATA_SIZE = 6;
 	static final int SCALE_DATA_SIZE = 16;
 		
-	private FileInfo fi;
+	private FileInfoXYZ fi;
 	private int bitsPerSample;
 	private int photoInterp;
 	private int samplesPerPixel;
@@ -27,7 +27,7 @@ public class TiffEncoder {
 	private boolean littleEndian = ij.Prefs.intelByteOrder;
 	private byte buffer[] = new byte[8];
 		
-	public TiffEncoder (FileInfo fi) {
+	public TiffEncoder (FileInfoXYZ fi) {
 		this.fi = fi;
 		fi.intelByteOrder = littleEndian;
 		bitsPerSample = 8;
@@ -38,27 +38,27 @@ public class TiffEncoder {
 		int colorMapSize = 0;
 
 		switch (fi.fileType) {
-			case FileInfo.GRAY8:
+			case FileInfoXYZ.GRAY8:
 				photoInterp = fi.whiteIsZero?0:1;
 				break;
-			case FileInfo.GRAY16_UNSIGNED:
-			case FileInfo.GRAY16_SIGNED:
+			case FileInfoXYZ.GRAY16_UNSIGNED:
+			case FileInfoXYZ.GRAY16_SIGNED:
 				bitsPerSample = 16;
 				photoInterp = fi.whiteIsZero?0:1;
 				bytesPerPixel = 2;
 				break;
-			case FileInfo.GRAY32_FLOAT:
+			case FileInfoXYZ.GRAY32_FLOAT:
 				bitsPerSample = 32;
 				photoInterp = fi.whiteIsZero?0:1;
 				bytesPerPixel = 4;
 				break;
-			case FileInfo.RGB:
+			case FileInfoXYZ.RGB:
 				photoInterp = 2;
 				samplesPerPixel = 3;
 				bytesPerPixel = 3;
 				bpsSize = BPS_DATA_SIZE;
 				break;
-			case FileInfo.RGB48:
+			case FileInfoXYZ.RGB48:
 				bitsPerSample = 16;
 				photoInterp = 2;
 				samplesPerPixel = 3;
@@ -66,7 +66,7 @@ public class TiffEncoder {
 				fi.nImages /= 3;
 				bpsSize = BPS_DATA_SIZE;
 				break;
-			case FileInfo.COLOR8:
+			case FileInfoXYZ.COLOR8:
 				photoInterp = 3;
 				nEntries = 10;
 				colorMapSize = MAP_SIZE*2;
@@ -105,13 +105,13 @@ public class TiffEncoder {
         if (nextIFD+fi.nImages*ifdSize>=0xffffffffL)
             nextIFD = 0L;
 		writeIFD(out, (int)imageOffset, (int)nextIFD);
-		if (fi.fileType==FileInfo.RGB||fi.fileType==FileInfo.RGB48)
+		if (fi.fileType==FileInfoXYZ.RGB||fi.fileType==FileInfoXYZ.RGB48)
 			writeBitsPerPixel(out);
 		if (description!=null)
 			writeDescription(out);
 		if (scaleSize>0)
 			writeScale(out);
-		if (fi.fileType==FileInfo.COLOR8)
+		if (fi.fileType==FileInfoXYZ.COLOR8)
 			writeColorMap(out);
 		if (metaDataSize>0)
 			writeMetaData(out);
@@ -260,7 +260,7 @@ public class TiffEncoder {
 		writeEntry(out, TiffDecoder.NEW_SUBFILE_TYPE, 4, 1, 0);
 		writeEntry(out, TiffDecoder.IMAGE_WIDTH, 4, 1, fi.width);
 		writeEntry(out, TiffDecoder.IMAGE_LENGTH, 4, 1, fi.height);
-		if (fi.fileType==FileInfo.RGB||fi.fileType==FileInfo.RGB48) {
+		if (fi.fileType==FileInfoXYZ.RGB||fi.fileType==FileInfoXYZ.RGB48) {
 			writeEntry(out, TiffDecoder.BITS_PER_SAMPLE,  3, 3, tagDataOffset);
 			tagDataOffset += BPS_DATA_SIZE;
 		} else
@@ -289,7 +289,7 @@ public class TiffEncoder {
 			int format = TiffDecoder.FLOATING_POINT;
 			writeEntry(out, TiffDecoder.SAMPLE_FORMAT, 3, 1, format);
 		}
-		if (fi.fileType==FileInfo.COLOR8) {
+		if (fi.fileType==FileInfoXYZ.COLOR8) {
 			writeEntry(out, TiffDecoder.COLOR_MAP, 3, MAP_SIZE, tagDataOffset);
 			tagDataOffset += MAP_SIZE*2;
 		}
@@ -303,7 +303,7 @@ public class TiffEncoder {
 	
 	/** Writes the 6 bytes of data required by RGB BitsPerSample tag. */
 	void writeBitsPerPixel(OutputStream out) throws IOException {
-		int bitsPerPixel = fi.fileType==FileInfo.RGB48?16:8;
+		int bitsPerPixel = fi.fileType==FileInfoXYZ.RGB48?16:8;
 		writeShort(out, bitsPerPixel);
 		writeShort(out, bitsPerPixel);
 		writeShort(out, bitsPerPixel);

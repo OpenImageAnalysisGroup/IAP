@@ -165,7 +165,7 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages()) {
 							
-							ImageProcessorOptions options = new ImageProcessorOptions();
+							ImageProcessorOptions options = new ImageProcessorOptions(vis, fluo, nir);
 							
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(options);
 							
