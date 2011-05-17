@@ -1577,6 +1577,17 @@ public class ImageOperation extends ImageConverter {
 		return new ImageOperation(bi);
 	}
 	
+	public ImageOperation drawLine(int x1, int y1, int x2, int y2, Color color, float width) {
+		BufferedImage bi = getImage().getAsBufferedImage();
+		Graphics2D g2 = (Graphics2D) bi.getGraphics();
+		
+		g2.setStroke(new BasicStroke(width));
+		g2.setColor(color);
+		g2.drawLine(x1, y1, x2, y2);
+		
+		return new ImageOperation(bi);
+	}
+	
 	public ArrayList<MarkerPair> searchBlueMarkers() {
 		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage());
 		
@@ -1674,5 +1685,20 @@ public class ImageOperation extends ImageConverter {
 		ImageCalculator ic = new ImageCalculator();
 		ImagePlus result = ic.run(param, image, input.getAsImagePlus());
 		return new ImageOperation(result);
+	}
+	
+	public ImageOperation getOriginalImageFromMask(FlexibleImage imageInput, int background) {
+		int[][] originalArray = imageInput.getAs2A();
+		int[][] resultMask = getImageAs2array();
+		
+		for (int i = 0; i < image.getWidth(); i++) {
+			for (int j = 0; j < image.getHeight(); j++) {
+				
+				if (resultMask[i][j] != background)
+					resultMask[i][j] = originalArray[i][j];
+				
+			}
+		}
+		return new ImageOperation(new FlexibleImage(resultMask));
 	}
 }
