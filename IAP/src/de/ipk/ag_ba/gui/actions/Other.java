@@ -192,12 +192,12 @@ public class Other {
 				if (!rBA03)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
-				boolean rNW04 = IAPservice.isReachable("nw-04.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new PortScanAction("NW-04",
-									simpleIcons ? (rNW04 ? pc : pcOff) : "img/ext/pc.png"), src
-									.getGUIsetting()));
-				if (!rNW04)
-					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+				// boolean rNW04 = IAPservice.isReachable("nw-04.ipk-gatersleben.de");
+				// resultNavigationButtons.add(new NavigationButton(new PortScanAction("NW-04",
+				// simpleIcons ? (rNW04 ? pc : pcOff) : "img/ext/pc.png"), src
+				// .getGUIsetting()));
+				// if (!rNW04)
+				// resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 			}
 			
