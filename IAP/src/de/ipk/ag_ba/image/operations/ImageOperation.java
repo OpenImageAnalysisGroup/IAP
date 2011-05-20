@@ -138,6 +138,22 @@ public class ImageOperation extends ImageConverter {
 				(int) (factor * image.getHeight()));
 	}
 	
+	public ImageOperation convertFluo2intensity() {
+		int[][] in = getImageAs2array();
+		for (int x = 0; x < image.getWidth(); x++)
+			for (int y = 0; y < image.getWidth(); y++) {
+				int c = in[x][y];
+				float rf = (float) (((c & 0xff0000) >> 16) / 255.0); // R 0..1
+				float gf = (float) (((c & 0x00ff00) >> 8) / 255.0); // G 0..1
+				// float bf = (float) ((c & 0x0000ff) / 255.0); // B 0..1
+				float intensity = (rf + gf / 2f) / 255f;
+				if (intensity < 0)
+					intensity = 0;
+				in[x][y] = new Color(intensity, intensity, intensity, 1f).getRGB();
+			}
+		return new ImageOperation(new FlexibleImage(in));
+	}
+	
 	// public void threshold(int cutValue) {
 	// ImageProcessor processor2 = image.getProcessor().convertToByte(true);
 	// ByteProcessor byteProcessor = new BinaryProcessor(
