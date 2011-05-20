@@ -763,7 +763,7 @@ public class LemnaTecDataExchange {
 			optStatus.setCurrentStatusValue(-1);
 		
 		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
+			optStatus.setCurrentStatusText1("Sort measurements (" + measurements.size() + ")");
 		
 		Collections.sort(measurements, new Comparator<NumericMeasurementInterface>() {
 			@Override
@@ -776,6 +776,9 @@ public class LemnaTecDataExchange {
 					return arg0.getQualityAnnotation().compareTo(arg1.getQualityAnnotation());
 			}
 		});
+		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
 		
 		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements, false);
 		
