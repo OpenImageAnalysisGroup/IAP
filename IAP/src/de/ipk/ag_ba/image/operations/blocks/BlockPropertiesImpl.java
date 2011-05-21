@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
+import ij.measure.ResultsTable;
+
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -48,6 +50,14 @@ public class BlockPropertiesImpl implements BlockProperties {
 			store.put(position, new TreeMap<String, Double>());
 		
 		store.get(position).put(name.name(), value);
+	}
+	
+	@Override
+	public void setNumericProperty(int position, String name, double value) {
+		if (!store.containsKey(position))
+			store.put(position, new TreeMap<String, Double>());
+		
+		store.get(position).put(name, value);
 	}
 	
 	@Override
@@ -105,5 +115,16 @@ public class BlockPropertiesImpl implements BlockProperties {
 			}
 		}
 		return result;
+	}
+	
+	@Override
+	public void storeResults(String id_prefix, ResultsTable numericResults, int position) {
+		for (int row = 0; row < numericResults.getCounter(); row++) {
+			for (int col = 0; col < numericResults.getLastColumn(); col++) {
+				String id = numericResults.getColumnHeading(col);
+				double val = numericResults.getValueAsDouble(col, row);
+				setNumericProperty(position, id_prefix + id, val);
+			}
+		}
 	}
 }

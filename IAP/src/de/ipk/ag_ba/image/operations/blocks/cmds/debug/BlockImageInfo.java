@@ -41,9 +41,9 @@ public class BlockImageInfo extends AbstractSnapshotAnalysisBlockFIS {
 		printInfo(getInput().getImages().getNir(), BlockPrintInfosTyp.NirImage);
 	}
 	
-	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp typ) {
+	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp type) {
 		
-		switch (typ) {
+		switch (type) {
 			case FluoImage:
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.HEIGHT_FLUO_IMAGE, workImage.getHeight());
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.WIDTH_FLUO_IMAGE, workImage.getWidth());
@@ -73,18 +73,18 @@ public class BlockImageInfo extends AbstractSnapshotAnalysisBlockFIS {
 		
 		if (infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT)) {
 			
-			if (typ.name().contains("Vis") && infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT_VIS) ||
-					typ.name().contains("Fluo") && infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT_FLUO) ||
-					typ.name().contains("Nir") && infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT_NIR)) {
+			if (type.name().contains("Vis") && infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT_VIS) ||
+					type.name().contains("Fluo") && infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT_FLUO) ||
+					type.name().contains("Nir") && infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT_NIR)) {
 				
-				System.out.println(typ + " - Infos: ##### Start #####");
+				System.out.println(type + " - Infos: ##### Start #####");
 				
 				if (infoMap.get(BlockInfoProperty.HEIGHT))
 					System.out.println("height: " + workImage.getHeight());
 				if (infoMap.get(BlockInfoProperty.WIDTH))
 					System.out.println("width: " + workImage.getWidth());
 				
-				System.out.println(typ + " - Infos: **** End ****");
+				System.out.println(type + " - Infos: **** End ****");
 			}
 		}
 	}
