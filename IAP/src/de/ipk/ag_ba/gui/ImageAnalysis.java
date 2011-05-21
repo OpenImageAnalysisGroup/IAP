@@ -35,7 +35,6 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.ipk.ag_ba.gui.actions.analysis.ActionPhenotypeAnalysis;
 import de.ipk.ag_ba.gui.actions.analysis.ActionPhytochamberAnalysis;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
@@ -51,14 +50,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 @SuppressWarnings("restriction")
 public class ImageAnalysis {
 	
-	public static NavigationButton getPhenotypingEntity(final MongoDB m,
-						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
-		
-		NavigationAction phenotypeAnalysisAction = new ActionPhenotypeAnalysis(m, epsilon, epsilon2, experiment);
-		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
-		return resultTaskButton;
-	}
-	
 	public static NavigationButton getPhytochamberEntity(final MongoDB m,
 						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 		
@@ -70,7 +61,7 @@ public class ImageAnalysis {
 	public static NavigationButton getMaizeEntity(final MongoDB m,
 			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 		
-		NavigationAction maizeAnalysisAction = new MaizeAnalysisAction(m, epsilon, epsilon2, experiment);
+		NavigationAction maizeAnalysisAction = new MaizeAnalysisAction(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(maizeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}

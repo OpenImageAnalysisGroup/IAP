@@ -1825,9 +1825,7 @@ public class ImageOperation {
 		return new ImageOperation(img2d);
 	}
 	
-	public ImageOperation clearMiddle(double d, double e, int background) {
-		int x1 = (int) (image.getWidth() / 2 + image.getWidth() * d);
-		int x2 = (int) (image.getWidth() / 2 + image.getWidth() * e);
-		return cutArea(x1, 0, x2 - x1, getImage().getHeight(), background, false);
+	public CompareImageGenerator compare() {
+		return new CompareImageGenerator(getImage());
 	}
 }

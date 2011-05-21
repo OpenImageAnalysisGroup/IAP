@@ -522,10 +522,10 @@ public class MongoDB {
 			for (DBObject substance : dbSubstances)
 				substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 		
-		if (status == null || (status != null && !status.wantsToStop()))
+		if (status != null || (status != null && !status.wantsToStop()))
 			status.setCurrentStatusText1("Determine Size");
 		long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
-		if (status == null || (status != null && !status.wantsToStop()))
+		if (status != null || (status != null && !status.wantsToStop()))
 			status.setCurrentStatusText1("Finalize Storage");
 		
 		// l = overallFileSize.getLong(); // in case of update the written bytes are not the right size

@@ -13,14 +13,12 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class CompareImageGenerator {
 	
 	private final FlexibleImage inputImage;
-	private final FlexibleImage referenceImage;
 	
-	public CompareImageGenerator(FlexibleImage input, FlexibleImage zeroImage) {
+	public CompareImageGenerator(FlexibleImage input) {
 		this.inputImage = input;
-		this.referenceImage = zeroImage;
 	}
 	
-	public FlexibleImage compareImages(double lDiffA, double lDiffB, double abDiff, int background, boolean green, boolean yellow) {
+	public ImageOperation compareImages(FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background, boolean green, boolean yellow) {
 		
 		// inputImage = new ImageOperation(inputImage).blur(1).getImage();
 		// referenceImage = new ImageOperation(referenceImage).blur(2).getImage();
@@ -69,14 +67,7 @@ public class CompareImageGenerator {
 				result[index] = imgInp[index];
 			}
 		}
-		return new FlexibleImage(result, width, height);
+		return new ImageOperation(new FlexibleImage(result, width, height));
 	}
 	
-	public FlexibleImage getInput() {
-		return inputImage;
-	}
-	
-	public FlexibleImage getZeroImage() {
-		return referenceImage;
-	}
 }

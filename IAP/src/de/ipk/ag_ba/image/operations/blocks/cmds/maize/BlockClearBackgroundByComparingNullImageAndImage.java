@@ -3,32 +3,37 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
-import java.awt.Color;
-
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
-import de.ipk.ag_ba.image.operations.CompareImageGenerator;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * @author pape, klukas
  */
 public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSnapshotAnalysisBlockFIS {
 	
-	int back = Color.WHITE.getRGB();
+	int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
-			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getVis(), getInput().getMasks().getVis());
-			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_VIS), options.getIntSetting(Setting.L_Diff_VIS),
-					options.getIntSetting(Setting.abDiff_VIS), back, true, false));
+			return new ImageOperation(getInput().getImages().getVis()).compare()
+					.compareImages(getInput().getMasks().getVis(),
+							options.getIntSetting(Setting.L_Diff_VIS),
+							options.getIntSetting(Setting.L_Diff_VIS),
+							options.getIntSetting(Setting.abDiff_VIS),
+							back, true, false).getImage();
 		}
 		if (options.getCameraTyp() == CameraTyp.TOP) {
-			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getVis(), getInput().getMasks().getVis());
-			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_VIS), options.getIntSetting(Setting.L_Diff_VIS),
-					options.getIntSetting(Setting.abDiff_VIS), back, true, false));
+			return new ImageOperation(getInput().getImages().getVis()).compare()
+					.compareImages(getInput().getMasks().getVis(),
+							options.getIntSetting(Setting.L_Diff_VIS),
+							options.getIntSetting(Setting.L_Diff_VIS),
+							options.getIntSetting(Setting.abDiff_VIS),
+							back, true, false).getImage();
 		}
 		throw new UnsupportedOperationException("Unknown camera setting.");
 	}
@@ -36,14 +41,20 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
-			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getFluo(), getInput().getMasks().getFluo());
-			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_FLOU), options.getIntSetting(Setting.L_Diff_FLOU),
-					options.getIntSetting(Setting.abDiff_FLOU), back, false, true));
+			return new ImageOperation(getInput().getImages().getFluo()).compare()
+					.compareImages(getInput().getMasks().getFluo(),
+							options.getIntSetting(Setting.L_Diff_FLOU),
+							options.getIntSetting(Setting.L_Diff_FLOU),
+							options.getIntSetting(Setting.abDiff_FLOU),
+							back, false, true).getImage();
 		}
 		if (options.getCameraTyp() == CameraTyp.TOP) {
-			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getFluo(), getInput().getMasks().getFluo());
-			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_FLOU), options.getIntSetting(Setting.L_Diff_FLOU),
-					options.getIntSetting(Setting.abDiff_FLOU), back, false, true));
+			return new ImageOperation(getInput().getImages().getFluo()).compare()
+					.compareImages(getInput().getMasks().getFluo(),
+							options.getIntSetting(Setting.L_Diff_FLOU),
+							options.getIntSetting(Setting.L_Diff_FLOU),
+							options.getIntSetting(Setting.abDiff_FLOU),
+							back, false, true).getImage();
 		}
 		throw new UnsupportedOperationException("Unknown camera setting.");
 	}
@@ -51,14 +62,20 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 	@Override
 	protected FlexibleImage processNIRmask() {
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
-			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getNir(), getInput().getMasks().getNir());
-			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_NIR), options.getIntSetting(Setting.L_Diff_NIR),
-					options.getIntSetting(Setting.abDiff_NIR), back, false, false));
+			return new ImageOperation(getInput().getImages().getNir()).compare()
+					.compareImages(getInput().getMasks().getNir(),
+							options.getIntSetting(Setting.L_Diff_NIR),
+							options.getIntSetting(Setting.L_Diff_NIR),
+							options.getIntSetting(Setting.abDiff_NIR),
+							back, false, false).getImage();
 		}
 		if (options.getCameraTyp() == CameraTyp.TOP) {
-			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getNir(), getInput().getMasks().getNir());
-			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_NIR), options.getIntSetting(Setting.L_Diff_NIR),
-					options.getIntSetting(Setting.abDiff_NIR), back, false, false));
+			return new ImageOperation(getInput().getImages().getNir()).compare()
+					.compareImages(getInput().getMasks().getNir(),
+							options.getIntSetting(Setting.L_Diff_NIR),
+							options.getIntSetting(Setting.L_Diff_NIR),
+							options.getIntSetting(Setting.abDiff_NIR),
+							back, false, false).getImage();
 		}
 		throw new UnsupportedOperationException("Unknown camera setting.");
 	}

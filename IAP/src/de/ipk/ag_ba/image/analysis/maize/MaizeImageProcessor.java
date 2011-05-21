@@ -18,7 +18,7 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 /**
  * @author pape, klukas, entzian
  */
-public class MaizeImageProcessor {
+public class MaizeImageProcessor implements ImageProcessor {
 	
 	private final ImageProcessorOptions options;
 	private final BlockProperties settings;
@@ -43,6 +43,12 @@ public class MaizeImageProcessor {
 		return pipeline(input, null, maxThreadsPerImage, debugStack, automaticParameterSearch, cropResult);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.image.analysis.maize.ImageProcessor#pipeline(de.ipk.ag_ba.image.structures.FlexibleImageSet,
+	 * de.ipk.ag_ba.image.structures.FlexibleImageSet, int, de.ipk.ag_ba.image.structures.FlexibleImageStack, boolean, boolean)
+	 */
+	@Override
 	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, FlexibleImageSet optInputMasks, int maxThreadsPerImage, FlexibleImageStack debugStack,
 			boolean automaticParameterSearch,
 			boolean cropResult)
@@ -85,6 +91,11 @@ public class MaizeImageProcessor {
 		return result;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.image.analysis.maize.ImageProcessor#getSettings()
+	 */
+	@Override
 	public BlockProperties getSettings() {
 		return settings;
 	}
