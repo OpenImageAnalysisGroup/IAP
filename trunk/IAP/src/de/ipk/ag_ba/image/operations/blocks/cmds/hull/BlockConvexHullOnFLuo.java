@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
- * Calculates the convex hull for the fluroescence image and stores according data results as numeric
+ * Calculates the convex hull for the fluorescence image and stores according data results as numeric
  * values (size of hull, centroid). The complex hull, the image borders and the centroid are drawn
  * on the result (input and result is the fluo mask).
  * 

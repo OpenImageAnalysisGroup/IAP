@@ -7,6 +7,9 @@
 
 package de.ipk.ag_ba.gui.actions;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * @author klukas
  */
@@ -82,5 +85,21 @@ public enum ImageConfiguration {
 			return ImageConfiguration.NirSide;
 		
 		return Unknown;
+	}
+	
+	public static Collection<ImageConfiguration> getTopImageTypes() {
+		Collection<ImageConfiguration> res = new ArrayList<ImageConfiguration>();
+		res.add(RgbTop);
+		res.add(FluoTop);
+		res.add(NirTop);
+		return res;
+	}
+	
+	public static Collection<ImageConfiguration> getSideImageTypes() {
+		Collection<ImageConfiguration> res = new ArrayList<ImageConfiguration>();
+		res.add(RgbSide);
+		res.add(FluoSide);
+		res.add(NirSide);
+		return res;
 	}
 }
