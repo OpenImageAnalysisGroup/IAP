@@ -38,6 +38,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
+import de.ipk.ag_ba.image.operations.complex_hull.ComplexHullCalculator;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -54,15 +55,20 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  * @author Entzian, Klukas, Pape
  */
 
-public class ImageOperation extends ImageConverter {
+public class ImageOperation {
 	
-	private final ImagePlus image;
-	private ResultsTable rt;
+	protected final ImagePlus image;
+	protected ResultsTable rt;
 	
 	// private Roi boundingBox;
 	
 	public ImageOperation(ImagePlus image) {
 		this.image = image;
+	}
+	
+	public ImageOperation(ImagePlus image, ResultsTable resultTable) {
+		this.image = image;
+		this.rt = resultTable;
 	}
 	
 	public ImageOperation(BufferedImage image) {
@@ -71,6 +77,10 @@ public class ImageOperation extends ImageConverter {
 	
 	public ImageOperation(FlexibleImage image) {
 		this(image.getAsImagePlus());
+	}
+	
+	public ImageOperation(FlexibleImage image, ResultsTable resultTable) {
+		this(image.getAsImagePlus(), resultTable);
 	}
 	
 	public ImageOperation(int[] image, int width, int height) {
@@ -156,6 +166,10 @@ public class ImageOperation extends ImageConverter {
 				in[x][y] = new Color(intensity, intensity, intensity, 1f).getRGB();
 			}
 		return new ImageOperation(new FlexibleImage(in));// .dilate();
+	}
+	
+	public ComplexHullCalculator hull() {
+		return new ComplexHullCalculator(this);
 	}
 	
 	// public void threshold(int cutValue) {
@@ -539,107 +553,6 @@ public class ImageOperation extends ImageConverter {
 					imgArr[x][y] = iBackgroundFill;
 			}
 		return new ImageOperation(imgArr);
-	}
-	
-	/**
-	 * TODO: not yet implemented
-	 */
-	@Deprecated
-	public Dimension2D centerOfGravity() {
-		
-		int[][] img = ImageConverter.convertIJto2A(image);
-		
-		// int [][] img = new int[5][5];
-		// for(int i = 0 ; i < 5; i++)
-		// for(int j = 0; j < 5; j++)
-		// img[i][j] = i*j;
-		
-		// int[][] img = { { 1, 1, 1, 1, 1, 1, 1 },
-		// { 1, 1, 1, 1, 1, 1, 1 },
-		// { 1, 1, 1, 1, 1, 1, 1 },
-		// { 1, 1, 1, 1, 1, 1, 1 },
-		// { 1, 1, 1, 1, 1, 1, 1 }};
-		
-		// int[][] img = { { 1, 1, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 }};
-		
-		// int[][] img = { { 0, 0, 1, 1, 1, 0, 0 },
-		// { 0, 0, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 }};
-		
-		// int[][] img = { { 0, 0, 1, 1, 1, 0, 0 },
-		// { 0, 0, 1, 1, 1, 0, 0 },
-		// { 0, 0, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 }};
-		
-		// int[][] img = { { 0, 0, 1, 1, 1, 0, 0 },
-		// { 0, 0, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 1, 1, 0, 0 },
-		// { 1, 1, 1, 0, 0, 0, 0 },
-		// { 1, 1, 1, 0, 0, 0, 0 }};
-		
-		// int[][] img = { { 0, 0, 0, 0, 1, 1, 1 },
-		// { 0, 0, 0, 0, 1, 1, 1 },
-		// { 1, 1, 1, 0, 1, 1, 1 },
-		// { 1, 1, 1, 0, 0, 0, 0 },
-		// { 1, 1, 1, 0, 0, 0, 0 }};
-		
-		// int[][] img = { { 0, 0, 0, 0, 0, 0, 0 },
-		// { 0, 0, 0, 0, 0, 0, 0 },
-		// { 1, 1, 1, 0, 1, 1, 1 },
-		// { 1, 1, 1, 0, 1, 1, 1 },
-		// { 1, 1, 1, 0, 1, 1, 1 }};
-		//
-		// int[][] img = { { 0, 1, 1, 0, 1, 0, 1, 0 },
-		// { 1, 1, 0, 0, 1, 1, 1, 0 },
-		// { 0, 1, 1, 1, 1, 0, 1, 0 },
-		// { 0, 0, 0, 0, 0, 1, 1, 0 },
-		// { 0, 1, 1, 1, 0, 0, 0, 1 },
-		// { 1, 1, 1, 1, 1, 0, 0, 0 } };
-		//
-		
-		// PrintImage.printImage(getImageAs2array(), PrintOption.CONSOLE);
-		// threshold(254);
-		// PrintImage.printImage(getImageAs2array(), PrintOption.CONSOLE);
-		double area = 0;
-		double firstMomentOfAreaJ = 0;
-		double firstMomentOfAreaI = 0;
-		double centreOfGravityJ = 0;
-		double centreOfGravityI = 0;
-		Dimension2D centerPoint = null;
-		
-		for (int i = 0; i < img.length; i++) {
-			for (int j = 0; j < img[0].length; j++) {
-				area = area + img[i][j];
-				firstMomentOfAreaI = firstMomentOfAreaI + (double) (i + 1)
-						* img[i][j];
-				firstMomentOfAreaJ = firstMomentOfAreaJ + (double) (j + 1)
-						* img[i][j];
-			}
-		}
-		
-		if (area != 0) {
-			centreOfGravityJ = (firstMomentOfAreaJ / area) - 1;
-			centreOfGravityI = (firstMomentOfAreaI / area) - 1;
-			
-		}
-		
-		// drawAndFillRect((int) centreOfGravityI - 5, (int) centreOfGravityJ -
-		// 5, 10, 10, 200);
-		
-		// System.out.println("SchwerpunktX: " + centreOfGravityI);
-		// System.out.println("SchwerpunktY: " + centreOfGravityJ);
-		
-		centerPoint.setSize(centreOfGravityI, centreOfGravityJ);
-		return centerPoint;
-		// return new Dimension2D(centreOfGravityI, centreOfGravityJ);
-		// return new Point2D.Double(centreOfGravityI, centreOfGravityJ);
 	}
 	
 	/**
@@ -1711,14 +1624,19 @@ public class ImageOperation extends ImageConverter {
 		int[][] originalArray = imageInput.getAs2A();
 		int[][] resultMask = getImageAs2array();
 		
-		for (int i = 0; i < image.getWidth(); i++) {
-			for (int j = 0; j < image.getHeight(); j++) {
+		for (int x = 0; x < image.getWidth(); x++) {
+			for (int y = 0; y < image.getHeight(); y++) {
 				
-				if (resultMask[i][j] != background)
-					resultMask[i][j] = originalArray[i][j];
+				if (resultMask[x][y] != background)
+					resultMask[x][y] = originalArray[x][y];
 				
 			}
 		}
 		return new ImageOperation(new FlexibleImage(resultMask));
 	}
+	
+	public BorderImageOperation border() {
+		return new BorderImageOperation(this);
+	}
+	
 }
