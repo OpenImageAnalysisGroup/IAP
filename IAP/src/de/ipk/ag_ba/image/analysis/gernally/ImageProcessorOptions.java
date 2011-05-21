@@ -158,7 +158,7 @@ public class ImageProcessorOptions {
 	private NeighbourhoodSetting neighbourhood;
 	
 	public enum CameraTyp {
-		TOP, SIDE
+		UNKNOWN, TOP, SIDE
 	}
 	
 	public enum ImageTyp {
@@ -167,7 +167,7 @@ public class ImageProcessorOptions {
 	
 	public void initStandardValues(double scale) {
 		
-		setCameraTyp(CameraTyp.TOP);
+		setCameraTyp(CameraTyp.UNKNOWN);
 		setNeighbourhood(NeighbourhoodSetting.NB4);
 		
 		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB, (0.001d) / 3);

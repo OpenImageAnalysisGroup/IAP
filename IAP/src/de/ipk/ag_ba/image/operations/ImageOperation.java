@@ -15,6 +15,7 @@ import ij.process.ImageProcessor;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Line2D;
@@ -23,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +32,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import org.ObjectRef;
+import org.ReleaseInfo;
 import org.Vector2d;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
@@ -43,6 +46,7 @@ import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -100,6 +104,10 @@ public class ImageOperation {
 		setResultsTable(rt);
 	}
 	
+	/**
+	 * Moves the image content. New clear regions are recolored to the
+	 * background color.
+	 */
 	public ImageOperation translate(double x, double y) {
 		image.getProcessor().translate(x, y);
 		return new ImageOperation(getImage())
@@ -122,12 +130,21 @@ public class ImageOperation {
 				.getHeight());
 	}
 	
+	/**
+	 * Rotates the image content. New clear regions are recolored to the
+	 * background color.
+	 */
 	public ImageOperation rotate(double degree) {
 		image.getProcessor().rotate(degree);
 		return new ImageOperation(getImage())
 				.replaceColors(Color.BLACK.getRGB(),
 						PhenotypeAnalysisTask.BACKGROUND_COLORint);
 	}
+	
+	/**
+	 * Scales the image content. New clear regions are recolored to the
+	 * background color.
+	 */
 	
 	public ImageOperation scale(double xScale, double yScale) {
 		image.getProcessor().scale(xScale, yScale);
@@ -136,6 +153,9 @@ public class ImageOperation {
 						PhenotypeAnalysisTask.BACKGROUND_COLORint);
 	}
 	
+	/**
+	 * Scales the image itself. See method scale to scale the content but not the image itself.
+	 */
 	public ImageOperation resize(int width, int height) {
 		ImageProcessor p = image.getProcessor().resize(width, height);
 		image.setProcessor(p);
@@ -143,6 +163,9 @@ public class ImageOperation {
 		return new ImageOperation(getImage());
 	}
 	
+	/**
+	 * Scales the image itself according to the given factor.
+	 */
 	public ImageOperation resize(double factor) {
 		return resize((int) (factor * image.getWidth()),
 				(int) (factor * image.getHeight()));
@@ -352,11 +375,19 @@ public class ImageOperation {
 	 * Erosion, then dilation. Removes small objects in the mask.
 	 * <p>
 	 * The closing of the dark-blue shape (union of two squares) by a disk, resulting in the union of the dark-blue shape and the light-blue areas:<br>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Closing.png/220px-Closing.png" >
+	 * <br>
+	 * <img src= "http://upload.wikimedia.org/wikipedia/commons/a/a2/MorphologicalClosing.png" >
 	 */
 	public void closing() { // es wird der 3x3 Minimum-Filter genutzt
 		image.getProcessor().dilate();
 		image.getProcessor().erode();
+	}
+	
+	public ImageOperation closing1() { // es wird der 3x3 Minimum-Filter genutzt
+		image.getProcessor().dilate();
+		image.getProcessor().erode();
+		
+		return new ImageOperation(image);
 	}
 	
 	/**
@@ -368,6 +399,22 @@ public class ImageOperation {
 	public void opening(int[][] mask) {
 		erode(mask);
 		dilate(mask);
+	}
+	
+	public ImageOperation opening(int[][] mask, int n) {
+		for (int i = 0; i < n; i++)
+			erode(mask);
+		for (int i = 0; i < n; i++)
+			dilate(mask);
+		return this;
+	}
+	
+	public ImageOperation opening(int[][] mask, int n1, int n2) {
+		for (int i = 0; i < n1; i++)
+			erode(mask);
+		for (int i = 0; i < n2; i++)
+			dilate(mask);
+		return this;
 	}
 	
 	/**
@@ -393,6 +440,14 @@ public class ImageOperation {
 		for (int i = 0; i < n; i++)
 			image.getProcessor().erode();
 		for (int i = 0; i < n; i++)
+			image.getProcessor().dilate();
+		return this;
+	}
+	
+	public ImageOperation opening(int n1, int n2) {
+		for (int i = 0; i < n1; i++)
+			image.getProcessor().erode();
+		for (int i = 0; i < n2; i++)
 			image.getProcessor().dilate();
 		return this;
 	}
@@ -522,22 +577,37 @@ public class ImageOperation {
 		image.getProcessor().draw(boundingBox);
 	}
 	
-	public ImageOperation cutArea(Roi boundingBox) {
+	/**
+	 * Needs to be tested. Where and how to use.
+	 * 
+	 * @author entzian
+	 */
+	public ImageOperation cutAreaBoundingBox(Roi boundingBox) {
 		image.getProcessor().setRoi(boundingBox);
 		return new ImageOperation(image.getProcessor().crop()
 				.getBufferedImage());
 	}
 	
-	public ImageOperation cutAreaWorking(int bx, int by, int bw, int bh,
+	public ImageOperation cutArea(int bx, int by, int bw, int bh,
 			int iBackgroundFill) {
+		return cutArea(bx, by, bw, bh, iBackgroundFill, true);
+	}
+	
+	public ImageOperation cutArea(int bx, int by, int bw, int bh,
+			int iBackgroundFill, boolean clearOutsideTrue_insideFalse) {
 		int[][] imgArr = new FlexibleImage(image).getAs2A();
 		int bx2 = bx + bw;
 		int by2 = by + bh;
 		for (int x = 0; x < image.getWidth(); x++)
 			for (int y = 0; y < image.getHeight(); y++) {
 				boolean inside = x >= bx && x < bx2 && y >= by && y < by2;
-				if (!inside)
-					imgArr[x][y] = iBackgroundFill;
+				if (clearOutsideTrue_insideFalse) {
+					if (!inside)
+						imgArr[x][y] = iBackgroundFill;
+				} else {
+					if (inside)
+						imgArr[x][y] = iBackgroundFill;
+				}
 			}
 		return new ImageOperation(imgArr);
 	}
@@ -555,14 +625,11 @@ public class ImageOperation {
 		return new ImageOperation(imgArr);
 	}
 	
-	/**
-	 * TODO: not yet implemented
-	 */
 	@Deprecated
 	public Dimension2D getDiameter() {
 		
 		Dimension2D dimension = null;
-		double minArea = 1000000000000000.0;
+		double minArea = java.lang.Double.MAX_VALUE;
 		
 		double width = 0, hight = 0;
 		
@@ -652,19 +719,32 @@ public class ImageOperation {
 	// ############# print #####################
 	
 	public void printImage() {
-		image.updateAndDraw();
-		image.show();
+		new FlexibleImage(image).print(SystemAnalysisExt.getCurrentTime());
+	}
+	
+	public ImageOperation printImage(String title) {
+		new FlexibleImage(image).copy().print(title);
+		return this;
 	}
 	
 	// ############# save ######################
 	
-	public void saveImage() {
-		saveImage("/Users/" + System.getProperty("user.name")
-				+ "/Desktop/test.png");
+	/**
+	 * Saves the file on the users desktop.
+	 */
+	public ImageOperation saveImageOnDesktop(String fileName) {
+		return saveImage(ReleaseInfo.getDesktopFolder() + File.separator + fileName);
 	}
 	
-	public void saveImage(String pfad) {
-		saveImage(pfad, SaveImage.PNG);
+	/**
+	 * Saves the image as an PNG.
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	public ImageOperation saveImage(String fileName) {
+		saveImage(fileName, SaveImage.PNG);
+		return this;
 	}
 	
 	public void saveImage(String pfad, SaveImage typ) {
@@ -1004,7 +1084,7 @@ public class ImageOperation {
 	public ImageOperation blur(double radius) {
 		GaussianBlur gb = new GaussianBlur();
 		gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
-		return new ImageOperation(getImage());
+		return new ImageOperation(new FlexibleImage(getImage().getAs2A()));
 	}
 	
 	public static FlexibleImage removeSmallPartsOfImage(
@@ -1302,6 +1382,9 @@ public class ImageOperation {
 		double ot = 1 / 3.0, cont = 16 / 116.0;
 		int Li, ai, bi;
 		
+		int[][] resultImage = new int[image.getWidth()][image.getHeight()];
+		int[][] img2d = getImageAs2array();
+		
 		for (y = 0; y < ye; y++) {
 			for (x = 0; x < xe; x++) {
 				c = image.getProcessor().getPixel(x, y);
@@ -1352,17 +1435,13 @@ public class ImageOperation {
 				
 				if ((Li > lowerValueOfL) && (Li < upperValueOfL) && (ai > lowerValueOfA) && (ai < upperValueOfA)
 						&& (bi > lowerValueOfB) && (bi < upperValueOfB)) {
-					image.getProcessor().putPixel(
-							x,
-							y,
-							((Li & 0xff) << 16) + ((ai & 0xff) << 8)
-									+ (bi & 0xff));
+					resultImage[x][y] = img2d[x][y];
 				} else {
-					image.getProcessor().putPixel(x, y, background);
+					resultImage[x][y] = background;
 				}
 			}
 		}
-		return new ImageOperation(getImage());
+		return new ImageOperation(resultImage);
 	}
 	
 	public ImageOperation medianFilter32Bit() {
@@ -1390,14 +1469,27 @@ public class ImageOperation {
 	}
 	
 	/**
+	 * (Source: ImageJ java doc)
+	 * Here the processing is done: Find the maxima of an image (does not find minima).
+	 * 
+	 * @param ip
+	 *           The input image
 	 * @param tolerance
+	 *           Height tolerance: maxima are accepted only if protruding more than this value
+	 *           from the ridge to a higher maximum
 	 * @param threshold
+	 *           minimum height of a maximum (uncalibrated); for no minimum height set it to
+	 *           ImageProcessor.NO_THRESHOLD
 	 * @param outputType
-	 *           0 - Maxima as single pixel (255)
+	 *           What to mark in output image: SINGLE_POINTS, IN_TOLERANCE or SEGMENTED.
+	 *           No output image is created for output types POINT_SELECTION, LIST and COUNT.
 	 * @param excludeOnEdges
+	 *           Whether to exclude edge maxima
 	 * @param isEDM
-	 * @return Binary Image
-	 * @author pape
+	 *           Whether the image is a float Euclidian Distance Map
+	 * @return A new byteProcessor with a normal (uninverted) LUT where the marked points
+	 *         are set to 255 (Background 0). Pixels outside of the roi of the input ip are not set.
+	 *         Returns null if outputType does not require an output or if cancelled by escape
 	 */
 	public ImageOperation findMax(double tolerance, double threshold,
 			int outputType, boolean excludeOnEdges, boolean isEDM) {
@@ -1406,6 +1498,10 @@ public class ImageOperation {
 		ResultsTable rt = ResultsTable.getResultsTable();
 		synchronized (rt) {
 			rt.reset();
+			
+			// ij.process.ImageConverter co = new ij.process.ImageConverter(image);
+			// co.convertToGray8();
+			
 			ByteProcessor p = find.findMaxima(image.getProcessor(), tolerance,
 					threshold, outputType, excludeOnEdges, isEDM);
 			
@@ -1420,13 +1516,32 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation findMax() {
-		return findMax(50);
+		return findMax(255 / 2);
 	}
 	
+	/**
+	 * (Source: ImageJ java doc)
+	 * Here the processing is done: Find the maxima of an image (does not find minima).
+	 * 
+	 * @param tolerance
+	 *           Height tolerance: maxima are accepted only if protruding more than this value
+	 *           from the ridge to a higher maximum
+	 */
 	public ImageOperation findMax(double tolerance) {
 		return findMax(tolerance, MaximumFinder.COUNT);
 	}
 	
+	/**
+	 * (Source: ImageJ java doc)
+	 * Here the processing is done: Find the maxima of an image (does not find minima).
+	 * 
+	 * @param tolerance
+	 *           Height tolerance: maxima are accepted only if protruding more than this value
+	 *           from the ridge to a higher maximum
+	 * @param outputType
+	 *           What to mark in output image: SINGLE_POINTS, IN_TOLERANCE or SEGMENTED.
+	 *           No output image is created for output types POINT_SELECTION, LIST and COUNT.
+	 */
 	public ImageOperation findMax(double tolerance, int outputType) {
 		return findMax(tolerance, ImageProcessor.NO_THRESHOLD, outputType, false, false);
 	}
@@ -1468,8 +1583,10 @@ public class ImageOperation {
 		return new ImageOperation(new FlexibleImage(bi));
 	}
 	
-	public ImageOperation threshold(int threshold, int rgbForeground,
-			int rgbBackground) {
+	/**
+	 * If pixel (only RGB-Blue!) is below the threshold, the background color is applied, otherwise the foreground color.
+	 */
+	public ImageOperation threshold(int threshold, int background, int foreground) {
 		int[] pixels = getImageAs1array();
 		for (int index = 0; index < pixels.length; index++) {
 			int rgb = pixels[index];
@@ -1479,9 +1596,9 @@ public class ImageOperation {
 			int b = (rgb & 0xff);
 			
 			if (b < threshold)
-				pixels[index] = rgbBackground;
+				pixels[index] = background;
 			else
-				pixels[index] = rgbForeground;
+				pixels[index] = foreground;
 		}
 		return new ImageOperation(pixels, getImage().getWidth(), getImage()
 				.getHeight());
@@ -1524,7 +1641,7 @@ public class ImageOperation {
 	public ArrayList<MarkerPair> searchBlueMarkers() {
 		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage());
 		
-		bmf.findCoordinates();
+		bmf.findCoordinates(PhenotypeAnalysisTask.BACKGROUND_COLORint);
 		
 		ArrayList<MarkerPair> mergedCoordinates = bmf
 				.getResultCoordinates((int) (getImage().getHeight() * 0.05d));
@@ -1555,7 +1672,7 @@ public class ImageOperation {
 				minResult = r;
 		}
 		FlexibleImage imageResult = new FlexibleImage(img);
-		return new MainAxisCalculationResult(imageResult, minResult);
+		return new MainAxisCalculationResult(imageResult, minResult, centroid);
 	}
 	
 	private DistanceSumAndPixelCount distancePointsToLine(int[][] img, Double line, int background) {
@@ -1635,8 +1752,82 @@ public class ImageOperation {
 		return new ImageOperation(new FlexibleImage(resultMask));
 	}
 	
-	public BorderImageOperation border() {
-		return new BorderImageOperation(this);
+	/**
+	 * copy the image into a new image, wich is increase about bordersize
+	 * 
+	 * @param input
+	 * @param bordersize
+	 * @param translatex
+	 * @param translatey
+	 * @param background
+	 *           - color of the border
+	 * @return
+	 */
+	public ImageOperation addBorder(int bordersize, int translatex, int translatey, int background) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+		
+		int[][] img2d = getImageAs2array();
+		int[][] result = new int[width + (2 * bordersize)][height + (2 * bordersize)];
+		
+		result = fillArray(result, background);
+		
+		for (int x = bordersize + translatex; x < (width + bordersize + translatex); x++) {
+			for (int y = bordersize + translatey; y < (height + bordersize + translatey); y++) {
+				result[x][y] = img2d[x - bordersize - translatex][y - bordersize - translatey];
+			}
+		}
+		return new ImageOperation(result);
 	}
 	
+	public int[][] fillArray(int[][] result, int background) {
+		for (int x = 0; x < result.length; x++)
+			for (int y = 0; y < result[0].length; y++)
+				result[x][y] = background;
+		return result;
+	}
+	
+	public Point calculateWidthAndHeight(int background) {
+		int[][] img2d = getImageAs2array();
+		
+		int minX = Integer.MAX_VALUE;
+		int maxX = 0;
+		int minY = Integer.MAX_VALUE;
+		int maxY = 0;
+		
+		for (int x = 0; x < img2d.length; x++) {
+			for (int y = 0; y < img2d[0].length; y++) {
+				if (img2d[x][y] != background && img2d[x][y] != Color.BLACK.getRGB()) {
+					if (x < minX)
+						minX = x;
+					if (x > maxX)
+						maxX = x;
+					if (y < minY)
+						minY = y;
+					if (y > maxY)
+						maxY = y;
+				}
+			}
+		}
+		return new Point(maxX - minX, maxY - minY);
+	}
+	
+	public ImageOperation clearImageBelowYvalue(int threshold, int background) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int[][] img2d = getImageAs2array();
+		
+		for (int x = 0; x < width; x++) {
+			for (int y = threshold; y < height; y++) {
+				img2d[x][y] = background;
+			}
+		}
+		return new ImageOperation(img2d);
+	}
+	
+	public ImageOperation clearMiddle(double d, double e, int background) {
+		int x1 = (int) (image.getWidth() / 2 + image.getWidth() * d);
+		int x2 = (int) (image.getWidth() / 2 + image.getWidth() * e);
+		return cutArea(x1, 0, x2 - x1, getImage().getHeight(), background, false);
+	}
 }

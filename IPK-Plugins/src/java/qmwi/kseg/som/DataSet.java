@@ -227,7 +227,7 @@ public class DataSet {
 		if (thedata == null)
 			thedata = data;
 		
-		double max = Double.MIN_VALUE;
+		double max = -Double.NEGATIVE_INFINITY;
 		
 		for (int i = 0; i < groups.size(); i++) {
 			if ((groups.elementAt(i)).equalsIgnoreCase(group)) {
@@ -249,7 +249,7 @@ public class DataSet {
 		if (thedata == null)
 			thedata = data;
 		
-		double min = Double.MAX_VALUE;
+		double min = Double.POSITIVE_INFINITY;
 		
 		for (int i = 0; i < groups.size(); i++) {
 			if ((groups.elementAt(i)).equalsIgnoreCase(group)) {

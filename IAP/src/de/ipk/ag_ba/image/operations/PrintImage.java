@@ -83,6 +83,7 @@ public class PrintImage {
 	}
 	
 	public static void printImage(ImagePlus image, String text) {
+		image.setTitle(text);
 		image.show(text);
 	}
 	

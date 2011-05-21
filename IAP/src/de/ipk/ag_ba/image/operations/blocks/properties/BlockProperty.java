@@ -17,4 +17,10 @@ public class BlockProperty {
 	public int getBlockPositionInPipeline() {
 		return blockPositionInPipeline;
 	}
+	
+	@Override
+	public String toString() {
+		return "P=" + blockPositionInPipeline + ", Value=" + value;
+	}
+	
 }
