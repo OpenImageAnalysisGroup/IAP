@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
+import ij.measure.ResultsTable;
+
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
@@ -32,5 +34,9 @@ public interface BlockProperties {
 	 * @see PropertyNames
 	 */
 	public ArrayList<BlockPropertyValue> getProperties(String search);
+	
+	void setNumericProperty(int position, String name, double value);
+	
+	void storeResults(String id_prefix, ResultsTable numericResults, int position);
 	
 }
