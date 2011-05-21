@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.importers.kgml.Vector2d;
 
 public class BlueMarkerFinder {
@@ -19,14 +20,18 @@ public class BlueMarkerFinder {
 		this.input = image;
 	}
 	
-	public void findCoordinates() {
+	public void findCoordinates(int background) {
 		ImageOperation io1 = new ImageOperation(input);
 		
-		resultTable = io1.thresholdLAB(120, 190, 105, 138, 10, 95, 0)
-				.convert2Grayscale().medianFilter8Bit()
-				.threshold(40, Color.WHITE.getRGB(), Color.BLACK.getRGB())
-				.findMax(10.0, MaximumFinder.LIST).getResultsTable();
-		
+		resultTable = io1
+				.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("vor opening").opening(0, 1)
+				.opening(8, 2).printImage("Vor Gray")
+				// .convert2Grayscale().printImage("Vor Threshold")
+				.medianFilter8Bit()
+				.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB()).printImage("nach thresh")
+				.findMax(10.0, MaximumFinder.SINGLE_POINTS).printImage("Single Point Search")
+				.findMax(10.0, MaximumFinder.LIST).opening(10, 0).printImage("MARKIERT GROESSER")
+				.getResultsTable();
 	}
 	
 	private ArrayList<Vector2d> getCoordinates() {
@@ -38,6 +43,7 @@ public class BlueMarkerFinder {
 			
 			Vector2d temp = new Vector2d(a, b);
 			result.add(temp);
+			System.out.println("vectoren" + i + ": " + temp);
 		}
 		return result;
 	}
@@ -47,9 +53,9 @@ public class BlueMarkerFinder {
 		ArrayList<Vector2d> coordinatesUnfiltered = getCoordinates();
 		
 		ArrayList<Vector2d> coordinatesLeft = searchLeft(coordinatesUnfiltered,
-				getMinX(coordinatesUnfiltered) + input.getWidth() * 0.08);
+				input.getWidth() * 0.5);
 		ArrayList<Vector2d> coordinatesRight = searchRight(
-				coordinatesUnfiltered, input.getWidth() * 0.1);
+				coordinatesUnfiltered, input.getWidth() * 0.5);
 		
 		ArrayList<MarkerPair> result = new ArrayList<MarkerPair>();
 		
@@ -103,12 +109,12 @@ public class BlueMarkerFinder {
 	}
 	
 	public ArrayList<Vector2d> searchRight(ArrayList<Vector2d> coordinates,
-			double sizeOfROI) {
+			double xLimit) {
 		ArrayList<Vector2d> result = new ArrayList<Vector2d>();
 		double minX = getMaxX(coordinates);
 		
 		for (int index = 0; index < coordinates.size(); index++) {
-			if (coordinates.get(index).x > minX - sizeOfROI) {
+			if (coordinates.get(index).x > xLimit) {
 				result.add(coordinates.get(index));
 			}
 		}
@@ -127,13 +133,12 @@ public class BlueMarkerFinder {
 	}
 	
 	private ArrayList<Vector2d> searchLeft(ArrayList<Vector2d> coordinates,
-			double sizeOfROI) {
+			double xLimit) {
 		
 		ArrayList<Vector2d> result = new ArrayList<Vector2d>();
-		double minX = getMinX(coordinates);
 		
 		for (int index = 0; index < coordinates.size(); index++) {
-			if (coordinates.get(index).x < minX + sizeOfROI) {
+			if (coordinates.get(index).x < xLimit) {
 				result.add(coordinates.get(index));
 			}
 		}

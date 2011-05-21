@@ -422,4 +422,9 @@ public class ReleaseInfo implements HelperClass {
 	public static JApplet getApplet() {
 		return appletContext;
 	}
+	
+	public static String getDesktopFolder() {
+		String home = System.getProperty("user.home");
+		return home + File.separator + "Desktop";
+	}
 }

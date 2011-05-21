@@ -24,11 +24,13 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getVis(), getInput().getMasks().getVis());
 			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_VIS), options.getIntSetting(Setting.L_Diff_VIS),
 					options.getIntSetting(Setting.abDiff_VIS), back, true, false));
-		} else {
+		}
+		if (options.getCameraTyp() == CameraTyp.TOP) {
 			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getVis(), getInput().getMasks().getVis());
 			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_VIS), options.getIntSetting(Setting.L_Diff_VIS),
 					options.getIntSetting(Setting.abDiff_VIS), back, true, false));
 		}
+		throw new UnsupportedOperationException("Unknown camera setting.");
 	}
 	
 	@Override
@@ -37,11 +39,13 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getFluo(), getInput().getMasks().getFluo());
 			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_FLOU), options.getIntSetting(Setting.L_Diff_FLOU),
 					options.getIntSetting(Setting.abDiff_FLOU), back, false, true));
-		} else {
+		}
+		if (options.getCameraTyp() == CameraTyp.TOP) {
 			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getFluo(), getInput().getMasks().getFluo());
 			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_FLOU), options.getIntSetting(Setting.L_Diff_FLOU),
 					options.getIntSetting(Setting.abDiff_FLOU), back, false, true));
 		}
+		throw new UnsupportedOperationException("Unknown camera setting.");
 	}
 	
 	@Override
@@ -50,10 +54,12 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getNir(), getInput().getMasks().getNir());
 			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_NIR), options.getIntSetting(Setting.L_Diff_NIR),
 					options.getIntSetting(Setting.abDiff_NIR), back, false, false));
-		} else {
+		}
+		if (options.getCameraTyp() == CameraTyp.TOP) {
 			CompareImageGenerator ci = new CompareImageGenerator(getInput().getImages().getNir(), getInput().getMasks().getNir());
 			return (ci.compareImages(options.getIntSetting(Setting.L_Diff_NIR), options.getIntSetting(Setting.L_Diff_NIR),
 					options.getIntSetting(Setting.abDiff_NIR), back, false, false));
 		}
+		throw new UnsupportedOperationException("Unknown camera setting.");
 	}
 }

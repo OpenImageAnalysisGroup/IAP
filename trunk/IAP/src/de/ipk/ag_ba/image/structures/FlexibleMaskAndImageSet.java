@@ -1,5 +1,8 @@
 package de.ipk.ag_ba.image.structures;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.PrintImage;
 
@@ -105,5 +108,21 @@ public class FlexibleMaskAndImageSet {
 	
 	public FlexibleMaskAndImageSet resize(double a, double b, double c) {
 		return new FlexibleMaskAndImageSet(getImages().resize(a, b, c), getMasks().resize(a, b, c));
+	}
+	
+	/**
+	 * Save all images in one TIFF stack
+	 * 
+	 * @throws FileNotFoundException
+	 */
+	public void save(String fileName) throws FileNotFoundException {
+		FlexibleImageStack fis = new FlexibleImageStack();
+		fis.addImage("vis", images.getVis());
+		fis.addImage("vis mask", masks.getVis());
+		fis.addImage("fluo", images.getFluo());
+		fis.addImage("fluo mask", masks.getFluo());
+		fis.addImage("nir", images.getNir());
+		fis.addImage("nir mask", masks.getNir());
+		fis.saveAsLayeredTif(new File(fileName));
 	}
 }

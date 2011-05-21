@@ -570,7 +570,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 					
 					y -= h / 5;
 					
-					FlexibleImage res = new ImageOperation(fi).cutAreaWorking(x, y, w, h, iBackgroundFill).getImage();
+					FlexibleImage res = new ImageOperation(fi).cutArea(x, y, w, h, iBackgroundFill).getImage();
 					
 					res.setType(type);
 					processedMasks.set(res);

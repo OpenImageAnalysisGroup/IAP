@@ -21,9 +21,9 @@ public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		
 		if (options.getCameraTyp() == CameraTyp.TOP) {
-			MainAxisCalculationResult r = getAngle(getInput().getMasks().getVis());
+			MainAxisCalculationResult macr = getAngle(getInput().getMasks().getVis());
 			
-			double angle = r.getMinResult().getAngle();
+			double angle = macr.getMinResult().getAngle();
 			
 			double imageRotationAngle = 0;
 			if (options.getVis() != null) {
@@ -31,10 +31,11 @@ public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 				System.out.println("Rotation: " + imageRotationAngle);
 			}
 			getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION, angle);
-			double normalizedDistanceToMainAxis = r.getMinResult().getDistanceSum() / r.getMinResult().getPixelCount() / r.getMinResult().getPixelCount();
+			double normalizedDistanceToMainAxis = macr.getMinResult().getDistanceSum() / macr.getMinResult().getPixelCount() / macr.getMinResult().getPixelCount();
 			getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE, normalizedDistanceToMainAxis);
+			getProperties().setNumericProperty(0, PropertyNames.CENTROID_X, macr.getCentroid().x);
+			getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y, macr.getCentroid().y);
 		}
-		
 		return getInput().getMasks().getVis();
 	}
 	
