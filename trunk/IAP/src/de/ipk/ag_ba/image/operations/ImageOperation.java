@@ -1498,10 +1498,6 @@ public class ImageOperation {
 		ResultsTable rt = ResultsTable.getResultsTable();
 		synchronized (rt) {
 			rt.reset();
-			
-			// ij.process.ImageConverter co = new ij.process.ImageConverter(image);
-			// co.convertToGray8();
-			
 			ByteProcessor p = find.findMaxima(image.getProcessor(), tolerance,
 					threshold, outputType, excludeOnEdges, isEDM);
 			
@@ -1752,6 +1748,10 @@ public class ImageOperation {
 		return new ImageOperation(new FlexibleImage(resultMask));
 	}
 	
+	public BorderImageOperation border() {
+		return new BorderImageOperation(this);
+	}
+	
 	/**
 	 * copy the image into a new image, wich is increase about bordersize
 	 * 
@@ -1828,4 +1828,5 @@ public class ImageOperation {
 	public CompareImageGenerator compare() {
 		return new CompareImageGenerator(getImage());
 	}
+	
 }
