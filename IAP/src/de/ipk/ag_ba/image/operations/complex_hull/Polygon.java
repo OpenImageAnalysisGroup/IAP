@@ -57,8 +57,8 @@ class Polygon {
 			cx = cx + (points[i].x() + points[i + 1].x()) * (points[i].y() * points[i + 1].x() - points[i].x() * points[i + 1].y());
 			cy = cy + (points[i].y() + points[i + 1].y()) * (points[i].y() * points[i + 1].x() - points[i].x() * points[i + 1].y());
 		}
-		cx /= (6 * area());
-		cy /= (6 * area());
+		cx = Math.abs(cx / (6 * area()));
+		cy = Math.abs(cy / (6 * area()));
 		return new Point(cx, cy);
 	}
 	
@@ -76,5 +76,20 @@ class Polygon {
 				crossings++;
 		}
 		return (crossings % 2 != 0);
+	}
+	
+	/**
+	 * @author klukas
+	 */
+	public java.awt.Polygon getGraphics2Dpolygon() {
+		int[] xpoints = new int[N];
+		int[] ypoints = new int[N];
+		int npoints = N;
+		for (int i = 0; i < N; i++) {
+			xpoints[i] = (int) points[i].x;
+			ypoints[i] = (int) points[i].y;
+		}
+		java.awt.Polygon res = new java.awt.Polygon(xpoints, ypoints, npoints);
+		return res;
 	}
 }

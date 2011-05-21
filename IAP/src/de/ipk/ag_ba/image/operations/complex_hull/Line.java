@@ -6,7 +6,7 @@ class Line {
 	
 	public Line(Point p0, Point p1) {
 		this.p0 = p0;
-		p0 = p1;
+		this.p1 = p1;
 	}
 	
 }
