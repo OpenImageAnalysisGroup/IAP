@@ -1,102 +1,68 @@
-/*************************************************************************
- * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
- *************************************************************************/
 package de.ipk.ag_ba.image.analysis.maize;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
+import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHeight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBelowMarker;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 
-/**
- * @author pape, klukas, entzian
- */
-public class MaizeImageProcessor implements ImageProcessor {
-	
-	private final ImageProcessorOptions options;
-	private final BlockProperties settings;
+public class MaizeImageProcessor extends AbstractImageProcessor {
 	
 	public MaizeImageProcessor(ImageProcessorOptions options) {
-		this(options, new BlockPropertiesImpl());
+		super(options);
 	}
 	
-	public MaizeImageProcessor(ImageProcessorOptions options, BlockPropertiesImpl settings) {
-		this.options = options;
-		this.settings = settings;
-	}
-	
-	public void setValuesToStandard(double scale) {
-		options.initStandardValues(scale);
-	}
-	
-	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, int maxThreadsPerImage, FlexibleImageStack debugStack,
-			boolean automaticParameterSearch,
-			boolean cropResult)
-			throws InstantiationException, IllegalAccessException, InterruptedException {
-		return pipeline(input, null, maxThreadsPerImage, debugStack, automaticParameterSearch, cropResult);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see de.ipk.ag_ba.image.analysis.maize.ImageProcessor#pipeline(de.ipk.ag_ba.image.structures.FlexibleImageSet,
-	 * de.ipk.ag_ba.image.structures.FlexibleImageSet, int, de.ipk.ag_ba.image.structures.FlexibleImageStack, boolean, boolean)
-	 */
 	@Override
-	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, FlexibleImageSet optInputMasks, int maxThreadsPerImage, FlexibleImageStack debugStack,
-			boolean automaticParameterSearch,
-			boolean cropResult)
-			throws InstantiationException, IllegalAccessException, InterruptedException {
+	protected BlockPipeline getPipeline() {
+		if (options.getCameraTyp() == CameraTyp.TOP) {
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 128);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 146);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255);
+			
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 104);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 98);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 194);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 132);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
+		} else {
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 132);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255);
+			
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 104);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 98);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 194);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 132);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
+		}
 		
 		BlockPipeline p = new BlockPipeline(options);
 		
-		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
-		p.add(BlockCalculateMainAxis.class);
+		p.add(BlockImageInfo.class);
 		p.add(BlockFindBlueMarkers.class);
+		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
+		p.add(BlockClearBelowMarker.class);
+		p.add(BlockCalculateMainAxis.class);
+		p.add(BlockLabFilter.class);
+		p.add(BlockRemoveSmallClusters.class);
+		p.add(BlockCalculateWidthAndHeight.class);
 		
-		// p.add(BlockCropAllFixedPhytoOne.class);
-		// p.add(BlockClearBackground.class);
-		// p.add(BlockFilterFluoMaskByValue30.class);
-		// p.add(BlockRemoveSmallClusters.class);
-		// p.add(BlockClosing.class);
-		// p.add(BlockResizeMasksToLargest.class);
-		// p.add(BlockEnlargeVisAndFluoMasks.class);
-		// if (automaticParameterSearch) {
-		// p.add(BlockAutomaticParameterSearchRotationOnFluo.class);
-		// p.add(BlockAutomaticParameterSearchScalingOnFluo.class);
-		// p.add(BlockAutomaticParameterSearchRotationOnFluo.class);
-		// p.add(BlockAutomaticParameterSearchScalingOnFluo.class);
-		// }
-		// p.add(BlockSetVisAndFluoMaskFromMergedVisAndFluo.class);
-		// p.add(BlockMoveNirMaskAndImageFixedUp.class);
-		// p.add(BlockCopyVisMaskToNirMask.class);
-		// p.add(BlockRemoveSmallClustersOnFluo.class);
-		// p.add(BlockApplyMasksToImages.class);
-		// p.add(BlockSetMasksToNull.class);
-		// if (cropResult)
-		// p.add(BlockCropImages.class);
-		
-		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
-		FlexibleMaskAndImageSet result = p.execute(workset, debugStack, settings);
-		
-		if (debugStack != null)
-			debugStack.addImage("RESULT", result.getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
-		
-		return result;
+		return p;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see de.ipk.ag_ba.image.analysis.maize.ImageProcessor#getSettings()
-	 */
-	@Override
-	public BlockProperties getSettings() {
-		return settings;
-	}
 }

@@ -1373,8 +1373,21 @@ public class ImageOperation {
 	public ImageOperation thresholdLAB(int lowerValueOfL, int upperValueOfL, int lowerValueOfA, int upperValueOfA, int lowerValueOfB,
 			int upperValueOfB, int background) {
 		
-		int xe = image.getProcessor().getWidth();
-		int ye = image.getProcessor().getHeight();
+		int width = image.getProcessor().getWidth();
+		int height = image.getProcessor().getHeight();
+		
+		int[][] resultImage = new int[image.getWidth()][image.getHeight()];
+		int[][] img2d = getImageAs2array();
+		
+		doThresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
+				lowerValueOfB, upperValueOfB, background);
+		
+		return new ImageOperation(resultImage);
+	}
+	
+	public static void doThresholdLAB(int width, int height, int[][] img2d, int[][] resultImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
+			int upperValueOfA, int lowerValueOfB,
+			int upperValueOfB, int background) {
 		int c, x, y = 0;
 		double rf, gf, bf;
 		double X, Y, Z, fX, fY, fZ;
@@ -1382,12 +1395,9 @@ public class ImageOperation {
 		double ot = 1 / 3.0, cont = 16 / 116.0;
 		int Li, ai, bi;
 		
-		int[][] resultImage = new int[image.getWidth()][image.getHeight()];
-		int[][] img2d = getImageAs2array();
-		
-		for (y = 0; y < ye; y++) {
-			for (x = 0; x < xe; x++) {
-				c = image.getProcessor().getPixel(x, y);
+		for (y = 0; y < height; y++) {
+			for (x = 0; x < width; x++) {
+				c = img2d[x][y];
 				
 				// RGB to XYZ
 				rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
@@ -1441,7 +1451,6 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new ImageOperation(resultImage);
 	}
 	
 	public ImageOperation medianFilter32Bit() {
@@ -1825,8 +1834,8 @@ public class ImageOperation {
 		return new ImageOperation(img2d);
 	}
 	
-	public CompareImageGenerator compare() {
-		return new CompareImageGenerator(getImage());
+	public ImageComparator compare() {
+		return new ImageComparator(getImage());
 	}
 	
 }

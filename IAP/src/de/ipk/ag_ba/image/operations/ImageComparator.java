@@ -10,11 +10,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author pape, klukas
  */
-public class CompareImageGenerator {
+public class ImageComparator {
 	
 	private final FlexibleImage inputImage;
 	
-	public CompareImageGenerator(FlexibleImage input) {
+	public ImageComparator(FlexibleImage input) {
 		this.inputImage = input;
 	}
 	

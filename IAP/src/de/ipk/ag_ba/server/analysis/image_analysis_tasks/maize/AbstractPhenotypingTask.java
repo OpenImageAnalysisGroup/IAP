@@ -75,84 +75,11 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		
 		ArrayList<ImageSet> workload = new ArrayList<ImageSet>();
 		
-		boolean top = false;
-		if (top) {
-			TreeMap<String, ImageSet> replicateId2ImageSetTop = new TreeMap<String, ImageSet>();
-			for (Measurement md : input) {
-				if (md instanceof ImageData) {
-					ImageData id = (ImageData) md;
-					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
-					if (!replicateId2ImageSetTop.containsKey(key)) {
-						replicateId2ImageSetTop.put(key, new ImageSet(null, null, null));
-					}
-					ImageSet is = replicateId2ImageSetTop.get(key);
-					is.setSide(false);
-					ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
-					if (ic == ImageConfiguration.Unknown)
-						ic = ImageConfiguration.get(id.getURL().getFileName());
-					
-					if (ic == ImageConfiguration.RgbTop)
-						is.setVis(id);
-					if (ic == ImageConfiguration.FluoTop)
-						is.setFluo(id);
-					if (ic == ImageConfiguration.NirTop)
-						is.setNir(id);
-				}
-			}
-			int workLoadIndex = workOnSubset;
-			for (ImageSet is : replicateId2ImageSetTop.values()) {
-				if (is.hasAllImageTypes()) {
-					if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0) {
-						workLoadIndex++;
-						continue;
-					} else
-						workLoadIndex++;
-					workload.add(is);
-				}
-			}
-		}
+		if (analyzeTopImages())
+			addTopImagesToWorkset(workload);
 		
-		boolean side = true;
-		if (side) {
-			TreeMap<String, ImageSet> replicateId2ImageSetSide = new TreeMap<String, ImageSet>();
-			for (Measurement md : input) {
-				if (md instanceof ImageData) {
-					ImageData id = (ImageData) md;
-					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
-					if (!replicateId2ImageSetSide.containsKey(key)) {
-						replicateId2ImageSetSide.put(key, new ImageSet(null, null, null));
-					}
-					ImageSet is = replicateId2ImageSetSide.get(key);
-					is.setSide(true);
-					
-					ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
-					if (ic == ImageConfiguration.Unknown)
-						ic = ImageConfiguration.get(id.getURL().getFileName());
-					
-					if (ic == ImageConfiguration.RgbSide)
-						is.setVis(id);
-					if (ic == ImageConfiguration.FluoSide)
-						is.setFluo(id);
-					if (ic == ImageConfiguration.NirSide)
-						is.setNir(id);
-				}
-			}
-			int workLoadIndex = workOnSubset;
-			for (ImageSet is : replicateId2ImageSetSide.values()) {
-				if (is.hasAllImageTypes()) {
-					if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0) {
-						workLoadIndex++;
-						continue;
-					} else
-						workLoadIndex++;
-					workload.add(is);
-					if (workload.size() > 20)
-						break;
-				}
-			}
-		}
-		
-		// Collection jobs = new ArrayList();
+		if (analyzeSideImages())
+			addSideImagesToWorkset(workload);
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
@@ -192,8 +119,8 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 							b = load(fluo, input, inputMasks, FlexibleImageType.FLUO);
 						}
 						if (nir instanceof LoadedImage) {
-							input.setFluo(new FlexibleImage(((LoadedImage) nir).getLoadedImage()));
-							inputMasks.setFluo(new FlexibleImage(((LoadedImage) nir).getLoadedImageLabelField()));
+							input.setNir(new FlexibleImage(((LoadedImage) nir).getLoadedImage()));
+							inputMasks.setNir(new FlexibleImage(((LoadedImage) nir).getLoadedImageLabelField()));
 						} else {
 							c = load(nir, input, inputMasks, FlexibleImageType.NIR);
 						}
@@ -243,6 +170,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 							
 							byte[] buf = null;
 							if (debugImageStack != null) {
+								System.out.println("[s");
 								MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
 								debugImageStack.saveAsLayeredTif(mos);
 								buf = mos.getBuff();
@@ -250,6 +178,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 								saveImage(visInputImage, pipelineResult.getVis(), buf, ".tiff");
 								saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
 								saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
+								System.out.println("f]");
 							}
 						} else {
 							System.err.println("Warning: not all three image types available for snapshot!");
@@ -278,6 +207,85 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		input = null;
 	}
 	
+	private void addSideImagesToWorkset(ArrayList<ImageSet> workload) {
+		TreeMap<String, ImageSet> replicateId2ImageSetSide = new TreeMap<String, ImageSet>();
+		for (Measurement md : input) {
+			if (md instanceof ImageData) {
+				ImageData id = (ImageData) md;
+				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
+				if (!replicateId2ImageSetSide.containsKey(key)) {
+					replicateId2ImageSetSide.put(key, new ImageSet(null, null, null));
+				}
+				ImageSet is = replicateId2ImageSetSide.get(key);
+				is.setSide(true);
+				
+				ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
+				if (ic == ImageConfiguration.Unknown)
+					ic = ImageConfiguration.get(id.getURL().getFileName());
+				
+				if (ic == ImageConfiguration.RgbSide)
+					is.setVis(id);
+				if (ic == ImageConfiguration.FluoSide)
+					is.setFluo(id);
+				if (ic == ImageConfiguration.NirSide)
+					is.setNir(id);
+			}
+		}
+		int workLoadIndex = workOnSubset;
+		for (ImageSet is : replicateId2ImageSetSide.values()) {
+			if (is.hasAllImageTypes()) {
+				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0) {
+					workLoadIndex++;
+					continue;
+				} else
+					workLoadIndex++;
+				workload.add(is);
+				if (workload.size() > 20)
+					break;
+			}
+		}
+	}
+	
+	private void addTopImagesToWorkset(ArrayList<ImageSet> workload) {
+		TreeMap<String, ImageSet> replicateId2ImageSetTop = new TreeMap<String, ImageSet>();
+		for (Measurement md : input) {
+			if (md instanceof ImageData) {
+				ImageData id = (ImageData) md;
+				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
+				if (!replicateId2ImageSetTop.containsKey(key)) {
+					replicateId2ImageSetTop.put(key, new ImageSet(null, null, null));
+				}
+				ImageSet is = replicateId2ImageSetTop.get(key);
+				is.setSide(false);
+				ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
+				if (ic == ImageConfiguration.Unknown)
+					ic = ImageConfiguration.get(id.getURL().getFileName());
+				
+				if (ic == ImageConfiguration.RgbTop)
+					is.setVis(id);
+				if (ic == ImageConfiguration.FluoTop)
+					is.setFluo(id);
+				if (ic == ImageConfiguration.NirTop)
+					is.setNir(id);
+			}
+		}
+		int workLoadIndex = workOnSubset;
+		for (ImageSet is : replicateId2ImageSetTop.values()) {
+			if (is.hasAllImageTypes()) {
+				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0) {
+					workLoadIndex++;
+					continue;
+				} else
+					workLoadIndex++;
+				workload.add(is);
+			}
+		}
+	}
+	
+	protected abstract boolean analyzeTopImages();
+	
+	protected abstract boolean analyzeSideImages();
+	
 	protected abstract ImageProcessor getImageProcessor(ImageProcessorOptions options);
 	
 	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
@@ -296,21 +304,23 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		}
 	}
 	
-	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageSet optInputMasks,
+	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageSet optImageMasks,
 			final FlexibleImageType type) {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
-				// System.out.println("Load Image");
 				try {
-					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, optInputMasks != null);
+					System.out.print(".");
+					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, optImageMasks != null);
 					input.set(new FlexibleImage(li.getLoadedImage(), type));
-					if (optInputMasks != null)
-						optInputMasks.set(new FlexibleImage(li.getLoadedImageLabelField(), type));
+					if (optImageMasks != null)
+						if (li.getLoadedImageLabelField() != null)
+							optImageMasks.set(new FlexibleImage(li.getLoadedImageLabelField(), type));
+						else
+							System.out.println("ERROR: Label field not available for:" + li);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
-				// System.out.println("Finished Load Image");
 			}
 		}, "load " + type.name(), 0);
 	}

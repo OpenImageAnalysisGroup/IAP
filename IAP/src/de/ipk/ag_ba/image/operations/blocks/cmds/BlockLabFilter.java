@@ -42,23 +42,29 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB) {
 		
-		int[][] originalArray = originalImage.getAs2A();
-		int[][] resultMask = new int[workMask.getWidth()][workMask.getHeight()];
+		int[][] image = originalImage.getAs2A();
+		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
+		int width = originalImage.getWidth();
+		int height = originalImage.getHeight();
 		
-		ImageOperation getLab = new ImageOperation(workMask);
-		resultMask = getLab.thresholdLAB(lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB, upperValueOfB, options.getBackground())
-				.getImageAs2array();
+		int back = options.getBackground();
+		
+		ImageOperation.doThresholdLAB(width, height, image, result,
+				lowerValueOfL, upperValueOfL,
+				lowerValueOfA, upperValueOfA,
+				lowerValueOfB, upperValueOfB,
+				back);
 		
 		for (int i = 0; i < workMask.getWidth(); i++) {
 			for (int j = 0; j < workMask.getHeight(); j++) {
 				
-				if (resultMask[i][j] != options.getBackground())
-					resultMask[i][j] = originalArray[i][j];
+				if (result[i][j] != back)
+					result[i][j] = image[i][j];
 				
 			}
 		}
 		
-		return new FlexibleImage(resultMask);
+		return new FlexibleImage(result);
 		
 	}
 }

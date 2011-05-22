@@ -23,15 +23,26 @@ public class BlueMarkerFinder {
 	public void findCoordinates(int background) {
 		ImageOperation io1 = new ImageOperation(input);
 		
-		resultTable = io1
-				.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("vor opening").opening(0, 1)
-				.opening(8, 2).printImage("Vor Gray")
-				// .convert2Grayscale().printImage("Vor Threshold")
-				.medianFilter8Bit()
-				.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB()).printImage("nach thresh")
-				.findMax(10.0, MaximumFinder.SINGLE_POINTS).printImage("Single Point Search")
-				.findMax(10.0, MaximumFinder.LIST).opening(10, 0).printImage("MARKIERT GROESSER")
-				.getResultsTable();
+		boolean debug = false;
+		if (debug)
+			resultTable = io1
+					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("vor opening").opening(0, 1)
+					.opening(8, 2).printImage("Vor Gray")
+					// .convert2Grayscale().printImage("Vor Threshold")
+					.medianFilter8Bit()
+					.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB()).printImage("nach thresh")
+					.findMax(10.0, MaximumFinder.SINGLE_POINTS).printImage("Single Point Search")
+					.findMax(10.0, MaximumFinder.LIST).opening(10, 0).printImage("MARKIERT GROESSER")
+					.getResultsTable();
+		else
+			resultTable = io1
+					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).opening(0, 1)
+					.opening(8, 2)
+					.medianFilter8Bit()
+					.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB())
+					.findMax(10.0, MaximumFinder.SINGLE_POINTS)
+					.findMax(10.0, MaximumFinder.LIST).opening(10, 0)
+					.getResultsTable();
 	}
 	
 	private ArrayList<Vector2d> getCoordinates() {
@@ -52,12 +63,22 @@ public class BlueMarkerFinder {
 		
 		ArrayList<Vector2d> coordinatesUnfiltered = getCoordinates();
 		
+		ArrayList<MarkerPair> result = new ArrayList<MarkerPair>();
+		
+		if (coordinatesUnfiltered == null) {
+			System.out.println("ERROR: No blue marker coordinates (null)!");
+			return result;
+		}
+		
+		if (coordinatesUnfiltered.isEmpty()) {
+			System.out.println("INFO: No blue marker coordinates (empty).");
+			return result;
+		}
+		
 		ArrayList<Vector2d> coordinatesLeft = searchLeft(coordinatesUnfiltered,
 				input.getWidth() * 0.5);
 		ArrayList<Vector2d> coordinatesRight = searchRight(
 				coordinatesUnfiltered, input.getWidth() * 0.5);
-		
-		ArrayList<MarkerPair> result = new ArrayList<MarkerPair>();
 		
 		HashSet<Vector2d> added = new HashSet<Vector2d>();
 		
