@@ -28,4 +28,14 @@ public class MaizeAnalysisTask extends AbstractPhenotypingTask {
 		return new MaizeImageProcessor(options);
 	}
 	
+	@Override
+	protected boolean analyzeTopImages() {
+		return false;
+	}
+	
+	@Override
+	protected boolean analyzeSideImages() {
+		return true;
+	}
+	
 }

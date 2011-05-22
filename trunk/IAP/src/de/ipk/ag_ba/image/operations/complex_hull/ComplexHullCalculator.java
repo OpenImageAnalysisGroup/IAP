@@ -90,10 +90,10 @@ public class ComplexHullCalculator {
 	 * The columns "hull.centroid.x" and "hull.centroid.y" contain the position of the
 	 * centroid of the hull polygon.
 	 * 
-	 * @return A ImageOperation-object, modified according to the given parameters.
-	 * @author klukas
 	 * @param centroidColor
 	 * @param drawCentroid
+	 * @return A ImageOperation-object, modified according to the given parameters.
+	 * @author klukas
 	 */
 	public ImageOperation find(boolean drawInputimage, boolean drawBorder, boolean drawHull, boolean drawCentroid,
 			int borderColor, int hullLineColor, int centroidColor) {

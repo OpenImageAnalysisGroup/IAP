@@ -158,13 +158,13 @@ public class SystemAnalysis {
 	public static boolean isHeadless() {
 		if (simulateHeadless) {
 			if (first) {
-				System.out.println("GUI AVAILABILITY SIMULATED=true, TRUE HEADLESS=" + GraphicsEnvironment.isHeadless());
+				System.out.println("GUI AVAILABILITY SIMULATED HEADLESS? = true, TRUE HEADLESS? =" + GraphicsEnvironment.isHeadless());
 				first = false;
 			}
 			return true;
 		}
 		if (first) {
-			System.out.println("GUI AVAILABILITY: HEADLESS=" + GraphicsEnvironment.isHeadless());
+			System.out.println("GUI AVAILABILITY: TRUE HEADLESS? =" + GraphicsEnvironment.isHeadless());
 			first = false;
 		}
 		return GraphicsEnvironment.isHeadless();
