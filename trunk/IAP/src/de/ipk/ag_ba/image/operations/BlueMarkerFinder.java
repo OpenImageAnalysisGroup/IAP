@@ -7,9 +7,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.Vector2d;
+
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.importers.kgml.Vector2d;
 
 public class BlueMarkerFinder {
 	
@@ -26,10 +27,10 @@ public class BlueMarkerFinder {
 		boolean debug = false;
 		if (debug)
 			resultTable = io1
-					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("vor opening").opening(0, 1)
-					.opening(8, 2).printImage("Vor Gray")
-					// .convert2Grayscale().printImage("Vor Threshold")
-					.medianFilter8Bit()
+					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab").opening(0, 1)
+					.opening(8, 2).printImage("nach opening")
+					.convert2Grayscale().printImage("nach gray")
+					// .medianFilter8Bit().printImage("nach8bit")
 					.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB()).printImage("nach thresh")
 					.findMax(10.0, MaximumFinder.SINGLE_POINTS).printImage("Single Point Search")
 					.findMax(10.0, MaximumFinder.LIST).opening(10, 0).printImage("MARKIERT GROESSER")
@@ -38,7 +39,8 @@ public class BlueMarkerFinder {
 			resultTable = io1
 					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).opening(0, 1)
 					.opening(8, 2)
-					.medianFilter8Bit()
+					.convert2Grayscale()
+					// .medianFilter8Bit()
 					.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB())
 					.findMax(10.0, MaximumFinder.SINGLE_POINTS)
 					.findMax(10.0, MaximumFinder.LIST).opening(10, 0)
@@ -75,10 +77,12 @@ public class BlueMarkerFinder {
 			return result;
 		}
 		
+		Vector2d minLeftmaxRight = searchminLeftmaxRight(coordinatesUnfiltered);
+		
 		ArrayList<Vector2d> coordinatesLeft = searchLeft(coordinatesUnfiltered,
-				input.getWidth() * 0.5);
+				minLeftmaxRight.x + (input.getWidth() * 0.05));
 		ArrayList<Vector2d> coordinatesRight = searchRight(
-				coordinatesUnfiltered, input.getWidth() * 0.5);
+				coordinatesUnfiltered, minLeftmaxRight.y - (input.getWidth() * 0.05));
 		
 		HashSet<Vector2d> added = new HashSet<Vector2d>();
 		
@@ -123,6 +127,19 @@ public class BlueMarkerFinder {
 		}
 		
 		return result;
+	}
+	
+	private Vector2d searchminLeftmaxRight(ArrayList<Vector2d> input) {
+		int min = Integer.MAX_VALUE;
+		int max = 0;
+		
+		for (int index = 0; index < input.size(); index++) {
+			if (input.get(index).x < min)
+				min = (int) input.get(index).x;
+			if (input.get(index).x > max)
+				max = (int) input.get(index).x;
+		}
+		return new Vector2d(min, max);
 	}
 	
 	private boolean sameYposition(Vector2d l, Vector2d r, int tolerance) {
