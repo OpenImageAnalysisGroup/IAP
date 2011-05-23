@@ -1680,6 +1680,14 @@ public class ImageOperation {
 		return new MainAxisCalculationResult(imageResult, minResult, centroid);
 	}
 	
+	/**
+	 * calculates distance between a line and pixels of an image
+	 * 
+	 * @param img
+	 * @param line
+	 * @param background
+	 * @return
+	 */
 	private DistanceSumAndPixelCount distancePointsToLine(int[][] img, Double line, int background) {
 		double dist = 0;
 		int pixelCount = 0;
