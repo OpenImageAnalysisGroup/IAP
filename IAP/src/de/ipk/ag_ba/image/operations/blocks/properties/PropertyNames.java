@@ -19,7 +19,7 @@ public enum PropertyNames {
 
 	CENTROID_X, CENTROID_Y,
 
-	TOP_WIDTH, TOP_HEIGHT, SIDE_WIDTH, SIDE_HEIGHT;
+	RESULT_TOP_WIDTH, RESULT_TOP_HEIGHT, RESULT_SIDE_WIDTH, RESULT_SIDE_HEIGHT;
 	
 	// public boolean storeAsResult() {
 	// switch (this) {

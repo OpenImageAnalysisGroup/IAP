@@ -18,7 +18,7 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
  * 
  * @author klukas
  */
-public class ComplexHullCalculator {
+public class ConvexHullCalculator {
 	
 	private final ImageOperation io;
 	
@@ -30,7 +30,7 @@ public class ComplexHullCalculator {
 	/**
 	 * The imageOperation - ResultTable is retained and extended (if available) during calculation.
 	 */
-	public ComplexHullCalculator(ImageOperation imageOperation) {
+	public ConvexHullCalculator(ImageOperation imageOperation) {
 		this.io = imageOperation;
 	}
 	
@@ -118,6 +118,9 @@ public class ComplexHullCalculator {
 		rt.addValue("hull.points", numberOfHullPoints);
 		rt.addValue("hull.area", polygon.area());
 		rt.addValue("hull.signedarea", polygon.signedArea());
+		
+		int filledArea = io.countFilledPixels();
+		rt.addValue("hull.fillgrade", filledArea / polygon.area());
 		
 		Point centroid = polygon.centroid();
 		rt.addValue("hull.centroid.x", centroid.x);

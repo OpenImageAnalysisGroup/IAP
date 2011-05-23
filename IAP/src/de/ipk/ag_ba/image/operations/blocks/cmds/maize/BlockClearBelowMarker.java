@@ -18,12 +18,9 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y);
 			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y);
 			
-			System.out.println(markerPosLeft + " " + markerPosRight);
-			
 			if (markerPosLeft != null) {
 				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
 						(int) markerPosLeft.getValue(), options.getBackground()).getImage();
-				
 				return result;
 			}
 			if (markerPosLeft == null && markerPosRight != null) {
@@ -47,8 +44,6 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 			
 			int heightVisImage = (int) getProperties().getNumericProperty(0, 1, PropertyNames.HEIGHT_VIS_IMAGE).getValue();
 			int heightFluoImage = (int) getProperties().getNumericProperty(0, 1, PropertyNames.HEIGHT_FLUO_IMAGE).getValue();
-			
-			System.out.println(markerPosLeft + " " + markerPosRight);
 			
 			if (markerPosLeft != null) {
 				double temp = (markerPosLeft.getValue() / heightVisImage) * heightFluoImage;
@@ -80,22 +75,16 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 			int heightVisImage = getInput().getMasks().getVis().getHeight();
 			int heightNirImage = getInput().getMasks().getNir().getHeight();
 			
-			System.out.println(markerPosLeft + " " + markerPosRight);
-			
 			if (markerPosLeft != null) {
 				double temp = (markerPosLeft.getValue() / heightVisImage) * heightNirImage;
 				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
 						(int) temp, options.getBackground()).getImage();
-				System.out.println("temp: " + temp + ", heightvis: " + heightVisImage + ", heigtnir: " + heightNirImage);
-				// result.print("nir");
 				return result;
 			}
 			if (markerPosLeft == null && markerPosRight != null) {
 				double temp = (markerPosRight.getValue() / heightVisImage) * heightNirImage;
 				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
 						(int) temp, options.getBackground()).getImage();
-				System.out.println("temp: " + temp + ", heightvis: " + heightVisImage + ", heigtnir: " + heightNirImage);
-				// result.print("nir");
 				return result;
 			}
 		}

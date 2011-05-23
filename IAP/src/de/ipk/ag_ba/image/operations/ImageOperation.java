@@ -41,7 +41,8 @@ import org.graffiti.plugin.io.resources.IOurl;
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
-import de.ipk.ag_ba.image.operations.complex_hull.ComplexHullCalculator;
+import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
+import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -172,10 +173,15 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation convertFluo2intensity() {
+		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		int[][] in = getImageAs2array();
 		for (int x = 0; x < image.getWidth(); x++)
 			for (int y = 0; y < image.getHeight(); y++) {
 				int c = in[x][y];
+				if (c == background) {
+					in[x][y] = background;
+					continue;
+				}
 				float rf = ((c & 0xff0000) >> 16);
 				float gf = ((c & 0x00ff00) >> 8);
 				// float bf = (float) ((c & 0x0000ff) / 255.0); // B 0..1
@@ -183,16 +189,18 @@ public class ImageOperation {
 				if (intensity < 0)
 					intensity = 0;
 				// intensity = 1 - intensity;
-				if (intensity < 44f / 255f)
-					intensity = 0;
-				intensity = 1 - intensity;
-				in[x][y] = new Color(intensity, intensity, intensity, 1f).getRGB();
+				if (intensity < 44f / 255f) {
+					in[x][y] = background;
+				} else {
+					intensity = 1 - intensity;
+					in[x][y] = new Color(intensity, intensity, intensity, 1f).getRGB();
+				}
 			}
 		return new ImageOperation(new FlexibleImage(in));// .dilate();
 	}
 	
-	public ComplexHullCalculator hull() {
-		return new ComplexHullCalculator(this);
+	public ConvexHullCalculator hull() {
+		return new ConvexHullCalculator(this);
 	}
 	
 	// public void threshold(int cutValue) {
@@ -1844,6 +1852,31 @@ public class ImageOperation {
 	
 	public ImageComparator compare() {
 		return new ImageComparator(getImage());
+	}
+	
+	public int countFilledPixels() {
+		int res = 0;
+		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int[][] img2d = getImageAs2array();
+		
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				if (img2d[x][y] != background)
+					res++;
+			}
+		}
+		return res;
+	}
+	
+	/**
+	 * @param n
+	 *           number of classes in histogram
+	 * @return
+	 */
+	public IntensityAnalysis intensity(int n) {
+		return new IntensityAnalysis(this, n);
 	}
 	
 }

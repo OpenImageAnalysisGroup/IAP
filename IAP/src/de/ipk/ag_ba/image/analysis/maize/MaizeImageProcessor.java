@@ -4,7 +4,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterMaskToMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
@@ -12,6 +12,8 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHei
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBelowMarker;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFluoToIntensity;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
 
 public class MaizeImageProcessor extends AbstractImageProcessor {
 	
@@ -58,9 +60,11 @@ public class MaizeImageProcessor extends AbstractImageProcessor {
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
 		p.add(BlockClearBelowMarker.class);
 		p.add(BlockCalculateMainAxis.class);
-		p.add(BlockLabFilter.class);
+		p.add(BlockLabFilterMaskToMask.class);
 		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockCalculateWidthAndHeight.class);
+		p.add(BlockFluoToIntensity.class);
+		p.add(BlockIntensityAnalysis.class);
 		
 		return p;
 	}
