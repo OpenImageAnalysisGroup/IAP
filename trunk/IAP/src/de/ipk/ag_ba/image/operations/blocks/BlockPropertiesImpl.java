@@ -105,7 +105,13 @@ public class BlockPropertiesImpl implements BlockProperties {
 		for (TreeMap<String, Double> tm : store.values()) {
 			for (String key : tm.keySet()) {
 				if (key.startsWith(search)) {
-					PropertyNames pn = PropertyNames.valueOf(key);
+					
+					PropertyNames pn = null;
+					try {
+						pn = PropertyNames.valueOf(key);
+					} catch (Exception e) {
+						// ignore, not a parameter which has an enum constant
+					}
 					if (pn == null)
 						continue;
 					

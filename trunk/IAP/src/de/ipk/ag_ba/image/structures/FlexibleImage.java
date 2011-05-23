@@ -195,4 +195,8 @@ public class FlexibleImage {
 				arrayL, arrayA, arrayB };
 	}
 	
+	public ImageOperation getIO() {
+		return new ImageOperation(this);
+	}
+	
 }

@@ -76,10 +76,10 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		ArrayList<ImageSet> workload = new ArrayList<ImageSet>();
 		
 		if (analyzeTopImages())
-			addTopImagesToWorkset(workload);
+			addTopImagesToWorkset(workload, 2);
 		
 		if (analyzeSideImages())
-			addSideImagesToWorkset(workload);
+			addSideImagesToWorkset(workload, 4);
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
@@ -137,7 +137,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 							ImageProcessor ptip = getImageProcessor(options);
 							
 							FlexibleImageStack debugImageStack = null;
-							boolean addDebugImages = false;
+							boolean addDebugImages = true;
 							if (addDebugImages) {
 								debugImageStack = new FlexibleImageStack();
 							}
@@ -207,7 +207,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		input = null;
 	}
 	
-	private void addSideImagesToWorkset(ArrayList<ImageSet> workload) {
+	private void addSideImagesToWorkset(ArrayList<ImageSet> workload, int max) {
 		TreeMap<String, ImageSet> replicateId2ImageSetSide = new TreeMap<String, ImageSet>();
 		for (Measurement md : input) {
 			if (md instanceof ImageData) {
@@ -244,9 +244,12 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 					break;
 			}
 		}
+		if (max > 0)
+			while (workload.size() > max)
+				workload.remove(0);
 	}
 	
-	private void addTopImagesToWorkset(ArrayList<ImageSet> workload) {
+	private void addTopImagesToWorkset(ArrayList<ImageSet> workload, int max) {
 		TreeMap<String, ImageSet> replicateId2ImageSetTop = new TreeMap<String, ImageSet>();
 		for (Measurement md : input) {
 			if (md instanceof ImageData) {
@@ -280,6 +283,9 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 				workload.add(is);
 			}
 		}
+		if (max > 0)
+			while (workload.size() > max)
+				workload.remove(0);
 	}
 	
 	protected abstract boolean analyzeTopImages();

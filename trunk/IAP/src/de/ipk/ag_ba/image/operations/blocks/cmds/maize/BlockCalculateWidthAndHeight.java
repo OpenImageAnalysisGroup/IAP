@@ -18,14 +18,14 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			Point values = getWidthandHeightSide(getInput().getMasks().getVis(), background);
 			
-			getProperties().setNumericProperty(0, PropertyNames.SIDE_WIDTH, values.x);
-			getProperties().setNumericProperty(0, PropertyNames.SIDE_HEIGHT, values.y);
+			getProperties().setNumericProperty(0, PropertyNames.RESULT_SIDE_WIDTH, values.x);
+			getProperties().setNumericProperty(0, PropertyNames.RESULT_SIDE_HEIGHT, values.y);
 		}
 		if (options.getCameraTyp() == CameraTyp.TOP) {
 			Point values = getWidthandHeightTop(getInput().getMasks().getVis(), background);
 			
-			getProperties().setNumericProperty(0, PropertyNames.TOP_WIDTH, values.x);
-			getProperties().setNumericProperty(0, PropertyNames.TOP_HEIGHT, values.y);
+			getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_WIDTH, values.x);
+			getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_HEIGHT, values.y);
 		}
 		return getInput().getMasks().getVis();
 	}
