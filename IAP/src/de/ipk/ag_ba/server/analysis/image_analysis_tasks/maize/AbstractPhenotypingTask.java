@@ -173,6 +173,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 								System.out.println("[s");
 								MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
 								debugImageStack.saveAsLayeredTif(mos);
+								debugImageStack.print("NNN");
 								buf = mos.getBuff();
 								
 								saveImage(visInputImage, pipelineResult.getVis(), buf, ".tiff");

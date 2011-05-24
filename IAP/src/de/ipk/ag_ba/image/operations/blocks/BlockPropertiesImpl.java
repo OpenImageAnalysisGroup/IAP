@@ -112,11 +112,15 @@ public class BlockPropertiesImpl implements BlockProperties {
 					} catch (Exception e) {
 						// ignore, not a parameter which has an enum constant
 					}
-					if (pn == null)
-						continue;
-					
-					BlockPropertyValue p = new BlockPropertyValue(pn.getName(), pn.getUnit(), tm.get(key));
-					result.add(p);
+					if (pn == null) {
+						if (tm.get(key) != null) {
+							BlockPropertyValue p = new BlockPropertyValue(key.substring(search.length()), "", tm.get(key));
+							result.add(p);
+						}
+					} else {
+						BlockPropertyValue p = new BlockPropertyValue(pn.getName(), pn.getUnit(), tm.get(key));
+						result.add(p);
+					}
 				}
 			}
 		}
