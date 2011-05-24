@@ -14,7 +14,7 @@ public class IntensityAnalysis {
 		this.n = numberOfIntervals;
 	}
 	
-	public ResultsTable calcualteHistorgram(int plantArea) {
+	public ResultsTable calcualteHistorgram(int plantArea, int plantImagePixelCnt) {
 		ResultsTable result = new ResultsTable();
 		
 		int[] pixels = io.getImageAs1array();
@@ -39,7 +39,7 @@ public class IntensityAnalysis {
 		
 		result.incrementCounter();
 		
-		result.addValue("intensity.average", sumOfIntensity / plantArea);
+		result.addValue("intensity.average", sumOfIntensity / plantArea*plantImagePixelCnt/pixels.length);
 		
 		for (int i = 0; i < this.n; i++) {
 			result.addValue("histogram.bin." + i, hist.getFreqAt(i));

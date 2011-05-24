@@ -15,8 +15,8 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
-			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y);
-			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y);
+			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
+			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
 			
 			if (markerPosLeft != null) {
 				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
@@ -39,8 +39,8 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getFluo();
 			
-			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y);
-			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y);
+			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
+			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
 			
 			int heightVisImage = (int) getProperties().getNumericProperty(0, 1, PropertyNames.HEIGHT_VIS_IMAGE).getValue();
 			int heightFluoImage = (int) getProperties().getNumericProperty(0, 1, PropertyNames.HEIGHT_FLUO_IMAGE).getValue();
@@ -69,8 +69,8 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
-			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y);
-			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y);
+			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
+			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
 			
 			int heightVisImage = getInput().getMasks().getVis().getHeight();
 			int heightNirImage = getInput().getMasks().getNir().getHeight();

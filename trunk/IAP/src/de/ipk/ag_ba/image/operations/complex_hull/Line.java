@@ -9,4 +9,7 @@ class Line {
 		this.p1 = p1;
 	}
 	
+	public int getlength() {
+		return (int) Math.sqrt(((p0.x-p0.y)*(p0.x-p0.y))+((p1.x-p1.y)*(p1.x-p1.y)));
+	}
 }
