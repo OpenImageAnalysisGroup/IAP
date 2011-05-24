@@ -99,7 +99,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					NeedsSwingThread {
@@ -760,8 +760,8 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 											.createJPEGEncoder(os);
 						JPEGEncodeParam jpegEncodeParam = jpegEncoder
 											.getDefaultJPEGEncodeParam(bi);
-						jpegEncodeParam
-											.setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
+//						jpegEncodeParam
+//											.setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
 						jpegEncodeParam.setXDensity(parameter.getScaleDPIprintDPI());
 						jpegEncodeParam.setYDensity(parameter.getScaleDPIprintDPI());
 						jpegEncodeParam.setQuality(1f, false);
