@@ -215,6 +215,8 @@ public class MongoDB {
 	
 	WeakHashMap<Mongo, HashSet<String>> authenticatedDBs = new WeakHashMap<Mongo, HashSet<String>>();
 	
+	private static HashSet<String> dbsAnalyzedForCollectionSettings = new HashSet<String>();
+	
 	private void processDB(String database, String optHosts, String optLogin, String optPass,
 						RunnableOnDB runnableOnDB) throws Exception {
 		Exception e = null;
@@ -265,6 +267,14 @@ public class MongoDB {
 								// System.err.println("ERROR: " + err.getMessage());
 							}
 						}
+					
+					if (!dbsAnalyzedForCollectionSettings.contains(database)) {
+						checkforCollectionsInitialization(db, "status_maize", 100, 50000);
+						checkforCollectionsInitialization(db, "status_barley", 100, 50000);
+						checkforCollectionsInitialization(db, "status_phyto", 100, 50000);
+						dbsAnalyzedForCollectionSettings.add(database);
+					}
+					
 					runnableOnDB.setDB(db);
 					runnableOnDB.run();
 					ok = true;
@@ -281,6 +291,16 @@ public class MongoDB {
 		}
 		if (e != null)
 			throw e;
+	}
+	
+	private void checkforCollectionsInitialization(DB db, String cappedCollectionName, int maxObjects, int maxBytes) {
+		if (!db.collectionExists(cappedCollectionName)) {
+			BasicDBObject createOptions = new BasicDBObject();
+			createOptions.append("capped", true);
+			createOptions.append("max", maxObjects); // max number of objects in collection (if smaller than max. size)
+			createOptions.append("size", maxBytes); // max size in bytes
+			db.createCollection(cappedCollectionName, createOptions);
+		}
 	}
 	
 	public void processDB(RunnableOnDB runnableOnDB) throws Exception {
