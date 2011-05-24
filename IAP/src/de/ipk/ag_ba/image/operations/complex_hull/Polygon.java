@@ -92,4 +92,21 @@ class Polygon {
 		java.awt.Polygon res = new java.awt.Polygon(xpoints, ypoints, npoints);
 		return res;
 	}
+	
+	public circle calculateminimalcircumcircle() {
+		for(int index=0;index<points.length; index++) {
+			Line linea = new Line(points[index],points[index+1]);
+			Line lineb = new Line(points[index+1],points[index+2]);
+			Line linec = new Line(points[index+2],points[index]);
+			
+			int a = linea.getlength();
+			int b= lineb.getlength();
+			int c = linec.getlength();
+			
+			double radius = (a*b*c)/Math.sqrt((a+b+c)*(-a+b+c)*(a-b+c)*(a+b-c));
+			
+//			circle k = new circle(radius);
+		}
+		return null;
+	}
 }

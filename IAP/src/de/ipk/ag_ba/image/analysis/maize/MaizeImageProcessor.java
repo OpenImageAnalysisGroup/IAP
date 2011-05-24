@@ -59,9 +59,9 @@ public class MaizeImageProcessor extends AbstractImageProcessor {
 		p.add(BlockFindBlueMarkers.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
 		p.add(BlockClearBelowMarker.class);
-		p.add(BlockCalculateMainAxis.class);
 		p.add(BlockLabFilterMaskToMask.class);
 		p.add(BlockRemoveSmallClusters.class);
+		p.add(BlockCalculateMainAxis.class);
 		p.add(BlockCalculateWidthAndHeight.class);
 		p.add(BlockFluoToIntensity.class);
 		p.add(BlockIntensityAnalysis.class);
