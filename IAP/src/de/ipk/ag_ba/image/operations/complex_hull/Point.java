@@ -1,5 +1,8 @@
 package de.ipk.ag_ba.image.operations.complex_hull;
 
+import java.awt.geom.Point2D;
+
+import org.graffiti.plugins.views.defaults.Point2Dfix;
 /**
  * @see http://www.iti.fh-flensburg.de/lang/algorithmen/geo/polygon.htm
  *      Public domain information ?!
@@ -86,6 +89,18 @@ class Point {
 	
 	public double y() {
 		return y;
+	}
+	
+	public double distEuclid(Point p) {
+		return Math.sqrt((x-p.x)*(x-p.x)+(y-p.y)*(y-p.y));
+	}
+
+	public Point2D toPoint2D() {
+		return new Point2Dfix(x,y);
+	}
+	
+	public String toString() {
+		return "x: " + x + ", y: " + y;
 	}
 	
 } // end class Point
