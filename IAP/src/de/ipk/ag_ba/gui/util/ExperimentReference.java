@@ -20,7 +20,7 @@ public class ExperimentReference {
 	private final ExperimentHeaderInterface header;
 	
 	public ExperimentReference(ExperimentHeaderInterface header) {
-		this.experimentName = header.getExperimentname();
+		this.experimentName = header.getExperimentName();
 		this.header = header;
 	}
 	

@@ -64,7 +64,7 @@ public class ExperimentInfo {
 	}
 	
 	public ExperimentInfo(ExperimentHeaderInterface header) {
-		this.experimentName = header.getExperimentname();
+		this.experimentName = header.getExperimentName();
 		try {
 			this.experimentID = Integer.parseInt(header.getDatabaseId());
 		} catch (Exception e) {

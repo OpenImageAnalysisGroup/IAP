@@ -182,11 +182,11 @@ public class MyExperimentInfoPanel extends JPanel {
 		if (!editPossible)
 			startEnabled = true;
 		
-		FolderPanel fp = new FolderPanel("Experiment " + experimentHeader.getExperimentname(), false, false, false, null);
+		FolderPanel fp = new FolderPanel("Experiment " + experimentHeader.getExperimentName(), false, false, false, null);
 		Color c = new Color(220, 220, 220);
 		fp.setFrameColor(c, Color.BLACK, 4, 8);
 		
-		editName = new JTextField(experimentHeader.getExperimentname());
+		editName = new JTextField(experimentHeader.getExperimentName());
 		coordinator = new JTextField(experimentHeader.getCoordinator());
 		groupVisibility = new JTextField(experimentHeader.getImportusergroup());
 		// getGroups(login, pass, experimentHeader.getImportusergroup(),
@@ -235,7 +235,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				
 				if (restore) {
 					saveB.setText("Save Changes");
-					editName.setText(experimentHeader.getExperimentname());
+					editName.setText(experimentHeader.getExperimentName());
 					coordinator.setText(experimentHeader.getCoordinator());
 					groupVisibility.setText(experimentHeader.getImportusergroup());
 					// groupVisibility.setSelectedItem(experimentHeader.getImportusergroup());

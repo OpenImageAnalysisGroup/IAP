@@ -40,7 +40,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 		super(ei.getDatabaseId() != null && ei.getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
 							: "Access Systems Biology Cloud Data Set");
 		
-		this.tt = "<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentname() + "</td></tr>"
+		this.tt = "<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentName() + "</td></tr>"
 				+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
 				+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()
 				+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark() + "</td></tr>";
@@ -165,7 +165,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 	
 	@Override
 	public String getDefaultTitle() {
-		return "" + header.getExperimentname();
+		return "" + header.getExperimentName();
 	}
 	
 	@Override

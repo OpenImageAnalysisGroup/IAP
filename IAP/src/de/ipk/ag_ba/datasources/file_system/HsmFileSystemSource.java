@@ -85,7 +85,7 @@ public class HsmFileSystemSource extends FileSystemSource {
 				ExperimentHeader eh = new ExperimentHeader(properties);
 				
 				if (accessOK(eh)) {
-					String experimentName = eh.getExperimentname();
+					String experimentName = eh.getExperimentName();
 					if (!experimentName2saveTime2data.containsKey(experimentName))
 						experimentName2saveTime2data.put(experimentName, new TreeMap<Long, ExperimentHeader>());
 					experimentName2saveTime2data.get(experimentName).put(saveTime, eh);

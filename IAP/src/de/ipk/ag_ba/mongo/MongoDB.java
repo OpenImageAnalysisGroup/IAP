@@ -1154,7 +1154,7 @@ public class MongoDB {
 		HashMap<String, ExperimentHeaderInterface> known = new HashMap<String, ExperimentHeaderInterface>();
 		ArrayList<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
 		for (ExperimentHeaderInterface ehi : in) {
-			String key = ehi.getImportusername() + "//" + ehi.getDatabase() + "//" + ehi.getExperimentname();
+			String key = ehi.getImportusername() + "//" + ehi.getDatabase() + "//" + ehi.getExperimentName();
 			if (!known.containsKey(key)) {
 				known.put(key, ehi);
 				result.add(ehi);

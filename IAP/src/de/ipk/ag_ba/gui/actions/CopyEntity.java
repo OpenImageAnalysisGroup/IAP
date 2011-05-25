@@ -29,7 +29,7 @@ public class CopyEntity extends AbstractExperimentAnalysisNavigation {
 	public String getDefaultTooltip() {
 		ExperimentHeaderInterface ei = experiment.getHeader();
 		return "<html>Copy Dataset:" +
-				"<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentname() + "</td></tr>"
+				"<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentName() + "</td></tr>"
 				+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
 				+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()
 				+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark() + "</td></tr>";

@@ -123,7 +123,7 @@ public class LemnaTecDataExchange {
 				ExperimentHeaderInterface ehi = new ExperimentHeader();
 				ehi.setExperimentname(rs.getString(1));
 				ehi.setDatabase(database);
-				ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentname());
+				ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentName());
 				ehi.setImportusername(user != null ? user : SystemAnalysis.getUserName());
 				ehi.setImportusergroup("LemnaTec");
 				LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
@@ -156,13 +156,13 @@ public class LemnaTecDataExchange {
 					"WHERE measurement_label=? AND tiled_image.snapshot_id=snapshot.id";
 			ps = connection.prepareStatement(sqlText);
 			for (ExperimentHeaderInterface ehi : result) {
-				ps.setString(1, ehi.getExperimentname());
+				ps.setString(1, ehi.getExperimentName());
 				rs = ps.executeQuery();
 				while (rs.next()) {
 					Timestamp min = rs.getTimestamp(1);
 					Timestamp max = rs.getTimestamp(2);
 					if (min == null || max == null)
-						System.out.println("Warning: No snapshot times stored for experiment " + ehi.getExperimentname()
+						System.out.println("Warning: No snapshot times stored for experiment " + ehi.getExperimentName()
 										+ " in database " + ehi.getDatabase() + "!");
 					if (min != null)
 						ehi.setStartdate(new Date(min.getTime()));
@@ -185,12 +185,12 @@ public class LemnaTecDataExchange {
 				sqlText = "SELECT distinct(creator) FROM import_data WHERE measurement_label=?";
 				ps = connection.prepareStatement(sqlText);
 				for (ExperimentHeaderInterface ehi : result) {
-					if (getCoordinatorFromExperimentName(ehi.getExperimentname()) != null) {
-						ehi.setCoordinator(getCoordinatorFromExperimentName(ehi.getExperimentname()));
+					if (getCoordinatorFromExperimentName(ehi.getExperimentName()) != null) {
+						ehi.setCoordinator(getCoordinatorFromExperimentName(ehi.getExperimentName()));
 					} else {
 						if (!people.containsKey(ehi))
 							people.put(ehi, new HashSet<String>());
-						ps.setString(1, ehi.getExperimentname());
+						ps.setString(1, ehi.getExperimentName());
 						rs = ps.executeQuery();
 						names.clear();
 						while (rs.next()) {
@@ -218,7 +218,7 @@ public class LemnaTecDataExchange {
 			for (ExperimentHeaderInterface ehi : result) {
 				if (!people.containsKey(ehi))
 					people.put(ehi, new HashSet<String>());
-				ps.setString(1, ehi.getExperimentname());
+				ps.setString(1, ehi.getExperimentName());
 				rs = ps.executeQuery();
 				names.clear();
 				while (rs.next()) {
@@ -511,7 +511,7 @@ public class LemnaTecDataExchange {
 			optStatus.setCurrentStatusValue(-1);
 		
 		Collection<Snapshot> snapshots = getSnapshotsOfExperiment(experimentReq.getDatabase(), experimentReq
-							.getExperimentname());
+							.getExperimentName());
 		HashMap<String, Integer> idtag2replicateID = new HashMap<String, Integer>();
 		
 		Timestamp earliest = null;
@@ -877,7 +877,7 @@ public class LemnaTecDataExchange {
 							+ "WHERE measure_label = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(sqlText);
-			ps.setString(1, header.getExperimentname());
+			ps.setString(1, header.getExperimentName());
 			try {
 				ResultSet rs = ps.executeQuery();
 				
