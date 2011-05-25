@@ -241,8 +241,6 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 				} else
 					workLoadIndex++;
 				workload.add(is);
-				if (workload.size() > 20)
-					break;
 			}
 		}
 		if (max > 0)
