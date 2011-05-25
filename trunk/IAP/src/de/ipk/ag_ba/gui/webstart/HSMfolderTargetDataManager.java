@@ -66,7 +66,7 @@ public class HSMfolderTargetDataManager {
 	public String prepareAndGetDataFileNameAndPath(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime, String zefn) {
 		String subPath = getTargetDirectory(experimentHeader, optSnapshotTime);
 		if (subPath.startsWith(DIRECTORY_FOLDER_NAME) || subPath.startsWith("bbb_"))
-			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentname()
+			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentName()
 					+ ". May not start with " + DIRECTORY_FOLDER_NAME + " or " + CONDITION_FOLDER_NAME + "!");
 		String res = path + File.separator + "data" + File.separator + subPath;
 		if (!new File(res).exists())
@@ -77,7 +77,7 @@ public class HSMfolderTargetDataManager {
 	public String prepareAndGetPreviewFileNameAndPath(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime, String zefn) {
 		String subPath = getTargetDirectory(experimentHeader, optSnapshotTime);
 		if (subPath.startsWith(DIRECTORY_FOLDER_NAME) || subPath.startsWith(CONDITION_FOLDER_NAME))
-			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentname()
+			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentName()
 					+ ". May not start with " + DIRECTORY_FOLDER_NAME + " or " + CONDITION_FOLDER_NAME + "!");
 		String res = path + File.separator + "icons" + File.separator + subPath;
 		if (!new File(res).exists())
@@ -107,7 +107,7 @@ public class HSMfolderTargetDataManager {
 			pre = experimentHeader.getExperimentType() + File.separator;
 		return pre +
 				filterBadChars(experimentHeader.getCoordinator()) + File.separator +
-				filterBadChars(experimentHeader.getExperimentname()) +
+				filterBadChars(experimentHeader.getExperimentName()) +
 				(optSnapshotTime == null ? "" : File.separator +
 						cal.get(GregorianCalendar.YEAR) + "-" + digit2(cal.get(GregorianCalendar.MONTH) + 1) + "-" + digit2(cal.get(GregorianCalendar.DAY_OF_MONTH)));
 	}

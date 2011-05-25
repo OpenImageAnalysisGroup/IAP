@@ -92,23 +92,23 @@ public class DayComponent extends JComponent {
 			if (date.equals(dateA)) {
 				if (!exp.containsKey(filter(ei.getImportusername(), "[unknown]")))
 					exp.put(filter(ei.getImportusername(), "[unknown]"), new ArrayList<String>());
-				exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment start: " + ei.getExperimentname());
+				exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment start: " + ei.getExperimentName());
 				startOrEnd = true;
 			}
 			if (date.equals(dateB)) {
 				if (!exp.containsKey(filter(ei.getImportusername(), "[unknown]")))
 					exp.put(filter(ei.getImportusername(), "[unknown]"), new ArrayList<String>());
 				if (date.equals(dateToday))
-					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment in progress: " + ei.getExperimentname());
+					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment in progress: " + ei.getExperimentName());
 				else
-					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment upload: " + ei.getExperimentname());
+					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment upload: " + ei.getExperimentName());
 				startOrEnd = true;
 			}
 			if (!startOrEnd) {
 				if (calendar.getTime().after(ei.getStartdate()) && calendar.getTime().before(ei.getImportdate())) {
 					if (!exp.containsKey(filter(ei.getImportusername(), "[unknown]")))
 						exp.put(filter(ei.getImportusername(), "[unknown]"), new ArrayList<String>());
-					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment running: " + ei.getExperimentname());
+					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment running: " + ei.getExperimentName());
 				}
 			}
 		}

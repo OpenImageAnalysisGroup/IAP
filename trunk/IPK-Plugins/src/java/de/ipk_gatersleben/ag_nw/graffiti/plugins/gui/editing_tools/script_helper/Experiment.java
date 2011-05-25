@@ -99,9 +99,9 @@ public class Experiment implements ExperimentInterface {
 	
 	public String getName() {
 		if (isEmpty())
-			return header.getExperimentname();
+			return header.getExperimentName();
 		else
-			return findHeader(null, this).getExperimentname();
+			return findHeader(null, this).getExperimentName();
 	}
 	
 	public String getRemark() {

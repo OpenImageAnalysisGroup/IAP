@@ -40,7 +40,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	}
 	
 	public String getExperimentName() {
-		return experiment.getHeader().getExperimentname();
+		return experiment.getHeader().getExperimentName();
 	}
 	
 	public boolean isReadOnly() {

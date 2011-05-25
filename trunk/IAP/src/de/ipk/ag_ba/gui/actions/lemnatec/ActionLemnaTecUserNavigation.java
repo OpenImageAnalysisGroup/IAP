@@ -82,9 +82,9 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 						status.setCurrentStatusText1(db);
 						set = true;
 					}
-					String id = experiment.getDatabase() + ":" + experiment.getExperimentname();
+					String id = experiment.getDatabase() + ":" + experiment.getExperimentName();
 					for (Snapshot s : new LemnaTecDataExchange().getSnapshotsOfExperiment(experiment.getDatabase(),
-										experiment.getExperimentname())) {
+										experiment.getExperimentName())) {
 						String c = s.getCreator();
 						if (c.length() == 0)
 							continue;

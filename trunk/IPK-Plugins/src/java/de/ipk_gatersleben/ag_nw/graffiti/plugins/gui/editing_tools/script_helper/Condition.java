@@ -161,7 +161,7 @@ public class Condition implements ConditionInterface {
 	// }
 	
 	public String getExperimentName() {
-		return header.getExperimentname();
+		return header.getExperimentName();
 	}
 	
 	public String getDatabase() {

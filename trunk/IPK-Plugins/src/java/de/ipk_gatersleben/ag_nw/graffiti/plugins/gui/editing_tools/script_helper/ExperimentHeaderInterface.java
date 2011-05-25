@@ -12,7 +12,7 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	
 	public void setExperimentname(String experimentname);
 	
-	public String getExperimentname();
+	public String getExperimentName();
 	
 	public void setRemark(String remark);
 	

@@ -106,8 +106,8 @@ public class TaskDescription {
 							
 							ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 							for (ExperimentHeaderInterface i : m.getExperimentList(null)) {
-								if (i.getExperimentname() != null && i.getExperimentname().contains("§")) {
-									String[] cc = i.getExperimentname().split("§");
+								if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
+									String[] cc = i.getExperimentName().split("§");
 									if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
 										String className = cc[0];
 										String partCnt = cc[2];
@@ -148,7 +148,7 @@ public class TaskDescription {
 								e.getHeader().setDatabaseId("");
 								for (SubstanceInterface si : e) {
 									for (ConditionInterface ci : si) {
-										ci.setExperimentName(e.getHeader().getExperimentname());
+										ci.setExperimentName(e.getHeader().getExperimentName());
 									}
 								}
 								long tStart = cmd.getSubmissionTime();

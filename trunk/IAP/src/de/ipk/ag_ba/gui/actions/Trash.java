@@ -67,7 +67,7 @@ public class Trash extends AbstractNavigationAction {
 						return;
 					else
 						ei = new ExperimentInfo(hhh);
-					experimentName = hhh.getExperimentname();
+					experimentName = hhh.getExperimentName();
 					message += "<li>Process Experiment " + experimentName + ": ";
 					if (cmd == DeletionCommand.DELETE || cmd == DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST) {
 						if (getHeader() != null) {

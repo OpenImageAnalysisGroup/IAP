@@ -33,7 +33,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		this();
 		if (copyFrom == null)
 			return;
-		experimentName = copyFrom.getExperimentname();
+		experimentName = copyFrom.getExperimentName();
 		remark = copyFrom.getRemark();
 		coordinator = copyFrom.getCoordinator();
 		databaseId = copyFrom.getDatabaseId();
@@ -64,7 +64,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		this.experimentName = experimentname;
 	}
 	
-	public String getExperimentname() {
+	public String getExperimentName() {
 		return experimentName;
 	}
 	
@@ -172,7 +172,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	public ExperimentHeader(Map map) {
 		this();
 		setExperimentname((String) map.get("experimentname"));
-		if (getExperimentname() == null)
+		if (getExperimentName() == null)
 			setExperimentname(ExperimentInterface.UNSPECIFIED_EXPERIMENTNAME);
 		setDatabase((String) map.get("database"));
 		setRemark((String) map.get("remark"));
@@ -279,14 +279,14 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	
 	@Override
 	public int compareTo(ExperimentHeaderInterface o) {
-		return getExperimentname().compareTo(o.getExperimentname());
+		return getExperimentName().compareTo(o.getExperimentName());
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		boolean oldStyle = false;
 		if (oldStyle)
-			return getExperimentname().equals(((ExperimentHeaderInterface) obj).getExperimentname());
+			return getExperimentName().equals(((ExperimentHeaderInterface) obj).getExperimentName());
 		else {
 			if (obj == null)
 				return false;
