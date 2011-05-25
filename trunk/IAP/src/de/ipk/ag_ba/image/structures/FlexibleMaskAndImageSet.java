@@ -117,12 +117,19 @@ public class FlexibleMaskAndImageSet {
 	 */
 	public void save(String fileName) throws FileNotFoundException {
 		FlexibleImageStack fis = new FlexibleImageStack();
-		fis.addImage("vis", images.getVis());
-		fis.addImage("vis mask", masks.getVis());
-		fis.addImage("fluo", images.getFluo());
-		fis.addImage("fluo mask", masks.getFluo());
-		fis.addImage("nir", images.getNir());
-		fis.addImage("nir mask", masks.getNir());
+		if (images.getVis() != null)
+			fis.addImage("vis", images.getVis());
+		if (masks.getVis() != null)
+			fis.addImage("vis mask", masks.getVis());
+		if (images.getFluo() != null)
+			fis.addImage("fluo", images.getFluo());
+		if (masks.getFluo() != null)
+			fis.addImage("fluo mask", masks.getFluo());
+		if (images.getNir() != null)
+			fis.addImage("nir", images.getNir());
+		if (masks.getNir() != null)
+			fis.addImage("nir mask", masks.getNir());
+		
 		fis.saveAsLayeredTif(new File(fileName));
 	}
 }

@@ -19,6 +19,9 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		this.plantImagePixelCountNir = getInput().getImages().getNir().getWidth()*getInput().getImages().getNir().getHeight();
 	}
 	
+	/**
+	 * ndiv [-1-1]
+	 */
 	@Override
 	protected FlexibleImage processVISmask() {
 		ImageOperation io = new ImageOperation(getInput().getMasks().getVis());

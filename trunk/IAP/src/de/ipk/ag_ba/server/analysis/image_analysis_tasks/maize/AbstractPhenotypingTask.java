@@ -76,10 +76,10 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		ArrayList<ImageSet> workload = new ArrayList<ImageSet>();
 		
 		if (analyzeTopImages())
-			addTopImagesToWorkset(workload, 2);
+			addTopImagesToWorkset(workload, 0);
 		
 		if (analyzeSideImages())
-			addSideImagesToWorkset(workload, 4);
+			addSideImagesToWorkset(workload, 0);
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
@@ -137,7 +137,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 							ImageProcessor ptip = getImageProcessor(options);
 							
 							FlexibleImageStack debugImageStack = null;
-							boolean addDebugImages = true;
+							boolean addDebugImages = false;
 							if (addDebugImages) {
 								debugImageStack = new FlexibleImageStack();
 							}
