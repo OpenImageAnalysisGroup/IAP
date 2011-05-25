@@ -19,13 +19,18 @@ public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 	
 	@Override
 	public InputStream getPreviewInputStream(IOurl url) throws Exception {
+		return getPreviewInputStream(url, 128);
+	}
+	
+	@Override
+	public InputStream getPreviewInputStream(IOurl url, int size) throws Exception {
 		
 		BufferedImage i = null;
 		InputStream is = url.getInputStream();
 		is = ResourceIOManager.getInputStreamMemoryCached(is);
 		i = ImageIO.read(is);
 		int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
-		double ICON_HEIGHT = 128;
+		double ICON_HEIGHT = size;
 		double factor = ICON_HEIGHT / maxS;
 		i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
 		
