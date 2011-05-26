@@ -142,7 +142,7 @@ public class Substance implements SubstanceInterface {
 	public static void addAndMerge(ExperimentInterface result, SubstanceInterface tobeMerged) {
 		SubstanceInterface save = null;
 		for (SubstanceInterface m : result)
-			if (tobeMerged.equals(m)) {
+			if (tobeMerged.compareTo(m) == 0) {
 				save = m;
 				break;
 			}
@@ -159,7 +159,7 @@ public class Substance implements SubstanceInterface {
 	public ConditionInterface addAndMergeData(ConditionInterface seriesnew) {
 		ConditionInterface save = null;
 		for (ConditionInterface s : this)
-			if (s.equals(seriesnew)) {
+			if (s.compareTo(seriesnew) == 0) {
 				save = s;
 				break;
 			}
