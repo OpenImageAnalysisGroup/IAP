@@ -562,7 +562,7 @@ public class Condition implements ConditionInterface {
 	public SampleInterface addAndMerge(SampleInterface samplenew) {
 		SampleInterface save = null;
 		for (SampleInterface s : this)
-			if (s.equals(samplenew)) {
+			if (s.compareTo(samplenew) == 0) {
 				save = s;
 				break;
 			}
