@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.actions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.BackgroundTaskStatusProvider;
@@ -24,6 +25,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		
 		this.jobStatus = new BackgroundTaskStatusProvider() {
 			int remainingJobs = 0;
+			int part_cnt = 0;
 			
 			@Override
 			public void setCurrentStatusValue(int value) {
@@ -47,25 +49,37 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			public double getCurrentStatusValueFine() {
 				double finishedJobs = 0.00001;
 				HashSet<String> activeJobsIds = new HashSet<String>();
+				HashMap<Long, Integer> submissionTime2partCnt = new HashMap<Long, Integer>();
 				try {
 					for (BatchCmd b : ActionJobStatus.this.m.batchGetAllCommands()) {
-						if (b.getString("_id") != null)
-							activeJobsIds.add(b.getString("_id"));
+						String jid = b.getString("_id");
+						if (jid != null)
+							activeJobsIds.add(jid);
 						if (b.getCurrentStatusValueFine() > 0)
 							finishedJobs += b.getCurrentStatusValueFine() / 100;
-						jobIds.add(b.getString("_id"));
+						if (jid != null) {
+							jobIds.add(jid);
+							
+							if (!submissionTime2partCnt.containsKey(b.getSubmissionTime()))
+								submissionTime2partCnt.put(b.getSubmissionTime(), b.getPartCnt());
+						}
 					}
-					for (String id : jobIds)
+					part_cnt = 0;
+					for (String id : jobIds) {
 						if (!activeJobsIds.contains(id))
 							finishedJobs += 1;
+					}
+					for (Integer cnt : submissionTime2partCnt.values())
+						part_cnt += cnt;
+					
 					remainingJobs = activeJobsIds.size();
 					if (remainingJobs == 0)
 						jobIds.clear();
 				} catch (Exception e) {
 					System.out.println("ERROR: " + e.getMessage());
 				}
-				if (jobIds.size() > 0)
-					return 100d / jobIds.size() * finishedJobs;
+				if (part_cnt > 0)
+					return 100d * (part_cnt - remainingJobs) / part_cnt;
 				else
 					return -1;
 			}
@@ -77,7 +91,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			@Override
 			public String getCurrentStatusMessage1() {
-				return remainingJobs + " remaining";
+				return remainingJobs + "/" + part_cnt + " remaining";
 			}
 			
 			@Override

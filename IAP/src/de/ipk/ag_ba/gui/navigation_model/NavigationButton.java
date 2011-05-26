@@ -174,16 +174,17 @@ public class NavigationButton implements StyleAware {
 			
 			String progress = "";
 			String s = "";
-			if (action.getStatusProvider().getCurrentStatusValueFine() > 0) {
-				if (action.getStatusProvider().getCurrentStatusValueFine() > 0)
-					progress = "" + action.getStatusProvider().getCurrentStatusValue() + "%";
+			double dp = action.getStatusProvider().getCurrentStatusValueFine();
+			if (dp > 0) {
+				if (dp > 0)
+					progress = "" + (int) dp + "%";
 				while (progress.length() < 5)
 					progress = "_" + progress;
 				progress = "";
 				
 				s = "<br>";
 				int len = (dots + " " + title + progress).length();
-				s += "<code>[" + getProgress("#", "-", len + 5, action.getStatusProvider().getCurrentStatusValueFine()) + "]</code>";
+				s += "<code>[" + getProgress("#", "-", len + 5, dp) + "]</code>";
 			}
 			String line2 = "";
 			if (action.getStatusProvider() != null && action.getStatusProvider().getCurrentStatusMessage1() != null
@@ -194,8 +195,7 @@ public class NavigationButton implements StyleAware {
 				line2 += "<p>" + action.getStatusProvider().getCurrentStatusMessage2();
 			if (statusServer != null) {
 				BackgroundTaskStatusProvider status = action.getStatusProvider();
-				String eta = statusServer.getRemainTime(status.getCurrentStatusValue() == -1,
-									status.getCurrentStatusValueFine());
+				String eta = statusServer.getRemainTime((int) dp == -1, dp);
 				if (eta.length() > 0) {
 					if (line2.length() > 0)
 						line2 += ", ";
