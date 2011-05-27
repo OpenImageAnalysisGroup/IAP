@@ -32,12 +32,14 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 				if (mp.getLeft() != null) {
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getLeft().x);
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getLeft().y);
+				} else {
 					System.out.println("n=" + n + ", i=" + i + ", lx: " + mp.getLeft().x + " ly: " + mp.getLeft().y);
 				}
 				i += 2;
 				if (mp.getRight() != null) {
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getRight().x);
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getRight().y);
+				} else {
 					System.out.println("n=" + n + ", i=" + i + ", rx: " + mp.getRight().x + " ry: " + mp.getRight().y);
 				}
 				i += 2;
@@ -52,7 +54,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	private FlexibleImage drawMarkers(FlexibleImage vis, ArrayList<MarkerPair> numericResult) {
 		ImageOperation io = new ImageOperation(vis);
 		
-		for(int index=0; index<numericResult.size();index++) {
+		for (int index = 0; index < numericResult.size(); index++) {
 			int leftX = (int) numericResult.get(index).left.x;
 			int leftY = (int) numericResult.get(index).left.y;
 			int rightX = (int) numericResult.get(index).right.x;
@@ -61,7 +63,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		return io.getImage();
 	}
-
+	
 	private ArrayList<MarkerPair> getMarkers(FlexibleImage image) {
 		return new ImageOperation(image).searchBlueMarkers();
 	}
