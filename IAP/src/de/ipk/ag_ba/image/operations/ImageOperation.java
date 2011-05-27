@@ -1805,7 +1805,8 @@ public class ImageOperation {
 		
 		for (int x = bordersize + translatex; x < (width + bordersize + translatex); x++) {
 			for (int y = bordersize + translatey; y < (height + bordersize + translatey); y++) {
-				result[x][y] = img2d[x - bordersize - translatex][y - bordersize - translatey];
+				if (x - bordersize - translatex >= 0 && y - bordersize - translatey >= 0 && x >= 0 && y >= 0)
+					result[x][y] = img2d[x - bordersize - translatex][y - bordersize - translatey];
 			}
 		}
 		return new ImageOperation(result);
@@ -1842,7 +1843,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		System.out.println(new Point(maxX - minX, maxY - minY).toString());
+		// System.out.println(new Point(maxX - minX, maxY - minY).toString());
 		if (isin)
 			return new Point(maxX - minX, maxY - minY);
 		else

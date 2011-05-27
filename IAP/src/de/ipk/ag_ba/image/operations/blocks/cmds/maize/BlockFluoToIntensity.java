@@ -8,6 +8,10 @@ public class BlockFluoToIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
+		if (getInput().getMasks().getFluo() == null) {
+			System.out.println("WARNING: BlockFluoToIntensity: Fluo Mask is NULL!");
+			return null;
+		}
 		ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
 		FlexibleImage res = io.convertFluo2intensity().getImage();
 		return res;

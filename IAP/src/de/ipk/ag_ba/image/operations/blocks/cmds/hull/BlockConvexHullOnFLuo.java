@@ -21,6 +21,10 @@ public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processFLUOmask() throws InterruptedException {
 		
+		if (getInput().getMasks().getFluo() == null) {
+			System.err.println("ERROR: BlockConvexHullOnFLuo: Input Fluo Mask is NULL!");
+			return null;
+		}
 		ImageOperation res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(true, false, true, true, Color.RED.getRGB(), Color.BLUE.getRGB(),
 				Color.ORANGE.getRGB());
 		

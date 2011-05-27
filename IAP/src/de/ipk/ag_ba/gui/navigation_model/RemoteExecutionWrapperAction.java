@@ -43,7 +43,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			String remoteCapableAnalysisActionParams = null;
 			String experimentInputMongoID = remoteAction.getMongoDatasetID();
 			ExperimentHeaderInterface header = remoteAction.getMongoDB().getExperimentHeader(new ObjectId(experimentInputMongoID));
-			int snapshotsPerJob = 10;
+			int snapshotsPerJob = 100;
 			int numberOfJobs = header.getNumberOfFiles() / snapshotsPerJob / 3;
 			
 			if (numberOfJobs < 1)

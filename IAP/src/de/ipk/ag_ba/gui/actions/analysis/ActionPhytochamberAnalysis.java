@@ -148,8 +148,9 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 				}
 			}
 			
+			System.out.println();
 			System.out.println("Statistics results :                  " + newStatisticsData.size());
-			System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
+			// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
 			
 			statisticsResult.getHeader().setDatabaseId("");
 			if (resultReceiver == null) {
