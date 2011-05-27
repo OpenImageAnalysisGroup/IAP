@@ -383,5 +383,4 @@ public class Sample implements SampleInterface {
 		s.setTtestInfo(getTtestInfo());
 		return s;
 	}
-	
 }

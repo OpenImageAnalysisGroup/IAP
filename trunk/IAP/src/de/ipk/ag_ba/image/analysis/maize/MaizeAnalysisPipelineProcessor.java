@@ -9,6 +9,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterMaskToMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHeight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
@@ -17,9 +18,9 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFluoToIntensity;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
 
-public class MaizeImageProcessor extends AbstractImageProcessor {
+public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 	
-	public MaizeImageProcessor(ImageProcessorOptions options) {
+	public MaizeAnalysisPipelineProcessor(ImageProcessorOptions options) {
 		super(options);
 	}
 	
@@ -67,6 +68,7 @@ public class MaizeImageProcessor extends AbstractImageProcessor {
 		p.add(BlockCalculateWidthAndHeight.class);
 		p.add(BlockFluoToIntensity.class);
 		p.add(BlockIntensityAnalysis.class);
+		p.add(BlockConvexHullOnFLuo.class);
 		p.add(BlockMoveMasksToImages.class);
 		p.add(BlockCropImages.class);
 		
