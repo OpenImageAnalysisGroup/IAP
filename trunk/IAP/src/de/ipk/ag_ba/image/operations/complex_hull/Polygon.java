@@ -98,47 +98,48 @@ class Polygon {
 		double maxDist = 0;
 		Circle result = null;
 		
-		for(int index=0;index<points.length; index++) {
-			if(maxDist < ptDistToCenterOfLine(maxSpan, points[index])) {
+		for (int index = 0; index < points.length; index++) {
+			if (maxDist < ptDistToCenterOfLine(maxSpan, points[index])) {
 				maxDist = ptDistToCenterOfLine(maxSpan, points[index]);
 				Circle temp = new Circle(maxSpan.p0, maxSpan.p1, points[index]);
 				result = temp;
 			}
 		}
-		if(containAllPoints(result)) {
+		if (containAllPoints(result)) {
 			return result;
 		} else {
 			throw new UnsupportedOperationException("not all points of the convex hull in the " + result.toString());
+			// return null;
 		}
 	}
-
+	
 	private boolean containAllPoints(Circle input) {
-		 Point center = new Point(input.x, input.y);
-		 
-	        for (int i = 0; i<points.length; i++) {
-	            double distance = center.distEuclid(points[i]);
-	            if(distance - input.d/2 > 0.001) {
-	            	return false;
-	            }
-	        }
-	        return true;
+		Point center = new Point(input.x, input.y);
+		
+		for (int i = 0; i < points.length; i++) {
+			double distance = center.distEuclid(points[i]);
+			if (distance - input.d / 2 > 1) {
+				return false;
+			}
+		}
+		return true;
 	}
-
+	
 	private double ptDistToCenterOfLine(Line maxSpan, Point point) {
-			double midX = (maxSpan.p0.x+maxSpan.p1.x)/2;
-			double midY = (maxSpan.p0.y+maxSpan.p1.y)/2;
-			Point temp = new Point(midX, midY);
-			
- 		return temp.distEuclid(point);
+		double midX = (maxSpan.p0.x + maxSpan.p1.x) / 2;
+		double midY = (maxSpan.p0.y + maxSpan.p1.y) / 2;
+		Point temp = new Point(midX, midY);
+		
+		return temp.distEuclid(point);
 	}
-
+	
 	private Line getMaxSpan() {
 		double maxDist = 0;
 		Line result = null;
 		
-		for(int i=0; i<points.length;i++) {
-			for(int j=i+1;j<points.length;j++) {
-				if(maxDist < points[i].distEuclid(points[j])) {
+		for (int i = 0; i < points.length; i++) {
+			for (int j = i + 1; j < points.length; j++) {
+				if (maxDist < points[i].distEuclid(points[j])) {
 					maxDist = points[i].distEuclid(points[j]);
 					Line temp = new Line(points[i], points[j]);
 					result = temp;
@@ -147,15 +148,16 @@ class Polygon {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * this method only works, if the polygon is the convex hull and the points are in order
+	 * 
 	 * @return
 	 */
 	public int perimeter() {
 		double distance = 0;
 		
-		for(int index=0; index<points.length;index++) {
+		for (int index = 0; index < points.length; index++) {
 			distance += points[index].distEuclid(points[(index + 1) % points.length]);
 		}
 		return (int) distance;

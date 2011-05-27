@@ -1842,6 +1842,7 @@ public class ImageOperation {
 				}
 			}
 		}
+		System.out.println(new Point(maxX - minX, maxY - minY).toString());
 		if (isin)
 			return new Point(maxX - minX, maxY - minY);
 		else

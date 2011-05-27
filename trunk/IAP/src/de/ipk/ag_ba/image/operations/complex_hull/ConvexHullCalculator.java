@@ -121,9 +121,12 @@ public class ConvexHullCalculator {
 		rt.addValue("hull.circularity", circularity());
 		
 		Circle circumcircle = polygon.calculateminimalcircumcircle();
-		rt.addValue("hull.circumcircle.x", circumcircle.x);
-		rt.addValue("hull.circumcircle.y", circumcircle.y);
-		rt.addValue("hull.circumcircle.d", circumcircle.d);
+		
+		if (circumcircle != null) {
+			rt.addValue("hull.circumcircle.x", circumcircle.x);
+			rt.addValue("hull.circumcircle.y", circumcircle.y);
+			rt.addValue("hull.circumcircle.d", circumcircle.d);
+		}
 		
 		int filledArea = io.countFilledPixels();
 		rt.addValue("hull.fillgrade", filledArea / polygon.area());
@@ -144,9 +147,9 @@ public class ConvexHullCalculator {
 	 * @return index of circularity [0-1], for index 1 the polygon is a circle
 	 */
 	private double circularity() {
-		return 4.0 * Math.PI*(polygon.area()/(polygon.perimeter()*polygon.perimeter()));
+		return 4.0 * Math.PI * (polygon.area() / (polygon.perimeter() * polygon.perimeter()));
 	}
-
+	
 	private static ImageOperation drawHullAndCentroid(boolean drawHull, boolean drawCentroid,
 			ImageOperation in, Polygon polygon, int hullLineColor, Point centroid, int centroidColor) {
 		
