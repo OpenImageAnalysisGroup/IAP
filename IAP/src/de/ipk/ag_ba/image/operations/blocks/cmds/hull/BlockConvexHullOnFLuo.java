@@ -4,6 +4,7 @@ import ij.measure.ResultsTable;
 
 import java.awt.Color;
 
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -20,12 +21,15 @@ public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processFLUOmask() throws InterruptedException {
 		
-		ImageOperation res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(false, true, true, true, Color.RED.getRGB(), Color.BLUE.getRGB(),
+		ImageOperation res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(true, false, true, true, Color.RED.getRGB(), Color.BLUE.getRGB(),
 				Color.ORANGE.getRGB());
 		
 		ResultsTable numericResults = res.getResultsTable();
 		
-		getProperties().storeResults("RESULT_", numericResults, getBlockPosition());
+		if (options.getCameraTyp() == CameraTyp.SIDE)
+			getProperties().storeResults("RESULT_side.", numericResults, getBlockPosition());
+		if (options.getCameraTyp() == CameraTyp.TOP)
+			getProperties().storeResults("RESULT_top.", numericResults, getBlockPosition());
 		
 		return res.getImage();
 	}

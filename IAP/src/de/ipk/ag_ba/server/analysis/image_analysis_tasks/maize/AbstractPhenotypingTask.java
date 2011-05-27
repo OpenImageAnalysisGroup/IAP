@@ -85,7 +85,22 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		final int wl = workload.size();
 		int idxxx = 0;
 		final ArrayList<Thread> wait = new ArrayList<Thread>();
-		System.out.println("Workload: " + wl);
+		System.out.println("Workload (Snapshots divided by top/side): " + wl);
+		int error = 0;
+		int side = 0;
+		int top = 0;
+		for (ImageSet md : workload) {
+			if (!md.hasAllImageTypes())
+				error++;
+			if (md.isSide())
+				side++;
+			else
+				top++;
+		}
+		if (error > 0)
+			System.out.println("Warning: not all three images available for " + error + " snapshots!");
+		System.out.println("Info: Side snapshots: " + side);
+		System.out.println("Info: Top snapshots: " + top);
 		
 		for (ImageSet md : workload) {
 			final ImageSet id = md;

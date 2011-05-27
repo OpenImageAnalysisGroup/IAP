@@ -39,10 +39,10 @@ public class IntensityAnalysis {
 		
 		result.incrementCounter();
 		
-		result.addValue("intensity.average", sumOfIntensity / plantArea*plantImagePixelCnt/pixels.length);
+		result.addValue("intensity.average", sumOfIntensity / plantArea * plantImagePixelCnt / pixels.length);
 		
 		for (int i = 0; i < this.n; i++) {
-			result.addValue("histogram.bin." + i, hist.getFreqAt(i));
+			result.addValue("histogram.bin." + (i + 1), hist.getFreqAt(i));
 		}
 		
 		return result;

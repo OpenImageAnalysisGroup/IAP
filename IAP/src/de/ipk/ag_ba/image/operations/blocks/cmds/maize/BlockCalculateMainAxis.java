@@ -22,19 +22,27 @@ public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 		
 		if (options.getCameraTyp() == CameraTyp.TOP) {
 			MainAxisCalculationResult macr = getAngle(getInput().getMasks().getVis());
-			
-			double angle = macr.getMinResult().getAngle();
-			
-			double imageRotationAngle = 0;
-			if (options.getVis() != null) {
-				imageRotationAngle = options.getVis().getPosition();
-				System.out.println("Rotation: " + imageRotationAngle);
+			if (macr != null) {
+				double angle = macr.getMinResult().getAngle();
+				
+				double imageRotationAngle = 0;
+				if (options.getVis() != null) {
+					imageRotationAngle = options.getVis().getPosition() != null ? options.getVis().getPosition() : 0;
+					if (options.getVis().getPosition() != null)
+						System.out.println("Considering top image rotation: " + imageRotationAngle);
+				}
+				
+				angle = angle - imageRotationAngle;
+				
+				getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION, angle);
+				double normalizedDistanceToMainAxis = macr.getMinResult().getDistanceSum() / macr.getMinResult().getPixelCount()
+						/ macr.getMinResult().getPixelCount();
+				getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE, normalizedDistanceToMainAxis);
+				getProperties().setNumericProperty(0, PropertyNames.CENTROID_X, macr.getCentroid().x);
+				getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y, macr.getCentroid().y);
+			} else {
+				System.out.println("Warning: Empty top vis mask image, main axis rotation can't be calculated.");
 			}
-			getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION, angle);
-			double normalizedDistanceToMainAxis = macr.getMinResult().getDistanceSum() / macr.getMinResult().getPixelCount() / macr.getMinResult().getPixelCount();
-			getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE, normalizedDistanceToMainAxis);
-			getProperties().setNumericProperty(0, PropertyNames.CENTROID_X, macr.getCentroid().x);
-			getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y, macr.getCentroid().y);
 		}
 		return getInput().getMasks().getVis();
 	}

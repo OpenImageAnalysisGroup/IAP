@@ -2,7 +2,7 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.maize.MaizeImageProcessor;
+import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipelineProcessor;
 
 /**
  * @author klukas
@@ -25,12 +25,12 @@ public class MaizeAnalysisTask extends AbstractPhenotypingTask {
 	
 	@Override
 	protected ImageProcessor getImageProcessor(ImageProcessorOptions options) {
-		return new MaizeImageProcessor(options);
+		return new MaizeAnalysisPipelineProcessor(options);
 	}
 	
 	@Override
 	protected boolean analyzeTopImages() {
-		return false;
+		return true;
 	}
 	
 	@Override

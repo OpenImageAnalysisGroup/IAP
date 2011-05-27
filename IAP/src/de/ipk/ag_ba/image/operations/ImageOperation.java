@@ -1740,7 +1740,10 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new Vector2d(positionx / area, positiony / area);
+		if (area > 0)
+			return new Vector2d(positionx / area, positiony / area);
+		else
+			return null;
 	}
 	
 	public MainAxisCalculationResult calculateTopMainAxis(int background) {
