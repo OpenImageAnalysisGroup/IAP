@@ -98,7 +98,6 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 			else
 				top++;
 		}
-		System.out.println();
 		if (error > 0)
 			System.out.println("Warning: not all three images available for " + error + " snapshots!");
 		System.out.println("Info: Workload Top/Side: " + top + "/" + side);

@@ -90,7 +90,8 @@ public class TaskDescription {
 				experiment.getHeader().setExperimentname(
 									cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§"
 											+ batch.getSubmissionTime());
-				System.out.println("SUB-T: " + batch.getSubmissionTime());
+				System.out.println("Received calculation results at " + SystemAnalysisExt.getCurrentTime() + ". Job has been submitted at "
+						+ SystemAnalysisExt.getCurrentTime(batch.getSubmissionTime()));
 				experiment.getHeader().setImportusergroup("Temp");
 				// System.out.println("Received result: " + experiment.getName());
 				try {
