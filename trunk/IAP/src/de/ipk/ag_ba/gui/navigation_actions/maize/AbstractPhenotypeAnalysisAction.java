@@ -143,8 +143,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				}
 			}
 			
-			System.out.println("Statistics results :                  " + newStatisticsData.size());
-			System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
+			System.out.println("Statistics results: " + newStatisticsData.size());
+			// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
 			
 			statisticsResult.getHeader().setDatabaseId("");
 			if (resultReceiver == null) {

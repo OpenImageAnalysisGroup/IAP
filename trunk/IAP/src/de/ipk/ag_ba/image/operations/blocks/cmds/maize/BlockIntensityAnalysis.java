@@ -24,6 +24,11 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	 */
 	@Override
 	protected FlexibleImage processVISmask() {
+		if (getInput().getMasks().getVis() == null) {
+			System.err.println("ERROR: BlockIntensityAnalysis: Vis Mask is NULL!");
+			return null;
+		}
+		
 		ImageOperation io = new ImageOperation(getInput().getMasks().getVis());
 		int pixelsum = io.convert2Grayscale().countFilledPixels();
 		

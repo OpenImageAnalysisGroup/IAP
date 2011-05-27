@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class ImageSet {
@@ -7,11 +8,17 @@ public class ImageSet {
 	private ImageData fluo;
 	private ImageData nir;
 	private boolean isSide;
+	private final SampleInterface sampleInfo;
 	
 	public ImageSet(ImageData vis, ImageData fluo, ImageData nir) {
+		this(vis, fluo, nir, null);
+	}
+	
+	public ImageSet(ImageData vis, ImageData fluo, ImageData nir, SampleInterface optSampleInfo) {
 		this.vis = vis;
 		this.fluo = fluo;
 		this.nir = nir;
+		sampleInfo = optSampleInfo;
 	}
 	
 	public ImageData getVIS() {
@@ -48,5 +55,9 @@ public class ImageSet {
 	
 	public void setSide(boolean isSide) {
 		this.isSide = isSide;
+	}
+	
+	public SampleInterface getSampleInfo() {
+		return sampleInfo;
 	}
 }

@@ -5,6 +5,7 @@ import java.awt.Point;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -40,21 +41,32 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	private Point getWidthandHeightTop(FlexibleImage image, int background) {
+		if (image == null) {
+			System.err.println("ERROR: BlockCalculateWidthAndHeight: Flu Mask is NULL!");
+			return null;
+		}
+		
 		int imagecentx = image.getWidth() / 2;
 		int imagecenty = image.getHeight() / 2;
 		int diagonal = (int) Math.sqrt((image.getWidth() * image.getWidth()) + (image.getHeight() * image.getHeight()));
 		
 		ImageOperation io = new ImageOperation(image);
-		FlexibleImage resize = io.addBorder(diagonal - image.getWidth(),
-				(int) (imagecentx - getProperties().getNumericProperty(0, 1, PropertyNames.CENTROID_X).getValue()),
-				(int) (imagecenty - getProperties().getNumericProperty(0, 1, PropertyNames.CENTROID_Y).getValue()), background).getImage();
+		BlockProperty pa = getProperties().getNumericProperty(0, 1, PropertyNames.CENTROID_X);
+		BlockProperty pb = getProperties().getNumericProperty(0, 1, PropertyNames.CENTROID_Y);
 		
-		int angle = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION).getValue();
-		
-		resize = new ImageOperation(resize).rotate(-angle).getImage();
-		resize.print("resize");
-		Point values = new ImageOperation(resize).calculateWidthAndHeight(background);
-		
-		return values;
+		if (pa != null && pb != null) {
+			FlexibleImage resize = io.addBorder(diagonal - image.getWidth(),
+					(int) (imagecentx - pa.getValue()),
+					(int) (imagecenty - pb.getValue()), background).getImage();
+			
+			int angle = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION).getValue();
+			
+			resize = new ImageOperation(resize).rotate(-angle).getImage();
+			// resize.print("resize");
+			Point values = new ImageOperation(resize).calculateWidthAndHeight(background);
+			
+			return values;
+		} else
+			return null;
 	}
 }

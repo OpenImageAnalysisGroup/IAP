@@ -118,7 +118,7 @@ class Polygon {
 		
 		for (int i = 0; i < points.length; i++) {
 			double distance = center.distEuclid(points[i]);
-			if (distance - input.d / 2 > 1) {
+			if (distance - input.d / 2 > 2) {
 				return false;
 			}
 		}

@@ -33,14 +33,14 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getLeft().x);
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getLeft().y);
 				} else {
-					System.out.println("n=" + n + ", i=" + i + ", lx: " + mp.getLeft().x + " ly: " + mp.getLeft().y);
+					// System.out.println("n=" + n + ", i=" + i + ", lx: " + mp.getLeft().x + " ly: " + mp.getLeft().y);
 				}
 				i += 2;
 				if (mp.getRight() != null) {
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getRight().x);
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getRight().y);
 				} else {
-					System.out.println("n=" + n + ", i=" + i + ", rx: " + mp.getRight().x + " ry: " + mp.getRight().y);
+					// System.out.println("n=" + n + ", i=" + i + ", rx: " + mp.getRight().x + " ry: " + mp.getRight().y);
 				}
 				i += 2;
 				n++;

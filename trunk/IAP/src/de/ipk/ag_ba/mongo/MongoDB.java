@@ -842,7 +842,7 @@ public class MongoDB {
 					}
 				}
 				
-				BackgroundTaskHelper.lockGetSemaphore(image.getURL() != null ? image.getURL().getPrefix() : "in", 1);
+				BackgroundTaskHelper.lockGetSemaphore(image.getURL() != null ? image.getURL().getPrefix() : "in", 2);
 				byte[] isMain = null;
 				byte[] isLabel = null;
 				try {
@@ -1629,8 +1629,9 @@ public class MongoDB {
 		} catch (Exception e) {
 			return new ArrayList<BatchCmd>();
 		}
-		if (res.size() > 0)
+		if (res.size() > 0) {
 			System.out.println("SCHEDULED FOR START: " + res.size());
+		}
 		return res;
 	}
 	

@@ -81,11 +81,12 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		if (analyzeSideImages())
 			addSideImagesToWorkset(workload, 0);
 		
+		workload = filterWorkload(workload, "Athletico");
+		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
 		int idxxx = 0;
 		final ArrayList<Thread> wait = new ArrayList<Thread>();
-		System.out.println("Workload (Snapshots divided by top/side): " + wl);
 		int error = 0;
 		int side = 0;
 		int top = 0;
@@ -97,10 +98,10 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 			else
 				top++;
 		}
+		System.out.println();
 		if (error > 0)
 			System.out.println("Warning: not all three images available for " + error + " snapshots!");
-		System.out.println("Info: Side snapshots: " + side);
-		System.out.println("Info: Top snapshots: " + top);
+		System.out.println("Info: Workload Top/Side: " + top + "/" + side);
 		
 		for (ImageSet md : workload) {
 			final ImageSet id = md;
@@ -191,13 +192,21 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 								debugImageStack.print("NNN");
 								buf = mos.getBuff();
 								
-								saveImage(visInputImage, pipelineResult.getVis(), buf, ".tiff");
-								saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
-								saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
 								System.out.println("f]");
+							} else {
+								visInputImage.setLabelURL(visInputImage.getURL());
+								fluo.setLabelURL(fluo.getURL());
+								nir.setLabelURL(nir.getURL());
 							}
+							if (pipelineResult.getVis() != null)
+								saveImage(visInputImage, pipelineResult.getVis(), buf, ".tiff");
+							if (pipelineResult.getFluo() != null)
+								saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
+							if (pipelineResult.getNir() != null)
+								saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
+							
 						} else {
-							System.err.println("Warning: not all three image types available for snapshot!");
+							System.err.println("ERROR: Not all three snapshots images could be loaded!");
 						}
 					} catch (Exception e) {
 						ErrorMsg.addErrorMessage(e);
@@ -221,6 +230,17 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		
 		status.setCurrentStatusValueFine(100d);
 		input = null;
+	}
+	
+	private ArrayList<ImageSet> filterWorkload(ArrayList<ImageSet> workload, String filter) {
+		if (filter == null)
+			return workload;
+		ArrayList<ImageSet> res = new ArrayList<ImageSet>();
+		for (ImageSet is : workload)
+			if (is.getSampleInfo() != null)
+				if (is.getSampleInfo().getParentCondition().toString().contains(filter))
+					res.add(is);
+		return res;
 	}
 	
 	private void addSideImagesToWorkset(ArrayList<ImageSet> workload, int max) {
@@ -270,7 +290,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 				ImageData id = (ImageData) md;
 				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
 				if (!replicateId2ImageSetTop.containsKey(key)) {
-					replicateId2ImageSetTop.put(key, new ImageSet(null, null, null));
+					replicateId2ImageSetTop.put(key, new ImageSet(null, null, null, id.getParentSample()));
 				}
 				ImageSet is = replicateId2ImageSetTop.get(key);
 				is.setSide(false);
