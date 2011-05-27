@@ -11,12 +11,12 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected FlexibleImage processFLUOmask() {
 		
 		int background = options.getBackground();
 		
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
-			Point values = getWidthandHeightSide(getInput().getMasks().getVis(), background);
+			Point values = getWidthandHeightSide(getInput().getMasks().getFluo(), background);
 			
 			if (values != null) {
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width", values.x);
@@ -24,14 +24,14 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 			}
 		}
 		if (options.getCameraTyp() == CameraTyp.TOP) {
-			Point values = getWidthandHeightTop(getInput().getMasks().getVis(), background);
+			Point values = getWidthandHeightTop(getInput().getMasks().getFluo(), background);
 			
 			if (values != null) {
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_top.width", values.x);
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_top.height", values.y);
 			}
 		}
-		return getInput().getMasks().getVis();
+		return getInput().getMasks().getFluo();
 	}
 	
 	private Point getWidthandHeightSide(FlexibleImage vis, int background) {
@@ -52,7 +52,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 		int angle = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION).getValue();
 		
 		resize = new ImageOperation(resize).rotate(-angle).getImage();
-		
+		resize.print("resize");
 		Point values = new ImageOperation(resize).calculateWidthAndHeight(background);
 		
 		return values;
