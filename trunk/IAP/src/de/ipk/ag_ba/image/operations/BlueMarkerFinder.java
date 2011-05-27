@@ -56,7 +56,6 @@ public class BlueMarkerFinder {
 			
 			Vector2d temp = new Vector2d(a, b);
 			result.add(temp);
-			System.out.println("vectoren" + i + ": " + temp);
 		}
 		return result;
 	}

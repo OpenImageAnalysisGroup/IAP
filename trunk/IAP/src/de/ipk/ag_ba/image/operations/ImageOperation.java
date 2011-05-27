@@ -391,9 +391,11 @@ public class ImageOperation {
 		image.getProcessor().erode();
 	}
 	
-	public ImageOperation closing1() { // es wird der 3x3 Minimum-Filter genutzt
-		image.getProcessor().dilate();
-		image.getProcessor().erode();
+	public ImageOperation closing(int m, int n) { // es wird der 3x3 Minimum-Filter genutzt
+		for (int i = 0; i < m; i++)
+			image.getProcessor().dilate();
+		for (int j = 0; j < n; j++)
+			image.getProcessor().erode();
 		
 		return new ImageOperation(image);
 	}
@@ -460,12 +462,13 @@ public class ImageOperation {
 		return this;
 	}
 	
-	public void skeletonize() {
+	public ImageOperation skeletonize() {
 		ImageProcessor processor2 = image.getProcessor().convertToByte(true);
 		ByteProcessor byteProcessor = new BinaryProcessor(
 				(ByteProcessor) processor2);
 		byteProcessor.skeletonize();
-		image.setProcessor(processor2.convertToRGB());
+		
+		return new ImageOperation(byteProcessor.getBufferedImage());
 	}
 	
 	public void outline(int[][] mask) { // starke Farbübergänge werden als
@@ -1819,6 +1822,7 @@ public class ImageOperation {
 		int maxX = 0;
 		int minY = Integer.MAX_VALUE;
 		int maxY = 0;
+		boolean isin = false;
 		
 		for (int x = 0; x < img2d.length; x++) {
 			for (int y = 0; y < img2d[0].length; y++) {
@@ -1831,10 +1835,14 @@ public class ImageOperation {
 						minY = y;
 					if (y > maxY)
 						maxY = y;
+					isin = true;
 				}
 			}
 		}
-		return new Point(maxX - minX, maxY - minY);
+		if (isin)
+			return new Point(maxX - minX, maxY - minY);
+		else
+			return null;
 	}
 	
 	public ImageOperation clearImageBelowYvalue(int threshold, int background) {
@@ -1877,6 +1885,36 @@ public class ImageOperation {
 	 */
 	public IntensityAnalysis intensity(int n) {
 		return new IntensityAnalysis(this, n);
+	}
+	
+	public ImageOperation rgbChannelWeighting() {
+		
+		int[] pixels = getImageAs1array();
+		int[] result = new int[pixels.length];
+		boolean flag = true;
+		int index = 0;
+		for (int c : pixels) {
+			int r = (c & 0xff0000) >> 16;
+			int g = (c & 0x00ff00) >> 8;
+			int b = (c & 0x0000ff);
+			
+			// min: -4*255, max: 4*255
+			// --> Range: 8*255, Offset: 4*255
+			int intensity = 4 * g - (3 * b) - r;
+			float i = (intensity + 4 * 255) / (float) (8 * 255);
+			if (i > 130f / 255f)
+				result[index] = new Color(i, i, i).getRGB();
+			else {
+				flag = true;
+				if (flag)
+					result[index] = Color.BLUE.getRGB();
+				else
+					result[index] = c;
+				flag = !flag;
+			}
+			index++;
+		}
+		return new ImageOperation(new FlexibleImage(result, image.getWidth(), image.getHeight()));
 	}
 	
 }
