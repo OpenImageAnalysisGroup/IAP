@@ -108,7 +108,8 @@ class Polygon {
 		if (containAllPoints(result)) {
 			return result;
 		} else {
-			throw new UnsupportedOperationException("not all points of the convex hull in the " + result.toString());
+			System.err.println("ERROR: Ploygon: not all points of the convex hull in the " + result.toString() + " points: " + this.toString());
+			return result;
 			// return null;
 		}
 	}
@@ -118,11 +119,22 @@ class Polygon {
 		
 		for (int i = 0; i < points.length; i++) {
 			double distance = center.distEuclid(points[i]);
-			if (distance - input.d / 2 > 2) {
+			if (distance - input.d / 2 > 10) {
 				return false;
 			}
 		}
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (int index = 0; index < points.length; index++) {
+			sb.append(points[index] + ";");
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 	
 	private double ptDistToCenterOfLine(Line maxSpan, Point point) {

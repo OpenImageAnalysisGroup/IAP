@@ -321,4 +321,8 @@ public class SystemAnalysisExt {
 	public static String getCurrentTime() {
 		return sdf.format(new Date());
 	}
+	
+	public static String getCurrentTime(long time) {
+		return sdf.format(new Date(time));
+	}
 }
