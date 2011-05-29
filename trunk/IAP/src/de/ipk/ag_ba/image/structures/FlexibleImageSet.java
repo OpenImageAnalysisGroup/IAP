@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * Holds up to three images (Vis/Fluo/NIR). Makes it more easy to process a
@@ -23,6 +24,9 @@ public class FlexibleImageSet {
 	private FlexibleImage vis;
 	private FlexibleImage fluo;
 	private FlexibleImage nir;
+	private ImageData visInfo;
+	private ImageData fluoInfo;
+	private ImageData nirInfo;
 	
 	public FlexibleImageSet() {
 		// empty
@@ -197,4 +201,36 @@ public class FlexibleImageSet {
 		}
 		return res;
 	}
+	
+	public void setImageInfo(ImageData visInfo, ImageData fluoInfo, ImageData nirInfo) {
+		this.setVisInfo(visInfo);
+		this.setFluoInfo(fluoInfo);
+		this.setNirInfo(nirInfo);
+		
+	}
+	
+	public void setVisInfo(ImageData visInfo) {
+		this.visInfo = visInfo;
+	}
+	
+	public ImageData getVisInfo() {
+		return visInfo;
+	}
+	
+	public void setFluoInfo(ImageData fluoInfo) {
+		this.fluoInfo = fluoInfo;
+	}
+	
+	public ImageData getFluoInfo() {
+		return fluoInfo;
+	}
+	
+	public void setNirInfo(ImageData nirInfo) {
+		this.nirInfo = nirInfo;
+	}
+	
+	public ImageData getNirInfo() {
+		return nirInfo;
+	}
+	
 }

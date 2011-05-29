@@ -294,4 +294,8 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 		this.rotation = rotation;
 	}
 	
+	public ImageData copy() {
+		return new ImageData(this.getParentSample(), this);
+	}
+	
 }

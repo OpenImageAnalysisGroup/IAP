@@ -1747,7 +1747,11 @@ public class ImageOperation {
 	}
 	
 	public MainAxisCalculationResult calculateTopMainAxis(int background) {
-		return calculateTopMainAxis(getCentroid(background), 20, background);
+		Vector2d r = getCentroid(background);
+		if (r != null)
+			return calculateTopMainAxis(r, 20, background);
+		else
+			return null;
 	}
 	
 	/**

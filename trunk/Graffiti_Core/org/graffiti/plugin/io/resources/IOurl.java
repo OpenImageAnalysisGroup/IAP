@@ -104,4 +104,8 @@ public class IOurl {
 			return getFileName();
 		}
 	}
+	
+	public IOurl copy() {
+		return new IOurl(prefix, detail, filename);
+	}
 }
