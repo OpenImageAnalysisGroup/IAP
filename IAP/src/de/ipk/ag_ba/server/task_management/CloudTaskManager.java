@@ -83,7 +83,7 @@ public class CloudTaskManager {
 							BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute());
 					
-					int maxTasks = SystemAnalysis.getNumberOfCPUs() / 2;
+					int maxTasks = SystemAnalysis.getNumberOfCPUs();
 					if (maxTasks < 1)
 						maxTasks = 1;
 					

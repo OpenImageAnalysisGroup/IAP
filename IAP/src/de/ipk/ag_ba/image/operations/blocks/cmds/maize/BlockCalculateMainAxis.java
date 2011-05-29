@@ -3,12 +3,15 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MainAxisCalculationResult;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * Calculates the main axis rotation for visible top images. All other image types and configs are ignored.
@@ -41,7 +44,11 @@ public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 				getProperties().setNumericProperty(0, PropertyNames.CENTROID_X, macr.getCentroid().x);
 				getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y, macr.getCentroid().y);
 			} else {
-				System.out.println("Warning: Empty top vis mask image, main axis rotation can't be calculated.");
+				if (!SystemAnalysis.isHeadless()) {
+					getInput().getImages().getVis().print("(Image) Could not determine main axis angle (" + SystemAnalysisExt.getCurrentTime() + ")");
+					getInput().getMasks().getVis().print("(Mask) Could not determine main axis angle (" + SystemAnalysisExt.getCurrentTime() + ")");
+				}
+				System.err.println("ERROR: BlockCalculateMainAxis: Could not determine main axis angle!");
 			}
 		}
 		return getInput().getMasks().getVis();

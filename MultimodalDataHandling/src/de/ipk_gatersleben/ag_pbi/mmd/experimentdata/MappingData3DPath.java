@@ -83,4 +83,12 @@ public class MappingData3DPath {
 		return isValid;
 	}
 	
+	public static ArrayList<MappingData3DPath> get(Experiment e) {
+		ArrayList<MappingData3DPath> res = new ArrayList<MappingData3DPath>();
+		for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(e)) {
+			res.add(new MappingData3DPath(nmi));
+		}
+		return res;
+	}
+	
 }

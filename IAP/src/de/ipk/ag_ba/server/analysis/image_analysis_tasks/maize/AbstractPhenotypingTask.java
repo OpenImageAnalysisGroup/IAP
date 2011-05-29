@@ -81,7 +81,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		if (analyzeSideImages())
 			addSideImagesToWorkset(workload, 0);
 		
-		workload = filterWorkload(workload, "Athletico");
+		// workload = filterWorkload(workload, "Rainbow Amerindian");
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
@@ -109,9 +109,9 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 				@Override
 				public void run() {
 					try {
-						ImageData visInputImage = id.getVIS();
-						ImageData fluo = id.getFLUO();
-						ImageData nir = id.getNIR();
+						ImageData visInputImage = id.getVIS().copy();
+						ImageData fluo = id.getFLUO().copy();
+						ImageData nir = id.getNIR().copy();
 						
 						if (visInputImage == null || nir == null || fluo == null)
 							return;
@@ -142,6 +142,10 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages()) {
+							
+							input.setImageInfo(visInputImage, fluo, nir);
+							inputMasks.setImageInfo(visInputImage, fluo, nir);
+							
 							boolean side = id.isSide();
 							
 							ImageProcessorOptions options = new ImageProcessorOptions(visInputImage, fluo, nir);
@@ -193,9 +197,9 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 								
 								System.out.println("f]");
 							} else {
-								visInputImage.setLabelURL(visInputImage.getURL());
-								fluo.setLabelURL(fluo.getURL());
-								nir.setLabelURL(nir.getURL());
+								visInputImage.setLabelURL(id.getVIS().getURL().copy());
+								fluo.setLabelURL(id.getFLUO().getURL().copy());
+								nir.setLabelURL(id.getNIR().getURL().copy());
 							}
 							if (pipelineResult.getVis() != null)
 								saveImage(visInputImage, pipelineResult.getVis(), buf, ".tiff");
@@ -238,7 +242,8 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		for (ImageSet is : workload)
 			if (is.getSampleInfo() != null)
 				if (is.getSampleInfo().getParentCondition().toString().contains(filter))
-					res.add(is);
+					if (is.getSampleInfo().getTime() < 13)
+						res.add(is);
 		return res;
 	}
 	
@@ -249,7 +254,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 				ImageData id = (ImageData) md;
 				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
 				if (!replicateId2ImageSetSide.containsKey(key)) {
-					replicateId2ImageSetSide.put(key, new ImageSet(null, null, null));
+					replicateId2ImageSetSide.put(key, new ImageSet(null, null, null, id.getParentSample()));
 				}
 				ImageSet is = replicateId2ImageSetSide.get(key);
 				is.setSide(true);
@@ -330,12 +335,12 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
 		if (optLabelImageContent == null) {
 			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
-			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
+			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, false);
 			output.add(imageRef);
 		} else {
 			LoadedImageStream loadedImage = new LoadedImageStream(id, image.getAsBufferedImage(), optLabelImageContent);
 			loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "d_" + id.getURL().getFileName() + labelFileExtension));
-			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget);
+			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, true);
 			if (imageRef == null) {
 				System.out.println("ERROR #1");
 			} else
@@ -364,11 +369,11 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		}, "load " + type.name(), 0);
 	}
 	
-	protected ImageData saveImageAndUpdateURL(LoadedImage result, DatabaseTarget storeResultInDatabase) {
+	protected ImageData saveImageAndUpdateURL(LoadedImage result, DatabaseTarget storeResultInDatabase, boolean processLabelUrl) {
 		result.getURL().setFileName("c_" + result.getURL().getFileName());
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
 		
-		if (result.getLabelURL() != null) {
+		if (result.getLabelURL() != null && processLabelUrl) {
 			result.getLabelURL().setFileName("c_" + result.getLabelURL().getFileName());
 			result.getLabelURL().setPrefix(LoadedDataHandler.PREFIX);
 		}

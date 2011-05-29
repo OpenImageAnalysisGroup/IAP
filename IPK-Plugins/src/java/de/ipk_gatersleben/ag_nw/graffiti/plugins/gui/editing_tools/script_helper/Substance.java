@@ -149,11 +149,14 @@ public class Substance implements SubstanceInterface {
 		
 		if (save == null)
 			result.add(tobeMerged);
-		else
+		else {
 			for (ConditionInterface s : tobeMerged) {
 				s.setParent(save);
 				save.addAndMergeData(s);
 			}
+			tobeMerged.clear();
+			tobeMerged.setName("INVALID_MERGED_SKIP");
+		}
 	}
 	
 	public ConditionInterface addAndMergeData(ConditionInterface seriesnew) {
@@ -172,6 +175,9 @@ public class Substance implements SubstanceInterface {
 				s.setParent(save);
 				save.addAndMerge(s);
 			}
+			seriesnew.clear();
+			seriesnew.setGenotype("INVALID_MERGED_SKIP");
+			
 			return save;
 		}
 	}

@@ -56,7 +56,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						if (jid != null)
 							activeJobsIds.add(jid);
 						if (b.getCurrentStatusValueFine() > 0)
-							finishedJobs += b.getCurrentStatusValueFine() / 100;
+							finishedJobs += b.getCurrentStatusValueFine() / 200;
 						if (jid != null) {
 							jobIds.add(jid);
 							

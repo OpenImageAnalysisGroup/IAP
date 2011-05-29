@@ -25,6 +25,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
 /**
  * @author klukas
@@ -152,6 +153,8 @@ public class TaskDescription {
 										ci.setExperimentName(e.getHeader().getExperimentName());
 									}
 								}
+								ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
+								e = (Experiment) MappingData3DPath.merge(mdpl);
 								long tStart = cmd.getSubmissionTime();
 								long tProcessing = tFinish - tStart;
 								long minutes = tProcessing / 1000 / 60;
