@@ -53,19 +53,29 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 		ImageOperation io = new ImageOperation(image);
 		BlockProperty pa = getProperties().getNumericProperty(0, 1, PropertyNames.CENTROID_X);
 		BlockProperty pb = getProperties().getNumericProperty(0, 1, PropertyNames.CENTROID_Y);
+		FlexibleImage resize = null;
 		
 		if (pa != null && pb != null) {
-			FlexibleImage resize = io.addBorder(diagonal - image.getWidth(),
-					(int) (imagecentx - pa.getValue()),
-					(int) (imagecenty - pb.getValue()), background).getImage();
+			if (image.getWidth() > image.getHeight()) {
+				resize = io.addBorder(diagonal - image.getWidth(),
+						(int) (imagecentx - pa.getValue()),
+						(int) (imagecenty - pb.getValue()), background).getImage();
+			} else {
+				resize = io.addBorder(diagonal - image.getHeight(),
+						(int) (imagecentx - pa.getValue()),
+						(int) (imagecenty - pb.getValue()), background).getImage();
+			}
 			
 			int angle = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION).getValue();
 			
-			resize = new ImageOperation(resize).rotate(-angle).getImage();
-			// resize.print("resize");
-			Point values = new ImageOperation(resize).calculateWidthAndHeight(background);
-			
-			return values;
+			if (resize != null) {
+				resize = new ImageOperation(resize).rotate(-angle).getImage();
+				resize.print("resize");
+				Point values = new ImageOperation(resize).calculateWidthAndHeight(background);
+				return values;
+			} else {
+				return null;
+			}
 		} else
 			return null;
 	}
