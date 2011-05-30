@@ -455,7 +455,23 @@ public class LemnaTecDataExchange {
 		} finally {
 			closeDatabaseConnection(connection);
 		}
+		checkForAndCorrectEqualSnapshotTimes(result);
 		return result;
+	}
+	
+	private void checkForAndCorrectEqualSnapshotTimes(Collection<Snapshot> result) {
+		HashSet<Long> snapshotTimes = new HashSet<Long>();
+		for (Snapshot s : result) {
+			Timestamp ts = s.getTimestamp();
+			long t = ts.getTime();
+			if (snapshotTimes.contains(t)) {
+				do {
+					t += 1;
+				} while (snapshotTimes.contains(t));
+				snapshotTimes.add(t);
+				ts.setTime(t);
+			}
+		}
 	}
 	
 	private static void loadJdbcDriver() throws ClassNotFoundException {

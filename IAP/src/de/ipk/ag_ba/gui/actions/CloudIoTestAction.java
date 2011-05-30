@@ -117,7 +117,7 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 				}
 			}
 			
-			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
+			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName() + " " + getDefaultTitle());
 			
 			statisticsResult.getHeader().setDatabaseId("");

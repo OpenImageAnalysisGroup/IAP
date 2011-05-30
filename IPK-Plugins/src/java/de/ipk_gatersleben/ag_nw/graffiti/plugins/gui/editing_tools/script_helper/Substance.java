@@ -139,7 +139,7 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
-	public static void addAndMerge(ExperimentInterface result, SubstanceInterface tobeMerged) {
+	public static void addAndMerge(ExperimentInterface result, SubstanceInterface tobeMerged, boolean ignoreSnapshotFineTime) {
 		SubstanceInterface save = null;
 		for (SubstanceInterface m : result)
 			if (tobeMerged.compareTo(m) == 0) {
@@ -152,14 +152,14 @@ public class Substance implements SubstanceInterface {
 		else {
 			for (ConditionInterface s : tobeMerged) {
 				s.setParent(save);
-				save.addAndMergeData(s);
+				save.addAndMergeData(s, ignoreSnapshotFineTime);
 			}
 			tobeMerged.clear();
 			tobeMerged.setName("INVALID_MERGED_SKIP");
 		}
 	}
 	
-	public ConditionInterface addAndMergeData(ConditionInterface seriesnew) {
+	public ConditionInterface addAndMergeData(ConditionInterface seriesnew, boolean ignoreSnapshotFineTime) {
 		ConditionInterface save = null;
 		for (ConditionInterface s : this)
 			if (s.compareTo(seriesnew) == 0) {
@@ -173,7 +173,7 @@ public class Substance implements SubstanceInterface {
 		} else {
 			for (SampleInterface s : seriesnew) {
 				s.setParent(save);
-				save.addAndMerge(s);
+				save.addAndMerge(s, ignoreSnapshotFineTime);
 			}
 			seriesnew.clear();
 			seriesnew.setGenotype("INVALID_MERGED_SKIP");

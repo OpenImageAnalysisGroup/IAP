@@ -139,7 +139,7 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 				}
 			}
 			
-			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
+			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, true));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 			statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
 			for (SubstanceInterface s : statisticsResult) {
