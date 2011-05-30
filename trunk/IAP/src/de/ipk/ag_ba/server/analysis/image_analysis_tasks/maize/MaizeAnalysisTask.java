@@ -7,7 +7,7 @@ import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipelineProcessor;
 /**
  * @author klukas
  */
-public class MaizeAnalysisTask extends AbstractPhenotypingTask {
+public class MaizeAnalysisTask extends AbstractMaizePhenotypingTask {
 	
 	public MaizeAnalysisTask() {
 		// empty

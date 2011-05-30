@@ -47,8 +47,30 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 				if (n >= 3)
 					break;
 			}
+			
+			if (numericResult != null) {
+				calculateDistanceBetweenMarkers(numericResult);
+			}
 		}
 		return getInput().getMasks().getVis();
+	}
+	
+	private void calculateDistanceBetweenMarkers(ArrayList<MarkerPair> numericResult) {
+		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y) != null
+				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y) != null) {
+			int markerPosOneLeft = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y).getValue();
+			int markerPosTwoLeft = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y).getValue();
+			
+			getProperties().setNumericProperty(0, PropertyNames.RESULT_DISTANCE_MARKER_LEFT, Math.abs(markerPosTwoLeft - markerPosOneLeft));
+		}
+		
+		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y) != null
+				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y) != null) {
+			int markerPosOneRight = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y).getValue();
+			int markerPosTwoRight = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y).getValue();
+			
+			getProperties().setNumericProperty(0, PropertyNames.RESULT_DISTANCE_MARKER_RIGHT, Math.abs(markerPosTwoRight - markerPosOneRight));
+		}
 	}
 	
 	private FlexibleImage drawMarkers(FlexibleImage vis, ArrayList<MarkerPair> numericResult) {

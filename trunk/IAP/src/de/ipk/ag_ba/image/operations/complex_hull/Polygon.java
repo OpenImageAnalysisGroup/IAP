@@ -94,36 +94,61 @@ class Polygon {
 	}
 	
 	public Circle calculateminimalcircumcircle() {
-		Line maxSpan = getMaxSpan();
-		double maxDist = 0;
-		Circle result = null;
-		
-		for (int index = 0; index < points.length; index++) {
-			if (maxDist < ptDistToCenterOfLine(maxSpan, points[index])) {
-				maxDist = ptDistToCenterOfLine(maxSpan, points[index]);
-				Circle temp = new Circle(maxSpan.p0, maxSpan.p1, points[index]);
-				result = temp;
+		if (points != null) {
+			Line maxSpan = getMaxSpan();
+			double maxDist = 0;
+			Circle result = null;
+			
+			for (int index = 0; index < points.length; index++) {
+				double ptDistToCenterOfLine = ptDistToCenterOfLine(maxSpan, points[index]);
+				if (maxDist < ptDistToCenterOfLine && maxSpan.getlength() / 2 < ptDistToCenterOfLine) {
+					maxDist = ptDistToCenterOfLine(maxSpan, points[index]);
+					Circle temp = new Circle(maxSpan.p0, maxSpan.p1, points[index]);
+					result = temp;
+				}
 			}
-		}
-		if (containAllPoints(result)) {
-			return result;
+			if (containAllPoints(result)) {
+				return result;
+			} else {
+				if (result != null)
+					System.err.println("ERROR: Ploygon: not all points of the convex hull in the " + result.toString() + " points: " + this.toString());
+				return bruteForceMcc();
+				// return null;
+			}
 		} else {
-			System.err.println("ERROR: Ploygon: not all points of the convex hull in the " + result.toString() + " points: " + this.toString());
-			return result;
-			// return null;
+			return null;
 		}
 	}
 	
-	private boolean containAllPoints(Circle input) {
-		Point center = new Point(input.x, input.y);
+	private Circle bruteForceMcc() {
+		Circle result = new Circle(0, 0, Integer.MAX_VALUE);
 		
 		for (int i = 0; i < points.length; i++) {
-			double distance = center.distEuclid(points[i]);
-			if (distance - input.d / 2 > 10) {
-				return false;
+			for (int j = i; j < points.length; j++) {
+				for (int k = j; k < points.length; k++) {
+					Circle temp = new Circle(points[i], points[j], points[k]);
+					if (containAllPoints(temp) && temp.d < result.d)
+						result = temp;
+				}
 			}
 		}
-		return true;
+		return result;
+	}
+	
+	private boolean containAllPoints(Circle input) {
+		if (input != null) {
+			Point center = new Point(input.x, input.y);
+			
+			for (int i = 0; i < points.length; i++) {
+				double distance = center.distEuclid(points[i]);
+				if (distance - input.d / 2 > 1) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	@Override

@@ -39,7 +39,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
-public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask {
+public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysisTask {
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 	
@@ -81,7 +81,7 @@ public abstract class AbstractPhenotypingTask extends AbstractImageAnalysisTask 
 		if (analyzeSideImages())
 			addSideImagesToWorkset(workload, 0);
 		
-		// workload = filterWorkload(workload, "Rainbow Amerindian");
+		// workload = filterWorkload(workload, "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
