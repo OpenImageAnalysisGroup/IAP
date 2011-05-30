@@ -154,7 +154,7 @@ public class TaskDescription {
 									}
 								}
 								ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
-								e = (Experiment) MappingData3DPath.merge(mdpl);
+								e = (Experiment) MappingData3DPath.merge(mdpl, false);
 								long tStart = cmd.getSubmissionTime();
 								long tProcessing = tFinish - tStart;
 								long minutes = tProcessing / 1000 / 60;

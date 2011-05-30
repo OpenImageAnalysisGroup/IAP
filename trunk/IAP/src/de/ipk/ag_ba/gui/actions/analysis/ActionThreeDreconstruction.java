@@ -146,7 +146,7 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 				}
 			}
 			
-			Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
+			Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
 			statisticsResult.getHeader().setDatabaseId("");
 			
 			MyExperimentInfoPanel ip = new MyExperimentInfoPanel();

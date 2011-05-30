@@ -179,7 +179,7 @@ public class DataImportDialog {
 			
 			if (e1 != null) {
 				sample.addAll(e1);
-				Substance3D.addAndMerge(experiment, md);
+				Substance3D.addAndMerge(experiment, md, false);
 			} else
 				ErrorMsg.addErrorMessage("File " + idf.getFile() + " could not be loaded. Ignoring...");
 		}

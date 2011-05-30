@@ -134,7 +134,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				mp.getSampleData().setRowId(-1);
 			}
 			
-			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
+			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 			statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
 			for (SubstanceInterface s : statisticsResult) {

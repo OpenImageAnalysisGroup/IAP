@@ -104,11 +104,12 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		return exps;
 	}
 	
-	public static ExperimentInterface getExperiment(ArrayList<NumericMeasurementInterface> measurements) {
-		return getExperiment(measurements, false);
+	public static ExperimentInterface getExperiment(ArrayList<NumericMeasurementInterface> measurements, boolean ignoreSnapshotFineTime) {
+		return getExperiment(measurements, false, ignoreSnapshotFineTime);
 	}
 	
-	public static ExperimentInterface getExperiment(ArrayList<NumericMeasurementInterface> measurements, boolean sortConditionsByName) {
+	public static ExperimentInterface getExperiment(ArrayList<NumericMeasurementInterface> measurements, boolean sortConditionsByName,
+			boolean ignoreSnapshotFineTime) {
 		ArrayList<MappingData3DPath> mappingpaths = new ArrayList<MappingData3DPath>();
 		
 		for (NumericMeasurementInterface meas : measurements)
@@ -122,7 +123,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 				}
 			});
 		
-		return new Experiment(MappingData3DPath.merge(mappingpaths));
+		return new Experiment(MappingData3DPath.merge(mappingpaths, ignoreSnapshotFineTime));
 	}
 	
 	@Override

@@ -8,7 +8,7 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 
 public interface SampleInterface extends MappingDataEntity, Comparable<SampleInterface>,
-					Collection<NumericMeasurementInterface> {
+		Collection<NumericMeasurementInterface> {
 	
 	public abstract void getString(StringBuilder r);
 	
@@ -41,7 +41,7 @@ public interface SampleInterface extends MappingDataEntity, Comparable<SampleInt
 	 */
 	public abstract DataMappingId getFullId();
 	
-	public abstract int compareTo(SampleInterface sd);
+	public abstract int compareTo(SampleInterface sd, boolean ignoreSnapshotFineTime);
 	
 	public abstract void recalculateSampleAverage();
 	

@@ -337,6 +337,16 @@ public class Sample implements SampleInterface {
 	}
 	
 	@Override
+	public int compareTo(SampleInterface sd, boolean ignoreSnapshotFineTime) {
+		if (!ignoreSnapshotFineTime) {
+			int rr = ((Long) getRowId()).compareTo(sd.getRowId());
+			if (rr != 0)
+				return rr;
+		}
+		return compareTo(sd);
+	}
+	
+	@Override
 	public int compareTo(SampleInterface sd) {
 		String u1 = getTimeUnit();
 		String u2 = sd.getTimeUnit();

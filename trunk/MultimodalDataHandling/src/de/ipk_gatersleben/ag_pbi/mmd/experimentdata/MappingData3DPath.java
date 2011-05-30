@@ -69,12 +69,12 @@ public class MappingData3DPath {
 		// }
 	}
 	
-	public static ExperimentInterface merge(ArrayList<MappingData3DPath> mappingpaths) {
+	public static ExperimentInterface merge(ArrayList<MappingData3DPath> mappingpaths, boolean ignoreSnapshotFineTime) {
 		
 		Experiment experiment = new Experiment();
 		
 		for (MappingData3DPath p : mappingpaths)
-			Substance.addAndMerge(experiment, p.getSubstance());
+			Substance.addAndMerge(experiment, p.getSubstance(), ignoreSnapshotFineTime);
 		
 		return experiment;
 	}

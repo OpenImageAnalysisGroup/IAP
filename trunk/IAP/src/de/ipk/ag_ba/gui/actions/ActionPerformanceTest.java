@@ -128,7 +128,7 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 				}
 			}
 			
-			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData));
+			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName() + " " + getDefaultTitle());
 			
 			statisticsResult.getHeader().setDatabaseId("");

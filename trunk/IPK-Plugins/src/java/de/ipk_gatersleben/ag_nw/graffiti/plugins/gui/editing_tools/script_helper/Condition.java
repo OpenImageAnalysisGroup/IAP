@@ -559,10 +559,10 @@ public class Condition implements ConditionInterface {
 		return header.getRemark();
 	}
 	
-	public SampleInterface addAndMerge(SampleInterface samplenew) {
+	public SampleInterface addAndMerge(SampleInterface samplenew, boolean ignoreSnapshotFineTime) {
 		SampleInterface save = null;
 		for (SampleInterface s : this)
-			if (s.compareTo(samplenew) == 0) {
+			if (s.compareTo(samplenew, ignoreSnapshotFineTime) == 0) {
 				save = s;
 				break;
 			}
