@@ -1807,8 +1807,8 @@ public class ImageOperation {
 		
 		result = fillArray(result, background);
 		
-		for (int x = bordersize + translatex; x < (width + bordersize + translatex); x++) {
-			for (int y = bordersize + translatey; y < (height + bordersize + translatey); y++) {
+		for (int x = bordersize + translatex; x < (width + translatex); x++) {
+			for (int y = bordersize + translatey; y < (height + translatey); y++) {
 				if (x - bordersize - translatex >= 0 && y - bordersize - translatey >= 0 && x >= 0 && y >= 0)
 					result[x][y] = img2d[x - bordersize - translatex][y - bordersize - translatey];
 			}
