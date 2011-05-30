@@ -19,19 +19,10 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		
 		ObjectRef clusterSizeRef = new ObjectRef();
 		FlexibleImage res =
 				new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
 						options.getNeighbourhood(), options.getCameraTyp(), clusterSizeRef).getImage();
-		
-		int[] clusterSizes = (int[]) clusterSizeRef.getObject();
-		
-		int filledPixels = 0;
-		
-		if (clusterSizes.length > 1)
-			for (int i = 1; i < clusterSizes.length; i++)
-				filledPixels += clusterSizes[i];
 		
 		return res;
 	}
@@ -41,10 +32,4 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 		return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
 				options.getNeighbourhood(), options.getCameraTyp(), null).getImage();
 	}
-	
-	// @Override
-	// protected FlexibleImage processNIRmask() {
-	// return new ImageOperation(getInput().getMasks().getNir()).removeSmallClusters(0.002d).getImage();
-	// }
-	
 }

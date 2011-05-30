@@ -31,10 +31,8 @@ public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
 		ResultsTable numericResults = res.getResultsTable();
 		
 		if (options.getCameraTyp() == CameraTyp.SIDE)
-			getProperties()
-					.storeResults(
-							"RESULT_side.deg"
-									+ (getInput().getImages().getFluoInfo() != null && getInput().getImages().getFluoInfo().getPosition() != null ? getInput()
+			getProperties().storeResults(
+					"RESULT_side.deg" + (getInput().getImages().getFluoInfo() != null && getInput().getImages().getFluoInfo().getPosition() != null ? getInput()
 											.getImages().getFluoInfo().getPosition().intValue() : "0")
 									+ ".", numericResults,
 							getBlockPosition());

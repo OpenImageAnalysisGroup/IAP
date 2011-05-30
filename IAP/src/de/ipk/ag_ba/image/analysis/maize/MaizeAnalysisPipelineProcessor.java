@@ -6,6 +6,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterMaskToMask;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterMaskToMaskBlack;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
@@ -17,6 +18,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBelowMarker;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFluoToIntensity;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresFromFluoUsingOpening;
 
 public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 	
@@ -29,10 +31,10 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		if (options.getCameraTyp() == CameraTyp.TOP) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 128);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 146);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 111); // vorher: 128
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 128); // //146);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255); // all yellow
 			
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 104);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
@@ -45,7 +47,7 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 132);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 125); // VORHER: 132);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255);
 			
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 104);
@@ -63,7 +65,9 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
 		p.add(BlockClearBelowMarker.class);
 		p.add(BlockLabFilterMaskToMask.class);
+		p.add(BlockLabFilterMaskToMaskBlack.class);
 		p.add(BlockRemoveSmallClusters.class);
+		p.add(BlockRemoveSmallStructuresFromFluoUsingOpening.class);
 		p.add(BlockCalculateMainAxis.class);
 		p.add(BlockCalculateWidthAndHeight.class);
 		p.add(BlockFluoToIntensity.class);
