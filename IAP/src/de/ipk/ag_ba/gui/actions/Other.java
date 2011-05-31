@@ -27,6 +27,7 @@ import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.actions.lemnatec.ActionLemnaCam;
+import de.ipk.ag_ba.gui.actions.lemnatec.ActionLemnaCam2;
 import de.ipk.ag_ba.gui.calendar.Calendar;
 import de.ipk.ag_ba.gui.enums.DBEtype;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -149,6 +150,10 @@ public class Other {
 				if (includeLemnaTecStatus) {
 					resultNavigationButtons.add(ActionLemnaCam.getLemnaCamButton(src.getGUIsetting()));
 					if (!IAPservice.isReachable("http://lemnacam.ipk-gatersleben.de"))
+						resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+					
+					resultNavigationButtons.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
+					if (!IAPservice.isReachable("http://ba-10.ipk-gatersleben.de"))
 						resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				}
 				

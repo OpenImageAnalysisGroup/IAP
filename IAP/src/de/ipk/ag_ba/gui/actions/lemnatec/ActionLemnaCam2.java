@@ -13,10 +13,10 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 /**
  * @author klukas
  */
-public final class ActionLemnaCam extends AbstractUrlNavigationAction {
+public final class ActionLemnaCam2 extends AbstractUrlNavigationAction {
 	
-	public ActionLemnaCam() {
-		super("Show Barley Greenhouse");
+	public ActionLemnaCam2() {
+		super("Show Maize Greenhouse");
 	}
 	
 	/**
@@ -24,8 +24,8 @@ public final class ActionLemnaCam extends AbstractUrlNavigationAction {
 	 * @return
 	 */
 	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
-		NavigationAction navigationAction = new ActionLemnaCam();
-		NavigationButton res = new NavigationButton(navigationAction, "Barley Greenhouse",
+		NavigationAction navigationAction = new ActionLemnaCam2();
+		NavigationButton res = new NavigationButton(navigationAction, "Maize Greenhouse",
 				IAPimages.getWebCam(),
 				guiSetting);
 		return res;
@@ -33,7 +33,7 @@ public final class ActionLemnaCam extends AbstractUrlNavigationAction {
 	
 	@Override
 	public String getURL() {
-		return "http://lemnacam.ipk-gatersleben.de/mjpg/video.mjpg";
+		return "http://ba-10/SnapshotJPEG?Resolution=640x480&Quality=Standard";
 	}
 	
 	@Override
