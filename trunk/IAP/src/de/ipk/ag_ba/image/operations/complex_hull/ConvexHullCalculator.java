@@ -73,14 +73,17 @@ public class ConvexHullCalculator {
 					points[n++] = new Point(x, y);
 			}
 		
-		QuickHull qh = new QuickHull();
-		numberOfHullPoints = qh.computeHull(points);
-		
-		Point[] resultPoints = new Point[numberOfHullPoints];
-		for (int i = 0; i < numberOfHullPoints; i++)
-			resultPoints[i] = points[i];
-		
-		this.polygon = new Polygon(resultPoints);
+		if (n > 0) {
+			QuickHull qh = new QuickHull();
+			numberOfHullPoints = qh.computeHull(points);
+			
+			Point[] resultPoints = new Point[numberOfHullPoints];
+			for (int i = 0; i < numberOfHullPoints; i++)
+				resultPoints[i] = points[i];
+			
+			this.polygon = new Polygon(resultPoints);
+		} else
+			polygon = null;
 	}
 	
 	/**
@@ -109,34 +112,38 @@ public class ConvexHullCalculator {
 		if (drawInputimage)
 			overDrawBorderImage(w, h, io.getImageAs2array(), borderImage, borderColor, drawBorder);
 		
+		Point centroid = null;
+		
 		ImageOperation res = new ImageOperation(borderImage);
 		ResultsTable rt = io.getResultsTable();
 		if (rt == null)
 			rt = new ResultsTable();
-		rt.incrementCounter();
 		
-		rt.addValue("hull.points", numberOfHullPoints);
-		rt.addValue("hull.area", polygon.area());
-		rt.addValue("hull.signedarea", polygon.signedArea());
-		rt.addValue("hull.circularity", circularity());
-		
-		Circle circumcircle = polygon.calculateminimalcircumcircle();
-		
-		if (circumcircle != null) {
-			rt.addValue("hull.circumcircle.x", circumcircle.x);
-			rt.addValue("hull.circumcircle.y", circumcircle.y);
-			rt.addValue("hull.circumcircle.d", circumcircle.d);
+		if (polygon != null) {
+			rt.incrementCounter();
+			
+			rt.addValue("hull.points", numberOfHullPoints);
+			rt.addValue("hull.area", polygon.area());
+			rt.addValue("hull.signedarea", polygon.signedArea());
+			rt.addValue("hull.circularity", circularity());
+			
+			Circle circumcircle = polygon.calculateminimalcircumcircle();
+			
+			if (circumcircle != null) {
+				rt.addValue("hull.circumcircle.x", circumcircle.x);
+				rt.addValue("hull.circumcircle.y", circumcircle.y);
+				rt.addValue("hull.circumcircle.d", circumcircle.d);
+			}
+			
+			int filledArea = io.countFilledPixels();
+			rt.addValue("hull.fillgrade", filledArea / polygon.area());
+			
+			centroid = polygon.centroid();
+			rt.addValue("hull.centroid.x", centroid.x);
+			rt.addValue("hull.centroid.y", centroid.y);
+			
 		}
-		
-		int filledArea = io.countFilledPixels();
-		rt.addValue("hull.fillgrade", filledArea / polygon.area());
-		
-		Point centroid = polygon.centroid();
-		rt.addValue("hull.centroid.x", centroid.x);
-		rt.addValue("hull.centroid.y", centroid.y);
-		
 		res.setResultsTable(rt);
-		
 		if (drawHull || drawCentroid)
 			res = drawHullAndCentroid(drawHull, drawCentroid, res, polygon, hullLineColor, centroid, centroidColor);
 		
@@ -157,10 +164,10 @@ public class ConvexHullCalculator {
 		
 		Graphics2D g2d = (Graphics2D) bi.getGraphics();
 		
-		if (drawHull)
+		if (drawHull && polygon != null)
 			drawHull(g2d, polygon, 2, hullLineColor);
 		
-		if (drawCentroid)
+		if (drawCentroid && centroid != null)
 			drawCross(g2d, centroid, 40, 4, centroidColor);
 		
 		return new ImageOperation(bi, in.getResultsTable());

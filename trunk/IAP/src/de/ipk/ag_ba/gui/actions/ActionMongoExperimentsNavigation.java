@@ -8,6 +8,7 @@
 package de.ipk.ag_ba.gui.actions;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.TreeMap;
 
 import org.SystemAnalysis;
@@ -21,6 +22,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
@@ -267,10 +269,17 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<ExperimentHeaderInterface> tempResults = new ArrayList<ExperimentHeaderInterface>();
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (ExperimentHeaderInterface exp : experiments) {
-					res.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
+					String n = exp.getExperimentName();
+					if (n.replaceAll("§", "").length() == n.length() - 3)
+						tempResults.add(exp);
+					else
+						res.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
 				}
+				if (tempResults.size() > 0)
+					res.add(new NavigationButton(createSubFolderActionForTemporaryResults(tempResults), src.getGUIsetting()));
 				NavigationButton tb = new NavigationButton(
 						new Trash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
 						src.getGUIsetting());
@@ -310,8 +319,143 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		return userNav;
 	}
 	
+	protected NavigationAction createSubFolderActionForTemporaryResults(final ArrayList<ExperimentHeaderInterface> experiments) {
+		NavigationAction userNav = new AbstractNavigationAction("Intermediate results of image analysis calculations") {
+			private NavigationButton src;
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+				TreeMap<Long, ArrayList<ExperimentHeaderInterface>> time2expList = new TreeMap<Long, ArrayList<ExperimentHeaderInterface>>();
+				for (ExperimentHeaderInterface exp : experiments) {
+					Long submissionTime = new Date().getTime();
+					try {
+						String n = exp.getExperimentName();
+						String[] nn = n.split("§");
+						submissionTime = Long.parseLong(nn[3]);
+					} catch (Exception err) {
+						System.err.println("ERROR: Problematic experiment name: " + exp.getExperimentName());
+					}
+					if (!time2expList.containsKey(submissionTime))
+						time2expList.put(submissionTime, new ArrayList<ExperimentHeaderInterface>());
+					
+					time2expList.get(submissionTime).add(exp);
+				}
+				for (Long time : time2expList.keySet()) {
+					String folderName = SystemAnalysisExt.getCurrentTime(time);
+					res.add(new NavigationButton(createSubFolderActionForTemporaryResults2(folderName, time2expList.get(time)), src.getGUIsetting()));
+				}
+				NavigationButton tb = new NavigationButton(
+						new Trash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
+						src.getGUIsetting());
+				tb.setRightAligned(true);
+				res.add(tb);
+				return res;
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
+				res.add(src);
+				return res;
+			}
+			
+			@Override
+			public String getDefaultTitle() {
+				return "Temporary Data (" + experiments.size() + ")";
+			}
+			
+			@Override
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
+				this.src = src;
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return IAPimages.getFolderRemoteClosed();
+			}
+			
+			@Override
+			public String getDefaultNavigationImage() {
+				return IAPimages.getFolderRemoteOpen();
+			}
+			
+		};
+		return userNav;
+	}
+	
+	protected NavigationAction createSubFolderActionForTemporaryResults2(final String displayName, final ArrayList<ExperimentHeaderInterface> experiments) {
+		NavigationAction userNav = new AbstractNavigationAction("Intermediate results of image analysis calculations") {
+			private NavigationButton src;
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+				for (ExperimentHeaderInterface exp : experiments) {
+					String n = exp.getExperimentName();
+					try {
+						String[] nn = n.split("§");
+						if (nn[0].indexOf(".") > 0)
+							nn[0] = nn[0].substring(nn[0].lastIndexOf(".") + ".".length());
+						String start = SystemAnalysisExt.getCurrentTime(Long.parseLong(nn[3]));
+						n = nn[0] + " (" + nn[1] + "/" + nn[2] + ") started " + start;
+					} catch (Exception err) {
+						System.err.println("ERROR: Problematic experiment name: " + exp.getExperimentName());
+					}
+					res.add(getMongoExperimentButton(n, exp, src.getGUIsetting(), m));
+				}
+				NavigationButton tb = new NavigationButton(
+						new Trash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
+						src.getGUIsetting());
+				tb.setRightAligned(true);
+				res.add(tb);
+				return res;
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
+				res.add(src);
+				return res;
+			}
+			
+			@Override
+			public String getDefaultTitle() {
+				return displayName + " (" + experiments.size() + ")";
+			}
+			
+			@Override
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
+				this.src = src;
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return IAPimages.getFolderRemoteClosed();
+			}
+			
+			@Override
+			public String getDefaultNavigationImage() {
+				return IAPimages.getFolderRemoteOpen();
+			}
+			
+		};
+		return userNav;
+	}
+	
 	public static NavigationButton getMongoExperimentButton(ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
 		NavigationAction action = new ActionMongoOrLemnaTecExperimentNavigation(ei, m);
+		NavigationButton exp = new NavigationButton(action, guiSetting);
+		return exp;
+	}
+	
+	public static NavigationButton getMongoExperimentButton(final String displayName, ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
+		NavigationAction action = new ActionMongoOrLemnaTecExperimentNavigation(ei, m) {
+			@Override
+			public String getDefaultTitle() {
+				return displayName;
+			}
+		};
 		NavigationButton exp = new NavigationButton(action, guiSetting);
 		return exp;
 	}

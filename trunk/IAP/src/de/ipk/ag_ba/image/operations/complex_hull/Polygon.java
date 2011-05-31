@@ -94,6 +94,9 @@ class Polygon {
 	}
 	
 	public Circle calculateminimalcircumcircle() {
+		if (true)
+			return bruteForceMcc();
+		
 		if (points != null) {
 			Line maxSpan = getMaxSpan();
 			double maxDist = 0;
@@ -110,8 +113,6 @@ class Polygon {
 			if (containAllPoints(result)) {
 				return result;
 			} else {
-				if (result != null)
-					System.err.println("ERROR: Ploygon: not all points of the convex hull in the " + result.toString() + " points: " + this.toString());
 				return bruteForceMcc();
 				// return null;
 			}

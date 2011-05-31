@@ -141,7 +141,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 						}
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
-						if (input.hasAllThreeImages()) {
+						if (input.hasAllThreeImages() && input.getSmallestHeight(true, true, false) > 1) {
 							
 							input.setImageInfo(visInputImage, fluo, nir);
 							inputMasks.setImageInfo(visInputImage, fluo, nir);
@@ -241,8 +241,8 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 		ArrayList<ImageSet> res = new ArrayList<ImageSet>();
 		for (ImageSet is : workload)
 			if (is.getSampleInfo() != null)
-				if (is.getSampleInfo().getParentCondition().toString().contains(filter))
-					if (is.getSampleInfo().getTime() < 13)
+				if (is.getSampleInfo().getParentCondition().toString().contains(filter) && is.getSampleInfo().getParentCondition().toString().contains("dry"))
+					if (is.getSampleInfo().getTime() == 6 || is.getSampleInfo().getTime() == 25)
 						res.add(is);
 		return res;
 	}
@@ -334,17 +334,21 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 	
 	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
 		if (optLabelImageContent == null) {
-			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
-			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, false);
-			output.add(imageRef);
-		} else {
-			LoadedImageStream loadedImage = new LoadedImageStream(id, image.getAsBufferedImage(), optLabelImageContent);
-			loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "d_" + id.getURL().getFileName() + labelFileExtension));
-			ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, true);
-			if (imageRef == null) {
-				System.out.println("ERROR #1");
-			} else
+			if (image.getHeight() > 1) {
+				LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
+				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, false);
 				output.add(imageRef);
+			}
+		} else {
+			if (image.getHeight() > 1) {
+				LoadedImageStream loadedImage = new LoadedImageStream(id, image.getAsBufferedImage(), optLabelImageContent);
+				loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "d_" + id.getURL().getFileName() + labelFileExtension));
+				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, true);
+				if (imageRef == null) {
+					System.out.println("ERROR #1");
+				} else
+					output.add(imageRef);
+			}
 		}
 	}
 	

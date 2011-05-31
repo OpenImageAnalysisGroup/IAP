@@ -11,7 +11,6 @@ import de.ipk.ag_ba.image.operations.MainAxisCalculationResult;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * Calculates the main axis rotation for visible top images. All other image types and configs are ignored.
@@ -45,8 +44,8 @@ public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 				getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y, macr.getCentroid().y);
 			} else {
 				if (!SystemAnalysis.isHeadless()) {
-					getInput().getImages().getVis().print("(Image) Could not determine main axis angle (" + SystemAnalysisExt.getCurrentTime() + ")");
-					getInput().getMasks().getVis().print("(Mask) Could not determine main axis angle (" + SystemAnalysisExt.getCurrentTime() + ")");
+					// getInput().getImages().getVis().print("(Image) Could not determine main axis angle (" + SystemAnalysisExt.getCurrentTime() + ")");
+					// getInput().getMasks().getVis().print("(Mask) Could not determine main axis angle (" + SystemAnalysisExt.getCurrentTime() + ")");
 				}
 				System.err.println("ERROR: BlockCalculateMainAxis: Could not determine main axis angle!");
 			}
