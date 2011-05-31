@@ -233,4 +233,35 @@ public class FlexibleImageSet {
 		return nirInfo;
 	}
 	
+	public int getSmallestWidth() {
+		int smallest = Integer.MAX_VALUE;
+		if (vis != null)
+			smallest = vis.getWidth();
+		if (fluo != null)
+			if (fluo.getWidth() < smallest)
+				smallest = fluo.getWidth();
+		if (nir != null)
+			if (nir.getWidth() < smallest)
+				smallest = nir.getWidth();
+		if (smallest < Integer.MAX_VALUE)
+			return smallest;
+		else
+			return 0;
+	}
+	
+	public int getSmallestHeight(boolean v, boolean f, boolean n) {
+		int smallest = Integer.MAX_VALUE;
+		if (vis != null && v)
+			smallest = vis.getHeight();
+		if (fluo != null && f)
+			if (fluo.getWidth() < smallest)
+				smallest = fluo.getHeight();
+		if (nir != null && n)
+			if (nir.getWidth() < smallest)
+				smallest = nir.getHeight();
+		if (smallest < Integer.MAX_VALUE)
+			return smallest;
+		else
+			return 0;
+	}
 }

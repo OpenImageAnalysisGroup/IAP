@@ -15,7 +15,6 @@ import ij.process.ImageProcessor;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Line2D;
@@ -1788,7 +1787,7 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * copy the image into a new image, wich is increase about bordersize
+	 * copy the image into a new image, which is increase about the bordersize
 	 * 
 	 * @param input
 	 * @param bordersize
@@ -1823,48 +1822,39 @@ public class ImageOperation {
 		return result;
 	}
 	
-	public Point calculateWidthAndHeight(int background) {
+	/**
+	 * @return top, bottom, left, right
+	 */
+	public int[] getExtremePoints(int background) {
 		int[][] img2d = getImageAs2array();
 		
-		int minX = Integer.MAX_VALUE;
-		int maxX = 0;
-		int minY = Integer.MAX_VALUE;
-		int maxY = 0;
+		int top = Integer.MAX_VALUE;
+		int bottom = 0;
+		int left = Integer.MAX_VALUE;
+		int right = 0;
+		
 		boolean isin = false;
 		
 		for (int x = 0; x < img2d.length; x++) {
 			for (int y = 0; y < img2d[0].length; y++) {
-				if (img2d[x][y] != background && img2d[x][y] != Color.BLACK.getRGB()) {
-					if (x < minX)
-						minX = x;
-					if (x > maxX)
-						maxX = x;
-					if (y < minY)
-						minY = y;
-					if (y > maxY)
-						maxY = y;
+				if (img2d[x][y] != background) {
+					if (x > right)
+						right = x;
+					if (x < left)
+						left = x;
+					if (y < top)
+						top = y;
+					if (y > bottom)
+						bottom = y;
 					isin = true;
 				}
 			}
 		}
-		// System.out.println(new Point(maxX - minX, maxY - minY).toString());
-		if (isin)
-			return new Point(maxX - minX, maxY - minY);
-		else
+		if (isin) {
+			int[] result = { top, bottom, left, right };
+			return result;
+		} else
 			return null;
-	}
-	
-	public ImageOperation clearImageBelowYvalue(int threshold, int background) {
-		int width = image.getWidth();
-		int height = image.getHeight();
-		int[][] img2d = getImageAs2array();
-		
-		for (int x = 0; x < width; x++) {
-			for (int y = threshold; y < height; y++) {
-				img2d[x][y] = background;
-			}
-		}
-		return new ImageOperation(img2d);
 	}
 	
 	public ImageComparator compare() {
@@ -1926,4 +1916,49 @@ public class ImageOperation {
 		return new ImageOperation(new FlexibleImage(result, image.getWidth(), image.getHeight()));
 	}
 	
+	public ImageOperation clearImageLeft(double cutoff, int background) {
+		int[][] img2d = getImageAs2array();
+		
+		int threshold = (int) cutoff;
+		
+		for (int x = 0; x < threshold; x++) {
+			for (int y = 0; y < image.getHeight(); y++) {
+				img2d[x][y] = background;
+			}
+		}
+		return new ImageOperation(img2d);
+	}
+	
+	public ImageOperation clearImageRight(double threshold, int background) {
+		int[][] img2d = getImageAs2array();
+		
+		for (int x = (int) threshold; x < image.getWidth(); x++) {
+			for (int y = 0; y < image.getHeight(); y++) {
+				img2d[x][y] = background;
+			}
+		}
+		return new ImageOperation(img2d);
+	}
+	
+	public ImageOperation clearImageAbove(double threshold, int background) {
+		int[][] img2d = getImageAs2array();
+		
+		for (int x = 0; x < image.getWidth(); x++) {
+			for (int y = 0; y < threshold; y++) {
+				img2d[x][y] = background;
+			}
+		}
+		return new ImageOperation(img2d);
+	}
+	
+	public ImageOperation clearImageBottom(int threshold, int background) {
+		int[][] img2d = getImageAs2array();
+		
+		for (int x = 0; x < image.getWidth(); x++) {
+			for (int y = threshold; y < image.getHeight(); y++) {
+				img2d[x][y] = background;
+			}
+		}
+		return new ImageOperation(img2d);
+	}
 }

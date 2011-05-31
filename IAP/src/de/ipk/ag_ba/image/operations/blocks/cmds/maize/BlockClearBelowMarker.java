@@ -19,12 +19,12 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
 			
 			if (markerPosLeft != null) {
-				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
+				FlexibleImage result = new ImageOperation(input).clearImageBottom(
 						(int) markerPosLeft.getValue(), options.getBackground()).getImage();
 				return result;
 			}
 			if (markerPosLeft == null && markerPosRight != null) {
-				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
+				FlexibleImage result = new ImageOperation(input).clearImageBottom(
 						(int) markerPosRight.getValue(), options.getBackground()).getImage();
 				
 				return result;
@@ -47,14 +47,14 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 			
 			if (markerPosLeft != null) {
 				double temp = (markerPosLeft.getValue() / heightVisImage) * heightFluoImage;
-				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
+				FlexibleImage result = new ImageOperation(input).clearImageBottom(
 						(int) temp, options.getBackground()).getImage();
 				
 				return result;
 			}
 			if (markerPosLeft == null && markerPosRight != null) {
 				double temp = (markerPosRight.getValue() / heightVisImage) * heightFluoImage;
-				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
+				FlexibleImage result = new ImageOperation(input).clearImageBottom(
 						(int) temp, options.getBackground()).getImage();
 				
 				return result;
@@ -76,14 +76,14 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 			int heightNirImage = getInput().getMasks().getNir().getHeight();
 			
 			if (markerPosLeft != null) {
-				double temp = (markerPosLeft.getValue() / heightVisImage) * heightNirImage;
-				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
+				double temp = (markerPosLeft.getValue() / heightVisImage) * heightNirImage + 8;
+				FlexibleImage result = new ImageOperation(input).clearImageBottom(
 						(int) temp, options.getBackground()).getImage();
 				return result;
 			}
 			if (markerPosLeft == null && markerPosRight != null) {
-				double temp = (markerPosRight.getValue() / heightVisImage) * heightNirImage;
-				FlexibleImage result = new ImageOperation(input).clearImageBelowYvalue(
+				double temp = (markerPosRight.getValue() / heightVisImage) * heightNirImage + 8;
+				FlexibleImage result = new ImageOperation(input).clearImageBottom(
 						(int) temp, options.getBackground()).getImage();
 				return result;
 			}

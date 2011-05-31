@@ -59,7 +59,8 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	private Point getWidthandHeightSide(FlexibleImage vis, int background) {
-		Point values = new ImageOperation(vis).calculateWidthAndHeight(background);
+		int[] temp = new ImageOperation(vis).getExtremePoints(background);
+		Point values = new Point(temp[1] - temp[0], temp[3] - temp[2]);
 		return values;
 	}
 	
@@ -103,7 +104,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 			if (resize != null) {
 				resize = new ImageOperation(resize).rotate(-angle).getImage();
 				// resize.print("resize");
-				Point values = new ImageOperation(resize).calculateWidthAndHeight(background);
+				Point values = getWidthandHeightSide(resize, background);
 				return values;
 			} else {
 				return null;
