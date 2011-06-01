@@ -157,9 +157,10 @@ public class ImageOperation {
 	 * Scales the image itself. See method scale to scale the content but not the image itself.
 	 */
 	public ImageOperation resize(int width, int height) {
-		ImageProcessor p = image.getProcessor().resize(width, height);
-		image.setProcessor(p);
-		
+		if (width > 1 && height > 1) {
+			ImageProcessor p = image.getProcessor().resize(width, height);
+			image.setProcessor(p);
+		}
 		return new ImageOperation(getImage());
 	}
 	
@@ -1838,6 +1839,8 @@ public class ImageOperation {
 		for (int x = 0; x < img2d.length; x++) {
 			for (int y = 0; y < img2d[0].length; y++) {
 				if (img2d[x][y] != background) {
+					// Color temp = new Color(img2d[x][y]);
+					// System.out.println(x + ":" + y + ", RGB: " + temp.getRed() + ", " + temp.getGreen() + ", " + temp.getBlue());
 					if (x > right)
 						right = x;
 					if (x < left)
@@ -1960,5 +1963,32 @@ public class ImageOperation {
 			}
 		}
 		return new ImageOperation(img2d);
+	}
+	
+	public ImageOperation border(int bb) {
+		int[][] in = getImageAs2array();
+		
+		int w = getImage().getWidth();
+		int h = getImage().getHeight();
+		
+		int backgroundColor = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		
+		if (h > bb)
+			for (int x = 0; x < w; x++) {
+				for (int d = 0; d < bb; d++) {
+					in[x][0 + d] = backgroundColor;
+					in[x][h - 1 - d] = backgroundColor;
+				}
+			}
+		
+		if (w > bb)
+			for (int y = 0; y < h; y++) {
+				for (int d = 0; d < bb; d++) {
+					in[0 + d][y] = backgroundColor;
+					in[w - 1 - d][y] = backgroundColor;
+				}
+			}
+		
+		return new ImageOperation(in);
 	}
 }

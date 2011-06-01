@@ -17,7 +17,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processFLUOmask() {
 		
 		int background = options.getBackground();
-		int realMarkerDist = 200;
+		double realMarkerDist = 1;
 		
 		BlockProperty distLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_DISTANCE_MARKER_LEFT);
 		BlockProperty distRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_DISTANCE_MARKER_RIGHT);
@@ -26,7 +26,6 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 			Point values = getWidthandHeightSide(getInput().getMasks().getFluo(), background);
 			
 			if (values != null) {
-				
 				if (distLeft != null) {
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width", values.x * (realMarkerDist / distLeft.getValue()));
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.height", values.y * (realMarkerDist / distLeft.getValue()));
@@ -60,7 +59,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 	
 	private Point getWidthandHeightSide(FlexibleImage vis, int background) {
 		int[] temp = new ImageOperation(vis).getExtremePoints(background);
-		Point values = new Point(temp[1] - temp[0], temp[3] - temp[2]);
+		Point values = new Point(Math.abs(temp[1] - temp[0]), Math.abs(temp[3] - temp[2]));
 		return values;
 	}
 	

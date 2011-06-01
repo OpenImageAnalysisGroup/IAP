@@ -32,11 +32,13 @@ public class BlockLabFilterMaskToMask extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		
-		return labFilter(getInput().getMasks().getNir(), getInput().getImages().getNir(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_NIR),
-				options.getIntSetting(Setting.LAB_MAX_L_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_A_VALUE_NIR),
-				options.getIntSetting(Setting.LAB_MAX_A_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_B_VALUE_NIR),
-				options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR));
+		if (getInput().getMasks().getNir() != null) {
+			return labFilter(getInput().getMasks().getNir(), getInput().getImages().getNir(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_NIR),
+					options.getIntSetting(Setting.LAB_MAX_L_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_A_VALUE_NIR),
+					options.getIntSetting(Setting.LAB_MAX_A_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_B_VALUE_NIR),
+					options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR));
+		} else
+			return null;
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
@@ -44,8 +46,8 @@ public class BlockLabFilterMaskToMask extends AbstractSnapshotAnalysisBlockFIS {
 		
 		int[][] image = workMask.getAs2A();
 		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
-		int width = originalImage.getWidth();
-		int height = originalImage.getHeight();
+		int width = workMask.getWidth();
+		int height = workMask.getHeight();
 		
 		int back = options.getBackground();
 		
@@ -55,16 +57,8 @@ public class BlockLabFilterMaskToMask extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfB, upperValueOfB,
 				back);
 		
-		for (int i = 0; i < workMask.getWidth(); i++) {
-			for (int j = 0; j < workMask.getHeight(); j++) {
-				
-				if (result[i][j] != back)
-					result[i][j] = image[i][j];
-				
-			}
-		}
+		FlexibleImage mask = new FlexibleImage(result);
 		
-		return new FlexibleImage(result);
-		
+		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, options.getBackground()).getImage();
 	}
 }
