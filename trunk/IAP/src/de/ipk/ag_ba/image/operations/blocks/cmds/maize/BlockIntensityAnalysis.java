@@ -54,11 +54,14 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		ImageOperation io = new ImageOperation(getInput().getMasks().getNir());
-		if (getInput().getMasks().getNir().getHeight() > 1) {
-			ResultsTable rt = io.intensity(3).calcualteHistorgram(plantAreaVis, plantImagePixelCountVis);
-			getProperties().storeResults("RESULT_nir.", rt, getBlockPosition());
-		}
-		return io.getImage();
+		if (getInput().getMasks().getNir() != null) {
+			ImageOperation io = new ImageOperation(getInput().getMasks().getNir());
+			if (getInput().getMasks().getNir().getHeight() > 1) {
+				ResultsTable rt = io.intensity(3).calcualteHistorgram(plantAreaVis, plantImagePixelCountVis);
+				getProperties().storeResults("RESULT_nir.", rt, getBlockPosition());
+			}
+			return io.getImage();
+		} else
+			return null;
 	}
 }

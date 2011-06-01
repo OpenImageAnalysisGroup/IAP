@@ -62,7 +62,9 @@ public class ImageProcessorOptions {
 
 			L_Diff_VIS, abDiff_VIS, L_Diff_FLOU, abDiff_FLOU, L_Diff_NIR, abDiff_NIR,
 
-			IS_PARAMETER_SEARCH, IS_CROP_RESULT;
+			IS_PARAMETER_SEARCH, IS_CROP_RESULT,
+
+			SCALE_FACTOR;
 		
 	}
 	
@@ -268,11 +270,13 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.abDiff_VIS, 40);
 		addIntSetting(Setting.L_Diff_FLOU, 20);
 		addIntSetting(Setting.abDiff_FLOU, 30);
-		addIntSetting(Setting.L_Diff_NIR, 17); // 14
+		addIntSetting(Setting.L_Diff_NIR, 19); // 14
 		addIntSetting(Setting.abDiff_NIR, 20);
 		
 		addBooleanSetting(Setting.IS_PARAMETER_SEARCH, false);
 		addBooleanSetting(Setting.IS_CROP_RESULT, false);
+		
+		addDoubleSetting(Setting.SCALE_FACTOR, 0.5);
 		
 	}
 	

@@ -17,13 +17,19 @@ public class BlockLabFilterMaskToMaskBlack extends AbstractSnapshotAnalysisBlock
 		return labFilter(getInput().getMasks().getVis(), getInput().getImages().getVis(), 110, 255, 0, 255, 0, 255);
 	}
 	
+	@Override
+	protected FlexibleImage processFLUOmask() {
+		
+		return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), 110, 255, 0, 255, 0, 255);
+	}
+	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB) {
 		
 		int[][] image = workMask.getAs2A();
 		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
-		int width = originalImage.getWidth();
-		int height = originalImage.getHeight();
+		int width = workMask.getWidth();
+		int height = workMask.getHeight();
 		
 		int back = options.getBackground();
 		
@@ -33,16 +39,8 @@ public class BlockLabFilterMaskToMaskBlack extends AbstractSnapshotAnalysisBlock
 				lowerValueOfB, upperValueOfB,
 				back);
 		
-		for (int i = 0; i < workMask.getWidth(); i++) {
-			for (int j = 0; j < workMask.getHeight(); j++) {
-				
-				if (result[i][j] != back)
-					result[i][j] = image[i][j];
-				
-			}
-		}
+		FlexibleImage mask = new FlexibleImage(result);
 		
-		return new FlexibleImage(result);
-		
+		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, options.getBackground()).getImage();
 	}
 }

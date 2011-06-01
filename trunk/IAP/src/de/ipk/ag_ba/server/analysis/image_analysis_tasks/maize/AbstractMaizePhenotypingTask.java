@@ -81,7 +81,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 		if (analyzeSideImages())
 			addSideImagesToWorkset(workload, 0);
 		
-		// workload = filterWorkload(workload, "Rainbow Amerindian"); // Athletico
+		workload = filterWorkload(workload, "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
@@ -113,8 +113,17 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 						ImageData fluo = id.getFLUO().copy();
 						ImageData nir = id.getNIR().copy();
 						
-						if (visInputImage == null || nir == null || fluo == null)
+						if (visInputImage == null || nir == null || fluo == null) {
+							System.err.println("ERROR: Internal Error: VIS/FLUO/NIR is NULL!");
 							return;
+						}
+						double rV = visInputImage.getPosition() != null ? visInputImage.getPosition() : 0;
+						double rF = fluo.getPosition() != null ? fluo.getPosition() : 0;
+						double rN = nir.getPosition() != null ? nir.getPosition() : 0;
+						if (Math.abs(rV - rF) > 0.001 || Math.abs(rF - rN) > 0.001) {
+							System.err.println("ERROR: Internal Error: VIS/FLUO/NIR rotation angles differ!");
+							return;
+						}
 						
 						final FlexibleImageSet input = new FlexibleImageSet();
 						final FlexibleImageSet inputMasks = new FlexibleImageSet();
@@ -156,7 +165,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 							ImageProcessor ptip = getImageProcessor(options);
 							
 							FlexibleImageStack debugImageStack = null;
-							boolean addDebugImages = false;
+							boolean addDebugImages = true;
 							if (addDebugImages) {
 								debugImageStack = new FlexibleImageStack();
 							}
@@ -252,7 +261,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 		for (Measurement md : input) {
 			if (md instanceof ImageData) {
 				ImageData id = (ImageData) md;
-				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
+				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
 				if (!replicateId2ImageSetSide.containsKey(key)) {
 					replicateId2ImageSetSide.put(key, new ImageSet(null, null, null, id.getParentSample()));
 				}
@@ -292,7 +301,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 		for (Measurement md : input) {
 			if (md instanceof ImageData) {
 				ImageData id = (ImageData) md;
-				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
+				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
 				if (!replicateId2ImageSetTop.containsKey(key)) {
 					replicateId2ImageSetTop.put(key, new ImageSet(null, null, null, id.getParentSample()));
 				}

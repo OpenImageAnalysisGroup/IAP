@@ -26,19 +26,22 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			numericResult = getMarkers(getInput().getMasks().getVis());
 			
+			int w = getInput().getMasks().getVis().getWidth();
+			int h = getInput().getMasks().getVis().getHeight();
+			
 			int n = 0;
 			int i = 1;
 			for (MarkerPair mp : numericResult) {
 				if (mp.getLeft() != null) {
-					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getLeft().x);
-					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getLeft().y);
+					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getLeft().x / w);
+					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getLeft().y / h);
 				} else {
 					// System.out.println("n=" + n + ", i=" + i + ", lx: " + mp.getLeft().x + " ly: " + mp.getLeft().y);
 				}
 				i += 2;
 				if (mp.getRight() != null) {
-					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getRight().x);
-					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getRight().y);
+					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getRight().x / w);
+					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getRight().y / h);
 				} else {
 					// System.out.println("n=" + n + ", i=" + i + ", rx: " + mp.getRight().x + " ry: " + mp.getRight().y);
 				}
@@ -47,7 +50,6 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 				if (n >= 3)
 					break;
 			}
-			
 			if (numericResult != null) {
 				calculateDistanceBetweenMarkers(numericResult);
 			}
@@ -58,16 +60,16 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	private void calculateDistanceBetweenMarkers(ArrayList<MarkerPair> numericResult) {
 		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y) != null
 				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y) != null) {
-			int markerPosOneLeft = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y).getValue();
-			int markerPosTwoLeft = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y).getValue();
+			double markerPosOneLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y).getValue();
+			double markerPosTwoLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y).getValue();
 			
 			getProperties().setNumericProperty(0, PropertyNames.RESULT_DISTANCE_MARKER_LEFT, Math.abs(markerPosTwoLeft - markerPosOneLeft));
 		}
 		
 		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y) != null
 				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y) != null) {
-			int markerPosOneRight = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y).getValue();
-			int markerPosTwoRight = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y).getValue();
+			double markerPosOneRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y).getValue();
+			double markerPosTwoRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y).getValue();
 			
 			getProperties().setNumericProperty(0, PropertyNames.RESULT_DISTANCE_MARKER_RIGHT, Math.abs(markerPosTwoRight - markerPosOneRight));
 		}
