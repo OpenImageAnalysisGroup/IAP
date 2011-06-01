@@ -15,23 +15,33 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 		
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
-			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR);
 			
-			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
-			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
+			BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
+			BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
 			
-			if (markerPosLeft != null) {
-				FlexibleImage result = new ImageOperation(input).clearImageBottom(
-						(int) (markerPosLeft.getValue() * getInput().getImages().getVis().getHeight() * scaleFactor), options.getBackground()).getImage();
-				
-				return result;
+			BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
+			BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
+			
+			FlexibleImage result = input;
+			
+			if (markerPosLeftY != null) {
+				result = new ImageOperation(result).clearImageBottom(
+						(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()), options.getBackground()).getImage();
+			} else
+				if (markerPosLeftY == null && markerPosRightY != null) {
+					result = new ImageOperation(result).clearImageBottom(
+							(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()), options.getBackground()).getImage();
+				}
+			
+			if (markerPosLeftX != null) {
+				result = new ImageOperation(result).clearImageLeft(
+						(int) (markerPosLeftX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
 			}
-			if (markerPosLeft == null && markerPosRight != null) {
-				FlexibleImage result = new ImageOperation(input).clearImageBottom(
-						(int) (markerPosRight.getValue() * getInput().getImages().getVis().getHeight() * scaleFactor), options.getBackground()).getImage();
-				
-				return result;
+			if (markerPosRightX != null) {
+				result = new ImageOperation(result).clearImageRight(
+						(int) (markerPosRightX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
 			}
+			return result;
 		}
 		return getInput().getMasks().getVis();
 	}

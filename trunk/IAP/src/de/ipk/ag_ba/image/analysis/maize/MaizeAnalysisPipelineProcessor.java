@@ -22,7 +22,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBelowMarker;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFluoToIntensity;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresFromVisUsingOpening;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockUseFluoMaskToClearVisAndNirMask;
 
 public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
@@ -73,7 +72,7 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		p.add(BlockClearBelowMarker.class);
 		p.add(BlockLabFilterMaskToMask.class);
 		p.add(BlockLabFilterMaskToMaskBlack.class);
-		p.add(BlockRemoveSmallStructuresFromVisUsingOpening.class);
+		// p.add(BlockRemoveSmallStructuresFromVisUsingOpening.class);
 		p.add(BlockMedianFilter.class);
 		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
