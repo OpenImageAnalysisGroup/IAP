@@ -19,21 +19,18 @@ public final class ActionLemnaCam2 extends AbstractUrlNavigationAction {
 		super("Show Maize Greenhouse");
 	}
 	
-	/**
-	 * @param guiSetting
-	 * @return
-	 */
 	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
 		NavigationAction navigationAction = new ActionLemnaCam2();
-		NavigationButton res = new NavigationButton(navigationAction, "Maize Greenhouse",
-				IAPimages.getWebCam(),
+		NavigationButton res = new NavigationButton(navigationAction, "CCTV (Maize)",
+				IAPimages.getWebCam2(),
 				guiSetting);
 		return res;
 	}
 	
 	@Override
 	public String getURL() {
-		return "http://ba-10/SnapshotJPEG?Resolution=640x480&Quality=Standard";
+		String url = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity";
+		return url;
 	}
 	
 	@Override
@@ -43,7 +40,12 @@ public final class ActionLemnaCam2 extends AbstractUrlNavigationAction {
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-		return null;
+		return currentSet;
+	}
+	
+	@Override
+	public String getDefaultTooltip() {
+		return "Show Camera Snapshots";
 	}
 	
 	@Override

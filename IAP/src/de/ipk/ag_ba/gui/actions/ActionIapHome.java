@@ -66,7 +66,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		// vantedNB.getAction().addAdditionalEntity(startVanted0);
 		homeActions.add(vantedNB);
 		
-		NavigationButton serverStatusEntity = Other.getServerStatusEntity(true, src != null ? src.getGUIsetting() : null);
+		NavigationButton serverStatusEntity = Other.getServerStatusEntity(false, src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
 		
 		String hsm = IAPmain.getHSMfolder();
