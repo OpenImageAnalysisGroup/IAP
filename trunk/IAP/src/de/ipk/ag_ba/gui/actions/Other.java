@@ -148,11 +148,11 @@ public class Other {
 				infoset.clear();
 				resultNavigationButtons.clear();
 				if (includeLemnaTecStatus) {
+					resultNavigationButtons.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
+					
 					resultNavigationButtons.add(ActionLemnaCam.getLemnaCamButton(src.getGUIsetting()));
 					// if (!IAPservice.isReachable("http://lemnacam.ipk-gatersleben.de"))
 					// resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
-					
-					resultNavigationButtons.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
 					
 					// if (!IAPservice.isReachable("http://ba-10.ipk-gatersleben.de"))
 					// resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
