@@ -25,7 +25,7 @@ public final class ActionLemnaCam extends AbstractUrlNavigationAction {
 	 */
 	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
 		NavigationAction navigationAction = new ActionLemnaCam();
-		NavigationButton res = new NavigationButton(navigationAction, "Barley Greenhouse",
+		NavigationButton res = new NavigationButton(navigationAction, "CCTV (Barley)",
 				IAPimages.getWebCam(),
 				guiSetting);
 		return res;

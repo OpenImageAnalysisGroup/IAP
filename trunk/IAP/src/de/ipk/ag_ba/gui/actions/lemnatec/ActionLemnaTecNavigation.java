@@ -122,6 +122,12 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			NavigationButton dokuButton = new NavigationButton(new DataSourceNavigationAction(doku), src.getGUIsetting());
 			result.add(dokuButton);
 			
+			result.add(new NavigationButton(new ActionLemnaAssessment(), src.getGUIsetting()));
+			
+			result.add(ActionLemnaCam.getLemnaCamButton(src.getGUIsetting()));
+			
+			result.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
+			
 		} catch (Exception e) {
 			// error
 		}

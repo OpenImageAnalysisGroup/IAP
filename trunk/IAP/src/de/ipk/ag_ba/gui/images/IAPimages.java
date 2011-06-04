@@ -9,8 +9,13 @@ public class IAPimages {
 	}
 	
 	public static String getWebCam() {
-		return "img/ext/gpl2/Gnome-Camera-Web-64.png";
+		return "img/ext/axis.png";
+		// return "img/ext/gpl2/Gnome-Camera-Web-64.png";
 		// "img/ext/cctv.png"
+	}
+	
+	public static String getWebCam2() {
+		return "img/ext/sp105.png";
 	}
 	
 	public static String getLogout() {
