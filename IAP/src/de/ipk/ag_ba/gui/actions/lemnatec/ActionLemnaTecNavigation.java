@@ -124,9 +124,9 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			
 			result.add(new NavigationButton(new ActionLemnaAssessment(), src.getGUIsetting()));
 			
-			result.add(ActionLemnaCam.getLemnaCamButton(src.getGUIsetting()));
-			
 			result.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
+			
+			result.add(ActionLemnaCam.getLemnaCamButton(src.getGUIsetting()));
 			
 		} catch (Exception e) {
 			// error
