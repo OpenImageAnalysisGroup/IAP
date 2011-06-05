@@ -130,10 +130,10 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				}
 			}
 			
-			for (MappingData3DPath mp : newStatisticsData) {
-				mp.getSampleData().setRowId(-1);
-			}
-			
+			// for (MappingData3DPath mp : newStatisticsData) {
+			// mp.getSampleData().setRowId(-1);
+			// }
+			//
 			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 			statisticsResult.getHeader().setImportusergroup(getDefaultTitle());

@@ -43,12 +43,17 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.AbstractExperimentDataProcessor;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessingManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessor;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
 /**
  * @author klukas
@@ -77,10 +82,13 @@ public class Other {
 				public void performActionCalculateResults(NavigationButton src) {
 					this.src = src;
 					try {
-						if (experimentName.getData(m) != null) {
-							SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(m, experimentName.getData(m),
+						ExperimentInterface ed = experimentName.getData(m);
+						Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements((Experiment) ed);
+						ed = MappingData3DPath.merge(md, true);
+						if (ed != null) {
+							SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(m, ed,
 												experimentName.getExperimentName());
-							ExperimentDataProcessingManager.getInstance().processData(experimentName.getData(m), pp, null,
+							ExperimentDataProcessingManager.getInstance().processData(ed, pp, null,
 												optSupplementaryPanel, null);
 							JComponent gui = IAPmain.showVANTED(true);
 							gui.setBorder(BorderFactory.createLoweredBevelBorder());

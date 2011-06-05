@@ -12,6 +12,7 @@
 package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -89,6 +90,13 @@ public class MappingData3DPath {
 			res.add(new MappingData3DPath(nmi));
 		}
 		return res;
+	}
+	
+	public static ExperimentInterface merge(Collection<NumericMeasurementInterface> md, boolean ignoreSnapshotFineTime) {
+		ArrayList<MappingData3DPath> mmd = new ArrayList<MappingData3DPath>();
+		for (NumericMeasurementInterface nmi : md)
+			mmd.add(new MappingData3DPath(nmi));
+		return merge(mmd, ignoreSnapshotFineTime);
 	}
 	
 }

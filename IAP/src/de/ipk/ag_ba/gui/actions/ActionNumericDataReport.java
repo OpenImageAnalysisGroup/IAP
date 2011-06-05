@@ -57,7 +57,7 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Tabular Report";
+		return "Watering Table";
 	}
 	
 	@Override

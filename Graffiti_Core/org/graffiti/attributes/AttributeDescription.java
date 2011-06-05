@@ -3,11 +3,11 @@ package org.graffiti.attributes;
 public class AttributeDescription {
 	
 	private String id;
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private Class attributeClass;
 	private String user_description;
 	
-	private boolean isNodeDesc, isEdgeDesc;
+	private final boolean isNodeDesc, isEdgeDesc;
 	private String optDeletePath;
 	
 	public AttributeDescription(String id, Class<?> attributeClass, String user_description, boolean isNodeDesc, boolean isEdgeDesc) {
@@ -32,12 +32,12 @@ public class AttributeDescription {
 		return id;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public void setAttributeClass(Class attributeClass) {
 		this.attributeClass = attributeClass;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class getAttributeClass() {
 		return attributeClass;
 	}

@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.ObjectRef;
 import org.SystemAnalysis;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
@@ -82,7 +83,7 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Create TAR File";
+		return "Download TAR Archive";
 	}
 	
 	@Override
@@ -248,10 +249,10 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 								
 								final String zefn;
 								ImageData id = (ImageData) bm;
-								try {
-									if (bm instanceof ImageData) {
-										id = (ImageData) bm;
-										zefn =
+								
+								if (bm instanceof ImageData) {
+									id = (ImageData) bm;
+									zefn =
 												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : "") +
 														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
 														(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad " : "0Grad") : "") + " " +
@@ -262,44 +263,45 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 														gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
 														gc.get(GregorianCalendar.MINUTE) + "_" +
 														gc.get(GregorianCalendar.SECOND) + ".png";
-										
-									} else {
-										zefn = bm.getURL().getFileName();
-									}
-									// bm.getURL().getFileName();
 									
-									final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
-									
-									// out.putNextEntry(new ZipEntry(zefn));
-									while (written.getInt() > 0)
-										Thread.sleep(5);
-									written.addInt(1);
-									es.submit(new Runnable() {
-										@Override
-										public void run() {
-											synchronized (out) {
-												try {
-													if (in.getCount() > 0) {
-														TarArchiveEntry entry = new TarArchiveEntry(zefn);
-														entry.setSize(in.getCount());
-														entry.setModTime(sa.getRowId());
-														out.putArchiveEntry(entry);
-														out.write(in.getBuff(), 0, in.getCount());
-														out.closeArchiveEntry();
-													}
-												} catch (IOException e) {
-													System.out.println("ERROR: " + e.getMessage());
-												}
-												written.addLong(in.getCount());
-												written.addInt(-1);
-											}
-										}
-									});
-									
-									in.close();
-								} catch (Exception e) {
-									System.out.println("ERROR: " + e.getMessage());
+								} else {
+									zefn = bm.getURL().getFileName();
 								}
+								// bm.getURL().getFileName();
+								
+								final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
+								
+								// out.putNextEntry(new ZipEntry(zefn));
+								while (written.getInt() > 0)
+									Thread.sleep(5);
+								written.addInt(1);
+								final ObjectRef error = new ObjectRef();
+								es.submit(new Runnable() {
+									@Override
+									public void run() {
+										synchronized (out) {
+											try {
+												if (in.getCount() > 0 && in.getBuff().length >= in.getCount()) {
+													TarArchiveEntry entry = new TarArchiveEntry(zefn);
+													entry.setSize(in.getCount());
+													entry.setModTime(sa.getRowId());
+													out.putArchiveEntry(entry);
+													out.write(in.getBuff(), 0, in.getCount());
+													out.closeArchiveEntry();
+													written.addLong(in.getCount());
+												}
+											} catch (IOException e) {
+												error.setObject(e);
+											}
+											written.addInt(-1);
+										}
+									}
+								});
+								
+								in.close();
+								if (error.getObject() != null)
+									throw (Exception) error.getObject();
+								
 								status.setCurrentStatusText1("Create TAR: " + (written.getLong() / 1024 / 1024) + " MB");
 								
 								long currTime = System.currentTimeMillis();

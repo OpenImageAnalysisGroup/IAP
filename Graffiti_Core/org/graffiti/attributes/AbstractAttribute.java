@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: AbstractAttribute.java,v 1.1 2011-01-31 09:04:43 klukas Exp $
+// $Id: AbstractAttribute.java,v 1.2 2011-06-05 16:08:37 klukas Exp $
 
 package org.graffiti.attributes;
 
@@ -27,13 +27,12 @@ import org.graffiti.plugin.XMLHelper;
  * Provides common functionality for classes implementing the <code>Attribute</code> interface. Stores the <code>id</code>, <code>parent</code> and
  * <code>attributable</code> of the <code>Attribute</code>.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class AbstractAttribute
 					implements Attribute {
-	@SuppressWarnings("unchecked")
 	protected static HashMap<String, Class> typedAttributesID2TypeForNodes = getDefaultNodeTypedAttributes();
-	@SuppressWarnings("unchecked")
 	protected static HashMap<String, Class> typedAttributesID2TypeForEdges = getDefaultEdgeTypedAttributes();
 	
 	public void setId(String id) {

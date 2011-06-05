@@ -6,7 +6,6 @@ package org;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.GraphicsEnvironment;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -242,7 +241,7 @@ public class ErrorMsg implements HelperClass {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public static Object findChildComponent(Component c, Class searchClass) {
 		if (c == null)
 			return null;
@@ -250,6 +249,7 @@ public class ErrorMsg implements HelperClass {
 		if (c.getClass() == searchClass)
 			return c;
 		try {
+			@SuppressWarnings("unchecked")
 			Object o = c.getClass().asSubclass(searchClass);
 			if (o != null)
 				return c;
@@ -265,7 +265,7 @@ public class ErrorMsg implements HelperClass {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void findChildComponents(Component c, Class searchClass, ArrayList<Object> result) {
 		if (c == null)
 			return;
