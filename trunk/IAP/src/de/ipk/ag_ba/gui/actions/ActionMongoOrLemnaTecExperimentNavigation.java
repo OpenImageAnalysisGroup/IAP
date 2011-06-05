@@ -96,7 +96,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 			for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m, new ExperimentReference(
 							experiment), guiSetting)) {
 				if (ne.getTitle().contains("Put data")) {
-					ne.setTitle("View in VANTED");
+					ne.setTitle("Analyze with VANTED");
 					actions.add(ne);
 				}
 			}

@@ -64,7 +64,7 @@ public class ActionFileManager extends AbstractNavigationAction {
 	public static NavigationButton getFileManagerEntity(MongoDB m,
 						final ExperimentReference experimentRef, GUIsetting guiSetting) {
 		NavigationAction fileManagerAction = new ActionFileManager(m, experimentRef);
-		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View Data",
+		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View Images",
 							"img/ext/user-desktop.png",
 							// "img/ext/applications-system.png",
 				guiSetting);
