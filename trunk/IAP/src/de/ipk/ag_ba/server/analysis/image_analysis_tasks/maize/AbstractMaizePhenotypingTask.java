@@ -10,10 +10,12 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
+import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
@@ -81,7 +83,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 		if (analyzeSideImages())
 			addSideImagesToWorkset(workload, 0);
 		
-		workload = filterWorkload(workload, "Rainbow Amerindian"); // Athletico
+		// workload = filterWorkload(workload, "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
@@ -165,7 +167,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 							ImageProcessor ptip = getImageProcessor(options);
 							
 							FlexibleImageStack debugImageStack = null;
-							boolean addDebugImages = true;
+							boolean addDebugImages = IAPmain.isSettingEnabled(IAPfeature.SHOWDEBUGSTACK);
 							if (addDebugImages) {
 								debugImageStack = new FlexibleImageStack();
 							}
