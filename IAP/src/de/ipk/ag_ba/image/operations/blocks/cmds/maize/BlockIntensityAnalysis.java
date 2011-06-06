@@ -46,10 +46,13 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
-		ResultsTable rt = io.intensity(3).calcualteHistorgram(plantAreaVis, plantImagePixelCountVis);
-		getProperties().storeResults("RESULT_fluo.", rt, getBlockPosition());
-		return io.getImage();
+		if (getInput().getMasks().getFluo() != null) {
+			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
+			ResultsTable rt = io.intensity(3).calcualteHistorgram(plantAreaVis, plantImagePixelCountVis);
+			getProperties().storeResults("RESULT_fluo.", rt, getBlockPosition());
+			return io.getImage();
+		} else
+			return null;
 	}
 	
 	@Override
