@@ -29,7 +29,9 @@ public final class ActionLemnaCam2 extends AbstractUrlNavigationAction {
 	
 	@Override
 	public String getURL() {
-		String url = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity";
+		String url =
+				"file:///home/view/view/view.jpg";
+		// "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity";
 		return url;
 	}
 	
