@@ -169,7 +169,7 @@ public class TaskDescription {
 							}
 						} else
 							System.out.println("Information: Batch command, processed by " + SystemAnalysisExt.getHostName()
-									+ " has been claimed by " + batch.getOwner()
+									+ " has been claimed by " + bcmd.getOwner()
 									+ ". Therefore analysis result is not saved.");
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
