@@ -371,6 +371,8 @@ public class IAPmain extends JApplet {
 		switch (feature) {
 			case REMOTE_EXECUTION:
 				return false;
+			case SHOWDEBUGSTACK:
+				return false;
 		}
 		return false;
 	}

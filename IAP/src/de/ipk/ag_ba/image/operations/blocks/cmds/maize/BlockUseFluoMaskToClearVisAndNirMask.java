@@ -9,26 +9,41 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		
+		if (getInput().getMasks().getVis() == null || getInput().getMasks().getFluo() == null)
+			return null;
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
-			return clearImage(input, getInput().getMasks().getFluo());
+			return clearImageSide(input, getInput().getMasks().getFluo());
+		}
+		
+		if (options.getCameraTyp() == CameraTyp.TOP) {
+			FlexibleImage input = getInput().getMasks().getVis();
+			
+			return clearImageTop(input, getInput().getMasks().getFluo());
 		}
 		return getInput().getMasks().getVis();
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
+		if (getInput().getMasks().getNir() == null || getInput().getMasks().getFluo() == null)
+			return null;
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
-			return clearImage(input, getInput().getMasks().getFluo());
+			return clearImageSide(input, getInput().getMasks().getFluo());
+		}
+		
+		if (options.getCameraTyp() == CameraTyp.TOP) {
+			FlexibleImage input = getInput().getMasks().getNir();
+			
+			return clearImageTop(input, getInput().getMasks().getFluo());
 		}
 		return getInput().getMasks().getNir();
 	}
 	
-	private FlexibleImage clearImage(FlexibleImage input, FlexibleImage fluo) {
+	private FlexibleImage clearImageSide(FlexibleImage input, FlexibleImage fluo) {
 		ImageOperation ioInput = new ImageOperation(input);
 		int background = options.getBackground();
 		ImageOperation ioFluo = new ImageOperation(fluo);
@@ -54,5 +69,32 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		positions[3] = (int) (positions[3] * s + pr * input.getWidth());
 		
 		return ioInput.clearImageLeft(positions[2], bl).clearImageRight(positions[3], br).clearImageAbove(positions[0], ba).getImage();
+	}
+	
+	private FlexibleImage clearImageTop(FlexibleImage input, FlexibleImage fluo) {
+		ImageOperation ioInput = new ImageOperation(input);
+		int background = options.getBackground();
+		ImageOperation ioFluo = new ImageOperation(fluo);
+		int[] positions = ioFluo.getExtremePoints(background);
+		if (positions == null)
+			return input;
+		
+		double scaleFactor = input.getWidth() / (double) fluo.getWidth();
+		
+		int bl = background; // Color.RED.getRGB();
+		int br = background; // Color.YELLOW.getRGB();
+		int ba = background; // Color.ORANGE.getRGB();
+		
+		double s = scaleFactor;
+		
+		double pa = 0.07;
+		
+		positions[0] = (int) (positions[0] * s - pa * input.getWidth());
+		positions[1] = (int) (positions[1] * s + pa * input.getWidth());
+		positions[2] = (int) (positions[2] * s - pa * input.getWidth());
+		positions[3] = (int) (positions[3] * s + pa * input.getWidth());
+		
+		return ioInput.clearImageLeft(positions[2], bl).clearImageRight(positions[3], br).clearImageAbove(positions[0], ba)
+				.clearImageBottom(positions[1], background).getImage();
 	}
 }

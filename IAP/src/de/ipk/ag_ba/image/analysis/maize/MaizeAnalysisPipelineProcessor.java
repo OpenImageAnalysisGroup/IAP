@@ -22,6 +22,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBelowMarker;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFluoToIntensity;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresFromTopVisUsingOpening;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockUseFluoMaskToClearVisAndNirMask;
 
 public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
@@ -36,11 +37,11 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 113); // vorher: 128
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 120); // vorher: 128
 			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 130); // //146);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255); // all yellow
 			
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 104);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 95);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 98);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 194);
@@ -72,7 +73,7 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		p.add(BlockClearBelowMarker.class);
 		p.add(BlockLabFilterMaskToMask.class);
 		p.add(BlockLabFilterMaskToMaskBlack.class);
-		// p.add(BlockRemoveSmallStructuresFromVisUsingOpening.class);
+		p.add(BlockRemoveSmallStructuresFromTopVisUsingOpening.class);
 		p.add(BlockMedianFilter.class);
 		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
