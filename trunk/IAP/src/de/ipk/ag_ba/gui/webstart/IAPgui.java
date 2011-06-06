@@ -184,11 +184,18 @@ public class IAPgui {
 		
 		for (NavigationButton ne : actionPanel.getEntitySet(target.length() > 0)) {
 			knownEntities.put(ne.getTitle(), ne);
+			if (ne.getTitle().contains("(")) {
+				knownEntities.put(ne.getTitle().substring(0, ne.getTitle().lastIndexOf("(")).trim(), ne);
+			}
 		}
 		String thisTarget = target.split("\\.", 2)[0];
+		
 		final String nextTarget = target.length() - thisTarget.length() > 1 ? target.substring(thisTarget.length()
 							+ ".".length()) : "";
 		NavigationButton button = knownEntities.get(thisTarget);
+		if (button == null && thisTarget.contains("(")) {
+			button = knownEntities.get(thisTarget.substring(0, thisTarget.lastIndexOf("(")).trim());
+		}
 		if (button != null) {
 			Runnable rrr = new Runnable() {
 				@Override
@@ -202,7 +209,7 @@ public class IAPgui {
 		} else {
 			System.out.println("Could not find target action " + thisTarget);
 			navigationPanel.getEntitySet(false).iterator().next().executeNavigation(
-					PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, null);
+							PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, null);
 		}
 	}
 }
