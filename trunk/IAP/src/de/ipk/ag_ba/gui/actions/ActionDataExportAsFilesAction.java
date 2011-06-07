@@ -41,7 +41,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author klukas
  */
-public class DataExportAsFilesAction extends AbstractNavigationAction {
+public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
@@ -54,11 +54,11 @@ public class DataExportAsFilesAction extends AbstractNavigationAction {
 	
 	// private JTable table;
 	
-	public DataExportAsFilesAction(String tooltip) {
+	public ActionDataExportAsFilesAction(String tooltip) {
 		super(tooltip);
 	}
 	
-	public DataExportAsFilesAction(MongoDB m, ExperimentReference experimentReference) {
+	public ActionDataExportAsFilesAction(MongoDB m, ExperimentReference experimentReference) {
 		this("Export Data Files");
 		this.m = m;
 		this.experimentReference = experimentReference;
@@ -86,10 +86,10 @@ public class DataExportAsFilesAction extends AbstractNavigationAction {
 		return IAPimages.saveAsArchive();
 	}
 	
-	private static WeakHashMap<String, DataExportAsFilesAction> validLinks2action = new WeakHashMap<String, DataExportAsFilesAction>();
+	private static WeakHashMap<String, ActionDataExportAsFilesAction> validLinks2action = new WeakHashMap<String, ActionDataExportAsFilesAction>();
 	
 	public static void setOutputStreamForAction(String uiid, OutputStream os) throws Exception {
-		DataExportAsFilesAction da = validLinks2action.get(uiid);
+		ActionDataExportAsFilesAction da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -99,7 +99,7 @@ public class DataExportAsFilesAction extends AbstractNavigationAction {
 	}
 	
 	public static String getFileNameForAction(String uiid) throws Exception {
-		DataExportAsFilesAction da = validLinks2action.get(uiid);
+		ActionDataExportAsFilesAction da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -108,7 +108,7 @@ public class DataExportAsFilesAction extends AbstractNavigationAction {
 	}
 	
 	public static Long getExperimentSizeForAction(String uiid) throws Exception {
-		DataExportAsFilesAction da = validLinks2action.get(uiid);
+		ActionDataExportAsFilesAction da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -117,7 +117,7 @@ public class DataExportAsFilesAction extends AbstractNavigationAction {
 	}
 	
 	public static void waitForFinishedDownloadAction(String uiid) throws Exception {
-		DataExportAsFilesAction da = validLinks2action.get(uiid);
+		ActionDataExportAsFilesAction da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -205,7 +205,7 @@ public class DataExportAsFilesAction extends AbstractNavigationAction {
 									if (bm instanceof ImageData) {
 										id = (ImageData) bm;
 										zefn =
-												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : "") +
+												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : id.getReplicateID() + "") +
 														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
 														(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad " : "0Grad") : "") + " " +
 														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +

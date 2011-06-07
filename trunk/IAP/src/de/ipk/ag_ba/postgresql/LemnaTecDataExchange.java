@@ -735,7 +735,7 @@ public class LemnaTecDataExchange {
 					image.setQualityAnnotation(idTag);
 					
 					String fn = sn.getPath_image();
-					if (fn.contains("/"))
+					if (fn != null && fn.contains("/"))
 						fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 					
 					Double position = null;

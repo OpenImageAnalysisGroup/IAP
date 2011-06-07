@@ -8,7 +8,6 @@ package de.ipk.ag_ba.gui.actions;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.ObjectRef;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
@@ -247,22 +247,25 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 								Date t = new Date(nm.getParentSample().getRowId());
 								gc.setTime(t);
 								
-								final String zefn;
+								String zefn;
 								ImageData id = (ImageData) bm;
 								
 								if (bm instanceof ImageData) {
 									id = (ImageData) bm;
 									zefn =
-												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : "") +
+												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : nm.getReplicateID() + "") +
 														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
-														(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad " : "0Grad") : "") + " " +
+														(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad" : "0Grad") : "") + " " +
 														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
 														gc.get(GregorianCalendar.YEAR) + "-" +
 														(gc.get(GregorianCalendar.MONTH) + 1) + "-" +
 														gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
 														gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
 														gc.get(GregorianCalendar.MINUTE) + "_" +
-														gc.get(GregorianCalendar.SECOND) + ".png";
+														gc.get(GregorianCalendar.SECOND) + " ";
+									
+									zefn += filter(100 - zefn.length() - ".png".length(), nm.getParentSample().getParentCondition())
+											+ ".png";
 									
 								} else {
 									zefn = bm.getURL().getFileName();
@@ -272,31 +275,30 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 								final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
 								
 								// out.putNextEntry(new ZipEntry(zefn));
-								while (written.getInt() > 0)
-									Thread.sleep(5);
-								written.addInt(1);
 								final ObjectRef error = new ObjectRef();
-								es.submit(new Runnable() {
-									@Override
-									public void run() {
-										synchronized (out) {
+								final String zefnf = zefn;
+								if (in.getCount() > 0 && in.getBuff().length >= in.getCount()) {
+									while (written.getInt() > 0)
+										Thread.sleep(5);
+									written.setInt(1);
+									es.submit(new Runnable() {
+										@Override
+										public void run() {
 											try {
-												if (in.getCount() > 0 && in.getBuff().length >= in.getCount()) {
-													TarArchiveEntry entry = new TarArchiveEntry(zefn);
-													entry.setSize(in.getCount());
-													entry.setModTime(sa.getRowId());
-													out.putArchiveEntry(entry);
-													out.write(in.getBuff(), 0, in.getCount());
-													out.closeArchiveEntry();
-													written.addLong(in.getCount());
-												}
-											} catch (IOException e) {
+												TarArchiveEntry entry = new TarArchiveEntry(zefnf);
+												entry.setSize(in.getCount());
+												entry.setModTime(sa.getRowId());
+												out.putArchiveEntry(entry);
+												out.write(in.getBuff(), 0, in.getCount());
+												out.closeArchiveEntry();
+												written.addLong(in.getCount());
+											} catch (Exception e) {
 												error.setObject(e);
 											}
-											written.addInt(-1);
+											written.setInt(-1);
 										}
-									}
-								});
+									});
+								}
 								
 								in.close();
 								if (error.getObject() != null)
@@ -372,6 +374,26 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 		// Object[][] rowdata = new Object[rows.size()][cols.size()];
 		//
 		// table = new JTable(rowdata, columns);
+	}
+	
+	private String filter(int maxLen, ConditionInterface condition) {
+		maxLen -= 2;
+		String conditionName = max(maxLen / 3, condition.getGenotype() + "");
+		maxLen += maxLen / 3 - conditionName.length();
+		conditionName += ";" + max(maxLen / 2, condition.getSpecies() + "");
+		maxLen += maxLen / 2 - conditionName.length();
+		conditionName += ";" + max(maxLen, condition.getTreatment() + "");
+		conditionName = StringManipulationTools.stringReplace(conditionName, " ", "_");
+		conditionName = StringManipulationTools.stringReplace(conditionName, ":", "_");
+		conditionName = StringManipulationTools.stringReplace(conditionName, "/", "_");
+		conditionName = StringManipulationTools.stringReplace(conditionName, "\\", "_");
+		return conditionName;
+	}
+	
+	private String max(int i, String s) {
+		if (s.length() > i)
+			s = s.substring(0, i);
+		return s;
 	}
 	
 	private void removeLostEntries() {

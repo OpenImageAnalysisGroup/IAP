@@ -11,6 +11,7 @@
  ************************************************************************************/
 package de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,37 +72,18 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 	}
 	
 	public ImageData(SampleInterface parent, ImageData other) {
-		this(parent);
-		setRowID(other.getRowID());
-		setReplicateID(other.getReplicateID());
-		setPixelsizeX(other.getPixelsizeX());
-		setPixelsizeY(other.getPixelsizeY());
-		setPosition(other.getPosition());
-		setPositionUnit(other.getPositionUnit());
-		setThickness(other.getThickness());
-		setPositionIn3D(other.getPositionIn3D());
-		setRotation(other.getRotation());
-		setURL(new IOurl(other.getURL()));
-		if (other.getLabelURL() != null)
-			setLabelURL(new IOurl(other.getLabelURL()));
+		this(parent, other.getAttributeMap());
+	}
+	
+	private Map<String, Object> getAttributeMap() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+		fillAttributeMap(attributes);
+		return attributes;
 	}
 	
 	@Override
 	public NumericMeasurementInterface clone(SampleInterface parent) {
-		ImageData i = new ImageData(parent);
-		i.setRowID(getRowID());
-		i.setReplicateID(getReplicateID());
-		i.setPixelsizeX(getPixelsizeX());
-		i.setPixelsizeY(getPixelsizeY());
-		i.setPosition(getPosition());
-		i.setPositionUnit(getPositionUnit());
-		i.setThickness(getThickness());
-		i.setPositionIn3D(getPositionIn3D());
-		i.setRotation(getRotation());
-		i.setURL(new IOurl(getURL()));
-		if (getLabelURL() != null)
-			i.setLabelURL(new IOurl(getLabelURL()));
-		return i;
+		return new ImageData(parent, getAttributeMap());
 	}
 	
 	public void setRowID(int id) {
@@ -133,10 +115,13 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 	
 	@Override
 	public void getXMLAttributeString(StringBuilder r) {
-		super.getXMLAttributeString(r);
-		Substance.getAttributeString(r, additionalAttributeNames, new Object[] { getPixelsizeX(),
+		StringBuilder rt = new StringBuilder();
+		super.getXMLAttributeString(rt);
+		Substance.getAttributeString(rt, additionalAttributeNames, new Object[] { getPixelsizeX(),
 							getPixelsizeY(), getThickness(), getRowID(),
 							getLabelURL() == null ? null : getLabelURL().toString(), getPositionIn3D(), getRotation() });
+		System.out.println(rt.toString());
+		r.append(rt.toString());
 	}
 	
 	@Override
