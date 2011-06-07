@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
-public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockClearBelowLowestMarker extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
@@ -26,11 +26,11 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 			
 			if (markerPosLeftY != null) {
 				result = new ImageOperation(result).clearImageBottom(
-						(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()), options.getBackground()).getImage();
+						(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 10, options.getBackground()).getImage();
 			} else
 				if (markerPosLeftY == null && markerPosRightY != null) {
 					result = new ImageOperation(result).clearImageBottom(
-							(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()), options.getBackground()).getImage();
+							(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 10, options.getBackground()).getImage();
 				}
 			
 			if (markerPosLeftX != null) {
@@ -51,7 +51,7 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 		
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getFluo();
-			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR);
+			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			
 			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
 			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
@@ -59,14 +59,14 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 			if (markerPosLeft != null) {
 				double temp = markerPosLeft.getValue();
 				FlexibleImage result = new ImageOperation(input).clearImageBottom(
-						(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor), options.getBackground()).getImage();
+						(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 8, options.getBackground()).getImage();
 				
 				return result;
 			}
 			if (markerPosLeft == null && markerPosRight != null) {
 				double temp = markerPosRight.getValue();
 				FlexibleImage result = new ImageOperation(input).clearImageBottom(
-						(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor), options.getBackground()).getImage();
+						(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 8, options.getBackground()).getImage();
 				
 				return result;
 			}
@@ -86,14 +86,20 @@ public class BlockClearBelowMarker extends AbstractSnapshotAnalysisBlockFIS {
 				
 				if (markerPosLeft != null) {
 					double temp = markerPosLeft.getValue();
+					double pos = temp * getInput().getImages().getNir().getHeight();
+					if (pos > 5)
+						pos -= 5;
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
-							(int) (temp * getInput().getImages().getNir().getHeight()), options.getBackground()).getImage();
+							(int) (pos), options.getBackground()).getImage();
 					return result;
 				}
 				if (markerPosLeft == null && markerPosRight != null) {
 					double temp = markerPosRight.getValue();
+					double pos = (temp * getInput().getImages().getNir().getHeight());
+					if (pos > 5)
+						pos -= 5;
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
-							(int) (temp * getInput().getImages().getNir().getHeight()), options.getBackground()).getImage();
+							(int) pos, options.getBackground()).getImage();
 					return result;
 				}
 			}

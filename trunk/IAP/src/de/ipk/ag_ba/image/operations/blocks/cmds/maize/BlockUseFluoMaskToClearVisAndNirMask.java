@@ -81,10 +81,6 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		
 		double scaleFactor = input.getWidth() / (double) fluo.getWidth();
 		
-		int bl = background; // Color.RED.getRGB();
-		int br = background; // Color.YELLOW.getRGB();
-		int ba = background; // Color.ORANGE.getRGB();
-		
 		double s = scaleFactor;
 		
 		double pa = 0.07;
@@ -94,7 +90,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		positions[2] = (int) (positions[2] * s - pa * input.getWidth());
 		positions[3] = (int) (positions[3] * s + pa * input.getWidth());
 		
-		return ioInput.clearImageLeft(positions[2], bl).clearImageRight(positions[3], br).clearImageAbove(positions[0], ba)
+		return ioInput.clearImageLeft(positions[2], background).clearImageRight(positions[3], background).clearImageAbove(positions[0], background)
 				.clearImageBottom(positions[1], background).getImage();
 	}
 }

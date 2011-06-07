@@ -16,19 +16,22 @@ public class BlueMarkerFinder {
 	
 	private final FlexibleImage input;
 	private ResultsTable resultTable;
+	private double options;
 	
-	public BlueMarkerFinder(FlexibleImage image) {
+	public BlueMarkerFinder(FlexibleImage image, double options) {
 		this.input = image;
+		this.options = options;
 	}
 	
 	public void findCoordinates(int background) {
 		ImageOperation io1 = new ImageOperation(input);
-		
+		double scaleFactor = options;
 		boolean debug = false;
 		if (debug)
 			resultTable = io1
-					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab").opening(0, 1)
-					.opening(8, 2).printImage("nach opening")
+					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
+					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
+					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor)).printImage("nach opening")
 					.convert2Grayscale().printImage("nach gray")
 					// .medianFilter8Bit().printImage("nach8bit")
 					.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB()).printImage("nach thresh")
@@ -38,7 +41,7 @@ public class BlueMarkerFinder {
 		else
 			resultTable = io1
 					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).opening(0, 1)
-					.opening(8, 2)
+					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
 					.convert2Grayscale()
 					// .medianFilter8Bit()
 					.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB())

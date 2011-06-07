@@ -5,20 +5,20 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirTop;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterMaskToMask;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterMaskToMaskBlack;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDecreaseImageAndMaskSize;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDecreaseMaskSize;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilter;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeFirst;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeLast;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHeight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBelowMarker;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBelowLowestMarker;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFluoToIntensity;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
@@ -65,19 +65,19 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		
 		BlockPipeline p = new BlockPipeline(options);
 		
+		p.add(BlockDecreaseImageAndMaskSize.class); // divide input (but not NIR) by 2
 		p.add(BlockImageInfo.class);
 		p.add(BlockClearNirTop.class);
 		p.add(BlockFindBlueMarkers.class);
-		p.add(BlockResizeFirst.class);
+		p.add(BlockDecreaseMaskSize.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
-		p.add(BlockClearBelowMarker.class);
-		p.add(BlockLabFilterMaskToMask.class);
-		p.add(BlockLabFilterMaskToMaskBlack.class);
+		p.add(BlockClearBelowLowestMarker.class);
+		p.add(BlockLabFilter.class);
 		p.add(BlockRemoveSmallStructuresFromTopVisUsingOpening.class);
 		p.add(BlockMedianFilter.class);
 		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
-		p.add(BlockResizeLast.class);
+		p.add(BlockCopyImagesApplyMask.class);
 		
 		p.add(BlockCalculateMainAxis.class);
 		p.add(BlockCalculateWidthAndHeight.class);

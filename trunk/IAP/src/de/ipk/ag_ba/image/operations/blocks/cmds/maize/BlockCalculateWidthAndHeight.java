@@ -59,8 +59,11 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 	
 	private Point getWidthandHeightSide(FlexibleImage vis, int background) {
 		int[] temp = new ImageOperation(vis).getExtremePoints(background);
-		Point values = new Point(Math.abs(temp[1] - temp[0]), Math.abs(temp[3] - temp[2]));
-		return values;
+		if (temp != null) {
+			Point values = new Point(Math.abs(temp[1] - temp[0]), Math.abs(temp[3] - temp[2]));
+			return values;
+		} else
+			return null;
 	}
 	
 	private Point getWidthandHeightTop(FlexibleImage image, int background) {
@@ -90,12 +93,12 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 			
 			if (image.getWidth() > image.getHeight()) {
 				resize = io.addBorder((diagonal - image.getWidth()) / 2,
-						(imagecentx - centroidX),
-						(imagecenty - centroidY), background).getImage();
+						(int) (imagecentx - centroidX),
+						(int) (imagecenty - centroidY), background).getImage();
 			} else {
 				resize = io.addBorder((diagonal - image.getHeight()) / 2,
-						(imagecentx - centroidX),
-						(imagecenty - centroidY), background).getImage();
+						(int) (imagecentx - centroidX),
+						(int) (imagecenty - centroidY), background).getImage();
 			}
 			
 			int angle = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION).getValue();

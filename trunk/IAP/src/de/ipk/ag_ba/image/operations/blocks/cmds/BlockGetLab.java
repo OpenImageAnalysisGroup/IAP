@@ -11,7 +11,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 /**
  * @author Entzian
  */
-public class BlockLabFilterMaskToMask extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockGetLab extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		
@@ -32,22 +32,20 @@ public class BlockLabFilterMaskToMask extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (getInput().getMasks().getNir() != null) {
-			return labFilter(getInput().getMasks().getNir(), getInput().getImages().getNir(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_NIR),
-					options.getIntSetting(Setting.LAB_MAX_L_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_A_VALUE_NIR),
-					options.getIntSetting(Setting.LAB_MAX_A_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_B_VALUE_NIR),
-					options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR));
-		} else
-			return null;
+		
+		return labFilter(getInput().getMasks().getNir(), getInput().getImages().getNir(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_NIR),
+				options.getIntSetting(Setting.LAB_MAX_L_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_A_VALUE_NIR),
+				options.getIntSetting(Setting.LAB_MAX_A_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_B_VALUE_NIR),
+				options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR));
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB) {
 		
-		int[][] image = workMask.getAs2A();
+		int[][] image = originalImage.getAs2A();
 		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
-		int width = workMask.getWidth();
-		int height = workMask.getHeight();
+		int width = originalImage.getWidth();
+		int height = originalImage.getHeight();
 		
 		int back = options.getBackground();
 		
@@ -57,8 +55,16 @@ public class BlockLabFilterMaskToMask extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfB, upperValueOfB,
 				back);
 		
-		FlexibleImage mask = new FlexibleImage(result);
+		for (int i = 0; i < workMask.getWidth(); i++) {
+			for (int j = 0; j < workMask.getHeight(); j++) {
+				
+				if (result[i][j] != back)
+					result[i][j] = image[i][j];
+				
+			}
+		}
 		
-		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, options.getBackground()).getImage();
+		return new FlexibleImage(result);
+		
 	}
 }

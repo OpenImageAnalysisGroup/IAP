@@ -496,8 +496,9 @@ public class ImageOperation {
 		
 	}
 	
-	public void gamma(double value) {
+	public ImageOperation gamma(double value) {
 		image.getProcessor().gamma(value);
+		return new ImageOperation(image.getProcessor().getBufferedImage());
 	}
 	
 	public void drawRect(int leftX, int leftY, int width, int heigh) {
@@ -1396,9 +1397,23 @@ public class ImageOperation {
 		return new ImageOperation(resultImage);
 	}
 	
-	public static void doThresholdLAB(int width, int height, int[][] img2d, int[][] resultImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
-			int upperValueOfA, int lowerValueOfB,
-			int upperValueOfB, int background) {
+	public static void doThresholdLAB(int width, int height, int[][] img2d, int[][] resultImage,
+			int lowerValueOfL, int upperValueOfL,
+			int lowerValueOfA, int upperValueOfA,
+			int lowerValueOfB, int upperValueOfB,
+			int background) {
+		
+		doThresholdLAB(width, height, img2d, resultImage,
+				new int[] { lowerValueOfL }, new int[] { upperValueOfL }, new int[] { lowerValueOfA }, new int[] { upperValueOfA }, new int[] { lowerValueOfB },
+				new int[] { upperValueOfB }, background);
+		
+	}
+	
+	public static void doThresholdLAB(int width, int height, int[][] img2d, int[][] resultImage,
+			int[] lowerValueOfL, int[] upperValueOfL,
+			int[] lowerValueOfA, int[] upperValueOfA,
+			int[] lowerValueOfB, int[] upperValueOfB,
+			int background) {
 		int c, x, y = 0;
 		double rf, gf, bf;
 		double X, Y, Z, fX, fY, fZ;
@@ -1454,14 +1469,93 @@ public class ImageOperation {
 				ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
 				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
 				
-				if ((Li > lowerValueOfL) && (Li < upperValueOfL) && (ai > lowerValueOfA) && (ai < upperValueOfA)
-						&& (bi > lowerValueOfB) && (bi < upperValueOfB)) {
-					resultImage[x][y] = img2d[x][y];
-				} else {
-					resultImage[x][y] = background;
+				boolean found = false;
+				for (int idx = 0; idx < lowerValueOfA.length; idx++) {
+					if ((Li > lowerValueOfL[idx]) && (Li < upperValueOfL[idx]) && (ai > lowerValueOfA[idx]) && (ai < upperValueOfA[idx])
+							&& (bi > lowerValueOfB[idx]) && (bi < upperValueOfB[idx])) {
+						if (resultImage[x][y] != background) {
+							resultImage[x][y] = img2d[x][y];
+							found = true;
+							break;
+						}
+					}
 				}
+				if (!found)
+					resultImage[x][y] = background;
 			}
 		}
+	}
+	
+	public Lab getLABAverage(int width, int height, int[][] img2d, int[][] resultImage, int up, int down, int left, int right) {
+		int c, x, y = 0;
+		double rf, gf, bf;
+		double X, Y, Z, fX, fY, fZ;
+		double La, aa, bb;
+		double ot = 1 / 3.0, cont = 16 / 116.0;
+		int Li, ai, bi;
+		
+		double sumL = 0;
+		double sumA = 0;
+		double sumB = 0;
+		
+		int count = 0;
+		
+		for (y = up; y < down; y++) {
+			for (x = left; x < right; x++) {
+				c = img2d[x][y];
+				
+				// RGB to XYZ
+				rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
+				gf = ((c & 0x00ff00) >> 8) / 255.0; // G 0..1
+				bf = (c & 0x0000ff) / 255.0; // B 0..1
+				
+				// white reference D65 PAL/SECAM
+				X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
+				Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
+				Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
+				// var_X = X / 95.047 //Observer = 2, Illuminant = D65
+				// var_Y = Y / 100.000
+				// var_Z = Z / 108.883
+				
+				// XYZ to Lab
+				if (X > 0.008856)
+					fX = Math.pow(X, ot);
+				else
+					fX = (7.78707 * X) + cont;// 7.7870689655172
+					
+				if (Y > 0.008856)
+					fY = Math.pow(Y, ot);
+				else
+					fY = (7.78707 * Y) + cont;
+				
+				if (Z > 0.008856)
+					fZ = Math.pow(Z, ot);
+				else
+					fZ = (7.78707 * Z) + cont;
+				
+				La = (116 * fY) - 16;
+				aa = 500 * (fX - fY);
+				bb = 200 * (fY - fZ);
+				
+				// Lab rescaled to the 0..255 range
+				// a* and b* range from -120 to 120 in the 8 bit space
+				La = La * 2.55;
+				aa = Math.floor((1.0625 * aa + 128) + 0.5);
+				bb = Math.floor((1.0625 * bb + 128) + 0.5);
+				
+				// bracketing
+				Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
+				ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
+				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+				
+				sumL += Li;
+				sumA += ai;
+				sumB += bi;
+				
+				count++;
+			}
+		}
+		return new Lab(sumL / (double) count, sumA / (double) count, sumB / (double) count);
 	}
 	
 	public ImageOperation medianFilter32Bit() {
@@ -1654,8 +1748,8 @@ public class ImageOperation {
 		return new ImageOperation(bi);
 	}
 	
-	public ArrayList<MarkerPair> searchBlueMarkers() {
-		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage());
+	public ArrayList<MarkerPair> searchBlueMarkers(double options) {
+		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options);
 		
 		bmf.findCoordinates(PhenotypeAnalysisTask.BACKGROUND_COLORint);
 		
