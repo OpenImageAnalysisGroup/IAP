@@ -22,7 +22,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 		BlockProperty distLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_DISTANCE_MARKER_LEFT);
 		BlockProperty distRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_DISTANCE_MARKER_RIGHT);
 		
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraTyp.SIDE && getInput().getMasks().getFluo() != null) {
 			Point values = getWidthandHeightSide(getInput().getMasks().getFluo(), background);
 			
 			if (values != null) {
@@ -90,12 +90,12 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 			
 			if (image.getWidth() > image.getHeight()) {
 				resize = io.addBorder((diagonal - image.getWidth()) / 2,
-						(int) (imagecentx - centroidX),
-						(int) (imagecenty - centroidY), background).getImage();
+						(imagecentx - centroidX),
+						(imagecenty - centroidY), background).getImage();
 			} else {
 				resize = io.addBorder((diagonal - image.getHeight()) / 2,
-						(int) (imagecentx - centroidX),
-						(int) (imagecenty - centroidY), background).getImage();
+						(imagecentx - centroidX),
+						(imagecenty - centroidY), background).getImage();
 			}
 			
 			int angle = (int) getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION).getValue();
