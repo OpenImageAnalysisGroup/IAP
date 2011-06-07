@@ -6,7 +6,6 @@
  */
 package de.ipk.ag_ba.gui.actions;
 
-import java.awt.GraphicsEnvironment;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,6 +44,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
+ * Improvements in the class {@link ActionDataExportTar} (like the better handling
+ * of the file names) are not contained in this command.
+ * 
  * @author klukas
  */
 public class ActionDataExport extends AbstractNavigationAction {
@@ -256,7 +258,7 @@ public class ActionDataExport extends AbstractNavigationAction {
 									if (bm instanceof ImageData) {
 										id = (ImageData) bm;
 										zefn =
-												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : "") +
+												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : nm.getReplicateID() + "") +
 														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
 														(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad " : "0Grad") : "") + " " +
 														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
