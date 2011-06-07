@@ -64,7 +64,7 @@ public class ImageProcessorOptions {
 
 			IS_PARAMETER_SEARCH, IS_CROP_RESULT,
 
-			SCALE_FACTOR;
+			SCALE_FACTOR_DECREASE_MASK, SCALE_FACTOR_DECREASE_IMG_AND_MASK;
 		
 	}
 	
@@ -267,7 +267,7 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.LAB_MAX_B_VALUE_NIR, 255);
 		
 		addIntSetting(Setting.L_Diff_VIS, 20);
-		addIntSetting(Setting.abDiff_VIS, 40);
+		addIntSetting(Setting.abDiff_VIS, 40); // 40
 		addIntSetting(Setting.L_Diff_FLOU, 20);
 		addIntSetting(Setting.abDiff_FLOU, 30);
 		addIntSetting(Setting.L_Diff_NIR, 19); // 14
@@ -276,7 +276,8 @@ public class ImageProcessorOptions {
 		addBooleanSetting(Setting.IS_PARAMETER_SEARCH, false);
 		addBooleanSetting(Setting.IS_CROP_RESULT, false);
 		
-		addDoubleSetting(Setting.SCALE_FACTOR, 0.5);
+		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK, 0.5);
+		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 0.5);
 		
 	}
 	

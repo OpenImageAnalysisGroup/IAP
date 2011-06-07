@@ -9,19 +9,19 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author klukas
  */
-public class BlockResizeFirst extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockDecreaseMaskSize extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
-		double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR);
+		double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 		return vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		FlexibleImage fluo = getInput().getMasks().getFluo();
-		double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR);
+		double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 		return fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
 	}
 }

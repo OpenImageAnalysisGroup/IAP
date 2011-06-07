@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MarkerPair;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -89,6 +90,6 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private ArrayList<MarkerPair> getMarkers(FlexibleImage image) {
-		return new ImageOperation(image).searchBlueMarkers();
+		return new ImageOperation(image).searchBlueMarkers(options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK));
 	}
 }
