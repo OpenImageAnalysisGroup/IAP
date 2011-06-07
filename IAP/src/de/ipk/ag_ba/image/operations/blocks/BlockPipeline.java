@@ -71,7 +71,7 @@ public class BlockPipeline {
 		}
 		
 		long b = System.currentTimeMillis();
-		System.out.println("PIPELINE execution time: " + (b - a) / 1000 + "s");
+		System.out.print("PET: " + (b - a) / 1000 + "s ");
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);
 		updatePipelineStatistics();
 		return input;
