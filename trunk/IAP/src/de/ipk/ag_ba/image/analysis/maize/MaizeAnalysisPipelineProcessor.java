@@ -5,6 +5,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirTop;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancing;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDecreaseImageAndMaskSize;
@@ -66,6 +67,7 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		BlockPipeline p = new BlockPipeline(options);
 		
 		p.add(BlockDecreaseImageAndMaskSize.class); // divide input (but not NIR) by 2
+		p.add(BlockColorBalancing.class);
 		p.add(BlockImageInfo.class);
 		p.add(BlockClearNirTop.class);
 		p.add(BlockFindBlueMarkers.class);

@@ -1486,7 +1486,7 @@ public class ImageOperation {
 		}
 	}
 	
-	public Lab getLABAverage(int width, int height, int[][] img2d, int[][] resultImage, int up, int down, int left, int right) {
+	public Lab getLABAverage(int[][] img2d, int x1, int y1, int w, int h) {
 		int c, x, y = 0;
 		double rf, gf, bf;
 		double X, Y, Z, fX, fY, fZ;
@@ -1500,8 +1500,9 @@ public class ImageOperation {
 		
 		int count = 0;
 		
-		for (y = up; y < down; y++) {
-			for (x = left; x < right; x++) {
+		for (x = x1; x < x1 + w; x++) {
+			for (y = y1; y < y1 + h; y++) {
+				
 				c = img2d[x][y];
 				
 				// RGB to XYZ
@@ -2084,5 +2085,130 @@ public class ImageOperation {
 			}
 		
 		return new ImageOperation(in);
+	}
+	
+	/**
+	 * for 3 Channels 24 bit
+	 * 
+	 * @param factors
+	 * @return
+	 */
+	public ImageOperation multiplicateImageChannelsWithFactors(double[] factors) {
+		int[][] img2d = getImageAs2array();
+		int width = getImage().getWidth();
+		int height = getImage().getHeight();
+		int c;
+		double rf, gf, bf;
+		int[][] result = new int[width][height];
+		
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				
+				c = img2d[x][y];
+				
+				rf = ((c & 0xff0000) >> 16);
+				gf = ((c & 0x00ff00) >> 8);
+				bf = (c & 0x0000ff);
+				
+				int r = (int) ((int) (rf) * factors[0]);
+				int g = (int) ((int) (gf) * factors[1]);
+				int b = (int) ((int) (bf) * factors[2]);
+				
+				if (r > 255)
+					r = 255;
+				if (g > 255)
+					g = 255;
+				if (b > 255)
+					b = 255;
+				
+				result[x][y] = new Color(r, g, b).getRGB();
+			}
+		}
+		return new ImageOperation(result);
+	}
+	
+	/**
+	 * Sum of all RGB channels of an area(x, y, width, height) in an image, under conditions in LAB
+	 * 
+	 * @param LThresh
+	 *           minimal brightness
+	 * @param ABThresh
+	 *           minimal A and B value
+	 */
+	public double[] getRGBAverage(int[][] img2d, int x1, int y1, int w, int h, int LThresh, int ABThresh) {
+		int c, x, y = 0;
+		double rf, gf, bf;
+		double X, Y, Z, fX, fY, fZ;
+		double La, aa, bb;
+		double ot = 1 / 3.0, cont = 16 / 116.0;
+		int Li, ai, bi;
+		
+		// sums of RGB
+		double sumR = 0;
+		double sumG = 0;
+		double sumB = 0;
+		
+		int count = 0;
+		
+		for (x = x1; x < x1 + w; x++) {
+			for (y = y1; y < y1 + h; y++) {
+				
+				c = img2d[x][y];
+				
+				// RGB to XYZ
+				rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
+				gf = ((c & 0x00ff00) >> 8) / 255.0; // G 0..1
+				bf = (c & 0x0000ff) / 255.0; // B 0..1
+				
+				// white reference D65 PAL/SECAM
+				X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
+				Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
+				Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
+				// var_X = X / 95.047 //Observer = 2, Illuminant = D65
+				// var_Y = Y / 100.000
+				// var_Z = Z / 108.883
+				
+				// XYZ to Lab
+				if (X > 0.008856)
+					fX = Math.pow(X, ot);
+				else
+					fX = (7.78707 * X) + cont;// 7.7870689655172
+					
+				if (Y > 0.008856)
+					fY = Math.pow(Y, ot);
+				else
+					fY = (7.78707 * Y) + cont;
+				
+				if (Z > 0.008856)
+					fZ = Math.pow(Z, ot);
+				else
+					fZ = (7.78707 * Z) + cont;
+				
+				La = (116 * fY) - 16;
+				aa = 500 * (fX - fY);
+				bb = 200 * (fY - fZ);
+				
+				// Lab rescaled to the 0..255 range
+				// a* and b* range from -120 to 120 in the 8 bit space
+				La = La * 2.55;
+				aa = Math.floor((1.0625 * aa + 128) + 0.5);
+				bb = Math.floor((1.0625 * bb + 128) + 0.5);
+				
+				// bracketing
+				Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
+				ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
+				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+				
+				// sum under following conditions
+				if (Li > LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
+					sumR += rf * 255;
+					sumG += gf * 255;
+					sumB += bf * 255;
+					
+					count++;
+				}
+			}
+		}
+		return new double[] { sumR / (double) count, sumG / (double) count, sumB / (double) count };
 	}
 }
