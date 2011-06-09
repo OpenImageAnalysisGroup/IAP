@@ -25,6 +25,7 @@ import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
@@ -68,8 +69,8 @@ public class HsmFileSystemSource extends FileSystemSource {
 			}
 		});
 		
-		HashMap<String, TreeMap<Long, ExperimentHeader>> experimentName2saveTime2data =
-				new HashMap<String, TreeMap<Long, ExperimentHeader>>();
+		HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data =
+				new HashMap<String, TreeMap<Long, ExperimentHeaderInterface>>();
 		
 		if (entries != null)
 			for (String e : entries) {
@@ -87,8 +88,9 @@ public class HsmFileSystemSource extends FileSystemSource {
 				if (accessOK(eh)) {
 					String experimentName = eh.getExperimentName();
 					if (!experimentName2saveTime2data.containsKey(experimentName))
-						experimentName2saveTime2data.put(experimentName, new TreeMap<Long, ExperimentHeader>());
+						experimentName2saveTime2data.put(experimentName, new TreeMap<Long, ExperimentHeaderInterface>());
 					experimentName2saveTime2data.get(experimentName).put(saveTime, eh);
+					eh.addHistoryItems(experimentName2saveTime2data.get(experimentName));
 				}
 			}
 		

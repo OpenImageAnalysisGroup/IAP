@@ -78,6 +78,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -344,7 +345,12 @@ public class MongoDB {
 	private void storeExperiment(ExperimentInterface experiment, DB db,
 						BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException, ExecutionException {
 		
-		// System.out.println("STORE EXPERIMENT: " + experiment.getName());
+		System.out.println("STORE EXPERIMENT: " + experiment.getName());
+		System.out.println("DB-ID: " + experiment.getHeader().getDatabaseId());
+		System.out.println("DB: " + experiment.getHeader().getDatabase());
+		System.out.println("Exp.type: " + experiment.getHeader().getExperimentType());
+		System.out.println("Group: " + experiment.getHeader().getImportusergroup());
+		System.out.println("Username: " + experiment.getHeader().getImportusername());
 		// experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 		
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
@@ -550,6 +556,7 @@ public class MongoDB {
 		
 		// l = overallFileSize.getLong(); // in case of update the written bytes are not the right size
 		experiment.getHeader().setSizekb(l / 1024);
+		experiment.getHeader().setStorageTime(new Date());
 		
 		experiment.fillAttributeMap(attributes);
 		BasicDBObject dbExperiment = new BasicDBObject(attributes);
@@ -562,8 +569,8 @@ public class MongoDB {
 		
 		if (status == null || (status != null && !status.wantsToStop())) {
 			experiments.insert(dbExperiment);
-			
 			String id = dbExperiment.get("_id").toString();
+			System.out.println(">>> STORED EXPERIMENT " + experiment.getHeader().getExperimentName() + " // DB-ID: " + id);
 			for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
 				eh.setDatabaseId(id);
 			}
@@ -1147,28 +1154,7 @@ public class MongoDB {
 			ErrorMsg.addErrorMessage(e);
 			return null;
 		}
-		return filterNewest(res);
-	}
-	
-	private ArrayList<ExperimentHeaderInterface> filterNewest(ArrayList<ExperimentHeaderInterface> in) {
-		HashMap<String, ExperimentHeaderInterface> known = new HashMap<String, ExperimentHeaderInterface>();
-		ArrayList<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
-		for (ExperimentHeaderInterface ehi : in) {
-			String key = ehi.getImportusername() + "//" + ehi.getDatabase() + "//" + ehi.getExperimentName();
-			if (!known.containsKey(key)) {
-				known.put(key, ehi);
-				result.add(ehi);
-			} else {
-				ExperimentHeaderInterface prevTime = known.get(key);
-				if (ehi.getImportdate().getTime() > prevTime.getImportdate().getTime()) {
-					result.remove(known.get(key));
-					result.add(ehi);
-					known.remove(key);
-					known.put(key, ehi);
-				}
-			}
-		}
-		return result;
+		return ExperimentHeaderService.filterNewest(res);
 	}
 	
 	public ExperimentInterface getExperiment(final ExperimentHeaderInterface header) {

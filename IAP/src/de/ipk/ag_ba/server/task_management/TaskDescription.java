@@ -147,10 +147,12 @@ public class TaskDescription {
 									sn = sn.substring(sn.lastIndexOf(".") + 1);
 								e.getHeader().setExperimentname(sn + ": " + experimentInput.getExperimentName());
 								e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
+								e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
 								e.getHeader().setDatabaseId("");
 								for (SubstanceInterface si : e) {
 									for (ConditionInterface ci : si) {
 										ci.setExperimentName(e.getHeader().getExperimentName());
+										ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
 									}
 								}
 								ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);

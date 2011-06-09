@@ -370,9 +370,9 @@ public class IAPmain extends JApplet {
 	public static boolean isSettingEnabled(IAPfeature feature) {
 		switch (feature) {
 			case REMOTE_EXECUTION:
-				return false;
-			case SHOWDEBUGSTACK:
 				return true;
+			case SHOWDEBUGSTACK:
+				return false;
 		}
 		return false;
 	}

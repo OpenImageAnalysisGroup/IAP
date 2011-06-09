@@ -2,6 +2,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 
 import java.util.Date;
 import java.util.Map;
+import java.util.TreeMap;
 
 import unit_test_support.TestValueRequired;
 
@@ -98,4 +99,18 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	public int hashCode();
 	
 	public ExperimentHeaderInterface clone();
+	
+	public Date getStorageTime();
+	
+	public Map<String, Object> getAttributeMap();
+	
+	public void setStorageTime(Date time);
+	
+	public TreeMap<Long, ExperimentHeaderInterface> getHistory();
+	
+	public void addHistoryItem(long time, ExperimentHeaderInterface exp);
+	
+	public void addHistoryItems(TreeMap<Long, ExperimentHeaderInterface> experiments);
+	
+	public void clearHistory();
 }

@@ -11,18 +11,18 @@ import de.ipk.ag_ba.gui.actions.Book;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 
 public class HsmMainDataSourceLevel implements DataSourceLevel {
 	
-	private final HashMap<String, TreeMap<Long, ExperimentHeader>> experimentName2saveTime2data;
+	private final HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data;
 	private String description;
 	private int n = 0;
 	
-	public HsmMainDataSourceLevel(HashMap<String, TreeMap<Long, ExperimentHeader>> experimentName2saveTime2data) {
+	public HsmMainDataSourceLevel(HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data) {
 		this.experimentName2saveTime2data = experimentName2saveTime2data;
-		for (TreeMap<Long, ExperimentHeader> tmm : experimentName2saveTime2data.values())
+		for (TreeMap<Long, ExperimentHeaderInterface> tmm : experimentName2saveTime2data.values())
 			n += 1; // tmm.values().size(); // only one item is counted (the remaining are older exp. versions)
 	}
 	
@@ -30,8 +30,8 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 	public Collection<DataSourceLevel> getSubLevels() {
 		TreeMap<String, DataSourceLevel> type2level = new TreeMap<String, DataSourceLevel>();
 		for (String expName : experimentName2saveTime2data.keySet()) {
-			TreeMap<Long, ExperimentHeader> time2exp = experimentName2saveTime2data.get(expName);
-			ExperimentHeader newestExp = time2exp.lastEntry().getValue();
+			TreeMap<Long, ExperimentHeaderInterface> time2exp = experimentName2saveTime2data.get(expName);
+			ExperimentHeaderInterface newestExp = time2exp.lastEntry().getValue();
 			String type = newestExp.getExperimentType();
 			if (type == null || type.length() == 0)
 				type = "[Unknown Experimenttype]";

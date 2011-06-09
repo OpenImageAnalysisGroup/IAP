@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -263,6 +264,8 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 						+ " errors). // " + SystemAnalysisExt.getCurrentTime());
 			}
 			experiment.getHeader().setRemark(experiment.getHeader().getRemark() + " // HSM transfer errors: " + errorCount);
+			experiment.getHeader().setStorageTime(new Date());
+			
 			createIndexFiles(experiment, hsmManager);
 			status.setCurrentStatusValueFine(100d);
 			

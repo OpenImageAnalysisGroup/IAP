@@ -9,17 +9,17 @@ import de.ipk.ag_ba.gui.actions.Book;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 
 public class HsmDataSourceLevelForUser implements DataSourceLevel {
 	
 	private final String user;
-	private final ArrayList<ExperimentHeader> experiments;
+	private final ArrayList<ExperimentHeaderInterface> experiments;
 	private String description;
 	private final int n;
 	
-	public HsmDataSourceLevelForUser(String user, ArrayList<ExperimentHeader> experiments) {
+	public HsmDataSourceLevelForUser(String user, ArrayList<ExperimentHeaderInterface> experiments) {
 		this.user = user;
 		this.experiments = experiments;
 		this.n = experiments.size();
@@ -33,7 +33,7 @@ public class HsmDataSourceLevelForUser implements DataSourceLevel {
 	@Override
 	public Collection<ExperimentReference> getExperiments() {
 		Collection<ExperimentReference> res = new ArrayList<ExperimentReference>();
-		for (ExperimentHeader eh : experiments) {
+		for (ExperimentHeaderInterface eh : experiments) {
 			res.add(new ExperimentReference(eh));
 		}
 		return res;

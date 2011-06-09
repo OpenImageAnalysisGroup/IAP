@@ -27,7 +27,6 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.StringManipulationTools;
@@ -75,6 +74,12 @@ public class NavigationButton implements StyleAware {
 	private ProgressStatusService statusServer;
 	private final GUIsetting guiSetting;
 	private String optStaticIconId;
+	private String overrideTitle;
+	
+	public NavigationButton(String overrideTitle, NavigationAction navigationAction, GUIsetting guiSetting) {
+		this(navigationAction, guiSetting);
+		this.overrideTitle = overrideTitle;
+	}
 	
 	public NavigationButton(NavigationAction navigationAction, GUIsetting guiSetting) {
 		if (navigationAction != null) {
@@ -145,6 +150,9 @@ public class NavigationButton implements StyleAware {
 		if (action != null && action.getDefaultTitle() != null && action.getDefaultTitle().length() > 0)
 			title = action.getDefaultTitle();
 		
+		if (overrideTitle != null)
+			title = overrideTitle;
+		
 		long compTime = System.currentTimeMillis() - processingStart;
 		if (!forceProgressText && !(isProcessing() || requestsTitleUpdates()) || compTime < 1000)
 			return title;
@@ -194,7 +202,6 @@ public class NavigationButton implements StyleAware {
 					&& action.getStatusProvider().getCurrentStatusMessage2().length() > 0)
 				line2 += "<p>" + action.getStatusProvider().getCurrentStatusMessage2();
 			if (statusServer != null) {
-				BackgroundTaskStatusProvider status = action.getStatusProvider();
 				String eta = statusServer.getRemainTime((int) dp == -1, dp);
 				if (eta.length() > 0) {
 					if (line2.length() > 0)
