@@ -83,4 +83,8 @@ public class IAPimages {
 	public static String saveToHsmArchive() {
 		return "img/ext/gpl2/Gnome-Media-Tape-64.png";
 	}
+	
+	public static String getFileHistory() {
+		return "img/ext/gpl2/Gnome-Document-Open-Recent-64.png";
+	}
 }

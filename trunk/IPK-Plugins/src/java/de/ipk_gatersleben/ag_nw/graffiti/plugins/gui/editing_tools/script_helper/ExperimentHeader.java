@@ -3,9 +3,12 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
@@ -19,6 +22,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	private String experimentName, remark, coordinator, databaseId, importUserName, importUserGroup;
 	private Date importDate;
 	private Date startDate;
+	private Date storageTime;
 	private Integer imageFiles = new Integer(0);
 	private String experimentType, sequence;
 	private long sizekb;
@@ -30,22 +34,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	}
 	
 	public ExperimentHeader(ExperimentHeaderInterface copyFrom) {
-		this();
-		if (copyFrom == null)
-			return;
-		experimentName = copyFrom.getExperimentName();
-		remark = copyFrom.getRemark();
-		coordinator = copyFrom.getCoordinator();
-		databaseId = copyFrom.getDatabaseId();
-		importUserName = copyFrom.getImportusername();
-		importUserGroup = copyFrom.getImportusergroup();
-		importDate = copyFrom.getImportdate();
-		startDate = copyFrom.getStartdate();
-		sizekb = copyFrom.getSizekb();
-		experimentType = copyFrom.getExperimentType();
-		sequence = copyFrom.getSequence();
-		database = copyFrom.getDatabase();
-		imageFiles = copyFrom.getNumberOfFiles();
+		this(copyFrom != null ? copyFrom.getAttributeMap() : null);
 	}
 	
 	public ExperimentHeader(ConditionInterface copyFrom) {
@@ -176,7 +165,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			setExperimentname(ExperimentInterface.UNSPECIFIED_EXPERIMENTNAME);
 		setDatabase((String) map.get("database"));
 		setRemark((String) map.get("remark"));
-		setDatabaseId(map.get("_id").toString()); // (String)
+		setDatabaseId(map.get("_id") + ""); // (String)
 		// map.get("excelfileid"));
 		setCoordinator((String) map.get("coordinator"));
 		setExperimenttype((String) map.get("experimenttype"));
@@ -234,6 +223,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("importusergroup", importUserGroup);
 		attributeValueMap.put("importdate", importDate);
 		attributeValueMap.put("startdate", startDate);
+		attributeValueMap.put("storagetime", storageTime);
 		attributeValueMap.put("measurements", measurementcount);
 		attributeValueMap.put("imagefiles", (imageFiles == null ? 0 : imageFiles));
 		attributeValueMap.put("sizekb", sizekb);
@@ -274,7 +264,9 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	
 	@Override
 	public ExperimentHeader clone() {
-		return new ExperimentHeader(this);
+		ExperimentHeader r = new ExperimentHeader(this);
+		r.setDatabaseId(getDatabaseId());
+		return r;
 	}
 	
 	@Override
@@ -334,5 +326,48 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Override
 	public String getDatabaseId() {
 		return databaseId;
+	}
+	
+	@Override
+	public Date getStorageTime() {
+		return storageTime;
+	}
+	
+	@Override
+	public Map<String, Object> getAttributeMap() {
+		Map<String, Object> res = new HashMap<String, Object>();
+		fillAttributeMap(res, -1);
+		return res;
+	}
+	
+	@Override
+	public void setStorageTime(Date time) {
+		storageTime = time;
+	}
+	
+	TreeMap<Long, ExperimentHeaderInterface> history = new TreeMap<Long, ExperimentHeaderInterface>();
+	
+	@Override
+	public TreeMap<Long, ExperimentHeaderInterface> getHistory() {
+		return history;
+	}
+	
+	@Override
+	public void addHistoryItem(long time, ExperimentHeaderInterface exp) {
+		if (exp != this)
+			history.put(time, exp);
+	}
+	
+	@Override
+	public void addHistoryItems(TreeMap<Long, ExperimentHeaderInterface> experiments) {
+		for (Entry<Long, ExperimentHeaderInterface> e : experiments.entrySet()) {
+			if (e.getValue() != this)
+				history.put(e.getKey(), e.getValue());
+		}
+	}
+	
+	@Override
+	public void clearHistory() {
+		history.clear();
 	}
 }

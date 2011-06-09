@@ -34,6 +34,7 @@ import com.toedter.calendar.JDateChooser;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -205,9 +206,12 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("Experiment-Type"), experimentTypeSelection, false);
 		fp.addGuiComponentRow(new JLabel("Start-Time"), expStart, false);
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
+		if (experimentHeader.getStorageTime() != null)
+			fp.addGuiComponentRow(new JLabel("Storage Time"), new JLabel(SystemAnalysisExt.getCurrentTime(experimentHeader.getStorageTime().getTime())), false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
 							+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
+		fp.addGuiComponentRow(new JLabel("Versions"), new JLabel(getVersionString(experimentHeader)), false);
 		if (optExperiment != null)
 			fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(optExperiment), false);
 		
@@ -319,6 +323,16 @@ public class MyExperimentInfoPanel extends JPanel {
 		
 		// setBorder(BorderFactory.createEtchedBorder());
 		setBorder(BorderFactory.createLoweredBevelBorder());
+	}
+	
+	private String getVersionString(ExperimentHeaderInterface experimentHeader) {
+		if (experimentHeader.getHistory() == null || experimentHeader.getHistory().isEmpty())
+			return "-";
+		else {
+			return experimentHeader.getHistory().size() + " versions (earliest " +
+					SystemAnalysisExt.getCurrentTime(experimentHeader.getHistory().firstEntry().getKey())
+					+ ")";
+		}
 	}
 	
 	private String niceValue(long d, String unit) {

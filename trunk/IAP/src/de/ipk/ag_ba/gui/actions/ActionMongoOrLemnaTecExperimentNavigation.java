@@ -79,6 +79,9 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 			boolean imageAnalysis = m != null || header.getDatabaseId().startsWith("hsm:");
 			getDefaultActions(actions, experiment, header, imageAnalysis, src.getGUIsetting(), m);
 		}
+		if (header.getHistory() != null && !header.getHistory().isEmpty()) {
+			actions.add(new NavigationButton(new ExperimentHistoryNavigationAction(header.getHistory(), m), src.getGUIsetting()));
+		}
 		return actions;
 	}
 	
