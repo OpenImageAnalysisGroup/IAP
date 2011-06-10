@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
-public class BlockClearBelowLowestMarker extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockClearMasksBelowLowestMarker extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
@@ -25,22 +25,27 @@ public class BlockClearBelowLowestMarker extends AbstractSnapshotAnalysisBlockFI
 			FlexibleImage result = input;
 			
 			if (markerPosLeftY != null) {
+				System.out.println("mark: " + markerPosLeftY.getValue());
 				result = new ImageOperation(result).clearImageBottom(
-						(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 10, options.getBackground()).getImage();
+						(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 40, options.getBackground()).getImage();
 			} else
 				if (markerPosLeftY == null && markerPosRightY != null) {
+					System.out.println("mark: " + markerPosRightY.getValue());
 					result = new ImageOperation(result).clearImageBottom(
-							(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 10, options.getBackground()).getImage();
+							(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 40, options.getBackground()).getImage();
 				}
 			
-			if (markerPosLeftX != null) {
-				result = new ImageOperation(result).clearImageLeft(
-						(int) (markerPosLeftX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
-			}
-			if (markerPosRightX != null) {
-				result = new ImageOperation(result).clearImageRight(
-						(int) (markerPosRightX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
-			}
+			boolean clearSides = true;
+			if (clearSides)
+				if (markerPosLeftX != null) {
+					result = new ImageOperation(result).clearImageLeft(
+							(int) (0.95 * markerPosLeftX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
+				}
+			if (clearSides)
+				if (markerPosRightX != null) {
+					result = new ImageOperation(result).clearImageRight(
+							(int) (1.05 * markerPosRightX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
+				}
 			return result;
 		}
 		return getInput().getMasks().getVis();
@@ -59,14 +64,14 @@ public class BlockClearBelowLowestMarker extends AbstractSnapshotAnalysisBlockFI
 			if (markerPosLeft != null) {
 				double temp = markerPosLeft.getValue();
 				FlexibleImage result = new ImageOperation(input).clearImageBottom(
-						(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 8, options.getBackground()).getImage();
+						(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 16, options.getBackground()).getImage();
 				
 				return result;
 			}
 			if (markerPosLeft == null && markerPosRight != null) {
 				double temp = markerPosRight.getValue();
 				FlexibleImage result = new ImageOperation(input).clearImageBottom(
-						(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 8, options.getBackground()).getImage();
+						(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 16, options.getBackground()).getImage();
 				
 				return result;
 			}
@@ -87,8 +92,8 @@ public class BlockClearBelowLowestMarker extends AbstractSnapshotAnalysisBlockFI
 				if (markerPosLeft != null) {
 					double temp = markerPosLeft.getValue();
 					double pos = temp * getInput().getImages().getNir().getHeight();
-					if (pos > 5)
-						pos -= 5;
+					if (pos > 10)
+						pos -= 10;
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
 							(int) (pos), options.getBackground()).getImage();
 					return result;
@@ -96,8 +101,8 @@ public class BlockClearBelowLowestMarker extends AbstractSnapshotAnalysisBlockFI
 				if (markerPosLeft == null && markerPosRight != null) {
 					double temp = markerPosRight.getValue();
 					double pos = (temp * getInput().getImages().getNir().getHeight());
-					if (pos > 5)
-						pos -= 5;
+					if (pos > 10)
+						pos -= 10;
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
 							(int) pos, options.getBackground()).getImage();
 					return result;

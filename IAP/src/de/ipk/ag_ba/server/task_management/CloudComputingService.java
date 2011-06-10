@@ -13,9 +13,12 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.gui.IAPfeature;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 
 /**
@@ -114,11 +117,13 @@ public class CloudComputingService {
 		if (!active) {
 			// enable server mode
 			try {
-				// m.batchClearJobs();
-				// for (ExperimentHeaderInterface ei : m.getExperimentList()) {
-				// if (ei.getExperimentname() == null || ei.getExperimentname().length() == 0 || ei.getExperimentname().contains("§"))
-				// m.deleteExperiment(ei.getExcelfileid());
-				// }
+				if (IAPmain.isSettingEnabled(IAPfeature.DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START)) {
+					m.batchClearJobs();
+					for (ExperimentHeaderInterface ei : m.getExperimentList(null)) {
+						if (ei.getExperimentName() == null || ei.getExperimentName().length() == 0 || ei.getExperimentName().contains("§"))
+							m.deleteExperiment(ei.getDatabaseId());
+					}
+				}
 				cloudTaskManager.setHostName(SystemAnalysisExt.getHostName());
 				cloudTaskManager.startWork(m);
 			} catch (UnknownHostException e) {

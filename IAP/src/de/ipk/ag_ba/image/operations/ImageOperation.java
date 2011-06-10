@@ -503,7 +503,10 @@ public class ImageOperation {
 	
 	public void drawRect(int leftX, int leftY, int width, int heigh) {
 		image.getProcessor().drawRect(leftX, leftY, width, heigh);
-		
+	}
+	
+	public void fillRect(int leftX, int leftY, int width, int heigh) {
+		image.getProcessor().fill(new Roi(leftX, leftY, width, heigh));
 	}
 	
 	public ImageOperation drawAndFillRect(int leftX, int leftY,
@@ -2135,7 +2138,7 @@ public class ImageOperation {
 	 * @param ABThresh
 	 *           minimal A and B value
 	 */
-	public double[] getRGBAverage(int[][] img2d, int x1, int y1, int w, int h, int LThresh, int ABThresh) {
+	public double[] getRGBAverage(int[][] img2d, int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
 		int c, x, y = 0;
 		double rf, gf, bf;
 		double X, Y, Z, fX, fY, fZ;
@@ -2200,15 +2203,38 @@ public class ImageOperation {
 				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
 				
 				// sum under following conditions
-				if (Li > LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
-					sumR += rf * 255;
-					sumG += gf * 255;
-					sumB += bf * 255;
-					
-					count++;
+				if (mode) {
+					if (Li > LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
+						sumR += rf * 255;
+						sumG += gf * 255;
+						sumB += bf * 255;
+						count++;
+					}
+				}
+				if (mode == false) {
+					if (Li < LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
+						sumR += rf * 255;
+						sumG += gf * 255;
+						sumB += bf * 255;
+						count++;
+					}
 				}
 			}
 		}
 		return new double[] { sumR / (double) count, sumG / (double) count, sumB / (double) count };
+	}
+	
+	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {
+		ImageOperation a = new ImageOperation(this.getImage());
+		int s = 30;
+		image.setColor(Color.YELLOW);
+		for (MarkerPair mp : numericResult)
+			if (mp.getLeft() != null)
+				a.fillRect((int) (mp.getLeft().x - s), (int) (mp.getLeft().y - s), s * 2, s * 2);
+		image.setColor(Color.RED);
+		for (MarkerPair mp : numericResult)
+			if (mp.getRight() != null)
+				a.fillRect((int) (mp.getRight().x - s), (int) (mp.getRight().y - s), s * 2, s * 2);
+		return a;
 	}
 }

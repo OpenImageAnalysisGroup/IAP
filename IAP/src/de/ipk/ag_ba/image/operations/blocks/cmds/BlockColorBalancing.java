@@ -14,29 +14,36 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISimage() {
 		FlexibleImage vis = getInput().getImages().getVis();
-		return Balancing(vis, 255);
+		double[] pix = getProbablyWhitePixels(vis, 0.08);
+		return ImageBalancing(vis, 255, pix);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
 		FlexibleImage fluo = getInput().getImages().getFluo();
-		return Balancing(fluo, 0);
+		FlexibleImage temp = new ImageOperation(fluo).invert().getImage();
+		double[] pix = getProbablyWhitePixels(temp, 0.08);
+		FlexibleImage temp1 = ImageBalancing(temp, 255, pix);
+		return new ImageOperation(temp1).invert().getImage();
 	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
-		return Balancing(vis, 255);
+		double[] pix = getProbablyWhitePixels(vis, 0.08);
+		return ImageBalancing(vis, 255, pix);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		FlexibleImage fluo = getInput().getMasks().getFluo();
-		return Balancing(fluo, 0);
+		FlexibleImage temp = new ImageOperation(fluo).invert().getImage();
+		double[] pix = getProbablyWhitePixels(temp, 0.08);
+		FlexibleImage temp1 = ImageBalancing(temp, 255, pix);
+		return new ImageOperation(temp1).invert().getImage();
 	}
 	
-	public FlexibleImage Balancing(FlexibleImage input, int brightness) {
-		double[] pix = getProbablyWhitePixels(input, 0.08);
+	public FlexibleImage ImageBalancing(FlexibleImage input, int brightness, double[] pix) {
 		double[] factors = calculateFactors(pix, brightness);
 		ImageOperation io = new ImageOperation(input);
 		return io.multiplicateImageChannelsWithFactors(factors).getImage();
@@ -58,10 +65,10 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ImageOperation io = new ImageOperation(input);
 		
-		double[] valuesleft = io.getRGBAverage(img2d, 2 * w, 2 * h, w, height - 2 * h, 150, 50);
-		double[] valuesright = io.getRGBAverage(img2d, width - 2 * w, 2 * h, w, height - 2 * h, 150, 50);
-		double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50);
-		double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50);
+		double[] valuesleft = io.getRGBAverage(img2d, 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
+		double[] valuesright = io.getRGBAverage(img2d, width - 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
+		double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
+		double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);
 		
 		double r = (valuesleft[0] + valuesright[0] + valuestop[0] + valuesdown[0]) / 4;
 		double g = (valuesleft[1] + valuesright[1] + valuestop[1] + valuesdown[1]) / 4;

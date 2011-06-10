@@ -36,6 +36,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 				if (mp.getLeft() != null) {
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getLeft().x / w);
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getLeft().y / h);
+					// System.out.println("n=" + n + ", i=" + i + ", lx: " + mp.getLeft().x + " ly: " + mp.getLeft().y);
 				} else {
 					// System.out.println("n=" + n + ", i=" + i + ", lx: " + mp.getLeft().x + " ly: " + mp.getLeft().y);
 				}
@@ -43,6 +44,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 				if (mp.getRight() != null) {
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getRight().x / w);
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getRight().y / h);
+					// System.out.println("n=" + n + ", i=" + i + ", rx: " + mp.getRight().x + " ry: " + mp.getRight().y);
 				} else {
 					// System.out.println("n=" + n + ", i=" + i + ", rx: " + mp.getRight().x + " ry: " + mp.getRight().y);
 				}
@@ -54,6 +56,9 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 			if (numericResult != null) {
 				calculateDistanceBetweenMarkers(numericResult);
 			}
+			boolean debug = false;
+			if (debug)
+				return new ImageOperation(getInput().getMasks().getVis()).drawMarkers(numericResult).getImage();
 		}
 		return getInput().getMasks().getVis();
 	}
@@ -90,6 +95,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private ArrayList<MarkerPair> getMarkers(FlexibleImage image) {
-		return new ImageOperation(image).searchBlueMarkers(options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK));
+		double s = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
+		return new ImageOperation(image).searchBlueMarkers(s * s / 1.2);
 	}
 }

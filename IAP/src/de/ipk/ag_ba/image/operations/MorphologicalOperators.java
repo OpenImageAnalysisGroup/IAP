@@ -3,7 +3,6 @@
  *************************************************************************/
 package de.ipk.ag_ba.image.operations;
 
-
 /**
  * @author entzian
  */
@@ -130,7 +129,7 @@ public class MorphologicalOperators {
 		return newArray;
 	}
 	
-	private void dilatation() {
+	public void dilatation() {
 		dilatation(this.src_image);
 	}
 	
