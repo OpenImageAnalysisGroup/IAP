@@ -6,6 +6,7 @@ import ij.plugin.filter.MaximumFinder;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 import org.Vector2d;
 
@@ -16,22 +17,24 @@ public class BlueMarkerFinder {
 	
 	private final FlexibleImage input;
 	private ResultsTable resultTable;
-	private double options;
+	private double scale;
 	
-	public BlueMarkerFinder(FlexibleImage image, double options) {
+	public BlueMarkerFinder(FlexibleImage image, double scale) {
 		this.input = image;
-		this.options = options;
+		this.scale = scale;
 	}
 	
 	public void findCoordinates(int background) {
 		ImageOperation io1 = new ImageOperation(input);
-		double scaleFactor = options;
+		double scaleFactor = scale;
 		boolean debug = false;
 		if (debug)
 			resultTable = io1
-					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
+					// .thresholdLAB(0, 255, 0, 200, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
+					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
 					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
-					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor)).printImage("nach opening")
+					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
+					.printImage("nach opening")
 					.convert2Grayscale().printImage("nach gray")
 					// .medianFilter8Bit().printImage("nach8bit")
 					.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB()).printImage("nach thresh")
@@ -40,7 +43,8 @@ public class BlueMarkerFinder {
 					.getResultsTable();
 		else
 			resultTable = io1
-					.thresholdLAB(0, 255, 0, 255, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).opening(0, 1)
+					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint)
+					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
 					.convert2Grayscale()
 					// .medianFilter8Bit()
@@ -54,12 +58,13 @@ public class BlueMarkerFinder {
 		ArrayList<Vector2d> result = new ArrayList<Vector2d>();
 		
 		for (int i = 0; i < resultTable.getCounter(); i++) {
-			int a = (int) resultTable.getValueAsDouble(0, i);
-			int b = (int) resultTable.getValueAsDouble(1, i);
+			int x = (int) resultTable.getValueAsDouble(0, i);
+			int y = (int) resultTable.getValueAsDouble(1, i);
 			
-			Vector2d temp = new Vector2d(a, b);
+			Vector2d temp = new Vector2d(x, y);
 			result.add(temp);
 		}
+		
 		return result;
 	}
 	
@@ -85,6 +90,9 @@ public class BlueMarkerFinder {
 				minLeftmaxRight.x + (input.getWidth() * 0.05));
 		ArrayList<Vector2d> coordinatesRight = searchRight(
 				coordinatesUnfiltered, minLeftmaxRight.y - (input.getWidth() * 0.05));
+		
+		coordinatesLeft = getThree(coordinatesLeft);
+		coordinatesRight = getThree(coordinatesRight);
 		
 		HashSet<Vector2d> added = new HashSet<Vector2d>();
 		
@@ -129,6 +137,65 @@ public class BlueMarkerFinder {
 		}
 		
 		return result;
+	}
+	
+	private ArrayList<Vector2d> getThree(ArrayList<Vector2d> coordinates) {
+		TreeSet<Double> valuesX = new TreeSet<Double>();
+		TreeSet<Double> valuesY = new TreeSet<Double>();
+		
+		for (Vector2d c : coordinates) {
+			valuesX.add(c.x);
+			valuesY.add(c.y);
+		}
+		
+		double min = valuesY.first();
+		double max = valuesY.last();
+		double mean = (max - min) / 2 + min;
+		double distance = (max - min) / 4;
+		
+		TreeSet<Double> valuesX1 = new TreeSet<Double>();
+		TreeSet<Double> valuesX2 = new TreeSet<Double>();
+		TreeSet<Double> valuesX3 = new TreeSet<Double>();
+		
+		TreeSet<Double> valuesY1 = new TreeSet<Double>();
+		TreeSet<Double> valuesY2 = new TreeSet<Double>();
+		TreeSet<Double> valuesY3 = new TreeSet<Double>();
+		
+		for (Vector2d c : coordinates) {
+			if (c.y - min < distance) {
+				valuesX1.add(c.x);
+				valuesY1.add(c.y);
+			} else
+				if (Math.abs(c.y - mean) < distance) {
+					valuesX2.add(c.x);
+					valuesY2.add(c.y);
+				} else {
+					valuesX3.add(c.x);
+					valuesY3.add(c.y);
+				}
+		}
+		
+		ArrayList<Vector2d> res = new ArrayList<Vector2d>();
+		
+		if (valuesY3.size() > 0) {
+			double mX3 = valuesX3.toArray(new Double[] {})[valuesX3.size() / 2];
+			double mY3 = valuesY3.toArray(new Double[] {})[valuesY3.size() / 2];
+			res.add(new Vector2d(mX3, mY3));
+		}
+		
+		if (valuesY2.size() > 0) {
+			double mX2 = valuesX2.toArray(new Double[] {})[valuesX2.size() / 2];
+			double mY2 = valuesY2.toArray(new Double[] {})[valuesY2.size() / 2];
+			res.add(new Vector2d(mX2, mY2));
+		}
+		
+		if (valuesY1.size() > 0) {
+			double mX1 = valuesX1.toArray(new Double[] {})[valuesX1.size() / 2];
+			double mY1 = valuesY1.toArray(new Double[] {})[valuesY1.size() / 2];
+			res.add(new Vector2d(mX1, mY1));
+		}
+		
+		return res;
 	}
 	
 	private Vector2d searchminLeftmaxRight(ArrayList<Vector2d> input) {

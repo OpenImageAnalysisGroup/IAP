@@ -83,7 +83,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 		if (analyzeSideImages())
 			addSideImagesToWorkset(workload, 0);
 		
-		workload = filterWorkload(workload, "Rainbow Amerindian"); // Athletico
+		// workload = filterWorkload(workload, "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
@@ -167,7 +167,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 							ImageProcessor ptip = getImageProcessor(options);
 							
 							FlexibleImageStack debugImageStack = null;
-							boolean addDebugImages = IAPmain.isSettingEnabled(IAPfeature.SHOWDEBUGSTACK);
+							boolean addDebugImages = IAPmain.isSettingEnabled(IAPfeature.SAVE_DEBUG_STACK);
 							if (addDebugImages) {
 								debugImageStack = new FlexibleImageStack();
 							}

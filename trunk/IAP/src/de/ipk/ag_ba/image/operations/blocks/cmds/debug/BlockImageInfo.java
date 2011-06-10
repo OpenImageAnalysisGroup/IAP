@@ -42,7 +42,12 @@ public class BlockImageInfo extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp type) {
-		
+		if (workImage == null) {
+			if (infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT)) {
+				System.out.println("Input Image is NULL");
+			}
+			return;
+		}
 		switch (type) {
 			case FluoImage:
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.HEIGHT_FLUO_IMAGE, workImage.getHeight());

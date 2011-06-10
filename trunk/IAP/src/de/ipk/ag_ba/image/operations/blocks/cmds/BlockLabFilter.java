@@ -29,7 +29,7 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processFLUOmask() {
 		
 		return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(),
-				new int[] { options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO), 110 },
+				new int[] { options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO), 130 },
 				new int[] { options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO), 255 },
 				new int[] { options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO), 0 },
 				new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO), 255 },

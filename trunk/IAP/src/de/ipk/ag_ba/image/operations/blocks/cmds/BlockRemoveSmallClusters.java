@@ -23,8 +23,13 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
 							options.getNeighbourhood(), options.getCameraTyp(), null).getImage();
 			return res;
+		} else {
+			FlexibleImage res =
+					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
+							options.getNeighbourhood(), options.getCameraTyp(), null).getImage();
+			return res;
 		}
-		return getInput().getMasks().getVis();
+		// return getInput().getMasks().getVis();
 	}
 	
 	@Override
@@ -32,7 +37,11 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 		if (options.getCameraTyp() == CameraTyp.TOP) {
 			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
 					options.getNeighbourhood(), options.getCameraTyp(), null).getImage();
+		} else {
+			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
+					options.getNeighbourhood(), options.getCameraTyp(), null).getImage();
 		}
-		return getInput().getMasks().getFluo();
+		
+		// return getInput().getMasks().getFluo();
 	}
 }

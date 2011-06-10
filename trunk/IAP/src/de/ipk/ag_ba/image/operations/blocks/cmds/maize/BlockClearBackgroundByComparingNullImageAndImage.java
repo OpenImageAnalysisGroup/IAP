@@ -31,7 +31,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 							options.getIntSetting(Setting.L_Diff_VIS),
 							options.getIntSetting(Setting.L_Diff_VIS),
 							options.getIntSetting(Setting.abDiff_VIS),
-							back, false, false).border(2).getImage();
+							back, true, false).border(2).getImage();
 		}
 		if (options.getCameraTyp() == CameraTyp.TOP) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
@@ -42,7 +42,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 							options.getIntSetting(Setting.L_Diff_VIS),
 							options.getIntSetting(Setting.L_Diff_VIS),
 							options.getIntSetting(Setting.abDiff_VIS),
-							back, false, false).border(2).getImage();
+							back, true, false).border(2).getImage();
 		}
 		throw new UnsupportedOperationException("Unknown camera setting.");
 	}
