@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Stack;
 
 import javax.imageio.ImageIO;
@@ -45,9 +46,12 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
@@ -398,13 +402,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		}
 		if (evt.getSource() == debugPipelineTest) {
 			try {
-				 myImage.fileURLmain
-				// targetTreeNode.getExperiment(). ...
-				 TODO: move IAPServiceImpl.getSnapshots to IAP project
-				 call getSnapshots here
-				 search snapshot with any primary URL equal to given URL
-				 use snapshot to start MaizeAnalysis pipeline with debug stack
-				 show debug stack (print)
+				Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
+						myImage.fileURLmain,
+						targetTreeNode.getExperiment());
+				
+				BlockPipeline.debugTryAnalyze(match, m);
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Error: " + e.getLocalizedMessage() + ". Command execution error.",
 						"Error", JOptionPane.INFORMATION_MESSAGE);
