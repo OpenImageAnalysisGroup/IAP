@@ -49,6 +49,8 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 	protected DatabaseTarget databaseTarget;
 	private int workOnSubset;
 	private int numberOfSubsets;
+	private boolean forceDebugStack;
+	private ArrayList<FlexibleImageStack> forcedDebugStacks;
 	
 	@Override
 	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workOnSubset, int numberOfSubsets) {
@@ -66,6 +68,15 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 	@Override
 	public ImageAnalysisType[] getOutputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE, ImageAnalysisType.MEASUREMENT };
+	}
+	
+	public void debugOverrideAndEnableDebugStackStorage(boolean enable) {
+		this.forceDebugStack = enable;
+		this.forcedDebugStacks = new ArrayList<FlexibleImageStack>();
+	}
+	
+	public ArrayList<FlexibleImageStack> getForcedDebugStackStorageResult() {
+		return forcedDebugStacks;
 	}
 	
 	@Override
@@ -168,7 +179,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 							
 							FlexibleImageStack debugImageStack = null;
 							boolean addDebugImages = IAPmain.isSettingEnabled(IAPfeature.SAVE_DEBUG_STACK);
-							if (addDebugImages) {
+							if (addDebugImages || forceDebugStack) {
 								debugImageStack = new FlexibleImageStack();
 							}
 							
@@ -198,27 +209,30 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 								output.add(m);
 							}
 							
-							byte[] buf = null;
-							if (debugImageStack != null) {
-								System.out.println("[s");
-								MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
-								debugImageStack.saveAsLayeredTif(mos);
-								debugImageStack.print("NNN");
-								buf = mos.getBuff();
-								
-								System.out.println("f]");
+							if (forceDebugStack) {
+								forcedDebugStacks.add(debugImageStack);
 							} else {
-								visInputImage.setLabelURL(id.getVIS().getURL().copy());
-								fluo.setLabelURL(id.getFLUO().getURL().copy());
-								nir.setLabelURL(id.getNIR().getURL().copy());
+								byte[] buf = null;
+								if (debugImageStack != null) {
+									System.out.println("[s");
+									MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
+									debugImageStack.saveAsLayeredTif(mos);
+									debugImageStack.print("NNN");
+									buf = mos.getBuff();
+									
+									System.out.println("f]");
+								} else {
+									visInputImage.setLabelURL(id.getVIS().getURL().copy());
+									fluo.setLabelURL(id.getFLUO().getURL().copy());
+									nir.setLabelURL(id.getNIR().getURL().copy());
+								}
+								if (pipelineResult.getVis() != null)
+									saveImage(visInputImage, pipelineResult.getVis(), buf, ".tiff");
+								if (pipelineResult.getFluo() != null)
+									saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
+								if (pipelineResult.getNir() != null)
+									saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
 							}
-							if (pipelineResult.getVis() != null)
-								saveImage(visInputImage, pipelineResult.getVis(), buf, ".tiff");
-							if (pipelineResult.getFluo() != null)
-								saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
-							if (pipelineResult.getNir() != null)
-								saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
-							
 						} else {
 							System.err.println("ERROR: Not all three snapshots images could be loaded!");
 						}

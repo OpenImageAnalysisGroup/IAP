@@ -4,8 +4,11 @@ import info.StopWatch;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
@@ -14,6 +17,11 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBl
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
  * @author klukas
@@ -133,5 +141,43 @@ public class BlockPipeline {
 				System.out.println("WARNING: BLOCK " + name
 						+ " is NULL image (nir)!");
 		}
+	}
+	
+	/**
+	 * The given image set is analyzed by a image pipeline upon users choice. The
+	 * debug image stack (result of pipeline) will be shown to the user.
+	 * 
+	 * @param m
+	 * @param match
+	 *           Image set to be analyzed.
+	 */
+	public static void debugTryAnalyze(Collection<NumericMeasurementInterface> input, MongoDB m) {
+		final MaizeAnalysisTask mat = new MaizeAnalysisTask();
+		mat.setInput(input, m, 0, 1);
+		
+		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+				mat.getName(),
+				mat.getTaskDescription());
+		Runnable backgroundTask = new Runnable() {
+			@Override
+			public void run() {
+				mat.debugOverrideAndEnableDebugStackStorage(true);
+				mat.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
+			}
+		};
+		Runnable finishSwingTask = new Runnable() {
+			@Override
+			public void run() {
+				int idx = 1;
+				for (FlexibleImageStack fis : mat.getForcedDebugStackStorageResult()) {
+					fis.print(mat.getName() + " // Result " + idx);
+					idx++;
+				}
+			}
+		};
+		BackgroundTaskHelper.issueSimpleTaskInWindow(mat.getName(), "Analyze...",
+				backgroundTask,
+				finishSwingTask,
+				status, false, true);
 	}
 }

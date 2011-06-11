@@ -18,6 +18,10 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
@@ -55,8 +59,13 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author klukas
@@ -378,5 +387,69 @@ public class IAPservice {
 				return true;
 		}
 		return false;
+	}
+	
+	private static ConditionInterface[] sort(ConditionInterface[] array) {
+		Arrays.sort(array, new Comparator<ConditionInterface>() {
+			@Override
+			public int compare(ConditionInterface o1, ConditionInterface o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		return array;
+	}
+	
+	private static Collection<NumericMeasurementInterface> sortImages(Collection<NumericMeasurementInterface> measurements) {
+		ArrayList<NumericMeasurementInterface> ml = (ArrayList<NumericMeasurementInterface>) measurements;
+		Collections.sort(ml, new Comparator<NumericMeasurementInterface>() {
+			@Override
+			public int compare(NumericMeasurementInterface o1, NumericMeasurementInterface o2) {
+				ImageData id1 = (ImageData) o1;
+				ImageData id2 = (ImageData) o2;
+				int r1 = id1.getSubstanceName().compareTo(id2.getSubstanceName());
+				if (r1 != 0)
+					return r1;
+				Double p1 = 0d;
+				if (id1.getPosition() != null)
+					p1 = id1.getPosition();
+				Double p2 = 0d;
+				if (id2.getPosition() != null)
+					p2 = id2.getPosition();
+				return p1.compareTo(p2);
+			}
+		});
+		return ml;
+	}
+	
+	public static Collection<NumericMeasurementInterface> getMatchFor(IOurl url, ExperimentInterface experiment) {
+		
+		Collection<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
+		
+		String search = url.toString();
+		String searchKey = null;
+		Collection<NumericMeasurementInterface> ml = Substance3D.getAllMeasurements(experiment);
+		for (NumericMeasurementInterface md : ml) {
+			if (md instanceof ImageData) {
+				ImageData id = (ImageData) md;
+				if (id.getURL() != null && id.getURL().toString().equals(search)) {
+					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
+					searchKey = key;
+					break;
+				}
+			}
+		}
+		if (searchKey != null) {
+			for (NumericMeasurementInterface md : ml) {
+				if (md instanceof ImageData) {
+					ImageData id = (ImageData) md;
+					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
+					if (searchKey.equals(key)) {
+						result.add(id);
+					}
+				}
+			}
+		}
+		
+		return result;
 	}
 }

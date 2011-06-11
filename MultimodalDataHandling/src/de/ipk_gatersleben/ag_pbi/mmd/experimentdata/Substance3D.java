@@ -241,7 +241,7 @@ public class Substance3D extends Substance {
 			return -1l;
 	}
 	
-	public static Collection<NumericMeasurementInterface> getAllMeasurements(Experiment e) {
+	public static Collection<NumericMeasurementInterface> getAllMeasurements(ExperimentInterface e) {
 		Collection<NumericMeasurementInterface> res = new ArrayList<NumericMeasurementInterface>();
 		for (SubstanceInterface si : e) {
 			for (ConditionInterface ci : si) {
