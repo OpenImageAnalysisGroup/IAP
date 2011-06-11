@@ -10,6 +10,7 @@ import java.io.OutputStream;
 
 import org.ErrorMsg;
 
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.utils.MyFileSaver;
 
 public class FlexibleImageStack {
@@ -53,5 +54,6 @@ public class FlexibleImageStack {
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);
 		image.show(title + " (" + stack.getSize() + ")");
+		IAPmain.showImageJ();
 	}
 }

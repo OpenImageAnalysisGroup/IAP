@@ -361,8 +361,9 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Override
 	public void addHistoryItems(TreeMap<Long, ExperimentHeaderInterface> experiments) {
 		for (Entry<Long, ExperimentHeaderInterface> e : experiments.entrySet()) {
-			if (e.getValue() != this)
+			if (e.getValue() != this) {
 				history.put(e.getKey(), e.getValue());
+			}
 		}
 	}
 	

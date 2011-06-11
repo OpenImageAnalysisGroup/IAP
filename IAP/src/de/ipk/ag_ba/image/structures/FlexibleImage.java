@@ -22,6 +22,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -101,6 +102,7 @@ public class FlexibleImage {
 	
 	public void print(String title) {
 		PrintImage.printImage(image, title);
+		IAPmain.showImageJ();
 	}
 	
 	public ImagePlus getAsImagePlus() {

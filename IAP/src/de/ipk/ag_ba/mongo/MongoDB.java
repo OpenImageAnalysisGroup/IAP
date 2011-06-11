@@ -1138,6 +1138,7 @@ public class MongoDB {
 				public void run() {
 					for (DBObject header : db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).find()) {
 						ExperimentHeader h = new ExperimentHeader(header.toMap());
+						h.setStorageTime(new Date(((ObjectId) header.get("_id")).getTime()));
 						if (user == null ||
 								h.getImportusername() != null && h.getImportusername().equals(user) ||
 								LemnaTecDataExchange.getAdministrators().contains(user))
