@@ -54,8 +54,6 @@ public class ExperimentHistoryNavigationAction extends AbstractNavigationAction 
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		for (Long time : history.keySet()) {
 			ExperimentHeaderInterface ei = history.get(time);
-			ei = ei.clone();
-			ei.clearHistory();
 			String t = SystemAnalysisExt.getCurrentTime(time);
 			res.add(0, new NavigationButton(t, new ActionMongoOrLemnaTecExperimentNavigation(ei, m), src.getGUIsetting()));
 		}

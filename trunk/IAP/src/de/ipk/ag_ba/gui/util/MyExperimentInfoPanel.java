@@ -206,12 +206,12 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("Experiment-Type"), experimentTypeSelection, false);
 		fp.addGuiComponentRow(new JLabel("Start-Time"), expStart, false);
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
-		if (experimentHeader.getStorageTime() != null)
-			fp.addGuiComponentRow(new JLabel("Storage Time"), new JLabel(SystemAnalysisExt.getCurrentTime(experimentHeader.getStorageTime().getTime())), false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
 							+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
-		fp.addGuiComponentRow(new JLabel("Versions"), new JLabel(getVersionString(experimentHeader)), false);
+		if (experimentHeader.getStorageTime() != null)
+			fp.addGuiComponentRow(new JLabel("Storage Time"), new JLabel(SystemAnalysisExt.getCurrentTime(experimentHeader.getStorageTime().getTime())), false);
+		fp.addGuiComponentRow(new JLabel("History"), new JLabel(getVersionString(experimentHeader)), false);
 		if (optExperiment != null)
 			fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(optExperiment), false);
 		
@@ -329,7 +329,10 @@ public class MyExperimentInfoPanel extends JPanel {
 		if (experimentHeader.getHistory() == null || experimentHeader.getHistory().isEmpty())
 			return "-";
 		else {
-			return experimentHeader.getHistory().size() + " versions (earliest " +
+			String s = "";
+			if (experimentHeader.getHistory().size() > 1)
+				s = "s";
+			return experimentHeader.getHistory().size() + " older version" + s + " (earliest " +
 					SystemAnalysisExt.getCurrentTime(experimentHeader.getHistory().firstEntry().getKey())
 					+ ")";
 		}

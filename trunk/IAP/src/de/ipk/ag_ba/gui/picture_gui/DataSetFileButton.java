@@ -67,6 +67,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	private JMenuItem removeOneFromDatabaseCmd;
 	private JMenuItem removeAllFromDatabaseCmd;
 	
+	private JMenuItem debugPipelineTest;
+	
 	MongoDB m;
 	
 	JProgressBar progress;
@@ -394,6 +396,22 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			
 			IAPmain.showVANTED(false);
 		}
+		if (evt.getSource() == debugPipelineTest) {
+			try {
+				 myImage.fileURLmain
+				// targetTreeNode.getExperiment(). ...
+				 TODO: move IAPServiceImpl.getSnapshots to IAP project
+				 call getSnapshots here
+				 search snapshot with any primary URL equal to given URL
+				 use snapshot to start MaizeAnalysis pipeline with debug stack
+				 show debug stack (print)
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, "Error: " + e.getLocalizedMessage() + ". Command execution error.",
+						"Error", JOptionPane.INFORMATION_MESSAGE);
+				ErrorMsg.addErrorMessage(e);
+				return;
+			}
+		}
 		if (evt.getSource() == showImageCmdMain) {
 			try {
 				FlexibleImage fi = new FlexibleImage(myImage.fileURLmain);
@@ -407,20 +425,27 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		}
 		if (evt.getSource() == showImageCmdLabel) {
 			try {
-				FlexibleImage fi = new FlexibleImage(myImage.fileURLlabel);
-				if (fi.getAsBufferedImage() == null) {
+				FlexibleImage fi = null;
+				try {
+					fi = new FlexibleImage(myImage.fileURLlabel);
+				} catch (Exception err) {
+					// try to load as TIFF..
+				}
+				if (fi == null || fi.getWidth() == 0) {
 					try {
 						TiffDecoder tid = new TiffDecoder(myImage.fileURLlabel.getInputStream(), myImage.fileURLlabel.getFileName());
 						FileInfoXYZ[] info = tid.getTiffInfo();
 						Opener o = new Opener();
 						ImagePlus imp = o.openTiffStack(info);
 						imp.show("Image Label View - " + myImage.fileURLlabel.getFileNameDecoded());
+						IAPmain.showImageJ();
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(null, "Error: " + e.getLocalizedMessage() + ". Image can not be shown.",
 								"Unknown Image Format", JOptionPane.INFORMATION_MESSAGE);
 					}
 				} else
-					fi.print("Image Label View - " + myImage.fileURLlabel.getFileNameDecoded());
+					if (fi != null)
+						fi.print("Image Label View - " + myImage.fileURLlabel.getFileNameDecoded());
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Error: " + e.getLocalizedMessage() + ". Image can not be shown.",
 						"Unknown Image Format", JOptionPane.INFORMATION_MESSAGE);
