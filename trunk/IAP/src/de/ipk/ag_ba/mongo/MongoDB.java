@@ -1409,12 +1409,14 @@ public class MongoDB {
 					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
 					double load = SystemAnalysis.getRealSystemCpuLoad();
-					res.setHostInfo(SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
+					res.setHostInfo(
+
+					SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 							SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
 							"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
-							(load > 0 ? ", load: "
-									+ StringManipulationTools.formatNumber(load, "#.#") : "")
-							+ ", queued: "
+							(load > 0 ? " used "
+									+ StringManipulationTools.formatNumber(100d * load, "#") + "&#37;" : "")
+							+ ", queue: "
 							+ BackgroundThreadDispatcher.getWorkLoad());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
 					dbc.save(res);
