@@ -1559,7 +1559,7 @@ public class ImageOperation {
 				count++;
 			}
 		}
-		return new Lab(sumL / (double) count, sumA / (double) count, sumB / (double) count);
+		return new Lab(sumL / count, sumA / count, sumB / count);
 	}
 	
 	public ImageOperation medianFilter32Bit() {
@@ -2053,6 +2053,9 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation clearImageBottom(int threshold, int background) {
+		if (threshold < image.getHeight())
+			return this;
+		
 		int[][] img2d = getImageAs2array();
 		
 		for (int x = 0; x < image.getWidth(); x++) {
@@ -2221,7 +2224,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new double[] { sumR / (double) count, sumG / (double) count, sumB / (double) count };
+		return new double[] { sumR / count, sumG / count, sumB / count };
 	}
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {

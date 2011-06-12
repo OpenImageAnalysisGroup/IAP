@@ -18,6 +18,9 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
+		if (getInput().getMasks().getVis() == null)
+			return null;
+		
 		if (options.getCameraTyp() == CameraTyp.TOP) {
 			FlexibleImage res =
 					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
@@ -34,6 +37,9 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
+		if (getInput().getMasks().getFluo() == null)
+			return null;
+		
 		if (options.getCameraTyp() == CameraTyp.TOP) {
 			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
 					options.getNeighbourhood(), options.getCameraTyp(), null).getImage();

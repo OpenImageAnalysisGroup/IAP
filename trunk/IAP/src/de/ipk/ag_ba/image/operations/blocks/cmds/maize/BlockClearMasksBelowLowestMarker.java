@@ -53,6 +53,8 @@ public class BlockClearMasksBelowLowestMarker extends AbstractSnapshotAnalysisBl
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
+		if (getInput().getImages().getFluo() == null)
+			return null;
 		
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getFluo();

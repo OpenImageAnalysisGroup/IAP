@@ -450,6 +450,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				win = new StackWindow(this);
 			else
 				win = new ImageWindow(this);
+			win.setTitle(statusMessage);
 			if (roi != null)
 				roi.setImage(this);
 			if (overlay != null && getCanvas() != null)

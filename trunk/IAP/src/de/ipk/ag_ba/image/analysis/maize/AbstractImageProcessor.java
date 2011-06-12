@@ -55,7 +55,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
 		
-		FlexibleMaskAndImageSet result = pipeline.execute(workset, debugStack, settings);
+		FlexibleMaskAndImageSet result = pipeline.execute(workset, debugStack, settings, getStatus());
 		
 		if (debugStack != null)
 			debugStack.addImage("RESULT", result.getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));

@@ -431,9 +431,13 @@ public class IAPservice {
 		for (NumericMeasurementInterface md : ml) {
 			if (md instanceof ImageData) {
 				ImageData id = (ImageData) md;
-				if (id.getURL() != null && id.getURL().toString().equals(search)) {
+				String u = id.getURL().getDetail() + "";
+				if (search.contains(u)) {
 					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
-					searchKey = key;
+					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
+					if (name.contains("."))
+						key += name.substring(name.lastIndexOf("."));
+					searchKey = key + "";
 					break;
 				}
 			}
@@ -443,9 +447,33 @@ public class IAPservice {
 				if (md instanceof ImageData) {
 					ImageData id = (ImageData) md;
 					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
+					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
+					if (name.contains("."))
+						key += name.substring(name.lastIndexOf("."));
 					if (searchKey.equals(key)) {
 						result.add(id);
 					}
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	public static Collection<NumericMeasurementInterface> getMatchForReference(IOurl fileNameMain, ExperimentInterface experiment, MongoDB m) {
+		Collection<NumericMeasurementInterface> pairs = getMatchFor(fileNameMain, experiment);
+		
+		Collection<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
+		
+		for (NumericMeasurementInterface nmi : pairs) {
+			ImageData id = (ImageData) nmi;
+			if (id.getLabelURL() != null) {
+				ImageData idMod = (ImageData) id.clone(id.getParentSample());
+				id.setURL(id.getLabelURL());
+				String annotation = id.getAnnotation();
+				if (annotation != null && annotation.length() > 0 && id.getAnnotationField("oldreference") != null) {
+					id.setLabelURL(new IOurl(id.getAnnotationField("oldreference")));
+					result.add(idMod);
 				}
 			}
 		}

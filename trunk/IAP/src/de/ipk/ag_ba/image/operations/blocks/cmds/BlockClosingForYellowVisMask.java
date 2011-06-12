@@ -12,7 +12,10 @@ public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockF
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return closing(getInput().getMasks().getVis(), getInput().getImages().getVis());
+		if (getInput().getMasks().getVis() == null)
+			return null;
+		else
+			return closing(getInput().getMasks().getVis(), getInput().getImages().getVis());
 	}
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {

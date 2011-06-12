@@ -8,17 +8,17 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMaskButNotOnVIS;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisContentOnFluoMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisContentOnFluoMask;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropMasks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDataAnalysis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeVisAndFluoMasks;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeMasksToLargest;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMorphologicalOperations;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeMasksToLargest;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockTransferImageSet;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchRotation;
@@ -122,7 +122,7 @@ public class BarleyTopImageProcessor {
 		if (cropResult && cropWorking)
 			p.add(BlockCropMasks.class);
 		
-		result = p.execute(workset, debugStack, settings);
+		result = p.execute(workset, debugStack, settings, null);
 		
 		if (debugStack != null) {
 			debugStack.addImage("RESULT", result.getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));

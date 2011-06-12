@@ -78,7 +78,7 @@ public class PhytochamberTopImageProcessor {
 			p.add(BlockCropImages.class);
 		
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, input);
-		FlexibleMaskAndImageSet result = p.execute(workset, debugStack, settings);
+		FlexibleMaskAndImageSet result = p.execute(workset, debugStack, settings, null);
 		
 		if (debugStack != null)
 			debugStack.addImage("RESULT", result.getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
