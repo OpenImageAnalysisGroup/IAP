@@ -66,11 +66,15 @@ public class BlockPipeline {
 		
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
-			block.setInputAndOptions(input, options, settings, index++,
-					debugStack);
+			
+			block.setInputAndOptions(input, options, settings, index++, debugStack);
+			
 			long ta = System.currentTimeMillis();
+			
 			input = block.process();
+			
 			long tb = System.currentTimeMillis();
+			
 			int seconds = (int) ((tb - ta) / 1000);
 			if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 				if (blockProgressOutput)
@@ -82,6 +86,7 @@ public class BlockPipeline {
 			block.reset();
 			
 			updateBlockStatistics();
+			
 			if (status != null) {
 				status.setCurrentStatusValueFine(100d * (index / (double) blocks.size()));
 				status.setCurrentStatusText1(blockClass.getSimpleName());
