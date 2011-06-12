@@ -14,6 +14,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISimage() {
 		FlexibleImage vis = getInput().getImages().getVis();
+		if (vis == null)
+			return null;
 		double[] pix = getProbablyWhitePixels(vis, 0.08);
 		return ImageBalancing(vis, 255, pix);
 	}
@@ -21,6 +23,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processFLUOimage() {
 		FlexibleImage fluo = getInput().getImages().getFluo();
+		if (fluo == null)
+			return null;
 		FlexibleImage temp = new ImageOperation(fluo).invert().getImage();
 		double[] pix = getProbablyWhitePixels(temp, 0.08);
 		FlexibleImage temp1 = ImageBalancing(temp, 255, pix);
@@ -30,6 +34,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
+		if (vis == null)
+			return null;
 		double[] pix = getProbablyWhitePixels(vis, 0.08);
 		return ImageBalancing(vis, 255, pix);
 	}
@@ -37,6 +43,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		FlexibleImage fluo = getInput().getMasks().getFluo();
+		if (fluo == null)
+			return null;
 		FlexibleImage temp = new ImageOperation(fluo).invert().getImage();
 		double[] pix = getProbablyWhitePixels(temp, 0.08);
 		FlexibleImage temp1 = ImageBalancing(temp, 255, pix);
@@ -44,15 +52,17 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	public FlexibleImage ImageBalancing(FlexibleImage input, int brightness, double[] pix) {
+		if (input == null)
+			return null;
 		double[] factors = calculateFactors(pix, brightness);
 		ImageOperation io = new ImageOperation(input);
 		return io.multiplicateImageChannelsWithFactors(factors).getImage();
 	}
 	
 	public double[] calculateFactors(double[] pix, int brightness) {
-		double r = brightness / (double) pix[0];
-		double g = brightness / (double) pix[1];
-		double b = brightness / (double) pix[2];
+		double r = brightness / pix[0];
+		double g = brightness / pix[1];
+		double b = brightness / pix[2];
 		return new double[] { r, g, b };
 	}
 	
