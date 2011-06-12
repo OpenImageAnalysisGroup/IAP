@@ -304,7 +304,7 @@ public class DataExchangeHelperForExperiments {
 						previewImage = null;
 						previewLoadAndConstructNeeded = true;
 					} else {
-						if (binaryFileInfo.getFileNameMain().getPrefix().startsWith("mongo_")) {
+						if (DataSetFileButton.ICON_WIDTH == 128) { // binaryFileInfo.getFileNameMain().getPrefix().startsWith("mongo_") &&
 							byte[] pi = m.getPreviewData(binaryFileInfo.getHashMain());
 							if (pi != null)
 								previewImage = new ImageIcon(pi);

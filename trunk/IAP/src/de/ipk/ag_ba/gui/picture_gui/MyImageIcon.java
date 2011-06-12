@@ -62,15 +62,15 @@ public class MyImageIcon extends ImageIcon {
 		
 		try {
 			BufferedImage i = null;
-			if (width == 128 && height == 128) {
-				ResourceIOHandler ioh = ResourceIOManager.getHandlerFromPrefix(fileURLmain.getPrefix());
-				i = ImageIO.read(ioh.getPreviewInputStream(fileURLmain));
-			} else {
-				i = ImageIO.read(fileURLmain.getInputStream());
-				int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
-				double factor = DataSetFileButton.ICON_HEIGHT / (double) maxS;
-				i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
-			}
+			// if (width == 128 && height == 128) {
+			ResourceIOHandler ioh = ResourceIOManager.getHandlerFromPrefix(fileURLmain.getPrefix());
+			i = ImageIO.read(ioh.getPreviewInputStream(fileURLmain, width));
+			// } else {
+			// i = ImageIO.read(fileURLmain.getInputStream());
+			// int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
+			// double factor = DataSetFileButton.ICON_HEIGHT / (double) maxS;
+			// i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
+			// }
 			imageAvailable = 1;
 			setImage(i);
 			
