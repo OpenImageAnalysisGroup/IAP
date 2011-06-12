@@ -5,9 +5,9 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
- * Resize masks images to largest width and height.
+ * Recolor pictures according to white point (or black point for fluo).
  * 
- * @author klukas
+ * @author pape, klukas
  */
 public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	
