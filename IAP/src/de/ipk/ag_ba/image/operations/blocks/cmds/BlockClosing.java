@@ -10,11 +10,15 @@ public class BlockClosing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
+		if (getInput().getMasks().getVis() == null)
+			return null;
 		return closing(getInput().getMasks().getVis(), getInput().getImages().getVis());
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
+		if (getInput().getMasks().getFluo() == null)
+			return null;
 		return closing(getInput().getMasks().getFluo(), getInput().getImages().getFluo());
 	}
 	

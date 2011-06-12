@@ -29,10 +29,14 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 
+/**
+ * @author rohn, klukas
+ */
 public class NumericMeasurement3D extends NumericMeasurement {
 	
 	private String positionUnit = null;
 	private Double position = null;
+	private String annotation;
 	
 	public NumericMeasurement3D(SampleInterface parent) {
 		super(parent);
@@ -44,6 +48,8 @@ public class NumericMeasurement3D extends NumericMeasurement {
 			setPosition((Double) map.get("position"));
 		if (map.containsKey("positionUnit"))
 			setPositionUnit((String) map.get("positionUnit"));
+		if (map.containsKey("annotation"))
+			setAnnotation((String) map.get("annotation"));
 		
 	}
 	
@@ -130,9 +136,9 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	public void getXMLAttributeString(StringBuilder r) {
 		super.getXMLAttributeString(r);
 		Substance.getAttributeString(r, new String[] {
-				"position", "positionUnit"
+				"position", "positionUnit", "annotation"
 		}, new Object[] {
-				position, positionUnit
+				position, positionUnit, annotation
 		});
 	}
 	
@@ -155,7 +161,10 @@ public class NumericMeasurement3D extends NumericMeasurement {
 					if (attr.getName().equals("positionUnit"))
 						setPositionUnit(attr.getValue());
 					else
-						super.setAttribute(attr);
+						if (attr.getName().equals("annotation"))
+							setAnnotation(attr.getValue());
+						else
+							super.setAttribute(attr);
 	}
 	
 	public NumericMeasurementInterface copyDataAndPath() {
@@ -179,6 +188,14 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		return positionUnit;
 	}
 	
+	public void setAnnotation(String annotation) {
+		this.annotation = annotation;
+	}
+	
+	public String getAnnotation() {
+		return annotation;
+	}
+	
 	public boolean equalNumericMeasurement(NumericMeasurementInterface meas) {
 		String u1 = getReplicateID() + " " + getValue() + " " + getUnit() + " " + getPositionUnit() + " " + getPosition();
 		String u2 = meas.getReplicateID() + " " + meas.getValue() + " " + meas.getUnit() + " "
@@ -195,6 +212,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		super.fillAttributeMap(attributes);
 		attributes.put("position", position);
 		attributes.put("positionUnit", positionUnit);
+		attributes.put("annotation", annotation);
 	}
 	
 	@Override
@@ -202,6 +220,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		NumericMeasurement3D m = (NumericMeasurement3D) super.clone(parent);
 		m.setPosition(getPosition());
 		m.setPositionUnit(getPositionUnit());
+		m.setAnnotation(getAnnotation());
 		return m;
 	}
 	

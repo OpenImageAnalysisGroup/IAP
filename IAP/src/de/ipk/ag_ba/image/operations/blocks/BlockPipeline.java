@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
+import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
@@ -48,7 +49,8 @@ public class BlockPipeline {
 	private static ThreadSafeOptions pipelineID = new ThreadSafeOptions();
 	
 	public FlexibleMaskAndImageSet execute(FlexibleMaskAndImageSet input,
-			FlexibleImageStack debugStack, BlockProperties settings)
+			FlexibleImageStack debugStack, BlockProperties settings,
+			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws InstantiationException, IllegalAccessException,
 			InterruptedException {
 		long a = System.currentTimeMillis();
@@ -58,6 +60,10 @@ public class BlockPipeline {
 		
 		int index = 0;
 		boolean blockProgressOutput = false;
+		
+		if (status != null)
+			status.setCurrentStatusValueFine(0);
+		
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			block.setInputAndOptions(input, options, settings, index++,
@@ -76,9 +82,21 @@ public class BlockPipeline {
 			block.reset();
 			
 			updateBlockStatistics();
+			if (status != null) {
+				status.setCurrentStatusValueFine(100d * (index / (double) blocks.size()));
+				status.setCurrentStatusText1(blockClass.getSimpleName());
+				status.setCurrentStatusText2(
+						"Finished " + index + "/" + blocks.size() + " (t=" + seconds + "s)");
+			};
 		}
 		
 		long b = System.currentTimeMillis();
+		
+		if (status != null) {
+			status.setCurrentStatusValueFine(100d * (index / (double) blocks.size()));
+			status.setCurrentStatusText1("Pipeline finished");
+			status.setCurrentStatusText2("T=" + ((b - a) / 1000) + "s");
+		}
 		System.out.print("PET: " + (b - a) / 1000 + "s ");
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);
 		updatePipelineStatistics();
@@ -168,10 +186,15 @@ public class BlockPipeline {
 		Runnable finishSwingTask = new Runnable() {
 			@Override
 			public void run() {
-				int idx = 1;
-				for (FlexibleImageStack fis : mat.getForcedDebugStackStorageResult()) {
-					fis.print(mat.getName() + " // Result " + idx);
-					idx++;
+				if (mat.getForcedDebugStackStorageResult() == null || mat.getForcedDebugStackStorageResult().isEmpty()) {
+					MainFrame.showMessageDialog("No pipeline results available!", "Error");
+				} else {
+					int idx = 1;
+					int nn = mat.getForcedDebugStackStorageResult().size();
+					for (FlexibleImageStack fis : mat.getForcedDebugStackStorageResult()) {
+						fis.print(mat.getName() + " // Result " + idx + "/" + nn);
+						idx++;
+					}
 				}
 			}
 		};

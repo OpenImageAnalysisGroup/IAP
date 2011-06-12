@@ -283,4 +283,26 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 		return new ImageData(this.getParentSample(), this);
 	}
 	
+	public String getAnnotationField(String key) {
+		String a = getAnnotation();
+		if (a != null) {
+			String anno = a;
+			String[] fields = anno.split(",");
+			for (String f : fields) {
+				String[] nn = f.split("#", 2);
+				if (nn[0].equals(key))
+					return nn[1];
+			}
+		}
+		return null;
+	}
+	
+	public synchronized void addAnnotationField(String key, String value) {
+		String a = getAnnotation();
+		if (a == null)
+			a = key + "#" + value;
+		else
+			a += "," + key + "#" + value;
+		setAnnotation(a);
+	}
 }

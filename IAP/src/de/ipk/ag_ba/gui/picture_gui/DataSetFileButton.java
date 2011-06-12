@@ -13,6 +13,8 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,8 +73,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	private JMenuItem removeOneFromDatabaseCmd;
 	private JMenuItem removeAllFromDatabaseCmd;
 	
-	private JMenuItem debugPipelineTest;
-	
 	MongoDB m;
 	
 	JProgressBar progress;
@@ -104,7 +104,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	// this.pass = pass;
 	// }
 	
-	public DataSetFileButton(MongoDB m, MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
+	public DataSetFileButton(final MongoDB m, final MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
 						ImageIcon previewImage) {
 		super();
 		
@@ -121,6 +121,76 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		this.targetTreeNode = targetTreeNode;
 		
 		this.m = m;
+		
+		addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					JPopupMenu jp = new JPopupMenu("Debug");
+					
+					JMenuItem debugPipelineTest1 = new JMenuItem("Maize Analysis Pipeline (this+ref.)");
+					debugPipelineTest1.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
+										imageResult.getBinaryFileInfo().getFileNameMain(),
+										targetTreeNode.getExperiment());
+								
+								BlockPipeline.debugTryAnalyze(match, m);
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+										"Error", JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTest2 = new JMenuItem("Maize Analysis Pipeline (ref.+old ref.)");
+					debugPipelineTest2.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								Collection<NumericMeasurementInterface> match =
+										IAPservice.getMatchForReference(
+												imageResult.getBinaryFileInfo().getFileNameMain(),
+												targetTreeNode.getExperiment(),
+												m);
+								
+								BlockPipeline.debugTryAnalyze(match, m);
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+										"Error", JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					jp.add(debugPipelineTest1);
+					jp.add(debugPipelineTest2);
+					
+					jp.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
 	}
 	
 	JLabel mmlbl;
@@ -400,20 +470,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			
 			IAPmain.showVANTED(false);
 		}
-		if (evt.getSource() == debugPipelineTest) {
-			try {
-				Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
-						myImage.fileURLmain,
-						targetTreeNode.getExperiment());
-				
-				BlockPipeline.debugTryAnalyze(match, m);
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, "Error: " + e.getLocalizedMessage() + ". Command execution error.",
-						"Error", JOptionPane.INFORMATION_MESSAGE);
-				ErrorMsg.addErrorMessage(e);
-				return;
-			}
-		}
 		if (evt.getSource() == showImageCmdMain) {
 			try {
 				FlexibleImage fi = new FlexibleImage(myImage.fileURLmain);
@@ -562,6 +618,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			// myPopup.add(removeOneFromDatabaseCmd);
 			// myPopup.add(removeAllFromDatabaseCmd);
 		}
+		
+		// myPopup.add(debugPipelineTest);
+		
 		// }
 		// else {
 		// final JMenuItem err = new JMenuItem("Upload in progress");

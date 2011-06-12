@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.analysis.maize;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
@@ -29,6 +31,8 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructure
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockUseFluoMaskToClearVisAndNirMask;
 
 public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
+	
+	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
 	public MaizeAnalysisPipelineProcessor(ImageProcessorOptions options) {
 		super(options);
@@ -95,6 +99,16 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		p.add(BlockCropImages.class);
 		
 		return p;
+	}
+	
+	@Override
+	public void setStatus(BackgroundTaskStatusProviderSupportingExternalCall status) {
+		this.status = status;
+	}
+	
+	@Override
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatus() {
+		return status;
 	}
 	
 }
