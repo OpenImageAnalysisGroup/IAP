@@ -26,7 +26,6 @@ import org.ApplicationStatus;
 import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
-import org.SystemAnalysis;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -374,9 +373,9 @@ public class IAPmain extends JApplet {
 			case REMOTE_EXECUTION:
 				return true;
 			case SAVE_DEBUG_STACK:
-				return true;
+				return false;
 			case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
-				return true;
+				return false;
 		}
 		return false;
 	}
@@ -386,15 +385,6 @@ public class IAPmain extends JApplet {
 			return "/media/nfs/hsm";
 		else
 			return ReleaseInfo.getAppSubdirFolder("local-iap-hsm");
-	}
-	
-	private static ImageJ ij = null;
-	
-	public static void showImageJ() {
-		if (SystemAnalysis.isHeadless())
-			return;
-		if (ij == null || !ij.isShowing())
-			ij = new ImageJ();
 	}
 }
 

@@ -1107,6 +1107,11 @@ public class ImageOperation {
 			int cutOffMinimumArea, NeighbourhoodSetting nb, CameraTyp typ,
 			ObjectRef optClusterSizeReturn) {
 		
+		if (cutOffMinimumArea < 1) {
+			System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");
+			cutOffMinimumArea = 1;
+		}
+		
 		int[] rgbArray = workImage.getAs1A();
 		int w = workImage.getWidth();
 		int h = workImage.getHeight();
@@ -1559,7 +1564,7 @@ public class ImageOperation {
 				count++;
 			}
 		}
-		return new Lab(sumL / count, sumA / count, sumB / count);
+		return new Lab(sumL / (double) count, sumA / (double) count, sumB / (double) count);
 	}
 	
 	public ImageOperation medianFilter32Bit() {
@@ -2053,9 +2058,6 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation clearImageBottom(int threshold, int background) {
-		if (threshold < image.getHeight())
-			return this;
-		
 		int[][] img2d = getImageAs2array();
 		
 		for (int x = 0; x < image.getWidth(); x++) {
@@ -2224,7 +2226,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new double[] { sumR / count, sumG / count, sumB / count };
+		return new double[] { sumR / (double) count, sumG / (double) count, sumB / (double) count };
 	}
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {

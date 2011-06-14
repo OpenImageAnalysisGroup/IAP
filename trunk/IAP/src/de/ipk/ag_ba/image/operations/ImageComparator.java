@@ -25,8 +25,19 @@ public class ImageComparator {
 		
 		int[] imgInp = inputImage.getAs1A();
 		
-		double[][] labImage = inputImage.getLab();
-		double[][] labImageRef = referenceImage.getLab();
+		double[][] labImage;
+		double[][] labImageRef;
+		
+		boolean ignoreRed = false;
+		if (ignoreRed) {
+			double[] factors = new double[] { 0.05, 0.7, 0.7 };
+			boolean show = false;
+			labImage = new ImageOperation(inputImage).multiplicateImageChannelsWithFactors(factors).printImage("input", show).getImage().getLab();
+			labImageRef = new ImageOperation(referenceImage).multiplicateImageChannelsWithFactors(factors).printImage("reference", show).getImage().getLab();
+		} else {
+			labImage = inputImage.getLab();
+			labImageRef = referenceImage.getLab();
+		}
 		
 		int width = inputImage.getWidth();
 		int height = inputImage.getHeight();
@@ -69,5 +80,4 @@ public class ImageComparator {
 		}
 		return new ImageOperation(new FlexibleImage(result, width, height));
 	}
-	
 }
