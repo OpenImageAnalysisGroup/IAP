@@ -15,8 +15,10 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		this.plantAreaVis = getInput().getImages().getVis().getIO().countFilledPixels();
 		this.plantImagePixelCountVis = getInput().getImages().getVis().getWidth() * getInput().getImages().getVis().getHeight();
 		
-		this.plantAreaNir = getInput().getImages().getNir().getIO().countFilledPixels();
-		this.plantImagePixelCountNir = getInput().getImages().getNir().getWidth() * getInput().getImages().getNir().getHeight();
+		if (getInput().getImages().getNir() != null) {
+			this.plantAreaNir = getInput().getImages().getNir().getIO().countFilledPixels();
+			this.plantImagePixelCountNir = getInput().getImages().getNir().getWidth() * getInput().getImages().getNir().getHeight();
+		}
 	}
 	
 	/**

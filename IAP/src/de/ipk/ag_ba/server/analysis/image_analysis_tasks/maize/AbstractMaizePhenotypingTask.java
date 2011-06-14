@@ -70,15 +70,6 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE, ImageAnalysisType.MEASUREMENT };
 	}
 	
-	public void debugOverrideAndEnableDebugStackStorage(boolean enable) {
-		this.forceDebugStack = enable;
-		this.forcedDebugStacks = new ArrayList<FlexibleImageStack>();
-	}
-	
-	public ArrayList<FlexibleImageStack> getForcedDebugStackStorageResult() {
-		return forcedDebugStacks;
-	}
-	
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
@@ -122,17 +113,17 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 				@Override
 				public void run() {
 					try {
-						ImageData inVis = id.getVIS().copy();
-						ImageData inFluo = id.getFLUO().copy();
-						ImageData inNir = id.getNIR().copy();
+						ImageData visInputImage = id.getVIS().copy();
+						ImageData fluo = id.getFLUO().copy();
+						ImageData nir = id.getNIR().copy();
 						
-						if (inVis == null || inNir == null || inFluo == null) {
+						if (visInputImage == null || nir == null || fluo == null) {
 							System.err.println("ERROR: Internal Error: VIS/FLUO/NIR is NULL!");
 							return;
 						}
-						double rV = inVis.getPosition() != null ? inVis.getPosition() : 0;
-						double rF = inFluo.getPosition() != null ? inFluo.getPosition() : 0;
-						double rN = inNir.getPosition() != null ? inNir.getPosition() : 0;
+						double rV = visInputImage.getPosition() != null ? visInputImage.getPosition() : 0;
+						double rF = fluo.getPosition() != null ? fluo.getPosition() : 0;
+						double rN = nir.getPosition() != null ? nir.getPosition() : 0;
 						if (Math.abs(rV - rF) > 0.001 || Math.abs(rF - rN) > 0.001) {
 							System.err.println("ERROR: Internal Error: VIS/FLUO/NIR rotation angles differ!");
 							return;
@@ -140,41 +131,37 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 						
 						final FlexibleImageSet input = new FlexibleImageSet();
 						final FlexibleImageSet inputMasks = new FlexibleImageSet();
-						if (status != null)
-							status.setCurrentStatusText2("Load Images");
 						
 						MyThread a = null, b = null, c = null;
 						
-						if (inVis instanceof LoadedImage) {
-							input.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImage()));
-							inputMasks.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImageLabelField()));
+						if (visInputImage instanceof LoadedImage) {
+							input.setVis(new FlexibleImage(((LoadedImage) visInputImage).getLoadedImage()));
+							inputMasks.setVis(new FlexibleImage(((LoadedImage) visInputImage).getLoadedImageLabelField()));
 						} else {
-							a = load(inVis, input, inputMasks, FlexibleImageType.VIS);
+							a = load(visInputImage, input, inputMasks, FlexibleImageType.VIS);
 						}
-						if (inFluo instanceof LoadedImage) {
-							input.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImage()));
-							inputMasks.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImageLabelField()));
+						if (fluo instanceof LoadedImage) {
+							input.setFluo(new FlexibleImage(((LoadedImage) fluo).getLoadedImage()));
+							inputMasks.setFluo(new FlexibleImage(((LoadedImage) fluo).getLoadedImageLabelField()));
 						} else {
-							b = load(inFluo, input, inputMasks, FlexibleImageType.FLUO);
+							b = load(fluo, input, inputMasks, FlexibleImageType.FLUO);
 						}
-						if (inNir instanceof LoadedImage) {
-							input.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImage()));
-							inputMasks.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImageLabelField()));
+						if (nir instanceof LoadedImage) {
+							input.setNir(new FlexibleImage(((LoadedImage) nir).getLoadedImage()));
+							inputMasks.setNir(new FlexibleImage(((LoadedImage) nir).getLoadedImageLabelField()));
 						} else {
-							c = load(inNir, input, inputMasks, FlexibleImageType.NIR);
+							c = load(nir, input, inputMasks, FlexibleImageType.NIR);
 						}
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages() && input.getSmallestHeight(true, true, false) > 1) {
-							if (status != null)
-								status.setCurrentStatusText2("Images are loaded");
 							
-							input.setImageInfo(inVis, inFluo, inNir);
-							inputMasks.setImageInfo(inVis, inFluo, inNir);
+							input.setImageInfo(visInputImage, fluo, nir);
+							inputMasks.setImageInfo(visInputImage, fluo, nir);
 							
 							boolean side = id.isSide();
 							
-							ImageProcessorOptions options = new ImageProcessorOptions(inVis, inFluo, inNir);
+							ImageProcessorOptions options = new ImageProcessorOptions(visInputImage, fluo, nir);
 							if (side)
 								options.setCameraTyp(CameraTyp.SIDE);
 							else
@@ -183,7 +170,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 							
 							FlexibleImageStack debugImageStack = null;
 							boolean addDebugImages = IAPmain.isSettingEnabled(IAPfeature.SAVE_DEBUG_STACK);
-							if (addDebugImages || forceDebugStack) {
+							if (addDebugImages) {
 								debugImageStack = new FlexibleImageStack();
 							}
 							
@@ -193,15 +180,9 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 							final boolean cropResult = true;
 							final boolean parameterSearch = true;
 							
-							if (status != null)
-								status.setCurrentStatusText1("Process Analysis Pipeline");
-							ptip.setStatus(status);
 							final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input, inputMasks,
-									maximumThreadCountOnImageLevel, debugImageStack,
-									parameterSearch, cropResult).getImages();
-							if (status != null)
-								status.setCurrentStatusText1("Pipeline Finished");
+									maximumThreadCountOnImageLevel, debugImageStack, parameterSearch, cropResult).getImages();
 							
 							BlockProperties analysisResults = ptip.getSettings();
 							
@@ -209,7 +190,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 								if (bpv.getName() == null)
 									continue;
 								
-								NumericMeasurement3D m = new NumericMeasurement3D(inVis, bpv.getName(), inVis.getParentSample()
+								NumericMeasurement3D m = new NumericMeasurement3D(visInputImage, bpv.getName(), visInputImage.getParentSample()
 										.getParentCondition().getExperimentName()
 										+ " (" + getName() + ")");
 								
@@ -219,34 +200,26 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 								output.add(m);
 							}
 							
-							if (forceDebugStack) {
-								forcedDebugStacks.add(debugImageStack);
+							byte[] buf = null;
+							if (debugImageStack != null) {
+								System.out.println("[s");
+								MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
+								debugImageStack.saveAsLayeredTif(mos);
+								buf = mos.getBuff();
+								
+								System.out.println("f]");
 							} else {
-								byte[] buf = null;
-								if (debugImageStack != null) {
-									System.out.println("[s");
-									MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
-									debugImageStack.saveAsLayeredTif(mos);
-									debugImageStack.print("NNN");
-									buf = mos.getBuff();
-									
-									System.out.println("f]");
-								} else {
-									inVis.addAnnotationField("oldreference", inVis.getLabelURL().toString());
-									inFluo.addAnnotationField("oldreference", inFluo.getLabelURL().toString());
-									inNir.addAnnotationField("oldreference", inNir.getLabelURL().toString());
-									
-									inVis.setLabelURL(id.getVIS().getURL().copy());
-									inFluo.setLabelURL(id.getFLUO().getURL().copy());
-									inNir.setLabelURL(id.getNIR().getURL().copy());
-								}
-								if (pipelineResult.getVis() != null)
-									saveImage(inVis, pipelineResult.getVis(), buf, ".tiff");
-								if (pipelineResult.getFluo() != null)
-									saveImage(inFluo, pipelineResult.getFluo(), buf, ".tiff");
-								if (pipelineResult.getNir() != null)
-									saveImage(inNir, pipelineResult.getNir(), buf, ".tiff");
+								visInputImage.setLabelURL(id.getVIS().getURL().copy());
+								fluo.setLabelURL(id.getFLUO().getURL().copy());
+								nir.setLabelURL(id.getNIR().getURL().copy());
 							}
+							if (pipelineResult.getVis() != null)
+								saveImage(visInputImage, pipelineResult.getVis(), buf, ".tiff");
+							if (pipelineResult.getFluo() != null)
+								saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
+							if (pipelineResult.getNir() != null)
+								saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
+							
 						} else {
 							System.err.println("ERROR: Not all three snapshots images could be loaded!");
 						}
