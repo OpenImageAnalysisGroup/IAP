@@ -39,6 +39,16 @@ public enum MongoGridFS {
 		return res;
 	}
 	
+	public static ArrayList<String> getFileCollectionsInclPreview() {
+		ArrayList<String> res = new ArrayList<String>();
+		for (MongoGridFS fs : values()) {
+			if (fs != FIELD_FILENAME)
+				if (!fs.toString().contains("."))
+					res.add(fs.toString());
+		}
+		return res;
+	}
+	
 	public static ArrayList<String> getFileCollectionsFor(NumericMeasurementInterface nmd) {
 		ArrayList<String> res = new ArrayList<String>();
 		if (nmd instanceof ImageData) {

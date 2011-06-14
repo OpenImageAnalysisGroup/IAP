@@ -68,6 +68,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			
 			if (!SystemAnalysis.isHeadless())
 				res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
+			if (!SystemAnalysis.isHeadless())
+				res.add(new NavigationButton(new MongoDBreorganizeAction(m), src.getGUIsetting()));
 			
 			NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
 			

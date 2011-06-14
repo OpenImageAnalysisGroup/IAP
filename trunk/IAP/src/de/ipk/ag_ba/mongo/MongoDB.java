@@ -2025,4 +2025,107 @@ public class MongoDB {
 		String prefix = h.getPrefix();
 		return h.getPreviewInputStream(new IOurl(prefix, hash, url.getFileName()));
 	}
+	
+	public synchronized String cleanUp(final BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
+		final StringBuilder res = new StringBuilder();
+		processDB(new RunnableOnDB() {
+			
+			private DB db;
+			
+			@Override
+			public void run() {
+				System.out.println("REORGANIZATION: Create inventory... // " + SystemAnalysisExt.getCurrentTime());
+				res.append("REORGANIZATION: Create inventory... // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+				status.setCurrentStatusText1("Create inventory");
+				status.setCurrentStatusValueFine(100d / 5 * 0);
+				long numberOfBinaryFilesInDatabase = 0;
+				HashMap<String, Integer> fs2cnt = new HashMap<String, Integer>();
+				for (String mgfs : MongoGridFS.getFileCollectionsInclPreview()) {
+					GridFS gridfs = new GridFS(db, mgfs);
+					int cnt = gridfs.getFileList().count();
+					numberOfBinaryFilesInDatabase += cnt;
+					fs2cnt.put(mgfs, cnt);
+					
+				}
+				System.out.println("REORGANIZATION: Stored binary files: " + numberOfBinaryFilesInDatabase + " // "
+						+ SystemAnalysisExt.getCurrentTime());
+				res.append("REORGANIZATION: Stored binary files: " + numberOfBinaryFilesInDatabase + " // "
+						+ SystemAnalysisExt.getCurrentTime() + "<br>");
+				status.setCurrentStatusText1("Binary files: " + numberOfBinaryFilesInDatabase);
+				status.setCurrentStatusValueFine(100d / 5 * 1);
+				
+				ArrayList<ExperimentHeaderInterface> el = getExperimentList(null);
+				HashSet<String> linkedHashes = new HashSet<String>();
+				double smallStep = 100d / 5 * 1 / el.size();
+				for (ExperimentHeaderInterface ehi : el) {
+					status.setCurrentStatusText2("Analyze " + ehi.getExperimentName());
+					ExperimentInterface exp = getExperiment(ehi);
+					List<NumericMeasurementInterface> binaryData = Substance3D.getAllFiles(exp);
+					for (NumericMeasurementInterface nmi : binaryData) {
+						if (nmi instanceof BinaryMeasurement) {
+							BinaryMeasurement bm = (BinaryMeasurement) nmi;
+							if (bm.getURL() != null)
+								linkedHashes.add(bm.getURL().getDetail());
+							if (bm.getLabelURL() != null)
+								linkedHashes.add(bm.getLabelURL().getDetail());
+						}
+					}
+					status.setCurrentStatusValueFineAdd(smallStep);
+				}
+				if (linkedHashes.size() > 0) {
+					long freeAll = 0;
+					System.out.println("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysisExt.getCurrentTime());
+					res.append("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+					status.setCurrentStatusText1("Linked files: " + linkedHashes.size());
+					status.setCurrentStatusValueFine(100d / 5 * 2);
+					
+					double stepSize = 100d / 5 * 3 / MongoGridFS.getFileCollectionsInclPreview().size();
+					
+					for (String mgfs : MongoGridFS.getFileCollectionsInclPreview()) {
+						GridFS gridfs = new GridFS(db, mgfs);
+						int cnt = gridfs.getFileList().count();
+						if (cnt == fs2cnt.get(mgfs)) {
+							ArrayList<GridFSDBFile> toBeRemoved = new ArrayList<GridFSDBFile>();
+							// no changes in between
+							DBCursor fl = gridfs.getFileList();
+							while (fl.hasNext()) {
+								DBObject dbo = fl.next();
+								GridFSDBFile f = (GridFSDBFile) dbo;
+								String md5 = f.getFilename();
+								if (!linkedHashes.contains(md5))
+									toBeRemoved.add(f);
+							}
+							System.out.println("REORGANIZATION: Binary files that are not linked (" + mgfs + "): " + toBeRemoved.size() + " // "
+									+ SystemAnalysisExt.getCurrentTime());
+							res.append("REORGANIZATION: Binary files that are not linked (" + mgfs + "): " + toBeRemoved.size() + " // "
+									+ SystemAnalysisExt.getCurrentTime() + "<br>");
+							long free = 0;
+							for (GridFSDBFile f : toBeRemoved) {
+								free += f.getLength();
+								gridfs.remove(f);
+							}
+							System.out.println("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
+									+ SystemAnalysisExt.getCurrentTime());
+							res.append("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
+									+ SystemAnalysisExt.getCurrentTime() + "<br>");
+							freeAll += free;
+						}
+						status.setCurrentStatusValueFineAdd(stepSize);
+					}
+					System.out.println("REORGANIZATION: Overall deleted MB: " + freeAll / 1024 / 1024 + " // "
+							+ SystemAnalysisExt.getCurrentTime());
+					res.append("REORGANIZATION: Overall deleted MB: " + freeAll / 1024 / 1024 + " // "
+							+ SystemAnalysisExt.getCurrentTime() + "<br>");
+					status.setCurrentStatusText1("Deleted MB: " + (freeAll / 1024 / 1024));
+					status.setCurrentStatusValueFine(100d / 5 * 5);
+				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		return res.toString();
+	}
 }
