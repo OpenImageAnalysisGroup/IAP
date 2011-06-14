@@ -737,9 +737,14 @@ public class ImageOperation {
 		new FlexibleImage(image).print(SystemAnalysisExt.getCurrentTime());
 	}
 	
-	public ImageOperation printImage(String title) {
-		new FlexibleImage(image).copy().print(title);
+	public ImageOperation printImage(String title, boolean doIt) {
+		if (doIt)
+			new FlexibleImage(image).copy().print(title);
 		return this;
+	}
+	
+	public ImageOperation printImage(String title) {
+		return printImage(title, true);
 	}
 	
 	// ############# save ######################
@@ -1564,7 +1569,7 @@ public class ImageOperation {
 				count++;
 			}
 		}
-		return new Lab(sumL / (double) count, sumA / (double) count, sumB / (double) count);
+		return new Lab(sumL / count, sumA / count, sumB / count);
 	}
 	
 	public ImageOperation medianFilter32Bit() {
@@ -2226,7 +2231,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new double[] { sumR / (double) count, sumG / (double) count, sumB / (double) count };
+		return new double[] { sumR / count, sumG / count, sumB / count };
 	}
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {
