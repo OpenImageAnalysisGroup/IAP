@@ -54,6 +54,7 @@ import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
@@ -144,7 +145,91 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				if (e.getButton() == MouseEvent.BUTTON3) {
 					JPopupMenu jp = new JPopupMenu("Debug");
 					
-					JMenuItem debugPipelineTest1 = new JMenuItem("Maize Analysis Pipeline (this+ref.)");
+					JMenuItem debugPipelineTestShowMainImage = new JMenuItem("Show Image");
+					debugPipelineTestShowMainImage.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								IOurl s = imageResult.getBinaryFileInfo().getFileNameMain();
+								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
+										s,
+										targetTreeNode.getExperiment());
+								
+								for (NumericMeasurementInterface nmi : match) {
+									ImageData id = (ImageData) nmi;
+									if (id.getURL().toString().equals(s.toString())) {
+										String oldRef = id.getURL().toString();
+										IOurl u = new IOurl(oldRef);
+										FlexibleImage fi = new FlexibleImage(u);
+										fi.print("Main Image");
+									}
+								}
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+										"Error", JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTestShowRefernceImage = new JMenuItem("Show Reference");
+					debugPipelineTestShowRefernceImage.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								IOurl s = imageResult.getBinaryFileInfo().getFileNameMain();
+								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
+										s,
+										targetTreeNode.getExperiment());
+								
+								for (NumericMeasurementInterface nmi : match) {
+									ImageData id = (ImageData) nmi;
+									if (id.getURL().toString().equals(s.toString())) {
+										String oldRef = id.getLabelURL().toString();
+										IOurl u = new IOurl(oldRef);
+										FlexibleImage fi = new FlexibleImage(u);
+										fi.print("Reference Image");
+									}
+								}
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+										"Error", JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTestShowImage = new JMenuItem("Show Old Reference");
+					debugPipelineTestShowImage.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								IOurl s = imageResult.getBinaryFileInfo().getFileNameMain();
+								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
+										s,
+										targetTreeNode.getExperiment());
+								
+								for (NumericMeasurementInterface nmi : match) {
+									ImageData id = (ImageData) nmi;
+									if (id.getURL().toString().equals(s.toString())) {
+										String oldRef = id.getAnnotationField("oldreference");
+										IOurl u = new IOurl(oldRef);
+										FlexibleImage fi = new FlexibleImage(u);
+										fi.print("Old Reference Image");
+									}
+								}
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+										"Error", JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTest1 = new JMenuItem("Maize Analysis Pipeline (Image+Reference)");
 					debugPipelineTest1.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -163,7 +248,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 					
-					JMenuItem debugPipelineTest2 = new JMenuItem("Maize Analysis Pipeline (ref.+old ref.)");
+					JMenuItem debugPipelineTest2 = new JMenuItem("Maize Analysis Pipeline (Reference+Old Reference)");
 					debugPipelineTest2.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -184,6 +269,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 					
+					jp.add(debugPipelineTestShowMainImage);
+					jp.add(debugPipelineTestShowRefernceImage);
+					jp.add(debugPipelineTestShowImage);
 					jp.add(debugPipelineTest1);
 					jp.add(debugPipelineTest2);
 					
