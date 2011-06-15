@@ -37,7 +37,7 @@ public class BlueMarkerFinder {
 					.printImage("nach opening")
 					.convert2Grayscale().printImage("nach gray")
 					// .medianFilter8Bit().printImage("nach8bit")
-					.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB()).printImage("nach thresh")
+					.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).printImage("nach thresh")
 					.findMax(10.0, MaximumFinder.SINGLE_POINTS).printImage("Single Point Search")
 					.findMax(10.0, MaximumFinder.LIST).opening(10, 0).printImage("MARKIERT GROESSER")
 					.getResultsTable();
@@ -48,7 +48,7 @@ public class BlueMarkerFinder {
 					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
 					.convert2Grayscale()
 					// .medianFilter8Bit()
-					.threshold(255 / 2, Color.WHITE.getRGB(), Color.BLACK.getRGB())
+					.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB())
 					.findMax(10.0, MaximumFinder.SINGLE_POINTS)
 					.findMax(10.0, MaximumFinder.LIST).opening(10, 0)
 					.getResultsTable();
