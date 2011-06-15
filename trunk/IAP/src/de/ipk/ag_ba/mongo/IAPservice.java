@@ -469,10 +469,10 @@ public class IAPservice {
 			ImageData id = (ImageData) nmi;
 			if (id.getLabelURL() != null) {
 				ImageData idMod = (ImageData) id.clone(id.getParentSample());
-				id.setURL(id.getLabelURL());
-				String annotation = id.getAnnotation();
+				idMod.setURL(idMod.getLabelURL());
+				String annotation = idMod.getAnnotation();
 				if (annotation != null && annotation.length() > 0 && id.getAnnotationField("oldreference") != null) {
-					id.setLabelURL(new IOurl(id.getAnnotationField("oldreference")));
+					idMod.setLabelURL(new IOurl(idMod.getAnnotationField("oldreference")));
 					result.add(idMod);
 				}
 			}

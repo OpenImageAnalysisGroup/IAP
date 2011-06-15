@@ -92,6 +92,8 @@ public class BlockPipeline {
 				status.setCurrentStatusText1(blockClass.getSimpleName());
 				status.setCurrentStatusText2(
 						"Finished " + index + "/" + blocks.size() + " (t=" + seconds + "s)");
+				if(status.wantsToStop())
+					break;
 			};
 		}
 		

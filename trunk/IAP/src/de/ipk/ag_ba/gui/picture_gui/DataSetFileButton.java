@@ -157,7 +157,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								
 								for (NumericMeasurementInterface nmi : match) {
 									ImageData id = (ImageData) nmi;
-									if (id.getURL().toString().equals(s.toString())) {
+									if (id.getURL().getDetail().equals(s.getDetail())) {
 										String oldRef = id.getURL().toString();
 										IOurl u = new IOurl(oldRef);
 										FlexibleImage fi = new FlexibleImage(u);
@@ -185,7 +185,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								
 								for (NumericMeasurementInterface nmi : match) {
 									ImageData id = (ImageData) nmi;
-									if (id.getURL().toString().equals(s.toString())) {
+									if (id.getURL().getDetail().equals(s.getDetail())) {
 										String oldRef = id.getLabelURL().toString();
 										IOurl u = new IOurl(oldRef);
 										FlexibleImage fi = new FlexibleImage(u);
@@ -213,7 +213,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								
 								for (NumericMeasurementInterface nmi : match) {
 									ImageData id = (ImageData) nmi;
-									if (id.getURL().toString().equals(s.toString())) {
+									if (id.getURL().getDetail().equals(s.getDetail())) {
 										String oldRef = id.getAnnotationField("oldreference");
 										IOurl u = new IOurl(oldRef);
 										FlexibleImage fi = new FlexibleImage(u);
