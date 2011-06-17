@@ -19,12 +19,17 @@ public class ImageComparator {
 	}
 	
 	public ImageOperation compareImages(FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background, boolean green, boolean yellow) {
+		return compareImages(referenceImage, lDiffA, lDiffB, abDiff, background, green, yellow, false);
+	}
+	
+	public ImageOperation compareImages(FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background, boolean green,
+			boolean yellow,
+			boolean adaptiveDependingOnIntensity) {
 		
 		// inputImage = new ImageOperation(inputImage).blur(1).getImage();
 		// referenceImage = new ImageOperation(referenceImage).blur(2).getImage();
 		
 		int[] imgInp = inputImage.getAs1A();
-		
 		double[][] labImage;
 		double[][] labImageRef;
 		
@@ -50,11 +55,28 @@ public class ImageComparator {
 			double a = Math.abs(labImage[1][index] - labImageRef[1][index]);
 			double b = Math.abs(labImage[2][index] - labImageRef[2][index]);
 			
+			double adaption = 1;
+			if (adaptiveDependingOnIntensity) {
+				double lmean = (labImage[0][index] + labImageRef[0][index]) / 2;
+				// 50 ===> 1
+				// 100 ===> 0.5
+				// __0 ===> 1.5
+				adaption = (50 - lmean) / 50d * 0.5d + 1d;
+				
+				// __0 ===> 2 min: 57.855087180124805 max: 107.26839402518289
+				if (lmean < 50)
+					adaption = (adaption - 1) * 2 + 1;
+				if (lmean < 50)
+					System.out.println(adaption);
+				if (lmean > 100)
+					System.out.println(lmean);
+			}
+			
 			boolean lOK;
 			if (l < 0)
-				lOK = -l < lDiffA;
+				lOK = -l < lDiffA * adaption;
 			else
-				lOK = l < lDiffB;
+				lOK = l < lDiffB * adaption;
 			
 			double aI = labImage[1][index];
 			double bI = labImage[1][index];
@@ -73,6 +95,32 @@ public class ImageComparator {
 				yellowint = false;
 			
 			if (a + b < abDiff && lOK && !greenint && !yellowint) {
+				result[index] = background;
+			} else {
+				result[index] = imgInp[index];
+			}
+		}
+		return new ImageOperation(new FlexibleImage(result, width, height));
+	}
+	
+	public ImageOperation compareGrayImages(FlexibleImage referenceImage, double maxDiffBlack, double maxDiffWhite, int background) {
+		
+		int[] imgInp = inputImage.getAs1A();
+		int[] imgRef = referenceImage.getAs1A();
+		int width = inputImage.getWidth();
+		int height = inputImage.getHeight();
+		
+		int[] result = new int[width * height];
+		
+		for (int index = 0; index < width * height; index++) {
+			
+			int in = (imgInp[index] & 0x0000ff);
+			int ref = (imgRef[index] & 0x0000ff);
+			int diff = Math.abs(in - ref);
+			int avg = (in + ref) / 2;
+			double maxDiff = avg / 255d * (maxDiffWhite - maxDiffBlack) + maxDiffBlack;
+			boolean equal = diff < maxDiff;
+			if (equal) {
 				result[index] = background;
 			} else {
 				result[index] = imgInp[index];

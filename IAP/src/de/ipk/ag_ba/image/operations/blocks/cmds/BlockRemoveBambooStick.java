@@ -10,6 +10,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 
 /**
+ * Clear bamboo stick in visible image. Use lab filter to select the stick pixels.
+ * 
  * @author pape
  */
 public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {

@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MorphologicalOperators;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -12,7 +13,8 @@ public class BlockClosing extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null)
 			return null;
-		return closing(getInput().getMasks().getVis(), getInput().getImages().getVis());
+		FlexibleImage rr = new ImageOperation(getInput().getMasks().getVis()).blur(3).getImage();
+		return closing(rr, getInput().getImages().getVis());
 	}
 	
 	@Override

@@ -28,13 +28,13 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 				// System.out.println("mark: " + markerPosLeftY.getValue());
 				if (markerPosLeftY.getValue() > 0.5)
 					result = new ImageOperation(result).clearImageBottom(
-							(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 40, options.getBackground()).getImage();
+							(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 45, options.getBackground()).getImage();
 			} else
 				if (markerPosLeftY == null && markerPosRightY != null) {
 					// System.out.println("mark: " + markerPosRightY.getValue());
 					if (markerPosRightY.getValue() > 0.5)
 						result = new ImageOperation(result).clearImageBottom(
-								(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 40, options.getBackground()).getImage();
+								(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 45, options.getBackground()).getImage();
 				}
 			
 			boolean clearSides = true;
@@ -105,7 +105,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 					if (temp > 0.5) {
 						double pos = temp * getInput().getImages().getNir().getHeight();
 						if (pos > 10)
-							pos -= 10;
+							pos -= 18;
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) (pos), options.getBackground()).getImage();
 						boolean clearSides = true;
@@ -128,7 +128,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 					if (temp > 0.5) {
 						double pos = (temp * getInput().getImages().getNir().getHeight());
 						if (pos > 10)
-							pos -= 14;
+							pos -= 18;
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) pos, options.getBackground()).getImage();
 						boolean clearSides = true;
