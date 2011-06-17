@@ -8,13 +8,22 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
+	protected void prepare() {
+		super.prepare();
+		if (getInput().getMasks().getFluo() != null && getInput().getMasks().getVis() != null) {
+			FlexibleImage fluoMask = clearImageSide(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), -0.07d);
+			getInput().getMasks().setFluo(fluoMask);
+		}
+	}
+	
+	@Override
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null || getInput().getMasks().getFluo() == null)
 			return null;
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
-			return clearImageSide(input, getInput().getMasks().getFluo());
+			return clearImageSide(input, getInput().getMasks().getFluo(), 0.1);
 		}
 		
 		if (options.getCameraTyp() == CameraTyp.TOP) {
@@ -32,7 +41,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
-			return clearImageSide(input, getInput().getMasks().getFluo());
+			return clearImageSide(input, getInput().getMasks().getFluo(), 0.03);
 		}
 		
 		if (options.getCameraTyp() == CameraTyp.TOP) {
@@ -50,7 +59,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		if (options.getCameraTyp() == CameraTyp.SIDE) {
 			FlexibleImage input = getInput().getImages().getNir();
 			
-			return clearImageSide(input, getInput().getMasks().getFluo());
+			return clearImageSide(input, getInput().getMasks().getFluo(), 0.03);
 		}
 		
 		if (options.getCameraTyp() == CameraTyp.TOP) {
@@ -61,7 +70,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		return getInput().getMasks().getNir();
 	}
 	
-	private FlexibleImage clearImageSide(FlexibleImage input, FlexibleImage fluo) {
+	private FlexibleImage clearImageSide(FlexibleImage input, FlexibleImage fluo, double cutTop) {
 		ImageOperation ioInput = new ImageOperation(input);
 		int background = options.getBackground();
 		ImageOperation ioFluo = new ImageOperation(fluo);
@@ -77,7 +86,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		
 		double s = scaleFactor;
 		
-		double pa = 0.1;
+		double pa = cutTop;
 		double pl = 0.02;
 		double pr = 0.02;
 		

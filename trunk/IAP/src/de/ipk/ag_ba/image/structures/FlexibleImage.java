@@ -16,6 +16,7 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
+import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
@@ -100,9 +101,19 @@ public class FlexibleImage {
 		return h;
 	}
 	
-	public void print(String title) {
-		PrintImage.printImage(image, title);
-		IAPmain.showImageJ();
+	public FlexibleImage print(String title, boolean doIt) {
+		if (doIt)
+			return print(title);
+		else
+			return this;
+	}
+	
+	public FlexibleImage print(String title) {
+		if (!SystemAnalysis.isHeadless()) {
+			PrintImage.printImage(image, title);
+			IAPmain.showImageJ();
+		}
+		return this;
 	}
 	
 	public ImagePlus getAsImagePlus() {

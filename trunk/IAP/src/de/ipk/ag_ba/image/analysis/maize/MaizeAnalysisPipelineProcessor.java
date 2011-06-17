@@ -90,6 +90,8 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		p.add(BlockClosing.class);
 		p.add(BlockRemoveBambooStick.class);
 		p.add(BlockRemoveSmallClusters.class);
+		p.add(BlockLabFilter.class);
+		// p.add(BlockRemoveSplitObjectsAbove.class);
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
 		p.add(BlockNirProcessing.class);
 		p.add(BlockCopyImagesApplyMask.class); // without nir
