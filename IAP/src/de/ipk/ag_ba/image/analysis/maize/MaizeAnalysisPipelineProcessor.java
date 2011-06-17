@@ -17,13 +17,15 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDecreaseMaskSize;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilter;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirProcessing;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveBambooStick;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHeight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBelowLowestMarker;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkers;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFluoToIntensity;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
@@ -72,6 +74,7 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		
 		BlockPipeline p = new BlockPipeline(options);
 		
+		// preprocessing
 		p.add(BlockDecreaseImageAndMaskSize.class); // divide input (but not NIR) by 2
 		p.add(BlockColorBalancing.class);
 		p.add(BlockImageInfo.class);
@@ -80,21 +83,25 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		p.add(BlockFindBlueMarkers.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
 		p.add(BlockLabFilter.class);
-		p.add(BlockClearMasksBelowLowestMarker.class);
+		p.add(BlockClearMasksBasedOnMarkers.class);
 		p.add(BlockRemoveSmallStructuresFromTopVisUsingOpening.class);
 		p.add(BlockMedianFilter.class);
 		p.add(BlockClosingForYellowVisMask.class);
+		p.add(BlockClosing.class);
+		p.add(BlockRemoveBambooStick.class);
 		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
-		p.add(BlockClosing.class);
-		p.add(BlockCopyImagesApplyMask.class);
+		p.add(BlockNirProcessing.class);
+		p.add(BlockCopyImagesApplyMask.class); // without nir
 		
+		// calculation of numeric values
 		p.add(BlockCalculateMainAxis.class);
 		p.add(BlockCalculateWidthAndHeight.class);
 		p.add(BlockFluoToIntensity.class);
 		p.add(BlockIntensityAnalysis.class);
 		p.add(BlockConvexHullOnFLuo.class);
 		
+		// postprocessing
 		p.add(BlockMoveMasksToImages.class);
 		p.add(BlockCropImages.class);
 		

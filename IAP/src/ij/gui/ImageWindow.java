@@ -610,7 +610,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			IJ.wait(10); // may be needed for Java 1.4 on OS X
 			setMenuBar(Menus.getMenuBar());
 		}
-		imp.setActivated(); // notify ImagePlus that image has been activated
+		if (imp != null)
+			imp.setActivated(); // notify ImagePlus that image has been activated
 		if (!closed && !quitting && !Interpreter.isBatchMode())
 			WindowManager.setCurrentWindow(this);
 		Frame channels = Channels.getInstance();

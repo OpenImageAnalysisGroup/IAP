@@ -23,13 +23,13 @@ public class BlockCopyImagesApplyMask extends AbstractSnapshotAnalysisBlockFIS {
 		return new ImageOperation(getInput().getImages().getFluo()).applyMask_ResizeSourceIfNeeded(fluoMask, options.getBackground()).getImage();
 	}
 	
-	@Override
-	protected FlexibleImage processNIRmask() {
-		if (getInput().getMasks().getNir() != null) {
-			FlexibleImage nirMask = getInput().getMasks().getNir();
-			return new ImageOperation(getInput().getImages().getNir()).applyMask_ResizeSourceIfNeeded(nirMask, options.getBackground()).getImage();
-		} else
-			return null;
-	}
+	// @Override
+	// protected FlexibleImage processNIRmask() {
+	// if (getInput().getMasks().getNir() != null) {
+	// FlexibleImage nirMask = getInput().getMasks().getNir();
+	// return new ImageOperation(getInput().getImages().getNir()).applyMask_ResizeSourceIfNeeded(nirMask, options.getBackground()).getImage();
+	// } else
+	// return null;
+	// }
 	
 }

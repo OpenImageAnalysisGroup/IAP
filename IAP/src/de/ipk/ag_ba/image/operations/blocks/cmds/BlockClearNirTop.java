@@ -24,6 +24,6 @@ public class BlockClearNirTop extends AbstractSnapshotAnalysisBlockFIS {
 		if (options.getCameraTyp() == CameraTyp.TOP)
 			return null;
 		else
-			return getInput().getMasks().getNir();
+			return getInput().getImages().getNir();
 	}
 }

@@ -37,16 +37,16 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 				new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO), 255 });
 	}
 	
-	@Override
-	protected FlexibleImage processNIRmask() {
-		if (getInput().getMasks().getNir() != null) {
-			return labFilter(getInput().getMasks().getNir(), getInput().getImages().getNir(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_NIR),
-					options.getIntSetting(Setting.LAB_MAX_L_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_A_VALUE_NIR),
-					options.getIntSetting(Setting.LAB_MAX_A_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_B_VALUE_NIR),
-					options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR));
-		} else
-			return null;
-	}
+	// @Override
+	// protected FlexibleImage processNIRmask() {
+	// if (getInput().getMasks().getNir() != null) {
+	// return labFilter(getInput().getMasks().getNir(), getInput().getImages().getNir(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_NIR),
+	// options.getIntSetting(Setting.LAB_MAX_L_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_A_VALUE_NIR),
+	// options.getIntSetting(Setting.LAB_MAX_A_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_B_VALUE_NIR),
+	// options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR));
+	// } else
+	// return null;
+	// }
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int[] lowerValueOfL, int[] upperValueOfL, int[] lowerValueOfA,
 			int[] upperValueOfA, int[] lowerValueOfB, int[] upperValueOfB) {

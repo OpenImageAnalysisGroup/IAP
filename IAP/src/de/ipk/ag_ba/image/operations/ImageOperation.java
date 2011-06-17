@@ -1972,6 +1972,11 @@ public class ImageOperation {
 		return new ImageComparator(getImage());
 	}
 	
+	/**
+	 * Alll Pixels will be count, which not equals background color = PhenotypeAnalysisTask.BACKGROUND_COLORint.
+	 * 
+	 * @return
+	 */
 	public int countFilledPixels() {
 		int res = 0;
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
@@ -1997,6 +2002,11 @@ public class ImageOperation {
 		return new IntensityAnalysis(this, n);
 	}
 	
+	/**
+	 * Each channel of an rgb-image will be weighted by the function p = 4 * g - (3 * b) - r.
+	 * 
+	 * @return
+	 */
 	public ImageOperation rgbChannelWeighting() {
 		
 		int[] pixels = getImageAs1array();
@@ -2101,9 +2111,10 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * for 3 Channels 24 bit
+	 * Image channels were multiplicted by factors {1, 2, 3} (a factor for each channel).
 	 * 
 	 * @param factors
+	 *           - for 3 Channels of an 24 bit image
 	 * @return
 	 */
 	public ImageOperation multiplicateImageChannelsWithFactors(double[] factors) {
@@ -2246,5 +2257,50 @@ public class ImageOperation {
 			if (mp.getRight() != null)
 				a.fillRect((int) (mp.getRight().x - s), (int) (mp.getRight().y - s), s * 2, s * 2);
 		return a;
+	}
+	
+	// maybe extract this functions in their own class color/white balancing
+	/**
+	 * intensity balancing for a rgb-image, pixels {r,g,b} is the reference which will be normalized to the brightness.
+	 * e.g.: the pixel with the values of {x,y,z} should be normalized to brightness white (value of 255 in rgb-image),
+	 * so all pixels were multiplicated by the calculated factor 255/{x,y,z}
+	 * 
+	 * @author pape
+	 */
+	public ImageOperation ImageBalancing(int brightness, double[] pixels) {
+		if (image == null)
+			return null;
+		double r = brightness / pixels[0];
+		double g = brightness / pixels[1];
+		double b = brightness / pixels[2];
+		double[] factors = { r, g, b };
+		ImageOperation io = new ImageOperation(image);
+		return io.multiplicateImageChannelsWithFactors(factors);
+	}
+	
+	/**
+	 * Calculates the average of the brightness of an area around an image.
+	 * 
+	 * @author pape
+	 */
+	public double[] getProbablyWhitePixels(double size) {
+		int[][] img2d = getImageAs2array();
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int w = (int) (width * size);
+		int h = (int) (height * size);
+		
+		ImageOperation io = new ImageOperation(image);
+		
+		double[] valuesleft = io.getRGBAverage(img2d, 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
+		double[] valuesright = io.getRGBAverage(img2d, width - 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
+		double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
+		double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);
+		
+		double r = (valuesleft[0] + valuesright[0] + valuestop[0] + valuesdown[0]) / 4;
+		double g = (valuesleft[1] + valuesright[1] + valuestop[1] + valuesdown[1]) / 4;
+		double b = (valuesleft[2] + valuesright[2] + valuestop[2] + valuesdown[2]) / 4;
+		
+		return new double[] { r, g, b };
 	}
 }
