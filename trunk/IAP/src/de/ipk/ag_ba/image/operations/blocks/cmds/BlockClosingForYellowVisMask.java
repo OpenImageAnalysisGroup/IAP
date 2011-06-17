@@ -7,6 +7,11 @@ import de.ipk.ag_ba.image.operations.MorphologicalOperators;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
+/**
+ * Improve flower visibility for visible mask.
+ * 
+ * @author pape
+ */
 public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockFIS {
 	protected int closeOperations = -1;
 	
@@ -20,8 +25,8 @@ public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockF
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
 		
-		FlexibleImage workImage = closing(mask, image, options.getBackground(), options.getIntSetting(Setting.CLOSING_REPEAT) * 2
-				* options.getIntSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK) * options.getIntSetting(Setting.SCALE_FACTOR_DECREASE_MASK));
+		FlexibleImage workImage = closing(mask, image, options.getBackground(), (int) (options.getIntSetting(Setting.CLOSING_REPEAT) * 2
+				* options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK) * options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK)));
 		return workImage;
 	}
 	
@@ -68,16 +73,19 @@ public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockF
 		int[][] mask = image;
 		
 		int blue = Color.BLUE.getRGB();
-		
+		boolean debug = false;
 		boolean flag = false;
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				if (mask[x][y] != 0) {
-					if (flag)
+					if (debug) {
+						if (flag)
+							rgbArray[x + y * w] = rgbNonModifiedArray[x + y * w];
+						else
+							rgbArray[x + y * w] = blue;
+						flag = !flag;
+					} else
 						rgbArray[x + y * w] = rgbNonModifiedArray[x + y * w];
-					else
-						rgbArray[x + y * w] = blue;
-					flag = !flag;
 				}
 			}
 		}

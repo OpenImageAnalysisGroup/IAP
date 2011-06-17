@@ -73,31 +73,4 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 		}
 		throw new UnsupportedOperationException("Unknown camera setting.");
 	}
-	
-	@Override
-	protected FlexibleImage processNIRmask() {
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
-			if (getInput().getMasks().getNir() != null) {
-				return new ImageOperation(getInput().getImages().getNir()).compare()
-						.compareImages(getInput().getMasks().getNir(),
-								options.getIntSetting(Setting.L_Diff_NIR),
-								options.getIntSetting(Setting.L_Diff_NIR),
-								options.getIntSetting(Setting.abDiff_NIR),
-								back, false, false).border(2).getImage();
-			} else
-				return null;
-		}
-		if (options.getCameraTyp() == CameraTyp.TOP) {
-			if (getInput().getMasks().getNir() != null) {
-				return new ImageOperation(getInput().getMasks().getNir()).compare()
-						.compareImages(getInput().getMasks().getNir(),
-								options.getIntSetting(Setting.L_Diff_NIR),
-								options.getIntSetting(Setting.L_Diff_NIR),
-								options.getIntSetting(Setting.abDiff_NIR),
-								back, false, false).border(2).getImage();
-			} else
-				return null;
-		}
-		throw new UnsupportedOperationException("Unknown camera setting.");
-	}
 }

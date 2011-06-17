@@ -172,8 +172,8 @@ public class ImageProcessorOptions {
 		setCameraTyp(CameraTyp.UNKNOWN);
 		setNeighbourhood(NeighbourhoodSetting.NB4);
 		
-		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB, (0.001d) / 4);
-		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, (0.001d) / 4);
+		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB, (0.001d) / 2);
+		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, (0.001d) / 7);
 		addDoubleSetting(Setting.SCALE, scale);
 		addIntSetting(Setting.ROTATION_ANGLE, -3);
 		addDoubleSetting(Setting.SCALE_X, 0.95);
@@ -270,7 +270,7 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.abDiff_VIS, 40); // 40
 		addIntSetting(Setting.L_Diff_FLOU, 20);
 		addIntSetting(Setting.abDiff_FLOU, 30);
-		addIntSetting(Setting.L_Diff_NIR, 19); // 14
+		addIntSetting(Setting.L_Diff_NIR, 5); // 14
 		addIntSetting(Setting.abDiff_NIR, 20);
 		
 		addBooleanSetting(Setting.IS_PARAMETER_SEARCH, false);
