@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -15,7 +15,7 @@ public class BlockNirProcessing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleMaskAndImageSet run() throws InterruptedException {
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			if (getInput().getImages().getNir() != null && getInput().getMasks().getNir() != null) {
 				{
 					FlexibleImage nir = getInput().getImages().getNir();

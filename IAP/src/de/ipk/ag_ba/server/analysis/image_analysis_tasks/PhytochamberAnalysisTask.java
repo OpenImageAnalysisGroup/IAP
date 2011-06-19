@@ -17,6 +17,7 @@ import de.ipk.ag_ba.gui.actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -24,9 +25,9 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.server.analysis.IOmodule;
+import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
@@ -41,7 +42,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 /**
  * @author klukas
  */
-public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
+public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 	
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
@@ -165,7 +166,9 @@ public class PhytochamberAnalysisTask extends AbstractImageAnalysisTask {
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages()) {
 							
-							ImageProcessorOptions options = new ImageProcessorOptions(vis, fluo, nir);
+							ImageProcessorOptions options = new ImageProcessorOptions();
+							if (vis != null && vis.getPosition() != null)
+								options.addDoubleSetting(Setting.ROTATION_ANGLE, vis.getPosition());
 							
 							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(options);
 							

@@ -65,7 +65,7 @@ public class BarleyTopImageProcessor {
 		
 		FlexibleMaskAndImageSet result = null;
 		
-		BlockPipeline p = new BlockPipeline(options);
+		BlockPipeline p = new BlockPipeline();
 		
 		if (automaticParameterSearch) {
 			p.add(BlockImageInfo.class);
@@ -122,7 +122,7 @@ public class BarleyTopImageProcessor {
 		if (cropResult && cropWorking)
 			p.add(BlockCropMasks.class);
 		
-		result = p.execute(workset, debugStack, settings, null);
+		result = p.execute(options, workset, debugStack, settings, null);
 		
 		if (debugStack != null) {
 			debugStack.addImage("RESULT", result.getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));

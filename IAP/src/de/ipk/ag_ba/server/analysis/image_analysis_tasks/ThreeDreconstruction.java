@@ -19,7 +19,6 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
@@ -42,7 +41,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 /**
  * @author klukas
  */
-public class ThreeDreconstruction extends AbstractImageAnalysisTask {
+public class ThreeDreconstruction implements ImageAnalysisTask {
 	
 	private Collection<NumericMeasurementInterface> output;
 	private Collection<NumericMeasurementInterface> input;
@@ -93,21 +92,6 @@ public class ThreeDreconstruction extends AbstractImageAnalysisTask {
 	@Override
 	public ImageAnalysisType[] getOutputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_VOLUME };
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
-	 * performImageAnalysis(int,
-	 * org.BackgroundTaskStatusProviderSupportingExternalCall)
-	 */
-	/**
-	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
-	 */
-	@Deprecated
-	@Override
-	public void performAnalysis(int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) {
-		performAnalysis(maximumThreadCount, 1, status);
 	}
 	
 	/*

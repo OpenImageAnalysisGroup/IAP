@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -13,7 +13,7 @@ public class BlockClearNirTop extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (options.getCameraTyp() == CameraTyp.TOP)
+		if (options.getCameraTyp() == CameraPosition.TOP)
 			return null;
 		else
 			return getInput().getMasks().getNir();
@@ -21,7 +21,7 @@ public class BlockClearNirTop extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		if (options.getCameraTyp() == CameraTyp.TOP)
+		if (options.getCameraTyp() == CameraPosition.TOP)
 			return null;
 		else
 			return getInput().getImages().getNir();

@@ -14,7 +14,6 @@ import java.util.LinkedList;
 
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * First: add a enumeration which describe the descriptor
@@ -23,6 +22,10 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas, entzian
  */
 public class ImageProcessorOptions {
+	
+	private final HashMap<Setting, LinkedList<Double>> numericSettings = new HashMap<ImageProcessorOptions.Setting, LinkedList<Double>>();
+	private CameraPosition cameraTyp;
+	private NeighbourhoodSetting neighbourhood;
 	
 	public enum Setting {
 			TRANSLATE_X, TRANSLATE_Y,
@@ -64,23 +67,13 @@ public class ImageProcessorOptions {
 
 			IS_PARAMETER_SEARCH, IS_CROP_RESULT,
 
-			SCALE_FACTOR_DECREASE_MASK, SCALE_FACTOR_DECREASE_IMG_AND_MASK;
-		
+			SCALE_FACTOR_DECREASE_MASK, SCALE_FACTOR_DECREASE_IMG_AND_MASK,
+
+			INPUT_VIS_IMAGE_ROTATION_ANGLE;
 	}
 	
-	// HashMap<IntSetting, Queue<Integer>> integerOptions = new HashMap<ImageProcessorOptions.IntSetting, Queue<Integer>>();
-	HashMap<Setting, LinkedList<Double>> doubleOptions = new HashMap<ImageProcessorOptions.Setting, LinkedList<Double>>();
-	private ImageData vis;
-	private ImageData fluo;
-	private ImageData nir;
-	
-	// HashMap<BooleanSetting, Queue<Boolean>> booleanOptions = new HashMap<ImageProcessorOptions.BooleanSetting, Queue<Boolean>>();
-	
-	public ImageProcessorOptions(ImageData vis, ImageData fluo, ImageData nir) {
+	public ImageProcessorOptions() {
 		this(1.0);
-		this.vis = vis;
-		this.fluo = fluo;
-		this.nir = nir;
 	}
 	
 	public ImageProcessorOptions(double scale) {
@@ -99,21 +92,21 @@ public class ImageProcessorOptions {
 	}
 	
 	public double showNextValue(Setting s) {
-		return doubleOptions.get(s).peek();
+		return numericSettings.get(s).peek();
 	}
 	
 	public void addDoubleSetting(Setting s, double value) {
-		if (!doubleOptions.containsKey(s))
-			doubleOptions.put(s, new LinkedList<Double>());
+		if (!numericSettings.containsKey(s))
+			numericSettings.put(s, new LinkedList<Double>());
 		// doubleOptions.put(s, new Stack<Double>());
-		doubleOptions.get(s).addLast(value);
+		numericSettings.get(s).addLast(value);
 	}
 	
 	public void showLinkedList(Setting s) {
 		System.out.println("LinkedList: ");
 		int i = 1;
-		while (doubleOptions.get(s).isEmpty()) {
-			System.out.println(i + ". TopElement: " + doubleOptions.get(s).pop());
+		while (numericSettings.get(s).isEmpty()) {
+			System.out.println(i + ". TopElement: " + numericSettings.get(s).pop());
 			i++;
 		}
 	}
@@ -126,18 +119,22 @@ public class ImageProcessorOptions {
 		return (int) getDoubleSetting(s);
 	}
 	
+	public boolean hasDoubleSetting(Setting s) {
+		return numericSettings.containsKey(s);
+	}
+	
 	public double getDoubleSetting(Setting s) {
-		if (doubleOptions.get(s).size() > 1)
-			return doubleOptions.get(s).pollFirst();
+		if (numericSettings.get(s).size() > 1)
+			return numericSettings.get(s).pollFirst();
 		// return doubleOptions.get(s).pop();
 		
 		else
-			return doubleOptions.get(s).peek();
+			return numericSettings.get(s).peek();
 	}
 	
 	public void clearSetting(Setting s) {
-		if (doubleOptions.containsKey(s)) {
-			doubleOptions.remove(s);
+		if (numericSettings.containsKey(s)) {
+			numericSettings.remove(s);
 		}
 	}
 	
@@ -156,10 +153,7 @@ public class ImageProcessorOptions {
 		addBooleanSetting(s, value);
 	}
 	
-	private CameraTyp cameraTyp;
-	private NeighbourhoodSetting neighbourhood;
-	
-	public enum CameraTyp {
+	public enum CameraPosition {
 		UNKNOWN, TOP, SIDE
 	}
 	
@@ -169,7 +163,7 @@ public class ImageProcessorOptions {
 	
 	public void initStandardValues(double scale) {
 		
-		setCameraTyp(CameraTyp.UNKNOWN);
+		setCameraPosition(CameraPosition.UNKNOWN);
 		setNeighbourhood(NeighbourhoodSetting.NB4);
 		
 		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB, (0.001d) / 3);
@@ -281,14 +275,12 @@ public class ImageProcessorOptions {
 		
 	}
 	
-	// ########## SET ###############
-	
-	public void setCameraTyp(CameraTyp cameraTyp) {
+	public void setCameraPosition(CameraPosition cameraTyp) {
 		this.cameraTyp = cameraTyp;
 		
 	}
 	
-	public CameraTyp getCameraTyp() {
+	public CameraPosition getCameraTyp() {
 		return cameraTyp;
 		
 	}
@@ -304,17 +296,4 @@ public class ImageProcessorOptions {
 	public NeighbourhoodSetting getNeighbourhood() {
 		return neighbourhood;
 	}
-	
-	public ImageData getVis() {
-		return vis;
-	}
-	
-	public ImageData getFluo() {
-		return fluo;
-	}
-	
-	public ImageData getNir() {
-		return nir;
-	}
-	
 }

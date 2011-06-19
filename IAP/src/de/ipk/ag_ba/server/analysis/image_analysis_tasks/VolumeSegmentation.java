@@ -14,8 +14,8 @@ import org.ErrorMsg;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.IOmodule;
+import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.analysis.ThreeDsegmentationColored;
 import de.ipk.ag_ba.server.databases.DBTable;
@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 /**
  * @author klukas
  */
-public class VolumeSegmentation extends AbstractImageAnalysisTask {
+public class VolumeSegmentation implements ImageAnalysisTask {
 	
 	private static int somSize = 4;
 	protected Collection<NumericMeasurementInterface> input;
@@ -70,15 +70,6 @@ public class VolumeSegmentation extends AbstractImageAnalysisTask {
 	@Override
 	public String getTaskDescription() {
 		return "Color- and SOM-based Volume Segmentation";
-	}
-	
-	/**
-	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
-	 */
-	@Deprecated
-	@Override
-	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status) {
-		performAnalysis(maximumThreadCount, 1, status);
 	}
 	
 	@Override

@@ -17,6 +17,7 @@ import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
@@ -59,7 +60,12 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 			public void run() {
 				// check all gridFS file collections and look for matching hash value...
 				for (String fs : MongoGridFS.getFileCollections()) {
+					DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
+					collectionChunks.ensureIndex("files_id");
+				}
+				for (String fs : MongoGridFS.getFileCollections()) {
 					GridFS gridfs = new GridFS(db, fs);
+					
 					GridFSDBFile fff = gridfs.findOne(url.getDetail());
 					if (fff != null) {
 						try {
@@ -94,6 +100,10 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 			@Override
 			public void run() {
 				// check all gridFS file collections and look for matching hash value...
+				for (String fs : MongoGridFS.getPreviewFileCollections()) {
+					DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
+					collectionChunks.ensureIndex("files_id");
+				}
 				for (String fs : MongoGridFS.getPreviewFileCollections()) {
 					GridFS gridfs = new GridFS(db, fs);
 					GridFSDBFile fff = gridfs.findOne(url.getDetail());

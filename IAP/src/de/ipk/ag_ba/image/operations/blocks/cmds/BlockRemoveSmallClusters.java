@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -21,7 +21,7 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getVis() == null)
 			return null;
 		
-		if (options.getCameraTyp() == CameraTyp.TOP) {
+		if (options.getCameraTyp() == CameraPosition.TOP) {
 			FlexibleImage res =
 					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
 							options.getNeighbourhood(), options.getCameraTyp(), null).getImage();
@@ -40,7 +40,7 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getFluo() == null)
 			return null;
 		
-		if (options.getCameraTyp() == CameraTyp.TOP) {
+		if (options.getCameraTyp() == CameraPosition.TOP) {
 			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
 					options.getNeighbourhood(), options.getCameraTyp(), null).getImage();
 		} else {

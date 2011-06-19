@@ -5,7 +5,8 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MainAxisCalculationResult;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -22,16 +23,15 @@ public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		
-		if (options.getCameraTyp() == CameraTyp.TOP && getInput().getMasks().getVis() != null) {
+		if (options.getCameraTyp() == CameraPosition.TOP && getInput().getMasks().getVis() != null) {
 			MainAxisCalculationResult macr = getAngle(getInput().getMasks().getVis());
 			if (macr != null) {
 				double angle = macr.getMinResult().getAngle();
 				
 				double imageRotationAngle = 0;
-				if (options.getVis() != null) {
-					imageRotationAngle = options.getVis().getPosition() != null ? options.getVis().getPosition() : 0;
-					if (options.getVis().getPosition() != null)
-						System.out.println("Considering top image rotation: " + imageRotationAngle);
+				if (options.hasDoubleSetting(Setting.INPUT_VIS_IMAGE_ROTATION_ANGLE)) {
+					imageRotationAngle = options.getDoubleSetting(Setting.INPUT_VIS_IMAGE_ROTATION_ANGLE);
+					System.out.println("Considering top image rotation: " + imageRotationAngle);
 				}
 				
 				angle = angle - imageRotationAngle;

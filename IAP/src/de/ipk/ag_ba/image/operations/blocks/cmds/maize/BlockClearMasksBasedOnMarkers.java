@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -13,7 +13,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 	@Override
 	protected FlexibleImage processVISmask() {
 		
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
 			BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
@@ -58,7 +58,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 		if (getInput().getImages().getFluo() == null)
 			return null;
 		
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getFluo();
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			
@@ -90,7 +90,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 	@Override
 	protected FlexibleImage processNIRimage() {
 		
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			if (getInput().getImages().getNir() != null) {
 				FlexibleImage input = getInput().getImages().getNir();
 				
@@ -156,7 +156,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 	@Override
 	protected FlexibleImage processNIRmask() {
 		
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			if (getInput().getMasks().getNir() != null) {
 				FlexibleImage input = getInput().getMasks().getNir();
 				

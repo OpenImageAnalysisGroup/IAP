@@ -14,8 +14,8 @@ import org.color.ColorUtil;
 import org.color.Color_CIE_Lab;
 
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.IOmodule;
+import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -26,7 +26,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 /**
  * @author klukas
  */
-public class ColorHueStatistics extends AbstractImageAnalysisTask {
+public class ColorHueStatistics implements ImageAnalysisTask {
 	
 	private Collection<NumericMeasurementInterface> output;
 	private final int colorCount;
@@ -75,21 +75,6 @@ public class ColorHueStatistics extends AbstractImageAnalysisTask {
 	@Override
 	public String getTaskDescription() {
 		return "Calculates a Color-Hue Histogram";
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
-	 * performAnalysis(int,
-	 * org.BackgroundTaskStatusProviderSupportingExternalCall)
-	 */
-	/**
-	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
-	 */
-	@Deprecated
-	@Override
-	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status) {
-		performAnalysis(maximumThreadCount, 1, status);
 	}
 	
 	/*

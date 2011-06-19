@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 public class IAmodule {
 	
-	private ArrayList<AbstractImageAnalysisTask> todo = new ArrayList<AbstractImageAnalysisTask>();
+	private final ArrayList<ImageAnalysisTask> todo = new ArrayList<ImageAnalysisTask>();
 	
 	public WorkerInfo getWorkerInfo() {
 		return new WorkerInfo(todo.size(), 0, 0, 0, "Images / Min");

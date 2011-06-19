@@ -3,7 +3,7 @@ package de.ipk.ag_ba.image.analysis.maize;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirTop;
@@ -36,13 +36,9 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
-	public MaizeAnalysisPipelineProcessor(ImageProcessorOptions options) {
-		super(options);
-	}
-	
 	@Override
-	protected BlockPipeline getPipeline() {
-		if (options.getCameraTyp() == CameraTyp.TOP) {
+	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
+		if (options.getCameraTyp() == CameraPosition.TOP) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green
@@ -72,7 +68,7 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
 		}
 		
-		BlockPipeline p = new BlockPipeline(options);
+		BlockPipeline p = new BlockPipeline();
 		
 		// preprocessing
 		p.add(BlockDecreaseImageAndMaskSize.class); // divide input (but not NIR) by 2
@@ -88,8 +84,10 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		p.add(BlockMedianFilter.class);
 		p.add(BlockClosingForYellowVisMask.class);
 		p.add(BlockClosing.class);
-		p.add(BlockRemoveBambooStick.class);
-		p.add(BlockRemoveSmallClusters.class);
+		
+		p.add(BlockLabFilter.class);
+		p.add(BlockRemoveSmallClusters.class); // requires lab filter before
+		p.add(BlockRemoveBambooStick.class); // requires remove small clusters before
 		p.add(BlockLabFilter.class);
 		// p.add(BlockRemoveSplitObjectsAbove.class);
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);

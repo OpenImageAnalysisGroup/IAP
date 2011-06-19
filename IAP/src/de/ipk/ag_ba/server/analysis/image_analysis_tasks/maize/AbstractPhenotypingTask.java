@@ -17,7 +17,8 @@ import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
@@ -26,9 +27,9 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.server.analysis.IOmodule;
+import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ImageSet;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
@@ -41,7 +42,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
-public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysisTask {
+public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 	
@@ -169,18 +170,23 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 							if (status != null)
 								status.setCurrentStatusText2("Images are loaded");
 							
+							// TODO: FIX THIS, ALL INFO SHOULD BE SUPPLIED USING THE ImageProcessorOptions, see below!!!
+							//
 							input.setImageInfo(inVis, inFluo, inNir);
 							inputMasks.setImageInfo(inVis, inFluo, inNir);
 							
 							boolean side = id.isSide();
 							
-							ImageProcessorOptions options = new ImageProcessorOptions(inVis, inFluo, inNir);
+							ImageProcessorOptions options = new ImageProcessorOptions();
+							if (inVis != null && inVis.getPosition() != null)
+								options.addDoubleSetting(Setting.ROTATION_ANGLE, inVis.getPosition());
 							if (side)
-								options.setCameraTyp(CameraTyp.SIDE);
+								options.setCameraPosition(CameraPosition.SIDE);
 							else
-								options.setCameraTyp(CameraTyp.TOP);
-							ImageProcessor ptip = getImageProcessor(options);
+								options.setCameraPosition(CameraPosition.TOP);
 							
+							// TODO: FIX THIS, THE SETTING SHOULD BE RETRIEVED FROM THE ImageProcessorOptions
+							// THERE SHOULD BE NO INPUT DEBUG STACK, ONLY A RESULT STACK
 							FlexibleImageStack debugImageStack = null;
 							boolean addDebugImages = IAPmain.isSettingEnabled(IAPfeature.SAVE_DEBUG_STACK);
 							if (addDebugImages || forceDebugStack) {
@@ -190,20 +196,35 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 							// input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
 							// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
 							
-							final boolean cropResult = true;
-							final boolean parameterSearch = true;
-							
 							if (status != null)
 								status.setCurrentStatusText1("Process Analysis Pipeline");
-							ptip.setStatus(status);
-							final FlexibleImageSet pipelineResult = ptip.pipeline(
-									input, inputMasks,
-									maximumThreadCountOnImageLevel, debugImageStack,
-									parameterSearch, cropResult).getImages();
-							if (status != null)
-								status.setCurrentStatusText1("Pipeline Finished");
 							
-							BlockProperties analysisResults = ptip.getSettings();
+							BlockProperties analysisResults;
+							
+							FlexibleImage resVis, resFluo, resNir;
+							{
+								ImageProcessor imageProcessor = getImageProcessor();
+								imageProcessor.setStatus(status);
+								
+								// TODO FIX: debugImageStack should be no input, only an output
+								// TODO FIX: The Images Should be Loaded inside the pipeline,
+								// not supplied by parameters!
+								// TODO: maximumThreadCound... should be no parameter but a setting!
+								FlexibleImageSet pipelineResult = imageProcessor.pipeline(
+										options,
+										input, inputMasks,
+										maximumThreadCountOnImageLevel, debugImageStack).getImages();
+								
+								resVis = pipelineResult.getVis();
+								resFluo = pipelineResult.getFluo();
+								resNir = pipelineResult.getNir();
+								// TODO: pipelineResult.getDebugStack();
+								
+								if (status != null)
+									status.setCurrentStatusText1("Pipeline Finished");
+								
+								analysisResults = imageProcessor.getSettings();
+							}
 							
 							for (BlockPropertyValue bpv : analysisResults.getProperties("RESULT_")) {
 								if (bpv.getName() == null)
@@ -240,12 +261,12 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 									inFluo.setLabelURL(id.getFLUO().getURL().copy());
 									inNir.setLabelURL(id.getNIR().getURL().copy());
 								}
-								if (pipelineResult.getVis() != null)
-									saveImage(inVis, pipelineResult.getVis(), buf, ".tiff");
-								if (pipelineResult.getFluo() != null)
-									saveImage(inFluo, pipelineResult.getFluo(), buf, ".tiff");
-								if (pipelineResult.getNir() != null)
-									saveImage(inNir, pipelineResult.getNir(), buf, ".tiff");
+								if (resVis != null)
+									saveImage(inVis, resVis, buf, ".tiff");
+								if (resFluo != null)
+									saveImage(inFluo, resFluo, buf, ".tiff");
+								if (resNir != null)
+									saveImage(inNir, resNir, buf, ".tiff");
 							}
 						} else {
 							System.err.println("ERROR: Not all three snapshots images could be loaded!");
@@ -369,7 +390,7 @@ public abstract class AbstractMaizePhenotypingTask extends AbstractImageAnalysis
 	
 	protected abstract boolean analyzeSideImages();
 	
-	protected abstract ImageProcessor getImageProcessor(ImageProcessorOptions options);
+	protected abstract ImageProcessor getImageProcessor();
 	
 	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
 		if (optLabelImageContent == null) {

@@ -3,7 +3,7 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -19,7 +19,7 @@ public class BlockEnlargeMaskOnFluo extends AbstractSnapshotAnalysisBlockFIS {
 		return enlargeMask(getInput().getMasks().getFluo(), options.getCameraTyp());
 	}
 	
-	private FlexibleImage enlargeMask(FlexibleImage workImage, CameraTyp cameraTyp) {
+	private FlexibleImage enlargeMask(FlexibleImage workImage, CameraPosition cameraTyp) {
 		
 		switch (cameraTyp) {
 			case SIDE:

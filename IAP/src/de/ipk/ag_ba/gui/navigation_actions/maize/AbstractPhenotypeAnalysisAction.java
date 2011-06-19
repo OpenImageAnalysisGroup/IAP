@@ -109,7 +109,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			tso.setInt(1);
 			
 			int pi = 1;// SystemAnalysis.getNumberOfCPUs();
-			int ti = 1;// SystemAnalysis.getNumberOfCPUs() / 2;
+			int ti = 4;// SystemAnalysis.getNumberOfCPUs() / 2;
 			
 			ImageAnalysisTask task = getImageAnalysisTask();
 			

@@ -4,7 +4,7 @@ import ij.measure.ResultsTable;
 
 import java.awt.Color;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -30,13 +30,13 @@ public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ResultsTable numericResults = res.getResultsTable();
 		
-		if (options.getCameraTyp() == CameraTyp.SIDE)
+		if (options.getCameraTyp() == CameraPosition.SIDE)
 			getProperties().storeResults(
 					"RESULT_side.deg" + (getInput().getImages().getFluoInfo() != null && getInput().getImages().getFluoInfo().getPosition() != null ? getInput()
 											.getImages().getFluoInfo().getPosition().intValue() : "0")
 									+ ".", numericResults,
 							getBlockPosition());
-		if (options.getCameraTyp() == CameraTyp.TOP)
+		if (options.getCameraTyp() == CameraPosition.TOP)
 			getProperties().storeResults("RESULT_top.", numericResults, getBlockPosition());
 		
 		return res.getImage();

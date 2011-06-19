@@ -19,6 +19,7 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import org.ErrorMsg;
 import org.ReleaseInfo;
+import org.StringManipulationTools;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
@@ -46,6 +47,22 @@ public class Bookmark {
 		try {
 			TextFile tf = new TextFile(getFileName());
 			title = tf.get(0);
+			try {
+				// scan for titles such as "test (3)", which should be displayed as "test"
+				if (title != null && title.contains("(")) {
+					String titleNo = title.substring(title.lastIndexOf("(") + "(".length());
+					if (titleNo.contains(")")) {
+						titleNo = titleNo.substring(0, titleNo.indexOf(")"));
+						titleNo = StringManipulationTools.stringReplace(titleNo, "/", "");
+						int n = Integer.parseInt(titleNo);
+						if (n < Integer.MAX_VALUE) {
+							title = title.substring(0, title.lastIndexOf("(")).trim();
+						}
+					}
+				}
+			} catch (Exception e) {
+				
+			}
 			target = tf.get(1);
 			icon = ImageIO.read(new File(getFileName(".png")));
 			optStaticIconId = getFileName(".png");

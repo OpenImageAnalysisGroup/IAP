@@ -38,7 +38,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
 import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
 import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
@@ -688,17 +688,17 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation removeSmallClusters(ObjectRef optClusterSizeReturn) {
-		return removeSmallClusters(0.005d, CameraTyp.TOP, optClusterSizeReturn);
+		return removeSmallClusters(0.005d, CameraPosition.TOP, optClusterSizeReturn);
 	}
 	
-	public ImageOperation removeSmallClusters(double factor, CameraTyp typ,
+	public ImageOperation removeSmallClusters(double factor, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
 		return removeSmallClusters(factor, NeighbourhoodSetting.NB4, typ,
 				optClusterSizeReturn);
 	}
 	
 	public ImageOperation removeSmallClusters(double factor,
-			NeighbourhoodSetting nb, CameraTyp typ,
+			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
 		FlexibleImage workImage = new FlexibleImage(image);
 		workImage = removeSmallPartsOfImage(workImage,
@@ -1109,7 +1109,7 @@ public class ImageOperation {
 	
 	public static FlexibleImage removeSmallPartsOfImage(
 			FlexibleImage workImage, int iBackgroundFill,
-			int cutOffMinimumArea, NeighbourhoodSetting nb, CameraTyp typ,
+			int cutOffMinimumArea, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
 		
 		if (cutOffMinimumArea < 1) {
@@ -1944,8 +1944,17 @@ public class ImageOperation {
 		
 		boolean isin = false;
 		
-		for (int x = 0; x < img2d.length; x++) {
-			for (int y = 0; y < img2d[0].length; y++) {
+		for (int y = 0; y < img2d[0].length; y++) {
+			// int pixelsInHorLine = 0;
+			// for (int ys = y; ys < img2d[0].length && ys <= y + 1; ys++) {
+			// for (int x = 0; x < img2d.length; x++) {
+			// if (img2d[x][ys] != background) {
+			// pixelsInHorLine++;
+			// }
+			// }
+			// }
+			// if (pixelsInHorLine > 15)
+			for (int x = 0; x < img2d.length; x++) {
 				if (img2d[x][y] != background) {
 					// Color temp = new Color(img2d[x][y]);
 					// System.out.println(x + ":" + y + ", RGB: " + temp.getRed() + ", " + temp.getGreen() + ", " + temp.getBlue());

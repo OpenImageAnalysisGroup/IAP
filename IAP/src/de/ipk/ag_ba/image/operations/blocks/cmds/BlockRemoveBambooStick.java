@@ -3,7 +3,7 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -21,18 +21,20 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 		if (processedMasks.getVis() != null && processedMasks.getFluo() != null) {
 			int background = options.getBackground();
 			// visible search most high Y
-			int[] extremePoints = new ImageOperation(processedMasks.getVis()).getExtremePoints(background);
+			int[] extremePoints = new ImageOperation(processedMasks.getVis().print("Mask Search For Maxima")).getExtremePoints(background);
 			// cut fluo from top
-			int temp = (int) ((extremePoints[0] / (double) processedMasks.getVis().getHeight()) * processedMasks.getFluo().getHeight());
-			FlexibleImage fi = new ImageOperation(processedMasks.getFluo()).clearImageAbove(temp, background).getImage();
-			processedMasks.setFluo(fi);
+			if (extremePoints != null) {
+				int temp = (int) ((extremePoints[0] / (double) processedMasks.getVis().getHeight()) * processedMasks.getFluo().getHeight());
+				FlexibleImage fi = new ImageOperation(processedMasks.getFluo()).clearImageAbove(temp, background).getImage();
+				processedMasks.setFluo(fi.print("Fluo Result"));
+			}
 		}
 	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() != null) {
-			if (options.getCameraTyp() == CameraTyp.SIDE) {
+			if (options.getCameraTyp() == CameraPosition.SIDE) {
 				return clearBamboo(getInput().getMasks().getVis());
 			}
 			return getInput().getMasks().getVis();

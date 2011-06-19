@@ -4,7 +4,7 @@ import java.awt.Point;
 
 import org.Vector2d;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
@@ -22,7 +22,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 		BlockProperty distLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_DISTANCE_MARKER_LEFT);
 		BlockProperty distRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_DISTANCE_MARKER_RIGHT);
 		
-		if (options.getCameraTyp() == CameraTyp.SIDE && getInput().getMasks().getFluo() != null) {
+		if (options.getCameraTyp() == CameraPosition.SIDE && getInput().getMasks().getFluo() != null) {
 			Point values = getWidthandHeightSide(getInput().getMasks().getFluo(), background);
 			
 			if (values != null) {
