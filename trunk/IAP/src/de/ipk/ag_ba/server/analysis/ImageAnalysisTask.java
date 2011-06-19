@@ -14,12 +14,6 @@ public interface ImageAnalysisTask {
 	
 	public String getTaskDescription();
 	
-	/**
-	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
-	 */
-	@Deprecated
-	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status);
-	
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
 						BackgroundTaskStatusProviderSupportingExternalCall status);
 	

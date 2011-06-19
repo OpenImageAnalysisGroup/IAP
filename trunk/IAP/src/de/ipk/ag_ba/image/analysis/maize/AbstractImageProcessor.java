@@ -17,29 +17,23 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
  */
 public abstract class AbstractImageProcessor implements ImageProcessor {
 	
-	protected final ImageProcessorOptions options;
 	private final BlockProperties settings;
-	private final BlockPipeline pipeline;
 	
-	public AbstractImageProcessor(ImageProcessorOptions options) {
-		this(options, new BlockPropertiesImpl());
+	public AbstractImageProcessor() {
+		this(new BlockPropertiesImpl());
 	}
 	
-	public AbstractImageProcessor(ImageProcessorOptions options, BlockPropertiesImpl settings) {
-		this.options = options;
+	public AbstractImageProcessor(BlockPropertiesImpl settings) {
 		this.settings = settings;
-		this.pipeline = getPipeline();
 	}
 	
-	public void setValuesToStandard(double scale) {
-		options.initStandardValues(scale);
-	}
-	
-	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, int maxThreadsPerImage, FlexibleImageStack debugStack,
-			boolean automaticParameterSearch,
-			boolean cropResult)
+	public FlexibleMaskAndImageSet pipeline(
+			ImageProcessorOptions options,
+			FlexibleImageSet input,
+			int maxThreadsPerImage,
+			FlexibleImageStack debugStack)
 			throws InstantiationException, IllegalAccessException, InterruptedException {
-		return pipeline(input, null, maxThreadsPerImage, debugStack, automaticParameterSearch, cropResult);
+		return pipeline(options, input, null, maxThreadsPerImage, debugStack);
 	}
 	
 	/*
@@ -48,14 +42,19 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	 * de.ipk.ag_ba.image.structures.FlexibleImageSet, int, de.ipk.ag_ba.image.structures.FlexibleImageStack, boolean, boolean)
 	 */
 	@Override
-	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, FlexibleImageSet optInputMasks, int maxThreadsPerImage, FlexibleImageStack debugStack,
-			boolean automaticParameterSearch,
-			boolean cropResult)
+	public FlexibleMaskAndImageSet pipeline(
+			ImageProcessorOptions options,
+			FlexibleImageSet input,
+			FlexibleImageSet optInputMasks,
+			int maxThreadsPerImage,
+			FlexibleImageStack debugStack)
 			throws InstantiationException, IllegalAccessException, InterruptedException {
+		
+		BlockPipeline pipeline = getPipeline(options);
 		
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
 		
-		FlexibleMaskAndImageSet result = pipeline.execute(workset, debugStack, settings, getStatus());
+		FlexibleMaskAndImageSet result = pipeline.execute(options, workset, debugStack, settings, getStatus());
 		
 		if (debugStack != null)
 			debugStack.addImage("RESULT", result.getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
@@ -72,5 +71,5 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		return settings;
 	}
 	
-	protected abstract BlockPipeline getPipeline();
+	protected abstract BlockPipeline getPipeline(ImageProcessorOptions options);
 }

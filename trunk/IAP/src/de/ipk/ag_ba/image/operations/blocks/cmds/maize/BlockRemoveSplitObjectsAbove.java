@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -11,7 +11,7 @@ public class BlockRemoveSplitObjectsAbove extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() == null || getInput().getMasks().getFluo() == null)
 			return null;
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getFluo();
 			int background = options.getBackground();
 			

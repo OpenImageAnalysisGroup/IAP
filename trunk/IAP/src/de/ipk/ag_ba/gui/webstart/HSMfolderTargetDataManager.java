@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.webstart;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -12,6 +13,9 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
 import org.w3c.dom.Document;
 
+import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.databases.DBTable;
+import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -19,7 +23,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 
 /**
  * OWNER : Experiment Name : DATE : Image
@@ -34,7 +41,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
  * klukas : 1107BA_Barley :2011-04-27 : xyz5.png
  * klukas : 1107BA_Barley :2011-04-27 : xyz6.png
  */
-public class HSMfolderTargetDataManager {
+public class HSMfolderTargetDataManager implements DatabaseTarget {
 	public static final String DIRECTORY_FOLDER_NAME = "index";
 	
 	private static final String CONDITION_FOLDER_NAME = "conditions";
@@ -187,5 +194,21 @@ public class HSMfolderTargetDataManager {
 				
 			}
 		}
+	}
+	
+	@Override
+	public LoadedImage saveImage(LoadedImage limg) throws Exception {
+		return null;
+	}
+	
+	@Override
+	public String getPrefix() {
+		return "hsm:";
+	}
+	
+	@Override
+	public void saveVolume(LoadedVolume volume, Sample3D s3d, MongoDB m, DBTable sample, InputStream threeDvolumePreviewIcon,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+		throw new UnsupportedOperationException("Saving volumes using this method is not yet supported!");
 	}
 }

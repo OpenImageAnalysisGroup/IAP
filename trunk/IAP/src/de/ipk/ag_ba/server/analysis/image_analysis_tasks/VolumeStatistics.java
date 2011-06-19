@@ -8,8 +8,8 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.IOmodule;
+import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
@@ -21,7 +21,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 /**
  * @author klukas
  */
-public class VolumeStatistics extends AbstractImageAnalysisTask {
+public class VolumeStatistics implements ImageAnalysisTask {
 	
 	private Collection<NumericMeasurementInterface> input;
 	private Collection<NumericMeasurementInterface> output;
@@ -60,21 +60,6 @@ public class VolumeStatistics extends AbstractImageAnalysisTask {
 	@Override
 	public String getTaskDescription() {
 		return "Creates an Voxel-Color-Histogramm (counts number of voxels for different colors)";
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @seede.ipk_gatersleben.ag_ba.graffiti.plugins.server.ImageAnalysisTask#
-	 * performImageAnalysis(int, boolean,
-	 * org.BackgroundTaskStatusProviderSupportingExternalCall)
-	 */
-	/**
-	 * @deprecated Use {@link #performAnalysis(int,int,BackgroundTaskStatusProviderSupportingExternalCall)} instead
-	 */
-	@Deprecated
-	@Override
-	public void performAnalysis(int maximumThreadCount, BackgroundTaskStatusProviderSupportingExternalCall status) {
-		performAnalysis(maximumThreadCount, 1, status);
 	}
 	
 	/*

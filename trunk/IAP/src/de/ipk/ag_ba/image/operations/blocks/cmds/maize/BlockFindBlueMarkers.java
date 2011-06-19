@@ -6,7 +6,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MarkerPair;
@@ -24,7 +24,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
 		
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			numericResult = getMarkers(getInput().getMasks().getVis());
 			
 			int w = getInput().getMasks().getVis().getWidth();

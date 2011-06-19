@@ -1847,6 +1847,10 @@ public class MongoDB {
 					GridFS gridfs_preview_files = new GridFS(db, "fs_preview_files");
 					DBCollection collectionC = db.getCollection("fs_preview_files.files");
 					collectionC.ensureIndex("filename");
+					
+					DBCollection collectionChunks = db.getCollection("fs_preview_files.chunks");
+					collectionChunks.ensureIndex("files_id");
+					
 					result.setObject(gridfs_preview_files);
 				} else
 					switch (c.getDatatype()) {
@@ -1856,12 +1860,20 @@ public class MongoDB {
 									GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
 									DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
 									collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									
+									DBCollection collectionChunks = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString() + ".chunks");
+									collectionChunks.ensureIndex("files_id");
+									
 									result.setObject(gridfs_images);
 									break;
 								case LABEL_FIELD:
 									GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_IMAGE_LABELS.toString());
 									DBCollection collectionB = db.getCollection(MongoGridFS.FS_IMAGE_LABELS_FILES.toString());
 									collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									
+									collectionChunks = db.getCollection(MongoGridFS.FS_IMAGE_LABELS.toString() + ".chunks");
+									collectionChunks.ensureIndex("files_id");
+									
 									result.setObject(gridfs_null_files);
 									break;
 							}
@@ -1872,12 +1884,20 @@ public class MongoDB {
 									GridFS gridfs_volumes = new GridFS(db, MongoGridFS.FS_VOLUMES.toString());
 									DBCollection collectionA = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString());
 									collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									
+									DBCollection collectionChunks = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString() + ".chunks");
+									collectionChunks.ensureIndex("files_id");
+									
 									result.setObject(gridfs_volumes);
 									break;
 								case LABEL_FIELD:
 									GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_VOLUME_LABELS.toString());
 									DBCollection collectionB = db.getCollection("fs_volume_labels.files");
 									collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									
+									collectionChunks = db.getCollection(MongoGridFS.FS_VOLUME_LABELS.toString() + ".chunks");
+									collectionChunks.ensureIndex("files_id");
+									
 									result.setObject(gridfs_null_files);
 									break;
 							}
@@ -1888,12 +1908,20 @@ public class MongoDB {
 									GridFS gridfs_networks = new GridFS(db, MongoGridFS.FS_NETWORKS.toString());
 									DBCollection collectionA = db.getCollection(MongoGridFS.FS_NETWORKS_FILES.toString());
 									collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									
+									DBCollection collectionChunks = db.getCollection(MongoGridFS.FS_NETWORKS.toString() + ".chunks");
+									collectionChunks.ensureIndex("files_id");
+									
 									result.setObject(gridfs_networks);
 									break;
 								case LABEL_FIELD:
 									GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_NETWORK_LABELS.toString());
 									DBCollection collectionB = db.getCollection(MongoGridFS.fs_networks_labels_files.toString());
 									collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+									
+									collectionChunks = db.getCollection(MongoGridFS.FS_NETWORK_LABELS.toString() + ".chunks");
+									collectionChunks.ensureIndex("files_id");
+									
 									result.setObject(gridfs_null_files);
 									break;
 							}
@@ -2108,12 +2136,35 @@ public class MongoDB {
 									+ SystemAnalysisExt.getCurrentTime());
 							res.append("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
 									+ SystemAnalysisExt.getCurrentTime() + "<br>");
+							System.out.println("Start compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime());
+							res.append("Start compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+							HashMap<String, Object> m = new HashMap<String, Object>();
+							m.put("compact", mgfs + ".files");
+							m.put("force", true);
+							BasicDBObject cmd = new BasicDBObject(m);
+							db.command(cmd);
+							
+							m.clear();
+							m.put("compact", mgfs);
+							m.put("force", true);
+							cmd = new BasicDBObject(m);
+							db.command(cmd);
+							
+							m.clear();
+							m.put("compact", mgfs + ".chunks");
+							m.put("force", true);
+							cmd = new BasicDBObject(m);
+							db.command(cmd);
+							
+							System.out.println("Finished compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime());
+							res.append("Finished compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime() + "<br>");
 							freeAll += free;
 						}
 						status.setCurrentStatusValueFineAdd(stepSize);
 					}
 					System.out.println("REORGANIZATION: Overall deleted MB: " + freeAll / 1024 / 1024 + " // "
 							+ SystemAnalysisExt.getCurrentTime());
+					
 					res.append("REORGANIZATION: Overall deleted MB: " + freeAll / 1024 / 1024 + " // "
 							+ SystemAnalysisExt.getCurrentTime() + "<br>");
 					status.setCurrentStatusText1("Deleted MB: " + (freeAll / 1024 / 1024));

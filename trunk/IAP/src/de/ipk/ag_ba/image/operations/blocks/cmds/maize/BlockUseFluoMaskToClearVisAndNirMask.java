@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -11,7 +11,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected void prepare() {
 		super.prepare();
 		if (getInput().getMasks().getFluo() != null && getInput().getMasks().getVis() != null) {
-			FlexibleImage fluoMask = clearImageSide(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), -0.07d);
+			FlexibleImage fluoMask = clearImageSide(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), -0.02d);
 			getInput().getMasks().setFluo(fluoMask);
 		}
 	}
@@ -20,13 +20,13 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null || getInput().getMasks().getFluo() == null)
 			return null;
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
 			return clearImageSide(input, getInput().getMasks().getFluo(), 0.1);
 		}
 		
-		if (options.getCameraTyp() == CameraTyp.TOP) {
+		if (options.getCameraTyp() == CameraPosition.TOP) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
 			return clearImageTop(input, getInput().getMasks().getFluo());
@@ -38,13 +38,13 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected FlexibleImage processNIRmask() {
 		if (getInput().getMasks().getNir() == null || getInput().getMasks().getFluo() == null)
 			return null;
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
 			return clearImageSide(input, getInput().getMasks().getFluo(), 0.03);
 		}
 		
-		if (options.getCameraTyp() == CameraTyp.TOP) {
+		if (options.getCameraTyp() == CameraPosition.TOP) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
 			return clearImageTop(input, getInput().getMasks().getFluo());
@@ -56,13 +56,13 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected FlexibleImage processNIRimage() {
 		if (getInput().getImages().getNir() == null || getInput().getMasks().getFluo() == null)
 			return null;
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getImages().getNir();
 			
 			return clearImageSide(input, getInput().getMasks().getFluo(), 0.03);
 		}
 		
-		if (options.getCameraTyp() == CameraTyp.TOP) {
+		if (options.getCameraTyp() == CameraPosition.TOP) {
 			FlexibleImage input = getInput().getImages().getNir();
 			
 			return clearImageTop(input, getInput().getMasks().getFluo());

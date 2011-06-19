@@ -50,7 +50,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
@@ -131,117 +130,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				for (ConditionInterface co : su)
 					for (SampleInterface sa : co) {
 						for (NumericMeasurementInterface nm : sa) {
-							
-							// copy main binary file (url)
-							if (nm instanceof BinaryMeasurement) {
-								final BinaryMeasurement bm = (BinaryMeasurement) nm;
-								if (bm.getURL() == null)
-									continue;
-								
-								status.setCurrentStatusValueFine(100d * (idx++) / files);
-								
-								final Long t = nm.getParentSample().getRowId();
-								Future<MyByteArrayInputStream> fileContent = null;
-								boolean targetExists = false;
-								{
-									// store data
-									String zefn = null;
-									try {
-										zefn = determineBinaryFileName(t, substanceName, nm, bm);
-										final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
-										boolean exists = targetFile.exists();
-										targetExists = exists;
-										try {
-											fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
-										} catch (Exception e) {
-											// try 2nd time
-											fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
-										}
-										if (exists) {
-											files--;
-											idx--;
-											knownFiles++;
-										}
-									} catch (Exception e) {
-										System.out.println("ERROR DATA STORAGE: " + e.getMessage() + " // " + zefn);
-										errorCount++;
-									}
-								}
-								if (!targetExists)
-									if (nm instanceof ImageData) {
-										// store preview icon
-										String zefn = null;
-										try {
-											zefn = determineBinaryFileName(t, substanceName, nm, bm);
-											final File targetFile = new File(hsmManager.prepareAndGetPreviewFileNameAndPath(experiment.getHeader(), t, zefn));
-											boolean exists = targetFile.exists();
-											targetExists = exists;
-											if (!exists) {
-												InputStream is = null;
-												if (fileContent != null) {
-													MyByteArrayInputStream bis = fileContent.get();
-													if (bis != null)
-														is = bis.getNewStream();
-												}
-												if (is == null)
-													is = bm.getURL().getInputStream();
-												try {
-													MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(ImageIO.read(is));
-													copyBinaryFileContentToTarget(experiment, written, hsmManager, es, null, previewStream, t, targetFile, exists);
-												} finally {
-													is.close();
-												}
-											}
-										} catch (Exception e) {
-											System.out.println("ERROR PREVIEW STORAGE: " + e.getMessage() + " // " + zefn + " // - error is ignored");
-										}
-									}
-								String pre = "";
-								status.setCurrentStatusText1(pre + "files: " + (knownFiles + files)
-										+ ", copied: " + idx
-										+ (knownFiles > 0 ? ", skipped: " + knownFiles + "" : ""));
-								
-								long currTime = System.currentTimeMillis();
-								
-								double speed = written.getLong() * 1000 / (currTime - startTime) / 1024 / 1024;
-								status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
-							}
-							
-							// copy label binary file (label url)
-							if (nm instanceof BinaryMeasurement) {
-								final BinaryMeasurement bm = (BinaryMeasurement) nm;
-								if (bm.getLabelURL() == null)
-									continue;
-								
-								long t = nm.getParentSample().getRowId();
-								
-								final String zefn;
-								try {
-									if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
-										zefn = "label_" + substanceName + "_" + bm.getLabelURL().getDetail() + getFileExtension(bm.getLabelURL().getFileName());
-									else
-										if (bm.getLabelURL().getPrefix().startsWith(LemnaTecFTPhandler.PREFIX)) {
-											String fn = bm.getLabelURL().getDetail();
-											zefn = "label_" + substanceName + "_" + fn.substring(fn.lastIndexOf("/") + "/".length())
-													+ getFileExtension(bm.getLabelURL().getFileName());;
-										} else
-											zefn = "label_" + determineBinaryFileName(t, substanceName, nm, bm);
-									
-									final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
-									
-									copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getLabelURL(), null, t, targetFile, targetFile.exists());
-									
-								} catch (Exception e) {
-									System.out.println("ERROR: " + e.getMessage());
-									e.printStackTrace();
-									errorCount++;
-								}
-								long currTime = System.currentTimeMillis();
-								
-								double speed = written.getLong() * 1000 / (currTime - startTime) / 1024 / 1024;
-								status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
-							}
-							
+							idx = storeData(experiment, written, idx, hsmManager, startTime, es, substanceName, nm);
 						}
 					}
 			}
@@ -280,6 +169,129 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				new File(fn).delete();
 			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
 		}
+	}
+	
+	private int storeData(
+			final ExperimentInterface experiment,
+			final ThreadSafeOptions written,
+			int idx,
+			final HSMfolderTargetDataManager hsmManager,
+			long startTime,
+			ExecutorService es,
+			final String substanceName,
+			NumericMeasurementInterface nm) {
+		
+		// copy main binary file (url)
+		if (nm instanceof BinaryMeasurement) {
+			final BinaryMeasurement bm = (BinaryMeasurement) nm;
+			if (bm.getURL() == null)
+				return idx;
+			
+			status.setCurrentStatusValueFine(100d * (idx++) / files);
+			
+			final Long t = nm.getParentSample().getRowId();
+			Future<MyByteArrayInputStream> fileContent = null;
+			boolean targetExists = false;
+			{
+				// store data
+				String zefn = null;
+				try {
+					zefn = determineBinaryFileName(t, substanceName, nm, bm);
+					final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
+					boolean exists = targetFile.exists();
+					targetExists = exists;
+					try {
+						fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
+					} catch (Exception e) {
+						Thread.sleep(15000);
+						// try 2nd time
+						fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
+					}
+					if (exists) {
+						files--;
+						idx--;
+						knownFiles++;
+					}
+				} catch (Exception e) {
+					System.out.println("ERROR DATA STORAGE: " + e.getMessage() + " // " + zefn);
+					errorCount++;
+				}
+			}
+			if (!targetExists)
+				if (nm instanceof ImageData) {
+					// store preview icon
+					String zefn = null;
+					try {
+						zefn = determineBinaryFileName(t, substanceName, nm, bm);
+						final File targetFile = new File(hsmManager.prepareAndGetPreviewFileNameAndPath(experiment.getHeader(), t, zefn));
+						boolean exists = targetFile.exists();
+						targetExists = exists;
+						if (!exists) {
+							InputStream is = null;
+							if (fileContent != null) {
+								MyByteArrayInputStream bis = fileContent.get();
+								if (bis != null)
+									is = bis.getNewStream();
+							}
+							if (is == null)
+								is = bm.getURL().getInputStream();
+							try {
+								MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(ImageIO.read(is));
+								copyBinaryFileContentToTarget(experiment, written, hsmManager, es, null, previewStream, t, targetFile, exists);
+							} finally {
+								is.close();
+							}
+						}
+					} catch (Exception e) {
+						System.out.println("ERROR PREVIEW STORAGE: " + e.getMessage() + " // " + zefn + " // - error is ignored");
+					}
+				}
+			String pre = "";
+			status.setCurrentStatusText1(pre + "files: " + (knownFiles + files)
+					+ ", copied: " + idx
+					+ (knownFiles > 0 ? ", skipped: " + knownFiles + "" : ""));
+			
+			long currTime = System.currentTimeMillis();
+			
+			double speed = written.getLong() * 1000 / (currTime - startTime) / 1024 / 1024;
+			status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
+		}
+		
+		// copy label binary file (label url)
+		if (nm instanceof BinaryMeasurement) {
+			final BinaryMeasurement bm = (BinaryMeasurement) nm;
+			if (bm.getLabelURL() == null)
+				return idx;
+			
+			long t = nm.getParentSample().getRowId();
+			
+			final String zefn;
+			try {
+				if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
+					zefn = "label_" + substanceName + "_" + bm.getLabelURL().getDetail() + getFileExtension(bm.getLabelURL().getFileName());
+				else
+					if (bm.getLabelURL().getPrefix().startsWith(LemnaTecFTPhandler.PREFIX)) {
+						String fn = bm.getLabelURL().getDetail();
+						zefn = "label_" + substanceName + "_" + fn.substring(fn.lastIndexOf("/") + "/".length())
+								+ getFileExtension(bm.getLabelURL().getFileName());;
+					} else
+						zefn = "label_" + determineBinaryFileName(t, substanceName, nm, bm);
+				
+				final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
+				
+				copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getLabelURL(), null, t, targetFile, targetFile.exists());
+				
+			} catch (Exception e) {
+				System.out.println("ERROR: " + e.getMessage());
+				e.printStackTrace();
+				errorCount++;
+			}
+			long currTime = System.currentTimeMillis();
+			
+			double speed = written.getLong() * 1000 / (currTime - startTime) / 1024 / 1024;
+			status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
+		}
+		return idx;
 	}
 	
 	private String getFileExtension(String fileName) {
@@ -342,7 +354,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		return es.submit(new Callable<MyByteArrayInputStream>() {
 			@Override
 			public MyByteArrayInputStream call() throws Exception {
-				BackgroundTaskHelper.lockAquire(hsmFolder, 1);
+				// BackgroundTaskHelper.lockAquire(hsmFolder, 1);
 				MyByteArrayInputStream in = null;
 				try {
 					try {
@@ -377,7 +389,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 						errorCount++;
 					}
 				} finally {
-					BackgroundTaskHelper.lockRelease(hsmFolder);
+					// BackgroundTaskHelper.lockRelease(hsmFolder);
 					written.addInt(-1);
 				}
 				return in != null ? in.getNewStream() : null;

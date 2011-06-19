@@ -3,7 +3,7 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -22,7 +22,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage vis = getInput().getImages().getVis();
 			vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
@@ -33,7 +33,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 							options.getIntSetting(Setting.abDiff_VIS),
 							back, false, false).border(2).getImage();
 		}
-		if (options.getCameraTyp() == CameraTyp.TOP) {
+		if (options.getCameraTyp() == CameraPosition.TOP) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage vis = getInput().getImages().getVis();
 			vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
@@ -49,7 +49,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (options.getCameraTyp() == CameraTyp.SIDE) {
+		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage fluo = getInput().getImages().getFluo();
 			fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
@@ -60,7 +60,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 							options.getIntSetting(Setting.abDiff_FLOU),
 							back, false, true).border(2).getImage();
 		}
-		if (options.getCameraTyp() == CameraTyp.TOP) {
+		if (options.getCameraTyp() == CameraPosition.TOP) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage fluo = getInput().getImages().getFluo();
 			fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));

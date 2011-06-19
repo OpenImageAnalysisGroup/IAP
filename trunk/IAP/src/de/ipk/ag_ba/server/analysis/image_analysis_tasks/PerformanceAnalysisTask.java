@@ -12,9 +12,9 @@ import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.AbstractImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.server.analysis.IOmodule;
+import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
@@ -24,7 +24,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author klukas
  */
-public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
+public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	
 	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
@@ -59,8 +59,7 @@ public class PerformanceAnalysisTask extends AbstractImageAnalysisTask {
 		return "Test input read performance";
 	}
 	
-	@Override
-	public void performAnalysis(final int maximumThreadCountParallelImages,
+	private void performAnalysis(final int maximumThreadCountParallelImages,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		
 		status.setCurrentStatusValue(0);

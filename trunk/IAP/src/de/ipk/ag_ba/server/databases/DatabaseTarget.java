@@ -23,9 +23,12 @@ public interface DatabaseTarget {
 	
 	LoadedImage saveImage(LoadedImage limg) throws Exception;
 	
-	void saveVolume(final LoadedVolume volume, Sample3D s3d, MongoDB m, DBTable sample,
-						InputStream threeDvolumePreviewIcon,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception;
+	void saveVolume(
+			final LoadedVolume volume,
+			Sample3D s3d,
+			MongoDB m, DBTable sample,
+			InputStream threeDvolumePreviewIcon,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception;
 	
 	String getPrefix();
 }

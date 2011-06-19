@@ -11,17 +11,28 @@ public class BlockPropertyValue {
 		this.unit = unit;
 		this.value = value;
 	}
-
+	
+	public BlockPropertyValue(String fromString) {
+		this(
+				fromString.split("|", 3)[0],
+				fromString.split("|", 3)[1],
+				Double.parseDouble(fromString.split("|", 3)[2]));
+	}
+	
 	public String getName() {
 		return name;
 	}
-
+	
 	public String getUnit() {
 		return unit;
 	}
-
+	
 	public Double getValue() {
 		return value;
+	}
+	
+	public String getString() {
+		return name + ";" + unit + ";" + value;
 	}
 	
 }

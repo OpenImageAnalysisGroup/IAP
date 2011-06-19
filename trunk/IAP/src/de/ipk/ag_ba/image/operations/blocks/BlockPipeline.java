@@ -30,13 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class BlockPipeline {
 	
 	private final ArrayList<Class<? extends ImageAnalysisBlockFIS>> blocks = new ArrayList<Class<? extends ImageAnalysisBlockFIS>>();
-	private final ImageProcessorOptions options;
 	private static int lastPipelineExecutionTimeInSec = -1;
-	
-	public BlockPipeline(ImageProcessorOptions options) {
-		this.options = options;
-		
-	}
 	
 	public void add(Class<? extends ImageAnalysisBlockFIS> blockClass) {
 		blocks.add(blockClass);
@@ -48,11 +42,14 @@ public class BlockPipeline {
 	
 	private static ThreadSafeOptions pipelineID = new ThreadSafeOptions();
 	
-	public FlexibleMaskAndImageSet execute(FlexibleMaskAndImageSet input,
-			FlexibleImageStack debugStack, BlockProperties settings,
+	public FlexibleMaskAndImageSet execute(
+			ImageProcessorOptions options,
+			FlexibleMaskAndImageSet input,
+			FlexibleImageStack debugStack,
+			BlockProperties settings,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
-			throws InstantiationException, IllegalAccessException,
-			InterruptedException {
+				throws InstantiationException, IllegalAccessException, InterruptedException {
+		
 		long a = System.currentTimeMillis();
 		nullPointerCheck(input, "PIPELINE INPUT ");
 		
@@ -85,7 +82,7 @@ public class BlockPipeline {
 			
 			block.reset();
 			
-			updateBlockStatistics();
+			updateBlockStatistics(1);
 			
 			if (status != null) {
 				status.setCurrentStatusValueFine(100d * (index / (double) blocks.size()));
@@ -110,11 +107,11 @@ public class BlockPipeline {
 		return input;
 	}
 	
-	private void updateBlockStatistics() {
+	private void updateBlockStatistics(int nBlocks) {
 		Calendar calendar = new GregorianCalendar();
 		int minute = calendar.get(Calendar.MINUTE);
 		synchronized (BlockPipeline.class) {
-			blockExecutionsWithinCurrentMinute++;
+			blockExecutionsWithinCurrentMinute += nBlocks;
 			if (currentMinuteB != minute) {
 				blockExecutionWithinLastMinute = blockExecutionsWithinCurrentMinute;
 				blockExecutionsWithinCurrentMinute = 0;

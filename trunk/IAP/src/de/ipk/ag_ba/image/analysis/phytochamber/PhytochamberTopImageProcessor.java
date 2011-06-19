@@ -54,7 +54,7 @@ public class PhytochamberTopImageProcessor {
 			boolean cropResult)
 			throws InstantiationException, IllegalAccessException, InterruptedException {
 		
-		BlockPipeline p = new BlockPipeline(options);
+		BlockPipeline p = new BlockPipeline();
 		p.add(BlockCropAllFixedPhytoOne.class);
 		p.add(BlockClearBackground.class);
 		p.add(BlockFilterFluoMaskByValue30.class);
@@ -78,7 +78,7 @@ public class PhytochamberTopImageProcessor {
 			p.add(BlockCropImages.class);
 		
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, input);
-		FlexibleMaskAndImageSet result = p.execute(workset, debugStack, settings, null);
+		FlexibleMaskAndImageSet result = p.execute(options, workset, debugStack, settings, null);
 		
 		if (debugStack != null)
 			debugStack.addImage("RESULT", result.getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));

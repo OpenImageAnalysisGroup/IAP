@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.post_process;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraTyp;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.ImageTyp;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -35,7 +35,7 @@ public abstract class BlockPostProcessEdgeErode extends AbstractSnapshotAnalysis
 		return postProcessResultImage(getInput().getImages().getNir(), getInput().getMasks().getNir(), options, options.getCameraTyp(), ImageTyp.NIR, enlarge);
 	}
 	
-	static FlexibleImage postProcessResultImage(FlexibleImage srcImage, FlexibleImage finalImage, ImageProcessorOptions options, CameraTyp cameraTyp,
+	static FlexibleImage postProcessResultImage(FlexibleImage srcImage, FlexibleImage finalImage, ImageProcessorOptions options, CameraPosition cameraTyp,
 			ImageTyp imageTyp, boolean enlarge) {
 		
 		ImageOperation maskIo = new ImageOperation(finalImage);

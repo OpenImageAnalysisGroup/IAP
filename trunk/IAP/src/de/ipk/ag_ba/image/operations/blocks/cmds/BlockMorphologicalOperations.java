@@ -35,7 +35,7 @@ public class BlockMorphologicalOperations extends AbstractSnapshotAnalysisBlockF
 				ImageTyp.NIR);
 	}
 	
-	private FlexibleImage morphologicalOperatorsToInitinalImageProcess(FlexibleImage srcImage, FlexibleImage workImage, ImageProcessorOptions.CameraTyp camera,
+	private FlexibleImage morphologicalOperatorsToInitinalImageProcess(FlexibleImage srcImage, FlexibleImage workImage, ImageProcessorOptions.CameraPosition camera,
 			ImageTyp typ) {
 		
 		ImageOperation maskIo = null;
