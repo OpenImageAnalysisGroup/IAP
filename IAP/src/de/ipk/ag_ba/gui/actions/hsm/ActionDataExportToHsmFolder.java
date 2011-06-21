@@ -198,7 +198,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				try {
 					zefn = determineBinaryFileName(t, substanceName, nm, bm);
 					final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
-					boolean exists = targetFile.exists();
+					boolean exists = targetFile.exists() && targetFile.length() > 0;
 					targetExists = exists;
 					try {
 						fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
@@ -224,7 +224,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					try {
 						zefn = determineBinaryFileName(t, substanceName, nm, bm);
 						final File targetFile = new File(hsmManager.prepareAndGetPreviewFileNameAndPath(experiment.getHeader(), t, zefn));
-						boolean exists = targetFile.exists();
+						boolean exists = targetFile.exists() && targetFile.length() > 0;
 						targetExists = exists;
 						if (!exists) {
 							InputStream is = null;
@@ -435,11 +435,11 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		for (File f : tempFile2fileName.keySet()) {
 			File te = new File(tempFile2fileName.get(f));
 			try {
-			f.renameTo(te);
-			System.out.println("OK: Save XML of experiment " + experimentReference.getExperimentName() + " as " + te.getCanonicalPath() + " // "
-					+ SystemAnalysisExt.getCurrentTime());
-			} catch(Exception e){
-				System.err.println("ERROR: Could not rename "+f.getName()+" to "+te.getName());
+				f.renameTo(te);
+				System.out.println("OK: Save XML of experiment " + experimentReference.getExperimentName() + " as " + te.getCanonicalPath() + " // "
+						+ SystemAnalysisExt.getCurrentTime());
+			} catch (Exception e) {
+				System.err.println("ERROR: Could not rename " + f.getName() + " to " + te.getName());
 			}
 			
 		}
