@@ -388,10 +388,10 @@ public class IAPmain extends JApplet {
 			if (new File("/Volumes/HSM").exists())
 				return "/Volumes/HSM";
 			else
-				if (new File("E:/HSM").exists())
-					return "E:/HSM";
+				if (new File("E:/austausch/HSM").exists())
+					return "E:/austausch/HSM";
 				else
-				return ReleaseInfo.getAppSubdirFolder("local-iap-hsm");
+					return ReleaseInfo.getAppSubdirFolder("local-iap-hsm");
 	}
 	
 	private static ImageJ ij = null;
