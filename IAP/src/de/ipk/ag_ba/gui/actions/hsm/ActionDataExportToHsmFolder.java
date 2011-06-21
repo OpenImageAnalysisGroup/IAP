@@ -434,9 +434,14 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		// rename all temp files
 		for (File f : tempFile2fileName.keySet()) {
 			File te = new File(tempFile2fileName.get(f));
+			try {
 			f.renameTo(te);
 			System.out.println("OK: Save XML of experiment " + experimentReference.getExperimentName() + " as " + te.getCanonicalPath() + " // "
 					+ SystemAnalysisExt.getCurrentTime());
+			} catch(Exception e){
+				System.err.println("ERROR: Could not rename "+f.getName()+" to "+te.getName());
+			}
+			
 		}
 	}
 	
