@@ -237,7 +237,10 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 								is = bm.getURL().getInputStream();
 							try {
 								MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(ImageIO.read(is));
+								if (previewStream!=null)
 								copyBinaryFileContentToTarget(experiment, written, hsmManager, es, null, previewStream, t, targetFile, exists);
+								else
+									System.out.println("ERROR: Preview could not be created or saved.");
 							} finally {
 								is.close();
 							}

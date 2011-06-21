@@ -120,7 +120,7 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 		Substance.getAttributeString(rt, additionalAttributeNames, new Object[] { getPixelsizeX(),
 							getPixelsizeY(), getThickness(), getRowID(),
 							getLabelURL() == null ? null : getLabelURL().toString(), getPositionIn3D(), getRotation() });
-		System.out.println(rt.toString());
+		//System.out.println(rt.toString());
 		r.append(rt.toString());
 	}
 	
