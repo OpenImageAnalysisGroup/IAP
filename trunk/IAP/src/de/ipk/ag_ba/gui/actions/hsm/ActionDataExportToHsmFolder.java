@@ -438,9 +438,11 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		for (File f : tempFile2fileName.keySet()) {
 			File te = new File(tempFile2fileName.get(f));
 			try {
+				if (f!=null && f.exists()){ 
 				f.renameTo(te);
 				System.out.println("OK: Save XML of experiment " + experimentReference.getExperimentName() + " as " + te.getCanonicalPath() + " // "
 						+ SystemAnalysisExt.getCurrentTime());
+				}
 			} catch (Exception e) {
 				System.err.println("ERROR: Could not rename " + f.getName() + " to " + te.getName());
 			}
@@ -451,7 +453,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	private void storeConditionIndexFile(final HSMfolderTargetDataManager hsmManager, long tsave, int eidx, HashMap<File, String> tempFile2fileName,
 			ExperimentInterface ei) throws IOException {
 		String conditionIndexFileName = tsave + "_" + eidx + "_" + ei.getHeader().getImportusername() + "_" + ei.getName() + ".iap.index.csv";
-		
+		conditionIndexFileName = StringManipulationTools.stringReplace(conditionIndexFileName, ":", "-");
 		File conditionFile = new File(hsmManager.prepareAndGetTargetFileForConditionIndex("in_progress_"
 					+ UUID.randomUUID().toString()));
 		TextFile conditionIndexFileContent = new TextFile();
@@ -500,6 +502,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	private void storeIndexFile(final HSMfolderTargetDataManager hsmManager, long tsave, int eidx, HashMap<File, String> tempFile2fileName,
 			ExperimentInterface ei) throws IOException {
 		String indexFileName = tsave + "_" + eidx + "_" + ei.getHeader().getImportusername() + "_" + ei.getName() + ".iap.index.csv";
+		indexFileName = StringManipulationTools.stringReplace(indexFileName, ":", "-");
 		
 		File indexFile = new File(hsmManager.prepareAndGetTargetFileForContentIndex("in_progress_"
 					+ UUID.randomUUID().toString()));
@@ -527,6 +530,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		if (ei.getStartDate() != null)
 			f.setLastModified(ei.getStartDate().getTime());
 		String xmlFileName = tsave + "_" + eidx + "_" + ei.getHeader().getImportusername() + "_" + ei.getName() + ".iap.vanted.bin";
+		xmlFileName = StringManipulationTools.stringReplace(xmlFileName, ":", "-");
 		tempFile2fileName.put(f, hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), null, xmlFileName));
 	}
 	
