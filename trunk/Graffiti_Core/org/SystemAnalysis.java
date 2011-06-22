@@ -35,7 +35,7 @@ public class SystemAnalysis {
 	public static int getNumberOfCPUs() {
 		if (fixedCPUload > 0)
 			return fixedCPUload;
-		boolean useHalfCPUpower = Runtime.getRuntime().availableProcessors() > 8;
+		boolean useHalfCPUpower = Runtime.getRuntime().availableProcessors() >= 8;
 		if (fullPower)
 			useHalfCPUpower = false;
 		if (halfPower)

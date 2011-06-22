@@ -11,7 +11,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected void prepare() {
 		super.prepare();
 		if (getInput().getMasks().getFluo() != null && getInput().getMasks().getVis() != null) {
-			FlexibleImage fluoMask = clearImageSide(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), -0.03d);
+			FlexibleImage fluoMask = clearImageSide(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), 0.01d);
 			getInput().getMasks().setFluo(fluoMask);
 		}
 	}
@@ -41,7 +41,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
-			return clearImageSide(input, getInput().getMasks().getFluo(), 0.03);
+			return clearImageSide(input, getInput().getMasks().getFluo(), 0.01);
 		}
 		
 		if (options.getCameraTyp() == CameraPosition.TOP) {
@@ -59,7 +59,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getImages().getNir();
 			
-			return clearImageSide(input, getInput().getMasks().getFluo(), 0.03);
+			return clearImageSide(input, getInput().getMasks().getFluo(), 0.01);
 		}
 		
 		if (options.getCameraTyp() == CameraPosition.TOP) {
@@ -70,15 +70,15 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		return getInput().getMasks().getNir();
 	}
 	
-	private FlexibleImage clearImageSide(FlexibleImage input, FlexibleImage fluo, double cutTop) {
-		ImageOperation ioInput = new ImageOperation(input);
+	private FlexibleImage clearImageSide(FlexibleImage inputToCut, FlexibleImage imageSource, double cutTop) {
+		ImageOperation ioInputForCut = new ImageOperation(inputToCut);
 		int background = options.getBackground();
-		ImageOperation ioFluo = new ImageOperation(fluo);
-		int[] positions = ioFluo.getExtremePoints(background);
+		ImageOperation ioSource = new ImageOperation(imageSource);
+		int[] positions = ioSource.getExtremePoints(background);
 		if (positions == null)
-			return input;
+			return inputToCut;
 		
-		double scaleFactor = input.getWidth() / (double) fluo.getWidth();
+		double scaleFactor = inputToCut.getWidth() / (double) imageSource.getWidth();
 		
 		int bl = background; // Color.RED.getRGB();
 		int br = background; // Color.YELLOW.getRGB();
@@ -90,14 +90,14 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		double pl = 0.02;
 		double pr = 0.02;
 		
-		double sv = input.getHeight() / (double) fluo.getHeight();
+		double sv = inputToCut.getHeight() / (double) imageSource.getHeight();
 		
-		positions[0] = (int) (positions[0] * sv - pa * input.getHeight());
+		positions[0] = (int) (positions[0] * sv - pa * inputToCut.getHeight());
 		positions[1] = (int) (positions[1] * s);
-		positions[2] = (int) (positions[2] * s - pl * input.getWidth());
-		positions[3] = (int) (positions[3] * s + pr * input.getWidth());
+		positions[2] = (int) (positions[2] * s - pl * inputToCut.getWidth());
+		positions[3] = (int) (positions[3] * s + pr * inputToCut.getWidth());
 		
-		return ioInput.clearImageLeft(positions[2], bl).clearImageRight(positions[3], br).clearImageAbove(positions[0], ba).getImage();
+		return ioInputForCut.clearImageLeft(positions[2], bl).clearImageRight(positions[3], br).clearImageAbove(positions[0], ba).getImage();
 	}
 	
 	private FlexibleImage clearImageTop(FlexibleImage input, FlexibleImage fluo) {

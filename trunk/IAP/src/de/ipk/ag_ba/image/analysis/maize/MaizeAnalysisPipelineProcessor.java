@@ -48,9 +48,9 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 			
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 55);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 98); // 98 // 130 gerste
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 90); // 98 // 130 gerste wegen topf
 			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 125);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 125);// 125
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
 		} else {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);

@@ -28,13 +28,13 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 				// System.out.println("mark: " + markerPosLeftY.getValue());
 				if (markerPosLeftY.getValue() > 0.5)
 					result = new ImageOperation(result).clearImageBottom(
-							(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 45, options.getBackground()).getImage();
+							(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 60, options.getBackground()).getImage();
 			} else
 				if (markerPosLeftY == null && markerPosRightY != null) {
 					// System.out.println("mark: " + markerPosRightY.getValue());
 					if (markerPosRightY.getValue() > 0.5)
 						result = new ImageOperation(result).clearImageBottom(
-								(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 45, options.getBackground()).getImage();
+								(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 60, options.getBackground()).getImage();
 				}
 			
 			boolean clearSides = true;
@@ -69,7 +69,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 				double temp = markerPosLeft.getValue();
 				if (temp > 0.5) {
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
-							(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 16, options.getBackground()).getImage();
+							(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18, options.getBackground()).getImage();
 					return result;
 				}
 				return input;
@@ -78,7 +78,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 				double temp = markerPosRight.getValue();
 				if (temp > 0.5) {
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
-							(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 16, options.getBackground()).getImage();
+							(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18, options.getBackground()).getImage();
 					return result;
 				}
 				return input;
