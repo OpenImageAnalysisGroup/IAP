@@ -260,10 +260,10 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.LAB_MIN_B_VALUE_NIR, 0);
 		addIntSetting(Setting.LAB_MAX_B_VALUE_NIR, 255);
 		
-		addIntSetting(Setting.L_Diff_VIS, 20);
+		addIntSetting(Setting.L_Diff_VIS, 40);
 		addIntSetting(Setting.abDiff_VIS, 40); // 40
-		addIntSetting(Setting.L_Diff_FLOU, 20);
-		addIntSetting(Setting.abDiff_FLOU, 30);
+		addIntSetting(Setting.L_Diff_FLOU, 75);// 20
+		addIntSetting(Setting.abDiff_FLOU, 40);// 30
 		addIntSetting(Setting.L_Diff_NIR, 5); // 14
 		addIntSetting(Setting.abDiff_NIR, 20);
 		

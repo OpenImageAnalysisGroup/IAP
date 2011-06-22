@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
@@ -48,12 +50,22 @@ public class ImageComparator {
 		int height = inputImage.getHeight();
 		
 		int[] result = new int[width * height];
+		boolean showDiff = true;
+		int[] diff;
+		if (showDiff)
+			diff = new int[width * height];
+		else
+			diff = null;
+		int blue = Color.BLUE.getRGB();
 		
 		for (int index = 0; index < width * height; index++) {
 			
 			double l = labImage[0][index] - labImageRef[0][index];
 			double a = Math.abs(labImage[1][index] - labImageRef[1][index]);
 			double b = Math.abs(labImage[2][index] - labImageRef[2][index]);
+			
+			if (showDiff)
+				diff[index] = new Color((float) Math.abs(2 * l / 255d), (float) Math.abs(2 * a / 255d), (float) Math.abs(2 * b / 255d)).getRGB();
 			
 			double adaption = 1;
 			if (adaptiveDependingOnIntensity) {
@@ -96,10 +108,15 @@ public class ImageComparator {
 			
 			if (a + b < abDiff && lOK && !greenint && !yellowint) {
 				result[index] = background;
+				
 			} else {
+				// if (index / 4 % 2 == 0)
+				// diff[index] = blue;
 				result[index] = imgInp[index];
 			}
 		}
+		if (showDiff)
+			new FlexibleImage(diff, width, height).print("difference");
 		return new ImageOperation(new FlexibleImage(result, width, height));
 	}
 	

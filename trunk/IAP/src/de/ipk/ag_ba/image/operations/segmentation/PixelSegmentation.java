@@ -862,6 +862,19 @@ public class PixelSegmentation {
 		return res;
 	}
 	
+	public Vector2d[] getClusterDimension() {
+		
+		Vector2d[] res = new Vector2d[cluster_min_x.length];
+		for (int i = 0; i < cluster_min_x.length; i++) {
+			int w = cluster_max_x[i] - cluster_min_x[i];
+			int h = cluster_max_y[i] - cluster_min_y[i];
+			
+			res[i] = new Vector2d(w, h);
+		}
+		
+		return res;
+	}
+	
 	public int[] getClusterSizeNormalized(int w, int h) {
 		
 		Vector2d[] clusterCenters = getClusterCenterPoints();
@@ -908,6 +921,19 @@ public class PixelSegmentation {
 			}
 		
 		return normalizedClusterAreaSizes;
+	}
+	
+	public int[] getClusterDimensionMinWH(Vector2d[] vector2ds) {
+		int[] res = new int[vector2ds.length];
+		for (int index = 0; index < vector2ds.length; index++) {
+			double w = vector2ds[index].getX();
+			double h = vector2ds[index].getY();
+			if (w > h)
+				res[index] = (int) h;
+			else
+				res[index] = (int) w;
+		}
+		return res;
 	}
 	
 }

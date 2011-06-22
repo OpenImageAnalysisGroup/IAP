@@ -20,13 +20,15 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		if (processedMasks.getVis() != null && processedMasks.getFluo() != null) {
 			int background = options.getBackground();
+			boolean show = false;
 			// visible search most high Y
-			int[] extremePoints = new ImageOperation(processedMasks.getVis().print("Mask Search For Maxima")).getExtremePoints(background);
+			int[] extremePoints = new ImageOperation(processedMasks.getVis().print("Mask Search For Maxima", show)).getExtremePoints(background);
 			// cut fluo from top
 			if (extremePoints != null) {
+				int h = processedMasks.getFluo().getHeight();
 				int temp = (int) ((extremePoints[0] / (double) processedMasks.getVis().getHeight()) * processedMasks.getFluo().getHeight());
-				FlexibleImage fi = new ImageOperation(processedMasks.getFluo()).clearImageAbove(temp, background).getImage();
-				processedMasks.setFluo(fi.print("Fluo Result"));
+				FlexibleImage fi = new ImageOperation(processedMasks.getFluo()).clearImageAbove(temp - 0.03 * h, background).getImage();
+				processedMasks.setFluo(fi.print("Fluo Result", show));
 			}
 		}
 	}

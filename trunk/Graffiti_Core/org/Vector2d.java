@@ -15,6 +15,22 @@ import java.awt.geom.Point2D;
  */
 public class Vector2d {
 	
+	public double getX() {
+		return x;
+	}
+	
+	public void setX(double x) {
+		this.x = x;
+	}
+	
+	public double getY() {
+		return y;
+	}
+	
+	public void setY(double y) {
+		this.y = y;
+	}
+	
 	public double x;
 	public double y;
 	
