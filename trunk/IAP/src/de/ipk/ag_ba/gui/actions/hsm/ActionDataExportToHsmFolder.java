@@ -6,6 +6,7 @@
  */
 package de.ipk.ag_ba.gui.actions.hsm;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -187,7 +188,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			if (bm.getURL() == null)
 				return idx;
 			
-			status.setCurrentStatusValueFine(100d * (idx++) / files);
+			status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles) / files);
 			
 			final Long t = nm.getParentSample().getRowId();
 			Future<MyByteArrayInputStream> fileContent = null;
@@ -233,12 +234,17 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 								if (bis != null)
 									is = bis.getNewStream();
 							}
-							if (is == null)
-								is = bm.getURL().getInputStream();
 							try {
-								MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(ImageIO.read(is));
-								if (previewStream!=null)
-								copyBinaryFileContentToTarget(experiment, written, hsmManager, es, null, previewStream, t, targetFile, exists);
+								if (is == null) {
+									is = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
+									if (is.available() <= 0) {
+										System.out.println("ERROR: Input stream contains no content for image with URL " + bm.getURL());
+									}
+								}
+								BufferedImage bimage = ImageIO.read(is);
+								MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(bimage);
+								if (previewStream != null)
+									copyBinaryFileContentToTarget(experiment, written, hsmManager, es, null, previewStream, t, targetFile, exists);
 								else
 									System.out.println("ERROR: Preview could not be created or saved.");
 							} finally {
@@ -438,10 +444,10 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		for (File f : tempFile2fileName.keySet()) {
 			File te = new File(tempFile2fileName.get(f));
 			try {
-				if (f!=null && f.exists()){ 
-				f.renameTo(te);
-				System.out.println("OK: Save XML of experiment " + experimentReference.getExperimentName() + " as " + te.getCanonicalPath() + " // "
-						+ SystemAnalysisExt.getCurrentTime());
+				if (f != null && f.exists()) {
+					f.renameTo(te);
+					System.out.println("OK: Save XML of experiment " + experimentReference.getExperimentName() + " as " + te.getCanonicalPath() + " // "
+							+ SystemAnalysisExt.getCurrentTime());
 				}
 			} catch (Exception e) {
 				System.err.println("ERROR: Could not rename " + f.getName() + " to " + te.getName());

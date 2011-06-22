@@ -182,6 +182,33 @@ public class ImageOperation {
 					in[x][y] = background;
 					continue;
 				}
+				
+				int r = (c & 0xff0000) >> 16;
+				int g = (c & 0x00ff00) >> 8;
+				// int b = c & 0x0000ff;
+				
+				float intensity = r * max(r, g) / ((255 * 255) + 255 * g);
+				// if (intensity < 0.05)
+				// intensity = 1;
+				in[x][y] = new Color(intensity, intensity, intensity, 1f).getRGB();
+			}
+		return new ImageOperation(new FlexibleImage(in));// .dilate();
+	}
+	
+	private float max(int r, int g) {
+		return r > g ? r : g;
+	}
+	
+	public ImageOperation convertFluo2intensityOldRGBbased() {
+		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int[][] in = getImageAs2array();
+		for (int x = 0; x < image.getWidth(); x++)
+			for (int y = 0; y < image.getHeight(); y++) {
+				int c = in[x][y];
+				if (c == background) {
+					in[x][y] = background;
+					continue;
+				}
 				float rf = ((c & 0xff0000) >> 16);
 				float gf = ((c & 0x00ff00) >> 8);
 				// float bf = (float) ((c & 0x0000ff) / 255.0); // B 0..1
