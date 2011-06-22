@@ -1,9 +1,11 @@
 package de.ipk.ag_ba.image.operations;
 
 import ij.ImagePlus;
+import ij.Prefs;
 import ij.gui.Roi;
 import ij.io.FileSaver;
 import ij.measure.ResultsTable;
+import ij.plugin.ContrastEnhancer;
 import ij.plugin.ImageCalculator;
 import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.MaximumFinder;
@@ -174,7 +176,8 @@ public class ImageOperation {
 	
 	public ImageOperation convertFluo2intensity() {
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
-		int[][] in = getImageAs2array();
+		
+		int[][] in = gamma(0.1).getImageAs2array();
 		for (int x = 0; x < image.getWidth(); x++)
 			for (int y = 0; y < image.getHeight(); y++) {
 				int c = in[x][y];
@@ -183,16 +186,28 @@ public class ImageOperation {
 					continue;
 				}
 				
-				int r = (c & 0xff0000) >> 16;
-				int g = (c & 0x00ff00) >> 8;
-				// int b = c & 0x0000ff;
+				int rf = (c & 0xff0000) >> 16;
+				int gf = (c & 0x00ff00) >> 8;
+				int bf = (c & 0x0000ff);
 				
-				float intensity = r * max(r, g) / ((255 * 255) + 255 * g);
+				float[] hsbvals = Color.RGBtoHSB(rf, gf, bf, null);
+				
+				int rgb = Color.HSBtoRGB(hsbvals[0], hsbvals[1], (float) (hsbvals[2]));
+				int r = (rgb & 0xff0000) >> 16;
+				int g = (rgb & 0x00ff00) >> 8;
+				
+				float intensityA = 1 - r * max(r, g) / ((255 * 255) + 255 * g);
+				float intensityB = 1 - r / (float) ((255) + g);
+				float intensity;
+				if (x / 4 % 2 == 0)
+					intensity = intensityB;
+				else
+					intensity = intensityB;
 				// if (intensity < 0.05)
 				// intensity = 1;
 				in[x][y] = new Color(intensity, intensity, intensity, 1f).getRGB();
 			}
-		return new ImageOperation(new FlexibleImage(in));// .dilate();
+		return new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
 	}
 	
 	private float max(int r, int g) {
@@ -1129,6 +1144,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation blur(double radius) {
+		Prefs.setThreads(1);
 		GaussianBlur gb = new GaussianBlur();
 		gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
 		return new ImageOperation(new FlexibleImage(getImage().getAs2A()));
@@ -1739,6 +1755,13 @@ public class ImageOperation {
 		byteProcessor.threshold(cutValue);
 		
 		return new ImageOperation(byteProcessor.getBufferedImage());
+	}
+	
+	public ImageOperation enhanceContrast() {
+		ContrastEnhancer ce = new ContrastEnhancer();
+		ce.equalize(image);
+		
+		return new ImageOperation(image);
 	}
 	
 	public ImageOperation convertBinary2rgb() {

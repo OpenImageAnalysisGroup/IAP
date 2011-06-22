@@ -50,7 +50,7 @@ public class ImageComparator {
 		int height = inputImage.getHeight();
 		
 		int[] result = new int[width * height];
-		boolean showDiff = true;
+		boolean showDiff = false;
 		int[] diff;
 		if (showDiff)
 			diff = new int[width * height];

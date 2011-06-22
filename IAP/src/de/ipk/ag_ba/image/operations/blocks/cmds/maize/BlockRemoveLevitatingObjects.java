@@ -14,8 +14,8 @@ public class BlockRemoveLevitatingObjects extends AbstractSnapshotAnalysisBlockF
 		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			int background = options.getBackground();
-			int cut = searchSplitObjectsInYDirection(input, 10, background);
-			if (cut > 0)
+			int cut = searchSplitObjectsInYDirection(input, 20, background);
+			if (cut > 0 && cut < getInput().getMasks().getVis().getHeight() * 0.65)
 				return new ImageOperation(getInput().getMasks().getVis()).clearImageAbove(cut, background).getImage();
 			else
 				return getInput().getMasks().getVis();
@@ -30,8 +30,8 @@ public class BlockRemoveLevitatingObjects extends AbstractSnapshotAnalysisBlockF
 		if (options.getCameraTyp() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getFluo();
 			int background = options.getBackground();
-			int cut = searchSplitObjectsInYDirection(input, 10, background);
-			if (cut > 0)
+			int cut = searchSplitObjectsInYDirection(input, 20, background);
+			if (cut > 0 && cut < getInput().getMasks().getFluo().getHeight() * 0.65)
 				return new ImageOperation(getInput().getMasks().getFluo()).clearImageAbove(cut, background).getImage();
 			else
 				return getInput().getMasks().getFluo();
