@@ -148,7 +148,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 				}
 				
 			}
-			return getInput().getMasks().getNir();
+			return getInput().getImages().getNir();
 		} else
 			return null;
 	}

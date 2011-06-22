@@ -37,12 +37,12 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage vis = getInput().getImages().getVis();
 			vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
-			return new ImageOperation(vis).compare()
-					.compareImages(getInput().getMasks().getVis(),
-							options.getIntSetting(Setting.L_Diff_VIS),
-							options.getIntSetting(Setting.L_Diff_VIS),
-							options.getIntSetting(Setting.abDiff_VIS),
-							back, false, false).border(2).getImage();
+			return new ImageOperation(vis).blur(3).printImage("median", false).compare()
+					.compareImages(getInput().getMasks().getVis().getIO().blur(3).printImage("medianb", false).getImage(),
+							options.getIntSetting(Setting.L_Diff_VIS) * 0.5,
+							options.getIntSetting(Setting.L_Diff_VIS) * 0.5,
+							options.getIntSetting(Setting.abDiff_VIS) * 0.5,
+							back, false, false, false).border(2).getImage();
 		}
 		throw new UnsupportedOperationException("Unknown camera setting.");
 	}

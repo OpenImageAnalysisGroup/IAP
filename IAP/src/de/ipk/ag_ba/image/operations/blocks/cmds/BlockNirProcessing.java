@@ -20,17 +20,15 @@ public class BlockNirProcessing extends AbstractSnapshotAnalysisBlockFIS {
 				{
 					FlexibleImage nir = getInput().getImages().getNir();
 					// White Balancing
-					ImageOperation io = new ImageOperation(nir.crop());
-					double[] pix = io.getProbablyWhitePixels(0.08);
-					FlexibleImage temp1 = new ImageOperation(nir).ImageBalancing(255, pix).getImage();
+					double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.crop(), 0.08);
+					FlexibleImage temp1 = new ImageOperation(nir).imageBalancing(255, pix).getImage();
 					getInput().getImages().setNir(temp1);
 				}
 				{
 					FlexibleImage nirMask = getInput().getMasks().getNir();
 					// White Balancing
-					ImageOperation ioMask = new ImageOperation(nirMask.crop());
-					double[] pix = ioMask.getProbablyWhitePixels(0.08);
-					FlexibleImage whiteReference = new ImageOperation(nirMask).ImageBalancing(255, pix).getImage();
+					double[] pix = BlockColorBalancing.getProbablyWhitePixels(nirMask.crop(), 0.08);
+					FlexibleImage whiteReference = new ImageOperation(nirMask).imageBalancing(255, pix).getImage();
 					// compare images
 					boolean debug = false;
 					whiteReference = new ImageOperation(getInput().getImages().getNir()).printImage("img", debug).compare()

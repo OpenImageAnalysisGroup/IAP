@@ -84,6 +84,14 @@ public class ColorXYZ {
 			var_G = 1;
 		if (var_B > 1)
 			var_B = 1;
+		
+		if (var_R < 0)
+			var_R = 0;
+		if (var_G < 0)
+			var_G = 0;
+		if (var_B < 0)
+			var_B = 0;
+		
 		return new Color((float) var_R, (float) var_G, (float) var_B);
 	}
 }

@@ -703,7 +703,7 @@ public class ImageOperation {
 		FlexibleImage workImage = new FlexibleImage(image);
 		workImage = removeSmallPartsOfImage(workImage,
 				PhenotypeAnalysisTask.BACKGROUND_COLORint,
-				(int) (image.getWidth() * image.getHeight() * factor), nb, typ,
+				(int) (image.getWidth() * image.getHeight() * factor), image.getWidth() / 100, nb, typ,
 				optClusterSizeReturn);
 		return new ImageOperation(workImage);
 	}
@@ -1107,14 +1107,31 @@ public class ImageOperation {
 		return new ImageOperation(new FlexibleImage(getImage().getAs2A()));
 	}
 	
+	/**
+	 * @param workImage
+	 * @param iBackgroundFill
+	 * @param cutOffMinimumArea
+	 *           always used on Top images
+	 * @param cutOffMinimumDimension
+	 *           can be used on side images, clusters with min width or height < cutOffMinimumDimension will be removed
+	 * @param nb
+	 * @param typ
+	 * @param optClusterSizeReturn
+	 * @return
+	 */
 	public static FlexibleImage removeSmallPartsOfImage(
 			FlexibleImage workImage, int iBackgroundFill,
-			int cutOffMinimumArea, NeighbourhoodSetting nb, CameraPosition typ,
+			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
 		
 		if (cutOffMinimumArea < 1) {
 			System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");
 			cutOffMinimumArea = 1;
+		}
+		
+		if (cutOffMinimumDimension < 1) {
+			System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumDimension + ". Set to 1.");
+			cutOffMinimumDimension = 1;
 		}
 		
 		int[] rgbArray = workImage.getAs1A();
@@ -1141,20 +1158,15 @@ public class ImageOperation {
 			PixelSegmentation ps = new PixelSegmentation(image, nb);
 			ps.doPixelSegmentation(1);
 			
-			int[] clusterSizes = new int[ps.getClusterSize().length];
+			int[] clusterSizes = null;
+			int[] clusterDimensions = null;
+			
+			clusterDimensions = new int[ps.getClusterDimension().length];
+			clusterSizes = new int[ps.getClusterSize().length];
 			
 			if (optClusterSizeReturn != null)
 				optClusterSizeReturn.setObject(clusterSizes);
-			
-			switch (typ) {
-				case TOP:
-					clusterSizes = ps.getClusterSizeNormalized(w, h);
-					break;
-				
-				case SIDE:
-					clusterSizes = ps.getClusterSize();
-					break;
-			}
+			clusterDimensions = ps.getClusterDimensionMinWH(ps.getClusterDimension());
 			
 			boolean log2 = false;
 			if (log2) {
@@ -1175,7 +1187,7 @@ public class ImageOperation {
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
 					int clusterID = mask[x][y];
-					if (clusterSizes[clusterID] < cutOffMinimumArea)
+					if (clusterDimensions[clusterID] < cutOffMinimumDimension)
 						rgbArray[x + y * w] = iBackgroundFill;
 				}
 			}
@@ -2276,7 +2288,7 @@ public class ImageOperation {
 	 * 
 	 * @author pape
 	 */
-	public ImageOperation ImageBalancing(int brightness, double[] pixels) {
+	public ImageOperation imageBalancing(int brightness, double[] pixels) {
 		if (image == null)
 			return null;
 		double r = brightness / pixels[0];
@@ -2287,29 +2299,10 @@ public class ImageOperation {
 		return io.multiplicateImageChannelsWithFactors(factors);
 	}
 	
-	/**
-	 * Calculates the average of the brightness of an area around an image.
-	 * 
-	 * @author pape
-	 */
-	public double[] getProbablyWhitePixels(double size) {
-		int[][] img2d = getImageAs2array();
-		int width = image.getWidth();
-		int height = image.getHeight();
-		int w = (int) (width * size);
-		int h = (int) (height * size);
+	public ImageOperation medianFilter32Bit(int repeat) {
+		for (int i = 0; i < repeat; i++)
+			image.getProcessor().medianFilter();
 		
-		ImageOperation io = new ImageOperation(image);
-		
-		double[] valuesleft = io.getRGBAverage(img2d, 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
-		double[] valuesright = io.getRGBAverage(img2d, width - 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
-		double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
-		double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);
-		
-		double r = (valuesleft[0] + valuesright[0] + valuestop[0] + valuesdown[0]) / 4;
-		double g = (valuesleft[1] + valuesright[1] + valuestop[1] + valuesdown[1]) / 4;
-		double b = (valuesleft[2] + valuesright[2] + valuestop[2] + valuesdown[2]) / 4;
-		
-		return new double[] { r, g, b };
+		return new ImageOperation(getImage());
 	}
 }
