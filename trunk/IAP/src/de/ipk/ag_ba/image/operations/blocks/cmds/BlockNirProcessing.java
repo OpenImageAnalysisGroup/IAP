@@ -15,7 +15,7 @@ public class BlockNirProcessing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleMaskAndImageSet run() throws InterruptedException {
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (getInput().getImages().getNir() != null && getInput().getMasks().getNir() != null) {
 				{
 					FlexibleImage nir = getInput().getImages().getNir();
@@ -32,7 +32,7 @@ public class BlockNirProcessing extends AbstractSnapshotAnalysisBlockFIS {
 					// compare images
 					boolean debug = false;
 					whiteReference = new ImageOperation(getInput().getImages().getNir()).printImage("img", debug).compare()
-							.compareGrayImages(whiteReference.print("ref", debug), 100, 20, options.getBackground()).printImage("result", debug).getImage();
+							.compareGrayImages(whiteReference.print("ref", debug), 100, 25, options.getBackground()).printImage("result", debug).getImage();
 					
 					getInput().getMasks().setNir(whiteReference);
 				}

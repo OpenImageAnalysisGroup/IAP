@@ -21,12 +21,16 @@ import java.awt.Rectangle;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Line2D.Double;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
@@ -203,8 +207,9 @@ public class ImageOperation {
 					intensity = intensityB;
 				else
 					intensity = intensityB;
-				// if (intensity < 0.05)
-				// intensity = 1;
+				if (intensity > 130f / 255f)
+					intensity = 1;
+				
 				in[x][y] = new Color(intensity, intensity, intensity, 1f).getRGB();
 			}
 		return new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
@@ -1205,32 +1210,45 @@ public class ImageOperation {
 			int[] clusterDimensions = null;
 			
 			clusterDimensions = new int[ps.getClusterDimension().length];
-			clusterSizes = new int[ps.getClusterSize().length];
 			
 			if (optClusterSizeReturn != null)
-				optClusterSizeReturn.setObject(clusterSizes);
+				optClusterSizeReturn.setObject(ps.getClusterSize());
 			clusterDimensions = ps.getClusterDimensionMinWH(ps.getClusterDimension());
 			
-			boolean log2 = false;
-			if (log2) {
-				int[] clusterPerimeter = ps.getPerimeter();
-				double[] clusterCircleSimilarity = ps.getCircuitRatio();
+			Vector2d[] clusterCenter = ps.getClusterCenterPoints();
+			Vector2d[] clusterDimensions2d = ps.getClusterDimension();
+			clusterSizes = ps.getClusterSize();
+			
+			HashSet<Integer> toBeDeletedClusterIDs = new HashSet<Integer>();
+			if (typ == CameraPosition.TOP) {
+				List<LargeCluster> largeClusters = new ArrayList<LargeCluster>();
+				for (int index = 0; index < clusterSizes.length; index++) {
+					if (clusterDimensions[index] >= cutOffMinimumDimension) {
+						LargeCluster lc = new LargeCluster(clusterDimensions2d[index], clusterCenter[index], clusterSizes[index], index);
+						largeClusters.add(lc);
+					}
+				}
 				
-				for (int clusterID = 0; clusterID < clusterSizes.length; clusterID++)
-					if (clusterSizes[clusterID] > 25)
-						System.out.println("ID: " + clusterID + ", SIZE: "
-								+ clusterSizes[clusterID] + ", PERIMETER: "
-								+ clusterPerimeter[clusterID] + ", CIRCLE? "
-								+ clusterCircleSimilarity[clusterID]
-								+ ", PFLANZE? "
-								+ (clusterCircleSimilarity[clusterID] < 0.013));
+				Collections.sort(largeClusters);
+				if (largeClusters.size() > 1) {
+					LargeCluster largest = largeClusters.get(0);
+					Rectangle2D largestBounding = largest.getBoundingBox(cutOffMinimumDimension * 5);
+					for (LargeCluster lc : largeClusters) {
+						if (lc != largeClusters) {
+							// if (lc.getSize()<cutOffMinimumDimension*10);
+							if (!lc.intersects(largestBounding)) {
+								toBeDeletedClusterIDs.add(lc.getIndex());
+							}
+						}
+					}
+				}
 			}
 			
 			int[][] mask = ps.getImageMask();
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
 					int clusterID = mask[x][y];
-					if (clusterDimensions[clusterID] < cutOffMinimumDimension)
+					if (clusterDimensions[clusterID] < cutOffMinimumDimension || toBeDeletedClusterIDs.contains(clusterID))
 						rgbArray[x + y * w] = iBackgroundFill;
 				}
 			}
@@ -1539,9 +1557,10 @@ public class ImageOperation {
 				
 				boolean found = false;
 				for (int idx = 0; idx < lowerValueOfA.length; idx++) {
-					if ((Li > lowerValueOfL[idx]) && (Li < upperValueOfL[idx]) && (ai > lowerValueOfA[idx]) && (ai < upperValueOfA[idx])
-							&& (bi > lowerValueOfB[idx]) && (bi < upperValueOfB[idx])) {
-						if (resultImage[x][y] != background) {
+					if (resultImage[x][y] != background) {
+						if (((Li > lowerValueOfL[idx]) && (Li < upperValueOfL[idx]) && (ai > lowerValueOfA[idx]) && (ai < upperValueOfA[idx])
+								&& (bi > lowerValueOfB[idx]) && (bi < upperValueOfB[idx])) ||
+								(Math.abs(ai - 127) < 5 && Math.abs(bi - 127) < 5)) {
 							resultImage[x][y] = img2d[x][y];
 							found = true;
 							break;

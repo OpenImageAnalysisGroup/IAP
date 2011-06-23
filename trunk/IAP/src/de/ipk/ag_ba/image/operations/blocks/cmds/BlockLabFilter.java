@@ -30,7 +30,7 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (options.getCameraTyp() == CameraPosition.SIDE)
+		if (options.getCameraPosition() == CameraPosition.SIDE)
 			return getInput().getMasks().getFluo();
 		else
 			return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(),

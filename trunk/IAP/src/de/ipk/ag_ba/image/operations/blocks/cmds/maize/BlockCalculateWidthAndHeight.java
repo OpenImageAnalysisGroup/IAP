@@ -17,23 +17,17 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processFLUOmask() {
 		
 		int background = options.getBackground();
-		double realMarkerDist = 1;
+		double realMarkerDistHorizontal = 1;
 		
-		BlockProperty distLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_DISTANCE_MARKER_LEFT);
-		BlockProperty distRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_DISTANCE_MARKER_RIGHT);
+		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 		
-		if (options.getCameraTyp() == CameraPosition.SIDE && getInput().getMasks().getFluo() != null) {
-			Point values = getWidthandHeightSide(getInput().getMasks().getFluo(), background);
+		if (options.getCameraPosition() == CameraPosition.SIDE && getInput().getMasks().getFluo() != null) {
+			Point values = getWidthAndHeightSide(getInput().getMasks().getFluo(), background);
 			
 			if (values != null) {
-				if (distLeft != null) {
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width", values.x * (realMarkerDist / distLeft.getValue()));
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.height", values.y * (realMarkerDist / distLeft.getValue()));
-				}
-				
-				if (distLeft == null && distRight != null) {
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width", values.x * (realMarkerDist / distRight.getValue()));
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.height", values.y * (realMarkerDist / distRight.getValue()));
+				if (distHorizontal != null) {
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width", values.x * (realMarkerDistHorizontal / distHorizontal.getValue()));
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.height", values.y * (realMarkerDistHorizontal / distHorizontal.getValue()));
 				}
 			}
 		}
@@ -57,7 +51,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 		return getInput().getMasks().getFluo();
 	}
 	
-	private Point getWidthandHeightSide(FlexibleImage vis, int background) {
+	private Point getWidthAndHeightSide(FlexibleImage vis, int background) {
 		int[] temp = new ImageOperation(vis).getExtremePoints(background);
 		if (temp != null) {
 			Point values = new Point(Math.abs(temp[1] - temp[0]), Math.abs(temp[3] - temp[2]));
@@ -106,7 +100,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 			if (resize != null) {
 				resize = new ImageOperation(resize).rotate(-angle).getImage();
 				// resize.print("resize");
-				Point values = getWidthandHeightSide(resize, background);
+				Point values = getWidthAndHeightSide(resize, background);
 				return values;
 			} else {
 				return null;

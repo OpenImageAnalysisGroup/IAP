@@ -13,7 +13,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 	@Override
 	protected FlexibleImage processVISmask() {
 		
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
 			BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
@@ -26,15 +26,20 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			
 			if (markerPosLeftY != null) {
 				// System.out.println("mark: " + markerPosLeftY.getValue());
-				if (markerPosLeftY.getValue() > 0.5)
-					result = new ImageOperation(result).clearImageBottom(
-							(int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 60, options.getBackground()).getImage();
+				if (markerPosLeftY.getValue() > 0.5) {
+					int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 60;
+					result = new ImageOperation(result).clearImageBottom(cy, options.getBackground()).getImage();
+					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
+				}
 			} else
 				if (markerPosLeftY == null && markerPosRightY != null) {
 					// System.out.println("mark: " + markerPosRightY.getValue());
-					if (markerPosRightY.getValue() > 0.5)
+					if (markerPosRightY.getValue() > 0.5) {
+						int cy = (int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 60;
 						result = new ImageOperation(result).clearImageBottom(
-								(int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 60, options.getBackground()).getImage();
+								cy, options.getBackground()).getImage();
+						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
+					}
 				}
 			
 			boolean clearSides = true;
@@ -58,7 +63,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 		if (getInput().getImages().getFluo() == null)
 			return null;
 		
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getFluo();
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			
@@ -68,8 +73,10 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			if (markerPosLeft != null) {
 				double temp = markerPosLeft.getValue();
 				if (temp > 0.5) {
+					int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18;
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
-							(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18, options.getBackground()).getImage();
+							cy, options.getBackground()).getImage();
+					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
 					return result;
 				}
 				return input;
@@ -77,8 +84,10 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			if (markerPosLeft == null && markerPosRight != null) {
 				double temp = markerPosRight.getValue();
 				if (temp > 0.5) {
+					int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18;
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
-							(int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18, options.getBackground()).getImage();
+							cy, options.getBackground()).getImage();
+					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
 					return result;
 				}
 				return input;
@@ -90,7 +99,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 	@Override
 	protected FlexibleImage processNIRimage() {
 		
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (getInput().getImages().getNir() != null) {
 				FlexibleImage input = getInput().getImages().getNir();
 				
@@ -108,6 +117,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 							pos -= 18;
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) (pos), options.getBackground()).getImage();
+						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);
 						boolean clearSides = true;
 						if (clearSides)
 							if (markerPosLeftX != null) {
@@ -131,6 +141,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 							pos -= 18;
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) pos, options.getBackground()).getImage();
+						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);
 						boolean clearSides = true;
 						if (clearSides)
 							if (markerPosLeftX != null) {
@@ -156,7 +167,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 	@Override
 	protected FlexibleImage processNIRmask() {
 		
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (getInput().getMasks().getNir() != null) {
 				FlexibleImage input = getInput().getMasks().getNir();
 				
@@ -174,6 +185,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 							pos -= 10;
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) (pos), options.getBackground()).getImage();
+						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);
 						boolean clearSides = true;
 						if (clearSides)
 							if (markerPosLeftX != null) {
@@ -197,6 +209,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 							pos -= 14;
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) pos, options.getBackground()).getImage();
+						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);
 						boolean clearSides = true;
 						if (clearSides)
 							if (markerPosLeftX != null) {

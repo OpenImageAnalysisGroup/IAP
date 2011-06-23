@@ -38,7 +38,7 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 	
 	@Override
 	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
-		if (options.getCameraTyp() == CameraPosition.TOP) {
+		if (options.getCameraPosition() == CameraPosition.TOP) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green

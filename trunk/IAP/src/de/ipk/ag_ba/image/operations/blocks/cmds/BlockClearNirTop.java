@@ -13,7 +13,7 @@ public class BlockClearNirTop extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (options.getCameraTyp() == CameraPosition.TOP)
+		if (options.getCameraPosition() == CameraPosition.TOP)
 			return null;
 		else
 			return getInput().getMasks().getNir();
@@ -21,7 +21,7 @@ public class BlockClearNirTop extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		if (options.getCameraTyp() == CameraPosition.TOP)
+		if (options.getCameraPosition() == CameraPosition.TOP)
 			return null;
 		else
 			return getInput().getImages().getNir();

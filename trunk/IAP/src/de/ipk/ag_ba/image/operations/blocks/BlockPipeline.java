@@ -89,7 +89,7 @@ public class BlockPipeline {
 				status.setCurrentStatusText1(blockClass.getSimpleName());
 				status.setCurrentStatusText2(
 						"Finished " + index + "/" + blocks.size() + " (t=" + seconds + "s)");
-				if(status.wantsToStop())
+				if (status.wantsToStop())
 					break;
 			};
 		}
@@ -173,7 +173,7 @@ public class BlockPipeline {
 	 * @param match
 	 *           Image set to be analyzed.
 	 */
-	public static void debugTryAnalyze(Collection<NumericMeasurementInterface> input, MongoDB m) {
+	public static void debugTryAnalyze(final Collection<NumericMeasurementInterface> input, MongoDB m) {
 		final MaizeAnalysisTask mat = new MaizeAnalysisTask();
 		mat.setInput(input, m, 0, 1);
 		
@@ -191,7 +191,7 @@ public class BlockPipeline {
 			@Override
 			public void run() {
 				if (mat.getForcedDebugStackStorageResult() == null || mat.getForcedDebugStackStorageResult().isEmpty()) {
-					MainFrame.showMessageDialog("No pipeline results available!", "Error");
+					MainFrame.showMessageDialog("No pipeline results available! (" + input.size() + " images input)", "Error");
 				} else {
 					int idx = 1;
 					int nn = mat.getForcedDebugStackStorageResult().size();

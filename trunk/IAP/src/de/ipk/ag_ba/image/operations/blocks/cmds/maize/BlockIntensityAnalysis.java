@@ -3,11 +3,14 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 import ij.measure.ResultsTable;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private int plantAreaVis, plantImagePixelCountVis, plantAreaNir, plantImagePixelCountNir;
+	BlockProperty MarkerDistHorizontal;
 	
 	@Override
 	protected void prepare() {
@@ -19,6 +22,8 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 			this.plantAreaNir = getInput().getImages().getNir().getIO().countFilledPixels();
 			this.plantImagePixelCountNir = getInput().getImages().getNir().getWidth() * getInput().getImages().getNir().getHeight();
 		}
+		if (getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
+			MarkerDistHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 	}
 	
 	/**
@@ -50,7 +55,8 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
-			ResultsTable rt = io.intensity(3).calcualteHistorgram(plantAreaVis, plantImagePixelCountVis);
+			
+			ResultsTable rt = io.intensity(5).calcualteHistorgram(plantAreaVis, plantImagePixelCountVis, MarkerDistHorizontal);
 			getProperties().storeResults("RESULT_fluo.", rt, getBlockPosition());
 			return io.getImage();
 		} else
@@ -62,7 +68,7 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getNir() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getNir());
 			if (getInput().getMasks().getNir().getHeight() > 1) {
-				ResultsTable rt = io.intensity(3).calcualteHistorgram(plantAreaVis, plantImagePixelCountVis);
+				ResultsTable rt = io.intensity(5).calcualteHistorgram(plantAreaVis, plantImagePixelCountVis, MarkerDistHorizontal);
 				if (rt != null)
 					getProperties().storeResults("RESULT_nir.", rt, getBlockPosition());
 			}
