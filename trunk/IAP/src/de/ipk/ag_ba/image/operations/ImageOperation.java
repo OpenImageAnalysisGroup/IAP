@@ -1559,8 +1559,8 @@ public class ImageOperation {
 				for (int idx = 0; idx < lowerValueOfA.length; idx++) {
 					if (resultImage[x][y] != background) {
 						if (((Li > lowerValueOfL[idx]) && (Li < upperValueOfL[idx]) && (ai > lowerValueOfA[idx]) && (ai < upperValueOfA[idx])
-								&& (bi > lowerValueOfB[idx]) && (bi < upperValueOfB[idx])) ||
-								(Math.abs(ai - 127) < 5 && Math.abs(bi - 127) < 5)) {
+								&& (bi > lowerValueOfB[idx]) && (bi < upperValueOfB[idx])) && !
+								(Math.abs(ai - 127) < 10 && Math.abs(bi - 127) < 10)) {
 							resultImage[x][y] = img2d[x][y];
 							found = true;
 							break;
