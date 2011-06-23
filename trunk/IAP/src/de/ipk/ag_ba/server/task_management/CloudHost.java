@@ -98,4 +98,17 @@ public class CloudHost extends BasicDBObject {
 	public String getOperatingSystem() {
 		return (String) get("operatingSystem");
 	}
+	
+	public String getPipelinesPerHour() {
+		try {
+			String h = getHostName();
+			long start = Long.parseLong(h.split("_")[1]);
+			long now = System.currentTimeMillis();
+			long diff = now - start;
+			int n = getPipelineExecutedWithinCurrentHour();
+			return "" + (int) (n / (diff / 1000d / 60d / 60d));
+		} catch (Exception e) {
+			return "unknown";
+		}
+	}
 }

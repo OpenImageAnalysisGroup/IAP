@@ -7,6 +7,7 @@
 
 package de.ipk.ag_ba.gui.actions;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProvider;
@@ -16,21 +17,43 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudHost;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * @author klukas
  */
-public class ActionHostInformation extends AbstractNavigationAction {
+public class ActionCloudHostInformation extends AbstractNavigationAction {
 	
 	private CloudHost ip;
 	private BackgroundTaskStatusProvider hostStatus;
 	private NavigationButton src;
 	private MongoDB m;
+	String niceHostName;
 	
-	public ActionHostInformation(final MongoDB m, final CloudHost ip) {
-		super("Compute Node: " + ip.getHostName());
+	public ActionCloudHostInformation(final MongoDB m, final CloudHost ip) {
+		super("<html>Compute Node: " + ip.getHostName() + " <br>realized speed: " + ip.getPipelinesPerHour() + "  (pipelines/h)");
 		this.ip = ip;
 		this.m = m;
+		
+		String hostInfo = ip.getHostName();
+		if (hostInfo != null && hostInfo.contains("_")) {
+			try {
+				String[] hhh = hostInfo.split("_", 2);
+				String host = hhh[0];
+				try {
+					InetAddress addr = InetAddress.getByName(host);
+					String hostname = addr.getHostName();
+					host = hostname;
+				} catch (Exception errr) {
+					// ignore if hostname is unknown
+				}
+				hostInfo = host + "<br>(up " + SystemAnalysisExt.getCurrentTime(Long.parseLong(hhh[1])) + ")";
+				
+			} catch (Exception err) {
+				// ignore unknown formatting
+			}
+		}
+		niceHostName = hostInfo;
 		
 		this.hostStatus = new BackgroundTaskStatusProvider() {
 			private String hostInfo;
@@ -55,7 +78,7 @@ public class ActionHostInformation extends AbstractNavigationAction {
 				try {
 					ch = m.batchGetUpdatedHostInfo(ip);
 					if (ch != null)
-						ActionHostInformation.this.ip = ch;
+						ActionCloudHostInformation.this.ip = ch;
 					hostInfo = ch.getHostInfo();
 					String rA = "";
 					if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
@@ -108,7 +131,7 @@ public class ActionHostInformation extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return ip.getHostName();
+		return niceHostName;
 	}
 	
 	@Override

@@ -12,7 +12,7 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.actions.ActionHostInformation;
+import de.ipk.ag_ba.gui.actions.ActionCloudHostInformation;
 import de.ipk.ag_ba.gui.actions.ActionJobStatus;
 import de.ipk.ag_ba.gui.actions.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -66,7 +66,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		
 		try {
 			for (CloudHost ip : m.batchGetAvailableHosts(150000)) {
-				NavigationButton n = new NavigationButton(new ActionHostInformation(m, ip), guiSetting);
+				NavigationButton n = new NavigationButton(new ActionCloudHostInformation(m, ip), guiSetting);
 				res.add(n);
 			}
 		} catch (Exception e) {

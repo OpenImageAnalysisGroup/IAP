@@ -370,13 +370,26 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static boolean isSettingEnabled(IAPfeature feature) {
-		switch (feature) {
-			case REMOTE_EXECUTION:
-				return true;
-			case SAVE_DEBUG_STACK:
-				return false;
-			case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
-				return false;
+		if (SystemAnalysis.isHeadless()) {
+			// don't change return values !!!
+			switch (feature) {
+				case REMOTE_EXECUTION:
+					return false;
+				case SAVE_DEBUG_STACK:
+					return false;
+				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
+					return false;
+			}
+		} else {
+			// these may be changed for interactive applet version !!!
+			switch (feature) {
+				case REMOTE_EXECUTION:
+					return false;
+				case SAVE_DEBUG_STACK:
+					return false;
+				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
+					return false;
+			}
 		}
 		return false;
 	}

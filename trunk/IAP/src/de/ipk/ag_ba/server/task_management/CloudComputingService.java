@@ -64,30 +64,49 @@ public class CloudComputingService {
 	
 	public static void main(String[] args) {
 		System.out.println("***************************************************");
+		System.out.println("*                                                 *");
 		System.out.println("*        IAP - Integrated Analysis Platform       *");
+		System.out.println("*                                                 *");
+		System.out.println("*      --  Systems Biology Cloud Computing --     *");
+		System.out.println("*                                                 *");
 		System.out.println("*     (c) 2010-2011 IPK, Group Image Analysis     *");
+		System.out.println("*                                                 *");
 		System.out.println("***************************************************");
 		System.out.println("*                                                 *");
-		System.out.println("* - PI: Dr. Christian Klukas -------------------- *");
-		System.out.println("* - Alexander Entzian --------------------------- *");
+		System.out.println("*  PI: Dr. Christian Klukas ..................... *");
+		System.out.println("*  Alexander Entzian ............................ *");
+		System.out.println("*  Jean-Michel Pape ............................. *");
 		System.out.println("*                                                 *");
 		System.out.println("***************************************************");
 		System.out.println("> SYSTEM ANALYSIS");
 		if (args.length > 0 && args[0].contains("full")) {
-			System.out.println(": detected command line parameter - enabling full CPU utilization");
+			System.out.println(": full - enabling full CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
 			SystemAnalysis.setUseFullCpuPower(true);
 		}
 		if (args.length > 0 && args[0].contains("half")) {
-			System.out.println(": detected command line parameter - enabling half CPU utilization");
 			SystemAnalysis.setUseHalfCpuPower(true);
+			System.out.println(": half - enabling half CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
 		}
 		if (args.length > 0) {
 			try {
 				Integer i = Integer.parseInt(args[0]);
-				System.out.println(": detected command line parameter - using " + i + " CPUs");
+				System.out.println(": " + args[0] + " - using " + i + " CPUs");
 				SystemAnalysis.setUseCpu(i);
 			} catch (Exception e) {
-				System.out.println(": unknown command line parameter");
+				if ((args[0] + "").equalsIgnoreCase("clear")) {
+					try {
+						MongoDB.getDefaultCloud().batchClearJobs();
+						System.out.println(":clear - cleared scheduled jobs in database " + MongoDB.getDefaultCloud().getDatabaseName());
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					System.out.println(": Valid command line parameters:");
+					System.out.println("   'half'  - use half of the CPUs");
+					System.out.println("   'full'  - use all of the CPUs");
+					System.out.println("   'nnn'   - use specified number of CPUs");
+					System.out.println("   'clear' - clear scheduled tasks");
+				}
 			}
 		}
 		SystemInfoExt si = new SystemInfoExt();
