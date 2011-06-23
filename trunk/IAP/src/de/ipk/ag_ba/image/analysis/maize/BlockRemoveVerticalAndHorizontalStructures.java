@@ -2,9 +2,6 @@ package de.ipk.ag_ba.image.analysis.maize;
 
 import java.util.List;
 
-import org.ErrorMsg;
-import org.apache.commons.math.MathException;
-
 public class BlockRemoveVerticalAndHorizontalStructures {
 	
 	private void ttt() {
@@ -51,21 +48,21 @@ public class BlockRemoveVerticalAndHorizontalStructures {
 			// (N-2+(t(a/(2N),N-2))^2)
 			// )^0.5
 			if (n - 2 > 0) {
-				try {
-					td.setDegreesOfFreedom(n - 2);
-					double t1 = td.inverseCumulativeProbability(1 - (1 - alpha) / (2 * n));
-					double testG = (n - 1) / Math.sqrt(n) * Math.sqrt(t1 * t1 / (n - 2 + t1));
-					if (G > testG) {
-						if (isMaxPotentialOutlier)
-							max_value.setIsOutlier(true, removeOutliers);
-						else
-							min_value.setIsOutlier(true, removeOutliers); // not relevant for our problem (!!!! 2011)
-						removedPoints++;
-						outlierIdentified = true;
-					}
-				} catch (MathException e) {
-					ErrorMsg.addErrorMessage(e);
-				}
+				// try {
+				// td.setDegreesOfFreedom(n - 2);
+				// double t1 = td.inverseCumulativeProbability(1 - (1 - alpha) / (2 * n));
+				// double testG = (n - 1) / Math.sqrt(n) * Math.sqrt(t1 * t1 / (n - 2 + t1));
+				// if (G > testG) {
+				// if (isMaxPotentialOutlier)
+				// max_value.setIsOutlier(true, removeOutliers);
+				// else
+				// min_value.setIsOutlier(true, removeOutliers); // not relevant for our problem (!!!! 2011)
+				// removedPoints++;
+				// outlierIdentified = true;
+				// }
+				// } catch (MathException e) {
+				// ErrorMsg.addErrorMessage(e);
+				// }
 			}
 		} while (outlierIdentified);
 		
