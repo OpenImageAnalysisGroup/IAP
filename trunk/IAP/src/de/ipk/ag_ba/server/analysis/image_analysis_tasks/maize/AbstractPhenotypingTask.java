@@ -123,21 +123,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				@Override
 				public void run() {
 					try {
-						ImageData inVis = id.getVIS().copy();
-						ImageData inFluo = id.getFLUO().copy();
-						ImageData inNir = id.getNIR().copy();
-						
-						if (inVis == null || inNir == null || inFluo == null) {
-							System.err.println("ERROR: Internal Error: VIS/FLUO/NIR is NULL!");
-							return;
-						}
-						double rV = inVis.getPosition() != null ? inVis.getPosition() : 0;
-						double rF = inFluo.getPosition() != null ? inFluo.getPosition() : 0;
-						double rN = inNir.getPosition() != null ? inNir.getPosition() : 0;
-						if (Math.abs(rV - rF) > 0.001 || Math.abs(rF - rN) > 0.001) {
-							System.err.println("ERROR: Internal Error: VIS/FLUO/NIR rotation angles differ!");
-							return;
-						}
+						ImageData inVis = id.getVIS() != null ? id.getVIS().copy() : null;
+						ImageData inFluo = id.getFLUO() != null ? id.getFLUO().copy() : null;
+						ImageData inNir = id.getNIR() != null ? id.getNIR().copy() : null;
 						
 						final FlexibleImageSet input = new FlexibleImageSet();
 						final FlexibleImageSet inputMasks = new FlexibleImageSet();
@@ -146,24 +134,29 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						
 						MyThread a = null, b = null, c = null;
 						
-						if (inVis instanceof LoadedImage) {
-							input.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImage()));
-							inputMasks.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImageLabelField()));
-						} else {
-							a = load(inVis, input, inputMasks, FlexibleImageType.VIS);
-						}
-						if (inFluo instanceof LoadedImage) {
-							input.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImage()));
-							inputMasks.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImageLabelField()));
-						} else {
-							b = load(inFluo, input, inputMasks, FlexibleImageType.FLUO);
-						}
-						if (inNir instanceof LoadedImage) {
-							input.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImage()));
-							inputMasks.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImageLabelField()));
-						} else {
-							c = load(inNir, input, inputMasks, FlexibleImageType.NIR);
-						}
+						if (inVis != null)
+							if (inVis instanceof LoadedImage) {
+								input.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImage()));
+								inputMasks.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImageLabelField()));
+							} else {
+								a = load(inVis, input, inputMasks, FlexibleImageType.VIS);
+							}
+						
+						if (inFluo != null)
+							if (inFluo instanceof LoadedImage) {
+								input.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImage()));
+								inputMasks.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImageLabelField()));
+							} else {
+								b = load(inFluo, input, inputMasks, FlexibleImageType.FLUO);
+							}
+						
+						if (inNir != null)
+							if (inNir instanceof LoadedImage) {
+								input.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImage()));
+								inputMasks.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImageLabelField()));
+							} else {
+								c = load(inNir, input, inputMasks, FlexibleImageType.NIR);
+							}
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 						if (input.hasAllThreeImages() && input.getSmallestHeight(true, true, false) > 1) {

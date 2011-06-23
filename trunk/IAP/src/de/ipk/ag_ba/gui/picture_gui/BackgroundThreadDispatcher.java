@@ -317,7 +317,8 @@ public class BackgroundThreadDispatcher {
 	public static void waitFor(MyThread[] threads) throws InterruptedException {
 		HashSet<MyThread> t = new HashSet<MyThread>();
 		for (MyThread m : threads)
-			t.add(m);
+			if (m != null)
+				t.add(m);
 		waitFor(t);
 	}
 	

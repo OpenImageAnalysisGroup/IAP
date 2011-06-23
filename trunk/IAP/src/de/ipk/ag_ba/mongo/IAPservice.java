@@ -450,7 +450,7 @@ public class IAPservice {
 					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
 					if (name.contains("."))
 						key += name.substring(name.lastIndexOf("."));
-					if (searchKey.equals(key)) {
+					if (searchKey.equalsIgnoreCase(key)) {
 						result.add(id);
 					}
 				}

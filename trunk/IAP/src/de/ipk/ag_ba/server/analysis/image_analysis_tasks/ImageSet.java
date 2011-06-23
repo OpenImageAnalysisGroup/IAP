@@ -45,8 +45,13 @@ public class ImageSet {
 		nir = id;
 	}
 	
+	/**
+	 * Checks if at least VIS and FLUO images are available. If the NIR is missing, this call still returns TRUE !
+	 * 
+	 * @return
+	 */
 	public boolean hasAllImageTypes() {
-		return vis != null && fluo != null && nir != null;
+		return vis != null && fluo != null;// && nir != null;
 	}
 	
 	public boolean isSide() {
