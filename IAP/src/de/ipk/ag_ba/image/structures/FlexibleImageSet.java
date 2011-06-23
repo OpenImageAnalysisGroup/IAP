@@ -137,8 +137,13 @@ public class FlexibleImageSet {
 		this.nir = nir;
 	}
 	
+	/**
+	 * Checks if at least VIS and FLUO are available. If NIR is NULL, then still TRUE is returned!
+	 * 
+	 * @return
+	 */
 	public boolean hasAllThreeImages() {
-		return vis != null && fluo != null && nir != null;
+		return vis != null && fluo != null;
 	}
 	
 	public void set(FlexibleImage flexibleImage) {
