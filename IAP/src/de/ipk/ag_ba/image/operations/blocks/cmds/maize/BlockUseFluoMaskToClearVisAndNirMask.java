@@ -20,13 +20,13 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null || getInput().getMasks().getFluo() == null)
 			return null;
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
 			return clearImageSide(input, getInput().getMasks().getFluo(), 0.1);
 		}
 		
-		if (options.getCameraTyp() == CameraPosition.TOP) {
+		if (options.getCameraPosition() == CameraPosition.TOP) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
 			return clearImageTop(input, getInput().getMasks().getFluo());
@@ -38,13 +38,13 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected FlexibleImage processNIRmask() {
 		if (getInput().getMasks().getNir() == null || getInput().getMasks().getFluo() == null)
 			return null;
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
 			return clearImageSide(input, getInput().getMasks().getFluo(), 0.01);
 		}
 		
-		if (options.getCameraTyp() == CameraPosition.TOP) {
+		if (options.getCameraPosition() == CameraPosition.TOP) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
 			return clearImageTop(input, getInput().getMasks().getFluo());
@@ -56,13 +56,13 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected FlexibleImage processNIRimage() {
 		if (getInput().getImages().getNir() == null || getInput().getMasks().getFluo() == null)
 			return null;
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getImages().getNir();
 			
 			return clearImageSide(input, getInput().getMasks().getFluo(), 0.01);
 		}
 		
-		if (options.getCameraTyp() == CameraPosition.TOP) {
+		if (options.getCameraPosition() == CameraPosition.TOP) {
 			FlexibleImage input = getInput().getImages().getNir();
 			
 			return clearImageTop(input, getInput().getMasks().getFluo());

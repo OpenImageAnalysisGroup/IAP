@@ -130,7 +130,7 @@ public class BlockPropertiesImpl implements BlockProperties {
 	@Override
 	public void storeResults(String id_prefix, ResultsTable numericResults, int position) {
 		for (int row = 0; row < numericResults.getCounter(); row++) {
-			for (int col = 0; col < numericResults.getLastColumn(); col++) {
+			for (int col = 0; col <= numericResults.getLastColumn(); col++) {
 				String id = numericResults.getColumnHeading(col);
 				double val = numericResults.getValueAsDouble(col, row);
 				setNumericProperty(position, id_prefix + id, val);

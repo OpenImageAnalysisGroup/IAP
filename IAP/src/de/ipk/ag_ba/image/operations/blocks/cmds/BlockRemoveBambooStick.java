@@ -36,7 +36,7 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() != null) {
-			if (options.getCameraTyp() == CameraPosition.SIDE) {
+			if (options.getCameraPosition() == CameraPosition.SIDE) {
 				return clearBamboo(getInput().getMasks().getVis());
 			}
 			return getInput().getMasks().getVis();

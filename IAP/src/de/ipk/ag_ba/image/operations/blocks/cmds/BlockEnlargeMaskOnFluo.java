@@ -16,7 +16,7 @@ public class BlockEnlargeMaskOnFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return enlargeMask(getInput().getMasks().getFluo(), options.getCameraTyp());
+		return enlargeMask(getInput().getMasks().getFluo(), options.getCameraPosition());
 	}
 	
 	private FlexibleImage enlargeMask(FlexibleImage workImage, CameraPosition cameraTyp) {

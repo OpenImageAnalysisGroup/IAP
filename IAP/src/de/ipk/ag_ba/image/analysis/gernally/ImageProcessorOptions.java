@@ -280,7 +280,7 @@ public class ImageProcessorOptions {
 		
 	}
 	
-	public CameraPosition getCameraTyp() {
+	public CameraPosition getCameraPosition() {
 		return cameraTyp;
 		
 	}

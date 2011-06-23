@@ -11,11 +11,11 @@ public class BlockRemoveLevitatingObjects extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null || getInput().getMasks().getVis() == null)
 			return null;
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			int background = options.getBackground();
 			int cut = searchSplitObjectsInYDirection(input, 20, background);
-			if (cut > 0 && cut < getInput().getMasks().getVis().getHeight() * 0.65)
+			if (cut > 0 && cut < getInput().getMasks().getVis().getHeight() * 0.5)
 				return new ImageOperation(getInput().getMasks().getVis()).clearImageAbove(cut, background).getImage();
 			else
 				return getInput().getMasks().getVis();
@@ -27,11 +27,11 @@ public class BlockRemoveLevitatingObjects extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() == null || getInput().getMasks().getFluo() == null)
 			return null;
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getFluo();
 			int background = options.getBackground();
 			int cut = searchSplitObjectsInYDirection(input, 20, background);
-			if (cut > 0 && cut < getInput().getMasks().getFluo().getHeight() * 0.65)
+			if (cut > 0 && cut < getInput().getMasks().getFluo().getHeight() * 0.5)
 				return new ImageOperation(getInput().getMasks().getFluo()).clearImageAbove(cut, background).getImage();
 			else
 				return getInput().getMasks().getFluo();

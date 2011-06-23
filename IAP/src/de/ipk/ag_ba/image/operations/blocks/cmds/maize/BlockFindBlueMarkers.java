@@ -24,7 +24,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
 		
-		if (options.getCameraTyp() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			numericResult = getMarkers(getInput().getMasks().getVis());
 			
 			int w = getInput().getMasks().getVis().getWidth();
@@ -54,7 +54,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 					break;
 			}
 			if (numericResult != null) {
-				calculateDistanceBetweenMarkers(numericResult);
+				calculateDistanceBetweenMarkers(numericResult, w);
 			}
 			boolean debug = false;
 			if (debug)
@@ -63,22 +63,52 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 		return getInput().getMasks().getVis();
 	}
 	
-	private void calculateDistanceBetweenMarkers(ArrayList<MarkerPair> numericResult) {
+	// distances vertical
+	private void calculateDistanceBetweenMarkers(ArrayList<MarkerPair> numericResult, int imageWidth) {
+		boolean debug = false;
 		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y) != null
-				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y) != null) {
-			double markerPosOneLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y).getValue();
-			double markerPosTwoLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y).getValue();
+				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y) != null) {
+			double markerPosOneLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y).getValue() * imageWidth;
+			double markerPosTwoLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y).getValue() * imageWidth;
 			
-			getProperties().setNumericProperty(0, PropertyNames.RESULT_DISTANCE_MARKER_LEFT, Math.abs(markerPosTwoLeft - markerPosOneLeft));
+			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_LEFT, Math.abs(markerPosTwoLeft - markerPosOneLeft));
+			if (debug)
+				System.out.println("dist_vertical: " + (markerPosTwoLeft - markerPosOneLeft));
 		}
 		
 		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y) != null
-				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y) != null) {
-			double markerPosOneRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y).getValue();
-			double markerPosTwoRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y).getValue();
+				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y) != null) {
+			double markerPosOneRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y).getValue() * imageWidth;
+			double markerPosTwoRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y).getValue() * imageWidth;
 			
-			getProperties().setNumericProperty(0, PropertyNames.RESULT_DISTANCE_MARKER_RIGHT, Math.abs(markerPosTwoRight - markerPosOneRight));
+			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_RIGHT, Math.abs(markerPosTwoRight - markerPosOneRight));
+			if (debug)
+				System.out.println("dist_vertical: " + (markerPosTwoRight - markerPosOneRight));
 		}
+		
+		// distances horizontal
+		int[] distances = new int[numericResult.size()];
+		int n = 0;
+		for (MarkerPair mp : numericResult) {
+			if (mp.getLeft() != null && mp.getRight() != null) {
+				distances[n] = (int) Math.abs(mp.getLeft().x - mp.getRight().x);
+			}
+			n++;
+		}
+		
+		int maxDist = max(distances);
+		getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT, maxDist);
+		
+		if (debug)
+			System.out.println("maxDist_horizontal: " + maxDist);
+	}
+	
+	private int max(int[] distances) {
+		int max = 0;
+		for (int n : distances)
+			if (n > max)
+				max = n;
+		return max;
 	}
 	
 	private FlexibleImage drawMarkers(FlexibleImage vis, ArrayList<MarkerPair> numericResult) {

@@ -23,7 +23,7 @@ public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		
-		if (options.getCameraTyp() == CameraPosition.TOP && getInput().getMasks().getVis() != null) {
+		if (options.getCameraPosition() == CameraPosition.TOP && getInput().getMasks().getVis() != null) {
 			MainAxisCalculationResult macr = getAngle(getInput().getMasks().getVis());
 			if (macr != null) {
 				double angle = macr.getMinResult().getAngle();
