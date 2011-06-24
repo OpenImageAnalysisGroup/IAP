@@ -53,7 +53,7 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 		int pixelsInCluster = 0;
 		int numberOfClusterPerLine = 0;
 		
-		FlexibleImage yellow = new ImageOperation(labFilter(mask, mask, 150, 255, 108, 165, 127, 255)).opening(1, 1).getImage();
+		FlexibleImage yellow = new ImageOperation(labFilter(mask, mask, 150, 255, 108, 165, 127, 255, options.getCameraPosition())).opening(1, 1).getImage();
 		
 		int[][] yellowarr = yellow.getAs2A();
 		int[][] origarr = mask.getAs2A();
@@ -103,7 +103,7 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
-			int upperValueOfA, int lowerValueOfB, int upperValueOfB) {
+			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ) {
 		
 		int[][] image = workMask.getAs2A();
 		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
@@ -116,7 +116,7 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
-				back);
+				back, typ);
 		
 		FlexibleImage mask = new FlexibleImage(result);
 		

@@ -3,6 +3,7 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -18,7 +19,7 @@ public class BlockGetLab extends AbstractSnapshotAnalysisBlockFIS {
 		return labFilter(getInput().getMasks().getVis(), getInput().getImages().getVis(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS), options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS), options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
-				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS));
+				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS), options.getCameraPosition());
 	}
 	
 	@Override
@@ -27,7 +28,7 @@ public class BlockGetLab extends AbstractSnapshotAnalysisBlockFIS {
 		return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO),
 				options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO), options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO),
 				options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO), options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO),
-				options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO));
+				options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO), options.getCameraPosition());
 	}
 	
 	@Override
@@ -36,11 +37,11 @@ public class BlockGetLab extends AbstractSnapshotAnalysisBlockFIS {
 		return labFilter(getInput().getMasks().getNir(), getInput().getImages().getNir(), options.getIntSetting(Setting.LAB_MIN_L_VALUE_NIR),
 				options.getIntSetting(Setting.LAB_MAX_L_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_A_VALUE_NIR),
 				options.getIntSetting(Setting.LAB_MAX_A_VALUE_NIR), options.getIntSetting(Setting.LAB_MIN_B_VALUE_NIR),
-				options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR));
+				options.getIntSetting(Setting.LAB_MAX_B_VALUE_NIR), options.getCameraPosition());
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
-			int upperValueOfA, int lowerValueOfB, int upperValueOfB) {
+			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ) {
 		
 		int[][] image = originalImage.getAs2A();
 		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
@@ -53,7 +54,7 @@ public class BlockGetLab extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
-				back);
+				back, typ);
 		
 		for (int i = 0; i < workMask.getWidth(); i++) {
 			for (int j = 0; j < workMask.getHeight(); j++) {

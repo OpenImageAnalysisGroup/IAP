@@ -25,7 +25,7 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 				new int[] { options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS) },
 				new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS) },
 				new int[] { options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS) });
+				new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS) }, options.getCameraPosition());
 	}
 	
 	@Override
@@ -39,11 +39,11 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 					new int[] { options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO) },
 					new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO) },
 					new int[] { options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO) });
+					new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO) }, options.getCameraPosition());
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int[] lowerValueOfL, int[] upperValueOfL, int[] lowerValueOfA,
-			int[] upperValueOfA, int[] lowerValueOfB, int[] upperValueOfB) {
+			int[] upperValueOfA, int[] lowerValueOfB, int[] upperValueOfB, CameraPosition typ) {
 		
 		int[][] image = workMask.getAs2A();
 		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
@@ -56,7 +56,7 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
-				back);
+				back, typ);
 		
 		FlexibleImage mask = new FlexibleImage(result);
 		
