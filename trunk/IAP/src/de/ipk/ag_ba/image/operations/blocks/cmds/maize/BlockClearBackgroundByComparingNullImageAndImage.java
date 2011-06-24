@@ -26,11 +26,11 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage vis = getInput().getImages().getVis();
 			vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
-			return new ImageOperation(vis).compare()
-					.compareImages(getInput().getMasks().getVis(),
-							options.getIntSetting(Setting.L_Diff_VIS),
-							options.getIntSetting(Setting.L_Diff_VIS),
-							options.getIntSetting(Setting.abDiff_VIS),
+			return new ImageOperation(vis).medianFilter32Bit().unsharpedMask(1.0f, 3.0).compare()
+					.compareImages(getInput().getMasks().getVis().getIO().blur(2).getImage(),
+							options.getIntSetting(Setting.L_Diff_VIS_SIDE),
+							options.getIntSetting(Setting.L_Diff_VIS_SIDE),
+							options.getIntSetting(Setting.abDiff_VIS_SIDE),
 							back, false, false).border(2).getImage();
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP) {

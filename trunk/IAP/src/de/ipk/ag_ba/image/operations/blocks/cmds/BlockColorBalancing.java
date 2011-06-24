@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -17,7 +18,11 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		if (vis == null)
 			return null;
 		ImageOperation io = new ImageOperation(vis);
-		double[] pix = getProbablyWhitePixels(vis, 0.06);
+		double[] pix;
+		if (options.getCameraPosition() == CameraPosition.SIDE)
+			pix = getProbablyWhitePixels(vis, 0.2);
+		else
+			pix = getProbablyWhitePixels(vis, 0.06);
 		return io.imageBalancing(255, pix).getImage();
 	}
 	
@@ -27,7 +32,11 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		if (vis == null)
 			return null;
 		ImageOperation io = new ImageOperation(vis);
-		double[] pix = getProbablyWhitePixels(vis, 0.06);
+		double[] pix;
+		if (options.getCameraPosition() == CameraPosition.SIDE)
+			pix = getProbablyWhitePixels(vis, 0.2);
+		else
+			pix = getProbablyWhitePixels(vis, 0.06);
 		return io.imageBalancing(255, pix).getImage();
 	}
 	

@@ -9,6 +9,7 @@ package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.color.ColorUtil;
+import de.ipk.ag_ba.image.operations.Channel;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.PrintImage;
@@ -88,6 +90,23 @@ public class FlexibleImage {
 	
 	public FlexibleImage(Image image) {
 		this(GravistoService.getBufferedImage(image));
+	}
+	
+	public FlexibleImage(int w, int h, float[][] channelR, float[][] channelG, float[][] channelB) {
+		this.w = w;
+		this.h = h;
+		
+		int[][] img = new int[w][h];
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				float r = channelR[x][y];
+				float g = channelG[x][y];
+				float b = channelB[x][y];
+				int c = new Color(r, g, b).getRGB();
+				img[x][y] = c;
+			}
+		}
+		image = ImageConverter.convert2AtoIJ(img);
 	}
 	
 	public BufferedImage getAsBufferedImage() {
@@ -199,8 +218,7 @@ public class FlexibleImage {
 	public double[][] getLab() {
 		final int w = getWidth();
 		final int h = getHeight();
-		final int arrayRGB[] = new int[w * h];
-		getAsBufferedImage().getRGB(0, 0, w, h, arrayRGB, 0, w);
+		final int arrayRGB[] = getAs1A();
 		double arrayL[] = new double[w * h];
 		double arrayA[] = new double[w * h];
 		double arrayB[] = new double[w * h];
@@ -223,14 +241,16 @@ public class FlexibleImage {
 		
 		if (leftX < 0 || rightX < 0 || topY < 0 || bottomY < 0) {
 			int[] ext = io.getExtremePoints(background);
-			if (leftX < 0)
-				leftX = ext[2];
-			if (rightX < 0)
-				rightX = ext[3];
-			if (topY < 0)
-				topY = ext[0];
-			if (bottomY < 0)
-				bottomY = ext[2];
+			if (ext != null) {
+				if (leftX < 0)
+					leftX = ext[2];
+				if (rightX < 0)
+					rightX = ext[3];
+				if (topY < 0)
+					topY = ext[0];
+				if (bottomY < 0)
+					bottomY = ext[2];
+			}
 		}
 		
 		int[][] res = new int[rightX - leftX][bottomY - topY];
@@ -239,7 +259,32 @@ public class FlexibleImage {
 				res[x][y] = img[x + leftX][y + topY];
 			}
 		}
-		return new FlexibleImage(res);
+		if (res.length > 0)
+			return new FlexibleImage(res);
+		else
+			return null;
 	}
 	
+	public float[][] getFloatChannel(Channel r) {
+		int[][] img = getAs2A();
+		float[][] result = new float[getWidth()][getHeight()];
+		for (int x = 0; x < w; x++)
+			for (int y = 0; y < h; y++) {
+				int c = img[x][y];
+				float f = 0f;
+				switch (r) {
+					case R:
+						f = ((c & 0xff0000) >> 16) / 255f;
+						break;
+					case G:
+						f = ((c & 0x00ff00) >> 8) / 255f;
+						break;
+					case B:
+						f = (c & 0x0000ff) / 255f;
+						break;
+				}
+				result[x][y] = f;
+			}
+		return result;
+	}
 }
