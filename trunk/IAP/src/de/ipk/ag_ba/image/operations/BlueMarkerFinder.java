@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import org.Vector2d;
 
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
@@ -18,10 +19,12 @@ public class BlueMarkerFinder {
 	private final FlexibleImage input;
 	private ResultsTable resultTable;
 	private double scale;
+	private final CameraPosition typ;
 	
-	public BlueMarkerFinder(FlexibleImage image, double scale) {
+	public BlueMarkerFinder(FlexibleImage image, double scale, CameraPosition typ) {
 		this.input = image;
 		this.scale = scale;
+		this.typ = typ;
 	}
 	
 	public void findCoordinates(int background) {
@@ -31,7 +34,7 @@ public class BlueMarkerFinder {
 		if (debug)
 			resultTable = io1
 					// .thresholdLAB(0, 255, 0, 200, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
-					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
+					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint, typ).printImage("nach lab")
 					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
 					.printImage("nach opening")
@@ -43,7 +46,7 @@ public class BlueMarkerFinder {
 					.getResultsTable();
 		else
 			resultTable = io1
-					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint)
+					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint, typ)
 					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
 					.convert2Grayscale()

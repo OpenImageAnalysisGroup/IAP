@@ -31,6 +31,7 @@ import java.awt.image.Kernel;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -1233,13 +1234,23 @@ public class ImageOperation {
 				
 				Collections.sort(largeClusters);
 				if (largeClusters.size() > 1) {
-					LargeCluster largest = largeClusters.get(0);
+					final LargeCluster largest = largeClusters.get(0);
 					Rectangle2D largestBounding = largest.getBoundingBox(cutOffMinimumDimension * 5);
+					Collections.sort(largeClusters, new Comparator<LargeCluster>() {
+						
+						@Override
+						public int compare(LargeCluster o1, LargeCluster o2) {
+							double d1 = largest.distanceTo(o1);
+							double d2 = largest.distanceTo(o2);
+							return d1 > d2 ? 1 : -1;
+						}
+					});
 					for (LargeCluster lc : largeClusters) {
 						if (lc != largeClusters) {
-							// if (lc.getSize()<cutOffMinimumDimension*10);
 							if (!lc.intersects(largestBounding)) {
 								toBeDeletedClusterIDs.add(lc.getIndex());
+							} else {
+								largestBounding.add(lc.getBoundingBox(cutOffMinimumDimension * 5));
 							}
 						}
 					}
@@ -1471,7 +1482,7 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation thresholdLAB(int lowerValueOfL, int upperValueOfL, int lowerValueOfA, int upperValueOfA, int lowerValueOfB,
-			int upperValueOfB, int background) {
+			int upperValueOfB, int background, CameraPosition typ) {
 		
 		int width = image.getProcessor().getWidth();
 		int height = image.getProcessor().getHeight();
@@ -1480,7 +1491,7 @@ public class ImageOperation {
 		int[][] img2d = getImageAs2array();
 		
 		doThresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
-				lowerValueOfB, upperValueOfB, background);
+				lowerValueOfB, upperValueOfB, background, typ);
 		
 		return new ImageOperation(resultImage);
 	}
@@ -1489,11 +1500,11 @@ public class ImageOperation {
 			int lowerValueOfL, int upperValueOfL,
 			int lowerValueOfA, int upperValueOfA,
 			int lowerValueOfB, int upperValueOfB,
-			int background) {
+			int background, CameraPosition typ) {
 		
 		doThresholdLAB(width, height, img2d, resultImage,
 				new int[] { lowerValueOfL }, new int[] { upperValueOfL }, new int[] { lowerValueOfA }, new int[] { upperValueOfA }, new int[] { lowerValueOfB },
-				new int[] { upperValueOfB }, background);
+				new int[] { upperValueOfB }, background, typ);
 		
 	}
 	
@@ -1501,13 +1512,22 @@ public class ImageOperation {
 			int[] lowerValueOfL, int[] upperValueOfL,
 			int[] lowerValueOfA, int[] upperValueOfA,
 			int[] lowerValueOfB, int[] upperValueOfB,
-			int background) {
+			int background, CameraPosition typ) {
 		int c, x, y = 0;
 		double rf, gf, bf;
 		double X, Y, Z, fX, fY, fZ;
 		double La, aa, bb;
 		double ot = 1 / 3.0, cont = 16 / 116.0;
 		int Li, ai, bi;
+		int maxDiffAleftBright, maxDiffArightBleft;
+		
+		if (typ == CameraPosition.SIDE) {
+			maxDiffAleftBright = 7;
+			maxDiffArightBleft = 7;
+		} else {
+			maxDiffAleftBright = 15;
+			maxDiffArightBleft = 7;
+		}
 		
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < width; x++) {
@@ -1562,7 +1582,7 @@ public class ImageOperation {
 					if (resultImage[x][y] != background) {
 						if (((Li > lowerValueOfL[idx]) && (Li < upperValueOfL[idx]) && (ai > lowerValueOfA[idx]) && (ai < upperValueOfA[idx])
 								&& (bi > lowerValueOfB[idx]) && (bi < upperValueOfB[idx])) && !
-								(Math.abs(ai - 127) < 5 && Math.abs(bi - 127) < 5 && Math.abs(Li - 127) > 110)) {
+								isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft)) {
 							resultImage[x][y] = img2d[x][y];
 							found = true;
 							break;
@@ -1573,6 +1593,24 @@ public class ImageOperation {
 					resultImage[x][y] = background;
 			}
 		}
+	}
+	
+	private static boolean isGray(int li, int ai, int bi, int maxDiffAleftBright, int maxDiffArightBleft) {
+		ai = ai - 127;
+		bi = bi - 127;
+		boolean aNoColor, bNoColor;
+		
+		if (ai < 0)
+			aNoColor = -ai < maxDiffAleftBright;
+		else
+			aNoColor = ai < maxDiffArightBleft;
+		
+		if (bi < 0)
+			bNoColor = -bi < maxDiffArightBleft;
+		else
+			bNoColor = bi < maxDiffAleftBright;
+		
+		return aNoColor && bNoColor;
 	}
 	
 	public Lab getLABAverage(int[][] img2d, int x1, int y1, int w, int h) {
@@ -1845,8 +1883,8 @@ public class ImageOperation {
 		return new ImageOperation(bi);
 	}
 	
-	public ArrayList<MarkerPair> searchBlueMarkers(double options) {
-		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options);
+	public ArrayList<MarkerPair> searchBlueMarkers(double options, CameraPosition typ) {
+		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options, typ);
 		
 		bmf.findCoordinates(PhenotypeAnalysisTask.BACKGROUND_COLORint);
 		

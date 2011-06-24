@@ -38,4 +38,8 @@ public class LargeCluster implements Comparable<LargeCluster> {
 				dimension.x + increaseSizeBy, dimension.y + increaseSizeBy);
 	}
 	
+	public double distanceTo(LargeCluster o1) {
+		return center.distance(o1.center);
+	}
+	
 }

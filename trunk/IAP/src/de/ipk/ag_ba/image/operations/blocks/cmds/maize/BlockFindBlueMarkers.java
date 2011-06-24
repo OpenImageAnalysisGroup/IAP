@@ -126,6 +126,6 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private ArrayList<MarkerPair> getMarkers(FlexibleImage image) {
 		double s = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
-		return new ImageOperation(image).searchBlueMarkers(s * s / 1.2);
+		return new ImageOperation(image).searchBlueMarkers(s * s / 1.2, options.getCameraPosition());
 	}
 }
