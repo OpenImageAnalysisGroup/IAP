@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations;
 
 import ij.ImagePlus;
+import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
@@ -33,12 +34,12 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 public class ImageConverter {
 	public static void main(String[] args) {
-
+		
 		try {
 			IOurl url = new IOurl(
 					"http://www.spiegel.de/images/image-150632-panoV9free-hldq.jpg");
 			BufferedImage img = ImageIO.read(url.getInputStream());
-
+			
 			// ############ Skalierung Test ##############
 			GravistoService.showImage(img, "Ausgang");
 			GravistoService.showImage(scalingIJ(img), "Scaling IJ Faktor 2");
@@ -49,50 +50,46 @@ public class ImageConverter {
 							"Scaling JAI Faktor 2");
 			GravistoService.showImage(scalingOWN(img), "Scaling OWN Faktor 2");
 			GravistoService.showImage(scalingAWT(img), "Scaling AWT Faktor 2");
-
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
 	}
-
+	
 	// ########## Rückgabe ImagePlus ##############
-
+	
 	public static ImagePlus convertBItoIJ(BufferedImage img) {
 		return img != null ? new ImagePlus("JImage", img) : null;
 	}
-
+	
 	public static ImagePlus convert1ABtoIJ(int w, int h, int[] img) {
 		img = ImageConverter.convert1ABto1A(img);
 		ImagePlus jImage = new ImagePlus("JImage", convert1AtoBI(w, h, img));
 		return jImage;
 	}
-
+	
 	public static ImagePlus convert1AtoIJ(int w, int h, int[] img) {
 		return new ImagePlus("JImage", new ColorProcessor(w, h, img));
 		// ImagePlus jImage = new ImagePlus("JImage", convert1AtoBI(w, h, img));
 		// return jImage;
 	}
-
+	
 	public static ImagePlus convert2AtoIJ(int[][] img) {
 		int w = img.length;
 		int h = img[0].length;
-		int[] i1 = convert2Ato1A(img);
-		return new ImagePlus("JImage", ImageConverter.convert1AtoBI(w, h, i1));
-		// ImagePlus jImage = new ImagePlus("JImage",
-		// ImageConverter.convert2AtoBI(img));
-		// return jImage;
+		return convert1AtoIJ(w, h, convert2Ato1A(img));
 	}
-
+	
 	public static ImagePlus convert2ABtoIJ(int[][] img) {
 		img = ImageConverter.convert2ABto2A(img);
 		ImagePlus jImage = new ImagePlus("JImage",
 				ImageConverter.convert2AtoBI(img));
 		return jImage;
 	}
-
+	
 	// ########## Rückgabe int[] ###############
-
+	
 	public static int[] convert1ABto1A(int[] img) {
 		for (int i = 0; i < img.length; i++) {
 			if (img[i] == 0)
@@ -102,12 +99,12 @@ public class ImageConverter {
 		}
 		return img;
 	}
-
+	
 	public static int[] convert2ABto1A(int[][] img) {
 		img = convert2ABto2A(img);
 		return ImageConverter.convert2Ato1A(img);
 	}
-
+	
 	public static int[] convertBIto1A(BufferedImage img) {
 		final int w = img.getWidth();
 		final int h = img.getHeight();
@@ -115,16 +112,16 @@ public class ImageConverter {
 		img.getRGB(0, 0, w, h, image, 0, w);
 		return image;
 	}
-
+	
 	public static int[] convert2Ato1A(int[][] img) {
 		int[] image = new int[img.length * img[0].length];
-
+		
 		for (int i = 0; i < img.length; i++)
 			for (int j = 0; j < img[0].length; j++)
 				image[i + j * img.length] = img[i][j];
 		return image;
 	}
-
+	
 	public static int[] convertIJto1A(ImagePlus img) {
 		Object res = img.getProcessor().getPixels();
 		if (res instanceof int[])
@@ -141,9 +138,9 @@ public class ImageConverter {
 				throw new UnsupportedOperationException("Unknown pixel format!");
 		}
 	}
-
+	
 	// ########## Rückgabe int[][] ###############
-
+	
 	public static int[][] convert2ABto2A(int[][] img) {
 		for (int i = 0; i < img.length; i++) {
 			for (int j = 0; j < img[i].length; j++)
@@ -154,7 +151,7 @@ public class ImageConverter {
 		}
 		return img;
 	}
-
+	
 	public static int[][] convert2ABto2AcolorFull(int[][] img) {
 		TreeSet<Integer> values = new TreeSet<Integer>();
 		for (int i = 0; i < img.length; i++) {
@@ -162,16 +159,16 @@ public class ImageConverter {
 				if (img[i][j] != 0)
 					values.add(img[i][j]);
 		}
-
+		
 		ArrayList<Color> colors = Colors.get(values.size(), 1);
-
+		
 		HashMap<Integer, Integer> value2color = new HashMap<Integer, Integer>();
-
+		
 		int idx = 0;
 		for (int value : values) {
 			value2color.put(value, colors.get(idx++).getRGB());
 		}
-
+		
 		for (int i = 0; i < img.length; i++) {
 			for (int j = 0; j < img[i].length; j++)
 				if (img[i][j] == 0)
@@ -181,22 +178,22 @@ public class ImageConverter {
 		}
 		return img;
 	}
-
+	
 	public static int[][] convert1ABto2A(int w, int h, int[] img) {
 		img = ImageConverter.convert1ABto1A(img);
 		return ImageConverter.convert1Ato2A(w, h, img);
 	}
-
+	
 	public static int[][] convertBIto2A(BufferedImage img) {
 		int[][] image = convert1Ato2A(img.getWidth(), img.getHeight(),
 				convertBIto1A(img));
 		return image;
 	}
-
+	
 	public static int[][] convert1Ato2A(int w, int h, int[] img) {
-
+		
 		int[][] image = new int[w][h];
-
+		
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
 				image[i][j] = img[i + j * w];
@@ -204,79 +201,97 @@ public class ImageConverter {
 		}
 		return image;
 	}
-
+	
 	public static int[][] convertIJto2A(ImagePlus img) {
-		BufferedImage image = ImageConverter.convertIJtoBI(img);
-		return ImageConverter.convertBIto2A(image);
+		if (img.getProcessor() instanceof ColorProcessor) {
+			ColorProcessor cp = (ColorProcessor) img.getProcessor();
+			int[] p = (int[]) cp.getPixels();
+			return convert1Ato2A(img.getWidth(), img.getHeight(), p);
+		} else {
+			ByteProcessor cp = (ByteProcessor) img.getProcessor();
+			byte[] p = (byte[]) cp.getPixels();
+			return convert1Abyteto2A(img.getWidth(), img.getHeight(), p);
+		}
 	}
-
-	// ######### Rückgabe BufferedImage ###########
-
+	
+	private static int[][] convert1Abyteto2A(int width, int height, byte[] p) {
+		int[] img = new int[p.length];
+		for (int i = 0; i < p.length; i++) {
+			int value = 0;
+			for (int ii = 0; ii < 3; ii++) {
+				value += (p[i] & 0x000000FF) << 8;
+				value += (p[i] & 0x000000FF) << 16;
+				value += (p[i] & 0x000000FF) << 24;
+			}
+			img[i] = value;
+		}
+		return convert1Ato2A(width, height, img);
+	}
+	
 	public static BufferedImage convert1ABtoBI(int width, int height, int[] img) {
 		img = ImageConverter.convert1ABto1A(img);
 		return ImageConverter.convert1AtoBI(width, height, img);
 	}
-
+	
 	public static BufferedImage convert2ABtoBI(int[][] img) {
 		img = ImageConverter.convert2ABto2A(img);
 		return ImageConverter.convert2AtoBI(img);
 	}
-
+	
 	public static BufferedImage convertPItoBI(PlanarImage plImage1) {
-
-		BufferedImage fBufferedImage = plImage1.getAsBufferedImage();
-		;
+		
+		BufferedImage fBufferedImage = plImage1.getAsBufferedImage();;
 		return fBufferedImage;
 	}
-
+	
 	public static BufferedImage convertIJtoBI(ImagePlus jImage1) {
-
+		
 		BufferedImage fBufferedImage = jImage1.getProcessor()
 				.getBufferedImage();
 		return fBufferedImage;
 	}
-
+	
 	public static BufferedImage convert1AtoBI(int width, int height, int[] img) {
-
+		
 		BufferedImage fBufferedImage = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_RGB);
 		WritableRaster wr = fBufferedImage.getRaster();
 		wr.setDataElements(0, 0, width, height, img);
 		return fBufferedImage;
-
+		
 	}
-
+	
 	public static BufferedImage convert2AtoBI(int[][] img) {
-
+		
 		if (img.length == 0)
 			return null;
-
+		
 		int width = img.length;
 		int height = img[0].length;
-
+		
 		BufferedImage fBufferedImage = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_RGB);
 		WritableRaster wr = fBufferedImage.getRaster();
 		for (int i = 0; i < width; i++)
 			wr.setDataElements(i, 0, 1, img[i].length, img[i]);
 		return fBufferedImage;
-
+		
 	}
-
+	
 	// ########### Print Image #################
-
+	
 	public static void printImage(BufferedImage image) {
 		printImage(ImageConverter.convertBIto2A(image));
 	}
-
+	
 	public static void printImage(int[][] image) {
 		printImage(image, "Image");
 	}
-
+	
 	public static void printImage(int[][] image, String text) {
 		printImage(image, "Image", 0, image.length, 0, image[0].length);
 	}
-
+	
 	public static void printImage(int[][] image, String text, int xPos,
 			int xLength, int yPos, int yLength) {
 		System.out.println(text);
@@ -289,33 +304,33 @@ public class ImageConverter {
 					System.out.println("");
 				}
 	}
-
+	
 	// ############ Skalieren Vergleich ################
-
+	
 	private static BufferedImage scalingIJ(BufferedImage img) {
-
+		
 		ImagePlus jImage1 = new ImagePlus("JImage", img);
-
+		
 		long startTime = System.currentTimeMillis();
-
+		
 		ImageProcessor imageJ1 = jImage1.getProcessor();
 		// imageJ1.setInterpolate(true); //bilinear
 		imageJ1.setInterpolate(false); // nearst
 		imageJ1 = imageJ1.resize(2 * img.getWidth(), 2 * img.getHeight());
 		jImage1.setProcessor(imageJ1);
-
+		
 		long endTime = System.currentTimeMillis();
 		System.out.println("Zeit IJ: " + (endTime - startTime));
-
+		
 		return convertIJtoBI(jImage1);
 	}
-
+	
 	private static BufferedImage scalingJAI(URL url) {
-
+		
 		PlanarImage plImage1 = JAI.create("url", url);
-
+		
 		long startTime = System.currentTimeMillis();
-
+		
 		ParameterBlock para = new ParameterBlock();
 		para.addSource(plImage1);
 		para.add(2.0F); // xScale
@@ -326,63 +341,63 @@ public class ImageConverter {
 		// para.add(new InterpolationBilinear());
 		plImage1 = JAI.create("scale", para, null);
 		BufferedImage time_temp = convertPItoBI(plImage1);
-
+		
 		long endTime = System.currentTimeMillis();
 		System.out.println("Zeit JAI: " + (endTime - startTime));
-
+		
 		return time_temp;
 	}
-
+	
 	private static BufferedImage scalingOWN(BufferedImage img) {
 		int[][] imageBIto2A = convertBIto2A(img);
-
+		
 		long startTime = System.currentTimeMillis();
-
+		
 		ImageScaling scalingOwn = new ImageScaling(imageBIto2A);
 		scalingOwn.doZoom(2, Scaling.NEAREST_NEIGHBOUR);
 		// scalingOwn.doZoom(2, Scaling.BILINEAR);
-
+		
 		long endTime = System.currentTimeMillis();
 		System.out.println("Zeit OWN: " + (endTime - startTime));
-
+		
 		return convert2AtoBI(scalingOwn.getResultImage());
 	}
-
+	
 	private static BufferedImage scalingAWT(BufferedImage img) {
-
+		
 		long startTime = System.currentTimeMillis();
-
+		
 		Image scalingAWT_temp = img.getScaledInstance(2 * img.getWidth(),
 				2 * img.getHeight(), Image.SCALE_AREA_AVERAGING);
 		BufferedImage scalingAWT = new BufferedImage(2 * img.getWidth(),
 				2 * img.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics g = scalingAWT.getGraphics();
 		g.drawImage(scalingAWT_temp, 0, 0, null);
-
+		
 		long endTime = System.currentTimeMillis();
 		System.out.println("Zeit AWT: " + (endTime - startTime));
-
+		
 		g.dispose();
 		return scalingAWT;
 	}
-
+	
 	public static BufferedImage copy(BufferedImage image) {
 		int[][] img = convertBIto2A(image);
 		return convert2AtoBI(img);
 	}
-
+	
 	public static BufferedImage getBufferedImageFromImage(Image image) {
 		// source: http://www.dreamincode.net/code/snippet1076.htm
 		if (image instanceof BufferedImage) {
 			return (BufferedImage) image;
 		}
-
+		
 		// This code ensures that all the pixels in the image are loaded
 		image = new ImageIcon(image).getImage();
-
+		
 		// Determine if the image has transparent pixels
 		boolean hasAlpha = hasAlpha(image);
-
+		
 		// Create a buffered image with a format that's compatible with the
 		// screen
 		BufferedImage bimage = null;
@@ -394,7 +409,7 @@ public class ImageConverter {
 			if (hasAlpha == true) {
 				transparency = Transparency.BITMASK;
 			}
-
+			
 			// Create the buffered image
 			GraphicsDevice gs = ge.getDefaultScreenDevice();
 			GraphicsConfiguration gc = gs.getDefaultConfiguration();
@@ -402,7 +417,7 @@ public class ImageConverter {
 					image.getHeight(null), transparency);
 		} catch (HeadlessException e) {
 		} // No screen
-
+		
 		if (bimage == null) {
 			// Create a buffered image using the default color model
 			int type = BufferedImage.TYPE_INT_RGB;
@@ -412,23 +427,23 @@ public class ImageConverter {
 			bimage = new BufferedImage(image.getWidth(null),
 					image.getHeight(null), type);
 		}
-
+		
 		// Copy image to buffered image
 		Graphics g = bimage.createGraphics();
-
+		
 		// Paint the image onto the buffered image
 		g.drawImage(image, 0, 0, null);
 		g.dispose();
-
+		
 		return bimage;
 	}
-
+	
 	private static boolean hasAlpha(Image image) {
 		// If buffered image, the color model is readily available
 		if (image instanceof BufferedImage) {
 			return ((BufferedImage) image).getColorModel().hasAlpha();
 		}
-
+		
 		// Use a pixel grabber to retrieve the image's color model;
 		// grabbing a single pixel is usually sufficient
 		PixelGrabber pg = new PixelGrabber(image, 0, 0, 1, 1, false);
@@ -436,9 +451,9 @@ public class ImageConverter {
 			pg.grabPixels();
 		} catch (InterruptedException e) {
 		}
-
+		
 		// Get the image's color model
 		return pg.getColorModel().hasAlpha();
 	}
-
+	
 }

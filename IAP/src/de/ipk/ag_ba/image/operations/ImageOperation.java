@@ -9,9 +9,11 @@ import ij.plugin.ContrastEnhancer;
 import ij.plugin.ImageCalculator;
 import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.MaximumFinder;
+import ij.plugin.filter.UnsharpMask;
 import ij.process.BinaryProcessor;
 import ij.process.Blitter;
 import ij.process.ByteProcessor;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
 import java.awt.BasicStroke;
@@ -1560,7 +1562,7 @@ public class ImageOperation {
 					if (resultImage[x][y] != background) {
 						if (((Li > lowerValueOfL[idx]) && (Li < upperValueOfL[idx]) && (ai > lowerValueOfA[idx]) && (ai < upperValueOfA[idx])
 								&& (bi > lowerValueOfB[idx]) && (bi < upperValueOfB[idx])) && !
-								(Math.abs(ai - 127) < 10 && Math.abs(bi - 127) < 10)) {
+								(Math.abs(ai - 127) < 5 && Math.abs(bi - 127) < 5 && Math.abs(Li - 127) > 110)) {
 							resultImage[x][y] = img2d[x][y];
 							found = true;
 							break;
@@ -2373,5 +2375,50 @@ public class ImageOperation {
 			image.getProcessor().medianFilter();
 		
 		return new ImageOperation(getImage());
+	}
+	
+	public ImageOperation unsharpedMask(FlexibleImage inp, double weight, double sigma) {
+		double[] fac = { weight, weight, weight };
+		FlexibleImage blured = new ImageOperation(image).blur(sigma).multiplicateImageChannelsWithFactors(fac).getImage();
+		blured.print("blured");
+		return new ImageOperation(inp).printImage("orig").subtractImages(blured, "").printImage("sub");
+	}
+	
+	public ImageOperation unsharpedMask(float weight, double sigma) {
+		UnsharpMask um = new UnsharpMask();
+		
+		float[][] channelR = getImage().getFloatChannel(Channel.R);
+		float[][] channelG = getImage().getFloatChannel(Channel.G);
+		float[][] channelB = getImage().getFloatChannel(Channel.B);
+		
+		float[][][] channels = new float[][][] { channelR, channelG, channelB };
+		
+		for (float[][] channel : channels) {
+			FloatProcessor fp = new FloatProcessor(channel);
+			fp.snapshot();
+			um.run(fp);
+		}
+		
+		return new ImageOperation(new FlexibleImage(getImage().getWidth(), getImage().getHeight(), channelR, channelG, channelB));
+	}
+	
+	public ImageOperation subtractImages(FlexibleImage input) {
+		int[][] img1 = getImageAs2array();
+		int[][] img2 = input.getAs2A();
+		
+		int w = input.getWidth();
+		int h = input.getHeight();
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				
+				int temp = img1[x][y] - img2[x][y];
+				if (temp >= 0)
+					img1[x][y] = temp;
+				else
+					img1[x][y] = 0;
+			}
+		}
+		return new ImageOperation(img1);
 	}
 }

@@ -14,6 +14,7 @@ public class BlockCopyImagesApplyMask extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage visMask = getInput().getMasks().getVis();
+		visMask = new ImageOperation(visMask).medianFilter32Bit().border(2).getImage();
 		return new ImageOperation(getInput().getImages().getVis()).applyMask_ResizeSourceIfNeeded(visMask, options.getBackground()).getImage();
 	}
 	

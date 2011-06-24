@@ -69,7 +69,7 @@ public class ImageProcessorOptions {
 
 			SCALE_FACTOR_DECREASE_MASK, SCALE_FACTOR_DECREASE_IMG_AND_MASK,
 
-			INPUT_VIS_IMAGE_ROTATION_ANGLE;
+			INPUT_VIS_IMAGE_ROTATION_ANGLE, L_Diff_VIS_SIDE, abDiff_VIS_SIDE;
 	}
 	
 	public ImageProcessorOptions() {
@@ -209,7 +209,7 @@ public class ImageProcessorOptions {
 		
 		addIntSetting(Setting.CLOSING_NIR_TOP, (int) Math.ceil(1 * scale));
 		addIntSetting(Setting.CLOSING_NIR_SIDE, (int) Math.ceil(1 * scale));
-		addIntSetting(Setting.CLOSING_REPEAT, (int) Math.ceil(2 * scale));
+		addIntSetting(Setting.CLOSING_REPEAT, 1);
 		
 		addIntSetting(Setting.POST_PROCESS_DILATE_RGB_TOP, (int) Math.ceil(1 * scale));
 		addIntSetting(Setting.POST_PROCESS_DILATE_FLUO_TOP, (int) Math.ceil(1 * scale));
@@ -260,7 +260,10 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.LAB_MIN_B_VALUE_NIR, 0);
 		addIntSetting(Setting.LAB_MAX_B_VALUE_NIR, 255);
 		
-		addIntSetting(Setting.L_Diff_VIS, 40);
+		addIntSetting(Setting.L_Diff_VIS_SIDE, 20); // 40
+		addIntSetting(Setting.abDiff_VIS_SIDE, 20); // 40
+		
+		addIntSetting(Setting.L_Diff_VIS, 40); // 40
 		addIntSetting(Setting.abDiff_VIS, 40); // 40
 		addIntSetting(Setting.L_Diff_FLOU, 75);// 20
 		addIntSetting(Setting.abDiff_FLOU, 40);// 30

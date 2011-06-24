@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.analysis.maize;
 
 import java.util.List;
 
+// this might not be needed
 public class BlockRemoveVerticalAndHorizontalStructures {
 	
 	private void ttt() {
