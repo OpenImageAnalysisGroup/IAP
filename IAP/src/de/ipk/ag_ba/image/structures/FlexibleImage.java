@@ -159,7 +159,7 @@ public class FlexibleImage {
 	int[][] cache2A = null;
 	
 	public int[][] getAs2A() {
-		boolean useCache = true;
+		boolean useCache = false;
 		if (!useCache)
 			return ImageConverter.convertIJto2A(image);
 		
@@ -220,7 +220,7 @@ public class FlexibleImage {
 	}
 	
 	public ImageOperation getIO() {
-		return new ImageOperation(this);
+		return new ImageOperation(getAs2A());
 	}
 	
 	/**

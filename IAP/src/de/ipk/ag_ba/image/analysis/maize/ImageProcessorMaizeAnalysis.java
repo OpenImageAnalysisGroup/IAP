@@ -77,7 +77,6 @@ public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
 		p.add(BlockLabFilter.class);
 		p.add(BlockClearMasksBasedOnMarkers.class);
-		// p.add(BlockRemoveVerticalAndHorizontalStructures);
 		p.add(BlockRemoveSmallStructuresFromTopVisUsingOpening.class);
 		p.add(BlockMedianFilter.class);
 		p.add(BlockClosingForYellowVisMask.class);
@@ -88,6 +87,7 @@ public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 		p.add(BlockRemoveBambooStick.class); // requires remove small clusters before
 		p.add(BlockLabFilter.class);
 		p.add(BlockRemoveLevitatingObjects.class);
+		p.add(BlockRemoveVerticalAndHorizontalStructures.class);
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
 		p.add(BlockNirProcessing.class);
 		p.add(BlockCopyImagesApplyMask.class); // without nir

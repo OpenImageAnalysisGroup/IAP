@@ -2,8 +2,87 @@ package de.ipk.ag_ba.image.analysis.maize;
 
 import java.util.List;
 
+import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractBlock;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageType;
+
 // this might not be needed
-public class BlockRemoveVerticalAndHorizontalStructures {
+public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
+	
+	@Override
+	protected FlexibleImage processMask(FlexibleImage mask) {
+		if (mask.getType() == FlexibleImageType.UNKNOWN) {
+			System.out.println("ERROR: Unknown image type!!!");
+			return mask;
+		}
+		if (mask.getType() == FlexibleImageType.NIR)
+			return mask;
+		if (mask.getType() == FlexibleImageType.FLUO)
+			return mask;
+		if (mask.getType() == FlexibleImageType.VIS)
+			return process(process(mask));
+		
+		return mask;
+	}
+	
+	private FlexibleImage process(FlexibleImage mask) {
+		int[][] img = mask.getAs2A();
+		int w = mask.getWidth();
+		int h = mask.getHeight();
+		int[] filledPixelsPerLine = new int[h];
+		int[] filledPixelsPerColumn = new int[w];
+		int back = options.getBackground();
+		for (int y = 0; y < h; y++) {
+			int filled = 0;
+			for (int x = 0; x < w; x++) {
+				if (img[x][y] != back) {
+					filled++;
+					filledPixelsPerColumn[x] = filledPixelsPerColumn[x] + 1;
+				}
+			}
+			filledPixelsPerLine[y] = filled;
+		}
+		int blue = options.getBackground();// Color.BLUE.getRGB();
+		// boolean flag = false;
+		int n = 10;
+		for (int scanBlock = 0; scanBlock < h / n; scanBlock++) {
+			double avg = getAvg(filledPixelsPerLine, scanBlock * n, n);
+			for (int i = 0; i < n; i++) {
+				int y = scanBlock * n + i;
+				if (filledPixelsPerLine[y] > avg * 1.5) {
+					for (int x = 0; x < w; x++) {
+						if (y > 1) {
+							img[x][y] = img[x][y - 1];
+						}
+					}
+				}
+			}
+		}
+		
+		for (int scanBlock = 0; scanBlock < w / n; scanBlock++) {
+			double avg = getAvg(filledPixelsPerColumn, scanBlock * n, n);
+			for (int i = 0; i < n; i++) {
+				int x = scanBlock * n + i;
+				if (filledPixelsPerColumn[x] > avg * 1.5) {
+					for (int y = 0; y < h; y++) {
+						if (x > 1) {
+							if (img[x - 1][y] != back)
+								img[x][y] = img[x - 1][y];
+						}
+					}
+				}
+			}
+		}
+		
+		return new FlexibleImage(img).print("TEST " + System.currentTimeMillis());
+	}
+	
+	private double getAvg(int[] filledPixelsPerLine, int startIndex, int n) {
+		double sum = 0;
+		for (int idx = startIndex; idx < startIndex + n; idx++)
+			sum += filledPixelsPerLine[idx];
+		return sum / n;
+	}
 	
 	private void ttt() {
 		boolean outlierIdentified;
@@ -68,5 +147,4 @@ public class BlockRemoveVerticalAndHorizontalStructures {
 		} while (outlierIdentified);
 		
 	}
-	
 }

@@ -24,14 +24,17 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 	protected FlexibleImage processVISmask() {
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			// double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
-			FlexibleImage vis = getInput().getImages().getVis();
+			FlexibleImage visImg = getInput().getImages().getVis();
+			FlexibleImage visMsk = getInput().getMasks().getVis();
 			// vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
-			return vis.getIO().compare() // .medianFilter32Bit().unsharpedMask(1.0f, 3.0)
-					.compareImages(getInput().getMasks().getVis().getIO().getImage(), // blur(2).
+			// unsharpedMask(1.0f, 3.0).printImage("UNSHARPEN").
+			FlexibleImage cleared = visImg.getIO().compare() // medianFilter32Bit().
+					.compareImages(visMsk.getIO().blur(2).getImage(), //
 							options.getIntSetting(Setting.L_Diff_VIS_SIDE),
 							options.getIntSetting(Setting.L_Diff_VIS_SIDE),
 							options.getIntSetting(Setting.abDiff_VIS_SIDE),
-							back, true).getImage(); // border(2).
+							back, true).border(2).getImage(); //
+			return getInput().getImages().getVis().getIO().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground()).printImage("CLEAR RESULT").getImage();
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);

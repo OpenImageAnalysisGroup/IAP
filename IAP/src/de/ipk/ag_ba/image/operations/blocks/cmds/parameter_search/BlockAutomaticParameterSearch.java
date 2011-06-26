@@ -389,7 +389,8 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 	
 	private double getMatchResultValue(FlexibleImage workMask, FlexibleImage visMaskImage, double valueX, double valueY,
 			MorphologicalOperationSearchType typ, MaskOperationDirect optUseSingleMaskOperationObject) {
-		
+		if (workMask == null)
+			return Double.NaN;
 		ImageOperation io = new ImageOperation(workMask);
 		// FlexibleImage changedMask = null;
 		switch (typ) {

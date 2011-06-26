@@ -31,7 +31,10 @@ public class BlockResizeMasksToLargest extends AbstractSnapshotAnalysisBlockFIS 
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		return getInput().getMasks().getNir().resize(w, h);
+		if (getInput().getMasks().getNir() != null)
+			return getInput().getMasks().getNir().resize(w, h);
+		else
+			return null;
 	}
 	
 	// @Override
