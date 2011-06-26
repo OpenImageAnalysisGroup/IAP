@@ -100,6 +100,10 @@ public class FlexibleImage {
 		image = ImageConverter.convert1AtoIJ(w, h, img);
 	}
 	
+	public FlexibleImage(int w, int h, double[][] labImage) {
+		this(ImageConverter.convertLABto1A(labImage), w, h);
+	}
+	
 	public BufferedImage getAsBufferedImage() {
 		return image.getBufferedImage();
 	}
@@ -148,7 +152,7 @@ public class FlexibleImage {
 	
 	public FlexibleImage resize(int w, int h) {
 		if (w == getWidth() && h == getHeight()) {
-			return new FlexibleImage(getAs2A());
+			return copy();
 		} else {
 			ImageOperation io = new ImageOperation(this);
 			io.resize(w, h);
@@ -206,6 +210,9 @@ public class FlexibleImage {
 		return io.getImage();
 	}
 	
+	/**
+	 * returns double arrays for L A B, range 0..255
+	 */
 	public double[][] getLab(boolean filterBackground) {
 		final int w = getWidth();
 		final int h = getHeight();

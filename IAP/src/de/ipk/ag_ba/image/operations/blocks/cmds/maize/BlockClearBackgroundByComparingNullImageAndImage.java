@@ -26,6 +26,9 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			// double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage visImg = getInput().getImages().getVis();
 			FlexibleImage visMsk = getInput().getMasks().getVis();
+			
+			visImg.getIO().subtractImages(visMsk).printImage("LAB difference");
+			
 			// vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
 			// unsharpedMask(1.0f, 3.0).printImage("UNSHARPEN").
 			FlexibleImage cleared = visImg.getIO().compare() // medianFilter32Bit().
@@ -34,7 +37,8 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 							options.getIntSetting(Setting.L_Diff_VIS_SIDE),
 							options.getIntSetting(Setting.abDiff_VIS_SIDE),
 							back, true).border(2).getImage(); //
-			return getInput().getImages().getVis().getIO().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground()).printImage("CLEAR RESULT").getImage();
+			return getInput().getImages().getVis().getIO().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
+					.printImage("CLEAR RESULT", false).getImage();
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);

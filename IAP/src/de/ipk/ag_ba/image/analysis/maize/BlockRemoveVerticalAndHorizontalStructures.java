@@ -44,12 +44,13 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 		}
 		int blue = options.getBackground();// Color.BLUE.getRGB();
 		// boolean flag = false;
-		int n = 10;
+		int n = 20;
 		for (int scanBlock = 0; scanBlock < h / n; scanBlock++) {
 			double avg = getAvg(filledPixelsPerLine, scanBlock * n, n);
+			double stddev = getStdDev(avg, filledPixelsPerLine, scanBlock * n, n);
 			for (int i = 0; i < n; i++) {
 				int y = scanBlock * n + i;
-				if (filledPixelsPerLine[y] > avg * 1.5) {
+				if (filledPixelsPerLine[y] - avg > stddev * 1.5) {
 					for (int x = 0; x < w; x++) {
 						if (y > 1) {
 							img[x][y] = img[x][y - 1];
@@ -61,9 +62,10 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 		
 		for (int scanBlock = 0; scanBlock < w / n; scanBlock++) {
 			double avg = getAvg(filledPixelsPerColumn, scanBlock * n, n);
+			double stddev = getStdDev(avg, filledPixelsPerColumn, scanBlock * n, n);
 			for (int i = 0; i < n; i++) {
 				int x = scanBlock * n + i;
-				if (filledPixelsPerColumn[x] > avg * 1.5) {
+				if (filledPixelsPerColumn[x] - avg > stddev * 1.5) {
 					for (int y = 0; y < h; y++) {
 						if (x > 1) {
 							if (img[x - 1][y] != back)
@@ -74,7 +76,7 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 			}
 		}
 		
-		return new FlexibleImage(img).print("TEST " + System.currentTimeMillis());
+		return new FlexibleImage(img).print("TEST " + System.currentTimeMillis(), false);
 	}
 	
 	private double getAvg(int[] filledPixelsPerLine, int startIndex, int n) {
@@ -82,6 +84,14 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 		for (int idx = startIndex; idx < startIndex + n; idx++)
 			sum += filledPixelsPerLine[idx];
 		return sum / n;
+	}
+	
+	private double getStdDev(double avg, int[] filledPixelsPerLine, int startIndex, int n) {
+		double sumDiff = 0;
+		for (int idx = startIndex; idx < startIndex + n; idx++)
+			sumDiff += (filledPixelsPerLine[idx] - avg) * (filledPixelsPerLine[idx] - avg);
+		double stdDev = Math.sqrt(sumDiff / (n - 1));
+		return stdDev;
 	}
 	
 	private void ttt() {

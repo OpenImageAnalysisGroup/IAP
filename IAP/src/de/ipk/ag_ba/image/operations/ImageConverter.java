@@ -32,6 +32,8 @@ import org.Colors;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.image.color.Color_CIE_Lab;
+
 public class ImageConverter {
 	public static void main(String[] args) {
 		
@@ -454,6 +456,17 @@ public class ImageConverter {
 		
 		// Get the image's color model
 		return pg.getColorModel().hasAlpha();
+	}
+	
+	public static int[] convertLABto1A(double[][] labImage) {
+		int[] res = new int[labImage[0].length];
+		for (int idx = 0; idx < res.length; idx++) {
+			double l = labImage[0][idx];
+			double a = labImage[0][idx];
+			double b = labImage[0][idx];
+			res[idx] = new Color_CIE_Lab(l, a, b).getRGB();
+		}
+		return res;
 	}
 	
 }

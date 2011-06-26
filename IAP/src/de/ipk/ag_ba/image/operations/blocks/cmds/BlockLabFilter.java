@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
- * calculates lab filter for vis and fluo image, the original pixels were copy at the end
+ * Uses a lab-based pixel filter for the vis and fluo images.
  * 
  * @author Entzian, Pape
  */

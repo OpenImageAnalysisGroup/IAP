@@ -25,6 +25,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
+ * A list of image analysis "blocks" ({@link ImageAnalysisBlockFIS}) which may be executed lineary in a row.
+ * 
  * @author klukas
  */
 public class BlockPipeline {
@@ -32,10 +34,18 @@ public class BlockPipeline {
 	private final ArrayList<Class<? extends ImageAnalysisBlockFIS>> blocks = new ArrayList<Class<? extends ImageAnalysisBlockFIS>>();
 	private static int lastPipelineExecutionTimeInSec = -1;
 	
+	/**
+	 * Adds a image analysis block to the pipeline (needs to implement {@link ImageAnalysisBlockFIS}).
+	 */
 	public void add(Class<? extends ImageAnalysisBlockFIS> blockClass) {
 		blocks.add(blockClass);
 	}
 	
+	/**
+	 * @return The execution time for the last pipeline execution time. This is a static method,
+	 *         if several pipelines are executed in parallel, it returns the execution time of the globally
+	 *         last finished pipeline.
+	 */
 	public static int getLastPipelineExecutionTimeInSec() {
 		return lastPipelineExecutionTimeInSec;
 	}

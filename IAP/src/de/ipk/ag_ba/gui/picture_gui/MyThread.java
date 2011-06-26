@@ -14,6 +14,8 @@ import org.ErrorMsg;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
+ * A thread which can be checked for run completion and for its results.
+ * 
  * @author klukas
  */
 public class MyThread extends Thread {
@@ -54,13 +56,13 @@ public class MyThread extends Thread {
 			sem.release();
 			RunnableForResult rc = (RunnableForResult) r;
 			if (!finished)
-				System.out.println("ERRRRRRR");
+				System.err.println("INTERNAL ERROR MYTHREAD 1");
 			return rc.getResult();
 		} else {
 			sem.acquire();
 			sem.release();
 			if (!finished)
-				System.out.println("ERRRRRRR");
+				System.err.println("INTERNAL ERROR MYTHREAD 2");
 			return null;
 		}
 	}
