@@ -13,6 +13,10 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockFIS {
 	
+	protected boolean isChangingImages() {
+		return false;
+	}
+	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		

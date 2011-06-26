@@ -45,7 +45,7 @@ public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockF
 		
 		int[] rgbNonModifiedArray = flImage.getAs1A();
 		
-		double[][] lMask = flMask.getLab();
+		double[][] lMask = flMask.getLab(true);
 		
 		int[][] image = new int[w][h];
 		for (int x = 0; x < w; x++) {

@@ -39,4 +39,6 @@ public interface BlockProperties {
 	
 	void storeResults(String id_prefix, ResultsTable numericResults, int position);
 	
+	public void printAnalysisResults();
+	
 }

@@ -421,7 +421,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 							.getParentCondition().getExperimentName()
 							+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
 					m.setValue(pixelCount);
-					m.setUnit("pixels");
+					m.setUnit("px");
 					m.getParentSample().setRowId(0);
 					output.add(m);
 				}
@@ -431,7 +431,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 						.getParentCondition().getExperimentName()
 						+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
 				m.setValue(h - geo.getTop());
-				m.setUnit("pixel");
+				m.setUnit("px");
 				m.getParentSample().setRowId(0);
 				output.add(m);
 				
@@ -439,7 +439,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 						.getParentCondition().getExperimentName()
 						+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
 				m.setValue(h - geo.getLeft() - (h - geo.getRight()));
-				m.setUnit("pixel");
+				m.setUnit("px");
 				m.getParentSample().setRowId(0);
 				output.add(m);
 			}
@@ -447,7 +447,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 					.getParentCondition().getExperimentName()
 					+ " (" + PhenotypeAnalysisTask.getNameStatic() + ")");
 			m.setValue(geo.getFilledPixels());
-			m.setUnit("pixel");
+			m.setUnit("px");
 			m.getParentSample().setRowId(0);
 			output.add(m);
 			

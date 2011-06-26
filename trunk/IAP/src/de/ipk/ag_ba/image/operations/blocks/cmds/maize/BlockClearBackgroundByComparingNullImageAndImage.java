@@ -23,15 +23,15 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 	@Override
 	protected FlexibleImage processVISmask() {
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
+			// double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage vis = getInput().getImages().getVis();
-			vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
-			return new ImageOperation(vis).medianFilter32Bit().unsharpedMask(1.0f, 3.0).compare()
-					.compareImages(getInput().getMasks().getVis().getIO().blur(2).getImage(),
+			// vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
+			return vis.getIO().compare() // .medianFilter32Bit().unsharpedMask(1.0f, 3.0)
+					.compareImages(getInput().getMasks().getVis().getIO().getImage(), // blur(2).
 							options.getIntSetting(Setting.L_Diff_VIS_SIDE),
 							options.getIntSetting(Setting.L_Diff_VIS_SIDE),
 							options.getIntSetting(Setting.abDiff_VIS_SIDE),
-							back, false, false).border(2).getImage();
+							back, true).getImage(); // border(2).
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
@@ -42,7 +42,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 							options.getIntSetting(Setting.L_Diff_VIS) * 0.8d,
 							options.getIntSetting(Setting.L_Diff_VIS) * 0.8d,
 							options.getIntSetting(Setting.abDiff_VIS) * 0.8d,
-							back, false, false, false).border(2).getImage();
+							back, false).border(2).getImage();
 		}
 		throw new UnsupportedOperationException("Unknown camera setting.");
 	}
@@ -53,12 +53,12 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage fluo = getInput().getImages().getFluo();
 			fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
-			return new ImageOperation(fluo).compare()
-					.compareImages(getInput().getMasks().getFluo(),
+			return new ImageOperation(fluo.getIO().medianFilter32Bit().getImage()).compare()
+					.compareImages(getInput().getMasks().getFluo().getIO().medianFilter32Bit().getImage(),
 							options.getIntSetting(Setting.L_Diff_FLOU),
 							options.getIntSetting(Setting.L_Diff_FLOU),
 							options.getIntSetting(Setting.abDiff_FLOU),
-							back, false, true).border(2).getImage();
+							back).border(2).getImage();
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
@@ -69,7 +69,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 							options.getIntSetting(Setting.L_Diff_FLOU),
 							options.getIntSetting(Setting.L_Diff_FLOU),
 							options.getIntSetting(Setting.abDiff_FLOU),
-							back, false, true).border(2).getImage();
+							back).border(2).getImage();
 		}
 		throw new UnsupportedOperationException("Unknown camera setting.");
 	}

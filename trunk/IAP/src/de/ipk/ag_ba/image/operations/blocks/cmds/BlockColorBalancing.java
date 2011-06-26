@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 /**
  * Recolor pictures according to white point (or black point for fluo).
  * 
- * @author pape
+ * @author pape, klukas
  */
 public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -67,7 +67,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	 * @author pape
 	 */
 	public static double[] getProbablyWhitePixels(FlexibleImage image, double size) {
-		int[][] img2d = image.getAs2A();
+		int[] img1d = image.getAs1A();
 		int width = image.getWidth();
 		int height = image.getHeight();
 		int w = (int) (width * size);
@@ -75,8 +75,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ImageOperation io = new ImageOperation(image);
 		
-		double[] valuesleft = io.getRGBAverage(img2d, 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
-		double[] valuesright = io.getRGBAverage(img2d, width - 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
+		double[] valuesleft = io.getRGBAverage(img1d, 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
+		double[] valuesright = io.getRGBAverage(img1d, width - 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
 		// double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
 		// double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);
 		

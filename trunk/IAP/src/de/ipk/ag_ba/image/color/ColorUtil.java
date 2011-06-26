@@ -597,4 +597,87 @@ public class ColorUtil {
 		return i;
 	}
 	
+	/**
+	 * returns double arrays for L A B, range 0..255
+	 */
+	public static void getLABfromRGBvar2(int[] arrayRGB, double[] arrayL, double[] arrayA, double[] arrayB, boolean filterBackground, int iBackgroundColor) {
+		int c = 0;
+		double rf, gf, bf;
+		double X, Y, Z, fX, fY, fZ;
+		double La, aa, bb;
+		double ot = 1 / 3.0, cont = 16 / 116.0;
+		
+		for (int idx = 0; idx < arrayRGB.length; idx++) {
+			c = arrayRGB[idx];
+			
+			if (filterBackground && c == iBackgroundColor) {
+				arrayL[idx] = 0;
+				arrayA[idx] = 0;
+				arrayB[idx] = 0;
+			} else {
+				// RGB to XYZ
+				rf = ((c & 0xff0000) >> 16) / 255d; // R 0..1
+				gf = ((c & 0x00ff00) >> 8) / 255d; // G 0..1
+				bf = (c & 0x0000ff) / 255d; // B 0..1
+				
+				// white reference D65 PAL/SECAM
+				X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
+				Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
+				Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
+				// var_X = X / 95.047 //Observer = 2, Illuminant = D65
+				// var_Y = Y / 100.000
+				// var_Z = Z / 108.883
+				
+				// XYZ to Lab
+				if (X > 0.008856)
+					fX = Math.pow(X, ot);
+				else
+					fX = (7.78707 * X) + cont;// 7.7870689655172
+					
+				if (Y > 0.008856)
+					fY = Math.pow(Y, ot);
+				else
+					fY = (7.78707 * Y) + cont;
+				
+				if (Z > 0.008856)
+					fZ = Math.pow(Z, ot);
+				else
+					fZ = (7.78707 * Z) + cont;
+				
+				La = (116 * fY) - 16;
+				aa = 500 * (fX - fY);
+				bb = 200 * (fY - fZ);
+				
+				arrayL[idx] = La * 2.55;
+				arrayA[idx] = 1.0625 * aa + 128;
+				arrayB[idx] = 1.0625 * bb + 128;
+				
+				if (arrayL[idx] < 0)
+					arrayL[idx] = 0;
+				if (arrayA[idx] < 0)
+					arrayA[idx] = 0;
+				if (arrayB[idx] < 0)
+					arrayB[idx] = 0;
+				
+				if (arrayL[idx] > 255)
+					arrayL[idx] = 255;
+				if (arrayA[idx] > 255)
+					arrayA[idx] = 255;
+				if (arrayB[idx] > 255)
+					arrayB[idx] = 255;
+			}
+		}
+	}
 }
+
+// // Lab rescaled to the 0..255 range
+// // a* and b* range from -120 to 120 in the 8 bit space
+// La = La * 2.55;
+// aa = Math.floor((1.0625 * aa + 128) + 0.5);
+// bb = Math.floor((1.0625 * bb + 128) + 0.5);
+//
+// // bracketing
+// Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
+// ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
+// bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+
