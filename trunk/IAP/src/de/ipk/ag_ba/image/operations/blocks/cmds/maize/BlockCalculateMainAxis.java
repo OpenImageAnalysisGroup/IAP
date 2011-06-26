@@ -21,6 +21,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
+	protected boolean isChangingImages() {
+		return false;
+	}
+	
+	@Override
 	protected FlexibleImage processVISmask() {
 		
 		if (options.getCameraPosition() == CameraPosition.TOP && getInput().getMasks().getVis() != null) {

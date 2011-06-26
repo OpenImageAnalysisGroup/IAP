@@ -8,9 +8,11 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
+ * Remove "peper and salt" noise from Fluo mask.
+ * 
  * @author Pape, Klukas
  */
-public class BlockMedianFilter extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockMedianFilterForFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {

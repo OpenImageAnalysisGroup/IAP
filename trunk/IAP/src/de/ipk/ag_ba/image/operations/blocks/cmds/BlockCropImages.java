@@ -7,6 +7,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
  * Crops available images (based on rectangular crop area, using comparison to background image).
+ * Does process the images, NOT the masks.
  * 
  * @author klukas
  */

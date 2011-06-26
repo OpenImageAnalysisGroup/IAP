@@ -65,6 +65,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 /**
+ * A number of commonly used image operation commands.
+ * 
  * @author Entzian, Klukas, Pape
  */
 
@@ -103,10 +105,6 @@ public class ImageOperation {
 	public ImageOperation(int[][] image) {
 		this(ImageConverter.convert2AtoIJ(image));
 	}
-	
-	// public ImageOperation(float[][] image) {
-	// this(new ImagePlus("JImage", new FloatProcessor(image)));
-	// }
 	
 	public ImageOperation(BufferedImage bufferedImage, ResultsTable rt) {
 		this(bufferedImage);
@@ -841,61 +839,6 @@ public class ImageOperation {
 		}
 		
 	}
-	
-	// private void blur() {
-	// ImageProcessor processor2 = image.getProcessor().convertToByte(true);
-	// ByteProcessor byteProcessor = new BinaryProcessor((ByteProcessor)
-	// processor2);
-	//
-	// boolean newTest = true;
-	//
-	// if (newTest) {
-	// IOurl test = new IOurl("file:///Users/entzian/Desktop/test.png");
-	// try {
-	// BufferedImage imgTest = ImageIO.read(test.getInputStream());
-	// PrintImage.printImage(imgTest);
-	// ImageOperation io = new ImageOperation(imgTest);
-	// // io.drawRect(3, 3, 10, 10);
-	// // io.drawAndFillRect(3, 3, 10, 10, 0);
-	// // io.setBackgroundValue(-1);
-	// // Roi testRoi = io.boundingBox();
-	// // io.drawBoundingBox(testRoi);
-	// // io.cutArea(testRoi);
-	//
-	// io.centerOfGravity();
-	// PrintImage.printImage(io.getImageAsBufferedImage());
-	//
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (Exception e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// } else {
-	//
-	// int w = byteimage.getProcessor().getWidth();
-	// int h = byteimage.getProcessor().getHeight();
-	// ByteProcessor copy = (ByteProcessor) processor2.duplicate();
-	// for (int v = 1; v <= h - 2; v++) {
-	// for (int u = 1; u <= w - 2; u++) {
-	// // compute filter result for position (u,v)
-	// int sum = 0;
-	// for (int j = -1; j <= 1; j++) {
-	// for (int i = -1; i <= 1; i++) {
-	// int p = copy.getPixel(u + i, v + j);
-	// sum = sum + p;
-	// }
-	// }
-	// int q = (int) (sum / 9.0);
-	// byteimage.getProcessor().putPixel(u, v, q);
-	// }
-	// }
-	//
-	// image.setProcessor(processor2.convertToRGB());
-	// }
-	// }
 	
 	static void testPhytokammer(IOurl urlFlu, IOurl urlVis, IOurl urlNIR,
 			BufferedImage imgFluo, BufferedImage imgVisible,
@@ -1713,7 +1656,7 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * (Source: ImageJ java doc)
+	 * (Source of javadoc: ImageJ java doc)
 	 * Here the processing is done: Find the maxima of an image (does not find minima).
 	 * 
 	 * @param ip
@@ -1761,7 +1704,7 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * (Source: ImageJ java doc)
+	 * (Source of javadoc: ImageJ java doc)
 	 * Here the processing is done: Find the maxima of an image (does not find minima).
 	 * 
 	 * @param tolerance
@@ -1773,7 +1716,7 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * (Source: ImageJ java doc)
+	 * (Source of javadoc: ImageJ java doc)
 	 * Here the processing is done: Find the maxima of an image (does not find minima).
 	 * 
 	 * @param tolerance
@@ -1786,21 +1729,6 @@ public class ImageOperation {
 	public ImageOperation findMax(double tolerance, int outputType) {
 		return findMax(tolerance, ImageProcessor.NO_THRESHOLD, outputType, false, false);
 	}
-	
-	// public ImageOperation maxium() {
-	// MaximumFinder mf = new MaximumFinder();
-	//
-	// mf.findMaxima(image.getProcessor(), 50, ImageProcessor.NO_THRESHOLD,
-	// MaximumFinder.COUNT, true, false);
-	//
-	// // System.out.println("resultTable2: " + rt.getValue("Count",
-	// rt.getCounter() - 1));
-	//
-	// return new ImageOperation(mf.findMaxima(image.getProcessor(), 50,
-	// ImageProcessor.NO_THRESHOLD, MaximumFinder.SEGMENTED, true,
-	// false).getBufferedImage());
-	//
-	// }
 	
 	/**
 	 * Creates binary image (foreground / background).
@@ -1833,7 +1761,7 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * If pixel (only RGB-Blue!) is below the threshold, the background color is applied, otherwise the foreground color.
+	 * If a pixel value (only RGB-Blue!) is below the threshold, the background color is applied, otherwise the foreground color.
 	 */
 	public ImageOperation threshold(int threshold, int background, int foreground) {
 		int[] pixels = getImageAs1array();
@@ -2016,12 +1944,17 @@ public class ImageOperation {
 		return new ImageOperation(new FlexibleImage(resultMask));
 	}
 	
+	/**
+	 * Process the image from its outside, e.g. floodfill and detection of outside borders
+	 * 
+	 * @return {@link BorderImageOperation} a helper object for performing several commands.
+	 */
 	public BorderImageOperation border() {
 		return new BorderImageOperation(this);
 	}
 	
 	/**
-	 * copy the image into a new image, which is increase about the bordersize
+	 * Copy the image into a new image, which size is increased according to the specified bordersize.
 	 * 
 	 * @param input
 	 * @param bordersize
@@ -2102,14 +2035,17 @@ public class ImageOperation {
 			return null;
 	}
 	
+	/**
+	 * @return {@link ImageComparator} a helper object containing several functions related to image comparison.
+	 */
 	public ImageComparator compare() {
 		return new ImageComparator(getImage());
 	}
 	
 	/**
-	 * All Pixels will be count, which not equals background color = PhenotypeAnalysisTask.BACKGROUND_COLORint.
+	 * All Pixels will be count, which are not equal to the background color (PhenotypeAnalysisTask.BACKGROUND_COLORint).
 	 * 
-	 * @return
+	 * @return Number of non-background pixels.
 	 */
 	public int countFilledPixels() {
 		int res = 0;
@@ -2160,8 +2096,8 @@ public class ImageOperation {
 	
 	/**
 	 * @param n
-	 *           number of classes in histogram
-	 * @return
+	 *           Number of classes in a histogram.
+	 * @return {@link IntensityAnalysis} a helper object for calculating histograms.
 	 */
 	public IntensityAnalysis intensity(int n) {
 		return new IntensityAnalysis(this, n);
@@ -2248,6 +2184,10 @@ public class ImageOperation {
 		return new ImageOperation(img2d);
 	}
 	
+	/**
+	 * Overwrites the borders of the image with the background color. The width of the border
+	 * lines may be specified using the parameter bb.
+	 */
 	public ImageOperation border(int bb) {
 		int[][] in = getImageAs2array();
 		
@@ -2276,7 +2216,7 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * Image channels were multiplicted by factors {1, 2, 3} (a factor for each channel).
+	 * Image channels are multiplied by factors {1, 2, 3} (a factor for each channel).
 	 * 
 	 * @param factors
 	 *           - for 3 Channels of an 24 bit image
@@ -2452,7 +2392,7 @@ public class ImageOperation {
 		return new ImageOperation(inp).printImage("orig").subtractImages(blured, "").printImage("sub");
 	}
 	
-	public ImageOperation unsharpedMask(float weight, double sigma) {
+	public ImageOperation unsharpenMask(float weight, double sigma) {
 		UnsharpMask um = new UnsharpMask();
 		
 		float[] channelR = getImage().getFloatChannel(Channel.R);
@@ -2471,23 +2411,33 @@ public class ImageOperation {
 		return new ImageOperation(new FlexibleImage(w, h, channelR, channelG, channelB));
 	}
 	
-	public ImageOperation subtractImages(FlexibleImage input) {
-		int[][] img1 = getImageAs2array();
-		int[][] img2 = input.getAs2A();
-		
-		int w = input.getWidth();
-		int h = input.getHeight();
-		
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				
-				int temp = img1[x][y] - img2[x][y];
-				if (temp >= 0)
-					img1[x][y] = temp;
-				else
-					img1[x][y] = 0;
-			}
+	/**
+	 * Substracts the given image2 from the stored image. Processing is based on the LAB colorspace. The
+	 * difference is divided by 2 and then "visualized".
+	 * 
+	 * @param image2
+	 * @return Difference image (differences (half of it) are stored inside the LAB color space).
+	 */
+	public ImageOperation subtractImages(FlexibleImage image2) {
+		int w = getImage().getWidth();
+		int h = getImage().getHeight();
+		double[][] labImage1 = getImage().getLab(false);
+		double[][] labImage2 = image2.getLab(false);
+		for (int idx = 0; idx < w * h; idx++) {
+			double lDiff = labImage1[0][idx] - labImage2[0][idx];
+			double aDiff = labImage1[1][idx] - labImage2[1][idx];
+			double bDiff = labImage1[2][idx] - labImage2[2][idx];
+			// if (lDiff < 0)
+			// lDiff = 255 - lDiff;
+			if (aDiff < 0)
+				aDiff = -aDiff;
+			if (bDiff < 0)
+				bDiff = -bDiff;
+			
+			labImage1[0][idx] = 80 + lDiff; // 80 * (labImage1[0][idx] + labImage2[0][idx]) / 2 / 255d +
+			labImage1[1][idx] = aDiff / 255d + 1;
+			labImage1[2][idx] = bDiff / 255d + 1;
 		}
-		return new ImageOperation(img1);
+		return new FlexibleImage(w, h, labImage1).getIO();
 	}
 }

@@ -71,6 +71,8 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	}
 	
 	private FlexibleImage clearImageSide(FlexibleImage inputToCut, FlexibleImage imageSource, double cutTop) {
+		if (inputToCut == null || imageSource == null)
+			return null;
 		ImageOperation ioInputForCut = new ImageOperation(inputToCut);
 		int background = options.getBackground();
 		ImageOperation ioSource = new ImageOperation(imageSource);
