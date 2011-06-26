@@ -52,7 +52,7 @@ public class ResourceIOManager {
 		}
 		ResourceIOHandler mh = getHandlerFromPrefix(url.getPrefix());
 		if (mh == null) {
-			System.err.println("Could not get handler from URL " + url.toString() + "!");
+			// System.err.println("Could not get handler from URL " + url.toString() + "!");
 			return null;
 		} else {
 			InputStream is = mh.getInputStream(url);

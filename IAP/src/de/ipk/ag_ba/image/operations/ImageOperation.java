@@ -760,7 +760,7 @@ public class ImageOperation {
 	
 	public ImageOperation findEdge() {
 		image.getProcessor().findEdges();
-		return new ImageOperation(image.getProcessor().getBufferedImage());
+		return new ImageOperation(image); // .getProcessor().getBufferedImage()
 	}
 	
 	// ################## get... ###################
@@ -1569,8 +1569,10 @@ public class ImageOperation {
 				// Lab rescaled to the 0..255 range
 				// a* and b* range from -120 to 120 in the 8 bit space
 				La = La * 2.55;
-				aa = Math.floor((1.0625 * aa + 128) + 0.5);
-				bb = Math.floor((1.0625 * bb + 128) + 0.5);
+				aa = 1.0625 * aa + 128;
+				bb = 1.0625 * bb + 128;
+				// aa = Math.floor((1.0625 * aa + 128) + 0.5);
+				// bb = Math.floor((1.0625 * bb + 128) + 0.5);
 				
 				// bracketing
 				Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
@@ -1744,7 +1746,8 @@ public class ImageOperation {
 					threshold, outputType, excludeOnEdges, isEDM);
 			
 			if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
-				return new ImageOperation(p.getBufferedImage(), (ResultsTable) rt.clone());
+				// p.getBufferedImage() ==> image (ck, 25.6.11)
+				return new ImageOperation(image, (ResultsTable) rt.clone());
 			} else {
 				setResultsTable((ResultsTable) rt.clone());
 				return this;
@@ -1813,7 +1816,8 @@ public class ImageOperation {
 				(ByteProcessor) image.getProcessor());
 		byteProcessor.threshold(cutValue);
 		
-		return new ImageOperation(byteProcessor.getBufferedImage());
+		// image ==> byteProcessor.getBufferedImage() (ck, 26.6.11)
+		return new ImageOperation(image);
 	}
 	
 	public ImageOperation enhanceContrast() {
@@ -2103,7 +2107,7 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * Alll Pixels will be count, which not equals background color = PhenotypeAnalysisTask.BACKGROUND_COLORint.
+	 * All Pixels will be count, which not equals background color = PhenotypeAnalysisTask.BACKGROUND_COLORint.
 	 * 
 	 * @return
 	 */
@@ -2118,6 +2122,37 @@ public class ImageOperation {
 			for (int y = 0; y < height; y++) {
 				if (img2d[x][y] != background)
 					res++;
+			}
+		}
+		return res;
+	}
+	
+	/**
+	 * The sum of the intensities of non-background pixels will be calculated. The intensity (0..1) of the red channel is analyzed.
+	 * 
+	 * @param b
+	 * @return
+	 */
+	public double intensityOfChannelRed(boolean performGrayScale) {
+		double res = 0;
+		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int[][] img2d = getImageAs2array();
+		
+		int[][] grayScale = img2d;
+		if (performGrayScale)
+			grayScale = convert2Grayscale().getImageAs2array();
+		
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				int c = img2d[x][y];
+				if (c != background) {
+					res++;
+					int cg = grayScale[x][y];
+					double rf = ((cg & 0xff0000) >> 16) / 255.0; // R 0..1
+					res += rf;
+				}
 			}
 		}
 		return res;
@@ -2289,8 +2324,7 @@ public class ImageOperation {
 	 * @param ABThresh
 	 *           minimal A and B value
 	 */
-	public double[] getRGBAverage(int[][] img2d, int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
-		int c, x, y = 0;
+	public double[] getRGBAverage(int[] img1d, int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
 		double rf, gf, bf;
 		double X, Y, Z, fX, fY, fZ;
 		double La, aa, bb;
@@ -2304,71 +2338,67 @@ public class ImageOperation {
 		
 		int count = 0;
 		
-		for (x = x1; x < x1 + w; x++) {
-			for (y = y1; y < y1 + h; y++) {
+		for (int c : img1d) {
+			
+			// RGB to XYZ
+			rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
+			gf = ((c & 0x00ff00) >> 8) / 255.0; // G 0..1
+			bf = (c & 0x0000ff) / 255.0; // B 0..1
+			
+			// white reference D65 PAL/SECAM
+			X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
+			Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
+			Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
+			// var_X = X / 95.047 //Observer = 2, Illuminant = D65
+			// var_Y = Y / 100.000
+			// var_Z = Z / 108.883
+			
+			// XYZ to Lab
+			if (X > 0.008856)
+				fX = Math.pow(X, ot);
+			else
+				fX = (7.78707 * X) + cont;// 7.7870689655172
 				
-				c = img2d[x][y];
-				
-				// RGB to XYZ
-				rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
-				gf = ((c & 0x00ff00) >> 8) / 255.0; // G 0..1
-				bf = (c & 0x0000ff) / 255.0; // B 0..1
-				
-				// white reference D65 PAL/SECAM
-				X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
-				Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
-				Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
-				// var_X = X / 95.047 //Observer = 2, Illuminant = D65
-				// var_Y = Y / 100.000
-				// var_Z = Z / 108.883
-				
-				// XYZ to Lab
-				if (X > 0.008856)
-					fX = Math.pow(X, ot);
-				else
-					fX = (7.78707 * X) + cont;// 7.7870689655172
-					
-				if (Y > 0.008856)
-					fY = Math.pow(Y, ot);
-				else
-					fY = (7.78707 * Y) + cont;
-				
-				if (Z > 0.008856)
-					fZ = Math.pow(Z, ot);
-				else
-					fZ = (7.78707 * Z) + cont;
-				
-				La = (116 * fY) - 16;
-				aa = 500 * (fX - fY);
-				bb = 200 * (fY - fZ);
-				
-				// Lab rescaled to the 0..255 range
-				// a* and b* range from -120 to 120 in the 8 bit space
-				La = La * 2.55;
-				aa = Math.floor((1.0625 * aa + 128) + 0.5);
-				bb = Math.floor((1.0625 * bb + 128) + 0.5);
-				
-				// bracketing
-				Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
-				ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
-				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
-				
-				// sum under following conditions
-				if (mode) {
-					if (Li > LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
-						sumR += rf * 255;
-						sumG += gf * 255;
-						sumB += bf * 255;
-						count++;
-					}
+			if (Y > 0.008856)
+				fY = Math.pow(Y, ot);
+			else
+				fY = (7.78707 * Y) + cont;
+			
+			if (Z > 0.008856)
+				fZ = Math.pow(Z, ot);
+			else
+				fZ = (7.78707 * Z) + cont;
+			
+			La = (116 * fY) - 16;
+			aa = 500 * (fX - fY);
+			bb = 200 * (fY - fZ);
+			
+			// Lab rescaled to the 0..255 range
+			// a* and b* range from -120 to 120 in the 8 bit space
+			La = La * 2.55;
+			aa = (1.0625 * aa + 128) + 0.5;
+			bb = (1.0625 * bb + 128) + 0.5;
+			
+			// bracketing
+			Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
+			ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
+			bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+			
+			// sum under following conditions
+			if (mode) {
+				if (Li > LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
+					sumR += rf * 255;
+					sumG += gf * 255;
+					sumB += bf * 255;
+					count++;
 				}
-				if (mode == false) {
-					if (Li < LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
-						sumR += rf * 255;
-						sumG += gf * 255;
-						sumB += bf * 255;
-						count++;
-					}
+			}
+			if (mode == false) {
+				if (Li < LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
+					sumR += rf * 255;
+					sumG += gf * 255;
+					sumB += bf * 255;
+					count++;
 				}
 			}
 		}
@@ -2425,19 +2455,20 @@ public class ImageOperation {
 	public ImageOperation unsharpedMask(float weight, double sigma) {
 		UnsharpMask um = new UnsharpMask();
 		
-		float[][] channelR = getImage().getFloatChannel(Channel.R);
-		float[][] channelG = getImage().getFloatChannel(Channel.G);
-		float[][] channelB = getImage().getFloatChannel(Channel.B);
+		float[] channelR = getImage().getFloatChannel(Channel.R);
+		float[] channelG = getImage().getFloatChannel(Channel.G);
+		float[] channelB = getImage().getFloatChannel(Channel.B);
 		
-		float[][][] channels = new float[][][] { channelR, channelG, channelB };
-		
-		for (float[][] channel : channels) {
-			FloatProcessor fp = new FloatProcessor(channel);
+		float[][] channels = new float[][] { channelR, channelG, channelB };
+		int w = getImage().getWidth();
+		int h = getImage().getHeight();
+		for (float[] channel : channels) {
+			FloatProcessor fp = new FloatProcessor(w, h, channel, null);
 			fp.snapshot();
 			um.run(fp);
 		}
 		
-		return new ImageOperation(new FlexibleImage(getImage().getWidth(), getImage().getHeight(), channelR, channelG, channelB));
+		return new ImageOperation(new FlexibleImage(w, h, channelR, channelG, channelB));
 	}
 	
 	public ImageOperation subtractImages(FlexibleImage input) {

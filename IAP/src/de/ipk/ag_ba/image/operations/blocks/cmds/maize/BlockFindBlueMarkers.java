@@ -20,15 +20,21 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
+	protected boolean isChangingImages() {
+		return false;
+	}
+	
+	@Override
 	protected FlexibleImage processVISmask() {
 		
 		ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
 		
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			numericResult = getMarkers(getInput().getMasks().getVis());
+		FlexibleImage vis = getInput().getMasks().getVis();
+		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null) {
+			numericResult = getMarkers(vis);
 			
-			int w = getInput().getMasks().getVis().getWidth();
-			int h = getInput().getMasks().getVis().getHeight();
+			int w = vis.getWidth();
+			int h = vis.getHeight();
 			
 			int n = 0;
 			int i = 1;
@@ -36,17 +42,11 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 				if (mp.getLeft() != null) {
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getLeft().x / w);
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getLeft().y / h);
-					// System.out.println("n=" + n + ", i=" + i + ", lx: " + mp.getLeft().x + " ly: " + mp.getLeft().y);
-				} else {
-					// System.out.println("n=" + n + ", i=" + i + ", lx: " + mp.getLeft().x + " ly: " + mp.getLeft().y);
 				}
 				i += 2;
 				if (mp.getRight() != null) {
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getRight().x / w);
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i + 1), mp.getRight().y / h);
-					// System.out.println("n=" + n + ", i=" + i + ", rx: " + mp.getRight().x + " ry: " + mp.getRight().y);
-				} else {
-					// System.out.println("n=" + n + ", i=" + i + ", rx: " + mp.getRight().x + " ry: " + mp.getRight().y);
 				}
 				i += 2;
 				n++;
@@ -58,7 +58,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 			}
 			boolean debug = false;
 			if (debug)
-				return new ImageOperation(getInput().getMasks().getVis()).drawMarkers(numericResult).getImage();
+				return new ImageOperation(vis).drawMarkers(numericResult).getImage();
 		}
 		return getInput().getMasks().getVis();
 	}
@@ -126,6 +126,6 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private ArrayList<MarkerPair> getMarkers(FlexibleImage image) {
 		double s = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
-		return new ImageOperation(image).searchBlueMarkers(s * s / 1.2, options.getCameraPosition());
+		return image.getIO().searchBlueMarkers(s * s / 1.2, options.getCameraPosition());
 	}
 }

@@ -11,6 +11,10 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockClearNirTop extends AbstractSnapshotAnalysisBlockFIS {
 	
+	protected boolean isChangingImages() {
+		return options.getCameraPosition() == CameraPosition.TOP;
+	}
+	
 	@Override
 	protected FlexibleImage processNIRmask() {
 		if (options.getCameraPosition() == CameraPosition.TOP)

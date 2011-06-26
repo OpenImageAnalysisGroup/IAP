@@ -12,6 +12,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockDecreaseMaskSize extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
+	protected boolean isChangingImages() {
+		return false;
+	}
+	
+	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
 		double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);

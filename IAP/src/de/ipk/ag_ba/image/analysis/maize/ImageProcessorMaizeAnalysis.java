@@ -11,8 +11,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingForYellowVisMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancing;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDecreaseImageAndMaskSize;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDecreaseMaskSize;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilter;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
@@ -32,7 +30,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObje
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresFromTopVisUsingOpening;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockUseFluoMaskToClearVisAndNirMask;
 
-public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
+public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
@@ -70,12 +68,11 @@ public class MaizeAnalysisPipelineProcessor extends AbstractImageProcessor {
 		
 		BlockPipeline p = new BlockPipeline();
 		
-		// preprocessing
-		p.add(BlockDecreaseImageAndMaskSize.class); // divide input (but not NIR) by 2
+		// p.add(BlockDecreaseImageAndMaskSize.class);
 		p.add(BlockColorBalancing.class);
 		p.add(BlockImageInfo.class);
 		p.add(BlockClearNirTop.class);
-		p.add(BlockDecreaseMaskSize.class);
+		// p.add(BlockDecreaseMaskSize.class);
 		p.add(BlockFindBlueMarkers.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
 		p.add(BlockLabFilter.class);

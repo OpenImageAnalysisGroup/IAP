@@ -42,7 +42,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 					}
 				}
 			
-			boolean clearSides = true;
+			boolean clearSides = false;
 			if (clearSides)
 				if (markerPosLeftX != null) {
 					result = new ImageOperation(result).clearImageLeft(

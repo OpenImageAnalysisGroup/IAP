@@ -5,6 +5,8 @@ import ij.measure.ResultsTable;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
@@ -135,6 +137,16 @@ public class BlockPropertiesImpl implements BlockProperties {
 				double val = numericResults.getValueAsDouble(col, row);
 				setNumericProperty(position, id_prefix + id, val);
 			}
+		}
+	}
+	
+	@Override
+	public void printAnalysisResults() {
+		for (BlockPropertyValue bpv : getProperties("RESULT_")) {
+			if (bpv.getName() == null)
+				continue;
+			
+			System.out.println(bpv.getName() + "=" + StringManipulationTools.formatNumber(bpv.getValue(), "#.###") + " " + bpv.getUnit());
 		}
 	}
 }

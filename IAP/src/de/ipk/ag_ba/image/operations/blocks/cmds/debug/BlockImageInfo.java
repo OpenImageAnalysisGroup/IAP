@@ -29,6 +29,10 @@ public class BlockImageInfo extends AbstractSnapshotAnalysisBlockFIS {
 		}
 	};
 	
+	protected boolean isChangingImages() {
+		return false;
+	}
+	
 	@Override
 	protected void prepare() {
 		printInfo(getInput().getMasks().getVis(), BlockPrintInfosTyp.VisMask);

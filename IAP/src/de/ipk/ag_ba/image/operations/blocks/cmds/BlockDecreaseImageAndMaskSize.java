@@ -12,6 +12,14 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockDecreaseImageAndMaskSize extends AbstractSnapshotAnalysisBlockFIS {
 	
+	/**
+	 * is set to false here, because the change does not need to be tracked with the debug TIFF stack,
+	 * speeds up tests.
+	 */
+	protected boolean isChangingImages() {
+		return false;
+	}
+	
 	@Override
 	protected FlexibleImage processVISimage() {
 		FlexibleImage vis = getInput().getImages().getVis();

@@ -9,7 +9,6 @@ package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -18,11 +17,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import org.SystemAnalysis;
-import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
-import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
-import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
-import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.color.ColorUtil;
@@ -58,28 +53,22 @@ public class FlexibleImage {
 	
 	public FlexibleImage(IOurl url) throws IOException, Exception {
 		InputStream is = url.getInputStream();
-		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
-		ResourceIOManager.copyContent(is, out);
-		MyByteArrayInputStream in = new MyByteArrayInputStream(out.getBuff(),
-				out.size());
-		image = new ImagePlus("JImage", ImageIO.read(in));
+		// // copy input stream: // not needed any more?!
+		// MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+		// ResourceIOManager.copyContent(is, out);
+		// MyByteArrayInputStream in = new MyByteArrayInputStream(out.getBuff(),
+		// out.size());
+		image = new ImagePlus(url.getFileName(), ImageIO.read(is));
 		w = image.getWidth();
 		h = image.getHeight();
-		// this(ImageConverter.convertBItoIJ(ImageIO.read(in)));
 	}
 	
-	/**
-	 * The given image is converted to a BufferedImage.
-	 */
 	public FlexibleImage(ImagePlus image) {
 		this.image = image;
 		this.w = image.getWidth();
 		this.h = image.getHeight();
 	}
 	
-	/**
-	 * The given image is converted to a BufferedImage.
-	 */
 	public FlexibleImage(int[] image, int w, int h) {
 		this(ImageConverter.convert1AtoIJ(w, h, image));
 	}
@@ -89,24 +78,26 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage(Image image) {
-		this(GravistoService.getBufferedImage(image));
+		this(new ImagePlus("Image", image));
 	}
 	
-	public FlexibleImage(int w, int h, float[][] channelR, float[][] channelG, float[][] channelB) {
+	public FlexibleImage(int w, int h, float[] channelR, float[] channelG, float[] channelB) {
 		this.w = w;
 		this.h = h;
-		
-		int[][] img = new int[w][h];
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				float r = channelR[x][y];
-				float g = channelG[x][y];
-				float b = channelB[x][y];
-				int c = new Color(r, g, b).getRGB();
-				img[x][y] = c;
-			}
+		int a = 255;
+		int alpha = ((a & 0xFF) << 24);
+		int[] img = new int[w * h];
+		for (int idx = 0; idx < img.length; idx++) {
+			int r = (int) (channelR[idx] * 255d + 0.5d);
+			int g = (int) (channelG[idx] * 255d + 0.5d);
+			int b = (int) (channelB[idx] * 255d + 0.5d);
+			int c = // alpha |
+			((r & 0xFF) << 16) |
+					((g & 0xFF) << 8) |
+					((b & 0xFF) << 0);
+			img[idx] = c;
 		}
-		image = ImageConverter.convert2AtoIJ(img);
+		image = ImageConverter.convert1AtoIJ(w, h, img);
 	}
 	
 	public BufferedImage getAsBufferedImage() {
@@ -156,13 +147,13 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage resize(int w, int h) {
-		// if (w == getWidth() && h == getHeight()) {
-		// return new FlexibleImage(getConvertAs2A());
-		// } else {
-		ImageOperation io = new ImageOperation(this);
-		io.resize(w, h);
-		return io.getImage();
-		// }
+		if (w == getWidth() && h == getHeight()) {
+			return new FlexibleImage(getAs2A());
+		} else {
+			ImageOperation io = new ImageOperation(this);
+			io.resize(w, h);
+			return io.getImage();
+		}
 	}
 	
 	int[][] cache2A = null;
@@ -215,14 +206,15 @@ public class FlexibleImage {
 		return io.getImage();
 	}
 	
-	public double[][] getLab() {
+	public double[][] getLab(boolean filterBackground) {
 		final int w = getWidth();
 		final int h = getHeight();
 		final int arrayRGB[] = getAs1A();
 		double arrayL[] = new double[w * h];
 		double arrayA[] = new double[w * h];
 		double arrayB[] = new double[w * h];
-		ColorUtil.getLABfromRGB(arrayRGB, arrayL, arrayA, arrayB, false);
+		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		ColorUtil.getLABfromRGBvar2(arrayRGB, arrayL, arrayA, arrayB, filterBackground, background);
 		return new double[][] {
 				arrayL, arrayA, arrayB };
 	}
@@ -265,26 +257,25 @@ public class FlexibleImage {
 			return null;
 	}
 	
-	public float[][] getFloatChannel(Channel r) {
-		int[][] img = getAs2A();
-		float[][] result = new float[getWidth()][getHeight()];
-		for (int x = 0; x < w; x++)
-			for (int y = 0; y < h; y++) {
-				int c = img[x][y];
-				float f = 0f;
-				switch (r) {
-					case R:
-						f = ((c & 0xff0000) >> 16) / 255f;
-						break;
-					case G:
-						f = ((c & 0x00ff00) >> 8) / 255f;
-						break;
-					case B:
-						f = (c & 0x0000ff) / 255f;
-						break;
-				}
-				result[x][y] = f;
+	public float[] getFloatChannel(Channel r) {
+		int[] img = getAs1A();
+		float[] result = new float[getWidth() * getHeight()];
+		for (int idx = 0; idx < img.length; idx++) {
+			int c = img[idx];
+			float f = 0f;
+			switch (r) {
+				case R:
+					f = ((c & 0xff0000) >> 16) / 255f;
+					break;
+				case G:
+					f = ((c & 0x00ff00) >> 8) / 255f;
+					break;
+				case B:
+					f = (c & 0x0000ff) / 255f;
+					break;
 			}
+			result[idx] = f;
+		}
 		return result;
 	}
 }

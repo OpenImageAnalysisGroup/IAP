@@ -112,15 +112,15 @@ public enum PropertyNames {
 				
 			case RESULT_VIS_MARKER_POS_1_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_1_RIGHT_Y:
-				return "pixel";
+				return "px";
 				
 			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_2_RIGHT_Y:
-				return "pixel";
+				return "px";
 				
 			case RESULT_VIS_MARKER_POS_3_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_3_RIGHT_Y:
-				return "pixel";
+				return "px";
 				
 		}
 		return null;
