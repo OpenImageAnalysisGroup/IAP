@@ -90,9 +90,9 @@ public class BlueMarkerFinder {
 		Vector2d minLeftmaxRight = searchminLeftmaxRight(coordinatesUnfiltered);
 		
 		ArrayList<Vector2d> coordinatesLeft = searchLeft(coordinatesUnfiltered,
-				minLeftmaxRight.x + (input.getWidth() * 0.05));
+				minLeftmaxRight.x + (input.getWidth() * 0.2));
 		ArrayList<Vector2d> coordinatesRight = searchRight(
-				coordinatesUnfiltered, minLeftmaxRight.y - (input.getWidth() * 0.05));
+				coordinatesUnfiltered, minLeftmaxRight.y - (input.getWidth() * 0.2));
 		
 		coordinatesLeft = getThree(coordinatesLeft);
 		coordinatesRight = getThree(coordinatesRight);

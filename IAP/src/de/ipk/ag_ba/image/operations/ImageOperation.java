@@ -182,7 +182,7 @@ public class ImageOperation {
 	public ImageOperation convertFluo2intensity() {
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		
-		int[][] in = gamma(0.1).getImageAs2array();
+		int[][] in = getImageAs2array(); // gamma(0.1) // 99999999999999999999999999999999
 		for (int x = 0; x < image.getWidth(); x++)
 			for (int y = 0; y < image.getHeight(); y++) {
 				int c = in[x][y];
@@ -193,25 +193,24 @@ public class ImageOperation {
 				
 				int rf = (c & 0xff0000) >> 16;
 				int gf = (c & 0x00ff00) >> 8;
-				int bf = (c & 0x0000ff);
+				// int bf = (c & 0x0000ff);
 				
-				float[] hsbvals = Color.RGBtoHSB(rf, gf, bf, null);
+				// float[] hsbvals = Color.RGBtoHSB(rf, gf, bf, null);
+				//
+				// int rgb = Color.HSBtoRGB(hsbvals[0], hsbvals[1], (float) (hsbvals[2]));
+				// int r = (rgb & 0xff0000) >> 16;
+				// int g = (rgb & 0x00ff00) >> 8;
 				
-				int rgb = Color.HSBtoRGB(hsbvals[0], hsbvals[1], (float) (hsbvals[2]));
-				int r = (rgb & 0xff0000) >> 16;
-				int g = (rgb & 0x00ff00) >> 8;
+				// float intensityA = 1 - r * max(r, g) / ((255 * 255) + 255 * g);
 				
-				float intensityA = 1 - r * max(r, g) / ((255 * 255) + 255 * g);
-				float intensityB = 1 - r / (float) ((255) + g);
-				float intensity;
-				if (x / 4 % 2 == 0)
-					intensity = intensityB;
-				else
-					intensity = intensityB;
-				if (intensity > 130f / 255f)
-					intensity = 1;
+				float intensity = 1 - rf / (float) ((255) + gf);
 				
-				in[x][y] = new Color(intensity, intensity, intensity, 1f).getRGB();
+				// if (intensity > 130f / 255f)
+				// intensity = 1;
+				
+				int i = (int) (intensity * 255d);
+				// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
+				in[x][y] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
 			}
 		return new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
 	}
@@ -241,7 +240,8 @@ public class ImageOperation {
 					in[x][y] = background;
 				} else {
 					intensity = 1 - intensity;
-					in[x][y] = new Color(intensity, intensity, intensity, 1f).getRGB();
+					int i = (int) (intensity * 255 + 0.5);
+					in[x][y] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
 				}
 			}
 		return new ImageOperation(new FlexibleImage(in));// .dilate();
@@ -1491,17 +1491,17 @@ public class ImageOperation {
 				
 				// XYZ to Lab
 				if (X > 0.008856)
-					fX = Math.pow(X, ot);
+					fX = MathPow(X, ot);
 				else
 					fX = (7.78707 * X) + cont;// 7.7870689655172
 					
 				if (Y > 0.008856)
-					fY = Math.pow(Y, ot);
+					fY = MathPow(Y, ot);
 				else
 					fY = (7.78707 * Y) + cont;
 				
 				if (Z > 0.008856)
-					fZ = Math.pow(Z, ot);
+					fZ = MathPow(Z, ot);
 				else
 					fZ = (7.78707 * Z) + cont;
 				
@@ -1538,6 +1538,26 @@ public class ImageOperation {
 					resultImage[x][y] = background;
 			}
 		}
+	}
+	
+	private static double[] cubeRoots = getCubeRoots(0, 1.1, 1100);
+	
+	public static double MathPow(double v, double ot) {
+		// if (v < 0 || v > 1.1) {
+		// System.out.println("TODO: " + v);
+		// return Math.pow(v, ot);
+		// } else
+		return cubeRoots[(int) (1000 * v)];
+	}
+	
+	private static double[] getCubeRoots(double lo, double up, int n) {
+		double[] res = new double[n + 1];
+		double sq = 1 / 3d;
+		for (int i = 0; i <= n; i++) {
+			double x = lo + i * (up - lo) / (double) n;
+			res[i] = Math.pow(x, sq);
+		}
+		return res;
 	}
 	
 	private static boolean isGray(int li, int ai, int bi, int maxDiffAleftBright, int maxDiffArightBleft) {
@@ -1592,17 +1612,17 @@ public class ImageOperation {
 				
 				// XYZ to Lab
 				if (X > 0.008856)
-					fX = Math.pow(X, ot);
+					fX = MathPow(X, ot);
 				else
 					fX = (7.78707 * X) + cont;// 7.7870689655172
 					
 				if (Y > 0.008856)
-					fY = Math.pow(Y, ot);
+					fY = MathPow(Y, ot);
 				else
 					fY = (7.78707 * Y) + cont;
 				
 				if (Z > 0.008856)
-					fZ = Math.pow(Z, ot);
+					fZ = MathPow(Z, ot);
 				else
 					fZ = (7.78707 * Z) + cont;
 				
@@ -1992,7 +2012,7 @@ public class ImageOperation {
 	/**
 	 * @return top, bottom, left, right
 	 */
-	public int[] getExtremePoints(int background) {
+	public TopBottomLeftRight getExtremePoints(int background) {
 		int[][] img2d = getImageAs2array();
 		
 		int top = Integer.MAX_VALUE;
@@ -2029,8 +2049,7 @@ public class ImageOperation {
 			}
 		}
 		if (isin) {
-			int[] result = { top, bottom, left, right };
-			return result;
+			return new TopBottomLeftRight(top, bottom, left, right);
 		} else
 			return null;
 	}
@@ -2101,41 +2120,6 @@ public class ImageOperation {
 	 */
 	public IntensityAnalysis intensity(int n) {
 		return new IntensityAnalysis(this, n);
-	}
-	
-	/**
-	 * Each channel of an rgb-image will be weighted by the function p = 4 * g - (3 * b) - r.
-	 * 
-	 * @return
-	 */
-	public ImageOperation rgbChannelWeighting() {
-		
-		int[] pixels = getImageAs1array();
-		int[] result = new int[pixels.length];
-		boolean flag = true;
-		int index = 0;
-		for (int c : pixels) {
-			int r = (c & 0xff0000) >> 16;
-			int g = (c & 0x00ff00) >> 8;
-			int b = (c & 0x0000ff);
-			
-			// min: -4*255, max: 4*255
-			// --> Range: 8*255, Offset: 4*255
-			int intensity = 4 * g - (3 * b) - r;
-			float i = (intensity + 4 * 255) / (float) (8 * 255);
-			if (i > 130f / 255f)
-				result[index] = new Color(i, i, i).getRGB();
-			else {
-				flag = true;
-				if (flag)
-					result[index] = Color.BLUE.getRGB();
-				else
-					result[index] = c;
-				flag = !flag;
-			}
-			index++;
-		}
-		return new ImageOperation(new FlexibleImage(result, image.getWidth(), image.getHeight()));
 	}
 	
 	public ImageOperation clearImageLeft(double cutoff, int background) {
@@ -2250,7 +2234,7 @@ public class ImageOperation {
 				if (b > 255)
 					b = 255;
 				
-				result[x][y] = new Color(r, g, b).getRGB();
+				result[x][y] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 			}
 		}
 		return new ImageOperation(result);
@@ -2264,12 +2248,12 @@ public class ImageOperation {
 	 * @param ABThresh
 	 *           minimal A and B value
 	 */
-	public double[] getRGBAverage(int[] img1d, int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
+	public double[] getRGBAverage(int[][] img2d, int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
 		double rf, gf, bf;
 		double X, Y, Z, fX, fY, fZ;
 		double La, aa, bb;
 		double ot = 1 / 3.0, cont = 16 / 116.0;
-		int Li, ai, bi;
+		int Li, ai, bi, c;
 		
 		// sums of RGB
 		double sumR = 0;
@@ -2278,71 +2262,74 @@ public class ImageOperation {
 		
 		int count = 0;
 		
-		for (int c : img1d) {
-			
-			// RGB to XYZ
-			rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
-			gf = ((c & 0x00ff00) >> 8) / 255.0; // G 0..1
-			bf = (c & 0x0000ff) / 255.0; // B 0..1
-			
-			// white reference D65 PAL/SECAM
-			X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
-			Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
-			Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
-			// var_X = X / 95.047 //Observer = 2, Illuminant = D65
-			// var_Y = Y / 100.000
-			// var_Z = Z / 108.883
-			
-			// XYZ to Lab
-			if (X > 0.008856)
-				fX = Math.pow(X, ot);
-			else
-				fX = (7.78707 * X) + cont;// 7.7870689655172
+		for (int x = x1; x < x1 + w; x++) {
+			for (int y = y1; y < y1 + h; y++) {
 				
-			if (Y > 0.008856)
-				fY = Math.pow(Y, ot);
-			else
-				fY = (7.78707 * Y) + cont;
-			
-			if (Z > 0.008856)
-				fZ = Math.pow(Z, ot);
-			else
-				fZ = (7.78707 * Z) + cont;
-			
-			La = (116 * fY) - 16;
-			aa = 500 * (fX - fY);
-			bb = 200 * (fY - fZ);
-			
-			// Lab rescaled to the 0..255 range
-			// a* and b* range from -120 to 120 in the 8 bit space
-			La = La * 2.55;
-			aa = (1.0625 * aa + 128) + 0.5;
-			bb = (1.0625 * bb + 128) + 0.5;
-			
-			// bracketing
-			Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
-			ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
-			bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
-			
-			// sum under following conditions
-			if (mode) {
-				if (Li > LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
-					sumR += rf * 255;
-					sumG += gf * 255;
-					sumB += bf * 255;
-					count++;
+				c = img2d[x][y];
+				// RGB to XYZ
+				rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
+				gf = ((c & 0x00ff00) >> 8) / 255.0; // G 0..1
+				bf = (c & 0x0000ff) / 255.0; // B 0..1
+				
+				// white reference D65 PAL/SECAM
+				X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
+				Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
+				Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
+				// var_X = X / 95.047 //Observer = 2, Illuminant = D65
+				// var_Y = Y / 100.000
+				// var_Z = Z / 108.883
+				
+				// XYZ to Lab
+				if (X > 0.008856)
+					fX = MathPow(X, ot);
+				else
+					fX = (7.78707 * X) + cont;// 7.7870689655172
+					
+				if (Y > 0.008856)
+					fY = MathPow(Y, ot);
+				else
+					fY = (7.78707 * Y) + cont;
+				
+				if (Z > 0.008856)
+					fZ = MathPow(Z, ot);
+				else
+					fZ = (7.78707 * Z) + cont;
+				
+				La = (116 * fY) - 16;
+				aa = 500 * (fX - fY);
+				bb = 200 * (fY - fZ);
+				
+				// Lab rescaled to the 0..255 range
+				// a* and b* range from -120 to 120 in the 8 bit space
+				La = La * 2.55;
+				aa = (1.0625 * aa + 128) + 0.5;
+				bb = (1.0625 * bb + 128) + 0.5;
+				
+				// bracketing
+				Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
+				ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
+				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+				
+				// sum under following conditions
+				if (mode) {
+					if (Li > LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
+						sumR += rf;
+						sumG += gf;
+						sumB += bf;
+						count++;
+					}
 				}
-			}
-			if (mode == false) {
-				if (Li < LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
-					sumR += rf * 255;
-					sumG += gf * 255;
-					sumB += bf * 255;
-					count++;
+				if (mode == false) {
+					if (Li < LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
+						sumR += rf;
+						sumG += gf;
+						sumB += bf;
+						count++;
+					}
 				}
 			}
 		}
-		return new double[] { sumR / count, sumG / count, sumB / count };
+		return new double[] { sumR / (double) count, sumG / (double) count, sumB / (double) count };
 	}
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {

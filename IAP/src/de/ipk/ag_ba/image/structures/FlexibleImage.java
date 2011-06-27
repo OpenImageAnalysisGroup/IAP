@@ -25,6 +25,7 @@ import de.ipk.ag_ba.image.operations.Channel;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.PrintImage;
+import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
@@ -78,6 +79,7 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage(Image image) {
+		// this(GravistoService.getBufferedImage(image));999999999999999999999999
 		this(new ImagePlus("Image", image));
 	}
 	
@@ -151,7 +153,7 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage resize(int w, int h) {
-		if (w == getWidth() && h == getHeight()) {
+		if (w == getWidth() && h == getHeight()) { // 999999999999999999999999999999
 			return copy();
 		} else {
 			ImageOperation io = new ImageOperation(this);
@@ -163,7 +165,7 @@ public class FlexibleImage {
 	int[][] cache2A = null;
 	
 	public int[][] getAs2A() {
-		boolean useCache = false;
+		boolean useCache = true; // 7777777777777777777777777777 false
 		if (!useCache)
 			return ImageConverter.convertIJto2A(image);
 		
@@ -227,7 +229,8 @@ public class FlexibleImage {
 	}
 	
 	public ImageOperation getIO() {
-		return new ImageOperation(getAs2A());
+		return new ImageOperation(this);
+		// return new ImageOperation(getAs2A());999999999999999999999999
 	}
 	
 	/**
@@ -239,17 +242,22 @@ public class FlexibleImage {
 		int[][] img = getAs2A();
 		
 		if (leftX < 0 || rightX < 0 || topY < 0 || bottomY < 0) {
-			int[] ext = io.getExtremePoints(background);
+			TopBottomLeftRight ext = io.getExtremePoints(background);
 			if (ext != null) {
 				if (leftX < 0)
-					leftX = ext[2];
+					leftX = ext.getLeftX();
 				if (rightX < 0)
-					rightX = ext[3];
+					rightX = ext.getRightX();
 				if (topY < 0)
-					topY = ext[0];
+					topY = ext.getTopY();
 				if (bottomY < 0)
-					bottomY = ext[2];
+					bottomY = ext.getBottomY();
 			}
+		}
+		
+		if (rightX - leftX <= 0 || bottomY - topY <= 0) {
+			System.out.println("WARNING: cropAbs detected negative crop desire...");
+			return io.getImage();
 		}
 		
 		int[][] res = new int[rightX - leftX][bottomY - topY];

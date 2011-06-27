@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -76,7 +77,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		ImageOperation ioInputForCut = new ImageOperation(inputToCut);
 		int background = options.getBackground();
 		ImageOperation ioSource = new ImageOperation(imageSource);
-		int[] positions = ioSource.getExtremePoints(background);
+		TopBottomLeftRight positions = ioSource.getExtremePoints(background);
 		if (positions == null)
 			return inputToCut;
 		
@@ -94,19 +95,20 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		
 		double sv = inputToCut.getHeight() / (double) imageSource.getHeight();
 		
-		positions[0] = (int) (positions[0] * sv - pa * inputToCut.getHeight());
-		positions[1] = (int) (positions[1] * s);
-		positions[2] = (int) (positions[2] * s - pl * inputToCut.getWidth());
-		positions[3] = (int) (positions[3] * s + pr * inputToCut.getWidth());
+		positions.setTop((int) (positions.getTopY() * sv - pa * inputToCut.getHeight()));
+		positions.setBottom((int) (positions.getBottomY() * s));
+		positions.setLeft((int) (positions.getLeftX() * s - pl * inputToCut.getWidth()));
+		positions.setRight((int) (positions.getRightX() * s + pr * inputToCut.getWidth()));
 		
-		return ioInputForCut.clearImageLeft(positions[2], bl).clearImageRight(positions[3], br).clearImageAbove(positions[0], ba).getImage();
+		// return ioInputForCut.clearImageLeft(positions[2], bl).clearImageRight(positions[3], br).clearImageAbove(positions[0], ba).getImage();
+		return ioInputForCut.clearImageAbove(positions.getTopY(), ba).getImage();
 	}
 	
 	private FlexibleImage clearImageTop(FlexibleImage input, FlexibleImage fluo) {
 		ImageOperation ioInput = new ImageOperation(input);
 		int background = options.getBackground();
 		ImageOperation ioFluo = new ImageOperation(fluo);
-		int[] positions = ioFluo.getExtremePoints(background);
+		TopBottomLeftRight positions = ioFluo.getExtremePoints(background);
 		if (positions == null)
 			return input;
 		
@@ -116,12 +118,13 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		
 		double pa = 0.07;
 		
-		positions[0] = (int) (positions[0] * s - pa * input.getWidth());
-		positions[1] = (int) (positions[1] * s + pa * input.getWidth());
-		positions[2] = (int) (positions[2] * s - pa * input.getWidth());
-		positions[3] = (int) (positions[3] * s + pa * input.getWidth());
+		positions.setTop((int) (positions.getTopY() * s - pa * input.getWidth()));
+		positions.setBottom((int) (positions.getBottomY() * s + pa * input.getWidth()));
+		positions.setLeft((int) (positions.getLeftX() * s - pa * input.getWidth()));
+		positions.setRight((int) (positions.getRightX() * s + pa * input.getWidth()));
 		
-		return ioInput.clearImageLeft(positions[2], background).clearImageRight(positions[3], background).clearImageAbove(positions[0], background)
-				.clearImageBottom(positions[1], background).getImage();
+		return ioInput.clearImageLeft(positions.getLeftX(), background).clearImageRight(positions.getRightX(), background)
+				.clearImageAbove(positions.getTopY(), background)
+				.clearImageBottom(positions.getBottomY(), background).getImage();
 	}
 }

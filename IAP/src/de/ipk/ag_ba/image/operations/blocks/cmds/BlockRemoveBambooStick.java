@@ -5,6 +5,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
@@ -24,11 +25,11 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 			int background = options.getBackground();
 			boolean show = false;
 			// visible search most high Y
-			int[] extremePoints = new ImageOperation(processedMasks.getVis().print("Mask Search For Maxima", show)).getExtremePoints(background);
+			TopBottomLeftRight extremePoints = new ImageOperation(processedMasks.getVis().print("Mask Search For Maxima", show)).getExtremePoints(background);
 			// cut fluo from top
 			if (extremePoints != null) {
 				int h = processedMasks.getFluo().getHeight();
-				int temp = (int) ((extremePoints[0] / (double) processedMasks.getVis().getHeight()) * processedMasks.getFluo().getHeight());
+				int temp = (int) ((extremePoints.getTopY() / (double) processedMasks.getVis().getHeight()) * processedMasks.getFluo().getHeight());
 				FlexibleImage fi = new ImageOperation(processedMasks.getFluo()).clearImageAbove(temp - 0.03 * h, background).getImage();
 				processedMasks.setFluo(fi.print("Fluo Result", show));
 			}
