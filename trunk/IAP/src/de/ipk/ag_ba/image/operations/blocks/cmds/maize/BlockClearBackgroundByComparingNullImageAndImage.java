@@ -27,7 +27,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			FlexibleImage visImg = getInput().getImages().getVis();
 			FlexibleImage visMsk = getInput().getMasks().getVis();
 			
-			visImg.getIO().subtractImages(visMsk).printImage("LAB difference");
+			// visImg.getIO().subtractImages(visMsk).printImage("LAB difference", true);
 			
 			// vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
 			// unsharpedMask(1.0f, 3.0).printImage("UNSHARPEN").

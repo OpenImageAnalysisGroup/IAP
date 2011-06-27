@@ -19,7 +19,7 @@ public class Histogram {
 	}
 	
 	public void addDataPoint(int value, int maxValue) {
-		addDataPoint((int) (value / (double) maxValue * n));
+		addDataPoint((int) (value / (double) maxValue * (n - 1)));
 	}
 	
 	public double getFreqAt(int i) {

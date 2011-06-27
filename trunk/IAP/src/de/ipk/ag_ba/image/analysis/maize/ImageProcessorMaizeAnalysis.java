@@ -63,6 +63,7 @@ public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 		p.add(BlockLabFilter.class);
 		p.add(BlockRemoveLevitatingObjects.class);
 		p.add(BlockRemoveVerticalAndHorizontalStructures.class);
+		p.add(BlockRemoveSmallClusters.class); // 2nd run
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
 		p.add(BlockNirProcessing.class);
 		p.add(BlockCopyImagesApplyMask.class); // without nir

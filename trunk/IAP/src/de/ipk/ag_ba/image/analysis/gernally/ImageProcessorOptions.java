@@ -267,7 +267,7 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.abDiff_VIS, 40); // 40
 		addIntSetting(Setting.L_Diff_FLOU, 75);// 20
 		addIntSetting(Setting.abDiff_FLOU, 40);// 30
-		addIntSetting(Setting.L_Diff_NIR, 5); // 14
+		addIntSetting(Setting.L_Diff_NIR, 14); // 14
 		addIntSetting(Setting.abDiff_NIR, 20);
 		
 		addBooleanSetting(Setting.IS_PARAMETER_SEARCH, false);

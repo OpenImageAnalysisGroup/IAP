@@ -11,6 +11,8 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 	
 	@Override
 	protected FlexibleImage processMask(FlexibleImage mask) {
+		if (mask == null)
+			return null;
 		if (mask.getType() == FlexibleImageType.UNKNOWN) {
 			System.out.println("ERROR: Unknown image type!!!");
 			return mask;
@@ -18,7 +20,7 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 		if (mask.getType() == FlexibleImageType.NIR)
 			return mask;
 		if (mask.getType() == FlexibleImageType.FLUO)
-			return mask;
+			return process(process(mask));
 		if (mask.getType() == FlexibleImageType.VIS)
 			return process(process(mask));
 		
@@ -45,7 +47,7 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 		int blue = options.getBackground();// Color.BLUE.getRGB();
 		// boolean flag = false;
 		int n = 20;
-		for (int scanBlock = 0; scanBlock < h / n; scanBlock++) {
+		for (int scanBlock = 0; scanBlock < h * 0.1 / n; scanBlock++) {
 			double avg = getAvg(filledPixelsPerLine, scanBlock * n, n);
 			double stddev = getStdDev(avg, filledPixelsPerLine, scanBlock * n, n);
 			for (int i = 0; i < n; i++) {
@@ -61,6 +63,8 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 		}
 		
 		for (int scanBlock = 0; scanBlock < w / n; scanBlock++) {
+			if (scanBlock * n > 0.3d * w && scanBlock * n < 0.7d * w)
+				continue;
 			double avg = getAvg(filledPixelsPerColumn, scanBlock * n, n);
 			double stddev = getStdDev(avg, filledPixelsPerColumn, scanBlock * n, n);
 			for (int i = 0; i < n; i++) {

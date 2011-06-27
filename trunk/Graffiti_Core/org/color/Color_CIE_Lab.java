@@ -68,15 +68,15 @@ public class Color_CIE_Lab {
 		double var_Z = var_Y - b / 200d;
 		
 		if (Math.pow(var_Y, 3d) > 0.008856)
-			var_Y = Math.pow(var_Y, 3);
+			var_Y = var_Y * var_Y * var_Y;
 		else
 			var_Y = (var_Y - 16d / 116d) / 7.787d;
 		if (Math.pow(var_X, 3d) > 0.008856)
-			var_X = Math.pow(var_X, 3);
+			var_X = var_X * var_X * var_X;
 		else
 			var_X = (var_X - 16 / 116) / 7.787;
 		if (Math.pow(var_Z, 3) > 0.008856)
-			var_Z = Math.pow(var_Z, 3);
+			var_Z = var_Z * var_Z * var_Z;
 		else
 			var_Z = (var_Z - 16 / 116) / 7.787d;
 		

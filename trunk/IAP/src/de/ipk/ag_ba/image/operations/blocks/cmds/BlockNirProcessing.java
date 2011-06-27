@@ -32,7 +32,7 @@ public class BlockNirProcessing extends AbstractSnapshotAnalysisBlockFIS {
 					// compare images
 					boolean debug = false;
 					whiteReference = new ImageOperation(getInput().getImages().getNir()).printImage("img", debug).compare()
-							.compareGrayImages(whiteReference.print("ref", debug), 100, 25, options.getBackground()).printImage("result", debug).getImage();
+							.compareGrayImages(whiteReference.print("ref", debug), 100, 35, options.getBackground()).printImage("result", debug).getImage();
 					
 					getInput().getMasks().setNir(whiteReference);
 				}

@@ -19,9 +19,9 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
-		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis, 0.2);
-		else
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
+			pix = getProbablyWhitePixels(vis, 0.3);
+		} else
 			pix = getProbablyWhitePixels(vis, 0.06);
 		return io.imageBalancing(255, pix).getImage();
 	}
@@ -34,7 +34,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis, 0.2);
+			pix = getProbablyWhitePixels(vis, 0.3);
 		else
 			pix = getProbablyWhitePixels(vis, 0.06);
 		return io.imageBalancing(255, pix).getImage();
@@ -67,7 +67,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	 * @author pape
 	 */
 	public static double[] getProbablyWhitePixels(FlexibleImage image, double size) {
-		int[] img1d = image.getAs1A();
+		int[][] img2d = image.getAs2A();
 		int width = image.getWidth();
 		int height = image.getHeight();
 		int w = (int) (width * size);
@@ -75,8 +75,9 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ImageOperation io = new ImageOperation(image);
 		
-		double[] valuesleft = io.getRGBAverage(img1d, 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
-		double[] valuesright = io.getRGBAverage(img1d, width - 2 * w, 2 * h, w, height - 2 * h, 150, 50, true);
+		double[] valuesleft = io.getRGBAverage(img2d, 20, h, w, height - 2 * h, 150, 50, true);
+		double[] valuesright = io.getRGBAverage(img2d, width - 20 - w, h, w, height - 2 * h, 150, 50, true);
+		// no function tested
 		// double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
 		// double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);
 		
@@ -84,6 +85,6 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		double g = (valuesleft[1] + valuesright[1]) / 2;// + valuestop[1] + valuesdown[1]) / 4;
 		double b = (valuesleft[2] + valuesright[2]) / 2;// + valuestop[2] + valuesdown[2]) / 4;
 		
-		return new double[] { r, g, b };
+		return new double[] { r * 255, g * 255, b * 255 };
 	}
 }

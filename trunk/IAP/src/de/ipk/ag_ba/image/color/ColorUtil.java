@@ -8,6 +8,7 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
@@ -630,17 +631,17 @@ public class ColorUtil {
 				
 				// XYZ to Lab
 				if (X > 0.008856)
-					fX = Math.pow(X, ot);
+					fX = ImageOperation.MathPow(X, ot);
 				else
 					fX = (7.78707 * X) + cont;// 7.7870689655172
 					
 				if (Y > 0.008856)
-					fY = Math.pow(Y, ot);
+					fY = ImageOperation.MathPow(Y, ot);
 				else
 					fY = (7.78707 * Y) + cont;
 				
 				if (Z > 0.008856)
-					fZ = Math.pow(Z, ot);
+					fZ = ImageOperation.MathPow(Z, ot);
 				else
 					fZ = (7.78707 * Z) + cont;
 				

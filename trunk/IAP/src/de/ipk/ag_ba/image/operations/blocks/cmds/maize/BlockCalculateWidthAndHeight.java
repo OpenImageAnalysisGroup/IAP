@@ -6,6 +6,7 @@ import org.Vector2d;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
@@ -56,9 +57,9 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	private Point getWidthAndHeightSide(FlexibleImage vis, int background) {
-		int[] temp = new ImageOperation(vis).getExtremePoints(background);
+		TopBottomLeftRight temp = new ImageOperation(vis).getExtremePoints(background);
 		if (temp != null) {
-			Point values = new Point(Math.abs(temp[1] - temp[0]), Math.abs(temp[3] - temp[2]));
+			Point values = new Point(Math.abs(temp.getRightX() - temp.getLeftX()), Math.abs(temp.getBottomY() - temp.getTopY()));
 			return values;
 		} else
 			return null;
