@@ -53,7 +53,7 @@ public class BlueMarkerFinder {
 					// .medianFilter8Bit()
 					.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB())
 					.findMax(10.0, MaximumFinder.SINGLE_POINTS)
-					.findMax(10.0, MaximumFinder.LIST).opening(10, 0)
+					.findMax(10.0, MaximumFinder.LIST)
 					.getResultsTable();
 	}
 	

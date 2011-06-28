@@ -22,6 +22,10 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
 			BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
 			
+			if (markerPosLeftY == null && markerPosRightY == null) { // set default
+				getProperties().setNumericProperty(0, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y, input.getHeight() * 0.136);
+			}
+			
 			FlexibleImage result = input;
 			
 			if (markerPosLeftY != null) {

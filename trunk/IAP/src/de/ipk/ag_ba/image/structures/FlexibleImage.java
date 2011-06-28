@@ -263,7 +263,11 @@ public class FlexibleImage {
 		int[][] res = new int[rightX - leftX][bottomY - topY];
 		for (int x = 0; x < rightX - leftX; x++) {
 			for (int y = 0; y < bottomY - topY; y++) {
-				res[x][y] = img[x + leftX][y + topY];
+				if (x + leftX < img.length && y + topY < img[0].length)
+					res[x][y] = img[x + leftX][y + topY];
+				else
+					continue;
+				// System.out.println("warning cropimage to small");
 			}
 		}
 		if (res.length > 0)
