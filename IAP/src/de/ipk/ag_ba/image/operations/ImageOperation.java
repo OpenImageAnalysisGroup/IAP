@@ -15,6 +15,7 @@ import ij.process.Blitter;
 import ij.process.ByteProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
+import info.StopWatch;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -54,6 +55,7 @@ import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
@@ -212,7 +214,7 @@ public class ImageOperation {
 				// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
 				in[x][y] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
 			}
-		return new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
+		return new ImageOperation(in); // new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
 	}
 	
 	private float max(int r, int g) {
@@ -751,7 +753,7 @@ public class ImageOperation {
 		FlexibleImage workImage = new FlexibleImage(image);
 		workImage = removeSmallPartsOfImage(workImage,
 				PhenotypeAnalysisTask.BACKGROUND_COLORint,
-				(int) (image.getWidth() * image.getHeight() * factor), image.getWidth() / 100, nb, typ,
+				(int) (image.getWidth() * image.getHeight() * factor), (image.getWidth() / 100) * 2, nb, typ,
 				optClusterSizeReturn);
 		return new ImageOperation(workImage);
 	}
@@ -1457,10 +1459,7 @@ public class ImageOperation {
 			int[] lowerValueOfB, int[] upperValueOfB,
 			int background, CameraPosition typ) {
 		int c, x, y = 0;
-		double rf, gf, bf;
-		double X, Y, Z, fX, fY, fZ;
-		double La, aa, bb;
-		double ot = 1 / 3.0, cont = 16 / 116.0;
+		int r, g, b;
 		int Li, ai, bi;
 		int maxDiffAleftBright, maxDiffArightBleft;
 		
@@ -1468,7 +1467,7 @@ public class ImageOperation {
 			maxDiffAleftBright = 7;
 			maxDiffArightBleft = 7;
 		} else {
-			maxDiffAleftBright = 15;
+			maxDiffAleftBright = 11; // 15
 			maxDiffArightBleft = 7;
 		}
 		
@@ -1477,50 +1476,13 @@ public class ImageOperation {
 				c = img2d[x][y];
 				
 				// RGB to XYZ
-				rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
-				gf = ((c & 0x00ff00) >> 8) / 255.0; // G 0..1
-				bf = (c & 0x0000ff) / 255.0; // B 0..1
+				r = ((c & 0xff0000) >> 16);
+				g = ((c & 0x00ff00) >> 8);
+				b = (c & 0x0000ff);
 				
-				// white reference D65 PAL/SECAM
-				X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
-				Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
-				Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
-				// var_X = X / 95.047 //Observer = 2, Illuminant = D65
-				// var_Y = Y / 100.000
-				// var_Z = Z / 108.883
-				
-				// XYZ to Lab
-				if (X > 0.008856)
-					fX = MathPow(X, ot);
-				else
-					fX = (7.78707 * X) + cont;// 7.7870689655172
-					
-				if (Y > 0.008856)
-					fY = MathPow(Y, ot);
-				else
-					fY = (7.78707 * Y) + cont;
-				
-				if (Z > 0.008856)
-					fZ = MathPow(Z, ot);
-				else
-					fZ = (7.78707 * Z) + cont;
-				
-				La = (116 * fY) - 16;
-				aa = 500 * (fX - fY);
-				bb = 200 * (fY - fZ);
-				
-				// Lab rescaled to the 0..255 range
-				// a* and b* range from -120 to 120 in the 8 bit space
-				La = La * 2.55;
-				aa = 1.0625 * aa + 128;
-				bb = 1.0625 * bb + 128;
-				// aa = Math.floor((1.0625 * aa + 128) + 0.5);
-				// bb = Math.floor((1.0625 * bb + 128) + 0.5);
-				
-				// bracketing
-				Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
-				ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
-				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+				Li = (int) IAPservice.labCube[r][g][b][0];
+				ai = (int) IAPservice.labCube[r][g][b][1];
+				bi = (int) IAPservice.labCube[r][g][b][2];
 				
 				boolean found = false;
 				for (int idx = 0; idx < lowerValueOfA.length; idx++) {
@@ -1540,17 +1502,79 @@ public class ImageOperation {
 		}
 	}
 	
-	private static double[] cubeRoots = getCubeRoots(0, 1.1, 1100);
+	public static double[][][][] getLabCube() {
+		StopWatch s = new StopWatch("lab_cube", true);
+		double X, Y, Z, fX, fY, fZ;
+		double La, aa, bb, rd, gd, bd;
+		int Li, ai, bi;
+		double ot = 1 / 3.0, cont = 16 / 116.0;
+		double[][][][] result = new double[256][256][256][3];
+		
+		for (int r = 0; r < 256; r++) {
+			for (int g = 0; g < 256; g++) {
+				for (int b = 0; b < 256; b++) {
+					rd = (r / 255d);
+					gd = (g / 255d);
+					bd = (b / 255d);
+					
+					// white reference D65 PAL/SECAM
+					X = 0.430587 * rd + 0.341545 * gd + 0.178336 * bd;
+					Y = 0.222021 * rd + 0.706645 * gd + 0.0713342 * bd;
+					Z = 0.0201837 * rd + 0.129551 * gd + 0.939234 * bd;
+					// var_X = X / 95.047 //Observer = 2, Illuminant = D65
+					// var_Y = Y / 100.000
+					// var_Z = Z / 108.883
+					
+					// XYZ to Lab
+					if (X > 0.008856)
+						fX = IAPservice.cubeRoots[(int) (1000 * X)];
+					else
+						fX = (7.78707 * X) + cont;// 7.7870689655172
+						
+					if (Y > 0.008856)
+						fY = IAPservice.cubeRoots[(int) (1000 * Y)];
+					else
+						fY = (7.78707 * Y) + cont;
+					
+					if (Z > 0.008856)
+						fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
+					else
+						fZ = (7.78707 * Z) + cont;
+					
+					La = (116 * fY) - 16;
+					aa = 500 * (fX - fY);
+					bb = 200 * (fY - fZ);
+					
+					// Lab rescaled to the 0..255 range
+					// a* and b* range from -120 to 120 in the 8 bit space
+					La = La * 2.55;
+					aa = 1.0625 * aa + 128;
+					bb = 1.0625 * bb + 128;
+					
+					// bracketing
+					Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
+					ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
+					bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+					
+					result[r][g][b][0] = Li;
+					result[r][g][b][1] = ai;
+					result[r][g][b][2] = bi;
+				}
+			}
+		}
+		s.printTime();
+		return result;
+	}
 	
 	public static double MathPow(double v, double ot) {
 		// if (v < 0 || v > 1.1) {
 		// System.out.println("TODO: " + v);
 		// return Math.pow(v, ot);
 		// } else
-		return cubeRoots[(int) (1000 * v)];
+		return IAPservice.cubeRoots[(int) (1000 * v)];
 	}
 	
-	private static double[] getCubeRoots(double lo, double up, int n) {
+	public static double[] getCubeRoots(double lo, double up, int n) {
 		double[] res = new double[n + 1];
 		double sq = 1 / 3d;
 		for (int i = 0; i <= n; i++) {
@@ -1580,10 +1604,8 @@ public class ImageOperation {
 	
 	public Lab getLABAverage(int[][] img2d, int x1, int y1, int w, int h) {
 		int c, x, y = 0;
-		double rf, gf, bf;
-		double X, Y, Z, fX, fY, fZ;
+		int r, g, b;
 		double La, aa, bb;
-		double ot = 1 / 3.0, cont = 16 / 116.0;
 		int Li, ai, bi;
 		
 		double sumL = 0;
@@ -1597,49 +1619,13 @@ public class ImageOperation {
 				
 				c = img2d[x][y];
 				
-				// RGB to XYZ
-				rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
-				gf = ((c & 0x00ff00) >> 8) / 255.0; // G 0..1
-				bf = (c & 0x0000ff) / 255.0; // B 0..1
+				r = ((c & 0xff0000) >> 16); // R 0..1
+				g = ((c & 0x00ff00) >> 8); // G 0..1
+				b = (c & 0x0000ff); // B 0..1
 				
-				// white reference D65 PAL/SECAM
-				X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
-				Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
-				Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
-				// var_X = X / 95.047 //Observer = 2, Illuminant = D65
-				// var_Y = Y / 100.000
-				// var_Z = Z / 108.883
-				
-				// XYZ to Lab
-				if (X > 0.008856)
-					fX = MathPow(X, ot);
-				else
-					fX = (7.78707 * X) + cont;// 7.7870689655172
-					
-				if (Y > 0.008856)
-					fY = MathPow(Y, ot);
-				else
-					fY = (7.78707 * Y) + cont;
-				
-				if (Z > 0.008856)
-					fZ = MathPow(Z, ot);
-				else
-					fZ = (7.78707 * Z) + cont;
-				
-				La = (116 * fY) - 16;
-				aa = 500 * (fX - fY);
-				bb = 200 * (fY - fZ);
-				
-				// Lab rescaled to the 0..255 range
-				// a* and b* range from -120 to 120 in the 8 bit space
-				La = La * 2.55;
-				aa = Math.floor((1.0625 * aa + 128) + 0.5);
-				bb = Math.floor((1.0625 * bb + 128) + 0.5);
-				
-				// bracketing
-				Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
-				ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
-				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+				Li = (int) IAPservice.labCube[r][g][b][0];
+				ai = (int) IAPservice.labCube[r][g][b][1];
+				bi = (int) IAPservice.labCube[r][g][b][2];
 				
 				sumL += Li;
 				sumA += ai;
@@ -2249,11 +2235,9 @@ public class ImageOperation {
 	 *           minimal A and B value
 	 */
 	public double[] getRGBAverage(int[][] img2d, int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
-		double rf, gf, bf;
-		double X, Y, Z, fX, fY, fZ;
-		double La, aa, bb;
-		double ot = 1 / 3.0, cont = 16 / 116.0;
-		int Li, ai, bi, c;
+		int r, g, b;
+		double Li, ai, bi;
+		int c;
 		
 		// sums of RGB
 		double sumR = 0;
@@ -2267,63 +2251,28 @@ public class ImageOperation {
 				
 				c = img2d[x][y];
 				// RGB to XYZ
-				rf = ((c & 0xff0000) >> 16) / 255.0; // R 0..1
-				gf = ((c & 0x00ff00) >> 8) / 255.0; // G 0..1
-				bf = (c & 0x0000ff) / 255.0; // B 0..1
+				r = ((c & 0xff0000) >> 16);
+				g = ((c & 0x00ff00) >> 8);
+				b = (c & 0x0000ff);
 				
-				// white reference D65 PAL/SECAM
-				X = 0.430587 * rf + 0.341545 * gf + 0.178336 * bf;
-				Y = 0.222021 * rf + 0.706645 * gf + 0.0713342 * bf;
-				Z = 0.0201837 * rf + 0.129551 * gf + 0.939234 * bf;
-				// var_X = X / 95.047 //Observer = 2, Illuminant = D65
-				// var_Y = Y / 100.000
-				// var_Z = Z / 108.883
-				
-				// XYZ to Lab
-				if (X > 0.008856)
-					fX = MathPow(X, ot);
-				else
-					fX = (7.78707 * X) + cont;// 7.7870689655172
-					
-				if (Y > 0.008856)
-					fY = MathPow(Y, ot);
-				else
-					fY = (7.78707 * Y) + cont;
-				
-				if (Z > 0.008856)
-					fZ = MathPow(Z, ot);
-				else
-					fZ = (7.78707 * Z) + cont;
-				
-				La = (116 * fY) - 16;
-				aa = 500 * (fX - fY);
-				bb = 200 * (fY - fZ);
-				
-				// Lab rescaled to the 0..255 range
-				// a* and b* range from -120 to 120 in the 8 bit space
-				La = La * 2.55;
-				aa = (1.0625 * aa + 128) + 0.5;
-				bb = (1.0625 * bb + 128) + 0.5;
-				
-				// bracketing
-				Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
-				ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
-				bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+				Li = IAPservice.labCube[r][g][b][0];
+				ai = IAPservice.labCube[r][g][b][1];
+				bi = IAPservice.labCube[r][g][b][2];
 				
 				// sum under following conditions
 				if (mode) {
 					if (Li > LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
-						sumR += rf;
-						sumG += gf;
-						sumB += bf;
+						sumR += r / 255d;
+						sumG += g / 255d;
+						sumB += b / 255d;
 						count++;
 					}
 				}
 				if (mode == false) {
 					if (Li < LThresh && Math.abs(ai - 127) < ABThresh && Math.abs(bi - 127) < ABThresh) {
-						sumR += rf;
-						sumG += gf;
-						sumB += bf;
+						sumR += r / 255d;
+						sumG += g / 255d;
+						sumB += b / 255d;
 						count++;
 					}
 				}
