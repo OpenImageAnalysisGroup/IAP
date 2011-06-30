@@ -2382,51 +2382,113 @@ public class ImageOperation {
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] img2a = getImageAs2array();
-		int[] mean = new int[(int) (h - (2 * factorH * h) + 1)];
 		int[][] res = img2a;
 		
-		for (int x = 0; x < w; x++) {
+		for (int x = (int) (w * factorW); x < w - (w * factorW); x++) {
+			
 			int y1 = (int) (h * 0.05);
 			int y2 = (int) (h * factorH);
 			
-			int pTop = img2a[x][y1];
-			int pNearPot = img2a[x][y2];
+			double l1 = getLabAverage(x, y1, 0);
+			double l2 = getLabAverage(x, y2, 0);
 			
-			double l1 = new Color_CIE_Lab(pTop, false).getL();
-			double l2 = new Color_CIE_Lab(pNearPot, false).getL();
+			double a1 = getLabAverage(x, y1, 1);
+			double a2 = getLabAverage(x, y2, 1);
 			
-			double c = getC(y1, y2, l1, l2, h);
-			double m = getM(y1, y2, c, l2);
+			double b1 = getLabAverage(x, y1, 2);
+			double b2 = getLabAverage(x, y2, 2);
 			
-			for (int y = (int) (h * factorH); y < h - (h * factorH) - 1; y++) {
-				double lGradient = m * (y - h / 2) * (y - h / 2) + c;
-				// if (x < w * factorW || x > w - (w * factorW))
-				if (x == w * factorW - x % 20)
-					mean[y + 1 - (int) (h * factorH)] = img2a[x][y];
-			}
-		}
-		
-		// for (int i = 0; i < mean.length; i++) {
-		// int d = (int) (w - (2 * w * factorW));
-		// mean[i] = mean[i] / d;
-		// }
-		
-		for (int y = (int) (h * factorH); y < h - (h * factorH) - 1; y++) {
-			for (int x = (int) (w * factorW); x < w - (w * factorW); x++) {
-				res[x][y] = mean[y + 1 - (int) (h * factorH)];
+			double y1_ = y1 - h / 2;
+			double y2_ = y2 - h / 2;
+			
+			double cl = getC(y1_, y2_, l1, l2, h);
+			double ml = getM(y1_, y2_, l1, l2);
+			
+			double ca = getC(y1_, y2_, a1, a2, h);
+			double ma = getM(y1_, y2_, a1, a2);
+			
+			double cb = getC(y1_, y2_, b1, b2, h);
+			double mb = getM(y1_, y2_, b1, b2);
+			
+			for (int y = y2; y < h - (h * factorH) - 1; y++) {
+				double lGradient = ml * (y - h / 2d) * (y - h / 2d) + cl;
+				double aGradient = ma * (y - h / 2d) * (y - h / 2d) + ca;
+				double bGradient = mb * (y - h / 2d) * (y - h / 2d) + cb;
+				
+				// if (x == w * factorW - x % 20)
+				// res[x][y] = new Color_CIE_Lab(lx, ax, bx).getRGB();
+				// res[x][y] = new Color_CIE_Lab(l2, a2, b2).getRGB();
+				res[x][y] = new Color_CIE_Lab(lGradient, aGradient, bGradient).getRGB();
 			}
 		}
 		return new ImageOperation(res);
 	}
 	
-	private double getM(int y1, int y2, double c, double l2) {
-		// see WolframAlpha: solve(l_1 = m *(y_1 -h/2)² +c | l_2 = m *(y_2 -h/2)² +c, m)
-		return -(4 * (c - l2)) / ((y2 - y1) * (y2 - y1));
+	/**
+	 * Calculate the Average of L, a or b value from a 8 neighbourhood of p
+	 * 
+	 * @param p
+	 * @param mode
+	 *           0 = L, 1 = a, 2 = b
+	 * @return
+	 */
+	private double getLabAverage(int x, int y, int colorMode) {
+		double average = 0;
+		int[][] img2a = getImageAs2array();
+		
+		if (x > 1 && y > 1 && x < img2a.length - 1 && y < img2a[0].length - 1) {
+			if (colorMode == 0) {
+				average += new Color_CIE_Lab(img2a[x][y], false).getL();
+				average += new Color_CIE_Lab(img2a[x - 1][y], false).getL();
+				average += new Color_CIE_Lab(img2a[x][y - 1], false).getL();
+				average += new Color_CIE_Lab(img2a[x - 1][y - 1], false).getL();
+				average += new Color_CIE_Lab(img2a[x + 1][y], false).getL();
+				average += new Color_CIE_Lab(img2a[x][y + 1], false).getL();
+				average += new Color_CIE_Lab(img2a[x + 1][y + 1], false).getL();
+				average += new Color_CIE_Lab(img2a[x + 1][y - 1], false).getL();
+				average += new Color_CIE_Lab(img2a[x - 1][y + 1], false).getL();
+			}
+			if (colorMode == 1) {
+				average += new Color_CIE_Lab(img2a[x][y], false).getA();
+				average += new Color_CIE_Lab(img2a[x - 1][y], false).getA();
+				average += new Color_CIE_Lab(img2a[x][y - 1], false).getA();
+				average += new Color_CIE_Lab(img2a[x - 1][y - 1], false).getA();
+				average += new Color_CIE_Lab(img2a[x + 1][y], false).getA();
+				average += new Color_CIE_Lab(img2a[x][y + 1], false).getA();
+				average += new Color_CIE_Lab(img2a[x + 1][y + 1], false).getA();
+				average += new Color_CIE_Lab(img2a[x + 1][y - 1], false).getA();
+				average += new Color_CIE_Lab(img2a[x - 1][y + 1], false).getA();
+			}
+			if (colorMode == 2) {
+				average += new Color_CIE_Lab(img2a[x][y], false).getB();
+				average += new Color_CIE_Lab(img2a[x - 1][y], false).getB();
+				average += new Color_CIE_Lab(img2a[x][y - 1], false).getB();
+				average += new Color_CIE_Lab(img2a[x - 1][y - 1], false).getB();
+				average += new Color_CIE_Lab(img2a[x + 1][y], false).getB();
+				average += new Color_CIE_Lab(img2a[x][y + 1], false).getB();
+				average += new Color_CIE_Lab(img2a[x + 1][y + 1], false).getB();
+				average += new Color_CIE_Lab(img2a[x + 1][y - 1], false).getB();
+				average += new Color_CIE_Lab(img2a[x - 1][y + 1], false).getB();
+			}
+			average = average / 9d;
+		} else {
+			if (colorMode == 0)
+				average = new Color_CIE_Lab(img2a[x][y], false).getL();
+			if (colorMode == 1)
+				average = new Color_CIE_Lab(img2a[x][y], false).getA();
+			if (colorMode == 2)
+				average = new Color_CIE_Lab(img2a[x][y], false).getB();
+		}
+		return average;
 	}
 	
-	private double getC(int y1, int y2, double l1, double l2, int h) {
+	private double getM(double y1, double y2, double l1, double l2) {
 		// see WolframAlpha: solve(l_1 = m *(y_1 -h/2)² +c | l_2 = m *(y_2 -h/2)² +c, m)
-		return (h * h * (-l1) + h * h * l2 - 4 * h * l2 * y1 + 4 * h * l1 * y2 + 4 * l2 * y1 * y1 - 4 * l1 * y2 * y2)
-				/ (4 * (y2 - y1) * (h - y1 - y2));
+		return (l1 - l2) / (y1 * y1 - y2 * y2);
+	}
+	
+	private double getC(double y1, double y2, double l1, double l2, double h) {
+		// see WolframAlpha: solve(l_1 = m *(y_1 -h/2)² +c | l_2 = m *(y_2 -h/2)² +c, m)
+		return (l2 * y1 * y1 - l1 * y2 * y2) / (y1 * y1 - y2 * y2);
 	}
 }
