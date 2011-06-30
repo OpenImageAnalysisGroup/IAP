@@ -21,9 +21,9 @@ public class Color_CIE_Lab {
 	}
 	
 	public Color_CIE_Lab(int rgb, boolean exactAndSlow) {
-		int red = (rgb >> 16) & 0xff;
-		int green = (rgb >> 8) & 0xff;
-		int blue = (rgb) & 0xff;
+		int red = (rgb & 0xff0000) >> 16;
+		int green = (rgb & 0x00ff00) >> 8;
+		int blue = (rgb & 0x0000ff);
 		
 		Color_CIE_Lab c = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(red, green, blue, exactAndSlow));
 		l = c.l;
@@ -31,10 +31,15 @@ public class Color_CIE_Lab {
 		b = c.b;
 	}
 	
+	/**
+	 * attention may not work correctly
+	 * 
+	 * @param rgb
+	 */
 	public Color_CIE_Lab(int rgb) {
-		int red = (rgb >> 16) & 0xff;
-		int green = (rgb >> 8) & 0xff;
-		int blue = (rgb) & 0xff;
+		int red = (rgb & 0xff0000) >> 16;
+		int green = (rgb & 0x00ff00) >> 8;
+		int blue = (rgb & 0x0000ff);
 		
 		l = IAPservice.labCube[red][green][blue][0];
 		a = IAPservice.labCube[red][green][blue][1];
