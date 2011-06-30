@@ -122,7 +122,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) (pos), options.getBackground()).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);
-						boolean clearSides = true;
+						boolean clearSides = false;
 						if (clearSides)
 							if (markerPosLeftX != null) {
 								result = new ImageOperation(result).clearImageLeft(
@@ -146,7 +146,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) pos, options.getBackground()).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);
-						boolean clearSides = true;
+						boolean clearSides = false;
 						if (clearSides)
 							if (markerPosLeftX != null) {
 								result = new ImageOperation(result).clearImageLeft(
@@ -190,7 +190,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) (pos), options.getBackground()).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);
-						boolean clearSides = true;
+						boolean clearSides = false;
 						if (clearSides)
 							if (markerPosLeftX != null) {
 								result = new ImageOperation(result).clearImageLeft(
@@ -214,7 +214,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 						FlexibleImage result = new ImageOperation(input).clearImageBottom(
 								(int) pos, options.getBackground()).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);
-						boolean clearSides = true;
+						boolean clearSides = false;
 						if (clearSides)
 							if (markerPosLeftX != null) {
 								result = new ImageOperation(result).clearImageLeft(

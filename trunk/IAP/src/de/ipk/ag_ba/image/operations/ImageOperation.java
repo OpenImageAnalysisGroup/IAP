@@ -49,6 +49,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
 import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
 import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
@@ -207,8 +208,8 @@ public class ImageOperation {
 				
 				float intensity = 1 - rf / (float) ((255) + gf);
 				
-				// if (intensity > 130f / 255f)
-				// intensity = 1;
+				if (intensity > 210f / 255f)
+					intensity = 1;
 				
 				int i = (int) (intensity * 255d);
 				// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
@@ -2375,5 +2376,57 @@ public class ImageOperation {
 			labImage1[2][idx] = bDiff / 255d + 1;
 		}
 		return new FlexibleImage(w, h, labImage1).getIO();
+	}
+	
+	public ImageOperation copyImagesParts(double factorH, double factorW) {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] img2a = getImageAs2array();
+		int[] mean = new int[(int) (h - (2 * factorH * h) + 1)];
+		int[][] res = img2a;
+		
+		for (int x = 0; x < w; x++) {
+			int y1 = (int) (h * 0.05);
+			int y2 = (int) (h * factorH);
+			
+			int pTop = img2a[x][y1];
+			int pNearPot = img2a[x][y2];
+			
+			double l1 = new Color_CIE_Lab(pTop, false).getL();
+			double l2 = new Color_CIE_Lab(pNearPot, false).getL();
+			
+			double c = getC(y1, y2, l1, l2, h);
+			double m = getM(y1, y2, c, l2);
+			
+			for (int y = (int) (h * factorH); y < h - (h * factorH) - 1; y++) {
+				double lGradient = m * (y - h / 2) * (y - h / 2) + c;
+				// if (x < w * factorW || x > w - (w * factorW))
+				if (x == w * factorW - x % 20)
+					mean[y + 1 - (int) (h * factorH)] = img2a[x][y];
+			}
+		}
+		
+		// for (int i = 0; i < mean.length; i++) {
+		// int d = (int) (w - (2 * w * factorW));
+		// mean[i] = mean[i] / d;
+		// }
+		
+		for (int y = (int) (h * factorH); y < h - (h * factorH) - 1; y++) {
+			for (int x = (int) (w * factorW); x < w - (w * factorW); x++) {
+				res[x][y] = mean[y + 1 - (int) (h * factorH)];
+			}
+		}
+		return new ImageOperation(res);
+	}
+	
+	private double getM(int y1, int y2, double c, double l2) {
+		// see WolframAlpha: solve(l_1 = m *(y_1 -h/2)² +c | l_2 = m *(y_2 -h/2)² +c, m)
+		return -(4 * (c - l2)) / ((y2 - y1) * (y2 - y1));
+	}
+	
+	private double getC(int y1, int y2, double l1, double l2, int h) {
+		// see WolframAlpha: solve(l_1 = m *(y_1 -h/2)² +c | l_2 = m *(y_2 -h/2)² +c, m)
+		return (h * h * (-l1) + h * h * l2 - 4 * h * l2 * y1 + 4 * h * l1 * y2 + 4 * l2 * y1 * y1 - 4 * l1 * y2 * y2)
+				/ (4 * (y2 - y1) * (h - y1 - y2));
 	}
 }

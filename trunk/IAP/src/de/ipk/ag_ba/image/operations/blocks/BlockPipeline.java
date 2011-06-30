@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ObjectRef;
 import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -183,20 +184,21 @@ public class BlockPipeline {
 	 * @param match
 	 *           Image set to be analyzed.
 	 */
-	public static void debugTryAnalyze(final Collection<NumericMeasurementInterface> input, MongoDB m) {
+	public static void debugTryAnalyze(final Collection<NumericMeasurementInterface> input, final MongoDB m) {
 		final MaizeAnalysisTask mat = new MaizeAnalysisTask();
 		mat.setInput(input, m, 0, 1);
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				mat.getName(),
 				mat.getTaskDescription());
-		Runnable backgroundTask = new Runnable() {
+		final Runnable backgroundTask = new Runnable() {
 			@Override
 			public void run() {
 				mat.debugOverrideAndEnableDebugStackStorage(true);
 				mat.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 			}
 		};
+		final ObjectRef finishSwingTaskRef = new ObjectRef();
 		Runnable finishSwingTask = new Runnable() {
 			@Override
 			public void run() {
@@ -206,12 +208,22 @@ public class BlockPipeline {
 					int idx = 1;
 					int nn = mat.getForcedDebugStackStorageResult().size();
 					for (FlexibleImageStack fis : mat.getForcedDebugStackStorageResult()) {
-						fis.print(mat.getName() + " // Result " + idx + "/" + nn);
+						fis.print(mat.getName() + " // Result " + idx + "/" + nn, new Runnable() {
+							@Override
+							public void run() {
+								mat.setInput(input, m, 0, 1);
+								BackgroundTaskHelper.issueSimpleTaskInWindow(mat.getName(), "Analyze...",
+										backgroundTask,
+										(Runnable) finishSwingTaskRef.getObject(),
+										status, false, true);
+							}
+						}, "Re-run Analysis (debug)");
 						idx++;
 					}
 				}
 			}
 		};
+		finishSwingTaskRef.setObject(finishSwingTask);
 		BackgroundTaskHelper.issueSimpleTaskInWindow(mat.getName(), "Analyze...",
 				backgroundTask,
 				finishSwingTask,
