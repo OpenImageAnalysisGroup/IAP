@@ -603,7 +603,8 @@ public class ColorUtil {
 	 */
 	public static void getLABfromRGBvar2(int[] arrayRGB, double[] arrayL, double[] arrayA, double[] arrayB, boolean filterBackground, int iBackgroundColor) {
 		int c = 0;
-		int r, g, b, Li, ai, bi;
+		int r, g, b;
+		double Li, ai, bi;
 		
 		for (int idx = 0; idx < arrayRGB.length; idx++) {
 			c = arrayRGB[idx];
@@ -618,27 +619,13 @@ public class ColorUtil {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = (int) ImageOperation.labCube[r][g][b][0];
-				ai = (int) ImageOperation.labCube[r][g][b][1];
-				bi = (int) ImageOperation.labCube[r][g][b][2];
+				Li = ImageOperation.labCube[r][g][b][0];
+				ai = ImageOperation.labCube[r][g][b][1];
+				bi = ImageOperation.labCube[r][g][b][2];
 				
 				arrayL[idx] = Li;
 				arrayA[idx] = ai;
 				arrayB[idx] = bi;
-				
-				if (arrayL[idx] < 0)
-					arrayL[idx] = 0;
-				if (arrayA[idx] < 0)
-					arrayA[idx] = 0;
-				if (arrayB[idx] < 0)
-					arrayB[idx] = 0;
-				
-				if (arrayL[idx] > 255)
-					arrayL[idx] = 255;
-				if (arrayA[idx] > 255)
-					arrayA[idx] = 255;
-				if (arrayB[idx] > 255)
-					arrayB[idx] = 255;
 			}
 		}
 	}

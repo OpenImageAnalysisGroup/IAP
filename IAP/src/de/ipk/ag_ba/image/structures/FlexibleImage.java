@@ -8,6 +8,7 @@
 package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
+import ij.process.ColorProcessor;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -59,7 +60,9 @@ public class FlexibleImage {
 		// ResourceIOManager.copyContent(is, out);
 		// MyByteArrayInputStream in = new MyByteArrayInputStream(out.getBuff(),
 		// out.size());
-		image = new ImagePlus(url.getFileName(), ImageIO.read(is));
+		BufferedImage img = ImageIO.read(is);
+		image = new ImagePlus(url.getFileName(),
+				new ColorProcessor(img.getWidth(), img.getHeight(), ImageConverter.convertBIto1A(img)));
 		w = image.getWidth();
 		h = image.getHeight();
 	}
@@ -135,7 +138,7 @@ public class FlexibleImage {
 	
 	public ImagePlus getAsImagePlus() {
 		ImagePlus result = image.createImagePlus();
-		result.setProcessor(image.getProcessor().duplicate());
+		result.setProcessor(image.getProcessor());// .duplicate());
 		return result;
 	}
 	
@@ -154,7 +157,7 @@ public class FlexibleImage {
 	
 	public FlexibleImage resize(int w, int h) {
 		if (w == getWidth() && h == getHeight()) { // 999999999999999999999999999999
-			return copy();
+			return this;// copy();
 		} else {
 			ImageOperation io = new ImageOperation(this);
 			io.resize(w, h);

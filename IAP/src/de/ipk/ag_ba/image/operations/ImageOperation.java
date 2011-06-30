@@ -171,6 +171,8 @@ public class ImageOperation {
 	 * Scales the image itself. See method scale to scale the content but not the image itself.
 	 */
 	public ImageOperation resize(int width, int height) {
+		if (width == image.getWidth() && height == image.getHeight())
+			return this;
 		if (width > 1 && height > 1) {
 			ImageProcessor p = image.getProcessor().resize(width, height);
 			image.setProcessor(p);
@@ -570,13 +572,15 @@ public class ImageOperation {
 		int width = fillValue.length;
 		int height = fillValue[0].length;
 		
-		int[][] bigImage = ImageConverter.convertIJto2A(image);
+		int[] bigImage = ImageConverter.convertIJto1A(image);
 		
-		for (int x = leftX; x < leftX + width && x < bigImage.length; x++)
-			for (int y = leftY; y < leftY + height && y < bigImage[0].length; y++)
-				bigImage[x][y] = fillValue[x - leftX][y - leftY];
+		int ww = image.getWidth();
 		
-		return new ImageOperation(ImageConverter.convert2AtoIJ(bigImage));
+		for (int x = leftX; x < leftX + width; x++)
+			for (int y = leftY; y < leftY + height; y++)
+				bigImage[x + y * ww] = fillValue[x - leftX][y - leftY];
+		
+		return new ImageOperation(ImageConverter.convert1AtoIJ(ww, image.getHeight(), bigImage));
 	}
 	
 	public ImageOperation drawAndFillRect(int leftX, int leftY, int width,
@@ -1509,25 +1513,28 @@ public class ImageOperation {
 	
 	public static double[][][][] getLabCube() {
 		StopWatch s = new StopWatch("lab_cube", true);
+		final double step = 1 / 255d;
 		final double[][][][] result = new double[256][256][256][3];
 		ExecutorService executor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
+		
 		for (int rr = 0; rr < 256; rr++) {
-			
 			final int r = rr;
+			final double rd = (r / 255d);
+			
 			executor.submit(new Runnable() {
 				
 				@Override
 				public void run() {
+					double gd = -step;
 					for (int g = 0; g < 256; g++) {
+						gd += step;
+						double bd = -step;
 						for (int b = 0; b < 256; b++) {
 							double X, Y, Z, fX, fY, fZ;
-							double La, aa, bb, rd, gd, bd;
-							int Li, ai, bi;
-							double ot = 1 / 3.0, cont = 16 / 116.0;
+							double La, aa, bb;
+							final double ot = 1 / 3.0, cont = 16 / 116.0;
 							
-							rd = (r / 255d);
-							gd = (g / 255d);
-							bd = (b / 255d);
+							bd += step;
 							
 							// white reference D65 PAL/SECAM
 							X = 0.430587 * rd + 0.341545 * gd + 0.178336 * bd;
@@ -1556,28 +1563,18 @@ public class ImageOperation {
 							else
 								fZ = (7.78707 * Z) + cont;
 							
-							La = (116 * fY) - 16;
-							aa = 500 * (fX - fY);
-							bb = 200 * (fY - fZ);
+							La = ((116 * fY) - 16) * 2.55;
+							aa = 1.0625 * (500 * (fX - fY)) + 128;
+							bb = 1.0625 * (200 * (fY - fZ)) + 128;
 							
-							// Lab rescaled to the 0..255 range
-							// a* and b* range from -120 to 120 in the 8 bit space
-							La = La * 2.55;
-							aa = 1.0625 * aa + 128;
-							bb = 1.0625 * bb + 128;
-							
-							// bracketing
-							Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
-							ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
-							bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
-							
-							result[r][g][b][0] = Li;
-							result[r][g][b][1] = ai;
-							result[r][g][b][2] = bi;
+							result[r][g][b][0] = La;
+							result[r][g][b][1] = aa;
+							result[r][g][b][2] = bb;
 						}
 					}
 				}
-			});
+			}
+					);
 		}
 		executor.shutdown();
 		try {
@@ -1601,7 +1598,7 @@ public class ImageOperation {
 		double[] res = new double[n + 1];
 		double sq = 1 / 3d;
 		for (int i = 0; i <= n; i++) {
-			double x = lo + i * (up - lo) / n;
+			double x = lo + i * (up - lo) / (double) n;
 			res[i] = Math.pow(x, sq);
 		}
 		return res;
@@ -2301,7 +2298,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new double[] { sumR / count, sumG / count, sumB / count };
+		return new double[] { sumR / (double) count, sumG / (double) count, sumB / (double) count };
 	}
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {
