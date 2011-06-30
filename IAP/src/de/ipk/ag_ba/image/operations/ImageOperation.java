@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
@@ -42,6 +44,7 @@ import javax.swing.JLabel;
 
 import org.ObjectRef;
 import org.ReleaseInfo;
+import org.SystemAnalysis;
 import org.Vector2d;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
@@ -76,8 +79,8 @@ public class ImageOperation {
 	
 	protected final ImagePlus image;
 	protected ResultsTable rt;
-	public static double[] cubeRoots = getCubeRoots(0, 1.1, 1100);
-	public static double[][][][] labCube = getLabCube();
+	public final static double[] cubeRoots = getCubeRoots(0, 1.1, 1100);
+	public final static double[][][][] labCube = getLabCube();
 	
 	// private Roi boundingBox;
 	
@@ -1506,63 +1509,81 @@ public class ImageOperation {
 	
 	public static double[][][][] getLabCube() {
 		StopWatch s = new StopWatch("lab_cube", true);
-		double X, Y, Z, fX, fY, fZ;
-		double La, aa, bb, rd, gd, bd;
-		int Li, ai, bi;
-		double ot = 1 / 3.0, cont = 16 / 116.0;
-		double[][][][] result = new double[256][256][256][3];
-		
-		for (int r = 0; r < 256; r++) {
-			for (int g = 0; g < 256; g++) {
-				for (int b = 0; b < 256; b++) {
-					rd = (r / 255d);
-					gd = (g / 255d);
-					bd = (b / 255d);
-					
-					// white reference D65 PAL/SECAM
-					X = 0.430587 * rd + 0.341545 * gd + 0.178336 * bd;
-					Y = 0.222021 * rd + 0.706645 * gd + 0.0713342 * bd;
-					Z = 0.0201837 * rd + 0.129551 * gd + 0.939234 * bd;
-					// var_X = X / 95.047 //Observer = 2, Illuminant = D65
-					// var_Y = Y / 100.000
-					// var_Z = Z / 108.883
-					
-					// XYZ to Lab
-					if (X > 0.008856)
-						fX = ImageOperation.cubeRoots[(int) (1000 * X)];
-					else
-						fX = (7.78707 * X) + cont;// 7.7870689655172
-						
-					if (Y > 0.008856)
-						fY = ImageOperation.cubeRoots[(int) (1000 * Y)];
-					else
-						fY = (7.78707 * Y) + cont;
-					
-					if (Z > 0.008856)
-						fZ = ImageOperation.cubeRoots[(int) (1000 * Z)];
-					else
-						fZ = (7.78707 * Z) + cont;
-					
-					La = (116 * fY) - 16;
-					aa = 500 * (fX - fY);
-					bb = 200 * (fY - fZ);
-					
-					// Lab rescaled to the 0..255 range
-					// a* and b* range from -120 to 120 in the 8 bit space
-					La = La * 2.55;
-					aa = 1.0625 * aa + 128;
-					bb = 1.0625 * bb + 128;
-					
-					// bracketing
-					Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
-					ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
-					bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
-					
-					result[r][g][b][0] = Li;
-					result[r][g][b][1] = ai;
-					result[r][g][b][2] = bi;
+		final double[][][][] result = new double[256][256][256][3];
+		ExecutorService executor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
+		for (int rr = 0; rr < 256; rr++) {
+			
+			final int r = rr;
+			executor.submit(new Runnable() {
+				
+				@Override
+				public void run() {
+					for (int g = 0; g < 256; g++) {
+						for (int b = 0; b < 256; b++) {
+							double X, Y, Z, fX, fY, fZ;
+							double La, aa, bb, rd, gd, bd;
+							int Li, ai, bi;
+							double ot = 1 / 3.0, cont = 16 / 116.0;
+							
+							rd = (r / 255d);
+							gd = (g / 255d);
+							bd = (b / 255d);
+							
+							// white reference D65 PAL/SECAM
+							X = 0.430587 * rd + 0.341545 * gd + 0.178336 * bd;
+							Y = 0.222021 * rd + 0.706645 * gd + 0.0713342 * bd;
+							Z = 0.0201837 * rd + 0.129551 * gd + 0.939234 * bd;
+							// var_X = X / 95.047 //Observer = 2, Illuminant = D65
+							// var_Y = Y / 100.000
+							// var_Z = Z / 108.883
+							
+							// XYZ to Lab
+							if (X > 0.008856)
+								fX = Math.pow(X, ot);
+							// fX = ImageOperation.cubeRoots[(int) (1000 * X)];
+							else
+								fX = (7.78707 * X) + cont;// 7.7870689655172
+								
+							if (Y > 0.008856)
+								fY = Math.pow(Y, ot);
+							// fY = ImageOperation.cubeRoots[(int) (1000 * Y)];
+							else
+								fY = (7.78707 * Y) + cont;
+							
+							if (Z > 0.008856)
+								fZ = Math.pow(Z, ot);
+							// fZ = ImageOperation.cubeRoots[(int) (1000 * Z)];
+							else
+								fZ = (7.78707 * Z) + cont;
+							
+							La = (116 * fY) - 16;
+							aa = 500 * (fX - fY);
+							bb = 200 * (fY - fZ);
+							
+							// Lab rescaled to the 0..255 range
+							// a* and b* range from -120 to 120 in the 8 bit space
+							La = La * 2.55;
+							aa = 1.0625 * aa + 128;
+							bb = 1.0625 * bb + 128;
+							
+							// bracketing
+							Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
+							ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
+							bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
+							
+							result[r][g][b][0] = Li;
+							result[r][g][b][1] = ai;
+							result[r][g][b][2] = bi;
+						}
+					}
 				}
-			}
+			});
+		}
+		executor.shutdown();
+		try {
+			executor.awaitTermination(1, TimeUnit.HOURS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		s.printTime();
 		return result;
@@ -1580,7 +1601,7 @@ public class ImageOperation {
 		double[] res = new double[n + 1];
 		double sq = 1 / 3d;
 		for (int i = 0; i <= n; i++) {
-			double x = lo + i * (up - lo) / (double) n;
+			double x = lo + i * (up - lo) / n;
 			res[i] = Math.pow(x, sq);
 		}
 		return res;
@@ -2280,7 +2301,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new double[] { sumR / (double) count, sumG / (double) count, sumB / (double) count };
+		return new double[] { sumR / count, sumG / count, sumB / count };
 	}
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {
