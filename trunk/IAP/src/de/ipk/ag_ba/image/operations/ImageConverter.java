@@ -196,9 +196,9 @@ public class ImageConverter {
 		
 		int[][] image = new int[w][h];
 		
-		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < h; j++) {
-				image[i][j] = img[i + j * w];
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				image[x][y] = img[x + y * w];
 			}
 		}
 		return image;

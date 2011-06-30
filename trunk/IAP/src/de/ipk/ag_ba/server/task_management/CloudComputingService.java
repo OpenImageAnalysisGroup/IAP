@@ -29,7 +29,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.DataMappingTypeManager3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
 /**
  * @author klukas
@@ -153,24 +152,28 @@ public class CloudComputingService {
 			DataMappingTypeManager3D.replaceVantedMappingTypeManager();
 			
 			MongoDB m = MongoDB.getDefaultCloud();
-			ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 			ArrayList<ExperimentHeaderInterface> el = m.getExperimentList(null);
 			HashSet<TempDataSetDescription> availableTempDatasets = new HashSet<TempDataSetDescription>();
 			for (ExperimentHeaderInterface i : el) {
 				String[] cc = i.getExperimentName().split("§");
 				if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
 					String className = cc[0];
+					String idxCnt = cc[1];
 					String partCnt = cc[2];
 					String submTime = cc[3];
-					availableTempDatasets.add(new TempDataSetDescription(className, partCnt, submTime));
+					if (idxCnt.equals("1"))
+						availableTempDatasets.add(new TempDataSetDescription(className, partCnt, submTime));
 				}
 			}
 			for (TempDataSetDescription cmd : availableTempDatasets) {
+				ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
+				HashSet<String> added = new HashSet<String>();
 				for (ExperimentHeaderInterface i : el) {
 					if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
 						String[] cc = i.getExperimentName().split("§");
 						if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
 							String className = cc[0];
+							String partIdx = cc[1];
 							String partCnt = cc[2];
 							String submTime = cc[3];
 							String bcn = cmd.getRemoteCapableAnalysisActionClassName();
@@ -178,26 +181,34 @@ public class CloudComputingService {
 							String bst = cmd.getSubmissionTime();
 							if (className.equals(bcn)
 										&& partCnt.equals(bpn)
-										&& submTime.equals(bst)) {
+										&& submTime.equals(bst)
+										&& !added.contains(partIdx)) {
 								knownResults.add(i);
+								added.add(partIdx);
 							}
 						}
 					}
 				}
 				System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 				System.out.println("> TODO: " + cmd.getPartCnt() + ", FINISHED: " + knownResults.size());
-				if (knownResults.size() >= cmd.getPartCntI()) {
+				if (knownResults.size() + 1 >= cmd.getPartCntI()) {
 					System.out.println("*****************************");
-					System.out.println("MERGE RESULTS:");
-					System.out.println("TODO: " + cmd.getPartCntI() + ", RESULTS FINISHED: " + knownResults.size());
+					System.out.println("MERGE INDEX: " + cmd.getPartCntI() + "/" + cmd.getPartCnt() + ", RESULTS AVAILABLE: " + knownResults.size());
 					Experiment e = new Experiment();
 					long tFinish = System.currentTimeMillis();
+					int wl = knownResults.size();
+					int idx = 0;
 					for (ExperimentHeaderInterface i : knownResults) {
 						ExperimentInterface ei = m.getExperiment(i);
+						String[] cc = i.getExperimentName().split("§");
+						idx++;
 						if (ei.getNumberOfMeasurementValues() > 0)
-							System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
+							System.out.print(idx + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2] + ": " + ei.getNumberOfMeasurementValues());
 						e.addAndMerge(ei);
-						System.out.println("*****************************");
+						System.out.println(" ==> " + e.getNumberOfMeasurementValues() + " // job submission: "
+								+ SystemAnalysisExt.getCurrentTime(Long.parseLong(cc[3]))
+								+ " // storage time: "
+								+ SystemAnalysisExt.getCurrentTime(ei.getHeader().getStorageTime().getTime()));
 					}
 					String sn = cmd.getRemoteCapableAnalysisActionClassName();
 					if (sn.indexOf(".") > 0)
@@ -212,8 +223,9 @@ public class CloudComputingService {
 							ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
 						}
 					}
-					ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
-					e = (Experiment) MappingData3DPath.merge(mdpl, false);
+					// ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
+					// e.clear();
+					// e.addAndMerge(MappingData3DPath.merge(mdpl, false));
 					long tStart = cmd.getSubmissionTimeL();
 					long tProcessing = tFinish - tStart;
 					long minutes = tProcessing / 1000 / 60;
@@ -228,9 +240,17 @@ public class CloudComputingService {
 					System.out.println("> SAVE COMBINED EXPERIMENT...");
 					m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
 					System.out.println("> DELETE TEMP DATA...");
-					for (ExperimentHeaderInterface i : knownResults)
-						m.deleteExperiment(i.getDatabaseId());
+					for (ExperimentHeaderInterface i : knownResults) {
+						try {
+							if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0)
+								m.deleteExperiment(i.getDatabaseId());
+							
+						} catch (Exception err) {
+							System.out.println("Could not delete experiment " + i.getExperimentName() + " (" + err.getMessage() + ")");
+						}
+					}
 					System.out.println("> COMPLETED");
+					return;
 				}
 			}
 		} catch (Exception e) {

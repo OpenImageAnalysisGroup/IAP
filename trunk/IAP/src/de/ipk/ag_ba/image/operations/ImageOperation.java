@@ -56,7 +56,6 @@ import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
@@ -77,6 +76,8 @@ public class ImageOperation {
 	
 	protected final ImagePlus image;
 	protected ResultsTable rt;
+	public static double[] cubeRoots = getCubeRoots(0, 1.1, 1100);
+	public static double[][][][] labCube = getLabCube();
 	
 	// private Roi boundingBox;
 	
@@ -1481,9 +1482,9 @@ public class ImageOperation {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = (int) IAPservice.labCube[r][g][b][0];
-				ai = (int) IAPservice.labCube[r][g][b][1];
-				bi = (int) IAPservice.labCube[r][g][b][2];
+				Li = (int) ImageOperation.labCube[r][g][b][0];
+				ai = (int) ImageOperation.labCube[r][g][b][1];
+				bi = (int) ImageOperation.labCube[r][g][b][2];
 				
 				boolean found = false;
 				for (int idx = 0; idx < lowerValueOfA.length; idx++) {
@@ -1528,17 +1529,17 @@ public class ImageOperation {
 					
 					// XYZ to Lab
 					if (X > 0.008856)
-						fX = IAPservice.cubeRoots[(int) (1000 * X)];
+						fX = ImageOperation.cubeRoots[(int) (1000 * X)];
 					else
 						fX = (7.78707 * X) + cont;// 7.7870689655172
 						
 					if (Y > 0.008856)
-						fY = IAPservice.cubeRoots[(int) (1000 * Y)];
+						fY = ImageOperation.cubeRoots[(int) (1000 * Y)];
 					else
 						fY = (7.78707 * Y) + cont;
 					
 					if (Z > 0.008856)
-						fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
+						fZ = ImageOperation.cubeRoots[(int) (1000 * Z)];
 					else
 						fZ = (7.78707 * Z) + cont;
 					
@@ -1572,7 +1573,7 @@ public class ImageOperation {
 		// System.out.println("TODO: " + v);
 		// return Math.pow(v, ot);
 		// } else
-		return IAPservice.cubeRoots[(int) (1000 * v)];
+		return ImageOperation.cubeRoots[(int) (1000 * v)];
 	}
 	
 	public static double[] getCubeRoots(double lo, double up, int n) {
@@ -1624,9 +1625,9 @@ public class ImageOperation {
 				g = ((c & 0x00ff00) >> 8); // G 0..1
 				b = (c & 0x0000ff); // B 0..1
 				
-				Li = (int) IAPservice.labCube[r][g][b][0];
-				ai = (int) IAPservice.labCube[r][g][b][1];
-				bi = (int) IAPservice.labCube[r][g][b][2];
+				Li = (int) ImageOperation.labCube[r][g][b][0];
+				ai = (int) ImageOperation.labCube[r][g][b][1];
+				bi = (int) ImageOperation.labCube[r][g][b][2];
 				
 				sumL += Li;
 				sumA += ai;
@@ -2256,9 +2257,9 @@ public class ImageOperation {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = IAPservice.labCube[r][g][b][0];
-				ai = IAPservice.labCube[r][g][b][1];
-				bi = IAPservice.labCube[r][g][b][2];
+				Li = ImageOperation.labCube[r][g][b][0];
+				ai = ImageOperation.labCube[r][g][b][1];
+				bi = ImageOperation.labCube[r][g][b][2];
 				
 				// sum under following conditions
 				if (mode) {

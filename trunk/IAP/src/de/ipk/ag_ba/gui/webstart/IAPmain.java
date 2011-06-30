@@ -371,10 +371,11 @@ public class IAPmain extends JApplet {
 	
 	public static boolean isSettingEnabled(IAPfeature feature) {
 		if (SystemAnalysis.isHeadless()) {
-			// don't change return values !!!
+			// don't change these return values !!!
+			// see
 			switch (feature) {
 				case REMOTE_EXECUTION:
-					return false;
+					return true;
 				case SAVE_DEBUG_STACK:
 					return false;
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:

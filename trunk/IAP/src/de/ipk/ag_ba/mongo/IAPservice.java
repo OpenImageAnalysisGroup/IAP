@@ -59,7 +59,6 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -481,7 +480,4 @@ public class IAPservice {
 		
 		return result;
 	}
-	
-	public static double[] cubeRoots = ImageOperation.getCubeRoots(0, 1.1, 1100);
-	public static double[][][][] labCube = ImageOperation.getLabCube();
 }

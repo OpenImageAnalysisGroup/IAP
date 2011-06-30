@@ -115,10 +115,23 @@ public class Condition implements ConditionInterface {
 	}
 	
 	public String getConditionName(boolean oldStyleIgnoringGrowthcondition) {
-		if (!oldStyleIgnoringGrowthcondition)
-			return getExperimentName() + ": " + getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
-								+ getGrowthconditions() + " / " + getVariety() + "/" + getSequence();
-		else {
+		return getConditionName(oldStyleIgnoringGrowthcondition, false);
+	}
+	
+	private String conditionCache = null;
+	
+	public String getConditionName(boolean oldStyleIgnoringGrowthcondition, boolean cached) {
+		if (!oldStyleIgnoringGrowthcondition) {
+			if (cached && conditionCache != null)
+				return conditionCache;
+			String res = getExperimentName() + ": " + getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
+					+ getGrowthconditions() + " / " + getVariety() + "/" + getSequence();
+			if (cached)
+				conditionCache = res;
+			return res;
+		} else {
+			if (cached && conditionCache != null)
+				return conditionCache;
 			String serie;
 			
 			String species = getSpecies();
@@ -134,7 +147,10 @@ public class Condition implements ConditionInterface {
 								&& !checkForSameGenoTypeAndTreatment(genotype, treatment))
 				serie += " (" + treatment + ")";
 			
-			return getRowId() + ": " + serie;
+			String res = getRowId() + ": " + serie;
+			if (cached)
+				conditionCache = res;
+			return res;
 		}
 	}
 	
@@ -532,7 +548,7 @@ public class Condition implements ConditionInterface {
 	}
 	
 	public int compareTo(ConditionInterface otherSeries) {
-		return getConditionName(false).compareTo(((Condition) otherSeries).getConditionName(false));
+		return getConditionName(false, true).compareTo(((Condition) otherSeries).getConditionName(false, true));
 	}
 	
 	public void setRowId(int rowId) {
