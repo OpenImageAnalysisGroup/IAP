@@ -2,11 +2,16 @@ package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.gui.ImageWindow;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+
+import javax.swing.JButton;
 
 import org.ErrorMsg;
 
@@ -56,4 +61,22 @@ public class FlexibleImageStack {
 		image.show(title + " (" + stack.getSize() + ")");
 		IAPmain.showImageJ();
 	}
+	
+	public void print(String title, final Runnable actionCmd, String buttonTitle) {
+		ImagePlus image = new ImagePlus();
+		image.setStack(stack);
+		image.show(title + " (" + stack.getSize() + ")");
+		ImageWindow win = image.getWindow();
+		JButton jb = new JButton(buttonTitle);
+		jb.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				actionCmd.run();
+			}
+		});
+		win.add(jb);
+		win.doLayout();
+		IAPmain.showImageJ();
+	}
+	
 }
