@@ -85,7 +85,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverage;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -849,7 +848,7 @@ public class MongoDB {
 					}
 				}
 				
-				BackgroundTaskHelper.lockGetSemaphore(image.getURL() != null ? image.getURL().getPrefix() : "in", 2);
+				// BackgroundTaskHelper.lockGetSemaphore(image.getURL() != null ? image.getURL().getPrefix() : "in", 2);
 				byte[] isMain = null;
 				byte[] isLabel = null;
 				try {
@@ -864,7 +863,7 @@ public class MongoDB {
 						System.out.println("Error: No Inputstream for " + id.getLabelURL() + ". " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
 					}
 				} finally {
-					BackgroundTaskHelper.lockRelease(image.getURL() != null ? image.getURL().getPrefix() : "in");
+					// BackgroundTaskHelper.lockRelease(image.getURL() != null ? image.getURL().getPrefix() : "in");
 				}
 				if (isMain == null) {
 					System.out.println("No input stream for source-URL:  " + image.getURL());
@@ -947,7 +946,7 @@ public class MongoDB {
 				if (fffMain != null && fffLabel != null && fffPreview != null) {
 					return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				} else {
-					BackgroundTaskHelper.lockGetSemaphore(m, 1);
+					// BackgroundTaskHelper.lockGetSemaphore(m, 1);
 					boolean saved;
 					try {
 						saved = saveImageFile(new InputStream[] {
@@ -959,7 +958,7 @@ public class MongoDB {
 								hashLabel,
 								fffMain == null, fffLabel == null);
 					} finally {
-						BackgroundTaskHelper.lockRelease(m);
+						// BackgroundTaskHelper.lockRelease(m);
 					}
 					if (saved) {
 						return DatabaseStorageResult.STORED_IN_DB;

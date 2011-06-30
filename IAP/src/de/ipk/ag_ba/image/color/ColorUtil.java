@@ -8,8 +8,8 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.mongo.IAPservice;
 
 /**
  * @author klukas
@@ -618,9 +618,9 @@ public class ColorUtil {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = (int) IAPservice.labCube[r][g][b][0];
-				ai = (int) IAPservice.labCube[r][g][b][1];
-				bi = (int) IAPservice.labCube[r][g][b][2];
+				Li = (int) ImageOperation.labCube[r][g][b][0];
+				ai = (int) ImageOperation.labCube[r][g][b][1];
+				bi = (int) ImageOperation.labCube[r][g][b][2];
 				
 				arrayL[idx] = Li;
 				arrayA[idx] = ai;

@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.color;
 
-import de.ipk.ag_ba.mongo.IAPservice;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 
 /*
  * Created on Feb 24, 2010 by Christian Klukas
@@ -41,9 +41,9 @@ public class Color_CIE_Lab {
 		int green = (rgb & 0x00ff00) >> 8;
 		int blue = (rgb & 0x0000ff);
 		
-		l = IAPservice.labCube[red][green][blue][0];
-		a = IAPservice.labCube[red][green][blue][1];
-		b = IAPservice.labCube[red][green][blue][2];
+		l = ImageOperation.labCube[red][green][blue][0];
+		a = ImageOperation.labCube[red][green][blue][1];
+		b = ImageOperation.labCube[red][green][blue][2];
 	}
 	
 	public void setL(double l) {
