@@ -12,6 +12,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancing;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilterForFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirProcessing;
@@ -52,6 +53,7 @@ public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 		// p.add(BlockDecreaseMaskSize.class);
 		p.add(BlockFindBlueMarkers.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
+		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockLabFilter.class);
 		p.add(BlockClearMasksBasedOnMarkers.class);
 		p.add(BlockRemoveSmallStructuresFromTopVisUsingOpening.class);
@@ -66,6 +68,7 @@ public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 		p.add(BlockRemoveSmallClusters.class); // 2nd run
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
 		p.add(BlockNirProcessing.class);
+		p.add(BlockLabFilterVis.class);
 		p.add(BlockCopyImagesApplyMask.class); // without nir
 		
 		// calculation of numeric values

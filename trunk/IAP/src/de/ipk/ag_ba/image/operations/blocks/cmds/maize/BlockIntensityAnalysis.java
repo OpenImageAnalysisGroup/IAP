@@ -41,17 +41,20 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getVis() != null) {
 			
 			ImageOperation io = new ImageOperation(getInput().getMasks().getVis());
-			double visibleIntensity = io.intensityOfChannelRed(true);
-			double averageVis = visibleIntensity / (double) visibleFilledPixels;
+			double visibleIntensitySum = io.intensitySumOfChannelRed(true);
+			double averageVis = visibleIntensitySum / (double) visibleFilledPixels;
 			
 			ResultsTable rt = new ResultsTable();
 			rt.incrementCounter();
 			rt.addValue("ndvi.vis.intensity.average", averageVis);
 			
 			if (getInput().getMasks().getNir() != null) {
-				double nirIntensity = getInput().getMasks().getNir().getIO().intensityOfChannelRed(false);
-				
-				double averageNir = nirIntensity / (double) nirFilledPixels;
+				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannelRed(false);
+				FlexibleImage v = getInput().getMasks().getVis();
+				FlexibleImage n = getInput().getMasks().getNir();
+				double visImageSize = v.getWidth() * v.getHeight();
+				double nirImageSize = n.getWidth() * n.getHeight();
+				double averageNir = nirIntensitySum / ((double) visibleFilledPixels * visImageSize / nirImageSize);
 				rt.addValue("ndvi.nir.intensity.average", averageNir);
 				
 				double ndvi = (averageNir - averageVis) / (averageNir + averageVis);

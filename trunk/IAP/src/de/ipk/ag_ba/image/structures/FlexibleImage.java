@@ -184,7 +184,7 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage copy() {
-		return new FlexibleImage(getAsImagePlus());
+		return new FlexibleImage(getAsImagePlus().duplicate());
 	}
 	
 	public void setType(FlexibleImageType type) {

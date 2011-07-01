@@ -2094,7 +2094,7 @@ public class ImageOperation {
 	 * @param b
 	 * @return
 	 */
-	public double intensityOfChannelRed(boolean performGrayScale) {
+	public double intensitySumOfChannelRed(boolean performGrayScale) {
 		double res = 0;
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		int width = image.getWidth();
@@ -2109,7 +2109,7 @@ public class ImageOperation {
 			for (int y = 0; y < height; y++) {
 				int c = img2d[x][y];
 				if (c != background) {
-					res++;
+					// res++;
 					int cg = grayScale[x][y];
 					double rf = ((cg & 0xff0000) >> 16) / 255.0; // R 0..1
 					res += rf;

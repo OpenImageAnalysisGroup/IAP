@@ -72,8 +72,7 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 				if (filledPixelsPerColumn[x] - avg > stddev * 1.5) {
 					for (int y = 0; y < h; y++) {
 						if (x > 1) {
-							if (img[x - 1][y] != back)
-								img[x][y] = img[x - 1][y];
+							img[x][y] = img[x - 1][y];
 						}
 					}
 				}

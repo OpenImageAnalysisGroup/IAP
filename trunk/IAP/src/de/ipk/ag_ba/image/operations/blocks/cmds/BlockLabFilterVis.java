@@ -14,14 +14,13 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author Entzian, Pape
  */
-public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		
 		return labFilter(
-				getInput().getMasks().getVis().getIO().dilate().dilate().dilate().blur(2)// .enhanceContrast().printImage("blur & multi")
-						.getImage(),
+				getInput().getMasks().getVis(),
 				getInput().getImages().getVis(),
 				new int[] { options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS) },
 				new int[] { options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS) },
@@ -29,20 +28,6 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 				new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS) },
 				new int[] { options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS) },
 				new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS) }, options.getCameraPosition());
-	}
-	
-	@Override
-	protected FlexibleImage processFLUOmask() {
-		if (options.getCameraPosition() == CameraPosition.SIDE)
-			return getInput().getMasks().getFluo();
-		else
-			return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(),
-					new int[] { options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO) }, options.getCameraPosition());
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int[] lowerValueOfL, int[] upperValueOfL, int[] lowerValueOfA,
