@@ -95,7 +95,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (analyzeSideImages())
 			addSideImagesToWorkset(workload, 0);
 		
-		// workload = filterWorkload(workload, "Rainbow Amerindian"); // Athletico
+		// workload = filterWorkload(workload, "Athletico");// "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
@@ -294,7 +294,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		ArrayList<ImageSet> res = new ArrayList<ImageSet>();
 		for (ImageSet is : workload)
 			if (is.getSampleInfo() != null)
-				if (is.getSampleInfo().getParentCondition().toString().contains(filter) && is.getSampleInfo().getParentCondition().toString().contains("dry"))
+				if (is.getSampleInfo().getParentCondition().toString().contains(filter) && !is.getSampleInfo().getParentCondition().toString().contains("wet"))
 					if (is.getSampleInfo().getTime() == 6 || is.getSampleInfo().getTime() == 25)
 						res.add(is);
 		return res;

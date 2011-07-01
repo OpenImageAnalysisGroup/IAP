@@ -289,6 +289,8 @@ public class DataExchangeHelperForExperiments {
 			if (bbb.size() > 0)
 				lastBBB = bbb.get(bbb.size() - 1);
 			for (final BinaryFileInfo binaryFileInfo : bbb) {
+				if (mt != expTree.getSelectionPath().getLastPathComponent())
+					break;
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
 				boolean previewLoadAndConstructNeeded = false;
 				
