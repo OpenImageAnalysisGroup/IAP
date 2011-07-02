@@ -188,7 +188,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			if (bm.getURL() == null)
 				return idx;
 			
-			status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles) / files);
+			status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles) / files / 2d);
 			
 			final Long t = nm.getParentSample().getRowId();
 			Future<MyByteArrayInputStream> fileContent = null;

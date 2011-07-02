@@ -82,7 +82,27 @@ public class TaskDescription {
 		
 		batch.setStatusProvider(statusProvider);
 		
-		RunnableWithMappingData resultReceiver = new RunnableWithMappingData() {
+		RunnableWithMappingData resultReceiver = getResultReceiver(batch, m);
+		
+		action.setWorkingSet(cmd.getPartIdx(), cmd.getPartCnt(), resultReceiver);
+		
+		String st = new SimpleDateFormat().format(new Date(startTime));
+		
+		BackgroundTaskHelper.issueSimpleTask("Batch: " + analysisActionClassName + " (start: " + st + ")",
+							"Initializing", new Runnable() {
+								@Override
+								public void run() {
+									try {
+										action.performActionCalculateResults(null);
+									} catch (Exception e) {
+										ErrorMsg.addErrorMessage(e);
+									}
+								}
+							}, null, statusProvider, 0);
+	}
+	
+	private RunnableWithMappingData getResultReceiver(final BatchCmd batch, final MongoDB m) {
+		return new RunnableWithMappingData() {
 			private ExperimentInterface experiment;
 			
 			@Override
@@ -184,19 +204,6 @@ public class TaskDescription {
 				this.experiment = experiment;
 			}
 		};
-		action.setWorkingSet(cmd.getPartIdx(), cmd.getPartCnt(), resultReceiver);
-		String st = new SimpleDateFormat().format(new Date(startTime));
-		BackgroundTaskHelper.issueSimpleTask("Batch: " + analysisActionClassName + " (start: " + st + ")",
-							"Initializing", new Runnable() {
-								@Override
-								public void run() {
-									try {
-										action.performActionCalculateResults(null);
-									} catch (Exception e) {
-										ErrorMsg.addErrorMessage(e);
-									}
-								}
-							}, null, statusProvider, 0);
 	}
 	
 	public boolean analysisFinished() {

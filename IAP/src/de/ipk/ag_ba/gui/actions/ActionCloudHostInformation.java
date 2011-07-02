@@ -57,10 +57,11 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 		
 		this.hostStatus = new BackgroundTaskStatusProvider() {
 			private String hostInfo;
+			private double lastStatus = -1;
 			
 			@Override
 			public int getCurrentStatusValue() {
-				return -1;
+				return (int) lastStatus;
 			}
 			
 			@Override
@@ -69,7 +70,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 			
 			@Override
 			public double getCurrentStatusValueFine() {
-				return -1;
+				return lastStatus;
 			}
 			
 			@Override
@@ -77,16 +78,19 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 				CloudHost ch;
 				try {
 					ch = m.batchGetUpdatedHostInfo(ip);
-					if (ch != null)
+					if (ch != null) {
 						ActionCloudHostInformation.this.ip = ch;
-					hostInfo = ch.getHostInfo();
-					String rA = "";
-					if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
-						rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
-					else
-						return "idle, ";
-					return rA + "t_p=" + ch.getLastPipelineTime() + " s, " +
-							ch.getPipelineExecutedWithinCurrentHour() + " p.e.";
+						lastStatus = ch.getTaskProgress();
+						hostInfo = ch.getHostInfo();
+						String rA = "";
+						if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
+							rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
+						else
+							return "idle, ";
+						return rA + "t_p=" + ch.getLastPipelineTime() + " s, " +
+								ch.getPipelineExecutedWithinCurrentHour() + " p.e.";
+					} else
+						return "N/A";
 				} catch (Exception e) {
 					// empty
 					return "unavailable";

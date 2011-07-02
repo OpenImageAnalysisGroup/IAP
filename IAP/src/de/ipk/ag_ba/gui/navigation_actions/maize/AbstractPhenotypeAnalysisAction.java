@@ -12,7 +12,7 @@ import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionMongoOrLemnaTecExperimentNavigation;
-import de.ipk.ag_ba.gui.actions.CopyEntity;
+import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -173,7 +173,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		res.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(experimentResult),
 							src.getGUIsetting()));
 		
-		res.add(new NavigationButton(new CopyEntity(m, new ExperimentReference(experimentResult)),
+		res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
 							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 		
 		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res, experimentResult, experimentResult.getHeader(),

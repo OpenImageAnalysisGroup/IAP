@@ -111,4 +111,15 @@ public class CloudHost extends BasicDBObject {
 			return "unknown";
 		}
 	}
+	
+	public double getTaskProgress() {
+		if (get("taskProgress") != null)
+			return (Double) get("taskProgress");
+		else
+			return 0;
+	}
+	
+	public void setTaskProgress(double progress) {
+		put("taskProgress", progress);
+	}
 }
