@@ -17,11 +17,11 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class CopyEntity extends AbstractExperimentAnalysisNavigation {
+public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	
 	private boolean active;
 	
-	public CopyEntity(MongoDB m, ExperimentReference experiment) {
+	public ActionCopyToMongo(MongoDB m, ExperimentReference experiment) {
 		super(m, experiment);
 	}
 	
@@ -39,9 +39,9 @@ public class CopyEntity extends AbstractExperimentAnalysisNavigation {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		Object[] sel = null;
 		if (MongoDB.getMongos().size() > 1) {
-			sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
-							"Target", MongoDB.getMongos()
-			});
+			sel = MyInputHelper.getInput(
+					"Select the database-target:",
+					"Target Selection", new Object[] { "Target", MongoDB.getMongos() });
 		} else
 			sel = new Object[] { MongoDB.getMongos().iterator().next() };
 		
@@ -81,5 +81,4 @@ public class CopyEntity extends AbstractExperimentAnalysisNavigation {
 	public String getDefaultTitle() {
 		return "Copy " + experiment.getExperimentName();
 	}
-	
 }

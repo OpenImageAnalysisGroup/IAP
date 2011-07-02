@@ -16,7 +16,7 @@ import de.ipk.ag_ba.gui.actions.ActionDataExportTar;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionNumericDataReport;
 import de.ipk.ag_ba.gui.actions.CloudIoTestAction;
-import de.ipk.ag_ba.gui.actions.CopyEntity;
+import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.gui.actions.analysis.ActionThreeDreconstruction;
 import de.ipk.ag_ba.gui.actions.analysis.ActionThreeDsegmentation;
@@ -89,7 +89,7 @@ public class ImageAnalysisCommandManager {
 		try {
 			// if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
 			// if (!analysis)
-			actions.add(new NavigationButton(new CopyEntity(m, experimentReference), guiSetting));
+			actions.add(new NavigationButton(new ActionCopyToMongo(m, experimentReference), guiSetting));
 		} catch (Exception e) {
 			// empty
 		}

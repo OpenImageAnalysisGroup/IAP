@@ -344,12 +344,13 @@ public class MongoDB {
 	private void storeExperiment(ExperimentInterface experiment, DB db,
 						BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException, ExecutionException {
 		
+		System.out.println(">>> " + SystemAnalysisExt.getCurrentTime());
 		System.out.println("STORE EXPERIMENT: " + experiment.getName());
-		System.out.println("DB-ID: " + experiment.getHeader().getDatabaseId());
-		System.out.println("DB: " + experiment.getHeader().getDatabase());
-		System.out.println("Exp.type: " + experiment.getHeader().getExperimentType());
-		System.out.println("Group: " + experiment.getHeader().getImportusergroup());
-		System.out.println("Username: " + experiment.getHeader().getImportusername());
+		System.out.println("DB-ID           : " + experiment.getHeader().getDatabaseId());
+		System.out.println("DB              : " + experiment.getHeader().getDatabase());
+		System.out.println("Exp.type        : " + experiment.getHeader().getExperimentType());
+		System.out.println("Group           : " + experiment.getHeader().getImportusergroup());
+		System.out.println("Username        : " + experiment.getHeader().getImportusername());
 		// experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 		
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
@@ -475,7 +476,7 @@ public class MongoDB {
 							if (status != null) {
 								if (res != null)
 									count++;
-								double prog = count * (100d / numberOfBinaryData / 2d);
+								double prog = count * (100d / numberOfBinaryData);
 								if (res != null)
 									status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
 								status.setCurrentStatusValueFine(prog);
@@ -569,7 +570,8 @@ public class MongoDB {
 		if (status == null || (status != null && !status.wantsToStop())) {
 			experiments.insert(dbExperiment);
 			String id = dbExperiment.get("_id").toString();
-			System.out.println(">>> STORED EXPERIMENT " + experiment.getHeader().getExperimentName() + " // DB-ID: " + id);
+			System.out.println(">>> STORED EXPERIMENT " + experiment.getHeader().getExperimentName() + " // DB-ID: " + id + " // "
+					+ SystemAnalysisExt.getCurrentTime());
 			for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
 				eh.setDatabaseId(id);
 			}
@@ -1388,7 +1390,8 @@ public class MongoDB {
 	public synchronized void batchPingHost(final String ip,
 			final int blocksExecutedWithinLastMinute,
 			final int pipelineExecutedWithinCurrentHour,
-			final int tasksExecutedWithinLastMinute) throws Exception {
+			final int tasksExecutedWithinLastMinute,
+			final double progress) throws Exception {
 		processDB(new RunnableOnDB() {
 			private DB db;
 			
@@ -1407,6 +1410,7 @@ public class MongoDB {
 					res.setBlocksExecutedWithinLastMinute(blocksExecutedWithinLastMinute);
 					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
+					res.setTaskProgress(progress);
 					double load = SystemAnalysis.getRealSystemCpuLoad();
 					res.setHostInfo(
 

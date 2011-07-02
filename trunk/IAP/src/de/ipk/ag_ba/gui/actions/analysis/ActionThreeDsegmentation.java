@@ -10,7 +10,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionMongoOrLemnaTecExperimentNavigation;
-import de.ipk.ag_ba.gui.actions.CopyEntity;
+import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -102,7 +102,7 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 			storedActions.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(res),
 								src.getGUIsetting()));
 			
-			storedActions.add(new NavigationButton(new CopyEntity(m,
+			storedActions.add(new NavigationButton(new ActionCopyToMongo(m,
 								new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
 			ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(storedActions, res, res.getHeader(), false,

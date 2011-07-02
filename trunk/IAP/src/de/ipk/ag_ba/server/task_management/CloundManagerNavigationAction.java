@@ -65,7 +65,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		}
 		
 		try {
-			for (CloudHost ip : m.batchGetAvailableHosts(150000)) {
+			for (CloudHost ip : m.batchGetAvailableHosts(5000)) {
 				NavigationButton n = new NavigationButton(new ActionCloudHostInformation(m, ip), guiSetting);
 				res.add(n);
 			}
