@@ -7,5 +7,5 @@ package de.ipk.ag_ba.image.operations;
  * @author entzian, klukas
  */
 public enum Position {
-	FIRST_FIELD, FIRST_ROW, FIRST_COLUMN, LAST_COLUMN, REMAINING
+	TOP_LEFT_PIXEL, FIRST_COLUMN, FIRST_ROW, LAST_ROW, INNER_REGION
 }

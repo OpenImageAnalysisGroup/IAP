@@ -60,11 +60,15 @@ public class ImageComparator {
 		
 		for (int index = 0; index < width * height; index++) {
 			double l = labImage[0][index] - labImageRef[0][index];
-			double a = Math.abs(labImage[1][index] - labImageRef[1][index]);
-			double b = Math.abs(labImage[2][index] - labImageRef[2][index]);
+			double a = labImage[1][index] - labImageRef[1][index];
+			double b = labImage[2][index] - labImageRef[2][index];
+			if (a < 0)
+				a = -a;
+			if (b < 0)
+				b = -b;
 			
 			if (showDiff) {
-				diff[index] = new Color((float) Math.abs(l / 255d), (float) Math.abs(a / 255d), (float) Math.abs(b / 255d)).getRGB();
+				diff[index] = new Color((float) Math.abs(l / 255d), (float) (a / 255d), (float) (b / 255d)).getRGB();
 			}
 			
 			if (adaptiveDependingOnIntensity) {

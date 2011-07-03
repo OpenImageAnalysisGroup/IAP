@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
- * @author Entzian
+ * @author Entzian, Klukas
  */
 public class BlockCountPixel extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -38,15 +38,12 @@ public class BlockCountPixel extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private int countPixel(FlexibleImage workMask) {
 		int count = 0;
-		int[][] workArray = workMask.getAs2A();
-		
-		for (int i = 0; i < workMask.getWidth(); i++) {
-			for (int j = 0; j < workMask.getHeight(); j++) {
-				if (workArray[i][j] != options.getBackground())
-					count++;
-			}
+		int[] workArray = workMask.getAs1A();
+		int back = options.getBackground();
+		for (int pi : workArray) {
+			if (pi != back)
+				count++;
 		}
 		return count;
 	}
-	
 }

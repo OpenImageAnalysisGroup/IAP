@@ -28,7 +28,7 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 	}
 	
 	private FlexibleImage process(FlexibleImage mask) {
-		int[][] img = mask.getAs2A();
+		int[] img = mask.getAs1A();
 		int w = mask.getWidth();
 		int h = mask.getHeight();
 		int[] filledPixelsPerLine = new int[h];
@@ -36,26 +36,28 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 		int back = options.getBackground();
 		for (int y = 0; y < h; y++) {
 			int filled = 0;
+			int yw = y * w;
 			for (int x = 0; x < w; x++) {
-				if (img[x][y] != back) {
+				if (img[x + yw] != back) {
 					filled++;
 					filledPixelsPerColumn[x] = filledPixelsPerColumn[x] + 1;
 				}
 			}
 			filledPixelsPerLine[y] = filled;
 		}
-		int blue = options.getBackground();// Color.BLUE.getRGB();
-		// boolean flag = false;
 		int n = 20;
 		for (int scanBlock = 0; scanBlock < h * 0.1 / n; scanBlock++) {
 			double avg = getAvg(filledPixelsPerLine, scanBlock * n, n);
 			double stddev = getStdDev(avg, filledPixelsPerLine, scanBlock * n, n);
+			double scut = stddev * 1.5;
 			for (int i = 0; i < n; i++) {
 				int y = scanBlock * n + i;
-				if (filledPixelsPerLine[y] - avg > stddev * 1.5) {
+				int yw = y * w;
+				int yw_ = (y - 1) * w;
+				if (filledPixelsPerLine[y] - avg > scut) {
 					for (int x = 0; x < w; x++) {
 						if (y > 1) {
-							img[x][y] = img[x][y - 1];
+							img[x + yw] = img[x + yw_];
 						}
 					}
 				}
@@ -67,19 +69,21 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 				continue;
 			double avg = getAvg(filledPixelsPerColumn, scanBlock * n, n);
 			double stddev = getStdDev(avg, filledPixelsPerColumn, scanBlock * n, n);
+			double scut = stddev * 1.5;
 			for (int i = 0; i < n; i++) {
 				int x = scanBlock * n + i;
-				if (filledPixelsPerColumn[x] - avg > stddev * 1.5) {
+				if (filledPixelsPerColumn[x] - avg > scut) {
 					for (int y = 0; y < h; y++) {
 						if (x > 1) {
-							img[x][y] = img[x - 1][y];
+							int yw = y * w;
+							img[x + yw] = img[x - 1 + yw];
 						}
 					}
 				}
 			}
 		}
 		
-		return new FlexibleImage(img).print("TEST " + System.currentTimeMillis(), false);
+		return new FlexibleImage(img, w, h).print("TEST " + System.currentTimeMillis(), false);
 	}
 	
 	private double getAvg(int[] filledPixelsPerLine, int startIndex, int n) {

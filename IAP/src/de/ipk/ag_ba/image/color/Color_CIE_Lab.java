@@ -41,9 +41,9 @@ public class Color_CIE_Lab {
 		int green = (rgb & 0x00ff00) >> 8;
 		int blue = (rgb & 0x0000ff);
 		
-		l = ImageOperation.labCube[red][green][blue][0];
-		a = ImageOperation.labCube[red][green][blue][1];
-		b = ImageOperation.labCube[red][green][blue][2];
+		l = ImageOperation.labCube[red][green][blue];
+		a = ImageOperation.labCube[red][green][blue + 256];
+		b = ImageOperation.labCube[red][green][blue + 512];
 	}
 	
 	public void setL(double l) {
