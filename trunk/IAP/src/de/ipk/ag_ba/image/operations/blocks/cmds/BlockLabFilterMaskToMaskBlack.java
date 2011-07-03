@@ -27,8 +27,8 @@ public class BlockLabFilterMaskToMaskBlack extends AbstractSnapshotAnalysisBlock
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ) {
 		
-		int[][] image = workMask.getAs2A();
-		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
+		int[] image = workMask.getAs1A();
+		int[] result = new int[image.length];
 		int width = workMask.getWidth();
 		int height = workMask.getHeight();
 		
@@ -40,7 +40,7 @@ public class BlockLabFilterMaskToMaskBlack extends AbstractSnapshotAnalysisBlock
 				lowerValueOfB, upperValueOfB,
 				back, typ);
 		
-		FlexibleImage mask = new FlexibleImage(result);
+		FlexibleImage mask = new FlexibleImage(result, width, height);
 		
 		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, options.getBackground()).getImage();
 	}

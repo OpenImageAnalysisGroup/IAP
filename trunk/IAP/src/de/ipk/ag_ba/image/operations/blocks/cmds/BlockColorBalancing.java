@@ -67,7 +67,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	 * @author pape
 	 */
 	public static double[] getProbablyWhitePixels(FlexibleImage image, double size) {
-		int[][] img2d = image.getAs2A();
+		int[] img2d = image.getAs1A();
 		int width = image.getWidth();
 		int height = image.getHeight();
 		int w = (int) (width * size);

@@ -43,8 +43,8 @@ public class BlockGetLab extends AbstractSnapshotAnalysisBlockFIS {
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ) {
 		
-		int[][] image = originalImage.getAs2A();
-		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
+		int[] image = originalImage.getAs1A();
+		int[] result = new int[image.length];
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 		
@@ -56,16 +56,12 @@ public class BlockGetLab extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfB, upperValueOfB,
 				back, typ);
 		
-		for (int i = 0; i < workMask.getWidth(); i++) {
-			for (int j = 0; j < workMask.getHeight(); j++) {
-				
-				if (result[i][j] != back)
-					result[i][j] = image[i][j];
-				
-			}
+		int idx = 0;
+		for (int c : result) {
+			if (c != back)
+				result[idx] = image[idx++];
 		}
 		
-		return new FlexibleImage(result);
-		
+		return new FlexibleImage(result, width, height);
 	}
 }

@@ -59,20 +59,21 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 		
 		FlexibleImage yellow = new ImageOperation(labFilter(mask, mask, 150, 255, 108, 165, 127, 255, options.getCameraPosition())).opening(1, 1).getImage();
 		
-		int[][] yellowarr = yellow.getAs2A();
-		int[][] origarr = mask.getAs2A();
+		int[] yellowarr = yellow.getAs1A();
+		int[] origarr = mask.getAs1A();
 		
 		int clusterSize = 9;
 		
 		mainLoop: for (int y = 0; y < height; y++) {
 			for (int x = widthQuarter; x < widthQuarter * 3; x++) {
-				if (yellowarr[x][y] != background) {
+				int ya = yellowarr[y * width + x];
+				if (ya != background) {
 					pixelsInCluster++;
-				}
-				if (yellowarr[x][y] == background && pixelsInCluster > clusterSize) {
-					pixelsInCluster = 0;
-					numberOfClusterPerLine++;
-				}
+				} else
+					if (pixelsInCluster > clusterSize) {
+						pixelsInCluster = 0;
+						numberOfClusterPerLine++;
+					}
 			}
 			if (numberOfClusterPerLine <= 1) {
 				numberOfClusterPerLine = 0;
@@ -81,17 +82,18 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 				break mainLoop;
 			}
 		}
-		return new FlexibleImage(origarr);
+		return new FlexibleImage(origarr, width, height);
 	}
 	
-	private void clearLine(int w, int[][] orig, int[][] yellow, int y, int background, int clusterSize) {
+	private void clearLine(int w, int[] orig, int[] yellow, int y, int background, int clusterSize) {
 		int count = 0;
+		int yw = y * w;
 		for (int x = w / 4; x < w * 3d / 4d; x++) {
-			if (yellow[x][y] != background)
+			if (yellow[x + yw] != background)
 				count++;
 			else
 				if (count > clusterSize) {
-					clearPixel(count, x, y, orig, background);
+					clearPixel(count, x, yw, orig, background);
 					count = 0;
 				} else {
 					count = 0;
@@ -99,18 +101,17 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 		}
 	}
 	
-	public void clearPixel(int count, int startX, int y, int[][] orig, int background) {
+	public void clearPixel(int count, int startX, int yw, int[] orig, int background) {
 		for (int x = startX - count; x < startX; x++) {
-			orig[x][y] = background;
+			orig[x + yw] = background;
 		}
-		
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ) {
 		
-		int[][] image = workMask.getAs2A();
-		int[][] result = new int[workMask.getWidth()][workMask.getHeight()];
+		int[] image = workMask.getAs1A();
+		int[] result = new int[image.length];
 		int width = workMask.getWidth();
 		int height = workMask.getHeight();
 		
@@ -122,7 +123,7 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfB, upperValueOfB,
 				back, typ);
 		
-		FlexibleImage mask = new FlexibleImage(result);
+		FlexibleImage mask = new FlexibleImage(result, width, height);
 		
 		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, options.getBackground()).getImage();
 	}

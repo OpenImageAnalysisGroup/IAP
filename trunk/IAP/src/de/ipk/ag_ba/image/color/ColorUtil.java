@@ -535,21 +535,19 @@ public class ColorUtil {
 		}
 	}
 	
-	public static LinkedList<double[][]> getLABfromRGB(FlexibleImage workImage, boolean exactAndSlow) {
-		LinkedList<double[][]> labList = new LinkedList<double[][]>();
+	public static LinkedList<double[]> getLABfromRGB(FlexibleImage workImage, boolean exactAndSlow) {
+		LinkedList<double[]> labList = new LinkedList<double[]>();
 		
-		int[][] workArray = workImage.getAs2A();
-		double[][] lArray = new double[workArray.length][workArray[0].length];
-		double[][] aArray = new double[workArray.length][workArray[0].length];
-		double[][] bArray = new double[workArray.length][workArray[0].length];
-		
-		for (int i = 0; i < workArray.length; i++) {
-			for (int j = 0; j < workArray[0].length; j++) {
-				Color_CIE_Lab lab = new Color_CIE_Lab(workArray[i][j], exactAndSlow);
-				lArray[i][j] = lab.getL();
-				aArray[i][j] = lab.getA();
-				bArray[i][j] = lab.getB();
-			}
+		int[] workArray = workImage.getAs1A();
+		double[] lArray = new double[workArray.length];
+		double[] aArray = new double[workArray.length];
+		double[] bArray = new double[workArray.length];
+		int idx = 0;
+		for (int c : workArray) {
+			Color_CIE_Lab lab = new Color_CIE_Lab(c, exactAndSlow);
+			lArray[idx] = lab.getL();
+			aArray[idx] = lab.getA();
+			bArray[idx++] = lab.getB();
 		}
 		
 		labList.add(lArray);
@@ -559,35 +557,35 @@ public class ColorUtil {
 		return labList;
 	}
 	
-	public static LinkedList<double[][]> getLABfromRGB(FlexibleImage workImage, boolean exactAndSlow, int iBackgroundColor) {
-		LinkedList<double[][]> labList = new LinkedList<double[][]>();
-		
-		int[][] workArray = workImage.getAs2A();
-		double[][] lArray = new double[workArray.length][workArray[0].length];
-		double[][] aArray = new double[workArray.length][workArray[0].length];
-		double[][] bArray = new double[workArray.length][workArray[0].length];
-		
-		for (int i = 0; i < workArray.length; i++) {
-			for (int j = 0; j < workArray[0].length; j++) {
-				if (workArray[i][j] == iBackgroundColor) {
-					lArray[i][j] = 0;
-					aArray[i][j] = 0;
-					bArray[i][j] = 0;
-				} else {
-					Color_CIE_Lab lab = new Color_CIE_Lab(workArray[i][j], exactAndSlow);
-					lArray[i][j] = lab.getL();
-					aArray[i][j] = lab.getA();
-					bArray[i][j] = lab.getB();
-				}
-			}
-		}
-		
-		labList.add(lArray);
-		labList.add(aArray);
-		labList.add(bArray);
-		
-		return labList;
-	}
+	// public static LinkedList<double[][]> getLABfromRGB(FlexibleImage workImage, boolean exactAndSlow, int iBackgroundColor) {
+	// LinkedList<double[][]> labList = new LinkedList<double[][]>();
+	//
+	// int[][] workArray = workImage.getAs2A();
+	// double[][] lArray = new double[workArray.length][workArray[0].length];
+	// double[][] aArray = new double[workArray.length][workArray[0].length];
+	// double[][] bArray = new double[workArray.length][workArray[0].length];
+	//
+	// for (int i = 0; i < workArray.length; i++) {
+	// for (int j = 0; j < workArray[0].length; j++) {
+	// if (workArray[i][j] == iBackgroundColor) {
+	// lArray[i][j] = 0;
+	// aArray[i][j] = 0;
+	// bArray[i][j] = 0;
+	// } else {
+	// Color_CIE_Lab lab = new Color_CIE_Lab(workArray[i][j], exactAndSlow);
+	// lArray[i][j] = lab.getL();
+	// aArray[i][j] = lab.getA();
+	// bArray[i][j] = lab.getB();
+	// }
+	// }
+	// }
+	//
+	// labList.add(lArray);
+	// labList.add(aArray);
+	// labList.add(bArray);
+	//
+	// return labList;
+	// }
 	
 	public static int getInt(int alpha, int red, int green, int blue) {
 		int i = 0;
@@ -619,9 +617,9 @@ public class ColorUtil {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = ImageOperation.labCube[r][g][b][0];
-				ai = ImageOperation.labCube[r][g][b][1];
-				bi = ImageOperation.labCube[r][g][b][2];
+				Li = ImageOperation.labCube[r][g][b];
+				ai = ImageOperation.labCube[r][g][b + 256];
+				bi = ImageOperation.labCube[r][g][b + 512];
 				
 				arrayL[idx] = Li;
 				arrayA[idx] = ai;
