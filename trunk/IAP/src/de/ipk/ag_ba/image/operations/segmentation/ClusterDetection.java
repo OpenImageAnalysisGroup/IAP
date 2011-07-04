@@ -10,11 +10,11 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 public class ClusterDetection implements Segmentation {
 	
-	private int[] img;
-	private int[] clu;
-	private int w;
-	private int h;
-	private int back;
+	private final int[] img;
+	private final int[] clu;
+	private final int w;
+	private final int h;
+	private final int back;
 	private int[] clusterPixelCount;
 	private int numberOfClusters;
 	private Vector2d[] centerPoints;
@@ -42,8 +42,8 @@ public class ClusterDetection implements Segmentation {
 		
 		for (int c : img) {
 			if (c != back && clu[idx] == 0) {
-				// currentClusterID++;
-				// assignCluster(currentClusterID, x, y);
+				currentClusterID++;
+				assignCluster(currentClusterID, x, y);
 			}
 			idx++;
 			x++;
