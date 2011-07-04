@@ -54,9 +54,8 @@ import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
 import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
 import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
-import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
-import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
+import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
@@ -1105,9 +1104,6 @@ public class ImageOperation {
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
 		
-		if (true)
-			return workImage;
-		
 		if (cutOffMinimumArea < 1) {
 			System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");
 			cutOffMinimumArea = 1;
@@ -1121,9 +1117,10 @@ public class ImageOperation {
 		int w = workImage.getWidth();
 		int h = workImage.getHeight();
 		
-		Segmentation ps = new ClusterDetection(workImage);
-		// new PixelSegmentation(image, NeighbourhoodSetting.NB4);
-		ps.detectClusters();
+		// Segmentation ps = // new ClusterDetection(workImage);
+		PixelSegmentation ps = new PixelSegmentation(workImage.getAs2A(), NeighbourhoodSetting.NB4);
+		ps.doPixelSegmentation(1);
+		// ps.detectClusters();
 		
 		int[] clusterSizes = null;
 		int[] clusterDimensions = null;
@@ -1174,14 +1171,14 @@ public class ImageOperation {
 		}
 		
 		int[] rgbArray = ps.getImage1A();
+		new FlexibleImage(rgbArray, w, h).print("RGB Array");
 		int[] mask = ps.getImageClusterIdMask();
+		new FlexibleImage(mask, w, h).print("Mask");
 		for (int idx = 0; idx < rgbArray.length; idx++) {
-			for (int y = 0; y < h; y++) {
-				int clusterID = mask[idx];
-				if (clusterID >= 0)
-					if (clusterDimensions[clusterID] < cutOffMinimumDimension || toBeDeletedClusterIDs.contains(clusterID))
-						rgbArray[idx] = iBackgroundFill;
-			}
+			int clusterID = mask[idx];
+			if (clusterID >= 0)
+				if (clusterDimensions[clusterID] < cutOffMinimumDimension || toBeDeletedClusterIDs.contains(clusterID))
+					rgbArray[idx] = iBackgroundFill;
 		}
 		
 		return new FlexibleImage(rgbArray, w, h);
