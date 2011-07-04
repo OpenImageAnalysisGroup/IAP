@@ -301,22 +301,24 @@ public class PixelSegmentation {
 	// ############# Private #################
 	
 	private void firstPass() {
-		for (int i = 0; i < src_image.length; i++) {
-			for (int j = 0; j < src_image[i].length; j++) {
-				if (src_image[i][j] == 1) {
-					if (i == 0 && j == 0)
-						inspectPixel(Position.TOP_LEFT_PIXEL, i, j);
+		int w = src_image.length;
+		int h = src_image[0].length;
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (src_image[x][y] == 1) {
+					if (x == 0 && y == 0)
+						inspectPixel(Position.TOP_LEFT_PIXEL, x, y);
 					else
-						if (i == 0)
-							inspectPixel(Position.FIRST_ROW, i, j);
+						if (x == 0)
+							inspectPixel(Position.FIRST_COL, x, y);
 						else
-							if (j == 0)
-								inspectPixel(Position.FIRST_COLUMN, i, j);
+							if (y == 0)
+								inspectPixel(Position.FIRST_ROW, x, y);
 							else
-								if (j == src_image[i].length - 1 && neighbourhood8)
-									inspectPixel(Position.LAST_ROW, i, j);
+								if (y == h - 1 && neighbourhood8)
+									inspectPixel(Position.LAST_ROW, x, y);
 								else
-									inspectPixel(Position.INNER_REGION, i, j);
+									inspectPixel(Position.INNER_REGION, x, y);
 				}
 			}
 		}
@@ -378,7 +380,7 @@ public class PixelSegmentation {
 				break;
 			
 			// erste Zeile oben, nicht die Ecke links aber die Ecke rechts
-			case FIRST_ROW:
+			case FIRST_COL:
 				pixelL = image_cluster_ids[x][y - 1];
 				
 				if (pixelL < foreground) {
@@ -390,7 +392,7 @@ public class PixelSegmentation {
 				break;
 			
 			// erste Spalte links, nicht die Ecke oben
-			case FIRST_COLUMN:
+			case FIRST_ROW:
 				if (!neighbourhood8) { // 4er
 					pixelT = image_cluster_ids[x - 1][y];
 					
