@@ -21,4 +21,8 @@ public interface Segmentation {
 	public abstract int[] getImageClusterIdMask();
 	
 	public abstract int[] getImage1A();
+	
+	public abstract void printOriginalImage();
+	
+	public abstract void printClusterIds();
 }

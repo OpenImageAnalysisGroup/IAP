@@ -15,9 +15,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockRemoveSmallClustersOnFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
+	public static boolean ngUse = true;
+	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
+		return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(ngUse, options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
 				options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 	}
 	

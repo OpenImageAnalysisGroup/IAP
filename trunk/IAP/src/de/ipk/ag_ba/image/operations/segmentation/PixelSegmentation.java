@@ -21,7 +21,7 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 /**
  * @author entzian
  */
-public class PixelSegmentation {
+public class PixelSegmentation implements Segmentation {
 	
 	private final int[][] src_image;
 	
@@ -940,6 +940,26 @@ public class PixelSegmentation {
 	
 	public int[] getImageClusterIdMask() {
 		return ImageConverter.convert2Ato1A(image_cluster_ids);
+	}
+	
+	@Override
+	public void detectClusters() {
+		doPixelSegmentation(1);
+	}
+	
+	@Override
+	public int getClusterCount() {
+		return getNumberOfCluster();
+	}
+	
+	@Override
+	public int getForegroundPixelCount() {
+		return getNumberOfPixel();
+	}
+	
+	@Override
+	public void printClusterIds() {
+		printClusterArray();
 	}
 	
 }

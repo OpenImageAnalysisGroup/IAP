@@ -56,6 +56,7 @@ import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
 import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
+import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.IAPservice;
@@ -190,39 +191,38 @@ public class ImageOperation {
 	public ImageOperation convertFluo2intensity() {
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		
-		int[][] in = getImageAs2array(); // gamma(0.1) // 99999999999999999999999999999999
+		int[] in = getImageAs1array(); // gamma(0.1) // 99999999999999999999999999999999
 		int w = image.getWidth();
 		int h = image.getHeight();
-		for (int x = 0; x < w; x++)
-			for (int y = 0; y < h; y++) {
-				int c = in[x][y];
-				if (c == background) {
-					in[x][y] = background;
-					continue;
-				}
-				
-				int rf = (c & 0xff0000) >> 16;
-				int gf = (c & 0x00ff00) >> 8;
-				// int bf = (c & 0x0000ff);
-				
-				// float[] hsbvals = Color.RGBtoHSB(rf, gf, bf, null);
-				//
-				// int rgb = Color.HSBtoRGB(hsbvals[0], hsbvals[1], (float) (hsbvals[2]));
-				// int r = (rgb & 0xff0000) >> 16;
-				// int g = (rgb & 0x00ff00) >> 8;
-				
-				// float intensityA = 1 - r * max(r, g) / ((255 * 255) + 255 * g);
-				
-				float intensity = 1 - rf / (float) ((255) + gf);
-				
-				if (intensity > 210f / 255f)
-					intensity = 1;
-				
-				int i = (int) (intensity * 255d);
-				// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
-				in[x][y] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
+		int idx = 0;
+		for (int c : in) {
+			if (c == background) {
+				in[idx++] = background;
+				continue;
 			}
-		return new ImageOperation(in); // new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
+			
+			int rf = (c & 0xff0000) >> 16;
+			int gf = (c & 0x00ff00) >> 8;
+			// int bf = (c & 0x0000ff);
+			
+			// float[] hsbvals = Color.RGBtoHSB(rf, gf, bf, null);
+			//
+			// int rgb = Color.HSBtoRGB(hsbvals[0], hsbvals[1], (float) (hsbvals[2]));
+			// int r = (rgb & 0xff0000) >> 16;
+			// int g = (rgb & 0x00ff00) >> 8;
+			
+			// float intensityA = 1 - r * max(r, g) / ((255 * 255) + 255 * g);
+			
+			float intensity = 1 - rf / (float) ((255) + gf);
+			
+			if (intensity > 210f / 255f)
+				intensity = 1;
+			
+			int i = (int) (intensity * 255d);
+			// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
+			in[idx++] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
+		}
+		return new ImageOperation(in, w, h); // new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
 	}
 	
 	private float max(int r, int g) {
@@ -722,21 +722,21 @@ public class ImageOperation {
 		return new ImageOperation(ImageConverter.convert2AtoBI(newImage));
 	}
 	
-	public ImageOperation removeSmallClusters(ObjectRef optClusterSizeReturn) {
-		return removeSmallClusters(0.005d, CameraPosition.TOP, optClusterSizeReturn);
+	public ImageOperation removeSmallClusters(boolean nextGeneration, ObjectRef optClusterSizeReturn) {
+		return removeSmallClusters(nextGeneration, 0.005d, CameraPosition.TOP, optClusterSizeReturn);
 	}
 	
-	public ImageOperation removeSmallClusters(double factor, CameraPosition typ,
+	public ImageOperation removeSmallClusters(boolean nextGeneration, double factor, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
-		return removeSmallClusters(factor, NeighbourhoodSetting.NB4, typ,
+		return removeSmallClusters(nextGeneration, factor, NeighbourhoodSetting.NB4, typ,
 				optClusterSizeReturn);
 	}
 	
-	public ImageOperation removeSmallClusters(double factor,
+	public ImageOperation removeSmallClusters(boolean nextGeneration, double factor,
 			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
 		FlexibleImage workImage = new FlexibleImage(image);
-		workImage = removeSmallPartsOfImage(workImage,
+		workImage = removeSmallPartsOfImage(nextGeneration, workImage,
 				PhenotypeAnalysisTask.BACKGROUND_COLORint,
 				(int) (image.getWidth() * image.getHeight() * factor), (image.getWidth() / 100) * 2, nb, typ,
 				optClusterSizeReturn);
@@ -1101,6 +1101,7 @@ public class ImageOperation {
 	 * @return
 	 */
 	public static FlexibleImage removeSmallPartsOfImage(
+			boolean nextGeneration,
 			FlexibleImage workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
@@ -1115,15 +1116,15 @@ public class ImageOperation {
 			cutOffMinimumDimension = 1;
 		}
 		
-		Segmentation ps = new ClusterDetection(workImage);
+		Segmentation ps;
+		if (nextGeneration)
+			ps = new ClusterDetection(workImage, PhenotypeAnalysisTask.BACKGROUND_COLORint);
+		else
+			ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
 		ps.detectClusters();
-		// PixelSegmentation ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
-		// ps.doPixelSegmentation(1);
 		
 		int[] clusterSizes = null;
 		int[] clusterDimensions = null;
-		
-		clusterDimensions = new int[ps.getClusterDimension().length];
 		
 		if (optClusterSizeReturn != null)
 			optClusterSizeReturn.setObject(ps.getClusterSize());
@@ -1172,8 +1173,10 @@ public class ImageOperation {
 		int[] mask = ps.getImageClusterIdMask();
 		for (int idx = 0; idx < rgbArray.length; idx++) {
 			int clusterID = mask[idx];
-			if (clusterID >= 0 &&
-					(clusterDimensions[clusterID] < cutOffMinimumDimension || toBeDeletedClusterIDs.contains(clusterID)))
+			if (clusterID >= 0
+					&&
+					(clusterDimensions[clusterID] < cutOffMinimumDimension || (clusterDimensions[clusterID] >= cutOffMinimumDimension && toBeDeletedClusterIDs
+							.contains(clusterID))))
 				rgbArray[idx] = iBackgroundFill;
 		}
 		
@@ -1959,24 +1962,21 @@ public class ImageOperation {
 	public double intensitySumOfChannelRed(boolean performGrayScale) {
 		double res = 0;
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
-		int width = image.getWidth();
-		int height = image.getHeight();
-		int[][] img2d = getImageAs2array();
+		int[] img2d = getImageAs1array();
 		
-		int[][] grayScale = img2d;
+		int[] grayScale = img2d;
 		if (performGrayScale)
-			grayScale = convert2Grayscale().getImageAs2array();
+			grayScale = convert2Grayscale().getImageAs1array();
 		
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				int c = img2d[x][y];
-				if (c != background) {
-					// res++;
-					int cg = grayScale[x][y];
-					double rf = ((cg & 0xff0000) >> 16) / 255.0; // R 0..1
-					res += rf;
-				}
+		int idx = 0;
+		for (int c : img2d) {
+			if (c != background) {
+				// res++;
+				int cg = grayScale[idx];
+				double rf = ((cg & 0xff0000) >> 16) / 255.0; // R 0..1
+				res += rf;
 			}
+			idx++;
 		}
 		return res;
 	}
@@ -2019,14 +2019,14 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation clearImageAbove(double threshold, int background) {
-		int[][] img2d = getImageAs2array();
-		
-		for (int x = 0; x < image.getWidth(); x++) {
-			for (int y = 0; y < threshold; y++) {
-				img2d[x][y] = background;
-			}
+		int[] img2d = getImageAs1array();
+		int w = image.getWidth();
+		int end = w * (int) threshold;
+		int idx = 0;
+		while (idx < end) {
+			img2d[idx++] = background;
 		}
-		return new ImageOperation(img2d);
+		return new ImageOperation(img2d, w, image.getHeight());
 	}
 	
 	public ImageOperation clearImageBottom(int threshold, int background) {
@@ -2047,7 +2047,7 @@ public class ImageOperation {
 	 * lines may be specified using the parameter bb.
 	 */
 	public ImageOperation border(int bb) {
-		int[][] in = getImageAs2array();
+		int[] in = getImageAs1array();
 		
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
@@ -2057,20 +2057,20 @@ public class ImageOperation {
 		if (h > bb)
 			for (int x = 0; x < w; x++) {
 				for (int d = 0; d < bb; d++) {
-					in[x][0 + d] = backgroundColor;
-					in[x][h - 1 - d] = backgroundColor;
+					in[x + d * w] = backgroundColor;
+					in[x + (h - 1 - d) * w] = backgroundColor;
 				}
 			}
 		
 		if (w > bb)
 			for (int y = 0; y < h; y++) {
 				for (int d = 0; d < bb; d++) {
-					in[0 + d][y] = backgroundColor;
-					in[w - 1 - d][y] = backgroundColor;
+					in[d + y * w] = backgroundColor;
+					in[w - 1 - d + y * w] = backgroundColor;
 				}
 			}
 		
-		return new ImageOperation(in);
+		return new ImageOperation(in, w, h);
 	}
 	
 	/**
@@ -2087,15 +2087,18 @@ public class ImageOperation {
 		double rf, gf, bf;
 		int[] result = new int[width * height];
 		int idx = 0;
+		double rfff = factors[0];
+		double gfff = factors[1];
+		double bfff = factors[2];
 		for (int c : img2d) {
 			
 			rf = ((c & 0xff0000) >> 16);
 			gf = ((c & 0x00ff00) >> 8);
 			bf = (c & 0x0000ff);
 			
-			int r = (int) (rf * factors[0]);
-			int g = (int) (gf * factors[1]);
-			int b = (int) (bf * factors[2]);
+			int r = (int) (rf * rfff);
+			int g = (int) (gf * gfff);
+			int b = (int) (bf * bfff);
 			
 			if (r > 255)
 				r = 255;
@@ -2117,7 +2120,7 @@ public class ImageOperation {
 	 * @param ABThresh
 	 *           minimal A and B value
 	 */
-	public double[] getRGBAverage(int[] img1d, int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
+	public double[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
 		int r, g, b;
 		double Li, ai, bi;
 		
@@ -2127,6 +2130,8 @@ public class ImageOperation {
 		double sumB = 0;
 		
 		int count = 0;
+		
+		int[] img1d = getImageAs1array();
 		
 		for (int c : img1d) {
 			// RGB to XYZ
@@ -2181,12 +2186,12 @@ public class ImageOperation {
 	 * 
 	 * @author pape
 	 */
-	public ImageOperation imageBalancing(int brightness, double[] pixels) {
+	public ImageOperation imageBalancing(int brightness, double[] rgbInfo) {
 		if (image == null)
 			return null;
-		double r = brightness / pixels[0];
-		double g = brightness / pixels[1];
-		double b = brightness / pixels[2];
+		double r = brightness / rgbInfo[0];
+		double g = brightness / rgbInfo[1];
+		double b = brightness / rgbInfo[2];
 		double[] factors = { r, g, b };
 		ImageOperation io = new ImageOperation(image);
 		return io.multiplicateImageChannelsWithFactors(factors);

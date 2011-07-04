@@ -15,6 +15,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * @return A set of images which may be used as a mask.
  */
 public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
+	public static boolean ngUse = true;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
@@ -23,12 +24,13 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			FlexibleImage res =
-					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB) / 2d,
+					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
+							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB) / 2d,
 							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			return res;
 		} else {
 			FlexibleImage res =
-					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
+					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse, options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
 							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			return res;
 		}
@@ -41,10 +43,12 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
+			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(ngUse,
+					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 		} else {
-			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
+			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(ngUse,
+					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 		}
 		
