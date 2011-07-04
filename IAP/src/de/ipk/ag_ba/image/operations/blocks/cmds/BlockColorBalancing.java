@@ -67,7 +67,6 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	 * @author pape
 	 */
 	public static double[] getProbablyWhitePixels(FlexibleImage image, double size) {
-		int[] img2d = image.getAs1A();
 		int width = image.getWidth();
 		int height = image.getHeight();
 		int w = (int) (width * size);
@@ -75,8 +74,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ImageOperation io = new ImageOperation(image);
 		
-		double[] valuesleft = io.getRGBAverage(img2d, 20, h, w, height - 2 * h, 150, 50, true);
-		double[] valuesright = io.getRGBAverage(img2d, width - 20 - w, h, w, height - 2 * h, 150, 50, true);
+		double[] valuesleft = io.getRGBAverage(20, h, w, height - 2 * h, 150, 50, true);
+		double[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true);
 		// no function tested
 		// double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
 		// double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);

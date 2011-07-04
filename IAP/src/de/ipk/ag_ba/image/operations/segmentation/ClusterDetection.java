@@ -4,7 +4,6 @@ import org.Vector2d;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 public class ClusterDetection implements Segmentation {
 	
@@ -19,65 +18,55 @@ public class ClusterDetection implements Segmentation {
 	private Vector2d[] widthAndHeight;
 	private int foregroundPixelCount;
 	
-	public ClusterDetection(FlexibleImage image) {
+	public ClusterDetection(FlexibleImage image, int background) {
 		this.img = image.getAs1A();
 		this.clu = new int[img.length];
 		this.w = image.getWidth();
 		this.h = image.getHeight();
-		this.back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		// img[1 + w] = background + 1;
+		this.back = background;
 	}
 	
 	@Override
 	public void detectClusters() {
-		int x = 0, y = 0;
 		int currentClusterID = 0;
 		int idx = 0;
 		this.foregroundPixelCount = 0;
-		for (int c : img) {
-			if (c != back)
-				foregroundPixelCount++;
-		}
 		
 		int[] queue = new int[w * h];
 		for (int c : img) {
-			if (c != back && clu[idx] == 0) {
-				currentClusterID++;
-				assignCluster(currentClusterID, x, y, queue);
+			if (c != back) {
+				foregroundPixelCount++;
+				if (clu[idx] == 0) {
+					currentClusterID++;
+					assignCluster(currentClusterID, idx, queue);
+				}
 			}
 			idx++;
-			x++;
-			if (x == w) {
-				x = 0;
-				y++;
-			}
 		}
 		idx = 0;
-		for (int cl : clu)
-			clu[idx++] = cl - 1;
 		numberOfClusters = currentClusterID;
-		if (currentClusterID > 0) {
-			this.clusterPixelCount = new int[currentClusterID];
-			Vector2i[] clusterMinXY = new Vector2i[currentClusterID];
+		if (numberOfClusters > 0) {
+			this.clusterPixelCount = new int[numberOfClusters + 1];
+			Vector2i[] clusterMinXY = new Vector2i[numberOfClusters + 1];
 			for (int i = 0; i < clusterMinXY.length; i++)
 				clusterMinXY[i] = new Vector2i(w, h);
-			Vector2i[] clusterMaxXY = new Vector2i[currentClusterID];
+			Vector2i[] clusterMaxXY = new Vector2i[numberOfClusters + 1];
 			for (int i = 0; i < clusterMaxXY.length; i++)
 				clusterMaxXY[i] = new Vector2i(0, 0);
-			x = 0;
-			y = 0;
+			int x = 0;
+			int y = 0;
 			idx = 0;
 			for (int cl : clu) {
-				if (cl > 0) {
-					clusterPixelCount[cl]++;
-					if (x < clusterMinXY[cl].x)
-						clusterMinXY[cl].x = x;
-					if (x < clusterMinXY[cl].y)
-						clusterMinXY[cl].y = y;
-					if (x > clusterMaxXY[cl].x)
-						clusterMaxXY[cl].x = x;
-					if (x > clusterMaxXY[cl].y)
-						clusterMaxXY[cl].y = y;
-				}
+				clusterPixelCount[cl]++;
+				if (x < clusterMinXY[cl].x)
+					clusterMinXY[cl].x = x;
+				if (y < clusterMinXY[cl].y)
+					clusterMinXY[cl].y = y;
+				if (x > clusterMaxXY[cl].x)
+					clusterMaxXY[cl].x = x;
+				if (y > clusterMaxXY[cl].y)
+					clusterMaxXY[cl].y = y;
 				idx++;
 				x++;
 				if (x == w) {
@@ -85,9 +74,9 @@ public class ClusterDetection implements Segmentation {
 					y++;
 				}
 			}
-			this.centerPoints = new Vector2d[numberOfClusters];
-			this.widthAndHeight = new Vector2d[numberOfClusters];
-			for (int i = 0; i < numberOfClusters; i++) {
+			this.centerPoints = new Vector2d[numberOfClusters + 1];
+			this.widthAndHeight = new Vector2d[numberOfClusters + 1];
+			for (int i = 0; i <= numberOfClusters; i++) {
 				double xd = (clusterMaxXY[i].x - clusterMinXY[i].x) / 2d + clusterMinXY[i].x;
 				double yd = (clusterMaxXY[i].x - clusterMinXY[i].x) / 2d + clusterMinXY[i].x;
 				double wd = clusterMaxXY[i].x - clusterMinXY[i].x;
@@ -101,29 +90,44 @@ public class ClusterDetection implements Segmentation {
 		}
 	}
 	
-	private void assignCluster(int currentClusterID, int x, int y, int[] queue) {
-		// LinkedList<Integer> queue = new LinkedList<Integer>();
+	private void assignCluster(int currentClusterID, int idx, int[] queue) {
 		int qL = 0, qR = 0;
-		Integer idx = x + y * w;
-		// queue.add(idx);
 		queue[++qR] = idx;
-		// while (!queue.isEmpty()) {
-		while (qR > qL) {
-			// idx = queue.poll();
-			idx = queue[qL++];
+		int maxQueueLength = queue.length - 1;
+		// int max = 0;
+		while (qR != qL) {
+			// if (qR - qL > max)
+			// max = qR - qL;
+			idx = queue[++qL];
+			if (qL == queue.length - 1)
+				qL = 0;
+			if (clu[idx] == currentClusterID)
+				continue;
 			clu[idx] = currentClusterID;
-			if (idx > 0 && img[idx - 1] != back && clu[idx - 1] == 0)
-				queue[++qR] = idx - 1;
-			// queue.add(idx - 1);
-			if (idx > w && img[idx - w] != back && clu[idx - w] == 0)
-				queue[++qR] = idx - w;
-			// queue.add(idx - w);
-			if (idx + 1 < img.length && img[idx + 1] != back && clu[idx + 1] == 0)
-				queue[++qR] = idx + 1;
-			// queue.add(idx + 1);
-			if (idx < img.length - w && img[idx + w] != back && clu[idx + w] == 0)
-				queue[++qR] = idx + w;
-			// queue.add(idx + w);
+			int f = idx - 1;
+			if (idx % w > 0 && img[f] != back && clu[f] == 0) {
+				queue[++qR] = f;
+				if (qR == maxQueueLength)
+					qR = 0;
+			}
+			f = idx - w;
+			if (idx > w && img[f] != back && clu[f] == 0) {
+				queue[++qR] = f;
+				if (qR == maxQueueLength)
+					qR = 0;
+			}
+			f = idx + 1;
+			if ((idx) % w < w - 1 && img[f] != back && clu[f] == 0) {
+				queue[++qR] = f;
+				if (qR == maxQueueLength)
+					qR = 0;
+			}
+			f = idx + w;
+			if (idx < img.length - w && img[f] != back && clu[f] == 0) {
+				queue[++qR] = f;
+				if (qR == maxQueueLength)
+					qR = 0;
+			}
 		}
 	}
 	
@@ -175,5 +179,26 @@ public class ClusterDetection implements Segmentation {
 	@Override
 	public int[] getImage1A() {
 		return img;
+	}
+	
+	@Override
+	public void printOriginalImage() {
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				System.out.print(img[x + y * w] + " ");
+			}
+			System.out.println();
+		}
+	}
+	
+	@Override
+	public void printClusterIds() {
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				System.out.print(clu[x + y * w] + " ");
+			}
+			System.out.println();
+		}
+		System.out.println("*************");
 	}
 }
