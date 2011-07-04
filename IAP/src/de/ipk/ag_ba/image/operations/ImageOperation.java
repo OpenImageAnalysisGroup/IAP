@@ -1114,13 +1114,10 @@ public class ImageOperation {
 			cutOffMinimumDimension = 1;
 		}
 		
-		int w = workImage.getWidth();
-		int h = workImage.getHeight();
-		
-		// Segmentation ps = // new ClusterDetection(workImage);
-		PixelSegmentation ps = new PixelSegmentation(workImage.getAs2A(), NeighbourhoodSetting.NB4);
-		ps.doPixelSegmentation(1);
+		// Segmentation ps = new ClusterDetection(workImage);
 		// ps.detectClusters();
+		PixelSegmentation ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
+		ps.doPixelSegmentation(1);
 		
 		int[] clusterSizes = null;
 		int[] clusterDimensions = null;
@@ -1170,17 +1167,17 @@ public class ImageOperation {
 			}
 		}
 		
-		int[] rgbArray = ps.getImage1A();
-		new FlexibleImage(rgbArray, w, h).print("RGB Array");
+		int[] rgbArray = workImage.getAs1A();
 		int[] mask = ps.getImageClusterIdMask();
-		new FlexibleImage(mask, w, h).print("Mask");
 		for (int idx = 0; idx < rgbArray.length; idx++) {
 			int clusterID = mask[idx];
-			if (clusterID >= 0)
-				if (clusterDimensions[clusterID] < cutOffMinimumDimension || toBeDeletedClusterIDs.contains(clusterID))
-					rgbArray[idx] = iBackgroundFill;
+			if (clusterID >= 0 &&
+					(clusterDimensions[clusterID] < cutOffMinimumDimension || toBeDeletedClusterIDs.contains(clusterID)))
+				rgbArray[idx] = iBackgroundFill;
 		}
 		
+		int w = workImage.getWidth();
+		int h = workImage.getHeight();
 		return new FlexibleImage(rgbArray, w, h);
 	}
 	
@@ -1472,7 +1469,7 @@ public class ImageOperation {
 		float[] res = new float[n + 1];
 		float sq = 1f / 3f;
 		for (int i = 0; i <= n; i++) {
-			float x = lo + i * (up - lo) / (float) n;
+			float x = lo + i * (up - lo) / n;
 			res[i] = (float) Math.pow(x, sq);
 		}
 		return res;
@@ -2158,7 +2155,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new double[] { sumR / (double) count, sumG / (double) count, sumB / (double) count };
+		return new double[] { sumR / count, sumG / count, sumB / count };
 	}
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {

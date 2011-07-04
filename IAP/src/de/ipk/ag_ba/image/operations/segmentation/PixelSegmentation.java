@@ -15,6 +15,8 @@ import org.Vector2d;
 
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.operations.Position;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * @author entzian
@@ -26,24 +28,24 @@ public class PixelSegmentation {
 	/**
 	 * True = 8-neighbourhood, False = 4-neighbourhood.
 	 */
-	private final boolean nb; // true = 8er; false = 4er
+	private final boolean neighbourhood8; // true = 8er; false = 4er
 	
 	/**
 	 * Specifies the first pixel value which is treated as foreground, values
 	 * below are treated as background.
 	 */
 	private final int foreground = 1;
-	private int zaehler = foreground;
-	private final HashMap<Integer, ArrayList<Integer>> clusterMapping = new HashMap<Integer, ArrayList<Integer>>();
+	private int currentClusterId = foreground;
+	private final HashMap<Integer, HashSet<Integer>> equalClusterIds = new HashMap<Integer, HashSet<Integer>>();
 	
-	private int[] image_cluster_size;
+	private int[] imageClusterSize;
 	private final int[][] image_cluster_ids;
-	private int[] cluster_border_size;
+	private int[] clusterBorderSize;
 	
-	private int[] cluster_min_x;
-	private int[] cluster_max_x;
-	private int[] cluster_min_y;
-	private int[] cluster_max_y;
+	private int[] clusterMinX;
+	private int[] clusterMaxX;
+	private int[] clusterMinY;
+	private int[] clusterMaxY;
 	
 	/**
 	 * Circuit ratio lambda = (A/(U*U))*4*Pi
@@ -58,22 +60,35 @@ public class PixelSegmentation {
 	
 	private final boolean calculatePerimeterAndRatio;
 	
-	public PixelSegmentation(int[][] image) {
-		this(image, NeighbourhoodSetting.NB4);
-	}
-	
-	public PixelSegmentation(int[][] image, NeighbourhoodSetting setting) {
+	public PixelSegmentation(FlexibleImage in, NeighbourhoodSetting setting) {
+		int[] rgbArray = in.getAs1A();
+		int w = in.getWidth();
+		int h = in.getHeight();
+		int[][] image = new int[w][h];
+		int iBackgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				int off = x + y * w;
+				int color = rgbArray[off];
+				if (color != iBackgroundFill) {
+					image[x][y] = 1;
+				} else {
+					image[x][y] = 0;
+				}
+			}
+		}
+		
 		src_image = image;
 		this.image_cluster_ids = new int[image.length][image[0].length];
 		switch (setting) {
 			case NB4:
-				nb = false;
+				neighbourhood8 = false;
 				break;
 			case NB8:
-				nb = true;
+				neighbourhood8 = true;
 				break;
 			default:
-				nb = false;
+				neighbourhood8 = false;
 		}
 		
 		calculatePerimeterAndRatio = true;
@@ -82,7 +97,7 @@ public class PixelSegmentation {
 	// ############### Public ####################
 	
 	public int[] getClusterSize() {
-		return image_cluster_size;
+		return imageClusterSize;
 	}
 	
 	public int[][] getImageMask() {
@@ -91,33 +106,33 @@ public class PixelSegmentation {
 	
 	public int getNumberOfCluster() {
 		int clusterNumbers = 0;
-		for (int pixelIndex = 1; pixelIndex < image_cluster_size.length; pixelIndex++)
-			if (image_cluster_size[pixelIndex] != 0)
+		for (int pixelIndex = 1; pixelIndex < imageClusterSize.length; pixelIndex++)
+			if (imageClusterSize[pixelIndex] != 0)
 				clusterNumbers++;
 		return clusterNumbers;
 	}
 	
 	public int getNumberOfPixel() {
 		int pixelNumbers = 0;
-		for (int pixelIndex = 1; pixelIndex < image_cluster_size.length; pixelIndex++)
-			pixelNumbers = pixelNumbers + image_cluster_size[pixelIndex];
+		for (int pixelIndex = 1; pixelIndex < imageClusterSize.length; pixelIndex++)
+			pixelNumbers = pixelNumbers + imageClusterSize[pixelIndex];
 		return pixelNumbers;
 	}
 	
 	public int[] getArea() {
-		return image_cluster_size;
+		return imageClusterSize;
 	}
 	
 	public int getArea(int position) {
-		return image_cluster_size[position];
+		return imageClusterSize[position];
 	}
 	
 	public int[] getPerimeter() {
-		return cluster_border_size;
+		return clusterBorderSize;
 	}
 	
 	public int getPerimeter(int position) {
-		return cluster_border_size[position];
+		return clusterBorderSize[position];
 	}
 	
 	public double[] getCircuitRatio() {
@@ -179,55 +194,42 @@ public class PixelSegmentation {
 	
 	private void calculateClusterDimension() {
 		
-		cluster_min_x = new int[zaehler];
-		cluster_max_x = new int[zaehler];
-		cluster_min_y = new int[zaehler];
-		cluster_max_y = new int[zaehler];
+		clusterMinX = new int[currentClusterId];
+		clusterMaxX = new int[currentClusterId];
+		clusterMinY = new int[currentClusterId];
+		clusterMaxY = new int[currentClusterId];
 		
-		Arrays.fill(cluster_min_x, src_image.length);
-		Arrays.fill(cluster_min_y, src_image[0].length);
-		Arrays.fill(cluster_max_x, 0);
-		Arrays.fill(cluster_max_y, 0);
+		Arrays.fill(clusterMinX, src_image.length);
+		Arrays.fill(clusterMinY, src_image[0].length);
+		Arrays.fill(clusterMaxX, 0);
+		Arrays.fill(clusterMaxY, 0);
 		
-		for (int i = 0; i < src_image.length; i++) {
-			for (int j = 0; j < src_image[i].length; j++) {
-				if (!(src_image[i][j] < foreground)) {
-					int clusterId = image_cluster_ids[i][j];
+		for (int x = 0; x < src_image.length; x++) {
+			for (int y = 0; y < src_image[x].length; y++) {
+				if (!(src_image[x][y] < foreground)) {
+					int clusterId = image_cluster_ids[x][y];
 					
-					int x = i;
-					int y = j;
+					if (x < clusterMinX[clusterId])
+						clusterMinX[clusterId] = x;
+					if (y < clusterMinY[clusterId])
+						clusterMinY[clusterId] = y;
 					
-					if (x < cluster_min_x[clusterId])
-						cluster_min_x[clusterId] = x;
-					if (y < cluster_min_y[clusterId])
-						cluster_min_y[clusterId] = y;
-					
-					if (x > cluster_max_x[clusterId])
-						cluster_max_x[clusterId] = x;
-					if (y > cluster_max_y[clusterId])
-						cluster_max_y[clusterId] = y;
+					if (x > clusterMaxX[clusterId])
+						clusterMaxX[clusterId] = x;
+					if (y > clusterMaxY[clusterId])
+						clusterMaxY[clusterId] = y;
 				}
 			}
 		}
-		
-		// System.out.println("Länge von cluster_min_x: " + cluster_min_x.length);
-		// System.out.println("Länge von cluster_max_x: " + cluster_max_x.length);
-		// System.out.println("Länge von cluster_min_y: " + cluster_min_y.length);
-		// System.out.println("Länge von cluster_max_y: " + cluster_max_y.length);
-		
-		// for (int i = 0; i <= cluster_min_x.length; i++)
-		// System.out.println("Cluster: " + i + " min_x: " + cluster_min_x[i] + " min_y: " + cluster_min_y[i] + " max_x: " + cluster_max_x[i] + " max_y: "
-		// + cluster_max_y[i]);
-		
 	}
 	
 	private void calculateCircuitRatio() {
-		cluster_lambda = new double[zaehler];
+		cluster_lambda = new double[currentClusterId];
 		
-		for (int i = 0; i < zaehler; i++)
-			if (cluster_border_size[i] > 0) {
-				cluster_lambda[i] = (double) image_cluster_size[i] / (double) cluster_border_size[i]
-									/ cluster_border_size[i] * 4 * Math.PI;
+		for (int i = 0; i < currentClusterId; i++)
+			if (clusterBorderSize[i] > 0) {
+				cluster_lambda[i] = (double) imageClusterSize[i] / (double) clusterBorderSize[i]
+									/ clusterBorderSize[i] * 4 * Math.PI;
 			}
 		
 	}
@@ -272,10 +274,10 @@ public class PixelSegmentation {
 	}
 	
 	public void printHashMap() {
-		printHashMap(this.clusterMapping);
+		printHashMap(this.equalClusterIds);
 	}
 	
-	public void printHashMap(HashMap<Integer, ArrayList<Integer>> hashM) {
+	public void printHashMap(HashMap<Integer, HashSet<Integer>> hashM) {
 		
 		if (!hashM.isEmpty())
 			for (int clusterID : hashM.keySet())
@@ -285,7 +287,7 @@ public class PixelSegmentation {
 	}
 	
 	public void printClusterArray() {
-		printClusterArray(image_cluster_size);
+		printClusterArray(imageClusterSize);
 	}
 	
 	public void printClusterArray(int[] zaehlerArray2) {
@@ -303,18 +305,18 @@ public class PixelSegmentation {
 			for (int j = 0; j < src_image[i].length; j++) {
 				if (src_image[i][j] == 1) {
 					if (i == 0 && j == 0)
-						parse(Position.TOP_LEFT_PIXEL);
+						inspectPixel(Position.TOP_LEFT_PIXEL, i, j);
 					else
 						if (i == 0)
-							parse(Position.FIRST_ROW, 0, j);
+							inspectPixel(Position.FIRST_ROW, i, j);
 						else
 							if (j == 0)
-								parse(Position.FIRST_COLUMN, i);
+								inspectPixel(Position.FIRST_COLUMN, i, j);
 							else
-								if (j == src_image[i].length - 1 && nb)
-									parse(Position.LAST_ROW, i, j);
+								if (j == src_image[i].length - 1 && neighbourhood8)
+									inspectPixel(Position.LAST_ROW, i, j);
 								else
-									parse(Position.INNER_REGION, i, j);
+									inspectPixel(Position.INNER_REGION, i, j);
 				}
 			}
 		}
@@ -322,18 +324,18 @@ public class PixelSegmentation {
 	
 	private void secondPass() {
 		
-		image_cluster_size = new int[zaehler];
+		imageClusterSize = new int[currentClusterId];
 		
 		for (int i = 0; i < src_image.length; i++)
 			for (int j = 0; j < src_image[i].length; j++) {
 				image_cluster_ids[i][j] = clusterMap[image_cluster_ids[i][j]];
-				image_cluster_size[image_cluster_ids[i][j]]++;
+				imageClusterSize[image_cluster_ids[i][j]]++;
 			}
 	}
 	
 	private void calculatePerimeterOfEachCluster() {
 		
-		cluster_border_size = new int[zaehler];
+		clusterBorderSize = new int[currentClusterId];
 		
 		for (int i = 0; i < src_image.length; i++) {
 			for (int j = 0; j < src_image[i].length; j++) {
@@ -353,11 +355,11 @@ public class PixelSegmentation {
 										&& currentPositionI - 1 + l <= src_image.length - 1
 										&& currentPositionJ - 1 + k <= src_image[currentPositionI].length - 1) {
 						if (image_cluster_ids[currentPositionI - 1 + l][currentPositionJ - 1 + k] != image_cluster_ids[currentPositionI][currentPositionJ]) {
-							cluster_border_size[image_cluster_ids[currentPositionI][currentPositionJ]]++;
+							clusterBorderSize[image_cluster_ids[currentPositionI][currentPositionJ]]++;
 							
 						}
 					} else {
-						cluster_border_size[image_cluster_ids[currentPositionI][currentPositionJ]]++;
+						clusterBorderSize[image_cluster_ids[currentPositionI][currentPositionJ]]++;
 					}
 				}
 			}
@@ -365,64 +367,56 @@ public class PixelSegmentation {
 		
 	}
 	
-	private void parse(Position zahl) {
-		parse(zahl, 0, 0);
-	}
-	
-	private void parse(Position zahl, int i) {
-		parse(zahl, i, 0);
-	}
-	
-	private void parse(Position position, int i, int j) {
+	private void inspectPixel(Position position, int x, int y) {
 		int pixelTR, pixelT, pixelTL, pixelL;
 		
 		switch (position) { // Ecke links oben und rechts oben
 			case TOP_LEFT_PIXEL:
-				image_cluster_ids[i][j] = zaehler;
-				zaehler++;
+				image_cluster_ids[x][y] = currentClusterId;
+				currentClusterId++;
 				
 				break;
 			
 			// erste Zeile oben, nicht die Ecke links aber die Ecke rechts
 			case FIRST_ROW:
-				pixelL = image_cluster_ids[i][j - 1];
+				pixelL = image_cluster_ids[x][y - 1];
 				
 				if (pixelL < foreground) {
-					image_cluster_ids[i][j] = zaehler;
-					zaehler++;
+					image_cluster_ids[x][y] = currentClusterId;
+					currentClusterId++;
 				} else
-					image_cluster_ids[i][j] = pixelL;
+					image_cluster_ids[x][y] = pixelL;
 				
 				break;
 			
 			// erste Spalte links, nicht die Ecke oben
 			case FIRST_COLUMN:
-				if (!nb) { // 4er
-					pixelT = image_cluster_ids[i - 1][j];
+				if (!neighbourhood8) { // 4er
+					pixelT = image_cluster_ids[x - 1][y];
 					
 					if (pixelT < foreground) {
-						image_cluster_ids[i][j] = zaehler;
-						zaehler++;
+						image_cluster_ids[x][y] = currentClusterId;
+						currentClusterId++;
 					} else
-						image_cluster_ids[i][j] = pixelT;
+						image_cluster_ids[x][y] = pixelT;
 				} else { // 8er
-					pixelTR = image_cluster_ids[i - 1][j + 1];
-					pixelT = image_cluster_ids[i - 1][j];
+					pixelTR = image_cluster_ids[x - 1][y + 1];
+					pixelT = image_cluster_ids[x - 1][y];
 					
 					if (pixelT < foreground && pixelTR < foreground) {
-						image_cluster_ids[i][j] = zaehler;
-						zaehler++;
+						image_cluster_ids[x][y] = currentClusterId;
+						currentClusterId++;
 						
 					} else
 						if (pixelT < foreground && pixelTR > foreground - 1) {
-							image_cluster_ids[i][j] = pixelTR;
+							image_cluster_ids[x][y] = pixelTR;
 							
 						} else
 							if (pixelT > foreground - 1 && pixelTR < foreground) {
-								image_cluster_ids[i][j] = pixelT;
+								image_cluster_ids[x][y] = pixelT;
 								
 							} else {
-								image_cluster_ids[i][j] = pixelT;
+								image_cluster_ids[x][y] = pixelT;
 								
 								// hashMapFuellen(image[i-1][j], image[i-1][j+1]);
 							}
@@ -433,62 +427,62 @@ public class PixelSegmentation {
 			// alles bis auf den linken, rechten (bei 8er Nachbarschaft) und oberen
 			// Rand
 			case INNER_REGION:
-				if (!nb) { // 4er
+				if (!neighbourhood8) { // 4er
 				
-					pixelT = image_cluster_ids[i - 1][j];
-					pixelL = image_cluster_ids[i][j - 1];
+					pixelT = image_cluster_ids[x - 1][y];
+					pixelL = image_cluster_ids[x][y - 1];
 					
 					if (pixelT < foreground) {
 						if (pixelL < foreground) {
-							image_cluster_ids[i][j] = zaehler;
-							zaehler++;
+							image_cluster_ids[x][y] = currentClusterId;
+							currentClusterId++;
 						} else {
-							image_cluster_ids[i][j] = pixelL;
+							image_cluster_ids[x][y] = pixelL;
 						}
 					} else {
 						if (pixelL < foreground) {
-							image_cluster_ids[i][j] = pixelT;
+							image_cluster_ids[x][y] = pixelT;
 						} else {
-							image_cluster_ids[i][j] = pixelL;
-							addHashMapEntry(pixelT, pixelL);
+							image_cluster_ids[x][y] = pixelL;
+							memorizeEqualClusterIds(pixelT, pixelL);
 						}
 					}
 				} else { // 8er
 				
-					pixelTR = image_cluster_ids[i - 1][j + 1];
-					pixelT = image_cluster_ids[i - 1][j];
-					pixelTL = image_cluster_ids[i - 1][j - 1];
-					pixelL = image_cluster_ids[i][j - 1];
+					pixelTR = image_cluster_ids[x - 1][y + 1];
+					pixelT = image_cluster_ids[x - 1][y];
+					pixelTL = image_cluster_ids[x - 1][y - 1];
+					pixelL = image_cluster_ids[x][y - 1];
 					
 					if (pixelTR < foreground) {
 						if (pixelT < foreground) {
 							if (pixelTL < foreground) {
 								if (pixelL < foreground) {
-									image_cluster_ids[i][j] = zaehler;
-									zaehler++;
+									image_cluster_ids[x][y] = currentClusterId;
+									currentClusterId++;
 								} else {
-									image_cluster_ids[i][j] = pixelL;
+									image_cluster_ids[x][y] = pixelL;
 								}
 							} else {
 								if (pixelL < foreground) {
-									image_cluster_ids[i][j] = pixelTL;
+									image_cluster_ids[x][y] = pixelTL;
 								} else {
-									image_cluster_ids[i][j] = pixelL;
+									image_cluster_ids[x][y] = pixelL;
 								}
 							}
 						} else {
 							if (pixelTL < foreground) {
 								if (pixelL < foreground) {
-									image_cluster_ids[i][j] = pixelT;
+									image_cluster_ids[x][y] = pixelT;
 								} else {
-									image_cluster_ids[i][j] = pixelL;
-									addHashMapEntry(pixelT, pixelL);
+									image_cluster_ids[x][y] = pixelL;
+									memorizeEqualClusterIds(pixelT, pixelL);
 								}
 							} else {
 								if (pixelL < foreground) {
-									image_cluster_ids[i][j] = pixelTL;
+									image_cluster_ids[x][y] = pixelTL;
 								} else {
-									image_cluster_ids[i][j] = pixelL;
+									image_cluster_ids[x][y] = pixelL;
 								}
 							}
 						}
@@ -496,33 +490,33 @@ public class PixelSegmentation {
 						if (pixelT < foreground) {
 							if (pixelTL < foreground) {
 								if (pixelL < foreground) {
-									image_cluster_ids[i][j] = pixelTR;
+									image_cluster_ids[x][y] = pixelTR;
 								} else {
-									image_cluster_ids[i][j] = pixelL;
-									addHashMapEntry(pixelTR, pixelL);
+									image_cluster_ids[x][y] = pixelL;
+									memorizeEqualClusterIds(pixelTR, pixelL);
 								}
 							} else {
 								if (pixelL < foreground) {
-									image_cluster_ids[i][j] = pixelTL;
-									addHashMapEntry(pixelTR, pixelTL);
+									image_cluster_ids[x][y] = pixelTL;
+									memorizeEqualClusterIds(pixelTR, pixelTL);
 								} else {
-									image_cluster_ids[i][j] = pixelL;
-									addHashMapEntry(pixelTR, pixelL);
+									image_cluster_ids[x][y] = pixelL;
+									memorizeEqualClusterIds(pixelTR, pixelL);
 								}
 							}
 						} else {
 							if (pixelTL < foreground) {
 								if (pixelL < foreground) {
-									image_cluster_ids[i][j] = pixelT;
+									image_cluster_ids[x][y] = pixelT;
 								} else {
-									image_cluster_ids[i][j] = pixelL;
-									addHashMapEntry(pixelT, pixelL);
+									image_cluster_ids[x][y] = pixelL;
+									memorizeEqualClusterIds(pixelT, pixelL);
 								}
 							} else {
 								if (pixelL < foreground) {
-									image_cluster_ids[i][j] = pixelTL;
+									image_cluster_ids[x][y] = pixelTL;
 								} else {
-									image_cluster_ids[i][j] = pixelL;
+									image_cluster_ids[x][y] = pixelL;
 								}
 							}
 						}
@@ -533,38 +527,38 @@ public class PixelSegmentation {
 			
 			// letzte Spalte rechts, nicht die Ecke oben
 			case LAST_ROW:
-				pixelT = image_cluster_ids[i - 1][j];
-				pixelTL = image_cluster_ids[i - 1][j - 1];
-				pixelL = image_cluster_ids[i][j - 1];
+				pixelT = image_cluster_ids[x - 1][y];
+				pixelTL = image_cluster_ids[x - 1][y - 1];
+				pixelL = image_cluster_ids[x][y - 1];
 				
 				if (pixelT < foreground) {
 					if (pixelTL < foreground) {
 						if (pixelL < foreground) {
-							image_cluster_ids[i][j] = zaehler;
-							zaehler++;
+							image_cluster_ids[x][y] = currentClusterId;
+							currentClusterId++;
 						} else {
-							image_cluster_ids[i][j] = pixelL;
+							image_cluster_ids[x][y] = pixelL;
 						}
 					} else {
 						if (pixelL < foreground) {
-							image_cluster_ids[i][j] = pixelTL;
+							image_cluster_ids[x][y] = pixelTL;
 						} else {
-							image_cluster_ids[i][j] = pixelL;
+							image_cluster_ids[x][y] = pixelL;
 						}
 					}
 				} else {
 					if (pixelTL < foreground) {
 						if (pixelL < foreground) {
-							image_cluster_ids[i][j] = pixelT;
+							image_cluster_ids[x][y] = pixelT;
 						} else {
-							image_cluster_ids[i][j] = pixelL;
-							addHashMapEntry(pixelT, pixelL);
+							image_cluster_ids[x][y] = pixelL;
+							memorizeEqualClusterIds(pixelT, pixelL);
 						}
 					} else {
 						if (pixelL < foreground) {
-							image_cluster_ids[i][j] = pixelTL;
+							image_cluster_ids[x][y] = pixelTL;
 						} else {
-							image_cluster_ids[i][j] = pixelL;
+							image_cluster_ids[x][y] = pixelL;
 						}
 					}
 				}
@@ -573,44 +567,44 @@ public class PixelSegmentation {
 		
 	}
 	
-	private void addHashMapEntry(int Pixel1, int Pixel2) {
-		if (Pixel1 != Pixel2) {
-			if (!clusterMapping.containsKey(Pixel2)) {
-				clusterMapping.put(Pixel2, new ArrayList<Integer>());
-				clusterMapping.get(Pixel2).add(Pixel1);
+	private void memorizeEqualClusterIds(int clusterId1, int clusterId2) {
+		if (clusterId1 != clusterId2) {
+			if (!equalClusterIds.containsKey(clusterId2)) {
+				equalClusterIds.put(clusterId2, new HashSet<Integer>());
+				equalClusterIds.get(clusterId2).add(clusterId1);
 			} else
-				if (!clusterMapping.get(Pixel2).contains(Pixel1)) {
-					clusterMapping.get(Pixel2).add(Pixel1);
+				if (!equalClusterIds.get(clusterId2).contains(clusterId1)) {
+					equalClusterIds.get(clusterId2).add(clusterId1);
 				}
 		}
 	}
 	
 	private void mergeHashMapRecursive() {
 		
-		tableLinks = new int[zaehler][zaehler];
-		clusterMap = new int[zaehler];
-		linesRun = new boolean[zaehler];
+		tableLinks = new int[currentClusterId][currentClusterId];
+		clusterMap = new int[currentClusterId];
+		linesRun = new boolean[currentClusterId];
 		
-		for (int key : clusterMapping.keySet()) {
-			for (int value : clusterMapping.get(key)) {
+		for (int key : equalClusterIds.keySet()) {
+			for (int value : equalClusterIds.get(key)) {
 				tableLinks[key][value] = -1;
 				tableLinks[value][key] = -1;
 			}
 		}
 		
-		for (int i = 0; i < zaehler; i++) {
+		for (int i = 0; i < currentClusterId; i++) {
 			clusterMap[i] = i;
 			linesRun[i] = true;
 		}
 		// long ersteZeit = System.currentTimeMillis();
-		recursiveMerge(1, 1, zaehler, 0, 0);
+		recursiveMerge(1, 1, currentClusterId, 0, 0);
 		// long zweiteZeit = System.currentTimeMillis();
 		// System.out.println("Dauer: " + (zweiteZeit - ersteZeit));
 	}
 	
 	private void recursiveMerge(int zeile, int spalte, int zaehlerJ, int missachten, int aktuellerCluster) {
 		for (int j = zeile; j < zaehlerJ; j++) {
-			for (int i = spalte; i < zaehler && linesRun[j]; i++) {
+			for (int i = spalte; i < currentClusterId && linesRun[j]; i++) {
 				// for(int i = spalte; i < zaehler; i++){
 				if (i != missachten) {
 					if (tableLinks[i][j] == -1) {
@@ -624,7 +618,7 @@ public class PixelSegmentation {
 						} else
 							clusterMap[i] = aktuellerCluster;
 						
-						if (i != zaehler)
+						if (i != currentClusterId)
 							recursiveMerge(i, 1, i + 1, j, aktuellerCluster);
 					}
 				} else
@@ -675,7 +669,7 @@ public class PixelSegmentation {
 											{ 0, 1, 0, 0, 0, 0, 0 },
 											{ 1, 1, 0, 0, 0, 0, 0 } };
 		//
-		PixelSegmentation test = new PixelSegmentation(eingabe_image, NeighbourhoodSetting.NB4);
+		PixelSegmentation test = new PixelSegmentation(new FlexibleImage(eingabe_image), NeighbourhoodSetting.NB4);
 		// PixelSegmentation test = new PixelSegmentation(testArray, NeighbourhoodSetting.NB4);
 		test.doPixelSegmentation(3);
 		// PrintImage.printImage(ImageConverter.convert2ABto2AcolorFull(test.getImageMask()));
@@ -696,9 +690,9 @@ public class PixelSegmentation {
 	
 	private void mergeHashMapDritteVariante() {
 		
-		int[] fuellGrad = new int[zaehler]; // enspricht x
-		clusterMap = new int[zaehler]; // entspricht y
-		tableLinks = new int[zaehler][zaehler];// entspricht z
+		int[] fuellGrad = new int[currentClusterId]; // enspricht x
+		clusterMap = new int[currentClusterId]; // entspricht y
+		tableLinks = new int[currentClusterId][currentClusterId];// entspricht z
 		
 		// for (int key : clusterMapping.keySet()) {
 		// for (int value : clusterMapping.get(key)) {
@@ -707,11 +701,11 @@ public class PixelSegmentation {
 		// }
 		// }
 		
-		for (int i = 0; i < zaehler; i++) {
+		for (int i = 0; i < currentClusterId; i++) {
 			clusterMap[i] = -1; // überall wo -1 steht wird dann der Index als Cluster gesetzt
 		}
 		
-		for (int key : clusterMapping.keySet()) {
+		for (int key : equalClusterIds.keySet()) {
 			
 			if (clusterMap[key] != -1) {
 				
@@ -721,7 +715,7 @@ public class PixelSegmentation {
 				clusterMap[key] = key;
 			}
 			
-			for (int value : clusterMapping.get(key)) {
+			for (int value : equalClusterIds.get(key)) {
 				
 				tableLinks[key][fuellGrad[key]] = value;
 				fuellGrad[key] += 1;
@@ -733,7 +727,7 @@ public class PixelSegmentation {
 					tableLinks[value][fuellGrad[value]] = key;
 					fuellGrad[value] += 1;
 				}
-				for (int value2 : clusterMapping.get(key))
+				for (int value2 : equalClusterIds.get(key))
 					if (value != value2) {
 						// System.out.println("value -> value2: " + value + " -> " + value2);
 						tableLinks[value][fuellGrad[value]] = value2;
@@ -770,43 +764,43 @@ public class PixelSegmentation {
 	
 	private void secondPassDritteVariante() {
 		
-		image_cluster_size = new int[zaehler];
+		imageClusterSize = new int[currentClusterId];
 		
 		for (int i = 0; i < src_image.length; i++)
 			for (int j = 0; j < src_image[i].length; j++) {
 				if (clusterMap[image_cluster_ids[i][j]] != -1)
 					image_cluster_ids[i][j] = clusterMap[image_cluster_ids[i][j]];
 				
-				image_cluster_size[image_cluster_ids[i][j]]++;
+				imageClusterSize[image_cluster_ids[i][j]]++;
 			}
 	}
 	
 	private void secondPassToepfe() {
-		int[] clusterMap = new int[zaehler];
-		image_cluster_size = new int[zaehler];
-		for (int i = 0; i < zaehler; i++)
+		int[] clusterMap = new int[currentClusterId];
+		imageClusterSize = new int[currentClusterId];
+		for (int i = 0; i < currentClusterId; i++)
 			clusterMap[i] = i;
 		
-		if (!clusterMapping.isEmpty())
-			for (int clusterID : clusterMapping.keySet())
-				for (int arrayID : clusterMapping.get(clusterID))
+		if (!equalClusterIds.isEmpty())
+			for (int clusterID : equalClusterIds.keySet())
+				for (int arrayID : equalClusterIds.get(clusterID))
 					clusterMap[arrayID] = clusterID;
 		
 		for (int i = 0; i < src_image.length; i++)
 			for (int j = 0; j < src_image[i].length; j++) {
 				image_cluster_ids[i][j] = clusterMap[image_cluster_ids[i][j]];
-				image_cluster_size[image_cluster_ids[i][j]]++;
+				imageClusterSize[image_cluster_ids[i][j]]++;
 			}
 	}
 	
 	private void mergeHashMapToepfe() {
 		
-		ArrayList<HashSet<Integer>> toepfe = new ArrayList<HashSet<Integer>>(clusterMapping.size());
-		for (int key : clusterMapping.keySet()) {
+		ArrayList<HashSet<Integer>> toepfe = new ArrayList<HashSet<Integer>>(); // equalClusterIds.size()
+		for (int key : equalClusterIds.keySet()) {
 			HashSet<Integer> topf = new HashSet<Integer>();
 			topf.add(key);
 			toepfe.add(topf);
-			for (int value : clusterMapping.get(key)) {
+			for (int value : equalClusterIds.get(key)) {
 				topf.add(value);
 			}
 		}
@@ -835,25 +829,25 @@ public class PixelSegmentation {
 				}
 		}
 		
-		clusterMapping.clear();
+		equalClusterIds.clear();
 		for (HashSet<Integer> topf : toepfe) {
 			if (topf.isEmpty())
 				continue;
 			Integer key = topf.iterator().next();
-			topf.remove(key);
-			clusterMapping.put(key, new ArrayList<Integer>(topf));
+			// topf.remove(key);
+			equalClusterIds.put(key, topf);// new ArrayList<Integer>(topf));
 		}
 	}
 	
 	public Vector2d[] getClusterCenterPoints() {
 		
-		Vector2d[] res = new Vector2d[cluster_min_x.length];
-		for (int i = 0; i < cluster_min_x.length; i++) {
-			int w = cluster_max_x[i] - cluster_min_x[i];
-			int h = cluster_max_y[i] - cluster_min_y[i];
+		Vector2d[] res = new Vector2d[clusterMinX.length];
+		for (int i = 0; i < clusterMinX.length; i++) {
+			int w = clusterMaxX[i] - clusterMinX[i];
+			int h = clusterMaxY[i] - clusterMinY[i];
 			
-			int cx = cluster_min_x[i] + w / 2;
-			int cy = cluster_min_y[i] + h / 2;
+			int cx = clusterMinX[i] + w / 2;
+			int cy = clusterMinY[i] + h / 2;
 			
 			res[i] = new Vector2d(cx, cy);
 			
@@ -865,10 +859,10 @@ public class PixelSegmentation {
 	
 	public Vector2d[] getClusterDimension() {
 		
-		Vector2d[] res = new Vector2d[cluster_min_x.length];
-		for (int i = 0; i < cluster_min_x.length; i++) {
-			int w = cluster_max_x[i] - cluster_min_x[i];
-			int h = cluster_max_y[i] - cluster_min_y[i];
+		Vector2d[] res = new Vector2d[clusterMinX.length];
+		for (int i = 0; i < clusterMinX.length; i++) {
+			int w = clusterMaxX[i] - clusterMinX[i];
+			int h = clusterMaxY[i] - clusterMinY[i];
 			
 			res[i] = new Vector2d(w, h);
 		}
