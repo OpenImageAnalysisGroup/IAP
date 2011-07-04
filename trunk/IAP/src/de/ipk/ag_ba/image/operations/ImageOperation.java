@@ -54,8 +54,9 @@ import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
 import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
 import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
+import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
-import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
+import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
@@ -1114,10 +1115,10 @@ public class ImageOperation {
 			cutOffMinimumDimension = 1;
 		}
 		
-		// Segmentation ps = new ClusterDetection(workImage);
-		// ps.detectClusters();
-		PixelSegmentation ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
-		ps.doPixelSegmentation(1);
+		Segmentation ps = new ClusterDetection(workImage);
+		ps.detectClusters();
+		// PixelSegmentation ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
+		// ps.doPixelSegmentation(1);
 		
 		int[] clusterSizes = null;
 		int[] clusterDimensions = null;

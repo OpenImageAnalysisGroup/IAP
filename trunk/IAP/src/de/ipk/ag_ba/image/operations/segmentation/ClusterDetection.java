@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.segmentation;
 
-import java.util.LinkedList;
-
 import org.Vector2d;
 import org.Vector2i;
 
@@ -40,10 +38,11 @@ public class ClusterDetection implements Segmentation {
 				foregroundPixelCount++;
 		}
 		
+		int[] queue = new int[w * h];
 		for (int c : img) {
 			if (c != back && clu[idx] == 0) {
 				currentClusterID++;
-				assignCluster(currentClusterID, x, y);
+				assignCluster(currentClusterID, x, y, queue);
 			}
 			idx++;
 			x++;
@@ -102,21 +101,29 @@ public class ClusterDetection implements Segmentation {
 		}
 	}
 	
-	private void assignCluster(int currentClusterID, int x, int y) {
-		LinkedList<Integer> queue = new LinkedList<Integer>();
+	private void assignCluster(int currentClusterID, int x, int y, int[] queue) {
+		// LinkedList<Integer> queue = new LinkedList<Integer>();
+		int qL = 0, qR = 0;
 		Integer idx = x + y * w;
-		queue.add(idx);
-		while (!queue.isEmpty()) {
-			idx = queue.poll();
+		// queue.add(idx);
+		queue[++qR] = idx;
+		// while (!queue.isEmpty()) {
+		while (qR > qL) {
+			// idx = queue.poll();
+			idx = queue[qL++];
 			clu[idx] = currentClusterID;
 			if (idx > 0 && img[idx - 1] != back && clu[idx - 1] == 0)
-				queue.add(idx - 1);
+				queue[++qR] = idx - 1;
+			// queue.add(idx - 1);
 			if (idx > w && img[idx - w] != back && clu[idx - w] == 0)
-				queue.add(idx - w);
+				queue[++qR] = idx - w;
+			// queue.add(idx - w);
 			if (idx + 1 < img.length && img[idx + 1] != back && clu[idx + 1] == 0)
-				queue.add(idx + 1);
+				queue[++qR] = idx + 1;
+			// queue.add(idx + 1);
 			if (idx < img.length - w && img[idx + w] != back && clu[idx + w] == 0)
-				queue.add(idx + w);
+				queue[++qR] = idx + w;
+			// queue.add(idx + w);
 		}
 	}
 	
