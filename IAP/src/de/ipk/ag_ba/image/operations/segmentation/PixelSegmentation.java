@@ -13,6 +13,7 @@ import java.util.HashSet;
 
 import org.Vector2d;
 
+import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.operations.Position;
 
 /**
@@ -302,7 +303,7 @@ public class PixelSegmentation {
 			for (int j = 0; j < src_image[i].length; j++) {
 				if (src_image[i][j] == 1) {
 					if (i == 0 && j == 0)
-						parse(Position.FIRST_FIELD);
+						parse(Position.TOP_LEFT_PIXEL);
 					else
 						if (i == 0)
 							parse(Position.FIRST_ROW, 0, j);
@@ -311,9 +312,9 @@ public class PixelSegmentation {
 								parse(Position.FIRST_COLUMN, i);
 							else
 								if (j == src_image[i].length - 1 && nb)
-									parse(Position.LAST_COLUMN, i, j);
+									parse(Position.LAST_ROW, i, j);
 								else
-									parse(Position.REMAINING, i, j);
+									parse(Position.INNER_REGION, i, j);
 				}
 			}
 		}
@@ -376,7 +377,7 @@ public class PixelSegmentation {
 		int pixelTR, pixelT, pixelTL, pixelL;
 		
 		switch (position) { // Ecke links oben und rechts oben
-			case FIRST_FIELD:
+			case TOP_LEFT_PIXEL:
 				image_cluster_ids[i][j] = zaehler;
 				zaehler++;
 				
@@ -431,7 +432,7 @@ public class PixelSegmentation {
 			
 			// alles bis auf den linken, rechten (bei 8er Nachbarschaft) und oberen
 			// Rand
-			case REMAINING:
+			case INNER_REGION:
 				if (!nb) { // 4er
 				
 					pixelT = image_cluster_ids[i - 1][j];
@@ -531,7 +532,7 @@ public class PixelSegmentation {
 				break;
 			
 			// letzte Spalte rechts, nicht die Ecke oben
-			case LAST_COLUMN:
+			case LAST_ROW:
 				pixelT = image_cluster_ids[i - 1][j];
 				pixelTL = image_cluster_ids[i - 1][j - 1];
 				pixelL = image_cluster_ids[i][j - 1];
@@ -923,17 +924,26 @@ public class PixelSegmentation {
 		return normalizedClusterAreaSizes;
 	}
 	
-	public int[] getClusterDimensionMinWH(Vector2d[] vector2ds) {
+	public int[] getClusterDimensionMinWH() {
+		Vector2d[] vector2ds = getClusterDimension();
 		int[] res = new int[vector2ds.length];
 		for (int index = 0; index < vector2ds.length; index++) {
-			double w = vector2ds[index].getX();
-			double h = vector2ds[index].getY();
+			double w = vector2ds[index].x;
+			double h = vector2ds[index].y;
 			if (w > h)
 				res[index] = (int) h;
 			else
 				res[index] = (int) w;
 		}
 		return res;
+	}
+	
+	public int[] getImage1A() {
+		return ImageConverter.convert2Ato1A(src_image);
+	}
+	
+	public int[] getImageClusterIdMask() {
+		return ImageConverter.convert2Ato1A(image_cluster_ids);
 	}
 	
 }
