@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -976,14 +975,8 @@ public class GravistoService implements HelperClass {
 	
 	@SuppressWarnings("unchecked")
 	public static IOurl getIOurl(Class location, String filename, String optExt) throws IOException {
-		File f;
+		File f = new File(getResource(location, filename).getFile());
 		
-		URL preURL = new URL(getResource(location, filename).toExternalForm());
-		try {
-			f = new File(preURL.toURI());
-		} catch (URISyntaxException e) {
-			f = new File(preURL.getPath());
-		}
 		String transformedURL = f.toString().replace("\\", "/");
 		
 		return new IOurl(transformedURL);
