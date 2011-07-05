@@ -2,16 +2,16 @@ package de.ipk.ag_ba.image.operations;
 
 import java.awt.geom.Rectangle2D;
 
-import org.Vector2d;
+import org.Vector2i;
 
 public class LargeCluster implements Comparable<LargeCluster> {
 	
-	private final Vector2d dimension;
-	private final Vector2d center;
+	private final Vector2i dimension;
+	private final Vector2i center;
 	private final int size;
 	private final int index;
 	
-	public LargeCluster(Vector2d dimension, Vector2d center, int size, int index) {
+	public LargeCluster(Vector2i dimension, Vector2i center, int size, int index) {
 		this.dimension = dimension;
 		this.center = center;
 		this.size = size;

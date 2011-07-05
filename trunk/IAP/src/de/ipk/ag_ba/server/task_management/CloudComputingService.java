@@ -111,17 +111,28 @@ public class CloudComputingService {
 						e1.printStackTrace();
 					}
 				} else
-					if ((args[0] + "").equalsIgnoreCase("merge")) {
-						merge();
-						return;
-					} else {
-						System.out.println(": Valid command line parameters:");
-						System.out.println("   'half'  - use half of the CPUs");
-						System.out.println("   'full'  - use all of the CPUs");
-						System.out.println("   'nnn'   - use specified number of CPUs");
-						System.out.println("   'clear' - clear scheduled tasks");
-						System.out.println("   'merge' - in case of error (merge interrupted previously), merge temporary results");
-					}
+					if ((args[0] + "").toLowerCase().startsWith("perf")) {
+						try {
+							System.out.println(":perf - perform performance test (TestPipelineMaize Copy)");
+							PerformanceTest p = new PerformanceTest();
+							p.testPipeline();
+							return;
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					} else
+						if ((args[0] + "").equalsIgnoreCase("merge")) {
+							merge();
+							return;
+						} else {
+							System.out.println(": Valid command line parameters:");
+							System.out.println("   'half'  - use half of the CPUs");
+							System.out.println("   'full'  - use all of the CPUs");
+							System.out.println("   'nnn'   - use specified number of CPUs");
+							System.out.println("   'clear' - clear scheduled tasks");
+							System.out.println("   'merge' - in case of error (merge interrupted previously), merge temporary results");
+							System.out.println("   'perf'  - perform performance test");
+						}
 			}
 		}
 		SystemInfoExt si = new SystemInfoExt();

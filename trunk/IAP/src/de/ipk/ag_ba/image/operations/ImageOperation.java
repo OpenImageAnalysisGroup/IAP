@@ -44,6 +44,7 @@ import org.ObjectRef;
 import org.ReleaseInfo;
 import org.SystemAnalysis;
 import org.Vector2d;
+import org.Vector2i;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -1130,8 +1131,8 @@ public class ImageOperation {
 			optClusterSizeReturn.setObject(ps.getClusterSize());
 		clusterDimensions = ps.getClusterDimensionMinWH();
 		
-		Vector2d[] clusterCenter = ps.getClusterCenterPoints();
-		Vector2d[] clusterDimensions2d = ps.getClusterDimension();
+		Vector2i[] clusterCenter = ps.getClusterCenterPoints();
+		Vector2i[] clusterDimensions2d = ps.getClusterDimension();
 		clusterSizes = ps.getClusterSize();
 		
 		HashSet<Integer> toBeDeletedClusterIDs = new HashSet<Integer>();

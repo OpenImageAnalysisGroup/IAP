@@ -600,30 +600,37 @@ public class ColorUtil {
 	 * returns double arrays for L A B, range 0..255
 	 */
 	public static void getLABfromRGBvar2(int[] arrayRGB, double[] arrayL, double[] arrayA, double[] arrayB, boolean filterBackground, int iBackgroundColor) {
-		int c = 0;
 		int r, g, b;
-		double Li, ai, bi;
 		
-		for (int idx = 0; idx < arrayRGB.length; idx++) {
-			c = arrayRGB[idx];
-			
-			if (filterBackground && c == iBackgroundColor) {
-				arrayL[idx] = 0;
-				arrayA[idx] = 0;
-				arrayB[idx] = 0;
-			} else {
-				// RGB to XYZ
+		if (filterBackground) {
+			int idx = 0;
+			for (int c : arrayRGB) {
+				if (c == iBackgroundColor) {
+					arrayL[idx] = 0;
+					arrayA[idx] = 0;
+					arrayB[idx] = 0;
+				} else {
+					r = ((c & 0xff0000) >> 16);
+					g = ((c & 0x00ff00) >> 8);
+					b = (c & 0x0000ff);
+					
+					arrayL[idx] = ImageOperation.labCube[r][g][b];
+					arrayL[idx] = ImageOperation.labCube[r][g][b + 256];
+					arrayB[idx] = ImageOperation.labCube[r][g][b + 512];
+				}
+				idx++;
+			}
+		} else {
+			int idx = 0;
+			for (int c : arrayRGB) {
 				r = ((c & 0xff0000) >> 16);
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = ImageOperation.labCube[r][g][b];
-				ai = ImageOperation.labCube[r][g][b + 256];
-				bi = ImageOperation.labCube[r][g][b + 512];
-				
-				arrayL[idx] = Li;
-				arrayA[idx] = ai;
-				arrayB[idx] = bi;
+				arrayL[idx] = ImageOperation.labCube[r][g][b];
+				arrayL[idx] = ImageOperation.labCube[r][g][b + 256];
+				arrayB[idx] = ImageOperation.labCube[r][g][b + 512];
+				idx++;
 			}
 		}
 	}
