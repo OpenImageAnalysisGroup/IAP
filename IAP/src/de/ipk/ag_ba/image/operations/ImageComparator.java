@@ -72,7 +72,7 @@ public class ImageComparator {
 			}
 			
 			if (adaptiveDependingOnIntensity) {
-				double lmean = (((labImage[0][index] + labImageRef[0][index]) / 2) / 255d);
+				double lmean = (((labImage[0][index] + labImageRef[0][index]) / 2d) / 255d);
 				adaption = lmean * lmean * lmean;
 			}
 			

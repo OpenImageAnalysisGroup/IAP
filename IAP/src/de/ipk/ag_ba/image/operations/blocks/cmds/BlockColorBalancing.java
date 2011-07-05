@@ -61,6 +61,34 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		return io.imageBalancing(255, pix).invert().getImage();
 	}
 	
+	@Override
+	protected FlexibleImage processNIRimage() {
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (getInput().getImages().getNir() != null) {
+				double side = 0.3; // value for white balancing (side width)
+				FlexibleImage nir = getInput().getImages().getNir();
+				// White Balancing
+				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.crop(), side);// 0.08);
+				return new ImageOperation(nir).imageBalancing(255, pix).getImage();
+			}
+		}
+		return getInput().getImages().getNir();
+	}
+	
+	@Override
+	protected FlexibleImage processNIRmask() {
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (getInput().getMasks().getNir() != null) {
+				double side = 0.3; // value for white balancing (side width)
+				FlexibleImage nir = getInput().getMasks().getNir();
+				// White Balancing
+				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.crop(), side);// 0.08);
+				return new ImageOperation(nir).imageBalancing(255, pix).getImage();
+			}
+		}
+		return getInput().getMasks().getNir();
+	}
+	
 	/**
 	 * Calculates the average of the brightness of an area around an image.
 	 * 
