@@ -40,7 +40,7 @@ public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 		
 		int back = options.getBackground();
 		
-		ImageOperation.doThresholdLAB(width, height, image, result,
+		ImageOperation.thresholdLABunclear2(width, height, image, result,
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,

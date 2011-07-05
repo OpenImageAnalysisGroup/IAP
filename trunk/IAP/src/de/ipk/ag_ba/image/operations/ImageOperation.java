@@ -1317,25 +1317,29 @@ public class ImageOperation {
 		int[] resultImage = new int[width * height];
 		int[] img2d = getImageAs1array();
 		
-		doThresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
+		thresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB, background, typ);
 		
 		return new ImageOperation(resultImage, width, height);
 	}
 	
-	public static void doThresholdLAB(int width, int height, int[] img2d, int[] resultImage,
+	public static void thresholdLAB(int width, int height, int[] img2d, int[] resultImage,
 			int lowerValueOfL, int upperValueOfL,
 			int lowerValueOfA, int upperValueOfA,
 			int lowerValueOfB, int upperValueOfB,
 			int background, CameraPosition typ) {
 		
-		doThresholdLAB(width, height, img2d, resultImage,
+		thresholdLABunclear2(width, height, img2d, resultImage,
 				new int[] { lowerValueOfL }, new int[] { upperValueOfL }, new int[] { lowerValueOfA }, new int[] { upperValueOfA }, new int[] { lowerValueOfB },
 				new int[] { upperValueOfB }, background, typ);
 		
 	}
 	
-	public static void doThresholdLAB(int width, int height, int[] img2d, int[] resultImage,
+	/**
+	 * A method with the same name (without the "unclear2") exists,
+	 * it is unclear if there is a difference.
+	 */
+	public static void thresholdLABunclear2(int width, int height, int[] img2d, int[] resultImage,
 			int[] lowerValueOfL, int[] upperValueOfL,
 			int[] lowerValueOfA, int[] upperValueOfA,
 			int[] lowerValueOfB, int[] upperValueOfB,
@@ -1641,13 +1645,31 @@ public class ImageOperation {
 	 * @return Binary image.
 	 * @author pape
 	 */
-	public ImageOperation threshold(int cutValue) {
+	public ImageOperation thresholdCreateBinaryImage(int cutValue) {
 		ByteProcessor byteProcessor = new BinaryProcessor(
 				(ByteProcessor) image.getProcessor());
 		byteProcessor.threshold(cutValue);
 		
 		// image ==> byteProcessor.getBufferedImage() (ck, 26.6.11)
 		return new ImageOperation(image);
+	}
+	
+	public ImageOperation thresholdBlueHigherThan(int threshold) {
+		int[] res = getImageAs1array();
+		int b;
+		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int idx = 0;
+		for (int c : res) {
+			if (c == back) {
+				idx++;
+				continue;
+			}
+			b = (c & 0x0000ff);
+			if (b > threshold)
+				res[idx] = back;
+			idx++;
+		}
+		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
 	
 	public ImageOperation enhanceContrast() {
@@ -1943,8 +1965,6 @@ public class ImageOperation {
 	public int countFilledPixels() {
 		int res = 0;
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
-		int width = image.getWidth();
-		int height = image.getHeight();
 		int[] img1d = getImageAs1array();
 		
 		for (int c : img1d) {
@@ -1955,26 +1975,27 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * The sum of the intensities of non-background pixels will be calculated. The intensity (0..1) of the red channel is analyzed.
+	 * The sum of the intensities of non-background pixels will be calculated. The intensity (0..1) of the blue channel is analyzed.
 	 * 
 	 * @param b
 	 * @return
 	 */
-	public double intensitySumOfChannelRed(boolean performGrayScale) {
+	public double intensitySumOfChannelBlue(boolean performGrayScale) {
 		double res = 0;
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		int[] img2d = getImageAs1array();
 		
-		int[] grayScale = img2d;
+		int[] grayScaledIfNeeded;
 		if (performGrayScale)
-			grayScale = convert2Grayscale().getImageAs1array();
+			grayScaledIfNeeded = convert2Grayscale().getImageAs1array();
+		else
+			grayScaledIfNeeded = img2d;
 		
 		int idx = 0;
 		for (int c : img2d) {
 			if (c != background) {
-				// res++;
-				int cg = grayScale[idx];
-				double rf = ((cg & 0xff0000) >> 16) / 255.0; // R 0..1
+				int cg = grayScaledIfNeeded[idx];
+				double rf = (cg & 0xff) / 255.0; // B 0..1
 				res += rf;
 			}
 			idx++;

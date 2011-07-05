@@ -168,7 +168,7 @@ public class ImageOperationTest {
 
 						ImageOperation io7 = new ImageOperation(fluoImage,
 								imgTest.getWidth(), imgTest.getHeight());
-						io7 = io7.threshold(254);
+						io7 = io7.thresholdCreateBinaryImage(254);
 						GravistoService.showImage(
 								io7.getImageAsBufferedImage(), "Threshold");
 

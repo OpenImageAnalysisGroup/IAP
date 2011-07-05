@@ -154,7 +154,18 @@ public class ImageProcessorOptions {
 	}
 	
 	public enum CameraPosition {
-		UNKNOWN, TOP, SIDE
+		UNKNOWN, TOP, SIDE;
+		
+		@Override
+		public String toString() {
+			switch (this) {
+				case TOP:
+					return "top";
+				case SIDE:
+					return "side";
+			}
+			return "unknown_camera_pos";
+		}
 	}
 	
 	public enum ImageTyp {

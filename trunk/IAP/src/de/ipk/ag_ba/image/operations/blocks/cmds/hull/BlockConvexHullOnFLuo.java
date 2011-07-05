@@ -25,7 +25,7 @@ public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
 			System.err.println("ERROR: BlockConvexHullOnFLuo: Input Fluo Mask is NULL!");
 			return null;
 		}
-		ImageOperation res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(true, false, true, true, Color.RED.getRGB(), Color.BLUE.getRGB(),
+		ImageOperation res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(true, false, false, false, Color.RED.getRGB(), Color.BLUE.getRGB(),
 				Color.ORANGE.getRGB());
 		
 		ResultsTable numericResults = res.getResultsTable();

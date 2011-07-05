@@ -34,7 +34,7 @@ public class BlockLabFilterMaskToMaskBlack extends AbstractSnapshotAnalysisBlock
 		
 		int back = options.getBackground();
 		
-		ImageOperation.doThresholdLAB(width, height, image, result,
+		ImageOperation.thresholdLAB(width, height, image, result,
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
