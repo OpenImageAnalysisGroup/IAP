@@ -1391,7 +1391,7 @@ public class ImageOperation {
 	}
 	
 	public static float[][][] getLabCube() {
-		StopWatch s = new StopWatch("lab_cube", true);
+		StopWatch s = new StopWatch("lab_cube", false);
 		final float step = 1f / 255f;
 		final float[][][] result = new float[256][256][256 * 3];
 		ExecutorService executor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());

@@ -17,9 +17,17 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
-		if (url.isEqualPrefix(getPrefix()))
-			return new BufferedInputStream(new FileInputStream(url.getDetail() + IOurl.SEPERATOR + url.getFileName()));
-		else
+		if (url.isEqualPrefix(getPrefix())) {
+			File file = new File(url.getDetail() + IOurl.SEPERATOR + url.getFileName());
+			if (file.exists()) {
+				FileInputStream fis = new FileInputStream(file);
+				return new BufferedInputStream(fis);
+			} else {
+				String fn = url.getDetail() + IOurl.SEPERATOR + url.getFileName();
+				fn = fn.substring(fn.indexOf("!") + 1);
+				return getClass().getResourceAsStream(fn);
+			}
+		} else
 			return null;
 	}
 	
