@@ -1360,7 +1360,6 @@ public class MongoDB {
 	 */
 	public ArrayList<CloudHost> batchGetAvailableHosts(final long maxUpdate) throws Exception {
 		final ArrayList<CloudHost> res = new ArrayList<CloudHost>();
-		final long curr = System.currentTimeMillis();
 		processDB(new RunnableOnDB() {
 			private DB db;
 			
@@ -1369,13 +1368,20 @@ public class MongoDB {
 				DBCollection dbc = db.getCollection("compute_hosts");
 				dbc.setObjectClass(CloudHost.class);
 				
+				ArrayList<CloudHost> del = new ArrayList<CloudHost>();
+				
 				DBCursor cursor = dbc.find();
+				final long curr = System.currentTimeMillis();
 				while (cursor.hasNext()) {
 					CloudHost h = (CloudHost) cursor.next();
-					if (curr - h.getLastUpdateTime() < maxUpdate)
+					if (curr - h.getLastUpdateTime() < maxUpdate) {
 						res.add(h);
-					
+					} else
+						if (curr - h.getLastUpdateTime() > 1000 * 60 * 5)
+							del.add(h);
 				}
+				for (CloudHost d : del)
+					dbc.remove(d);
 			}
 			
 			@Override
