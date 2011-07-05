@@ -1391,6 +1391,8 @@ public class ImageOperation {
 	}
 	
 	public static float[][][] getLabCube() {
+		if (IAPservice.getCurrentTimeAsNiceString()==null)
+			System.out.println();
 		StopWatch s = new StopWatch("lab_cube", false);
 		final float step = 1f / 255f;
 		final float[][][] result = new float[256][256][256 * 3];
@@ -1426,20 +1428,20 @@ public class ImageOperation {
 							
 							// XYZ to Lab
 							if (X > 0.008856)
-								fX = (float) Math.pow(X, ot);
-							// fX = IAPservice.cubeRoots[(int) (1000 * X)];
+								// 	fX = (float) Math.pow(X, ot);
+							fX = IAPservice.cubeRoots[(int) (1000 * X)];
 							else
 								fX = (7.78707f * X) + cont;// 7.7870689655172
 								
 							if (Y > 0.008856)
-								fY = (float) Math.pow(Y, ot);
-							// fY = IAPservice.cubeRoots[(int) (1000 * Y)];
+								// fY = (float) Math.pow(Y, ot);
+							fY = IAPservice.cubeRoots[(int) (1000 * Y)];
 							else
 								fY = (7.78707f * Y) + cont;
 							
 							if (Z > 0.008856)
-								fZ = (float) Math.pow(Z, ot);
-							// fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
+								// 	fZ = (float) Math.pow(Z, ot);
+							 fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
 							else
 								fZ = (7.78707f * Z) + cont;
 							
@@ -1474,15 +1476,7 @@ public class ImageOperation {
 		return IAPservice.cubeRoots[(int) (1000 * v)];
 	}
 	
-	public static float[] getCubeRoots(float lo, float up, int n) {
-		float[] res = new float[n + 1];
-		float sq = 1f / 3f;
-		for (int i = 0; i <= n; i++) {
-			float x = lo + i * (up - lo) / n;
-			res[i] = (float) Math.pow(x, sq);
-		}
-		return res;
-	}
+	
 	
 	private static boolean isGray(int li, int ai, int bi, int maxDiffAleftBright, int maxDiffArightBleft) {
 		ai = ai - 127;
