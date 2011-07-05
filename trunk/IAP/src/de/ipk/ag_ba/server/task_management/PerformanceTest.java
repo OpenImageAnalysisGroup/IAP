@@ -38,57 +38,29 @@ public class PerformanceTest {
 		if (ImageOperation.labCube == null)
 			System.out.println("LAB cube could not be initialized (impossible internal error)");
 		
-		boolean side = true;
-		boolean top = false;
+		FlexibleImage imgVis = PerformanceTestImages.getImage(ImageNames.MAIZE_VIS_SIDE_BELONG_TO_REFERENCE_1386);
+		FlexibleImage imgFluo = PerformanceTestImages.getImage(ImageNames.MAIZE_FLU_SIDE_BELONG_TO_REFERENCE_1386);
+		FlexibleImage imgNir = PerformanceTestImages.getImage(ImageNames.MAIZE_NIR_SIDE_BELONG_TO_REFERENCE_1386);
 		
-		if (side) {
-			// -----------------------------Side------------------------------------------------------------
-			FlexibleImage imgVisible = PerformanceTestImages.getImage(ImageNames.MAIZE_VIS_BELONG_TO_REFERENCE_1);
-			FlexibleImage imgFluor = PerformanceTestImages.getImage(ImageNames.MAIZE_FLU_BELONG_TO_REFERENCE_0);
-			FlexibleImage imgNIR = PerformanceTestImages.getImage(ImageNames.MAIZE_NIR_BELONG_TO_REFERENCE_0);
-			
-			FlexibleImage ref_imgVisible = PerformanceTestImages.getImage(ImageNames.MAIZE_VIS_REFERENCE_1);
-			FlexibleImage ref_imgFluo = PerformanceTestImages.getImage(ImageNames.MAIZE_FLU_REFERENCE_0);
-			FlexibleImage ref_imgNIR = PerformanceTestImages.getImage(ImageNames.MAIZE_NIR_REFERENCE_0);
-			
-			FlexibleImage imgVis = PerformanceTestImages.getImage(ImageNames.MAIZE_VIS_SIDE_BELONG_TO_REFERENCE_1386);
-			FlexibleImage imgFluo = PerformanceTestImages.getImage(ImageNames.MAIZE_FLU_SIDE_BELONG_TO_REFERENCE_1386);
-			FlexibleImage imgNir = PerformanceTestImages.getImage(ImageNames.MAIZE_NIR_SIDE_BELONG_TO_REFERENCE_1386);
-			
-			FlexibleImage imgVisRef = PerformanceTestImages.getImage(ImageNames.MAIZE_VIS_SIDE_REFERENCE_1386);
-			FlexibleImage imgFluoRef = PerformanceTestImages.getImage(ImageNames.MAIZE_FLU_SIDE_REFERENCE_1386);
-			FlexibleImage imgNirRef = PerformanceTestImages.getImage(ImageNames.MAIZE_NIR_SIDE_REFERENCE_1386);
-			StopWatch school;
-			boolean oldschool = true;
-			if (oldschool) {
-				BlockRemoveSmallClustersOnFluo.ngUse = false;
-				BlockRemoveSmallClusters.ngUse = false;
-				FlexibleImage fc = imgFluo.copy();
-				FlexibleImage nc = imgFluoRef.copy();
-				school = new StopWatch("oldschool");
-				testSide("oldschool", imgVis, imgVisRef, fc, nc, imgNir, imgNirRef, "1");
-				school.printTime();
-			}
-			BlockRemoveSmallClustersOnFluo.ngUse = true;
-			BlockRemoveSmallClusters.ngUse = true;
-			school = new StopWatch("newschool");
-			testSide("newschool", imgVis, imgVisRef, imgFluo, imgFluoRef, imgNir, imgNirRef, "1");
+		FlexibleImage imgVisRef = PerformanceTestImages.getImage(ImageNames.MAIZE_VIS_SIDE_REFERENCE_1386);
+		FlexibleImage imgFluoRef = PerformanceTestImages.getImage(ImageNames.MAIZE_FLU_SIDE_REFERENCE_1386);
+		FlexibleImage imgNirRef = PerformanceTestImages.getImage(ImageNames.MAIZE_NIR_SIDE_REFERENCE_1386);
+		StopWatch school;
+		boolean oldschool = true;
+		if (oldschool) {
+			BlockRemoveSmallClustersOnFluo.ngUse = false;
+			BlockRemoveSmallClusters.ngUse = false;
+			FlexibleImage fc = imgFluo.copy();
+			FlexibleImage nc = imgFluoRef.copy();
+			school = new StopWatch("oldschool");
+			testSide("oldschool", imgVis, imgVisRef, fc, nc, imgNir, imgNirRef, "1");
 			school.printTime();
-			// testSide(imgVisible, ref_imgVisible, imgFluor, ref_imgFluo, imgNIR, ref_imgNIR, "2");
 		}
-		
-		if (top) {
-			// -----------------------------Top-------------------------------------------------------------
-			FlexibleImage imgVisTop = PerformanceTestImages.getImage(ImageNames.MAIZE_TOP_BELONG_TO_REFERENCE_0);
-			FlexibleImage imgFluoTop = PerformanceTestImages.getImage(ImageNames.MAIZE_TOP_FLU_BELONG_TO_REFERENCE_0);
-			FlexibleImage imgNirTop = PerformanceTestImages.getImage(ImageNames.MAIZE_TOP_NIR_BELONG_TO_REFERENCE_0);
-			
-			FlexibleImage imgVisTopRef = PerformanceTestImages.getImage(ImageNames.MAIZE_TOP_REFERENCE_0);
-			FlexibleImage imgFluoTopRef = PerformanceTestImages.getImage(ImageNames.MAIZE_TOP_FLU_REFERENCE_0);
-			FlexibleImage imgNirTopRef = PerformanceTestImages.getImage(ImageNames.MAIZE_TOP_NIR_REFERENCE_0);
-			
-			testTop(imgVisTop, imgVisTopRef, imgFluoTop, imgFluoTopRef, imgNirTop, imgNirTopRef);
-		}
+		BlockRemoveSmallClustersOnFluo.ngUse = true;
+		BlockRemoveSmallClusters.ngUse = true;
+		school = new StopWatch("newschool");
+		testSide("newschool", imgVis, imgVisRef, imgFluo, imgFluoRef, imgNir, imgNirRef, "1");
+		school.printTime();
 	}
 	
 	public void testSide(String debugInfo, FlexibleImage imgVis, FlexibleImage imgVisRef, FlexibleImage imgFluo, FlexibleImage imgFluoRef, FlexibleImage imgNir,

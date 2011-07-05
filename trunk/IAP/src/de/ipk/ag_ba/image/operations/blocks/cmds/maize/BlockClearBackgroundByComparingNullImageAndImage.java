@@ -96,7 +96,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			FlexibleImage nir = getInput().getImages().getNir();
 			return new ImageOperation(nir).compare()
 					.compareGrayImages(getInput().getMasks().getNir(), 25, 15, options.getBackground())
-					.printImage("result nir", true).thresholdBlueHigherThan(200).border(2).getImage();
+					.printImage("result nir", false).thresholdBlueHigherThan(200).border(2).getImage();
 		}
 		throw new UnsupportedOperationException("Unknown camera setting.");
 	}
