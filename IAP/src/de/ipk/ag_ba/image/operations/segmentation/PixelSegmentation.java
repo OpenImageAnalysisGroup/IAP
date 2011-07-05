@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.Vector2d;
+import org.Vector2i;
 
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.operations.Position;
@@ -841,9 +842,9 @@ public class PixelSegmentation implements Segmentation {
 		}
 	}
 	
-	public Vector2d[] getClusterCenterPoints() {
+	public Vector2i[] getClusterCenterPoints() {
 		
-		Vector2d[] res = new Vector2d[clusterMinX.length];
+		Vector2i[] res = new Vector2i[clusterMinX.length];
 		for (int i = 0; i < clusterMinX.length; i++) {
 			int w = clusterMaxX[i] - clusterMinX[i];
 			int h = clusterMaxY[i] - clusterMinY[i];
@@ -851,7 +852,7 @@ public class PixelSegmentation implements Segmentation {
 			int cx = clusterMinX[i] + w / 2;
 			int cy = clusterMinY[i] + h / 2;
 			
-			res[i] = new Vector2d(cx, cy);
+			res[i] = new Vector2i(cx, cy);
 			
 			// System.out.println("Center of Cluster = " + i + " Point X = " + cx + " Y = " + cy);
 		}
@@ -859,14 +860,14 @@ public class PixelSegmentation implements Segmentation {
 		return res;
 	}
 	
-	public Vector2d[] getClusterDimension() {
+	public Vector2i[] getClusterDimension() {
 		
-		Vector2d[] res = new Vector2d[clusterMinX.length];
+		Vector2i[] res = new Vector2i[clusterMinX.length];
 		for (int i = 0; i < clusterMinX.length; i++) {
 			int w = clusterMaxX[i] - clusterMinX[i];
 			int h = clusterMaxY[i] - clusterMinY[i];
 			
-			res[i] = new Vector2d(w, h);
+			res[i] = new Vector2i(w, h);
 		}
 		
 		return res;
@@ -874,7 +875,7 @@ public class PixelSegmentation implements Segmentation {
 	
 	public int[] getClusterSizeNormalized(int w, int h) {
 		
-		Vector2d[] clusterCenters = getClusterCenterPoints();
+		Vector2i[] clusterCenters = getClusterCenterPoints();
 		int[] normalizedClusterAreaSizes = new int[getClusterSize().length];
 		int[] clusterAreaSizes = getClusterSize();
 		
@@ -883,7 +884,7 @@ public class PixelSegmentation implements Segmentation {
 		
 		if (true)
 			for (int cluster = 1; cluster < clusterAreaSizes.length; cluster++) {
-				Vector2d centerOfCluster = clusterCenters[cluster];
+				Vector2i centerOfCluster = clusterCenters[cluster];
 				
 				double distanceFromCenterOfClusterToCenterOfImage = centerOfCluster.distance(w / 2.5d, h / 2.5d);
 				
@@ -902,11 +903,11 @@ public class PixelSegmentation implements Segmentation {
 		
 		if (false)
 			for (int cluster = 1; cluster < clusterAreaSizes.length; cluster++) {
-				Vector2d center = clusterCenters[cluster];
+				Vector2i center = clusterCenters[cluster];
 				
 				double distanceFromCenterToCluster = clusterCenters[0].distance(center);
 				
-				distanceFromCenterToLeftTopEdge = clusterCenters[0].distance(new Vector2d(0, 0));
+				distanceFromCenterToLeftTopEdge = clusterCenters[0].distance(new Vector2i(0, 0));
 				
 				double d = ((distanceFromCenterToLeftTopEdge - distanceFromCenterToCluster) < 0) ? 0
 						: (distanceFromCenterToLeftTopEdge - distanceFromCenterToCluster);
@@ -921,15 +922,15 @@ public class PixelSegmentation implements Segmentation {
 	}
 	
 	public int[] getClusterDimensionMinWH() {
-		Vector2d[] vector2ds = getClusterDimension();
+		Vector2i[] vector2ds = getClusterDimension();
 		int[] res = new int[vector2ds.length];
 		for (int index = 0; index < vector2ds.length; index++) {
-			double w = vector2ds[index].x;
-			double h = vector2ds[index].y;
+			int w = vector2ds[index].x;
+			int h = vector2ds[index].y;
 			if (w > h)
-				res[index] = (int) h;
+				res[index] = h;
 			else
-				res[index] = (int) w;
+				res[index] = w;
 		}
 		return res;
 	}

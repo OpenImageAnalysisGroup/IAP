@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.image.operations.segmentation;
 
-import org.Vector2d;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -14,8 +13,8 @@ public class ClusterDetection implements Segmentation {
 	private final int back;
 	private int[] clusterPixelCount;
 	private int numberOfClusters;
-	private Vector2d[] centerPoints;
-	private Vector2d[] widthAndHeight;
+	private Vector2i[] centerPoints;
+	private Vector2i[] widthAndHeight;
 	private int foregroundPixelCount;
 	
 	public ClusterDetection(FlexibleImage image, int background) {
@@ -74,19 +73,19 @@ public class ClusterDetection implements Segmentation {
 					y++;
 				}
 			}
-			this.centerPoints = new Vector2d[numberOfClusters + 1];
-			this.widthAndHeight = new Vector2d[numberOfClusters + 1];
+			this.centerPoints = new Vector2i[numberOfClusters + 1];
+			this.widthAndHeight = new Vector2i[numberOfClusters + 1];
 			for (int i = 0; i <= numberOfClusters; i++) {
-				double xd = (clusterMaxXY[i].x - clusterMinXY[i].x) / 2d + clusterMinXY[i].x;
-				double yd = (clusterMaxXY[i].x - clusterMinXY[i].x) / 2d + clusterMinXY[i].x;
-				double wd = clusterMaxXY[i].x - clusterMinXY[i].x;
-				double hd = clusterMaxXY[i].y - clusterMinXY[i].y;
-				centerPoints[i] = new Vector2d(xd, yd);
-				widthAndHeight[i] = new Vector2d(wd, hd);
+				int xd = (clusterMaxXY[i].x - clusterMinXY[i].x) / 2 + clusterMinXY[i].x;
+				int yd = (clusterMaxXY[i].x - clusterMinXY[i].x) / 2 + clusterMinXY[i].x;
+				int wd = clusterMaxXY[i].x - clusterMinXY[i].x;
+				int hd = clusterMaxXY[i].y - clusterMinXY[i].y;
+				centerPoints[i] = new Vector2i(xd, yd);
+				widthAndHeight[i] = new Vector2i(wd, hd);
 			}
 		} else {
-			this.centerPoints = new Vector2d[0];
-			this.widthAndHeight = new Vector2d[0];
+			this.centerPoints = new Vector2i[0];
+			this.widthAndHeight = new Vector2i[0];
 		}
 	}
 	
@@ -132,12 +131,12 @@ public class ClusterDetection implements Segmentation {
 	}
 	
 	@Override
-	public Vector2d[] getClusterCenterPoints() {
+	public Vector2i[] getClusterCenterPoints() {
 		return centerPoints;
 	}
 	
 	@Override
-	public Vector2d[] getClusterDimension() {
+	public Vector2i[] getClusterDimension() {
 		return widthAndHeight;
 	}
 	
@@ -158,15 +157,15 @@ public class ClusterDetection implements Segmentation {
 	
 	@Override
 	public int[] getClusterDimensionMinWH() {
-		Vector2d[] vector2ds = getClusterDimension();
+		Vector2i[] vector2ds = getClusterDimension();
 		int[] res = new int[vector2ds.length];
 		for (int index = 0; index < vector2ds.length; index++) {
-			double w = vector2ds[index].x;
-			double h = vector2ds[index].y;
+			int w = vector2ds[index].x;
+			int h = vector2ds[index].y;
 			if (w > h)
-				res[index] = (int) h;
+				res[index] = h;
 			else
-				res[index] = (int) w;
+				res[index] = w;
 		}
 		return res;
 	}

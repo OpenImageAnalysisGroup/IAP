@@ -1,14 +1,14 @@
 package de.ipk.ag_ba.image.operations.segmentation;
 
-import org.Vector2d;
+import org.Vector2i;
 
 public interface Segmentation {
 	
 	public abstract void detectClusters();
 	
-	public abstract Vector2d[] getClusterCenterPoints();
+	public abstract Vector2i[] getClusterCenterPoints();
 	
-	public abstract Vector2d[] getClusterDimension();
+	public abstract Vector2i[] getClusterDimension();
 	
 	public abstract int[] getClusterSize();
 	
