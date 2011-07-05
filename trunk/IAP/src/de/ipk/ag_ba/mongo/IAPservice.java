@@ -7,6 +7,8 @@
 
 package de.ipk.ag_ba.mongo;
 
+import info.StopWatch;
+
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -482,5 +484,17 @@ public class IAPservice {
 		return result;
 	}
 
-	public final static float[] cubeRoots = ImageOperation.getCubeRoots(0f, 1.1f, 1100);
+	public final static float[] cubeRoots = getCubeRoots(0f, 1.1f, 1100);
+	
+	public static float[] getCubeRoots(float lo, float up, int n) {
+		StopWatch s = new StopWatch("cube_roots", false);
+		float[] res = new float[n + 1];
+		float sq = 1f / 3f;
+		for (int i = 0; i <= n; i++) {
+			float x = lo + i * (up - lo) / n;
+			res[i] = (float) Math.pow(x, sq);
+		}
+		s.printTime();
+		return res;
+	}
 }

@@ -6,6 +6,8 @@
  */
 package de.ipk.ag_ba.server.task_management;
 
+import info.StopWatch;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -114,12 +116,15 @@ public class CloudComputingService {
 					if ((args[0] + "").toLowerCase().startsWith("perf")) {
 						try {
 							System.out.println(":perf - perform performance test (TestPipelineMaize Copy)");
+							StopWatch sw = new StopWatch("IAP performance test", false);
 							PerformanceTest p = new PerformanceTest();
 							p.testPipeline();
-							return;
+							System.out.println();
+							sw.printTime();
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
+						System.exit(0);
 					} else
 						if ((args[0] + "").equalsIgnoreCase("merge")) {
 							merge();
