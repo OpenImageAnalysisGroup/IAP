@@ -25,4 +25,12 @@ public class Histogram {
 	public double getFreqAt(int i) {
 		return freq[i];
 	}
+	
+	public int getBorderLeft(int i, int maxValue) {
+		return i * maxValue / n;
+	}
+	
+	public int getBorderRight(int i, int maxValue) {
+		return (i + 1) * maxValue / n;
+	}
 }

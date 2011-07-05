@@ -12,22 +12,21 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	
+	@Override
 	protected boolean isChangingImages() {
 		return false;
 	}
 	
-	private int visibleFilledPixels, visibleImageSizeInPixel, nirFilledPixels, nirImageSizeInPixel;
+	private int visibleFilledPixels, nirFilledPixels;
 	BlockProperty markerDistanceHorizontally;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
 		this.visibleFilledPixels = getInput().getImages().getVis().getIO().countFilledPixels();
-		this.visibleImageSizeInPixel = getInput().getImages().getVis().getWidth() * getInput().getImages().getVis().getHeight();
 		
 		if (getInput().getImages().getNir() != null) {
 			this.nirFilledPixels = getInput().getImages().getNir().getIO().countFilledPixels();
-			this.nirImageSizeInPixel = getInput().getImages().getNir().getWidth() * getInput().getImages().getNir().getHeight();
 		}
 		if (getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
 			markerDistanceHorizontally = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
@@ -38,29 +37,26 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	 */
 	@Override
 	protected FlexibleImage processVISmask() {
+		
 		if (getInput().getMasks().getVis() != null) {
 			
 			ImageOperation io = new ImageOperation(getInput().getMasks().getVis());
-			double visibleIntensitySum = io.intensitySumOfChannelRed(true);
-			double averageVis = visibleIntensitySum / (double) visibleFilledPixels;
+			double visibleIntensitySum = io.intensitySumOfChannelBlue(true);
+			double averageVis = visibleIntensitySum / visibleFilledPixels;
 			
 			ResultsTable rt = new ResultsTable();
 			rt.incrementCounter();
 			rt.addValue("ndvi.vis.intensity.average", averageVis);
 			
 			if (getInput().getMasks().getNir() != null) {
-				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannelRed(false);
-				FlexibleImage v = getInput().getMasks().getVis();
-				FlexibleImage n = getInput().getMasks().getNir();
-				double visImageSize = v.getWidth() * v.getHeight();
-				double nirImageSize = n.getWidth() * n.getHeight();
-				double averageNir = nirIntensitySum / ((double) visibleFilledPixels * visImageSize / nirImageSize);
+				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannelBlue(false);
+				double averageNir = nirIntensitySum / nirFilledPixels;
 				rt.addValue("ndvi.nir.intensity.average", averageNir);
 				
 				double ndvi = (averageNir - averageVis) / (averageNir + averageVis);
 				rt.addValue("ndvi", ndvi);
 			}
-			getProperties().storeResults("RESULT_", rt, getBlockPosition());
+			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".", rt, getBlockPosition());
 			return getInput().getMasks().getVis();
 		} else
 			return null;
@@ -71,8 +67,8 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getFluo() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
 			
-			ResultsTable rt = io.intensity(5).calculateHistorgram(); // markerDistanceHorizontally
-			getProperties().storeResults("RESULT_fluo.", rt, getBlockPosition());
+			ResultsTable rt = io.intensity(7).calculateHistorgram(); // markerDistanceHorizontally
+			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return io.getImage();
 		} else
 			return null;
@@ -83,9 +79,9 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getNir() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getNir());
 			if (getInput().getMasks().getNir().getHeight() > 1) {
-				ResultsTable rt = io.intensity(5).calculateHistorgram(); // markerDistanceHorizontally
+				ResultsTable rt = io.intensity(7).calculateHistorgram(); // markerDistanceHorizontally
 				if (rt != null)
-					getProperties().storeResults("RESULT_nir.", rt, getBlockPosition());
+					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.", rt, getBlockPosition());
 			}
 			return io.getImage();
 		} else

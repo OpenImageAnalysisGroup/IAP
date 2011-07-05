@@ -46,7 +46,7 @@ public class IntensityAnalysis {
 		// double normalize = ((realDist * realDist) / (markerDistHorizontal.getValue() * markerDistHorizontal.getValue()));
 		
 		for (int i = 0; i < this.n; i++) {
-			result.addValue("histogram.bin." + (i + 1), hist.getFreqAt(i)); // * normalize
+			result.addValue("histogram.bin." + (i + 1) + "." + hist.getBorderLeft(i, 255) + "_" + hist.getBorderRight(i, 255), hist.getFreqAt(i)); // * normalize
 		}
 		// }
 		return result;
