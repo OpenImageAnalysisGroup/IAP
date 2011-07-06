@@ -69,6 +69,7 @@ import org.graffiti.plugin.algorithm.PreconditionException;
 import org.graffiti.plugin.algorithm.ProvidesAccessToOtherAlgorithms;
 import org.graffiti.plugin.algorithm.ProvidesGeneralContextMenu;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.parameter.Parameter;
 import org.graffiti.plugin.view.View;
@@ -977,9 +978,7 @@ public class GravistoService implements HelperClass {
 	public static IOurl getIOurl(Class location, String filename, String optExt) throws IOException {
 		File f = new File(getResource(location, filename).getFile());
 		
-		String transformedURL = f.toString().replace("\\", "/");
-		
-		return new IOurl(transformedURL);
+		return FileSystemHandler.getURL(f);
 	}
 	
 	public static void addKnownMemoryHog(MemoryHog memoryHog) {
