@@ -18,17 +18,19 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		
-		return labFilter(
-				getInput().getMasks().getVis().getIO().dilate().dilate().dilate().blur(2)// .enhanceContrast().printImage("blur & multi")
-						.getImage(),
-				getInput().getImages().getVis(),
-				new int[] { options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS) }, options.getCameraPosition());
+		if (getInput().getMasks().getVis() == null)
+			return null;
+		else
+			return labFilter(
+					getInput().getMasks().getVis().getIO().dilate().dilate().dilate().blur(2)// .enhanceContrast().printImage("blur & multi")
+							.getImage(),
+					getInput().getImages().getVis(),
+					new int[] { options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS) },
+					new int[] { options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS) },
+					new int[] { options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS) },
+					new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS) },
+					new int[] { options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS) },
+					new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS) }, options.getCameraPosition());
 	}
 	
 	@Override

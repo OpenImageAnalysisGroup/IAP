@@ -90,7 +90,13 @@ public class CloudComputingService {
 		System.out.println("*                                                 *");
 		System.out.println("***************************************************");
 		System.out.println("> SYSTEM ANALYSIS");
-		if (args.length > 0 && args[0].contains("full")) {
+		boolean clusterExecutionMode = false;
+		if (args.length > 0 && args[0].toLowerCase().startsWith("close") ||
+				(args.length > 1 && args[1].startsWith("close"))) {
+			System.out.println(": close - auto-closing after finishing compute task - " + SystemAnalysis.getNumberOfCPUs());
+			clusterExecutionMode = true;
+		}
+		if (args.length > 0 && args[0].toLowerCase().contains("full")) {
 			System.out.println(": full - enabling full CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
 			SystemAnalysis.setUseFullCpuPower(true);
 		}
@@ -104,7 +110,7 @@ public class CloudComputingService {
 				System.out.println(": " + args[0] + " - using " + i + " CPUs");
 				SystemAnalysis.setUseCpu(i);
 			} catch (Exception e) {
-				if ((args[0] + "").equalsIgnoreCase("clear")) {
+				if ((args[0] + "").toLowerCase().equalsIgnoreCase("clear")) {
 					try {
 						MongoDB.getDefaultCloud().batchClearJobs();
 						System.out.println(":clear - cleared scheduled jobs in database " + MongoDB.getDefaultCloud().getDatabaseName());
@@ -126,41 +132,50 @@ public class CloudComputingService {
 						}
 						System.exit(0);
 					} else
-						if ((args[0] + "").equalsIgnoreCase("merge")) {
-							merge();
-							return;
+						if ((args[0] + "").toLowerCase().startsWith("close")) {
+							// ignore, has been processed at the start of this method
 						} else {
-							System.out.println(": Valid command line parameters:");
-							System.out.println("   'half'  - use half of the CPUs");
-							System.out.println("   'full'  - use all of the CPUs");
-							System.out.println("   'nnn'   - use specified number of CPUs");
-							System.out.println("   'clear' - clear scheduled tasks");
-							System.out.println("   'merge' - in case of error (merge interrupted previously), merge temporary results");
-							System.out.println("   'perf'  - perform performance test");
+							if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
+								merge();
+								return;
+							} else {
+								System.out.println(": Valid command line parameters:");
+								System.out.println("   'half'  - use half of the CPUs");
+								System.out.println("   'full'  - use all of the CPUs");
+								System.out.println("   'nnn'   - use specified number of CPUs");
+								System.out.println("   'clear' - clear scheduled tasks");
+								System.out.println("   'merge' - in case of error (merge interrupted previously), merge temporary results");
+								System.out.println("   'perf'  - perform performance test");
+								System.out.println("   'close' - close after task completion (cluster execution mode)");
+							}
 						}
 			}
-		}
-		SystemInfoExt si = new SystemInfoExt();
-		System.out.println("CPUs (sockets,physical,logical): " +
-				si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
-				si.getCpuLogicalCores() + ", using " + SystemAnalysis.getNumberOfCPUs());
-		System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
-		System.out.println(">");
-		System.out.println("> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
-		
-		// register extended hierarchy and loaded image loaders (and more)
-		new MultimodalDataHandlingAddon();
-		
-		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
-		for (MongoDB m : MongoDB.getMongos()) {
-			for (ResourceIOHandler handler : m.getHandlers())
-				ResourceIOManager.registerIOHandler(handler);
+			SystemInfoExt si = new SystemInfoExt();
+			System.out.println("CPUs (sockets,physical,logical): " +
+					si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
+					si.getCpuLogicalCores() + ", using " + SystemAnalysis.getNumberOfCPUs());
+			System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
+			System.out.println(">");
+			System.out.println("> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
 			
-			CloudComputingService cc = new CloudComputingService();
-			cc.switchStatus(m);
-			System.out.println("START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());
+			// register extended hierarchy and loaded image loaders (and more)
+			new MultimodalDataHandlingAddon();
+			
+			ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
+			for (MongoDB m : MongoDB.getMongos()) {
+				for (ResourceIOHandler handler : m.getHandlers())
+					ResourceIOManager.registerIOHandler(handler);
+				
+				CloudComputingService cc = new CloudComputingService();
+				cc.setClusterExecutionModeSingleTaskAndExit(clusterExecutionMode);
+				cc.switchStatus(m);
+				System.out.println("START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());
+			}
 		}
-		
+	}
+	
+	private void setClusterExecutionModeSingleTaskAndExit(boolean autoClose) {
+		cloudTaskManager.setClusterExecutionModeSingleTaskAndExit(autoClose);
 	}
 	
 	private static void merge() {

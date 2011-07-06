@@ -72,6 +72,11 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	}
 	
 	@Override
+	public boolean requestTitleUpdates() {
+		return jobStatus.getCurrentStatusValue() >= -1;
+	}
+	
+	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}

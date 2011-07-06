@@ -1122,7 +1122,16 @@ public class ImageOperation {
 			ps = new ClusterDetection(workImage, PhenotypeAnalysisTask.BACKGROUND_COLORint);
 		else
 			ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
-		ps.detectClusters();
+		try {
+			ps.detectClusters();
+		} catch (ArrayIndexOutOfBoundsException er) {
+			if (nextGeneration) {
+				System.out.println("WARNING/ERROR: NEXT GENERATION CLUSTER DETECTION: ARRAY-INDEX-OUT-OF-BOUNDS EXCEPTION - retry with older code");
+				ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
+				ps.detectClusters();
+			} else
+				throw er;
+		}
 		
 		int[] clusterSizes = null;
 		int[] clusterDimensions = null;
@@ -1391,7 +1400,7 @@ public class ImageOperation {
 	}
 	
 	public static float[][][] getLabCube() {
-		if (IAPservice.getCurrentTimeAsNiceString()==null)
+		if (IAPservice.getCurrentTimeAsNiceString() == null)
 			System.out.println();
 		StopWatch s = new StopWatch("lab_cube", false);
 		final float step = 1f / 255f;
@@ -1428,20 +1437,20 @@ public class ImageOperation {
 							
 							// XYZ to Lab
 							if (X > 0.008856)
-								// 	fX = (float) Math.pow(X, ot);
-							fX = IAPservice.cubeRoots[(int) (1000 * X)];
+								// fX = (float) Math.pow(X, ot);
+								fX = IAPservice.cubeRoots[(int) (1000 * X)];
 							else
 								fX = (7.78707f * X) + cont;// 7.7870689655172
 								
 							if (Y > 0.008856)
 								// fY = (float) Math.pow(Y, ot);
-							fY = IAPservice.cubeRoots[(int) (1000 * Y)];
+								fY = IAPservice.cubeRoots[(int) (1000 * Y)];
 							else
 								fY = (7.78707f * Y) + cont;
 							
 							if (Z > 0.008856)
-								// 	fZ = (float) Math.pow(Z, ot);
-							 fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
+								// fZ = (float) Math.pow(Z, ot);
+								fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
 							else
 								fZ = (7.78707f * Z) + cont;
 							
@@ -1475,8 +1484,6 @@ public class ImageOperation {
 		// } else
 		return IAPservice.cubeRoots[(int) (1000 * v)];
 	}
-	
-	
 	
 	private static boolean isGray(int li, int ai, int bi, int maxDiffAleftBright, int maxDiffArightBleft) {
 		ai = ai - 127;

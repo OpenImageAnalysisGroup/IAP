@@ -35,23 +35,31 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 		this.ip = ip;
 		this.m = m;
 		
-		String hostInfo = ip.getHostName();
+		final String hostInfo = ip.getHostName();
 		if (hostInfo != null && hostInfo.contains("_")) {
-			try {
-				String[] hhh = hostInfo.split("_", 2);
-				String host = hhh[0];
-				try {
-					InetAddress addr = InetAddress.getByName(host);
-					String hostname = addr.getHostName();
-					host = hostname;
-				} catch (Exception errr) {
-					// ignore if hostname is unknown
+			Thread t = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						String[] hhh = hostInfo.split("_", 2);
+						String host = hhh[0];
+						niceHostName = "" + host + "<br>(up " + SystemAnalysisExt.getCurrentTime(Long.parseLong(hhh[1])) + ")";
+						try {
+							InetAddress addr = InetAddress.getByName(host);
+							String hostname = addr.getHostName();
+							host = hostname;
+						} catch (Exception errr) {
+							niceHostName = host + "<br>(up " + SystemAnalysisExt.getCurrentTime(Long.parseLong(hhh[1])) + ")";
+						}
+						niceHostName = host + "<br>(up " + SystemAnalysisExt.getCurrentTime(Long.parseLong(hhh[1])) + ")";
+						
+					} catch (Exception err) {
+						// ignore unknown formatting
+					}
 				}
-				hostInfo = host + "<br>(up " + SystemAnalysisExt.getCurrentTime(Long.parseLong(hhh[1])) + ")";
-				
-			} catch (Exception err) {
-				// ignore unknown formatting
-			}
+			});
+			t.setName("DNS Lookup for compute host " + hostInfo);
+			t.start();
 		}
 		niceHostName = hostInfo;
 		
@@ -87,7 +95,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 							rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
 						else
 							return "idle, ";
-						return rA + "t_p=" + ch.getLastPipelineTime() + " s, " +
+						return ip.getPipelinesPerHour() + " p.e./h, " + rA + "t_p=" + ch.getLastPipelineTime() + " s, " +
 								ch.getPipelineExecutedWithinCurrentHour() + " p.e.";
 					} else
 						return "N/A";

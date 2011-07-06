@@ -20,6 +20,7 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
 	
 	private BatchCmd cmd;
 	private final MongoDB m;
+	private int lastStatus = -1;
 	
 	public MongoJobStatusProvider(BatchCmd cmd, MongoDB m) {
 		this.cmd = cmd;
@@ -28,7 +29,7 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
 	
 	@Override
 	public int getCurrentStatusValue() {
-		return (int) getCurrentStatusValueFine();
+		return lastStatus;
 	}
 	
 	@Override
@@ -38,14 +39,18 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
 	
 	@Override
 	public double getCurrentStatusValueFine() {
-		cmd = m.batchGetCommand(cmd);
+		double ret;
 		try {
+			cmd = m.batchGetCommand(cmd);
 			if (cmd.getRunStatus() == CloudAnalysisStatus.SCHEDULED)
-				return -1;
-			return cmd.getCurrentStatusValueFine();
+				ret = -1;
+			else
+				ret = cmd.getCurrentStatusValueFine();
 		} catch (NullPointerException npe) {
-			return -1;
+			ret = -2;
 		}
+		lastStatus = (int) Math.round(ret);
+		return ret;
 	}
 	
 	@Override

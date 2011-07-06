@@ -43,6 +43,8 @@ public class TaskDescription {
 	
 	private final String systemIP;
 	
+	private boolean autoClose;
+	
 	public static String getTaskDescriptionText(String hostIPs, String task, String params, String startTime) {
 		return task + "$" + params + "$" + startTime;
 	}
@@ -197,6 +199,11 @@ public class TaskDescription {
 					ErrorMsg.addErrorMessage(e);
 				}
 				finished = true;
+				if (autoClose) {
+					System.out.println("> Cluster Execution Mode is active // FINISHED COMPUTE TASK");
+					System.out.println("> SYSTEM.EXIT");
+					System.exit(0);
+				}
 			}
 			
 			@Override
@@ -212,5 +219,9 @@ public class TaskDescription {
 	
 	public BatchCmd getBatchCmd() {
 		return cmd;
+	}
+	
+	public void setSystemExitAfterCompletion(boolean autoClose) {
+		this.autoClose = autoClose;
 	}
 }
