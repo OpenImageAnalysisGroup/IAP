@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URLDecoder;
 
 import org.HomeFolder;
 
@@ -23,9 +24,18 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 				FileInputStream fis = new FileInputStream(file);
 				return new BufferedInputStream(fis);
 			} else {
-				String fn = url.getDetail() + IOurl.SEPERATOR + url.getFileName();
-				fn = fn.substring(fn.indexOf("!") + 1);
-				return getClass().getResourceAsStream(fn);
+				String decoded = URLDecoder.decode(url.getDetail() + IOurl.SEPERATOR + url.getFileName());
+				file = new File(
+						decoded
+						);
+				if (file.exists()) {
+					FileInputStream fis = new FileInputStream(file);
+					return new BufferedInputStream(fis);
+				} else {
+					String fn = url.getDetail() + IOurl.SEPERATOR + url.getFileName();
+					fn = fn.substring(fn.indexOf("!") + 1);
+					return getClass().getResourceAsStream(fn);
+				}
 			}
 		} else
 			return null;
