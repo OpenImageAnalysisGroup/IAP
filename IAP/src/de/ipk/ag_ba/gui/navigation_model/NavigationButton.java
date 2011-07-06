@@ -183,6 +183,9 @@ public class NavigationButton implements StyleAware {
 			String progress = "";
 			String s = "";
 			double dp = action.getStatusProvider().getCurrentStatusValueFine();
+			if (dp < -1.01) {
+				System.out.println("Button " + title + " should be removed...");
+			}
 			if (dp > 0) {
 				if (dp > 0)
 					progress = "" + (int) dp + "%";

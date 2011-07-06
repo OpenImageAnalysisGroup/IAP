@@ -37,6 +37,7 @@ import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -197,7 +198,27 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							FlexibleImage resVis, resFluo, resNir;
 							{
 								ImageProcessor imageProcessor = getImageProcessor();
-								imageProcessor.setStatus(status);
+								BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = new BackgroundTaskStatusProviderSupportingExternalCallImpl("",
+										"") {
+									double lastAdd = 0;
+									
+									@Override
+									public synchronized void setCurrentStatusValueFine(double value) {
+										super.setCurrentStatusValueFine(value);
+										if (value > 0) {
+											double add = value / wl;
+											status.setCurrentStatusValueFineAdd(add - lastAdd);
+											lastAdd = add;
+										}
+									}
+									
+									@Override
+									public void setCurrentStatusValue(int value) {
+										setCurrentStatusValueFine(value);
+									}
+									
+								};
+								imageProcessor.setStatus(statusForThisTask);
 								
 								// TODO FIX: debugImageStack should be no input, only an output
 								// TODO FIX: The Images Should be Loaded inside the pipeline,
@@ -213,8 +234,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								resNir = pipelineResult.getNir();
 								// TODO: pipelineResult.getDebugStack();
 								
-								if (status != null)
-									status.setCurrentStatusText1("Pipeline Finished");
+								// if (status != null)
+								// status.setCurrentStatusText1("Pipeline Finished");
 								
 								analysisResults = imageProcessor.getSettings();
 							}
@@ -268,7 +289,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						ErrorMsg.addErrorMessage(e);
 					}
 					tso.addInt(1);
-					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
+					// status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 					status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + wl);
 				}
 			}, "process image " + idxxx, -10);

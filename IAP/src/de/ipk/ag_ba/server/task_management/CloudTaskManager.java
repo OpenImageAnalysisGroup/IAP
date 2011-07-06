@@ -34,6 +34,8 @@ public class CloudTaskManager {
 	Thread timerThread;
 	private MongoDB m;
 	
+	private boolean autoClose;
+	
 	private void setProcess(boolean process) {
 		this.process = process;
 		if (timerThread == null) {
@@ -100,39 +102,57 @@ public class CloudTaskManager {
 						}
 					}
 					
+					int nn = 0;
+					progressSum = 0;
 					ArrayList<TaskDescription> del = new ArrayList<TaskDescription>();
+					// System.out.println("RUNNING: " + runningTasks.size());
 					for (TaskDescription td : runningTasks) {
 						if (td.analysisFinished()) {
 							td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.FINISHED);
 							del.add(td);
 						} else {
 							td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS);
+							progressSum += td.getBatchCmd().getCurrentStatusValueFine();
+							nn++;
 						}
+						progressSum += td.getBatchCmd().getCurrentStatusValueFine();
+						nn++;
 					}
 					if (del.size() > 0)
 						runningTasks.removeAll(del);
 					
-					int nn = 0;
-					progressSum = 0;
 					for (TaskDescription td : commands_to_start) {
 						if (!runningTasks.contains(td)) {
 							try {
 								td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS);
-								nn++;
-								progressSum += td.getBatchCmd().getCurrentStatusValueFine();
 								runningTasks.add(td);
+								td.setSystemExitAfterCompletion(autoClose);
 								td.startWork(td.getBatchCmd(), hostName, hostName, m);
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 							}
 						}
 					}
-					progressSum /= (nn);
+					if (nn == 0)
+						progressSum = -1;
+					else
+						progressSum /= (nn);
 				}
 				Thread.sleep(1000);
+				if (runningTasks.isEmpty()) {
+					if (autoClose) {
+						System.out.println("> Cluster Execution Mode is active // NO RUNNING TASK");
+						System.out.println("> SYSTEM.EXIT");
+						System.exit(0);
+					}
+				}
 			} while (true);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void setClusterExecutionModeSingleTaskAndExit(boolean autoClose) {
+		this.autoClose = autoClose;
 	}
 }
