@@ -33,6 +33,9 @@ public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int[] lowerValueOfL, int[] upperValueOfL, int[] lowerValueOfA,
 			int[] upperValueOfA, int[] lowerValueOfB, int[] upperValueOfB, CameraPosition typ) {
 		
+		if (workMask == null || originalImage == null)
+			return null;
+		
 		int[] image = workMask.getAs1A();
 		int[] result = new int[image.length];
 		int width = workMask.getWidth();
