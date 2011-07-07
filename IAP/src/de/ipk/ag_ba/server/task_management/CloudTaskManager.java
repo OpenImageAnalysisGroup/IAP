@@ -137,6 +137,8 @@ public class CloudTaskManager {
 						progressSum = -1;
 					else
 						progressSum /= (nn);
+				} else {
+					System.out.println("> Cloud Task Manager: Processing Disabled // " + SystemAnalysisExt.getCurrentTime());
 				}
 				Thread.sleep(1000);
 				if (runningTasks.isEmpty()) {
@@ -145,7 +147,8 @@ public class CloudTaskManager {
 						System.out.println("> SYSTEM.EXIT");
 						System.exit(0);
 					}
-				}
+				} else
+					System.out.println("> Cloud Task Manager: Running Tasks: " + runningTasks.size() + " // " + SystemAnalysisExt.getCurrentTime());
 			} while (true);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

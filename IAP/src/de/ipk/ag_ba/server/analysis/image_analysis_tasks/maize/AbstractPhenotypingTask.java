@@ -452,7 +452,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					// System.out.print("o");
 					// else
 					// System.out.print(".");
-					System.out.println(id.getURL() + ";" + id.getLabelURL());
+					// System.out.println(id.getURL() + ";" + id.getLabelURL());
 					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, optImageMasks != null, loadedReferenceImage);
 					// synchronized (lastRef) {
 					// if (li.getLoadedImageLabelField() != null) {
