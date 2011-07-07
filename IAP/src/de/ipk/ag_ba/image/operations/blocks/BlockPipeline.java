@@ -112,7 +112,7 @@ public class BlockPipeline {
 			status.setCurrentStatusText1("Pipeline finished");
 			status.setCurrentStatusText2("T=" + ((b - a) / 1000) + "s");
 		}
-		System.out.print("PET: " + (b - a) / 1000 + "s ");
+		// System.out.print("PET: " + (b - a) / 1000 + "s ");
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);
 		updatePipelineStatistics();
 		return input;

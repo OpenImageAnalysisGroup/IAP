@@ -272,7 +272,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 			public void run() {
 				// System.out.println("Load Image");
 				try {
-					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, false);
+					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, false, null);
 					input.set(new FlexibleImage(li.getLoadedImage(), type));
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);

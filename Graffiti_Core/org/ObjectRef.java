@@ -56,4 +56,8 @@ public class ObjectRef implements HelperClass {
 	public synchronized Long getLong() {
 		return (Long) data;
 	}
+	
+	public void setString(String string) {
+		toStringVal = string;
+	}
 }

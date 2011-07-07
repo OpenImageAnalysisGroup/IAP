@@ -100,7 +100,7 @@ public class ColorHueStatistics implements ImageAnalysisTask {
 						else {
 							// load image
 							try {
-								li = IOmodule.loadImageFromFileOrMongo(i, true, false);
+								li = IOmodule.loadImageFromFileOrMongo(i, true, false, null);
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 								System.out.println("Error loading file: " + i.getURL().toString());
