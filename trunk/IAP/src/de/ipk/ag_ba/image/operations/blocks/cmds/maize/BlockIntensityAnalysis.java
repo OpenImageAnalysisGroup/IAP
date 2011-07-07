@@ -66,8 +66,8 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
-			
-			ResultsTable rt = io.intensity(7).calculateHistorgram(); // markerDistanceHorizontally
+			BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
+			ResultsTable rt = io.intensity(7).calculateHistorgram(distHorizontal); // markerDistanceHorizontally
 			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return io.getImage();
 		} else
@@ -79,7 +79,8 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getNir() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getNir());
 			if (getInput().getMasks().getNir().getHeight() > 1) {
-				ResultsTable rt = io.intensity(7).calculateHistorgram(); // markerDistanceHorizontally
+				BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
+				ResultsTable rt = io.intensity(7).calculateHistorgram(distHorizontal); // markerDistanceHorizontally
 				if (rt != null)
 					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.", rt, getBlockPosition());
 			}

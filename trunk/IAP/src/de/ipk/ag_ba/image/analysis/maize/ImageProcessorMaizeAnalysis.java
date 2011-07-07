@@ -7,7 +7,8 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingForYellowVisMask;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancing;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancingFluoAndNir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancingVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
@@ -45,12 +46,10 @@ public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 		modifySettings(options);
 		
 		BlockPipeline p = new BlockPipeline();
-		// p.add(BlockDecreaseImageAndMaskSize.class);
-		p.add(BlockColorBalancing.class);
 		p.add(BlockImageInfo.class);
-		// p.add(BlockClearNirTop.class);
-		// p.add(BlockDecreaseMaskSize.class);
+		p.add(BlockColorBalancingVis.class);
 		p.add(BlockFindBlueMarkers.class);
+		p.add(BlockColorBalancingFluoAndNir.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
 		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockLabFilter.class);

@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
@@ -97,9 +98,10 @@ public class ConvexHullCalculator {
 	 * @param drawCentroid
 	 * @return A ImageOperation-object, modified according to the given parameters.
 	 * @author klukas
+	 * @param distHorizontal
 	 */
 	public ImageOperation find(boolean drawInputimage, boolean drawBorder, boolean drawHull, boolean drawCentroid,
-			int borderColor, int hullLineColor, int centroidColor) {
+			int borderColor, int hullLineColor, int centroidColor, BlockProperty distHorizontal) {
 		
 		calculate(borderColor);
 		
@@ -123,24 +125,27 @@ public class ConvexHullCalculator {
 			rt.incrementCounter();
 			
 			rt.addValue("hull.points", numberOfHullPoints);
-			rt.addValue("hull.area", polygon.area());
-			rt.addValue("hull.signedarea", polygon.signedArea());
+			double realMarkerDist = 1;
+			double normFactorArea = (realMarkerDist * realMarkerDist) / (distHorizontal.getValue() * distHorizontal.getValue());
+			double normFactor = realMarkerDist / distHorizontal.getValue();
+			rt.addValue("hull.area", polygon.area() * normFactorArea);
+			rt.addValue("hull.signedarea", polygon.signedArea() * normFactorArea);
 			rt.addValue("hull.circularity", circularity());
 			
 			Circle circumcircle = polygon.calculateminimalcircumcircle();
 			
 			if (circumcircle != null) {
-				rt.addValue("hull.circumcircle.x", circumcircle.x);
-				rt.addValue("hull.circumcircle.y", circumcircle.y);
-				rt.addValue("hull.circumcircle.d", circumcircle.d);
+				rt.addValue("hull.circumcircle.x", circumcircle.x * normFactor);
+				rt.addValue("hull.circumcircle.y", circumcircle.y * normFactor);
+				rt.addValue("hull.circumcircle.d", circumcircle.d * normFactor);
 			}
 			
 			int filledArea = io.countFilledPixels();
 			rt.addValue("hull.fillgrade", filledArea / polygon.area());
 			
 			centroid = polygon.centroid();
-			rt.addValue("hull.centroid.x", centroid.x);
-			rt.addValue("hull.centroid.y", centroid.y);
+			rt.addValue("hull.centroid.x", centroid.x * normFactor);
+			rt.addValue("hull.centroid.y", centroid.y * normFactor);
 			
 		}
 		res.setResultsTable(rt);
