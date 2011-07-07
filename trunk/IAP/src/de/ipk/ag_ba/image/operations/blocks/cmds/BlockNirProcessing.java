@@ -23,8 +23,9 @@ public class BlockNirProcessing extends AbstractSnapshotAnalysisBlockFIS {
 				nirMask = new ImageOperation(getInput().getImages().getNir()).printImage("img", debug).compare()
 							.compareGrayImages(nirMask.print("ref", debug),
 									// 250, 12,
-									40, 40,
-									options.getBackground()).thresholdBlueHigherThan(238).printImage("result", debug).getImage();
+									20, 12,
+									// 40, 40,
+									options.getBackground()).thresholdBlueHigherThan(160).printImage("result", debug).getImage();
 				
 				getInput().getMasks().setNir(nirMask);
 			}
