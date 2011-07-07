@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.intensity;
 
 import ij.measure.ResultsTable;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 public class IntensityAnalysis {
@@ -14,7 +15,7 @@ public class IntensityAnalysis {
 		this.n = numberOfIntervals;
 	}
 	
-	public ResultsTable calculateHistorgram() {
+	public ResultsTable calculateHistorgram(BlockProperty distHorizontal) {
 		ResultsTable result = new ResultsTable();
 		
 		int[] pixels = io.getImageAs1array();
@@ -41,12 +42,15 @@ public class IntensityAnalysis {
 		result.incrementCounter();
 		
 		result.addValue("intensity.average", sumOfIntensity / plantImagePixelCnt / 255d);
+		int realMarkerDist = 1;
+		
 		// double realDist = 1;
 		// if (markerDistHorizontal != null) {
 		// double normalize = ((realDist * realDist) / (markerDistHorizontal.getValue() * markerDistHorizontal.getValue()));
-		
+		double normalize = realMarkerDist / distHorizontal.getValue();
 		for (int i = 0; i < this.n; i++) {
-			result.addValue("histogram.bin." + (i + 1) + "." + hist.getBorderLeft(i, 255) + "_" + hist.getBorderRight(i, 255), hist.getFreqAt(i)); // * normalize
+			result.addValue("histogram.bin." + (i + 1) + "." + hist.getBorderLeft(i, 255) + "_" + hist.getBorderRight(i, 255), hist.getFreqAt(i) * normalize); // *
+																																																				// normalize
 		}
 		// }
 		return result;

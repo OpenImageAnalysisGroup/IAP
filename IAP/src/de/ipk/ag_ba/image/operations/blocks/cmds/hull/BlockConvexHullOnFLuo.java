@@ -7,6 +7,8 @@ import java.awt.Color;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
@@ -20,23 +22,31 @@ public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() throws InterruptedException {
+		ResultsTable numericResults;
+		ImageOperation res;
 		
 		if (getInput().getMasks().getFluo() == null) {
 			System.err.println("ERROR: BlockConvexHullOnFLuo: Input Fluo Mask is NULL!");
 			return null;
 		}
-		ImageOperation res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(true, false, false, false, Color.RED.getRGB(), Color.BLUE.getRGB(),
-				Color.ORANGE.getRGB());
-		
-		ResultsTable numericResults = res.getResultsTable();
-		
-		if (options.getCameraPosition() == CameraPosition.SIDE)
+		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
+		if (distHorizontal != null) {
+			res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(true, false, false, false, Color.RED.getRGB(),
+					Color.BLUE.getRGB(),
+					Color.ORANGE.getRGB(), distHorizontal);
+			
+			numericResults = res.getResultsTable();
+		} else {
+			numericResults = null;
+			res = new ImageOperation(getInput().getMasks().getFluo());
+		}
+		if (options.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
 			getProperties().storeResults(
 					"RESULT_side.deg" + (getInput().getImages().getFluoInfo() != null && getInput().getImages().getFluoInfo().getPosition() != null ? getInput()
 											.getImages().getFluoInfo().getPosition().intValue() : "0")
 									+ ".", numericResults,
 							getBlockPosition());
-		if (options.getCameraPosition() == CameraPosition.TOP)
+		if (options.getCameraPosition() == CameraPosition.TOP && numericResults != null)
 			getProperties().storeResults("RESULT_top.", numericResults, getBlockPosition());
 		
 		return res.getImage();
