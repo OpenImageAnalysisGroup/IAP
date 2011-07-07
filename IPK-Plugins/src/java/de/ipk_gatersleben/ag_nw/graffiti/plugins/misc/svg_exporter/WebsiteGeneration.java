@@ -663,7 +663,6 @@ public class WebsiteGeneration extends AbstractEditorAlgorithm implements
 		settings.setCreateJPG(false);
 		settings.setIncludeTooltip(false);
 		settings.setIncludeURLinTooltip(false);
-		settings.setWithBorder(true);
 		settings.setCustomTarget("main");
 		{
 			settings.setScaleSetting(SizeSetting.FIXED);

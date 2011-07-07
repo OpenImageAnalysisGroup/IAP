@@ -99,7 +99,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					NeedsSwingThread {
@@ -166,15 +166,6 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	@Override
 	public Parameter[] getParameters() {
 		
-		BooleanParameter bpBorder = new BooleanParameter(
-							parameter.useTransparency(),
-							"Add image border",
-							"<html>"
-												+ "If enabled, the graph will be surrounded by a border. The size of the border<br>" +
-												"will be the distance between the origin (0,0) and the most top-left graphelement.<br>" +
-												"To increase border size move the graph to lower-right");
-		bpBorder.setLeftAligned(true);
-		
 		BooleanParameter bpTransparency = new BooleanParameter(
 							parameter.useTransparency(),
 							"Enable transparency support",
@@ -219,7 +210,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		scaleJComponent.setLeftAligned(true);
 		
 		return new Parameter[] { scaleJComponent,
-							bpBorder, parameter.isCreateJPG() ? null : bpTransparency, bpCreateHTMLmap,
+							parameter.isCreateJPG() ? null : bpTransparency, bpCreateHTMLmap,
 							bpIncludeURL, bpIncludeTooltip, bpCustomURLtarget };
 	}
 	
@@ -356,9 +347,6 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		
 		i++;
 		
-		parameter.setWithBorder(((BooleanParameter) params[i++])
-							.getBoolean());
-		
 		if (parameter.isCreateJPG()) {
 			i++;
 			parameter.setUseTransparency(false);
@@ -439,7 +427,6 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	
 	public static BufferedImage createPNGimageFromGraphGetBI(Graph g, int maxW, int maxH) {
 		PngJpegAlgorithmParams settings = new PngJpegAlgorithmParams();
-		settings.setWithBorder(true);
 		settings.setScaleSetting(SizeSetting.FIXED);
 		settings.setMaxWidth(maxW);
 		settings.setMaxHeight(maxW);
@@ -760,8 +747,8 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 											.createJPEGEncoder(os);
 						JPEGEncodeParam jpegEncodeParam = jpegEncoder
 											.getDefaultJPEGEncodeParam(bi);
-//						jpegEncodeParam
-//											.setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
+						// jpegEncodeParam
+						// .setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
 						jpegEncodeParam.setXDensity(parameter.getScaleDPIprintDPI());
 						jpegEncodeParam.setYDensity(parameter.getScaleDPIprintDPI());
 						jpegEncodeParam.setQuality(1f, false);
@@ -1201,8 +1188,8 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 
 			viewRectangle = getViewRectFromSelection(view, graph.getGraphElements());
 			
-			double dimx = viewRectangle.getX() + viewRectangle.getWidth() + (parameter.isWithBorder() && viewRectangle.getX() > 0 ? viewRectangle.getX() : 0);
-			double dimy = viewRectangle.getY() + viewRectangle.getHeight() + (parameter.isWithBorder() && viewRectangle.getY() > 0 ? viewRectangle.getY() : 0);
+			double dimx = viewRectangle.getX() + viewRectangle.getWidth() + (viewRectangle.getX() > 0 ? viewRectangle.getX() : 0);
+			double dimy = viewRectangle.getY() + viewRectangle.getHeight() + (viewRectangle.getY() > 0 ? viewRectangle.getY() : 0);
 			
 			dimSrc = new Vector2d(dimx, dimy);
 			Graphics2D g2d = (Graphics2D) viewerComponent.getGraphics();
@@ -1234,7 +1221,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 							zoomScaleFromView);
 		
 		if (parameter.getClipX() != -1 && dim.x > parameter.getClipX()) {
-			double scaleClip = parameter.getClipX() / dim.x;
+			double scaleClip = parameter.getClipX() / dim.x + 0;
 			dim.x = parameter.getClipX();
 			dimSrc.x = scaleClip * dimSrc.x;
 		}
@@ -1301,21 +1288,27 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		
 		scale.setObject(outputScale);
 		
-		// clip top-left border if possible
-		if (!parameter.isWithBorder() && viewRectangle != null && parameter.getClipX() < 0 && parameter.getClipY() < 0) {
-			if (viewRectangle.getX() > 0 && viewRectangle.getY() >= 0)
-				bi = bi.getSubimage((int) viewRectangle.getX(), (int) viewRectangle.getY(), (int) viewRectangle.getWidth(), (int) viewRectangle.getHeight());
-			else
-				if (viewRectangle.getX() <= 0 && viewRectangle.getY() <= 0)
-					; // keep image as it is
-				else
-					if (viewRectangle.getX() <= 0)
-						bi = bi.getSubimage(0, (int) viewRectangle.getY(), (int) (viewRectangle.getWidth() + viewRectangle.getX()), (int) viewRectangle.getHeight());
-					else
-						if (viewRectangle.getY() <= 0)
-							bi = bi.getSubimage((int) viewRectangle.getX(), 0, (int) viewRectangle.getWidth(),
-												(int) (viewRectangle.getHeight() + viewRectangle.getY()));
-		}
+		// // clip top-left border if possible
+		// if (!parameter.isWithBorder() && viewRectangle != null && parameter.getClipX() < 0 && parameter.getClipY() < 0) {
+		// if (viewRectangle.getX() > 0 && viewRectangle.getY() >= 0) {
+		// int vx = (int) viewRectangle.getX();
+		// int vy = (int) viewRectangle.getY();
+		// int vw = (int) viewRectangle.getWidth();
+		// int vh = (int) viewRectangle.getHeight();
+		// System.out.println("AVAIL:  " + bi.getWidth() + " / " + bi.getHeight());
+		// System.out.println("DESIRE: " + vx + " / " + vy + " : " + vw + " / " + vy);
+		// bi = bi.getSubimage(vx, vy, vw, vh);
+		// } else
+		// if (viewRectangle.getX() <= 0 && viewRectangle.getY() <= 0)
+		// ; // keep image as it is
+		// else
+		// if (viewRectangle.getX() <= 0)
+		// bi = bi.getSubimage(0, (int) viewRectangle.getY(), (int) (viewRectangle.getWidth() + viewRectangle.getX()), (int) viewRectangle.getHeight());
+		// else
+		// if (viewRectangle.getY() <= 0)
+		// bi = bi.getSubimage((int) viewRectangle.getX(), 0, (int) viewRectangle.getWidth(),
+		// (int) (viewRectangle.getHeight() + viewRectangle.getY()));
+		// }
 		return bi;
 	}
 	
@@ -1399,8 +1392,8 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		double desiredScaleHeight = Double.MAX_VALUE;
 		if (parameter.getMaxWidth() > 0) {
 			if (parameter.getMaxHeight() == -1)
-				dim.x = dimSrc.x < parameter.getMaxWidth() ? dimSrc.x : parameter
-									.getMaxWidth();
+				dim.x = dimSrc.x < parameter.getMaxWidth() ? parameter
+									.getMaxWidth() : dimSrc.x;
 			else
 				dim.x = parameter.getMaxWidth();
 			desiredScaleWidth = dim.x / dimSrc.x;
