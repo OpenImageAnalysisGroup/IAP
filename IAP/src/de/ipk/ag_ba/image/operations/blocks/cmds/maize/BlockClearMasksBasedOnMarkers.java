@@ -10,17 +10,24 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
+	BlockProperty markerPosLeftY, markerPosRightY, markerPosLeftX, markerPosRightX;
+	
+	@Override
+	protected void prepare() {
+		super.prepare();
+		
+		markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
+		markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
+		
+		markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
+		markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
+	}
+	
 	@Override
 	protected FlexibleImage processVISmask() {
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
-			
-			BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
-			BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
-			
-			BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
-			BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
 			
 			if (markerPosLeftY == null && markerPosRightY == null) { // set default
 				getProperties().setNumericProperty(0, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y, input.getHeight() * 0.136);
@@ -71,11 +78,8 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			FlexibleImage input = getInput().getMasks().getFluo();
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			
-			BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
-			BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
-			
-			if (markerPosLeft != null) {
-				double temp = markerPosLeft.getValue();
+			if (markerPosLeftY != null) {
+				double temp = markerPosLeftY.getValue();
 				if (temp > 0.5) {
 					int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18;
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
@@ -85,8 +89,8 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 				}
 				return input;
 			}
-			if (markerPosLeft == null && markerPosRight != null) {
-				double temp = markerPosRight.getValue();
+			if (markerPosLeftY == null && markerPosRightY != null) {
+				double temp = markerPosRightY.getValue();
 				if (temp > 0.5) {
 					int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18;
 					FlexibleImage result = new ImageOperation(input).clearImageBottom(
@@ -107,14 +111,8 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			if (getInput().getImages().getNir() != null) {
 				FlexibleImage input = getInput().getImages().getNir();
 				
-				BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
-				BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
-				
-				BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
-				BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
-				
-				if (markerPosLeft != null) {
-					double temp = markerPosLeft.getValue();
+				if (markerPosLeftY != null) {
+					double temp = markerPosLeftY.getValue();
 					if (temp > 0.5) {
 						double pos = temp * getInput().getImages().getNir().getHeight();
 						if (pos > 10)
@@ -137,8 +135,8 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 					}
 					return input;
 				}
-				if (markerPosLeft == null && markerPosRight != null) {
-					double temp = markerPosRight.getValue();
+				if (markerPosLeftY == null && markerPosRightY != null) {
+					double temp = markerPosRightY.getValue();
 					if (temp > 0.5) {
 						double pos = (temp * getInput().getImages().getNir().getHeight());
 						if (pos > 10)
@@ -175,14 +173,8 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			if (getInput().getMasks().getNir() != null) {
 				FlexibleImage input = getInput().getMasks().getNir();
 				
-				BlockProperty markerPosLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
-				BlockProperty markerPosRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
-				
-				BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
-				BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
-				
-				if (markerPosLeft != null) {
-					double temp = markerPosLeft.getValue();
+				if (markerPosLeftY != null) {
+					double temp = markerPosLeftY.getValue();
 					if (temp > 0.5) {
 						double pos = temp * getInput().getImages().getNir().getHeight();
 						if (pos > 10)
@@ -205,8 +197,8 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 					}
 					return input;
 				}
-				if (markerPosLeft == null && markerPosRight != null) {
-					double temp = markerPosRight.getValue();
+				if (markerPosLeftY == null && markerPosRightY != null) {
+					double temp = markerPosRightY.getValue();
 					if (temp > 0.5) {
 						double pos = (temp * getInput().getImages().getNir().getHeight());
 						if (pos > 10)

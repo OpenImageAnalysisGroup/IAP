@@ -16,166 +16,46 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
-		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
-		
-		BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
-		BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
-		
-		FlexibleImage fluo = getInput().getImages().getFluo();
-		if (fluo == null)
-			return null;
-		ImageOperation io = new ImageOperation(fluo);
-		int width = fluo.getWidth();
-		int height = fluo.getHeight();
-		double markerPosY = -1;
-		double markerPosX = -1;
-		if (markerPosLeftY != null) {
-			markerPosY = markerPosLeftY.getValue() * height;
-		}
-		if (markerPosLeftY == null && markerPosRightY != null) {
-			markerPosY = markerPosRightY.getValue() * height;
-		}
-		if (markerPosLeftX != null) {
-			markerPosX = markerPosLeftX.getValue() * width;
-		}
-		if (markerPosLeftX == null && markerPosRightX != null) {
-			markerPosX = fluo.getWidth() - markerPosRightX.getValue() * width;
-		}
-		double[] pix;
-		if (markerPosY != -1)
-			pix = getProbablyWhitePixels(io.invert().getImage(), 0.08, markerPosX, markerPosY);
+		FlexibleImage input = getInput().getImages().getFluo();
+		FlexibleImage res;
+		if (input != null)
+			res = balance(input, 255, true);
 		else
-			pix = getProbablyWhitePixels(io.invert().getImage(), 0.08);
-		return io.imageBalancing(255, pix).invert().getImage();
+			res = input;
+		return res;
 		
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
-		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
-		
-		BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
-		BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
-		
-		FlexibleImage fluo = getInput().getMasks().getFluo();
-		if (fluo == null)
-			return null;
-		ImageOperation io = new ImageOperation(fluo);
-		int width = fluo.getWidth();
-		int height = fluo.getHeight();
-		double markerPosY = -1;
-		double markerPosX = -1;
-		if (markerPosLeftY != null) {
-			markerPosY = markerPosLeftY.getValue() * height;
-		}
-		if (markerPosLeftY == null && markerPosRightY != null) {
-			markerPosY = markerPosRightY.getValue() * height;
-		}
-		if (markerPosLeftX != null) {
-			markerPosX = markerPosLeftX.getValue() * width;
-		}
-		if (markerPosLeftX == null && markerPosRightX != null) {
-			markerPosX = fluo.getWidth() - markerPosRightX.getValue() * width;
-		}
-		double[] pix;
-		if (markerPosY != -1)
-			pix = getProbablyWhitePixels(io.invert().getImage(), 0.08, markerPosX, markerPosY);
+		FlexibleImage input = getInput().getMasks().getFluo();
+		FlexibleImage res;
+		if (input != null)
+			res = balance(input, 255, true);
 		else
-			pix = getProbablyWhitePixels(io.invert().getImage(), 0.08);
-		return io.imageBalancing(255, pix).invert().getImage();
+			res = input;
+		return res;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
-		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
-		
-		BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
-		BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
-		
-		FlexibleImage res = getInput().getImages().getNir();
-		if (options.getCameraPosition() == CameraPosition.TOP) {
-			if (getInput().getImages().getNir() != null) {
-				double side = 0.3; // value for white balancing (side width)
-				FlexibleImage nir = getInput().getImages().getNir();
-				// White Balancing
-				double[] pix = BlockColorBalancingFluoAndNir.getProbablyWhitePixels(nir.crop(), side);// 0.08);
-				res = new ImageOperation(nir).imageBalancing(170, pix).getImage();
-			}
-		} else {
-			FlexibleImage nir = getInput().getImages().getNir();
-			ImageOperation io = new ImageOperation(nir);
-			int width = nir.getWidth();
-			int height = nir.getHeight();
-			double markerPosY = -1;
-			double markerPosX = -1;
-			if (markerPosLeftY != null) {
-				markerPosY = markerPosLeftY.getValue() * height;
-			}
-			if (markerPosLeftY == null && markerPosRightY != null) {
-				markerPosY = markerPosRightY.getValue() * height;
-			}
-			if (markerPosLeftX != null) {
-				markerPosX = markerPosLeftX.getValue() * width;
-			}
-			if (markerPosLeftX == null && markerPosRightX != null) {
-				markerPosX = nir.getWidth() - markerPosRightX.getValue() * width;
-			}
-			double[] pix;
-			if (markerPosY != -1)
-				pix = getProbablyWhitePixels(io.getImage(), 0.08, markerPosX, markerPosY);
-			else
-				pix = getProbablyWhitePixels(io.getImage(), 0.08);
-			res = io.imageBalancing(170, pix).getImage();
-		}
+		FlexibleImage input = getInput().getImages().getNir();
+		FlexibleImage res;
+		if (input != null)
+			res = balance(input, 170, false);
+		else
+			res = input;
 		return res;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
-		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
-		
-		BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
-		BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
-		
-		FlexibleImage res = getInput().getMasks().getNir();
-		if (options.getCameraPosition() == CameraPosition.TOP) {
-			if (getInput().getMasks().getNir() != null) {
-				double side = 0.3; // value for white balancing (side width)
-				FlexibleImage nir = getInput().getMasks().getNir();
-				// White Balancing
-				double[] pix = BlockColorBalancingFluoAndNir.getProbablyWhitePixels(nir.crop(), side);// 0.08);
-				res = new ImageOperation(nir).imageBalancing(170, pix).getImage();
-			}
-		} else {
-			FlexibleImage nir = getInput().getMasks().getNir();
-			ImageOperation io = new ImageOperation(nir);
-			int width = nir.getWidth();
-			int height = nir.getHeight();
-			double markerPosY = -1;
-			double markerPosX = -1;
-			if (markerPosLeftY != null) {
-				markerPosY = markerPosLeftY.getValue() * height;
-			}
-			if (markerPosLeftY == null && markerPosRightY != null) {
-				markerPosY = markerPosRightY.getValue() * height;
-			}
-			if (markerPosLeftX != null) {
-				markerPosX = markerPosLeftX.getValue() * width;
-			}
-			if (markerPosLeftX == null && markerPosRightX != null) {
-				markerPosX = nir.getWidth() - markerPosRightX.getValue() * width;
-			}
-			double[] pix;
-			if (markerPosY != -1)
-				pix = getProbablyWhitePixels(io.getImage(), 0.08, markerPosX, markerPosY);
-			else
-				pix = getProbablyWhitePixels(io.getImage(), 0.08);
-			res = io.imageBalancing(170, pix).getImage();
-		}
+		FlexibleImage input = getInput().getMasks().getNir();
+		FlexibleImage res;
+		if (input != null)
+			res = balance(input, 170, false);
+		else
+			res = input;
 		return res;
 	}
 	
@@ -225,7 +105,12 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 		return res;
 	}
 	
-	public FlexibleImage nirBalance(FlexibleImage input) {
+	/**
+	 * @param invert
+	 *           - inverts the image (used for fluo)
+	 * @return
+	 */
+	public FlexibleImage balance(FlexibleImage input, int whitePoint, boolean invert) {
 		BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
 		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
 		
@@ -238,12 +123,18 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 				double side = 0.3; // value for white balancing (side width)
 				FlexibleImage nir = input;
 				// White Balancing
-				double[] pix = BlockColorBalancingFluoAndNir.getProbablyWhitePixels(nir.crop(), side);// 0.08);
-				res = new ImageOperation(nir).imageBalancing(170, pix).getImage();
+				double[] pix;
+				if (invert) {
+					ImageOperation io = new ImageOperation(input);
+					pix = getProbablyWhitePixels(io.invert().getImage(), 0.08);
+					return io.imageBalancing(whitePoint, pix).invert().getImage();
+				} else {
+					pix = BlockColorBalancingFluoAndNir.getProbablyWhitePixels(nir.crop(), side);// 0.08);
+					res = new ImageOperation(nir).imageBalancing(whitePoint, pix).getImage();
+				}
 			}
 		} else {
-			FlexibleImage nir = input;
-			ImageOperation io = new ImageOperation(nir);
+			ImageOperation io = new ImageOperation(input);
 			int width = input.getWidth();
 			int height = input.getHeight();
 			double markerPosY = -1;
@@ -258,14 +149,26 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 				markerPosX = markerPosLeftX.getValue() * width;
 			}
 			if (markerPosLeftX == null && markerPosRightX != null) {
-				markerPosX = nir.getWidth() - markerPosRightX.getValue() * width;
+				markerPosX = input.getWidth() - markerPosRightX.getValue() * width;
 			}
 			double[] pix;
 			if (markerPosY != -1)
-				pix = getProbablyWhitePixels(io.getImage(), 0.08, markerPosX, markerPosY);
+				if (invert) {
+					pix = getProbablyWhitePixels(io.invert().getImage(), 0.08, markerPosX, markerPosY);
+					res = io.imageBalancing(whitePoint, pix).invert().getImage();
+				} else {
+					pix = getProbablyWhitePixels(io.getImage(), 0.08, markerPosX, markerPosY);
+					res = io.imageBalancing(whitePoint, pix).getImage();
+				}
 			else
-				pix = getProbablyWhitePixels(io.getImage(), 0.08);
-			res = io.imageBalancing(170, pix).getImage();
+				if (invert) {
+					pix = getProbablyWhitePixels(io.invert().getImage(), 0.08);
+					res = io.imageBalancing(whitePoint, pix).invert().getImage();
+				} else {
+					pix = getProbablyWhitePixels(io.getImage(), 0.08);
+					res = io.imageBalancing(whitePoint, pix).getImage();
+				}
+			
 		}
 		return res;
 	}
