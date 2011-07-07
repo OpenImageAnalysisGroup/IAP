@@ -1,11 +1,13 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.ObjectRef;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -117,6 +119,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			System.out.println("Warning: not all three images available for " + error + " snapshots!");
 		System.out.println("Info: Workload Top/Side: " + top + "/" + side);
 		
+		final ObjectRef lastRefVis = new ObjectRef();
+		final ObjectRef lastRefFluo = new ObjectRef();
+		final ObjectRef lastRefNir = new ObjectRef();
+		
 		for (ImageSet md : workload) {
 			final ImageSet id = md;
 			Thread t = BackgroundThreadDispatcher.addTask(new Runnable() {
@@ -135,20 +141,21 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						
 						MyThread a = null, b = null, c = null;
 						
-						if (inVis != null)
+						if (inVis != null) {
 							if (inVis instanceof LoadedImage) {
 								input.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImage()));
 								inputMasks.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImageLabelField()));
 							} else {
-								a = load(inVis, input, inputMasks, FlexibleImageType.VIS);
+								a = load(inVis, input, inputMasks, lastRefVis, FlexibleImageType.VIS);
 							}
+						}
 						
 						if (inFluo != null)
 							if (inFluo instanceof LoadedImage) {
 								input.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImage()));
 								inputMasks.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImageLabelField()));
 							} else {
-								b = load(inFluo, input, inputMasks, FlexibleImageType.FLUO);
+								b = load(inFluo, input, inputMasks, lastRefFluo, FlexibleImageType.FLUO);
 							}
 						
 						if (inNir != null)
@@ -156,7 +163,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								input.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImage()));
 								inputMasks.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImageLabelField()));
 							} else {
-								c = load(inNir, input, inputMasks, FlexibleImageType.NIR);
+								c = load(inNir, input, inputMasks, lastRefNir, FlexibleImageType.NIR);
 							}
 						// process images
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
@@ -427,13 +434,32 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageSet optImageMasks,
-			final FlexibleImageType type) {
+			final ObjectRef lastRef, final FlexibleImageType type) {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					System.out.print(".");
-					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, optImageMasks != null);
+					BufferedImage loadedReferenceImage = null;
+					// synchronized (lastRef) {
+					// if (lastRef.getObject() != null) {
+					// String refUrl = lastRef.toString();
+					// if (refUrl.toString().equals(id.getLabelURL().toString())) {
+					// loadedReferenceImage = (BufferedImage) lastRef.getObject();
+					// }
+					// }
+					// }
+					// if (loadedReferenceImage != null)
+					// System.out.print("o");
+					// else
+					// System.out.print(".");
+					System.out.println(id.getURL() + ";" + id.getLabelURL());
+					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, optImageMasks != null, loadedReferenceImage);
+					// synchronized (lastRef) {
+					// if (li.getLoadedImageLabelField() != null) {
+					// lastRef.setObject(li.getLoadedImageLabelField());
+					// lastRef.setString(li.getLabelURL().toString());
+					// }
+					// }
 					input.set(new FlexibleImage(li.getLoadedImage(), type));
 					if (optImageMasks != null)
 						if (li.getLoadedImageLabelField() != null)

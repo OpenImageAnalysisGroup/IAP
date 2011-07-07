@@ -51,7 +51,8 @@ public class IOmodule {
 		return new WorkerInfo(todo.size(), 0, processed, lastKBperSecTransferSpeed, "KB/s");
 	}
 	
-	public static LoadedImage loadImageFromFileOrMongo(ImageData id, boolean loadImage, boolean loadLabelField) throws Exception {
+	public static LoadedImage loadImageFromFileOrMongo(ImageData id, boolean loadImage, boolean loadLabelField, BufferedImage optLoadedReferenceImage)
+			throws Exception {
 		LoadedImage result = null;
 		StopWatch s = new StopWatch("Load image and null-image", false);
 		BufferedImage image = null;
@@ -60,8 +61,12 @@ public class IOmodule {
 		BufferedImage imageNULL = null;
 		try {
 			if (loadLabelField)
-				if (id.getLabelURL() != null)
-					imageNULL = ImageIO.read(id.getLabelURL().getInputStream());
+				if (id.getLabelURL() != null) {
+					if (optLoadedReferenceImage != null)
+						imageNULL = optLoadedReferenceImage;
+					else
+						imageNULL = ImageIO.read(id.getLabelURL().getInputStream());
+				}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}

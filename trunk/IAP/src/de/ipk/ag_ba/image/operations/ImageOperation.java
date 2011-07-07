@@ -1147,12 +1147,13 @@ public class ImageOperation {
 		HashSet<Integer> toBeDeletedClusterIDs = new HashSet<Integer>();
 		if (typ == CameraPosition.TOP) {
 			List<LargeCluster> largeClusters = new ArrayList<LargeCluster>();
-			for (int index = 0; index < clusterSizes.length; index++) {
-				if (clusterDimensions[index] >= cutOffMinimumDimension) {
-					LargeCluster lc = new LargeCluster(clusterDimensions2d[index], clusterCenter[index], clusterSizes[index], index);
-					largeClusters.add(lc);
+			if (clusterSizes != null)
+				for (int index = 0; index < clusterSizes.length; index++) {
+					if (clusterDimensions[index] >= cutOffMinimumDimension) {
+						LargeCluster lc = new LargeCluster(clusterDimensions2d[index], clusterCenter[index], clusterSizes[index], index);
+						largeClusters.add(lc);
+					}
 				}
-			}
 			
 			Collections.sort(largeClusters);
 			if (largeClusters.size() > 1) {
@@ -1181,14 +1182,15 @@ public class ImageOperation {
 		
 		int[] rgbArray = workImage.getAs1A();
 		int[] mask = ps.getImageClusterIdMask();
-		for (int idx = 0; idx < rgbArray.length; idx++) {
-			int clusterID = mask[idx];
-			if (clusterID >= 0
-					&&
-					(clusterDimensions[clusterID] < cutOffMinimumDimension || (clusterDimensions[clusterID] >= cutOffMinimumDimension && toBeDeletedClusterIDs
-							.contains(clusterID))))
-				rgbArray[idx] = iBackgroundFill;
-		}
+		if (clusterDimensions != null && clusterDimensions.length > 0)
+			for (int idx = 0; idx < rgbArray.length; idx++) {
+				int clusterID = mask[idx];
+				if (clusterID >= 0
+						&&
+						(clusterDimensions[clusterID] < cutOffMinimumDimension || (clusterDimensions[clusterID] >= cutOffMinimumDimension && toBeDeletedClusterIDs
+								.contains(clusterID))))
+					rgbArray[idx] = iBackgroundFill;
+			}
 		
 		int w = workImage.getWidth();
 		int h = workImage.getHeight();
