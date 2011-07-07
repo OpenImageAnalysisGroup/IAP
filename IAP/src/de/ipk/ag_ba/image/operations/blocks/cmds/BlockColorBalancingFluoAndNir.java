@@ -224,4 +224,49 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 		double[] res = getProbablyWhitePixels(image, size, -1., -1);
 		return res;
 	}
+	
+	public FlexibleImage nirBalance(FlexibleImage input) {
+		BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
+		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
+		
+		BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
+		BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
+		
+		FlexibleImage res = input;
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (input != null) {
+				double side = 0.3; // value for white balancing (side width)
+				FlexibleImage nir = input;
+				// White Balancing
+				double[] pix = BlockColorBalancingFluoAndNir.getProbablyWhitePixels(nir.crop(), side);// 0.08);
+				res = new ImageOperation(nir).imageBalancing(170, pix).getImage();
+			}
+		} else {
+			FlexibleImage nir = input;
+			ImageOperation io = new ImageOperation(nir);
+			int width = input.getWidth();
+			int height = input.getHeight();
+			double markerPosY = -1;
+			double markerPosX = -1;
+			if (markerPosLeftY != null) {
+				markerPosY = markerPosLeftY.getValue() * height;
+			}
+			if (markerPosLeftY == null && markerPosRightY != null) {
+				markerPosY = markerPosRightY.getValue() * height;
+			}
+			if (markerPosLeftX != null) {
+				markerPosX = markerPosLeftX.getValue() * width;
+			}
+			if (markerPosLeftX == null && markerPosRightX != null) {
+				markerPosX = nir.getWidth() - markerPosRightX.getValue() * width;
+			}
+			double[] pix;
+			if (markerPosY != -1)
+				pix = getProbablyWhitePixels(io.getImage(), 0.08, markerPosX, markerPosY);
+			else
+				pix = getProbablyWhitePixels(io.getImage(), 0.08);
+			res = io.imageBalancing(170, pix).getImage();
+		}
+		return res;
+	}
 }
