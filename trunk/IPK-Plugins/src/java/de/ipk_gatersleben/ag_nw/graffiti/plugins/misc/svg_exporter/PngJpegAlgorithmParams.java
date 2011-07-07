@@ -7,7 +7,6 @@ public class PngJpegAlgorithmParams {
 	private boolean includeURLinTooltip = false;
 	private boolean includeTooltip = true;
 	private boolean customTarget = false;
-	private boolean withBorder = false;
 	
 	private String customTargetValue = null;
 	
@@ -171,13 +170,5 @@ public class PngJpegAlgorithmParams {
 	
 	public int getClipY() {
 		return clipY;
-	}
-	
-	public void setWithBorder(boolean withBorder) {
-		this.withBorder = withBorder;
-	}
-	
-	public boolean isWithBorder() {
-		return withBorder;
 	}
 }
