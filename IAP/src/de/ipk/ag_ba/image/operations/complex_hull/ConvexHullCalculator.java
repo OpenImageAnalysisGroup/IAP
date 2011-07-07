@@ -126,8 +126,8 @@ public class ConvexHullCalculator {
 			
 			rt.addValue("hull.points", numberOfHullPoints);
 			double realMarkerDist = 1;
-			double normFactorArea = (realMarkerDist * realMarkerDist) / (distHorizontal.getValue() * distHorizontal.getValue());
-			double normFactor = realMarkerDist / distHorizontal.getValue();
+			double normFactorArea = distHorizontal != null ? (realMarkerDist * realMarkerDist) / (distHorizontal.getValue() * distHorizontal.getValue()) : 1;
+			double normFactor = distHorizontal != null ? realMarkerDist / distHorizontal.getValue() : 1;
 			rt.addValue("hull.area", polygon.area() * normFactorArea);
 			rt.addValue("hull.signedarea", polygon.signedArea() * normFactorArea);
 			rt.addValue("hull.circularity", circularity());
