@@ -40,6 +40,9 @@ public class MyThread extends Thread {
 	public void run() {
 		try {
 			super.run();
+		} catch (Exception e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
 		} finally {
 			finished = true;
 			sem.release();

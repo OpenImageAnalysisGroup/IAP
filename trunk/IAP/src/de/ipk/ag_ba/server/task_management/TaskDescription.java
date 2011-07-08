@@ -97,6 +97,7 @@ public class TaskDescription {
 									try {
 										action.performActionCalculateResults(null);
 									} catch (Exception e) {
+										e.printStackTrace();
 										ErrorMsg.addErrorMessage(e);
 									}
 								}
