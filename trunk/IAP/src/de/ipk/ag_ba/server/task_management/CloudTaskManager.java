@@ -147,8 +147,8 @@ public class CloudTaskManager {
 						System.out.println("> SYSTEM.EXIT");
 						System.exit(0);
 					}
-				} else
-					System.out.println("> Cloud Task Manager: Running Tasks: " + runningTasks.size() + " // " + SystemAnalysisExt.getCurrentTime());
+				} // else
+				// System.out.println("> Cloud Task Manager: Running Tasks: " + runningTasks.size() + " // " + SystemAnalysisExt.getCurrentTime());
 			} while (true);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

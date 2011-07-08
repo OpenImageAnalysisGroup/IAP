@@ -292,8 +292,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						} else {
 							System.err.println("ERROR: Not all three snapshots images could be loaded!");
 						}
+					} catch (Error e) {
+						e.printStackTrace();
 					} catch (Exception e) {
-						ErrorMsg.addErrorMessage(e);
+						e.printStackTrace();
 					}
 					tso.addInt(1);
 					// status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
@@ -309,7 +311,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-			ErrorMsg.addErrorMessage(e);
 		}
 		
 		status.setCurrentStatusValueFine(100d);
@@ -466,8 +467,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							optImageMasks.set(new FlexibleImage(li.getLoadedImageLabelField(), type));
 						else
 							System.out.println("ERROR: Label field not available for:" + li);
+				} catch (Error err) {
+					err.printStackTrace();
 				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
+					e.printStackTrace();
 				}
 			}
 		}, "load " + type.name(), 0);

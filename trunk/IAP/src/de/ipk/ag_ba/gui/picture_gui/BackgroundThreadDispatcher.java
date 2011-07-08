@@ -279,31 +279,6 @@ public class BackgroundThreadDispatcher {
 				t.getResult();
 				updateTaskStatistics();
 			}
-			// boolean oneRunning;
-			// do {
-			// oneRunning = false;
-			// ArrayList<MyThread> del = null;
-			// for (MyThread t : threads) {
-			// if (t == null)
-			// continue;
-			// if (!t.isFinished())
-			// oneRunning = true;
-			// else {
-			// if (del == null)
-			// del = new ArrayList<MyThread>();
-			// del.add(t);
-			// updateTaskStatistics();
-			// }
-			// }
-			// if (del != null)
-			// for (MyThread d : del)
-			// threads.remove(d);
-			// try {
-			// Thread.sleep(100);
-			// } catch (InterruptedException e) {
-			// // empty
-			// }
-			// } while (oneRunning);
 		} finally {
 			if (Thread.currentThread().getName().contains("wait;"))
 				Thread.currentThread().setName(Thread.currentThread().getName().substring("wait;".length()));
