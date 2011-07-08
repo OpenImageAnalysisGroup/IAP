@@ -19,7 +19,12 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		final FlexibleImageSet processedImages = new FlexibleImageSet();
 		final FlexibleImageSet processedMasks = new FlexibleImageSet();
 		
-		prepare();
+		try {
+			prepare();
+		} catch (Exception e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
 		
 		String name = this.getClass().getSimpleName();
 		
@@ -29,7 +34,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedImages.setVis(processVISimage());
-						} catch (InterruptedException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 							ErrorMsg.addErrorMessage(e);
 						}
@@ -40,7 +45,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedImages.setFluo(processFLUOimage());
-						} catch (InterruptedException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 							ErrorMsg.addErrorMessage(e);
 						}
@@ -51,7 +56,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedImages.setNir(processNIRimage());
-						} catch (InterruptedException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 							ErrorMsg.addErrorMessage(e);
 						}
@@ -62,7 +67,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedMasks.setVis(processVISmask());
-						} catch (InterruptedException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 							ErrorMsg.addErrorMessage(e);
 						}
@@ -73,7 +78,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedMasks.setFluo(processFLUOmask());
-						} catch (InterruptedException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 							ErrorMsg.addErrorMessage(e);
 						}
@@ -83,14 +88,19 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedMasks.setNir(processNIRmask());
-						} catch (InterruptedException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
 				}, name + "process NIR mask", 1) });
 		
-		postProcess(processedImages, processedMasks);
+		try {
+			postProcess(processedImages, processedMasks);
+		} catch (Exception e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
 		
 		return new FlexibleMaskAndImageSet(processedImages, processedMasks);
 	}
