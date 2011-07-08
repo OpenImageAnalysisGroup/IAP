@@ -32,7 +32,7 @@ public class ClusterDetection implements Segmentation {
 		int idx = 0;
 		this.foregroundPixelCount = 0;
 		
-		int[] queue = new int[w * h];
+		int[] queue = new int[w * h * 2];
 		for (int c : img) {
 			if (c != back) {
 				foregroundPixelCount++;

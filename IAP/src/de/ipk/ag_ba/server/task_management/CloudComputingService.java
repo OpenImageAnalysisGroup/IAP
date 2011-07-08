@@ -150,27 +150,27 @@ public class CloudComputingService {
 							}
 						}
 			}
-			SystemInfoExt si = new SystemInfoExt();
-			System.out.println("CPUs (sockets,physical,logical): " +
+		}
+		SystemInfoExt si = new SystemInfoExt();
+		System.out.println("CPUs (sockets,physical,logical): " +
 					si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
 					si.getCpuLogicalCores() + ", using " + SystemAnalysis.getNumberOfCPUs());
-			System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
-			System.out.println(">");
-			System.out.println("> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
+		System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
+		System.out.println(">");
+		System.out.println("> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
+		
+		// register extended hierarchy and loaded image loaders (and more)
+		new MultimodalDataHandlingAddon();
+		
+		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
+		for (MongoDB m : MongoDB.getMongos()) {
+			for (ResourceIOHandler handler : m.getHandlers())
+				ResourceIOManager.registerIOHandler(handler);
 			
-			// register extended hierarchy and loaded image loaders (and more)
-			new MultimodalDataHandlingAddon();
-			
-			ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
-			for (MongoDB m : MongoDB.getMongos()) {
-				for (ResourceIOHandler handler : m.getHandlers())
-					ResourceIOManager.registerIOHandler(handler);
-				
-				CloudComputingService cc = new CloudComputingService();
-				cc.setClusterExecutionModeSingleTaskAndExit(clusterExecutionMode);
-				cc.switchStatus(m);
-				System.out.println("START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());
-			}
+			CloudComputingService cc = new CloudComputingService();
+			cc.setClusterExecutionModeSingleTaskAndExit(clusterExecutionMode);
+			cc.switchStatus(m);
+			System.out.println("START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());
 		}
 	}
 	

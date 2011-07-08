@@ -13,12 +13,13 @@ import org.Vector2d;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class BlueMarkerFinder {
 	
 	private final FlexibleImage input;
 	private ResultsTable resultTable;
-	private double scale;
+	private final double scale;
 	private final CameraPosition typ;
 	
 	public BlueMarkerFinder(FlexibleImage image, double scale, CameraPosition typ) {
@@ -83,7 +84,7 @@ public class BlueMarkerFinder {
 		}
 		
 		if (coordinatesUnfiltered.isEmpty()) {
-			System.out.println("INFO: No blue marker coordinates (empty).");
+			System.out.println("INFO: No blue marker coordinates (empty). Image " + input + " //" + typ + " // " + SystemAnalysisExt.getCurrentTime());
 			return result;
 		}
 		
