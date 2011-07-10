@@ -163,4 +163,8 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	public MongoDB getMongoInstance() {
 		return m;
 	}
+	
+	public String getCSVheader() {
+		return "Plant ID;Condition;Day;Time;Weight A (g);Weight B (g);Water;RGB;Fluo;Nir;Other\n";
+	}
 }

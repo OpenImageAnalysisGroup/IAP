@@ -11,13 +11,14 @@ import java.util.Collection;
 
 import org.SystemAnalysis;
 
+import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ActionDataExport;
+import de.ipk.ag_ba.gui.actions.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.gui.actions.ActionDataExportTar;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionNumericDataReport;
+import de.ipk.ag_ba.gui.actions.ActionNumericDataReportComplete;
 import de.ipk.ag_ba.gui.actions.CloudIoTestAction;
-import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
-import de.ipk.ag_ba.gui.actions.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.gui.actions.analysis.ActionThreeDreconstruction;
 import de.ipk.ag_ba.gui.actions.analysis.ActionThreeDsegmentation;
 import de.ipk.ag_ba.gui.actions.hsm.ActionDataExportToHsmFolder;
@@ -56,6 +57,8 @@ public class ImageAnalysisCommandManager {
 		
 		if (SystemAnalysis.isHeadless())
 			actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
+		if (SystemAnalysis.isHeadless())
+			actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference), guiSetting));
 		
 		actions.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReference, IAPmain.getHSMfolder()), guiSetting));
 		
