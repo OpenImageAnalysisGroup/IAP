@@ -165,6 +165,6 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	}
 	
 	public String getCSVheader() {
-		return "Plant ID;Condition;Day;Time;Weight A (g);Weight B (g);Water;RGB;Fluo;Nir;Other\n";
+		return "Plant ID;Condition;Day;Time\n";
 	}
 }
