@@ -3,6 +3,8 @@ package de.ipk.ag_ba.image.operations.blocks;
 import ij.measure.ResultsTable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.StringManipulationTools;
@@ -16,7 +18,7 @@ public class BlockPropertiesImpl implements BlockProperties {
 	private final TreeMap<Integer, TreeMap<String, Double>> store = new TreeMap<Integer, TreeMap<String, Double>>();
 	
 	@Override
-	public BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, Enum<?> pName) {
+	public synchronized BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, Enum<?> pName) {
 		String name = pName.name();
 		if (searchIndex <= 0 && !store.containsKey(currentPositionInPipeline + searchIndex))
 			return null;
@@ -47,7 +49,7 @@ public class BlockPropertiesImpl implements BlockProperties {
 	}
 	
 	@Override
-	public void setNumericProperty(int position, Enum<?> name, double value) {
+	public synchronized void setNumericProperty(int position, Enum<?> name, double value) {
 		if (!store.containsKey(position))
 			store.put(position, new TreeMap<String, Double>());
 		
@@ -55,7 +57,7 @@ public class BlockPropertiesImpl implements BlockProperties {
 	}
 	
 	@Override
-	public void setNumericProperty(int position, String name, double value) {
+	public synchronized void setNumericProperty(int position, String name, double value) {
 		if (!store.containsKey(position))
 			store.put(position, new TreeMap<String, Double>());
 		
@@ -63,7 +65,7 @@ public class BlockPropertiesImpl implements BlockProperties {
 	}
 	
 	@Override
-	public String toString() {
+	public synchronized String toString() {
 		StringBuilder sb = new StringBuilder();
 		
 		for (Integer index : store.keySet()) {
@@ -77,17 +79,17 @@ public class BlockPropertiesImpl implements BlockProperties {
 	}
 	
 	@Override
-	public int getBlockPosition() {
+	public synchronized int getBlockPosition() {
 		return store.lastKey();
 	}
 	
 	@Override
-	public int getNumberOfBlocksWithPropertyResults() {
+	public synchronized int getNumberOfBlocksWithPropertyResults() {
 		return store.size();
 	}
 	
 	@Override
-	public int getNumberOfBlocksWithThisProperty(Enum<?> pName) {
+	public synchronized int getNumberOfBlocksWithThisProperty(Enum<?> pName) {
 		String name = pName.name();
 		int foundCount = 0;
 		for (int index = getBlockPosition(); index >= 0; index--) {
@@ -101,36 +103,38 @@ public class BlockPropertiesImpl implements BlockProperties {
 	}
 	
 	@Override
-	public ArrayList<BlockPropertyValue> getProperties(String search) {
+	public synchronized ArrayList<BlockPropertyValue> getProperties(String search) {
 		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
-		
-		for (TreeMap<String, Double> tm : store.values()) {
-			for (String key : tm.keySet()) {
-				if (key.startsWith(search)) {
-					
-					PropertyNames pn = null;
-					try {
-						pn = PropertyNames.valueOf(key);
-					} catch (Exception e) {
-						// ignore, not a parameter which has an enum constant
-					}
-					if (pn == null) {
-						if (tm.get(key) != null) {
-							BlockPropertyValue p = new BlockPropertyValue(key.substring(search.length()), "", tm.get(key));
-							result.add(p);
+		Collection<TreeMap<String, Double>> sv = store.values();
+		if (sv != null)
+			for (TreeMap<String, Double> tm : sv) {
+				Set<String> ks = tm.keySet();
+				if (ks != null)
+					for (String key : ks) {
+						if (key.startsWith(search)) {
+							PropertyNames pn = null;
+							try {
+								pn = PropertyNames.valueOf(key);
+							} catch (Exception e) {
+								// ignore, not a parameter which has an enum constant
+							}
+							if (pn == null) {
+								if (tm.get(key) != null) {
+									BlockPropertyValue p = new BlockPropertyValue(key.substring(search.length()), "", tm.get(key));
+									result.add(p);
+								}
+							} else {
+								BlockPropertyValue p = new BlockPropertyValue(pn.getName(), pn.getUnit(), tm.get(key));
+								result.add(p);
+							}
 						}
-					} else {
-						BlockPropertyValue p = new BlockPropertyValue(pn.getName(), pn.getUnit(), tm.get(key));
-						result.add(p);
 					}
-				}
 			}
-		}
 		return result;
 	}
 	
 	@Override
-	public void storeResults(String id_prefix, ResultsTable numericResults, int position) {
+	public synchronized void storeResults(String id_prefix, ResultsTable numericResults, int position) {
 		for (int row = 0; row < numericResults.getCounter(); row++) {
 			for (int col = 0; col <= numericResults.getLastColumn(); col++) {
 				String id = numericResults.getColumnHeading(col);
@@ -141,7 +145,7 @@ public class BlockPropertiesImpl implements BlockProperties {
 	}
 	
 	@Override
-	public void printAnalysisResults() {
+	public synchronized void printAnalysisResults() {
 		for (BlockPropertyValue bpv : getProperties("RESULT_")) {
 			if (bpv.getName() == null)
 				continue;
