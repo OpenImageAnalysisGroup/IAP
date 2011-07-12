@@ -51,7 +51,6 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -669,12 +668,13 @@ public class MongoDB {
 		}
 		
 		GridFSInputFile inputFile = fs.createFile(is, hash);
+		fs.getDB().setWriteConcern(WriteConcern.REPLICAS_SAFE);
 		inputFile.save();
 		result = inputFile.getLength();
 		is.close();
-		CommandResult cr = fs.getDB().getLastError(WriteConcern.REPLICAS_SAFE);
-		if (!cr.ok())
-			System.out.println("ERROR: MONGODB GRIDFS STORAGE RESULT: " + cr.getErrorMessage());
+		// CommandResult cr = fs.getDB().getLastError(WriteConcern.REPLICAS_SAFE);
+		// if (!cr.ok())
+		// System.out.println("ERROR: MONGODB GRIDFS STORAGE RESULT: " + cr.getErrorMessage());
 		return result;
 	}
 	
