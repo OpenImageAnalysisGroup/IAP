@@ -30,7 +30,7 @@ public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 		}
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
-		if (distHorizontal != null) {
+		if (distHorizontal != null || options.getCameraPosition() == CameraPosition.TOP) {
 			res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(true, false, false, false, Color.RED.getRGB(),
 					Color.BLUE.getRGB(),
 					Color.ORANGE.getRGB(), distHorizontal);
@@ -47,7 +47,10 @@ public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
 									+ ".", numericResults,
 							getBlockPosition());
 		if (options.getCameraPosition() == CameraPosition.TOP && numericResults != null)
-			getProperties().storeResults("RESULT_top.", numericResults, getBlockPosition());
+			getProperties().storeResults(
+					"RESULT_top" + (getInput().getImages().getFluoInfo() != null && getInput().getImages().getFluoInfo().getPosition() != null ? getInput()
+							.getImages().getFluoInfo().getPosition().intValue() : "0")
+							+ ".", numericResults, getBlockPosition());
 		
 		return res.getImage();
 	}
