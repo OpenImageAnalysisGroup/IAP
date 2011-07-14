@@ -1380,9 +1380,11 @@ public class MongoDB {
 					CloudHost h = (CloudHost) cursor.next();
 					if (curr - h.getLastUpdateTime() < maxUpdate) {
 						res.add(h);
-					} else
-						if (curr - h.getLastUpdateTime() > 1000 * 60 * 5)
+					} else {
+						long age = curr - h.getLastUpdateTime();
+						if (age > 1000 * 60 * 3)
 							del.add(h);
+					}
 				}
 				for (CloudHost d : del)
 					dbc.remove(d);
@@ -1414,8 +1416,16 @@ public class MongoDB {
 				query.put(CloudHost.getHostId(), ip);
 				
 				CloudHost res = (CloudHost) dbc.findOne(query);
+				boolean add = false;
+				if (res == null) {
+					System.out.println("INSERT: " + query);
+					res = new CloudHost();
+					add = true;
+				}
 				if (res != null) {
 					res.updateTime();
+					res.setHostName(ip);
+					res.setClusterExecutionMode(IAPservice.isCloudExecutionModeActive());
 					res.setOperatingSystem(SystemAnalysis.getOperatingSystem());
 					res.setBlocksExecutedWithinLastMinute(blocksExecutedWithinLastMinute);
 					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
@@ -1432,16 +1442,10 @@ public class MongoDB {
 							+ ", queue: "
 							+ BackgroundThreadDispatcher.getWorkLoad());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
-					dbc.save(res);
-				} else {
-					try {
-						res = new CloudHost();
-						res.updateTime();
-						res.setHostName(SystemAnalysisExt.getHostName()); // + "//" + System.currentTimeMillis()
+					if (add)
 						dbc.insert(res);
-					} catch (UnknownHostException e) {
-						ErrorMsg.addErrorMessage(e);
-					}
+					else
+						dbc.save(res);
 				}
 			}
 			

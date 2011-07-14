@@ -12,6 +12,7 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.actions.ActionCloudClusterHostInformation;
 import de.ipk.ag_ba.gui.actions.ActionCloudHostInformation;
 import de.ipk.ag_ba.gui.actions.ActionJobStatus;
 import de.ipk.ag_ba.gui.actions.ActionMongoExperimentsNavigation;
@@ -65,10 +66,20 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		}
 		
 		try {
-			ArrayList<CloudHost> hl = m.batchGetAvailableHosts(5 * 60 * 1000);
+			ArrayList<CloudHost> hl = m.batchGetAvailableHosts(3 * 60 * 1000);
+			boolean clusterAvailable = false;
 			for (CloudHost ip : hl) {
-				NavigationButton n = new NavigationButton(new ActionCloudHostInformation(m, ip), guiSetting);
-				res.add(n);
+				if (!ip.isClusterExecutionMode()) {
+					NavigationButton n = new NavigationButton(new ActionCloudHostInformation(m, ip), guiSetting);
+					res.add(n);
+				} else
+					clusterAvailable = true;
+			}
+			if (clusterAvailable) {
+				res.add(
+						new NavigationButton(
+								new ActionCloudClusterHostInformation(m),
+								guiSetting));
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);

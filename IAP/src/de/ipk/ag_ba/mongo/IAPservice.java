@@ -483,8 +483,9 @@ public class IAPservice {
 		
 		return result;
 	}
-
+	
 	public final static float[] cubeRoots = getCubeRoots(0f, 1.1f, 1100);
+	private static boolean autoClose;
 	
 	public static float[] getCubeRoots(float lo, float up, int n) {
 		StopWatch s = new StopWatch("cube_roots", false);
@@ -496,5 +497,13 @@ public class IAPservice {
 		}
 		s.printTime();
 		return res;
+	}
+	
+	public static void setCloudExecutionMode(boolean autoClose) {
+		IAPservice.autoClose = autoClose;
+	}
+	
+	public static boolean isCloudExecutionModeActive() {
+		return autoClose;
 	}
 }

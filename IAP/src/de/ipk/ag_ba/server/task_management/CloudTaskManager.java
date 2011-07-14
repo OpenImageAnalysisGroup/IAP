@@ -14,6 +14,7 @@ import org.ErrorMsg;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -74,6 +75,7 @@ public class CloudTaskManager {
 	}
 	
 	private void run() throws Exception {
+		long startTime = System.currentTimeMillis();
 		try {
 			double progressSum = -1;
 			do {
@@ -141,14 +143,14 @@ public class CloudTaskManager {
 					System.out.println("> Cloud Task Manager: Processing Disabled // " + SystemAnalysisExt.getCurrentTime());
 				}
 				Thread.sleep(1000);
-				if (runningTasks.isEmpty()) {
-					if (autoClose) {
+				if (autoClose && System.currentTimeMillis() - startTime > 10000) {
+					if (runningTasks.isEmpty()) {
 						System.out.println("> Cluster Execution Mode is active // NO RUNNING TASK");
 						System.out.println("> SYSTEM.EXIT");
 						System.exit(0);
 					}
 				} // else
-				// System.out.println("> Cloud Task Manager: Running Tasks: " + runningTasks.size() + " // " + SystemAnalysisExt.getCurrentTime());
+					// System.out.println("> Cloud Task Manager: Running Tasks: " + runningTasks.size() + " // " + SystemAnalysisExt.getCurrentTime());
 			} while (true);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -157,5 +159,6 @@ public class CloudTaskManager {
 	
 	public void setClusterExecutionModeSingleTaskAndExit(boolean autoClose) {
 		this.autoClose = autoClose;
+		IAPservice.setCloudExecutionMode(autoClose);
 	}
 }
