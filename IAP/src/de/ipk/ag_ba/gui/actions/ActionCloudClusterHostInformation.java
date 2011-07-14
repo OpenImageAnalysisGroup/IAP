@@ -170,7 +170,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 		try {
 			hl = m.batchGetAvailableHosts(3 * 60 * 1000);
 			for (CloudHost ip : hl) {
-				if (!ip.isClusterExecutionMode()) {
+				if (ip.isClusterExecutionMode()) {
 					NavigationButton n = new NavigationButton(new ActionCloudHostInformation(m, ip), src.getGUIsetting());
 					res.add(n);
 				}
