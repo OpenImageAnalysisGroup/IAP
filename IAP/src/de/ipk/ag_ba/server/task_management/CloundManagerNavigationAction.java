@@ -16,8 +16,10 @@ import de.ipk.ag_ba.gui.actions.ActionCloudClusterHostInformation;
 import de.ipk.ag_ba.gui.actions.ActionCloudHostInformation;
 import de.ipk.ag_ba.gui.actions.ActionJobStatus;
 import de.ipk.ag_ba.gui.actions.ActionMongoExperimentsNavigation;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
@@ -80,6 +82,10 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 						new NavigationButton(
 								new ActionCloudClusterHostInformation(m),
 								guiSetting));
+				res.add(WebFolder.getURLentity("Analyze Cluster Status",
+						"http://pdw-24.ipk-gatersleben.de/ganglia/?m=load_one&r=hour&s=descending&c=Brocken&h=&sh=1&hc=4",
+						IAPimages.getComputerConsole(), src.getGUIsetting()));
+				
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
