@@ -99,16 +99,16 @@ public class CloudHost extends BasicDBObject {
 		return (String) get("operatingSystem");
 	}
 	
-	public String getPipelinesPerHour() {
+	public int getPipelinesPerHour() {
 		try {
 			String h = getHostName();
 			long start = Long.parseLong(h.split("_")[1]);
 			long now = System.currentTimeMillis();
 			long diff = now - start;
 			int n = getPipelineExecutedWithinCurrentHour();
-			return "" + (int) (n / (diff / 1000d / 60d / 60d));
+			return (int) (n / (diff / 1000d / 60d / 60d));
 		} catch (Exception e) {
-			return "unknown";
+			return -1;
 		}
 	}
 	
@@ -121,5 +121,15 @@ public class CloudHost extends BasicDBObject {
 	
 	public void setTaskProgress(double progress) {
 		put("taskProgress", progress);
+	}
+	
+	public void setClusterExecutionMode(boolean mode) {
+		put("clusterMode", mode);
+	}
+	
+	public boolean isClusterExecutionMode() {
+		if (get("clusterMode") != null)
+			return (Boolean) get("clusterMode");
+		return false;
 	}
 }

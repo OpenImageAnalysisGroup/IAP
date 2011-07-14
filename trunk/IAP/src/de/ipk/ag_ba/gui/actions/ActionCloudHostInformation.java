@@ -95,7 +95,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 							rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
 						else
 							return "idle, ";
-						return ip.getPipelinesPerHour() + " p.e./h, " + rA + "t_p=" + ch.getLastPipelineTime() + " s, " +
+						return ch.getPipelinesPerHour() + " p.e./h, " + rA + "t_p=" + ch.getLastPipelineTime() + " s, " +
 								ch.getPipelineExecutedWithinCurrentHour() + " p.e.";
 					} else
 						return "N/A";
