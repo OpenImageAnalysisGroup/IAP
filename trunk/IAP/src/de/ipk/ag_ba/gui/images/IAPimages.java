@@ -30,6 +30,15 @@ public class IAPimages {
 			return "img/ext/network-server-status.png";
 	}
 	
+	public static String getCloudComputer() {
+		return "img/ext/poweredge-r810-overview1.png";
+	}
+	
+	public static String getComputerConsole() {
+		return "img/ext/poweredge-r810-overview6.png";
+		// return "img/ext/computer.png";
+	}
+	
 	public static String getNetworkPCoffline() {
 		if (ns)
 			return "img/ext/gpl2/Gnome-Network-Offline-64.png";

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
@@ -128,12 +129,16 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 	@Override
 	public String getDefaultImage() {
 		if (ip != null) {
-			if (ip.getOperatingSystem() != null) {
-				if (ip.getOperatingSystem().toUpperCase().contains("WINDOWS"))
+			if (ip.isClusterExecutionMode())
+				return IAPimages.getCloudComputer();
+			
+			String os = ip.getOperatingSystem();
+			if (os != null) {
+				if (os.toUpperCase().contains("WINDOWS"))
 					return "img/ext/windows-pc.png";
-				if (ip.getOperatingSystem().toUpperCase().contains("MAC"))
+				if (os.toUpperCase().contains("MAC"))
 					return "img/ext/macpro_side.png";
-				if (ip.getOperatingSystem().toUpperCase().contains("LINUX"))
+				if (os.toUpperCase().contains("LINUX"))
 					return "img/ext/dellR810.png";
 				return "img/ext/network-server-status.png";
 			}
