@@ -58,7 +58,6 @@ import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.Mongo;
 import com.mongodb.ServerAddress;
-import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
@@ -343,6 +342,30 @@ public class MongoDB {
 	}
 	
 	private void storeExperiment(ExperimentInterface experiment, DB db,
+			BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException, ExecutionException {
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		tso.setBval(0, true);
+		Thread loadGen = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (tso.getBval(0, true)) {
+					double v = Math.random();
+					v = Math.sin(v);
+					tso.setDouble(v);
+				}
+			}
+		});
+		if (IAPservice.isCloudExecutionModeActive())
+			loadGen.start();
+		
+		try {
+			storeExperimentInnerCall(experiment, db, status);
+		} finally {
+			tso.setBval(0, false);
+		}
+	}
+	
+	private void storeExperimentInnerCall(ExperimentInterface experiment, DB db,
 						BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException, ExecutionException {
 		
 		System.out.println(">>> " + SystemAnalysisExt.getCurrentTime());
@@ -668,7 +691,7 @@ public class MongoDB {
 		}
 		
 		GridFSInputFile inputFile = fs.createFile(is, hash);
-		fs.getDB().setWriteConcern(WriteConcern.REPLICAS_SAFE);
+		// fs.getDB().setWriteConcern(WriteConcern.REPLICAS_SAFE);
 		inputFile.save();
 		result = inputFile.getLength();
 		is.close();
@@ -1382,7 +1405,7 @@ public class MongoDB {
 						res.add(h);
 					} else {
 						long age = curr - h.getLastUpdateTime();
-						if (age > 1000 * 60 * 3)
+						if (age > 1000 * 60 * 15)
 							del.add(h);
 					}
 				}
@@ -1456,7 +1479,7 @@ public class MongoDB {
 		});
 	}
 	
-	public synchronized CloudHost batchGetUpdatedHostInfo(final CloudHost h) throws Exception {
+	public CloudHost batchGetUpdatedHostInfo(final CloudHost h) throws Exception {
 		final ObjectRef r = new ObjectRef();
 		processDB(new RunnableOnDB() {
 			private DB db;
@@ -2145,9 +2168,15 @@ public class MongoDB {
 							res.append("REORGANIZATION: Binary files that are not linked (" + mgfs + "): " + toBeRemoved.size() + " // "
 									+ SystemAnalysisExt.getCurrentTime() + "<br>");
 							long free = 0;
+							int fIdx = 0;
+							int fN = toBeRemoved.size();
 							for (GridFSDBFile f : toBeRemoved) {
 								free += f.getLength();
 								gridfs.remove(f);
+								fIdx++;
+								status.setCurrentStatusText1("File " + fIdx + "/" + fN);
+								status.setCurrentStatusText2("Removed: " + free / 1024 / 1024 + " MB");
+								status.setCurrentStatusValueFine(fIdx * 100d / fN);
 							}
 							System.out.println("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
 									+ SystemAnalysisExt.getCurrentTime());
