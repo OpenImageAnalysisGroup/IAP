@@ -469,4 +469,15 @@ public class ImageConverter {
 		return res;
 	}
 	
+	public static int[] convertLABto1A(float[][] labImage) {
+		int[] res = new int[labImage[0].length];
+		for (int idx = 0; idx < res.length; idx++) {
+			double l = labImage[0][idx];
+			double a = labImage[0][idx];
+			double b = labImage[0][idx];
+			res[idx] = new Color_CIE_Lab(l, a, b).getRGB();
+		}
+		return res;
+	}
+	
 }

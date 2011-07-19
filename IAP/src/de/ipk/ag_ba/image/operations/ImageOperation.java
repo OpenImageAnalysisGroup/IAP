@@ -31,7 +31,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -319,22 +318,57 @@ public class ImageOperation {
 	 *           considered as foreground.
 	 * @return The source image, filtered by the given mask.
 	 */
+	public ImageOperation applyMask_ResizeSourceIfNeeded(int[] mask, int maskW, int maskH,
+			int background) {
+		
+		ImageOperation io = this;
+		// if the source image size is not equal to the given mask, the source
+		// image is resized
+		if (image.getWidth() != maskW
+				|| image.getHeight() != maskH) {
+			io = resize(maskW, maskH);
+		}
+		
+		int[] maskPixels = mask;
+		int[] originalImage = io.getImageAs1array();
+		
+		int idx = 0;
+		for (int maskPixel : maskPixels) {
+			if (maskPixel != background)
+				maskPixels[idx] = originalImage[idx];
+			idx++;
+		}
+		
+		return new ImageOperation(maskPixels, maskW, maskH);
+	}
+	
+	/**
+	 * Copies the content of the stored image of this operation onto the given
+	 * mask (and returns the result). Pixels where the mask has not the
+	 * background color are set according to the source image. Pixels with
+	 * background color are not modified.
+	 * 
+	 * @param mask
+	 *           The mask which is used as a template.
+	 * @param background
+	 *           The color which is used to determine which parts of the mask
+	 *           are considered as background (empty), all other pixels are
+	 *           considered as foreground.
+	 * @return The source image, filtered by the given mask.
+	 */
 	public ImageOperation applyMask_ResizeSourceIfNeeded(FlexibleImage mask,
 			int background) {
 		
-		FlexibleImage srcImage = new FlexibleImage(image);
-		
+		ImageOperation io = this;
 		// if the source image size is not equal to the given mask, the source
 		// image is resized
-		// ToDo: think or tests, shouldn't the mask be resized?
-		if (srcImage.getWidth() != mask.getWidth()
-				|| srcImage.getHeight() != mask.getHeight()) {
-			srcImage = new ImageOperation(srcImage).resize(mask.getWidth(),
-					mask.getHeight()).getImage();
+		if (image.getWidth() != mask.getWidth()
+				|| image.getHeight() != mask.getHeight()) {
+			io = resize(mask.getWidth(), mask.getHeight());
 		}
 		
 		int[] maskPixels = mask.getAs1A();
-		int[] originalImage = srcImage.getAs1A();
+		int[] originalImage = io.getImageAs1array();
 		
 		int idx = 0;
 		for (int maskPixel : maskPixels) {
@@ -513,11 +547,148 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation opening(int n1, int n2) {
-		for (int i = 0; i < n1; i++)
-			image.getProcessor().erode();
-		for (int i = 0; i < n2; i++)
-			image.getProcessor().dilate();
-		return this;
+		ImageOperation io = erodeNG(n1);
+		io = io.dilateNG(n2);
+		return io;
+		// for (int i = 0; i < n1; i++)
+		// image.getProcessor().erode();
+		// for (int i = 0; i < n2; i++)
+		// image.getProcessor().dilate();
+		// return this;
+	}
+	
+	/**
+	 * increase area of mask
+	 * 
+	 * @param n
+	 *           number of times the code should be run
+	 */
+	public ImageOperation dilateNG(int n) {
+		int[] imagePixels = getImageAs1array();
+		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int w = image.getWidth();
+		int h = image.getHeight();
+		for (int i = 0; i < n; i++) {
+			int p;
+			// run through from left top to bottom right and
+			// add one pixel left to any non-background pixel and one pixel
+			// above any non-background pixel
+			// the first line of pixels may be omitted, as above there can't
+			// be pixels to be set
+			for (int idx = w + 1; idx < imagePixels.length; idx++) {
+				p = imagePixels[idx];
+				if (p != back) {
+					imagePixels[idx - w] = p;
+					if ((idx - 1) % w != 0)
+						imagePixels[idx - 1] = p;
+				}
+			}
+			// run through from bottom right to top left (reverse)
+			// add one pixel right to any non-background pixel and one pixel
+			// below any non-background pixel
+			for (int idx = imagePixels.length - 1 - w - 1; idx >= 0; idx--) {
+				p = imagePixels[idx];
+				if (p != back) {
+					imagePixels[idx + w] = p;
+					if (idx % w != 0)
+						imagePixels[idx + 1] = p;
+				}
+			}
+		}
+		return new ImageOperation(imagePixels, w, h);
+	}
+	
+	/**
+	 * increase area of mask
+	 * 
+	 * @param n
+	 *           number of times the code should be run
+	 */
+	public ImageOperation dilateNG(int n, FlexibleImage inputImageForNewPixels) {
+		int[] imagePixels = getImageAs1array();
+		int[] inputImagePixels = inputImageForNewPixels.getAs1A();
+		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int w = image.getWidth();
+		int h = image.getHeight();
+		for (int i = 0; i < n; i++) {
+			int p;
+			// run through from left top to bottom right and
+			// add one pixel left to any non-background pixel and one pixel
+			// above any non-background pixel
+			// the first line of pixels may be omitted, as above there can't
+			// be pixels to be set
+			for (int idx = w + 1; idx < imagePixels.length; idx++) {
+				p = imagePixels[idx];
+				if (p != back) {
+					imagePixels[idx - w] = inputImagePixels[idx - w];;
+					if ((idx - 1) % w != 0)
+						imagePixels[idx - 1] = inputImagePixels[idx - 1];
+				}
+			}
+			// run through from bottom right to top left (reverse)
+			// add one pixel right to any non-background pixel and one pixel
+			// below any non-background pixel
+			for (int idx = imagePixels.length - 1 - w - 1; idx >= 0; idx--) {
+				p = imagePixels[idx];
+				if (p != back) {
+					imagePixels[idx + w] = inputImagePixels[idx + w];;
+					if (idx % w != 0)
+						imagePixels[idx + 1] = inputImagePixels[idx + 1];;
+				}
+			}
+		}
+		return new ImageOperation(imagePixels, w, h);
+	}
+	
+	/**
+	 * reduce area of mask
+	 * 
+	 * @param n
+	 *           number of times the code should be run
+	 */
+	private ImageOperation erodeNG(int n) {
+		int[] imagePixels = getImageAs1array();
+		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int w = image.getWidth();
+		int h = image.getHeight();
+		for (int i = 0; i < n; i++) {
+			// remove any pixel that has not 4 neighbors
+			
+			// set any pixel value to the number of neighbors
+			// later all pixels with less than 4 neighbors are set to background
+			int x = 0;
+			int y = 0;
+			for (int idx = w + 1; idx < imagePixels.length; idx++) {
+				if (x > 0 && x != w - 1 && y != 0 && y < h - 1) {
+					int p = imagePixels[idx];
+					if (p != back) {
+						int nc = 0;
+						if (imagePixels[idx - w] != back) // above
+							nc++;
+						if (imagePixels[idx - 1] != back) // left
+							nc++;
+						if (imagePixels[idx + 1] != back) // right
+							nc++;
+						if (imagePixels[idx + w] != back) // below
+							nc++;
+						imagePixels[idx] = nc;
+					}
+				}
+				x++;
+				if (x == w - 1) {
+					x = 0;
+					y++;
+				}
+			}
+			for (int idx = w + 1; idx < imagePixels.length; idx++) {
+				int p = imagePixels[idx];
+				if (p != back) {
+					if (p < 4)
+						imagePixels[idx] = back;
+				}
+			}
+		}
+		return new ImageOperation(imagePixels, w, h);
 	}
 	
 	public ImageOperation skeletonize() {
@@ -1083,10 +1254,59 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation blur(double radius) {
-		Prefs.setThreads(1);
-		GaussianBlur gb = new GaussianBlur();
-		gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
-		return this;// new ImageOperation(new FlexibleImage(getImage().getAs2A()));
+		boolean oldStyle = false;
+		if (oldStyle) {
+			Prefs.setThreads(1);
+			GaussianBlur gb = new GaussianBlur();
+			gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
+			return this;// new ImageOperation(new FlexibleImage(getImage().getAs2A()));
+		} else {
+			int sidePixels = (int) (radius * 2d);
+			if (sidePixels < 3)
+				sidePixels = 3;
+			int[] img = getImageAs1array();
+			int[] imgR = new int[img.length];
+			int[] imgG = new int[img.length];
+			int[] imgB = new int[img.length];
+			int w = image.getWidth();
+			int h = image.getHeight();
+			for (int i = 0; i < img.length; i++) {
+				int p = img[i];
+				imgR[i] = (p & 0x00ff0000) >> 16;
+				imgG[i] = (p & 0x0000ff00) >> 8;
+				imgB[i] = (p & 0x000000ff);
+			}
+			int sideL = -sidePixels / 2;
+			int sideR = sidePixels / 2;
+			int sumR, sumG, sumB;
+			for (int i = 0; i < img.length; i++) {
+				sumR = 0;
+				sumG = 0;
+				sumB = 0;
+				for (int y = sideL; y < sideR; y++) {
+					int yw = y * w;
+					for (int x = sideL; x < sideR; x++) {
+						int idx = i + x + yw;
+						if (idx < 0)
+							idx = 0;
+						else
+							if (idx >= img.length)
+								idx = img.length - 1;
+						sumR += imgR[idx];
+						sumG += imgG[idx];
+						sumB += imgB[idx];
+					}
+				}
+				sumR /= sidePixels;
+				sumG /= sidePixels;
+				sumB /= sidePixels;
+				sumR /= sidePixels;
+				sumG /= sidePixels;
+				sumB /= sidePixels;
+				img[i] = 0xFF000000 | (sumR << 16) | (sumG << 8) | (sumB);
+			}
+			return new ImageOperation(img, w, h);
+		}
 	}
 	
 	/**
@@ -1144,7 +1364,9 @@ public class ImageOperation {
 		Vector2i[] clusterDimensions2d = ps.getClusterDimension();
 		clusterSizes = ps.getClusterSize();
 		
-		HashSet<Integer> toBeDeletedClusterIDs = new HashSet<Integer>();
+		boolean[] toBeDeletedClusterIDs = new boolean[clusterCenter.length];
+		
+		// HashSet<Integer> toBeDeletedClusterIDs = new HashSet<Integer>();
 		if (typ == CameraPosition.TOP) {
 			List<LargeCluster> largeClusters = new ArrayList<LargeCluster>();
 			if (clusterSizes != null)
@@ -1171,7 +1393,8 @@ public class ImageOperation {
 				for (LargeCluster lc : largeClusters) {
 					if (lc != largeClusters) {
 						if (!lc.intersects(largestBounding)) {
-							toBeDeletedClusterIDs.add(lc.getIndex());
+							toBeDeletedClusterIDs[lc.getIndex()] = true;
+							// toBeDeletedClusterIDs.add(lc.getIndex());
 						} else {
 							largestBounding.add(lc.getBoundingBox(cutOffMinimumDimension * 5));
 						}
@@ -1187,8 +1410,10 @@ public class ImageOperation {
 				int clusterID = mask[idx];
 				if (clusterID >= 0
 						&&
-						(clusterDimensions[clusterID] < cutOffMinimumDimension || (clusterDimensions[clusterID] >= cutOffMinimumDimension && toBeDeletedClusterIDs
-								.contains(clusterID))))
+						(clusterDimensions[clusterID] < cutOffMinimumDimension || (clusterDimensions[clusterID] >= cutOffMinimumDimension &&
+						// toBeDeletedClusterIDs.contains(clusterID)
+						toBeDeletedClusterIDs[clusterID]
+								)))
 					rgbArray[idx] = iBackgroundFill;
 			}
 		
@@ -1340,9 +1565,9 @@ public class ImageOperation {
 			int lowerValueOfB, int upperValueOfB,
 			int background, CameraPosition typ) {
 		
-		thresholdLABunclear2(width, height, img2d, resultImage,
-				new int[] { lowerValueOfL }, new int[] { upperValueOfL }, new int[] { lowerValueOfA }, new int[] { upperValueOfA }, new int[] { lowerValueOfB },
-				new int[] { upperValueOfB }, background, typ);
+		thresholdLAB3(width, height, img2d, resultImage,
+					lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB,
+					upperValueOfB, background, typ);
 		
 	}
 	
@@ -1350,10 +1575,10 @@ public class ImageOperation {
 	 * A method with the same name (without the "unclear2") exists,
 	 * it is unclear if there is a difference.
 	 */
-	public static void thresholdLABunclear2(int width, int height, int[] img2d, int[] resultImage,
-			int[] lowerValueOfL, int[] upperValueOfL,
-			int[] lowerValueOfA, int[] upperValueOfA,
-			int[] lowerValueOfB, int[] upperValueOfB,
+	public static void thresholdLAB3(int width, int height, int[] imagePixels, int[] resultImage,
+			int lowerValueOfL, int upperValueOfL,
+			int lowerValueOfA, int upperValueOfA,
+			int lowerValueOfB, int upperValueOfB,
 			int background, CameraPosition typ) {
 		int c, x, y = 0;
 		int r, g, b;
@@ -1372,9 +1597,8 @@ public class ImageOperation {
 			int yw = y * width;
 			for (x = 0; x < width; x++) {
 				int off = x + yw;
-				c = img2d[off];
+				c = imagePixels[off];
 				
-				// RGB to XYZ
 				r = ((c & 0xff0000) >> 16);
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
@@ -1383,19 +1607,11 @@ public class ImageOperation {
 				ai = (int) ImageOperation.labCube[r][g][b + 256];
 				bi = (int) ImageOperation.labCube[r][g][b + 512];
 				
-				boolean found = false;
-				for (int idx = 0; idx < lowerValueOfA.length; idx++) {
-					if (resultImage[off] != background) {
-						if (((Li > lowerValueOfL[idx]) && (Li < upperValueOfL[idx]) && (ai > lowerValueOfA[idx]) && (ai < upperValueOfA[idx])
-								&& (bi > lowerValueOfB[idx]) && (bi < upperValueOfB[idx])) && !
-								isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft)) {
-							resultImage[off] = img2d[off];
-							found = true;
-							break;
-						}
-					}
-				}
-				if (!found)
+				if (resultImage[off] != background && (((Li > lowerValueOfL) && (Li < upperValueOfL) && (ai > lowerValueOfA) && (ai < upperValueOfA)
+								&& (bi > lowerValueOfB) && (bi < upperValueOfB)) && !
+								isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft))) {
+					resultImage[off] = imagePixels[off];
+				} else
 					resultImage[off] = background;
 			}
 		}
@@ -1420,8 +1636,9 @@ public class ImageOperation {
 					float gd = -step;
 					float X, Y, Z, fX, fY, fZ;
 					float La, aa, bb;
-					final double ot = 1d / 3d;
+					// final double ot = 1d / 3d;
 					final float cont = 16f / 116f;
+					float[] p;
 					for (int g = 0; g < 256; g++) {
 						gd += step;
 						float bd = -step;
@@ -1459,10 +1676,10 @@ public class ImageOperation {
 							La = ((116 * fY) - 16) * 2.55f;
 							aa = 1.0625f * (500f * (fX - fY)) + 128f;
 							bb = 1.0625f * (200f * (fY - fZ)) + 128f;
-							
-							result[r][g][b] = La;
-							result[r][g][b + 256] = aa;
-							result[r][g][b + 512] = bb;
+							p = result[r][g];
+							p[b] = La;
+							p[b + 256] = aa;
+							p[b + 512] = bb;
 						}
 					}
 				}
@@ -1489,7 +1706,6 @@ public class ImageOperation {
 	
 	private static boolean isGray(int li, int ai, int bi, int maxDiffAleftBright, int maxDiffArightBleft) {
 		ai = ai - 127;
-		bi = bi - 127;
 		boolean aNoColor, bNoColor;
 		
 		if (ai < 0)
@@ -1497,12 +1713,16 @@ public class ImageOperation {
 		else
 			aNoColor = ai < maxDiffArightBleft;
 		
-		if (bi < 0)
-			bNoColor = -bi < maxDiffArightBleft;
-		else
-			bNoColor = bi < maxDiffAleftBright;
-		
-		return aNoColor && bNoColor;
+		if (aNoColor) {
+			bi = bi - 127;
+			if (bi < 0)
+				bNoColor = -bi < maxDiffArightBleft;
+			else
+				bNoColor = bi < maxDiffAleftBright;
+			
+			return bNoColor;
+		} else
+			return false;
 	}
 	
 	public Lab getLABAverage(int[][] img2d, int x1, int y1, int w, int h) {
@@ -1541,9 +1761,52 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation medianFilter32Bit() {
-		image.getProcessor().medianFilter();
-		
-		return new ImageOperation(getImage());
+		if (false) {
+			int[] img = getImageAs1array();
+			int w = image.getWidth();
+			int h = image.getHeight();
+			int[] out = new int[img.length];
+			int last = img.length - w;
+			for (int i = 0; i < img.length; i++) {
+				if (i > w && i < last) {
+					int center = img[i];
+					int above = img[i - w];
+					int left = img[i - 1];
+					int right = img[i + 1];
+					int below = img[i + w];
+					out[i] = median(center, above, left, right, below);
+				} else
+					out[i] = img[i];
+			}
+			return null;
+		} else {
+			image.getProcessor().medianFilter();
+			return new ImageOperation(getImage());
+		}
+	}
+	
+	private final int findMedian(int[] values) {
+		// Finds the 5th largest of 9 values
+		for (int i = 1; i <= 4; i++) {
+			int max = 0;
+			int mj = 1;
+			for (int j = 1; j <= 9; j++)
+				if (values[j] > max) {
+					max = values[j];
+					mj = j;
+				}
+			values[mj] = 0;
+		}
+		int max = 0;
+		for (int j = 1; j <= 9; j++)
+			if (values[j] > max)
+				max = values[j];
+		return max;
+	}
+	
+	private int median(int center, int above, int left, int right, int below) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 	public ImageOperation medianFilter8Bit() {
@@ -2145,48 +2408,48 @@ public class ImageOperation {
 	 * @param ABThresh
 	 *           minimal A and B value
 	 */
-	public double[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
+	public float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
 		int r, g, b;
-		double Li, ai, bi;
+		float Li, ai, bi;
 		
 		// sums of RGB
-		double sumR = 0;
-		double sumG = 0;
-		double sumB = 0;
+		float sumR = 0;
+		float sumG = 0;
+		float sumB = 0;
 		
 		int count = 0;
 		
 		int[] img1d = getImageAs1array();
-		
+		float[] p;
 		for (int c : img1d) {
 			// RGB to XYZ
 			r = (c & 0xff0000) >> 16;
 			g = (c & 0x00ff00) >> 8;
 			b = c & 0x0000ff;
-			
-			Li = ImageOperation.labCube[r][g][b];
-			ai = ImageOperation.labCube[r][g][b + 256];
-			bi = ImageOperation.labCube[r][g][b + 512];
+			p = ImageOperation.labCube[r][g];
+			Li = p[b];
+			ai = p[b + 256];
+			bi = p[b + 512];
 			
 			// sum under following conditions
 			if (mode) {
 				if (Li > LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-					sumR += r / 255d;
-					sumG += g / 255d;
-					sumB += b / 255d;
+					sumR += r / 255f;
+					sumG += g / 255f;
+					sumB += b / 255f;
 					count++;
 				}
 			}
 			if (mode == false) {
 				if (Li < LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-					sumR += r / 255d;
-					sumG += g / 255d;
-					sumB += b / 255d;
+					sumR += r / 255f;
+					sumG += g / 255f;
+					sumB += b / 255f;
 					count++;
 				}
 			}
 		}
-		return new double[] { sumR / count, sumG / count, sumB / count };
+		return new float[] { sumR / count, sumG / count, sumB / count };
 	}
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {
@@ -2265,12 +2528,12 @@ public class ImageOperation {
 	public ImageOperation subtractImages(FlexibleImage image2) {
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
-		double[][] labImage1 = getImage().getLab(false);
-		double[][] labImage2 = image2.getLab(false);
+		float[][] labImage1 = getImage().getLab(false);
+		float[][] labImage2 = image2.getLab(false);
 		for (int idx = 0; idx < w * h; idx++) {
-			double lDiff = labImage1[0][idx] - labImage2[0][idx];
-			double aDiff = labImage1[1][idx] - labImage2[1][idx];
-			double bDiff = labImage1[2][idx] - labImage2[2][idx];
+			float lDiff = labImage1[0][idx] - labImage2[0][idx];
+			float aDiff = labImage1[1][idx] - labImage2[1][idx];
+			float bDiff = labImage1[2][idx] - labImage2[2][idx];
 			// if (lDiff < 0)
 			// lDiff = 255 - lDiff;
 			if (aDiff < 0)
@@ -2279,8 +2542,8 @@ public class ImageOperation {
 				bDiff = -bDiff;
 			
 			labImage1[0][idx] = 80 + lDiff; // 80 * (labImage1[0][idx] + labImage2[0][idx]) / 2 / 255d +
-			labImage1[1][idx] = aDiff / 255d + 1;
-			labImage1[2][idx] = bDiff / 255d + 1;
+			labImage1[1][idx] = aDiff / 255f + 1;
+			labImage1[2][idx] = bDiff / 255f + 1;
 		}
 		return new FlexibleImage(w, h, labImage1).getIO();
 	}

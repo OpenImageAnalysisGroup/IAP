@@ -113,4 +113,14 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	public void addHistoryItems(TreeMap<Long, ExperimentHeaderInterface> experiments);
 	
 	public void clearHistory();
+	
+	/**
+	 * Stores information about the source ID of analyzed data.
+	 * Makes it possible to later look for analysis results for a given DB id.
+	 * 
+	 * @param databaseId
+	 */
+	public void setOriginDbId(String databaseId);
+	
+	public String getOriginDbId();
 }

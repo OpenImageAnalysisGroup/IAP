@@ -81,7 +81,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 						
 					}
 				}, "database write thread");
-				writeThread.setPriority(Thread.MIN_PRIORITY);
+				// writeThread.setPriority(Thread.MIN_PRIORITY);
 				BackgroundThreadDispatcher.addTask(writeThread, -1);
 			} catch (Exception err) {
 				JOptionPane.showMessageDialog(null, "Error: " + err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

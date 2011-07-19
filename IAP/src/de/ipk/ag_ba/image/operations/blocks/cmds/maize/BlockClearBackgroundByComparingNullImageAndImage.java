@@ -66,8 +66,14 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			FlexibleImage fluo = getInput().getImages().getFluo();
 			fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
-			return new ImageOperation(fluo.getIO().medianFilter32Bit().getImage()).compare()
-					.compareImages(getInput().getMasks().getFluo().getIO().medianFilter32Bit().getImage(),
+			return new ImageOperation(fluo.getIO()
+					.blur(1.5)
+					// .medianFilter32Bit()
+					.getImage()).compare()
+					.compareImages(getInput().getMasks().getFluo().getIO()
+							.blur(1.5)
+							// .medianFilter32Bit()
+							.getImage(),
 							options.getIntSetting(Setting.L_Diff_FLOU) * 0.5d,
 							options.getIntSetting(Setting.L_Diff_FLOU) * 0.5d,
 							options.getIntSetting(Setting.abDiff_FLOU) * 0.5d,

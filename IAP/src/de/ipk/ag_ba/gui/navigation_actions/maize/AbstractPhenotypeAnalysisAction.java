@@ -10,9 +10,9 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionMongoOrLemnaTecExperimentNavigation;
-import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -145,7 +145,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			System.out.println("Statistics results: " + newStatisticsData.size());
 			// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
-			
+			statisticsResult.getHeader().setOriginDbId(res.getHeader().getDatabaseId());
 			statisticsResult.getHeader().setDatabaseId("");
 			if (resultReceiver == null) {
 				if (status != null)

@@ -79,7 +79,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 						dataChangedListener.actionPerformed(null);
 				}
 			}, "determine project node size");
-			infoThread.setPriority(Thread.MIN_PRIORITY);
+			// infoThread.setPriority(Thread.MIN_PRIORITY);
 			BackgroundThreadDispatcher.addTask(infoThread, 1);
 		}
 	}

@@ -102,8 +102,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ImageOperation io = new ImageOperation(image);
 		
-		double[] valuesleft = io.getRGBAverage(20, h, w, height - 2 * h, 150, 50, true);
-		double[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true);
+		float[] valuesleft = io.getRGBAverage(20, h, w, height - 2 * h, 150, 50, true);
+		float[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true);
 		// no function tested
 		// double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
 		// double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);

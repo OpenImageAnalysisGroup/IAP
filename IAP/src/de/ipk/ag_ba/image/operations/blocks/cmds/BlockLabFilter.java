@@ -22,15 +22,14 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 		else
 			return labFilter(
-					getInput().getMasks().getVis().getIO().dilate().dilate().dilate().blur(2)// .enhanceContrast().printImage("blur & multi")
-							.getImage(),
+					getInput().getMasks().getVis().getIO().dilateNG(3, getInput().getImages().getVis()).blur(2).getImage(),
 					getInput().getImages().getVis(),
-					new int[] { options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS) },
-					new int[] { options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS) },
-					new int[] { options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS) }, options.getCameraPosition());
+					options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
+					options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
+					options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
+					options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
+						options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
+						options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS), options.getCameraPosition());
 	}
 	
 	@Override
@@ -39,16 +38,16 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 			return getInput().getMasks().getFluo();
 		else
 			return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(),
-					new int[] { options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO) },
-					new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO) }, options.getCameraPosition());
+						options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO),
+					options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO),
+						options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO),
+						options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO),
+						options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO),
+						options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO), options.getCameraPosition());
 	}
 	
-	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int[] lowerValueOfL, int[] upperValueOfL, int[] lowerValueOfA,
-			int[] upperValueOfA, int[] lowerValueOfB, int[] upperValueOfB, CameraPosition typ) {
+	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
+			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ) {
 		
 		int[] workMask1D = workMask.getAs1A();
 		// int[] result = new int[workMask1D.length];
@@ -57,15 +56,12 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 		
 		int back = options.getBackground();
 		
-		ImageOperation.thresholdLABunclear2(width, height, workMask1D, workMask1D,
+		ImageOperation.thresholdLAB3(width, height, workMask1D, workMask1D,
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
 				back, typ);
 		
-		// FlexibleImage mask = new FlexibleImage(result, width, height);
-		FlexibleImage mask = new FlexibleImage(workMask1D, width, height);
-		
-		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, options.getBackground()).getImage();
+		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(workMask1D, width, height, options.getBackground()).getImage();
 	}
 }

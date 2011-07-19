@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Stack;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.Timer;
 
@@ -23,7 +25,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 public class BackgroundThreadDispatcher {
 	Stack<MyThread> todo = new Stack<MyThread>();
 	Stack<Integer> todoPriorities = new Stack<Integer>();
-	LinkedList<Thread> runningTasks = new LinkedList<Thread>();
+	LinkedList<MyThread> runningTasks = new LinkedList<MyThread>();
 	int maxTask = SystemAnalysis.getNumberOfCPUs();
 	
 	int indicator = 0;
@@ -82,13 +84,13 @@ public class BackgroundThreadDispatcher {
 	int getCurrentRunningTasks() {
 		int load;
 		synchronized (runningTasks) {
-			ArrayList<Thread> toBeRemoved = new ArrayList<Thread>();
-			for (Iterator<Thread> it = runningTasks.iterator(); it.hasNext();) {
-				Thread t = it.next();
+			ArrayList<MyThread> toBeRemoved = new ArrayList<MyThread>();
+			for (Iterator<MyThread> it = runningTasks.iterator(); it.hasNext();) {
+				MyThread t = it.next();
 				if (!t.isAlive())
 					toBeRemoved.add(t);
 			}
-			for (Iterator<Thread> it = toBeRemoved.iterator(); it.hasNext();)
+			for (Iterator<MyThread> it = toBeRemoved.iterator(); it.hasNext();)
 				myRemove(it.next());
 			load = runningTasks.size();
 		}
@@ -140,7 +142,7 @@ public class BackgroundThreadDispatcher {
 		sheduler.start();
 	}
 	
-	private boolean highMemoryLoad(LinkedList<Thread> runningTasks) {
+	private boolean highMemoryLoad(LinkedList<MyThread> runningTasks) {
 		if (runningTasks.size() < 1)
 			return false;
 		Runtime r = Runtime.getRuntime();
@@ -169,7 +171,7 @@ public class BackgroundThreadDispatcher {
 	private static long lastPrint = 0;
 	private static long lastGC = 0;
 	
-	protected void myRemove(Thread rt) {
+	protected void myRemove(MyThread rt) {
 		synchronized (runningTasks) {
 			runningTasks.remove(rt);
 		}
@@ -178,6 +180,8 @@ public class BackgroundThreadDispatcher {
 		// t.interrupt();
 		// }
 	}
+	
+	ExecutorService es = Executors.newCachedThreadPool();
 	
 	private void schedulerCode() {
 		while (true) {
@@ -189,7 +193,7 @@ public class BackgroundThreadDispatcher {
 				// kein Fehler! normal!
 			}
 			while (!todo.empty()) {
-				Thread t = null;
+				MyThread t = null;
 				synchronized (todo) {
 					int maxPrio = Integer.MIN_VALUE;
 					// search maximum priority
@@ -215,8 +219,9 @@ public class BackgroundThreadDispatcher {
 					}
 				}
 				if (t != null) {
-					t.setPriority(Thread.MIN_PRIORITY);
-					t.start();
+					// t.setPriority(Thread.MIN_PRIORITY);
+					// t.start();
+					es.submit(t.getRunCode());
 					synchronized (runningTasks) {
 						runningTasks.add(t);
 					}
@@ -237,7 +242,7 @@ public class BackgroundThreadDispatcher {
 					}
 					synchronized (runningTasks) {
 						for (int i = 0; i < runningTasks.size(); i++) {
-							Thread rt = runningTasks.get(i);
+							MyThread rt = runningTasks.get(i);
 							if (!rt.isAlive()) {
 								myRemove(rt);
 								i--;

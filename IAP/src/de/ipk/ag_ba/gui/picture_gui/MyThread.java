@@ -18,14 +18,18 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  * 
  * @author klukas
  */
-public class MyThread extends Thread {
-	
+public class MyThread implements Runnable { // extends Thread {
+
 	private boolean finished = false;
 	private final Runnable r;
 	private final Semaphore sem;
+	private String name;
+	private Runnable runCode;
 	
 	public MyThread(Runnable r, String name) {
-		super(r, name);
+		// super(r, name);
+		this.name = name;
+		this.runCode = r;
 		sem = BackgroundTaskHelper.lockGetSemaphore(null, 1);
 		try {
 			sem.acquire();
@@ -39,7 +43,8 @@ public class MyThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			super.run();
+			// super.run();
+			runCode.run();
 		} catch (Error err1) {
 			err1.printStackTrace();
 		} catch (Exception err2) {
@@ -69,5 +74,21 @@ public class MyThread extends Thread {
 				System.err.println("INTERNAL ERROR MYTHREAD 2");
 			return null;
 		}
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public boolean isAlive() {
+		return !finished;
+	}
+	
+	public Runnable getRunCode() {
+		return this;
 	}
 }

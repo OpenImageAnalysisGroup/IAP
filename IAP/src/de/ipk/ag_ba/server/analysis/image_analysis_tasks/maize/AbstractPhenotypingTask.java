@@ -103,7 +103,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
 		int idxxx = 0;
-		final ArrayList<Thread> wait = new ArrayList<Thread>();
+		final ArrayList<MyThread> wait = new ArrayList<MyThread>();
 		int error = 0;
 		int side = 0;
 		int top = 0;
@@ -125,7 +125,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		for (ImageSet md : workload) {
 			final ImageSet id = md;
-			Thread t = BackgroundThreadDispatcher.addTask(new Runnable() {
+			MyThread t = BackgroundThreadDispatcher.addTask(new Runnable() {
 				
 				@Override
 				public void run() {

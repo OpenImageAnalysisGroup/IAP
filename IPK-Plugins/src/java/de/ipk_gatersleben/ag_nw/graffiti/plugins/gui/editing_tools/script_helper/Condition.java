@@ -740,4 +740,8 @@ public class Condition implements ConditionInterface {
 		return res;
 	}
 	
+	@Override
+	public String getOriginDbId() {
+		return header.getOriginDbId();
+	}
 }

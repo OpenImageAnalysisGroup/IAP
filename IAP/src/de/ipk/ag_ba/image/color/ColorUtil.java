@@ -141,52 +141,52 @@ public class ColorUtil {
 		return "#" + (r + g + b);
 	}
 	
-	public static ColorXYZ colorRGB2XYZ(double R, double G, double B, boolean exactAndSlow) {
-		double var_R = (R / 255); // R from 0 to 255
-		double var_G = (G / 255); // G from 0 to 255
-		double var_B = (B / 255); // B from 0 to 255
+	public static ColorXYZ colorRGB2XYZ(float R, float G, float B, boolean exactAndSlow) {
+		float var_R = (R / 255f); // R from 0 to 255
+		float var_G = (G / 255f); // G from 0 to 255
+		float var_B = (B / 255f); // B from 0 to 255
 		
 		if (exactAndSlow) {
 			if (var_R > 0.04045) {
 				double a = ((var_R + 0.055) / 1.055);
-				var_R = Math.pow(a, 2.4);
+				var_R = (float) Math.pow(a, 2.4);
 			} else
-				var_R = var_R / 12.92;
+				var_R = var_R / 12.92f;
 			if (var_G > 0.04045) {
 				double a = ((var_G + 0.055) / 1.055);
-				var_G = Math.pow(a, 2.4);
+				var_G = (float) Math.pow(a, 2.4);
 			} else
-				var_G = var_G / 12.92;
+				var_G = var_G / 12.92f;
 			if (var_B > 0.04045) {
 				double a = ((var_B + 0.055) / 1.055);
-				var_B = Math.pow(a, 2.4);
+				var_B = (float) Math.pow(a, 2.4);
 			} else
-				var_B = var_B / 12.92;
+				var_B = var_B / 12.92f;
 		} else {
 			if (var_R > 0.04045) {
-				double a = ((var_R + 0.055) / 1.055);
-				var_R = a * a * 1.2; // ~ Math.pow(a, 2.4);
+				float a = ((var_R + 0.055f) / 1.055f);
+				var_R = a * a * 1.2f; // ~ Math.pow(a, 2.4);
 			} else
-				var_R = var_R / 12.92;
+				var_R = var_R / 12.92f;
 			if (var_G > 0.04045) {
-				double a = ((var_G + 0.055) / 1.055);
-				var_G = a * a * 1.2; // ~ Math.pow(b, 2.4);
+				float a = ((var_G + 0.055f) / 1.055f);
+				var_G = a * a * 1.2f; // ~ Math.pow(b, 2.4);
 			} else
-				var_G = var_G / 12.92;
+				var_G = var_G / 12.92f;
 			if (var_B > 0.04045) {
-				double a = ((var_B + 0.055) / 1.055);
-				var_B = a * a * 1.2; // ~ Math.pow(c, 2.4);
+				float a = ((var_B + 0.055f) / 1.055f);
+				var_B = a * a * 1.2f; // ~ Math.pow(c, 2.4);
 			} else
-				var_B = var_B / 12.92;
+				var_B = var_B / 12.92f;
 		}
 		var_R = var_R * 100;
 		var_G = var_G * 100;
 		var_B = var_B * 100;
 		
 		// Observer. = 2°, Illuminant = D65
-		double X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
-		double Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
-		double Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+		float X = var_R * 0.4124f + var_G * 0.3576f + var_B * 0.1805f;
+		float Y = var_R * 0.2126f + var_G * 0.7152f + var_B * 0.0722f;
+		float Z = var_R * 0.0193f + var_G * 0.1192f + var_B * 0.9505f;
 		return new ColorXYZ(X, Y, Z);
 	}
 	
@@ -197,34 +197,34 @@ public class ColorUtil {
 		int green = (rgb >> 8) & 0xff;
 		int blue = (rgb) & 0xff;
 		
-		double R = red;
-		double G = green;
-		double B = blue;
-		double var_R = (R / 255); // R from 0 to 255
-		double var_G = (G / 255); // G from 0 to 255
-		double var_B = (B / 255); // B from 0 to 255
+		float R = red;
+		float G = green;
+		float B = blue;
+		float var_R = (R / 255f); // R from 0 to 255
+		float var_G = (G / 255f); // G from 0 to 255
+		float var_B = (B / 255f); // B from 0 to 255
 		
 		if (var_R > 0.04045)
-			var_R = Math.pow(((var_R + 0.055) / 1.055), 2.4);
+			var_R = (float) Math.pow(((var_R + 0.055) / 1.055), 2.4);
 		else
-			var_R = var_R / 12.92;
+			var_R = var_R / 12.92f;
 		if (var_G > 0.04045)
-			var_G = Math.pow(((var_G + 0.055) / 1.055), 2.4);
+			var_G = (float) Math.pow(((var_G + 0.055) / 1.055), 2.4);
 		else
-			var_G = var_G / 12.92;
+			var_G = var_G / 12.92f;
 		if (var_B > 0.04045)
-			var_B = Math.pow(((var_B + 0.055) / 1.055), 2.4);
+			var_B = (float) Math.pow(((var_B + 0.055) / 1.055), 2.4);
 		else
-			var_B = var_B / 12.92;
+			var_B = var_B / 12.92f;
 		
 		var_R = var_R * 100;
 		var_G = var_G * 100;
 		var_B = var_B * 100;
 		
 		// Observer. = 2°, Illuminant = D65
-		double X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
-		double Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
-		double Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+		float X = var_R * 0.4124f + var_G * 0.3576f + var_B * 0.1805f;
+		float Y = var_R * 0.2126f + var_G * 0.7152f + var_B * 0.0722f;
+		float Z = var_R * 0.0193f + var_G * 0.1192f + var_B * 0.9505f;
 		result.x = X;
 		result.y = Y;
 		result.z = Z;
@@ -262,32 +262,32 @@ public class ColorUtil {
 	
 	public static void getLABfromRGB(int rgb, Color_CIE_Lab lab_result, ColorXYZ xyz_result) {
 		colorRGB2XYZ(rgb, xyz_result);
-		double X = xyz_result.x;
-		double Y = xyz_result.y;
-		double Z = xyz_result.z;
-		double ref_X = 95.047; // Observer= 2°, Illuminant= D65
-		double ref_Y = 100.000;
-		double ref_Z = 108.883;
-		double var_X = X / ref_X; //
-		double var_Y = Y / ref_Y; //
-		double var_Z = Z / ref_Z; //
+		float X = xyz_result.x;
+		float Y = xyz_result.y;
+		float Z = xyz_result.z;
+		float ref_X = 95.047f; // Observer= 2°, Illuminant= D65
+		float ref_Y = 100.000f;
+		float ref_Z = 108.883f;
+		float var_X = X / ref_X; //
+		float var_Y = Y / ref_Y; //
+		float var_Z = Z / ref_Z; //
 		
 		if (var_X > 0.008856)
-			var_X = Math.pow(var_X, (1 / 3d));
+			var_X = (float) Math.pow(var_X, (1 / 3d));
 		else
-			var_X = (7.787 * var_X) + (16 / 116d);
+			var_X = (7.787f * var_X) + (16 / 116f);
 		if (var_Y > 0.008856)
-			var_Y = Math.pow(var_Y, (1 / 3d));
+			var_Y = (float) Math.pow(var_Y, (1 / 3d));
 		else
-			var_Y = (7.787 * var_Y) + (16 / 116d);
+			var_Y = (7.787f * var_Y) + (16 / 116f);
 		if (var_Z > 0.008856)
-			var_Z = Math.pow(var_Z, (1 / 3d));
+			var_Z = (float) Math.pow(var_Z, (1 / 3d));
 		else
-			var_Z = (7.787 * var_Z) + (16 / 116d);
+			var_Z = (7.787f * var_Z) + (16 / 116f);
 		
-		double CIE_L = (116 * var_Y) - 16;
-		double CIE_a = 500 * (var_X - var_Y);
-		double CIE_b = 200 * (var_Y - var_Z);
+		float CIE_L = (116 * var_Y) - 16;
+		float CIE_a = 500 * (var_X - var_Y);
+		float CIE_b = 200 * (var_Y - var_Z);
 		lab_result.setL(CIE_L);
 		lab_result.setA(CIE_a);
 		lab_result.setA(CIE_b);
@@ -599,24 +599,28 @@ public class ColorUtil {
 	/**
 	 * returns double arrays for L A B, range 0..255
 	 */
-	public static void getLABfromRGBvar2(int[] arrayRGB, double[] arrayL, double[] arrayA, double[] arrayB, boolean filterBackground, int iBackgroundColor) {
+	public static void getLABfromRGBvar2(int[] arrayRGB,
+			float[] arrayL, float[] arrayA, float[] arrayB,
+			boolean filterBackground, int iBackgroundColor) {
 		int r, g, b;
-		
+		float[] p;
 		if (filterBackground) {
 			int idx = 0;
 			for (int c : arrayRGB) {
 				if (c == iBackgroundColor) {
-					arrayL[idx] = 0;
-					arrayA[idx] = 0;
-					arrayB[idx] = 0;
+					// arrayL[idx] = 0;
+					// arrayA[idx] = 0;
+					// arrayB[idx] = 0;
 				} else {
 					r = ((c & 0xff0000) >> 16);
 					g = ((c & 0x00ff00) >> 8);
 					b = (c & 0x0000ff);
 					
-					arrayL[idx] = ImageOperation.labCube[r][g][b];
-					arrayL[idx] = ImageOperation.labCube[r][g][b + 256];
-					arrayB[idx] = ImageOperation.labCube[r][g][b + 512];
+					p = ImageOperation.labCube[r][g];
+					
+					arrayL[idx] = p[b];
+					arrayL[idx] = p[b + 256];
+					arrayB[idx] = p[b + 512];
 				}
 				idx++;
 			}
@@ -627,9 +631,11 @@ public class ColorUtil {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				arrayL[idx] = ImageOperation.labCube[r][g][b];
-				arrayL[idx] = ImageOperation.labCube[r][g][b + 256];
-				arrayB[idx] = ImageOperation.labCube[r][g][b + 512];
+				p = ImageOperation.labCube[r][g];
+				
+				arrayL[idx] = p[b];
+				arrayL[idx] = p[b + 256];
+				arrayB[idx] = p[b + 512];
 				idx++;
 			}
 		}
