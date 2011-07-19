@@ -46,7 +46,7 @@ public class PerformanceTest {
 		FlexibleImage imgFluoRef = PerformanceTestImages.getImage(ImageNames.MAIZE_FLU_SIDE_REFERENCE_1386);
 		FlexibleImage imgNirRef = PerformanceTestImages.getImage(ImageNames.MAIZE_NIR_SIDE_REFERENCE_1386);
 		StopWatch school;
-		boolean oldschool = true;
+		boolean oldschool = false;
 		if (oldschool) {
 			BlockRemoveSmallClustersOnFluo.ngUse = false;
 			BlockRemoveSmallClusters.ngUse = false;

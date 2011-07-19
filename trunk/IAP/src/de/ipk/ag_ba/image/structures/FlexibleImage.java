@@ -109,6 +109,10 @@ public class FlexibleImage {
 		this(ImageConverter.convertLABto1A(labImage), w, h);
 	}
 	
+	public FlexibleImage(int w, int h, float[][] labImage) {
+		this(ImageConverter.convertLABto1A(labImage), w, h);
+	}
+	
 	public BufferedImage getAsBufferedImage() {
 		return image.getBufferedImage();
 	}
@@ -218,16 +222,16 @@ public class FlexibleImage {
 	/**
 	 * returns double arrays for L A B, range 0..255
 	 */
-	public double[][] getLab(boolean filterBackground) {
+	public float[][] getLab(boolean filterBackground) {
 		final int w = getWidth();
 		final int h = getHeight();
 		final int arrayRGB[] = getAs1A();
-		double arrayL[] = new double[w * h];
-		double arrayA[] = new double[w * h];
-		double arrayB[] = new double[w * h];
+		float arrayL[] = new float[w * h];
+		float arrayA[] = new float[w * h];
+		float arrayB[] = new float[w * h];
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		ColorUtil.getLABfromRGBvar2(arrayRGB, arrayL, arrayA, arrayB, filterBackground, background);
-		return new double[][] {
+		return new float[][] {
 				arrayL, arrayA, arrayB };
 	}
 	

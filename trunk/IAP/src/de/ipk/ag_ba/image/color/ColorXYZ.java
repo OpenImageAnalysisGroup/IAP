@@ -7,14 +7,14 @@ import java.awt.Color;
  */
 public class ColorXYZ {
 	
-	public double x, y, z;
+	public float x, y, z;
 	
 	/**
 	 * @param x
 	 * @param y
 	 * @param z
 	 */
-	public ColorXYZ(double x, double y, double z) {
+	public ColorXYZ(float x, float y, float z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -37,46 +37,46 @@ public class ColorXYZ {
 	/**
 	 * @return
 	 */
-	public double getX() {
+	public float getX() {
 		return x;
 	}
 	
 	/**
 	 * @return
 	 */
-	public double getY() {
+	public float getY() {
 		return y;
 	}
 	
 	/**
 	 * @return
 	 */
-	public double getZ() {
+	public float getZ() {
 		return z;
 	}
 	
 	public Color getColor() {
-		double var_X = x / 100d; // X from 0 to 95.047 (Observer = 2°, Illuminant
-											// = D65)
-		double var_Y = y / 100d; // Y from 0 to 100.000
-		double var_Z = z / 100d; // Z from 0 to 108.883
+		float var_X = x / 100f; // X from 0 to 95.047 (Observer = 2°, Illuminant
+										// = D65)
+		float var_Y = y / 100f; // Y from 0 to 100.000
+		float var_Z = z / 100f; // Z from 0 to 108.883
 		
-		double var_R = var_X * 3.2406 + var_Y * -1.5372 + var_Z * -0.4986d;
-		double var_G = var_X * -0.9689 + var_Y * 1.8758 + var_Z * 0.0415d;
-		double var_B = var_X * 0.0557 + var_Y * -0.2040 + var_Z * 1.0570d;
+		float var_R = var_X * 3.2406f + var_Y * -1.5372f + var_Z * -0.4986f;
+		float var_G = var_X * -0.9689f + var_Y * 1.8758f + var_Z * 0.0415f;
+		float var_B = var_X * 0.0557f + var_Y * -0.2040f + var_Z * 1.0570f;
 		
 		if (var_R > 0.0031308)
-			var_R = 1.055 * (Math.pow(var_R, (1 / 2.4d))) - 0.055d;
+			var_R = (float) (1.055f * (Math.pow(var_R, (1 / 2.4f))) - 0.055f);
 		else
-			var_R = 12.92 * var_R;
+			var_R = 12.92f * var_R;
 		if (var_G > 0.0031308)
-			var_G = 1.055 * (Math.pow(var_G, (1 / 2.4d))) - 0.055d;
+			var_G = (float) (1.055f * (Math.pow(var_G, (1 / 2.4f))) - 0.055f);
 		else
-			var_G = 12.92 * var_G;
+			var_G = 12.92f * var_G;
 		if (var_B > 0.0031308)
-			var_B = 1.055 * (Math.pow(var_B, (1 / 2.4d))) - 0.055d;
+			var_B = (float) (1.055f * (Math.pow(var_B, (1 / 2.4f))) - 0.055f);
 		else
-			var_B = 12.92 * var_B;
+			var_B = 12.92f * var_B;
 		
 		if (var_R > 1)
 			var_R = 1;

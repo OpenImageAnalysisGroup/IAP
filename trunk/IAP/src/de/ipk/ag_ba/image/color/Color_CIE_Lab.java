@@ -10,11 +10,17 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
  * @author klukas
  */
 public class Color_CIE_Lab {
-	private double l;
-	private double a;
-	private double b;
+	private float l;
+	private float a;
+	private float b;
 	
 	public Color_CIE_Lab(double l, double a, double b) {
+		this.l = (float) l;
+		this.a = (float) a;
+		this.b = (float) b;
+	}
+	
+	public Color_CIE_Lab(float l, float a, float b) {
 		this.l = l;
 		this.a = a;
 		this.b = b;
@@ -46,27 +52,27 @@ public class Color_CIE_Lab {
 		b = ImageOperation.labCube[red][green][blue + 512];
 	}
 	
-	public void setL(double l) {
+	public void setL(float l) {
 		this.l = l;
 	}
 	
-	public double getL() {
+	public float getL() {
 		return l;
 	}
 	
-	public void setA(double a) {
+	public void setA(float a) {
 		this.a = a;
 	}
 	
-	public double getA() {
+	public float getA() {
 		return a;
 	}
 	
-	public void setB(double b) {
+	public void setB(float b) {
 		this.b = b;
 	}
 	
-	public double getB() {
+	public float getB() {
 		return b;
 	}
 	
@@ -92,13 +98,13 @@ public class Color_CIE_Lab {
 		else
 			var_Z = (var_Z - 16d / 116d) / 7.787d;
 		
-		double ref_X = 95.047; // Observer= 2°, Illuminant= D65
-		double ref_Y = 100.000;
-		double ref_Z = 108.883;
+		float ref_X = 95.047f; // Observer= 2°, Illuminant= D65
+		float ref_Y = 100.000f;
+		float ref_Z = 108.883f;
 		
-		double X = ref_X * var_X; // ref_X = 95.047 Observer= 2°, Illuminant= D65
-		double Y = ref_Y * var_Y; // ref_Y = 100.000
-		double Z = ref_Z * var_Z; // ref_Z = 108.883
+		float X = (float) (ref_X * var_X); // ref_X = 95.047 Observer= 2°, Illuminant= D65
+		float Y = (float) (ref_Y * var_Y); // ref_Y = 100.000
+		float Z = (float) (ref_Z * var_Z); // ref_Z = 108.883
 		
 		return new ColorXYZ(X, Y, Z);
 	}

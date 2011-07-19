@@ -127,6 +127,7 @@ public class CloudComputingService {
 							p.testPipeline();
 							System.out.println();
 							sw.printTime();
+							Thread.sleep(5 * 60 * 1000);
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}

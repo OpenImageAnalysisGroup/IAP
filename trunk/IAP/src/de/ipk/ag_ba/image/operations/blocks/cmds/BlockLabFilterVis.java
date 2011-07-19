@@ -22,16 +22,16 @@ public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 		return labFilter(
 				getInput().getMasks().getVis(),
 				getInput().getImages().getVis(),
-				new int[] { options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS) },
-				new int[] { options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS) }, options.getCameraPosition());
+					options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
+					options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
+					options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS), options.getCameraPosition());
 	}
 	
-	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int[] lowerValueOfL, int[] upperValueOfL, int[] lowerValueOfA,
-			int[] upperValueOfA, int[] lowerValueOfB, int[] upperValueOfB, CameraPosition typ) {
+	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
+			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ) {
 		
 		if (workMask == null || originalImage == null)
 			return null;
@@ -43,7 +43,7 @@ public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 		
 		int back = options.getBackground();
 		
-		ImageOperation.thresholdLABunclear2(width, height, image, result,
+		ImageOperation.thresholdLAB3(width, height, image, result,
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,

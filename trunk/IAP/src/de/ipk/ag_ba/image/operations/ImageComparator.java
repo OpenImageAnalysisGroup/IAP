@@ -31,8 +31,8 @@ public class ImageComparator {
 		// referenceImage = new ImageOperation(referenceImage).blur(2).getImage();
 		
 		int[] imgInp = inputImage.getAs1A();
-		double[][] labImage;
-		double[][] labImageRef;
+		float[][] labImage;
+		float[][] labImageRef;
 		
 		boolean ignoreRed = false;
 		if (ignoreRed) {

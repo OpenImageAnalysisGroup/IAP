@@ -72,12 +72,12 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 		
 		ImageOperation io = new ImageOperation(image);
 		
-		double[] valuesleft;
+		float[] valuesleft;
 		double r, b, g;
 		
 		if (MarkerPosX == -1) {
 			valuesleft = io.getRGBAverage(20, h, w, height - 2 * h, 150, 50, true);
-			double[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true);
+			float[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true);
 			
 			r = (valuesleft[0] + valuesright[0]) / 2;
 			g = (valuesleft[1] + valuesright[1]) / 2;

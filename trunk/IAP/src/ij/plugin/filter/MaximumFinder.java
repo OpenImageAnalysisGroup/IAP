@@ -344,8 +344,10 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 		byte[] outPixels = (byte[]) outIp.getPixels();
 		// IJ.write("roi: "+roi.toString());
 		if (roi != null) {
-			for (int y = 0, i = 0; y < outIp.getHeight(); y++) { // delete everything outside roi
-				for (int x = 0; x < outIp.getWidth(); x++, i++) {
+			int h = outIp.getHeight();
+			int w = outIp.getWidth();
+			for (int y = 0, i = 0; y < h; y++) { // delete everything outside roi
+				for (int x = 0; x < w; x++, i++) {
 					if (x < roi.x || x >= roi.x + roi.width || y < roi.y || y >= roi.y + roi.height)
 						outPixels[i] = (byte) 0;
 					else
@@ -837,7 +839,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 					}
 				}
 			} // for directions d
-			// if(!continues && x<50&&y<40)IJ.write("x,y end="+x+","+y);
+				// if(!continues && x<50&&y<40)IJ.write("x,y end="+x+","+y);
 		} while (continues);
 		// IJ.log("deleted to "+x+","+y);
 	} // void removeLineFrom

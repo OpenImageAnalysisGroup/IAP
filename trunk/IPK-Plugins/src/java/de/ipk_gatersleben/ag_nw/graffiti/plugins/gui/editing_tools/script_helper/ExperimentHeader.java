@@ -27,7 +27,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	private String experimentType, sequence;
 	private long sizekb;
 	private int experimentID = -1;
-	private String database;
+	private String database, originDatabaseId;
 	
 	public ExperimentHeader() {
 		//
@@ -47,6 +47,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		experimentType = copyFrom.getExperimentType();
 		sequence = copyFrom.getSequence();
 		database = copyFrom.getDatabase();
+		originDatabaseId = copyFrom.getOriginDbId();
 	}
 	
 	public void setExperimentname(String experimentname) {
@@ -148,11 +149,13 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		r.append("<experiment experimentid=\"" + experimentID + "\">");
 		Substance.getAttributeString(r, new String[] {
 				"experimentname", "database", "remark", "coordinator", "experimenttype", "sequence", "excelfileid",
-				"importusername", "importusergroup", "importdate", "startdate", "measurements", "imagefiles", "sizekb"
+				"importusername", "importusergroup", "importdate", "startdate", "measurements", "imagefiles", "sizekb",
+				"origin"
 		}, new Object[] {
 				experimentName, database, remark, coordinator, experimentType, sequence, databaseId, importUserName,
 				importUserGroup, AttributeHelper.getDateString(importDate), AttributeHelper.getDateString(startDate),
-				measurementcount, (imageFiles == null ? 0 : imageFiles), sizekb
+				measurementcount, (imageFiles == null ? 0 : imageFiles), sizekb,
+				originDatabaseId
 		}, true);
 		r.append("</experiment>");
 	}
@@ -202,6 +205,8 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			setSizekb(Integer.parseInt(((String) map.get("sizekb"))));
 		else
 			setSizekb(((Long) map.get("sizekb")));
+		if (map.get("origin") != null && map.get("origin") instanceof String)
+			setOriginDbId((String) map.get("origin"));
 	}
 	
 	public ExperimentHeader(String experimentname) {
@@ -227,6 +232,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("measurements", measurementcount);
 		attributeValueMap.put("imagefiles", (imageFiles == null ? 0 : imageFiles));
 		attributeValueMap.put("sizekb", sizekb);
+		attributeValueMap.put("origin", originDatabaseId);
 	}
 	
 	public String toStringLines() {
@@ -288,11 +294,13 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			String s1 = experimentName + ";" + remark + ";" + coordinator + ";" + databaseId + ";" + importUserName + ";"
 								+ importUserGroup + ";" + imageFiles + ";" + sizekb + ";" + experimentType + ";" + sequence + ";"
 								+ experimentID + ";" + database + ";" + (importDate != null ? importDate.getTime() : "") + ";"
-					+ (startDate != null ? startDate.getTime() : "");
+					+ (startDate != null ? startDate.getTime() : "")
+					+ ";" + originDatabaseId;
 			String s2 = e.experimentName + ";" + e.remark + ";" + e.coordinator + ";" + e.databaseId + ";"
 								+ e.importUserName + ";" + e.importUserGroup + ";" + e.imageFiles + ";" + e.sizekb + ";"
 								+ e.experimentType + ";" + e.sequence + ";" + e.experimentID + ";" + e.database + ";"
-								+ (e.importDate != null ? e.importDate.getTime() : "") + ";" + (e.startDate != null ? e.startDate.getTime() : "");
+								+ (e.importDate != null ? e.importDate.getTime() : "") + ";" + (e.startDate != null ? e.startDate.getTime() : "")
+								+ ";" + originDatabaseId;
 			return s1.equals(s2);
 		}
 	}
@@ -370,5 +378,15 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Override
 	public void clearHistory() {
 		history.clear();
+	}
+	
+	@Override
+	public void setOriginDbId(String databaseId) {
+		this.originDatabaseId = databaseId;
+	}
+	
+	@Override
+	public String getOriginDbId() {
+		return originDatabaseId;
 	}
 }

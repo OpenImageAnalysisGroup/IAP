@@ -173,4 +173,6 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public ArrayList<SampleInterface> getSortedSamples();
 	
+	public String getOriginDbId();
+	
 }
