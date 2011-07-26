@@ -10,9 +10,12 @@ public class BlockRemoveSmallStructuresFromTopVisUsingOpening extends AbstractSn
 	
 	@Override
 	protected FlexibleImage processVISmask() {
+		if (getInput().getMasks().getVis() == null)
+			return null;
+		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			FlexibleImage mask = new ImageOperation(getInput().getMasks().getVis()).opening(
-					(int) (1 * options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK))).getImage();
+						(int) (1 * options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK))).getImage();
 			return new ImageOperation(getInput().getMasks().getVis()).applyMask_ResizeMaskIfNeeded(mask, options.getBackground()).getImage();
 		} else
 			return getInput().getMasks().getVis();

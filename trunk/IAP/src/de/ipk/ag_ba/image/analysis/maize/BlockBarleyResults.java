@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockBarleyResults extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processFLUOmask() throws InterruptedException {
+	protected FlexibleImage processVISmask() throws InterruptedException {
 		FlexibleImage input = getInput().getMasks().getVis();
 		ResultsTable rt = new ResultsTable();
 		int filledPixels = new ImageOperation(input).countFilledPixels();

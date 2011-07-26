@@ -20,26 +20,29 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null)
 			return null;
-		else
-			return labFilter(
-					getInput().getMasks().getVis().getIO().dilateNG(3, getInput().getImages().getVis()).blur(2).getImage(),
+		
+		return labFilter(
+					getInput().getMasks().getVis().getImageOperation().dilateNG(3, getInput().getImages().getVis()).blur(3).getImage(),
 					getInput().getImages().getVis(),
 					options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
 					options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
 					options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
 					options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
 						options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
-						options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS), options.getCameraPosition());
+						options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS), options.getCameraPosition()).getImageOperation().dilate().getImage();
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
+		if (getInput().getMasks().getFluo() == null)
+			return null;
+		
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			return getInput().getMasks().getFluo();
 		else
 			return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(),
 						options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO),
-					options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO),
+						options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO),
 						options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO),
 						options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO),
 						options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO),

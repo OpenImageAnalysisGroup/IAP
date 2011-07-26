@@ -235,7 +235,7 @@ public class FlexibleImage {
 				arrayL, arrayA, arrayB };
 	}
 	
-	public ImageOperation getIO() {
+	public ImageOperation getImageOperation() {
 		return new ImageOperation(this);
 		// return new ImageOperation(getAs2A());999999999999999999999999
 	}

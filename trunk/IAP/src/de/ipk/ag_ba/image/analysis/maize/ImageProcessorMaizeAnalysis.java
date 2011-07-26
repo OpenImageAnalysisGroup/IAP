@@ -11,7 +11,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancingVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilterForFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirProcessing;
@@ -49,21 +48,21 @@ public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 		p.add(BlockColorBalancingFluoAndNir.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
 		// p.add(BlockRemoveSmallClusters.class); // not for barley
-		p.add(BlockLabFilter.class);
+		p.add(BlockLabFilter.class); // maxdiffaleft and right modified
 		p.add(BlockClearMasksBasedOnMarkers.class);
 		p.add(BlockRemoveSmallStructuresFromTopVisUsingOpening.class);
 		p.add(BlockMedianFilterForFluo.class);
 		// p.add(BlockClosingForYellowVisMask.class); // not for barley
-		p.add(BlockLabFilter.class);
+		// p.add(BlockLabFilter.class); // not for barley
 		// p.add(BlockRemoveSmallClusters.class); // requires lab filter before
 		// p.add(BlockRemoveBambooStick.class); // requires remove small clusters before (the processing would vertically stop at any noise)
-		p.add(BlockLabFilter.class);
+		// p.add(BlockLabFilter.class); // not for barley
 		p.add(BlockRemoveLevitatingObjects.class);
 		p.add(BlockRemoveVerticalAndHorizontalStructures.class);
 		// p.add(BlockRemoveSmallClusters.class); // 2nd run
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
 		p.add(BlockNirProcessing.class);
-		p.add(BlockLabFilterVis.class);
+		// p.add(BlockLabFilterVis.class); // not for barley
 		p.add(BlockCopyImagesApplyMask.class); // without nir
 		
 		// calculation of numeric values
@@ -85,41 +84,41 @@ public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 	 * Modify default LAB filter options according to the Maize analysis requirements.
 	 */
 	private void modifySettings(ImageProcessorOptions options) {
-		if (options.getCameraPosition() == CameraPosition.TOP) {
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 120);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 125); // 130
-			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255); // all yellow
-			
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 55);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 90); // 98 // 130 gerste wegen topf
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 125);// 125
-			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
-		} else {
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 125);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255);
-			
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 100);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 98);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 130);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
-		}
+		// if (options.getCameraPosition() == CameraPosition.TOP) {
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 120);
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 125); // 130
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255); // all yellow
+		//
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 55);
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 90); // 98 // 130 gerste wegen topf
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 125);// 125
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
+		// } else {
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0);
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 255);
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 125);
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255);
+		//
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 100);
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 98);
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
+		// options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 130);
+		// options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
+		// }
 		// Test Barley
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 120);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 132);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 125); // 130
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255); // all yellow
 			
@@ -129,9 +128,25 @@ public class ImageProcessorMaizeAnalysis extends AbstractImageProcessor {
 			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 125);// 125
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
+		} else {
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 123);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255);
+			
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 100);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 98);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 130);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
 		}
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 20); // 130
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 20);
+		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 7); // 20
+		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 7); // 20
+		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 20); // 20
+		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 20); // 20
 		options.clearAndAddIntSetting(Setting.BOTTOM_CUT_DELAY_VIS, 0);
 		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1150); // for Barley
 	}

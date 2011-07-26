@@ -1586,8 +1586,8 @@ public class ImageOperation {
 		int maxDiffAleftBright, maxDiffArightBleft;
 		
 		if (typ == CameraPosition.SIDE) {
-			maxDiffAleftBright = 7;
-			maxDiffArightBleft = 7;
+			maxDiffAleftBright = 3; // Maize 7
+			maxDiffArightBleft = 3; // Maize 7
 		} else {
 			maxDiffAleftBright = 11; // 15
 			maxDiffArightBleft = 7;
@@ -2121,13 +2121,15 @@ public class ImageOperation {
 	
 	public ImageOperation getOriginalImageFromMask(FlexibleImage imageInput, int background) {
 		int[] originalArray = imageInput.getAs1A();
-		int[] resultMask = getImageAs1array();
+		int[] resultMask = getImageAs1array().clone();
 		int w = imageInput.getWidth();
 		int h = imageInput.getHeight();
 		int idx = 0;
 		for (int c : resultMask) {
 			if (c != background)
 				resultMask[idx] = originalArray[idx++];
+			else
+				idx++;
 		}
 		return new ImageOperation(new FlexibleImage(resultMask, w, h));
 	}
@@ -2545,7 +2547,7 @@ public class ImageOperation {
 			labImage1[1][idx] = aDiff / 255f + 1;
 			labImage1[2][idx] = bDiff / 255f + 1;
 		}
-		return new FlexibleImage(w, h, labImage1).getIO();
+		return new FlexibleImage(w, h, labImage1).getImageOperation();
 	}
 	
 	public ImageOperation copyImagesParts(double factorH, double factorW) {
