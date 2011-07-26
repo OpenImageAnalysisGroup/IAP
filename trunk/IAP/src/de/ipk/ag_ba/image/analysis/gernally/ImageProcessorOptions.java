@@ -63,13 +63,15 @@ public class ImageProcessorOptions {
 			LAB_MAX_L_VALUE_FLUO, LAB_MIN_A_VALUE_FLUO, LAB_MAX_A_VALUE_FLUO, LAB_MIN_B_VALUE_FLUO, LAB_MAX_B_VALUE_FLUO, LAB_MIN_L_VALUE_NIR, LAB_MAX_L_VALUE_NIR,
 			LAB_MIN_A_VALUE_NIR, LAB_MAX_A_VALUE_NIR, LAB_MIN_B_VALUE_NIR, LAB_MAX_B_VALUE_NIR,
 
-			L_Diff_VIS, abDiff_VIS, L_Diff_FLOU, abDiff_FLOU, L_Diff_NIR, abDiff_NIR,
+			L_Diff_VIS_TOP, abDiff_VIS_TOP, L_Diff_FLOU, abDiff_FLOU, L_Diff_NIR, abDiff_NIR,
 
 			IS_PARAMETER_SEARCH, IS_CROP_RESULT,
 
 			SCALE_FACTOR_DECREASE_MASK, SCALE_FACTOR_DECREASE_IMG_AND_MASK,
 
-			INPUT_VIS_IMAGE_ROTATION_ANGLE, L_Diff_VIS_SIDE, abDiff_VIS_SIDE;
+			INPUT_VIS_IMAGE_ROTATION_ANGLE, L_Diff_VIS_SIDE, abDiff_VIS_SIDE,
+
+			BOTTOM_CUT_DELAY_VIS, REAL_MARKER_DISTANCE;
 	}
 	
 	public ImageProcessorOptions() {
@@ -274,8 +276,8 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.L_Diff_VIS_SIDE, 20); // 40
 		addIntSetting(Setting.abDiff_VIS_SIDE, 20); // 40
 		
-		addIntSetting(Setting.L_Diff_VIS, 40); // 40
-		addIntSetting(Setting.abDiff_VIS, 40); // 40
+		addIntSetting(Setting.L_Diff_VIS_TOP, 40); // 40
+		addIntSetting(Setting.abDiff_VIS_TOP, 40); // 40
 		addIntSetting(Setting.L_Diff_FLOU, 75);// 20
 		addIntSetting(Setting.abDiff_FLOU, 40);// 30
 		addIntSetting(Setting.L_Diff_NIR, 14); // 14
@@ -287,6 +289,8 @@ public class ImageProcessorOptions {
 		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK, 1);
 		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 1);
 		
+		addIntSetting(Setting.BOTTOM_CUT_DELAY_VIS, 60);
+		addIntSetting(Setting.REAL_MARKER_DISTANCE, 1128);
 	}
 	
 	public void setCameraPosition(CameraPosition cameraTyp) {

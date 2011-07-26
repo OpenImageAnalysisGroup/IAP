@@ -22,12 +22,13 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getVis() == null)
 			return null;
 		
-		if (options.getCameraPosition() == CameraPosition.TOP) {
-			FlexibleImage res =
-					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
-							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB) / 2d,
-							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
-			return res;
+		if (options.getCameraPosition() == CameraPosition.TOP) { // not for barley
+		// FlexibleImage res =
+		// new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
+		// options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB) / 2d,
+		// options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+		// return res;
+			return getInput().getMasks().getVis();
 		} else {
 			FlexibleImage res =
 					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse, options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
