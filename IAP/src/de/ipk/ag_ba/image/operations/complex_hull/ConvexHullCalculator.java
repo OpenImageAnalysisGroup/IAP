@@ -99,9 +99,10 @@ public class ConvexHullCalculator {
 	 * @return A ImageOperation-object, modified according to the given parameters.
 	 * @author klukas
 	 * @param distHorizontal
+	 * @param realDist
 	 */
 	public ImageOperation find(boolean drawInputimage, boolean drawBorder, boolean drawHull, boolean drawCentroid,
-			int borderColor, int hullLineColor, int centroidColor, BlockProperty distHorizontal) {
+			int borderColor, int hullLineColor, int centroidColor, BlockProperty distHorizontal, int realMarkerDist) {
 		
 		calculate(borderColor);
 		
@@ -125,7 +126,6 @@ public class ConvexHullCalculator {
 			rt.incrementCounter();
 			
 			rt.addValue("hull.points", numberOfHullPoints);
-			double realMarkerDist = 1;
 			double normFactorArea = distHorizontal != null ? (realMarkerDist * realMarkerDist) / (distHorizontal.getValue() * distHorizontal.getValue()) : 1;
 			double normFactor = distHorizontal != null ? realMarkerDist / distHorizontal.getValue() : 1;
 			rt.addValue("hull.area", polygon.area() * normFactorArea);

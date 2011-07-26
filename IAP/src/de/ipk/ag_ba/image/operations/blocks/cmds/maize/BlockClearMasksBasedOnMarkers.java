@@ -38,7 +38,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			if (markerPosLeftY != null) {
 				// System.out.println("mark: " + markerPosLeftY.getValue());
 				if (markerPosLeftY.getValue() > 0.5) {
-					int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - 60;
+					int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - options.getIntSetting(Setting.BOTTOM_CUT_DELAY_VIS);
 					result = new ImageOperation(result).clearImageBottom(cy, options.getBackground()).getImage();
 					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
 				}
@@ -46,7 +46,8 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 				if (markerPosLeftY == null && markerPosRightY != null) {
 					// System.out.println("mark: " + markerPosRightY.getValue());
 					if (markerPosRightY.getValue() > 0.5) {
-						int cy = (int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight()) - 60;
+						int cy = (int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight())
+								- options.getIntSetting(Setting.BOTTOM_CUT_DELAY_VIS);
 						result = new ImageOperation(result).clearImageBottom(
 								cy, options.getBackground()).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);

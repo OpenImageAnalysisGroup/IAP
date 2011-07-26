@@ -5,6 +5,7 @@ import ij.measure.ResultsTable;
 import java.awt.Color;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
@@ -31,9 +32,10 @@ public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 		if (distHorizontal != null || options.getCameraPosition() == CameraPosition.TOP) {
+			int realDist = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
 			res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(true, false, false, false, Color.RED.getRGB(),
 					Color.BLUE.getRGB(),
-					Color.ORANGE.getRGB(), distHorizontal);
+					Color.ORANGE.getRGB(), distHorizontal, realDist);
 			
 			numericResults = res.getResultsTable();
 		} else {

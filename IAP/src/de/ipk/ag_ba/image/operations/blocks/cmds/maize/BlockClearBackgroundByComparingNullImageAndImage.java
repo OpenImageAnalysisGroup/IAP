@@ -48,9 +48,9 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 					// .blur(3).printImage("median", false)
 					.compare()
 					.compareImages(getInput().getMasks().getVis().getIO().blur(3).printImage("medianb", false).getImage(),
-							options.getIntSetting(Setting.L_Diff_VIS) * 0.5d,
-							options.getIntSetting(Setting.L_Diff_VIS) * 0.5d,
-							options.getIntSetting(Setting.abDiff_VIS) * 0.5d,
+							options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
+							options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
+							options.getIntSetting(Setting.abDiff_VIS_TOP) * 0.5d,
 							back, false)
 							// .dilate().dilate().dilate()
 					.border(2).getImage();
