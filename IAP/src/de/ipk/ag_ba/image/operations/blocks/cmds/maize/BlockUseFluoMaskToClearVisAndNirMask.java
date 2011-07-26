@@ -21,6 +21,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null || getInput().getMasks().getFluo() == null)
 			return null;
+		
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
@@ -39,6 +40,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected FlexibleImage processNIRmask() {
 		if (getInput().getMasks().getNir() == null || getInput().getMasks().getFluo() == null)
 			return null;
+		
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
@@ -57,6 +59,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected FlexibleImage processNIRimage() {
 		if (getInput().getImages().getNir() == null || getInput().getMasks().getFluo() == null)
 			return null;
+		
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getImages().getNir();
 			
@@ -74,6 +77,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	private FlexibleImage clearImageSide(FlexibleImage inputToCut, FlexibleImage imageSource, double cutTop) {
 		if (inputToCut == null || imageSource == null)
 			return null;
+		
 		ImageOperation ioInputForCut = new ImageOperation(inputToCut);
 		int background = options.getBackground();
 		ImageOperation ioSource = new ImageOperation(imageSource);
