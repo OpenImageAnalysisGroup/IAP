@@ -1761,28 +1761,27 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation medianFilter32Bit() {
-		if (false) {
-			int[] img = getImageAs1array();
-			int w = image.getWidth();
-			int h = image.getHeight();
-			int[] out = new int[img.length];
-			int last = img.length - w;
-			for (int i = 0; i < img.length; i++) {
-				if (i > w && i < last) {
-					int center = img[i];
-					int above = img[i - w];
-					int left = img[i - 1];
-					int right = img[i + 1];
-					int below = img[i + w];
-					out[i] = median(center, above, left, right, below);
-				} else
-					out[i] = img[i];
-			}
-			return null;
-		} else {
-			image.getProcessor().medianFilter();
-			return new ImageOperation(getImage());
+		int[] img = getImageAs1array();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[] out = new int[img.length];
+		int last = img.length - w;
+		for (int i = 0; i < img.length; i++) {
+			if (i > w && i < last) {
+				int center = img[i];
+				int above = img[i - w];
+				int left = img[i - 1];
+				int right = img[i + 1];
+				int below = img[i + w];
+				out[i] = median(center, above, left, right, below);
+			} else
+				out[i] = img[i];
 		}
+		return new ImageOperation(out, w, h);
+		
+		// old imagej
+		// image.getProcessor().medianFilter();
+		// return new ImageOperation(getImage());
 	}
 	
 	private final int findMedian(int[] values) {
@@ -1805,8 +1804,9 @@ public class ImageOperation {
 	}
 	
 	private int median(int center, int above, int left, int right, int below) {
-		// TODO Auto-generated method stub
-		return 0;
+		int[] temp = { center, above, left, right, below };
+		java.util.Arrays.sort(temp);
+		return temp[2];
 	}
 	
 	public ImageOperation medianFilter8Bit() {
