@@ -24,10 +24,10 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	protected void prepare() {
 		super.prepare();
 		if (getInput().getImages().getVis() != null)
-			this.visibleFilledPixels = getInput().getImages().getVis().getImageOperation().countFilledPixels();
+			this.visibleFilledPixels = getInput().getImages().getVis().getIO().countFilledPixels();
 		
 		if (getInput().getImages().getNir() != null) {
-			this.nirFilledPixels = getInput().getImages().getNir().getImageOperation().countFilledPixels();
+			this.nirFilledPixels = getInput().getImages().getNir().getIO().countFilledPixels();
 		}
 		if (getProperties() != null && getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
 			markerDistanceHorizontally = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
@@ -50,7 +50,7 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 			rt.addValue("ndvi.vis.intensity.average", averageVis);
 			
 			if (getInput().getMasks().getNir() != null) {
-				double nirIntensitySum = getInput().getMasks().getNir().getImageOperation().intensitySumOfChannelBlue(false);
+				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannelBlue(false);
 				double averageNir = nirIntensitySum / nirFilledPixels;
 				rt.addValue("ndvi.nir.intensity.average", averageNir);
 				
