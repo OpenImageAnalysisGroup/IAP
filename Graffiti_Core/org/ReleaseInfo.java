@@ -256,12 +256,12 @@ public class ReleaseInfo implements HelperClass {
 		
 		if (SystemInfo.isMac() || windows) {
 			if (getRunningReleaseStatus() == Release.KGML_EDITOR)
-				return home + getFileSeparator() + "KGML_EDITOR";
+				return home + getFileSeparator() + "IAP_KGML_EDITOR";
 			else
 				return home + getFileSeparator() + HomeFolder.WIN_MAC_HOMEFOLDER;
 		} else {
 			if (getRunningReleaseStatus() == Release.KGML_EDITOR)
-				return home + getFileSeparator() + ".kgml_editor";
+				return home + getFileSeparator() + ".iap_kgml_editor";
 			else
 				return home + getFileSeparator() + HomeFolder.LINUX_HOMEFOLDER;
 		}
@@ -270,7 +270,7 @@ public class ReleaseInfo implements HelperClass {
 	private static String getAppFolderNameOldStyle() {
 		String home = System.getProperty("user.home");
 		if (getRunningReleaseStatus() == Release.KGML_EDITOR)
-			return home + getFileSeparator() + ".kgml_editor";
+			return home + getFileSeparator() + ".iap_kgml_editor";
 		else
 			return home + getFileSeparator() + HomeFolder.WIN_MAC_HOMEFOLDER_OLD;
 	}

@@ -75,7 +75,7 @@ import org.graffiti.graphics.NodeLabelAttribute;
  * attributes.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class AttributeHelper implements HelperClass {
 	
@@ -777,7 +777,7 @@ public class AttributeHelper implements HelperClass {
 	 * @param fontName
 	 *           - the name of the font to use with this label
 	 */
-	public static void setLabel(Node node, String label, String fontName, String alignment) {
+	public static void setLabel(GraphElement node, String label, String fontName, String alignment) {
 		if (label == null) {
 			if (hasAttribute(node, GraphicAttributeConstants.LABELGRAPHICS)) {
 				NodeLabelAttribute labelAttr;
@@ -809,7 +809,7 @@ public class AttributeHelper implements HelperClass {
 		}
 	}
 	
-	public static void setLabel(int idx, Node node, String label, String fontName, String alignment) {
+	public static void setLabel(int idx, GraphElement node, String label, String fontName, String alignment) {
 		String index = "" + idx;
 		if (idx < 0)
 			index = "";

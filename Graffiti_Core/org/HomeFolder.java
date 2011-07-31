@@ -53,9 +53,9 @@ public class HomeFolder implements HelperClass {
 		
 	}
 	
-	public static String WIN_MAC_HOMEFOLDER = "VANTED";
-	public static String LINUX_HOMEFOLDER = ".vanted";
-	public static String WIN_MAC_HOMEFOLDER_OLD = ".vanted";
+	public static String WIN_MAC_HOMEFOLDER = "IAP";
+	public static String LINUX_HOMEFOLDER = ".iap";
+	public static String WIN_MAC_HOMEFOLDER_OLD = ".iap";
 	
 	public static void copyFile(File oldfile, File newfile) throws IOException {
 		if (oldfile.compareTo(newfile) != 0) {
