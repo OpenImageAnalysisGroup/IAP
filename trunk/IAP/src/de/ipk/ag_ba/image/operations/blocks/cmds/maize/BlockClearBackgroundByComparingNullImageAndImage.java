@@ -32,13 +32,13 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 				
 				// vis = vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight()));
 				// unsharpedMask(1.0f, 3.0).printImage("UNSHARPEN").
-				FlexibleImage cleared = visImg.getImageOperation().compare() // medianFilter32Bit().
-						.compareImages(visMsk.getImageOperation().blur(2).getImage(), //
+				FlexibleImage cleared = visImg.getIO().compare() // medianFilter32Bit().
+						.compareImages(visMsk.getIO().blur(2).getImage(), //
 								options.getIntSetting(Setting.L_Diff_VIS_SIDE) * 0.5,
 								options.getIntSetting(Setting.L_Diff_VIS_SIDE) * 0.5,
 								options.getIntSetting(Setting.abDiff_VIS_SIDE) * 0.5,
 								back, true).border(2).getImage(); //
-				return getInput().getImages().getVis().getImageOperation().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
+				return getInput().getImages().getVis().getIO().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
 						.printImage("CLEAR RESULT", false).getImage();
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP) {
@@ -48,14 +48,14 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 				FlexibleImage cleared = new ImageOperation(visX)
 						// .blur(3).printImage("median", false)
 						.compare()
-						.compareImages(getInput().getMasks().getVis().getImageOperation().blur(3).printImage("medianb", false).getImage(),
+						.compareImages(getInput().getMasks().getVis().getIO().blur(3).printImage("medianb", false).getImage(),
 								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
 								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
 								options.getIntSetting(Setting.abDiff_VIS_TOP) * 0.5d,
 								back, false)
 							// .dilate().dilate().dilate()
 						.border(2).getImage();
-				return getInput().getImages().getVis().getImageOperation().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
+				return getInput().getImages().getVis().getIO().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
 						.printImage("CLEAR RESULT", false).getImage();
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");
@@ -71,11 +71,11 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 				FlexibleImage fluo = getInput().getImages().getFluo();
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
-				return new ImageOperation(fluo.getImageOperation()
+				return new ImageOperation(fluo.getIO()
 						.blur(1.5)
 						// .medianFilter32Bit()
 						.getImage()).compare()
-						.compareImages(getInput().getMasks().getFluo().getImageOperation()
+						.compareImages(getInput().getMasks().getFluo().getIO()
 								.blur(1.5)
 								// .medianFilter32Bit()
 								.getImage(),
@@ -89,7 +89,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 				FlexibleImage fluo = getInput().getImages().getFluo();
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
 				return new ImageOperation(fluo).compare()
-						.compareImages(getInput().getMasks().getFluo().getImageOperation().copyImagesParts(0.26, 0.3).printImage("cut out", false).getImage(),
+						.compareImages(getInput().getMasks().getFluo().getIO().copyImagesParts(0.26, 0.3).printImage("cut out", false).getImage(),
 								options.getIntSetting(Setting.L_Diff_FLOU) * 0.5d,
 								options.getIntSetting(Setting.L_Diff_FLOU) * 0.5d,
 								options.getIntSetting(Setting.abDiff_FLOU) * 0.5d,
