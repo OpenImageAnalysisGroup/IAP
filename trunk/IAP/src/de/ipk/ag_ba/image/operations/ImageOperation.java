@@ -1545,7 +1545,7 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation thresholdLAB(int lowerValueOfL, int upperValueOfL, int lowerValueOfA, int upperValueOfA, int lowerValueOfB,
-			int upperValueOfB, int background, CameraPosition typ) {
+			int upperValueOfB, int background, CameraPosition typ, boolean maize) {
 		
 		int width = image.getProcessor().getWidth();
 		int height = image.getProcessor().getHeight();
@@ -1554,7 +1554,7 @@ public class ImageOperation {
 		int[] img2d = getImageAs1array();
 		
 		thresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
-				lowerValueOfB, upperValueOfB, background, typ);
+				lowerValueOfB, upperValueOfB, background, typ, maize);
 		
 		return new ImageOperation(resultImage, width, height);
 	}
@@ -1563,11 +1563,12 @@ public class ImageOperation {
 			int lowerValueOfL, int upperValueOfL,
 			int lowerValueOfA, int upperValueOfA,
 			int lowerValueOfB, int upperValueOfB,
-			int background, CameraPosition typ) {
+			int background, CameraPosition typ,
+			boolean maize) {
 		
 		thresholdLAB3(width, height, img2d, resultImage,
 					lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB,
-					upperValueOfB, background, typ);
+					upperValueOfB, background, typ, maize);
 		
 	}
 	
@@ -1579,15 +1580,15 @@ public class ImageOperation {
 			int lowerValueOfL, int upperValueOfL,
 			int lowerValueOfA, int upperValueOfA,
 			int lowerValueOfB, int upperValueOfB,
-			int background, CameraPosition typ) {
+			int background, CameraPosition typ, boolean maize) {
 		int c, x, y = 0;
 		int r, g, b;
 		int Li, ai, bi;
 		int maxDiffAleftBright, maxDiffArightBleft;
 		
 		if (typ == CameraPosition.SIDE) {
-			maxDiffAleftBright = 3; // Maize 7
-			maxDiffArightBleft = 3; // Maize 7
+			maxDiffAleftBright = maize ? 7 : 3;
+			maxDiffArightBleft = maize ? 7 : 3;
 		} else {
 			maxDiffAleftBright = 11; // 15
 			maxDiffArightBleft = 7;
@@ -1626,60 +1627,44 @@ public class ImageOperation {
 		ExecutorService executor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
 		
 		for (int rr = 0; rr < 256; rr++) {
-			final int r = rr;
-			final float rd = (r / 255f);
+			final int red = rr;
+			final float rd = (red / 255f);
 			
 			executor.submit(new Runnable() {
-				
 				@Override
 				public void run() {
 					float gd = -step;
 					float X, Y, Z, fX, fY, fZ;
 					float La, aa, bb;
-					// final double ot = 1d / 3d;
-					final float cont = 16f / 116f;
 					float[] p;
-					for (int g = 0; g < 256; g++) {
+					for (int green = 0; green < 256; green++) {
 						gd += step;
 						float bd = -step;
-						for (int b = 0; b < 256; b++) {
+						// moved outside of most inner loop to increase performance:
+						float aXa = 1000 * (0.430587f * rd + 0.341545f * gd);
+						float aYa = 1000 * (0.222021f * rd + 0.706645f * gd);
+						float aZa = 1000 * (0.0201837f * rd + 0.129551f * gd);
+						p = result[red][green];
+						
+						for (int blue = 0; blue < 256; blue++) {
 							
 							bd += step;
 							
 							// white reference D65 PAL/SECAM
-							X = 0.430587f * rd + 0.341545f * gd + 0.178336f * bd;
-							Y = 0.222021f * rd + 0.706645f * gd + 0.0713342f * bd;
-							Z = 0.0201837f * rd + 0.129551f * gd + 0.939234f * bd;
-							// var_X = X / 95.047 //Observer = 2, Illuminant = D65
-							// var_Y = Y / 100.000
-							// var_Z = Z / 108.883
+							X = aXa + 178.336f * bd;
+							Y = aYa + 71.3342f * bd;
+							Z = aZa + 939.234f * bd;
 							
-							// XYZ to Lab
-							if (X > 0.008856)
-								// fX = (float) Math.pow(X, ot);
-								fX = IAPservice.cubeRoots[(int) (1000 * X)];
-							else
-								fX = (7.78707f * X) + cont;// 7.7870689655172
-								
-							if (Y > 0.008856)
-								// fY = (float) Math.pow(Y, ot);
-								fY = IAPservice.cubeRoots[(int) (1000 * Y)];
-							else
-								fY = (7.78707f * Y) + cont;
-							
-							if (Z > 0.008856)
-								// fZ = (float) Math.pow(Z, ot);
-								fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
-							else
-								fZ = (7.78707f * Z) + cont;
+							fX = IAPservice.cubeRoots[(int) X];
+							fY = IAPservice.cubeRoots[(int) Y];
+							fZ = IAPservice.cubeRoots[(int) Z];
 							
 							La = ((116 * fY) - 16) * 2.55f;
 							aa = 1.0625f * (500f * (fX - fY)) + 128f;
 							bb = 1.0625f * (200f * (fY - fZ)) + 128f;
-							p = result[r][g];
-							p[b] = La;
-							p[b + 256] = aa;
-							p[b + 512] = bb;
+							p[blue] = La;
+							p[blue + 256] = aa;
+							p[blue + 512] = bb;
 						}
 					}
 				}
@@ -1782,6 +1767,32 @@ public class ImageOperation {
 		// old imagej
 		// image.getProcessor().medianFilter();
 		// return new ImageOperation(getImage());
+	}
+	
+	public ImageOperation medianFilter32Bit(boolean p) {
+		if (p) {
+			int[] img = getImageAs1array();
+			int w = image.getWidth();
+			// int h = image.getHeight();
+			int[] out = new int[img.length];
+			int last = img.length - w;
+			for (int i = 0; i < img.length; i++) {
+				if (i > w && i < last) {
+					int center = img[i];
+					int above = img[i - w];
+					int left = img[i - 1];
+					int right = img[i + 1];
+					int below = img[i + w];
+					out[i] = findMedian(new int[] { center, above, left, right, below });
+					// median(center, above, left, right, below);
+				} else
+					out[i] = img[i];
+			}
+			return null;
+		} else {
+			image.getProcessor().medianFilter();
+			return new ImageOperation(getImage());
+		}
 	}
 	
 	private final int findMedian(int[] values) {
@@ -2005,8 +2016,8 @@ public class ImageOperation {
 		return new ImageOperation(bi);
 	}
 	
-	public ArrayList<MarkerPair> searchBlueMarkers(double options, CameraPosition typ) {
-		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options, typ);
+	public ArrayList<MarkerPair> searchBlueMarkers(double options, CameraPosition typ, boolean maize) {
+		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options, typ, maize);
 		
 		bmf.findCoordinates(PhenotypeAnalysisTask.BACKGROUND_COLORint);
 		
@@ -2121,7 +2132,7 @@ public class ImageOperation {
 	
 	public ImageOperation getOriginalImageFromMask(FlexibleImage imageInput, int background) {
 		int[] originalArray = imageInput.getAs1A();
-		int[] resultMask = getImageAs1array().clone();
+		int[] resultMask = getImageAs1array();
 		int w = imageInput.getWidth();
 		int h = imageInput.getHeight();
 		int idx = 0;
@@ -2415,16 +2426,15 @@ public class ImageOperation {
 		float Li, ai, bi;
 		
 		// sums of RGB
-		float sumR = 0;
-		float sumG = 0;
-		float sumB = 0;
+		int sumR = 0;
+		int sumG = 0;
+		int sumB = 0;
 		
 		int count = 0;
 		
 		int[] img1d = getImageAs1array();
 		float[] p;
 		for (int c : img1d) {
-			// RGB to XYZ
 			r = (c & 0xff0000) >> 16;
 			g = (c & 0x00ff00) >> 8;
 			b = c & 0x0000ff;
@@ -2436,22 +2446,24 @@ public class ImageOperation {
 			// sum under following conditions
 			if (mode) {
 				if (Li > LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-					sumR += r / 255f;
-					sumG += g / 255f;
-					sumB += b / 255f;
+					sumR += r;
+					sumG += g;
+					sumB += b;
 					count++;
 				}
-			}
-			if (mode == false) {
+			} else {
 				if (Li < LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-					sumR += r / 255f;
-					sumG += g / 255f;
-					sumB += b / 255f;
+					sumR += r;
+					sumG += g;
+					sumB += b;
 					count++;
 				}
 			}
 		}
-		return new float[] { sumR / count, sumG / count, sumB / count };
+		if (count > 0)
+			return new float[] { sumR / 255f / count, sumG / 255f / count, sumB / 255f / count };
+		else
+			return new float[] { 1, 1, 1 };
 	}
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {
@@ -2547,7 +2559,7 @@ public class ImageOperation {
 			labImage1[1][idx] = aDiff / 255f + 1;
 			labImage1[2][idx] = bDiff / 255f + 1;
 		}
-		return new FlexibleImage(w, h, labImage1).getImageOperation();
+		return new FlexibleImage(w, h, labImage1).getIO();
 	}
 	
 	public ImageOperation copyImagesParts(double factorH, double factorW) {
