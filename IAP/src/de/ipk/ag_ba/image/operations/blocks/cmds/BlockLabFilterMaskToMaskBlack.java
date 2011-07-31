@@ -11,21 +11,23 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 /**
  * @author Entzian
  */
+@Deprecated
 public class BlockLabFilterMaskToMaskBlack extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
-		
-		return labFilter(getInput().getMasks().getVis(), getInput().getImages().getVis(), 110, 255, 0, 255, 0, 255, options.getCameraPosition());
+		boolean maize = true;
+		return labFilter(getInput().getMasks().getVis(), getInput().getImages().getVis(), 110, 255, 0, 255, 0, 255, options.getCameraPosition(), maize);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		
-		return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), 110, 255, 0, 255, 0, 255, options.getCameraPosition());
+		boolean maize = true;
+		return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), 110, 255, 0, 255, 0, 255, options.getCameraPosition(), maize);
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
-			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ) {
+			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ,
+			boolean maize) {
 		
 		int[] image = workMask.getAs1A();
 		int[] result = new int[image.length];
@@ -38,7 +40,7 @@ public class BlockLabFilterMaskToMaskBlack extends AbstractSnapshotAnalysisBlock
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
-				back, typ);
+				back, typ, maize);
 		
 		FlexibleImage mask = new FlexibleImage(result, width, height);
 		

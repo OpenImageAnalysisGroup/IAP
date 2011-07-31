@@ -21,11 +21,13 @@ public class BlueMarkerFinder {
 	private ResultsTable resultTable;
 	private final double scale;
 	private final CameraPosition typ;
+	private boolean maize;
 	
-	public BlueMarkerFinder(FlexibleImage image, double scale, CameraPosition typ) {
+	public BlueMarkerFinder(FlexibleImage image, double scale, CameraPosition typ, boolean maize) {
 		this.input = image;
 		this.scale = scale;
 		this.typ = typ;
+		this.maize = maize;
 	}
 	
 	public void findCoordinates(int background) {
@@ -35,7 +37,8 @@ public class BlueMarkerFinder {
 		if (debug)
 			resultTable = io1
 					// .thresholdLAB(0, 255, 0, 200, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
-					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint, typ).printImage("nach lab")
+					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint, typ,
+							maize).printImage("nach lab")
 					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
 					.printImage("nach opening")
@@ -47,7 +50,7 @@ public class BlueMarkerFinder {
 					.getResultsTable();
 		else
 			resultTable = io1
-					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint, typ)
+					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint, typ, maize)
 					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
 					.convert2Grayscale()

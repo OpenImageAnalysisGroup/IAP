@@ -27,11 +27,14 @@ public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 				options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
 					options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
-				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS), options.getCameraPosition());
+				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
+				options.getCameraPosition(),
+				options.isMaize());
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
-			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ) {
+			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ,
+			boolean maize) {
 		
 		if (workMask == null || originalImage == null)
 			return null;
@@ -47,7 +50,7 @@ public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
-				back, typ);
+				back, typ, maize);
 		
 		FlexibleImage mask = new FlexibleImage(result, width, height);
 		
