@@ -2140,7 +2140,7 @@ public class MongoDB {
 					}
 					status.setCurrentStatusValueFineAdd(smallStep);
 				}
-				if (linkedHashes.size() > 0) {
+				if (linkedHashes.size() >= 0) {
 					long freeAll = 0;
 					System.out.println("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysisExt.getCurrentTime());
 					res.append("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysisExt.getCurrentTime() + "<br>");
