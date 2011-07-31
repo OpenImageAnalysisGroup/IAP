@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MegaTools.java,v 1.1 2011-01-31 09:03:34 klukas Exp $
+// $Id: MegaTools.java,v 1.2 2011-07-31 17:25:35 klukas Exp $
 
 package org.graffiti.plugins.modes.defaults;
 
@@ -45,7 +45,7 @@ import org.graffiti.session.Session;
  * DOCUMENT ME!
  * 
  * @author holleis
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class MegaTools extends AbstractUndoableTool {
 	// ~ Instance fields ========================================================
@@ -105,7 +105,7 @@ public abstract class MegaTools extends AbstractUndoableTool {
 	private static MouseEvent lastMouseE = null;
 	private static Component lastMouseSrc = null;
 	
-	public static boolean MouseWheelZoomEnabled = true;
+	public static boolean MouseWheelZoomEnabled = !AttributeHelper.macOSrunning();
 	
 	/**
 	 * Temporarily marks the component under cursor.
