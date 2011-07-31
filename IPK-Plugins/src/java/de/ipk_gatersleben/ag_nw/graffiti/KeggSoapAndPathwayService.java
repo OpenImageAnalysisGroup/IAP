@@ -92,6 +92,8 @@ public class KeggSoapAndPathwayService
 				false, // boolean reactionNameToNo,
 				false,
 							false,
+							true,
+							false,
 							true, // boolean increaseNodeSize,
 				false, // boolean useShortName
 				storeOldId,
@@ -132,6 +134,8 @@ public class KeggSoapAndPathwayService
 				false, // boolean reactionNameToNo,
 				true, // kegg id --> KO-EC
 				true, // ko ID --> ko Name
+				true, // brite based ko ID --> gene name
+				false, // brite based ko ID --> EC id
 				resizeNodes, // boolean increaseNodeSize,
 				false, // boolean useShortName
 				storeOldId,

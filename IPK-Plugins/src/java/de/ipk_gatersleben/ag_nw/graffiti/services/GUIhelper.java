@@ -58,13 +58,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class GUIhelper {
 	
 	public static Component getHelpTextComponent(String plainText, String title,
-						String helpTopic) {
+			String helpTopic) {
 		JPanel result = new JPanel();
 		plainText = plainText.replaceAll("<br>", "\n");
 		plainText = plainText.replaceAll("<html>", "");
 		plainText = plainText.replaceAll("<small>", "");
 		FolderPanel fp = new FolderPanel(title, false, false, false,
-							JLabelJavaHelpLink.getHelpActionListener(helpTopic));
+				JLabelJavaHelpLink.getHelpActionListener(helpTopic));
 		JTextArea helpText = new JTextArea();
 		helpText.setLineWrap(true);
 		helpText.setWrapStyleWord(true);
@@ -87,7 +87,7 @@ public class GUIhelper {
 	// window is
 	// closed
 	public static int showMessageDialog(Object guiComponentOrText, String title,
-						String[] buttons) {
+			String[] buttons) {
 		
 		JComponent content = null;
 		
@@ -99,25 +99,25 @@ public class GUIhelper {
 			content = (JComponent) guiComponentOrText;
 		
 		MyDialog md = new MyDialog(MainFrame.getInstance(), title, buttons,
-							content, 5);
+				content, 5);
 		md.setBounds(MainFrame.getRelativeCenterPosition(md));
 		md.setVisible(true);
 		return md.getReturnValue();
 	}
 	
 	public static JComponent getWebsiteButton(String title, final String url,
-						final String opt_local_folder, final String optIntroText,
-						final String optIntroDialogTitle) {
+			final String opt_local_folder, final String optIntroText,
+			final String optIntroDialogTitle) {
 		JButton res = new JButton(title);
 		res.setToolTipText("<html>Click button to open URL:<br><code><b>" + url);
 		res.addActionListener(getDialogAction(url, opt_local_folder,
-							optIntroText, optIntroDialogTitle));
+				optIntroText, optIntroDialogTitle));
 		return res;
 	}
 	
 	private static ActionListener getDialogAction(final String url,
-						final String opt_local_folder, final String optIntroText,
-						final String optIntroDialogTitle) {
+			final String opt_local_folder, final String optIntroText,
+			final String optIntroDialogTitle) {
 		return new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (optIntroText != null) {
@@ -131,13 +131,13 @@ public class GUIhelper {
 							}
 							AttributeHelper.showInBrowser(url);
 							if (opt_local_folder != null
-												&& opt_local_folder.length() > 0)
+									&& opt_local_folder.length() > 0)
 								AttributeHelper.showInBrowser(opt_local_folder);
 						}
 					};
 					t.start();
 					showMessageDialog(optIntroText, optIntroDialogTitle,
-										new String[] { "OK" });
+							new String[] { "OK" });
 				} else {
 					AttributeHelper.showInBrowser(url);
 					if (opt_local_folder != null && opt_local_folder.length() > 0)
@@ -148,31 +148,31 @@ public class GUIhelper {
 	}
 	
 	public static JComponent getWebsiteDownloadButton(final String title,
-						final String optUrlManualDownloadWebsite,
-						final String target_dir_null_ask_user, final String optIntroText,
-						final String[] downloadURLs, final String optIntroDialogTitle,
-						final FileDownloadStatusInformationProvider statusProvider) {
+			final String optUrlManualDownloadWebsite,
+			final String target_dir_null_ask_user, final String optIntroText,
+			final String[] downloadURLs, final String optIntroDialogTitle,
+			final FileDownloadStatusInformationProvider statusProvider) {
 		return getWebsiteDownloadButton(title, optUrlManualDownloadWebsite,
-							target_dir_null_ask_user, optIntroText, downloadURLs,
-							optIntroDialogTitle, statusProvider, null);
+				target_dir_null_ask_user, optIntroText, downloadURLs,
+				optIntroDialogTitle, statusProvider, null);
 	}
 	
 	public static JComponent getWebsiteDownloadButton(final String title,
-						final String optUrlManualDownloadWebsite,
-						final String target_dir_null_ask_user, final String optIntroText,
-						final String[] downloadURLs, final String optIntroDialogTitle,
-						final FileDownloadStatusInformationProvider statusProvider,
-						final Runnable optFinishSwingTask) {
+			final String optUrlManualDownloadWebsite,
+			final String target_dir_null_ask_user, final String optIntroText,
+			final String[] downloadURLs, final String optIntroDialogTitle,
+			final FileDownloadStatusInformationProvider statusProvider,
+			final Runnable optFinishSwingTask) {
 		
 		final JButton res = new JMButton("Download/Update");
 		res
-							.setToolTipText("<html>Click button to start automatic download<br><code><b>Check License first!");
+				.setToolTipText("<html>Click button to start automatic download<br><code><b>Check License/Disclaimers first!");
 		res.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				final String opt_local_folder;
 				if (target_dir_null_ask_user == null) {
 					File file = OpenFileDialogService
-										.getDirectoryFromUser("Select folder");
+							.getDirectoryFromUser("Select folder");
 					if (file == null)
 						return;
 					else
@@ -184,90 +184,90 @@ public class GUIhelper {
 				res.setEnabled(false);
 				res.setText("Downloading");
 				final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-									"Please wait...", "Downloading files...");
+						"Please wait...", "Downloading files...");
 				BackgroundTaskHelper.issueSimpleTask(title, "Please wait...",
-									new Runnable() {
-										public void run() {
-											boolean allOK = true;
-											for (String downloadURL : downloadURLs) {
-												allOK = performDownload(downloadURL,
-																	opt_local_folder, status);
-												if (status.wantsToStop()) {
-													break;
-												}
-											}
-											if (status.wantsToStop()) {
-												allOK = true;
-												try {
-													status.setCurrentStatusText1("Cancel...");
-													for (String downloadURL : downloadURLs) {
-														String fileName = downloadURL
-																			.substring(downloadURL.lastIndexOf("/") + 1);
-														String targetFileName = ReleaseInfo
-																			.getAppFolderWithFinalSep()
-																			+ fileName;
-														if (new File(targetFileName).exists()) {
-															new File(targetFileName).delete();
-															status.setCurrentStatusText2("Delete "
-																				+ targetFileName);
-														}
-													}
-												} catch (Exception e) {
-													//
-												}
-											}
-											
-											if (!allOK) {
-												res.setEnabled(true);
-												res
-																	.setText("<html><small>Automatic download failure<br>Click here for manual download");
-												res
-																	.removeActionListener(res.getActionListeners()[0]);
-												res.addActionListener(getDialogAction(
-																	optUrlManualDownloadWebsite, opt_local_folder,
-																	optIntroText, optIntroDialogTitle));
-												res.requestFocus();
-												final JDialog jd = (JDialog) ErrorMsg
-																	.findParentComponent(res, JDialog.class);
-												if (jd != null) {
-													SwingUtilities.invokeLater(new Runnable() {
-														public void run() {
-															jd.pack();
-														}
-													});
-												}
-											} else {
-												if (status.wantsToStop()) {
-													res.setText("Canceled");
-													status.pleaseContinueRun();
-													status.setCurrentStatusText2("Canceled!");
-												} else {
-													res.setText("Downloaded");
-												}
-												res.setEnabled(false);
-												if (statusProvider != null)
-													statusProvider.finishedNewDownload();
-												if (optFinishSwingTask != null)
-													SwingUtilities.invokeLater(optFinishSwingTask);
+						new Runnable() {
+							public void run() {
+								boolean allOK = true;
+								for (String downloadURL : downloadURLs) {
+									allOK = performDownload(downloadURL,
+											opt_local_folder, status);
+									if (status.wantsToStop()) {
+										break;
+									}
+								}
+								if (status.wantsToStop()) {
+									allOK = true;
+									try {
+										status.setCurrentStatusText1("Cancel...");
+										for (String downloadURL : downloadURLs) {
+											String fileName = downloadURL.substring(downloadURL.lastIndexOf("/") + 1);
+											if (downloadURL.contains("|"))
+												fileName = downloadURL.substring(downloadURL.lastIndexOf("|") + 1);
+											String targetFileName = ReleaseInfo.getAppFolderWithFinalSep()
+													+ fileName;
+											if (new File(targetFileName).exists()) {
+												new File(targetFileName).delete();
+												status.setCurrentStatusText2("Delete "
+														+ targetFileName);
 											}
 										}
-									}, null, status);
+									} catch (Exception e) {
+										//
+									}
+								}
+								
+								if (!allOK) {
+									res.setEnabled(true);
+									res
+											.setText("<html><small>Automatic download failure<br>Click here for manual download");
+									res
+											.removeActionListener(res.getActionListeners()[0]);
+									res.addActionListener(getDialogAction(
+											optUrlManualDownloadWebsite, opt_local_folder,
+											optIntroText, optIntroDialogTitle));
+									res.requestFocus();
+									final JDialog jd = (JDialog) ErrorMsg
+											.findParentComponent(res, JDialog.class);
+									if (jd != null) {
+										SwingUtilities.invokeLater(new Runnable() {
+											public void run() {
+												jd.pack();
+											}
+										});
+									}
+								} else {
+									if (status.wantsToStop()) {
+										res.setText("Canceled");
+										status.pleaseContinueRun();
+										status.setCurrentStatusText2("Canceled!");
+									} else {
+										res.setText("Downloaded");
+									}
+									res.setEnabled(false);
+									if (statusProvider != null)
+										statusProvider.finishedNewDownload();
+									if (optFinishSwingTask != null)
+										SwingUtilities.invokeLater(optFinishSwingTask);
+								}
+							}
+						}, null, status);
 			}
 		});
 		return res;
 	}
 	
 	public static boolean performDownload(String downloadURL,
-						String opt_local_folder,
-						BackgroundTaskStatusProviderSupportingExternalCallImpl status) {
+			String opt_local_folder,
+			BackgroundTaskStatusProviderSupportingExternalCallImpl status) {
 		return performDownload(downloadURL, opt_local_folder, status, null);
 	}
 	
 	public static ArrayList<String> performDirectoryListing(String downloadURL,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		if (status == null)
 			status = new BackgroundTaskConsoleLogger(
-								"downloading: " + downloadURL, "please wait", false);
+					"downloading: " + downloadURL, "please wait", false);
 		String server, remote;
 		
 		runIdx++;
@@ -328,6 +328,10 @@ public class GUIhelper {
 		String fileName = targetfilename;
 		if (fileName == null)
 			fileName = downloadURL.substring(downloadURL.lastIndexOf("/") + 1);
+		if (downloadURL.contains("|")) {
+			fileName = downloadURL.substring(downloadURL.lastIndexOf("|") + 1);
+			downloadURL = downloadURL.substring(0, downloadURL.indexOf("|"));
+		}
 		String target = opt_local_folder;
 		String targetFileName = target + fileName;
 		boolean downloadOK = true;
@@ -339,12 +343,22 @@ public class GUIhelper {
 		boolean ftp = false;
 		ObjectRef lastStatus = new ObjectRef();
 		try {
+			boolean downloadNeeded = true;
 			if (downloadURL.indexOf("ftp://") == 0) {
 				ftp = true;
-				if (!processFTPdownload(status, downloadURL, targetFileName,
-						lastStatus))
-					downloadOK = false;
-			} else {
+				try {
+					if (!processFTPdownload(status, downloadURL, targetFileName,
+							lastStatus))
+						downloadOK = false;
+					else
+						downloadNeeded = false;
+				} catch (Exception err) {
+					ftp = false;
+					System.out.println("ERROR: FTP download failed: " + err.getMessage());
+					System.out.println("INFO: TRYING DEFAULT URL DOWNLOAD METHOD");
+				}
+			};
+			if (downloadNeeded) {
 				URL url = new URL(downloadURL);
 				conn = url.openConnection();
 				int contentLength = conn.getContentLength();
@@ -366,6 +380,7 @@ public class GUIhelper {
 						break;
 					}
 				}
+				downloadOK = true;
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
@@ -403,8 +418,8 @@ public class GUIhelper {
 	private static int runIdx = 0;
 	
 	private static boolean processFTPdownload(
-						final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
-						String downloadURL, String targetFileName, ObjectRef lastStatus) throws InterruptedException {
+			final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
+			String downloadURL, String targetFileName, ObjectRef lastStatus) throws InterruptedException {
 		runIdx++;
 		final int thisRun = runIdx;
 		status.setCurrentStatusText1(downloadURL);
@@ -457,7 +472,7 @@ public class GUIhelper {
 	}
 	
 	private static boolean processDownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status, String downloadURL,
-						String targetFileName, ObjectRef lastStatus, final int thisRun, String server, String remote, final FTPClient ftp) {
+			String targetFileName, ObjectRef lastStatus, final int thisRun, String server, String remote, final FTPClient ftp) {
 		String username;
 		String password;
 		String local;
@@ -486,7 +501,7 @@ public class GUIhelper {
 								try {
 									long max = Long.parseLong(msg);
 									MyOutputStream os = (MyOutputStream) myoutputstream
-														.getObject();
+											.getObject();
 									os.setMaxBytes(max);
 								} catch (Exception e) {
 									System.out.println("Could not determine file length for detailed progress information");
@@ -532,7 +547,7 @@ public class GUIhelper {
 			// ftp.listFiles(pathname);
 			
 			OutputStream output = new MyOutputStream(lastStatus, status,
-								new FileOutputStream(local));
+					new FileOutputStream(local));
 			myoutputstream.setObject(output);
 			ftp.setRemoteVerificationEnabled(false);
 			long tA = System.currentTimeMillis();
@@ -563,7 +578,7 @@ public class GUIhelper {
 			});
 			return result;
 		} catch (Exception err) {
-			ErrorMsg.addErrorMessage(err);
+			System.out.println("ERROR: FTP DOWNLOAD ERROR: " + err.getMessage());
 			if (ftp != null && ftp.isConnected()) {
 				try {
 					System.out.println("Disconnect FTP connection (following error condition)");
@@ -578,7 +593,7 @@ public class GUIhelper {
 	
 	private static ArrayList<String> listFiles(final BackgroundTaskStatusProviderSupportingExternalCall status,
 			String downloadURL,
-				String server, String remotePath, final FTPClient ftp) {
+			String server, String remotePath, final FTPClient ftp) {
 		String username;
 		String password;
 		username = "anonymous@" + server;
@@ -682,7 +697,7 @@ class MyDialog extends JDialog {
 	private double border;
 	
 	public MyDialog(Frame instance, String title, String[] buttons,
-						JComponent mainView, int border) {
+			JComponent mainView, int border) {
 		super(instance);
 		this.title = title;
 		this.buttons = buttons;
@@ -721,8 +736,8 @@ class MyDialog extends JDialog {
 		// sp.getVerticalScrollBar().setValue(0);
 		// }});
 		add(TableLayout.getSplitVertical(mainView, TableLayout.getMultiSplit(
-							buttonArr, TableLayoutConstants.PREFERRED, 5, 0, 5, 3),
-							TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED), "1,1");
+				buttonArr, TableLayoutConstants.PREFERRED, 5, 0, 5, 3),
+				TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED), "1,1");
 		validate();
 		
 		setResizable(false);
@@ -742,7 +757,7 @@ class MyDialog extends JDialog {
 		});
 		
 		getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-							.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ESC_ACTION_KEY);
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ESC_ACTION_KEY);
 		pack();
 	}
 	

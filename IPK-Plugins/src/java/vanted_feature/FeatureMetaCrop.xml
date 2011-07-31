@@ -13,6 +13,7 @@
          <main>vanted_feature.PluginFeatureMetaCropAccess</main>
          <version>n/a</version>
          <optional>true</optional>
+         <optionaldefault>false</optionaldefault>
          <priority>true</priority>
          <available>http://metacrop.ipk-gatersleben.de</available>
     </plugindesc>

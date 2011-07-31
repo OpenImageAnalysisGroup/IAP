@@ -30,6 +30,7 @@ import org.graffiti.plugin.algorithm.AbstractAlgorithm;
 import org.graffiti.plugin.algorithm.PreconditionException;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.DatabaseBasedLabelReplacementService;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.KeggFTPinfo;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -77,6 +78,9 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 		boolean processKeggId2EcAnnotaion = false;
 		boolean koId2koName = false;
 		
+		boolean briteKO2geneName = true;
+		boolean briteKO2ecName = false;
+		
 		JPanel guiPanel = new JPanel();
 		
 		// **********************************
@@ -104,15 +108,19 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 		
 		guiPanel.setLayout(new TableLayout(size));
 		
-		JButton changeButton1 = getChangeButton(true, false);
+		JButton changeButton1 = getChangeButton(KeggFTPinfo.keggFTPavailable, false);
 		JButton changeButton2 = getChangeButton(false, false);
 		JButton changeButton3 = getChangeButton(false, true);
-		JButton changeButton4 = getChangeButton(true, true);
-		JButton changeButton5 = getChangeButton(true, true);
+		JButton changeButton4 = getChangeButton(KeggFTPinfo.keggFTPavailable, true);
+		JButton changeButton5 = getChangeButton(KeggFTPinfo.keggFTPavailable, true);
+		JButton changeButton6 = getChangeButton(true, true);
+		JButton changeButton7 = getChangeButton(false, true);
 		
-		guiPanel.add(new JLabel("Compound IDs  "), "1,1");
-		guiPanel.add(new JLabel("  Compound Names (<-> Comp. File-DB)"), "3,1");
-		guiPanel.add(changeButton1, "2,1");
+		if (KeggFTPinfo.keggFTPavailable) {
+			guiPanel.add(new JLabel("Compound IDs  "), "1,1");
+			guiPanel.add(new JLabel("  Compound Names (<-> Comp. File-DB)"), "3,1");
+			guiPanel.add(changeButton1, "2,1");
+		}
 		
 		guiPanel.add(new JLabel("EC Numbers  "), "1,2 r");
 		guiPanel.add(new JLabel("  Substance Names (<-> Enz. File-DB)"), "3,2");
@@ -122,13 +130,23 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 		guiPanel.add(new JLabel("  Enzyme IDs (-> SOAP*)"), "3,3");
 		guiPanel.add(changeButton3, "2,3");
 		
-		guiPanel.add(new JLabel("KO/Gene ID# "), "1,4 r");
-		guiPanel.add(new JLabel("  Enzyme IDs (-> KO File-DB)"), "3,4");
-		guiPanel.add(changeButton4, "2,4");
-		
-		guiPanel.add(new JLabel("KO ID"), "1,5 r");
-		guiPanel.add(new JLabel("  KO Name (-> KO File-DB)"), "3,5");
-		guiPanel.add(changeButton5, "2,5");
+		if (KeggFTPinfo.keggFTPavailable) {
+			guiPanel.add(new JLabel("KO/Gene ID# "), "1,4 r");
+			guiPanel.add(new JLabel("  Enzyme IDs (-> KO File-DB)"), "3,4");
+			guiPanel.add(changeButton4, "2,4");
+			
+			guiPanel.add(new JLabel("KO IDs  "), "1,5 r");
+			guiPanel.add(new JLabel("  KO Name (-> KO File-DB)"), "3,5");
+			guiPanel.add(changeButton5, "2,5");
+		} else {
+			guiPanel.add(new JLabel("IDs of Orthologs (KO)  "), "1,4 r");
+			guiPanel.add(new JLabel("  Gene Name (-> KEGG BRITE DB)"), "3,4");
+			guiPanel.add(changeButton6, "2,4");
+			
+			guiPanel.add(new JLabel("IDs of Othologs (KO)  "), "1,5 r");
+			guiPanel.add(new JLabel("  Enzyme IDs (-> KEGG BRITE DB)"), "3,5");
+			guiPanel.add(changeButton7, "2,5");
+		}
 		
 		JCheckBox increaseSizeCheckBox = new JCheckBox("<html>" +
 							"Increase node size if label does not fit<br>" +
@@ -143,7 +161,8 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 												new JLabel("<html><small>" +
 																	"<br>* SOAP based renaming-operation may take a longer time" +
 																	"<br>~ Requires KEGG Reaction node attribute" +
-																	"<br># Requires KEGG ID attribute matching a KO/KO-Gene entry and KO-EC annotation"),
+																	(KeggFTPinfo.keggFTPavailable ?
+																			"<br># Requires KEGG ID attribute matching a KO/KO-Gene entry and KO-EC annotation" : "")),
 												TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED), "1,7,3,7");
 		
 		String helpText;
@@ -178,6 +197,9 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 			reactionNameToNo = changeButton3.getText().contains("<");
 			processKeggId2EcAnnotaion = changeButton4.getText().contains(">");
 			koId2koName = changeButton5.getText().contains(">");
+			briteKO2geneName = changeButton6.getText().contains(">");
+			briteKO2ecName = changeButton7.getText().contains(">");
+			
 			DatabaseBasedLabelReplacementService mwt = new DatabaseBasedLabelReplacementService(
 								nodes,
 								compoundNameToID,
@@ -188,6 +210,8 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 								reactionNameToNo,
 								processKeggId2EcAnnotaion,
 								koId2koName,
+								briteKO2geneName,
+								briteKO2ecName,
 								increaseSizeCheckBox.isSelected(),
 								useShortNameCheckBox.isSelected(),
 								false, false, null);

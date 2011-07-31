@@ -12,7 +12,7 @@ public class TabMetaCrop extends PathwayWebLinkTab {
 	private static final long serialVersionUID = 1L;
 	
 	public TabMetaCrop() {
-		super("MetaCrop pathways", "http://vanted.ipk-gatersleben.de/addons/metacrop/gml/",
+		super("MetaCrop", "http://vanted.ipk-gatersleben.de/addons/metacrop/gml/",
 							"pathways", "pathway", "http://metacrop.ipk-gatersleben.de/", false);
 	}
 	

@@ -174,25 +174,33 @@ public class MenuItemInfoDialog
 																								.replaceAll("<br>",
 																													"")
 																								+
-																								" is part of the " +
+																								"<br>is part of "
+																					+
 																								DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME
-																								+ "<br>- <b>developed by Christian Klukas, Plant Bioinformatics Group<p><br>"
-																								:
+																								+ " (c) 2010-2011 Group Image Analysis,<br>IPK-Gatersleben - " +
+																										"design and implementation by Christian Klukas, head of group<br><br>"
+																								: "")
+																+
 																								"<b>Development</b>"
 																													+
 																													"<br><br>"
 																													+
-																													"Application design and implementation by "
+																													"VANTED has been designed and implemented mainly by Christian Klukas in the<br>"
+																+
+																													"frame of his PhD thesis. The PhD work was performed under the supervision<br>"
+																+
+																													"of Falk Schreiber (lead of group plant bioinformatics).<br><br>"
+																+
+																													"Parts of the application have been implementated by other members<br>"
 																													+
-																													"members of the IPK working groups<br>"
+																													"of the IPK working group plant bioinformatics.<br>"
 																													+
-																													"Image Analysis and Plant Bioinformatics - http://bioinformatics.ipk-gatersleben.de<br>"
-																													+
-																													"<br>Initial Gravisto library development at University of Passau.<br>" +
+																													"<br>Initial Gravisto graph editor library development at University of Passau.<br>"
+																+
 																													otherParties +
 																													(otherParties2.length() > 0 ?
 																																		"<br><br><b>Information</b><br><br>" : "") +
-																													otherParties2) +
+																													otherParties2 +
 																			"<small><small><small><br><font color=\"gray\"><br>System-Info: " +
 																			Java_1_5_compatibility.getJavaVersion() + ", " +
 																			SystemAnalysis.getNumberOfCPUs() + " CPU" + (SystemAnalysis.getNumberOfCPUs() > 1 ? "s, " : ", ")

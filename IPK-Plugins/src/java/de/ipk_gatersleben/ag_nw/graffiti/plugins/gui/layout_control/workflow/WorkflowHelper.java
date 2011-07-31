@@ -359,8 +359,14 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		
 		// Database-based node statusbar-infos
 		
-		JComponent zoomCheckBox = new SettingsHelperDefaultIsTrue().getBooleanSettingsEditor(
+		JComponent zoomCheckBox;
+		if (AttributeHelper.macOSrunning()) {
+			zoomCheckBox = new SettingsHelperDefaultIsFalse().getBooleanSettingsEditor(
+					"<html>Mouse Wheel Zoom<br>(disable to scroll instead)", "graph_view_wheel_zoom", enableZoom, disableZoom);
+		} else {
+			zoomCheckBox = new SettingsHelperDefaultIsTrue().getBooleanSettingsEditor(
 							"<html>Mouse Wheel Zoom<br>(disable to scroll instead)", "graph_view_wheel_zoom", enableZoom, disableZoom);
+		}
 		settings.addGuiComponentRow(null, zoomCheckBox, false);
 		// settings.addGuiComponentRow(new JLabel("Move nodes/bends"), gridSize,
 		// false);

@@ -40,7 +40,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class GravistoMain extends JApplet {
 	// ~ Static fields/initializers =============================================
@@ -253,8 +253,8 @@ public class GravistoMain extends JApplet {
 		DBEgravistoHelper.DBE_GRAVISTO_NAME = "" + stS + "DBE-Gravisto" + stE + "<br><small>* "
 							+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments<br>* "
 							+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "alisation " + stS + " to" + stE + "olkit<br></small>";
-		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "VANTED applet";
-		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "";
+		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-VANTED applet";
+		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "IAP - Integrated Analysis Platform";// CK 31.7.2011 //
 		
 		// AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		

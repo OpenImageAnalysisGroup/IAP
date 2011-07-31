@@ -34,12 +34,12 @@ import de.ipk.ag_ba.mongo.MongoDB;
 public class ImageAnalysisCommandManager {
 	
 	public static Collection<NavigationButton> getCommands(MongoDB m,
-						ExperimentReference experimentReference, GUIsetting guiSetting) {
+			ExperimentReference experimentReference, GUIsetting guiSetting) {
 		return getCommands(m, experimentReference, true, guiSetting);
 	}
 	
 	public static Collection<NavigationButton> getCommands(MongoDB m,
-						ExperimentReference experimentReference, boolean analysis, GUIsetting guiSetting) {
+			ExperimentReference experimentReference, boolean analysis, GUIsetting guiSetting) {
 		
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		
@@ -59,8 +59,9 @@ public class ImageAnalysisCommandManager {
 			actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 		if (SystemAnalysis.isHeadless())
 			actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference), guiSetting));
-		
-		actions.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReference, IAPmain.getHSMfolder()), guiSetting));
+		String hsmf = IAPmain.getHSMfolder();
+		if (hsmf != null)
+			actions.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReference, hsmf), guiSetting));
 		
 		actions.add(new NavigationButton(new ActionDataExport(m, experimentReference), guiSetting));
 		
@@ -84,9 +85,9 @@ public class ImageAnalysisCommandManager {
 			actions.add(ImageAnalysis.getMaizeEntity(m, experimentReference, 10, 15, guiSetting));
 			
 			actions.add(ActionThreeDreconstruction.getThreeDreconstructionTaskEntity(m, experimentReference,
-								"3-D Reconstruction", 15, 25, guiSetting));
+					"3-D Reconstruction", 15, 25, guiSetting));
 			actions.add(ActionThreeDsegmentation.getThreeDsegmentationTaskEntity(m, experimentReference,
-								"3-D Segmentation", 15, 25, guiSetting));
+					"3-D Segmentation", 15, 25, guiSetting));
 		}
 		
 		try {

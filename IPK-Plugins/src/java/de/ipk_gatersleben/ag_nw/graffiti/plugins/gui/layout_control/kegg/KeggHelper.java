@@ -32,23 +32,27 @@ import org.HelperClass;
 import org.StringManipulationTools;
 import org.graffiti.graph.Node;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_brite.BriteService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
 
 /**
  * HTML Parser
  * 
  * @author Christian Klukas
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class KeggHelper implements HelperClass {
 	
-	private static String kgmlVersion = "0.7.0";
+	private static String kgmlVersion = "0.6.1";
 	
 	/**
 	 * @return True, if the pathways for this version are provided by KEGG via FTP.
 	 */
 	private boolean isKEGGftpDownloadVersion(String kgmlVersion) {
-		return kgmlVersion.equals("0.7.0");
+		if (KeggFTPinfo.keggFTPavailable)
+			return kgmlVersion.equals("0.7.0");
+		else
+			return false;
 	}
 	
 	/**
@@ -61,9 +65,9 @@ public class KeggHelper implements HelperClass {
 	 * @throws ServiceException
 	 */
 	public Collection<KeggPathwayEntry> getXMLpathways(
-						String serverURL, OrganismEntry organism, boolean stripOrganismName,
-						BackgroundTaskStatusProviderSupportingExternalCall status)
-						throws IOException, ServiceException {
+			String serverURL, OrganismEntry organism, boolean stripOrganismName,
+			BackgroundTaskStatusProviderSupportingExternalCall status)
+			throws IOException, ServiceException {
 		
 		KEGGLocator locator = new KEGGLocator();
 		KEGGPortType serv = locator.getKEGGPort();
@@ -76,19 +80,21 @@ public class KeggHelper implements HelperClass {
 				boolean ok = true;
 				if (isKEGGftpDownloadVersion(kgmlVersion)) {
 					ok = KeggFTPinfo.getInstance().isKnown(mapNumber, status);
+					if (!KeggFTPinfo.keggFTPavailable)
+						ok = true;
 					if (!ok)
 						unknown++;
 				}
 				
 				if (ok)
 					result.add(
-									new KeggPathwayEntry(
-														def[i].getDefinition(),
-														stripOrganismName,
-														mapNumber,
-														getGroupFromMapNumber(mapNumber, def[i].getDefinition())
-									// getGroupFromMapName(def[i].getDefinition())
-									));
+							new KeggPathwayEntry(
+									def[i].getDefinition(),
+									stripOrganismName,
+									mapNumber,
+									getGroupFromMapNumber(mapNumber, def[i].getDefinition())
+							// getGroupFromMapName(def[i].getDefinition())
+							));
 			}
 		if (unknown > 0) {
 			System.out.println("Information: based on FTP directory listing " + unknown + " patways, included in SOAP return are filtered out for display.");
@@ -98,6 +104,10 @@ public class KeggHelper implements HelperClass {
 	
 	public static String[] getGroupFromMapNumber(String mapNumber, String mapName) {
 		if (!KoService.isExternalKoFileAvailable()) {
+			String[] rr = BriteService.getPathwayGroupFromMapNumber(getDigits(mapNumber));
+			if (rr != null)
+				return rr;
+			
 			if (mapName.indexOf(" - ") > 0) {
 				mapName = mapName.substring(0, mapName.lastIndexOf(" - "));
 			}
@@ -116,9 +126,9 @@ public class KeggHelper implements HelperClass {
 			}
 			if (mapName.indexOf(" - ") > 0) {
 				String s1 = mapName.substring(0, mapName.indexOf(" - ")).trim();
-				return new String[] { "not found in KO", s1 };
+				return new String[] { "not found", s1 };
 			} else
-				return new String[] { "not found in KO", "unknown group" };
+				return new String[] { "not found", "unknown group" };
 		}
 	}
 	
@@ -323,21 +333,23 @@ public class KeggHelper implements HelperClass {
 	private static Collection<OrganismEntry> cachedOrganismList = new ArrayList<OrganismEntry>();
 	
 	public synchronized Collection<OrganismEntry> getOrganisms()
-						throws IOException, ServiceException {
+			throws IOException, ServiceException {
 		if (cachedOrganismList.size() > 1) {
 			return cachedOrganismList;
 		}
 		KEGGLocator locator = new KEGGLocator();
 		KEGGPortType serv = locator.getKEGGPort();
 		ArrayList<OrganismEntry> result = new ArrayList<OrganismEntry>();
-		OrganismEntry mapEnty = new OrganismEntry("map", "Reference Pathways (MAP)");
-		result.add(mapEnty);
+		if (KeggFTPinfo.keggFTPavailable) {
+			OrganismEntry mapEnty = new OrganismEntry("map", "Reference Pathways (MAP)");
+			result.add(mapEnty);
+		}
 		OrganismEntry koEnty = new OrganismEntry("ko", "Reference Pathways (KO)");
 		result.add(koEnty);
-		OrganismEntry rnEnty = new OrganismEntry("ko", "Reference Pathways (RN)");
+		OrganismEntry rnEnty = new OrganismEntry("ec", "Reference Pathways (EC)");
 		result.add(rnEnty);
-		OrganismEntry otEnty = new OrganismEntry("ko", "Reference Pathways (OT)");
-		result.add(otEnty);
+		// OrganismEntry otEnty = new OrganismEntry("ko", "Reference Pathways (OT)");
+		// result.add(otEnty);
 		try {
 			Definition[] def = serv.list_organisms();
 			for (int i = 0; i < def.length; i++)
@@ -351,7 +363,7 @@ public class KeggHelper implements HelperClass {
 	}
 	
 	public Collection<String> getLinkedPathwayIDs(String pathway_id)
-						throws IOException, ServiceException {
+			throws IOException, ServiceException {
 		ArrayList<String> result = new ArrayList<String>();
 		KEGGLocator locator = new KEGGLocator();
 		KEGGPortType serv = locator.getKEGGPort();
@@ -412,8 +424,9 @@ public class KeggHelper implements HelperClass {
 		JLabel lbl = new JLabel(" v");
 		lbl.setHorizontalAlignment(SwingConstants.RIGHT);
 		return TableLayout.getSplit(
-							lbl,
-							result, // new JLabel("<html><small>&nbsp;(in case of problems,<br>&nbsp;select 0.6 instead of 0.6.1)"),
+				KeggFTPinfo.keggFTPavailable ? lbl : null,
+				KeggFTPinfo.keggFTPavailable ?
+						result : null, // new JLabel("<html><small>&nbsp;(in case of problems,<br>&nbsp;select 0.6 instead of 0.6.1)"),
 				TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED); // , TableLayout.PREFERRED);
 	}
 }

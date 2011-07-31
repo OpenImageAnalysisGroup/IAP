@@ -41,6 +41,8 @@ import org.graffiti.graph.AdjListGraph;
 import org.graffiti.graph.Edge;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.Node;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -48,6 +50,7 @@ import org.jdom.input.SAXBuilder;
 
 import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.EntryType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.IdRef;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.KeggId;
@@ -445,9 +448,21 @@ public class Pathway {
 			SAXBuilder builder = new SAXBuilder(false);
 			Document doc;
 			try {
+				TextFile tf = new TextFile(in, 0);
+				int idx = 0;
+				for (String s : tf) {
+					if (s.contains("DOCTYPE")) {
+						tf.remove(idx);
+						break;
+					}
+					idx++;
+				}
+				MyByteArrayOutputStream bos = new MyByteArrayOutputStream();
+				tf.write(bos);
+				MyByteArrayInputStream in2 = new MyByteArrayInputStream(bos.getBuffTrimmed());
 				builder.setValidation(false);
 				builder.setExpandEntities(false);
-				doc = builder.build(in);
+				doc = builder.build(in2);
 				Element kgmlRoot = doc.getRootElement();
 				result = getPathwayFromKgmlRootElement(kgmlRoot);
 			} catch (JDOMException e) {

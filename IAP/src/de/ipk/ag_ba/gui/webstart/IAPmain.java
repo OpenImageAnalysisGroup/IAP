@@ -109,7 +109,7 @@ public class IAPmain extends JApplet {
 		setLayout(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.FILL } }));
 		
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-							"", "");
+				"", "");
 		JComponent advancedNavigation = IAPgui.getNavigation(myStatus, false);
 		add(advancedNavigation, "0,0");
 		validate();
@@ -165,15 +165,15 @@ public class IAPmain extends JApplet {
 	public void myAppletLoad(MainFrame statusPanel, final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
-		String name = stS + "VANTED" + stE + " - " + stS + "V" + stE + "isualization and " + stS + "A" + stE
-							+ "nalysis of " + stS + "N" + stE + "e" + stS + "t" + stE + "works <br>containing " + stS + "E" + stE
-							+ "xperimental " + stS + "D" + stE + "ata";
-		DBEgravistoHelper.DBE_GRAVISTO_VERSION = "VANTED V" + DBEgravistoHelper.DBE_GRAVISTO_VERSION_CODE;
-		DBEgravistoHelper.DBE_GRAVISTO_NAME = stS + "VANTED" + stE + "&nbsp;-&nbsp;" + stS + "V" + stE
-							+ "isualization&nbsp;and&nbsp;" + stS + "A" + stE + "nalysis&nbsp;of&nbsp;" + stS + "N" + stE + "e" + stS
-							+ "t" + stE + "works&nbsp;<br>containing&nbsp;" + stS + "E" + stE + "xperimental&nbsp;" + stS + "D" + stE
-							+ "ata<br>";
-		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "VANTED";
+		String name = stS + "IAP-VANTED" + stE + " - " + stS + "V" + stE + "isualization and " + stS + "A" + stE
+				+ "nalysis of " + stS + "N" + stE + "e" + stS + "t" + stE + "works <br>containing " + stS + "E" + stE
+				+ "xperimental " + stS + "D" + stE + "ata";
+		DBEgravistoHelper.DBE_GRAVISTO_VERSION = "IAP-VANTED V" + DBEgravistoHelper.DBE_GRAVISTO_VERSION_CODE;
+		DBEgravistoHelper.DBE_GRAVISTO_NAME = stS + "IAP-VANTED" + stE + "&nbsp;-&nbsp;" + stS + "V" + stE
+				+ "isualization&nbsp;and&nbsp;" + stS + "A" + stE + "nalysis&nbsp;of&nbsp;" + stS + "N" + stE + "e" + stS
+				+ "t" + stE + "works&nbsp;<br>containing&nbsp;" + stS + "E" + stE + "xperimental&nbsp;" + stS + "D" + stE
+				+ "ata<br>";
+		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-VANTED";
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "Integrated Analysis Platform";
 		
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "";
@@ -184,13 +184,13 @@ public class IAPmain extends JApplet {
 		result.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		
 		String s = ""
-							+ "<html><small><br>&nbsp;&nbsp;&nbsp;</small>Welcome to "
-							+ name
-							+ "!<br>"
-							+ "<small>"
-							+ "&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
-							+ "&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
-							+ "&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
+				+ "<html><small><br>&nbsp;&nbsp;&nbsp;</small>Welcome to "
+				+ name
+				+ "!<br>"
+				+ "<small>"
+				+ "&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
+				+ "&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
+				+ "&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
 		
 		ReleaseInfo.setHelpIntroductionText(s);
 		
@@ -311,7 +311,7 @@ public class IAPmain extends JApplet {
 			System.err.println("Internal error: Plugin Description files could not be loaded.");
 			System.err.println("-- Program needs to be stopped");
 			JOptionPane.showMessageDialog(null, "<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
-								+ "Program execution can not continue.<br>" + "The application needs to be closed.</html>");
+					+ "Program execution can not continue.<br>" + "The application needs to be closed.</html>");
 			System.err.println("EXIT");
 			System.exit(1);
 		}
@@ -364,7 +364,7 @@ public class IAPmain extends JApplet {
 		if (cachedImages.containsKey(name))
 			return cachedImages.get(name);
 		NavigationImage res = new NavigationImage(
-							ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()), name);
+				ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()), name);
 		cachedImages.put(name, res);
 		return res;
 	}
@@ -396,16 +396,21 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static String getHSMfolder() {
-		if (new File("/media/nfs/hsm").exists())
-			return "/media/nfs/hsm";
-		else
-			if (new File("/Volumes/HSM").exists())
-				return "/Volumes/HSM";
+		try {
+			if (new File("/media/nfs/hsm").exists())
+				return "/media/nfs/hsm";
 			else
-				if (new File("E:/austausch/HSM").exists())
-					return "E:/austausch/HSM";
+				if (new File("/Volumes/HSM").exists())
+					return "/Volumes/HSM";
 				else
-					return ReleaseInfo.getAppSubdirFolder("local-iap-hsm");
+					if (new File("E:/austausch/HSM").exists())
+						return "E:/austausch/HSM";
+					else
+						return ReleaseInfo.getAppSubdirFolder("local-iap-hsm");
+		} catch (Exception e) {
+			System.out.println("INFO: HSM file system folder not accessible: " + e.getMessage());
+			return null;
+		}
 	}
 	
 	private static ImageJ ij = null;

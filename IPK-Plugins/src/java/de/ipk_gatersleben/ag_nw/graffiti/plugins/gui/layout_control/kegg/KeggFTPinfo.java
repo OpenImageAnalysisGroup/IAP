@@ -13,6 +13,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class KeggFTPinfo {
 	
+	public static final boolean keggFTPavailable = false;
+	
 	private static final KeggFTPinfo instance = new KeggFTPinfo();
 	
 	private KeggFTPinfo() {
@@ -58,29 +60,34 @@ public class KeggFTPinfo {
 			String url2 = "ftp://ftp.genome.jp"
 					+ "/pub/kegg/xml/kgml/" + metabolic + "/" + mapID;// + "/" + map + mapNumber + ".xml";
 			
-			BackgroundTaskHelper.lockAquire("ftpPathwayLookup", 1);
-			if (!org2list.containsKey(keyM)) {
-				ArrayList<String> filesMetabolic = GUIhelper.performDirectoryListing(url1, status);
-				TreeSet<String> files = new TreeSet<String>(filesMetabolic);
-				org2list.put(keyM, files);
+			if (keggFTPavailable) {
+				BackgroundTaskHelper.lockAquire("ftpPathwayLookup", 1);
+				if (!org2list.containsKey(keyM)) {
+					ArrayList<String> filesMetabolic = GUIhelper.performDirectoryListing(url1, status);
+					TreeSet<String> files = new TreeSet<String>(filesMetabolic);
+					org2list.put(keyM, files);
+				}
+				if (!org2list.containsKey(keyNM)) {
+					ArrayList<String> filesNonMetabolic = GUIhelper.performDirectoryListing(url2, status);
+					TreeSet<String> files = new TreeSet<String>(filesNonMetabolic);
+					org2list.put(map + "_nonmetab", files);
+				}
+				BackgroundTaskHelper.lockRelease("ftpPathwayLookup");
 			}
-			if (!org2list.containsKey(keyNM)) {
-				ArrayList<String> filesNonMetabolic = GUIhelper.performDirectoryListing(url2, status);
-				TreeSet<String> files = new TreeSet<String>(filesNonMetabolic);
-				org2list.put(map + "_nonmetab", files);
-			}
-			BackgroundTaskHelper.lockRelease("ftpPathwayLookup");
 		}
 	}
 	
 	public boolean isMetabolic(String mapNumber, BackgroundTaskStatusProviderSupportingExternalCall status) {
 		init(mapNumber, status);
+		if (!keggFTPavailable)
+			return false;
 		String fn = getMapFromName(mapNumber) + StringManipulationTools.getNumbersFromString(mapNumber) + ".xml";
 		boolean isMetabolic = org2list.get(getMapFromName(mapNumber) + "_metab").contains(fn);
 		boolean isNonMetabolic = org2list.get(getMapFromName(mapNumber) + "_nonmetab").contains(fn);
 		
 		if (!isMetabolic && !isNonMetabolic) {
-			System.out.println("WARNING: pathway unknown: " + fn + " - decision about metabolic can't be made");
+			if (keggFTPavailable)
+				System.out.println("WARNING: pathway unknown: " + fn + " - decision about metabolic can't be made");
 		}
 		if (isMetabolic && isNonMetabolic) {
 			System.out.println("WARNING: pathway is known as both, metabolic and non-metabolic: " + fn + " - decision about metabolic can't be made");
@@ -91,8 +98,9 @@ public class KeggFTPinfo {
 	public boolean isKnown(String mapNumber, BackgroundTaskStatusProviderSupportingExternalCall status) {
 		init(mapNumber, status);
 		String fn = getMapFromName(mapNumber) + StringManipulationTools.getNumbersFromString(mapNumber) + ".xml";
-		boolean isMetabolic = org2list.get(getMapFromName(mapNumber) + "_metab").contains(fn);
-		boolean isNonMetabolic = org2list.get(getMapFromName(mapNumber) + "_nonmetab").contains(fn);
+		boolean isMetabolic = org2list.get(getMapFromName(mapNumber) + "_metab") != null && org2list.get(getMapFromName(mapNumber) + "_metab").contains(fn);
+		boolean isNonMetabolic = org2list.get(getMapFromName(mapNumber) + "_nonmetab") != null
+				&& org2list.get(getMapFromName(mapNumber) + "_nonmetab").contains(fn);
 		
 		return isMetabolic || isNonMetabolic;
 	}
