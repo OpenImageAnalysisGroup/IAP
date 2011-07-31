@@ -88,7 +88,7 @@ public class IPKnodeComponent extends NodeComponent {
 				}
 			} else
 				result = doubleClickHelp(n, includeClickHelp).length() > 0 ? StringManipulationTools.stringReplace(doubleClickHelp(n, includeClickHelp), " |", "")
-									: null;
+						: null;
 		}
 		return result;
 	}
@@ -115,6 +115,8 @@ public class IPKnodeComponent extends NodeComponent {
 		String mainlbl = AttributeHelper.getLabel(n, "node");
 		if (mainlbl.length() <= 0)
 			mainlbl = "[]";
+		mainlbl = mainlbl.replaceAll("<p>", "");
+		mainlbl = mainlbl.replaceAll("<center>", "");
 		mainlbl = mainlbl.replaceAll("<br>", "");
 		mainlbl = mainlbl.replaceAll("<html>", "");
 		int hiddenNodes = 0;
@@ -122,6 +124,8 @@ public class IPKnodeComponent extends NodeComponent {
 			String lbl = AttributeHelper.getLabel(m, "[n/a]");
 			if (lbl.length() <= 0)
 				lbl = "[]";
+			lbl = lbl.replaceAll("<p>", "");
+			lbl = lbl.replaceAll("<center>", "");
 			lbl = lbl.replaceAll("<br>", "");
 			lbl = lbl.replaceAll("<html>", "");
 			if (nl.length() > 0)
@@ -133,8 +137,8 @@ public class IPKnodeComponent extends NodeComponent {
 				nl.append(lbl);
 		}
 		result = doubleClickHelp(n, includeClickHelp) + "Degree: " + n.getDegree() + ", " + mainlbl + " is connected to: " + nl.toString()
-							+ (hiddenNodes > 0 ? " (" +
-												getHiddenText(hiddenNodes, includeClickHelp) + ")" : "");
+				+ (hiddenNodes > 0 ? " (" +
+						getHiddenText(hiddenNodes, includeClickHelp) + ")" : "");
 		return result;
 	}
 	
@@ -186,9 +190,9 @@ public class IPKnodeComponent extends NodeComponent {
 						resultAenzymeClassInfo += entry;
 				}
 				resultAenzymeClassInfo += "<br><font color=gray>"
-									+ "<small>ENZYME nomenclature database - Swiss Institute of Bioinformatics ("
-									+ EnzymeService.getReleaseVersionForEnzymeClasses() + ")"
-									+ "</small></font>";
+						+ "<small>ENZYME nomenclature database - Swiss Institute of Bioinformatics ("
+						+ EnzymeService.getReleaseVersionForEnzymeClasses() + ")"
+						+ "</small></font>";
 			}
 			// Retrieve enzyme information
 			if (eze == null) {
@@ -208,7 +212,7 @@ public class IPKnodeComponent extends NodeComponent {
 				}
 				if (syn.length() > 0)
 					resultBenzymeEntryInfo += "<small>Synonyms: " + syn
-										+ "</small><br>";
+							+ "</small><br>";
 				
 				String ca = "";
 				for (Iterator<?> it = eze.getCA().iterator(); it.hasNext();) {
@@ -220,7 +224,7 @@ public class IPKnodeComponent extends NodeComponent {
 				}
 				if (ca.length() > 0)
 					resultBenzymeEntryInfo += "<small>Catalytic act.: " + ca
-										+ "</small><br>";
+							+ "</small><br>";
 				
 				String cf = "";
 				for (Iterator<?> it = eze.getCF().iterator(); it.hasNext();) {
@@ -232,7 +236,7 @@ public class IPKnodeComponent extends NodeComponent {
 				}
 				if (cf.length() > 0)
 					resultBenzymeEntryInfo += "<small>Cofactor(s): " + cf
-										+ "</small><br>";
+							+ "</small><br>";
 				
 				String cc = "";
 				for (Iterator<?> it = eze.getCC().iterator(); it.hasNext();) {
@@ -244,11 +248,11 @@ public class IPKnodeComponent extends NodeComponent {
 				}
 				if (cc.length() > 0)
 					resultBenzymeEntryInfo += "<small>Comments: " + cc
-										+ "</small><br>";
+							+ "</small><br>";
 				
 				resultBenzymeEntryInfo += "<font color=gray><small>SIB "
-									+ EnzymeService.getReleaseVersionForEnzymeInformation()
-									+ "</small></font>";
+						+ EnzymeService.getReleaseVersionForEnzymeInformation()
+						+ "</small></font>";
 			}
 		} else {
 			resultAenzymeClassInfo = null;
@@ -269,8 +273,8 @@ public class IPKnodeComponent extends NodeComponent {
 				tabB = "<small><font color=gray>- Unspecific or invalid enzyme -</font></small>";
 			
 			return "<table>" + "<tr><td valign=\"top\">" + tabA
-								+ "</td>" + "<td valign=\"top\">" + tabB
-								+ "</td></tr></table></html>";
+					+ "</td>" + "<td valign=\"top\">" + tabB
+					+ "</td></tr></table></html>";
 		}
 	}
 	
@@ -305,10 +309,10 @@ public class IPKnodeComponent extends NodeComponent {
 				}
 				if (syn.length() > 0)
 					resultCompoundInfo += "<small>Names: " + syn
-										+ "</small><br>";
+							+ "</small><br>";
 				resultCompoundInfo += "<font color=gray><small>KEGG-LIGAND "
-									+ CompoundService.getReleaseVersionForCompoundInformation()
-									+ "</small></font>";
+						+ CompoundService.getReleaseVersionForCompoundInformation()
+						+ "</small></font>";
 			}
 		} else {
 			resultCompoundInfo = null;
@@ -317,7 +321,7 @@ public class IPKnodeComponent extends NodeComponent {
 			return null;
 		else
 			return "<table><tr><td valign=\"top\">"
-								+ resultCompoundInfo + "</td></tr></table></html>";
+					+ resultCompoundInfo + "</td></tr></table></html>";
 	}
 	
 	public IPKnodeComponent(GraphElement ge) {

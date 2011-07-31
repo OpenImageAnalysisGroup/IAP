@@ -8,6 +8,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe;
 
 import java.awt.Dimension;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -30,6 +31,7 @@ import org.graffiti.graphics.NodeGraphicAttribute;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg.CompoundEntry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg.CompoundService;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_brite.BriteService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoEntry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.sib_enzymes.EnzymeEntry;
@@ -62,6 +64,8 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	private boolean useGreekName;
 	private boolean processKeggId2EcAnnotation;
 	private boolean koId2koName;
+	private final boolean briteKO2geneName;
+	private final boolean briteKO2ecName;
 	
 	public DatabaseBasedLabelReplacementService(
 						Collection<Node> nodes,
@@ -73,6 +77,8 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 						boolean reactionNameToNo,
 						boolean processKeggId2EcAnnotaion,
 						boolean koId2koName,
+						boolean briteKO2geneName,
+						boolean briteKO2ecName,
 						boolean increaseNodeSize,
 						boolean useShortName,
 						boolean preserveOldId,
@@ -85,6 +91,8 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 		this.compNameToID = compoundNameToID;
 		this.reactionIdToEcName = reactionNameToEcId;
 		this.reactionNameToId = reactionNameToNo;
+		this.briteKO2geneName = briteKO2geneName;
+		this.briteKO2ecName = briteKO2ecName;
 		this.increaseNodeSize = increaseNodeSize;
 		this.useShortName = useShortName;
 		this.preserveOldId = preserveOldId;
@@ -308,6 +316,45 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 						if (myTargetName.length() > 0) {
 							targetName = myTargetName;
 							targetName = StringManipulationTools.stringReplace(targetName, "ec:", "");
+						}
+					}
+				
+				if (targetName == null)
+					if (briteKO2geneName || briteKO2ecName) {
+						ArrayList<IndexAndString> keggIDs = KeggGmlHelper.getKeggIds(n);
+						for (IndexAndString ias : keggIDs) {
+							if (ias.getValue() != null) {
+								String[] keggID = ias.getValue().split(" ");
+								for (String kid : keggID) {
+									if (kid.startsWith("K")) {
+										ArrayList<String> altIDs = BriteService.getKoNamesFromKO(kid);
+										if (altIDs != null) {
+											if (useShortName && !briteKO2ecName) {
+												int minLen = Integer.MAX_VALUE;
+												for (String s : altIDs) {
+													int len = s.length();
+													if (len < minLen) {
+														targetName = s;
+														minLen = len;
+													}
+												}
+											} else {
+												if (briteKO2ecName) {
+													for (String s : altIDs) {
+														if (s.toUpperCase().startsWith("EC:")) {
+															targetName = s.substring("ec:".length());
+															break;
+														}
+													}
+												} else
+													if (briteKO2geneName && altIDs.size() > 0) {
+														targetName = altIDs.iterator().next();
+													}
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				

@@ -47,7 +47,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.GUIhelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class KoService extends MemoryHog implements BackgroundTaskStatusProvider,
-					FileDownloadStatusInformationProvider, HelperClass {
+		FileDownloadStatusInformationProvider, HelperClass {
 	private static boolean read_ko_DB_txt = false;
 	
 	private static String koDBrelease = "unknown";
@@ -165,7 +165,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 		if (!ReleaseInfo.getIsAllowedFeature(FeatureSet.KEGG_ACCESS))
 			return;
 		String modifiedTime = GravistoService.getFileModificationDateAndTime(getFile("ko"),
-							"unknown version (file not found)");
+				"unknown version (file not found)");
 		File f = getFile("ko");
 		if (f.exists()) {
 			koDBrelease = "database download " + modifiedTime + "";
@@ -324,7 +324,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 				return new BufferedReader(new InputStreamReader(cl.getResourceAsStream(fileName)));
 			} catch (Exception e2) {
 				MainFrame.showMessage("<html><b>Click Help/Database Status</b> for help on downloading KO data",
-									MessageType.INFO);
+						MessageType.INFO);
 				return null;
 			}
 		}
@@ -475,17 +475,17 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	public JComponent getStatusPane(boolean showEmpty) {
 		
 		FolderPanel res = new FolderPanel("<html>" + "KEGG Orthology (KO) Database<br><small>"
-							+ "(classification system for orthologous genes)");
+				+ "(classification system for orthologous genes)");
 		res.setFrameColor(Color.LIGHT_GRAY, null, 1, 5);
 		
 		if (!ReleaseInfo.getIsAllowedFeature(FeatureSet.KEGG_ACCESS)) {
 			res
-								.addGuiComponentRow(
-													null,
-													new JLabel(
-																		"<html>"
-																							+ "KEGG features are disabled.<br>Use side panel Help/Settings to enable access. Then restart the program."),
-													false);
+					.addGuiComponentRow(
+							null,
+							new JLabel(
+									"<html>"
+											+ "KEGG features are disabled.<br>Use side panel Help/Settings to enable access. Then restart the program."),
+							false);
 			res.layoutRows();
 			return res;
 		}
@@ -519,7 +519,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 			status2 = "<html><b>Bringing database online...</b><br>Please wait a few moments.";
 		
 		res.addGuiComponentRow(new JLabel("<html>" + "Downloaded Files:&nbsp;"), FolderPanel.getBorderedComponent(
-							new JLabel(status2), b, b, b, b), false);
+				new JLabel(status2), b, b, b, b), false);
 		
 		ArrayList<JComponent> actionButtons = new ArrayList<JComponent>();
 		if (!showEmpty) {
@@ -530,7 +530,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 		pretifyButtons(actionButtons);
 		
 		res.addGuiComponentRow(new JLabel("<html>" + "Visit Website(s)"), TableLayout.getMultiSplit(actionButtons,
-							TableLayout.PREFERRED, bB, bB, bB, bB), false);
+				TableLayout.PREFERRED, bB, bB, bB, bB), false);
 		
 		res.layoutRows();
 		return res;
@@ -538,33 +538,33 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	
 	private JComponent getDownloadButton() {
 		JComponent a = GUIhelper.getWebsiteDownloadButton("Download",
-							// "http://www.genome.jp/anonftp/",
+				// "http://www.genome.jp/anonftp/",
 				"http://www.genome.jp/kegg/download/ftp.html",
-							// "http://www.genome.jp/kegg/kegg6.html",
+				// "http://www.genome.jp/kegg/kegg6.html",
 				ReleaseInfo.getAppFolderWithFinalSep(), "<html>"
-												+ "The following URL and the target folder will be automatically opened in a few seconds:<br><br>"
-												+
-												// "<code><b>http://www.genome.jp/anonftp/</b></code><br><br>"
+						+ "The following URL and the target folder will be automatically opened in a few seconds:<br><br>"
+						+
+						// "<code><b>http://www.genome.jp/anonftp/</b></code><br><br>"
 						// +
 						"<code><b>"
-												+ "http://www.genome.jp/kegg/download/ftp.html"
-												+
-												// "http://www.genome.jp/kegg/kegg6.html" +
+						+ "http://www.genome.jp/kegg/download/ftp.html"
+						+
+						// "http://www.genome.jp/kegg/kegg6.html" +
 						"</b></code><br><br>"
-												+ "Please (re)evaluate your KEGG license status, before proceeding with the following steps:<br>"
-												+ "<ol>"
-												+ "	<li>Click the FTP link with the title: &quot;genes/&quot; KEGG GENES (daily updated)"
-												+
-												// "	<li>Open the ftp folder &quot;tarfiles&quot;"
+						+ "Please (re)evaluate your KEGG license status, before proceeding with the following steps:<br>"
+						+ "<ol>"
+						+ "	<li>Click the FTP link with the title: &quot;genes/&quot; KEGG GENES (daily updated)"
+						+
+						// "	<li>Open the ftp folder &quot;tarfiles&quot;"
 						// +
 						// "	<li>Open the ftp folder &quot;tarfiles&quot;"
 						// +
 						"	<li>Download the following file:" + "		<ul>" + "			<li>ko" + "		</ul>" + "</ol>"
-												+ "After downloading it, please move this file to the following location:<br><br>" + "<code><b>"
-												+ ReleaseInfo.getAppFolder() + "</b></code><br><br>"
-												+ "After closing and re-opening this application, the KEGG KO database will be<br>"
-												+ "available to the system.", new String[] { "ftp://ftp.genome.jp/pub/kegg/genes/ko" },
-							"Download Instructions", this);
+						+ "After downloading it, please move this file to the following location:<br><br>" + "<code><b>"
+						+ ReleaseInfo.getAppFolder() + "</b></code><br><br>"
+						+ "After closing and re-opening this application, the KEGG KO database will be<br>"
+						+ "available to the system.", new String[] { "ftp://ftp.genome.jp/pub/kegg/genes/ko" },
+				"Download Instructions", this);
 		
 		((JButton) a).addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -573,11 +573,11 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 					organisms += org + "\n";
 				
 				Object[] res = MyInputHelper.getInput("<html>Here you can specifiy the organisms to be accounted for<br>"
-									+ "in the KO database, which will reduce the database memory <br>"
-									+ "needs. Please use the short species description, e.g.<br>"
-									+ "HSA for human and ATH for arabidopsis." + "<ul><li>empty field: all species are loaded</li>"
-									+ "<li>one species per line: only this species will be loaded</li>" + "</ul>",
-									"Please Select Organisms", new Object[] { "Species Names//", organisms });
+						+ "in the KO database, which will reduce the database memory <br>"
+						+ "needs. Please use the short species description, e.g.<br>"
+						+ "HSA for human and ATH for arabidopsis." + "<ul><li>empty field: all species are loaded</li>"
+						+ "<li>one species per line: only this species will be loaded</li>" + "</ul>",
+						"Please Select Organisms", new Object[] { "Species Names//", organisms });
 				if (res != null)
 					writeDefault((String) res[0]);
 				

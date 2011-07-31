@@ -21,9 +21,13 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		
 		try {
 			prepare();
-		} catch (Exception e) {
-			e.printStackTrace();
-			ErrorMsg.addErrorMessage(e);
+		} catch (Error err1) {
+			System.out.println("ERROR: ERROR: " + err1.getLocalizedMessage());
+			err1.printStackTrace();
+		} catch (Exception err2) {
+			System.out.println("ERROR: EXCEPTION: " + err2.getLocalizedMessage());
+			err2.printStackTrace();
+			ErrorMsg.addErrorMessage(err2);
 		}
 		
 		String name = this.getClass().getSimpleName();

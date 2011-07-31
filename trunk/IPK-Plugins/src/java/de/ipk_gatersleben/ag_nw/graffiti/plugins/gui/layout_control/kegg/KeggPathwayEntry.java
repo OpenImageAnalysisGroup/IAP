@@ -57,29 +57,35 @@ public class KeggPathwayEntry implements Comparable<Object> {
 		val = val.replaceAll("&amp;", "&");
 		String map = StringManipulationTools.removeNumbersFromString(val);
 		String mapNumber = StringManipulationTools.getNumbersFromString(val);
-		URL url = new URL("http://www.genome.ad.jp"
-							+ "/kegg/KGML/KGML_v" + KeggHelper.getKgmlVersion() + "/" + map + "/" + map + mapNumber + ".xml");
-		
-		if (KeggHelper.getKgmlVersion().equals("0.7.0")) {
-			boolean isMetab = KeggFTPinfo.getInstance().isMetabolic(mapName, null);
-			// ftp://ftp.genome.jp/pub/kegg/xml/kgml/metabolic/organisms/hsa/
-			// ftp://ftp.genome.jp/pub/kegg/xml/kgml/metabolic/ko/
-			// ftp://ftp.genome.jp/pub/kegg/xml/kgml/non-metabolic/organisms/hsa/
-			// ftp://ftp.genome.jp/pub/kegg/xml/kgml/non-metabolic/ko/
-			if (map.equals("map") && !isMetab)
-				map = "ko";
-			if (map.equals("map") && isMetab)
-				map = "ko"; // "ec"
-			String mapID = map;
-			if (!mapID.equals("ko") && !mapID.equals("ec"))
-				mapID = "organisms/" + mapID;
+		if (!KeggFTPinfo.keggFTPavailable) {
+			// http://www.genome.jp/kegg-bin/download?entry=hsa00010&format=kgml
+			URL url = new URL("http://www.genome.jp/kegg-bin/download?entry=" + map + mapNumber + "&format=kgml");
+			return url;
+		} else {
+			URL url = new URL("http://www.genome.ad.jp"
+					+ "/kegg/KGML/KGML_v" + KeggHelper.getKgmlVersion() + "/" + map + "/" + map + mapNumber + ".xml");
 			
-			String metabolic = isMetab ? "metabolic" : "non-metabolic";
-			
-			url = new URL("ftp://ftp.genome.jp"
-								+ "/pub/kegg/xml/kgml/" + metabolic + "/" + mapID + "/" + map + mapNumber + ".xml");
+			if (KeggHelper.getKgmlVersion().equals("0.7.0")) {
+				boolean isMetab = KeggFTPinfo.getInstance().isMetabolic(mapName, null);
+				// ftp://ftp.genome.jp/pub/kegg/xml/kgml/metabolic/organisms/hsa/
+				// ftp://ftp.genome.jp/pub/kegg/xml/kgml/metabolic/ko/
+				// ftp://ftp.genome.jp/pub/kegg/xml/kgml/non-metabolic/organisms/hsa/
+				// ftp://ftp.genome.jp/pub/kegg/xml/kgml/non-metabolic/ko/
+				if (map.equals("map") && !isMetab)
+					map = "ko";
+				if (map.equals("map") && isMetab)
+					map = "ko"; // "ec"
+				String mapID = map;
+				if (!mapID.equals("ko") && !mapID.equals("ec"))
+					mapID = "organisms/" + mapID;
+				
+				String metabolic = isMetab ? "metabolic" : "non-metabolic";
+				
+				url = new URL("ftp://ftp.genome.jp"
+						+ "/pub/kegg/xml/kgml/" + metabolic + "/" + mapID + "/" + map + mapNumber + ".xml");
+			}
+			return url;
 		}
-		return url;
 	}
 	
 	public static KeggPathwayEntry getKeggPathwayEntryFromMap(String mapName) {
@@ -91,8 +97,8 @@ public class KeggPathwayEntry implements Comparable<Object> {
 		getOrganismLettersFromMapId(val);
 		String mapNumber = val;
 		return new KeggPathwayEntry(mapName + " - " + mapNumber,
-							false, mapNumber,
-							KeggHelper.getGroupFromMapNumber(mapNumber, mapName)
+				false, mapNumber,
+				KeggHelper.getGroupFromMapNumber(mapNumber, mapName)
 		// KeggHelper.getGroupFromMapName(mapName)
 		);
 	}
@@ -103,10 +109,10 @@ public class KeggPathwayEntry implements Comparable<Object> {
 	
 	public KeggPathwayEntry(KeggPathwayEntry copyThisEntry, boolean colorEnzymesAndUseReferencePathway) {
 		this(
-							copyThisEntry.getPathwayName(),
-							copyThisEntry.isStripOrganismName(),
-							copyThisEntry.getMapName(),
-							copyThisEntry.getGroupName());
+				copyThisEntry.getPathwayName(),
+				copyThisEntry.isStripOrganismName(),
+				copyThisEntry.getMapName(),
+				copyThisEntry.getGroupName());
 		setColorEnzymesAndUseReferencePathway(colorEnzymesAndUseReferencePathway);
 	}
 	
@@ -161,11 +167,11 @@ public class KeggPathwayEntry implements Comparable<Object> {
 			String file = pathwayURL.getFile();
 			file = StringManipulationTools.stringReplace(file, "/" + organismName3letters + "/" + organismName3letters, "/map/map");
 			URL url = new URL(
-								pathwayURL.getProtocol(),
-								pathwayURL.getHost(),
-								pathwayURL.getPort(),
-								file
-								);
+					pathwayURL.getProtocol(),
+					pathwayURL.getHost(),
+					pathwayURL.getPort(),
+					file
+					);
 			if (!FileDownloadCache.isCacheURL(url))
 				url = FileDownloadCache.getCacheURL(url, mapName);
 			return url;

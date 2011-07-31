@@ -65,6 +65,6 @@ public class ActionShowVANTED extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "VANTED";
+		return "IAP-VANTED";
 	}
 }

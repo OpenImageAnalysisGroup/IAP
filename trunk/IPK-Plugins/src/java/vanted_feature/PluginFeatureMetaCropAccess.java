@@ -6,7 +6,7 @@ package vanted_feature;
 import org.FeatureSet;
 import org.Release;
 import org.ReleaseInfo;
-import org.SettingsHelperDefaultIsTrue;
+import org.SettingsHelperDefaultIsFalse;
 import org.graffiti.options.GravistoPreferences;
 
 import de.ipk_gatersleben.ag_nw.graffiti.IPK_PluginAdapter;
@@ -20,7 +20,9 @@ public class PluginFeatureMetaCropAccess
 	public PluginFeatureMetaCropAccess() {
 		if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR) {
 			// this string needs to be the same as in the FeatureMetaCrop.xml file
-			if (new SettingsHelperDefaultIsTrue().isEnabled("MetaCrop and RIMAS database access")) {
+			if (new SettingsHelperDefaultIsFalse().isEnabled("MetaCrop and RIMAS database access")) {
+				// if SettingsHelperDefaultIsFalse is changed to e.g. SettingsHelperDefaultIsTrue
+				// the feature settings XML needs to be changed, too. // CK 31.7.2011
 				ReleaseInfo.enableFeature(FeatureSet.MetaCrop_ACCESS);
 				ReleaseInfo.enableFeature(FeatureSet.RIMAS_ACCESS);
 			}

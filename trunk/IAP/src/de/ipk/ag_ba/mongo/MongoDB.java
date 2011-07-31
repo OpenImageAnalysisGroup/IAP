@@ -137,9 +137,13 @@ public class MongoDB {
 	
 	private static MongoDB dc = null;
 	
+	public static String getDefaultCloudHostName() {
+		return "ba-13.ipk-gatersleben.de";
+	}
+	
 	public static MongoDB getDefaultCloud() {
 		if (dc == null) {
-			dc = new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
+			dc = new MongoDB("Data Processing", "cloud1", getDefaultCloudHostName(), "iap", "iap#2011", HashType.MD5);
 		}
 		return dc;
 		// return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
@@ -186,7 +190,7 @@ public class MongoDB {
 	}
 	
 	public void saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
-						throws Exception {
+			throws Exception {
 		final ThreadSafeOptions err = new ThreadSafeOptions();
 		RunnableOnDB r = new RunnableOnDB() {
 			
@@ -218,7 +222,7 @@ public class MongoDB {
 	private static HashSet<String> dbsAnalyzedForCollectionSettings = new HashSet<String>();
 	
 	private void processDB(String database, String optHosts, String optLogin, String optPass,
-						RunnableOnDB runnableOnDB) throws Exception {
+			RunnableOnDB runnableOnDB) throws Exception {
 		Exception e = null;
 		try {
 			boolean ok = false;
@@ -366,7 +370,7 @@ public class MongoDB {
 	}
 	
 	private void storeExperimentInnerCall(ExperimentInterface experiment, DB db,
-						BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException, ExecutionException {
+			BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException, ExecutionException {
 		
 		System.out.println(">>> " + SystemAnalysisExt.getCurrentTime());
 		System.out.println("STORE EXPERIMENT: " + experiment.getName());
@@ -401,7 +405,7 @@ public class MongoDB {
 		int count = 0;
 		StringBuilder errors = new StringBuilder();
 		int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
-							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK });
+				MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK });
 		List<DBObject> dbSubstances = new ArrayList<DBObject>();
 		HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		for (SubstanceInterface s : experiment) {
@@ -603,8 +607,8 @@ public class MongoDB {
 		
 		if (errorCount > 0) {
 			MainFrame.showMessageDialog(
-								"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
-													+ "", "Errors");
+					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
+							+ "", "Errors");
 		}
 		
 	}
@@ -636,7 +640,7 @@ public class MongoDB {
 	}
 	
 	public boolean saveImageFile(InputStream[] isImages, GridFS gridfs_images, GridFS gridfs_label_images,
-						GridFS gridfs_preview_files, ImageData image, String hashMain, String hashLabel, boolean storeMain, boolean storeLabel) throws IOException {
+			GridFS gridfs_preview_files, ImageData image, String hashMain, String hashLabel, boolean storeMain, boolean storeLabel) throws IOException {
 		boolean allOK = true;
 		
 		try {
@@ -702,7 +706,7 @@ public class MongoDB {
 	}
 	
 	private long saveVolumeFile(GridFS gridfs_volumes, GridFS gridfs_preview, VolumeData id, ObjectRef optFileSize,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus, String hash) throws Exception {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, String hash) throws Exception {
 		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create Outputstream");
@@ -747,7 +751,7 @@ public class MongoDB {
 				else
 					lv = new LoadedVolumeExtension(IOmodule.loadVolume(id));
 				GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule
-									.getThreeDvolumePreviewIcon(lv, optStatus));
+						.getThreeDvolumePreviewIcon(lv, optStatus));
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Save Preview Icon");
 				inputFilePreview.setFilename(hash);
@@ -759,7 +763,7 @@ public class MongoDB {
 		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved Volume ("
-								+ ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
+					+ ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
 		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
@@ -908,7 +912,7 @@ public class MongoDB {
 				hashes = GravistoService.getHashFromInputStream(new InputStream[] {
 						new MyByteArrayInputStream(isMain),
 						isLabel != null ? new MyByteArrayInputStream(isLabel) : null
-						},
+				},
 						new ObjectRef[] { fileSize, fileSize }, getHashType());
 				
 				String hashMain = hashes[0];
@@ -982,7 +986,7 @@ public class MongoDB {
 								new MyByteArrayInputStream(isMain),
 								isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
 								getPreviewImageStream(new MyByteArrayInputStream(isMain))
-							}, gridfs_images, gridfs_label_files,
+						}, gridfs_images, gridfs_label_files,
 								gridfs_preview_files, id, hashMain,
 								hashLabel,
 								fffMain == null, fffLabel == null);
@@ -1008,7 +1012,7 @@ public class MongoDB {
 	}
 	
 	public DatabaseStorageResult saveVolumeFile(DB db, VolumeData volume, ObjectRef optFileSize,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		GridFS gridfs_volumes = new GridFS(db, MongoGridFS.FS_VOLUMES.toString());
 		DBCollection collectionA = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString());
 		collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
@@ -1228,7 +1232,7 @@ public class MongoDB {
 					experiment.setHeader(header);
 					
 					int numberOfImagesAndVolumes = countMeasurementValues(experiment, new MeasurementNodeType[] {
-										MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
+							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
 					
 					if (numberOfImagesAndVolumes > 0 && interactiveCalculateExperimentSize) {
@@ -1456,14 +1460,14 @@ public class MongoDB {
 					res.setTaskProgress(progress);
 					double load = SystemAnalysis.getRealSystemCpuLoad();
 					res.setHostInfo(
-
-					SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
-							SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
-							"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
-							(load > 0 ? " used "
-									+ StringManipulationTools.formatNumber(100d * load, "#") + "&#37;" : "")
-							+ ", queue: "
-							+ BackgroundThreadDispatcher.getWorkLoad());
+							
+							SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
+									SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
+									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
+									(load > 0 ? " used "
+											+ StringManipulationTools.formatNumber(100d * load, "#") + "&#37;" : "")
+									+ ", queue: "
+									+ BackgroundThreadDispatcher.getWorkLoad());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
 					if (add)
 						dbc.insert(res);
@@ -1543,9 +1547,9 @@ public class MongoDB {
 						BatchCmd batch = (BatchCmd) dbo;
 						CloudAnalysisStatus s = batch.getRunStatus();
 						if (s == CloudAnalysisStatus.SCHEDULED
-											|| (
-											(batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING)
-											&& System.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate)) {
+								|| (
+								(batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING)
+								&& System.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate)) {
 							res.add(batch);
 							break;
 						}

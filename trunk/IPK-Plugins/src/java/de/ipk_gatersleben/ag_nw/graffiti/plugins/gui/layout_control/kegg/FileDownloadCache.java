@@ -35,7 +35,7 @@ public class FileDownloadCache {
 	 */
 	@SuppressWarnings("deprecation")
 	public static URL getCacheURL(URL url, String fileID) {
-		boolean useCache = true;
+		boolean useCache = KeggFTPinfo.keggFTPavailable;
 		if (!useCache)
 			return url;
 		else {
@@ -74,9 +74,9 @@ public class FileDownloadCache {
 	}
 	
 	private static boolean downloadFile(URL url, File targetFile)
-						throws IOException {
+			throws IOException {
 		String path = HomeFolder.getTemporaryFolderWithFinalSep()
-							+ "downloaded/";
+				+ "downloaded/";
 		new File(path).mkdirs();
 		new File(path).deleteOnExit();
 		targetFile.deleteOnExit();
@@ -100,7 +100,7 @@ public class FileDownloadCache {
 	
 	public static boolean isCacheURL(URL url) {
 		return (!url.toExternalForm().contains("http:/") && !url
-							.toExternalForm().contains("ftp:/"));
+				.toExternalForm().contains("ftp:/"));
 	}
 	
 }

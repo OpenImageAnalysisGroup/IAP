@@ -8,7 +8,7 @@ package de.ipk.ag_ba.image.operations;
  */
 public class MorphologicalOperators {
 	
-	private final int[][] src_image;
+	private final int[][] image;
 	
 	private final int foreground = 1;
 	private final int background = 0;
@@ -16,49 +16,30 @@ public class MorphologicalOperators {
 	private final int[][] image_result;
 	private int[][] mask;
 	
-	/**
-	 * Position "I" corresponds to Y Position "J" corresponds to X
-	 */
-	private int positionMaskJ;
-	private int positionMaskI;
-	
 	public MorphologicalOperators(int[][] src_image) {
-		this(src_image, new int[][] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }, 1, 1);
+		this(src_image, new int[][] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } });
 	}
 	
-	public MorphologicalOperators(int[][] src_image, int[][] mask, int positionMaskJ, int positionMaskI) {
+	public MorphologicalOperators(int[][] image, int[][] mask) {
 		
-		this.src_image = src_image;
-		this.image_result = new int[src_image.length][src_image[0].length];
-		this.positionMaskJ = positionMaskJ;
-		this.positionMaskI = positionMaskI;
+		this.image = image;
+		this.image_result = new int[image.length][image[0].length];
 		this.mask = mask;
 		
 	}
 	
-	public boolean changeMask(int[][] newMask, int posJ, int posI) {
+	public boolean replaceMask(int[][] newMask) {
 		this.mask = newMask;
-		this.positionMaskJ = posJ;
-		this.positionMaskI = posI;
 		return true;
 	}
 	
-	public void doDilatation() {
-		dilatation();
-	}
-	
-	public void doErosion() {
-		erosion();
-	}
-	
-	// beides mit der selben Maske durchführen
-	public void doOpening() {
+	public void opening() {
 		erosion();
 		int[][] newSrcImage = cloneArray();
 		dilatation(newSrcImage);
 	}
 	
-	public void doOpening(int repeat) {
+	public void opening(int repeat) {
 		erosion();
 		for (int i = 1; i < repeat; i++) {
 			int[][] newSrcImage = cloneArray();
@@ -70,9 +51,9 @@ public class MorphologicalOperators {
 		}
 	}
 	
-	public void doOpening(int[][] changeMask, int posJ, int posI) {
+	public void doOpening(int[][] changeMask) {
 		erosion();
-		changeMask(changeMask, posJ, posI);
+		replaceMask(changeMask);
 		int[][] newSrcImage = cloneArray();
 		dilatation(newSrcImage);
 	}
@@ -84,9 +65,9 @@ public class MorphologicalOperators {
 		erosion(newSrcImage);
 	}
 	
-	public void doClosing(int[][] changeMask, int posJ, int posI) {
+	public void doClosing(int[][] changeMask) {
 		dilatation();
-		changeMask(changeMask, posJ, posI);
+		replaceMask(changeMask);
 		int[][] newSrcImage = cloneArray();
 		erosion(newSrcImage);
 	}
@@ -130,40 +111,38 @@ public class MorphologicalOperators {
 	}
 	
 	public void dilatation() {
-		dilatation(this.src_image);
+		dilatation(this.image);
 	}
 	
 	private void dilatation(int[][] src_image) {
-		for (int i = 0; i < src_image.length; i++) {
-			for (int j = 0; j < src_image[i].length; j++) {
-				if (src_image[i][j] == foreground) {
-					insertMask(i, j);
+		int w = src_image.length;
+		int h = src_image[0].length;
+		int maskWidth = mask.length;
+		int maskHeight = mask[0].length;
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (src_image[x][y] == foreground) {
+					for (int l = 0; l < maskWidth; l++) {
+						for (int k = 0; k < maskHeight; k++) {
+							if (x + l <= w - 1 && y + k <= h - 1)
+								image_result[x + l][y + k] = mask[l][k];
+						}
+					}
 				}
 			}
 		}
 	}
 	
-	private void insertMask(int currentPositionI, int currentPositionJ) {
-		for (int l = 0; l < mask.length; l++) {
-			for (int k = 0; k < mask[l].length; k++) {
-				if (currentPositionI - positionMaskI + l >= 0 && currentPositionJ - positionMaskJ + k >= 0
-									&& currentPositionI - positionMaskI + l <= src_image.length - 1
-									&& currentPositionJ - positionMaskJ + k <= src_image[currentPositionI].length - 1)
-					image_result[currentPositionI - positionMaskI + l][currentPositionJ - positionMaskJ + k] = mask[l][k];
-			}
-		}
-	}
-	
-	private void erosion() {
-		erosion(this.src_image);
+	public void erosion() {
+		erosion(this.image);
 	}
 	
 	private void erosion(int[][] src_image) {
 		for (int i = 0; i < src_image.length; i++) {
 			for (int j = 0; j < src_image[i].length; j++) {
-				if (i - positionMaskI >= 0 && j - positionMaskJ >= 0
-									&& i + (mask.length - positionMaskI - 1) <= src_image.length - 1
-									&& j + (mask[0].length - positionMaskJ - 1) <= src_image[i].length - 1) {
+				if (i >= 0 && j >= 0
+									&& i + (mask.length - 1) <= src_image.length - 1
+									&& j + (mask[0].length - 1) <= src_image[i].length - 1) {
 					mergeMask(i, j, src_image);
 				} else {
 					image_result[i][j] = background;
@@ -172,14 +151,14 @@ public class MorphologicalOperators {
 		}
 	}
 	
-	private void mergeMask(int currentPositionI, int currentPositionJ, int[][] src_image) {
+	private void mergeMask(int x, int y, int[][] src_image) {
 		
 		boolean agrees = true;
 		
 		mainloop: for (int l = 0; l < mask.length; l++) {
 			for (int k = 0; k < mask[l].length; k++) {
 				if (mask[l][k] == 1
-									&& src_image[currentPositionI - positionMaskI + l][currentPositionJ - positionMaskJ + k] != 1) {
+									&& src_image[x + l][y + k] != 1) {
 					agrees = false;
 					break mainloop;
 				}
@@ -187,9 +166,9 @@ public class MorphologicalOperators {
 		}
 		
 		if (agrees)
-			image_result[currentPositionI][currentPositionJ] = foreground;
+			image_result[x][y] = foreground;
 		else
-			image_result[currentPositionI][currentPositionJ] = background;
+			image_result[x][y] = background;
 	}
 	
 }

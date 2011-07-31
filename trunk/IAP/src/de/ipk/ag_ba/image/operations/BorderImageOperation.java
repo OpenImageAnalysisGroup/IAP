@@ -89,12 +89,12 @@ public class BorderImageOperation {
 		int bc = removeInnerBorders ? bc = Color.CYAN.getRGB() : borderColor;
 		int[][] tempOut = removeInnerBorders ? new int[w][h] : out;
 		int res = 0;
-		for (int x = 0; x < image.getWidth(); x++)
-			for (int y = 0; y < image.getHeight(); y++) {
+		for (int x = 0; x < w; x++)
+			for (int y = 0; y < h; y++) {
 				tempOut[x][y] = backgroundColor;
 				if (in[x][y] != backgroundColor) {
 					// pixels at the border of the image are ignored
-					if (x > 0 && x < w - 1 && y > 0 && y < h - 1) {
+					if (x < w - 1 && y < h - 1) {
 						int above = in[x][y - 1];
 						int left = in[x - 1][y];
 						int right = in[x + 1][y];

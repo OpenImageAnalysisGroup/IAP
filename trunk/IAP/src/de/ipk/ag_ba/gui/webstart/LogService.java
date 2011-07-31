@@ -2,12 +2,19 @@ package de.ipk.ag_ba.gui.webstart;
 
 import java.util.Stack;
 
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 public class LogService {
 	
+	private static boolean ba13reachable = IAPservice.isMongoReachable();
+	
 	public String getLatestNews(int n, String pre, String preLine, String lineBreak, String follow) {
 		StringBuilder res = new StringBuilder();
+		if (!ba13reachable) {
+			System.out.println("INFO: MAIN CLOUD DATABASE NOT REACHABLE: COULD RETRIEVE LATEST NEWS");
+			return res.toString();
+		}
 		try {
 			Stack<String> news = new Stack<String>();
 			for (String item : MongoDB.getDefaultCloud().getNews(5)) {
