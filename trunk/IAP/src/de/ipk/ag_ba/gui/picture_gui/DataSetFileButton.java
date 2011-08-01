@@ -52,6 +52,8 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -238,7 +240,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										imageResult.getBinaryFileInfo().getFileNameMain(),
 										targetTreeNode.getExperiment());
 								
-								BlockPipeline.debugTryAnalyze(match, m);
+								BlockPipeline.debugTryAnalyze(match, m, new MaizeAnalysisTask());
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);
@@ -259,7 +261,47 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												targetTreeNode.getExperiment(),
 												m);
 								
-								BlockPipeline.debugTryAnalyze(match, m);
+								BlockPipeline.debugTryAnalyze(match, m, new MaizeAnalysisTask());
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+										"Error", JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTest3 = new JMenuItem("Barley Analysis Pipeline (Image+Reference)");
+					debugPipelineTest1.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
+										imageResult.getBinaryFileInfo().getFileNameMain(),
+										targetTreeNode.getExperiment());
+								
+								BlockPipeline.debugTryAnalyze(match, m, new BarleyAnalysisTask());
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+										"Error", JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTest4 = new JMenuItem("Barley Analysis Pipeline (Reference+Old Reference)");
+					debugPipelineTest2.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								Collection<NumericMeasurementInterface> match =
+										IAPservice.getMatchForReference(
+												imageResult.getBinaryFileInfo().getFileNameMain(),
+												targetTreeNode.getExperiment(),
+												m);
+								
+								BlockPipeline.debugTryAnalyze(match, m, new BarleyAnalysisTask());
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);
@@ -274,7 +316,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					jp.add(debugPipelineTestShowImage);
 					jp.add(debugPipelineTest1);
 					jp.add(debugPipelineTest2);
-					
+					jp.add(debugPipelineTest3);
+					jp.add(debugPipelineTest4);
 					jp.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}

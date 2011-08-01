@@ -1460,8 +1460,8 @@ public class MongoDB {
 					res.setTaskProgress(progress);
 					double load = SystemAnalysis.getRealSystemCpuLoad();
 					res.setHostInfo(
-							
-							SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
+
+					SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 									SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
 									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
 									(load > 0 ? " used "
@@ -2098,7 +2098,10 @@ public class MongoDB {
 		return h.getPreviewInputStream(new IOurl(prefix, hash, url.getFileName()));
 	}
 	
-	public synchronized String cleanUp(final BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
+	public synchronized String cleanUp(
+			final BackgroundTaskStatusProviderSupportingExternalCall status,
+			final boolean compact_warningLongExecutionTime)
+			throws Exception {
 		final StringBuilder res = new StringBuilder();
 		processDB(new RunnableOnDB() {
 			
@@ -2186,28 +2189,32 @@ public class MongoDB {
 									+ SystemAnalysisExt.getCurrentTime());
 							res.append("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
 									+ SystemAnalysisExt.getCurrentTime() + "<br>");
-							System.out.println("Start compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime());
-							res.append("Start compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime() + "<br>");
-							HashMap<String, Object> m = new HashMap<String, Object>();
-							m.put("compact", mgfs + ".files");
-							m.put("force", true);
-							BasicDBObject cmd = new BasicDBObject(m);
-							db.command(cmd);
-							
-							m.clear();
-							m.put("compact", mgfs);
-							m.put("force", true);
-							cmd = new BasicDBObject(m);
-							db.command(cmd);
-							
-							m.clear();
-							m.put("compact", mgfs + ".chunks");
-							m.put("force", true);
-							cmd = new BasicDBObject(m);
-							db.command(cmd);
-							
-							System.out.println("Finished compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime());
-							res.append("Finished compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+							if (compact_warningLongExecutionTime) {
+								System.out.println("Start compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime());
+								res.append("Start compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+								HashMap<String, Object> m = new HashMap<String, Object>();
+								m.put("compact", mgfs + ".files");
+								m.put("force", true);
+								BasicDBObject cmd = new BasicDBObject(m);
+								db.command(cmd);
+								
+								m.clear();
+								m.put("compact", mgfs);
+								m.put("force", true);
+								cmd = new BasicDBObject(m);
+								db.command(cmd);
+								
+								m.clear();
+								m.put("compact", mgfs + ".chunks");
+								m.put("force", true);
+								cmd = new BasicDBObject(m);
+								db.command(cmd);
+								
+								System.out.println("Finished compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime());
+								res.append("Finished compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+							} else {
+								System.out.println("Compact operation was not requested. Database contains free space, free file system space is not increased!");
+							}
 							freeAll += free;
 						}
 						status.setCurrentStatusValueFineAdd(stepSize);

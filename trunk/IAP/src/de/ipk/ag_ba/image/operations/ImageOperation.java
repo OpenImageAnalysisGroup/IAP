@@ -944,14 +944,14 @@ public class ImageOperation {
 		new FlexibleImage(image).print(SystemAnalysisExt.getCurrentTime());
 	}
 	
-	public ImageOperation printImage(String title, boolean doIt) {
+	public ImageOperation print(String title, boolean doIt) {
 		if (doIt)
 			new FlexibleImage(image).copy().print(title);
 		return this;
 	}
 	
-	public ImageOperation printImage(String title) {
-		return printImage(title, true);
+	public ImageOperation print(String title) {
+		return print(title, true);
 	}
 	
 	// ############# save ######################
@@ -1254,7 +1254,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation blur(double radius) {
-		boolean oldStyle = false;
+		boolean oldStyle = true;
 		if (oldStyle) {
 			Prefs.setThreads(1);
 			GaussianBlur gb = new GaussianBlur();
@@ -1272,9 +1272,9 @@ public class ImageOperation {
 			int h = image.getHeight();
 			for (int i = 0; i < img.length; i++) {
 				int p = img[i];
-				imgR[i] = (p & 0x00ff0000) >> 16;
-				imgG[i] = (p & 0x0000ff00) >> 8;
-				imgB[i] = (p & 0x000000ff);
+				imgR[i] = (p & 0xff0000) >> 16;
+				imgG[i] = (p & 0x00ff00) >> 8;
+				imgB[i] = (p & 0x0000ff);
 			}
 			int sideL = -sidePixels / 2;
 			int sideR = sidePixels / 2;
@@ -1283,6 +1283,7 @@ public class ImageOperation {
 				sumR = 0;
 				sumG = 0;
 				sumB = 0;
+				int n = 0;
 				for (int y = sideL; y < sideR; y++) {
 					int yw = y * w;
 					for (int x = sideL; x < sideR; x++) {
@@ -1295,15 +1296,11 @@ public class ImageOperation {
 						sumR += imgR[idx];
 						sumG += imgG[idx];
 						sumB += imgB[idx];
+						n++;
 					}
 				}
-				sumR /= sidePixels;
-				sumG /= sidePixels;
-				sumB /= sidePixels;
-				sumR /= sidePixels;
-				sumG /= sidePixels;
-				sumB /= sidePixels;
-				img[i] = 0xFF000000 | (sumR << 16) | (sumG << 8) | (sumB);
+				sumR /= n;
+				img[i] = (0xFF << 24 | (sumR & 0xFF) << 16) | ((sumG & 0xFF) << 8) | ((sumB & 0xFF) << 0);
 			}
 			return new ImageOperation(img, w, h);
 		}
@@ -2510,7 +2507,7 @@ public class ImageOperation {
 		double[] fac = { weight, weight, weight };
 		FlexibleImage blured = new ImageOperation(image).blur(sigma).multiplicateImageChannelsWithFactors(fac).getImage();
 		blured.print("blured");
-		return new ImageOperation(inp).printImage("orig").subtractImages(blured, "").printImage("sub");
+		return new ImageOperation(inp).print("orig").subtractImages(blured, "").print("sub");
 	}
 	
 	public ImageOperation unsharpenMask(float weight, double sigma) {

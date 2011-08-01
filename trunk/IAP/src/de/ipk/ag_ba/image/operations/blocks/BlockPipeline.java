@@ -20,7 +20,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
@@ -184,8 +184,12 @@ public class BlockPipeline {
 	 * @param match
 	 *           Image set to be analyzed.
 	 */
-	public static void debugTryAnalyze(final Collection<NumericMeasurementInterface> input, final MongoDB m) {
-		final MaizeAnalysisTask mat = new MaizeAnalysisTask();
+	public static void debugTryAnalyze(
+			final Collection<NumericMeasurementInterface> input,
+			final MongoDB m,
+			AbstractPhenotypingTask analysisTask
+			) {
+		final AbstractPhenotypingTask mat = analysisTask;
 		mat.setInput(input, m, 0, 1);
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(

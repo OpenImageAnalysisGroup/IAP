@@ -12,6 +12,7 @@ import org.BackgroundTaskStatusProvider;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
@@ -51,4 +52,6 @@ public interface NavigationAction {
 	public NavigationImage getImageIcon();
 	
 	public boolean requestTitleUpdates();
+	
+	public ParameterOptions getParameters();
 }

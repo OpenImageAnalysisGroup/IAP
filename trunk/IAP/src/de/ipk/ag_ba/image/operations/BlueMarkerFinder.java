@@ -38,15 +38,15 @@ public class BlueMarkerFinder {
 			resultTable = io1
 					// .thresholdLAB(0, 255, 0, 200, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
 					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint, typ,
-							maize).printImage("nach lab")
+							maize).print("nach lab")
 					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
-					.printImage("nach opening")
-					.convert2Grayscale().printImage("nach gray")
+					.print("nach opening")
+					.convert2Grayscale().print("nach gray")
 					// .medianFilter8Bit().printImage("nach8bit")
-					.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).printImage("nach thresh")
-					.findMax(10.0, MaximumFinder.SINGLE_POINTS).printImage("Single Point Search")
-					.findMax(10.0, MaximumFinder.LIST).opening(10, 0).printImage("MARKIERT GROESSER")
+					.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).print("nach thresh")
+					.findMax(10.0, MaximumFinder.SINGLE_POINTS).print("Single Point Search")
+					.findMax(10.0, MaximumFinder.LIST).opening(10, 0).print("MARKIERT GROESSER")
 					.getResultsTable();
 		else
 			resultTable = io1
