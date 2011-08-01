@@ -11,6 +11,7 @@ import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.actions.ParameterOptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
@@ -147,5 +148,10 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	@Override
 	public boolean requestTitleUpdates() {
 		return false;
+	}
+	
+	@Override
+	public ParameterOptions getParameters() {
+		return remoteAction == null ? null : remoteAction.getParameters();
 	}
 }

@@ -13,7 +13,7 @@ import org.junit.Test;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
-import de.ipk.ag_ba.image.analysis.maize.ImageProcessorMaizeAnalysis;
+import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipeline;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
@@ -78,7 +78,7 @@ public class PerformanceTest {
 		options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 		options.setCameraPosition(CameraPosition.SIDE);
 		// options.clearAndAddDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 0.5);
-		ImageProcessorMaizeAnalysis pipeline = new ImageProcessorMaizeAnalysis();
+		MaizeAnalysisPipeline pipeline = new MaizeAnalysisPipeline();
 		
 		debugStack = null;// new FlexibleImageStack();
 		
@@ -102,7 +102,7 @@ public class PerformanceTest {
 				ImageProcessorOptions options = new ImageProcessorOptions(scale);
 				options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 				options.setCameraPosition(CameraPosition.SIDE);
-				ImageProcessorMaizeAnalysis pipeline = new ImageProcessorMaizeAnalysis();
+				MaizeAnalysisPipeline pipeline = new MaizeAnalysisPipeline();
 				debugStack = new FlexibleImageStack();
 				try {
 					res = pipeline.pipeline(options, input, ref_input, 2, debugStack);
@@ -132,7 +132,7 @@ public class PerformanceTest {
 		options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 		options.setCameraPosition(CameraPosition.TOP);
 		// options.clearAndAddDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 0.5);
-		ImageProcessorMaizeAnalysis maize = new ImageProcessorMaizeAnalysis();
+		MaizeAnalysisPipeline maize = new MaizeAnalysisPipeline();
 		
 		debugStack = new FlexibleImageStack();
 		

@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.analysis.barley;
+package de.ipk.ag_ba.image.analysis.maize;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
@@ -39,7 +39,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockUseFluoMaskToClearVi
  * 
  * @author klukas, pape, entzian
  */
-public class ImageProcessorBarleyAnalysis extends AbstractImageProcessor {
+public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
@@ -89,6 +89,7 @@ public class ImageProcessorBarleyAnalysis extends AbstractImageProcessor {
 	 * Modify default LAB filter options according to the Maize analysis requirements.
 	 */
 	private void modifySettings(ImageProcessorOptions options) {
+		options.setIsMaize(false);
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);

@@ -22,20 +22,22 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getVis() == null)
 			return null;
 		
-		if (options.getCameraPosition() == CameraPosition.TOP) { // not for barley
-		// FlexibleImage res =
-		// new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
-		// options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB) / 2d,
-		// options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
-		// return res;
-			return getInput().getMasks().getVis();
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (options.isMaize()) {
+				// not for barley
+				FlexibleImage res =
+						new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB) / 2d,
+								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+				return res;
+			} else
+				return getInput().getMasks().getVis();
 		} else {
 			FlexibleImage res =
 					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse, options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
 							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			return res;
 		}
-		// return getInput().getMasks().getVis();
 	}
 	
 	@Override
@@ -52,7 +54,5 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 		}
-		
-		// return getInput().getMasks().getFluo();
 	}
 }

@@ -35,6 +35,11 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 		return false;
 	}
 	
+	@Override
+	public ParameterOptions getParameters() {
+		return null;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
