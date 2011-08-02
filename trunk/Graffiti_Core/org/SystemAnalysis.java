@@ -113,11 +113,6 @@ public class SystemAnalysis {
 		return -1;
 	}
 	
-	public static double getRealSystemCpuLoad() {
-		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-		return operatingSystemMXBean.getSystemLoadAverage();
-	}
-	
 	/**
 	 * The option -Xmx5g will not result in a result of 5 GB. it seems the
 	 * java parameter does not use base of 1024 values but base of 1000 values.

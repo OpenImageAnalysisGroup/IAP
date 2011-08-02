@@ -1458,7 +1458,7 @@ public class MongoDB {
 					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
 					res.setTaskProgress(progress);
-					double load = SystemAnalysis.getRealSystemCpuLoad();
+					double load = SystemAnalysisExt.getRealSystemCpuLoad();
 					res.setHostInfo(
 
 					SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +

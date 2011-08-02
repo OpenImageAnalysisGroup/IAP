@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.ErrorMsg;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -91,67 +92,80 @@ public class CloudComputingService {
 		System.out.println("***************************************************");
 		System.out.println("> SYSTEM ANALYSIS");
 		boolean clusterExecutionMode = false;
-		if (args.length > 0 && args[0].toLowerCase().startsWith("close") ||
-				(args.length > 1 && args[1].startsWith("close"))) {
-			System.out.println(": close - auto-closing after finishing compute task - " + SystemAnalysis.getNumberOfCPUs());
-			clusterExecutionMode = true;
+		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
+			SystemInfoExt info = new SystemInfoExt();
+			System.out.println("Sockets        : " + info.getCpuSockets());
+			System.out.println("Cores p. sock. : " + info.getPhysicalCoresPerSocket());
+			System.out.println("Physical Cores : " + info.getCpuPhysicalCores());
+			System.out.println("Logical Cores  : " + info.getCpuLogicalCores());
+			System.out.println("Log./phys. core: " + info.getHyperThreadingFactor());
+			System.out.println("CPUs (avail.)  : " + info.getCpuCountAvailable());
+			System.out.println("Phys. mem. (GB): " + info.getPhysicalMemoryInGB());
+			System.out.println("System load    : " + StringManipulationTools.formatNumber(info.getLoad(), "#.#"));
+			System.exit(0);
 		} else
-			if (args.length > 0 && args[0].toLowerCase().contains("full")) {
-				System.out.println(": full - enabling full CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
-				SystemAnalysis.setUseFullCpuPower(true);
+			if (args.length > 0 && args[0].toLowerCase().startsWith("close") ||
+					(args.length > 1 && args[1].startsWith("close"))) {
+				System.out.println(": close - auto-closing after finishing compute task - " + SystemAnalysis.getNumberOfCPUs());
+				clusterExecutionMode = true;
 			} else
-				if (args.length > 0 && args[0].contains("half")) {
-					SystemAnalysis.setUseHalfCpuPower(true);
-					System.out.println(": half - enabling half CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
+				if (args.length > 0 && args[0].toLowerCase().contains("full")) {
+					System.out.println(": full - enabling full CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
+					SystemAnalysis.setUseFullCpuPower(true);
 				} else
-					if (args.length > 0) {
-						try {
-							Integer i = Integer.parseInt(args[0]);
-							System.out.println(": " + args[0] + " - using " + i + " CPUs");
-							SystemAnalysis.setUseCpu(i);
-						} catch (Exception e) {
-							if ((args[0] + "").toLowerCase().equalsIgnoreCase("clear")) {
-								try {
-									MongoDB.getDefaultCloud().batchClearJobs();
-									System.out.println(":clear - cleared scheduled jobs in database " + MongoDB.getDefaultCloud().getDatabaseName());
-									return;
-								} catch (Exception e1) {
-									e1.printStackTrace();
-								}
-							} else
-								if ((args[0] + "").toLowerCase().startsWith("perf")) {
+					if (args.length > 0 && args[0].contains("half")) {
+						SystemAnalysis.setUseHalfCpuPower(true);
+						System.out.println(": half - enabling half CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
+					} else
+						if (args.length > 0) {
+							try {
+								Integer i = Integer.parseInt(args[0]);
+								System.out.println(": " + args[0] + " - using " + i + " CPUs");
+								SystemAnalysis.setUseCpu(i);
+							} catch (Exception e) {
+								if ((args[0] + "").toLowerCase().equalsIgnoreCase("clear")) {
 									try {
-										System.out.println(":perf - perform performance test (TestPipelineMaize Copy)");
-										StopWatch sw = new StopWatch("IAP performance test", false);
-										PerformanceTest p = new PerformanceTest();
-										p.testPipeline();
-										System.out.println();
-										sw.printTime();
-										Thread.sleep(5 * 60 * 1000);
+										MongoDB.getDefaultCloud().batchClearJobs();
+										System.out.println(":clear - cleared scheduled jobs in database " + MongoDB.getDefaultCloud().getDatabaseName());
+										return;
 									} catch (Exception e1) {
 										e1.printStackTrace();
 									}
-									System.exit(0);
 								} else
-									if ((args[0] + "").toLowerCase().startsWith("close")) {
-										// ignore, has been processed at the start of this method
-									} else {
-										if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
-											merge();
-											return;
-										} else {
-											System.out.println(": Valid command line parameters:");
-											System.out.println("   'half'  - use half of the CPUs");
-											System.out.println("   'full'  - use all of the CPUs");
-											System.out.println("   'nnn'   - use specified number of CPUs");
-											System.out.println("   'clear' - clear scheduled tasks");
-											System.out.println("   'merge' - in case of error (merge interrupted previously), merge temporary results");
-											System.out.println("   'perf'  - perform performance test");
-											System.out.println("   'close' - close after task completion (cluster execution mode)");
+									if ((args[0] + "").toLowerCase().startsWith("perf")) {
+										try {
+											System.out.println(":perf - perform performance test (TestPipelineMaize Copy)");
+											StopWatch sw = new StopWatch("IAP performance test", false);
+											PerformanceTest p = new PerformanceTest();
+											p.testPipeline();
+											System.out.println();
+											sw.printTime();
+											Thread.sleep(5 * 60 * 1000);
+										} catch (Exception e1) {
+											e1.printStackTrace();
 										}
-									}
+										System.exit(0);
+									} else
+										if ((args[0] + "").toLowerCase().startsWith("close")) {
+											// ignore, has been processed at the start of this method
+										} else {
+											if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
+												merge();
+												return;
+											} else {
+												System.out.println(": Valid command line parameters:");
+												System.out.println("   'half'  - use half of the CPUs");
+												System.out.println("   'full'  - use all of the CPUs");
+												System.out.println("   'nnn'   - use specified number of CPUs");
+												System.out.println("   'clear' - clear scheduled tasks");
+												System.out.println("   'merge' - in case of error (merge interrupted previously), merge temporary results");
+												System.out.println("   'perf'  - perform performance test");
+												System.out.println("   'close' - close after task completion (cluster execution mode)");
+												System.out.println("   'info'  - Show CPU info");
+											}
+										}
+							}
 						}
-					}
 		SystemInfoExt si = new SystemInfoExt();
 		System.out.println("CPUs (sockets,physical,logical): " +
 					si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
