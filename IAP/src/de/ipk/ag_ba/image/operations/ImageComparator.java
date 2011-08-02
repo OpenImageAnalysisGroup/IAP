@@ -68,7 +68,13 @@ public class ImageComparator {
 				b = -b;
 			
 			if (showDiff) {
-				diff[index] = new Color((float) Math.abs(l / 255d), (float) (a / 255d), (float) (b / 255d)).getRGB();
+				try {
+					diff[index] = new Color((float) Math.abs(l / 255d), (float) (a / 255d), (float) (b / 255d)).getRGB();
+				} catch (Exception e) {
+					System.out.println("LAB: " + l + " " + a + " " + b);
+					// TODO: handle exception
+				}
+				
 			}
 			
 			if (adaptiveDependingOnIntensity) {

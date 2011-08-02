@@ -5,8 +5,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
-import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
-import de.ipk.ag_ba.image.analysis.maize.BlockRemoveVerticalAndHorizontalStructures;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingForYellowVisMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancingFluoAndNir;
@@ -21,7 +19,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirProcessing;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveBambooStick;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuoOrVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHeight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
@@ -53,8 +51,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockFindBlueMarkers.class);
 		p.add(BlockColorBalancingFluoAndNir.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
-		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockLabFilter.class);
+		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockClearMasksBasedOnMarkers.class);
 		p.add(BlockRemoveSmallStructuresFromTopVisUsingOpening.class);
 		p.add(BlockMedianFilterForFluo.class);
@@ -76,7 +74,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockCalculateWidthAndHeight.class);
 		p.add(BlockFluoToIntensity.class);
 		p.add(BlockIntensityAnalysis.class);
-		p.add(BlockConvexHullOnFLuo.class);
+		p.add(BlockConvexHullOnFLuoOrVis.class);
 		
 		// postprocessing
 		p.add(BlockMoveMasksToImages.class);

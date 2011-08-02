@@ -19,15 +19,15 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected FlexibleImage processVISmask() {
 		
 		int background = options.getBackground();
 		double realMarkerDistHorizontal = 1;
 		
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
-		
-		if (options.getCameraPosition() == CameraPosition.SIDE && getInput().getMasks().getFluo() != null) {
-			Point values = getWidthAndHeightSide(getInput().getMasks().getFluo(), background);
+		FlexibleImage img = options.isMaize() ? getInput().getMasks().getFluo() : getInput().getMasks().getVis();
+		if (options.getCameraPosition() == CameraPosition.SIDE && img != null) {
+			Point values = getWidthAndHeightSide(img, background);
 			
 			if (values != null) {
 				if (distHorizontal != null) {
@@ -53,7 +53,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 		// }
 		// }
 		// }
-		return getInput().getMasks().getFluo();
+		return getInput().getMasks().getVis();
 	}
 	
 	private Point getWidthAndHeightSide(FlexibleImage vis, int background) {

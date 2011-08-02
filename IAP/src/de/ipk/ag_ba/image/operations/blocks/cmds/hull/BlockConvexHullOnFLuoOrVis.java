@@ -11,6 +11,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * Calculates the convex hull for the fluorescence image and stores according data results as numeric
@@ -19,42 +20,56 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author klukas
  */
-public class BlockConvexHullOnFLuo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockConvexHullOnFLuoOrVis extends AbstractSnapshotAnalysisBlockFIS {
+	@Override
+	protected FlexibleImage processVISmask() throws InterruptedException {
+		FlexibleImage image = getInput().getMasks().getVis();
+		if (!options.isMaize()) {
+			ImageData info = getInput().getImages().getVisInfo();
+			ImageOperation res = processImage(image, info);
+			return res.getImage();
+		} else
+			return image;
+	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() throws InterruptedException {
+		FlexibleImage image = getInput().getMasks().getFluo();
+		if (options.isMaize()) {
+			ImageData info = getInput().getImages().getFluoInfo();
+			ImageOperation res = processImage(image, info);
+			return res.getImage();
+		} else
+			return image;
+	}
+	
+	private ImageOperation processImage(FlexibleImage image, ImageData info) {
 		ResultsTable numericResults;
 		ImageOperation res;
-		
-		if (getInput().getMasks().getFluo() == null) {
-			System.err.println("ERROR: BlockConvexHullOnFLuo: Input Fluo Mask is NULL!");
+		if (image == null) {
+			System.err.println("ERROR: BlockConvexHullOnFLuo: Input Mask is NULL!");
 			return null;
 		}
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 		if (distHorizontal != null || options.getCameraPosition() == CameraPosition.TOP) {
 			int realDist = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
-			res = new ImageOperation(getInput().getMasks().getFluo()).hull().find(true, false, false, false, Color.RED.getRGB(),
+			res = new ImageOperation(image).hull().find(true, false, false, false, Color.RED.getRGB(),
 					Color.BLUE.getRGB(),
 					Color.ORANGE.getRGB(), distHorizontal, realDist);
 			
 			numericResults = res.getResultsTable();
 		} else {
 			numericResults = null;
-			res = new ImageOperation(getInput().getMasks().getFluo());
+			res = new ImageOperation(image);
 		}
 		if (options.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
 			getProperties().storeResults(
-					"RESULT_side.deg" + (getInput().getImages().getFluoInfo() != null && getInput().getImages().getFluoInfo().getPosition() != null ? getInput()
-											.getImages().getFluoInfo().getPosition().intValue() : "0")
-									+ ".", numericResults,
+					"RESULT_side.", numericResults,
 							getBlockPosition());
 		if (options.getCameraPosition() == CameraPosition.TOP && numericResults != null)
 			getProperties().storeResults(
-					"RESULT_top" + (getInput().getImages().getFluoInfo() != null && getInput().getImages().getFluoInfo().getPosition() != null ? getInput()
-							.getImages().getFluoInfo().getPosition().intValue() : "0")
-							+ ".", numericResults, getBlockPosition());
-		
-		return res.getImage();
+					"RESULT_top.", numericResults, getBlockPosition());
+		return res;
 	}
 	
 }

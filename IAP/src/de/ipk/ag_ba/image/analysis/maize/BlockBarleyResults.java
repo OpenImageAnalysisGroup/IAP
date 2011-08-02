@@ -19,15 +19,11 @@ public class BlockBarleyResults extends AbstractSnapshotAnalysisBlockFIS {
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)
 			getProperties().storeResults(
-					"RESULT_side.deg" + (getInput().getImages().getVisInfo() != null && getInput().getImages().getVisInfo().getPosition() != null ? getInput()
-											.getImages().getVisInfo().getPosition().intValue() : "0")
-									+ ".", rt,
+					"RESULT_side.", rt,
 							getBlockPosition());
 		if (options.getCameraPosition() == CameraPosition.TOP && rt != null)
 			getProperties().storeResults(
-					"RESULT_top" + (getInput().getImages().getVisInfo() != null && getInput().getImages().getVisInfo().getPosition() != null ? getInput()
-							.getImages().getVisInfo().getPosition().intValue() : "0")
-							+ ".", rt, getBlockPosition());
+					"RESULT_top.", rt, getBlockPosition());
 		
 		return input;
 	}

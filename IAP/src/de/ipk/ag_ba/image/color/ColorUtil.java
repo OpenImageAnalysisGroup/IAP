@@ -619,7 +619,7 @@ public class ColorUtil {
 					p = ImageOperation.labCube[r][g];
 					
 					arrayL[idx] = p[b];
-					arrayL[idx] = p[b + 256];
+					arrayA[idx] = p[b + 256];
 					arrayB[idx] = p[b + 512];
 				}
 				idx++;
@@ -634,7 +634,7 @@ public class ColorUtil {
 				p = ImageOperation.labCube[r][g];
 				
 				arrayL[idx] = p[b];
-				arrayL[idx] = p[b + 256];
+				arrayA[idx] = p[b + 256];
 				arrayB[idx] = p[b + 512];
 				idx++;
 			}

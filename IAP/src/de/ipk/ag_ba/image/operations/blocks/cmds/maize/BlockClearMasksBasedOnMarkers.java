@@ -40,7 +40,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			if (markerPosLeftY != null) {
 				// System.out.println("mark: " + markerPosLeftY.getValue());
 				if (markerPosLeftY.getValue() > 0.5) {
-					int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - options.getIntSetting(Setting.BOTTOM_CUT_DELAY_VIS);
+					int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS);
 					result = new ImageOperation(result).clearImageBottom(cy, options.getBackground()).getImage();
 					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
 				}
@@ -49,23 +49,23 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 					// System.out.println("mark: " + markerPosRightY.getValue());
 					if (markerPosRightY.getValue() > 0.5) {
 						int cy = (int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight())
-									- options.getIntSetting(Setting.BOTTOM_CUT_DELAY_VIS);
+									- options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS);
 						result = new ImageOperation(result).clearImageBottom(
 									cy, options.getBackground()).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
 					}
 				}
 			
-			boolean clearSides = false;
+			boolean clearSides = !options.isMaize();
 			if (clearSides)
 				if (markerPosLeftX != null) {
 					result = new ImageOperation(result).clearImageLeft(
-								(int) (0.95 * markerPosLeftX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
+								(int) (50 + markerPosLeftX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
 				}
 			if (clearSides)
 				if (markerPosRightX != null) {
 					result = new ImageOperation(result).clearImageRight(
-								(int) (1.05 * markerPosRightX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
+								(int) (-50 + markerPosRightX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
 				}
 			return result;
 		}

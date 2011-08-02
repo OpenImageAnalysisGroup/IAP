@@ -6,9 +6,9 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
-import de.ipk.ag_ba.image.analysis.maize.BlockBarleyResults;
 import de.ipk.ag_ba.image.analysis.maize.BlockRemoveVerticalAndHorizontalStructures;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingOnFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancingFluoAndNir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancingVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask;
@@ -17,8 +17,10 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilterForFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirProcessing;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluoVerySmallElements;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuoOrVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHeight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
@@ -50,9 +52,15 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockFindBlueMarkers.class);
 		p.add(BlockColorBalancingFluoAndNir.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
+		p.add(BlockMedianFilterForFluo.class);
+		p.add(BlockMedianFilterForFluo.class);
 		p.add(BlockLabFilter.class);
+		// p.add(BlockClosingOnFluo.class);
+		p.add(BlockClosingOnFluo.class);
+		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockClearMasksBasedOnMarkers.class);
 		p.add(BlockRemoveSmallStructuresFromTopVisUsingOpening.class);
+		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockMedianFilterForFluo.class);
 		p.add(BlockRemoveLevitatingObjects.class);
 		p.add(BlockRemoveVerticalAndHorizontalStructures.class);
@@ -63,10 +71,12 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		// calculation of numeric values
 		p.add(BlockCalculateMainAxis.class);
 		p.add(BlockCalculateWidthAndHeight.class);
+		p.add(BlockRemoveSmallClusters.class);
 		p.add(BlockFluoToIntensity.class);
+		p.add(BlockMedianFilterForFluo.class);
+		p.add(BlockRemoveSmallClustersOnFluoVerySmallElements.class);
 		p.add(BlockIntensityAnalysis.class);
-		p.add(BlockConvexHullOnFLuo.class);
-		p.add(BlockBarleyResults.class);
+		p.add(BlockConvexHullOnFLuoOrVis.class);
 		
 		// postprocessing
 		p.add(BlockMoveMasksToImages.class);
@@ -79,20 +89,20 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	 * Modify default LAB filter options according to the Maize analysis requirements.
 	 */
 	private void modifySettings(ImageProcessorOptions options) {
-		options.setIsMaize(true);
+		options.setIsMaize(false);
 		
 		// Test Barley
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 100);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 132);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 125); // 130
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 135);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 123); // 130
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255); // all yellow
 			
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 55);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 100);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 130); // 98 // 130 gerste wegen topf
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 80); // 98 // 130 gerste wegen topf
 			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 125);// 125
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
@@ -113,10 +123,18 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		}
 		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 7); // 20
 		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 7); // 20
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 20); // 20
+		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 50); // 20
 		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 20); // 20
-		options.clearAndAddIntSetting(Setting.BOTTOM_CUT_DELAY_VIS, 0);
+		options.clearAndAddIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS, 0);
 		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1150); // for Barley
+		
+		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 120); // 20
+		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 120); // 20
+		
+		double cut = (0.001d) / 1;
+		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, cut);
+		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, cut * 0.2);
+		
 	}
 	
 	@Override
