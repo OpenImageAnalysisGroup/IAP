@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -16,9 +18,11 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.AttributeHelper;
 import org.ErrorMsg;
 import org.SystemInfo;
 
+import oshi.software.os.windows.WindowsHardwareAbstractionLayer;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class SystemAnalysisExt {
@@ -28,6 +32,8 @@ public class SystemAnalysisExt {
 	}
 	
 	private static int cpuSockets = -1;
+	
+	private static WindowsHardwareAbstractionLayer hal = AttributeHelper.windowsRunning() ? new WindowsHardwareAbstractionLayer() : null;
 	
 	public static int getNumberOfCpuSockets() {
 		if (cpuSockets > 0)
@@ -41,7 +47,7 @@ public class SystemAnalysisExt {
 			}
 		}
 		cpuSockets = res;
-		return -1;
+		return res;
 	}
 	
 	private static int physicalCores = -1;
@@ -67,13 +73,21 @@ public class SystemAnalysisExt {
 		if (logicCpuCount > 0)
 			return logicCpuCount;
 		int res = -1;
-		if (new File("/proc/cpuinfo").exists()) {
-			res = getLinuxCpuInfoSetInfo("/proc/cpuinfo", "processor");
-		} else {
-			if (SystemInfo.isMac()) {
-				res = (int) getMacSysctl("hw.logicalcpu");
+		boolean runtime = true;
+		if (runtime)
+			res = Runtime.getRuntime().availableProcessors();
+		else
+			if (new File("/proc/cpuinfo").exists()) {
+				res = getLinuxCpuInfoSetInfo("/proc/cpuinfo", "processor");
+			} else {
+				if (SystemInfo.isMac()) {
+					res = (int) getMacSysctl("hw.logicalcpu");
+				} else {
+					if (hal != null) {
+						return hal.getProcessors().length;
+					}
+				}
 			}
-		}
 		logicCpuCount = res;
 		return res;
 	}
@@ -94,10 +108,14 @@ public class SystemAnalysisExt {
 			 * reg04: base=0x800000000 (32768MB), size=32768MB, count=1: write-back
 			 * reg05: base=0x1000000000 (65536MB), size= 2048MB, count=1: write-back
 			 */
-			res = getLinuxLastLineInfo("/proc/mtrr", "(", "MB)") / 1024;
+			res = Math.round(getLinuxLastLineInfo("/proc/mtrr", "(", "MB)") / 1024d);
 		} else {
 			if (SystemInfo.isMac()) {
-				res = getMacSysctl("hw.memsize") / 1024 / 1024 / 1024;
+				res = Math.round(getMacSysctl("hw.memsize") / 1024d / 1024d / 1024d);
+			} else {
+				if (hal != null) {
+					return Math.round(hal.getMemory().getTotal() / 1024d / 1024d / 1024d);
+				}
 			}
 		}
 		physicalMemoryInGB = res;
@@ -324,5 +342,70 @@ public class SystemAnalysisExt {
 	
 	public static String getCurrentTime(long time) {
 		return sdf.format(new Date(time));
+	}
+	
+	private static long lastNanos = System.nanoTime();
+	private static long lastProcessCPUnanos = getProcessNanos();
+	
+	public static double getRealSystemCpuLoad() {
+		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+		double res = operatingSystemMXBean.getSystemLoadAverage();
+		
+		if (res < 0) {
+			// if (AttributeHelper.windowsRunning()) {
+			// @SuppressWarnings("restriction")
+			// com.sun.management.OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(
+			// OperatingSystemMXBean.class);
+			// return osBean.getSystemCpuLoad() * getNumberOfCpuLogicalCores();
+			// } else
+			if (AttributeHelper.windowsRunning()) {
+				System.out.println("PROCESS LOAD");
+				// java.lang.management.OperatingSystemMXBean os =
+				// ManagementFactory.getOperatingSystemMXBean();
+				//
+				// if (os instanceof com.sun.management.OperatingSystemMXBean) {
+				// long cpuTime = ((com.sun.management.OperatingSystemMXBean) os).getProcessCpuTime();
+				// System.out.println("CPU time = " + cpuTime);
+				// }
+				long nowNanos = System.nanoTime();
+				long nowProcessCPUnanos = getProcessNanos();
+				if (nowNanos == lastNanos || nowProcessCPUnanos == lastProcessCPUnanos) {
+					try {
+						Thread.sleep(50);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					nowNanos = System.nanoTime();
+					nowProcessCPUnanos = getProcessNanos();
+				}
+				
+				if (nowNanos > lastNanos && nowProcessCPUnanos >= lastProcessCPUnanos) {
+					long process = nowProcessCPUnanos - lastProcessCPUnanos;
+					long time = nowNanos - lastNanos;
+					double load = process / (double) time * getNumberOfCpuLogicalCores();
+					lastNanos = nowNanos;
+					lastProcessCPUnanos = nowProcessCPUnanos;
+					// in this case only the CPU load of this process can be determined
+					res = load;
+				}
+			}
+			return res;
+		} else
+			return res;
+	}
+	
+	private static long getProcessNanos() {
+		try {
+			java.lang.management.OperatingSystemMXBean os =
+					ManagementFactory.getOperatingSystemMXBean();
+			
+			if (os instanceof com.sun.management.OperatingSystemMXBean) {
+				long cpuTime = ((com.sun.management.OperatingSystemMXBean) os).getProcessCpuTime();
+				return cpuTime;
+			}
+		} catch (Exception e) {
+			return -2;
+		}
+		return -1;
 	}
 }

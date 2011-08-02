@@ -3,7 +3,6 @@ package de.ipk.ag_ba.server.task_management;
 import org.SystemAnalysis;
 import org.SystemInfo;
 
-
 public class SystemInfoExt extends SystemInfo {
 	
 	private final double load;
@@ -14,7 +13,7 @@ public class SystemInfoExt extends SystemInfo {
 	private final long physMemInGB;
 	
 	public SystemInfoExt() {
-		load = SystemAnalysis.getRealSystemCpuLoad();
+		load = SystemAnalysisExt.getRealSystemCpuLoad();
 		cpuSockets = SystemAnalysisExt.getNumberOfCpuSockets();
 		cpuPhysicalCores = SystemAnalysisExt.getNumberOfCpuPhysicalCores();
 		cpuLogicalCores = SystemAnalysisExt.getNumberOfCpuLogicalCores();
