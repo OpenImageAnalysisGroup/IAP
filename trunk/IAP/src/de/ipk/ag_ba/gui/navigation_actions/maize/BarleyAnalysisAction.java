@@ -6,15 +6,15 @@ import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
 
 /**
  * @author klukas
  */
-public class MaizeAnalysisAction extends AbstractPhenotypeAnalysisAction {
+public class BarleyAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
-	public MaizeAnalysisAction(MongoDB m, ExperimentReference experiment) {
-		super("Analyze Phenotype (Maize)");
+	public BarleyAnalysisAction(MongoDB m, ExperimentReference experiment) {
+		super("Analyze Phenotype (Barley)");
 		this.m = m;
 		this.experiment = experiment;
 		this.experimentResult = null;
@@ -22,13 +22,13 @@ public class MaizeAnalysisAction extends AbstractPhenotypeAnalysisAction {
 			this.mongoDatasetID = experiment.getHeader().getDatabaseId();
 	}
 	
-	public MaizeAnalysisAction() {
-		super("Analyze Phenotype (Maize)");
+	public BarleyAnalysisAction() {
+		super("Analyze Phenotype (Barley)");
 	}
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new MaizeAnalysisTask();
+		return new BarleyAnalysisTask();
 	}
 	
 	@Override
@@ -41,12 +41,12 @@ public class MaizeAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/mais.png";
+		return "img/000Grad.png";
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Maize Analysis";
+		return "Barley Analysis";
 	}
 	
 }

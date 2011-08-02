@@ -16,8 +16,8 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	
 	@Override
 	protected FlexibleMaskAndImageSet run() throws InterruptedException {
-		final FlexibleImageSet processedImages = new FlexibleImageSet();
-		final FlexibleImageSet processedMasks = new FlexibleImageSet();
+		final FlexibleImageSet processedImages = new FlexibleImageSet(getInput().getImages());
+		final FlexibleImageSet processedMasks = new FlexibleImageSet(getInput().getImages());
 		
 		try {
 			prepare();

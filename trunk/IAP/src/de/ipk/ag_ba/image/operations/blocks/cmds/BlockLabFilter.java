@@ -22,7 +22,8 @@ public class BlockLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 		else
 			return labFilter(
-					getInput().getMasks().getVis().getIO().dilateNG(3, getInput().getImages().getVis()).blur(2).getImage(),
+					// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
+					getInput().getMasks().getVis().getIO().blur(1).getImage(),
 					getInput().getImages().getVis(),
 					options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
 					options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),

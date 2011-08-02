@@ -66,16 +66,16 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 				FlexibleImage fluo = getInput().getImages().getFluo();
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
 				return new ImageOperation(fluo.getIO()
-						.blur(1.5).print("Blurred 1.5 fluo image", true)
-						// .medianFilter32Bit()
+						// .blur(1.5).print("Blurred 1.5 fluo image", true)
+						.medianFilter32Bit()
 						.getImage()).compare()
 						.compareImages(getInput().getMasks().getFluo().getIO()
-								.blur(1.5).print("Blurred 1.5 fluo mask", true)
-								// .medianFilter32Bit()
+								// .blur(1.5).print("Blurred 1.5 fluo mask", true)
+								.medianFilter32Bit()
 								.getImage(),
-								options.getIntSetting(Setting.L_Diff_FLOU) * 0.5d,
-								options.getIntSetting(Setting.L_Diff_FLOU) * 0.5d,
-								options.getIntSetting(Setting.abDiff_FLOU) * 0.5d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
+								options.getIntSetting(Setting.abDiff_FLUO) * 0.5d,
 								back).border(2).getImage();
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP) {
@@ -84,9 +84,9 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
 				return new ImageOperation(fluo).compare()
 						.compareImages(getInput().getMasks().getFluo().getIO().copyImagesParts(0.26, 0.3).print("cut out", false).getImage(),
-								options.getIntSetting(Setting.L_Diff_FLOU) * 0.5d,
-								options.getIntSetting(Setting.L_Diff_FLOU) * 0.5d,
-								options.getIntSetting(Setting.abDiff_FLOU) * 0.5d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
+								options.getIntSetting(Setting.abDiff_FLUO) * 0.5d,
 								back).border(2).getImage();
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");
@@ -104,8 +104,8 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				FlexibleImage nir = getInput().getImages().getNir();
 				return new ImageOperation(nir).compare()
-						.compareGrayImages(getInput().getMasks().getNir(), 24, 15, options.getBackground())
-						.print("result nir", false).thresholdBlueHigherThan(140).border(2).getImage();
+						.compareGrayImages(getInput().getMasks().getNir(), 10, 23, options.getBackground())
+						.print("result nir", false).thresholdBlueHigherThan(240).border(2).getImage();
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");
 		} else {

@@ -103,25 +103,25 @@ public class ClusterDetection implements Segmentation {
 			if (clu[idx] == currentClusterID)
 				continue;
 			clu[idx] = currentClusterID;
-			int f = idx - 1;
+			int f = idx - 1; // left
 			if (idx % w > 0 && img[f] != back && clu[f] == 0) {
 				queue[++qR] = f;
 				if (qR == maxQueueLength)
 					qR = 0;
 			}
-			f = idx - w;
+			f = idx - w; // above
 			if (idx > w && img[f] != back && clu[f] == 0) {
 				queue[++qR] = f;
 				if (qR == maxQueueLength)
 					qR = 0;
 			}
-			f = idx + 1;
+			f = idx + 1; // right
 			if ((idx) % w < w - 1 && img[f] != back && clu[f] == 0) {
 				queue[++qR] = f;
 				if (qR == maxQueueLength)
 					qR = 0;
 			}
-			f = idx + w;
+			f = idx + w; // below
 			if (idx < img.length - w && img[f] != back && clu[f] == 0) {
 				queue[++qR] = f;
 				if (qR == maxQueueLength)

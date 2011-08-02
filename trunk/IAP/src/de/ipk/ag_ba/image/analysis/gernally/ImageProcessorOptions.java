@@ -57,13 +57,13 @@ public class ImageProcessorOptions {
 
 		// boolean
 		PROCESS_NIR, DEBUG_TAKE_TIMES, DEBUG_OVERLAY_RESULT_IMAGE, IS_DEBUG_PRINT_EACH_STEP, IS_DEBUG_VIS, IS_DEBUG_FLUO, IS_DEBUG_NIR, REMOVE_SMALL_CLUSTER_SIZE_FLUO,
-		REMOVE_SMALL_CLUSTER_SIZE_RGB,
+		REMOVE_SMALL_CLUSTER_SIZE_VIS,
 
 		LAB_MIN_L_VALUE_VIS, LAB_MAX_L_VALUE_VIS, LAB_MIN_A_VALUE_VIS, LAB_MAX_A_VALUE_VIS, LAB_MIN_B_VALUE_VIS, LAB_MAX_B_VALUE_VIS, LAB_MIN_L_VALUE_FLUO,
 		LAB_MAX_L_VALUE_FLUO, LAB_MIN_A_VALUE_FLUO, LAB_MAX_A_VALUE_FLUO, LAB_MIN_B_VALUE_FLUO, LAB_MAX_B_VALUE_FLUO, LAB_MIN_L_VALUE_NIR, LAB_MAX_L_VALUE_NIR,
 		LAB_MIN_A_VALUE_NIR, LAB_MAX_A_VALUE_NIR, LAB_MIN_B_VALUE_NIR, LAB_MAX_B_VALUE_NIR,
 
-		L_Diff_VIS_TOP, abDiff_VIS_TOP, L_Diff_FLOU, abDiff_FLOU, L_Diff_NIR, abDiff_NIR,
+		L_Diff_VIS_TOP, abDiff_VIS_TOP, L_Diff_FLUO, abDiff_FLUO, L_Diff_NIR, abDiff_NIR,
 
 		IS_PARAMETER_SEARCH, IS_CROP_RESULT,
 
@@ -71,7 +71,7 @@ public class ImageProcessorOptions {
 
 		INPUT_VIS_IMAGE_ROTATION_ANGLE, L_Diff_VIS_SIDE, abDiff_VIS_SIDE,
 
-		BOTTOM_CUT_DELAY_VIS, REAL_MARKER_DISTANCE;
+		BOTTOM_CUT_OFFSET_VIS, REAL_MARKER_DISTANCE;
 	}
 	
 	public ImageProcessorOptions() {
@@ -179,7 +179,7 @@ public class ImageProcessorOptions {
 		setCameraPosition(CameraPosition.UNKNOWN);
 		setNeighbourhood(NeighbourhoodSetting.NB4);
 		
-		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB, (0.001d) / 4);
+		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, (0.001d) / 4);
 		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, (0.001d) / 5);
 		addDoubleSetting(Setting.SCALE, scale);
 		addIntSetting(Setting.ROTATION_ANGLE, -3);
@@ -278,8 +278,8 @@ public class ImageProcessorOptions {
 		
 		addIntSetting(Setting.L_Diff_VIS_TOP, 40); // 40
 		addIntSetting(Setting.abDiff_VIS_TOP, 40); // 40
-		addIntSetting(Setting.L_Diff_FLOU, 75);// 20
-		addIntSetting(Setting.abDiff_FLOU, 40);// 30
+		addIntSetting(Setting.L_Diff_FLUO, 75);// 20
+		addIntSetting(Setting.abDiff_FLUO, 40);// 30
 		addIntSetting(Setting.L_Diff_NIR, 14); // 14
 		addIntSetting(Setting.abDiff_NIR, 20);
 		
@@ -289,7 +289,7 @@ public class ImageProcessorOptions {
 		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK, 1);
 		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 1);
 		
-		addIntSetting(Setting.BOTTOM_CUT_DELAY_VIS, 60);
+		addIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS, 80);
 		addIntSetting(Setting.REAL_MARKER_DISTANCE, 1128);
 	}
 	

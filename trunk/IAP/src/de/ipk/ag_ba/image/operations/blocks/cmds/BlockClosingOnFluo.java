@@ -1,27 +1,18 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
-import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MorphologicalOperators;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
-public class BlockClosing extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockClosingOnFluo extends AbstractSnapshotAnalysisBlockFIS {
 	protected int closeOperations = -1;
-	
-	@Override
-	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null)
-			return null;
-		FlexibleImage rr = new ImageOperation(getInput().getMasks().getVis()).blur(3).getImage();
-		return closing(rr, getInput().getImages().getVis());
-	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() == null)
 			return null;
-		return closing(getInput().getMasks().getFluo(), getInput().getImages().getFluo());
+		return closing(getInput().getMasks().getFluo().getIO().blur(0.5).getImage(), getInput().getImages().getFluo());
 	}
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {

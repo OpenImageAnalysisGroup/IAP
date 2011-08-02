@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMaskButNotOnVIS;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingOnFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisContentOnFluoMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropMasks;
@@ -70,7 +70,7 @@ public class BarleyTopImageProcessor {
 		if (automaticParameterSearch) {
 			p.add(BlockImageInfo.class);
 			p.add(BlockClearBackground.class);
-			p.add(BlockClosing.class);
+			p.add(BlockClosingOnFluo.class);
 			p.add(BlockRemoveSmallClusters.class);
 			p.add(BlockDataAnalysis.class);
 			// p.add(BlockPrintInfos.class);
@@ -104,7 +104,7 @@ public class BarleyTopImageProcessor {
 			
 		} else {
 			p.add(BlockClearBackground.class);
-			p.add(BlockClosing.class);
+			p.add(BlockClosingOnFluo.class);
 			p.add(BlockRemoveSmallClusters.class);
 			p.add(BlockDataAnalysis.class);
 			p.add(BlockResizeMasksToLargest.class);

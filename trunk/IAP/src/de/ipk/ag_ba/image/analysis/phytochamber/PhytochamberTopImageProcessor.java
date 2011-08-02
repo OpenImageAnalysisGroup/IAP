@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingOnFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropAllFixedPhytoOne;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
@@ -59,7 +59,7 @@ public class PhytochamberTopImageProcessor {
 		p.add(BlockClearBackground.class);
 		p.add(BlockFilterFluoMaskByValue30.class);
 		p.add(BlockRemoveSmallClusters.class);
-		p.add(BlockClosing.class);
+		p.add(BlockClosingOnFluo.class);
 		p.add(BlockResizeMasksToLargest.class);
 		p.add(BlockEnlargeVisAndFluoMasks.class);
 		if (automaticParameterSearch) {

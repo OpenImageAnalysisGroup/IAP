@@ -33,6 +33,14 @@ public class FlexibleImageSet {
 		// use setVis, ...
 	}
 	
+	public FlexibleImageSet(FlexibleImageSet copyImageInfoFromThisSet) {
+		if (copyImageInfoFromThisSet != null) {
+			visInfo = copyImageInfoFromThisSet.visInfo;
+			fluoInfo = copyImageInfoFromThisSet.fluoInfo;
+			nirInfo = copyImageInfoFromThisSet.nirInfo;
+		}
+	}
+	
 	public FlexibleImageSet(FlexibleImage vis, FlexibleImage fluo, FlexibleImage nir) {
 		if (vis != null)
 			vis.setType(FlexibleImageType.VIS);

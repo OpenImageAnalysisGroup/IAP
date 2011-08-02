@@ -51,7 +51,7 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 			
 			if (getInput().getMasks().getNir() != null) {
 				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannelBlue(false);
-				double averageNir = nirIntensitySum / nirFilledPixels;
+				double averageNir = 1 - nirIntensitySum / nirFilledPixels;
 				rt.addValue("ndvi.nir.intensity.average", averageNir);
 				
 				double ndvi = (averageNir - averageVis) / (averageNir + averageVis);

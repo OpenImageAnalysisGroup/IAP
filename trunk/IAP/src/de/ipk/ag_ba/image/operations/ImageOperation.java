@@ -215,7 +215,7 @@ public class ImageOperation {
 			
 			float intensity = 1 - rf / (float) ((255) + gf);
 			
-			if (intensity > 210f / 255f)
+			if (intensity > 170f / 255f)
 				intensity = 1;
 			
 			int i = (int) (intensity * 255d);
@@ -547,14 +547,18 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation opening(int n1, int n2) {
-		ImageOperation io = erodeNG(n1);
-		io = io.dilateNG(n2);
-		return io;
-		// for (int i = 0; i < n1; i++)
-		// image.getProcessor().erode();
-		// for (int i = 0; i < n2; i++)
-		// image.getProcessor().dilate();
-		// return this;
+		boolean fast_but_incorrect = false;
+		if (fast_but_incorrect) {
+			ImageOperation io = erodeNG(n1);
+			io = io.dilateNG(n2);
+			return io;
+		} else {
+			for (int i = 0; i < n1; i++)
+				image.getProcessor().erode();
+			for (int i = 0; i < n2; i++)
+				image.getProcessor().dilate();
+			return this;
+		}
 	}
 	
 	/**
@@ -563,6 +567,7 @@ public class ImageOperation {
 	 * @param n
 	 *           number of times the code should be run
 	 */
+	@Deprecated
 	public ImageOperation dilateNG(int n) {
 		int[] imagePixels = getImageAs1array();
 		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
@@ -604,6 +609,7 @@ public class ImageOperation {
 	 * @param n
 	 *           number of times the code should be run
 	 */
+	@Deprecated
 	public ImageOperation dilateNG(int n, FlexibleImage inputImageForNewPixels) {
 		int[] imagePixels = getImageAs1array();
 		int[] inputImagePixels = inputImageForNewPixels.getAs1A();
@@ -647,6 +653,7 @@ public class ImageOperation {
 	 *           number of times the code should be run
 	 */
 	private ImageOperation erodeNG(int n) {
+		// todo this command does not work correctly, yet
 		int[] imagePixels = getImageAs1array();
 		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		int w = image.getWidth();
@@ -904,14 +911,27 @@ public class ImageOperation {
 				optClusterSizeReturn);
 	}
 	
-	public ImageOperation removeSmallClusters(boolean nextGeneration, double factor,
+	public ImageOperation removeSmallClusters(boolean nextGeneration, double cutOffPercentageOfImage,
 			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
+		return removeSmallClusters(nextGeneration, cutOffPercentageOfImage, (image.getWidth() / 100) * 2, nb, typ, optClusterSizeReturn);
+	}
+	
+	public ImageOperation removeSmallClusters(boolean nextGeneration, double cutOffPercentageOfImage, int cutOffVertHorOfImage,
+			NeighbourhoodSetting nb, CameraPosition typ,
+			ObjectRef optClusterSizeReturn) {
+		boolean considerArea = false;
+		return removeSmallClusters(nextGeneration, cutOffPercentageOfImage, cutOffVertHorOfImage, nb, typ, optClusterSizeReturn, considerArea);
+	}
+	
+	public ImageOperation removeSmallClusters(boolean nextGeneration, double cutOffPercentageOfImage, int cutOffVertHorOfImage,
+			NeighbourhoodSetting nb, CameraPosition typ,
+			ObjectRef optClusterSizeReturn, boolean considerArea) {
 		FlexibleImage workImage = new FlexibleImage(image);
 		workImage = removeSmallPartsOfImage(nextGeneration, workImage,
 				PhenotypeAnalysisTask.BACKGROUND_COLORint,
-				(int) (image.getWidth() * image.getHeight() * factor), (image.getWidth() / 100) * 2, nb, typ,
-				optClusterSizeReturn);
+				(int) (image.getWidth() * image.getHeight() * cutOffPercentageOfImage), cutOffVertHorOfImage, nb, typ,
+				optClusterSizeReturn, considerArea);
 		return new ImageOperation(workImage);
 	}
 	
@@ -1306,6 +1326,16 @@ public class ImageOperation {
 		}
 	}
 	
+	public static FlexibleImage removeSmallPartsOfImage(
+			boolean nextGeneration,
+			FlexibleImage workImage, int iBackgroundFill,
+			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
+			ObjectRef optClusterSizeReturn) {
+		boolean considerArea = false;
+		return removeSmallPartsOfImage(nextGeneration, workImage, iBackgroundFill, cutOffMinimumArea, cutOffMinimumDimension, nb, typ, optClusterSizeReturn,
+				considerArea);
+	}
+	
 	/**
 	 * @param workImage
 	 * @param iBackgroundFill
@@ -1322,7 +1352,8 @@ public class ImageOperation {
 			boolean nextGeneration,
 			FlexibleImage workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
-			ObjectRef optClusterSizeReturn) {
+			ObjectRef optClusterSizeReturn,
+			boolean considerArea) {
 		
 		if (cutOffMinimumArea < 1) {
 			System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");
@@ -1334,7 +1365,11 @@ public class ImageOperation {
 			cutOffMinimumDimension = 1;
 		}
 		
+		if (!considerArea)
+			cutOffMinimumArea = 0;
+		
 		Segmentation ps;
+		
 		if (nextGeneration)
 			ps = new ClusterDetection(workImage, PhenotypeAnalysisTask.BACKGROUND_COLORint);
 		else
@@ -1351,11 +1386,11 @@ public class ImageOperation {
 		}
 		
 		int[] clusterSizes = null;
-		int[] clusterDimensions = null;
+		int[] clusterDimensionMinWH = null;
 		
 		if (optClusterSizeReturn != null)
 			optClusterSizeReturn.setObject(ps.getClusterSize());
-		clusterDimensions = ps.getClusterDimensionMinWH();
+		clusterDimensionMinWH = ps.getClusterDimensionMinWH();
 		
 		Vector2i[] clusterCenter = ps.getClusterCenterPoints();
 		Vector2i[] clusterDimensions2d = ps.getClusterDimension();
@@ -1368,7 +1403,7 @@ public class ImageOperation {
 			List<LargeCluster> largeClusters = new ArrayList<LargeCluster>();
 			if (clusterSizes != null)
 				for (int index = 0; index < clusterSizes.length; index++) {
-					if (clusterDimensions[index] >= cutOffMinimumDimension) {
+					if (clusterDimensionMinWH[index] >= cutOffMinimumDimension) {
 						LargeCluster lc = new LargeCluster(clusterDimensions2d[index], clusterCenter[index], clusterSizes[index], index);
 						largeClusters.add(lc);
 					}
@@ -1402,12 +1437,17 @@ public class ImageOperation {
 		
 		int[] rgbArray = workImage.getAs1A();
 		int[] mask = ps.getImageClusterIdMask();
-		if (clusterDimensions != null && clusterDimensions.length > 0)
+		if (clusterDimensionMinWH != null && clusterDimensionMinWH.length > 0)
 			for (int idx = 0; idx < rgbArray.length; idx++) {
 				int clusterID = mask[idx];
 				if (clusterID >= 0
 						&&
-						(clusterDimensions[clusterID] < cutOffMinimumDimension || (clusterDimensions[clusterID] >= cutOffMinimumDimension &&
+						(
+								(
+								clusterDimensionMinWH[clusterID] < cutOffMinimumDimension
+								|| clusterSizes[clusterID] <= cutOffMinimumArea
+								)
+								|| (clusterDimensionMinWH[clusterID] >= cutOffMinimumDimension &&
 						// toBeDeletedClusterIDs.contains(clusterID)
 						toBeDeletedClusterIDs[clusterID]
 								)))
@@ -1587,8 +1627,8 @@ public class ImageOperation {
 			maxDiffAleftBright = maize ? 7 : 3;
 			maxDiffArightBleft = maize ? 7 : 3;
 		} else {
-			maxDiffAleftBright = 11; // 15
-			maxDiffArightBleft = 7;
+			maxDiffAleftBright = maize ? 11 : 3; // 15
+			maxDiffArightBleft = maize ? 7 : 3;
 		}
 		
 		for (y = 0; y < height; y++) {
@@ -1606,8 +1646,7 @@ public class ImageOperation {
 				bi = (int) ImageOperation.labCube[r][g][b + 512];
 				
 				if (resultImage[off] != background && (((Li > lowerValueOfL) && (Li < upperValueOfL) && (ai > lowerValueOfA) && (ai < upperValueOfA)
-								&& (bi > lowerValueOfB) && (bi < upperValueOfB)) && !
-								isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft))) {
+								&& (bi > lowerValueOfB) && (bi < upperValueOfB)) && !isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft))) {
 					resultImage[off] = imagePixels[off];
 				} else
 					resultImage[off] = background;
@@ -1622,12 +1661,12 @@ public class ImageOperation {
 		final float step = 1f / 255f;
 		final float[][][] result = new float[256][256][256 * 3];
 		ExecutorService executor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
-		
+		final float cont = 16f / 116f;
 		for (int rr = 0; rr < 256; rr++) {
 			final int red = rr;
 			final float rd = (red / 255f);
 			
-			executor.submit(new Runnable() {
+			Runnable r = new Runnable() {
 				@Override
 				public void run() {
 					float gd = -step;
@@ -1647,26 +1686,55 @@ public class ImageOperation {
 							
 							bd += step;
 							
-							// white reference D65 PAL/SECAM
-							X = aXa + 178.336f * bd;
-							Y = aYa + 71.3342f * bd;
-							Z = aZa + 939.234f * bd;
+							boolean old = true;
 							
-							fX = IAPservice.cubeRoots[(int) X];
-							fY = IAPservice.cubeRoots[(int) Y];
-							fZ = IAPservice.cubeRoots[(int) Z];
-							
-							La = ((116 * fY) - 16) * 2.55f;
-							aa = 1.0625f * (500f * (fX - fY)) + 128f;
-							bb = 1.0625f * (200f * (fY - fZ)) + 128f;
+							if (old) {
+								// white reference D65 PAL/SECAM
+								X = 0.430587f * rd + 0.341545f * gd + 0.178336f * bd;
+								Y = 0.222021f * rd + 0.706645f * gd + 0.0713342f * bd;
+								Z = 0.0201837f * rd + 0.129551f * gd + 0.939234f * bd;
+								
+								// XYZ to Lab
+								if (X > 0.008856)
+									fX = IAPservice.cubeRoots[(int) (1000 * X)];
+								else
+									fX = (7.78707f * X) + cont;// 7.7870689655172
+									
+								if (Y > 0.008856)
+									fY = IAPservice.cubeRoots[(int) (1000 * Y)];
+								else
+									fY = (7.78707f * Y) + cont;
+								
+								if (Z > 0.008856)
+									fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
+								else
+									fZ = (7.78707f * Z) + cont;
+								
+								La = ((116 * fY) - 16) * 2.55f;
+								aa = 1.0625f * (500f * (fX - fY)) + 128f;
+								bb = 1.0625f * (200f * (fY - fZ)) + 128f;
+							} else {
+								// white reference D65 PAL/SECAM
+								X = aXa + 178.336f * bd;
+								Y = aYa + 71.3342f * bd;
+								Z = aZa + 939.234f * bd;
+								
+								fX = IAPservice.cubeRoots[(int) X];
+								fY = IAPservice.cubeRoots[(int) Y];
+								fZ = IAPservice.cubeRoots[(int) Z];
+								
+								La = ((116 * fY) - 16) * 2.55f;
+								aa = 1.0625f * (500f * (fX - fY)) + 128f;
+								bb = 1.0625f * (200f * (fY - fZ)) + 128f;
+							}
 							p[blue] = La;
 							p[blue + 256] = aa;
 							p[blue + 512] = bb;
 						}
 					}
 				}
-			}
-					);
+			};
+			executor.submit(r);
 		}
 		executor.shutdown();
 		try {
@@ -1675,7 +1743,30 @@ public class ImageOperation {
 			e.printStackTrace();
 		}
 		s.printTime();
+		analyzeCube(result);
 		return result;
+	}
+	
+	private static void analyzeCube(float[][][] labCube) {
+		double lmi = java.lang.Double.MAX_VALUE, lma = 0, ami = java.lang.Double.MAX_VALUE, ama = 0, bmi = java.lang.Double.MAX_VALUE, bma = 0;
+		for (int r = 0; r < 255; r++)
+			for (int g = 0; g < 255; g++)
+				for (int b = 0; b < 255; b++) {
+					float lf = labCube[r][g][b];
+					float af = labCube[r][g][b + 256];
+					float bf = labCube[r][g][b + 512];
+					
+					lmi = lf < lmi ? lf : lmi;
+					ami = af < ami ? af : ami;
+					bmi = bf < bmi ? bf : bmi;
+					
+					lma = lf > lma ? lf : lma;
+					ama = af > ama ? af : ama;
+					bma = bf > bma ? bf : bma;
+				}
+		System.out.println("L:[" + lmi + "," + lma + "]");
+		System.out.println("A:[" + ami + "," + ama + "]");
+		System.out.println("B:[" + bmi + "," + bma + "]");
 	}
 	
 	public static double MathPow(double v, double ot) {
@@ -1743,36 +1834,17 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation medianFilter32Bit() {
-		int[] img = getImageAs1array();
-		int w = image.getWidth();
-		int h = image.getHeight();
-		int[] out = new int[img.length];
-		int last = img.length - w;
-		for (int i = 0; i < img.length; i++) {
-			if (i > w && i < last) {
-				int center = img[i];
-				int above = img[i - w];
-				int left = img[i - 1];
-				int right = img[i + 1];
-				int below = img[i + w];
-				out[i] = median(center, above, left, right, below);
-			} else
-				out[i] = img[i];
-		}
-		return new ImageOperation(out, w, h);
-		
-		// old imagej
-		// image.getProcessor().medianFilter();
-		// return new ImageOperation(getImage());
+		return medianFilter32Bit(true);
 	}
 	
 	public ImageOperation medianFilter32Bit(boolean p) {
 		if (p) {
 			int[] img = getImageAs1array();
 			int w = image.getWidth();
-			// int h = image.getHeight();
+			int h = image.getHeight();
 			int[] out = new int[img.length];
 			int last = img.length - w;
+			boolean jmp = true;
 			for (int i = 0; i < img.length; i++) {
 				if (i > w && i < last) {
 					int center = img[i];
@@ -1780,12 +1852,14 @@ public class ImageOperation {
 					int left = img[i - 1];
 					int right = img[i + 1];
 					int below = img[i + w];
-					out[i] = findMedian(new int[] { center, above, left, right, below });
-					// median(center, above, left, right, below);
+					if (jmp)
+						out[i] = median(center, above, left, right, below);
+					else
+						out[i] = findMedian(new int[] { center, above, left, right, below });
 				} else
 					out[i] = img[i];
 			}
-			return null;
+			return new ImageOperation(out, w, h);
 		} else {
 			image.getProcessor().medianFilter();
 			return new ImageOperation(getImage());
@@ -1940,6 +2014,24 @@ public class ImageOperation {
 			}
 			b = (c & 0x0000ff);
 			if (b > threshold)
+				res[idx] = back;
+			idx++;
+		}
+		return new ImageOperation(res, image.getWidth(), image.getHeight());
+	}
+	
+	public ImageOperation thresholdClearBlueBetween(int thresholdStart, int thresholdEnd) {
+		int[] res = getImageAs1array();
+		int b;
+		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int idx = 0;
+		for (int c : res) {
+			if (c == back) {
+				idx++;
+				continue;
+			}
+			b = (c & 0x0000ff);
+			if (b >= thresholdStart && b <= thresholdEnd)
 				res[idx] = back;
 			idx++;
 		}

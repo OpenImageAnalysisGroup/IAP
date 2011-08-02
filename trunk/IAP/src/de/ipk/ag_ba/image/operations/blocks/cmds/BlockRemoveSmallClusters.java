@@ -27,16 +27,26 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 				// not for barley
 				FlexibleImage res =
 						new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB) / 2d,
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d,
 								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 				return res;
-			} else
-				return getInput().getMasks().getVis();
+			} else {
+				FlexibleImage res =
+						new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (getInput().getMasks().getVis().getWidth() / 100) * 1,
+								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+				return res;
+			}
 		} else {
-			FlexibleImage res =
-					new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse, options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_RGB),
-							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
-			return res;
+			if (options.isMaize()) {
+				FlexibleImage res =
+						new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS),
+								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+				return res;
+			} else {
+				return getInput().getMasks().getVis();
+			}
 		}
 	}
 	
@@ -50,8 +60,10 @@ public class BlockRemoveSmallClusters extends AbstractSnapshotAnalysisBlockFIS {
 					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 		} else {
+			int cut2 = (int) ((getInput().getMasks().getFluo().getWidth() / 100) * 0.5);
+			double cut = options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO);
 			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(ngUse,
-					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
+					cut, cut2,
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 		}
 	}

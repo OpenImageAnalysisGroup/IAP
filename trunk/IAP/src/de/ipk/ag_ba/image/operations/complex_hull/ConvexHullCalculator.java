@@ -28,6 +28,8 @@ public class ConvexHullCalculator {
 	
 	private Polygon polygon;
 	
+	private int borderPixels;
+	
 	/**
 	 * The imageOperation - ResultTable is retained and extended (if available) during calculation.
 	 */
@@ -57,7 +59,7 @@ public class ConvexHullCalculator {
 		
 		int b = borderColor;
 		
-		io.border().borderDetection(backgroundColor, b, false, in, w, h, borderImage);
+		borderPixels = io.border().borderDetection(backgroundColor, b, false, in, w, h, borderImage);
 		
 		int n = 0;
 		for (int x = 0; x < w; x++)
@@ -126,10 +128,15 @@ public class ConvexHullCalculator {
 			rt.incrementCounter();
 			
 			rt.addValue("hull.points", numberOfHullPoints);
+			int filledArea = io.countFilledPixels();
+			if (filledArea > 0)
+				rt.addValue("compactness", borderPixels * borderPixels / filledArea);
+			rt.addValue("border.length", borderPixels);
+			rt.addValue("area", filledArea);
 			double normFactorArea = distHorizontal != null ? (realMarkerDist * realMarkerDist) / (distHorizontal.getValue() * distHorizontal.getValue()) : 1;
 			double normFactor = distHorizontal != null ? realMarkerDist / distHorizontal.getValue() : 1;
 			rt.addValue("hull.area", polygon.area() * normFactorArea);
-			rt.addValue("hull.signedarea", polygon.signedArea() * normFactorArea);
+			// rt.addValue("hull.signedarea", polygon.signedArea() * normFactorArea);
 			rt.addValue("hull.circularity", circularity());
 			
 			Circle circumcircle = polygon.calculateminimalcircumcircle();
@@ -140,7 +147,6 @@ public class ConvexHullCalculator {
 				rt.addValue("hull.circumcircle.d", circumcircle.d * normFactor);
 			}
 			
-			int filledArea = io.countFilledPixels();
 			rt.addValue("hull.fillgrade", filledArea / polygon.area());
 			
 			centroid = polygon.centroid();

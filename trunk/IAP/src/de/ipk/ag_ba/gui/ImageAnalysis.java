@@ -37,6 +37,7 @@ import javax.swing.event.ChangeListener;
 
 import de.ipk.ag_ba.gui.actions.analysis.ActionPhytochamberAnalysis;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_actions.maize.BarleyAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -62,6 +63,14 @@ public class ImageAnalysis {
 			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 		
 		NavigationAction maizeAnalysisAction = new MaizeAnalysisAction(m, experiment);
+		NavigationButton resultTaskButton = new NavigationButton(maizeAnalysisAction, guiSetting);
+		return resultTaskButton;
+	}
+	
+	public static NavigationButton getBarleyEntity(final MongoDB m,
+			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
+		
+		NavigationAction maizeAnalysisAction = new BarleyAnalysisAction(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(maizeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}

@@ -4,6 +4,7 @@ import ij.ImagePlus;
 import ij.io.FileInfoXYZ;
 import ij.io.Opener;
 import ij.io.TiffDecoder;
+import info.StopWatch;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Component;
@@ -272,15 +273,18 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					});
 					
 					JMenuItem debugPipelineTest3 = new JMenuItem("Barley Analysis Pipeline (Image+Reference)");
-					debugPipelineTest1.addActionListener(new ActionListener() {
+					debugPipelineTest3.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
+								StopWatch s = new StopWatch("barley", true);
 								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
 										imageResult.getBinaryFileInfo().getFileNameMain(),
 										targetTreeNode.getExperiment());
-								
+								s.printTime();
+								s = new StopWatch("barley (b)");
 								BlockPipeline.debugTryAnalyze(match, m, new BarleyAnalysisTask());
+								s.printTime();
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);
@@ -291,7 +295,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					});
 					
 					JMenuItem debugPipelineTest4 = new JMenuItem("Barley Analysis Pipeline (Reference+Old Reference)");
-					debugPipelineTest2.addActionListener(new ActionListener() {
+					debugPipelineTest4.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
