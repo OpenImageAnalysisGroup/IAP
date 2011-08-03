@@ -450,7 +450,7 @@ public class SkeletonProcessor2d {
 		for (Limb l : endlimbs) {
 			res += l.points.size();
 		}
-		return (int) (res / (double) endlimbs.size());
+		return (int) ((res / (double) endlimbs.size()) - (res / (double) endlimbs.size()) * 0.1);
 	}
 	
 	/**
