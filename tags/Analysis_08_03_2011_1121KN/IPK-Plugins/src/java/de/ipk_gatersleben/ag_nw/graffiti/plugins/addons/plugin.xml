@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE plugin
+  PUBLIC "-//GRAFFITI/DTD Plugin Descriptin 1.0//EN"
+ "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
+
+<plugin>
+	<author>Hendrik Rohn, Christian Klukas</author>
+	<description>Realizes management of Add-ons.</description>
+
+	<plugindesc>
+		<name>Addon-Plugin</name>
+		<main>de.ipk_gatersleben.ag_nw.graffiti.plugins.addons.AddonManagerPlugin</main>
+		<version>0.1.0</version>
+		<feedname>Add-ons</feedname>
+		<feedurl>http://vanted.ipk-gatersleben.de/addons/feed.xml</feedurl>
+		<available>http://vanted.sourceforge.net/</available>
+	</plugindesc>
+</plugin>

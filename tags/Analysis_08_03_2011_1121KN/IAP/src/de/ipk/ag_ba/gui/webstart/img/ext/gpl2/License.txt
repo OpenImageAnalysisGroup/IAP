@@ -1,0 +1,16 @@
+GNU General Public License version 2
+http://www.gnu.org/licenses/gpl-2.0.html
+
+
+AUTHORS
+1	Ulisse Perusin <uli.peru@gmail.com>
+2	Riccardo Buzzotta <raozuzu@yahoo.it>
+3	Josef Vybíral <cornelius@vybiral.info>
+4	Hylke Bons <h.bons@student.rug.nl>
+5	Ricardo González <rick@jinlabs.com>
+6	Lapo Calamandrei <calamandrei@gmail.com>
+7	Rodney Dawes <dobey@novell.com>
+8	Luca Ferretti <elle.uca@libero.it>
+9	Tuomas Kuosmanen <tigert@gimp.org>
+10	Andreas Nilsson <nisses.mail@home.se>
+11	Jakub Steiner <jimmac@novell.com>
