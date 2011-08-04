@@ -137,7 +137,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			}
 			
 			es.shutdown();
-			es.awaitTermination(1, TimeUnit.DAYS);
+			es.awaitTermination(31, TimeUnit.DAYS);
 			
 			if (errorCount == 0) {
 				status.setCurrentStatusText1("Finalize storage");
@@ -202,11 +202,13 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					boolean exists = targetFile.exists() && targetFile.length() > 0;
 					targetExists = exists;
 					try {
-						fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
+						fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists, null);
 					} catch (Exception e) {
-						Thread.sleep(15000);
-						// try 2nd time
-						fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists);
+						System.out.println("ERROR: HSM TRANSFER AND DATA STORAGE: " + e.getMessage() + " // WILL RETRY IN 2 MINUTES // "
+								+ SystemAnalysisExt.getCurrentTime());
+						Thread.sleep(120000);
+						// try 2nd time after 2 minutes
+						fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists, null);
 					}
 					if (exists) {
 						files--;
@@ -214,7 +216,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 						knownFiles++;
 					}
 				} catch (Exception e) {
-					System.out.println("ERROR DATA STORAGE: " + e.getMessage() + " // " + zefn);
+					System.out.println("ERROR: HSM TRANSFER AND DATA STORAGE: " + e.getMessage() + " // " + zefn + " // " + SystemAnalysisExt.getCurrentTime());
 					errorCount++;
 				}
 			}
@@ -244,7 +246,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 								BufferedImage bimage = ImageIO.read(is);
 								MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(bimage);
 								if (previewStream != null)
-									copyBinaryFileContentToTarget(experiment, written, hsmManager, es, null, previewStream, t, targetFile, exists);
+									copyBinaryFileContentToTarget(experiment, written, hsmManager, es, null, previewStream, t, targetFile, exists, null);
 								else
 									System.out.println("ERROR: Preview could not be created or saved.");
 							} finally {
@@ -262,7 +264,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			
 			long currTime = System.currentTimeMillis();
 			
-			double speed = written.getLong() * 1000 / (currTime - startTime) / 1024 / 1024;
+			double speed = written.getLong() * 1000d / (currTime - startTime) / 1024d / 1024d;
 			status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
 		}
 		
@@ -288,18 +290,63 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				
 				final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
 				
-				copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getLabelURL(), null, t, targetFile, targetFile.exists());
+				copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getLabelURL(), null, t, targetFile, targetFile.exists(), null);
 				
 			} catch (Exception e) {
-				System.out.println("ERROR: " + e.getMessage());
+				System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE: " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
 				e.printStackTrace();
 				errorCount++;
 			}
 			long currTime = System.currentTimeMillis();
 			
-			double speed = written.getLong() * 1000 / (currTime - startTime) / 1024 / 1024;
+			double speed = written.getLong() * 1000d / (currTime - startTime) / 1024d / 1024d;
 			status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
 		}
+		
+		// copy old reference label binary file (oldreference annotation)
+		if (nm instanceof ImageData) {
+			final ImageData id = (ImageData) nm;
+			String oldRef = id.getAnnotationField("oldreference");
+			
+			if (oldRef == null || oldRef.isEmpty())
+				return idx;
+			
+			final IOurl oldRefUrl = new IOurl(oldRef);
+			
+			long t = nm.getParentSample().getRowId();
+			
+			final String zefn;
+			try {
+				if (oldRefUrl.getPrefix().startsWith("mongo_"))
+					zefn = "label_oldreference_" + substanceName + "_" + oldRefUrl.getDetail() + getFileExtension(oldRefUrl.getFileName());
+				else
+					if (oldRefUrl.getPrefix().startsWith(LemnaTecFTPhandler.PREFIX)) {
+						String fn = oldRefUrl.getDetail();
+						zefn = "label_oldreference_" + substanceName + "_" + fn.substring(fn.lastIndexOf("/") + "/".length())
+								+ getFileExtension(oldRefUrl.getFileName());;
+					} else
+						zefn = "label_oldreference_" + determineBinaryFileName(t, substanceName, nm, id);
+				
+				final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
+				Runnable postProcess = new Runnable() {
+					@Override
+					public void run() {
+						String updatedOldReference = oldRefUrl.toString();
+						id.replaceAnnotationField("oldreference", updatedOldReference);
+					}
+				};
+				copyBinaryFileContentToTarget(experiment, written, hsmManager, es, oldRefUrl, null, t, targetFile, targetFile.exists(), postProcess);
+			} catch (Exception e) {
+				System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE OF OLDREFERENCE: " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
+				e.printStackTrace();
+				errorCount++;
+			}
+			long currTime = System.currentTimeMillis();
+			
+			double speed = written.getLong() * 1000d / (currTime - startTime) / 1024d / 1024d;
+			status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
+		}
+		
 		return idx;
 	}
 	
@@ -354,8 +401,8 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	}
 	
 	private Future<MyByteArrayInputStream> copyBinaryFileContentToTarget(final ExperimentInterface experiment, final ThreadSafeOptions written,
-			final HSMfolderTargetDataManager hsmManager, ExecutorService es, final IOurl url, final MyByteArrayInputStream optUrlContent, final Long t,
-			final File targetFile, final boolean targetExists)
+			final HSMfolderTargetDataManager hsmManager, final ExecutorService es, final IOurl url, final MyByteArrayInputStream optUrlContent, final Long t,
+			final File targetFile, final boolean targetExists, final Runnable optPostProcess)
 			throws InterruptedException {
 		while (written.getInt() > 0)
 			Thread.sleep(5);
@@ -369,22 +416,24 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					try {
 						if (!targetExists) {
 							in = url != null ? ResourceIOManager.getInputStreamMemoryCached(url) : optUrlContent;
-							File f = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, "in_progress_"
+							synchronized (es) {
+								File f = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, "in_progress_"
 										+ UUID.randomUUID().toString()));
-							BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f));
-							try {
-								if (in.getCount() > 0)
-									bos.write(in.getBuff(), 0, in.getCount());
-							} finally {
-								bos.close();
+								BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f));
+								try {
+									if (in.getCount() > 0)
+										bos.write(in.getBuff(), 0, in.getCount());
+								} finally {
+									bos.close();
+								}
+								written.addLong(in.getCount());
+								in.close();
+								if (t != null)
+									f.setLastModified(t);
+								f.setWritable(false);
+								f.setExecutable(false);
+								f.renameTo(targetFile);
 							}
-							written.addLong(in.getCount());
-							in.close();
-							if (t != null)
-								f.setLastModified(t);
-							f.setWritable(false);
-							f.setExecutable(false);
-							f.renameTo(targetFile);
 						}
 						String fullPath = targetFile.getAbsolutePath();
 						String subPath = fullPath.substring(hsmFolder.length());
@@ -393,6 +442,8 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 							url.setDetail("");
 							url.setFileName(subPath + "#" + extractLastFileName(url.getFileName()));
 						}
+						if (optPostProcess != null)
+							optPostProcess.run();
 					} catch (Exception e) {
 						System.out.println("ERROR: " + e.getMessage());
 						errorCount++;

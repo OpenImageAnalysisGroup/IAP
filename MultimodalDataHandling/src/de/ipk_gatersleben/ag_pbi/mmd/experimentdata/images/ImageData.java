@@ -120,7 +120,7 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 		Substance.getAttributeString(rt, additionalAttributeNames, new Object[] { getPixelsizeX(),
 							getPixelsizeY(), getThickness(), getRowID(),
 							getLabelURL() == null ? null : getLabelURL().toString(), getPositionIn3D(), getRotation() });
-		//System.out.println(rt.toString());
+		// System.out.println(rt.toString());
 		r.append(rt.toString());
 	}
 	
@@ -298,11 +298,42 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 	}
 	
 	public synchronized void addAnnotationField(String key, String value) {
+		if (key == null || value == null)
+			return;
+		if (value.contains(","))
+			throw new UnsupportedOperationException("annotation field value must not contain a commata character");
 		String a = getAnnotation();
 		if (a == null)
 			a = key + "#" + value;
 		else
 			a += "," + key + "#" + value;
 		setAnnotation(a);
+	}
+	
+	public boolean replaceAnnotationField(String key, String value) {
+		if (key == null || value == null)
+			return false;
+		boolean found = false;
+		StringBuilder res = new StringBuilder();
+		String a = getAnnotation();
+		if (value.contains(","))
+			throw new UnsupportedOperationException("annotation field value must not contain a commata character");
+		if (a != null) {
+			String anno = a;
+			String[] fields = anno.split(",");
+			for (String f : fields) {
+				String[] nn = f.split("#", 2);
+				if (res.length() > 0)
+					res.append(",");
+				res.append(nn[0]);
+				if (nn[0].equals(key)) {
+					res.append("#" + value);
+					found = true;
+				} else
+					res.append("#" + nn[1]);
+			}
+		}
+		setAnnotation(res.toString());
+		return found;
 	}
 }
