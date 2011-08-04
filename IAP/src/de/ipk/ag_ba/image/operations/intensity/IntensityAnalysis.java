@@ -15,7 +15,7 @@ public class IntensityAnalysis {
 		this.n = numberOfIntervals;
 	}
 	
-	public ResultsTable calculateHistorgram(BlockProperty distHorizontal) {
+	public ResultsTable calculateHistorgram(BlockProperty distHorizontal, int realMarkerDistance) {
 		ResultsTable result = new ResultsTable();
 		
 		int[] pixels = io.getImageAs1array();
@@ -42,12 +42,11 @@ public class IntensityAnalysis {
 		result.incrementCounter();
 		
 		result.addValue("intensity.average", sumOfIntensity / plantImagePixelCnt / 255d);
-		int realMarkerDist = 1;
 		
 		// double realDist = 1;
 		// if (markerDistHorizontal != null) {
 		// double normalize = ((realDist * realDist) / (markerDistHorizontal.getValue() * markerDistHorizontal.getValue()));
-		double normalize = realMarkerDist / distHorizontal.getValue();
+		double normalize = realMarkerDistance / distHorizontal.getValue();
 		for (int i = 0; i < this.n; i++) {
 			result.addValue("histogram.bin." + (i + 1) + "." + hist.getBorderLeft(i, 255) + "_" + hist.getBorderRight(i, 255), hist.getFreqAt(i) * normalize); // *
 																																																				// normalize

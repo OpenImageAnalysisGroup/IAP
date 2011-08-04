@@ -126,33 +126,49 @@ public class ConvexHullCalculator {
 		
 		if (polygon != null) {
 			rt.incrementCounter();
+			double normFactorArea = distHorizontal != null ? (realMarkerDist * realMarkerDist) / (distHorizontal.getValue() * distHorizontal.getValue()) : 1;
+			double normFactor = distHorizontal != null ? realMarkerDist / distHorizontal.getValue() : 1;
 			
 			rt.addValue("hull.points", numberOfHullPoints);
 			int filledArea = io.countFilledPixels();
 			if (filledArea > 0)
-				rt.addValue("compactness", borderPixels * borderPixels / filledArea);
-			rt.addValue("border.length", borderPixels);
+				rt.addValue("compactness", 4 * Math.PI / (borderPixels * borderPixels / filledArea));
+			
+			if (distHorizontal != null) {
+				rt.addValue("area.norm", filledArea * normFactor);
+				rt.addValue("hull.area.norm", polygon.area() * normFactorArea);
+				rt.addValue("border.length.norm", borderPixels * normFactor);
+			}
 			rt.addValue("area", filledArea);
-			double normFactorArea = distHorizontal != null ? (realMarkerDist * realMarkerDist) / (distHorizontal.getValue() * distHorizontal.getValue()) : 1;
-			double normFactor = distHorizontal != null ? realMarkerDist / distHorizontal.getValue() : 1;
-			rt.addValue("hull.area", polygon.area() * normFactorArea);
+			rt.addValue("hull.area", polygon.area());
+			rt.addValue("border.length", borderPixels);
+			
 			// rt.addValue("hull.signedarea", polygon.signedArea() * normFactorArea);
 			rt.addValue("hull.circularity", circularity());
 			
 			Circle circumcircle = polygon.calculateminimalcircumcircle();
 			
 			if (circumcircle != null) {
-				rt.addValue("hull.circumcircle.x", circumcircle.x * normFactor);
-				rt.addValue("hull.circumcircle.y", circumcircle.y * normFactor);
-				rt.addValue("hull.circumcircle.d", circumcircle.d * normFactor);
+				if (distHorizontal != null) {
+					rt.addValue("hull.circumcircle.x.norm", circumcircle.x * normFactor);
+					rt.addValue("hull.circumcircle.y.norm", circumcircle.y * normFactor);
+					rt.addValue("hull.circumcircle.d.norm", circumcircle.d * normFactor);
+				}
+				rt.addValue("hull.circumcircle.x", circumcircle.x);
+				rt.addValue("hull.circumcircle.y", circumcircle.y);
+				rt.addValue("hull.circumcircle.d", circumcircle.d);
 			}
 			
 			rt.addValue("hull.fillgrade", filledArea / polygon.area());
 			
 			centroid = polygon.centroid();
-			rt.addValue("hull.centroid.x", centroid.x * normFactor);
-			rt.addValue("hull.centroid.y", centroid.y * normFactor);
 			
+			if (distHorizontal != null) {
+				rt.addValue("hull.centroid.x.norm", centroid.x * normFactor);
+				rt.addValue("hull.centroid.y.norm", centroid.y * normFactor);
+			}
+			rt.addValue("hull.centroid.x", centroid.x);
+			rt.addValue("hull.centroid.y", centroid.y);
 		}
 		res.setResultsTable(rt);
 		if (drawHull || drawCentroid)

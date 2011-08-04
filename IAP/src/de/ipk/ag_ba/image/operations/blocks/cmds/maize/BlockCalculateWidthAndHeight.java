@@ -5,6 +5,7 @@ import java.awt.Point;
 import org.Vector2d;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -22,7 +23,7 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processVISmask() {
 		
 		int background = options.getBackground();
-		double realMarkerDistHorizontal = 1;
+		double realMarkerDistHorizontal = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
 		
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 		FlexibleImage img = options.isMaize() ? getInput().getMasks().getFluo() : getInput().getMasks().getVis();
@@ -31,9 +32,14 @@ public class BlockCalculateWidthAndHeight extends AbstractSnapshotAnalysisBlockF
 			
 			if (values != null) {
 				if (distHorizontal != null) {
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width", values.x * (realMarkerDistHorizontal / distHorizontal.getValue()));
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.height", values.y * (realMarkerDistHorizontal / distHorizontal.getValue()));
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width.norm",
+							values.x * (realMarkerDistHorizontal / distHorizontal.getValue()));
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.height.norm",
+							values.y * (realMarkerDistHorizontal / distHorizontal.getValue()));
 				}
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width", values.x);
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.height", values.y);
+				
 			}
 		}
 		

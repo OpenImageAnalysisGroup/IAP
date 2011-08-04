@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import ij.measure.ResultsTable;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
@@ -42,19 +43,25 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getVis() != null) {
 			
 			ImageOperation io = new ImageOperation(getInput().getMasks().getVis());
-			double visibleIntensitySum = io.intensitySumOfChannelBlue(true);
-			double averageVis = visibleIntensitySum / visibleFilledPixels;
+			double visibleIntensitySumR = io.intensitySumOfChannel(false, true, false, false);
+			double visibleIntensitySumG = io.intensitySumOfChannel(false, false, true, false);
+			double visibleIntensitySumB = io.intensitySumOfChannel(false, false, false, true);
+			double averageVisR = visibleIntensitySumR / visibleFilledPixels;
+			double averageVisG = visibleIntensitySumG / visibleFilledPixels;
+			double averageVisB = visibleIntensitySumB / visibleFilledPixels;
 			
 			ResultsTable rt = new ResultsTable();
 			rt.incrementCounter();
-			rt.addValue("ndvi.vis.intensity.average", averageVis);
+			rt.addValue("ndvi.vis.red.intensity.average", averageVisR);
+			rt.addValue("ndvi.vis.green.intensity.average", averageVisG);
+			rt.addValue("ndvi.vis.blue.intensity.average", averageVisB);
 			
 			if (getInput().getMasks().getNir() != null) {
-				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannelBlue(false);
+				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannel(false, true, false, false);
 				double averageNir = 1 - nirIntensitySum / nirFilledPixels;
 				rt.addValue("ndvi.nir.intensity.average", averageNir);
 				
-				double ndvi = (averageNir - averageVis) / (averageNir + averageVis);
+				double ndvi = (averageNir - averageVisR) / (averageNir + averageVisR);
 				rt.addValue("ndvi", ndvi);
 			}
 			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".", rt, getBlockPosition());
@@ -68,7 +75,7 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getFluo() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
 			if (markerDistanceHorizontally != null) {
-				ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally); // markerDistanceHorizontally
+				ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally, options.getIntSetting(Setting.REAL_MARKER_DISTANCE)); // markerDistanceHorizontally
 				if (rt != null)
 					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			}
@@ -83,7 +90,7 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getNir());
 			if (getInput().getMasks().getNir().getHeight() > 1) {
 				if (markerDistanceHorizontally != null) {
-					ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally); // markerDistanceHorizontally
+					ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally, options.getIntSetting(Setting.REAL_MARKER_DISTANCE)); // markerDistanceHorizontally
 					if (rt != null)
 						getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.", rt, getBlockPosition());
 				}

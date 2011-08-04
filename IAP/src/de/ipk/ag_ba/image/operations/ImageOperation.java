@@ -2250,32 +2250,38 @@ public class ImageOperation {
 	 * @param bordersize
 	 * @param translatex
 	 * @param translatey
-	 * @param background
+	 * @param borderColor
 	 *           - color of the border
 	 * @return
 	 */
-	public ImageOperation addBorder(int bordersize, int translatex, int translatey, int background) {
+	public ImageOperation addBorder(int bordersize, int translatex, int translatey, int borderColor) {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
 		int[][] img2d = getImageAs2array();
 		int[][] result = new int[width + (2 * bordersize)][height + (2 * bordersize)];
 		
-		result = fillArray(result, background);
+		result = fillArray(result, borderColor);
 		
-		for (int x = bordersize + translatex; x < (width + translatex); x++) {
-			for (int y = bordersize + translatey; y < (height + translatey); y++) {
-				if (x - bordersize - translatex >= 0 && y - bordersize - translatey >= 0 && x >= 0 && y >= 0)
-					result[x][y] = img2d[x - bordersize - translatex][y - bordersize - translatey];
+		for (int xt = bordersize + translatex; xt < (width + bordersize + translatex); xt++) {
+			for (int yt = bordersize + translatey; yt < (height + bordersize + translatey); yt++) {
+				if (xt - bordersize - translatex >= 0 && yt - bordersize - translatey >= 0 && xt >= 0 && yt >= 0)
+					result[xt][yt] = img2d[xt - bordersize - translatex][yt - bordersize - translatey];
 			}
 		}
 		return new ImageOperation(result);
 	}
 	
-	public int[][] fillArray(int[][] result, int background) {
+	public static int[][] fillArray(int[][] result, int background) {
 		for (int x = 0; x < result.length; x++)
 			for (int y = 0; y < result[0].length; y++)
 				result[x][y] = background;
+		return result;
+	}
+	
+	public static int[] fillArray(int[] result, int background) {
+		for (int x = 0; x < result.length; x++)
+			result[x] = background;
 		return result;
 	}
 	
@@ -2325,14 +2331,19 @@ public class ImageOperation {
 		return new ImageComparator(getImage());
 	}
 	
+	public int countFilledPixels() {
+		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		return countFilledPixels(back);
+	}
+	
 	/**
 	 * All Pixels will be count, which are not equal to the background color (PhenotypeAnalysisTask.BACKGROUND_COLORint).
 	 * 
 	 * @return Number of non-background pixels.
 	 */
-	public int countFilledPixels() {
+	public int countFilledPixels(int back) {
 		int res = 0;
-		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int background = back;
 		int[] img1d = getImageAs1array();
 		
 		for (int c : img1d) {
@@ -2343,12 +2354,12 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * The sum of the intensities of non-background pixels will be calculated. The intensity (0..1) of the blue channel is analyzed.
+	 * The sum of the intensities of non-background pixels will be calculated. The intensity (0..1) of the red channel is analyzed.
 	 * 
 	 * @param b
 	 * @return
 	 */
-	public double intensitySumOfChannelBlue(boolean performGrayScale) {
+	public double intensitySumOfChannel(boolean performGrayScale, boolean red, boolean green, boolean blue) {
 		double res = 0;
 		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
 		int[] img2d = getImageAs1array();
@@ -2363,8 +2374,18 @@ public class ImageOperation {
 		for (int c : img2d) {
 			if (c != background) {
 				int cg = grayScaledIfNeeded[idx];
-				double rf = (cg & 0xff) / 255.0; // B 0..1
-				res += rf;
+				if (red) {
+					double rf = ((cg & 0xff0000) >> 16) / 255.0; // B 0..1
+					res += rf;
+				}
+				if (green) {
+					double rf = ((cg & 0x00ff00) >> 8) / 255.0; // B 0..1
+					res += rf;
+				}
+				if (blue) {
+					double rf = ((cg & 0x0000ff)) / 255.0; // B 0..1
+					res += rf;
+				}
 			}
 			idx++;
 		}
@@ -2388,6 +2409,8 @@ public class ImageOperation {
 		
 		for (int y = 0; y < image.getHeight(); y++) {
 			int yw = y * w;
+			if (threshold > img2d.length)
+				threshold = img2d.length;
 			for (int x = 0; x < threshold; x++) {
 				img2d[x + yw] = background;
 			}
@@ -2401,6 +2424,8 @@ public class ImageOperation {
 		int h = image.getHeight();
 		for (int y = 0; y < image.getHeight(); y++) {
 			int yw = y * w;
+			if (threshold < 0)
+				threshold = 0;
 			for (int x = (int) threshold; x < image.getWidth(); x++) {
 				img2d[x + yw] = background;
 			}
@@ -2549,6 +2574,9 @@ public class ImageOperation {
 				}
 			}
 		}
+		if (count < w * h * 0.1) {
+			return getRGBAverage(x1, y1, w, h, LThresh * 2, (int) (ABThresh * 1.1), mode);
+		}
 		if (count > 0)
 			return new float[] { sumR / 255f / count, sumG / 255f / count, sumB / 255f / count };
 		else
@@ -2584,6 +2612,7 @@ public class ImageOperation {
 		double g = brightness / rgbInfo[1];
 		double b = brightness / rgbInfo[2];
 		double[] factors = { r, g, b };
+		// System.out.println("balance factors: " + r + " " + g + " " + b);
 		ImageOperation io = new ImageOperation(image);
 		return io.multiplicateImageChannelsWithFactors(factors);
 	}
