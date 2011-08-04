@@ -359,7 +359,6 @@ public class SystemAnalysisExt {
 			// return osBean.getSystemCpuLoad() * getNumberOfCpuLogicalCores();
 			// } else
 			if (AttributeHelper.windowsRunning()) {
-				System.out.println("PROCESS LOAD");
 				// java.lang.management.OperatingSystemMXBean os =
 				// ManagementFactory.getOperatingSystemMXBean();
 				//
@@ -382,7 +381,7 @@ public class SystemAnalysisExt {
 				if (nowNanos > lastNanos && nowProcessCPUnanos >= lastProcessCPUnanos) {
 					long process = nowProcessCPUnanos - lastProcessCPUnanos;
 					long time = nowNanos - lastNanos;
-					double load = process / (double) time * getNumberOfCpuLogicalCores();
+					double load = process / (double) time; // * getNumberOfCpuLogicalCores()
 					lastNanos = nowNanos;
 					lastProcessCPUnanos = nowProcessCPUnanos;
 					// in this case only the CPU load of this process can be determined
