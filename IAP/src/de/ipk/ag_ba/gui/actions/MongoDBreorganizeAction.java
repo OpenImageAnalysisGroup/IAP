@@ -30,7 +30,7 @@ public class MongoDBreorganizeAction extends AbstractNavigationAction implements
 	
 	String result = "Internal Error";
 	
-	private final boolean compactDatabase = false;
+	private boolean compactDatabase = false;
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
@@ -49,18 +49,22 @@ public class MongoDBreorganizeAction extends AbstractNavigationAction implements
 	public ParameterOptions getParameters() {
 		return new ParameterOptions(
 				"<html>" +
-						"This command removes not linked database entries and files.<br>" +
+						"This command removes not linked database entries and files.<br><br>" +
 						"If enabled, not only internal database space is made available,<br>" +
-						"but also space in the file system. This operation option may<br>" +
-						"take a long time (up to several hours).",
+						"but also space in the file system.<br>" +
+						"This operation and especially this option may need a long time<br>" +
+						"to proceed (up to several hours).",
 				new Object[] {
-						"Compact database", "Warning: May take a very long time (up to several hours)", false
+						"Compact database@@Warning: May take a very long time (up to several hours)", compactDatabase
 		});
 	}
 	
+	@Override
 	public void setParameters(Object[] parameters) {
-		if (parameters != null) {
-			
+		super.setParameters(parameters);
+		if (parameters != null && parameters.length == 1) {
+			int idx = 0;
+			compactDatabase = (Boolean) parameters[idx++];
 		}
 	}
 	

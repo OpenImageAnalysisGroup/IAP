@@ -36,6 +36,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.actions.ParameterOptions;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -69,6 +70,9 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
 	private final String hsmFolder;
+	private boolean includeMainImages = true;
+	private boolean includeReferenceImages = true;
+	private boolean includeAnnotationImages = true;
 	
 	public ActionDataExportToHsmFolder(MongoDB m, ExperimentReference experimentReference, String hsmFolder) {
 		super("Save in HSM Archive (" + hsmFolder + ")");
@@ -80,6 +84,30 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
+	}
+	
+	@Override
+	public ParameterOptions getParameters() {
+		return new ParameterOptions(
+				"<html>" +
+						"This commands copies the experiment and its connected binary data to the<br>" +
+						"HSM (Hierarchical Storage Management), which may be used as a safe<br>" +
+						"backup storage.<br><br>", new Object[] {
+						"Copy images", includeMainImages,
+						"Coy reference images", includeReferenceImages,
+						"Copy annotation images", includeAnnotationImages
+				});
+	}
+	
+	@Override
+	public void setParameters(Object[] parameters) {
+		super.setParameters(parameters);
+		if (parameters != null && parameters.length == 3) {
+			int idx = 0;
+			includeMainImages = (Boolean) parameters[idx++];
+			includeReferenceImages = (Boolean) parameters[idx++];
+			includeAnnotationImages = (Boolean) parameters[idx++];
+		}
 	}
 	
 	@Override
@@ -187,39 +215,43 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			final BinaryMeasurement bm = (BinaryMeasurement) nm;
 			if (bm.getURL() == null)
 				return idx;
-			
-			status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles) / files / 2d);
-			
-			final Long t = nm.getParentSample().getRowId();
-			Future<MyByteArrayInputStream> fileContent = null;
 			boolean targetExists = false;
-			{
-				// store data
-				String zefn = null;
-				try {
-					zefn = determineBinaryFileName(t, substanceName, nm, bm);
-					final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
-					boolean exists = targetFile.exists() && targetFile.length() > 0;
-					targetExists = exists;
+			Future<MyByteArrayInputStream> fileContent = null;
+			final Long t = nm.getParentSample().getRowId();
+			if (includeMainImages) {
+				targetExists = true;
+				bm.setURL(null);
+			} else {
+				status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles) / files / 2d);
+				{
+					// store data
+					String zefn = null;
 					try {
-						fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists, null);
+						zefn = determineBinaryFileName(t, substanceName, nm, bm);
+						final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
+						boolean exists = targetFile.exists() && targetFile.length() > 0;
+						targetExists = exists;
+						try {
+							fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists, null);
+						} catch (Exception e) {
+							System.out.println("ERROR: HSM TRANSFER AND DATA STORAGE: " + e.getMessage() + " // WILL RETRY IN 2 MINUTES // "
+									+ SystemAnalysisExt.getCurrentTime());
+							Thread.sleep(120000);
+							// try 2nd time after 2 minutes
+							fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists, null);
+						}
+						if (exists) {
+							files--;
+							idx--;
+							knownFiles++;
+						}
 					} catch (Exception e) {
-						System.out.println("ERROR: HSM TRANSFER AND DATA STORAGE: " + e.getMessage() + " // WILL RETRY IN 2 MINUTES // "
-								+ SystemAnalysisExt.getCurrentTime());
-						Thread.sleep(120000);
-						// try 2nd time after 2 minutes
-						fileContent = copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getURL(), null, t, targetFile, exists, null);
+						System.out.println("ERROR: HSM TRANSFER AND DATA STORAGE: " + e.getMessage() + " // " + zefn + " // " + SystemAnalysisExt.getCurrentTime());
+						errorCount++;
 					}
-					if (exists) {
-						files--;
-						idx--;
-						knownFiles++;
-					}
-				} catch (Exception e) {
-					System.out.println("ERROR: HSM TRANSFER AND DATA STORAGE: " + e.getMessage() + " // " + zefn + " // " + SystemAnalysisExt.getCurrentTime());
-					errorCount++;
 				}
 			}
+			
 			if (!targetExists)
 				if (nm instanceof ImageData) {
 					// store preview icon
@@ -274,33 +306,37 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			if (bm.getLabelURL() == null)
 				return idx;
 			
-			long t = nm.getParentSample().getRowId();
-			
-			final String zefn;
-			try {
-				if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
-					zefn = "label_" + substanceName + "_" + bm.getLabelURL().getDetail() + getFileExtension(bm.getLabelURL().getFileName());
-				else
-					if (bm.getLabelURL().getPrefix().startsWith(LemnaTecFTPhandler.PREFIX)) {
-						String fn = bm.getLabelURL().getDetail();
-						zefn = "label_" + substanceName + "_" + fn.substring(fn.lastIndexOf("/") + "/".length())
-								+ getFileExtension(bm.getLabelURL().getFileName());;
-					} else
-						zefn = "label_" + determineBinaryFileName(t, substanceName, nm, bm);
+			if (!includeReferenceImages) {
+				bm.setLabelURL(null);
+			} else {
+				long t = nm.getParentSample().getRowId();
 				
-				final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
+				final String zefn;
+				try {
+					if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
+						zefn = "label_" + substanceName + "_" + bm.getLabelURL().getDetail() + getFileExtension(bm.getLabelURL().getFileName());
+					else
+						if (bm.getLabelURL().getPrefix().startsWith(LemnaTecFTPhandler.PREFIX)) {
+							String fn = bm.getLabelURL().getDetail();
+							zefn = "label_" + substanceName + "_" + fn.substring(fn.lastIndexOf("/") + "/".length())
+									+ getFileExtension(bm.getLabelURL().getFileName());;
+						} else
+							zefn = "label_" + determineBinaryFileName(t, substanceName, nm, bm);
+					
+					final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
+					
+					copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getLabelURL(), null, t, targetFile, targetFile.exists(), null);
+					
+				} catch (Exception e) {
+					System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE: " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
+					e.printStackTrace();
+					errorCount++;
+				}
+				long currTime = System.currentTimeMillis();
 				
-				copyBinaryFileContentToTarget(experiment, written, hsmManager, es, bm.getLabelURL(), null, t, targetFile, targetFile.exists(), null);
-				
-			} catch (Exception e) {
-				System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE: " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
-				e.printStackTrace();
-				errorCount++;
+				double speed = written.getLong() * 1000d / (currTime - startTime) / 1024d / 1024d;
+				status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
 			}
-			long currTime = System.currentTimeMillis();
-			
-			double speed = written.getLong() * 1000d / (currTime - startTime) / 1024d / 1024d;
-			status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
 		}
 		
 		// copy old reference label binary file (oldreference annotation)
@@ -310,41 +346,45 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			
 			if (oldRef == null || oldRef.isEmpty())
 				return idx;
-			
-			final IOurl oldRefUrl = new IOurl(oldRef);
-			
-			long t = nm.getParentSample().getRowId();
-			
-			final String zefn;
-			try {
-				if (oldRefUrl.getPrefix().startsWith("mongo_"))
-					zefn = "label_oldreference_" + substanceName + "_" + oldRefUrl.getDetail() + getFileExtension(oldRefUrl.getFileName());
-				else
-					if (oldRefUrl.getPrefix().startsWith(LemnaTecFTPhandler.PREFIX)) {
-						String fn = oldRefUrl.getDetail();
-						zefn = "label_oldreference_" + substanceName + "_" + fn.substring(fn.lastIndexOf("/") + "/".length())
-								+ getFileExtension(oldRefUrl.getFileName());;
-					} else
-						zefn = "label_oldreference_" + determineBinaryFileName(t, substanceName, nm, id);
+			if (!includeAnnotationImages) {
+				String updatedOldReference = "";
+				id.replaceAnnotationField("oldreference", updatedOldReference);
+			} else {
+				final IOurl oldRefUrl = new IOurl(oldRef);
 				
-				final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
-				Runnable postProcess = new Runnable() {
-					@Override
-					public void run() {
-						String updatedOldReference = oldRefUrl.toString();
-						id.replaceAnnotationField("oldreference", updatedOldReference);
-					}
-				};
-				copyBinaryFileContentToTarget(experiment, written, hsmManager, es, oldRefUrl, null, t, targetFile, targetFile.exists(), postProcess);
-			} catch (Exception e) {
-				System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE OF OLDREFERENCE: " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
-				e.printStackTrace();
-				errorCount++;
+				long t = nm.getParentSample().getRowId();
+				
+				final String zefn;
+				try {
+					if (oldRefUrl.getPrefix().startsWith("mongo_"))
+						zefn = "label_oldreference_" + substanceName + "_" + oldRefUrl.getDetail() + getFileExtension(oldRefUrl.getFileName());
+					else
+						if (oldRefUrl.getPrefix().startsWith(LemnaTecFTPhandler.PREFIX)) {
+							String fn = oldRefUrl.getDetail();
+							zefn = "label_oldreference_" + substanceName + "_" + fn.substring(fn.lastIndexOf("/") + "/".length())
+									+ getFileExtension(oldRefUrl.getFileName());;
+						} else
+							zefn = "label_oldreference_" + determineBinaryFileName(t, substanceName, nm, id);
+					
+					final File targetFile = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), t, zefn));
+					Runnable postProcess = new Runnable() {
+						@Override
+						public void run() {
+							String updatedOldReference = oldRefUrl.toString();
+							id.replaceAnnotationField("oldreference", updatedOldReference);
+						}
+					};
+					copyBinaryFileContentToTarget(experiment, written, hsmManager, es, oldRefUrl, null, t, targetFile, targetFile.exists(), postProcess);
+				} catch (Exception e) {
+					System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE OF OLDREFERENCE: " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
+					e.printStackTrace();
+					errorCount++;
+				}
+				long currTime = System.currentTimeMillis();
+				
+				double speed = written.getLong() * 1000d / (currTime - startTime) / 1024d / 1024d;
+				status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
 			}
-			long currTime = System.currentTimeMillis();
-			
-			double speed = written.getLong() * 1000d / (currTime - startTime) / 1024d / 1024d;
-			status.setCurrentStatusText2((written.getLong() / 1024 / 1024) + " MB, " + (int) speed + " MB/s");
 		}
 		
 		return idx;

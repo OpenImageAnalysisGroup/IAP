@@ -35,6 +35,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -51,6 +52,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
@@ -204,7 +206,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 					
-					JMenuItem debugPipelineTestShowImage = new JMenuItem("Show Old Reference");
+					JMenuItem debugPipelineTestShowImage = new JMenuItem("Show Annotation");
 					debugPipelineTestShowImage.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -222,6 +224,57 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										FlexibleImage fi = new FlexibleImage(u);
 										fi.print("Old Reference Image");
 									}
+								}
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+										"Error", JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugShowSnapshot = new JMenuItem("Main, Reference, Annotation (Stack)");
+					debugShowSnapshot.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
+										imageResult.getBinaryFileInfo().getFileNameMain(),
+										targetTreeNode.getExperiment());
+								if (match.size() > 0) {
+									FlexibleImageStack snapshot = new FlexibleImageStack();
+									for (NumericMeasurementInterface nmi : match) {
+										if (nmi instanceof ImageData) {
+											ImageData id = (ImageData) nmi;
+											if (id.getURL() != null) {
+												FlexibleImage fi = new FlexibleImage(id.getURL());
+												snapshot.addImage(id.getSubstanceName(), fi);
+											}
+										}
+									}
+									for (NumericMeasurementInterface nmi : match) {
+										if (nmi instanceof ImageData) {
+											ImageData id = (ImageData) nmi;
+											if (id.getLabelURL() != null) {
+												FlexibleImage fi = new FlexibleImage(id.getLabelURL());
+												snapshot.addImage("Reference " + id.getSubstanceName(), fi);
+											}
+										}
+									}
+									for (NumericMeasurementInterface nmi : match) {
+										if (nmi instanceof ImageData) {
+											ImageData id = (ImageData) nmi;
+											if (id.getAnnotationField("oldreference") != null) {
+												FlexibleImage fi = new FlexibleImage(new IOurl(id.getAnnotationField("oldreference")));
+												snapshot.addImage("Annotation " + id.getSubstanceName(), fi);
+											}
+										}
+									}
+									
+									NumericMeasurementInterface a = match.iterator().next();
+									snapshot.print("Snapshot " + a.getQualityAnnotation() + " " + a.getParentSample().getSampleTime() + " "
+											+ a.getParentSample().getParentCondition().getConditionName());
 								}
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
@@ -318,6 +371,24 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					jp.add(debugPipelineTestShowMainImage);
 					jp.add(debugPipelineTestShowRefernceImage);
 					jp.add(debugPipelineTestShowImage);
+					
+					JMenu sn = new JMenu("Snapshot");
+					JMenuItem a = new JMenuItem("Main");
+					a.addActionListener(getListener(targetTreeNode, true, false, false));
+					sn.add(a);
+					JMenuItem b = new JMenuItem("Reference");
+					b.addActionListener(getListener(targetTreeNode, false, true, false));
+					sn.add(b);
+					JMenuItem c = new JMenuItem("Annotation");
+					c.addActionListener(getListener(targetTreeNode, false, false, true));
+					sn.add(c);
+					
+					JMenuItem debugShowSnapshotNoStack = new JMenuItem("Main, Reference, Annotation");
+					debugShowSnapshotNoStack.addActionListener(getListener(targetTreeNode, true, true, true));
+					sn.add(debugShowSnapshotNoStack);
+					sn.add(debugShowSnapshot);
+					jp.add(sn);
+					
 					jp.add(debugPipelineTest1);
 					jp.add(debugPipelineTest2);
 					jp.add(debugPipelineTest3);
@@ -912,5 +983,59 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	public void setDownloadNeeded(boolean b) {
 		this.downloadNeeded = true;
 		myImage = null;
+	}
+	
+	private ActionListener getListener(final MongoTreeNode targetTreeNode, final boolean main, final boolean ref, final boolean anno) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
+							imageResult.getBinaryFileInfo().getFileNameMain(),
+							targetTreeNode.getExperiment());
+					if (match.size() > 0) {
+						NumericMeasurementInterface a = match.iterator().next();
+						String pre = "snapshot " + a.getQualityAnnotation() + " " +
+								a.getParentSample().getSampleTime() + " " + a.getParentSample().getParentCondition().getConditionName();
+						
+						if (main)
+							for (NumericMeasurementInterface nmi : match) {
+								if (nmi instanceof ImageData) {
+									ImageData id = (ImageData) nmi;
+									if (id.getURL() != null) {
+										FlexibleImage fi = new FlexibleImage(id.getURL());
+										fi.print(id.getSubstanceName() + " // " + pre);
+									}
+								}
+							}
+						if (ref)
+							for (NumericMeasurementInterface nmi : match) {
+								if (nmi instanceof ImageData) {
+									ImageData id = (ImageData) nmi;
+									if (id.getLabelURL() != null) {
+										FlexibleImage fi = new FlexibleImage(id.getLabelURL());
+										fi.print("Reference " + id.getSubstanceName() + " // " + pre);
+									}
+								}
+							}
+						if (anno)
+							for (NumericMeasurementInterface nmi : match) {
+								if (nmi instanceof ImageData) {
+									ImageData id = (ImageData) nmi;
+									if (id.getAnnotationField("oldreference") != null) {
+										FlexibleImage fi = new FlexibleImage(new IOurl(id.getAnnotationField("oldreference")));
+										fi.print("Annotation " + id.getSubstanceName() + " // " + pre);
+									}
+								}
+							}
+					}
+				} catch (Exception err) {
+					JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+							"Error", JOptionPane.INFORMATION_MESSAGE);
+					ErrorMsg.addErrorMessage(err);
+					return;
+				}
+			}
+		};
 	}
 }

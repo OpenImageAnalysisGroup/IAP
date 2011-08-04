@@ -54,4 +54,6 @@ public interface NavigationAction {
 	public boolean requestTitleUpdates();
 	
 	public ParameterOptions getParameters();
+	
+	public void setParameters(Object[] parameters);
 }
