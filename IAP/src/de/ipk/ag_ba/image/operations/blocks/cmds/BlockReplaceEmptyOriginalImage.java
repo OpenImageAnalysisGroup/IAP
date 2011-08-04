@@ -41,14 +41,14 @@ public class BlockReplaceEmptyOriginalImage extends AbstractBlock {
 			if (image.getIO().countFilledPixels() == 0) {
 				try {
 					image = new FlexibleImage(infoUrl);
-					image.getIO().addBorder(20, 0, 0, Color.RED.getRGB());
+					image.getIO().addBorder(50, 0, 0, Color.RED.getRGB());
 				} catch (Exception e) {
 					image = null;
 					getInput().getImages().getVisInfo().addAnnotationField("loaderror", e.getMessage());
 				}
 			}
 		}
-		if (image != null) {
+		if (image == null) {
 			int[] img = new int[sz * sz];
 			img = ImageOperation.fillArray(img, Color.WHITE.getRGB());
 			image = new FlexibleImage(img, sz, sz);
