@@ -19,10 +19,6 @@ public class Limb {
 		this.endpoint = endpoint;
 	}
 	
-	public Point getInitialpoint() {
-		return initialpoint;
-	}
-	
 	public void setInitialpoint(Point initialpoint) {
 		this.initialpoint = initialpoint;
 	}

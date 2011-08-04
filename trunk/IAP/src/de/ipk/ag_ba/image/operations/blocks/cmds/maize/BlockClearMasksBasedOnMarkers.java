@@ -60,12 +60,12 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			if (clearSides)
 				if (markerPosLeftX != null) {
 					result = new ImageOperation(result).clearImageLeft(
-								(int) (50 + markerPosLeftX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
+								(int) (-120 + markerPosLeftX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
 				}
 			if (clearSides)
 				if (markerPosRightX != null) {
 					result = new ImageOperation(result).clearImageRight(
-								(int) (-50 + markerPosRightX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
+								(int) (120 + markerPosRightX.getValue() * getInput().getMasks().getVis().getWidth()), options.getBackground()).getImage();
 				}
 			return result;
 		}
