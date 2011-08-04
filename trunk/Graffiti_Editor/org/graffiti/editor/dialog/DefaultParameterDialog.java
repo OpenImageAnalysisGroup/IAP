@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: DefaultParameterDialog.java,v 1.1 2011-01-31 09:04:31 klukas Exp $
+// $Id: DefaultParameterDialog.java,v 1.2 2011-08-04 11:30:02 klukas Exp $
 
 package org.graffiti.editor.dialog;
 
@@ -65,7 +65,7 @@ import org.graffiti.session.Session;
 /**
  * The default implementation of a parameter dialog.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class DefaultParameterDialog extends AbstractParameterDialog implements
 					ActionListener, WindowListener {
@@ -549,65 +549,64 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 		Parameter[] p = new Parameter[parameters.length / 2];
 		for (int i = 0; i < p.length; i++) {
 			Object desc = parameters[i * 2];
+			String nameTitle, nameTooltip;
+			String nameDesc = (String) desc;
+			if (nameDesc.indexOf("@@") > 0) {
+				nameTitle = nameDesc.substring(0, nameDesc.indexOf("@@"));
+				nameTooltip = nameDesc.substring(nameDesc.indexOf("@@") + "@@".length());
+			} else {
+				nameTitle = nameDesc;
+				nameTooltip = nameDesc;
+			}
 			Object param = parameters[i * 2 + 1];
 			if (param instanceof JComponent) {
 				JComponent val = (JComponent) param;
-				String name = (String) desc;
-				JComponentParameter sp = new JComponentParameter(val, name, name);
+				JComponentParameter sp = new JComponentParameter(val, nameTitle, nameTooltip);
 				p[i] = sp;
 			} else
 				if (param instanceof String) {
 					String val = (String) param;
-					String name = (String) desc;
-					StringParameter sp = new StringParameter(val, name, name);
+					StringParameter sp = new StringParameter(val, nameTitle, nameTooltip);
 					p[i] = sp;
 				} else
 					if (param instanceof Double) {
 						Double val = (Double) param;
-						String name = (String) desc;
-						DoubleParameter dp = new DoubleParameter(val, name, name);
+						DoubleParameter dp = new DoubleParameter(val, nameTitle, nameTooltip);
 						p[i] = dp;
 					} else
 						if (param instanceof Node) {
 							Node val = (Node) param;
-							String name = (String) desc;
-							NodeParameter ip = new NodeParameter(val.getGraph(), val, name, name);
+							NodeParameter ip = new NodeParameter(val.getGraph(), val, nameTitle, nameTooltip);
 							p[i] = ip;
 						} else
 							if (param instanceof Edge) {
 								Edge val = (Edge) param;
-								String name = (String) desc;
-								EdgeParameter ip = new EdgeParameter(val, name, name);
+								EdgeParameter ip = new EdgeParameter(val, nameTitle, nameTooltip);
 								p[i] = ip;
 							} else
 								if (param instanceof Integer) {
 									Integer val = (Integer) param;
-									String name = (String) desc;
-									IntegerParameter ip = new IntegerParameter(val, name, name);
+									IntegerParameter ip = new IntegerParameter(val, nameTitle, nameTooltip);
 									p[i] = ip;
 								} else
 									if (param instanceof List) {
 										List val = (List) param;
-										String name = (String) desc;
-										ObjectListParameter ip = new ObjectListParameter(val.size() > 0 ? val.get(0) : null, name, name, val);
+										ObjectListParameter ip = new ObjectListParameter(val.size() > 0 ? val.get(0) : null, nameTitle, nameTooltip, val);
 										p[i] = ip;
 									} else
 										if (param instanceof Set) {
 											Set val = (Set) param;
-											String name = (String) desc;
-											ObjectListParameter ip = new ObjectListParameter(val.size() > 0 ? val.iterator().next() : null, name, name, val);
+											ObjectListParameter ip = new ObjectListParameter(val.size() > 0 ? val.iterator().next() : null, nameTitle, nameTooltip, val);
 											p[i] = ip;
 										} else
 											if (param instanceof Color) {
 												Color c = (Color) param;
-												String name = (String) desc;
-												ColorParameter sp = new ColorParameter(c, name, name);
+												ColorParameter sp = new ColorParameter(c, nameTitle, nameTooltip);
 												p[i] = sp;
 											} else
 												if (param instanceof Boolean) {
 													Boolean val = (Boolean) param;
-													String name = (String) desc;
-													BooleanParameter ip = new BooleanParameter(val, name, name);
+													BooleanParameter ip = new BooleanParameter(val, nameTitle, nameTooltip);
 													p[i] = ip;
 												}
 		}
