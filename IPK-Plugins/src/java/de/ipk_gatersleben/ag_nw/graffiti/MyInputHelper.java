@@ -24,6 +24,8 @@ public class MyInputHelper implements HelperClass {
 	 *           starts with "[Hello]", the single OK Button will be titled
 	 *           "Hello". If the description starts with [Yes;No], two buttons,
 	 *           titles 'Yes' and 'No' will be shown.
+	 *           Parameter descriptions may optionally be specified as
+	 *           title@@tooltip.
 	 * @param title
 	 *           The shown dialog window will use this value as its window title.
 	 * @param parameters
