@@ -154,4 +154,10 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	public ParameterOptions getParameters() {
 		return remoteAction == null ? null : remoteAction.getParameters();
 	}
+	
+	@Override
+	public void setParameters(Object[] parameters) {
+		//
+	}
+	
 }

@@ -38,6 +38,7 @@ import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.actions.BookmarkAction;
 import de.ipk.ag_ba.gui.actions.Calendar2;
+import de.ipk.ag_ba.gui.actions.ParameterOptions;
 import de.ipk.ag_ba.gui.calendar.MyCalendarIcon;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -47,6 +48,7 @@ import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.ProgressStatusService;
 
@@ -402,140 +404,155 @@ public class NavigationButton implements StyleAware {
 			MyUtility.navigate(navPanel.getEntitySet(false), srcNavGraphicslEntity.getTitle());
 			final NavigationAction na = srcNavGraphicslEntity.getAction();
 			
-			BackgroundTaskHelper.issueSimpleTask(srcNavGraphicslEntity.getTitle(), "Please wait...", new Runnable() {
-				public void run() {
-					try {
-						na.performActionCalculateResults(srcNavGraphicslEntity);
-						// Thread.sleep(10000);
-					} catch (Exception e) {
-						if (n1 != null)
-							n1.setText("Error");
-						ErrorMsg.addErrorMessage(e);
+			boolean execute = true;
+			ParameterOptions params = na.getParameters();
+			if (params != null && params.userRequestNeeded()) {
+				Object[] res = MyInputHelper.getInput(params.getDescription(), srcNavGraphicslEntity.getTitle(), params.getParameterField());
+				if (res == null) {
+					execute = false;
+					srcNavGraphicslEntity.setProcessing(false);
+					if (n1 != null)
+						n1.setText(srcNavGraphicslEntity.getTitle());
+					srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(100);
+				} else
+					na.setParameters(res);
+			}
+			
+			if (execute)
+				BackgroundTaskHelper.issueSimpleTask(srcNavGraphicslEntity.getTitle(), "Please wait...", new Runnable() {
+					public void run() {
+						try {
+							na.performActionCalculateResults(srcNavGraphicslEntity);
+							// Thread.sleep(10000);
+						} catch (Exception e) {
+							if (n1 != null)
+								n1.setText("Error");
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
-				}
-			}, new Runnable() {
-				public void run() {
-					try {
-						boolean reload = false;
-						MainPanelComponent mpc = na.getResultMainPanel();
-						if (mpc != null) {
-							graphPanel.setEnabled(false);
-							graphPanel.setVisible(false);
-							graphPanel.removeAll();
-							JComponent gui = mpc.getGUI();
-							if (ErrorMsg.getErrorMsgCount() > 0) {
-								ArrayList<JComponent> errors = new ArrayList<JComponent>();
-								for (String s : ErrorMsg.getErrorMessages()) {
-									JLabel e = new JLabel("<html><table><tr><td>"
-														+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
-																			.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
-									e.setOpaque(true);
-									e.setBackground(new Color(255, 240, 240));
-									e.setBorder(BorderFactory.createLoweredBevelBorder());
-									errors.add(e);
-								}
-								ErrorMsg.clearErrorMessages();
-								gui = TableLayout.getSplitVertical(TableLayout.getMultiSplitVertical(errors, 2), gui,
-													TableLayout.PREFERRED, TableLayout.FILL);
-							}
-							graphPanel.add(gui, "0,0");
-							graphPanel.validate();
-							graphPanel.setEnabled(true);
-							graphPanel.setVisible(true);
-							graphPanel.repaint();
-						} else {
-							if (ErrorMsg.getErrorMsgCount() > 0) {
+				}, new Runnable() {
+					public void run() {
+						try {
+							boolean reload = false;
+							MainPanelComponent mpc = na.getResultMainPanel();
+							if (mpc != null) {
 								graphPanel.setEnabled(false);
 								graphPanel.setVisible(false);
 								graphPanel.removeAll();
-								ArrayList<JComponent> errors = new ArrayList<JComponent>();
-								for (String s : ErrorMsg.getErrorMessages()) {
-									JLabel e = new JLabel("<html><table><tr><td>"
+								JComponent gui = mpc.getGUI();
+								if (ErrorMsg.getErrorMsgCount() > 0) {
+									ArrayList<JComponent> errors = new ArrayList<JComponent>();
+									for (String s : ErrorMsg.getErrorMessages()) {
+										JLabel e = new JLabel("<html><table><tr><td>"
 														+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
 																			.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
-									e.setOpaque(true);
-									e.setBackground(new Color(255, 240, 240));
-									e.setBorder(BorderFactory.createLoweredBevelBorder());
-									errors.add(e);
+										e.setOpaque(true);
+										e.setBackground(new Color(255, 240, 240));
+										e.setBorder(BorderFactory.createLoweredBevelBorder());
+										errors.add(e);
+									}
+									ErrorMsg.clearErrorMessages();
+									gui = TableLayout.getSplitVertical(TableLayout.getMultiSplitVertical(errors, 2), gui,
+													TableLayout.PREFERRED, TableLayout.FILL);
 								}
-								ErrorMsg.clearErrorMessages();
-								
-								JComponent gui = TableLayout.getMultiSplitVertical(errors, 2);
-								
 								graphPanel.add(gui, "0,0");
 								graphPanel.validate();
 								graphPanel.setEnabled(true);
 								graphPanel.setVisible(true);
 								graphPanel.repaint();
-							}
-						}
-						
-						if (target == PanelTarget.NAVIGATION) {
-							ArrayList<NavigationButton> prior = new ArrayList<NavigationButton>();
-							boolean includeBookmarks = false;
-							ArrayList<NavigationButton> var = navPanel.getEntitySet(includeBookmarks);
-							if (var != null)
-								for (final NavigationButton ss : var) {
-									if (ss != srcNavGraphicslEntity)
-										prior.add(ss);
-									else
-										break;
-								}
-							ArrayList<NavigationButton> res = na.getResultNewNavigationSet(prior);
-							if (res != null && res.size() > 0 && res.get(res.size() - 1) == null) {
-								String path = MyNavigationPanel.getTargetPath(res);
-								IAPgui.navigateTo(path, NavigationButton.this);
-							} else
-								navPanel.setEntitySet(res);
-						} else {
-							boolean includeBookmarks = false;
-							ArrayList<NavigationButton> var = navPanel.getEntitySet(includeBookmarks);
-							ArrayList<NavigationButton> set = na.getResultNewNavigationSet(var);
-							boolean execute = false;
-							NavigationButton del = null;
-							if (set != null)
-								if (set != null && set.size() > 0 && set.get(set.size() - 1) == null) {
-									String path = MyNavigationPanel.getTargetPath(set);
-									IAPgui.navigateTo(path, NavigationButton.this);
-									reload = true;
-								} else {
-									for (final NavigationButton src : set) {
-										if (execute) {
-											del = src;
-											SwingUtilities.invokeLater(new Runnable() {
-												@Override
-												public void run() {
-													src.executeNavigation(target, navPanel, actionPanel, graphPanel, n1, null, true);
-												}
-											});
-											break;
-										}
-										if (src == srcNavGraphicslEntity)
-											execute = !recursive;
+							} else {
+								if (ErrorMsg.getErrorMsgCount() > 0) {
+									graphPanel.setEnabled(false);
+									graphPanel.setVisible(false);
+									graphPanel.removeAll();
+									ArrayList<JComponent> errors = new ArrayList<JComponent>();
+									for (String s : ErrorMsg.getErrorMessages()) {
+										JLabel e = new JLabel("<html><table><tr><td>"
+														+ StringManipulationTools.removeHTMLtags(s.replaceAll("<br>", "_br_"))
+																			.replaceAll("_br_", "<br>").replaceAll("\n", "<br>"));
+										e.setOpaque(true);
+										e.setBackground(new Color(255, 240, 240));
+										e.setBorder(BorderFactory.createLoweredBevelBorder());
+										errors.add(e);
 									}
-									if (del != null)
-										set.remove(del);
-									navPanel.setEntitySet(set);
+									ErrorMsg.clearErrorMessages();
+									
+									JComponent gui = TableLayout.getMultiSplitVertical(errors, 2);
+									
+									graphPanel.add(gui, "0,0");
+									graphPanel.validate();
+									graphPanel.setEnabled(true);
+									graphPanel.setVisible(true);
+									graphPanel.repaint();
 								}
+							}
+							
+							if (target == PanelTarget.NAVIGATION) {
+								ArrayList<NavigationButton> prior = new ArrayList<NavigationButton>();
+								boolean includeBookmarks = false;
+								ArrayList<NavigationButton> var = navPanel.getEntitySet(includeBookmarks);
+								if (var != null)
+									for (final NavigationButton ss : var) {
+										if (ss != srcNavGraphicslEntity)
+											prior.add(ss);
+										else
+											break;
+									}
+								ArrayList<NavigationButton> res = na.getResultNewNavigationSet(prior);
+								if (res != null && res.size() > 0 && res.get(res.size() - 1) == null) {
+									String path = MyNavigationPanel.getTargetPath(res);
+									IAPgui.navigateTo(path, NavigationButton.this);
+								} else
+									navPanel.setEntitySet(res);
+							} else {
+								boolean includeBookmarks = false;
+								ArrayList<NavigationButton> var = navPanel.getEntitySet(includeBookmarks);
+								ArrayList<NavigationButton> set = na.getResultNewNavigationSet(var);
+								boolean execute = false;
+								NavigationButton del = null;
+								if (set != null)
+									if (set != null && set.size() > 0 && set.get(set.size() - 1) == null) {
+										String path = MyNavigationPanel.getTargetPath(set);
+										IAPgui.navigateTo(path, NavigationButton.this);
+										reload = true;
+									} else {
+										for (final NavigationButton src : set) {
+											if (execute) {
+												del = src;
+												SwingUtilities.invokeLater(new Runnable() {
+													@Override
+													public void run() {
+														src.executeNavigation(target, navPanel, actionPanel, graphPanel, n1, null, true);
+													}
+												});
+												break;
+											}
+											if (src == srcNavGraphicslEntity)
+												execute = !recursive;
+										}
+										if (del != null)
+											set.remove(del);
+										navPanel.setEntitySet(set);
+									}
+							}
+							if (!reload) {
+								ArrayList<NavigationButton> actions = na.getResultNewActionSet();
+								if (actions != null && na.getAdditionalEntities() != null)
+									actions.addAll(na.getAdditionalEntities());
+								actionPanel.setEntitySet(actions);
+							}
+							if (optFinishAction != null) {
+								BackgroundTaskHelper.executeLaterOnSwingTask(10, optFinishAction);
+							}
+							
+						} finally {
+							srcNavGraphicslEntity.setProcessing(false);
+							if (n1 != null)
+								n1.setText(srcNavGraphicslEntity.getTitle());
+							srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(100);
 						}
-						if (!reload) {
-							ArrayList<NavigationButton> actions = na.getResultNewActionSet();
-							if (actions != null && na.getAdditionalEntities() != null)
-								actions.addAll(na.getAdditionalEntities());
-							actionPanel.setEntitySet(actions);
-						}
-						if (optFinishAction != null) {
-							BackgroundTaskHelper.executeLaterOnSwingTask(10, optFinishAction);
-						}
-						
-					} finally {
-						srcNavGraphicslEntity.setProcessing(false);
-						if (n1 != null)
-							n1.setText(srcNavGraphicslEntity.getTitle());
-						srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(100);
 					}
-				}
-			}, srcNavGraphicslEntity.getAction().getStatusProvider());
+				}, srcNavGraphicslEntity.getAction().getStatusProvider());
 		}
 	}
 	
