@@ -287,7 +287,7 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 		String a = getAnnotation();
 		if (a != null) {
 			String anno = a;
-			String[] fields = anno.split(",");
+			String[] fields = anno.split(";");
 			for (String f : fields) {
 				String[] nn = f.split("#", 2);
 				if (nn[0].equals(key))
@@ -300,13 +300,13 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 	public synchronized void addAnnotationField(String key, String value) {
 		if (key == null || value == null)
 			return;
-		if (value.contains(","))
-			throw new UnsupportedOperationException("annotation field value must not contain a commata character");
+		if (value.contains(";"))
+			throw new UnsupportedOperationException("annotation field value must not contain the ;-character");
 		String a = getAnnotation();
 		if (a == null)
 			a = key + "#" + value;
 		else
-			a += "," + key + "#" + value;
+			a += ";" + key + "#" + value;
 		setAnnotation(a);
 	}
 	
@@ -316,15 +316,15 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 		boolean found = false;
 		StringBuilder res = new StringBuilder();
 		String a = getAnnotation();
-		if (value.contains(","))
+		if (value.contains(";"))
 			throw new UnsupportedOperationException("annotation field value must not contain a commata character");
 		if (a != null) {
 			String anno = a;
-			String[] fields = anno.split(",");
+			String[] fields = anno.split(";");
 			for (String f : fields) {
 				String[] nn = f.split("#", 2);
 				if (res.length() > 0)
-					res.append(",");
+					res.append(";");
 				res.append(nn[0]);
 				if (nn[0].equals(key)) {
 					res.append("#" + value);
