@@ -2536,6 +2536,10 @@ public class ImageOperation {
 	 *           minimal A and B value
 	 */
 	public float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
+		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, mode, 0);
+	}
+	
+	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode, int recursion) {
 		int r, g, b;
 		float Li, ai, bi;
 		
@@ -2574,8 +2578,8 @@ public class ImageOperation {
 				}
 			}
 		}
-		if (count < w * h * 0.1) {
-			return getRGBAverage(x1, y1, w, h, LThresh * 2, (int) (ABThresh * 1.1), mode);
+		if (count < w * h * 0.1 && recursion < 30) {
+			return getRGBAverage(x1, y1, w, h, LThresh * 2, (int) (ABThresh * 1.1), mode, recursion + 1);
 		}
 		if (count > 0)
 			return new float[] { sumR / 255f / count, sumG / 255f / count, sumB / 255f / count };
