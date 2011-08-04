@@ -2132,9 +2132,9 @@ public class MongoDB {
 				ArrayList<ExperimentHeaderInterface> el = getExperimentList(null);
 				HashSet<String> linkedHashes = new HashSet<String>();
 				double smallStep = 100d / 5 * 1 / el.size();
-				for (ExperimentHeaderInterface ehi : el) {
-					status.setCurrentStatusText2("Analyze " + ehi.getExperimentName());
-					ExperimentInterface exp = getExperiment(ehi);
+				for (ExperimentHeaderInterface ehii : el) {
+					status.setCurrentStatusText2("Analyze " + ehii.getExperimentName());
+					ExperimentInterface exp = getExperiment(ehii);
 					List<NumericMeasurementInterface> binaryData = Substance3D.getAllFiles(exp);
 					for (NumericMeasurementInterface nmi : binaryData) {
 						if (nmi instanceof BinaryMeasurement) {
@@ -2143,6 +2143,14 @@ public class MongoDB {
 								linkedHashes.add(bm.getURL().getDetail());
 							if (bm.getLabelURL() != null)
 								linkedHashes.add(bm.getLabelURL().getDetail());
+							if (nmi instanceof ImageData) {
+								ImageData imData = (ImageData) nmi;
+								String oldRef = imData.getAnnotationField("oldreference");
+								if (oldRef != null && oldRef.length() > 0) {
+									IOurl u = new IOurl(oldRef);
+									linkedHashes.add(u.getDetail());
+								}
+							}
 						}
 					}
 					status.setCurrentStatusValueFineAdd(smallStep);
