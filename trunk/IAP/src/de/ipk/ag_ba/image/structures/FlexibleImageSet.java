@@ -15,7 +15,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * Holds up to three images (Vis/Fluo/NIR). Makes it more easy to process a
- * snapshot and to relate images of differnt kinds.
+ * snapshot and to relate images of different kinds.
  * 
  * @author klukas
  */
