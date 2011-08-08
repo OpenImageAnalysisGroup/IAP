@@ -127,6 +127,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 40);
 		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 90);
 		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 90);
+		options.clearAndAddIntSetting(Setting.B_Diff_NIR, 20); // 30
+		options.clearAndAddIntSetting(Setting.W_Diff_NIR, 23); // 33
 		
 		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1104);
 	}

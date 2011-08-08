@@ -5,7 +5,10 @@ import ij.measure.ResultsTable;
 import java.awt.Color;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -38,7 +41,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		skel2d.findEndpointsAndBranches();
 		skel2d.print("endpoints and branches", debug);
 		// skel2d.removeBurls();
-		skel2d.deleteShortEndLimbs(15, 2);
+		skel2d.deleteShortEndLimbs(20);
 		skel2d.calculateEndlimbsRecursive();
 		
 		int leafcount = skel2d.endlimbs.size();
@@ -46,24 +49,30 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		int leaflength = fires.getIO().countFilledPixels(skel2d.background);
 		
 		// ***Out***
-		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength);
+		System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
 		FlexibleImage result = MapOriginalOnSkelUseingMedian(fires, vis, Color.BLACK.getRGB());
 		result.print("res", debug);
 		FlexibleImage result2 = copyONOriginalImage(fires, vis, Color.BLACK.getRGB());
 		result2.print("res2", debug);
 		
 		// ***Saved***
+		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
+		double normFactor = distHorizontal != null ? options.getIntSetting(Setting.REAL_MARKER_DISTANCE) / distHorizontal.getValue() : 1;
 		ResultsTable rt = new ResultsTable();
 		rt.incrementCounter();
 		rt.addValue("leaf.count", leafcount);
-		if (leafcount > 0)
+		if (leafcount > 0) {
+			if (distHorizontal != null)
+				rt.addValue("leaf.length.sum.norm", leaflength * normFactor);
 			rt.addValue("leaf.length.sum", leaflength);
-		else
+		} else
 			rt.addValue("leaf.length.sum", 0);
 		
-		if (leafcount > 0)
+		if (leafcount > 0) {
+			if (distHorizontal != null)
+				rt.addValue("leaf.length.avg.norm", leaflength * normFactor / leafcount);
 			rt.addValue("leaf.length.avg", leaflength / leafcount);
-		else
+		} else
 			rt.addValue("leaf.length.avg", 0);
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)

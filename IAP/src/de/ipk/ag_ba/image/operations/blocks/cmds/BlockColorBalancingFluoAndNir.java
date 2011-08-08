@@ -14,6 +14,15 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlockFIS {
 	
+	BlockProperty bpleft, bpright;
+	
+	@Override
+	protected void prepare() {
+		super.prepare();
+		bpleft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
+		bpright = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
+	}
+	
 	@Override
 	protected FlexibleImage processFLUOimage() {
 		FlexibleImage input = getInput().getImages().getFluo();
@@ -64,7 +73,8 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 	 * 
 	 * @author pape
 	 */
-	public static double[] getProbablyWhitePixels(FlexibleImage image, double size, double MarkerPosX, double MarkerPosY) {
+	private static double[] getProbablyWhitePixels(FlexibleImage image, double size, double MarkerPosX, double MarkerPosY, BlockProperty bpleft,
+			BlockProperty bpright) {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		int w = (int) (width * size);
@@ -72,23 +82,38 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 		
 		ImageOperation io = new ImageOperation(image);
 		
-		float[] valuesleft;
-		double r, b, g;
+		// float[] valuesleft;
+		// double r, b, g;
+		//
+		// if (MarkerPosX == -1) {
+		// valuesleft = io.getRGBAverage(20, h, w, height - 2 * h, 150, 50, true);
+		// float[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true);
+		//
+		// r = (valuesleft[0] + valuesright[0]) / 2;
+		// g = (valuesleft[1] + valuesright[1]) / 2;
+		// b = (valuesleft[2] + valuesright[2]) / 2;
+		// } else {
+		// valuesleft = io.getRGBAverage((int) MarkerPosX, (int) MarkerPosY, 50, 50, 150, 50, true);
 		
-		if (MarkerPosX == -1) {
-			valuesleft = io.getRGBAverage(20, h, w, height - 2 * h, 150, 50, true);
-			float[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true);
+		float[] values;
+		if (bpleft != null && bpright != null) {
+			int left = (int) (bpleft.getValue() * width);
+			int right = (int) (bpright.getValue() * width);
+			int a = (right - left) / 4;
+			int b = right - left;
 			
-			r = (valuesleft[0] + valuesright[0]) / 2;
-			g = (valuesleft[1] + valuesright[1]) / 2;
-			b = (valuesleft[2] + valuesright[2]) / 2;
+			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, 150, 50, true);
 		} else {
-			valuesleft = io.getRGBAverage((int) MarkerPosX, (int) MarkerPosY, 50, 50, 150, 50, true);
+			int left = (int) (0.3 * width);
+			int right = (int) (width - 0.3 * width);
+			int a = (right - left) / 4;
+			int b = right - left;
 			
-			r = valuesleft[0];
-			g = valuesleft[1];
-			b = valuesleft[2];
+			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, 150, 50, true);
 		}
+		double r = values[0];
+		double g = values[1];
+		double b = values[2];
 		// no function tested
 		// double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
 		// double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);
@@ -100,8 +125,9 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 		return new double[] { r * 255, g * 255, b * 255 };
 	}
 	
-	public static double[] getProbablyWhitePixels(FlexibleImage image, double size) {
-		double[] res = getProbablyWhitePixels(image, size, -1., -1);
+	private static double[] getProbablyWhitePixels(FlexibleImage image, double size, BlockProperty bpleft,
+			BlockProperty bpright) {
+		double[] res = getProbablyWhitePixels(image, size, -1., -1, bpleft, bpleft);
 		return res;
 	}
 	
@@ -132,10 +158,10 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 				double[] pix;
 				if (invert) {
 					ImageOperation io = new ImageOperation(input);
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, bpleft, bpright);
 					return io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else {
-					pix = BlockColorBalancingFluoAndNir.getProbablyWhitePixels(inputUsedForColorAnalysis.crop(), side);// 0.08);
+					pix = BlockColorBalancingFluoAndNir.getProbablyWhitePixels(inputUsedForColorAnalysis.crop(), side, bpleft, bpright);// 0.08);
 					res = new ImageOperation(nir).imageBalancing(whitePoint, pix).getImage();
 				}
 			}
@@ -160,18 +186,18 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 			double[] pix;
 			if (markerPosY != -1)
 				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, markerPosX, markerPosY);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, markerPosX, markerPosY, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, 0.08, markerPosX, markerPosY);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, 0.08, markerPosX, markerPosY, bpleft, bpright);
 					res = io.imageBalancing(whitePoint, pix).getImage();
 				}
 			else
 				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, 0.08);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, 0.08, bpleft, bpright);
 					res = io.imageBalancing(whitePoint, pix).getImage();
 				}
 		}

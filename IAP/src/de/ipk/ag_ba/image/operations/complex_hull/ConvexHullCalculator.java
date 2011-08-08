@@ -132,10 +132,10 @@ public class ConvexHullCalculator {
 			rt.addValue("hull.points", numberOfHullPoints);
 			int filledArea = io.countFilledPixels();
 			if (filledArea > 0)
-				rt.addValue("compactness", 4 * Math.PI / (borderPixels * borderPixels / filledArea));
-			
+				rt.addValue("compactness.01", 4 * Math.PI / (borderPixels * borderPixels / filledArea));
+			rt.addValue("compactness.16", (borderPixels * borderPixels / filledArea));
 			if (distHorizontal != null) {
-				rt.addValue("area.norm", filledArea * normFactor);
+				rt.addValue("area.norm", filledArea * normFactorArea);
 				rt.addValue("hull.area.norm", polygon.area() * normFactorArea);
 				rt.addValue("border.length.norm", borderPixels * normFactor);
 			}
