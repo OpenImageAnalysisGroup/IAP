@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
+import java.util.TreeMap;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -17,4 +19,6 @@ public interface ImageAnalysisBlockFIS {
 	public BlockProperties getProperties();
 	
 	public int getBlockPosition();
+	
+	public void postProcessResultsForAllAngles(TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult);
 }

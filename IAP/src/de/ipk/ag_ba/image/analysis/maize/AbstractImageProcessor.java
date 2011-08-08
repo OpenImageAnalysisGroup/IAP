@@ -3,6 +3,8 @@
  *************************************************************************/
 package de.ipk.ag_ba.image.analysis.maize;
 
+import java.util.TreeMap;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
@@ -72,4 +74,10 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	}
 	
 	protected abstract BlockPipeline getPipeline(ImageProcessorOptions options);
+	
+	@Override
+	public BlockProperties postProcessPipelineResults(TreeMap<Double, BlockProperties> analysisResults) throws InstantiationException, IllegalAccessException {
+		BlockPipeline pipeline = getPipeline(null);
+		return pipeline.postProcessPipelineResultsForAllAngles(analysisResults);
+	}
 }

@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.analysis.maize;
 
+import java.util.TreeMap;
+
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
@@ -21,4 +23,7 @@ public interface ImageProcessor {
 	public abstract void setStatus(BackgroundTaskStatusProviderSupportingExternalCall status);
 	
 	public abstract BackgroundTaskStatusProviderSupportingExternalCall getStatus();
+	
+	public abstract BlockProperties postProcessPipelineResults(TreeMap<Double, BlockProperties> analysisResults) throws InstantiationException,
+			IllegalAccessException;
 }
