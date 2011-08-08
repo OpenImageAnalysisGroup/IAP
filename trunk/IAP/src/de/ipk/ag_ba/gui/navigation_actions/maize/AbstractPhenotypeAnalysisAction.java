@@ -93,7 +93,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			ImageAnalysisTask task = getImageAnalysisTask();
 			
-			task.setInput(workload, m, workOnSubset, numberOfSubsets);
+			task.setInput(workload, null, m, workOnSubset, numberOfSubsets);
 			task.performAnalysis(pi, ti, status);
 			
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();

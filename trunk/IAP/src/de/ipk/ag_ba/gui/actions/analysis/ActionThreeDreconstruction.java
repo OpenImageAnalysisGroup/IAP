@@ -12,10 +12,9 @@ import de.ipk.ag_ba.gui.ImageAnalysis3D;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionMongoOrLemnaTecExperimentNavigation;
-import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -31,16 +30,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import display.DisplayHistogram;
 
 /**
@@ -78,13 +74,11 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 			return;
 		voxelresolution = (Integer) inp[0];
 		widthFactor = (Integer) inp[1];
-		
+		ArrayList<Sample3D> workset = new ArrayList<Sample3D>();
 		try {
 			ExperimentInterface res = experiment.getData(m).clone();
 			
 			// src.title = src.title + ": processing";
-			
-			HashMap<Sample3D, ArrayList<NumericMeasurementInterface>> workset = new HashMap<Sample3D, ArrayList<NumericMeasurementInterface>>();
 			
 			for (SubstanceInterface m : res) {
 				Substance3D m3 = (Substance3D) m;
@@ -92,57 +86,35 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.IMAGE)) {
-							if (md instanceof ImageData) {
-								ImageData i = (ImageData) md;
-								ImageConfiguration ic = ImageConfiguration.get(i.getSubstanceName());
-								if (ic == ImageConfiguration.Unknown)
-									ic = ImageConfiguration.get(i.getURL().getFileName());
-								if (!(ic == ImageConfiguration.RgbSide || ic == ImageConfiguration.FluoSide || ic == ImageConfiguration.NirSide))
-									continue;
-								if (workset.get(sd3) == null)
-									workset.put(sd3, new ArrayList<NumericMeasurementInterface>());
-								workset.get(sd3).add(i);
-							}
-						}
+						workset.add(sd3);
 					}
 				}
 			}
 			
 			ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
 			
-			for (Sample3D s3d : workset.keySet()) {
-				
-				ArrayList<NumericMeasurementInterface> workload = workset.get(s3d);
-				
-				if (workload.size() < 1)
-					continue;
-				
-				VolumeStatistics volumeStatistics = new VolumeStatistics();
-				
-				DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
-				
-				ThreeDreconstruction threeDreconstructionTask = new ThreeDreconstruction(saveVolumesToDB);
-				threeDreconstructionTask.setInput(workload, m, 0, 1);
-				threeDreconstructionTask.setResolution(voxelresolution, widthFactor);
-				threeDreconstructionTask.addResultProcessor(volumeStatistics);
-				
-				threeDreconstructionTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 2, status);
-				
-				System.out.println("Process Sample: " + s3d.toString() + " Substance: " + s3d.getParentCondition().getParentSubstance().getName());
-				
-				HashMap<ImageAnalysisTask, ArrayList<NumericMeasurementInterface>> volumeStatisticsResults =
+			VolumeStatistics volumeStatistics = new VolumeStatistics();
+			
+			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
+			
+			ThreeDreconstruction threeDreconstructionTask = new ThreeDreconstruction(saveVolumesToDB);
+			threeDreconstructionTask.setInput(workset, null, m, 0, 1);
+			threeDreconstructionTask.setResolution(voxelresolution, widthFactor);
+			threeDreconstructionTask.addResultProcessor(volumeStatistics);
+			
+			threeDreconstructionTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 2, status);
+			
+			HashMap<ImageAnalysisTask, ArrayList<NumericMeasurementInterface>> volumeStatisticsResults =
 						threeDreconstructionTask.getAdditionalResults();
-				
-				ArrayList<NumericMeasurementInterface> statRes = volumeStatisticsResults.get(volumeStatistics);
-				if (statRes == null) {
-					// ErrorMsg.addErrorMessage("Error: no statistics result");
-				} else {
-					// add volumes (if available)
-					statRes.addAll(threeDreconstructionTask.getOutput());
-					for (NumericMeasurementInterface m : statRes) {
-						newStatisticsData.add(new MappingData3DPath(m));
-					}
+			
+			ArrayList<NumericMeasurementInterface> statRes = volumeStatisticsResults.get(volumeStatistics);
+			if (statRes == null) {
+				// ErrorMsg.addErrorMessage("Error: no statistics result");
+			} else {
+				// add volumes (if available)
+				statRes.addAll(threeDreconstructionTask.getOutput());
+				for (NumericMeasurementInterface m : statRes) {
+					newStatisticsData.add(new MappingData3DPath(m));
 				}
 			}
 			

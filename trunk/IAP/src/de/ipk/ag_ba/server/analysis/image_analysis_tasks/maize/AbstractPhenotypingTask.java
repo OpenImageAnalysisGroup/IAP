@@ -58,7 +58,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private ArrayList<FlexibleImageStack> forcedDebugStacks;
 	
 	@Override
-	public void setInput(Collection<Sample3D> input, MongoDB m, int workOnSubset, int numberOfSubsets) {
+	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m, int workOnSubset,
+			int numberOfSubsets) {
 		this.input = input;
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
@@ -332,28 +333,29 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void addSideImagesToWorkset(ArrayList<ImageSet> workload, int max) {
 		TreeMap<String, ImageSet> replicateId2ImageSetSide = new TreeMap<String, ImageSet>();
-		for (Measurement md : input) {
-			if (md instanceof ImageData) {
-				ImageData id = (ImageData) md;
-				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
-				if (!replicateId2ImageSetSide.containsKey(key)) {
-					replicateId2ImageSetSide.put(key, new ImageSet(null, null, null, id.getParentSample()));
+		for (Sample3D ins : input)
+			for (Measurement md : ins) {
+				if (md instanceof ImageData) {
+					ImageData id = (ImageData) md;
+					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
+					if (!replicateId2ImageSetSide.containsKey(key)) {
+						replicateId2ImageSetSide.put(key, new ImageSet(null, null, null, id.getParentSample()));
+					}
+					ImageSet is = replicateId2ImageSetSide.get(key);
+					is.setSide(true);
+					
+					ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
+					if (ic == ImageConfiguration.Unknown)
+						ic = ImageConfiguration.get(id.getURL().getFileName());
+					
+					if (ic == ImageConfiguration.RgbSide)
+						is.setVis(id);
+					if (ic == ImageConfiguration.FluoSide)
+						is.setFluo(id);
+					if (ic == ImageConfiguration.NirSide)
+						is.setNir(id);
 				}
-				ImageSet is = replicateId2ImageSetSide.get(key);
-				is.setSide(true);
-				
-				ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
-				if (ic == ImageConfiguration.Unknown)
-					ic = ImageConfiguration.get(id.getURL().getFileName());
-				
-				if (ic == ImageConfiguration.RgbSide)
-					is.setVis(id);
-				if (ic == ImageConfiguration.FluoSide)
-					is.setFluo(id);
-				if (ic == ImageConfiguration.NirSide)
-					is.setNir(id);
 			}
-		}
 		int workLoadIndex = workOnSubset;
 		for (ImageSet is : replicateId2ImageSetSide.values()) {
 			if (is.hasAllImageTypes()) {
@@ -372,27 +374,29 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void addTopImagesToWorkset(ArrayList<ImageSet> workload, int max) {
 		TreeMap<String, ImageSet> replicateId2ImageSetTop = new TreeMap<String, ImageSet>();
-		for (Measurement md : input) {
-			if (md instanceof ImageData) {
-				ImageData id = (ImageData) md;
-				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
-				if (!replicateId2ImageSetTop.containsKey(key)) {
-					replicateId2ImageSetTop.put(key, new ImageSet(null, null, null, id.getParentSample()));
+		
+		for (Sample3D ins : input)
+			for (Measurement md : ins) {
+				if (md instanceof ImageData) {
+					ImageData id = (ImageData) md;
+					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
+					if (!replicateId2ImageSetTop.containsKey(key)) {
+						replicateId2ImageSetTop.put(key, new ImageSet(null, null, null, id.getParentSample()));
+					}
+					ImageSet is = replicateId2ImageSetTop.get(key);
+					is.setSide(false);
+					ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
+					if (ic == ImageConfiguration.Unknown)
+						ic = ImageConfiguration.get(id.getURL().getFileName());
+					
+					if (ic == ImageConfiguration.RgbTop)
+						is.setVis(id);
+					if (ic == ImageConfiguration.FluoTop)
+						is.setFluo(id);
+					if (ic == ImageConfiguration.NirTop)
+						is.setNir(id);
 				}
-				ImageSet is = replicateId2ImageSetTop.get(key);
-				is.setSide(false);
-				ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
-				if (ic == ImageConfiguration.Unknown)
-					ic = ImageConfiguration.get(id.getURL().getFileName());
-				
-				if (ic == ImageConfiguration.RgbTop)
-					is.setVis(id);
-				if (ic == ImageConfiguration.FluoTop)
-					is.setFluo(id);
-				if (ic == ImageConfiguration.NirTop)
-					is.setNir(id);
 			}
-		}
 		int workLoadIndex = workOnSubset;
 		for (ImageSet is : replicateId2ImageSetTop.values()) {
 			if (is.hasAllImageTypes()) {

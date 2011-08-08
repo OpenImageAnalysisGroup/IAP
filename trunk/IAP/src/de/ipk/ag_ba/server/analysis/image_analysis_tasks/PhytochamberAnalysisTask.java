@@ -36,6 +36,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
@@ -44,7 +45,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  */
 public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 	
-	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
+	private Collection<Sample3D> input = new ArrayList<Sample3D>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 	
 	ArrayList<ImagePreProcessor> preProcessors = new ArrayList<ImagePreProcessor>();
@@ -57,7 +58,8 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workOnSubset, int numberOfSubsets) {
+	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m, int workOnSubset,
+			int numberOfSubsets) {
 		this.input = input;
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
@@ -87,26 +89,28 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 		output = new ArrayList<NumericMeasurementInterface>();
 		ArrayList<ImageSet> workload = new ArrayList<ImageSet>();
 		TreeMap<String, ImageSet> replicateId2ImageSet = new TreeMap<String, ImageSet>();
-		for (Measurement md : input) {
-			if (md instanceof ImageData) {
-				ImageData id = (ImageData) md;
-				String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
-				if (!replicateId2ImageSet.containsKey(key)) {
-					replicateId2ImageSet.put(key, new ImageSet(null, null, null));
+		
+		for (Sample3D ins : input)
+			for (Measurement md : ins) {
+				if (md instanceof ImageData) {
+					ImageData id = (ImageData) md;
+					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID();
+					if (!replicateId2ImageSet.containsKey(key)) {
+						replicateId2ImageSet.put(key, new ImageSet(null, null, null));
+					}
+					ImageSet is = replicateId2ImageSet.get(key);
+					ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
+					if (ic == ImageConfiguration.Unknown)
+						ic = ImageConfiguration.get(id.getURL().getFileName());
+					
+					if (ic == ImageConfiguration.RgbTop)
+						is.setVis(id);
+					if (ic == ImageConfiguration.FluoTop)
+						is.setFluo(id);
+					if (ic == ImageConfiguration.NirTop)
+						is.setNir(id);
 				}
-				ImageSet is = replicateId2ImageSet.get(key);
-				ImageConfiguration ic = ImageConfiguration.get(id.getSubstanceName());
-				if (ic == ImageConfiguration.Unknown)
-					ic = ImageConfiguration.get(id.getURL().getFileName());
-				
-				if (ic == ImageConfiguration.RgbTop)
-					is.setVis(id);
-				if (ic == ImageConfiguration.FluoTop)
-					is.setFluo(id);
-				if (ic == ImageConfiguration.NirTop)
-					is.setNir(id);
 			}
-		}
 		int workLoadIndex = workOnSubset;
 		for (ImageSet is : replicateId2ImageSet.values()) {
 			if (is.hasAllImageTypes()) {

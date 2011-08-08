@@ -24,7 +24,9 @@ public interface ImageAnalysisTask {
 	
 	public ImageAnalysisType[] getOutputTypes();
 	
-	public void setInput(Collection<Sample3D> input, MongoDB m, int workOnSubset, int numberOfSubsets);
+	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements,
+			MongoDB m, int workOnSubset,
+			int numberOfSubsets);
 	
 	public Collection<NumericMeasurementInterface> getOutput();
 }

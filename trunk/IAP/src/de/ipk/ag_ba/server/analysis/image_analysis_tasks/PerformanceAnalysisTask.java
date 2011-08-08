@@ -19,6 +19,7 @@ import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
@@ -26,7 +27,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	
-	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
+	private Collection<Sample3D> input = new ArrayList<Sample3D>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 	
 	private MongoDB m;
@@ -37,7 +38,9 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		// empty
 	}
 	
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workLoadIndex, int workLoadSize) {
+	public void setInput(Collection<Sample3D> input,
+			Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m,
+			int workLoadIndex, int workLoadSize) {
 		this.input = input;
 		this.m = m;
 		this.workLoadIndex = workLoadIndex;
@@ -65,10 +68,11 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
 		ArrayList<ImageData> workload = new ArrayList<ImageData>();
-		for (Measurement md : input)
-			if (md instanceof ImageData) {
-				workload.add((ImageData) md);
-			}
+		for (Sample3D ins : input)
+			for (Measurement md : ins)
+				if (md instanceof ImageData) {
+					workload.add((ImageData) md);
+				}
 		
 		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
 		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCountParallelImages, new ThreadFactory() {
