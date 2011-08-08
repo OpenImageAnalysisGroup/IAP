@@ -78,6 +78,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
+						workload.add(sd3);
 					}
 				}
 			}

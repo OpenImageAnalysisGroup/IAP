@@ -99,7 +99,8 @@ public class MyExperimentInfoPanel extends JPanel {
 	
 	private JComboBox getExperimentTypes(MongoDB m, String experimentType, boolean editPossible) {
 		TreeSet<String> typeset = new TreeSet<String>();
-		typeset.add(experimentType);
+		if (experimentType != null)
+			typeset.add(experimentType);
 		typeset.add(IAPexperimentTypes.Phytochamber);
 		typeset.add(IAPexperimentTypes.BarleyGreenhouse);
 		typeset.add(IAPexperimentTypes.MaizeGreenhouse);
