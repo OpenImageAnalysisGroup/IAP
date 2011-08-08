@@ -42,11 +42,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
-	private Collection<NumericMeasurementInterface> input = new ArrayList<NumericMeasurementInterface>();
+	private Collection<Sample3D> input = new ArrayList<Sample3D>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 	
 	ArrayList<ImagePreProcessor> preProcessors = new ArrayList<ImagePreProcessor>();
@@ -57,7 +58,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private ArrayList<FlexibleImageStack> forcedDebugStacks;
 	
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workOnSubset, int numberOfSubsets) {
+	public void setInput(Collection<Sample3D> input, MongoDB m, int workOnSubset, int numberOfSubsets) {
 		this.input = input;
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
@@ -98,7 +99,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (analyzeSideImages())
 			addSideImagesToWorkset(workload, 0);
 		
-		// workload = filterWorkload(workload, "Athletico");// "Rainbow Amerindian"); // Athletico
+		// workload = filterWorkload(workload, "Apex");// "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();

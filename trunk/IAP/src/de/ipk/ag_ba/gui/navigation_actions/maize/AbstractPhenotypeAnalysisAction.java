@@ -23,17 +23,14 @@ import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author klukas
@@ -73,11 +70,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		try {
 			ExperimentInterface res = experiment.getData(m);
 			
-			ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
-			
-			HashSet<String> ignored = new HashSet<String>();
-			
-			HashSet<ImageConfiguration> validConfigs = getValidImageTypes();
+			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
 			for (SubstanceInterface m : res) {
 				Substance3D m3 = (Substance3D) m;
@@ -85,19 +78,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.IMAGE)) {
-							if (md instanceof ImageData) {
-								ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
-								if (config == ImageConfiguration.Unknown)
-									config = ImageConfiguration.get(((ImageData) md).getURL().getFileName());
-								
-								if (validConfigs.contains(config)) {
-									ImageData i = (ImageData) md;
-									workload.add(i);
-								} else
-									ignored.add(((ImageData) md).getSubstanceName());
-							}
-						}
 					}
 				}
 			}
