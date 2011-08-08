@@ -86,7 +86,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 				System.out.println("dist_vertical: " + (markerPosTwoRight - markerPosOneRight));
 		}
 		
-		// distances horizontal
+		// distances horizontal, max dist
 		int[] distances = new int[numericResult.size()];
 		int n = 0;
 		for (MarkerPair mp : numericResult) {
@@ -97,6 +97,9 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		
 		int maxDist = max(distances);
+		// int maxDist = (int) Math.abs(getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X).getValue() - getProperties()
+		// .getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X).getValue() * imageWidth);
+		
 		getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT, maxDist);
 		
 		if (debug)
