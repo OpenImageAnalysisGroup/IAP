@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class SkeletonProcessor2d {
 	
-	public int[][] skelArray;
+	public int[][] skelImg;
 	public ArrayList<Point> endpoints = new ArrayList<Point>();
 	public ArrayList<Point> branches = new ArrayList<Point>();
 	public ArrayList<Limb> endlimbs = new ArrayList<Limb>();
@@ -25,18 +25,18 @@ public class SkeletonProcessor2d {
 	public boolean debug = false;
 	
 	public SkeletonProcessor2d(FlexibleImage inp) {
-		this.skelArray = inp.getAs2A().clone();
+		this.skelImg = inp.getAs2A().clone();
 		// TODO findEndpointsAndBranches(); all in one, do it later
 	}
 	
 	public SkeletonProcessor2d(int[][] image, ArrayList<Point> endpoints, ArrayList<Point> branches) {
-		this.skelArray = image.clone();
+		this.skelImg = image.clone();
 		this.endpoints = endpoints;
 		this.branches = branches;
 	}
 	
 	public SkeletonProcessor2d(int[][] image) {
-		this.skelArray = image;
+		this.skelImg = image;
 	}
 	
 	public void setBranches(ArrayList<Point> branches) {
@@ -59,6 +59,7 @@ public class SkeletonProcessor2d {
 	 * Recursive Method to calculate Endlimbs
 	 */
 	public void calculateEndlimbsRecursive() {
+		endlimbs.clear();
 		for (int i = 0; i < endpoints.size(); i++) {
 			Limb res = new Limb(endpoints.get(i));
 			Point actual = endpoints.get(i);
@@ -96,11 +97,14 @@ public class SkeletonProcessor2d {
 			mark(next, colorMarkedEndLimbs);
 			calcrecEL2(next, res);
 		}
+		if (next == null) {
+			// System.out.println("No neighbour found!!");
+		}
 	}
 	
 	private Point hasBranch(ArrayList<Point> neighbours) {
 		for (Point p : neighbours) {
-			if (skelArray[p.x][p.y] == colorBranches)
+			if (skelImg[p.x][p.y] == colorBranches)
 				return p;
 		}
 		return null;
@@ -108,7 +112,7 @@ public class SkeletonProcessor2d {
 	
 	private Point hasEndpoint(ArrayList<Point> neighbours) {
 		for (Point p : neighbours) {
-			if (skelArray[p.x][p.y] == colorEndpoints)
+			if (skelImg[p.x][p.y] == colorEndpoints)
 				return p;
 		}
 		return null;
@@ -116,7 +120,7 @@ public class SkeletonProcessor2d {
 	
 	private Point hasNextpoint(ArrayList<Point> neighbours) {
 		for (Point p : neighbours) {
-			if (skelArray[p.x][p.y] == foreground)
+			if (skelImg[p.x][p.y] == foreground)
 				return p;
 		}
 		return null;
@@ -177,13 +181,14 @@ public class SkeletonProcessor2d {
 		for (Limb l : endlimbs) {
 			if (l.isCut) {
 				System.out.println("cut: " + l.endpoint.toString() + " , " + l.initialpoint.toString());
-				Point[] con = getNextLimb(l);
+				Point[] con = getNearestLimb(l);
 				connect(con[0], con[1]);
 			}
 		}
 	}
 	
-	private Point[] getNextLimb(Limb l) {
+	private Point[] getNearestLimb(Limb l) {
+		// TODO improvement: first sort y, pre/succ calc dist -> O(nlogn)
 		int dist = Integer.MAX_VALUE;
 		Point ini = l.initialpoint;
 		Point res = null;
@@ -232,7 +237,7 @@ public class SkeletonProcessor2d {
 		int err = dx + dy, e2; /* error value e_xy */
 		
 		while (true) { /* loop */
-			skelArray[x0][y0] = foreground;
+			skelImg[x0][y0] = foreground;
 			if (x0 == x1 && y0 == y1)
 				break;
 			e2 = 2 * err;
@@ -254,37 +259,37 @@ public class SkeletonProcessor2d {
 	private ArrayList<Point> getNeighbours(Point inp) {
 		ArrayList<Point> res = new ArrayList<Point>();
 		
-		if (inp.x > 0 && inp.x < this.skelArray.length && inp.y > 0 && inp.y < this.skelArray[0].length) {
+		if (inp.x > 0 && inp.x < this.skelImg.length && inp.y > 0 && inp.y < this.skelImg[0].length) {
 			
-			if (this.skelArray[inp.x - 1][inp.y - 1] != background && this.skelArray[inp.x - 1][inp.y - 1] != colorMarkedEndLimbs) {
+			if (this.skelImg[inp.x - 1][inp.y - 1] != background && this.skelImg[inp.x - 1][inp.y - 1] != colorMarkedEndLimbs) {
 				res.add(new Point(inp.x - 1, inp.y - 1));
 			}
 			
-			if (this.skelArray[inp.x + 1][inp.y + 1] != background && this.skelArray[inp.x + 1][inp.y + 1] != colorMarkedEndLimbs) {
+			if (this.skelImg[inp.x + 1][inp.y + 1] != background && this.skelImg[inp.x + 1][inp.y + 1] != colorMarkedEndLimbs) {
 				res.add(new Point(inp.x + 1, inp.y + 1));
 			}
 			
-			if (this.skelArray[inp.x + 1][inp.y - 1] != background && this.skelArray[inp.x + 1][inp.y - 1] != colorMarkedEndLimbs) {
+			if (this.skelImg[inp.x + 1][inp.y - 1] != background && this.skelImg[inp.x + 1][inp.y - 1] != colorMarkedEndLimbs) {
 				res.add(new Point(inp.x + 1, inp.y - 1));
 			}
 			
-			if (this.skelArray[inp.x - 1][inp.y + 1] != background && this.skelArray[inp.x - 1][inp.y + 1] != colorMarkedEndLimbs) {
+			if (this.skelImg[inp.x - 1][inp.y + 1] != background && this.skelImg[inp.x - 1][inp.y + 1] != colorMarkedEndLimbs) {
 				res.add(new Point(inp.x - 1, inp.y + 1));
 			}
 			
-			if (this.skelArray[inp.x][inp.y - 1] != background && this.skelArray[inp.x][inp.y - 1] != colorMarkedEndLimbs) {
+			if (this.skelImg[inp.x][inp.y - 1] != background && this.skelImg[inp.x][inp.y - 1] != colorMarkedEndLimbs) {
 				res.add(new Point(inp.x, inp.y - 1));
 			}
 			
-			if (this.skelArray[inp.x - 1][inp.y] != background && this.skelArray[inp.x - 1][inp.y] != colorMarkedEndLimbs) {
+			if (this.skelImg[inp.x - 1][inp.y] != background && this.skelImg[inp.x - 1][inp.y] != colorMarkedEndLimbs) {
 				res.add(new Point(inp.x - 1, inp.y));
 			}
 			
-			if (this.skelArray[inp.x + 1][inp.y] != background && this.skelArray[inp.x + 1][inp.y] != colorMarkedEndLimbs) {
+			if (this.skelImg[inp.x + 1][inp.y] != background && this.skelImg[inp.x + 1][inp.y] != colorMarkedEndLimbs) {
 				res.add(new Point(inp.x + 1, inp.y));
 			}
 			
-			if (this.skelArray[inp.x][inp.y + 1] != background && this.skelArray[inp.x][inp.y + 1] != colorMarkedEndLimbs) {
+			if (this.skelImg[inp.x][inp.y + 1] != background && this.skelImg[inp.x][inp.y + 1] != colorMarkedEndLimbs) {
 				res.add(new Point(inp.x, inp.y + 1));
 			}
 		}
@@ -336,12 +341,12 @@ public class SkeletonProcessor2d {
 		
 		int[][] dot = new int[][] { { 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 } };
 		
-		int width = skelArray.length;
-		int height = skelArray[0].length;
+		int width = skelImg.length;
+		int height = skelImg[0].length;
 		int[][] imgbin;
 		
-		imgbin = rgbToBinaryArray(skelArray);
-		skelArray = binaryArrayToRgb(imgbin);
+		imgbin = rgbToBinaryArray(skelImg);
+		skelImg = binaryArrayToRgb(imgbin);
 		
 		if (endpoints != null)
 			endpoints.clear();
@@ -358,12 +363,12 @@ public class SkeletonProcessor2d {
 					
 					// delete Dots
 					if (matchMask3x3(dot, area))
-						skelArray[x][y] = background;
+						skelImg[x][y] = background;
 					
 					// endpoints
 					for (int index = 0; index < listEndpointMasks.length; index++) {
 						if (matchMask3x3(listEndpointMasks[index], area)) {
-							skelArray[x][y] = colorEndpoints;
+							skelImg[x][y] = colorEndpoints;
 							endpoints.add(new Point(x, y));
 						}
 					}
@@ -371,7 +376,7 @@ public class SkeletonProcessor2d {
 					// branches
 					for (int index = 0; index < listBranchMasks.length; index++) {
 						if (matchMask3x3(listBranchMasks[index], area)) {
-							skelArray[x][y] = colorBranches;
+							skelImg[x][y] = colorBranches;
 							branches.add(new Point(x, y));
 						}
 					}
@@ -385,15 +390,15 @@ public class SkeletonProcessor2d {
 		int[][] burl1 = new int[][] { { colorBranches, foreground, background }, { foreground, background, foreground },
 				{ background, foreground, colorBranches } };
 		int[][] repburl1 = new int[][] { { foreground, background, background }, { background, foreground, background }, { background, background, foreground } };
-		int width = skelArray.length;
-		int height = skelArray[0].length;
+		int width = skelImg.length;
+		int height = skelImg[0].length;
 		
 		for (int x = 1; x < width - 1; x++) {
 			for (int y = 1; y < height - 1; y++) {
-				if (skelArray[x][y] != background) {
-					int[][] area = new int[][] { { skelArray[x - 1][y - 1], skelArray[x][y - 1], skelArray[x + 1][y - 1] },
-							{ skelArray[x - 1][y], skelArray[x][y], skelArray[x + 1][y] },
-							{ skelArray[x - 1][y + 1], skelArray[x][y + 1], skelArray[x + 1][y + 1] } };
+				if (skelImg[x][y] != background) {
+					int[][] area = new int[][] { { skelImg[x - 1][y - 1], skelImg[x][y - 1], skelImg[x + 1][y - 1] },
+							{ skelImg[x - 1][y], skelImg[x][y], skelImg[x + 1][y] },
+							{ skelImg[x - 1][y + 1], skelImg[x][y + 1], skelImg[x + 1][y + 1] } };
 					
 					// delete and replace burl1
 					if (matchMask3x3(burl1, area))
@@ -404,15 +409,15 @@ public class SkeletonProcessor2d {
 	}
 	
 	private void replace(int x, int y, int[][] mask) {
-		skelArray[x - 1][y - 1] = mask[0][0];
-		skelArray[x][y - 1] = mask[1][0];
-		skelArray[x + 1][y - 1] = mask[2][0];
-		skelArray[x - 1][y] = mask[0][1];
-		skelArray[x][y] = mask[1][1];
-		skelArray[x + 1][y] = mask[2][1];
-		skelArray[x - 1][y + 1] = mask[0][2];
-		skelArray[x][y + 1] = mask[1][2];
-		skelArray[x + 1][y + 1] = mask[2][2];
+		skelImg[x - 1][y - 1] = mask[0][0];
+		skelImg[x][y - 1] = mask[1][0];
+		skelImg[x + 1][y - 1] = mask[2][0];
+		skelImg[x - 1][y] = mask[0][1];
+		skelImg[x][y] = mask[1][1];
+		skelImg[x + 1][y] = mask[2][1];
+		skelImg[x - 1][y + 1] = mask[0][2];
+		skelImg[x][y + 1] = mask[1][2];
+		skelImg[x + 1][y + 1] = mask[2][2];
 	}
 	
 	/**
@@ -422,6 +427,7 @@ public class SkeletonProcessor2d {
 	 *           - average of n percent smallest endlimbs
 	 * @param repeat
 	 */
+	@Deprecated
 	public void deleteShortEndLimbs(int threshold, int repeat) {
 		for (int i = 0; i < repeat; i++) {
 			calculateEndlimbsRecursive();
@@ -432,13 +438,22 @@ public class SkeletonProcessor2d {
 	}
 	
 	public void deleteShortEndLimbs(int threshold) {
-		for (Limb l : endlimbs) {
-			if (l.length() < threshold) {
-				forRemove.add(l);
-				// System.out.println("del");
+		calculateEndlimbsRecursive();
+		int autothreshold = getAutoThresh(threshold / (double) 100);
+		boolean goRecursive = false;
+		do {
+			goRecursive = false;
+			System.out.println("numofendlimbs: " + endlimbs.size());
+			
+			for (Limb l : endlimbs) {
+				if (l.length() < autothreshold) {
+					forRemove.add(l);
+					goRecursive = true;
+					// System.out.println("del");
+				}
 			}
-		}
-		totalRefreshSkeleton();
+			totalRefreshSkeleton();
+		} while (goRecursive);
 	}
 	
 	/**
@@ -476,14 +491,14 @@ public class SkeletonProcessor2d {
 					int x = point.x;
 					int y = point.y;
 					if (debug)
-						skelArray[x][y] = colorDebug;
+						skelImg[x][y] = colorDebug;
 					else
-						skelArray[x][y] = background;
+						skelImg[x][y] = background;
 				}
 				if (debug)
-					skelArray[forRemove.get(index).endpoint.x][forRemove.get(index).endpoint.y] = colorDebug;
+					skelImg[forRemove.get(index).endpoint.x][forRemove.get(index).endpoint.y] = colorDebug;
 				else
-					skelArray[forRemove.get(index).endpoint.x][forRemove.get(index).endpoint.y] = background;
+					skelImg[forRemove.get(index).endpoint.x][forRemove.get(index).endpoint.y] = background;
 				endlimbs.remove(forRemove.get(index));
 			}
 			forRemove.clear();
@@ -495,11 +510,12 @@ public class SkeletonProcessor2d {
 	 * remark all end- and branchpoints
 	 */
 	private void basicRefreshSkeleton() {
+		System.out.println("endpoints ref: " + endpoints.size());
 		for (Point p : endpoints) {
-			skelArray[p.x][p.y] = colorEndpoints;
+			skelImg[p.x][p.y] = colorEndpoints;
 		}
 		for (Point p : branches) {
-			skelArray[p.x][p.y] = colorBranches;
+			skelImg[p.x][p.y] = colorBranches;
 		}
 	}
 	
@@ -516,11 +532,11 @@ public class SkeletonProcessor2d {
 	}
 	
 	public void print(String title, boolean show) {
-		new FlexibleImage(this.skelArray).print(title, show);
+		new FlexibleImage(this.skelImg).print(title, show);
 	}
 	
 	public FlexibleImage getAsFlexibleImage() {
-		return new FlexibleImage(this.skelArray);
+		return new FlexibleImage(this.skelImg);
 	}
 	
 	private boolean isBranch(Point inp) {
@@ -538,7 +554,7 @@ public class SkeletonProcessor2d {
 	}
 	
 	private void mark(Point inp, int color) {
-		skelArray[inp.x][inp.y] = color;
+		skelImg[inp.x][inp.y] = color;
 	}
 	
 	private int[][] binaryArrayToRgb(int[][] input) {
@@ -652,60 +668,60 @@ public class SkeletonProcessor2d {
 	private Point getNeighbour(Point inp) {
 		Point res = null;
 		Point branchInNeighbourhood = null;
-		if (inp.x > 0 && inp.x < this.skelArray.length && inp.y > 0 && inp.y < this.skelArray[0].length) {
+		if (inp.x > 0 && inp.x < this.skelImg.length && inp.y > 0 && inp.y < this.skelImg[0].length) {
 			
-			if (this.skelArray[inp.x - 1][inp.y - 1] != background && this.skelArray[inp.x - 1][inp.y - 1] != colorMarkedEndLimbs
-					&& this.skelArray[inp.x - 1][inp.y - 1] != colorEndpoints) {
-				if (this.skelArray[inp.x - 1][inp.y - 1] != colorBranches) {
+			if (this.skelImg[inp.x - 1][inp.y - 1] != background && this.skelImg[inp.x - 1][inp.y - 1] != colorMarkedEndLimbs
+					&& this.skelImg[inp.x - 1][inp.y - 1] != colorEndpoints) {
+				if (this.skelImg[inp.x - 1][inp.y - 1] != colorBranches) {
 					res = new Point(inp.x - 1, inp.y - 1);
 				} else
 					branchInNeighbourhood = new Point(inp.x - 1, inp.y - 1);
 			}
-			if (this.skelArray[inp.x + 1][inp.y + 1] != background && this.skelArray[inp.x + 1][inp.y + 1] != colorMarkedEndLimbs
-					&& this.skelArray[inp.x + 1][inp.y + 1] != colorEndpoints) {
-				if (this.skelArray[inp.x + 1][inp.y + 1] != colorBranches) {
+			if (this.skelImg[inp.x + 1][inp.y + 1] != background && this.skelImg[inp.x + 1][inp.y + 1] != colorMarkedEndLimbs
+					&& this.skelImg[inp.x + 1][inp.y + 1] != colorEndpoints) {
+				if (this.skelImg[inp.x + 1][inp.y + 1] != colorBranches) {
 					res = new Point(inp.x + 1, inp.y + 1);
 				} else
 					branchInNeighbourhood = new Point(inp.x + 1, inp.y + 1);
 			}
-			if (this.skelArray[inp.x + 1][inp.y - 1] != background && this.skelArray[inp.x + 1][inp.y - 1] != colorMarkedEndLimbs
-					&& this.skelArray[inp.x + 1][inp.y - 1] != colorEndpoints) {
-				if (this.skelArray[inp.x + 1][inp.y - 1] != colorBranches) {
+			if (this.skelImg[inp.x + 1][inp.y - 1] != background && this.skelImg[inp.x + 1][inp.y - 1] != colorMarkedEndLimbs
+					&& this.skelImg[inp.x + 1][inp.y - 1] != colorEndpoints) {
+				if (this.skelImg[inp.x + 1][inp.y - 1] != colorBranches) {
 					res = new Point(inp.x + 1, inp.y - 1);
 				} else
 					branchInNeighbourhood = new Point(inp.x + 1, inp.y - 1);
 			}
-			if (this.skelArray[inp.x - 1][inp.y + 1] != background && this.skelArray[inp.x - 1][inp.y + 1] != colorMarkedEndLimbs
-					&& this.skelArray[inp.x - 1][inp.y + 1] != colorEndpoints) {
-				if (this.skelArray[inp.x - 1][inp.y + 1] != colorBranches) {
+			if (this.skelImg[inp.x - 1][inp.y + 1] != background && this.skelImg[inp.x - 1][inp.y + 1] != colorMarkedEndLimbs
+					&& this.skelImg[inp.x - 1][inp.y + 1] != colorEndpoints) {
+				if (this.skelImg[inp.x - 1][inp.y + 1] != colorBranches) {
 					res = new Point(inp.x - 1, inp.y + 1);
 				} else
 					branchInNeighbourhood = new Point(inp.x - 1, inp.y + 1);
 			}
-			if (this.skelArray[inp.x][inp.y - 1] != background && this.skelArray[inp.x][inp.y - 1] != colorMarkedEndLimbs
-					&& this.skelArray[inp.x][inp.y - 1] != colorEndpoints) {
-				if (this.skelArray[inp.x][inp.y - 1] != colorBranches) {
+			if (this.skelImg[inp.x][inp.y - 1] != background && this.skelImg[inp.x][inp.y - 1] != colorMarkedEndLimbs
+					&& this.skelImg[inp.x][inp.y - 1] != colorEndpoints) {
+				if (this.skelImg[inp.x][inp.y - 1] != colorBranches) {
 					res = new Point(inp.x, inp.y - 1);
 				} else
 					branchInNeighbourhood = new Point(inp.x, inp.y - 1);
 			}
-			if (this.skelArray[inp.x - 1][inp.y] != background && this.skelArray[inp.x - 1][inp.y] != colorMarkedEndLimbs
-					&& this.skelArray[inp.x - 1][inp.y] != colorEndpoints) {
-				if (this.skelArray[inp.x - 1][inp.y] != colorBranches) {
+			if (this.skelImg[inp.x - 1][inp.y] != background && this.skelImg[inp.x - 1][inp.y] != colorMarkedEndLimbs
+					&& this.skelImg[inp.x - 1][inp.y] != colorEndpoints) {
+				if (this.skelImg[inp.x - 1][inp.y] != colorBranches) {
 					res = new Point(inp.x - 1, inp.y);
 				} else
 					branchInNeighbourhood = new Point(inp.x - 1, inp.y);
 			}
-			if (this.skelArray[inp.x + 1][inp.y] != background && this.skelArray[inp.x + 1][inp.y] != colorMarkedEndLimbs
-					&& this.skelArray[inp.x + 1][inp.y] != colorEndpoints) {
-				if (this.skelArray[inp.x + 1][inp.y] != colorBranches) {
+			if (this.skelImg[inp.x + 1][inp.y] != background && this.skelImg[inp.x + 1][inp.y] != colorMarkedEndLimbs
+					&& this.skelImg[inp.x + 1][inp.y] != colorEndpoints) {
+				if (this.skelImg[inp.x + 1][inp.y] != colorBranches) {
 					res = new Point(inp.x + 1, inp.y);
 				} else
 					branchInNeighbourhood = new Point(inp.x + 1, inp.y);
 			}
-			if (this.skelArray[inp.x][inp.y + 1] != background && this.skelArray[inp.x][inp.y + 1] != colorMarkedEndLimbs
-					&& this.skelArray[inp.x][inp.y + 1] != colorEndpoints) {
-				if (this.skelArray[inp.x][inp.y + 1] != colorBranches) {
+			if (this.skelImg[inp.x][inp.y + 1] != background && this.skelImg[inp.x][inp.y + 1] != colorMarkedEndLimbs
+					&& this.skelImg[inp.x][inp.y + 1] != colorEndpoints) {
+				if (this.skelImg[inp.x][inp.y + 1] != colorBranches) {
 					res = new Point(inp.x, inp.y + 1);
 				} else
 					branchInNeighbourhood = new Point(inp.x, inp.y + 1);

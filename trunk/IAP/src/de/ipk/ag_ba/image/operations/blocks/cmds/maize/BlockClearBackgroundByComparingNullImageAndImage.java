@@ -103,11 +103,13 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				FlexibleImage nir = getInput().getImages().getNir();
-				if (options.isMaize())
+				if (options.isMaize()) {
+					int blackDiff = 30;
+					int whiteDiff = 33;
 					return new ImageOperation(nir).compare()
-							.compareGrayImages(getInput().getMasks().getNir(), 30, 33, options.getBackground())
+							.compareGrayImages(getInput().getMasks().getNir(), blackDiff, whiteDiff, options.getBackground())
 							.print("result nir", false).thresholdClearBlueBetween(150, 169).thresholdBlueHigherThan(240).border(2).getImage();
-				
+				}
 				return new ImageOperation(nir).compare()
 						.compareGrayImages(getInput().getMasks().getNir(), 10, 23, options.getBackground())
 						.print("result nir", false).thresholdBlueHigherThan(240).border(2).getImage();

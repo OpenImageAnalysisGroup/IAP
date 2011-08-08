@@ -101,8 +101,9 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		positions.setLeft((int) (positions.getLeftX() * s - pl * inputToCut.getWidth()));
 		positions.setRight((int) (positions.getRightX() * s + pr * inputToCut.getWidth()));
 		
-		// return ioInputForCut.clearImageLeft(positions[2], bl).clearImageRight(positions[3], br).clearImageAbove(positions[0], ba).getImage();
-		return ioInputForCut.clearImageAbove(positions.getTopY(), ba).getImage();
+		return ioInputForCut.clearImageLeft(positions.getLeftX(), bl).clearImageRight(positions.getRightX(), br).clearImageAbove(positions.getTopY(), ba)
+				.getImage();
+		// return ioInputForCut.clearImageAbove(positions.getTopY(), ba).getImage();
 	}
 	
 	private FlexibleImage clearImageTop(FlexibleImage input, FlexibleImage fluo) {

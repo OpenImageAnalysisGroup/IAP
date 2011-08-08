@@ -2539,7 +2539,7 @@ public class ImageOperation {
 		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, mode, 0);
 	}
 	
-	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode, int recursion) {
+	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, int recursion) {
 		int r, g, b;
 		float Li, ai, bi;
 		
@@ -2562,7 +2562,7 @@ public class ImageOperation {
 			bi = p[b + 512];
 			
 			// sum under following conditions
-			if (mode) {
+			if (searchWhiteTrue) {
 				if (Li > LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
 					sumR += r;
 					sumG += g;
@@ -2579,7 +2579,7 @@ public class ImageOperation {
 			}
 		}
 		if (count < w * h * 0.1 && recursion < 30) {
-			return getRGBAverage(x1, y1, w, h, LThresh * 2, (int) (ABThresh * 1.1), mode, recursion + 1);
+			return getRGBAverage(x1, y1, w, h, LThresh * 2, (int) (ABThresh * 1.1), searchWhiteTrue, recursion + 1);
 		}
 		if (count > 0)
 			return new float[] { sumR / 255f / count, sumG / 255f / count, sumB / 255f / count };

@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -20,13 +21,15 @@ public class BlockNirProcessing extends AbstractSnapshotAnalysisBlockFIS {
 				FlexibleImage nirMask = getInput().getMasks().getNir();
 				// compare images
 				boolean debug = false;
+				int blackDiff = options.getIntSetting(Setting.B_Diff_NIR);
+				int whiteDiff = options.getIntSetting(Setting.W_Diff_NIR);
 				nirMask = new ImageOperation(getInput().getImages().getNir()).print("img", debug).compare()
 							.compareGrayImages(nirMask.print("ref", debug),
 									// 20, 12,
-									20, 12,
+									blackDiff, whiteDiff,
 									// 250, 12,
 									// 40, 40,
-									options.getBackground()).thresholdBlueHigherThan(150).print("result", debug).getImage();
+									options.getBackground()).thresholdBlueHigherThan(180).print("result", debug).getImage(); // 150
 				
 				getInput().getMasks().setNir(nirMask);
 			}
