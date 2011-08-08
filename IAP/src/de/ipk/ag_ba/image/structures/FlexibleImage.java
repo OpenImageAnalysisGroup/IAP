@@ -73,7 +73,7 @@ public class FlexibleImage {
 		this.h = image.getHeight();
 	}
 	
-	public FlexibleImage(int[] image, int w, int h) {
+	public FlexibleImage(int w, int h, int[] image) {
 		this(ImageConverter.convert1AtoIJ(w, h, image));
 	}
 	
@@ -106,11 +106,11 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage(int w, int h, double[][] labImage) {
-		this(ImageConverter.convertLABto1A(labImage), w, h);
+		this(w, h, ImageConverter.convertLABto1A(labImage));
 	}
 	
 	public FlexibleImage(int w, int h, float[][] labImage) {
-		this(ImageConverter.convertLABto1A(labImage), w, h);
+		this(w, h, ImageConverter.convertLABto1A(labImage));
 	}
 	
 	public BufferedImage getAsBufferedImage() {
@@ -265,7 +265,8 @@ public class FlexibleImage {
 		}
 		
 		if (rightX - leftX <= 0 || bottomY - topY <= 0) {
-			System.out.println("WARNING: cropAbs detected negative crop desire...");
+			if (rightX - leftX < 0 || bottomY - topY < 0)
+				System.out.println("WARNING: cropAbs detected negative crop desire...");
 			return io.getImage();
 		}
 		

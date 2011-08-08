@@ -51,7 +51,7 @@ public class BlockReplaceEmptyOriginalImage extends AbstractBlock {
 		if (image == null) {
 			int[] img = new int[sz * sz];
 			img = ImageOperation.fillArray(img, Color.WHITE.getRGB());
-			image = new FlexibleImage(img, sz, sz);
+			image = new FlexibleImage(sz, sz, img);
 			image = image.getIO().drawLine(0, 0, sz, sz, Color.RED, 5).drawLine(sz, 0, 0, sz, Color.RED, 5).addBorder(5, 0, 0, Color.RED.getRGB())
 					.getImage();
 		}

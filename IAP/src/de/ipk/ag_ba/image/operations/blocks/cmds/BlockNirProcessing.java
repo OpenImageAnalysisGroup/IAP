@@ -23,6 +23,7 @@ public class BlockNirProcessing extends AbstractSnapshotAnalysisBlockFIS {
 				boolean debug = false;
 				int blackDiff = options.getIntSetting(Setting.B_Diff_NIR);
 				int whiteDiff = options.getIntSetting(Setting.W_Diff_NIR);
+				// getInput().getImages().getNir().getIO().subtractGrayImages(nirMask).print("subimg");
 				nirMask = new ImageOperation(getInput().getImages().getNir()).print("img", debug).compare()
 							.compareGrayImages(nirMask.print("ref", debug),
 									// 20, 12,

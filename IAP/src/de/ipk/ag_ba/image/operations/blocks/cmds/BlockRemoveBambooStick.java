@@ -83,7 +83,7 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 				break mainLoop;
 			}
 		}
-		return new FlexibleImage(origarr, width, height);
+		return new FlexibleImage(width, height, origarr);
 	}
 	
 	private void clearLine(int w, int[] orig, int[] yellow, int y, int background, int clusterSize) {
@@ -125,7 +125,7 @@ public class BlockRemoveBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfB, upperValueOfB,
 				back, typ, maize);
 		
-		FlexibleImage mask = new FlexibleImage(result, width, height);
+		FlexibleImage mask = new FlexibleImage(width, height, result);
 		
 		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, options.getBackground()).getImage();
 	}

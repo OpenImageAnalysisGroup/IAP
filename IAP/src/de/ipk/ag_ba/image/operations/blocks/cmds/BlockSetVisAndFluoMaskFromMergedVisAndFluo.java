@@ -20,7 +20,7 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 	protected FlexibleImage processVISmask() {
 		MaskOperation o = new MaskOperation(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), null, options.getBackground(), Color.GRAY.getRGB());
 		o.mergeMasks();
-		FlexibleImage result = new FlexibleImage(o.getMask(), getInput().getMasks().getLargestWidth(), getInput().getMasks().getLargestHeight());
+		FlexibleImage result = new FlexibleImage(getInput().getMasks().getLargestWidth(), getInput().getMasks().getLargestHeight(), o.getMask());
 		int[] resPixels = result.getAs1A();
 		{
 			int filled = 0;
@@ -55,6 +55,6 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 	protected FlexibleImage processFLUOmask() {
 		MaskOperation o = new MaskOperation(getInput().getMasks().getVis(), getInput().getMasks().getFluo(), null, options.getBackground(), Color.GRAY.getRGB());
 		o.mergeMasks();
-		return new FlexibleImage(o.getMask(), getInput().getMasks().getLargestWidth(), getInput().getMasks().getLargestHeight());
+		return new FlexibleImage(getInput().getMasks().getLargestWidth(), getInput().getMasks().getLargestHeight(), o.getMask());
 	}
 }

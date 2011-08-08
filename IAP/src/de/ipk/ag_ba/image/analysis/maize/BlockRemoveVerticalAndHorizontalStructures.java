@@ -83,7 +83,7 @@ public class BlockRemoveVerticalAndHorizontalStructures extends AbstractBlock {
 			}
 		}
 		
-		return new FlexibleImage(img, w, h).print("TEST " + System.currentTimeMillis(), false);
+		return new FlexibleImage(w, h, img).print("TEST " + System.currentTimeMillis(), false);
 	}
 	
 	private double getAvg(int[] filledPixelsPerLine, int startIndex, int n) {

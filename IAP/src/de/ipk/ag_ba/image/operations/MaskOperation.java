@@ -87,7 +87,7 @@ public class MaskOperation {
 	}
 	
 	public FlexibleImage getMaskAsFlexibleImage() {
-		return new FlexibleImage(mask, widthMask, heightMask);
+		return new FlexibleImage(widthMask, heightMask, mask);
 	}
 	
 	public BufferedImage getMaskAsBufferedImage() {
@@ -116,7 +116,7 @@ public class MaskOperation {
 			i++;
 		}
 		
-		return new FlexibleImage(image1A, image.getWidth(), image.getHeight());
+		return new FlexibleImage(image.getWidth(), image.getHeight(), image1A);
 	}
 	
 }
