@@ -113,7 +113,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 			}
 		int workLoadIndex = workOnSubset;
 		for (ImageSet is : replicateId2ImageSet.values()) {
-			if (is.hasAllImageTypes()) {
+			if (is.hasAllNeededImageTypes()) {
 				if (workLoadIndex % numberOfSubsets != 0) {
 					workLoadIndex++;
 					continue;

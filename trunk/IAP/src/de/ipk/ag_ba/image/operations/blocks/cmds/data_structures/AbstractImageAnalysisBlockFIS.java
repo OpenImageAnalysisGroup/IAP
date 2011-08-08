@@ -1,6 +1,9 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
 import info.StopWatch;
+
+import java.util.TreeMap;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
@@ -84,5 +87,10 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	@Override
 	public int getBlockPosition() {
 		return blockPositionInPipeline;
+	}
+	
+	@Override
+	public void postProcessResultsForAllAngles(TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
+		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
 	}
 }

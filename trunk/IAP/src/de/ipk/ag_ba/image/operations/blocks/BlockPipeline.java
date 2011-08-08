@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashSet;
+import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ObjectRef;
@@ -237,5 +238,18 @@ public class BlockPipeline {
 				backgroundTask,
 				finishSwingTask,
 				status, false, true);
+	}
+	
+	public BlockProperties postProcessPipelineResultsForAllAngles(TreeMap<Double, BlockProperties> allResultsForSnapshot) throws InstantiationException,
+			IllegalAccessException {
+		BlockProperties summaryResult = new BlockPropertiesImpl();
+		int index = 0;
+		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
+			ImageAnalysisBlockFIS block = blockClass.newInstance();
+			block.setInputAndOptions(null, null, null, index++, null);
+			block.postProcessResultsForAllAngles(allResultsForSnapshot, summaryResult);
+		}
+		
+		return summaryResult;
 	}
 }

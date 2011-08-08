@@ -50,7 +50,7 @@ public class ImageSet {
 	 * 
 	 * @return
 	 */
-	public boolean hasAllImageTypes() {
+	public boolean hasAllNeededImageTypes() {
 		return vis != null && fluo != null;// && nir != null;
 	}
 	

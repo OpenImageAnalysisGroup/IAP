@@ -102,4 +102,22 @@ public enum ImageConfiguration {
 		res.add(NirSide);
 		return res;
 	}
+	
+	public boolean isSide() {
+		switch (this) {
+			case RgbSide:
+			case FluoSide:
+			case NirSide:
+				return true;
+			case RgbTop:
+			case FluoTop:
+			case NirTop:
+				return false;
+			case Unknown:
+				throw new UnsupportedOperationException(
+						"ERROR: Can't decide if image is taken from side or top configuration as image configuration is undefined (Unknown)!");
+		}
+		throw new UnsupportedOperationException(
+				"ERROR: NO CASE MATCH (Internal Error 1, Error 2: Can't decide if image is taken from side or top configuration as image configuration is undefined (Unknown)!");
+	}
 }
