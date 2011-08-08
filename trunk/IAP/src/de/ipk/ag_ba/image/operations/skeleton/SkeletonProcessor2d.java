@@ -443,7 +443,7 @@ public class SkeletonProcessor2d {
 		boolean goRecursive = false;
 		do {
 			goRecursive = false;
-			System.out.println("numofendlimbs: " + endlimbs.size());
+			// System.out.println("numofendlimbs: " + endlimbs.size());
 			
 			for (Limb l : endlimbs) {
 				if (l.length() < autothreshold) {
@@ -510,7 +510,7 @@ public class SkeletonProcessor2d {
 	 * remark all end- and branchpoints
 	 */
 	private void basicRefreshSkeleton() {
-		System.out.println("endpoints ref: " + endpoints.size());
+		// System.out.println("endpoints ref: " + endpoints.size());
 		for (Point p : endpoints) {
 			skelImg[p.x][p.y] = colorEndpoints;
 		}

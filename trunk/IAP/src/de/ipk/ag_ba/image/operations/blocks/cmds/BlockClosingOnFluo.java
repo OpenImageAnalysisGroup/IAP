@@ -66,6 +66,6 @@ public class BlockClosingOnFluo extends AbstractSnapshotAnalysisBlockFIS {
 			}
 		}
 		
-		return new FlexibleImage(rgbArray, w, h);
+		return new FlexibleImage(w, h, rgbArray);
 	}
 }

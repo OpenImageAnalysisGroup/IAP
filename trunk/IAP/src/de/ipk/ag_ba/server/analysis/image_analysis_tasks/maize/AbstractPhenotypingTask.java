@@ -96,7 +96,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		addTopOrSideImagesToWorkset(workload, 0, analyzeTopImages(), analyzeSideImages());
 		
-		workload = filterWorkload(workload, "Athletico");// "Rainbow Amerindian"); // Athletico
+		// workload = filterWorkload(workload, "Athletico");// "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int workloadSnapshots = workload.size();
@@ -187,7 +187,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (md instanceof ImageData) {
 					ImageData id = (ImageData) md;
 					String keyA = id.getParentSample().getFullId() + ";" + id.getReplicateID();
-					Double keyB = id.getPosition();
+					Double keyB = id.getPosition() != null ? id.getPosition() : 0d;
 					if (!replicateId2ImageSetSide.containsKey(keyA)) {
 						replicateId2ImageSetSide.put(keyA, new TreeMap<Double, ImageSet>());
 					}

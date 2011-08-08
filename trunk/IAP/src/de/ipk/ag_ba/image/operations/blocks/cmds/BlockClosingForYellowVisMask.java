@@ -90,6 +90,6 @@ public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockF
 			}
 		}
 		
-		return new FlexibleImage(rgbArray, w, h);
+		return new FlexibleImage(w, h, rgbArray);
 	}
 }

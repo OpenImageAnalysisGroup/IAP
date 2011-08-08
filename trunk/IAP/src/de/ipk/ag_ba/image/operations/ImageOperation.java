@@ -253,7 +253,7 @@ public class ImageOperation {
 				in[idx++] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
 			}
 		}
-		return new ImageOperation(new FlexibleImage(in, image.getWidth(), image.getHeight()));// .dilate();
+		return new ImageOperation(new FlexibleImage(image.getWidth(), image.getHeight(), in));// .dilate();
 	}
 	
 	public ConvexHullCalculator hull() {
@@ -1270,7 +1270,7 @@ public class ImageOperation {
 				img[idx++] = o;
 			else
 				idx++;
-		return new FlexibleImage(img, image.getWidth(), image.getHeight());
+		return new FlexibleImage(image.getWidth(), image.getHeight(), img);
 	}
 	
 	public ImageOperation blur(double radius) {
@@ -1456,7 +1456,7 @@ public class ImageOperation {
 		
 		int w = workImage.getWidth();
 		int h = workImage.getHeight();
-		return new FlexibleImage(rgbArray, w, h);
+		return new FlexibleImage(w, h, rgbArray);
 	}
 	
 	/**
@@ -2047,7 +2047,7 @@ public class ImageOperation {
 	
 	public ImageOperation convertBinary2rgb() {
 		int[] bi = ImageConverter.convertBIto1A(image.getProcessor().getBufferedImage());
-		return new ImageOperation(new FlexibleImage(bi, image.getWidth(), image.getHeight()));
+		return new ImageOperation(new FlexibleImage(image.getWidth(), image.getHeight(), bi));
 	}
 	
 	/**
@@ -2231,7 +2231,7 @@ public class ImageOperation {
 			else
 				idx++;
 		}
-		return new ImageOperation(new FlexibleImage(resultMask, w, h));
+		return new ImageOperation(new FlexibleImage(w, h, resultMask));
 	}
 	
 	/**
@@ -2682,6 +2682,32 @@ public class ImageOperation {
 			labImage1[2][idx] = bDiff / 255f + 1;
 		}
 		return new FlexibleImage(w, h, labImage1).getIO();
+	}
+	
+	public ImageOperation subtractGrayImages(FlexibleImage image2) {
+		int w = getImage().getWidth();
+		int h = getImage().getHeight();
+		int[] img1 = getImageAs1array();
+		int[] img2 = image2.getAs1A();
+		int[] res = new int[img1.length];
+		
+		for (int idx = 0; idx < w * h; idx++) {
+			int c1 = img1[idx];
+			int c2 = img2[idx];
+			int b1 = (c1 & 0x0000ff);
+			int b2 = (c2 & 0x0000ff);
+			
+			int b = b1 - b2 + 127;
+			if (b < 0)
+				b = 0;
+			if (b > 255)
+				b = 255;
+			int r = Math.abs(b - 127) + 127;
+			int g = Math.abs(b - 127) + 127;
+			res[idx] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			
+		}
+		return new FlexibleImage(w, h, res).getIO();
 	}
 	
 	public ImageOperation copyImagesParts(double factorH, double factorW) {

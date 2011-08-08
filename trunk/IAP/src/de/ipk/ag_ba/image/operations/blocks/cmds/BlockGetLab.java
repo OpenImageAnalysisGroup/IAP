@@ -65,6 +65,6 @@ public class BlockGetLab extends AbstractSnapshotAnalysisBlockFIS {
 				result[idx] = image[idx++];
 		}
 		
-		return new FlexibleImage(result, width, height);
+		return new FlexibleImage(width, height, result);
 	}
 }

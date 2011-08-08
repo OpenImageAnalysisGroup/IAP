@@ -94,8 +94,8 @@ public class ImageComparator {
 				result[index] = imgInp[index];
 		}
 		if (showDiff)
-			new FlexibleImage(diff, width, height).print("difference");
-		return new ImageOperation(new FlexibleImage(result, width, height));
+			new FlexibleImage(width, height, diff).print("difference");
+		return new ImageOperation(new FlexibleImage(width, height, result));
 	}
 	
 	public ImageOperation compareGrayImages(FlexibleImage referenceImage, double maxDiffBlack, double maxDiffWhite, int background) {
@@ -121,6 +121,6 @@ public class ImageComparator {
 				result[index] = imgInp[index];
 			}
 		}
-		return new ImageOperation(new FlexibleImage(result, width, height));
+		return new ImageOperation(new FlexibleImage(width, height, result));
 	}
 }

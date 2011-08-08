@@ -3,10 +3,15 @@ package de.ipk.ag_ba.image.operations.blocks.cmds;
 import ij.measure.ResultsTable;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.TreeMap;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
@@ -65,15 +70,13 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			if (distHorizontal != null)
 				rt.addValue("leaf.length.sum.norm", leaflength * normFactor);
 			rt.addValue("leaf.length.sum", leaflength);
-		} else
-			rt.addValue("leaf.length.sum", 0);
+		}
 		
 		if (leafcount > 0) {
 			if (distHorizontal != null)
 				rt.addValue("leaf.length.avg.norm", leaflength * normFactor / leafcount);
 			rt.addValue("leaf.length.avg", leaflength / leafcount);
-		} else
-			rt.addValue("leaf.length.avg", 0);
+		}
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)
 			getProperties().storeResults(
@@ -104,7 +107,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			} else
 				img[i] = img[i];
 		}
-		return new FlexibleImage(img, w, h);
+		return new FlexibleImage(w, h, img);
 	}
 	
 	private int median(int center, int above, int left, int right, int below) {
@@ -128,7 +131,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			if (fi[index] == back)
 				fi[index] = oi[index];
 		}
-		return new FlexibleImage(fi, fires.getWidth(), fires.getHeight());
+		return new FlexibleImage(fires.getWidth(), fires.getHeight(), fi);
 	}
 	
 	/**
@@ -156,5 +159,47 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			}
 		}
 		return new FlexibleImage(res);
+	}
+	
+	@Override
+	public void postProcessResultsForAllAngles(TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
+		Double maxLeafcount = -1d;
+		Double maxLeaflength = -1d;
+		Double maxLeaflengthNorm = -1d;
+		ArrayList<Double> lc = new ArrayList<Double>();
+		// System.out.println("ANGLES WITHIN SNAPSHOT: " + allResultsForSnapshot.size());
+		for (BlockProperties rt : allResultsForSnapshot.values()) {
+			for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.count")) {
+				if (v.getValue() != null) {
+					if (v.getValue() > maxLeafcount)
+						maxLeafcount = v.getValue();
+					lc.add(v.getValue());
+				}
+			}
+			for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.length.sum")) {
+				if (v.getValue() != null) {
+					if (v.getValue() > maxLeaflength)
+						maxLeaflength = v.getValue();
+				}
+			}
+			for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.length.sum.norm")) {
+				if (v.getValue() != null) {
+					if (v.getValue() > maxLeaflengthNorm)
+						maxLeaflengthNorm = v.getValue();
+				}
+			}
+		}
+		
+		if (maxLeafcount > 0) {
+			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.max", maxLeafcount);
+			Double[] lca = lc.toArray(new Double[] {});
+			Arrays.sort(lca);
+			Double median = lca[lca.length / 2];
+			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.median", median);
+		}
+		if (maxLeaflength > 0)
+			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.max", maxLeaflength);
+		if (maxLeaflengthNorm > 0)
+			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm);
 	}
 }

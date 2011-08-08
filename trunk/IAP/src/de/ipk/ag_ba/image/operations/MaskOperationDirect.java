@@ -92,7 +92,7 @@ public class MaskOperationDirect {
 			i++;
 		}
 		
-		return new FlexibleImage(image1A, image.getWidth(), image.getHeight());
+		return new FlexibleImage(image.getWidth(), image.getHeight(), image1A);
 	}
 	
 }
