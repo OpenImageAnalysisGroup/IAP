@@ -49,7 +49,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		int leaflength = fires.getIO().countFilledPixels(skel2d.background);
 		
 		// ***Out***
-		System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
+		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
 		FlexibleImage result = MapOriginalOnSkelUseingMedian(fires, vis, Color.BLACK.getRGB());
 		result.print("res", debug);
 		FlexibleImage result2 = copyONOriginalImage(fires, vis, Color.BLACK.getRGB());

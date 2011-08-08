@@ -100,7 +100,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (analyzeSideImages())
 			addSideImagesToWorkset(workload, 0);
 		
-		// workload = filterWorkload(workload, "Apex");// "Rainbow Amerindian"); // Athletico
+		workload = filterWorkload(workload, "Athletico");// "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
