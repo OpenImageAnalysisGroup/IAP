@@ -33,7 +33,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 public class VolumeSegmentation implements ImageAnalysisTask {
 	
 	private static int somSize = 4;
-	protected Collection<NumericMeasurementInterface> input;
+	protected Collection<Sample3D> input;
 	protected MongoDB m;
 	protected Collection<NumericMeasurementInterface> output;
 	
@@ -86,39 +86,41 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 		somSize = (Integer) res[0];
 		output = new ArrayList<NumericMeasurementInterface>();
 		try {
-			for (NumericMeasurementInterface in : input) {
-				if (in instanceof VolumeData) {
-					status.setCurrentStatusText1("Load Volume");
-					LoadedVolume volume = IOmodule.loadVolume((VolumeData) in);
-					
-					volume.getURL().setFileName(volume.getURL().getFileName() + ".labelfield");
-					status.setCurrentStatusText1("Segmentation");
-					ThreeDsegmentationColored.segment(new LoadedVolumeExtension(volume), somSize, status, volume
+			for (Sample3D ins : input) {
+				for (NumericMeasurementInterface in : ins) {
+					if (in instanceof VolumeData) {
+						status.setCurrentStatusText1("Load Volume");
+						LoadedVolume volume = IOmodule.loadVolume((VolumeData) in);
+						
+						volume.getURL().setFileName(volume.getURL().getFileName() + ".labelfield");
+						status.setCurrentStatusText1("Segmentation");
+						ThreeDsegmentationColored.segment(new LoadedVolumeExtension(volume), somSize, status, volume
 										.getDimensionX(), volume.getDimensionY(), volume.getDimensionZ());
-					
-					if (storeResultInDatabase != null) {
-						long bytes = volume.getDimensionX() * volume.getDimensionY() * volume.getDimensionZ() * 4;
-						status.setCurrentStatusText1("Generate Stream (" + bytes / 1024 / 1024 + " MB)");
-						try {
-							status.setCurrentStatusText1("Saving (" + bytes / 1024 / 1024 + " MB)");
-							long t1 = System.currentTimeMillis();
-							storeResultInDatabase.saveVolume(volume, (Sample3D) volume.getParentSample(), m,
+						
+						if (storeResultInDatabase != null) {
+							long bytes = volume.getDimensionX() * volume.getDimensionY() * volume.getDimensionZ() * 4;
+							status.setCurrentStatusText1("Generate Stream (" + bytes / 1024 / 1024 + " MB)");
+							try {
+								status.setCurrentStatusText1("Saving (" + bytes / 1024 / 1024 + " MB)");
+								long t1 = System.currentTimeMillis();
+								storeResultInDatabase.saveVolume(volume, (Sample3D) volume.getParentSample(), m,
 												DBTable.SAMPLE, null, status);
-							long t2 = System.currentTimeMillis();
-							if (t2 > t1)
-								System.out.println("Saved Volume ("
+								long t2 = System.currentTimeMillis();
+								if (t2 > t1)
+									System.out.println("Saved Volume ("
 													+ StringManipulationTools.formatNumber(bytes / (t2 - t1) * 1000d / 1024 / 1024, "#.##")
 													+ " MB/s, if already in DB, save is skipped)");
-							else
-								System.out.println("Volume saved in 0 ms, saving was not needed or error occured.");
-							status.setCurrentStatusText1("Finished");
-							VolumeData volumeInDatabase = new VolumeData(volume.getParentSample(), volume);
-							output.add(volumeInDatabase);
-						} catch (Exception e) {
-							ErrorMsg.addErrorMessage(e);
+								else
+									System.out.println("Volume saved in 0 ms, saving was not needed or error occured.");
+								status.setCurrentStatusText1("Finished");
+								VolumeData volumeInDatabase = new VolumeData(volume.getParentSample(), volume);
+								output.add(volumeInDatabase);
+							} catch (Exception e) {
+								ErrorMsg.addErrorMessage(e);
+							}
+						} else {
+							output.add(volume);
 						}
-					} else {
-						output.add(volume);
 					}
 				}
 			}
@@ -130,7 +132,9 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workLoadIndex, int workLoadSize) {
+	public void setInput(Collection<Sample3D> input,
+			Collection<NumericMeasurementInterface> optValidMeasurements,
+			MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;
 		this.m = m;
 		this.workLoadIndex = workLoadIndex;

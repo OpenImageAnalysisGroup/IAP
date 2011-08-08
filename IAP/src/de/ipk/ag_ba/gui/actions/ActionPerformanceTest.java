@@ -18,17 +18,14 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PerformanceAnalysisTask
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author klukas
@@ -66,7 +63,7 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 		try {
 			ExperimentInterface res = experiment.getData(m);
 			
-			ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
+			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
 			int workIndex = 0;
 			for (SubstanceInterface m : res) {
@@ -75,13 +72,9 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.IMAGE)) {
-							workIndex++;
-							if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
-								if (md instanceof ImageData) {
-									workload.add((NumericMeasurementInterface) md);
-								}
-						}
+						workIndex++;
+						if (resultReceiver == null || workIndex % numberOfSubsets == workOnSubset)
+							workload.add(sd3);
 					}
 				}
 			}
@@ -103,7 +96,7 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
 			for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 1) {
 				long t1 = System.currentTimeMillis();
-				task.setInput(workload, m, 0, 1);
+				task.setInput(workload, null, m, 0, 1);
 				task.performAnalysis(pi, 1, status);
 				long t2 = System.currentTimeMillis();
 				statRes.addAll(task.getOutput());

@@ -10,10 +10,9 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionMongoOrLemnaTecExperimentNavigation;
-import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
@@ -23,17 +22,14 @@ import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author klukas
@@ -76,7 +72,7 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 		try {
 			ExperimentInterface res = experiment.getData(m);
 			
-			ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
+			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
 			HashSet<String> ignored = new HashSet<String>();
 			
@@ -86,27 +82,7 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.IMAGE)) {
-							if (md instanceof ImageData) {
-								ImageConfiguration config = ImageConfiguration.get(((ImageData) md).getSubstanceName());
-								if (config == ImageConfiguration.Unknown)
-									config = ImageConfiguration.get(((ImageData) md).getURL().getFileName());
-								
-								if (config == ImageConfiguration.FluoTop) {
-									ImageData i = (ImageData) md;
-									workload.add(i);
-								} else
-									if (config == ImageConfiguration.RgbTop) {
-										ImageData i = (ImageData) md;
-										workload.add(i);
-									} else
-										if (config == ImageConfiguration.NirTop) {
-											ImageData i = (ImageData) md;
-											workload.add(i);
-										} else
-											ignored.add(((ImageData) md).getSubstanceName());
-							}
-						}
+						workload.add(sd3);
 					}
 				}
 			}
@@ -122,7 +98,7 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 			
 			PhytochamberAnalysisTask task = new PhytochamberAnalysisTask();
 			
-			task.setInput(workload, m, workOnSubset, numberOfSubsets);
+			task.setInput(workload, null, m, workOnSubset, numberOfSubsets);
 			task.performAnalysis(pi, ti, status);
 			
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();

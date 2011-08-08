@@ -8,9 +8,9 @@ import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionMongoOrLemnaTecExperimentNavigation;
-import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -22,15 +22,12 @@ import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
  * @author klukas
@@ -62,7 +59,7 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 			
 			// src.title = src.title + ": processing";
 			
-			Collection<NumericMeasurementInterface> workset = new ArrayList<NumericMeasurementInterface>();
+			Collection<Sample3D> workset = new ArrayList<Sample3D>();
 			
 			for (SubstanceInterface m : res) {
 				Substance3D m3 = (Substance3D) m;
@@ -70,19 +67,20 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						for (Measurement md : sd3.getMeasurements(MeasurementNodeType.VOLUME)) {
-							if (md instanceof VolumeData) {
-								VolumeData i = (VolumeData) md;
-								workset.add(i);
-							}
-						}
+						workset.add(sd3);
 					}
 				}
 			}
+			// for (Measurement md : sd3.getMeasurements(MeasurementNodeType.VOLUME)) {
+			// if (md instanceof VolumeData) {
+			// VolumeData i = (VolumeData) md;
+			// workset.add(i);
+			// }
+			// }
 			
 			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
 			VolumeSegmentation segmentationTask = new VolumeSegmentation(saveVolumesToDB);
-			segmentationTask.setInput(workset, m, 0, 1);
+			segmentationTask.setInput(workset, null, m, 0, 1);
 			
 			segmentationTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 			

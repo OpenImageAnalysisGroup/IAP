@@ -43,8 +43,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  */
 public class ThreeDreconstruction implements ImageAnalysisTask {
 	
+	private Collection<Sample3D> input;
 	private Collection<NumericMeasurementInterface> output;
-	private Collection<NumericMeasurementInterface> input;
 	private MongoDB m;
 	
 	private int voxelresolution = 200;
@@ -113,13 +113,14 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 		// add volume to result set
 		
 		LinkedHashSet<Sample3D> samples = new LinkedHashSet<Sample3D>();
-		for (Measurement md : input) {
-			if (md instanceof ImageData) {
-				ImageData li = (ImageData) md;
-				Sample3D s3d = (Sample3D) li.getParentSample();
-				samples.add(s3d);
+		for (Sample3D ins : input)
+			for (Measurement md : ins) {
+				if (md instanceof ImageData) {
+					ImageData li = (ImageData) md;
+					Sample3D s3d = (Sample3D) li.getParentSample();
+					samples.add(s3d);
+				}
 			}
-		}
 		
 		for (Sample3D s3d : samples) {
 			ImageConfiguration ic = ImageConfiguration.get(s3d.getParentCondition().getParentSubstance().getName());
@@ -150,9 +151,9 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 					processSampleCreateVolume(s3d, imageData, replicateID, maximumThreadCountParallelImages, status);
 					
 					for (ImageAnalysisTask resultProcessor : resultProcessors) {
-						Collection<NumericMeasurementInterface> inp = new ArrayList<NumericMeasurementInterface>();
-						inp.add(volume);
-						resultProcessor.setInput(inp, m, 0, 1);
+						Collection<Sample3D> inp = new ArrayList<Sample3D>();
+						inp.add((Sample3D) volume.getParentSample());
+						resultProcessor.setInput(inp, null, m, 0, 1);
 						resultProcessor.performAnalysis(maximumThreadCountParallelImages, maximumThreadCountParallelImages,
 											status);
 						if (additionalResults.get(resultProcessor) == null)
@@ -340,7 +341,8 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<NumericMeasurementInterface> input, MongoDB m, int workLoadIndex, int workLoadSize) {
+	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements,
+			MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;
 		this.m = m;
 		this.workLoadIndex = workLoadIndex;

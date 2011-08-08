@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.LinkedHashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ObjectRef;
@@ -24,6 +25,7 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypi
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 
 /**
  * A list of image analysis "blocks" ({@link ImageAnalysisBlockFIS}) which may be executed lineary in a row.
@@ -190,7 +192,10 @@ public class BlockPipeline {
 			AbstractPhenotypingTask analysisTask
 			) {
 		final AbstractPhenotypingTask mat = analysisTask;
-		mat.setInput(input, m, 0, 1);
+		final LinkedHashSet<Sample3D> samples = new LinkedHashSet<Sample3D>();
+		for (NumericMeasurementInterface nmi : input)
+			samples.add((Sample3D) nmi.getParentSample());
+		mat.setInput(samples, input, m, 0, 1);
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				mat.getName(),
@@ -215,7 +220,7 @@ public class BlockPipeline {
 						fis.print(mat.getName() + " // Result " + idx + "/" + nn, new Runnable() {
 							@Override
 							public void run() {
-								mat.setInput(input, m, 0, 1);
+								mat.setInput(samples, input, m, 0, 1);
 								BackgroundTaskHelper.issueSimpleTaskInWindow(mat.getName(), "Analyze...",
 										backgroundTask,
 										(Runnable) finishSwingTaskRef.getObject(),
