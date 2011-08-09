@@ -12,7 +12,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancingVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilterForFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirProcessing;
@@ -68,7 +67,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockRemoveSmallClusters.class); // 2nd run
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
 		p.add(BlockNirProcessing.class);
-		p.add(BlockLabFilterVis.class);
+		// p.add(BlockLabFilterVis.class);
 		p.add(BlockCopyImagesApplyMask.class); // without nir
 		
 		// calculation of numeric values

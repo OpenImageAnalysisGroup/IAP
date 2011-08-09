@@ -24,7 +24,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private boolean debug = false;
+	private boolean debug = true;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
