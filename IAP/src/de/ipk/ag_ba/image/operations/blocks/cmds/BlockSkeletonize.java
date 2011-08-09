@@ -24,19 +24,19 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private boolean debug = true;
+	private boolean debug = false;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
 		FlexibleImage res = vis;
-		FlexibleImage viswork = vis.copy().getIO().medianFilter32Bit().closing(3, 3).getImage().print("vis", debug);
-		
-		if (viswork != null)
-			if (options.isMaize())
-				if (options.getCameraPosition() == CameraPosition.SIDE)
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
+			FlexibleImage viswork = vis.copy().getIO().medianFilter32Bit().closing(3, 3).getImage().print("vis", debug);
+			
+			if (viswork != null)
+				if (options.isMaize())
 					res = calcSkeleton(viswork, vis);
-		
+		}
 		return res;
 	}
 	
@@ -46,15 +46,14 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		skel2d.findEndpointsAndBranches();
 		skel2d.print("endpoints and branches", debug);
 		// skel2d.removeBurls();
-		skel2d.deleteShortEndLimbs(20);
-		skel2d.calculateEndlimbsRecursive();
+		skel2d.deleteShortEndLimbs(10);
 		
 		int leafcount = skel2d.endlimbs.size();
 		FlexibleImage fires = skel2d.getAsFlexibleImage();
-		int leaflength = fires.getIO().countFilledPixels(skel2d.background);
+		int leaflength = fires.getIO().countFilledPixels(SkeletonProcessor2d.background);
 		
 		// ***Out***
-		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
+		System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
 		FlexibleImage result = MapOriginalOnSkelUseingMedian(fires, vis, Color.BLACK.getRGB());
 		result.print("res", debug);
 		FlexibleImage result2 = copyONOriginalImage(fires, vis, Color.BLACK.getRGB());
@@ -117,21 +116,30 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	/**
-	 * Maps skeleton on original image
-	 * 
-	 * @param fires
-	 * @param orig
-	 * @param back
-	 * @return
+	 * Draws skeleton on plant image
 	 */
-	private FlexibleImage copyONOriginalImage(FlexibleImage fires, FlexibleImage orig, int back) {
-		int[] fi = fires.getAs1A();
-		int[] oi = orig.getAs1A();
-		for (int index = 0; index < fi.length; index++) {
-			if (fi[index] == back)
-				fi[index] = oi[index];
+	private FlexibleImage copyONOriginalImage(FlexibleImage skeletImage, FlexibleImage plantImage, int back) {
+		int[] skelImg = skeletImage.getAs1A();
+		int[] plantImg = plantImage.getAs1A();
+		int w = skeletImage.getWidth();
+		int h = skeletImage.getHeight();
+		for (int index = 0; index < skelImg.length; index++) {
+			if (skelImg[index] != back) {
+				int v = skelImg[index];
+				int r = 3;
+				if (v == SkeletonProcessor2d.colorEndpoints)
+					r = 16;
+				if (v == SkeletonProcessor2d.colorBranches)
+					r = 8;
+				for (int diffX = -r; diffX < r; diffX++)
+					for (int diffY = -r; diffY < r; diffY++) {
+						if (index - diffX + w * diffY >= 0)
+							plantImg[index - diffX + w * diffY] = v;
+					}
+				plantImg[index] = v; // center
+			}
 		}
-		return new FlexibleImage(fires.getWidth(), fires.getHeight(), fi);
+		return new FlexibleImage(w, h, plantImg);
 	}
 	
 	/**
@@ -167,8 +175,50 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		Double maxLeaflength = -1d;
 		Double maxLeaflengthNorm = -1d;
 		ArrayList<Double> lc = new ArrayList<Double>();
+		
+		Integer a = null;
+		searchLoop: for (Double key : allResultsForSnapshot.keySet()) {
+			BlockProperties rt = allResultsForSnapshot.get(key);
+			for (BlockPropertyValue v : rt.getProperties("RESULT_top.main.axis.rotation")) {
+				if (v.getValue() != null) {
+					a = v.getValue().intValue();
+					System.out.println("main.axis.rotation: " + a);
+					break searchLoop;
+				}
+			}
+		}
+		
+		Double bestAngle = null;
+		if (a != null) {
+			a = a % 180;
+			Double bestDiff = Double.MAX_VALUE;
+			for (Double d : allResultsForSnapshot.keySet()) {
+				if (d >= 0) {
+					double dist = Math.abs(a - d);
+					if (dist < bestDiff) {
+						bestAngle = d;
+						bestDiff = dist;
+					}
+				}
+			}
+		}
 		// System.out.println("ANGLES WITHIN SNAPSHOT: " + allResultsForSnapshot.size());
-		for (BlockProperties rt : allResultsForSnapshot.values()) {
+		for (Double key : allResultsForSnapshot.keySet()) {
+			BlockProperties rt = allResultsForSnapshot.get(key);
+			
+			if (bestAngle != null && key == bestAngle) {
+				System.out.println("Best side angle: " + bestAngle);
+				Double cnt = null;
+				for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.count")) {
+					if (v.getValue() != null)
+						cnt = v.getValue();
+				}
+				if (cnt != null) {
+					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.best", cnt);
+					System.out.println("Leaf count for best side image: " + cnt);
+				}
+			}
+			
 			for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.count")) {
 				if (v.getValue() != null) {
 					if (v.getValue() > maxLeafcount)
@@ -192,6 +242,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		
 		if (maxLeafcount > 0) {
 			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.max", maxLeafcount);
+			System.out.println("MAX leaf count: " + maxLeafcount);
 			Double[] lca = lc.toArray(new Double[] {});
 			Arrays.sort(lca);
 			Double median = lca[lca.length / 2];

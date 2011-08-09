@@ -161,7 +161,7 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, bpleft, bpright);
 					return io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else {
-					pix = BlockColorBalancingFluoAndNir.getProbablyWhitePixels(inputUsedForColorAnalysis.crop(), side, bpleft, bpright);// 0.08);
+					pix = BlockColorBalancingFluoAndNir.getProbablyWhitePixels(inputUsedForColorAnalysis, side, null, null);// 0.08);
 					res = new ImageOperation(nir).imageBalancing(whitePoint, pix).getImage();
 				}
 			}

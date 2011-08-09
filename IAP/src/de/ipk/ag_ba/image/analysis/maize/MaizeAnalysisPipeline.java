@@ -103,7 +103,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 			
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 0);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 98); // 98 // 130 gerste wegen topf
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 80); // 98 // 130 gerste wegen topf
 			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 125);// 125
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
@@ -122,9 +122,9 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 130);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
 		}
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 100);
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 100);
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 40);
+		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 40);
+		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 40);
+		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 60);
 		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 40);
 		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 90);
 		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 90);
