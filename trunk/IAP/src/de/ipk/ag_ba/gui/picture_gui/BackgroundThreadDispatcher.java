@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 
 import javax.swing.Timer;
 
+import org.AttributeHelper;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
@@ -235,7 +236,7 @@ public class BackgroundThreadDispatcher {
 				// (higher than all running tasks) then the loop is
 				// stopped, it can run, too
 				int maxTask = SystemAnalysis.getNumberOfCPUs();
-				double load = SystemAnalysisExt.getRealSystemCpuLoad();
+				double load = AttributeHelper.windowsRunning() ? 1 : SystemAnalysisExt.getRealSystemCpuLoad();
 				if (maxTask > 1 && load > 0) {
 					if (load / maxTask < 1) {
 						if (moreLoad < maxTask * 2) {
