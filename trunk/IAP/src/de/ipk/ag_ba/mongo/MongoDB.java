@@ -826,7 +826,7 @@ public class MongoDB {
 		return ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
-	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(1, new ThreadFactory() {
+	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(4, new ThreadFactory() {
 		int n = 1;
 		
 		@Override

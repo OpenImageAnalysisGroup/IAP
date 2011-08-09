@@ -75,7 +75,7 @@ public class BlockPipeline {
 		
 		if (status != null)
 			status.setCurrentStatusValueFine(0);
-		
+		String lastTstring = "";
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			
@@ -101,9 +101,9 @@ public class BlockPipeline {
 			
 			if (status != null) {
 				status.setCurrentStatusValueFine(100d * (index / (double) blocks.size()));
-				status.setCurrentStatusText1(blockClass.getSimpleName());
 				status.setCurrentStatusText2(
-						"Finished " + index + "/" + blocks.size() + " (" + block.getClass().getSimpleName() + ")");
+						"Finished " + index + "/" + blocks.size());// + "<br>" +"" + filter(blockClass.getSimpleName()));
+				// status.setCurrentStatusText1(block.getClass().getSimpleName());
 				if (status.wantsToStop())
 					break;
 			};
@@ -113,13 +113,24 @@ public class BlockPipeline {
 		
 		if (status != null) {
 			status.setCurrentStatusValueFine(100d * (index / (double) blocks.size()));
-			status.setCurrentStatusText1("Pipeline finished");
-			status.setCurrentStatusText2("T=" + ((b - a) / 1000) + "s");
+			// status.setCurrentStatusText1("Pipeline finished");
+			status.setCurrentStatusText1("T=" + ((b - a) / 1000) + "s");
+			lastTstring = "T=" + ((b - a) / 1000) + "s";
 		}
 		// System.out.print("PET: " + (b - a) / 1000 + "s ");
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);
 		updatePipelineStatistics();
 		return input;
+	}
+	
+	private String filter(String simpleName) {
+		if (simpleName.startsWith("Block"))
+			simpleName = simpleName.substring("Block".length());
+		while (simpleName.length() < 30)
+			simpleName += "_";
+		if (simpleName.length() > 30)
+			simpleName = simpleName.substring(0, 30 - "...".length()) + "...";
+		return simpleName;
 	}
 	
 	private void updateBlockStatistics(int nBlocks) {

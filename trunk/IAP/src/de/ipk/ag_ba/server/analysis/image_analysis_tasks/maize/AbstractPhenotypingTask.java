@@ -39,6 +39,7 @@ import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -255,6 +256,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			@Override
 			public void run() {
 				try {
+					BackgroundTaskHelper.lockAquire("load images", 4);
 					BufferedImage loadedReferenceImage = null;
 					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, optImageMasks != null, loadedReferenceImage);
 					input.set(new FlexibleImage(li.getLoadedImage(), type));
@@ -267,6 +269,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					err.printStackTrace();
 				} catch (Exception e) {
 					e.printStackTrace();
+				} finally {
+					BackgroundTaskHelper.lockRelease("load images");
 				}
 			}
 		}, "load " + type.name(), 0);
@@ -411,14 +415,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		final FlexibleImageSet input = new FlexibleImageSet();
 		final FlexibleImageSet inputMasks = new FlexibleImageSet();
-		if (status != null)
-			status.setCurrentStatusText2("Load Images");
+		// if (status != null)
+		// status.setCurrentStatusText1("Load Images");
 		
 		loadImages(inVis, inFluo, inNir, input, inputMasks);
 		
 		if (input.hasAllThreeImages() && input.getSmallestHeight(true, true, false) > 1) {
-			if (status != null)
-				status.setCurrentStatusText2("Images are loaded");
+			// if (status != null)
+			// status.setCurrentStatusText1("Images are loaded");
 			
 			// TODO: FIX THIS, ALL INFO SHOULD BE SUPPLIED USING THE ImageProcessorOptions, see below!!!
 			//
@@ -446,8 +450,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			// input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
 			// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
 			
-			if (status != null)
-				status.setCurrentStatusText2("Process Analysis Pipeline");
+			// if (status != null)
+			// status.setCurrentStatusText1("Process Analysis Pipeline");
 			
 			BlockProperties analysisResults;
 			
@@ -475,7 +479,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					
 					@Override
 					public void setCurrentStatusText2(String s2) {
-						status.setCurrentStatusText1(s2);
+						status.setCurrentStatusText2(s2);
 					}
 					
 					@Override

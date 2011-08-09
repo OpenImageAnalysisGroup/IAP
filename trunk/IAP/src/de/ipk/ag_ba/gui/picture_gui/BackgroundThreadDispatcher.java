@@ -18,6 +18,7 @@ import javax.swing.Timer;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * @author klukas
@@ -26,7 +27,6 @@ public class BackgroundThreadDispatcher {
 	Stack<MyThread> todo = new Stack<MyThread>();
 	Stack<Integer> todoPriorities = new Stack<Integer>();
 	LinkedList<MyThread> runningTasks = new LinkedList<MyThread>();
-	int maxTask = SystemAnalysis.getNumberOfCPUs();
 	
 	int indicator = 0;
 	
@@ -184,6 +184,7 @@ public class BackgroundThreadDispatcher {
 	ExecutorService es = Executors.newCachedThreadPool();
 	
 	private void schedulerCode() {
+		int moreLoad = 0;
 		while (true) {
 			try {
 				Thread.sleep(50);
@@ -233,6 +234,19 @@ public class BackgroundThreadDispatcher {
 				// in case there is a higher priority task waiting
 				// (higher than all running tasks) then the loop is
 				// stopped, it can run, too
+				int maxTask = SystemAnalysis.getNumberOfCPUs();
+				double load = SystemAnalysisExt.getRealSystemCpuLoad();
+				if (maxTask > 1 && load > 0) {
+					if (load / maxTask < 1) {
+						if (moreLoad < maxTask * 2) {
+							// System.out.print(maxTask + " --> ");
+							moreLoad += 1;
+							maxTask = maxTask + moreLoad;
+							// System.out.println(maxTask + " (Load too low: " + load + ")");
+						}
+					} else
+						moreLoad -= 1;
+				}
 				while (runningTasks.size() - waitThreads.size() + 1 >= maxTask || highMemoryLoad(runningTasks)) {
 					int highestRunningPrio = Integer.MIN_VALUE;
 					try {
