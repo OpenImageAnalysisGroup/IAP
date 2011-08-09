@@ -77,6 +77,7 @@ public class PerformanceTest {
 		
 		options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 		options.setCameraPosition(CameraPosition.SIDE);
+		options.setIsMaize(true);
 		// options.clearAndAddDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 0.5);
 		MaizeAnalysisPipeline pipeline = new MaizeAnalysisPipeline();
 		
