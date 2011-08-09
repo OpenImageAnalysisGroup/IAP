@@ -3,6 +3,8 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
+import ij.measure.ResultsTable;
+
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
@@ -41,12 +43,19 @@ public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 				
 				angle = angle - imageRotationAngle;
 				
-				getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION, angle);
+				// getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION, angle);
 				double normalizedDistanceToMainAxis = macr.getMinResult().getDistanceSum() / macr.getMinResult().getPixelCount()
 						/ macr.getMinResult().getPixelCount();
-				getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE, normalizedDistanceToMainAxis);
+				// getProperties().setNumericProperty(0, PropertyNames.RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE, normalizedDistanceToMainAxis);
 				getProperties().setNumericProperty(0, PropertyNames.CENTROID_X, macr.getCentroid().x);
 				getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y, macr.getCentroid().y);
+				
+				ResultsTable rt = new ResultsTable();
+				rt.incrementCounter();
+				rt.addValue("main.axis.rotation", angle);
+				rt.addValue("main.axis.normalized.distance", normalizedDistanceToMainAxis);
+				
+				getProperties().storeResults("RESULT_top.", rt, getBlockPosition());
 			} else {
 				if (!SystemAnalysis.isHeadless()) {
 					// getInput().getImages().getVis().print("(Image) Could not determine main axis angle (" + SystemAnalysisExt.getCurrentTime() + ")");

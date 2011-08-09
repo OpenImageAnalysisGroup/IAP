@@ -1837,8 +1837,8 @@ public class ImageOperation {
 		return medianFilter32Bit(true);
 	}
 	
-	public ImageOperation medianFilter32Bit(boolean p) {
-		if (p) {
+	public ImageOperation medianFilter32Bit(boolean performanceOptimized) {
+		if (performanceOptimized) {
 			int[] img = getImageAs1array();
 			int w = image.getWidth();
 			int h = image.getHeight();
@@ -2618,7 +2618,39 @@ public class ImageOperation {
 		double[] factors = { r, g, b };
 		// System.out.println("balance factors: " + r + " " + g + " " + b);
 		ImageOperation io = new ImageOperation(image);
-		return io.multiplicateImageChannelsWithFactors(factors);
+		ImageOperation res = io.multiplicateImageChannelsWithFactors(factors);
+		if (r + g + b > 60) {
+			res = res.blur(10);
+			res = res.multiplyHSV(0.4, 1.4, 0.9);
+		}
+		return res;
+	}
+	
+	private ImageOperation multiplyHSV(double hf, double sf, double vf) {
+		int[] image = getImageAs1array();
+		int width = getImage().getWidth();
+		int height = getImage().getHeight();
+		float[] hsbvals = new float[3];
+		for (int idx = 0; idx < image.length; idx++) {
+			int c = image[idx];
+			int r = (c & 0xff0000) >> 16;
+			int g = (c & 0x00ff00) >> 8;
+			int b = (c & 0x0000ff);
+			Color.RGBtoHSB(r, g, b, hsbvals);
+			hsbvals[0] *= hf;
+			hsbvals[1] *= sf;
+			hsbvals[2] *= vf;
+			if (hsbvals[1] < 0)
+				hsbvals[1] = 0;
+			if (hsbvals[1] > 1)
+				hsbvals[1] = 1;
+			if (hsbvals[2] < 0)
+				hsbvals[2] = 0;
+			if (hsbvals[2] > 1)
+				hsbvals[2] = 1;
+			image[idx] = Color.HSBtoRGB(hsbvals[0], hsbvals[1], hsbvals[2]);
+		}
+		return new ImageOperation(image, width, height);
 	}
 	
 	public ImageOperation medianFilter32Bit(int repeat) {

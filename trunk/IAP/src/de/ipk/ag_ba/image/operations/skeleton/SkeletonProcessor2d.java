@@ -15,12 +15,12 @@ public class SkeletonProcessor2d {
 	
 	ArrayList<Limb> forRemove = new ArrayList<Limb>();
 	
-	public int colorEndpoints = Color.YELLOW.getRGB();
-	public int colorBranches = Color.RED.getRGB();
-	public int colorMarkedEndLimbs = Color.BLUE.getRGB();
-	public int foreground = Color.WHITE.getRGB();
-	public int background = Color.BLACK.getRGB(); // TODO Color.BLACK.getRGB() or -16777216 must be replaced by the real backgroundcolor
-	public int colorDebug = Color.GREEN.getRGB();
+	public static final int colorEndpoints = Color.YELLOW.getRGB();
+	public static final int colorBranches = Color.RED.getRGB();
+	public static final int colorMarkedEndLimbs = Color.BLUE.getRGB();
+	public static final int foreground = Color.orange.getRGB();
+	public static final int background = Color.BLACK.getRGB(); // TODO Color.BLACK.getRGB() or -16777216 must be replaced by the real backgroundcolor
+	public static final int colorDebug = Color.GREEN.getRGB();
 	
 	public boolean debug = false;
 	
@@ -181,7 +181,7 @@ public class SkeletonProcessor2d {
 		boolean added = false;
 		for (Limb l : endlimbs) {
 			if (l.isCut) {
-				System.out.println("cut: " + l.endpoint.toString() + " , " + l.initialpoint.toString());
+				// System.out.println("connecting limbs: " + l.endpoint.toString() + " , " + l.initialpoint.toString());
 				Point[] toConnect = getNearestLimb(l);
 				connect(toConnect[0], toConnect[1], colorMarkedEndLimbs, l);
 				added = true;
@@ -497,26 +497,29 @@ public class SkeletonProcessor2d {
 	 * @param threshold
 	 */
 	public void deleteShortEndLimbs(int threshold) {
-		if (endlimbs.size() <= 0)
-			calculateEndlimbsRecursive();
-		while (connectSkeleton()) {
-			calculateEndlimbsRecursive();
-		}
-		int autothreshold = getAutoThresh(threshold / (double) 100);
-		boolean goRecursive = false;
+		int n = 0;
 		do {
-			goRecursive = false;
-			// System.out.println("numofendlimbs: " + endlimbs.size());
-			
-			for (Limb l : endlimbs) {
-				if (l.length() < autothreshold) {
-					forRemove.add(l);
-					goRecursive = true;
-					// System.out.println("del");
+			// do {
+			calculateEndlimbsRecursive();
+			// } while (connectSkeleton() && n < 1000);
+			int autothreshold = getAutoThresh(threshold / (double) 100);
+			boolean goRecursive = false;
+			do {
+				goRecursive = false;
+				// System.out.println("numofendlimbs: " + endlimbs.size());
+				
+				for (Limb l : endlimbs) {
+					if (l.length() < autothreshold) {
+						forRemove.add(l);
+						goRecursive = true;
+						// System.out.println("del");
+					}
 				}
-			}
-			totalRefreshSkeleton();
-		} while (goRecursive);
+				totalRefreshSkeleton();
+			} while (goRecursive);
+			calculateEndlimbsRecursive();
+			n++;
+		} while (connectSkeleton() && n < 1000);
 	}
 	
 	/**
@@ -564,11 +567,11 @@ public class SkeletonProcessor2d {
 					skelImg[forRemove.get(index).endpoint.x][forRemove.get(index).endpoint.y] = background;
 				endlimbs.remove(forRemove.get(index));
 			}
-			forRemove.clear();
-			endpoints.clear();
-			branches.clear();
-			findEndpointsAndBranches();
 		}
+		forRemove.clear();
+		endpoints.clear();
+		branches.clear();
+		findEndpointsAndBranches();
 	}
 	
 	/**
