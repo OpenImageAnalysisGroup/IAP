@@ -177,14 +177,17 @@ public class SkeletonProcessor2d {
 		}
 	}
 	
-	public void connectSkeleton() {
+	public boolean connectSkeleton() {
+		boolean added = false;
 		for (Limb l : endlimbs) {
 			if (l.isCut) {
 				System.out.println("cut: " + l.endpoint.toString() + " , " + l.initialpoint.toString());
-				Point[] con = getNearestLimb(l);
-				connect(con[0], con[1]);
+				Point[] toConnect = getNearestLimb(l);
+				connect(toConnect[0], toConnect[1], colorMarkedEndLimbs, l);
+				added = true;
 			}
 		}
+		return added;
 	}
 	
 	private Point[] getNearestLimb(Limb l) {
@@ -193,32 +196,41 @@ public class SkeletonProcessor2d {
 		Point ini = l.initialpoint;
 		Point res = null;
 		for (Point p : endpoints) {
-			if (ini.distance(p) < dist)
+			if (ini.distance(p) < dist && p != ini) {
 				res = p;
+				dist = (int) ini.distance(p);
+			}
 		}
 		for (Point p : branches) {
-			if (ini.distance(p) < dist)
+			if (ini.distance(p) < dist && p != ini) {
 				res = p;
+				dist = (int) ini.distance(p);
+			}
 		}
 		
 		boolean endok = false;
 		Point end = l.endpoint;
 		for (Point p : endpoints) {
-			if (end.distance(p) < dist) {
+			if (end.distance(p) < dist && p != end) {
 				res = p;
+				dist = (int) end.distance(p);
 				endok = true;
 			}
 		}
 		for (Point p : branches) {
-			if (end.distance(p) < dist) {
+			if (end.distance(p) < dist && p != end) {
 				res = p;
+				dist = (int) end.distance(p);
 				endok = true;
 			}
 		}
-		if (endok)
+		if (endok) {
+			endpoints.remove(end);
 			return new Point[] { res, end };
-		else
+		} else {
+			endpoints.remove(ini);
 			return new Point[] { res, ini };
+		}
 	}
 	
 	/**
@@ -226,8 +238,9 @@ public class SkeletonProcessor2d {
 	 * 
 	 * @param initialpoint
 	 * @param endpoint
+	 * @param l
 	 */
-	private void connect(Point initialpoint, Point endpoint) {
+	private void connect(Point initialpoint, Point endpoint, int color, Limb l) {
 		int x0 = initialpoint.x;
 		int x1 = endpoint.x;
 		int y0 = initialpoint.y;
@@ -237,7 +250,8 @@ public class SkeletonProcessor2d {
 		int err = dx + dy, e2; /* error value e_xy */
 		
 		while (true) { /* loop */
-			skelImg[x0][y0] = foreground;
+			skelImg[x0][y0] = color;
+			l.points.add(new Point(x0, y0));
 			if (x0 == x1 && y0 == y1)
 				break;
 			e2 = 2 * err;
@@ -385,6 +399,46 @@ public class SkeletonProcessor2d {
 		}
 	}
 	
+	/**
+	 * Not Mask based
+	 */
+	public void findEndpointsAndBranches2() {
+		int width = skelImg.length;
+		int height = skelImg[0].length;
+		
+		int[][] imgbin = rgbToBinaryArray(skelImg);
+		skelImg = binaryArrayToRgb(imgbin);
+		
+		for (int x = 1; x < width - 1; x++) {
+			for (int y = 1; y < height - 1; y++) {
+				if (imgbin[x][y] != 0) {
+					int[][] area = new int[][] { { imgbin[x - 1][y - 1], imgbin[x][y - 1], imgbin[x + 1][y - 1] },
+							{ imgbin[x - 1][y], imgbin[x][y], imgbin[x + 1][y] },
+							{ imgbin[x - 1][y + 1], imgbin[x][y + 1], imgbin[x + 1][y + 1] } };
+					int numOfNeigbours = getNumberOfNeighbours(area);
+					if (numOfNeigbours < 1)
+						skelImg[x][y] = background;
+					if (numOfNeigbours == 1)
+						skelImg[x][y] = colorEndpoints;
+					if (numOfNeigbours > 2)
+						skelImg[x][y] = colorBranches;
+				}
+			}
+		}
+	}
+	
+	private int getNumberOfNeighbours(int[][] inp) {
+		int res = 0;
+		for (int x = 0; x < inp.length; x++) {
+			for (int y = 0; y < inp[0].length; y++) {
+				if (inp[x][y] != 0)
+					res++;
+			}
+		}
+		
+		return res - 1;
+	}
+	
 	public void removeBurls() {
 		
 		int[][] burl1 = new int[][] { { colorBranches, foreground, background }, { foreground, background, foreground },
@@ -437,8 +491,17 @@ public class SkeletonProcessor2d {
 		}
 	}
 	
+	/**
+	 * First try to connect, than delete
+	 * 
+	 * @param threshold
+	 */
 	public void deleteShortEndLimbs(int threshold) {
-		calculateEndlimbsRecursive();
+		if (endlimbs.size() <= 0)
+			calculateEndlimbsRecursive();
+		while (connectSkeleton()) {
+			calculateEndlimbsRecursive();
+		}
 		int autothreshold = getAutoThresh(threshold / (double) 100);
 		boolean goRecursive = false;
 		do {
@@ -502,6 +565,8 @@ public class SkeletonProcessor2d {
 				endlimbs.remove(forRemove.get(index));
 			}
 			forRemove.clear();
+			endpoints.clear();
+			branches.clear();
 			findEndpointsAndBranches();
 		}
 	}
