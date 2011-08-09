@@ -15,7 +15,7 @@ public class BlockReplaceEmptyOriginalImage extends AbstractBlock {
 	@Override
 	protected FlexibleImage processVISimage() throws InterruptedException {
 		FlexibleImage image = getInput().getImages().getVis();
-		IOurl infoUrl = getInput().getImages().getVisInfo().getURL();
+		IOurl infoUrl = getInput().getImages().getVisInfo() != null ? getInput().getImages().getVisInfo().getURL() : null;
 		image = processImage(image, infoUrl);
 		return image;
 	}
@@ -23,7 +23,7 @@ public class BlockReplaceEmptyOriginalImage extends AbstractBlock {
 	@Override
 	protected FlexibleImage processFLUOimage() throws InterruptedException {
 		FlexibleImage image = getInput().getImages().getFluo();
-		IOurl infoUrl = getInput().getImages().getFluoInfo().getURL();
+		IOurl infoUrl = getInput().getImages().getFluoInfo() != null ? getInput().getImages().getFluoInfo().getURL() : null;
 		image = processImage(image, infoUrl);
 		return image;
 	}
@@ -31,7 +31,7 @@ public class BlockReplaceEmptyOriginalImage extends AbstractBlock {
 	@Override
 	protected FlexibleImage processNIRimage() throws InterruptedException {
 		FlexibleImage image = getInput().getImages().getNir();
-		IOurl infoUrl = getInput().getImages().getNirInfo().getURL();
+		IOurl infoUrl = getInput().getImages().getNirInfo() != null ? getInput().getImages().getNirInfo().getURL() : null;
 		image = processImage(image, infoUrl);
 		return image;
 	}

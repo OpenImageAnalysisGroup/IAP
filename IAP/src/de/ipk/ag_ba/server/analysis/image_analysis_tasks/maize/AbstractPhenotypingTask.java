@@ -202,11 +202,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					
 					is.setSide(ic.isSide());
 					
-					if (ic == ImageConfiguration.RgbSide)
+					if (ic == ImageConfiguration.RgbSide || ic == ImageConfiguration.RgbTop)
 						is.setVis(id);
-					if (ic == ImageConfiguration.FluoSide)
+					if (ic == ImageConfiguration.FluoSide || ic == ImageConfiguration.FluoTop)
 						is.setFluo(id);
-					if (ic == ImageConfiguration.NirSide)
+					if (ic == ImageConfiguration.NirSide || ic == ImageConfiguration.NirTop)
 						is.setNir(id);
 				}
 			}

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.TreeMap;
 
@@ -102,7 +103,7 @@ public class BlockPipeline {
 				status.setCurrentStatusValueFine(100d * (index / (double) blocks.size()));
 				status.setCurrentStatusText1(blockClass.getSimpleName());
 				status.setCurrentStatusText2(
-						"Finished " + index + "/" + blocks.size() + " (t=" + seconds + "s)");
+						"Finished " + index + "/" + blocks.size() + " (" + block.getClass().getSimpleName() + ")");
 				if (status.wantsToStop())
 					break;
 			};
@@ -194,8 +195,17 @@ public class BlockPipeline {
 			) {
 		final AbstractPhenotypingTask mat = analysisTask;
 		final LinkedHashSet<Sample3D> samples = new LinkedHashSet<Sample3D>();
-		for (NumericMeasurementInterface nmi : input)
-			samples.add((Sample3D) nmi.getParentSample());
+		HashMap<Sample3D, Sample3D> old2newSample = new HashMap<Sample3D, Sample3D>();
+		for (NumericMeasurementInterface nmi : input) {
+			if (!old2newSample.containsKey(nmi.getParentSample())) {
+				Sample3D s3dNewSample = (Sample3D) nmi.getParentSample().clone(nmi.getParentSample().getParentCondition());
+				s3dNewSample.clear();
+				old2newSample.put((Sample3D) nmi.getParentSample(), s3dNewSample);
+				samples.add(s3dNewSample);
+			}
+			old2newSample.get(nmi.getParentSample()).add(nmi.clone(old2newSample.get(nmi.getParentSample())));
+		}
+		
 		mat.setInput(samples, input, m, 0, 1);
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
