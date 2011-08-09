@@ -1660,7 +1660,7 @@ public class ImageOperation {
 		StopWatch s = new StopWatch("lab_cube", false);
 		final float step = 1f / 255f;
 		final float[][][] result = new float[256][256][256 * 3];
-		ExecutorService executor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
+		ExecutorService executor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs() <= 6 ? SystemAnalysis.getNumberOfCPUs() : 6);
 		final float cont = 16f / 116f;
 		for (int rr = 0; rr < 256; rr++) {
 			final int red = rr;
