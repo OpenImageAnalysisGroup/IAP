@@ -127,8 +127,6 @@ public class TaskDescription {
 							
 							ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
 							
-							System.out.println("MV a=" + experiment.getNumberOfMeasurementValues() + ". b=" + experiment2.getNumberOfMeasurementValues());
-							
 							ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 							for (ExperimentHeaderInterface i : m.getExperimentList(null)) {
 								if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
@@ -157,8 +155,25 @@ public class TaskDescription {
 								System.out.println("TODO: " + batch.getPartCnt() + ", RESULTS FINISHED: " + knownResults.size());
 								Experiment e = new Experiment();
 								long tFinish = System.currentTimeMillis();
+								boolean removeWaterAndWeightDataFromSubsequentDatasets = false;
 								for (ExperimentHeaderInterface i : knownResults) {
 									ExperimentInterface ei = m.getExperiment(i);
+									if (removeWaterAndWeightDataFromSubsequentDatasets) {
+										System.out.print("INFO: Remove duplicate water and weight data before adding results to merged dataset");
+										ArrayList<SubstanceInterface> toBeRemoved = new ArrayList<SubstanceInterface>();
+										for (SubstanceInterface si : ei) {
+											if (si.getName() != null && (si.getName().equals("weight_before") ||
+													(si.getName().equals("water_weight") ||
+															si.getName().equals("water_sum"))))
+												toBeRemoved.add(si);
+										}
+										for (SubstanceInterface si : toBeRemoved) {
+											ei.remove(si);
+											System.out.print(".");
+										}
+										System.out.println();
+									}
+									removeWaterAndWeightDataFromSubsequentDatasets = true;
 									if (ei.getNumberOfMeasurementValues() > 0)
 										System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
 									e.addAndMerge(ei);

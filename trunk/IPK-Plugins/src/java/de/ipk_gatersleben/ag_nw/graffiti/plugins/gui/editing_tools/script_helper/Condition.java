@@ -744,4 +744,9 @@ public class Condition implements ConditionInterface {
 	public String getOriginDbId() {
 		return header.getOriginDbId();
 	}
+	
+	@Override
+	public void setExperimentHeader(ExperimentHeaderInterface header) {
+		this.header = header;
+	}
 }
