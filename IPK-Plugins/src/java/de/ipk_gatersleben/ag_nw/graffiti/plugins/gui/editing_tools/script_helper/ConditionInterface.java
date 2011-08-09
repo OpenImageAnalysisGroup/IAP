@@ -175,4 +175,6 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public String getOriginDbId();
 	
+	public void setExperimentHeader(ExperimentHeaderInterface header);
+	
 }

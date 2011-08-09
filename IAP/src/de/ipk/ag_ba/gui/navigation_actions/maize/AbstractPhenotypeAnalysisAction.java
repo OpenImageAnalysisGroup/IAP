@@ -68,11 +68,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			return;
 		
 		try {
-			ExperimentInterface res = experiment.getData(m);
+			ExperimentInterface experimentToBeAnalysed = experiment.getData(m);
 			
 			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
-			for (SubstanceInterface m : res) {
+			for (SubstanceInterface m : experimentToBeAnalysed) {
 				Substance3D m3 = (Substance3D) m;
 				for (ConditionInterface s : m3) {
 					Condition3D s3 = (Condition3D) s;
@@ -126,8 +126,19 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			System.out.println("Statistics results: " + newStatisticsData.size());
 			// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
-			statisticsResult.getHeader().setOriginDbId(res.getHeader().getDatabaseId());
+			statisticsResult.getHeader().setOriginDbId(experimentToBeAnalysed.getHeader().getDatabaseId());
 			statisticsResult.getHeader().setDatabaseId("");
+			boolean addWaterData = true;
+			if (addWaterData) {
+				for (SubstanceInterface si : experimentToBeAnalysed) {
+					if (si.getName() != null && (si.getName().equals("weight_before") ||
+							si.getName().equals("water_weight") || si.getName().equals("water_sum"))) {
+						statisticsResult.add(si);
+						for (ConditionInterface ci : si)
+							ci.setExperimentHeader(statisticsResult.getHeader());
+					}
+				}
+			}
 			if (resultReceiver == null) {
 				if (status != null)
 					status.setCurrentStatusText1("Ready");

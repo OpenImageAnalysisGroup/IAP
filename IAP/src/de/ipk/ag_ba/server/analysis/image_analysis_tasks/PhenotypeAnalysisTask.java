@@ -29,6 +29,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 /**
  * @author klukas
  */
+@Deprecated
 public class PhenotypeAnalysisTask implements ImageAnalysisTask {
 	
 	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);
