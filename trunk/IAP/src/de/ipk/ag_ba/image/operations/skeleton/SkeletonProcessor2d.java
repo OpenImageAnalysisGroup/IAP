@@ -15,7 +15,7 @@ public class SkeletonProcessor2d {
 	
 	ArrayList<Limb> forRemove = new ArrayList<Limb>();
 	
-	public static final int colorEndpoints = Color.YELLOW.getRGB();
+	public static final int colorEndpoints = Color.PINK.getRGB();
 	public static final int colorBranches = Color.RED.getRGB();
 	public static final int colorMarkedEndLimbs = Color.BLUE.getRGB();
 	public static final int foreground = Color.orange.getRGB();

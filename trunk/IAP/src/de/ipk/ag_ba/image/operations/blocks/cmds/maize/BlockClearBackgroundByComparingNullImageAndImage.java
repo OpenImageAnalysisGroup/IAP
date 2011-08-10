@@ -27,7 +27,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 				FlexibleImage visImg = getInput().getImages().getVis().print("In VIS", false);
 				FlexibleImage visMsk = getInput().getMasks().getVis().print("In Mask", false);
 				FlexibleImage cleared = visImg.getIO().compare() // medianFilter32Bit().
-						.compareImages(visMsk.getIO().blur(2).print("Blurred Mask", false).getImage(),
+						.compareImages("vis", visMsk.getIO().blur(2).print("Blurred Mask", false).getImage(),
 								options.getIntSetting(Setting.L_Diff_VIS_SIDE) * 0.5,
 								options.getIntSetting(Setting.L_Diff_VIS_SIDE) * 0.5,
 								options.getIntSetting(Setting.abDiff_VIS_SIDE) * 0.5,
@@ -42,7 +42,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 				FlexibleImage cleared = new ImageOperation(visX)
 						// .blur(3).printImage("median", false)
 						.compare()
-						.compareImages(getInput().getMasks().getVis().getIO().blur(3).print("medianb", false).getImage(),
+						.compareImages("vis", getInput().getMasks().getVis().getIO().blur(3).print("medianb", false).getImage(),
 								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
 								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
 								options.getIntSetting(Setting.abDiff_VIS_TOP) * 0.5d,
@@ -69,7 +69,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 						// .blur(1.5).print("Blurred 1.5 fluo image", true)
 						.medianFilter32Bit()
 						.getImage()).compare()
-						.compareImages(getInput().getMasks().getFluo().getIO()
+						.compareImages("fluo", getInput().getMasks().getFluo().getIO()
 								// .blur(1.5).print("Blurred 1.5 fluo mask", true)
 								.medianFilter32Bit()
 								.getImage(),
@@ -83,7 +83,7 @@ public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSn
 				FlexibleImage fluo = getInput().getImages().getFluo();
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
 				return new ImageOperation(fluo).compare()
-						.compareImages(getInput().getMasks().getFluo().getIO().copyImagesParts(0.26, 0.3).print("cut out", false).getImage(),
+						.compareImages("fluo", getInput().getMasks().getFluo().getIO().copyImagesParts(0.26, 0.3).print("cut out", false).getImage(),
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
 								options.getIntSetting(Setting.abDiff_FLUO) * 0.5d,

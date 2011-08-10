@@ -22,6 +22,7 @@ public class BlockFluoToIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 		processedImages.setFluo(processedMasks.getFluo());
+		processedMasks.setFluo(processedMasks.getFluo().getIO().medianFilter32Bit().getImage());
 	}
 	
 }
