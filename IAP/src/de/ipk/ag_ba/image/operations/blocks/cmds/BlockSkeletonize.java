@@ -26,7 +26,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debug = true;
+	private final boolean debug = false;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
@@ -55,14 +55,15 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		skel2d.deleteShortEndLimbs(10);
 		
 		int leafcount = skel2d.endlimbs.size();
-		FlexibleImage fires = skel2d.getAsFlexibleImage();
-		int leaflength = fires.getIO().countFilledPixels(SkeletonProcessor2d.background);
+		FlexibleImage skelres = skel2d.getAsFlexibleImage();
+		int leaflength = skelres.getIO().countFilledPixels(SkeletonProcessor2d.background);
+		skel2d.detectBloom(vis);
 		
 		// ***Out***
-		System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
-		FlexibleImage result = MapOriginalOnSkelUseingMedian(fires, vis, Color.BLACK.getRGB());
+		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
+		FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
 		result.print("res", debug);
-		FlexibleImage result2 = copyONOriginalImage(fires, vis, Color.BLACK.getRGB());
+		FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
 		result2.print("res2", debug);
 		
 		// ***Saved***
@@ -119,36 +120,6 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		int[] temp = { center, above, left, right, below };
 		java.util.Arrays.sort(temp);
 		return temp[2];
-	}
-	
-	/**
-	 * Draws skeleton on plant image
-	 */
-	private FlexibleImage copyONOriginalImage(FlexibleImage skeletImage, FlexibleImage plantImage, int back) {
-		int[] skelImg = skeletImage.getAs1A();
-		int[] plantImg = plantImage.getAs1A();
-		int w = skeletImage.getWidth();
-		int h = skeletImage.getHeight();
-		for (int index = 0; index < skelImg.length; index++) {
-			if (skelImg[index] != back) {
-				int v = skelImg[index];
-				int r = 2;
-				if (v == SkeletonProcessor2d.colorEndpoints)
-					r = 18;
-				if (v == SkeletonProcessor2d.colorBranches)
-					r = 3;
-				for (int diffX = -r; diffX < r; diffX++)
-					for (int diffY = -r; diffY < r; diffY++) {
-						if (v == SkeletonProcessor2d.colorEndpoints &&
-								((diffX * diffX + diffY * diffY) <= 12 * 12)) // ||
-							// (diffX * diffX + diffY * diffY) >= 20 * 20)
-							continue;
-						if (index - diffX + w * diffY >= 0)
-							plantImg[index - diffX + w * diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
-					}
-			}
-		}
-		return new FlexibleImage(w, h, plantImg);
 	}
 	
 	private int avg(int mask, int plant) {

@@ -4,10 +4,12 @@ import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class SkeletonProcessor2d {
 	
+	private static final int colorBloom = Color.GREEN.getRGB();
 	public int[][] skelImg;
 	public ArrayList<Point> endpoints = new ArrayList<Point>();
 	public ArrayList<Point> branches = new ArrayList<Point>();
@@ -15,7 +17,7 @@ public class SkeletonProcessor2d {
 	
 	ArrayList<Limb> forRemove = new ArrayList<Limb>();
 	
-	public static final int colorEndpoints = Color.PINK.getRGB();
+	public static final int colorEndpoints = colorBloom;
 	public static final int colorBranches = Color.RED.getRGB();
 	public static final int colorMarkedEndLimbs = Color.BLUE.getRGB();
 	public static final int foreground = Color.orange.getRGB();
@@ -803,5 +805,100 @@ public class SkeletonProcessor2d {
 			return res;
 		} else
 			return branchInNeighbourhood;
+	}
+	
+	public FlexibleImage copyONOriginalImage(FlexibleImage vis) {
+		int[][] plantImg = vis.getAs2A();
+		int w = skelImg.length;
+		int h = skelImg[0].length;
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (skelImg[x][y] != background) {
+					int v = skelImg[x][y];
+					int r = 2;
+					if (v == colorEndpoints)
+						r = 18;
+					if (v == colorBranches)
+						r = 3;
+					for (int diffX = -r; diffX < r; diffX++)
+						for (int diffY = -r; diffY < r; diffY++) {
+							if (v == SkeletonProcessor2d.colorEndpoints &&
+									((diffX * diffX + diffY * diffY) <= 12 * 12)) // ||
+								// (diffX * diffX + diffY * diffY) >= 20 * 20)
+								continue;
+							if (x - diffX >= 0 && y - diffY >= 0)
+								plantImg[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
+						}
+				}
+			}
+		}
+		return new FlexibleImage(plantImg);
+	}
+	
+	public void detectBloom(FlexibleImage vis) {
+		ArrayList<Limb> topLimbs = getTopEndlimbs();
+		System.out.println("probably bloom endlimbs: " + topLimbs.size());
+		if (topLimbs.size() >= 3)
+			for (Limb l : topLimbs) {
+				isBloom(l, vis);
+			}
+	}
+	
+	private boolean isBloom(Limb l, FlexibleImage vis) {
+		int[][] visImg = vis.getAs2A();
+		int sum = 0, r, g, b, Li = 0, ai = 0, bi = 0;
+		
+		for (Point p : l.points) {
+			int c = visImg[p.x][p.y];
+			
+			r = ((c & 0xff0000) >> 16); // R 0..1
+			g = ((c & 0x00ff00) >> 8); // G 0..1
+			b = (c & 0x0000ff); // B 0..1
+			
+			Li += (int) ImageOperation.labCube[r][g][b];
+			ai += (int) ImageOperation.labCube[r][g][b + 256];
+			bi += (int) ImageOperation.labCube[r][g][b + 512];
+			
+			sum++;
+		}
+		
+		Li = Li / sum;
+		ai = ai / sum;
+		bi = bi / sum;
+		
+		// interval 0 - 255
+		if (bi > 130 && Li > 150) {
+			System.out.println("bloom found!!!");
+			markLimb(l, colorBloom);
+			return true;
+		} else
+			return false;
+	}
+	
+	private void markLimb(Limb l, int color) {
+		for (Point p : l.points) {
+			skelImg[p.x][p.y] = color;
+		}
+		
+	}
+	
+	private ArrayList<Limb> getTopEndlimbs() {
+		int maxHeight = Integer.MAX_VALUE;
+		Limb res = null;
+		ArrayList<Limb> maxLimbs = new ArrayList<Limb>();
+		for (Limb l : endlimbs) {
+			if (l.endpoint.y < maxHeight) {
+				maxHeight = l.endpoint.y;
+				res = l;
+			}
+		}
+		maxLimbs.add(res);
+		System.out.println("max endpoint: " + res.endpoint.toString());
+		
+		for (Limb l : endlimbs) {
+			if (l != res && l.endpoint.y < maxHeight * 1.3)
+				maxLimbs.add(l);
+		}
+		return maxLimbs;
 	}
 }

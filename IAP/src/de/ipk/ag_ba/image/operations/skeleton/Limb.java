@@ -19,6 +19,10 @@ public class Limb {
 		this.endpoint = endpoint;
 	}
 	
+	public Limb() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	public void setInitialpoint(Point initialpoint) {
 		this.initialpoint = initialpoint;
 	}
