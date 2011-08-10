@@ -226,9 +226,11 @@ public class SkeletonProcessor2d {
 		}
 		if (endok) {
 			endpoints.remove(end);
+			l.endpoint = res;;
 			return new Point[] { res, end };
 		} else {
 			endpoints.remove(ini);
+			l.initialpoint = res;
 			return new Point[] { res, ini };
 		}
 	}
