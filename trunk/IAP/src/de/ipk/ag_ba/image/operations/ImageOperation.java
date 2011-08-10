@@ -2621,7 +2621,7 @@ public class ImageOperation {
 		ImageOperation res = io.multiplicateImageChannelsWithFactors(factors);
 		if (r + g + b > 60) {
 			res = res.blur(10);
-			res = res.multiplyHSV(0.4, 1.4, 0.9);
+			res = res.multiplyHSV(2, 1.4, 0.9);
 		}
 		return res;
 	}
@@ -2637,9 +2637,24 @@ public class ImageOperation {
 			int g = (c & 0x00ff00) >> 8;
 			int b = (c & 0x0000ff);
 			Color.RGBtoHSB(r, g, b, hsbvals);
-			hsbvals[0] *= hf;
-			hsbvals[1] *= sf;
-			hsbvals[2] *= vf;
+			double blue = 0.8;
+			hsbvals[0] = (float) ((hsbvals[0] - blue) * hf + blue);
+			boolean left = (idx % width) < width / 2;
+			if (left)
+				hsbvals[1] *= sf * 1.5;
+			else
+				hsbvals[1] *= sf;
+			if (left)
+				hsbvals[0] = (float) (hsbvals[1]);
+			else
+				hsbvals[0] = hsbvals[1];
+			if (left)
+				hsbvals[2] *= vf * 0.95;
+			else
+				hsbvals[2] *= vf;
+			
+			hsbvals[2] = (float) ((hsbvals[2] - 0.7) * 1.5 + 0.5);
+			
 			if (hsbvals[1] < 0)
 				hsbvals[1] = 0;
 			if (hsbvals[1] > 1)
