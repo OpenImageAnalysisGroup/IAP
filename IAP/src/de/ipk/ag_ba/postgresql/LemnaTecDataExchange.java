@@ -557,6 +557,7 @@ public class LemnaTecDataExchange {
 		int workload = snapshots.size();
 		HashMap<String, NumericMeasurement> knownDayAndReplicateIDs = new HashMap<String, NumericMeasurement>();
 		int idxx = 0;
+		HashSet<Long> processedSnapshotTimes = new HashSet<Long>();
 		for (Snapshot sn : snapshots) {
 			if (sn.getId_tag().length() <= 0) {
 				System.out.println("Warning: snapshot with empty ID tag is ignored.");
@@ -614,7 +615,9 @@ public class LemnaTecDataExchange {
 			
 			int day = DateUtil.getElapsedDays(earliest, new Date(sn.getTimestamp().getTime())) + 1;
 			
-			{
+			boolean firstSnapshotInfoForTimePoint = !processedSnapshotTimes.contains(sn.getTimestamp().getTime());
+			
+			if (firstSnapshotInfoForTimePoint) {
 				// if (sn.getWeight_before() > 0) {
 				// process weight_before
 				Substance s = new Substance();
@@ -642,7 +645,8 @@ public class LemnaTecDataExchange {
 				measurements.add(weightBefore);
 				// }
 			}
-			{
+			
+			if (firstSnapshotInfoForTimePoint) {
 				// if (sn.getWeight_after() > sn.getWeight_before()) {
 				// process water_weight
 				Substance s = new Substance();
@@ -670,7 +674,8 @@ public class LemnaTecDataExchange {
 				measurements.add(weightBefore);
 				// }
 			}
-			{
+			
+			if (firstSnapshotInfoForTimePoint) {
 				// if (sn.getWater_amount() > 0) {
 				// process water_amount
 				String iidd = day + "/" + replicateID;
@@ -772,6 +777,7 @@ public class LemnaTecDataExchange {
 					
 					measurements.add(image);
 				}
+				processedSnapshotTimes.add(sn.getTimestamp().getTime());
 			}
 			
 		}
