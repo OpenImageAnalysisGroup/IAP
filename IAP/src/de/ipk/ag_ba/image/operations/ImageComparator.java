@@ -20,11 +20,11 @@ public class ImageComparator {
 		this.inputImage = input;
 	}
 	
-	public ImageOperation compareImages(FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background) {
-		return compareImages(referenceImage, lDiffA, lDiffB, abDiff, background, false);
+	public ImageOperation compareImages(String desc, FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background) {
+		return compareImages(desc, referenceImage, lDiffA, lDiffB, abDiff, background, false);
 	}
 	
-	public ImageOperation compareImages(FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background,
+	public ImageOperation compareImages(String desc, FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background,
 			boolean adaptiveDependingOnIntensity) {
 		
 		// inputImage = new ImageOperation(inputImage).blur(1).getImage();
@@ -94,7 +94,7 @@ public class ImageComparator {
 				result[index] = imgInp[index];
 		}
 		if (showDiff)
-			new FlexibleImage(width, height, diff).print("difference");
+			new FlexibleImage(width, height, diff).print("difference: " + desc);
 		return new ImageOperation(new FlexibleImage(width, height, result));
 	}
 	

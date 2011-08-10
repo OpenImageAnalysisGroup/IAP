@@ -215,7 +215,7 @@ public class ImageOperation {
 			
 			float intensity = 1 - rf / (float) ((255) + gf);
 			
-			if (intensity > 170f / 255f)
+			if (intensity > 210f / 255f)
 				intensity = 1;
 			
 			int i = (int) (intensity * 255d);
@@ -1855,7 +1855,7 @@ public class ImageOperation {
 					if (jmp)
 						out[i] = median(center, above, left, right, below);
 					else
-						out[i] = findMedian(new int[] { center, above, left, right, below });
+						out[i] = findMedianOf9(new int[] { center, above, left, right, below });
 				} else
 					out[i] = img[i];
 			}
@@ -1866,7 +1866,41 @@ public class ImageOperation {
 		}
 	}
 	
-	private final int findMedian(int[] values) {
+	public ImageOperation medianFilter32BitvariableMask(int n) {
+		int[] img = getImageAs1array();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[] out = new int[img.length];
+		int[] mask = new int[(2 * n + 1) * (2 * n + 1)];
+		for (int i = 0; i < img.length; i++) {
+			int filled = 0;
+			for (int x = -n; x < n; x++)
+				for (int y = -n; y < n; y++) {
+					int xCurrent = i % w;
+					int yCurrent = i / w;
+					int ii = i;
+					if (xCurrent <= n)
+						ii += n - xCurrent;
+					if (xCurrent >= w - n)
+						ii -= xCurrent - w + n;
+					if (yCurrent <= n)
+						ii += w * n - yCurrent;
+					if (yCurrent >= h - n)
+						ii -= (yCurrent - h + n) * w;
+					int index = ii + x + y * w;
+					if (index < 0)
+						index = 0;
+					if (index >= img.length)
+						index = img.length - 1;
+					int pixel = img[index];
+					mask[filled++] = pixel;
+				}
+			out[i] = median(mask);
+		}
+		return new ImageOperation(out, w, h);
+	}
+	
+	private final int findMedianOf9(int[] values) {
 		// Finds the 5th largest of 9 values
 		for (int i = 1; i <= 4; i++) {
 			int max = 0;
@@ -1889,6 +1923,11 @@ public class ImageOperation {
 		int[] temp = { center, above, left, right, below };
 		java.util.Arrays.sort(temp);
 		return temp[2];
+	}
+	
+	private int median(int[] temp) {
+		java.util.Arrays.sort(temp);
+		return temp[(temp.length + 1) / 2 - 1];
 	}
 	
 	public ImageOperation medianFilter8Bit() {
@@ -2645,7 +2684,7 @@ public class ImageOperation {
 			else
 				hsbvals[1] *= sf;
 			if (left)
-				hsbvals[0] = (float) (hsbvals[1]);
+				hsbvals[0] = (hsbvals[1]);
 			else
 				hsbvals[0] = hsbvals[1];
 			if (left)
@@ -2870,5 +2909,33 @@ public class ImageOperation {
 	private double getC(double y1, double y2, double l1, double l2, double h) {
 		// see WolframAlpha: solve(l_1 = m *(y_1 -h/2)² +c | l_2 = m *(y_2 -h/2)² +c, m)
 		return (l2 * y1 * y1 - l1 * y2 * y2) / (y1 * y1 - y2 * y2);
+	}
+	
+	public ImageOperation dilateHorizontal(int maskWidth) {
+		int[] img = getImageAs1array();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[] out = new int[img.length];
+		int offX = maskWidth / 2;
+		for (int i = 0; i < img.length; i++) {
+			int cnt = 0;
+			int color = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+			for (int xdiff = -offX; xdiff <= offX; xdiff++) {
+				int ii = i + xdiff;
+				if (ii < 0)
+					ii = 0;
+				if (ii >= img.length)
+					ii = img.length - 1;
+				if (img[ii] != PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+					cnt++;
+					color = Color.GREEN.getRGB();
+				}
+			}
+			if (cnt > 0) {
+				out[i] = color;
+			} else
+				out[i] = img[i];
+		}
+		return new ImageOperation(out, w, h);
 	}
 }

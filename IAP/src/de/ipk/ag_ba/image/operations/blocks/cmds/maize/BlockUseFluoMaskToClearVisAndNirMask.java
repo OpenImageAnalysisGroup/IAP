@@ -12,8 +12,13 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 	protected void prepare() {
 		super.prepare();
 		if (getInput().getMasks().getFluo() != null && getInput().getMasks().getVis() != null) {
-			FlexibleImage fluoMask = clearImageSide(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), 0.01d);
-			getInput().getMasks().setFluo(fluoMask);
+			if (options.getCameraPosition() == CameraPosition.TOP) {
+				FlexibleImage fluoMask = clearImageSide(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), 0.05d);
+				getInput().getMasks().setFluo(fluoMask);
+			} else {
+				FlexibleImage fluoMask = clearImageSide(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), 0.01d);
+				getInput().getMasks().setFluo(fluoMask);
+			}
 		}
 	}
 	

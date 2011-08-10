@@ -9,6 +9,8 @@ import java.util.TreeMap;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.color.Color_CIE_Lab;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
@@ -24,14 +26,18 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private boolean debug = false;
+	private final boolean debug = true;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
 		FlexibleImage res = vis;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage viswork = vis.copy().getIO().medianFilter32Bit().closing(3, 3).getImage().print("vis", debug);
+			FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
+					// .closing(3, 3)
+					.dilateHorizontal(18)
+					.blur(1)
+					.getImage().print("vis", debug);
 			
 			if (viswork != null)
 				if (options.isMaize())
@@ -126,20 +132,45 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		for (int index = 0; index < skelImg.length; index++) {
 			if (skelImg[index] != back) {
 				int v = skelImg[index];
-				int r = 3;
+				int r = 2;
 				if (v == SkeletonProcessor2d.colorEndpoints)
-					r = 16;
+					r = 18;
 				if (v == SkeletonProcessor2d.colorBranches)
-					r = 8;
+					r = 3;
 				for (int diffX = -r; diffX < r; diffX++)
 					for (int diffY = -r; diffY < r; diffY++) {
+						if (v == SkeletonProcessor2d.colorEndpoints &&
+								((diffX * diffX + diffY * diffY) <= 12 * 12)) // ||
+							// (diffX * diffX + diffY * diffY) >= 20 * 20)
+							continue;
 						if (index - diffX + w * diffY >= 0)
-							plantImg[index - diffX + w * diffY] = v;
+							plantImg[index - diffX + w * diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
 					}
-				plantImg[index] = v; // center
 			}
 		}
 		return new FlexibleImage(w, h, plantImg);
+	}
+	
+	private int avg(int mask, int plant) {
+		int r, g, b, r2, g2, b2;
+		r = (mask & 0xff0000) >> 16;
+		g = (mask & 0x00ff00) >> 8;
+		b = (mask & 0x0000ff);
+		
+		r2 = (plant & 0xff0000) >> 16;
+		g2 = (plant & 0x00ff00) >> 8;
+		b2 = (plant & 0x0000ff);
+		
+		float ll = ImageOperation.labCube[r][g][b];
+		float la = ImageOperation.labCube[r][g][b + 256];
+		float lb = ImageOperation.labCube[r][g][b + 512];
+		
+		float l2l = ImageOperation.labCube[r2][g2][b2];
+		float l2a = ImageOperation.labCube[r2][g2][b2 + 256];
+		float l2b = ImageOperation.labCube[r2][g2][b2 + 512];
+		double of = 0.7;
+		double off = 0.3;
+		return new Color_CIE_Lab(Math.min(ll, l2l), la * of + l2a * off, lb * of + l2b * off).getRGB();
 	}
 	
 	/**
