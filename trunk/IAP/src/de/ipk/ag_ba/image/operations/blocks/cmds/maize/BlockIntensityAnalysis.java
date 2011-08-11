@@ -1,12 +1,14 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import ij.measure.ResultsTable;
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * @author klukas, pape
@@ -89,6 +91,25 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		if (getInput().getMasks().getNir() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getNir());
 			if (getInput().getMasks().getNir().getHeight() > 1) {
+				int[] nirImg = getInput().getMasks().getNir().getAs1A();
+				int filled = 0;
+				double fSum = 0;
+				int b = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+				for (int x : nirImg) {
+					// Feuchtigkeit (%) = -7E-05x^3 + 0,0627x^2 - 15,416x + 1156,1 // Formel: E-Mail Alex 10.8.2011
+					if (x != b) {
+						double f = -7E-05 * x * x * x + 0.0627 * x * x - 15.416 * x + 1156.1;
+						if (f < 0)
+							f = 0;
+						if (f > 100)
+							f = 100;
+						fSum += f;
+					}
+				}
+				if (options.getCameraPosition() == CameraPosition.SIDE)
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", fSum / filled);
+				else
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", fSum / filled);
 				if (markerDistanceHorizontally != null) {
 					ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally, options.getIntSetting(Setting.REAL_MARKER_DISTANCE)); // markerDistanceHorizontally
 					if (rt != null)
