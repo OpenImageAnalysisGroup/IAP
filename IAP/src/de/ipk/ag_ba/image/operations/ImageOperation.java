@@ -737,6 +737,10 @@ public class ImageOperation {
 		return new ImageOperation(image.getProcessor().getBufferedImage());
 	}
 	
+	/**
+	 * WARNING: NON-STANDARD METHOD (no return)
+	 */
+	@Deprecated
 	public void drawRect(int leftX, int leftY, int width, int heigh) {
 		image.getProcessor().drawRect(leftX, leftY, width, heigh);
 	}
@@ -762,6 +766,11 @@ public class ImageOperation {
 		return new ImageOperation(ImageConverter.convert1AtoIJ(ww, image.getHeight(), bigImage));
 	}
 	
+	/**
+	 * Warning: PROBABLY NOT WORKING CORRECTLY
+	 * CK
+	 */
+	@Deprecated
 	public ImageOperation drawAndFillRect(int leftX, int leftY, int width,
 			int height, int fillValue) {
 		Roi rec = new Roi(leftX, leftY, width, height);
@@ -2937,5 +2946,9 @@ public class ImageOperation {
 				out[i] = img[i];
 		}
 		return new ImageOperation(out, w, h);
+	}
+	
+	public ImageCanvas getCanvas() {
+		return new ImageCanvas(getImage());
 	}
 }

@@ -39,7 +39,6 @@ import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -256,7 +255,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			@Override
 			public void run() {
 				try {
-					BackgroundTaskHelper.lockAquire("load images", 4);
 					BufferedImage loadedReferenceImage = null;
 					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, optImageMasks != null, loadedReferenceImage);
 					input.set(new FlexibleImage(li.getLoadedImage(), type));
@@ -269,8 +267,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					err.printStackTrace();
 				} catch (Exception e) {
 					e.printStackTrace();
-				} finally {
-					BackgroundTaskHelper.lockRelease("load images");
 				}
 			}
 		}, "load " + type.name(), 0);
