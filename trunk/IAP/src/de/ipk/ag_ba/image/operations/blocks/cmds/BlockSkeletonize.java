@@ -26,7 +26,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debug = false;
+	private final boolean debug = true;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
@@ -49,7 +49,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis) {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.getIO().skeletonize().getImage()));
-		skel2d.findEndpointsAndBranches();
+		skel2d.findEndpointsAndBranches2();
 		skel2d.print("endpoints and branches", debug);
 		skel2d.deleteShortEndLimbs(10);
 		
