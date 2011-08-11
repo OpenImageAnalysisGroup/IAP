@@ -71,13 +71,19 @@ public class BlockPipeline {
 		int id = pipelineID.addInt(1);
 		
 		int index = 0;
-		boolean blockProgressOutput = false;
+		boolean blockProgressOutput = true;
 		
 		if (status != null)
 			status.setCurrentStatusValueFine(0);
-		String lastTstring = "";
+		
+		HashMap<Class<? extends ImageAnalysisBlockFIS>, ImageAnalysisBlockFIS> c2o = new HashMap<Class<? extends ImageAnalysisBlockFIS>, ImageAnalysisBlockFIS>();
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
+			c2o.put(blockClass, block);
+		}
+		
+		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
+			ImageAnalysisBlockFIS block = c2o.get(blockClass);// blockClass.newInstance();
 			
 			block.setInputAndOptions(input, options, settings, index++, debugStack);
 			
@@ -115,7 +121,6 @@ public class BlockPipeline {
 			status.setCurrentStatusValueFine(100d * (index / (double) blocks.size()));
 			// status.setCurrentStatusText1("Pipeline finished");
 			status.setCurrentStatusText1("T=" + ((b - a) / 1000) + "s");
-			lastTstring = "T=" + ((b - a) / 1000) + "s";
 		}
 		// System.out.print("PET: " + (b - a) / 1000 + "s ");
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);

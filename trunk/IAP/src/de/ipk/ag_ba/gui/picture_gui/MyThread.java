@@ -7,6 +7,7 @@
 
 package de.ipk.ag_ba.gui.picture_gui;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 import org.ErrorMsg;
@@ -18,8 +19,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  * 
  * @author klukas
  */
-public class MyThread implements Runnable { // extends Thread {
-
+public class MyThread extends Thread implements Runnable {
+	
+	public static final boolean NEW_SCHEDULER = false;
+	
 	private boolean finished = false;
 	private final Runnable r;
 	private final Semaphore sem;
@@ -76,19 +79,30 @@ public class MyThread implements Runnable { // extends Thread {
 		}
 	}
 	
-	public String getName() {
+	public String getNameNG() {
 		return name;
 	}
 	
-	public void setName(String name) {
+	public void setNameNG(String name) {
 		this.name = name;
 	}
 	
-	public boolean isAlive() {
+	public boolean isAliveNG() {
 		return !finished;
 	}
 	
 	public Runnable getRunCode() {
 		return this;
+	}
+	
+	public void setPriorityNG(int minPriority) {
+		setPriority(minPriority);
+	}
+	
+	public void startNG(ExecutorService es) {
+		if (NEW_SCHEDULER)
+			es.submit(this);
+		else
+			start();
 	}
 }

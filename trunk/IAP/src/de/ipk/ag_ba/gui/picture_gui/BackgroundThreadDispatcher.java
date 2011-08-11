@@ -215,15 +215,14 @@ public class BackgroundThreadDispatcher {
 							todo.remove(i);
 							Integer prio = todoPriorities.get(i);
 							todoPriorities.remove(i);
-							t.setName(t.getName() + ", priority:" + prio.toString());
+							t.setName(t.getNameNG() + ", priority:" + prio.toString());
 							break;
 						}
 					}
 				}
 				if (t != null) {
-					// t.setPriority(Thread.MIN_PRIORITY);
-					// t.start();
-					es.submit(t.getRunCode());
+					t.setPriorityNG(Thread.MIN_PRIORITY);
+					t.startNG(es);
 					synchronized (runningTasks) {
 						runningTasks.add(t);
 					}

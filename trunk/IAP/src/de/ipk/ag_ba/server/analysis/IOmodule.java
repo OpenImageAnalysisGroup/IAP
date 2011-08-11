@@ -18,18 +18,20 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
-import org.HomeFolder;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Graph;
-import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.networks.LoadedNetwork;
@@ -56,30 +58,45 @@ public class IOmodule {
 		LoadedImage result = null;
 		StopWatch s = new StopWatch("Load image and null-image", false);
 		BufferedImage image = null;
-		if (loadImage)
-			image = ImageIO.read(id.getURL().getInputStream());
+		Semaphore se = BackgroundTaskHelper.lockGetSemaphore(ResourceIOManager.getHandlerFromPrefix(id.getURL().getPrefix()), 1);
+		if (loadImage) {
+			MyByteArrayInputStream isMain;
+			se.acquire();
+			try {
+				isMain = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
+			} finally {
+				se.release();
+			}
+			image = ImageIO.read(isMain);
+		}
 		BufferedImage imageNULL = null;
 		try {
 			if (loadLabelField)
 				if (id.getLabelURL() != null) {
 					if (optLoadedReferenceImage != null)
 						imageNULL = optLoadedReferenceImage;
-					else
-						imageNULL = ImageIO.read(id.getLabelURL().getInputStream());
+					else {
+						InputStream isLabel;
+						se.acquire();
+						try {
+							isLabel = ResourceIOManager.getInputStreamMemoryCached(id.getLabelURL());
+						} finally {
+							se.release();
+						}
+						imageNULL = ImageIO.read(isLabel);
+					}
 				}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		result = new LoadedImage(id, image, imageNULL);
-		s.printTime(200);
+		s.printTime(100);
 		return result;
 	}
 	
 	public static byte[] loadImageContentFromFileOrMongo(ImageData id) throws Exception {
-		InputStream is = id.getURL().getInputStream();
-		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
-		HomeFolder.copyContent(is, out);
-		return out.getBuff();
+		MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
+		return is.getBuffTrimmed();
 	}
 	
 	public static InputStream getThreeDvolumePreviewIcon(LoadedVolumeExtension volume,
