@@ -25,6 +25,7 @@ public class SkeletonProcessor2d {
 	public static final int colorDebug = Color.GREEN.getRGB();
 	
 	public boolean debug = false;
+	private int colorBloomEndpoint = Color.CYAN.getRGB();
 	
 	public SkeletonProcessor2d(FlexibleImage inp) {
 		this.skelImg = inp.getAs2A().clone();
@@ -634,7 +635,7 @@ public class SkeletonProcessor2d {
 	}
 	
 	public int detectBloom(FlexibleImage vis) {
-		ArrayList<Limb> topLimbs = getTopEndlimbs();
+		ArrayList<Limb> topLimbs = getTopEndlimbs(0.3);
 		ArrayList<Limb> bloomLimbs = new ArrayList<Limb>();
 		int numberOfProbalblyBloomLeafs = topLimbs.size();
 		int sumDist = 0;
@@ -662,8 +663,10 @@ public class SkeletonProcessor2d {
 		System.out.println("bloomcandidates: " + bloomLimbs.size());
 		if (bloomLimbs.size() >= numberOfProbalblyBloomLeafs * 0.5 && avgDistToCentroid < maxLimblength * 0.45 && avgLength < maxLimblength * 0.3) {
 			System.out.println("bloom detect!!!");
-			for (Limb l : bloomLimbs)
+			for (Limb l : bloomLimbs) {
 				markLimb(l, colorBloom);
+				skelImg[l.endpoint.x][l.endpoint.y] = colorBloomEndpoint;
+			}
 			return bloomLimbs.size();
 		}
 		return 0;
@@ -699,9 +702,9 @@ public class SkeletonProcessor2d {
 		Li = Li / sum;
 		ai = ai / sum;
 		bi = bi / sum;
-		
+		System.out.println("l: " + Li + " a: " + ai + " bi: " + bi);
 		// interval 0 - 255
-		if (bi > 120 && Li > 200)
+		if (bi > 120 && Li > 200 && ai > 105)
 			return true;
 		else
 			return false;
@@ -714,7 +717,7 @@ public class SkeletonProcessor2d {
 		
 	}
 	
-	private ArrayList<Limb> getTopEndlimbs() {
+	private ArrayList<Limb> getTopEndlimbs(double n) {
 		int maxHeight = Integer.MAX_VALUE;
 		Limb res = null;
 		ArrayList<Limb> maxLimbs = new ArrayList<Limb>();
@@ -728,7 +731,7 @@ public class SkeletonProcessor2d {
 		System.out.println("max endpoint: " + res.endpoint.toString());
 		
 		for (Limb l : endlimbs) {
-			if (l != res && l.endpoint.y < maxHeight * 1.3)
+			if (l != res && l.endpoint.y < maxHeight * (1 + 0.3))
 				maxLimbs.add(l);
 		}
 		return maxLimbs;
