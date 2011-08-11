@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class SkeletonProcessor2d {
 	
-	private static final int colorBloom = Color.GREEN.getRGB();
+	static final int colorBloom = Color.GREEN.getRGB();
 	public int[][] skelImg;
 	public ArrayList<Point> endpoints = new ArrayList<Point>();
 	public ArrayList<Point> branches = new ArrayList<Point>();
