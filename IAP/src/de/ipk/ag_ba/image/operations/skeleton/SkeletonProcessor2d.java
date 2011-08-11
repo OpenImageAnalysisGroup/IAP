@@ -128,17 +128,17 @@ public class SkeletonProcessor2d {
 		return null;
 	}
 	
-	/**
-	 * Method to detect the clade: take the lowest end-point(min y), calculate way to any endpoint
-	 * -> based on the assumption - the way which contains max number of branches shall be the clade
-	 */
-	public void findTrailWithMaxBranches() {
-		ArrayList<Limb> trails = new ArrayList<Limb>();
-		Point p = getLowest(endpoints);
-		Limb res = new Limb(p);
-		Point actual = p;
-		calcrecAllBranches(actual, res);
-	}
+	// /**
+	// * Method to detect the clade: take the lowest end-point(min y), calculate way to any endpoint
+	// * -> based on the assumption - the way which contains max number of branches shall be the clade
+	// */
+	// public void findTrailWithMaxBranches() {
+	// ArrayList<Limb> trails = new ArrayList<Limb>();
+	// Point p = getLowest(endpoints);
+	// Limb res = new Limb(p);
+	// Point actual = p;
+	// calcrecAllBranches(actual, res);
+	// }
 	
 	private Point getLowest(ArrayList<Point> endpoints2) {
 		double y = Integer.MAX_VALUE;
@@ -152,32 +152,32 @@ public class SkeletonProcessor2d {
 		return res;
 	}
 	
-	private void calcrecAllBranches(Point actual, Limb res) {
-		Point neighbour = getNeighbour(actual);
-		boolean ok = false;
-		if (neighbour == null) {
-			res.setInitialpoint(actual);
-			ok = true;
-		}
-		if (isBranch(neighbour)) {
-			res.addPoint(neighbour);
-			ArrayList<Point> temp = getNeighbours(neighbour);
-			mark(neighbour, colorMarkedEndLimbs);
-			for (Point p : temp) {
-				calcrecAllBranches(p, res);
-			}
-		}
-		if (isEndpoint(neighbour)) {
-			res.setInitialpoint(neighbour);
-			endlimbs.add(res);
-			ok = true;
-		}
-		if (neighbour != null && !(isBranch(neighbour)) && !ok) {
-			res.addPoint(neighbour);
-			mark(neighbour, colorMarkedEndLimbs);
-			calcrecAllBranches(neighbour, res);
-		}
-	}
+	// private void calcrecAllBranches(Point actual, Limb res) {
+	// Point neighbour = getNeighbour(actual);
+	// boolean ok = false;
+	// if (neighbour == null) {
+	// res.setInitialpoint(actual);
+	// ok = true;
+	// }
+	// if (isBranch(neighbour)) {
+	// res.addPoint(neighbour);
+	// ArrayList<Point> temp = getNeighbours(neighbour);
+	// mark(neighbour, colorMarkedEndLimbs);
+	// for (Point p : temp) {
+	// calcrecAllBranches(p, res);
+	// }
+	// }
+	// if (isEndpoint(neighbour)) {
+	// res.setInitialpoint(neighbour);
+	// endlimbs.add(res);
+	// ok = true;
+	// }
+	// if (neighbour != null && !(isBranch(neighbour)) && !ok) {
+	// res.addPoint(neighbour);
+	// mark(neighbour, colorMarkedEndLimbs);
+	// calcrecAllBranches(neighbour, res);
+	// }
+	// }
 	
 	public boolean connectSkeleton() {
 		boolean added = false;
@@ -268,10 +268,6 @@ public class SkeletonProcessor2d {
 				y0 += sy;
 			} /* e_xy+e_y < 0 */
 		}
-	}
-	
-	private Neighbourhood getNeighbourhood(Point inp) {
-		return new Neighbourhood(getNeighbours(inp));
 	}
 	
 	private ArrayList<Point> getNeighbours(Point inp) {
@@ -443,58 +439,6 @@ public class SkeletonProcessor2d {
 		return res - 1;
 	}
 	
-	public void removeBurls() {
-		
-		int[][] burl1 = new int[][] { { colorBranches, foreground, background }, { foreground, background, foreground },
-				{ background, foreground, colorBranches } };
-		int[][] repburl1 = new int[][] { { foreground, background, background }, { background, foreground, background }, { background, background, foreground } };
-		int width = skelImg.length;
-		int height = skelImg[0].length;
-		
-		for (int x = 1; x < width - 1; x++) {
-			for (int y = 1; y < height - 1; y++) {
-				if (skelImg[x][y] != background) {
-					int[][] area = new int[][] { { skelImg[x - 1][y - 1], skelImg[x][y - 1], skelImg[x + 1][y - 1] },
-							{ skelImg[x - 1][y], skelImg[x][y], skelImg[x + 1][y] },
-							{ skelImg[x - 1][y + 1], skelImg[x][y + 1], skelImg[x + 1][y + 1] } };
-					
-					// delete and replace burl1
-					if (matchMask3x3(burl1, area))
-						replace(x, y, repburl1);
-				}
-			}
-		}
-	}
-	
-	private void replace(int x, int y, int[][] mask) {
-		skelImg[x - 1][y - 1] = mask[0][0];
-		skelImg[x][y - 1] = mask[1][0];
-		skelImg[x + 1][y - 1] = mask[2][0];
-		skelImg[x - 1][y] = mask[0][1];
-		skelImg[x][y] = mask[1][1];
-		skelImg[x + 1][y] = mask[2][1];
-		skelImg[x - 1][y + 1] = mask[0][2];
-		skelImg[x][y + 1] = mask[1][2];
-		skelImg[x + 1][y + 1] = mask[2][2];
-	}
-	
-	/**
-	 * delete all endlimbs which are shorter than thresh
-	 * 
-	 * @param threshold
-	 *           - average of n percent smallest endlimbs
-	 * @param repeat
-	 */
-	@Deprecated
-	public void deleteShortEndLimbs(int threshold, int repeat) {
-		for (int i = 0; i < repeat; i++) {
-			calculateEndlimbsRecursive();
-			int autothreshold = getAutoThresh(threshold / (double) 100);
-			// System.out.println("thresh: " + autothreshold);
-			deleteShortEndLimbs(autothreshold);
-		}
-	}
-	
 	/**
 	 * First try to connect, than delete
 	 * 
@@ -659,152 +603,6 @@ public class SkeletonProcessor2d {
 			}
 		}
 		return res;
-	}
-	
-	/**
-	 * Iterative Version
-	 * Only search Limbs which connected to an endpoint, stops on next branch or endpoint
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	public void calculateEndLimbsIterative() {
-		for (int index = 0; index < endpoints.size(); index++) {
-			Limb res = new Limb(endpoints.get(index));
-			Point actual = endpoints.get(index);
-			boolean hasNeighbour = false;
-			
-			if (getNeighbour(actual) != null)
-				hasNeighbour = true;
-			
-			while (hasNeighbour) {
-				Point neighbour = getNeighbour(actual);
-				if (neighbour == null) {
-					hasNeighbour = false;
-					res.setInitialpoint(actual);
-				}
-				if (neighbour != null && isBranch(neighbour) == true) {
-					hasNeighbour = false;
-					res.setInitialpoint(neighbour);
-				}
-				if (neighbour != null && isEndpoint(neighbour) == true) {
-					hasNeighbour = false;
-					res.setInitialpoint(neighbour);
-					res.isCut = true;
-					endpoints.remove(neighbour);
-				}
-				if (neighbour != null && !isEndpoint(neighbour) && !isBranch(neighbour)) {
-					actual = neighbour;
-					res.addPoint(neighbour);
-					mark(neighbour, colorMarkedEndLimbs);
-				}
-			}
-			this.endlimbs.add(res);
-		}
-	}
-	
-	@Deprecated
-	private void calcrecEL(Point actual, Limb res) {
-		Point neighbour = getNeighbour(actual);
-		boolean ok = false;
-		if (neighbour == null) {
-			res.setInitialpoint(actual);
-			ok = true;
-		}
-		if (isBranch(neighbour)) {
-			res.setInitialpoint(neighbour);
-			endlimbs.add(res);
-			ok = true;
-		}
-		if (isEndpoint(neighbour)) {
-			res.setInitialpoint(neighbour);
-			endpoints.remove(neighbour);
-			res.isCut = true;
-			endlimbs.add(res);
-			ok = true;
-		}
-		if (neighbour != null && ok == false) {
-			res.addPoint(neighbour);
-			mark(neighbour, colorMarkedEndLimbs);
-			calcrecEL(neighbour, res);
-		}
-	}
-	
-	/**
-	 * Return Pixel in the 8 - neighbourhood, if pixel is no endpoint, background or pixel who is already visited.
-	 * Branchpoints in 8 - neighbourhood will be returned.
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	private Point getNeighbour(Point inp) {
-		Point res = null;
-		Point branchInNeighbourhood = null;
-		if (inp.x > 0 && inp.x < this.skelImg.length && inp.y > 0 && inp.y < this.skelImg[0].length) {
-			
-			if (this.skelImg[inp.x - 1][inp.y - 1] != background && this.skelImg[inp.x - 1][inp.y - 1] != colorMarkedEndLimbs
-					&& this.skelImg[inp.x - 1][inp.y - 1] != colorEndpoints) {
-				if (this.skelImg[inp.x - 1][inp.y - 1] != colorBranches) {
-					res = new Point(inp.x - 1, inp.y - 1);
-				} else
-					branchInNeighbourhood = new Point(inp.x - 1, inp.y - 1);
-			}
-			if (this.skelImg[inp.x + 1][inp.y + 1] != background && this.skelImg[inp.x + 1][inp.y + 1] != colorMarkedEndLimbs
-					&& this.skelImg[inp.x + 1][inp.y + 1] != colorEndpoints) {
-				if (this.skelImg[inp.x + 1][inp.y + 1] != colorBranches) {
-					res = new Point(inp.x + 1, inp.y + 1);
-				} else
-					branchInNeighbourhood = new Point(inp.x + 1, inp.y + 1);
-			}
-			if (this.skelImg[inp.x + 1][inp.y - 1] != background && this.skelImg[inp.x + 1][inp.y - 1] != colorMarkedEndLimbs
-					&& this.skelImg[inp.x + 1][inp.y - 1] != colorEndpoints) {
-				if (this.skelImg[inp.x + 1][inp.y - 1] != colorBranches) {
-					res = new Point(inp.x + 1, inp.y - 1);
-				} else
-					branchInNeighbourhood = new Point(inp.x + 1, inp.y - 1);
-			}
-			if (this.skelImg[inp.x - 1][inp.y + 1] != background && this.skelImg[inp.x - 1][inp.y + 1] != colorMarkedEndLimbs
-					&& this.skelImg[inp.x - 1][inp.y + 1] != colorEndpoints) {
-				if (this.skelImg[inp.x - 1][inp.y + 1] != colorBranches) {
-					res = new Point(inp.x - 1, inp.y + 1);
-				} else
-					branchInNeighbourhood = new Point(inp.x - 1, inp.y + 1);
-			}
-			if (this.skelImg[inp.x][inp.y - 1] != background && this.skelImg[inp.x][inp.y - 1] != colorMarkedEndLimbs
-					&& this.skelImg[inp.x][inp.y - 1] != colorEndpoints) {
-				if (this.skelImg[inp.x][inp.y - 1] != colorBranches) {
-					res = new Point(inp.x, inp.y - 1);
-				} else
-					branchInNeighbourhood = new Point(inp.x, inp.y - 1);
-			}
-			if (this.skelImg[inp.x - 1][inp.y] != background && this.skelImg[inp.x - 1][inp.y] != colorMarkedEndLimbs
-					&& this.skelImg[inp.x - 1][inp.y] != colorEndpoints) {
-				if (this.skelImg[inp.x - 1][inp.y] != colorBranches) {
-					res = new Point(inp.x - 1, inp.y);
-				} else
-					branchInNeighbourhood = new Point(inp.x - 1, inp.y);
-			}
-			if (this.skelImg[inp.x + 1][inp.y] != background && this.skelImg[inp.x + 1][inp.y] != colorMarkedEndLimbs
-					&& this.skelImg[inp.x + 1][inp.y] != colorEndpoints) {
-				if (this.skelImg[inp.x + 1][inp.y] != colorBranches) {
-					res = new Point(inp.x + 1, inp.y);
-				} else
-					branchInNeighbourhood = new Point(inp.x + 1, inp.y);
-			}
-			if (this.skelImg[inp.x][inp.y + 1] != background && this.skelImg[inp.x][inp.y + 1] != colorMarkedEndLimbs
-					&& this.skelImg[inp.x][inp.y + 1] != colorEndpoints) {
-				if (this.skelImg[inp.x][inp.y + 1] != colorBranches) {
-					res = new Point(inp.x, inp.y + 1);
-				} else
-					branchInNeighbourhood = new Point(inp.x, inp.y + 1);
-			}
-		}
-		if (branchInNeighbourhood == null) {
-			if (res == null)
-				System.out.println("res == null" + " inpx: " + inp.x + " inpy: " + inp.y);
-			return res;
-		} else
-			return branchInNeighbourhood;
 	}
 	
 	public FlexibleImage copyONOriginalImage(FlexibleImage vis) {

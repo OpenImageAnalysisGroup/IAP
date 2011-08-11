@@ -51,7 +51,6 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.getIO().skeletonize().getImage()));
 		skel2d.findEndpointsAndBranches();
 		skel2d.print("endpoints and branches", debug);
-		// skel2d.removeBurls();
 		skel2d.deleteShortEndLimbs(10);
 		
 		int leafcount = skel2d.endlimbs.size();
