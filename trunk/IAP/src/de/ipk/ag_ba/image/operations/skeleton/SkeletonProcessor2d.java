@@ -17,7 +17,7 @@ public class SkeletonProcessor2d {
 	
 	ArrayList<Limb> forRemove = new ArrayList<Limb>();
 	
-	public static final int colorEndpoints = colorBloom;
+	public static final int colorEndpoints = Color.PINK.getRGB();
 	public static final int colorBranches = Color.RED.getRGB();
 	public static final int colorMarkedEndLimbs = Color.BLUE.getRGB();
 	public static final int foreground = Color.orange.getRGB();
@@ -633,16 +633,48 @@ public class SkeletonProcessor2d {
 		return new FlexibleImage(plantImg);
 	}
 	
-	public void detectBloom(FlexibleImage vis) {
+	public boolean detectBloom(FlexibleImage vis) {
 		ArrayList<Limb> topLimbs = getTopEndlimbs();
-		System.out.println("probably bloom endlimbs: " + topLimbs.size());
-		if (topLimbs.size() >= 3)
-			for (Limb l : topLimbs) {
-				isBloom(l, vis);
+		ArrayList<Limb> bloomLimbs = new ArrayList<Limb>();
+		int numberOfProbalblyBloomLeafs = topLimbs.size();
+		int sumDist = 0;
+		Point centroid = new Point();
+		
+		for (Limb l : topLimbs) {
+			if (checkBloomColor(l, vis)) {
+				bloomLimbs.add(l);
 			}
+			centroid.x += l.endpoint.x;
+			centroid.y += l.endpoint.y;
+		}
+		centroid.x = centroid.x / numberOfProbalblyBloomLeafs;
+		centroid.y = centroid.y / numberOfProbalblyBloomLeafs;
+		
+		for (Limb l : bloomLimbs) {
+			sumDist += l.endpoint.distance(centroid);
+		}
+		double avgDist = sumDist / (double) numberOfProbalblyBloomLeafs;
+		double maxLimblength = getMaxLimbLength();
+		System.out.println("bloomcandidates: " + bloomLimbs.size());
+		if (bloomLimbs.size() >= numberOfProbalblyBloomLeafs * 0.6 && avgDist < maxLimblength * 0.5) {
+			System.out.println("bloom detect!!!");
+			for (Limb l : bloomLimbs)
+				markLimb(l, colorBloom);
+			return true;
+		}
+		return false;
 	}
 	
-	private boolean isBloom(Limb l, FlexibleImage vis) {
+	private double getMaxLimbLength() {
+		int max = 0;
+		for (Limb l : endlimbs) {
+			if (l.points.size() > max)
+				max = l.points.size();
+		}
+		return max;
+	}
+	
+	private boolean checkBloomColor(Limb l, FlexibleImage vis) {
 		int[][] visImg = vis.getAs2A();
 		int sum = 0, r, g, b, Li = 0, ai = 0, bi = 0;
 		
@@ -665,11 +697,9 @@ public class SkeletonProcessor2d {
 		bi = bi / sum;
 		
 		// interval 0 - 255
-		if (bi > 130 && Li > 150) {
-			System.out.println("bloom found!!!");
-			markLimb(l, colorBloom);
+		if (bi > 120 && Li > 190)
 			return true;
-		} else
+		else
 			return false;
 	}
 	
