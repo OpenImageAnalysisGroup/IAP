@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -11,6 +13,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
 	BlockProperty markerPosLeftY, markerPosRightY, markerPosLeftX, markerPosRightX, markerDist;
+	
+	boolean debug = false;
 	
 	@Override
 	protected void prepare() {
@@ -40,11 +44,16 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			FlexibleImage result = input;
 			
 			// Clear bottom
+			int color;
+			if (debug)
+				color = Color.RED.getRGB();
+			else
+				color = options.getBackground();
 			if (markerPosLeftY != null) {
 				// System.out.println("mark: " + markerPosLeftY.getValue());
 				if (markerPosLeftY.getValue() > 0.5) {
 					int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS);
-					result = new ImageOperation(result).clearImageBottom(cy, options.getBackground()).getImage();
+					result = new ImageOperation(result).clearImageBottom(cy, color).getImage();
 					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
 				}
 			} else
@@ -54,7 +63,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 						int cy = (int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight())
 									- options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS);
 						result = new ImageOperation(result).clearImageBottom(
-									cy, options.getBackground()).getImage();
+									cy, color).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
 					}
 				}
@@ -244,7 +253,11 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 							(int) (120 + markerPosRightX.getValue() * width), options.getBackground()).getImage();
 			}
 		}
-		
+		int color;
+		if (debug)
+			color = Color.RED.getRGB();
+		else
+			color = options.getBackground();
 		if (options.isMaize()) {
 			if (markerDist != null && markerPosLeftX != null && markerPosRightX != null) {
 				double dist = markerDist.getValue() * 0.15;
@@ -252,17 +265,17 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 				double posRight = width / 2 + markerDist.getValue() / 2;
 				
 				result = new ImageOperation(result).clearImageRight(
-						(int) (dist + posRight), options.getBackground())
-						.clearImageLeft((int) (-dist + posLeft), options.getBackground())
+						(int) (dist + posRight), color)
+						.clearImageLeft((int) (-dist + posLeft), color)
 						.getImage();
 			} else {
 				if (markerPosLeftX != null) {
 					result = new ImageOperation(result).clearImageLeft(
-								(int) (-120 + markerPosLeftX.getValue() * width), options.getBackground()).getImage();
+								(int) (-120 + markerPosLeftX.getValue() * width), color).getImage();
 				}
 				if (markerPosRightX != null) {
 					result = new ImageOperation(result).clearImageRight(
-							(int) (120 + markerPosRightX.getValue() * width), options.getBackground()).getImage();
+							(int) (120 + markerPosRightX.getValue() * width), color).getImage();
 				}
 			}
 		}
