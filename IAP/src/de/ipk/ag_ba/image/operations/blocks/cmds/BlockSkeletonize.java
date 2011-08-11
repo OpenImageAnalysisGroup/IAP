@@ -56,7 +56,8 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		int leafcount = skel2d.endlimbs.size();
 		FlexibleImage skelres = skel2d.getAsFlexibleImage();
 		int leaflength = skelres.getIO().countFilledPixels(SkeletonProcessor2d.background);
-		boolean bloom = skel2d.detectBloom(vis);
+		int bloomLimbCount = skel2d.detectBloom(vis);
+		leafcount -= bloomLimbCount;
 		
 		// ***Out***
 		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
@@ -71,7 +72,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		ResultsTable rt = new ResultsTable();
 		rt.incrementCounter();
 		
-		if (bloom)
+		if (bloomLimbCount > 0)
 			rt.addValue("bloom", 1);
 		rt.addValue("leaf.count", leafcount);
 		if (leafcount > 0) {

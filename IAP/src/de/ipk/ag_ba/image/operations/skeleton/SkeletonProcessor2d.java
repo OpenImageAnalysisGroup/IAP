@@ -633,11 +633,12 @@ public class SkeletonProcessor2d {
 		return new FlexibleImage(plantImg);
 	}
 	
-	public boolean detectBloom(FlexibleImage vis) {
+	public int detectBloom(FlexibleImage vis) {
 		ArrayList<Limb> topLimbs = getTopEndlimbs();
 		ArrayList<Limb> bloomLimbs = new ArrayList<Limb>();
 		int numberOfProbalblyBloomLeafs = topLimbs.size();
 		int sumDist = 0;
+		int avgLength = 0;
 		Point centroid = new Point();
 		
 		for (Limb l : topLimbs) {
@@ -646,23 +647,26 @@ public class SkeletonProcessor2d {
 			}
 			centroid.x += l.endpoint.x;
 			centroid.y += l.endpoint.y;
+			avgLength += l.points.size();
 		}
 		centroid.x = centroid.x / numberOfProbalblyBloomLeafs;
 		centroid.y = centroid.y / numberOfProbalblyBloomLeafs;
+		avgLength = avgLength / numberOfProbalblyBloomLeafs;
 		
 		for (Limb l : bloomLimbs) {
 			sumDist += l.endpoint.distance(centroid);
 		}
-		double avgDist = sumDist / (double) numberOfProbalblyBloomLeafs;
+		double avgDistToCentroid = sumDist / (double) numberOfProbalblyBloomLeafs;
 		double maxLimblength = getMaxLimbLength();
+		
 		System.out.println("bloomcandidates: " + bloomLimbs.size());
-		if (bloomLimbs.size() >= numberOfProbalblyBloomLeafs * 0.6 && avgDist < maxLimblength * 0.5) {
+		if (bloomLimbs.size() >= numberOfProbalblyBloomLeafs * 0.5 && avgDistToCentroid < maxLimblength * 0.45 && avgLength < maxLimblength * 0.3) {
 			System.out.println("bloom detect!!!");
 			for (Limb l : bloomLimbs)
 				markLimb(l, colorBloom);
-			return true;
+			return bloomLimbs.size();
 		}
-		return false;
+		return 0;
 	}
 	
 	private double getMaxLimbLength() {
@@ -697,7 +701,7 @@ public class SkeletonProcessor2d {
 		bi = bi / sum;
 		
 		// interval 0 - 255
-		if (bi > 120 && Li > 190)
+		if (bi > 120 && Li > 200)
 			return true;
 		else
 			return false;
