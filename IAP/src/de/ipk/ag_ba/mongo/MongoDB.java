@@ -226,7 +226,7 @@ public class MongoDB {
 	
 	private static HashSet<String> dbsAnalyzedForCollectionSettings = new HashSet<String>();
 	
-	private void processDB(String database, String optHosts, String optLogin, String optPass,
+	private synchronized void processDB(String database, String optHosts, String optLogin, String optPass,
 			RunnableOnDB runnableOnDB) throws Exception {
 		Exception e = null;
 		try {

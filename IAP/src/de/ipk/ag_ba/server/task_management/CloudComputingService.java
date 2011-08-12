@@ -21,6 +21,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
@@ -135,6 +136,12 @@ public class CloudComputingService {
 									if ((args[0] + "").toLowerCase().startsWith("perf")) {
 										try {
 											System.out.println(":perf - perform performance test (TestPipelineMaize Copy)");
+											
+											StopWatch s = new StopWatch(">INFO: LabCube construction", false);
+											ImageOperation io = new ImageOperation(new int[][] { { 0, 0 } });
+											if (io != null)
+												s.printTime();
+											
 											StopWatch sw = new StopWatch("IAP performance test", false);
 											PerformanceTest p = new PerformanceTest();
 											p.testPipeline();
@@ -173,6 +180,11 @@ public class CloudComputingService {
 		System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
 		System.out.println(">");
 		System.out.println("> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
+		
+		StopWatch s = new StopWatch(">INFO: LabCube construction", false);
+		ImageOperation io = new ImageOperation(new int[][] { { 0, 0 } });
+		if (io != null)
+			s.printTime();
 		
 		// register extended hierarchy and loaded image loaders (and more)
 		new MultimodalDataHandlingAddon();

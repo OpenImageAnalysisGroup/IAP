@@ -14,7 +14,6 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.actions.ImagePreProcessor;
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
@@ -119,45 +118,30 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		System.out.println("Info: Workload Top/Side: " + top + "/" + side);
 		final int workloadEqualAngleSnapshotSets = top + side;
 		
-		for (TreeMap<Double, ImageSet> tm : workload) {
-			final TreeMap<Double, ImageSet> tmf = tm;
-			MyThread t = BackgroundThreadDispatcher.addTask(new Runnable() {
-				
-				@Override
-				public void run() {
-					try {
-						Sample3D inSample = null;
-						TreeMap<Double, BlockProperties> analysisResults = new TreeMap<Double, BlockProperties>();
-						for (Double angle : tmf.keySet()) {
-							if (tmf.get(angle).getVIS() != null)
-								inSample = (Sample3D) tmf.get(angle).getVIS().getParentSample();
-							BlockProperties results = processAngleWithinSnapshot(tmf.get(angle), maximumThreadCountOnImageLevel, status,
+		for (TreeMap<Double, ImageSet> tmf : workload) {
+			try {
+				Sample3D inSample = null;
+				TreeMap<Double, BlockProperties> analysisResults = new TreeMap<Double, BlockProperties>();
+				for (Double angle : tmf.keySet()) {
+					if (tmf.get(angle).getVIS() != null)
+						inSample = (Sample3D) tmf.get(angle).getVIS().getParentSample();
+					BlockProperties results = processAngleWithinSnapshot(tmf.get(angle), maximumThreadCountOnImageLevel, status,
 									workloadEqualAngleSnapshotSets);
-							if (results != null)
-								analysisResults.put(angle, results);
-						}
-						if (inSample != null && !analysisResults.isEmpty()) {
-							BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(analysisResults);
-							processStatisticalSampleOutput(inSample, postprocessingResults);
-						}
-					} catch (Error e) {
-						e.printStackTrace();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					tso.addInt(1);
-					status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + workloadSnapshots);
+					if (results != null)
+						analysisResults.put(angle, results);
 				}
-			}, "process image " + idxxx, -10);
+				if (inSample != null && !analysisResults.isEmpty()) {
+					BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(analysisResults);
+					processStatisticalSampleOutput(inSample, postprocessingResults);
+				}
+			} catch (Error e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			tso.addInt(1);
+			status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + workloadSnapshots);
 			idxxx++;
-			wait.add(t);
-			
-		}
-		
-		try {
-			BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		
 		status.setCurrentStatusValueFine(100d);
@@ -251,7 +235,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageSet optImageMasks, final FlexibleImageType type) {
-		return BackgroundThreadDispatcher.addTask(new Runnable() {
+		return new MyThread(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -269,7 +253,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					e.printStackTrace();
 				}
 			}
-		}, "load " + type.name(), 0);
+		}, "load " + type.name());
 	}
 	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result, DatabaseTarget storeResultInDatabase, boolean processLabelUrl) {
@@ -336,7 +320,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				c = load(inNir, input, inputMasks, FlexibleImageType.NIR);
 			}
 		// process images
-		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
+		a.run();
+		b.run();
+		c.run();
 	}
 	
 	private void processStatisticalOutput(ImageData inVis, BlockProperties analysisResults) {
