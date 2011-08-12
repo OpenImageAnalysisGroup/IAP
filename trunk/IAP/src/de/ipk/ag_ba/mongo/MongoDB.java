@@ -226,7 +226,7 @@ public class MongoDB {
 	
 	private static HashSet<String> dbsAnalyzedForCollectionSettings = new HashSet<String>();
 	
-	private synchronized void processDB(String database, String optHosts, String optLogin, String optPass,
+	private void processDB(String database, String optHosts, String optLogin, String optPass,
 			RunnableOnDB runnableOnDB) throws Exception {
 		Exception e = null;
 		try {
@@ -1437,7 +1437,7 @@ public class MongoDB {
 		return res;
 	}
 	
-	public synchronized void batchPingHost(final String ip,
+	public  void batchPingHost(final String ip,
 			final int blocksExecutedWithinLastMinute,
 			final int pipelineExecutedWithinCurrentHour,
 			final int tasksExecutedWithinLastMinute,
