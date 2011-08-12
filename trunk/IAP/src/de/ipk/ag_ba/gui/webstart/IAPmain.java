@@ -84,7 +84,7 @@ public class IAPmain extends JApplet {
 	static boolean myClassKnown = false;
 	
 	public IAPmain() {
-		System.out.println("Initialize IAP applet start...");
+		System.out.println(">INFO: Initialize IAP applet start...");
 		ReleaseInfo.setRunningAsApplet(this);
 		
 		setupLogger();
@@ -123,7 +123,7 @@ public class IAPmain extends JApplet {
 					ErrorMsg.addErrorMessage("Reload Classes, Problems may occur");
 				}
 				IAPmain.myClassKnown = true;
-				System.out.println("Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
+				System.out.println("INFO: Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
 				myAppletLoad(mainFrame1, myStatus);
 				// myAppletLoad(mainFrame2, myStatus);
 			}
@@ -213,7 +213,7 @@ public class IAPmain extends JApplet {
 			@Override
 			public void setText(String text) {
 				MainFrame.showMessage(text, MessageType.PERMANENT_INFO);
-				System.out.println(text);
+				// System.out.println(text);
 			}
 			
 			@Override
@@ -223,7 +223,7 @@ public class IAPmain extends JApplet {
 			
 			@Override
 			public void setInitialisationFinished() {
-				MainFrame.showMessage("", MessageType.INFO);
+				// MainFrame.showMessage("", MessageType.INFO);
 			}
 			
 			@Override
@@ -277,7 +277,7 @@ public class IAPmain extends JApplet {
 				// System.out.println(ss);
 				if (ss.indexOf("addon") >= 0) {
 					locations_exclude.add(ss);
-					System.out.println("Disable plugin " + ss);
+					// System.out.println("Disable plugin " + ss);
 				}
 				
 			}

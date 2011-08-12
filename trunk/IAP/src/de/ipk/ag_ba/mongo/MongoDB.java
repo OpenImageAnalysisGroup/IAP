@@ -7,6 +7,8 @@
 
 package de.ipk.ag_ba.mongo;
 
+import info.StopWatch;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -132,20 +134,23 @@ public class MongoDB {
 	}
 	
 	public static MongoDB getLocalDB() {
-		return new MongoDB("Local DB", "localCloud1", "localhost", null, null, HashType.MD5);
+		if (defaultLocalInstance == null)
+			defaultLocalInstance = new MongoDB("Local DB", "localCloud1", "localhost", null, null, HashType.MD5);
+		return defaultLocalInstance;
 	}
 	
-	private static MongoDB dc = null;
+	private static MongoDB defaultCloudInstance = null;
+	private static MongoDB defaultLocalInstance = null;
 	
 	public static String getDefaultCloudHostName() {
 		return "ba-13.ipk-gatersleben.de";
 	}
 	
 	public static MongoDB getDefaultCloud() {
-		if (dc == null) {
-			dc = new MongoDB("Data Processing", "cloud1", getDefaultCloudHostName(), "iap", "iap#2011", HashType.MD5);
+		if (defaultCloudInstance == null) {
+			defaultCloudInstance = new MongoDB("Data Processing", "cloud1", getDefaultCloudHostName(), "iap", "iap#2011", HashType.MD5);
 		}
-		return dc;
+		return defaultCloudInstance;
 		// return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
 	}
 	
@@ -175,7 +180,7 @@ public class MongoDB {
 	// substances
 	// conditions
 	
-	public MongoDB(String displayName, String databaseName, String hostName, String login, String password, HashType hashType) {
+	private MongoDB(String displayName, String databaseName, String hostName, String login, String password, HashType hashType) {
 		if (databaseName == null || databaseName.contains("_") || databaseName.contains("/"))
 			throw new UnsupportedOperationException("Database name may not be NULL and may not contain special characters!");
 		this.displayName = displayName;
@@ -234,18 +239,24 @@ public class MongoDB {
 					DB db;
 					if (m == null) {
 						if (optHosts == null || optHosts.length() == 0) {
+							StopWatch s = new StopWatch("INFO: new Mongo()", false);
 							m = new Mongo();
+							s.printTime();
 						} else {
+							StopWatch s = new StopWatch("INFO: new Mongo(seeds)", false);
 							List<ServerAddress> seeds = new ArrayList<ServerAddress>();
 							for (String h : optHosts.split(","))
 								seeds.add(new ServerAddress(h));
 							m = new Mongo(seeds);
 							m.slaveOk();
+							s.printTime();
 						}
 						if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains("admin")) {
 							DB dbAdmin = m.getDB("admin");
 							try {
+								StopWatch s = new StopWatch("INFO: dbAdmin.authenticate()");
 								dbAdmin.authenticate("iap", "iap#2011".toCharArray());
+								s.printTime();
 								if (authenticatedDBs.get(m) == null)
 									authenticatedDBs.put(m, new HashSet<String>());
 								authenticatedDBs.get(m).add(database);
