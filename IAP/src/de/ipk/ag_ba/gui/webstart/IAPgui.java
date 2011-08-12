@@ -189,27 +189,28 @@ public class IAPgui {
 			}
 		}
 		String thisTarget = target.split("\\.", 2)[0];
-		
-		final String nextTarget = target.length() - thisTarget.length() > 1 ? target.substring(thisTarget.length()
+		if (thisTarget != null && thisTarget.length() > 0) {
+			final String nextTarget = target.length() - thisTarget.length() > 1 ? target.substring(thisTarget.length()
 							+ ".".length()) : "";
-		NavigationButton button = knownEntities.get(thisTarget);
-		if (button == null && thisTarget.contains("(")) {
-			button = knownEntities.get(thisTarget.substring(0, thisTarget.lastIndexOf("(")).trim());
-		}
-		if (button != null) {
-			Runnable rrr = new Runnable() {
-				@Override
-				public void run() {
-					if (nextTarget.length() > 0) {
-						navigateTo(nextTarget, navigationPanel, actionPanel, graphPanel);
+			NavigationButton button = knownEntities.get(thisTarget);
+			if (button == null && thisTarget.contains("(")) {
+				button = knownEntities.get(thisTarget.substring(0, thisTarget.lastIndexOf("(")).trim());
+			}
+			if (button != null) {
+				Runnable rrr = new Runnable() {
+					@Override
+					public void run() {
+						if (nextTarget.length() > 0) {
+							navigateTo(nextTarget, navigationPanel, actionPanel, graphPanel);
+						}
 					}
-				}
-			};
-			button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
-		} else {
-			System.out.println("Could not find target action " + thisTarget);
-			navigationPanel.getEntitySet(false).iterator().next().executeNavigation(
+				};
+				button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
+			} else {
+				System.out.println("WARNING: Could not find target action: " + thisTarget);
+				navigationPanel.getEntitySet(false).iterator().next().executeNavigation(
 							PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, null);
+			}
 		}
 	}
 }

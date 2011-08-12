@@ -488,7 +488,7 @@ public class IAPservice {
 	private static boolean autoClose;
 	
 	public static float[] getCubeRoots(float lo, float up, int n) {
-		StopWatch s = new StopWatch("cube_roots", false);
+		StopWatch s = new StopWatch("INFO: cube_roots", false);
 		float[] res = new float[n + 1];
 		float sq = 1f / 3f;
 		for (int i = 0; i <= n; i++) {
