@@ -234,13 +234,13 @@ public class BackgroundThreadDispatcher {
 				// in case there is a higher priority task waiting
 				// (higher than all running tasks) then the loop is
 				// stopped, it can run, too
-				int maxTask = SystemAnalysis.getNumberOfCPUs();
-				double load = AttributeHelper.windowsRunning() ? 1 : SystemAnalysisExt.getRealSystemCpuLoad();
+				int maxTask  =1;
+				double load = 1;//AttributeHelper.windowsRunning() ? 1 : SystemAnalysisExt.getRealSystemCpuLoad();
 				if (maxTask > 1 && load > 0) {
 					if (load / maxTask < 1) {
 						if (moreLoad < maxTask * 2) {
 							// System.out.print(maxTask + " --> ");
-							moreLoad += 1;
+							moreLoad += 0;//1;
 							maxTask = maxTask + moreLoad;
 							// System.out.println(maxTask + " (Load too low: " + load + ")");
 						}
