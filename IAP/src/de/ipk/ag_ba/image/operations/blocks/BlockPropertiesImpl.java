@@ -4,6 +4,7 @@ import ij.measure.ResultsTable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -12,10 +13,12 @@ import org.StringManipulationTools;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockPropertiesImpl implements BlockProperties {
 	
 	private final TreeMap<Integer, TreeMap<String, Double>> store = new TreeMap<Integer, TreeMap<String, Double>>();
+	private final HashMap<String, FlexibleImage> storedImg = new HashMap<String, FlexibleImage>();
 	
 	@Override
 	public synchronized BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, Enum<?> pName) {
@@ -152,5 +155,15 @@ public class BlockPropertiesImpl implements BlockProperties {
 			
 			System.out.println(bpv.getName() + "=" + StringManipulationTools.formatNumber(bpv.getValue(), "#.###") + " " + bpv.getUnit());
 		}
+	}
+	
+	@Override
+	public void setImage(String id, FlexibleImage image) {
+		storedImg.put(id, image);
+	}
+	
+	@Override
+	public FlexibleImage getImage(String id) {
+		return storedImg.get(id);
 	}
 }

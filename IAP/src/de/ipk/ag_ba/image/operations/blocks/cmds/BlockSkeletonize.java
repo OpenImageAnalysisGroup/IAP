@@ -3,8 +3,10 @@ package de.ipk.ag_ba.image.operations.blocks.cmds;
 import ij.measure.ResultsTable;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.TreeMap;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
@@ -26,7 +28,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debug = true;
+	private final boolean debug = false;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
@@ -35,13 +37,16 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
 					// .closing(3, 3)
-					.dilateHorizontal(18)
-					.blur(1)
+					.erode()
+					.dilateHorizontal(5)
+					.blur(3)
 					.getImage().print("vis", debug);
 			
 			if (viswork != null)
-				if (options.isMaize())
-					res = calcSkeleton(viswork, vis);
+				if (options.isMaize()) {
+					getProperties().setImage("skeleton", calcSkeleton(viswork, vis));
+					res = getProperties().getImage("beforeBloomEnhancement");
+				}
 		}
 		return res;
 	}
@@ -51,12 +56,16 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.getIO().skeletonize().getImage()));
 		skel2d.findEndpointsAndBranches2();
 		skel2d.print("endpoints and branches", debug);
-		skel2d.deleteShortEndLimbs(10);
+		
+		skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
+		HashSet<Point> knownBloompoints = skel2d.detectBloom(vis);
+		int bloomLimbCount = knownBloompoints.size();
+		skel2d.deleteShortEndLimbs(10, false, knownBloompoints);
+		skel2d.detectBloom(vis);
 		
 		int leafcount = skel2d.endlimbs.size();
 		FlexibleImage skelres = skel2d.getAsFlexibleImage();
 		int leaflength = skelres.getIO().countFilledPixels(SkeletonProcessor2d.background);
-		int bloomLimbCount = skel2d.detectBloom(vis);
 		leafcount -= bloomLimbCount;
 		
 		// ***Out***
@@ -72,14 +81,17 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		ResultsTable rt = new ResultsTable();
 		rt.incrementCounter();
 		
-		if (bloomLimbCount > 0)
-			rt.addValue("bloom", 1);
+		rt.addValue("bloom.count", bloomLimbCount);
 		rt.addValue("leaf.count", leafcount);
 		if (leafcount > 0) {
 			if (distHorizontal != null)
 				rt.addValue("leaf.length.sum.norm", leaflength * normFactor);
 			rt.addValue("leaf.length.sum", leaflength);
 		}
+		if (bloomLimbCount > 0)
+			rt.addValue("bloom", 1);
+		else
+			rt.addValue("bloom", 0);
 		
 		if (leafcount > 0) {
 			if (distHorizontal != null)
@@ -96,7 +108,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 					"RESULT_top.", rt,
 					getBlockPosition());
 		
-		return result2;
+		return skel2d.getAsFlexibleImage();
 	}
 	
 	private FlexibleImage MapOriginalOnSkelUseingMedian(FlexibleImage skeleton, FlexibleImage original, int back) {
@@ -247,7 +259,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		
 		if (maxLeafcount > 0) {
 			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.max", maxLeafcount);
-			System.out.println("MAX leaf count: " + maxLeafcount);
+			// System.out.println("MAX leaf count: " + maxLeafcount);
 			Double[] lca = lc.toArray(new Double[] {});
 			Arrays.sort(lca);
 			Double median = lca[lca.length / 2];
