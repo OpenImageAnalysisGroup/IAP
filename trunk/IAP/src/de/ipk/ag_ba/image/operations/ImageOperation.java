@@ -58,6 +58,7 @@ import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
+import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
@@ -77,7 +78,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  */
 
 public class ImageOperation {
-	
 	protected final ImagePlus image;
 	protected ResultsTable rt;
 	public final static float[][][] labCube = getLabCube();
@@ -380,6 +380,33 @@ public class ImageOperation {
 		return new ImageOperation(maskPixels, mask.getWidth(), mask.getHeight());
 	}
 	
+	public ImageOperation erodeRetainingLines() {
+		int[][] img = getImageAs2array();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] res = new int[w][h];
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				int neighCnt = 0;
+				if (img[x][y] == PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+					res[x][y] = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+				} else {
+					for (int xd = -1; xd <= 1; xd++)
+						for (int yd = -1; yd <= 1; yd++) {
+							if (img[x + xd][y + yd] != PhenotypeAnalysisTask.BACKGROUND_COLORint)
+								neighCnt++;
+						}
+					if (neighCnt > 3 && neighCnt < 9)
+						res[x][y] = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+					else
+						res[x][y] = img[x][y];
+				}
+			}
+		}
+		return new ImageOperation(res);
+	}
+	
 	/**
 	 * Reduce area of mask.
 	 * <p>
@@ -460,6 +487,12 @@ public class ImageOperation {
 		return erode(image.getProcessor());
 	}
 	
+	public ImageOperation erode(int n) { // es wird der 3x3 Minimum-Filter genutzt
+		for (int i = 0; i < n; i++)
+			image.getProcessor().erode();
+		return new ImageOperation(image);
+	}
+	
 	/**
 	 * Dilation, then erosion. Removes small holes in the image.
 	 * <p>
@@ -469,6 +502,32 @@ public class ImageOperation {
 	public void closing(int[][] mask) {
 		dilate(mask);
 		erode(mask);
+	}
+	
+	/**
+	 * INFO: Works on colorful image.
+	 * 
+	 * @author pape, klukas
+	 */
+	public ImageOperation dilatationColorImage() {
+		int[][] src_image = getImageAs2array();
+		int w = src_image.length;
+		int h = src_image[0].length;
+		int[][] image_result = new int[w][h];
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (src_image[x][y] != PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+					for (int xd = -1; xd <= 1; xd++) {
+						for (int yd = -1; yd <= 1; yd++) {
+							if (x + xd <= w - 1 && y + yd <= h - 1)
+								if (image_result[x + xd][y + yd] == PhenotypeAnalysisTask.BACKGROUND_COLORint)
+									image_result[x + xd][y + yd] = src_image[x][y];
+						}
+					}
+				}
+			}
+		}
+		return new ImageOperation(getImageAs2array());
 	}
 	
 	/**
@@ -2950,5 +3009,36 @@ public class ImageOperation {
 	
 	public ImageCanvas getCanvas() {
 		return new ImageCanvas(getImage());
+	}
+	
+	public ImageOperation copyOnImage(FlexibleImage image2) {
+		int[][] res = getImageAs2array();
+		int[][] skelImg = image2.getAs2A();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (skelImg[x][y] != SkeletonProcessor2d.background) {
+					int v = skelImg[x][y];
+					int r = 2;
+					if (v == SkeletonProcessor2d.colorEndpoints)
+						r = 18;
+					if (v == SkeletonProcessor2d.colorBranches)
+						r = 3;
+					if (v == SkeletonProcessor2d.colorBloomEndpoint)
+						r = 20;
+					for (int diffX = -r; diffX < r; diffX++)
+						for (int diffY = -r; diffY < r; diffY++) {
+							if ((v == SkeletonProcessor2d.colorEndpoints || v == SkeletonProcessor2d.colorBloomEndpoint) &&
+									((diffX * diffX + diffY * diffY) <= 12 * 12)) // ||
+								// (diffX * diffX + diffY * diffY) >= 20 * 20)
+								continue;
+							if (x - diffX >= 0 && y - diffY >= 0)
+								res[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
+						}
+				}
+			}
+		}
+		return new ImageOperation(res);
 	}
 }

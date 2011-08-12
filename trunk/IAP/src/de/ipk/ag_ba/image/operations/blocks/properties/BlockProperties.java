@@ -5,6 +5,7 @@ import ij.measure.ResultsTable;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public interface BlockProperties {
 	
@@ -40,5 +41,9 @@ public interface BlockProperties {
 	void storeResults(String id_prefix, ResultsTable numericResults, int position);
 	
 	public void printAnalysisResults();
+	
+	public void setImage(String id, FlexibleImage image);
+	
+	public FlexibleImage getImage(String id);
 	
 }

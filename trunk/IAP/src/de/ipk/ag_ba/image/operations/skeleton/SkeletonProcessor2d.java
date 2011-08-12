@@ -3,6 +3,7 @@ package de.ipk.ag_ba.image.operations.skeleton;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -25,7 +26,7 @@ public class SkeletonProcessor2d {
 	public static final int colorDebug = Color.GREEN.getRGB();
 	
 	public boolean debug = false;
-	private int colorBloomEndpoint = Color.CYAN.getRGB();
+	public static int colorBloomEndpoint = Color.CYAN.getRGB();
 	
 	public SkeletonProcessor2d(FlexibleImage inp) {
 		this.skelImg = inp.getAs2A().clone();
@@ -445,28 +446,33 @@ public class SkeletonProcessor2d {
 	 * 
 	 * @param threshold
 	 */
-	public void deleteShortEndLimbs(int threshold) {
+	public void deleteShortEndLimbs(int threshold, boolean simulate, HashSet<Point> knownBlooms) {
 		int n = 0;
 		do {
 			// do {
+			removeShortEndLimbsUpdateCrossingsAndEndpoints();
 			calculateEndlimbsRecursive();
+			// System.out.println("numofendlimbs0: " + endlimbs.size());
 			// } while (connectSkeleton() && n < 1000);
 			int autothreshold = getAutoThresh(threshold / (double) 100);
 			boolean goRecursive = false;
 			do {
 				goRecursive = false;
-				// System.out.println("numofendlimbs: " + endlimbs.size());
+				// System.out.println("numofendlimbs1: " + endlimbs.size() + " auto: " + autothreshold);
 				
 				for (Limb l : endlimbs) {
-					if (l.length() < autothreshold) {
-						forRemove.add(l);
-						goRecursive = true;
-						// System.out.println("del");
+					if (l.length() < autothreshold && !knownBlooms.contains(l.endpoint)) {
+						if (!simulate) {
+							forRemove.add(l);
+							goRecursive = true;
+							// System.out.println("del");
+						}
 					}
 				}
-				totalRefreshSkeleton();
+				removeShortEndLimbsUpdateCrossingsAndEndpoints();
 			} while (goRecursive);
 			calculateEndlimbsRecursive();
+			// System.out.println("numofendlimbs2: " + endlimbs.size());
 			n++;
 		} while (connectSkeleton() && n < 1000);
 	}
@@ -498,7 +504,7 @@ public class SkeletonProcessor2d {
 	/**
 	 * Removed all limbs saved in forRemove, reset the skeleton and recalculate all end- and branchpoints.
 	 */
-	private void totalRefreshSkeleton() {
+	private void removeShortEndLimbsUpdateCrossingsAndEndpoints() {
 		if (forRemove.size() > 0) {
 			for (int index = 0; index < forRemove.size(); index++) {
 				for (int index2 = 0; index2 < forRemove.get(index).points.size(); index2++) {
@@ -619,9 +625,11 @@ public class SkeletonProcessor2d {
 						r = 18;
 					if (v == colorBranches)
 						r = 3;
+					if (v == colorBloomEndpoint)
+						r = 20;
 					for (int diffX = -r; diffX < r; diffX++)
 						for (int diffY = -r; diffY < r; diffY++) {
-							if (v == SkeletonProcessor2d.colorEndpoints &&
+							if ((v == colorEndpoints || v == colorBloomEndpoint) &&
 									((diffX * diffX + diffY * diffY) <= 12 * 12)) // ||
 								// (diffX * diffX + diffY * diffY) >= 20 * 20)
 								continue;
@@ -634,7 +642,7 @@ public class SkeletonProcessor2d {
 		return new FlexibleImage(plantImg);
 	}
 	
-	public int detectBloom(FlexibleImage vis) {
+	public HashSet<Point> detectBloom(FlexibleImage vis) {
 		ArrayList<Limb> topLimbs = getTopEndlimbs(0.3);
 		ArrayList<Limb> bloomLimbs = new ArrayList<Limb>();
 		int numberOfProbalblyBloomLeafs = topLimbs.size();
@@ -660,16 +668,18 @@ public class SkeletonProcessor2d {
 		double avgDistToCentroid = sumDist / (double) numberOfProbalblyBloomLeafs;
 		double maxLimblength = getMaxLimbLength();
 		
-		System.out.println("bloomcandidates: " + bloomLimbs.size());
+		// System.out.println("bloomcandidates: " + bloomLimbs.size());
 		if (bloomLimbs.size() >= numberOfProbalblyBloomLeafs * 0.5 && avgDistToCentroid < maxLimblength * 0.45 && avgLength < maxLimblength * 0.3) {
-			System.out.println("bloom detect!!!");
+			// System.out.println("bloom detect!!!");
+			HashSet<Point> res = new HashSet<Point>();
 			for (Limb l : bloomLimbs) {
 				markLimb(l, colorBloom);
 				skelImg[l.endpoint.x][l.endpoint.y] = colorBloomEndpoint;
+				res.add(l.endpoint);
 			}
-			return bloomLimbs.size();
+			return res;
 		}
-		return 0;
+		return new HashSet<Point>();
 	}
 	
 	private double getMaxLimbLength() {
@@ -683,8 +693,8 @@ public class SkeletonProcessor2d {
 	
 	private boolean checkBloomColor(Limb l, FlexibleImage vis) {
 		int[][] visImg = vis.getAs2A();
-		int sum = 0, r, g, b, Li = 0, ai = 0, bi = 0;
-		
+		int yellow = 0, r, g, b, Li = 0, ai = 0, bi = 0;
+		int green = 0;
 		for (Point p : l.points) {
 			int c = visImg[p.x][p.y];
 			
@@ -692,19 +702,17 @@ public class SkeletonProcessor2d {
 			g = ((c & 0x00ff00) >> 8); // G 0..1
 			b = (c & 0x0000ff); // B 0..1
 			
-			Li += (int) ImageOperation.labCube[r][g][b];
-			ai += (int) ImageOperation.labCube[r][g][b + 256];
-			bi += (int) ImageOperation.labCube[r][g][b + 512];
+			Li = (int) ImageOperation.labCube[r][g][b];
+			ai = (int) ImageOperation.labCube[r][g][b + 256];
+			bi = (int) ImageOperation.labCube[r][g][b + 512];
 			
-			sum++;
+			if (bi > 120 && Li > 200 && ai > 112 && Li < 235) // ai: 105
+				yellow++;
+			else
+				green++;
 		}
-		
-		Li = Li / sum;
-		ai = ai / sum;
-		bi = bi / sum;
-		System.out.println("l: " + Li + " a: " + ai + " bi: " + bi);
-		// interval 0 - 255
-		if (bi > 120 && Li > 200 && ai > 105)
+		System.out.println("yellow: " + yellow + " green: " + green);
+		if (yellow > 2 && yellow > green * 0.2)
 			return true;
 		else
 			return false;
@@ -728,7 +736,7 @@ public class SkeletonProcessor2d {
 			}
 		}
 		maxLimbs.add(res);
-		System.out.println("max endpoint: " + res.endpoint.toString());
+		// System.out.println("max endpoint: " + res.endpoint.toString());
 		
 		for (Limb l : endlimbs) {
 			if (l != res && l.endpoint.y < maxHeight * (1 + 0.3))

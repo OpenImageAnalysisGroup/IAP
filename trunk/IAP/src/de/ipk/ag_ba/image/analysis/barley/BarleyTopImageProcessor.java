@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropMasks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDataAnalysis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeVisAndFluoMasks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMorphologicalOperations;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeMasksToLargest;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockTransferImageSet;
@@ -71,7 +71,7 @@ public class BarleyTopImageProcessor {
 			p.add(BlockImageInfo.class);
 			p.add(BlockClearBackground.class);
 			p.add(BlockClosingOnFluo.class);
-			p.add(BlockRemoveSmallClusters.class);
+			p.add(BlockRemoveSmallClustersVisFluo.class);
 			p.add(BlockDataAnalysis.class);
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockMorphologicalOperations.class);
@@ -105,7 +105,7 @@ public class BarleyTopImageProcessor {
 		} else {
 			p.add(BlockClearBackground.class);
 			p.add(BlockClosingOnFluo.class);
-			p.add(BlockRemoveSmallClusters.class);
+			p.add(BlockRemoveSmallClustersVisFluo.class);
 			p.add(BlockDataAnalysis.class);
 			p.add(BlockResizeMasksToLargest.class);
 			p.add(BlockEnlargeVisAndFluoMasks.class);

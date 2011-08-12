@@ -11,12 +11,13 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancingFluoAndNir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancingVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilterForFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterVisFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilterFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirProcessing;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveBambooStick;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveBambooStickVis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockReplaceEmptyOriginalImage;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
@@ -24,12 +25,13 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuoOrVis
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHeight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkers;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkersVisFluoNir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFluoToIntensity;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjects;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresFromTopVisUsingOpening;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjectsVis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjectsVisFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresUsingOpeningTopVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockUseFluoMaskToClearVisAndNirMask;
 
 /**
@@ -52,21 +54,33 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockFindBlueMarkers.class);
 		p.add(BlockColorBalancingFluoAndNir.class);
 		p.add(BlockClearBackgroundByComparingNullImageAndImage.class);
-		p.add(BlockLabFilter.class);
-		p.add(BlockRemoveSmallClusters.class);
-		p.add(BlockClearMasksBasedOnMarkers.class);
-		p.add(BlockRemoveSmallStructuresFromTopVisUsingOpening.class);
-		p.add(BlockMedianFilterForFluo.class);
+		p.add(BlockClearMasksBasedOnMarkersVisFluoNir.class);
+		p.add(BlockLabFilterVisFluo.class);
+		// "beforeBloomEnhancement" image is saved in the following block
 		p.add(BlockClosingForYellowVisMask.class);
-		p.add(BlockLabFilter.class);
-		p.add(BlockRemoveSmallClusters.class); // requires lab filter before
-		p.add(BlockRemoveBambooStick.class); // requires remove small clusters before (the processing would vertically stop at any noise)
-		p.add(BlockLabFilter.class);
-		p.add(BlockRemoveLevitatingObjects.class);
-		p.add(BlockRemoveVerticalAndHorizontalStructures.class);
-		p.add(BlockRemoveSmallClusters.class); // 2nd run
+		p.add(BlockRemoveSmallClustersVisFluo.class);
+		p.add(BlockRemoveSmallStructuresUsingOpeningTopVis.class);
+		p.add(BlockMedianFilterFluo.class);
+		// p.add(BlockClosingForYellowVisMask.class);
+		p.add(BlockRemoveSmallClustersVisFluo.class); // requires lab filter before
+		p.add(BlockRemoveBambooStickVis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
+		p.add(BlockRemoveLevitatingObjectsVisFluo.class);
+		p.add(BlockRemoveVerticalAndHorizontalStructuresVisFluo.class);
+		p.add(BlockRemoveSmallClustersVisFluo.class); // 2nd run
 		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
+		// "skelton" image is saved in the following block
+		// "beforeBloomEnhancement" is restored by the following block
+		p.add(BlockSkeletonize.class);
+		
+		p.add(BlockRemoveSmallClustersVis.class);
+		p.add(BlockRemoveBambooStickVis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
+		p.add(BlockRemoveLevitatingObjectsVis.class);
+		p.add(BlockRemoveVerticalAndHorizontalStructuresVis.class);
+		p.add(BlockRemoveSmallClustersVis.class); // 2nd run
+		p.add(BlockUseFluoMaskToClearVisAndNirMask.class);
+		
 		p.add(BlockNirProcessing.class);
+		
 		// p.add(BlockLabFilterVis.class);
 		p.add(BlockCopyImagesApplyMask.class); // without nir
 		
@@ -76,8 +90,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockFluoToIntensity.class);
 		p.add(BlockIntensityAnalysis.class);
 		p.add(BlockConvexHullOnFLuoOrVis.class);
-		p.add(BlockSkeletonize.class);
 		
+		p.add(drawSkeletonOnImage.class);
 		// postprocessing
 		p.add(BlockMoveMasksToImages.class);
 		p.add(BlockCropImages.class);
@@ -132,6 +146,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		options.clearAndAddIntSetting(Setting.W_Diff_NIR, 23); // 33
 		
 		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1104);
+		options.clearAndAddIntSetting(Setting.CLOSING_REPEAT, 2);
 	}
 	
 	@Override

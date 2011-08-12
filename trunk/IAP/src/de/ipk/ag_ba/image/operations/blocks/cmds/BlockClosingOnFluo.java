@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
-import de.ipk.ag_ba.image.operations.MorphologicalOperators;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -49,12 +49,12 @@ public class BlockClosingOnFluo extends AbstractSnapshotAnalysisBlockFIS {
 			}
 		}
 		int cnt = 0;
+		ImageOperation op = new ImageOperation(image);
 		do {
-			MorphologicalOperators op = new MorphologicalOperators(image);
-			op.doClosing();
-			image = op.getResultImage();
+			op.closing();
 			cnt++;
 		} while (cnt < closingRepeat);
+		image = op.getImageAs2array();
 		int[][] mask = image;
 		
 		for (int x = 0; x < w; x++) {
