@@ -91,7 +91,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockIntensityAnalysis.class);
 		p.add(BlockConvexHullOnFLuoOrVis.class);
 		
-		p.add(drawSkeletonOnImage.class);
+		p.add(BlockDrawSkeletonOnImageVis.class);
 		// postprocessing
 		p.add(BlockMoveMasksToImages.class);
 		p.add(BlockCropImages.class);
