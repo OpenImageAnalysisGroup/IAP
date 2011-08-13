@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.gui.navigation_actions.maize;
 
+import info.StopWatch;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -68,8 +70,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			return;
 		
 		try {
+			StopWatch sw = new StopWatch(">LOAD EXPERIMENT " + experiment.getExperimentName());
 			ExperimentInterface experimentToBeAnalysed = experiment.getData(m);
-			
+			sw.printTime();
 			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
 			for (SubstanceInterface m : experimentToBeAnalysed) {

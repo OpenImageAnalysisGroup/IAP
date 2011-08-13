@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 
+import info.StopWatch;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -128,9 +130,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			};
 			idxxx++;
-			BackgroundThreadDispatcher.addTask(r, getName() + " " + idxxx, -100);
+			wait.add(BackgroundThreadDispatcher.addTask(r, getName() + " " + idxxx, -100));
 		}
-		
+		try {
+			BackgroundThreadDispatcher.waitFor(wait);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
@@ -228,6 +234,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	protected abstract ImageProcessor getImageProcessor();
 	
 	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
+		if (output == null)
+			return;
 		if (optLabelImageContent == null) {
 			if (image.getHeight() > 1) {
 				LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
@@ -306,6 +314,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private synchronized void loadImages(ImageData inVis, ImageData inFluo, ImageData inNir, final FlexibleImageSet input, final FlexibleImageSet inputMasks)
 			throws InterruptedException {
+		StopWatch s = new StopWatch(">LOAD INPUT IMAGES", false);
 		MyThread a = null, b = null, c = null;
 		
 		if (inVis != null) {
@@ -336,6 +345,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		a.run();
 		b.run();
 		c.run();
+		s.printTime();
 	}
 	
 	private void processStatisticalOutput(ImageData inVis, BlockProperties analysisResults) {
@@ -350,7 +360,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			m.setValue(bpv.getValue());
 			m.setUnit(bpv.getUnit());
 			
-			output.add(m);
+			if (output != null)
+				output.add(m);
 		}
 	}
 	
@@ -372,6 +383,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private synchronized void processAndOrSaveTiffImagesOrResultImages(ImageSet id, ImageData inVis, ImageData inFluo, ImageData inNir,
 			FlexibleImageStack debugImageStack,
 			FlexibleImage resVis, FlexibleImage resFluo, FlexibleImage resNir) {
+		StopWatch s = new StopWatch(">SAVE IMAGE RESULTS", false);
 		if (forceDebugStack) {
 			forcedDebugStacks.add(debugImageStack);
 		} else {
@@ -400,6 +412,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			if (resNir != null)
 				saveImage(inNir, resNir, buf, ".tiff");
 		}
+		s.printTime();
 	}
 	
 	private BlockProperties processAngleWithinSnapshot(ImageSet id, final int maximumThreadCountOnImageLevel,
