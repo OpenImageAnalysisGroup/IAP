@@ -38,6 +38,7 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ImageSet;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -314,7 +315,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private synchronized void loadImages(ImageData inVis, ImageData inFluo, ImageData inNir, final FlexibleImageSet input, final FlexibleImageSet inputMasks)
 			throws InterruptedException {
-		StopWatch s = new StopWatch(">LOAD INPUT IMAGES", false);
+		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">LOAD INPUT IMAGES", false);
 		MyThread a = null, b = null, c = null;
 		
 		if (inVis != null) {
@@ -383,7 +384,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private synchronized void processAndOrSaveTiffImagesOrResultImages(ImageSet id, ImageData inVis, ImageData inFluo, ImageData inNir,
 			FlexibleImageStack debugImageStack,
 			FlexibleImage resVis, FlexibleImage resFluo, FlexibleImage resNir) {
-		StopWatch s = new StopWatch(">SAVE IMAGE RESULTS", false);
+		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE IMAGE RESULTS", false);
 		if (forceDebugStack) {
 			forcedDebugStacks.add(debugImageStack);
 		} else {
