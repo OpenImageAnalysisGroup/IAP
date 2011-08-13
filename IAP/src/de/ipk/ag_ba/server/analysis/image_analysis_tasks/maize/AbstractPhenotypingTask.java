@@ -7,11 +7,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
 
+import javax.imageio.ImageIO;
+
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.ObjectRef;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
@@ -256,26 +261,61 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 	}
 	
-	private MyThread load(final ImageData id, final FlexibleImageSet input, final FlexibleImageSet optImageMasks, final FlexibleImageType type) {
-		return new MyThread(new Runnable() {
+	private MyThread load(final ImageData id, final FlexibleImageSet input,
+			final FlexibleImageSet optImageMasks, final FlexibleImageType type,
+			final MyByteArrayInputStream optMainImageContent,
+			final MyByteArrayInputStream optLabelImageContent) {
+		Runnable r = new Runnable() {
 			@Override
 			public void run() {
 				try {
-					BufferedImage loadedReferenceImage = null;
-					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, optImageMasks != null, loadedReferenceImage);
+					LoadedImage li;
+					if (optImageMasks != null) {
+						final ObjectRef mainImg = new ObjectRef();
+						final ObjectRef labelImg = new ObjectRef();
+						Runnable r1 = new Runnable() {
+							@Override
+							public void run() {
+								try {
+									mainImg.setObject(ImageIO.read(optMainImageContent));
+								} catch (Exception e) {
+									System.out.println(">ERROR: Could not load main image: " + id);
+								}
+								
+							}
+						};
+						Runnable r2 = new Runnable() {
+							@Override
+							public void run() {
+								try {
+									labelImg.setObject(optLabelImageContent != null ? ImageIO.read(optLabelImageContent) : null);
+								} catch (Exception e) {
+									System.out.println(">ERROR: Could not load label image: " + id);
+								}
+								
+							}
+						};
+						MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image", -80);
+						MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image", -80);
+						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b });
+						li = new LoadedImage(id,
+								(BufferedImage) mainImg.getObject(),
+								(BufferedImage) labelImg.getObject());
+					} else
+						li = IOmodule.loadImageFromFileOrMongo(id, true, optImageMasks != null);
+					
 					input.set(new FlexibleImage(li.getLoadedImage(), type));
 					if (optImageMasks != null)
 						if (li.getLoadedImageLabelField() != null)
 							optImageMasks.set(new FlexibleImage(li.getLoadedImageLabelField(), type));
 						else
-							System.out.println("ERROR: Label field not available for:" + li);
-				} catch (Error err) {
-					err.printStackTrace();
+							System.out.println(">ERROR: Label field not available for:" + li);
 				} catch (Exception e) {
-					e.printStackTrace();
+					System.out.println(">ERROR: Could not load image: " + id);
 				}
 			}
-		}, "load " + type.name());
+		};
+		return new MyThread(r, "Load Image " + (id != null && id.getURL() != null ? "" + id.getURL().getFileName() : "(null)"));
 	}
 	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result, DatabaseTarget storeResultInDatabase, boolean processLabelUrl) {
@@ -315,15 +355,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private synchronized void loadImages(ImageData inVis, ImageData inFluo, ImageData inNir, final FlexibleImageSet input, final FlexibleImageSet inputMasks)
 			throws InterruptedException {
-		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">LOAD INPUT IMAGES", false);
+		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">LOAD", false);
 		MyThread a = null, b = null, c = null;
-		
 		if (inVis != null) {
 			if (inVis instanceof LoadedImage) {
 				input.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImage()));
 				inputMasks.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImageLabelField()));
 			} else {
-				a = load(inVis, input, inputMasks, FlexibleImageType.VIS);
+				try {
+					MyByteArrayInputStream optMainImageContent = ResourceIOManager.getInputStreamMemoryCached(inVis.getURL());
+					MyByteArrayInputStream optLabelImageContent = inVis.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(inVis.getLabelURL())
+							: null;
+					a = load(inVis, input, inputMasks, FlexibleImageType.VIS,
+							optMainImageContent, optLabelImageContent);
+				} catch (Exception e) {
+					System.out.println(">ERROR: Could not load VIS image or reference: " + inVis);
+				}
 			}
 		}
 		
@@ -332,7 +379,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				input.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImage()));
 				inputMasks.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImageLabelField()));
 			} else {
-				b = load(inFluo, input, inputMasks, FlexibleImageType.FLUO);
+				try {
+					MyByteArrayInputStream optMainImageContent = ResourceIOManager.getInputStreamMemoryCached(inFluo.getURL());
+					MyByteArrayInputStream optLabelImageContent = inFluo.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(inFluo.getLabelURL())
+							: null;
+					b = load(inFluo, input, inputMasks, FlexibleImageType.FLUO, optMainImageContent, optLabelImageContent);
+				} catch (Exception e) {
+					System.out.println(">ERROR: Could not load FLUO image or reference: " + inFluo);
+				}
 			}
 		
 		if (inNir != null)
@@ -340,12 +394,19 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				input.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImage()));
 				inputMasks.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImageLabelField()));
 			} else {
-				c = load(inNir, input, inputMasks, FlexibleImageType.NIR);
+				try {
+					MyByteArrayInputStream optMainImageContent = ResourceIOManager.getInputStreamMemoryCached(inNir.getURL());
+					MyByteArrayInputStream optLabelImageContent = inNir.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(inNir.getLabelURL())
+							: null;
+					c = load(inNir, input, inputMasks, FlexibleImageType.NIR, optMainImageContent, optLabelImageContent);
+				} catch (Exception e) {
+					System.out.println(">ERROR: Could not load NIR image or reference: " + inNir);
+				}
 			}
-		// process images
-		a.run();
-		b.run();
-		c.run();
+		BackgroundThreadDispatcher.addTask(a, -90);
+		BackgroundThreadDispatcher.addTask(b, -90);
+		BackgroundThreadDispatcher.addTask(c, -90);
+		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, });
 		s.printTime();
 	}
 	

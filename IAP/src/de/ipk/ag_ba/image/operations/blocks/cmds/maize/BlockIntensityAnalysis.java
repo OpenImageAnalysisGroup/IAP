@@ -8,7 +8,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * @author klukas, pape
@@ -94,7 +93,7 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 				int[] nirImg = getInput().getMasks().getNir().getAs1A();
 				int filled = 0;
 				double fSum = 0;
-				int b = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+				int b = ImageOperation.BACKGROUND_COLORint;
 				for (int x : nirImg) {
 					// Feuchtigkeit (%) = -7E-05x^3 + 0,0627x^2 - 15,416x + 1156,1 // Formel: E-Mail Alex 10.8.2011
 					if (x != b) {

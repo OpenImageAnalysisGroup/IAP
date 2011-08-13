@@ -23,7 +23,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.graffiti.editor.GravistoService;
 
 import qmwi.kseg.som.SOM_ColorReduce;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 
 /*
  * Created on Dec 17, 2009 by Christian Klukas
@@ -136,7 +136,7 @@ public class MyPicture {
 				// Color c = new Color(rgb);
 				allp++;
 				// if (ta.isTransparent(c)) {
-				if (rgb == PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+				if (rgb == ImageOperation.BACKGROUND_COLORint) {
 					transparentImageData.set(y * width + x);
 				} else {
 					nottransp++;

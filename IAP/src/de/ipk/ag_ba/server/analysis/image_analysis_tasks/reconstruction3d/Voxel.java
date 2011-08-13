@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d;
 
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 
 /**
  * @author klukas
@@ -20,11 +20,11 @@ public class Voxel {
 	}
 	
 	public Voxel(int px, int py, int pz) {
-		this(px, py, pz, PhenotypeAnalysisTask.BACKGROUND_COLORint);
+		this(px, py, pz, ImageOperation.BACKGROUND_COLORint);
 	}
 	
 	public boolean isEmpty() {
-		return color != PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		return color != ImageOperation.BACKGROUND_COLORint;
 	}
 	
 }

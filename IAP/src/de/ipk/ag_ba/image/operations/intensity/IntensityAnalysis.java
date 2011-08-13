@@ -3,7 +3,6 @@ package de.ipk.ag_ba.image.operations.intensity;
 import ij.measure.ResultsTable;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 public class IntensityAnalysis {
 	
@@ -22,7 +21,7 @@ public class IntensityAnalysis {
 		
 		double sumOfIntensity = 0;
 		
-		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int background = ImageOperation.BACKGROUND_COLORint;
 		
 		Histogram hist = new Histogram(this.n);
 		int plantImagePixelCnt = 0;

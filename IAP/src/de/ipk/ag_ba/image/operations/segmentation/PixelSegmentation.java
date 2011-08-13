@@ -15,9 +15,9 @@ import org.Vector2d;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.operations.ImageConverter;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.Position;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * @author entzian
@@ -66,7 +66,7 @@ public class PixelSegmentation implements Segmentation {
 		int w = in.getWidth();
 		int h = in.getHeight();
 		int[][] image = new int[w][h];
-		int iBackgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int iBackgroundFill = ImageOperation.BACKGROUND_COLORint;
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				int off = x + y * w;
