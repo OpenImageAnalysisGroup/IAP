@@ -711,7 +711,7 @@ public class SkeletonProcessor2d {
 			else
 				green++;
 		}
-		System.out.println("yellow: " + yellow + " green: " + green);
+		// System.out.println("yellow: " + yellow + " green: " + green);
 		if (yellow > 2 && yellow > green * 0.2)
 			return true;
 		else

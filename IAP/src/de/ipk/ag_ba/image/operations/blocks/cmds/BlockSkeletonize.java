@@ -199,7 +199,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			for (BlockPropertyValue v : rt.getProperties("RESULT_top.main.axis.rotation")) {
 				if (v.getValue() != null) {
 					a = v.getValue().intValue();
-					System.out.println("main.axis.rotation: " + a);
+					// System.out.println("main.axis.rotation: " + a);
 					break searchLoop;
 				}
 			}
@@ -224,7 +224,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			BlockProperties rt = allResultsForSnapshot.get(key);
 			
 			if (bestAngle != null && key == bestAngle) {
-				System.out.println("Best side angle: " + bestAngle);
+				// System.out.println("Best side angle: " + bestAngle);
 				Double cnt = null;
 				for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.count")) {
 					if (v.getValue() != null)
@@ -232,7 +232,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 				}
 				if (cnt != null) {
 					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.best", cnt);
-					System.out.println("Leaf count for best side image: " + cnt);
+					// System.out.println("Leaf count for best side image: " + cnt);
 				}
 			}
 			

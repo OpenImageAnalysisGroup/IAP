@@ -26,10 +26,10 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected void prepare() {
 		super.prepare();
-		if (getInput().getImages().getVis() != null)
+		if (getInput().getMasks().getVis() != null)
 			this.visibleFilledPixels = getInput().getMasks().getVis().getIO().countFilledPixels();
 		
-		if (getInput().getImages().getNir() != null) {
+		if (getInput().getMasks().getNir() != null) {
 			this.nirFilledPixels = getInput().getMasks().getNir().getIO().countFilledPixels();
 		}
 		if (getProperties() != null && getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
