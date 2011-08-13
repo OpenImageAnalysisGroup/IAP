@@ -136,7 +136,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			};
 			idxxx++;
-			wait.add(BackgroundThreadDispatcher.addTask(r, getName() + " " + idxxx, -100));
+			wait.add(BackgroundThreadDispatcher.addTask(r, getName() + " " + idxxx, 5000));
 		}
 		try {
 			BackgroundThreadDispatcher.waitFor(wait);
@@ -295,8 +295,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								
 							}
 						};
-						MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image", 900);
-						MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image", 900);
+						MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image", 2000);
+						MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image", 2000);
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b });
 						li = new LoadedImage(id,
 								(BufferedImage) mainImg.getObject(),
@@ -353,7 +353,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		preProcessors.add(pre);
 	}
 	
-	private synchronized void loadImages(ImageData inVis, ImageData inFluo, ImageData inNir, final FlexibleImageSet input, final FlexibleImageSet inputMasks)
+	private void loadImages(ImageData inVis, ImageData inFluo, ImageData inNir, final FlexibleImageSet input, final FlexibleImageSet inputMasks)
 			throws InterruptedException {
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">LOAD", false);
 		MyThread a = null, b = null, c = null;
@@ -403,9 +403,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					System.out.println(">ERROR: Could not load NIR image or reference: " + inNir);
 				}
 			}
-		BackgroundThreadDispatcher.addTask(a, +1000);
-		BackgroundThreadDispatcher.addTask(b, +1000);
-		BackgroundThreadDispatcher.addTask(c, +1000);
+		BackgroundThreadDispatcher.addTask(a, 1000);
+		BackgroundThreadDispatcher.addTask(b, 1000);
+		BackgroundThreadDispatcher.addTask(c, 1000);
 		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, });
 		s.printTime();
 	}
@@ -442,7 +442,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 	}
 	
-	private synchronized void processAndOrSaveTiffImagesOrResultImages(ImageSet id, ImageData inVis, ImageData inFluo, ImageData inNir,
+	private void processAndOrSaveTiffImagesOrResultImages(ImageSet id, ImageData inVis, ImageData inFluo, ImageData inNir,
 			FlexibleImageStack debugImageStack,
 			FlexibleImage resVis, FlexibleImage resFluo, FlexibleImage resNir) {
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE IMAGE RESULTS", false);
