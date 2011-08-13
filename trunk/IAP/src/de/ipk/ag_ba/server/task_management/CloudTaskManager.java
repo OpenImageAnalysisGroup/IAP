@@ -141,13 +141,13 @@ public class CloudTaskManager {
 					else
 						progressSum /= (nn);
 				} else {
-					System.out.println("> Cloud Task Manager: Processing Disabled // " + SystemAnalysisExt.getCurrentTime());
+					System.out.println(SystemAnalysisExt.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysisExt.getCurrentTime());
 				}
 				Thread.sleep(1000);
 				if (autoClose && System.currentTimeMillis() - startTime > 10000) {
 					if (runningTasks.isEmpty()) {
-						System.out.println("> Cluster Execution Mode is active // NO RUNNING TASK");
-						System.out.println("> SYSTEM.EXIT");
+						System.out.println(SystemAnalysisExt.getCurrentTime() + "> Cluster Execution Mode is active // NO RUNNING TASK");
+						System.out.println(SystemAnalysisExt.getCurrentTime() + "> SYSTEM.EXIT");
 						System.exit(0);
 					}
 				} // else

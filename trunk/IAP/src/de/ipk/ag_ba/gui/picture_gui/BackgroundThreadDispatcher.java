@@ -15,11 +15,9 @@ import java.util.concurrent.Executors;
 
 import javax.swing.Timer;
 
-import org.AttributeHelper;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * @author klukas
@@ -234,13 +232,13 @@ public class BackgroundThreadDispatcher {
 				// in case there is a higher priority task waiting
 				// (higher than all running tasks) then the loop is
 				// stopped, it can run, too
-				int maxTask  =1;
-				double load = 1;//AttributeHelper.windowsRunning() ? 1 : SystemAnalysisExt.getRealSystemCpuLoad();
+				int maxTask = SystemAnalysis.getNumberOfCPUs();
+				double load = 1;// AttributeHelper.windowsRunning() ? 1 : SystemAnalysisExt.getRealSystemCpuLoad();
 				if (maxTask > 1 && load > 0) {
 					if (load / maxTask < 1) {
 						if (moreLoad < maxTask * 2) {
 							// System.out.print(maxTask + " --> ");
-							moreLoad += 0;//1;
+							moreLoad += 0;// 1;
 							maxTask = maxTask + moreLoad;
 							// System.out.println(maxTask + " (Load too low: " + load + ")");
 						}

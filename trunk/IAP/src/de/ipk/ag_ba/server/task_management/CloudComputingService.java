@@ -91,7 +91,7 @@ public class CloudComputingService {
 		System.out.println("*  Jean-Michel Pape ............................. *");
 		System.out.println("*                                                 *");
 		System.out.println("***************************************************");
-		System.out.println("> SYSTEM ANALYSIS");
+		System.out.println(SystemAnalysisExt.getCurrentTime() + "> SYSTEM ANALYSIS");
 		boolean clusterExecutionMode = false;
 		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
 			SystemInfoExt info = new SystemInfoExt();
@@ -137,7 +137,7 @@ public class CloudComputingService {
 										try {
 											System.out.println(":perf - perform performance test (TestPipelineMaize Copy)");
 											
-											StopWatch s = new StopWatch(">INFO: LabCube construction", false);
+											StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">INFO: LabCube construction", false);
 											ImageOperation io = new ImageOperation(new int[][] { { 0, 0 } });
 											if (io != null)
 												s.printTime();
@@ -178,10 +178,10 @@ public class CloudComputingService {
 					si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
 					si.getCpuLogicalCores() + ", using " + SystemAnalysis.getNumberOfCPUs());
 		System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
-		System.out.println(">");
-		System.out.println("> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
+		System.out.println(SystemAnalysisExt.getCurrentTime() + ">");
+		System.out.println(SystemAnalysisExt.getCurrentTime() + "> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
 		
-		StopWatch s = new StopWatch(">INFO: LabCube construction", false);
+		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">INFO: LabCube construction", false);
 		ImageOperation io = new ImageOperation(new int[][] { { 0, 0 } });
 		if (io != null)
 			s.printTime();
@@ -247,8 +247,8 @@ public class CloudComputingService {
 						}
 					}
 				}
-				System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
-				System.out.println("> TODO: " + cmd.getPartCnt() + ", FINISHED: " + knownResults.size());
+				System.out.println(SystemAnalysisExt.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
+				System.out.println(SystemAnalysisExt.getCurrentTime() + "> TODO: " + cmd.getPartCnt() + ", FINISHED: " + knownResults.size());
 				if (knownResults.size() + 1 >= cmd.getPartCntI()) {
 					System.out.println("*****************************");
 					System.out.println("MERGE INDEX: " + cmd.getPartCntI() + "/" + cmd.getPartCnt() + ", RESULTS AVAILABLE: " + knownResults.size());
@@ -307,7 +307,7 @@ public class CloudComputingService {
 							System.out.println("Could not delete experiment " + i.getExperimentName() + " (" + err.getMessage() + ")");
 						}
 					}
-					System.out.println("> COMPLETED");
+					System.out.println(SystemAnalysisExt.getCurrentTime() + "> COMPLETED");
 					return;
 				}
 			}
