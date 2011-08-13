@@ -14,6 +14,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.actions.ImagePreProcessor;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
@@ -118,34 +119,46 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		System.out.println("Info: Workload Top/Side: " + top + "/" + side);
 		final int workloadEqualAngleSnapshotSets = top + side;
 		
-		for (TreeMap<Double, ImageSet> tmf : workload) {
-			try {
-				Sample3D inSample = null;
-				TreeMap<Double, BlockProperties> analysisResults = new TreeMap<Double, BlockProperties>();
-				for (Double angle : tmf.keySet()) {
-					if (tmf.get(angle).getVIS() != null)
-						inSample = (Sample3D) tmf.get(angle).getVIS().getParentSample();
-					BlockProperties results = processAngleWithinSnapshot(tmf.get(angle), maximumThreadCountOnImageLevel, status,
-									workloadEqualAngleSnapshotSets);
-					if (results != null)
-						analysisResults.put(angle, results);
+		for (TreeMap<Double, ImageSet> tm : workload) {
+			final TreeMap<Double, ImageSet> tmf = tm;
+			Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tmf);
 				}
-				if (inSample != null && !analysisResults.isEmpty()) {
-					BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(analysisResults);
-					processStatisticalSampleOutput(inSample, postprocessingResults);
-				}
-			} catch (Error e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			tso.addInt(1);
-			status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + workloadSnapshots);
+			};
 			idxxx++;
+			BackgroundThreadDispatcher.addTask(r, getName() + " " + idxxx, -100);
 		}
 		
 		status.setCurrentStatusValueFine(100d);
 		input = null;
+	}
+	
+	private void processSnapshot(final int maximumThreadCountOnImageLevel, final BackgroundTaskStatusProviderSupportingExternalCall status,
+			final ThreadSafeOptions tso, final int workloadSnapshots, final int workloadEqualAngleSnapshotSets, TreeMap<Double, ImageSet> tmf) {
+		try {
+			Sample3D inSample = null;
+			TreeMap<Double, BlockProperties> analysisResults = new TreeMap<Double, BlockProperties>();
+			for (Double angle : tmf.keySet()) {
+				if (tmf.get(angle).getVIS() != null)
+					inSample = (Sample3D) tmf.get(angle).getVIS().getParentSample();
+				BlockProperties results = processAngleWithinSnapshot(tmf.get(angle), maximumThreadCountOnImageLevel, status,
+								workloadEqualAngleSnapshotSets);
+				if (results != null)
+					analysisResults.put(angle, results);
+			}
+			if (inSample != null && !analysisResults.isEmpty()) {
+				BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(analysisResults);
+				processStatisticalSampleOutput(inSample, postprocessingResults);
+			}
+		} catch (Error e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		tso.addInt(1);
+		status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + workloadSnapshots);
 	}
 	
 	private ArrayList<TreeMap<Double, ImageSet>> filterWorkload(ArrayList<TreeMap<Double, ImageSet>> workload, String filter) {
@@ -291,7 +304,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		preProcessors.add(pre);
 	}
 	
-	private void loadImages(ImageData inVis, ImageData inFluo, ImageData inNir, final FlexibleImageSet input, final FlexibleImageSet inputMasks)
+	private synchronized void loadImages(ImageData inVis, ImageData inFluo, ImageData inNir, final FlexibleImageSet input, final FlexibleImageSet inputMasks)
 			throws InterruptedException {
 		MyThread a = null, b = null, c = null;
 		
