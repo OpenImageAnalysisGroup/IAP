@@ -6,6 +6,8 @@
  */
 package de.ipk.ag_ba.server.task_management;
 
+import info.StopWatch;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -123,9 +125,10 @@ public class TaskDescription {
 					if (bcmd != null)
 						if (SystemAnalysisExt.getHostName().equals(bcmd.getOwner())) {
 							m.batchClearJob(batch);
+							StopWatch sw = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE EXPERIMENT " + experiment.getName(), false);
 							m.saveExperiment(experiment, null);
-							
-							ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
+							sw.printTime();
+							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
 							
 							ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 							for (ExperimentHeaderInterface i : m.getExperimentList(null)) {

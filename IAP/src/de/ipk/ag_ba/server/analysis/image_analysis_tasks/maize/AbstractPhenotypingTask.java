@@ -395,7 +395,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				debugImageStack.saveAsLayeredTif(mos);
 				debugImageStack.print("NNN");
 				buf = mos.getBuff();
-				
 				System.out.println("f]");
 			} else {
 				inVis.addAnnotationField("oldreference", inVis.getLabelURL().toString());
