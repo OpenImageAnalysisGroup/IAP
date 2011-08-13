@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
 
@@ -31,7 +30,6 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.networks.LoadedNetwork;
@@ -53,38 +51,21 @@ public class IOmodule {
 		return new WorkerInfo(todo.size(), 0, processed, lastKBperSecTransferSpeed, "KB/s");
 	}
 	
-	public static LoadedImage loadImageFromFileOrMongo(ImageData id, boolean loadImage, boolean loadLabelField, BufferedImage optLoadedReferenceImage)
+	public static LoadedImage loadImageFromFileOrMongo(ImageData id, boolean loadImage, boolean loadLabelField)
 			throws Exception {
 		LoadedImage result = null;
 		StopWatch s = new StopWatch("Load image and null-image", false);
 		BufferedImage image = null;
-		Semaphore se = BackgroundTaskHelper.lockGetSemaphore(ResourceIOManager.getHandlerFromPrefix(id.getURL().getPrefix()), 1);
 		if (loadImage) {
-			MyByteArrayInputStream isMain;
-			se.acquire();
-			try {
-				isMain = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
-			} finally {
-				se.release();
-			}
+			MyByteArrayInputStream isMain = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
 			image = ImageIO.read(isMain);
 		}
 		BufferedImage imageNULL = null;
 		try {
 			if (loadLabelField)
 				if (id.getLabelURL() != null) {
-					if (optLoadedReferenceImage != null)
-						imageNULL = optLoadedReferenceImage;
-					else {
-						InputStream isLabel;
-						se.acquire();
-						try {
-							isLabel = ResourceIOManager.getInputStreamMemoryCached(id.getLabelURL());
-						} finally {
-							se.release();
-						}
-						imageNULL = ImageIO.read(isLabel);
-					}
+					InputStream isLabel = ResourceIOManager.getInputStreamMemoryCached(id.getLabelURL());
+					imageNULL = ImageIO.read(isLabel);
 				}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);

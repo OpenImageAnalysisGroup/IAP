@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * Detects the border pixels of the image objects. Uses the coordinates of the border pixels to calculate
@@ -43,7 +42,7 @@ public class ConvexHullCalculator {
 		int w = io.getImage().getWidth();
 		int h = io.getImage().getHeight();
 		
-		int backgroundColor = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int backgroundColor = ImageOperation.BACKGROUND_COLORint;
 		
 		for (int x = 0; x < w; x++) {
 			in[x][0] = backgroundColor;

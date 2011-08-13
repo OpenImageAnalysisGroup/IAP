@@ -10,6 +10,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.ipk.ag_ba.image.operations.ImageOperation;
+
 /**
  * @author klukas
  */
@@ -35,7 +37,7 @@ public class ColorHistogram {
 
 	public void countColorPixels(int[] rgbArray) {
 		int red, green, blue;
-		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
+		Color backgroundFill = ImageOperation.BACKGROUND_COLOR;
 		int iBackgroundFill = backgroundFill.getRGB();
 		int[] count = new int[numberOfColors];
 		for (int i = 0; i < numberOfColors; i++)

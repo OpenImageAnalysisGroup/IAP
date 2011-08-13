@@ -7,6 +7,7 @@ import java.util.Collection;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -75,8 +76,8 @@ public class VolumeStatistics implements ImageAnalysisTask {
 		
 		output = new ArrayList<NumericMeasurementInterface>();
 		
-		int background = new Color(PhenotypeAnalysisTask.BACKGROUND_COLOR.getRed(),
-							PhenotypeAnalysisTask.BACKGROUND_COLOR.getBlue(), PhenotypeAnalysisTask.BACKGROUND_COLOR.getRed(), 0)
+		int background = new Color(ImageOperation.BACKGROUND_COLOR.getRed(),
+							ImageOperation.BACKGROUND_COLOR.getBlue(), ImageOperation.BACKGROUND_COLOR.getRed(), 0)
 							.getRGB();
 		long filled = 0, voxels = 0;
 		for (Sample3D ins : input) {

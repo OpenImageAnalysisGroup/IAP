@@ -20,6 +20,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.phytochamber.PhytochamberTopImageProcessor;
 import de.ipk.ag_ba.image.operations.ImageConverter;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -276,7 +277,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 			public void run() {
 				// System.out.println("Load Image");
 				try {
-					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, false, null);
+					LoadedImage li = IOmodule.loadImageFromFileOrMongo(id, true, false);
 					input.set(new FlexibleImage(li.getLoadedImage(), type));
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
@@ -294,7 +295,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 		int w = b.getWidth();
 		int h = b.getHeight();
 		int[] arrayRGB = ImageConverter.convertBIto1A(b);
-		int iBackgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int iBackgroundFill = ImageOperation.BACKGROUND_COLORint;
 		Geometry g = detectGeometry(w, h, arrayRGB, iBackgroundFill, limg);
 		
 		NumericMeasurement3D m;

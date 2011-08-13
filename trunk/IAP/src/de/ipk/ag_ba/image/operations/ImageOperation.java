@@ -61,7 +61,6 @@ import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.IAPservice;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -80,6 +79,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 public class ImageOperation {
 	protected final ImagePlus image;
 	protected ResultsTable rt;
+	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);
+	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	public final static float[][][] labCube = getLabCube();
 	
 	// private Roi boundingBox;
@@ -126,7 +127,7 @@ public class ImageOperation {
 		image.getProcessor().translate(x, y);
 		return new ImageOperation(getImage())
 				.replaceColors(Color.BLACK.getRGB(),
-						PhenotypeAnalysisTask.BACKGROUND_COLORint);
+						ImageOperation.BACKGROUND_COLORint);
 	}
 	
 	public ImageOperation replaceColors(int search, int replace) {
@@ -152,7 +153,7 @@ public class ImageOperation {
 		image.getProcessor().rotate(degree);
 		return new ImageOperation(getImage())
 				.replaceColors(Color.BLACK.getRGB(),
-						PhenotypeAnalysisTask.BACKGROUND_COLORint);
+						ImageOperation.BACKGROUND_COLORint);
 	}
 	
 	/**
@@ -164,7 +165,7 @@ public class ImageOperation {
 		image.getProcessor().scale(xScale, yScale);
 		return new ImageOperation(getImage())
 				.replaceColors(Color.BLACK.getRGB(),
-						PhenotypeAnalysisTask.BACKGROUND_COLORint);
+						ImageOperation.BACKGROUND_COLORint);
 	}
 	
 	/**
@@ -189,7 +190,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation convertFluo2intensity() {
-		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int background = ImageOperation.BACKGROUND_COLORint;
 		
 		int[] in = getImageAs1array(); // gamma(0.1) // 99999999999999999999999999999999
 		int w = image.getWidth();
@@ -230,7 +231,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation convertFluo2intensityOldRGBbased() {
-		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int background = ImageOperation.BACKGROUND_COLORint;
 		int[] in = getImageAs1array();
 		int idx = 0;
 		for (int c : in) {
@@ -389,16 +390,16 @@ public class ImageOperation {
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				int neighCnt = 0;
-				if (img[x][y] == PhenotypeAnalysisTask.BACKGROUND_COLORint) {
-					res[x][y] = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+				if (img[x][y] == ImageOperation.BACKGROUND_COLORint) {
+					res[x][y] = ImageOperation.BACKGROUND_COLORint;
 				} else {
 					for (int xd = -1; xd <= 1; xd++)
 						for (int yd = -1; yd <= 1; yd++) {
-							if (img[x + xd][y + yd] != PhenotypeAnalysisTask.BACKGROUND_COLORint)
+							if (img[x + xd][y + yd] != ImageOperation.BACKGROUND_COLORint)
 								neighCnt++;
 						}
 					if (neighCnt > 3 && neighCnt < 9)
-						res[x][y] = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+						res[x][y] = ImageOperation.BACKGROUND_COLORint;
 					else
 						res[x][y] = img[x][y];
 				}
@@ -516,11 +517,11 @@ public class ImageOperation {
 		int[][] image_result = new int[w][h];
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
-				if (src_image[x][y] != PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+				if (src_image[x][y] != ImageOperation.BACKGROUND_COLORint) {
 					for (int xd = -1; xd <= 1; xd++) {
 						for (int yd = -1; yd <= 1; yd++) {
 							if (x + xd <= w - 1 && y + yd <= h - 1)
-								if (image_result[x + xd][y + yd] == PhenotypeAnalysisTask.BACKGROUND_COLORint)
+								if (image_result[x + xd][y + yd] == ImageOperation.BACKGROUND_COLORint)
 									image_result[x + xd][y + yd] = src_image[x][y];
 						}
 					}
@@ -629,7 +630,7 @@ public class ImageOperation {
 	@Deprecated
 	public ImageOperation dilateNG(int n) {
 		int[] imagePixels = getImageAs1array();
-		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int back = ImageOperation.BACKGROUND_COLORint;
 		int w = image.getWidth();
 		int h = image.getHeight();
 		for (int i = 0; i < n; i++) {
@@ -672,7 +673,7 @@ public class ImageOperation {
 	public ImageOperation dilateNG(int n, FlexibleImage inputImageForNewPixels) {
 		int[] imagePixels = getImageAs1array();
 		int[] inputImagePixels = inputImageForNewPixels.getAs1A();
-		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int back = ImageOperation.BACKGROUND_COLORint;
 		int w = image.getWidth();
 		int h = image.getHeight();
 		for (int i = 0; i < n; i++) {
@@ -714,7 +715,7 @@ public class ImageOperation {
 	private ImageOperation erodeNG(int n) {
 		// todo this command does not work correctly, yet
 		int[] imagePixels = getImageAs1array();
-		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int back = ImageOperation.BACKGROUND_COLORint;
 		int w = image.getWidth();
 		int h = image.getHeight();
 		for (int i = 0; i < n; i++) {
@@ -997,7 +998,7 @@ public class ImageOperation {
 			ObjectRef optClusterSizeReturn, boolean considerArea) {
 		FlexibleImage workImage = new FlexibleImage(image);
 		workImage = removeSmallPartsOfImage(nextGeneration, workImage,
-				PhenotypeAnalysisTask.BACKGROUND_COLORint,
+				ImageOperation.BACKGROUND_COLORint,
 				(int) (image.getWidth() * image.getHeight() * cutOffPercentageOfImage), cutOffVertHorOfImage, nb, typ,
 				optClusterSizeReturn, considerArea);
 		return new ImageOperation(workImage);
@@ -1151,7 +1152,7 @@ public class ImageOperation {
 		imgFFTest.show("Fluorescence Vorstufe1");
 		
 		// merge infos of both masks
-		int background = PhenotypeAnalysisTask.BACKGROUND_COLOR.getRGB();
+		int background = ImageOperation.BACKGROUND_COLOR.getRGB();
 		MaskOperation o = new MaskOperation(ioR.getImage(), ioF.getImage(),
 				null, background, 1);
 		o.mergeMasks();
@@ -1439,7 +1440,7 @@ public class ImageOperation {
 		Segmentation ps;
 		
 		if (nextGeneration)
-			ps = new ClusterDetection(workImage, PhenotypeAnalysisTask.BACKGROUND_COLORint);
+			ps = new ClusterDetection(workImage, ImageOperation.BACKGROUND_COLORint);
 		else
 			ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
 		try {
@@ -1562,7 +1563,7 @@ public class ImageOperation {
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
-				if (img[x][y] != PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+				if (img[x][y] != ImageOperation.BACKGROUND_COLORint) {
 					if (x < smallestX)
 						smallestX = x;
 					if (x > largestX)
@@ -2112,7 +2113,7 @@ public class ImageOperation {
 	public ImageOperation thresholdBlueHigherThan(int threshold) {
 		int[] res = getImageAs1array();
 		int b;
-		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int back = ImageOperation.BACKGROUND_COLORint;
 		int idx = 0;
 		for (int c : res) {
 			if (c == back) {
@@ -2130,7 +2131,7 @@ public class ImageOperation {
 	public ImageOperation thresholdClearBlueBetween(int thresholdStart, int thresholdEnd) {
 		int[] res = getImageAs1array();
 		int b;
-		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int back = ImageOperation.BACKGROUND_COLORint;
 		int idx = 0;
 		for (int c : res) {
 			if (c == back) {
@@ -2215,7 +2216,7 @@ public class ImageOperation {
 	public ArrayList<MarkerPair> searchBlueMarkers(double options, CameraPosition typ, boolean maize) {
 		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options, typ, maize);
 		
-		bmf.findCoordinates(PhenotypeAnalysisTask.BACKGROUND_COLORint);
+		bmf.findCoordinates(ImageOperation.BACKGROUND_COLORint);
 		
 		ArrayList<MarkerPair> mergedCoordinates = bmf
 				.getResultCoordinates((int) (getImage().getHeight() * 0.05d));
@@ -2439,7 +2440,7 @@ public class ImageOperation {
 	}
 	
 	public int countFilledPixels() {
-		int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int back = ImageOperation.BACKGROUND_COLORint;
 		return countFilledPixels(back);
 	}
 	
@@ -2468,7 +2469,7 @@ public class ImageOperation {
 	 */
 	public double intensitySumOfChannel(boolean performGrayScale, boolean red, boolean green, boolean blue) {
 		double res = 0;
-		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int background = ImageOperation.BACKGROUND_COLORint;
 		int[] img2d = getImageAs1array();
 		
 		int[] grayScaledIfNeeded;
@@ -2574,7 +2575,7 @@ public class ImageOperation {
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
 		
-		int backgroundColor = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int backgroundColor = ImageOperation.BACKGROUND_COLORint;
 		
 		if (h > bb)
 			for (int x = 0; x < w; x++) {
@@ -2987,14 +2988,14 @@ public class ImageOperation {
 		int offX = maskWidth / 2;
 		for (int i = 0; i < img.length; i++) {
 			int cnt = 0;
-			int color = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+			int color = ImageOperation.BACKGROUND_COLORint;
 			for (int xdiff = -offX; xdiff <= offX; xdiff++) {
 				int ii = i + xdiff;
 				if (ii < 0)
 					ii = 0;
 				if (ii >= img.length)
 					ii = img.length - 1;
-				if (img[ii] != PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+				if (img[ii] != ImageOperation.BACKGROUND_COLORint) {
 					cnt++;
 					color = Color.GREEN.getRGB();
 				}

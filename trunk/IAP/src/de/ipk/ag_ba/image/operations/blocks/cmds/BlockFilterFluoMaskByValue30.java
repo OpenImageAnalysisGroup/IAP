@@ -5,7 +5,6 @@ import java.awt.Color;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * Filters the Fluo Mask by removing all pixels below a threshold in the HSV - VALUE.
@@ -20,7 +19,7 @@ public class BlockFilterFluoMaskByValue30 extends AbstractSnapshotAnalysisBlockF
 		
 		FlexibleImage fluoMask = getInput().getMasks().getFluo();
 		
-		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
+		Color backgroundFill = ImageOperation.BACKGROUND_COLOR;
 		final int iBackgroundFill = backgroundFill.getRGB();
 		
 		return new ImageOperation(fluoMask).filterByHSV_value(0.3, iBackgroundFill).getImage();

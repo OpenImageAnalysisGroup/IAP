@@ -12,7 +12,6 @@ import org.Vector2d;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class BlueMarkerFinder {
@@ -37,7 +36,7 @@ public class BlueMarkerFinder {
 		if (debug)
 			resultTable = io1
 					// .thresholdLAB(0, 255, 0, 200, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
-					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint, typ,
+					.thresholdLAB(0, 255, 0, 255, 10, 110, ImageOperation.BACKGROUND_COLORint, typ,
 							maize).print("nach lab")
 					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
@@ -50,7 +49,7 @@ public class BlueMarkerFinder {
 					.getResultsTable();
 		else
 			resultTable = io1
-					.thresholdLAB(0, 255, 0, 255, 10, 110, PhenotypeAnalysisTask.BACKGROUND_COLORint, typ, maize)
+					.thresholdLAB(0, 255, 0, 255, 10, 110, ImageOperation.BACKGROUND_COLORint, typ, maize)
 					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
 					.convert2Grayscale()

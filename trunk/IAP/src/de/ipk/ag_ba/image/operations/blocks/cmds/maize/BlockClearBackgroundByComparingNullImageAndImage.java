@@ -8,7 +8,6 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * Clears the background by comparison of foreground and background.
@@ -18,7 +17,7 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
  */
 public class BlockClearBackgroundByComparingNullImageAndImage extends AbstractSnapshotAnalysisBlockFIS {
 	
-	int back = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+	int back = ImageOperation.BACKGROUND_COLORint;
 	
 	@Override
 	protected FlexibleImage processVISmask() {

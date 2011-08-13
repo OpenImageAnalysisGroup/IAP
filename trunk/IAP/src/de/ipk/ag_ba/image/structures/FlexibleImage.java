@@ -27,7 +27,6 @@ import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.PrintImage;
 import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * @author klukas
@@ -229,7 +228,7 @@ public class FlexibleImage {
 		float arrayL[] = new float[w * h];
 		float arrayA[] = new float[w * h];
 		float arrayB[] = new float[w * h];
-		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int background = ImageOperation.BACKGROUND_COLORint;
 		ColorUtil.getLABfromRGBvar2(arrayRGB, arrayL, arrayA, arrayB, filterBackground, background);
 		return new float[][] {
 				arrayL, arrayA, arrayB };
@@ -247,7 +246,7 @@ public class FlexibleImage {
 	 */
 	public FlexibleImage cropAbs(int leftX, int rightX, int topY, int bottomY) {
 		ImageOperation io = new ImageOperation(image);
-		int background = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		int background = ImageOperation.BACKGROUND_COLORint;
 		int[][] img = getAs2A();
 		
 		if (leftX < 0 || rightX < 0 || topY < 0 || bottomY < 0) {

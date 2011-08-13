@@ -306,7 +306,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 						boolean isDataAnalysis, ArrayList<NumericMeasurementInterface> output,
 						ArrayList<ImagePreProcessor> preProcessors, final double epsilonA, final double epsilonB) throws InterruptedException {
 		
-		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
+		Color backgroundFill = ImageOperation.BACKGROUND_COLOR;
 		final int iBackgroundFill = backgroundFill.getRGB();
 		
 		BufferedImage img = limg.getLoadedImage();
@@ -526,7 +526,7 @@ public class BlockClearBackground extends AbstractSnapshotAnalysisBlockFIS {
 		
 		int filled = 0;
 		
-		Color backgroundFill = PhenotypeAnalysisTask.BACKGROUND_COLOR;
+		Color backgroundFill = ImageOperation.BACKGROUND_COLOR;
 		final int iBackgroundFill = backgroundFill.getRGB();
 		
 		int[] pixel = processedMasks.getVis().getAs1A();

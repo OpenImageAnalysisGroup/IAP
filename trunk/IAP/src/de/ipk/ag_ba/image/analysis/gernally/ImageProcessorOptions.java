@@ -12,8 +12,8 @@ import ij.plugin.filter.MaximumFinder;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * First: add a enumeration which describe the descriptor
@@ -304,7 +304,7 @@ public class ImageProcessorOptions {
 	}
 	
 	public int getBackground() {
-		return PhenotypeAnalysisTask.BACKGROUND_COLORint;
+		return ImageOperation.BACKGROUND_COLORint;
 	}
 	
 	public void setNeighbourhood(NeighbourhoodSetting neighbourhood) {

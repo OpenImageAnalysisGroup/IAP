@@ -17,7 +17,7 @@ import qmwi.kseg.som.Tools;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.color.ColorXYZ;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.IntVolumeVisitor;
 
@@ -117,7 +117,7 @@ public class ThreeDsegmentationColored {
 		for (int x = 0; x < sx; x++)
 			for (int y = 0; y < sy; y++)
 				for (int z = 0; z < sz; z++) {
-					threeDdata[x][y][z] = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+					threeDdata[x][y][z] = ImageOperation.BACKGROUND_COLORint;
 				}
 		
 		ArrayList<Color> colors = Colors.get(klassen.length, 1d);
@@ -144,7 +144,7 @@ public class ThreeDsegmentationColored {
 		threeDdata.getLoadedVolume().visitIntArray(new IntVolumeVisitor() {
 			@Override
 			public void visit(int x, int y, int z, int value) throws Exception {
-				if (value != PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+				if (value != ImageOperation.BACKGROUND_COLORint) {
 					ColorUtil.getLABfromRGB(value, lab, xyz);
 					String inputLine = lab.getL() + ";" + lab.getA() + ";" + lab.getB();
 					SOMdataEntry sde = result.addEntry(inputLine, false);

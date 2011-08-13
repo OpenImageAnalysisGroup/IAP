@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Stack;
@@ -31,9 +30,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
  */
 @Deprecated
 public class PhenotypeAnalysisTask implements ImageAnalysisTask {
-	
-	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);
-	public static final int BACKGROUND_COLORint = BACKGROUND_COLOR.getRGB();
 	
 	private Collection<Sample3D> input = new ArrayList<Sample3D>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
@@ -107,7 +103,7 @@ public class PhenotypeAnalysisTask implements ImageAnalysisTask {
 								limg = (LoadedImage) id;
 							} else {
 								try {
-									limg = IOmodule.loadImageFromFileOrMongo(id, true, true, null);
+									limg = IOmodule.loadImageFromFileOrMongo(id, true, true);
 								} catch (Exception e) {
 									ErrorMsg.addErrorMessage(e);
 								}

@@ -1,8 +1,8 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhenotypeAnalysisTask;
 
 /**
  * Improve flower visibility for visible mask.
@@ -45,7 +45,7 @@ public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockF
 		int[] workImg = workImage.getAs1A();
 		
 		for (int i = 0; i < workImg.length; i++) {
-			if (workImg[i] != PhenotypeAnalysisTask.BACKGROUND_COLORint)
+			if (workImg[i] != ImageOperation.BACKGROUND_COLORint)
 				in[i] = workImg[i];
 		}
 		
@@ -155,7 +155,7 @@ public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockF
 								if (x + xd >= 0 && y + yd >= 0 && x + xd < w && y + yd < h) {
 									
 									if (count) {
-										if (rgbArray[oa] == PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+										if (rgbArray[oa] == ImageOperation.BACKGROUND_COLORint) {
 											l = lMask[0][oa];
 											a = lMask[1][oa];
 											b = lMask[2][oa];
@@ -165,7 +165,7 @@ public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockF
 										}
 									} else
 										if (green < 2)
-											if (rgbArray[oa] == PhenotypeAnalysisTask.BACKGROUND_COLORint) {
+											if (rgbArray[oa] == ImageOperation.BACKGROUND_COLORint) {
 												image[x + xd][y + yd] = color;
 											}
 								}
@@ -174,7 +174,7 @@ public class BlockClosingForYellowVisMask extends AbstractSnapshotAnalysisBlockF
 					if (color != iBackgroundFill)
 						image[x][y] = rgbArray[off];
 					else
-						image[x][y] = PhenotypeAnalysisTask.BACKGROUND_COLORint;
+						image[x][y] = ImageOperation.BACKGROUND_COLORint;
 				}
 			}
 		}
