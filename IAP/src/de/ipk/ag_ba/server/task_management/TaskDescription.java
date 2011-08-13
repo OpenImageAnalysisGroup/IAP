@@ -103,7 +103,7 @@ public class TaskDescription {
 										ErrorMsg.addErrorMessage(e);
 									}
 								}
-							}, null, statusProvider, 0);
+							}, null, statusProvider, -1000);
 	}
 	
 	private RunnableWithMappingData getResultReceiver(final BatchCmd batch, final MongoDB m) {
