@@ -295,8 +295,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								
 							}
 						};
-						MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image", -80);
-						MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image", -80);
+						MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image", 900);
+						MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image", 900);
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b });
 						li = new LoadedImage(id,
 								(BufferedImage) mainImg.getObject(),
@@ -403,9 +403,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					System.out.println(">ERROR: Could not load NIR image or reference: " + inNir);
 				}
 			}
-		BackgroundThreadDispatcher.addTask(a, -90);
-		BackgroundThreadDispatcher.addTask(b, -90);
-		BackgroundThreadDispatcher.addTask(c, -90);
+		BackgroundThreadDispatcher.addTask(a, +1000);
+		BackgroundThreadDispatcher.addTask(b, +1000);
+		BackgroundThreadDispatcher.addTask(c, +1000);
 		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, });
 		s.printTime();
 	}
