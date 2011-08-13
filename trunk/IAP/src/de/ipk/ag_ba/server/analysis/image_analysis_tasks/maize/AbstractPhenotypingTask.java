@@ -369,7 +369,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 	}
 	
-	private void processAndOrSaveTiffImagesOrResultImages(ImageSet id, ImageData inVis, ImageData inFluo, ImageData inNir, FlexibleImageStack debugImageStack,
+	private synchronized void processAndOrSaveTiffImagesOrResultImages(ImageSet id, ImageData inVis, ImageData inFluo, ImageData inNir,
+			FlexibleImageStack debugImageStack,
 			FlexibleImage resVis, FlexibleImage resFluo, FlexibleImage resNir) {
 		if (forceDebugStack) {
 			forcedDebugStacks.add(debugImageStack);
