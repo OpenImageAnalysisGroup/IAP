@@ -692,7 +692,11 @@ public class SkeletonProcessor2d {
 	}
 	
 	private boolean checkBloomColor(Limb l, FlexibleImage vis) {
+		if (vis == null || l == null || l.points == null)
+			return false;
 		int[][] visImg = vis.getAs2A();
+		if (visImg == null)
+			return false;
 		int yellow = 0, r, g, b, Li = 0, ai = 0, bi = 0;
 		int green = 0;
 		for (Point p : l.points) {
