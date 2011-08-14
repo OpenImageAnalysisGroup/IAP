@@ -20,5 +20,6 @@
 	<classpathentry kind="lib" path="lib/mongo-2.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/platform.jar"/>
+	<classpathentry kind="lib" path="lib/jsr166y.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
