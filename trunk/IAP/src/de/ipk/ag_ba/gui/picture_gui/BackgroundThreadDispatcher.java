@@ -56,6 +56,7 @@ public class BackgroundThreadDispatcher {
 				myInstance = new BackgroundThreadDispatcher();
 			synchronized (myInstance.todo) {
 				myInstance.todo.push(t);
+				userPriority = 0;
 				myInstance.todoPriorities.push(new Integer(userPriority));
 				myInstance.sheduler.interrupt();
 			}
