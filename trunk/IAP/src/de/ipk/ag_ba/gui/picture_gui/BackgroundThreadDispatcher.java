@@ -202,7 +202,7 @@ public class BackgroundThreadDispatcher {
 						if (curPrio > maxPrio)
 							maxPrio = curPrio;
 					}
-					System.out.println(">MAX PRIO: " + maxPrio);
+					// System.out.println(">MAX PRIO: " + maxPrio);
 					// search oldest thread with maximum priority
 					for (int i = 0; i < todo.size(); i++) {
 						int curPrio = (todoPriorities.get(i)).intValue();
