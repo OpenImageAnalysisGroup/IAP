@@ -239,26 +239,32 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	protected abstract ImageProcessor getImageProcessor();
 	
-	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
-		if (output == null)
-			return;
-		if (optLabelImageContent == null) {
-			if (image.getHeight() > 1) {
-				LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
-				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, false);
-				output.add(imageRef);
+	private MyThread saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, final String labelFileExtension) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				if (output == null)
+					return;
+				if (optLabelImageContent == null) {
+					if (image.getHeight() > 1) {
+						LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
+						ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, false);
+						output.add(imageRef);
+					}
+				} else {
+					if (image.getHeight() > 1) {
+						LoadedImageStream loadedImage = new LoadedImageStream(id, image.getAsBufferedImage(), optLabelImageContent);
+						loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "d_" + id.getURL().getFileName() + labelFileExtension));
+						ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, true);
+						if (imageRef == null) {
+							System.out.println("ERROR #1");
+						} else
+							output.add(imageRef);
+					}
+				}
 			}
-		} else {
-			if (image.getHeight() > 1) {
-				LoadedImageStream loadedImage = new LoadedImageStream(id, image.getAsBufferedImage(), optLabelImageContent);
-				loadedImage.setLabelURL(new IOurl(id.getURL().getPrefix(), null, "d_" + id.getURL().getFileName() + labelFileExtension));
-				ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, true);
-				if (imageRef == null) {
-					System.out.println("ERROR #1");
-				} else
-					output.add(imageRef);
-			}
-		}
+		};
+		return new MyThread(r, "Save Image");
 	}
 	
 	private MyThread load(final ImageData id, final FlexibleImageSet input,
@@ -444,7 +450,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void processAndOrSaveTiffImagesOrResultImages(ImageSet id, ImageData inVis, ImageData inFluo, ImageData inNir,
 			FlexibleImageStack debugImageStack,
-			FlexibleImage resVis, FlexibleImage resFluo, FlexibleImage resNir) {
+			FlexibleImage resVis, FlexibleImage resFluo, FlexibleImage resNir) throws InterruptedException {
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE IMAGE RESULTS", false);
 		if (forceDebugStack) {
 			forcedDebugStacks.add(debugImageStack);
@@ -466,12 +472,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				inFluo.setLabelURL(id.getFLUO().getURL().copy());
 				inNir.setLabelURL(id.getNIR().getURL().copy());
 			}
+			MyThread a = null, b = null, c = null;
 			if (resVis != null)
-				saveImage(inVis, resVis, buf, ".tiff");
+				a = BackgroundThreadDispatcher.addTask(saveImage(inVis, resVis, buf, ".tiff"), 10000);
 			if (resFluo != null)
-				saveImage(inFluo, resFluo, buf, ".tiff");
+				b = BackgroundThreadDispatcher.addTask(saveImage(inFluo, resFluo, buf, ".tiff"), 10000);
 			if (resNir != null)
-				saveImage(inNir, resNir, buf, ".tiff");
+				c = BackgroundThreadDispatcher.addTask(saveImage(inNir, resNir, buf, ".tiff"), 10000);
+			BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 		}
 		s.printTime();
 	}

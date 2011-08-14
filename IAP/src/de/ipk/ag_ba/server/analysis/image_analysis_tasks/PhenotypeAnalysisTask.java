@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Stack;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
+import jsr166y.ForkJoinPool;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.actions.ImagePreProcessor;
@@ -124,26 +128,34 @@ public class PhenotypeAnalysisTask implements ImageAnalysisTask {
 		}
 		int idx = 1, maxJob = jobs.size();
 		ArrayList<MyThread> threads = new ArrayList<MyThread>();
+		boolean jsr166 = false;
+		ForkJoinPool fjp = jsr166 ? new ForkJoinPool(SystemAnalysis.getNumberOfCPUs()) : null;
 		while (!jobs.empty()) {
 			final Callable<Integer> call = jobs.pop();
-			threads.add(BackgroundThreadDispatcher.addTask(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						call.call();
-					} catch (Exception e) {
-						ErrorMsg.addErrorMessage(e);
+			if (jsr166)
+				fjp.submit(call);
+			else
+				threads.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							call.call();
+						} catch (Exception e) {
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
-				}
-			}, getName() + " job " + (idx++) + "/" + maxJob, -1));
+				}, getName() + " job " + (idx++) + "/" + maxJob, -1));
 		}
 		try {
-			BackgroundThreadDispatcher.waitFor(threads);
+			if (jsr166)
+				fjp.awaitTermination(365, TimeUnit.DAYS);
+			else {
+				BackgroundThreadDispatcher.waitFor(threads);
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
-		
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
