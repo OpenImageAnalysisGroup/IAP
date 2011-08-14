@@ -241,6 +241,8 @@ public class MongoDB {
 						if (optHosts == null || optHosts.length() == 0) {
 							StopWatch s = new StopWatch("INFO: new Mongo()", false);
 							m = new Mongo();
+							m.slaveOk();
+							m.getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime();
 						} else {
 							StopWatch s = new StopWatch("INFO: new Mongo(seeds)", false);
@@ -249,6 +251,7 @@ public class MongoDB {
 								seeds.add(new ServerAddress(h));
 							m = new Mongo(seeds);
 							m.slaveOk();
+							m.getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime();
 						}
 						if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains("admin")) {
@@ -1437,7 +1440,7 @@ public class MongoDB {
 		return res;
 	}
 	
-	public  void batchPingHost(final String ip,
+	public void batchPingHost(final String ip,
 			final int blocksExecutedWithinLastMinute,
 			final int pipelineExecutedWithinCurrentHour,
 			final int tasksExecutedWithinLastMinute,
