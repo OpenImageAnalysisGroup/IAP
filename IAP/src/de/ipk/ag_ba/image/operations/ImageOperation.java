@@ -36,22 +36,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
 import org.ObjectRef;
 import org.ReleaseInfo;
 import org.SystemAnalysis;
 import org.Vector2d;
 import org.Vector2i;
 import org.graffiti.editor.GravistoService;
-import org.graffiti.editor.MainFrame;
-import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
 import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
 import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
@@ -62,13 +55,6 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 /**
  * A number of commonly used image operation commands.
@@ -1086,182 +1072,6 @@ public class ImageOperation {
 				break;
 		}
 		
-	}
-	
-	static void testPhytokammer(IOurl urlFlu, IOurl urlVis, IOurl urlNIR,
-			BufferedImage imgFluo, BufferedImage imgVisible,
-			BufferedImage imgNIR) throws InterruptedException {
-		
-		int[] fluoImageOriginal = ImageConverter.convertBIto1A(imgFluo);
-		int[] rgbImageOriginal = ImageConverter.convertBIto1A(imgVisible);
-		int[] nirImageOriginal = ImageConverter.convertBIto1A(imgNIR);
-		
-		int[] fluoImage;
-		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
-		{
-			SubstanceInterface substance = new Substance();
-			substance.setName(ImageConfiguration.FluoTop.toString());
-			ConditionInterface condition = new Condition(substance);
-			Sample sample = new Sample(condition);
-			LoadedImage limg = new LoadedImage(sample, imgFluo);
-			limg.setURL(urlFlu);
-			
-			BlockClearBackground.clearBackgroundAndInterpretImage(limg, 2,
-					null, null, true, output, null, 0.5, 0.5);
-			
-			// MainFrame
-			// .showMessageWindow("FluoTop Clean", new JLabel(
-			// new ImageIcon(limg.getLoadedImage())));
-		}
-		{
-			SubstanceInterface substance = new Substance();
-			substance.setName(ImageConfiguration.RgbTop.toString());
-			ConditionInterface condition = new Condition(substance);
-			Sample sample = new Sample(condition);
-			LoadedImage limg = new LoadedImage(sample, imgVisible);
-			limg.setURL(urlVis);
-			BlockClearBackground.clearBackgroundAndInterpretImage(limg, 2,
-					null, null, true, output, null, 2.5, 2.5);
-			
-			// MainFrame.showMessageWindow("RgbTop Clean", new JLabel(
-			// new ImageIcon(limg.getLoadedImage())));
-		}
-		
-		int[] rgbImage = ImageConverter.convertBIto1A(imgVisible);
-		fluoImage = ImageConverter.convertBIto1A(imgFluo);
-		
-		// modify masks
-		ImageOperation ioR = new ImageOperation(rgbImage,
-				imgVisible.getWidth(), imgVisible.getHeight());
-		ioR.erode().erode();
-		ioR.dilate().dilate().dilate().dilate().dilate();
-		
-		ImageOperation ioF = new ImageOperation(fluoImage, imgFluo.getWidth(),
-				imgFluo.getHeight());
-		for (int i = 0; i < 4; i++)
-			ioF.erode();
-		for (int i = 0; i < 20; i++)
-			ioF.dilate();
-		
-		int[] rgbImageM = ioR.getImageAs1array();
-		int[] fluoImageM = ioF.getImageAs1array();
-		
-		BufferedImage imgFluoTest = ImageConverter.convert1AtoBI(
-				imgFluo.getWidth(), imgFluo.getHeight(), fluoImageM);
-		ImagePlus imgFFTest = ImageConverter.convertBItoIJ(imgFluoTest);
-		imgFFTest.show("Fluorescence Vorstufe1");
-		
-		// merge infos of both masks
-		int background = ImageOperation.BACKGROUND_COLOR.getRGB();
-		MaskOperation o = new MaskOperation(ioR.getImage(), ioF.getImage(),
-				null, background, 1);
-		o.mergeMasks();
-		
-		// modify source images according to merged mask
-		int i = 0;
-		for (int m : o.getMask()) {
-			if (m == 0) {
-				rgbImage[i] = background;
-				fluoImage[i] = background;
-			}
-			i++;
-		}
-		
-		// BufferedImage imgFluoTest2 =
-		// ImageConverter.convert1AtoBI(imgFluo.getWidth(),imgFluo.getHeight(),
-		// fluoImage);
-		// ImagePlus imgFFTest2 = ImageConverter.convertBItoIJ(imgFluoTest2);
-		// imgFFTest2.show("Fluorescence Vorstufe2");
-		
-		{
-			
-			SubstanceInterface substance = new Substance();
-			substance.setName(ImageConfiguration.NirTop.toString());
-			ConditionInterface condition = new Condition(substance);
-			Sample sample = new Sample(condition);
-			LoadedImage limg = new LoadedImage(sample, imgNIR);
-			limg.setURL(urlNIR);
-			BlockClearBackground.clearBackgroundAndInterpretImage(limg, 2,
-					null, null, true, output, null, 1, 0.5);
-			
-			int[] nirImage = ImageConverter.convertBIto1A(imgNIR);
-			
-			// process NIR
-			
-			MainFrame.showMessageWindow("NIR Source", new JLabel(new ImageIcon(
-					imgNIR)));
-			
-			int[] mask = rgbImage;
-			// resize mask
-			ImageOperation ioo = new ImageOperation(mask,
-					imgVisible.getWidth(), imgVisible.getHeight());
-			ioo.resize(imgNIR.getWidth(), imgNIR.getHeight());
-			ioo.rotate(-9);
-			i = 0;
-			for (int m : ioo.getImageAs1array()) {
-				if (m == background) {
-					nirImage[i] = background;
-				}
-				i++;
-			}
-			imgNIR = ImageConverter.convert1AtoBI(imgNIR.getWidth(),
-					imgNIR.getHeight(), nirImage);
-		}
-		
-		{ // fluo störungen beseitigen
-			ImageOperation ioFF = new ImageOperation(fluoImage,
-					imgFluo.getWidth(), imgFluo.getHeight());
-			for (int ii = 0; ii < 5; ii++)
-				ioFF.erode();
-			for (int ii = 0; ii < 5; ii++)
-				ioFF.dilate();
-			ioFF.closing();
-			
-			int idx = 0;
-			for (int m : ioFF.getImageAs1array()) {
-				if (m == background)
-					fluoImage[idx] = background;
-				else
-					fluoImage[idx] = fluoImageOriginal[idx];
-				idx++;
-			}
-		}
-		
-		{ // rgb störungen beseitigen
-			ImageOperation ioFF = new ImageOperation(rgbImage,
-					imgVisible.getWidth(), imgVisible.getHeight());
-			for (int ii = 0; ii < 6; ii++)
-				ioFF.erode();
-			for (int ii = 0; ii < 8; ii++)
-				ioFF.dilate();
-			for (int ii = 0; ii < 2; ii++)
-				ioFF.erode();
-			// for (int ii=0; ii<1; ii++)
-			// ioFF.erode(new int [][]
-			// {{0,0,1,0,0},{0,1,1,1,0},{1,1,1,1,1},{0,1,1,1,0},{0,0,1,0,0}});
-			
-			int idx = 0;
-			for (int m : ioFF.getImageAs1array()) {
-				if (m == background)
-					rgbImage[idx] = background;
-				else
-					rgbImage[idx] = rgbImageOriginal[idx];
-				idx++;
-			}
-		}
-		
-		imgVisible = ImageConverter.convert1AtoBI(imgVisible.getWidth(),
-				imgVisible.getHeight(), rgbImage);
-		imgFluo = ImageConverter.convert1AtoBI(imgFluo.getWidth(),
-				imgFluo.getHeight(), fluoImage);
-		
-		ImagePlus imgVV = ImageConverter.convertBItoIJ(imgVisible);
-		ImagePlus imgFF = ImageConverter.convertBItoIJ(imgFluo);
-		ImagePlus imgNN = ImageConverter.convertBItoIJ(imgNIR);
-		
-		imgVV.show("Visible");
-		imgFF.show("Fluorescence");
-		imgNN.show("NIR");
 	}
 	
 	public static void showTwoImagesAsOne_resize(BufferedImage imgF2,

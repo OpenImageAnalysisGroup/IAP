@@ -135,7 +135,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					tso.setBval(0, true); // finished
 				}
 			}, "process dropped files");
-			BackgroundThreadDispatcher.addTask(t, 1);
+			BackgroundThreadDispatcher.addTask(t, 1, 0);
 		}
 		MyThread t = new MyThread(new Runnable() {
 			
@@ -163,7 +163,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 				}
 			}
 		}, "add image to database");
-		BackgroundThreadDispatcher.addTask(t, 1);
+		BackgroundThreadDispatcher.addTask(t, 1, 0);
 		e.dropComplete(true);
 	}
 	
@@ -230,7 +230,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					file.delete();
 			}
 		}, "store image in database");
-		BackgroundThreadDispatcher.addTask(t, -1);
+		BackgroundThreadDispatcher.addTask(t, -1, 0);
 	}
 	
 	public void processDirectory(File file) {
