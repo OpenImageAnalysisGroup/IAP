@@ -141,7 +141,7 @@ public class CloudTaskManager {
 										}
 									}
 								};
-								BackgroundThreadDispatcher.addTask(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName(), -20000);
+								BackgroundThreadDispatcher.addTask(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName(), -200000);
 								Thread.sleep(20000);
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
