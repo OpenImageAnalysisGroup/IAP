@@ -215,7 +215,7 @@ public class BackgroundThreadDispatcher {
 							Integer prio = todoPriorities.get(i);
 							todoPriorities.remove(i);
 							t.setName(t.getNameNG() + ", priority:" + prio.toString());
-							System.out.println(">ABOUT TO START " + t.getNameNG() + " // current scheduler status priority: " + curPrio);
+							// System.out.println(">ABOUT TO START " + t.getNameNG() + " // current scheduler status priority: " + curPrio);
 							break;
 						}
 					}
