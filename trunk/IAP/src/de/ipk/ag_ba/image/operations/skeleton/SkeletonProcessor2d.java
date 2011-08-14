@@ -633,7 +633,7 @@ public class SkeletonProcessor2d {
 									((diffX * diffX + diffY * diffY) <= 12 * 12)) // ||
 								// (diffX * diffX + diffY * diffY) >= 20 * 20)
 								continue;
-							if (x - diffX >= 0 && y - diffY >= 0)
+							if (x - diffX >= 0 && y - diffY >= 0 && x - diffX < w && y - diffY < h)
 								plantImg[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
 						}
 				}
