@@ -588,7 +588,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						});
 					}
 				}, "database download");
-				BackgroundThreadDispatcher.addTask(download, 1 + 1000);
+				BackgroundThreadDispatcher.addTask(download, 1 + 1000, 0);
 			} else
 				if (downloadInProgress) {
 					JMenuItem tempItem = new JMenuItem("Download in progress...");

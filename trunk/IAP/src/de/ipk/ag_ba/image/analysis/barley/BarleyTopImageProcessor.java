@@ -8,16 +8,14 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMaskButNotOnVIS;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingOnFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisContentOnFluoMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropMasks;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockDataAnalysis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeVisAndFluoMasks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMorphologicalOperations;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeMasksToLargest;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockTransferImageSet;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
@@ -69,10 +67,10 @@ public class BarleyTopImageProcessor {
 		
 		if (automaticParameterSearch) {
 			p.add(BlockImageInfo.class);
-			p.add(BlockClearBackground.class);
+			// p.add(BlockClearBackground.class);
 			p.add(BlockClosingOnFluo.class);
 			p.add(BlockRemoveSmallClustersVisFluo.class);
-			p.add(BlockDataAnalysis.class);
+			// p.add(BlockDataAnalysis.class);
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockMorphologicalOperations.class);
 			// p.add(BlockPrintInfos.class);
@@ -103,10 +101,10 @@ public class BarleyTopImageProcessor {
 			// p.add(BlockPrintInfosEND.class);
 			
 		} else {
-			p.add(BlockClearBackground.class);
+			// p.add(BlockClearBackground.class);
 			p.add(BlockClosingOnFluo.class);
 			p.add(BlockRemoveSmallClustersVisFluo.class);
-			p.add(BlockDataAnalysis.class);
+			// p.add(BlockDataAnalysis.class);
 			p.add(BlockResizeMasksToLargest.class);
 			p.add(BlockEnlargeVisAndFluoMasks.class);
 			p.add(BlockCopyVisMaskToNirMask.class);

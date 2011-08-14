@@ -45,18 +45,18 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 	
-	public static MyThread addTask(Runnable r, String name, int userPriority) {
-		return addTask(new MyThread(r, name), userPriority);
+	public static MyThread addTask(Runnable r, String name, int userPriority, int parentPriority) {
+		return addTask(new MyThread(r, name), userPriority, parentPriority);
 	}
 	
-	public static MyThread addTask(MyThread t, int userPriority) {
-		// System.out.println("Add task " + t.getName() + ", Priority: " + userPriority);
+	public static MyThread addTask(MyThread t, int userPriority, int parentPriority) {
+		System.out.println("Add task " + t.getNameNG() + ", Priority: " + userPriority + ", Parent Priority: " + parentPriority);
 		synchronized (myInstance) {
 			if (myInstance == null)
 				myInstance = new BackgroundThreadDispatcher();
 			synchronized (myInstance.todo) {
 				myInstance.todo.push(t);
-				myInstance.todoPriorities.push(new Integer(userPriority));
+				myInstance.todoPriorities.push(new Integer(parentPriority + 1));// userPriority));
 				myInstance.sheduler.interrupt();
 			}
 		}

@@ -224,7 +224,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 					status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + wl);
 				}
-			}, "process image " + idxxx, -10);
+			}, "process image " + idxxx, -10, 0);
 			idxxx++;
 			wait.add(t);
 			
@@ -251,7 +251,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 					output.addAll(res);
 				}
 			}
-		}, "statistic image analysis", 4);
+		}, "statistic image analysis", 4, 0);
 	}
 	
 	private void saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, String labelFileExtension) {
@@ -284,7 +284,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 				}
 				// System.out.println("Finished Load Image");
 			}
-		}, "load " + type.name(), 0);
+		}, "load " + type.name(), 0, 0);
 	}
 	
 	public static ArrayList<NumericMeasurementInterface> statisticalAnalysisOfResultImage(LoadedImage limg,

@@ -64,6 +64,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private int numberOfSubsets;
 	private boolean forceDebugStack;
 	private ArrayList<FlexibleImageStack> forcedDebugStacks;
+	private int prio;
 	
 	@Override
 	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m, int workOnSubset,
@@ -136,7 +137,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			};
 			idxxx++;
-			wait.add(BackgroundThreadDispatcher.addTask(r, getName() + " " + idxxx, 5000));
+			wait.add(BackgroundThreadDispatcher.addTask(r, getName() + " " + idxxx, getParentPriority() + 1, getParentPriority() + 1));
 		}
 		try {
 			BackgroundThreadDispatcher.waitFor(wait);
@@ -145,6 +146,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		status.setCurrentStatusValueFine(100d);
 		input = null;
+	}
+	
+	private int getParentPriority() {
+		return prio;
+	}
+	
+	public void setParentPriority(int prio) {
+		this.prio = prio;
 	}
 	
 	private void processSnapshot(final int maximumThreadCountOnImageLevel, final BackgroundTaskStatusProviderSupportingExternalCall status,
@@ -156,7 +165,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (tmf.get(angle).getVIS() != null)
 					inSample = (Sample3D) tmf.get(angle).getVIS().getParentSample();
 				BlockProperties results = processAngleWithinSnapshot(tmf.get(angle), maximumThreadCountOnImageLevel, status,
-								workloadEqualAngleSnapshotSets);
+								workloadEqualAngleSnapshotSets, getParentPriority());
 				if (results != null)
 					analysisResults.put(angle, results);
 			}
@@ -301,8 +310,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								
 							}
 						};
-						MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image", 2000);
-						MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image", 2000);
+						MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image", getParentPriority() + 1, getParentPriority() + 2);
+						MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image", getParentPriority() + 1, getParentPriority() + 2);
 						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b });
 						li = new LoadedImage(id,
 								(BufferedImage) mainImg.getObject(),
@@ -359,7 +368,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		preProcessors.add(pre);
 	}
 	
-	private void loadImages(ImageData inVis, ImageData inFluo, ImageData inNir, final FlexibleImageSet input, final FlexibleImageSet inputMasks)
+	private void loadImages(ImageData inVis,
+			ImageData inFluo, ImageData inNir,
+			final FlexibleImageSet input, final FlexibleImageSet inputMasks,
+			final int parentPriority)
 			throws InterruptedException {
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">LOAD", false);
 		MyThread a = null, b = null, c = null;
@@ -409,9 +421,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					System.out.println(">ERROR: Could not load NIR image or reference: " + inNir);
 				}
 			}
-		BackgroundThreadDispatcher.addTask(a, 1000);
-		BackgroundThreadDispatcher.addTask(b, 1000);
-		BackgroundThreadDispatcher.addTask(c, 1000);
+		BackgroundThreadDispatcher.addTask(a, parentPriority + 1, parentPriority + 1);
+		BackgroundThreadDispatcher.addTask(b, parentPriority + 1, parentPriority + 1);
+		BackgroundThreadDispatcher.addTask(c, parentPriority + 1, parentPriority + 1);
 		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, });
 		s.printTime();
 	}
@@ -448,9 +460,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 	}
 	
-	private void processAndOrSaveTiffImagesOrResultImages(ImageSet id, ImageData inVis, ImageData inFluo, ImageData inNir,
+	private void processAndOrSaveTiffImagesOrResultImages(ImageSet id,
+			ImageData inVis, ImageData inFluo, ImageData inNir,
 			FlexibleImageStack debugImageStack,
-			FlexibleImage resVis, FlexibleImage resFluo, FlexibleImage resNir) throws InterruptedException {
+			FlexibleImage resVis, FlexibleImage resFluo, FlexibleImage resNir,
+			int parentPriority) throws InterruptedException {
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE IMAGE RESULTS", false);
 		if (forceDebugStack) {
 			forcedDebugStacks.add(debugImageStack);
@@ -474,11 +488,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 			MyThread a = null, b = null, c = null;
 			if (resVis != null)
-				a = BackgroundThreadDispatcher.addTask(saveImage(inVis, resVis, buf, ".tiff"), 10000);
+				a = BackgroundThreadDispatcher.addTask(saveImage(inVis, resVis, buf, ".tiff"), parentPriority + 1, 5);
 			if (resFluo != null)
-				b = BackgroundThreadDispatcher.addTask(saveImage(inFluo, resFluo, buf, ".tiff"), 10000);
+				b = BackgroundThreadDispatcher.addTask(saveImage(inFluo, resFluo, buf, ".tiff"), parentPriority + 1, 5);
 			if (resNir != null)
-				c = BackgroundThreadDispatcher.addTask(saveImage(inNir, resNir, buf, ".tiff"), 10000);
+				c = BackgroundThreadDispatcher.addTask(saveImage(inNir, resNir, buf, ".tiff"), parentPriority + 1, 5);
 			BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 		}
 		s.printTime();
@@ -486,7 +500,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private BlockProperties processAngleWithinSnapshot(ImageSet id, final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
-			final int workloadSnapshotAngles) throws InterruptedException, InstantiationException, IllegalAccessException {
+			final int workloadSnapshotAngles,
+			int parentPriority) throws InterruptedException, InstantiationException, IllegalAccessException {
 		ImageData inVis = id.getVIS() != null ? id.getVIS().copy() : null;
 		ImageData inFluo = id.getFLUO() != null ? id.getFLUO().copy() : null;
 		ImageData inNir = id.getNIR() != null ? id.getNIR().copy() : null;
@@ -496,7 +511,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		// if (status != null)
 		// status.setCurrentStatusText1("Load Images");
 		
-		loadImages(inVis, inFluo, inNir, input, inputMasks);
+		loadImages(inVis, inFluo, inNir, input, inputMasks, parentPriority + 1);
 		
 		if (input.hasAllThreeImages() && input.getSmallestHeight(true, true, false) > 1) {
 			// if (status != null)
@@ -590,7 +605,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			
 			processStatisticalOutput(inVis, analysisResults);
 			
-			processAndOrSaveTiffImagesOrResultImages(id, inVis, inFluo, inNir, debugImageStack, resVis, resFluo, resNir);
+			processAndOrSaveTiffImagesOrResultImages(id, inVis, inFluo, inNir,
+					debugImageStack, resVis, resFluo, resNir,
+					parentPriority);
 			
 			return analysisResults;
 		} else {

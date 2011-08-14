@@ -263,15 +263,15 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		final ThreadSafeOptions bestParameterTS = new ThreadSafeOptions();
 		bestParameterTS.setDouble(Double.NaN);
 		
-		boolean threaded = false;
+		// boolean threaded = false;
 		
-		if (threaded) {
-			zaehler = searchMultiThreaded(workMask, visMaskImage, borderLeft, borderRight, zaehler, scanParameterX, bestValueOfOtherTranslation, operation,
+		// if (threaded) {
+		// zaehler = searchMultiThreaded(workMask, visMaskImage, borderLeft, borderRight, zaehler, scanParameterX, bestValueOfOtherTranslation, operation,
+		// intervallSteps, bestValueTS, bestParameterTS);
+		// } else {
+		zaehler = searchSingleThreaded(workMask, visMaskImage, borderLeft, borderRight, zaehler, scanParameterX, bestValueOfOtherTranslation, operation,
 					intervallSteps, bestValueTS, bestParameterTS);
-		} else {
-			zaehler = searchSingleThreaded(workMask, visMaskImage, borderLeft, borderRight, zaehler, scanParameterX, bestValueOfOtherTranslation, operation,
-					intervallSteps, bestValueTS, bestParameterTS);
-		}
+		// }
 		
 		double newBorderLeft = bestParameterTS.getDouble() - intervallSteps;
 		double newBorderRight = bestParameterTS.getDouble() + intervallSteps;
@@ -301,9 +301,12 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 					n, zaehler, scanParameterX, bestValueOfOtherTranslation, operation);
 	}
 	
-	private int searchMultiThreaded(final FlexibleImage workMask, final FlexibleImage visMaskImage, double borderLeft, double borderRight, int zaehler,
-			final boolean scanParameterX, final double bestValueOfOtherTranslation, final MorphologicalOperationSearchType operation, double intervallSteps,
-			final ThreadSafeOptions bestValueTS, final ThreadSafeOptions bestParameterTS) {
+	private int searchMultiThreaded(final FlexibleImage workMask,
+			final FlexibleImage visMaskImage, double borderLeft, double borderRight, int zaehler,
+			final boolean scanParameterX, final double bestValueOfOtherTranslation,
+			final MorphologicalOperationSearchType operation, double intervallSteps,
+			final ThreadSafeOptions bestValueTS, final ThreadSafeOptions bestParameterTS,
+			int parentPriority) {
 		ArrayList<MyThread> tl = new ArrayList<MyThread>();
 		for (double step = borderLeft; step <= borderRight; step += intervallSteps) {// step = Math.round((intervallSteps + step) * accuracy) / accuracy) {
 			zaehler++;
@@ -314,7 +317,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 						public void run() {
 							innerLoop(workMask, visMaskImage, scanParameterX, bestValueOfOtherTranslation, operation, bestValueTS, bestParameterTS, fstep, null);
 						}
-					}, "Inner loop " + operation, 3));
+					}, "Inner loop " + operation, 1, parentPriority));
 		}
 		
 		try {

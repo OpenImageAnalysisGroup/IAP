@@ -272,7 +272,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 							try {
 								limg = IOmodule.loadImageFromFileOrMongo(image, true, true);
 								
-								limg = PhenotypeAnalysisTask.clearBackground(limg, 1);
+								// limg = PhenotypeAnalysisTask.clearBackground(limg, 1);
 								
 								limg = storeResultInDatabase.saveImage(limg);
 								

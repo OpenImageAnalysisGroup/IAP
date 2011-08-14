@@ -8,7 +8,6 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMasksToImages;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearBackground;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingOnFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropAllFixedPhytoOne;
@@ -16,8 +15,8 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeVisAndFluoMasks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockFilterFluoMaskByValue30;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveNirMaskAndImageFixedUp;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeMasksToLargest;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSetMasksToNull;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSetVisAndFluoMaskFromMergedVisAndFluo;
@@ -56,7 +55,7 @@ public class PhytochamberTopImageProcessor {
 		
 		BlockPipeline p = new BlockPipeline();
 		p.add(BlockCropAllFixedPhytoOne.class);
-		p.add(BlockClearBackground.class);
+		// p.add(BlockClearBackground.class);
 		p.add(BlockFilterFluoMaskByValue30.class);
 		p.add(BlockRemoveSmallClustersVisFluo.class);
 		p.add(BlockClosingOnFluo.class);

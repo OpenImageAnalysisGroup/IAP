@@ -10,12 +10,15 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 
 public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnalysisBlockFIS {
 	
+	private int prio = 4;
+	
 	public AbstractSnapshotAnalysisBlockFIS() {
 		super();
 	}
 	
 	@Override
 	protected FlexibleMaskAndImageSet run() throws InterruptedException {
+		int parentPriority = getParentPriority();
 		final FlexibleImageSet processedImages = new FlexibleImageSet(getInput().getImages());
 		final FlexibleImageSet processedMasks = new FlexibleImageSet(getInput().getImages());
 		
@@ -43,7 +46,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}, name + " process VIS image", 1),
+				}, name + " process VIS image", 1, parentPriority),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -54,7 +57,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}, name + "process FLU image", 1),
+				}, name + " process FLU image", 1, parentPriority),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -65,7 +68,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}, name + "process NIR image", 1),
+				}, name + " process NIR image", 1, parentPriority),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -76,7 +79,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}, name + "process VIS mask", 1),
+				}, name + " process VIS mask", 1, parentPriority),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -87,7 +90,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}, name + "process FLU mask", 1), BackgroundThreadDispatcher.addTask(new Runnable() {
+				}, name + " process FLU mask", 1, parentPriority), BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
 						try {
@@ -97,7 +100,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}, name + "process NIR mask", 1) });
+				}, name + " process NIR mask", 1, parentPriority) });
 		
 		try {
 			postProcess(processedImages, processedMasks);
@@ -107,6 +110,14 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		}
 		
 		return new FlexibleMaskAndImageSet(processedImages, processedMasks);
+	}
+	
+	protected int getParentPriority() {
+		return prio;
+	}
+	
+	public void setParentPriority(int prio) {
+		this.prio = prio;
 	}
 	
 	protected void prepare() {

@@ -167,7 +167,7 @@ public class DataExchangeHelperForExperiments {
 				addFilesToPanel(filePanel, mtdbe, expTree, m);
 			}
 		}, "add files to panel");
-		BackgroundThreadDispatcher.addTask(r, 0 + 1000);
+		BackgroundThreadDispatcher.addTask(r, 1000, 0);
 	}
 	
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel, final MongoTreeNode mt,
@@ -396,7 +396,7 @@ public class DataExchangeHelperForExperiments {
 							boolean isLast = fIsLast;
 							if (isLast)
 								for (MyThread ttt : executeLater)
-									BackgroundThreadDispatcher.addTask(ttt, -1 + 1000);
+									BackgroundThreadDispatcher.addTask(ttt, -1 + 1000, 0);
 						}
 					});
 				} else
