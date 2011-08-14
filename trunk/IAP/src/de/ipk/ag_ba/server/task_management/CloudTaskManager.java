@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -88,7 +89,7 @@ public class CloudTaskManager {
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
 							progressSum);
 					
-					int maxTasks = 1;// SystemAnalysis.getNumberOfCPUs() >= 4 ? 4 : 2;
+					int maxTasks = SystemAnalysis.getNumberOfCPUs();
 					if (maxTasks < 1)
 						maxTasks = 1;
 					
@@ -129,7 +130,19 @@ public class CloudTaskManager {
 								td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS);
 								runningTasks.add(td);
 								td.setSystemExitAfterCompletion(autoClose);
-								td.startWork(td.getBatchCmd(), hostName, hostName, m);
+								final TaskDescription tdf = td;
+								Runnable r = new Runnable() {
+									@Override
+									public void run() {
+										try {
+											tdf.startWork(tdf.getBatchCmd(), hostName, hostName, m);
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+									}
+								};
+								BackgroundThreadDispatcher.addTask(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName(), -20000);
+								Thread.sleep(10000);
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 							}
