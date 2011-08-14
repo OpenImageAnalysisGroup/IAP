@@ -56,7 +56,6 @@ public class BackgroundThreadDispatcher {
 				myInstance = new BackgroundThreadDispatcher();
 			synchronized (myInstance.todo) {
 				myInstance.todo.push(t);
-				userPriority = 0;
 				myInstance.todoPriorities.push(new Integer(userPriority));
 				myInstance.sheduler.interrupt();
 			}
@@ -203,6 +202,7 @@ public class BackgroundThreadDispatcher {
 						if (curPrio > maxPrio)
 							maxPrio = curPrio;
 					}
+					System.out.println(">MAX PRIO: " + maxPrio);
 					// search oldest thread with maximum priority
 					for (int i = 0; i < todo.size(); i++) {
 						int curPrio = (todoPriorities.get(i)).intValue();
@@ -215,6 +215,7 @@ public class BackgroundThreadDispatcher {
 							Integer prio = todoPriorities.get(i);
 							todoPriorities.remove(i);
 							t.setName(t.getNameNG() + ", priority:" + prio.toString());
+							System.out.println(">ABOUT TO START " + t.getNameNG() + " // current scheduler status priority: " + curPrio);
 							break;
 						}
 					}
@@ -271,16 +272,16 @@ public class BackgroundThreadDispatcher {
 							}
 						}
 					}
-					int highestNOTrunningPrio = Integer.MIN_VALUE;
-					synchronized (todo) {
-						for (int i = 0; i < todo.size(); i++) {
-							int curPrio = (todoPriorities.get(i)).intValue();
-							if (curPrio > highestNOTrunningPrio)
-								highestNOTrunningPrio = curPrio;
-						}
-					}
-					if (highestNOTrunningPrio > highestRunningPrio)
-						break;
+					// int highestNOTrunningPrio = Integer.MIN_VALUE;
+					// synchronized (todo) {
+					// for (int i = 0; i < todo.size(); i++) {
+					// int curPrio = (todoPriorities.get(i)).intValue();
+					// if (curPrio > highestNOTrunningPrio)
+					// highestNOTrunningPrio = curPrio;
+					// }
+					// }
+					// if (highestNOTrunningPrio > highestRunningPrio)
+					// break;
 				}
 			}
 		}
