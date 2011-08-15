@@ -20,6 +20,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 
 /**
  * calculate the skeleton to detect the leafs and the clade
@@ -28,40 +29,60 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debug = false;
+	private boolean debug = false;
+	private boolean debug2 = false;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
+		FlexibleImage fluo = getInput().getMasks().getFluo() != null ? getInput().getMasks().getFluo().copy() : null;
 		FlexibleImage res = vis;
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null) {
 			FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
 					// .closing(3, 3)
-					.erode()
+					// .erode()
 					.dilateHorizontal(5)
-					.blur(3)
+					.blur(1)
 					.getImage().print("vis", debug);
 			
 			if (viswork != null)
-				if (options.isMaize()) {
-					getProperties().setImage("skeleton", calcSkeleton(viswork, vis));
+				if (options.isMaize() && vis != null && fluo != null) {
+					getProperties().setImage("skeleton", calcSkeleton(viswork, vis, fluo));
 					res = getProperties().getImage("beforeBloomEnhancement");
 				}
 		}
 		return res;
 	}
 	
-	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis) {
+	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo) {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.getIO().skeletonize().getImage()));
 		skel2d.findEndpointsAndBranches2();
 		skel2d.print("endpoints and branches", debug);
 		
+		double xf = fluo.getWidth() / (double) vis.getWidth();
+		double yf = fluo.getHeight() / (double) vis.getHeight();
+		int h = vis.getHeight();
+		
 		skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
-		HashSet<Point> knownBloompoints = skel2d.detectBloom(vis);
+		FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.getIO().blur(10).getImage().print("blurf", false), 0.075f, h, 20).getIO().// blur(3).
+				thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
+		
+		probablyBloomFluo = probablyBloomFluo.getIO().print("BEFORE", debug2).medianFilter32Bit().invert().removeSmallClusters(true, null).
+				erode().erode().erode().erode().invert().
+				getImage();
+		
+		if (debug2) {
+			FlexibleImageStack fis = new FlexibleImageStack();
+			fis.addImage("PROB", probablyBloomFluo);
+			fis.addImage("FLUO", fluo);
+			fis.print("CHECK THIS");
+		}
+		
+		HashSet<Point> knownBloompoints = skel2d.detectBloom(probablyBloomFluo, xf, yf);
 		int bloomLimbCount = knownBloompoints.size();
 		skel2d.deleteShortEndLimbs(10, false, knownBloompoints);
-		skel2d.detectBloom(vis);
+		skel2d.detectBloom(probablyBloomFluo, xf, yf);
 		
 		int leafcount = skel2d.endlimbs.size();
 		FlexibleImage skelres = skel2d.getAsFlexibleImage();
@@ -80,6 +101,8 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		double normFactor = distHorizontal != null ? options.getIntSetting(Setting.REAL_MARKER_DISTANCE) / distHorizontal.getValue() : 1;
 		ResultsTable rt = new ResultsTable();
 		rt.incrementCounter();
+		
+		rt.addValue("bloom.area.size", probablyBloomFluo.getIO().print("BLOOM AREA", true).countFilledPixels());
 		
 		rt.addValue("bloom.count", bloomLimbCount);
 		rt.addValue("leaf.count", leafcount);

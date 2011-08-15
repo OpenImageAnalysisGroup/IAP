@@ -1938,6 +1938,23 @@ public class ImageOperation {
 		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
 	
+	public ImageOperation thresholdGrayClearLowerThan(int threshold, int back) {
+		int[] res = getImageAs1array();
+		int b;
+		int idx = 0;
+		for (int c : res) {
+			if (c == back) {
+				idx++;
+				continue;
+			}
+			b = (c & 0x0000ff);
+			if (b < threshold)
+				res[idx] = back;
+			idx++;
+		}
+		return new ImageOperation(res, image.getWidth(), image.getHeight());
+	}
+	
 	public ImageOperation thresholdClearBlueBetween(int thresholdStart, int thresholdEnd) {
 		int[] res = getImageAs1array();
 		int b;
