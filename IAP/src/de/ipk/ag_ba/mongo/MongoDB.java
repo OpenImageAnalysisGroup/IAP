@@ -1478,8 +1478,8 @@ public class MongoDB {
 					SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 									SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
 									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
-									(load > 0 ? " used "
-											+ StringManipulationTools.formatNumber(100d * load, "#") + "&#37;" : "")
+									(load > 0 ? " load "
+											+ StringManipulationTools.formatNumber(load, "#.#") + "&#37;" : "")
 									+ ", queue: "
 									+ BackgroundThreadDispatcher.getWorkLoad());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
