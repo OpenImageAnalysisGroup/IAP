@@ -18,7 +18,6 @@ import javax.swing.Timer;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * @author klukas
@@ -51,9 +50,9 @@ public class BackgroundThreadDispatcher {
 	}
 	
 	public static MyThread addTask(MyThread t, int userPriority, int parentPriority) {
-		if (parentPriority > 4)
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">Add task " + t.getNameNG() + ", Priority: " + userPriority + ", Parent Priority: "
-					+ parentPriority);
+		// if (parentPriority > 4)
+		// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Add task " + t.getNameNG() + ", Priority: " + userPriority + ", Parent Priority: "
+		// + parentPriority);
 		synchronized (myInstance) {
 			if (myInstance == null)
 				myInstance = new BackgroundThreadDispatcher();

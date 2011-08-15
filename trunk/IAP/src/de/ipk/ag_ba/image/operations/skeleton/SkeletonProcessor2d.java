@@ -651,14 +651,14 @@ public class SkeletonProcessor2d {
 		Point centroid = new Point();
 		
 		for (Limb l : topLimbs) {
+			if (l.endpoint == null)
+				continue;
 			if (checkBloomColor(l, vis)) {
 				bloomLimbs.add(l);
 			}
-			if (l.endpoint != null) {
-				centroid.x += l.endpoint.x;
-				centroid.y += l.endpoint.y;
-				avgLength += l.points.size();
-			}
+			centroid.x += l.endpoint.x;
+			centroid.y += l.endpoint.y;
+			avgLength += l.points.size();
 		}
 		centroid.x = centroid.x / numberOfProbalblyBloomLeafs;
 		centroid.y = centroid.y / numberOfProbalblyBloomLeafs;
