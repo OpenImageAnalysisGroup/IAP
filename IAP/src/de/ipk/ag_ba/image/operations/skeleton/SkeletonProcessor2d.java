@@ -474,7 +474,7 @@ public class SkeletonProcessor2d {
 			calculateEndlimbsRecursive();
 			// System.out.println("numofendlimbs2: " + endlimbs.size());
 			n++;
-		} while (connectSkeleton() && n < 1000);
+		} while (connectSkeleton() && n < 100);
 	}
 	
 	/**
@@ -642,46 +642,29 @@ public class SkeletonProcessor2d {
 		return new FlexibleImage(plantImg);
 	}
 	
-	public HashSet<Point> detectBloom(FlexibleImage vis) {
+	public HashSet<Point> detectBloom(FlexibleImage vis, double xf, double yf) {
 		ArrayList<Limb> topLimbs = getTopEndlimbs(0.3);
 		ArrayList<Limb> bloomLimbs = new ArrayList<Limb>();
-		int numberOfProbalblyBloomLeafs = topLimbs.size();
-		int sumDist = 0;
-		int avgLength = 0;
-		Point centroid = new Point();
+		
+		double maxLen = getMaxLimbLength();
 		
 		for (Limb l : topLimbs) {
 			if (l.endpoint == null)
 				continue;
-			if (checkBloomColor(l, vis)) {
-				bloomLimbs.add(l);
+			if (checkBloomColor(l, vis, xf, yf)) {
+				if (l.points.size() < maxLen * 0.4d)
+					bloomLimbs.add(l);
 			}
-			centroid.x += l.endpoint.x;
-			centroid.y += l.endpoint.y;
-			avgLength += l.points.size();
+			
 		}
-		centroid.x = centroid.x / numberOfProbalblyBloomLeafs;
-		centroid.y = centroid.y / numberOfProbalblyBloomLeafs;
-		avgLength = avgLength / numberOfProbalblyBloomLeafs;
 		
+		HashSet<Point> res = new HashSet<Point>();
 		for (Limb l : bloomLimbs) {
-			sumDist += l.endpoint.distance(centroid);
+			markLimb(l, colorBloom);
+			skelImg[l.endpoint.x][l.endpoint.y] = colorBloomEndpoint;
+			res.add(l.endpoint);
 		}
-		double avgDistToCentroid = sumDist / (double) numberOfProbalblyBloomLeafs;
-		double maxLimblength = getMaxLimbLength();
-		
-		// System.out.println("bloomcandidates: " + bloomLimbs.size());
-		if (bloomLimbs.size() >= numberOfProbalblyBloomLeafs * 0.5 && avgDistToCentroid < maxLimblength * 0.45 && avgLength < maxLimblength * 0.3) {
-			// System.out.println("bloom detect!!!");
-			HashSet<Point> res = new HashSet<Point>();
-			for (Limb l : bloomLimbs) {
-				markLimb(l, colorBloom);
-				skelImg[l.endpoint.x][l.endpoint.y] = colorBloomEndpoint;
-				res.add(l.endpoint);
-			}
-			return res;
-		}
-		return new HashSet<Point>();
+		return res;
 	}
 	
 	private double getMaxLimbLength() {
@@ -693,32 +676,28 @@ public class SkeletonProcessor2d {
 		return max;
 	}
 	
-	private boolean checkBloomColor(Limb l, FlexibleImage vis) {
+	private boolean checkBloomColor(Limb l, FlexibleImage vis, double xf, double yf) {
 		if (vis == null || l == null || l.points == null)
 			return false;
 		int[][] visImg = vis.getAs2A();
 		if (visImg == null)
 			return false;
-		int yellow = 0, r, g, b, Li = 0, ai = 0, bi = 0;
-		int green = 0;
+		int b;
+		double green = 0;
 		for (Point p : l.points) {
-			int c = visImg[p.x][p.y];
+			int c = visImg[(int) (p.x * xf)][(int) (p.y * yf)];
 			
-			r = ((c & 0xff0000) >> 16); // R 0..1
-			g = ((c & 0x00ff00) >> 8); // G 0..1
 			b = (c & 0x0000ff); // B 0..1
 			
-			Li = (int) ImageOperation.labCube[r][g][b];
-			ai = (int) ImageOperation.labCube[r][g][b + 256];
-			bi = (int) ImageOperation.labCube[r][g][b + 512];
-			
-			if (bi > 120 && Li > 200 && ai > 112 && Li < 235) // ai: 105
-				yellow++;
-			else
-				green++;
+			green += b;
 		}
-		// System.out.println("yellow: " + yellow + " green: " + green);
-		if (yellow > 2 && yellow > green * 0.2)
+		green /= (double) l.points.size();
+		// Point p = l.endpoint;
+		// int c = visImg[(int) (p.x * xf)][(int) (p.y * yf)];
+		// b = (c & 0x0000ff); // B 0..1
+		// green += b;
+		// System.out.println("green: " + green);
+		if (green > 10)
 			return true;
 		else
 			return false;
@@ -732,22 +711,88 @@ public class SkeletonProcessor2d {
 	}
 	
 	private ArrayList<Limb> getTopEndlimbs(double n) {
-		int maxHeight = Integer.MAX_VALUE;
+		int minY = Integer.MAX_VALUE;
 		Limb res = null;
 		ArrayList<Limb> maxLimbs = new ArrayList<Limb>();
 		for (Limb l : endlimbs) {
-			if (l.endpoint.y < maxHeight) {
-				maxHeight = l.endpoint.y;
+			if (l.endpoint.y < minY) {
+				minY = l.endpoint.y;
 				res = l;
 			}
 		}
 		maxLimbs.add(res);
 		// System.out.println("max endpoint: " + res.endpoint.toString());
 		
+		int border = (int) (minY + skelImg[0].length * n);
+		
 		for (Limb l : endlimbs) {
-			if (l != res && l.endpoint.y < maxHeight * (1 + 0.3))
+			if (l != res && l.endpoint.y < border)
 				maxLimbs.add(l);
 		}
 		return maxLimbs;
+	}
+	
+	public FlexibleImage calcProbablyBloomImage(FlexibleImage image, float hueBloom, int hVis, float f) {
+		int[][] visImg = image.getAs2A();
+		int h = image.getHeight();
+		int w = image.getWidth();
+		int cutPositionY = 0;// (int) (getMinLimbY().endpoint.y * h / (double) hVis);
+		int r, g, b, c, s = 0;
+		float distToYellow = 0f;
+		float[] hsbvals = new float[3];
+		int[][] res = new int[w][h];
+		double hueSum = 0;
+		int nnn = 0;
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				c = visImg[x][y];
+				if (c != background) {
+					r = ((c & 0xff0000) >> 16); // R 0..1
+					g = ((c & 0x00ff00) >> 8); // G 0..1
+					b = (c & 0x0000ff); // B 0..1
+					
+					Color.RGBtoHSB(r, g, b, hsbvals);
+					hueSum += hsbvals[0];
+					nnn++;
+				}
+			}
+		}
+		float avgHue = hueBloom;// (float) (nnn > 0 ? hueSum / nnn : hueBloom);
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = cutPositionY - s; y < cutPositionY + h * 1; y++) {
+				c = visImg[x][y];
+				if (c != ImageOperation.BACKGROUND_COLORint) {
+					r = ((c & 0xff0000) >> 16); // R 0..1
+					g = ((c & 0x00ff00) >> 8); // G 0..1
+					b = (c & 0x0000ff); // B 0..1
+					
+					Color.RGBtoHSB(r, g, b, hsbvals);
+					distToYellow = 255 - Math.abs((avgHue - hsbvals[0]) * 255 * f); // 0.167 equivalent to Yellow
+				} else {
+					distToYellow = 0;
+				}
+				if (distToYellow < 0)
+					distToYellow = 0;
+				if (distToYellow > 255)
+					distToYellow = 255;
+				
+				res[x][y] = (0xFF << 24 | ((int) distToYellow & 0xFF) << 16) | (((int) distToYellow & 0xFF) << 8) | (((int) distToYellow & 0xFF) << 0);
+			}
+		}
+		return new FlexibleImage(res);
+	}
+	
+	private Limb getMinLimbY() {
+		int maxHeight = Integer.MAX_VALUE;
+		Limb res = null;
+		for (Limb l : endlimbs) {
+			if (l.endpoint.y < maxHeight) {
+				maxHeight = l.endpoint.y;
+				res = l;
+			}
+		}
+		return res;
 	}
 }
