@@ -117,15 +117,15 @@ public class ImageProcessorOptions {
 		return (getDoubleSetting(s) > 0) ? true : false;
 	}
 	
-	public int getIntSetting(Setting s) {
-		return (int) getDoubleSetting(s);
+	public Integer getIntSetting(Setting s) {
+		return getDoubleSetting(s) != null ? getDoubleSetting(s).intValue() : null;
 	}
 	
 	public boolean hasDoubleSetting(Setting s) {
 		return numericSettings.containsKey(s);
 	}
 	
-	public double getDoubleSetting(Setting s) {
+	public Double getDoubleSetting(Setting s) {
 		if (numericSettings.get(s).size() > 1)
 			return numericSettings.get(s).pollFirst();
 		// return doubleOptions.get(s).pop();

@@ -20,7 +20,7 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private int visibleFilledPixels, nirFilledPixels;
-	BlockProperty markerDistanceHorizontally;
+	BlockProperty markerDistanceHorizontally = null;
 	
 	@Override
 	protected void prepare() {
@@ -75,11 +75,10 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
-			if (markerDistanceHorizontally != null) {
-				ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally, options.getIntSetting(Setting.REAL_MARKER_DISTANCE)); // markerDistanceHorizontally
-				if (rt != null)
-					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
-			}
+			ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally,
+						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), true); // markerDistanceHorizontally
+			if (rt != null)
+				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return io.getImage();
 		} else
 			return null;
@@ -109,11 +108,10 @@ public class BlockIntensityAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", fSum / filled);
 				else
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", fSum / filled);
-				if (markerDistanceHorizontally != null) {
-					ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally, options.getIntSetting(Setting.REAL_MARKER_DISTANCE)); // markerDistanceHorizontally
-					if (rt != null)
-						getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.", rt, getBlockPosition());
-				}
+				ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally,
+						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), false); // markerDistanceHorizontally
+				if (rt != null)
+					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.", rt, getBlockPosition());
 			}
 			return io.getImage();
 		} else

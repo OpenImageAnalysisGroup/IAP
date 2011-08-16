@@ -188,6 +188,7 @@ public class ImageOperation {
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int idx = 0;
+		float[] hsb = new float[3];
 		for (int c : in) {
 			if (c == background) {
 				in[idx++] = background;
@@ -208,19 +209,21 @@ public class ImageOperation {
 			
 			float intensity = Float.NaN;
 			
+			intensity = 1 - rf / (float) ((255) + gf);
+			if (intensity > 210f / 255f)
+				intensity = 1;
 			switch (type) {
 				case CLASSIC:
-					intensity = 1 - rf / (float) ((255) + gf);
-					if (intensity > 210f / 255f)
-						intensity = 1;
 					break;
 				case CHLOROPHYL:
+					Color.RGBtoHSB(rf, gf, 0, hsb);
+					if (intensity < 1)
+						intensity = (1 - (1 - hsb[0] / (60f / 360f)) * hsb[2]);
+					break;
 				case PHENOL:
-					double l = ImageOperation.labCube[rf][gf][0 + 0];
-					int yellow = gf; //
-					// double a = ImageOperation.labCube[rf][gf][bf + 256];
-					// double b = ImageOperation.labCube[rf][gf][bf + 512];
-					intensity = 0;
+					Color.RGBtoHSB(rf, gf, 0, hsb);
+					if (intensity < 1)
+						intensity = 1 - (1 - (1 - hsb[0] / (60f / 360f)) * hsb[2]);
 					break;
 				default:
 					throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");

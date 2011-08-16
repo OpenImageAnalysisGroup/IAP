@@ -112,6 +112,22 @@ public class FlexibleImage {
 		this(w, h, ImageConverter.convertLABto1A(labImage));
 	}
 	
+	public FlexibleImage(FlexibleImage grayR, FlexibleImage grayG, FlexibleImage grayB) {
+		this(grayR.getWidth(), grayR.getHeight(), getImgFromRGB(grayR, grayG, grayB));
+	}
+	
+	private static int[] getImgFromRGB(FlexibleImage grayR, FlexibleImage grayG, FlexibleImage grayB) {
+		int[] r = grayR.getAs1A();
+		int[] g = grayG.getAs1A();
+		int[] b = grayB.getAs1A();
+		int[] res = new int[r.length];
+		for (int i = 0; i < r.length; i++) {
+			int ci = (0xFF << 24 | (r[i] & 0xFF) << 16) | ((g[i] & 0xFF) << 8) | ((b[i] & 0xFF) << 0);
+			res[i] = ci;
+		}
+		return res;
+	}
+	
 	public BufferedImage getAsBufferedImage() {
 		return image.getBufferedImage();
 	}

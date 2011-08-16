@@ -14,43 +14,55 @@ public class IntensityAnalysis {
 		this.n = numberOfIntervals;
 	}
 	
-	public ResultsTable calculateHistorgram(BlockProperty distHorizontal, int realMarkerDistance) {
+	public ResultsTable calculateHistorgram(BlockProperty optDistHorizontal, Integer optRealMarkerDistance, boolean multiLevel) {
 		ResultsTable result = new ResultsTable();
 		
 		int[] pixels = io.getImageAs1array();
 		
-		double sumOfIntensity = 0;
+		double sumOfIntensityChlorophyl = 0;
+		double sumOfIntensityPhenol = 0;
+		double sumOfIntensityClassic = 0;
 		
 		int background = ImageOperation.BACKGROUND_COLORint;
 		
-		Histogram hist = new Histogram(this.n);
+		Histogram histChlorophyl = new Histogram(this.n);
 		int plantImagePixelCnt = 0;
 		for (int c : pixels) {
 			if (c == background)
 				continue;
 			plantImagePixelCnt++;
-			// int r = (c & 0xff0000) >> 16;
-			// int g = (c & 0x00ff00) >> 8;
-			int b = (c & 0x0000ff);
+			int r_intensityClassic = (c & 0xff0000) >> 16;
+			int g_intensityChlorophyl = (c & 0x00ff00) >> 8;
+			int b_intensityPhenol = (c & 0x0000ff);
 			
-			sumOfIntensity += (255 - b);
-			
-			hist.addDataPoint(b, 255);
+			sumOfIntensityChlorophyl += (255 - g_intensityChlorophyl);
+			if (multiLevel) {
+				sumOfIntensityPhenol += (255 - b_intensityPhenol);
+				sumOfIntensityClassic += (255 - r_intensityClassic);
+			}
+			histChlorophyl.addDataPoint(g_intensityChlorophyl, 255);
 		}
 		
 		result.incrementCounter();
 		
-		result.addValue("intensity.average", sumOfIntensity / plantImagePixelCnt / 255d);
-		
-		// double realDist = 1;
-		// if (markerDistHorizontal != null) {
-		// double normalize = ((realDist * realDist) / (markerDistHorizontal.getValue() * markerDistHorizontal.getValue()));
-		double normalize = realMarkerDistance / distHorizontal.getValue();
-		for (int i = 0; i < this.n; i++) {
-			result.addValue("histogram.bin." + (i + 1) + "." + hist.getBorderLeft(i, 255) + "_" + hist.getBorderRight(i, 255), hist.getFreqAt(i) * normalize); // *
-																																																				// normalize
+		if (multiLevel) {
+			result.addValue("intensity.chlorophyl.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
+			result.addValue("intensity.phenol.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
 		}
-		// }
+		result.addValue("intensity.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
+		
+		if (optDistHorizontal != null && optRealMarkerDistance != null) {
+			double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
+			for (int i = 0; i < this.n; i++) {
+				result.addValue("histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
+						histChlorophyl.getFreqAt(i) * normalize);
+			}
+		}
+		for (int i = 0; i < this.n; i++) {
+			result.addValue(
+					"chlorophyl.normalized.histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
+					histChlorophyl.getFreqAt(i));
+		}
 		return result;
 	}
 }
