@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
+import de.ipk.ag_ba.image.operations.FluoAnalysis;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -10,11 +11,13 @@ public class BlockFluoToIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() == null) {
-			System.out.println("WARNING: BlockFluoToIntensity: Fluo Mask is NULL!");
 			return null;
 		}
 		ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
-		FlexibleImage res = io.convertFluo2intensity().getImage();
+		io.print("FLUO");
+		FlexibleImage resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL).getImage();
+		FlexibleImage resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL).getImage();
+		FlexibleImage res = io.convertFluo2intensity(FluoAnalysis.CLASSIC).getImage();
 		return res;
 	}
 	

@@ -67,6 +67,12 @@ public class ImageOperation {
 	protected ResultsTable rt;
 	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
+	
+	/**
+	 * L:[0.0,254.6050567626953]<br>
+	 * A:[26.135635375976562,225.2710723876953]<br>
+	 * B:[8.081741333007812,222.49612426757812]
+	 */
 	public final static float[][][] labCube = getLabCube();
 	
 	// private Roi boundingBox;
@@ -175,7 +181,7 @@ public class ImageOperation {
 				(int) (factor * image.getHeight()));
 	}
 	
-	public ImageOperation convertFluo2intensity() {
+	public ImageOperation convertFluo2intensity(FluoAnalysis type) {
 		int background = ImageOperation.BACKGROUND_COLORint;
 		
 		int[] in = getImageAs1array(); // gamma(0.1) // 99999999999999999999999999999999
@@ -190,7 +196,7 @@ public class ImageOperation {
 			
 			int rf = (c & 0xff0000) >> 16;
 			int gf = (c & 0x00ff00) >> 8;
-			// int bf = (c & 0x0000ff);
+			int bf = (c & 0x0000ff);
 			
 			// float[] hsbvals = Color.RGBtoHSB(rf, gf, bf, null);
 			//
@@ -200,10 +206,25 @@ public class ImageOperation {
 			
 			// float intensityA = 1 - r * max(r, g) / ((255 * 255) + 255 * g);
 			
-			float intensity = 1 - rf / (float) ((255) + gf);
+			float intensity = Float.NaN;
 			
-			if (intensity > 210f / 255f)
-				intensity = 1;
+			switch (type) {
+				case CLASSIC:
+					intensity = 1 - rf / (float) ((255) + gf);
+					if (intensity > 210f / 255f)
+						intensity = 1;
+					break;
+				case CHLOROPHYL:
+				case PHENOL:
+					double l = ImageOperation.labCube[rf][gf][0 + 0];
+					int yellow = gf; //
+					// double a = ImageOperation.labCube[rf][gf][bf + 256];
+					// double b = ImageOperation.labCube[rf][gf][bf + 512];
+					intensity = 0;
+					break;
+				default:
+					throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");
+			}
 			
 			int i = (int) (intensity * 255d);
 			// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
@@ -2868,5 +2889,9 @@ public class ImageOperation {
 			}
 		}
 		return new ImageOperation(res);
+	}
+	
+	public ImageOperation copy() {
+		return new ImageOperation(getImage().copy());
 	}
 }
