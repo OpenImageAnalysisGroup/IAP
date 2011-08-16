@@ -648,16 +648,17 @@ public class SkeletonProcessor2d {
 		
 		double maxLen = getMaxLimbLength();
 		
-		for (Limb l : topLimbs) {
-			if (l.endpoint == null)
-				continue;
-			if (checkBloomColor(l, vis, xf, yf)) {
-				if (l.points.size() < maxLen * 0.4d)
-					bloomLimbs.add(l);
+		if (topLimbs != null)
+			for (Limb l : topLimbs) {
+				if (l == null || l.endpoint == null || l.points.size() < 5)
+					continue;
+				if (checkBloomColor(l, vis, xf, yf)) {
+					if (l.points.size() < maxLen * 1d)
+						bloomLimbs.add(l);
+				}
+				
 			}
-			
-		}
-		
+		// double avgDist = avgDistBetweenLimbs(bloomLimbs);
 		HashSet<Point> res = new HashSet<Point>();
 		for (Limb l : bloomLimbs) {
 			markLimb(l, colorBloom);
@@ -665,15 +666,6 @@ public class SkeletonProcessor2d {
 			res.add(l.endpoint);
 		}
 		return res;
-	}
-	
-	private double getMaxLimbLength() {
-		int max = 0;
-		for (Limb l : endlimbs) {
-			if (l.points.size() > max)
-				max = l.points.size();
-		}
-		return max;
 	}
 	
 	private boolean checkBloomColor(Limb l, FlexibleImage vis, double xf, double yf) {
@@ -684,20 +676,24 @@ public class SkeletonProcessor2d {
 			return false;
 		int b;
 		double green = 0;
+		int greenMax = 0;
 		for (Point p : l.points) {
 			int c = visImg[(int) (p.x * xf)][(int) (p.y * yf)];
 			
 			b = (c & 0x0000ff); // B 0..1
 			
 			green += b;
+			if (b > greenMax)
+				greenMax = b;
 		}
 		green /= (double) l.points.size();
 		// Point p = l.endpoint;
 		// int c = visImg[(int) (p.x * xf)][(int) (p.y * yf)];
 		// b = (c & 0x0000ff); // B 0..1
 		// green += b;
-		// System.out.println("green: " + green);
-		if (green > 10)
+		if (greenMax > 0)
+			System.out.println("green: " + green + ", max: " + greenMax + " l.length: " + l.points.size() + " end: " + l.endpoint.toString());
+		if (green > 10 && greenMax > 20)
 			return true;
 		else
 			return false;
@@ -712,14 +708,8 @@ public class SkeletonProcessor2d {
 	
 	private ArrayList<Limb> getTopEndlimbs(double n) {
 		int minY = Integer.MAX_VALUE;
-		Limb res = null;
+		Limb res = getMinLimbY();
 		ArrayList<Limb> maxLimbs = new ArrayList<Limb>();
-		for (Limb l : endlimbs) {
-			if (l.endpoint.y < minY) {
-				minY = l.endpoint.y;
-				res = l;
-			}
-		}
 		maxLimbs.add(res);
 		// System.out.println("max endpoint: " + res.endpoint.toString());
 		
@@ -736,7 +726,7 @@ public class SkeletonProcessor2d {
 		int[][] visImg = image.getAs2A();
 		int h = image.getHeight();
 		int w = image.getWidth();
-		int cutPositionY = 0;// (int) (getMinLimbY().endpoint.y * h / (double) hVis);
+		int cutPositionY = (int) (getMinLimbY().endpoint.y * h / (double) hVis);
 		int r, g, b, c, s = 0;
 		float distToYellow = 0f;
 		float[] hsbvals = new float[3];
@@ -761,7 +751,7 @@ public class SkeletonProcessor2d {
 		float avgHue = hueBloom;// (float) (nnn > 0 ? hueSum / nnn : hueBloom);
 		
 		for (int x = 0; x < w; x++) {
-			for (int y = cutPositionY - s; y < cutPositionY + h * 1; y++) {
+			for (int y = cutPositionY - s; y < cutPositionY + h * 0.1; y++) {
 				c = visImg[x][y];
 				if (c != ImageOperation.BACKGROUND_COLORint) {
 					r = ((c & 0xff0000) >> 16); // R 0..1
@@ -794,5 +784,14 @@ public class SkeletonProcessor2d {
 			}
 		}
 		return res;
+	}
+	
+	private double getMaxLimbLength() {
+		int max = 0;
+		for (Limb l : endlimbs) {
+			if (l.points.size() > max)
+				max = l.points.size();
+		}
+		return max;
 	}
 }
