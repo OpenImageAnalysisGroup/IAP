@@ -94,7 +94,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
 		result.print("res", debug);
 		FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
-		result2.print("res2", debug);
+		result2.print("res2", true);
 		
 		// ***Saved***
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
@@ -102,7 +102,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		ResultsTable rt = new ResultsTable();
 		rt.incrementCounter();
 		
-		rt.addValue("bloom.area.size", probablyBloomFluo.getIO().print("BLOOM AREA", false).countFilledPixels());
+		rt.addValue("bloom.area.size", probablyBloomFluo.getIO().print("BLOOM AREA", debug2).countFilledPixels());
 		
 		rt.addValue("bloom.count", bloomLimbCount);
 		rt.addValue("leaf.count", leafcount);
