@@ -137,13 +137,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			};
 			idxxx++;
-			wait.add(BackgroundThreadDispatcher.addTask(r, getName() + " " + idxxx, getParentPriority() + 1, getParentPriority() + 1));
+			r.run();
+			// wait.add(BackgroundThreadDispatcher.addTask(r, getName() + " " + idxxx, getParentPriority() + 1, getParentPriority() + 1));
 		}
-		try {
-			BackgroundThreadDispatcher.waitFor(wait);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// BackgroundThreadDispatcher.waitFor(wait);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
@@ -431,9 +432,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						System.out.println(">ERROR: Could not load NIR image or reference: " + inNir);
 					}
 				}
-		BackgroundThreadDispatcher.addTask(a, parentPriority + 1, parentPriority + 1);
-		BackgroundThreadDispatcher.addTask(b, parentPriority + 1, parentPriority + 1);
-		BackgroundThreadDispatcher.addTask(c, parentPriority + 1, parentPriority + 1);
+		if (a != null)
+			BackgroundThreadDispatcher.addTask(a, parentPriority + 1, parentPriority + 1);
+		if (b != null)
+			BackgroundThreadDispatcher.addTask(b, parentPriority + 1, parentPriority + 1);
+		if (c != null)
+			BackgroundThreadDispatcher.addTask(c, parentPriority + 1, parentPriority + 1);
 		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, });
 		s.printTime();
 	}
