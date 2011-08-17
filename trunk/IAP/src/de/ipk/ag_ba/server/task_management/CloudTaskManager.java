@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import org.ErrorMsg;
-import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -89,7 +88,7 @@ public class CloudTaskManager {
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
 							progressSum);
 					
-					int maxTasks = SystemAnalysis.getNumberOfCPUs() / 2;
+					int maxTasks = 1;
 					if (maxTasks < 1)
 						maxTasks = 1;
 					
