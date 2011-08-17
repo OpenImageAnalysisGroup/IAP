@@ -46,8 +46,13 @@ public class IntensityAnalysis {
 		result.incrementCounter();
 		
 		if (multiLevel) {
-			result.addValue("intensity.chlorophyl.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
-			result.addValue("intensity.phenol.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
+			if (plantImagePixelCnt > 0) {
+				result.addValue("intensity.chlorophyl.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
+				result.addValue("intensity.phenol.average", sumOfIntensityPhenol / plantImagePixelCnt / 255d);
+			}
+			if (sumOfIntensityChlorophyl > 0)
+				result.addValue("intensity.phenol.chlorophyl.ratio", sumOfIntensityPhenol / sumOfIntensityChlorophyl);
+			
 		}
 		result.addValue("intensity.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
 		

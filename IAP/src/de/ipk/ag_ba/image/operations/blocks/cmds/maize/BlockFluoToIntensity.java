@@ -33,7 +33,7 @@ public class BlockFluoToIntensity extends AbstractSnapshotAnalysisBlockFIS {
 		/**
 		 * @see IntensityAnalysis: r_intensityClassic, g_.., b_...
 		 */
-		fis.print("HHH");
+		// fis.print("HHH");
 		// r.getIO().saveImageOnDesktop("FLUO_C_P_C.png");
 		return r;
 	}
