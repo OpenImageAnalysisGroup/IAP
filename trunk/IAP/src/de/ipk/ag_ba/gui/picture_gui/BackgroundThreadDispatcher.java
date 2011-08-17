@@ -62,6 +62,7 @@ public class BackgroundThreadDispatcher {
 				myInstance.sheduler.interrupt();
 			}
 		}
+		t.run();
 		return t;
 	}
 	
