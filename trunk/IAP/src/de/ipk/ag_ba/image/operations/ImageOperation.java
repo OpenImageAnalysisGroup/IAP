@@ -212,28 +212,45 @@ public class ImageOperation {
 			intensity = 1 - rf / (float) ((255) + gf);
 			if (intensity > 210f / 255f)
 				intensity = 1;
-			switch (type) {
-				case CLASSIC:
-					break;
-				case CHLOROPHYL:
-					Color.RGBtoHSB(rf, gf, 0, hsb);
-					if (intensity < 1)
-						intensity = (1 - (1 - hsb[0] / (60f / 360f)) * hsb[2]);
-					break;
-				case PHENOL:
-					Color.RGBtoHSB(rf, gf, 0, hsb);
-					if (intensity < 1)
-						intensity = 1 - (1 - (1 - hsb[0] / (60f / 360f)) * hsb[2]);
-					break;
-				default:
-					throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");
-			}
+			else
+				switch (type) {
+					case CLASSIC:
+						intensity = intensity / 0.825f;
+						break;
+					case CHLOROPHYL:
+						Color.RGBtoHSB(rf, gf, 0, hsb);
+						hsb[2] = rf / 255f;
+						intensity = 1 - (1 - distanceToRed(hsb[0])) * (hsb[2]);
+						break;
+					case PHENOL:
+						Color.RGBtoHSB(rf, gf, 0, hsb);
+						hsb[2] = rf / 255f;
+						intensity = 1 - distanceToRed(hsb[0]) * (hsb[2]);
+						break;
+					default:
+						throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");
+				}
 			
 			int i = (int) (intensity * 255d);
 			// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
 			in[idx++] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
 		}
 		return new ImageOperation(in, w, h); // new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
+	}
+	
+	/**
+	 * @return 0 ==> Yellow, 1 ==> Red, 0.5 ==> Orange
+	 */
+	public static float distanceToRed(float f) {
+		float red = 0;
+		float yellow = 60f / 360f;
+		if (f < yellow) { // 0 - 0.16)
+			red = f / yellow;
+		} else { // 0.16 - 1
+			f -= yellow;
+			red = 1 - (f / (1 - yellow));
+		}
+		return red;
 	}
 	
 	private float max(int r, int g) {

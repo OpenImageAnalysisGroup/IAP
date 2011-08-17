@@ -213,11 +213,13 @@ public class BackgroundThreadDispatcher {
 							t = todo.get(i);
 							// System.out.println("Start thread " + t.getName() + ". blocked: " + waitThreads.size() + ", max run:" + maxTask + ", running: "
 							// + runningTasks.size() + ", todo:" + todo.size());
-							todo.remove(i);
-							Integer prio = todoPriorities.get(i);
-							todoPriorities.remove(i);
-							t.setName(t.getNameNG() + ", priority:" + prio);
-							// System.out.println(">ABOUT TO START " + t.getNameNG() + " // current scheduler status priority: " + curPrio);
+							if (t != null) {
+								todo.remove(i);
+								Integer prio = todoPriorities.get(i);
+								todoPriorities.remove(i);
+								t.setName(t.getNameNG() + ", priority:" + prio);
+								// System.out.println(">ABOUT TO START " + t.getNameNG() + " // current scheduler status priority: " + curPrio);
+							}
 							break;
 						}
 					}
@@ -274,16 +276,16 @@ public class BackgroundThreadDispatcher {
 							}
 						}
 					}
-					// int highestNOTrunningPrio = Integer.MIN_VALUE;
-					// synchronized (todo) {
-					// for (int i = 0; i < todo.size(); i++) {
-					// int curPrio = (todoPriorities.get(i)).intValue();
-					// if (curPrio > highestNOTrunningPrio)
-					// highestNOTrunningPrio = curPrio;
-					// }
-					// }
-					// if (highestNOTrunningPrio > highestRunningPrio)
-					// break;
+					int highestNOTrunningPrio = Integer.MIN_VALUE;
+					synchronized (todo) {
+						for (int i = 0; i < todo.size(); i++) {
+							int curPrio = (todoPriorities.get(i)).intValue();
+							if (curPrio > highestNOTrunningPrio)
+								highestNOTrunningPrio = curPrio;
+						}
+					}
+					if (highestNOTrunningPrio > highestRunningPrio)
+						break;
 				}
 			}
 		}
@@ -315,7 +317,9 @@ public class BackgroundThreadDispatcher {
 		for (MyThread m : threads)
 			if (m != null)
 				t.add(m);
-		waitFor(t);
+		
+		if (t.size() > 0)
+			waitFor(t);
 	}
 	
 	public static void waitFor(Collection<MyThread> threads) throws InterruptedException {
@@ -323,7 +327,8 @@ public class BackgroundThreadDispatcher {
 		for (MyThread m : threads)
 			t.add(m);
 		threads.clear();
-		waitFor(t);
+		if (t.size() > 0)
+			waitFor(t);
 	}
 	
 	private static void updateTaskStatistics() {

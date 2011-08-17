@@ -642,21 +642,25 @@ public class SkeletonProcessor2d {
 		return new FlexibleImage(plantImg);
 	}
 	
-	public HashSet<Point> detectBloom(FlexibleImage vis, double xf, double yf) {
-		ArrayList<Limb> topLimbs = getTopEndlimbs(0.3);
+	public HashSet<Point> detectBloom(FlexibleImage vis, FlexibleImage fluo, double xf, double yf) {
+		ArrayList<Limb> topLimbs = getTopEndlimbs(1);
 		ArrayList<Limb> bloomLimbs = new ArrayList<Limb>();
 		
 		double maxLen = getMaxLimbLength();
-		
+		Limb minY = getMinLimbY();
 		if (topLimbs != null)
 			for (Limb l : topLimbs) {
 				if (l == null || l.endpoint == null || l.points.size() < 5)
 					continue;
-				if (checkBloomColor(l, vis, xf, yf)) {
-					if (l.points.size() < maxLen * 1d)
-						bloomLimbs.add(l);
+				if (checkBamboEnd(l, vis, xf, yf)) {
+					markLimb(l, background);
+					endlimbs.remove(l);
+				} else {
+					if (l.endpoint.y < minY.endpoint.y + 0.3 * vis.getHeight())
+						if (l.points.size() < maxLen * 0.4d)
+							if (checkBloomColorOnFluo(l, fluo, xf, yf) && checkBloomColorOnVis(l, vis, xf, yf))
+								bloomLimbs.add(l);
 				}
-				
 			}
 		// double avgDist = avgDistBetweenLimbs(bloomLimbs);
 		HashSet<Point> res = new HashSet<Point>();
@@ -668,10 +672,66 @@ public class SkeletonProcessor2d {
 		return res;
 	}
 	
-	private boolean checkBloomColor(Limb l, FlexibleImage vis, double xf, double yf) {
+	private boolean checkBamboEnd(Limb l, FlexibleImage vis, double xf, double yf) {
 		if (vis == null || l == null || l.points == null)
 			return false;
+		
 		int[][] visImg = vis.getAs2A();
+		int r = 0, g, b;
+		
+		int c = visImg[l.endpoint.x][l.endpoint.y];
+		
+		r = ((c & 0xff0000) >> 16); // R 0..1
+		g = ((c & 0x00ff00) >> 8); // G 0..1
+		b = (c & 0x0000ff); // B 0..1
+		
+		if (r == 0 && g == 0 && b == 254)
+			return true;
+		else
+			return false;
+	}
+	
+	private boolean checkBloomColorOnVis(Limb l, FlexibleImage vis, double xf, double yf) {
+		if (vis == null || l == null || l.points == null)
+			return false;
+		
+		int[][] visImg = vis.getAs2A();
+		double lSum = 0, aSum = 0, bSum = 0;
+		int r = 0, g, b, n = 0;
+		float li, ai, bi;
+		
+		for (Point p : l.points) {
+			int c = visImg[p.x][p.y];
+			
+			if (c == ImageOperation.BACKGROUND_COLORint)
+				continue;
+			r = ((c & 0xff0000) >> 16); // R 0..1
+			g = ((c & 0x00ff00) >> 8); // G 0..1
+			b = (c & 0x0000ff); // B 0..1
+			
+			li = ImageOperation.labCube[r][g][b];
+			ai = ImageOperation.labCube[r][g][b + 256];
+			bi = ImageOperation.labCube[r][g][b + 512];
+			
+			lSum += li;
+			aSum += ai;
+			bSum += bi;
+			n++;
+		}
+		lSum = lSum / n;
+		aSum = aSum / n;
+		bSum = bSum / n;
+		// System.out.println("lsum: " + lSum + " aSum: " + aSum + " bSum: " + bSum);
+		if (aSum < 135 && aSum > 100 && bSum > 127 && lSum > 100)
+			return true;
+		else
+			return false;
+	}
+	
+	private boolean checkBloomColorOnFluo(Limb l, FlexibleImage fluo, double xf, double yf) {
+		if (fluo == null || l == null || l.points == null)
+			return false;
+		int[][] visImg = fluo.getAs2A();
 		if (visImg == null)
 			return false;
 		int b;
@@ -691,8 +751,8 @@ public class SkeletonProcessor2d {
 		// int c = visImg[(int) (p.x * xf)][(int) (p.y * yf)];
 		// b = (c & 0x0000ff); // B 0..1
 		// green += b;
-		if (greenMax > 0)
-			System.out.println("green: " + green + ", max: " + greenMax + " l.length: " + l.points.size() + " end: " + l.endpoint.toString());
+		// if (greenMax > 0)
+		// System.out.println("green: " + green + ", max: " + greenMax + " l.length: " + l.points.size() + " end: " + l.endpoint.toString());
 		if (green > 10 && greenMax > 20)
 			return true;
 		else
@@ -726,7 +786,7 @@ public class SkeletonProcessor2d {
 		int[][] visImg = image.getAs2A();
 		int h = image.getHeight();
 		int w = image.getWidth();
-		int cutPositionY = (int) (getMinLimbY().endpoint.y * h / (double) hVis);
+		int cutPositionY = (int) ((getMinLimbY().endpoint.y * h / (double) hVis) - h * 0.05);
 		int r, g, b, c, s = 0;
 		float distToYellow = 0f;
 		float[] hsbvals = new float[3];
@@ -752,6 +812,8 @@ public class SkeletonProcessor2d {
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = cutPositionY - s; y < cutPositionY + h * 0.1; y++) {
+				if (y < 0)
+					continue;
 				c = visImg[x][y];
 				if (c != ImageOperation.BACKGROUND_COLORint) {
 					r = ((c & 0xff0000) >> 16); // R 0..1

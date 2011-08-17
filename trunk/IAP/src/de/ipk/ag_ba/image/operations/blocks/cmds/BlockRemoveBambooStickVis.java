@@ -3,6 +3,8 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
@@ -64,8 +66,8 @@ public class BlockRemoveBambooStickVis extends AbstractSnapshotAnalysisBlockFIS 
 		int[] origarr = mask.getAs1A();
 		
 		int clusterSize = 9;
-		
-		mainLoop: for (int y = 0; y < height; y++) {
+		int y, lastX = -1, n = 0;
+		mainLoop: for (y = 0; y < height; y++) {
 			for (int x = widthQuarter; x < widthQuarter * 3; x++) {
 				int ya = yellowarr[y * width + x];
 				if (ya != background) {
@@ -78,28 +80,42 @@ public class BlockRemoveBambooStickVis extends AbstractSnapshotAnalysisBlockFIS 
 			}
 			if (numberOfClusterPerLine <= 1) {
 				numberOfClusterPerLine = 0;
-				clearLine(width, origarr, yellowarr, y, background, clusterSize);
+				int lx = clearLine(width, origarr, yellowarr, y, background, clusterSize);
+				if (lx > 0) {
+					lastX = lx;
+					n++;
+				}
 			} else {
 				break mainLoop;
 			}
 		}
-		return new FlexibleImage(width, height, origarr);
+		if (lastX > 0 && n > 10)
+			return new FlexibleImage(width, height, origarr).getIO().getCanvas().fillRect(lastX - 8, y - 16, 16, 32, new Color(0, 0, 254).getRGB()).getImage();
+		else
+			return new FlexibleImage(width, height, origarr);
 	}
 	
-	private void clearLine(int w, int[] orig, int[] yellow, int y, int background, int clusterSize) {
+	private int clearLine(int w, int[] orig, int[] yellow, int y, int background, int clusterSize) {
 		int count = 0;
 		int yw = y * w;
+		int sumX = 0, n = 0;
 		for (int x = w / 4; x < w * 3d / 4d; x++) {
 			if (yellow[x + yw] != background)
 				count++;
 			else
 				if (count > clusterSize) {
 					clearPixel(count, x, yw, orig, background);
+					sumX += x;
+					n++;
 					count = 0;
 				} else {
 					count = 0;
 				}
 		}
+		if (n > 0)
+			return sumX / n;
+		else
+			return -1;
 	}
 	
 	public void clearPixel(int count, int startX, int yw, int[] orig, int background) {
