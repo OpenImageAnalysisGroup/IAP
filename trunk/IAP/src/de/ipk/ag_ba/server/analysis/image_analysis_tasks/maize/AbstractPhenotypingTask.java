@@ -376,51 +376,61 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">LOAD", false);
 		MyThread a = null, b = null, c = null;
 		if (inVis != null) {
-			if (inVis instanceof LoadedImage) {
-				input.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImage()));
-				inputMasks.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImageLabelField()));
-			} else {
-				try {
-					MyByteArrayInputStream optMainImageContent = ResourceIOManager.getInputStreamMemoryCached(inVis.getURL());
-					MyByteArrayInputStream optLabelImageContent = inVis.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(inVis.getLabelURL())
-							: null;
-					a = load(inVis, input, inputMasks, FlexibleImageType.VIS,
-							optMainImageContent, optLabelImageContent);
-				} catch (Exception e) {
-					System.out.println(">ERROR: Could not load VIS image or reference: " + inVis);
+			if (inVis.getAnnotationField("outlier") != null && inVis.getAnnotationField("outlier").equals("1")) {
+				System.out.println("INFO: Ignore marked outlier: " + inVis);
+			} else
+				if (inVis instanceof LoadedImage) {
+					input.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImage()));
+					inputMasks.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImageLabelField()));
+				} else {
+					try {
+						MyByteArrayInputStream optMainImageContent = ResourceIOManager.getInputStreamMemoryCached(inVis.getURL());
+						MyByteArrayInputStream optLabelImageContent = inVis.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(inVis.getLabelURL())
+								: null;
+						a = load(inVis, input, inputMasks, FlexibleImageType.VIS,
+								optMainImageContent, optLabelImageContent);
+					} catch (Exception e) {
+						System.out.println(">ERROR: Could not load VIS image or reference: " + inVis);
+					}
 				}
-			}
 		}
 		
 		if (inFluo != null)
-			if (inFluo instanceof LoadedImage) {
-				input.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImage()));
-				inputMasks.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImageLabelField()));
-			} else {
-				try {
-					MyByteArrayInputStream optMainImageContent = ResourceIOManager.getInputStreamMemoryCached(inFluo.getURL());
-					MyByteArrayInputStream optLabelImageContent = inFluo.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(inFluo.getLabelURL())
-							: null;
-					b = load(inFluo, input, inputMasks, FlexibleImageType.FLUO, optMainImageContent, optLabelImageContent);
-				} catch (Exception e) {
-					System.out.println(">ERROR: Could not load FLUO image or reference: " + inFluo);
+			if (inFluo.getAnnotationField("outlier") != null && inVis.getAnnotationField("outlier").equals("1")) {
+				System.out.println("INFO: Ignore marked outlier: " + inFluo);
+			} else
+				if (inFluo instanceof LoadedImage) {
+					input.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImage()));
+					inputMasks.setFluo(new FlexibleImage(((LoadedImage) inFluo).getLoadedImageLabelField()));
+				} else {
+					try {
+						MyByteArrayInputStream optMainImageContent = ResourceIOManager.getInputStreamMemoryCached(inFluo.getURL());
+						MyByteArrayInputStream optLabelImageContent = inFluo.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(inFluo
+								.getLabelURL())
+								: null;
+						b = load(inFluo, input, inputMasks, FlexibleImageType.FLUO, optMainImageContent, optLabelImageContent);
+					} catch (Exception e) {
+						System.out.println(">ERROR: Could not load FLUO image or reference: " + inFluo);
+					}
 				}
-			}
 		
 		if (inNir != null)
-			if (inNir instanceof LoadedImage) {
-				input.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImage()));
-				inputMasks.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImageLabelField()));
-			} else {
-				try {
-					MyByteArrayInputStream optMainImageContent = ResourceIOManager.getInputStreamMemoryCached(inNir.getURL());
-					MyByteArrayInputStream optLabelImageContent = inNir.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(inNir.getLabelURL())
-							: null;
-					c = load(inNir, input, inputMasks, FlexibleImageType.NIR, optMainImageContent, optLabelImageContent);
-				} catch (Exception e) {
-					System.out.println(">ERROR: Could not load NIR image or reference: " + inNir);
+			if (inNir.getAnnotationField("outlier") != null && inNir.getAnnotationField("outlier").equals("1")) {
+				System.out.println("INFO: Ignore marked outlier: " + inNir);
+			} else
+				if (inNir instanceof LoadedImage) {
+					input.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImage()));
+					inputMasks.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImageLabelField()));
+				} else {
+					try {
+						MyByteArrayInputStream optMainImageContent = ResourceIOManager.getInputStreamMemoryCached(inNir.getURL());
+						MyByteArrayInputStream optLabelImageContent = inNir.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(inNir.getLabelURL())
+								: null;
+						c = load(inNir, input, inputMasks, FlexibleImageType.NIR, optMainImageContent, optLabelImageContent);
+					} catch (Exception e) {
+						System.out.println(">ERROR: Could not load NIR image or reference: " + inNir);
+					}
 				}
-			}
 		BackgroundThreadDispatcher.addTask(a, parentPriority + 1, parentPriority + 1);
 		BackgroundThreadDispatcher.addTask(b, parentPriority + 1, parentPriority + 1);
 		BackgroundThreadDispatcher.addTask(c, parentPriority + 1, parentPriority + 1);
