@@ -322,6 +322,8 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 			String anno = a;
 			String[] fields = anno.split(";");
 			for (String f : fields) {
+				if (f.length() == 0)
+					continue;
 				String[] nn = f.split("#", 2);
 				if (res.length() > 0)
 					res.append(";");

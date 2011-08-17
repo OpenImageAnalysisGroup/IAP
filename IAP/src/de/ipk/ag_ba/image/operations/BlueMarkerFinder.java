@@ -20,7 +20,7 @@ public class BlueMarkerFinder {
 	private ResultsTable resultTable;
 	private final double scale;
 	private final CameraPosition typ;
-	private boolean maize;
+	private final boolean maize;
 	
 	public BlueMarkerFinder(FlexibleImage image, double scale, CameraPosition typ, boolean maize) {
 		this.input = image;
@@ -81,12 +81,12 @@ public class BlueMarkerFinder {
 		ArrayList<MarkerPair> result = new ArrayList<MarkerPair>();
 		
 		if (coordinatesUnfiltered == null) {
-			System.out.println("ERROR: No blue marker coordinates (null)!");
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: No blue marker coordinates (null)!");
 			return result;
 		}
 		
 		if (coordinatesUnfiltered.isEmpty()) {
-			System.out.println("INFO: No blue marker coordinates (empty). Image " + input + " //" + typ + " // " + SystemAnalysisExt.getCurrentTime());
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: No blue marker coordinates (empty). Image " + input + " //" + typ);
 			return result;
 		}
 		
