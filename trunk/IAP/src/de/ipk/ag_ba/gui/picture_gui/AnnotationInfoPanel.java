@@ -1,0 +1,108 @@
+package de.ipk.ag_ba.gui.picture_gui;
+
+import info.clearthought.layout.TableLayout;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+
+public class AnnotationInfoPanel extends JPanel {
+	
+	private final DataSetFileButton imageButton;
+	private final MongoTreeNode mt;
+	private JCheckBox cbO;
+	private JCheckBox cbF;
+	
+	public AnnotationInfoPanel(DataSetFileButton imageButton, MongoTreeNode mt) {
+		this.imageButton = imageButton;
+		this.mt = mt;
+	}
+	
+	public void removeGui() {
+		addGui(true);
+	}
+	
+	public void addGui() {
+		addGui(false);
+	}
+	
+	public void addGui(boolean onlyChecked) {
+		removeAll();
+		ArrayList<JComponent> anno = getAnnotationElements(onlyChecked);
+		setLayout(TableLayout.getLayout(TableLayout.PREFERRED, TableLayout.PREFERRED, 1, anno.size()));
+		int idx = 0;
+		for (JComponent a : anno)
+			add(a, "0," + (idx++));
+		revalidate();
+		
+	}
+	
+	private ArrayList<JComponent> getAnnotationElements(boolean onlyChecked) {
+		if (cbO == null) {
+			cbO = new JCheckBox("Outlier");
+			MappingDataEntity mde = imageButton.imageResult.getBinaryFileInfo().entity;
+			if (mde != null && mde instanceof ImageData) {
+				modifyFlagGui((ImageData) mde, "outlier", cbO);
+			}
+		}
+		if (cbF == null) {
+			cbF = new JCheckBox("Flagged");
+			MappingDataEntity mde = imageButton.imageResult.getBinaryFileInfo().entity;
+			if (mde != null && mde instanceof ImageData) {
+				modifyFlagGui((ImageData) mde, "flagged", cbF);
+			}
+		}
+		ArrayList<JComponent> res = new ArrayList<JComponent>();
+		if (cbO != null && (!onlyChecked || cbO.isSelected()))
+			res.add(cbO);
+		if (cbF != null && (!onlyChecked || cbF.isSelected()))
+			res.add(cbF);
+		return res;
+	}
+	
+	private void modifyFlagGui(final ImageData id, final String key, final JCheckBox cb) {
+		String f = id.getAnnotationField(key);
+		if (f != null && f.equals("1"))
+			cb.setSelected(true);
+		cb.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String a = id.getAnnotationField(key);
+				if (cb.isSelected()) {
+					if (a != null)
+						id.addAnnotationField(key, "1");
+					else
+						id.replaceAnnotationField(key, "1");
+				} else {
+					if (a != null)
+						id.replaceAnnotationField(key, "");
+					else
+						id.addAnnotationField(key, "");
+				}
+			}
+		});
+	}
+	
+	private long callTime = 0;
+	
+	public void removeGuiLater() {
+		callTime = System.currentTimeMillis();
+		final long callTime2 = callTime;
+		Timer rt = new Timer(3000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (callTime2 == callTime)
+					removeGui();
+			}
+		});
+		rt.start();
+	}
+}
