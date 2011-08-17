@@ -19,7 +19,7 @@ public class BinaryFileInfo {
 	
 	private IOurl fileNameMain, fileNameLabel;
 	private final boolean primary;
-	private final MappingDataEntity entity;
+	final MappingDataEntity entity;
 	
 	public BinaryFileInfo(IOurl fileNameMain, IOurl fileNameLabel, boolean primary, MappingDataEntity entity) {
 		this.fileNameMain = fileNameMain;

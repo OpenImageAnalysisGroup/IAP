@@ -5,6 +5,10 @@
  */
 package de.ipk.ag_ba.gui.picture_gui;
 
+import info.clearthought.layout.TableLayout;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -354,7 +359,14 @@ public class DataExchangeHelperForExperiments {
 				// soll der Button hinzugefügt werden
 				if (mt == expTree.getSelectionPath().getLastPathComponent() &&
 									DataSetFileButton.ICON_WIDTH == tw) {
-					filePanel.add(imageButton);
+					final AnnotationInfoPanel aip = new AnnotationInfoPanel(imageButton, mt);
+					JComponent buttonAndInfo = TableLayout.getSplitVertical(aip, imageButton, TableLayout.PREFERRED,
+							TableLayout.PREFERRED);
+					imageButton.addMouseListener(getML(aip));
+					buttonAndInfo.addMouseListener(getML(aip));
+					filePanel.add(
+							buttonAndInfo
+							);
 					filePanel.validate();
 					filePanel.repaint();
 					filePanel.getScrollpane().validate();
@@ -401,6 +413,32 @@ public class DataExchangeHelperForExperiments {
 					});
 				} else
 					stop.setStopWanted(true);
+			}
+			
+			private MouseListener getML(final AnnotationInfoPanel aip) {
+				return new MouseListener() {
+					@Override
+					public void mouseReleased(MouseEvent e) {
+					}
+					
+					@Override
+					public void mousePressed(MouseEvent e) {
+					}
+					
+					@Override
+					public void mouseExited(MouseEvent e) {
+						aip.removeGuiLater();
+					}
+					
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						aip.addGui();
+					}
+					
+					@Override
+					public void mouseClicked(MouseEvent e) {
+					}
+				};
 			}
 		};
 	}
