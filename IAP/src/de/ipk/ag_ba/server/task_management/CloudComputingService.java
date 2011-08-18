@@ -11,10 +11,14 @@ import info.StopWatch;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
@@ -211,7 +215,7 @@ public class CloudComputingService {
 		try {
 			DataMappingTypeManager3D.replaceVantedMappingTypeManager();
 			
-			MongoDB m = MongoDB.getDefaultCloud();
+			final MongoDB m = MongoDB.getDefaultCloud();
 			ArrayList<ExperimentHeaderInterface> el = m.getExperimentList(null);
 			HashSet<TempDataSetDescription> availableTempDatasets = new HashSet<TempDataSetDescription>();
 			for (ExperimentHeaderInterface i : el) {
@@ -254,22 +258,42 @@ public class CloudComputingService {
 				if (knownResults.size() + 1 >= cmd.getPartCntI()) {
 					System.out.println("*****************************");
 					System.out.println("MERGE INDEX: " + cmd.getPartCntI() + "/" + cmd.getPartCnt() + ", RESULTS AVAILABLE: " + knownResults.size());
-					Experiment e = new Experiment();
+					final Experiment e = new Experiment();
 					long tFinish = System.currentTimeMillis();
-					int wl = knownResults.size();
-					int idx = 0;
-					for (ExperimentHeaderInterface i : knownResults) {
-						ExperimentInterface ei = m.getExperiment(i);
-						String[] cc = i.getExperimentName().split("§");
-						idx++;
-						if (ei.getNumberOfMeasurementValues() > 0)
-							System.out.print(idx + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2] + ": " + ei.getNumberOfMeasurementValues());
-						e.addAndMerge(ei);
-						System.out.println(" ==> " + e.getNumberOfMeasurementValues() + " // job submission: "
-								+ SystemAnalysisExt.getCurrentTime(Long.parseLong(cc[3]))
-								+ " // storage time: "
-								+ SystemAnalysisExt.getCurrentTime(ei.getHeader().getStorageTime().getTime()));
+					final int wl = knownResults.size();
+					final ThreadSafeOptions tso = new ThreadSafeOptions();
+					final Runtime r = Runtime.getRuntime();
+					ExecutorService es = Executors.newFixedThreadPool(8);
+					for (ExperimentHeaderInterface ii : knownResults) {
+						final ExperimentHeaderInterface i = ii;
+						Runnable rr = new Runnable() {
+							@Override
+							public void run() {
+								System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+										+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
+								ExperimentInterface ei = m.getExperiment(i);
+								String[] cc = i.getExperimentName().split("§");
+								tso.addInt(1);
+								System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2] + ": "
+											+ ei.getNumberOfMeasurementValues());
+								int mv;
+								synchronized (e) {
+									StopWatch s = new StopWatch(">e.addMerge");
+									e.addAndMerge(ei);
+									mv = e.getNumberOfMeasurementValues();
+									s.printTime();
+								}
+								System.out.print(" ==> ");
+								System.out.println(mv + " // job submission: "
+										+ SystemAnalysisExt.getCurrentTime(Long.parseLong(cc[3]))
+										+ " // storage time: "
+										+ SystemAnalysisExt.getCurrentTime(ei.getHeader().getStorageTime().getTime()));
+							}
+						};
+						es.execute(rr);
 					}
+					es.shutdown();
+					es.awaitTermination(31, TimeUnit.DAYS);
 					String sn = cmd.getRemoteCapableAnalysisActionClassName();
 					if (sn.indexOf(".") > 0)
 						sn = sn.substring(sn.lastIndexOf(".") + 1);
