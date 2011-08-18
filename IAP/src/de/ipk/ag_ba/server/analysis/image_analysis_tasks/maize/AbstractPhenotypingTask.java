@@ -55,7 +55,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
-	boolean threaded = false;
 	
 	private Collection<Sample3D> input = new ArrayList<Sample3D>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
@@ -314,14 +313,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							}
 						};
 						
-						if (threaded) {
-							MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image", getParentPriority() + 1, getParentPriority() + 2);
-							MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image", getParentPriority() + 1, getParentPriority() + 2);
-							BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b });
-						} else {
-							r1.run();
-							r2.run();
-						}
+						MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image", getParentPriority() + 1, getParentPriority() + 2);
+						MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image", getParentPriority() + 1, getParentPriority() + 2);
+						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b });
+						
 						li = new LoadedImage(id,
 								(BufferedImage) mainImg.getObject(),
 								(BufferedImage) labelImg.getObject());
@@ -440,19 +435,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						System.out.println(">ERROR: Could not load NIR image or reference: " + inNir);
 					}
 				}
-		if (threaded) {
-			if (a != null)
-				BackgroundThreadDispatcher.addTask(a, parentPriority + 1, parentPriority + 1);
-			if (b != null)
-				BackgroundThreadDispatcher.addTask(b, parentPriority + 1, parentPriority + 1);
-			if (c != null)
-				BackgroundThreadDispatcher.addTask(c, parentPriority + 1, parentPriority + 1);
-			BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, });
-		} else {
-			a.run();
-			b.run();
-			c.run();
-		}
+		if (a != null)
+			BackgroundThreadDispatcher.addTask(a, parentPriority + 1, parentPriority + 1);
+		if (b != null)
+			BackgroundThreadDispatcher.addTask(b, parentPriority + 1, parentPriority + 1);
+		if (c != null)
+			BackgroundThreadDispatcher.addTask(c, parentPriority + 1, parentPriority + 1);
+		BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, });
+		
 		s.printTime();
 	}
 	
@@ -522,16 +512,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				rb = saveImage(inFluo, resFluo, buf, ".tiff");
 			if (resNir != null)
 				rc = saveImage(inNir, resNir, buf, ".tiff");
-			if (threaded) {
-				a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5);
-				b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5);
-				c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5);
-				BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
-			} else {
-				ra.run();
-				rb.run();
-				rc.run();
-			}
+			
+			a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5);
+			b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5);
+			c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5);
+			BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 		}
 		s.printTime();
 	}

@@ -230,12 +230,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 			
 		}
 		
-		try {
-			BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			ErrorMsg.addErrorMessage(e);
-		}
+		BackgroundThreadDispatcher.waitFor(wait.toArray(new MyThread[] {}));
 		
 		status.setCurrentStatusValueFine(100d);
 		input = null;

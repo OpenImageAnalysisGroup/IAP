@@ -38,6 +38,8 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 			
 			int n = 0;
 			int i = 1;
+			if (getProperties() == null)
+				System.out.println("CHECK");
 			for (MarkerPair mp : numericResult) {
 				if (mp.getLeft() != null) {
 					getProperties().setNumericProperty(0, PropertyNames.getPropertyName(i), mp.getLeft().x / w);

@@ -7,7 +7,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockMatchBrightness extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISimage() throws InterruptedException {
+	protected FlexibleImage processVISimage() {
 		return match(getInput().getImages().getVis(), getInput().getMasks().getVis());
 	}
 	
@@ -50,12 +50,12 @@ public class BlockMatchBrightness extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOimage() throws InterruptedException {
+	protected FlexibleImage processFLUOimage() {
 		return match(getInput().getImages().getFluo(), getInput().getMasks().getFluo());
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() throws InterruptedException {
+	protected FlexibleImage processNIRimage() {
 		return match(getInput().getImages().getNir(), getInput().getMasks().getNir());
 	}
 }

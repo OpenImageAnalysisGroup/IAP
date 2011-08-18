@@ -29,15 +29,15 @@ import de.ipk.ag_ba.image.structures.FlexibleImageStack;
  */
 public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private boolean debug = false;
-	private boolean debug2 = false;
+	private final boolean debug = false;
+	private final boolean debug2 = false;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
 		FlexibleImage fluo = getInput().getMasks().getFluo() != null ? getInput().getMasks().getFluo().copy() : null;
 		FlexibleImage res = vis;
-		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null) {
+		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
 			FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
 					// .closing(3, 3)
 					// .erode()

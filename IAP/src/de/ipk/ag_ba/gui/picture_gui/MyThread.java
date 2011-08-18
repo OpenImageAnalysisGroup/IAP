@@ -24,10 +24,11 @@ public class MyThread extends Thread implements Runnable {
 	public static final boolean NEW_SCHEDULER = false;
 	
 	private boolean finished = false;
+	private boolean started = false;
 	private final Runnable r;
 	private final Semaphore sem;
 	private String name;
-	private Runnable runCode;
+	private final Runnable runCode;
 	
 	public MyThread(Runnable r, String name) {
 		// super(r, name);
@@ -46,12 +47,13 @@ public class MyThread extends Thread implements Runnable {
 	@Override
 	public void run() {
 		try {
+			started = true;
 			// super.run();
 			runCode.run();
-		} catch (Error err1) {
-			err1.printStackTrace();
-		} catch (Exception err2) {
-			err2.printStackTrace();
+			// } catch (Error err1) {
+			// err1.printStackTrace();
+			// } catch (Exception err2) {
+			// err2.printStackTrace();
 		} finally {
 			finished = true;
 			sem.release();
@@ -60,6 +62,10 @@ public class MyThread extends Thread implements Runnable {
 	
 	public boolean isFinished() {
 		return finished;
+	}
+	
+	public boolean isStarted() {
+		return started;
 	}
 	
 	public Object getResult() throws InterruptedException {
@@ -100,6 +106,7 @@ public class MyThread extends Thread implements Runnable {
 	}
 	
 	public void startNG(ExecutorService es) {
+		started = true;
 		if (NEW_SCHEDULER)
 			es.submit(this);
 		else

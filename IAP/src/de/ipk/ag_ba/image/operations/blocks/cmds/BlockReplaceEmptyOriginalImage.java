@@ -13,7 +13,7 @@ public class BlockReplaceEmptyOriginalImage extends AbstractBlock {
 	private static final int sz = 128 - 5;
 	
 	@Override
-	protected FlexibleImage processVISimage() throws InterruptedException {
+	protected FlexibleImage processVISimage() {
 		FlexibleImage image = getInput().getImages().getVis();
 		IOurl infoUrl = getInput().getImages().getVisInfo() != null ? getInput().getImages().getVisInfo().getURL() : null;
 		image = processImage(image, infoUrl);
@@ -21,7 +21,7 @@ public class BlockReplaceEmptyOriginalImage extends AbstractBlock {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOimage() throws InterruptedException {
+	protected FlexibleImage processFLUOimage() {
 		FlexibleImage image = getInput().getImages().getFluo();
 		IOurl infoUrl = getInput().getImages().getFluoInfo() != null ? getInput().getImages().getFluoInfo().getURL() : null;
 		image = processImage(image, infoUrl);
@@ -29,7 +29,7 @@ public class BlockReplaceEmptyOriginalImage extends AbstractBlock {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() throws InterruptedException {
+	protected FlexibleImage processNIRimage() {
 		FlexibleImage image = getInput().getImages().getNir();
 		IOurl infoUrl = getInput().getImages().getNirInfo() != null ? getInput().getImages().getNirInfo().getURL() : null;
 		image = processImage(image, infoUrl);

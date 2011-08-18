@@ -11,32 +11,32 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	protected abstract FlexibleImage processMask(FlexibleImage mask);
 	
 	@Override
-	protected FlexibleImage processVISimage() throws InterruptedException {
+	protected FlexibleImage processVISimage() {
 		return processImage(getInput().getImages().getVis());
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOimage() throws InterruptedException {
+	protected FlexibleImage processFLUOimage() {
 		return processImage(getInput().getImages().getFluo());
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() throws InterruptedException {
+	protected FlexibleImage processNIRimage() {
 		return processImage(getInput().getImages().getNir());
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() throws InterruptedException {
+	protected FlexibleImage processVISmask() {
 		return processMask(getInput().getMasks().getVis());
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() throws InterruptedException {
+	protected FlexibleImage processFLUOmask() {
 		return processMask(getInput().getMasks().getFluo());
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() throws InterruptedException {
+	protected FlexibleImage processNIRmask() {
 		return processMask(getInput().getMasks().getNir());
 	}
 }

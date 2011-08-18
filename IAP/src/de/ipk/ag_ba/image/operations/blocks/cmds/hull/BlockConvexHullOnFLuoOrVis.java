@@ -22,7 +22,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class BlockConvexHullOnFLuoOrVis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
-	protected FlexibleImage processVISmask() throws InterruptedException {
+	protected FlexibleImage processVISmask() {
 		FlexibleImage image = getInput().getMasks().getVis();
 		if (!options.isMaize()) {
 			ImageData info = getInput().getImages().getVisInfo();
@@ -33,7 +33,7 @@ public class BlockConvexHullOnFLuoOrVis extends AbstractSnapshotAnalysisBlockFIS
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() throws InterruptedException {
+	protected FlexibleImage processFLUOmask() {
 		FlexibleImage image = getInput().getMasks().getFluo();
 		if (options.isMaize()) {
 			ImageData info = getInput().getImages().getFluoInfo();
