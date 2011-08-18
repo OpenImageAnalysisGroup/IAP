@@ -421,9 +421,21 @@ public class MongoDB {
 		StringBuilder errors = new StringBuilder();
 		int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
 				MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK });
+		
+		if (status != null || (status != null && !status.wantsToStop()))
+			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Determine Size");
+		{
+			long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
+			experiment.getHeader().setSizekb(l / 1024);
+		}
+		
 		List<DBObject> dbSubstances = new ArrayList<DBObject>();
 		HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
-		for (SubstanceInterface s : experiment) {
+		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>(experiment);
+		experiment.clear();
+		while (!sl.isEmpty()) {
+			SubstanceInterface s = sl.get(0);
+			sl.remove(0);
 			if (status != null && status.wantsToStop())
 				break;
 			if (status != null)
@@ -591,13 +603,9 @@ public class MongoDB {
 				substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 		
 		if (status != null || (status != null && !status.wantsToStop()))
-			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Determine Size");
-		long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
-		if (status != null || (status != null && !status.wantsToStop()))
 			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Finalize Storage");
 		
 		// l = overallFileSize.getLong(); // in case of update the written bytes are not the right size
-		experiment.getHeader().setSizekb(l / 1024);
 		experiment.getHeader().setStorageTime(new Date());
 		
 		experiment.fillAttributeMap(attributes);
