@@ -273,7 +273,19 @@ public class CloudComputingService {
 										+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 								ExperimentInterface ei = m.getExperiment(i);
 								String[] cc = i.getExperimentName().split("§");
-								tso.addInt(1);
+								synchronized (tso) {
+									tso.addInt(1);
+									if (tso.getInt() != 1) {
+										// weight_before, water_weight, water_sum
+										ArrayList<SubstanceInterface> del = new ArrayList<SubstanceInterface>();
+										for (SubstanceInterface si : ei) {
+											if (si.getName().equals("weight_before") || si.getName().equals("water_weight") || si.getName().equals("water_sum"))
+												del.add(si);
+										}
+										for (SubstanceInterface d : del)
+											ei.remove(d);
+									}
+								}
 								System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
 								// + ": "+ ei.getNumberOfMeasurementValues());
 								// int mv;
