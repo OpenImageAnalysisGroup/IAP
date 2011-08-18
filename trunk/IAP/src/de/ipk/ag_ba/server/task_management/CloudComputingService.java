@@ -263,7 +263,7 @@ public class CloudComputingService {
 					final int wl = knownResults.size();
 					final ThreadSafeOptions tso = new ThreadSafeOptions();
 					final Runtime r = Runtime.getRuntime();
-					ExecutorService es = Executors.newFixedThreadPool(8);
+					ExecutorService es = Executors.newFixedThreadPool(2);
 					for (ExperimentHeaderInterface ii : knownResults) {
 						final ExperimentHeaderInterface i = ii;
 						Runnable rr = new Runnable() {
@@ -276,18 +276,20 @@ public class CloudComputingService {
 								tso.addInt(1);
 								System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2] + ": "
 											+ ei.getNumberOfMeasurementValues());
-								int mv;
+								// int mv;
 								synchronized (e) {
 									StopWatch s = new StopWatch(">e.addMerge");
 									e.addAndMerge(ei);
-									mv = e.getNumberOfMeasurementValues();
+									// mv = e.getNumberOfMeasurementValues();
 									s.printTime();
+									ei.clear();
+									ei = null;
 								}
-								System.out.print(" ==> ");
-								System.out.println(mv + " // job submission: "
-										+ SystemAnalysisExt.getCurrentTime(Long.parseLong(cc[3]))
-										+ " // storage time: "
-										+ SystemAnalysisExt.getCurrentTime(ei.getHeader().getStorageTime().getTime()));
+								// System.out.print(" ==> ");
+								// System.out.println(mv + " // job submission: "
+								// + SystemAnalysisExt.getCurrentTime(Long.parseLong(cc[3]))
+								// + " // storage time: "
+								// + SystemAnalysisExt.getCurrentTime(ei.getHeader().getStorageTime().getTime()));
 							}
 						};
 						es.execute(rr);
@@ -323,6 +325,7 @@ public class CloudComputingService {
 					
 					System.out.println("> SAVE COMBINED EXPERIMENT...");
 					m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
+					e.clear();
 					System.out.println("> DELETE TEMP DATA...");
 					for (ExperimentHeaderInterface i : knownResults) {
 						try {
