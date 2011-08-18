@@ -17,7 +17,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	}
 	
 	@Override
-	protected FlexibleMaskAndImageSet run() throws InterruptedException {
+	protected FlexibleMaskAndImageSet run() {
 		int parentPriority = getParentPriority();
 		final FlexibleImageSet processedImages = new FlexibleImageSet(getInput().getImages());
 		final FlexibleImageSet processedMasks = new FlexibleImageSet(getInput().getImages());
@@ -83,22 +83,12 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
-						try {
-							processedMasks.setFluo(processFLUOmask());
-						} catch (Exception e) {
-							e.printStackTrace();
-							ErrorMsg.addErrorMessage(e);
-						}
+						processedMasks.setFluo(processFLUOmask());
 					}
 				}, name + " process FLU mask", 1, parentPriority), BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
-						try {
-							processedMasks.setNir(processNIRmask());
-						} catch (Exception e) {
-							e.printStackTrace();
-							ErrorMsg.addErrorMessage(e);
-						}
+						processedMasks.setNir(processNIRmask());
 					}
 				}, name + " process NIR mask", 1, parentPriority) });
 		
@@ -124,27 +114,35 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		// empty
 	}
 	
-	protected FlexibleImage processVISimage() throws InterruptedException {
+	protected FlexibleImage processVISimage() {
 		return getInput().getImages().getVis();
 	}
 	
-	protected FlexibleImage processFLUOimage() throws InterruptedException {
+	protected FlexibleImage processFLUOimage() {
 		return getInput().getImages().getFluo();
 	}
 	
-	protected FlexibleImage processNIRimage() throws InterruptedException {
+	protected FlexibleImage processNIRimage() {
 		return getInput().getImages().getNir();
 	}
 	
-	protected FlexibleImage processVISmask() throws InterruptedException {
+	protected FlexibleImage processVISmask() {
 		return getInput().getMasks().getVis();
 	}
 	
-	protected FlexibleImage processFLUOmask() throws InterruptedException {
+	protected FlexibleImage processFLUOmask() {
+		if (getInput() == null)
+			System.out.println("ERROR 1");
+		if (getInput().getMasks() == null)
+			System.out.println("ERROR 2");
 		return getInput().getMasks().getFluo();
 	}
 	
-	protected FlexibleImage processNIRmask() throws InterruptedException {
+	protected FlexibleImage processNIRmask() {
+		if (getInput() == null)
+			System.out.println("ERROR 1");
+		if (getInput().getMasks() == null)
+			System.out.println("ERROR 2");
 		return getInput().getMasks().getNir();
 	}
 	

@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 public class BlockNirProcessing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleMaskAndImageSet run() throws InterruptedException {
+	protected FlexibleMaskAndImageSet run() {
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (getInput().getImages().getNir() != null && getInput().getMasks().getNir() != null) {
 				FlexibleImage nirMask = getInput().getMasks().getNir();

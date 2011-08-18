@@ -20,6 +20,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.mongo.IAPservice;
@@ -93,6 +94,7 @@ public class CloudComputingService {
 		System.out.println("***************************************************");
 		System.out.println(SystemAnalysisExt.getCurrentTime() + "> SYSTEM ANALYSIS");
 		boolean clusterExecutionMode = false;
+		BackgroundThreadDispatcher.useThreads = false;
 		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
 			SystemInfoExt info = new SystemInfoExt();
 			System.out.println("Sockets        : " + info.getCpuSockets());

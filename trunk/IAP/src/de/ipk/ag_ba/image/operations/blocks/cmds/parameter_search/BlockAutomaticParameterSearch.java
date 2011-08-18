@@ -3,7 +3,6 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import org.ErrorMsg;
 import org.ObjectRef;
 import org.Vector2d;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -320,12 +319,8 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 					}, "Inner loop " + operation, 1, parentPriority));
 		}
 		
-		try {
-			BackgroundThreadDispatcher.waitFor(tl);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			ErrorMsg.addErrorMessage(e);
-		}
+		BackgroundThreadDispatcher.waitFor(tl);
+		
 		return zaehler;
 	}
 	

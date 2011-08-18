@@ -445,7 +445,7 @@ public class DataExchangeHelperForExperiments {
 	
 	private static void clearPanel(final DataSetFilePanel filePanel, final MongoTreeNode mt, final JTree expTree) {
 		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
+			Runnable r = new Runnable() {
 				public void run() {
 					if (mt == expTree.getSelectionPath().getLastPathComponent()) {
 						filePanel.removeAll();
@@ -454,7 +454,11 @@ public class DataExchangeHelperForExperiments {
 						filePanel.getScrollpane().validate();
 					}
 				}
-			});
+			};
+			if (SwingUtilities.isEventDispatchThread())
+				r.run();
+			else
+				SwingUtilities.invokeAndWait(r);
 		} catch (InterruptedException e2) {
 			SupplementaryFilePanelMongoDB.showError("InterruptedException", e2);
 		} catch (InvocationTargetException e2) {

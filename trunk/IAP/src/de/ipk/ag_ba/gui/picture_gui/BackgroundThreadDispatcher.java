@@ -27,6 +27,8 @@ public class BackgroundThreadDispatcher {
 	Stack<Integer> todoPriorities = new Stack<Integer>();
 	LinkedList<MyThread> runningTasks = new LinkedList<MyThread>();
 	
+	public static boolean useThreads = true;
+	
 	int indicator = 0;
 	
 	public static String projectLoading = " PLEASE WAIT - Loading Experimental Data";
@@ -62,7 +64,8 @@ public class BackgroundThreadDispatcher {
 				myInstance.sheduler.interrupt();
 			}
 		}
-		t.run();
+		if (!useThreads && userPriority != Integer.MIN_VALUE)
+			t.run();
 		return t;
 	}
 	
@@ -134,7 +137,8 @@ public class BackgroundThreadDispatcher {
 				// System.out.println(msg.trim());
 			}
 		});
-		t.start();
+		if (!SystemAnalysis.isHeadless())
+			t.start();
 		
 		sheduler = new Thread(new Runnable() {
 			public void run() {
@@ -227,7 +231,11 @@ public class BackgroundThreadDispatcher {
 				}
 				if (t != null) {
 					t.setPriorityNG(Thread.MIN_PRIORITY);
-					t.startNG(es);
+					if (!t.isFinished() && !t.isStarted())
+						if (useThreads)
+							t.startNG(es);
+						else
+							t.run();
 					synchronized (runningTasks) {
 						runningTasks.add(t);
 					}
@@ -292,7 +300,7 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 	
-	private static void waitFor(HashSet<MyThread> threads) throws InterruptedException {
+	private static void waitFor(HashSet<MyThread> threads) {
 		try {
 			synchronized (waitThreads) {
 				waitThreads.add(Thread.currentThread());
@@ -303,6 +311,8 @@ public class BackgroundThreadDispatcher {
 				t.getResult();
 				updateTaskStatistics();
 			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		} finally {
 			if (Thread.currentThread().getName().contains("wait;"))
 				Thread.currentThread().setName(Thread.currentThread().getName().substring("wait;".length()));
@@ -313,7 +323,7 @@ public class BackgroundThreadDispatcher {
 		
 	}
 	
-	public static void waitFor(MyThread[] threads) throws InterruptedException {
+	public static void waitFor(MyThread[] threads) {
 		HashSet<MyThread> t = new HashSet<MyThread>();
 		for (MyThread m : threads)
 			if (m != null)
@@ -323,7 +333,7 @@ public class BackgroundThreadDispatcher {
 			waitFor(t);
 	}
 	
-	public static void waitFor(Collection<MyThread> threads) throws InterruptedException {
+	public static void waitFor(Collection<MyThread> threads) {
 		HashSet<MyThread> t = new HashSet<MyThread>();
 		for (MyThread m : threads)
 			t.add(m);
