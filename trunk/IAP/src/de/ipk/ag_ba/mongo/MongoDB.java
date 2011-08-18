@@ -405,18 +405,10 @@ public class MongoDB {
 		
 		DBCollection conditions = db.getCollection("conditions");
 		
-		boolean inline = false;
-		
-		if (inline) {
-			substances = null;
-			conditions = null;
-		}
-		
 		int errorCount = 0;
 		
 		long lastTransferSum = 0;
 		int lastSecond = -1;
-		boolean safeOneTimeSave = false; // requires too much memory on the client in case of large experiments
 		int count = 0;
 		StringBuilder errors = new StringBuilder();
 		int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
@@ -429,11 +421,12 @@ public class MongoDB {
 			experiment.getHeader().setSizekb(l / 1024);
 		}
 		
-		List<DBObject> dbSubstances = new ArrayList<DBObject>();
-		HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
+		// List<DBObject> dbSubstances = new ArrayList<DBObject>();
+		// HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>(experiment);
 		experiment.clear();
 		Runtime r = Runtime.getRuntime();
+		ArrayList<String> substanceIDs = new ArrayList<String>();
 		while (!sl.isEmpty()) {
 			System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
@@ -447,9 +440,9 @@ public class MongoDB {
 			attributes.clear();
 			s.fillAttributeMap(attributes);
 			BasicDBObject substance = new BasicDBObject(filter(attributes));
-			dbSubstances.add(substance);
+			// dbSubstances.add(substance);
 			
-			List<BasicDBObject> dbConditions = new ArrayList<BasicDBObject>();
+			ArrayList<BasicDBObject> dbConditions = new ArrayList<BasicDBObject>();
 			
 			for (ConditionInterface c : s) {
 				if (status != null && status.wantsToStop())
@@ -584,14 +577,9 @@ public class MongoDB {
 				} // sample
 				condition.put("samples", dbSamples);
 			} // condition
-			if (inline)
-				substance.put("conditions", dbConditions);
-			else {
-				if (safeOneTimeSave)
-					substance2conditions.put(substance, dbConditions);
-				else
-					processSubstanceSaving(status, substances, conditions, dbSubstances, substance2conditions);
-			}
+			processSubstanceSaving(status, substances, conditions, substance, dbConditions);
+			substanceIDs.add(((BasicDBObject) substance).getString("_id"));
+			
 		} // substance
 		
 		System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
@@ -599,14 +587,10 @@ public class MongoDB {
 		if (status != null)
 			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE SUB-ELEMENTS OF SUBSTANCES FINISHED");
 		
-		if (substances != null && safeOneTimeSave)
-			processSubstanceSaving(status, substances, conditions, dbSubstances, substance2conditions);
+		// if (substances != null && safeOneTimeSave)
+		// processSubstanceSaving(status, substances, conditions, dbSubstances, substance2conditions);
 		if (status != null)
 			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE OF SUBSTANCE-DB ELEMENTS FINISHED");
-		ArrayList<String> substanceIDs = new ArrayList<String>();
-		if (dbSubstances != null)
-			for (DBObject substance : dbSubstances)
-				substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 		
 		if (status != null || (status != null && !status.wantsToStop()))
 			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Finalize Storage");
@@ -616,10 +600,7 @@ public class MongoDB {
 		
 		experiment.fillAttributeMap(attributes);
 		BasicDBObject dbExperiment = new BasicDBObject(attributes);
-		if (inline)
-			dbExperiment.put("substances", dbSubstances);
-		else
-			dbExperiment.put("substance_ids", substanceIDs);
+		dbExperiment.put("substance_ids", substanceIDs);
 		
 		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
@@ -644,26 +625,20 @@ public class MongoDB {
 	}
 	
 	private void processSubstanceSaving(BackgroundTaskStatusProviderSupportingExternalCall status, DBCollection substances, DBCollection conditions,
-			List<DBObject> dbSubstances, HashMap<DBObject, List<BasicDBObject>> substance2conditions) {
-		for (DBObject dbSubstance : dbSubstances) {
-			if (status != null)
-				status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
-			ArrayList<String> conditionIDs = new ArrayList<String>();
-			if (substance2conditions.get(dbSubstance) != null)
-				for (DBObject dbc : substance2conditions.get(dbSubstance)) {
-					conditions.insert(dbc);
-				}
-			if (substance2conditions.get(dbSubstance) != null) {
-				for (DBObject dbCondition : substance2conditions.get(dbSubstance))
-					conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
-				substance2conditions.remove(dbSubstance);
-			}
-			dbSubstance.put("condition_ids", conditionIDs);
-			if (status == null || (status != null && !status.wantsToStop())) {
-				substances.insert(dbSubstance);
-			}
+			BasicDBObject dbSubstance, Collection<BasicDBObject> dbConditions) {
+		if (status != null)
+			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
+		ArrayList<String> conditionIDs = new ArrayList<String>();
+		for (DBObject dbc : dbConditions) {
+			conditions.insert(dbc);
 		}
-		dbSubstances.clear();
+		for (DBObject dbCondition : dbConditions)
+			conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
+		
+		dbSubstance.put("condition_ids", conditionIDs);
+		if (status == null || (status != null && !status.wantsToStop())) {
+			substances.insert(dbSubstance);
+		}
 	}
 	
 	private HashMap<String, Object> filter(HashMap<String, Object> attributes) {
