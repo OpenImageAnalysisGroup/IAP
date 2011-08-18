@@ -274,8 +274,8 @@ public class CloudComputingService {
 								ExperimentInterface ei = m.getExperiment(i);
 								String[] cc = i.getExperimentName().split("§");
 								tso.addInt(1);
-								System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2] + ": "
-											+ ei.getNumberOfMeasurementValues());
+								System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
+								// + ": "+ ei.getNumberOfMeasurementValues());
 								// int mv;
 								synchronized (e) {
 									StopWatch s = new StopWatch(">e.addMerge");
