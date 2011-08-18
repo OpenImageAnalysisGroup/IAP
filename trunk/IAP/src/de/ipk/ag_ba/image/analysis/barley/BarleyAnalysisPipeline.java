@@ -17,8 +17,8 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilterVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilterFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirProcessing;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluoVerySmallElements;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuoOrVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
@@ -31,6 +31,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjectsVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresUsingOpeningTopVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockUseFluoMaskToClearVisAndNirMask;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * Comprehensive corn image analysis pipeline, processing VIS, FLUO and NIR images. Depends on reference images for initial comparison
@@ -89,6 +90,8 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	 * Modify default LAB filter options according to the Maize analysis requirements.
 	 */
 	private void modifySettings(ImageProcessorOptions options) {
+		if (options == null)
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">INTERNAL ERROR: options object is NULL (BarleyAnalysisPipeline)");
 		options.setIsMaize(false);
 		
 		// Test Barley

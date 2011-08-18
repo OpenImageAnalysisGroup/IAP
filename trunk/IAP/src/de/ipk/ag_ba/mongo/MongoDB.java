@@ -425,7 +425,8 @@ public class MongoDB {
 		for (SubstanceInterface s : experiment) {
 			if (status != null && status.wantsToStop())
 				break;
-			
+			if (status != null)
+				status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE SUBSTANCE " + s.getName());
 			attributes.clear();
 			s.fillAttributeMap(attributes);
 			BasicDBObject substance = new BasicDBObject(filter(attributes));
@@ -436,6 +437,8 @@ public class MongoDB {
 			for (ConditionInterface c : s) {
 				if (status != null && status.wantsToStop())
 					break;
+				if (status != null)
+					status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE CONDITION " + c.getName());
 				attributes.clear();
 				c.fillAttributeMap(attributes);
 				BasicDBObject condition = new BasicDBObject(filter(attributes));
@@ -570,8 +573,13 @@ public class MongoDB {
 				substance2conditions.put(substance, dbConditions);
 		} // substance
 		
+		if (status != null)
+			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE SUB-ELEMENTS OF SUBSTANCES FINISHED");
+		
 		if (substances != null)
 			for (DBObject dbSubstance : dbSubstances) {
+				if (status != null)
+					status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
 				ArrayList<String> conditionIDs = new ArrayList<String>();
 				if (substance2conditions.get(dbSubstance) != null)
 					for (DBObject dbc : substance2conditions.get(dbSubstance)) {
@@ -585,16 +593,18 @@ public class MongoDB {
 					substances.insert(dbSubstance);
 				}
 			}
+		if (status != null)
+			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE OF SUBSTANCE-DB ELEMENTS FINISHED");
 		ArrayList<String> substanceIDs = new ArrayList<String>();
 		if (dbSubstances != null)
 			for (DBObject substance : dbSubstances)
 				substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 		
 		if (status != null || (status != null && !status.wantsToStop()))
-			status.setCurrentStatusText1("Determine Size");
+			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Determine Size");
 		long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
 		if (status != null || (status != null && !status.wantsToStop()))
-			status.setCurrentStatusText1("Finalize Storage");
+			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Finalize Storage");
 		
 		// l = overallFileSize.getLong(); // in case of update the written bytes are not the right size
 		experiment.getHeader().setSizekb(l / 1024);
