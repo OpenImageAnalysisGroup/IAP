@@ -442,17 +442,14 @@ public class MongoDB {
 			BasicDBObject substance = new BasicDBObject(filter(attributes));
 			// dbSubstances.add(substance);
 			
-			ArrayList<BasicDBObject> dbConditions = new ArrayList<BasicDBObject>();
+			ArrayList<String> conditionIDs = new ArrayList<String>();
 			
 			for (ConditionInterface c : s) {
 				if (status != null && status.wantsToStop())
 					break;
-				if (status != null)
-					status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE CONDITION " + c.getName());
 				attributes.clear();
 				c.fillAttributeMap(attributes);
 				BasicDBObject condition = new BasicDBObject(filter(attributes));
-				dbConditions.add(condition);
 				
 				List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
 				for (SampleInterface sa : c) {
@@ -576,8 +573,13 @@ public class MongoDB {
 						sample.put("networks", dbVolumes);
 				} // sample
 				condition.put("samples", dbSamples);
+				
+				conditions.insert(condition);
+				
+				conditionIDs.add(((BasicDBObject) condition).getString("_id"));
+				
 			} // condition
-			processSubstanceSaving(status, substances, conditions, substance, dbConditions);
+			processSubstanceSaving(status, substances, substance, conditionIDs);
 			substanceIDs.add(((BasicDBObject) substance).getString("_id"));
 			
 		} // substance
@@ -624,16 +626,10 @@ public class MongoDB {
 		
 	}
 	
-	private void processSubstanceSaving(BackgroundTaskStatusProviderSupportingExternalCall status, DBCollection substances, DBCollection conditions,
-			BasicDBObject dbSubstance, Collection<BasicDBObject> dbConditions) {
+	private void processSubstanceSaving(BackgroundTaskStatusProviderSupportingExternalCall status, DBCollection substances,
+			BasicDBObject dbSubstance, ArrayList<String> conditionIDs) {
 		if (status != null)
 			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
-		ArrayList<String> conditionIDs = new ArrayList<String>();
-		for (DBObject dbc : dbConditions) {
-			conditions.insert(dbc);
-		}
-		for (DBObject dbCondition : dbConditions)
-			conditionIDs.add(((BasicDBObject) dbCondition).getString("_id"));
 		
 		dbSubstance.put("condition_ids", conditionIDs);
 		if (status == null || (status != null && !status.wantsToStop())) {
