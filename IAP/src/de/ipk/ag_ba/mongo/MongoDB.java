@@ -433,7 +433,11 @@ public class MongoDB {
 		HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>(experiment);
 		experiment.clear();
+		Runtime r = Runtime.getRuntime();
 		while (!sl.isEmpty()) {
+			System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
+			
 			SubstanceInterface s = sl.get(0);
 			sl.remove(0);
 			if (status != null && status.wantsToStop())
@@ -590,6 +594,8 @@ public class MongoDB {
 			}
 		} // substance
 		
+		System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+				+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 		if (status != null)
 			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE SUB-ELEMENTS OF SUBSTANCES FINISHED");
 		
@@ -626,6 +632,8 @@ public class MongoDB {
 				eh.setDatabaseId(id);
 			}
 		}
+		System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+				+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 		
 		if (errorCount > 0) {
 			MainFrame.showMessageDialog(
