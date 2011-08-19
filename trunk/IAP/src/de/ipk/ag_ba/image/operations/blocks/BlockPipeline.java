@@ -71,7 +71,7 @@ public class BlockPipeline {
 		int id = pipelineID.addInt(1);
 		
 		int index = 0;
-		boolean blockProgressOutput = true;
+		boolean blockProgressOutput = false;
 		
 		if (status != null)
 			status.setCurrentStatusValueFine(0);
