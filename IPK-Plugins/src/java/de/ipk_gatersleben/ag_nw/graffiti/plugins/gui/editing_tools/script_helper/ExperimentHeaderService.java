@@ -13,7 +13,7 @@ public class ExperimentHeaderService {
 		Collections.sort(in, new Comparator<ExperimentHeaderInterface>() {
 			@Override
 			public int compare(ExperimentHeaderInterface o1, ExperimentHeaderInterface o2) {
-				Long ct = o1.getImportdate().getTime();
+				Long ct = o1.getImportdate() != null ? o1.getImportdate().getTime() : -1;
 				Long pt = o2.getImportdate() != null ? o2.getImportdate().getTime() : -1;
 				
 				if (o1.getStorageTime() != null)
@@ -31,8 +31,8 @@ public class ExperimentHeaderService {
 				result.add(ehi);
 			} else {
 				ExperimentHeaderInterface prevTime = known.get(key);
-				long ct = ehi.getImportdate().getTime();
-				long pt = prevTime.getImportdate().getTime();
+				long ct = ehi.getImportdate() != null ? ehi.getImportdate().getTime() : -1;
+				long pt = prevTime.getImportdate() != null ? prevTime.getImportdate().getTime() : -1;
 				
 				if (ehi.getStorageTime() != null)
 					ct = ehi.getStorageTime().getTime();
