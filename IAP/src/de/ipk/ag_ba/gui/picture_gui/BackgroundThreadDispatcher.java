@@ -18,6 +18,7 @@ import javax.swing.Timer;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * @author klukas
@@ -59,6 +60,9 @@ public class BackgroundThreadDispatcher {
 			if (myInstance == null)
 				myInstance = new BackgroundThreadDispatcher();
 			synchronized (myInstance.todo) {
+				if (myInstance.todo.size() >= 99) {
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INTERNAL WARNING: LARGE TODO QUEUE SIZE. ADDING ANOTHER TASK: " + t.getNameNG());
+				}
 				myInstance.todo.push(t);
 				myInstance.todoPriorities.push(new Integer(parentPriority + 1));// userPriority));
 				myInstance.sheduler.interrupt();
