@@ -294,8 +294,9 @@ public class CloudComputingService {
 									e.addAndMerge(ei);
 									// mv = e.getNumberOfMeasurementValues();
 									s.printTime();
+									ExperimentHeaderInterface t = ei.getHeader();
 									ei.clear();
-									ei = null;
+									ei.setHeader(t);
 								}
 								// System.out.print(" ==> ");
 								// System.out.println(mv + " // job submission: "

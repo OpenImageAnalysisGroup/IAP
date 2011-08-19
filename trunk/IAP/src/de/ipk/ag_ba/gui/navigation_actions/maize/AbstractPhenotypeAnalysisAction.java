@@ -132,7 +132,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
 			statisticsResult.getHeader().setOriginDbId(experimentToBeAnalysed.getHeader().getDatabaseId());
 			statisticsResult.getHeader().setDatabaseId("");
-			boolean addWaterData = true;
+			boolean addWaterData = workOnSubset == 0;
 			if (addWaterData) {
 				for (SubstanceInterface si : experimentToBeAnalysed) {
 					if (si.getName() != null && (si.getName().equals("weight_before") ||
