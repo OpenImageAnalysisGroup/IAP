@@ -99,6 +99,7 @@ public class CloudComputingService {
 		System.out.println(SystemAnalysisExt.getCurrentTime() + "> SYSTEM ANALYSIS");
 		boolean clusterExecutionMode = false;
 		BackgroundThreadDispatcher.useThreads = false;
+		System.out.println(SystemAnalysisExt.getCurrentTime() + ">DISABLE SUB-TASK MULTITHREADING");
 		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
 			SystemInfoExt info = new SystemInfoExt();
 			System.out.println("Sockets        : " + info.getCpuSockets());
