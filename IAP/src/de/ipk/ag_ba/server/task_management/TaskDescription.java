@@ -162,13 +162,14 @@ public class TaskDescription {
 								for (ExperimentHeaderInterface i : knownResults) {
 									ExperimentInterface ei = m.getExperiment(i);
 									if (removeWaterAndWeightDataFromSubsequentDatasets) {
-										System.out.print("INFO: Remove duplicate water and weight data before adding results to merged dataset");
 										ArrayList<SubstanceInterface> toBeRemoved = new ArrayList<SubstanceInterface>();
 										for (SubstanceInterface si : ei) {
 											if (si.getName() != null && (si.getName().equals("weight_before") ||
 													(si.getName().equals("water_weight") ||
-															si.getName().equals("water_sum"))))
+															si.getName().equals("water_sum")))) {
+												System.out.print("INFO: Remove duplicate water and weight data before adding results to merged dataset");
 												toBeRemoved.add(si);
+											}
 										}
 										for (SubstanceInterface si : toBeRemoved) {
 											ei.remove(si);
@@ -211,7 +212,7 @@ public class TaskDescription {
 								m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
 							}
 						} else
-							System.out.println("Information: Batch command, processed by " + SystemAnalysisExt.getHostName()
+							System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostName()
 									+ " has been claimed by " + bcmd.getOwner()
 									+ ". Therefore analysis result is not saved.");
 				} catch (Exception e) {
