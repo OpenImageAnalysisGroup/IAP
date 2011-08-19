@@ -14,7 +14,7 @@ public class ExperimentHeaderService {
 			@Override
 			public int compare(ExperimentHeaderInterface o1, ExperimentHeaderInterface o2) {
 				Long ct = o1.getImportdate().getTime();
-				Long pt = o2.getImportdate().getTime();
+				Long pt = o2.getImportdate() != null ? o2.getImportdate().getTime() : -1;
 				
 				if (o1.getStorageTime() != null)
 					ct = o1.getStorageTime().getTime();
