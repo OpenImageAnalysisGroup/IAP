@@ -63,9 +63,13 @@ public class BackgroundThreadDispatcher {
 				if (myInstance.todo.size() >= 99) {
 					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INTERNAL WARNING: LARGE TODO QUEUE SIZE. ADDING ANOTHER TASK: " + t.getNameNG());
 				}
-				myInstance.todo.push(t);
-				myInstance.todoPriorities.push(new Integer(parentPriority + 1));// userPriority));
-				myInstance.sheduler.interrupt();
+				if (!useThreads && userPriority != Integer.MIN_VALUE) {
+					// no
+				} else {
+					myInstance.todo.push(t);
+					myInstance.todoPriorities.push(new Integer(parentPriority + 1));// userPriority));
+					myInstance.sheduler.interrupt();
+				}
 			}
 		}
 		if (!useThreads && userPriority != Integer.MIN_VALUE) {
