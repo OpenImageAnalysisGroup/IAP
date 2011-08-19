@@ -68,8 +68,13 @@ public class BackgroundThreadDispatcher {
 				myInstance.sheduler.interrupt();
 			}
 		}
-		if (!useThreads && userPriority != Integer.MIN_VALUE)
-			t.run();
+		if (!useThreads && userPriority != Integer.MIN_VALUE) {
+			try {
+				t.run();
+			} catch (Exception e) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + t.getNameNG() + ": " + e.getMessage());
+			}
+		}
 		return t;
 	}
 	
