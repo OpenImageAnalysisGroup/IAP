@@ -1721,7 +1721,6 @@ public class ImageOperation {
 	public Lab getLABAverage(int[][] img2d, int x1, int y1, int w, int h) {
 		int c, x, y = 0;
 		int r, g, b;
-		double La, aa, bb;
 		int Li, ai, bi;
 		
 		double sumL = 0;
