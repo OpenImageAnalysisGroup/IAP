@@ -130,8 +130,10 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			System.out.println("Statistics results: " + newStatisticsData.size());
 			// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
+			statisticsResult.setHeader(experiment.getHeader().clone());
 			statisticsResult.getHeader().setOriginDbId(experimentToBeAnalysed.getHeader().getDatabaseId());
 			statisticsResult.getHeader().setDatabaseId("");
+			statisticsResult.setHeader(statisticsResult.iterator().next().iterator().next().getExperimentHeader());
 			boolean addWaterData = workOnSubset == 0;
 			if (addWaterData) {
 				for (SubstanceInterface si : experimentToBeAnalysed) {
