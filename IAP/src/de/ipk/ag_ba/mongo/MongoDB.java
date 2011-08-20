@@ -1185,6 +1185,10 @@ public class MongoDB {
 	}
 	
 	public ArrayList<ExperimentHeaderInterface> getExperimentList(final String user) {
+		return getExperimentList(user, null);
+	}
+	
+	public ArrayList<ExperimentHeaderInterface> getExperimentList(final String user, final BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		final ArrayList<ExperimentHeaderInterface> res = new ArrayList<ExperimentHeaderInterface>();
 		try {
 			processDB(new RunnableOnDB() {
@@ -1192,7 +1196,12 @@ public class MongoDB {
 				
 				@Override
 				public void run() {
-					for (DBObject header : db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).find()) {
+					if (optStatus != null)
+						optStatus.setCurrentStatusText1("Get Experiment List");
+					DBCollection col = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
+					if (optStatus != null)
+						optStatus.setCurrentStatusText1("Iterate Experiments");
+					for (DBObject header : col.find()) {
 						ExperimentHeader h = new ExperimentHeader(header.toMap());
 						h.setStorageTime(new Date(((ObjectId) header.get("_id")).getTime()));
 						if (user == null ||
@@ -1211,6 +1220,8 @@ public class MongoDB {
 			ErrorMsg.addErrorMessage(e);
 			return null;
 		}
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Process Result");
 		return ExperimentHeaderService.filterNewest(res);
 	}
 	
