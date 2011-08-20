@@ -487,7 +487,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		status.setCurrentStatusText1("Establishing Connection");
-		experimentList = m.getExperimentList(currentUser);
+		experimentList = m.getExperimentList(currentUser, status);
 		nAvail = experimentList.size();
 		status.setCurrentStatusText1("");
 	}
