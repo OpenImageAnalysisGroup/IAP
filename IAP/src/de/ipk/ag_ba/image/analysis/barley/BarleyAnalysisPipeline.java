@@ -31,7 +31,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityAnalysis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjectsVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresUsingOpeningTopVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockUseFluoMaskToClearVisAndNirMask;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * Comprehensive corn image analysis pipeline, processing VIS, FLUO and NIR images. Depends on reference images for initial comparison
@@ -91,7 +90,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	 */
 	private void modifySettings(ImageProcessorOptions options) {
 		if (options == null)
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">INTERNAL ERROR: options object is NULL (BarleyAnalysisPipeline)");
+			return;
 		options.setIsMaize(false);
 		
 		// Test Barley
