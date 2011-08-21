@@ -94,6 +94,15 @@ public class SystemAnalysisExt {
 	
 	private static long physicalMemoryInGB = -1;
 	
+	public static NetworkIO getNetworkIoStats() {
+		NetworkIO res = new NetworkIO();
+		if (AttributeHelper.linuxRunning())
+			if (new File("/proc/cpuinfo").exists()) {
+				// res = getLinuxCpuInfoSetInfo("/proc/cpuinfo", "processor");
+			}
+		return res;
+	}
+	
 	public static long getPhysicalMemoryInGB() {
 		if (physicalMemoryInGB > 0)
 			return physicalMemoryInGB;
@@ -188,6 +197,24 @@ public class SystemAnalysisExt {
 			for (String s : tf) {
 				if (s.startsWith(setting) && s.contains(":"))
 					settingValues.add(s.split(":")[1].trim());
+			}
+			result = settingValues.size();
+		} catch (FileNotFoundException e) {
+			ErrorMsg.addErrorMessage(e);
+		} catch (IOException e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		return result;
+	}
+	
+	private static int getLinuxNetworkStatInfo(String fileName, String columnHeader) {
+		int result = -1;
+		HashSet<String> settingValues = new HashSet<String>();
+		try {
+			TextFile tf = new TextFile(fileName);
+			for (String s : tf) {
+				// if (s.startsWith(setting) && s.contains(":"))
+				// settingValues.add(s.split(":")[1].trim());
 			}
 			result = settingValues.size();
 		} catch (FileNotFoundException e) {
