@@ -47,7 +47,9 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			
 			if (viswork != null)
 				if (options.isMaize() && vis != null && fluo != null) {
-					getProperties().setImage("skeleton", calcSkeleton(viswork, vis, fluo));
+					FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+					if (sk != null)
+						getProperties().setImage("skeleton", sk);
 					res = getProperties().getImage("beforeBloomEnhancement");
 				}
 		}
@@ -65,6 +67,9 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		int h = vis.getHeight();
 		
 		skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
+		if (skel2d.getMinLimbY() == null || skel2d.getMinLimbY().endpoint == null) {
+			
+		}
 		FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.getIO().blur(10).getImage().print("blurf", false), 0.075f, h, 20).getIO().// blur(3).
 				thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
 		

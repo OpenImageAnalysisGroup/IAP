@@ -836,7 +836,7 @@ public class SkeletonProcessor2d {
 		return new FlexibleImage(res);
 	}
 	
-	private Limb getMinLimbY() {
+	public Limb getMinLimbY() {
 		int maxHeight = Integer.MAX_VALUE;
 		Limb res = null;
 		for (Limb l : endlimbs) {
