@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class Limb {
 	
-	Point endpoint;
+	public Point endpoint;
 	Point initialpoint;
 	ArrayList<Point> points = new ArrayList<Point>();
 	boolean isCut = false;
