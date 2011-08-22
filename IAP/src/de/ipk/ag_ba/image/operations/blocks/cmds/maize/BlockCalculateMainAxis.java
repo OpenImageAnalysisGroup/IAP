@@ -53,7 +53,7 @@ public class BlockCalculateMainAxis extends AbstractSnapshotAnalysisBlockFIS {
 				ResultsTable rt = new ResultsTable();
 				rt.incrementCounter();
 				rt.addValue("main.axis.rotation", angle);
-				rt.addValue("main.axis.normalized.distance", normalizedDistanceToMainAxis);
+				rt.addValue("main.axis.normalized.distance.avg", normalizedDistanceToMainAxis);
 				
 				getProperties().storeResults("RESULT_top.", rt, getBlockPosition());
 			} else {
