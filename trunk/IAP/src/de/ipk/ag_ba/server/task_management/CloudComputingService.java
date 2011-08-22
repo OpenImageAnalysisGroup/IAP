@@ -295,9 +295,9 @@ public class CloudComputingService {
 									e.addAndMerge(ei);
 									// mv = e.getNumberOfMeasurementValues();
 									s.printTime();
-									ExperimentHeaderInterface t = ei.getHeader();
-									ei.clear();
-									ei.setHeader(t);
+									// ExperimentHeaderInterface t = ei.getHeader();
+									// ei.clear();
+									// ei.setHeader(t);
 								}
 								// System.out.print(" ==> ");
 								// System.out.println(mv + " // job submission: "
@@ -339,7 +339,6 @@ public class CloudComputingService {
 					
 					System.out.println("> SAVE COMBINED EXPERIMENT...");
 					m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
-					e.clear();
 					System.out.println("> DELETE TEMP DATA...");
 					for (ExperimentHeaderInterface i : knownResults) {
 						try {
