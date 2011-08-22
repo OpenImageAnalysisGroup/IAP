@@ -5,6 +5,7 @@
  */
 package org.graffiti.attributes;
 
+
 /**
  * @author Christian Klukas
  *         To change the template for this generated type comment go to
@@ -33,6 +34,11 @@ public class ObjectAttribute extends StringAttribute {
 	 */
 	public ObjectAttribute(String id) throws IllegalIdException {
 		super(id);
+	}
+	
+	public ObjectAttribute(String id, Object value) {
+		this(id);
+		setValue(value);
 	}
 	
 	/*
