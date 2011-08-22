@@ -109,6 +109,7 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 			// }
 		} else {
 			cols.add("Condition");
+			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;
 			cols.add("Time");
 			cols.add("Plant ID");
 			cols.add("Measurement"); // substance
@@ -165,6 +166,6 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 	}
 	
 	public String getCSVheader() {
-		return "Plant ID;Condition;Day;Time;Weight A (g);Weight B (g);Water;RGB;Fluo;Nir;Other\r\n";
+		return "Plant ID;Condition;Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;Day;Time;Weight A (g);Weight B (g);Water;RGB;Fluo;Nir;Other\r\n";
 	}
 }
