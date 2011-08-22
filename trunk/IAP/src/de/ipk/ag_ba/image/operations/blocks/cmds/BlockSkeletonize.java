@@ -107,7 +107,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		ResultsTable rt = new ResultsTable();
 		rt.incrementCounter();
 		
-		rt.addValue("bloom.area.size", probablyBloomFluo.getIO().print("BLOOM AREA", debug2).countFilledPixels());
+		rt.addValue("fluo.bloom.area.size", probablyBloomFluo.getIO().print("BLOOM AREA", debug2).countFilledPixels());
 		
 		rt.addValue("bloom.count", bloomLimbCount);
 		rt.addValue("leaf.count", leafcount);
