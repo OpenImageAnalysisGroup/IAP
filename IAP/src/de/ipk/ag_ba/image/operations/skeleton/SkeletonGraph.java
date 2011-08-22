@@ -12,6 +12,7 @@ import org.graffiti.graph.Edge;
 import org.graffiti.graph.Node;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class SkeletonGraph {
 	private static final boolean DEBUG = true;
@@ -65,7 +66,6 @@ public class SkeletonGraph {
 		}
 		if (DEBUG) {
 			FlexibleImage fi = new FlexibleImage(skelImg).print("TO BE ANALYZED...");
-			
 			debugImg = fi.copy();
 		}
 		if (DEBUG)
@@ -96,10 +96,11 @@ public class SkeletonGraph {
 												+ (startNode == null || endNode == null ? "NULL" : ""));
 						if (startNode != null && endNode != null) {
 							Edge edge = graph.addEdge(startNode, endNode, true);
-							ObjectAttribute oa = new ObjectAttribute("points");
-							oa.setValue(edgePoints);
+							ObjectAttribute oa = new ObjectAttribute("info");
+							oa.setValue(new LimbInfo(edgePoints));
 							edge.addAttribute(oa, "");
 							nGraphEdgePoints += edgePoints.size();
+							nGraphEdgePoints--;// either source or target pixel is not really part of the edge
 							edge.setDouble("len", edgePoints.size());
 							
 						}
@@ -129,7 +130,62 @@ public class SkeletonGraph {
 		if (DEBUG)
 			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges() + " Edge Pixels: "
 					+ nGraphEdgePoints);
-		
+		tryRemove4crossings(graph);
+		if (DEBUG)
+			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges() + " Edge Pixels: "
+					+ nGraphEdgePoints);
+	}
+	
+	private void tryRemove4crossings(AdjListGraph graph) {
+		ArrayList<Node> delN = new ArrayList<Node>();
+		for (Node n : graph.getNodes()) {
+			if (n.getDegree() > 4)
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">INTERNAL ERROR: FOUND HIGH SKELETON GRAPH NODE DEGREE: " + n.getDegree());
+			else
+				if (n.getDegree() == 4) {
+					LimbInfo[] lia = new LimbInfo[4];
+					Node[] limbN = new Node[4];
+					int idx = 0;
+					for (Edge e : n.getEdges()) {
+						ObjectAttribute oa = (ObjectAttribute) e.getAttribute("info");
+						limbN[idx] = e.getSource() != n ? e.getSource() : e.getTarget();
+						lia[idx++] = (LimbInfo) oa.getValue();
+					}
+					double diffVariant1 = Math.abs(lia[0].getLinearMx() - lia[1].getLinearMx()) + Math.abs(lia[2].getLinearMx() - lia[3].getLinearMx());
+					double diffVariant2 = Math.abs(lia[0].getLinearMx() - lia[2].getLinearMx()) + Math.abs(lia[1].getLinearMx() - lia[3].getLinearMx());
+					double diffVariant3 = Math.abs(lia[0].getLinearMx() - lia[3].getLinearMx()) + Math.abs(lia[1].getLinearMx() - lia[2].getLinearMx());
+					int a1 = -1, a2 = -1, b1 = -1, b2 = -1;
+					if (diffVariant1 < diffVariant2 && diffVariant1 < diffVariant3) {
+						// crossing of 0<-->1 and 2<-->3
+						a1 = 0;
+						a2 = 1;
+						b1 = 2;
+						b2 = 3;
+					} else
+						if (diffVariant2 < diffVariant1 && diffVariant2 < diffVariant3) {
+							// crossing of 0<-->2 and 1<-->3
+							a1 = 0;
+							a2 = 2;
+							b1 = 1;
+							b2 = 3;
+						} else {
+							// crossing of 0<-->3 and 1<-->2
+							a1 = 0;
+							a2 = 3;
+							b1 = 1;
+							b2 = 2;
+						}
+					Edge e01 = graph.addEdge(limbN[a1], limbN[a2], true);
+					e01.addAttribute(new ObjectAttribute("info", new LimbInfo(lia[a1], lia[a2])), "");
+					Edge e23 = graph.addEdge(limbN[b1], limbN[b2], true);
+					e23.addAttribute(new ObjectAttribute("info", new LimbInfo(lia[b1], lia[b2])), "");
+					delN.add(n);
+				} else {
+					// todo
+				}
+		}
+		for (Node n : delN)
+			graph.deleteNode(n);
 	}
 	
 	private void printMatrix(int[][] skelImg2, int x, int y) {
