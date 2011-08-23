@@ -11,6 +11,7 @@ import info.StopWatch;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -97,6 +98,7 @@ public class CloudComputingService {
 		System.out.println("*                                                 *");
 		System.out.println("***************************************************");
 		System.out.println(SystemAnalysisExt.getCurrentTime() + "> SYSTEM ANALYSIS");
+		SystemAnalysis.simulateHeadless = true;
 		boolean clusterExecutionMode = false;
 		BackgroundThreadDispatcher.useThreads = false;
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">DISABLE SUB-TASK MULTITHREADING");
@@ -219,18 +221,20 @@ public class CloudComputingService {
 			final MongoDB m = MongoDB.getDefaultCloud();
 			ArrayList<ExperimentHeaderInterface> el = m.getExperimentList(null);
 			HashSet<TempDataSetDescription> availableTempDatasets = new HashSet<TempDataSetDescription>();
+			HashSet<String> processedSubmissionTimes = new HashSet<String>();
 			for (ExperimentHeaderInterface i : el) {
 				String[] cc = i.getExperimentName().split("§");
-				if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
+				if (i.getImportusergroup() != null && i.getImportusergroup().equals("Temp") && cc.length == 4) {
 					String className = cc[0];
 					String idxCnt = cc[1];
 					String partCnt = cc[2];
 					String submTime = cc[3];
-					if (idxCnt.equals("1"))
-						availableTempDatasets.add(new TempDataSetDescription(className, partCnt, submTime));
+					if (!processedSubmissionTimes.contains(submTime))
+						availableTempDatasets.add(new TempDataSetDescription(className, partCnt, submTime, i.getOriginDbId()));
+					processedSubmissionTimes.add(submTime);
 				}
 			}
-			for (TempDataSetDescription cmd : availableTempDatasets) {
+			for (TempDataSetDescription tempDataSetDescription : availableTempDatasets) {
 				ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 				HashSet<String> added = new HashSet<String>();
 				for (ExperimentHeaderInterface i : el) {
@@ -241,9 +245,9 @@ public class CloudComputingService {
 							String partIdx = cc[1];
 							String partCnt = cc[2];
 							String submTime = cc[3];
-							String bcn = cmd.getRemoteCapableAnalysisActionClassName();
-							String bpn = cmd.getPartCnt();
-							String bst = cmd.getSubmissionTime();
+							String bcn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
+							String bpn = tempDataSetDescription.getPartCnt();
+							String bst = tempDataSetDescription.getSubmissionTime();
 							if (className.equals(bcn)
 										&& partCnt.equals(bpn)
 										&& submTime.equals(bst)
@@ -255,103 +259,131 @@ public class CloudComputingService {
 					}
 				}
 				System.out.println(SystemAnalysisExt.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
-				System.out.println(SystemAnalysisExt.getCurrentTime() + "> TODO: " + cmd.getPartCnt() + ", FINISHED: " + knownResults.size());
-				if (knownResults.size() + 1 >= cmd.getPartCntI()) {
-					System.out.println("*****************************");
-					System.out.println("MERGE INDEX: " + cmd.getPartCntI() + "/" + cmd.getPartCnt() + ", RESULTS AVAILABLE: " + knownResults.size());
-					final Experiment e = new Experiment();
-					long tFinish = System.currentTimeMillis();
-					final int wl = knownResults.size();
-					final ThreadSafeOptions tso = new ThreadSafeOptions();
-					final Runtime r = Runtime.getRuntime();
-					ExecutorService es = Executors.newFixedThreadPool(2);
-					for (ExperimentHeaderInterface ii : knownResults) {
-						final ExperimentHeaderInterface i = ii;
-						Runnable rr = new Runnable() {
-							@Override
-							public void run() {
-								System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
-										+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
-								ExperimentInterface ei = m.getExperiment(i);
-								String[] cc = i.getExperimentName().split("§");
-								synchronized (tso) {
-									tso.addInt(1);
-									if (tso.getInt() != 1) {
-										// weight_before, water_weight, water_sum
-										ArrayList<SubstanceInterface> del = new ArrayList<SubstanceInterface>();
-										for (SubstanceInterface si : ei) {
-											if (si.getName().equals("weight_before") || si.getName().equals("water_weight") || si.getName().equals("water_sum"))
-												del.add(si);
+				System.out.println(SystemAnalysisExt.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCnt() + ", FINISHED: " + knownResults.size());
+				if (knownResults.size() + 1 < tempDataSetDescription.getPartCntI()) {
+					// not everything has been computed (internal error)
+					TreeSet<Integer> jobIDs = new TreeSet<Integer>();
+					{
+						int idx = 0;
+						while (idx < tempDataSetDescription.getPartCntI()) {
+							if (!added.contains(idx + "")) {
+								System.out.println("Missing: " + idx);
+								jobIDs.add(idx++);
+							} else
+								idx++;
+						}
+					}
+					for (int jobID : jobIDs) {
+						BatchCmd cmd = new BatchCmd();
+						cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
+						cmd.setSubmissionTime(tempDataSetDescription.getSubmissionTimeL());
+						cmd.setTargetIPs(new HashSet<String>());
+						cmd.setSubTaskInfo(jobID, tempDataSetDescription.getPartCntI());
+						cmd.setRemoteCapableAnalysisActionClassName(tempDataSetDescription.getRemoteCapableAnalysisActionClassName());
+						cmd.setRemoteCapableAnalysisActionParams("");
+						cmd.setExperimentMongoID(tempDataSetDescription.getOriginDBid());
+						BatchCmd.enqueueBatchCmd(MongoDB.getDefaultCloud(), cmd);
+						System.out.println("Enqueue: " + jobID);
+					}
+				} else
+					if (knownResults.size() + 1 >= tempDataSetDescription.getPartCntI()) {
+						System.out.println("*****************************");
+						System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
+								+ ", RESULTS AVAILABLE: " + knownResults.size());
+						final Experiment e = new Experiment();
+						long tFinish = System.currentTimeMillis();
+						final int wl = knownResults.size();
+						final ThreadSafeOptions tso = new ThreadSafeOptions();
+						final Runtime r = Runtime.getRuntime();
+						ExecutorService es = Executors.newFixedThreadPool(2);
+						for (ExperimentHeaderInterface ii : knownResults) {
+							final ExperimentHeaderInterface i = ii;
+							Runnable rr = new Runnable() {
+								@Override
+								public void run() {
+									System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
+											/ 1024
+											+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
+									ExperimentInterface ei = m.getExperiment(i);
+									String[] cc = i.getExperimentName().split("§");
+									synchronized (tso) {
+										tso.addInt(1);
+										if (tso.getInt() != 1) {
+											// weight_before, water_weight, water_sum
+											ArrayList<SubstanceInterface> del = new ArrayList<SubstanceInterface>();
+											for (SubstanceInterface si : ei) {
+												if (si.getName().equals("weight_before") || si.getName().equals("water_weight") || si.getName().equals("water_sum"))
+													del.add(si);
+											}
+											for (SubstanceInterface d : del)
+												ei.remove(d);
 										}
-										for (SubstanceInterface d : del)
-											ei.remove(d);
 									}
+									System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
+									// + ": "+ ei.getNumberOfMeasurementValues());
+									// int mv;
+									synchronized (e) {
+										StopWatch s = new StopWatch(">e.addMerge");
+										e.addAndMerge(ei);
+										// mv = e.getNumberOfMeasurementValues();
+										s.printTime();
+										// ExperimentHeaderInterface t = ei.getHeader();
+										// ei.clear();
+										// ei.setHeader(t);
+									}
+									// System.out.print(" ==> ");
+									// System.out.println(mv + " // job submission: "
+									// + SystemAnalysisExt.getCurrentTime(Long.parseLong(cc[3]))
+									// + " // storage time: "
+									// + SystemAnalysisExt.getCurrentTime(ei.getHeader().getStorageTime().getTime()));
 								}
-								System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
-								// + ": "+ ei.getNumberOfMeasurementValues());
-								// int mv;
-								synchronized (e) {
-									StopWatch s = new StopWatch(">e.addMerge");
-									e.addAndMerge(ei);
-									// mv = e.getNumberOfMeasurementValues();
-									s.printTime();
-									// ExperimentHeaderInterface t = ei.getHeader();
-									// ei.clear();
-									// ei.setHeader(t);
-								}
-								// System.out.print(" ==> ");
-								// System.out.println(mv + " // job submission: "
-								// + SystemAnalysisExt.getCurrentTime(Long.parseLong(cc[3]))
-								// + " // storage time: "
-								// + SystemAnalysisExt.getCurrentTime(ei.getHeader().getStorageTime().getTime()));
+							};
+							es.execute(rr);
+						}
+						es.shutdown();
+						es.awaitTermination(31, TimeUnit.DAYS);
+						String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
+						if (sn.indexOf(".") > 0)
+							sn = sn.substring(sn.lastIndexOf(".") + 1);
+						e.getHeader().setExperimentname(sn + ": " + "manual merge at " + SystemAnalysisExt.getCurrentTime());
+						e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
+						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
+						e.getHeader().setDatabaseId("");
+						for (SubstanceInterface si : e) {
+							for (ConditionInterface ci : si) {
+								ci.setExperimentName(e.getHeader().getExperimentName());
+								ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
 							}
-						};
-						es.execute(rr);
-					}
-					es.shutdown();
-					es.awaitTermination(31, TimeUnit.DAYS);
-					String sn = cmd.getRemoteCapableAnalysisActionClassName();
-					if (sn.indexOf(".") > 0)
-						sn = sn.substring(sn.lastIndexOf(".") + 1);
-					e.getHeader().setExperimentname(sn + ": " + "manual merge at " + SystemAnalysisExt.getCurrentTime());
-					e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
-					e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
-					e.getHeader().setDatabaseId("");
-					for (SubstanceInterface si : e) {
-						for (ConditionInterface ci : si) {
-							ci.setExperimentName(e.getHeader().getExperimentName());
-							ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
 						}
-					}
-					// ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
-					// e.clear();
-					// e.addAndMerge(MappingData3DPath.merge(mdpl, false));
-					long tStart = cmd.getSubmissionTimeL();
-					long tProcessing = tFinish - tStart;
-					long minutes = tProcessing / 1000 / 60;
-					e.getHeader().setRemark(
+						// ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
+						// e.clear();
+						// e.addAndMerge(MappingData3DPath.merge(mdpl, false));
+						long tStart = tempDataSetDescription.getSubmissionTimeL();
+						long tProcessing = tFinish - tStart;
+						long minutes = tProcessing / 1000 / 60;
+						e.getHeader().setRemark(
 								e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " + SystemAnalysisExt.getCurrentTime());
-					System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
-					System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
-					System.out.println("*****************************");
-					System.out.println("Merged Experiment: " + e.getName());
-					System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
-					
-					System.out.println("> SAVE COMBINED EXPERIMENT...");
-					m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
-					System.out.println("> DELETE TEMP DATA...");
-					for (ExperimentHeaderInterface i : knownResults) {
-						try {
-							if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0)
-								m.deleteExperiment(i.getDatabaseId());
-							
-						} catch (Exception err) {
-							System.out.println("Could not delete experiment " + i.getExperimentName() + " (" + err.getMessage() + ")");
+						System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
+						System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
+						System.out.println("*****************************");
+						System.out.println("Merged Experiment: " + e.getName());
+						System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
+						
+						System.out.println("> SAVE COMBINED EXPERIMENT...");
+						m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
+						System.out.println("> DELETE TEMP DATA...");
+						for (ExperimentHeaderInterface i : knownResults) {
+							try {
+								if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0)
+									m.deleteExperiment(i.getDatabaseId());
+								
+							} catch (Exception err) {
+								System.out.println("Could not delete experiment " + i.getExperimentName() + " (" + err.getMessage() + ")");
+							}
 						}
+						System.out.println(SystemAnalysisExt.getCurrentTime() + "> COMPLETED");
+						return;
 					}
-					System.out.println(SystemAnalysisExt.getCurrentTime() + "> COMPLETED");
-					return;
-				}
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);

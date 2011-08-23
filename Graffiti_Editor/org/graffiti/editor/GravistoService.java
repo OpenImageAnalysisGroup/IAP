@@ -1150,10 +1150,11 @@ public class GravistoService implements HelperClass {
 	}
 	
 	public static String getHashFromInputStream(InputStream is, ObjectRef optFileSize, HashType type) throws Exception {
-		return getHashFromInputStream(new InputStream[] { is }, new ObjectRef[] { optFileSize }, type)[0];
+		return getHashFromInputStream(new InputStream[] { is }, new ObjectRef[] { optFileSize }, type, false)[0];
 	}
 	
-	public static String[] getHashFromInputStream(final InputStream[] iss, final ObjectRef[] optFileSize, final HashType type) throws Exception {
+	public static String[] getHashFromInputStream(final InputStream[] iss, final ObjectRef[] optFileSize, final HashType type, boolean threaded)
+			throws Exception {
 		if (iss == null)
 			return null;
 		
@@ -1202,11 +1203,15 @@ public class GravistoService implements HelperClass {
 				}
 			});
 			t1.setName("Hash Calculation (Stream " + i + ")");
-			t1.start();
+			if (threaded)
+				t1.start();
+			else
+				t1.run();
 			tl.add(t1);
 		}
-		for (int i = 0; i < iss.length; i++)
-			tl.get(i).join();
+		if (threaded)
+			for (int i = 0; i < iss.length; i++)
+				tl.get(i).join();
 		String[] res = new String[iss.length];
 		for (int i = 0; i < iss.length; i++)
 			res[i] = (String) resultList.get(i).getObject();

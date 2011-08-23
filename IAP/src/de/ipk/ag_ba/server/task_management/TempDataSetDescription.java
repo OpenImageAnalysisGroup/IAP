@@ -5,11 +5,13 @@ public class TempDataSetDescription implements Comparable<TempDataSetDescription
 	private final String bcn;
 	private final String bpn;
 	private final String bst;
+	private final String originDBid;
 	
-	public TempDataSetDescription(String bcn, String bpn, String bst) {
+	public TempDataSetDescription(String bcn, String bpn, String bst, String originDBid) {
 		this.bcn = bcn;
 		this.bpn = bpn;
 		this.bst = bst;
+		this.originDBid = originDBid;
 	}
 	
 	@Override
@@ -45,5 +47,9 @@ public class TempDataSetDescription implements Comparable<TempDataSetDescription
 	
 	public long getSubmissionTimeL() {
 		return Long.parseLong(bst);
+	}
+
+	public String getOriginDBid() {
+		return originDBid;
 	}
 }

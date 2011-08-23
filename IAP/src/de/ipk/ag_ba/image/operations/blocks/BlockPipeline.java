@@ -46,6 +46,10 @@ public class BlockPipeline {
 		blocks.add(blockClass);
 	}
 	
+	public void remove(Class<?> class1) {
+		blocks.remove(class1);
+	}
+	
 	/**
 	 * @return The execution time for the last pipeline execution time. This is a static method,
 	 *         if several pipelines are executed in parallel, it returns the execution time of the globally
@@ -278,4 +282,5 @@ public class BlockPipeline {
 		
 		return summaryResult;
 	}
+	
 }
