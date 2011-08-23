@@ -73,7 +73,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.getIO().blur(10).getImage().print("blurf", false), 0.075f, h, 20).getIO().// blur(3).
 				thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
 		
-		probablyBloomFluo = probablyBloomFluo.getIO().print("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
+		probablyBloomFluo = probablyBloomFluo.getIO().print("BEFORE", true).medianFilter32Bit().invert().removeSmallClusters(true, null).
 				erode().erode().erode().erode().invert().
 				getImage();
 		
