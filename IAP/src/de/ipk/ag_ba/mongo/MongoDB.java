@@ -242,6 +242,7 @@ public class MongoDB {
 							StopWatch s = new StopWatch("INFO: new Mongo()", false);
 							m = new Mongo();
 							m.slaveOk();
+							m.getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
 							m.getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime();
 						} else {
@@ -251,6 +252,7 @@ public class MongoDB {
 								seeds.add(new ServerAddress(h));
 							m = new Mongo(seeds);
 							m.slaveOk();
+							m.getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
 							m.getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime();
 						}
@@ -1240,6 +1242,7 @@ public class MongoDB {
 				
 				@Override
 				public void run() {
+					// synchronized (db) {
 					DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
 					DBObject expref = dbr.fetch();
 					if (expref != null) {
@@ -1267,12 +1270,13 @@ public class MongoDB {
 					experiment.setHeader(header);
 					
 					int numberOfImagesAndVolumes = countMeasurementValues(experiment, new MeasurementNodeType[] {
-							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
+								MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
 					
 					if (numberOfImagesAndVolumes > 0 && interactiveCalculateExperimentSize) {
 						updateExperimentSize(db, experiment, optStatusProvider);
 					}
+					// }
 				}
 				
 				@Override
