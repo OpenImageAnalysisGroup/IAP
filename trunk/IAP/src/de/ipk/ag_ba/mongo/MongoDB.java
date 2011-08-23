@@ -347,7 +347,7 @@ public class MongoDB {
 					DBObject o = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).findOne(obj);
 					if (o != null) {
 						WriteResult wr = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).remove(o);
-						System.out.println(wr.toString());
+						System.out.println(SystemAnalysisExt.getCurrentTime() + ">DELETE WRITERESULT: ERROR? " + wr.getLastError().getErrorMessage());
 					}
 				}
 			}
@@ -576,11 +576,11 @@ public class MongoDB {
 				
 				conditions.insert(condition);
 				
-				conditionIDs.add(((BasicDBObject) condition).getString("_id"));
+				conditionIDs.add((condition).getString("_id"));
 				
 			} // condition
 			processSubstanceSaving(status, substances, substance, conditionIDs);
-			substanceIDs.add(((BasicDBObject) substance).getString("_id"));
+			substanceIDs.add((substance).getString("_id"));
 			
 		} // substance
 		
@@ -937,7 +937,7 @@ public class MongoDB {
 						new MyByteArrayInputStream(isMain),
 						isLabel != null ? new MyByteArrayInputStream(isLabel) : null
 				},
-						new ObjectRef[] { fileSize, fileSize }, getHashType());
+						new ObjectRef[] { fileSize, fileSize }, getHashType(), false);
 				
 				String hashMain = hashes[0];
 				String hashLabel = hashes[1];

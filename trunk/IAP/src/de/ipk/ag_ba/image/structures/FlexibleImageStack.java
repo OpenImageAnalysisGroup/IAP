@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import javax.swing.JButton;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.utils.MyFileSaver;
@@ -56,6 +57,8 @@ public class FlexibleImageStack {
 	}
 	
 	public void print(String title) {
+		if (SystemAnalysis.isHeadless())
+			return;
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);
 		image.show(title + " (" + stack.getSize() + ")");
@@ -63,6 +66,8 @@ public class FlexibleImageStack {
 	}
 	
 	public void print(String title, final Runnable actionCmd, String buttonTitle) {
+		if (SystemAnalysis.isHeadless())
+			return;
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);
 		image.show(title + " (" + stack.getSize() + ")");
