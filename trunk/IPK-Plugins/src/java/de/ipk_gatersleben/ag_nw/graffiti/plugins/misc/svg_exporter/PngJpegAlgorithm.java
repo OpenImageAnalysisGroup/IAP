@@ -83,10 +83,6 @@ import org.graffiti.session.EditorSession;
 import org.graffiti.util.InstanceCreationException;
 import org.w3c.dom.NodeList;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
-
 import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.NeedsSwingThread;
@@ -99,7 +95,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					NeedsSwingThread {
@@ -741,33 +737,33 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 				
 				if (parameter.getScaleSetting() == SizeSetting.DPI) {
 					
-					if (parameter.isCreateJPG()) {
-						FileOutputStream os = new FileOutputStream(file);
-						JPEGImageEncoder jpegEncoder = JPEGCodec
-											.createJPEGEncoder(os);
-						JPEGEncodeParam jpegEncodeParam = jpegEncoder
-											.getDefaultJPEGEncodeParam(bi);
-						// jpegEncodeParam
-						// .setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
-						jpegEncodeParam.setXDensity(parameter.getScaleDPIprintDPI());
-						jpegEncodeParam.setYDensity(parameter.getScaleDPIprintDPI());
-						jpegEncodeParam.setQuality(1f, false);
-						jpegEncoder.encode(bi, jpegEncodeParam);
-					} else {
-						writePngFile(bi, file.getAbsolutePath(), parameter
+					// if (parameter.isCreateJPG()) {
+					// FileOutputStream os = new FileOutputStream(file);
+					// JPEGImageEncoder jpegEncoder = JPEGCodec
+					// .createJPEGEncoder(os);
+					// JPEGEncodeParam jpegEncodeParam = jpegEncoder
+					// .getDefaultJPEGEncodeParam(bi);
+					// // jpegEncodeParam
+					// // .setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
+					// jpegEncodeParam.setXDensity(parameter.getScaleDPIprintDPI());
+					// jpegEncodeParam.setYDensity(parameter.getScaleDPIprintDPI());
+					// jpegEncodeParam.setQuality(1f, false);
+					// jpegEncoder.encode(bi, jpegEncodeParam);
+					// } else {
+					writePngFile(bi, file.getAbsolutePath(), parameter
 											.getScaleDPIprintDPI());
-					}
+					// }
 				} else {
-					if (parameter.isCreateJPG()) {
-						FileOutputStream os = new FileOutputStream(file);
-						JPEGImageEncoder jpegEncoder = JPEGCodec
-											.createJPEGEncoder(os);
-						JPEGEncodeParam jpegEncodeParam = jpegEncoder
-											.getDefaultJPEGEncodeParam(bi);
-						jpegEncodeParam.setQuality(1f, false);
-						jpegEncoder.encode(bi, jpegEncodeParam);
-					} else
-						ImageIO.write(bi, imageType, file);
+					// if (parameter.isCreateJPG()) {
+					// FileOutputStream os = new FileOutputStream(file);
+					// JPEGImageEncoder jpegEncoder = JPEGCodec
+					// .createJPEGEncoder(os);
+					// JPEGEncodeParam jpegEncodeParam = jpegEncoder
+					// .getDefaultJPEGEncodeParam(bi);
+					// jpegEncodeParam.setQuality(1f, false);
+					// jpegEncoder.encode(bi, jpegEncodeParam);
+					// } else
+					ImageIO.write(bi, imageType, file);
 				}
 				
 				status.setCurrentStatusValueFine(100d);

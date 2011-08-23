@@ -16,6 +16,7 @@ import javax.swing.Timer;
 import org.BackgroundTaskStatusProvider;
 import org.HelperClass;
 import org.ObjectRef;
+import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -87,13 +88,14 @@ public class BackgroundTaskHelper implements HelperClass {
 	 * in case the <code>pleaseStop</code> method is called.
 	 */
 	public void startWork(final Object referenceObject) {
-		final BackgroundTaskGUIprovider taskWindow;
-		if (showDialog)
-			taskWindow = new BackgroundTaskWindow(modal);
-		else
-			taskWindow = new BackgroundTaskPanelEntry(false);
-		taskWindow.setStatusProvider(statusProvider, title, taskName);
-		
+		BackgroundTaskGUIprovider taskWindow = null;
+		if (!SystemAnalysis.isHeadless()) {
+			if (showDialog)
+				taskWindow = new BackgroundTaskWindow(modal);
+			else
+				taskWindow = new BackgroundTaskPanelEntry(false);
+			taskWindow.setStatusProvider(statusProvider, title, taskName);
+		}
 		runThread = new Thread(workTask);
 		final long currentTime = System.currentTimeMillis();
 		if (taskName != null)
@@ -106,58 +108,63 @@ public class BackgroundTaskHelper implements HelperClass {
 			runThread.start();
 		}
 		
-		if (!showDialog) {
-			// add panel to mainframe status area
-			final MainFrame mf = GravistoService.getInstance().getMainFrame();
-			if (mf != null) {
-				if (title != null) {
-					final ObjectRef tt = new ObjectRef();
-					ActionListener al = new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							if (runThread.isAlive())
-								mf.addStatusPanel((JPanel) taskWindow);
-							Timer t = (Timer) tt.getObject();
-							if (t != null)
-								t.stop();
-						}
-					};
-					/**
-					 * Show task panel entry with delay (no dialog for short tasks)
-					 */
-					if (autoClose) {
-						Timer t = new Timer(initalShowDelay, al);
-						tt.setObject(t);
-						t.start();
-					} else
-						al.actionPerformed(null);
-				}
-			}
-		}
+		final BackgroundTaskGUIprovider taskWindowF = taskWindow;
 		
-		final ThreadSafeOptions tso = new ThreadSafeOptions();
-		final Timer checkStatus = new Timer(100, new ActionListener() {
-			boolean finishedCalled = false;
-			
-			public void actionPerformed(ActionEvent arg0) {
-				if (!runThread.isAlive()) {
-					if (!finishedCalled) {
-						long endTime = System.currentTimeMillis();
-						taskWindow.setTaskFinished(autoClose, endTime - currentTime);
-						finishedCalled = true;
-					}
-				}
-				if (!taskWindow.isProgressViewVisible()) {
-					Timer checkStatusTimer = (Timer) tso.getParam(0, null);
-					if (checkStatusTimer != null)
-						checkStatusTimer.stop();
-					synchronized (runningTasksRefrenceObjects) {
-						runningTasksRefrenceObjects.remove(referenceObject);
+		if (!SystemAnalysis.isHeadless())
+			if (!showDialog) {
+				// add panel to mainframe status area
+				final MainFrame mf = GravistoService.getInstance().getMainFrame();
+				if (mf != null) {
+					if (title != null) {
+						final ObjectRef tt = new ObjectRef();
+						ActionListener al = new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								if (runThread.isAlive())
+									mf.addStatusPanel((JPanel) taskWindowF);
+								Timer t = (Timer) tt.getObject();
+								if (t != null)
+									t.stop();
+							}
+						};
+						/**
+						 * Show task panel entry with delay (no dialog for short tasks)
+						 */
+						if (autoClose) {
+							Timer t = new Timer(initalShowDelay, al);
+							tt.setObject(t);
+							t.start();
+						} else
+							al.actionPerformed(null);
 					}
 				}
 			}
-		});
-		tso.setParam(0, checkStatus);
-		checkStatus.start();
+		
+		if (!SystemAnalysis.isHeadless()) {
+			final ThreadSafeOptions tso = new ThreadSafeOptions();
+			Timer checkStatus = new Timer(100, new ActionListener() {
+				boolean finishedCalled = false;
+				
+				public void actionPerformed(ActionEvent arg0) {
+					if (!runThread.isAlive()) {
+						if (!finishedCalled) {
+							long endTime = System.currentTimeMillis();
+							taskWindowF.setTaskFinished(autoClose, endTime - currentTime);
+							finishedCalled = true;
+						}
+					}
+					if (!taskWindowF.isProgressViewVisible()) {
+						Timer checkStatusTimer = (Timer) tso.getParam(0, null);
+						if (checkStatusTimer != null)
+							checkStatusTimer.stop();
+						synchronized (runningTasksRefrenceObjects) {
+							runningTasksRefrenceObjects.remove(referenceObject);
+						}
+					}
+				}
+			});
+			tso.setParam(0, checkStatus);
+			checkStatus.start();
+		}
 	}
 	
 	public Thread getRunThread() {
