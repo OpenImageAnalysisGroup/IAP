@@ -45,5 +45,4 @@ public interface BlockProperties {
 	public void setImage(String id, FlexibleImage image);
 	
 	public FlexibleImage getImage(String id);
-	
 }
