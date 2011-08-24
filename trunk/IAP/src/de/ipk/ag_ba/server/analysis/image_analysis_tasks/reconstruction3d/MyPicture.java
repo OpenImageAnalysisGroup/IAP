@@ -20,10 +20,11 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.graffiti.editor.GravistoService;
 
 import qmwi.kseg.som.SOM_ColorReduce;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /*
  * Created on Dec 17, 2009 by Christian Klukas
@@ -40,11 +41,11 @@ public class MyPicture {
 	
 	private double angle, cosAngle, sinAngle;
 	
-	private BufferedImage img;
-	
 	private boolean isTop;
 	
 	private TransparencyAnalysis ta;
+	
+	int[][] img;
 	
 	/**
 	 * @param cubeRelativePixel
@@ -95,7 +96,7 @@ public class MyPicture {
 	}
 	
 	public int getRGB(int x, int y) {
-		int rgb = img.getRGB(x, y);
+		int rgb = img[x][y];
 		return rgb;
 	}
 	
@@ -112,27 +113,24 @@ public class MyPicture {
 		this.sinAngle = Math.sin(angle);
 		
 		// this.isTop = isTop;
+		width = bufferedImage.getWidth();
+		height = bufferedImage.getHeight();
 		
-		img = bufferedImage;
-		
-		width = img.getWidth();
-		height = img.getHeight();
+		img = new FlexibleImage(bufferedImage).getAs2A();
 		
 		// blur image
-		int blr = 0;// (int) ((double) width / mg.getResolution() * blurfactor);
-		
-		blr = 0;
-		
-		if (blr > 0) {
-			img = GravistoService.blurImage(img, blr);
-		}
+		// int blr = 0;// (int) ((double) width / mg.getResolution() * blurfactor);
+		// blr = 0;
+		// if (blr > 0) {
+		// img = GravistoService.blurImage(img, blr);
+		// }
 		
 		transparentImageData = new BitSet(width * height);
 		long nottransp = 0;
 		long allp = 0;
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				int rgb = img.getRGB(x, y);
+				int rgb = getRGB(x, y);
 				// Color c = new Color(rgb);
 				allp++;
 				// if (ta.isTransparent(c)) {
@@ -145,6 +143,58 @@ public class MyPicture {
 		}
 		if (nottransp / (double) allp > 0.50)
 			System.out.println("WARNING: High Picture Fill: " + (int) (100d * nottransp / allp) + "%");
+		
+		// this.ta = ta;
+		
+		return 1d * nottransp / allp < 0.3;
+	}
+	
+	public boolean setPictureData(FlexibleImage image, double angle,
+			ThreeDmodelGenerator mg
+			// ,
+			// TransparencyAnalysis ta,
+			// boolean isTop
+			// , double blurfactor
+			) {
+		
+		this.angle = angle;
+		this.cosAngle = Math.cos(angle);
+		this.sinAngle = Math.sin(angle);
+		
+		// this.isTop = isTop;
+		
+		img = image.getAs2A();
+		
+		width = image.getWidth();
+		height = image.getHeight();
+		
+		// // blur image
+		// int blr = 0;// (int) ((double) width / mg.getResolution() * blurfactor);
+		//
+		// blr = 0;
+		//
+		// if (blr > 0) {
+		// img = GravistoService.blurImage(img, blr);
+		// }
+		//
+		transparentImageData = new BitSet(width * height);
+		long nottransp = 0;
+		long allp = 0;
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				int rgb = getRGB(x, y);
+				// Color c = new Color(rgb);
+				allp++;
+				// if (ta.isTransparent(c)) {
+				if (rgb == ImageOperation.BACKGROUND_COLORint) {
+					transparentImageData.set(y * width + x);
+				} else {
+					nottransp++;
+				}
+			}
+		}
+		if (nottransp / (double) allp > 0.50)
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: High Picture Fill: " + (int) (100d * nottransp / allp) + "%");
 		
 		// this.ta = ta;
 		
@@ -178,7 +228,7 @@ public class MyPicture {
 					;
 				else
 					continue;
-				int rgb = img.getRGB(x, y);
+				int rgb = getRGB(x, y);
 				int red = (rgb & 0x00ff0000) >> 16;
 				int green = (rgb & 0x0000ff00) >> 8;
 				int blue = rgb & 0x000000ff;
