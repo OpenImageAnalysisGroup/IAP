@@ -191,10 +191,10 @@ public class ConvexHullCalculator {
 		Graphics2D g2d = (Graphics2D) bi.getGraphics();
 		
 		if (drawHull && polygon != null)
-			drawHull(g2d, polygon, 2, hullLineColor);
+			drawHull(g2d, polygon, 4, hullLineColor);
 		
 		if (drawCentroid && centroid != null)
-			drawCross(g2d, centroid, 40, 4, centroidColor);
+			drawCross(g2d, centroid, 50, 5, centroidColor);
 		
 		return new ImageOperation(bi, in.getResultsTable());
 	}

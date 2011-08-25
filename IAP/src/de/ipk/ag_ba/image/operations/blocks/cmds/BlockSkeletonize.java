@@ -73,7 +73,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.getIO().blur(10).getImage().print("blurf", false), 0.075f, h, 20).getIO().// blur(3).
 				thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
 		
-		probablyBloomFluo = probablyBloomFluo.getIO().print("BEFORE", true).medianFilter32Bit().invert().removeSmallClusters(true, null).
+		probablyBloomFluo = probablyBloomFluo.getIO().print("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
 				erode().erode().erode().erode().invert().
 				getImage();
 		
@@ -97,7 +97,7 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		// ***Out***
 		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
 		FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
-		result.print("res", debug);
+		result.print("res", false);
 		FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
 		result2.print("res2", false);
 		

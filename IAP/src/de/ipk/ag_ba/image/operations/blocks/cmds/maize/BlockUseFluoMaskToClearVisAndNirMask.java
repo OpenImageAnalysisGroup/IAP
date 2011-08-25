@@ -29,7 +29,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
-			return clearImageSide(input, getInput().getMasks().getFluo(), 0.1);
+			return clearImageSide(input, getInput().getMasks().getFluo(), 0.1).print("cleared", false);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {

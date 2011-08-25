@@ -28,7 +28,7 @@ public class BlockFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		
 		ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
-		
+		getInput().getImages().getVis();
 		FlexibleImage vis = getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null) {
 			numericResult = getMarkers(vis);
