@@ -163,16 +163,23 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		try {
 			Sample3D inSample = null;
 			TreeMap<Double, BlockProperties> analysisResults = new TreeMap<Double, BlockProperties>();
+			TreeMap<Double, ImageData> analysisInput = new TreeMap<Double, ImageData>();
 			for (Double angle : tmf.keySet()) {
 				if (tmf.get(angle).getVIS() != null)
 					inSample = (Sample3D) tmf.get(angle).getVIS().getParentSample();
+				else
+					continue;
+				ImageData inImage = tmf.get(angle).getVIS();
 				BlockProperties results = processAngleWithinSnapshot(tmf.get(angle), maximumThreadCountOnImageLevel, status,
 								workloadEqualAngleSnapshotSets, getParentPriority());
-				if (results != null)
+				if (results != null) {
+					analysisInput.put(angle, inImage);
 					analysisResults.put(angle, results);
+				}
 			}
 			if (inSample != null && !analysisResults.isEmpty()) {
-				BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(inSample, analysisResults);
+				BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(
+						inSample, analysisInput, analysisResults);
 				processStatisticalSampleOutput(inSample, postprocessingResults);
 			}
 		} catch (Error e) {
@@ -454,7 +461,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			NumericMeasurement3D m = new NumericMeasurement3D(inVis, bpv.getName(), inVis.getParentSample()
 					.getParentCondition().getExperimentName()
 					+ " (" + getName() + ")");
-			
 			m.setValue(bpv.getValue());
 			m.setUnit(bpv.getUnit());
 			
@@ -468,8 +474,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			if (bpv.getName() == null)
 				continue;
 			
-			NumericMeasurement3D m = new NumericMeasurement3D(new NumericMeasurement(inSample), bpv.getName(), inSample.getParentCondition().getExperimentName()
-					+ " (" + getName() + ")");
+			NumericMeasurement3D m = new NumericMeasurement3D(new NumericMeasurement(inSample),
+					bpv.getName(),
+					inSample.getParentCondition().getExperimentName()
+							+ " (" + getName() + ")");
 			
 			m.setValue(bpv.getValue());
 			m.setUnit(bpv.getUnit());

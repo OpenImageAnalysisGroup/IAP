@@ -181,7 +181,7 @@ public class TaskDescription {
 									if (ei.getNumberOfMeasurementValues() > 0)
 										System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
 									e.addAndMerge(ei);
-									m.deleteExperiment(i.getDatabaseId());
+									// m.deleteExperiment(i.getDatabaseId());
 									System.out.println("*****************************");
 								}
 								String sn = cmd.getRemoteCapableAnalysisActionClassName();

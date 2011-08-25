@@ -14,6 +14,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author pape, klukas, entzian
@@ -77,9 +78,14 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	protected abstract BlockPipeline getPipeline(ImageProcessorOptions options);
 	
 	@Override
-	public BlockProperties postProcessPipelineResults(Sample3D inSample, TreeMap<Double, BlockProperties> analysisResults) throws InstantiationException,
+	public BlockProperties postProcessPipelineResults(Sample3D inSample,
+			TreeMap<Double, ImageData> inImages,
+			TreeMap<Double, BlockProperties> analysisResults) throws InstantiationException,
 			IllegalAccessException {
 		BlockPipeline pipeline = getPipeline(null);
-		return pipeline.postProcessPipelineResultsForAllAngles(inSample, analysisResults);
+		return pipeline.postProcessPipelineResultsForAllAngles(
+				inSample,
+				inImages,
+				analysisResults);
 	}
 }

@@ -28,6 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * A list of image analysis "blocks" ({@link ImageAnalysisBlockFIS}) which may be executed lineary in a row.
@@ -270,7 +271,9 @@ public class BlockPipeline {
 				status, false, true);
 	}
 	
-	public BlockProperties postProcessPipelineResultsForAllAngles(Sample3D inSample, TreeMap<Double, BlockProperties> allResultsForSnapshot)
+	public BlockProperties postProcessPipelineResultsForAllAngles(Sample3D inSample,
+			TreeMap<Double, ImageData> inImages,
+			TreeMap<Double, BlockProperties> allResultsForSnapshot)
 			throws InstantiationException,
 			IllegalAccessException {
 		BlockProperties summaryResult = new BlockPropertiesImpl();
@@ -278,7 +281,7 @@ public class BlockPipeline {
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			block.setInputAndOptions(null, null, null, index++, null);
-			block.postProcessResultsForAllAngles(inSample, allResultsForSnapshot, summaryResult);
+			block.postProcessResultsForAllAngles(inSample, inImages, allResultsForSnapshot, summaryResult);
 		}
 		
 		return summaryResult;

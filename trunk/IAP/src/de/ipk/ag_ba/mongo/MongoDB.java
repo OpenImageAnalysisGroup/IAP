@@ -426,7 +426,6 @@ public class MongoDB {
 		// List<DBObject> dbSubstances = new ArrayList<DBObject>();
 		// HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>(experiment);
-		experiment.clear();
 		Runtime r = Runtime.getRuntime();
 		ArrayList<String> substanceIDs = new ArrayList<String>();
 		while (!sl.isEmpty()) {

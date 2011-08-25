@@ -7,6 +7,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public interface ImageAnalysisBlockFIS {
 	
@@ -21,5 +22,7 @@ public interface ImageAnalysisBlockFIS {
 	
 	public int getBlockPosition();
 	
-	public void postProcessResultsForAllAngles(Sample3D inSample, TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult);
+	public void postProcessResultsForAllAngles(Sample3D inSample,
+			TreeMap<Double, ImageData> inImages,
+			TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult);
 }
