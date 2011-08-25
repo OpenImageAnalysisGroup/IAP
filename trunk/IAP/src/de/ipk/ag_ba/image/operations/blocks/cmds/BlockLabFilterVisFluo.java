@@ -18,7 +18,7 @@ public class BlockLabFilterVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null)
+		if (getInput().getMasks().getVis() == null && getInput().getImages().getVis() == null)
 			return null;
 		else
 			return labFilter(
@@ -37,7 +37,7 @@ public class BlockLabFilterVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput().getMasks().getFluo() == null)
+		if (getInput().getMasks().getFluo() == null && getInput().getImages().getFluo() == null)
 			return null;
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE)

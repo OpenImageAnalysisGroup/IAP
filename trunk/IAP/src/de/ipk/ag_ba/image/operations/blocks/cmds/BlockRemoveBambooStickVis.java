@@ -90,7 +90,7 @@ public class BlockRemoveBambooStickVis extends AbstractSnapshotAnalysisBlockFIS 
 			}
 		}
 		if (lastX > 0 && n > 10)
-			return new FlexibleImage(width, height, origarr).getIO().getCanvas().fillRect(lastX - 8, y - 16, 16, 32, new Color(0, 0, 254).getRGB()).getImage();
+			return new FlexibleImage(width, height, origarr).getIO().getCanvas().fillRect(lastX - 8, y - 16, 16, 32, new Color(0, 0, 254).getRGB(), 0).getImage();
 		else
 			return new FlexibleImage(width, height, origarr);
 	}

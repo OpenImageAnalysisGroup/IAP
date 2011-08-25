@@ -122,7 +122,7 @@ public class BlockUseFluoMaskToClearVisAndNirMask extends AbstractSnapshotAnalys
 		
 		double s = scaleFactor;
 		
-		double pa = 0.07;
+		double pa = 0.08;
 		
 		positions.setTop((int) (positions.getTopY() * s - pa * input.getWidth()));
 		positions.setBottom((int) (positions.getBottomY() * s + pa * input.getWidth()));
