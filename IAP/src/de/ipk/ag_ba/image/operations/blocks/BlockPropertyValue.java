@@ -34,5 +34,4 @@ public class BlockPropertyValue {
 	public String getString() {
 		return name + ";" + unit + ";" + value;
 	}
-	
 }

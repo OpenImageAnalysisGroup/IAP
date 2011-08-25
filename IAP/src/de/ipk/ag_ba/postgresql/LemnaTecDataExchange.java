@@ -545,6 +545,7 @@ public class LemnaTecDataExchange {
 			for (String id : ids) {
 				replID++;
 				idtag2replicateID.put(id, replID);
+				System.out.println(id + ";" + replID);
 			}
 		}
 		

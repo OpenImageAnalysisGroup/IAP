@@ -19,6 +19,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeColorDepth;
 
 public class BlockThreeDgeneration extends AbstractBlock {
@@ -38,8 +39,11 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	}
 	
 	@Override
-	public void postProcessResultsForAllAngles(Sample3D inSample, TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
-		super.postProcessResultsForAllAngles(inSample, allResultsForSnapshot, summaryResult);
+	public void postProcessResultsForAllAngles(
+			Sample3D inSample,
+			TreeMap<Double, ImageData> inImages,
+			TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
+		super.postProcessResultsForAllAngles(inSample, inImages, allResultsForSnapshot, summaryResult);
 		
 		int voxelresolution = 200;
 		int widthFactor = 40;
@@ -83,11 +87,11 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				}
 			}
 		}
-		double vv = 0.03;
+		double vv = 1;
 		double plantVolume = vv * solidVoxels;
 		getProperties().setNumericProperty(0, "RESULT_plant.volume", plantVolume);
 		
-		boolean createVolumeDataset = true;
+		boolean createVolumeDataset = false;
 		if (createVolumeDataset) {
 			Sample sample = inSample;
 			LoadedVolumeExtension volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResult());

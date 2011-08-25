@@ -371,16 +371,17 @@ public class CloudComputingService {
 						
 						System.out.println("> SAVE COMBINED EXPERIMENT...");
 						m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
-						System.out.println("> DELETE TEMP DATA...");
-						for (ExperimentHeaderInterface i : knownResults) {
-							try {
-								if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0)
-									m.deleteExperiment(i.getDatabaseId());
-								
-							} catch (Exception err) {
-								System.out.println("Could not delete experiment " + i.getExperimentName() + " (" + err.getMessage() + ")");
-							}
-						}
+						System.out.println("> DELETE TEMP DATA IS DISABLED!");
+						// System.out.println("> DELETE TEMP DATA...");
+						// for (ExperimentHeaderInterface i : knownResults) {
+						// try {
+						// if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0)
+						// m.deleteExperiment(i.getDatabaseId());
+						//
+						// } catch (Exception err) {
+						// System.out.println("Could not delete experiment " + i.getExperimentName() + " (" + err.getMessage() + ")");
+						// }
+						// }
 						System.out.println(SystemAnalysisExt.getCurrentTime() + "> COMPLETED");
 						return;
 					}

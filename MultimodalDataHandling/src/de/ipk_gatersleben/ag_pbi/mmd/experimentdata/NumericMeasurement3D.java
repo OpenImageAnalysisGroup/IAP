@@ -55,6 +55,11 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	
 	public NumericMeasurement3D(Measurement copyFrom, String newSubstanceName, String optNewExperimentName) {
 		super(copyFrom, newSubstanceName, optNewExperimentName);
+		if (copyFrom instanceof NumericMeasurement3D) {
+			setPositionUnit(((NumericMeasurement3D) copyFrom).getPositionUnit());
+			setPosition(((NumericMeasurement3D) copyFrom).getPosition());
+			setAnnotation(((NumericMeasurement3D) copyFrom).getAnnotation());
+		}
 	}
 	
 	@Override

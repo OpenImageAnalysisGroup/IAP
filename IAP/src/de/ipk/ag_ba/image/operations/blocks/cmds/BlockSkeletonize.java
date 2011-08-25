@@ -22,6 +22,7 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * calculate the skeleton to detect the leafs and the clade
@@ -216,7 +217,10 @@ public class BlockSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public void postProcessResultsForAllAngles(Sample3D inSample, TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
+	public void postProcessResultsForAllAngles(
+			Sample3D inSample,
+			TreeMap<Double, ImageData> inImages,
+			TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
 		Double maxLeafcount = -1d;
 		Double maxLeaflength = -1d;
 		Double maxLeaflengthNorm = -1d;
