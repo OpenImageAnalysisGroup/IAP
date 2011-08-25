@@ -24,7 +24,7 @@ public class BlockConvexHullOnFLuoOrVis extends AbstractSnapshotAnalysisBlockFIS
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage image = getInput().getMasks().getVis();
-		if (!options.isMaize()) {
+		if (options.isMaize()) {
 			ImageData info = getInput().getImages().getVisInfo();
 			ImageOperation res = processImage(image, info);
 			return res.getImage();
@@ -53,7 +53,7 @@ public class BlockConvexHullOnFLuoOrVis extends AbstractSnapshotAnalysisBlockFIS
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 		if (distHorizontal != null || options.getCameraPosition() == CameraPosition.TOP) {
 			int realDist = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
-			res = new ImageOperation(image).hull().find(true, false, false, false, Color.RED.getRGB(),
+			res = new ImageOperation(image).hull().find(true, false, true, true, Color.RED.getRGB(),
 					Color.BLUE.getRGB(),
 					Color.ORANGE.getRGB(), distHorizontal, realDist);
 			

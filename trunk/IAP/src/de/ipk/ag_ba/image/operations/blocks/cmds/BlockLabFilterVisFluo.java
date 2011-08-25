@@ -32,7 +32,7 @@ public class BlockLabFilterVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 						options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
 						options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
 						options.getCameraPosition(),
-						options.isMaize());
+						options.isMaize()).print("after lab", false);
 	}
 	
 	@Override
