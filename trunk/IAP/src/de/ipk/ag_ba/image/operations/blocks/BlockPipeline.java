@@ -270,14 +270,15 @@ public class BlockPipeline {
 				status, false, true);
 	}
 	
-	public BlockProperties postProcessPipelineResultsForAllAngles(TreeMap<Double, BlockProperties> allResultsForSnapshot) throws InstantiationException,
+	public BlockProperties postProcessPipelineResultsForAllAngles(Sample3D inSample, TreeMap<Double, BlockProperties> allResultsForSnapshot)
+			throws InstantiationException,
 			IllegalAccessException {
 		BlockProperties summaryResult = new BlockPropertiesImpl();
 		int index = 0;
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			block.setInputAndOptions(null, null, null, index++, null);
-			block.postProcessResultsForAllAngles(allResultsForSnapshot, summaryResult);
+			block.postProcessResultsForAllAngles(inSample, allResultsForSnapshot, summaryResult);
 		}
 		
 		return summaryResult;

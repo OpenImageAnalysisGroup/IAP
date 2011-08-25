@@ -9,6 +9,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 
 public interface ImageProcessor {
 	
@@ -24,6 +25,7 @@ public interface ImageProcessor {
 	
 	public abstract BackgroundTaskStatusProviderSupportingExternalCall getStatus();
 	
-	public abstract BlockProperties postProcessPipelineResults(TreeMap<Double, BlockProperties> analysisResults) throws InstantiationException,
+	public abstract BlockProperties postProcessPipelineResults(Sample3D inSample, TreeMap<Double, BlockProperties> analysisResults)
+			throws InstantiationException,
 			IllegalAccessException;
 }
