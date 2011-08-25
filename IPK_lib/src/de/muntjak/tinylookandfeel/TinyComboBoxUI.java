@@ -321,7 +321,6 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 	/*
 	 * Copied from BasicComboBoxUI.
 	 */
-	@Override
 	public Dimension getSizeForComponent(Component comp) {
 		currentValuePane.add(comp);
 		comp.setFont(comboBox.getFont());
