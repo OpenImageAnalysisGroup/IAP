@@ -172,7 +172,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					analysisResults.put(angle, results);
 			}
 			if (inSample != null && !analysisResults.isEmpty()) {
-				BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(analysisResults);
+				BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(inSample, analysisResults);
 				processStatisticalSampleOutput(inSample, postprocessingResults);
 			}
 		} catch (Error e) {

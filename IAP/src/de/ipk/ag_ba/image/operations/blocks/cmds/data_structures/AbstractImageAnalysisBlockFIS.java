@@ -9,6 +9,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 
 public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBlockFIS {
 	
@@ -90,7 +91,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	@Override
-	public void postProcessResultsForAllAngles(TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
+	public void postProcessResultsForAllAngles(Sample3D inSample, TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
 		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
 	}
 }
