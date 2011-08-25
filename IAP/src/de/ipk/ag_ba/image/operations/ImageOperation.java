@@ -832,8 +832,14 @@ public class ImageOperation {
 		image.getProcessor().drawRect(leftX, leftY, width, heigh);
 	}
 	
+	@Deprecated
 	public void fillRect(int leftX, int leftY, int width, int heigh) {
 		image.getProcessor().fill(new Roi(leftX, leftY, width, heigh));
+	}
+	
+	public ImageOperation fillRect2(int leftX, int leftY, int width, int heigh) {
+		image.getProcessor().fill(new Roi(leftX, leftY, width, heigh));
+		return new ImageOperation(image.getProcessor().getBufferedImage());
 	}
 	
 	public ImageOperation drawAndFillRect(int leftX, int leftY,
@@ -2470,6 +2476,45 @@ public class ImageOperation {
 	 *           - for 3 Channels of an 24 bit image
 	 * @return
 	 */
+	public ImageOperation multiplicateImageChannelsWithFactors(double[] factorsTop, double[] factorsBottom) {
+		int[][] img2d = getImageAs2array();
+		int width = getImage().getWidth();
+		int height = getImage().getHeight();
+		double rf, gf, bf;
+		int[][] result = new int[width][height];
+		for (int y = 0; y < height; y++) {
+			double rfff = (factorsBottom[0] - factorsTop[0]) / (double) height * y + factorsTop[0];
+			double gfff = (factorsBottom[1] - factorsTop[1]) / (double) height * y + factorsTop[1];
+			double bfff = (factorsBottom[2] - factorsTop[2]) / (double) height * y + factorsTop[2];
+			for (int x = 0; x < width; x++) {
+				int c = img2d[x][y];
+				rf = ((c & 0xff0000) >> 16);
+				gf = ((c & 0x00ff00) >> 8);
+				bf = (c & 0x0000ff);
+				
+				int r = (int) (rf * rfff);
+				int g = (int) (gf * gfff);
+				int b = (int) (bf * bfff);
+				
+				if (r > 255)
+					r = 255;
+				if (g > 255)
+					g = 255;
+				if (b > 255)
+					b = 255;
+				result[x][y] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			}
+		}
+		return new ImageOperation(result);
+	}
+	
+	/**
+	 * Image channels are multiplied by factors {1, 2, 3} (a factor for each channel).
+	 * 
+	 * @param factors
+	 *           - for 3 Channels of an 24 bit image
+	 * @return
+	 */
 	public ImageOperation multiplicateImageChannelsWithFactors(double[] factors) {
 		int[] img2d = getImageAs1array();
 		int width = getImage().getWidth();
@@ -2515,7 +2560,7 @@ public class ImageOperation {
 	}
 	
 	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, int recursion) {
-		int r, g, b;
+		int r, g, b, c, temp = 0;
 		float Li, ai, bi;
 		
 		// sums of RGB
@@ -2525,34 +2570,41 @@ public class ImageOperation {
 		
 		int count = 0;
 		
-		int[] img1d = getImageAs1array();
+		int[][] img2d = getImageAs2array();
 		float[] p;
-		for (int c : img1d) {
-			r = (c & 0xff0000) >> 16;
-			g = (c & 0x00ff00) >> 8;
-			b = c & 0x0000ff;
-			p = ImageOperation.labCube[r][g];
-			Li = p[b];
-			ai = p[b + 256];
-			bi = p[b + 512];
-			
-			// sum under following conditions
-			if (searchWhiteTrue) {
-				if (Li > LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-					sumR += r;
-					sumG += g;
-					sumB += b;
-					count++;
-				}
-			} else {
-				if (Li < LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-					sumR += r;
-					sumG += g;
-					sumB += b;
-					count++;
+		for (int x = x1; x < x1 + w; x++) {
+			for (int y = y1; y < y1 + h; y++) {
+				
+				c = img2d[x][y];
+				if (c != -2049)
+					temp++;
+				r = (c & 0xff0000) >> 16;
+				g = (c & 0x00ff00) >> 8;
+				b = c & 0x0000ff;
+				p = ImageOperation.labCube[r][g];
+				Li = p[b];
+				ai = p[b + 256];
+				bi = p[b + 512];
+				
+				// sum under following conditions
+				if (searchWhiteTrue) {
+					if (Li > LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
+						sumR += r;
+						sumG += g;
+						sumB += b;
+						count++;
+					}
+				} else {
+					if (Li < LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
+						sumR += r;
+						sumG += g;
+						sumB += b;
+						count++;
+					}
 				}
 			}
 		}
+		System.out.println("temp :: " + temp);
 		if (count < w * h * 0.1 && recursion < 30) {
 			return getRGBAverage(x1, y1, w, h, LThresh * 2, (int) (ABThresh * 1.1), searchWhiteTrue, recursion + 1);
 		}
@@ -2587,16 +2639,35 @@ public class ImageOperation {
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfo) {
 		if (image == null)
 			return null;
-		double r = brightness / rgbInfo[0];
-		double g = brightness / rgbInfo[1];
-		double b = brightness / rgbInfo[2];
-		double[] factors = { r, g, b };
-		// System.out.println("balance factors: " + r + " " + g + " " + b);
-		ImageOperation io = new ImageOperation(image);
-		ImageOperation res = io.multiplicateImageChannelsWithFactors(factors);
-		if (r + g + b > 60) {
-			res = res.blur(10);
-			res = res.multiplyHSV(2, 1.4, 0.9);
+		ImageOperation res;
+		if (rgbInfo.length > 3) {
+			double r1 = brightness / rgbInfo[0];
+			double g1 = brightness / rgbInfo[1];
+			double b1 = brightness / rgbInfo[2];
+			double r2 = brightness / rgbInfo[3];
+			double g2 = brightness / rgbInfo[4];
+			double b2 = brightness / rgbInfo[5];
+			double[] factorsTop = { r1, g1, b1 };
+			double[] factorsBottom = { r2, g2, b2 };
+			// System.out.println("balance factors: " + r + " " + g + " " + b);
+			ImageOperation io = new ImageOperation(image);
+			res = io.multiplicateImageChannelsWithFactors(factorsTop, factorsBottom);
+			if (r1 + g1 + b1 + r2 + g2 + b2 > 120) {
+				res = res.blur(10);
+				res = res.multiplyHSV(2, 1.4, 0.9);
+			}
+		} else {
+			double r = brightness / rgbInfo[0];
+			double g = brightness / rgbInfo[1];
+			double b = brightness / rgbInfo[2];
+			double[] factors = { r, g, b };
+			// System.out.println("balance factors: " + r + " " + g + " " + b);
+			ImageOperation io = new ImageOperation(image);
+			res = io.multiplicateImageChannelsWithFactors(factors);
+			if (r + g + b > 60) {
+				res = res.blur(10);
+				res = res.multiplyHSV(2, 1.4, 0.9);
+			}
 		}
 		return res;
 	}

@@ -63,7 +63,7 @@ public class ImageProcessorOptions {
 		LAB_MAX_L_VALUE_FLUO, LAB_MIN_A_VALUE_FLUO, LAB_MAX_A_VALUE_FLUO, LAB_MIN_B_VALUE_FLUO, LAB_MAX_B_VALUE_FLUO, LAB_MIN_L_VALUE_NIR, LAB_MAX_L_VALUE_NIR,
 		LAB_MIN_A_VALUE_NIR, LAB_MAX_A_VALUE_NIR, LAB_MIN_B_VALUE_NIR, LAB_MAX_B_VALUE_NIR,
 
-		L_Diff_VIS_TOP, abDiff_VIS_TOP, L_Diff_FLUO, abDiff_FLUO, B_Diff_NIR, W_Diff_NIR,
+		L_Diff_VIS_TOP, abDiff_VIS_TOP, L_Diff_FLUO, abDiff_FLUO, B_Diff_NIR, W_Diff_NIR, B_Diff_NIR_TOP, W_Diff_NIR_TOP,
 
 		IS_PARAMETER_SEARCH, IS_CROP_RESULT,
 
@@ -282,6 +282,8 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.abDiff_FLUO, 40);// 30
 		addIntSetting(Setting.B_Diff_NIR, 14); // 14
 		addIntSetting(Setting.W_Diff_NIR, 20);
+		addIntSetting(Setting.B_Diff_NIR_TOP, 14);
+		addIntSetting(Setting.W_Diff_NIR_TOP, 20);
 		
 		addBooleanSetting(Setting.IS_PARAMETER_SEARCH, false);
 		addBooleanSetting(Setting.IS_CROP_RESULT, false);

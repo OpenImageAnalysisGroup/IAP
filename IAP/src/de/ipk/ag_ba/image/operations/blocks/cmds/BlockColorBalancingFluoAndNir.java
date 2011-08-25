@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -51,7 +53,7 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 		FlexibleImage input = getInput().getImages().getNir();
 		FlexibleImage res;
 		if (input != null)
-			res = balance(input, 170, false);
+			res = balance(input, 180, false);
 		else
 			res = input;
 		return res;
@@ -62,7 +64,7 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 		FlexibleImage input = getInput().getMasks().getNir();
 		FlexibleImage res;
 		if (input != null)
-			res = balance(input, 170, false);
+			res = balance(input, 180, false);
 		else
 			res = input;
 		return res;
@@ -77,23 +79,9 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 			BlockProperty bpright) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		int w = (int) (width * size);
-		int h = (int) (height * size);
+		boolean debug = false;
 		
 		ImageOperation io = new ImageOperation(image);
-		
-		// float[] valuesleft;
-		// double r, b, g;
-		//
-		// if (MarkerPosX == -1) {
-		// valuesleft = io.getRGBAverage(20, h, w, height - 2 * h, 150, 50, true);
-		// float[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true);
-		//
-		// r = (valuesleft[0] + valuesright[0]) / 2;
-		// g = (valuesleft[1] + valuesright[1]) / 2;
-		// b = (valuesleft[2] + valuesright[2]) / 2;
-		// } else {
-		// valuesleft = io.getRGBAverage((int) MarkerPosX, (int) MarkerPosY, 50, 50, 150, 50, true);
 		
 		float[] values;
 		if (bpleft != null && bpright != null) {
@@ -104,23 +92,39 @@ public class BlockColorBalancingFluoAndNir extends AbstractSnapshotAnalysisBlock
 			
 			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, 150, 50, true);
 		} else {
+			float[] valuesTop, valuesBottom;
 			int left = (int) (0.3 * width);
 			int right = (int) (width - 0.3 * width);
-			int a = (right - left) / 4;
-			int b = right - left;
+			int scanHeight = (right - left) / 4;
+			int scanWidth = right - left;
+			int startHTop = (int) (height * 0.1 - scanHeight / 2);
 			
-			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, 150, 50, true);
+			// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
+			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true);
+			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true);
+			
+			if (debug) {
+				image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
+						.fillRect(left, height - (startHTop + scanHeight), scanWidth, scanHeight, Color.RED.getRGB(), 0.5).getImage()
+						.print("region scan for color balance");
+			}
+			values = new float[6];
+			int i = 0;
+			values[i] = valuesTop[i++];
+			values[i] = valuesTop[i++];
+			values[i] = valuesTop[i++];
+			i = 0;
+			values[i] += valuesBottom[i++];
+			values[i] += valuesBottom[i++];
+			values[i] += valuesBottom[i++];
+			
+			values[0] = values[0] / 2f;
+			values[1] = values[1] / 2f;
+			values[2] = values[2] / 2f;
 		}
 		double r = values[0];
 		double g = values[1];
 		double b = values[2];
-		// no function tested
-		// double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
-		// double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);
-		
-		// double r = (valuesleft[0] + valuesright[0]) / 2; // + valuestop[0] + valuesdown[0]) / 4;
-		// double g = (valuesleft[1] + valuesright[1]) / 2;// + valuestop[1] + valuesdown[1]) / 4;
-		// double b = (valuesleft[2] + valuesright[2]) / 2;// + valuestop[2] + valuesdown[2]) / 4;
 		
 		return new double[] { r * 255, g * 255, b * 255 };
 	}
