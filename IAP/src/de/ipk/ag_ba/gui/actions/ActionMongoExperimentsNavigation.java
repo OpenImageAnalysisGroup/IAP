@@ -37,6 +37,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	private final boolean limitToData;
 	private String currentUser;
 	private int nVis, nAvail = 0;
+	private boolean error;
+	private String errorMsg;
 	
 	public ActionMongoExperimentsNavigation(MongoDB m, boolean limitToData, boolean limitToResults) {
 		super("Access " + m.getDisplayName());
@@ -63,74 +65,79 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		nVis = 0;
-		if (!limitToResuls) {
-			res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
-			
-			if (!SystemAnalysis.isHeadless())
-				res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
-			if (!SystemAnalysis.isHeadless())
-				res.add(new NavigationButton(new MongoDBreorganizeAction(m), src.getGUIsetting()));
-			
-			NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
-			
-			NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Add Files", "img/ext/user-desktop.png",
-							"img/ext/user-desktop.png", src.getGUIsetting());
-			res.add(uploadFilesEntity);
-		}
-		// gruppe => user => experiment
 		
-		if (experimentList == null) {
-			res.add(Other.getServerStatusEntity(true, "Error Status", src.getGUIsetting()));
+		if (error) {
+			res.add(Other.getServerStatusEntity(false, "<html><center>Connection Error<br>(" + errorMsg + ")</center>", src.getGUIsetting()));
 		} else {
-			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> experiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
-			ArrayList<ExperimentHeaderInterface> trashed = new ArrayList<ExperimentHeaderInterface>();
-			for (ExperimentHeaderInterface eh : experimentList) {
-				String type = IAPservice.getSetting(IAPoptions.GROUP_BY_EXPERIMENT_TYPE) ? eh.getExperimentType() : eh.getImportusergroup();
-				if (type == null || type.length() == 0)
-					type = "[no type]";
-				String user = IAPservice.getSetting(IAPoptions.GROUP_BY_COORDINATOR) ? eh.getCoordinator() : eh.getImportusername();
-				if (user == null || user.length() == 0)
-					user = "[no user]";
-				if (eh.inTrash()) {
-					trashed.add(eh);
-					nVis++;
-					continue;
-				}
-				if (!experiments.containsKey(type))
-					experiments.put(type, new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
-				if (!experiments.get(type).containsKey(user))
-					experiments.get(type).put(user, new ArrayList<ExperimentHeaderInterface>());
-				experiments.get(type).get(user).add(eh);
-			}
-			
-			if (!limitToResuls)
-				if (currentUser == null || !currentUser.equals("public"))
-					res.add(new NavigationButton(
-							new CloundManagerNavigationAction(m, new ActionMongoExperimentsNavigation(m, false, true)), src.getGUIsetting()));
-			
-			if (!limitToResuls)
-				if (currentUser == null || !currentUser.equals("public"))
-					res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
-			
-			for (String group : experiments.keySet()) {
-				if (limitToResuls && !group.toUpperCase().contains("ANALYSIS RESULTS"))
-					continue;
-				if (limitToData && group.toUpperCase().contains("ANALYSIS RESULTS"))
-					continue;
+			if (!limitToResuls) {
+				res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
 				
-				res.add(new NavigationButton(createMongoGroupNavigationAction(group
-						+ " (" + count(experiments.get(group)) + ")", experiments.get(group)), src
-									.getGUIsetting()));
+				if (!SystemAnalysis.isHeadless())
+					res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
+				if (!SystemAnalysis.isHeadless())
+					res.add(new NavigationButton(new MongoDBreorganizeAction(m), src.getGUIsetting()));
+				
+				NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
+				
+				NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Add Files", "img/ext/user-desktop.png",
+							"img/ext/user-desktop.png", src.getGUIsetting());
+				res.add(uploadFilesEntity);
 			}
+			// gruppe => user => experiment
 			
-			if (!limitToResuls)
-				if (trashed.size() > 0) {
-					res.add(new NavigationButton(getTrashedExperimentsAction(trashed, m), src.getGUIsetting()));
+			if (experimentList == null) {
+				res.add(Other.getServerStatusEntity(true, "Error Status", src.getGUIsetting()));
+			} else {
+				TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> experiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
+				ArrayList<ExperimentHeaderInterface> trashed = new ArrayList<ExperimentHeaderInterface>();
+				for (ExperimentHeaderInterface eh : experimentList) {
+					String type = IAPservice.getSetting(IAPoptions.GROUP_BY_EXPERIMENT_TYPE) ? eh.getExperimentType() : eh.getImportusergroup();
+					if (type == null || type.length() == 0)
+						type = "[no type]";
+					String user = IAPservice.getSetting(IAPoptions.GROUP_BY_COORDINATOR) ? eh.getCoordinator() : eh.getImportusername();
+					if (user == null || user.length() == 0)
+						user = "[no user]";
+					if (eh.inTrash()) {
+						trashed.add(eh);
+						nVis++;
+						continue;
+					}
+					if (!experiments.containsKey(type))
+						experiments.put(type, new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
+					if (!experiments.get(type).containsKey(user))
+						experiments.get(type).put(user, new ArrayList<ExperimentHeaderInterface>());
+					experiments.get(type).get(user).add(eh);
 				}
-			
-			for (TreeMap<String, ArrayList<ExperimentHeaderInterface>> tm : experiments.values())
-				for (ArrayList<ExperimentHeaderInterface> al : tm.values())
-					nVis += al.size();
+				
+				if (!limitToResuls)
+					if (currentUser == null || !currentUser.equals("public"))
+						res.add(new NavigationButton(
+								new CloundManagerNavigationAction(m, new ActionMongoExperimentsNavigation(m, false, true)), src.getGUIsetting()));
+				
+				if (!limitToResuls)
+					if (currentUser == null || !currentUser.equals("public"))
+						res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
+				
+				for (String group : experiments.keySet()) {
+					if (limitToResuls && !group.toUpperCase().contains("ANALYSIS RESULTS"))
+						continue;
+					if (limitToData && group.toUpperCase().contains("ANALYSIS RESULTS"))
+						continue;
+					
+					res.add(new NavigationButton(createMongoGroupNavigationAction(group
+							+ " (" + count(experiments.get(group)) + ")", experiments.get(group)), src
+									.getGUIsetting()));
+				}
+				
+				if (!limitToResuls)
+					if (trashed.size() > 0) {
+						res.add(new NavigationButton(getTrashedExperimentsAction(trashed, m), src.getGUIsetting()));
+					}
+				
+				for (TreeMap<String, ArrayList<ExperimentHeaderInterface>> tm : experiments.values())
+					for (ArrayList<ExperimentHeaderInterface> al : tm.values())
+						nVis += al.size();
+			}
 		}
 		
 		return res;
@@ -487,8 +494,30 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		status.setCurrentStatusText1("Establishing Connection");
-		experimentList = m.getExperimentList(currentUser, status);
-		nAvail = experimentList.size();
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				experimentList = m.getExperimentList(currentUser, status);
+			}
+		};
+		error = false;
+		errorMsg = "";
+		
+		Thread t = new Thread(r, "Read MonogDB Experiment List");
+		t.start();
+		long start = System.currentTimeMillis();
+		do {
+			Thread.sleep(10);
+			long current = System.currentTimeMillis();
+			if (current - start > 1000) {
+				t.interrupt();
+				error = true;
+				errorMsg = "time out";
+				break;
+			}
+		} while (t.isAlive());
+		
+		nAvail = experimentList != null ? experimentList.size() : 0;
 		status.setCurrentStatusText1("");
 	}
 	
