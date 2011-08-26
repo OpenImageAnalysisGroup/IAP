@@ -571,6 +571,9 @@ public class LemnaTecDataExchange {
 			
 			idxx++;
 			
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ")");
+			
 			Condition conditionTemplate = idtag2condition.get(sn.getId_tag());
 			
 			species = conditionTemplate != null ? conditionTemplate.getSpecies() : "not specified";
@@ -754,7 +757,11 @@ public class LemnaTecDataExchange {
 						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
 											+ sn.getPath_image_config_blob(), sn.getId_tag()
 											+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+						if (optStatus != null)
+							optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ") (FTP)");
 						position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
+						if (optStatus != null)
+							optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ")");
 						if (Math.abs(position) < 0.00001)
 							position = null;
 					}
