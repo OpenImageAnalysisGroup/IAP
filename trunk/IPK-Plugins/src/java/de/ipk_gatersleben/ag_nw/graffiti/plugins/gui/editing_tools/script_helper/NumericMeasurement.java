@@ -40,6 +40,11 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		setValue(copyFrom.getValue());
 		setReplicateID(copyFrom.getReplicateID());
 		
+		if (copyFrom instanceof NumericMeasurement) {
+			setQualityAnnotation(((NumericMeasurement) copyFrom).getQualityAnnotation());
+			setUnit(((NumericMeasurement) copyFrom).getUnit());
+		}
+		
 		SubstanceInterface md = copyFrom.getParentSample().getParentCondition().getParentSubstance().clone();
 		md.setName(newSubstanceName);
 		ConditionInterface series = copyFrom.getParentSample().getParentCondition().clone(md);
