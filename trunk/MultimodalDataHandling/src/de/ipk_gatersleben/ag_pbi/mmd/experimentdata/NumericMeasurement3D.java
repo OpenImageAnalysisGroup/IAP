@@ -121,10 +121,15 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	
 	public static ExperimentInterface getExperiment(ArrayList<NumericMeasurementInterface> measurements, boolean sortConditionsByName,
 			boolean ignoreSnapshotFineTime) {
+		return getExperiment(measurements, sortConditionsByName, ignoreSnapshotFineTime, true);
+	}
+	
+	public static ExperimentInterface getExperiment(ArrayList<NumericMeasurementInterface> measurements, boolean sortConditionsByName,
+			boolean ignoreSnapshotFineTime, boolean cloneElements) {
 		ArrayList<MappingData3DPath> mappingpaths = new ArrayList<MappingData3DPath>();
 		
 		for (NumericMeasurementInterface meas : measurements)
-			mappingpaths.add(new MappingData3DPath(meas));
+			mappingpaths.add(new MappingData3DPath(meas, cloneElements));
 		
 		if (sortConditionsByName)
 			Collections.sort(mappingpaths, new Comparator<MappingData3DPath>() {

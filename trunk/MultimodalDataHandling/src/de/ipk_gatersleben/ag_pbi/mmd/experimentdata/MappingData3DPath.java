@@ -47,18 +47,22 @@ public class MappingData3DPath {
 	}
 	
 	public MappingData3DPath(NumericMeasurementInterface meas) {
+		this(meas, true);
+	}
+	
+	public MappingData3DPath(NumericMeasurementInterface meas, boolean clone) {
 		// try {
 		SampleInterface sample = meas.getParentSample();
 		
 		ConditionInterface cond = sample.getParentCondition();
 		SubstanceInterface md = cond.getParentSubstance();
 		
-		mdnew = md.clone();
-		condnew = cond.clone(mdnew);
+		mdnew = clone ? md.clone() : md;
+		condnew = clone ? cond.clone(mdnew) : cond;
 		mdnew.add(condnew);
-		sampnew = sample.clone(condnew);
+		sampnew = clone ? sample.clone(condnew) : sample;
 		condnew.add(sampnew);
-		measnew = meas.clone(sampnew);
+		measnew = clone ? meas.clone(sampnew) : meas;
 		sampnew.add(measnew);
 		// } catch (NullPointerException e) {
 		// ErrorMsg.addErrorMessage(e);
