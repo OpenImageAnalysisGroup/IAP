@@ -285,10 +285,21 @@ public class SystemAnalysisExt {
 	 */
 	public static InetAddress getLocalHost() throws
 			UnknownHostException {
-		InetAddress localHost =
-				InetAddress.getLocalHost();
-		if (!localHost.isLoopbackAddress())
-			return localHost;
+		InetAddress localHost = InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 });
+		try {
+			localHost =
+					InetAddress.getLocalHost();
+			if (!localHost.isLoopbackAddress())
+				return localHost;
+			InetAddress[] addrs =
+					getAllLocalUsingNetworkInterface();
+			for (int i = 0; i < addrs.length; i++) {
+				if (!addrs[i].isLoopbackAddress())
+					return addrs[i];
+			}
+		} catch (Exception e) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + e.getMessage());
+		}
 		InetAddress[] addrs =
 				getAllLocalUsingNetworkInterface();
 		for (int i = 0; i < addrs.length; i++) {
