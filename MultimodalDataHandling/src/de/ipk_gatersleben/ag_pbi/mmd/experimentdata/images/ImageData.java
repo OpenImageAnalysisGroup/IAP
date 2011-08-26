@@ -246,7 +246,7 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 			idx++;
 		attributes.put(additionalAttributeNames[idx++], positionIn3D);
 		attributes.put(additionalAttributeNames[idx++], rotation);
-		attributes.put("filename", url.toString());
+		attributes.put("filename", url + "");
 	}
 	
 	@Override
