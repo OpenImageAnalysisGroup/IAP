@@ -67,7 +67,7 @@ public class BackgroundThreadDispatcher {
 					// no
 				} else {
 					myInstance.todo.push(t);
-					myInstance.todoPriorities.push(new Integer(parentPriority + 1));// userPriority));
+					myInstance.todoPriorities.push(new Integer(userPriority)); // parentPriority + 1));//
 					myInstance.sheduler.interrupt();
 				}
 			}
