@@ -12,39 +12,45 @@ public class LogService {
 	
 	public String getLatestNews(int n, String pre, final String preLine, String lineBreak, String follow) {
 		StringBuilder res = new StringBuilder();
+		final Stack<String> news = new Stack<String>();
 		if (!ba13reachable) {
-			System.out.println("INFO: MAIN CLOUD DATABASE NOT REACHABLE: COULD RETRIEVE LATEST NEWS");
-			return res.toString();
-		}
-		try {
-			final Stack<String> news = new Stack<String>();
-			Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					for (String item : MongoDB.getDefaultCloud().getNews(5)) {
-						news.push(preLine + item);
+			news.add(preLine
+					+ SystemAnalysisExt.getCurrentTime()
+					+ ": Data Processing database is not reachable at network level (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
+		} else {
+			try {
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						for (String item : MongoDB.getDefaultCloud().getNews(5)) {
+							news.push(preLine + item);
+						}
 					}
-				}
-			};
-			Thread t = new Thread(r, "Read MonogDB news");
-			t.start();
-			long start = System.currentTimeMillis();
-			do {
-				Thread.sleep(10);
-				long current = System.currentTimeMillis();
-				if (current - start > 1000) {
-					news.add(SystemAnalysisExt.getCurrentTime()
-							+ ": Could not access latest news (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
-					t.interrupt();
-					break;
-				}
-			} while (t.isAlive());
-			while (!news.empty()) {
-				String item = news.pop();
-				res.append(item);
+				};
+				Thread t = new Thread(r, "Read MonogDB news");
+				t.start();
+				long start = System.currentTimeMillis();
+				do {
+					Thread.sleep(10);
+					long current = System.currentTimeMillis();
+					if (current - start > 1000) {
+						news.add(preLine
+								+ SystemAnalysisExt.getCurrentTime()
+								+ ": Could not access latest news (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
+						t.interrupt();
+						break;
+					}
+				} while (t.isAlive());
+			} catch (Exception e) {
+				news.add(preLine
+						+ SystemAnalysisExt.getCurrentTime()
+						+ ": Could not access latest news (" + e.getMessage()
+						+ "). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
 			}
-		} catch (Exception e) {
-			System.out.println("ERROR: COULD RETRIEVE LATEST NEWS: " + e.getMessage());
+		}
+		while (!news.empty()) {
+			String item = news.pop();
+			res.append(item);
 		}
 		if (res != null && res.length() > 0)
 			return pre + res.toString() + follow;
