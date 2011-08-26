@@ -811,7 +811,7 @@ public class LemnaTecDataExchange {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
 		
-		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements, true, false, false);
+		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements, true, false, true);
 		
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
 		if (optStatus != null)
