@@ -85,7 +85,7 @@ public class BlockFluoToIntensity extends AbstractSnapshotAnalysisBlockFIS {
 				int rf = (workimg[i] & 0xff0000) >> 16;
 				
 				double hsvColMax = maxHsv;
-				hue = (int) ((rf - minMax.getMin()) * (hsvColMax / (double) (minMax.getMax() - minMax.getMin())));
+				hue = (int) ((rf - minMax.getMin()) * (hsvColMax / (minMax.getMax() - minMax.getMin())));
 				if (hue > hsvColMax)
 					hue = (int) hsvColMax;
 				if (hue < 0)
@@ -122,7 +122,8 @@ public class BlockFluoToIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 		processedImages.setFluo(processedMasks.getFluo());
-		processedMasks.setFluo(processedMasks.getFluo().getIO().medianFilter32Bit().getImage());
+		if (processedMasks.getFluo() != null)
+			processedMasks.setFluo(processedMasks.getFluo().getIO().medianFilter32Bit().getImage());
 	}
 	
 }

@@ -7,6 +7,7 @@ import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnalysisBlockFIS {
 	
@@ -25,12 +26,11 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		try {
 			prepare();
 		} catch (Error err1) {
-			System.out.println("ERROR: ERROR: " + err1.getLocalizedMessage());
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: BLOCK PREPARE ERROR: " + err1.getLocalizedMessage());
 			err1.printStackTrace();
 		} catch (Exception err2) {
-			System.out.println("ERROR: EXCEPTION: " + err2.getLocalizedMessage());
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: BLOCK PREPARE EXCEPTION: " + err2.getLocalizedMessage());
 			err2.printStackTrace();
-			ErrorMsg.addErrorMessage(err2);
 		}
 		
 		String name = this.getClass().getSimpleName();
@@ -46,7 +46,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}, name + " process VIS image", 1, parentPriority),
+				}, name + " process VIS image", parentPriority + 1, parentPriority),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -57,7 +57,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}, name + " process FLU image", 1, parentPriority),
+				}, name + " process FLU image", parentPriority + 1, parentPriority),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -79,18 +79,18 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}, name + " process VIS mask", 1, parentPriority),
+				}, name + " process VIS mask", parentPriority + 1, parentPriority),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
 						processedMasks.setFluo(processFLUOmask());
 					}
-				}, name + " process FLU mask", 1, parentPriority), BackgroundThreadDispatcher.addTask(new Runnable() {
+				}, name + " process FLU mask", parentPriority + 1, parentPriority), BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
 						processedMasks.setNir(processNIRmask());
 					}
-				}, name + " process NIR mask", 1, parentPriority) });
+				}, name + " process NIR mask", parentPriority + 1, parentPriority) });
 		
 		try {
 			postProcess(processedImages, processedMasks);

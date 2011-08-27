@@ -509,7 +509,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		do {
 			Thread.sleep(10);
 			long current = System.currentTimeMillis();
-			if (current - start > 2000) {
+			if (current - start > 5000) {
 				t.interrupt();
 				error = true;
 				errorMsg = "time out";

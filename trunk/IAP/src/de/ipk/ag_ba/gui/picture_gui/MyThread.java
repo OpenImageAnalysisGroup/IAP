@@ -21,7 +21,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  */
 public class MyThread extends Thread implements Runnable {
 	
-	public static final boolean NEW_SCHEDULER = false;
+	public static final boolean NEW_SCHEDULER = true;
 	
 	private boolean finished = false;
 	private boolean started = false;
@@ -31,9 +31,7 @@ public class MyThread extends Thread implements Runnable {
 	private final Runnable runCode;
 	
 	public MyThread(Runnable r, String name) {
-		// super(r, name);
-		this.name = name;
-		this.runCode = r;
+		// synchronized (MyThread.class) {
 		sem = BackgroundTaskHelper.lockGetSemaphore(null, 1);
 		try {
 			sem.acquire();
@@ -41,6 +39,9 @@ public class MyThread extends Thread implements Runnable {
 			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
+		// }
+		this.name = name;
+		this.runCode = r;
 		this.r = r;
 	}
 	

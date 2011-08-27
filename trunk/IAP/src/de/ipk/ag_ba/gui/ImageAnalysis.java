@@ -38,6 +38,7 @@ import javax.swing.event.ChangeListener;
 import de.ipk.ag_ba.gui.actions.analysis.ActionPhytochamberAnalysis;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.BarleyAnalysisAction;
+import de.ipk.ag_ba.gui.navigation_actions.maize.Maize3DanalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -48,7 +49,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 /**
  * @author klukas
  */
-@SuppressWarnings("restriction")
 public class ImageAnalysis {
 	
 	public static NavigationButton getPhytochamberEntity(final MongoDB m,
@@ -63,6 +63,14 @@ public class ImageAnalysis {
 			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 		
 		NavigationAction maizeAnalysisAction = new MaizeAnalysisAction(m, experiment);
+		NavigationButton resultTaskButton = new NavigationButton(maizeAnalysisAction, guiSetting);
+		return resultTaskButton;
+	}
+	
+	public static NavigationButton getMaize3dEntity(final MongoDB m,
+			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
+		
+		NavigationAction maizeAnalysisAction = new Maize3DanalysisAction(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(maizeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}

@@ -2483,9 +2483,9 @@ public class ImageOperation {
 		double rf, gf, bf;
 		int[][] result = new int[width][height];
 		for (int y = 0; y < height; y++) {
-			double rfff = (factorsBottom[0] - factorsTop[0]) / (double) height * y + factorsTop[0];
-			double gfff = (factorsBottom[1] - factorsTop[1]) / (double) height * y + factorsTop[1];
-			double bfff = (factorsBottom[2] - factorsTop[2]) / (double) height * y + factorsTop[2];
+			double rfff = (factorsBottom[0] - factorsTop[0]) / height * y + factorsTop[0];
+			double gfff = (factorsBottom[1] - factorsTop[1]) / height * y + factorsTop[1];
+			double bfff = (factorsBottom[2] - factorsTop[2]) / height * y + factorsTop[2];
 			for (int x = 0; x < width; x++) {
 				int c = img2d[x][y];
 				rf = ((c & 0xff0000) >> 16);
@@ -2604,7 +2604,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		System.out.println("temp :: " + temp);
+		// System.out.println("temp :: " + temp);
 		if (count < w * h * 0.1 && recursion < 30) {
 			return getRGBAverage(x1, y1, w, h, LThresh * 2, (int) (ABThresh * 1.1), searchWhiteTrue, recursion + 1);
 		}
