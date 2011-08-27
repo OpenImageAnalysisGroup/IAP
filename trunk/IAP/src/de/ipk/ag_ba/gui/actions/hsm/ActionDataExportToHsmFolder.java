@@ -94,7 +94,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 						"HSM (Hierarchical Storage Management), which may be used as a safe<br>" +
 						"backup storage.<br><br>", new Object[] {
 						"Copy images", includeMainImages,
-						"Coy reference images", includeReferenceImages,
+						"Copy reference images", includeReferenceImages,
 						"Copy annotation images", includeAnnotationImages
 				});
 	}
@@ -218,7 +218,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			boolean targetExists = false;
 			Future<MyByteArrayInputStream> fileContent = null;
 			final Long t = nm.getParentSample().getRowId();
-			if (includeMainImages) {
+			if (!includeMainImages) {
 				targetExists = true;
 				bm.setURL(null);
 			} else {

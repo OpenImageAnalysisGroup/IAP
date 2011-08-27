@@ -27,6 +27,8 @@ public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 		
 		BufferedImage i = null;
 		InputStream is = url.getInputStream();
+		if (is == null)
+			return null;
 		is = ResourceIOManager.getInputStreamMemoryCached(is);
 		i = ImageIO.read(is);
 		int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();

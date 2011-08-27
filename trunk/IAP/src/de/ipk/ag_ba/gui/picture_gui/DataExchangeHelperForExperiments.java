@@ -32,6 +32,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
@@ -40,7 +41,6 @@ import com.mongodb.gridfs.GridFSDBFile;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
@@ -300,28 +300,28 @@ public class DataExchangeHelperForExperiments {
 				boolean previewLoadAndConstructNeeded = false;
 				
 				ImageIcon previewImage = null;
-				if (FileSystemHandler.isFileUrl(binaryFileInfo.getFileNameMain())) {
-					MyImageIcon myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
-										DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileNameMain(),
-										binaryFileInfo.getFileNameLabel(), binaryFileInfo);
-					myImage.imageAvailable = 1;
-					previewImage = myImage;
-				} else
-					if (LemnaTecFTPhandler.isLemnaTecFtpUrl(binaryFileInfo.getFileNameMain())) {
-						previewImage = null;
+				// if (FileSystemHandler.isFileUrl(binaryFileInfo.getFileNameMain())) {
+				// MyImageIcon myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
+				// DataSetFileButton.ICON_HEIGHT, binaryFileInfo.getFileNameMain(),
+				// binaryFileInfo.getFileNameLabel(), binaryFileInfo);
+				// myImage.imageAvailable = 1;
+				// previewImage = myImage;
+				// } else
+				// // if (LemnaTecFTPhandler.isLemnaTecFtpUrl(binaryFileInfo.getFileNameMain())) {
+				// previewImage = null;
+				// previewLoadAndConstructNeeded = true;
+				// } else {
+				if (DataSetFileButton.ICON_WIDTH == 128) { // binaryFileInfo.getFileNameMain().getPrefix().startsWith("mongo_") &&
+					byte[] pi = ResourceIOManager.getPreviewImageContent(binaryFileInfo.getFileNameMain());
+					if (pi != null)
+						previewImage = new ImageIcon(pi);
+					else
 						previewLoadAndConstructNeeded = true;
-					} else {
-						if (DataSetFileButton.ICON_WIDTH == 128) { // binaryFileInfo.getFileNameMain().getPrefix().startsWith("mongo_") &&
-							byte[] pi = m.getPreviewData(binaryFileInfo.getHashMain());
-							if (pi != null)
-								previewImage = new ImageIcon(pi);
-							else
-								previewLoadAndConstructNeeded = true;
-						} else {
-							previewImage = null;
-							previewLoadAndConstructNeeded = true;
-						}
-					}
+				} else {
+					previewImage = null;
+					previewLoadAndConstructNeeded = true;
+				}
+				// }
 				final DataSetFileButton imageButton = new DataSetFileButton(m, mt, imageResult,
 									previewImage, mt.isReadOnly());
 				if (binaryFileInfo.isPrimary())
@@ -360,7 +360,7 @@ public class DataExchangeHelperForExperiments {
 				if (mt == expTree.getSelectionPath().getLastPathComponent() &&
 									DataSetFileButton.ICON_WIDTH == tw) {
 					final AnnotationInfoPanel aip = new AnnotationInfoPanel(imageButton, mt);
-					JComponent buttonAndInfo = TableLayout.getSplitVertical(aip, imageButton, TableLayout.PREFERRED,
+					JComponent buttonAndInfo = TableLayout.getSplitVertical(imageButton, aip, TableLayout.PREFERRED,
 							TableLayout.PREFERRED);
 					imageButton.addMouseListener(getML(aip));
 					buttonAndInfo.addMouseListener(getML(aip));

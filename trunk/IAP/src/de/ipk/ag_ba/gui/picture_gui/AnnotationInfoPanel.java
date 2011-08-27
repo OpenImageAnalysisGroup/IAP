@@ -15,6 +15,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class AnnotationInfoPanel extends JPanel {
+	private static final long serialVersionUID = 7793767687607473484L;
 	
 	private final DataSetFileButton imageButton;
 	private final MongoTreeNode mt;

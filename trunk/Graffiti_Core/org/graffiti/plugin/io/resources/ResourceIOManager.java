@@ -149,7 +149,10 @@ public class ResourceIOManager {
 	
 	public static byte[] getPreviewImageContent(IOurl ioUrl) throws Exception {
 		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
-		copyContent(getHandlerFromPrefix(ioUrl.getPrefix()).getPreviewInputStream(ioUrl), output);
+		InputStream in = getHandlerFromPrefix(ioUrl.getPrefix()).getPreviewInputStream(ioUrl);
+		if (in == null)
+			return null;
+		copyContent(in, output);
 		byte[] imageContent = output.getBuffTrimmed();
 		return imageContent;
 	}
