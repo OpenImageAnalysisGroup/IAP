@@ -20,8 +20,8 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockReplaceEmptyOriginalImage;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize;
-import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuoOrVis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockLoadImagesIfNeeded;
+import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnMaizeFluoAndVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHeight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
@@ -49,7 +49,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		modifySettings(options);
 		
 		BlockPipeline p = new BlockPipeline();
-		p.add(BlockImageInfo.class);
+		p.add(BlockLoadImagesIfNeeded.class);
 		p.add(BlockColorBalancingVis.class);
 		p.add(BlockFindBlueMarkers.class);
 		p.add(BlockColorBalancingFluoAndNir.class);
@@ -89,7 +89,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockCalculateWidthAndHeight.class);
 		p.add(BlockFluoToIntensity.class);
 		p.add(BlockIntensityAnalysis.class);
-		p.add(BlockConvexHullOnFLuoOrVis.class);
+		p.add(BlockConvexHullOnMaizeFluoAndVis.class);
 		
 		p.add(BlockDrawSkeletonOnImageVis.class);
 		// postprocessing
@@ -107,6 +107,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		options.setIsMaize(true);
+		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
+		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);

@@ -67,6 +67,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	public void performActionCalculateResults(final NavigationButton src) {
 		this.src = src;
 		
+		// BackgroundThreadDispatcher.useThreads = false;
+		
 		if (experimentResult != null)
 			return;
 		

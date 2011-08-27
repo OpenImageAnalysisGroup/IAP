@@ -12,7 +12,6 @@ import org.Vector2d;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class BlueMarkerFinder {
 	
@@ -81,12 +80,12 @@ public class BlueMarkerFinder {
 		ArrayList<MarkerPair> result = new ArrayList<MarkerPair>();
 		
 		if (coordinatesUnfiltered == null) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: No blue marker coordinates (null)!");
+			// System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: No blue marker coordinates (null)!");
 			return result;
 		}
 		
 		if (coordinatesUnfiltered.isEmpty()) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: No blue marker coordinates (empty). Image " + input + " //" + typ);
+			// System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: No blue marker coordinates (empty). Image " + input + " //" + typ);
 			return result;
 		}
 		

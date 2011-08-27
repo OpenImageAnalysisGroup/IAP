@@ -53,6 +53,8 @@ public class BackgroundThreadDispatcher {
 	}
 	
 	public static MyThread addTask(MyThread t, int userPriority, int parentPriority) {
+		if (t == null)
+			return null;
 		// if (parentPriority > 4)
 		// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Add task " + t.getNameNG() + ", Priority: " + userPriority + ", Parent Priority: "
 		// + parentPriority);
@@ -237,8 +239,8 @@ public class BackgroundThreadDispatcher {
 								todoPriorities.remove(i);
 								t.setName(t.getNameNG() + ", priority:" + prio);
 								// System.out.println(">ABOUT TO START " + t.getNameNG() + " // current scheduler status priority: " + curPrio);
+								break;
 							}
-							break;
 						}
 					}
 				}

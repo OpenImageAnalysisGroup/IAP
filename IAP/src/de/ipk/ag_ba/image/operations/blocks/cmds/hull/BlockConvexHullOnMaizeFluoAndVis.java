@@ -20,14 +20,14 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author klukas
  */
-public class BlockConvexHullOnFLuoOrVis extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockConvexHullOnMaizeFluoAndVis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage image = getInput().getMasks().getVis();
 		if (options.isMaize()) {
 			ImageData info = getInput().getImages().getVisInfo();
 			ImageOperation res = processImage(image, info);
-			return res.getImage();
+			return res != null ? res.getImage() : null;
 		} else
 			return image;
 	}
@@ -38,7 +38,7 @@ public class BlockConvexHullOnFLuoOrVis extends AbstractSnapshotAnalysisBlockFIS
 		if (options.isMaize()) {
 			ImageData info = getInput().getImages().getFluoInfo();
 			ImageOperation res = processImage(image, info);
-			return res.getImage();
+			return res != null ? res.getImage() : null;
 		} else
 			return image;
 	}
@@ -47,13 +47,13 @@ public class BlockConvexHullOnFLuoOrVis extends AbstractSnapshotAnalysisBlockFIS
 		ResultsTable numericResults;
 		ImageOperation res;
 		if (image == null) {
-			System.err.println("ERROR: BlockConvexHullOnFLuo: Input Mask is NULL!");
 			return null;
 		}
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 		if (distHorizontal != null || options.getCameraPosition() == CameraPosition.TOP) {
 			int realDist = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
-			res = new ImageOperation(image).hull().find(true, false, true, true, Color.RED.getRGB(),
+			boolean drawHull = options.getBooleanSetting(Setting.DRAW_CONVEX_HULL);
+			res = new ImageOperation(image).hull().find(true, false, drawHull, drawHull, Color.RED.getRGB(),
 					Color.BLUE.getRGB(),
 					Color.ORANGE.getRGB(), distHorizontal, realDist);
 			

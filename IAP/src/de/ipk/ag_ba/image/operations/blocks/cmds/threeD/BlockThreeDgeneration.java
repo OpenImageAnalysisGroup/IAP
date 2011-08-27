@@ -34,6 +34,9 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		FlexibleImage fi = getInput().getImages() != null ? getInput().getImages().getVis() : null;
 		if (fi != null) {
 			getProperties().setImage("img.vis.3D", fi);
+		} else {
+			System.out.println();
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: NO VIS IMAGE TO BE STORED FOR LATER 3D GENRATION!");
 		}
 		return super.processVISimage();
 	}
@@ -43,7 +46,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			Sample3D inSample,
 			TreeMap<Double, ImageData> inImages,
 			TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
-		super.postProcessResultsForAllAngles(inSample, inImages, allResultsForSnapshot, summaryResult);
+		// super.postProcessResultsForAllAngles(inSample, inImages, allResultsForSnapshot, summaryResult);
 		
 		int voxelresolution = 200;
 		int widthFactor = 40;
@@ -58,73 +61,75 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">Process image angle " + angle + " (TODO)");
 			BlockProperties bp = allResultsForSnapshot.get(angle);
 			FlexibleImage vis = bp.getImage("img.vis.3D");
-			
-			MyPicture p = new MyPicture();
-			p.setPictureData(vis.getAsBufferedImage(), angle, mg);
-			pictures.add(p);
+			if (vis != null) {
+				
+				MyPicture p = new MyPicture();
+				p.setPictureData(vis.getAsBufferedImage(), angle, mg);
+				pictures.add(p);
+			}
 		}
-		
-		mg.setRoundViewImages(pictures);
-		mg.calculateModel(new BackgroundTaskConsoleLogger("", "", true), modeOfOperation, 0);
-		// the cube is a true cube (dim X,Y,Z are equal), the
-		// input images are stretched to the target square
-		// therefore, the actual volume calculation needs to consider
-		// the source dimensions of the voxels, and therefore a un-stretch
-		// calculation needs to be performed to error-correct the calculated volume
-		int[][][] cube = mg.getRGBcubeResult();
-		int solidVoxels = 0;
-		for (int x = 0; x < voxelresolution; x++) {
-			int[][] cubeYZ = cube[x];
-			for (int y = 0; y < voxelresolution; y++) {
-				int[] cubeZ = cubeYZ[y];
-				for (int z = 0; z < voxelresolution; z++) {
-					int c = cubeZ[z];
-					// if voxel can be considered not transparent (solid)
-					// add voxel volume to the result
-					boolean solid = c != ImageOperation.BACKGROUND_COLORint;
-					if (solid)
-						solidVoxels++;
+		if (pictures.size() > 0) {
+			mg.setRoundViewImages(pictures);
+			mg.calculateModel(new BackgroundTaskConsoleLogger("", "", true), modeOfOperation, 0);
+			// the cube is a true cube (dim X,Y,Z are equal), the
+			// input images are stretched to the target square
+			// therefore, the actual volume calculation needs to consider
+			// the source dimensions of the voxels, and therefore a un-stretch
+			// calculation needs to be performed to error-correct the calculated volume
+			int[][][] cube = mg.getRGBcubeResult();
+			int solidVoxels = 0;
+			for (int x = 0; x < voxelresolution; x++) {
+				int[][] cubeYZ = cube[x];
+				for (int y = 0; y < voxelresolution; y++) {
+					int[] cubeZ = cubeYZ[y];
+					for (int z = 0; z < voxelresolution; z++) {
+						int c = cubeZ[z];
+						// if voxel can be considered not transparent (solid)
+						// add voxel volume to the result
+						boolean solid = c != ImageOperation.BACKGROUND_COLORint;
+						if (solid)
+							solidVoxels++;
+					}
 				}
 			}
-		}
-		double vv = 1;
-		double plantVolume = vv * solidVoxels;
-		getProperties().setNumericProperty(0, "RESULT_plant.volume", plantVolume);
-		
-		boolean createVolumeDataset = false;
-		if (createVolumeDataset) {
-			Sample sample = inSample;
-			LoadedVolumeExtension volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResult());
+			double vv = 1;
+			double plantVolume = vv * solidVoxels;
+			getProperties().setNumericProperty(0, "RESULT_plant.volume", plantVolume);
 			
-			HashSet<Integer> replicateIDsOfSampleMeasurements = new HashSet<Integer>();
-			for (Measurement m : sample) {
-				replicateIDsOfSampleMeasurements.add(m.getReplicateID());
-			}
-			
-			int replicateID = -1;
-			if (replicateIDsOfSampleMeasurements.size() == 1)
-				replicateID = replicateIDsOfSampleMeasurements.iterator().next();
-			else
-				System.out.println(SystemAnalysisExt.getCurrentTime()
-						+ ">ERROR: 3D Volume generation block didn't find the expected single sample measurement replicate ID. It found "
-						+ replicateIDsOfSampleMeasurements.size() + " differing replicate IDs, instead! The generated volume possibly can't be related" +
+			boolean createVolumeDataset = false;
+			if (createVolumeDataset) {
+				Sample sample = inSample;
+				LoadedVolumeExtension volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResult());
+				
+				HashSet<Integer> replicateIDsOfSampleMeasurements = new HashSet<Integer>();
+				for (Measurement m : sample) {
+					replicateIDsOfSampleMeasurements.add(m.getReplicateID());
+				}
+				
+				int replicateID = -1;
+				if (replicateIDsOfSampleMeasurements.size() == 1)
+					replicateID = replicateIDsOfSampleMeasurements.iterator().next();
+				else
+					System.out.println(SystemAnalysisExt.getCurrentTime()
+							+ ">ERROR: 3D Volume generation block didn't find the expected single sample measurement replicate ID. It found "
+							+ replicateIDsOfSampleMeasurements.size() + " differing replicate IDs, instead! The generated volume possibly can't be related" +
 								"to a single set of side views of a single Snapshot. This is a internal error.");
-			volume.setReplicateID(replicateID);
-			
-			volume.setVoxelsizeX(25f * 400 / voxelresolution);
-			volume.setVoxelsizeY(25f * 400 / voxelresolution * (100d / widthFactor));
-			volume.setVoxelsizeZ(25f * 400 / voxelresolution);
-			
-			volume.setDimensionX(voxelresolution);
-			volume.setDimensionY(voxelresolution);
-			volume.setDimensionZ(voxelresolution);
-			
-			if (volume.getURL() == null)
-				volume.setURL(new IOurl("loadedvolume", "", ""));
-			volume.getURL().setFileName("IAP_reconstruction_" + System.currentTimeMillis() + ".argb_volume");
-			
-			volume.setColorDepth(VolumeColorDepth.RGBA.toString());
-			
+				volume.setReplicateID(replicateID);
+				
+				volume.setVoxelsizeX(25f * 400 / voxelresolution);
+				volume.setVoxelsizeY(25f * 400 / voxelresolution * (100d / widthFactor));
+				volume.setVoxelsizeZ(25f * 400 / voxelresolution);
+				
+				volume.setDimensionX(voxelresolution);
+				volume.setDimensionY(voxelresolution);
+				volume.setDimensionZ(voxelresolution);
+				
+				if (volume.getURL() == null)
+					volume.setURL(new IOurl("loadedvolume", "", ""));
+				volume.getURL().setFileName("IAP_reconstruction_" + System.currentTimeMillis() + ".argb_volume");
+				
+				volume.setColorDepth(VolumeColorDepth.RGBA.toString());
+			}
 			// the volume needs to be added to the output set
 			// it will be saved e.g. by MongoDB, where the side view animated GIF will be rendered as
 			// the preview icon

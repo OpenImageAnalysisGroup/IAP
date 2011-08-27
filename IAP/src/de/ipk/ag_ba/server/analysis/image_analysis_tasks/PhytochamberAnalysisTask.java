@@ -33,6 +33,7 @@ import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
@@ -150,75 +151,75 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 						
 						final FlexibleImageSet input = new FlexibleImageSet();
 						
-						MyThread a = null, b = null, c = null;
+						// MyThread a = null, b = null, c = null;
+						//
+						// if (vis instanceof LoadedImage) {
+						// input.setVis(new FlexibleImage(((LoadedImage) vis).getLoadedImage()));
+						// } else {
+						// a = load(vis, input, FlexibleImageType.VIS);
+						// }
+						// if (fluo instanceof LoadedImage) {
+						// input.setFluo(new FlexibleImage(((LoadedImage) fluo).getLoadedImage()));
+						// } else {
+						// b = load(fluo, input, FlexibleImageType.FLUO);
+						// }
+						// if (nir instanceof LoadedImage) {
+						// input.setFluo(new FlexibleImage(((LoadedImage) nir).getLoadedImage()));
+						// } else {
+						// c = load(nir, input, FlexibleImageType.NIR);
+						// }
+						// // process images
+						// BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
+						// if (input.hasAllThreeImages()) {
 						
-						if (vis instanceof LoadedImage) {
-							input.setVis(new FlexibleImage(((LoadedImage) vis).getLoadedImage()));
-						} else {
-							a = load(vis, input, FlexibleImageType.VIS);
+						ImageProcessorOptions options = new ImageProcessorOptions();
+						if (vis != null && vis.getPosition() != null)
+							options.addDoubleSetting(Setting.ROTATION_ANGLE, vis.getPosition());
+						
+						PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(options);
+						
+						FlexibleImageStack debugImageStack = null;
+						boolean addDebugImages = false;
+						if (addDebugImages) {
+							debugImageStack = new FlexibleImageStack();
 						}
-						if (fluo instanceof LoadedImage) {
-							input.setFluo(new FlexibleImage(((LoadedImage) fluo).getLoadedImage()));
-						} else {
-							b = load(fluo, input, FlexibleImageType.FLUO);
-						}
-						if (nir instanceof LoadedImage) {
-							input.setFluo(new FlexibleImage(((LoadedImage) nir).getLoadedImage()));
-						} else {
-							c = load(nir, input, FlexibleImageType.NIR);
-						}
-						// process images
-						BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
-						if (input.hasAllThreeImages()) {
-							
-							ImageProcessorOptions options = new ImageProcessorOptions();
-							if (vis != null && vis.getPosition() != null)
-								options.addDoubleSetting(Setting.ROTATION_ANGLE, vis.getPosition());
-							
-							PhytochamberTopImageProcessor ptip = new PhytochamberTopImageProcessor(options);
-							
-							FlexibleImageStack debugImageStack = null;
-							boolean addDebugImages = false;
-							if (addDebugImages) {
-								debugImageStack = new FlexibleImageStack();
-							}
-							
-							// input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
-							// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
-							
-							final boolean cropResult = true;
-							final boolean parameterSearch = true;
-							
-							final FlexibleImageSet pipelineResult = ptip.pipeline(
+						
+						// input.setVis(new ImageOperation(input.getVis()).scale(0.2, 0.2).getImage());
+						// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2, 0.2).getImage());
+						
+						final boolean cropResult = true;
+						final boolean parameterSearch = true;
+						
+						final FlexibleImageSet pipelineResult = ptip.pipeline(
 									input,
 									maximumThreadCountOnImageLevel, debugImageStack, parameterSearch, cropResult).getImages();
+						
+						MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
+						MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
+						MyThread g = statisticalAnalaysis(nir, pipelineResult.getNir());
+						boolean multiThreaded = true;
+						if (!multiThreaded) {
+							e.run();
+							f.run();
+							g.run();
+						} else
+							BackgroundThreadDispatcher.waitFor(new MyThread[] { e, f, g });
+						
+						byte[] buf = null;
+						if (debugImageStack != null) {
+							MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
+							debugImageStack.saveAsLayeredTif(mos);
+							buf = mos.getBuff();
 							
-							MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
-							MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
-							MyThread g = statisticalAnalaysis(nir, pipelineResult.getNir());
-							boolean multiThreaded = true;
-							if (!multiThreaded) {
-								e.run();
-								f.run();
-								g.run();
-							} else
-								BackgroundThreadDispatcher.waitFor(new MyThread[] { e, f, g });
-							
-							byte[] buf = null;
-							if (debugImageStack != null) {
-								MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
-								debugImageStack.saveAsLayeredTif(mos);
-								buf = mos.getBuff();
-								
-								saveImage(vis, pipelineResult.getVis(), buf, ".tiff");
-								saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
-								saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
-							}
-						} else {
-							System.err.println("Warning: not all three image types available for snapshot!");
+							saveImage(vis, pipelineResult.getVis(), buf, ".tiff");
+							saveImage(fluo, pipelineResult.getFluo(), buf, ".tiff");
+							saveImage(nir, pipelineResult.getNir(), buf, ".tiff");
 						}
+						// } else {
+						// System.err.println("Warning: not all three image types available for snapshot!");
+						// }
 					} catch (Exception e) {
-						ErrorMsg.addErrorMessage(e);
+						System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + e.getMessage());
 					}
 					tso.addInt(1);
 					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);

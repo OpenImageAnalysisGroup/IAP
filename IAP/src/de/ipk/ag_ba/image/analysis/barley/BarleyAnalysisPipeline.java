@@ -19,8 +19,8 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirProcessing;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluoVerySmallElements;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockImageInfo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnFLuoOrVis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockLoadImagesIfNeeded;
+import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHullOnMaizeFluoAndVis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateMainAxis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalculateWidthAndHeight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByComparingNullImageAndImage;
@@ -47,7 +47,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		modifySettings(options);
 		
 		BlockPipeline p = new BlockPipeline();
-		p.add(BlockImageInfo.class);
+		p.add(BlockLoadImagesIfNeeded.class);
 		p.add(BlockColorBalancingVis.class);
 		p.add(BlockFindBlueMarkers.class);
 		p.add(BlockColorBalancingFluoAndNir.class);
@@ -76,7 +76,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockMedianFilterFluo.class);
 		p.add(BlockRemoveSmallClustersOnFluoVerySmallElements.class);
 		p.add(BlockIntensityAnalysis.class);
-		p.add(BlockConvexHullOnFLuoOrVis.class);
+		p.add(BlockConvexHullOnMaizeFluoAndVis.class);
 		
 		// postprocessing
 		p.add(BlockMoveMasksToImages.class);

@@ -84,7 +84,7 @@ public class BlockColorBalancingVis extends AbstractSnapshotAnalysisBlockFIS {
 					image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
 							.fillRect(left, height - (startHTop + scanHeight), scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
 							.drawLine(100, 100, 1000, 1000, Color.RED.getRGB(), 0.5, 10).getImage()
-							.print("region scan for color balance");
+							.print("region scan for color balance", false);
 				}
 				values = new float[6];
 				int i = 0;
@@ -124,7 +124,7 @@ public class BlockColorBalancingVis extends AbstractSnapshotAnalysisBlockFIS {
 				if (debug) {
 					image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
 							.fillRect(left, height - (startHTop + scanHeight), scanWidth, scanHeight, Color.RED.getRGB(), 0.5).getImage()
-							.print("region scan for color balance");
+							.print("region scan for color balance", false);
 				}
 			}
 			values = new float[6];

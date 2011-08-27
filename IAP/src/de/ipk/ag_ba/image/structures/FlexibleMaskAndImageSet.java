@@ -132,4 +132,63 @@ public class FlexibleMaskAndImageSet {
 		
 		fis.saveAsLayeredTif(new File(fileName));
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder res = new StringBuilder();
+		res.append("[");
+		if (images != null) {
+			if (images.getVis() != null)
+				res.append("VIS:1,");
+			else
+				res.append("VIS:NULL,");
+			if (images.getFluo() != null)
+				res.append("FLU:1,");
+			else
+				res.append("FLU:NULL,");
+			if (images.getNir() != null)
+				res.append("NIR:1/");
+			else
+				res.append("NIR:NULL/");
+		} else
+			res.append("NULL/");
+		if (masks != null) {
+			if (masks.getVis() != null)
+				res.append("VIS-R:1,");
+			else
+				res.append("VIS-R:NULL,");
+			if (masks.getFluo() != null)
+				res.append("FLU-R:1,");
+			else
+				res.append("FLU-R:NULL,");
+			if (masks.getNir() != null)
+				res.append("NIR:1");
+			else
+				res.append("NIR:NULL");
+		} else
+			res.append("NULL");
+		res.append("]");
+		return res.toString();
+	}
+	
+	public int getImageCount() {
+		int res = 0;
+		if (images != null) {
+			if (images.getVis() != null)
+				res++;
+			if (images.getFluo() != null)
+				res++;
+			if (images.getNir() != null)
+				res++;
+		}
+		if (masks != null) {
+			if (masks.getVis() != null)
+				res++;
+			if (masks.getFluo() != null)
+				res++;
+			if (masks.getNir() != null)
+				res++;
+		}
+		return res;
+	}
 }

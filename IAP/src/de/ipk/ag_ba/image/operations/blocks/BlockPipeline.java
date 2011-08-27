@@ -24,6 +24,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
@@ -71,7 +72,7 @@ public class BlockPipeline {
 				throws InstantiationException, IllegalAccessException, InterruptedException {
 		
 		long a = System.currentTimeMillis();
-		nullPointerCheck(input, "PIPELINE INPUT ");
+		// nullPointerCheck(input, "PIPELINE INPUT ");
 		
 		int id = pipelineID.addInt(1);
 		
@@ -93,9 +94,16 @@ public class BlockPipeline {
 			block.setInputAndOptions(input, options, settings, index++, debugStack);
 			
 			long ta = System.currentTimeMillis();
-			
-			input = block.process();
-			
+			int n = input.getImageCount();
+			FlexibleMaskAndImageSet input2 = block.process();
+			if (n - input.getImageCount() > 0) {
+				System.out.println();
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: BLOCK " + block.getClass().getSimpleName() + " HAS SET "
+						+ (n - input.getImageCount() + " IMAGE(S) TO NULL!"));
+				System.out.println("IN: " + input);
+				System.out.println("OUT: " + input2);
+			}
+			input = input2;
 			long tb = System.currentTimeMillis();
 			
 			int seconds = (int) ((tb - ta) / 1000);

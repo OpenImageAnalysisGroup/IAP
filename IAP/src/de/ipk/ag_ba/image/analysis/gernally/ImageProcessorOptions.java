@@ -71,7 +71,7 @@ public class ImageProcessorOptions {
 
 		INPUT_VIS_IMAGE_ROTATION_ANGLE, L_Diff_VIS_SIDE, abDiff_VIS_SIDE,
 
-		BOTTOM_CUT_OFFSET_VIS, REAL_MARKER_DISTANCE;
+		BOTTOM_CUT_OFFSET_VIS, REAL_MARKER_DISTANCE, DRAW_CONVEX_HULL;
 	}
 	
 	public ImageProcessorOptions() {

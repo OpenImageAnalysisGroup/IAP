@@ -18,7 +18,7 @@ public class BlockLabFilterVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null && getInput().getImages().getVis() == null)
+		if (getInput().getMasks().getVis() == null || getInput().getImages().getVis() == null)
 			return null;
 		else
 			return labFilter(
@@ -57,7 +57,8 @@ public class BlockLabFilterVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ,
 			boolean maize) {
-		
+		if (workMask == null)
+			return null;
 		int[] workMask1D = workMask.getAs1A();
 		// int[] result = new int[workMask1D.length];
 		int width = workMask.getWidth();
