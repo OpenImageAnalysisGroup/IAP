@@ -178,25 +178,14 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 					
-					JMenuItem debugPipelineTestShowRefernceImage = new JMenuItem("Show Reference");
-					debugPipelineTestShowRefernceImage.addActionListener(new ActionListener() {
+					JMenuItem debugPipelineTestShowReferenceImage = new JMenuItem("Show Reference");
+					debugPipelineTestShowReferenceImage.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
-								IOurl s = imageResult.getBinaryFileInfo().getFileNameMain();
-								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
-										s,
-										targetTreeNode.getExperiment());
-								
-								for (NumericMeasurementInterface nmi : match) {
-									ImageData id = (ImageData) nmi;
-									if (id.getURL().getDetail().equals(s.getDetail())) {
-										String oldRef = id.getLabelURL().toString();
-										IOurl u = new IOurl(oldRef);
-										FlexibleImage fi = new FlexibleImage(u);
-										fi.print("Reference Image");
-									}
-								}
+								IOurl s = imageResult.getBinaryFileInfo().getFileNameLabel();
+								FlexibleImage fi = new FlexibleImage(s);
+								fi.print("Reference Image");
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);
@@ -222,7 +211,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										String oldRef = id.getAnnotationField("oldreference");
 										IOurl u = new IOurl(oldRef);
 										FlexibleImage fi = new FlexibleImage(u);
-										fi.print("Old Reference Image");
+										fi.print("Annotation Image");
 									}
 								}
 							} catch (Exception err) {
@@ -369,7 +358,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					});
 					
 					jp.add(debugPipelineTestShowMainImage);
-					jp.add(debugPipelineTestShowRefernceImage);
+					jp.add(debugPipelineTestShowReferenceImage);
 					jp.add(debugPipelineTestShowImage);
 					
 					JMenu sn = new JMenu("Snapshot");
@@ -434,7 +423,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	public DataSetFileButton(MongoDB m, MongoTreeNode projectNode, ImageResult imageResult,
 						ImageIcon previewImage, boolean readOnly) {
-		this(m, projectNode, "<html><body><b>" + getMaxString(strip(imageResult.getFileNameMain()))
+		this(m, projectNode, "<html><body><b>"
+				+ getMaxString(strip(imageResult.getFileNameMain(), ((ImageData) imageResult.getBinaryFileInfo().entity).getQualityAnnotation()
+						+ "<br>("
+						+ (((ImageData) imageResult.getBinaryFileInfo().entity).getPosition() != null ? ((ImageData) imageResult.getBinaryFileInfo().entity)
+								.getPosition().intValue() + ")" : "0)")))
 							+ "</b></body></html>", null, previewImage);
 		this.imageResult = imageResult;
 		this.readOnly = readOnly;
@@ -442,7 +435,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			setToolTipText(imageResult.getFileNameMain());
 	}
 	
-	private static String strip(String fileName) {
+	private static String strip(String fileName, String opt) {
+		if (fileName.equals("null"))
+			fileName = opt;
 		if (fileName.contains(File.separator))
 			return fileName.substring(fileName.lastIndexOf(File.separator) + File.separator.length());
 		else
