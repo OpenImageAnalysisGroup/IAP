@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipeline;
 import de.ipk.ag_ba.image.operations.ImageOperation;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
@@ -49,7 +49,7 @@ public class PerformanceTest {
 		boolean oldschool = false;
 		if (oldschool) {
 			BlockRemoveSmallClustersOnFluo.ngUse = false;
-			BlockRemoveSmallClustersVisFluo.ngUse = false;
+			BlockRemoveSmallClusters_vis_fluo.ngUse = false;
 			FlexibleImage fc = imgFluo.copy();
 			FlexibleImage nc = imgFluoRef.copy();
 			school = new StopWatch("oldschool");
@@ -57,7 +57,7 @@ public class PerformanceTest {
 			school.printTime();
 		}
 		BlockRemoveSmallClustersOnFluo.ngUse = true;
-		BlockRemoveSmallClustersVisFluo.ngUse = true;
+		BlockRemoveSmallClusters_vis_fluo.ngUse = true;
 		school = new StopWatch("newschool");
 		testSide("newschool", imgVis, imgVisRef, imgFluo, imgFluoRef, imgNir, imgNirRef, "1");
 		school.printTime();
