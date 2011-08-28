@@ -8,17 +8,17 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMaskButNotOnVIS;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingOnFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisContentOnFluoMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropMasks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeVisAndFluoMasks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMorphologicalOperations;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeMasksToLargest;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockTransferImageSet;
-import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockLoadImagesIfNeeded;
+import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchRotation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchScaling;
 import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchTranslation;
@@ -66,10 +66,10 @@ public class BarleyTopImageProcessor {
 		BlockPipeline p = new BlockPipeline();
 		
 		if (automaticParameterSearch) {
-			p.add(BlockLoadImagesIfNeeded.class);
+			p.add(BlockLoadImagesIfNeeded_images_masks.class);
 			// p.add(BlockClearBackground.class);
-			p.add(BlockClosingOnFluo.class);
-			p.add(BlockRemoveSmallClustersVisFluo.class);
+			p.add(BlockClosing_fluo.class);
+			p.add(BlockRemoveSmallClusters_vis_fluo.class);
 			// p.add(BlockDataAnalysis.class);
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockMorphologicalOperations.class);
@@ -96,14 +96,14 @@ public class BarleyTopImageProcessor {
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockPostProcessEdgeErodeEnlargeOnFluo.class);
 			p.add(BlockApplyMaskButNotOnVIS.class);
-			p.add(BlockLoadImagesIfNeeded.class);
+			p.add(BlockLoadImagesIfNeeded_images_masks.class);
 			p.add(BlockTransferImageSet.class);
 			// p.add(BlockPrintInfosEND.class);
 			
 		} else {
 			// p.add(BlockClearBackground.class);
-			p.add(BlockClosingOnFluo.class);
-			p.add(BlockRemoveSmallClustersVisFluo.class);
+			p.add(BlockClosing_fluo.class);
+			p.add(BlockRemoveSmallClusters_vis_fluo.class);
 			// p.add(BlockDataAnalysis.class);
 			p.add(BlockResizeMasksToLargest.class);
 			p.add(BlockEnlargeVisAndFluoMasks.class);

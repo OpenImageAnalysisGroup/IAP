@@ -8,15 +8,15 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMasksToImages;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingOnFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropAllFixedPhytoOne;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCrop_images_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeVisAndFluoMasks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockFilterFluoMaskByValue30;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveNirMaskAndImageFixedUp;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersVisFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeMasksToLargest;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSetMasksToNull;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSetVisAndFluoMaskFromMergedVisAndFluo;
@@ -57,8 +57,8 @@ public class PhytochamberTopImageProcessor {
 		p.add(BlockCropAllFixedPhytoOne.class);
 		// p.add(BlockClearBackground.class);
 		p.add(BlockFilterFluoMaskByValue30.class);
-		p.add(BlockRemoveSmallClustersVisFluo.class);
-		p.add(BlockClosingOnFluo.class);
+		p.add(BlockRemoveSmallClusters_vis_fluo.class);
+		p.add(BlockClosing_fluo.class);
 		p.add(BlockResizeMasksToLargest.class);
 		p.add(BlockEnlargeVisAndFluoMasks.class);
 		if (automaticParameterSearch) {
@@ -74,7 +74,7 @@ public class PhytochamberTopImageProcessor {
 		p.add(BlockApplyMasksToImages.class);
 		p.add(BlockSetMasksToNull.class);
 		if (cropResult)
-			p.add(BlockCropImages.class);
+			p.add(BlockCrop_images_vis_fluo_nir.class);
 		
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, input);
 		FlexibleMaskAndImageSet result = p.execute(options, workset, debugStack, settings, null);

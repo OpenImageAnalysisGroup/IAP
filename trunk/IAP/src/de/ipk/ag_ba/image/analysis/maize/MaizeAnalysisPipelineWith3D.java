@@ -7,8 +7,8 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropImages;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockReplaceEmptyOriginalImage;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCrop_images_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.threeD.BlockThreeDgeneration;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -33,8 +33,8 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 		BlockPipeline p = super.getPipeline(options);
 		if (options != null)
 			options.clearAndAddBooleanSetting(Setting.DRAW_CONVEX_HULL, false);
-		p.remove(BlockCropImages.class);
-		p.remove(BlockReplaceEmptyOriginalImage.class);
+		p.remove(BlockCrop_images_vis_fluo_nir.class);
+		p.remove(BlockReplaceEmptyOriginalImages_vis_fluo_nir.class);
 		p.add(BlockThreeDgeneration.class);
 		return p;
 	}
