@@ -92,15 +92,34 @@ public class CloudTaskManager {
 					int maxTasks = SystemAnalysis.getNumberOfCPUs() / 2;
 					if (maxTasks < 1)
 						maxTasks = 1;
-					
-					if (runningTasks.size() < maxTasks) {
+					int cpuDesire = 0;
+					for (TaskDescription t : runningTasks) {
+						if (t.getBatchCmd() != null) {
+							int tu = t.getBatchCmd().getCpuTargetUtilization();
+							if (cpuDesire < Integer.MAX_VALUE) {
+								if (tu == Integer.MAX_VALUE)
+									cpuDesire = Integer.MAX_VALUE;
+								else
+									cpuDesire += tu;
+							}
+						}
+					}
+					if (cpuDesire < maxTasks) { // if (runningTasks.size() < maxTasks) {
 						if (m == null)
 							return;
 						for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart(maxTasks - runningTasks.size())) {
 							if (batch.getExperimentMongoID() != null) {
 								ExperimentHeaderInterface header = m.getExperimentHeader(batch.getExperimentMongoID());
 								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), hostName);
-								commands_to_start.add(task);
+								int tu = batch.getCpuTargetUtilization();
+								if (cpuDesire < Integer.MAX_VALUE) {
+									if (tu == Integer.MAX_VALUE)
+										cpuDesire = Integer.MAX_VALUE;
+									else
+										cpuDesire += tu;
+								}
+								if (cpuDesire + tu < maxTasks)
+									commands_to_start.add(task);
 							}
 						}
 					}

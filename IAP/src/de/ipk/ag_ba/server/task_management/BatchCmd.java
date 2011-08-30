@@ -160,4 +160,12 @@ public class BatchCmd extends BasicDBObject {
 	public static DBObject getRunstatusMatcher(CloudAnalysisStatus starting) {
 		return new BasicDBObject("runstatus", starting.toString());
 	}
+	
+	public int getCpuTargetUtilization() {
+		return getInt("cpu_utilization", 1);
+	}
+	
+	public void setCpuTargetUtilization(int cpu_util) {
+		put("cpu_utilization", cpu_util);
+	}
 }

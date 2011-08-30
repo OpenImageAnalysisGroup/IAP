@@ -68,6 +68,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 				cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
 				cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
 				cmd.setExperimentMongoID(experimentInputMongoID);
+				cmd.setCpuTargetUtilization(remoteAction.getCpuTargetUtilization());
 				BatchCmd.enqueueBatchCmd(remoteAction.getMongoDB(), cmd);
 				cm.getAction().performActionCalculateResults(src);
 			}
