@@ -49,4 +49,9 @@ public class MaizeAnalysisAction extends AbstractPhenotypeAnalysisAction {
 		return "Maize Analysis";
 	}
 	
+	@Override
+	public int getCpuTargetUtilization() {
+		return 1;
+	}
+	
 }

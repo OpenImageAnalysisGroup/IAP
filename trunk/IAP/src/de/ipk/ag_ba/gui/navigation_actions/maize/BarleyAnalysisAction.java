@@ -49,4 +49,9 @@ public class BarleyAnalysisAction extends AbstractPhenotypeAnalysisAction {
 		return "Barley Analysis";
 	}
 	
+	@Override
+	public int getCpuTargetUtilization() {
+		return 1;
+	}
+	
 }

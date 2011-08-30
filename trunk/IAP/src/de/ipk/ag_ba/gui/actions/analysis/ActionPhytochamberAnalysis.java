@@ -207,4 +207,9 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 	public MongoDB getMongoDB() {
 		return m;
 	}
+	
+	@Override
+	public int getCpuTargetUtilization() {
+		return 1;
+	}
 }

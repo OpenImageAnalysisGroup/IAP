@@ -176,4 +176,11 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 		return m;
 	}
 	
+	@Override
+	public int getCpuTargetUtilization() {
+		// by returning this high number, this task will be the only one running
+		// on the cloud execution server
+		return Integer.MAX_VALUE;
+	}
+	
 }

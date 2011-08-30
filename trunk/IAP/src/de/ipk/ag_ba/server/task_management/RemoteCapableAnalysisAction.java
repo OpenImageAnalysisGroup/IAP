@@ -22,4 +22,9 @@ public interface RemoteCapableAnalysisAction extends NavigationAction {
 	public String getMongoDatasetID();
 	
 	public MongoDB getMongoDB();
+	
+	/**
+	 * @return 1, if this task utilizes 1 CPU, 2, if this tasks creates two concurrent subtasks.
+	 */
+	public int getCpuTargetUtilization();
 }
