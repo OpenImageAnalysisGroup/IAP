@@ -1,14 +1,20 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.threeD;
 
+import info.StopWatch;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
 
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractBlock;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.GenerationMode;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.MyPicture;
@@ -48,7 +54,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
 		// super.postProcessResultsForAllAngles(inSample, inImages, allResultsForSnapshot, summaryResult);
 		
-		int voxelresolution = 200;
+		int voxelresolution = 500;
 		int widthFactor = 40;
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
 		
@@ -94,9 +100,17 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			}
 			double vv = 1;
 			double plantVolume = vv * solidVoxels;
-			summaryResult.setNumericProperty(0, "RESULT_plant.volume", plantVolume);
+			summaryResult.setNumericProperty(0, "RESULT_plant3d.volume", plantVolume);
 			
-			boolean createVolumeDataset = false;
+			BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
+			double realMarkerDistHorizontal = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
+			if (distHorizontal != null) {
+				double corr = realMarkerDistHorizontal / distHorizontal.getValue();
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_plant3d.volume.norm",
+								plantVolume * corr * corr * corr);
+			}
+			
+			boolean createVolumeDataset = true;
 			if (createVolumeDataset) {
 				Sample sample = inSample;
 				LoadedVolumeExtension volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResult());
@@ -130,19 +144,84 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				
 				volume.setColorDepth(VolumeColorDepth.RGBA.toString());
 			}
-			// the volume needs to be added to the output set
-			// it will be saved e.g. by MongoDB, where the side view animated GIF will be rendered as
-			// the preview icon
-			//
-			// the actual volume should probably not be saved, because it is too large,
-			// instead the MongoDB volume storage code should conditionally, depending on some flag
-			// not save the volume, but a larger animated gif of the side view as the actual content,
-			// turning the output effectively into a stored image
-			//
-			// an alternative is to save a compressed surface volume (oct-tree!?), which could be expanded
-			// into full volume structure on demand, or depending code (image GIF) could be adapted to accept
-			// a "virtual cube", which provides XYZ access to the colored voxels, similar to the int[][][] cube
+			boolean create3Dskeleton = true;
+			if (create3Dskeleton) {
+				int fire = ImageOperation.BACKGROUND_COLORint;
+				StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create 3D Skeleton", true);
+				HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
+				boolean foundBorderVoxel = false;
+				do {
+					for (int x = 1; x < voxelresolution - 1; x++) {
+						for (int y = 1; y < voxelresolution - 1; y++) {
+							for (int z = 1; z < voxelresolution - 1; z++) {
+								int c = cube[x][y][z];
+								boolean filled = c != fire;
+								if (filled) {
+									boolean left = cube[x - 1][y][z] != fire;
+									boolean right = cube[x + 1][y][z] != fire;
+									boolean above = cube[x][y - 1][z] != fire;
+									boolean below = cube[x][y + 1][z] != fire;
+									boolean behind = cube[x][y][z + 1] != fire;
+									boolean before = cube[x][y][z - 1] != fire;
+									if (!left || !right || !above || !below || !behind || !before) {
+										// border voxel
+										foundBorderVoxel = true;
+										int filledSurrounding = 0;
+										if (left)
+											filledSurrounding++;
+										if (right)
+											filledSurrounding++;
+										if (above)
+											filledSurrounding++;
+										if (below)
+											filledSurrounding++;
+										if (behind)
+											filledSurrounding++;
+										if (before)
+											filledSurrounding++;
+										if (filledSurrounding <= 2)
+											addSkeleton(x2y2z2colorSkeleton, x, y, z, c);
+									}
+									cube[x][y][z] = fire;
+								}
+							}
+						}
+					}
+				} while (foundBorderVoxel);
+				long skeletonLength = 0;
+				for (int x = 1; x < voxelresolution - 1; x++) {
+					if (x2y2z2colorSkeleton.containsKey(x)) {
+						HashMap<Integer, HashMap<Integer, Integer>> y2z = x2y2z2colorSkeleton.get(x);
+						for (int y = 1; y < voxelresolution - 1; y++) {
+							if (y2z.containsKey(y)) {
+								HashMap<Integer, Integer> z2c = y2z.get(y);
+								for (int z : y2z.keySet()) {
+									Integer c = z2c.get(z);
+									cube[x][y][z] = c;
+									skeletonLength++;
+								}
+							}
+						}
+					}
+				}
+				summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length", skeletonLength);
+				if (distHorizontal != null) {
+					double corr = realMarkerDistHorizontal / distHorizontal.getValue();
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_plant3d.skeleton.length.norm",
+							skeletonLength * corr);
+				}
+				
+				s.printTime();
+			}
 		}
 		
+	}
+	
+	private void addSkeleton(HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton, int x, int y, int z, int c) {
+		if (!x2y2z2colorSkeleton.containsKey(x))
+			x2y2z2colorSkeleton.put(x, new HashMap<Integer, HashMap<Integer, Integer>>());
+		if (!x2y2z2colorSkeleton.get(x).containsKey(y))
+			x2y2z2colorSkeleton.get(x).put(y, new HashMap<Integer, Integer>());
+		x2y2z2colorSkeleton.get(x).get(y).put(z, c);
 	}
 }

@@ -749,22 +749,24 @@ public class MongoDB {
 			gridfs_preview.remove(vvv);
 			vvv = null;
 		}
-		
-		IntVolumeInputStream is = (IntVolumeInputStream) id.getURL().getInputStream();
-		System.out.println("AVAIL: " + is.available());
-		System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
-		GridFSInputFile inputFile = gridfs_volumes.createFile(is);
-		inputFile.setFilename(hash);
-		inputFile.getMetaData().put("name", id.getURL().getFileName());
-		inputFile.save();
-		System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
-		
+		boolean saveVolume = true;
+		long saved = 0;
+		if (saveVolume) {
+			IntVolumeInputStream is = (IntVolumeInputStream) id.getURL().getInputStream();
+			System.out.println("AVAIL: " + is.available());
+			System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
+			GridFSInputFile inputFile = gridfs_volumes.createFile(is);
+			inputFile.setFilename(hash);
+			inputFile.getMetaData().put("name", id.getURL().getFileName());
+			inputFile.save();
+			saved += inputFile.getLength();
+			System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
+		}
 		GridFSDBFile fff = gridfs_preview.findOne(id.getURL().getDetail());
 		if (fff != null) {
 			gridfs_preview.remove(fff);
 			fff = null;
 		}
-		
 		if (fff == null) {
 			try {
 				if (optStatus != null)
@@ -788,7 +790,7 @@ public class MongoDB {
 		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved Volume ("
-					+ ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
+					+ saved / 1024 / 1024 + " MB)");
 		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
