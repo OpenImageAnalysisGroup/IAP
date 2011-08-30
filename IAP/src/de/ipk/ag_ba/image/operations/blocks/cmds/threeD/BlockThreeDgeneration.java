@@ -67,6 +67,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">Process image angle " + angle + " (TODO)");
 			BlockProperties bp = allResultsForSnapshot.get(angle);
 			FlexibleImage vis = bp.getImage("img.vis.3D");
+			bp.setImage("img.vis.3D", null);
 			if (vis != null) {
 				
 				MyPicture p = new MyPicture();
