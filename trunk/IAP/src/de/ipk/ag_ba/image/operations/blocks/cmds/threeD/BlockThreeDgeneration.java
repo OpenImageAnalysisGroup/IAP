@@ -63,9 +63,11 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		mg.setCubeSideLength(300, 300, 300);
 		
 		ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
+		BlockProperty distHorizontal = null;
 		for (Double angle : allResultsForSnapshot.keySet()) {
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">Process image angle " + angle + " (TODO)");
 			BlockProperties bp = allResultsForSnapshot.get(angle);
+			distHorizontal = bp.getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 			FlexibleImage vis = bp.getImage("img.vis.3D");
 			bp.setImage("img.vis.3D", null);
 			if (vis != null) {
@@ -103,7 +105,6 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			double plantVolume = vv * solidVoxels;
 			summaryResult.setNumericProperty(0, "RESULT_plant3d.volume", plantVolume);
 			
-			BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 			double realMarkerDistHorizontal = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
 			if (distHorizontal != null) {
 				double corr = realMarkerDistHorizontal / distHorizontal.getValue();
