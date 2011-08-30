@@ -24,23 +24,17 @@ public class BlockConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage image = getInput().getMasks().getVis();
-		if (options.isMaize()) {
-			ImageData info = getInput().getImages().getVisInfo();
-			ImageOperation res = processImage(image, info);
-			return res != null ? res.getImage() : null;
-		} else
-			return image;
+		ImageData info = getInput().getImages().getVisInfo();
+		ImageOperation res = processImage(image, info);
+		return res != null ? res.getImage() : null;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		FlexibleImage image = getInput().getMasks().getFluo();
-		if (options.isMaize()) {
-			ImageData info = getInput().getImages().getFluoInfo();
-			ImageOperation res = processImage(image, info);
-			return res != null ? res.getImage() : null;
-		} else
-			return image;
+		ImageData info = getInput().getImages().getFluoInfo();
+		ImageOperation res = processImage(image, info);
+		return res != null ? res.getImage() : null;
 	}
 	
 	private ImageOperation processImage(FlexibleImage image, ImageData info) {

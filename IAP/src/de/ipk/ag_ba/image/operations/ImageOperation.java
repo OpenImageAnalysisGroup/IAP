@@ -2984,4 +2984,48 @@ public class ImageOperation {
 	public ImageOperation copy() {
 		return new ImageOperation(getImage().copy());
 	}
+	
+	public ImageOperation adaptiveThreshold(int n, int assumedBackground) {
+		int[][] img = getImageAs2array();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] out = new int[w][h];
+		int x, y, thresh, temp = 0;
+		double K = 0.05d;
+		int[] mean = new int[n * n];
+		for (int j = 0; j < h; j++) {
+			for (int i = 0; i < w; i++) {
+				// Check the local neighbourhood
+				for (int k = 0; k < n; k++) {
+					for (int l = 0; l < n; l++) {
+						x = i - ((int) (n / 2)) + k;
+						y = j - ((int) (n / 2)) + l;
+						if (x > 0 && x < w && y > 0 && y < h) {
+							temp = img[x][y] & 0x0000ff;
+							mean[k * n + l] = temp;
+						} else
+							mean[k * n + l] = assumedBackground;
+					}
+				}
+				// Find the threshold value
+				// thresh = mean(mean);
+				// thresh = median(mean);
+				thresh = (int) (mean(mean) * (1 + K * ((img[i][j] & 0x0000ff) / assumedBackground - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
+				
+				if ((img[i][j] & 0x0000ff) > thresh) {
+					out[i][j] = Color.WHITE.getRGB();
+				} else {
+					out[i][j] = img[i][j];
+				}
+			}
+		}
+		return new ImageOperation(out);
+	}
+	
+	private int mean(int[] temp) {
+		int sum = 0;
+		for (int i = 0; i < temp.length; i++)
+			sum += temp[i];
+		return (int) (sum / (double) temp.length);
+	}
 }

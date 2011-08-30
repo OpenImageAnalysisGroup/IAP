@@ -243,21 +243,26 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 	}
 	
 	public FlexibleImage clearSides(FlexibleImage result, int width) {
+		int colorRight, colorLeft;
+		if (debug) {
+			colorRight = Color.BLUE.getRGB();
+			colorLeft = Color.YELLOW.getRGB();
+		} else {
+			colorRight = options.getBackground();
+			colorLeft = options.getBackground();
+		}
+		
 		if (!options.isMaize()) {
 			if (markerPosLeftX != null) {
 				result = new ImageOperation(result).clearImageLeft(
-							(int) (-120 + markerPosLeftX.getValue() * width), options.getBackground()).getImage();
+							(int) (120 + markerPosLeftX.getValue() * width), colorLeft).getImage();
 			}
 			if (markerPosRightX != null) {
 				result = new ImageOperation(result).clearImageRight(
-							(int) (120 + markerPosRightX.getValue() * width), options.getBackground()).getImage();
+							(int) (-120 + markerPosRightX.getValue() * width), colorRight).getImage();
 			}
 		}
-		int color;
-		if (debug)
-			color = Color.RED.getRGB();
-		else
-			color = options.getBackground();
+		
 		if (options.isMaize()) {
 			if (markerDist != null && markerPosLeftX != null && markerPosRightX != null) {
 				double dist = markerDist.getValue() * 0.15;
@@ -265,17 +270,17 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 				double posRight = width / 2 + markerDist.getValue() / 2;
 				
 				result = new ImageOperation(result).clearImageRight(
-						(int) (dist + posRight), color)
-						.clearImageLeft((int) (-dist + posLeft), color)
+						(int) (dist + posRight), colorRight)
+						.clearImageLeft((int) (-dist + posLeft), colorLeft)
 						.getImage();
 			} else {
 				if (markerPosLeftX != null) {
 					result = new ImageOperation(result).clearImageLeft(
-								(int) (-120 + markerPosLeftX.getValue() * width), color).getImage();
+								(int) (-120 + markerPosLeftX.getValue() * width), colorLeft).getImage();
 				}
 				if (markerPosRightX != null) {
 					result = new ImageOperation(result).clearImageRight(
-							(int) (120 + markerPosRightX.getValue() * width), color).getImage();
+							(int) (120 + markerPosRightX.getValue() * width), colorRight).getImage();
 				}
 			}
 		}
