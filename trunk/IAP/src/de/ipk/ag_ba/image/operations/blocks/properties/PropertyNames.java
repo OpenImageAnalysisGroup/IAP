@@ -23,7 +23,9 @@ public enum PropertyNames {
 
 	MARKER_DISTANCE_BOTTOM_TOP_LEFT, MARKER_DISTANCE_BOTTOM_TOP_RIGHT,
 
-	INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, MARKER_DISTANCE_LEFT_RIGHT;
+	INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, INTERNAL_CROP_BOTTOM_POT_POSITION_NIR,
+	MARKER_DISTANCE_LEFT_RIGHT,
+	MARKER_DISTANCE_REAL_VALUE;
 	
 	// public boolean storeAsResult() {
 	// switch (this) {
@@ -97,7 +99,7 @@ public enum PropertyNames {
 			case RESULT_VIS_MARKER_POS_3_RIGHT_Y:
 				return "mark3.y";
 		}
-		return null;
+		return toString();
 	}
 	
 	public String getUnit() {
@@ -126,6 +128,6 @@ public enum PropertyNames {
 			case RESULT_SIDE_HEIGHT:
 				return "percent";
 		}
-		return null;
+		return "";
 	}
 }

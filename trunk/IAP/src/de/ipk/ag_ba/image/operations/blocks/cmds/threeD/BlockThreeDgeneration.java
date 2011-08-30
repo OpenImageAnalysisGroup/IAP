@@ -40,6 +40,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		FlexibleImage fi = getInput().getImages() != null ? getInput().getImages().getVis() : null;
 		if (fi != null) {
 			getProperties().setImage("img.vis.3D", fi.print("CLEARED", false));
+			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_REAL_VALUE, options.getDoubleSetting(Setting.REAL_MARKER_DISTANCE));
 		} else {
 			System.out.println();
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: NO VIS IMAGE TO BE STORED FOR LATER 3D GENRATION!");
@@ -64,10 +65,14 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		
 		ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 		BlockProperty distHorizontal = null;
+		double realMarkerDistHorizontal = Double.NaN;
 		for (Double angle : allResultsForSnapshot.keySet()) {
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">Process image angle " + angle + " (TODO)");
 			BlockProperties bp = allResultsForSnapshot.get(angle);
 			distHorizontal = bp.getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
+			BlockProperty bpv = bp.getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_REAL_VALUE);
+			if (bpv != null)
+				realMarkerDistHorizontal = bpv.getValue();
 			FlexibleImage vis = bp.getImage("img.vis.3D");
 			bp.setImage("img.vis.3D", null);
 			if (vis != null) {
@@ -105,7 +110,6 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			double plantVolume = vv * solidVoxels;
 			summaryResult.setNumericProperty(0, "RESULT_plant3d.volume", plantVolume);
 			
-			double realMarkerDistHorizontal = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
 			if (distHorizontal != null) {
 				double corr = realMarkerDistHorizontal / distHorizontal.getValue();
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_plant3d.volume.norm",
