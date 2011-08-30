@@ -2,49 +2,42 @@ package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import java.awt.Color;
 
-import org.graffiti.plugin.io.resources.IOurl;
-
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractBlock;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class BlockReplaceEmptyOriginalImages_vis_fluo_nir extends AbstractBlock {
 	
 	private static final int sz = 128 - 5;
 	
-	@Override
-	protected FlexibleImage processVISimage() {
-		FlexibleImage image = getInput().getImages().getVis();
-		IOurl infoUrl = getInput().getImages().getVisInfo() != null ? getInput().getImages().getVisInfo().getURL() : null;
-		image = processImage(image, infoUrl);
-		return image;
-	}
-	
-	@Override
-	protected FlexibleImage processFLUOimage() {
-		FlexibleImage image = getInput().getImages().getFluo();
-		IOurl infoUrl = getInput().getImages().getFluoInfo() != null ? getInput().getImages().getFluoInfo().getURL() : null;
-		image = processImage(image, infoUrl);
-		return image;
-	}
-	
-	@Override
-	protected FlexibleImage processNIRimage() {
-		FlexibleImage image = getInput().getImages().getNir();
-		IOurl infoUrl = getInput().getImages().getNirInfo() != null ? getInput().getImages().getNirInfo().getURL() : null;
-		image = processImage(image, infoUrl);
-		return image;
-	}
-	
-	public FlexibleImage processImage(FlexibleImage image, IOurl infoUrl) {
+	public FlexibleImage processImage(FlexibleImage image) {
+		FlexibleImageType it = image == null ? FlexibleImageType.UNKNOWN : image.getType();
 		if (image != null) {
 			if (image.getIO().countFilledPixels() == 0) {
+				ImageData imageInfo = null;
+				switch (it) {
+					case FLUO:
+						imageInfo = getInput().getImages().getFluoInfo();
+						break;
+					case NIR:
+						imageInfo = getInput().getImages().getNirInfo();
+						break;
+					case VIS:
+						imageInfo = getInput().getImages().getVisInfo();
+						break;
+					case UNKNOWN:
+						break;
+				}
 				try {
-					image = new FlexibleImage(infoUrl);
-					image.getIO().addBorder(50, 0, 0, Color.RED.getRGB());
+					if (imageInfo != null) {
+						image = new FlexibleImage(imageInfo.getURL());
+						image.getIO().addBorder(50, 0, 0, Color.RED.getRGB());
+					}
 				} catch (Exception e) {
 					image = null;
-					getInput().getImages().getVisInfo().addAnnotationField("loaderror", e.getMessage());
+					imageInfo.addAnnotationField("loaderror", e.getMessage());
 				}
 			}
 		}

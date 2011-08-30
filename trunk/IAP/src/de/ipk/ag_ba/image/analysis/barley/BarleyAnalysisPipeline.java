@@ -17,17 +17,17 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilter_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockNirFilterSide_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallVerySmallClusters_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallVerySmallClusters_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHull_vis_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalcIntensity_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByRefComparison_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkers_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityConversion_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalcIntensity_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjects_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresUsingOpening_top_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockUseFluoMaskToClear_vis_nir;
@@ -136,6 +136,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		double cut = (0.001d) / 1;
 		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, cut);
 		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, cut * 0.2);
+		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
 		
 	}
 	

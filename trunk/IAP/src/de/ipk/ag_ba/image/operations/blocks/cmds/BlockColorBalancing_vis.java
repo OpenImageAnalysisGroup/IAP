@@ -38,7 +38,7 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis, 0.3, false);
+			pix = getProbablyWhitePixels(vis, 0.3, true);
 		else
 			pix = getProbablyWhitePixels(vis, 0.06, false);
 		return io.imageBalancing(255, pix).getImage();
