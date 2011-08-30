@@ -1062,6 +1062,11 @@ public class MongoDB {
 				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 			} else {
 				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, optFileSize, optStatus, hash);
+				fff = gridfs_volumes.findOne(hash);
+				if (fff != null && fff.getLength() <= 0) {
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">Delete generated volume from MongoDB file system (to save space and for debugging).");
+					gridfs_volumes.remove(fff);
+				}
 				return DatabaseStorageResult.STORED_IN_DB;
 			}
 		} catch (Exception e) {
