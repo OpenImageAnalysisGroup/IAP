@@ -197,7 +197,7 @@ public class ImageOperation {
 			
 			int rf = (c & 0xff0000) >> 16;
 			int gf = (c & 0x00ff00) >> 8;
-			int bf = (c & 0x0000ff);
+			// int bf = (c & 0x0000ff);
 			
 			// float[] hsbvals = Color.RGBtoHSB(rf, gf, bf, null);
 			//

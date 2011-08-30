@@ -106,7 +106,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			if (debug) {
 				image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
 						.fillRect(left, height - (startHTop + scanHeight), scanWidth, scanHeight, Color.RED.getRGB(), 0.5).getImage()
-						.print("region scan for color balance", false);
+						.print("region scan for color balance", debug);
 			}
 			values = new float[6];
 			int i = 0;
