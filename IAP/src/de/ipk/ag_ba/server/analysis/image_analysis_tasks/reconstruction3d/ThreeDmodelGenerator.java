@@ -14,6 +14,7 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.color.ColorUtil;
+import de.ipk.ag_ba.image.operations.ImageOperation;
 
 /*
  * Created on Dec 17, 2009 by Christian Klukas
@@ -46,7 +47,8 @@ public class ThreeDmodelGenerator {
 	
 	private int maxPossibleLevels;
 	
-	public static final Color TRANSPARENT_COLOR = new Color(0, 0, 0, 0);
+	public static final Color TRANSPARENT_COLOR = ImageOperation.BACKGROUND_COLOR;
+	public static final int TRANSPARENT_COLORint = ImageOperation.BACKGROUND_COLORint;
 	
 	public ThreeDmodelGenerator(int voxelresolution, int widthFactor) {
 		this.maxVoxelPerSide = voxelresolution;
@@ -318,8 +320,7 @@ public class ThreeDmodelGenerator {
 			if (cc.size() == 0) {
 				byteCube[xi][yi][zi] = (byte) 0;
 				if (rgb) {
-					// TRANSPARENT_COLOR;
-					rgbCube[xi][yi][zi] = 0;
+					rgbCube[xi][yi][zi] = TRANSPARENT_COLORint;
 				}
 			} else {
 				if (rgb) {

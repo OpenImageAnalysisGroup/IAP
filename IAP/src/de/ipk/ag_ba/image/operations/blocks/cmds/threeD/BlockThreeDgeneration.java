@@ -33,7 +33,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	protected FlexibleImage processVISimage() {
 		FlexibleImage fi = getInput().getImages() != null ? getInput().getImages().getVis() : null;
 		if (fi != null) {
-			getProperties().setImage("img.vis.3D", fi);
+			getProperties().setImage("img.vis.3D", fi.print("CLEARED", false));
 		} else {
 			System.out.println();
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: NO VIS IMAGE TO BE STORED FOR LATER 3D GENRATION!");
@@ -64,7 +64,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			if (vis != null) {
 				
 				MyPicture p = new MyPicture();
-				p.setPictureData(vis.getAsBufferedImage(), angle, mg);
+				p.setPictureData(vis, angle / 180d * Math.PI, mg);
 				pictures.add(p);
 			}
 		}
@@ -94,7 +94,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			}
 			double vv = 1;
 			double plantVolume = vv * solidVoxels;
-			getProperties().setNumericProperty(0, "RESULT_plant.volume", plantVolume);
+			summaryResult.setNumericProperty(0, "RESULT_plant.volume", plantVolume);
 			
 			boolean createVolumeDataset = false;
 			if (createVolumeDataset) {
