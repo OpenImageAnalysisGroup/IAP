@@ -13,6 +13,8 @@ public class ExperimentHeaderService {
 		Collections.sort(in, new Comparator<ExperimentHeaderInterface>() {
 			@Override
 			public int compare(ExperimentHeaderInterface o1, ExperimentHeaderInterface o2) {
+				if (o1 == null || o2 == null)
+					return 0;
 				Long ct = o1.getImportdate() != null ? o1.getImportdate().getTime() : -1;
 				Long pt = o2.getImportdate() != null ? o2.getImportdate().getTime() : -1;
 				
