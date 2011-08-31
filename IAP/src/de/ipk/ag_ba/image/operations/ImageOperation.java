@@ -469,6 +469,12 @@ public class ImageOperation {
 		return this;
 	}
 	
+	public ImageOperation dilate(int n) {
+		for (int i = 1; i <= n; i++)
+			image.getProcessor().dilate();
+		return this;
+	}
+	
 	/**
 	 * Enlarge area of mask.
 	 * <p>
@@ -2640,7 +2646,7 @@ public class ImageOperation {
 		if (image == null)
 			return null;
 		ImageOperation res;
-		if (rgbInfo.length > 3) {
+		if (rgbInfo.length > 3 && rgbInfo.length < 6) {
 			double r1 = brightness / rgbInfo[0];
 			double g1 = brightness / rgbInfo[1];
 			double b1 = brightness / rgbInfo[2];
@@ -2656,6 +2662,27 @@ public class ImageOperation {
 				res = res.blur(10);
 				res = res.multiplyHSV(2, 1.4, 0.9);
 			}
+		}
+		if (rgbInfo.length > 6) {
+			// right
+			double r1 = brightness / rgbInfo[0];
+			double g1 = brightness / rgbInfo[1];
+			double b1 = brightness / rgbInfo[2];
+			// left
+			double r2 = brightness / rgbInfo[3];
+			double g2 = brightness / rgbInfo[4];
+			double b2 = brightness / rgbInfo[5];
+			// center
+			double r3 = brightness / rgbInfo[6];
+			double g3 = brightness / rgbInfo[7];
+			double b3 = brightness / rgbInfo[8];
+			
+			double[] factorsTopRight = { r1, g1, b1 };
+			double[] factorsBottomLeft = { r2, g2, b2 };
+			double[] factorsCenter = { r3, g3, b3 };
+			
+			ImageOperation io = new ImageOperation(image);
+			res = io.rmCircleShade(factorsTopRight, factorsBottomLeft, factorsCenter);
 		} else {
 			double r = brightness / rgbInfo[0];
 			double g = brightness / rgbInfo[1];
@@ -2670,6 +2697,25 @@ public class ImageOperation {
 			}
 		}
 		return res;
+	}
+	
+	private ImageOperation rmCircleShade(double[] factorsTopRight, double[] factorsBottomLeft, double[] factorsCenter) {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] img = getImageAs2array();
+		int cx = w / 2;
+		int cy = h / 2;
+		int distToCenter, pix;
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; x < h; y++) {
+				distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + y * y);
+				pix = img[x][y] & 0x0000ff;
+				if (y > h / 2)
+					img[x][y] = (int) (pix * distToCenter * (factorsTopRight[0] - factorsCenter[0]));
+				// else
+			}
+		}
+		return null;
 	}
 	
 	private ImageOperation multiplyHSV(double hf, double sf, double vf) {
@@ -2951,6 +2997,10 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation copyOnImage(FlexibleImage image2) {
+		return copyOnImage(image2, 2);
+	}
+	
+	public ImageOperation copyOnImage(FlexibleImage image2, int size) {
 		int[][] res = getImageAs2array();
 		int[][] skelImg = image2.getAs2A();
 		int w = image.getWidth();
@@ -2959,7 +3009,7 @@ public class ImageOperation {
 			for (int y = 0; y < h; y++) {
 				if (skelImg[x][y] != SkeletonProcessor2d.background) {
 					int v = skelImg[x][y];
-					int r = 2;
+					int r = size;
 					if (v == SkeletonProcessor2d.colorEndpoints)
 						r = 18;
 					if (v == SkeletonProcessor2d.colorBranches)

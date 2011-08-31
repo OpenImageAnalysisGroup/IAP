@@ -39,21 +39,37 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage vis = getInput().getMasks().getVis();
 		FlexibleImage fluo = getInput().getMasks().getFluo() != null ? getInput().getMasks().getFluo().copy() : null;
 		FlexibleImage res = vis;
-		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-			FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
-					// .closing(3, 3)
-					// .erode()
-					.dilateHorizontal(10)
-					.blur(1)
-					.getImage().print("vis", debug);
-			
-			if (viswork != null)
-				if (options.isMaize() && vis != null && fluo != null) {
-					FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
-					if (sk != null)
-						getProperties().setImage("skeleton", sk);
-					res = getProperties().getImage("beforeBloomEnhancement");
-				}
+		if (options.isMaize()) {
+			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
+				FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
+						// .closing(3, 3)
+						// .erode()
+						.dilateHorizontal(10)
+						.blur(1)
+						.getImage().print("vis", debug);
+				
+				if (viswork != null)
+					if (vis != null && fluo != null) {
+						FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+						if (sk != null)
+							getProperties().setImage("skeleton", sk);
+						res = getProperties().getImage("beforeBloomEnhancement");
+					}
+			}
+		} else {
+			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
+				FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
+						.dilate(4)
+						.blur(1)
+						.getImage().print("vis", false);
+				
+				if (viswork != null)
+					if (vis != null && fluo != null) {
+						FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+						if (sk != null)
+							res = res.getIO().copyOnImage(sk).getImage();
+					}
+			}
 		}
 		return res;
 	}
