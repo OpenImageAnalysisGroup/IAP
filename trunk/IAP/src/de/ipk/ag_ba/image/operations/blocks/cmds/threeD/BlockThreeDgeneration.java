@@ -26,6 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.ByteShortIntArray;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeColorDepth;
 
 public class BlockThreeDgeneration extends AbstractBlock {
@@ -117,9 +118,10 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			}
 			
 			boolean createVolumeDataset = true;
+			LoadedVolumeExtension volume = null;
 			if (createVolumeDataset) {
 				Sample sample = inSample;
-				LoadedVolumeExtension volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResult());
+				volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResultCopy());
 				
 				HashSet<Integer> replicateIDsOfSampleMeasurements = new HashSet<Integer>();
 				for (Measurement m : sample) {
@@ -149,6 +151,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				volume.getURL().setFileName("IAP_reconstruction_" + System.currentTimeMillis() + ".argb_volume");
 				
 				volume.setColorDepth(VolumeColorDepth.RGBA.toString());
+				summaryResult.setVolume("RESULT_plant_model", volume);
 			}
 			boolean create3Dskeleton = true;
 			if (create3Dskeleton) {
@@ -216,6 +219,10 @@ public class BlockThreeDgeneration extends AbstractBlock {
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_plant3d.skeleton.length.norm",
 							skeletonLength * corr);
 				}
+				
+				LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
+				lve.setVolume(new ByteShortIntArray(mg.getRGBcubeResult()));
+				summaryResult.setVolume("RESULT_plant_skeleton", lve);
 				
 				s.printTime();
 			}

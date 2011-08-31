@@ -582,4 +582,13 @@ public class ThreeDmodelGenerator {
 		}
 		return diff;
 	}
+	
+	public int[][][] getRGBcubeResultCopy() {
+		int[][][] res = new int[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
+		for (int x = 0; x < maxVoxelPerSide; x++)
+			for (int y = 0; y < maxVoxelPerSide; y++)
+				for (int z = 0; z < maxVoxelPerSide; z++)
+					res[x][y][z] = rgbCube[x][y][z];
+		return res;
+	}
 }
