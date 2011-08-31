@@ -113,7 +113,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			
 			if (distHorizontal != null) {
 				double corr = realMarkerDistHorizontal / distHorizontal.getValue();
-				getProperties().setNumericProperty(getBlockPosition(), "RESULT_plant3d.volume.norm",
+				summaryResult.setNumericProperty(0, "RESULT_plant3d.volume.norm",
 								plantVolume * corr * corr * corr);
 			}
 			
@@ -160,6 +160,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
 				boolean foundBorderVoxel = false;
 				do {
+					foundBorderVoxel = false;
 					for (int x = 1; x < voxelresolution - 1; x++) {
 						for (int y = 1; y < voxelresolution - 1; y++) {
 							for (int z = 1; z < voxelresolution - 1; z++) {
@@ -204,7 +205,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 						for (int y = 1; y < voxelresolution - 1; y++) {
 							if (y2z.containsKey(y)) {
 								HashMap<Integer, Integer> z2c = y2z.get(y);
-								for (int z : y2z.keySet()) {
+								for (int z : z2c.keySet()) {
 									Integer c = z2c.get(z);
 									cube[x][y][z] = c;
 									skeletonLength++;
@@ -216,7 +217,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length", skeletonLength);
 				if (distHorizontal != null) {
 					double corr = realMarkerDistHorizontal / distHorizontal.getValue();
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_plant3d.skeleton.length.norm",
+					summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length.norm",
 							skeletonLength * corr);
 				}
 				
