@@ -1537,19 +1537,21 @@ public class ImageOperation {
 		
 		thresholdLAB3(width, height, img2d, resultImage,
 					lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB,
-					upperValueOfB, background, typ, maize);
+					upperValueOfB, background, typ, maize, false, null);
 		
 	}
 	
 	/**
 	 * A method with the same name (without the "unclear2") exists,
 	 * it is unclear if there is a difference.
+	 * 
+	 * @param oi
 	 */
-	public static void thresholdLAB3(int width, int height, int[] imagePixels, int[] resultImage,
+	public static FlexibleImage thresholdLAB3(int width, int height, int[] imagePixels, int[] resultImage,
 			int lowerValueOfL, int upperValueOfL,
 			int lowerValueOfA, int upperValueOfA,
 			int lowerValueOfB, int upperValueOfB,
-			int background, CameraPosition typ, boolean maize) {
+			int background, CameraPosition typ, boolean maize, boolean replaceBlueStick, int[][] oi) {
 		int c, x, y = 0;
 		int r, g, b;
 		int Li, ai, bi;
@@ -1580,10 +1582,83 @@ public class ImageOperation {
 				if (resultImage[off] != background && (((Li > lowerValueOfL) && (Li < upperValueOfL) && (ai > lowerValueOfA) && (ai < upperValueOfA)
 								&& (bi > lowerValueOfB) && (bi < upperValueOfB)) && !isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft))) {
 					resultImage[off] = imagePixels[off];
-				} else
-					resultImage[off] = background;
+				} else {
+					if (replaceBlueStick && maize && typ == CameraPosition.SIDE) {
+						boolean backFound = false;
+						boolean greenFound = false;
+						int green = Color.GREEN.getRGB();
+						for (int xd = 1; xd < 15; xd++) {
+							off = x + xd + yw;
+							
+							if (off < 0 || off >= imagePixels.length)
+								break;
+							c = imagePixels[off];
+							
+							if (c == background) {
+								backFound = true;
+								break;
+							} else {
+								r = ((c & 0xff0000) >> 16);
+								g = ((c & 0x00ff00) >> 8);
+								b = (c & 0x0000ff);
+								
+								Li = (int) ImageOperation.labCube[r][g][b];
+								ai = (int) ImageOperation.labCube[r][g][b + 256];
+								bi = (int) ImageOperation.labCube[r][g][b + 512];
+								
+								if (ai < 120 && Math.abs(bi - 127) < 10) {
+									greenFound = true;
+									green = c;
+									break;
+								}
+							}
+						}
+						
+						boolean backFoundL = false;
+						boolean greenFoundL = false;
+						for (int xd = -1; xd > -15; xd--) {
+							off = x + xd + yw;
+							if (off < 0 || off >= imagePixels.length)
+								break;
+							c = imagePixels[off];
+							
+							if (c == background) {
+								backFoundL = true;
+								break;
+							} else {
+								r = ((c & 0xff0000) >> 16);
+								g = ((c & 0x00ff00) >> 8);
+								b = (c & 0x0000ff);
+								
+								Li = (int) ImageOperation.labCube[r][g][b];
+								ai = (int) ImageOperation.labCube[r][g][b + 256];
+								bi = (int) ImageOperation.labCube[r][g][b + 512];
+								
+								if (ai < 120 && Math.abs(bi - 127) < 10) {
+									greenFoundL = true;
+									green = c;
+									break;
+								}
+							}
+							off = x + yw;
+							if (greenFound || greenFoundL) {
+								c = imagePixels[off];
+								r = ((c & 0xff0000) >> 16);
+								g = ((c & 0x00ff00) >> 8);
+								b = (c & 0x0000ff);
+								oi[x][y] = new Color(r, b, g).getRGB();
+							} else
+								resultImage[off] = background;
+						}
+					} else
+						resultImage[off] = background;
+				}
 			}
 		}
+		if (oi != null)
+			return new FlexibleImage(oi);
+		else
+			return null;
 	}
 	
 	public static float[][][] getLabCube() {
@@ -2645,8 +2720,8 @@ public class ImageOperation {
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfo) {
 		if (image == null)
 			return null;
-		ImageOperation res;
-		if (rgbInfo.length > 3 && rgbInfo.length < 6) {
+		ImageOperation res = null;
+		if (rgbInfo.length > 3 && rgbInfo.length <= 6) {
 			double r1 = brightness / rgbInfo[0];
 			double g1 = brightness / rgbInfo[1];
 			double b1 = brightness / rgbInfo[2];
@@ -2664,26 +2739,14 @@ public class ImageOperation {
 			}
 		}
 		if (rgbInfo.length > 6) {
-			// right
-			double r1 = brightness / rgbInfo[0];
-			double g1 = brightness / rgbInfo[1];
-			double b1 = brightness / rgbInfo[2];
-			// left
-			double r2 = brightness / rgbInfo[3];
-			double g2 = brightness / rgbInfo[4];
-			double b2 = brightness / rgbInfo[5];
-			// center
-			double r3 = brightness / rgbInfo[6];
-			double g3 = brightness / rgbInfo[7];
-			double b3 = brightness / rgbInfo[8];
-			
-			double[] factorsTopRight = { r1, g1, b1 };
-			double[] factorsBottomLeft = { r2, g2, b2 };
-			double[] factorsCenter = { r3, g3, b3 };
+			double[] factorsTopRight = { brightness / rgbInfo[0] };
+			double[] factorsBottomLeft = { brightness / rgbInfo[3] };
+			double[] factorsCenter = { brightness / rgbInfo[6] };
 			
 			ImageOperation io = new ImageOperation(image);
 			res = io.rmCircleShade(factorsTopRight, factorsBottomLeft, factorsCenter);
-		} else {
+		}
+		if (rgbInfo.length <= 3) {
 			double r = brightness / rgbInfo[0];
 			double g = brightness / rgbInfo[1];
 			double b = brightness / rgbInfo[2];
@@ -2700,22 +2763,31 @@ public class ImageOperation {
 	}
 	
 	private ImageOperation rmCircleShade(double[] factorsTopRight, double[] factorsBottomLeft, double[] factorsCenter) {
-		int w = image.getWidth();
-		int h = image.getHeight();
 		int[][] img = getImageAs2array();
+		int w = img.length;
+		int h = img[0].length;
 		int cx = w / 2;
 		int cy = h / 2;
+		int maxDistToCenter = (int) Math.sqrt(cx * cx + cy * cy);
 		int distToCenter, pix;
+		double fac;
+		int[][] res = new int[w][h];
 		for (int x = 0; x < w; x++) {
-			for (int y = 0; x < h; y++) {
+			for (int y = 0; y < h; y++) {
 				distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + y * y);
 				pix = img[x][y] & 0x0000ff;
-				if (y > h / 2)
-					img[x][y] = (int) (pix * distToCenter * (factorsTopRight[0] - factorsCenter[0]));
-				// else
+				if (y <= h / 2)
+					fac = ((factorsTopRight[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsTopRight[0]);
+				else
+					fac = ((factorsBottomLeft[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsBottomLeft[0]);
+				pix = (int) (pix * fac);
+				if (pix > 255)
+					pix = 255;
+				
+				res[x][y] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
 			}
 		}
-		return null;
+		return new ImageOperation(res);
 	}
 	
 	private ImageOperation multiplyHSV(double hf, double sf, double vf) {

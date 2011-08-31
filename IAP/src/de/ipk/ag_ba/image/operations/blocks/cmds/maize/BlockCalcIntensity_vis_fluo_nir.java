@@ -20,7 +20,7 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 		return false;
 	}
 	
-	private int visibleFilledPixels, nirFilledPixels;
+	private int visibleFilledPixels, nirFilledPixels, nirSkeletonFilledPixels;
 	BlockProperty markerDistanceHorizontally = null;
 	
 	@Override
@@ -29,9 +29,12 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 		if (getInput().getMasks().getVis() != null)
 			this.visibleFilledPixels = getInput().getMasks().getVis().getIO().countFilledPixels();
 		
-		if (getInput().getMasks().getNir() != null) {
+		if (getInput().getMasks().getNir() != null)
 			this.nirFilledPixels = getInput().getMasks().getNir().getIO().countFilledPixels();
-		}
+		
+		if (getProperties().getImage("nir_skeleton") != null)
+			this.nirSkeletonFilledPixels = getProperties().getImage("nir_skeleton").getIO().countFilledPixels();
+		
 		if (getProperties() != null && getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
 			markerDistanceHorizontally = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 	}
@@ -66,6 +69,13 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 				double ndvi = (averageNir - averageVisR) / (averageNir + averageVisR);
 				rt.addValue("ndvi", ndvi);
 			}
+			
+			if (getProperties().getImage("nir_skeleton") != null) {
+				double nirSkeletonIntensitySum = getProperties().getImage("nir_skeleton").getIO().intensitySumOfChannel(false, true, false, false);
+				double avgNirSkel = 1 - nirSkeletonIntensitySum / nirSkeletonFilledPixels;
+				rt.addValue("nir.skeleton.intensity.average", avgNirSkel);
+			}
+			
 			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".", rt, getBlockPosition());
 			return getInput().getMasks().getVis();
 		} else

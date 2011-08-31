@@ -41,12 +41,12 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage res = vis;
 		if (options.isMaize()) {
 			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
+				FlexibleImage viswork = vis.copy().getIO().print("orig")// .medianFilter32Bit()
 						// .closing(3, 3)
 						// .erode()
-						.dilateHorizontal(10)
+						.dilateHorizontal(10) // 10
 						.blur(1)
-						.getImage().print("vis", debug);
+						.getImage().print("vis", true);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -78,7 +78,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.getIO().skeletonize().getImage()));
 		skel2d.findEndpointsAndBranches2();
-		skel2d.print("endpoints and branches", debug);
+		skel2d.print("endpoints and branches", true);
 		
 		double xf = fluo.getWidth() / (double) vis.getWidth();
 		double yf = fluo.getHeight() / (double) vis.getHeight();
