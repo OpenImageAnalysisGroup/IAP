@@ -46,6 +46,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
@@ -173,7 +174,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			if (inSample != null && !analysisResults.isEmpty()) {
 				BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(
 						inSample, analysisInput, analysisResults);
-				processStatisticalSampleOutput(inSample, postprocessingResults);
+				processStatisticalAndVolumeSampleOutput(inSample, postprocessingResults);
 			}
 		} catch (Error e) {
 			e.printStackTrace();
@@ -462,7 +463,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 	}
 	
-	private void processStatisticalSampleOutput(Sample3D inSample, BlockProperties analysisResults) {
+	private void processStatisticalAndVolumeSampleOutput(Sample3D inSample, BlockProperties analysisResults) {
+		for (String volumeID : analysisResults.getVolumeNames()) {
+			VolumeData v = analysisResults.getVolume(volumeID);
+			if (v != null) {
+				analysisResults.setVolume(volumeID, null);
+				output.add(v);
+			}
+		}
 		for (BlockPropertyValue bpv : analysisResults.getProperties("RESULT_")) {
 			if (bpv.getName() == null)
 				continue;
