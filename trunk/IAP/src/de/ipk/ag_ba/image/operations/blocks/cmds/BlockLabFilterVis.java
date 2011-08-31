@@ -14,6 +14,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author Entzian, Pape
  */
+@Deprecated
 public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
@@ -50,7 +51,7 @@ public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
-				back, typ, maize);
+				back, typ, maize, false, null);
 		
 		FlexibleImage mask = new FlexibleImage(width, height, result);
 		

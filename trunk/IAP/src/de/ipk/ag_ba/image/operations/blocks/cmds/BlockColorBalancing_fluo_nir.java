@@ -193,7 +193,8 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, markerPosX, markerPosY, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else { // Nir
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, 0.08, markerPosX, markerPosY, bpleft, bpright);
+					// pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().getImage(), 0.08, markerPosX, markerPosY, bpleft, bpright);
 					res = io.imageBalancing(whitePoint, pix).getImage();
 				}
 			else
@@ -219,19 +220,19 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		float[] temp;
 		// get TopRight
 		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, 150, 50, false);
-		res[0] = temp[0];
-		res[1] = temp[1];
-		res[2] = temp[2];
+		res[0] = temp[0] * 255f;
+		res[1] = temp[1] * 255f;
+		res[2] = temp[2] * 255f;
 		// get BottomLeft
-		inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, 150, 50, false);
-		res[3] = temp[0];
-		res[4] = temp[1];
-		res[5] = temp[2];
+		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, 150, 50, false);
+		res[3] = temp[0] * 255f;
+		res[4] = temp[1] * 255f;
+		res[5] = temp[2] * 255f;
 		// get Center
-		inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, false);
-		res[6] = temp[0];
-		res[7] = temp[1];
-		res[8] = temp[2];
+		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, false);
+		res[6] = temp[0] * 255f;
+		res[7] = temp[1] * 255f;
+		res[8] = temp[2] * 255f;
 		return res;
 	}
 }

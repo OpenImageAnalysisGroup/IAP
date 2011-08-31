@@ -8,6 +8,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 
 /**
  * Uses a lab-based pixel filter for the vis and fluo images.
@@ -15,6 +16,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * @author Entzian, Pape
  */
 public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
+	FlexibleImage mod = null;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
@@ -32,7 +34,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
 						options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
 						options.getCameraPosition(),
-						options.isMaize()).print("after lab", false);
+						options.isMaize(), true).print("after lab", false);
 	}
 	
 	@Override
@@ -51,12 +53,12 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO),
 						options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO),
 						options.getCameraPosition(),
-						options.isMaize());
+						options.isMaize(), false);
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ,
-			boolean maize) {
+			boolean maize, boolean blueStick) {
 		if (workMask == null)
 			return null;
 		int[] workMask1D = workMask.getAs1A();
@@ -66,12 +68,18 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		
 		int back = options.getBackground();
 		
-		ImageOperation.thresholdLAB3(width, height, workMask1D, workMask1D,
+		mod = ImageOperation.thresholdLAB3(width, height, workMask1D, workMask1D,
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
-				back, typ, maize);
+				back, typ, maize, blueStick, originalImage.getAs2A());
 		
-		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(workMask1D, width, height, options.getBackground()).getImage();
+		return new ImageOperation(mod).applyMask_ResizeSourceIfNeeded(workMask1D, width, height, options.getBackground()).getImage();
+	}
+	
+	@Override
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		super.postProcess(processedImages, processedMasks);
+		processedImages.setVis(mod);
 	}
 }
