@@ -193,7 +193,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, markerPosX, markerPosY, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else { // Nir
-					pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, 0.08, markerPosX, markerPosY, bpleft, bpright);
 					res = io.imageBalancing(whitePoint, pix).getImage();
 				}
 			else
