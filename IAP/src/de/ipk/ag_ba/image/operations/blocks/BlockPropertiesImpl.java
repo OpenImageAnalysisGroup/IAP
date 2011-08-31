@@ -14,11 +14,14 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class BlockPropertiesImpl implements BlockProperties {
 	
 	private final TreeMap<Integer, TreeMap<String, Double>> store = new TreeMap<Integer, TreeMap<String, Double>>();
 	private final HashMap<String, FlexibleImage> storedImg = new HashMap<String, FlexibleImage>();
+	private final HashMap<String, VolumeData> storedVol = new HashMap<String, VolumeData>();
 	
 	@Override
 	public synchronized BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, Enum<?> pName) {
@@ -165,5 +168,20 @@ public class BlockPropertiesImpl implements BlockProperties {
 	@Override
 	public FlexibleImage getImage(String id) {
 		return storedImg.get(id);
+	}
+	
+	@Override
+	public void setVolume(String string, LoadedVolumeExtension volume) {
+		storedVol.put(string, volume);
+	}
+	
+	@Override
+	public Set<String> getVolumeNames() {
+		return storedVol.keySet();
+	}
+	
+	@Override
+	public VolumeData getVolume(String string) {
+		return storedVol.get(string);
 	}
 }

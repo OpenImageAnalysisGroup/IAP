@@ -3,9 +3,12 @@ package de.ipk.ag_ba.image.operations.blocks.properties;
 import ij.measure.ResultsTable;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public interface BlockProperties {
 	
@@ -45,4 +48,10 @@ public interface BlockProperties {
 	public void setImage(String id, FlexibleImage image);
 	
 	public FlexibleImage getImage(String id);
+	
+	public void setVolume(String string, LoadedVolumeExtension volume);
+	
+	public Set<String> getVolumeNames();
+	
+	public VolumeData getVolume(String string);
 }
