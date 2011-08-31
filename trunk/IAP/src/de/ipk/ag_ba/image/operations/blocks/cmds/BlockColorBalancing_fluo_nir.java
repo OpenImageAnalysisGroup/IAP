@@ -79,7 +79,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			BlockProperty bpright) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		boolean debug = false;
+		boolean debug = true;
 		
 		ImageOperation io = new ImageOperation(image);
 		
@@ -192,8 +192,8 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 				if (invert) {
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, markerPosX, markerPosY, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
-				} else {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, 0.08, markerPosX, markerPosY, bpleft, bpright);
+				} else { // Nir
+					pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);
 					res = io.imageBalancing(whitePoint, pix).getImage();
 				}
 			else
@@ -205,6 +205,33 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 					res = io.imageBalancing(whitePoint, pix).getImage();
 				}
 		}
+		return res;
+	}
+	
+	private double[] getProbablyWhitePixelsforNir(FlexibleImage inputUsedForColorAnalysis) {
+		int w = inputUsedForColorAnalysis.getWidth();
+		int h = inputUsedForColorAnalysis.getHeight();
+		
+		int scanHeight = (int) (h * 0.1);
+		int scanWidth = (int) (w * 0.1);
+		
+		double[] res = new double[9];
+		float[] temp;
+		// get TopRight
+		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, 150, 50, false);
+		res[0] = temp[0];
+		res[1] = temp[1];
+		res[2] = temp[2];
+		// get BottomLeft
+		inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, 150, 50, false);
+		res[3] = temp[0];
+		res[4] = temp[1];
+		res[5] = temp[2];
+		// get Center
+		inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, false);
+		res[6] = temp[0];
+		res[7] = temp[1];
+		res[8] = temp[2];
 		return res;
 	}
 }

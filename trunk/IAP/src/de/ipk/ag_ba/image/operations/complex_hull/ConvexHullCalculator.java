@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.complex_hull;
 
 import ij.measure.ResultsTable;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -202,6 +203,8 @@ public class ConvexHullCalculator {
 	private static void drawHull(Graphics2D g2d, Polygon polygon, int lineWidth, int hullLineColor) {
 		g2d.setStroke(new BasicStroke(lineWidth));
 		g2d.setPaint(new Color(hullLineColor));
+		float opacity = 0.5f;
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 		g2d.drawPolygon(polygon.getGraphics2Dpolygon());
 	}
 	
