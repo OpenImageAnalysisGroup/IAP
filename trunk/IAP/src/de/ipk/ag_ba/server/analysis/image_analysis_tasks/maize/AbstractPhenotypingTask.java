@@ -33,6 +33,7 @@ import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ImageSet;
+import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
@@ -46,6 +47,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
@@ -60,6 +62,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private boolean forceDebugStack;
 	private ArrayList<FlexibleImageStack> forcedDebugStacks;
 	private int prio;
+	private MongoDB m;
 	
 	@Override
 	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m, int workOnSubset,
@@ -67,6 +70,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.input = input;
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
+		this.m = m;
 		databaseTarget = new DataBaseTargetMongoDB(true, m);
 	}
 	
@@ -468,7 +472,19 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			VolumeData v = analysisResults.getVolume(volumeID);
 			if (v != null) {
 				analysisResults.setVolume(volumeID, null);
-				output.add(v);
+				
+				try {
+					databaseTarget.saveVolume((LoadedVolume) v, inSample, m, DBTable.SAMPLE, null, null);
+					VolumeData volumeInDatabase = new VolumeData(inSample, v);
+					volumeInDatabase.getURL().setPrefix(databaseTarget.getPrefix());
+					output.add(volumeInDatabase);
+					
+					output.add(v);
+				} catch (Exception e) {
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: Could not save volume data: " + e.getMessage());
+					e.printStackTrace();
+				}
+				
 			}
 		}
 		for (BlockPropertyValue bpv : analysisResults.getProperties("RESULT_")) {

@@ -112,14 +112,19 @@ public class CloudTaskManager {
 								ExperimentHeaderInterface header = m.getExperimentHeader(batch.getExperimentMongoID());
 								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), hostName);
 								int tu = batch.getCpuTargetUtilization();
+								boolean stop = false;
 								if (cpuDesire < Integer.MAX_VALUE) {
-									if (tu == Integer.MAX_VALUE)
+									if (tu == Integer.MAX_VALUE) {
 										cpuDesire = Integer.MAX_VALUE;
-									else
+										stop = true;
+									} else
 										cpuDesire += tu;
-								}
+								} else
+									stop = true;
 								if (cpuDesire + tu < maxTasks)
 									commands_to_start.add(task);
+								if (stop)
+									break;
 							}
 						}
 					}

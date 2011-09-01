@@ -20,9 +20,16 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	
 	private boolean active;
+	private final boolean saveAnnotation;
 	
 	public ActionCopyToMongo(MongoDB m, ExperimentReference experiment) {
 		super(m, experiment);
+		saveAnnotation = false;
+	}
+	
+	public ActionCopyToMongo(MongoDB m, ExperimentReference experiment, boolean annotationSave) {
+		super(m, experiment);
+		this.saveAnnotation = annotationSave;
 	}
 	
 	@Override
@@ -62,13 +69,14 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	
 	@Override
 	public String getDefaultImage() {
+		if (saveAnnotation)
+			return "img/ext/gpl2/Gnome-Document-Save-64.png";
 		if (active) {
 			if (System.currentTimeMillis() % 1000 < 500)
 				return "img/ext/transfer2.png";
 			else
 				return "img/ext/transfer22.png";
 		} else
-			
 			return "img/ext/transfer2.png";
 	}
 	

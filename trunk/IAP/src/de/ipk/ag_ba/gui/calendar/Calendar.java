@@ -9,13 +9,17 @@ package de.ipk.ag_ba.gui.calendar;
 
 import info.clearthought.layout.TableLayout;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TreeMap;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.actions.Calendar2;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -29,6 +33,8 @@ public class Calendar extends JComponent {
 	private final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei;
 	private final Calendar2 calEnt;
 	
+	ArrayList<DayComponent> days;
+	
 	public Calendar(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, Calendar2 action) {
 		setOpaque(false);
 		calEnt = action;
@@ -36,12 +42,13 @@ public class Calendar extends JComponent {
 		
 		this.group2ei = group2ei;
 		GregorianCalendar gc = new GregorianCalendar();
-		updateGUI(sameDay(gc, cal));
+		boolean virtual = SystemAnalysis.isHeadless();
+		updateGUI(sameDay(gc, cal), virtual);
 	}
 	
-	public void updateGUI(boolean doMark) {
+	public void updateGUI(boolean doMark, boolean virtual) {
 		removeAll();
-		ArrayList<DayComponent> days = new ArrayList<DayComponent>();
+		days = new ArrayList<DayComponent>();
 		
 		days.add(new DayComponent("Sunday"));
 		days.add(new DayComponent("Monday"));
@@ -72,28 +79,29 @@ public class Calendar extends JComponent {
 			pcal.add(GregorianCalendar.DAY_OF_MONTH, +1);
 		}
 		
-		JPanel jp = new JPanel();;
-		jp.setLayout(new TableLayout(new double[][] {
+		if (!virtual) {
+			JPanel jp = new JPanel();
+			jp.setLayout(new TableLayout(new double[][] {
 							{ TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL,
 												TableLayout.FILL, TableLayout.FILL },
 							{ TableLayout.PREFERRED, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL, TableLayout.FILL,
 												TableLayout.FILL, TableLayout.FILL } }));
-		int row = 0;
-		while (days.size() > 0) {
-			for (int day = 0; day < 7 && days.size() > 0; day++) {
-				jp.add(days.get(0), day + "," + row);
-				days.remove(0);
+			int row = 0;
+			while (days.size() > 0) {
+				for (int day = 0; day < 7 && days.size() > 0; day++) {
+					jp.add(days.get(0), day + "," + row);
+					days.remove(0);
+				}
+				row++;
 			}
-			row++;
+			
+			jp.setOpaque(false);
+			
+			setLayout(TableLayout.getLayout(TableLayout.FILL, new double[] { TableLayout.FILL }));
+			add(jp, "0,0");
+			
+			validate();
 		}
-		
-		jp.setOpaque(false);
-		
-		setLayout(TableLayout.getLayout(TableLayout.FILL, new double[] { TableLayout.FILL }));
-		add(jp, "0,0");
-		
-		validate();
-		
 		calEnt.updateGUI();
 	}
 	
@@ -120,12 +128,17 @@ public class Calendar extends JComponent {
 		return cal;
 	}
 	
+	public ArrayList<DayComponent> getCalendarEntries() {
+		ArrayList<DayComponent> result = new ArrayList<DayComponent>(days);
+		return result;
+	}
+	
 	// private JComponent getNavBar(final Calendar calendar) {
 	// JButton left = new JButton();
 	// left.setIcon(FolderPanel.getLeftRightIcon(Iconsize.MIDDLE, true));
 	// JButton right = new JButton();
 	// right.setIcon(FolderPanel.getLeftRightIcon(Iconsize.MIDDLE, false));
-	// left.addActionListener(new ActionListener() {
+	// left.addActionListen8er(new ActionListener() {
 	// @Override
 	// public void actionPerformed(ActionEvent e) {
 	// cal.add(GregorianCalendar.MONTH, -1);
@@ -150,4 +163,25 @@ public class Calendar extends JComponent {
 	// JLabel("<html><h3>&nbsp;&nbsp;&nbsp;"+date), nav, TableLayout.FILL,
 	// TableLayout.PREFERRED);
 	// }
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		ArrayList<DayComponent> days = getCalendarEntries();
+		int row = 0;
+		String m = DateFormat.getDateInstance(DateFormat.LONG, Locale.US).format(cal.getTime());
+		sb.append("<table width=\"800px\" height=\"400px\"><tr><td colspan=\"7\"><center><b><large>" + m
+				+ "</large></b></center></td></tr>");
+		while (days.size() > 0) {
+			sb.append("<tr>");
+			for (int day = 0; day < 7 && days.size() > 0; day++) {
+				sb.append(days.get(0).getAsHTML());
+				days.remove(0);
+			}
+			sb.append("</tr>");
+			row++;
+		}
+		sb.append("</table>");
+		return sb.toString();
+	}
 }
