@@ -30,6 +30,7 @@ import javax.swing.border.Border;
 
 import org.Colors;
 import org.StringManipulationTools;
+import org.color.ColorUtil;
 
 import de.ipk.ag_ba.gui.actions.Calendar2;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -48,9 +49,16 @@ public class DayComponent extends JComponent {
 	private Calendar2 calEnt;
 	
 	private static ArrayList<Color> userColors = Colors.get(9, colorInt * 2);
+	private final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei;
+	private final boolean main;
+	private final boolean mark;
+	private String day;
 	
 	public DayComponent(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, boolean main,
 						boolean mark, GregorianCalendar calendar, Calendar2 calEnt) {
+		this.group2ei = group2ei;
+		this.main = main;
+		this.mark = mark;
 		this.calEnt = calEnt;
 		addMouseListener(getMouseListener());
 		setLayout(TableLayout.getLayout(TableLayout.FILL, new double[] { TableLayout.FILL, TableLayout.PREFERRED }));
@@ -90,25 +98,25 @@ public class DayComponent extends JComponent {
 			String dateToday = sdf.format(new Date().getTime());
 			boolean startOrEnd = false;
 			if (date.equals(dateA)) {
-				if (!exp.containsKey(filter(ei.getImportusername(), "[unknown]")))
-					exp.put(filter(ei.getImportusername(), "[unknown]"), new ArrayList<String>());
-				exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment start: " + ei.getExperimentName());
+				if (!exp.containsKey(filter(ei.getExperimentType(), "[unknown]")))
+					exp.put(filter(ei.getExperimentType(), "[unknown]"), new ArrayList<String>());
+				exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment start: " + ei.getExperimentName());
 				startOrEnd = true;
 			}
 			if (date.equals(dateB)) {
-				if (!exp.containsKey(filter(ei.getImportusername(), "[unknown]")))
-					exp.put(filter(ei.getImportusername(), "[unknown]"), new ArrayList<String>());
+				if (!exp.containsKey(filter(ei.getExperimentType(), "[unknown]")))
+					exp.put(filter(ei.getExperimentType(), "[unknown]"), new ArrayList<String>());
 				if (date.equals(dateToday))
-					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment in progress: " + ei.getExperimentName());
+					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment in progress: " + ei.getExperimentName());
 				else
-					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment upload: " + ei.getExperimentName());
+					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment upload: " + ei.getExperimentName());
 				startOrEnd = true;
 			}
 			if (!startOrEnd) {
 				if (calendar.getTime().after(ei.getStartdate()) && calendar.getTime().before(ei.getImportdate())) {
-					if (!exp.containsKey(filter(ei.getImportusername(), "[unknown]")))
-						exp.put(filter(ei.getImportusername(), "[unknown]"), new ArrayList<String>());
-					exp.get(filter(ei.getImportusername(), "[unknown]")).add("experiment running: " + ei.getExperimentName());
+					if (!exp.containsKey(filter(ei.getExperimentType(), "[unknown]")))
+						exp.put(filter(ei.getExperimentType(), "[unknown]"), new ArrayList<String>());
+					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment running: " + ei.getExperimentName());
 				}
 			}
 		}
@@ -195,6 +203,10 @@ public class DayComponent extends JComponent {
 	
 	public DayComponent(String day) {
 		compact = true;
+		main = false;
+		mark = false;
+		this.day = day;
+		group2ei = null;
 		color = Color.LIGHT_GRAY.brighter();
 		color2 = color.darker();
 		color2 = Colors.getColor((float) 0.4, 1, color, color2);
@@ -252,4 +264,104 @@ public class DayComponent extends JComponent {
 		return jLabel;
 	}
 	
+	private String center3(String lbl, String tooltip, boolean main, int i, int max, Color color3) {
+		Color foregroundColor = Color.BLACK;
+		Color backgroundColor = Color.WHITE;
+		if (!main)
+			foregroundColor = Color.GRAY;
+		
+		if (main)
+			backgroundColor = new Color(color3.getRed(), color3.getGreen(), color3.getBlue(), 60);
+		else
+			backgroundColor = new Color(color3.getRed(), color3.getGreen(), color3.getBlue(), 20);
+		
+		return "<td bgcolor=\"" + ColorUtil.getHexFromColor(backgroundColor) + "\"><center>" +
+				"<abbr title=\"" + tooltip + "\" style=\"color:"
+				+ ColorUtil.getHexFromColor(Color.BLACK) + "\">" + lbl + "" +
+						"</abbr></center></td>"; // foregroundColor
+	}
+	
+	public String getAsHTML() {
+		if (calendar == null)
+			return "<td style=\"background-color:" + ColorUtil.getHexFromColor(color) + "\"><center><b>" + day + "</b></center></td>";
+		
+		StringBuilder sb = new StringBuilder();
+		int month = calendar.get(GregorianCalendar.MONTH);
+		int dayOfMonth = calendar.get(GregorianCalendar.DAY_OF_MONTH);
+		int dayOfWeek = calendar.get(GregorianCalendar.DAY_OF_WEEK);
+		
+		sb.append("<td align=\"center\" style=\"background:-moz-linear-gradient(top," + ColorUtil.getHexFromColor(color) + ","
+				+ ColorUtil.getHexFromColor(color2)
+				+ ");background:-webkit-linear-gradient(top," + ColorUtil.getHexFromColor(color) + "," + ColorUtil.getHexFromColor(color2) + ");background-color:"
+				+ ColorUtil.getHexFromColor(color) + "\"><table width=\"100%\">");
+		sb.append("<center>" + dayOfMonth + "</center>");
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy");
+		String date = sdf.format(calendar.getTime());
+		TreeMap<String, ArrayList<String>> exp = new TreeMap<String, ArrayList<String>>();
+		TreeSet<ExperimentHeaderInterface> experiments = new TreeSet<ExperimentHeaderInterface>();
+		for (String s : group2ei.keySet())
+			for (String s2 : group2ei.get(s).keySet())
+				for (ExperimentHeaderInterface ehi : group2ei.get(s).get(s2))
+					experiments.add(ehi);
+		for (ExperimentHeaderInterface ei : experiments) {
+			if (ei.getStartdate() == null)
+				continue;
+			String dateA = sdf.format(ei.getStartdate().getTime());
+			String dateB = sdf.format(ei.getImportdate().getTime());
+			String dateToday = sdf.format(new Date().getTime());
+			boolean startOrEnd = false;
+			if (date.equals(dateA)) {
+				if (!exp.containsKey(filter(ei.getExperimentType(), "[unknown]")))
+					exp.put(filter(ei.getExperimentType(), "[unknown]"), new ArrayList<String>());
+				exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment start: " + ei.getExperimentName());
+				startOrEnd = true;
+			}
+			if (date.equals(dateB)) {
+				if (!exp.containsKey(filter(ei.getExperimentType(), "[unknown]")))
+					exp.put(filter(ei.getExperimentType(), "[unknown]"), new ArrayList<String>());
+				if (date.equals(dateToday))
+					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment in progress: " + ei.getExperimentName());
+				else
+					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment upload: " + ei.getExperimentName());
+				startOrEnd = true;
+			}
+			if (!startOrEnd) {
+				if (calendar.getTime().after(ei.getStartdate()) && calendar.getTime().before(ei.getImportdate())) {
+					if (!exp.containsKey(filter(ei.getExperimentType(), "[unknown]")))
+						exp.put(filter(ei.getExperimentType(), "[unknown]"), new ArrayList<String>());
+					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment running: " + ei.getExperimentName());
+				}
+			}
+		}
+		sb.append("<table width=\"100%\">");
+		for (String user : exp.keySet()) {
+			sb.append("<tr>");
+			int n = exp.get(user).size();
+			String s = user;
+			
+			if (n > 1) {
+				s += " (" + n + ")";
+			} else {
+				if (exp.get(user).iterator().next().indexOf("start") >= 0)
+					s = exp.get(user).iterator().next().split(":", 2)[1] + " started";
+				else
+					if (exp.get(user).iterator().next().indexOf("progress") >= 0)
+						s = exp.get(user).iterator().next().split(":", 2)[1] + " in progress";
+					else
+						if (exp.get(user).iterator().next().indexOf("upload") >= 0)
+							s = exp.get(user).iterator().next().split(":", 2)[1] + " finished";
+						else
+							s = exp.get(user).iterator().next().split(":", 2)[1];
+			}
+			sb.append(
+					"" +
+							center3(s,
+									"" + user + ": " + StringManipulationTools.getStringList(exp.get(user), "\n"),
+									main, 1, 1, userColors.get(Math.abs(user.hashCode()) % userColors.size())) + "");
+			sb.append("</tr>");
+		}
+		sb.append("</table></td>");
+		return sb.toString();
+	}
 }

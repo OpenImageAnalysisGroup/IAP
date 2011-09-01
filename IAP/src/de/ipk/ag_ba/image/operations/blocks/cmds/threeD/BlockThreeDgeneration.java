@@ -24,6 +24,7 @@ import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.ByteShortIntArray;
@@ -147,7 +148,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				volume.setDimensionZ(voxelresolution);
 				
 				if (volume.getURL() == null)
-					volume.setURL(new IOurl("loadedvolume", "", ""));
+					volume.setURL(new IOurl(LoadedDataHandler.PREFIX, "", ""));
 				volume.getURL().setFileName("IAP_reconstruction_" + System.currentTimeMillis() + ".argb_volume");
 				
 				volume.setColorDepth(VolumeColorDepth.RGBA.toString());

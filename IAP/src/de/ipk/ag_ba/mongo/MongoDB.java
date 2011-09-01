@@ -755,9 +755,8 @@ public class MongoDB {
 			IntVolumeInputStream is = (IntVolumeInputStream) id.getURL().getInputStream();
 			System.out.println("AVAIL: " + is.available());
 			System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
-			GridFSInputFile inputFile = gridfs_volumes.createFile(is);
+			GridFSInputFile inputFile = gridfs_volumes.createFile(is, id.getURL().getFileName());
 			inputFile.setFilename(hash);
-			inputFile.getMetaData().put("name", id.getURL().getFileName());
 			inputFile.save();
 			saved += inputFile.getLength();
 			System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
@@ -1049,11 +1048,12 @@ public class MongoDB {
 		
 		String hash;
 		try {
-			hash = GravistoService.getHashFromInputStream(volume.getURL().getInputStream(), optFileSize, getHashType());
+			InputStream iis = volume.getURL().getInputStream();
+			hash = GravistoService.getHashFromInputStream(iis, optFileSize, getHashType());
 			
 			GridFSDBFile fff = gridfs_volumes.findOne(hash);
 			if (fff != null && fff.getLength() <= 0) {
-				System.out.println("Found Zero-Size File.");
+				System.out.println("Found Zero-Size File." + "");
 				System.out.println("Delete Existing Volume.");
 				gridfs_volumes.remove(fff);
 				fff = null;
@@ -1070,6 +1070,7 @@ public class MongoDB {
 				return DatabaseStorageResult.STORED_IN_DB;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
