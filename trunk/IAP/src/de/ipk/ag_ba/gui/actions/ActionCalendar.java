@@ -93,7 +93,7 @@ public class ActionCalendar extends AbstractNavigationAction {
 					c.getCalendar().add(GregorianCalendar.MONTH, 1);
 				else
 					c.getCalendar().add(GregorianCalendar.MONTH, -1);
-				c.updateGUI(false, true);
+				c.updateGUI(false, false);
 				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Phenotyping, group2ei, m, refCalEnt, refCalGui, guIsetting);
 				return res;
 			}

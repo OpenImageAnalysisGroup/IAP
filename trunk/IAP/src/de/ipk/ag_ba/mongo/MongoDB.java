@@ -419,8 +419,10 @@ public class MongoDB {
 		if (status != null || (status != null && !status.wantsToStop()))
 			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Determine Size");
 		{
-			long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
-			experiment.getHeader().setSizekb(l / 1024);
+			if (!experiment.getHeader().getDatabaseId().startsWith("hsm:")) {
+				long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
+				experiment.getHeader().setSizekb(l / 1024);
+			}
 		}
 		
 		// List<DBObject> dbSubstances = new ArrayList<DBObject>();
@@ -852,7 +854,7 @@ public class MongoDB {
 		return ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
-	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(4, new ThreadFactory() {
+	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(6, new ThreadFactory() {
 		int n = 1;
 		
 		@Override
@@ -939,7 +941,7 @@ public class MongoDB {
 						new MyByteArrayInputStream(isMain),
 						isLabel != null ? new MyByteArrayInputStream(isLabel) : null
 				},
-						new ObjectRef[] { fileSize, fileSize }, getHashType(), false);
+						new ObjectRef[] { fileSize, fileSize }, getHashType(), true);
 				
 				String hashMain = hashes[0];
 				String hashLabel = hashes[1];
