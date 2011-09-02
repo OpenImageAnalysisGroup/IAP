@@ -661,7 +661,7 @@ public class MongoDB {
 	public long saveAnnotationFile(GridFS gridfs_annotation, String hash, File file) throws IOException {
 		GridFSInputFile inputFile = gridfs_annotation.createFile(file);
 		inputFile.setFilename(hash);
-		inputFile.getMetaData().put("name", file.getName());
+		// inputFile.getMetaData().put("name", file.getName());
 		inputFile.save();
 		return file.length();
 	}
@@ -783,7 +783,7 @@ public class MongoDB {
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Save Preview Icon");
 				inputFilePreview.setFilename(hash);
-				inputFilePreview.getMetaData().put("name", id.getURL().getFileName());
+				// inputFilePreview.getMetaData().put("name", id.getURL().getFileName());
 				inputFilePreview.save();
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
@@ -818,7 +818,7 @@ public class MongoDB {
 		
 		GridFSInputFile inputFile = gridfs_networks.createFile(is);
 		inputFile.setFilename(hash);
-		inputFile.getMetaData().put("name", network.getURL().getFileName());
+		// inputFile.getMetaData().put("name", network.getURL().getFileName());
 		inputFile.save();
 		System.out.println("SAVED NETWORK: " + network.toString() + " // SIZE: " + inputFile.getLength());
 		
@@ -842,7 +842,7 @@ public class MongoDB {
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Save Preview Icon");
 				inputFilePreview.setFilename(hash);
-				inputFilePreview.getMetaData().put("name", network.getURL().getFileName());
+				// inputFilePreview.getMetaData().put("name", network.getURL().getFileName());
 				inputFilePreview.save();
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
