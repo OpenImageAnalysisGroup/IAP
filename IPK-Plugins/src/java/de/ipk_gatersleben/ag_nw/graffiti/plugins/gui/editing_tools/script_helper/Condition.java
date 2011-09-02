@@ -422,28 +422,31 @@ public class Condition implements ConditionInterface {
 														if (attr.getName().equals("sizekb"))
 															;// ignore
 														else
-															if (attr.getName().equals("name"))
-																setSpecies(attr.getValue());
+															if (attr.getName().equals("origin"))
+																setExperimentDatabaseOriginId(attr.getValue());
 															else
-																if (attr.getName().equals("genotype"))
-																	setGenotype(attr.getValue());
+																if (attr.getName().equals("name"))
+																	setSpecies(attr.getValue());
 																else
-																	if (attr.getName().equals("growthconditions"))
-																		setGrowthconditions(attr.getValue());
+																	if (attr.getName().equals("genotype"))
+																		setGenotype(attr.getValue());
 																	else
-																		if (attr.getName().equals("treatment"))
-																			setTreatment(attr.getValue());
+																		if (attr.getName().equals("growthconditions"))
+																			setGrowthconditions(attr.getValue());
 																		else
-																			if (attr.getName().equals("variety"))
-																				setVariety(attr.getValue());
+																			if (attr.getName().equals("treatment"))
+																				setTreatment(attr.getValue());
 																			else
-																				if (attr.getName().equals("experimenttype"))
-																					setExperimentType(attr.getValue());
+																				if (attr.getName().equals("variety"))
+																					setVariety(attr.getValue());
 																				else
-																					if (attr.getName().equals("sequence"))
-																						setSequence(attr.getValue());
+																					if (attr.getName().equals("experimenttype"))
+																						setExperimentType(attr.getValue());
 																					else
-																						System.err.println("Internal Error: Unknown Condition Attribute: " + attr.getName());
+																						if (attr.getName().equals("sequence"))
+																							setSequence(attr.getValue());
+																						else
+																							System.err.println("Internal Error: Unknown Condition Attribute: " + attr.getName());
 	}
 	
 	public void setDataOfChildElement(Element childElement) {
@@ -468,6 +471,14 @@ public class Condition implements ConditionInterface {
 	
 	public void setExperimentDatabaseId(String databaseId) {
 		header.setDatabaseId(databaseId != null ? databaseId.intern() : null);
+	}
+	
+	public void setExperimentDatabaseOriginId(String originId) {
+		header.setOriginDbId(originId != null ? originId.intern() : null);
+	}
+	
+	public String getExperimentDatabaseOriginId() {
+		return header.getOriginDbId();
 	}
 	
 	public String getExperimentDatabaseId() {

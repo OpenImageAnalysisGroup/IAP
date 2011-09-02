@@ -170,7 +170,7 @@ public class Calendar extends JComponent {
 		ArrayList<DayComponent> days = getCalendarEntries();
 		int row = 0;
 		String m = DateFormat.getDateInstance(DateFormat.LONG, Locale.US).format(cal.getTime());
-		sb.append("<table width=\"800px\" height=\"400px\"><tr><td colspan=\"7\"><center><b><large>" + m
+		sb.append("<table width=\"1000px\" height=\"400px\"><tr><td colspan=\"7\"><center><b><large>" + m
 				+ "</large></b></center></td></tr>");
 		while (days.size() > 0) {
 			sb.append("<tr>");

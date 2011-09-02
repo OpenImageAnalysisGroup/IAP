@@ -152,8 +152,8 @@ public class LemnaTecDataExchange {
 			
 			sqlText = "" +
 					"SELECT min(time_stamp), max(time_stamp), count(*) " +
-					"FROM snapshot,tiled_image " +
-					"WHERE measurement_label=? AND tiled_image.snapshot_id=snapshot.id";
+					"FROM snapshot " + // ,tiled_image " +
+					"WHERE measurement_label=?";// ; AND tiled_image.snapshot_id=snapshot.id";
 			ps = connection.prepareStatement(sqlText);
 			for (ExperimentHeaderInterface ehi : result) {
 				ps.setString(1, ehi.getExperimentName());

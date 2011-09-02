@@ -42,13 +42,13 @@ public class DayComponent extends JComponent {
 	private static final long serialVersionUID = 1L;
 	private final Color color;
 	private Color color2;
-	static double colorInt = 0.35;// 0.25;
-	private ArrayList<Color> colors = Colors.get(12, colorInt);
+	static double colorIntensity = 0.15;// 0.25;
+	private ArrayList<Color> colors = Colors.get(12, colorIntensity);
 	boolean compact = false;
 	private GregorianCalendar calendar;
 	private Calendar2 calEnt;
 	
-	private static ArrayList<Color> userColors = Colors.get(9, colorInt * 2);
+	private static ArrayList<Color> userColors = Colors.get(9, colorIntensity * 2);
 	private final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei;
 	private final boolean main;
 	private final boolean mark;
@@ -67,14 +67,14 @@ public class DayComponent extends JComponent {
 		int dayOfMonth = calendar.get(GregorianCalendar.DAY_OF_MONTH);
 		int dayOfWeek = calendar.get(GregorianCalendar.DAY_OF_WEEK);
 		if (!main) {
-			colors = Colors.get(12, colorInt / 2);
+			colors = Colors.get(12, colorIntensity / 2);
 		}
 		if (mark)
-			colors = Colors.get(12, colorInt * 2);
+			colors = Colors.get(12, colorIntensity * 2);
 		else
 			if (main && (dayOfWeek == 1 || dayOfWeek == 7)) {
 				// main = false;
-				colors = Colors.get(12, colorInt * 0.8);
+				colors = Colors.get(12, colorIntensity * 0.8);
 			}
 		color = colors.get(month);
 		color2 = color.darker();
@@ -109,7 +109,7 @@ public class DayComponent extends JComponent {
 				if (date.equals(dateToday))
 					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment in progress: " + ei.getExperimentName());
 				else
-					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment upload: " + ei.getExperimentName());
+					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment finished: " + ei.getExperimentName());
 				startOrEnd = true;
 			}
 			if (!startOrEnd) {
@@ -323,7 +323,7 @@ public class DayComponent extends JComponent {
 				if (date.equals(dateToday))
 					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment in progress: " + ei.getExperimentName());
 				else
-					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment upload: " + ei.getExperimentName());
+					exp.get(filter(ei.getExperimentType(), "[unknown]")).add("experiment finished: " + ei.getExperimentName());
 				startOrEnd = true;
 			}
 			if (!startOrEnd) {
