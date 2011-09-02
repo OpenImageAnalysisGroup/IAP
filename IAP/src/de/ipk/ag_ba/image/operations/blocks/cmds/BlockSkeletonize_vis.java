@@ -25,7 +25,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * calculate the skeleton to detect the leafs and the clade
+ * calculate the skeleton to detect the leafs and the tassel
  * 
  * @author pape
  */
@@ -46,7 +46,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 						// .erode()
 						.dilateHorizontal(10) // 10
 						.blur(1)
-						.getImage().print("vis", true);
+						.getImage().print("vis", false);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -61,7 +61,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 				FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
 						.dilate(4)
 						.blur(1)
-						.getImage().print("vis", false);
+						.getImage().print("vis", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -78,7 +78,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.getIO().skeletonize().getImage()));
 		skel2d.findEndpointsAndBranches2();
-		skel2d.print("endpoints and branches", true);
+		skel2d.print("endpoints and branches", debug);
 		
 		double xf = fluo.getWidth() / (double) vis.getWidth();
 		double yf = fluo.getHeight() / (double) vis.getHeight();

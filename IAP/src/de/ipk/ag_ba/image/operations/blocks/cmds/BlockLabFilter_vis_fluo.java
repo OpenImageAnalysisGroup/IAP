@@ -22,7 +22,12 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null || getInput().getImages().getVis() == null)
 			return null;
-		else
+		else {
+			boolean blueStick;
+			if (options.isMaize())
+				blueStick = true;
+			else
+				blueStick = false;
 			return labFilter(
 					// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
 					getInput().getMasks().getVis().getIO().blur(1).getImage(),
@@ -34,7 +39,8 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
 						options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
 						options.getCameraPosition(),
-						options.isMaize(), true).print("after lab", false);
+						options.isMaize(), blueStick).print("after lab", false);
+		}
 	}
 	
 	@Override

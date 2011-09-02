@@ -21,32 +21,31 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null)
 			return null;
-		
+		FlexibleImage res, mask = getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (options.isMaize()) {
 				// not for barley
-				FlexibleImage res =
-						new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d,
+				res = new ImageOperation(mask).removeSmallClusters(ngUse,
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 100) * 2,
 								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
-				return res;
 			} else {
-				FlexibleImage res =
-						new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (getInput().getMasks().getVis().getWidth() / 100) * 1,
+				res = new ImageOperation(mask).removeSmallClusters(ngUse,
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 100) * 1,
 								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
-				return res;
 			}
+			return res;
 		} else {
 			if (options.isMaize()) {
-				FlexibleImage res =
-						new ImageOperation(getInput().getMasks().getVis()).removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS),
+				res = new ImageOperation(mask).removeSmallClusters(ngUse,
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS), (mask.getWidth() / 100) * 2,
 								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
-				return res;
+				
 			} else {
-				return getInput().getMasks().getVis();
+				res = new ImageOperation(mask).removeSmallClusters(ngUse,
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 3d, (mask.getWidth() / 100) / 2,
+								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
+			return res;
 		}
 	}
 	
@@ -57,7 +56,7 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(ngUse,
-					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
+					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d, (getInput().getMasks().getFluo().getWidth() / 100) * 2,
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 		} else {
 			int cut2 = (int) ((getInput().getMasks().getFluo().getWidth() / 100) * 0.5);
