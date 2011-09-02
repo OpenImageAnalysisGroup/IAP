@@ -288,7 +288,7 @@ public class LemnaTecDataExchange {
 				return null;
 			else {
 				if (experimentname.length() >= 6) {
-					int id = Integer.parseInt(experimentname.substring(0, 4));
+					// int id = Integer.parseInt(experimentname.substring(0, 4));
 					String kuerzel = experimentname.substring(4, 6);
 					String coor = getCoordinatorFromNameID(kuerzel);
 					return coor;
