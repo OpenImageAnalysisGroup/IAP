@@ -1015,14 +1015,14 @@ public class ImageOperation {
 	
 	public ImageOperation removeSmallClusters(boolean nextGeneration, double factor, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
-		return removeSmallClusters(nextGeneration, factor, NeighbourhoodSetting.NB4, typ,
+		return removeSmallClusters(nextGeneration, factor, (image.getWidth() / 100) * 2, NeighbourhoodSetting.NB4, typ,
 				optClusterSizeReturn);
 	}
 	
-	public ImageOperation removeSmallClusters(boolean nextGeneration, double cutOffPercentageOfImage,
+	public ImageOperation removeSmallClusters(boolean nextGeneration, double cutOffPercentageOfImage, double cutoffDimension,
 			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
-		return removeSmallClusters(nextGeneration, cutOffPercentageOfImage, (image.getWidth() / 100) * 2, nb, typ, optClusterSizeReturn);
+		return removeSmallClusters(nextGeneration, cutOffPercentageOfImage, cutoffDimension, nb, typ, optClusterSizeReturn);
 	}
 	
 	public ImageOperation removeSmallClusters(boolean nextGeneration, double cutOffPercentageOfImage, int cutOffVertHorOfImage,
@@ -3107,12 +3107,19 @@ public class ImageOperation {
 		return new ImageOperation(getImage().copy());
 	}
 	
-	public ImageOperation adaptiveThreshold(int n, int assumedBackground) {
+	/**
+	 * @param n
+	 *           - size of the local region to detect threshold
+	 * @param assumedBackground
+	 * @return
+	 * @author pape
+	 */
+	public ImageOperation adaptiveThresholdForGrayscaleImage(int n, int assumedBackground, int newForeground) {
 		int[][] img = getImageAs2array();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] out = new int[w][h];
-		int x, y, thresh, temp = 0;
+		int x, y, thresh, pix, temp = 0;
 		double K = 0.05d;
 		int[] mean = new int[n * n];
 		for (int j = 0; j < h; j++) {
@@ -3134,8 +3141,9 @@ public class ImageOperation {
 				// thresh = median(mean);
 				thresh = (int) (mean(mean) * (1 + K * ((img[i][j] & 0x0000ff) / assumedBackground - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
 				
-				if ((img[i][j] & 0x0000ff) > thresh) {
-					out[i][j] = Color.WHITE.getRGB();
+				pix = img[i][j] & 0x0000ff;
+				if (pix > thresh) {
+					out[i][j] = newForeground;
 				} else {
 					out[i][j] = img[i][j];
 				}

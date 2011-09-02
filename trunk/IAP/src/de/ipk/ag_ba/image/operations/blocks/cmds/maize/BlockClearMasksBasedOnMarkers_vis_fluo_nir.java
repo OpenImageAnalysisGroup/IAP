@@ -37,8 +37,9 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
+			boolean setDefault = false;
 			if (markerPosLeftY == null && markerPosRightY == null) { // set default
-				getProperties().setNumericProperty(0, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y, input.getHeight() * 0.136);
+				setDefault = true;
 			}
 			
 			FlexibleImage result = input;
@@ -68,6 +69,15 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 					}
 				}
 			
+			if (setDefault) {
+				double markerPosLeftYDefault = input.getHeight() - (input.getHeight() * 0.136); // TODO set default value as option
+				
+				int cy = (int) (markerPosLeftYDefault
+						- options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS));
+				result = new ImageOperation(result).clearImageBottom(
+						cy, color).getImage();
+				getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
+			}
 			// Clear Sides
 			int width = getInput().getMasks().getVis().getWidth();
 			return clearSides(result, width);

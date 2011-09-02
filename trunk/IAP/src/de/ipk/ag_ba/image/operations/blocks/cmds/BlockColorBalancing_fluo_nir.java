@@ -79,7 +79,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			BlockProperty bpright) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		boolean debug = true;
+		boolean debug = false;
 		
 		ImageOperation io = new ImageOperation(image);
 		
