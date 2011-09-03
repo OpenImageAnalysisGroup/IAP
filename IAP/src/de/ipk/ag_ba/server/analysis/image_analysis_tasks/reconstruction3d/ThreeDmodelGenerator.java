@@ -467,6 +467,10 @@ public class ThreeDmodelGenerator {
 		return rgbCube;
 	}
 	
+	public int[][][] getByteCubeResult() {
+		return byteCube;
+	}
+	
 	public String getPaletteString() {
 		// "0 0 0|0 3 0|..."
 		StringBuilder sb = new StringBuilder();

@@ -168,7 +168,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	private void createSimpleDefaultSkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
 			double realMarkerDistHorizontal, int[][][] cube, LoadedVolumeExtension volume) {
 		int fire = ImageOperation.BACKGROUND_COLORint;
-		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create 3D Skeleton", true);
+		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create simple 3D skeleton", true);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
 		boolean foundBorderVoxel = false;
 		do {
@@ -243,7 +243,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	private void createAdvancedProbabilitySkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
 			double realMarkerDistHorizontal, int[][][] probabilityCube, LoadedVolumeExtension volume) {
 		int empty = 0;
-		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create 3D Skeleton", true);
+		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create advanced probablity 3D skeleton", true);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
 		boolean foundBorderVoxel = false;
 		do {
