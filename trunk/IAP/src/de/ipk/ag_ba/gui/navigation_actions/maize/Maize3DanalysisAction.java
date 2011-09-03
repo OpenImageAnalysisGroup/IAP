@@ -51,9 +51,9 @@ public class Maize3DanalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public int getCpuTargetUtilization() {
-		// by returning this high number, this task will be the only one running
+		// by returning a very high number, this task will be the only one running
 		// on the cloud execution server
-		return Integer.MAX_VALUE;
+		return 2;// Integer.MAX_VALUE;
 	}
 	
 }
