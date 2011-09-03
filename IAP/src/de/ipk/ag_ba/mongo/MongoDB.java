@@ -757,8 +757,9 @@ public class MongoDB {
 			IntVolumeInputStream is = (IntVolumeInputStream) id.getURL().getInputStream();
 			System.out.println("AVAIL: " + is.available());
 			System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
-			GridFSInputFile inputFile = gridfs_volumes.createFile(is, id.getURL().getFileName());
-			inputFile.setFilename(hash);
+			GridFSInputFile inputFile = gridfs_volumes.createFile(is, hash);
+			// inputFile.setFilename(hash);
+			// id.getURL().getFileName());
 			inputFile.save();
 			saved += inputFile.getLength();
 			System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
