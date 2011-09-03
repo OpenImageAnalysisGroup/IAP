@@ -55,8 +55,6 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			Sample3D inSample,
 			TreeMap<Double, ImageData> inImages,
 			TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
-		// super.postProcessResultsForAllAngles(inSample, inImages, allResultsForSnapshot, summaryResult);
-		
 		int voxelresolution = 500;
 		int widthFactor = 40;
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
@@ -156,80 +154,165 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			}
 			boolean create3Dskeleton = true;
 			if (create3Dskeleton) {
-				int fire = ImageOperation.BACKGROUND_COLORint;
-				StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create 3D Skeleton", true);
-				HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
-				boolean foundBorderVoxel = false;
-				do {
-					foundBorderVoxel = false;
-					for (int x = 1; x < voxelresolution - 1; x++) {
-						for (int y = 1; y < voxelresolution - 1; y++) {
-							for (int z = 1; z < voxelresolution - 1; z++) {
-								int c = cube[x][y][z];
-								boolean filled = c != fire;
-								if (filled) {
-									boolean left = cube[x - 1][y][z] != fire;
-									boolean right = cube[x + 1][y][z] != fire;
-									boolean above = cube[x][y - 1][z] != fire;
-									boolean below = cube[x][y + 1][z] != fire;
-									boolean behind = cube[x][y][z + 1] != fire;
-									boolean before = cube[x][y][z - 1] != fire;
-									if (!left || !right || !above || !below || !behind || !before) {
-										// border voxel
-										foundBorderVoxel = true;
-										int filledSurrounding = 0;
-										if (left)
-											filledSurrounding++;
-										if (right)
-											filledSurrounding++;
-										if (above)
-											filledSurrounding++;
-										if (below)
-											filledSurrounding++;
-										if (behind)
-											filledSurrounding++;
-										if (before)
-											filledSurrounding++;
-										if (filledSurrounding <= 2)
-											addSkeleton(x2y2z2colorSkeleton, x, y, z, c);
-									}
-									cube[x][y][z] = fire;
-								}
-							}
-						}
-					}
-				} while (foundBorderVoxel);
-				long skeletonLength = 0;
-				for (int x = 1; x < voxelresolution - 1; x++) {
-					if (x2y2z2colorSkeleton.containsKey(x)) {
-						HashMap<Integer, HashMap<Integer, Integer>> y2z = x2y2z2colorSkeleton.get(x);
-						for (int y = 1; y < voxelresolution - 1; y++) {
-							if (y2z.containsKey(y)) {
-								HashMap<Integer, Integer> z2c = y2z.get(y);
-								for (int z : z2c.keySet()) {
-									Integer c = z2c.get(z);
-									cube[x][y][z] = c;
-									skeletonLength++;
-								}
-							}
-						}
-					}
-				}
-				summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length", skeletonLength);
-				if (distHorizontal != null) {
-					double corr = realMarkerDistHorizontal / distHorizontal.getValue();
-					summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length.norm",
-							skeletonLength * corr);
-				}
-				
-				LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
-				lve.setVolume(new ByteShortIntArray(mg.getRGBcubeResult()));
-				summaryResult.setVolume("RESULT_plant_skeleton", lve);
-				
-				s.printTime();
+				createSimpleDefaultSkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube, volume);
+			}
+			boolean create3DadvancedProbabilitySkeleton = true;
+			if (create3DadvancedProbabilitySkeleton) {
+				int[][][] probabilityCube = mg.getRGBcubeResult();
+				createAdvancedProbabilitySkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube, volume);
 			}
 		}
 		
+	}
+	
+	private void createSimpleDefaultSkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
+			double realMarkerDistHorizontal, int[][][] cube, LoadedVolumeExtension volume) {
+		int fire = ImageOperation.BACKGROUND_COLORint;
+		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create 3D Skeleton", true);
+		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
+		boolean foundBorderVoxel = false;
+		do {
+			foundBorderVoxel = false;
+			for (int x = 1; x < voxelresolution - 1; x++) {
+				for (int y = 1; y < voxelresolution - 1; y++) {
+					for (int z = 1; z < voxelresolution - 1; z++) {
+						int c = cube[x][y][z];
+						boolean filled = c != fire;
+						if (filled) {
+							boolean left = cube[x - 1][y][z] != fire;
+							boolean right = cube[x + 1][y][z] != fire;
+							boolean above = cube[x][y - 1][z] != fire;
+							boolean below = cube[x][y + 1][z] != fire;
+							boolean behind = cube[x][y][z + 1] != fire;
+							boolean before = cube[x][y][z - 1] != fire;
+							if (!left || !right || !above || !below || !behind || !before) {
+								// border voxel
+								foundBorderVoxel = true;
+								int filledSurrounding = 0;
+								if (left)
+									filledSurrounding++;
+								if (right)
+									filledSurrounding++;
+								if (above)
+									filledSurrounding++;
+								if (below)
+									filledSurrounding++;
+								if (behind)
+									filledSurrounding++;
+								if (before)
+									filledSurrounding++;
+								if (filledSurrounding <= 2)
+									addSkeleton(x2y2z2colorSkeleton, x, y, z, c);
+							}
+							cube[x][y][z] = fire;
+						}
+					}
+				}
+			}
+		} while (foundBorderVoxel);
+		long skeletonLength = 0;
+		for (int x = 1; x < voxelresolution - 1; x++) {
+			if (x2y2z2colorSkeleton.containsKey(x)) {
+				HashMap<Integer, HashMap<Integer, Integer>> y2z = x2y2z2colorSkeleton.get(x);
+				for (int y = 1; y < voxelresolution - 1; y++) {
+					if (y2z.containsKey(y)) {
+						HashMap<Integer, Integer> z2c = y2z.get(y);
+						for (int z : z2c.keySet()) {
+							Integer c = z2c.get(z);
+							cube[x][y][z] = c;
+							skeletonLength++;
+						}
+					}
+				}
+			}
+		}
+		summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length", skeletonLength);
+		if (distHorizontal != null) {
+			double corr = realMarkerDistHorizontal / distHorizontal.getValue();
+			summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length.norm",
+					skeletonLength * corr);
+		}
+		
+		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
+		lve.setVolume(new ByteShortIntArray(cube));
+		summaryResult.setVolume("RESULT_plant_skeleton", lve);
+		
+		s.printTime();
+	}
+	
+	private void createAdvancedProbabilitySkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
+			double realMarkerDistHorizontal, int[][][] probabilityCube, LoadedVolumeExtension volume) {
+		int empty = 0;
+		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create 3D Skeleton", true);
+		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
+		boolean foundBorderVoxel = false;
+		do {
+			foundBorderVoxel = false;
+			for (int x = 1; x < voxelresolution - 1; x++) {
+				for (int y = 1; y < voxelresolution - 1; y++) {
+					for (int z = 1; z < voxelresolution - 1; z++) {
+						int c = probabilityCube[x][y][z];
+						boolean filled = c > empty;
+						if (filled) {
+							boolean left = probabilityCube[x - 1][y][z] != empty;
+							boolean right = probabilityCube[x + 1][y][z] != empty;
+							boolean above = probabilityCube[x][y - 1][z] != empty;
+							boolean below = probabilityCube[x][y + 1][z] != empty;
+							boolean behind = probabilityCube[x][y][z + 1] != empty;
+							boolean before = probabilityCube[x][y][z - 1] != empty;
+							if (!left || !right || !above || !below || !behind || !before) {
+								// border voxel
+								foundBorderVoxel = true;
+								int filledSurrounding = 0;
+								if (left)
+									filledSurrounding++;
+								if (right)
+									filledSurrounding++;
+								if (above)
+									filledSurrounding++;
+								if (below)
+									filledSurrounding++;
+								if (behind)
+									filledSurrounding++;
+								if (before)
+									filledSurrounding++;
+								if (filledSurrounding <= 2)
+									addSkeleton(x2y2z2colorSkeleton, x, y, z, c);
+							}
+							probabilityCube[x][y][z]--;
+						}
+					}
+				}
+			}
+		} while (foundBorderVoxel);
+		long skeletonLength = 0;
+		for (int x = 1; x < voxelresolution - 1; x++) {
+			if (x2y2z2colorSkeleton.containsKey(x)) {
+				HashMap<Integer, HashMap<Integer, Integer>> y2z = x2y2z2colorSkeleton.get(x);
+				for (int y = 1; y < voxelresolution - 1; y++) {
+					if (y2z.containsKey(y)) {
+						HashMap<Integer, Integer> z2c = y2z.get(y);
+						for (int z : z2c.keySet()) {
+							Integer c = z2c.get(z);
+							probabilityCube[x][y][z] = c;
+							skeletonLength++;
+						}
+					}
+				}
+			}
+		}
+		summaryResult.setNumericProperty(0, "RESULT_plant3d.probability-skeleton.length", skeletonLength);
+		if (distHorizontal != null) {
+			double corr = realMarkerDistHorizontal / distHorizontal.getValue();
+			summaryResult.setNumericProperty(0, "RESULT_plant3d.probability-skeleton.length.norm",
+					skeletonLength * corr);
+		}
+		
+		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
+		lve.setVolume(new ByteShortIntArray(probabilityCube));
+		summaryResult.setVolume("RESULT_plant_probability-skeleton", lve);
+		
+		s.printTime();
 	}
 	
 	private void addSkeleton(HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton, int x, int y, int z, int c) {
