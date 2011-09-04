@@ -747,13 +747,14 @@ public class MongoDB {
 			optStatus.setCurrentStatusText1("Save Volume");
 		
 		GridFSDBFile vvv = gridfs_volumes.findOne(hash);
-		if (vvv != null) {
+		boolean removeExistingVolumeFile = false;
+		if (removeExistingVolumeFile && vvv != null) {
 			gridfs_preview.remove(vvv);
 			vvv = null;
 		}
-		boolean saveVolume = false;
+		boolean saveVolume = true;
 		long saved = 0;
-		if (saveVolume) {
+		if (saveVolume && vvv == null) {
 			IntVolumeInputStream is = (IntVolumeInputStream) id.getURL().getInputStream();
 			System.out.println("AVAIL: " + is.available());
 			System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
@@ -765,7 +766,8 @@ public class MongoDB {
 			System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
 		}
 		GridFSDBFile fff = gridfs_preview.findOne(id.getURL().getDetail());
-		if (fff != null) {
+		boolean removeExistingPreviewFile = false;
+		if (removeExistingPreviewFile && fff != null) {
 			gridfs_preview.remove(fff);
 			fff = null;
 		}
@@ -793,12 +795,12 @@ public class MongoDB {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved Volume ("
 					+ saved / 1024 / 1024 + " MB)");
-		return saved;
+		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
 	private long saveNetworkFile(GridFS gridfs_networks, GridFS gridfs_preview, NetworkData network, ObjectRef optFileSize,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus, String hash) throws Exception {
-		long saved = 0;
+		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create Outputstream");
 		
@@ -821,7 +823,6 @@ public class MongoDB {
 		inputFile.setFilename(hash);
 		// inputFile.getMetaData().put("name", network.getURL().getFileName());
 		inputFile.save();
-		saved = inputFile.getLength();
 		System.out.println("SAVED NETWORK: " + network.toString() + " // SIZE: " + inputFile.getLength());
 		
 		GridFSDBFile fff = gridfs_preview.findOne(network.getURL().getDetail());
@@ -846,7 +847,6 @@ public class MongoDB {
 				inputFilePreview.setFilename(hash);
 				// inputFilePreview.getMetaData().put("name", network.getURL().getFileName());
 				inputFilePreview.save();
-				saved = inputFilePreview.getLength();
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -854,7 +854,7 @@ public class MongoDB {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved Network ("
 					+ ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
-		return saved;
+		return ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
 	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(6, new ThreadFactory() {
