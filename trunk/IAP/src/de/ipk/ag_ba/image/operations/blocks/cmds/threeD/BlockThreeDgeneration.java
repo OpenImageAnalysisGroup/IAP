@@ -162,7 +162,6 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				createAdvancedProbabilitySkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube, volume);
 			}
 		}
-		
 	}
 	
 	/**
