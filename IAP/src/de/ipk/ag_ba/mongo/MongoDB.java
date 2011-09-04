@@ -756,42 +756,47 @@ public class MongoDB {
 		long saved = 0;
 		if (saveVolume && vvv == null) {
 			IntVolumeInputStream is = (IntVolumeInputStream) id.getURL().getInputStream();
-			System.out.println("AVAIL: " + is.available());
-			System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
-			GridFSInputFile inputFile = gridfs_volumes.createFile(is, hash);
-			// inputFile.setFilename(hash);
-			// id.getURL().getFileName());
-			inputFile.save();
-			saved += inputFile.getLength();
-			System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
-		}
-		GridFSDBFile fff = gridfs_preview.findOne(id.getURL().getDetail());
-		boolean removeExistingPreviewFile = false;
-		if (removeExistingPreviewFile && fff != null) {
-			gridfs_preview.remove(fff);
-			fff = null;
-		}
-		if (fff == null) {
-			try {
-				if (optStatus != null)
-					optStatus.setCurrentStatusText1("Render Side Views");
-				System.out.println("Render side view GIF...");
-				LoadedVolumeExtension lv;
-				if (id instanceof LoadedVolumeExtension)
-					lv = (LoadedVolumeExtension) id;
-				else
-					lv = new LoadedVolumeExtension(IOmodule.loadVolume(id));
-				GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule
-						.getThreeDvolumePreviewIcon(lv, optStatus));
-				if (optStatus != null)
-					optStatus.setCurrentStatusText1("Save Preview Icon");
-				inputFilePreview.setFilename(hash);
-				// inputFilePreview.getMetaData().put("name", id.getURL().getFileName());
-				inputFilePreview.save();
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
+			if (is != null) {
+				System.out.println("AVAIL: " + is.available());
+				System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
+				GridFSInputFile inputFile = gridfs_volumes.createFile(is, hash);
+				// inputFile.setFilename(hash);
+				// id.getURL().getFileName());
+				inputFile.save();
+				saved += inputFile.getLength();
+				System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
+				
+				GridFSDBFile fff = gridfs_preview.findOne(id.getURL().getDetail());
+				boolean removeExistingPreviewFile = false;
+				if (removeExistingPreviewFile && fff != null) {
+					gridfs_preview.remove(fff);
+					fff = null;
+				}
+				if (fff == null) {
+					try {
+						if (optStatus != null)
+							optStatus.setCurrentStatusText1("Render Side Views");
+						System.out.println("Render side view GIF...");
+						LoadedVolumeExtension lv;
+						if (id instanceof LoadedVolumeExtension)
+							lv = (LoadedVolumeExtension) id;
+						else
+							lv = new LoadedVolumeExtension(IOmodule.loadVolume(id));
+						GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule
+								.getThreeDvolumePreviewIcon(lv, optStatus));
+						if (optStatus != null)
+							optStatus.setCurrentStatusText1("Save Preview Icon");
+						inputFilePreview.setFilename(hash);
+						// inputFilePreview.getMetaData().put("name", id.getURL().getFileName());
+						inputFilePreview.save();
+						saved += inputFilePreview.getLength();
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
 			}
 		}
+		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved Volume ("
 					+ saved / 1024 / 1024 + " MB)");
