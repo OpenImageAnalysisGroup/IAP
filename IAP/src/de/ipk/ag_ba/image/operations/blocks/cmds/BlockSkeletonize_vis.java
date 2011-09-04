@@ -41,7 +41,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage res = vis;
 		if (options.isMaize()) {
 			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = vis.copy().getIO().print("orig")// .medianFilter32Bit()
+				FlexibleImage viswork = vis.copy().getIO().print("orig", debug)// .medianFilter32Bit()
 						// .closing(3, 3)
 						// .erode()
 						.dilateHorizontal(10) // 10
