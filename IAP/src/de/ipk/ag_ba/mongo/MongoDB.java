@@ -795,7 +795,7 @@ public class MongoDB {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved Volume ("
 					+ saved / 1024 / 1024 + " MB)");
-		return ((VolumeInputStream) id.getURL().getInputStream()).getNumberOfBytes();
+		return saved;
 	}
 	
 	private long saveNetworkFile(GridFS gridfs_networks, GridFS gridfs_preview, NetworkData network, ObjectRef optFileSize,
