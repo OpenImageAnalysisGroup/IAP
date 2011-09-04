@@ -165,6 +165,9 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		
 	}
 	
+	/**
+	 * The "fire" burns down each solid voxel with fixed speed.
+	 */
 	private void createSimpleDefaultSkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
 			double realMarkerDistHorizontal, int[][][] cube, LoadedVolumeExtension volume) {
 		int fire = ImageOperation.BACKGROUND_COLORint;
@@ -240,6 +243,9 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		s.printTime();
 	}
 	
+	/**
+	 * The "fire" slowly burns down the cube, based on each voxel's probability
+	 */
 	private void createAdvancedProbabilitySkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
 			double realMarkerDistHorizontal, int[][][] probabilityCube, LoadedVolumeExtension volume) {
 		int empty = 0;

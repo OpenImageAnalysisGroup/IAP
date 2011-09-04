@@ -36,11 +36,11 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 				getInput().getMasks().setNir(nirMask);
 				// nirMask.print("old compare");
 				nirCopy.getIO().crop().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground())
-						.adaptiveThresholdForGrayscaleImage(10, 255, options.getBackground()).getImage().print("new thresh");
+						.adaptiveThresholdForGrayscaleImage(10, 255, options.getBackground()).getImage().print("new thresh", debug);
 				
 				FlexibleImage sk = nirMask.getIO().skeletonize().getImage();
 				if (sk != null) {
-					FlexibleImage skelMap = MapOriginalOnSkel(sk, nirMask, options.getBackground()).print("mapped");
+					FlexibleImage skelMap = MapOriginalOnSkel(sk, nirMask, options.getBackground()).print("mapped", debug);
 					getProperties().setImage("nir_skeleton", sk);
 				}
 			}
