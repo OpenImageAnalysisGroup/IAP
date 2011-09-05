@@ -91,6 +91,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			// the source dimensions of the voxels, and therefore a un-stretch
 			// calculation needs to be performed to error-correct the calculated volume
 			int[][][] cube = mg.getRGBcubeResult();
+			
 			int solidVoxels = 0;
 			for (int x = 0; x < voxelresolution; x++) {
 				int[][] cubeYZ = cube[x];
@@ -158,7 +159,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			}
 			boolean create3DadvancedProbabilitySkeleton = true;
 			if (create3DadvancedProbabilitySkeleton) {
-				int[][][] probabilityCube = mg.getRGBcubeResult();
+				int[][][] probabilityCube = mg.getByteCubeResult();
 				createAdvancedProbabilitySkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube, volume);
 			}
 		}
