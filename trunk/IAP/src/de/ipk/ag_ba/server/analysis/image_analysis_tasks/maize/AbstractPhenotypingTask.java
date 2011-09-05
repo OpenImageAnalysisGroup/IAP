@@ -162,19 +162,20 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			Sample3D inSample = null;
 			TreeMap<Double, BlockProperties> analysisResults = new TreeMap<Double, BlockProperties>();
 			TreeMap<Double, ImageData> analysisInput = new TreeMap<Double, ImageData>();
-			for (Double angle : tmf.keySet()) {
-				if (tmf.get(angle).getVIS() != null)
-					inSample = (Sample3D) tmf.get(angle).getVIS().getParentSample();
-				else
-					continue;
-				ImageData inImage = tmf.get(angle).getVIS();
-				BlockProperties results = processAngleWithinSnapshot(tmf.get(angle), maximumThreadCountOnImageLevel, status,
+			if (tmf != null)
+				for (Double angle : tmf.keySet()) {
+					if (tmf.get(angle).getVIS() != null)
+						inSample = (Sample3D) tmf.get(angle).getVIS().getParentSample();
+					else
+						continue;
+					ImageData inImage = tmf.get(angle).getVIS();
+					BlockProperties results = processAngleWithinSnapshot(tmf.get(angle), maximumThreadCountOnImageLevel, status,
 								workloadEqualAngleSnapshotSets, getParentPriority());
-				if (results != null) {
-					analysisInput.put(angle, inImage);
-					analysisResults.put(angle, results);
+					if (results != null) {
+						analysisInput.put(angle, inImage);
+						analysisResults.put(angle, results);
+					}
 				}
-			}
 			if (inSample != null && !analysisResults.isEmpty()) {
 				BlockProperties postprocessingResults = getImageProcessor().postProcessPipelineResults(
 						inSample, analysisInput, analysisResults);
