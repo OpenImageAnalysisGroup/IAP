@@ -401,16 +401,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (ExperimentHeaderInterface exp : experiments) {
-					String n = exp.getExperimentName();
-					try {
-						String[] nn = n.split("§");
-						if (nn[0].indexOf(".") > 0)
-							nn[0] = nn[0].substring(nn[0].lastIndexOf(".") + ".".length());
-						String start = SystemAnalysisExt.getCurrentTime(Long.parseLong(nn[3]));
-						n = nn[0] + " (" + nn[1] + "/" + nn[2] + ") started " + start;
-					} catch (Exception err) {
-						System.err.println("ERROR: Problematic experiment name: " + exp.getExperimentName());
-					}
+					String n = getTempdataExperimentName(exp);
 					res.add(getMongoExperimentButton(n, exp, src.getGUIsetting(), m));
 				}
 				NavigationButton tb = new NavigationButton(
@@ -523,5 +514,19 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	
 	public void setLogin(String user) {
 		this.currentUser = user;
+	}
+	
+	public static String getTempdataExperimentName(ExperimentHeaderInterface exp) {
+		String n = exp.getExperimentName();
+		try {
+			String[] nn = n.split("§");
+			if (nn[0].indexOf(".") > 0)
+				nn[0] = nn[0].substring(nn[0].lastIndexOf(".") + ".".length());
+			String start = SystemAnalysisExt.getCurrentTime(Long.parseLong(nn[3]));
+			n = nn[0] + " (" + nn[1] + "/" + nn[2] + ") started " + start;
+		} catch (Exception err) {
+			System.err.println("ERROR: Problematic experiment name: " + exp.getExperimentName());
+		}
+		return n;
 	}
 }
