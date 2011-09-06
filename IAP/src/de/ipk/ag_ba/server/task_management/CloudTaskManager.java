@@ -107,7 +107,7 @@ public class CloudTaskManager {
 					if (cpuDesire < maxTasks) { // if (runningTasks.size() < maxTasks) {
 						if (m == null)
 							return;
-						for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart(maxTasks - runningTasks.size())) {
+						for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart(maxTasks - cpuDesire)) {
 							if (batch.getExperimentMongoID() != null) {
 								ExperimentHeaderInterface header = m.getExperimentHeader(batch.getExperimentMongoID());
 								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), hostName);
