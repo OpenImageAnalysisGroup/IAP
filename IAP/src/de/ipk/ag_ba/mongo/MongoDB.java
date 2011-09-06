@@ -1720,7 +1720,7 @@ public class MongoDB {
 			return new ArrayList<BatchCmd>();
 		}
 		if (res.size() > 0) {
-			System.out.println("SCHEDULED FOR START: " + res.size());
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">SCHEDULED FOR START: " + res.size());
 		}
 		return res;
 	}
