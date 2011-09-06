@@ -125,9 +125,13 @@ public class CloudTaskManager {
 									commands_to_start.add(task);
 								if (stop)
 									break;
+							} else {
+								System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: INTERNAL ERROR: BATCH-CMD REFERS TO NULL-EXPERIMENT-ID");
 							}
 						}
 					}
+					if (!commands_to_start.isEmpty())
+						System.out.println(SystemAnalysisExt.getCurrentTime() + ">TO BE STARTED: " + commands_to_start.size());
 					
 					int nn = 0;
 					progressSum = 0;
@@ -167,8 +171,11 @@ public class CloudTaskManager {
 								};
 								BackgroundThreadDispatcher.addTask(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName(), Integer.MIN_VALUE, Integer.MIN_VALUE);
 							} catch (Exception e) {
-								ErrorMsg.addErrorMessage(e);
+								System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: BATCH-CMD COULD NOT BE STARTED: " + e.getMessage());
 							}
+						} else {
+							System.out.println(SystemAnalysisExt.getCurrentTime()
+									+ ">INFO: INTERNAL INFO: runningTasks already contains a cmd which was sheduled for start");
 						}
 					}
 					if (nn == 0)
