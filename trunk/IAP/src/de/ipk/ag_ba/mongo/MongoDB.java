@@ -1678,7 +1678,7 @@ public class MongoDB {
 								if (hostName.equals("" + batch.getOwner())) {
 									res.add(batch);
 									added = true;
-									addCnt++;
+									addCnt += batch.getCpuTargetUtilization();
 									if (addCnt >= maxTasks)
 										break;
 								}
@@ -1702,7 +1702,7 @@ public class MongoDB {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (batch.getCpuTargetUtilization() < maxTasks && hostName.equals("" + batch.getOwner())) {
 									res.add(batch);
-									addCnt++;
+									addCnt += batch.getCpuTargetUtilization();
 									if (addCnt >= maxTasks)
 										added = true;
 									break;
