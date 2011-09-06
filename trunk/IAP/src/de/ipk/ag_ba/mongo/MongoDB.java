@@ -1060,6 +1060,7 @@ public class MongoDB {
 		try {
 			InputStream iis = volume.getURL().getInputStream();
 			hash = GravistoService.getHashFromInputStream(iis, optFileSize, getHashType());
+			volume.getURL().setDetail(hash);
 			
 			GridFSDBFile fff = gridfs_volumes.findOne(hash);
 			if (fff != null && fff.getLength() <= 0) {
