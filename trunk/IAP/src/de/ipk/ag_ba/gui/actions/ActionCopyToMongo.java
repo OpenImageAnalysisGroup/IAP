@@ -87,6 +87,6 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy " + experiment.getExperimentName();
+		return "Copy " + ActionMongoExperimentsNavigation.getTempdataExperimentName(experiment.getHeader());
 	}
 }
