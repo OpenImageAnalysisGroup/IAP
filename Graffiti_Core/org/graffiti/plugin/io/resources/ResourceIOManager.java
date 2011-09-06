@@ -149,7 +149,12 @@ public class ResourceIOManager {
 	
 	public static byte[] getPreviewImageContent(IOurl ioUrl) throws Exception {
 		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
-		InputStream in = getHandlerFromPrefix(ioUrl.getPrefix()).getPreviewInputStream(ioUrl);
+		ResourceIOHandler handler = getHandlerFromPrefix(ioUrl.getPrefix());
+		if (handler == null) {
+			System.out.println("INFO: No handler for IO-URL: " + ioUrl);
+			return null;
+		}
+		InputStream in = handler.getPreviewInputStream(ioUrl);
 		if (in == null)
 			return null;
 		copyContent(in, output);

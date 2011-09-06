@@ -478,6 +478,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					databaseTarget.saveVolume((LoadedVolume) v, inSample, m, DBTable.SAMPLE, null, null);
 					VolumeData volumeInDatabase = new VolumeData(inSample, v);
 					volumeInDatabase.getURL().setPrefix(databaseTarget.getPrefix());
+					volumeInDatabase.getURL().setDetail(v.getURL().getDetail());
 					output.add(volumeInDatabase);
 					
 					output.add(v);

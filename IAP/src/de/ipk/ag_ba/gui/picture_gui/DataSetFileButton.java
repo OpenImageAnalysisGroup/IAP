@@ -59,6 +59,7 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTa
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
@@ -423,11 +424,15 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	public DataSetFileButton(MongoDB m, MongoTreeNode projectNode, ImageResult imageResult,
 						ImageIcon previewImage, boolean readOnly) {
-		this(m, projectNode, "<html><body><b>"
-				+ getMaxString(strip(imageResult.getFileNameMain(), ((ImageData) imageResult.getBinaryFileInfo().entity).getQualityAnnotation()
-						+ "<br>("
-						+ (((ImageData) imageResult.getBinaryFileInfo().entity).getPosition() != null ? ((ImageData) imageResult.getBinaryFileInfo().entity)
-								.getPosition().intValue() + ")" : "0)")))
+		this(m, projectNode,
+				"<html><body><b>"
+						+ getMaxString(strip(
+								imageResult.getFileNameMain(),
+								((NumericMeasurement3D) imageResult.getBinaryFileInfo().entity).getQualityAnnotation()
+										+ "<br>("
+										+ (((NumericMeasurement3D) imageResult.getBinaryFileInfo().entity).getPosition() != null ? ((NumericMeasurement3D) imageResult
+												.getBinaryFileInfo().entity)
+												.getPosition().intValue() + ")" : "0)")))
 							+ "</b></body></html>", null, previewImage);
 		this.imageResult = imageResult;
 		this.readOnly = readOnly;
