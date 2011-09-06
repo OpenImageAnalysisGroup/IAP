@@ -1672,21 +1672,23 @@ public class MongoDB {
 						int addCnt = 0;
 						for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.SCHEDULED))) {
 							BatchCmd batch = (BatchCmd) dbo;
-							if (batch.getOwner() == null)
-								batchClaim(batch, CloudAnalysisStatus.STARTING, false);
-							if (hostName.equals("" + batch.getOwner())) {
-								res.add(batch);
-								added = true;
-								addCnt++;
-								if (addCnt >= maxTasks)
-									break;
+							if (batch.getCpuTargetUtilization() < maxTasks) {
+								if (batch.getOwner() == null)
+									batchClaim(batch, CloudAnalysisStatus.STARTING, false);
+								if (hostName.equals("" + batch.getOwner())) {
+									res.add(batch);
+									added = true;
+									addCnt++;
+									if (addCnt >= maxTasks)
+										break;
+								}
 							}
 						}
 						int claimed = 0;
 						if (addCnt < maxTasks)
 							for (DBObject dbo : collection.find()) {
 								BatchCmd batch = (BatchCmd) dbo;
-								if (!added)
+								if (!added && batch.getCpuTargetUtilization() < maxTasks)
 									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5000)) {
 										// res.add(batch);
 										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
@@ -1698,7 +1700,7 @@ public class MongoDB {
 						if (addCnt < maxTasks)
 							for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.STARTING))) {
 								BatchCmd batch = (BatchCmd) dbo;
-								if (hostName.equals("" + batch.getOwner())) {
+								if (batch.getCpuTargetUtilization() < maxTasks && hostName.equals("" + batch.getOwner())) {
 									res.add(batch);
 									addCnt++;
 									if (addCnt >= maxTasks)
