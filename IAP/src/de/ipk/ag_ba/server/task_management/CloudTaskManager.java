@@ -121,7 +121,7 @@ public class CloudTaskManager {
 										cpuDesire += tu;
 								} else
 									stop = true;
-								if (cpuDesire + tu < maxTasks || (runningTasks.isEmpty() && commands_to_start.isEmpty()))
+								if (cpuDesire < maxTasks || (runningTasks.isEmpty() && commands_to_start.isEmpty()))
 									commands_to_start.add(task);
 								if (stop)
 									break;
