@@ -767,7 +767,7 @@ public class MongoDB {
 				System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
 				
 				GridFSDBFile fff = gridfs_preview.findOne(id.getURL().getDetail());
-				boolean removeExistingPreviewFile = false;
+				boolean removeExistingPreviewFile = true;
 				if (removeExistingPreviewFile && fff != null) {
 					gridfs_preview.remove(fff);
 					fff = null;
@@ -783,10 +783,9 @@ public class MongoDB {
 						else
 							lv = new LoadedVolumeExtension(IOmodule.loadVolume(id));
 						GridFSInputFile inputFilePreview = gridfs_preview.createFile(IOmodule
-								.getThreeDvolumePreviewIcon(lv, optStatus));
+								.getThreeDvolumePreviewIcon(lv, optStatus), hash);
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("Save Preview Icon");
-						inputFilePreview.setFilename(hash);
 						// inputFilePreview.getMetaData().put("name", id.getURL().getFileName());
 						inputFilePreview.save();
 						saved += inputFilePreview.getLength();
