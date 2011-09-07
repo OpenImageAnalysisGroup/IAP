@@ -14,7 +14,6 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class BlockPropertiesImpl implements BlockProperties {
@@ -171,7 +170,7 @@ public class BlockPropertiesImpl implements BlockProperties {
 	}
 	
 	@Override
-	public void setVolume(String string, LoadedVolumeExtension volume) {
+	public void setVolume(String string, VolumeData volume) {
 		storedVol.put(string, volume);
 	}
 	

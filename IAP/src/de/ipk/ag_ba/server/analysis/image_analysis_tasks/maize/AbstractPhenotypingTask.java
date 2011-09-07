@@ -480,8 +480,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					volumeInDatabase.getURL().setPrefix(databaseTarget.getPrefix());
 					volumeInDatabase.getURL().setDetail(v.getURL().getDetail());
 					output.add(volumeInDatabase);
-					
-					output.add(v);
 				} catch (Exception e) {
 					System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: Could not save volume data: " + e.getMessage());
 					e.printStackTrace();

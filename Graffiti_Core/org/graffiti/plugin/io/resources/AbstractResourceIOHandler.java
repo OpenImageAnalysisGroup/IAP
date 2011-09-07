@@ -24,13 +24,19 @@ public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 	
 	@Override
 	public InputStream getPreviewInputStream(IOurl url, int size) throws Exception {
-		
+		if (url == null) {
+			System.out.println("ERROR: Request for InputStream of NULL-URL");
+			return null;
+		}
 		BufferedImage i = null;
 		InputStream is = url.getInputStream();
 		if (is == null)
 			return null;
 		is = ResourceIOManager.getInputStreamMemoryCached(is);
 		i = ImageIO.read(is);
+		if (i == null) {
+			return null;
+		}
 		int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
 		double ICON_HEIGHT = size;
 		double factor = ICON_HEIGHT / maxS;
