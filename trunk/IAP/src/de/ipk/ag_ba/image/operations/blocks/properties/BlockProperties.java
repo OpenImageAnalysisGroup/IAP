@@ -7,7 +7,6 @@ import java.util.Set;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public interface BlockProperties {
@@ -49,7 +48,7 @@ public interface BlockProperties {
 	
 	public FlexibleImage getImage(String id);
 	
-	public void setVolume(String string, LoadedVolumeExtension volume);
+	public void setVolume(String string, VolumeData volume);
 	
 	public Set<String> getVolumeNames();
 	
