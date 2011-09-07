@@ -162,7 +162,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
 				mpc = new MainPanelComponent(info, true);
 			} else {
-				mpc = new MainPanelComponent("Running in batch-mode. Partial result is not shown at this place.");
+				// mpc = new MainPanelComponent("Running in batch-mode. Partial result is not shown at this place.");
 				resultReceiver.setExperimenData(statisticsResult);
 				resultReceiver.run();
 			}
