@@ -24,6 +24,8 @@ public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 	
 	@Override
 	public InputStream getPreviewInputStream(IOurl url, int size) throws Exception {
+		if (url != null && url.getFileName() != null && url.getFileName().contains(".argb_volume"))
+			return null;
 		if (url == null) {
 			System.out.println("ERROR: Request for InputStream of NULL-URL");
 			return null;

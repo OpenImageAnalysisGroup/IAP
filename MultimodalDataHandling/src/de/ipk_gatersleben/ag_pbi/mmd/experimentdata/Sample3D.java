@@ -49,6 +49,10 @@ public class Sample3D extends Sample {
 					continue;
 				if (key.equals("images"))
 					continue;
+				if (key.equals("volumes"))
+					continue;
+				if (key.equals("networks"))
+					continue;
 				if (key.equals("measurements"))
 					continue;
 				Object o = map.get(key);

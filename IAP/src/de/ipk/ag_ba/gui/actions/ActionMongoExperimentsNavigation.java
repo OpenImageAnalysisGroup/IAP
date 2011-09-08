@@ -80,7 +80,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
 				
 				NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Add Files", "img/ext/user-desktop.png",
-							"img/ext/user-desktop.png", src.getGUIsetting());
+						"img/ext/user-desktop.png", src.getGUIsetting());
 				res.add(uploadFilesEntity);
 			}
 			// gruppe => user => experiment
@@ -126,7 +126,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 					
 					res.add(new NavigationButton(createMongoGroupNavigationAction(group
 							+ " (" + count(experiments.get(group)) + ")", experiments.get(group)), src
-									.getGUIsetting()));
+							.getGUIsetting()));
 				}
 				
 				if (!limitToResuls)
@@ -184,7 +184,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 				actions.add(Trash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
-									src.getGUIsetting(), m));
+						src.getGUIsetting(), m));
 				for (ExperimentHeaderInterface exp : trashed)
 					actions.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
 				return actions;
@@ -194,7 +194,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	}
 	
 	private NavigationAction createMongoGroupNavigationAction(final String group,
-						final TreeMap<String, ArrayList<ExperimentHeaderInterface>> user2exp) {
+			final TreeMap<String, ArrayList<ExperimentHeaderInterface>> user2exp) {
 		NavigationAction groupNav = new AbstractNavigationAction("Show User-Group Folder") {
 			private NavigationButton src;
 			
@@ -203,7 +203,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (String user : user2exp.keySet()) {
 					res.add(new NavigationButton(createMongoUserNavigationAction(user, user2exp.get(user)), src
-										.getGUIsetting()));
+							.getGUIsetting()));
 				}
 				return res;
 			}
@@ -272,7 +272,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	}
 	
 	protected NavigationAction createMongoUserNavigationAction(final String user,
-						final ArrayList<ExperimentHeaderInterface> experiments) {
+			final ArrayList<ExperimentHeaderInterface> experiments) {
 		NavigationAction userNav = new AbstractNavigationAction("Show user folder") {
 			private NavigationButton src;
 			
@@ -500,7 +500,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		do {
 			Thread.sleep(10);
 			long current = System.currentTimeMillis();
-			if (current - start > 5000) {
+			if (current - start > 15000) {
 				t.interrupt();
 				error = true;
 				errorMsg = "time out";
