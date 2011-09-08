@@ -25,6 +25,7 @@ public class AnnotationInfoPanel extends JPanel {
 	public AnnotationInfoPanel(DataSetFileButton imageButton, MongoTreeNode mt) {
 		this.imageButton = imageButton;
 		this.mt = mt;
+		addGui(true);
 	}
 	
 	public void removeGui() {

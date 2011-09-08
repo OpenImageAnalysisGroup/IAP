@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
 
+import org.StringManipulationTools;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
@@ -114,7 +115,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			if (distHorizontal != null) {
 				double corr = realMarkerDistHorizontal / distHorizontal.getValue();
 				summaryResult.setNumericProperty(0, "RESULT_plant3d.volume.norm",
-								plantVolume * corr * corr * corr);
+						plantVolume * corr * corr * corr);
 			}
 			
 			boolean createVolumeDataset = true;
@@ -135,7 +136,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 					System.out.println(SystemAnalysisExt.getCurrentTime()
 							+ ">ERROR: 3D Volume generation block didn't find the expected single sample measurement replicate ID. It found "
 							+ replicateIDsOfSampleMeasurements.size() + " differing replicate IDs, instead! The generated volume possibly can't be related" +
-								"to a single set of side views of a single Snapshot. This is a internal error.");
+							"to a single set of side views of a single Snapshot. This is a internal error.");
 				volume.setReplicateID(replicateID);
 				
 				volume.setVoxelsizeX(25f * 400 / voxelresolution);
@@ -155,12 +156,14 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			}
 			boolean create3Dskeleton = true;
 			if (create3Dskeleton) {
-				createSimpleDefaultSkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube, volume);
+				createSimpleDefaultSkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube,
+						(LoadedVolumeExtension) volume.clone(volume.getParentSample()));
 			}
 			boolean create3DadvancedProbabilitySkeleton = true;
 			if (create3DadvancedProbabilitySkeleton) {
 				int[][][] probabilityCube = mg.getByteCubeResult();
-				createAdvancedProbabilitySkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube, volume);
+				createAdvancedProbabilitySkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube,
+						(LoadedVolumeExtension) volume.clone(volume.getParentSample()));
 			}
 		}
 	}
@@ -238,6 +241,11 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
 		lve.setVolume(new ByteShortIntArray(cube));
+		String n = lve.getURL().getFileName();
+		if (n == null)
+			n = SystemAnalysisExt.getCurrentTime() + " (NO VOLUME NAME, NULL ERROR 1)";
+		n = StringManipulationTools.stringReplace(n, ".argb_volume", "");
+		lve.getURL().setFileName(n + ".(plant skeleton).argb_volume");
 		summaryResult.setVolume("RESULT_plant_skeleton", lve);
 		
 		s.printTime();
@@ -316,6 +324,12 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
 		lve.setVolume(new ByteShortIntArray(probabilityCube));
+		String n = lve.getURL().getFileName();
+		if (n == null)
+			n = SystemAnalysisExt.getCurrentTime() + " (NO VOLUME NAME, NULL ERROR 2)";
+		n = StringManipulationTools.stringReplace(n, ".argb_volume", "");
+		lve.getURL().setFileName(n + ".(plant probability skeleton).argb_volume");
+		
 		summaryResult.setVolume("RESULT_plant_probability-skeleton", lve);
 		
 		s.printTime();
