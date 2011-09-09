@@ -42,8 +42,9 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		experimentName = copyFrom.getExperimentName();
 		remark = copyFrom.getExperimentRemark();
 		coordinator = copyFrom.getCoordinator();
-		importDate = copyFrom.getExperimentImportdate();
+		importDate = copyFrom.getExperimentImportDate();
 		startDate = copyFrom.getExperimentStartDate();
+		storageTime = copyFrom.getExperimentStorageDate();
 		experimentType = copyFrom.getExperimentType();
 		sequence = copyFrom.getSequence();
 		database = copyFrom.getDatabase();
@@ -149,11 +150,11 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		r.append("<experiment experimentid=\"" + experimentID + "\">");
 		Substance.getAttributeString(r, new String[] {
 				"experimentname", "database", "remark", "coordinator", "experimenttype", "sequence", "excelfileid",
-				"importusername", "importusergroup", "importdate", "startdate", "measurements", "imagefiles", "sizekb",
+				"importusername", "importusergroup", "importdate", "startdate", "storagetime", "measurements", "imagefiles", "sizekb",
 				"origin"
 		}, new Object[] {
 				experimentName, database, remark, coordinator, experimentType, sequence, databaseId, importUserName,
-				importUserGroup, AttributeHelper.getDateString(importDate), AttributeHelper.getDateString(startDate),
+				importUserGroup, AttributeHelper.getDateString(importDate), AttributeHelper.getDateString(startDate), AttributeHelper.getDateString(storageTime),
 				measurementcount, (imageFiles == null ? 0 : imageFiles), sizekb,
 				originDatabaseId
 		}, true);
@@ -197,6 +198,17 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			}
 		} else
 			setStartdate((Date) map.get("startdate"));
+		if (map.get("storagetime") != null && map.get("storagetime") instanceof String) {
+			try {
+				DateFormat format = new SimpleDateFormat("E MMM d HH:mm:ss z yyyy", new Locale("en"));
+				Date aDate = format.parse((String) map.get("storagetime"));
+				setStorageTime(aDate);
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+				System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("storagetime"));
+			}
+		} else
+			setStorageTime((Date) map.get("storagetime"));
 		if (map.get("imagefiles") != null && map.get("imagefiles") instanceof String)
 			setNumberOfFiles(Integer.parseInt(((String) map.get("imagefiles"))));
 		else
@@ -292,15 +304,15 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 				return false;
 			ExperimentHeader e = (ExperimentHeader) obj;
 			String s1 = experimentName + ";" + remark + ";" + coordinator + ";" + databaseId + ";" + importUserName + ";"
-								+ importUserGroup + ";" + imageFiles + ";" + sizekb + ";" + experimentType + ";" + sequence + ";"
-								+ experimentID + ";" + database + ";" + (importDate != null ? importDate.getTime() : "") + ";"
+					+ importUserGroup + ";" + imageFiles + ";" + sizekb + ";" + experimentType + ";" + sequence + ";"
+					+ experimentID + ";" + database + ";" + (importDate != null ? importDate.getTime() : "") + ";"
 					+ (startDate != null ? startDate.getTime() : "")
 					+ ";" + originDatabaseId;
 			String s2 = e.experimentName + ";" + e.remark + ";" + e.coordinator + ";" + e.databaseId + ";"
-								+ e.importUserName + ";" + e.importUserGroup + ";" + e.imageFiles + ";" + e.sizekb + ";"
-								+ e.experimentType + ";" + e.sequence + ";" + e.experimentID + ";" + e.database + ";"
-								+ (e.importDate != null ? e.importDate.getTime() : "") + ";" + (e.startDate != null ? e.startDate.getTime() : "")
-								+ ";" + originDatabaseId;
+					+ e.importUserName + ";" + e.importUserGroup + ";" + e.imageFiles + ";" + e.sizekb + ";"
+					+ e.experimentType + ";" + e.sequence + ";" + e.experimentID + ";" + e.database + ";"
+					+ (e.importDate != null ? e.importDate.getTime() : "") + ";" + (e.startDate != null ? e.startDate.getTime() : "")
+					+ ";" + originDatabaseId;
 			return s1.equals(s2);
 		}
 	}

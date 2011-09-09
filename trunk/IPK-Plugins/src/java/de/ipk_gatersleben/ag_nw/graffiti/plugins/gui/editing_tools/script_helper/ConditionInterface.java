@@ -37,6 +37,10 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public Date getExperimentStartDate();
 	
+	public Date getExperimentStorageDate();
+	
+	public void setExperimentStorageDate(Date storageTime);
+	
 	public int getConditionId();
 	
 	public Collection<MyComparableDataPoint> getMeanMCDPs();
@@ -119,7 +123,7 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public void setExperimentImportdate(Date experimentimportdate);
 	
-	public Date getExperimentImportdate();
+	public Date getExperimentImportDate();
 	
 	public void setExperimentRemark(String experimentRemark);
 	
