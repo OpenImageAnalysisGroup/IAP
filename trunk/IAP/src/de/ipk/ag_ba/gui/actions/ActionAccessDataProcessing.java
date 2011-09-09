@@ -12,11 +12,11 @@ import de.ipk.ag_ba.mongo.MongoDB;
 /**
  * @author klukas
  */
-public class Phenotyping extends AbstractNavigationAction {
+public class ActionAccessDataProcessing extends AbstractNavigationAction {
 	NavigationButton src = null;
 	private final GUIsetting guiSetting;
 	
-	public Phenotyping(GUIsetting guIsetting) {
+	public ActionAccessDataProcessing(GUIsetting guIsetting) {
 		super("Access IAP Phenotyping Service Platform");
 		this.guiSetting = guIsetting;
 	}

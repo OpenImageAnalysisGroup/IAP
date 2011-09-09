@@ -57,7 +57,7 @@ public class ExperimentHistoryNavigationAction extends AbstractNavigationAction 
 			String t = SystemAnalysisExt.getCurrentTime(time);
 			res.add(0, new NavigationButton(t, new ActionMongoOrLemnaTecExperimentNavigation(ei, m), src.getGUIsetting()));
 		}
-		res.add(0, new NavigationButton(new Trash(history.values(), DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m), src.getGUIsetting()));
+		res.add(0, new NavigationButton(new ActionTrash(history.values(), DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m), src.getGUIsetting()));
 		return res;
 	}
 }

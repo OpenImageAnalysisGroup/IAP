@@ -170,7 +170,7 @@ public class CloudComputingService {
 										System.exit(0);
 									} else
 										if ((args[0] + "").toLowerCase().startsWith("back") && !(args[0] + "").toLowerCase().startsWith("backup")) {
-											SupportBackup sb = new SupportBackup();
+											BackupSupport sb = new BackupSupport();
 											sb.makeBackup();
 											System.exit(0);
 										} else
@@ -187,7 +187,7 @@ public class CloudComputingService {
 													public void run() {
 														try {
 															Thread.sleep(1000);
-															SupportBackup sb = new SupportBackup();
+															BackupSupport sb = new BackupSupport();
 															sb.makeBackup();
 														} catch (InterruptedException e) {
 															System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: PROCESSING INTERRUPTED");
@@ -195,7 +195,7 @@ public class CloudComputingService {
 													}
 												};
 												t.scheduleAtFixedRate(tT, d, period);
-												SupportBackup sb = new SupportBackup();
+												BackupSupport sb = new BackupSupport();
 												sb.makeBackup();
 											} else
 												if ((args[0] + "").toLowerCase().startsWith("close")) {

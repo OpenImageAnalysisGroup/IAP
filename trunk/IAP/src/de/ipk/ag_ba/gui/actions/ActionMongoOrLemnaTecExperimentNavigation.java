@@ -64,10 +64,10 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 							&& (header.getImportusername() == null || header.getImportusername().equals(SystemAnalysis.getUserName()))) {
 			if (m != null)
 				if (header.inTrash()) {
-					actions.add(Trash.getTrashEntity(header, DeletionCommand.UNTRASH, src.getGUIsetting(), m));
-					actions.add(Trash.getTrashEntity(header, DeletionCommand.DELETE, src.getGUIsetting(), m));
+					actions.add(ActionTrash.getTrashEntity(header, DeletionCommand.UNTRASH, src.getGUIsetting(), m));
+					actions.add(ActionTrash.getTrashEntity(header, DeletionCommand.DELETE, src.getGUIsetting(), m));
 				} else
-					actions.add(Trash.getTrashEntity(header, DeletionCommand.TRASH, src.getGUIsetting(), m));
+					actions.add(ActionTrash.getTrashEntity(header, DeletionCommand.TRASH, src.getGUIsetting(), m));
 		}
 		boolean add = true;
 		if (header != null && header.inTrash())

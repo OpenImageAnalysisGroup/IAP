@@ -11,7 +11,8 @@ package de.ipk.ag_ba.mongo;
  * @author klukas
  */
 public enum DatabaseStorageResult {
-	EXISITING_NO_STORAGE_NEEDED("known"), IO_ERROR_SEE_ERRORMSG("I/O error"), STORED_IN_DB("stored");
+	EXISITING_NO_STORAGE_NEEDED("known"), IO_ERROR_SEE_ERRORMSG("I/O error"), STORED_IN_DB("stored"),
+	IO_ERROR_INPUT_NOT_AVAILABLE("INPUT error");
 	
 	private String desc;
 	
