@@ -25,7 +25,7 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
  */
 public class ThreeDmodelGenerator {
 	
-	private static int PROBABILITY_THRESHOLD = 30;
+	private static int PROBABILITY_THRESHOLD = 10;
 	
 	private ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 	
