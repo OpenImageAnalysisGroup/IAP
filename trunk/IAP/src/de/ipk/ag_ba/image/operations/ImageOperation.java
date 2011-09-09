@@ -2774,15 +2774,18 @@ public class ImageOperation {
 		int[][] res = new int[w][h];
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
-				distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + y * y);
+				distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
 				pix = img[x][y] & 0x0000ff;
-				if (y <= h / 2)
-					fac = ((factorsTopRight[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsTopRight[0]);
-				else
-					fac = ((factorsBottomLeft[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsBottomLeft[0]);
+				// if (y <= h / 2)
+				fac = ((factorsTopRight[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsCenter[0]);
+				// else
+				// fac = ((factorsBottomLeft[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsBottomLeft[0]);
 				pix = (int) (pix * fac);
 				if (pix > 255)
 					pix = 255;
+				else
+					if (pix < 0)
+						pix = 0;
 				
 				res[x][y] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
 			}
@@ -3113,15 +3116,16 @@ public class ImageOperation {
 	 * @param assumedBackground
 	 * @return
 	 * @author pape
+	 * @param K
 	 */
-	public ImageOperation adaptiveThresholdForGrayscaleImage(int n, int assumedBackground, int newForeground) {
+	public ImageOperation adaptiveThresholdForGrayscaleImage(int n, int assumedBackground, int newForeground, double K) {
 		int[][] img = getImageAs2array();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] out = new int[w][h];
-		int x, y, thresh, pix, temp = 0;
-		double K = 0.05d;
-		int[] mean = new int[n * n];
+		int x, y, thresh, pix, min = Integer.MAX_VALUE, max = 0, temp = 0;
+		double mean;
+		int[] valuesMask = new int[n * n];
 		for (int j = 0; j < h; j++) {
 			for (int i = 0; i < w; i++) {
 				// Check the local neighbourhood
@@ -3131,15 +3135,19 @@ public class ImageOperation {
 						y = j - ((int) (n / 2)) + l;
 						if (x > 0 && x < w && y > 0 && y < h) {
 							temp = img[x][y] & 0x0000ff;
-							mean[k * n + l] = temp;
+							valuesMask[k * n + l] = temp;
+							if (temp > max)
+								max = temp;
+							if (temp < min)
+								min = temp;
 						} else
-							mean[k * n + l] = assumedBackground;
+							valuesMask[k * n + l] = assumedBackground;
 					}
 				}
 				// Find the threshold value
-				// thresh = mean(mean);
 				// thresh = median(mean);
-				thresh = (int) (mean(mean) * (1 + K * ((img[i][j] & 0x0000ff) / assumedBackground - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
+				mean = mean(valuesMask);
+				thresh = (int) (mean * (1 + K * (standardDerivation(valuesMask, mean) / assumedBackground - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
 				
 				pix = img[i][j] & 0x0000ff;
 				if (pix > thresh) {
@@ -3147,15 +3155,32 @@ public class ImageOperation {
 				} else {
 					out[i][j] = img[i][j];
 				}
+				min = Integer.MAX_VALUE;
+				max = 0;
 			}
 		}
 		return new ImageOperation(out);
 	}
 	
-	private int mean(int[] temp) {
+	private double standardDerivation(int[] valuesMask, double mean) {
+		double res, fac;
+		if (valuesMask.length > 0) {
+			res = 0;
+		} else {
+			double sum = 0.;
+			for (int index = 0; index < valuesMask.length; index++) {
+				fac = (valuesMask[index] - mean);
+				sum += fac * fac;
+			}
+			res = sum / (double) valuesMask.length;
+		}
+		return Math.sqrt(res);
+	}
+	
+	private double mean(int[] temp) {
 		int sum = 0;
 		for (int i = 0; i < temp.length; i++)
 			sum += temp[i];
-		return (int) (sum / (double) temp.length);
+		return sum / (double) temp.length;
 	}
 }

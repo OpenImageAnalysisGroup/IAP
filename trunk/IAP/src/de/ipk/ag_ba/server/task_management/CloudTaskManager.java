@@ -38,7 +38,9 @@ public class CloudTaskManager {
 	
 	private boolean autoClose;
 	
-	private void setProcess(boolean process) {
+	private boolean fixedDisableProcess;
+	
+	void setProcess(boolean process) {
 		this.process = process;
 		if (timerThread == null) {
 			timerThread = new Thread(new Runnable() {
@@ -80,7 +82,7 @@ public class CloudTaskManager {
 		try {
 			double progressSum = -1;
 			do {
-				if (CloudTaskManager.this.process) {
+				if (CloudTaskManager.this.process || fixedDisableProcess) {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
 					
 					m.batchPingHost(hostName,
@@ -104,7 +106,7 @@ public class CloudTaskManager {
 							}
 						}
 					}
-					if (cpuDesire < maxTasks) { // if (runningTasks.size() < maxTasks) {
+					if (!fixedDisableProcess && cpuDesire < maxTasks) { // if (runningTasks.size() < maxTasks) {
 						if (m == null)
 							return;
 						for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart(maxTasks - cpuDesire)) {
@@ -203,5 +205,9 @@ public class CloudTaskManager {
 	public void setClusterExecutionModeSingleTaskAndExit(boolean autoClose) {
 		this.autoClose = autoClose;
 		IAPservice.setCloudExecutionMode(autoClose);
+	}
+	
+	public void setDisableProcess(boolean fixedDisableProcess) {
+		this.fixedDisableProcess = fixedDisableProcess;
 	}
 }

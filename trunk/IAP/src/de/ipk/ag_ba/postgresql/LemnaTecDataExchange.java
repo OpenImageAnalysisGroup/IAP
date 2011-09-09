@@ -30,6 +30,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -71,6 +72,8 @@ public class LemnaTecDataExchange {
 		invalidDBs.add("bacula");
 		invalidDBs.add("LTTestDB");
 		invalidDBs.add("LemnaTest");
+		invalidDBs.add("CornTest2");
+		invalidDBs.add("CornTest3");
 		
 		String sqlText = "SELECT datname FROM pg_database";
 		
@@ -499,17 +502,6 @@ public class LemnaTecDataExchange {
 		connection.close();
 	}
 	
-	public static void main(String[] args) {
-		try {
-			for (Snapshot snapshot : new LemnaTecDataExchange().getSnapshotsOfExperiment("DH-MB1", "DH-MB_Reihe_01"))
-				System.out.println("Creator: " + snapshot.getCreator() + "Bild: " + snapshot.getPath_image());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	private static final HashMap<String, Double> blob2angle = new HashMap<String, Double>();
 	
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
@@ -545,7 +537,7 @@ public class LemnaTecDataExchange {
 			for (String id : ids) {
 				replID++;
 				idtag2replicateID.put(id, replID);
-				System.out.println(id + ";" + replID);
+				// System.out.println(id + ";" + replID);
 			}
 		}
 		
@@ -855,14 +847,19 @@ public class LemnaTecDataExchange {
 			else {
 				InputStream in = url.getInputStream();
 				// read configuration object in order to detect rotation angle
-				MyByteArrayOutputStream out = new MyByteArrayOutputStream();
-				byte[] temp = new byte[1024];
-				int read = in.read(temp);
-				while (read > 0) {
-					out.write(temp, 0, read);
-					read = in.read(temp);
+				try {
+					MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+					byte[] temp = new byte[1024];
+					int read = in.read(temp);
+					while (read > 0) {
+						out.write(temp, 0, read);
+						read = in.read(temp);
+					}
+					buf = out.getBuff();
+				} catch (Exception err) {
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: NO ROTATION ANGLE FOR URL " + url);
+					return Double.NaN;
 				}
-				buf = out.getBuff();
 			}
 			TextFile tf = new TextFile(new MyByteArrayInputStream(buf, buf.length), 0);
 			// System.out.println(url.toString());

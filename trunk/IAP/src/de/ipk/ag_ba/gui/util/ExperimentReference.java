@@ -7,6 +7,7 @@
 package de.ipk.ag_ba.gui.util;
 
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
@@ -37,8 +38,12 @@ public class ExperimentReference {
 	public ExperimentInterface getData(MongoDB m, boolean interactiveGetExperimentSize) throws Exception {
 		if (experiment != null)
 			return experiment;
-		else
-			return m.getExperiment(header, interactiveGetExperimentSize, null);
+		else {
+			if (header.getDatabaseId().startsWith("lemnatec:"))
+				return new LemnaTecDataExchange().getExperiment(header, null);
+			else
+				return m.getExperiment(header, interactiveGetExperimentSize, null);
+		}
 	}
 	
 	public String getExperimentName() {

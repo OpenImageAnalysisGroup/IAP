@@ -127,4 +127,13 @@ public class HsmFileSystemSource extends FileSystemSource {
 			}
 		}
 	}
+	
+	public Collection<ExperimentHeaderInterface> getAllExperimentsNewest() {
+		Collection<TreeMap<Long, ExperimentHeaderInterface>> a = ((HsmMainDataSourceLevel) thisLevel).experimentName2saveTime2data.values();
+		Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
+		for (TreeMap<Long, ExperimentHeaderInterface> map : a) {
+			result.add(map.lastEntry().getValue());
+		}
+		return result;
+	}
 }

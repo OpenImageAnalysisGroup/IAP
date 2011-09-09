@@ -9,6 +9,7 @@ package de.ipk.ag_ba.image.analysis.gernally;
 
 import ij.plugin.filter.MaximumFinder;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -318,6 +319,7 @@ public class ImageProcessorOptions {
 	}
 	
 	private Boolean isMaize = null;
+	private int nirBackground = new Color(180, 180, 180).getRGB();
 	
 	public void setIsMaize(boolean isMaize) {
 		this.isMaize = isMaize;
@@ -327,5 +329,9 @@ public class ImageProcessorOptions {
 		if (isMaize == null)
 			throw new UnsupportedOperationException("The isMaize Setting needs to be parameterized for each pipeline.");
 		return isMaize;
+	}
+	
+	public int getNirBackground() {
+		return nirBackground;
 	}
 }

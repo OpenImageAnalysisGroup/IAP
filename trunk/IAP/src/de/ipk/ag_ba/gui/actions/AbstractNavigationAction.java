@@ -31,6 +31,10 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 		this.tooltip = tooltip;
 	}
 	
+	public void setStatusProvider(BackgroundTaskStatusProviderSupportingExternalCall status) {
+		this.status = status;
+	}
+	
 	public boolean requestTitleUpdates() {
 		return false;
 	}
