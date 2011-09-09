@@ -359,7 +359,8 @@ public class ThreeDmodelGenerator {
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
 			if (status.wantsToStop())
 				break;
-			status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
+			if (xi % 100 == 0)
+				status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
 			y = -cubeSideLengthY / 2d;
 			for (int yi = 0; yi < maxVoxelPerSide; yi++) {
 				z = -cubeSideLengthZ / 2d;
