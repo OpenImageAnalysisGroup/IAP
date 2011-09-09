@@ -22,7 +22,7 @@ public class Condition implements ConditionInterface {
 	
 	public enum ConditionInfo {
 		IGNORED_FIELD("---"), SPECIES("Species"), GENOTYPE("Genotype"), VARIETY("Variety"), GROWTHCONDITIONS(
-							"Growth Condititions"), TREATMENT("Treatment"), SEQUENCE("Sequence");
+				"Growth Condititions"), TREATMENT("Treatment"), SEQUENCE("Sequence");
 		
 		private String desc;
 		
@@ -55,11 +55,11 @@ public class Condition implements ConditionInterface {
 	private ExperimentHeaderInterface header;
 	
 	private static final String[] attributeNames = new String[] { "experimentname", "database", "experimenttype",
-						"coordinator", "startdate", "importdate", "remark", "genotype", "growthconditions", "id", "name", "treatment",
-						"variety" };
+			"coordinator", "startdate", "importdate", "storagedate", "remark", "genotype", "growthconditions", "id", "name", "treatment",
+			"variety" };
 	
 	private static final String[] attributeNamesForDocument = new String[] { "genotype", "growthconditions", "id",
-						"name", "treatment", "variety" };
+			"name", "treatment", "variety" };
 	
 	public Condition(SubstanceInterface md) {
 		parent = md;
@@ -92,8 +92,8 @@ public class Condition implements ConditionInterface {
 	
 	private Object[] getAttributeValues() {
 		return new Object[] { getExperimentName(), getDatabase(), getExperimentType(), getCoordinator(),
-							getExperimentStartDate(), getExperimentImportdate(), getExperimentRemark(), getGenotype(),
-							getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety() };
+				getExperimentStartDate(), getExperimentImportDate(), getExperimentStorageDate(), getExperimentRemark(), getGenotype(),
+				getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety() };
 	}
 	
 	public void getStringOfChildren(StringBuilder r) {
@@ -140,11 +140,11 @@ public class Condition implements ConditionInterface {
 			
 			serie = species;
 			if (genotype != null && genotype.length() > 0
-								&& !genotype.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
+					&& !genotype.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
 				serie += "/" + genotype;
 			if (treatment != null && treatment.length() > 0 && !treatment.equals("null")
-								&& !treatment.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING)
-								&& !checkForSameGenoTypeAndTreatment(genotype, treatment))
+					&& !treatment.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING)
+					&& !checkForSameGenoTypeAndTreatment(genotype, treatment))
 				serie += " (" + treatment + ")";
 			
 			String res = getRowId() + ": " + serie;
@@ -213,8 +213,8 @@ public class Condition implements ConditionInterface {
 			int replicate = m.getParentSample().size();
 			Measurement reference = m;
 			MyComparableDataPoint mcdp = new MyComparableDataPoint(ismean, mean, stddev, serie, timeUnitAndTime,
-								measurementUnit, timeValueForComparison, ttestInfo == TtestInfo.REFERENCE, ttestInfo == TtestInfo.H1,
-								timeUnit, seriesID, replicate, reference);
+					measurementUnit, timeValueForComparison, ttestInfo == TtestInfo.REFERENCE, ttestInfo == TtestInfo.H1,
+					timeUnit, seriesID, replicate, reference);
 			result.add(mcdp);
 		}
 		return result;
@@ -237,8 +237,8 @@ public class Condition implements ConditionInterface {
 				int replicate = m.getReplicateID();
 				Measurement reference = m;
 				MyComparableDataPoint mcdp = new MyComparableDataPoint(ismean, mean, stddev, serie, timeUnitAndTime,
-									measurementUnit, timeValueForComparison, ttestInfo == TtestInfo.REFERENCE, ttestInfo == TtestInfo.H1,
-									timeUnit, seriesID, replicate, reference);
+						measurementUnit, timeValueForComparison, ttestInfo == TtestInfo.REFERENCE, ttestInfo == TtestInfo.H1,
+						timeUnit, seriesID, replicate, reference);
 				result.add(mcdp);
 			}
 		}
@@ -413,40 +413,43 @@ public class Condition implements ConditionInterface {
 											if (attr.getName().equals("startdate"))
 												setExperimentStartDate(AttributeHelper.getDateFromString(attr.getValue()));
 											else
-												if (attr.getName().equals("measurements"))
-													;// ignore
+												if (attr.getName().equals("storagedate"))
+													setExperimentStorageDate(AttributeHelper.getDateFromString(attr.getValue()));
 												else
-													if (attr.getName().equals("imagefiles"))
+													if (attr.getName().equals("measurements"))
 														;// ignore
 													else
-														if (attr.getName().equals("sizekb"))
+														if (attr.getName().equals("imagefiles"))
 															;// ignore
 														else
-															if (attr.getName().equals("origin"))
-																setExperimentDatabaseOriginId(attr.getValue());
+															if (attr.getName().equals("sizekb"))
+																;// ignore
 															else
-																if (attr.getName().equals("name"))
-																	setSpecies(attr.getValue());
+																if (attr.getName().equals("origin"))
+																	setExperimentDatabaseOriginId(attr.getValue());
 																else
-																	if (attr.getName().equals("genotype"))
-																		setGenotype(attr.getValue());
+																	if (attr.getName().equals("name"))
+																		setSpecies(attr.getValue());
 																	else
-																		if (attr.getName().equals("growthconditions"))
-																			setGrowthconditions(attr.getValue());
+																		if (attr.getName().equals("genotype"))
+																			setGenotype(attr.getValue());
 																		else
-																			if (attr.getName().equals("treatment"))
-																				setTreatment(attr.getValue());
+																			if (attr.getName().equals("growthconditions"))
+																				setGrowthconditions(attr.getValue());
 																			else
-																				if (attr.getName().equals("variety"))
-																					setVariety(attr.getValue());
+																				if (attr.getName().equals("treatment"))
+																					setTreatment(attr.getValue());
 																				else
-																					if (attr.getName().equals("experimenttype"))
-																						setExperimentType(attr.getValue());
+																					if (attr.getName().equals("variety"))
+																						setVariety(attr.getValue());
 																					else
-																						if (attr.getName().equals("sequence"))
-																							setSequence(attr.getValue());
+																						if (attr.getName().equals("experimenttype"))
+																							setExperimentType(attr.getValue());
 																						else
-																							System.err.println("Internal Error: Unknown Condition Attribute: " + attr.getName());
+																							if (attr.getName().equals("sequence"))
+																								setSequence(attr.getValue());
+																							else
+																								System.err.println("Internal Error: Unknown Condition Attribute: " + attr.getName());
 	}
 	
 	public void setDataOfChildElement(Element childElement) {
@@ -491,6 +494,14 @@ public class Condition implements ConditionInterface {
 	
 	public void setExperimentStartDate(Date experimentStartDate) {
 		header.setStartdate(experimentStartDate != null ? experimentStartDate : null);
+	}
+	
+	public void setExperimentStorageDate(Date experimentStorageDate) {
+		header.setStorageTime(experimentStorageDate != null ? experimentStorageDate : null);
+	}
+	
+	public Date getExperimentStorageDate() {
+		return header.getStorageTime();
 	}
 	
 	public void setSpecies(String species) {
@@ -547,7 +558,7 @@ public class Condition implements ConditionInterface {
 	
 	public void getXMLAttributeStringForDocument(StringBuilder r) {
 		Substance.getAttributeString(r, attributeNamesForDocument, new Object[] { getGenotype(), getGrowthconditions(),
-							getRowId(), getSpecies(), getTreatment(), getVariety() });
+				getRowId(), getSpecies(), getTreatment(), getVariety() });
 	}
 	
 	public void getStringForDocument(StringBuilder r) {
@@ -574,7 +585,7 @@ public class Condition implements ConditionInterface {
 		header.setImportdate(experimentimportdate);
 	}
 	
-	public Date getExperimentImportdate() {
+	public Date getExperimentImportDate() {
 		return header.getImportdate();
 	}
 	
@@ -625,7 +636,7 @@ public class Condition implements ConditionInterface {
 	/*
 	 * Delegate Methods
 	 */
-
+	
 	public boolean addAll(Collection<? extends SampleInterface> arg0) {
 		return samples.addAll(arg0);
 	}
@@ -721,7 +732,7 @@ public class Condition implements ConditionInterface {
 		String s1 = species + ";" + genotype + ";" + growthconditions + ";" + treatment + ";" + variety + ";" + rowId;
 		Condition c = (Condition) obj;
 		String s2 = c.species + ";" + c.genotype + ";" + c.growthconditions + ";" + c.treatment + ";" + c.variety + ";"
-							+ c.rowId;
+				+ c.rowId;
 		return s1.equals(s2);
 	}
 	

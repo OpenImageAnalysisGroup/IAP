@@ -140,8 +140,6 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			experiment.setHeader(experimentReference.getHeader().clone());
 			
 			experiment.getHeader().setOriginDbId(experimentReference.getHeader().getDatabaseId());
-			experiment.getHeader().setStorageTime(new Date());
-			
 			final ThreadSafeOptions written = new ThreadSafeOptions();
 			
 			this.files = determineNumberOfFilesInDataset(experiment);
@@ -560,7 +558,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		String conditionIndexFileName = tsave + "_" + eidx + "_" + ei.getHeader().getImportusername() + "_" + ei.getName() + ".iap.index.csv";
 		conditionIndexFileName = StringManipulationTools.stringReplace(conditionIndexFileName, ":", "-");
 		File conditionFile = new File(hsmManager.prepareAndGetTargetFileForConditionIndex("in_progress_"
-					+ UUID.randomUUID().toString()));
+				+ UUID.randomUUID().toString()));
 		TextFile conditionIndexFileContent = new TextFile();
 		
 		TreeMap<String, ArrayList<String>> conditionString2substance = new TreeMap<String, ArrayList<String>>();
@@ -597,7 +595,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				conditionIndexFileContent.add(experimentName + "," + conditionNumber + "," + ci.getConditionId() + "," + key + "," + conditionFields.get(key));
 			}
 			conditionIndexFileContent.add(experimentName + "," + conditionNumber + "," + ci.getConditionId() + "," + "substances" + ","
-						+ StringManipulationTools.getStringList(conditionString2substance.get(condString), ";"));
+					+ StringManipulationTools.getStringList(conditionString2substance.get(condString), ";"));
 			conditionNumber++;
 		}
 		conditionIndexFileContent.write(conditionFile);
@@ -610,7 +608,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		indexFileName = StringManipulationTools.stringReplace(indexFileName, ":", "-");
 		
 		File indexFile = new File(hsmManager.prepareAndGetTargetFileForContentIndex("in_progress_"
-					+ UUID.randomUUID().toString()));
+				+ UUID.randomUUID().toString()));
 		TextFile indexFileContent = new TextFile();
 		LinkedHashMap<String, Object> header = new LinkedHashMap<String, Object>();
 		ei.getHeader().fillAttributeMap(header, ei.getNumberOfMeasurementValues());
@@ -628,7 +626,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		TextFile tf = new TextFile();
 		tf.add(Experiment.getString(ei));
 		File f = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), null, "in_progress_"
-					+ UUID.randomUUID().toString()));
+				+ UUID.randomUUID().toString()));
 		tf.write(f); // to temp file
 		f.setExecutable(false);
 		f.setWritable(false);
@@ -651,7 +649,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			return new MainPanelComponent("Output incomplete. Error: " + errorMessage);
 		else
 			return new MainPanelComponent("The data has been exported (copied " + mb + " MB, " + files + " files added, " + knownFiles
-						+ " existing files have been skipped)." + errorMessage);
+					+ " existing files have been skipped)." + errorMessage);
 	}
 	
 	public ExperimentReference getExperimentReference() {
