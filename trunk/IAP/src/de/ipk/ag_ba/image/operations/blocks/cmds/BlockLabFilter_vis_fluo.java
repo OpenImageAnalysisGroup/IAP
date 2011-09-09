@@ -25,7 +25,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		else {
 			boolean blueStick;
 			if (options.isMaize())
-				blueStick = true;
+				blueStick = false;
 			else
 				blueStick = false;
 			return labFilter(
