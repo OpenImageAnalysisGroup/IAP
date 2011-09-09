@@ -148,7 +148,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3) {
+				if (e.getButton() == MouseEvent.BUTTON3 && primary) {
 					JPopupMenu jp = new JPopupMenu("Debug");
 					
 					JMenuItem debugPipelineTestShowMainImage = new JMenuItem("Show Image");
@@ -390,6 +390,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	}
 	
 	JLabel mmlbl;
+	private boolean primary;
 	
 	public void updateLayout(String label, MyImageIcon icon, ImageIcon previewImage) {
 		double border = 2;
@@ -978,6 +979,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			mmlbl.setOpaque(true);
 			mmlbl.setText(mmlbl.getText());
 		}
+		this.primary = true;
 	}
 	
 	public void setDownloadNeeded(boolean b) {

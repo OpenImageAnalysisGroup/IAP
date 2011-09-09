@@ -284,6 +284,9 @@ public class DataExchangeHelperForExperiments {
 					if (v != null && v instanceof String) {
 						String vs = (String) v;
 						String fileName = vs;
+						if (fileName.contains("#"))
+							fileName = fileName.split("#", 2)[1];
+						bbb.add(new BinaryFileInfo(primary.getFileNameLabel(), new IOurl(fileName), false, mt.getTargetEntity()));
 						bbb.add(new BinaryFileInfo(new IOurl(fileName), null, false, mt.getTargetEntity()));
 					}
 				}
@@ -360,8 +363,9 @@ public class DataExchangeHelperForExperiments {
 				if (mt == expTree.getSelectionPath().getLastPathComponent() &&
 									DataSetFileButton.ICON_WIDTH == tw) {
 					final AnnotationInfoPanel aip = new AnnotationInfoPanel(imageButton, mt);
-					JComponent buttonAndInfo = TableLayout.getSplitVertical(imageButton, aip, TableLayout.PREFERRED,
-							TableLayout.PREFERRED);
+					JComponent buttonAndInfo = !binaryFileInfo.isPrimary() ? imageButton :
+							TableLayout.getSplitVertical(imageButton, aip, TableLayout.PREFERRED,
+									TableLayout.PREFERRED);
 					imageButton.addMouseListener(getML(aip));
 					buttonAndInfo.addMouseListener(getML(aip));
 					filePanel.add(
