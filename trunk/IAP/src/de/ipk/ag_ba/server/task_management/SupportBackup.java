@@ -61,6 +61,8 @@ public class SupportBackup {
 				for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {
 					if (hsmExp.getOriginDbId() != null)
 						hsmIdArr.add(new IdTime(hsmExp.getOriginDbId(), hsmExp.getImportdate(), null));
+					else
+						System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN HSM!");
 				}
 			}
 			
@@ -68,32 +70,35 @@ public class SupportBackup {
 				boolean found = false;
 				for (IdTime h : hsmIdArr) {
 					if (h.equals(it)) {
-						if (it.time.after(h.time))
+						if (it.time.getTime() - h.time.getTime() > 1000) {
+							System.out.println(SystemAnalysisExt.getCurrentTime() + ">BACKUP NEEDED (NEW DATA): " + it.Id);
 							toSave.add(it);
-						
+						}
 						found = true;
 						break;
 					}
 				}
 				
 				if (!found) {
-					System.out.println("NOT FOUND: " + it.Id);
 					toSave.add(it);
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">BACKUP NEEDED (NEW EXPERIMENT): " + it.Id);
 				}
 			}
 			
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">START BACKUP OF " + toSave.size() + " EXPERIMENTS!");
-			
+			MongoDB m = MongoDB.getDefaultCloud();
 			for (IdTime it : toSave) {
 				ExperimentHeaderInterface src = it.getExperimentHeader();
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">START BACKUP OF EXPERIMENT: " + it.Id);
 				
 				ExperimentReference er = new ExperimentReference(src);
 				
-				ActionDataExportToHsmFolder copyAction = new ActionDataExportToHsmFolder(MongoDB.getDefaultCloud(), er,
+				ActionDataExportToHsmFolder copyAction = new ActionDataExportToHsmFolder(m, er,
 									hsmFolder);
 				boolean enabled = true;
 				copyAction.setStatusProvider(new BackgroundTaskConsoleLogger("", "", enabled));
 				copyAction.performActionCalculateResults(null);
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">FINISHED BACKUP OF EXPERIMENT: " + it.Id);
 			}
 			s.printTime();
 		} catch (Exception e1) {

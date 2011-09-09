@@ -140,6 +140,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			experiment.setHeader(experimentReference.getHeader().clone());
 			
 			experiment.getHeader().setOriginDbId(experimentReference.getHeader().getDatabaseId());
+			experiment.getHeader().setStorageTime(new Date());
 			
 			final ThreadSafeOptions written = new ThreadSafeOptions();
 			
@@ -156,7 +157,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			
 			ExecutorService es = Executors.newFixedThreadPool(2);
 			
-			boolean simulate = true;
+			boolean simulate = false;
 			
 			for (SubstanceInterface su : experiment) {
 				final String substanceName = su.getName();
@@ -164,7 +165,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					for (SampleInterface sa : co) {
 						for (NumericMeasurementInterface nm : sa) {
 							if (simulate) {
-								System.out.println("backup to hsm simu");
+								; // System.out.println("backup to hsm simu");
 							} else
 								idx = storeData(experiment, written, idx, hsmManager, startTime, es, substanceName, nm);
 						}
