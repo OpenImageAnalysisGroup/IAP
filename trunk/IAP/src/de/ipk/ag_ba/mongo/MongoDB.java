@@ -747,7 +747,7 @@ public class MongoDB {
 			optStatus.setCurrentStatusText1("Save Volume");
 		
 		GridFSDBFile vvv = gridfs_volumes.findOne(hash);
-		boolean removeExistingVolumeFile = false;
+		boolean removeExistingVolumeFile = true;
 		if (removeExistingVolumeFile && vvv != null) {
 			gridfs_preview.remove(vvv);
 			vvv = null;
@@ -759,13 +759,18 @@ public class MongoDB {
 			if (is != null) {
 				System.out.println("AVAIL: " + is.available());
 				System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
-				GridFSInputFile inputFile = gridfs_volumes.createFile(is, hash);
-				// inputFile.setFilename(hash);
-				// id.getURL().getFileName());
-				inputFile.save();
-				saved += inputFile.getLength();
-				System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
-				
+				boolean skipVolumeSave = true;
+				if (!skipVolumeSave) {
+					GridFSInputFile inputFile = gridfs_volumes.createFile(is, hash);
+					// inputFile.setFilename(hash);
+					// id.getURL().getFileName());
+					inputFile.save();
+					saved += inputFile.getLength();
+					
+					System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
+				} else {
+					System.out.println("SKIPPED VOLUME SAVE");
+				}
 				GridFSDBFile fff = gridfs_preview.findOne(id.getURL().getDetail());
 				boolean removeExistingPreviewFile = true;
 				if (removeExistingPreviewFile && fff != null) {
@@ -1524,8 +1529,8 @@ public class MongoDB {
 					res.setTaskProgress(progress);
 					double load = SystemAnalysisExt.getRealSystemCpuLoad();
 					res.setHostInfo(
-							
-							SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
+
+					SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 									SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
 									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
 									(load > 0 ? " load "

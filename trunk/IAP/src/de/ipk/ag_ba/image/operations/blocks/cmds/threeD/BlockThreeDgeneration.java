@@ -29,6 +29,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.ByteShortIntArray;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeColorDepth;
 
 public class BlockThreeDgeneration extends AbstractBlock {
@@ -157,13 +158,13 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			boolean create3Dskeleton = true;
 			if (create3Dskeleton) {
 				createSimpleDefaultSkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube,
-						(LoadedVolumeExtension) volume.clone(volume.getParentSample()));
+						(LoadedVolume) volume.clone(volume.getParentSample()));
 			}
 			boolean create3DadvancedProbabilitySkeleton = true;
 			if (create3DadvancedProbabilitySkeleton) {
 				int[][][] probabilityCube = mg.getByteCubeResult();
 				createAdvancedProbabilitySkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube,
-						(LoadedVolumeExtension) volume.clone(volume.getParentSample()));
+						(LoadedVolume) volume.clone(volume.getParentSample()));
 			}
 		}
 	}
@@ -172,7 +173,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	 * The "fire" burns down each solid voxel with fixed speed.
 	 */
 	private void createSimpleDefaultSkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
-			double realMarkerDistHorizontal, int[][][] cube, LoadedVolumeExtension volume) {
+			double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume) {
 		int fire = ImageOperation.BACKGROUND_COLORint;
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create simple 3D skeleton", true);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
@@ -255,7 +256,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	 * The "fire" slowly burns down the cube, based on each voxel's probability
 	 */
 	private void createAdvancedProbabilitySkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
-			double realMarkerDistHorizontal, int[][][] probabilityCube, LoadedVolumeExtension volume) {
+			double realMarkerDistHorizontal, int[][][] probabilityCube, LoadedVolume volume) {
 		int empty = 0;
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create advanced probablity 3D skeleton", true);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();

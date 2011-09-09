@@ -518,6 +518,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	
 	public static String getTempdataExperimentName(ExperimentHeaderInterface exp) {
 		String n = exp.getExperimentName();
+		if (n == null || !n.contains("§"))
+			return n;
 		try {
 			String[] nn = n.split("§");
 			if (nn[0].indexOf(".") > 0)
