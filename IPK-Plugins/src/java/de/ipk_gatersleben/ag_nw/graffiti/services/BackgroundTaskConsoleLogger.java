@@ -15,12 +15,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class BackgroundTaskConsoleLogger extends
 					BackgroundTaskStatusProviderSupportingExternalCallImpl {
 	
-	private boolean enabled;
+	private final boolean enabled;
 	
 	public BackgroundTaskConsoleLogger(String status1, String status2, boolean enabled) {
 		super(status1, status2);
 		this.enabled = enabled;
-		if (enabled)
+		if (enabled && status1 != null && status1.length() > 0)
 			System.out.println("Task Started: " + status1 + " // " + status2);
 	}
 	
