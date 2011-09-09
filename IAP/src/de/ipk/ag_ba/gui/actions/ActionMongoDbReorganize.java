@@ -17,11 +17,11 @@ import de.ipk.ag_ba.mongo.MongoDB;
 /**
  * @author klukas
  */
-public class MongoDBreorganizeAction extends AbstractNavigationAction implements NavigationAction {
+public class ActionMongoDbReorganize extends AbstractNavigationAction implements NavigationAction {
 	
 	private final MongoDB m;
 	
-	public MongoDBreorganizeAction(MongoDB m) {
+	public ActionMongoDbReorganize(MongoDB m) {
 		super("Delete stale binary files");
 		this.m = m;
 	}

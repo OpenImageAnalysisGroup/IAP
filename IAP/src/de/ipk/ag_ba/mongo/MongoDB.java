@@ -1064,6 +1064,8 @@ public class MongoDB {
 		try {
 			InputStream iis = volume.getURL().getInputStream();
 			hash = GravistoService.getHashFromInputStream(iis, optFileSize, getHashType());
+			if (hash == null)
+				return DatabaseStorageResult.IO_ERROR_INPUT_NOT_AVAILABLE;
 			volume.getURL().setDetail(hash);
 			
 			GridFSDBFile fff = gridfs_volumes.findOne(hash);

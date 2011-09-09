@@ -20,9 +20,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 
-public class SupportBackup {
+public class BackupSupport {
 	
-	public SupportBackup() {
+	public BackupSupport() {
 		new MultimodalDataHandlingAddon();
 		
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
@@ -34,7 +34,7 @@ public class SupportBackup {
 	
 	public void makeBackup() {
 		try {
-			System.out.println(":back - perform backup now");
+			System.out.println(":back - perform backup - now");
 			
 			StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">INFO: LemnaTec to HSM Backup", false);
 			
@@ -44,7 +44,6 @@ public class SupportBackup {
 			ArrayList<IdTime> toSave = new ArrayList<IdTime>();
 			
 			for (String db : lt.getDatabases()) {
-				System.out.println("db" + db);
 				for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
 					ltIdArr.add(new IdTime(ltExp.getDatabaseId(), ltExp.getImportdate(), ltExp));
 				}
@@ -94,7 +93,7 @@ public class SupportBackup {
 				ExperimentReference er = new ExperimentReference(src);
 				
 				ActionDataExportToHsmFolder copyAction = new ActionDataExportToHsmFolder(m, er,
-									hsmFolder);
+						hsmFolder);
 				boolean enabled = true;
 				copyAction.setStatusProvider(new BackgroundTaskConsoleLogger("", "", enabled));
 				copyAction.performActionCalculateResults(null);

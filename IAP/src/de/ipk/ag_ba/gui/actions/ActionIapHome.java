@@ -41,7 +41,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		ArrayList<NavigationButton> homeActions = new ArrayList<NavigationButton>();
 		
 		homePrimaryActions = new ArrayList<NavigationButton>();
-		for (NavigationButton ne : new Phenotyping(guiSetting).getResultNewActionSet()) {
+		for (NavigationButton ne : new ActionAccessDataProcessing(guiSetting).getResultNewActionSet()) {
 			homePrimaryActions.add(ne);
 		}
 		

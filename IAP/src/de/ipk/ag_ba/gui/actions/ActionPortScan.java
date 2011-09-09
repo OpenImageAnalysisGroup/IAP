@@ -16,13 +16,13 @@ import de.ipk.ag_ba.mongo.IAPservice;
 /**
  * @author klukas
  */
-public class PortScanAction extends AbstractNavigationAction {
+public class ActionPortScan extends AbstractNavigationAction {
 	
 	private final String hostname;
 	private ArrayList<String> scanResult;
 	private final String image;
 	
-	public PortScanAction(String hostname, String image) {
+	public ActionPortScan(String hostname, String image) {
 		super("Port-Scan");
 		this.hostname = hostname;
 		this.image = image;

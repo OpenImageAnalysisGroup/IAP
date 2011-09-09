@@ -158,35 +158,35 @@ public class Other {
 				String pcOff = IAPimages.getNetworkPCoffline();
 				
 				boolean rLocal = IAPservice.isReachable("localhost");
-				resultNavigationButtons.add(new NavigationButton(new PortScanAction("localhost",
+				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("localhost",
 									simpleIcons ? "img/ext/computer.png" : "img/ext/computer.png"), src
 									.getGUIsetting()));
 				if (!rLocal)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA13 = IAPservice.isReachable("ba-13.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new PortScanAction("BA-13",
+				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-13",
 									simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
 									.getGUIsetting()));
 				if (!rBA13)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA24 = IAPservice.isReachable("ba-24.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new PortScanAction("BA-24",
+				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-24",
 									simpleIcons ? (rBA24 ? pc : pcOff) : "img/ext/macPro.png"), src
 									.getGUIsetting()));
 				if (!rBA24)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rLemnaDB = IAPservice.isReachable("lemna-db.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new PortScanAction("lemna-db",
+				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("lemna-db",
 						simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
 									.getGUIsetting()));
 				if (!rLemnaDB)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new PortScanAction("BA-03",
+				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-03",
 									simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src
 									.getGUIsetting()));
 				if (!rBA03)

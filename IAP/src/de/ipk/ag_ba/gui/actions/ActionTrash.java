@@ -18,7 +18,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class Trash extends AbstractNavigationAction {
+public class ActionTrash extends AbstractNavigationAction {
 	
 	private final MongoDB m;
 	private String experimentName;
@@ -26,20 +26,20 @@ public class Trash extends AbstractNavigationAction {
 	private String message = "";
 	private DeletionCommand cmd;
 	
-	public Trash(MongoDB m, String experimentName) {
+	public ActionTrash(MongoDB m, String experimentName) {
 		super("Mark experiment as deleted");
 		this.m = m;
 		this.experimentName = experimentName;
 	}
 	
-	public Trash(ExperimentHeaderInterface header, DeletionCommand cmd, MongoDB m) {
+	public ActionTrash(ExperimentHeaderInterface header, DeletionCommand cmd, MongoDB m) {
 		super("Perform '" + cmd + "'-operation");
 		this.m = m;
 		this.setHeader(header);
 		this.cmd = cmd;
 	}
 	
-	public Trash(Collection<ExperimentHeaderInterface> headers, DeletionCommand cmd, MongoDB m) {
+	public ActionTrash(Collection<ExperimentHeaderInterface> headers, DeletionCommand cmd, MongoDB m) {
 		super("Perform '" + cmd + "'-operation");
 		this.m = m;
 		this.setHeader(headers);
@@ -142,7 +142,7 @@ public class Trash extends AbstractNavigationAction {
 	
 	public static NavigationButton getTrashEntity(final MongoDB m, final String experimentName,
 						GUIsetting guiSetting) {
-		NavigationAction trashAction = new Trash(m, experimentName);
+		NavigationAction trashAction = new ActionTrash(m, experimentName);
 		NavigationButton trash = new NavigationButton(trashAction, "Delete", "img/ext/edit-delete.png", guiSetting);
 		trash.setRightAligned(true);
 		return trash;
@@ -150,7 +150,7 @@ public class Trash extends AbstractNavigationAction {
 	
 	public static NavigationButton getTrashEntity(ExperimentHeaderInterface header, DeletionCommand cmd,
 						GUIsetting guiSetting, MongoDB m) {
-		NavigationAction trashAction = new Trash(header, cmd, m);
+		NavigationAction trashAction = new ActionTrash(header, cmd, m);
 		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guiSetting);
 		trash.setRightAligned(cmd != DeletionCommand.UNTRASH);
 		return trash;
@@ -158,7 +158,7 @@ public class Trash extends AbstractNavigationAction {
 	
 	public static NavigationButton getTrashEntity(ArrayList<ExperimentHeaderInterface> trashed, DeletionCommand cmd,
 						GUIsetting guiSetting, MongoDB m) {
-		NavigationAction trashAction = new Trash(trashed, cmd, m);
+		NavigationAction trashAction = new ActionTrash(trashed, cmd, m);
 		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guiSetting);
 		trash.setRightAligned(true);
 		return trash;

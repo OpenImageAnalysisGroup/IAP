@@ -75,7 +75,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				if (!SystemAnalysis.isHeadless())
 					res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
 				if (!SystemAnalysis.isHeadless())
-					res.add(new NavigationButton(new MongoDBreorganizeAction(m), src.getGUIsetting()));
+					res.add(new NavigationButton(new ActionMongoDbReorganize(m), src.getGUIsetting()));
 				
 				NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
 				
@@ -183,7 +183,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
-				actions.add(Trash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
+				actions.add(ActionTrash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
 						src.getGUIsetting(), m));
 				for (ExperimentHeaderInterface exp : trashed)
 					actions.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
@@ -290,7 +290,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				if (tempResults.size() > 0)
 					res.add(new NavigationButton(createSubFolderActionForTemporaryResults(tempResults), src.getGUIsetting()));
 				NavigationButton tb = new NavigationButton(
-						new Trash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
+						new ActionTrash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
 						src.getGUIsetting());
 				tb.setRightAligned(true);
 				res.add(tb);
@@ -355,7 +355,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 					res.add(new NavigationButton(createSubFolderActionForTemporaryResults2(folderName, time2expList.get(time)), src.getGUIsetting()));
 				}
 				NavigationButton tb = new NavigationButton(
-						new Trash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
+						new ActionTrash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
 						src.getGUIsetting());
 				tb.setRightAligned(true);
 				res.add(tb);
@@ -401,11 +401,10 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (ExperimentHeaderInterface exp : experiments) {
-					String n = getTempdataExperimentName(exp);
-					res.add(getMongoExperimentButton(n, exp, src.getGUIsetting(), m));
+					res.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
 				}
 				NavigationButton tb = new NavigationButton(
-						new Trash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
+						new ActionTrash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
 						src.getGUIsetting());
 				tb.setRightAligned(true);
 				res.add(tb);
@@ -444,9 +443,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	}
 	
 	public static NavigationButton getMongoExperimentButton(ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
-		NavigationAction action = new ActionMongoOrLemnaTecExperimentNavigation(ei, m);
-		NavigationButton exp = new NavigationButton(action, guiSetting);
-		return exp;
+		return getMongoExperimentButton(
+				ActionMongoExperimentsNavigation.getTempdataExperimentName(ei), ei, guiSetting, m);
 	}
 	
 	public static NavigationButton getMongoExperimentButton(final String displayName, ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
