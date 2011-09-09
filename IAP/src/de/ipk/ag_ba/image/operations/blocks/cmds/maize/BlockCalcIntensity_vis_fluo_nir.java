@@ -70,12 +70,6 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 				rt.addValue("ndvi", ndvi);
 			}
 			
-			if (getProperties().getImage("nir_skeleton") != null) {
-				double nirSkeletonIntensitySum = getProperties().getImage("nir_skeleton").getIO().intensitySumOfChannel(false, true, false, false);
-				double avgNirSkel = 1 - nirSkeletonIntensitySum / nirSkeletonFilledPixels;
-				rt.addValue("nir.skeleton.intensity.average", avgNirSkel);
-			}
-			
 			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".", rt, getBlockPosition());
 			return getInput().getMasks().getVis();
 		} else
@@ -97,9 +91,21 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
+		
+		if (getProperties().getImage("nir_skeleton") != null) {
+			double nirSkeletonIntensitySum = getProperties().getImage("nir_skeleton").getIO().intensitySumOfChannel(false, true, false, false);
+			double avgNirSkel = 1 - nirSkeletonIntensitySum / nirSkeletonFilledPixels;
+			getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.skeleton.intensity.average", avgNirSkel);
+		}
+		
 		if (getInput().getMasks().getNir() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getNir());
 			if (getInput().getMasks().getNir().getHeight() > 1) {
+				
+				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannel(false, true, false, false);
+				double avgNir = 1 - nirIntensitySum / nirFilledPixels;
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + "nir.intensity.average", avgNir);
+				
 				int[] nirImg = getInput().getMasks().getNir().getAs1A();
 				int filled = 0;
 				double fSum = 0;

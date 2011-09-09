@@ -16,7 +16,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
 
 public class HsmMainDataSourceLevel implements DataSourceLevel {
 	
-	private final HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data;
+	final HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data;
 	private String description;
 	private int n = 0;
 	

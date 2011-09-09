@@ -139,6 +139,8 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			
 			experiment.setHeader(experimentReference.getHeader().clone());
 			
+			experiment.getHeader().setOriginDbId(experimentReference.getHeader().getDatabaseId());
+			
 			final ThreadSafeOptions written = new ThreadSafeOptions();
 			
 			this.files = determineNumberOfFilesInDataset(experiment);
@@ -154,12 +156,17 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			
 			ExecutorService es = Executors.newFixedThreadPool(2);
 			
+			boolean simulate = true;
+			
 			for (SubstanceInterface su : experiment) {
 				final String substanceName = su.getName();
 				for (ConditionInterface co : su)
 					for (SampleInterface sa : co) {
 						for (NumericMeasurementInterface nm : sa) {
-							idx = storeData(experiment, written, idx, hsmManager, startTime, es, substanceName, nm);
+							if (simulate) {
+								System.out.println("backup to hsm simu");
+							} else
+								idx = storeData(experiment, written, idx, hsmManager, startTime, es, substanceName, nm);
 						}
 					}
 			}

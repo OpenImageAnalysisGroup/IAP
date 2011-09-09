@@ -5,6 +5,7 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -87,6 +88,9 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 			return inputToCut;
 		
 		double scaleFactor = inputToCut.getWidth() / (double) imageSource.getWidth();
+		
+		if (inputToCut.getType() == FlexibleImageType.NIR)
+			background = options.getNirBackground();
 		
 		int bl = background; // Color.RED.getRGB();
 		int br = background; // Color.YELLOW.getRGB();

@@ -200,11 +200,11 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		if (map.get("imagefiles") != null && map.get("imagefiles") instanceof String)
 			setNumberOfFiles(Integer.parseInt(((String) map.get("imagefiles"))));
 		else
-			setNumberOfFiles((Integer) map.get("imagefiles"));
+			setNumberOfFiles(map.get("imagefiles") != null ? (Integer) map.get("imagefiles") : 0);
 		if (map.get("sizekb") != null && map.get("sizekb") instanceof String)
 			setSizekb(Integer.parseInt(((String) map.get("sizekb"))));
 		else
-			setSizekb(((Long) map.get("sizekb")));
+			setSizekb(map.get("sizekb") != null ? ((Long) map.get("sizekb")) : 0);
 		if (map.get("origin") != null && map.get("origin") instanceof String)
 			setOriginDbId((String) map.get("origin"));
 	}

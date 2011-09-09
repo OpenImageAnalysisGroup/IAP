@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -19,29 +21,33 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (getInput().getImages().getNir() != null && getInput().getMasks().getNir() != null) {
 				FlexibleImage nirMask = getInput().getMasks().getNir();
-				FlexibleImage nirCopy = getInput().getImages().getNir().copy();
 				// compare images
-				boolean debug = false;
+				boolean debug = true;
 				int blackDiff = options.getIntSetting(Setting.B_Diff_NIR);
 				int whiteDiff = options.getIntSetting(Setting.W_Diff_NIR);
 				// getInput().getImages().getNir().getIO().subtractGrayImages(nirMask).print("subimg");
-				nirMask = new ImageOperation(getInput().getImages().getNir()).print("img", debug).compare()
+				if (options.isMaize())
+					nirMask = new ImageOperation(getInput().getImages().getNir()).print("img", debug).compare()
 							.compareGrayImages(nirMask.print("ref", debug),
 									// 20, 12,
 									blackDiff, whiteDiff,
 									// 250, 12,
 									// 40, 40,
-									options.getBackground()).thresholdBlueHigherThan(180).print("result", false).getImage(); // 150
-				
+									new Color(180, 180, 180).getRGB()).print("result", debug).getImage(); // 150
+				else
+					nirMask = getInput().getImages().getNir();
+				if (options.isMaize())
+					nirMask = nirMask.getIO().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground(), 0.14).getImage().print("new thresh", debug);
+				else
+					nirMask = nirMask.getIO().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground(), 0.05).getImage().print("new thresh", debug);
 				getInput().getMasks().setNir(nirMask);
-				// nirMask.print("old compare");
-				nirCopy.getIO().crop().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground())
-						.adaptiveThresholdForGrayscaleImage(10, 255, options.getBackground()).getImage().print("new thresh", debug);
-				
-				FlexibleImage sk = nirMask.getIO().skeletonize().getImage();
-				if (sk != null) {
-					FlexibleImage skelMap = MapOriginalOnSkel(sk, nirMask, options.getBackground()).print("mapped", debug);
-					getProperties().setImage("nir_skeleton", sk);
+				boolean useNirSkeleton = false;
+				if (useNirSkeleton) {
+					FlexibleImage sk = nirMask.getIO().skeletonize().getImage();
+					if (sk != null) {
+						FlexibleImage skelMap = MapOriginalOnSkel(sk, nirMask, options.getBackground()).print("mapped", debug);
+						getProperties().setImage("nir_skeleton", sk);
+					}
 				}
 			}
 		}
