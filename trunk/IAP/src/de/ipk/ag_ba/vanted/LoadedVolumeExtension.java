@@ -153,9 +153,9 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		if (volume2 == null)
 			volume2 = new int[getDimensionX()][getDimensionY()][getDimensionZ()];
 		
-		System.out.println("Angle: " + (int) rotation + " degree");
+		// System.out.println("Angle: " + (int) rotation + " degree");
 		double angle = rotation / 180d * Math.PI;
-		System.out.println("Angle: " + angle);
+		// System.out.println("Angle: " + angle);
 		double cos = Math.cos(angle);
 		double sin = Math.sin(angle);
 		
