@@ -210,7 +210,6 @@ public class MongoDB {
 			public void run() {
 				try {
 					storeExperiment(experiment, db, status);
-					updateExperimentSize(db, experiment, status);
 				} catch (Exception e) {
 					err.setParam(0, e);
 				}
@@ -619,8 +618,11 @@ public class MongoDB {
 				eh.setDatabaseId(id);
 			}
 		}
-		System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
-				+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
+		
+		updateExperimentSize(db, experiment, status);
+		
+		// System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+		// + " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 		
 		if (errorCount > 0) {
 			MainFrame.showMessageDialog(
