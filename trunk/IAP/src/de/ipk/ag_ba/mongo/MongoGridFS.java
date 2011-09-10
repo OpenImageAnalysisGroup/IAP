@@ -2,6 +2,9 @@ package de.ipk.ag_ba.mongo;
 
 import java.util.ArrayList;
 
+import com.mongodb.DB;
+import com.mongodb.gridfs.GridFS;
+
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.networks.NetworkData;
@@ -64,6 +67,13 @@ public enum MongoGridFS {
 					res.add(FS_NETWORK_LABELS.toString());
 				} else
 					res.addAll(getFileCollections());
+		return res;
+	}
+	
+	public static ArrayList<GridFS> getGridFsFileCollectionsFor(DB db, NumericMeasurementInterface nmd) {
+		ArrayList<GridFS> res = new ArrayList<GridFS>();
+		for (String s : getFileCollectionsFor(nmd))
+			res.add(new GridFS(db, s));
 		return res;
 	}
 	

@@ -199,13 +199,15 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		} else
 			setStartdate((Date) map.get("startdate"));
 		if (map.get("storagetime") != null && map.get("storagetime") instanceof String) {
-			try {
-				DateFormat format = new SimpleDateFormat("E MMM d HH:mm:ss z yyyy", new Locale("en"));
-				Date aDate = format.parse((String) map.get("storagetime"));
-				setStorageTime(aDate);
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-				System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("storagetime"));
+			if (!((String) map.get("storagetime")).equals("null")) {
+				try {
+					DateFormat format = new SimpleDateFormat("E MMM d HH:mm:ss z yyyy", new Locale("en"));
+					Date aDate = format.parse((String) map.get("storagetime"));
+					setStorageTime(aDate);
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+					System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("storagetime"));
+				}
 			}
 		} else
 			setStorageTime((Date) map.get("storagetime"));
