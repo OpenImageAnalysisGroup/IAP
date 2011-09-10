@@ -136,10 +136,10 @@ public class ThreeDmodelGenerator {
 					palette = pictures.iterator().next().getColorPalette(maxIndexedColorCount, status);
 				}
 				status.setCurrentStatusText1("Normalize Cube...");
-				status.setCurrentStatusText2("");
+				// status.setCurrentStatusText2("");
 				generateNormalizedByteCube(colorMode);
 				status.setCurrentStatusText1("Colorize Cube...");
-				status.setCurrentStatusText2("");
+				// status.setCurrentStatusText2("");
 				colorModelRGB(pictures, palette, status, colorMode == GenerationMode.COLORED_RGBA, runColor);
 				
 				runColor.shutdown();
@@ -152,7 +152,7 @@ public class ThreeDmodelGenerator {
 			}
 		
 		status.setCurrentStatusText1("Cube Construction Finished");
-		status.setCurrentStatusText2("");
+		// status.setCurrentStatusText2("");
 		
 		if (!status.wantsToStop())
 			status.setCurrentStatusValueFine(100d);
@@ -186,8 +186,8 @@ public class ThreeDmodelGenerator {
 				}
 				
 				tso.addInt(1);
-				System.out.println("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
-									+ tsoRunCount.getInt() + " active)");
+				// System.out.println("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
+				// + tsoRunCount.getInt() + " active)");
 				status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
 									+ tsoRunCount.getInt() + " active)");
 				tsoRunCount.addInt(-1);
@@ -204,8 +204,8 @@ public class ThreeDmodelGenerator {
 				cutModel2(fp, transparentVoxels, status, 100d * 1 / pictures.size());
 				
 				tso.addInt(1);
-				status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
-									+ tsoRunCount.getInt() + " active)");
+				// status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
+				// + tsoRunCount.getInt() + " active)");
 				tsoRunCount.addInt(-1);
 			}
 		};
@@ -359,8 +359,8 @@ public class ThreeDmodelGenerator {
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
 			if (status.wantsToStop())
 				break;
-			if (xi % 100 == 0)
-				status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
+			// if (xi % 100 == 0)
+			// status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
 			y = -cubeSideLengthY / 2d;
 			for (int yi = 0; yi < maxVoxelPerSide; yi++) {
 				z = -cubeSideLengthZ / 2d;
@@ -390,14 +390,14 @@ public class ThreeDmodelGenerator {
 		double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
 		double voxelSizeZ = cubeSideLengthZ / maxVoxelPerSide;
 		x = -cubeSideLengthX / 2d;
-		long vcnt = (maxVoxelPerSide * maxVoxelPerSide * maxVoxelPerSide);
+		// long vcnt = (maxVoxelPerSide * maxVoxelPerSide * maxVoxelPerSide);
 		double smallProgressStep = progressStep / maxVoxelPerSide;
 		boolean isTopViewPicture = p.getIsTop();
-		System.out.println("CUTTT 2... (angle: " + angle + ")");
+		// System.out.println("CUTTT 2... (angle: " + angle + ")");
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
 			if (status.wantsToStop())
 				break;
-			status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
+			// status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
 			y = -cubeSideLengthY / 2d;
 			for (int yi = 0; yi < maxVoxelPerSide; yi++) {
 				z = -cubeSideLengthZ / 2d;

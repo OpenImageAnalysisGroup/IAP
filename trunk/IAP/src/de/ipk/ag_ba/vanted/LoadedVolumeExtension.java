@@ -271,7 +271,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		}
 		
 		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
-		// GravistoService.showImage(images.get(0), "Image");
+		GravistoService.showImage(images.get(0), "Image");
 		WriteAnimatedGif.saveAnimate(out, images.toArray(new BufferedImage[] {}), delayTimes.toArray(new String[] {}));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValueFine(100);

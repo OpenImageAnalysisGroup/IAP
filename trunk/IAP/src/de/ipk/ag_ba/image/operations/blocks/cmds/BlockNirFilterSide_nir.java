@@ -22,7 +22,7 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 			if (getInput().getImages().getNir() != null && getInput().getMasks().getNir() != null) {
 				FlexibleImage nirMask = getInput().getMasks().getNir();
 				// compare images
-				boolean debug = true;
+				boolean debug = false;
 				int blackDiff = options.getIntSetting(Setting.B_Diff_NIR);
 				int whiteDiff = options.getIntSetting(Setting.W_Diff_NIR);
 				// getInput().getImages().getNir().getIO().subtractGrayImages(nirMask).print("subimg");
@@ -45,7 +45,9 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 				if (useNirSkeleton) {
 					FlexibleImage sk = nirMask.getIO().skeletonize().getImage();
 					if (sk != null) {
-						FlexibleImage skelMap = MapOriginalOnSkel(sk, nirMask, options.getBackground()).print("mapped", debug);
+						if (debug) {
+							FlexibleImage skelMap = MapOriginalOnSkel(sk, nirMask, options.getBackground()).print("mapped", debug);
+						}
 						getProperties().setImage("nir_skeleton", sk);
 					}
 				}

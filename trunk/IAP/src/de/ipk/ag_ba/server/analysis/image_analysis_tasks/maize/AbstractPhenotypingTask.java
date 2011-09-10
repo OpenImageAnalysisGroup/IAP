@@ -475,11 +475,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				analysisResults.setVolume(volumeID, null);
 				
 				try {
+					StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE VOLUME");
 					databaseTarget.saveVolume((LoadedVolume) v, inSample, m, DBTable.SAMPLE, null, null);
 					VolumeData volumeInDatabase = new VolumeData(inSample, v);
 					volumeInDatabase.getURL().setPrefix(databaseTarget.getPrefix());
 					volumeInDatabase.getURL().setDetail(v.getURL().getDetail());
 					output.add(volumeInDatabase);
+					s.printTime();
 				} catch (Exception e) {
 					System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: Could not save volume data: " + e.getMessage());
 					e.printStackTrace();
@@ -508,7 +510,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			FlexibleImageStack debugImageStack,
 			FlexibleImage resVis, FlexibleImage resFluo, FlexibleImage resNir,
 			int parentPriority) throws InterruptedException {
-		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE IMAGE RESULTS", false);
+		// StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE IMAGE RESULTS", false);
 		if (forceDebugStack) {
 			forcedDebugStacks.add(debugImageStack);
 		} else {
@@ -521,13 +523,17 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				buf = mos.getBuff();
 				System.out.println("f]");
 			} else {
-				inVis.addAnnotationField("oldreference", inVis.getLabelURL().toString());
-				inFluo.addAnnotationField("oldreference", inFluo.getLabelURL().toString());
-				inNir.addAnnotationField("oldreference", inNir.getLabelURL().toString());
+				if (inVis != null && inVis.getLabelURL() != null)
+					inVis.addAnnotationField("oldreference", inVis.getLabelURL().toString());
+				if (inFluo != null && inFluo.getLabelURL() != null)
+					inFluo.addAnnotationField("oldreference", inFluo.getLabelURL().toString());
+				if (inNir != null && inNir.getLabelURL() != null)
+					inNir.addAnnotationField("oldreference", inNir.getLabelURL().toString());
 				
 				inVis.setLabelURL(id.getVIS().getURL().copy());
 				inFluo.setLabelURL(id.getFLUO().getURL().copy());
-				inNir.setLabelURL(id.getNIR().getURL().copy());
+				if (inNir != null && id != null && id.getNIR() != null && id.getNIR().getURL() != null)
+					inNir.setLabelURL(id.getNIR().getURL().copy());
 			}
 			MyThread a = null, b = null, c = null, ra = null, rb = null, rc = null;
 			
@@ -543,7 +549,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5);
 			BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 		}
-		s.printTime();
+		// s.printTime();
 	}
 	
 	private BlockProperties processAngleWithinSnapshot(ImageSet id, final int maximumThreadCountOnImageLevel,

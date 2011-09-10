@@ -173,16 +173,19 @@ public class BackgroundThreadDispatcher {
 		if (free < max * 0.1d) {
 			if (System.currentTimeMillis() - lastPrint > 1000) {
 				lastPrint = System.currentTimeMillis();
-				System.out.println("high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024) + " MB");
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
+						+ " MB");
 			}
 			if (System.currentTimeMillis() - lastGC > 1000 * 30) {
 				lastGC = System.currentTimeMillis();
-				System.out.println("high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024) + " MB --- GARBAGE COLLECTION");
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
+						+ " MB --- GARBAGE COLLECTION");
 				System.gc();
 				used = r.totalMemory() - r.freeMemory();
 				max = r.maxMemory();
 				free = max - used;
-				System.out.println("new memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024) + " MB");
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">new memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
+						+ " MB");
 			}
 			return true;
 		} else
