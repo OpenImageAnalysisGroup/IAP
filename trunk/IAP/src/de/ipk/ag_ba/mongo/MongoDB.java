@@ -210,6 +210,7 @@ public class MongoDB {
 			public void run() {
 				try {
 					storeExperiment(experiment, db, status);
+					updateExperimentSize(db, experiment, status);
 				} catch (Exception e) {
 					err.setParam(0, e);
 				}
@@ -1531,8 +1532,8 @@ public class MongoDB {
 					res.setTaskProgress(progress);
 					double load = SystemAnalysisExt.getRealSystemCpuLoad();
 					res.setHostInfo(
-
-					SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
+							
+							SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 									SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
 									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
 									(load > 0 ? " load "
