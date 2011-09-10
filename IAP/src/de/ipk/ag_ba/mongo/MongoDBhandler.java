@@ -7,6 +7,7 @@
 package de.ipk.ag_ba.mongo;
 
 import java.io.InputStream;
+import java.util.HashMap;
 
 import org.ObjectRef;
 import org.graffiti.editor.GravistoService;
@@ -24,6 +25,8 @@ import com.mongodb.gridfs.GridFSDBFile;
 public class MongoDBhandler extends AbstractResourceIOHandler {
 	private final String prefix;
 	private final MongoDB m;
+	
+	private final HashMap<String, GridFS> cachedCollection = new HashMap<String, GridFS>();
 	
 	public MongoDBhandler(String ip, MongoDB m) {
 		this.m = m;
@@ -105,7 +108,12 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 					collectionChunks.ensureIndex("files_id");
 				}
 				for (String fs : MongoGridFS.getPreviewFileCollections()) {
-					GridFS gridfs = new GridFS(db, fs);
+					GridFS gridfs;
+					synchronized (cachedCollection) {
+						if (!cachedCollection.containsKey(fs))
+							cachedCollection.put(fs, new GridFS(db, fs));
+						gridfs = cachedCollection.get(fs);
+					}
 					GridFSDBFile fff = gridfs.findOne(url.getDetail());
 					if (fff != null) {
 						try {

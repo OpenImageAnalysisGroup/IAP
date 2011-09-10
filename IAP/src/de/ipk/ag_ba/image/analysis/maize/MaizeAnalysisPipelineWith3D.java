@@ -13,7 +13,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.threeD.BlockThreeDgeneration;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -53,10 +52,10 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 				}
 			}
 			if (rotationAngles.size() > 3) {
-				System.out.print(SystemAnalysisExt.getCurrentTime() + ">INFO: START 3D-PROCESSING OF A SAMPLE WITH " + rotationAngles.size()
-						+ " RELATED SIDE ANGLE IMAGES...");
+				// System.out.print(SystemAnalysisExt.getCurrentTime() + ">INFO: START 3D-PROCESSING OF A SAMPLE WITH " + rotationAngles.size()
+				// + " RELATED SIDE ANGLE IMAGES...");
 				FlexibleMaskAndImageSet res = super.pipeline(options, input, optInputMasks, maxThreadsPerImage, debugStack);
-				System.out.println("OK");
+				// System.out.println("OK");
 				return res;
 			}
 		}
