@@ -1398,22 +1398,32 @@ public class MongoDB {
 				ObjectRef newSize = new ObjectRef();
 				newSize.addLong(0);
 				if (optStatusProvider != null) {
-					optStatusProvider.setCurrentStatusValue(0);
+					optStatusProvider.setCurrentStatusValueFine(0);
 					optStatusProvider.setCurrentStatusText1("Update Experiment Size Info");
 				}
-				double n = 0;
 				List<NumericMeasurementInterface> abc = Substance3D.getAllFiles(experiment);
-				double max = abc.size();
+				double max = 0;
+				int n = 0;
+				HashMap<Class, ArrayList<GridFS>> cachedFS = new HashMap<Class, ArrayList<GridFS>>();
 				for (NumericMeasurementInterface nmd : abc) {
-					if (optStatusProvider != null)
-						optStatusProvider.setCurrentStatusValueFineAdd(100d / max * n);
-					n += 1;
 					if (nmd instanceof BinaryMeasurement) {
+						max++;
+					}
+				}
+				for (NumericMeasurementInterface nmd : abc) {
+					if (nmd instanceof BinaryMeasurement) {
+						n++;
+						if (optStatusProvider != null) {
+							optStatusProvider.setCurrentStatusValueFine(100d * n / max);
+							optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
+						}
 						IOurl url = ((BinaryMeasurement) nmd).getURL();
 						if (url != null) {
 							String hash = url.getDetail();
-							for (String s : MongoGridFS.getFileCollectionsFor(nmd)) {
-								GridFS gridfs = new GridFS(db, s);
+							if (!cachedFS.containsKey(nmd.getClass()))
+								cachedFS.put(nmd.getClass(), MongoGridFS.getGridFsFileCollectionsFor(db, nmd));
+							ArrayList<GridFS> col = cachedFS.get(nmd.getClass());
+							for (GridFS gridfs : col) {
 								GridFSDBFile file = gridfs.findOne(hash);
 								if (file != null) {
 									newSize.addLong(file.getLength());
@@ -1857,7 +1867,6 @@ public class MongoDB {
 		db.getCollection("conditions").ensureIndex("_id");
 		BasicDBList l = (BasicDBList) substance.get("condition_ids");
 		if (l != null) {
-			double n = 0;
 			double max = l.size();
 			for (Object o : l) {
 				DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
@@ -1868,8 +1877,7 @@ public class MongoDB {
 					processCondition(s3d, cond);
 				}
 				if (optStatusProvider != null)
-					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * n / max);
-				n += 1;
+					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
 			}
 		}
 	}
