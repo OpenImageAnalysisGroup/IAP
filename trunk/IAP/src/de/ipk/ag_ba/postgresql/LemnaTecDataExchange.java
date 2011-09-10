@@ -166,7 +166,7 @@ public class LemnaTecDataExchange {
 					Timestamp max = rs.getTimestamp(2);
 					if (min == null || max == null)
 						System.out.println("Warning: No snapshot times stored for experiment " + ehi.getExperimentName()
-										+ " in database " + ehi.getDatabase() + "!");
+								+ " in database " + ehi.getDatabase() + "!");
 					if (min != null)
 						ehi.setStartdate(new Date(min.getTime()));
 					else
@@ -263,7 +263,7 @@ public class LemnaTecDataExchange {
 			login2niceName.put("LTAdmin", "LTAdmin (LemnaTec)");
 			login2niceName.put("LemnaTec Support", "LemnaTec Support (LemnaTec)");
 			login2niceName.put("entzian", "Entzian, Alexander (BA)");
-			login2niceName.put("neumannk", "Neumann, Kerstin (GD)");
+			login2niceName.put("neumannk", "Neumann, Kerstin (GED)");
 			login2niceName.put("hartmann", "Hartmann, Anja (PBI)");
 			login2niceName.put("mary", "Ziems, Mary (GD");
 			login2niceName.put("Ziems", "Ziems, Mary (GD");
@@ -310,7 +310,7 @@ public class LemnaTecDataExchange {
 			id2coo = new HashMap<String, String>();
 			id2coo.put("AC", "Arana, Fernando (HET)");
 			id2coo.put("MM", "Muraya, Moses Mahugu (HET)");
-			id2coo.put("KN", "Neumann, Kerstin (GD)");
+			id2coo.put("KN", "Neumann, Kerstin (GED)");
 			id2coo.put("BA", "Klukas, Christian (BA)");
 		}
 		return id2coo.get(kuerzel);
@@ -335,13 +335,13 @@ public class LemnaTecDataExchange {
 	}
 	
 	public Collection<Snapshot> getSnapshotsOfExperiment(String database, String experiment) throws SQLException,
-						ClassNotFoundException {
+			ClassNotFoundException {
 		Collection<Snapshot> result = new ArrayList<Snapshot>();
 		Connection connection = openConnectionToDatabase(database);
 		try {
 			HashMap<Long, String> id2path = new HashMap<Long, String>();
 			String sqlReadImageFileTable = "SELECT "
-							+ "image_file_table.id as image_file_tableID, path FROM image_file_table";
+					+ "image_file_table.id as image_file_tableID, path FROM image_file_table";
 			//
 			// +
 			// "FROM snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
@@ -367,19 +367,19 @@ public class LemnaTecDataExchange {
 			{
 				// load snapshots with images
 				String sqlText = "SELECT "
-							+ "	creator, measurement_label, camera_label, id_tag, path, "
-							+ "	time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
-							+ "	image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, "
-							+ "	image_file_table.id as image_file_tableID "
-							+ "FROM "
-							+ "	snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
-							+ "WHERE "
-							+ "	snapshot.measurement_label = ? and "
-							+ "	snapshot.id = tiled_image.snapshot_id and "
-							+ "	tiled_image.id = tile.tiled_image_id and "
-							+ "	tile.image_oid = image_file_table.id and "
-							+ "	snapshot.configuration_id = image_unit_configuration.compconfigid and "
-							+ "	tiled_image.camera_label = image_unit_configuration.gid";
+						+ "	creator, measurement_label, camera_label, id_tag, path, "
+						+ "	time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
+						+ "	image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, "
+						+ "	image_file_table.id as image_file_tableID "
+						+ "FROM "
+						+ "	snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
+						+ "WHERE "
+						+ "	snapshot.measurement_label = ? and "
+						+ "	snapshot.id = tiled_image.snapshot_id and "
+						+ "	tiled_image.id = tile.tiled_image_id and "
+						+ "	tile.image_oid = image_file_table.id and "
+						+ "	snapshot.configuration_id = image_unit_configuration.compconfigid and "
+						+ "	tiled_image.camera_label = image_unit_configuration.gid";
 				
 				ps = connection.prepareStatement(sqlText);
 				ps.setString(1, experiment);
@@ -487,7 +487,7 @@ public class LemnaTecDataExchange {
 		loadJdbcDriver();
 		
 		String path = "jdbc:postgresql:" + (host != null ? ("//" + host) + (port != null ? ":" + port : "") + "/" : "")
-							+ database;
+				+ database;
 		Connection connection = DriverManager.getConnection(path, user, password);
 		
 		if (Debug.TEST) {
@@ -505,7 +505,7 @@ public class LemnaTecDataExchange {
 	private static final HashMap<String, Double> blob2angle = new HashMap<String, Double>();
 	
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
 		
 		String species = "";
@@ -520,7 +520,7 @@ public class LemnaTecDataExchange {
 			optStatus.setCurrentStatusValue(-1);
 		
 		Collection<Snapshot> snapshots = getSnapshotsOfExperiment(experimentReq.getDatabase(), experimentReq
-							.getExperimentName());
+				.getExperimentName());
 		HashMap<String, Integer> idtag2replicateID = new HashMap<String, Integer>();
 		
 		Timestamp earliest = null;
@@ -606,7 +606,7 @@ public class LemnaTecDataExchange {
 			
 			if (replicateID == null) {
 				System.out.println("Warning: internal IAP error. Could not create get replicate ID for ID tag '"
-									+ sn.getId_tag() + "'. Snapshot is ignored.");
+						+ sn.getId_tag() + "'. Snapshot is ignored.");
 				continue;
 			}
 			
@@ -747,8 +747,8 @@ public class LemnaTecDataExchange {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-											+ sn.getPath_image_config_blob(), sn.getId_tag()
-											+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+								+ sn.getPath_image_config_blob(), sn.getId_tag()
+								+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ") (FTP)");
 						position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
@@ -764,15 +764,15 @@ public class LemnaTecDataExchange {
 					}
 					
 					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-										+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+							+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 					image.setURL(url);
 					fn = sn.getPath_null_image();
 					if (fn != null) {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-											+ sn.getPath_null_image(), sn.getId_tag()
-											+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+								+ sn.getPath_null_image(), sn.getId_tag()
+								+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 						image.setLabelURL(url);
 					}
 					
@@ -896,13 +896,13 @@ public class LemnaTecDataExchange {
 	}
 	
 	private HashMap<String, Condition> getPlantIdAnnotation(ExperimentHeaderInterface header) throws SQLException,
-						ClassNotFoundException {
+			ClassNotFoundException {
 		HashMap<String, Condition> res = new HashMap<String, Condition>();
 		
 		Connection connection = openConnectionToDatabase(header.getDatabase());
 		try {
 			String sqlText = "SELECT id_tag, meta_data_name, meta_data_value, meta_data_type " + "FROM  meta_info_src "
-							+ "WHERE measure_label = ?";
+					+ "WHERE measure_label = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(sqlText);
 			ps.setString(1, header.getExperimentName());
@@ -989,7 +989,7 @@ public class LemnaTecDataExchange {
 		boolean ok = false;
 		try {
 			String sqlText = "SELECT role, db_ids, removed " + "FROM  ltuser "
-							+ "WHERE name = ? AND passwd = ?";
+					+ "WHERE name = ? AND passwd = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(sqlText);
 			ps.setString(1, u);
