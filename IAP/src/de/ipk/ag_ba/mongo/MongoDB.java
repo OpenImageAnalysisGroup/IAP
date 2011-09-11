@@ -1583,6 +1583,19 @@ public class MongoDB {
 					double load = SystemAnalysisExt.getRealSystemCpuLoad();
 					boolean monitor = !CloudComputingService.getInstance().getIsCalculationPossible();
 					int wl = BackgroundThreadDispatcher.getWorkLoad();
+					StringBuilder diskHistory = new StringBuilder();
+					if (monitor) {
+						diskHistory.append("<br>storage:");
+						for (File lfw : File.listRoots()) {
+							long fs = lfw.getFreeSpace();
+							long ts = lfw.getTotalSpace();
+							long free = fs / 1024 / 1024 / 1024;
+							long size = ts / 1024 / 1024 / 1024;
+							long used = (ts - fs) / 1024 / 1024 / 1024;
+							int prc = (int) (100d * (1d - free / (double) size));
+							diskHistory.append("<br>" + lfw.toString() + " -> " + used + "/" + size + " GB used (" + prc + "%)");
+						}
+					}
 					res.setHostInfo(
 							(monitor ? "monitoring, " : "") +
 									SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
@@ -1590,7 +1603,7 @@ public class MongoDB {
 									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
 									(load > 0 ? " load "
 											+ StringManipulationTools.formatNumber(load, "#.#") + "" : "") +
-									(wl > 0 ? ", queue: " + wl : ""));
+									(wl > 0 ? ", queue: " + wl : "") + diskHistory.toString());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
 					if (add)
 						dbc.insert(res);
