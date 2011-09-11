@@ -5,19 +5,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
-import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -221,21 +218,6 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 			mg.setCameraDistance(1500);
 			mg.setCubeSideLength(300, 300, 300);
 			
-			final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
-			ExecutorService run = Executors.newFixedThreadPool(maximumThreadCount, new ThreadFactory() {
-				@Override
-				public Thread newThread(Runnable r) {
-					Thread t = new Thread(r);
-					int i;
-					synchronized (tsoLA) {
-						tsoLA.addInt(1);
-						i = tsoLA.getInt();
-					}
-					t.setName("Analyse input images (" + i + ")");
-					return t;
-				}
-			});
-			
 			status.setCurrentStatusValue(0);
 			double workLoad = loadedImages.size();
 			final double workloadStep = 100d / workLoad;
@@ -245,7 +227,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 			status.setCurrentStatusValue(-1);
 			
 			final ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
-			
+			ArrayList<MyThread> wait = new ArrayList<MyThread>();
 			for (final ImageData image : loadedImages) {
 				String fileName = image.getURL().getFileName();
 				if (fileName.indexOf("/") >= 0)
@@ -254,7 +236,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 					fileName = fileName.substring(fileName.lastIndexOf("\\") + "\\".length());
 				final String ffn = fileName;
 				
-				run.execute(new Runnable() {
+				wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
 					public void run() {
 						MyPicture p = new MyPicture();
 						
@@ -302,14 +284,11 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 											+ image.getPositionUnit() + ", is top: " + (getIsTopFromFileName(ffn)));
 						status.setCurrentStatusValueFineAdd(workloadStep);
 					}
-				});
+				}, "analyze input image for 3-D construction", 40, 39));
 			}
-			run.shutdown();
-			try {
-				run.awaitTermination(7, TimeUnit.DAYS);
-			} catch (InterruptedException e) {
-				ErrorMsg.addErrorMessage(e);
-			} // wait max 7 days for result
+			
+			BackgroundThreadDispatcher.waitFor(wait);
+			
 			status.setCurrentStatusValue(100);
 			
 			mg.setRoundViewImages(pictures);

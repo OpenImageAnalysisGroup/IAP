@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -13,6 +12,8 @@ import org.ErrorMsg;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 
@@ -25,7 +26,7 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
  */
 public class ThreeDmodelGenerator {
 	
-	private static int PROBABILITY_THRESHOLD = 10;
+	private static int PROBABILITY_THRESHOLD = 20;
 	
 	private ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 	
@@ -72,35 +73,6 @@ public class ThreeDmodelGenerator {
 	
 	public void calculateModel(final BackgroundTaskStatusProviderSupportingExternalCall status,
 						GenerationMode colorMode, int maxIndexedColorCount) {
-		final ThreadSafeOptions tsoLA = new ThreadSafeOptions();
-		ExecutorService run = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
-			@Override
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r);
-				int i;
-				synchronized (tsoLA) {
-					tsoLA.addInt(1);
-					i = tsoLA.getInt();
-				}
-				t.setName("Cube cut (" + i + ")");
-				return t;
-			}
-		});
-		
-		final ThreadSafeOptions tsoCO = new ThreadSafeOptions();
-		ExecutorService runColor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
-			@Override
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r);
-				int i;
-				synchronized (tsoLA) {
-					tsoCO.addInt(1);
-					i = tsoCO.getInt();
-				}
-				t.setName("Cube Coloring (" + i + ")");
-				return t;
-			}
-		});
 		
 		status.setCurrentStatusText1("Init cube cut (" + maxVoxelPerSide + "x" + maxVoxelPerSide + "x" + maxVoxelPerSide
 							+ ")");
@@ -111,19 +83,16 @@ public class ThreeDmodelGenerator {
 		final ThreadSafeOptions tsoRunCount = new ThreadSafeOptions();
 		tso.setInt(0);
 		tsoRunCount.setInt(0);
+		ArrayList<MyThread> wait = new ArrayList<MyThread>();
 		for (MyPicture p : pictures) {
 			final MyPicture fp = p;
-			run.execute(cuttt2(status, tso, tsoRunCount, fp));
+			wait.add(BackgroundThreadDispatcher.addTask(
+					cuttt2(status, tso, tsoRunCount, fp), "cube cut " + p.getAngle(), 20, 19));
 			
 			if (status.wantsToStop())
 				break;
 		}
-		run.shutdown();
-		try {
-			run.awaitTermination(7, TimeUnit.DAYS);
-		} catch (InterruptedException e) {
-			ErrorMsg.addErrorMessage(e);
-		} // wait max 7 days for result
+		BackgroundThreadDispatcher.waitFor(wait);
 		
 		status.setCurrentStatusValue(0);
 		
@@ -140,15 +109,7 @@ public class ThreeDmodelGenerator {
 				generateNormalizedByteCube(colorMode);
 				status.setCurrentStatusText1("Colorize Cube...");
 				// status.setCurrentStatusText2("");
-				colorModelRGB(pictures, palette, status, colorMode == GenerationMode.COLORED_RGBA, runColor);
-				
-				runColor.shutdown();
-				try {
-					runColor.awaitTermination(7, TimeUnit.DAYS);
-				} catch (InterruptedException e) {
-					ErrorMsg.addErrorMessage(e);
-				} // wait max 7 days for result
-				
+				colorModelRGB(pictures, palette, status, colorMode == GenerationMode.COLORED_RGBA);
 			}
 		
 		status.setCurrentStatusText1("Cube Construction Finished");
@@ -212,41 +173,44 @@ public class ThreeDmodelGenerator {
 	}
 	
 	private void colorModelRGB(final ArrayList<MyPicture> pictures, final ArrayList<Color> palette,
-						BackgroundTaskStatusProviderSupportingExternalCall status, final boolean rgb, ExecutorService runColor) {
+						BackgroundTaskStatusProviderSupportingExternalCall status, final boolean rgb) {
 		if (rgb)
 			System.out.println("Recolor Cube... (using true color RGBA generation mode)");
 		else
 			System.out.println("Recolor Cube... (using palette with " + palette.size() + " colors)");
-		double x, y, z;
+		
 		double voxelSizeX = cubeSideLengthX / maxVoxelPerSide;
-		double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
+		final double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
 		final double voxelSizeZ = cubeSideLengthZ / maxVoxelPerSide;
-		x = -cubeSideLengthX / 2d;
 		status.setCurrentStatusText1("Colorize Cube");
 		status.setCurrentStatusText2(rgb ? "RGBA Mode active" : "Indexed Color Mode active");
 		
+		ArrayList<MyThread> wait = new ArrayList<MyThread>();
+		double x;
+		x = -cubeSideLengthX / 2d;
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
 			if (status.wantsToStop())
 				break;
+			final double xF = x;
 			status.setCurrentStatusValueFine(100d * xi / maxVoxelPerSide);
-			y = -cubeSideLengthY / 2d;
-			for (int yi = 0; yi < maxVoxelPerSide; yi++) {
-				z = -cubeSideLengthZ / 2d;
-				final double xF = x;
-				final double yF = y;
-				final double zF = z;
-				final int xiF = xi;
-				final int yiF = yi;
-				runColor.submit(new Runnable() {
-					@Override
-					public void run() {
-						processOneSlice(pictures, palette, rgb, xF, yF, zF, voxelSizeZ, xiF, yiF);
+			final int xiF = xi;
+			MyThread w = BackgroundThreadDispatcher.addTask(new Runnable() {
+				@Override
+				public void run() {
+					double y = -cubeSideLengthY / 2d;
+					for (int yi = 0; yi < maxVoxelPerSide; yi++) {
+						double z = -cubeSideLengthZ / 2d;
+						final double zF = z;
+						final int yiF = yi;
+						processOneSlice(pictures, palette, rgb, xF, y, zF, voxelSizeZ, xiF, yiF);
+						y += voxelSizeY;
 					}
-				});
-				y += voxelSizeY;
-			}
+				}
+			}, "color rgb cube slice " + xi, 20, 19);
+			wait.add(w);
 			x += voxelSizeX;
 		}
+		BackgroundThreadDispatcher.waitFor(wait);
 	}
 	
 	private void processOneSlice(ArrayList<MyPicture> pictures, ArrayList<Color> palette, boolean rgb, double x, double y, double z, double voxelSizeZ, int xi,

@@ -8,9 +8,11 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 
 import org.ErrorMsg;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
@@ -59,6 +61,7 @@ public class MyThread extends Thread implements Runnable {
 			finished = true;
 			sem.release();
 		}
+		// System.out.print("f");
 	}
 	
 	public boolean isFinished() {
@@ -106,11 +109,41 @@ public class MyThread extends Thread implements Runnable {
 		setPriority(minPriority);
 	}
 	
+	private static ThreadSafeOptions tso = new ThreadSafeOptions();
+	
 	public void startNG(ExecutorService es) {
 		started = true;
-		if (NEW_SCHEDULER)
-			es.submit(this);
-		else
+		tso.addLong(1);
+		if (NEW_SCHEDULER) {
+			boolean submitted = false;
+			do {
+				// if (tso.getLong() % 40 == 0)
+				// System.out.println();
+				try {
+					synchronized (es) {
+						// ThreadPoolExecutor tpe = (ThreadPoolExecutor) es;
+						// if (tpe.getQueue().size() > SystemAnalysis.getNumberOfCPUs()) {
+						// System.out.print("h");
+						// start();
+						// } else {
+						es.submit(this);
+						submitted = true;
+						if (tso.getLong() % 10 == 0) {
+							// System.out.print(".");
+						}
+						// }
+					}
+				} catch (RejectedExecutionException ree) {
+					System.out.print("w");
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						//
+					}
+					// start();
+				}
+			} while (!submitted);
+		} else
 			start();
 	}
 }
