@@ -781,7 +781,9 @@ public class MongoDB {
 					// System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
 				} else {
 					// create 512x512 animated GIF instead of saving the full volume cube
+					StopWatch ss = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">CREATE GIF 512x512", true);
 					InputStream inps = IOmodule.getThreeDvolumeRenderViewGif(lv, optStatus);
+					ss.printTime();
 					GridFSInputFile inputFile = gridfs_volumes.createFile(inps, hash);
 					inputFile.save();
 					saved += inputFile.getLength();
@@ -798,7 +800,7 @@ public class MongoDB {
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("Render Side Views");
 						// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Create preview: render side views GIF...");
-						StopWatch ss = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">CREATE GIF", true);
+						StopWatch ss = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">CREATE GIF 256x256", true);
 						InputStream inps = IOmodule.getThreeDvolumePreviewIcon(lv, optStatus);
 						ss.printTime();
 						lv = null;
