@@ -54,8 +54,6 @@ public class CloudComputingService {
 	
 	private final CloudTaskManager cloudTaskManager;
 	
-	private final boolean enableCloudComputing = true;
-	
 	private CloudComputingService() {
 		cloudTaskManager = new CloudTaskManager();
 	}
@@ -474,7 +472,7 @@ public class CloudComputingService {
 	}
 	
 	public boolean getIsCalculationPossible() {
-		return enableCloudComputing;
+		return cloudTaskManager.isDisableProces();
 	}
 	
 }
