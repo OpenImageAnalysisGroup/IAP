@@ -98,7 +98,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 					if (blocksExecutedWithinLastMinute > 0 || tasksWithinLastMinute > 0)
 						rA = blocksExecutedWithinLastMinute + " bpm, ";
 					else
-						return "idle, ";
+						return ""; // "idle, ";
 					return speed + " p.e./h, " + rA + "t_p=[" + lastPipelineTimeMin + "," + lastPipelineTimeMax + "] s";
 				} catch (Exception e) {
 					// empty

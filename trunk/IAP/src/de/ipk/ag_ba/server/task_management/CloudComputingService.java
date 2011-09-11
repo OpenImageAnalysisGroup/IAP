@@ -107,7 +107,10 @@ public class CloudComputingService {
 		SystemAnalysis.simulateHeadless = true;
 		boolean clusterExecutionMode = false;
 		BackgroundThreadDispatcher.useThreads = false;
-		boolean enableCloudComputing = true;
+		{
+			CloudComputingService cc = CloudComputingService.getInstance();
+			cc.setEnableCalculations(true);
+		}
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">DISABLE SUB-TASK MULTITHREADING");
 		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
 			SystemInfoExt info = new SystemInfoExt();
@@ -170,60 +173,72 @@ public class CloudComputingService {
 										System.exit(0);
 									} else
 										if ((args[0] + "").toLowerCase().startsWith("back") && !(args[0] + "").toLowerCase().startsWith("backup")) {
-											BackupSupport sb = new BackupSupport();
+											BackupSupport sb = BackupSupport.getInstance();
 											sb.makeBackup();
 											System.exit(0);
 										} else
-											if ((args[0] + "").toLowerCase().startsWith("backup")) {
-												enableCloudComputing = false;
-												Timer t = new Timer();
-												Date d = new Date();
-												long period = 1000 * 60 * 60 * 24; // 24 Hours
-												d.setHours(23);
-												d.setMinutes(59);
-												d.setSeconds(59);
-												TimerTask tT = new TimerTask() {
-													@Override
-													public void run() {
-														try {
-															Thread.sleep(1000);
-															BackupSupport sb = new BackupSupport();
-															sb.makeBackup();
-														} catch (InterruptedException e) {
-															System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: PROCESSING INTERRUPTED");
+											if ((args[0] + "").toLowerCase().startsWith("monitor") && !(args[0] + "").toLowerCase().startsWith("monitor")) {
+												{
+													CloudComputingService cc = CloudComputingService.getInstance();
+													cc.setEnableCalculations(false);
+												}
+												
+											} else
+												if ((args[0] + "").toLowerCase().startsWith("backup")) {
+													{
+														CloudComputingService cc = CloudComputingService.getInstance();
+														cc.setEnableCalculations(false);
+													}
+													
+													Timer t = new Timer();
+													Date d = new Date();
+													long period = 1000 * 60 * 60 * 24; // 24 Hours
+													d.setHours(23);
+													d.setMinutes(59);
+													d.setSeconds(59);
+													TimerTask tT = new TimerTask() {
+														@Override
+														public void run() {
+															try {
+																Thread.sleep(1000);
+																BackupSupport sb = BackupSupport.getInstance();
+																sb.makeBackup();
+															} catch (InterruptedException e) {
+																System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: PROCESSING INTERRUPTED");
+															}
+														}
+													};
+													t.scheduleAtFixedRate(tT, d, period);
+													BackupSupport sb = BackupSupport.getInstance();
+													sb.makeBackup();
+												} else
+													if ((args[0] + "").toLowerCase().startsWith("close")) {
+														// ignore, has been processed at the start of this method
+													} else {
+														if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
+															merge();
+															return;
+														} else {
+															System.out.println(": Valid command line parameters:");
+															System.out.println("   'half'    - use half of the CPUs");
+															System.out.println("   'full'    - use all of the CPUs");
+															System.out.println("   'nnn'     - use specified number of CPUs");
+															System.out.println("   'clear'   - clear scheduled tasks");
+															System.out.println("   'merge'   - in case of error (merge interrupted previously), merge temporary results");
+															System.out.println("   'perf'    - perform performance test");
+															System.out.println("   'close'   - close after task completion (cluster execution mode)");
+															System.out.println("   'info'    - Show CPU info");
+															System.out.println("   'monitor' - Report system info to cloud (join, but don't perform calculations)");
+															System.out.println("   'back'    - perform LemnaTec to HSM backup now");
+															System.out.println("   'backup'  - perform LemnaTec to HSM backup now, and then every midnight");
 														}
 													}
-												};
-												t.scheduleAtFixedRate(tT, d, period);
-												BackupSupport sb = new BackupSupport();
-												sb.makeBackup();
-											} else
-												if ((args[0] + "").toLowerCase().startsWith("close")) {
-													// ignore, has been processed at the start of this method
-												} else {
-													if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
-														merge();
-														return;
-													} else {
-														System.out.println(": Valid command line parameters:");
-														System.out.println("   'half'  - use half of the CPUs");
-														System.out.println("   'full'  - use all of the CPUs");
-														System.out.println("   'nnn'   - use specified number of CPUs");
-														System.out.println("   'clear' - clear scheduled tasks");
-														System.out.println("   'merge' - in case of error (merge interrupted previously), merge temporary results");
-														System.out.println("   'perf'  - perform performance test");
-														System.out.println("   'close' - close after task completion (cluster execution mode)");
-														System.out.println("   'info'  - Show CPU info");
-														System.out.println("   'back'  - perform LemnaTec to HSM backup now");
-														System.out.println("   'backup'- perform LemnaTec to HSM backup at midnight");
-													}
-												}
 							}
 						}
 		SystemInfoExt si = new SystemInfoExt();
 		System.out.println("CPUs (sockets,physical,logical): " +
-					si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
-					si.getCpuLogicalCores() + ", using " + SystemAnalysis.getNumberOfCPUs());
+				si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
+				si.getCpuLogicalCores() + ", using " + SystemAnalysis.getNumberOfCPUs());
 		System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">");
 		System.out.println(SystemAnalysisExt.getCurrentTime() + "> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
@@ -241,9 +256,8 @@ public class CloudComputingService {
 			for (ResourceIOHandler handler : m.getHandlers())
 				ResourceIOManager.registerIOHandler(handler);
 			
-			CloudComputingService cc = new CloudComputingService();
+			CloudComputingService cc = CloudComputingService.getInstance();
 			cc.setClusterExecutionModeSingleTaskAndExit(clusterExecutionMode);
-			cc.setEnableCalculations(enableCloudComputing);
 			cc.switchStatus(m);
 			System.out.println("START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());
 		}
@@ -292,9 +306,9 @@ public class CloudComputingService {
 							String bpn = tempDataSetDescription.getPartCnt();
 							String bst = tempDataSetDescription.getSubmissionTime();
 							if (className.equals(bcn)
-										&& partCnt.equals(bpn)
-										&& submTime.equals(bst)
-										&& !added.contains(partIdx)) {
+									&& partCnt.equals(bpn)
+									&& submTime.equals(bst)
+									&& !added.contains(partIdx)) {
 								knownResults.add(i);
 								added.add(partIdx);
 							}
@@ -457,6 +471,10 @@ public class CloudComputingService {
 			cloudTaskManager.stopWork();
 		}
 		this.active = !active;
+	}
+	
+	public boolean getIsCalculationPossible() {
+		return enableCloudComputing;
 	}
 	
 }
