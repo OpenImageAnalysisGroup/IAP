@@ -472,7 +472,7 @@ public class CloudComputingService {
 	}
 	
 	public boolean getIsCalculationPossible() {
-		return cloudTaskManager.isDisableProces();
+		return !cloudTaskManager.isDisableProces();
 	}
 	
 }

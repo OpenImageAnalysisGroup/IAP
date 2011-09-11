@@ -210,4 +210,8 @@ public class CloudTaskManager {
 	public void setDisableProcess(boolean fixedDisableProcess) {
 		this.fixedDisableProcess = fixedDisableProcess;
 	}
+	
+	public boolean isDisableProces() {
+		return fixedDisableProcess;
+	}
 }
