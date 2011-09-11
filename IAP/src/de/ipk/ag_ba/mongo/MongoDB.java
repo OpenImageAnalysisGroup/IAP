@@ -1584,7 +1584,7 @@ public class MongoDB {
 					boolean monitor = !CloudComputingService.getInstance().getIsCalculationPossible();
 					int wl = BackgroundThreadDispatcher.getWorkLoad();
 					StringBuilder diskHistory = new StringBuilder();
-					if (monitor) {
+					if (monitor || true) {
 						diskHistory.append("<br>storage:");
 						for (File lfw : File.listRoots()) {
 							long fs = lfw.getFreeSpace();
@@ -1597,7 +1597,7 @@ public class MongoDB {
 						}
 					}
 					res.setHostInfo(
-							(monitor ? "monitoring, " : "") +
+							(monitor ? "monitoring:<br>" : "") +
 									SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 									SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
 									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
