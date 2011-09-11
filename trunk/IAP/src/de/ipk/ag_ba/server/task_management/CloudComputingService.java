@@ -54,7 +54,7 @@ public class CloudComputingService {
 	
 	private final CloudTaskManager cloudTaskManager;
 	
-	private boolean enableCloudComputing;
+	private final boolean enableCloudComputing = true;
 	
 	private CloudComputingService() {
 		cloudTaskManager = new CloudTaskManager();
