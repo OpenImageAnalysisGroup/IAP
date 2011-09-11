@@ -22,7 +22,17 @@ import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 
 public class BackupSupport {
 	
-	public BackupSupport() {
+	private static BackupSupport instance = null;
+	
+	public static synchronized BackupSupport getInstance() {
+		if (instance == null)
+			instance = new BackupSupport();
+		return instance;
+	}
+	
+	private boolean backupRunning = false;
+	
+	private BackupSupport() {
 		new MultimodalDataHandlingAddon();
 		
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
@@ -33,6 +43,19 @@ public class BackupSupport {
 	}
 	
 	public void makeBackup() {
+		if (backupRunning) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: BACKUP PROCEDURE IS SKIPPED, BECAUSE PREVIOUS BACKUP OPERATION IS STILL RUNNING");
+			return;
+		}
+		backupRunning = true;
+		try {
+			makeBackupInnerCall();
+		} finally {
+			backupRunning = true;
+		}
+	}
+	
+	private void makeBackupInnerCall() {
 		try {
 			System.out.println(":back - perform backup - now");
 			
@@ -104,4 +127,5 @@ public class BackupSupport {
 			e1.printStackTrace();
 		}
 	}
+	
 }

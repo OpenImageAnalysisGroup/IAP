@@ -75,6 +75,7 @@ import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
+import de.ipk.ag_ba.server.task_management.CloudComputingService;
 import de.ipk.ag_ba.server.task_management.CloudHost;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
@@ -1580,15 +1581,16 @@ public class MongoDB {
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
 					res.setTaskProgress(progress);
 					double load = SystemAnalysisExt.getRealSystemCpuLoad();
+					boolean monitor = !CloudComputingService.getInstance().getIsCalculationPossible();
+					int wl = BackgroundThreadDispatcher.getWorkLoad();
 					res.setHostInfo(
-
-					SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
+							(monitor ? "monitoring, " : "") +
+									SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
 									SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
 									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
 									(load > 0 ? " load "
-											+ StringManipulationTools.formatNumber(load, "#.#") + "" : "")
-									+ ", queue: "
-									+ BackgroundThreadDispatcher.getWorkLoad());
+											+ StringManipulationTools.formatNumber(load, "#.#") + "" : "") +
+									(wl > 0 ? ", queue: " + wl : ""));
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
 					if (add)
 						dbc.insert(res);
