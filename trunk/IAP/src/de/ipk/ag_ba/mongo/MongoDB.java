@@ -979,7 +979,7 @@ public class MongoDB {
 				
 				String[] hashes;
 				
-				hashes = GravistoService.getHashFromInputStream(new InputStream[] {
+				hashes = GravistoServiceExt.getHashFromInputStream(new InputStream[] {
 						new MyByteArrayInputStream(isMain),
 						isLabel != null ? new MyByteArrayInputStream(isLabel) : null
 				},
@@ -1603,7 +1603,7 @@ public class MongoDB {
 									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
 									(load > 0 ? " load "
 											+ StringManipulationTools.formatNumber(load, "#.#") + "" : "") +
-									(wl > 0 ? ", queue: " + wl : "") + diskHistory.toString());
+									(wl > 0 ? ", active: " + wl : "") + diskHistory.toString());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
 					if (add)
 						dbc.insert(res);

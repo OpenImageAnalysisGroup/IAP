@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.swing.Timer;
 
@@ -24,7 +25,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
  * @author klukas
  */
 public class BackgroundThreadDispatcher {
-	Stack<MyThread> todo = new Stack<MyThread>();
+	private final Stack<MyThread> todo = new Stack<MyThread>();
 	Stack<Integer> todoPriorities = new Stack<Integer>();
 	LinkedList<MyThread> runningTasks = new LinkedList<MyThread>();
 	
@@ -62,9 +63,9 @@ public class BackgroundThreadDispatcher {
 			if (myInstance == null)
 				myInstance = new BackgroundThreadDispatcher();
 			synchronized (myInstance.todo) {
-				if (myInstance.todo.size() >= 99) {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INTERNAL WARNING: LARGE TODO QUEUE SIZE. ADDING ANOTHER TASK: " + t.getNameNG());
-				}
+				// if (myInstance.todo.size() >= 99) {
+				// System.out.println(SystemAnalysisExt.getCurrentTime() + ">INTERNAL WARNING: LARGE TODO QUEUE SIZE. ADDING ANOTHER TASK: " + t.getNameNG());
+				// }
 				if (!useThreads && userPriority != Integer.MIN_VALUE) {
 					// no
 				} else {
@@ -97,6 +98,11 @@ public class BackgroundThreadDispatcher {
 		int load;
 		synchronized (todo) {
 			load = todo.size();
+			if (es != null && es instanceof ThreadPoolExecutor) {
+				ThreadPoolExecutor tpe = (ThreadPoolExecutor) es;
+				load += tpe.getActiveCount();
+				// load = (int) tpe.getCompletedTaskCount();
+			}
 		}
 		return load;
 	}
@@ -209,6 +215,10 @@ public class BackgroundThreadDispatcher {
 	
 	private void schedulerCode() {
 		int moreLoad = 0;
+		
+		ThreadPoolExecutor tpe = (ThreadPoolExecutor) es;
+		tpe.setMaximumPoolSize(SystemAnalysis.getNumberOfCPUs());
+		
 		while (true) {
 			try {
 				Thread.sleep(50);

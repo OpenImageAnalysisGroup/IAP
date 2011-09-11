@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -271,10 +272,13 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		}
 		
 		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
-		GravistoService.showImage(images.get(0), "Image");
+		// GravistoService.showImage(images.get(0), "Image");
 		WriteAnimatedGif.saveAnimate(out, images.toArray(new BufferedImage[] {}), delayTimes.toArray(new String[] {}));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValueFine(100);
+		
+		BufferedImage img = ImageIO.read(new MyByteArrayInputStream(out.getBuffTrimmed()));
+		GravistoService.showImage(img, "RENDER");
 		return new MyByteArrayInputStream(out.getBuff(), out.size());
 	}
 	
