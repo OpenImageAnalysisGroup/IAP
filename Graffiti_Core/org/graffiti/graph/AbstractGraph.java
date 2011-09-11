@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: AbstractGraph.java,v 1.1 2011-01-31 09:04:45 klukas Exp $
+// $Id: AbstractGraph.java,v 1.2 2011-09-11 05:15:09 klukas Exp $
 package org.graffiti.graph;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import org.graffiti.event.ListenerManager;
 /**
  * Provides further functionality for graphs.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * @see Graph
  * @see AdjListGraph
  */
@@ -74,7 +74,7 @@ public abstract class AbstractGraph extends AbstractAttributable implements
 	private CollectionAttribute defaultNodeAttribute;
 	
 	/** Contains a set of attribute consumers. */
-	private Set<AttributeConsumer> attributeConsumers;
+	private final Set<AttributeConsumer> attributeConsumers;
 	
 	// ~ Constructors ===========================================================
 	
@@ -580,7 +580,9 @@ public abstract class AbstractGraph extends AbstractAttributable implements
 		
 		Map<Node, Node> hm = new HashMap<Node, Node>();
 		
-		for (Node oldNode : g.getNodes()) {
+		List<Node> nc = new ArrayList<Node>(g.getNodes());
+		
+		for (Node oldNode : nc) {
 			Node newNode = addNodeCopy(oldNode);
 			if (newNode == null) {
 				ErrorMsg.addErrorMessage("Node is NULL");
