@@ -764,6 +764,12 @@ public class MongoDB {
 			if (is != null) {
 				// System.out.println("AVAIL: " + is.available());
 				// System.out.println("TARGET-LENGTH: " + (id.getDimensionX() * id.getDimensionY() * id.getDimensionZ() * 4));
+				LoadedVolumeExtension lv;
+				if (id instanceof LoadedVolumeExtension)
+					lv = (LoadedVolumeExtension) id;
+				else
+					lv = new LoadedVolumeExtension(IOmodule.loadVolume(id));
+				
 				boolean skipVolumeSave = true;
 				if (!skipVolumeSave) {
 					GridFSInputFile inputFile = gridfs_volumes.createFile(is, hash);
@@ -774,7 +780,11 @@ public class MongoDB {
 					
 					// System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
 				} else {
-					// System.out.println("SKIPPED VOLUME SAVE");
+					// create 512x512 animated GIF instead of saving the full volume cube
+					InputStream inps = IOmodule.getThreeDvolumeRenderViewGif(lv, optStatus);
+					GridFSInputFile inputFile = gridfs_volumes.createFile(inps, hash);
+					inputFile.save();
+					saved += inputFile.getLength();
 				}
 				GridFSDBFile fff = gridfs_preview.findOne(hash);
 				boolean removeExistingPreviewFile = true;
@@ -788,11 +798,6 @@ public class MongoDB {
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("Render Side Views");
 						// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Create preview: render side views GIF...");
-						LoadedVolumeExtension lv;
-						if (id instanceof LoadedVolumeExtension)
-							lv = (LoadedVolumeExtension) id;
-						else
-							lv = new LoadedVolumeExtension(IOmodule.loadVolume(id));
 						StopWatch ss = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">CREATE GIF", true);
 						InputStream inps = IOmodule.getThreeDvolumePreviewIcon(lv, optStatus);
 						ss.printTime();
@@ -1090,9 +1095,6 @@ public class MongoDB {
 			GridFS gridfs_volumes = new GridFS(db, MongoGridFS.FS_VOLUMES.toString());
 			DBCollection collectionA = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString());
 			collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
-			GridFS gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW_FILES.toString());
-			DBCollection collectionB = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
-			collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 			
 			GridFSDBFile fff = gridfs_volumes.findOne(hash);
 			if (fff != null && fff.getLength() <= 0) {
@@ -1104,12 +1106,18 @@ public class MongoDB {
 			if (fff != null) {
 				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 			} else {
+				GridFS gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW_FILES.toString());
+				DBCollection collectionB = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
+				collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+				
 				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, optFileSize, optStatus, hash);
 				fff = gridfs_volumes.findOne(hash);
 				if (fff != null && fff.getLength() <= 0) {
 					System.out.println(SystemAnalysisExt.getCurrentTime() + ">Delete generated volume from MongoDB file system (to save space and for debugging).");
 					gridfs_volumes.remove(fff);
 				}
+				gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW_FILES.toString());
+				
 				fff = gridfs_preview.findOne(hash);
 				if (fff != null && fff.getLength() <= 0) {
 					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: OK, VOLUME PREVIEW SAVED: " + hash);
