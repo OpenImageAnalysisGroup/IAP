@@ -189,11 +189,7 @@ public class CloudComputingService {
 													}
 													
 													Timer t = new Timer();
-													Date d = new Date();
 													long period = 1000 * 60 * 60 * 24; // 24 Hours
-													d.setHours(23);
-													d.setMinutes(59);
-													d.setSeconds(59);
 													TimerTask tT = new TimerTask() {
 														@Override
 														public void run() {
@@ -206,7 +202,11 @@ public class CloudComputingService {
 															}
 														}
 													};
-													t.scheduleAtFixedRate(tT, d, period);
+													Date startTime = new Date(); // current day at 23:59:39
+													startTime.setHours(23);
+													startTime.setMinutes(59);
+													startTime.setSeconds(59);
+													t.scheduleAtFixedRate(tT, startTime, period);
 													BackupSupport sb = BackupSupport.getInstance();
 													sb.makeBackup();
 												} else
