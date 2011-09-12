@@ -167,8 +167,14 @@ public class ImageOperation {
 		if (width == image.getWidth() && height == image.getHeight())
 			return this;
 		if (width > 1 && height > 1) {
-			ImageProcessor p = image.getProcessor().resize(width, height);
-			image.setProcessor(p);
+			try {
+				ImageProcessor p = image.getProcessor().resize(width, height);
+				image.setProcessor(p);
+			} catch (Exception e) {
+				// System.out.println("img : " + image);
+				image.setProcessor(new FlexibleImage(width, height, new int[width * height]).getAsImagePlus().getProcessor());
+			}
+			
 		}
 		return new ImageOperation(getImage());
 	}
@@ -1514,6 +1520,21 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation thresholdLAB(int lowerValueOfL, int upperValueOfL, int lowerValueOfA, int upperValueOfA, int lowerValueOfB,
+			int upperValueOfB, int background, CameraPosition typ, boolean maize, boolean getRemoved) {
+		
+		int width = image.getProcessor().getWidth();
+		int height = image.getProcessor().getHeight();
+		
+		int[] resultImage = new int[width * height];
+		int[] img2d = getImageAs1array();
+		
+		thresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
+				lowerValueOfB, upperValueOfB, background, typ, maize, getRemoved);
+		
+		return new ImageOperation(resultImage, width, height);
+	}
+	
+	public ImageOperation thresholdLAB(int lowerValueOfL, int upperValueOfL, int lowerValueOfA, int upperValueOfA, int lowerValueOfB,
 			int upperValueOfB, int background, CameraPosition typ, boolean maize) {
 		
 		int width = image.getProcessor().getWidth();
@@ -1523,7 +1544,7 @@ public class ImageOperation {
 		int[] img2d = getImageAs1array();
 		
 		thresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
-				lowerValueOfB, upperValueOfB, background, typ, maize);
+				lowerValueOfB, upperValueOfB, background, typ, maize, false);
 		
 		return new ImageOperation(resultImage, width, height);
 	}
@@ -1537,7 +1558,20 @@ public class ImageOperation {
 		
 		thresholdLAB3(width, height, img2d, resultImage,
 					lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB,
-					upperValueOfB, background, typ, maize, false, null);
+					upperValueOfB, background, typ, maize, false, null, false);
+		
+	}
+	
+	public static void thresholdLAB(int width, int height, int[] img2d, int[] resultImage,
+			int lowerValueOfL, int upperValueOfL,
+			int lowerValueOfA, int upperValueOfA,
+			int lowerValueOfB, int upperValueOfB,
+			int background, CameraPosition typ,
+			boolean maize, boolean getRemoved) {
+		
+		thresholdLAB3(width, height, img2d, resultImage,
+					lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB,
+					upperValueOfB, background, typ, maize, false, null, getRemoved);
 		
 	}
 	
@@ -1551,7 +1585,7 @@ public class ImageOperation {
 			int lowerValueOfL, int upperValueOfL,
 			int lowerValueOfA, int upperValueOfA,
 			int lowerValueOfB, int upperValueOfB,
-			int background, CameraPosition typ, boolean maize, boolean replaceBlueStick, int[][] oi) {
+			int background, CameraPosition typ, boolean maize, boolean replaceBlueStick, int[][] oi, boolean getRemovedPixel) {
 		int c, x, y = 0;
 		int r, g, b;
 		int Li, ai, bi;
@@ -1581,7 +1615,10 @@ public class ImageOperation {
 				
 				if (resultImage[off] != background && (((Li > lowerValueOfL) && (Li < upperValueOfL) && (ai > lowerValueOfA) && (ai < upperValueOfA)
 								&& (bi > lowerValueOfB) && (bi < upperValueOfB)) && !isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft))) {
-					resultImage[off] = imagePixels[off];
+					if (!getRemovedPixel)
+						resultImage[off] = imagePixels[off];
+					else
+						resultImage[off] = background;
 				} else {
 					if (replaceBlueStick && maize && typ == CameraPosition.SIDE) {
 						boolean backFound = false;
@@ -1640,18 +1677,22 @@ public class ImageOperation {
 									break;
 								}
 							}
-							off = x + yw;
-							if (greenFound || greenFoundL) {
-								c = imagePixels[off];
-								r = ((c & 0xff0000) >> 16);
-								g = ((c & 0x00ff00) >> 8);
-								b = (c & 0x0000ff);
-								oi[x][y] = new Color(r, b, g).getRGB();
-							} else
-								resultImage[off] = background;
 						}
+						off = x + yw;
+						if (greenFound || greenFoundL) {
+							c = imagePixels[off];
+							r = ((c & 0xff0000) >> 16);
+							g = ((c & 0x00ff00) >> 8);
+							b = (c & 0x0000ff);
+							oi[x][y] = new Color(r, b, g).getRGB();
+						} else
+							resultImage[off] = background;
+						
 					} else
-						resultImage[off] = background;
+						if (!getRemovedPixel)
+							resultImage[off] = background;
+						else
+							resultImage[off] = imagePixels[off];
 				}
 			}
 		}
@@ -3182,5 +3223,89 @@ public class ImageOperation {
 		for (int i = 0; i < temp.length; i++)
 			sum += temp[i];
 		return sum / (double) temp.length;
+	}
+	
+	/**
+	 * Replace pixel in the given image by the background, if inp is !background.
+	 * 
+	 * @param mask
+	 * @param background
+	 * @return
+	 */
+	public ImageOperation removePixel(FlexibleImage inp, int background) {
+		int[] img = getImageAs1array();
+		int[] mask = inp.getAs1A();
+		int[] res = new int[img.length];
+		
+		for (int index = 0; index < img.length; index++) {
+			if (mask[index] != background) {
+				res[index] = background;
+			} else
+				res[index] = img[index];
+		}
+		return new ImageOperation(res, inp.getWidth(), inp.getHeight());
+	}
+	
+	/**
+	 * Do the same as function removePixel, but keep Pixel in the Lab range(l,a,b).
+	 * 
+	 * @param print
+	 * @param background
+	 * @return
+	 */
+	public ImageOperation removePixel(FlexibleImage inp, int background, int l, int a, int b) {
+		int[] img = getImageAs1array();
+		int[] mask = inp.getAs1A();
+		int width = inp.getWidth();
+		int lenght = img.length;
+		Lab labAvg;
+		boolean color;
+		int[] res = new int[lenght];
+		int rf, gf, bf, li, ai, bi, center, above, left, right, below;
+		
+		for (int index = 0; index < lenght; index++) {
+			if (index > width && index < index - width) {
+				center = img[index];
+				above = img[index - lenght];
+				left = img[index - 1];
+				right = img[index + 1];
+				below = img[index + lenght];
+				
+				labAvg = getLabAverage(new int[] { center, above, left, right, below });
+				
+			} else {
+				center = img[index];
+				labAvg = getLabAverage(new int[] { center });
+			}
+			if (labAvg.AverageA < a && labAvg.AverageB > b)
+				color = true;
+			else
+				color = false;
+			
+			if (mask[index] != background && !color) {
+				res[index] = background;
+			} else
+				res[index] = img[index];
+		}
+		return new ImageOperation(res, inp.getWidth(), inp.getHeight());
+	}
+	
+	private Lab getLabAverage(int[] is) {
+		int rf, gf, bf, li, ai, bi;
+		int sumL = 0;
+		int sumA = 0;
+		int sumB = 0;
+		int length = is.length;
+		
+		for (int i = 0; i < length; i++) {
+			rf = ((is[i] & 0xff0000) >> 16);
+			gf = ((is[i] & 0x00ff00) >> 8);
+			bf = (is[i] & 0x0000ff);
+			
+			sumL += (int) ImageOperation.labCube[rf][gf][bf];
+			sumA += (int) ImageOperation.labCube[rf][gf][bf + 256];
+			sumB += (int) ImageOperation.labCube[rf][gf][bf + 512];
+		}
+		return new Lab(sumL / (double) length, sumA / (double) length, sumB / (double) length);
 	}
 }

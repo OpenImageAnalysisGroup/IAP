@@ -179,7 +179,8 @@ public class FlexibleImage {
 			return this;// copy();
 		} else {
 			ImageOperation io = new ImageOperation(this);
-			io.resize(w, h);
+			if (w > 1 && h > 1)
+				io.resize(w, h);
 			return io.getImage();
 		}
 	}

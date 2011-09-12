@@ -51,7 +51,7 @@ public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
-				back, typ, maize, false, null);
+				back, typ, maize, false, null, false);
 		
 		FlexibleImage mask = new FlexibleImage(width, height, result);
 		

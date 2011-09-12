@@ -24,22 +24,61 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 		else {
 			boolean blueStick;
-			if (options.isMaize())
+			boolean removeBlueBasket;
+			if (options.isMaize()) {
 				blueStick = false;
-			else
+				removeBlueBasket = false;
+			} else {
 				blueStick = false;
-			return labFilter(
-					// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
-					getInput().getMasks().getVis().getIO().blur(1).getImage(),
-					getInput().getImages().getVis(),
-					options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
-					options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
-					options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
-					options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
+				removeBlueBasket = true;
+			}
+			boolean debug = false;
+			if (!removeBlueBasket)
+				return labFilter(
+						// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
+						getInput().getMasks().getVis().getIO().blur(1).getImage(),
+						getInput().getImages().getVis(),
+						options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
+						options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
+						options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
+						options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
 						options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
 						options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
 						options.getCameraPosition(),
-						options.isMaize(), blueStick).print("after lab", false);
+						options.isMaize(), blueStick, removeBlueBasket).print("after lab", debug);
+			else {
+				FlexibleImage removed = labFilter(
+						// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
+						getInput().getMasks().getVis().copy().getIO().blur(1).getImage(),
+						getInput().getImages().getVis().copy(),
+						options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
+						options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
+						options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
+						options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
+							options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
+							options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
+							options.getCameraPosition(),
+							options.isMaize(), blueStick, removeBlueBasket).getIO().dilate().dilate().getImage().print("after lab (removed)", debug);
+				
+				FlexibleImage res = getInput().getMasks().getVis().print("mask", debug).getIO()
+						.removePixel(removed.copy().print("rm", debug), options.getBackground(), 1, 120, 127)
+						.getImage().print("without blue parts", debug);
+				
+				FlexibleImage res2 = labFilter(
+						res.copy(),
+						getInput().getImages().getVis().copy(),
+						100,
+						255,
+						0, // 127 - 10,
+						255, // 127 + 10,
+						0, // 127 - 10,
+						255, // 127 + 10,
+						options.getCameraPosition(),
+							options.isMaize(), false, true).getIO().dilate(5).blur(2).getImage()
+						.print("after lab (removed black)", debug);
+				
+				return res.getIO().removePixel(res2.print("black parts removed from blue parts removal", debug), options.getBackground()).getImage();
+			}
 		}
 	}
 	
@@ -59,12 +98,12 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO),
 						options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO),
 						options.getCameraPosition(),
-						options.isMaize(), false);
+						options.isMaize(), false, false);
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ,
-			boolean maize, boolean blueStick) {
+			boolean maize, boolean blueStick, boolean blueBasket) {
 		if (workMask == null)
 			return null;
 		int[] workMask1D = workMask.getAs1A();
@@ -78,7 +117,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				lowerValueOfL, upperValueOfL,
 				lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB,
-				back, typ, maize, blueStick, originalImage.getAs2A());
+				back, typ, maize, blueStick, originalImage.getAs2A(), blueBasket);
 		
 		return new ImageOperation(mod).applyMask_ResizeSourceIfNeeded(workMask1D, width, height, options.getBackground()).getImage();
 	}

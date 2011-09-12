@@ -65,7 +65,7 @@ public class IntensityAnalysis {
 		}
 		for (int i = 0; i < this.n; i++) {
 			result.addValue(
-					"chlorophyl.normalized.histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
+					"normalized.histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
 					histChlorophyl.getFreqAt(i));
 		}
 		return result;
