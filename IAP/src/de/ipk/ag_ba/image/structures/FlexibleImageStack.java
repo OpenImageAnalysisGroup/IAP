@@ -36,7 +36,8 @@ public class FlexibleImageStack {
 			this.h = image.getHeight();
 			stack = new ImageStack(w, h);
 		} else {
-			image = image.resize(w, h);
+			if (w > 1 && h > 1)
+				image = image.resize(w, h);
 			if (image.getWidth() != w)
 				ErrorMsg.addErrorMessage("mismatching image size: " + w + " <> " + image.getWidth());
 			if (image.getHeight() != h)

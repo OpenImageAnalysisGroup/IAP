@@ -3,7 +3,6 @@ package de.ipk.ag_ba.image.operations.blocks.cmds;
 import java.awt.Color;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -23,8 +22,8 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 				FlexibleImage nirMask = getInput().getMasks().getNir();
 				// compare images
 				boolean debug = false;
-				int blackDiff = options.getIntSetting(Setting.B_Diff_NIR);
-				int whiteDiff = options.getIntSetting(Setting.W_Diff_NIR);
+				int blackDiff = 50; // options.getIntSetting(Setting.B_Diff_NIR);
+				int whiteDiff = 5; // options.getIntSetting(Setting.W_Diff_NIR);
 				// getInput().getImages().getNir().getIO().subtractGrayImages(nirMask).print("subimg");
 				if (options.isMaize())
 					nirMask = new ImageOperation(getInput().getImages().getNir()).print("img", debug).compare()
@@ -33,11 +32,11 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 									blackDiff, whiteDiff,
 									// 250, 12,
 									// 40, 40,
-									new Color(180, 180, 180).getRGB()).print("result", debug).getImage(); // 150
+									new Color(180, 180, 180).getRGB()).print("result", false).getImage(); // 150
 				else
 					nirMask = getInput().getImages().getNir();
 				if (options.isMaize())
-					nirMask = nirMask.getIO().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground(), 0.14).getImage().print("new thresh", debug);
+					nirMask = nirMask.getIO().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground(), 0.13).getImage().print("new thresh", debug);
 				else
 					nirMask = nirMask.getIO().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground(), 0.05).getImage().print("new thresh", debug);
 				getInput().getMasks().setNir(nirMask);

@@ -5,6 +5,10 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
+/**
+ * WARNING: takes the input image again!!! (error)
+ */
+@Deprecated
 public class BlockClosing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	protected int closeOperations = -1;
 	
