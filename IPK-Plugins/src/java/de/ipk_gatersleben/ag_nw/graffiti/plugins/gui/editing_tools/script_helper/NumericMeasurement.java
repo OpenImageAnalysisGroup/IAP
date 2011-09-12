@@ -9,7 +9,7 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 
 public class NumericMeasurement implements NumericMeasurementInterface {
-	private double value;
+	private double value = Double.NaN;
 	private int replicateID;
 	private SampleInterface parentSample;
 	private String unit;

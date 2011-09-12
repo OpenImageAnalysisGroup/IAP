@@ -9,7 +9,7 @@ public class Snapshot {
 	
 	private String creator, measurement_label, id_tag, camera_label, path_image, path_null_image;
 	private Timestamp time_stamp;
-	private double weight_before, weight_after;
+	private double weight_before = Double.NaN, weight_after = Double.NaN;
 	private int water_amount;
 	private double xFactor;
 	private double yFactor;

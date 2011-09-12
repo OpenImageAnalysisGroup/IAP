@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import ij.measure.ResultsTable;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -104,7 +103,7 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 				
 				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannel(false, true, false, false);
 				double avgNir = 1 - nirIntensitySum / nirFilledPixels;
-				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + "nir.intensity.average", avgNir);
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.intensity.average", avgNir);
 				
 				int[] nirImg = getInput().getMasks().getNir().getAs1A();
 				int filled = 0;
@@ -121,10 +120,10 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 						fSum += f;
 					}
 				}
-				if (options.getCameraPosition() == CameraPosition.SIDE)
+				if (filled > 0) {
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", fSum / filled);
-				else
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", fSum / filled);
+				} else
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", 0);
 				ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally,
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), false); // markerDistanceHorizontally
 				
