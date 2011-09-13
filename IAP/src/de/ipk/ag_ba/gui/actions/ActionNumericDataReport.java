@@ -32,6 +32,7 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	private JTable table;
+	private final static String separator = "\t";
 	
 	public ActionNumericDataReport(String tooltip) {
 		super(tooltip);
@@ -132,13 +133,13 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 				} else
 					continue;
 				for (ConditionInterface c : su) {
-					String cid = sid + ";" + c.getConditionId() + "-" + c.getConditionName();
+					String cid = sid + separator + c.getConditionId() + "-" + c.getConditionName();
 					for (SampleInterface sa : c) {
-						String said = cid + ";" + sa.getSampleTime();
+						String said = cid + separator + sa.getSampleTime();
 						for (Measurement m : sa) {
-							String mid = said + ";" + m.getReplicateID();
+							String mid = said + separator + m.getReplicateID();
 							if (m.getValue() > 0)
-								System.out.println(mid + ";" + hueVal + ";" + m.getValue());
+								System.out.println(mid + separator + hueVal + separator + m.getValue());
 						}
 					}
 				}
@@ -166,6 +167,9 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 	}
 	
 	public String getCSVheader() {
-		return "Plant ID;Condition;Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;Day;Time;Weight A (g);Weight B (g);Water;RGB;Fluo;Nir;Other\r\n";
+		return "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator +
+					"Variety" + separator + "GrowthCondition" + separator + "Treatment" + separator + "Sequence" + separator +
+					"Day" + separator + "Time" + separator + "Day (Int)" + separator + "Weight A (g)" + separator +
+					"Weight B (g)" + separator + "Water" + separator + "RGB" + separator + "Fluo" + separator + "Nir" + separator + "Other\r\n";
 	}
 }

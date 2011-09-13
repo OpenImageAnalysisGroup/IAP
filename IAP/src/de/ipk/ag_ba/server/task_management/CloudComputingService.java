@@ -175,7 +175,7 @@ public class CloudComputingService {
 											sb.makeBackup();
 											System.exit(0);
 										} else
-											if ((args[0] + "").toLowerCase().startsWith("monitor") && !(args[0] + "").toLowerCase().startsWith("monitor")) {
+											if ((args[0] + "").toLowerCase().startsWith("monitor")) {
 												{
 													CloudComputingService cc = CloudComputingService.getInstance();
 													cc.setEnableCalculations(false);
