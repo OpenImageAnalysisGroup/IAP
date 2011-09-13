@@ -88,8 +88,9 @@ public class DayComponent extends JComponent {
 		TreeSet<ExperimentHeaderInterface> experiments = new TreeSet<ExperimentHeaderInterface>();
 		for (String s : group2ei.keySet())
 			for (String s2 : group2ei.get(s).keySet())
-				for (ExperimentHeaderInterface ehi : group2ei.get(s).get(s2))
-					experiments.add(ehi);
+				if (group2ei.get(s) != null)
+					for (ExperimentHeaderInterface ehi : group2ei.get(s).get(s2))
+						experiments.add(ehi);
 		for (ExperimentHeaderInterface ei : experiments) {
 			if (ei.getStartdate() == null)
 				continue;
