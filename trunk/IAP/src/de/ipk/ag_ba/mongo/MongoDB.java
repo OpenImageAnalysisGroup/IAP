@@ -1586,7 +1586,7 @@ public class MongoDB {
 					StringBuilder diskHistory = new StringBuilder();
 					if (monitor) {
 						diskHistory.append("<br>storage:");
-						for (File lfw : File.listRoots()) {
+						for (File lfw : myListRoots()) {
 							long fs = lfw.getFreeSpace();
 							long ts = lfw.getTotalSpace();
 							long free = fs / 1024 / 1024 / 1024;
@@ -1610,6 +1610,17 @@ public class MongoDB {
 					else
 						dbc.save(res);
 				}
+			}
+			
+			private ArrayList<File> myListRoots() {
+				ArrayList<File> res = new ArrayList<File>();
+				for (File f : File.listRoots()) {
+					res.add(f);
+				}
+				File hsm = new File("/media/nfs/hsm");
+				if (hsm.exists())
+					res.add(hsm);
+				return res;
 			}
 			
 			@Override
