@@ -261,11 +261,11 @@ public class CloudComputingService {
 		}
 	}
 	
-	private void setEnableCalculations(boolean enableCloudComputing) {
+	public void setEnableCalculations(boolean enableCloudComputing) {
 		cloudTaskManager.setDisableProcess(!enableCloudComputing);
 	}
 	
-	private void setClusterExecutionModeSingleTaskAndExit(boolean autoClose) {
+	public void setClusterExecutionModeSingleTaskAndExit(boolean autoClose) {
 		cloudTaskManager.setClusterExecutionModeSingleTaskAndExit(autoClose);
 	}
 	
