@@ -55,11 +55,11 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
 				options.getCameraPosition(),
-				options.isMaize(), false, true).getIO().dilate(dilate).getImage().print("after lab", false);
+				options.isMaize(), false, true).getIO().dilate(dilate).getImage().print("after lab", debug);
 		
-		FlexibleImage result = mask.copy().print("mask", false).getIO()
-				.removePixel(labResult.copy().print("rm", false), options.getBackground(), 1, 105, 120)
-				.getImage().print("without blue parts", false);
+		FlexibleImage result = mask.copy().print("mask", debug).getIO()
+				.removePixel(labResult.copy().print("rm", debug), options.getBackground(), 1, 105, 120)
+				.getImage().print("without blue parts", debug);
 		
 		FlexibleImage potFiltered = labFilter(
 				result.copy(),
@@ -72,7 +72,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				255, // 127 + 10,
 				options.getCameraPosition(),
 				options.isMaize(), false, true).getIO().dilate(6).blur(3).getImage()
-				.print("after lab (removed black)", true);
+				.print("after lab (removed black)", debug);
 		
 		return result = result.getIO().removePixel(potFiltered.print("black parts removed from blue parts removal", debug), options.getBackground(), 50, 110, 1)
 				.getImage();

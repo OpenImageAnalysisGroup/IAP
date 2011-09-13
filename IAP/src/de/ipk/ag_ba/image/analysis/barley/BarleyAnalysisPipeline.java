@@ -6,6 +6,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
+import de.ipk.ag_ba.image.analysis.maize.BlockColorBalancing_nir_second_run;
 import de.ipk.ag_ba.image.analysis.maize.BlockRemoveVerticalAndHorizontalStructures_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancing_fluo_nir;
@@ -51,6 +52,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockColorBalancing_vis.class);
 		p.add(BlockFindBlueMarkers_vis.class);
 		p.add(BlockColorBalancing_fluo_nir.class);
+		p.add(BlockColorBalancing_nir_second_run.class);
 		p.add(BlockClearBackgroundByRefComparison_vis_fluo_nir.class);
 		p.add(BlockMedianFilter_fluo.class);
 		p.add(BlockMedianFilter_fluo.class);
