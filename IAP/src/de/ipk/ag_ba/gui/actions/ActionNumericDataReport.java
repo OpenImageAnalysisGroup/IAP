@@ -170,6 +170,6 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 		return "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator +
 					"Variety" + separator + "GrowthCondition" + separator + "Treatment" + separator + "Sequence" + separator +
 					"Day" + separator + "Time" + separator + "Day (Int)" + separator + "Weight A (g)" + separator +
-					"Weight B (g)" + separator + "Water" + separator + "RGB" + separator + "Fluo" + separator + "Nir" + separator + "Other\r\n";
+					"Weight B (g)" + separator + "Water (g)" + separator + "RGB" + separator + "Fluo" + separator + "Nir" + separator + "Other\r\n";
 	}
 }

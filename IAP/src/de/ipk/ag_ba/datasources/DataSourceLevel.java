@@ -38,5 +38,4 @@ public interface DataSourceLevel {
 	public String getDescription();
 	
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src);
-	
 }
