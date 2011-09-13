@@ -448,12 +448,9 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	}
 	
 	public static NavigationButton getMongoExperimentButton(final String displayName, ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
-		NavigationAction action = new ActionMongoOrLemnaTecExperimentNavigation(ei, m) {
-			@Override
-			public String getDefaultTitle() {
-				return displayName;
-			}
-		};
+		ActionMongoOrLemnaTecExperimentNavigation action = new ActionMongoOrLemnaTecExperimentNavigation(ei, m);
+		action.setOverrideTitle(displayName);
+		
 		NavigationButton exp = new NavigationButton(action, guiSetting);
 		return exp;
 	}

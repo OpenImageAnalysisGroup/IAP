@@ -58,7 +58,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Numeric Data";
+		return "Create Data Report";
 	}
 	
 	@Override
@@ -167,6 +167,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	
 	public String getCSVheader() {
 		return "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator + "Variety" + separator + "GrowthCondition"
-				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int);\r\n";
+				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int)"
+				+ separator + "Weight A (g)" + separator + "Water B (g)" + "\r\n";
 	}
 }

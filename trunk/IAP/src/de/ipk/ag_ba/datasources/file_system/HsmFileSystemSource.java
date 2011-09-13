@@ -20,6 +20,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.actions.ActionDomainLogout;
 import de.ipk.ag_ba.gui.actions.Library;
+import de.ipk.ag_ba.gui.actions.Other;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
@@ -51,6 +52,9 @@ public class HsmFileSystemSource extends FileSystemSource {
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
 		Collection<NavigationButton> res = new ArrayList<NavigationButton>();
 		res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
+		res.add(Other.getCalendarEntity(
+				this.getAllExperimentsNewestByGroup(),
+				null, src.getGUIsetting()));
 		
 		return res;
 	}
@@ -95,6 +99,7 @@ public class HsmFileSystemSource extends FileSystemSource {
 			}
 		
 		this.thisLevel = new HsmMainDataSourceLevel(experimentName2saveTime2data);
+		((HsmMainDataSourceLevel) thisLevel).setHsmFileSystemSource(this);
 	}
 	
 	@Override
@@ -129,11 +134,26 @@ public class HsmFileSystemSource extends FileSystemSource {
 	}
 	
 	public Collection<ExperimentHeaderInterface> getAllExperimentsNewest() {
-		Collection<TreeMap<Long, ExperimentHeaderInterface>> a = ((HsmMainDataSourceLevel) thisLevel).experimentName2saveTime2data.values();
-		Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
-		for (TreeMap<Long, ExperimentHeaderInterface> map : a) {
-			result.add(map.lastEntry().getValue());
-		}
-		return result;
+		if (thisLevel != null && ((HsmMainDataSourceLevel) thisLevel).experimentName2saveTime2data != null) {
+			Collection<TreeMap<Long, ExperimentHeaderInterface>> a = ((HsmMainDataSourceLevel) thisLevel).experimentName2saveTime2data.values();
+			Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
+			for (TreeMap<Long, ExperimentHeaderInterface> map : a) {
+				result.add(map.lastEntry().getValue());
+			}
+			return result;
+		} else
+			return null;
+	}
+	
+	/**
+	 * @return currently the group info is not processed, the returned
+	 *         set contains the same content as getAllExperimentsNewest with
+	 *         some dummy group info (good enough for the calendar construction).
+	 */
+	public TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> getAllExperimentsNewestByGroup() {
+		TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> res = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
+		res.put("a", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
+		res.get("a").put("b", (ArrayList<ExperimentHeaderInterface>) getAllExperimentsNewest());
+		return res;
 	}
 }

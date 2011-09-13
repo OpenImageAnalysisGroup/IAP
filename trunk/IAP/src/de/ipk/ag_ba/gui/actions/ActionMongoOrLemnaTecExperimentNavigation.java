@@ -35,6 +35,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 	private final MongoDB m;
 	private String domainUser;
 	private final String tt;
+	private String displayName;
 	
 	public ActionMongoOrLemnaTecExperimentNavigation(ExperimentHeaderInterface ei, MongoDB m) {
 		super(ei.getDatabaseId() != null && ei.getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
@@ -168,7 +169,10 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 	
 	@Override
 	public String getDefaultTitle() {
-		return "" + header.getExperimentName();
+		if (displayName != null)
+			return displayName;
+		else
+			return "" + header.getExperimentName();
 	}
 	
 	@Override
@@ -184,5 +188,9 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 	
 	public void setLogin(String domainUser) {
 		this.domainUser = domainUser;
+	}
+	
+	public void setOverrideTitle(String displayName) {
+		this.displayName = displayName;
 	}
 }

@@ -110,7 +110,7 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return actions;
 	}
-
+	
 	public DataSourceLevel getDataSourceLevel() {
 		return dataSourceLevel;
 	}
