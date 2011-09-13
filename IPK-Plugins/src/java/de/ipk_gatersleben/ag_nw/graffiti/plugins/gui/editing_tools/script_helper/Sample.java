@@ -393,4 +393,19 @@ public class Sample implements SampleInterface {
 		s.setTtestInfo(getTtestInfo());
 		return s;
 	}
+	
+	@Override
+	public String getSubstanceNameWithUnit() {
+		String sub = getParentCondition().getParentSubstance().getName();
+		
+		String unit = null;
+		for (NumericMeasurementInterface nmi : this) {
+			unit = nmi.getUnit();
+			if (unit != null)
+				break;
+		}
+		if (unit != null && unit.length() > 0)
+			sub += " (" + unit + ")";
+		return sub;
+	}
 }

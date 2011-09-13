@@ -117,4 +117,6 @@ public interface SampleInterface extends MappingDataEntity, Comparable<SampleInt
 	public abstract int hashCode();
 	
 	public SampleInterface clone(ConditionInterface parent);
+	
+	public abstract String getSubstanceNameWithUnit();
 }

@@ -819,6 +819,8 @@ public class Experiment implements ExperimentInterface {
 			String keyName = field2niceName.get(key);
 			if (keyName == null)
 				continue;
+			if (value == null || value.equals("null"))
+				continue;// value = "[unknown]";
 			niceProperties.put(keyName, value);
 		}
 		for (String n : niceProperties.keySet()) {
@@ -836,7 +838,8 @@ public class Experiment implements ExperimentInterface {
 		res.put("experimenttype", "<!-- A -->Type of Experiment");
 		res.put("startdate", "<!-- C BR -->Experiment Start");
 		
-		res.put("database", "<!-- D-->Source");
+		res.put("database", "<!-- D-->Database");
+		res.put("origin", "<!-- D-->Origin");
 		res.put("importdate", "<!-- E -->Import Date");
 		res.put("excelfileid", "<!-- F BR -->Experiment ID");
 		
