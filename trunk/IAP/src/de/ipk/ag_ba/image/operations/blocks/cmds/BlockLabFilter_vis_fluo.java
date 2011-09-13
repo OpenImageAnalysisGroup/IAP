@@ -9,6 +9,7 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
+import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 
 /**
  * Uses a lab-based pixel filter for the vis and fluo images.
@@ -31,11 +32,11 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			boolean debug = false;
 			if (options.isMaize()) {
 				blueStick = false;
-				dilate = 2;
+				dilate = 3;
 				result = labFilterVis(mask, orig, dilate, debug);
 			} else {
 				blueStick = false;
-				dilate = 2;
+				dilate = 4;
 				result = labFilterVis(mask, orig, dilate, debug);
 			}
 			return result;
@@ -43,6 +44,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private FlexibleImage labFilterVis(FlexibleImage mask, FlexibleImage orig, int dilate, boolean debug) {
+		FlexibleImageStack fis = new FlexibleImageStack();
 		
 		FlexibleImage labResult = labFilter(
 				// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
@@ -55,11 +57,19 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
 				options.getCameraPosition(),
-				options.isMaize(), false, true).getIO().dilate(dilate).getImage().print("after lab", debug);
+				options.isMaize(), false, true).getIO().erode(2).dilate(dilate).getImage().print("after lab", false);
 		
-		FlexibleImage result = mask.copy().print("mask", debug).getIO()
-				.removePixel(labResult.copy().print("rm", debug), options.getBackground(), 1, 105, 120)
-				.getImage().print("without blue parts", debug);
+		if (debug) {
+			fis.addImage("mask", mask.copy());
+			fis.addImage("labresult", labResult.copy());
+		}
+		
+		FlexibleImage result = mask.copy().getIO()
+				.removePixel(labResult.copy(), options.getBackground(), 1, 105, 120)
+				.getImage();
+		
+		if (debug)
+			fis.addImage("without blue parts", result);
 		
 		FlexibleImage potFiltered = labFilter(
 				result.copy(),
@@ -71,10 +81,17 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				0, // 127 - 10,
 				255, // 127 + 10,
 				options.getCameraPosition(),
-				options.isMaize(), false, true).getIO().dilate(6).blur(3).getImage()
-				.print("after lab (removed black)", debug);
+				options.isMaize(), false, true).getIO().clearImageAbove(mask.getHeight() * 0.6, options.getBackground()).erode(1).dilate(dilate * 3).blur(4)
+				.getImage(); // old
+		// 6x
+		// dilate
 		
-		return result = result.getIO().removePixel(potFiltered.print("black parts removed from blue parts removal", debug), options.getBackground(), 50, 110, 1)
+		if (debug) {
+			fis.addImage("removed böack", potFiltered);
+			fis.print("debug lab filter");
+		}
+		
+		return result = result.getIO().removePixel(potFiltered.print("black parts removed from blue parts removal", false), options.getBackground(), 50, 110, 1)
 				.getImage();
 	}
 	
