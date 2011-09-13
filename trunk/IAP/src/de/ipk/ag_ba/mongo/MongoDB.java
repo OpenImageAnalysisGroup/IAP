@@ -1593,7 +1593,7 @@ public class MongoDB {
 							long size = ts / 1024 / 1024 / 1024;
 							long used = (ts - fs) / 1024 / 1024 / 1024;
 							int prc = (int) (100d * (1d - free / (double) size));
-							diskHistory.append("<br>" + lfw.toString() + " -> " + used + "/" + size + " GB used (" + prc + "%)");
+							diskHistory.append("<br>" + lfw.toString() + " -> " + free + " GB free (" + size + " GB, " + prc + "% used)");
 						}
 					}
 					res.setHostInfo(
@@ -1617,9 +1617,14 @@ public class MongoDB {
 				for (File f : File.listRoots()) {
 					res.add(f);
 				}
-				File hsm = new File("/media/nfs/hsm");
-				if (hsm.exists())
-					res.add(hsm);
+				String[] roots = new String[] { "/media/nfs/hsm", "/media/data4", "/home" };
+				for (String r : roots) {
+					if (res.contains(r))
+						continue;
+					File hsm = new File(r);
+					if (hsm.exists())
+						res.add(hsm);
+				}
 				return res;
 			}
 			
