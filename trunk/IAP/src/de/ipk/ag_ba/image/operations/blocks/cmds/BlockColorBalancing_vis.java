@@ -45,7 +45,7 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	/**
-	 * Calculates the average of the brightness of an area around an image.
+	 * Calculates the average of the brightness of an area around an image. (bottom and top for linear interpolation, center for default)
 	 * 
 	 * @author pape
 	 */
