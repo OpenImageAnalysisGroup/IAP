@@ -24,62 +24,58 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 		else {
 			boolean blueStick;
-			boolean removeBlueBasket;
+			int dilate;
+			FlexibleImage result;
+			FlexibleImage mask = getInput().getMasks().getVis();
+			FlexibleImage orig = getInput().getImages().getVis();
+			boolean debug = false;
 			if (options.isMaize()) {
 				blueStick = false;
-				removeBlueBasket = false;
+				dilate = 2;
+				result = labFilterVis(mask, orig, dilate, debug);
 			} else {
 				blueStick = false;
-				removeBlueBasket = true;
+				dilate = 2;
+				result = labFilterVis(mask, orig, dilate, debug);
 			}
-			boolean debug = false;
-			if (!removeBlueBasket)
-				return labFilter(
-						// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
-						getInput().getMasks().getVis().getIO().blur(1).getImage(),
-						getInput().getImages().getVis(),
-						options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
-						options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
-						options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
-						options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
-						options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
-						options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
-						options.getCameraPosition(),
-						options.isMaize(), blueStick, removeBlueBasket).print("after lab", debug);
-			else {
-				FlexibleImage removed = labFilter(
-						// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
-						getInput().getMasks().getVis().copy().getIO().blur(1).getImage(),
-						getInput().getImages().getVis().copy(),
-						options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
-						options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
-						options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
-						options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
-							options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
-							options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
-							options.getCameraPosition(),
-							options.isMaize(), blueStick, removeBlueBasket).getIO().dilate().dilate().getImage().print("after lab (removed)", debug);
-				
-				FlexibleImage res = getInput().getMasks().getVis().print("mask", debug).getIO()
-						.removePixel(removed.copy().print("rm", debug), options.getBackground(), 1, 120, 127)
-						.getImage().print("without blue parts", debug);
-				
-				FlexibleImage res2 = labFilter(
-						res.copy(),
-						getInput().getImages().getVis().copy(),
-						100,
-						255,
-						0, // 127 - 10,
-						255, // 127 + 10,
-						0, // 127 - 10,
-						255, // 127 + 10,
-						options.getCameraPosition(),
-							options.isMaize(), false, true).getIO().dilate(5).blur(2).getImage()
-						.print("after lab (removed black)", debug);
-				
-				return res.getIO().removePixel(res2.print("black parts removed from blue parts removal", debug), options.getBackground()).getImage();
-			}
+			return result;
 		}
+	}
+	
+	private FlexibleImage labFilterVis(FlexibleImage mask, FlexibleImage orig, int dilate, boolean debug) {
+		
+		FlexibleImage labResult = labFilter(
+				// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
+				mask.copy().getIO().blur(1).getImage(),
+				orig.copy(),
+				options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
+				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
+				options.getCameraPosition(),
+				options.isMaize(), false, true).getIO().dilate(dilate).getImage().print("after lab", false);
+		
+		FlexibleImage result = mask.copy().print("mask", false).getIO()
+				.removePixel(labResult.copy().print("rm", false), options.getBackground(), 1, 105, 120)
+				.getImage().print("without blue parts", false);
+		
+		FlexibleImage potFiltered = labFilter(
+				result.copy(),
+				getInput().getImages().getVis().copy(),
+				100,
+				255,
+				0, // 127 - 10,
+				255, // 127 + 10,
+				0, // 127 - 10,
+				255, // 127 + 10,
+				options.getCameraPosition(),
+				options.isMaize(), false, true).getIO().dilate(6).blur(3).getImage()
+				.print("after lab (removed black)", true);
+		
+		return result = result.getIO().removePixel(potFiltered.print("black parts removed from blue parts removal", debug), options.getBackground(), 50, 110, 1)
+				.getImage();
 	}
 	
 	@Override

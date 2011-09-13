@@ -292,7 +292,7 @@ public class ImageProcessorOptions {
 		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK, 1);
 		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 1);
 		
-		addIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS, 80);
+		addIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS, 30);
 		addIntSetting(Setting.REAL_MARKER_DISTANCE, 1128);
 	}
 	
