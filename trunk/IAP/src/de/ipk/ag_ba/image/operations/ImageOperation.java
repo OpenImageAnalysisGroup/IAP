@@ -53,6 +53,7 @@ import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
@@ -466,7 +467,7 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * Enlarge area of mask. es wird der 3x3 Minimum-Filter genutzt
+	 * Enlarge area of mask.
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
@@ -475,10 +476,49 @@ public class ImageOperation {
 		return this;
 	}
 	
+	/**
+	 * Enlarge area of mask.
+	 * <p>
+	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
+	 */
 	public ImageOperation dilate(int n) {
 		for (int i = 1; i <= n; i++)
 			image.getProcessor().dilate();
 		return this;
+	}
+	
+	/**
+	 * Enlarge area of mask.
+	 * <p>
+	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
+	 */
+	public ImageOperation dilateHor(int n) {
+		if (n == Integer.MAX_VALUE) {
+			int[][] img = getImageAs2array();
+			int w = image.getWidth();
+			int h = image.getHeight();
+			boolean foundFilled = false;
+			for (int y = 0; y < h; y++) {
+				int filled = 0;
+				if (!foundFilled)
+					for (int x = 0; x < w; x++) {
+						if (img[x][y] != BACKGROUND_COLORint)
+							filled++;
+					}
+				if (foundFilled || filled > w * 0.02d) {
+					foundFilled = true;
+					for (int x = 0; x < w; x++) {
+						img[x][y] = 1;
+					}
+				}
+			}
+			return new ImageOperation(img);
+		} else {
+			int[][] mask = new int[1][n];
+			for (int i = 0; i < n; i++)
+				mask[0][i] = 1;
+			return dilate(mask);
+		}
 	}
 	
 	/**
@@ -504,10 +544,12 @@ public class ImageOperation {
 	}
 	
 	/**
+	 * WARNING: WORKS PROBABLY ONLY ON BINARY IMAGES
 	 * Enlarge area of mask.
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
+	@Deprecated
 	public ImageOperation dilate(int[][] mask) {
 		return dilate(image.getProcessor(), mask);
 	}
@@ -527,6 +569,11 @@ public class ImageOperation {
 		return erode(image.getProcessor());
 	}
 	
+	/**
+	 * Reduce area of mask.
+	 * <p>
+	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
+	 */
 	public ImageOperation erode(int n) { // es wird der 3x3 Minimum-Filter genutzt
 		for (int i = 0; i < n; i++)
 			image.getProcessor().erode();
@@ -2677,8 +2724,8 @@ public class ImageOperation {
 	 * @param ABThresh
 	 *           minimal A and B value
 	 */
-	public float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean mode) {
-		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, mode, 0);
+	public float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue) {
+		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, searchWhiteTrue, 0);
 	}
 	
 	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, int recursion) {
@@ -2818,7 +2865,7 @@ public class ImageOperation {
 				distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
 				pix = img[x][y] & 0x0000ff;
 				// if (y <= h / 2)
-				fac = ((factorsTopRight[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsCenter[0]);
+				fac = ((factorsTopRight[0] - factorsCenter[0]) / maxDistToCenter * distToCenter + factorsCenter[0]);
 				// else
 				// fac = ((factorsBottomLeft[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsBottomLeft[0]);
 				pix = (int) (pix * fac);
@@ -3159,7 +3206,8 @@ public class ImageOperation {
 	 * @author pape
 	 * @param K
 	 */
-	public ImageOperation adaptiveThresholdForGrayscaleImage(int n, int assumedBackground, int newForeground, double K) {
+	public ImageOperation adaptiveThresholdForGrayscaleImage(int n,
+			int assumedBackground, int newForeground, double K) {
 		int[][] img = getImageAs2array();
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -3172,8 +3220,8 @@ public class ImageOperation {
 				// Check the local neighbourhood
 				for (int k = 0; k < n; k++) {
 					for (int l = 0; l < n; l++) {
-						x = i - ((int) (n / 2)) + k;
-						y = j - ((int) (n / 2)) + l;
+						x = i - ((n / 2)) + k;
+						y = j - ((n / 2)) + l;
 						if (x > 0 && x < w && y > 0 && y < h) {
 							temp = img[x][y] & 0x0000ff;
 							valuesMask[k * n + l] = temp;
@@ -3213,7 +3261,7 @@ public class ImageOperation {
 				fac = (valuesMask[index] - mean);
 				sum += fac * fac;
 			}
-			res = sum / (double) valuesMask.length;
+			res = sum / valuesMask.length;
 		}
 		return Math.sqrt(res);
 	}
@@ -3307,5 +3355,19 @@ public class ImageOperation {
 			sumB += (int) ImageOperation.labCube[rf][gf][bf + 512];
 		}
 		return new Lab(sumL / (double) length, sumA / (double) length, sumB / (double) length);
+	}
+	
+	public ImageOperation debug(FlexibleImageStack fis, String msg, boolean debug) {
+		if (debug && fis != null && msg != null)
+			fis.addImage(msg, getImage());
+		return this;
+	}
+	
+	public ImageOperation binary() {
+		int[] res = getImageAs1array();
+		int i = 0;
+		for (int c : res)
+			res[i++] = c != BACKGROUND_COLORint ? 1 : 0;
+		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
 }

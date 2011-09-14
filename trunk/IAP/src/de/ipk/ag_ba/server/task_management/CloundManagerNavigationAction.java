@@ -44,7 +44,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Task Management";
+		return "Cloud Computing";
 	}
 	
 	@Override
@@ -68,7 +68,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		}
 		
 		try {
-			ArrayList<CloudHost> hl = m.batchGetAvailableHosts(5 * 60 * 1000);
+			ArrayList<CloudHost> hl = m.batchGetAvailableHosts(2 * 60 * 1000);
 			boolean clusterAvailable = false;
 			for (CloudHost ip : hl) {
 				if (!ip.isClusterExecutionMode()) {

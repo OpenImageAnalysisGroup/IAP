@@ -9,6 +9,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -97,5 +98,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			TreeMap<Double, BlockProperties> allResultsForSnapshot,
 			BlockProperties summaryResult) {
 		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
+	}
+	
+	protected void reportError(Exception error, String errorMessage) {
+		System.err.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
+		if (error != null)
+			error.printStackTrace();
 	}
 }

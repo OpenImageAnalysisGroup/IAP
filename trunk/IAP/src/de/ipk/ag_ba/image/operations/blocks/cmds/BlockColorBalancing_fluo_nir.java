@@ -16,6 +16,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
+	static boolean debug = true;
+	
 	BlockProperty bpleft, bpright;
 	
 	@Override
@@ -79,7 +81,6 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			BlockProperty bpright) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		boolean debug = false;
 		
 		ImageOperation io = new ImageOperation(image);
 		
@@ -144,7 +145,8 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	 *           - inverts the image (used for fluo)
 	 * @return
 	 */
-	public FlexibleImage balance(FlexibleImage input, FlexibleImage inputUsedForColorAnalysis, int whitePoint, boolean invert) {
+	public FlexibleImage balance(FlexibleImage input, FlexibleImage inputUsedForColorAnalysis,
+			int whitePoint, boolean invert) {
 		BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
 		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
 		
@@ -218,17 +220,18 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		double[] res = new double[9];
 		float[] temp;
 		// get TopRight
-		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, 150, 50, false);
+		int minL = 150;// 150;
+		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, minL, 50, false);
 		res[0] = temp[0] * 255f;
 		res[1] = temp[1] * 255f;
 		res[2] = temp[2] * 255f;
 		// get BottomLeft
-		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, 150, 50, false);
+		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, minL, 50, false);
 		res[3] = temp[0] * 255f;
 		res[4] = temp[1] * 255f;
 		res[5] = temp[2] * 255f;
 		// get Center
-		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, false);
+		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, minL, 50, false);
 		res[6] = temp[0] * 255f;
 		res[7] = temp[1] * 255f;
 		res[8] = temp[2] * 255f;

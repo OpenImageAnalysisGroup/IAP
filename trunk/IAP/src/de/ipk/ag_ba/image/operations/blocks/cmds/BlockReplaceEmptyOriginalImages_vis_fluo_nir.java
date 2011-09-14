@@ -12,6 +12,10 @@ public class BlockReplaceEmptyOriginalImages_vis_fluo_nir extends AbstractBlock 
 	
 	private static final int sz = 128 - 5;
 	
+	private static Color lr = new Color(255, 230, 230);
+	private static int lri = new Color(255, 230, 230).getRGB();
+	
+	@Override
 	public FlexibleImage processImage(FlexibleImage image) {
 		FlexibleImageType it = image == null ? FlexibleImageType.UNKNOWN : image.getType();
 		if (image != null) {
@@ -33,7 +37,7 @@ public class BlockReplaceEmptyOriginalImages_vis_fluo_nir extends AbstractBlock 
 				try {
 					if (imageInfo != null) {
 						image = new FlexibleImage(imageInfo.getURL());
-						image.getIO().addBorder(50, 0, 0, Color.RED.getRGB());
+						image.getIO().addBorder(50, 0, 0, lri);
 					}
 				} catch (Exception e) {
 					image = null;
@@ -45,7 +49,7 @@ public class BlockReplaceEmptyOriginalImages_vis_fluo_nir extends AbstractBlock 
 			int[] img = new int[sz * sz];
 			img = ImageOperation.fillArray(img, Color.WHITE.getRGB());
 			image = new FlexibleImage(sz, sz, img);
-			image = image.getIO().drawLine(0, 0, sz, sz, Color.RED, 5).drawLine(sz, 0, 0, sz, Color.RED, 5).addBorder(5, 0, 0, Color.RED.getRGB())
+			image = image.getIO().drawLine(0, 0, sz, sz, lr, 5).drawLine(sz, 0, 0, sz, lr, 5).addBorder(5, 0, 0, lri)
 					.getImage();
 		}
 		return image;

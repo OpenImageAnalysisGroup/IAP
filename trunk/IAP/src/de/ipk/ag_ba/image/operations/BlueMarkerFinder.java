@@ -5,6 +5,8 @@ import ij.plugin.filter.MaximumFinder;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -20,12 +22,14 @@ public class BlueMarkerFinder {
 	private final double scale;
 	private final CameraPosition typ;
 	private final boolean maize;
+	private final int inputImageWidth;
 	
 	public BlueMarkerFinder(FlexibleImage image, double scale, CameraPosition typ, boolean maize) {
 		this.input = image;
 		this.scale = scale;
 		this.typ = typ;
 		this.maize = maize;
+		this.inputImageWidth = this.input.getWidth();
 	}
 	
 	public void findCoordinates(int background) {
@@ -73,7 +77,7 @@ public class BlueMarkerFinder {
 		return result;
 	}
 	
-	public ArrayList<MarkerPair> getResultCoordinates(int tolerance) {
+	public ArrayList<MarkerPair> getResultCoordinates(int verticalToleranceToDetectPairs) {
 		
 		ArrayList<Vector2d> coordinatesUnfiltered = getCoordinates();
 		
@@ -106,10 +110,10 @@ public class BlueMarkerFinder {
 				Vector2d l = coordinatesLeft.get(indexLeft);
 				Vector2d r = coordinatesRight.get(indexRight);
 				if (!added.contains(l) && !added.contains(r)) {
-					if (sameYposition(l, r, tolerance)) {
+					if (sameYposition(l, r, verticalToleranceToDetectPairs)) {
 						added.add(l);
 						added.add(r);
-						result.add(new MarkerPair(l, r));
+						result.add(new MarkerPair(l, r, inputImageWidth));
 					}
 				}
 			}
@@ -124,7 +128,7 @@ public class BlueMarkerFinder {
 					else
 						index++;
 				}
-				result.add(index, new MarkerPair(l, null));
+				result.add(index, new MarkerPair(l, null, inputImageWidth));
 			}
 		}
 		
@@ -137,9 +141,36 @@ public class BlueMarkerFinder {
 					else
 						index++;
 				}
-				result.add(index, new MarkerPair(null, r));
+				result.add(index, new MarkerPair(null, r, inputImageWidth));
 			}
 		}
+		
+		double minX = Double.MAX_VALUE;
+		double maxX = -Double.MAX_VALUE;
+		
+		for (MarkerPair mp : result) {
+			if (mp.left != null && mp.left.x < minX)
+				minX = mp.left.x;
+			if (mp.right != null && mp.right.x > maxX)
+				maxX = mp.right.x;
+		}
+		
+		for (MarkerPair mp : result) {
+			if (mp.left != null)
+				mp.left.x = minX;
+			if (mp.right != null)
+				mp.right.x = maxX;
+		}
+		
+		/**
+		 * marker 1 needs later to be the lowest one
+		 */
+		Collections.sort(result, new Comparator<MarkerPair>() {
+			@Override
+			public int compare(MarkerPair o1, MarkerPair o2) {
+				return o1.left.y < o2.left.y ? 1 : -1;
+			}
+		});
 		
 		return result;
 	}
