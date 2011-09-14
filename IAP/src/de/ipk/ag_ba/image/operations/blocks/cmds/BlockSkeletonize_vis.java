@@ -25,7 +25,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * calculate the skeleton to detect the leafs and the tassel
+ * calculate the skeleton to detect the leafs and the tassel.
+ * REQUIRES FLUO image for bloom detection.
  * 
  * @author pape
  */

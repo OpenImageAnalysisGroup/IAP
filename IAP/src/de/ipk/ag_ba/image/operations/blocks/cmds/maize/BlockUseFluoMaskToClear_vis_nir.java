@@ -26,7 +26,7 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 	@Override
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null || getInput().getMasks().getFluo() == null)
-			return null;
+			return getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
@@ -44,7 +44,7 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 	@Override
 	protected FlexibleImage processNIRmask() {
 		if (getInput().getMasks().getNir() == null || getInput().getMasks().getFluo() == null)
-			return null;
+			return getInput().getMasks().getNir();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			
@@ -62,7 +62,7 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 	@Override
 	protected FlexibleImage processNIRimage() {
 		if (getInput().getImages().getNir() == null || getInput().getMasks().getFluo() == null)
-			return null;
+			return getInput().getImages().getNir();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getImages().getNir();
 			

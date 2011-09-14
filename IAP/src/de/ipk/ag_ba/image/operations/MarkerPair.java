@@ -7,9 +7,21 @@ public class MarkerPair {
 	public Vector2d left;
 	public Vector2d right;
 	
-	public MarkerPair(Vector2d l, Vector2d r) {
+	public MarkerPair(Vector2d l, Vector2d r, int imageWidth) {
 		left = l;
 		right = r;
+		calculateMissingLeftOrRight(imageWidth);
+	}
+	
+	private void calculateMissingLeftOrRight(int imageWidth) {
+		if (left == null && right == null)
+			throw new UnsupportedOperationException("MarkerPair left AND right is NULL");
+		if (left == null) {
+			left = new Vector2d(imageWidth - right.x, right.y);
+		}
+		if (right == null) {
+			right = new Vector2d(imageWidth - left.x, left.y);
+		}
 	}
 	
 	public Vector2d getLeft() {

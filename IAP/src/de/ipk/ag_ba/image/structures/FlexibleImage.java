@@ -60,6 +60,8 @@ public class FlexibleImage {
 		// MyByteArrayInputStream in = new MyByteArrayInputStream(out.getBuff(),
 		// out.size());
 		BufferedImage img = ImageIO.read(is);
+		if (img == null)
+			throw new Exception("Image could not be read: " + url);
 		image = new ImagePlus(url.getFileName(),
 				new ColorProcessor(img.getWidth(), img.getHeight(), ImageConverter.convertBIto1A(img)));
 		w = image.getWidth();

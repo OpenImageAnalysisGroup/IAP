@@ -7,7 +7,6 @@ import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnalysisBlockFIS {
 	
@@ -26,11 +25,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		try {
 			prepare();
 		} catch (Error err1) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: BLOCK PREPARE ERROR: " + err1.getLocalizedMessage());
-			err1.printStackTrace();
+			reportError(null, "BLOCK PREPARE ERROR: " + err1.getLocalizedMessage());
 		} catch (Exception err2) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: BLOCK PREPARE EXCEPTION: " + err2.getLocalizedMessage());
-			err2.printStackTrace();
+			reportError(err2, "BLOCK PREPARE EXCEPTION: " + err2.getLocalizedMessage());
 		}
 		
 		String name = this.getClass().getSimpleName();

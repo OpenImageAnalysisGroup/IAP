@@ -17,7 +17,7 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 	private final GUIsetting guiSetting;
 	
 	public ActionAccessDataProcessing(GUIsetting guIsetting) {
-		super("Access IAP Phenotyping Service Platform");
+		super("Access IAP Cloud Computing Platform");
 		this.guiSetting = guIsetting;
 	}
 	
@@ -38,8 +38,9 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 		ArrayList<NavigationButton> phenoDBcommands = new ArrayList<NavigationButton>();
 		
 		NavigationAction saveExperimentAction = new SaveExperimentInCloud(false);
-		NavigationButton uploadDataEntity = new NavigationButton(saveExperimentAction, "Process Files", "img/ext/user-desktop.png",
-							"img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
+		NavigationButton uploadDataEntity = new NavigationButton(saveExperimentAction, "Process Files",
+				"img/ext/user-desktop.png",
+				"img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
 		phenoDBcommands.add(uploadDataEntity);
 		
 		NavigationAction lemnaExperiments = new ActionLemnaTecNavigation();
@@ -49,7 +50,7 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 			phenoDBcommands.add(lemnaEntity);
 		
 		for (MongoDB m : MongoDB.getMongos()) {
-			NavigationAction mongoExperiments = new ActionMongoExperimentsNavigation(m, true, false);
+			NavigationAction mongoExperiments = new ActionMongoExperimentsNavigation(m, false, false);
 			NavigationButton mongo = new NavigationButton(mongoExperiments, m.getDisplayName(), "img/ext/network-mongo.png",
 								"img/ext/network-mongo-gray.png", src != null ? src.getGUIsetting() : guiSetting);
 			
