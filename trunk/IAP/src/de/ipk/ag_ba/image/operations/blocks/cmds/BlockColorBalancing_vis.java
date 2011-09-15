@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import java.awt.Color;
-
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -52,7 +50,7 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	private double[] getProbablyWhitePixels(FlexibleImage image, double size, boolean verticalGradient) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		boolean debug = true;
+		boolean debug = false;
 		
 		ImageOperation io = new ImageOperation(image);
 		
@@ -68,7 +66,7 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				int scanHeight = (right - left) / 4;
 				int scanWidth = right - left;
 				
-				values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
+				values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true, debug);
 			} else {
 				int left = (int) (0.3 * width);
 				int right = (int) (width - 0.3 * width);
@@ -77,15 +75,9 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				int startHTop = (int) (height * 0.1 - scanHeight / 2);
 				
 				// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
-				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true);
-				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true);
+				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true, debug);
+				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true, debug);
 				
-				if (debug) {
-					image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
-							.fillRect(left, height - (startHTop + scanHeight), scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
-							.drawLine(100, 100, 1000, 1000, Color.RED.getRGB(), 0.5, 10).getImage()
-							.print("region scan for color balance", false);
-				}
 				values = new float[6];
 				int i = 0;
 				values[i] = valuesTop[i++];
@@ -109,8 +101,8 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				int scanWidth = right - left;
 				int startHTop = (int) (height * 0.1 - scanHeight / 2);
 				
-				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true);
-				valuesBottom = io.getRGBAverage(left, height - startHTop, scanWidth, scanHeight, 150, 50, true);
+				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true, debug);
+				valuesBottom = io.getRGBAverage(left, height - startHTop, scanWidth, scanHeight, 150, 50, true, debug);
 			} else {
 				int left = (int) (0.3 * width);
 				int right = (int) (width - 0.3 * width);
@@ -118,14 +110,8 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				int scanWidth = right - left;
 				int startHTop = (int) (height * 0.1 - scanHeight / 2);
 				
-				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true);
-				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true);
-				
-				if (debug) {
-					image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
-							.fillRect(left, height - (startHTop + scanHeight), scanWidth, scanHeight, Color.RED.getRGB(), 0.5).getImage()
-							.print("region scan for color balance", false);
-				}
+				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true, debug);
+				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true, debug);
 			}
 			values = new float[6];
 			int i = 0;
