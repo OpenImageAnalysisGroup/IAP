@@ -210,7 +210,7 @@ public class LemnaTecDataExchange {
 					}
 				}
 			} catch (Exception e) {
-				System.out.println("Info: Database " + database + " has no import_data table (" + e.getMessage() + ")");
+				// System.out.println("Info: Database " + database + " has no import_data table (" + e.getMessage() + ")");
 				for (ExperimentHeaderInterface ehi : result) {
 					ehi.setCoordinator(null);
 				}
