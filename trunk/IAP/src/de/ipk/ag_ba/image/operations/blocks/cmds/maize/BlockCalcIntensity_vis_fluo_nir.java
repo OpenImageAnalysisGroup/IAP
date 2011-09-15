@@ -79,7 +79,7 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
-			ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally,
+			ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), true); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
@@ -124,7 +124,7 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", fSum / filled);
 				} else
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", 0);
-				ResultsTable rt = io.intensity(7).calculateHistorgram(markerDistanceHorizontally,
+				ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), false); // markerDistanceHorizontally
 				
 				if (options == null)
