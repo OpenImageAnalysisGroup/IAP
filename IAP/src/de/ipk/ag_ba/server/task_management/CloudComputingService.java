@@ -10,11 +10,8 @@ import info.StopWatch;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -189,26 +186,8 @@ public class CloudComputingService {
 														cc.setEnableCalculations(false);
 													}
 													
-													Timer t = new Timer();
-													long period = 1000 * 60 * 60 * 24; // 24 Hours
-													TimerTask tT = new TimerTask() {
-														@Override
-														public void run() {
-															try {
-																Thread.sleep(1000);
-																BackupSupport sb = BackupSupport.getInstance();
-																sb.makeBackup();
-															} catch (InterruptedException e) {
-																System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: PROCESSING INTERRUPTED");
-															}
-														}
-													};
-													Date startTime = new Date(); // current day at 23:59:39
-													startTime.setHours(23);
-													startTime.setMinutes(59);
-													startTime.setSeconds(59);
-													t.scheduleAtFixedRate(tT, startTime, period);
 													BackupSupport sb = BackupSupport.getInstance();
+													sb.scheduleBackup();
 													sb.makeBackup();
 												} else
 													if ((args[0] + "").toLowerCase().startsWith("close")) {
