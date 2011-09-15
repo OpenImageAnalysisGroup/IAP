@@ -143,6 +143,50 @@ public class Other {
 				this.src = src;
 				infoset.clear();
 				resultNavigationButtons.clear();
+				
+				resultNavigationButtons.add(new NavigationButton(new AbstractNavigationAction("Show full backup history") {
+					
+					private NavigationButton src;
+					
+					@Override
+					public void performActionCalculateResults(NavigationButton src) throws Exception {
+						this.src = src;
+					}
+					
+					@Override
+					public String getDefaultImage() {
+						return IAPimages.getArchive();
+					}
+					
+					@Override
+					public String getDefaultTitle() {
+						return "Backup History";
+					}
+					
+					@Override
+					public MainPanelComponent getResultMainPanel() {
+						ArrayList<String> htmlTextPanels = new ArrayList<String>();
+						htmlTextPanels.add(BackupSupport.getInstance().getHistory(Integer.MAX_VALUE,
+								"<br>" +
+										"<p>Full Backup-History:<br><ul>",
+								"<li>", "", ""));
+						
+						return new MainPanelComponent(htmlTextPanels);
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+						ArrayList<NavigationButton> set = new ArrayList<NavigationButton>(currentSet);
+						set.add(src);
+						return set;
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewActionSet() {
+						return new ArrayList<NavigationButton>();
+					}
+				}, src.getGUIsetting()));
+				
 				if (includeLemnaTecStatus) {
 					resultNavigationButtons.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
 					
@@ -218,7 +262,7 @@ public class Other {
 			@Override
 			public MainPanelComponent getResultMainPanel() {
 				ArrayList<String> htmlTextPanels = new ArrayList<String>();
-				htmlTextPanels.add(BackupSupport.getInstance().getHistory(20,
+				htmlTextPanels.add(BackupSupport.getInstance().getHistory(10,
 						"<br>" +
 								"<p>Backup-Status:<br><ul>",
 						"<li>", "", ""));

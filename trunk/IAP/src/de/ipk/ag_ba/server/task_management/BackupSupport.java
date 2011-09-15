@@ -195,7 +195,11 @@ public class BackupSupport {
 		StringBuilder res = new StringBuilder();
 		final Stack<String> news = new Stack<String>();
 		for (int i = 0; i < history.size() && i < maxLines; i++) {
-			news.push(preLine + history.get(i));
+			String item = preLine + history.get(i);
+			if (maxLines < Integer.MAX_VALUE)
+				news.push(item);
+			else
+				res.append(item);
 		}
 		while (!news.empty()) {
 			String item = news.pop();
