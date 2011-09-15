@@ -11,6 +11,7 @@ import info.StopWatch;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -351,7 +352,10 @@ public class CloudComputingService {
 						final ThreadSafeOptions tso = new ThreadSafeOptions();
 						final Runtime r = Runtime.getRuntime();
 						ExecutorService es = Executors.newFixedThreadPool(2);
+						HashMap<ExperimentHeaderInterface, String> experiment2id =
+								new HashMap<ExperimentHeaderInterface, String>();
 						for (ExperimentHeaderInterface ii : knownResults) {
+							experiment2id.put(ii, ii.getDatabaseId());
 							final ExperimentHeaderInterface i = ii;
 							Runnable rr = new Runnable() {
 								@Override
@@ -400,7 +404,7 @@ public class CloudComputingService {
 						String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
 						if (sn.indexOf(".") > 0)
 							sn = sn.substring(sn.lastIndexOf(".") + 1);
-						e.getHeader().setExperimentname(sn + ": " + "manual merge at " + SystemAnalysisExt.getCurrentTime());
+						e.getHeader().setExperimentname(sn + ": " + e.getName() + ", manual merge at " + SystemAnalysisExt.getCurrentTime());
 						e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
 						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
 						e.getHeader().setDatabaseId("");
@@ -417,7 +421,8 @@ public class CloudComputingService {
 						long tProcessing = tFinish - tStart;
 						long minutes = tProcessing / 1000 / 60;
 						e.getHeader().setRemark(
-								e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " + SystemAnalysisExt.getCurrentTime());
+								e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " +
+										SystemAnalysisExt.getCurrentTime());
 						System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 						System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
 						System.out.println("*****************************");
@@ -431,14 +436,14 @@ public class CloudComputingService {
 						for (ExperimentHeaderInterface i : knownResults) {
 							try {
 								if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0)
-									m.deleteExperiment(i.getDatabaseId());
+									m.deleteExperiment(experiment2id.get(i));
 								
 							} catch (Exception err) {
-								System.out.println("Could not delete experiment " + i.getExperimentName() + " (" + err.getMessage() + ")");
+								System.out.println("Could not delete experiment " + i.getExperimentName() + " (" +
+										err.getMessage() + ")");
 							}
 						}
 						System.out.println(SystemAnalysisExt.getCurrentTime() + "> COMPLETED");
-						return;
 					}
 			}
 		} catch (Exception e) {

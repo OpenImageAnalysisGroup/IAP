@@ -89,11 +89,19 @@ public class BackupSupport {
 			}
 			
 			for (IdTime it : ltIdArr) {
+				String db = it.getExperimentHeader().getDatabase();
+				if (db == null || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">DATASET IGNORED (INVALID DB): " + it.Id + " (DB: "
+							+ it.getExperimentHeader().getDatabase() + ")");
+					continue;
+				}
+				
 				boolean found = false;
 				for (IdTime h : hsmIdArr) {
 					if (h.equals(it)) {
 						if (it.time.getTime() - h.time.getTime() > 1000) {
-							System.out.println(SystemAnalysisExt.getCurrentTime() + ">BACKUP NEEDED (NEW DATA): " + it.Id);
+							System.out.println(SystemAnalysisExt.getCurrentTime() + ">BACKUP NEEDED (NEW DATA): " + it.Id + " (DB: "
+									+ it.getExperimentHeader().getDatabase() + ")");
 							toSave.add(it);
 						}
 						found = true;
@@ -103,7 +111,8 @@ public class BackupSupport {
 				
 				if (!found) {
 					toSave.add(it);
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">BACKUP NEEDED (NEW EXPERIMENT): " + it.Id);
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">BACKUP NEEDED (NEW EXPERIMENT): " + it.Id + " (DB: "
+							+ it.getExperimentHeader().getDatabase() + ")");
 				}
 			}
 			

@@ -202,6 +202,9 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("ID"), disable(new JTextField(experimentHeader.getDatabaseId() + "")), false);
 		fp.addGuiComponentRow(new JLabel("Import by"), disable(new JTextField(experimentHeader.getImportusername())),
 							false);
+		fp.addGuiComponentRow(new JLabel("Origin"), new JLabel(experimentHeader.getOriginDbId() + ""), false);
+		fp.addGuiComponentRow(new JLabel("Database"), new JLabel(experimentHeader.getDatabase() + ""), false);
+		
 		fp.addGuiComponentRow(new JLabel("Coordinator"), coordinator, false);
 		fp.addGuiComponentRow(new JLabel("Group"), groupVisibility, false);
 		fp.addGuiComponentRow(new JLabel("Experiment-Type"), experimentTypeSelection, false);
