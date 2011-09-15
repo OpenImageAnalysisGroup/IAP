@@ -125,7 +125,8 @@ public class BlockPropertiesImpl implements BlockProperties {
 							}
 							if (pn == null) {
 								if (tm.get(key) != null) {
-									BlockPropertyValue p = new BlockPropertyValue(key.substring(search.length()), "", tm.get(key));
+									String name = key.substring(search.length());
+									BlockPropertyValue p = new BlockPropertyValue(name, getUnitFromName(name), tm.get(key));
 									result.add(p);
 								}
 							} else {
@@ -136,6 +137,150 @@ public class BlockPropertiesImpl implements BlockProperties {
 					}
 			}
 		return result;
+	}
+	
+	TreeMap<String, String> name2unit = getUnits();
+	
+	private String getUnitFromName(String name) {
+		if (name2unit.containsKey(name))
+			return name2unit.get(name);
+		else
+			return "";
+	}
+	
+	private TreeMap<String, String> getUnits() {
+		TreeMap<String, String> res = new TreeMap<String, String>();
+		res.put("top.fluo.intensity.average", "relative / pix");
+		res.put("top.fluo.normalized.histogram.bin.1.0_36", "px");
+		res.put("top.fluo.normalized.histogram.bin.2.36_72", "px");
+		res.put("top.fluo.normalized.histogram.bin.3.72_109", "px");
+		res.put("top.fluo.normalized.histogram.bin.4.109_145", "px");
+		res.put("top.fluo.normalized.histogram.bin.5.145_182", "px");
+		res.put("top.fluo.normalized.histogram.bin.6.182_218", "px");
+		res.put("top.fluo.normalized.histogram.bin.7.218_255", "px");
+		res.put("top.ndvi", "relative");
+		res.put("top.ndvi.vis.blue.intensity.average", "relative");
+		res.put("top.ndvi.vis.green.intensity.average", "relative");
+		res.put("top.ndvi.vis.red.intensity.average", "relative");
+		res.put("top.nir.intensity.average", "relative / pix");
+		res.put("top.nir.normalized.histogram.bin.1.0_36", "px");
+		res.put("top.nir.normalized.histogram.bin.2.36_72", "px");
+		res.put("top.nir.normalized.histogram.bin.3.72_109", "px");
+		res.put("top.nir.normalized.histogram.bin.4.109_145", "px");
+		res.put("top.nir.normalized.histogram.bin.5.145_182", "px");
+		res.put("top.nir.normalized.histogram.bin.6.182_218", "px");
+		res.put("top.nir.normalized.histogram.bin.7.218_255", "px");
+		res.put("top.nir.wetness.avg", "");
+		res.put("vis.side", "images");
+		res.put("fluo.top", "images");
+		res.put("nir.side", "images");
+		res.put("RESULT_VIS_MARKER_POS_1_LEFT_X", "null");
+		res.put("", "");
+		res.put("RESULT_VIS_MARKER_POS_1_RIGHT_X", "null");
+		res.put("RESULT_VIS_MARKER_POS_2_LEFT_X", "null");
+		res.put("", "");
+		res.put("RESULT_VIS_MARKER_POS_2_RIGHT_X", "null");
+		res.put("side.height", "mm");
+		res.put("side.height.norm", "mm");
+		res.put("side.width", "mm");
+		res.put("side.width.norm", "mm");
+		res.put("side.fluo.histogram.bin.1.0_36", "px");
+		res.put("side.fluo.histogram.bin.2.36_72", "px");
+		res.put("side.fluo.histogram.bin.3.72_109", "px");
+		res.put("side.fluo.histogram.bin.4.109_145", "px");
+		res.put("side.fluo.histogram.bin.5.145_182", "px");
+		res.put("side.fluo.histogram.bin.6.182_218", "px");
+		res.put("side.fluo.histogram.bin.7.218_255", "px");
+		res.put("side.fluo.intensity.average", "relative");
+		res.put("side.fluo.intensity.chlorophyl.average", "relative");
+		res.put("side.fluo.intensity.phenol.average", "relative");
+		res.put("side.fluo.intensity.phenol.chlorophyl.ratio", "c/p");
+		res.put("side.fluo.normalized.histogram.bin.1.0_36", "px");
+		res.put("side.fluo.normalized.histogram.bin.2.36_72", "px");
+		res.put("side.fluo.normalized.histogram.bin.3.72_109", "px");
+		res.put("side.fluo.normalized.histogram.bin.4.109_145", "px");
+		res.put("side.fluo.normalized.histogram.bin.5.145_182", "px");
+		res.put("side.fluo.normalized.histogram.bin.6.182_218", "px");
+		res.put("side.fluo.normalized.histogram.bin.7.218_255", "px");
+		res.put("side.ndvi", "relative");
+		res.put("side.ndvi.vis.blue.intensity.average", "relative");
+		res.put("side.ndvi.vis.green.intensity.average", "relative");
+		res.put("side.ndvi.vis.red.intensity.average", "relative");
+		res.put("side.nir.histogram.bin.1.0_36", "px");
+		res.put("side.nir.histogram.bin.2.36_72", "px");
+		res.put("side.nir.histogram.bin.3.72_109", "px");
+		res.put("side.nir.histogram.bin.4.109_145", "px");
+		res.put("side.nir.histogram.bin.5.145_182", "px");
+		res.put("side.nir.histogram.bin.6.182_218", "px");
+		res.put("side.nir.histogram.bin.7.218_255", "px");
+		res.put("side.nir.intensity.average", "relative");
+		res.put("side.nir.normalized.histogram.bin.1.0_36", "px");
+		res.put("side.nir.normalized.histogram.bin.2.36_72", "px");
+		res.put("side.nir.normalized.histogram.bin.3.72_109", "px");
+		res.put("side.nir.normalized.histogram.bin.4.109_145", "px");
+		res.put("side.nir.normalized.histogram.bin.5.145_182", "px");
+		res.put("side.nir.normalized.histogram.bin.6.182_218", "px");
+		res.put("side.nir.normalized.histogram.bin.7.218_255", "px");
+		res.put("side.nir.skeleton.intensity.average", "relative");
+		res.put("side.nir.wetness.avg", "percent");
+		res.put("side.bloom", "0/1");
+		res.put("side.bloom.count", "tassel");
+		res.put("side.fluo.bloom.area.size", "mm^2");
+		res.put("side.leaf.count", "leafs");
+		res.put("side.leaf.length.avg", "px");
+		res.put("side.leaf.length.avg.norm", "mm");
+		res.put("side.leaf.length.sum", "px");
+		res.put("side.leaf.length.sum.norm", "mm");
+		res.put("side.area", "px");
+		res.put("side.area.norm", "mm^2");
+		res.put("side.border.length", "px");
+		res.put("side.border.length.norm", "mm");
+		res.put("side.compactness.01", "relative");
+		res.put("side.compactness.16", "relative");
+		res.put("side.hull.area", "px");
+		res.put("side.hull.area.norm", "mm^2");
+		res.put("side.hull.centroid.x", "px");
+		res.put("side.hull.centroid.x.norm", "mm");
+		res.put("side.hull.centroid.y", "px");
+		res.put("side.hull.centroid.y.norm", "mm");
+		res.put("side.hull.circularity", "relative");
+		res.put("side.hull.circumcircle.d", "px");
+		res.put("side.hull.circumcircle.d.norm", "mm");
+		res.put("side.hull.circumcircle.x", "px");
+		res.put("side.hull.circumcircle.x.norm", "mm");
+		res.put("side.hull.circumcircle.y", "px");
+		res.put("side.hull.circumcircle.y.norm", "mm");
+		res.put("side.hull.fillgrade", "percent");
+		res.put("side.hull.points", "hullpoints");
+		res.put("fluo.side", "images");
+		res.put("side.leaf.count.max", "leafs");
+		res.put("side.leaf.count.median", "leafs");
+		res.put("side.leaf.length.sum.max", "px");
+		res.put("side.leaf.length.sum.norm.max", "mm");
+		res.put("RESULT_VIS_MARKER_POS_3_LEFT_X", "null");
+		res.put("", "");
+		res.put("RESULT_VIS_MARKER_POS_3_RIGHT_X", "null");
+		res.put("top.main.axis.normalized.distance.avg", "mm");
+		res.put("top.main.axis.rotation", "degree");
+		res.put("top.area", "px");
+		res.put("top.border.length", "px");
+		res.put("top.compactness.01", "relative");
+		res.put("top.compactness.16", "relative");
+		res.put("top.hull.area", "px");
+		res.put("top.hull.centroid.x", "px");
+		res.put("top.hull.centroid.y", "px");
+		res.put("top.hull.circularity", "relative");
+		res.put("top.hull.circumcircle.d", "px");
+		res.put("top.hull.circumcircle.x", "px");
+		res.put("top.hull.circumcircle.y", "px");
+		res.put("top.hull.fillgrade", "percent");
+		res.put("top.hull.points", "hullpoints");
+		res.put("side.leaf.count.best", "leafs");
+		res.put("top.fluo.intensity.chlorophyl.average", "relative");
+		res.put("top.fluo.intensity.phenol.average", "relative");
+		res.put("top.fluo.intensity.phenol.chlorophyl.ratio", "relative");
+		
+		return res;
 	}
 	
 	@Override

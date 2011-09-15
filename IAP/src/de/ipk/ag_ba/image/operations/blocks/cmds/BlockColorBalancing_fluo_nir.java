@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	static boolean debug = true;
+	static boolean debug = false;
 	
 	BlockProperty bpleft, bpright;
 	
@@ -91,7 +91,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			int a = (right - left) / 4;
 			int b = right - left;
 			
-			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, 150, 50, true);
+			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, 150, 50, true, false);
 		} else {
 			float[] valuesTop, valuesBottom;
 			int left = (int) (0.3 * width);
@@ -101,8 +101,8 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			int startHTop = (int) (height * 0.1 - scanHeight / 2);
 			
 			// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
-			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true);
-			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true);
+			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true, false);
+			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true, false);
 			
 			if (debug) {
 				image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
@@ -194,7 +194,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 				if (invert) {
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, markerPosX, markerPosY, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
-				} else { // Nir
+				} else { // nir - remove round shade
 					pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);
 					res = io.imageBalancing(whitePoint, pix).getImage();
 				}
@@ -214,27 +214,65 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		int w = inputUsedForColorAnalysis.getWidth();
 		int h = inputUsedForColorAnalysis.getHeight();
 		
-		int scanHeight = (int) (h * 0.1);
+		int scanHeight = (int) (h * 0.06);
 		int scanWidth = (int) (w * 0.1);
 		
+		boolean searchWhiteTrue = true;
 		double[] res = new double[9];
-		float[] temp;
+		float[] topR, bottomR, topL, bottomL, center, top = new float[3], bottom = new float[3];
+		
+		int minL = 215;// 150;
+		
+		BlockProperty bmpYl1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
+		BlockProperty bmpYr1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
+		
+		BlockProperty bmpYl2 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y);
+		BlockProperty bmpYr2 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y);
+		
+		BlockProperty bmpXl = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
+		BlockProperty bmpXr = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
+		
+		if (bmpXl != null || bmpXr != null || bmpYl1 != null || bmpYr1 != null || bmpYl2 != null || bmpYr2 != null) {
+			
+			int yBottom = (int) ((bmpYl1.getValue() + bmpYr1.getValue()) / 2 * h);
+			int yTop = (int) ((bmpYl2.getValue() + bmpYr2.getValue()) / 2 * h);
+			int left = (int) (bmpXl.getValue() * w);
+			int right = (int) (bmpXr.getValue() * w);
+			
+			topL = inputUsedForColorAnalysis.getIO().getRGBAverage(left, yTop, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			topR = inputUsedForColorAnalysis.getIO().getRGBAverage(right - scanWidth, yTop, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			bottomL = inputUsedForColorAnalysis.getIO().getRGBAverage(left, yBottom, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			bottomR = inputUsedForColorAnalysis.getIO().getRGBAverage(right - scanWidth, yBottom, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			
+			int i = 0;
+			top[i] = (topL[i] + topR[i]) / 2;
+			bottom[i] = (bottomL[i] + bottomR[i]) / 2;
+			top[++i] = (topL[i] + topR[i]) / 2;
+			bottom[i] = (bottomL[i] + bottomR[i]) / 2;
+			top[++i] = (topL[i] + topR[i]) / 2;
+			bottom[i] = (bottomL[i] + bottomR[i]) / 2;
+			
+			center = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth, h / 2 - scanHeight, scanWidth * 2, scanHeight * 2, minL, 50,
+					searchWhiteTrue,
+					debug);
+		} else {
+			top = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, minL, 50, searchWhiteTrue, true);
+			bottom = inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, minL, 50, searchWhiteTrue, true);
+			center = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, minL, 50,
+					searchWhiteTrue, true);
+		}
 		// get TopRight
-		int minL = 150;// 150;
-		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, minL, 50, false);
-		res[0] = temp[0] * 255f;
-		res[1] = temp[1] * 255f;
-		res[2] = temp[2] * 255f;
+		res[0] = top[0] * 255f;
+		res[1] = top[1] * 255f;
+		res[2] = top[2] * 255f;
 		// get BottomLeft
-		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, minL, 50, false);
-		res[3] = temp[0] * 255f;
-		res[4] = temp[1] * 255f;
-		res[5] = temp[2] * 255f;
+		res[3] = bottom[0] * 255f;
+		res[4] = bottom[1] * 255f;
+		res[5] = bottom[2] * 255f;
 		// get Center
-		temp = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, minL, 50, false);
-		res[6] = temp[0] * 255f;
-		res[7] = temp[1] * 255f;
-		res[8] = temp[2] * 255f;
+		res[6] = center[0] * 255f;
+		res[7] = center[1] * 255f;
+		res[8] = center[2] * 255f;
 		return res;
 	}
 }

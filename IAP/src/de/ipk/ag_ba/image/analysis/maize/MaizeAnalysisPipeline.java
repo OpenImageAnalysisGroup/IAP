@@ -54,7 +54,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockColorBalancing_vis.class);
 		p.add(BlockFindBlueMarkers_vis.class);
 		p.add(BlockColorBalancing_fluo_nir.class);
-		p.add(BlockColorBalancing_nir_second_run.class);
+		p.add(BlockColorBalancing_vertical_nir.class);
+		p.add(BlockColorBalancing_fluo_nir.class);
 		p.add(BlockClearBackgroundByRefComparison_vis_fluo_nir.class);
 		p.add(BlockClearNirPot_nir.class);
 		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
