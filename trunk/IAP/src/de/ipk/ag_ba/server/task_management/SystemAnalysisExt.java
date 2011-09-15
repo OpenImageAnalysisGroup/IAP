@@ -20,6 +20,7 @@ import java.util.HashSet;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
+import org.StringManipulationTools;
 import org.SystemInfo;
 
 import oshi.software.os.windows.WindowsHardwareAbstractionLayer;
@@ -444,5 +445,57 @@ public class SystemAnalysisExt {
 			return -2;
 		}
 		return -1;
+	}
+	
+	public static String getStatus(String pre, final String preLine, String lineBreak, String follow) {
+		StringBuilder res = new StringBuilder();
+		SystemInfoExt info = new SystemInfoExt();
+		res.append(preLine + "Sockets        : " + info.getCpuSockets() + lineBreak);
+		res.append(preLine + "Cores p. sock. : " + info.getPhysicalCoresPerSocket() + lineBreak);
+		res.append(preLine + "Physical Cores : " + info.getCpuPhysicalCores() + lineBreak);
+		res.append(preLine + "Logical Cores  : " + info.getCpuLogicalCores() + lineBreak);
+		res.append(preLine + "Log./phys. core: " + info.getHyperThreadingFactor() + lineBreak);
+		res.append(preLine + "CPUs (avail.)  : " + info.getCpuCountAvailable() + lineBreak);
+		res.append(preLine + "Phys. mem. (GB): " + info.getPhysicalMemoryInGB() + lineBreak);
+		res.append(preLine + "System load    : " + StringManipulationTools.formatNumber(info.getLoad(), "#.#") + lineBreak);
+		if (res != null && res.length() > 0)
+			return pre + res.toString() + follow;
+		else
+			return res.toString();
+	}
+	
+	public static String getStorageStatus(String pre, final String preLine, String lineBreak, String follow) {
+		StringBuilder res = new StringBuilder();
+		
+		for (File lfw : SystemAnalysisExt.myListRoots()) {
+			long fs = lfw.getFreeSpace();
+			long ts = lfw.getTotalSpace();
+			long free = fs / 1024 / 1024 / 1024;
+			long size = ts / 1024 / 1024 / 1024;
+			long used = (ts - fs) / 1024 / 1024 / 1024;
+			int prc = (int) (100d * (1d - free / (double) size));
+			res.append(preLine + lfw.toString() + " -> " + free + " GB free (" + size + " GB, " + prc + "% used)" + lineBreak);
+		}
+		
+		if (res != null && res.length() > 0)
+			return pre + res.toString() + follow;
+		else
+			return res.toString();
+	}
+	
+	public static ArrayList<File> myListRoots() {
+		ArrayList<File> res = new ArrayList<File>();
+		for (File f : File.listRoots()) {
+			res.add(f);
+		}
+		String[] roots = new String[] { "/media/nfs/hsm", "/media/data4", "/home", "/Users" };
+		for (String r : roots) {
+			if (res.contains(r))
+				continue;
+			File hsm = new File(r);
+			if (hsm.exists())
+				res.add(hsm);
+		}
+		return res;
 	}
 }

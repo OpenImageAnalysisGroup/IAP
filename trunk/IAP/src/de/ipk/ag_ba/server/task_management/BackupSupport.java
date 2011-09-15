@@ -5,6 +5,7 @@ import info.StopWatch;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,6 +28,8 @@ public class BackupSupport {
 	
 	private static BackupSupport instance = null;
 	
+	private final ArrayList<String> history = new ArrayList<String>();
+	
 	public static synchronized BackupSupport getInstance() {
 		if (instance == null)
 			instance = new BackupSupport();
@@ -43,11 +46,27 @@ public class BackupSupport {
 			for (ResourceIOHandler handler : m.getHandlers())
 				ResourceIOManager.registerIOHandler(handler);
 		}
+		
+		print("INFO: BACKUP SUPPORT READY");
+		String hsmFolder = IAPmain.getHSMfolder();
+		if (hsmFolder != null && new File(hsmFolder).exists()) {
+			if (new File(hsmFolder).canRead())
+				print("INFO: HSM FOLDER CAN BE READ");
+			else
+				print("ERROR: HSM FOLDER CAN NOT BE READ");
+			if (new File(hsmFolder).canWrite())
+				print("INFO: HSM FOLDER IS WRITABLE");
+			else
+				print("ERROR: CAN NOT WRITE TO HSM FOLDER");
+			
+		} else {
+			print("WARNING: HSM FOLDER NOT AVAILABLE: " + hsmFolder);
+		}
 	}
 	
 	public void makeBackup() {
 		if (backupRunning) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: BACKUP PROCEDURE IS SKIPPED, BECAUSE PREVIOUS BACKUP OPERATION IS STILL RUNNING");
+			print("INFO: BACKUP PROCEDURE IS SKIPPED, BECAUSE PREVIOUS BACKUP OPERATION IS STILL RUNNING");
 			return;
 		}
 		backupRunning = true;
@@ -56,6 +75,12 @@ public class BackupSupport {
 		} finally {
 			backupRunning = true;
 		}
+	}
+	
+	private void print(String msg) {
+		msg = SystemAnalysisExt.getCurrentTime() + ">" + msg;
+		history.add(msg);
+		System.out.println(msg);
 	}
 	
 	private void makeBackupInnerCall() {
@@ -77,7 +102,7 @@ public class BackupSupport {
 			
 			String hsmFolder = IAPmain.getHSMfolder();
 			if (hsmFolder != null && new File(hsmFolder).exists()) {
-				System.out.println("HSM Folder: " + hsmFolder);
+				print("HSM Folder: " + hsmFolder);
 				Library lib = new Library();
 				HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsmFolder,
 						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
@@ -94,8 +119,7 @@ public class BackupSupport {
 			for (IdTime it : ltIdArr) {
 				String db = it.getExperimentHeader().getDatabase();
 				if (db == null || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">DATASET IGNORED (INVALID DB): " + it.Id + " (DB: "
-							+ it.getExperimentHeader().getDatabase() + ")");
+					print("DATASET IGNORED (INVALID DB): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 					continue;
 				}
 				
@@ -103,8 +127,7 @@ public class BackupSupport {
 				for (IdTime h : hsmIdArr) {
 					if (h.equals(it)) {
 						if (it.time.getTime() - h.time.getTime() > 1000) {
-							System.out.println(SystemAnalysisExt.getCurrentTime() + ">BACKUP NEEDED (NEW DATA): " + it.Id + " (DB: "
-									+ it.getExperimentHeader().getDatabase() + ")");
+							print("BACKUP NEEDED (NEW DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 							toSave.add(it);
 						}
 						found = true;
@@ -114,16 +137,16 @@ public class BackupSupport {
 				
 				if (!found) {
 					toSave.add(it);
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">BACKUP NEEDED (NEW EXPERIMENT): " + it.Id + " (DB: "
+					print("BACKUP NEEDED (NEW EXPERIMENT): " + it.Id + " (DB: "
 							+ it.getExperimentHeader().getDatabase() + ")");
 				}
 			}
 			
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">START BACKUP OF " + toSave.size() + " EXPERIMENTS!");
+			print("START BACKUP OF " + toSave.size() + " EXPERIMENTS!");
 			MongoDB m = MongoDB.getDefaultCloud();
 			for (IdTime it : toSave) {
 				ExperimentHeaderInterface src = it.getExperimentHeader();
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">START BACKUP OF EXPERIMENT: " + it.Id);
+				print("START BACKUP OF EXPERIMENT: " + it.Id);
 				
 				ExperimentReference er = new ExperimentReference(src);
 				
@@ -132,7 +155,7 @@ public class BackupSupport {
 				boolean enabled = true;
 				copyAction.setStatusProvider(new BackgroundTaskConsoleLogger("", "", enabled));
 				copyAction.performActionCalculateResults(null);
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">FINISHED BACKUP OF EXPERIMENT: " + it.Id);
+				print("FINISHED BACKUP OF EXPERIMENT: " + it.Id);
 			}
 			s.printTime();
 		} catch (Exception e1) {
@@ -143,8 +166,7 @@ public class BackupSupport {
 	public void scheduleBackup() {
 		String hsmFolder = IAPmain.getHSMfolder();
 		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder
-					+ ") HAS BEEN SCHEDULED EVERY DAY AT MIDNIGHT");
+			print("AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT MIDNIGHT");
 			Timer t = new Timer();
 			long period = 1000 * 60 * 60 * 24; // 24 Hours
 			TimerTask tT = new TimerTask() {
@@ -155,7 +177,7 @@ public class BackupSupport {
 						BackupSupport sb = BackupSupport.getInstance();
 						sb.makeBackup();
 					} catch (InterruptedException e) {
-						System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: PROCESSING INTERRUPTED");
+						print("INFO: PROCESSING INTERRUPTED");
 					}
 				}
 			};
@@ -165,8 +187,23 @@ public class BackupSupport {
 			startTime.setSeconds(59);
 			t.scheduleAtFixedRate(tT, startTime, period);
 		} else {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: NO AUTOMATIC BACKUP SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
+			print("WARNING: NO AUTOMATIC BACKUP SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
 		}
 	}
 	
+	public String getHistory(int maxLines, String pre, final String preLine, String lineBreak, String follow) {
+		StringBuilder res = new StringBuilder();
+		final Stack<String> news = new Stack<String>();
+		for (int i = 0; i < history.size() && i < maxLines; i++) {
+			news.push(preLine + history.get(i));
+		}
+		while (!news.empty()) {
+			String item = news.pop();
+			res.append(item);
+		}
+		if (res != null && res.length() > 0)
+			return pre + res.toString() + follow;
+		else
+			return res.toString();
+	}
 }

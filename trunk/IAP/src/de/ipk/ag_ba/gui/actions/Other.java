@@ -32,6 +32,8 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.task_management.BackupSupport;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -215,7 +217,17 @@ public class Other {
 			
 			@Override
 			public MainPanelComponent getResultMainPanel() {
-				return null;
+				ArrayList<String> htmlTextPanels = new ArrayList<String>();
+				htmlTextPanels.add(BackupSupport.getInstance().getHistory(20,
+						"<br>" +
+								"<p>Backup-Status:<br><ul>",
+						"<li>", "", ""));
+				
+				htmlTextPanels.add(SystemAnalysisExt.getStatus("<br><p>System-Status:<br><ul>", "<li>", "", ""));
+				
+				htmlTextPanels.add(SystemAnalysisExt.getStorageStatus("<br><p>Storage-Status:<br><ul>", "<li>", "", ""));
+				
+				return new MainPanelComponent(htmlTextPanels);
 			}
 			
 		};
