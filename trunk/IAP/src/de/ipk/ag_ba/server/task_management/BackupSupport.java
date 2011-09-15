@@ -4,6 +4,9 @@ import info.StopWatch;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -57,7 +60,7 @@ public class BackupSupport {
 	
 	private void makeBackupInnerCall() {
 		try {
-			System.out.println(":back - perform backup - now");
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">START BACKUP SYNC");
 			
 			StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">INFO: LemnaTec to HSM Backup", false);
 			
@@ -134,6 +137,35 @@ public class BackupSupport {
 			s.printTime();
 		} catch (Exception e1) {
 			e1.printStackTrace();
+		}
+	}
+	
+	public void scheduleBackup() {
+		String hsmFolder = IAPmain.getHSMfolder();
+		if (hsmFolder != null && new File(hsmFolder).exists()) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder
+					+ ") HAS BEEN SCHEDULED EVERY DAY AT MIDNIGHT");
+			Timer t = new Timer();
+			long period = 1000 * 60 * 60 * 24; // 24 Hours
+			TimerTask tT = new TimerTask() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(1000);
+						BackupSupport sb = BackupSupport.getInstance();
+						sb.makeBackup();
+					} catch (InterruptedException e) {
+						System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: PROCESSING INTERRUPTED");
+					}
+				}
+			};
+			Date startTime = new Date(); // current day at 23:59:39
+			startTime.setHours(23);
+			startTime.setMinutes(59);
+			startTime.setSeconds(59);
+			t.scheduleAtFixedRate(tT, startTime, period);
+		} else {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: NO AUTOMATIC BACKUP SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
 		}
 	}
 	
