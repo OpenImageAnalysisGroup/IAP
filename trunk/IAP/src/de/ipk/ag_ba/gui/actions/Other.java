@@ -49,7 +49,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 public class Other {
 	
 	public static ArrayList<NavigationButton> getProcessExperimentDataWithVantedEntities(final MongoDB m, final ExperimentReference experimentName,
-						GUIsetting guIsetting) {
+			GUIsetting guIsetting) {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		
 		ArrayList<AbstractExperimentDataProcessor> validProcessors = new ArrayList<AbstractExperimentDataProcessor>();
@@ -75,9 +75,9 @@ public class Other {
 						ed = MappingData3DPath.merge(md, true);
 						if (ed != null) {
 							SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(m, ed,
-												experimentName.getExperimentName());
+									experimentName.getExperimentName());
 							ExperimentDataProcessingManager.getInstance().processData(ed, pp, null,
-												optSupplementaryPanel, null);
+									optSupplementaryPanel, null);
 							JComponent gui = IAPmain.showVANTED(true);
 							gui.setBorder(BorderFactory.createLoweredBevelBorder());
 							mpc = new MainPanelComponent(gui);
@@ -95,7 +95,7 @@ public class Other {
 				
 				@Override
 				public ArrayList<NavigationButton> getResultNewNavigationSet(
-									ArrayList<NavigationButton> currentSet) {
+						ArrayList<NavigationButton> currentSet) {
 					ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 					res.add(src);
 					return res;
@@ -112,7 +112,7 @@ public class Other {
 				}
 			};
 			NavigationButton ne = new NavigationButton(action, pp.getShortName(), "img/vanted1_0.png",
-								guIsetting);
+					guIsetting);
 			
 			ImageIcon i = pp.getIcon();
 			if (i != null) {
@@ -127,12 +127,12 @@ public class Other {
 	}
 	
 	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus,
-						GUIsetting guIsetting) {
+			GUIsetting guIsetting) {
 		return getServerStatusEntity(includeLemnaTecStatus, "Check Status", guIsetting);
 	}
 	
 	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus, String title,
-						GUIsetting guIsetting) {
+			GUIsetting guIsetting) {
 		NavigationAction serverStatusAction = new AbstractNavigationAction("Check service availability") {
 			private NavigationButton src;
 			private final HashMap<String, ArrayList<String>> infoset = new HashMap<String, ArrayList<String>>();
@@ -168,7 +168,7 @@ public class Other {
 						ArrayList<String> htmlTextPanels = new ArrayList<String>();
 						htmlTextPanels.add(BackupSupport.getInstance().getHistory(Integer.MAX_VALUE,
 								"<br>" +
-										"<p>Full Backup-History:<br><ul>",
+										"<p>Full Backup-History:<br><br><ul>",
 								"<li>", "", ""));
 						
 						return new MainPanelComponent(htmlTextPanels);
@@ -205,36 +205,36 @@ public class Other {
 				
 				boolean rLocal = IAPservice.isReachable("localhost");
 				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("localhost",
-									simpleIcons ? "img/ext/computer.png" : "img/ext/computer.png"), src
-									.getGUIsetting()));
+						simpleIcons ? "img/ext/computer.png" : "img/ext/computer.png"), src
+						.getGUIsetting()));
 				if (!rLocal)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA13 = IAPservice.isReachable("ba-13.ipk-gatersleben.de");
 				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-13",
-									simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
-									.getGUIsetting()));
+						simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
+						.getGUIsetting()));
 				if (!rBA13)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA24 = IAPservice.isReachable("ba-24.ipk-gatersleben.de");
 				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-24",
-									simpleIcons ? (rBA24 ? pc : pcOff) : "img/ext/macPro.png"), src
-									.getGUIsetting()));
+						simpleIcons ? (rBA24 ? pc : pcOff) : "img/ext/macPro.png"), src
+						.getGUIsetting()));
 				if (!rBA24)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rLemnaDB = IAPservice.isReachable("lemna-db.ipk-gatersleben.de");
 				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("lemna-db",
 						simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
-									.getGUIsetting()));
+						.getGUIsetting()));
 				if (!rLemnaDB)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
 				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-03",
-									simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src
-									.getGUIsetting()));
+						simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src
+						.getGUIsetting()));
 				if (!rBA03)
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
@@ -249,7 +249,7 @@ public class Other {
 			
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(
-								ArrayList<NavigationButton> currentSet) {
+					ArrayList<NavigationButton> currentSet) {
 				currentSet.add(src);
 				return currentSet;
 			}
@@ -264,25 +264,25 @@ public class Other {
 				ArrayList<String> htmlTextPanels = new ArrayList<String>();
 				htmlTextPanels.add(BackupSupport.getInstance().getHistory(10,
 						"<br>" +
-								"<p>Backup-Status:<br><ul>",
+								"<p>Backup-Status:<br><br><ul>",
 						"<li>", "", ""));
 				
-				htmlTextPanels.add(SystemAnalysisExt.getStatus("<br><p>System-Status:<br><ul>", "<li>", "", ""));
+				htmlTextPanels.add(SystemAnalysisExt.getStatus("<br><p>System-Status:<br><br><ul>", "<li>", "", ""));
 				
-				htmlTextPanels.add(SystemAnalysisExt.getStorageStatus("<br><p>Storage-Status:<br><ul>", "<li>", "", ""));
+				htmlTextPanels.add(SystemAnalysisExt.getStorageStatus("<br><p>Storage-Status:<br><br><ul>", "<li>", "", ""));
 				
 				return new MainPanelComponent(htmlTextPanels);
 			}
 			
 		};
 		NavigationButton serverStatusEntity = new NavigationButton(serverStatusAction, title,
-							IAPimages.getCheckstatus(),
-							guIsetting);
+				IAPimages.getCheckstatus(),
+				guIsetting);
 		return serverStatusEntity;
 	}
 	
 	public static NavigationButton getCalendarEntity(
-						final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final MongoDB m, GUIsetting guiSettings) {
+			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final MongoDB m, GUIsetting guiSettings) {
 		
 		final ObjectRef refCalEnt = new ObjectRef();
 		final ObjectRef refCalGui = new ObjectRef();
@@ -330,7 +330,7 @@ public class Other {
 	// private SimpleDateFormat sdf = new SimpleDateFormat("MMMM");
 	
 	private static void checkServerAvailabilityByPing(HashMap<String, ArrayList<String>> infoset, String name,
-						String role, String host) {
+			String role, String host) {
 		infoset.put(name, new ArrayList<String>());
 		InetAddress address;
 		try {
@@ -343,11 +343,11 @@ public class Other {
 			
 		} catch (Exception e1) {
 			infoset.get(name).add(
-								"<h2>" + role + "</h2><hr><br>" + "" + "The " + role + " was not reachable within time limits.<br>"
-													+ "The cause may be internet connectivity problems or server side<br>"
-													+ "problems which may take some time to be corrected.<br><br>"
-													+ "The availability of this server is monitored automatically.<br>"
-													+ "Effort will be put on improving reliability of the service.<br>");
+					"<h2>" + role + "</h2><hr><br>" + "" + "The " + role + " was not reachable within time limits.<br>"
+							+ "The cause may be internet connectivity problems or server side<br>"
+							+ "problems which may take some time to be corrected.<br><br>"
+							+ "The availability of this server is monitored automatically.<br>"
+							+ "Effort will be put on improving reliability of the service.<br>");
 			infoset.get(name).add("Error-Details: " + e1.toString());
 			infoset.get(name).add("<br><b>Status result check: ERROR</b>");
 			

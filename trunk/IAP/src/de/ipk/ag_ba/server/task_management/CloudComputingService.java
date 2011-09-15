@@ -40,6 +40,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.DataMappingTypeManager3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
 /**
  * @author klukas
@@ -393,9 +394,9 @@ public class CloudComputingService {
 								ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
 							}
 						}
-						// ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
-						// e.clear();
-						// e.addAndMerge(MappingData3DPath.merge(mdpl, false));
+						ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
+						e.clear();
+						e.addAndMerge(MappingData3DPath.merge(mdpl, false));
 						long tStart = tempDataSetDescription.getSubmissionTimeL();
 						long tProcessing = tFinish - tStart;
 						long minutes = tProcessing / 1000 / 60;
