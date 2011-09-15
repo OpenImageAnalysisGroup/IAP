@@ -39,8 +39,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 						try {
 							processedImages.setVis(processVISimage());
 						} catch (Exception e) {
-							e.printStackTrace();
-							ErrorMsg.addErrorMessage(e);
+							reportError(e, "could not process VIS image");
 						}
 					}
 				}, name + " process VIS image", parentPriority + 1, parentPriority),
@@ -50,8 +49,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 						try {
 							processedImages.setFluo(processFLUOimage());
 						} catch (Exception e) {
-							e.printStackTrace();
-							ErrorMsg.addErrorMessage(e);
+							reportError(e, "could not process FLU image");
 						}
 					}
 				}, name + " process FLU image", parentPriority + 1, parentPriority),
@@ -61,8 +59,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 						try {
 							processedImages.setNir(processNIRimage());
 						} catch (Exception e) {
-							e.printStackTrace();
-							ErrorMsg.addErrorMessage(e);
+							reportError(e, "could not process NIR image");
 						}
 					}
 				}, name + " process NIR image", 1, parentPriority),
@@ -72,8 +69,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 						try {
 							processedMasks.setVis(processVISmask());
 						} catch (Exception e) {
-							e.printStackTrace();
-							ErrorMsg.addErrorMessage(e);
+							reportError(e, "could not process VIS mask");
 						}
 					}
 				}, name + " process VIS mask", parentPriority + 1, parentPriority),
@@ -137,9 +133,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	
 	protected FlexibleImage processNIRmask() {
 		if (getInput() == null)
-			System.out.println("ERROR 1");
+			System.out.println("ERROR 3");
 		if (getInput().getMasks() == null)
-			System.out.println("ERROR 2");
+			System.out.println("ERROR 4");
 		return getInput().getMasks().getNir();
 	}
 	

@@ -3,12 +3,15 @@ package de.ipk.ag_ba.server.task_management;
 import info.StopWatch;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.ReleaseInfo;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
@@ -21,6 +24,7 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 
@@ -46,7 +50,33 @@ public class BackupSupport {
 			for (ResourceIOHandler handler : m.getHandlers())
 				ResourceIOManager.registerIOHandler(handler);
 		}
-		
+		final String fn = ReleaseInfo.getAppFolderWithFinalSep() + "iap_backup_history.txt";
+		try {
+			TextFile tf = new TextFile(fn);
+			history.addAll(tf);
+			print("INFO: BACKUP HISTORY LOADED (" + fn + ")");
+		} catch (IOException e) {
+			print("INFO: NO BACKUP HISTORY TO LOAD (" + e.getMessage() + " - " + fn + ")");
+		}
+		Timer t = new Timer("IAP Backup-History Saver");
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		TimerTask tT = new TimerTask() {
+			@Override
+			public void run() {
+				if (tso.getInt() == history.size())
+					return;
+				try {
+					TextFile tf = new TextFile();
+					tf.addAll(history);
+					tf.write(fn);
+					tso.setInt(history.size());
+				} catch (IOException e) {
+					print("ERROR: BACKUP HISTORY COULD NOT BE SAVED (" + e.getMessage() + " - " + fn + ")");
+				}
+			}
+		};
+		tT.run();
+		t.scheduleAtFixedRate(tT, new Date(), 1 * 60 * 1000);
 		print("INFO: BACKUP SUPPORT READY");
 		String hsmFolder = IAPmain.getHSMfolder();
 		if (hsmFolder != null && new File(hsmFolder).exists()) {
@@ -159,7 +189,7 @@ public class BackupSupport {
 			}
 			s.printTime();
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			print("ERROR: BACKUP INNER-CALL ERROR (" + e1.getMessage() + ")");
 		}
 	}
 	
@@ -167,7 +197,7 @@ public class BackupSupport {
 		String hsmFolder = IAPmain.getHSMfolder();
 		if (hsmFolder != null && new File(hsmFolder).exists()) {
 			print("AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT MIDNIGHT");
-			Timer t = new Timer();
+			Timer t = new Timer("IAP 24h-Backup-Timer");
 			long period = 1000 * 60 * 60 * 24; // 24 Hours
 			TimerTask tT = new TimerTask() {
 				@Override
@@ -177,7 +207,7 @@ public class BackupSupport {
 						BackupSupport sb = BackupSupport.getInstance();
 						sb.makeBackup();
 					} catch (InterruptedException e) {
-						print("INFO: PROCESSING INTERRUPTED");
+						print("INFO: PROCESSING INTERRUPTED (" + e.getMessage() + ")");
 					}
 				}
 			};
