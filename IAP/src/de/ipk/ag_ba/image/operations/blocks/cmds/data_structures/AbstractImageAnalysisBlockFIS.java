@@ -100,8 +100,14 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
 	}
 	
+	protected void reportError(Error error, String errorMessage) {
+		System.err.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: ERROR IN BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
+		if (error != null)
+			error.printStackTrace();
+	}
+	
 	protected void reportError(Exception error, String errorMessage) {
-		System.err.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
+		System.err.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: EXCEPTION IN BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
 		if (error != null)
 			error.printStackTrace();
 	}

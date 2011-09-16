@@ -618,8 +618,8 @@ public class SkeletonProcessor2d {
 		int h = skelImg[0].length;
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
-				if (skelImg[x][y] != background) {
-					int v = skelImg[x][y];
+				int v = skelImg[x][y];
+				if (v != background) {
 					int r = 2;
 					if (v == colorEndpoints)
 						r = 18;
@@ -746,7 +746,7 @@ public class SkeletonProcessor2d {
 			if (b > greenMax)
 				greenMax = b;
 		}
-		green /= (double) l.points.size();
+		green /= l.points.size();
 		// Point p = l.endpoint;
 		// int c = visImg[(int) (p.x * xf)][(int) (p.y * yf)];
 		// b = (c & 0x0000ff); // B 0..1
@@ -786,6 +786,8 @@ public class SkeletonProcessor2d {
 		int[][] visImg = image.getAs2A();
 		int h = image.getHeight();
 		int w = image.getWidth();
+		if (getMinLimbY() == null)
+			return new FlexibleImage(new int[w][h]);
 		int cutPositionY = (int) ((getMinLimbY().endpoint.y * h / (double) hVis) - h * 0.05);
 		int r, g, b, c, s = 0;
 		float distToYellow = 0f;

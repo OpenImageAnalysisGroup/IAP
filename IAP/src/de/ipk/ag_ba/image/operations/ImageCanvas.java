@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations;
 
+import java.awt.Rectangle;
+
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class ImageCanvas {
@@ -147,6 +149,30 @@ public class ImageCanvas {
 	
 	public FlexibleImage getImage() {
 		return image;
+	}
+	
+	public ImageCanvas fillRectOutside(Rectangle rectangle, int backgroundColorint) {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		ImageCanvas res = this;
+		
+		int xL = rectangle.x - 1;
+		if (xL > 0)
+			res = fillRect(0, 0, xL, h, backgroundColorint, 1);
+		
+		int yT = rectangle.y - 1;
+		if (yT > 0)
+			res = fillRect(0, 0, w, yT, backgroundColorint, 1);
+		
+		int xR = rectangle.x + rectangle.width + 1;
+		if (xR < w && xR > 0)
+			res = fillRect(xR, 0, w - xR, h, backgroundColorint, 1);
+		
+		int yB = rectangle.y + rectangle.height + 1;
+		if (yB < h && yB > 0)
+			res = fillRect(0, yB, w, h - yB, backgroundColorint, 1);
+		
+		return res;
 	}
 	
 }
