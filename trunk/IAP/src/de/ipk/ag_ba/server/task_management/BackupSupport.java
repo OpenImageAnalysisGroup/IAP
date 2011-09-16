@@ -56,7 +56,7 @@ public class BackupSupport {
 			history.addAll(tf);
 			print("INFO: BACKUP HISTORY LOADED (" + fn + ")");
 		} catch (IOException e) {
-			print("INFO: NO BACKUP HISTORY TO LOAD (" + e.getMessage() + " - " + fn + ")");
+			print("INFO: NO BACKUP HISTORY TO LOAD (" + fn + ": " + e.getMessage() + ")");
 		}
 		Timer t = new Timer("IAP Backup-History Saver");
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
