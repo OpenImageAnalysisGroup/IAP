@@ -186,10 +186,13 @@ public class ReleaseInfo implements HelperClass {
 			if (!new File(appFolder).isDirectory()) {
 				boolean success = (new File(appFolder)).mkdirs();
 				if (!success) {
-					appFolder = System.getenv("USERPROFILE");
-					if (!new File(appFolder).isDirectory()) {
-						success = (new File(appFolder)).mkdirs();
-					}
+					String appFolder2 = System.getenv("USERPROFILE");
+					if (!new File(appFolder2).isDirectory()) {
+						success = (new File(appFolder2)).mkdirs();
+						if (success)
+							appFolder = appFolder2;
+					} else
+						return appFolder;
 				}
 			}
 		} catch (Exception e) {
@@ -200,7 +203,6 @@ public class ReleaseInfo implements HelperClass {
 	
 	private static String getAppFolderName() {
 		String newStyle = getAppFolderNameNewStyle();
-		
 		try {
 			
 			String oldStyle = getAppFolderNameOldStyle();
@@ -225,16 +227,15 @@ public class ReleaseInfo implements HelperClass {
 			}
 			
 		} catch (Exception e) {
+			System.out.println("ERROR: CAN'T CORRECTLY PROCESS HOME " +
+					"FOLDER DETECTION: " + e.getMessage());
 			ErrorMsg.addErrorMessage(e);
 		}
-		
 		return newStyle;
 	}
 	
 	private static String getAppFolderNameNewStyle() {
 		String home = System.getProperty("user.home");
-		if (home == null)
-			home = "/home/" + SystemAnalysis.getUserName();
 		boolean windows = false;
 		if (SystemInfo.isMac())
 			home = home + getFileSeparator() + "Library" + getFileSeparator()
@@ -271,8 +272,6 @@ public class ReleaseInfo implements HelperClass {
 	
 	private static String getAppFolderNameOldStyle() {
 		String home = System.getProperty("user.home");
-		if (home == null)
-			home = "/home/" + SystemAnalysis.getUserName();
 		if (getRunningReleaseStatus() == Release.KGML_EDITOR)
 			return home + getFileSeparator() + ".iap_kgml_editor";
 		else
@@ -284,7 +283,8 @@ public class ReleaseInfo implements HelperClass {
 	}
 	
 	public static String getAppFolderWithFinalSep() {
-		return getAppFolder() + getFileSeparator();
+		String r = getAppFolder();
+		return r + getFileSeparator();
 	}
 	
 	public static String getAppWebURL() {
