@@ -5,6 +5,7 @@ import info.StopWatch;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Stack;
 import java.util.Timer;
@@ -224,12 +225,15 @@ public class BackupSupport {
 	public String getHistory(int maxLines, String pre, final String preLine, String lineBreak, String follow) {
 		StringBuilder res = new StringBuilder();
 		final Stack<String> news = new Stack<String>();
+		ArrayList<String> h = new ArrayList<String>(history);
+		if (maxLines < Integer.MAX_VALUE)
+			Collections.reverse(h);
 		for (int i = 0; i < history.size() && i < maxLines; i++) {
-			String item = preLine + history.get(i);
-			if (maxLines < Integer.MAX_VALUE)
-				news.push(item);
-			else
-				res.append(item);
+			String item = preLine + h.get(i);
+			// if (maxLines < Integer.MAX_VALUE)
+			// news.push(item);
+			// else
+			res.append(item);
 		}
 		while (!news.empty()) {
 			String item = news.pop();
