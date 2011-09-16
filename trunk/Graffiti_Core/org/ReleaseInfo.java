@@ -271,6 +271,8 @@ public class ReleaseInfo implements HelperClass {
 	
 	private static String getAppFolderNameOldStyle() {
 		String home = System.getProperty("user.home");
+		if (home == null)
+			home = "/home/" + SystemAnalysis.getUserName();
 		if (getRunningReleaseStatus() == Release.KGML_EDITOR)
 			return home + getFileSeparator() + ".iap_kgml_editor";
 		else
