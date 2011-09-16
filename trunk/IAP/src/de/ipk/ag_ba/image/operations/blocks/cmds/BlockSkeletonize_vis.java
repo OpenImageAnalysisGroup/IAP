@@ -45,9 +45,10 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 				FlexibleImage viswork = vis.copy().getIO().print("orig", debug)// .medianFilter32Bit()
 						// .closing(3, 3)
 						// .erode()
-						.dilateHorizontal(10) // 10
+						.border(5)
+						.dilateHorizontal(20) // 10
 						.blur(1)
-						.getImage().print("vis", false);
+						.getImage().print("vis", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {

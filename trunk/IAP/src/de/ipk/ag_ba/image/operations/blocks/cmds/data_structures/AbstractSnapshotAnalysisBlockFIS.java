@@ -25,7 +25,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		try {
 			prepare();
 		} catch (Error err1) {
-			reportError(null, "BLOCK PREPARE ERROR: " + err1.getLocalizedMessage());
+			reportError(err1, "BLOCK PREPARE ERROR: " + err1.getLocalizedMessage());
 		} catch (Exception err2) {
 			reportError(err2, "BLOCK PREPARE EXCEPTION: " + err2.getLocalizedMessage());
 		}

@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.complex_hull;
 
+import java.awt.Rectangle;
+
 /*************************************************************************
  * Compilation: javac Polygon.java
  * Execution: java Polygon
@@ -199,5 +201,24 @@ class Polygon {
 			distance += points[index].distEuclid(points[(index + 1) % points.length]);
 		}
 		return (int) distance;
+	}
+	
+	public Rectangle getRectangle() {
+		int xMin = Integer.MAX_VALUE;
+		int xMax = 0;
+		int yMin = Integer.MAX_VALUE;
+		int yMax = 0;
+		for (Point p : points) {
+			if (p.x < xMin)
+				xMin = (int) p.x;
+			if (p.y < yMin)
+				yMin = (int) p.y;
+			if (p.x > xMax)
+				xMax = (int) p.x;
+			if (p.y > yMax)
+				yMax = (int) p.y;
+		}
+		Rectangle res = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
+		return res;
 	}
 }

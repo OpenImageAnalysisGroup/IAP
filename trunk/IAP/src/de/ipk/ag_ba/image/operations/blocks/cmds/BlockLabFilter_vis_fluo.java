@@ -83,14 +83,14 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				clearImageAbove(mask.getHeight() * 0.6, options.getBackground()).
 				erode(1).print("A: " + dilate, debug).
 				threshold(127, 1, ImageOperation.BACKGROUND_COLORint).print("B", debug).
-				dilate(5).
+				dilate(11).
 				dilateHor(Integer.MAX_VALUE).print("C", debug).
 						debug(fis, "before hor dilate", debug).dilateHor(2 + dilate * 3).
 						debug(fis, "after hor dilate", debug).// blur(4).
 				getImage(); // old 6x dilate
 		
 		if (debug) {
-			fis.addImage("removed back", potFiltered);
+			fis.addImage("removed black", potFiltered);
 			fis.print("debug lab filter");
 		}
 		

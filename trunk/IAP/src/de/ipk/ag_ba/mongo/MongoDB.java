@@ -1663,47 +1663,47 @@ public class MongoDB {
 		});
 	}
 	
-	/**
-	 * if a batch lastUpdate time is older then the provided limit, it is
-	 * returned in the result set and will most likely be re-claimed to
-	 * another host
-	 */
-	public Collection<BatchCmd> batchGetCommands(final long maxUpdate) {
-		final Collection<BatchCmd> res = new ArrayList<BatchCmd>();
-		try {
-			processDB(new RunnableOnDB() {
-				private DB db;
-				
-				@Override
-				public void run() {
-					// System.out.println("---");
-					DBCollection collection = db.getCollection("schedule");
-					collection.setObjectClass(BatchCmd.class);
-					for (DBObject dbo : collection.find()) {
-						BatchCmd batch = (BatchCmd) dbo;
-						CloudAnalysisStatus s = batch.getRunStatus();
-						if (s == CloudAnalysisStatus.SCHEDULED
-								|| (
-								(batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING)
-								&& System.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate)) {
-							res.add(batch);
-							break;
-						}
-						// System.out.println(batch);
-					}
-				}
-				
-				@Override
-				public void setDB(DB db) {
-					this.db = db;
-				}
-			});
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-			return null;
-		}
-		return res;
-	}
+	// /**
+	// * if a batch lastUpdate time is older then the provided limit, it is
+	// * returned in the result set and will most likely be re-claimed to
+	// * another host
+	// */
+	// public Collection<BatchCmd> batchGetCommands(final long maxUpdate) {
+	// final Collection<BatchCmd> res = new ArrayList<BatchCmd>();
+	// try {
+	// processDB(new RunnableOnDB() {
+	// private DB db;
+	//
+	// @Override
+	// public void run() {
+	// // System.out.println("---");
+	// DBCollection collection = db.getCollection("schedule");
+	// collection.setObjectClass(BatchCmd.class);
+	// for (DBObject dbo : collection.find()) {
+	// BatchCmd batch = (BatchCmd) dbo;
+	// CloudAnalysisStatus s = batch.getRunStatus();
+	// if (s == CloudAnalysisStatus.SCHEDULED
+	// || (
+	// (batch.getRunStatus() == CloudAnalysisStatus.STARTING || batch.getRunStatus() == CloudAnalysisStatus.STARTING)
+	// && System.currentTimeMillis() - batch.getLastUpdateTime() > maxUpdate)) {
+	// res.add(batch);
+	// break;
+	// }
+	// // System.out.println(batch);
+	// }
+	// }
+	//
+	// @Override
+	// public void setDB(DB db) {
+	// this.db = db;
+	// }
+	// });
+	// } catch (Exception e) {
+	// ErrorMsg.addErrorMessage(e);
+	// return null;
+	// }
+	// return res;
+	// }
 	
 	public Collection<BatchCmd> batchGetAllCommands() {
 		final Collection<BatchCmd> res = new ArrayList<BatchCmd>();

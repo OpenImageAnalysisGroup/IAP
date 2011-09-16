@@ -171,6 +171,7 @@ public class ConvexHullCalculator {
 			rt.addValue("hull.centroid.y", centroid.y);
 		}
 		res.setResultsTable(rt);
+		
 		if (drawHull || drawCentroid)
 			res = drawHullAndCentroid(drawHull, drawCentroid, res, polygon, hullLineColor, centroid, centroidColor);
 		
@@ -186,6 +187,8 @@ public class ConvexHullCalculator {
 	
 	private static ImageOperation drawHullAndCentroid(boolean drawHull, boolean drawCentroid,
 			ImageOperation in, Polygon polygon, int hullLineColor, Point centroid, int centroidColor) {
+		
+		// in = in.getCanvas().fillRectOutside(polygon.getRectangle(), ImageOperation.BACKGROUND_COLORint).getImage().getIO();
 		
 		BufferedImage bi = in.getImageAsBufferedImage();
 		

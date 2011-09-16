@@ -2746,12 +2746,15 @@ public class ImageOperation {
 		int sumB = 0;
 		
 		int count = 0;
+		int imgw = getImage().getWidth();
+		int imgh = getImage().getHeight();
 		
 		int[][] img2d = getImageAs2array();
 		float[] p;
 		for (int x = x1; x < x1 + w; x++) {
 			for (int y = y1; y < y1 + h; y++) {
-				
+				if (x < 0 || y < 0 || x >= imgw || y >= imgh)
+					continue;
 				c = img2d[x][y];
 				r = (c & 0xff0000) >> 16;
 				g = (c & 0x00ff00) >> 8;

@@ -57,7 +57,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		if (input != null)
 			res = balance(input, 180, false);
 		else
-			res = input;
+			res = null;
 		return res;
 	}
 	
@@ -232,7 +232,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		BlockProperty bmpXl = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
 		BlockProperty bmpXr = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
 		
-		if (bmpXl != null || bmpXr != null || bmpYl1 != null || bmpYr1 != null || bmpYl2 != null || bmpYr2 != null) {
+		if (bmpXl != null && bmpXr != null && bmpYl1 != null && bmpYr1 != null && bmpYl2 != null && bmpYr2 != null) {
 			
 			int yBottom = (int) ((bmpYl1.getValue() + bmpYr1.getValue()) / 2 * h);
 			int yTop = (int) ((bmpYl2.getValue() + bmpYr2.getValue()) / 2 * h);
