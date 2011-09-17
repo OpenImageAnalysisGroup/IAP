@@ -33,7 +33,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	public CloundManagerNavigationAction(MongoDB m, ActionMongoExperimentsNavigation mongoExperimentsNavigationAction) {
 		super("Task- and Server-Management");
-		this.m = m;
+		this.m = m != null ? m : MongoDB.getDefaultCloud();
 		this.en = mongoExperimentsNavigationAction;
 	}
 	
@@ -52,7 +52,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		GUIsetting guiSetting = src.getGUIsetting();
 		NavigationButton startOrStopServerMode = new NavigationButton(
-							new EnableOrDisableServerModeAction(m), guiSetting);
+				new EnableOrDisableServerModeAction(m), guiSetting);
 		res.add(startOrStopServerMode);
 		
 		try {
