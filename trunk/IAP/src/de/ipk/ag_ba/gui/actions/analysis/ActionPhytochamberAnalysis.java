@@ -49,7 +49,7 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 	private String mongoDatasetID;
 	
 	public ActionPhytochamberAnalysis(MongoDB m, double epsilon, double epsilon2,
-						ExperimentReference experiment) {
+			ExperimentReference experiment) {
 		super("Analyse Phytochamber Top-Images");
 		this.m = m;
 		this.experiment = experiment;
@@ -160,13 +160,13 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
 		res.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(experimentResult),
-							src.getGUIsetting()));
+				src.getGUIsetting()));
 		
 		res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
-							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+				"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 		
 		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
-							false, src.getGUIsetting(), m);
+				false, src.getGUIsetting(), m);
 		return res;
 	}
 	
@@ -199,7 +199,7 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 	}
 	
 	@Override
-	public String getMongoDatasetID() {
+	public String getDatasetID() {
 		return mongoDatasetID;
 	}
 	
@@ -211,5 +211,13 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 	@Override
 	public int getCpuTargetUtilization() {
 		return 1;
+	}
+	
+	@Override
+	public int getNumberOfJobs() {
+		int snapshotsPerJob = 200;
+		int numberOfJobs = experiment.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
+		
+		return numberOfJobs;
 	}
 }

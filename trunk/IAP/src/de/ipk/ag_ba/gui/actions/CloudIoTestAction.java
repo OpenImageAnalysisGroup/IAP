@@ -167,7 +167,7 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 	}
 	
 	@Override
-	public String getMongoDatasetID() {
+	public String getDatasetID() {
 		return datasetID;
 	}
 	
@@ -181,6 +181,11 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 		// by returning this high number, this task will be the only one running
 		// on the cloud execution server
 		return Integer.MAX_VALUE;
+	}
+	
+	@Override
+	public int getNumberOfJobs() {
+		return 1;
 	}
 	
 }

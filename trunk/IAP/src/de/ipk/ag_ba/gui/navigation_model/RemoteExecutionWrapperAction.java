@@ -6,16 +6,15 @@ import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
-import org.bson.types.ObjectId;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.actions.ParameterOptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 public class RemoteExecutionWrapperAction implements NavigationAction {
@@ -40,10 +39,8 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 		// } else {
 		String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
 		String remoteCapableAnalysisActionParams = null;
-		String experimentInputMongoID = remoteAction.getMongoDatasetID();
-		ExperimentHeaderInterface header = remoteAction.getMongoDB().getExperimentHeader(new ObjectId(experimentInputMongoID));
-		int snapshotsPerJob = 100;
-		int numberOfJobs = header.getNumberOfFiles() / snapshotsPerJob / 3;
+		String experimentInputMongoID = remoteAction.getDatasetID();
+		int numberOfJobs = remoteAction.getNumberOfJobs();
 		
 		if (numberOfJobs < 1)
 			numberOfJobs = 1;
@@ -67,7 +64,10 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
 			cmd.setExperimentMongoID(experimentInputMongoID);
 			cmd.setCpuTargetUtilization(remoteAction.getCpuTargetUtilization());
-			BatchCmd.enqueueBatchCmd(remoteAction.getMongoDB(), cmd);
+			MongoDB m = remoteAction.getMongoDB();
+			if (m == null)
+				m = MongoDB.getDefaultCloud();
+			BatchCmd.enqueueBatchCmd(m, cmd);
 			cm.getAction().performActionCalculateResults(src);
 		}
 		System.out.println("Enqueued " + jobIDs.size() + " new jobs!");

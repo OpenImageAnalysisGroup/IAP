@@ -19,7 +19,7 @@ public interface RemoteCapableAnalysisAction extends NavigationAction {
 	
 	public void setParams(ExperimentReference inputExperiment, MongoDB m, String params);
 	
-	public String getMongoDatasetID();
+	public String getDatasetID();
 	
 	public MongoDB getMongoDB();
 	
@@ -27,4 +27,6 @@ public interface RemoteCapableAnalysisAction extends NavigationAction {
 	 * @return 1, if this task utilizes 1 CPU, 2, if this tasks creates two concurrent subtasks.
 	 */
 	public int getCpuTargetUtilization();
+	
+	public int getNumberOfJobs();
 }

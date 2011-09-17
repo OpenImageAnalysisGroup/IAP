@@ -54,4 +54,12 @@ public class BarleyAnalysisAction extends AbstractPhenotypeAnalysisAction {
 		return 1;
 	}
 	
+	@Override
+	public int getNumberOfJobs() {
+		int snapshotsPerJob = 200;
+		int numberOfJobs = experiment.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
+		
+		return numberOfJobs;
+	}
+	
 }

@@ -207,7 +207,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	}
 	
 	@Override
-	public String getMongoDatasetID() {
+	public String getDatasetID() {
 		return mongoDatasetID;
 	}
 	
