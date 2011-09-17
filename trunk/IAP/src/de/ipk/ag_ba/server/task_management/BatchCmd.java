@@ -10,12 +10,13 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.BackgroundTaskStatusProvider;
-import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
@@ -93,9 +94,10 @@ public class BatchCmd extends BasicDBObject {
 		// statusProvider.pleaseContinueRun() -->
 	}
 	
-	public ObjectId getExperimentMongoID() {
-		if (getString("experiment") != null)
-			return new ObjectId(getString("experiment"));
+	public ExperimentHeaderInterface getExperimentHeader() {
+		String expId = getString("experiment");
+		if (expId != null)
+			return new ExperimentReference(expId).getHeader();
 		else
 			return null;
 	}

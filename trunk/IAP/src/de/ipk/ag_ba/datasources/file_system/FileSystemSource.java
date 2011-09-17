@@ -39,10 +39,10 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	private final Library lib;
 	private String description;
 	
-	public FileSystemSource(Library lib, String dataSourceName, String url, String[] validExtensions,
+	public FileSystemSource(Library lib, String dataSourceName, String folder, String[] validExtensions,
 						NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
 		this.lib = lib;
-		this.url = url;
+		this.url = folder;
 		this.validExtensions = validExtensions;
 		this.mainDataSourceIcon = mainDataSourceIcon;
 		this.folderIcon = folderIcon;

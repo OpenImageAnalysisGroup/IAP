@@ -152,7 +152,11 @@ public class BackupSupport {
 				if (db == null || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
 					print("DATASET IGNORED (INVALID DB): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 					continue;
-				}
+				} else
+					if (it.getExperimentHeader().getExperimentName().equals("unknown")) {
+						print("DATASET IGNORED (INVALID UKNOWN EXPERIMENT NAME): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+						continue;
+					}
 				
 				boolean found = false;
 				for (IdTime h : hsmIdArr) {

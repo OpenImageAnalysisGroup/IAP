@@ -26,13 +26,15 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	private final RemoteCapableAnalysisAction actionProxy;
 	private final BackgroundTaskStatusProvider jobStatus;
 	private final MongoDB m;
+	private final String experimentName;
 	
 	public BatchInformationAction(final BatchCmd cmd, MongoDB m) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		super("Cloud Compute Job: " + cmd.getRemoteCapableAnalysisActionClassName());
 		this.cmd = cmd;
 		this.m = m;
 		actionProxy = (RemoteCapableAnalysisAction) Class.forName(cmd.getRemoteCapableAnalysisActionClassName()).newInstance();
-		jobStatus = new MongoJobStatusProvider(cmd, m);
+		jobStatus = new MongoJobStatusProvider(cmd, this.m);
+		experimentName = cmd.getExperimentHeader().getExperimentName();
 	}
 	
 	@Override
@@ -52,7 +54,7 @@ public class BatchInformationAction extends AbstractNavigationAction {
 		String time = new Date(cmd.getSubmissionTime()).toString();
 		sb.append("Compute job start time: " + time + "<br>");
 		sb.append("Target IPs: " + cmd.getTargetIPs() + "<br>");
-		sb.append("Processing Experiment: " + m.getExperimentHeader(cmd.getExperimentMongoID()).getExperimentName());
+		sb.append("Processing Experiment: " + experimentName);
 		return sb.toString();
 	}
 	
