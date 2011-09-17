@@ -56,4 +56,12 @@ public class Maize3DanalysisAction extends AbstractPhenotypeAnalysisAction {
 		return 2;// Integer.MAX_VALUE;
 	}
 	
+	@Override
+	public int getNumberOfJobs() {
+		int snapshotsPerJob = 100;
+		int numberOfJobs = experiment.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
+		
+		return numberOfJobs;
+	}
+	
 }
