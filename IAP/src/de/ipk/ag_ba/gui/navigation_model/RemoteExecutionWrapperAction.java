@@ -7,7 +7,6 @@ import java.util.TreeSet;
 import org.BackgroundTaskStatusProvider;
 import org.ErrorMsg;
 import org.bson.types.ObjectId;
-import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -15,7 +14,6 @@ import de.ipk.ag_ba.gui.actions.ParameterOptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
-import de.ipk.ag_ba.server.task_management.CloudHost;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
@@ -36,44 +34,44 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		ArrayList<CloudHost> targetIPs = remoteAction.getMongoDB().batchGetAvailableHosts(10000);
-		if (false && targetIPs.isEmpty()) {
-			MainFrame.showMessageDialog("No active compute node found.", "Information");
-		} else {
-			String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
-			String remoteCapableAnalysisActionParams = null;
-			String experimentInputMongoID = remoteAction.getMongoDatasetID();
-			ExperimentHeaderInterface header = remoteAction.getMongoDB().getExperimentHeader(new ObjectId(experimentInputMongoID));
-			int snapshotsPerJob = 100;
-			int numberOfJobs = header.getNumberOfFiles() / snapshotsPerJob / 3;
-			
-			if (numberOfJobs < 1)
-				numberOfJobs = 1;
-			TreeSet<Integer> jobIDs = new TreeSet<Integer>();
-			{
-				int idx = 0;
-				while (jobIDs.size() < numberOfJobs)
-					jobIDs.add(idx++);
-			}
-			long st = System.currentTimeMillis();
-			for (int id : jobIDs) {
-				BatchCmd cmd = new BatchCmd();
-				cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
-				cmd.setSubmissionTime(st);
-				HashSet<String> ips = new HashSet<String>();
-				for (CloudHost h : targetIPs)
-					ips.add(h.getHostName());
-				cmd.setTargetIPs(ips);
-				cmd.setSubTaskInfo(id, jobIDs.size());
-				cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
-				cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
-				cmd.setExperimentMongoID(experimentInputMongoID);
-				cmd.setCpuTargetUtilization(remoteAction.getCpuTargetUtilization());
-				BatchCmd.enqueueBatchCmd(remoteAction.getMongoDB(), cmd);
-				cm.getAction().performActionCalculateResults(src);
-			}
-			System.out.println("Enqueued " + jobIDs.size() + " new jobs!");
+		// ArrayList<CloudHost> targetIPs = remoteAction.getMongoDB().batchGetAvailableHosts(10000);
+		// if (false && targetIPs.isEmpty()) {
+		// MainFrame.showMessageDialog("No active compute node found.", "Information");
+		// } else {
+		String remoteCapableAnalysisActionClassName = remoteAction.getClass().getCanonicalName();
+		String remoteCapableAnalysisActionParams = null;
+		String experimentInputMongoID = remoteAction.getMongoDatasetID();
+		ExperimentHeaderInterface header = remoteAction.getMongoDB().getExperimentHeader(new ObjectId(experimentInputMongoID));
+		int snapshotsPerJob = 100;
+		int numberOfJobs = header.getNumberOfFiles() / snapshotsPerJob / 3;
+		
+		if (numberOfJobs < 1)
+			numberOfJobs = 1;
+		TreeSet<Integer> jobIDs = new TreeSet<Integer>();
+		{
+			int idx = 0;
+			while (jobIDs.size() < numberOfJobs)
+				jobIDs.add(idx++);
 		}
+		long st = System.currentTimeMillis();
+		for (int id : jobIDs) {
+			BatchCmd cmd = new BatchCmd();
+			cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
+			cmd.setSubmissionTime(st);
+			HashSet<String> ips = new HashSet<String>();
+			// for (CloudHost h : targetIPs)
+			// ips.add(h.getHostName());
+			cmd.setTargetIPs(ips);
+			cmd.setSubTaskInfo(id, jobIDs.size());
+			cmd.setRemoteCapableAnalysisActionClassName(remoteCapableAnalysisActionClassName);
+			cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
+			cmd.setExperimentMongoID(experimentInputMongoID);
+			cmd.setCpuTargetUtilization(remoteAction.getCpuTargetUtilization());
+			BatchCmd.enqueueBatchCmd(remoteAction.getMongoDB(), cmd);
+			cm.getAction().performActionCalculateResults(src);
+		}
+		System.out.println("Enqueued " + jobIDs.size() + " new jobs!");
+		// }
 	}
 	
 	@Override
