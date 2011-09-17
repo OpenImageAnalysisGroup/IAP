@@ -134,13 +134,13 @@ public class MyThread extends Thread implements Runnable {
 						// }
 					}
 				} catch (RejectedExecutionException ree) {
-					System.out.print("w");
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						//
-					}
-					// start();
+					// System.out.print("w");
+					// try {
+					// Thread.sleep(100);
+					// } catch (InterruptedException e) {
+					// //
+					// }
+					run();
 				}
 			} while (!submitted);
 		} else

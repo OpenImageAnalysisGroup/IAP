@@ -6,6 +6,12 @@
  */
 package de.ipk.ag_ba.gui.util;
 
+import java.io.IOException;
+
+import org.SystemAnalysis;
+import org.bson.types.ObjectId;
+
+import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -18,11 +24,43 @@ public class ExperimentReference {
 	
 	private final String experimentName;
 	private ExperimentInterface experiment;
-	private final ExperimentHeaderInterface header;
+	private ExperimentHeaderInterface header;
 	
 	public ExperimentReference(ExperimentHeaderInterface header) {
 		this.experimentName = header.getExperimentName();
 		this.header = header;
+	}
+	
+	public ExperimentReference(String databaseID) {
+		if (databaseID.startsWith("lemnatec:")) {
+			String db = databaseID.split(":")[1];
+			try {
+				for (ExperimentHeaderInterface ehi : new LemnaTecDataExchange().getExperimentsInDatabase(SystemAnalysis.getUserName(), db)) {
+					if (ehi.getDatabaseId().equals(databaseID)) {
+						header = ehi;
+						break;
+					}
+				}
+			} catch (Exception e) {
+				throw new UnsupportedOperationException(e);
+			}
+		} else {
+			if (databaseID.startsWith("hsm:")) {
+				String fileName = databaseID.substring("hsm:".length());
+				try {
+					header = HsmFileSystemSource.getHSMexperimentHeaderFromFileName(null, fileName);
+				} catch (IOException e) {
+					throw new UnsupportedOperationException(e);
+				}
+			} else {
+				for (MongoDB m : MongoDB.getMongos()) {
+					header = m.getExperimentHeader(new ObjectId(databaseID));
+					if (header != null)
+						break;
+				}
+			}
+		}
+		this.experimentName = header.getExperimentName();
 	}
 	
 	public ExperimentReference(ExperimentInterface experiment) {

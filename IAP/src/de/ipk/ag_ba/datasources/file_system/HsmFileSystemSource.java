@@ -9,6 +9,7 @@ package de.ipk.ag_ba.datasources.file_system;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -77,17 +78,10 @@ public class HsmFileSystemSource extends FileSystemSource {
 				new HashMap<String, TreeMap<Long, ExperimentHeaderInterface>>();
 		
 		if (entries != null)
-			for (String e : entries) {
-				long saveTime = Long.parseLong(e.substring(0, e.indexOf("_")));
+			for (String fileName : entries) {
+				long saveTime = Long.parseLong(fileName.substring(0, fileName.indexOf("_")));
 				
-				HashMap<String, String> properties = new HashMap<String, String>();
-				TextFile tf = new TextFile(folder + File.separator + e);
-				properties.put("_id", "hsm:" + folder + File.separator + e);
-				for (String p : tf) {
-					String[] entry = p.split(",", 3);
-					properties.put(entry[1], entry[2]);
-				}
-				ExperimentHeader eh = new ExperimentHeader(properties);
+				ExperimentHeader eh = getHSMexperimentHeaderFromFileName(url, fileName);
 				
 				if (accessOK(eh)) {
 					String experimentName = eh.getExperimentName();
@@ -100,6 +94,20 @@ public class HsmFileSystemSource extends FileSystemSource {
 		
 		this.thisLevel = new HsmMainDataSourceLevel(experimentName2saveTime2data);
 		((HsmMainDataSourceLevel) thisLevel).setHsmFileSystemSource(this);
+	}
+	
+	public static ExperimentHeader getHSMexperimentHeaderFromFileName(String optUrl, String fileName) throws IOException {
+		String url = optUrl != null ? optUrl + File.separator : "";
+		String folder = url + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME;
+		HashMap<String, String> properties = new HashMap<String, String>();
+		TextFile tf = new TextFile(folder + File.separator + fileName);
+		properties.put("_id", "hsm:" + folder + File.separator + fileName);
+		for (String p : tf) {
+			String[] entry = p.split(",", 3);
+			properties.put(entry[1], entry[2]);
+		}
+		ExperimentHeader eh = new ExperimentHeader(properties);
+		return eh;
 	}
 	
 	@Override

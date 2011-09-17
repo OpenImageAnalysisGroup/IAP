@@ -19,7 +19,8 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 	final HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data;
 	private String description;
 	private int n = 0;
-	private HsmFileSystemSource hsmFileSystemSource;
+	
+	// private HsmFileSystemSource hsmFileSystemSource;
 	
 	public HsmMainDataSourceLevel(HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data) {
 		this.experimentName2saveTime2data = experimentName2saveTime2data;
@@ -88,7 +89,7 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 	}
 	
 	public void setHsmFileSystemSource(HsmFileSystemSource hsmFileSystemSource) {
-		this.hsmFileSystemSource = hsmFileSystemSource;
+		// this.hsmFileSystemSource = hsmFileSystemSource;
 	}
 	
 }
