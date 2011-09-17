@@ -413,7 +413,7 @@ public class Condition implements ConditionInterface {
 											if (attr.getName().equals("startdate"))
 												setExperimentStartDate(AttributeHelper.getDateFromString(attr.getValue()));
 											else
-												if (attr.getName().equals("storagedate"))
+												if (attr.getName().equals("storagedate") || attr.getName().equals("storagetime"))
 													setExperimentStorageDate(AttributeHelper.getDateFromString(attr.getValue()));
 												else
 													if (attr.getName().equals("measurements"))
