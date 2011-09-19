@@ -45,15 +45,16 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 				color = options.getBackground();
 			if (markerPosLeftY != null) {
 				if (markerPosLeftY.getValue() > 0.55) {
-					int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight()) - options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS);
+					// Integer cuof = options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS);
+					int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight());
 					result = new ImageOperation(result).clearImageBottom(cy, color).getImage();
 					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
 				}
 			} else
 				if (markerPosLeftY == null && markerPosRightY != null) {
 					if (markerPosRightY.getValue() > 0.55) {
-						int cy = (int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight())
-									- options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS);
+						// - options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS)
+						int cy = (int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight());
 						result = new ImageOperation(result).clearImageBottom(
 									cy, color).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
@@ -164,8 +165,8 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 				double temp = markerPosLeftY.getValue();
 				if (temp > 0.5) {
 					double pos = temp * getInput().getImages().getNir().getHeight();
-					if (pos > 10)
-						pos -= 10;
+					// if (pos > 10)
+					// pos -= 10;
 					result = new ImageOperation(input).clearImageBottom(
 								(int) (pos), options.getNirBackground()).getImage();
 					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);
@@ -188,8 +189,8 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 				double temp = markerPosRightY.getValue();
 				if (temp > 0.5) {
 					double pos = (temp * getInput().getImages().getNir().getHeight());
-					if (pos > 10)
-						pos -= 14;
+					// if (pos > 10)
+					// pos -= 14;
 					result = new ImageOperation(input).clearImageBottom(
 								(int) pos, options.getNirBackground()).getImage();
 					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR, pos);

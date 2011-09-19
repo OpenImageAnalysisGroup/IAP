@@ -114,7 +114,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 50 * 255 / 100);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green
 			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 120);

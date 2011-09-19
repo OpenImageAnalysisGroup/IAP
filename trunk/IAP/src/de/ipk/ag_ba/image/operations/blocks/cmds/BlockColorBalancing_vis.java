@@ -14,6 +14,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
+	boolean debug = false;
+	
 	@Override
 	protected FlexibleImage processVISimage() {
 		FlexibleImage vis = getInput().getImages().getVis();
@@ -22,9 +24,9 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			pix = getProbablyWhitePixels(vis, 0.3, true);
+			pix = getProbablyWhitePixels(vis, 0.3, true, 150, 50);
 		} else
-			pix = getProbablyWhitePixels(vis, 0.06, false);
+			pix = getProbablyWhitePixels(vis, 0.06, false, 230, 10);
 		return io.imageBalancing(255, pix).getImage().print("after", false);
 	}
 	
@@ -36,9 +38,9 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis, 0.3, true);
+			pix = getProbablyWhitePixels(vis, 0.3, true, 150, 50);
 		else
-			pix = getProbablyWhitePixels(vis, 0.06, false);
+			pix = getProbablyWhitePixels(vis, 0.06, false, 230, 10);
 		return io.imageBalancing(255, pix).getImage();
 	}
 	
@@ -47,10 +49,9 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	 * 
 	 * @author pape
 	 */
-	private double[] getProbablyWhitePixels(FlexibleImage image, double size, boolean verticalGradient) {
+	private double[] getProbablyWhitePixels(FlexibleImage image, double size, boolean verticalGradient, int lThres, int abThres) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		boolean debug = false;
 		
 		ImageOperation io = new ImageOperation(image);
 		
@@ -75,8 +76,8 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				int startHTop = (int) (height * 0.1 - scanHeight / 2);
 				
 				// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
-				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true, debug);
-				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true, debug);
+				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
+				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, abThres, true, debug);
 				
 				values = new float[6];
 				int i = 0;
@@ -101,8 +102,8 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				int scanWidth = right - left;
 				int startHTop = (int) (height * 0.1 - scanHeight / 2);
 				
-				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true, debug);
-				valuesBottom = io.getRGBAverage(left, height - startHTop, scanWidth, scanHeight, 150, 50, true, debug);
+				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
+				valuesBottom = io.getRGBAverage(left, height - startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
 			} else {
 				int left = (int) (0.3 * width);
 				int right = (int) (width - 0.3 * width);
@@ -110,8 +111,8 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				int scanWidth = right - left;
 				int startHTop = (int) (height * 0.1 - scanHeight / 2);
 				
-				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true, debug);
-				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true, debug);
+				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
+				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, abThres, true, debug);
 			}
 			values = new float[6];
 			int i = 0;
