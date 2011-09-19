@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
@@ -8,6 +10,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockFIS {
+	
+	boolean debug = false;
 	
 	@Override
 	protected void prepare() {
@@ -30,7 +34,7 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
-			return clearImageSide(input, getInput().getMasks().getFluo(), 0.1).print("cleared", false);
+			return clearImageSide(input, getInput().getMasks().getFluo(), 0.1).print("cleared", debug);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
@@ -45,6 +49,17 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 	protected FlexibleImage processNIRmask() {
 		if (getInput().getMasks().getNir() == null || getInput().getMasks().getFluo() == null)
 			return getInput().getMasks().getNir();
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (getInput().getMasks().getVis() != null) {
+				// apply enlarged vis mask to nir
+				ImageOperation nir = getInput().getMasks().getNir().copy().getIO().print("NIRRRR", debug);
+				FlexibleImage mask = getInput().getMasks().getVis().copy().getIO().blur(13).
+						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
+				return nir.applyMask_ResizeMaskIfNeeded(
+						mask,
+						options.getBackground()).print("FILTERED NIR", debug).getImage();
+			}
+		}
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getNir();
 			

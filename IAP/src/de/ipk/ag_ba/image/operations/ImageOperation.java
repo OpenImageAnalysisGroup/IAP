@@ -3221,14 +3221,14 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * @param n
+	 * @param sizeOfRegion
 	 *           - size of the local region to detect threshold
 	 * @param assumedBackground
 	 * @return
 	 * @author pape
 	 * @param K
 	 */
-	public ImageOperation adaptiveThresholdForGrayscaleImage(int n,
+	public ImageOperation adaptiveThresholdForGrayscaleImage(int sizeOfRegion,
 			int assumedBackground, int newForeground, double K) {
 		int[][] img = getImageAs2array();
 		int w = image.getWidth();
@@ -3236,23 +3236,23 @@ public class ImageOperation {
 		int[][] out = new int[w][h];
 		int x, y, thresh, pix, min = Integer.MAX_VALUE, max = 0, temp = 0;
 		double mean;
-		int[] valuesMask = new int[n * n];
+		int[] valuesMask = new int[sizeOfRegion * sizeOfRegion];
 		for (int j = 0; j < h; j++) {
 			for (int i = 0; i < w; i++) {
 				// Check the local neighbourhood
-				for (int k = 0; k < n; k++) {
-					for (int l = 0; l < n; l++) {
-						x = i - ((n / 2)) + k;
-						y = j - ((n / 2)) + l;
+				for (int k = 0; k < sizeOfRegion; k++) {
+					for (int l = 0; l < sizeOfRegion; l++) {
+						x = i - ((sizeOfRegion / 2)) + k;
+						y = j - ((sizeOfRegion / 2)) + l;
 						if (x > 0 && x < w && y > 0 && y < h) {
 							temp = img[x][y] & 0x0000ff;
-							valuesMask[k * n + l] = temp;
+							valuesMask[k * sizeOfRegion + l] = temp;
 							if (temp > max)
 								max = temp;
 							if (temp < min)
 								min = temp;
 						} else
-							valuesMask[k * n + l] = assumedBackground;
+							valuesMask[k * sizeOfRegion + l] = assumedBackground;
 					}
 				}
 				// Find the threshold value
@@ -3392,4 +3392,13 @@ public class ImageOperation {
 			res[i++] = c != BACKGROUND_COLORint ? 1 : 0;
 		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
+	
+	public ImageOperation binary(int foreground, int background) {
+		int[] res = getImageAs1array();
+		int i = 0;
+		for (int c : res)
+			res[i++] = c != BACKGROUND_COLORint ? foreground : background;
+		return new ImageOperation(res, image.getWidth(), image.getHeight());
+	}
+	
 }

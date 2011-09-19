@@ -31,8 +31,9 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processFLUOimage() {
 		FlexibleImage input = getInput().getImages().getFluo();
 		FlexibleImage res;
+		boolean invert = true;
 		if (input != null)
-			res = balance(input, input.getIO().medianFilter32Bit().getImage(), 255, true);
+			res = balance(input, input.getIO().medianFilter32Bit().getImage(), 255, invert);
 		else
 			res = input;
 		return res;
@@ -43,8 +44,9 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processFLUOmask() {
 		FlexibleImage input = getInput().getMasks().getFluo();
 		FlexibleImage res;
+		boolean invert = true;
 		if (input != null)
-			res = balance(input, 255, true);
+			res = balance(input, 255, invert);
 		else
 			res = input;
 		return res;
@@ -82,6 +84,9 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
+		int lThres = 240;
+		int abThres = 5;
+		
 		ImageOperation io = new ImageOperation(image);
 		
 		float[] values;
@@ -91,7 +96,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			int a = (right - left) / 4;
 			int b = right - left;
 			
-			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, 150, 50, true, false);
+			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, lThres, abThres, true, false);
 		} else {
 			float[] valuesTop, valuesBottom;
 			int left = (int) (0.3 * width);
@@ -101,8 +106,8 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			int startHTop = (int) (height * 0.1 - scanHeight / 2);
 			
 			// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
-			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, 150, 50, true, false);
-			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, 150, 50, true, false);
+			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, false);
+			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, 50, true, false);
 			
 			if (debug) {
 				image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)

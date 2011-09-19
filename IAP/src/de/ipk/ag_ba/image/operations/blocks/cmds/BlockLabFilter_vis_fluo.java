@@ -28,18 +28,19 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			FlexibleImage result;
 			FlexibleImage mask = getInput().getMasks().getVis();
 			FlexibleImage orig = getInput().getImages().getVis();
+			boolean side = options.getCameraPosition() == CameraPosition.SIDE;
 			if (options.isMaize()) {
 				dilate = 3;
-				result = labFilterVis(mask, orig, dilate, debug);
+				result = labFilterVis(side, mask, orig, dilate, debug);
 			} else {
 				dilate = 4;
-				result = labFilterVis(mask, orig, dilate, debug);
+				result = labFilterVis(side, mask, orig, dilate, debug);
 			}
 			return result;
 		}
 	}
 	
-	private FlexibleImage labFilterVis(FlexibleImage mask, FlexibleImage orig, int dilate, boolean debug) {
+	private FlexibleImage labFilterVis(boolean sideImage, FlexibleImage mask, FlexibleImage orig, int dilate, boolean debug) {
 		FlexibleImageStack fis = new FlexibleImageStack();
 		
 		FlexibleImage labResult = labFilter(
@@ -54,7 +55,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
 				options.getCameraPosition(),
 				options.isMaize(), false, true,
-				options.getBackground()).getIO().erode(2).dilate(dilate).getImage().print("after lab", false);
+				options.getBackground()).getIO().erode(2).dilate(dilate).getImage().print("after lab", debug);
 		
 		if (debug) {
 			fis.addImage("mask", mask.copy());
@@ -67,6 +68,9 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		
 		if (debug)
 			fis.addImage("without blue parts", result);
+		
+		if (!sideImage)
+			return result;
 		
 		FlexibleImage potFiltered = labFilter(
 				result.copy(),
