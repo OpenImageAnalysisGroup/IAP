@@ -12,6 +12,7 @@ import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
+import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -80,7 +81,10 @@ public class ExperimentReference {
 			if (header.getDatabaseId().startsWith("lemnatec:"))
 				return new LemnaTecDataExchange().getExperiment(header, null);
 			else
-				return m.getExperiment(header, interactiveGetExperimentSize, null);
+				if (header.getDatabaseId().startsWith("hsm:"))
+					return HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
+				else
+					return m.getExperiment(header, interactiveGetExperimentSize, null);
 		}
 	}
 	
