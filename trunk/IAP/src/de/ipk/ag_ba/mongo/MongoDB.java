@@ -1752,6 +1752,13 @@ public class MongoDB {
 						for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.SCHEDULED))) {
 							BatchCmd batch = (BatchCmd) dbo;
 							if (batch.getCpuTargetUtilization() < maxTasks) {
+								try {
+									if (batch.getExperimentHeader() == null)
+										continue;
+								} catch (Exception e) {
+									// e.g. HSM folder on this system not available
+									continue;
+								}
 								if (batch.getOwner() == null)
 									batchClaim(batch, CloudAnalysisStatus.STARTING, false);
 								if (hostName.equals("" + batch.getOwner())) {
@@ -1768,8 +1775,8 @@ public class MongoDB {
 							for (DBObject dbo : collection.find()) {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (!added && batch.getCpuTargetUtilization() < maxTasks)
-									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5000)) {
-										// res.add(batch);
+									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 30000)) {
+										// after 30 seconds tasks are taken away from other systems
 										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
 										claimed++;
 										if (claimed >= maxTasks)
