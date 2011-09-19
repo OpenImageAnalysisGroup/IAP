@@ -12,15 +12,17 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
 import javax.swing.ImageIcon;
 
+import org.graffiti.editor.GravistoService;
+
 import de.ipk.ag_ba.gui.actions.Calendar2;
-import de.ipk.ag_ba.image.operations.ImageCanvas;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 /**
  * @author klukas
@@ -52,12 +54,15 @@ public class MyCalendarIcon extends ImageIcon implements DynamicPaintingIcon {
 	}
 	
 	@Override
-	public FlexibleImage getCurrentImage() {
-		FlexibleImage fi = new FlexibleImage(getImage());
-		ImageCanvas canvas = fi.getIO().getCanvas();
-		paintCalendarInfo(canvas.getGraphics(), 0, 0);
-		canvas.updateFromGraphics();
-		return canvas.getImage();
+	public Image getCurrentImage() {
+		Image i = null;
+		try {
+			i = GravistoService.loadImage(IAPmain.class, calendarEntity.getActionImage(), 48, 48);
+			paintCalendarInfo(i.getGraphics(), 0, 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return i;
 	}
 	
 	private void paintCalendarInfo(Graphics g, int x, int y) {

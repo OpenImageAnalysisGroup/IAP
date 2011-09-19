@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.gui.calendar;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import java.awt.Image;
 
 public interface DynamicPaintingIcon {
-	public FlexibleImage getCurrentImage();
+	public Image getCurrentImage();
 }

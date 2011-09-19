@@ -32,6 +32,7 @@ import org.Colors;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.gui.picture_gui.MyImageIcon;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 
 public class ImageConverter {
@@ -478,6 +479,13 @@ public class ImageConverter {
 			res[idx] = new Color_CIE_Lab(l, a, b).getRGB();
 		}
 		return res;
+	}
+	
+	public static BufferedImage convertImage2BufferedImage(Image image) {
+		if (image instanceof BufferedImage)
+			return (BufferedImage) image;
+		else
+			return MyImageIcon.toBufferedImage(image);
 	}
 	
 }
