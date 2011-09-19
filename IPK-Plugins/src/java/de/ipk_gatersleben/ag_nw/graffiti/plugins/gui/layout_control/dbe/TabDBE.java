@@ -238,12 +238,12 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 			
 			public boolean process(List<File> files) {
 				// GravistoMainHelper.processDroppedFiles(files.toArray(new File[]{}), false, (Class)PutIntoSidePanel.class);
-				ExperimentLoader.loadFile(files, receiver != null ? receiver : TabDBE.this);
+				ExperimentFileLoader.loadFile(files, receiver != null ? receiver : TabDBE.this);
 				return true;
 			}
 			
 			public boolean canProcess(File f) {
-				return ExperimentLoader.canLoadFile(f);
+				return ExperimentFileLoader.canLoadFile(f);
 			}
 			
 			public void setExperimentDataReceiver(ExperimentDataPresenter receiver) {

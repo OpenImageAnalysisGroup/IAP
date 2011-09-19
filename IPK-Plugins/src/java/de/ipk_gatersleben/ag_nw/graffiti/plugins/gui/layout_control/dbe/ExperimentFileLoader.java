@@ -31,7 +31,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.kegg_exp
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
-public class ExperimentLoader {
+public class ExperimentFileLoader {
 	
 	public static final String[] supportedMagicFieldStrings = new String[] { "V1.0", "V1.0T", "V1.1", "V1.1T", "V1.2", "V1.2T" }; // TODO:
 	
@@ -80,7 +80,7 @@ public class ExperimentLoader {
 	}
 	
 	public static void loadFile(final Collection<File> fileList, final ExperimentDataPresenter receiver) {
-		synchronized (ExperimentLoader.class) {
+		synchronized (ExperimentFileLoader.class) {
 			final ArrayList<File> keggExpressionFiles = new ArrayList<File>();
 			final ArrayList<File> rawTextFiles = new ArrayList<File>();
 			for (File f : fileList) {
@@ -103,9 +103,9 @@ public class ExperimentLoader {
 								new Runnable() {
 									public void run() {
 										HashMap<File, TableData> unformatedExcelData = new HashMap<File, TableData>();
-										ExperimentLoader.processExcelTemplateFiles(fileList, status, receiver, unformatedExcelData);
+										ExperimentFileLoader.processExcelTemplateFiles(fileList, status, receiver, unformatedExcelData);
 										status.setCurrentStatusText2("");
-										ExperimentLoader.processRawAndExpressionTextFiles(keggExpressionFiles, rawTextFiles, unformatedExcelData,
+										ExperimentFileLoader.processRawAndExpressionTextFiles(keggExpressionFiles, rawTextFiles, unformatedExcelData,
 															rawFile2relevantColumns, status, receiver);
 									}
 								},
@@ -350,7 +350,7 @@ public class ExperimentLoader {
 						final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
 						ExperimentDataPresenter receiver,
 						HashMap<File, TableData> rawTextFilesReceiver) {
-		synchronized (ExperimentLoader.class) {
+		synchronized (ExperimentFileLoader.class) {
 			for (File f : fileList) {
 				status.setCurrentStatusText2("Read File: " + f.getName());
 				try {
@@ -370,7 +370,7 @@ public class ExperimentLoader {
 						final HashMap<File, ArrayList<TextFileColumnInformation>> rawFile2relevantColumns,
 						final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
 						final ExperimentDataPresenter receiver) {
-		synchronized (ExperimentLoader.class) {
+		synchronized (ExperimentFileLoader.class) {
 			HashMap<File, Boolean> transposeContent = new HashMap<File, Boolean>();
 			rawTextFiles.addAll(unformatedExcelData.keySet());
 			if (keggExpressionFiles.size() > 0 || rawTextFiles.size() > 0) {

@@ -1,12 +1,15 @@
 package de.ipk.ag_ba.image.operations;
 
+import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class ImageCanvas {
 	
 	private FlexibleImage image;
+	private Graphics graphics;
 	
 	public ImageCanvas(FlexibleImage image) {
 		this.image = image;
@@ -175,4 +178,15 @@ public class ImageCanvas {
 		return res;
 	}
 	
+	private BufferedImage buf = null;
+	
+	public Graphics getGraphics() {
+		if (buf == null)
+			buf = image.getAsBufferedImage();
+		return buf.getGraphics();
+	}
+	
+	public void updateFromGraphics() {
+		image = new FlexibleImage(buf);
+	}
 }

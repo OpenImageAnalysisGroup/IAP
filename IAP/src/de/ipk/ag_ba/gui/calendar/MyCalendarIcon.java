@@ -19,11 +19,13 @@ import java.util.GregorianCalendar;
 import javax.swing.ImageIcon;
 
 import de.ipk.ag_ba.gui.actions.Calendar2;
+import de.ipk.ag_ba.image.operations.ImageCanvas;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
  * @author klukas
  */
-public class MyCalendarIcon extends ImageIcon {
+public class MyCalendarIcon extends ImageIcon implements DynamicPaintingIcon {
 	private static final long serialVersionUID = 1L;
 	private final Calendar2 calendarEntity;
 	private final int imgS;
@@ -46,6 +48,19 @@ public class MyCalendarIcon extends ImageIcon {
 	@Override
 	public synchronized void paintIcon(Component c, Graphics g, int x, int y) {
 		super.paintIcon(c, g, x, y);
+		paintCalendarInfo(g, x, y);
+	}
+	
+	@Override
+	public FlexibleImage getCurrentImage() {
+		FlexibleImage fi = new FlexibleImage(getImage());
+		ImageCanvas canvas = fi.getIO().getCanvas();
+		paintCalendarInfo(canvas.getGraphics(), 0, 0);
+		canvas.updateFromGraphics();
+		return canvas.getImage();
+	}
+	
+	private void paintCalendarInfo(Graphics g, int x, int y) {
 		Graphics2D g2d = (Graphics2D) g.create();
 		
 		if (imgS < 48) {
