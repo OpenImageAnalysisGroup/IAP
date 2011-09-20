@@ -3447,4 +3447,29 @@ public class ImageOperation {
 		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
 	
+	/**
+	 * @return The combine image (a and b where a pixels are background).
+	 */
+	public ImageOperation or(FlexibleImage b) {
+		if (b == null)
+			return this;
+		int[][] aa = getImageAs2array();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] ba = b.resize(w, h).getAs2A();
+		for (int x = 0; x < w; x++)
+			for (int y = 0; y < h; y++) {
+				int apixel = aa[x][y];
+				if (apixel == BACKGROUND_COLORint)
+					aa[x][y] = ba[x][y];
+				else {
+					int bpixel = ba[x][y];
+					if (bpixel != BACKGROUND_COLORint) {
+						aa[x][y] = aa[x][y] | ba[x][y];
+					}
+				}
+			}
+		return new FlexibleImage(aa).getIO();
+	}
+	
 }
