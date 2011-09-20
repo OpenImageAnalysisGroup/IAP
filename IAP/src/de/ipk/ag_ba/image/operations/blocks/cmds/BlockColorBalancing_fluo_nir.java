@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import java.awt.Color;
-
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -84,7 +82,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int lThres = 240;
+		int lThres = -10;
 		int abThres = 5;
 		
 		ImageOperation io = new ImageOperation(image);
@@ -109,11 +107,6 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
 			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, 50, true, debug);
 			
-			if (debug) {
-				image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
-						.fillRect(left, height - (startHTop + scanHeight), scanWidth, scanHeight, Color.RED.getRGB(), 0.5).getImage()
-						.print("region scan for color balance", debug);
-			}
 			values = new float[6];
 			int i = 0;
 			values[i] = valuesTop[i++];
@@ -226,7 +219,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		double[] res = new double[9];
 		float[] topR, bottomR, topL, bottomL, center, top = new float[3], bottom = new float[3];
 		
-		int minL = 215;// 150;
+		int minL = -10;// 150;
 		
 		BlockProperty bmpYl1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
 		BlockProperty bmpYr1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);

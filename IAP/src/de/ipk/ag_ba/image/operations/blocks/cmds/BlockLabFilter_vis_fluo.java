@@ -55,7 +55,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
 				options.getCameraPosition(),
 				options.isMaize(), false, true,
-				options.getBackground()).getIO().erode(2).dilate(dilate).getImage().print("after lab", debug);
+				options.getBackground()).getIO().erode(2).print("before dilate, after lab", debug).dilate(dilate).getImage().print("after lab", debug);
 		
 		if (debug) {
 			fis.addImage("mask", mask.copy());
@@ -104,24 +104,24 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				.getImage();
 	}
 	
-	@Override
-	protected FlexibleImage processFLUOmask() {
-		if (getInput().getMasks().getFluo() == null && getInput().getImages().getFluo() == null)
-			return null;
-		
-		if (options.getCameraPosition() == CameraPosition.SIDE)
-			return getInput().getMasks().getFluo();
-		else
-			return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(),
-						options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO),
-					options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO),
-						options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO),
-						options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO),
-						options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO),
-						options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO),
-						options.getCameraPosition(),
-						options.isMaize(), false, false, options.getBackground());
-	}
+	// @Override
+	// protected FlexibleImage processFLUOmask() {
+	// if (getInput().getMasks().getFluo() == null && getInput().getImages().getFluo() == null)
+	// return null;
+	//
+	// if (options.getCameraPosition() == CameraPosition.SIDE)
+	// return getInput().getMasks().getFluo();
+	// else
+	// return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(),
+	// options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO),
+	// options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO),
+	// options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO),
+	// options.getIntSetting(Setting.LAB_MAX_A_VALUE_FLUO),
+	// options.getIntSetting(Setting.LAB_MIN_B_VALUE_FLUO),
+	// options.getIntSetting(Setting.LAB_MAX_B_VALUE_FLUO),
+	// options.getCameraPosition(),
+	// options.isMaize(), false, false, options.getBackground());
+	// }
 	
 	static FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ,
