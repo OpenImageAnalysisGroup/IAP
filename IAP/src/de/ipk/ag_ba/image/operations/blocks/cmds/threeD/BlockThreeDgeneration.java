@@ -55,8 +55,8 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	@Override
 	public void postProcessResultsForAllAngles(
 			Sample3D inSample,
-			TreeMap<Double, ImageData> inImages,
-			TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
+			TreeMap<String, ImageData> inImages,
+			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
 		int voxelresolution = 500;
 		int widthFactor = 40;
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
@@ -68,7 +68,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 		BlockProperty distHorizontal = null;
 		double realMarkerDistHorizontal = Double.NaN;
-		for (Double angle : allResultsForSnapshot.keySet()) {
+		for (String angle : allResultsForSnapshot.keySet()) {
 			// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Process image angle " + angle + " (TODO)");
 			BlockProperties bp = allResultsForSnapshot.get(angle);
 			distHorizontal = bp.getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
@@ -80,7 +80,8 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			if (vis != null) {
 				
 				MyPicture p = new MyPicture();
-				p.setPictureData(vis, angle / 180d * Math.PI, mg);
+				double ang = Double.parseDouble(angle.substring(angle.indexOf(";") + ";".length()));
+				p.setPictureData(vis, ang / 180d * Math.PI, mg);
 				pictures.add(p);
 			}
 		}

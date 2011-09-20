@@ -12,6 +12,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	
+	static boolean debug = false;
+	
 	@Override
 	protected FlexibleImage processVISimage() {
 		FlexibleImage vis = getInput().getImages().getVis();
@@ -102,8 +104,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ImageOperation io = new ImageOperation(image);
 		
-		float[] valuesleft = io.getRGBAverage(20, h, w, height - 2 * h, 150, 50, true, false);
-		float[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true, false);
+		float[] valuesleft = io.getRGBAverage(20, h, w, height - 2 * h, 150, 50, true, debug);
+		float[] valuesright = io.getRGBAverage(width - 20 - w, h, w, height - 2 * h, 150, 50, true, debug);
 		// no function tested
 		// double[] valuestop = io.getRGBAverage(img2d, 2 * w, 2 * h, width - 2 * w, h, 150, 50, true);
 		// double[] valuesdown = io.getRGBAverage(img2d, 2 * w, height - 2 * h, width - 2 * w, h, 150, 50, true);

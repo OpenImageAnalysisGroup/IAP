@@ -23,6 +23,6 @@ public interface ImageAnalysisBlockFIS {
 	public int getBlockPosition();
 	
 	public void postProcessResultsForAllAngles(Sample3D inSample,
-			TreeMap<Double, ImageData> inImages,
-			TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult);
+			TreeMap<String, ImageData> inImages,
+			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult);
 }

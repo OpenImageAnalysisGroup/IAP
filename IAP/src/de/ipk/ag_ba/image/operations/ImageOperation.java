@@ -2798,7 +2798,7 @@ public class ImageOperation {
 		}
 		if (count > 0) {
 			if (debug)
-				canvas.getImage().print("regionscan for white balance");
+				canvas.getImage().print("region scan for white balance", debug);
 			
 			return new float[] { sumR / 255f / count, sumG / 255f / count, sumB / 255f / count };
 		} else

@@ -280,8 +280,8 @@ public class BlockPipeline {
 	}
 	
 	public BlockProperties postProcessPipelineResultsForAllAngles(Sample3D inSample,
-			TreeMap<Double, ImageData> inImages,
-			TreeMap<Double, BlockProperties> allResultsForSnapshot)
+			TreeMap<String, ImageData> inImages,
+			TreeMap<String, BlockProperties> allResultsForSnapshot)
 			throws InstantiationException,
 			IllegalAccessException {
 		BlockProperties summaryResult = new BlockPropertiesImpl();

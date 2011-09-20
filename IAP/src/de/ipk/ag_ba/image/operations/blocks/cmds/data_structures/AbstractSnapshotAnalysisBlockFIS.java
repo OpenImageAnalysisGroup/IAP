@@ -116,7 +116,10 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	}
 	
 	protected FlexibleImage processNIRimage() {
-		return getInput().getImages().getNir();
+		if (getInput() != null && getInput().getImages() != null)
+			return getInput().getImages().getNir();
+		else
+			return null;
 	}
 	
 	protected FlexibleImage processVISmask() {
