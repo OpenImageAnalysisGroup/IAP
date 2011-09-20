@@ -1639,11 +1639,11 @@ public class ImageOperation {
 		int maxDiffAleftBright, maxDiffArightBleft;
 		
 		if (typ == CameraPosition.SIDE) {
-			maxDiffAleftBright = maize ? 7 : 3;
-			maxDiffArightBleft = maize ? 7 : 3;
+			maxDiffAleftBright = maize ? 3 : 3; // old maize 7
+			maxDiffArightBleft = maize ? 3 : 3; // old maize 7
 		} else {
-			maxDiffAleftBright = maize ? 11 : 3; // 15
-			maxDiffArightBleft = maize ? 7 : 3;
+			maxDiffAleftBright = maize ? 11 : 11; // 15 old barley 3
+			maxDiffArightBleft = maize ? 7 : 11; // old barley 3
 		}
 		
 		for (y = 0; y < height; y++) {
@@ -2728,17 +2728,25 @@ public class ImageOperation {
 		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, searchWhiteTrue, 0, debug);
 	}
 	
+	public float[] getRGBAverageNir(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, boolean debug) {
+		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, searchWhiteTrue, 0, debug);
+	}
+	
 	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, int recursion) {
 		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, searchWhiteTrue, recursion, false);
 	}
 	
+	/**
+	 * @param LThresh
+	 *           if > 0 then Lthreshold else variable threshold (-50 = median)
+	 */
 	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, int recursion, boolean debug) {
 		int r, g, b, c;
 		float Li, ai, bi;
 		FlexibleImage marked = null;
 		ImageCanvas canvas = new ImageOperation(image).copy().getCanvas();
 		if (debug) {
-			marked = canvas.fillRect(x1, y1, w, h, Color.RED.getRGB(), 0.5).getImage();
+			marked = canvas.fillRect(x1, y1, w, h, Color.RED.getRGB(), 0.7).getImage();
 		}
 		// sums of RGB
 		int sumR = 0;
@@ -2751,6 +2759,42 @@ public class ImageOperation {
 		
 		int[][] img2d = getImageAs2array();
 		float[] p;
+		if (LThresh < 0) {
+			ArrayList<Float> lArray = new ArrayList<Float>();
+			for (int x = x1; x < x1 + w; x++) {
+				for (int y = y1; y < y1 + h; y++) {
+					if (x < 0 || y < 0 || x >= imgw || y >= imgh)
+						continue;
+					c = img2d[x][y];
+					r = (c & 0xff0000) >> 16;
+					g = (c & 0x00ff00) >> 8;
+					b = c & 0x0000ff;
+					p = ImageOperation.labCube[r][g];
+					Li = p[b];
+					ai = p[b + 256];
+					bi = p[b + 512];
+					// if (Li < 200 && debug)
+					// System.out.println("li: " + Li + " r: " + r + " b: " + b + " g: " + g);
+					// sum under following conditions
+					if (searchWhiteTrue) {
+						if ((ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
+							lArray.add(Li);
+						}
+					} else {
+						if ((ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
+							lArray.add(Li);
+						}
+					}
+				}
+			}
+			if (lArray.size() > 0) {
+				int index = (int) (lArray.size() * (-LThresh / 100d)) - 1;
+				index = lArray.size() - index;
+				Collections.sort(lArray);
+				LThresh = lArray.get(index).intValue() - 1;
+			}
+			
+		}
 		for (int x = x1; x < x1 + w; x++) {
 			for (int y = y1; y < y1 + h; y++) {
 				if (x < 0 || y < 0 || x >= imgw || y >= imgh)
@@ -2774,7 +2818,7 @@ public class ImageOperation {
 						count++;
 						
 						if (debug && marked != null)
-							canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.1);
+							canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.6);
 					}
 				} else {
 					if (Li < LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
@@ -2784,21 +2828,22 @@ public class ImageOperation {
 						count++;
 						
 						if (debug && marked != null)
-							canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.1);
+							canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.7);
 					}
 				}
 			}
 		}
-		// System.out.println("temp :: " + temp);
+		if (debug)
+			canvas.getImage().print("region scan for white balance", debug);
+		
 		if (count < w * h * 0.1 && recursion < 30) {
 			if (searchWhiteTrue)
 				return getRGBAverage(x1, y1, w, h, (int) (LThresh * 0.8), (int) (ABThresh * 1.1), searchWhiteTrue, recursion + 1);
 			else
 				return getRGBAverage(x1, y1, w, h, LThresh * 2, (int) (ABThresh * 1.1), searchWhiteTrue, recursion + 1);
 		}
+		
 		if (count > 0) {
-			if (debug)
-				canvas.getImage().print("region scan for white balance", debug);
 			
 			return new float[] { sumR / 255f / count, sumG / 255f / count, sumB / 255f / count };
 		} else

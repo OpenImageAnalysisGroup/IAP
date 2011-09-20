@@ -48,7 +48,7 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 		float[] values;
 		float[] valuesTop, valuesBottom = { 0f, 0f, 0f }, valuesBottomLeft, valuesBottomRight;
 		int left, right, scanHeight, scanWidth, startHTop;
-		int cutoff = 220;
+		int cutoff = -10;
 		
 		if (bpleftX == null || bprightX == null || bpleftY == null || bprightY == null) { // fall back to default
 			left = (int) (0.3 * width);

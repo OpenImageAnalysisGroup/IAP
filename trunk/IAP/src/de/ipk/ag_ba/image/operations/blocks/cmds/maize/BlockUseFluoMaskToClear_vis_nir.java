@@ -53,7 +53,7 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 			if (getInput().getMasks().getVis() != null) {
 				// apply enlarged vis mask to nir
 				ImageOperation nir = getInput().getMasks().getNir().copy().getIO().print("NIRRRR", debug);
-				FlexibleImage mask = getInput().getMasks().getVis().copy().getIO().blur(13).
+				FlexibleImage mask = getInput().getMasks().getVis().copy().getIO().blur(15).
 						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
 				return nir.applyMask_ResizeMaskIfNeeded(
 						mask,

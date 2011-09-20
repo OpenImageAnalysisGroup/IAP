@@ -24,10 +24,10 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			pix = getProbablyWhitePixels(vis, 0.3, true, 150, 50);
+			pix = getProbablyWhitePixels(vis, 0.3, true, -10, 50);
 		} else
-			pix = getProbablyWhitePixels(vis, 0.06, false, 230, 10);
-		return io.imageBalancing(255, pix).getImage().print("after", false);
+			pix = getProbablyWhitePixels(vis, 0.06, false, -10, 10);
+		return io.imageBalancing(255, pix).getImage().print("after", debug);
 	}
 	
 	@Override
@@ -38,10 +38,10 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis, 0.3, true, 150, 50);
+			pix = getProbablyWhitePixels(vis, 0.3, true, -10, 50);
 		else
-			pix = getProbablyWhitePixels(vis, 0.06, false, 230, 10);
-		return io.imageBalancing(255, pix).getImage();
+			pix = getProbablyWhitePixels(vis, 0.06, false, -10, 10);
+		return io.imageBalancing(255, pix).getImage().print("after", debug);
 	}
 	
 	/**
