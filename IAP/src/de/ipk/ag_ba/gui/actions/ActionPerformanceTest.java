@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.TreeMap;
 
 import org.ErrorMsg;
-import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
@@ -94,21 +93,21 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 			// task.addPreprocessor(new CutImagePreprocessor());
 			TreeMap<Long, String> times = new TreeMap<Long, String>();
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
-			for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 1) {
-				long t1 = System.currentTimeMillis();
-				task.setInput(workload, null, m, 0, 1);
-				task.performAnalysis(pi, 1, status);
-				long t2 = System.currentTimeMillis();
-				statRes.addAll(task.getOutput());
-				// String ss = "T(s)/PI/TI\t" + ((t2 - t1) / 1000) + "\t" + pi;
-				// times.put((t2 - t1), ss);
-				// System.out.println("------------------------------------------------------------");
-				// System.out.println("--- " + ss);
-				// System.out.println("------------------------------------------------------------");
-				// for (String s : times.values()) {
-				// System.out.println(s);
-				// }
-			}
+			// for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 1) {
+			long t1 = System.currentTimeMillis();
+			task.setInput(workload, null, m, 0, 1);
+			task.performAnalysis(1, 1, status);
+			long t2 = System.currentTimeMillis();
+			statRes.addAll(task.getOutput());
+			// String ss = "T(s)/PI/TI\t" + ((t2 - t1) / 1000) + "\t" + pi;
+			// times.put((t2 - t1), ss);
+			// System.out.println("------------------------------------------------------------");
+			// System.out.println("--- " + ss);
+			// System.out.println("------------------------------------------------------------");
+			// for (String s : times.values()) {
+			// System.out.println(s);
+			// }
+			// }
 			
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
 			
