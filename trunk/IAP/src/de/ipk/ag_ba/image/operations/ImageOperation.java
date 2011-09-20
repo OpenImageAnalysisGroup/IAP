@@ -3258,7 +3258,8 @@ public class ImageOperation {
 				// Find the threshold value
 				// thresh = median(mean);
 				mean = mean(valuesMask);
-				thresh = (int) (mean * (1 + K * (standardDerivation(valuesMask, mean) / assumedBackground - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
+				double maxStandardDerivation = 128.; // for grayscale image with intensity g(x,y) in [0-255]
+				thresh = (int) (mean * (1 + K * (standardDerivation(valuesMask, mean) / maxStandardDerivation - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
 				
 				pix = img[i][j] & 0x0000ff;
 				if (pix > thresh) {
@@ -3283,7 +3284,7 @@ public class ImageOperation {
 				fac = (valuesMask[index] - mean);
 				sum += fac * fac;
 			}
-			res = sum / valuesMask.length;
+			res = sum / (valuesMask.length - 1);
 		}
 		return Math.sqrt(res);
 	}
