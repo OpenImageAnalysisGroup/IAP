@@ -62,6 +62,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockLabFilter_vis_fluo.class);
 		// p.add(BlockClosingOnFluo.class);
 		// p.add(BlockClosing_fluo.class);
+		p.add(BlockIntensityConversion_fluo.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class);
 		p.add(BlockClearNirPot_nir.class);
 		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
@@ -78,7 +79,6 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockCalcMainAxis_vis.class);
 		p.add(BlockCalcWidthAndHeight_vis.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class);
-		p.add(BlockIntensityConversion_fluo.class);
 		p.add(BlockMedianFilter_fluo.class);
 		p.add(BlockRemoveSmallVerySmallClusters_fluo.class);
 		p.add(BlockCalcIntensity_vis_fluo_nir.class);

@@ -7,6 +7,7 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockFIS {
@@ -31,6 +32,17 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null || getInput().getMasks().getFluo() == null)
 			return getInput().getMasks().getVis();
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (getInput().getMasks().getFluo() != null) {
+				// apply enlarged FLUO mask to nir
+				ImageOperation vis = getInput().getMasks().getVis().copy().getIO().print("VISSSS", debug);
+				FlexibleImage mask = getInput().getMasks().getFluo().copy().getIO().blur(25).
+						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred fluo mask", debug).getImage();
+				return vis.applyMask_ResizeMaskIfNeeded(
+						mask,
+						options.getBackground()).print("FILTERED NIR", debug).getImage();
+			}
+		}
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getMasks().getVis();
 			
@@ -47,30 +59,6 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (getInput().getMasks().getNir() == null || getInput().getMasks().getFluo() == null)
-			return getInput().getMasks().getNir();
-		if (options.getCameraPosition() == CameraPosition.TOP) {
-			if (getInput().getMasks().getVis() != null) {
-				// apply enlarged vis mask to nir
-				ImageOperation nir = getInput().getMasks().getNir().copy().getIO().print("NIRRRR", debug);
-				FlexibleImage mask = getInput().getMasks().getVis().copy().getIO().blur(15).
-						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
-				return nir.applyMask_ResizeMaskIfNeeded(
-						mask,
-						options.getBackground()).print("FILTERED NIR", debug).getImage();
-			}
-		}
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage input = getInput().getMasks().getNir();
-			
-			return clearImageSide(input, getInput().getMasks().getFluo(), 0.01);
-		}
-		
-		if (options.getCameraPosition() == CameraPosition.TOP) {
-			FlexibleImage input = getInput().getMasks().getNir();
-			
-			return clearImageTop(input, getInput().getMasks().getFluo());
-		}
 		return getInput().getMasks().getNir();
 	}
 	
@@ -152,4 +140,40 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 				.clearImageAbove(positions.getTopY(), background)
 				.clearImageBottom(positions.getBottomY(), background).getImage();
 	}
+	
+	@Override
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		if (processedMasks.getNir() == null || processedMasks.getFluo() == null) {
+			processedMasks.setNir(getInput().getMasks().getNir());
+			return;
+		}
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (processedMasks.getFluo() != null) {
+				// apply enlarged VIS mask to nir
+				ImageOperation nir = processedMasks.getNir().copy().getIO().print("NIRRRR", debug);
+				FlexibleImage mask = processedMasks.getVis().copy().getIO().or(
+						getInput().getMasks().getFluo()
+						).print("OR operation", debug).blur(10).
+						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
+				processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
+						mask,
+						options.getBackground()).print("FILTERED NIR", debug).getImage());
+				return;
+			}
+		}
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
+			FlexibleImage input = processedMasks.getNir();
+			
+			processedMasks.setNir(clearImageSide(input, processedMasks.getFluo(), 0.01));
+			return;
+		}
+		
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			FlexibleImage input = processedMasks.getNir();
+			
+			processedMasks.setNir(clearImageTop(input, processedMasks.getFluo()));
+			return;
+		}
+	}
+	
 }

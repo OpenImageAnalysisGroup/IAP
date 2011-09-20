@@ -33,7 +33,8 @@ public class BlockClearNirPot_nir extends AbstractSnapshotAnalysisBlockFIS {
 			int nSkipWhite = 0;
 			for (int x = 0; x < w; x++) {
 				int v = nirArray[x][y] & 0x0000ff;
-				if (v < 110 || nSkipWhite < 10) {
+				int vAbove = nirArray[x][y - 20] & 0x0000ff;
+				if (v < 110 || nSkipWhite < 10 || vAbove < 110) {
 					currentlyBlack++;
 					if (v >= 100)
 						nSkipWhite++;

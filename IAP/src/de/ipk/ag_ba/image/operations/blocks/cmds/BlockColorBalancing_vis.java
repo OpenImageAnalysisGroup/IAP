@@ -73,7 +73,7 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				int right = (int) (width - 0.3 * width);
 				int scanHeight = (right - left) / 4;
 				int scanWidth = right - left;
-				int startHTop = (int) (height * 0.1 - scanHeight / 2);
+				int startHTop = (int) (height * 0.01); // - scanHeight / 2
 				
 				// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
 				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);

@@ -57,6 +57,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockColorBalancing_vertical_nir.class);
 		p.add(BlockColorBalancing_fluo_nir.class);
 		p.add(BlockClearBackgroundByRefComparison_vis_fluo_nir.class);
+		p.add(BlockIntensityConversion_fluo.class);
 		p.add(BlockClearNirPot_nir.class);
 		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
 		p.add(BlockLabFilter_vis_fluo.class);
@@ -91,7 +92,6 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		// calculation of numeric values
 		p.add(BlockCalcMainAxis_vis.class);
 		p.add(BlockCalcWidthAndHeight_vis.class);
-		p.add(BlockIntensityConversion_fluo.class);
 		p.add(BlockCalcIntensity_vis_fluo_nir.class);
 		p.add(BlockConvexHull_vis_fluo.class);
 		
