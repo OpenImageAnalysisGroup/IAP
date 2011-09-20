@@ -225,11 +225,10 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 	
 	@Override
 	public boolean equalNumericMeasurement(NumericMeasurementInterface meas) {
-		String u1 = getRowID() + " " + getPixelsizeX() + " " + getPixelsizeY() + " " + getThickness() + " " + getURL();
-		String u2 = ((ImageData) meas).getRowID() + " " + +((ImageData) meas).getPixelsizeX() + " "
-							+ ((ImageData) meas).getPixelsizeY() + " " + ((ImageData) meas).getThickness() + " "
-							+ ((ImageData) meas).getURL();
-		return super.equalNumericMeasurement(meas) && u1.equals(u2);
+		ImageData id2 = ((ImageData) meas);
+		return super.equalNumericMeasurement(meas) && (getURL() + "").equals(id2.getURL()) && (getRowID() + "").equals(id2.getRowID() + "")
+				&& (getPixelsizeX() + "").equals(id2.getPixelsizeX()) && (getPixelsizeY() + "").equals(id2.getPixelsizeY()) &&
+				(getThickness() + "").equals(id2.getThickness() + "");
 	}
 	
 	@Override

@@ -237,15 +237,15 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	public void postProcessResultsForAllAngles(
 			Sample3D inSample,
-			TreeMap<Double, ImageData> inImages,
-			TreeMap<Double, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
+			TreeMap<String, ImageData> inImages,
+			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
 		Double maxLeafcount = -1d;
 		Double maxLeaflength = -1d;
 		Double maxLeaflengthNorm = -1d;
 		ArrayList<Double> lc = new ArrayList<Double>();
 		
 		Integer a = null;
-		searchLoop: for (Double key : allResultsForSnapshot.keySet()) {
+		searchLoop: for (String key : allResultsForSnapshot.keySet()) {
 			BlockProperties rt = allResultsForSnapshot.get(key);
 			for (BlockPropertyValue v : rt.getProperties("RESULT_top.main.axis.rotation")) {
 				if (v.getValue() != null) {
@@ -256,25 +256,26 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 			}
 		}
 		
-		Double bestAngle = null;
+		String bestAngle = null;
 		if (a != null) {
 			a = a % 180;
 			Double bestDiff = Double.MAX_VALUE;
-			for (Double d : allResultsForSnapshot.keySet()) {
+			for (String dc : allResultsForSnapshot.keySet()) {
+				double d = Double.parseDouble(dc.substring(dc.indexOf(";") + ";".length()));
 				if (d >= 0) {
 					double dist = Math.abs(a - d);
 					if (dist < bestDiff) {
-						bestAngle = d;
+						bestAngle = dc;
 						bestDiff = dist;
 					}
 				}
 			}
 		}
 		// System.out.println("ANGLES WITHIN SNAPSHOT: " + allResultsForSnapshot.size());
-		for (Double key : allResultsForSnapshot.keySet()) {
-			BlockProperties rt = allResultsForSnapshot.get(key);
+		for (String keyC : allResultsForSnapshot.keySet()) {
+			BlockProperties rt = allResultsForSnapshot.get(keyC);
 			
-			if (bestAngle != null && key == bestAngle) {
+			if (bestAngle != null && keyC.equals(bestAngle)) {
 				// System.out.println("Best side angle: " + bestAngle);
 				Double cnt = null;
 				for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.count")) {

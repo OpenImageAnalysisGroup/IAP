@@ -96,7 +96,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			int a = (right - left) / 4;
 			int b = right - left;
 			
-			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, lThres, abThres, true, false);
+			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, lThres, abThres, true, debug);
 		} else {
 			float[] valuesTop, valuesBottom;
 			int left = (int) (0.3 * width);
@@ -106,8 +106,8 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			int startHTop = (int) (height * 0.1 - scanHeight / 2);
 			
 			// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
-			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, false);
-			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, 50, true, false);
+			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
+			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, 50, true, debug);
 			
 			if (debug) {
 				image.copy().getIO().getCanvas().fillRect(left, startHTop, scanWidth, scanHeight, Color.RED.getRGB(), 0.5)
@@ -261,10 +261,10 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 					searchWhiteTrue,
 					debug);
 		} else {
-			top = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, minL, 50, searchWhiteTrue, true);
-			bottom = inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, minL, 50, searchWhiteTrue, true);
+			top = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			bottom = inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
 			center = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, minL, 50,
-					searchWhiteTrue, true);
+					searchWhiteTrue, debug);
 		}
 		// get TopRight
 		res[0] = top[0] * 255f;
