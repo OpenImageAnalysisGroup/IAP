@@ -65,9 +65,9 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	@Override
 	public String toString() {
 		if (position != null && positionUnit != null)
-			return "Omics-value: " + getValue() + " (" + position + " " + positionUnit + ")";
+			return "Omics-value: " + getValue() + " (" + position + " " + positionUnit + ")" + " " + getUnit();
 		else
-			return "Omics-value: " + getValue();
+			return "Omics-value: " + getValue() + " " + getUnit();
 	}
 	
 	public MeasurementNodeType getType() {

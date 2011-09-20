@@ -18,6 +18,7 @@ import de.ipk.ag_ba.gui.actions.ActionDataExportTar;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionNumericDataReport;
 import de.ipk.ag_ba.gui.actions.ActionNumericDataReportComplete;
+import de.ipk.ag_ba.gui.actions.ActionPerformanceTest;
 import de.ipk.ag_ba.gui.actions.CloudIoTestAction;
 import de.ipk.ag_ba.gui.actions.analysis.ActionThreeDreconstruction;
 import de.ipk.ag_ba.gui.actions.analysis.ActionThreeDsegmentation;
@@ -69,6 +70,7 @@ public class ImageAnalysisCommandManager {
 		
 		actions.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experimentReference), guiSetting));
 		
+		actions.add(new NavigationButton(new ActionPerformanceTest(m, experimentReference), guiSetting));
 		if (analysis) {
 			// NavigationAction performanceTestAction = new PerformanceTestAction(m, experimentReference);
 			// NavigationButton performanceTestButton = new NavigationButton(performanceTestAction, guiSetting);

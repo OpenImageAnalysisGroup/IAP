@@ -75,7 +75,7 @@ public class IOmodule {
 		return result;
 	}
 	
-	public static byte[] loadImageContentFromFileOrMongo(ImageData id) throws Exception {
+	public static byte[] loadImageContent(ImageData id) throws Exception {
 		MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
 		return is.getBuffTrimmed();
 	}
