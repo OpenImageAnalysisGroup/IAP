@@ -17,6 +17,7 @@ import org.w3c.dom.Document;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -213,7 +214,11 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	}
 	
 	@Override
-	public LoadedImage saveImage(LoadedImage limg) throws Exception {
+	public LoadedImage saveImage(LoadedImage limg, boolean keepRemoteURLs_safe_space) throws Exception {
+		// everything should be safed in the HSM
+		if (keepRemoteURLs_safe_space)
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: INTERNAL ERROR: HSM SAFE SHOULD ALSO PROCESS REMOTE DATA");
+		keepRemoteURLs_safe_space = false;
 		return null;
 	}
 	

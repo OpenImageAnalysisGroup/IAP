@@ -100,7 +100,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	 */
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-						final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		
 		output = new ArrayList<NumericMeasurementInterface>();
 		
@@ -153,7 +153,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 						inp.add((Sample3D) volume.getParentSample());
 						resultProcessor.setInput(inp, null, m, 0, 1);
 						resultProcessor.performAnalysis(maximumThreadCountParallelImages, maximumThreadCountParallelImages,
-											status);
+								status);
 						if (additionalResults.get(resultProcessor) == null)
 							additionalResults.put(resultProcessor, new ArrayList<NumericMeasurementInterface>());
 						additionalResults.get(resultProcessor).addAll(resultProcessor.getOutput());
@@ -203,7 +203,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	}
 	
 	private void processSampleCreateVolume(Sample3D sample, ArrayList<ImageData> loadedImages, int replicateID,
-						final int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
 		// double maxPercent = 2; // maximum background color difference
 		
@@ -257,7 +257,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 								
 								// limg = PhenotypeAnalysisTask.clearBackground(limg, 1);
 								
-								limg = storeResultInDatabase.saveImage(limg);
+								limg = storeResultInDatabase.saveImage(limg, false);
 								
 								if (limg == null) {
 									ErrorMsg.addErrorMessage("Could not store processed input image in database target.");
@@ -281,7 +281,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 						else
 							status.setCurrentStatusText1("Image: " + ffn);
 						status.setCurrentStatusText2("Angle: " + (image.getPosition().intValue()) + " "
-											+ image.getPositionUnit() + ", is top: " + (getIsTopFromFileName(ffn)));
+								+ image.getPositionUnit() + ", is top: " + (getIsTopFromFileName(ffn)));
 						status.setCurrentStatusValueFineAdd(workloadStep);
 					}
 				}, "analyze input image for 3-D construction", 40, 39));
@@ -316,7 +316,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 			volume.setColorDepth(VolumeColorDepth.RGBA.toString());
 		} catch (OutOfMemoryError e) {
 			MainFrame.showMessageDialog("You have not enough memory! Please select a lower resolution",
-								"Out of Memory Error");
+					"Out of Memory Error");
 		}
 	}
 	

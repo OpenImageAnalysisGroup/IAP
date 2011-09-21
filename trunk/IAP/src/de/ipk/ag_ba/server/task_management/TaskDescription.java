@@ -77,9 +77,9 @@ public class TaskDescription {
 	}
 	
 	public void startWork(final BatchCmd batch, String hostName, String ip, final MongoDB m)
-						throws ClassCastException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+			throws ClassCastException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		final RemoteCapableAnalysisAction action = RemoteAnalysisRepository.getInstance().getNewAnalysisAction(
-							analysisActionClassName);
+				analysisActionClassName);
 		action.setParams(experimentInput, m, params);
 		
 		final BackgroundTaskStatusProvider statusProvider = action.getStatusProvider();
@@ -93,17 +93,17 @@ public class TaskDescription {
 		String st = new SimpleDateFormat().format(new Date(startTime));
 		
 		BackgroundTaskHelper.issueSimpleTask("Batch: " + analysisActionClassName + " (start: " + st + ")",
-							"Initializing", new Runnable() {
-								@Override
-								public void run() {
-									try {
-										action.performActionCalculateResults(null);
-									} catch (Exception e) {
-										e.printStackTrace();
-										ErrorMsg.addErrorMessage(e);
-									}
-								}
-							}, null, statusProvider, -1000);
+				"Initializing", new Runnable() {
+					@Override
+					public void run() {
+						try {
+							action.performActionCalculateResults(null);
+						} catch (Exception e) {
+							e.printStackTrace();
+							ErrorMsg.addErrorMessage(e);
+						}
+					}
+				}, null, statusProvider, -1000);
 	}
 	
 	private RunnableWithMappingData getResultReceiver(final BatchCmd batch, final MongoDB m) {
@@ -114,8 +114,8 @@ public class TaskDescription {
 			public void run() {
 				// store dataset in mongo
 				experiment.getHeader().setExperimentname(
-									cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§"
-											+ batch.getSubmissionTime());
+						cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§"
+								+ batch.getSubmissionTime());
 				System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Received calculation results. Job has been submitted at "
 						+ SystemAnalysisExt.getCurrentTime(batch.getSubmissionTime()));
 				experiment.getHeader().setImportusergroup("Temp");
@@ -126,7 +126,7 @@ public class TaskDescription {
 						if (SystemAnalysisExt.getHostName().equals(bcmd.getOwner())) {
 							m.batchClearJob(batch);
 							StopWatch sw = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE EXPERIMENT " + experiment.getName(), false);
-							m.saveExperiment(experiment, null);
+							m.saveExperiment(experiment, null, true);
 							sw.printTime();
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
 							
@@ -166,7 +166,7 @@ public class TaskDescription {
 										for (SubstanceInterface si : ei) {
 											if (si.getName() != null && (si.getName().equals("weight_before") ||
 													(si.getName().equals("water_weight") ||
-															si.getName().equals("water_sum")))) {
+													si.getName().equals("water_sum")))) {
 												System.out.print(SystemAnalysisExt.getCurrentTime()
 														+ ">INFO: Remove duplicate water and weight data before adding results to merged dataset");
 												toBeRemoved.add(si);

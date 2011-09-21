@@ -921,7 +921,7 @@ public class MongoDB {
 	
 	public Future<DatabaseStorageResult> saveImageFile(final DB db,
 			final ImageData id, final ObjectRef fileSize,
-			final boolean keepDataLinksToDataSource_safe_space) throws Exception {
+			final boolean keepRemoteURLs_safe_space) throws Exception {
 		
 		final ImageData image = id;
 		
@@ -953,7 +953,7 @@ public class MongoDB {
 				if (image.getURL() != null &&
 								(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) ||
 								image.getURL().getPrefix().startsWith("hsm_"))) {
-					if (keepDataLinksToDataSource_safe_space)
+					if (keepRemoteURLs_safe_space)
 						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 					
 					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));

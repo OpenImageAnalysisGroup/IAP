@@ -35,7 +35,8 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 	}
 	
 	@Override
-	public LoadedImage saveImage(final LoadedImage limg) throws Exception {
+	public LoadedImage saveImage(final LoadedImage limg,
+			final boolean keepRemoteURLs_safe_space) throws Exception {
 		if (!store)
 			return null;
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
@@ -44,7 +45,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			
 			public void run() {
 				try {
-					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null, false).get();
+					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null, keepRemoteURLs_safe_space).get();
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					tso.setParam(1, e);
@@ -75,7 +76,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 	 */
 	@Override
 	public void saveVolume(final LoadedVolume volume, Sample3D s3d, final MongoDB m, DBTable sample,
-						InputStream threeDvolumePreviewIcon, final BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+			InputStream threeDvolumePreviewIcon, final BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		if (!store)
 			return;
 		m.processDB(new RunnableOnDB() {

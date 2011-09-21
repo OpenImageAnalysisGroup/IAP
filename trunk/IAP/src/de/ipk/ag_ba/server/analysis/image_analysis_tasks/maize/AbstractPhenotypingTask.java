@@ -95,7 +95,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
-						final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
@@ -157,7 +157,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						continue;
 					ImageData inImage = tmf.get(configAndAngle).getVIS();
 					BlockProperties results = processAngleWithinSnapshot(tmf.get(configAndAngle), maximumThreadCountOnImageLevel, status,
-								workloadEqualAngleSnapshotSets, getParentPriority());
+							workloadEqualAngleSnapshotSets, getParentPriority());
 					if (results != null) {
 						analysisInput.put(configAndAngle, inImage);
 						analysisResults.put(configAndAngle, results);
@@ -208,7 +208,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						ic = ImageConfiguration.get(id.getURL().getFileName());
 						System.out.println(SystemAnalysisExt.getCurrentTime() +
 								">INFO: IMAGE CONFIGURATION UNKNOWN (" + id.getSubstanceName() + "), " +
-										"GUESSING FROM IMAGE NAME: " + id.getURL() + ", GUESS: " + ic);
+								"GUESSING FROM IMAGE NAME: " + id.getURL() + ", GUESS: " + ic);
 					}
 					if (ic == ImageConfiguration.Unknown) {
 						System.out.println(SystemAnalysisExt.getCurrentTime() +
@@ -354,7 +354,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		try {
 			LoadedImage lib = result;
-			result = storeResultInDatabase.saveImage(result);
+			result = storeResultInDatabase.saveImage(result, true);
 			// add processed image to result
 			if (result != null)
 				return new ImageData(result.getParentSample(), result);
@@ -612,7 +612,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		{
 			ImageProcessor imageProcessor = getImageProcessor();
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = new BackgroundTaskStatusProviderSupportingExternalCallImpl("",
-						"") {
+					"") {
 				double lastAdd = 0;
 				
 				@Override
@@ -648,9 +648,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			// not supplied by parameters!
 			// TODO: maximumThreadCount... should be no parameter but a setting!
 			FlexibleMaskAndImageSet ret = imageProcessor.pipeline(
-						options,
-						input, inputMasks,
-						maximumThreadCountOnImageLevel, debugImageStack);
+					options,
+					input, inputMasks,
+					maximumThreadCountOnImageLevel, debugImageStack);
 			FlexibleImageSet pipelineResult = ret != null ? ret.getImages() : null;
 			
 			if (pipelineResult != null) {
@@ -665,8 +665,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			processStatisticalOutput(inVis, analysisResults);
 			
 			processAndOrSaveTiffImagesOrResultImages(id, inVis, inFluo, inNir,
-						debugImageStack, resVis, resFluo, resNir,
-						parentPriority);
+					debugImageStack, resVis, resFluo, resNir,
+					parentPriority);
 		}
 		return analysisResults;
 		// } else {
