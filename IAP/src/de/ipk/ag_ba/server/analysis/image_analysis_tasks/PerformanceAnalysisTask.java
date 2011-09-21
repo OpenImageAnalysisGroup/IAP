@@ -307,7 +307,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 			ThreadSafeOptions tsoLoadDataErrorsFLUOtop, ThreadSafeOptions tsoLoadDataErrorsNIRside, ThreadSafeOptions tsoLoadDataErrorsNIRtop,
 			ThreadSafeOptions tsoLoadDataErrorsVISside, ThreadSafeOptions tsoLoadDataErrorsVIStop) {
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: CONVERTING IMAGE DATA TO IMAGE: " + message
-				+ ", IMAGE: " + id.getURL());
+				+ ", IMAGE: " + id.getURL()+", TIME "+id.getParentSample().getTime()+" "+id.getParentSample().getTimeUnit());
 		switch (ic) {
 			case FluoSide:
 				tsoLoadDataErrorsFLUOside.addLong(1);
