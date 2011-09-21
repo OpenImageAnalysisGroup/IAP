@@ -85,9 +85,11 @@ public class ExperimentReference {
 			if (header.getDatabaseId().startsWith("lemnatec:"))
 				return new LemnaTecDataExchange().getExperiment(header, null);
 			else
-				if (header.getDatabaseId().startsWith("hsm:"))
-					return HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
-				else
+				if (header.getDatabaseId().startsWith("hsm:")) {
+					synchronized (ExperimentReference.class) {
+						return HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
+					}
+				} else
 					return m.getExperiment(header, interactiveGetExperimentSize, null);
 		}
 	}

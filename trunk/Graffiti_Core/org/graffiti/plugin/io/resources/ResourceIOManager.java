@@ -100,6 +100,7 @@ public class ResourceIOManager {
 			return (MyByteArrayInputStream) is;
 		} else {
 			ResourceIOManager.copyContent(is, bos);
+			System.out.print(".");
 			return new MyByteArrayInputStream(bos.toByteArray(), bos.size());
 		}
 	}
@@ -142,9 +143,13 @@ public class ResourceIOManager {
 	
 	public static ResourceIOHandler getHandlerFromPrefix(String prefix) {
 		for (ResourceIOHandler mh : getInstance().handlers)
-			if (mh.getPrefix().equals(prefix))
+			if (mh.getPrefix().startsWith(prefix))
 				return mh;
-		return null;
+
+		if (prefix.contains("_"))
+			return getHandlerFromPrefix(prefix.substring(0, prefix.indexOf("_")));
+		else
+			return null;
 	}
 	
 	public static byte[] getPreviewImageContent(IOurl ioUrl) throws Exception {

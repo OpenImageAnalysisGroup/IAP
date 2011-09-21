@@ -19,6 +19,7 @@ import javax.imageio.ImageIO;
 
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.color.ColorUtil;
@@ -53,7 +54,10 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage(IOurl url) throws IOException, Exception {
-		InputStream is = url.getInputStream();
+		InputStream is;
+		synchronized (FlexibleImage.class) {
+			is = ResourceIOManager.getInputStreamMemoryCached(url);
+		}
 		// // copy input stream: // not needed any more?!
 		// MyByteArrayOutputStream out = new MyByteArrayOutputStream();
 		// ResourceIOManager.copyContent(is, out);
