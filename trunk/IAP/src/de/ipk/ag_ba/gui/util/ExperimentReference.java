@@ -6,6 +6,7 @@
  */
 package de.ipk.ag_ba.gui.util;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.SystemAnalysis;
@@ -49,7 +50,10 @@ public class ExperimentReference {
 			if (databaseID.startsWith("hsm:")) {
 				String fileName = databaseID.substring("hsm:".length());
 				try {
-					header = HsmFileSystemSource.getHSMexperimentHeaderFromFileName(null, fileName);
+					if (new File(fileName).exists())
+						header = HsmFileSystemSource.getHSMexperimentHeaderFromFullyQualifiedFileName(fileName);
+					else
+						header = null;
 				} catch (IOException e) {
 					throw new UnsupportedOperationException(e);
 				}
@@ -61,7 +65,7 @@ public class ExperimentReference {
 				}
 			}
 		}
-		this.experimentName = header.getExperimentName();
+		this.experimentName = header != null ? header.getExperimentName() : null;
 	}
 	
 	public ExperimentReference(ExperimentInterface experiment) {

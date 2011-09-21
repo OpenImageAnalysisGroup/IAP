@@ -199,6 +199,13 @@ public class MongoDB {
 	
 	public void saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
+		saveExperiment(experiment, status, false);
+	}
+	
+	public void saveExperiment(final ExperimentInterface experiment,
+			final BackgroundTaskStatusProviderSupportingExternalCall status,
+			final boolean keepDataLinksToDataSource_safe_space)
+			throws Exception {
 		final ThreadSafeOptions err = new ThreadSafeOptions();
 		RunnableOnDB r = new RunnableOnDB() {
 			
@@ -212,7 +219,7 @@ public class MongoDB {
 			@Override
 			public void run() {
 				try {
-					storeExperiment(experiment, db, status);
+					storeExperiment(experiment, db, status, keepDataLinksToDataSource_safe_space);
 				} catch (Exception e) {
 					err.setParam(0, e);
 				}
@@ -365,7 +372,8 @@ public class MongoDB {
 	}
 	
 	private void storeExperiment(ExperimentInterface experiment, DB db,
-			BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException, ExecutionException {
+			BackgroundTaskStatusProviderSupportingExternalCall status,
+			boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setBval(0, true);
 		Thread loadGen = new Thread(new Runnable() {
@@ -383,14 +391,15 @@ public class MongoDB {
 			loadGen.start();
 		
 		try {
-			storeExperimentInnerCall(experiment, db, status);
+			storeExperimentInnerCall(experiment, db, status, keepDataLinksToDataSource_safe_space);
 		} finally {
 			tso.setBval(0, false);
 		}
 	}
 	
 	private void storeExperimentInnerCall(ExperimentInterface experiment, DB db,
-			BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException, ExecutionException {
+			BackgroundTaskStatusProviderSupportingExternalCall status,
+			boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
 		
 		System.out.println(">>> " + SystemAnalysisExt.getCurrentTime());
 		System.out.println("STORE EXPERIMENT: " + experiment.getName());
@@ -399,6 +408,7 @@ public class MongoDB {
 		System.out.println("Exp.type        : " + experiment.getHeader().getExperimentType());
 		System.out.println("Group           : " + experiment.getHeader().getImportusergroup());
 		System.out.println("Username        : " + experiment.getHeader().getImportusername());
+		System.out.println(">>> KEEP EXTERNAL REFS?  : " + keepDataLinksToDataSource_safe_space);
 		// experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 		
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
@@ -499,7 +509,8 @@ public class MongoDB {
 							try {
 								if (m instanceof ImageData) {
 									ImageData id = (ImageData) m;
-									storageResults.add(saveImageFile(db, id, overallFileSize));
+									storageResults.add(saveImageFile(db, id, overallFileSize,
+											keepDataLinksToDataSource_safe_space));
 									imageDataQueue.add(id);
 									count++;
 								}
@@ -908,7 +919,10 @@ public class MongoDB {
 		}
 	});
 	
-	public Future<DatabaseStorageResult> saveImageFile(final DB db, final ImageData id, final ObjectRef fileSize) throws Exception {
+	public Future<DatabaseStorageResult> saveImageFile(final DB db,
+			final ImageData id, final ObjectRef fileSize,
+			final boolean keepDataLinksToDataSource_safe_space) throws Exception {
+		
 		final ImageData image = id;
 		
 		return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
@@ -922,11 +936,24 @@ public class MongoDB {
 						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				}
 				
+				if (image.getURL() != null && image.getLabelURL() != null) {
+					if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix())) {
+						if ((image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) || image.getURL().getPrefix().startsWith("hsm_"))) {
+							if (keepDataLinksToDataSource_safe_space) {
+								return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+							}
+						}
+					}
+				}
+				
 				// check if the source URL has been imported before, it is assumed that the source URL content
 				// is not modified
 				if (image.getURL() != null &&
-						(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) ||
-						image.getURL().getPrefix().startsWith("hsm_"))) {
+								(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) ||
+								image.getURL().getPrefix().startsWith("hsm_"))) {
+					if (keepDataLinksToDataSource_safe_space)
+						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+					
 					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
 					
 					if (image.getLabelURL() != null) {
@@ -963,7 +990,8 @@ public class MongoDB {
 					try {
 						isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
 					} catch (Exception e) {
-						System.out.println("Error: No Inputstream for " + id.getLabelURL() + ". " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
+						System.out.println("Error: No Inputstream for " + id.getLabelURL() + ". " + e.getMessage() + " // "
+										+ SystemAnalysisExt.getCurrentTime());
 					}
 				} finally {
 					// BackgroundTaskHelper.lockRelease(image.getURL() != null ? image.getURL().getPrefix() : "in");
@@ -980,17 +1008,17 @@ public class MongoDB {
 				String[] hashes;
 				
 				hashes = GravistoServiceExt.getHashFromInputStream(new InputStream[] {
-						new MyByteArrayInputStream(isMain),
-						isLabel != null ? new MyByteArrayInputStream(isLabel) : null
-				},
-						new ObjectRef[] { fileSize, fileSize }, getHashType(), true);
+								new MyByteArrayInputStream(isMain),
+								isLabel != null ? new MyByteArrayInputStream(isLabel) : null
+						},
+								new ObjectRef[] { fileSize, fileSize }, getHashType(), true);
 				
 				String hashMain = hashes[0];
 				String hashLabel = hashes[1];
 				
 				if (image.getURL() != null &&
-						(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) ||
-						image.getURL().getPrefix().startsWith("hsm_")) {
+								(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) ||
+								image.getURL().getPrefix().startsWith("hsm_")) {
 					db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
 					
 					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
@@ -1053,13 +1081,13 @@ public class MongoDB {
 					boolean saved;
 					try {
 						saved = saveImageFile(new InputStream[] {
-								new MyByteArrayInputStream(isMain),
-								isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
-								getPreviewImageStream(new MyByteArrayInputStream(isMain))
-						}, gridfs_images, gridfs_label_files,
-								gridfs_preview_files, id, hashMain,
-								hashLabel,
-								fffMain == null, fffLabel == null);
+										new MyByteArrayInputStream(isMain),
+										isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
+										getPreviewImageStream(new MyByteArrayInputStream(isMain))
+								}, gridfs_images, gridfs_label_files,
+										gridfs_preview_files, id, hashMain,
+										hashLabel,
+										fffMain == null, fffLabel == null);
 					} finally {
 						// BackgroundTaskHelper.lockRelease(m);
 					}
@@ -1752,13 +1780,8 @@ public class MongoDB {
 						for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.SCHEDULED))) {
 							BatchCmd batch = (BatchCmd) dbo;
 							if (batch.getCpuTargetUtilization() < maxTasks) {
-								try {
-									if (batch.getExperimentHeader() == null)
-										continue;
-								} catch (Exception e) {
-									// e.g. HSM folder on this system not available
+								if (batch.getExperimentHeader() == null)
 									continue;
-								}
 								if (batch.getOwner() == null)
 									batchClaim(batch, CloudAnalysisStatus.STARTING, false);
 								if (hostName.equals("" + batch.getOwner())) {
@@ -1774,6 +1797,8 @@ public class MongoDB {
 						if (addCnt < maxTasks)
 							for (DBObject dbo : collection.find()) {
 								BatchCmd batch = (BatchCmd) dbo;
+								if (batch.getExperimentHeader() == null)
+									continue;
 								if (!added && batch.getCpuTargetUtilization() < maxTasks)
 									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 30000)) {
 										// after 30 seconds tasks are taken away from other systems
@@ -1786,6 +1811,8 @@ public class MongoDB {
 						if (addCnt < maxTasks)
 							for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.STARTING))) {
 								BatchCmd batch = (BatchCmd) dbo;
+								if (batch.getExperimentHeader() == null)
+									continue;
 								if (batch.getCpuTargetUtilization() < maxTasks && hostName.equals("" + batch.getOwner())) {
 									res.add(batch);
 									addCnt += batch.getCpuTargetUtilization();

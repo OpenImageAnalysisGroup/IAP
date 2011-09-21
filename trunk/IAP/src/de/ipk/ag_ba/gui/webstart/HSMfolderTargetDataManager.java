@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
+import org.graffiti.plugin.io.resources.IOurl;
 import org.w3c.dom.Document;
 
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -188,10 +189,25 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	}
 	
 	private static void updateFileUrls(Experiment md) {
+		// hsm_media_nfs_hsm:////data/Maize Greenhouse/Klukas, Christian (BA)/1107BA_Corn/2011-03-17/label_vis.side_blob19907.png#1107BA1153 (287).png
+		// loaded:////data/Maize Greenhouse/Klukas, Christian (BA)/1107BA_Corn/2011-03-16/c_1107BA1151 fluo.side DEG_271 REPL_014 day_015 2011-03-16 07_36_18
+		// 1107BA1151 (271).png#1107BA1151 (271).png
 		for (NumericMeasurementInterface nmi : Substance3D.getAllFiles(md)) {
 			if (nmi instanceof BinaryMeasurement) {
 				BinaryMeasurement bm = (BinaryMeasurement) nmi;
-				
+				if (bm.getURL() != null) {
+					if ((bm.getURL() + "").startsWith("hsm__")) {
+						bm.setURL(new IOurl(
+								StringManipulationTools.stringReplace(
+										(bm.getURL() + ""),
+										"hsm__", "hsm_")));
+					}
+					if ((bm.getLabelURL() + "").startsWith("hsm__"))
+						bm.setLabelURL(new IOurl(
+								StringManipulationTools.stringReplace(
+										(bm.getLabelURL() + ""),
+										"hsm__", "hsm_")));
+				}
 			}
 		}
 	}

@@ -96,9 +96,9 @@ public class BatchCmd extends BasicDBObject {
 	
 	public ExperimentHeaderInterface getExperimentHeader() {
 		String expId = getString("experiment");
-		if (expId != null)
+		if (expId != null) {
 			return new ExperimentReference(expId).getHeader();
-		else
+		} else
 			return null;
 	}
 	
