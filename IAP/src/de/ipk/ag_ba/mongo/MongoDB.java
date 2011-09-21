@@ -703,7 +703,7 @@ public class MongoDB {
 						}
 						break;
 					case 2:
-						if (storeLabel) {
+						if (storeLabel && gridfs_label_images != null && hashLabel != null) {
 							fs = gridfs_label_images;
 							hash = hashLabel;
 						}
@@ -715,11 +715,13 @@ public class MongoDB {
 						}
 						break;
 				}
-				if (fs != null && saveStream(hash, is, fs) < 0)
-					allOK = false;
+				if (fs != null && hash != null && is != null)
+					if (saveStream(hash, is, fs) < 0)
+						allOK = false;
 			}
 		} catch (Exception e) {
-			System.err.println("Error: " + e.getMessage());
+			System.err.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: SAVING IMAGE FILE TO MONGDB FAILED WITH EXCEPTION: " + e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return allOK;
@@ -920,10 +922,8 @@ public class MongoDB {
 	});
 	
 	public Future<DatabaseStorageResult> saveImageFile(final DB db,
-			final ImageData id, final ObjectRef fileSize,
+			final ImageData image, final ObjectRef fileSize,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
-		
-		final ImageData image = id;
 		
 		return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
 			@Override
@@ -932,33 +932,33 @@ public class MongoDB {
 				// if the image data source is equal to the target (determined by the prefix),
 				// the image content does not need to be copied (assumption valid while using MongoDB data storage)
 				if (image.getURL() != null && image.getLabelURL() != null) {
-					if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix()))
+					if (image.getURL().getPrefix().equals(mh.getPrefix()) && image.getLabelURL().getPrefix().equals(mh.getPrefix()))
 						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				}
 				/*
-				if (image.getURL() != null && image.getLabelURL() != null) {
-					if (id.getURL().getPrefix().equals(mh.getPrefix())
-							&& id.getLabelURL().getPrefix().equals(mh.getPrefix())) {
-						if ((image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) 
-								|| image.getURL().getPrefix().startsWith("hsm_"))) {
-							if (keepDataLinksToDataSource_safe_space) {
-								return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
-							}
-						}
-					}
-				}
-				*/
+				 * if (image.getURL() != null && image.getLabelURL() != null) {
+				 * if (id.getURL().getPrefix().equals(mh.getPrefix())
+				 * && id.getLabelURL().getPrefix().equals(mh.getPrefix())) {
+				 * if ((image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)
+				 * || image.getURL().getPrefix().startsWith("hsm_"))) {
+				 * if (keepDataLinksToDataSource_safe_space) {
+				 * return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+				 * }
+				 * }
+				 * }
+				 * }
+				 */
 				// check if the source URL has been imported before, it is assumed that the source URL content
 				// is not modified
 				if (image.getURL() != null &&
-								(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) ||
-								image.getURL().getPrefix().startsWith("hsm_"))) {
+						(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) ||
+						image.getURL().getPrefix().startsWith("hsm_"))) {
 					if (keepRemoteURLs_safe_space)
 						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 					
 					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
 					
-					if (image.getLabelURL() != null) {
+					if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL()) && image.getLabelURL() != null) {
 						DBObject knownLabelURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
 						if (knownURL != null && knownLabelURL != null) {
 							GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
@@ -985,15 +985,16 @@ public class MongoDB {
 				byte[] isLabel = null;
 				try {
 					try {
-						isMain = id.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
+						isMain = image.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
 					} catch (Exception e) {
-						System.out.println("Error: No Inputstream for " + id.getURL() + ". " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
+						System.out.println("Error: No Inputstream for " + image.getURL() + ". " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
 					}
 					try {
-						isLabel = id.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
+						if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL()))
+							isLabel = image.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
 					} catch (Exception e) {
-						System.out.println("Error: No Inputstream for " + id.getLabelURL() + ". " + e.getMessage() + " // "
-										+ SystemAnalysisExt.getCurrentTime());
+						System.out.println("Error: No Inputstream for " + image.getLabelURL() + ". " + e.getMessage() + " // "
+								+ SystemAnalysisExt.getCurrentTime());
 					}
 				} finally {
 					// BackgroundTaskHelper.lockRelease(image.getURL() != null ? image.getURL().getPrefix() : "in");
@@ -1010,32 +1011,36 @@ public class MongoDB {
 				String[] hashes;
 				
 				hashes = GravistoServiceExt.getHashFromInputStream(new InputStream[] {
-								new MyByteArrayInputStream(isMain),
-								isLabel != null ? new MyByteArrayInputStream(isLabel) : null
-						},
-								new ObjectRef[] { fileSize, fileSize }, getHashType(), true);
+						new MyByteArrayInputStream(isMain),
+						isLabel != null ? new MyByteArrayInputStream(isLabel) : null
+				},
+						new ObjectRef[] { fileSize, fileSize }, getHashType(), true);
 				
 				String hashMain = hashes[0];
 				String hashLabel = hashes[1];
 				
 				if (image.getURL() != null &&
-								(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) ||
-								image.getURL().getPrefix().startsWith("hsm_")) {
+						(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) ||
+						image.getURL().getPrefix().startsWith("hsm_")) {
 					db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
 					
-					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
-					if (knownURL == null) {
-						Map<String, String> m1 = new HashMap<String, String>();
-						m1.put("srcUrl", image.getURL().toString());
-						m1.put("hash", hashMain);
-						db.getCollection("constantSrc2hash").insert(new BasicDBObject(m1));
+					if (hashMain != null) {
+						DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
+						if (knownURL == null) {
+							Map<String, String> m1 = new HashMap<String, String>();
+							m1.put("srcUrl", image.getURL().toString());
+							m1.put("hash", hashMain);
+							db.getCollection("constantSrc2hash").insert(new BasicDBObject(m1));
+						}
 					}
-					DBObject knownLabelURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
-					if (knownLabelURL == null) {
-						Map<String, String> m1 = new HashMap<String, String>();
-						m1.put("srcUrl", image.getLabelURL().toString());
-						m1.put("hash", hashLabel);
-						db.getCollection("constantSrc2hash").insert(new BasicDBObject(m1));
+					if (hashLabel != null) {
+						DBObject knownLabelURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
+						if (knownLabelURL == null) {
+							Map<String, String> m1 = new HashMap<String, String>();
+							m1.put("srcUrl", image.getLabelURL().toString());
+							m1.put("hash", hashLabel);
+							db.getCollection("constantSrc2hash").insert(new BasicDBObject(m1));
+						}
 					}
 				}
 				
@@ -1055,10 +1060,9 @@ public class MongoDB {
 				image.getURL().setPrefix(mh.getPrefix());
 				image.getURL().setDetail(hashMain);
 				
-				GridFSDBFile fffLabel = gridfs_label_files.findOne(hashLabel);
-				if (image.getLabelURL() != null) {
-					image.getLabelURL().setPrefix(mh.getPrefix());
-					image.getLabelURL().setDetail(hashLabel);
+				GridFSDBFile fffLabel = null;
+				if (hashLabel != null && image.getLabelURL() != null) {
+					fffLabel = gridfs_label_files.findOne(hashLabel);
 				}
 				
 				GridFSDBFile fffPreview = gridfs_preview_files.findOne(hashMain);
@@ -1076,23 +1080,26 @@ public class MongoDB {
 					fffPreview = null;
 				}
 				
+				if (hashLabel != null && image.getLabelURL() != null) {
+					if (fffLabel != null) {
+						image.getLabelURL().setPrefix(mh.getPrefix());
+						image.getLabelURL().setDetail(hashLabel);
+					}
+				}
+				
 				if (fffMain != null && fffLabel != null && fffPreview != null) {
 					return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				} else {
-					// BackgroundTaskHelper.lockGetSemaphore(m, 1);
 					boolean saved;
-					try {
-						saved = saveImageFile(new InputStream[] {
-										new MyByteArrayInputStream(isMain),
-										isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
-										getPreviewImageStream(new MyByteArrayInputStream(isMain))
-								}, gridfs_images, gridfs_label_files,
-										gridfs_preview_files, id, hashMain,
-										hashLabel,
-										fffMain == null, fffLabel == null);
-					} finally {
-						// BackgroundTaskHelper.lockRelease(m);
-					}
+					saved = saveImageFile(new InputStream[] {
+							new MyByteArrayInputStream(isMain),
+							isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
+							getPreviewImageStream(new MyByteArrayInputStream(isMain))
+					}, gridfs_images, gridfs_label_files,
+							gridfs_preview_files, image, hashMain,
+							hashLabel,
+							fffMain == null, fffLabel == null);
+					
 					if (saved) {
 						return DatabaseStorageResult.STORED_IN_DB;
 					} else
@@ -1100,6 +1107,11 @@ public class MongoDB {
 				}
 			}
 		});
+	}
+	
+	protected boolean processLabelData(boolean keepRemoteURLs_safe_space, IOurl labelURL) {
+		return !keepRemoteURLs_safe_space || (labelURL != null && (labelURL.getPrefix().equals(LemnaTecFTPhandler.PREFIX)
+				|| labelURL.getPrefix().startsWith("hsm_")));
 	}
 	
 	private InputStream getPreviewImageStream(InputStream in) {
