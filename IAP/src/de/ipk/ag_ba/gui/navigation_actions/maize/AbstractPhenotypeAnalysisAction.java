@@ -143,7 +143,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						statisticsResult.setHeader(cond.getExperimentHeader());
 				}
 			}
-			boolean addWaterData = workOnSubset == 0;
+			boolean addWaterData = true;
 			if (addWaterData) {
 				for (SubstanceInterface si : experimentToBeAnalysed) {
 					if (si.getName() != null && (si.getName().equals("weight_before") ||

@@ -37,7 +37,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		return PREFIX;
 	}
 	
-	private final boolean useCachedCloudDataIfAvailable = true;
+	public static boolean useCachedCloudDataIfAvailable = true;
 	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
