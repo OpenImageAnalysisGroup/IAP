@@ -21,7 +21,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
  */
 public interface DatabaseTarget {
 	
-	LoadedImage saveImage(LoadedImage limg) throws Exception;
+	LoadedImage saveImage(LoadedImage limg, boolean keepRemoteLabelURLs_safe_space) throws Exception;
 	
 	void saveVolume(
 			final LoadedVolume volume,

@@ -85,7 +85,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 	
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
-						final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
@@ -191,8 +191,8 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 						final boolean parameterSearch = true;
 						
 						final FlexibleImageSet pipelineResult = ptip.pipeline(
-									input,
-									maximumThreadCountOnImageLevel, debugImageStack, parameterSearch, cropResult).getImages();
+								input,
+								maximumThreadCountOnImageLevel, debugImageStack, parameterSearch, cropResult).getImages();
 						
 						MyThread e = statisticalAnalaysis(vis, pipelineResult.getVis());
 						MyThread f = statisticalAnalaysis(fluo, pipelineResult.getFluo());
@@ -284,7 +284,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 	}
 	
 	public static ArrayList<NumericMeasurementInterface> statisticalAnalysisOfResultImage(LoadedImage limg,
-						String experimentNameExtension) {
+			String experimentNameExtension) {
 		ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 		
 		BufferedImage b = limg.getLoadedImage();
@@ -306,8 +306,8 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 				if (pos > 0)
 					sn = sn.substring(0, pos);
 				m = new NumericMeasurement3D(limg, sn + ": hue=" + che.getHue(), limg.getParentSample()
-									.getParentCondition().getExperimentName()
-									+ " (" + experimentNameExtension + ")");
+						.getParentCondition().getExperimentName()
+						+ " (" + experimentNameExtension + ")");
 				m.setValue(che.getNumberOfPixels() / pixelCount);
 				m.setUnit("proportion");
 				// m.setPosition((double) che.getHue());
@@ -325,22 +325,22 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 		}
 		if (!limg.getSubstanceName().toUpperCase().contains("TOP")) {
 			m = new NumericMeasurement3D(limg, limg.getSubstanceName() + ": height", limg.getParentSample()
-								.getParentCondition().getExperimentName()
-								+ " (" + experimentNameExtension + ")");
+					.getParentCondition().getExperimentName()
+					+ " (" + experimentNameExtension + ")");
 			m.setValue(h - g.getTop());
 			m.setUnit("pixel");
 			output.add(m);
 			
 			m = new NumericMeasurement3D(limg, limg.getSubstanceName() + ": width", limg.getParentSample()
-								.getParentCondition().getExperimentName()
-								+ " (" + experimentNameExtension + ")");
+					.getParentCondition().getExperimentName()
+					+ " (" + experimentNameExtension + ")");
 			m.setValue(h - g.getLeft() - (h - g.getRight()));
 			m.setUnit("pixel");
 			output.add(m);
 		}
 		m = new NumericMeasurement3D(limg, limg.getSubstanceName() + ": filled pixels", limg.getParentSample()
-							.getParentCondition().getExperimentName()
-							+ " (" + experimentNameExtension + ")");
+				.getParentCondition().getExperimentName()
+				+ " (" + experimentNameExtension + ")");
 		m.setValue(g.getFilledPixels());
 		m.setUnit("pixel");
 		output.add(m);
@@ -440,7 +440,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 		
 		try {
 			LoadedImage lib = result;
-			result = storeResultInDatabase.saveImage(result);
+			result = storeResultInDatabase.saveImage(result, true);
 			// add processed image to result
 			if (result != null)
 				return new ImageData(result.getParentSample(), result);
