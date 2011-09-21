@@ -935,17 +935,19 @@ public class MongoDB {
 					if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix()))
 						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 				}
-				
+				/*
 				if (image.getURL() != null && image.getLabelURL() != null) {
-					if (id.getURL().getPrefix().equals(mh.getPrefix()) && id.getLabelURL().getPrefix().equals(mh.getPrefix())) {
-						if ((image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) || image.getURL().getPrefix().startsWith("hsm_"))) {
+					if (id.getURL().getPrefix().equals(mh.getPrefix())
+							&& id.getLabelURL().getPrefix().equals(mh.getPrefix())) {
+						if ((image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) 
+								|| image.getURL().getPrefix().startsWith("hsm_"))) {
 							if (keepDataLinksToDataSource_safe_space) {
 								return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 							}
 						}
 					}
 				}
-				
+				*/
 				// check if the source URL has been imported before, it is assumed that the source URL content
 				// is not modified
 				if (image.getURL() != null &&
