@@ -44,7 +44,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			
 			public void run() {
 				try {
-					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null).get();
+					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null, false).get();
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					tso.setParam(1, e);

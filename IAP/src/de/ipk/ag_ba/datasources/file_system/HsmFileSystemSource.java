@@ -110,6 +110,18 @@ public class HsmFileSystemSource extends FileSystemSource {
 		return eh;
 	}
 	
+	public static ExperimentHeader getHSMexperimentHeaderFromFullyQualifiedFileName(String fileName) throws IOException {
+		HashMap<String, String> properties = new HashMap<String, String>();
+		TextFile tf = new TextFile(fileName);
+		properties.put("_id", "hsm:" + fileName);
+		for (String p : tf) {
+			String[] entry = p.split(",", 3);
+			properties.put(entry[1], entry[2]);
+		}
+		ExperimentHeader eh = new ExperimentHeader(properties);
+		return eh;
+	}
+	
 	@Override
 	public String getName() {
 		if (thisLevel == null)

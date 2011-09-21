@@ -116,7 +116,7 @@ public class TaskDescription {
 				experiment.getHeader().setExperimentname(
 									cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§"
 											+ batch.getSubmissionTime());
-				System.out.println("Received calculation results at " + SystemAnalysisExt.getCurrentTime() + ". Job has been submitted at "
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Received calculation results. Job has been submitted at "
 						+ SystemAnalysisExt.getCurrentTime(batch.getSubmissionTime()));
 				experiment.getHeader().setImportusergroup("Temp");
 				// System.out.println("Received result: " + experiment.getName());
@@ -210,7 +210,7 @@ public class TaskDescription {
 								System.out.println("*****************************");
 								System.out.println("Merged Experiment: " + e.getName());
 								System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
-								m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
+								m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true), true);
 							}
 						} else
 							System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostName()
