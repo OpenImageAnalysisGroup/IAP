@@ -128,7 +128,10 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 				if (status != null)
 					status.setCurrentStatusText1("Store Result");
 				
-				m.saveExperiment(statisticsResult, status);
+				if (m == null)
+					m = MongoDB.getDefaultCloud();
+				if (m != null && statisticsResult != null)
+					m.saveExperiment(statisticsResult, status);
 				
 				if (status != null)
 					status.setCurrentStatusText1("Ready");

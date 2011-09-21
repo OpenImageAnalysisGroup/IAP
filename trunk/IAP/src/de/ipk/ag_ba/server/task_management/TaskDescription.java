@@ -167,7 +167,8 @@ public class TaskDescription {
 											if (si.getName() != null && (si.getName().equals("weight_before") ||
 													(si.getName().equals("water_weight") ||
 															si.getName().equals("water_sum")))) {
-												System.out.print("INFO: Remove duplicate water and weight data before adding results to merged dataset");
+												System.out.print(SystemAnalysisExt.getCurrentTime()
+														+ ">INFO: Remove duplicate water and weight data before adding results to merged dataset");
 												toBeRemoved.add(si);
 											}
 										}
@@ -181,7 +182,7 @@ public class TaskDescription {
 									if (ei.getNumberOfMeasurementValues() > 0)
 										System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
 									e.addAndMerge(ei);
-									// m.deleteExperiment(i.getDatabaseId());
+									m.deleteExperiment(i.getDatabaseId());
 									System.out.println("*****************************");
 								}
 								String sn = cmd.getRemoteCapableAnalysisActionClassName();

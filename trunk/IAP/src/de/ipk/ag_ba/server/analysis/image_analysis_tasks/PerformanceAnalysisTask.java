@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
@@ -12,12 +13,14 @@ import javax.imageio.ImageIO;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.ReleaseInfo;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -26,6 +29,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -40,6 +44,8 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	private MongoDB m;
 	private int workLoadIndex;
 	private int workLoadSize;
+	
+	private final TextFile errors = new TextFile();
 	
 	public PerformanceAnalysisTask() {
 		// empty
@@ -70,6 +76,25 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	}
 	
 	private void performAnalysis(final int maximumThreadCountParallelImages,
+			final BackgroundTaskStatusProviderSupportingExternalCall status) {
+		synchronized (errors) {
+			errors.clear();
+			try {
+				LemnaTecFTPhandler.useCachedCloudDataIfAvailable = false;
+				performAnalysisIC(maximumThreadCountParallelImages, status);
+			} finally {
+				LemnaTecFTPhandler.useCachedCloudDataIfAvailable = true;
+			}
+			try {
+				errors.write(ReleaseInfo.getAppFolderWithFinalSep() + "performance_test_" + System.currentTimeMillis() + ".txt");
+			} catch (IOException e) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void performAnalysisIC(final int maximumThreadCountParallelImages,
 						final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		if (workLoadIndex != 0)
 			return;
@@ -121,6 +146,15 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		final ThreadSafeOptions tsoLoadDataErrorsNIRside = new ThreadSafeOptions();
 		final ThreadSafeOptions tsoLoadDataErrorsNIRtop = new ThreadSafeOptions();
 		
+		final ThreadSafeOptions tsoLoadDataOkVISside = new ThreadSafeOptions();
+		final ThreadSafeOptions tsoLoadDataOkVIStop = new ThreadSafeOptions();
+		
+		final ThreadSafeOptions tsoLoadDataOkFLUOside = new ThreadSafeOptions();
+		final ThreadSafeOptions tsoLoadDataOkFLUOtop = new ThreadSafeOptions();
+		
+		final ThreadSafeOptions tsoLoadDataOkNIRside = new ThreadSafeOptions();
+		final ThreadSafeOptions tsoLoadDataOkNIRtop = new ThreadSafeOptions();
+		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int wl = workload.size();
 		final ThreadSafeOptions tsoBytesRead = new ThreadSafeOptions();
@@ -154,6 +188,28 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 							byte[] imgDataNF = null;
 							try {
 								imgDataNF = loadImageContent(maximumThreadCountParallelImages, tsoBytesRead, tsoStartTime, id);
+								switch (ic) {
+									case FluoSide:
+										tsoLoadDataOkFLUOside.addInt(1);
+										break;
+									case FluoTop:
+										tsoLoadDataOkFLUOtop.addInt(1);
+										break;
+									case NirSide:
+										tsoLoadDataOkNIRside.addInt(1);
+										break;
+									case NirTop:
+										tsoLoadDataOkNIRtop.addInt(1);
+										break;
+									case RgbSide:
+										tsoLoadDataOkVISside.addInt(1);
+										break;
+									case RgbTop:
+										tsoLoadDataOkVIStop.addInt(1);
+										break;
+									case Unknown:
+										break;
+								}
 							} catch (Exception e) {
 								System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: DATA LOAD ERROR: " + e.getMessage() + ", IMAGE: " + id.getURL());
 								switch (ic) {
@@ -186,18 +242,26 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 									@Override
 									public void run() {
 										try {
+											boolean ok = true;
 											BufferedImage img = ImageIO.read(new MyByteArrayInputStream(imgData));
 											if (img == null) {
 												imgReadError("read error, image is NULL", id, ic, tsoLoadDataErrorsFLUOside,
 														tsoLoadDataErrorsFLUOtop, tsoLoadDataErrorsNIRside, tsoLoadDataErrorsNIRtop,
 														tsoLoadDataErrorsVISside, tsoLoadDataErrorsVIStop);
+												ok = false;
 											} else {
-												if (img.getWidth() < 10 || img.getHeight() < 10)
+												if (img.getWidth() < 10 || img.getHeight() < 10) {
 													imgReadError("read error, image size is small: " + img.getWidth() + "x" + img.getHeight(), id, ic,
 															tsoLoadDataErrorsFLUOside,
 															tsoLoadDataErrorsFLUOtop, tsoLoadDataErrorsNIRside, tsoLoadDataErrorsNIRtop,
 															tsoLoadDataErrorsVISside, tsoLoadDataErrorsVIStop);
+													ok = false;
+												}
 											}
+											if (ok)
+												imgReadOk(id, ic, tsoLoadDataOkFLUOside,
+														tsoLoadDataOkFLUOtop, tsoLoadDataOkNIRside, tsoLoadDataOkNIRtop,
+														tsoLoadDataOkVISside, tsoLoadDataOkVIStop);
 										} catch (Exception e2) {
 											imgReadError(e2.getMessage(), id, ic, tsoLoadDataErrorsFLUOside,
 													tsoLoadDataErrorsFLUOtop, tsoLoadDataErrorsNIRside, tsoLoadDataErrorsNIRtop,
@@ -223,8 +287,19 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 													tsoLoadDataErrorsVISside.getInt() + tsoLoadDataErrorsVISside.getLong() +
 													tsoLoadDataErrorsVIStop.getInt() + tsoLoadDataErrorsVIStop.getLong();
 									
+									long okCnt =
+											tsoLoadDataOkFLUOside.getInt() + tsoLoadDataOkFLUOside.getLong() +
+													tsoLoadDataOkFLUOtop.getInt() + tsoLoadDataOkFLUOtop.getLong() +
+													tsoLoadDataOkNIRside.getInt() + tsoLoadDataOkNIRside.getLong() +
+													tsoLoadDataOkNIRtop.getInt() + tsoLoadDataOkNIRtop.getLong() +
+													tsoLoadDataOkVISside.getInt() + tsoLoadDataOkVISside.getLong() +
+													tsoLoadDataOkVIStop.getInt() + tsoLoadDataOkVIStop.getLong();
+									
 									status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl + ", " + (int) mbs
-														+ " MB/s (" + maximumThreadCountParallelImages + " thread(s), errors: " + errorCnt + ")");
+														+ " MB/s" +
+														(maximumThreadCountParallelImages > 1 ?
+																" (" + maximumThreadCountParallelImages + " thread(s)" : "") +
+														", ok: " + okCnt + ", errors: " + errorCnt + ")");
 									{
 										NumericMeasurement m = new NumericMeasurement(id, "read speed", id.getParentSample()
 															.getParentCondition().getExperimentName()
@@ -286,6 +361,24 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		System.out.println("NIR SIDE\t\t" + tsoLoadDataErrorsNIRside.getInt() + "\t\t" + tsoLoadDataErrorsNIRside.getLong());
 		System.out.println("NIR TOP \t\t" + tsoLoadDataErrorsNIRtop.getInt() + "\t\t" + tsoLoadDataErrorsNIRtop.getLong());
 		
+		errors.add(SystemAnalysisExt.getCurrentTime() + ">ERROR-STAT:");
+		errors.add("CONFIG\t\tGET DATA ERRORS\t\tLOAD DATA ERRORS");
+		errors.add("VIS SIDE\t\t" + tsoLoadDataErrorsVISside.getInt() + "\t\t" + tsoLoadDataErrorsVISside.getLong());
+		errors.add("VIS TOP \t\t" + tsoLoadDataErrorsVIStop.getInt() + "\t\t" + tsoLoadDataErrorsVIStop.getLong());
+		errors.add("FLUO SIDE\t\t" + tsoLoadDataErrorsFLUOside.getInt() + "\t\t" + tsoLoadDataErrorsFLUOside.getLong());
+		errors.add("FLUO TOP\t\t" + tsoLoadDataErrorsFLUOtop.getInt() + "\t\t" + tsoLoadDataErrorsFLUOtop.getLong());
+		errors.add("NIR SIDE\t\t" + tsoLoadDataErrorsNIRside.getInt() + "\t\t" + tsoLoadDataErrorsNIRside.getLong());
+		errors.add("NIR TOP \t\t" + tsoLoadDataErrorsNIRtop.getInt() + "\t\t" + tsoLoadDataErrorsNIRtop.getLong());
+		
+		errors.add(SystemAnalysisExt.getCurrentTime() + ">OK-STAT:");
+		errors.add("CONFIG\t\tGET DATA OK\t\tLOAD DATA OK");
+		errors.add("VIS SIDE\t\t" + tsoLoadDataOkVISside.getInt() + "\t\t" + tsoLoadDataOkVISside.getLong());
+		errors.add("VIS TOP \t\t" + tsoLoadDataOkVIStop.getInt() + "\t\t" + tsoLoadDataOkVIStop.getLong());
+		errors.add("FLUO SIDE\t\t" + tsoLoadDataOkFLUOside.getInt() + "\t\t" + tsoLoadDataOkFLUOside.getLong());
+		errors.add("FLUO TOP\t\t" + tsoLoadDataOkFLUOtop.getInt() + "\t\t" + tsoLoadDataOkFLUOtop.getLong());
+		errors.add("NIR SIDE\t\t" + tsoLoadDataOkNIRside.getInt() + "\t\t" + tsoLoadDataOkNIRside.getLong());
+		errors.add("NIR TOP \t\t" + tsoLoadDataOkNIRtop.getInt() + "\t\t" + tsoLoadDataOkNIRtop.getLong());
+		
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
@@ -306,8 +399,12 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	protected void imgReadError(String message, ImageData id, ImageConfiguration ic, ThreadSafeOptions tsoLoadDataErrorsFLUOside,
 			ThreadSafeOptions tsoLoadDataErrorsFLUOtop, ThreadSafeOptions tsoLoadDataErrorsNIRside, ThreadSafeOptions tsoLoadDataErrorsNIRtop,
 			ThreadSafeOptions tsoLoadDataErrorsVISside, ThreadSafeOptions tsoLoadDataErrorsVIStop) {
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: CONVERTING IMAGE DATA TO IMAGE: " + message
-				+ ", IMAGE: " + id.getURL()+", TIME "+id.getParentSample().getTime()+" "+id.getParentSample().getTimeUnit());
+		String sss = SystemAnalysisExt.getCurrentTime() + ">ERROR: CONVERTING IMAGE DATA TO IMAGE: " + message
+				+ ", IMAGE: " + id.getURL() + ", TIME " + id.getParentSample().getTime() + " " + id.getParentSample().getTimeUnit() + ", "
+				+ id.getParentSample().getSampleTime() + ", " + SystemAnalysisExt.getCurrentTime(id.getParentSample().getRowId()) + ", ID "
+				+ id.getQualityAnnotation();
+		System.out.println(sss);
+		errors.add(sss);
 		switch (ic) {
 			case FluoSide:
 				tsoLoadDataErrorsFLUOside.addLong(1);
@@ -326,6 +423,33 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 				break;
 			case RgbTop:
 				tsoLoadDataErrorsVIStop.addLong(1);
+				break;
+			case Unknown:
+				break;
+		}
+	}
+	
+	protected void imgReadOk(ImageData id, ImageConfiguration ic, ThreadSafeOptions tsoLoadDataOkFLUOside,
+			ThreadSafeOptions tsoLoadDataOkFLUOtop, ThreadSafeOptions tsoLoadDataOkNIRside, ThreadSafeOptions tsoLoadDataOkNIRtop,
+			ThreadSafeOptions tsoLoadDataOkVISside, ThreadSafeOptions tsoLoadDataOkVIStop) {
+		switch (ic) {
+			case FluoSide:
+				tsoLoadDataOkFLUOside.addLong(1);
+				break;
+			case FluoTop:
+				tsoLoadDataOkFLUOtop.addLong(1);
+				break;
+			case NirSide:
+				tsoLoadDataOkNIRside.addLong(1);
+				break;
+			case NirTop:
+				tsoLoadDataOkNIRtop.addLong(1);
+				break;
+			case RgbSide:
+				tsoLoadDataOkVISside.addLong(1);
+				break;
+			case RgbTop:
+				tsoLoadDataOkVIStop.addLong(1);
 				break;
 			case Unknown:
 				break;
