@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 
@@ -97,7 +98,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 			}
 		});
 		
-		final ExecutorService run2 = Executors.newFixedThreadPool(maximumThreadCountParallelImages, new ThreadFactory() {
+		final ExecutorService run2 = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
 			@Override
 			public Thread newThread(Runnable r) {
 				Thread t = new Thread(r);
