@@ -143,7 +143,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						statisticsResult.setHeader(cond.getExperimentHeader());
 				}
 			}
-			boolean addWaterData = true;
+			boolean addWaterData = workOnSubset < 5;
 			if (addWaterData) {
 				for (SubstanceInterface si : experimentToBeAnalysed) {
 					if (si.getName() != null && (si.getName().equals("weight_before") ||
@@ -178,13 +178,13 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
 		res.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(experimentResult),
-							src.getGUIsetting()));
+				src.getGUIsetting()));
 		
 		res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
-							"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+				"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 		
 		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
-							false, src.getGUIsetting(), m);
+				false, src.getGUIsetting(), m);
 		return res;
 	}
 	
