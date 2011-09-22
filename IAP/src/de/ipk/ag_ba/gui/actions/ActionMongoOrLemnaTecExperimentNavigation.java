@@ -77,7 +77,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 			add = true;
 		}
 		if (add) {
-			boolean imageAnalysis = m != null || header.getDatabaseId().startsWith("hsm:");
+			boolean imageAnalysis = m != null || header.getDatabaseId().startsWith("hsm:") || header.getDatabaseId().startsWith("lemnatec:");
 			getDefaultActions(actions, experiment, header, imageAnalysis, src.getGUIsetting(), m);
 		}
 		if (header.getHistory() != null && !header.getHistory().isEmpty()) {

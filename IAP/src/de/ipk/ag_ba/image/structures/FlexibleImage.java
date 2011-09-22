@@ -55,9 +55,9 @@ public class FlexibleImage {
 	
 	public FlexibleImage(IOurl url) throws IOException, Exception {
 		InputStream is;
-		synchronized (FlexibleImage.class) {
+		//synchronized (FlexibleImage.class) {
 			is = ResourceIOManager.getInputStreamMemoryCached(url);
-		}
+			//}
 		// // copy input stream: // not needed any more?!
 		// MyByteArrayOutputStream out = new MyByteArrayOutputStream();
 		// ResourceIOManager.copyContent(is, out);
