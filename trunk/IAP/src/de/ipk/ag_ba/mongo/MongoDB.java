@@ -67,7 +67,6 @@ import com.mongodb.WriteResult;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
@@ -1857,8 +1856,8 @@ public class MongoDB {
 				public int compare(BatchCmd o1, BatchCmd o2) {
 					Long a = o1.getSubmissionTime();
 					Long b = o2.getSubmissionTime();
-					int res=a.compareTo(b);
-					if (res!=0)
+					int res = a.compareTo(b);
+					if (res != 0)
 						return res;
 					Integer m = o1.getPartIdx();
 					Integer n = o2.getPartIdx();
