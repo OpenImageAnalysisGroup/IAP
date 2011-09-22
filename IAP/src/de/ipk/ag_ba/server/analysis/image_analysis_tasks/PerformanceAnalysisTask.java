@@ -402,7 +402,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		String sss = SystemAnalysisExt.getCurrentTime() + ">ERROR: CONVERTING IMAGE DATA TO IMAGE: " + message
 				+ ", IMAGE: " + id.getURL() + ", TIME " + id.getParentSample().getTime() + " " + id.getParentSample().getTimeUnit() + ", "
 				+ id.getParentSample().getSampleTime() + ", " + SystemAnalysisExt.getCurrentTime(id.getParentSample().getRowId()) + ", ID "
-				+ id.getQualityAnnotation();
+				+ id.getQualityAnnotation() + ", CONFIG: " + ic;
 		System.out.println(sss);
 		errors.add(sss);
 		switch (ic) {
