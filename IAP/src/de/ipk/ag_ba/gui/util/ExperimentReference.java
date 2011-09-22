@@ -8,6 +8,7 @@ package de.ipk.ag_ba.gui.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.WeakHashMap;
 
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
@@ -16,6 +17,7 @@ import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
@@ -27,6 +29,9 @@ public class ExperimentReference {
 	private final String experimentName;
 	private ExperimentInterface experiment;
 	private ExperimentHeaderInterface header;
+	
+	private static WeakHashMap<String, ExperimentInterface> weakId2exp = 
+			new WeakHashMap<String, ExperimentInterface>();
 	
 	public ExperimentReference(ExperimentHeaderInterface header) {
 		this.experimentName = header.getExperimentName();
@@ -78,19 +83,24 @@ public class ExperimentReference {
 		return getData(m, false);
 	}
 	
-	public ExperimentInterface getData(MongoDB m, boolean interactiveGetExperimentSize) throws Exception {
+	public synchronized ExperimentInterface getData(MongoDB m, boolean interactiveGetExperimentSize) throws Exception {
 		if (experiment != null)
 			return experiment;
 		else {
+			ExperimentInterface res = weakId2exp.get(header.getDatabaseId());
+			if (res!=null)
+				return res;
 			if (header.getDatabaseId().startsWith("lemnatec:"))
-				return new LemnaTecDataExchange().getExperiment(header, null);
+				res = new LemnaTecDataExchange().getExperiment(header, null);
 			else
 				if (header.getDatabaseId().startsWith("hsm:")) {
 					synchronized (ExperimentReference.class) {
-						return HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
+						res=HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
 					}
 				} else
-					return m.getExperiment(header, interactiveGetExperimentSize, null);
+					res=m.getExperiment(header, interactiveGetExperimentSize, null);
+			weakId2exp.put(header.getDatabaseId(), res);
+			return res;
 		}
 	}
 	

@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -66,6 +67,7 @@ import com.mongodb.WriteResult;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
@@ -1777,7 +1779,7 @@ public class MongoDB {
 	}
 	
 	public Collection<BatchCmd> batchGetWorkTasksScheduledForStart(final int maxTasks) {
-		final Collection<BatchCmd> res = new ArrayList<BatchCmd>();
+		final ArrayList<BatchCmd> res = new ArrayList<BatchCmd>();
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
@@ -1850,6 +1852,19 @@ public class MongoDB {
 		}
 		if (res.size() > 0) {
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">SCHEDULED FOR START: " + res.size());
+			java.util.Collections.sort(res, new Comparator<BatchCmd>() {
+				@Override
+				public int compare(BatchCmd o1, BatchCmd o2) {
+					Long a = o1.getSubmissionTime();
+					Long b = o2.getSubmissionTime();
+					int res=a.compareTo(b);
+					if (res!=0)
+						return res;
+					Integer m = o1.getPartIdx();
+					Integer n = o2.getPartIdx();
+					return m.compareTo(n);
+				}
+			});
 		}
 		return res;
 	}
