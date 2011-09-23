@@ -74,7 +74,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected void debugEnd(StopWatch w) {
 		if (w != null) {
-			w.printTime();
+			w.printTime(10);
 		}
 	}
 	

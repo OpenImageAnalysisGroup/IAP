@@ -6,15 +6,22 @@
  */
 package de.ipk.ag_ba.hsm;
 
+import info.StopWatch;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.concurrent.Semaphore;
 
 import org.StringManipulationTools;
 import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
+
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class HsmResourceIoHandler extends AbstractResourceIOHandler {
 	private final String prefix;
@@ -53,9 +60,19 @@ public class HsmResourceIoHandler extends AbstractResourceIOHandler {
 		String fn = url.getFileName();
 		String path = url.getDetail().substring(url.getDetail().indexOf(File.separator) + File.separator.length());
 		fn = folder + path + File.separator + fn.substring(0, fn.lastIndexOf("#"));
-		if (!new File(fn).exists())
+/*		if (!new File(fn).exists())
 			System.out.println("Error: Can't find HSM file: " + fn);
-		return new FileInputStream(new File(fn));
+			
+*/		
+		Semaphore lock = BackgroundTaskHelper.lockGetSemaphore("hsm", 4);
+		StopWatch fw = new StopWatch("WAIT: "+url.getFileName()+"", false);
+		lock.acquire();
+		fw.printTime(500);
+		StopWatch fr = new StopWatch(url.getFileName()+"", false);
+		MyByteArrayInputStream res = ResourceIOManager.getInputStreamMemoryCached(new FileInputStream(new File(fn)));
+		fr.printTime(500);
+		lock.release();
+		return res;
 	}
 	
 	@Override
