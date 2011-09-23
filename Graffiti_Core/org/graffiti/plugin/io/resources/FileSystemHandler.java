@@ -30,7 +30,7 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 				file = new File(
 						decoded
 						);
-				if (file.exists() && file.canRead()) {
+				if (file.exists()) {
 					FileInputStream fis = new FileInputStream(file);
 					return fis;
 				} else {
