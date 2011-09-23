@@ -240,7 +240,7 @@ public class ImageProcessorOptions {
 		addIntSetting(Setting.POST_PROCESS_ERODE_NIR_SIDE, (int) Math.ceil(1 * scale));
 		
 		addBooleanSetting(Setting.PROCESS_NIR, false);
-		addBooleanSetting(Setting.DEBUG_TAKE_TIMES, false);
+		addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
 		addBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, false);
 		addBooleanSetting(Setting.IS_DEBUG_PRINT_EACH_STEP, false);
 		addBooleanSetting(Setting.IS_DEBUG_VIS, false);

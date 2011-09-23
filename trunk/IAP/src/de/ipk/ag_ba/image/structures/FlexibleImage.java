@@ -63,6 +63,8 @@ public class FlexibleImage {
 		}
 		if (img!=null)
 			System.out.print("o");
+		else
+			System.out.print("-");
 		if (img==null) {
 			InputStream is = ResourceIOManager.getInputStreamMemoryCached(url);
 			img = ImageIO.read(is);

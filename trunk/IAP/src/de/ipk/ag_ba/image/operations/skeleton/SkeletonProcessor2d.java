@@ -370,12 +370,19 @@ public class SkeletonProcessor2d {
 		if (branches != null)
 			branches.clear();
 		
+		int[][] area = new int[3][3];
 		for (int x = 1; x < width - 1; x++) {
 			for (int y = 1; y < height - 1; y++) {
 				if (imgbin[x][y] != 0) {
-					int[][] area = new int[][] { { imgbin[x - 1][y - 1], imgbin[x][y - 1], imgbin[x + 1][y - 1] },
-							{ imgbin[x - 1][y], imgbin[x][y], imgbin[x + 1][y] },
-							{ imgbin[x - 1][y + 1], imgbin[x][y + 1], imgbin[x + 1][y + 1] } };
+					area[0][0] = imgbin[x - 1][y - 1];
+					area[0][1] = imgbin[x][y - 1];
+					area[0][2] = imgbin[x + 1][y - 1];
+					area[1][0] = imgbin[x - 1][y];
+					area[1][1] = imgbin[x][y];
+					area[1][2] = imgbin[x + 1][y];
+					area[2][0] = imgbin[x - 1][y + 1];
+					area[2][1] = imgbin[x][y + 1];
+					area[2][2] = imgbin[x + 1][y + 1];
 					
 					// delete Dots
 					if (matchMask3x3(dot, area))
