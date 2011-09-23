@@ -104,7 +104,7 @@ public class BackupSupport {
 		try {
 			makeBackupInnerCall();
 		} finally {
-			backupRunning = true;
+			backupRunning = false;
 		}
 	}
 	
