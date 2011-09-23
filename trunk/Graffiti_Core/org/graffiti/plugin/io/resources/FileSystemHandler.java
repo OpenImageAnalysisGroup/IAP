@@ -19,7 +19,9 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
 		if (url.isEqualPrefix(getPrefix())) {
-			File file = new File(url.getDetail() + IOurl.SEPERATOR + url.getFileName());
+			File file = new File(
+					url.getDetail()
+							+ IOurl.SEPERATOR + url.getFileName());
 			if (file.exists()) {
 				FileInputStream fis = new FileInputStream(file);
 				return new BufferedInputStream(fis);
@@ -28,9 +30,9 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 				file = new File(
 						decoded
 						);
-				if (file.exists()) {
+				if (file.exists() && file.canRead()) {
 					FileInputStream fis = new FileInputStream(file);
-					return new BufferedInputStream(fis);
+					return fis;
 				} else {
 					String fn = url.getDetail() + IOurl.SEPERATOR + url.getFileName();
 					fn = fn.substring(fn.indexOf("!") + 1);
@@ -42,7 +44,10 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 	}
 	
 	public static File getFile(IOurl url) {
-		return new File(url.getDetail() + IOurl.SEPERATOR + url.getFileName());
+		return new File(
+				URLDecoder.decode(
+						url.getDetail()
+						) + IOurl.SEPERATOR + url.getFileName());
 	}
 	
 	public static boolean isFileUrl(IOurl url) {
