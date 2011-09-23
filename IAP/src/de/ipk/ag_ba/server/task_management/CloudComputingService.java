@@ -29,7 +29,6 @@ import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.actions.Library;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.mongo.IAPservice;
@@ -106,7 +105,7 @@ public class CloudComputingService {
 		System.out.println(SystemAnalysisExt.getCurrentTime() + "> SYSTEM ANALYSIS");
 		SystemAnalysis.simulateHeadless = true;
 		boolean clusterExecutionMode = false;
-		BackgroundThreadDispatcher.useThreads = false;
+		// BackgroundThreadDispatcher.useThreads = false;
 		{
 			CloudComputingService cc = CloudComputingService.getInstance();
 			cc.setEnableCalculations(true);
@@ -232,11 +231,11 @@ public class CloudComputingService {
 		
 		String hsm = IAPmain.getHSMfolder();
 		if (hsm != null && new File(hsm).exists()) {
-			System.out.println(SystemAnalysisExt.getCurrentTime()+">HSM Folder: " + hsm);
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">HSM Folder: " + hsm);
 			Library lib = new Library();
 			HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsm,
-				IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-				IAPmain.loadIcon("img/ext/folder-remote.png"));
+					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+					IAPmain.loadIcon("img/ext/folder-remote.png"));
 		}
 		// register extended hierarchy and loaded image loaders (and more)
 		new MultimodalDataHandlingAddon();
