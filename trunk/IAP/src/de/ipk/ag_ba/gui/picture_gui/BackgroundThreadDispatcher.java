@@ -29,7 +29,7 @@ public class BackgroundThreadDispatcher {
 	Stack<Integer> todoPriorities = new Stack<Integer>();
 	LinkedList<MyThread> runningTasks = new LinkedList<MyThread>();
 	
-	public static boolean useThreads = true;
+	public static boolean useThreads = false;
 	
 	int indicator = 0;
 	

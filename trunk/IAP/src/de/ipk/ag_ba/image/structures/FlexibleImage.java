@@ -14,6 +14,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.WeakHashMap;
 
 import javax.imageio.ImageIO;
 
@@ -53,17 +54,21 @@ public class FlexibleImage {
 		this.type = type;
 	}
 	
+	private static WeakHashMap<String, BufferedImage> url2image = new WeakHashMap<String, BufferedImage>();
+	
 	public FlexibleImage(IOurl url) throws IOException, Exception {
-		InputStream is;
-		//synchronized (FlexibleImage.class) {
-			is = ResourceIOManager.getInputStreamMemoryCached(url);
-			//}
-		// // copy input stream: // not needed any more?!
-		// MyByteArrayOutputStream out = new MyByteArrayOutputStream();
-		// ResourceIOManager.copyContent(is, out);
-		// MyByteArrayInputStream in = new MyByteArrayInputStream(out.getBuff(),
-		// out.size());
-		BufferedImage img = ImageIO.read(is);
+		BufferedImage img = null;
+		synchronized (url2image) {
+			img = url2image.get(url+"");
+		}
+		if (img!=null)
+			System.out.print("o");
+		if (img==null) {
+			InputStream is = ResourceIOManager.getInputStreamMemoryCached(url);
+			img = ImageIO.read(is);
+			url2image.put(url+"", img);
+		}
+		
 		if (img == null)
 			throw new Exception("Image could not be read: " + url);
 		image = new ImagePlus(url.getFileName(),

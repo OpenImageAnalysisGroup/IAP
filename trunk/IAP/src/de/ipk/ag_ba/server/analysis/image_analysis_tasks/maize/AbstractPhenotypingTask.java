@@ -265,7 +265,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						if (id != null && id.getParentSample() != null) {
 							LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
 							ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, false);
+							if (imageRef!=null)
 							output.add(imageRef);
+							else
+								System.out.println(SystemAnalysisExt.getCurrentTime()+">ERROR: SaveImageAndUpdateURL failed! (NULL Result)");
 						}
 					}
 				} else {
