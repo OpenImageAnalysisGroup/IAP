@@ -8,6 +8,7 @@ package de.ipk.ag_ba.server.task_management;
 
 import info.StopWatch;
 
+import java.io.File;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,9 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.IAPfeature;
+import de.ipk.ag_ba.gui.actions.Library;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -227,6 +230,14 @@ public class CloudComputingService {
 		if (io != null)
 			s.printTime();
 		
+		String hsm = IAPmain.getHSMfolder();
+		if (hsm != null && new File(hsm).exists()) {
+			System.out.println(SystemAnalysisExt.getCurrentTime()+">HSM Folder: " + hsm);
+			Library lib = new Library();
+			HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsm,
+				IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+				IAPmain.loadIcon("img/ext/folder-remote.png"));
+		}
 		// register extended hierarchy and loaded image loaders (and more)
 		new MultimodalDataHandlingAddon();
 		
