@@ -510,8 +510,8 @@ public class MongoDB {
 							try {
 								if (m instanceof ImageData) {
 									ImageData id = (ImageData) m;
-									boolean direct = true;
-									if (direct) {
+//									boolean direct = true;
+//									if (direct) {
 										saveImageFileDirect(db, id, overallFileSize,
 												keepDataLinksToDataSource_safe_space);
 										
@@ -520,11 +520,11 @@ public class MongoDB {
 										BasicDBObject dbo = new BasicDBObject(filter(attributes));
 										dbImages.add(dbo);
 										
-									} else {
-										storageResults.add(saveImageFile(db, id, overallFileSize,
-												keepDataLinksToDataSource_safe_space));
-										imageDataQueue.add(id);
-									}
+//									} else {
+//										storageResults.add(saveImageFile(db, id, overallFileSize,
+//												keepDataLinksToDataSource_safe_space));
+//										imageDataQueue.add(id);
+//									}
 									count++;
 								}
 								if (m instanceof VolumeData) {
@@ -935,17 +935,25 @@ public class MongoDB {
 		}
 	});
 	
-	public Future<DatabaseStorageResult> saveImageFile(final DB db,
+//	public Future<DatabaseStorageResult> saveImageFile(final DB db,
+//			final ImageData image, final ObjectRef fileSize,
+//			final boolean keepRemoteURLs_safe_space) throws Exception {
+//		
+//		return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
+//			@Override
+//			public DatabaseStorageResult call() throws Exception {
+//				return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+//			}
+//		});
+//	}
+	
+	public DatabaseStorageResult saveImageFile(final DB db,
 			final ImageData image, final ObjectRef fileSize,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
 		
-		return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
-			@Override
-			public DatabaseStorageResult call() throws Exception {
 				return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
-			}
-		});
 	}
+
 	
 	protected boolean processLabelData(boolean keepRemoteURLs_safe_space, IOurl labelURL) {
 		return !keepRemoteURLs_safe_space || (labelURL != null && (labelURL.getPrefix().equals(LemnaTecFTPhandler.PREFIX)

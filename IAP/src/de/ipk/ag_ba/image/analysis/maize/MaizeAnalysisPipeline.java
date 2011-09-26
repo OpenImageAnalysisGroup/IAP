@@ -110,6 +110,9 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 	private void modifySettings(ImageProcessorOptions options) {
 		if (options == null)
 			return;
+		
+//		options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
+
 		options.setIsMaize(true);
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
 		

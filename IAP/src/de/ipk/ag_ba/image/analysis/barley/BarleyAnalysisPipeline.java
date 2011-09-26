@@ -99,6 +99,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	private void modifySettings(ImageProcessorOptions options) {
 		if (options == null)
 			return;
+		
+//		options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
+
 		options.setIsMaize(false);
 		
 		// Test Barley
