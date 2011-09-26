@@ -4,7 +4,10 @@ import info.StopWatch;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -105,6 +108,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		addTopOrSideImagesToWorkset(workload, 0, analyzeTopImages(), analyzeSideImages());
 		
 		// workload = filterWorkload(workload, "Athletico");// "Rainbow Amerindian"); // Athletico
+
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int workloadSnapshots = workload.size();
@@ -195,11 +199,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void addTopOrSideImagesToWorkset(ArrayList<TreeMap<String, ImageSet>> workload, int max, boolean top, boolean side) {
 		TreeMap<String, TreeMap<String, ImageSet>> replicateId2ImageSetSide = new TreeMap<String, TreeMap<String, ImageSet>>();
+	
 		for (Sample3D ins : input)
 			for (Measurement md : ins) {
 				if (md instanceof ImageData) {
 					ImageData id = (ImageData) md;
-					String keyA = id.getParentSample().getFullId() + ";" + id.getReplicateID();
+					
+					String keyA = id.getParentSample().getSampleTime()+";"+ id.getParentSample().getFullId() + ";" + id.getReplicateID();
 					if (!replicateId2ImageSetSide.containsKey(keyA)) {
 						replicateId2ImageSetSide.put(keyA, new TreeMap<String, ImageSet>());
 					}
@@ -234,6 +240,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					}
 				}
 			}
+		
 		int workLoadIndex = workOnSubset;
 		for (TreeMap<String, ImageSet> is : replicateId2ImageSetSide.values()) {
 			if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0) {
@@ -243,6 +250,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				workLoadIndex++;
 			workload.add(is);
 		}
+		
 		if (max > 0)
 			while (workload.size() > max)
 				workload.remove(0);
