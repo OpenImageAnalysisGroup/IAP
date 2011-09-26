@@ -107,8 +107,9 @@ public class BlockPipeline {
 			long tb = System.currentTimeMillis();
 			
 			int seconds = (int) ((tb - ta) / 1000);
-			if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
+//			if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 				if (blockProgressOutput)
+					if (seconds>0)
 					System.out.println("Pipeline " + id + ": finished block "
 							+ index + "/" + blocks.size() + ", took " + seconds
 							+ " sec., time: " + StopWatch.getNiceTime() + " ("

@@ -64,15 +64,18 @@ public class HsmResourceIoHandler extends AbstractResourceIOHandler {
 			System.out.println("Error: Can't find HSM file: " + fn);
 			
 */		
-		Semaphore lock = BackgroundTaskHelper.lockGetSemaphore("hsm", 4);
-		StopWatch fw = new StopWatch("WAIT: "+url.getFileName()+"", false);
-		lock.acquire();
-		fw.printTime(500);
-		StopWatch fr = new StopWatch(url.getFileName()+"", false);
-		MyByteArrayInputStream res = ResourceIOManager.getInputStreamMemoryCached(new FileInputStream(new File(fn)));
-		fr.printTime(500);
-		lock.release();
-		return res;
+//		Semaphore lock = BackgroundTaskHelper.lockGetSemaphore("hsm", 1);
+//		StopWatch fw = new StopWatch("WAIT: "+url.getFileName()+"", true);
+//		lock.acquire();
+		try {
+//			fw.printTime(10);
+			StopWatch fr = new StopWatch(url.getFileName()+"", false);
+			MyByteArrayInputStream res = ResourceIOManager.getInputStreamMemoryCached(new FileInputStream(new File(fn)));
+			fr.printTime(500);
+			return res;
+		} finally {
+//			lock.release();
+		}
 	}
 	
 	@Override
