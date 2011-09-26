@@ -87,6 +87,7 @@ public class ExperimentReference {
 		if (experiment != null)
 			return experiment;
 		else {
+			synchronized (ExperimentReference.class) {
 			ExperimentInterface res = weakId2exp.get(header.getDatabaseId());
 			if (res!=null)
 				return res;
@@ -94,13 +95,12 @@ public class ExperimentReference {
 				res = new LemnaTecDataExchange().getExperiment(header, null);
 			else
 				if (header.getDatabaseId().startsWith("hsm:")) {
-					synchronized (ExperimentReference.class) {
 						res=HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
-					}
 				} else
 					res=m.getExperiment(header, interactiveGetExperimentSize, null);
 			weakId2exp.put(header.getDatabaseId(), res);
 			return res;
+			}
 		}
 	}
 	
