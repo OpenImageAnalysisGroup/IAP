@@ -21,5 +21,6 @@
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/platform.jar"/>
 	<classpathentry kind="lib" path="lib/jsr166y.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk16-146.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
