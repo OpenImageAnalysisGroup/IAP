@@ -41,7 +41,7 @@ public class BlockLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalys
 	@Override
 	protected void prepare() {
 		if (getInput() != null) {
-			synchronized (options) {
+//			synchronized (options) {
 				if (getInput().getImages() != null)
 					getInput().setImages(new FlexibleImageSet(getInput().getImages()));
 				if (getInput().getMasks() != null)
@@ -109,7 +109,7 @@ public class BlockLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalys
 						}
 					}
 				}
-			}
+//			}
 		}
 		
 		printInfo(getInput().getMasks().getVis(), BlockPrintInfosTyp.VisMask);
