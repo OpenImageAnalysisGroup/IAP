@@ -194,8 +194,8 @@ public class GravistoMainHelper implements HelperClass {
 	}
 	
 	public static void setLookAndFeel() {
-		if (ReleaseInfo.isRunningAsApplet())
-			return;
+		// if (ReleaseInfo.isRunningAsApplet())
+		// return;
 		
 		Properties p = System.getProperties();
 		String os = (String) p.get("os.name");
