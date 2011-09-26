@@ -27,7 +27,8 @@ public class BlockClearNirPot_nir extends AbstractSnapshotAnalysisBlockFIS {
 		int w = nir.getWidth();
 		int h = nir.getHeight();
 		
-		for (int y = h - 1; y >= 0; y--) {
+		if (h>22)
+		for (int y = h - 1; y >= 21; y--) {
 			int maxContinousBlack = 0;
 			int currentlyBlack = 0;
 			int nSkipWhite = 0;
