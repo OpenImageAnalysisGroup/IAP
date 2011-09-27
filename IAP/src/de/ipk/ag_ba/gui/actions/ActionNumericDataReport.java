@@ -63,7 +63,7 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/applications-office.png";
+		return "img/ext/watering.png";
 	}
 	
 	@Override
