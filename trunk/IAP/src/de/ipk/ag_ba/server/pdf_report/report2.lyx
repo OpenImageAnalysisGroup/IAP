@@ -1,0 +1,928 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass amsart
+\use_default_options false
+\begin_modules
+theorems-ams
+eqs-within-sections
+figs-within-sections
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding latin9
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Analysis of Experiment [experimentname]
+\end_layout
+
+\begin_layout Author
+Research Group Image Analysis
+\end_layout
+
+\begin_layout Date
+19.09.2011
+\end_layout
+
+\begin_layout Address
+Leibniz Institute of Plant Genetics and Crop Plant Research, Group Image
+ Analysis, Corrensstr.
+ 3, 06466 Gatersleben, Germany
+\end_layout
+
+\begin_layout Email
+klukas@ipk-gatersleben.de, entzian@ipk-gatersleben.de
+\end_layout
+
+\begin_layout URL
+http://ba-13.ipk-gatersleben.de
+\end_layout
+
+\begin_layout Abstract
+This document is automatically created.
+ 
+\end_layout
+
+\begin_layout Keywords
+image analysis, phenotyping, maize 
+\end_layout
+
+\begin_layout Section
+Overview
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Overview 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Experiment 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Experimentname 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Analysis
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Start 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[StartExp] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[StartAna]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+End 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[EndExp] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[EndAna]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Numeric values 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[NumExp] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[NumAna]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Images 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ImagesExp] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ImagesAna]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Storage 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[StorageExp] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[StorageAna]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Overview2
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Notes 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Remarks
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[Notes] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[Remarks]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Experiment Factors
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="6">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ID 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Genotype 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Variety 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Treatment 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sequence 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+xyz
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ID] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[Genotype] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[Variety] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[Treatment] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[Sequence] 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[xyz]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Water
+\end_layout
+
+\begin_layout Subsection
+Target Weight
+\end_layout
+
+\begin_layout Itemize
+Weight after watering (target weight).
+ 
+\end_layout
+
+\begin_layout Itemize
+Colnum name: weight.b 
+\end_layout
+
+\begin_layout Itemize
+Unit: g
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename weight.b.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Water consumption
+\end_layout
+
+\begin_layout Itemize
+Consumption of water based of weight measurments 
+\end_layout
+
+\begin_layout Itemize
+Column name: water 
+\end_layout
+
+\begin_layout Itemize
+Unit: g 
+\end_layout
+
+\begin_layout Section
+Biomass
+\end_layout
+
+\begin_layout Itemize
+Digital Biomass based on the side.area and top.area 
+\end_layout
+
+\begin_layout Itemize
+Unit: pixel³ 
+\end_layout
+
+\begin_layout Subsection
+IAP
+\end_layout
+
+\begin_layout Itemize
+Equation: 
+\begin_inset Formula $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+Column name: digital.biomass.iap.norm
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename digital.biomass.iap.norm.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+LemnaTec
+\end_layout
+
+\begin_layout Itemize
+Equation: 
+\begin_inset Formula $Biomass_{LemnaTec}=\sqrt{side.area_{0ï¿œ}*side.area_{90\text{ï¿œ}}*top.area}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+Column name: digital.biomass.lemnatec.norm 
+\end_layout
+
+\begin_layout Subsection
+KeyGene
+\end_layout
+
+\begin_layout Itemize
+Equation: 
+\begin_inset Formula $Biomass_{KeyGene}=side.area_{0\text{ï¿œ}}+side.area_{90\text{ï¿œ}}+\log(\frac{top.area}{3})$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+Column name: digital.biomass.keygene.norm
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename digital.biomass.keygene.norm.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+General Descriptors
+\end_layout
+
+\begin_layout Subsection
+Height
+\end_layout
+
+\begin_layout Itemize
+Plant height (mm) (normalized to distance of left and right marker) 
+\end_layout
+
+\begin_layout Itemize
+Column name: side.height.norm 
+\end_layout
+
+\begin_layout Itemize
+Unit: mm
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.height.norm.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Width
+\end_layout
+
+\begin_layout Itemize
+Plant width (mm) (normalized to distance of left and right marker) 
+\end_layout
+
+\begin_layout Itemize
+Column name: side.width.norm 
+\end_layout
+
+\begin_layout Itemize
+Unit: mm
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.width.norm.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Projected Side Area
+\end_layout
+
+\begin_layout Itemize
+Number of foreground pixels from side camera 
+\end_layout
+
+\begin_layout Itemize
+Colum name: side.area.norm 
+\end_layout
+
+\begin_layout Itemize
+Unit: pixel²
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.area.norm.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Fluorescence
+\end_layout
+
+\begin_layout Subsection
+Chlorophyll
+\end_layout
+
+\begin_layout Itemize
+Average activity of chlorophyll, based on red reflection.
+ 
+\end_layout
+
+\begin_layout Itemize
+The darker the higher acitivity 
+\end_layout
+
+\begin_layout Itemize
+Column name: side.fluo.intensity.chlorophyl.average 
+\end_layout
+
+\begin_layout Itemize
+Unit: relative intensity/pixel
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.fluo.intensity.chlorophyl.average.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.fluo.chlorophyl.normalized.histogram.bin.1.0_36;side.fluo.chlorop.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Other
+\end_layout
+
+\begin_layout Itemize
+Average activity without chlorohyll (e.
+ g.
+ phenol), based of yellow reflection.
+ 
+\end_layout
+
+\begin_layout Itemize
+The darker the higher acitivity 
+\end_layout
+
+\begin_layout Itemize
+Column name: side.fluo.intensity.phenol.average 
+\end_layout
+
+\begin_layout Itemize
+Unit: relative intensity/pixel
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.fluo.intensity.phenol.average.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+NIR Intensity
+\end_layout
+
+\begin_layout Itemize
+Average intensity of near infrared (NIR) 
+\end_layout
+
+\begin_layout Itemize
+Represents the water content of the plant 
+\end_layout
+
+\begin_layout Itemize
+Column name: side.nir.intensity.average.norm 
+\end_layout
+
+\begin_layout Itemize
+Unit: relative intensity/pixel
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.nir.intensity.average.norm.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.nir.histogram.bin.1.0_36;side.nir.histogram.bin.2.36_72;side.nir..png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Plant Structure
+\end_layout
+
+\begin_layout Subsection
+Number of leafs
+\end_layout
+
+\begin_layout Itemize
+Number of leafs-tips 
+\end_layout
+
+\begin_layout Itemize
+Colum name: side.leaf.count.median 
+\end_layout
+
+\begin_layout Itemize
+Unit: leafs 
+\end_layout
+
+\begin_layout Itemize
+Hint: leaf-tips are shown as red retangles in the image
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.leaf.count.median.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Tassel
+\end_layout
+
+\begin_layout Itemize
+Male flower count 
+\end_layout
+
+\begin_layout Itemize
+Colum name: side.bloom.count 
+\end_layout
+
+\begin_layout Itemize
+Unit: tassel 
+\end_layout
+
+\begin_layout Itemize
+Hint: the number of blue retangles in the image
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.bloom.count.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Length
+\end_layout
+
+\begin_layout Itemize
+Length of all leafs plus stem 
+\end_layout
+
+\begin_layout Itemize
+Column name: side.leaf.length.sum.norm.max 
+\end_layout
+
+\begin_layout Itemize
+Unit: mm 
+\end_layout
+
+\begin_layout Itemize
+Hint: the yellow line in the image
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset Graphics
+	filename side.leaf.length.sum.norm.max.png
+	width 13cm
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
