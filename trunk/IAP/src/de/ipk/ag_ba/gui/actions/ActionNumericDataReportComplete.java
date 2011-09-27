@@ -58,12 +58,12 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Create Data Report";
+		return "Download Report Files";
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/applications-office.png";
+		return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
 	}
 	
 	@Override
