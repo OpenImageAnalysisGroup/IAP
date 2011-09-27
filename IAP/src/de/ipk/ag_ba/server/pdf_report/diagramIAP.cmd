@@ -7,4 +7,5 @@ Rscript diagramForReportPDF.r ${INPUTFILE} png "boxplotStacked" none
 Rscript diagramForReportPDF.r ${INPUTFILE} png "!boxplot" ${2}
 echo "Create PDF..."
 /usr/texbin/pdflatex report2.tex
+/usr/bin/pdflatex report2.tex
 echo "Finished"
