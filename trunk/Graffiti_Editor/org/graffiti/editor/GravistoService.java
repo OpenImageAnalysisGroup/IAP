@@ -976,7 +976,13 @@ public class GravistoService implements HelperClass {
 	
 	@SuppressWarnings("unchecked")
 	public static IOurl getIOurl(Class location, String filename, String optExt) throws IOException {
-		File f = new File(getResource(location, filename).getFile());
+		URL rr = getResource(location, filename);
+		if (rr == null)
+			throw new IOException("Could not get resource URL for file " + filename + ". Reference class: " + location);
+		String fn = rr.getFile();
+		if (fn == null)
+			throw new IOException("Could not get file name info for file " + filename + ". Reference class: " + location);
+		File f = new File(fn);
 		
 		return FileSystemHandler.getURL(f);
 	}
