@@ -8,12 +8,9 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 
-import org.ErrorMsg;
-import org.graffiti.plugin.algorithm.ThreadSafeOptions;
-
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -23,7 +20,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  */
 public class MyThread extends Thread implements Runnable {
 	
-	public static final boolean NEW_SCHEDULER = true;
+	public static final boolean NEW_SCHEDULER = false;
 	
 	private boolean finished = false;
 	private boolean started = false;
@@ -33,18 +30,17 @@ public class MyThread extends Thread implements Runnable {
 	private final Runnable runCode;
 	
 	public MyThread(Runnable r, String name) {
-		// synchronized (MyThread.class) {
-		sem = BackgroundTaskHelper.lockGetSemaphore(null, 1);
-		try {
-			sem.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			ErrorMsg.addErrorMessage(e);
-		}
-		// }
 		this.name = name;
 		this.runCode = r;
 		this.r = r;
+		sem = BackgroundTaskHelper.lockGetSemaphore(null, 1);
+		do {
+			try {
+				sem.acquire();
+			} catch (InterruptedException ie) {
+				System.out.println("xi");
+			}
+		} while (sem.availablePermits() > 0);
 	}
 	
 	@Override
@@ -73,19 +69,30 @@ public class MyThread extends Thread implements Runnable {
 	}
 	
 	public Object getResult() throws InterruptedException {
-		if (r instanceof RunnableForResult) {
-			sem.acquire();
-			sem.release();
-			RunnableForResult rc = (RunnableForResult) r;
-			if (!finished)
-				System.err.println("INTERNAL ERROR MYTHREAD 1");
-			return rc.getResult();
-		} else {
-			sem.acquire();
-			sem.release();
-			if (!finished)
-				System.err.println("INTERNAL ERROR MYTHREAD 2");
-			return null;
+		synchronized (this) {
+			if (!started)
+				run();
+			
+			if (r instanceof RunnableForResult) {
+				sem.acquire();
+				sem.release();
+				RunnableForResult rc = (RunnableForResult) r;
+				if (!finished)
+					System.err.println("INTERNAL ERROR MYTHREAD 1 (NOT FINISHED!)");
+				return rc.getResult();
+			} else {
+				do {
+					try {
+						sem.acquire();
+					} catch (InterruptedException ie) {
+						// empty
+					}
+				} while (!finished);
+				sem.release();
+				if (!finished)
+					System.err.println("INTERNAL ERROR MYTHREAD 2 (NOT FINISHED)");
+				return null;
+			}
 		}
 	}
 	
@@ -109,41 +116,22 @@ public class MyThread extends Thread implements Runnable {
 		setPriority(minPriority);
 	}
 	
-	private static ThreadSafeOptions tso = new ThreadSafeOptions();
+	@Override
+	public String toString() {
+		return "Background Task " + name;
+	}
 	
 	public void startNG(ExecutorService es) {
-		started = true;
-		tso.addLong(1);
-		if (NEW_SCHEDULER) {
-			boolean submitted = false;
-			do {
-				// if (tso.getLong() % 40 == 0)
-				// System.out.println();
-				try {
-					synchronized (es) {
-						// ThreadPoolExecutor tpe = (ThreadPoolExecutor) es;
-						// if (tpe.getQueue().size() > SystemAnalysis.getNumberOfCPUs()) {
-						// System.out.print("h");
-						// start();
-						// } else {
-						es.submit(this);
-						submitted = true;
-						if (tso.getLong() % 10 == 0) {
-							// System.out.print(".");
-						}
-						// }
-					}
-				} catch (RejectedExecutionException ree) {
-					// System.out.print("w");
-					// try {
-					// Thread.sleep(100);
-					// } catch (InterruptedException e) {
-					// //
-					// }
-					run();
+		if (!started) {
+			started = true;
+			if (NEW_SCHEDULER) {
+				synchronized (es) {
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: SUBMITTED TASK " + name + " TO EXECUTION TASK QUEUE");
+					es.submit(this);
 				}
-			} while (!submitted);
-		} else
-			start();
+			} else {
+				start();
+			}
+		}
 	}
 }

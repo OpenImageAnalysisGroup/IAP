@@ -128,32 +128,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Workload Top/Side: " + top + "/" + side);
 		final int workloadEqualAngleSnapshotSets = top + side;
 		
-		if (maximumThreadCountParallelImages < 2) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS...");
-			for (TreeMap<String, ImageSet> tm : workload) {
-				processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tm);
-			}
-		} else {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ISSUE BACKGROUND TASKS FOR SNAPSHOT ANALYSIS...");
-			final ArrayList<MyThread> wait = new ArrayList<MyThread>();
-			for (TreeMap<String, ImageSet> tm : workload) {
-				final TreeMap<String, ImageSet> tmf = tm;
-				Runnable r = new Runnable() {
-					@Override
-					public void run() {
-						if (status == null || !status.wantsToStop())
-							processSnapshot(maximumThreadCountOnImageLevel,
-									status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tmf);
-					}
-				};
-				
-				if (status == null || !status.wantsToStop())
-					wait.add(
-							BackgroundThreadDispatcher.addTask(r, "Analyze " + tm.firstKey() + " and " + tm.size() + " more snapshots",
-									1000, 1000));
-			}
-			BackgroundThreadDispatcher.waitFor(wait);
+		System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS...");
+		for (TreeMap<String, ImageSet> tm : workload) {
+			processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tm);
 		}
+		
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
@@ -199,7 +178,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						}
 					}
 				};
-				wait.add(BackgroundThreadDispatcher.addTask(r, "Analyze image within snapshot", 2000, 2000));
+				wait.add(BackgroundThreadDispatcher.addTask(r, "Analyze image within snapshot", -1000, -1000));
 			}
 		}
 		BackgroundThreadDispatcher.waitFor(wait);

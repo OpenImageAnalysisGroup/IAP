@@ -18,6 +18,8 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {
+		if (getInput() == null || getInput().getImages() == null)
+			return null;
 		FlexibleImage vis = getInput().getImages().getVis();
 		if (vis == null)
 			return null;

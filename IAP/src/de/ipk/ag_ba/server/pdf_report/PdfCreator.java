@@ -188,4 +188,8 @@ public class PdfCreator {
 		// The directory is now empty so delete it
 		return dir.delete();
 	}
+	
+	public String getPDFurl() {
+		return new File(tempDirectory.getAbsolutePath() + File.separator + "report2.pdf").getAbsolutePath();
+	}
 }
