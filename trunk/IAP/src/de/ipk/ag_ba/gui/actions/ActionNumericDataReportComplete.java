@@ -8,15 +8,21 @@ package de.ipk.ag_ba.gui.actions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import javax.swing.JTable;
 
+import org.AttributeHelper;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.gwt.SnapshotData;
+import de.ipk.ag_ba.server.pdf_report.PdfCreator;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
@@ -58,7 +64,10 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Download Report Files";
+		if (SystemAnalysis.isHeadless())
+			return "Download Report Files";
+		else
+			return "Create PDF Report";
 	}
 	
 	@Override
@@ -109,52 +118,104 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 			// }
 			// }
 		} else {
-			cols.add("Condition");
-			cols.add("Time");
-			cols.add("Plant ID");
-			// cols.add("Measurement"); // substance
-			cols.add("Replicate ID"); // substance
-			// cols.add("Value");
-			columns = cols.toArray();
+			boolean pdf = true;
 			
-			HashMap<String, Integer> id2row = new HashMap<String, Integer>();
-			for (SubstanceInterface su : experiment) {
-				String sid = su.getName();
-				String hue;
-				int hueVal = 0;
-				if (sid.contains("hue=")) {
-					hue = sid.substring(sid.indexOf("hue=") + "hue=".length()).trim();
-					try {
-						hueVal = Integer.parseInt(hue);
-					} catch (Exception e) {
-						// empty
-					}
-				} else
-					continue;
-				for (ConditionInterface c : su) {
-					String cid = sid + separator + c.getConditionId() + "-" + c.getConditionName();
-					for (SampleInterface sa : c) {
-						String said = cid + separator + sa.getSampleTime();
-						for (Measurement m : sa) {
-							String mid = said + separator + m.getReplicateID();
-							if (m.getValue() > 0)
-								System.out.println(mid + separator + hueVal + separator + m.getValue());
+			if (pdf) {
+				
+				ArrayList<SnapshotData> snapshots;
+				StringBuilder csv = new StringBuilder();
+				boolean water = false;
+				String csvHeader = getCSVheader();
+				if (!water) {
+					HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
+					snapshots = IAPservice.getSnapshotsFromExperiment(null, experiment, indexInfo, false);
+					TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
+					for (String val : indexInfo.keySet())
+						cola.put(indexInfo.get(val), val);
+					StringBuilder indexHeader = new StringBuilder();
+					for (String val : cola.values())
+						indexHeader.append(separator + val);
+					csvHeader = StringManipulationTools.stringReplace(csvHeader, "\r\n", "");
+					csvHeader = StringManipulationTools.stringReplace(csvHeader, "\n", "");
+					csv.append(csvHeader + indexHeader.toString() + "\r\n");
+				} else {
+					snapshots = IAPservice.getSnapshotsFromExperiment(null, experiment, null, false);
+					csv.append(csvHeader);
+				}
+				for (SnapshotData s : snapshots) {
+					boolean germanLanguage = false;
+					csv.append(s.getCSVvalue(germanLanguage, separator));
+				}
+				byte[] result = csv.toString().getBytes();
+				
+				PdfCreator p = new PdfCreator();
+				
+				p.prepareTempDirectory();
+				p.saveReportCSV(result);
+				p.saveScripts(new String[] {
+							"diagramForReportPDF.r",
+							"diagramIAP.cmd",
+							"diagramIAP.bat",
+							"initLinux.r",
+							"report2.tex", "createDiagramFromValuesLinux.r"
+					});
+				
+				p.executeRstat();
+				
+				boolean ok = p.hasPDFcontent();
+				
+				AttributeHelper.showInBrowser(p.getPDFurl());
+				
+				// p.deleteDirectory();
+				
+			} else {
+				
+				cols.add("Condition");
+				cols.add("Time");
+				cols.add("Plant ID");
+				// cols.add("Measurement"); // substance
+				cols.add("Replicate ID"); // substance
+				// cols.add("Value");
+				columns = cols.toArray();
+				
+				HashMap<String, Integer> id2row = new HashMap<String, Integer>();
+				for (SubstanceInterface su : experiment) {
+					String sid = su.getName();
+					String hue;
+					int hueVal = 0;
+					if (sid.contains("hue=")) {
+						hue = sid.substring(sid.indexOf("hue=") + "hue=".length()).trim();
+						try {
+							hueVal = Integer.parseInt(hue);
+						} catch (Exception e) {
+							// empty
+						}
+					} else
+						continue;
+					for (ConditionInterface c : su) {
+						String cid = sid + separator + c.getConditionId() + "-" + c.getConditionName();
+						for (SampleInterface sa : c) {
+							String said = cid + separator + sa.getSampleTime();
+							for (Measurement m : sa) {
+								String mid = said + separator + m.getReplicateID();
+								if (m.getValue() > 0)
+									System.out.println(mid + separator + hueVal + separator + m.getValue());
+							}
 						}
 					}
 				}
 			}
-			
 		}
 		
 		Object[][] rowdata = new Object[rows.size()][cols.size()];
 		
-		table = new JTable(rowdata, columns);
+		table = null;
 		
 	}
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent(table);
+		return new MainPanelComponent("The generated PDF report will be opened automatically in a moment.");
 	}
 	
 	public ExperimentReference getExperimentReference() {

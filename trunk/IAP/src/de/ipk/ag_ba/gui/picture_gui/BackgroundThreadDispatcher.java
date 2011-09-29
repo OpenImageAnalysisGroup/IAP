@@ -10,9 +10,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Stack;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.Timer;
 
@@ -57,22 +60,22 @@ public class BackgroundThreadDispatcher {
 		if (t == null)
 			return null;
 		// if (parentPriority > 4)
-		// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Add task " + t.getNameNG() + ", Priority: " + userPriority + ", Parent Priority: "
-		// + parentPriority);
 		synchronized (myInstance) {
 			if (myInstance == null)
 				myInstance = new BackgroundThreadDispatcher();
-			synchronized (myInstance.todo) {
-				// if (myInstance.todo.size() >= 99) {
-				// System.out.println(SystemAnalysisExt.getCurrentTime() + ">INTERNAL WARNING: LARGE TODO QUEUE SIZE. ADDING ANOTHER TASK: " + t.getNameNG());
-				// }
-				if (!useThreads && userPriority != Integer.MIN_VALUE) {
-					// no
-				} else {
-					myInstance.todo.push(t);
-					myInstance.todoPriorities.push(new Integer(userPriority)); // parentPriority + 1));//
-					myInstance.sheduler.interrupt();
-				}
+		}
+		synchronized (myInstance.todo) {
+			if (!useThreads && userPriority != Integer.MIN_VALUE) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">Task " + t.getNameNG() + ", Priority: "
+						+ userPriority + ", Parent Priority: "
+						+ parentPriority + " > INTERNAL THREAD SCHEDULER SITUATION WHERE TASKS ARE NOT ADDED TO QUEUE");
+			} else {
+				// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Add task " + t.getNameNG() + ", Priority: "
+				// + userPriority + ", Parent Priority: "
+				// + parentPriority);
+				myInstance.todo.push(t);
+				myInstance.todoPriorities.push(new Integer(userPriority)); // parentPriority + 1));//
+				myInstance.sheduler.interrupt();
 			}
 		}
 		if (!useThreads && userPriority != Integer.MIN_VALUE) {
@@ -165,7 +168,7 @@ public class BackgroundThreadDispatcher {
 			public void run() {
 				schedulerCode();
 			}
-		});
+		}, "Background Task Scheduler");
 		sheduler.start();
 	}
 	
@@ -205,24 +208,45 @@ public class BackgroundThreadDispatcher {
 		synchronized (runningTasks) {
 			runningTasks.remove(rt);
 		}
-		// synchronized (waitThreads) {
-		// for (Thread t : waitThreads)
-		// t.interrupt();
-		// }
+		synchronized (waitThreads) {
+			for (Thread t : waitThreads)
+				t.interrupt();
+		}
 	}
 	
-	ExecutorService es = Executors.newCachedThreadPool();
+	ExecutorService es = new ThreadPoolExecutor(
+			32000,
+			32000,
+			10, TimeUnit.SECONDS,
+			new ArrayBlockingQueue<Runnable>(32000, true),
+			new ThreadFactory() {
+				int idx = 1;
+				
+				@Override
+				public Thread newThread(Runnable r) {
+					Thread res = new Thread(r, "Background Pool Thread " + idx);
+					idx++;
+					return res;
+				}
+			}, new RejectedExecutionHandler() {
+				@Override
+				public void rejectedExecution(Runnable r, ThreadPoolExecutor tpe) {
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: TASK HAS BEEN REJECTED, EXECUTING DIRECTLY");
+					r.run();
+				}
+			});
+	
+	// Executors.newCachedThreadPool();
 	
 	private void schedulerCode() {
 		int moreLoad = 0;
-		
-		ThreadPoolExecutor tpe = (ThreadPoolExecutor) es;
-		tpe.setMaximumPoolSize(SystemAnalysis.getNumberOfCPUs());
-		
 		while (true) {
 			try {
-				Thread.sleep(50);
+				Thread.sleep(500000);
 			} catch (InterruptedException e) {
+				// System.out.println(SystemAnalysisExt.getCurrentTime() +
+				// ">INFO: SCHEDULER INTERRUPTED, PROBABLY A NEW TASK HAS BEEN SUBMITTED: TODO: "
+				// + todo.size());
 				// PictureGUI.showError("Background thread dispatcher was interrupted.",
 				// e);
 				// kein Fehler! normal!
@@ -247,25 +271,29 @@ public class BackgroundThreadDispatcher {
 							// System.out.println("Start thread " + t.getName() + ". blocked: " + waitThreads.size() + ", max run:" + maxTask + ", running: "
 							// + runningTasks.size() + ", todo:" + todo.size());
 							if (t != null) {
+								// System.out.println("REMOVED TASK " + t.getNameNG());
 								todo.remove(i);
 								Integer prio = todoPriorities.get(i);
 								todoPriorities.remove(i);
 								t.setName(t.getNameNG() + ", priority:" + prio);
 								// System.out.println(">ABOUT TO START " + t.getNameNG() + " // current scheduler status priority: " + curPrio);
 								break;
+							} else {
+								System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: INTERNAL ERROR: SCHEDULED TASK TODO IS NULL!");
 							}
 						}
 					}
 				}
 				if (t != null) {
-					t.setPriorityNG(Thread.MIN_PRIORITY);
-					if (!t.isFinished() && !t.isStarted())
+					// t.setPriorityNG(Thread.MIN_PRIORITY);
+					if (!t.isFinished() && !t.isStarted()) {
 						if (useThreads)
 							t.startNG(es);
 						else
 							t.run();
-					synchronized (runningTasks) {
-						runningTasks.add(t);
+						synchronized (runningTasks) {
+							runningTasks.add(t);
+						}
 					}
 				}
 				// System.out.println("Running tasks: " + runningTasks.size() + "/" + maxTask + " max");
@@ -396,6 +424,7 @@ public class BackgroundThreadDispatcher {
 			Thread.sleep(1000 * secondsDelay);
 		} catch (InterruptedException e) {
 			// empty
+			e.printStackTrace();
 		}
 	}
 	
