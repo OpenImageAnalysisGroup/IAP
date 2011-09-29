@@ -585,14 +585,18 @@ public class IAPservice {
 										}
 									}
 								}
-								if (sub.equals("water_sum"))
-									sn.setTargetWaterAmount((int) mmSum);
-								else
-									if (sub.equals("weight_before"))
-										sn.setWeightBefore(mmLowest);
-									else
-										if (sub.equals("water_weight"))
-											sn.setWeightAfter(mmSum);
+								if (sub.equals("water_sum")) {
+									if (mmSum > 0)
+										sn.setTargetWaterAmount((int) mmSum);
+								} else
+									if (sub.equals("weight_before")) {
+										if (mmLowest < Double.MAX_VALUE)
+											sn.setWeightBefore(mmLowest);
+									} else
+										if (sub.equals("water_weight")) {
+											if (mmSum > 0)
+												sn.setWeightAfter(mmSum);
+										}
 							}
 						}
 						
@@ -664,8 +668,10 @@ public class IAPservice {
 							}
 							if (imageCount > 0 && optSubstanceIds != null) {
 								String sub = s.getSubstanceNameWithUnit();
-								int idx = optSubstanceIds.get(sub);
-								sn.storeValue(idx, (double) imageCount);
+								if (sub != null) {
+									int idx = optSubstanceIds.get(sub);
+									sn.storeValue(idx, (double) imageCount);
+								}
 							}
 						}
 					}
