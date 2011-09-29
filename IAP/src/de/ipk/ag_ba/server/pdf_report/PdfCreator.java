@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import org.AttributeHelper;
 import org.ObjectRef;
 import org.ReleaseInfo;
+import org.StringManipulationTools;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -19,6 +20,8 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class PdfCreator {
 	
@@ -26,6 +29,12 @@ public class PdfCreator {
 	
 	final TreeMap<Long, String> output = new TreeMap<Long, String>();
 	final ThreadSafeOptions tso = new ThreadSafeOptions();
+	
+	private final ExperimentInterface experiment;
+	
+	public PdfCreator(ExperimentInterface experiment) {
+		this.experiment = experiment;
+	}
 	
 	public void prepareTempDirectory() throws IOException {
 		String fn = ReleaseInfo.getAppFolderWithFinalSep() + System.nanoTime();
@@ -60,6 +69,7 @@ public class PdfCreator {
 	}
 	
 	public void executeRstat() throws IOException {
+		readAndModify("report2.tex");
 		
 		String name = tempDirectory.getAbsolutePath() + File.separator + "diagramIAP.cmd";
 		if (AttributeHelper.windowsRunning())
@@ -108,8 +118,10 @@ public class PdfCreator {
 			while (!tso.getBval(0, false)) {
 				Thread.sleep(20);
 				long now = System.currentTimeMillis();
-				if (now - start > 1000 * 60 && myRef.getObject() != null) {
-					output.put(System.nanoTime(), "ERROR: TIME-OUT: Report generation took more than one minute and has therefore been canceled.");
+				if (now - start > 1000 * 60 * 5 && myRef.getObject() != null) {
+					output.put(System.nanoTime(), "ERROR: TIME-OUT: " +
+							"Report generation took more than " +
+							"three minutes and has therefore been canceled.");
 					tso.setBval(1, true);
 					if (myRef.getObject() != null) {
 						Process ls_proc = (Process) myRef.getObject();
@@ -122,6 +134,38 @@ public class PdfCreator {
 			tso.setBval(1, true);
 			throw new UnsupportedOperationException(e);
 		}
+	}
+	
+	/**
+	 * Modify latex file
+	 * 
+	 * @param fn
+	 *           file name
+	 * @throws IOException
+	 */
+	private void readAndModify(String fn) throws IOException {
+		
+		File fff = new File(tempDirectory.getAbsolutePath() + File.separator + fn);
+		String c = TextFile.read(fff);
+		c = StringManipulationTools.stringReplace(c, "--experimentname--", safe(experiment.getName()));
+		c = StringManipulationTools.stringReplace(c, "--StartExp--", safe(SystemAnalysisExt.getCurrentTime(experiment.getStartDate().getTime())));
+		c = StringManipulationTools.stringReplace(c, "--EndExp--", safe(SystemAnalysisExt.getCurrentTime(experiment.getImportDate().getTime())));
+		c = StringManipulationTools.stringReplace(c, "--NumExp--", safe(experiment.getNumberOfMeasurementValues() + ""));
+		
+		c = StringManipulationTools.stringReplace(c, "--ImagesExp--", safe(experiment.getHeader().getNumberOfFiles() + ""));
+		
+		c = StringManipulationTools.stringReplace(c, "--StorageExp--",
+					safe(experiment.getHeader().getSizekb() + " KB"));
+		
+		c = StringManipulationTools.stringReplace(c, "--RemarkExp--",
+					safe(experiment.getHeader().getRemark()));
+		
+		TextFile.write(tempDirectory.getAbsolutePath() + File.separator + fn, c);
+	}
+	
+	private String safe(String name) {
+		String res = StringManipulationTools.stringReplace(name, "_", "\\textunderscore ");
+		return res;
 	}
 	
 	public void saveScripts(String[] files) throws Exception {

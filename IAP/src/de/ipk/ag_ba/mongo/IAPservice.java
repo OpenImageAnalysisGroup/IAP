@@ -63,7 +63,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.server.gwt.SnapshotData;
+import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -500,7 +500,7 @@ public class IAPservice {
 		return mainMongoDBreachable;
 	}
 	
-	public static ArrayList<SnapshotData> getSnapshotsFromExperiment(
+	public static ArrayList<SnapshotDataIAP> getSnapshotsFromExperiment(
 			UrlCacheManager urlManager,
 			ExperimentInterface experiment,
 			HashMap<String, Integer> optSubstanceIds,
@@ -508,9 +508,9 @@ public class IAPservice {
 		
 		StopWatch sw = new StopWatch("Create Snapshots");
 		
-		HashMap<Long, SnapshotData> timestampe2snapshot = new HashMap<Long, SnapshotData>();
+		HashMap<Long, SnapshotDataIAP> timestampe2snapshot = new HashMap<Long, SnapshotDataIAP>();
 		
-		ArrayList<SnapshotData> result = new ArrayList<SnapshotData>();
+		ArrayList<SnapshotDataIAP> result = new ArrayList<SnapshotDataIAP>();
 		
 		if (experiment != null)
 			for (SubstanceInterface substance : experiment) {
@@ -519,12 +519,12 @@ public class IAPservice {
 						long time = s.getRowId();
 						
 						if (!timestampe2snapshot.containsKey(time)) {
-							SnapshotData ns = new SnapshotData();
+							SnapshotDataIAP ns = new SnapshotDataIAP();
 							timestampe2snapshot.put(time, ns);
 							result.add(ns);
 						}
 						
-						SnapshotData sn = timestampe2snapshot.get(time);
+						SnapshotDataIAP sn = timestampe2snapshot.get(time);
 						
 						// set fields
 						if (sn.getCondition() == null)
@@ -713,9 +713,9 @@ public class IAPservice {
 		// sw.printTime(50);
 		//
 		sw = new StopWatch("Sort Snapshots");
-		Collections.sort(result, new Comparator<SnapshotData>() {
+		Collections.sort(result, new Comparator<SnapshotDataIAP>() {
 			@Override
-			public int compare(SnapshotData a, SnapshotData b) {
+			public int compare(SnapshotDataIAP a, SnapshotDataIAP b) {
 				int r;
 				r = a.getDay().compareTo(b.getDay());
 				if (r != 0)
@@ -736,7 +736,7 @@ public class IAPservice {
 		
 		// if (prepareTransportToBrowser)
 		// currently this needs to be performed, independently on if the data needs to be transported
-		for (SnapshotData sd : result)
+		for (SnapshotDataIAP sd : result)
 			sd.prepareFieldsForDataTransport();
 		
 		return result;
