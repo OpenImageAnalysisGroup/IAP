@@ -4,9 +4,61 @@
 ###############################################################################
 
 
-# TODO: Add comment
-# 
-# Author: Entzian
+####################################################################
+##
+#		FOR TEST, Don´t remove it!!
+##
+if(FALSE){
+	
+	rm(list=ls(all=TRUE))
+	
+	while(!is.null(dev.list())) {
+		dev.off()
+	}
+	
+	
+	fileName <- "report.csv"
+	#saveName="OutputDiagramm"
+	saveFormat="png"
+	imageWidth="1280"
+	imageHeight="768"
+	dpi="90"
+	
+	#boxplotStacked <- für Intensitätsdarstellungen
+	#boxplot <- Standard Boxplot
+	#!boxplot <- für xy-Diagramm (vorerst Descriptor vs. Day)
+	
+	#diagrammTyp="boxplotStacked"
+	diagramTyp="!boxplot"
+	isGray="false"
+	#isGray="true"
+	#treatment="Treatment"
+	treatment="none"
+	filterTreatment="none"
+	#filterTreatment="normal$dry"
+	secondTreatment="none"
+	filterSecondTreatment="none"
+	filterXaxis="none"
+	#filterXaxis=c("6$8$10$12")
+	xAxis="Day (Int)"
+	descriptor="Water (weight-diff)"
+	#descriptor="Repl.ID"
+	#descriptor <- c("side.nir.histogram.bin.1.0_36$side.nir.histogram.bin.2.36_72$side.nir.histogram.bin.3.72_109$side.nir.histogram.bin.4.109_145$side.nir.histogram.bin.5.145_182$side.nir.histogram.bin.6.182_218$side.nir.histogram.bin.7.218_255")
+	#descriptor <- c("side.fluo.chlorophyl.normalized.histogram.bin.1.0_36$side.fluo.chlorophyl.normalized.histogram.bin.2.36_72$side.fluo.chlorophyl.normalized.histogram.bin.3.72_109$side.fluo.chlorophyl.normalized.histogram.bin.4.109_145$side.fluo.chlorophyl.normalized.histogram.bin.5.145_182$side.fluo.chlorophyl.normalized.histogram.bin.6.182_218$side.fluo.chlorophyl.normalized.histogram.bin.7.218_255")
+	#descriptor <- c("Wert1$Wert2$Wert3$Wert4")
+	showResultInR=TRUE
+	xAxisName="Day"
+	#yAxisName="digital biomass (mm^3)"
+	yAxisName <- c("test")
+	transparent=TRUE
+	
+	saveName = descriptor
+	
+	iniDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8")
+}
+##
+#		END Of Test
+##
 ###############################################################################
 
 valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="png", imageWidth="1280",
@@ -291,13 +343,13 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 			for(h in 1:durchlauf) {
 				
 				symbolParameter <- numeric()
-				
-				layout(matrix(c(1,2), nrow = 2, ncol = 1, byrow = TRUE), heights=c(2,1))
+							
 				
 				if (h==1) {
 					Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste(saveName,saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
 				}
 				
+				layout(matrix(c(1,2), nrow = 2, ncol = 1, byrow = TRUE), heights=c(2,1))
 				par(mar=c(4.1,4.1,2.1,2.1))
 				
 				if (tolower(diagramTyp) == "boxplot") {
