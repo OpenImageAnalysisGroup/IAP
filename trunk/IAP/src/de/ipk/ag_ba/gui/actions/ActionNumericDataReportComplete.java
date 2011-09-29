@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 
 import org.AttributeHelper;
@@ -21,7 +22,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.gwt.SnapshotData;
+import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.pdf_report.PdfCreator;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -118,11 +119,11 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 			// }
 			// }
 		} else {
-			boolean pdf = true;
+			boolean pdf = !SystemAnalysis.isHeadless();
 			
 			if (pdf) {
 				
-				ArrayList<SnapshotData> snapshots;
+				ArrayList<SnapshotDataIAP> snapshots;
 				StringBuilder csv = new StringBuilder();
 				boolean water = false;
 				String csvHeader = getCSVheader();
@@ -142,7 +143,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 					snapshots = IAPservice.getSnapshotsFromExperiment(null, experiment, null, false);
 					csv.append(csvHeader);
 				}
-				for (SnapshotData s : snapshots) {
+				for (SnapshotDataIAP s : snapshots) {
 					boolean germanLanguage = false;
 					csv.append(s.getCSVvalue(germanLanguage, separator));
 				}
@@ -215,7 +216,10 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("The generated PDF report will be opened automatically in a moment.");
+		if (SystemAnalysis.isHeadless())
+			return new MainPanelComponent(new JLabel());
+		else
+			return new MainPanelComponent("The generated PDF report will be opened automatically in a moment.");
 	}
 	
 	public ExperimentReference getExperimentReference() {

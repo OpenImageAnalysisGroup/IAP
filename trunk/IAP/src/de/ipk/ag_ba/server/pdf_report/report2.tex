@@ -36,13 +36,13 @@
 \usepackage{babel}
 \begin{document}
 
-\title{Analysis of Experiment {[}experimentname{]}}
+\title{Analysis of Experiment --experimentname--}
 
 
-\author{Research Group Image Analysis}
+\author{Research Group Image Analysis\\ \\ IPK-Gatersleben\\ \\ C. Klukas \& A. Entzian}
 
 
-\date{19.09.2011}
+\date{29.09.2011}
 
 
 \address{Leibniz Institute of Plant Genetics and Crop Plant Research, Group
@@ -54,47 +54,55 @@ Image Analysis, Corrensstr. 3, 06466 Gatersleben, Germany}
 
 \urladdr{http://ba-13.ipk-gatersleben.de}
 \begin{abstract}
-This document is automatically created.
+This document is automatically created based on the automated image analysis performed 
+inside the integrated analysis platform IAP. Currently the pipelines and data analysis tools are in beta status, 
+which means that we are working on makeing the analysis procedures, statistical operations, diagram output and report
+generation more stable and suitable to the needs of any user of the automated imaging infrastructure at the IPK.
+
+If you have any hints, comments or suggestions for improvements, please don't hesitate to contact any member
+of the group image analysis.
 \end{abstract}
 
 \keywords{image analysis, phenotyping, maize }
 
 \maketitle
 
-\section{Overview}
+\section{Experiment info}
 \begin{lyxlist}{00.00.0000}
-\item [{Overview}]~
+\item [{Experiment properties}]~
 \end{lyxlist}
 \begin{tabular}{|c|c|c|}
 \hline 
-Experiment & Experimentname & Analysis\tabularnewline
+Experiment & --experimentname--\tabularnewline
 \hline 
 \hline 
-Start & {[}StartExp{]} & {[}StartAna{]}\tabularnewline
+Start & --StartExp--\tabularnewline
 \hline 
-End & {[}EndExp{]} & {[}EndAna{]}\tabularnewline
+End & --EndExp--\tabularnewline
 \hline 
-Numeric values & {[}NumExp{]} & {[}NumAna{]}\tabularnewline
+Numeric values & --NumExp-- \tabularnewline
 \hline 
-Images & {[}ImagesExp{]} & {[}ImagesAna{]}\tabularnewline
+Images & --ImagesExp-- \tabularnewline
 \hline 
-Storage & {[}StorageExp{]} & {[}StorageAna{]}\tabularnewline
+Storage & --StorageExp-- \tabularnewline
 \hline 
 \end{tabular}
 \begin{lyxlist}{00.00.0000}
-\item [{Overview2}]~
+\item [{Remarks}]~
 \end{lyxlist}
 \begin{tabular}{|c|c|}
 \hline 
-Notes & Remarks\tabularnewline
+Notes\tabularnewline
 \hline 
 \hline 
-{[}Notes{]} & {[}Remarks{]}\tabularnewline
+--RemarkExp--\tabularnewline
 \hline 
 \end{tabular}
 
+\begin{lyxlist}{00.00.0000}
+\item [{Experiment factors}]~
+\end{lyxlist}
 
-\section{Experiment Factors}
 \begin{lyxlist}{00.00.0000}
 \item [{%
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -102,29 +110,32 @@ Notes & Remarks\tabularnewline
 ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \hline 
 \hline 
-{[}ID{]} & {[}Genotype{]} & {[}Variety{]} & {[}Treatment{]} & {[}Sequence{]} & {[}xyz{]}\tabularnewline
+--ID-- & --Genotype-- & --Variety-- & --Treatment-- & --Sequence-- & --xyz--\tabularnewline
 \hline 
 \end{tabular}}]~
 \end{lyxlist}
 
-\section{\noindent Water}
+\section{\noindent Weight and water consumption}
 
-
-\subsection{Target Weight}
+\subsection{Weights (before and after watering)}
 \begin{itemize}
-\item Weight after watering (target weight).
-\item Colnum name: weight.b
+\item Weight before and after watering.
+\item Colnum name: Weight A (g), Weight B (g)
 \item Unit: g\end{itemize}
 \begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"Weight A (g)\string"}}]~
 \item [{\includegraphics[width=13cm]{\string"Weight B (g)\string"}}]~
 \end{lyxlist}
 
-\subsection{Water consumption}
+\subsection{Watering amounts / consumption}
 \begin{itemize}
-\item Consumption of water based of weight measurments
-\item Column name: water
-\item Unit: g
-\end{itemize}
+\item Consumption of water based of weight measurments.
+\item Colnum name: Watering (weight-diff)
+\item Unit: g\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"Water (weight-diff)\string"}}]~
+\end{lyxlist}
+
 
 \section{\noindent Biomass}
 \begin{itemize}
@@ -132,7 +143,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Unit: pixel\textthreesuperior{}
 \end{itemize}
 
-\subsection{IAP}
+\subsection{IAP based formula}
 \begin{itemize}
 \item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
 \item Column name: digital.biomass.iap.norm\end{itemize}
@@ -140,23 +151,23 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 %\item [{\includegraphics[width=13cm]{digital\lyxdot biomass\lyxdot iap\lyxdot norm}}]~
 %\end{lyxlist}
 
-\subsection{LemnaTec}
+\subsection{LemnaTec formula}
 \begin{itemize}
-\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0\lyxmathsym{�}}*side.area_{90\text{�}}*top.area}$
+\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
 %\item Column name: digital.biomass.lemnatec.norm
 \end{itemize}
 
-\subsection{KeyGene}
+\subsection{KeyGene formula}
 \begin{itemize}
-\item Equation: $Biomass_{KeyGene}=side.area_{0\text{�}}+side.area_{90\text{�}}+\log(\frac{top.area}{3})$
+\item Equation: $Biomass_{KeyGene}=side.area_{0^{\circ}}+side.area_{90^{\circ}}+\log(\frac{top.area}{3})$
 \item Column name: digital.biomass.keygene.norm\end{itemize}
 %\begin{lyxlist}{00.00.0000}
 %\item [{\includegraphics[width=13cm]{digital\lyxdot biomass\lyxdot keygene\lyxdot norm}}]~
 %\end{lyxlist}
 
-\section{General Descriptors}
+\section{General growth related plant properties}
 
-\subsection{Height}
+\subsection{Plant height}
 \begin{itemize}
 \item Plant height (mm) (normalized to distance of left and right marker)
 \item Column name: side.height.norm
@@ -166,7 +177,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \end{lyxlist}
 \end{itemize}
 
-\subsection{Width}
+\subsection{Plant width}
 \begin{itemize}
 \item Plant width (mm) (normalized to distance of left and right marker) 
 \item Column name: side.width.norm
@@ -176,7 +187,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \end{lyxlist}
 \end{itemize}
 
-\subsection{Projected Side Area}
+\subsection{Projected side area}
 \begin{itemize}
 \item Number of foreground pixels from side camera
 \item Colum name: side.area.norm
@@ -186,12 +197,12 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \end{lyxlist}
 \end{itemize}
 
-\section{Fluorescence}
+\section{Fluorescence intensity analysis}
 
 
-\subsection{Chlorophyll}
+\subsection{Chlorophyl intensity}
 \begin{itemize}
-\item Average activity of chlorophyll, based on red reflection.
+\item Average activity of chlorophyl, based on red reflection.
 \item The darker the higher acitivity
 \item Column name: side.fluo.intensity.chlorophyl.average
 \item Unit: relative intensity/pixel
@@ -201,7 +212,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \end{lyxlist}
 \end{itemize}
 
-\subsection{Other}
+\subsection{Phenols and other fluorescence intensity}
 \begin{itemize}
 \item Average activity without chlorohyll (e. g. phenol), based of yellow
 reflection.
@@ -213,7 +224,7 @@ reflection.
 %\end{lyxlist}
 \end{itemize}
 
-\subsection{NIR Intensity}
+\subsection{Near-infrared intensity}
 \begin{itemize}
 \item Average intensity of near infrared (NIR)
 \item Represents the water content of the plant
@@ -225,8 +236,7 @@ reflection.
 \end{lyxlist}
 \end{itemize}
 
-\section{Plant Structure}
-
+\section{Plant structures}
 
 \subsection{Number of leafs}
 \begin{itemize}
@@ -239,7 +249,7 @@ reflection.
 \end{lyxlist}
 \end{itemize}
 
-\subsection{Tassel}
+\subsection{Tassel (for maize plants)}
 \begin{itemize}
 \item Male flower count
 \item Colum name: side.bloom.count
@@ -250,7 +260,7 @@ reflection.
 \end{lyxlist}
 \end{itemize}
 
-\subsection{Length}
+\subsection{Leaf lengths}
 \begin{itemize}
 \item Length of all leafs plus stem
 \item Column name: side.leaf.length.sum.norm.max

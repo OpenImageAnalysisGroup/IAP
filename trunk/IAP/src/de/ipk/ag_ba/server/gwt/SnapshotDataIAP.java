@@ -4,36 +4,36 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public class SnapshotData {
-	private String plantId;
+public class SnapshotDataIAP {
+	public String plantId;
 	
-	transient private StringBuilder rgbUrl = new StringBuilder();
-	transient private StringBuilder fluoUrl = new StringBuilder();
-	transient private StringBuilder nirUrl = new StringBuilder();
-	transient private StringBuilder unknownUrl = new StringBuilder();
+	public transient StringBuilder rgbUrl = new StringBuilder();
+	public transient StringBuilder fluoUrl = new StringBuilder();
+	public transient StringBuilder nirUrl = new StringBuilder();
+	public transient StringBuilder unknownUrl = new StringBuilder();
 	
-	transient private StringBuilder rgbUrlAngle = new StringBuilder();
-	transient private StringBuilder fluoUrlAngle = new StringBuilder();
-	transient private StringBuilder nirUrlAngle = new StringBuilder();
-	transient private StringBuilder unknownUrlAngle = new StringBuilder();
+	public transient StringBuilder rgbUrlAngle = new StringBuilder();
+	public transient StringBuilder fluoUrlAngle = new StringBuilder();
+	public transient StringBuilder nirUrlAngle = new StringBuilder();
+	public transient StringBuilder unknownUrlAngle = new StringBuilder();
 	
-	private String dataTransport;
-	private ArrayList<Double> storeValues;
+	public String dataTransport;
+	public ArrayList<Double> storeValues;
 	
-	private Long snapshotTime;
-	private int day;
+	public Long snapshotTime;
+	public int day;
 	
-	private Double weight_before, weight_after;
+	public Double weight_before, weight_after;
 	
-	private Integer water_amount;
+	public Integer water_amount;
 	
-	private String condition, timePoint;
+	public String condition, timePoint;
 	
-	private String species, genotype, variety, growthCondition, treatment, sequence;
+	public String species, genotype, variety, growthCondition, treatment, sequence;
 	
-	transient private HashMap<Integer, Double> store;
+	public transient HashMap<Integer, Double> store;
 	
-	public SnapshotData() {
+	public SnapshotDataIAP() {
 		// empty
 	}
 	
@@ -378,7 +378,7 @@ public class SnapshotData {
 	}
 	
 	public String getCSVvalue(boolean numberFormat_deTrue_enFalse, String separator) {
-		SnapshotData s = this;
+		SnapshotDataIAP s = this;
 		
 		String weightBeforeWatering = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null ? s.getWeightBefore() + "" : "");
 		String waterWeight = enDe(numberFormat_deTrue_enFalse, s.getWeightOfWatering() != null ? s.getWeightOfWatering() + "" : "");

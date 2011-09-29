@@ -18,13 +18,13 @@ treatment <- args[4]
 #diagramTyp="boxplotStacked"
 
 if(tolower(diagramTyp) != tolower("boxplotStacked")){
-	descriptorSet <- c("Weight B (g)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)",
+	descriptorSet <- c("Weight A (g)","Weight B (g)","Water (weight-diff)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)",
 			"side.fluo.intensity.chlorophyl.average (relative)","side.fluo.intensity.phenol.average (relative)",
 			"side.nir.intensity.average (relative)",
 			"side.leaf.count.median (leafs)","side.bloom.count (tassel)","side.leaf.length.sum.norm.max (mm)")
 			   
 	# "digital biomass IAP (pixel^3)","digital biomass KeyGene (pixel^3)", 
-	descriptorSetName <- c("weight (g)","height (mm)", "width (mm)", "side area (pixel^2)",
+	descriptorSetName <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "height (mm)", "width (mm)", "side area (pixel^2)",
 						   "chlorophyl intensity (relative intensity/pixel)", "fluorescence intensity (relative intensity/pixel)", "nir intensity (relative intensity/pixel)",
 						   "number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)")
 				   
@@ -46,6 +46,8 @@ if(length(args) < 4) {
 	treatment = "none"
 }
 
+treatment = "Condition"
+
 workingDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8") 
 
 #print(colnames(workingDataSet));
@@ -55,7 +57,8 @@ workingDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-88
 for (y in 1:length(descriptorSet)) {
 	
 	print(paste("> Generate diagram of", descriptorSet[y]))
-	valuesAsDiagram(workingDataSet,saveName=descriptorSet[y],saveFormat=saveFormat,diagramTyp=diagramTyp,treatment=treatment,filterTreatment=filterTreatment,
+	valuesAsDiagram(workingDataSet,saveName=descriptorSet[y],saveFormat=saveFormat,diagramTyp=diagramTyp,
+			treatment=treatment,filterTreatment=filterTreatment,
 			descriptor=descriptorSet[y],xAxisName="Day",yAxisName=descriptorSetName[y])
 	print("... finished")
 	
