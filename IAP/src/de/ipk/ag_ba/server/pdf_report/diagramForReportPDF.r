@@ -46,7 +46,7 @@ if(length(args) < 4) {
 	treatment = "none"
 }
 
-workingDataSet <- read.csv2(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8") 
+workingDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8") 
 
 #print(colnames(workingDataSet));
 
