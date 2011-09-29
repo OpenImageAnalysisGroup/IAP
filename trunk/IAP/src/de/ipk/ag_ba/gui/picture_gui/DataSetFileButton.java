@@ -4,7 +4,6 @@ import ij.ImagePlus;
 import ij.io.FileInfoXYZ;
 import ij.io.Opener;
 import ij.io.TiffDecoder;
-import info.StopWatch;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Component;
@@ -24,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Stack;
 
@@ -43,9 +43,12 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import org.AttributeHelper;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.HomeFolder;
+import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -56,10 +59,20 @@ import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.Maize3DanalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
@@ -320,14 +333,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
-								StopWatch s = new StopWatch("barley", true);
 								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
 										imageResult.getBinaryFileInfo().getFileNameMain(),
 										targetTreeNode.getExperiment());
-								s.printTime();
-								s = new StopWatch("barley (b)");
 								BlockPipeline.debugTryAnalyze(match, m, new BarleyAnalysisTask());
-								s.printTime();
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);
@@ -351,6 +360,71 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								BlockPipeline.debugTryAnalyze(match, m, new BarleyAnalysisTask());
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
+										"Error", JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTest5 = new JMenuItem("Maize 3-D Analysis (Snapshot Images+References)");
+					debugPipelineTest5.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								MappingDataEntity img = imageResult.getBinaryFileInfo().getEntity();
+								ImageData i = (ImageData) img;
+								
+								ExperimentInterface experiment = targetTreeNode.getExperiment();
+								
+								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
+										imageResult.getBinaryFileInfo().getFileNameMain(),
+										experiment);
+								
+								ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
+								
+								for (SubstanceInterface m : experiment) {
+									Substance3D m3 = (Substance3D) m;
+									for (ConditionInterface s : m3) {
+										Condition3D s3 = (Condition3D) s;
+										for (SampleInterface sd : s3) {
+											Sample3D sd3 = (Sample3D) sd;
+											boolean found = false;
+											search:
+											for (NumericMeasurementInterface nmi : sd3) {
+												for (NumericMeasurementInterface nmiHIT : match) {
+													if (nmi == nmiHIT) {
+														found = true;
+														break search;
+													}
+												}
+											}
+											if (found)
+												workload.add(sd3);
+										}
+									}
+								}
+								
+								final ThreadSafeOptions tso = new ThreadSafeOptions();
+								tso.setInt(1);
+								
+								final Maize3DanalysisTask task = new Maize3DanalysisTask();
+								task.setInput(workload, null, null, 0, 1);
+								
+								final BackgroundTaskStatusProviderSupportingExternalCall sp =
+										new BackgroundTaskStatusProviderSupportingExternalCallImpl("Maize 3-D Reconstruction", "");
+								Runnable backgroundTask = new Runnable() {
+									@Override
+									public void run() {
+										task.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, sp);
+									}
+								};
+								BackgroundTaskHelper.issueSimpleTaskInWindow(
+										"Maize 3-D Debug Test", "Initialize...", backgroundTask, null, sp);
+								
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: " + err.getMessage() +
+										". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);
 								ErrorMsg.addErrorMessage(err);
 								return;
@@ -383,6 +457,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					jp.add(debugPipelineTest2);
 					jp.add(debugPipelineTest3);
 					jp.add(debugPipelineTest4);
+					jp.add(debugPipelineTest5);
 					jp.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}

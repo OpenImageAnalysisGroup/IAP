@@ -379,8 +379,8 @@ public class LemnaTecDataExchange {
 						+ "	snapshot.id = tiled_image.snapshot_id and "
 						+ "	tiled_image.id = tile.tiled_image_id and "
 						+ "	tile.image_oid = image_file_table.id and "
-						+ "	snapshot.configuration_id = image_unit_configuration.compconfigid and "
-						+ "	tiled_image.camera_label = image_unit_configuration.gid";
+						+ "	snapshot.configuration_id = image_unit_configuration.id and "
+						+ "	tiled_image.snapshot_id = snapshot.id";
 				
 				ps = connection.prepareStatement(sqlText);
 				ps.setString(1, experiment);
