@@ -29,13 +29,20 @@ public class BlockCalcWidthAndHeight_vis extends AbstractSnapshotAnalysisBlockFI
 		FlexibleImage img = options.isMaize() ? getInput().getMasks().getFluo() : getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && img != null) {
 			Point values = getWidthAndHeightSide(img, background);
+			img.print("img");
+			double resf = options.isMaize() ? (double) getInput().getMasks().getVis().getWidth() / (double) img.getWidth()
+					* (getInput().getImages().getFluo().getWidth() / (double) getInput().getImages().getFluo().getHeight())
+					/ (getInput().getImages().getVis().getWidth() / (double) getInput().getImages().getVis().getHeight())
+					: 1.0;
 			
+			double resfww = options.isMaize() ? (double) getInput().getMasks().getVis().getWidth() / (double) img.getWidth()
+							: 1.0;
 			if (values != null) {
 				if (distHorizontal != null) {
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width.norm",
-							values.x * (realMarkerDistHorizontal / distHorizontal.getValue()));
+							values.x * (realMarkerDistHorizontal / distHorizontal.getValue()) * resfww);
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.height.norm",
-							values.y * (realMarkerDistHorizontal / distHorizontal.getValue()));
+							values.y * (realMarkerDistHorizontal / distHorizontal.getValue()) * resf);
 				}
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.width", values.x);
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_side.height", values.y);
