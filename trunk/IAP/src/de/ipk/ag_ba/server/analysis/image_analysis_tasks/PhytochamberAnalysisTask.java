@@ -85,7 +85,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 	
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
-			final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException {
 		
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
@@ -237,7 +237,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 		input = null;
 	}
 	
-	private MyThread statisticalAnalaysis(final ImageData id, final FlexibleImage image) {
+	private MyThread statisticalAnalaysis(final ImageData id, final FlexibleImage image) throws InterruptedException {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {
@@ -267,7 +267,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 	}
 	
 	private MyThread load(final ImageData id, final FlexibleImageSet input,
-			final FlexibleImageType type) {
+			final FlexibleImageType type) throws InterruptedException {
 		return BackgroundThreadDispatcher.addTask(new Runnable() {
 			@Override
 			public void run() {

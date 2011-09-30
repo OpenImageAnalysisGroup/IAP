@@ -100,7 +100,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	 */
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-			final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException {
 		
 		output = new ArrayList<NumericMeasurementInterface>();
 		
@@ -203,7 +203,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	}
 	
 	private void processSampleCreateVolume(Sample3D sample, ArrayList<ImageData> loadedImages, int replicateID,
-			final int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final int maximumThreadCount, final BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException {
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
 		// double maxPercent = 2; // maximum background color difference
 		

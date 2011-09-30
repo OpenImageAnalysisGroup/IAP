@@ -166,7 +166,7 @@ public class DataExchangeHelperForExperiments {
 	}
 	
 	public static void fillFilePanel(final DataSetFilePanel filePanel, final MongoTreeNode mtdbe, final JTree expTree,
-						final MongoDB m) {
+						final MongoDB m) throws InterruptedException {
 		MyThread r = new MyThread(new Runnable() {
 			public void run() {
 				addFilesToPanel(filePanel, mtdbe, expTree, m);
@@ -375,35 +375,40 @@ public class DataExchangeHelperForExperiments {
 					filePanel.repaint();
 					filePanel.getScrollpane().validate();
 					if (previewLoadAndConstructNeededF) {
-						MyThread t = new MyThread(new Runnable() {
-							@Override
-							public void run() {
-								if (mt == expTree.getSelectionPath().getLastPathComponent() &&
-													DataSetFileButton.ICON_WIDTH == tw) {
-									final MyImageIcon myImage;
-									try {
-										myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
-															DataSetFileButton.ICON_HEIGHT,
-															binaryFileInfo.getFileNameMain(),
-															binaryFileInfo.getFileNameLabel(), binaryFileInfo);
-										myImage.imageAvailable = 1;
+						MyThread t;
+						try {
+							t = new MyThread(new Runnable() {
+								@Override
+								public void run() {
+									if (mt == expTree.getSelectionPath().getLastPathComponent() &&
+														DataSetFileButton.ICON_WIDTH == tw) {
+										final MyImageIcon myImage;
 										try {
-											SwingUtilities.invokeAndWait(new Runnable() {
-												@Override
-												public void run() {
-													imageButton.updateLayout(null, myImage, myImage);
-												}
-											});
-										} catch (Exception e) {
-											ErrorMsg.addErrorMessage(e);
+											myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
+																DataSetFileButton.ICON_HEIGHT,
+																binaryFileInfo.getFileNameMain(),
+																binaryFileInfo.getFileNameLabel(), binaryFileInfo);
+											myImage.imageAvailable = 1;
+											try {
+												SwingUtilities.invokeAndWait(new Runnable() {
+													@Override
+													public void run() {
+														imageButton.updateLayout(null, myImage, myImage);
+													}
+												});
+											} catch (Exception e) {
+												ErrorMsg.addErrorMessage(e);
+											}
+										} catch (MalformedURLException e) {
+											// empty
 										}
-									} catch (MalformedURLException e) {
-										// empty
 									}
 								}
-							}
-						}, "preview load and construct");
-						executeLater.add(t);
+							}, "preview load and construct");
+							executeLater.add(t);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 						
 					}
 					BackgroundTaskHelper.executeLaterOnSwingTask(10, new Runnable() {

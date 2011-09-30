@@ -10,7 +10,7 @@ package de.ipk.ag_ba.gui.actions;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -24,7 +24,7 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	
 	private final BatchCmd cmd;
 	private final RemoteCapableAnalysisAction actionProxy;
-	private final BackgroundTaskStatusProvider jobStatus;
+	private final BackgroundTaskStatusProviderSupportingExternalCall jobStatus;
 	private final MongoDB m;
 	private final String experimentName;
 	
@@ -84,7 +84,7 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public BackgroundTaskStatusProvider getStatusProvider() {
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return jobStatus;
 	}
 	

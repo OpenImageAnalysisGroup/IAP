@@ -10,7 +10,7 @@ package de.ipk.ag_ba.gui.actions;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -21,7 +21,7 @@ import de.ipk.ag_ba.server.task_management.CloudHost;
  */
 public class ActionCloudClusterHostInformation extends AbstractNavigationAction {
 	
-	private BackgroundTaskStatusProvider hostStatus;
+	private BackgroundTaskStatusProviderSupportingExternalCall hostStatus;
 	private NavigationButton src;
 	private MongoDB m;
 	
@@ -29,7 +29,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 		super("Compute Cluster");
 		this.m = m;
 		
-		this.hostStatus = new BackgroundTaskStatusProvider() {
+		this.hostStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
 			private String hostInfo;
 			private double lastStatus = -1;
 			
@@ -123,6 +123,36 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			@Override
 			public void pleaseContinueRun() {
 			}
+			
+			@Override
+			public void setCurrentStatusValueFine(double value) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public boolean wantsToStop() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public void setCurrentStatusText1(String status) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void setCurrentStatusText2(String status) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void setCurrentStatusValueFineAdd(double smallProgressStep) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 	
@@ -137,7 +167,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	}
 	
 	@Override
-	public BackgroundTaskStatusProvider getStatusProvider() {
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return hostStatus;
 	}
 	

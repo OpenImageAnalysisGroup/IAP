@@ -30,5 +30,5 @@ public interface ImageProcessor {
 			TreeMap<String, ImageData> inImages,
 			TreeMap<String, BlockProperties> analysisResults)
 			throws InstantiationException,
-			IllegalAccessException;
+			IllegalAccessException, InterruptedException;
 }

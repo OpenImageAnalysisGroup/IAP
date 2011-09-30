@@ -72,7 +72,7 @@ public class ThreeDmodelGenerator {
 	}
 	
 	public void calculateModel(final BackgroundTaskStatusProviderSupportingExternalCall status,
-						GenerationMode colorMode, int maxIndexedColorCount) {
+						GenerationMode colorMode, int maxIndexedColorCount) throws InterruptedException {
 		
 		status.setCurrentStatusText1("Init cube cut (" + maxVoxelPerSide + "x" + maxVoxelPerSide + "x" + maxVoxelPerSide
 							+ ")");
@@ -173,7 +173,7 @@ public class ThreeDmodelGenerator {
 	}
 	
 	private void colorModelRGB(final ArrayList<MyPicture> pictures, final ArrayList<Color> palette,
-						BackgroundTaskStatusProviderSupportingExternalCall status, final boolean rgb) {
+						BackgroundTaskStatusProviderSupportingExternalCall status, final boolean rgb) throws InterruptedException {
 		if (rgb)
 			System.out.println("Recolor Cube... (using true color RGBA generation mode)");
 		else

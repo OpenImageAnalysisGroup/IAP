@@ -8,7 +8,6 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -31,7 +30,6 @@ public class ActionFileManager extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
-		BackgroundThreadDispatcher.useThreads = true;
 		try {
 			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(m, experiment.getData(m),
 								experiment.getExperimentName());

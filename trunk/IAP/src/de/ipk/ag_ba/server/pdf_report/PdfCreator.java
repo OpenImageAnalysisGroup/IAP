@@ -118,10 +118,10 @@ public class PdfCreator {
 			while (!tso.getBval(0, false)) {
 				Thread.sleep(20);
 				long now = System.currentTimeMillis();
-				if (now - start > 1000 * 60 * 5 && myRef.getObject() != null) {
+				if (now - start > 1000 * 60 * 10 && myRef.getObject() != null) {
 					output.put(System.nanoTime(), "ERROR: TIME-OUT: " +
 							"Report generation took more than " +
-							"three minutes and has therefore been canceled.");
+							"10 minutes and has therefore been canceled.");
 					tso.setBval(1, true);
 					if (myRef.getObject() != null) {
 						Process ls_proc = (Process) myRef.getObject();

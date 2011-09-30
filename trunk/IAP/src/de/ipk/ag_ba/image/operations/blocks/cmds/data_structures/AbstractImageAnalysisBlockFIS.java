@@ -96,7 +96,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	public void postProcessResultsForAllAngles(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
 			TreeMap<String, BlockProperties> allResultsForSnapshot,
-			BlockProperties summaryResult) {
+			BlockProperties summaryResult) throws InterruptedException {
 		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
 	}
 	

@@ -81,7 +81,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	public BlockProperties postProcessPipelineResults(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
 			TreeMap<String, BlockProperties> analysisResults) throws InstantiationException,
-			IllegalAccessException {
+			IllegalAccessException, InterruptedException {
 		BlockPipeline pipeline = getPipeline(null);
 		return pipeline.postProcessPipelineResultsForAllAngles(
 				inSample,

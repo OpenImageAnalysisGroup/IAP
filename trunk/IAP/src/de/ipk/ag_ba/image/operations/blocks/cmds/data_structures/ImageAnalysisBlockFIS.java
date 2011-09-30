@@ -24,5 +24,6 @@ public interface ImageAnalysisBlockFIS {
 	
 	public void postProcessResultsForAllAngles(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult);
+			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult)
+			throws InterruptedException;
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -15,7 +15,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	
 	private final MongoDB m;
 	private NavigationButton src;
-	private BackgroundTaskStatusProvider jobStatus;
+	private BackgroundTaskStatusProviderSupportingExternalCall jobStatus;
 	
 	public ActionJobStatus(MongoDB m) {
 		super("Analyze Workload");
@@ -23,7 +23,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		
 		final HashSet<String> jobIds = new HashSet<String>();
 		
-		this.jobStatus = new BackgroundTaskStatusProvider() {
+		this.jobStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
 			int remainingJobs = 0;
 			int part_cnt = 0;
 			
@@ -98,6 +98,36 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			public String getCurrentStatusMessage2() {
 				return null;
 			}
+			
+			@Override
+			public void setCurrentStatusValueFine(double value) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public boolean wantsToStop() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public void setCurrentStatusText1(String status) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void setCurrentStatusText2(String status) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void setCurrentStatusValueFineAdd(double smallProgressStep) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 	
@@ -131,7 +161,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public BackgroundTaskStatusProvider getStatusProvider() {
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return jobStatus;
 	}
 	

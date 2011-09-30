@@ -95,7 +95,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	@Override
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
-			final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException {
 		
 		status.setCurrentStatusValue(0);
 		output = new ArrayList<NumericMeasurementInterface>();
@@ -146,7 +146,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void processSnapshot(final int maximumThreadCountOnImageLevel, final BackgroundTaskStatusProviderSupportingExternalCall status,
-			final ThreadSafeOptions tso, final int workloadSnapshots, final int workloadEqualAngleSnapshotSets, final TreeMap<String, ImageSet> tmf) {
+			final ThreadSafeOptions tso, final int workloadSnapshots, final int workloadEqualAngleSnapshotSets, final TreeMap<String, ImageSet> tmf)
+			throws InterruptedException {
 		
 		Sample3D inSample = null;
 		final TreeMap<String, BlockProperties> analysisResults = new TreeMap<String, BlockProperties>();
@@ -178,7 +179,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						}
 					}
 				};
-				wait.add(BackgroundThreadDispatcher.addTask(r, "Analyze image within snapshot", -1000, -1000));
+				boolean threaded = true;
+				if (!threaded)
+					r.run();
+				else
+					wait.add(BackgroundThreadDispatcher.addTask(r, "Analyze image within snapshot", -1000, -1000));
 			}
 		}
 		BackgroundThreadDispatcher.waitFor(wait);
@@ -277,7 +282,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	protected abstract ImageProcessor getImageProcessor();
 	
-	private MyThread saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, final String labelFileExtension) {
+	private MyThread saveImage(final ImageData id, final FlexibleImage image, final byte[] optLabelImageContent, final String labelFileExtension)
+			throws InterruptedException {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {

@@ -416,7 +416,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								Runnable backgroundTask = new Runnable() {
 									@Override
 									public void run() {
-										task.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, sp);
+										try {
+											task.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, sp);
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
 									}
 								};
 								BackgroundTaskHelper.issueSimpleTaskInWindow(
@@ -574,97 +578,102 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				downloadNeeded = false;
 				setProgressValue(-1);
 				showProgressbar();
-				MyThread download = new MyThread(new Runnable() {
-					public void run() {
-						downloadInProgress = true;
-						final File tfMain;
-						try {
-							tfMain = File.createTempFile("dbe_", "." + imageResult.getFileNameMain());
-							SupplementaryFilePanelMongoDB.addTempFileToBeDeletedLater(tfMain);
-						} catch (IOException e2) {
-							SupplementaryFilePanelMongoDB.showError("Could not create temp file for storing database image!",
-												e2);
-							downloadNeeded = true;
-							return;
-						}
-						final File tfLabel;
-						try {
-							tfLabel = File.createTempFile("dbe_", "." + imageResult.getFileNameLabel());
-							SupplementaryFilePanelMongoDB.addTempFileToBeDeletedLater(tfLabel);
-						} catch (IOException e2) {
-							SupplementaryFilePanelMongoDB.showError("Could not create temp file for storing database image!",
-												e2);
-							downloadNeeded = true;
-							return;
-						}
-						
-						try {
-							IOurl urlMain = imageResult.getBinaryFileInfo().getFileNameMain();
-							System.out.println(urlMain);
-							InputStream isMain = urlMain != null ? urlMain.getInputStream() : null;
-							if (isMain == null)
-								System.out.println("Inputstream = null");
-							HomeFolder.copyFile(isMain, tfMain);
-							
-							IOurl urlLabel = imageResult.getBinaryFileInfo().getFileNameLabel();
-							System.out.println(urlLabel);
-							InputStream isLabel = urlLabel != null ? urlLabel.getInputStream() : null;
-							if (isLabel == null)
-								System.out.println("Inputstream = null");
-							HomeFolder.copyFile(isLabel, tfLabel);
-						} catch (Exception e1) {
-							System.out.println("No valid input stream for "
-												+ imageResult.getBinaryFileInfo().getFileNameMain().toString() + " and/or label.");
-							
-							MappingDataEntity mde = targetTreeNode.getTargetEntity();
+				MyThread download;
+				try {
+					download = new MyThread(new Runnable() {
+						public void run() {
+							downloadInProgress = true;
+							final File tfMain;
 							try {
-								VolumeData volume = (VolumeData) mde;
-								if (volume != null)
-									DataExchangeHelperForExperiments.downloadFile(m, imageResult.getHashMain(), tfMain, DataSetFileButton.this,
-														MongoCollection.VOLUMES);
-							} catch (Exception e) {
-								DataExchangeHelperForExperiments.downloadFile(m, imageResult.getHashMain(), tfMain, DataSetFileButton.this,
-													MongoCollection.IMAGES);
-								DataExchangeHelperForExperiments.downloadFile(m, imageResult.getFileNameLabel(), tfLabel, DataSetFileButton.this,
-										MongoCollection.IMAGES);
+								tfMain = File.createTempFile("dbe_", "." + imageResult.getFileNameMain());
+								SupplementaryFilePanelMongoDB.addTempFileToBeDeletedLater(tfMain);
+							} catch (IOException e2) {
+								SupplementaryFilePanelMongoDB.showError("Could not create temp file for storing database image!",
+													e2);
+								downloadNeeded = true;
+								return;
 							}
-						}
-						
-						if (tfMain != null || tfLabel != null) {
-							imageResult.downloadedFileMain = tfMain;
-							imageResult.downloadedFileLabel = tfLabel;
+							final File tfLabel;
+							try {
+								tfLabel = File.createTempFile("dbe_", "." + imageResult.getFileNameLabel());
+								SupplementaryFilePanelMongoDB.addTempFileToBeDeletedLater(tfLabel);
+							} catch (IOException e2) {
+								SupplementaryFilePanelMongoDB.showError("Could not create temp file for storing database image!",
+													e2);
+								downloadNeeded = true;
+								return;
+							}
+							
+							try {
+								IOurl urlMain = imageResult.getBinaryFileInfo().getFileNameMain();
+								System.out.println(urlMain);
+								InputStream isMain = urlMain != null ? urlMain.getInputStream() : null;
+								if (isMain == null)
+									System.out.println("Inputstream = null");
+								HomeFolder.copyFile(isMain, tfMain);
+								
+								IOurl urlLabel = imageResult.getBinaryFileInfo().getFileNameLabel();
+								System.out.println(urlLabel);
+								InputStream isLabel = urlLabel != null ? urlLabel.getInputStream() : null;
+								if (isLabel == null)
+									System.out.println("Inputstream = null");
+								HomeFolder.copyFile(isLabel, tfLabel);
+							} catch (Exception e1) {
+								System.out.println("No valid input stream for "
+													+ imageResult.getBinaryFileInfo().getFileNameMain().toString() + " and/or label.");
+								
+								MappingDataEntity mde = targetTreeNode.getTargetEntity();
+								try {
+									VolumeData volume = (VolumeData) mde;
+									if (volume != null)
+										DataExchangeHelperForExperiments.downloadFile(m, imageResult.getHashMain(), tfMain, DataSetFileButton.this,
+															MongoCollection.VOLUMES);
+								} catch (Exception e) {
+									DataExchangeHelperForExperiments.downloadFile(m, imageResult.getHashMain(), tfMain, DataSetFileButton.this,
+														MongoCollection.IMAGES);
+									DataExchangeHelperForExperiments.downloadFile(m, imageResult.getFileNameLabel(), tfLabel, DataSetFileButton.this,
+											MongoCollection.IMAGES);
+								}
+							}
+							
+							if (tfMain != null || tfLabel != null) {
+								imageResult.downloadedFileMain = tfMain;
+								imageResult.downloadedFileLabel = tfLabel;
+								SwingUtilities.invokeLater(new Runnable() {
+									public void run() {
+										try {
+											myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
+																DataSetFileButton.ICON_HEIGHT,
+																FileSystemHandler.getURL(tfMain),
+																FileSystemHandler.getURL(tfLabel),
+																myImage != null ? myImage.getBinaryFileInfo() : null);
+										} catch (MalformedURLException e) {
+											downloadNeeded = true;
+											SupplementaryFilePanelMongoDB.showError("URL Format Error", e);
+										}
+									}
+								});
+							}
+							
+							downloadInProgress = false;
+							hideProgressbar();
 							SwingUtilities.invokeLater(new Runnable() {
 								public void run() {
-									try {
-										myImage = new MyImageIcon(MainFrame.getInstance(), DataSetFileButton.ICON_WIDTH,
-															DataSetFileButton.ICON_HEIGHT,
-															FileSystemHandler.getURL(tfMain),
-															FileSystemHandler.getURL(tfLabel),
-															myImage != null ? myImage.getBinaryFileInfo() : null);
-									} catch (MalformedURLException e) {
-										downloadNeeded = true;
-										SupplementaryFilePanelMongoDB.showError("URL Format Error", e);
+									if (myPopup.isVisible()) {
+										myPopup.setVisible(false);
+										JPopupMenu myPopup2 = new JPopupMenu();
+										addDefaultCommands(myPopup2);
+										myPopup2.validate();
+										myPopup2.show(DataSetFileButton.this, 5, 5);
 									}
 								}
 							});
 						}
-						
-						downloadInProgress = false;
-						hideProgressbar();
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								if (myPopup.isVisible()) {
-									myPopup.setVisible(false);
-									JPopupMenu myPopup2 = new JPopupMenu();
-									addDefaultCommands(myPopup2);
-									myPopup2.validate();
-									myPopup2.show(DataSetFileButton.this, 5, 5);
-								}
-							}
-						});
-					}
-				}, "database download");
-				BackgroundThreadDispatcher.addTask(download, 1 + 1000, 0);
+					}, "database download");
+					BackgroundThreadDispatcher.addTask(download, 1 + 1000, 0);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			} else
 				if (downloadInProgress) {
 					JMenuItem tempItem = new JMenuItem("Download in progress...");
@@ -830,7 +839,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			p.getScrollpane().validate();
 			p.repaint();
 			targetTreeNode.setSizeDirty(true);
-			targetTreeNode.updateSizeInfo(m, sizeChangedListener);
+			try {
+				targetTreeNode.updateSizeInfo(m, sizeChangedListener);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		if (evt.getSource() == removeAllFromDatabaseCmd) {
 			// DataExchangeHelperForExperiments.removeAllImagesForOneTargetNodeFromDataBase(user,
@@ -842,7 +855,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			p.getScrollpane().validate();
 			p.repaint();
 			targetTreeNode.setSizeDirty(true);
-			targetTreeNode.updateSizeInfo(m, sizeChangedListener);
+			try {
+				targetTreeNode.updateSizeInfo(m, sizeChangedListener);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			// if (user.equals(Consts.ROOTUSERNAME.toString())) { // TODO
 			Thread t = new Thread(new Runnable() {
 				public void run() {

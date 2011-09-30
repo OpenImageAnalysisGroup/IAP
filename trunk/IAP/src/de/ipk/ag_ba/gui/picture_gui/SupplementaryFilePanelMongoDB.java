@@ -74,9 +74,17 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 						for (int i = 0; i < files.length; i++) {
 							File file = files[i];
 							if (file.isDirectory())
-								targetDropTarget.processDirectory(file);
+								try {
+									targetDropTarget.processDirectory(file);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
 							else
-								targetDropTarget.addImageToDatabase(file, false);
+								try {
+									targetDropTarget.addImageToDatabase(file, false);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
 						}
 						
 					}
@@ -128,7 +136,11 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 				if (mt instanceof MongoTreeNode && ((MongoTreeNode) mt).getTargetEntity() != null) {
 					final MongoTreeNode mtdbe = (MongoTreeNode) mt;
 					MongoTreeNode projectNode = mtdbe.getProjectNode();
-					projectNode.updateSizeInfo(m, thisPanel);
+					try {
+						projectNode.updateSizeInfo(m, thisPanel);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
 					
 					MyDropTarget myDropTarget = new MyDropTarget(m, filePanel, mtdbe, expTree);
 					currentDropTarget = myDropTarget;
@@ -150,7 +162,11 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							filePanel.repaint();
 							
 							removeTempFiles();
-							DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, m);
+							try {
+								DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, m);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
 						}
 					});
 					

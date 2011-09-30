@@ -7,7 +7,7 @@
 
 package de.ipk.ag_ba.gui.actions;
 
-import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
@@ -16,7 +16,7 @@ import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
 /**
  * @author klukas
  */
-public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
+public class MongoJobStatusProvider implements BackgroundTaskStatusProviderSupportingExternalCall {
 	
 	private BatchCmd cmd;
 	private final MongoDB m;
@@ -86,6 +86,36 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProvider {
 	@Override
 	public void pleaseContinueRun() {
 		// empty
+	}
+	
+	@Override
+	public void setCurrentStatusValueFine(double value) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public boolean wantsToStop() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void setCurrentStatusText1(String status) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void setCurrentStatusText2(String status) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void setCurrentStatusValueFineAdd(double smallProgressStep) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

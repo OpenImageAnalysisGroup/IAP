@@ -8,7 +8,6 @@ package de.ipk.ag_ba.gui.actions;
 
 import java.util.ArrayList;
 
-import org.BackgroundTaskStatusProvider;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
@@ -69,7 +68,7 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 		return additionalEntities;
 	}
 	
-	public BackgroundTaskStatusProvider getStatusProvider() {
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return status;
 	}
 	
