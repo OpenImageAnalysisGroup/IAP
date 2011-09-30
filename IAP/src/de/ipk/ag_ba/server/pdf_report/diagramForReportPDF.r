@@ -46,7 +46,7 @@ if(length(args) < 4) {
 	treatment = "none"
 }
 
-treatment = "Condition"
+treatment = "Treatment"; #"Condition"
 
 workingDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8") 
 
