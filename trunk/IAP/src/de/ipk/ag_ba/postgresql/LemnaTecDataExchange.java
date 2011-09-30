@@ -365,63 +365,9 @@ public class LemnaTecDataExchange {
 			rs.close();
 			ps.close();
 			HashSet<Long> knownSnaphotIds = new HashSet<Long>();
-			{
-				// load snapshots with images
-				String sqlText = "SELECT "
-						+ "	creator, measurement_label, camera_label, id_tag, path, "
-						+ "	time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
-						+ "	image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, "
-						+ "	image_file_table.id as image_file_tableID "
-						+ "FROM "
-						+ "	snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
-						+ "WHERE "
-						+ "	snapshot.measurement_label = ? and "
-						+ "	snapshot.id = tiled_image.snapshot_id and "
-						+ "	tiled_image.id = tile.tiled_image_id and "
-						+ "	tile.image_oid = image_file_table.id and "
-						+ "	snapshot.configuration_id = image_unit_configuration.id and "
-						+ "	tiled_image.snapshot_id = snapshot.id";
-				
-				ps = connection.prepareStatement(sqlText);
-				ps.setString(1, experiment);
-				
-				rs = ps.executeQuery();
-				
-				while (rs.next()) {
-					Snapshot snapshot = new Snapshot();
-					
-					knownSnaphotIds.add(rs.getLong("snapshotID"));
-					
-					snapshot.setCreator(rs.getString("creator"));
-					snapshot.setMeasurement_label(rs.getString("measurement_label"));
-					snapshot.setUserDefinedCameraLabeL(rs.getString("camera_label"));
-					snapshot.setId_tag(rs.getString("id_tag"));
-					
-					snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
-					snapshot.setWater_amount(rs.getInt("water_amount"));
-					double w = rs.getDouble("weight_after");
-					if (w >= 0 && w <= 100000)
-						snapshot.setWeight_after(w);
-					w = rs.getDouble("weight_before");
-					if (w >= 0 && w <= 100000)
-						snapshot.setWeight_before(w);
-					
-					snapshot.setCamera_label(rs.getString("compname"));
-					snapshot.setXfactor(rs.getDouble("xfactor"));
-					snapshot.setYfactor(rs.getDouble("yfactor"));
-					
-					String s1 = id2path.get(rs.getLong("image_oid"));
-					snapshot.setPath_image(s1);
-					String s2 = id2path.get(rs.getLong("null_image_oid"));
-					snapshot.setPath_null_image(s2);
-					String s3 = id2path.get(rs.getLong("image_parameter_oid"));
-					// System.out.println(s3);
-					snapshot.setPath_image_config_blob(s3);
-					
-					result.add(snapshot);
-				}
-				rs.close();
-				ps.close();
+			getProperImageSnapshots(experiment, result, connection, id2path, knownSnaphotIds);
+			if (result.size() == 0) {
+				getImageSnapshotsWithUnknownImageUnitConfiguration(experiment, result, connection, id2path, knownSnaphotIds);
 			}
 			{
 				// load snapshots without images
@@ -466,6 +412,159 @@ public class LemnaTecDataExchange {
 		}
 		checkForAndCorrectEqualSnapshotTimes(result);
 		return result;
+	}
+	
+	private void getProperImageSnapshots(String experiment, Collection<Snapshot> result, Connection connection, HashMap<Long, String> id2path,
+			HashSet<Long> knownSnaphotIds) throws SQLException {
+		PreparedStatement ps;
+		ResultSet rs;
+		{
+			// load snapshots with images
+			String sqlText = "SELECT "
+					+ "	creator, measurement_label, camera_label, id_tag, path, "
+					+ "	time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
+					+ "	image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, "
+					+ "	image_file_table.id as image_file_tableID, compname "
+					+ "FROM "
+					+ "	snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
+					+ "WHERE "
+					+ "	snapshot.measurement_label = ? and "
+					+ "	snapshot.id = tiled_image.snapshot_id and "
+					+ "	tiled_image.id = tile.tiled_image_id and "
+					+ "	tile.image_oid = image_file_table.id and "
+					// + "	snapshot.configuration_id = image_unit_configuration.id and"
+					// + "	image_unit_configuration.id = tiled_image.id";
+					+ "	image_unit_configuration.gid = tiled_image.camera_label";
+			// and "
+			// + "	tiled_image.camera_label = image_unit_configuration.gid";
+			// + "	snapshot.configuration_id = image_unit_configuration.id and "
+			// + "	tiled_image.snapshot_id = snapshot.id";
+			
+			ps = connection.prepareStatement(sqlText);
+			ps.setString(1, experiment);
+			
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				Snapshot snapshot = new Snapshot();
+				
+				knownSnaphotIds.add(rs.getLong("snapshotID"));
+				
+				snapshot.setCreator(rs.getString("creator"));
+				snapshot.setMeasurement_label(rs.getString("measurement_label"));
+				snapshot.setUserDefinedCameraLabeL(rs.getString("camera_label"));
+				snapshot.setId_tag(rs.getString("id_tag"));
+				
+				snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
+				snapshot.setWater_amount(rs.getInt("water_amount"));
+				double w = rs.getDouble("weight_after");
+				if (w >= 0 && w <= 100000)
+					snapshot.setWeight_after(w);
+				w = rs.getDouble("weight_before");
+				if (w >= 0 && w <= 100000)
+					snapshot.setWeight_before(w);
+				
+				snapshot.setCamera_label(rs.getString("compname"));
+				snapshot.setXfactor(rs.getDouble("xfactor"));
+				snapshot.setYfactor(rs.getDouble("yfactor"));
+				
+				String s1 = id2path.get(rs.getLong("image_oid"));
+				snapshot.setPath_image(s1);
+				String s2 = id2path.get(rs.getLong("null_image_oid"));
+				snapshot.setPath_null_image(s2);
+				String s3 = id2path.get(rs.getLong("image_parameter_oid"));
+				// System.out.println(s3);
+				snapshot.setPath_image_config_blob(s3);
+				
+				result.add(snapshot);
+			}
+			rs.close();
+			ps.close();
+		}
+	}
+	
+	private void getImageSnapshotsWithUnknownImageUnitConfiguration(String experiment, Collection<Snapshot> result, Connection connection,
+			HashMap<Long, String> id2path,
+				HashSet<Long> knownSnaphotIds) throws SQLException {
+		PreparedStatement ps;
+		ResultSet rs;
+		{
+			// load snapshots with images
+			String sqlText = "SELECT "
+						+ "	creator, measurement_label, camera_label, id_tag, path, "
+						+ "	time_stamp, water_amount, weight_after, weight_before, "
+						+ "	image_oid, null_image_oid, snapshot.id as snapshotID, "
+						+ "	image_file_table.id as image_file_tableID "
+						+ "FROM "
+						+ "	snapshot, tiled_image, tile, image_file_table "
+						+ "WHERE "
+						+ "	snapshot.measurement_label = ? and "
+						+ "	snapshot.id = tiled_image.snapshot_id and "
+						+ "	tiled_image.id = tile.tiled_image_id and "
+						+ "	tile.image_oid = image_file_table.id";
+			
+			ps = connection.prepareStatement(sqlText);
+			ps.setString(1, experiment);
+			
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				Snapshot snapshot = new Snapshot();
+				
+				knownSnaphotIds.add(rs.getLong("snapshotID"));
+				
+				snapshot.setCreator(rs.getString("creator"));
+				snapshot.setMeasurement_label(rs.getString("measurement_label"));
+				snapshot.setUserDefinedCameraLabeL(rs.getString("camera_label"));
+				snapshot.setId_tag(rs.getString("id_tag"));
+				
+				snapshot.setTime_stamp(rs.getTimestamp("time_stamp"));
+				snapshot.setWater_amount(rs.getInt("water_amount"));
+				double w = rs.getDouble("weight_after");
+				if (w >= 0 && w <= 100000)
+					snapshot.setWeight_after(w);
+				w = rs.getDouble("weight_before");
+				if (w >= 0 && w <= 100000)
+					snapshot.setWeight_before(w);
+				
+				snapshot.setCamera_label(getCompNameFromConfigLabel(rs.getString("camera_label")));// rs.getString("compname"));
+				snapshot.setXfactor(0);// rs.getDouble("xfactor"));
+				snapshot.setYfactor(0);// rs.getDouble("yfactor"));
+				
+				String s1 = id2path.get(rs.getLong("image_oid"));
+				snapshot.setPath_image(s1);
+				String s2 = id2path.get(rs.getLong("null_image_oid"));
+				snapshot.setPath_null_image(s2);
+				String s3 = getCompAngleFromConfigLabel(rs.getString("camera_label"));
+				// System.out.println(s3);
+				snapshot.setPath_image_config_blob(s3);
+				
+				result.add(snapshot);
+			}
+			rs.close();
+			ps.close();
+		}
+		
+	}
+	
+	private String getCompNameFromConfigLabel(String conf) {
+		String res = "";
+		if (conf.toUpperCase().contains("NIR"))
+			res += "nir.";
+		if (conf.toUpperCase().contains("RGB"))
+			res += "vis.";
+		if (conf.toUpperCase().contains("FLU"))
+			res += "fluo.";
+		if (conf.toUpperCase().contains("TOP"))
+			res += "top";
+		if (conf.toUpperCase().contains("SIDE"))
+			res += "side";
+		return res;
+	}
+	
+	private String getCompAngleFromConfigLabel(String conf) {
+		String res = StringManipulationTools.getNumbersFromString(conf);
+		return res;
 	}
 	
 	private void checkForAndCorrectEqualSnapshotTimes(Collection<Snapshot> result) {
@@ -762,20 +861,33 @@ public class LemnaTecDataExchange {
 					
 					fn = sn.getPath_image_config_blob();
 					if (fn != null) {
-						if (fn.contains("/"))
-							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-						IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-								+ sn.getPath_image_config_blob(), sn.getId_tag()
-								+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
-						if (optStatus != null)
-							optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ") (FTP)");
-						position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
-						if (optStatus != null)
-							optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ")");
-						if (Math.abs(position) < 0.00001)
-							position = null;
+						try {
+							String a = sn.getUserDefinedCameraLabel();
+							String b = StringManipulationTools.getNumbersFromString(a);
+							position = Double.parseDouble(b);
+							if (position > 360)
+								throw new NumberFormatException("Number too large");
+						} catch (NumberFormatException nfe) {
+							try {
+								position = Double.parseDouble(fn);
+							} catch (NumberFormatException e) {
+								if (fn.contains("/"))
+									fn = fn.substring(fn.lastIndexOf("/") + "/".length());
+								IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
+										+ sn.getPath_image_config_blob(), sn.getId_tag()
+										+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+								if (optStatus != null)
+									optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ") (FTP)");
+								position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
+								if (optStatus != null)
+									optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ")");
+							}
+						}
 					}
 					
+					if (position != null)
+						if (Math.abs(position) < 0.00001)
+							position = null;
 					if (position != null) {
 						image.setPosition(position);
 						image.setPositionUnit("degree");
