@@ -17,7 +17,6 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -112,7 +111,7 @@ public class BlockPipeline {
 			int seconds = (int) ((tb - ta) / 1000);
 			// if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 			if (blockProgressOutput)
-				if (seconds > 0)
+				if (seconds > 10)
 					System.out.println("Pipeline " + id + ": finished block "
 							+ index + "/" + blocks.size() + ", took " + seconds
 							+ " sec., time: " + StopWatch.getNiceTime() + " ("
@@ -139,7 +138,7 @@ public class BlockPipeline {
 			// status.setCurrentStatusText1("Pipeline finished");
 			status.setCurrentStatusText1("T=" + ((b - a) / 1000) + "s");
 		}
-		// System.out.print("PET: " + (b - a) / 1000 + "s ");
+		System.out.print("PET: " + (b - a) / 1000 + "s ");
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);
 		updatePipelineStatistics();
 		return input;
@@ -248,7 +247,11 @@ public class BlockPipeline {
 			@Override
 			public void run() {
 				mat.debugOverrideAndEnableDebugStackStorage(true);
-				mat.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
+				try {
+					mat.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		};
 		final ObjectRef finishSwingTaskRef = new ObjectRef();
@@ -287,7 +290,7 @@ public class BlockPipeline {
 			TreeMap<String, ImageData> inImages,
 			TreeMap<String, BlockProperties> allResultsForSnapshot)
 			throws InstantiationException,
-			IllegalAccessException {
+			IllegalAccessException, InterruptedException {
 		BlockProperties summaryResult = new BlockPropertiesImpl();
 		int index = 0;
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {

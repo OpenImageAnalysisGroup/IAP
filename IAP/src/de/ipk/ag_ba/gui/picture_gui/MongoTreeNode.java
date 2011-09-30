@@ -62,7 +62,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		}
 	}
 	
-	public void updateSizeInfo(final MongoDB m, final ActionListener dataChangedListener) {
+	public void updateSizeInfo(final MongoDB m, final ActionListener dataChangedListener) throws InterruptedException {
 		if (getExperimentName() == null)
 			return;
 		if (!sizeDirty)

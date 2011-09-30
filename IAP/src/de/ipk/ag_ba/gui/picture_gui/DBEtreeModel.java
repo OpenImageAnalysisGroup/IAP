@@ -184,7 +184,11 @@ public class DBEtreeModel implements TreeModel {
 		final MongoTreeNode expNode = new MongoTreeNode(null, dataChangedListener, document, document,
 							document.getName(), isReadOnly);
 		expNode.setSizeDirty(true);
-		expNode.updateSizeInfo(m, dataChangedListener);
+		try {
+			expNode.updateSizeInfo(m, dataChangedListener);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		expNode.setIndex(0);
 		expNode.setIsLeaf(false);
 		

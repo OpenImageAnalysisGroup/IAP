@@ -74,7 +74,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		
 		try {
 			StopWatch sw = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">LOAD EXPERIMENT " + experiment.getExperimentName());
+			
+			String dbID = experiment.getHeader().getDatabaseId();
+			
 			ExperimentInterface experimentToBeAnalysed = experiment.getData(m);
+			
 			sw.printTime();
 			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
@@ -133,7 +137,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			System.out.println("Statistics results: " + newStatisticsData.size());
 			// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
 			statisticsResult.setHeader(experiment.getHeader().clone());
-			statisticsResult.getHeader().setOriginDbId(experimentToBeAnalysed.getHeader().getDatabaseId());
 			statisticsResult.getHeader().setDatabaseId("");
 			if (statisticsResult.size() > 0) {
 				SubstanceInterface subst = statisticsResult.iterator().next();
@@ -154,6 +157,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					}
 				}
 			}
+			
+			statisticsResult.getHeader().setOriginDbId(dbID);
+			
 			if (resultReceiver == null) {
 				if (status != null)
 					status.setCurrentStatusText1("Ready");

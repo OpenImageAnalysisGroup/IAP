@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.WeakHashMap;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -433,7 +432,7 @@ public class MongoDB {
 		if (status != null || (status != null && !status.wantsToStop()))
 			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Determine Size");
 		{
-			if (!experiment.getHeader().getDatabaseId().startsWith("hsm:")) {
+			if (experiment.getHeader().getDatabaseId() != null && !experiment.getHeader().getDatabaseId().startsWith("hsm:")) {
 				long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
 				experiment.getHeader().setSizekb(l / 1024);
 			}
@@ -510,21 +509,21 @@ public class MongoDB {
 							try {
 								if (m instanceof ImageData) {
 									ImageData id = (ImageData) m;
-//									boolean direct = true;
-//									if (direct) {
-										saveImageFileDirect(db, id, overallFileSize,
+									// boolean direct = true;
+									// if (direct) {
+									saveImageFileDirect(db, id, overallFileSize,
 												keepDataLinksToDataSource_safe_space);
-										
-										attributes.clear();
-										id.fillAttributeMap(attributes);
-										BasicDBObject dbo = new BasicDBObject(filter(attributes));
-										dbImages.add(dbo);
-										
-//									} else {
-//										storageResults.add(saveImageFile(db, id, overallFileSize,
-//												keepDataLinksToDataSource_safe_space));
-//										imageDataQueue.add(id);
-//									}
+									
+									attributes.clear();
+									id.fillAttributeMap(attributes);
+									BasicDBObject dbo = new BasicDBObject(filter(attributes));
+									dbImages.add(dbo);
+									
+									// } else {
+									// storageResults.add(saveImageFile(db, id, overallFileSize,
+									// keepDataLinksToDataSource_safe_space));
+									// imageDataQueue.add(id);
+									// }
 									count++;
 								}
 								if (m instanceof VolumeData) {
@@ -935,25 +934,24 @@ public class MongoDB {
 		}
 	});
 	
-//	public Future<DatabaseStorageResult> saveImageFile(final DB db,
-//			final ImageData image, final ObjectRef fileSize,
-//			final boolean keepRemoteURLs_safe_space) throws Exception {
-//		
-//		return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
-//			@Override
-//			public DatabaseStorageResult call() throws Exception {
-//				return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
-//			}
-//		});
-//	}
+	// public Future<DatabaseStorageResult> saveImageFile(final DB db,
+	// final ImageData image, final ObjectRef fileSize,
+	// final boolean keepRemoteURLs_safe_space) throws Exception {
+	//
+	// return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
+	// @Override
+	// public DatabaseStorageResult call() throws Exception {
+	// return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+	// }
+	// });
+	// }
 	
 	public DatabaseStorageResult saveImageFile(final DB db,
 			final ImageData image, final ObjectRef fileSize,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
 		
-				return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+		return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
 	}
-
 	
 	protected boolean processLabelData(boolean keepRemoteURLs_safe_space, IOurl labelURL) {
 		return !keepRemoteURLs_safe_space || (labelURL != null && (labelURL.getPrefix().equals(LemnaTecFTPhandler.PREFIX)
@@ -1659,7 +1657,7 @@ public class MongoDB {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (batch.getExperimentHeader() == null)
 									continue;
-								if (!added && batch.getCpuTargetUtilization() < maxTasks)
+								if (!added && batch.getCpuTargetUtilization() <= maxTasks)
 									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 30000)) {
 										// after 30 seconds tasks are taken away from other systems
 										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
@@ -1673,7 +1671,7 @@ public class MongoDB {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (batch.getExperimentHeader() == null)
 									continue;
-								if (batch.getCpuTargetUtilization() < maxTasks && hostName.equals("" + batch.getOwner())) {
+								if (batch.getCpuTargetUtilization() <= maxTasks && hostName.equals("" + batch.getOwner())) {
 									res.add(batch);
 									addCnt += batch.getCpuTargetUtilization();
 									if (addCnt >= maxTasks)

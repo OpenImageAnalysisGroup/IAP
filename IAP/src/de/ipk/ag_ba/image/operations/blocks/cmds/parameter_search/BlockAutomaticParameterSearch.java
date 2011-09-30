@@ -305,7 +305,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 			final boolean scanParameterX, final double bestValueOfOtherTranslation,
 			final MorphologicalOperationSearchType operation, double intervallSteps,
 			final ThreadSafeOptions bestValueTS, final ThreadSafeOptions bestParameterTS,
-			int parentPriority) {
+			int parentPriority) throws InterruptedException {
 		ArrayList<MyThread> tl = new ArrayList<MyThread>();
 		for (double step = borderLeft; step <= borderRight; step += intervallSteps) {// step = Math.round((intervallSteps + step) * accuracy) / accuracy) {
 			zaehler++;

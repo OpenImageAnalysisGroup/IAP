@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeSet;
 
-import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
@@ -109,7 +109,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	}
 	
 	@Override
-	public BackgroundTaskStatusProvider getStatusProvider() {
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		// MainFrame.showMessageDialog("Remote execution not yet fully implemented!", "Internal Error");
 		return new BackgroundTaskStatusProviderSupportingExternalCallImpl("Remote", "Start");
 	}

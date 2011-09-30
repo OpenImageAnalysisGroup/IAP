@@ -8,7 +8,7 @@ package de.ipk.ag_ba.gui.interfaces;
 
 import java.util.ArrayList;
 
-import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -37,7 +37,7 @@ public interface NavigationAction {
 	
 	public ArrayList<NavigationButton> getAdditionalEntities();
 	
-	public BackgroundTaskStatusProvider getStatusProvider();
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider();
 	
 	public String getDefaultTitle();
 	

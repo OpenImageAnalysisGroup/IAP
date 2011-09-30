@@ -56,7 +56,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	public void postProcessResultsForAllAngles(
 			Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
+			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) throws InterruptedException {
 		int voxelresolution = 500;
 		int widthFactor = 40;
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;

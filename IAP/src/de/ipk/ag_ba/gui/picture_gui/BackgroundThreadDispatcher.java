@@ -2,17 +2,13 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Stack;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -28,21 +24,14 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
  * @author klukas
  */
 public class BackgroundThreadDispatcher {
-	private final Stack<MyThread> todo = new Stack<MyThread>();
-	Stack<Integer> todoPriorities = new Stack<Integer>();
-	LinkedList<MyThread> runningTasks = new LinkedList<MyThread>();
-	
-	public static boolean useThreads = false;
-	
 	int indicator = 0;
 	
 	public static String projectLoading = " PLEASE WAIT - Loading Experimental Data";
 	
 	private static BackgroundThreadDispatcher myInstance = new BackgroundThreadDispatcher();
 	
-	private Thread sheduler = null;
+	private final Thread sheduler = null;
 	private StatusDisplay frame;
-	private static HashSet<Thread> waitThreads = new HashSet<Thread>();
 	
 	public static void setFrameInstance(StatusDisplay mainFrame) {
 		synchronized (myInstance) {
@@ -52,39 +41,16 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 	
-	public static MyThread addTask(Runnable r, String name, int userPriority, int parentPriority) {
+	public static MyThread addTask(Runnable r, String name, int userPriority, int parentPriority) throws InterruptedException {
 		return addTask(new MyThread(r, name), userPriority, parentPriority);
 	}
 	
 	public static MyThread addTask(MyThread t, int userPriority, int parentPriority) {
 		if (t == null)
 			return null;
-		// if (parentPriority > 4)
-		synchronized (myInstance) {
-			if (myInstance == null)
-				myInstance = new BackgroundThreadDispatcher();
-		}
-		synchronized (myInstance.todo) {
-			if (!useThreads && userPriority != Integer.MIN_VALUE) {
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">Task " + t.getNameNG() + ", Priority: "
-						+ userPriority + ", Parent Priority: "
-						+ parentPriority + " > INTERNAL THREAD SCHEDULER SITUATION WHERE TASKS ARE NOT ADDED TO QUEUE");
-			} else {
-				// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Add task " + t.getNameNG() + ", Priority: "
-				// + userPriority + ", Parent Priority: "
-				// + parentPriority);
-				myInstance.todo.push(t);
-				myInstance.todoPriorities.push(new Integer(userPriority)); // parentPriority + 1));//
-				myInstance.sheduler.interrupt();
-			}
-		}
-		if (!useThreads && userPriority != Integer.MIN_VALUE) {
-			try {
-				t.run();
-			} catch (Exception e) {
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + t.getNameNG() + ": " + e.getMessage());
-			}
-		}
+		
+		t.startNG(myInstance.es);
+		
 		return t;
 	}
 	
@@ -94,36 +60,7 @@ public class BackgroundThreadDispatcher {
 	 * @return Number of scheduled+number of running tasks;
 	 */
 	public static int getWorkLoad() {
-		return myInstance.getCountSheduledTasks() + myInstance.getCurrentRunningTasks();
-	}
-	
-	int getCountSheduledTasks() {
-		int load;
-		synchronized (todo) {
-			load = todo.size();
-			if (es != null && es instanceof ThreadPoolExecutor) {
-				ThreadPoolExecutor tpe = (ThreadPoolExecutor) es;
-				load += tpe.getActiveCount();
-				// load = (int) tpe.getCompletedTaskCount();
-			}
-		}
-		return load;
-	}
-	
-	int getCurrentRunningTasks() {
-		int load;
-		synchronized (runningTasks) {
-			ArrayList<MyThread> toBeRemoved = new ArrayList<MyThread>();
-			for (Iterator<MyThread> it = runningTasks.iterator(); it.hasNext();) {
-				MyThread t = it.next();
-				if (!t.isAlive())
-					toBeRemoved.add(t);
-			}
-			for (Iterator<MyThread> it = toBeRemoved.iterator(); it.hasNext();)
-				myRemove(it.next());
-			load = runningTasks.size();
-		}
-		return load;
+		return -1;
 	}
 	
 	public BackgroundThreadDispatcher() {
@@ -148,8 +85,8 @@ public class BackgroundThreadDispatcher {
 				if (indicator >= 4 || indicator < 0)
 					indicator = 0;
 				
-				int exec = getCurrentRunningTasks();
-				int wl = getCountSheduledTasks();
+				int exec = -1;
+				int wl = -1;
 				if (exec > 0 || wl > 0) {
 					msg = " " + indicatorStr + " perform operations (" + (wl + exec) + " remaining) " + indicatorStr;
 				} else
@@ -163,13 +100,6 @@ public class BackgroundThreadDispatcher {
 		});
 		if (!SystemAnalysis.isHeadless())
 			t.start();
-		
-		sheduler = new Thread(new Runnable() {
-			public void run() {
-				schedulerCode();
-			}
-		}, "Background Task Scheduler");
-		sheduler.start();
 	}
 	
 	private boolean highMemoryLoad(LinkedList<MyThread> runningTasks) {
@@ -204,21 +134,11 @@ public class BackgroundThreadDispatcher {
 	private static long lastPrint = 0;
 	private static long lastGC = 0;
 	
-	protected void myRemove(MyThread rt) {
-		synchronized (runningTasks) {
-			runningTasks.remove(rt);
-		}
-		synchronized (waitThreads) {
-			for (Thread t : waitThreads)
-				t.interrupt();
-		}
-	}
-	
 	ExecutorService es = new ThreadPoolExecutor(
-			32000,
-			32000,
+			SystemAnalysis.getNumberOfCPUs(),
+			SystemAnalysis.getNumberOfCPUs(),
 			10, TimeUnit.SECONDS,
-			new ArrayBlockingQueue<Runnable>(32000, true),
+			new ArrayBlockingQueue<Runnable>(SystemAnalysis.getNumberOfCPUs(), true),
 			new ThreadFactory() {
 				int idx = 1;
 				
@@ -228,158 +148,9 @@ public class BackgroundThreadDispatcher {
 					idx++;
 					return res;
 				}
-			}, new RejectedExecutionHandler() {
-				@Override
-				public void rejectedExecution(Runnable r, ThreadPoolExecutor tpe) {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: TASK HAS BEEN REJECTED, EXECUTING DIRECTLY");
-					r.run();
-				}
 			});
 	
-	// Executors.newCachedThreadPool();
-	
-	private void schedulerCode() {
-		int moreLoad = 0;
-		while (true) {
-			try {
-				Thread.sleep(500000);
-			} catch (InterruptedException e) {
-				// System.out.println(SystemAnalysisExt.getCurrentTime() +
-				// ">INFO: SCHEDULER INTERRUPTED, PROBABLY A NEW TASK HAS BEEN SUBMITTED: TODO: "
-				// + todo.size());
-				// PictureGUI.showError("Background thread dispatcher was interrupted.",
-				// e);
-				// kein Fehler! normal!
-			}
-			while (!todo.empty()) {
-				MyThread t = null;
-				synchronized (todo) {
-					int maxPrio = Integer.MIN_VALUE;
-					// search maximum priority
-					for (int i = 0; i < todo.size(); i++) {
-						int curPrio = (todoPriorities.get(i)).intValue();
-						if (curPrio > maxPrio)
-							maxPrio = curPrio;
-					}
-					// System.out.println(">MAX PRIO: " + maxPrio);
-					// search oldest thread with maximum priority
-					for (int i = 0; i < todo.size(); i++) {
-						int curPrio = (todoPriorities.get(i)).intValue();
-						if (curPrio == maxPrio) {
-							// use that thread and run it
-							t = todo.get(i);
-							// System.out.println("Start thread " + t.getName() + ". blocked: " + waitThreads.size() + ", max run:" + maxTask + ", running: "
-							// + runningTasks.size() + ", todo:" + todo.size());
-							if (t != null) {
-								// System.out.println("REMOVED TASK " + t.getNameNG());
-								todo.remove(i);
-								Integer prio = todoPriorities.get(i);
-								todoPriorities.remove(i);
-								t.setName(t.getNameNG() + ", priority:" + prio);
-								// System.out.println(">ABOUT TO START " + t.getNameNG() + " // current scheduler status priority: " + curPrio);
-								break;
-							} else {
-								System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: INTERNAL ERROR: SCHEDULED TASK TODO IS NULL!");
-							}
-						}
-					}
-				}
-				if (t != null) {
-					// t.setPriorityNG(Thread.MIN_PRIORITY);
-					if (!t.isFinished() && !t.isStarted()) {
-						if (useThreads)
-							t.startNG(es);
-						else
-							t.run();
-						synchronized (runningTasks) {
-							runningTasks.add(t);
-						}
-					}
-				}
-				// System.out.println("Running tasks: " + runningTasks.size() + "/" + maxTask + " max");
-				// wait until the number of running tasks gets below the
-				// maximum
-				// then a new one can be started above
-				// in case there is a higher priority task waiting
-				// (higher than all running tasks) then the loop is
-				// stopped, it can run, too
-				int maxTask = SystemAnalysis.getNumberOfCPUs();
-				double load = 1;// AttributeHelper.windowsRunning() ? 1 : SystemAnalysisExt.getRealSystemCpuLoad();
-				if (maxTask > 1 && load > 0) {
-					if (load / maxTask < 1) {
-						if (moreLoad < maxTask * 2) {
-							// System.out.print(maxTask + " --> ");
-							moreLoad += 0;// 1;
-							maxTask = maxTask + moreLoad;
-							// System.out.println(maxTask + " (Load too low: " + load + ")");
-						}
-					} else
-						moreLoad -= 1;
-				}
-				while (runningTasks.size() - waitThreads.size() + 1 >= maxTask || highMemoryLoad(runningTasks)) {
-					int highestRunningPrio = Integer.MIN_VALUE;
-					try {
-						Thread.sleep(5);
-					} catch (InterruptedException e) {
-						// kein Fehler, normal!
-					}
-					synchronized (runningTasks) {
-						for (int i = 0; i < runningTasks.size(); i++) {
-							MyThread rt = runningTasks.get(i);
-							if (!rt.isAlive()) {
-								myRemove(rt);
-								i--;
-							} else {
-								String name = rt.getName();
-								try {
-									int thisPrio = Integer.parseInt(name.substring(name.indexOf(":") + ":".length()));
-									if (thisPrio > highestRunningPrio)
-										highestRunningPrio = thisPrio;
-								} catch (Exception nfe) {
-									System.err.println("Invalid thread name (priority can't be parsed): " + name);
-								}
-							}
-						}
-					}
-					int highestNOTrunningPrio = Integer.MIN_VALUE;
-					synchronized (todo) {
-						for (int i = 0; i < todo.size(); i++) {
-							int curPrio = (todoPriorities.get(i)).intValue();
-							if (curPrio > highestNOTrunningPrio)
-								highestNOTrunningPrio = curPrio;
-						}
-					}
-					if (highestNOTrunningPrio > highestRunningPrio)
-						break;
-				}
-			}
-		}
-	}
-	
-	private static void waitFor(HashSet<MyThread> threads) {
-		try {
-			synchronized (waitThreads) {
-				waitThreads.add(Thread.currentThread());
-			}
-			if (!Thread.currentThread().getName().contains("wait;"))
-				Thread.currentThread().setName("wait;" + Thread.currentThread().getName());
-			for (MyThread t : threads) {
-				t.getResult();
-				updateTaskStatistics();
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			if (Thread.currentThread().getName().contains("wait;"))
-				Thread.currentThread().setName(Thread.currentThread().getName().substring("wait;".length()));
-			synchronized (waitThreads) {
-				waitThreads.remove(Thread.currentThread());
-			}
-		}
-		
-	}
-	
-	public static void waitFor(MyThread[] threads) {
+	public static void waitFor(MyThread[] threads) throws InterruptedException {
 		HashSet<MyThread> t = new HashSet<MyThread>();
 		for (MyThread m : threads)
 			if (m != null)
@@ -389,13 +160,10 @@ public class BackgroundThreadDispatcher {
 			waitFor(t);
 	}
 	
-	public static void waitFor(Collection<MyThread> threads) {
-		HashSet<MyThread> t = new HashSet<MyThread>();
-		for (MyThread m : threads)
-			t.add(m);
-		threads.clear();
-		if (t.size() > 0)
-			waitFor(t);
+	public static void waitFor(Collection<MyThread> threads) throws InterruptedException {
+		for (MyThread m : threads) {
+			m.getResult();
+		}
 	}
 	
 	private static void updateTaskStatistics() {

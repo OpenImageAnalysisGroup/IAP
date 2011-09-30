@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
@@ -82,11 +82,11 @@ public class TaskDescription {
 				analysisActionClassName);
 		action.setParams(experimentInput, m, params);
 		
-		final BackgroundTaskStatusProvider statusProvider = action.getStatusProvider();
+		final BackgroundTaskStatusProviderSupportingExternalCall statusProvider = action.getStatusProvider();
 		
 		batch.setStatusProvider(statusProvider);
 		
-		RunnableWithMappingData resultReceiver = getResultReceiver(batch, m);
+		RunnableWithMappingData resultReceiver = getResultReceiver(batch, m, statusProvider);
 		
 		action.setWorkingSet(cmd.getPartIdx(), cmd.getPartCnt(), resultReceiver);
 		
@@ -106,7 +106,8 @@ public class TaskDescription {
 				}, null, statusProvider, -1000);
 	}
 	
-	private RunnableWithMappingData getResultReceiver(final BatchCmd batch, final MongoDB m) {
+	private RunnableWithMappingData getResultReceiver(final BatchCmd batch, final MongoDB m,
+			final BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
 		return new RunnableWithMappingData() {
 			private ExperimentInterface experiment;
 			
@@ -126,7 +127,7 @@ public class TaskDescription {
 						if (SystemAnalysisExt.getHostName().equals(bcmd.getOwner())) {
 							m.batchClearJob(batch);
 							StopWatch sw = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE EXPERIMENT " + experiment.getName(), false);
-							m.saveExperiment(experiment, null, true);
+							m.saveExperiment(experiment, statusProvider, true);
 							sw.printTime();
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
 							

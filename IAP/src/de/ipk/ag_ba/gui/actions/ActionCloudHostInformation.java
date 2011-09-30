@@ -10,7 +10,7 @@ package de.ipk.ag_ba.gui.actions;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -26,7 +26,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 public class ActionCloudHostInformation extends AbstractNavigationAction {
 	
 	private CloudHost ip;
-	private BackgroundTaskStatusProvider hostStatus;
+	private BackgroundTaskStatusProviderSupportingExternalCall hostStatus;
 	private NavigationButton src;
 	private MongoDB m;
 	String niceHostName;
@@ -64,7 +64,8 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 		}
 		niceHostName = hostInfo;
 		
-		this.hostStatus = new BackgroundTaskStatusProvider() {
+		this.hostStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
+			
 			private String hostInfo;
 			private double lastStatus = -1;
 			
@@ -123,6 +124,36 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 			@Override
 			public void pleaseContinueRun() {
 			}
+			
+			@Override
+			public void setCurrentStatusValueFine(double value) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public boolean wantsToStop() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public void setCurrentStatusText1(String status) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void setCurrentStatusText2(String status) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void setCurrentStatusValueFineAdd(double smallProgressStep) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 	
@@ -152,7 +183,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public BackgroundTaskStatusProvider getStatusProvider() {
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return hostStatus;
 	}
 	

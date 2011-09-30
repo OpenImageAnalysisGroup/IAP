@@ -8,9 +8,9 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -20,7 +20,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  */
 public class MyThread extends Thread implements Runnable {
 	
-	public static final boolean NEW_SCHEDULER = false;
+	public static final boolean NEW_SCHEDULER = true;
 	
 	private boolean finished = false;
 	private boolean started = false;
@@ -29,18 +29,12 @@ public class MyThread extends Thread implements Runnable {
 	private String name;
 	private final Runnable runCode;
 	
-	public MyThread(Runnable r, String name) {
+	public MyThread(Runnable r, String name) throws InterruptedException {
 		this.name = name;
 		this.runCode = r;
 		this.r = r;
 		sem = BackgroundTaskHelper.lockGetSemaphore(null, 1);
-		do {
-			try {
-				sem.acquire();
-			} catch (InterruptedException ie) {
-				System.out.println("xi");
-			}
-		} while (sem.availablePermits() > 0);
+		sem.acquire();
 	}
 	
 	@Override
@@ -70,9 +64,6 @@ public class MyThread extends Thread implements Runnable {
 	
 	public Object getResult() throws InterruptedException {
 		synchronized (this) {
-			if (!started)
-				run();
-			
 			if (r instanceof RunnableForResult) {
 				sem.acquire();
 				sem.release();
@@ -81,13 +72,7 @@ public class MyThread extends Thread implements Runnable {
 					System.err.println("INTERNAL ERROR MYTHREAD 1 (NOT FINISHED!)");
 				return rc.getResult();
 			} else {
-				do {
-					try {
-						sem.acquire();
-					} catch (InterruptedException ie) {
-						// empty
-					}
-				} while (!finished);
+				sem.acquire();
 				sem.release();
 				if (!finished)
 					System.err.println("INTERNAL ERROR MYTHREAD 2 (NOT FINISHED)");
@@ -125,9 +110,10 @@ public class MyThread extends Thread implements Runnable {
 		if (!started) {
 			started = true;
 			if (NEW_SCHEDULER) {
-				synchronized (es) {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: SUBMITTED TASK " + name + " TO EXECUTION TASK QUEUE");
+				try {
 					es.submit(this);
+				} catch (RejectedExecutionException rje) {
+					run();
 				}
 			} else {
 				start();

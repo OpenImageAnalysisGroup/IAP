@@ -118,56 +118,76 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		final Object data = data0;
 		
 		if (data != null) {
-			MyThread t = new MyThread(new Runnable() {
-				public void run() {
-					for (int i = 0; i < ((java.util.List) data).size(); i++) {
-						File file = (File) ((java.util.List) data).get(i);
-						status.setCurrentStatusText2("Process " + file.getName());
-						if (file.isDirectory())
-							processDirectory(file);
-						else {
-							if (file.length() > 0) {
-								addImageToDatabase(file, false);
-							}
-						}
-						status.setCurrentStatusValueFine(100d * i / ((java.util.List) data).size());
-					}
-					tso.setBval(0, true); // finished
-				}
-			}, "process dropped files");
-			BackgroundThreadDispatcher.addTask(t, 1, 0);
-		}
-		MyThread t = new MyThread(new Runnable() {
-			
-			public void run() {
-				if (s != null) {
-					System.out.println(e.getCurrentDataFlavorsAsList().toString());
-					final String[] files = s.split("\r"); //$NON-NLS-1$
-					if (files != null)
-						for (int i = 0; i < files.length; i++) {
-							File file;
-							try {
-								files[i] = MyTools.stringReplace(files[i], " ", "" + "%20");
-								file = new File(new URI(files[i]));
-								status.setCurrentStatusText2("Process " + file.getName());
-								if (file.isDirectory())
+			MyThread t;
+			try {
+				t = new MyThread(new Runnable() {
+					public void run() {
+						for (int i = 0; i < ((java.util.List) data).size(); i++) {
+							File file = (File) ((java.util.List) data).get(i);
+							status.setCurrentStatusText2("Process " + file.getName());
+							if (file.isDirectory())
+								try {
 									processDirectory(file);
-								else
-									addImageToDatabase(file, false);
-							} catch (URISyntaxException e2) {
-								SupplementaryFilePanelMongoDB.showError("URL Syntax Error.", e2);
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							else {
+								if (file.length() > 0) {
+									try {
+										addImageToDatabase(file, false);
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+								}
 							}
-							status.setCurrentStatusValueFine(100d * i / files.length);
+							status.setCurrentStatusValueFine(100d * i / ((java.util.List) data).size());
 						}
-					tso.setBval(0, true); // finished
-				}
+						tso.setBval(0, true); // finished
+					}
+				}, "process dropped files");
+				BackgroundThreadDispatcher.addTask(t, 1, 0);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
 			}
-		}, "add image to database");
-		BackgroundThreadDispatcher.addTask(t, 1, 0);
+		}
+		MyThread t;
+		try {
+			t = new MyThread(new Runnable() {
+				
+				public void run() {
+					if (s != null) {
+						System.out.println(e.getCurrentDataFlavorsAsList().toString());
+						final String[] files = s.split("\r"); //$NON-NLS-1$
+						if (files != null)
+							for (int i = 0; i < files.length; i++) {
+								File file;
+								try {
+									files[i] = MyTools.stringReplace(files[i], " ", "" + "%20");
+									file = new File(new URI(files[i]));
+									status.setCurrentStatusText2("Process " + file.getName());
+									if (file.isDirectory())
+										processDirectory(file);
+									else
+										addImageToDatabase(file, false);
+								} catch (URISyntaxException e2) {
+									SupplementaryFilePanelMongoDB.showError("URL Syntax Error.", e2);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								status.setCurrentStatusValueFine(100d * i / files.length);
+							}
+						tso.setBval(0, true); // finished
+					}
+				}
+			}, "add image to database");
+			BackgroundThreadDispatcher.addTask(t, 1, 0);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		e.dropComplete(true);
 	}
 	
-	public void addImageToDatabase(final File file, final boolean deleteUponCompletion) {
+	public void addImageToDatabase(final File file, final boolean deleteUponCompletion) throws InterruptedException {
 		final DataSetFileButton imageButton = new DataSetFileButton(m, targetTreeNode,
 							"<html><body><b>" + DataSetFileButton.getMaxString(file.getName()) + //$NON-NLS-1$
 									"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null); //$NON-NLS-1$//$NON-NLS-2$
@@ -223,7 +243,11 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					imageButton.imageResult = new ImageResult(icon, bfi);
 					imageButton.setProgressValue(100);
 					targetTreeNode.setSizeDirty(true);
-					targetTreeNode.updateSizeInfo(m, targetTreeNode.getSizeChangedListener());
+					try {
+						targetTreeNode.updateSizeInfo(m, targetTreeNode.getSizeChangedListener());
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					imageButton.hideProgressbar();
 				}
 				if (deleteUponCompletion)
@@ -233,7 +257,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		BackgroundThreadDispatcher.addTask(t, -1, 0);
 	}
 	
-	public void processDirectory(File file) {
+	public void processDirectory(File file) throws InterruptedException {
 		File[] list = file.listFiles();
 		for (int j = 0; j < list.length; j++) {
 			File currentFile = list[j];
