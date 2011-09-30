@@ -111,8 +111,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-//		options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
-
+		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
+		
 		options.setIsMaize(true);
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
 		
@@ -156,7 +156,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		options.clearAndAddIntSetting(Setting.B_Diff_NIR_TOP, 20); // 30); // 20
 		options.clearAndAddIntSetting(Setting.W_Diff_NIR_TOP, 33);// 33); // 23
 		
-		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1104);
+		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1448);
 		options.clearAndAddIntSetting(Setting.CLOSING_REPEAT, 2);
 	}
 	
