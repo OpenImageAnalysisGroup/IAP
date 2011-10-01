@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -107,9 +108,20 @@ public class LemnaTecDataExchange {
 		return result;
 	}
 	
-	public Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database)
+	private static WeakHashMap<String, Collection<ExperimentHeaderInterface>> memRes1 = new WeakHashMap<String, Collection<ExperimentHeaderInterface>>();
+	
+	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database)
+		throws SQLException, ClassNotFoundException {
+		Collection<ExperimentHeaderInterface> res = memRes1.get(user+";"+database);
+		if (res==null)  {
+			res = getExperimentsInDatabaseIC(user, database);
+			memRes1.put(user+";"+database, res);
+		}
+		return res;
+	}
+	private Collection<ExperimentHeaderInterface> getExperimentsInDatabaseIC(String user, String database)
 			throws SQLException, ClassNotFoundException {
-		
+		System.out.println("GET EXP LIST LT");
 		String sqlText = "SELECT distinct(measurement_label) FROM snapshot ORDER BY measurement_label";
 		
 		Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();

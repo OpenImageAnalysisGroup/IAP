@@ -8,6 +8,7 @@ package de.ipk.ag_ba.gui.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.WeakHashMap;
 
 import org.SystemAnalysis;
@@ -42,7 +43,9 @@ public class ExperimentReference {
 		if (databaseID.startsWith("lemnatec:")) {
 			String db = databaseID.split(":")[1];
 			try {
-				for (ExperimentHeaderInterface ehi : new LemnaTecDataExchange().getExperimentsInDatabase(SystemAnalysis.getUserName(), db)) {
+				Collection<ExperimentHeaderInterface> res = new LemnaTecDataExchange().getExperimentsInDatabase(
+						SystemAnalysis.getUserName(), db);
+				for (ExperimentHeaderInterface ehi : res) {
 					if (ehi.getDatabaseId().equals(databaseID)) {
 						header = ehi;
 						break;
