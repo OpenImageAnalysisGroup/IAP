@@ -109,16 +109,19 @@ public class LemnaTecDataExchange {
 	}
 	
 	private static WeakHashMap<String, Collection<ExperimentHeaderInterface>> memRes1 = new WeakHashMap<String, Collection<ExperimentHeaderInterface>>();
+	private static long updateTime = -1;
 	
 	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database)
-		throws SQLException, ClassNotFoundException {
-		Collection<ExperimentHeaderInterface> res = memRes1.get(user+";"+database);
-		if (res==null)  {
+			throws SQLException, ClassNotFoundException {
+		Collection<ExperimentHeaderInterface> res = memRes1.get(user + ";" + database);
+		if (res == null || System.currentTimeMillis() - updateTime > 2 * 60 * 1000) {
 			res = getExperimentsInDatabaseIC(user, database);
-			memRes1.put(user+";"+database, res);
+			updateTime = System.currentTimeMillis();
+			memRes1.put(user + ";" + database, res);
 		}
 		return res;
 	}
+	
 	private Collection<ExperimentHeaderInterface> getExperimentsInDatabaseIC(String user, String database)
 			throws SQLException, ClassNotFoundException {
 		System.out.println("GET EXP LIST LT");
