@@ -39,7 +39,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 	
 	public ActionMongoOrLemnaTecExperimentNavigation(ExperimentHeaderInterface ei, MongoDB m) {
 		super(ei.getDatabaseId() != null && ei.getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
-							: "Access Systems Biology Cloud Data Set");
+				: "Access Systems Biology Cloud Data Set");
 		
 		this.tt = "<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentName() + "</td></tr>"
 				+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
@@ -62,7 +62,9 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 		// ei.experimentName));
 		
 		if (header != null && !header.getDatabaseId().startsWith("lemnatec:")
-							&& (header.getImportusername() == null || header.getImportusername().equals(SystemAnalysis.getUserName()))) {
+				&& (header.getImportusername() == null ||
+						header.getImportusername().equals("tomcat") ||
+				header.getImportusername().equals(SystemAnalysis.getUserName()))) {
 			if (m != null)
 				if (header.inTrash()) {
 					actions.add(ActionTrash.getTrashEntity(header, DeletionCommand.UNTRASH, src.getGUIsetting(), m));
@@ -87,7 +89,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 	}
 	
 	public static void getDefaultActions(ArrayList<NavigationButton> actions, ExperimentInterface experiment,
-						ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting, MongoDB m) {
+			ExperimentHeaderInterface header, boolean imageAnalysis, GUIsetting guiSetting, MongoDB m) {
 		if (experiment == null)
 			return;
 		try {
@@ -98,7 +100,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends AbstractNavigatio
 		}
 		if (imageAnalysis)
 			for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m, new ExperimentReference(
-							experiment), guiSetting)) {
+					experiment), guiSetting)) {
 				if (ne.getTitle().contains("Put data")) {
 					ne.setTitle("Analyze with VANTED");
 					actions.add(ne);
