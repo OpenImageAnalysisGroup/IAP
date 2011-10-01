@@ -65,7 +65,7 @@ public class LoadedDataHandler extends AbstractResourceIOHandler {
 		return null;
 	}
 	
-	private LoadedData getEntry(IOurl url, ObjectRef useLabelURLref) {
+	private synchronized LoadedData getEntry(IOurl url, ObjectRef useLabelURLref) {
 		synchronized (known) {
 			LoadedData result = null;
 			ArrayList<WeakReference<LoadedData>> del = null;
@@ -99,7 +99,7 @@ public class LoadedDataHandler extends AbstractResourceIOHandler {
 		return PREFIX;
 	}
 	
-	public static void registerObject(LoadedData loadedData) {
+	public synchronized static void registerObject(LoadedData loadedData) {
 		synchronized (known) {
 			known.add(new WeakReference<LoadedData>(loadedData));
 			ArrayList<WeakReference<LoadedData>> del = null;

@@ -2422,8 +2422,8 @@ public class MongoDB {
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		if (image.getLabelURL() != null && isLabel == null) {
-			System.out.println("No input stream for source-URL (label):  " + image.getURL());
-			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
+			//System.out.println("No input stream for source-URL (label):  " + image.getURL());
+			//return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		
 		String[] hashes;
