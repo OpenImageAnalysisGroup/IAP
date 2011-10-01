@@ -82,7 +82,7 @@ public class MyAdvancedFTP {
 		}
 		
 		final ObjectRef myoutputstream = new ObjectRef();
-		BackgroundTaskHelper.lockAquire(server, 1);
+		BackgroundTaskHelper.lockAquire(server, 2);
 		try {
 			status.setCurrentStatusText1("Waiting for shared FTP connection");
 			status.setCurrentStatusText2("Server: " + server);
@@ -106,7 +106,7 @@ public class MyAdvancedFTP {
 				ftp.connect(server);
 				int reply = ftp.getReplyCode();
 				if (!FTPReply.isPositiveCompletion(reply)) {
-					System.out.println("Disconnecting from FTP server: " + server);
+					System.out.println("Non-Positivy Completion Result -> Disconnecting from FTP server: " + server);
 					ftp.disconnect();
 					status.setCurrentStatusText1("Can't connect to FTP server");
 					status.setCurrentStatusText2("ERROR");
@@ -114,7 +114,7 @@ public class MyAdvancedFTP {
 				}
 				// if (!ftp.login("anonymous", "anonymous")) {
 				if (!ftp.login(username, password)) {
-					System.out.println("Disconnecting from FTP server: " + server);
+					System.out.println("Login not successful -> Disconnecting from FTP server: " + server);
 					ftp.disconnect();
 					status.setCurrentStatusText1("Can't login to FTP server");
 					status.setCurrentStatusText2("ERROR");
@@ -138,20 +138,22 @@ public class MyAdvancedFTP {
 				target.setBuf(null);
 				MainFrame.showMessage("Can't download " + downloadURL + ". File not available.", MessageType.INFO);
 			}
-			BackgroundTaskHelper.executeLaterOnSwingTask(10000, new Runnable() {
-				public void run() {
-					try {
-						synchronized (GUIhelper.class) {
-							if (runIdx == thisRun) {
-								System.out.println("Disconnecting from FTP server: " + server);
-								ftp.disconnect();
+			boolean autoClose = true;
+			if (autoClose)
+				BackgroundTaskHelper.executeLaterOnSwingTask(10000, new Runnable() {
+					public void run() {
+						try {
+							synchronized (GUIhelper.class) {
+								if (runIdx == thisRun) {
+									System.out.println("Disconnecting from FTP server: " + server);
+									ftp.disconnect();
+								}
 							}
+						} catch (Exception err) {
+							ErrorMsg.addErrorMessage(err);
 						}
-					} catch (Exception err) {
-						ErrorMsg.addErrorMessage(err);
 					}
-				}
-			});
+				});
 			return result;
 		} catch (Exception err) {
 			ErrorMsg.addErrorMessage(err);

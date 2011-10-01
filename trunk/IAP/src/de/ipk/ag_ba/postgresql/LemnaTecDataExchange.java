@@ -432,7 +432,7 @@ public class LemnaTecDataExchange {
 					+ "	snapshot.id = tiled_image.snapshot_id and "
 					+ "	tiled_image.id = tile.tiled_image_id and "
 					+ "	tile.image_oid = image_file_table.id and "
-					// + "	snapshot.configuration_id = image_unit_configuration.id and"
+						+ "	snapshot.configuration_id = image_unit_configuration.id and"
 					// + "	image_unit_configuration.id = tiled_image.id";
 					+ "	image_unit_configuration.gid = tiled_image.camera_label";
 			// and "
