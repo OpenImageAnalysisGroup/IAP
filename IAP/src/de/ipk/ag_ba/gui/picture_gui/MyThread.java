@@ -109,15 +109,19 @@ public class MyThread extends Thread implements Runnable {
 	public void startNG(ExecutorService es) {
 		if (!started) {
 			started = true;
-			if (NEW_SCHEDULER) {
-				try {
-					es.submit(this);
-				} catch (RejectedExecutionException rje) {
-					run();
+			boolean direct = true;
+			if (direct)
+				run();
+			else
+				if (NEW_SCHEDULER) {
+					try {
+						es.submit(this);
+					} catch (RejectedExecutionException rje) {
+						run();
+					}
+				} else {
+					start();
 				}
-			} else {
-				start();
-			}
 		}
 	}
 }
