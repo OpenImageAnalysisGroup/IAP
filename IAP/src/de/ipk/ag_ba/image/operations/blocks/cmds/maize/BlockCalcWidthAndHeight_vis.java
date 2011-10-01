@@ -29,7 +29,7 @@ public class BlockCalcWidthAndHeight_vis extends AbstractSnapshotAnalysisBlockFI
 		FlexibleImage img = options.isMaize() ? getInput().getMasks().getFluo() : getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && img != null) {
 			Point values = getWidthAndHeightSide(img, background);
-			img.print("img");
+			//img.print("img");
 			double resf = options.isMaize() ? (double) getInput().getMasks().getVis().getWidth() / (double) img.getWidth()
 					* (getInput().getImages().getFluo().getWidth() / (double) getInput().getImages().getFluo().getHeight())
 					/ (getInput().getImages().getVis().getWidth() / (double) getInput().getImages().getVis().getHeight())

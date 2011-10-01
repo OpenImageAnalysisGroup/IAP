@@ -138,7 +138,7 @@ public class MyAdvancedFTP {
 				target.setBuf(null);
 				MainFrame.showMessage("Can't download " + downloadURL + ". File not available.", MessageType.INFO);
 			}
-			boolean autoClose = true;
+			boolean autoClose = false;
 			if (autoClose)
 				BackgroundTaskHelper.executeLaterOnSwingTask(10000, new Runnable() {
 					public void run() {
