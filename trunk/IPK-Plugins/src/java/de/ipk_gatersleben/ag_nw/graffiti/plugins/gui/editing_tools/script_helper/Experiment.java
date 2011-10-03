@@ -245,7 +245,7 @@ public class Experiment implements ExperimentInterface {
 	}
 	
 	public static ArrayList<Document> getDocuments(ExperimentInterface mappingDataList,
-						BackgroundTaskStatusProviderSupportingExternalCall status, boolean mergeExperimentsReturnOnlyOne) {
+			BackgroundTaskStatusProviderSupportingExternalCall status, boolean mergeExperimentsReturnOnlyOne) {
 		ArrayList<Document> docList = new ArrayList<Document>();
 		for (String s : getStrings(mappingDataList, status, mergeExperimentsReturnOnlyOne))
 			docList.add(XMLHelper.getDocumentFromXMLstring(s));
@@ -253,7 +253,7 @@ public class Experiment implements ExperimentInterface {
 	}
 	
 	public static ArrayList<String> getStrings(ExperimentInterface mappingDataList,
-						BackgroundTaskStatusProviderSupportingExternalCall status, boolean mergeExperimentsReturnOnlyOne) {
+			BackgroundTaskStatusProviderSupportingExternalCall status, boolean mergeExperimentsReturnOnlyOne) {
 		
 		HashMap<String, LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>> experimentName2substanceName2Conditions = new HashMap<String, LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>>();
 		
@@ -285,19 +285,19 @@ public class Experiment implements ExperimentInterface {
 					
 					if (!experimentName2substanceName2Conditions.containsKey(expName))
 						experimentName2substanceName2Conditions.put(expName,
-											new LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>());
+								new LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>());
 					
 					if (!experimentName2substanceName2Conditions.get(expName).containsKey(substanceName))
 						experimentName2substanceName2Conditions.get(expName).put(substanceName,
-											new LinkedHashMap<String, ConditionInterface>());
+								new LinkedHashMap<String, ConditionInterface>());
 					
 					if (!experimentName2substanceName2Conditions.get(expName).get(substanceName)
-										.containsKey(((Condition) condition).getConditionName(false))) {
+							.containsKey(((Condition) condition).getConditionName(false))) {
 						experimentName2substanceName2Conditions.get(expName).get(substanceName)
-											.put(((Condition) condition).getConditionName(false), condition);
+								.put(((Condition) condition).getConditionName(false), condition);
 					} else {
 						experimentName2substanceName2Conditions.get(expName).get(substanceName)
-											.get(((Condition) condition).getConditionName(false)).addAll(condition);
+								.get(((Condition) condition).getConditionName(false)).addAll(condition);
 					}
 				}
 			}
@@ -327,7 +327,7 @@ public class Experiment implements ExperimentInterface {
 			for (String expName : experimentName2substanceName2Conditions.keySet()) {
 				
 				LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>> substances2conditions = experimentName2substanceName2Conditions
-									.get(expName);
+						.get(expName);
 				ConditionInterface c1 = substances2conditions.values().iterator().next().values().iterator().next();
 				
 				StringBuilder r = new StringBuilder();
@@ -462,7 +462,7 @@ public class Experiment implements ExperimentInterface {
 	/*
 	 * Delegate methods
 	 */
-
+	
 	public boolean isEmpty() {
 		for (SubstanceInterface s : this)
 			for (ConditionInterface c : s)
@@ -805,7 +805,7 @@ public class Experiment implements ExperimentInterface {
 		String tableRowBreak = "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
 		sb.append("<table class='experimentInfo'>" +
 				"<tr><th>Experiment</th><th>" + StringManipulationTools.removeHTMLtags(getName()) + "</th></tr>" +
-						tableRowBreak);
+				tableRowBreak);
 		
 		Map<String, Object> attributeValueMap = new HashMap<String, Object>();
 		header.fillAttributeMap(attributeValueMap, getNumberOfMeasurementValues());
@@ -853,5 +853,29 @@ public class Experiment implements ExperimentInterface {
 		res.put("measurements", "<!-- L -->Numeric Measurements");
 		res.put("imagefiles", "<!-- M -->Binary Files");
 		return res;
+	}
+	
+	@Override
+	public void numberConditions() {
+		TreeSet<String> conditions = new TreeSet<String>();
+		for (SubstanceInterface si : this) {
+			for (ConditionInterface ci : si) {
+				Condition c = (Condition) ci;
+				conditions.add(c.getConditionName(false, false));
+			}
+		}
+		HashMap<String, Integer> condition2id = new HashMap<String, Integer>();
+		int idx = 1;
+		for (String cid : conditions) {
+			condition2id.put(cid, idx);
+			idx++;
+		}
+		for (SubstanceInterface si : this) {
+			for (ConditionInterface ci : si) {
+				Condition c = (Condition) ci;
+				String cid = c.getConditionName(false, false);
+				c.setRowId(condition2id.get(cid));
+			}
+		}
 	}
 }
