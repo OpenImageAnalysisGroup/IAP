@@ -40,13 +40,15 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	private NavigationButton src;
 	private JTable table;
 	private static final String separator = "\t";
+	private final boolean exportIndividualAngles;
 	
-	public ActionNumericDataReportComplete(String tooltip) {
+	public ActionNumericDataReportComplete(String tooltip, boolean exportIndividualAngles) {
 		super(tooltip);
+		this.exportIndividualAngles = exportIndividualAngles;
 	}
 	
-	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference) {
-		this("Show/export numeric data report");
+	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles) {
+		this("Show/export numeric data report" + (exportIndividualAngles ? " (for each angle)" : ""), exportIndividualAngles);
 		this.m = m;
 		this.experimentReference = experimentReference;
 	}
@@ -66,9 +68,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		if (SystemAnalysis.isHeadless())
-			return "Download Report Files";
+			return "Download Report Files" + (exportIndividualAngles ? " (side angles)" : " (average)");
 		else
-			return "Create PDF Report";
+			return "Create PDF Report" + (exportIndividualAngles ? " (side angles)" : " (average)");
 	}
 	
 	@Override
@@ -129,7 +131,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				String csvHeader = getCSVheader();
 				if (!water) {
 					HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
-					snapshots = IAPservice.getSnapshotsFromExperiment(null, experiment, indexInfo, false);
+					snapshots = IAPservice.getSnapshotsFromExperiment(
+							null, experiment, indexInfo, false,
+							exportIndividualAngles);
 					TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
 					for (String val : indexInfo.keySet())
 						cola.put(indexInfo.get(val), val);
@@ -138,14 +142,25 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 						indexHeader.append(separator + val);
 					csvHeader = StringManipulationTools.stringReplace(csvHeader, "\r\n", "");
 					csvHeader = StringManipulationTools.stringReplace(csvHeader, "\n", "");
-					csv.append(csvHeader + indexHeader.toString() + "\r\n");
+					if (exportIndividualAngles)
+						csv.append("angle" + separator + csvHeader + indexHeader.toString() + "\r\n");
+					else
+						csv.append(csvHeader + indexHeader.toString() + "\r\n");
 				} else {
-					snapshots = IAPservice.getSnapshotsFromExperiment(null, experiment, null, false);
+					snapshots = IAPservice.getSnapshotsFromExperiment(
+							null, experiment, null, false, exportIndividualAngles);
 					csv.append(csvHeader);
 				}
-				for (SnapshotDataIAP s : snapshots) {
-					boolean germanLanguage = false;
-					csv.append(s.getCSVvalue(germanLanguage, separator));
+				if (exportIndividualAngles) {
+					for (SnapshotDataIAP s : snapshots) {
+						boolean germanLanguage = false;
+						csv.append(s.getCSVvalue(germanLanguage, separator));
+					}
+				} else {
+					for (SnapshotDataIAP s : snapshots) {
+						boolean germanLanguage = false;
+						csv.append(s.getCSVvalue(germanLanguage, separator));
+					}
 				}
 				byte[] result = csv.toString().getBytes();
 				
@@ -154,12 +169,12 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				p.prepareTempDirectory();
 				p.saveReportCSV(result);
 				p.saveScripts(new String[] {
-							"diagramForReportPDF.r",
-							"diagramIAP.cmd",
-							"diagramIAP.bat",
-							"initLinux.r",
-							"report2.tex", "createDiagramFromValuesLinux.r"
-					});
+						"diagramForReportPDF.r",
+						"diagramIAP.cmd",
+						"diagramIAP.bat",
+						"initLinux.r",
+						"report2.tex", "createDiagramFromValuesLinux.r"
+				});
 				
 				p.executeRstat();
 				
