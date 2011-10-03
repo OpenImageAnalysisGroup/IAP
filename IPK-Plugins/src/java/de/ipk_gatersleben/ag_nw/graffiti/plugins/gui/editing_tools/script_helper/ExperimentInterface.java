@@ -108,4 +108,6 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	
 	public String toHTMLstring();
 	
+	public void numberConditions();
+	
 }
