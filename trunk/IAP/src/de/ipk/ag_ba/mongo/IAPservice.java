@@ -73,6 +73,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -504,7 +505,8 @@ public class IAPservice {
 			UrlCacheManager urlManager,
 			ExperimentInterface experiment,
 			HashMap<String, Integer> optSubstanceIds,
-			boolean prepareTransportToBrowser) {
+			boolean prepareTransportToBrowser,
+			boolean storeAllAngleValues) {
 		
 		StopWatch sw = new StopWatch("Create Snapshots");
 		
@@ -571,6 +573,12 @@ public class IAPservice {
 										sn.storeValue(idx, vvv);
 									} else
 										sn.storeValue(idx, mm.getValue());
+									if (storeAllAngleValues) {
+										for (NumericMeasurementInterface nmi : s) {
+											NumericMeasurement3D nmi3d = (NumericMeasurement3D) nmi;
+											sn.storeAngleValue(idx, nmi3d.getPosition(), nmi3d.getValue());
+										}
+									}
 								}
 							} else {
 								double mmSum = 0;

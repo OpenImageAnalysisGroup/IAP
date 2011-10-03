@@ -537,4 +537,12 @@ public class SnapshotDataIAP {
 		}
 		return res.toString();
 	}
+	
+	private transient HashMap<String, Double> position2store;
+	
+	public void storeAngleValue(int idx, Double position, double value) {
+		if (position2store == null)
+			position2store = new HashMap<String, Double>();
+		position2store.put(idx + ";" + position, value);
+	}
 }

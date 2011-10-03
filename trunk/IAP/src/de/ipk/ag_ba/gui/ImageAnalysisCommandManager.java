@@ -59,7 +59,8 @@ public class ImageAnalysisCommandManager {
 		if (SystemAnalysis.isHeadless())
 			actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 		// if (SystemAnalysis.isHeadless())
-		actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference), guiSetting));
+		actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false), guiSetting));
+		actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true), guiSetting));
 		String hsmf = IAPmain.getHSMfolder();
 		if (hsmf != null)
 			actions.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReference, hsmf), guiSetting));
