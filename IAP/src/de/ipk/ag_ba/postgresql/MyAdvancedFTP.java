@@ -82,7 +82,7 @@ public class MyAdvancedFTP {
 		}
 		
 		final ObjectRef myoutputstream = new ObjectRef();
-		BackgroundTaskHelper.lockAquire(server, 2);
+		BackgroundTaskHelper.lockAquire(server, 1);
 		try {
 			status.setCurrentStatusText1("Waiting for shared FTP connection");
 			status.setCurrentStatusText2("Server: " + server);
@@ -138,7 +138,7 @@ public class MyAdvancedFTP {
 				target.setBuf(null);
 				MainFrame.showMessage("Can't download " + downloadURL + ". File not available.", MessageType.INFO);
 			}
-			boolean autoClose = false;
+			boolean autoClose = true;
 			if (autoClose)
 				BackgroundTaskHelper.executeLaterOnSwingTask(10000, new Runnable() {
 					public void run() {

@@ -323,11 +323,11 @@ public class LemnaTecDataExchange {
 	private String getCoordinatorFromNameID(String kuerzel) {
 		if (id2coo == null) {
 			id2coo = new HashMap<String, String>();
-			id2coo.put("AC", "Arana, Fernando (HET)");
+			id2coo.put("AC", "Arana, Dr. Fernando (HET)");
 			id2coo.put("MM", "Muraya, Moses Mahugu (HET)");
 			id2coo.put("KN", "Neumann, Kerstin (GED)");
-			id2coo.put("KW", "Weigelt-Fischer, Kathleen (HET)");
-			id2coo.put("BA", "Klukas, Christian (BA)");
+			id2coo.put("KW", "Weigelt-Fischer, Dr. Kathleen (HET)");
+			id2coo.put("BA", "Klukas, Dr. Christian (BA)");
 		}
 		return id2coo.get(kuerzel);
 	}
@@ -830,7 +830,7 @@ public class LemnaTecDataExchange {
 						
 						NumericMeasurement water = new NumericMeasurement(sample);
 						water.setReplicateID(replicateID);
-						water.setUnit("(g)");
+						water.setUnit("g");
 						water.setValue(wa - wb);// sn.getWater_amount());
 						water.setQualityAnnotation(idTag);
 						

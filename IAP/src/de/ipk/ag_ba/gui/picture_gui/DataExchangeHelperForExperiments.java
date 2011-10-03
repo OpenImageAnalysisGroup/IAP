@@ -390,7 +390,7 @@ public class DataExchangeHelperForExperiments {
 																binaryFileInfo.getFileNameLabel(), binaryFileInfo);
 											myImage.imageAvailable = 1;
 											try {
-												SwingUtilities.invokeAndWait(new Runnable() {
+												BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
 													@Override
 													public void run() {
 														imageButton.updateLayout(null, myImage, myImage);

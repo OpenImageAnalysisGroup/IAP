@@ -444,9 +444,6 @@ public class MongoDB {
 		Runtime r = Runtime.getRuntime();
 		ArrayList<String> substanceIDs = new ArrayList<String>();
 		while (!sl.isEmpty()) {
-			System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
-					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
-			
 			SubstanceInterface s = sl.get(0);
 			sl.remove(0);
 			if (status != null && status.wantsToStop())
@@ -511,7 +508,7 @@ public class MongoDB {
 									ImageData id = (ImageData) m;
 									// boolean direct = true;
 									// if (direct) {
-									saveImageFileDirect(db, id, overallFileSize,
+									res = saveImageFileDirect(db, id, overallFileSize,
 												keepDataLinksToDataSource_safe_space);
 									
 									attributes.clear();
@@ -524,7 +521,7 @@ public class MongoDB {
 									// keepDataLinksToDataSource_safe_space));
 									// imageDataQueue.add(id);
 									// }
-									count++;
+									// count++;
 								}
 								if (m instanceof VolumeData) {
 									VolumeData vd = (VolumeData) m;
@@ -2422,8 +2419,8 @@ public class MongoDB {
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		if (image.getLabelURL() != null && isLabel == null) {
-			//System.out.println("No input stream for source-URL (label):  " + image.getURL());
-			//return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
+			// System.out.println("No input stream for source-URL (label):  " + image.getURL());
+			// return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 		
 		String[] hashes;
