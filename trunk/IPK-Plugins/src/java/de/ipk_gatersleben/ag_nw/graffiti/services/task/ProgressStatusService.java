@@ -45,7 +45,7 @@ public class ProgressStatusService implements HelperClass {
 			return "";
 		}
 		double currentSpeedUntilNow = 0;
-		if (currentStatusValueFine < lastProgress) {
+		if (currentStatusValueFine < lastProgress || System.currentTimeMillis() - firstUpdate > 30000) {
 			firstUpdate = thisUpdate;
 			firstStatusValueFine = currentStatusValueFine;
 		}
@@ -61,7 +61,7 @@ public class ProgressStatusService implements HelperClass {
 		double averageSpeed = 0;
 		for (int i = 0; i < initialFillStatus; i++)
 			averageSpeed += lastSpeeds[i] / initialFillStatus;
-		averageSpeed = averageSpeed * 1000; // percent per second
+		// averageSpeed = averageSpeed * 1000; // percent per second
 		
 		if (true)
 			averageSpeed = currentSpeedUntilNow;

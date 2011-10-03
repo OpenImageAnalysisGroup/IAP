@@ -24,6 +24,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -77,7 +78,17 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					MyByteArrayOutputStream bos = new MyByteArrayOutputStream();
 					BackgroundTaskStatusProviderSupportingExternalCallImpl status = new CommandLineBackgroundTaskStatusProvider(
 										false);
-					MyAdvancedFTP.processFTPdownload(status, ur, bos);
+					try {
+						MyAdvancedFTP.processFTPdownload(status, ur, bos);
+					} catch (Error e) {
+						System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: ERROR: FTP DOWNLOAD FAILED (" + e.getMessage() + ") // "
+								+ ur.substring(ur.indexOf("@")));
+						return null;
+					} catch (Exception e) {
+						System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: FTP DOWNLOAD FAILED (" + e.getMessage() + ") // "
+								+ ur.substring(ur.indexOf("@")));
+						return null;
+					}
 					MyByteArrayInputStream res = new MyByteArrayInputStream(bos.getBuff(), bos.size());
 					return res;
 				} else {
@@ -110,9 +121,9 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	}
 	
 	private Session session = null;
-	private final Channel channel = null;
+	private Channel channel = null;
 	
-	private ChannelSftp getChannel() throws Exception {
+	private synchronized ChannelSftp getChannel() throws Exception {
 		if (session == null || !session.isConnected()) {
 			JSch jsch = new JSch();
 			String host = "lemna-db.ipk-gatersleben.de";
@@ -125,10 +136,10 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 			session.connect();
 		}
 		
-		// if (channel == null || !channel.isConnected()) {
-		// channel = session.openChannel("sftp");
-		// channel.connect(30);
-		// }
+		if (channel == null || !channel.isConnected()) {
+			channel = session.openChannel("sftp");
+			channel.connect(30);
+		}
 		
 		ChannelSftp c = (ChannelSftp) channel;
 		return c;

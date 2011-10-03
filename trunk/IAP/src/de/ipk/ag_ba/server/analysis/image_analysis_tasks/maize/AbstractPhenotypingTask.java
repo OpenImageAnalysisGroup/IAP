@@ -179,7 +179,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						}
 					}
 				};
-				boolean threaded = true;
+				boolean threaded = false;
 				if (!threaded)
 					r.run();
 				else
