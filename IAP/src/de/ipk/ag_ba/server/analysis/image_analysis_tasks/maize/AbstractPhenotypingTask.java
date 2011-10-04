@@ -5,9 +5,11 @@ import info.StopWatch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
+import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -41,6 +43,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -129,10 +132,25 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final int workloadEqualAngleSnapshotSets = top + side;
 		
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS...");
+		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(this, SystemAnalysis.getNumberOfCPUs());
 		for (TreeMap<String, ImageSet> tm : workload) {
-			processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tm);
+			final TreeMap<String, ImageSet> tmf = tm;
+			maxCon.acquire(1);
+			Thread t = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tmf);
+					} catch (InterruptedException err) {
+						err.printStackTrace();
+					} finally {
+						maxCon.release(1);
+					}
+				}
+			}, "Snapshot Analysis");
+			t.start();
 		}
-		
+		maxCon.acquire(SystemAnalysis.getNumberOfCPUs());
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
@@ -179,7 +197,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						}
 					}
 				};
-				boolean threaded = false;
+				boolean threaded = true;
 				if (!threaded)
 					r.run();
 				else

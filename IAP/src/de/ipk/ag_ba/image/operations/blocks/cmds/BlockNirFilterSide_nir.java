@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import java.awt.Color;
-
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -62,21 +60,21 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 						nirMask = new FlexibleImage(nirMask.getWidth(), nirMask.getHeight(), nirRefArray).print("CLEANED UP REF", debug);
 					}
 				}
-				if (options.isMaize())
-					nirMask = new ImageOperation(nirImage).print("input", debug).compare()
-							.compareGrayImages(nirMask.print("ref", debug),
-									// 20, 12,
-									blackDiff, whiteDiff,
-									// 250, 12,
-									// 40, 40,
-									new Color(180, 180, 180).getRGB()).print("result of comparison", false).getImage(); // 150
-					
+				// if (options.isMaize())
+				// nirMask = new ImageOperation(nirImage).print("input", debug).compare()
+				// .compareGrayImages(nirMask.print("ref", debug),
+				// // 20, 12,
+				// blackDiff, whiteDiff,
+				// // 250, 12,
+				// // 40, 40,
+				// new Color(180, 180, 180).getRGB()).print("result of comparison", false).getImage(); // 150
+				
 				if (options.isMaize())
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
 							options.getBackground(), 0.08).getImage().print("ADAPT OUT", debug);
 				else
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
-							options.getBackground(), 0.05).getImage().print("ADAPT OUT", debug);
+							options.getBackground(), 0.08).getImage().print("ADAPT OUT", debug); // 0.05
 				getInput().getMasks().setNir(nirMask);
 				boolean useNirSkeleton = true;
 				if (useNirSkeleton) {
