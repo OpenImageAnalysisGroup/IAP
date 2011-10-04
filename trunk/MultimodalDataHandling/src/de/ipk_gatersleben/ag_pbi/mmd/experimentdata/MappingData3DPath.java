@@ -14,6 +14,8 @@ package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -75,11 +77,22 @@ public class MappingData3DPath {
 	}
 	
 	public static ExperimentInterface merge(ArrayList<MappingData3DPath> mappingpaths, boolean ignoreSnapshotFineTime) {
+		return merge(mappingpaths, ignoreSnapshotFineTime, null);
+	}
+	
+	public static ExperimentInterface merge(ArrayList<MappingData3DPath> mappingpaths, boolean ignoreSnapshotFineTime,
+				BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		
 		Experiment experiment = new Experiment();
 		
-		for (MappingData3DPath p : mappingpaths)
+		int idx = 0;
+		int max = mappingpaths.size();
+		for (MappingData3DPath p : mappingpaths) {
 			Substance.addAndMerge(experiment, p.getSubstance(), ignoreSnapshotFineTime);
+			idx++;
+			if (optStatus != null)
+				optStatus.setCurrentStatusValueFine(100d / max * idx);
+		}
 		
 		return experiment;
 	}

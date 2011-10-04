@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -108,7 +107,7 @@ public class LemnaTecDataExchange {
 		return result;
 	}
 	
-	private static WeakHashMap<String, Collection<ExperimentHeaderInterface>> memRes1 = new WeakHashMap<String, Collection<ExperimentHeaderInterface>>();
+	private static HashMap<String, Collection<ExperimentHeaderInterface>> memRes1 = new HashMap<String, Collection<ExperimentHeaderInterface>>();
 	private static long updateTime = -1;
 	
 	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database)

@@ -25,7 +25,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
-import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
@@ -160,6 +159,9 @@ public class TaskDescription {
 								Experiment e = new Experiment();
 								long tFinish = System.currentTimeMillis();
 								boolean removeWaterAndWeightDataFromSubsequentDatasets = false;
+								ArrayList<String> deleteIDs = new ArrayList<String>();
+								int iii = 0;
+								int mmm = knownResults.size();
 								for (ExperimentHeaderInterface i : knownResults) {
 									ExperimentInterface ei = m.getExperiment(i);
 									if (removeWaterAndWeightDataFromSubsequentDatasets) {
@@ -180,11 +182,16 @@ public class TaskDescription {
 										System.out.println();
 									}
 									removeWaterAndWeightDataFromSubsequentDatasets = true;
-									if (ei.getNumberOfMeasurementValues() > 0)
-										System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
+									// if (ei.getNumberOfMeasurementValues() > 0)
+									// System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
 									e.addAndMerge(ei);
-									m.deleteExperiment(i.getDatabaseId());
+									deleteIDs.add(i.getDatabaseId());
 									System.out.println("*****************************");
+									iii++;
+									if (statusProvider != null) {
+										statusProvider.setCurrentStatusText1("Merged dataset " + iii + "/" + mmm);
+										statusProvider.setCurrentStatusValueFine(100d / mmm * iii);
+									}
 								}
 								String sn = cmd.getRemoteCapableAnalysisActionClassName();
 								if (sn.indexOf(".") > 0)
@@ -199,8 +206,15 @@ public class TaskDescription {
 										ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
 									}
 								}
-								ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
-								e = (Experiment) MappingData3DPath.merge(mdpl, false);
+								boolean superMerge = false;
+								if (superMerge) {
+									ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
+									if (statusProvider != null)
+										statusProvider.setCurrentStatusText1("Merging Analysis Results");
+									e = (Experiment) MappingData3DPath.merge(mdpl, false);
+									if (statusProvider != null)
+										statusProvider.setCurrentStatusText1("Merged Analysis Results");
+								}
 								long tStart = cmd.getSubmissionTime();
 								long tProcessing = tFinish - tStart;
 								long minutes = tProcessing / 1000 / 60;
@@ -210,15 +224,28 @@ public class TaskDescription {
 								System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
 								System.out.println("*****************************");
 								System.out.println("Merged Experiment: " + e.getName());
-								System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
-								m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true), true);
+								// System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
+								m.saveExperiment(e, statusProvider, true); // new BackgroundTaskConsoleLogger("", "", true)
+								int idx = 0;
+								int max = deleteIDs.size();
+								if (statusProvider != null)
+									statusProvider.setCurrentStatusText1("Saved Merged Analysis Results");
+								for (String delID : deleteIDs) {
+									m.deleteExperiment(delID);
+									idx++;
+									if (statusProvider != null) {
+										statusProvider.setCurrentStatusText2("Deleted temp result " + idx + "/" + max);
+										statusProvider.setCurrentStatusValueFine(100d / max * idx);
+									}
+								}
 							}
 						} else
 							System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostName()
 									+ " has been claimed by " + bcmd.getOwner()
 									+ ". Therefore analysis result is not saved.");
 				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + e.getMessage());
+					e.printStackTrace();
 				}
 				finished = true;
 				if (autoClose) {
