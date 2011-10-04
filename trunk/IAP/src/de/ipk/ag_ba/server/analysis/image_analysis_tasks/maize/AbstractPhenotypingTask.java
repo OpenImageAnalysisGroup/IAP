@@ -132,7 +132,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final int workloadEqualAngleSnapshotSets = top + side;
 		
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS...");
-		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(this, SystemAnalysis.getNumberOfCPUs());
+		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(this, SystemAnalysis.getNumberOfCPUs() / 2);
 		for (TreeMap<String, ImageSet> tm : workload) {
 			final TreeMap<String, ImageSet> tmf = tm;
 			maxCon.acquire(1);
@@ -150,7 +150,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}, "Snapshot Analysis");
 			t.start();
 		}
-		maxCon.acquire(SystemAnalysis.getNumberOfCPUs());
+		maxCon.acquire(SystemAnalysis.getNumberOfCPUs() / 2);
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
