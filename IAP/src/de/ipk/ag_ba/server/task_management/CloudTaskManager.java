@@ -170,7 +170,10 @@ public class CloudTaskManager {
 										}
 									}
 								};
-								BackgroundThreadDispatcher.addTask(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName(), Integer.MIN_VALUE, Integer.MIN_VALUE);
+								Thread t = new Thread(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName());
+								t.setPriority(Thread.MIN_PRIORITY);
+								t.start();
+								
 							} catch (Exception e) {
 								System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: BATCH-CMD COULD NOT BE STARTED: " + e.getMessage());
 							}

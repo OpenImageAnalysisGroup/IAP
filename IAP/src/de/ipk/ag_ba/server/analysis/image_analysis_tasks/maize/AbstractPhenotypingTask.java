@@ -152,6 +152,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			t.start();
 		}
 		maxCon.acquire(SystemAnalysis.getNumberOfCPUs() / 2);
+		maxCon.release(SystemAnalysis.getNumberOfCPUs() / 2);
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
