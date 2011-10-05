@@ -32,8 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.ObjectRef;
@@ -56,6 +55,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * A number of commonly used image operation commands.
@@ -1428,14 +1428,14 @@ public class ImageOperation {
 				if (clusterID >= 0
 						&&
 						(
-								(
-								clusterDimensionMinWH[clusterID] < cutOffMinimumDimension
-								|| clusterSizes[clusterID] <= cutOffMinimumArea
-								)
-								|| (clusterDimensionMinWH[clusterID] >= cutOffMinimumDimension &&
+						(
+						clusterDimensionMinWH[clusterID] < cutOffMinimumDimension
+						|| clusterSizes[clusterID] <= cutOffMinimumArea
+						)
+						|| (clusterDimensionMinWH[clusterID] >= cutOffMinimumDimension &&
 						// toBeDeletedClusterIDs.contains(clusterID)
 						toBeDeletedClusterIDs[clusterID]
-								)))
+						)))
 					rgbArray[idx] = iBackgroundFill;
 			}
 		
@@ -1604,8 +1604,8 @@ public class ImageOperation {
 			boolean maize) {
 		
 		thresholdLAB3(width, height, img2d, resultImage,
-					lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB,
-					upperValueOfB, background, typ, maize, false, null, false);
+				lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB,
+				upperValueOfB, background, typ, maize, false, null, false);
 		
 	}
 	
@@ -1617,8 +1617,8 @@ public class ImageOperation {
 			boolean maize, boolean getRemoved) {
 		
 		thresholdLAB3(width, height, img2d, resultImage,
-					lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB,
-					upperValueOfB, background, typ, maize, false, null, getRemoved);
+				lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA, lowerValueOfB,
+				upperValueOfB, background, typ, maize, false, null, getRemoved);
 		
 	}
 	
@@ -1661,7 +1661,7 @@ public class ImageOperation {
 				bi = (int) ImageOperation.labCube[r][g][b + 512];
 				
 				if (resultImage[off] != background && (((Li > lowerValueOfL) && (Li < upperValueOfL) && (ai > lowerValueOfA) && (ai < upperValueOfA)
-								&& (bi > lowerValueOfB) && (bi < upperValueOfB)) && !isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft))) {
+						&& (bi > lowerValueOfB) && (bi < upperValueOfB)) && !isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft))) {
 					if (!getRemovedPixel)
 						resultImage[off] = imagePixels[off];
 					else
@@ -1755,7 +1755,13 @@ public class ImageOperation {
 		StopWatch s = new StopWatch("lab_cube", false);
 		final float step = 1f / 255f;
 		final float[][][] result = new float[256][256][256 * 3];
-		ExecutorService executor = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs() <= 6 ? SystemAnalysis.getNumberOfCPUs() : 6);
+		
+		int cpus = SystemAnalysis.getNumberOfCPUs();
+		if (cpus > 6)
+			cpus = cpus / 2;
+		
+		final Semaphore sema = BackgroundTaskHelper.lockGetSemaphore(null, cpus);
+		
 		final float cont = 16f / 116f;
 		for (int rr = 0; rr < 256; rr++) {
 			final int red = rr;
@@ -1827,16 +1833,23 @@ public class ImageOperation {
 							p[blue + 512] = bb;
 						}
 					}
+					sema.release(1);
 				}
 			};
-			executor.submit(r);
+			try {
+				sema.acquire(1);
+			} catch (InterruptedException e) {
+				throw new Error("LAB construction has been interrupted (AA)");
+			}
+			Thread t = new Thread(r, "LAB CUBE " + rr);
+			t.start();
 		}
-		executor.shutdown();
 		try {
-			executor.awaitTermination(1, TimeUnit.HOURS);
+			sema.acquire(cpus);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			throw new Error("LAB construction has been interrupted (BB)");
 		}
+		sema.release(cpus);
 		s.printTime();
 		analyzeCube(result);
 		return result;
@@ -3275,7 +3288,6 @@ public class ImageOperation {
 	 * @return
 	 * @author pape
 	 * @param K
-	 *           = 0.1..0.5
 	 */
 	public ImageOperation adaptiveThresholdForGrayscaleImage(int sizeOfRegion,
 			int assumedBackground, int newForeground, double K) {
@@ -3305,10 +3317,11 @@ public class ImageOperation {
 					}
 				}
 				// Find the threshold value
-				// thresh = median(valuesMask); // an alternative to the mean
+				// thresh = median(mean);
 				mean = mean(valuesMask);
 				double maxStandardDerivation = 128.; // for grayscale image with intensity g(x,y) in [0-255]
 				thresh = (int) (mean * (1 + K * (standardDerivation(valuesMask, mean) / maxStandardDerivation - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
+				
 				pix = img[i][j] & 0x0000ff;
 				if (pix > thresh) {
 					out[i][j] = newForeground;
