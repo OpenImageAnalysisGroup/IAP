@@ -398,6 +398,8 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static String getHSMfolder() {
+		if (true)
+			return null;
 		try {
 			if (new File("/media/nfs/hsm").exists())
 				return "/media/nfs/hsm";

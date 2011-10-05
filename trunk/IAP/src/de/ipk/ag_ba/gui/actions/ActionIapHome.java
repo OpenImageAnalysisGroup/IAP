@@ -68,7 +68,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		
 		NavigationButton serverStatusEntity = Other.getServerStatusEntity(false, src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
-		
+
 		String hsm = IAPmain.getHSMfolder();
 		if (hsm != null && new File(hsm).exists()) {
 			// add HSM entry
