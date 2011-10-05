@@ -14,6 +14,7 @@ import java.util.Date;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.bson.types.ObjectId;
 
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -231,10 +232,14 @@ public class TaskDescription {
 								if (statusProvider != null)
 									statusProvider.setCurrentStatusText1("Saved Merged Analysis Results");
 								for (String delID : deleteIDs) {
-									m.deleteExperiment(delID);
+									// m.deleteExperiment(delID);
+									ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(delID));
+									m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
 									idx++;
 									if (statusProvider != null) {
-										statusProvider.setCurrentStatusText2("Deleted temp result " + idx + "/" + max);
+										// statusProvider.setCurrentStatusText2("Deleted temp result " + idx + "/" + max);
+										statusProvider.setCurrentStatusText2("Marked temp result " + idx + "/" + max +
+												" as trashed");
 										statusProvider.setCurrentStatusValueFine(100d / max * idx);
 									}
 								}
