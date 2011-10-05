@@ -58,18 +58,18 @@ public class FlexibleImage {
 	
 	public FlexibleImage(IOurl url) throws IOException, Exception {
 		BufferedImage img = null;
-//		synchronized (url2image) {
-			img = url2image.get(url+"");
-			if (img!=null)
-				System.out.println("o ~ "+url);
-			else
-				System.out.println("- ~ "+url);
-			if (img==null) {
-				InputStream is = ResourceIOManager.getInputStreamMemoryCached(url);
-				img = ImageIO.read(is);
-				url2image.put(url+"", img);
-			}
-//		}
+		// synchronized (url2image) {
+		img = url2image.get(url + "");
+		if (img != null)
+			System.out.println("o ~ " + url);
+		// else
+		// System.out.println("- ~ "+url);
+		if (img == null) {
+			InputStream is = ResourceIOManager.getInputStreamMemoryCached(url);
+			img = ImageIO.read(is);
+			url2image.put(url + "", img);
+		}
+		// }
 		
 		if (img == null)
 			throw new Exception("Image could not be read: " + url);

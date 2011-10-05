@@ -288,6 +288,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				workLoadIndex++;
 			workload.add(is);
 		}
+		System.out.println(SystemAnalysisExt.getCurrentTime() + ">Processing " + workload.size() + " of " + replicateId2ImageSetSide.size() + " (subset "
+				+ workLoadIndex + "/" + numberOfSubsets + ")");
 		
 		if (max > 0)
 			while (workload.size() > max)

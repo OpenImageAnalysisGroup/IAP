@@ -107,6 +107,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			task.setInput(workload, null, m, workOnSubset, numberOfSubsets);
 			task.performAnalysis(pi, ti, status);
 			
+			if (status != null)
+				status.setCurrentStatusText1("Analysis finished");
+			
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
 			Collection<NumericMeasurementInterface> statRes = task.getOutput();
 			
@@ -125,6 +128,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			// mp.getSampleData().setRowId(-1);
 			// }
 			//
+			if (status != null)
+				status.setCurrentStatusText1("Create result dataset");
 			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 			statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
@@ -146,7 +151,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						statisticsResult.setHeader(cond.getExperimentHeader());
 				}
 			}
-			boolean addWaterData = workOnSubset < 5;
+			boolean addWaterData = workOnSubset == 0;
 			if (addWaterData) {
 				for (SubstanceInterface si : experimentToBeAnalysed) {
 					if (si.getName() != null && (si.getName().equals("weight_before") ||
@@ -169,8 +174,12 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				mpc = new MainPanelComponent(info, true);
 			} else {
 				// mpc = new MainPanelComponent("Running in batch-mode. Partial result is not shown at this place.");
+				if (status != null)
+					status.setCurrentStatusText1("Result-Receiver processes results");
 				resultReceiver.setExperimenData(statisticsResult);
 				resultReceiver.run();
+				if (status != null)
+					status.setCurrentStatusText1("Processing finished");
 			}
 			this.experimentResult = statisticsResult;
 		} catch (Exception e) {
