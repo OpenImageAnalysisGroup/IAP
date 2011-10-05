@@ -90,7 +90,7 @@ public class CloudTaskManager {
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
 							progressSum);
 					
-					int maxTasks = 2;
+					int maxTasks = 1;
 					if (maxTasks < 1)
 						maxTasks = 1;
 					int cpuDesire = 0;
