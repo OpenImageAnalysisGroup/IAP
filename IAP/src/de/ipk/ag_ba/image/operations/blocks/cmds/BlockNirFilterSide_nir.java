@@ -74,7 +74,7 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 							options.getBackground(), 0.08).getImage().print("ADAPT OUT", debug);
 				else
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
-							options.getBackground(), 0.08).getImage().print("ADAPT OUT", debug); // 0.05
+							options.getBackground(), 0.05).getImage().print("ADAPT OUT", debug);
 				getInput().getMasks().setNir(nirMask);
 				boolean useNirSkeleton = true;
 				if (useNirSkeleton) {

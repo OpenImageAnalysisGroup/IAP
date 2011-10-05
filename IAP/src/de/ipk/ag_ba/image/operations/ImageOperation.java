@@ -2932,7 +2932,10 @@ public class ImageOperation {
 				distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
 				pix = img[x][y] & 0x0000ff;
 				// if (y <= h / 2)
-				fac = ((factorsTopRight[0] - factorsCenter[0]) / maxDistToCenter * distToCenter + factorsCenter[0]);
+				double fff = (factorsTopRight[0] - factorsCenter[0]) / maxDistToCenter * distToCenter;
+				fac =
+						fff * fff * fff // 0....1 linear
+								+ factorsCenter[0];
 				// else
 				// fac = ((factorsBottomLeft[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsBottomLeft[0]);
 				pix = (int) (pix * fac);
@@ -3272,6 +3275,7 @@ public class ImageOperation {
 	 * @return
 	 * @author pape
 	 * @param K
+	 *           = 0.1..0.5
 	 */
 	public ImageOperation adaptiveThresholdForGrayscaleImage(int sizeOfRegion,
 			int assumedBackground, int newForeground, double K) {
@@ -3301,11 +3305,10 @@ public class ImageOperation {
 					}
 				}
 				// Find the threshold value
-				// thresh = median(mean);
+				// thresh = median(valuesMask); // an alternative to the mean
 				mean = mean(valuesMask);
 				double maxStandardDerivation = 128.; // for grayscale image with intensity g(x,y) in [0-255]
 				thresh = (int) (mean * (1 + K * (standardDerivation(valuesMask, mean) / maxStandardDerivation - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
-				
 				pix = img[i][j] & 0x0000ff;
 				if (pix > thresh) {
 					out[i][j] = newForeground;
