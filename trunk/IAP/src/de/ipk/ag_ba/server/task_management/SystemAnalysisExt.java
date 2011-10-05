@@ -24,6 +24,7 @@ import org.StringManipulationTools;
 import org.SystemInfo;
 
 import oshi.software.os.windows.WindowsHardwareAbstractionLayer;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class SystemAnalysisExt {
@@ -488,8 +489,10 @@ public class SystemAnalysisExt {
 		for (File f : File.listRoots()) {
 			res.add(f);
 		}
-		String[] roots = new String[] { "/media/nfs/hsm", "/media/data4", "/home", "/Users" };
+		String[] roots = new String[] { IAPmain.getHSMfolder(), "/media/data4", "/home", "/Users" };
 		for (String r : roots) {
+			if (r == null)
+				continue;
 			if (res.contains(r))
 				continue;
 			File hsm = new File(r);
