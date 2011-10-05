@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.bson.types.ObjectId;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -421,11 +422,16 @@ public class CloudComputingService {
 						System.out.println("> SAVE COMBINED EXPERIMENT...");
 						m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
 						// System.out.println("> DELETE TEMP DATA IS DISABLED!");
-						System.out.println("> DELETE TEMP DATA...");
+						// System.out.println("> DELETE TEMP DATA...");
+						System.out.println("> MARK TEMP DATA AS TRASHED...");
 						for (ExperimentHeaderInterface i : knownResults) {
 							try {
-								if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0)
-									m.deleteExperiment(experiment2id.get(i));
+								if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0) {
+									ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(experiment2id.get(i)));
+									m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+									
+									// m.deleteExperiment(experiment2id.get(i));
+								}
 								
 							} catch (Exception err) {
 								System.out.println("Could not delete experiment " + i.getExperimentName() + " (" +

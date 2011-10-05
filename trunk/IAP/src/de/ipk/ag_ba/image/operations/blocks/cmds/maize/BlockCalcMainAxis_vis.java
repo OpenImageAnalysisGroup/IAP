@@ -62,7 +62,7 @@ public class BlockCalcMainAxis_vis extends AbstractSnapshotAnalysisBlockFIS {
 					// getInput().getMasks().getVis().print("(Mask) Could not determine main axis angle (" + SystemAnalysisExt.getCurrentTime() + ")");
 				}
 				System.err.println("ERROR: BlockCalculateMainAxis: Could not determine main axis angle!");
-				getInput().getMasks().getVis().print("main axis problem");
+				// getInput().getMasks().getVis().print("main axis problem");
 			}
 		}
 		return getInput().getMasks().getVis();
