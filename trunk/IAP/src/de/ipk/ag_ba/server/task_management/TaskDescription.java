@@ -11,6 +11,7 @@ import info.StopWatch;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -131,12 +132,13 @@ public class TaskDescription {
 							sw.printTime();
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
 							
-							ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
+							TreeMap<Integer, ExperimentHeaderInterface> knownResults = new TreeMap<Integer, ExperimentHeaderInterface>();
 							for (ExperimentHeaderInterface i : m.getExperimentList(null)) {
 								if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
 									String[] cc = i.getExperimentName().split("§");
 									if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
 										String className = cc[0];
+										String partIdx = cc[1];
 										String partCnt = cc[2];
 										String submTime = cc[3];
 										String bcn = cmd.getRemoteCapableAnalysisActionClassName();
@@ -145,7 +147,7 @@ public class TaskDescription {
 										if (className.equals(bcn)
 												&& partCnt.equals(bpn)
 												&& submTime.equals(bst))
-											knownResults.add(i);
+											knownResults.put(Integer.parseInt(partIdx), i);
 										// else
 										// System.out.println("NO FIT: " + i.getExperimentname());
 									}
@@ -159,32 +161,11 @@ public class TaskDescription {
 								System.out.println("TODO: " + batch.getPartCnt() + ", RESULTS FINISHED: " + knownResults.size());
 								Experiment e = new Experiment();
 								long tFinish = System.currentTimeMillis();
-								boolean removeWaterAndWeightDataFromSubsequentDatasets = false;
 								ArrayList<String> deleteIDs = new ArrayList<String>();
 								int iii = 0;
 								int mmm = knownResults.size();
-								for (ExperimentHeaderInterface i : knownResults) {
+								for (ExperimentHeaderInterface i : knownResults.values()) {
 									ExperimentInterface ei = m.getExperiment(i);
-									if (removeWaterAndWeightDataFromSubsequentDatasets) {
-										ArrayList<SubstanceInterface> toBeRemoved = new ArrayList<SubstanceInterface>();
-										for (SubstanceInterface si : ei) {
-											if (si.getName() != null && (si.getName().equals("weight_before") ||
-													(si.getName().equals("water_weight") ||
-													si.getName().equals("water_sum")))) {
-												System.out.print(SystemAnalysisExt.getCurrentTime()
-														+ ">INFO: Remove duplicate water and weight data before adding results to merged dataset");
-												toBeRemoved.add(si);
-											}
-										}
-										for (SubstanceInterface si : toBeRemoved) {
-											ei.remove(si);
-											System.out.print(".");
-										}
-										System.out.println();
-									}
-									removeWaterAndWeightDataFromSubsequentDatasets = true;
-									// if (ei.getNumberOfMeasurementValues() > 0)
-									// System.out.println("Measurements: " + ei.getNumberOfMeasurementValues());
 									e.addAndMerge(ei);
 									deleteIDs.add(i.getDatabaseId());
 									System.out.println("*****************************");
