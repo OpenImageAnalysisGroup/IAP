@@ -112,7 +112,10 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				if (!limitToResuls)
 					if (currentUser == null || !currentUser.equals("public"))
 						res.add(new NavigationButton(
-								new CloundManagerNavigationAction(m, new ActionMongoExperimentsNavigation(m, false, true)), src.getGUIsetting()));
+								new CloundManagerNavigationAction(m,
+										new ActionMongoExperimentsNavigation(m, false, true),
+										false),
+								src.getGUIsetting()));
 				
 				if (!limitToResuls)
 					if (currentUser == null || !currentUser.equals("public"))

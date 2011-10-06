@@ -30,9 +30,13 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	private NavigationButton src;
 	private final MongoDB m;
 	private final ActionMongoExperimentsNavigation en;
+	private final boolean showMonitoringNodes;
 	
-	public CloundManagerNavigationAction(MongoDB m, ActionMongoExperimentsNavigation mongoExperimentsNavigationAction) {
+	public CloundManagerNavigationAction(MongoDB m,
+			ActionMongoExperimentsNavigation mongoExperimentsNavigationAction,
+			boolean showMonitoringNodes) {
 		super("Task- and Server-Management");
+		this.showMonitoringNodes = showMonitoringNodes;
 		this.m = m != null ? m : MongoDB.getDefaultCloud();
 		this.en = mongoExperimentsNavigationAction;
 	}
@@ -72,8 +76,13 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			boolean clusterAvailable = false;
 			for (CloudHost ip : hl) {
 				if (!ip.isClusterExecutionMode()) {
-					NavigationButton n = new NavigationButton(new ActionCloudHostInformation(m, ip), guiSetting);
-					res.add(n);
+					if (ip.getHostInfo() == null ||
+							((showMonitoringNodes && ip.getHostInfo().contains("monitoring:")) ||
+							(!showMonitoringNodes && !ip.getHostInfo().contains("monitoring:"))
+							)) {
+						NavigationButton n = new NavigationButton(new ActionCloudHostInformation(m, ip), guiSetting);
+						res.add(n);
+					}
 				} else
 					clusterAvailable = true;
 			}
