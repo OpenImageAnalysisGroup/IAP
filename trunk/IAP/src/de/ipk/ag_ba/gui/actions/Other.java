@@ -33,6 +33,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BackupSupport;
+import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -144,6 +145,21 @@ public class Other {
 				infoset.clear();
 				resultNavigationButtons.clear();
 				
+				// BackgroundTaskHelper.isTaskWithGivenReferenceRunning(referenceObject)
+				
+				for (MongoDB m : MongoDB.getMongos()) {
+					CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m,
+							null,
+							true);
+					try {
+						cmna.performActionCalculateResults(src);
+						for (NavigationButton o : cmna.getResultNewActionSet())
+							resultNavigationButtons.add(o);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				
 				resultNavigationButtons.add(new NavigationButton(new AbstractNavigationAction("Show full backup history") {
 					
 					private NavigationButton src;
@@ -203,40 +219,43 @@ public class Other {
 				String pc = IAPimages.getNetworkPConline();
 				String pcOff = IAPimages.getNetworkPCoffline();
 				
-				boolean rLocal = IAPservice.isReachable("localhost");
-				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("localhost",
-						simpleIcons ? "img/ext/computer.png" : "img/ext/computer.png"), src
-						.getGUIsetting()));
-				if (!rLocal)
-					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+				// boolean rLocal = IAPservice.isReachable("localhost");
+				// resultNavigationButtons.add(new NavigationButton(new ActionPortScan("localhost",
+				// simpleIcons ? "img/ext/computer.png" : "img/ext/computer.png"), src
+				// .getGUIsetting()));
+				// if (!rLocal)
+				// resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				boolean rBA13 = IAPservice.isReachable("ba-13.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-13",
-						simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
-						.getGUIsetting()));
-				if (!rBA13)
+				if (!rBA13) {
+					resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-13",
+							simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
+							.getGUIsetting()));
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+				}
 				
 				boolean rBA24 = IAPservice.isReachable("ba-24.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-24",
-						simpleIcons ? (rBA24 ? pc : pcOff) : "img/ext/macPro.png"), src
-						.getGUIsetting()));
-				if (!rBA24)
+				if (!rBA24) {
+					resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-24",
+							simpleIcons ? (rBA24 ? pc : pcOff) : "img/ext/macPro.png"), src
+							.getGUIsetting()));
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+				}
 				
 				boolean rLemnaDB = IAPservice.isReachable("lemna-db.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("lemna-db",
-						simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
-						.getGUIsetting()));
-				if (!rLemnaDB)
+				if (!rLemnaDB) {
+					resultNavigationButtons.add(new NavigationButton(new ActionPortScan("lemna-db",
+							simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
+							.getGUIsetting()));
 					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+				}
 				
-				boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
-				resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-03",
-						simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src
-						.getGUIsetting()));
-				if (!rBA03)
-					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+				// boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
+				// resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-03",
+				// simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src
+				// .getGUIsetting()));
+				// if (!rBA03)
+				// resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
 				// boolean rNW04 = IAPservice.isReachable("nw-04.ipk-gatersleben.de");
 				// resultNavigationButtons.add(new NavigationButton(new PortScanAction("NW-04",

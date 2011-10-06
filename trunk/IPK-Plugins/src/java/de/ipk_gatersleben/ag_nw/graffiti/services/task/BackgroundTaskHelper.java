@@ -60,9 +60,9 @@ public class BackgroundTaskHelper implements HelperClass {
 	 *           be shown, if set to false, a pane will be shown in the GUI.
 	 */
 	public BackgroundTaskHelper(Runnable workTask,
-						BackgroundTaskStatusProvider statusProvider,
-						String title, String taskName, boolean autoClose,
-						boolean showDialogIsTrue_ShowPanelIsFalse) {
+			BackgroundTaskStatusProvider statusProvider,
+			String title, String taskName, boolean autoClose,
+			boolean showDialogIsTrue_ShowPanelIsFalse) {
 		this.workTask = workTask;
 		this.statusProvider = statusProvider;
 		this.title = title;
@@ -72,9 +72,9 @@ public class BackgroundTaskHelper implements HelperClass {
 	}
 	
 	public BackgroundTaskHelper(Runnable workTask,
-						BackgroundTaskStatusProvider statusProvider,
-						String title, String taskName, boolean autoClose,
-						boolean showDialogIsTrue_ShowPanelIsFalse, int intialShowDelayForStatusPanel) {
+			BackgroundTaskStatusProvider statusProvider,
+			String title, String taskName, boolean autoClose,
+			boolean showDialogIsTrue_ShowPanelIsFalse, int intialShowDelayForStatusPanel) {
 		this(workTask, statusProvider, title, taskName, autoClose, showDialogIsTrue_ShowPanelIsFalse);
 		this.initalShowDelay = intialShowDelayForStatusPanel;
 	}
@@ -164,6 +164,27 @@ public class BackgroundTaskHelper implements HelperClass {
 			});
 			tso.setParam(0, checkStatus);
 			checkStatus.start();
+		} else {
+			final ThreadSafeOptions tso = new ThreadSafeOptions();
+			Timer checkStatus = new Timer(100, new ActionListener() {
+				boolean finishedCalled = false;
+				
+				public void actionPerformed(ActionEvent arg0) {
+					if (!runThread.isAlive()) {
+						if (!finishedCalled) {
+							finishedCalled = true;
+							synchronized (runningTasksRefrenceObjects) {
+								runningTasksRefrenceObjects.remove(referenceObject);
+							}
+							Timer checkStatusTimer = (Timer) tso.getParam(0, null);
+							if (checkStatusTimer != null)
+								checkStatusTimer.stop();
+						}
+					}
+				}
+			});
+			tso.setParam(0, checkStatus);
+			checkStatus.start();
 		}
 	}
 	
@@ -186,21 +207,21 @@ public class BackgroundTaskHelper implements HelperClass {
 	}
 	
 	public static void issueSimpleTask(String taskName, String progressText, Runnable backgroundTask, Runnable finishSwingTask, BackgroundTaskStatusProvider sp,
-						int delayForPanel) {
+			int delayForPanel) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText, "", backgroundTask, finishSwingTask);
 		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, taskName, true, false, delayForPanel);
 		bth.startWork(taskName);
 	}
 	
 	public static void issueSimpleTaskInWindow(String taskName, String progressText, Runnable backgroundTask, Runnable finishSwingTask,
-						BackgroundTaskStatusProvider sp) {
+			BackgroundTaskStatusProvider sp) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText, "", backgroundTask, finishSwingTask);
 		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, taskName, true, true);
 		bth.startWork(taskName);
 	}
 	
 	public static void issueSimpleTaskInWindow(String taskName, String progressText, Runnable backgroundTask, Runnable finishSwingTask,
-						BackgroundTaskStatusProvider sp, boolean modal, boolean autoclose) {
+			BackgroundTaskStatusProvider sp, boolean modal, boolean autoclose) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText, "", backgroundTask, finishSwingTask);
 		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, taskName, autoclose, true);
 		bth.setModalWindow(modal);
@@ -220,7 +241,7 @@ public class BackgroundTaskHelper implements HelperClass {
 	}
 	
 	public static void issueSimpleTask(String taskName, String progressText1, String progressText2, Runnable backgroundTask1, Runnable finishSwingTask,
-						boolean autoclose) {
+			boolean autoclose) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText1, progressText2, backgroundTask1, finishSwingTask);
 		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sbt, taskName, taskName, autoclose, false);
 		bth.startWork(taskName);

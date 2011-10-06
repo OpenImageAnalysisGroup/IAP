@@ -382,8 +382,8 @@ public class SnapshotDataIAP {
 		
 		String weightBeforeWatering = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null ? s.getWeightBefore() + "" : "");
 		String waterWeight = enDe(numberFormat_deTrue_enFalse, s.getWeightOfWatering() != null ? s.getWeightOfWatering() + "" : "");
-		String sumBA = s.getWeightBefore() != null && s.getWeightOfWatering() != null ?
-				(s.getWeightBefore() + s.getWeightOfWatering()) + "" : "";
+		String sumBA = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null && s.getWeightOfWatering() != null ?
+				(s.getWeightBefore() + s.getWeightOfWatering()) + "" : "");
 		String waterAmount = enDe(numberFormat_deTrue_enFalse, s.getWaterAmount() != null ? s.getWaterAmount() + "" : "");
 		if (store == null) {
 			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;
