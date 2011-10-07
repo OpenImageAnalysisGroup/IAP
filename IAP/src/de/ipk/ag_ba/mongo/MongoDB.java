@@ -127,7 +127,7 @@ public class MongoDB {
 		
 		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
 		res.add(getDefaultCloud());
-		res.add(new MongoDB("Data Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de,", null, null, HashType.MD5));
+		res.add(new MongoDB("Data Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
 		// } else
 		// res.add(getLocalDB());
 		// }
@@ -140,7 +140,7 @@ public class MongoDB {
 	
 	public static MongoDB getLocalDB() {
 		if (defaultLocalInstance == null)
-			defaultLocalInstance = new MongoDB("Local DB", "localCloud1", "localhost", "iap24", "iap24", HashType.MD5);
+			defaultLocalInstance = new MongoDB("Local DB", "localCloud1", "localhost", null, null, HashType.MD5);
 		return defaultLocalInstance;
 	}
 	
@@ -232,7 +232,7 @@ public class MongoDB {
 			throw (Exception) err.getParam(0, null);
 	}
 	
-	private static Mongo m;
+	private static HashMap<String, Mongo> m = new HashMap<String, Mongo>();
 	
 	WeakHashMap<Mongo, HashSet<String>> authenticatedDBs = new WeakHashMap<Mongo, HashSet<String>>();
 	
@@ -249,51 +249,52 @@ public class MongoDB {
 			do {
 				try {
 					DB db;
-					if (m == null) {
+					String key = optHosts + ";" + database;
+					if (m.get(key) == null) {
 						if (optHosts == null || optHosts.length() == 0) {
 							StopWatch s = new StopWatch("INFO: new Mongo()", false);
-							m = new Mongo();
-							m.slaveOk();
-							m.getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
-							m.getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
+							m.put(key, new Mongo());
+							m.get(key).slaveOk();
+							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
+							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime();
 						} else {
 							StopWatch s = new StopWatch("INFO: new Mongo(seeds)", false);
 							List<ServerAddress> seeds = new ArrayList<ServerAddress>();
 							for (String h : optHosts.split(","))
 								seeds.add(new ServerAddress(h));
-							m = new Mongo(seeds);
-							m.slaveOk();
-							m.getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
-							m.getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
+							m.put(key, new Mongo(seeds));
+							m.get(key).slaveOk();
+							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
+							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime();
 						}
-						if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains("admin")) {
-							DB dbAdmin = m.getDB("admin");
+						if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains("admin")) {
+							DB dbAdmin = m.get(key).getDB("admin");
 							try {
 								StopWatch s = new StopWatch("INFO: dbAdmin.authenticate()");
-								dbAdmin.authenticate("iap", "iap#2011".toCharArray());
+								dbAdmin.authenticate(optLogin, optPass.toCharArray());
 								s.printTime();
-								if (authenticatedDBs.get(m) == null)
-									authenticatedDBs.put(m, new HashSet<String>());
-								authenticatedDBs.get(m).add(database);
+								if (authenticatedDBs.get(m.get(key)) == null)
+									authenticatedDBs.put(m.get(key), new HashSet<String>());
+								authenticatedDBs.get(m.get(key)).add(database);
 							} catch (Exception err) {
 								// System.err.println("ERROR: " + err.getMessage());
 							}
 						}
 					}
-					db = m.getDB(database);
+					db = m.get(key).getDB(database);
 					
-					if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains(database))
+					if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains(database))
 						if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
 							try {
 								boolean auth = db.authenticate(optLogin, optPass.toCharArray());
 								if (!auth) {
 									// throw new Exception("Invalid MongoDB login data provided!");
 								} else {
-									if (authenticatedDBs.get(m) == null)
-										authenticatedDBs.put(m, new HashSet<String>());
-									authenticatedDBs.get(m).add(database);
+									if (authenticatedDBs.get(m.get(key)) == null)
+										authenticatedDBs.put(m.get(key), new HashSet<String>());
+									authenticatedDBs.get(m.get(key)).add(database);
 								}
 							} catch (Exception err) {
 								// System.err.println("ERROR: " + err.getMessage());
