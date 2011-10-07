@@ -178,6 +178,8 @@ public class CloudComputingService {
 										} else
 											if ((args[0] + "").toLowerCase().startsWith("monitor")) {
 												{
+													System.out.println(SystemAnalysisExt.getCurrentTime()
+															+ ">'monitor' - Report system info to cloud (join, but don't perform calculations)");
 													CloudComputingService cc = CloudComputingService.getInstance();
 													cc.setEnableCalculations(false);
 												}
