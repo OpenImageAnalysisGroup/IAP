@@ -320,6 +320,7 @@ public class ImageProcessorOptions {
 	
 	private Boolean isMaize = null;
 	private int nirBackground = new Color(180, 180, 180).getRGB();
+	private boolean highResMaize;
 	
 	public void setIsMaize(boolean isMaize) {
 		this.isMaize = isMaize;
@@ -333,5 +334,17 @@ public class ImageProcessorOptions {
 	
 	public int getNirBackground() {
 		return nirBackground;
+	}
+	
+	public boolean isBarleyInBarleySystem() {
+		return !isMaize() && !isHighResMaize();
+	}
+	
+	public void setHighResMaize(boolean highResMaize) {
+		this.highResMaize = highResMaize;
+	}
+	
+	public boolean isHighResMaize() {
+		return highResMaize;
 	}
 }
