@@ -99,6 +99,12 @@ public class ImageComparator {
 	}
 	
 	public ImageOperation compareGrayImages(FlexibleImage referenceImage, double maxDiffBlack, double maxDiffWhite, int background) {
+		boolean invert = false;
+		if (maxDiffBlack < 0 && maxDiffWhite < 0) {
+			invert = true;
+			maxDiffBlack = -maxDiffBlack;
+			maxDiffWhite = -maxDiffWhite;
+		}
 		
 		int[] imgInp = inputImage.getAs1A();
 		int[] imgRef = referenceImage.getAs1A();
@@ -114,8 +120,11 @@ public class ImageComparator {
 			int diff = Math.abs(in - ref);
 			int avg = (in + ref) / 2;
 			double maxDiff = avg / 255d * (maxDiffWhite - maxDiffBlack) + maxDiffBlack;
-			boolean equal = diff < maxDiff;
-			if (equal) {
+			boolean nearlyEqual = diff < maxDiff;
+			if (invert)
+				nearlyEqual = !nearlyEqual;
+			
+			if (nearlyEqual) {
 				result[index] = background;
 			} else {
 				result[index] = imgInp[index];

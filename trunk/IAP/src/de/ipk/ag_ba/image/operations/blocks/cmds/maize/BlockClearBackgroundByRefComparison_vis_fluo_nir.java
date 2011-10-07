@@ -19,6 +19,8 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 	
 	int back = ImageOperation.BACKGROUND_COLORint;
 	
+	boolean debug = true;
+	
 	@Override
 	protected FlexibleImage processVISmask() {
 		if (getInput().getImages().getVis() != null && getInput().getMasks().getVis() != null) {
@@ -107,11 +109,18 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 					int whiteDiff = options.getIntSetting(Setting.W_Diff_NIR_TOP);
 					return new ImageOperation(nir).compare()
 							.compareGrayImages(getInput().getMasks().getNir(), blackDiff, whiteDiff, options.getBackground())
-							.print("result nir", false).thresholdClearBlueBetween(150, 169).thresholdBlueHigherThan(240).border(2).getImage(); // 150 169 240
+							.print("result nir", debug).thresholdClearBlueBetween(150, 169).thresholdBlueHigherThan(240).border(2).getImage(); // 150 169 240
+				} else {
+					if (options.isHighResMaize())
+						return new ImageOperation(nir).compare()
+								.compareGrayImages(getInput().getMasks().getNir(), 10, 23, options.getBackground())
+								.print("result nir", debug).thresholdBlueHigherThan(240).border(2).getImage();
+					else
+						return new ImageOperation(nir).compare()
+								.compareGrayImages(getInput().getMasks().getNir(), -20, -13, options.getBackground())
+								.print("result nir", debug).getImage();// .thresholdBlueHigherThan(240).border(2).getImage();
+						
 				}
-				return new ImageOperation(nir).compare()
-						.compareGrayImages(getInput().getMasks().getNir(), 10, 23, options.getBackground())
-						.print("result nir", false).thresholdBlueHigherThan(240).border(2).getImage();
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");
 		} else {

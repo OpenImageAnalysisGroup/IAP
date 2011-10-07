@@ -1642,8 +1642,8 @@ public class ImageOperation {
 			maxDiffAleftBright = maize ? 3 : 3; // old maize 7
 			maxDiffArightBleft = maize ? 3 : 3; // old maize 7
 		} else {
-			maxDiffAleftBright = maize ? 11 : 11; // 15 old barley 3
-			maxDiffArightBleft = maize ? 7 : 11; // old barley 3
+			maxDiffAleftBright = maize ? 11 : 3; // 11; // 15 old barley 3
+			maxDiffArightBleft = maize ? 7 : 3;// 11; // old barley 3
 		}
 		
 		for (y = 0; y < height; y++) {
