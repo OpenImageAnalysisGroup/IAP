@@ -100,11 +100,10 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-//		options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
-
+		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
+		
 		options.setIsMaize(false);
 		
-		// Test Barley
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 100);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);

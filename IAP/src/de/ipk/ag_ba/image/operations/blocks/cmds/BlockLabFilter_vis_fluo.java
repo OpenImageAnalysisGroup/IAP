@@ -33,7 +33,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				dilate = 3;
 				result = labFilterVis(side, mask, orig, dilate, debug);
 			} else {
-				dilate = 4;
+				dilate = 0;
 				result = labFilterVis(side, mask, orig, dilate, debug);
 			}
 			return result;
@@ -42,6 +42,15 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private FlexibleImage labFilterVis(boolean sideImage, FlexibleImage mask, FlexibleImage orig, int dilate, boolean debug) {
 		FlexibleImageStack fis = new FlexibleImageStack();
+		
+		if (!sideImage && !options.isHighResMaize()) {
+			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 10);
+			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 80); // 98 // 130 gerste wegen topf
+			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
+			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 120);// 125
+			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
+		}
 		
 		FlexibleImage labResult = labFilter(
 				// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
