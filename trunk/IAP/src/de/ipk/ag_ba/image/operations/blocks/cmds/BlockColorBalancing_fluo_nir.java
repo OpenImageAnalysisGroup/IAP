@@ -54,9 +54,15 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processNIRimage() {
 		FlexibleImage input = getInput().getImages().getNir();
 		FlexibleImage res;
-		if (input != null)
-			res = balance(input, 180, false);
-		else
+		int rr = 180;
+		if (input != null) {
+			if (options.getCameraPosition() == CameraPosition.TOP && !options.isMaize()) // for barley top, background is black
+			{
+				if (options.isBarleyInBarleySystem())
+					rr = 150;
+			}
+			res = balance(input, rr, false);
+		} else
 			res = null;
 		return res;
 	}
@@ -65,9 +71,15 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processNIRmask() {
 		FlexibleImage input = getInput().getMasks().getNir();
 		FlexibleImage res;
-		if (input != null)
-			res = balance(input, 180, false);
-		else
+		int rr = 180;
+		if (input != null) {
+			if (options.getCameraPosition() == CameraPosition.TOP && !options.isMaize()) // for barley top, background is black
+			{
+				if (options.isBarleyInBarleySystem())
+					rr = 150;
+			}
+			res = balance(input, rr, false);
+		} else
 			res = input;
 		return res;
 	}

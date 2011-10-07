@@ -186,4 +186,13 @@ public class BlockLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalys
 			}
 		}
 	}
+	
+	@Override
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		super.postProcess(processedImages, processedMasks);
+		if (options != null && !options.isMaize())
+			if (processedImages != null && processedImages.getVis() != null && processedImages.getFluo() != null
+					&& processedImages.getVis().getHeight() > processedImages.getFluo().getHeight())
+				options.setHighResMaize(true);
+	}
 }
