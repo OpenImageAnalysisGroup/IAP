@@ -878,7 +878,10 @@ public class LemnaTecDataExchange {
 						try {
 							String a = sn.getUserDefinedCameraLabel();
 							String b = StringManipulationTools.getNumbersFromString(a);
-							position = Double.parseDouble(b);
+							if (b.length() == 0)
+								position = 0d;
+							else
+								position = Double.parseDouble(b);
 							if (position > 360)
 								throw new NumberFormatException("Number too large");
 						} catch (NumberFormatException nfe) {

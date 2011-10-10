@@ -93,7 +93,12 @@ public class ResourceIOManager {
 	
 	public static MyByteArrayInputStream getInputStreamMemoryCached(IOurl url) throws IOException, Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		InputStream is = url != null ? url.getInputStream() : null;
+		InputStream is = null;
+		try {
+			is = url != null ? url.getInputStream() : null;
+		} catch (Exception e) {
+			System.out.println("IO-ERROR " + e.getMessage() + " FOR URL " + url);
+		}
 		if (is == null)
 			return null;
 		if (is instanceof MyByteArrayInputStream) {
@@ -145,7 +150,7 @@ public class ResourceIOManager {
 		for (ResourceIOHandler mh : getInstance().handlers)
 			if (mh.getPrefix().startsWith(prefix))
 				return mh;
-
+		
 		if (prefix.contains("_"))
 			return getHandlerFromPrefix(prefix.substring(0, prefix.indexOf("_")));
 		else

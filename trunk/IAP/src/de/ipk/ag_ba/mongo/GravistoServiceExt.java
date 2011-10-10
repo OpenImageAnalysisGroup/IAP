@@ -6,13 +6,13 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.graffiti.editor.HashType;
 
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class GravistoServiceExt {
 	
@@ -24,50 +24,56 @@ public class GravistoServiceExt {
 		final ArrayList<ObjectRef> resultList = new ArrayList<ObjectRef>();
 		for (int i = 0; i < iss.length; i++)
 			resultList.add(new ObjectRef());
-		ArrayList<MyThread> wait = new ArrayList<MyThread>();
+		final Semaphore sema = BackgroundTaskHelper.lockGetSemaphore(null, iss.length);
 		for (int i = 0; i < iss.length; i++) {
 			final int iii = i;
-			wait.add(
-					BackgroundThreadDispatcher.addTask(new Runnable() {
-						@Override
-						public void run() {
-							InputStream is = iss[iii];
-							if (is == null)
-								return;
-							MessageDigest digest;
-							try {
-								digest = MessageDigest.getInstance(type.toString());
-							} catch (NoSuchAlgorithmException e1) {
-								throw new Error(e1);
+			Thread t = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						InputStream is = iss[iii];
+						if (is == null)
+							return;
+						MessageDigest digest;
+						try {
+							digest = MessageDigest.getInstance(type.toString());
+						} catch (NoSuchAlgorithmException e1) {
+							throw new Error(e1);
+						}
+						byte[] buffer = new byte[1024 * 1024];
+						int read = 0;
+						long len = 0;
+						try {
+							while ((read = is.read(buffer)) > 0) {
+								len += read;
+								digest.update(buffer, 0, read);
 							}
-							byte[] buffer = new byte[1024 * 1024];
-							int read = 0;
-							long len = 0;
+							if (optFileSize[iii] != null)
+								optFileSize[iii].addLong(len);
+						} catch (IOException e) {
+							ErrorMsg.addErrorMessage(e);
+						} finally {
 							try {
-								while ((read = is.read(buffer)) > 0) {
-									len += read;
-									digest.update(buffer, 0, read);
-								}
-								if (optFileSize[iii] != null)
-									optFileSize[iii].addLong(len);
+								is.close();
 							} catch (IOException e) {
 								ErrorMsg.addErrorMessage(e);
-							} finally {
-								try {
-									is.close();
-								} catch (IOException e) {
-									ErrorMsg.addErrorMessage(e);
-								}
 							}
-							
-							byte[] md5sum = digest.digest();
-							BigInteger bigInt = new BigInteger(1, md5sum);
-							String output = bigInt.toString(16);
-							resultList.get(iii).setObject(output);
 						}
-					}, "Hash Calculation (Stream " + i + ")", 30, 29));
+						
+						byte[] md5sum = digest.digest();
+						BigInteger bigInt = new BigInteger(1, md5sum);
+						String output = bigInt.toString(16);
+						resultList.get(iii).setObject(output);
+					} finally {
+						sema.release(1);
+					}
+				}
+			}, "Hash Calculation (Stream " + i + ")");
+			sema.acquire(1);
+			t.start();
 		}
-		BackgroundThreadDispatcher.waitFor(wait);
+		sema.acquire(iss.length);
+		sema.release(iss.length);
 		String[] res = new String[iss.length];
 		for (int i = 0; i < iss.length; i++)
 			res[i] = (String) resultList.get(i).getObject();
