@@ -12,10 +12,12 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -58,15 +60,42 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 			}
 		}
 		if (url.isEqualPrefix(getPrefix())) {
+			boolean lokalCache = true;
+			if (lokalCache) {
+				String detail = url.getDetail();
+				detail = "/Volumes/3TB_1/pgftp/" + detail.split("/", 2)[1];
+				String fn = detail;
+				File fff = new File(fn);
+				if (fff.exists()) {
+					IOurl u = FileSystemHandler.getURL(fff);
+					return ResourceIOManager.getInputStreamMemoryCached(u);
+				} else {
+					detail = url.getDetail();
+					detail = "/Volumes/3TB_2/pgftp2/" + detail.split("/", 2)[1];
+					fn = detail;
+					fff = new File(fn);
+					if (fff.exists()) {
+						IOurl u = FileSystemHandler.getURL(fff);
+						return ResourceIOManager.getInputStreamMemoryCached(u);
+					} else {
+						System.out.println("No cached copy for " + url);
+						return null;
+					}
+				}
+			}
 			boolean useSCP = false;
 			if (useSCP) {
-				ChannelSftp c = getChannel();
-				String detail = url.getDetail();
-				detail = "/data0/pgftp/" + detail.split("/", 2)[1];
-				c.cd(detail.substring(0, detail.lastIndexOf("/")));
-				String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
-				InputStream is = c.get(fn);
-				return is;
+				InputStream iss = null;
+				synchronized (PREFIX) {
+					ChannelSftp c = getChannel();
+					String detail = url.getDetail();
+					detail = "/data0/pgftp/" + detail.split("/", 2)[1];
+					c.cd(detail.substring(0, detail.lastIndexOf("/")));
+					String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
+					InputStream is = c.get(fn);
+					iss = ResourceIOManager.getInputStreamMemoryCached(is);
+				}
+				return iss;
 			} else {
 				boolean advancedFTP = true;
 				
