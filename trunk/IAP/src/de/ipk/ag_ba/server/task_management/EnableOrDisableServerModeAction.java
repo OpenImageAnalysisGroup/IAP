@@ -30,12 +30,12 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return CloudComputingService.getInstance().getStatusImageName();
+		return CloudComputingService.getInstance(m).getStatusImageName();
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return CloudComputingService.getInstance().getTaskNameEnableOrDisableActionText();
+		return CloudComputingService.getInstance(m).getTaskNameEnableOrDisableActionText();
 	}
 	
 	@Override
@@ -58,6 +58,6 @@ public class EnableOrDisableServerModeAction extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		CloudComputingService.getInstance().switchStatus(m);
+		CloudComputingService.getInstance(m).switchStatus(m);
 	}
 }

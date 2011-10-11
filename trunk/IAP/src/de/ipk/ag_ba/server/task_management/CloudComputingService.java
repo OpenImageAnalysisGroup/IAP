@@ -50,7 +50,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
  */
 public class CloudComputingService {
 	
-	static CloudComputingService instance = null;
+	static HashMap<MongoDB,CloudComputingService> instance = 
+new HashMap<MongoDB,CloudComputingService>();
 	
 	boolean active = false;
 	
@@ -60,10 +61,11 @@ public class CloudComputingService {
 		cloudTaskManager = new CloudTaskManager();
 	}
 	
-	public synchronized static CloudComputingService getInstance() {
-		if (instance == null)
-			instance = new CloudComputingService();
-		return instance;
+	public synchronized static CloudComputingService getInstance(MongoDB m) {
+		if (!instance.containsKey(m))
+			instance.put(m, new CloudComputingService());
+
+		return instance.get(m);
 	}
 	
 	private void checkStatus() {
@@ -107,8 +109,10 @@ public class CloudComputingService {
 		SystemAnalysis.simulateHeadless = true;
 		boolean clusterExecutionMode = false;
 		{
-			CloudComputingService cc = CloudComputingService.getInstance();
-			cc.setEnableCalculations(true);
+			for (MongoDB m : MongoDB.getMongos()) {
+				CloudComputingService cc = CloudComputingService.getInstance(m);
+				cc.setEnableCalculations(true);
+			}
 		}
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">DISABLE SUB-TASK MULTITHREADING");
 		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
@@ -180,15 +184,19 @@ public class CloudComputingService {
 												{
 													System.out.println(SystemAnalysisExt.getCurrentTime()
 															+ ">'monitor' - Report system info to cloud (join, but don't perform calculations)");
-													CloudComputingService cc = CloudComputingService.getInstance();
-													cc.setEnableCalculations(false);
+													for (MongoDB m : MongoDB.getMongos()) {
+														CloudComputingService cc = CloudComputingService.getInstance(m);
+														cc.setEnableCalculations(false);
+													}
 												}
 												
 											} else
 												if ((args[0] + "").toLowerCase().startsWith("backup")) {
 													{
-														CloudComputingService cc = CloudComputingService.getInstance();
-														cc.setEnableCalculations(false);
+														for (MongoDB m : MongoDB.getMongos()) {
+															CloudComputingService cc = CloudComputingService.getInstance(m);
+															cc.setEnableCalculations(false);
+														}
 													}
 													
 													BackupSupport sb = BackupSupport.getInstance();
@@ -247,7 +255,7 @@ public class CloudComputingService {
 			for (ResourceIOHandler handler : m.getHandlers())
 				ResourceIOManager.registerIOHandler(handler);
 			
-			CloudComputingService cc = CloudComputingService.getInstance();
+			CloudComputingService cc = CloudComputingService.getInstance(m);
 			cc.setClusterExecutionModeSingleTaskAndExit(clusterExecutionMode);
 			cc.switchStatus(m);
 			System.out.println("START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());

@@ -143,7 +143,8 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 	
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
-		if (processedMasks.getNir() == null || processedMasks.getFluo() == null) {
+		if (processedMasks.getNir() == null || processedMasks.getFluo() == null ||
+				processedMasks.getVis()==null) {
 			processedMasks.setNir(getInput().getMasks().getNir());
 			return;
 		}

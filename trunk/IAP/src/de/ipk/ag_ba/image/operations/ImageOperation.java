@@ -196,7 +196,14 @@ public class ImageOperation {
 		int h = image.getHeight();
 		int idx = 0;
 		float[] hsb = new float[3];
+		int x = 0;
+		int y = 0;
 		for (int c : in) {
+			x++;
+			if (x==w) {
+				y++;
+				x = 0;
+			}
 			if (c == background) {
 				in[idx++] = background;
 				continue;
@@ -217,7 +224,10 @@ public class ImageOperation {
 			float intensity = Float.NaN;
 			
 			intensity = 1 - rf / (float) ((255) + gf);
-			if (intensity > 210f / 255f)
+			double min = 210f / 255f;
+//			if (y>h*0.90d)
+				min = 150f / 255f;
+			if (intensity > min)
 				intensity = 1;
 			else
 				switch (type) {
@@ -233,6 +243,8 @@ public class ImageOperation {
 						Color.RGBtoHSB(rf, gf, 0, hsb);
 						hsb[2] = rf / 255f;
 						intensity = 1 - distanceToRed(hsb[0]) * (hsb[2]);
+						if (intensity>170f/255f)
+							intensity = 1;
 						break;
 					default:
 						throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");
@@ -1660,8 +1672,10 @@ public class ImageOperation {
 				ai = (int) ImageOperation.labCube[r][g][b + 256];
 				bi = (int) ImageOperation.labCube[r][g][b + 512];
 				
-				if (resultImage[off] != background && (((Li > lowerValueOfL) && (Li < upperValueOfL) && (ai > lowerValueOfA) && (ai < upperValueOfA)
-						&& (bi > lowerValueOfB) && (bi < upperValueOfB)) && !isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft))) {
+				if (resultImage[off] != background && (((Li > lowerValueOfL) && (Li < upperValueOfL)
+						&& (ai > lowerValueOfA) && (ai < upperValueOfA)
+						&& (bi > lowerValueOfB) && (bi < upperValueOfB))
+						&& !isGray(Li, ai, bi, maxDiffAleftBright, maxDiffArightBleft))) {
 					if (!getRemovedPixel)
 						resultImage[off] = imagePixels[off];
 					else
@@ -3487,5 +3501,30 @@ public class ImageOperation {
 			}
 		return new FlexibleImage(aa).getIO();
 	}
-	
+
+	public ImageOperation filterGray(int minBrightness, int maxAdiff, int maxBdiff) {
+		float[][] lab = getImage().getLab(true);
+		int w = getWidth();
+		int h = getHeight();
+		int[] in = getImageAs1array();
+		int res[] = new int[w*h];
+		for (int i = 0; i<w*h;i++) {
+			float l = lab[0][i];
+			float a = lab[1][i];
+			float b = lab[2][i];
+			if (l>minBrightness && Math.abs(a-127d)<maxAdiff && Math.abs(b-127d)<maxBdiff)
+				res[i]=BACKGROUND_COLORint;
+			else
+				res[i]=in[i];
+		}
+		return new ImageOperation(res, w, h);
+	}
+
+	private int getHeight() {
+		return image.getHeight();
+	}
+
+	private int getWidth() {
+		return image.getWidth();
+	}
 }

@@ -38,6 +38,17 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		FlexibleImage result = input;
 		int color = options.getBackground();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
+			
+			if (options.isBarleyInBarleySystem()) {
+				double temp = 0.01;
+	
+				int cy = (int) (input.getHeight() - temp * getInput().getImages().getVis().getHeight());
+				result = new ImageOperation(input).clearImageBottom(
+						cy, options.getBackground()).getImage();
+				getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
+				return result;
+			}
+			
 			// Clear bottom
 			if (debug)
 				color = Color.RED.getRGB();
@@ -67,6 +78,8 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		// Default
 		// TODO set default value as option 0.136 for maize
 		double markerPosLeftYDefault = input.getHeight() - (input.getHeight() * 0.05);
+		if (options.isBarleyInBarleySystem())
+			markerPosLeftYDefault = input.getHeight() - (input.getHeight() * 0.01);
 		int cy = (int) (markerPosLeftYDefault
 				- options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS));
 		result = new ImageOperation(result).clearImageBottom(
@@ -113,6 +126,9 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		// return getInput().getMasks().getFluo();
 		// default
 		double temp = 0.05;
+		if (options.isBarleyInBarleySystem())
+			temp = 0.01;
+
 		int cy = (int) (input.getHeight() - temp * getInput().getImages().getFluo().getHeight());
 		result = new ImageOperation(input).clearImageBottom(
 				cy, options.getBackground()).getImage();
@@ -129,6 +145,8 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			result = cutNir(input);
 			double temp = 0.05;
+			if (options.isBarleyInBarleySystem())
+				temp = 0.01;
 			int cy = (int) (input.getHeight() - temp * input.getHeight());
 			result = new ImageOperation(input).clearImageBottom(
 						cy, new Color(180, 180, 180).getRGB()).getImage();
