@@ -72,9 +72,13 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 				if (options.isMaize())
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
 							options.getBackground(), 0.08).getImage().print("ADAPT OUT", debug);
-				else
+				else {
+					double f  = 0.05;
+					if (options.isBarleyInBarleySystem())
+						f = 0.15;
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
-							options.getBackground(), 0.05).getImage().print("ADAPT OUT", debug);
+							options.getBackground(), f).getImage().print("ADAPT OUT", debug);
+				}
 				getInput().getMasks().setNir(nirMask);
 				boolean useNirSkeleton = true;
 				if (useNirSkeleton) {

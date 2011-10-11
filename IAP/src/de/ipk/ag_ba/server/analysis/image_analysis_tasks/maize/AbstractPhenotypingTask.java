@@ -107,7 +107,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		addTopOrSideImagesToWorkset(workload, 0, analyzeTopImages(), analyzeSideImages());
 		
-		// workload = filterWorkload(workload, "Athletico");// "Rainbow Amerindian"); // Athletico
+//		 workload = filterWorkload(workload, null);// "Athletico");// "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int workloadSnapshots = workload.size();
@@ -132,7 +132,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final int workloadEqualAngleSnapshotSets = top + side;
 		
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS...");
-		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(this.getClass(), SystemAnalysis.getNumberOfCPUs() / 2);
+		int nn = SystemAnalysis.getNumberOfCPUs() / 2+1;
+		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null,
+				nn);
 		for (TreeMap<String, ImageSet> tm : workload) {
 			final TreeMap<String, ImageSet> tmf = tm;
 			maxCon.acquire(1);
@@ -151,8 +153,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			t.setPriority(Thread.MIN_PRIORITY);
 			t.start();
 		}
-		maxCon.acquire(SystemAnalysis.getNumberOfCPUs() / 2);
-		maxCon.release(SystemAnalysis.getNumberOfCPUs() / 2);
+		maxCon.acquire(nn);
+		maxCon.release(nn);
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
@@ -221,13 +223,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + workloadSnapshots);
 	}
 	
-	private ArrayList<TreeMap<Double, ImageSet>> filterWorkload(ArrayList<TreeMap<Double, ImageSet>> workload, String filter) {
-		if (filter == null)
-			return workload;
-		ArrayList<TreeMap<Double, ImageSet>> res = new ArrayList<TreeMap<Double, ImageSet>>();
-		for (TreeMap<Double, ImageSet> tm : workload)
+	private ArrayList<TreeMap<String, ImageSet>> filterWorkload(
+				ArrayList<TreeMap<String, ImageSet>> workload,
+			String filter) {
+//		if (filter == null)
+//			return workload;
+		ArrayList<TreeMap<String, ImageSet>>  res = new ArrayList<TreeMap<String, ImageSet>>();
+		for (TreeMap<String, ImageSet>  tm : workload)
 			loopB: for (ImageSet is : tm.values()) {
 				if (is.getSampleInfo() != null)
+					if (filter==null) {
+						if (is.getSampleInfo().getTime() == 56) {
+							res.add(tm);
+							break loopB;
+						}
+						
+					} else
 					if (is.getSampleInfo().getParentCondition().toString().contains(filter) && !is.getSampleInfo().getParentCondition().toString().contains("wet"))
 						if (is.getSampleInfo().getTime() == 20 || is.getSampleInfo().getTime() == 31 || is.getSampleInfo().getTime() == 57) {
 							res.add(tm);

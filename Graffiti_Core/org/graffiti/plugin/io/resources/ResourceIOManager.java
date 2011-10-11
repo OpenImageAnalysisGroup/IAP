@@ -59,7 +59,7 @@ public class ResourceIOManager {
 			if (is != null)
 				return is;
 			else {
-				System.err.println("Could not create inputstream from URL " + url.toString() + "!");
+				//System.err.println("Could not create inputstream from URL " + url.toString() + "!");
 				return null;
 			}
 		}

@@ -1473,7 +1473,7 @@ public class MongoDB {
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
 					res.setTaskProgress(progress);
 					double load = SystemAnalysisExt.getRealSystemCpuLoad();
-					boolean monitor = !CloudComputingService.getInstance().getIsCalculationPossible();
+					boolean monitor = !CloudComputingService.getInstance(MongoDB.this).getIsCalculationPossible();
 					int wl = BackgroundThreadDispatcher.getWorkLoad();
 					StringBuilder diskHistory = new StringBuilder();
 					if (monitor) {

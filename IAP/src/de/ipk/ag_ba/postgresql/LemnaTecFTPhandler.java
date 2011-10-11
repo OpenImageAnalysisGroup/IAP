@@ -52,8 +52,11 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 				if (MongoDB.getDefaultCloud() != null) {
 					MongoDB dc = MongoDB.getDefaultCloud();
 					IOurl urlForCopiedData = dc.getURLforStoredData(url);
-					if (urlForCopiedData != null)
-						return urlForCopiedData.getInputStream();
+					if (urlForCopiedData != null) {
+						InputStream is = urlForCopiedData.getInputStream();
+						if (is!=null)
+							return is;
+					}
 				}
 			} catch (Exception e) {
 				System.out.println("ERROR: Could not check default cloud for cached input stream data url: " + e.getMessage());
@@ -62,25 +65,17 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		if (url.isEqualPrefix(getPrefix())) {
 			boolean lokalCache = true;
 			if (lokalCache) {
-				String detail = url.getDetail();
-				detail = "/Volumes/3TB_1/pgftp/" + detail.split("/", 2)[1];
-				String fn = detail;
-				File fff = new File(fn);
-				if (fff.exists()) {
-					IOurl u = FileSystemHandler.getURL(fff);
-					return ResourceIOManager.getInputStreamMemoryCached(u);
-				} else {
-					detail = url.getDetail();
-					detail = "/Volumes/3TB_2/pgftp2/" + detail.split("/", 2)[1];
-					fn = detail;
-					fff = new File(fn);
+				for (String path : new String[] {"/Volumes/3TB_1/pgftp/", "I:/", "J:/"}) {
+					String detail = url.getDetail();
+					detail = path + detail.split("/", 2)[1];
+					String fn = detail;
+					File fff = new File(fn);
 					if (fff.exists()) {
 						IOurl u = FileSystemHandler.getURL(fff);
-						return ResourceIOManager.getInputStreamMemoryCached(u);
-					} else {
-						System.out.println("No cached copy for " + url);
-						return null;
-					}
+						MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(u);
+						if (is!=null)
+							return is;
+					} 
 				}
 			}
 			boolean useSCP = false;
