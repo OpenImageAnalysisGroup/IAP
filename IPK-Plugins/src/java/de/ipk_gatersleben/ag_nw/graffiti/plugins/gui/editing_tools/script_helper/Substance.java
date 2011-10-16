@@ -140,45 +140,45 @@ public class Substance implements SubstanceInterface {
 	}
 	
 	public static void addAndMerge(ExperimentInterface result, SubstanceInterface tobeMerged, boolean ignoreSnapshotFineTime) {
-		SubstanceInterface save = null;
+		SubstanceInterface targetSubstance = null;
 		for (SubstanceInterface m : result)
 			if (tobeMerged.compareTo(m) == 0) {
-				save = m;
+				targetSubstance = m;
 				break;
 			}
 		
-		if (save == null)
+		if (targetSubstance == null)
 			result.add(tobeMerged);
 		else {
-			for (ConditionInterface s : tobeMerged) {
-				s.setParent(save);
-				save.addAndMergeData(s, ignoreSnapshotFineTime);
+			for (ConditionInterface cond : tobeMerged) {
+				cond.setParent(targetSubstance);
+				targetSubstance.addAndMergeData(cond, ignoreSnapshotFineTime);
 			}
 			tobeMerged.clear();
 			tobeMerged.setName("INVALID_MERGED_SKIP");
 		}
 	}
 	
-	public ConditionInterface addAndMergeData(ConditionInterface seriesnew, boolean ignoreSnapshotFineTime) {
-		ConditionInterface save = null;
-		for (ConditionInterface s : this)
-			if (s.compareTo(seriesnew) == 0) {
-				save = s;
+	public ConditionInterface addAndMergeData(ConditionInterface newCondition, boolean ignoreSnapshotFineTime) {
+		ConditionInterface targetCondition = null;
+		for (ConditionInterface cond : this)
+			if (cond.compareTo(newCondition) == 0) {
+				targetCondition = cond;
 				break;
 			}
 		
-		if (save == null) {
-			add(seriesnew);
-			return seriesnew;
+		if (targetCondition == null) {
+			add(newCondition);
+			return newCondition;
 		} else {
-			for (SampleInterface s : seriesnew) {
-				s.setParent(save);
-				save.addAndMerge(s, ignoreSnapshotFineTime);
+			for (SampleInterface s : newCondition) {
+				s.setParent(targetCondition);
+				targetCondition.addAndMerge(s, ignoreSnapshotFineTime);
 			}
-			seriesnew.clear();
-			seriesnew.setGenotype("INVALID_MERGED_SKIP");
+			newCondition.clear();
+			newCondition.setGenotype("INVALID_MERGED_SKIP");
 			
-			return save;
+			return targetCondition;
 		}
 	}
 	

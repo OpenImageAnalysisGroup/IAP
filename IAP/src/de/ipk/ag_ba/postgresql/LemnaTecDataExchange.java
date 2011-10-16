@@ -576,8 +576,14 @@ public class LemnaTecDataExchange {
 		return res;
 	}
 	
-	private String getCompAngleFromConfigLabel(String conf) {
-		String res = StringManipulationTools.getNumbersFromString(conf);
+	
+	private static HashMap<String,String> config2numbers = new HashMap<String,String>();
+	
+
+	private synchronized String getCompAngleFromConfigLabel(String conf) {
+		if (config2numbers.containsKey(conf))
+			config2numbers.put(conf, StringManipulationTools.getNumbersFromString(conf));
+		String res = config2numbers.get(conf);
 		return res;
 	}
 	

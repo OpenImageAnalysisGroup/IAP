@@ -20,7 +20,7 @@ public class Sample implements SampleInterface {
 	 * hashCode and eventually compareTo method implementation.
 	 */
 	private String measurementtool;
-	private long rowId;
+	private Long rowId;
 	private int time = -1;
 	private String timeUnit = "-1";
 	private TtestInfo ttestInfo = TtestInfo.EMPTY;
@@ -170,9 +170,13 @@ public class Sample implements SampleInterface {
 	}
 	
 	public void setAttribute(Attribute attr) {
-		if (attr == null || attr.getValue() == null)
+		String val = attr!=null ? attr.getValue() : null;
+		if (val == null)
 			return;
-		attr.setValue(StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#")));
+		if (val.length()>0 && val.contains("~"))
+			attr.setValue(StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#")));
+		else
+ 			attr.setValue(val);
 		
 		if (attr.getName().equals("id")) {
 			try {
@@ -240,7 +244,7 @@ public class Sample implements SampleInterface {
 		this.rowId = rowId;
 	}
 	
-	public long getRowId() {
+	public Long getRowId() {
 		return rowId;
 	}
 	
@@ -339,7 +343,7 @@ public class Sample implements SampleInterface {
 	@Override
 	public int compareTo(SampleInterface sd, boolean ignoreSnapshotFineTime) {
 		if (!ignoreSnapshotFineTime) {
-			int rr = ((Long) getRowId()).compareTo(sd.getRowId());
+			int rr = getRowId().compareTo(sd.getRowId());
 			if (rr != 0)
 				return rr;
 		}

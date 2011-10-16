@@ -821,7 +821,7 @@ public class SkeletonProcessor2d {
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = cutPositionY - s; y < cutPositionY + h * 0.1; y++) {
-				if (y < 0)
+				if (y < 0 || y>=h)
 					continue;
 				c = visImg[x][y];
 				if (c != ImageOperation.BACKGROUND_COLORint) {

@@ -151,9 +151,9 @@ public class ResourceIOManager {
 			if (mh.getPrefix().startsWith(prefix))
 				return mh;
 		
-		if (prefix.contains("_"))
-			return getHandlerFromPrefix(prefix.substring(0, prefix.indexOf("_")));
-		else
+//		if (prefix.contains("_"))
+//			return getHandlerFromPrefix(prefix.substring(0, prefix.indexOf("_")));
+//		else
 			return null;
 	}
 	

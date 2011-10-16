@@ -13,6 +13,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
 /**
  * @author klukas
@@ -61,7 +62,12 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 		
 		try {
 			active = true;
-			m.saveExperiment(experiment.getData(m), status);
+
+			ExperimentInterface exp = experiment.getData(m); // .clone();
+			
+			exp.getHeader().setOriginDbId(experiment.getHeader().getDatabaseId());
+
+			m.saveExperiment(exp, status);
 		} finally {
 			active = false;
 		}

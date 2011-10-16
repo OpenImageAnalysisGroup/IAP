@@ -124,7 +124,7 @@ public class Condition implements ConditionInterface {
 		if (!oldStyleIgnoringGrowthcondition) {
 			if (cached && conditionCache != null)
 				return conditionCache;
-			String res = getExperimentName() + ": " + getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
+			String res = /* getExperimentName() + ": " + */ getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
 					+ getGrowthconditions() + " / " + getVariety() + "/" + getSequence();
 			if (cached)
 				conditionCache = res;

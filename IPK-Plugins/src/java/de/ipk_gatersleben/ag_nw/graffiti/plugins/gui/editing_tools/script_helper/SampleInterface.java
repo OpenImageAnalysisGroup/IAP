@@ -67,7 +67,7 @@ public interface SampleInterface extends MappingDataEntity, Comparable<SampleInt
 	
 	public abstract void setRowId(long rowId);
 	
-	public abstract long getRowId();
+	public abstract Long getRowId();
 	
 	public abstract void setTtestInfo(TtestInfo ttestInfo);
 	

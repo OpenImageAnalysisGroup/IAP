@@ -90,7 +90,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput().getMasks().getFluo() == null)
+		if (getInput().getMasks().getFluo() == null || getInput().getMasks().getVis()==null)
 			return null;
 		
 		FlexibleImage input = getInput().getMasks().getFluo();
