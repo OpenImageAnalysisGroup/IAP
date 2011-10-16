@@ -178,7 +178,7 @@ public class XmlDataChartComponent extends JComponent {
 		if (isShowing())
 			validate();
 		else
-			validateTree();
+			validate(); // JRE7 bug validateTree();
 	}
 	
 	public static JPanel prettifyChart(org.graffiti.graph.GraphElement ge,
