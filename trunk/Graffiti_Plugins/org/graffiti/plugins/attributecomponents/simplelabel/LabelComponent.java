@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: LabelComponent.java,v 1.1 2011-01-31 09:03:40 klukas Exp $
+// $Id: LabelComponent.java,v 1.2 2011-10-16 12:06:01 klukas Exp $
 
 package org.graffiti.plugins.attributecomponents.simplelabel;
 
@@ -60,7 +60,7 @@ import org.graffiti.util.Pair;
 /**
  * This component represents a label for a node or an edge.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class LabelComponent extends AbstractAttributeComponent implements
 					GraphicAttributeConstants {
@@ -221,7 +221,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 		if (isShowing())
 			validate();
 		else
-			validateTree();
+			validate(); // JRE7 bug	validateTree();
 	}
 	
 	private void updateBorderOrShadow(double strokeWidth) {

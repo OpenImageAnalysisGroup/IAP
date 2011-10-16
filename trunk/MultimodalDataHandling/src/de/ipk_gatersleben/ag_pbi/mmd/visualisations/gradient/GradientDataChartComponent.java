@@ -114,7 +114,7 @@ public class GradientDataChartComponent extends JComponent {
 		if (isShowing())
 			validate();
 		else
-			validateTree();
+			validate();// JRE7 bug validateTree();
 	}
 	
 	private JFreeChart createChart(GradientCharts gc, IntervalXYDataset dataset, ChartOptions co) {

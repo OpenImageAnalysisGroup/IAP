@@ -109,7 +109,7 @@ public class ChartAttributeComponent extends AbstractAttributeComponent
 		if (isShowing())
 			validate();
 		else
-			validateTree();
+			validate(); // JRE7 bug		validateTree();
 	}
 	
 	private boolean isLabelTop() {

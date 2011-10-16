@@ -142,6 +142,8 @@ public class BlockPipeline {
 			status.setCurrentStatusText1("T=" + ((b - a) / 1000) + "s");
 		}
 		System.out.print("PET: " + (b - a) / 1000 + "s ");
+		if (pipelineExecutionsWithinCurrentHour%5==0)
+			System.out.println();
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);
 		updatePipelineStatistics();
 		return input;

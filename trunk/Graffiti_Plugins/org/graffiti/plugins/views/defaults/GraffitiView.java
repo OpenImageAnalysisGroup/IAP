@@ -6,7 +6,7 @@
 // Copyright (c) 2003-2009 IPK-Gatersleben
 //
 // ==============================================================================
-// $Id: GraffitiView.java,v 1.2 2011-02-05 20:33:32 klukas Exp $
+// $Id: GraffitiView.java,v 1.3 2011-10-16 12:06:01 klukas Exp $
 
 package org.graffiti.plugins.views.defaults;
 
@@ -619,7 +619,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		if (isShowing())
 			validate();
 		else
-			validateTree();
+			validate(); //JRE7 bug	validateTree();
 		
 		adjustPreferredSize(true);
 		
@@ -1706,7 +1706,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * DOCUMENT ME!
 	 * 
 	 * @author $Author: klukas $
-	 * @version $Revision: 1.2 $ $Date: 2011-02-05 20:33:32 $
+	 * @version $Revision: 1.3 $ $Date: 2011-10-16 12:06:01 $
 	 */
 	class ZoomedMouseListener implements MouseListener {
 		/** DOCUMENT ME! */
@@ -1762,7 +1762,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * DOCUMENT ME!
 	 * 
 	 * @author $Author: klukas $
-	 * @version $Revision: 1.2 $ $Date: 2011-02-05 20:33:32 $
+	 * @version $Revision: 1.3 $ $Date: 2011-10-16 12:06:01 $
 	 */
 	class ZoomedMouseMotionListener implements MouseMotionListener {
 		/** DOCUMENT ME! */
