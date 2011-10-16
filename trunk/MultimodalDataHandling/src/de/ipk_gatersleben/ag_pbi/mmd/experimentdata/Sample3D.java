@@ -164,7 +164,7 @@ public class Sample3D extends Sample {
 	
 	@Override
 	public void setAttribute(Attribute attr) {
-		if (attr == null || attr.getValue() == null)
+		if (attr == null || attr.getValue() == null || attr.getValue().length()==0)
 			return;
 		if (attr.getName().equals("component"))
 			setComponent(attr.getValue());

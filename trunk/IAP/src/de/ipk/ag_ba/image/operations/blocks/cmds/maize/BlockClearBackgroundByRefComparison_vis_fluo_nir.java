@@ -19,7 +19,7 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 	
 	int back = ImageOperation.BACKGROUND_COLORint;
 	
-	boolean debug = true;
+	boolean debug = false;
 	
 	@Override
 	protected FlexibleImage processVISmask() {

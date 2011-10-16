@@ -55,9 +55,9 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		GUIsetting guiSetting = src.getGUIsetting();
-		// NavigationButton startOrStopServerMode = new NavigationButton(
-		// new EnableOrDisableServerModeAction(m), guiSetting);
-		// res.add(startOrStopServerMode);
+		 NavigationButton startOrStopServerMode = new NavigationButton(
+		 new EnableOrDisableServerModeAction(m), guiSetting);
+		 res.add(startOrStopServerMode);
 		
 		try {
 			NavigationButton jobStatus = new NavigationButton(new ActionJobStatus(m), src.getGUIsetting());

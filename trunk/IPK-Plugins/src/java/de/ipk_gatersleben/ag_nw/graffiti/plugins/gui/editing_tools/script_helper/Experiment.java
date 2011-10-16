@@ -443,7 +443,7 @@ public class Experiment implements ExperimentInterface {
 			Experiment mainDataset = results.get(0);
 			for (int i = 1; i < results.size(); i++) {
 				ExperimentInterface toBeAdded = results.get(i);
-				Experiment.addAndMerge(mainDataset, toBeAdded);
+				mainDataset.addAndMerge(toBeAdded);
 			}
 			return mainDataset;
 		}
