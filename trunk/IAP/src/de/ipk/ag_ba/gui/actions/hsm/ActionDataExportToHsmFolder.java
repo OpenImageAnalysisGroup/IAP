@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -132,7 +133,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		this.src = src;
 		this.errorMessage = null;
 		try {
-			status.setCurrentStatusText1("Load Experiment");
+			status.setCurrentStatusText1("Clone Experiment");
 			final ExperimentInterface experiment = experimentReference.getData(m).clone();
 			
 			status.setCurrentStatusText1("Store Files...");
@@ -180,17 +181,17 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				System.out.println("OK: File transfer of experiment " + experimentReference.getExperimentName() + " to HSM complete (saved " + idx
 						+ " files). Saving XML... // " + SystemAnalysisExt.getCurrentTime());
 				status.setCurrentStatusText1("Finalize storage");
-				status.setCurrentStatusText1("Index Created");
+				status.setCurrentStatusText2("Index Created");
 			} else {
 				status.setCurrentStatusText1("Data Transfer Incomplete");
-				status.setCurrentStatusText1("Could not save valid dataset");
+				status.setCurrentStatusText2("Could not save valid dataset");
 				System.out.println("ERROR: File transfer of experiment " + experimentReference.getExperimentName() + " to HSM incomplete (" + errorCount
 						+ " errors). // " + SystemAnalysisExt.getCurrentTime());
 			}
 			experiment.getHeader().setRemark(experiment.getHeader().getRemark() + " // HSM transfer errors: " + errorCount);
 			experiment.getHeader().setStorageTime(new Date());
 			
-			createIndexFiles(experiment, hsmManager);
+			createIndexFiles(experiment, hsmManager, status);
 			status.setCurrentStatusValueFine(100d);
 			
 			this.mb = (written.getLong() / 1024 / 1024) + "";
@@ -409,14 +410,21 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		return fileName;
 	}
 	
-	private void createIndexFiles(final ExperimentInterface experiment, final HSMfolderTargetDataManager hsmManager) {
+	private void createIndexFiles(final ExperimentInterface experiment, final HSMfolderTargetDataManager hsmManager,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		try {
 			long tsave = System.currentTimeMillis();
 			int eidx = 0;
 			LinkedHashMap<File, String> tempFile2fileName = new LinkedHashMap<File, String>();
 			for (ExperimentInterface ei : experiment.split()) {
-				storeXMLdataset(experiment, hsmManager, tsave, eidx, tempFile2fileName, ei);
+				if (optStatus!=null)
+					optStatus.setCurrentStatusText1("Create XML File");
+				storeXMLdataset(experiment, hsmManager, tsave, eidx, tempFile2fileName, ei, optStatus);
+				if (optStatus!=null)
+					optStatus.setCurrentStatusText1("Create Condition File");
 				storeConditionIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
+				if (optStatus!=null)
+					optStatus.setCurrentStatusText1("Create Index File");
 				storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
 				
 				eidx++;
@@ -621,10 +629,11 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	}
 	
 	private void storeXMLdataset(final ExperimentInterface experiment, final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
-			LinkedHashMap<File, String> tempFile2fileName, ExperimentInterface ei)
+			LinkedHashMap<File, String> tempFile2fileName, ExperimentInterface ei,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws IOException {
 		TextFile tf = new TextFile();
-		tf.add(Experiment.getString(ei));
+		tf.add(Experiment.getString(ei, optStatus));
 		File f = new File(hsmManager.prepareAndGetDataFileNameAndPath(experiment.getHeader(), null, "in_progress_"
 				+ UUID.randomUUID().toString()));
 		tf.write(f); // to temp file

@@ -289,7 +289,8 @@ public class BlockPropertiesImpl implements BlockProperties {
 			for (int col = 0; col <= numericResults.getLastColumn(); col++) {
 				String id = numericResults.getColumnHeading(col);
 				double val = numericResults.getValueAsDouble(col, row);
-				setNumericProperty(position, id_prefix + id, val);
+				if (!Double.isNaN(val))
+					setNumericProperty(position, id_prefix + id, val);
 			}
 		}
 	}
