@@ -56,7 +56,10 @@ public class Sample3D extends Sample {
 				if (key.equals("measurements"))
 					continue;
 				Object o = map.get(key);
-				setAttribute(new Attribute(key, o + ""));
+				if (o instanceof String)
+					setAttribute(new Attribute(key, (String)o));
+				else
+					setAttribute(new Attribute(key, o + ""));
 			}
 		}
 	}

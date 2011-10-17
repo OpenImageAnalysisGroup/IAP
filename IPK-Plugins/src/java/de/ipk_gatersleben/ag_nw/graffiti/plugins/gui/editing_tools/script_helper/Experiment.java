@@ -333,7 +333,9 @@ public class Experiment implements ExperimentInterface {
 				StringBuilder r = new StringBuilder();
 				int measurementcount = 0;
 				for (String substance : substances2conditions.keySet()) {
-					
+					if (status != null)
+						status.setCurrentStatusText2("Process "+substance);
+
 					SubstanceInterface s = null;
 					
 					for (SubstanceInterface sub : mappingDataList)
@@ -401,8 +403,9 @@ public class Experiment implements ExperimentInterface {
 		return getDocuments(mappingDataList, null, false);
 	}
 	
-	public static String getString(ExperimentInterface mappingDataList) {
-		ArrayList<String> res = getStrings(mappingDataList, null, true);
+	public static String getString(ExperimentInterface mappingDataList,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		ArrayList<String> res = getStrings(mappingDataList, optStatus, true);
 		if (res.size() > 1)
 			ErrorMsg.addErrorMessage("Internal error: request for merged string representation returned more than one string!");
 		return res.iterator().next();
@@ -565,7 +568,7 @@ public class Experiment implements ExperimentInterface {
 	}
 	
 	public String toStringWithErrorThrowing() throws IOException, TransformerException, JDOMException {
-		return getString(this);
+		return getString(this, null);
 	}
 	
 	public void trimToSize() {

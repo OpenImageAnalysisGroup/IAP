@@ -1252,6 +1252,17 @@ public class MongoDB {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+		int nmin = Integer.MAX_VALUE;
+		int nmax = 0;
+		if (experiment!=null) {
+			for (SubstanceInterface si : experiment) {
+				if (si.size()>nmax)
+					nmax = si.size();
+				if (si.size()<nmin)
+					nmin = si.size();
+			}
+			System.out.println("Condition-Count: "+nmin+"..."+nmax);
+		}
 		return experiment;
 	}
 	
