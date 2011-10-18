@@ -48,7 +48,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Cloud Computing";
+		return "Cloud Computing ("+m.getDatabaseName()+")";
 	}
 	
 	@Override

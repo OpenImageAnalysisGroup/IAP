@@ -489,7 +489,9 @@ public class SystemAnalysisExt {
 		for (File f : File.listRoots()) {
 			res.add(f);
 		}
-		String[] roots = new String[] { IAPmain.getHSMfolder(), "/media/data4", "/home", "/Users" };
+		String[] roots = new String[] { IAPmain.getHSMfolder(),
+				"/media/data4", "/home", "/Users",
+				"/backups", "/data0"};
 		for (String r : roots) {
 			if (r == null)
 				continue;
