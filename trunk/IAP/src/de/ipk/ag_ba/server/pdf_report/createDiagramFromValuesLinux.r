@@ -16,8 +16,19 @@ if(FALSE){
 		dev.off()
 	}
 	
+	options(error = quote({
+		sink(file="error.txt", split = TRUE);
+		dump.frames();
+		print(attr(last.dump,"error.message"));
+		#x <- attr(last.dump,"error.message")
+		traceback();
+		sink(file=NULL);		
+		#q()
+	}))
 	
-	fileName <- "report.csv"
+	
+	#fileName <- "report.csv"
+	fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
 	#saveName="OutputDiagramm"
 	saveFormat="png"
 	imageWidth="1280"
@@ -28,33 +39,38 @@ if(FALSE){
 	#boxplot <- Standard Boxplot
 	#!boxplot <- für xy-Diagramm (vorerst Descriptor vs. Day)
 	
-	#diagrammTyp="boxplotStacked"
-	diagramTyp="!boxplot"
+	diagramTyp="boxplotStacked"
+	#diagramTyp="!boxplot"
 	isGray="false"
 	#isGray="true"
-	#treatment="Treatment"
-	treatment="none"
-	filterTreatment="none"
-	#filterTreatment="normal$dry"
+	treatment="Treatment"
+	#treatment="none"
+	#filterTreatment="none"
+	filterTreatment="normal$dry"
 	secondTreatment="none"
 	filterSecondTreatment="none"
 	filterXaxis="none"
 	#filterXaxis=c("6$8$10$12")
 	xAxis="Day (Int)"
-	descriptor="Water (weight-diff)"
+	#descriptor="Water (weight-diff)"
 	#descriptor="Repl.ID"
 	#descriptor <- c("side.nir.histogram.bin.1.0_36$side.nir.histogram.bin.2.36_72$side.nir.histogram.bin.3.72_109$side.nir.histogram.bin.4.109_145$side.nir.histogram.bin.5.145_182$side.nir.histogram.bin.6.182_218$side.nir.histogram.bin.7.218_255")
 	#descriptor <- c("side.fluo.chlorophyl.normalized.histogram.bin.1.0_36$side.fluo.chlorophyl.normalized.histogram.bin.2.36_72$side.fluo.chlorophyl.normalized.histogram.bin.3.72_109$side.fluo.chlorophyl.normalized.histogram.bin.4.109_145$side.fluo.chlorophyl.normalized.histogram.bin.5.145_182$side.fluo.chlorophyl.normalized.histogram.bin.6.182_218$side.fluo.chlorophyl.normalized.histogram.bin.7.218_255")
 	#descriptor <- c("Wert1$Wert2$Wert3$Wert4")
+	
+	#descriptor <- "side.leaf.length.avg (px)"
+	descriptor <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255")
+	yAxisName <- c("NIR absorption class (%)")
+	
 	showResultInR=TRUE
 	xAxisName="Day"
 	#yAxisName="digital biomass (mm^3)"
-	yAxisName <- c("test")
+	#yAxisName <- c("test")
 	transparent=TRUE
-	
+	legendUnderImage = TRUE
 	saveName = descriptor
-	
-	iniDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8")
+	#iniDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8")
+	iniDataSet <- read.csv(fileName, header=TRUE, sep=";", fileEncoding="ISO-8859-1", encoding="UTF-8")
 }
 ##
 #		END Of Test
@@ -65,7 +81,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 		imageHeight="768", dpi="90", diagramTyp="!boxplot", isGray="false", treatment="Treatment",
 		filterTreatment="none", secondTreatment="none", filterSecondTreatment="none", 
 		filterXaxis="none", xAxis="Day (Int)", descriptor="side.area", showResultInR=FALSE, xAxisName="none", yAxisName="none",
-		transparent=TRUE) {			
+		transparent=TRUE, legendUnderImage=TRUE) {			
 
 #library for save images
 #install.packages(c("Cairo"), repos="http://cran.r-project.org", dependencies = TRUE)
@@ -73,7 +89,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 #library for colors
 #install.packages(c("RColorBrewer"), repos="http://cran.r-project.org", dependencies = TRUE)
 	library("RColorBrewer")
-	
+
 	
 	isNA <- TRUE
 	isNum <- FALSE
@@ -85,7 +101,6 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 		saveName <- gsub(regExpressionSpezialCharacter,";",saveName)
 	}
 	saveName <- gsub("\\^", "", saveName);
-	
 #	iniDataSet <- read.csv2(fileName, header=TRUE, sep=";", fileEncoding="ISO-8859-1", encoding="UTF-8")
 	
 	
@@ -218,7 +233,15 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 			resFilterSecondTreatment <- numeric()
 			if (secondTreatment != "none") {
 				secondTreatment <- gsub(regExpressionCol,".",secondTreatment)
-				resFilterSecondTreatment <- strsplit(filterSecondTreatment, "$", fixed=TRUE)[[1]]
+				
+				if(filterSecondTreatment != "none") {
+					resFilterSecondTreatment <- strsplit(filterSecondTreatment, "$", fixed=TRUE)[[1]]
+				} else {
+					resFilterSecondTreatment <- as.character(unique(CalculateMeanWorkingDataSet[secondTreatment])[[1]])
+				}
+				
+			} else {
+				secondTreatment <- treatmentName
 			}
 			
 			resfilterXaxis <- numeric()
@@ -236,6 +259,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 				} else {
 					rowName <- c(rowName, descriptorName[i])
 				}
+				
 			}
 			
 			for (i in 1:length(days)) {
@@ -244,12 +268,12 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 			
 			filterTyp <- list()
 			filterTyp[[1]] <- filterTreatment
-			filterTyp[[2]] <- secondTreatment
+			filterTyp[[2]] <- filterSecondTreatment
 			filterTyp[[3]] <- filterXaxis
 			
 			column <- list()
 			column[[1]] <- treatmentName
-			column[[2]] <- treatmentName
+			column[[2]] <- secondTreatment
 			column[[3]] <- xAxis
 			
 			filterValues<- list()
@@ -257,13 +281,18 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 			filterValues[[2]] <- resFilterSecondTreatment
 			filterValues[[3]] <- resfilterXaxis
 			
-			
+			#print("Hallo")
+			#print(filterTyp)
+			#print(length(filterTyp))
+			#print(column)
+			#print(filterValues)
 			
 			for(d in 1:length(filterTyp)) {
 				
 				if (filterTyp[[d]] != "none") {
 					
 					set <- rep(FALSE, times=length(CalculateMeanWorkingDataSet[[column[[d]]]])) | match(CalculateMeanWorkingDataSet[[column[[d]]]],filterValues[[d]],nomatch = 0)
+				
 				} else {
 					
 					set <- rep(TRUE, times=length(CalculateMeanWorkingDataSet[[column[[d]]]]))
@@ -275,18 +304,16 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 					tempWorkingDatasetSum <- tempWorkingDatasetSum & set
 				}
 			}
-			
+
 			multiDescriptor <- descriptorName
 			tempWorkingDatasetDesc <- matrix(ncol = length(multiDescriptor), nrow = length(CalculateMeanWorkingDataSet[[treatmentName]]))
 			colnames(tempWorkingDatasetDesc) <- multiDescriptor 
-			
-			
+				
 			for (d in 1:length(multiDescriptor)) {
 				tempWorkingDatasetDesc[,multiDescriptor[d]] <- rep(FALSE, times=length(CalculateMeanWorkingDataSet[[treatmentName]])) 
 				tempWorkingDatasetDesc[,multiDescriptor[d]] <- tempWorkingDatasetSum & (tempWorkingDatasetDesc[,multiDescriptor[d]] | !is.na(CalculateMeanWorkingDataSet[multiDescriptor[d]]!=is.na("NA")))
 
 			}
-
 			overallResult <- matrix(ncol = length(days), nrow = length(rowName))
 			colnames(overallResult) <- colName
 			#rownames(overallResult) <- multiDescriptor
@@ -313,7 +340,6 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 			#colnames(overallResult) <- colName
 			workingDataSet <- overallResult
 			
-			
 			##################################### valuesAsDiagram #############################################
 			
 			
@@ -339,37 +365,45 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 			}
 			
 			standardPar <- par()
-			
+		
 			for(h in 1:durchlauf) {
-				
 				symbolParameter <- numeric()
 							
-				
-				if (h==1) {
-					Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste(saveName,saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
-				}
-				
-				layout(matrix(c(1,2), nrow = 2, ncol = 1, byrow = TRUE), heights=c(2,1))
-				par(mar=c(4.1,4.1,2.1,2.1))
-				
+			
 				if (tolower(diagramTyp) == "boxplot") {
+					
+					if (h==1) {
+						Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste(saveName,saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
+					}
+					par(mar=c(4.1,4.1,2.1,2.1))
+#					if (legendUnderImage) {
+#						layout(matrix(c(1,2), nrow = 2, ncol = 1, byrow = TRUE), heights=c(2,1))
+#						par(mar=c(4.1,4.1,2.1,2.1))
+#					}
+					
+					
 					barplot(workingDataSet, beside= TRUE, main="", xlab=xAxisName, ylab=yAxisName, col=usedColor, space=c(0,2), width=0.1, ylim=c(0,max(workingDataSet,na.rm=TRUE)))
 					symbolParameter <- 15
-				} else if (tolower(diagramTyp) == "boxplotstacked") {
+				} else if (tolower(diagramTyp) == "boxplotstacked") {	
 					
 					workingDataSet[is.na(workingDataSet)] <- 0
 					
 					if (length(resFilterTreatment) > 1) {
-						
-						layoutMatrix <- c(1:(2*length(resFilterTreatment)))
-						
-						layout(matrix(layoutMatrix, nrow = 2, ncol = length(resFilterTreatment), byrow = FALSE), heights=c(2,1))
+										
+						#layoutMatrix <- c(1:(2*length(resFilterTreatment)))
+						#layout(matrix(layoutMatrix, nrow = 2, ncol = length(resFilterTreatment), byrow = FALSE), heights=c(2,1))
 						symbolParameter <- 15
 						
+						write(x="", append=FALSE, file=paste(saveName,"tex",sep="."))
 						
 						for(o in 1:length(resFilterTreatment)) {
-							rowWhichPlotInOneDiagram <- grep(paste(" ",resFilterTreatment[o],sep=""), rownames(workingDataSet))
 							
+							if (h==1) {
+								Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste(saveName,o,saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
+							}
+							par(mar=c(4.1,4.1,2.1,2.1))
+							
+							rowWhichPlotInOneDiagram <- grep(paste(" ",resFilterTreatment[o],sep=""), rownames(workingDataSet))
 							
 							for (d in 1:length(workingDataSet[1,])) {
 								hundredPercentValue	 <- sum(workingDataSet[rowWhichPlotInOneDiagram,d],na.rm=TRUE)
@@ -389,13 +423,49 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 							}
 							
 							barplot(workingDataSet[rowWhichPlotInOneDiagram,], col=usedColor, main=resFilterTreatment[o], xlab=xAxisName, ylab=yAxisName, ylim=c(0,100))
-							par(mar=c(0.1,0.1,0.1,0.1))
-							barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig
-							legend("left", rownames(workingDataSet[rowWhichPlotInOneDiagram,]), col= usedColor, pch=symbolParameter, bty="n")
-							par(mar=c(4.1,4.1,2.1,2.1))
+							#par(mar=c(0.1,0.1,0.1,0.1))
+							#barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig
+							#legend("left", rownames(workingDataSet[rowWhichPlotInOneDiagram,]), col= usedColor, pch=symbolParameter, bty="n")
+							#par(mar=c(4.1,4.1,2.1,2.1))
+							
+							if (h==1) {
+								dev.off()
+							}
+													
+							
+							### latex Datei erweitern
+							
+							latexText <- paste("\\begin{lyxlist}{00.00.0000}","\n",
+											   "\\item [{\\includegraphics[width=13cm]{",
+											   "\\string\"",
+											   gsub("\\.", "\\\\lyxdot ", saveName,),
+											   paste("\\lyxdot ",o,sep=""),
+											   "\\string\"",
+											   "}}]~","\n",
+										   	   "\\end{lyxlist}","\n",sep="")
+										
+							write(x=latexText, append=TRUE, file=paste(saveName,"tex",sep="."))								
+							
 						}
+						
+						##Legende
+					
+						if (h==1) {
+							Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste("legendeBoxStacked",saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
+							barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig			
+							legend("left", substr(rownames(workingDataSet[rowWhichPlotInOneDiagram,]),1, str_locate(rownames(workingDataSet[rowWhichPlotInOneDiagram,])," ")-1), col= usedColor, pch=symbolParameter, bty="n")
+							#legend("topleft", rownames(workingDataSet), col= usedColor, pch=symbolParameter)
+							#legend("bottomleft", resFilterTreatment, col= usedColor, pch=symbolParameter)
+							dev.off()
+						}
+						
+						
 					} else {
 						
+						if (h==1) {
+							Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste(saveName,saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
+						}
+						par(mar=c(4.1,4.1,2.1,2.1))
 						
 						#print(workingDataSet)
 						for (d in 1:length(workingDataSet[1,])) {
@@ -410,11 +480,30 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 						#print(workingDataSet)
 						barplot(workingDataSet, col=usedColor, main="", xlab=xAxisName, ylab=yAxisName, ylim=c(0,100))
 						symbolParameter <- 15
+						
+						latexText <- paste("\\begin{lyxlist}{00.00.0000}","\n",
+								"\\item [{\\includegraphics[width=13cm]{",
+								"\\string\"",
+								gsub("\\.", "\\\\lyxdot ", saveName),
+								"\\string\"",
+								"}}]~","\n",
+								"\\end{lyxlist}","\n",sep="")
+						
+						write(x=latexText, append=FALSE, file=paste(saveName,"tex",sep="."))
 					}
 					
 					
 					
 				} else {
+					
+					if (h==1) {
+						Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste(saveName,saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
+					}
+					par(mar=c(4.1,4.1,1.1,2.1))
+#					if (legendUnderImage) {
+#						layout(matrix(c(1,2), nrow = 2, ncol = 1, byrow = TRUE), heights=c(2,1))
+#						par(mar=c(4.1,4.1,2.1,2.1))
+#					}
 					
 					if (filterXaxis == "none") {
 						xCoords <- as.numeric(colnames(workingDataSet))
@@ -448,19 +537,49 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 					}
 					symbolParameter <- 1:length(workingDataSet[,1])
 				}
-
+				
+				
+				
+				
+#				if (!is.null(dev.list())) {
+#					if (h==1) {
+#						dev.off()
+#					}
+#				}
+				
+				###Legende
 				if (!(tolower(diagramTyp) == "boxplotstacked" & length(resFilterTreatment) > 1)) {
 					grid()
-					#split.screen(c(1,1))
+					if(h==1){
+						dev.off()
+						Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste("legende",saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
+						barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig			
+						legend("left", resFilterTreatment, col= usedColor, pch=symbolParameter, bty="n")
+						#legend("topleft", rownames(workingDataSet), col= usedColor, pch=symbolParameter)
+						#legend("bottomleft", resFilterTreatment, col= usedColor, pch=symbolParameter)
+						dev.off()
+					}
+				}
 					
-					par(mar=c(0.1,0.1,0.1,0.1))
-					barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig
-					legend("left", rownames(workingDataSet), col= usedColor, pch=symbolParameter, bty="n")
-				}
+					
+				
+#				if (!(tolower(diagramTyp) == "boxplotstacked" & length(resFilterTreatment) > 1)) {
+#					grid()
+#					#split.screen(c(1,1))
+#					
+#					if(legendUnderImage){
+#						par(mar=c(0.1,0.1,0.1,0.1))
+#						barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig
+#						legend("left", rownames(workingDataSet), col= usedColor, pch=symbolParameter, bty="n")
+#					} else {
+#						legend("topleft", resFilterTreatment, col= usedColor, pch=symbolParameter)
+#						#legend("topleft", rownames(workingDataSet), col= usedColor, pch=symbolParameter)
+#						#legend("bottomleft", resFilterTreatment, col= usedColor, pch=symbolParameter)
+#					}
+#					
+#				} 
 				#close.screen(all=TRUE)
-				if (h==1) {
-					dev.off()
-				}
+				
 				par(mar=standardPar$mar, oma=standardPar$oma, xpd=standardPar$xpd)
 			}
 			
