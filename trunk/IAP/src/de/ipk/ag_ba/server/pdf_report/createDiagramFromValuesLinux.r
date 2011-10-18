@@ -89,7 +89,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 #library for colors
 #install.packages(c("RColorBrewer"), repos="http://cran.r-project.org", dependencies = TRUE)
 	library("RColorBrewer")
-
+	library(stringr)
 	
 	isNA <- TRUE
 	isNum <- FALSE
