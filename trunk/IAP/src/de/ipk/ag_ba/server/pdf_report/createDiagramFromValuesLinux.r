@@ -39,8 +39,8 @@ if(FALSE){
 	#boxplot <- Standard Boxplot
 	#!boxplot <- für xy-Diagramm (vorerst Descriptor vs. Day)
 	
-	diagramTyp="boxplotStacked"
-	#diagramTyp="!boxplot"
+	#diagramTyp="boxplotStacked"
+	diagramTyp="!boxplot"
 	isGray="false"
 	#isGray="true"
 	treatment="Treatment"
@@ -58,8 +58,9 @@ if(FALSE){
 	#descriptor <- c("side.fluo.chlorophyl.normalized.histogram.bin.1.0_36$side.fluo.chlorophyl.normalized.histogram.bin.2.36_72$side.fluo.chlorophyl.normalized.histogram.bin.3.72_109$side.fluo.chlorophyl.normalized.histogram.bin.4.109_145$side.fluo.chlorophyl.normalized.histogram.bin.5.145_182$side.fluo.chlorophyl.normalized.histogram.bin.6.182_218$side.fluo.chlorophyl.normalized.histogram.bin.7.218_255")
 	#descriptor <- c("Wert1$Wert2$Wert3$Wert4")
 	
+	descriptor <- "Treatment"
 	#descriptor <- "side.leaf.length.avg (px)"
-	descriptor <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255")
+	#descriptor <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255")
 	yAxisName <- c("NIR absorption class (%)")
 	
 	showResultInR=TRUE
@@ -323,7 +324,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 			for (d in 1:length(multiDescriptor)) {
 				for (y in 1:length(treatment)) {
 					for (i in 1:length(days)) {
-						if (!noTreatment) {
+						if (!noTreatment) {	##if treatment[y] == days[i]
 							result <- c(result,mean(as.numeric(CalculateMeanWorkingDataSet[(CalculateMeanWorkingDataSet[treatmentName]==treatment[y] & CalculateMeanWorkingDataSet[xAxis]==days[i] & tempWorkingDatasetDesc[,multiDescriptor[d]]),descriptorName[d]]),na.rm=TRUE))
 						} else {
 							result <- c(result,mean(as.numeric(CalculateMeanWorkingDataSet[(CalculateMeanWorkingDataSet[xAxis]==days[i] & tempWorkingDatasetDesc[,multiDescriptor[d]]),descriptorName[d]]),na.rm=TRUE))
@@ -435,14 +436,12 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 							
 							### latex Datei erweitern
 							
-							latexText <- paste("\\begin{lyxlist}{00.00.0000}","\n",
-											   "\\item [{\\includegraphics[width=13cm]{",
+							latexText <- paste( "\\item [{\\includegraphics[width=13cm]{",
 											   "\\string\"",
 											   gsub("\\.", "\\\\lyxdot ", saveName,),
 											   paste("\\lyxdot ",o,sep=""),
 											   "\\string\"",
-											   "}}]~","\n",
-										   	   "\\end{lyxlist}","\n",sep="")
+											   "}}]~","\n", sep="")
 										
 							write(x=latexText, append=TRUE, file=paste(saveName,"tex",sep="."))								
 							
@@ -481,13 +480,11 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 						barplot(workingDataSet, col=usedColor, main="", xlab=xAxisName, ylab=yAxisName, ylim=c(0,100))
 						symbolParameter <- 15
 						
-						latexText <- paste("\\begin{lyxlist}{00.00.0000}","\n",
-								"\\item [{\\includegraphics[width=13cm]{",
+						latexText <- paste("\\item [{\\includegraphics[width=13cm]{",
 								"\\string\"",
 								gsub("\\.", "\\\\lyxdot ", saveName),
 								"\\string\"",
-								"}}]~","\n",
-								"\\end{lyxlist}","\n",sep="")
+								"}}]~","\n", sep="")
 						
 						write(x=latexText, append=FALSE, file=paste(saveName,"tex",sep="."))
 					}
