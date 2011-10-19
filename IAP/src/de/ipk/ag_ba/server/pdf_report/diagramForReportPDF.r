@@ -53,14 +53,16 @@ workingDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-88
 #print(colnames(workingDataSet));
 
 #print(workingDataSet["side.leaf.length.sum.norm.max..mm."]);
+time <- system.time({
+	for (y in 1:length(descriptorSet)) {
+		
+		print(paste("> Generate diagram of", descriptorSet[y]))
+		valuesAsDiagram(workingDataSet,saveName=descriptorSet[y],saveFormat=saveFormat,diagramTyp=diagramTyp,
+				treatment=treatment,filterTreatment=filterTreatment,
+				descriptor=descriptorSet[y],xAxisName="Day",yAxisName=descriptorSetName[y])
+		print("... finished")
+	}
+},TRUE)
+print(time)
 
-for (y in 1:length(descriptorSet)) {
-	
-	print(paste("> Generate diagram of", descriptorSet[y]))
-	valuesAsDiagram(workingDataSet,saveName=descriptorSet[y],saveFormat=saveFormat,diagramTyp=diagramTyp,
-			treatment=treatment,filterTreatment=filterTreatment,
-			descriptor=descriptorSet[y],xAxisName="Day",yAxisName=descriptorSetName[y])
-	print("... finished")
-	
-}
 
