@@ -26,9 +26,9 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			pix = getProbablyWhitePixels(vis, 0.3, true, -10, 50);
+			pix = getProbablyWhitePixels(vis, true, -10, 50);
 		} else
-			pix = getProbablyWhitePixels(vis, 0.06, false, -10, 10);
+			pix = getProbablyWhitePixels(vis, false, -10, 10);
 		return io.imageBalancing(255, pix).getImage().print("after", debug);
 	}
 	
@@ -40,9 +40,9 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis, 0.3, true, -10, 50);
+			pix = getProbablyWhitePixels(vis, true, -10, 50);
 		else
-			pix = getProbablyWhitePixels(vis, 0.06, false, -10, 10);
+			pix = getProbablyWhitePixels(vis, false, -10, 10);
 		return io.imageBalancing(255, pix).getImage().print("after", debug);
 	}
 	
@@ -51,7 +51,7 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	 * 
 	 * @author pape
 	 */
-	private double[] getProbablyWhitePixels(FlexibleImage image, double size, boolean verticalGradient, int lThres, int abThres) {
+	private double[] getProbablyWhitePixels(FlexibleImage image, boolean verticalGradientSideView, int lThres, int abThres) {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -61,7 +61,7 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		BlockProperty bpright = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
 		
 		float[] values;
-		if (!verticalGradient) {
+		if (!verticalGradientSideView) {
 			float[] valuesTop, valuesBottom;
 			if (bpleft != null && bpright != null) {
 				int left = (int) (bpleft.getValue() * width);
@@ -126,7 +126,7 @@ public class BlockColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 			values[i++] = valuesBottom[2];
 		}
 		
-		if (verticalGradient) {
+		if (verticalGradientSideView) {
 			double r = values[0];
 			double g = values[1];
 			double b = values[2];
