@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.analysis.maize;
 
+import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
@@ -13,8 +14,15 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 		FlexibleImage nir = getInput().getImages().getNir();
 		if (nir == null)
 			return null;
-		double[] pix = getProbablyWhitePixels(nir);
-		return nir.getIO().imageBalancing(180, pix).getImage();
+		if (options.isBarleyInBarleySystem()) {
+			if (options.getCameraPosition()==CameraPosition.TOP)
+				return nir;
+			double[] pix = getProbablyWhitePixels(nir.getIO().copy().invert().getImage());
+			return nir.getIO().imageBalancing(180, pix).getImage();
+		} else {
+			double[] pix = getProbablyWhitePixels(nir);
+			return nir.getIO().imageBalancing(180, pix).getImage();
+		}
 	}
 	
 	@Override
@@ -22,8 +30,15 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 		FlexibleImage nir = getInput().getMasks().getNir();
 		if (nir == null)
 			return null;
-		double[] pix = getProbablyWhitePixels(nir);
-		return nir.getIO().imageBalancing(180, pix).getImage();
+		if (options.isBarleyInBarleySystem()) {
+			if (options.getCameraPosition()==CameraPosition.TOP)
+				return nir;
+			double[] pix = getProbablyWhitePixels(nir.getIO().copy().invert().getImage());
+			return nir.getIO().imageBalancing(180, pix).getImage();
+		} else {
+			double[] pix = getProbablyWhitePixels(nir);
+			return nir.getIO().imageBalancing(180, pix).getImage();
+		}
 	}
 	
 	/**

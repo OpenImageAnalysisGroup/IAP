@@ -37,6 +37,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		FlexibleImage input = getInput().getMasks().getVis();
 		FlexibleImage result = input;
 		int color = options.getBackground();
+		boolean visCutPosSet = false;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			
 			if (options.isBarleyInBarleySystem()) {
@@ -60,6 +61,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 					int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight());
 					result = new ImageOperation(result).clearImageBottom(cy, color).getImage();
 					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
+					visCutPosSet = true;
 				}
 			} else
 				if (markerPosLeftY == null && markerPosRightY != null) {
@@ -69,6 +71,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 						result = new ImageOperation(result).clearImageBottom(
 									cy, color).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
+						visCutPosSet = true;
 					}
 				}
 			// Clear Sides
@@ -84,17 +87,19 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 				- options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS));
 		result = new ImageOperation(result).clearImageBottom(
 				cy, options.getBackground()).getImage();
-		getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
+		if (!visCutPosSet)
+			getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
 		return result;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() == null || getInput().getMasks().getVis()==null)
-			return null;
+			return getInput().getMasks().getFluo();
 		
 		FlexibleImage input = getInput().getMasks().getFluo();
 		FlexibleImage result = input;
+		boolean fluoCutPosSet = false;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 			
@@ -105,6 +110,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 					result = new ImageOperation(input).clearImageBottom(
 							cy, options.getBackground()).getImage();
 					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
+					fluoCutPosSet = true;
 					return result;
 				}
 				return input;
@@ -116,6 +122,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 					result = new ImageOperation(input).clearImageBottom(
 							cy, options.getBackground()).getImage();
 					getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
+					fluoCutPosSet = true;
 					return result;
 				}
 			}
@@ -132,7 +139,8 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		int cy = (int) (input.getHeight() - temp * getInput().getImages().getFluo().getHeight());
 		result = new ImageOperation(input).clearImageBottom(
 				cy, options.getBackground()).getImage();
-		getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
+		if (!fluoCutPosSet)
+			getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
 		return result;
 	}
 	
@@ -170,7 +178,6 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 			int cy = (int) (input.getHeight() - temp * input.getHeight());
 			result = new ImageOperation(input).clearImageBottom(
 						cy, new Color(180, 180, 180).getRGB()).getImage();
-			getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
 			return result;
 		} else
 			return getInput().getMasks().getNir();

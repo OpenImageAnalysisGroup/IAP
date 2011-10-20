@@ -68,7 +68,7 @@ public class ImageData extends NumericMeasurement3D implements BinaryMeasurement
 	
 	@Override
 	public String toString() {
-		return "Image: " + pixelsizex + "x" + pixelsizey + " " + getURL();
+		return /*"Image: " + pixelsizex + "x" + pixelsizey + " " +*/getURL().getFileName()+" | "+getURL().getPrefix()+"://"+getURL().getDetail();
 	}
 	
 	public ImageData(SampleInterface parent, ImageData other) {

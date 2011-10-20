@@ -11,6 +11,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingForMaizeBloom_vis_s
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancing_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockColorBalancing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyImagesApplyMask_vis_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCreateDummyReferenceIfNeeded_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCrop_images_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockLabFilter_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMedianFilter_fluo;
@@ -51,6 +52,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		BlockPipeline p = new BlockPipeline();
 		p.add(BlockLoadImagesIfNeeded_images_masks.class);
+		p.add(BlockCreateDummyReferenceIfNeeded_vis.class);
 		p.add(BlockColorBalancing_vis.class);
 		p.add(BlockFindBlueMarkers_vis.class);
 		p.add(BlockColorBalancing_fluo_nir.class);

@@ -14,7 +14,9 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	static boolean debug = false;
+	boolean debug = false;
+	
+	boolean barleyInBarley = false;
 	
 	BlockProperty bpleft, bpright;
 	
@@ -40,6 +42,9 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
+		FlexibleImage inputMain = getInput().getImages().getFluo();
+		if (inputMain==null)
+			return null;
 		FlexibleImage input = getInput().getMasks().getFluo();
 		FlexibleImage res;
 		boolean invert = true;
@@ -58,25 +63,32 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		if (input != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP && !options.isMaize()) // for barley top, background is black
 			{
-				if (options.isBarleyInBarleySystem())
-					rr = 150;
+				if (options.isBarleyInBarleySystem()) {
+					barleyInBarley = true;
+					rr = 80;
+				}
 			}
 			res = balance(input, rr, false);
 		} else
-			res = null;
+			res = input;
 		return res;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
+		FlexibleImage inputMain = getInput().getImages().getNir();
+		if (inputMain==null)
+			return null;
 		FlexibleImage input = getInput().getMasks().getNir();
 		FlexibleImage res;
 		int rr = 180;
 		if (input != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP && !options.isMaize()) // for barley top, background is black
 			{
-				if (options.isBarleyInBarleySystem())
-					rr = 150;
+				if (options.isBarleyInBarleySystem()) {
+					barleyInBarley = true;
+					rr = 80;
+				}
 			}
 			res = balance(input, rr, false);
 		} else
@@ -89,7 +101,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	 * 
 	 * @author pape
 	 */
-	private static double[] getProbablyWhitePixels(FlexibleImage image, double size, double MarkerPosX, double MarkerPosY, BlockProperty bpleft,
+	private double[] getProbablyWhitePixels(FlexibleImage image, double size, double MarkerPosX, double MarkerPosY, BlockProperty bpleft,
 			BlockProperty bpright) {
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -106,7 +118,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			int a = (right - left) / 4;
 			int b = right - left;
 			
-			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, lThres, abThres, true, debug);
+			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, lThres, abThres, !barleyInBarley, debug);
 		} else {
 			float[] valuesTop, valuesBottom;
 			int left = (int) (0.3 * width);
@@ -116,8 +128,8 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			int startHTop = (int) (height * 0.1 - scanHeight / 2);
 			
 			// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
-			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
-			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, 50, true, debug);
+			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, !barleyInBarley, debug);
+			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, 50, !barleyInBarley, debug);
 			
 			values = new float[6];
 			int i = 0;
@@ -140,7 +152,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		return new double[] { r * 255, g * 255, b * 255 };
 	}
 	
-	private static double[] getProbablyWhitePixels(FlexibleImage image, double size, BlockProperty bpleft,
+	private double[] getProbablyWhitePixels(FlexibleImage image, double size, BlockProperty bpleft,
 			BlockProperty bpright) {
 		double[] res = getProbablyWhitePixels(image, size, -1., -1, bpleft, bpleft);
 		return res;
@@ -177,7 +189,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, bpleft, bpright);
 					return io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else {
-					pix = BlockColorBalancing_fluo_nir.getProbablyWhitePixels(inputUsedForColorAnalysis, side, null, null);// 0.08);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, side, null, null);// 0.08);
 					res = new ImageOperation(nir).imageBalancing(whitePoint, pix).getImage();
 				}
 			}

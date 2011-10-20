@@ -112,7 +112,8 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 		positions.setLeft((int) (positions.getLeftX() * s - pl * inputToCut.getWidth()));
 		positions.setRight((int) (positions.getRightX() * s + pr * inputToCut.getWidth()));
 		
-		return ioInputForCut.clearImageLeft(positions.getLeftX(), bl).clearImageRight(positions.getRightX(), br).clearImageAbove(positions.getTopY(), ba)
+		return ioInputForCut.clearImageLeft(positions.getLeftX(), bl).
+				clearImageRight(positions.getRightX(), br).clearImageAbove(positions.getTopY(), ba)
 				.getImage();
 		// return ioInputForCut.clearImageAbove(positions.getTopY(), ba).getImage();
 	}
@@ -154,7 +155,7 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 			ImageOperation nir = processedMasks.getNir().copy().getIO().print("NIRRRR", debug);
 			FlexibleImage mask = processedMasks.getVis().copy().getIO().or(
 						getInput().getMasks().getFluo()
-						).print("OR operation", debug).blur(10).
+						).print("OR operation", debug).blur(20).
 						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
 			processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
 						mask,
@@ -163,7 +164,8 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 			int gray = new Color(180, 180, 180).getRGB();
 			processedImages.setNir(processedImages.getNir().getIO().applyMask_ResizeMaskIfNeeded(
 					mask,
-					options.getBackground()).print("FILTERED NIR IMAGE", debug).replaceColors(back, gray).getImage());
+					options.getBackground()).print("FILTERED NIR IMAGE", debug).
+					replaceColors(back, gray).getImage());
 			return;
 		}
 		// }

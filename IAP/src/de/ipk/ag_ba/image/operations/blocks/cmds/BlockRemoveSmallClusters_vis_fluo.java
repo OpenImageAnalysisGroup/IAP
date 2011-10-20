@@ -55,8 +55,11 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 			return null;
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(ngUse,
-					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d, (getInput().getMasks().getFluo().getWidth() / 100) * 2,
+			return new ImageOperation(getInput().getMasks().getFluo()).
+					dilate().
+					removeSmallClusters(ngUse,
+					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d, 
+					(getInput().getMasks().getFluo().getWidth() / 100) * 1,
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 		} else {
 			int cut2 = (int) ((getInput().getMasks().getFluo().getWidth() / 100) * 0.5);
