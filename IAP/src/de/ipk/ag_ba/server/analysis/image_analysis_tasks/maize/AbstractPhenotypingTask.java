@@ -131,13 +131,37 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Workload Top/Side: " + top + "/" + side);
 		final int workloadEqualAngleSnapshotSets = top + side;
 		
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS...");
-		int nn = SystemAnalysis.getNumberOfCPUs() / 2+1;
-		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null,
+		int nn = SystemAnalysis.getNumberOfCPUs();
+		if (SystemAnalysis.getMemoryMB()<1500 && nn>1) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY");
+			nn = 1;
+		}
+		if (SystemAnalysis.getMemoryMB()<2000 && nn>2) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY");
+			nn = 2;
+		}
+		if (SystemAnalysis.getMemoryMB()<4000 && nn>4) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY");
+			nn = 4;
+		}
+		
+		if (nn>1 && SystemAnalysis.getUsedMemoryInMB()>SystemAnalysis.getMemoryMB()*0.7d) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">HIGH MEMORY UTILIZATION, REDUCING CONCURRENCY");
+			nn = nn/2;
+			if (nn<1)
+				nn = 1;
+		}
+
+		System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: "+nn+")");
+		
+		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(AbstractPhenotypingTask.class,
 				nn);
+		final ThreadSafeOptions freed = new ThreadSafeOptions();
 		for (TreeMap<String, ImageSet> tm : workload) {
 			final TreeMap<String, ImageSet> tmf = tm;
+			
 			maxCon.acquire(1);
+			try {
 			Thread t = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -147,11 +171,17 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						err.printStackTrace();
 					} finally {
 						maxCon.release(1);
+						freed.setBval(0, true);
 					}
 				}
 			}, "Snapshot Analysis");
 			t.setPriority(Thread.MIN_PRIORITY);
 			t.start();
+			} catch(Exception eeee) {
+				if (!freed.getBval(0, false))
+					maxCon.release(1);
+				throw new RuntimeException(eeee);
+			}
 		}
 		maxCon.acquire(nn);
 		maxCon.release(nn);

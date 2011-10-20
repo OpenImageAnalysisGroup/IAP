@@ -143,7 +143,8 @@ public class BlockPipeline {
 		}
 		System.out.print("PET: " + (b - a) / 1000 + "s ");
 		if (pipelineExecutionsWithinCurrentHour%5==0)
-			System.out.println();
+			System.out.println(" || "+SystemAnalysis.getUsedMemoryInMB()+" / "+SystemAnalysis.getMemoryMB()+" MB used ("+(int)(100d*SystemAnalysis.getUsedMemoryInMB()/SystemAnalysis.getMemoryMB())+"%)");
+		
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);
 		updatePipelineStatistics();
 		return input;

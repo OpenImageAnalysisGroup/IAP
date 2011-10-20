@@ -3,6 +3,7 @@ package de.ipk.ag_ba.gui.actions.lemnatec;
 import java.util.ArrayList;
 
 import org.AttributeHelper;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.actions.AbstractUrlNavigationAction;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -29,10 +30,10 @@ public final class ActionLemnaCam2 extends AbstractUrlNavigationAction {
 	
 	@Override
 	public String getURL() {
-		String url =
-				"file:///home/view/view/view.jpg";
-		// "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity";
-		return url;
+		if (SystemAnalysis.isHeadless())
+			return "file:///home/view/view/view.jpg";
+		else  
+			return "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity";
 	}
 	
 	@Override
