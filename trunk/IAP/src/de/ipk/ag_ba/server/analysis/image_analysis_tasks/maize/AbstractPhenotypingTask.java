@@ -107,7 +107,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		addTopOrSideImagesToWorkset(workload, 0, analyzeTopImages(), analyzeSideImages());
 		
-//		 workload = filterWorkload(workload, null);// "Athletico");// "Rainbow Amerindian"); // Athletico
+		// workload = filterWorkload(workload, null);// "Athletico");// "Rainbow Amerindian"); // Athletico
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final int workloadSnapshots = workload.size();
@@ -132,27 +132,27 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final int workloadEqualAngleSnapshotSets = top + side;
 		
 		int nn = SystemAnalysis.getNumberOfCPUs();
-		if (SystemAnalysis.getMemoryMB()<1500 && nn>1) {
+		if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY");
 			nn = 1;
 		}
-		if (SystemAnalysis.getMemoryMB()<2000 && nn>2) {
+		if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY");
-			nn = 2;
+			nn = 1;
 		}
-		if (SystemAnalysis.getMemoryMB()<4000 && nn>4) {
+		if (SystemAnalysis.getMemoryMB() < 4000 && nn > 4) {
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY");
 			nn = 4;
 		}
 		
-		if (nn>1 && SystemAnalysis.getUsedMemoryInMB()>SystemAnalysis.getMemoryMB()*0.7d) {
+		if (nn > 1 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis.getMemoryMB() * 0.7d) {
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">HIGH MEMORY UTILIZATION, REDUCING CONCURRENCY");
-			nn = nn/2;
-			if (nn<1)
+			nn = nn / 2;
+			if (nn < 1)
 				nn = 1;
 		}
-
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: "+nn+")");
+		
+		System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: " + nn + ")");
 		
 		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(AbstractPhenotypingTask.class,
 				nn);
@@ -162,22 +162,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			
 			maxCon.acquire(1);
 			try {
-			Thread t = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tmf);
-					} catch (InterruptedException err) {
-						err.printStackTrace();
-					} finally {
-						maxCon.release(1);
-						freed.setBval(0, true);
+				Thread t = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tmf);
+						} catch (InterruptedException err) {
+							err.printStackTrace();
+						} finally {
+							maxCon.release(1);
+							freed.setBval(0, true);
+						}
 					}
-				}
-			}, "Snapshot Analysis");
-			t.setPriority(Thread.MIN_PRIORITY);
-			t.start();
-			} catch(Exception eeee) {
+				}, "Snapshot Analysis");
+				t.setPriority(Thread.MIN_PRIORITY);
+				t.start();
+			} catch (Exception eeee) {
 				if (!freed.getBval(0, false))
 					maxCon.release(1);
 				throw new RuntimeException(eeee);
@@ -221,7 +221,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						BlockProperties results;
 						try {
 							results = processAngleWithinSnapshot(tmf.get(configAndAngle), maximumThreadCountOnImageLevel, status,
-										workloadEqualAngleSnapshotSets, getParentPriority());
+									workloadEqualAngleSnapshotSets, getParentPriority());
 							if (results != null) {
 								analysisInput.put(configAndAngle, inImage);
 								analysisResults.put(configAndAngle, results);
@@ -243,7 +243,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			BlockProperties postprocessingResults;
 			try {
 				postprocessingResults = getImageProcessor().postProcessPipelineResults(
-							inSample, analysisInput, analysisResults);
+						inSample, analysisInput, analysisResults);
 				processStatisticalAndVolumeSampleOutput(inSample, postprocessingResults);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -254,26 +254,27 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private ArrayList<TreeMap<String, ImageSet>> filterWorkload(
-				ArrayList<TreeMap<String, ImageSet>> workload,
+			ArrayList<TreeMap<String, ImageSet>> workload,
 			String filter) {
-//		if (filter == null)
-//			return workload;
-		ArrayList<TreeMap<String, ImageSet>>  res = new ArrayList<TreeMap<String, ImageSet>>();
-		for (TreeMap<String, ImageSet>  tm : workload)
+		// if (filter == null)
+		// return workload;
+		ArrayList<TreeMap<String, ImageSet>> res = new ArrayList<TreeMap<String, ImageSet>>();
+		for (TreeMap<String, ImageSet> tm : workload)
 			loopB: for (ImageSet is : tm.values()) {
 				if (is.getSampleInfo() != null)
-					if (filter==null) {
+					if (filter == null) {
 						if (is.getSampleInfo().getTime() == 56) {
 							res.add(tm);
 							break loopB;
 						}
 						
 					} else
-					if (is.getSampleInfo().getParentCondition().toString().contains(filter) && !is.getSampleInfo().getParentCondition().toString().contains("wet"))
-						if (is.getSampleInfo().getTime() == 20 || is.getSampleInfo().getTime() == 31 || is.getSampleInfo().getTime() == 57) {
-							res.add(tm);
-							break loopB;
-						}
+						if (is.getSampleInfo().getParentCondition().toString().contains(filter)
+								&& !is.getSampleInfo().getParentCondition().toString().contains("wet"))
+							if (is.getSampleInfo().getTime() == 20 || is.getSampleInfo().getTime() == 31 || is.getSampleInfo().getTime() == 57) {
+								res.add(tm);
+								break loopB;
+							}
 			}
 		return res;
 	}
