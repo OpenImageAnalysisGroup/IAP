@@ -26,7 +26,8 @@ public class BlockCrop_images_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS).getValue();
 				// }
 				
-				potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS).getValue();
+				if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS)!=null)
+					potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS).getValue();
 
 				return getInput().getImages().getVis().cropAbs(-1, -1, -1, potCut);
 			}
