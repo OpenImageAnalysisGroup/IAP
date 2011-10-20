@@ -90,6 +90,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 #library for colors
 #install.packages(c("RColorBrewer"), repos="http://cran.r-project.org", dependencies = TRUE)
 	library("RColorBrewer")
+#install.packages(c(stringr), repos="http://cran.r-project.org", dependencies = TRUE)
 	library(stringr)
 	
 	isNA <- TRUE
@@ -450,7 +451,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 						##Legende
 					
 						if (h==1) {
-							Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste("legendeBoxStacked",saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
+							Cairo(width=as.numeric(imageWidth), height=as.numeric(40*length(rownames(workingDataSet))),file=paste("legendeBoxStacked",saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
 							barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig			
 							legend("left", substr(rownames(workingDataSet[rowWhichPlotInOneDiagram,]),1, str_locate(rownames(workingDataSet[rowWhichPlotInOneDiagram,])," ")-1), col= usedColor, pch=symbolParameter, bty="n")
 							#legend("topleft", rownames(workingDataSet), col= usedColor, pch=symbolParameter)
@@ -478,7 +479,18 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 						
 						#print(workingDataSet)
 						barplot(workingDataSet, col=usedColor, main="", xlab=xAxisName, ylab=yAxisName, ylim=c(0,100))
+						
 						symbolParameter <- 15
+						if (h==1) {
+							dev.off()
+							#Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste("legendeBoxStacked",saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
+		Cairo(width=as.numeric(imageWidth), height=as.numeric(40*length(rownames(workingDataSet))),file=paste("legendeBoxStacked",saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
+							barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig			
+							legend("left", substr(rownames(workingDataSet),1, str_locate(rownames(workingDataSet)," ")-1), col= usedColor, pch=symbolParameter, bty="n")
+							#legend("topleft", rownames(workingDataSet), col= usedColor, pch=symbolParameter)
+							#legend("bottomleft", resFilterTreatment, col= usedColor, pch=symbolParameter)
+							dev.off()
+						}
 						
 						latexText <- paste("\\item [{\\includegraphics[width=13cm]{",
 								"\\string\"",
@@ -545,7 +557,8 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 #				}
 				
 				###Legende
-				if (!(tolower(diagramTyp) == "boxplotstacked" & length(resFilterTreatment) > 1)) {
+				if (!(tolower(diagramTyp) == "boxplotstacked")) {
+				#if (!(tolower(diagramTyp) == "boxplotstacked" & length(resFilterTreatment) > 1)) {
 					grid()
 					if(h==1){
 						dev.off()
