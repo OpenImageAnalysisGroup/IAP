@@ -84,7 +84,10 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 				FlexibleImage fluo = getInput().getImages().getFluo();
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
 				return new ImageOperation(fluo).compare()
-						.compareImages("fluo", getInput().getMasks().getFluo().getIO().copyImagesParts(0.26, 0.3).print("cut out", false).getImage(),
+						.compareImages("fluo", getInput().getMasks().getFluo()
+								//.getIO().
+								//copyImagesParts(0.26, 0.3).print("cut out", true).getImage()
+								,
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
 								options.getIntSetting(Setting.abDiff_FLUO) * 0.5d,
@@ -117,8 +120,8 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 								.print("result nir", debug).thresholdBlueHigherThan(240).border(2).getImage();
 					else
 						return new ImageOperation(nir).compare()
-								.compareGrayImages(getInput().getMasks().getNir(), -20, -13, options.getBackground())
-								.print("result nir", debug).getImage();// .thresholdBlueHigherThan(240).border(2).getImage();
+								.compareGrayImages(getInput().getMasks().getNir(), 10, 23, options.getBackground())
+								.print("result nir", debug).thresholdBlueHigherThan(240).border(2).getImage();
 						
 				}
 			}

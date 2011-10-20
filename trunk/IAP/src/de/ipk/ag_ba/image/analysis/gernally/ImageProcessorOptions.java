@@ -181,7 +181,7 @@ public class ImageProcessorOptions {
 		setNeighbourhood(NeighbourhoodSetting.NB4);
 		
 		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, (0.001d) / 4);
-		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, (0.001d) / 5);
+		addDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, (0.001d) / 20);
 		addDoubleSetting(Setting.SCALE, scale);
 		addIntSetting(Setting.ROTATION_ANGLE, -3);
 		addDoubleSetting(Setting.SCALE_X, 0.95);

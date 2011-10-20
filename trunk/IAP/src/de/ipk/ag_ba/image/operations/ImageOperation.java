@@ -226,18 +226,27 @@ public class ImageOperation {
 			intensity = 1 - rf / (float) ((255) + gf);
 			double min = 210f / 255f;
 //			if (y>h*0.90d)
-				min = 150f / 255f;
+				min = 210f / 255f;
 			if (intensity > min)
 				intensity = 1;
-			else
+			else {
+				Color.RGBtoHSB(rf, gf, 0, hsb);
+				hsb[2] = rf / 255f;
+				float intensityChloro = 1 - (1 - distanceToRed(hsb[0])) * (hsb[2]);
+				float intensityPheno = 1 - distanceToRed(hsb[0]) * (hsb[2]);
+
 				switch (type) {
 					case CLASSIC:
 						intensity = intensity / 0.825f;
+						if (intensityChloro>240f/255f && intensityPheno>100f/255f)
+							intensity = 1;
 						break;
 					case CHLOROPHYL:
 						Color.RGBtoHSB(rf, gf, 0, hsb);
 						hsb[2] = rf / 255f;
 						intensity = 1 - (1 - distanceToRed(hsb[0])) * (hsb[2]);
+						if (intensity>240f/255f && intensityPheno>100f/255f)
+							intensity = 1;
 						break;
 					case PHENOL:
 						Color.RGBtoHSB(rf, gf, 0, hsb);
@@ -245,11 +254,15 @@ public class ImageOperation {
 						intensity = 1 - distanceToRed(hsb[0]) * (hsb[2]);
 						if (intensity>170f/255f)
 							intensity = 1;
+						else
+							if (intensityChloro>240f/255f && intensity>100f/255f)
+								intensity = 1;
+						
 						break;
 					default:
 						throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");
 				}
-			
+			}
 			int i = (int) (intensity * 255d);
 			// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
 			in[idx++] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
@@ -3495,7 +3508,7 @@ public class ImageOperation {
 				else {
 					int bpixel = ba[x][y];
 					if (bpixel != BACKGROUND_COLORint) {
-						aa[x][y] = aa[x][y] | ba[x][y];
+						aa[x][y] = aa[x][y];// | ba[x][y];
 					}
 				}
 			}

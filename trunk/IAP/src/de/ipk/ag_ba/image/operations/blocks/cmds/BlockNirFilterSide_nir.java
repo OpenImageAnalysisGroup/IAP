@@ -18,7 +18,7 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processNIRmask() {
 		FlexibleImage nirImage = getInput().getImages().getNir();
 		FlexibleImage nirMask = getInput().getMasks().getNir();
-		int average = 180;
+		int average = 150;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (nirImage != null && nirMask != null) {
 				// compare images
@@ -26,7 +26,8 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 				int whiteDiff = 5; // options.getIntSetting(Setting.W_Diff_NIR);
 				boolean advancedComparisonFilter = true;
 				if (advancedComparisonFilter) {
-					ImageOperation subtracted = nirImage.getIO().subtractGrayImages(nirMask).print("subimg", debug);
+					ImageOperation subtracted = nirImage.getIO().
+							subtractGrayImages(nirMask).print("subimg", debug);
 					int[] sub = subtracted.copy().getImageAs1array();
 					int idx = 0;
 					for (int c : sub) {
@@ -35,7 +36,8 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 						int rn = Math.abs(r - b);
 						sub[idx++] = (0xFF << 24 | (rn & 0xFF) << 16) | ((rn & 0xFF) << 8) | ((rn & 0xFF) << 0);
 					}
-					new FlexibleImage(nirImage.getWidth(), nirImage.getHeight(), sub).print("subtracted gray", debug);
+					new FlexibleImage(nirImage.getWidth(), nirImage.getHeight(), sub).
+						print("subtracted gray", debug);
 					int[] nirArray = nirImage.getAs1A();
 					int[] nirRefArray = nirMask.getAs1A();
 					double sum = 0;
@@ -56,8 +58,10 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 							}
 							idx++;
 						}
-						nirImage = new FlexibleImage(nirImage.getWidth(), nirImage.getHeight(), nirArray).print("CLEANED UP INP", debug);
-						nirMask = new FlexibleImage(nirMask.getWidth(), nirMask.getHeight(), nirRefArray).print("CLEANED UP REF", debug);
+						nirImage = new FlexibleImage(nirImage.getWidth(), nirImage.getHeight(), nirArray).
+								print("CLEANED UP INP", debug);
+						nirMask = new FlexibleImage(nirMask.getWidth(), nirMask.getHeight(), nirRefArray).
+								print("CLEANED UP REF", debug);
 					}
 				}
 				// if (options.isMaize())
@@ -70,10 +74,11 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 				// new Color(180, 180, 180).getRGB()).print("result of comparison", false).getImage(); // 150
 				
 				if (options.isMaize())
-					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
-							options.getBackground(), 0.08).getImage().print("ADAPT OUT", debug);
+					nirMask = nirImage.getIO().print("ADAPT IN", debug).
+						adaptiveThresholdForGrayscaleImage(50, average,
+							options.getBackground(), 0.10).getImage().print("ADAPT OUT", debug);
 				else {
-					double f  = 0.05;
+					double f  = 0.08;
 					if (options.isBarleyInBarleySystem())
 						f = 0.15;
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
@@ -85,7 +90,8 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 					FlexibleImage sk = nirMask.getIO().skeletonize().getImage();
 					if (sk != null) {
 						if (debug) {
-							FlexibleImage skelMap = MapOriginalOnSkel(sk, nirMask, options.getBackground()).print("mapped", debug);
+							FlexibleImage skelMap = MapOriginalOnSkel(sk, nirMask, options.getBackground()).
+									print("mapped", debug);
 						}
 						getProperties().setImage("nir_skeleton", sk);
 					}

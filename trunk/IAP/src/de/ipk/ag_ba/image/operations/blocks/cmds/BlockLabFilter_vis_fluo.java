@@ -82,8 +82,20 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		if (debug)
 			fis.addImage("without blue parts", result);
 		
-		if (!sideImage || !options.isHighResMaize())
-			return result;
+		if (!sideImage || !options.isHighResMaize()) {
+			if (options.isHighResMaize()) {
+				// remove black matts inside the holes
+				return 
+						result.getIO().thresholdLAB(
+								0, 150, 
+								110, 150, 
+								100, 150, 
+								ImageOperation.BACKGROUND_COLORint,
+								CameraPosition.TOP,
+								false, true).getImage();
+			} else
+				return result;
+		}
 		
 		FlexibleImage potFiltered = labFilter(
 				result.copy(),

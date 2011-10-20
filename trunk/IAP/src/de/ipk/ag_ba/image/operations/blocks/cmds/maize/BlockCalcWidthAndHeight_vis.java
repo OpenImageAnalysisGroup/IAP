@@ -26,16 +26,28 @@ public class BlockCalcWidthAndHeight_vis extends AbstractSnapshotAnalysisBlockFI
 		double realMarkerDistHorizontal = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
 		
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
-		FlexibleImage img = options.isMaize() ? getInput().getMasks().getFluo() : getInput().getMasks().getVis();
+		
+		boolean useFluo = false;//options.isMaize();
+
+		int vertYsoilLevel = -1;
+		if (useFluo) {
+			if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO)!=null)
+				vertYsoilLevel = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO).getValue();
+		} else {
+			if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS)!=null)
+				vertYsoilLevel = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS).getValue();
+		}
+		
+		FlexibleImage img = useFluo ? getInput().getMasks().getFluo() : getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && img != null) {
-			Point values = getWidthAndHeightSide(img, background);
-			//img.print("img");
-			double resf = options.isMaize() ? (double) getInput().getMasks().getVis().getWidth() / (double) img.getWidth()
+			Point values = getWidthAndHeightSide(img, background, vertYsoilLevel);
+
+			double resf = useFluo ? (double) getInput().getMasks().getVis().getWidth() / (double) img.getWidth()
 					* (getInput().getImages().getFluo().getWidth() / (double) getInput().getImages().getFluo().getHeight())
 					/ (getInput().getImages().getVis().getWidth() / (double) getInput().getImages().getVis().getHeight())
 					: 1.0;
 			
-			double resfww = options.isMaize() ? (double) getInput().getMasks().getVis().getWidth() / (double) img.getWidth()
+			double resfww = useFluo ? (double) getInput().getMasks().getVis().getWidth() / (double) img.getWidth()
 							: 1.0;
 			if (values != null) {
 				if (distHorizontal != null) {
@@ -69,9 +81,11 @@ public class BlockCalcWidthAndHeight_vis extends AbstractSnapshotAnalysisBlockFI
 		return getInput().getMasks().getVis();
 	}
 	
-	private Point getWidthAndHeightSide(FlexibleImage vis, int background) {
+	private Point getWidthAndHeightSide(FlexibleImage vis, int background, int vertYsoilLevel) {
 		TopBottomLeftRight temp = new ImageOperation(vis).getExtremePoints(background);
 		if (temp != null) {
+			if (vertYsoilLevel>0)
+				temp.setBottom(vertYsoilLevel);
 			Point values = new Point(Math.abs(temp.getRightX() - temp.getLeftX()), Math.abs(temp.getBottomY() - temp.getTopY()));
 			return values;
 		} else
@@ -118,7 +132,7 @@ public class BlockCalcWidthAndHeight_vis extends AbstractSnapshotAnalysisBlockFI
 			if (resize != null) {
 				resize = new ImageOperation(resize).rotate(-angle).getImage();
 				// resize.print("resize");
-				Point values = getWidthAndHeightSide(resize, background);
+				Point values = getWidthAndHeightSide(resize, background,-1);
 				return values;
 			} else {
 				return null;
