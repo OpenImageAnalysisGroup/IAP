@@ -77,18 +77,20 @@ public class FlexibleImageStack {
 			return;
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);
-		image.show(title + " (" + stack.getSize() + ")");
-		ImageWindow win = image.getWindow();
-		JButton jb = new JButton(buttonTitle);
-		jb.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				actionCmd.run();
-			}
-		});
-		win.add(jb);
-		win.doLayout();
-		IAPmain.showImageJ();
+		if (image.getWidth() > 0 && image.getHeight() > 0) {
+			image.show(title + " (" + stack.getSize() + ")");
+			ImageWindow win = image.getWindow();
+			JButton jb = new JButton(buttonTitle);
+			jb.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					actionCmd.run();
+				}
+			});
+			win.add(jb);
+			win.doLayout();
+			IAPmain.showImageJ();
+		}
 	}
 	
 }

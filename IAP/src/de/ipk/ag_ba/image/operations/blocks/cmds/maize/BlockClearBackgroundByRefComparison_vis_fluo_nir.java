@@ -3,6 +3,8 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -23,6 +25,19 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 	
 	@Override
 	protected FlexibleImage processVISmask() {
+		if (getInput().getImages().getVis() != null && getInput().getMasks().getVis() == null) {
+			// no reference image create dummy image
+			FlexibleImage in = getInput().getImages().getVis();
+			FlexibleImage simulatedGreen = in.getIO().copy().filterByHSV(0.1, Color.GREEN.getRGB()).
+					print("simulated background green", debug).getImage();
+			FlexibleImage simulatedGreen2 = in.getIO().copy().filterByHSV(0.1, new Color(94, 118, 50).getRGB()).
+					print("simulated background green 2", debug).getImage();
+			FlexibleImage simulatedBlue = in.getIO().copy().print("mist", debug).filterByHSV(0.1, new Color(20, 36, 76).getRGB()).
+					print("simulated background blue", debug).getImage();
+			FlexibleImage simBlueGreen = simulatedBlue.getIO().or(simulatedGreen).or(simulatedGreen2).print("simulated green and blue", debug).getImage();
+			getInput().getMasks().setVis(in.getIO().xor(simBlueGreen).print("sim xor", debug).getImage());
+		}
+		
 		if (getInput().getImages().getVis() != null && getInput().getMasks().getVis() != null) {
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
 				FlexibleImage visImg = getInput().getImages().getVis().print("In VIS", false);
@@ -61,6 +76,12 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
+		if (getInput().getImages().getFluo() != null && getInput().getMasks().getFluo() == null) {
+			// create simulated fluo background
+			int w = getInput().getImages().getFluo().getWidth();
+			int h = getInput().getImages().getFluo().getHeight();
+			getInput().getMasks().setFluo(ImageOperation.createColoredImage(w, h, new Color(3, 3, 3)));
+		}
 		if (getInput().getImages().getFluo() != null && getInput().getMasks().getFluo() != null) {
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
 				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
@@ -101,6 +122,12 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
+		if (getInput().getImages().getNir() != null && getInput().getMasks().getNir() == null) {
+			// create simulated nir background
+			int w = getInput().getImages().getNir().getWidth();
+			int h = getInput().getImages().getNir().getHeight();
+			getInput().getMasks().setNir(ImageOperation.createColoredImage(w, h, new Color(180, 180, 180)));
+		}
 		if (getInput().getImages().getNir() != null && getInput().getMasks().getNir() != null) {
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
 				return getInput().getMasks().getNir();
