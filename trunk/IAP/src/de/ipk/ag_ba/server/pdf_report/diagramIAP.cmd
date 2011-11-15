@@ -3,8 +3,17 @@ cd $(dirname $0)
 echo "Current directory: $(pwd)"
 PARAM=$#
 INPUTFILE="report.csv"
-Rscript diagramForReportPDF.r ${INPUTFILE} png "boxplotStacked" none
-Rscript diagramForReportPDF.r ${INPUTFILE} png "!boxplot" ${2}
+
+if [ $PARAM = 1 ]; then
+	TREAT=${1}
+else
+	TREAT="Treatment"	
+fi
+
+Rscript diagramForReportPDF.r ${INPUTFILE} png "boxplotStacked" ${TREAT}
+Rscript diagramForReportPDF.r ${INPUTFILE} png "!boxplot" ${TREAT}
+Rscript diagramForReportPDF.r ${INPUTFILE} png "appendix" ${TREAT}
+
 echo "Create PDF..."
 /usr/texbin/pdflatex report2.tex
 /usr/bin/pdflatex report2.tex
