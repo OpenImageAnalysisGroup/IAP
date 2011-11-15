@@ -200,7 +200,7 @@ public class ImageOperation {
 		int y = 0;
 		for (int c : in) {
 			x++;
-			if (x==w) {
+			if (x == w) {
 				y++;
 				x = 0;
 			}
@@ -225,44 +225,31 @@ public class ImageOperation {
 			
 			intensity = 1 - rf / (float) ((255) + gf);
 			double min = 210f / 255f;
-//			if (y>h*0.90d)
-				min = 210f / 255f;
+			// if (y>h*0.90d)
+			min = 150f / 255f;
 			if (intensity > min)
 				intensity = 1;
-			else {
-				Color.RGBtoHSB(rf, gf, 0, hsb);
-				hsb[2] = rf / 255f;
-				float intensityChloro = 1 - (1 - distanceToRed(hsb[0])) * (hsb[2]);
-				float intensityPheno = 1 - distanceToRed(hsb[0]) * (hsb[2]);
-
+			else
 				switch (type) {
 					case CLASSIC:
 						intensity = intensity / 0.825f;
-						if (intensityChloro>240f/255f && intensityPheno>100f/255f)
-							intensity = 1;
 						break;
 					case CHLOROPHYL:
 						Color.RGBtoHSB(rf, gf, 0, hsb);
 						hsb[2] = rf / 255f;
 						intensity = 1 - (1 - distanceToRed(hsb[0])) * (hsb[2]);
-						if (intensity>240f/255f && intensityPheno>100f/255f)
-							intensity = 1;
 						break;
 					case PHENOL:
 						Color.RGBtoHSB(rf, gf, 0, hsb);
 						hsb[2] = rf / 255f;
 						intensity = 1 - distanceToRed(hsb[0]) * (hsb[2]);
-						if (intensity>170f/255f)
+						if (intensity > 170f / 255f)
 							intensity = 1;
-						else
-							if (intensityChloro>240f/255f && intensity>100f/255f)
-								intensity = 1;
-						
 						break;
 					default:
 						throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");
 				}
-			}
+			
 			int i = (int) (intensity * 255d);
 			// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
 			in[idx++] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
@@ -1570,6 +1557,37 @@ public class ImageOperation {
 			
 			if (hsb[2] < t)
 				pixels[index] = clearColor;
+		}
+		return new ImageOperation(pixels, getImage().getWidth(), getImage()
+				.getHeight());
+	}
+	
+	public ImageOperation filterByHSV(double maxDist, int clearColor) {
+		
+		int rgb = clearColor;
+		int r = ((rgb >> 16) & 0xff);
+		int g = ((rgb >> 8) & 0xff);
+		int b = (rgb & 0xff);
+		
+		float[] hsb = new float[3];
+		Color.RGBtoHSB(r, g, b, hsb);
+		
+		float t = hsb[0];
+		
+		int[] pixels = getImageAs1array();
+		for (int index = 0; index < pixels.length; index++) {
+			rgb = pixels[index];
+			// int a = ((rgb >> 24) & 0xff);
+			r = ((rgb >> 16) & 0xff);
+			g = ((rgb >> 8) & 0xff);
+			b = (rgb & 0xff);
+			
+			Color.RGBtoHSB(r, g, b, hsb);
+			
+			if (Math.abs(hsb[0] - t) > maxDist)
+				pixels[index] = BACKGROUND_COLORint;
+			else
+				pixels[index] = rgb;
 		}
 		return new ImageOperation(pixels, getImage().getWidth(), getImage()
 				.getHeight());
@@ -3514,30 +3532,58 @@ public class ImageOperation {
 			}
 		return new FlexibleImage(aa).getIO();
 	}
-
+	
+	public ImageOperation xor(FlexibleImage b) {
+		if (b == null)
+			return this;
+		int[][] aa = getImageAs2array();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] ba = b.resize(w, h).getAs2A();
+		for (int x = 0; x < w; x++)
+			for (int y = 0; y < h; y++) {
+				int apixel = aa[x][y];
+				int bpixel = ba[x][y];
+				if (apixel != BACKGROUND_COLORint && bpixel != BACKGROUND_COLORint) {
+					aa[x][y] = BACKGROUND_COLORint;
+				}
+			}
+		return new FlexibleImage(aa).getIO();
+	}
+	
 	public ImageOperation filterGray(int minBrightness, int maxAdiff, int maxBdiff) {
 		float[][] lab = getImage().getLab(true);
 		int w = getWidth();
 		int h = getHeight();
 		int[] in = getImageAs1array();
-		int res[] = new int[w*h];
-		for (int i = 0; i<w*h;i++) {
+		int res[] = new int[w * h];
+		for (int i = 0; i < w * h; i++) {
 			float l = lab[0][i];
 			float a = lab[1][i];
 			float b = lab[2][i];
-			if (l>minBrightness && Math.abs(a-127d)<maxAdiff && Math.abs(b-127d)<maxBdiff)
-				res[i]=BACKGROUND_COLORint;
+			if (l > minBrightness && Math.abs(a - 127d) < maxAdiff && Math.abs(b - 127d) < maxBdiff)
+				res[i] = BACKGROUND_COLORint;
 			else
-				res[i]=in[i];
+				res[i] = in[i];
 		}
 		return new ImageOperation(res, w, h);
 	}
-
+	
 	private int getHeight() {
 		return image.getHeight();
 	}
-
+	
 	private int getWidth() {
 		return image.getWidth();
+	}
+	
+	public static FlexibleImage createColoredImage(int w, int h, Color col) {
+		int[] img = new int[w * h];
+		int ci = col.getRGB();
+		int wh = w * h;
+		for (int i = 0; i < wh; i++) {
+			img[i] = ci;
+		}
+		return new FlexibleImage(w, h, img);
 	}
 }

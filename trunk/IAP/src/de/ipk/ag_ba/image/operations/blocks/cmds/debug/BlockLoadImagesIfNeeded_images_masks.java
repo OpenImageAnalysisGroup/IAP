@@ -121,8 +121,11 @@ public class BlockLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalys
 					}
 				}
 			}
+			
 			// }
 		}
+		
+		checkForStrangeTVtestImageAndReplaceWithNull();
 		
 		printInfo(getInput().getMasks().getVis(), BlockPrintInfosTyp.VisMask);
 		printInfo(getInput().getImages().getVis(), BlockPrintInfosTyp.VisImage);
@@ -132,6 +135,57 @@ public class BlockLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalys
 		
 		printInfo(getInput().getMasks().getNir(), BlockPrintInfosTyp.NirMask);
 		printInfo(getInput().getImages().getNir(), BlockPrintInfosTyp.NirImage);
+	}
+	
+	private void checkForStrangeTVtestImageAndReplaceWithNull() {
+		if (getInput().getImages().getVis() != null) {
+			// check for TV test image
+			FlexibleImage i = getInput().getImages().getVis();
+			if (i.getWidth() == 768 && i.getHeight() == 576) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: WARNING: VISIBLE IMAGE IS TV-TEST-IMAGE (set to null) !!!");
+				getInput().getImages().setVis(null);
+			}
+		}
+		if (getInput().getImages().getFluo() != null) {
+			// check for TV test image
+			FlexibleImage i = getInput().getImages().getFluo();
+			if (i.getWidth() == 768 && i.getHeight() == 576) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: WARNING: FLUO IMAGE IS TV-TEST-IMAGE (set to null) !!!");
+				getInput().getImages().setFluo(null);
+			}
+		}
+		if (getInput().getImages().getNir() != null) {
+			// check for TV test image
+			FlexibleImage i = getInput().getImages().getNir();
+			if (i.getWidth() == 768 && i.getHeight() == 576) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: WARNING: NIR IMAGE IS TV-TEST-IMAGE (set to null) !!!");
+				getInput().getImages().setNir(null);
+			}
+		}
+		if (getInput().getMasks().getVis() != null) {
+			// check for TV test image
+			FlexibleImage i = getInput().getMasks().getVis();
+			if (i.getWidth() == 768 && i.getHeight() == 576) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: WARNING: VISIBLE REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
+				getInput().getMasks().setVis(null);
+			}
+		}
+		if (getInput().getMasks().getFluo() != null) {
+			// check for TV test image
+			FlexibleImage i = getInput().getMasks().getFluo();
+			if (i.getWidth() == 768 && i.getHeight() == 576) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: WARNING: FLUO REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
+				getInput().getMasks().setFluo(null);
+			}
+		}
+		if (getInput().getMasks().getNir() != null) {
+			// check for TV test image
+			FlexibleImage i = getInput().getMasks().getNir();
+			if (i.getWidth() == 768 && i.getHeight() == 576) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: WARNING: NIR REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
+				getInput().getMasks().setNir(null);
+			}
+		}
 	}
 	
 	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp type) {

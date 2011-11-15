@@ -197,6 +197,9 @@ public class TaskDescription {
 									if (statusProvider != null)
 										statusProvider.setCurrentStatusText1("Merged Analysis Results");
 								}
+								
+								e.sortSubstances();
+								
 								long tStart = cmd.getSubmissionTime();
 								long tProcessing = tFinish - tStart;
 								long minutes = tProcessing / 1000 / 60;

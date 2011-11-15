@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -334,8 +336,8 @@ public class Experiment implements ExperimentInterface {
 				int measurementcount = 0;
 				for (String substance : substances2conditions.keySet()) {
 					if (status != null)
-						status.setCurrentStatusText2("Process "+substance);
-
+						status.setCurrentStatusText2("Process " + substance);
+					
 					SubstanceInterface s = null;
 					
 					for (SubstanceInterface sub : mappingDataList)
@@ -465,7 +467,7 @@ public class Experiment implements ExperimentInterface {
 	/*
 	 * Delegate methods
 	 */
-	
+
 	public boolean isEmpty() {
 		for (SubstanceInterface s : this)
 			for (ConditionInterface c : s)
@@ -880,5 +882,14 @@ public class Experiment implements ExperimentInterface {
 				c.setRowId(condition2id.get(cid));
 			}
 		}
+	}
+	
+	public void sortSubstances() {
+		Collections.sort(md, new Comparator<SubstanceInterface>() {
+			@Override
+			public int compare(SubstanceInterface o1, SubstanceInterface o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
 	}
 }

@@ -221,7 +221,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						BlockProperties results;
 						try {
 							results = processAngleWithinSnapshot(tmf.get(configAndAngle), maximumThreadCountOnImageLevel, status,
-									workloadEqualAngleSnapshotSets, getParentPriority());
+										workloadEqualAngleSnapshotSets, getParentPriority());
 							if (results != null) {
 								analysisInput.put(configAndAngle, inImage);
 								analysisResults.put(configAndAngle, results);
@@ -243,7 +243,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			BlockProperties postprocessingResults;
 			try {
 				postprocessingResults = getImageProcessor().postProcessPipelineResults(
-						inSample, analysisInput, analysisResults);
+							inSample, analysisInput, analysisResults);
 				processStatisticalAndVolumeSampleOutput(inSample, postprocessingResults);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -358,9 +358,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						if (id != null && id.getParentSample() != null) {
 							LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
 							ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, false);
-							if (imageRef != null)
-								output.add(imageRef);
-							else
+							if (imageRef != null) {
+								if (output != null)
+									output.add(imageRef);
+							} else
 								System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: SaveImageAndUpdateURL failed! (NULL Result)");
 						}
 					}
@@ -371,8 +372,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						ImageData imageRef = saveImageAndUpdateURL(loadedImage, databaseTarget, true);
 						if (imageRef == null) {
 							System.out.println("ERROR #1");
-						} else
-							output.add(imageRef);
+						} else {
+							if (output != null)
+								output.add(imageRef);
+						}
 					}
 				}
 			}
@@ -554,6 +557,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	// }
 	
 	private void processStatisticalOutput(ImageData inVis, BlockProperties analysisResults) {
+		if (output == null) {
+			System.out.println("Internal Error: Output is NULL!!");
+			throw new RuntimeException("Internal Error: Output is NULL!! 1");
+		}
+		
 		for (BlockPropertyValue bpv : analysisResults.getProperties("RESULT_")) {
 			if (bpv.getName() == null)
 				continue;
@@ -570,6 +578,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void processStatisticalAndVolumeSampleOutput(Sample3D inSample, BlockProperties analysisResults) {
+		if (output == null) {
+			System.out.println("Internal Error: Output is NULL!!");
+			throw new RuntimeException("Internal Error: Output is NULL!! 2");
+		}
+		
 		for (String volumeID : analysisResults.getVolumeNames()) {
 			VolumeData v = analysisResults.getVolume(volumeID);
 			if (v != null) {
@@ -604,10 +617,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					inSample.getParentCondition().getExperimentName()
 							+ " (" + getName() + ")");
 			
-			m.setValue(bpv.getValue());
-			m.setUnit(bpv.getUnit());
-			
-			output.add(m);
+			if (bpv != null && m != null) {
+				m.setValue(bpv.getValue());
+				m.setUnit(bpv.getUnit());
+				
+				output.add(m);
+			}
 		}
 	}
 	
