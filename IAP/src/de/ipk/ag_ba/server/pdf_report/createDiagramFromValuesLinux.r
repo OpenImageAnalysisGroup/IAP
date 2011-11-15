@@ -28,7 +28,9 @@ if(FALSE){
 	
 	
 	#fileName <- "report.csv"
-	fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
+	#fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
+	fileName <- "testDataset2.csv"
+	#fileName <- "1107BA_Corn_new2.csv"
 	#saveName="OutputDiagramm"
 	saveFormat="png"
 	imageWidth="1280"
@@ -46,9 +48,9 @@ if(FALSE){
 	treatment="Treatment"
 	#treatment="none"
 	#filterTreatment="none"
-	filterTreatment="normal$dry"
-	secondTreatment="none"
-	filterSecondTreatment="none"
+	filterTreatment="dry"
+	secondTreatment="Day (Int)"
+	filterSecondTreatment="8$12"
 	filterXaxis="none"
 	#filterXaxis=c("6$8$10$12")
 	xAxis="Day (Int)"
@@ -58,8 +60,9 @@ if(FALSE){
 	#descriptor <- c("side.fluo.chlorophyl.normalized.histogram.bin.1.0_36$side.fluo.chlorophyl.normalized.histogram.bin.2.36_72$side.fluo.chlorophyl.normalized.histogram.bin.3.72_109$side.fluo.chlorophyl.normalized.histogram.bin.4.109_145$side.fluo.chlorophyl.normalized.histogram.bin.5.145_182$side.fluo.chlorophyl.normalized.histogram.bin.6.182_218$side.fluo.chlorophyl.normalized.histogram.bin.7.218_255")
 	#descriptor <- c("Wert1$Wert2$Wert3$Wert4")
 	
-	descriptor <- "Treatment"
-	#descriptor <- "side.leaf.length.avg (px)"
+	#descriptor <- "Treatment"
+	descriptor <- "Plant ID$Repl ID"
+	#descriptor <- "top.fluo.normalized.histogram.bin.2.25_51"
 	#descriptor <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255")
 	yAxisName <- c("NIR absorption class (%)")
 	
@@ -72,6 +75,7 @@ if(FALSE){
 	saveName = descriptor
 	#iniDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8")
 	iniDataSet <- read.csv(fileName, header=TRUE, sep=";", fileEncoding="ISO-8859-1", encoding="UTF-8")
+	appendix=FALSE
 }
 ##
 #		END Of Test
@@ -82,7 +86,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 		imageHeight="768", dpi="90", diagramTyp="!boxplot", isGray="false", treatment="Treatment",
 		filterTreatment="none", secondTreatment="none", filterSecondTreatment="none", 
 		filterXaxis="none", xAxis="Day (Int)", descriptor="side.area", showResultInR=FALSE, xAxisName="none", yAxisName="none",
-		transparent=TRUE, legendUnderImage=TRUE) {			
+		transparent=TRUE, legendUnderImage=TRUE, appendix=FALSE) {			
 
 #library for save images
 #install.packages(c("Cairo"), repos="http://cran.r-project.org", dependencies = TRUE)
@@ -294,7 +298,6 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 				if (filterTyp[[d]] != "none") {
 					
 					set <- rep(FALSE, times=length(CalculateMeanWorkingDataSet[[column[[d]]]])) | match(CalculateMeanWorkingDataSet[[column[[d]]]],filterValues[[d]],nomatch = 0)
-				
 				} else {
 					
 					set <- rep(TRUE, times=length(CalculateMeanWorkingDataSet[[column[[d]]]]))
@@ -304,7 +307,9 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 					tempWorkingDatasetSum <- set
 				} else {
 					tempWorkingDatasetSum <- tempWorkingDatasetSum & set
+					
 				}
+				#print(tempWorkingDatasetSum)
 			}
 
 			multiDescriptor <- descriptorName
@@ -466,7 +471,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 							Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste(saveName,saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
 						}
 						par(mar=c(4.1,4.1,2.1,2.1))
-						
+												
 						#print(workingDataSet)
 						for (d in 1:length(workingDataSet[1,])) {
 							hundredPercentValue	 <- sum(workingDataSet[,d],na.rm=TRUE)
@@ -545,6 +550,17 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 						}	
 					}
 					symbolParameter <- 1:length(workingDataSet[,1])
+
+					if(appendix) {
+						latexText <- paste("\\item [{\\includegraphics[width=13cm]{",
+								"\\string\"",
+								gsub("\\.", "\\\\lyxdot ", saveName),
+								"\\string\"",
+								"}}]~","\n", sep="")
+						
+						write(x=latexText, append=TRUE, file="appendixImage.tex")
+					}
+					
 				}
 				
 				
