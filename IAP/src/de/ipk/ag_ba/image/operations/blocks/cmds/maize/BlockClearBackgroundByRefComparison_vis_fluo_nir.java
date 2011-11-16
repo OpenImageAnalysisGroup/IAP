@@ -76,12 +76,6 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput().getImages().getFluo() != null && getInput().getMasks().getFluo() == null) {
-			// create simulated fluo background
-			int w = getInput().getImages().getFluo().getWidth();
-			int h = getInput().getImages().getFluo().getHeight();
-			getInput().getMasks().setFluo(ImageOperation.createColoredImage(w, h, new Color(3, 3, 3)));
-		}
 		if (getInput().getImages().getFluo() != null && getInput().getMasks().getFluo() != null) {
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
 				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
@@ -106,8 +100,8 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
 				return new ImageOperation(fluo).compare()
 						.compareImages("fluo", getInput().getMasks().getFluo()
-								//.getIO().
-								//copyImagesParts(0.26, 0.3).print("cut out", true).getImage()
+								// .getIO().
+								// copyImagesParts(0.26, 0.3).print("cut out", true).getImage()
 								,
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
@@ -149,7 +143,7 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 						return new ImageOperation(nir).compare()
 								.compareGrayImages(getInput().getMasks().getNir(), 10, 23, options.getBackground())
 								.print("result nir", debug).thresholdBlueHigherThan(240).border(2).getImage();
-						
+					
 				}
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");
