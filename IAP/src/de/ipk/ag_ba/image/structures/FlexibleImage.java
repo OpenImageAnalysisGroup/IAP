@@ -294,8 +294,8 @@ public class FlexibleImage {
 		}
 		
 		if (rightX - leftX <= 0 || bottomY - topY <= 0) {
-			if (rightX - leftX < 0 || bottomY - topY < 0)
-				System.out.println("WARNING: cropAbs detected negative crop desire...");
+			// if (rightX - leftX < 0 || bottomY - topY < 0)
+			// System.out.println("WARNING: cropAbs detected negative crop desire...");
 			return io.getImage();
 		}
 		

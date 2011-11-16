@@ -473,6 +473,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	@Override
 	public Collection<NumericMeasurementInterface> getOutput() {
+		if (output == null)
+			System.out.println("INTERNAL ERROR: SECOND ATTEMPT TO RETRIEVE OUTPUT!!");
 		Collection<NumericMeasurementInterface> result = output;
 		output = null;
 		return result;

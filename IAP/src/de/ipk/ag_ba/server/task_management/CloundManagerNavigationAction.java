@@ -48,16 +48,16 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Cloud Computing ("+m.getDatabaseName()+")";
+		return "Cloud Computing (" + m.getDatabaseName() + ")";
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		GUIsetting guiSetting = src.getGUIsetting();
-		 NavigationButton startOrStopServerMode = new NavigationButton(
-		 new EnableOrDisableServerModeAction(m), guiSetting);
-		 res.add(startOrStopServerMode);
+		NavigationButton startOrStopServerMode = new NavigationButton(
+				new EnableOrDisableServerModeAction(m), guiSetting);
+		res.add(startOrStopServerMode);
 		
 		try {
 			NavigationButton jobStatus = new NavigationButton(new ActionJobStatus(m), src.getGUIsetting());
@@ -72,7 +72,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		}
 		
 		try {
-			ArrayList<CloudHost> hl = m.batchGetAvailableHosts(2 * 60 * 1000);
+			ArrayList<CloudHost> hl = m.batchGetAvailableHosts(3 * 60 * 1000);
 			boolean clusterAvailable = false;
 			for (CloudHost ip : hl) {
 				if (!ip.isClusterExecutionMode()) {
