@@ -310,7 +310,7 @@ public class FlexibleImage {
 			}
 		}
 		if (res.length > 0)
-			return new FlexibleImage(res);
+			return new FlexibleImage(res).print("DABA", false);
 		else
 			return null;
 	}

@@ -43,7 +43,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		FlexibleImage inputMain = getInput().getImages().getFluo();
-		if (inputMain==null)
+		if (inputMain == null)
 			return null;
 		FlexibleImage input = getInput().getMasks().getFluo();
 		FlexibleImage res;
@@ -77,7 +77,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	@Override
 	protected FlexibleImage processNIRmask() {
 		FlexibleImage inputMain = getInput().getImages().getNir();
-		if (inputMain==null)
+		if (inputMain == null)
 			return null;
 		FlexibleImage input = getInput().getMasks().getNir();
 		FlexibleImage res;
@@ -278,6 +278,10 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 					searchWhiteTrue,
 					debug);
 		} else {
+			if (scanWidth > w)
+				scanWidth = w;
+			if (scanHeight > h)
+				scanHeight = h;
 			top = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
 			bottom = inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
 			center = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, minL, 50,

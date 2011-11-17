@@ -66,6 +66,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private ArrayList<FlexibleImageStack> forcedDebugStacks;
 	private int prio;
 	private MongoDB m;
+	private Exception error;
+	private boolean runOK;
 	
 	@Override
 	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m, int workOnSubset,
@@ -157,34 +159,40 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(AbstractPhenotypingTask.class,
 				nn);
 		final ThreadSafeOptions freed = new ThreadSafeOptions();
-		for (TreeMap<String, ImageSet> tm : workload) {
-			final TreeMap<String, ImageSet> tmf = tm;
-			
-			maxCon.acquire(1);
-			try {
-				Thread t = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tmf);
-						} catch (InterruptedException err) {
-							err.printStackTrace();
-						} finally {
-							maxCon.release(1);
-							freed.setBval(0, true);
+		try {
+			for (TreeMap<String, ImageSet> tm : workload) {
+				final TreeMap<String, ImageSet> tmf = tm;
+				
+				maxCon.acquire(1);
+				try {
+					Thread t = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tmf);
+							} catch (InterruptedException err) {
+								System.err.println("INTERNAL ERROR: ERROR NNNN 444");
+								err.printStackTrace();
+							} finally {
+								maxCon.release(1);
+								freed.setBval(0, true);
+							}
 						}
-					}
-				}, "Snapshot Analysis");
-				t.setPriority(Thread.MIN_PRIORITY);
-				t.start();
-			} catch (Exception eeee) {
-				if (!freed.getBval(0, false))
-					maxCon.release(1);
-				throw new RuntimeException(eeee);
+					}, "Snapshot Analysis");
+					t.setPriority(Thread.MIN_PRIORITY);
+					t.start();
+				} catch (Exception eeee) {
+					error = eeee;
+					if (!freed.getBval(0, false))
+						maxCon.release(1);
+					throw new RuntimeException(eeee);
+				}
 			}
+			maxCon.acquire(nn);
+			maxCon.release(nn);
+		} finally {
+			runOK = true;
 		}
-		maxCon.acquire(nn);
-		maxCon.release(nn);
 		status.setCurrentStatusValueFine(100d);
 		input = null;
 	}
@@ -204,7 +212,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		Sample3D inSample = null;
 		final TreeMap<String, BlockProperties> analysisResults = new TreeMap<String, BlockProperties>();
 		final TreeMap<String, ImageData> analysisInput = new TreeMap<String, ImageData>();
-		ArrayList<MyThread> wait = new ArrayList<MyThread>();
+		// ArrayList<MyThread> wait = new ArrayList<MyThread>();
 		if (tmf != null) {
 			for (final String configAndAngle : tmf.keySet()) {
 				if (status != null && status.wantsToStop())
@@ -215,30 +223,30 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					continue;
 				final ImageData inImage = tmf.get(configAndAngle).getVIS();
 				
-				Runnable r = new Runnable() {
-					@Override
-					public void run() {
-						BlockProperties results;
-						try {
-							results = processAngleWithinSnapshot(tmf.get(configAndAngle), maximumThreadCountOnImageLevel, status,
+				// Runnable r = new Runnable() {
+				// @Override
+				// public void run() {
+				BlockProperties results;
+				try {
+					results = processAngleWithinSnapshot(tmf.get(configAndAngle), maximumThreadCountOnImageLevel, status,
 										workloadEqualAngleSnapshotSets, getParentPriority());
-							if (results != null) {
-								analysisInput.put(configAndAngle, inImage);
-								analysisResults.put(configAndAngle, results);
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+					if (results != null) {
+						analysisInput.put(configAndAngle, inImage);
+						analysisResults.put(configAndAngle, results);
 					}
-				};
-				boolean threaded = false;
-				if (!threaded)
-					r.run();
-				else
-					wait.add(BackgroundThreadDispatcher.addTask(r, "Analyze image within snapshot", -1000, -1000));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				// }
+				// };
+				// boolean threaded = false;
+				// if (!threaded)
+				// r.run();
+				// else
+				// wait.add(BackgroundThreadDispatcher.addTask(r, "Analyze image within snapshot", -1000, -1000));
 			}
 		}
-		BackgroundThreadDispatcher.waitFor(wait);
+		// BackgroundThreadDispatcher.waitFor(wait);
 		if (inSample != null && !analysisResults.isEmpty()) {
 			BlockProperties postprocessingResults;
 			try {
@@ -351,8 +359,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
-				if (output == null)
+				if (output == null) {
+					System.err.println("INTERNAL ERROR: OUTPUT IS NULL!!! 3");
 					return;
+				}
 				if (optLabelImageContent == null) {
 					if (image.getHeight() > 1) {
 						if (id != null && id.getParentSample() != null) {
@@ -560,7 +570,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void processStatisticalOutput(ImageData inVis, BlockProperties analysisResults) {
 		if (output == null) {
-			System.out.println("Internal Error: Output is NULL!!");
+			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
 		}
 		
@@ -581,7 +591,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void processStatisticalAndVolumeSampleOutput(Sample3D inSample, BlockProperties analysisResults) {
 		if (output == null) {
-			System.out.println("Internal Error: Output is NULL!!");
+			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 2");
 		}
 		

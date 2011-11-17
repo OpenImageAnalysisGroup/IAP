@@ -26,9 +26,9 @@ public class BlockCrop_images_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS).getValue();
 				// }
 				
-				if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS)!=null)
+				if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) != null)
 					potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS).getValue();
-
+				
 				return getInput().getImages().getVis().cropAbs(-1, -1, -1, potCut);
 			}
 		} else
@@ -48,10 +48,10 @@ public class BlockCrop_images_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO).getValue();
 				// }
 				
-				if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO)!=null)
-					potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO).getValue();
-
-				return getInput().getImages().getFluo().cropAbs(-1, -1, -1, potCut);
+				if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
+					potCut = (int) getProperties().getNumericProperty(0, 1,
+							PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO).getValue();
+				return getInput().getImages().getFluo().cropAbs(-1, -1, -1, -1);// potCut);
 			}
 		} else
 			return null;
@@ -70,9 +70,9 @@ public class BlockCrop_images_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
 				// }
 				
-				if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR)!=null)
+				if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) != null)
 					potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
-
+				
 				return getInput().getImages().getNir().cropAbs(-1, -1, -1, potCut);
 			}
 		} else

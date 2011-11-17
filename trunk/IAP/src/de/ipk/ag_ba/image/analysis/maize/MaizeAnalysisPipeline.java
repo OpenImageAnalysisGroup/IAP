@@ -29,6 +29,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByRefComparison_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkers_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearSides;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockFindBlueMarkers_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockIntensityConversion_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjects_vis;
@@ -55,6 +56,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockCreateDummyReferenceIfNeeded_vis.class);
 		p.add(BlockColorBalancing_vis.class);
 		p.add(BlockFindBlueMarkers_vis.class);
+		p.add(BlockClearSides.class);
 		p.add(BlockColorBalancing_fluo_nir.class);
 		p.add(BlockColorBalancing_vertical_nir.class);
 		p.add(BlockColorBalancing_fluo_nir.class);

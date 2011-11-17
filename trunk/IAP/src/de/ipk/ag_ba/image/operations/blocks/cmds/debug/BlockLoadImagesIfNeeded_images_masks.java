@@ -244,9 +244,29 @@ public class BlockLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalys
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
-		if (options != null) //  && !options.isMaize()
+		if (options != null) // && !options.isMaize()
 			if (processedImages != null && processedImages.getVis() != null && processedImages.getFluo() != null
 					&& processedImages.getVis().getHeight() > processedImages.getFluo().getHeight())
 				options.setHighResMaize(true);
+		
+		if (processedImages.getVis() != null && processedMasks.getVis() != null &&
+				processedImages.getVis().getWidth() != processedMasks.getVis().getWidth()) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (VIS)");
+			processedImages.setVis(null);
+			processedMasks.setVis(null);
+		}
+		if (processedImages.getFluo() != null && processedMasks.getFluo() != null &&
+				processedImages.getFluo().getWidth() != processedMasks.getFluo().getWidth()) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (FLUO)");
+			processedImages.setFluo(null);
+			processedMasks.setFluo(null);
+		}
+		if (processedImages.getNir() != null && processedMasks.getNir() != null &&
+				processedImages.getNir().getWidth() != processedMasks.getNir().getWidth()) {
+			System.out.println(SystemAnalysisExt.getCurrentTime() + "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (NIR)");
+			processedImages.setNir(null);
+			processedMasks.setNir(null);
+		}
+		
 	}
 }
