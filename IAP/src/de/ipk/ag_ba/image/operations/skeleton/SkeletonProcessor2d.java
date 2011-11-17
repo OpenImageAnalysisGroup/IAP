@@ -631,7 +631,7 @@ public class SkeletonProcessor2d {
 					if (v == colorEndpoints)
 						r = 18;
 					if (v == colorBranches)
-						r = 3;
+						r = 2;
 					if (v == colorBloomEndpoint)
 						r = 20;
 					for (int diffX = -r; diffX < r; diffX++)
@@ -640,7 +640,7 @@ public class SkeletonProcessor2d {
 									((diffX * diffX + diffY * diffY) <= 12 * 12)) // ||
 								// (diffX * diffX + diffY * diffY) >= 20 * 20)
 								continue;
-							if (x - diffX >= 0 && y - diffY >= 0 && x - diffX < w && y - diffY < h)
+							if (x - diffX > 0 && y - diffY > 0 && x - diffX < w && y - diffY < h)
 								plantImg[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
 						}
 				}
@@ -821,7 +821,7 @@ public class SkeletonProcessor2d {
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = cutPositionY - s; y < cutPositionY + h * 0.1; y++) {
-				if (y < 0 || y>=h)
+				if (y < 0 || y >= h)
 					continue;
 				c = visImg[x][y];
 				if (c != ImageOperation.BACKGROUND_COLORint) {

@@ -188,8 +188,16 @@ public class ImageOperation {
 				(int) (factor * image.getHeight()));
 	}
 	
-	public ImageOperation convertFluo2intensity(FluoAnalysis type) {
+	/**
+	 * @param minimumIntensity
+	 *           E.g. 150 or 210. Use a negative value in order to use the
+	 *           default border (currently 150).
+	 */
+	public ImageOperation convertFluo2intensity(FluoAnalysis type, double minimumIntensity) {
 		int background = ImageOperation.BACKGROUND_COLORint;
+		
+		if (minimumIntensity < 0)
+			minimumIntensity = 150;
 		
 		int[] in = getImageAs1array(); // gamma(0.1) // 99999999999999999999999999999999
 		int w = image.getWidth();
@@ -226,7 +234,11 @@ public class ImageOperation {
 			intensity = 1 - rf / (float) ((255) + gf);
 			double min = 210f / 255f;
 			// if (y>h*0.90d)
+			
 			min = 150f / 255f;
+			
+			min = minimumIntensity / 255f;
+			
 			if (intensity > min)
 				intensity = 1;
 			else
@@ -252,7 +264,8 @@ public class ImageOperation {
 			
 			int i = (int) (intensity * 255d);
 			// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
-			in[idx++] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
+			int val = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
+			in[idx++] = val;
 		}
 		return new ImageOperation(in, w, h); // new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
 	}
@@ -2802,8 +2815,9 @@ public class ImageOperation {
 		int r, g, b, c;
 		float Li, ai, bi;
 		FlexibleImage marked = null;
-		ImageCanvas canvas = new ImageOperation(image).copy().getCanvas();
+		ImageCanvas canvas = null;
 		if (debug) {
+			canvas = new ImageOperation(image).copy().getCanvas();
 			marked = canvas.fillRect(x1, y1, w, h, Color.RED.getRGB(), 0.7).getImage();
 		}
 		// sums of RGB
@@ -3309,12 +3323,13 @@ public class ImageOperation {
 						r = 20;
 					for (int diffX = -r; diffX < r; diffX++)
 						for (int diffY = -r; diffY < r; diffY++) {
+							if (!(x - diffX >= 0 && y - diffY >= 0 && x - diffX < w && y - diffY < h))
+								continue;
 							if ((v == SkeletonProcessor2d.colorEndpoints || v == SkeletonProcessor2d.colorBloomEndpoint) &&
 									((diffX * diffX + diffY * diffY) <= 12 * 12)) // ||
 								// (diffX * diffX + diffY * diffY) >= 20 * 20)
 								continue;
-							if (x - diffX >= 0 && y - diffY >= 0 && x - diffX < w && y - diffY < h)
-								res[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
+							res[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
 						}
 				}
 			}
