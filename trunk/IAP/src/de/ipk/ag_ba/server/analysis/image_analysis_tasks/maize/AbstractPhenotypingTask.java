@@ -102,96 +102,104 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	public void performAnalysis(final int maximumThreadCountParallelImages, final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException {
 		
-		status.setCurrentStatusValue(0);
-		output = new ArrayList<NumericMeasurementInterface>();
-		
-		ArrayList<TreeMap<String, ImageSet>> workload = new ArrayList<TreeMap<String, ImageSet>>();
-		
-		addTopOrSideImagesToWorkset(workload, 0, analyzeTopImages(), analyzeSideImages());
-		
-		// workload = filterWorkload(workload, null);// "Athletico");// "Rainbow Amerindian"); // Athletico
-		
-		final ThreadSafeOptions tso = new ThreadSafeOptions();
-		final int workloadSnapshots = workload.size();
-		int snapshotsWithNotAllNeededImageTypes = 0;
-		int side = 0;
-		int top = 0;
-		for (TreeMap<String, ImageSet> tm : workload)
-			for (ImageSet md : tm.values()) {
-				if (!md.hasAllNeededImageTypes()) {
-					snapshotsWithNotAllNeededImageTypes++;
-					System.out.println(md.getVIS() + " / " + md.getFLUO() + " / " + md.getNIR());
-				}
-				if (md.isSide())
-					side++;
-				else
-					top++;
-			}
-		if (snapshotsWithNotAllNeededImageTypes > 0)
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: not all three images available for " + snapshotsWithNotAllNeededImageTypes
-					+ " snapshots!");
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Workload Top/Side: " + top + "/" + side);
-		final int workloadEqualAngleSnapshotSets = top + side;
-		
-		int nn = SystemAnalysis.getNumberOfCPUs();
-		if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY");
-			nn = 1;
-		}
-		if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY");
-			nn = 1;
-		}
-		if (SystemAnalysis.getMemoryMB() < 4000 && nn > 4) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY");
-			nn = 4;
-		}
-		
-		if (nn > 1 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis.getMemoryMB() * 0.7d) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">HIGH MEMORY UTILIZATION, REDUCING CONCURRENCY");
-			nn = nn / 2;
-			if (nn < 1)
-				nn = 1;
-		}
-		
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: " + nn + ")");
-		
-		final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(AbstractPhenotypingTask.class,
-				nn);
-		final ThreadSafeOptions freed = new ThreadSafeOptions();
+		status.setCurrentStatusValue(-1);
+		status.setCurrentStatusText1("Wait for execution time slot");
+		final Semaphore maxInst= BackgroundTaskHelper.lockGetSemaphore(AbstractPhenotypingTask.class, 1);
+		maxInst.acquire();
 		try {
-			for (TreeMap<String, ImageSet> tm : workload) {
-				final TreeMap<String, ImageSet> tmf = tm;
-				
-				maxCon.acquire(1);
-				try {
-					Thread t = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tmf);
-							} catch (InterruptedException err) {
-								System.err.println("INTERNAL ERROR: ERROR NNNN 444");
-								err.printStackTrace();
-							} finally {
-								maxCon.release(1);
-								freed.setBval(0, true);
-							}
-						}
-					}, "Snapshot Analysis");
-					t.setPriority(Thread.MIN_PRIORITY);
-					t.start();
-				} catch (Exception eeee) {
-					error = eeee;
-					if (!freed.getBval(0, false))
-						maxCon.release(1);
-					throw new RuntimeException(eeee);
+			status.setCurrentStatusValue(0);
+			status.setCurrentStatusText1("Initiate "+getName());
+			output = new ArrayList<NumericMeasurementInterface>();
+			
+			ArrayList<TreeMap<String, ImageSet>> workload = new ArrayList<TreeMap<String, ImageSet>>();
+			
+			addTopOrSideImagesToWorkset(workload, 0, analyzeTopImages(), analyzeSideImages());
+			
+			// workload = filterWorkload(workload, null);// "Athletico");// "Rainbow Amerindian"); // Athletico
+			
+			final ThreadSafeOptions tso = new ThreadSafeOptions();
+			final int workloadSnapshots = workload.size();
+			int snapshotsWithNotAllNeededImageTypes = 0;
+			int side = 0;
+			int top = 0;
+			for (TreeMap<String, ImageSet> tm : workload)
+				for (ImageSet md : tm.values()) {
+					if (!md.hasAllNeededImageTypes()) {
+						snapshotsWithNotAllNeededImageTypes++;
+						System.out.println(md.getVIS() + " / " + md.getFLUO() + " / " + md.getNIR());
+					}
+					if (md.isSide())
+						side++;
+					else
+						top++;
 				}
+			if (snapshotsWithNotAllNeededImageTypes > 0)
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: not all three images available for " + snapshotsWithNotAllNeededImageTypes
+						+ " snapshots!");
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Workload Top/Side: " + top + "/" + side);
+			final int workloadEqualAngleSnapshotSets = top + side;
+			
+			int nn = SystemAnalysis.getNumberOfCPUs();
+			if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY");
+				nn = 1;
 			}
-			maxCon.acquire(nn);
-			maxCon.release(nn);
+			if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY");
+				nn = 1;
+			}
+			if (SystemAnalysis.getMemoryMB() < 4000 && nn > 4) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY");
+				nn = 4;
+			}
+			
+			if (nn > 1 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis.getMemoryMB() * 0.7d) {
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">HIGH MEMORY UTILIZATION, REDUCING CONCURRENCY");
+				nn = nn / 2;
+				if (nn < 1)
+					nn = 1;
+			}
+			
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: " + nn + ")");
+		
+			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(this, nn);
+			final ThreadSafeOptions freed = new ThreadSafeOptions();
+			try {
+				for (TreeMap<String, ImageSet> tm : workload) {
+					final TreeMap<String, ImageSet> tmf = tm;
+					
+					maxCon.acquire(1);
+					try {
+						Thread t = new Thread(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									processSnapshot(maximumThreadCountOnImageLevel, status, tso, workloadSnapshots, workloadEqualAngleSnapshotSets, tmf);
+								} catch (InterruptedException err) {
+									System.err.println("INTERNAL ERROR: ERROR NNNN 444");
+									err.printStackTrace();
+								} finally {
+									maxCon.release(1);
+									freed.setBval(0, true);
+								}
+							}
+						}, "Snapshot Analysis");
+						t.setPriority(Thread.MIN_PRIORITY);
+						t.start();
+					} catch (Exception eeee) {
+						error = eeee;
+						if (!freed.getBval(0, false))
+							maxCon.release(1);
+						throw new RuntimeException(eeee);
+					}
+				}
+				maxCon.acquire(nn);
+				maxCon.release(nn);
+			} finally {
+				runOK = true;
+			}
 		} finally {
-			runOK = true;
+			maxInst.release();
 		}
 		status.setCurrentStatusValueFine(100d);
 		input = null;
@@ -486,7 +494,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (output == null)
 			System.out.println("INTERNAL ERROR: SECOND ATTEMPT TO RETRIEVE OUTPUT!!");
 		Collection<NumericMeasurementInterface> result = output;
-		output = null;
+		//output = null;
+		Thread.currentThread().dumpStack();
 		return result;
 	}
 	
