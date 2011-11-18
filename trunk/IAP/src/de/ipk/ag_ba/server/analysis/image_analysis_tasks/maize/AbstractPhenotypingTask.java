@@ -104,11 +104,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		status.setCurrentStatusValue(-1);
 		status.setCurrentStatusText1("Wait for execution time slot");
-		final Semaphore maxInst= BackgroundTaskHelper.lockGetSemaphore(AbstractPhenotypingTask.class, 1);
+		final Semaphore maxInst = BackgroundTaskHelper.lockGetSemaphore(AbstractPhenotypingTask.class, 1);
 		maxInst.acquire();
 		try {
 			status.setCurrentStatusValue(0);
-			status.setCurrentStatusText1("Initiate "+getName());
+			status.setCurrentStatusText1("Initiate " + getName());
 			output = new ArrayList<NumericMeasurementInterface>();
 			
 			ArrayList<TreeMap<String, ImageSet>> workload = new ArrayList<TreeMap<String, ImageSet>>();
@@ -161,8 +161,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 			
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: " + nn + ")");
-		
-			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(this, nn);
+			
+			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
 			final ThreadSafeOptions freed = new ThreadSafeOptions();
 			try {
 				for (TreeMap<String, ImageSet> tm : workload) {
@@ -494,7 +494,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (output == null)
 			System.out.println("INTERNAL ERROR: SECOND ATTEMPT TO RETRIEVE OUTPUT!!");
 		Collection<NumericMeasurementInterface> result = output;
-		//output = null;
+		// output = null;
 		Thread.currentThread().dumpStack();
 		return result;
 	}
