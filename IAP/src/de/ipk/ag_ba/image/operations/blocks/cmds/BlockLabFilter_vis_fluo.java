@@ -57,7 +57,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		
 		FlexibleImage labResult = labFilter(
 				// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
-				mask.copy().getIO().blur(3).getImage(),
+				mask.copy().getIO().blur((dilate > 0 ? 3 : 1)).getImage(),
 				orig.copy(),
 				options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),

@@ -30,7 +30,7 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			} else {
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 100) * 1,
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 300) * 1,
 								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
 			return res;
@@ -55,12 +55,21 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 			return null;
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			return new ImageOperation(getInput().getMasks().getFluo()).
-					dilate().
-					removeSmallClusters(ngUse,
-					options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d, 
-					(getInput().getMasks().getFluo().getWidth() / 100) * 1,
-					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+			if (options.isMaize()) {
+				return new ImageOperation(getInput().getMasks().getFluo()).
+						dilate().
+						removeSmallClusters(ngUse,
+						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d, 
+						(getInput().getMasks().getFluo().getWidth() / 100) * 1,
+						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+			} else {
+				return new ImageOperation(getInput().getMasks().getFluo()).
+						dilate().
+						removeSmallClusters(ngUse,
+						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d, 
+						(getInput().getMasks().getFluo().getWidth() / 300) * 1,
+						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+			}
 		} else {
 			int cut2 = (int) ((getInput().getMasks().getFluo().getWidth() / 100) * 0.5);
 			double cut = options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO);

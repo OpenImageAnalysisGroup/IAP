@@ -85,7 +85,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				pictures.add(p);
 			}
 		}
-		if (pictures.size() > 0) {
+		if (pictures.size() > 2) {
 			mg.setRoundViewImages(pictures);
 			mg.calculateModel(new BackgroundTaskConsoleLogger("", "", true), modeOfOperation, 0);
 			// the cube is a true cube (dim X,Y,Z are equal), the

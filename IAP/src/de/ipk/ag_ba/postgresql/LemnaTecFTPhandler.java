@@ -78,7 +78,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					} 
 				}
 			}
-			boolean useSCP = false;
+			boolean useSCP = true;
 			if (useSCP) {
 				InputStream iss = null;
 				synchronized (PREFIX) {

@@ -7,6 +7,10 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 // this might not be needed
+/**
+ * @author Christian Klukas
+ * @deprecated
+ */
 public class BlockRemoveVerticalAndHorizontalStructures_vis_fluo extends AbstractBlock {
 	
 	@Override

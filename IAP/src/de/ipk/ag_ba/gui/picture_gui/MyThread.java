@@ -109,7 +109,7 @@ public class MyThread extends Thread implements Runnable {
 	public void startNG(ExecutorService es) {
 		if (!started) {
 			started = true;
-			boolean direct = true;
+			boolean direct = false;
 			if (direct)
 				run();
 			else
