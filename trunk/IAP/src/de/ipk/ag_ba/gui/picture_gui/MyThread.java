@@ -28,6 +28,8 @@ public class MyThread extends Thread implements Runnable {
 	private final Semaphore sem;
 	private String name;
 	private final Runnable runCode;
+
+	private Runnable finishTask;
 	
 	public MyThread(Runnable r, String name) throws InterruptedException {
 		this.name = name;
@@ -50,6 +52,8 @@ public class MyThread extends Thread implements Runnable {
 		} finally {
 			finished = true;
 			sem.release();
+			if (finishTask!=null)
+				finishTask.run();
 		}
 		// System.out.print("f");
 	}
@@ -123,5 +127,9 @@ public class MyThread extends Thread implements Runnable {
 					start();
 				}
 		}
+	}
+
+	public void setFinishrunnable(Runnable finishTask) {
+		this.finishTask = finishTask;		
 	}
 }

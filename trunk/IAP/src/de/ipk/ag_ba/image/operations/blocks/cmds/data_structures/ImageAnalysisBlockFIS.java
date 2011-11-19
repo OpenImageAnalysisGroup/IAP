@@ -2,6 +2,8 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
 import java.util.TreeMap;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -24,6 +26,7 @@ public interface ImageAnalysisBlockFIS {
 	
 	public void postProcessResultsForAllAngles(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult)
+			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InterruptedException;
 }

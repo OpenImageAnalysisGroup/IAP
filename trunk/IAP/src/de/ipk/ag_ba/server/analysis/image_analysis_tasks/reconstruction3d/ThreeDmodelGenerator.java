@@ -26,7 +26,7 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
  */
 public class ThreeDmodelGenerator {
 	
-	private static int PROBABILITY_THRESHOLD = 30;
+	private int PROBABILITY_THRESHOLD = 100;
 	
 	private ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 	
@@ -165,8 +165,9 @@ public class ThreeDmodelGenerator {
 				cutModel2(fp, transparentVoxels, status, 100d * 1 / pictures.size());
 				
 				tso.addInt(1);
-				// status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
-				// + tsoRunCount.getInt() + " active)");
+				if (status!=null)
+				 status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
+				 + tsoRunCount.getInt() + " active)");
 				tsoRunCount.addInt(-1);
 			}
 		};
@@ -354,14 +355,15 @@ public class ThreeDmodelGenerator {
 		double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
 		double voxelSizeZ = cubeSideLengthZ / maxVoxelPerSide;
 		x = -cubeSideLengthX / 2d;
-		// long vcnt = (maxVoxelPerSide * maxVoxelPerSide * maxVoxelPerSide);
+		 long vcnt = (maxVoxelPerSide * maxVoxelPerSide * maxVoxelPerSide);
 		double smallProgressStep = progressStep / maxVoxelPerSide;
 		boolean isTopViewPicture = p.getIsTop();
 		// System.out.println("CUTTT 2... (angle: " + angle + ")");
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
 			if (status.wantsToStop())
 				break;
-			// status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
+			if (status!=null)
+			 status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
 			y = -cubeSideLengthY / 2d;
 			for (int yi = 0; yi < maxVoxelPerSide; yi++) {
 				z = -cubeSideLengthZ / 2d;

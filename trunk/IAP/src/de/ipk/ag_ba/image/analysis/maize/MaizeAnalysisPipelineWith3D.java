@@ -32,6 +32,8 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 		BlockPipeline p = super.getPipeline(options);
 		if (options != null)
 			options.clearAndAddBooleanSetting(Setting.DRAW_CONVEX_HULL, false);
+		if (options != null)
+			options.clearAndAddBooleanSetting(Setting.DRAW_SKELETON, false);
 		p.remove(BlockCrop_images_vis_fluo_nir.class);
 		p.remove(BlockReplaceEmptyOriginalImages_vis_fluo_nir.class);
 		p.add(BlockThreeDgeneration.class);

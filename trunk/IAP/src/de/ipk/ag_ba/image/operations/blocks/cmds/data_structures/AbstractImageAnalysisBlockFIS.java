@@ -4,6 +4,8 @@ import info.StopWatch;
 
 import java.util.TreeMap;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
@@ -96,7 +98,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	public void postProcessResultsForAllAngles(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
 			TreeMap<String, BlockProperties> allResultsForSnapshot,
-			BlockProperties summaryResult) throws InterruptedException {
+			BlockProperties summaryResult,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
 	}
 	

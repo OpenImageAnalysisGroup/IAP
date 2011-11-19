@@ -5,6 +5,8 @@ package de.ipk.ag_ba.image.analysis.maize;
 
 import java.util.TreeMap;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
@@ -80,12 +82,14 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	@Override
 	public BlockProperties postProcessPipelineResults(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> analysisResults) throws InstantiationException,
+			TreeMap<String, BlockProperties> analysisResults,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InstantiationException,
 			IllegalAccessException, InterruptedException {
 		BlockPipeline pipeline = getPipeline(null);
 		return pipeline.postProcessPipelineResultsForAllAngles(
 				inSample,
 				inImages,
-				analysisResults);
+				analysisResults,
+				optStatus);
 	}
 }

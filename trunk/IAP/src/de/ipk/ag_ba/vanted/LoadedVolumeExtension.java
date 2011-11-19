@@ -29,6 +29,8 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
+import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.ByteShortIntArray;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.IntVolumeVisitor;
@@ -56,7 +58,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		final int width = getDimensionX();
 		final int height = getDimensionY();
 		final int depth = getDimensionZ();
-		boolean threaded = false;
+		boolean threaded = true;
 		if (threaded)
 			rotateVolumeThreaded(rotation, new VolumeReceiver() {
 				
@@ -258,27 +260,43 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		int degreeSteps = 10; // 2
 		int degree = 0;
 		int delay = 3;
-		if (optStatus != null)
+		if (optStatus != null) {
+			optStatus.setCurrentStatusText1("Processing 3-D Volume");
+			optStatus.setCurrentStatusText2("Render side view GIF");
 			optStatus.setCurrentStatusValueFine(0);
+		}
+		FlexibleImageStack fis = new FlexibleImageStack();
 		while (degree < 360) {
 			BufferedImage result = new BufferedImage(getDimensionX(), getDimensionY(), BufferedImage.TYPE_INT_ARGB);
 			renderSideView(degree, result);
 			result = GravistoService.getScaledImage(result, width, height);
 			images.add(result);
+			fis.addImage("Deg "+degree, new FlexibleImage(result));
 			delayTimes.add("" + delay);
 			degree += degreeSteps;
-			if (optStatus != null)
+			if (optStatus != null) {
 				optStatus.setCurrentStatusValueFine(degree * 100d / 360);
+				optStatus.setCurrentStatusText2("Rendered side view ("+degree+"°)");
+			}
 		}
 		
+		fis.print("Render (Stack)");
+		
+		if (optStatus != null) {
+			optStatus.setCurrentStatusText1("Process side view GIF");
+			optStatus.setCurrentStatusText2("Saving animated GIF");
+		}
 		MyByteArrayOutputStream out = new MyByteArrayOutputStream();
 		// GravistoService.showImage(images.get(0), "Image");
 		WriteAnimatedGif.saveAnimate(out, images.toArray(new BufferedImage[] {}), delayTimes.toArray(new String[] {}));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValueFine(100);
-		
-		BufferedImage img = ImageIO.read(new MyByteArrayInputStream(out.getBuffTrimmed()));
-		GravistoService.showImage(img, "RENDER");
+
+		if (optStatus != null) {
+			optStatus.setCurrentStatusText1("Side views processed");
+			optStatus.setCurrentStatusText2("");
+		}
+
 		return new MyByteArrayInputStream(out.getBuff(), out.size());
 	}
 	

@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.TreeMap;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
@@ -68,8 +70,10 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 				if (viswork != null)
 					if (vis != null && fluo != null) {
 						FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
-						if (sk != null)
-							res = res.getIO().copyOnImage(sk).getImage();
+						if (sk != null) {
+							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
+							res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
+						}
 					}
 			}
 		}
@@ -238,7 +242,8 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 	public void postProcessResultsForAllAngles(
 			Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) {
+			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		Double maxLeafcount = -1d;
 		Double maxLeaflength = -1d;
 		Double maxLeaflengthNorm = -1d;

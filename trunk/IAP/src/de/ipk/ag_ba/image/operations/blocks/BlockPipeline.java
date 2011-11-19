@@ -294,7 +294,8 @@ public class BlockPipeline {
 	
 	public BlockProperties postProcessPipelineResultsForAllAngles(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot)
+			TreeMap<String, BlockProperties> allResultsForSnapshot,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InstantiationException,
 			IllegalAccessException, InterruptedException {
 		BlockProperties summaryResult = new BlockPropertiesImpl();
@@ -302,7 +303,7 @@ public class BlockPipeline {
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			block.setInputAndOptions(null, null, null, index++, null);
-			block.postProcessResultsForAllAngles(inSample, inImages, allResultsForSnapshot, summaryResult);
+			block.postProcessResultsForAllAngles(inSample, inImages, allResultsForSnapshot, summaryResult, optStatus);
 		}
 		
 		return summaryResult;
