@@ -315,11 +315,15 @@ public class DataExchangeHelperForExperiments {
 				// previewLoadAndConstructNeeded = true;
 				// } else {
 				if (DataSetFileButton.ICON_WIDTH == 128) { // binaryFileInfo.getFileNameMain().getPrefix().startsWith("mongo_") &&
-					byte[] pi = ResourceIOManager.getPreviewImageContent(binaryFileInfo.getFileNameMain());
-					if (pi != null)
-						previewImage = new ImageIcon(pi);
-					else
+					try {
+						byte[] pi = ResourceIOManager.getPreviewImageContent(binaryFileInfo.getFileNameMain());
+						if (pi != null)
+							previewImage = new ImageIcon(pi);
+						else
+							previewLoadAndConstructNeeded = true;
+					} catch(Exception e) {
 						previewLoadAndConstructNeeded = true;
+					}
 				} else {
 					previewImage = null;
 					previewLoadAndConstructNeeded = true;

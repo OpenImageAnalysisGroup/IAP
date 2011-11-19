@@ -1004,7 +1004,7 @@ public class MongoDB {
 				
 				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, optFileSize, optStatus, hash);
 				fff = gridfs_volumes.findOne(hash);
-				if (fff != null && fff.getLength() <= 0) {
+				if (fff != null) {
 					System.out.println(SystemAnalysisExt.getCurrentTime() + ">Delete generated volume from MongoDB file system (to save space and for debugging).");
 					gridfs_volumes.remove(fff);
 				}

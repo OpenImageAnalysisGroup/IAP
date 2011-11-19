@@ -72,7 +72,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockRemoveSmallClusters_vis_fluo.class);
 		p.add(BlockMedianFilter_fluo.class);
 		p.add(BlockRemoveLevitatingObjects_vis_fluo.class);
-		p.add(BlockRemoveVerticalAndHorizontalStructures_vis_fluo.class);
+		//p.add(BlockRemoveVerticalAndHorizontalStructures_vis_fluo.class);
 		p.add(BlockUseFluoMaskToClear_vis_nir.class);
 		p.add(BlockNirFilterSide_nir.class);
 		p.add(BlockCopyImagesApplyMask_vis_fluo.class);
@@ -145,7 +145,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 120); // 20
 		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 120); // 20
 		
-		double cut = (0.001d) / 1;
+		double cut = (0.001d) / 100; // seems to have no effect // ck 19.11.2011
 		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, cut);
 		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, cut * 0.2);
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
