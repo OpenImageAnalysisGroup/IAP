@@ -51,6 +51,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
@@ -61,6 +62,7 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.Maize3DanalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
+import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
@@ -74,6 +76,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
@@ -418,7 +422,21 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									public void run() {
 										try {
 											task.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, sp);
-										} catch (InterruptedException e) {
+											Collection<NumericMeasurementInterface> out = task.getOutput();
+											FlexibleImageStack fis = new FlexibleImageStack();
+											for (NumericMeasurementInterface nmi : out) {
+												if (nmi instanceof LoadedImage) {
+													LoadedImage li = (LoadedImage) nmi;
+													fis.addImage(((LoadedImage) nmi).getPositionIn3D(),
+															new FlexibleImage(li.getLoadedImage()));
+												}
+												if (nmi instanceof LoadedVolumeExtension) {
+													LoadedVolumeExtension lve = (LoadedVolumeExtension) nmi;
+													lve.getSideViewGif(512, 512, sp);
+												}
+											}
+											fis.print("Foreground images");
+										} catch (Exception e) {
 											e.printStackTrace();
 										}
 									}

@@ -52,7 +52,7 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 	ArrayList<ZoomedImage> zoomedImages = new ArrayList<ZoomedImage>();
 	DisplayHistogram histogram, histogramG, histogramB;
 	ArrayList<NavigationButton> storedActions = new ArrayList<NavigationButton>();
-	private int voxelresolution = 200;
+	private int voxelresolution = 500;
 	private int widthFactor = 40;
 	
 	public ActionThreeDreconstruction(MongoDB m, ExperimentReference experiment) {

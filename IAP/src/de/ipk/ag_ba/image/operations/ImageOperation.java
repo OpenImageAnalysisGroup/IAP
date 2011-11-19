@@ -3301,39 +3301,40 @@ public class ImageOperation {
 		return new ImageCanvas(getImage());
 	}
 	
-	public ImageOperation copyOnImage(FlexibleImage image2) {
-		return copyOnImage(image2, 2);
+	public ImageOperation drawSkeleton(FlexibleImage image2, boolean doItReally) {
+		return drawSkeleton2(image2, 1, doItReally);
 	}
 	
-	public ImageOperation copyOnImage(FlexibleImage image2, int size) {
+	public ImageOperation drawSkeleton2(FlexibleImage image2, int size, boolean doItReally) {
 		int[][] res = getImageAs2array();
 		int[][] skelImg = image2.getAs2A();
 		int w = image.getWidth();
 		int h = image.getHeight();
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				if (skelImg[x][y] != SkeletonProcessor2d.background) {
-					int v = skelImg[x][y];
-					int r = size;
-					if (v == SkeletonProcessor2d.colorEndpoints)
-						r = 18;
-					if (v == SkeletonProcessor2d.colorBranches)
-						r = 3;
-					if (v == SkeletonProcessor2d.colorBloomEndpoint)
-						r = 20;
-					for (int diffX = -r; diffX < r; diffX++)
-						for (int diffY = -r; diffY < r; diffY++) {
-							if (!(x - diffX >= 0 && y - diffY >= 0 && x - diffX < w && y - diffY < h))
-								continue;
-							if ((v == SkeletonProcessor2d.colorEndpoints || v == SkeletonProcessor2d.colorBloomEndpoint) &&
-									((diffX * diffX + diffY * diffY) <= 12 * 12)) // ||
-								// (diffX * diffX + diffY * diffY) >= 20 * 20)
-								continue;
-							res[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
-						}
+		if (doItReally)
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					if (skelImg[x][y] != SkeletonProcessor2d.background) {
+						int v = skelImg[x][y];
+						int r = size;
+						if (v == SkeletonProcessor2d.colorEndpoints)
+							r = 16;
+						if (v == SkeletonProcessor2d.colorBranches)
+							r = 2;
+						if (v == SkeletonProcessor2d.colorBloomEndpoint)
+							r = 18;
+						for (int diffX = -r; diffX < r; diffX++)
+							for (int diffY = -r; diffY < r; diffY++) {
+								if (!(x - diffX >= 0 && y - diffY >= 0 && x - diffX < w && y - diffY < h))
+									continue;
+								if ((v == SkeletonProcessor2d.colorEndpoints || v == SkeletonProcessor2d.colorBloomEndpoint) &&
+										((diffX * diffX + diffY * diffY) <= 10 * 10)) // ||
+									// (diffX * diffX + diffY * diffY) >= 20 * 20)
+									continue;
+								res[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
+							}
+					}
 				}
 			}
-		}
 		return new ImageOperation(res);
 	}
 	

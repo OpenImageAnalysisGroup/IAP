@@ -149,7 +149,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, cut);
 		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, cut * 0.2);
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
-		
+		options.addBooleanSetting(Setting.DRAW_SKELETON, true);
 	}
 	
 	@Override

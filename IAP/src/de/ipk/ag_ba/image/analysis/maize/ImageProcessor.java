@@ -28,7 +28,8 @@ public interface ImageProcessor {
 	
 	public abstract BlockProperties postProcessPipelineResults(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> analysisResults)
+			TreeMap<String, BlockProperties> analysisResults,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InstantiationException,
 			IllegalAccessException, InterruptedException;
 }

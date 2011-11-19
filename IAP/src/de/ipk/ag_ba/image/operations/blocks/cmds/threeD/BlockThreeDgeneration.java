@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -56,13 +57,14 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	public void postProcessResultsForAllAngles(
 			Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult) throws InterruptedException {
+			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		int voxelresolution = 500;
 		int widthFactor = 40;
 		GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
 		
 		ThreeDmodelGenerator mg = new ThreeDmodelGenerator(voxelresolution, widthFactor);
-		mg.setCameraDistance(1500);
+		mg.setCameraDistance(3200);
 		mg.setCubeSideLength(300, 300, 300);
 		
 		ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
@@ -87,7 +89,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		}
 		if (pictures.size() > 2) {
 			mg.setRoundViewImages(pictures);
-			mg.calculateModel(new BackgroundTaskConsoleLogger("", "", true), modeOfOperation, 0);
+			mg.calculateModel(optStatus, modeOfOperation, 0);
 			// the cube is a true cube (dim X,Y,Z are equal), the
 			// input images are stretched to the target square
 			// therefore, the actual volume calculation needs to consider
@@ -158,13 +160,18 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			}
 			boolean create3Dskeleton = true;
 			if (create3Dskeleton) {
+				if (optStatus!=null)
+					optStatus.setCurrentStatusText1("Create 3-D probability skeleton");
 				createSimpleDefaultSkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube,
 						(LoadedVolume) volume.clone(volume.getParentSample()));
 			}
 			boolean create3DadvancedProbabilitySkeleton = true;
 			if (create3DadvancedProbabilitySkeleton) {
+				if (optStatus!=null)
+					optStatus.setCurrentStatusText1("Create advanced 3-D probability skeleton");
 				int[][][] probabilityCube = mg.getByteCubeResult();
-				createAdvancedProbabilitySkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube,
+				createAdvancedProbabilitySkeleton(
+						summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube,
 						(LoadedVolume) volume.clone(volume.getParentSample()));
 			}
 		}
@@ -257,7 +264,8 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	 * The "fire" slowly burns down the cube, based on each voxel's probability
 	 */
 	private void createAdvancedProbabilitySkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
-			double realMarkerDistHorizontal, int[][][] probabilityCube, LoadedVolume volume) {
+			double realMarkerDistHorizontal,
+			int[][][] probabilityCube, LoadedVolume volume) {
 		int empty = 0;
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create advanced probablity 3D skeleton", false);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
