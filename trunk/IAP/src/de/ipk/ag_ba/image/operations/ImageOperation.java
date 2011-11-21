@@ -1429,7 +1429,7 @@ public class ImageOperation {
 					public int compare(LargeCluster o1, LargeCluster o2) {
 						double d1 = largest.distanceTo(o1);
 						double d2 = largest.distanceTo(o2);
-						return d1 > d2 ? 1 : -1;
+						return d1 > d2 ? 1 : (d1==d2 ? 0 :-1);
 					}
 				});
 				for (LargeCluster lc : largeClusters) {
