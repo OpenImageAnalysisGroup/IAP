@@ -65,13 +65,13 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		// p.add(BlockClosingOnFluo.class);
 		// p.add(BlockClosing_fluo.class);
 		p.add(BlockIntensityConversion_fluo.class);
-		p.add(BlockRemoveSmallClusters_vis_fluo.class);
+//		p.add(BlockRemoveSmallClusters_vis_fluo.class);
 		p.add(BlockClearNirPot_nir.class);
 		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
-		p.add(BlockRemoveSmallStructuresUsingOpening_top_vis.class);
-		p.add(BlockRemoveSmallClusters_vis_fluo.class);
+//		p.add(BlockRemoveSmallStructuresUsingOpening_top_vis.class);
+//		p.add(BlockRemoveSmallClusters_vis_fluo.class);
 		p.add(BlockMedianFilter_fluo.class);
-		p.add(BlockRemoveLevitatingObjects_vis_fluo.class);
+//		p.add(BlockRemoveLevitatingObjects_vis_fluo.class);
 		//p.add(BlockRemoveVerticalAndHorizontalStructures_vis_fluo.class);
 		p.add(BlockUseFluoMaskToClear_vis_nir.class);
 		p.add(BlockNirFilterSide_nir.class);
@@ -82,7 +82,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockCalcWidthAndHeight_vis.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class);
 		p.add(BlockMedianFilter_fluo.class);
-		p.add(BlockRemoveSmallVerySmallClusters_fluo.class);
+//		p.add(BlockRemoveSmallVerySmallClusters_fluo.class);
 		p.add(BlockCalcIntensity_vis_fluo_nir.class);
 		p.add(BlockSkeletonize_vis.class);
 		p.add(BlockConvexHull_vis_fluo.class);
