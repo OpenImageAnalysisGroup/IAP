@@ -113,7 +113,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		maxInst.acquire();
 		try {
 			status.setCurrentStatusValue(0);
-			status.setCurrentStatusText1("Initiate " + getName());
+			status.setCurrentStatusText1("Start " + getName());
 			output = new ArrayList<NumericMeasurementInterface>();
 
 			ArrayList<TreeMap<String, ImageSet>> workload = new ArrayList<TreeMap<String, ImageSet>>();
@@ -121,7 +121,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			addTopOrSideImagesToWorkset(workload, 0, analyzeTopImages(),
 					analyzeSideImages());
 
-			// workload = filterWorkload(workload, null);// "Athletico");//
+			workload = filterWorkload(workload, null);// "Athletico");//
 			// "Rainbow Amerindian"); // Athletico
 
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
@@ -327,7 +327,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			loopB: for (ImageSet is : tm.values()) {
 				if (is.getSampleInfo() != null)
 					if (filter == null) {
-						if (is.getSampleInfo().getTime() == 56) {
+						if (is.getSampleInfo().getTime() == 61) {
 							res.add(tm);
 							break loopB;
 						}
@@ -336,9 +336,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							.toString().contains(filter)
 							&& !is.getSampleInfo().getParentCondition()
 									.toString().contains("wet"))
-						if (is.getSampleInfo().getTime() == 20
-								|| is.getSampleInfo().getTime() == 31
-								|| is.getSampleInfo().getTime() == 57) {
+						if (is.getSampleInfo().getTime() == 61) {
 							res.add(tm);
 							break loopB;
 						}
