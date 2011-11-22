@@ -121,7 +121,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			addTopOrSideImagesToWorkset(workload, 0, analyzeTopImages(),
 					analyzeSideImages());
 
-			workload = filterWorkload(workload, null);// "Athletico");//
+//			workload = filterWorkload(workload, null);// "Athletico");//
 			// "Rainbow Amerindian"); // Athletico
 
 			final ThreadSafeOptions tso = new ThreadSafeOptions();

@@ -63,7 +63,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 		} else {
 			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
 				FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
-						.dilate(4)
+						.dilate(3)
 						.blur(1)
 						.getImage().print("vis", debug);
 				
@@ -76,6 +76,22 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 						}
 					}
 			}
+			if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
+				FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
+						.dilate(2)
+						.blur(1)
+						.getImage().print("vis", debug);
+				
+				if (viswork != null)
+					if (vis != null && fluo != null) {
+						FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+						if (sk != null) {
+							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
+							res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
+						}
+					}
+			}
+
 		}
 		return res;
 	}
