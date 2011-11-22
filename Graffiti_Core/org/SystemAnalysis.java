@@ -43,7 +43,7 @@ public class SystemAnalysis {
 			useHalfCPUpower = true;
 		int cpus = Runtime.getRuntime().availableProcessors();
 		if (useHalfCPUpower)
-			return cpus / 2 > 0 ? cpus / 2 : 1;
+			return cpus / 2 > 0 ? cpus / 2+3 : 1;
 		else
 			return cpus;
 	}
