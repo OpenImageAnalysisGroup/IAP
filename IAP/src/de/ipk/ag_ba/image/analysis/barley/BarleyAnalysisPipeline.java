@@ -80,11 +80,11 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		// calculation of numeric values
 		p.add(BlockCalcMainAxis_vis.class);
 		p.add(BlockCalcWidthAndHeight_vis.class);
-		p.add(BlockRemoveSmallClusters_vis_fluo.class);
-		p.add(BlockMedianFilter_fluo.class);
+//		p.add(BlockRemoveSmallClusters_vis_fluo.class);
+//		p.add(BlockMedianFilter_fluo.class);
 //		p.add(BlockRemoveSmallVerySmallClusters_fluo.class);
 		p.add(BlockCalcIntensity_vis_fluo_nir.class);
-		p.add(BlockSkeletonize_vis.class);
+//		p.add(BlockSkeletonize_vis.class);
 		p.add(BlockConvexHull_vis_fluo.class);
 		
 		// postprocessing
