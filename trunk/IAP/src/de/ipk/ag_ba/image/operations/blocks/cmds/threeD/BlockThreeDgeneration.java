@@ -14,7 +14,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractBlock;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -57,7 +57,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	public void postProcessResultsForAllAngles(
 			Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult,
+			TreeMap<String, BlockResultSet> allResultsForSnapshot, BlockResultSet summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		int voxelresolution = 500;
 		int widthFactor = 40;
@@ -72,7 +72,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		double realMarkerDistHorizontal = Double.NaN;
 		for (String angle : allResultsForSnapshot.keySet()) {
 			// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Process image angle " + angle + " (TODO)");
-			BlockProperties bp = allResultsForSnapshot.get(angle);
+			BlockResultSet bp = allResultsForSnapshot.get(angle);
 			distHorizontal = bp.getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 			BlockProperty bpv = bp.getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_REAL_VALUE);
 			if (bpv != null)
@@ -180,7 +180,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	/**
 	 * The "fire" burns down each solid voxel with fixed speed.
 	 */
-	private void createSimpleDefaultSkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
+	private void createSimpleDefaultSkeleton(BlockResultSet summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
 			double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume) {
 		int fire = ImageOperation.BACKGROUND_COLORint;
 		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create simple 3D skeleton", false);
@@ -263,7 +263,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	/**
 	 * The "fire" slowly burns down the cube, based on each voxel's probability
 	 */
-	private void createAdvancedProbabilitySkeleton(BlockProperties summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
+	private void createAdvancedProbabilitySkeleton(BlockResultSet summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
 			double realMarkerDistHorizontal,
 			int[][][] probabilityCube, LoadedVolume volume) {
 		int empty = 0;

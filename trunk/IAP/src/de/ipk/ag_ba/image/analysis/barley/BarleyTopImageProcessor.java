@@ -6,7 +6,7 @@ package de.ipk.ag_ba.image.analysis.barley;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMaskButNotOnVIS;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisContentOnFluoMask;
@@ -26,7 +26,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockPostProcessEd
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockPostProcessEdgeErodeEnlargeOnFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockPostProcessEdgeErodeReduce;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockPostProcessEdgeErodeReduceOnFluo;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -37,13 +37,13 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 public class BarleyTopImageProcessor {
 	
 	private final ImageProcessorOptions options;
-	private final BlockProperties settings;
+	private final BlockResultSet settings;
 	
 	public BarleyTopImageProcessor(ImageProcessorOptions options) {
-		this(options, new BlockPropertiesImpl());
+		this(options, new BlockResults());
 	}
 	
-	public BarleyTopImageProcessor(ImageProcessorOptions options, BlockPropertiesImpl settings) {
+	public BarleyTopImageProcessor(ImageProcessorOptions options, BlockResults settings) {
 		this.options = options;
 		this.settings = settings;
 	}
@@ -130,7 +130,7 @@ public class BarleyTopImageProcessor {
 		return result;
 	}
 	
-	public BlockProperties getSettings() {
+	public BlockResultSet getSettings() {
 		return settings;
 	}
 }

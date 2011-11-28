@@ -10,8 +10,8 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -23,13 +23,13 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public abstract class AbstractImageProcessor implements ImageProcessor {
 	
-	private final BlockProperties settings;
+	private final BlockResultSet settings;
 	
 	public AbstractImageProcessor() {
-		this(new BlockPropertiesImpl());
+		this(new BlockResults());
 	}
 	
-	public AbstractImageProcessor(BlockPropertiesImpl settings) {
+	public AbstractImageProcessor(BlockResults settings) {
 		this.settings = settings;
 	}
 	
@@ -73,16 +73,16 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	 * @see de.ipk.ag_ba.image.analysis.maize.ImageProcessor#getSettings()
 	 */
 	@Override
-	public BlockProperties getSettings() {
+	public BlockResultSet getSettings() {
 		return settings;
 	}
 	
 	protected abstract BlockPipeline getPipeline(ImageProcessorOptions options);
 	
 	@Override
-	public BlockProperties postProcessPipelineResults(Sample3D inSample,
+	public BlockResultSet postProcessPipelineResults(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> analysisResults,
+			TreeMap<String, BlockResultSet> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InstantiationException,
 			IllegalAccessException, InterruptedException {
 		BlockPipeline pipeline = getPipeline(null);

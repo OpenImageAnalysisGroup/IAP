@@ -24,8 +24,8 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockReplaceEmptyOriginalImages
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlockConvexHull_vis_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalcIntensity_vis_fluo_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalcMainAxis_vis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.OK_NOV11_BlockCalcIntensity_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.OK_NOV11_BlockCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearBackgroundByRefComparison_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkers_vis_fluo_nir;
@@ -94,9 +94,9 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockCopyImagesApplyMask_vis_fluo.class); // without nir
 		
 		// calculation of numeric values
-		p.add(BlockCalcMainAxis_vis.class);
+		p.add(OK_NOV11_BlockCalcMainAxis_vis.class);
 		p.add(BlockCalcWidthAndHeight_vis.class);
-		p.add(BlockCalcIntensity_vis_fluo_nir.class);
+		p.add(OK_NOV11_BlockCalcIntensity_vis_fluo_nir.class);
 		p.add(BlockConvexHull_vis_fluo.class);
 		
 		p.add(BlockDrawSkeleton_vis.class);

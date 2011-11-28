@@ -17,8 +17,8 @@ import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -258,7 +258,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 	public void postProcessResultsForAllAngles(
 			Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot, BlockProperties summaryResult,
+			TreeMap<String, BlockResultSet> allResultsForSnapshot, BlockResultSet summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		Double maxLeafcount = -1d;
 		Double maxLeaflength = -1d;
@@ -267,7 +267,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 		
 		Integer a = null;
 		searchLoop: for (String key : allResultsForSnapshot.keySet()) {
-			BlockProperties rt = allResultsForSnapshot.get(key);
+			BlockResultSet rt = allResultsForSnapshot.get(key);
 			for (BlockPropertyValue v : rt.getProperties("RESULT_top.main.axis.rotation")) {
 				if (v.getValue() != null) {
 					a = v.getValue().intValue();
@@ -294,7 +294,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		// System.out.println("ANGLES WITHIN SNAPSHOT: " + allResultsForSnapshot.size());
 		for (String keyC : allResultsForSnapshot.keySet()) {
-			BlockProperties rt = allResultsForSnapshot.get(keyC);
+			BlockResultSet rt = allResultsForSnapshot.get(keyC);
 			
 			if (bestAngle != null && keyC.equals(bestAngle)) {
 				// System.out.println("Best side angle: " + bestAngle);

@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
+import org.graffiti.plugin.parameter.Parameter;
+
 import ij.measure.ResultsTable;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -10,9 +12,17 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
+ * Calculates overall properties of the vis, fluo and nir images, such as number of pixels, intensities, NDVI and more.
+ * 
+ * Is used in the current pipelines for maize and barley.
+ * 
+ * Does not need any input parameters.
+ * 
  * @author klukas, pape
+ * 
+ * status: ok, 23.11.2011, c. klukas
  */
-public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class OK_NOV11_BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -135,5 +145,16 @@ public class BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlo
 			return io.getImage();
 		} else
 			return null;
+	}
+
+	@Override
+	public Parameter[] getParameters() {
+		// no parameters are needed
+		return new Parameter[] {};
+	}
+
+	@Override
+	public void setParameters(Parameter[] params) {
+		super.setParameters(params);
 	}
 }

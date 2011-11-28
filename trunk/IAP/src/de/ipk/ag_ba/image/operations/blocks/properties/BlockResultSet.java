@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
-public interface BlockProperties {
+public interface BlockResultSet {
 	
 	/**
 	 * @param searchIndex

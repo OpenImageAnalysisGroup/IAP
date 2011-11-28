@@ -18,7 +18,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -62,17 +62,18 @@ public class BlockPipeline {
 	
 	private static ThreadSafeOptions pipelineID = new ThreadSafeOptions();
 	
+	private static long lastOutput = 0;
+	
 	public FlexibleMaskAndImageSet execute(
 			ImageProcessorOptions options,
 			FlexibleMaskAndImageSet input,
 			FlexibleImageStack debugStack,
-			BlockProperties settings,
+			BlockResultSet settings,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 				throws InstantiationException, IllegalAccessException, InterruptedException {
 		
 		long a = System.currentTimeMillis();
-		// nullPointerCheck(input, "PIPELINE INPUT ");
-		
+
 		int id = pipelineID.addInt(1);
 		
 		int index = 0;
@@ -81,17 +82,11 @@ public class BlockPipeline {
 		if (status != null)
 			status.setCurrentStatusValueFine(0);
 		
-		HashMap<Class<? extends ImageAnalysisBlockFIS>, ImageAnalysisBlockFIS> c2o = new HashMap<Class<? extends ImageAnalysisBlockFIS>, ImageAnalysisBlockFIS>();
-		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
-			ImageAnalysisBlockFIS block = blockClass.newInstance();
-			c2o.put(blockClass, block);
-		}
-		
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			if (status != null && status.wantsToStop())
 				break;
 			
-			ImageAnalysisBlockFIS block = c2o.get(blockClass);// blockClass.newInstance();
+			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			
 			block.setInputAndOptions(input, options, settings, index++, debugStack);
 			
@@ -120,8 +115,6 @@ public class BlockPipeline {
 							+ " sec., " + mseconds + " ms, time: " + StopWatch.getNiceTime() + " ("
 							+ block.getClass().getSimpleName() + ")");
 			
-			block.reset();
-			
 			updateBlockStatistics(1);
 			
 			if (status != null) {
@@ -142,22 +135,22 @@ public class BlockPipeline {
 			status.setCurrentStatusText1("T=" + ((b - a) / 1000) + "s");
 		}
 		System.out.print("PET: " + (b - a) / 1000 + "s ");
-		if (pipelineExecutionsWithinCurrentHour%5==0)
-			System.out.println(" || "+SystemAnalysis.getUsedMemoryInMB()+" / "+SystemAnalysis.getMemoryMB()+" MB used ("+(int)(100d*SystemAnalysis.getUsedMemoryInMB()/SystemAnalysis.getMemoryMB())+"%)");
-		
+		if (pipelineExecutionsWithinCurrentHour%5==0) {
+			String s5performance = "";
+			long now = System.currentTimeMillis();
+			if (lastOutput>0) {
+				s5performance="last 5 pipelines executed within "+(now-lastOutput)+" ms, ";
+			}
+			System.out.println();
+			System.out.print(SystemAnalysisExt.getCurrentTime()+
+					">INFO: "+s5performance+pipelineExecutionsWithinCurrentHour+" pipelines executed, "+blockExecutionWithinLastMinute+" blocks/min"+
+					", "+SystemAnalysis.getUsedMemoryInMB()+" / "+SystemAnalysis.getMemoryMB()+
+					" MB used ("+(int)(100d*SystemAnalysis.getUsedMemoryInMB()/SystemAnalysis.getMemoryMB())+"%) || ");
+			lastOutput = now;
+		}
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);
 		updatePipelineStatistics();
 		return input;
-	}
-	
-	private String filter(String simpleName) {
-		if (simpleName.startsWith("Block"))
-			simpleName = simpleName.substring("Block".length());
-		while (simpleName.length() < 30)
-			simpleName += "_";
-		if (simpleName.length() > 30)
-			simpleName = simpleName.substring(0, 30 - "...".length()) + "...";
-		return simpleName;
 	}
 	
 	private void updateBlockStatistics(int nBlocks) {
@@ -193,31 +186,6 @@ public class BlockPipeline {
 	
 	private static int pipelineExecutionsWithinCurrentHour = 0;
 	
-	private void nullPointerCheck(FlexibleMaskAndImageSet input, String name) {
-		if (input.getImages() != null) {
-			if (input.getImages().getVis() == null)
-				System.out.println("WARNING: BLOCK " + name
-						+ " is NULL image (vis)!");
-			if (input.getImages().getFluo() == null)
-				System.out.println("WARNING: BLOCK " + name
-						+ " is NULL image (fluo)!");
-			if (input.getImages().getNir() == null)
-				System.out.println("WARNING: BLOCK " + name
-						+ " is NULL image (nir)!");
-		}
-		if (input.getMasks() != null) {
-			if (input.getMasks().getVis() == null)
-				System.out.println("WARNING: BLOCK " + name
-						+ " is NULL image (vis)!");
-			if (input.getMasks().getFluo() == null)
-				System.out.println("WARNING: BLOCK " + name
-						+ " is NULL image (fluo)!");
-			if (input.getMasks().getNir() == null)
-				System.out.println("WARNING: BLOCK " + name
-						+ " is NULL image (nir)!");
-		}
-	}
-	
 	/**
 	 * The given image set is analyzed by a image pipeline upon users choice. The
 	 * debug image stack (result of pipeline) will be shown to the user.
@@ -226,7 +194,7 @@ public class BlockPipeline {
 	 * @param match
 	 *           Image set to be analyzed.
 	 */
-	public static void debugTryAnalyze(
+	public static void debugTryAnalysis(
 			final Collection<NumericMeasurementInterface> input,
 			final MongoDB m,
 			AbstractPhenotypingTask analysisTask
@@ -292,13 +260,13 @@ public class BlockPipeline {
 				status, false, true);
 	}
 	
-	public BlockProperties postProcessPipelineResultsForAllAngles(Sample3D inSample,
+	public BlockResultSet postProcessPipelineResultsForAllAngles(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot,
+			TreeMap<String, BlockResultSet> allResultsForSnapshot,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InstantiationException,
 			IllegalAccessException, InterruptedException {
-		BlockProperties summaryResult = new BlockPropertiesImpl();
+		BlockResultSet summaryResult = new BlockResults();
 		int index = 0;
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();

@@ -25,7 +25,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -248,7 +248,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			throws InterruptedException {
 		
 		Sample3D inSample = null;
-		final TreeMap<String, BlockProperties> analysisResults = new TreeMap<String, BlockProperties>();
+		final TreeMap<String, BlockResultSet> analysisResults = new TreeMap<String, BlockResultSet>();
 		final TreeMap<String, ImageData> analysisInput = new TreeMap<String, ImageData>();
 		ArrayList<MyThread> wait = new ArrayList<MyThread>();
 		if (tmf != null) {
@@ -265,7 +265,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				Runnable r = new Runnable() {
 					@Override
 					public void run() {
-						BlockProperties results;
+						BlockResultSet results;
 						try {
 							results = processAngleWithinSnapshot(
 									tmf.get(configAndAngle),
@@ -302,7 +302,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		BackgroundThreadDispatcher.waitFor(wait);
 		if (inSample != null && !analysisResults.isEmpty()) {
-			BlockProperties postprocessingResults;
+			BlockResultSet postprocessingResults;
 			try {
 				postprocessingResults = getImageProcessor()
 						.postProcessPipelineResults(inSample, analysisInput,
@@ -696,7 +696,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	// }
 	
 	private void processStatisticalOutput(ImageData inVis,
-			BlockProperties analysisResults) {
+			BlockResultSet analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
@@ -719,7 +719,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void processStatisticalAndVolumeSampleOutput(Sample3D inSample,
-			BlockProperties analysisResults) {
+			BlockResultSet analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 2");
@@ -832,7 +832,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		// s.printTime();
 	}
 	
-	private BlockProperties processAngleWithinSnapshot(ImageSet id,
+	private BlockResultSet processAngleWithinSnapshot(ImageSet id,
 			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadSnapshotAngles, int parentPriority)
@@ -893,7 +893,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		// if (status != null)
 		// status.setCurrentStatusText1("Process Analysis Pipeline");
 		
-		BlockProperties analysisResults = null;
+		BlockResultSet analysisResults = null;
 		
 		FlexibleImage resVis = null, resFluo = null, resNir = null;
 		{
