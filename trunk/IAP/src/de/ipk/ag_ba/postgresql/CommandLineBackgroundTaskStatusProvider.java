@@ -61,8 +61,11 @@ public class CommandLineBackgroundTaskStatusProvider extends BackgroundTaskStatu
 	private synchronized void showProgress() {
 		if (System.currentTimeMillis() - lastOutput > 10 * 1000 && lastProgress != getCurrentStatusValue()) {
 			System.out.println();
+			System.out.println("**********************");
 			System.out.println(SystemAnalysisExt.getCurrentTime() + "> INFO: Progress: " + getCurrentStatusValue() + "% // " + getCurrentStatusMessage1() + " // "
 					+ getCurrentStatusMessage2());
+			System.out.println("**********************");
+			System.out.println();
 			lastOutput = System.currentTimeMillis();
 			lastProgress = getCurrentStatusValue();
 		}
