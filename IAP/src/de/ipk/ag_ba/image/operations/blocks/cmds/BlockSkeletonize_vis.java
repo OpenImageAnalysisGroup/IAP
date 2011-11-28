@@ -91,7 +91,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 						}
 					}
 			}
-
+			
 		}
 		return res;
 	}

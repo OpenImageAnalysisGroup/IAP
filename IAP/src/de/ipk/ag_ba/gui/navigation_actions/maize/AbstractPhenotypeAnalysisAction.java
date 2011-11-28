@@ -88,7 +88,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						workload.add(sd3);
+						if (filter == null || filter.isValidSample(sd3))
+							workload.add(sd3);
 					}
 				}
 			}
@@ -193,13 +194,13 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
 		res.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(experimentResult),
-				src.getGUIsetting()));
+				src != null ? src.getGUIsetting() : null));
 		
 		res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
-				"Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+				"Save Result", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null)); // PoweredMongoDBgreen.png"));
 		
 		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
-				false, src.getGUIsetting(), m);
+				false, src != null ? src.getGUIsetting() : null, m);
 		return res;
 	}
 	
@@ -234,4 +235,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	protected abstract ImageAnalysisTask getImageAnalysisTask();
 	
 	protected abstract HashSet<ImageConfiguration> getValidImageTypes();
+	
+	private SnapshotFilter filter;
+	
+	public void setFilter(SnapshotFilter filter) {
+		this.filter = filter;
+	}
+	
 }

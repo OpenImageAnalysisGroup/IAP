@@ -469,7 +469,7 @@ public class SkeletonProcessor2d {
 				
 				for (Limb l : endlimbs) {
 					if (l.length() < autothreshold && !knownBlooms.contains(l.endpoint)) {
-						if (!simulate) {
+						if (!simulate && !forRemove.contains(l)) {
 							forRemove.add(l);
 							goRecursive = true;
 							// System.out.println("del");
@@ -680,7 +680,7 @@ public class SkeletonProcessor2d {
 	}
 	
 	private boolean checkBamboEnd(Limb l, FlexibleImage vis, double xf, double yf) {
-		if (vis == null || l == null || l.points == null)
+		if (vis == null || l == null || l.points == null || vis.getHeight() <= 0)
 			return false;
 		
 		int[][] visImg = vis.getAs2A();

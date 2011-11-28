@@ -160,7 +160,7 @@ public class MongoDB {
 	}
 	
 	public static MongoDB getLocalUnitTestsDB() {
-		return new MongoDB("Unit Tests local", "localUnitTests", "ba-13", null, null, HashType.MD5);
+		return new MongoDB("Unit Tests local", "localUnitTests", "ba-13", "iap", "iap#2011", HashType.MD5);
 	}
 	
 	private final MongoDBhandler mh;
@@ -315,7 +315,7 @@ public class MongoDB {
 				} catch (Exception err) {
 					System.out.println("EXEC " + (nrep - repeats + 1) + " ERROR: " + err.getLocalizedMessage() + " T=" + IAPservice.getCurrentTimeAsNiceString());
 					e = err;
-					 Thread.sleep(60*1000);
+					Thread.sleep(60 * 1000);
 				}
 				repeats--;
 			} while (!ok && repeats > 0);
@@ -1254,14 +1254,14 @@ public class MongoDB {
 		}
 		int nmin = Integer.MAX_VALUE;
 		int nmax = 0;
-		if (experiment!=null) {
+		if (experiment != null) {
 			for (SubstanceInterface si : experiment) {
-				if (si.size()>nmax)
+				if (si.size() > nmax)
 					nmax = si.size();
-				if (si.size()<nmin)
+				if (si.size() < nmin)
 					nmin = si.size();
 			}
-			System.out.println("Condition-Count: "+nmin+"..."+nmax);
+			System.out.println("Condition-Count: " + nmin + "..." + nmax);
 		}
 		return experiment;
 	}
