@@ -6,7 +6,7 @@ package de.ipk.ag_ba.image.analysis.phytochamber;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertiesImpl;
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
@@ -22,7 +22,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSetMasksToNull;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSetVisAndFluoMaskFromMergedVisAndFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchRotationOnFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchScalingOnFluo;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -33,13 +33,13 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 public class PhytochamberTopImageProcessor {
 	
 	private final ImageProcessorOptions options;
-	private final BlockProperties settings;
+	private final BlockResultSet settings;
 	
 	public PhytochamberTopImageProcessor(ImageProcessorOptions options) {
-		this(options, new BlockPropertiesImpl());
+		this(options, new BlockResults());
 	}
 	
-	public PhytochamberTopImageProcessor(ImageProcessorOptions options, BlockPropertiesImpl settings) {
+	public PhytochamberTopImageProcessor(ImageProcessorOptions options, BlockResults settings) {
 		this.options = options;
 		this.settings = settings;
 	}
@@ -85,7 +85,7 @@ public class PhytochamberTopImageProcessor {
 		return result;
 	}
 	
-	public BlockProperties getSettings() {
+	public BlockResultSet getSettings() {
 		return settings;
 	}
 }

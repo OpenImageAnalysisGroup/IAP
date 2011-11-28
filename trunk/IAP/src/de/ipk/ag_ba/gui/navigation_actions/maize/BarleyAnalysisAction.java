@@ -12,7 +12,6 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTa
  * @author klukas
  */
 public class BarleyAnalysisAction extends AbstractPhenotypeAnalysisAction {
-	
 	public BarleyAnalysisAction(MongoDB m, ExperimentReference experiment) {
 		super("Analyze Phenotype (Barley)");
 		this.m = m;

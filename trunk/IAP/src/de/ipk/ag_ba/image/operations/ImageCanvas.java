@@ -15,13 +15,13 @@ public class ImageCanvas {
 		this.image = image;
 	}
 	
-	public ImageCanvas drawLine(int x0, int y0, int x1, int y1, int color, double alpha, int s) {
+	public ImageCanvas drawLine(int x0, int y0, int x1, int y1, int color, double alpha, int size) {
 		int dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
 		int dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
 		int err = dx + dy, e2; /* error value e_xy */
 		
 		while (true) { /* loop */
-			fillRect(x0 - s, y0 - s, s + s, s + s, color, alpha);
+			fillRect(x0 - size, y0 - size, size + size, size + size, color, alpha);
 			if (x0 == x1 && y0 == y1)
 				break;
 			e2 = 2 * err;
