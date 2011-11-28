@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
 import org.ErrorMsg;
+import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
@@ -143,6 +144,17 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	}
 	
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		// empty
+	}
+	
+	@Override
+	public Parameter[] getParameters() {
+		// empty
+		return null;
+	}
+
+	@Override
+	public void setParameters(Parameter[] params) {
 		// empty
 	}
 }

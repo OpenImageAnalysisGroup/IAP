@@ -5,7 +5,7 @@ import java.util.TreeMap;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -20,15 +20,15 @@ public interface ImageProcessor {
 			FlexibleImageStack debugStack)
 			throws InstantiationException, IllegalAccessException, InterruptedException;
 	
-	public abstract BlockProperties getSettings();
+	public abstract BlockResultSet getSettings();
 	
 	public abstract void setStatus(BackgroundTaskStatusProviderSupportingExternalCall status);
 	
 	public abstract BackgroundTaskStatusProviderSupportingExternalCall getStatus();
 	
-	public abstract BlockProperties postProcessPipelineResults(Sample3D inSample,
+	public abstract BlockResultSet postProcessPipelineResults(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> analysisResults,
+			TreeMap<String, BlockResultSet> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InstantiationException,
 			IllegalAccessException, InterruptedException;

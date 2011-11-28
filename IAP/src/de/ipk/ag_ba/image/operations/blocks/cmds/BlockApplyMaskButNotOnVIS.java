@@ -14,5 +14,4 @@ public class BlockApplyMaskButNotOnVIS extends AbstractSnapshotAnalysisBlockFIS 
 		return new ImageOperation(getInput().getImages().getVis()).applyMask_ResizeSourceIfNeeded(getInput().getMasks().getFluo(), options.getBackground())
 				.getImage();
 	}
-	
 }

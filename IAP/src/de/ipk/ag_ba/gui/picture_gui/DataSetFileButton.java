@@ -301,7 +301,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										imageResult.getBinaryFileInfo().getFileNameMain(),
 										targetTreeNode.getExperiment());
 								
-								BlockPipeline.debugTryAnalyze(match, m, new MaizeAnalysisTask());
+								BlockPipeline.debugTryAnalysis(match, m, new MaizeAnalysisTask());
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);
@@ -322,7 +322,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												targetTreeNode.getExperiment(),
 												m);
 								
-								BlockPipeline.debugTryAnalyze(match, m, new MaizeAnalysisTask());
+								BlockPipeline.debugTryAnalysis(match, m, new MaizeAnalysisTask());
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);
@@ -340,7 +340,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								Collection<NumericMeasurementInterface> match = IAPservice.getMatchFor(
 										imageResult.getBinaryFileInfo().getFileNameMain(),
 										targetTreeNode.getExperiment());
-								BlockPipeline.debugTryAnalyze(match, m, new BarleyAnalysisTask());
+								BlockPipeline.debugTryAnalysis(match, m, new BarleyAnalysisTask());
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);
@@ -361,7 +361,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												targetTreeNode.getExperiment(),
 												m);
 								
-								BlockPipeline.debugTryAnalyze(match, m, new BarleyAnalysisTask());
+								BlockPipeline.debugTryAnalysis(match, m, new BarleyAnalysisTask());
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: " + err.getLocalizedMessage() + ". Command execution error.",
 										"Error", JOptionPane.INFORMATION_MESSAGE);

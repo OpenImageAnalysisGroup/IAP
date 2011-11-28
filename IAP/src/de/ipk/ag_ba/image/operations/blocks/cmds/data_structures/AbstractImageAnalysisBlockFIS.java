@@ -5,10 +5,11 @@ import info.StopWatch;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
@@ -20,7 +21,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	private FlexibleImageStack debugStack;
 	protected ImageProcessorOptions options;
 	private FlexibleMaskAndImageSet input;
-	private BlockProperties properties;
+	private BlockResultSet properties;
 	private int blockPositionInPipeline;
 	
 	public AbstractImageAnalysisBlockFIS() {
@@ -28,7 +29,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	@Override
-	public void setInputAndOptions(FlexibleMaskAndImageSet input, ImageProcessorOptions options, BlockProperties properties,
+	public void setInputAndOptions(FlexibleMaskAndImageSet input, ImageProcessorOptions options, BlockResultSet properties,
 			int blockPositionInPipeline,
 			FlexibleImageStack debugStack) {
 		this.input = input;
@@ -37,15 +38,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		this.blockPositionInPipeline = blockPositionInPipeline;
 		this.debugStack = debugStack;
 	}
-	
-	@Override
-	public void reset() {
-		input = null;
-		options = null;
-		properties = null;
-		debugStack = null;
-	}
-	
+
 	@Override
 	public final FlexibleMaskAndImageSet process() throws InterruptedException {
 		StopWatch w = debugStart(this.getClass().getSimpleName());
@@ -84,21 +77,19 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return input;
 	}
 	
-	@Override
-	public BlockProperties getProperties() {
+	protected BlockResultSet getProperties() {
 		return properties;
 	}
 	
-	@Override
-	public int getBlockPosition() {
+	protected int getBlockPosition() {
 		return blockPositionInPipeline;
 	}
 	
 	@Override
 	public void postProcessResultsForAllAngles(Sample3D inSample,
 			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockProperties> allResultsForSnapshot,
-			BlockProperties summaryResult,
+			TreeMap<String, BlockResultSet> allResultsForSnapshot,
+			BlockResultSet summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
 	}
@@ -113,5 +104,16 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		System.err.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: EXCEPTION IN BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
 		if (error != null)
 			error.printStackTrace();
+	}
+	
+	@Override
+	public Parameter[] getParameters() {
+		// empty
+		return null;
+	}
+
+	@Override
+	public void setParameters(Parameter[] params) {
+		// empty
 	}
 }

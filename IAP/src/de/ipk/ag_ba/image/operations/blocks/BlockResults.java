@@ -10,33 +10,33 @@ import java.util.TreeMap;
 
 import org.StringManipulationTools;
 
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperties;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
-public class BlockPropertiesImpl implements BlockProperties {
+public class BlockResults implements BlockResultSet {
 	
-	private final TreeMap<Integer, TreeMap<String, Double>> store = new TreeMap<Integer, TreeMap<String, Double>>();
-	private final HashMap<String, FlexibleImage> storedImg = new HashMap<String, FlexibleImage>();
-	private final HashMap<String, VolumeData> storedVol = new HashMap<String, VolumeData>();
+	private final TreeMap<Integer, TreeMap<String, Double>> storedNumerics = new TreeMap<Integer, TreeMap<String, Double>>();
+	private final HashMap<String, FlexibleImage> storedImages = new HashMap<String, FlexibleImage>();
+	private final HashMap<String, VolumeData> storedVolumes = new HashMap<String, VolumeData>();
 	
 	@Override
 	public synchronized BlockProperty getNumericProperty(int currentPositionInPipeline, int searchIndex, Enum<?> pName) {
 		String name = pName.name();
-		if (searchIndex <= 0 && !store.containsKey(currentPositionInPipeline + searchIndex))
+		if (searchIndex <= 0 && !storedNumerics.containsKey(currentPositionInPipeline + searchIndex))
 			return null;
 		else {
 			if (searchIndex > 0) {
 				// search property
 				int foundCount = 0;
 				for (int index = currentPositionInPipeline; index >= 0; index--) {
-					if (store.containsKey(index)) {
-						if (store.get(index).containsKey(name)) {
+					if (storedNumerics.containsKey(index)) {
+						if (storedNumerics.get(index).containsKey(name)) {
 							foundCount++;
 							if (foundCount == searchIndex) {
-								Double d = store.get(index).get(name);
+								Double d = storedNumerics.get(index).get(name);
 								return new BlockProperty(d, index);
 							}
 						}
@@ -44,7 +44,7 @@ public class BlockPropertiesImpl implements BlockProperties {
 				}
 				return null;
 			} else {
-				Double d = store.get(currentPositionInPipeline + searchIndex).get(name);
+				Double d = storedNumerics.get(currentPositionInPipeline + searchIndex).get(name);
 				if (d == null)
 					return null;
 				else
@@ -55,28 +55,28 @@ public class BlockPropertiesImpl implements BlockProperties {
 	
 	@Override
 	public synchronized void setNumericProperty(int position, Enum<?> name, double value) {
-		if (!store.containsKey(position))
-			store.put(position, new TreeMap<String, Double>());
+		if (!storedNumerics.containsKey(position))
+			storedNumerics.put(position, new TreeMap<String, Double>());
 		
-		store.get(position).put(name.name(), value);
+		storedNumerics.get(position).put(name.name(), value);
 	}
 	
 	@Override
 	public synchronized void setNumericProperty(int position, String name, double value) {
-		if (!store.containsKey(position))
-			store.put(position, new TreeMap<String, Double>());
+		if (!storedNumerics.containsKey(position))
+			storedNumerics.put(position, new TreeMap<String, Double>());
 		
-		store.get(position).put(name, value);
+		storedNumerics.get(position).put(name, value);
 	}
 	
 	@Override
 	public synchronized String toString() {
 		StringBuilder sb = new StringBuilder();
 		
-		for (Integer index : store.keySet()) {
+		for (Integer index : storedNumerics.keySet()) {
 			sb.append("BLOCK: " + index + ": \n");
-			for (String property : store.get(index).keySet()) {
-				sb.append("- " + property + " = " + store.get(index).get(property) + "\n");
+			for (String property : storedNumerics.get(index).keySet()) {
+				sb.append("- " + property + " = " + storedNumerics.get(index).get(property) + "\n");
 			}
 		}
 		
@@ -85,12 +85,12 @@ public class BlockPropertiesImpl implements BlockProperties {
 	
 	@Override
 	public synchronized int getBlockPosition() {
-		return store.lastKey();
+		return storedNumerics.lastKey();
 	}
 	
 	@Override
 	public synchronized int getNumberOfBlocksWithPropertyResults() {
-		return store.size();
+		return storedNumerics.size();
 	}
 	
 	@Override
@@ -98,8 +98,8 @@ public class BlockPropertiesImpl implements BlockProperties {
 		String name = pName.name();
 		int foundCount = 0;
 		for (int index = getBlockPosition(); index >= 0; index--) {
-			if (store.containsKey(index)) {
-				if (store.get(index).containsKey(name)) {
+			if (storedNumerics.containsKey(index)) {
+				if (storedNumerics.get(index).containsKey(name)) {
 					foundCount++;
 				}
 			}
@@ -110,7 +110,7 @@ public class BlockPropertiesImpl implements BlockProperties {
 	@Override
 	public synchronized ArrayList<BlockPropertyValue> getProperties(String search) {
 		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
-		Collection<TreeMap<String, Double>> sv = store.values();
+		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
 		if (sv != null)
 			for (TreeMap<String, Double> tm : sv) {
 				Set<String> ks = tm.keySet();
@@ -307,26 +307,26 @@ public class BlockPropertiesImpl implements BlockProperties {
 	
 	@Override
 	public void setImage(String id, FlexibleImage image) {
-		storedImg.put(id, image);
+		storedImages.put(id, image);
 	}
 	
 	@Override
 	public FlexibleImage getImage(String id) {
-		return storedImg.get(id);
+		return storedImages.get(id);
 	}
 	
 	@Override
 	public void setVolume(String string, VolumeData volume) {
-		storedVol.put(string, volume);
+		storedVolumes.put(string, volume);
 	}
 	
 	@Override
 	public Set<String> getVolumeNames() {
-		return storedVol.keySet();
+		return storedVolumes.keySet();
 	}
 	
 	@Override
 	public VolumeData getVolume(String string) {
-		return storedVol.get(string);
+		return storedVolumes.get(string);
 	}
 }

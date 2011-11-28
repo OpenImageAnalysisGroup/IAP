@@ -45,6 +45,8 @@ public class IntensityAnalysis {
 		
 		result.incrementCounter();
 		
+		result.addValue("filled.pixels", plantImagePixelCnt);
+		result.addValue("filled.percent", (100d*pixels.length)/plantImagePixelCnt);
 		if (multiLevel) {
 			if (plantImagePixelCnt > 0) {
 				result.addValue("intensity.chlorophyl.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
