@@ -25,18 +25,18 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 public class DBEinputFileReader extends ExperimentDataFileReader {
-	
+
 	int dataCount = 0;
 	private String experimentname;
 	private String remark;
 	private String coordinator;
 	private Date importdate;
 	private Date startdate;
-	
+
 	public @Override
 	Experiment getXMLDataFromExcelTable(File excelFile, TableData myData,
-						BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
-		
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
+
 		if (myData.isDBEtransposedInputForm()) {
 			status1 = "Process Transposed Input File...";
 			// myData.showDataDialog();
@@ -44,9 +44,9 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 			// myData.showDataDialog();
 		} else
 			status1 = "Process Input File...";
-		
+
 		Experiment e = new Experiment();
-		
+
 		status2 = "Add Experiment-Header";
 		if (statusProvider != null)
 			statusProvider.setCurrentStatusText1(status1);
@@ -60,48 +60,39 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		if (statusProvider != null)
 			statusProvider.setCurrentStatusText2(status2);
 		getExperimentMeasurementsElement(e, myData, statusProvider);
-		
+
 		// for all conditions set experimentstuff
-		
+
 		progressDouble = new Double(100d);
 		return e;
 	}
-	
+
 	/*
-	 * <experimentdata>
-	 * <cachetime>Tue Nov 02 11:15:48 CET 2004</cachetime>
+	 * <experimentdata> <cachetime>Tue Nov 02 11:15:48 CET 2004</cachetime>
 	 * <experiment experimentid="246">
-	 * <experimentname>AAT-Berlin-Proben</experimentname>
-	 * <remark>null</remark>
+	 * <experimentname>AAT-Berlin-Proben</experimentname> <remark>null</remark>
 	 * <coordinator>Hardy Rolletschek</coordinator>
-	 * <excelfileid>284</excelfileid>
-	 * <importusername>hardy</importusername>
-	 * <importdate>Wed Dec 01 15:57:00 CET 2004</importdate>
-	 * <startdate>Wed Oct 20 00:00:00 CEST 2004</startdate>
-	 * <measurements>221</measurements>
-	 * <imagefiles>0</imagefiles>
-	 * <sizekb>0</sizekb>
-	 * </experiment>
-	 * <measurements>
-	 * <substance id="3" name="Sucrose" formula="C12H22O11"
-	 * substancegroup="sugar">
-	 * <line id="526" name="Vicia narbonensis" genotype="wild type"
-	 * treatment="null">
-	 * <sample id="1285" time="-1" unit="-1">
-	 * <average unit="&#00181;mol/g" replicates="7" min="108.816751731602"
-	 * max="125.640731640212"
-	 * stddev="6.513326955309744">118.87748255289114</average>
-	 * <data unit="&#00181;mol/g">108.816751731602</data>
-	 * <data unit="&#00181;mol/g">125.640731640212</data>
-	 * <data unit="&#00181;mol/g">125.598092379386</data>
-	 * ...
+	 * <excelfileid>284</excelfileid> <importusername>hardy</importusername>
+	 * <importdate>Wed Dec 01 15:57:00 CET 2004</importdate> <startdate>Wed Oct
+	 * 20 00:00:00 CEST 2004</startdate> <measurements>221</measurements>
+	 * <imagefiles>0</imagefiles> <sizekb>0</sizekb> </experiment>
+	 * <measurements> <substance id="3" name="Sucrose" formula="C12H22O11"
+	 * substancegroup="sugar"> <line id="526" name="Vicia narbonensis"
+	 * genotype="wild type" treatment="null"> <sample id="1285" time="-1"
+	 * unit="-1"> <average unit="&#00181;mol/g" replicates="7"
+	 * min="108.816751731602" max="125.640731640212"
+	 * stddev="6.513326955309744">118.87748255289114</average> <data
+	 * unit="&#00181;mol/g">108.816751731602</data> <data
+	 * unit="&#00181;mol/g">125.640731640212</data> <data
+	 * unit="&#00181;mol/g">125.598092379386</data> ...
 	 */
 
-	private void getExperimentMeasurementsElement(Experiment e, TableData myData,
-						BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
+	private void getExperimentMeasurementsElement(Experiment e,
+			TableData myData,
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
 		if (checkStopp())
 			return;
-		
+
 		int skipCount = 0;
 		int sampleIDcount = 0;
 		status1 = "Init compound database";
@@ -122,24 +113,27 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 			statusProvider.setCurrentStatusText2(status2);
 		int progressSubstance = 0;
 		int substCount = myData.getSubstanceColumnInformation("F").size();
-		for (SubstanceColumnInformation sci : myData.getSubstanceColumnInformation("F")) {
+		for (SubstanceColumnInformation sci : myData
+				.getSubstanceColumnInformation("F")) {
 			if (checkStopp())
 				return;
-			
+
 			if (myData.getUnicodeStringCellData(sci.getFirstColumn(), 20) == null) {
 				skipCount++;
 				continue;
 			}
-			sampleIDcount = processSubstanceEntries(myData, e, sampleIDcount, sci);
+			sampleIDcount = processSubstanceEntries(myData, e, sampleIDcount,
+					sci);
 			progressSubstance = progressSubstance + 1;
 			double pv = ((double) progressSubstance / (double) substCount) * 100d;
 			progressDouble = pv;
-			status2 = dataCount + " values, " + sampleIDcount +
-								" samples, " + substCount + " substances";
+			status2 = dataCount + " values, " + sampleIDcount + " samples, "
+					+ substCount + " substances";
 			if (statusProvider != null)
 				statusProvider.setCurrentStatusText2(status2);
 			if (statusProvider != null)
-				statusProvider.setCurrentStatusValueFine(progressDouble / 2 + 50d);
+				statusProvider
+						.setCurrentStatusValueFine(progressDouble / 2 + 50d);
 		}
 		// setze datacount zu condition (wieviele measurements gemessen)
 		// da.setText(new Integer(dataCount).toString());
@@ -149,18 +143,21 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		if (statusProvider != null)
 			statusProvider.setCurrentStatusText1("Dataset created");
 		if (statusProvider != null)
-			statusProvider.setCurrentStatusText2("Open Dataset-Tab (please wait)");
-		
+			statusProvider
+					.setCurrentStatusText2("Open Dataset-Tab (please wait)");
+
 	}
-	
-	private int processSubstanceEntries(TableData myData, Experiment e, int sampleIDcount, SubstanceColumnInformation sci) {
+
+	private int processSubstanceEntries(TableData myData, Experiment e,
+			int sampleIDcount, SubstanceColumnInformation sci) {
 		CompoundEntry ce;
-		
+
 		SubstanceInterface s = Experiment.getTypeManager().getNewSubstance();
 		s.setRowId("column " + sci.getColumnList());
 		// ********** ADD SUBSTANCE ATTRIBUTES **************
 		// substance name
-		String substName = myData.getUnicodeStringCellData(sci.getFirstColumn(), 20);
+		String substName = myData.getUnicodeStringCellData(
+				sci.getFirstColumn(), 20);
 		s.setName(substName);
 		// add formula information, if possible
 		ce = CompoundService.getInformation(substName);
@@ -174,29 +171,34 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 			if (plantOrLine == null)
 				continue;
 			status1 = "Processing data:";
-			status2 = "" + dataCount + " values and " + sampleIDcount + " samples";
+			status2 = "" + dataCount + " values and " + sampleIDcount
+					+ " samples";
 			Object plantIDval = myData.getCellData(colPlant, 11, null);
-			sampleIDcount = processLineEntries(myData, sampleIDcount, sci, s, colPlant, plantIDval, plantOrLine);
+			sampleIDcount = processLineEntries(myData, sampleIDcount, sci, s,
+					colPlant, plantIDval, plantOrLine);
 		}
-		
+
 		e.add(s);
-		
+
 		return sampleIDcount;
 	}
-	
-	private int processLineEntries(TableData myData, int sampleIDcount, SubstanceColumnInformation sci, SubstanceInterface s, int colPlant, Object plantIDval,
-						String plantOrLine) {
-		int lineID = ((Double) plantIDval).intValue();
-		
+
+	private int processLineEntries(TableData myData, int sampleIDcount,
+			SubstanceColumnInformation sci, SubstanceInterface s, int colPlant,
+			Object plantIDval, String plantOrLine) {
+		int lineID = (plantIDval instanceof Integer) ? (Integer) plantIDval
+				: ((Double) plantIDval).intValue();
+
 		ConditionInterface c = Experiment.getTypeManager().getNewCondition(s);
 		s.add(c);
-		
+
 		// ********** ADD LINE ATTRIBUTES ***********
 		c.setRowId(lineID);
 		c.setSpecies(plantOrLine);
 		String genoType = myData.getUnicodeStringCellData(colPlant, 14);
 		if (genoType == null) {
-			ErrorMsg.addErrorMessage("Genotype not defined in column " + colPlant);
+			ErrorMsg.addErrorMessage("Genotype not defined in column "
+					+ colPlant);
 			genoType = "NOT DEFINED (INPUT ERROR)";
 		}
 		c.setGenotype(genoType);
@@ -213,42 +215,42 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		else
 			c.setTreatment("");
 		for (SampleEntry sample : myData.getSamples(sci, lineID)) {
-			sampleIDcount = processSampleEntries(myData, sampleIDcount, sci, c, sample);
+			sampleIDcount = processSampleEntries(myData, sampleIDcount, sci, c,
+					sample);
 		}
-		
+
 		c.setExperimentName(experimentname);
 		c.setExperimentCoordinator(coordinator);
 		c.setExperimentImportdate(importdate);
 		c.setExperimentRemark(remark);
 		c.setExperimentStartDate(startdate);
 		c.setExperimentType("");
-		
+
 		return sampleIDcount;
 	}
-	
-	private int processSampleEntries(
-						TableData myData,
-						int sampleIDcount,
-						SubstanceColumnInformation sci,
-						ConditionInterface c,
-						SampleEntry sample) {
+
+	private int processSampleEntries(TableData myData, int sampleIDcount,
+			SubstanceColumnInformation sci, ConditionInterface c,
+			SampleEntry sample) {
 		// ADD SAMPLE ENTRY
 		SampleInterface s = Experiment.getTypeManager().getNewSample(c);
 		c.add(s);
-		
+
 		// ADD SAMPLE ATTRIBUTES: ID, TIME, UNIT
 		s.setRowId(++sampleIDcount);
-		s.setTime(new Integer(processTimeData(new Double(sample.getTime()).toString())));
+		s.setTime(new Integer(processTimeData(new Double(sample.getTime())
+				.toString())));
 		s.setTimeUnit(sample.getTimeUnit());
 		// ADD DATA ATTRIBUTE: MEASUREMENT TOOL
-		String mesTool = myData.getUnicodeStringCellData(sci.getFirstColumn(), 21);
+		String mesTool = myData.getUnicodeStringCellData(sci.getFirstColumn(),
+				21);
 		s.setMeasurementtool(mesTool == null ? "" : mesTool);
 		ArrayList<ReplicateDouble> measurements = sample.getMeasurementValues();
 		// ADD AVERAGE ENTRY
-		
+
 		SampleAverage sa = Experiment.getTypeManager().getNewSampleAverage(s);
 		s.setSampleAverage(sa);
-		
+
 		// ADD AVERAGE ATTRIBUTES: UNIT, REPLICATES, MIN, MAX, STDDEV
 		sa.setUnit(sample.getMeasurementUnit());
 		sa.setReplicateId(new Integer(measurements.size()));
@@ -259,11 +261,14 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		for (ReplicateDouble itMes : measurements) {
 			Double value = itMes.doubleValue();
 			// ADD DATA ENTRY
-			NumericMeasurementInterface m = Experiment.getTypeManager().getNewMeasurement(s);
+			NumericMeasurementInterface m = Experiment.getTypeManager()
+					.getNewMeasurement(s);
 			s.add(m);
 			// ADD DATA ATTRIBUTE: UNIT
-			m.setUnit(checkNullError(myData.getUnicodeStringCellData(sci.getFirstColumn(), 22),
-													"No measurement unit given for substance listed in column(s) " + sci.getColumnList() + "!", "n/a"));
+			m.setUnit(checkNullError(
+					myData.getUnicodeStringCellData(sci.getFirstColumn(), 22),
+					"No measurement unit given for substance listed in column(s) "
+							+ sci.getColumnList() + "!", "n/a"));
 			m.setReplicateID(new Integer(itMes.getReplicateNumber()));
 			m.setValue(value);
 			dataCount++;
@@ -271,32 +276,36 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		status2 = dataCount + " measurement values processed";
 		return sampleIDcount;
 	}
-	
-	private String checkNullError(String value, String errorMessageIfNull, String replaceWithForNull) {
+
+	private String checkNullError(String value, String errorMessageIfNull,
+			String replaceWithForNull) {
 		if (value == null) {
 			ErrorMsg.addErrorMessage(errorMessageIfNull);
 			return replaceWithForNull;
 		}
 		return value;
 	}
-	
+
 	private String processTimeData(String timeVal) {
 		if (timeVal != null) {
 			if (timeVal.endsWith(".0"))
-				timeVal = StringManipulationTools.stringReplace(timeVal, ".0", "");
+				timeVal = StringManipulationTools.stringReplace(timeVal, ".0",
+						"");
 		}
 		return timeVal;
 	}
-	
+
 	private void getExperimentHeaderElement(File excelFile, TableData myData) {
 		experimentname = (String) myData.getCellData(col("B"), 6, "");
 		remark = (String) myData.getCellData(col("B"), 5, "");
 		coordinator = (String) myData.getCellData(col("B"), 7, "");
-		importdate = excelFile == null ? new Date() : new Date(excelFile.lastModified());
-		startdate = AttributeHelper.getDateFromString(myData.getCellDataDate(col("B"), 4, ""));
+		importdate = excelFile == null ? new Date() : new Date(
+				excelFile.lastModified());
+		startdate = AttributeHelper.getDateFromString(myData.getCellDataDate(
+				col("B"), 4, ""));
 		dataCount = 0;
 	}
-	
+
 	private int col(String col) {
 		if (col.length() == 1) {
 			char c1 = col.charAt(0);
