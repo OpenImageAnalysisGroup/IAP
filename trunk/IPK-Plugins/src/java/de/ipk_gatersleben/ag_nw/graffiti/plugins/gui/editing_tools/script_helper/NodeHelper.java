@@ -47,15 +47,15 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_class
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class NodeHelper implements Node, HelperClass {
-	
+
 	private final Node n;
 	private final boolean lastNode;
-	
+
 	public NodeHelper(Node n, boolean isLastNode) {
 		this.n = n;
 		this.lastNode = isLastNode;
 	}
-	
+
 	/**
 	 * Enumerate alternative identifiers, assigned to the mapped xml substance
 	 * data.
@@ -70,7 +70,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Enumerate alternative identifiers, assigned to the mapped xml substance
 	 * data. Only the specified index value is processed.
@@ -86,35 +86,51 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	private ArrayList<MemSample> memSamples = null;
 	private ArrayList<MemPlant> memPlants = null;
-	
-	public boolean memSample(double value, int replicate, int plantID, String unit, String optTimeUnit,
-						Integer optTimeValueForComparision) {
+
+	public boolean memSample(double value, int replicate, int plantID,
+			String unit, String optTimeUnit, Integer optTimeValueForComparision) {
 		if (memSamples == null)
 			memSamples = new ArrayList<MemSample>();
-		memSamples.add(new MemSample(value, replicate, plantID, unit, optTimeUnit, optTimeValueForComparision));
+		memSamples.add(new MemSample(value, replicate, plantID, unit,
+				optTimeUnit, optTimeValueForComparision));
 		return true;
 	}
-	
-	public int memGetPlantID(String species, String genotype, String optVariety, String optGrowthConditions,
-						String optTreatment) {
+
+	public int memGetPlantID(String species, String genotype,
+			String optVariety, String optGrowthConditions, String optTreatment) {
+		return memGetPlantID(-1, species, genotype, optVariety,
+				optGrowthConditions, optTreatment);
+	}
+
+	/**
+	 * Use a negative optOverrideUseThisPlantID, to get a new ID. If valid IDs
+	 * are given, they may be specified in this parameter.
+	 */
+	public int memGetPlantID(int optOverrideUseThisPlantID, String species,
+			String genotype, String optVariety, String optGrowthConditions,
+			String optTreatment) {
 		if (memPlants == null)
 			memPlants = new ArrayList<MemPlant>();
-		int idx = 0;
 		for (MemPlant mp : memPlants) {
-			idx++;
-			if (mp.getSpecies().equals(species) && mp.getGenotype().equals(genotype))
-				return idx;
+			if (mp.getSpecies().equals(species)
+					&& mp.getGenotype().equals(genotype))
+				return mp.getConditionID();
 		}
-		MemPlant mp = new MemPlant(species, genotype, optVariety, optGrowthConditions, optTreatment);
+		MemPlant mp = new MemPlant(
+				optOverrideUseThisPlantID < 0 ? memPlants.size() + 1
+						: optOverrideUseThisPlantID, species, genotype,
+				optVariety, optGrowthConditions, optTreatment);
 		memPlants.add(mp);
-		return memPlants.size();
+		return mp.getConditionID();
 	}
-	
-	public boolean memAddDataMapping(String substanceName, String measurementUnit, String experimentStart,
-						String experimentName, String coordinator, String optRemark, String optSequence) {
+
+	public boolean memAddDataMapping(String substanceName,
+			String measurementUnit, String experimentStart,
+			String experimentName, String coordinator, String optRemark,
+			String optSequence) {
 		if (memPlants == null || memPlants.size() <= 0) {
 			ErrorMsg.addErrorMessage("No plants defined (use memGetPlantID), can not create and add mapping data!");
 			return false;
@@ -123,8 +139,9 @@ public class NodeHelper implements Node, HelperClass {
 			ErrorMsg.addErrorMessage("No samples defined (use memSample), can not create and add mapping data!");
 			return false;
 		}
-		ExperimentInterface d = getMappingDataDocument(substanceName, measurementUnit, experimentStart, experimentName,
-							coordinator, optRemark, optSequence);
+		ExperimentInterface d = getMappingDataDocument(substanceName,
+				measurementUnit, experimentStart, experimentName, coordinator,
+				optRemark, optSequence);
 		if (d != null) {
 			for (SubstanceInterface m : d)
 				Experiment2GraphHelper.addMappingData2Node(m, getGraphNode());
@@ -133,16 +150,19 @@ public class NodeHelper implements Node, HelperClass {
 		memSamples.clear();
 		return d != null;
 	}
-	
-	public void addDataMapping(Collection<DataSetRow> datasetRows, String substanceName) {
+
+	public void addDataMapping(Collection<DataSetRow> datasetRows,
+			String substanceName) {
 		// memGetPlantID(species, genotype, optVariety, optGrowthConditions,
 		// optTreatment)
 		String unit = "";
 		String experimentName = "";
 		for (DataSetRow dsr : datasetRows) {
-			if (dsr.substanceName == null || !dsr.substanceName.equals(substanceName))
+			if (dsr.substanceName == null
+					|| !dsr.substanceName.equals(substanceName))
 				continue;
-			int plantID = memGetPlantID(dsr.species, dsr.genotype, "", "", dsr.treatment);
+			int plantID = memGetPlantID(dsr.species, dsr.genotype, "", "",
+					dsr.treatment);
 			unit = dsr.unit;
 			experimentName = dsr.experimentName;
 			Integer timeValue = null;
@@ -152,33 +172,40 @@ public class NodeHelper implements Node, HelperClass {
 				timeValue = new Integer(-1);
 			}
 			String timeUnit = dsr.timeUnit;
-			if (timeUnit == null || timeUnit.length() <= 0 || timeUnit.equals("NA"))
+			if (timeUnit == null || timeUnit.length() <= 0
+					|| timeUnit.equals("NA"))
 				timeUnit = "-1";
 			int replicateID = -1;
 			try {
 				replicateID = dsr.replicateID;
 			} catch (Exception e) {
 			}
-			memSample(dsr.value.doubleValue(), replicateID, plantID, dsr.unit, timeUnit, timeValue);
+			memSample(dsr.value.doubleValue(), replicateID, plantID, dsr.unit,
+					timeUnit, timeValue);
 		}
-		memAddDataMapping(substanceName, unit, "", experimentName, "Coordinator", "", "");
+		memAddDataMapping(substanceName, unit, "", experimentName,
+				"Coordinator", "", "");
 	}
-	
-	public ExperimentInterface getMappingDataDocument(String substanceName, String measurementUnit,
-						String experimentStart, String experimentName, String coordinator, String optRemark, String optSequence) {
-		ExperimentInterface d = ExperimentConstructor.processData(substanceName, measurementUnit, memSamples, memPlants,
-							experimentStart, experimentName, coordinator, optRemark, optSequence);
+
+	public ExperimentInterface getMappingDataDocument(String substanceName,
+			String measurementUnit, String experimentStart,
+			String experimentName, String coordinator, String optRemark,
+			String optSequence) {
+		ExperimentInterface d = ExperimentConstructor.processData(
+				substanceName, measurementUnit, memSamples, memPlants,
+				experimentStart, experimentName, coordinator, optRemark,
+				optSequence);
 		return d;
 	}
-	
+
 	public NodeHelper(Node workNode) {
 		this(workNode, false);
 	}
-	
+
 	public boolean writeDatasetTable(String fileName, boolean useAverage) {
 		TextFile tf = new TextFile();
 		tf.add(getDatasetTable().toString());
-		
+
 		try {
 			tf.write(fileName);
 			return true;
@@ -187,156 +214,162 @@ public class NodeHelper implements Node, HelperClass {
 			return false;
 		}
 	}
-	
+
 	private String checkStringFormat(String text) {
 		if (text == null || text.equals("NA"))
 			return "NA";
 		else
 			return "\"" + text + "\"";
 	}
-	
+
 	private String checkFormat(String text) {
 		text = StringManipulationTools.stringReplace(text, "\"", "\\\"");
 		return text;
 	}
-	
+
 	private String getRowLabel(int i, int minWidth) {
 		String result = "" + i;
 		while (result.length() < minWidth)
 			result = "0" + result;
 		return result;
 	}
-	
+
 	public Node getGraphNode() {
 		return n;
 	}
-	
+
 	public void setFillColor(Color c) {
 		AttributeHelper.setFillColor(n, c);
 	}
-	
+
 	public Color getFillColor() {
 		return AttributeHelper.getFillColor(n);
 	}
-	
+
 	public boolean isLastNode() {
 		return lastNode;
 	}
-	
+
 	public Color getBorderColor() {
 		return AttributeHelper.getOutlineColor(n);
 	}
-	
+
 	public void setBorderColor(Color c) {
 		AttributeHelper.setOutlineColor(n, c);
 	}
-	
+
 	public void setSize(double width, double height) {
 		AttributeHelper.setSize(n, width, height);
 	}
-	
+
 	public double getWidth() {
 		return AttributeHelper.getSize(n).x;
 	}
-	
+
 	public double getHeight() {
 		return AttributeHelper.getSize(n).y;
 	}
-	
+
 	public String getClusterID(String ifNoCluster) {
 		return NodeTools.getClusterID(n, ifNoCluster);
 	}
-	
+
 	public void setClusterID(String clusterID) {
 		NodeTools.setClusterID(n, clusterID);
 	}
-	
+
 	public void setPosition(double x, double y) {
 		AttributeHelper.setPosition(n, x, y);
 	}
-	
+
 	public double getX() {
 		return AttributeHelper.getPositionX(n);
 	}
-	
+
 	public double getY() {
 		return AttributeHelper.getPositionY(n);
 	}
-	
+
 	public String getURL() {
 		String u = AttributeHelper.getReferenceURL(n);
 		return u;
 	}
-	
+
 	public void setURL(String url) {
 		AttributeHelper.setReferenceURL(n, url);
 	}
-	
+
 	public String getPathwayReference() {
 		String u = AttributeHelper.getPathwayReference(n);
 		return u;
 	}
-	
+
 	public void setPathwayReference(String ref) {
 		AttributeHelper.setPathwayReference(n, ref);
 	}
-	
+
 	public void setAttributeValue(String path, String name, Object value) {
 		AttributeHelper.setAttribute(n, path, name, value);
 	}
-	
-	public Object getAttributeValue(String path, String name, Object returnIfNull, Object returnType) {
-		return AttributeHelper.getAttributeValue(n, path, name, returnIfNull, returnType);
+
+	public Object getAttributeValue(String path, String name,
+			Object returnIfNull, Object returnType) {
+		return AttributeHelper.getAttributeValue(n, path, name, returnIfNull,
+				returnType);
 	}
-	
+
 	public String getTooltip() {
 		return AttributeHelper.getToolTipText(n);
 	}
-	
+
 	public void setTooltip(String tooltip) {
 		AttributeHelper.setToolTipText(n, tooltip);
 	}
-	
+
 	public void setLabel(String label) {
 		AttributeHelper.setLabel(n, label);
 	}
-	
+
 	public String getLabel() {
 		return AttributeHelper.getLabel(n, "");
 	}
-	
+
 	public double getBorderWidth() {
 		return AttributeHelper.getFrameThickNess(n);
 	}
-	
+
 	public void setBorderWidth(double w) {
 		AttributeHelper.setBorderWidth(n, w);
 	}
-	
+
 	public void setRounding(double r) {
 		AttributeHelper.setRoundedEdges(n, r);
 	}
-	
+
 	public double getRounding() {
 		return AttributeHelper.getRoundedEdges(n);
 	}
-	
+
 	public ExperimentInterface getDataMappings() {
 		try {
-			CollectionAttribute ca = (CollectionAttribute) n.getAttribute(Experiment2GraphHelper.mapFolder);
-			XMLAttribute xa = (XMLAttribute) ca.getAttribute(Experiment2GraphHelper.mapVarName);
+			CollectionAttribute ca = (CollectionAttribute) n
+					.getAttribute(Experiment2GraphHelper.mapFolder);
+			XMLAttribute xa = (XMLAttribute) ca
+					.getAttribute(Experiment2GraphHelper.mapVarName);
 			return xa.getMappedData();
 		} catch (AttributeNotFoundException e) {
 			// no mapping data
 			return new Experiment();
 		}
 	}
-	
+
 	public ArrayList<SubstanceInterface> getMappings() {
 		ArrayList<SubstanceInterface> result = new ArrayList<SubstanceInterface>();
 		try {
-			CollectionAttribute ca = (CollectionAttribute) n.getAttribute(Experiment2GraphHelper.mapFolder);
-			XMLAttribute xa = (XMLAttribute) ca.getAttribute(Experiment2GraphHelper.mapVarName);
+			CollectionAttribute ca = (CollectionAttribute) n
+					.getAttribute(Experiment2GraphHelper.mapFolder);
+			XMLAttribute xa = (XMLAttribute) ca
+					.getAttribute(Experiment2GraphHelper.mapVarName);
 			for (SubstanceInterface xmldata : xa.getMappedData()) {
 				result.add(xmldata);
 			}
@@ -345,15 +378,15 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	public Set<String> getMappedSeriesNames() {
 		HashSet<String> seriesnames = new HashSet<String>();
 		for (ConditionInterface sd : getMappedSeriesData())
 			seriesnames.add(sd.getConditionName());
-		
+
 		return seriesnames;
 	}
-	
+
 	public ArrayList<ConditionInterface> getMappedSeriesData() {
 		ArrayList<ConditionInterface> result = new ArrayList<ConditionInterface>();
 		for (SubstanceInterface md : getDataMappings()) {
@@ -361,7 +394,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	// public List<org.w3c.dom.Node> getMappedSeriesDataDomNodes() {
 	// List<org.w3c.dom.Node> result = new ArrayList<org.w3c.dom.Node>();
 	// ArrayList<MappingData> mdl = getDataMappings();
@@ -376,7 +409,7 @@ public class NodeHelper implements Node, HelperClass {
 	//
 	// return result;
 	// }
-	
+
 	public ArrayList<NumericMeasurementInterface> getMappedSampleData() {
 		ArrayList<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
 		for (SubstanceInterface md : getDataMappings()) {
@@ -387,7 +420,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	public ArrayList<SampleAverageInterface> getMappedAverageSampleData() {
 		ArrayList<SampleAverageInterface> result = new ArrayList<SampleAverageInterface>();
 		for (SubstanceInterface md : getDataMappings()) {
@@ -398,8 +431,9 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
-	public ArrayList<NumericMeasurementInterface> getMappedSampleDataForTimePoint(int timeValue) {
+
+	public ArrayList<NumericMeasurementInterface> getMappedSampleDataForTimePoint(
+			int timeValue) {
 		ArrayList<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
 		for (NumericMeasurementInterface sd : getMappedSampleData()) {
 			if (sd.getParentSample().getTime() == timeValue)
@@ -407,7 +441,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	public ArrayList<Double> getMappedMeanValuesForTimePoint(int timeValue) {
 		ArrayList<Double> result = new ArrayList<Double>();
 		for (ConditionInterface sd : getMappedSeriesData()) {
@@ -421,7 +455,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	public Set<Integer> getMappedTimePointsCoveredByAllLines() {
 		List<HashSet<Integer>> timePoints = new ArrayList<HashSet<Integer>>();
 		for (ConditionInterface sd : getMappedSeriesData()) {
@@ -444,7 +478,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return timePointsCoveredInAllSeries;
 	}
-	
+
 	public Set<Integer> getMappedUniqueTimePoints() {
 		HashSet<Integer> result = new HashSet<Integer>();
 		for (SubstanceInterface md : getDataMappings()) {
@@ -454,7 +488,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	public void setChartType(GraffitiCharts chartType0123456) {
 		// if (chartType0123456==0)
 		NodeTools.setNodeComponentType(n, chartType0123456.getName());
@@ -488,7 +522,7 @@ public class NodeHelper implements Node, HelperClass {
 		// else
 		// ErrorMsg.addErrorMessage("Internal Error: Invalid diagram style id: Valid is only type -1...6!");
 	}
-	
+
 	public double getAverage() {
 		double sum = 0;
 		ExperimentInterface mdl = getDataMappings();
@@ -496,286 +530,371 @@ public class NodeHelper implements Node, HelperClass {
 			sum += md.getAverage();
 		return sum / mdl.size();
 	}
-	
+
+	@Override
 	public Collection<Edge> getAllInEdges() {
 		return n.getAllInEdges();
 	}
-	
+
+	@Override
 	public Collection<Node> getAllInNeighbors() {
 		return n.getAllInNeighbors();
 	}
-	
+
+	@Override
 	public Collection<Edge> getAllOutEdges() {
 		return n.getAllOutEdges();
 	}
-	
+
+	@Override
 	public Collection<Node> getAllOutNeighbors() {
 		return getAllInNeighbors();
 	}
-	
+
+	@Override
 	public Collection<Edge> getDirectedInEdges() {
 		return n.getDirectedInEdges();
 	}
-	
+
+	@Override
 	public Iterator<Edge> getDirectedInEdgesIterator() {
 		return n.getDirectedInEdgesIterator();
 	}
-	
+
+	@Override
 	public Collection<Edge> getDirectedOutEdges() {
 		return n.getDirectedOutEdges();
 	}
-	
+
+	@Override
 	public Iterator<Edge> getDirectedOutEdgesIterator() {
 		return n.getDirectedOutEdgesIterator();
 	}
-	
+
+	@Override
 	public Collection<Edge> getEdges() {
 		return n.getEdges();
 	}
-	
+
+	@Override
 	public Iterator<Edge> getEdgesIterator() {
 		return n.getEdgesIterator();
 	}
-	
+
+	@Override
 	public int getInDegree() {
 		return n.getInDegree();
 	}
-	
+
+	@Override
 	public Set<Node> getInNeighbors() {
 		return n.getInNeighbors();
 	}
-	
+
+	@Override
 	public Iterator<Node> getInNeighborsIterator() {
 		return n.getInNeighborsIterator();
 	}
-	
+
+	@Override
 	public Set<Node> getNeighbors() {
 		return n.getNeighbors();
 	}
-	
+
+	@Override
 	public Iterator<Node> getNeighborsIterator() {
 		return n.getNeighborsIterator();
 	}
-	
+
+	@Override
 	public int getOutDegree() {
 		return n.getOutDegree();
 	}
-	
+
+	@Override
 	public Set<Node> getOutNeighbors() {
 		return n.getOutNeighbors();
 	}
-	
+
+	@Override
 	public Iterator<Node> getOutNeighborsIterator() {
 		return n.getOutNeighborsIterator();
 	}
-	
+
+	@Override
 	public Iterator<Node> getUndirectedNeighborsIterator() {
 		return n.getUndirectedNeighborsIterator();
 	}
-	
+
+	@Override
 	public Collection<Edge> getUndirectedEdges() {
 		return n.getUndirectedEdges();
 	}
-	
+
+	@Override
 	public Iterator<Edge> getUndirectedEdgesIterator() {
 		return n.getUndirectedEdgesIterator();
 	}
-	
+
+	@Override
 	public Collection<Node> getUndirectedNeighbors() {
 		return n.getUndirectedNeighbors();
 	}
-	
+
+	@Override
 	public void setGraph(Graph graph) {
 		n.setGraph(graph);
 	}
-	
+
+	@Override
 	public Graph getGraph() {
 		return n.getGraph();
 	}
-	
+
+	@Override
 	public void setID(long id) {
 		n.setID(id);
 	}
-	
+
+	@Override
 	public long getID() {
 		return n.getID();
 	}
-	
+
+	@Override
 	public int getViewID() {
 		return n.getViewID();
 	}
-	
+
+	@Override
 	public void setViewID(int id) {
 		n.setViewID(id);
 	}
-	
-	public Attribute getAttribute(String path) throws AttributeNotFoundException {
+
+	@Override
+	public Attribute getAttribute(String path)
+			throws AttributeNotFoundException {
 		return n.getAttribute(path);
 	}
-	
+
+	@Override
 	public CollectionAttribute getAttributes() {
 		return n.getAttributes();
 	}
-	
+
+	@Override
 	public synchronized void setBoolean(String path, boolean value) {
 		n.setBoolean(path, value);
 	}
-	
+
+	@Override
 	public boolean getBoolean(String path) throws AttributeNotFoundException {
 		return n.getBoolean(path);
 	}
-	
+
+	@Override
 	public synchronized void setByte(String path, byte value) {
 		n.setByte(path, value);
 	}
-	
+
+	@Override
 	public byte getByte(String path) throws AttributeNotFoundException {
 		return n.getByte(path);
 	}
-	
+
+	@Override
 	public synchronized void setDouble(String path, double value) {
 		n.setDouble(path, value);
 	}
-	
+
+	@Override
 	public double getDouble(String path) throws AttributeNotFoundException {
 		return n.getDouble(path);
 	}
-	
+
+	@Override
 	public synchronized void setFloat(String path, float value) {
 		n.setFloat(path, value);
 	}
-	
+
+	@Override
 	public float getFloat(String path) throws AttributeNotFoundException {
 		return n.getFloat(path);
 	}
-	
+
+	@Override
 	public synchronized void setInteger(String path, int value) {
 		n.setInteger(path, value);
 	}
-	
+
+	@Override
 	public int getInteger(String path) throws AttributeNotFoundException {
 		return n.getInteger(path);
 	}
-	
+
+	@Override
 	public ListenerManager getListenerManager() {
 		return n.getListenerManager();
 	}
-	
+
+	@Override
 	public synchronized void setLong(String path, long value) {
 		n.setLong(path, value);
 	}
-	
+
+	@Override
 	public long getLong(String path) throws AttributeNotFoundException {
 		return n.getLong(path);
 	}
-	
+
+	@Override
 	public synchronized void setShort(String path, short value) {
 		n.setShort(path, value);
 	}
-	
+
+	@Override
 	public short getShort(String path) throws AttributeNotFoundException {
 		return n.getShort(path);
 	}
-	
+
+	@Override
 	public synchronized void setString(String path, String value) {
 		n.setString(path, value);
 	}
-	
+
+	@Override
 	public String getString(String path) throws AttributeNotFoundException {
 		return n.getString(path);
 	}
-	
-	public synchronized void addAttribute(Attribute attr, String path) throws AttributeExistsException,
-						NoCollectionAttributeException, FieldAlreadySetException {
+
+	@Override
+	public synchronized void addAttribute(Attribute attr, String path)
+			throws AttributeExistsException, NoCollectionAttributeException,
+			FieldAlreadySetException {
 		n.addAttribute(attr, path);
 	}
-	
-	public synchronized void addBoolean(String path, String id, boolean value) throws NoCollectionAttributeException,
-						AttributeExistsException, FieldAlreadySetException {
+
+	@Override
+	public synchronized void addBoolean(String path, String id, boolean value)
+			throws NoCollectionAttributeException, AttributeExistsException,
+			FieldAlreadySetException {
 		n.addBoolean(path, id, value);
 	}
-	
-	public synchronized void addByte(String path, String id, byte value) throws NoCollectionAttributeException,
-						AttributeExistsException, FieldAlreadySetException {
+
+	@Override
+	public synchronized void addByte(String path, String id, byte value)
+			throws NoCollectionAttributeException, AttributeExistsException,
+			FieldAlreadySetException {
 		n.addByte(path, id, value);
 	}
-	
-	public synchronized void addDouble(String path, String id, double value) throws NoCollectionAttributeException,
-						AttributeExistsException, FieldAlreadySetException {
+
+	@Override
+	public synchronized void addDouble(String path, String id, double value)
+			throws NoCollectionAttributeException, AttributeExistsException,
+			FieldAlreadySetException {
 		n.addDouble(path, id, value);
 	}
-	
-	public synchronized void addFloat(String path, String id, float value) throws NoCollectionAttributeException,
-						AttributeExistsException, FieldAlreadySetException {
+
+	@Override
+	public synchronized void addFloat(String path, String id, float value)
+			throws NoCollectionAttributeException, AttributeExistsException,
+			FieldAlreadySetException {
 		n.addFloat(path, id, value);
 	}
-	
-	public synchronized void addInteger(String path, String id, int value) throws NoCollectionAttributeException,
-						AttributeExistsException, FieldAlreadySetException {
+
+	@Override
+	public synchronized void addInteger(String path, String id, int value)
+			throws NoCollectionAttributeException, AttributeExistsException,
+			FieldAlreadySetException {
 		n.addInteger(path, id, value);
 	}
-	
-	public synchronized void addLong(String path, String id, long value) throws NoCollectionAttributeException,
-						AttributeExistsException, FieldAlreadySetException {
+
+	@Override
+	public synchronized void addLong(String path, String id, long value)
+			throws NoCollectionAttributeException, AttributeExistsException,
+			FieldAlreadySetException {
 		n.addLong(path, id, value);
 	}
-	
-	public synchronized void addShort(String path, String id, short value) throws NoCollectionAttributeException,
-						AttributeExistsException, FieldAlreadySetException {
+
+	@Override
+	public synchronized void addShort(String path, String id, short value)
+			throws NoCollectionAttributeException, AttributeExistsException,
+			FieldAlreadySetException {
 		n.addShort(path, id, value);
 	}
-	
-	public synchronized void addString(String path, String id, String value) throws NoCollectionAttributeException,
-						AttributeExistsException, FieldAlreadySetException {
+
+	@Override
+	public synchronized void addString(String path, String id, String value)
+			throws NoCollectionAttributeException, AttributeExistsException,
+			FieldAlreadySetException {
 		n.addString(path, id, value);
 	}
-	
-	public synchronized void changeBoolean(String path, boolean value) throws AttributeNotFoundException {
+
+	@Override
+	public synchronized void changeBoolean(String path, boolean value)
+			throws AttributeNotFoundException {
 		n.changeBoolean(path, value);
 	}
-	
-	public synchronized void changeByte(String path, byte value) throws AttributeNotFoundException {
+
+	@Override
+	public synchronized void changeByte(String path, byte value)
+			throws AttributeNotFoundException {
 		n.changeByte(path, value);
 	}
-	
-	public synchronized void changeDouble(String path, double value) throws AttributeNotFoundException {
+
+	@Override
+	public synchronized void changeDouble(String path, double value)
+			throws AttributeNotFoundException {
 		n.changeDouble(path, value);
 	}
-	
-	public synchronized void changeFloat(String path, float value) throws AttributeNotFoundException {
+
+	@Override
+	public synchronized void changeFloat(String path, float value)
+			throws AttributeNotFoundException {
 		n.changeFloat(path, value);
 	}
-	
-	public synchronized void changeInteger(String path, int value) throws AttributeNotFoundException {
+
+	@Override
+	public synchronized void changeInteger(String path, int value)
+			throws AttributeNotFoundException {
 		n.changeInteger(path, value);
 	}
-	
-	public synchronized void changeLong(String path, long value) throws AttributeNotFoundException {
+
+	@Override
+	public synchronized void changeLong(String path, long value)
+			throws AttributeNotFoundException {
 		n.changeLong(path, value);
 	}
-	
-	public synchronized void changeShort(String path, short value) throws AttributeNotFoundException {
+
+	@Override
+	public synchronized void changeShort(String path, short value)
+			throws AttributeNotFoundException {
 		n.changeShort(path, value);
 	}
-	
-	public synchronized void changeString(String path, String value) throws AttributeNotFoundException {
+
+	@Override
+	public synchronized void changeString(String path, String value)
+			throws AttributeNotFoundException {
 		n.changeString(path, value);
 	}
-	
-	public synchronized Attribute removeAttribute(String path) throws AttributeNotFoundException {
+
+	@Override
+	public synchronized Attribute removeAttribute(String path)
+			throws AttributeNotFoundException {
 		return n.removeAttribute(path);
 	}
-	
+
 	public synchronized void removeDataMapping() {
 		RemoveMappingDataAlgorithm.removeMappingDataFrom(n);
 	}
-	
+
 	public synchronized void addDataMapping(SubstanceInterface mappingData) {
 		Experiment2GraphHelper.addMappingData2Node(mappingData, n);
 	}
-	
+
 	public void mergeMultipleMappings() {
-		ExperimentInterface mappingList = Experiment2GraphHelper.getMappedDataListFromGraphElement(n);
+		ExperimentInterface mappingList = Experiment2GraphHelper
+				.getMappedDataListFromGraphElement(n);
 		if (mappingList != null) {
 			SubstanceInterface mapping1 = mappingList.iterator().next();
 			for (SubstanceInterface m : mappingList) {
@@ -788,11 +907,12 @@ public class NodeHelper implements Node, HelperClass {
 			AttributeHelper.deleteAttribute(n, "charting", "diagramtitle*");
 		}
 	}
-	
+
+	@Override
 	public int getDegree() {
 		return n.getDegree();
 	}
-	
+
 	public static List<NodeHelper> getNodeHelperList(Collection<Node> nodes) {
 		List<NodeHelper> result = new ArrayList<NodeHelper>();
 		for (Iterator<Node> it = nodes.iterator(); it.hasNext();) {
@@ -801,20 +921,20 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	public void setPosition(Point2D position) {
 		setPosition(position.getX(), position.getY());
 	}
-	
+
 	public Point2D getPosition() {
 		return new Point2D.Double(getX(), getY());
 	}
-	
+
 	/**
 	 * Shortcut method to modify the range axis minimum and maximum value.
-	 * Besides setting the minimum and maximum value, this method enables the use
-	 * of the custom values. You may disable the use of the custom range with the
-	 * method <code>setChartSettingUseCustomRange</code>.
+	 * Besides setting the minimum and maximum value, this method enables the
+	 * use of the custom values. You may disable the use of the custom range
+	 * with the method <code>setChartSettingUseCustomRange</code>.
 	 * 
 	 * @param minValue
 	 * @param maxValue
@@ -824,7 +944,7 @@ public class NodeHelper implements Node, HelperClass {
 		setAttributeValue("charting", "maxRange", new Double(maxValue));
 		setAttributeValue("charting", "useCustomRange", new Boolean(true));
 	}
-	
+
 	/**
 	 * Shortcut method to enable or disable the display of a custom range. (see
 	 * also <code>setChartRange</code>) Implementation:
@@ -833,7 +953,7 @@ public class NodeHelper implements Node, HelperClass {
 	public void setChartSettingUseCustomRange(boolean set) {
 		setAttributeValue("charting", "useCustomRange", new Boolean(set));
 	}
-	
+
 	public double getMappedMinSampleAvgValue() {
 		double min = Double.NaN;
 		for (SampleAverageInterface sd : getMappedAverageSampleData()) {
@@ -844,7 +964,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return min;
 	}
-	
+
 	public double getMappedMaxSampleAvgValue() {
 		double max = Double.NaN;
 		for (SampleAverageInterface sd : getMappedAverageSampleData()) {
@@ -855,7 +975,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return max;
 	}
-	
+
 	public DataSetTable getDatasetTable() {
 		String substanceName = getLabel();
 		DataSetTable dst = new DataSetTable();
@@ -880,22 +1000,27 @@ public class NodeHelper implements Node, HelperClass {
 						timeUnit = "NA";
 					// String measUnit = spd.getUnit();
 					for (NumericMeasurementInterface m : spd) {
-						dst.addRow(getRowLabel(row++, 5), checkFormat(experimentName), checkFormat(substanceName), mapping,
-											checkFormat(species), checkFormat(genotype), checkFormat(treatment), seriesId, timeS,
-											checkStringFormat(timeUnit), m.getReplicateID(), m.getValue(), checkFormat(m.getUnit()));
+						dst.addRow(getRowLabel(row++, 5),
+								checkFormat(experimentName),
+								checkFormat(substanceName), mapping,
+								checkFormat(species), checkFormat(genotype),
+								checkFormat(treatment), seriesId, timeS,
+								checkStringFormat(timeUnit),
+								m.getReplicateID(), m.getValue(),
+								checkFormat(m.getUnit()));
 					}
 				}
 			}
 		}
 		return dst;
 	}
-	
+
 	public HashSet<Node> getAllOutChildNodes() {
 		HashSet<Node> result = new HashSet<Node>();
 		enumerateChildNodes(this.getGraphNode(), result);
 		return result;
 	}
-	
+
 	private static void enumerateChildNodes(Node n, Collection<Node> result) {
 		if (result.contains(n))
 			return;
@@ -903,27 +1028,30 @@ public class NodeHelper implements Node, HelperClass {
 		for (Node nn : n.getAllOutNeighbors())
 			enumerateChildNodes(nn, result);
 	}
-	
+
 	public boolean hasDataMapping() {
 		try {
-			Attribute a = n.getAttribute(Experiment2GraphHelper.mapFolder + Attribute.SEPARATOR
-								+ Experiment2GraphHelper.mapVarName);
+			Attribute a = n.getAttribute(Experiment2GraphHelper.mapFolder
+					+ Attribute.SEPARATOR + Experiment2GraphHelper.mapVarName);
 			return a != null;
 		} catch (AttributeNotFoundException anfe) {
 			return false;
 		}
 	}
-	
-	public TreeMap<DataMappingId, Stack<Double>> getIdsAndValues(Integer overrideReplicateId) {
+
+	public TreeMap<DataMappingId, Stack<Double>> getIdsAndValues(
+			Integer overrideReplicateId) {
 		TreeMap<DataMappingId, Stack<Double>> result = new TreeMap<DataMappingId, Stack<Double>>();
 		for (NumericMeasurementInterface sd : getMappedSampleData()) {
 			DataMappingId sid = sd.getParentSample().getFullId();
-			
+
 			DataMappingId fullId;
 			if (overrideReplicateId != null)
-				fullId = sid.getFullDataMappingIdForReplicate(overrideReplicateId);
+				fullId = sid
+						.getFullDataMappingIdForReplicate(overrideReplicateId);
 			else
-				fullId = sid.getFullDataMappingIdForReplicate(sd.getReplicateID());
+				fullId = sid.getFullDataMappingIdForReplicate(sd
+						.getReplicateID());
 			Double value = sd.getValue();
 			if (!result.containsKey(fullId))
 				result.put(fullId, new Stack<Double>());
@@ -931,12 +1059,12 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	public TreeMap<DataMappingId, Stack<Double>> getIdsAndAverageValues() {
 		TreeMap<DataMappingId, Stack<Double>> result = new TreeMap<DataMappingId, Stack<Double>>();
 		for (SampleAverageInterface sd : getMappedAverageSampleData()) {
 			DataMappingId sid = sd.getParentSample().getFullId();
-			
+
 			DataMappingId fullId;
 			fullId = sid.getFullDataMappingIdForReplicate(-1);
 			Double value = sd.getValue();
@@ -946,7 +1074,7 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return result;
 	}
-	
+
 	public void setLabelFontSize(int size, boolean wordWrap) {
 		LabelAttribute la = AttributeHelper.getLabel(-1, n);
 		if (la != null) {
@@ -955,27 +1083,27 @@ public class NodeHelper implements Node, HelperClass {
 				la.wordWrap();
 		}
 	}
-	
+
 	/**
 	 * Set Label Position relative to the node.
 	 * 
 	 * @param index
-	 *           Use "-1" to set position of main label, use values 0 to 99 to
-	 *           set annotation label positions.
+	 *            Use "-1" to set position of main label, use values 0 to 99 to
+	 *            set annotation label positions.
 	 * @param align
-	 *           The node label alignment setting.
+	 *            The node label alignment setting.
 	 */
 	public void setLabelAlignment(int index, AlignmentSetting align) {
 		AttributeHelper.setLabelAlignment(index, n, align);
 	}
-	
+
 	public void labelWordWrap() {
 		LabelAttribute la = AttributeHelper.getLabel(-1, n);
 		if (la != null) {
 			la.wordWrap();
 		}
 	}
-	
+
 	public int removeAdditionalDataMappingIDs() {
 		int workCnt = 0;
 		for (SubstanceInterface md : getDataMappings()) {
@@ -983,22 +1111,23 @@ public class NodeHelper implements Node, HelperClass {
 		}
 		return workCnt;
 	}
-	
+
 	public String getShape() {
 		return AttributeHelper.getShape(this);
 	}
-	
+
 	public String getLabel(boolean htmlEncoded) {
 		if (!htmlEncoded)
 			return getLabel();
 		else
 			return StringManipulationTools.UnicodeToHtml(getLabel());
 	}
-	
+
+	@Override
 	public int compareTo(GraphElement o) {
 		return getGraphNode().compareTo(o);
 	}
-	
+
 	/**
 	 * @return List of leaf-nodes, reachable from this node.
 	 */
