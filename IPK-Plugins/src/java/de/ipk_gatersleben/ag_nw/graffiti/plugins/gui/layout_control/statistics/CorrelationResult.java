@@ -19,14 +19,14 @@ import org.StringManipulationTools;
  *         (c) 2004 IPK-Gatersleben
  */
 public class CorrelationResult {
-	private static DecimalFormat outputBase = ErrorMsg.getDecimalFormat("########0.00");
+	private static DecimalFormat outputBase = ErrorMsg.getDecimalFormat("########0.000");
 	
-	private List<FloatAndDesc> r = new ArrayList<FloatAndDesc>();
-	private List<Double> corrprobs = new ArrayList<Double>();
+	private final List<FloatAndDesc> r = new ArrayList<FloatAndDesc>();
+	private final List<Double> corrprobs = new ArrayList<Double>();
 	private float maxR = Float.MIN_VALUE;
 	private boolean isAnyOneSignificant = false;
 	private double maxCorrProb = Double.NEGATIVE_INFINITY;
-	private String dataset1, dataset2;
+	private final String dataset1, dataset2;
 	private int dataset2offsetOfMaxR = 0;
 	private int indexOfMaxOrMin = Integer.MAX_VALUE;
 	private String maxRcalculationHistory = "";
