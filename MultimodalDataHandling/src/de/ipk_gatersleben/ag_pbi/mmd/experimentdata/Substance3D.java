@@ -30,30 +30,34 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
+/**
+ * @author Klukas, Rohn
+ * 
+ */
 public class Substance3D extends Substance {
-	
+
 	public Substance3D() {
 		super();
 	}
-	
+
 	public Substance3D(Map<String, Object> map) {
 		super(map);
 	}
-	
-	public static ExperimentInterface removeAllMeasurementsWhichAreNotOfType(ExperimentInterface mds,
-						MeasurementNodeType type) {
-		
+
+	public static ExperimentInterface removeAllMeasurementsWhichAreNotOfType(
+			ExperimentInterface mds, MeasurementNodeType type) {
+
 		if (mds != null) {
-			
+
 			List<NumericMeasurementInterface> measlist = new ArrayList<NumericMeasurementInterface>();
 			List<SampleInterface> samplelist = new ArrayList<SampleInterface>();
 			List<ConditionInterface> serieslist = new ArrayList<ConditionInterface>();
 			List<SubstanceInterface> mdlist = new ArrayList<SubstanceInterface>();
-			
+
 			for (NumericMeasurementInterface meas : getAllFiles(mds))
 				if (((NumericMeasurement3D) meas).getType() != type)
 					measlist.add(meas);
-			
+
 			for (NumericMeasurementInterface m : measlist) {
 				SampleInterface parent = m.getParentSample();
 				parent.remove(m);
@@ -61,14 +65,14 @@ public class Substance3D extends Substance {
 					samplelist.add(parent);
 				}
 			}
-			
+
 			for (SampleInterface s : samplelist) {
 				ConditionInterface parent = s.getParentCondition();
 				parent.remove(s);
 				if (parent.size() == 0)
 					serieslist.add(parent);
 			}
-			
+
 			for (ConditionInterface s : serieslist) {
 				SubstanceInterface parent = s.getParentSubstance();
 				parent.remove(s);
@@ -76,16 +80,17 @@ public class Substance3D extends Substance {
 					mdlist.add(parent);
 			}
 			mds.removeAll(mdlist);
-			
+
 		}
-		
+
 		if (type != MeasurementNodeType.OMICS)
 			deleteAllEmptyMappingDataEntities(mds);
-		
+
 		return mds;
 	}
-	
-	private static void deleteAllEmptyMappingDataEntities(ExperimentInterface mds3d) {
+
+	private static void deleteAllEmptyMappingDataEntities(
+			ExperimentInterface mds3d) {
 		List<SubstanceInterface> delmds = new ArrayList<SubstanceInterface>();
 		for (SubstanceInterface md : mds3d) {
 			List<ConditionInterface> delseries = new ArrayList<ConditionInterface>();
@@ -106,33 +111,35 @@ public class Substance3D extends Substance {
 		}
 		for (SubstanceInterface md : delmds)
 			mds3d.remove(md);
-		
+
 	}
-	
-	public static List<ConditionInterface> getAllSeries(Iterable<SubstanceInterface> mds) {
+
+	public static List<ConditionInterface> getAllSeries(
+			Iterable<SubstanceInterface> mds) {
 		List<ConditionInterface> list = new ArrayList<ConditionInterface>();
-		
+
 		for (SubstanceInterface m : mds)
 			for (ConditionInterface series : m)
 				list.add(series);
-		
+
 		return list;
 	}
-	
-	public static List<SampleInterface> getAllSamples(Iterable<SubstanceInterface> mds) {
+
+	public static List<SampleInterface> getAllSamples(
+			Iterable<SubstanceInterface> mds) {
 		List<SampleInterface> list = new ArrayList<SampleInterface>();
-		
+
 		for (ConditionInterface series : Substance3D.getAllSeries(mds))
 			for (SampleInterface sample : series)
 				list.add(sample);
-		
+
 		return list;
 	}
-	
+
 	public static ExperimentInterface copyMappings(ExperimentInterface mds3d) {
-		
+
 		return mds3d.clone();
-		
+
 		// List<Substance> copy = new ArrayList<Substance>();
 		//
 		// if(mds3d!=null)
@@ -144,16 +151,19 @@ public class Substance3D extends Substance {
 		// for(Sample sample : series) {
 		// Sample samplenew = new Sample3D(seriesnew,sample);
 		// seriesnew.addAndMerge(samplenew);
-		// for(NumericMeasurement meas : ((Sample3D)sample).getAllMeasurements())
+		// for(NumericMeasurement meas :
+		// ((Sample3D)sample).getAllMeasurements())
 		// {
 		// NumericMeasurement measnew = null;
 		// switch(((NumericMeasurement3D) meas).getType()) {
-		// case IMAGE : measnew = new ImageData(samplenew,(ImageData) meas);break;
+		// case IMAGE : measnew = new ImageData(samplenew,(ImageData)
+		// meas);break;
 		// case NETWORK : measnew = new NetworkData(samplenew,(NetworkData)
 		// meas);break;
 		// case VOLUME : measnew = new VolumeData(samplenew,(VolumeData)
 		// meas);break;
-		// case OMICS : measnew = new NumericMeasurement3D(samplenew,meas);break;
+		// case OMICS : measnew = new
+		// NumericMeasurement3D(samplenew,meas);break;
 		// }
 		// if(measnew!=null)
 		// samplenew.add(measnew);
@@ -165,47 +175,53 @@ public class Substance3D extends Substance {
 		//
 		// return new Experiment(copy);
 	}
-	
-	public static ExperimentInterface splitMappings(ExperimentInterface mds3d, MeasurementNodeType type) {
+
+	public static ExperimentInterface splitMappings(ExperimentInterface mds3d,
+			MeasurementNodeType type) {
 		if (mds3d == null)
 			return null;
-		
-		return Substance3D.removeAllMeasurementsWhichAreNotOfType(mds3d.clone(), type);
+
+		return Substance3D.removeAllMeasurementsWhichAreNotOfType(
+				mds3d.clone(), type);
 	}
-	
+
 	public static String getExperimentName(List<Substance> mds) {
 		if (mds.size() > 0 && mds.get(0).iterator().hasNext())
 			return mds.get(0).iterator().next().getExperimentName();
 		else
 			return null;
 	}
-	
-	public static List<NumericMeasurementInterface> getAllFiles(ExperimentInterface mds) {
+
+	public static List<NumericMeasurementInterface> getAllFiles(
+			ExperimentInterface mds) {
 		return getAllFiles(mds, null);
 	}
-	
-	public static List<NumericMeasurementInterface> getAllFiles(ExperimentInterface mds, MeasurementNodeType type) {
+
+	public static List<NumericMeasurementInterface> getAllFiles(
+			ExperimentInterface mds, MeasurementNodeType type) {
 		List<NumericMeasurementInterface> list = new ArrayList<NumericMeasurementInterface>();
 		for (SubstanceInterface m : mds)
 			for (ConditionInterface series : m)
 				for (SampleInterface sample : series) {
 					if (sample instanceof Sample3D) {
-						for (NumericMeasurementInterface meas : ((Sample3D) sample).getMeasurements(type))
+						for (NumericMeasurementInterface meas : ((Sample3D) sample)
+								.getMeasurements(type))
 							list.add(meas);
 					}
 				}
-		
+
 		return list;
 	}
-	
+
 	public static SubstanceInterface createnewSubstance(String substancename) {
 		SubstanceInterface md = Experiment.getTypeManager().getNewSubstance();
-		md.setAttribute(new Attribute("name", substancename != null ? substancename
-							: ExperimentInterface.UNSPECIFIED_SUBSTANCE));
+		md.setAttribute(new Attribute("name",
+				substancename != null ? substancename
+						: ExperimentInterface.UNSPECIFIED_SUBSTANCE));
 		md.setAttribute(new Attribute("id", "column 0"));
 		return md;
 	}
-	
+
 	public static Long getFileSize(List<NumericMeasurementInterface> files) {
 		long size = 0;
 		HashMap<String, ResourceIOHandler> map = new HashMap<String, ResourceIOHandler>();
@@ -216,7 +232,8 @@ public class Substance3D extends Substance {
 				if (u != null) {
 					String prefix = u.getPrefix();
 					if (!map.containsKey(prefix)) {
-						map.put(prefix, ResourceIOManager.getHandlerFromPrefix(prefix));
+						map.put(prefix,
+								ResourceIOManager.getHandlerFromPrefix(prefix));
 					}
 					ResourceIOHandler h = map.get(prefix);
 					if (h != null) {
@@ -240,8 +257,9 @@ public class Substance3D extends Substance {
 		else
 			return -1l;
 	}
-	
-	public static Collection<NumericMeasurementInterface> getAllMeasurements(ExperimentInterface e) {
+
+	public static Collection<NumericMeasurementInterface> getAllMeasurements(
+			ExperimentInterface e) {
 		Collection<NumericMeasurementInterface> res = new ArrayList<NumericMeasurementInterface>();
 		for (SubstanceInterface si : e) {
 			for (ConditionInterface ci : si) {
@@ -254,5 +272,44 @@ public class Substance3D extends Substance {
 		}
 		return res;
 	}
-	
+
+	public static NumericMeasurementInterface findCorrespondingMeasurement(
+			ExperimentInterface experiment, NumericMeasurement3D prototype,
+			String substanceName) {
+		for (SubstanceInterface s : experiment) {
+			if (s.getName().equals(substanceName)) {
+				String protypeConditionName = prototype.getParentSample()
+						.getParentCondition().getConditionName();
+				Long prototypeSampleRowID = prototype.getParentSample()
+						.getRowId();
+				int prototypeReplicateID = prototype.getReplicateID();
+				String prototypeQualityAnnotation = prototype
+						.getQualityAnnotation();
+				double prototypePosition = prototype.getPosition() != null ? prototype
+						.getPosition() : 0;
+				for (ConditionInterface ci : s) {
+					if (ci.getConditionName().equals(protypeConditionName)) {
+						for (SampleInterface si : ci) {
+							if (prototypeSampleRowID.equals(si.getRowId())) {
+								for (NumericMeasurementInterface nmi : si) {
+									if (nmi instanceof NumericMeasurement3D) {
+										NumericMeasurement3D n3 = (de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D) nmi;
+										double n3p = n3.getPosition() != null ? n3
+												.getPosition() : 0;
+										if (n3.getReplicateID() == prototypeReplicateID
+												&& n3.getQualityAnnotation()
+														.equals(prototypeQualityAnnotation)
+												&& Math.abs(n3p
+														- prototypePosition) < 0.00001)
+											return n3;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
 }

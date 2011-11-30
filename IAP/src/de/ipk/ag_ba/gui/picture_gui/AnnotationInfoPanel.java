@@ -8,45 +8,50 @@ import java.util.ArrayList;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+
+import org.StringManipulationTools;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class AnnotationInfoPanel extends JPanel {
 	private static final long serialVersionUID = 7793767687607473484L;
-	
+
 	private final DataSetFileButton imageButton;
 	private final MongoTreeNode mt;
 	private JCheckBox cbO;
 	private JCheckBox cbF;
-	
+	private JLabel annotationLabel;
+
 	public AnnotationInfoPanel(DataSetFileButton imageButton, MongoTreeNode mt) {
 		this.imageButton = imageButton;
 		this.mt = mt;
 		addGui(true);
 	}
-	
+
 	public void removeGui() {
 		addGui(true);
 	}
-	
+
 	public void addGui() {
 		addGui(false);
 	}
-	
+
 	public void addGui(boolean onlyChecked) {
 		removeAll();
 		ArrayList<JComponent> anno = getAnnotationElements(onlyChecked);
-		setLayout(TableLayout.getLayout(TableLayout.PREFERRED, TableLayout.PREFERRED, 1, anno.size()));
+		setLayout(TableLayout.getLayout(TableLayout.PREFERRED,
+				TableLayout.PREFERRED, 1, anno.size()));
 		int idx = 0;
 		for (JComponent a : anno)
 			add(a, "0," + (idx++));
 		revalidate();
-		
+
 	}
-	
+
 	private ArrayList<JComponent> getAnnotationElements(boolean onlyChecked) {
 		if (cbO == null) {
 			cbO = new JCheckBox("Outlier");
@@ -62,15 +67,25 @@ public class AnnotationInfoPanel extends JPanel {
 				modifyFlagGui((ImageData) mde, "flagged", cbF);
 			}
 		}
+		if (annotationLabel == null) {
+			annotationLabel = new JLabel("");
+			MappingDataEntity mde = imageButton.imageResult.getBinaryFileInfo().entity;
+			if (mde != null && mde instanceof ImageData) {
+				modifyFlagGui((ImageData) mde, "rem:", annotationLabel);
+			}
+		}
 		ArrayList<JComponent> res = new ArrayList<JComponent>();
 		if (cbO != null && (!onlyChecked || cbO.isSelected()))
 			res.add(cbO);
 		if (cbF != null && (!onlyChecked || cbF.isSelected()))
 			res.add(cbF);
+		if (annotationLabel != null && annotationLabel.getText().length() > 0)
+			res.add(annotationLabel);
 		return res;
 	}
-	
-	private void modifyFlagGui(final ImageData id, final String key, final JCheckBox cb) {
+
+	private void modifyFlagGui(final ImageData id, final String key,
+			final JCheckBox cb) {
 		String f = id.getAnnotationField(key);
 		if (f != null && f.equals("1"))
 			cb.setSelected(true);
@@ -94,9 +109,23 @@ public class AnnotationInfoPanel extends JPanel {
 			}
 		});
 	}
-	
+
+	private void modifyFlagGui(final ImageData id, final String keySearch,
+			final JLabel cb) {
+		ArrayList<String> display = new ArrayList<String>();
+		for (String key : id.getAnnotationKeys(keySearch)) {
+			String f = id.getAnnotationField(key);
+			if (f != null && f.length() > 0)
+				display.add(StringManipulationTools.stringReplace(key,
+						keySearch, "") + ": " + f);
+		}
+		if (display.size() > 0)
+			cb.setText("<html>"
+					+ StringManipulationTools.getStringList(display, "<br>"));
+	}
+
 	private long callTime = 0;
-	
+
 	public void removeGuiLater() {
 		callTime = System.currentTimeMillis();
 		final long callTime2 = callTime;

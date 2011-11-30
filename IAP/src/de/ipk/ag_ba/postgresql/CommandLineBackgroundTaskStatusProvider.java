@@ -12,63 +12,90 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 /**
  * @author klukas
  */
-public class CommandLineBackgroundTaskStatusProvider extends BackgroundTaskStatusProviderSupportingExternalCallImpl {
-	
+public class CommandLineBackgroundTaskStatusProvider extends
+		BackgroundTaskStatusProviderSupportingExternalCallImpl {
+
 	private final boolean enabled;
 	private final boolean showOnlyProgressBar;
-	
-	public CommandLineBackgroundTaskStatusProvider(String status1, String status2) {
+
+	public CommandLineBackgroundTaskStatusProvider(String status1,
+			String status2) {
 		super(status1, status2);
 		this.enabled = true;
 		this.showOnlyProgressBar = false;
 	}
-	
+
 	public CommandLineBackgroundTaskStatusProvider(boolean enabled) {
 		super("", "");
 		this.enabled = enabled;
 		this.showOnlyProgressBar = false;
 	}
-	
-	public CommandLineBackgroundTaskStatusProvider(boolean enabled, boolean showOnlyProgressBar) {
+
+	public CommandLineBackgroundTaskStatusProvider(boolean enabled,
+			boolean showOnlyProgressBar) {
 		super("", "");
 		this.enabled = enabled;
 		this.showOnlyProgressBar = showOnlyProgressBar;
 	}
-	
+
 	@Override
 	public void setCurrentStatusText1(String status) {
 		super.setCurrentStatusText1(status);
 		if (enabled && !showOnlyProgressBar)
 			System.out.println(status);
-		else
-			if (enabled)
-				showProgress();
+		else if (enabled)
+			showProgress();
 	}
-	
+
 	@Override
 	public void setCurrentStatusText2(String status) {
 		super.setCurrentStatusText2(status);
 		if (enabled && !showOnlyProgressBar)
 			System.out.println(status);
-		else
-			if (enabled)
-				showProgress();
+		else if (enabled)
+			showProgress();
 	}
-	
+
 	long lastOutput = -1;
 	long lastProgress = -100;
-	
+	long firstProgressFineTime = -1;
+	double firstProgressFineValue = -1;
+
 	private synchronized void showProgress() {
-		if (System.currentTimeMillis() - lastOutput > 10 * 1000 && lastProgress != getCurrentStatusValue()) {
+		if (System.currentTimeMillis() - lastOutput > 10 * 1000
+				&& lastProgress != getCurrentStatusValue()) {
 			System.out.println();
-			System.out.println("**********************");
-			System.out.println(SystemAnalysisExt.getCurrentTime() + "> INFO: Progress: " + getCurrentStatusValue() + "% // " + getCurrentStatusMessage1() + " // "
+			System.out
+					.println("****************************************************************************************");
+			System.out.println(SystemAnalysisExt.getCurrentTime()
+					+ "> INFO: Progress: " + getCurrentStatusValue() + "% // "
+					+ getCurrentStatusMessage1() + " // "
 					+ getCurrentStatusMessage2());
-			System.out.println("**********************");
-			System.out.println();
+			if (firstProgressFineValue >= 0
+					&& firstProgressFineValue < getCurrentStatusValueFine()
+					&& System.currentTimeMillis() - firstProgressFineTime > 0) {
+				long timeForProgress = System.currentTimeMillis()
+						- firstProgressFineTime;
+				double progress = getCurrentStatusValueFine()
+						- firstProgressFineValue;
+				double speed = progress / timeForProgress;
+				double remainingTime = (100 - progress) / speed;
+				long finishTime = (long) (System.currentTimeMillis() + remainingTime);
+				System.out.println(SystemAnalysisExt.getCurrentTime()
+						+ "> INFO: Estimated finish time (100%): "
+						+ SystemAnalysisExt.getCurrentTime(finishTime));
+			}
+			System.out
+					.println("****************************************************************************************");
 			lastOutput = System.currentTimeMillis();
 			lastProgress = getCurrentStatusValue();
+
+			if (lastProgress > 0) {
+				if (firstProgressFineValue < 0) {
+					firstProgressFineValue = getCurrentStatusValueFine();
+					firstProgressFineTime = System.currentTimeMillis();
+				}
+			}
 		}
 	}
-	
 }
