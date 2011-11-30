@@ -114,9 +114,13 @@ public class NodeHelper implements Node, HelperClass {
 			String optTreatment) {
 		if (memPlants == null)
 			memPlants = new ArrayList<MemPlant>();
+		String info = species + ";" + genotype + ";" + optVariety + ";"
+				+ optGrowthConditions + ";" + optTreatment;
 		for (MemPlant mp : memPlants) {
-			if (mp.getSpecies().equals(species)
-					&& mp.getGenotype().equals(genotype))
+			String info2 = mp.getSpecies() + ";" + mp.getGenotype() + ";"
+					+ mp.getVariety() + ";" + mp.getGrowthConditions() + ";"
+					+ mp.getTreatment();
+			if (info.equals(info2))
 				return mp.getConditionID();
 		}
 		MemPlant mp = new MemPlant(
