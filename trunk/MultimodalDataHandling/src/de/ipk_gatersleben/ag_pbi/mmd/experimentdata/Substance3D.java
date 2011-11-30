@@ -276,6 +276,7 @@ public class Substance3D extends Substance {
 	public static NumericMeasurementInterface findCorrespondingMeasurement(
 			ExperimentInterface experiment, NumericMeasurement3D prototype,
 			String substanceName) {
+		ArrayList<NumericMeasurementInterface> res = new ArrayList<NumericMeasurementInterface>();
 		for (SubstanceInterface s : experiment) {
 			if (s.getName().equals(substanceName)) {
 				String protypeConditionName = prototype.getParentSample()
@@ -288,7 +289,8 @@ public class Substance3D extends Substance {
 				double prototypePosition = prototype.getPosition() != null ? prototype
 						.getPosition() : 0;
 				for (ConditionInterface ci : s) {
-					if (ci.getConditionName().equals(protypeConditionName)) {
+					if (ci.getConditionName().split(":", 2)[1]
+							.equals(protypeConditionName.split(":", 2)[1])) {
 						for (SampleInterface si : ci) {
 							if (prototypeSampleRowID.equals(si.getRowId())) {
 								for (NumericMeasurementInterface nmi : si) {
@@ -301,7 +303,7 @@ public class Substance3D extends Substance {
 														.equals(prototypeQualityAnnotation)
 												&& Math.abs(n3p
 														- prototypePosition) < 0.00001)
-											return n3;
+											res.add(n3);
 									}
 								}
 							}
@@ -310,6 +312,6 @@ public class Substance3D extends Substance {
 				}
 			}
 		}
-		return null;
+		return res.size() == 1 ? res.get(0) : null;
 	}
 }
