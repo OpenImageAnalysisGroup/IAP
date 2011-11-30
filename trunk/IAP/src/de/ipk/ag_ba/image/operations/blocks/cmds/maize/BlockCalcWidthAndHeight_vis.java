@@ -100,7 +100,9 @@ public class BlockCalcWidthAndHeight_vis extends
 												.getIO()
 												.getCanvas()
 												.fillRect(
-														values.x,
+														values.x
+																/ 2
+																+ temp.getLeftX(),
 														vertYsoilLevelF,
 														10,
 														vertYsoilLevelF
@@ -113,7 +115,9 @@ public class BlockCalcWidthAndHeight_vis extends
 												.getIO()
 												.getCanvas()
 												.fillRect(
-														values.x,
+														values.x
+																/ 2
+																+ temp.getLeftX(),
 														temp.getTopY(),
 														10,
 														temp.getBottomY()

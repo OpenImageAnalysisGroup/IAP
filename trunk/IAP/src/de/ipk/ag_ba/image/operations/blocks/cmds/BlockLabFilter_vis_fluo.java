@@ -18,10 +18,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImageStack;
  */
 public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	boolean debug = false;
-	
+
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null || getInput().getImages().getVis() == null)
+		if (getInput().getMasks().getVis() == null
+				|| getInput().getImages().getVis() == null)
 			return null;
 		else {
 			int dilate;
@@ -32,32 +33,41 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			if (options.isMaize()) {
 				dilate = 3;
 				result = labFilterVis(side, mask, orig, dilate, debug);
-				return result.getIO().filterGray(220, 15, 15).getImage().print("Gray filtered", debug);
+				return result.getIO().filterGray(220, 15, 15).getImage()
+						.print("Gray filtered", debug);
 			} else {
 				dilate = 1;
 				result = labFilterVis(side, mask, orig, dilate, debug);
-				return result.getIO().filterGray(220, 15, 15).getImage().print("Gray filtered", debug);
+				return result.getIO().filterGray(220, 15, 15).getImage()
+						.print("Gray filtered", debug);
 			}
 		}
 	}
-	
-	private FlexibleImage labFilterVis(boolean sideImage, FlexibleImage mask, FlexibleImage orig, int dilate, boolean debug) {
+
+	private FlexibleImage labFilterVis(boolean sideImage, FlexibleImage mask,
+			FlexibleImage orig, int dilate, boolean debug) {
 		FlexibleImageStack fis = new FlexibleImageStack();
-		
+
 		if (!sideImage && !options.isHighResMaize()) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 10);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 80); // 98 // 130 gerste wegen topf
+			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 80); // 98
+																				// //
+																				// 130
+																				// gerste
+																				// wegen
+																				// topf
 			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 120);// 125
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
 		}
-		
+
 		if (sideImage && options.isBarleyInBarleySystem())
 			dilate = 0;
-		
+
 		FlexibleImage labResult = labFilter(
-				// getInput().getMasks().getVis().getIO().dilate(3, getInput().getImages().getVis()).blur(2).getImage(),
+				// getInput().getMasks().getVis().getIO().dilate(3,
+				// getInput().getImages().getVis()).blur(2).getImage(),
 				mask.copy().getIO().blur((dilate > 0 ? 3 : 1)).getImage(),
 				orig.copy(),
 				options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
@@ -66,78 +76,107 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				options.getIntSetting(Setting.LAB_MAX_A_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
-				options.getCameraPosition(),
-				options.isMaize(), false, true,
-				options.getBackground()).getIO().erode(dilate > 0 ? 2 : 0).print("before dilate, after lab", debug).
-				dilate(dilate > 0 ? 3 : 0).getImage().print("after lab", debug);
-		
+				options.getCameraPosition(), options.isMaize(), false, true,
+				options.getBackground()).getIO().erode(dilate > 0 ? 2 : 0)
+				.print("before dilate, after lab", debug)
+				.dilate(dilate > 0 ? 3 : 0).getImage()
+				.print("after lab", debug);
+
 		if (debug) {
 			fis.addImage("mask", mask.copy());
 			fis.addImage("labresult", labResult.copy());
 		}
-		
-		FlexibleImage result = mask.copy().getIO()
-				.removePixel(labResult.copy(), options.getBackground(), 1, 105, 120)
-				.getImage();
-		
+
+		FlexibleImage result = mask
+				.copy()
+				.getIO()
+				.removePixel(labResult.copy(), options.getBackground(), 1, 105,
+						120).getImage();
+
 		if (debug)
 			fis.addImage("without blue parts", result);
-		
+
 		if (!sideImage || !options.isHighResMaize()) {
 			if (options.isHighResMaize()) {
 				// remove black matts inside the holes
-				return result.getIO().thresholdLAB(
-								0, 150,
-								110, 150,
-								100, 150,
+				return result
+						.getIO()
+						.thresholdLAB(0, 150, 110, 150, 100, 150,
 								ImageOperation.BACKGROUND_COLORint,
-								CameraPosition.TOP,
-								false, true).getImage();
+								CameraPosition.TOP, false, true).getImage();
 			} else
 				return result;
 		}
-		
+
 		FlexibleImage potFiltered = labFilter(
-				result.copy(),
-				getInput().getImages().getVis().copy(),
+				// options.isMaize() ?
+				result.copy(), getInput().getImages().getVis().copy(),
 				100, // filter anything that is very dark
 				255,
 				0, // 127 - 10,
 				255, // 127 + 10,
 				0, // 127 - 10,
 				255, // 127 + 10,
-				options.getCameraPosition(),
-				options.isMaize(), false, true,
-				options.getBackground()).getIO().
-				clearImageAbove(mask.getHeight() * 0.6, options.getBackground()).
-				erode(1).print("A: " + dilate, debug).
-				threshold(127, 1, ImageOperation.BACKGROUND_COLORint).print("B", debug).
-				dilate(11).
-				dilateHor(Integer.MAX_VALUE).print("C", debug).
-						debug(fis, "before hor dilate", debug).dilateHor(2 + dilate * 3).
-						debug(fis, "after hor dilate", debug).// blur(4).
-				getImage(); // old 6x dilate
-		
+				options.getCameraPosition(), options.isMaize(), false, true,
+				options.getBackground())
+				.getIO()
+				.clearImageAbove(mask.getHeight() * 0.6,
+						options.getBackground()).erode(1)
+				.print("A: " + dilate, debug)
+				.threshold(127, 1, ImageOperation.BACKGROUND_COLORint)
+				.print("B", debug).dilate(11).dilateHor(Integer.MAX_VALUE)
+				.print("C", debug).debug(fis, "before hor dilate", debug)
+				.dilateHor(2 + dilate * 3)
+				.debug(fis, "after hor dilate", debug).// blur(4).
+				getImage();// : null;
+
+		// // move down the pot filtering by a number of pixels, in order not
+		// // delete leafs
+		// // that are visible within the pot / before the pot background
+		// if (!options.isMaize()) {
+		// potFiltered = labFilter(result.copy(),
+		// getInput().getImages().getVis().copy(),
+		// 100, // filter anything that is very dark
+		// 255,
+		// 0, // 127 - 10,
+		// 255, // 127 + 10,
+		// 0, // 127 - 10,
+		// 255, // 127 + 10,
+		// options.getCameraPosition(), options.isMaize(), false,
+		// true, options.getBackground())
+		// .getIO()
+		// .clearImageAbove(mask.getHeight() * 0.6,
+		// options.getBackground()).erode(1)
+		// .print("A: " + dilate, debug)
+		// .threshold(127, 1, ImageOperation.BACKGROUND_COLORint)
+		// .getImage();
+		// }
+
 		if (debug) {
 			fis.addImage("removed black", potFiltered);
 			fis.print("debug lab filter");
 		}
-		
-		return result = result.getIO().removePixel(
-					potFiltered.print("black parts removed from blue parts removal", false),
-					options.getBackground())// , 50, 110, 1)
+
+		return result = result
+				.getIO()
+				.removePixel(
+						potFiltered.print(
+								"black parts removed from blue parts removal",
+								false), options.getBackground())// , 50, 110, 1)
 				.getImage();
 	}
-	
+
 	// @Override
 	// protected FlexibleImage processFLUOmask() {
-	// if (getInput().getMasks().getFluo() == null && getInput().getImages().getFluo() == null)
+	// if (getInput().getMasks().getFluo() == null &&
+	// getInput().getImages().getFluo() == null)
 	// return null;
 	//
 	// if (options.getCameraPosition() == CameraPosition.SIDE)
 	// return getInput().getMasks().getFluo();
 	// else
-	// return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(),
+	// return labFilter(getInput().getMasks().getFluo(),
+	// getInput().getImages().getFluo(),
 	// options.getIntSetting(Setting.LAB_MIN_L_VALUE_FLUO),
 	// options.getIntSetting(Setting.LAB_MAX_L_VALUE_FLUO),
 	// options.getIntSetting(Setting.LAB_MIN_A_VALUE_FLUO),
@@ -147,28 +186,32 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	// options.getCameraPosition(),
 	// options.isMaize(), false, false, options.getBackground());
 	// }
-	
-	static FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
-			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ,
-			boolean maize, boolean blueStick, boolean blueBasket, int back) {
+
+	static FlexibleImage labFilter(FlexibleImage workMask,
+			FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL,
+			int lowerValueOfA, int upperValueOfA, int lowerValueOfB,
+			int upperValueOfB, CameraPosition typ, boolean maize,
+			boolean blueStick, boolean blueBasket, int back) {
 		if (workMask == null)
 			return null;
 		int[] workMask1D = workMask.getAs1A();
 		// int[] result = new int[workMask1D.length];
 		int width = workMask.getWidth();
 		int height = workMask.getHeight();
-		
-		FlexibleImage mod = ImageOperation.thresholdLAB3(width, height, workMask1D, workMask1D,
-				lowerValueOfL, upperValueOfL,
-				lowerValueOfA, upperValueOfA,
-				lowerValueOfB, upperValueOfB,
-				back, typ, maize, blueStick, originalImage.getAs2A(), blueBasket);
-		
-		return new ImageOperation(mod).applyMask_ResizeSourceIfNeeded(workMask1D, width, height, back).getImage();
+
+		FlexibleImage mod = ImageOperation.thresholdLAB3(width, height,
+				workMask1D, workMask1D, lowerValueOfL, upperValueOfL,
+				lowerValueOfA, upperValueOfA, lowerValueOfB, upperValueOfB,
+				back, typ, maize, blueStick, originalImage.getAs2A(),
+				blueBasket);
+
+		return new ImageOperation(mod).applyMask_ResizeSourceIfNeeded(
+				workMask1D, width, height, back).getImage();
 	}
-	
+
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(FlexibleImageSet processedImages,
+			FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 		// processedImages.setVis(mod);
 	}
