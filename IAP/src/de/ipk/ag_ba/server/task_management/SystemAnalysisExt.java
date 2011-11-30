@@ -26,6 +26,7 @@ import org.SystemInfo;
 import oshi.software.os.windows.WindowsHardwareAbstractionLayer;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.ProgressStatusService;
 
 public class SystemAnalysisExt {
 	
@@ -491,7 +492,7 @@ public class SystemAnalysisExt {
 		}
 		String[] roots = new String[] { IAPmain.getHSMfolder(),
 				"/media/data4", "/home", "/Users",
-				"/backups", "/data0"};
+				"/backups", "/data0" };
 		for (String r : roots) {
 			if (r == null)
 				continue;
@@ -502,5 +503,11 @@ public class SystemAnalysisExt {
 				res.add(hsm);
 		}
 		return res;
+	}
+	
+	public static String getWaitTime(long fullTime) {
+		ProgressStatusService pss = new ProgressStatusService();
+		String res = pss.getRemainTimeString(-1, fullTime / 1000);
+		return StringManipulationTools.stringReplace(res, "&nbsp;", " ");
 	}
 }

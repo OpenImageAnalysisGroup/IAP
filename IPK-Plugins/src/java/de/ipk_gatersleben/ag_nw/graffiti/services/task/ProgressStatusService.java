@@ -71,6 +71,11 @@ public class ProgressStatusService implements HelperClass {
 		double remainPercent = 100 - currentStatusValueFine;
 		double remainTimeSeconds = remainPercent / averageSpeed;
 		
+		return getRemainTimeString(averageSpeed, remainTimeSeconds);
+	}
+	
+	public String getRemainTimeString(double averageSpeed, double remainTimeSeconds) {
+		String result;
 		if (remainTimeSeconds < 0)
 			return "";
 		
@@ -87,28 +92,28 @@ public class ProgressStatusService implements HelperClass {
 		int nn = 1;
 		String res[] = new String[2];
 		if (remainTimeYears > 1 && numberResults < nn)
-			if (((int)remainTimeYears) == 1)
+			if (((int) remainTimeYears) == 1)
 				res[numberResults++] = (int) remainTimeYears + "&nbsp;year";
 			else
 				res[numberResults++] = (int) remainTimeYears + "&nbsp;years";
 		// if (remainTimeMonths>1 && numberResults<2)
 		// res[numberResults++]=(int)remainTimeMonths+" months";
 		if (remainTimeWeeks > 1 && numberResults < nn)
-			if (((int)remainTimeWeeks) == 1)
+			if (((int) remainTimeWeeks) == 1)
 				res[numberResults++] = (int) remainTimeWeeks + "&nbsp;week";
 			else
 				res[numberResults++] = (int) remainTimeWeeks + "&nbsp;weeks";
-		if (((int)remainTimeDays) > 1 && numberResults < nn)
+		if (((int) remainTimeDays) > 1 && numberResults < nn)
 			if (remainTimeDays == 1)
 				res[numberResults++] = (int) remainTimeDays + "&nbsp;day";
 			else
 				res[numberResults++] = (int) remainTimeDays + "&nbsp;days";
-		if (((int)remainTimeHours) > 1 && numberResults < nn)
+		if (((int) remainTimeHours) > 1 && numberResults < nn)
 			if (remainTimeHours == 1)
 				res[numberResults++] = (int) remainTimeHours + "&nbsp;hour";
 			else
 				res[numberResults++] = (int) remainTimeHours + "&nbsp;hours";
-		if (((int)remainTimeMinutes) > 1 && numberResults < nn)
+		if (((int) remainTimeMinutes) > 1 && numberResults < nn)
 			res[numberResults++] = (int) remainTimeMinutes + "&nbsp;min";
 		if (numberResults < nn)
 			res[numberResults++] = (int) remainTimeSeconds % 60 + "&nbsp;sec";
@@ -118,15 +123,17 @@ public class ProgressStatusService implements HelperClass {
 		else
 			result = "~&nbsp;" + res[0];
 		
-		// increase expectation only if the value increased 10 times without
-		// lowering again
-		if (averageSpeed > lastSpeed) {
-			biggerThanBeforeCount++;
-			if (biggerThanBeforeCount <= 10)
-				result = lastRes;
-		} else
-			biggerThanBeforeCount = 0;
-		lastSpeed = averageSpeed;
+		if (averageSpeed > 0) {
+			// increase expectation only if the value increased 10 times without
+			// lowering again
+			if (averageSpeed > lastSpeed) {
+				biggerThanBeforeCount++;
+				if (biggerThanBeforeCount <= 10)
+					result = lastRes;
+			} else
+				biggerThanBeforeCount = 0;
+			lastSpeed = averageSpeed;
+		}
 		lastRes = result;
 		if (remainTimeSeconds < 1)
 			result = "";

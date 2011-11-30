@@ -283,7 +283,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				};
 				boolean threaded = false;
 				if (!threaded) {
-					if (optMaxCon != null && optMaxCon.tryAcquire(1)) {
+					boolean lowMem = false;
+					if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+									.getMemoryMB() * 0.7d) {
+						System.out.println(SystemAnalysisExt.getCurrentTime()
+								+ ">HIGH MEMORY UTILIZATION, REDUCING CONCURRENCY (AT SNAPSHOT LEVEL)");
+						lowMem = true;
+					}
+					if (!lowMem && optMaxCon != null && optMaxCon.tryAcquire(1)) {
 						MyThread mt = new MyThread(r, getName() + " " + System.currentTimeMillis());
 						mt.setFinishrunnable(new Runnable() {
 							@Override
