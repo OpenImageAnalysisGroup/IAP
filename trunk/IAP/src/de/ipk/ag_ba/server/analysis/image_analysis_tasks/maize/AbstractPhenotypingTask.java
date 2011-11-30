@@ -287,6 +287,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					long used = SystemAnalysis.getUsedMemoryInMB();
 					long avail = SystemAnalysis.getMemoryMB();
 					if (used > avail * 0.7d) {
+						System.out.println();
 						System.out.println(SystemAnalysisExt.getCurrentTime()
 								+ ">HIGH MEMORY UTILIZATION (" + (100 * used / avail) + "%), REDUCING CONCURRENCY (AT SNAPSHOT LEVEL)");
 						lowMem = true;
