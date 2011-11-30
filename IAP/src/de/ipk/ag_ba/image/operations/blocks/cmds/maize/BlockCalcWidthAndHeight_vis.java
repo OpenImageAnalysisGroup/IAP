@@ -19,6 +19,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockCalcWidthAndHeight_vis extends
 		AbstractSnapshotAnalysisBlockFIS {
 
+	private static final boolean debug = false;
+
 	@Override
 	protected boolean isChangingImages() {
 		return true;
@@ -105,7 +107,7 @@ public class BlockCalcWidthAndHeight_vis extends
 																- values.y,
 														Color.BLUE.getRGB(),
 														255).getImage()
-												.print("DEBUG");
+												.print("DEBUG", debug);
 									else
 										visRes = visRes
 												.getIO()
@@ -117,7 +119,8 @@ public class BlockCalcWidthAndHeight_vis extends
 														temp.getBottomY()
 																- temp.getTopY(),
 														Color.RED.getRGB(), 255)
-												.getImage().print("DEBUG");
+												.getImage()
+												.print("DEBUG", debug);
 									return visRes;
 								}
 

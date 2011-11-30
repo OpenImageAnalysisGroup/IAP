@@ -55,7 +55,7 @@ public class BarleyTopImageProcessor {
 	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, int maxThreadsPerImage, FlexibleImageStack debugStack,
 			boolean automaticParameterSearch,
 			boolean cropResult)
-			throws InstantiationException, IllegalAccessException, InterruptedException {
+			throws Exception {
 		// if (debugStack != null)
 		// options.setDebugTakeTimes(true);
 		

@@ -38,7 +38,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			FlexibleImageSet input,
 			int maxThreadsPerImage,
 			FlexibleImageStack debugStack)
-			throws InstantiationException, IllegalAccessException, InterruptedException {
+			throws Exception {
 		return pipeline(options, input, null, maxThreadsPerImage, debugStack);
 	}
 	
@@ -54,7 +54,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			FlexibleImageSet optInputMasks,
 			int maxThreadsPerImage,
 			FlexibleImageStack debugStack)
-			throws InstantiationException, IllegalAccessException, InterruptedException {
+			throws Exception {
 		
 		BlockPipeline pipeline = getPipeline(options);
 		

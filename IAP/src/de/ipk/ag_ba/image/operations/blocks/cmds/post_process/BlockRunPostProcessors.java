@@ -19,4 +19,20 @@ public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 		return fi;
 	}
 
+	@Override
+	protected FlexibleImage processVISimage() {
+		FlexibleImage fi = getInput().getImages().getVis();
+		if (fi != null) {
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.RgbSide)) {
+				fi = roi.postProcessVis(fi);
+			}
+		}
+		return fi;
+	}
+
+	@Override
+	protected boolean isChangingImages() {
+		return true;
+	}
 }

@@ -18,7 +18,7 @@ public interface ImageProcessor {
 			ImageProcessorOptions options,
 			FlexibleImageSet input, FlexibleImageSet optInputMasks, int maxThreadsPerImage,
 			FlexibleImageStack debugStack)
-			throws InstantiationException, IllegalAccessException, InterruptedException;
+			throws Exception;
 	
 	public abstract BlockResultSet getSettings();
 	
@@ -30,6 +30,5 @@ public interface ImageProcessor {
 			TreeMap<String, ImageData> inImages,
 			TreeMap<String, BlockResultSet> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
-			throws InstantiationException,
-			IllegalAccessException, InterruptedException;
+			throws Exception;
 }

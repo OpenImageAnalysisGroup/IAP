@@ -37,22 +37,21 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas
  */
 public class BlockPipeline {
-
+	
 	private final ArrayList<Class<? extends ImageAnalysisBlockFIS>> blocks = new ArrayList<Class<? extends ImageAnalysisBlockFIS>>();
 	private static int lastPipelineExecutionTimeInSec = -1;
-
+	
 	/**
-	 * Adds a image analysis block to the pipeline (needs to implement
-	 * {@link ImageAnalysisBlockFIS}).
+	 * Adds a image analysis block to the pipeline (needs to implement {@link ImageAnalysisBlockFIS}).
 	 */
 	public void add(Class<? extends ImageAnalysisBlockFIS> blockClass) {
 		blocks.add(blockClass);
 	}
-
+	
 	public void remove(Class<?> class1) {
 		blocks.remove(class1);
 	}
-
+	
 	/**
 	 * @return The execution time for the last pipeline execution time. This is
 	 *         a static method, if several pipelines are executed in parallel,
@@ -62,32 +61,31 @@ public class BlockPipeline {
 	public static int getLastPipelineExecutionTimeInSec() {
 		return lastPipelineExecutionTimeInSec;
 	}
-
+	
 	private static ThreadSafeOptions pipelineID = new ThreadSafeOptions();
-
+	
 	private static long lastOutput = 0;
-
+	
 	public FlexibleMaskAndImageSet execute(ImageProcessorOptions options,
 			FlexibleMaskAndImageSet input, FlexibleImageStack debugStack,
 			BlockResultSet settings,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
-			throws InstantiationException, IllegalAccessException,
-			InterruptedException {
-
+			throws Exception {
+		
 		long a = System.currentTimeMillis();
-
+		
 		int id = pipelineID.addInt(1);
-
+		
 		int index = 0;
 		boolean blockProgressOutput = false;
-
+		
 		if (status != null)
 			status.setCurrentStatusValueFine(0);
-
+		
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			if (status != null && status.wantsToStop())
 				break;
-
+			
 			ImageAnalysisBlockFIS block = null;
 			try {
 				block = blockClass.newInstance();
@@ -99,7 +97,7 @@ public class BlockPipeline {
 			}
 			block.setInputAndOptions(input, options, settings, index++,
 					debugStack);
-
+			
 			long ta = System.currentTimeMillis();
 			int n = input.getImageCount();
 			FlexibleMaskAndImageSet input2 = block.process();
@@ -114,11 +112,11 @@ public class BlockPipeline {
 			}
 			input = input2;
 			long tb = System.currentTimeMillis();
-
+			
 			int seconds = (int) ((tb - ta) / 1000);
-
+			
 			int mseconds = (int) (tb - ta);
-
+			
 			// if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 			if (blockProgressOutput)
 				if (seconds >= 10)
@@ -127,24 +125,23 @@ public class BlockPipeline {
 							+ " sec., " + mseconds + " ms, time: "
 							+ StopWatch.getNiceTime() + " ("
 							+ block.getClass().getSimpleName() + ")");
-
+			
 			updateBlockStatistics(1);
-
+			
 			if (status != null) {
 				status.setCurrentStatusValueFine(100d * (index / (double) blocks
 						.size()));
 				status.setCurrentStatusText2("Finished " + index + "/"
 						+ blocks.size());// + "<br>" +"" +
-											// filter(blockClass.getSimpleName()));
+												// filter(blockClass.getSimpleName()));
 				// status.setCurrentStatusText1(block.getClass().getSimpleName());
 				if (status.wantsToStop())
 					break;
-			}
-			;
+			};
 		}
-
+		
 		long b = System.currentTimeMillis();
-
+		
 		if (status != null) {
 			status.setCurrentStatusValueFine(100d * (index / (double) blocks
 					.size()));
@@ -181,7 +178,7 @@ public class BlockPipeline {
 		updatePipelineStatistics();
 		return input;
 	}
-
+	
 	private void updateBlockStatistics(int nBlocks) {
 		Calendar calendar = new GregorianCalendar();
 		int minute = calendar.get(Calendar.MINUTE);
@@ -194,34 +191,34 @@ public class BlockPipeline {
 			}
 		}
 	}
-
+	
 	public static int getBlockExecutionsWithinLastMinute() {
 		return blockExecutionWithinLastMinute;
 	}
-
+	
 	private static int blockExecutionWithinLastMinute = 0;
 	private static int blockExecutionsWithinCurrentMinute = 0;
 	private static int currentMinuteB = -1;
-
+	
 	private void updatePipelineStatistics() {
 		synchronized (BlockPipeline.class) {
 			pipelineExecutionsWithinCurrentHour++;
 		}
 	}
-
+	
 	public static int getPipelineExecutionsWithinCurrentHour() {
 		return pipelineExecutionsWithinCurrentHour;
 	}
-
+	
 	private static int pipelineExecutionsWithinCurrentHour = 0;
-
+	
 	/**
 	 * The given image set is analyzed by a image pipeline upon users choice.
 	 * The debug image stack (result of pipeline) will be shown to the user.
 	 * 
 	 * @param m
 	 * @param match
-	 *            Image set to be analyzed.
+	 *           Image set to be analyzed.
 	 */
 	public static void debugTryAnalysis(
 			final Collection<NumericMeasurementInterface> input,
@@ -241,9 +238,9 @@ public class BlockPipeline {
 			old2newSample.get(nmi.getParentSample()).add(
 					nmi.clone(old2newSample.get(nmi.getParentSample())));
 		}
-
+		
 		mat.setInput(samples, input, m, 0, 1);
-
+		
 		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				mat.getName(), mat.getTaskDescription());
 		final Runnable backgroundTask = new Runnable() {
@@ -295,7 +292,7 @@ public class BlockPipeline {
 				"Analyze...", backgroundTask, finishSwingTask, status, false,
 				true);
 	}
-
+	
 	public BlockResultSet postProcessPipelineResultsForAllAngles(
 			Sample3D inSample, TreeMap<String, ImageData> inImages,
 			TreeMap<String, BlockResultSet> allResultsForSnapshot,
@@ -310,8 +307,8 @@ public class BlockPipeline {
 			block.postProcessResultsForAllAngles(inSample, inImages,
 					allResultsForSnapshot, summaryResult, optStatus);
 		}
-
+		
 		return summaryResult;
 	}
-
+	
 }
