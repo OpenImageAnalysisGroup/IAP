@@ -5,6 +5,7 @@ import java.awt.Point;
 
 import org.Vector2d;
 
+import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -12,6 +13,7 @@ import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
+import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockCalcWidthAndHeight_vis extends
@@ -56,14 +58,15 @@ public class BlockCalcWidthAndHeight_vis extends
 							.getValue();
 			}
 		}
+		final int vertYsoilLevelF = vertYsoilLevel;
 
 		FlexibleImage visRes = getInput().getMasks().getVis();
 
 		FlexibleImage img = useFluo ? getInput().getMasks().getFluo()
 				: getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && img != null) {
-			TopBottomLeftRight temp = getWidthAndHeightSide(img, background,
-					vertYsoilLevel);
+			final TopBottomLeftRight temp = getWidthAndHeightSide(img,
+					background, vertYsoilLevel);
 
 			double resf = useFluo ? (double) getInput().getMasks().getVis()
 					.getWidth()
@@ -78,31 +81,51 @@ public class BlockCalcWidthAndHeight_vis extends
 					.getWidth()
 					/ (double) img.getWidth() : 1.0;
 
-			Point values = null;
-
-			if (temp != null)
-				values = new Point(
-						Math.abs(temp.getRightX() - temp.getLeftX()),
-						Math.abs(temp.getBottomY() - temp.getTopY()));
+			final Point values = temp != null ? new Point(Math.abs(temp
+					.getRightX() - temp.getLeftX()), Math.abs(temp.getBottomY()
+					- temp.getTopY())) : null;
 
 			if (values != null) {
 
-				if (!useFluo && false) {
-					if (vertYsoilLevel > 0)
-						visRes = visRes
-								.getIO()
-								.getCanvas()
-								.drawLine(values.x, vertYsoilLevel, values.x,
-										vertYsoilLevel - values.y,
-										Color.BLUE.getRGB(), 255, 10)
-								.getImage().print("DEBUG");
-					else
-						visRes = visRes
-								.getIO()
-								.getCanvas()
-								.drawLine(values.x, temp.getTopY(), values.x,
-										temp.getBottomY(), Color.BLUE.getRGB(),
-										255, 10).getImage().print("DEBUG");
+				if (!useFluo) {
+					getProperties().addImagePostProcessor(
+							new RunnableOnImageSet() {
+								@Override
+								public FlexibleImage postProcessVis(
+										FlexibleImage visRes) {
+									if (vertYsoilLevelF > 0)
+										visRes = visRes
+												.getIO()
+												.getCanvas()
+												.fillRect(
+														values.x,
+														vertYsoilLevelF,
+														10,
+														vertYsoilLevelF
+																- values.y,
+														Color.BLUE.getRGB(),
+														255).getImage()
+												.print("DEBUG");
+									else
+										visRes = visRes
+												.getIO()
+												.getCanvas()
+												.fillRect(
+														values.x,
+														temp.getTopY(),
+														10,
+														temp.getBottomY()
+																- temp.getTopY(),
+														Color.RED.getRGB(), 255)
+												.getImage().print("DEBUG");
+									return visRes;
+								}
+
+								@Override
+								public ImageConfiguration getConfig() {
+									return ImageConfiguration.RgbSide;
+								}
+							});
 				}
 
 				if (distHorizontal != null) {
