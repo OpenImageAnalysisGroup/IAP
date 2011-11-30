@@ -42,7 +42,7 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	
 	@Override
 	public FlexibleMaskAndImageSet pipeline(ImageProcessorOptions options, FlexibleImageSet input, FlexibleImageSet optInputMasks, int maxThreadsPerImage,
-			FlexibleImageStack debugStack) throws InstantiationException, IllegalAccessException, InterruptedException {
+			FlexibleImageStack debugStack) throws Exception {
 		HashSet<Integer> rotationAngles = new HashSet<Integer>();
 		if (input != null && input.getVisInfo() != null && input.getVisInfo().getParentSample() != null) {
 			SampleInterface inSample = input.getVisInfo().getParentSample();

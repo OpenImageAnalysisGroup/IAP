@@ -836,8 +836,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadSnapshotAngles, int parentPriority)
-			throws InterruptedException, InstantiationException,
-			IllegalAccessException {
+			throws Exception {
 		ImageData inVis = id.getVIS() != null ? id.getVIS().copy() : null;
 		ImageData inFluo = id.getFLUO() != null ? id.getFLUO().copy() : null;
 		ImageData inNir = id.getNIR() != null ? id.getNIR().copy() : null;

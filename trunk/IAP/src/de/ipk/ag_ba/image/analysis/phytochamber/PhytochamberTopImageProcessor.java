@@ -51,7 +51,7 @@ public class PhytochamberTopImageProcessor {
 	public FlexibleMaskAndImageSet pipeline(FlexibleImageSet input, int maxThreadsPerImage, FlexibleImageStack debugStack,
 			boolean automaticParameterSearch,
 			boolean cropResult)
-			throws InstantiationException, IllegalAccessException, InterruptedException {
+			throws Exception {
 		
 		BlockPipeline p = new BlockPipeline();
 		p.add(BlockCropAllFixedPhytoOne.class);
