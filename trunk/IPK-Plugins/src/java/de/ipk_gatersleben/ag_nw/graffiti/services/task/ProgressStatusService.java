@@ -118,7 +118,7 @@ public class ProgressStatusService implements HelperClass {
 				res[numberResults++] = (int) remainTimeHours + "&nbsp;hours";
 		if (((int) remainTimeMinutes) >= 1 && numberResults < nn)
 			res[numberResults++] = (int) remainTimeMinutes + "&nbsp;min";
-		if (numberResults < nn)
+		if (numberResults < nn && remainTimeSeconds > 0)
 			res[numberResults++] = (int) remainTimeSeconds % 60 + "&nbsp;sec";
 		
 		if (numberResults == 2)
