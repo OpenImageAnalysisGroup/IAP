@@ -75,6 +75,10 @@ public class ProgressStatusService implements HelperClass {
 	}
 	
 	public String getRemainTimeString(double averageSpeed, double remainTimeSeconds) {
+		return getRemainTimeString(averageSpeed, remainTimeSeconds, 1);
+	}
+	
+	public String getRemainTimeString(double averageSpeed, double remainTimeSeconds, int nn) {
 		String result;
 		if (remainTimeSeconds < 0)
 			return "";
@@ -89,16 +93,15 @@ public class ProgressStatusService implements HelperClass {
 		/**
 		 * nn=1 --> 2h, nn=2 --> 2h 30m
 		 */
-		int nn = 1;
 		String res[] = new String[2];
-		if (remainTimeYears > 1 && numberResults < nn)
+		if (remainTimeYears >= 1 && numberResults < nn)
 			if (((int) remainTimeYears) == 1)
 				res[numberResults++] = (int) remainTimeYears + "&nbsp;year";
 			else
 				res[numberResults++] = (int) remainTimeYears + "&nbsp;years";
 		// if (remainTimeMonths>1 && numberResults<2)
 		// res[numberResults++]=(int)remainTimeMonths+" months";
-		if (remainTimeWeeks > 1 && numberResults < nn)
+		if (remainTimeWeeks >= 1 && numberResults < nn)
 			if (((int) remainTimeWeeks) == 1)
 				res[numberResults++] = (int) remainTimeWeeks + "&nbsp;week";
 			else
@@ -108,12 +111,12 @@ public class ProgressStatusService implements HelperClass {
 				res[numberResults++] = (int) remainTimeDays + "&nbsp;day";
 			else
 				res[numberResults++] = (int) remainTimeDays + "&nbsp;days";
-		if (((int) remainTimeHours) > 1 && numberResults < nn)
-			if (remainTimeHours == 1)
+		if (((int) remainTimeHours) >= 1 && numberResults < nn)
+			if ((int) remainTimeHours == 1)
 				res[numberResults++] = (int) remainTimeHours + "&nbsp;hour";
 			else
 				res[numberResults++] = (int) remainTimeHours + "&nbsp;hours";
-		if (((int) remainTimeMinutes) > 1 && numberResults < nn)
+		if (((int) remainTimeMinutes) >= 1 && numberResults < nn)
 			res[numberResults++] = (int) remainTimeMinutes + "&nbsp;min";
 		if (numberResults < nn)
 			res[numberResults++] = (int) remainTimeSeconds % 60 + "&nbsp;sec";
