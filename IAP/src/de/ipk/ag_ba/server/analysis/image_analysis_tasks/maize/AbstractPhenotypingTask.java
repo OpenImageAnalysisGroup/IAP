@@ -202,8 +202,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 											status, tso, workloadSnapshots,
 											workloadEqualAngleSnapshotSets,
 											tmf, maxCon);
-								} catch (InterruptedException err) {
-									System.err.println("INTERNAL ERROR: ERROR NNNN 444");
+								} catch (Exception err) {
+									System.err.println(SystemAnalysisExt
+											.getCurrentTime()
+											+ "> ERROR: "
+											+ err.getMessage());
+									System.err.println(SystemAnalysisExt
+											.getCurrentTime()
+											+ "> ERROR-CAUSE: SAMPLE: "
+											+ tmf.firstKey()
+											+ " / "
+											+ tmf.get(tmf.firstKey())
+													.getSampleInfo()
+											+ " / "
+											+ tmf.get(tmf.firstKey())
+													.getSampleInfo()
+													.getParentCondition());
 									err.printStackTrace();
 								} finally {
 									maxCon.release(1);
@@ -212,7 +226,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							}
 						}, "Snapshot Analysis");
 						t.setPriority(Thread.MIN_PRIORITY);
-						t.start();
+						if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+								.getMemoryMB() * 0.6) {
+							System.out.println();
+							System.out
+									.println(SystemAnalysisExt.getCurrentTime()
+											+ ">HIGH MEMORY UTILIZATION (>60%), REDUCING CONCURRENCY (THREAD.RUN)");
+							t.run();
+						} else {
+							t.start();
+						}
 					} catch (Exception eeee) {
 						error = eeee;
 						if (!freed.getBval(0, false))
