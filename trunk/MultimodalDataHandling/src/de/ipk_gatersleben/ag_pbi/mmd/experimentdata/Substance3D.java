@@ -288,9 +288,10 @@ public class Substance3D extends Substance {
 						.getQualityAnnotation();
 				double prototypePosition = prototype.getPosition() != null ? prototype
 						.getPosition() : 0;
+				String ptC = protypeConditionName.split(": ", 2)[1];
 				for (ConditionInterface ci : s) {
-					if (ci.getConditionName().split(":", 2)[1]
-							.equals(protypeConditionName.split(":", 2)[1])) {
+					String ciC = ci.getConditionName().split(": ", 2)[1];
+					if (ciC.equals(ptC)) {
 						for (SampleInterface si : ci) {
 							if (prototypeSampleRowID.equals(si.getRowId())) {
 								for (NumericMeasurementInterface nmi : si) {
@@ -312,6 +313,10 @@ public class Substance3D extends Substance {
 				}
 			}
 		}
+		if (res.size() == 0)
+			System.out.println("NO MATCH !!!!! !!!!!!12345");
+		if (res.size() > 1)
+			System.out.println("MORE THAN ONE MATCH !!!!!!!!!!!12345");
 		return res.size() == 1 ? res.get(0) : null;
 	}
 }
