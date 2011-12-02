@@ -168,12 +168,20 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				
 				p.prepareTempDirectory();
 				p.saveReportCSV(result);
+				// p.saveScripts(new String[] {
+				// "diagramForReportPDF.r",
+				// "diagramIAP.cmd",
+				// "diagramIAP.bat",
+				// "initLinux.r",
+				// "report2.tex", "createDiagramFromValuesLinux.r"
+				// });
+				
 				p.saveScripts(new String[] {
-						"diagramForReportPDF.r",
+						"createDiagramOneFile.r",
 						"diagramIAP.cmd",
 						"diagramIAP.bat",
 						"initLinux.r",
-						"report2.tex", "createDiagramFromValuesLinux.r"
+						"report2.tex"
 				});
 				
 				p.executeRstat();
