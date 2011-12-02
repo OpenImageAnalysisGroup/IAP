@@ -3,16 +3,19 @@ cd /d %~dp0
 echo Current directory:
 cd
 
-if "%1"=="" GOTO point1
+IF "%~1" neq "" (
 SET Treat=%1
-GOTO skript
-
-:point1
+) ELSE (
 SET Treat=Treatment
-GOTO skript 
+)
+
+if "%~2" neq "" (
+SET Sec=%2
+) ELSE (
+SET Sec=""
+)
 
 :skript
-Rscript diagramForReportPDF.r report.csv png "boxplotStacked" %Treat%
-Rscript diagramForReportPDF.r report.csv png "!boxplot" %Treat%
-Rscript diagramForReportPDF.r report.csv png "appendix" %Treat%
+Rscript createDiagramOneFile.r report.csv png FALSE %Treat% %Sec%
+Rscript createDiagramOneFile.r report.csv png TRUE %Treat% %Sec%
 pdflatex report2.tex

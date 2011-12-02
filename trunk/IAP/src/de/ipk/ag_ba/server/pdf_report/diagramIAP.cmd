@@ -6,13 +6,17 @@ INPUTFILE="report.csv"
 
 if [ $PARAM = 1 ]; then
 	TREAT=${1}
+	SEC=""
+elif [ $PARAM = 2 ]; then
+	TREAT=${1}
+	SEC=${2}	
 else
-	TREAT="Treatment"	
+	TREAT="Treatment"
+	SEC=""
 fi
 
-Rscript diagramForReportPDF.r ${INPUTFILE} png "boxplotStacked" ${TREAT}
-Rscript diagramForReportPDF.r ${INPUTFILE} png "!boxplot" ${TREAT}
-Rscript diagramForReportPDF.r ${INPUTFILE} png "appendix" ${TREAT}
+Rscript createDiagramOneFile.r ${INPUTFILE} png FALSE ${TREAT} ${SEC}
+Rscript createDiagramOneFile.r ${INPUTFILE} png TRUE ${TREAT} ${SEC}
 
 echo "Create PDF..."
 /usr/texbin/pdflatex report2.tex
