@@ -327,21 +327,24 @@ getBooleanVectorForFilterValues <- function(groupedDataFrame, listOfValues) {
 #	return(row)
 #}
 
-buildRowForOverallList <- function(i, des, listOfValues, dataSet) {
-	rowString <- des
-	for(k in 1:length(listOfValues)){
-		if(listOfValues[k] != "none") {
-			rowString <- paste(rowString,dataSet[i,k])
+buildRowForOverallList <- function(i, des, listOfValues, dataSet, day) {
+	rowString <- list(row=des, day=numeric())
+	#for(k in 1:length(listOfValues)){
+	for(k in listOfValues){
+		if(k != "none") {
+			rowString$row <- paste(rowString$row,dataSet[i,k])
 		}
 	}
+	#rowString$day <- as.character(dataSet[i,day])
 	return(rowString)
 } 
-
+##########################!!!!! hier ist ein  Fehler !!!!!!########################
 fillOverallResult <- function(groupedDataFrame, overallList) {
 	overallList$debug %debug% "fillOverallResult()"
 	for(i in 1:length(overallList$iniDataSet[,1])) {
+	#for(i in 1:length(overallList$filterXaxis)) {
 		for(des in overallList$descriptor) {
-			row <- buildRowForOverallList(i,des, c(overallList$treatment, overallList$secondTreatment),overallList$iniDataSet)
+			rowAndColumn <- buildRowForOverallList(i,des, c(overallList$treatment, overallList$secondTreatment),overallList$iniDataSet, overallList$xAxis)
 			
 #			if(overallList$secondTreatment != "none") {
 #				
@@ -349,7 +352,9 @@ fillOverallResult <- function(groupedDataFrame, overallList) {
 #			} else {
 #				row <- paste(des, overallList$iniDataSet[i,overallList$treatment])
 #			}
-			overallList$overallResult[row, as.character(overallList$iniDataSet[i,overallList$xAxis])] <- overallList$iniDataSet[i,des]
+			####!!!!!! FEHLER IN overallList$iniDataSet[i,des] !!!!!!!######
+			###as.character(overallList$iniDataSet[i,overallList$xAxis])
+			overallList$overallResult[rowAndColumn$row, as.character(overallList$iniDataSet[i,overallList$xAxis])] <- overallList$iniDataSet[i,des]
 		}
 	}	
 	return(overallList)
@@ -376,7 +381,7 @@ getResultDataFrame <- function(overallList) {
 	
 	groupBy <- groupByFunction(list(overallList$treatment, overallList$secondTreatment, overallList$xAxis))
 	groupedDataFrame <- data.table(overallList$iniDataSet)
-	groupedDataFrame <- as.data.frame(groupedDataFrame[,lapply(.SD, mean), by=groupBy])
+	groupedDataFrame <- as.data.frame(groupedDataFrame[,lapply(.SD, mean, na.rm=TRUE), by=groupBy])
 	overallList$iniDataSet <- groupedDataFrame[getBooleanVectorForFilterValues(groupedDataFrame, buildList(overallList)),]
 	
 	return(fillOverallResult(groupedDataFrame, overallList))
@@ -438,6 +443,14 @@ openImageFile <- function(overallList, extraString="") {
 	Cairo(width=as.numeric(overallList$imageWidth), height=as.numeric(overallList$imageHeight),file=paste(filename,overallList$saveFormat,sep="."),type=tolower(overallList$saveFormat),bg=overallList$bgColor,units="px",dpi=as.numeric(overallList$dpi), pointsize=20)			
 }
 
+plotDiagram <- function(rowIndex, overallList) {
+	if (y==1) {
+		plot(overallList$filterXaxis, overallList$overallResult[rowIndex,], main="", type="b", xlab=overallList$xAxisName, col=overallList$color[rowIndex], ylab=overallList$yAxisName, pch=rowIndex, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
+	} else {	
+		points(overallList$filterXaxis, overallList$overallResult[rowIndex,], type="b", col=overallList$color[rowIndex], pch=rowIndex, lty=1, lwd=3 )
+	}	
+}
+
 makeLinearDiagram <- function(h, overallList) {
 	overallList$debug %debug% "makeLinearDiagram()"
 	overallList$symbolParameter <- 1:length(overallList$rowName)
@@ -453,21 +466,33 @@ makeLinearDiagram <- function(h, overallList) {
 		if(numberOfNaN == length(overallList$overallResult[y,])) {
 			print(paste("... No Plotting of the treatment '",overallList$rowName[y],"'(No Values)"))
 			
-		} else if (numberOfNaN > 1 & numberOfNaN < (length(overallList$overallResult[y,])-1)) {
+		#} else if (numberOfNaN > 1 & numberOfNaN < (length(overallList$overallResult[y,])-1)) {
+		} else if (numberOfNaN > 0 & numberOfNaN < (length(overallList$overallResult[y,])-1)) {
 			#test[y,is.nan(test[y,])]  <- NA
 			#sum(match(is.na(test[y,]),FALSE),na.rm=TRUE)
 			
 			newCoords <- seq(min(overallList$filterXaxis,na.rm=TRUE),max(overallList$filterXaxis,na.rm=TRUE),1)
 			newValue <- approx(overallList$filterXaxis, overallList$overallResult[y,],xout=newCoords,method="linear")
-		
-			if (y == 1) {
-				plot(newValue$x[!is.na(match(newCoords, overallList$filterXaxis))], newValue$y[!is.na(match(newCoords, overallList$filterXaxis))], main="", type="c", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
-			} else {
-				points(newValue$x[!is.na(match(newCoords, overallList$filterXaxis))], newValue$y[!is.na(match(newCoords, overallList$filterXaxis))], type="c", col=overallList$color[y], pch=y, lty=1, lwd=3 )	
-			}
-			points(overallList$filterXaxis, overallList$overallResult[y,], type="p", col=overallList$color[y], pch=y, lty=1, lwd=3 )
-		} else if (numberOfNaN == 0 | (length(overallList$overallResult[y,])-1) == numberOfNaN){
 			
+			naVector <- is.na(overallList$overallResult[y,])
+			overallResultWithNaValues <- overallList$overallResult[y,]
+			overallList$overallResult[y,naVector] <- newValue$y[overallList$filterXaxis[naVector]]
+			#overallList$filterXaxis[naVector]
+			
+			if (y == 1) {
+				plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="c", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
+			} else {
+				points(overallList$filterXaxis, overallList$overallResult[y,], type="c", col=overallList$color[y], pch=y, lty=1, lwd=3 )	
+			}
+			
+#			if (y == 1) {
+#				plot(newValue$x[!is.na(match(newCoords, overallList$filterXaxis))], newValue$y[!is.na(match(newCoords, overallList$filterXaxis))], main="", type="c", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
+#			} else {
+#				points(newValue$x[!is.na(match(newCoords, overallList$filterXaxis))], newValue$y[!is.na(match(newCoords, overallList$filterXaxis))], type="c", col=overallList$color[y], pch=y, lty=1, lwd=3 )	
+#			}
+			points(overallList$filterXaxis, overallResultWithNaValues, type="p", col=overallList$color[y], pch=y, lty=1, lwd=3 )
+		} else if (numberOfNaN == 0 | (length(overallList$overallResult[y,])-1) == numberOfNaN){
+			#plotDiagram(y, overallList, type)
 			if (y==1) {
 				plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="b", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
 			} else {	
@@ -691,8 +716,8 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		if (typOfStartOptions != "allmanual") {
 			fileName <- fileName %exists% args[1]
 		} else {
-			fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
-			#fileName <- "report.csv" ## englischVersion <- TRUE setzen!!
+			#fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
+			fileName <- "report.csv" ## englischVersion <- TRUE setzen!!
 		}
 		
 		saveFormat <- saveFormat %exists% args[2]
@@ -726,7 +751,7 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 							   				  "side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
 			descriptorSetName <- c(descriptorSetName, "NIR absorption class (%)", "red fluorescence histogram (%)")
 			diagramTypVector <- c(diagramTypVector, "boxplotStacked", "boxplotStacked")
-		
+			
 			if(appendix) {
 				
 				descriptorSet <- colnames(workingDataSet[colnames(workingDataSet) != descriptorSet]) 
@@ -755,9 +780,9 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		#descriptorSet <- c("digital.biomass.keygene.norm","side.area","top.area")                   
 		#descriptorSetName <- c("digital biomass (mm^3)","test1", "test2")
 			
-		descriptorSet <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
-					"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
-		descriptorSetName <- c("NIR absorption class (%)", "chlorophyll fluorescence histogram (%)")
+#		descriptorSet <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
+#					"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
+#		descriptorSetName <- c("NIR absorption class (%)", "chlorophyll fluorescence histogram (%)")
 			
 #		descriptorSet <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255")
 #		descriptorSetName <- c("NIR absorption class (%)")
@@ -786,8 +811,9 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		
 		treatment <- "Treatment"
 		#filterTreatment <- "dry$normal$wet"
-		filterTreatment <- "dry$normal"
-		#filterTreatment <- "none"
+		#filterTreatment <- "dry$normal"
+		#filterTreatment <- "normal bewaessert$Trockentress"
+		filterTreatment <- "none"
 		##filterTreatment <- "Deutschland$Spanien$Italien$China"
 		
 		secondTreatment <- "none"
@@ -804,45 +830,48 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		#filterXaxis <- c("2$4$6$8$10$12$13$15$16$21$22$25$27$29$30$31$33$35$36$37$39$41$43$45$47$49$50$51$55$57$59$61$63$64")
 		#filterXaxis <- c("6$8$10")
 		filterXaxis <- "none"
+		#filterXaxis <- c("6$8$10$12$13$14$15$16$20$21$22$23$26$27$28$29$30$31$33$34$35$36$37$38")
 		
 		treatment <- "Treatment"
 		##treatment <- "Variety"
 		#treatment <- "none"
 		
-		diagramTyp="boxplotStacked"
-		#diagramTyp="!boxplot"
+		#diagramTyp="boxplotStacked"
+		diagramTyp="!boxplot"
 		#diagramTyp="boxplot"
 		
 		bgColor <- "transparent"
 		isGray="FALSE"
 		#transparent <- "TRUE"
 		#legendUnderImage <- "TRUE"
-		showResultInR <- FALSE
+		showResultInR <- TRUE
 		
-		fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
+		#fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
 		#fileName <- "testDataset2.csv"
+		fileName <- "report.csv"
 		englischVersion <- FALSE
 		workingDataSet <- englischVersion %getData% fileName
 		
 		#descriptor <- c("Hallo2")
 		#descriptor <- c("Plant ID","Treatment","Hallo","Wert1", "Repl ID")
 #		descriptorSet <- c("side.area.norm (mm^2)")		
-#		descriptorSetName <- c("Das ist ein Testname")
+		descriptorSetName <- c("Das ist ein Testname")
 
 		#descriptorSet <- c("Plant ID$Treatment$Hallo$Wert1$Repl ID")
 		
 		diagramTypVector <- rep.int(diagramTyp, times=length(descriptorSetName))
 		
 		
-#		saveName <- "test"
-#		yAxisName <- "test2"
-#		debug <- TRUE
-#		iniDataSet = workingDataSet
-#		#descriptor <- c("Plant ID$Treatment$Hallo$Wert1$Repl ID")
-#		#descriptor <- c("side.area.norm (mm^2)")
-#		descriptor <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255")
-#		appendix <- FALSE
-#		stoppTheCalculation <- FALSE
+		saveName <- "test"
+		yAxisName <- "test2"
+		debug <- TRUE
+		iniDataSet = workingDataSet
+		#descriptor <- c("Plant ID$Treatment$Hallo$Wert1$Repl ID")
+		#descriptor <- c("side.area.norm (mm^2)")
+		descriptor <- c("Weight B (g)")
+		#descriptor <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255")
+		appendix <- FALSE
+		stoppTheCalculation <- FALSE
 		
 }
 
