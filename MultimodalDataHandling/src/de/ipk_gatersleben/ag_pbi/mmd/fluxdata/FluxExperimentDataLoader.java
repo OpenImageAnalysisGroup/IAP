@@ -51,7 +51,7 @@ public class FluxExperimentDataLoader extends TemplateLoader {
 	
 	@Override
 	public List<ExperimentInterface> process(final List<File> files, final ExperimentDataPresenter receiver,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		return getExperimentDataFromFileList(files, status);
 	}
 	
@@ -181,7 +181,7 @@ public class FluxExperimentDataLoader extends TemplateLoader {
 			else
 				ErrorMsg.addErrorMessage("No reactionname specified! Using &#060;empty&#062; instead!");
 			ExperimentInterface e = processReaction(file, tabledata, conditions, samples,
-									reactionname, col);
+					reactionname, col);
 			
 			if (e == null) {
 				ErrorMsg.addErrorMessage("Errors occured when parsing reaction in column " + (col + 18) + "! Ignoring...");
@@ -194,7 +194,7 @@ public class FluxExperimentDataLoader extends TemplateLoader {
 				experiment.addAll(e);
 		}
 		// add sample IDs
-		int sampleID = 1;
+		long sampleID = 1;
 		if (experiment == null)
 			return null;
 		
@@ -208,10 +208,10 @@ public class FluxExperimentDataLoader extends TemplateLoader {
 	}
 	
 	private ExperimentInterface processReaction(final File file, TableData tabledata,
-						HashMap<Integer, ConditionInterface> conditions,
-						HashMap<Integer, SampleInterface> samples,
-						String reactionname,
-						int col) {
+			HashMap<Integer, ConditionInterface> conditions,
+			HashMap<Integer, SampleInterface> samples,
+			String reactionname,
+			int col) {
 		ExperimentInterface experiment = new Experiment();
 		
 		FluxReaction reaction = new FluxReaction(tabledata.getUnicodeStringCellData(col, 20));
@@ -246,7 +246,7 @@ public class FluxExperimentDataLoader extends TemplateLoader {
 				ConditionInterface condition;
 				if (conditions.get(entityID) == null) {
 					MainFrame.showMessageDialog("<html>File " + file.toString() + " was ignored.<br>" +
-										"No corresponding column found in row 11 for entity ID " + entityID + "!", "Error");
+							"No corresponding column found in row 11 for entity ID " + entityID + "!", "Error");
 					return null;
 				}
 				condition = conditions.get(entityID).clone(substancecopy);
@@ -308,7 +308,7 @@ public class FluxExperimentDataLoader extends TemplateLoader {
 				}
 			} catch (Exception e) {
 				MainFrame.showMessageDialog("<html>File " + file.toString() + " was ignored.<br>" +
-									"Row 11, Column " + TableData.getExcelColumnName(column) + ": entity ID not numerical!", "Error");
+						"Row 11, Column " + TableData.getExcelColumnName(column) + ": entity ID not numerical!", "Error");
 				return null;
 			}
 		return conditions;
@@ -394,8 +394,8 @@ public class FluxExperimentDataLoader extends TemplateLoader {
 	}
 	
 	private NumericMeasurementInterface getMeasurementData(TableData tabledata,
-						SampleInterface sample, int col,
-						int row, Double od, Double quality, FluxReactant fr) {
+			SampleInterface sample, int col,
+			int row, Double od, Double quality, FluxReactant fr) {
 		NumericMeasurementInterface measurementdata = Experiment.getTypeManager().getNewMeasurement(sample);
 		// replicate ID
 		Object replicateIDObj = tabledata.getCellData(col("B"), row, null);

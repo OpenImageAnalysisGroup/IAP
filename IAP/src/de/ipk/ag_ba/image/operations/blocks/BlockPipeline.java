@@ -153,7 +153,7 @@ public class BlockPipeline {
 			String s5performance = "";
 			long now = System.currentTimeMillis();
 			if (lastOutput > 0) {
-				s5performance = "5 p. "
+				s5performance = ""
 						+ (now - lastOutput) + " ms, ";
 			}
 			System.out.println();
@@ -164,8 +164,7 @@ public class BlockPipeline {
 							+ pipelineExecutionsWithinCurrentHour
 							+ " p.e., "
 							+ blockExecutionWithinLastMinute
-							+ " bl/min"
-							+ ", "
+							+ " bl/m, "
 							+ SystemAnalysis.getUsedMemoryInMB()
 							+ "/"
 							+ SystemAnalysis.getMemoryMB()
