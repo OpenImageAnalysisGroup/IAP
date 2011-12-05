@@ -13,7 +13,6 @@ import java.util.Date;
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
-import org.StringManipulationTools;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg.CompoundEntry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg.CompoundService;
@@ -25,18 +24,18 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 public class DBEinputFileReader extends ExperimentDataFileReader {
-
+	
 	int dataCount = 0;
 	private String experimentname;
 	private String remark;
 	private String coordinator;
 	private Date importdate;
 	private Date startdate;
-
+	
 	public @Override
 	Experiment getXMLDataFromExcelTable(File excelFile, TableData myData,
 			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
-
+		
 		if (myData.isDBEtransposedInputForm()) {
 			status1 = "Process Transposed Input File...";
 			// myData.showDataDialog();
@@ -44,9 +43,9 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 			// myData.showDataDialog();
 		} else
 			status1 = "Process Input File...";
-
+		
 		Experiment e = new Experiment();
-
+		
 		status2 = "Add Experiment-Header";
 		if (statusProvider != null)
 			statusProvider.setCurrentStatusText1(status1);
@@ -60,13 +59,13 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		if (statusProvider != null)
 			statusProvider.setCurrentStatusText2(status2);
 		getExperimentMeasurementsElement(e, myData, statusProvider);
-
+		
 		// for all conditions set experimentstuff
-
+		
 		progressDouble = new Double(100d);
 		return e;
 	}
-
+	
 	/*
 	 * <experimentdata> <cachetime>Tue Nov 02 11:15:48 CET 2004</cachetime>
 	 * <experiment experimentid="246">
@@ -86,13 +85,13 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 	 * unit="&#00181;mol/g">125.640731640212</data> <data
 	 * unit="&#00181;mol/g">125.598092379386</data> ...
 	 */
-
+	
 	private void getExperimentMeasurementsElement(Experiment e,
 			TableData myData,
 			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
 		if (checkStopp())
 			return;
-
+		
 		int skipCount = 0;
 		int sampleIDcount = 0;
 		status1 = "Init compound database";
@@ -117,7 +116,7 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 				.getSubstanceColumnInformation("F")) {
 			if (checkStopp())
 				return;
-
+			
 			if (myData.getUnicodeStringCellData(sci.getFirstColumn(), 20) == null) {
 				skipCount++;
 				continue;
@@ -145,13 +144,13 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		if (statusProvider != null)
 			statusProvider
 					.setCurrentStatusText2("Open Dataset-Tab (please wait)");
-
+		
 	}
-
+	
 	private int processSubstanceEntries(TableData myData, Experiment e,
 			int sampleIDcount, SubstanceColumnInformation sci) {
 		CompoundEntry ce;
-
+		
 		SubstanceInterface s = Experiment.getTypeManager().getNewSubstance();
 		s.setRowId("column " + sci.getColumnList());
 		// ********** ADD SUBSTANCE ATTRIBUTES **************
@@ -177,21 +176,21 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 			sampleIDcount = processLineEntries(myData, sampleIDcount, sci, s,
 					colPlant, plantIDval, plantOrLine);
 		}
-
+		
 		e.add(s);
-
+		
 		return sampleIDcount;
 	}
-
+	
 	private int processLineEntries(TableData myData, int sampleIDcount,
 			SubstanceColumnInformation sci, SubstanceInterface s, int colPlant,
 			Object plantIDval, String plantOrLine) {
 		int lineID = (plantIDval instanceof Integer) ? (Integer) plantIDval
 				: ((Double) plantIDval).intValue();
-
+		
 		ConditionInterface c = Experiment.getTypeManager().getNewCondition(s);
 		s.add(c);
-
+		
 		// ********** ADD LINE ATTRIBUTES ***********
 		c.setRowId(lineID);
 		c.setSpecies(plantOrLine);
@@ -218,28 +217,31 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 			sampleIDcount = processSampleEntries(myData, sampleIDcount, sci, c,
 					sample);
 		}
-
+		
 		c.setExperimentName(experimentname);
 		c.setExperimentCoordinator(coordinator);
 		c.setExperimentImportdate(importdate);
 		c.setExperimentRemark(remark);
 		c.setExperimentStartDate(startdate);
 		c.setExperimentType("");
-
+		
 		return sampleIDcount;
 	}
-
+	
 	private int processSampleEntries(TableData myData, int sampleIDcount,
 			SubstanceColumnInformation sci, ConditionInterface c,
 			SampleEntry sample) {
 		// ADD SAMPLE ENTRY
 		SampleInterface s = Experiment.getTypeManager().getNewSample(c);
 		c.add(s);
-
+		
 		// ADD SAMPLE ATTRIBUTES: ID, TIME, UNIT
 		s.setRowId(++sampleIDcount);
-		s.setTime(new Integer(processTimeData(new Double(sample.getTime())
-				.toString())));
+		s.setTime(sample.getTime());
+		if (sample.getOptFineTime() != null)
+			s.setRowId(sample.getOptFineTime());
+		
+		// new Integer(processTimeData(new Double(sample.getTime()).toString())));
 		s.setTimeUnit(sample.getTimeUnit());
 		// ADD DATA ATTRIBUTE: MEASUREMENT TOOL
 		String mesTool = myData.getUnicodeStringCellData(sci.getFirstColumn(),
@@ -247,10 +249,10 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		s.setMeasurementtool(mesTool == null ? "" : mesTool);
 		ArrayList<ReplicateDouble> measurements = sample.getMeasurementValues();
 		// ADD AVERAGE ENTRY
-
+		
 		SampleAverage sa = Experiment.getTypeManager().getNewSampleAverage(s);
 		s.setSampleAverage(sa);
-
+		
 		// ADD AVERAGE ATTRIBUTES: UNIT, REPLICATES, MIN, MAX, STDDEV
 		sa.setUnit(sample.getMeasurementUnit());
 		sa.setReplicateId(new Integer(measurements.size()));
@@ -270,13 +272,15 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 					"No measurement unit given for substance listed in column(s) "
 							+ sci.getColumnList() + "!", "n/a"));
 			m.setReplicateID(new Integer(itMes.getReplicateNumber()));
+			if (itMes.getOptionalQualityAnnotation() != null)
+				m.setQualityAnnotation(itMes.getOptionalQualityAnnotation());
 			m.setValue(value);
 			dataCount++;
 		}
 		status2 = dataCount + " measurement values processed";
 		return sampleIDcount;
 	}
-
+	
 	private String checkNullError(String value, String errorMessageIfNull,
 			String replaceWithForNull) {
 		if (value == null) {
@@ -285,16 +289,16 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		}
 		return value;
 	}
-
-	private String processTimeData(String timeVal) {
-		if (timeVal != null) {
-			if (timeVal.endsWith(".0"))
-				timeVal = StringManipulationTools.stringReplace(timeVal, ".0",
-						"");
-		}
-		return timeVal;
-	}
-
+	
+	// private String processTimeData(String timeVal) {
+	// if (timeVal != null) {
+	// if (timeVal.endsWith(".0"))
+	// timeVal = StringManipulationTools.stringReplace(timeVal, ".0",
+	// "");
+	// }
+	// return timeVal;
+	// }
+	
 	private void getExperimentHeaderElement(File excelFile, TableData myData) {
 		experimentname = (String) myData.getCellData(col("B"), 6, "");
 		remark = (String) myData.getCellData(col("B"), 5, "");
@@ -305,7 +309,7 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 				col("B"), 4, ""));
 		dataCount = 0;
 	}
-
+	
 	private int col(String col) {
 		if (col.length() == 1) {
 			char c1 = col.charAt(0);

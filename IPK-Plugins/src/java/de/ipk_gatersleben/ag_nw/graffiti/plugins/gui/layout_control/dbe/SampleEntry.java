@@ -10,21 +10,27 @@ import java.util.ArrayList;
 
 public class SampleEntry {
 	
-	private double time;
-	private String timeUnit;
-	private String measurementUnit;
-	private ArrayList<ReplicateDouble> measurementValues;
+	private final int time;
+	private final Long optFineTime;
+	private final String timeUnit;
+	private final String measurementUnit;
+	private final ArrayList<ReplicateDouble> measurementValues;
 	
-	public SampleEntry(double time, String timeUnit, String measurementUnit,
-						ArrayList<ReplicateDouble> measurementValues) {
+	public SampleEntry(int time, Long optFineTime, String timeUnit, String measurementUnit,
+			ArrayList<ReplicateDouble> measurementValues) {
 		this.time = time;
+		this.optFineTime = optFineTime;
 		this.timeUnit = timeUnit;
 		this.measurementUnit = measurementUnit;
 		this.measurementValues = measurementValues;
 	}
 	
-	public double getTime() {
+	public int getTime() {
 		return time;
+	}
+	
+	public Long getOptFineTime() {
+		return optFineTime;
 	}
 	
 	public String getTimeUnit() {

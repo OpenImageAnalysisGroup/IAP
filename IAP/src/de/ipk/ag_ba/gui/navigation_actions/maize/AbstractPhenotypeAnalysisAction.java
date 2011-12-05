@@ -47,7 +47,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	protected Experiment experimentResult;
 	
 	// used when started as remote analysis task
-	protected RunnableWithMappingData resultReceiver;
+	private RunnableWithMappingData resultReceiver;
 	protected int workOnSubset;
 	protected int numberOfSubsets;
 	protected String mongoDatasetID;
@@ -166,7 +166,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			statisticsResult.getHeader().setOriginDbId(dbID);
 			
-			if (resultReceiver == null) {
+			if (getResultReceiver() == null) {
 				if (status != null)
 					status.setCurrentStatusText1("Ready");
 				
@@ -177,8 +177,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				// mpc = new MainPanelComponent("Running in batch-mode. Partial result is not shown at this place.");
 				if (status != null)
 					status.setCurrentStatusText1("Result-Receiver processes results");
-				resultReceiver.setExperimenData(statisticsResult);
-				resultReceiver.run();
+				getResultReceiver().setExperimenData(statisticsResult);
+				getResultReceiver().run();
 				if (status != null)
 					status.setCurrentStatusText1("Processing finished");
 			}
@@ -211,7 +211,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	
 	@Override
 	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver) {
-		this.resultReceiver = resultReceiver;
+		this.setResultReceiver(resultReceiver);
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
 	}
@@ -240,6 +240,14 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	
 	public void setFilter(SnapshotFilter filter) {
 		this.filter = filter;
+	}
+
+	public RunnableWithMappingData getResultReceiver() {
+		return resultReceiver;
+	}
+
+	public void setResultReceiver(RunnableWithMappingData resultReceiver) {
+		this.resultReceiver = resultReceiver;
 	}
 	
 }

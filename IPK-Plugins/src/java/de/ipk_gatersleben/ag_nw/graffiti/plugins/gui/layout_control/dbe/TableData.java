@@ -89,9 +89,9 @@ public class TableData {
 	}
 	
 	protected int processAdditionaldentifiers(boolean processAllIDs, boolean processAllNewIDs,
-						final ExperimentInterface substanceNodes, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-						double optStartProgress, double optEndProgress, StringBuilder statusMessage, boolean skipFirstRow,
-						HashSet<Integer> ignoreColumns) {
+			final ExperimentInterface substanceNodes, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			double optStartProgress, double optEndProgress, StringBuilder statusMessage, boolean skipFirstRow,
+			HashSet<Integer> ignoreColumns) {
 		
 		// first row description of columns
 		// ArrayList<org.w3c.dom.Node> substanceNodes =
@@ -157,7 +157,7 @@ public class TableData {
 								}
 								if (altIds.length() > 50)
 									altIds = altIds.substring(0, 50) + "... // id count="
-														+ mainId2alternativeIDs.get(mainID).size();
+											+ mainId2alternativeIDs.get(mainID).size();
 							}
 							lastMapping = "<li>row " + row + ": '" + mainID + "' ==> (" + altIds + ")";
 						}
@@ -179,7 +179,7 @@ public class TableData {
 			if (name != null) {
 				if (optStatus != null)
 					optStatus.setCurrentStatusText2("Process Substance " + (int) (nodeIdx + 1) + "/" + (int) nodeCnt + " ("
-										+ name + ") (" + (processAllIDs ? "match all current IDs" : "match current main ID") + ")...");
+							+ name + ") (" + (processAllIDs ? "match all current IDs" : "match current main ID") + ")...");
 				if (name.endsWith(".0"))
 					name = name.substring(0, name.length() - 2);
 				
@@ -220,17 +220,17 @@ public class TableData {
 			nodeIdx = nodeIdx + 1;
 			if (optStatus != null)
 				optStatus.setCurrentStatusText2("Processed Substance: " + (int) nodeIdx + "/" + (int) nodeCnt
-									+ " (main ID: " + name + ") (" + (processAllIDs ? "match all IDs" : "match main ID") + ")...");
+						+ " (main ID: " + name + ") (" + (processAllIDs ? "match all IDs" : "match main ID") + ")...");
 			if (optStatus != null)
 				optStatus.setCurrentStatusValueFine(optStartProgress + nodeIdx / nodeCnt * workLoad);
 		}
 		statusMessage.append("" + "<ul>Definition of first and last alternative identifier:" + firstMapping + ""
-							+ lastMapping + ""
-							+
-							// (matchStrings.length()>0 ?
+				+ lastMapping + ""
+				+
+				// (matchStrings.length()>0 ?
 				// "<li>Matches:<br>"+matchStrings : "")+
 				(matchStrings.length() > 0 ? "<li>First 5 matches:<br>" + matchStrings : "") + "</ul>" + "Matches: "
-							+ matches + ", overall alternative ID count (empty values omitted): " + idCnt);
+				+ matches + ", overall alternative ID count (empty values omitted): " + idCnt);
 		return idCnt;
 	}
 	
@@ -319,7 +319,7 @@ public class TableData {
 	}
 	
 	public synchronized String getTableStringData(int startRow, int endRow, int startCol, int endCol, String rowDivider,
-						String colDivider) {
+			String colDivider) {
 		StringBuilder res = new StringBuilder();
 		for (int row = startRow; row <= endRow; row++) {
 			for (int col = startCol; col <= endCol; col++) {
@@ -398,7 +398,7 @@ public class TableData {
 			return AttributeHelper.getDateString(jd1);
 		} catch (ClassCastException cce) {
 			ErrorMsg.addErrorMessage("Could not return date data from column " + getExcelColumnName(col) + ", row " + row
-								+ " [cell=" + getCellData(col, row, expectIfNULL) + "]!");
+					+ " [cell=" + getCellData(col, row, expectIfNULL) + "]!");
 			return expectIfNULL;
 		}
 	}
@@ -412,7 +412,7 @@ public class TableData {
 			return jd1;
 		} catch (ClassCastException cce) {
 			ErrorMsg.addErrorMessage("Could not return date data from column " + getExcelColumnName(col) + ", row " + row
-								+ " [cell=" + getCellData(col, row, expectIfNULL) + "]!");
+					+ " [cell=" + getCellData(col, row, expectIfNULL) + "]!");
 			return expectIfNULL;
 		}
 	}
@@ -448,9 +448,11 @@ public class TableData {
 		return maxCol + 1;
 	}
 	
-	public ArrayList<SampleEntry> getSamples(SubstanceColumnInformation sci, int plantOrGenotypeColumnRefID) {
+	public ArrayList<SampleEntry> getSamples(SubstanceColumnInformation sci, long plantOrGenotypeColumnRefID) {
 		HashMap<String, ArrayList<ReplicateDouble>> plant_time_timeunit = new HashMap<String, ArrayList<ReplicateDouble>>();
-		HashMap<String, Double> plant_time_timeunit2time = new HashMap<String, Double>();
+		HashMap<String, Integer> plant_time_timeunit2time = new HashMap<String, Integer>();
+		HashMap<String, Long> plant_time_timeunit2fineTime = new HashMap<String, Long>();
+		
 		HashMap<String, String> plant_time_timeunit2timeunit = new HashMap<String, String>();
 		HashMap<String, String> plant_time_timeunit2mesunit = new HashMap<String, String>();
 		for (int column : sci.getColumns()) {
@@ -466,26 +468,39 @@ public class TableData {
 							if (val instanceof String) {
 								sr = getUnicodeStringCellData(column, row);
 								if (sr != null
-													&& (sr.equalsIgnoreCase("-") || sr.equalsIgnoreCase("n/a") || sr.equalsIgnoreCase("na")))
+										&& (sr.equalsIgnoreCase("-") || sr.equalsIgnoreCase("n/a") || sr.equalsIgnoreCase("na")))
 									ok = true;
 							}
 							if (!ok)
 								ErrorMsg.addErrorMessage("Non-Numeric value (" + sr + ") in column "
-													+ getExcelColumnName(column) + ", row " + row + "!");
+										+ getExcelColumnName(column) + ", row " + row + "!");
 						}
 						if (!ok)
 							continue;
 					}
 					Object plantObj = getCellData(col("A"), row, null);
 					if (plantObj != null) {
-						if (!(plantObj instanceof Double)) {
+						if (!(plantObj instanceof Double) && !(plantObj instanceof Long)) {
 							ErrorMsg.addErrorMessage("Non-Numeric value in column A, row " + row + "!");
 							continue;
 						}
-						Double plantID = (Double) plantObj;
-						if (plantID.intValue() == plantOrGenotypeColumnRefID) {
-							processData(plant_time_timeunit, plant_time_timeunit2time, plant_time_timeunit2timeunit,
-												plant_time_timeunit2mesunit, column, row, val, plantID);
+						if (plantObj instanceof Double) {
+							Double plantID = (Double) plantObj;
+							if (plantID.intValue() == plantOrGenotypeColumnRefID) {
+								processData(plant_time_timeunit, plant_time_timeunit2time,
+										plant_time_timeunit2fineTime,
+										plant_time_timeunit2timeunit,
+										plant_time_timeunit2mesunit, column, row, val, plantID.longValue());
+							}
+						}
+						else {
+							Long plantID = (Long) plantObj;
+							if (plantID == plantOrGenotypeColumnRefID) {
+								processData(plant_time_timeunit, plant_time_timeunit2time,
+										plant_time_timeunit2fineTime,
+										plant_time_timeunit2timeunit,
+										plant_time_timeunit2mesunit, column, row, val, plantID);
+							}
 						}
 					}
 				}
@@ -493,8 +508,10 @@ public class TableData {
 		}
 		ArrayList<SampleEntry> result = new ArrayList<SampleEntry>();
 		for (String key : plant_time_timeunit.keySet()) {
-			SampleEntry se = new SampleEntry(plant_time_timeunit2time.get(key), plant_time_timeunit2timeunit.get(key),
-								plant_time_timeunit2mesunit.get(key), plant_time_timeunit.get(key));
+			SampleEntry se = new SampleEntry(plant_time_timeunit2time.get(key),
+					plant_time_timeunit2fineTime.get(key),
+					plant_time_timeunit2timeunit.get(key),
+					plant_time_timeunit2mesunit.get(key), plant_time_timeunit.get(key));
 			result.add(se);
 		}
 		return result;
@@ -511,8 +528,8 @@ public class TableData {
 			} catch (Exception e) {
 				if (warnNonNumeric)
 					ErrorMsg.addErrorMessage("Input Format Warning: Instead of Numeric Value  a " + "Text Value (" + os
-										+ ") that could not be converted to a numeric value " + getExcelColumnName(column) + " row " + row
-										+ "!");
+							+ ") that could not be converted to a numeric value " + getExcelColumnName(column) + " row " + row
+							+ "!");
 				// empty
 			}
 		}
@@ -520,32 +537,65 @@ public class TableData {
 	}
 	
 	private void processData(HashMap<String, ArrayList<ReplicateDouble>> plant_time_timeunit,
-						HashMap<String, Double> plant_time_timeunit2time, HashMap<String, String> plant_time_timeunit2timeunit,
-						HashMap<String, String> plant_time_timeunit2mesunit, int column, int row, Object val, Double plantID) {
+			HashMap<String, Integer> plant_time_timeunit2time,
+			HashMap<String, Long> plant_time_timeunit2optFineTime,
+			HashMap<String, String> plant_time_timeunit2timeunit,
+			HashMap<String, String> plant_time_timeunit2mesunit, int column, int row, Object val, Long plantID) {
 		String plant = plantID.toString();
-		String time = "-1";
+		Integer time = -1;
+		Long optFineTime = null;
 		String replicateNum = "-1";
 		Object timeObj = getCellData(col("C"), row, null);
-		if (timeObj != null && timeObj instanceof Double)
-			time = ((Double) timeObj).toString();
+		if (timeObj != null && timeObj instanceof Double) {
+			time = ((Double) timeObj).intValue();
+			if (Math.abs((Double) timeObj - time) > 0.001)
+				ErrorMsg.addErrorMessage("Warning: time value in " +
+						"row " + row + ", column C is not a whole number! Time fraction is ignored!");
+		} else
+			if (timeObj != null && timeObj instanceof Integer) {
+				time = (Integer) timeObj;
+			} else {
+				if (timeObj != null && timeObj instanceof String) {
+					String timeString = (String) timeObj;
+					time = Integer.parseInt(timeString.split(";", 2)[0]);
+					optFineTime = Long.parseLong(timeString.split(";", 2)[1]);
+				}
+			}
+		
+		// plant_time_timeunit2optFineTime
+		//
+		String optQualityAnnotation = null;
 		Object replObj = getCellData(col("B"), row, null);
 		if (replObj != null && replObj instanceof Double)
 			replicateNum = ((Double) replObj).toString();
-		ReplicateDouble measureValue = new ReplicateDouble(val, replicateNum, null);
+		else
+			if (replObj != null && replObj instanceof Integer)
+				replicateNum = ((Integer) replObj).toString();
+			else {
+				if (replObj != null && replObj instanceof String) {
+					String replicateString = (String) replObj;
+					replicateNum = replicateString.split(";", 2)[0];
+					optQualityAnnotation = replicateString.split(";", 2)[1];
+				}
+			}
+		
+		ReplicateDouble measureValue = new ReplicateDouble(val, replicateNum, optQualityAnnotation);
 		
 		String timeUnit = getUnicodeStringCellData(col("D"), row);
 		if (timeUnit == null)
 			timeUnit = "-1";
 		
-		String plantIDandTime = plant + "$" + time + "$" + timeUnit;
+		String plantIDandTime = plant + "$" + time + "$" + timeUnit + "$" + optFineTime;
 		if (!plant_time_timeunit.containsKey(plantIDandTime)) {
 			plant_time_timeunit.put(plantIDandTime, new ArrayList<ReplicateDouble>());
-			plant_time_timeunit2time.put(plantIDandTime, new Double(time));
+			plant_time_timeunit2time.put(plantIDandTime, time);
 			plant_time_timeunit2timeunit.put(plantIDandTime, timeUnit);
+			if (optFineTime != null)
+				plant_time_timeunit2optFineTime.put(plantIDandTime, optFineTime);
 			String mesUnit = getUnicodeStringCellData(column, 22);
 			if (mesUnit == null) {
 				ErrorMsg.addErrorMessage("Warning: No measurement unit in dataset in row 22, column "
-									+ getExcelColumnName(column) + "!");
+						+ getExcelColumnName(column) + "!");
 				mesUnit = "no unit set";
 			}
 			plant_time_timeunit2mesunit.put(plantIDandTime, mesUnit);

@@ -1,7 +1,10 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +20,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -28,53 +34,55 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.JDOM2DOM;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_classes.TimeAndTimeUnit;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_classes.XPathHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 /**
  * @author klukas
  */
 public class Experiment implements ExperimentInterface {
-
+	
 	ArrayList<SubstanceInterface> md;
 	private ExperimentHeaderInterface header;
 	static DataMappingTypeManagerInterface typemanager = new DataMappingTypeManager();
-
+	
 	public Experiment() {
 		md = new ArrayList<SubstanceInterface>();
 		header = new ExperimentHeader();
 	}
-
+	
 	public Experiment(SubstanceInterface data) {
 		this();
 		add(data);
 	}
-
+	
 	public Experiment(List<SubstanceInterface> data) {
 		this();
 		addAll(data);
 	}
-
+	
 	public Experiment(ExperimentInterface data) {
 		this();
 		for (SubstanceInterface m : data)
 			add(m);
 	}
-
+	
 	public Experiment(Document doc) {
 		this();
 		addAll(getExperimentFromDOM(doc));
 	}
-
+	
 	@Override
 	public void addAll(ExperimentInterface m) {
 		md.addAll(m);
 		if (isEmpty())
 			setHeader(m.getHeader());
 	}
-
+	
 	@Override
 	public Experiment filter(Collection<String> validNames,
 			Collection<String> validTimes) {
@@ -102,7 +110,7 @@ public class Experiment implements ExperimentInterface {
 			sd.getParentCondition().remove(sd);
 		return filtered;
 	}
-
+	
 	@Override
 	public String getName() {
 		if (isEmpty())
@@ -110,7 +118,7 @@ public class Experiment implements ExperimentInterface {
 		else
 			return findHeader(null, this).getExperimentName();
 	}
-
+	
 	@Override
 	public String getRemark() {
 		if (isEmpty())
@@ -118,7 +126,7 @@ public class Experiment implements ExperimentInterface {
 		else
 			return findHeader(header, this).getRemark();
 	}
-
+	
 	@Override
 	public String getCoordinator() {
 		if (isEmpty())
@@ -126,7 +134,7 @@ public class Experiment implements ExperimentInterface {
 		else
 			return findHeader(header, this).getCoordinator();
 	}
-
+	
 	@Override
 	public Date getImportDate() {
 		if (isEmpty())
@@ -134,7 +142,7 @@ public class Experiment implements ExperimentInterface {
 		else
 			return findHeader(header, this).getImportdate();
 	}
-
+	
 	@Override
 	public Date getStartDate() {
 		if (isEmpty())
@@ -142,10 +150,10 @@ public class Experiment implements ExperimentInterface {
 		else
 			return findHeader(header, this).getStartdate();
 	}
-
+	
 	public Collection<ExperimentInterface> splitOldStyle() {
 		HashMap<String, ExperimentInterface> result = new HashMap<String, ExperimentInterface>();
-
+		
 		ArrayList<Document> dl = Experiment.getDocuments(this);
 		for (Document d : dl) {
 			ExperimentInterface e = new Experiment(d);
@@ -154,13 +162,13 @@ public class Experiment implements ExperimentInterface {
 		}
 		return result.values();
 	}
-
+	
 	@Override
 	public Collection<ExperimentInterface> split() {
 		HashMap<String, ExperimentInterface> result = new HashMap<String, ExperimentInterface>();
-
+		
 		HashMap<String, ArrayList<ConditionInterface>> expname2cons = new HashMap<String, ArrayList<ConditionInterface>>();
-
+		
 		// first: group all conditions with the same experiment header
 		for (SubstanceInterface s : this)
 			for (ConditionInterface c : s) {
@@ -169,12 +177,12 @@ public class Experiment implements ExperimentInterface {
 							new ArrayList<ConditionInterface>());
 				expname2cons.get(c.getExperimentName()).add(c);
 			}
-
+		
 		// second: clone all conditions (including their substance and all
 		// samples recursively
 		for (String expn : expname2cons.keySet()) {
 			ExperimentInterface e = new Experiment();
-
+			
 			for (ConditionInterface con : expname2cons.get(expn)) {
 				SubstanceInterface sub = con.getParentSubstance().clone();
 				ConditionInterface c = con.clone(sub);
@@ -195,7 +203,7 @@ public class Experiment implements ExperimentInterface {
 			result.put("doesnt matter", this.clone());
 		return result.values();
 	}
-
+	
 	public List<NumericMeasurementInterface> getAllMeasurements() {
 		List<NumericMeasurementInterface> list = new ArrayList<NumericMeasurementInterface>();
 		for (SubstanceInterface sub : md)
@@ -203,10 +211,10 @@ public class Experiment implements ExperimentInterface {
 				for (SampleInterface sample : series)
 					for (NumericMeasurementInterface meas : sample)
 						list.add(meas);
-
+		
 		return list;
 	}
-
+	
 	@Override
 	public void setHeader(ExperimentHeaderInterface header) {
 		this.header = header;
@@ -215,7 +223,7 @@ public class Experiment implements ExperimentInterface {
 				for (ConditionInterface s : m)
 					s.setExperimentInfo(header);
 	}
-
+	
 	@Override
 	public ExperimentHeaderInterface getHeader() {
 		if (isEmpty())
@@ -228,7 +236,7 @@ public class Experiment implements ExperimentInterface {
 			return null;
 		}
 	}
-
+	
 	@Override
 	public Collection<ExperimentHeaderInterface> getHeaders() {
 		if (isEmpty()) {
@@ -245,22 +253,22 @@ public class Experiment implements ExperimentInterface {
 			return result;
 		}
 	}
-
+	
 	public static Document getEmptyDocument(ExperimentHeaderInterface header) {
 		StringBuilder r = new StringBuilder();
 		r.append("</measurements>");
 		r.append("</experimentdata>");
 		StringBuilder r2 = new StringBuilder();
 		r2.append("<experimentdata>");
-
+		
 		r2.append(header.toString());
 		r2.append("<measurements>");
-
+		
 		r2.append(r);
-
+		
 		return XMLHelper.getDocumentFromXMLstring(r2.toString());
 	}
-
+	
 	public static ArrayList<Document> getDocuments(
 			ExperimentInterface mappingDataList,
 			BackgroundTaskStatusProviderSupportingExternalCall status,
@@ -271,23 +279,23 @@ public class Experiment implements ExperimentInterface {
 			docList.add(XMLHelper.getDocumentFromXMLstring(s));
 		return docList;
 	}
-
+	
 	public static ArrayList<String> getStrings(
 			ExperimentInterface mappingDataList,
 			BackgroundTaskStatusProviderSupportingExternalCall status,
 			boolean mergeExperimentsReturnOnlyOne) {
-
+		
 		HashMap<String, LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>> experimentName2substanceName2Conditions = new HashMap<String, LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>>();
-
+		
 		String experimentNameForAll = null;
-
+		
 		// HashMap<String, Integer> conditionOffsetsForExperiments = new
 		// HashMap<String, Integer>();
 		// int experimentINDEX = 0;
 		// int experimentINDEXoffset = 50000; // maximale anzahl von
 		// experimenten
 		// und/oder conditions !!!
-
+		
 		if (status != null)
 			status.setCurrentStatusText2("Extracting metadata from elements");
 		if (mappingDataList != null)
@@ -302,7 +310,7 @@ public class Experiment implements ExperimentInterface {
 						experimentNameForAll = expName;
 					if (mergeExperimentsReturnOnlyOne)
 						expName = experimentNameForAll;
-
+					
 					// if
 					// (!conditionOffsetsForExperiments.containsKey(condition.getExperimentName()))
 					// {
@@ -310,20 +318,20 @@ public class Experiment implements ExperimentInterface {
 					// (experimentINDEX++)
 					// * experimentINDEXoffset);
 					// }
-
+					
 					if (!experimentName2substanceName2Conditions
 							.containsKey(expName))
 						experimentName2substanceName2Conditions
 								.put(expName,
 										new LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>());
-
+					
 					if (!experimentName2substanceName2Conditions.get(expName)
 							.containsKey(substanceName))
 						experimentName2substanceName2Conditions
 								.get(expName)
 								.put(substanceName,
 										new LinkedHashMap<String, ConditionInterface>());
-
+					
 					if (!experimentName2substanceName2Conditions
 							.get(expName)
 							.get(substanceName)
@@ -346,51 +354,51 @@ public class Experiment implements ExperimentInterface {
 					}
 				}
 			}
-
+		
 		ArrayList<String> docList = new ArrayList<String>();
 		if (status != null)
 			status.setCurrentStatusText2("Creating experiment header");
 		if (experimentName2substanceName2Conditions.isEmpty()) {
-
+			
 			StringBuilder r = new StringBuilder();
 			int measurementcount = 0;
-
+			
 			r.append("</measurements>");
 			r.append("</experimentdata>");
-
+			
 			StringBuilder r2 = new StringBuilder();
 			r2.append("<experimentdata>");
-
+			
 			ExperimentHeaderInterface eh = findHeader(
 					mappingDataList != null ? mappingDataList.getHeader()
 							: null, mappingDataList);
 			eh.toString(r2, measurementcount);
 			r2.append("<measurements>");
-
+			
 			r2.append(r);
-
+			
 			docList.add(r2.toString());
 		} else {
 			for (String expName : experimentName2substanceName2Conditions
 					.keySet()) {
-
+				
 				LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>> substances2conditions = experimentName2substanceName2Conditions
 						.get(expName);
 				ConditionInterface c1 = substances2conditions.values()
 						.iterator().next().values().iterator().next();
-
+				
 				StringBuilder r = new StringBuilder();
 				int measurementcount = 0;
 				for (String substance : substances2conditions.keySet()) {
 					if (status != null)
 						status.setCurrentStatusText2("Process " + substance);
-
+					
 					SubstanceInterface s = null;
-
+					
 					for (SubstanceInterface sub : mappingDataList)
 						if (sub.getName().equals(substance))
 							s = sub;
-
+					
 					s.getSubstanceString(r);
 					for (ConditionInterface sd : substances2conditions.get(
 							substance).values()) {
@@ -404,28 +412,28 @@ public class Experiment implements ExperimentInterface {
 					}
 					r.append("</substance>");
 				}
-
+				
 				r.append("</measurements>");
 				r.append("</experimentdata>");
-
+				
 				StringBuilder r2 = new StringBuilder();
 				r2.append("<experimentdata>");
-
+				
 				ExperimentHeaderInterface eh = findHeader(
 						c1.getExperimentHeader(), mappingDataList);
-
+				
 				eh.toString(r2, measurementcount);
 				r2.append("<measurements>");
-
+				
 				r2.append(r);
-
+				
 				docList.add(r2.toString());
 			}
 		}
-
+		
 		return docList;
 	}
-
+	
 	private static ExperimentHeaderInterface findHeader(
 			ExperimentHeaderInterface suggestion,
 			ExperimentInterface mappingDataList) {
@@ -439,7 +447,7 @@ public class Experiment implements ExperimentInterface {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * <experimentdata> <experiment experimentid="-1">
 	 * <experimentname>Gluthation</experimentname> <remark>SXD plants</remark>
@@ -457,7 +465,7 @@ public class Experiment implements ExperimentInterface {
 			ExperimentInterface mappingDataList) {
 		return getDocuments(mappingDataList, null, false);
 	}
-
+	
 	public static String getString(ExperimentInterface mappingDataList,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		ArrayList<String> res = getStrings(mappingDataList, optStatus, true);
@@ -465,19 +473,19 @@ public class Experiment implements ExperimentInterface {
 			ErrorMsg.addErrorMessage("Internal error: request for merged string representation returned more than one string!");
 		return res.iterator().next();
 	}
-
+	
 	public static void setTypeManager(DataMappingTypeManagerInterface m) {
 		Experiment.typemanager = m;
 	}
-
+	
 	public static DataMappingTypeManagerInterface getTypeManager() {
 		return Experiment.typemanager;
 	}
-
+	
 	public static Experiment getExperimentFromDOM(org.w3c.dom.Document doc) {
 		return getExperimentFromJDOM(JDOM2DOM.getJDOMfromDOM(doc));
 	}
-
+	
 	// public static List<Substance> getExperimentFromDocuments(List<Document>
 	// documents) {
 	//
@@ -487,13 +495,13 @@ public class Experiment implements ExperimentInterface {
 	//
 	// return getExperiment(list);
 	// }
-
+	
 	public static ExperimentInterface getExperiment(
 			List<org.jdom.Document> documents) {
 		List<Experiment> results = new ArrayList<Experiment>();
 		for (org.jdom.Document doc : documents)
 			results.add(Substance.getData(doc.getRootElement()));
-
+		
 		if (results.size() == 0)
 			return new Experiment();
 		if (results.size() == 1) {
@@ -507,7 +515,7 @@ public class Experiment implements ExperimentInterface {
 			return mainDataset;
 		}
 	}
-
+	
 	public static Experiment getExperimentFromJDOM(org.jdom.Document doc) {
 		Experiment e = Substance.getData(doc.getRootElement());
 		if (e.isEmpty()) {
@@ -518,80 +526,80 @@ public class Experiment implements ExperimentInterface {
 		}
 		return e;
 	}
-
+	
 	/*
 	 * Delegate methods
 	 */
-
+	
 	@Override
 	public boolean isEmpty() {
 		for (SubstanceInterface s : this)
 			for (ConditionInterface c : s)
 				return c == null;
-
+		
 		return true;
 	}
-
+	
 	@Override
 	public void add(int index, SubstanceInterface element) {
 		md.add(index, element);
 	}
-
+	
 	@Override
 	public boolean add(SubstanceInterface e) {
 		return md.add(e);
 	}
-
+	
 	@Override
 	public boolean addAll(Collection<? extends SubstanceInterface> c) {
 		return md.addAll(c);
 	}
-
+	
 	@Override
 	public boolean addAll(int index, Collection<? extends SubstanceInterface> c) {
 		return md.addAll(index, c);
 	}
-
+	
 	@Override
 	public boolean contains(Object o) {
 		return md.contains(o);
 	}
-
+	
 	@Override
 	public boolean containsAll(Collection<?> arg0) {
 		return md.containsAll(arg0);
 	}
-
+	
 	@Override
 	public void ensureCapacity(int minCapacity) {
 		md.ensureCapacity(minCapacity);
 	}
-
+	
 	@Override
 	public int indexOf(Object o) {
 		return md.indexOf(o);
 	}
-
+	
 	@Override
 	public int lastIndexOf(Object o) {
 		return md.lastIndexOf(o);
 	}
-
+	
 	@Override
 	public ListIterator<SubstanceInterface> listIterator() {
 		return md.listIterator();
 	}
-
+	
 	@Override
 	public ListIterator<SubstanceInterface> listIterator(int index) {
 		return md.listIterator(index);
 	}
-
+	
 	@Override
 	public SubstanceInterface remove(int index) {
 		return md.remove(index);
 	}
-
+	
 	@Override
 	public boolean remove(Object o) {
 		boolean success = md.remove(o);
@@ -603,37 +611,37 @@ public class Experiment implements ExperimentInterface {
 		}
 		return success;
 	}
-
+	
 	@Override
 	public boolean removeAll(Collection<?> arg0) {
 		return md.removeAll(arg0);
 	}
-
+	
 	@Override
 	public boolean retainAll(Collection<?> arg0) {
 		return md.retainAll(arg0);
 	}
-
+	
 	@Override
 	public SubstanceInterface set(int index, SubstanceInterface element) {
 		return md.set(index, element);
 	}
-
+	
 	@Override
 	public List<SubstanceInterface> subList(int fromIndex, int toIndex) {
 		return md.subList(fromIndex, toIndex);
 	}
-
+	
 	@Override
 	public Object[] toArray() {
 		return md.toArray();
 	}
-
+	
 	@Override
 	public <T> T[] toArray(T[] a) {
 		return md.toArray(a);
 	}
-
+	
 	@Override
 	public String toString() {
 		try {
@@ -644,38 +652,38 @@ public class Experiment implements ExperimentInterface {
 					+ md.toString();
 		}
 	}
-
+	
 	@Override
 	public String toStringWithErrorThrowing() throws IOException,
 			TransformerException, JDOMException {
 		return getString(this, null);
 	}
-
+	
 	@Override
 	public void trimToSize() {
 		md.trimToSize();
 	}
-
+	
 	@Override
 	public int size() {
 		return md.size();
 	}
-
+	
 	@Override
 	public SubstanceInterface get(int index) {
 		return md.get(index);
 	}
-
+	
 	@Override
 	public Iterator<SubstanceInterface> iterator() {
 		return md.iterator();
 	}
-
+	
 	@Override
 	public void clear() {
 		md.clear();
 	}
-
+	
 	@Override
 	public String getSequence() {
 		if (isEmpty())
@@ -683,16 +691,15 @@ public class Experiment implements ExperimentInterface {
 		else
 			return md.iterator().next().iterator().next().getSequence();
 	}
-
+	
 	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
 		getHeader().fillAttributeMap(attributeValueMap,
 				Experiment.getNumberOfMeasurementValues(this));
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#getStringOfChildren(java.lang.StringBuilder)
@@ -701,10 +708,9 @@ public class Experiment implements ExperimentInterface {
 	public void getStringOfChildren(StringBuilder r) {
 		// empty
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#getXMLAttributeString(java.lang.StringBuilder)
@@ -713,10 +719,9 @@ public class Experiment implements ExperimentInterface {
 	public void getXMLAttributeString(StringBuilder r) {
 		// empty
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#setAttribute(org.jdom.Attribute)
@@ -725,10 +730,9 @@ public class Experiment implements ExperimentInterface {
 	public void setAttribute(Attribute attr) {
 		// empty
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#setData(org.jdom.Element)
@@ -737,10 +741,9 @@ public class Experiment implements ExperimentInterface {
 	public boolean setData(Element xmlElement) {
 		return false;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#setDataOfChildElement(org.jdom.Element)
@@ -749,9 +752,9 @@ public class Experiment implements ExperimentInterface {
 	public void setDataOfChildElement(Element childElement) {
 		// empty
 	}
-
+	
 	public void writeToFile(File targetDir) {
-
+		
 		int cnt = 1;
 		for (Document doc : getDocuments(this)) {
 			String name = "Omics-Data " + (cnt++);
@@ -763,7 +766,7 @@ public class Experiment implements ExperimentInterface {
 					+ name + ".xml");
 		}
 	}
-
+	
 	public Experiment cloneOldStyle() {
 		Experiment clone = null;
 		ArrayList<Document> dl = Experiment.getDocuments(this);
@@ -779,7 +782,7 @@ public class Experiment implements ExperimentInterface {
 		}
 		return clone;
 	}
-
+	
 	@Override
 	public Experiment clone() {
 		Experiment clone = new Experiment();
@@ -800,7 +803,7 @@ public class Experiment implements ExperimentInterface {
 		}
 		return clone;
 	}
-
+	
 	/**
 	 * Use experiment.addAndMerge instead.
 	 */
@@ -809,7 +812,7 @@ public class Experiment implements ExperimentInterface {
 			ExperimentInterface toBeAdded) {
 		result.addAndMerge(toBeAdded);
 	}
-
+	
 	@Override
 	public void addAndMerge(ExperimentInterface toBeAdded) {
 		if (isEmpty() && toBeAdded.isEmpty())
@@ -818,7 +821,7 @@ public class Experiment implements ExperimentInterface {
 			for (SubstanceInterface tobeMerged : toBeAdded)
 				Substance.addAndMerge(this, tobeMerged, false);
 	}
-
+	
 	public static String[] getTimes(ExperimentInterface experimentData) {
 		TreeSet<String> times = new TreeSet<String>();
 		for (SubstanceInterface md : experimentData) {
@@ -835,7 +838,7 @@ public class Experiment implements ExperimentInterface {
 		else
 			return new String[] { XPathHelper.noGivenTimeStringConstant };
 	}
-
+	
 	public static String[] getConditionsAsString(
 			ExperimentInterface experimentData) {
 		TreeSet<String> plants = new TreeSet<String>();
@@ -849,7 +852,7 @@ public class Experiment implements ExperimentInterface {
 		else
 			return new String[] { XPathHelper.noGivenTimeStringConstant };
 	}
-
+	
 	public static boolean isReplicateDataMissing(ExperimentInterface md) {
 		boolean oneWithMoreThanOne = false;
 		all: for (SubstanceInterface m : md)
@@ -862,7 +865,7 @@ public class Experiment implements ExperimentInterface {
 				}
 		return !oneWithMoreThanOne;
 	}
-
+	
 	/**
 	 * Use experiment.getNumberOfMeasurementValues() instead.
 	 */
@@ -874,7 +877,7 @@ public class Experiment implements ExperimentInterface {
 		}
 		return res;
 	}
-
+	
 	@Override
 	public int getNumberOfMeasurementValues() {
 		int res = 0;
@@ -883,7 +886,7 @@ public class Experiment implements ExperimentInterface {
 		}
 		return res;
 	}
-
+	
 	/**
 	 * Use experiment.getMeasurementValuesSum() instead.
 	 */
@@ -895,7 +898,7 @@ public class Experiment implements ExperimentInterface {
 		}
 		return res;
 	}
-
+	
 	@Override
 	public double getMeasurementValuesSum() {
 		double res = 0;
@@ -904,7 +907,7 @@ public class Experiment implements ExperimentInterface {
 		}
 		return res;
 	}
-
+	
 	@Override
 	public String toHTMLstring() {
 		StringBuilder sb = new StringBuilder();
@@ -913,7 +916,7 @@ public class Experiment implements ExperimentInterface {
 				+ "<tr><th>Experiment</th><th>"
 				+ StringManipulationTools.removeHTMLtags(getName())
 				+ "</th></tr>" + tableRowBreak);
-
+		
 		Map<String, Object> attributeValueMap = new HashMap<String, Object>();
 		header.fillAttributeMap(attributeValueMap,
 				getNumberOfMeasurementValues());
@@ -940,30 +943,30 @@ public class Experiment implements ExperimentInterface {
 		sb.append("</table>");
 		return sb.toString();
 	}
-
+	
 	private HashMap<String, String> getNiceHTMLfieldNameMapping() {
 		HashMap<String, String> res = new HashMap<String, String>();
-
+		
 		res.put("experimenttype", "<!-- A -->Type of Experiment");
 		res.put("startdate", "<!-- C BR -->Experiment Start");
-
+		
 		res.put("database", "<!-- D-->Database");
 		res.put("origin", "<!-- D-->Origin");
 		res.put("importdate", "<!-- E -->Import Date");
 		res.put("excelfileid", "<!-- F BR -->Experiment ID");
-
+		
 		res.put("importusername", "<!-- G -->Owner");
 		res.put("coordinator", "<!-- H -->Coordinator");
 		res.put("importusergroup", "<!-- I BR -->Data Visibility");
-
+		
 		res.put("remark", "<!-- J -->Remark");
 		res.put("sequence", "<!-- K BR -->Sequence");
-
+		
 		res.put("measurements", "<!-- L -->Numeric Measurements");
 		res.put("imagefiles", "<!-- M -->Binary Files");
 		return res;
 	}
-
+	
 	@Override
 	public void numberConditions() {
 		TreeSet<String> conditions = new TreeSet<String>();
@@ -987,7 +990,7 @@ public class Experiment implements ExperimentInterface {
 			}
 		}
 	}
-
+	
 	public void sortSubstances() {
 		Collections.sort(md, new Comparator<SubstanceInterface>() {
 			@Override
@@ -995,5 +998,26 @@ public class Experiment implements ExperimentInterface {
 				return o1.getName().compareTo(o2.getName());
 			}
 		});
+	}
+	
+	public static ExperimentInterface loadFromFile(String fileName)
+			throws FileNotFoundException, IOException, ParserConfigurationException, SAXException {
+		try (InputStream in = new FileInputStream(fileName)) {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document w3Doc = builder.parse(in);
+			Experiment md = Experiment.getExperimentFromDOM(w3Doc);
+			return md;
+		}
+	}
+	
+	@Override
+	public void saveToFile(String fileName) throws IOException {
+		TextFile.write(fileName, toString());
+		// stream = new FileOutputStream(xmlFile);
+		// org.jdom.Document dd = JDOM2DOM.getJDOMfromDOM(getDocument());
+		// out.output(dd, stream);
+		// stream.close();
+		
 	}
 }

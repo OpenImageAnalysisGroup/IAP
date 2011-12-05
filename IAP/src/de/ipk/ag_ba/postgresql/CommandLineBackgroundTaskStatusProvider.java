@@ -6,6 +6,8 @@
  */
 package de.ipk.ag_ba.postgresql;
 
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
@@ -68,11 +70,12 @@ public class CommandLineBackgroundTaskStatusProvider extends
 				&& lastProgress != getCurrentStatusValue()) {
 			System.out.println();
 			System.out
-					.println("****************************************************************************************");
+					.println("***********************************************************************************************");
 			System.out.println(SystemAnalysisExt.getCurrentTime()
 					+ "> INFO: Progress: " + getCurrentStatusValue() + "% // "
 					+ getCurrentStatusMessage1() + " // "
-					+ getCurrentStatusMessage2());
+					+ getCurrentStatusMessage2() + " // Load: " + (int) (10d * SystemAnalysisExt.getRealSystemCpuLoad()) / 10
+					+ " // Mem: " + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB");
 			if (firstProgressFineValue >= 0
 					&& firstProgressFineValue < getCurrentStatusValueFine()
 					&& System.currentTimeMillis() - firstProgressFineTime > 0) {
@@ -94,7 +97,7 @@ public class CommandLineBackgroundTaskStatusProvider extends
 						+ remain);
 			}
 			System.out
-					.println("****************************************************************************************");
+					.println("***********************************************************************************************");
 			lastOutput = System.currentTimeMillis();
 			lastProgress = getCurrentStatusValue();
 			

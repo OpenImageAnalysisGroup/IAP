@@ -42,62 +42,87 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	
 	public Collection<ExperimentHeaderInterface> getHeaders();
 	
+	@Override
 	public boolean isEmpty();
 	
+	@Override
 	public void add(int index, SubstanceInterface element);
 	
+	@Override
 	public boolean add(SubstanceInterface e);
 	
+	@Override
 	public boolean addAll(Collection<? extends SubstanceInterface> c);
 	
+	@Override
 	public boolean addAll(int index, Collection<? extends SubstanceInterface> c);
 	
+	@Override
 	public boolean contains(Object o);
 	
+	@Override
 	public boolean containsAll(Collection<?> arg0);
 	
 	public void ensureCapacity(int minCapacity);
 	
+	@Override
 	public int indexOf(Object o);
 	
+	@Override
 	public int lastIndexOf(Object o);
 	
+	@Override
 	public ListIterator<SubstanceInterface> listIterator();
 	
+	@Override
 	public ListIterator<SubstanceInterface> listIterator(int index);
 	
+	@Override
 	public SubstanceInterface remove(int index);
 	
+	@Override
 	public boolean remove(Object o);
 	
+	@Override
 	public boolean removeAll(Collection<?> arg0);
 	
+	@Override
 	public boolean retainAll(Collection<?> arg0);
 	
+	@Override
 	public SubstanceInterface set(int index, SubstanceInterface element);
 	
+	@Override
 	public List<SubstanceInterface> subList(int fromIndex, int toIndex);
 	
+	@Override
 	public Object[] toArray();
 	
+	@Override
 	public <T> T[] toArray(T[] a);
 	
+	@Override
 	public String toString();
 	
 	public String toStringWithErrorThrowing() throws IOException, TransformerException, JDOMException;
 	
 	public void trimToSize();
 	
+	@Override
 	public int size();
 	
+	@Override
 	public SubstanceInterface get(int index);
 	
+	@Override
 	public Iterator<SubstanceInterface> iterator();
 	
+	@Override
 	public void clear();
 	
 	public String getSequence();
 	
+	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap);
 	
 	public int getNumberOfMeasurementValues();
@@ -109,5 +134,7 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	public String toHTMLstring();
 	
 	public void numberConditions();
+	
+	public void saveToFile(String string) throws IOException;
 	
 }
