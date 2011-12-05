@@ -19,12 +19,12 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class BlockResults implements BlockResultSet {
-
+	
 	private final TreeMap<Integer, TreeMap<String, Double>> storedNumerics = new TreeMap<Integer, TreeMap<String, Double>>();
 	private final HashMap<String, FlexibleImage> storedImages = new HashMap<String, FlexibleImage>();
 	private final HashMap<String, VolumeData> storedVolumes = new HashMap<String, VolumeData>();
 	private final ArrayList<RunnableOnImageSet> storedPostProcessors = new ArrayList<RunnableOnImageSet>();
-
+	
 	@Override
 	public synchronized BlockProperty getNumericProperty(
 			int currentPositionInPipeline, int searchIndex, Enum<?> pName) {
@@ -60,29 +60,29 @@ public class BlockResults implements BlockResultSet {
 			}
 		}
 	}
-
+	
 	@Override
 	public synchronized void setNumericProperty(int position, Enum<?> name,
 			double value) {
 		if (!storedNumerics.containsKey(position))
 			storedNumerics.put(position, new TreeMap<String, Double>());
-
+		
 		storedNumerics.get(position).put(name.name(), value);
 	}
-
+	
 	@Override
 	public synchronized void setNumericProperty(int position, String name,
 			double value) {
 		if (!storedNumerics.containsKey(position))
 			storedNumerics.put(position, new TreeMap<String, Double>());
-
+		
 		storedNumerics.get(position).put(name, value);
 	}
-
+	
 	@Override
 	public synchronized String toString() {
 		StringBuilder sb = new StringBuilder();
-
+		
 		for (Integer index : storedNumerics.keySet()) {
 			sb.append("BLOCK: " + index + ": \n");
 			for (String property : storedNumerics.get(index).keySet()) {
@@ -90,20 +90,20 @@ public class BlockResults implements BlockResultSet {
 						+ storedNumerics.get(index).get(property) + "\n");
 			}
 		}
-
+		
 		return sb.toString();
 	}
-
+	
 	@Override
 	public synchronized int getBlockPosition() {
 		return storedNumerics.lastKey();
 	}
-
+	
 	@Override
 	public synchronized int getNumberOfBlocksWithPropertyResults() {
 		return storedNumerics.size();
 	}
-
+	
 	@Override
 	public synchronized int getNumberOfBlocksWithThisProperty(Enum<?> pName) {
 		String name = pName.name();
@@ -117,7 +117,7 @@ public class BlockResults implements BlockResultSet {
 		}
 		return foundCount;
 	}
-
+	
 	@Override
 	public synchronized ArrayList<BlockPropertyValue> getProperties(
 			String search) {
@@ -155,16 +155,16 @@ public class BlockResults implements BlockResultSet {
 			}
 		return result;
 	}
-
+	
 	TreeMap<String, String> name2unit = getUnits();
-
+	
 	private String getUnitFromName(String name) {
 		if (name2unit.containsKey(name))
 			return name2unit.get(name);
 		else
 			return "";
 	}
-
+	
 	private TreeMap<String, String> getUnits() {
 		TreeMap<String, String> res = new TreeMap<String, String>();
 		res.put("top.fluo.intensity.average", "relative / pix");
@@ -296,10 +296,10 @@ public class BlockResults implements BlockResultSet {
 		res.put("top.fluo.intensity.chlorophyl.average", "relative");
 		res.put("top.fluo.intensity.phenol.average", "relative");
 		res.put("top.fluo.intensity.phenol.chlorophyl.ratio", "relative");
-
+		
 		return res;
 	}
-
+	
 	@Override
 	public synchronized void storeResults(String id_prefix,
 			ResultsTable numericResults, int position) {
@@ -312,51 +312,53 @@ public class BlockResults implements BlockResultSet {
 			}
 		}
 	}
-
+	
 	@Override
 	public synchronized void printAnalysisResults() {
 		for (BlockPropertyValue bpv : getProperties("RESULT_")) {
 			if (bpv.getName() == null)
 				continue;
-
+			
 			System.out.println(bpv.getName()
 					+ "="
 					+ StringManipulationTools.formatNumber(bpv.getValue(),
 							"#.###") + " " + bpv.getUnit());
 		}
 	}
-
+	
 	@Override
 	public void setImage(String id, FlexibleImage image) {
 		storedImages.put(id, image);
 	}
-
+	
 	@Override
 	public FlexibleImage getImage(String id) {
-		return storedImages.get(id);
+		FlexibleImage res = storedImages.get(id);
+		storedImages.remove(id);
+		return res;
 	}
-
+	
 	@Override
 	public void setVolume(String string, VolumeData volume) {
 		storedVolumes.put(string, volume);
 	}
-
+	
 	@Override
 	public Set<String> getVolumeNames() {
 		return storedVolumes.keySet();
 	}
-
+	
 	@Override
 	public VolumeData getVolume(String string) {
 		return storedVolumes.get(string);
 	}
-
+	
 	@Override
 	public synchronized void addImagePostProcessor(
 			RunnableOnImageSet runnableOnImageSet) {
 		storedPostProcessors.add(runnableOnImageSet);
 	}
-
+	
 	@Override
 	public synchronized ArrayList<RunnableOnImageSet> getStoredPostProcessors(
 			ImageConfiguration conf) {

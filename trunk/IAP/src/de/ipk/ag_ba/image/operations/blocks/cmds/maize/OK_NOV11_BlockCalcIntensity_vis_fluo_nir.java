@@ -1,8 +1,9 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
+import ij.measure.ResultsTable;
+
 import org.graffiti.plugin.parameter.Parameter;
 
-import ij.measure.ResultsTable;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -13,14 +14,11 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * Calculates overall properties of the vis, fluo and nir images, such as number of pixels, intensities, NDVI and more.
- * 
  * Is used in the current pipelines for maize and barley.
- * 
  * Does not need any input parameters.
  * 
  * @author klukas, pape
- * 
- * status: ok, 23.11.2011, c. klukas
+ *         status: ok, 23.11.2011, c. klukas
  */
 public class OK_NOV11_BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -41,8 +39,9 @@ public class OK_NOV11_BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAn
 		if (getInput().getMasks().getNir() != null)
 			this.nirFilledPixels = getInput().getMasks().getNir().getIO().countFilledPixels();
 		
-		if (getProperties().getImage("nir_skeleton") != null)
-			this.nirSkeletonFilledPixels = getProperties().getImage("nir_skeleton").getIO().countFilledPixels();
+		FlexibleImage nirSkel = getProperties().getImage("nir_skeleton");
+		if (nirSkel != null)
+			this.nirSkeletonFilledPixels = nirSkel.getIO().countFilledPixels();
 		
 		if (getProperties() != null && getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
 			markerDistanceHorizontally = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
@@ -90,7 +89,7 @@ public class OK_NOV11_BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAn
 		if (getInput().getMasks().getFluo() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
 			ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
-						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), true); // markerDistanceHorizontally
+					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), true); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return io.getImage();
@@ -146,13 +145,13 @@ public class OK_NOV11_BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAn
 		} else
 			return null;
 	}
-
+	
 	@Override
 	public Parameter[] getParameters() {
 		// no parameters are needed
 		return new Parameter[] {};
 	}
-
+	
 	@Override
 	public void setParameters(Parameter[] params) {
 		super.setParameters(params);

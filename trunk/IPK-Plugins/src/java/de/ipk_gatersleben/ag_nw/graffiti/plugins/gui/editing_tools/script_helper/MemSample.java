@@ -8,13 +8,15 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 
 public class MemSample {
 	
-	private double value;
-	private int replicate;
-	private int plantID;
-	private String optTimeUnit;
-	private Integer optTimeValueForComparison;
+	private final double value;
+	private final int replicate;
+	private final long plantID;
+	private final String optTimeUnit;
+	private final Integer optTimeValueForComparison;
+	private Long optFineTimeValueForComparison;
+	private String optQualityAnnotation;
 	
-	public MemSample(double value, int replicate, int plantID, String unit, String optTimeUnit, Integer optTimeValueForComparision) {
+	public MemSample(double value, int replicate, long plantID, String unit, String optTimeUnit, Integer optTimeValueForComparision) {
 		this.value = value;
 		this.replicate = replicate;
 		this.plantID = plantID;
@@ -22,16 +24,31 @@ public class MemSample {
 		this.optTimeValueForComparison = optTimeValueForComparision;
 	}
 	
-	public double getPlantID() {
+	public MemSample(double value, String replicateAndOptQualityAnnotation, long plantID, String unit, String optTimeUnit,
+			String optTimeValueAndFineTimeValueForComparison) {
+		this.value = value;
+		this.replicate = Integer.parseInt(replicateAndOptQualityAnnotation.split(";", 2)[0]);
+		this.setOptQualityAnnotation(replicateAndOptQualityAnnotation.split(";", 2)[1]);
+		this.plantID = plantID;
+		this.optTimeUnit = optTimeUnit;
+		this.optTimeValueForComparison = Integer.parseInt(optTimeValueAndFineTimeValueForComparison.split(";", 2)[0]);
+		this.optFineTimeValueForComparison = Long.parseLong(optTimeValueAndFineTimeValueForComparison.split(";", 2)[1]);
+	}
+	
+	public long getPlantID() {
 		return plantID;
 	}
 	
-	public double getReplicateID() {
+	public int getReplicateID() {
 		return replicate;
 	}
 	
-	public Double getTime() {
-		return new Double(optTimeValueForComparison);
+	public Integer getTime() {
+		return optTimeValueForComparison;
+	}
+	
+	public Long getOptTimeValueFine() {
+		return optFineTimeValueForComparison;
 	}
 	
 	public double getValue() {
@@ -40,5 +57,13 @@ public class MemSample {
 	
 	public String getTimeUnit() {
 		return optTimeUnit;
+	}
+	
+	public String getOptQualityAnnotation() {
+		return optQualityAnnotation;
+	}
+	
+	private void setOptQualityAnnotation(String optQualityAnnotation) {
+		this.optQualityAnnotation = optQualityAnnotation;
 	}
 }

@@ -9,13 +9,14 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe;
 public class ReplicateDouble {
 	private double measurementValue;
 	private String replicateNumber;
-	private String optQualityAnnotation;
+	private final String optQualityAnnotation;
 	
 	public ReplicateDouble(Object measurementValue, String replicateNumber, String optQualityAnnotation) {
 		if (measurementValue == null || (!(measurementValue instanceof Double)))
 			measurementValue = new Double(Double.NaN);
 		this.setMeasurementValue((Double) measurementValue);
 		this.setReplicateNumber(replicateNumber);
+		this.optQualityAnnotation = optQualityAnnotation;
 	}
 	
 	public void setMeasurementValue(double measurementValue) {
