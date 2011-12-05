@@ -63,7 +63,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 	
 	@Override
 	public List<ExperimentInterface> process(final List<File> files, final ExperimentDataPresenter receiver,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		return getExperimentDataFromFileList(files, status);
 	}
 	
@@ -144,9 +144,9 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 			String unit = tabledata.getUnicodeStringCellData(sci.getFirstColumn(), 22);
 			for (int columnMeasurement : sci.getColumns()) {
 				if ((unit == null && tabledata.getUnicodeStringCellData(columnMeasurement, 22) != null) ||
-									(unit != null && tabledata.getUnicodeStringCellData(columnMeasurement, 22) == null) ||
-									(unit != null && tabledata.getUnicodeStringCellData(columnMeasurement, 22) != null &&
-									!unit.equals(tabledata.getUnicodeStringCellData(columnMeasurement, 22)))) {
+						(unit != null && tabledata.getUnicodeStringCellData(columnMeasurement, 22) == null) ||
+						(unit != null && tabledata.getUnicodeStringCellData(columnMeasurement, 22) != null &&
+						!unit.equals(tabledata.getUnicodeStringCellData(columnMeasurement, 22)))) {
 					// convert columnList (columns as integers) to columns
 					// (columns in Excel notation)
 					String columns = "";
@@ -158,8 +158,8 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 					
 					if (transposed)
 						MainFrame.showMessageDialog("<html>File " + file.toString() + " was ignored.<br>" +
-											"Measurement unit for substance \"" + substance + "\" listed in " + (transposed ? "rows" : "columns") + " " +
-											columns + " is not identical!", "Error");
+								"Measurement unit for substance \"" + substance + "\" listed in " + (transposed ? "rows" : "columns") + " " +
+								columns + " is not identical!", "Error");
 					return null;
 				}
 				// measurement tool
@@ -167,7 +167,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 				if (tabledata.getUnicodeStringCellData(columnMeasurement, 21) != null)
 					measurementtool = tabledata.getUnicodeStringCellData(columnMeasurement, 21);
 				ExperimentInterface e = processSubstance(file, tabledata, conditions, samples,
-									measurementtool, columnMeasurement, columnList);
+						measurementtool, columnMeasurement, columnList);
 				if (experiment == null)
 					experiment = e;
 				else
@@ -176,7 +176,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 			currentColumn++;
 		}
 		// add sample IDs
-		int sampleID = 1;
+		long sampleID = 1;
 		if (experiment == null)
 			return null;
 		
@@ -190,10 +190,10 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 	}
 	
 	private ExperimentInterface processSubstance(final File file, TableData tabledata,
-						HashMap<Integer, ConditionInterface> conditions,
-						HashMap<Integer, SampleInterface> samples,
-						String measurementtool,
-						int columnMeasurement, String columnList) {
+			HashMap<Integer, ConditionInterface> conditions,
+			HashMap<Integer, SampleInterface> samples,
+			String measurementtool,
+			int columnMeasurement, String columnList) {
 		ExperimentInterface experiment = new Experiment();
 		
 		SubstanceInterface substance = Experiment.getTypeManager().getNewSubstance();
@@ -216,7 +216,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 			ConditionInterface condition;
 			if (conditions.get(entityID) == null) {
 				MainFrame.showMessageDialog("<html>File " + file.toString() + " was ignored.<br>" +
-									"No corresponding column found in row 11 for entity ID " + entityID + "!", "Error");
+						"No corresponding column found in row 11 for entity ID " + entityID + "!", "Error");
 				return null;
 			}
 			condition = conditions.get(entityID).clone(substancecopy);
@@ -275,7 +275,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 				}
 			} catch (Exception e) {
 				MainFrame.showMessageDialog("<html>File " + file.toString() + " was ignored.<br>" +
-									"Row 11, Column " + TableData.getExcelColumnName(column) + ": entity ID not numerical!", "Error");
+						"Row 11, Column " + TableData.getExcelColumnName(column) + ": entity ID not numerical!", "Error");
 				return null;
 			}
 		return conditions;
@@ -361,8 +361,8 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 	}
 	
 	private NumericMeasurementInterface getMeasurementData(TableData tabledata,
-						SampleInterface sample, int columnMeasurement, String columnList,
-						int row, Double od) {
+			SampleInterface sample, int columnMeasurement, String columnList,
+			int row, Double od) {
 		NumericMeasurementInterface measurementdata = Experiment.getTypeManager().getNewMeasurement(sample);
 		// replicate ID
 		Object replicateIDObj = tabledata.getCellData(col("B"), row, null);

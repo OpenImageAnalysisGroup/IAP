@@ -93,7 +93,7 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 			return;
 		
 		int skipCount = 0;
-		int sampleIDcount = 0;
+		long sampleIDcount = 0;
 		status1 = "Init compound database";
 		status2 = "";
 		if (statusProvider != null)
@@ -147,8 +147,8 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		
 	}
 	
-	private int processSubstanceEntries(TableData myData, Experiment e,
-			int sampleIDcount, SubstanceColumnInformation sci) {
+	private long processSubstanceEntries(TableData myData, Experiment e,
+			long sampleIDcount, SubstanceColumnInformation sci) {
 		CompoundEntry ce;
 		
 		SubstanceInterface s = Experiment.getTypeManager().getNewSubstance();
@@ -182,7 +182,7 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		return sampleIDcount;
 	}
 	
-	private int processLineEntries(TableData myData, int sampleIDcount,
+	private long processLineEntries(TableData myData, long sampleIDcount,
 			SubstanceColumnInformation sci, SubstanceInterface s, int colPlant,
 			Object plantIDval, String plantOrLine) {
 		int lineID = (plantIDval instanceof Integer) ? (Integer) plantIDval
@@ -228,7 +228,7 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		return sampleIDcount;
 	}
 	
-	private int processSampleEntries(TableData myData, int sampleIDcount,
+	private long processSampleEntries(TableData myData, long sampleIDcount,
 			SubstanceColumnInformation sci, ConditionInterface c,
 			SampleEntry sample) {
 		// ADD SAMPLE ENTRY

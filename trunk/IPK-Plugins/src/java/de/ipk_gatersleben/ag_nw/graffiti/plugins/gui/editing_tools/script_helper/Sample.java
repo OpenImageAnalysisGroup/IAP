@@ -41,6 +41,7 @@ public class Sample implements SampleInterface {
 	
 	private static final String[] attributeNames = new String[] { "id", "measurementtool", "time", "unit", "ttest" };
 	
+	@Override
 	public void getString(StringBuilder r) {
 		r.append("<sample");
 		getXMLAttributeString(r);
@@ -53,32 +54,38 @@ public class Sample implements SampleInterface {
 		r.append("</sample>");
 	}
 	
+	@Override
 	public void getXMLAttributeString(StringBuilder r) {
 		Substance.getAttributeString(r, attributeNames, getAttributeValues());
 	}
 	
 	private Object[] getAttributeValues() {
 		return new Object[] { getRowId(), getMeasurementtool(), getTime(), getTimeUnit(),
-							getTtestInfo().toString() };
+				getTtestInfo().toString() };
 	}
 	
+	@Override
 	public void getStringOfChildren(StringBuilder r) {
 		for (NumericMeasurementInterface m : this)
 			m.getString(r);
 	}
 	
+	@Override
 	public ConditionInterface getParentCondition() {
 		return parent;
 	}
 	
+	@Override
 	public void setSampleTtestInfo(TtestInfo info) {
 		setTtestInfo(info);
 	}
 	
+	@Override
 	public String getSampleTime() {
 		return getTimeUnit() + " " + getTime();
 	}
 	
+	@Override
 	public Double[] getDataList() {
 		Double[] result = new Double[size()];
 		int idx = 0;
@@ -87,12 +94,14 @@ public class Sample implements SampleInterface {
 		return result;
 	}
 	
+	@Override
 	public SampleAverageInterface getSampleAverage() {
 		if (sampleAverage == null)
 			recalculateSampleAverage();
 		return sampleAverage;
 	}
 	
+	@Override
 	public void setSampleAverage(SampleAverageInterface average) {
 		sampleAverage = average;
 	}
@@ -105,6 +114,7 @@ public class Sample implements SampleInterface {
 	// getMeasurements().add(m);
 	// }
 	
+	@Override
 	public String getTimeUnit() {
 		if (timeUnit == null)
 			timeUnit = Sample.UNSPECIFIED_TIME_STRING;
@@ -120,6 +130,7 @@ public class Sample implements SampleInterface {
 	 * @return A id, which may be used to compare the data point with other data
 	 *         points from other substances.
 	 */
+	@Override
 	public DataMappingId getFullId() {
 		int seriesId = parent.getSeriesId();
 		String expName = parent.getExperimentName();
@@ -131,9 +142,10 @@ public class Sample implements SampleInterface {
 		String timeU = getTimeUnit();
 		
 		return DataMappingId.getEmptyDataMappingWithoutReplicateInformation(seriesId, expName, seriesName, species,
-							genotype, rowId, timeP, timeU);
+				genotype, rowId, timeP, timeU);
 	}
 	
+	@Override
 	public void recalculateSampleAverage() {
 		if (sampleAverage == null) {
 			if (size() > 0)
@@ -142,10 +154,12 @@ public class Sample implements SampleInterface {
 			sampleAverage.calculateValuesFromSampleData();
 	}
 	
+	@Override
 	public TtestInfo getTtestInfo() {
 		return ttestInfo;
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public boolean setData(Element sampleElement) {
 		List attributeList = sampleElement.getAttributes();
@@ -165,25 +179,27 @@ public class Sample implements SampleInterface {
 		return true;
 	}
 	
+	@Override
 	public double calcMean() {
 		return sampleAverage.getValue();
 	}
 	
+	@Override
 	public void setAttribute(Attribute attr) {
-		String val = attr!=null ? attr.getValue() : null;
+		String val = attr != null ? attr.getValue() : null;
 		if (val == null)
 			return;
-		if (val.length()>0 && val.contains("~"))
+		if (val.length() > 0 && val.contains("~"))
 			attr.setValue(StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#")));
 		else
- 			attr.setValue(val);
+			attr.setValue(val);
 		
 		if (attr.getName().equals("id")) {
 			try {
 				if (attr.getValue().length() > 0)
 					setRowId(Long.parseLong(attr.getValue()));
 				else
-					setRowId(-1);
+					setRowId(-1l);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -207,6 +223,7 @@ public class Sample implements SampleInterface {
 							System.err.println("Internal Error: Unknown Sample Attribute: " + attr.getName());
 	}
 	
+	@Override
 	public void setDataOfChildElement(Element childElement) {
 		if (childElement.getName().equals("average")) {
 			SampleAverageInterface s = Experiment.getTypeManager().getNewSampleAverage(this);
@@ -220,43 +237,53 @@ public class Sample implements SampleInterface {
 			}
 	}
 	
+	@Override
 	public void setMeasurementtool(String measurementtool) {
 		this.measurementtool = measurementtool;
 	}
 	
+	@Override
 	public String getMeasurementtool() {
 		return measurementtool;
 	}
 	
+	@Override
 	public void setTimeUnit(String timeUnit) {
 		this.timeUnit = timeUnit;
 	}
 	
+	@Override
 	public void setTime(int time) {
 		this.time = time;
 	}
 	
+	@Override
 	public int getTime() {
 		return time;
 	}
 	
-	public void setRowId(long rowId) {
+	@Override
+	public void setRowId(Long rowId) {
 		this.rowId = rowId;
 	}
 	
+	@Override
 	public Long getRowId() {
 		return rowId;
 	}
 	
+	@Override
 	public void setTtestInfo(TtestInfo ttestInfo) {
 		this.ttestInfo = ttestInfo;
 	}
 	
+	@Override
 	public void setParent(ConditionInterface series) {
 		parent = series;
 		
 	}
 	
+	@Override
 	public String getAverageUnit() {
 		Collection<NumericMeasurementInterface> col = this;
 		if (col == null || col.size() <= 0)
@@ -268,27 +295,33 @@ public class Sample implements SampleInterface {
 	/*
 	 * Delegate Methods
 	 */
-
+	
+	@Override
 	public boolean add(NumericMeasurementInterface e) {
 		return measurements.add(e);
 	}
 	
+	@Override
 	public boolean addAll(Collection<? extends NumericMeasurementInterface> c) {
 		return measurements.addAll(c);
 	}
 	
+	@Override
 	public void clear() {
 		measurements.clear();
 	}
 	
+	@Override
 	public boolean contains(Object o) {
 		return measurements.contains(o);
 	}
 	
+	@Override
 	public boolean containsAll(Collection<?> c) {
 		return measurements.containsAll(c);
 	}
 	
+	@Override
 	public boolean isEmpty() {
 		return measurements.isEmpty();
 	}
@@ -296,32 +329,39 @@ public class Sample implements SampleInterface {
 	/**
 	 * Don't forget to call updateSampleAverage after removing a measurement.
 	 */
+	@Override
 	public boolean remove(Object o) {
 		if (o instanceof NumericMeasurement)
 			((NumericMeasurement) o).setParentSample(null);
 		return measurements.remove(o);
 	}
 	
+	@Override
 	public boolean removeAll(Collection<?> c) {
 		return measurements.removeAll(c);
 	}
 	
+	@Override
 	public boolean retainAll(Collection<?> c) {
 		return measurements.retainAll(c);
 	}
 	
+	@Override
 	public int size() {
 		return measurements.size();
 	}
 	
+	@Override
 	public Object[] toArray() {
 		return measurements.toArray();
 	}
 	
+	@Override
 	public <T> T[] toArray(T[] a) {
 		return measurements.toArray(a);
 	}
 	
+	@Override
 	public Iterator<NumericMeasurementInterface> iterator() {
 		return measurements.iterator();
 	}
@@ -332,6 +372,7 @@ public class Sample implements SampleInterface {
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#fillAttributeMap(java.util.Map)
 	 */
+	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
 		Object[] values = getAttributeValues();
 		int idx = 0;
@@ -388,6 +429,7 @@ public class Sample implements SampleInterface {
 	// return s1.hashCode();
 	// }
 	//
+	@Override
 	public SampleInterface clone(ConditionInterface parent) {
 		SampleInterface s = Experiment.getTypeManager().getNewSample(parent);
 		s.setMeasurementtool(getMeasurementtool());

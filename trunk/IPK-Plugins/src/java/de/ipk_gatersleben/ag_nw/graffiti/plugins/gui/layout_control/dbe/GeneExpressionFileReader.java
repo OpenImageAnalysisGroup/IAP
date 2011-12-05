@@ -39,7 +39,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 	
 	@Override
 	public ExperimentInterface getXMLDataFromExcelTable(File excelFile, TableData myData,
-						BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
 		System.out.println("Read Template 2...");
 		status1 = "Process file content...";
 		status2 = "";
@@ -67,7 +67,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 		status2 = "";
 		
 		ExperimentInterface e = getExperimentMeasurementsElement(excelFile, myData, new ExperimentData(), ec_number,
-							data_start_col, anno);
+				data_start_col, anno);
 		
 		e.setHeader(header);
 		
@@ -97,7 +97,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 	 * @param excelColumnHeader
 	 */
 	private void checkHeaderInfo(ArrayList<Annotation> anno, TableData myData, String attributeName,
-						String excelColumnHeader) {
+			String excelColumnHeader) {
 		if (getHeaderColumn(myData, excelColumnHeader) >= 0) {
 			anno.add(new Annotation(attributeName, getHeaderColumn(myData, excelColumnHeader)));
 		} else {
@@ -106,14 +106,14 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 	}
 	
 	protected ExperimentInterface getExperimentMeasurementsElement(File excelFile, TableData myData,
-						ExperimentData experimentData, int ec_number_col, int data_start_col, ArrayList<Annotation> anno) {
+			ExperimentData experimentData, int ec_number_col, int data_start_col, ArrayList<Annotation> anno) {
 		
 		if (checkStopp())
 			return null;
 		
 		ExperimentInterface e = new Experiment();
 		
-		int sampleIDcount = 0;
+		long sampleIDcount = 0;
 		int dataCount = 0;
 		int skipCount = 0;
 		
@@ -130,14 +130,14 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 			if (val != null) {
 				if (knownSubstanceIds.contains(val)) {
 					ErrorMsg
-										.addErrorMessage("<b>Duplicate substance row (row "
-															+ row
-															+ "). Substance ID: "
-															+ val
-															+ "</b><br>"
-															+ "For this input format duplicate substance name definitions in different rows are not supported.<br>"
-															+ "Please specify each substance in exactly one row. In case of replicates, use different columns, and specify the<br>"
-															+ "replicate ID as defined by the input format. Use the same row for these replicates for one measured substance.");
+							.addErrorMessage("<b>Duplicate substance row (row "
+									+ row
+									+ "). Substance ID: "
+									+ val
+									+ "</b><br>"
+									+ "For this input format duplicate substance name definitions in different rows are not supported.<br>"
+									+ "Please specify each substance in exactly one row. In case of replicates, use different columns, and specify the<br>"
+									+ "replicate ID as defined by the input format. Use the same row for these replicates for one measured substance.");
 					errCnt++;
 				}
 				knownSubstanceIds.add(val);
@@ -146,18 +146,19 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 		knownSubstanceIds.clear();
 		if (errCnt > 0) {
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					MainFrame.showMessageDialog("<html>For this input format each measured substance needs to be placed<br>"
-										+ "in a single row. Multiple rows for the same substance are not supported.<br>"
-										+ "Use different columns but the same row for different rows and time points.<br>"
-										+ "Error details are available from the menu command Help/Error Messages", "Format Error");
+							+ "in a single row. Multiple rows for the same substance are not supported.<br>"
+							+ "Use different columns but the same row for different rows and time points.<br>"
+							+ "Error details are available from the menu command Help/Error Messages", "Format Error");
 				}
 			});
 		} else {
 			
 			for (int row = 2; row <= myData.getMaximumRow(); row++) {
 				status1 = "Processing row " + (row - 1) + "/" + (myData.getMaximumRow() - 1) + ", " + skipCount
-									+ " invalid rows skipped";
+						+ " invalid rows skipped";
 				status2 = "(" + dataCount + " measurement values)";
 				if (checkStopp())
 					return null;
@@ -165,7 +166,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 				if (myData.getUnicodeStringCellData(ec_number_col, row) == null) {
 					skipCount++;
 					ErrorMsg.addErrorMessage("Data row with missing or invalid identifier (row " + row + ", column "
-										+ ec_number_col + ")");
+							+ ec_number_col + ")");
 					continue;
 				}
 				
@@ -183,7 +184,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 				// add annotations as attributes
 				for (Annotation ann : anno) {
 					substanceEntry.setAttribute(new Attribute(ann.getTitle(), myData.getCellData(ann.getColumn(), row, "")
-										.toString()));
+							.toString()));
 				}
 				
 				// ************** ADD LINE ELEMENTS **************
@@ -206,14 +207,14 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 					// ********* ADD SAMPLES (TIME VALUES FOR ONE LINE like emb, per,
 					// ...) **************
 					for (Iterator<TimeAndPlantName> sampleIt = experimentData.getSampleTimeIterator(myData, plantOrLine,
-										data_start_col, 1, row); sampleIt.hasNext();) {
+							data_start_col, 1, row); sampleIt.hasNext();) {
 						TimeAndPlantName timeAndPlantName = sampleIt.next();
 						
 						// ADD SAMPLE ENTRY
 						SampleInterface sampleEntry = Experiment.getTypeManager().getNewSample(lineEntry);
 						lineEntry.add(sampleEntry);
 						// ADD SAMPLE ATTRIBUTES: ID, TIME, UNIT
-						sampleEntry.setRowId(new Integer(++sampleIDcount));
+						sampleEntry.setRowId(++sampleIDcount);
 						sampleEntry.setTime(new Integer(timeAndPlantName.getTime()));
 						if (optTimeUnit != null && optTimeUnit.length() > 0)
 							sampleEntry.setTimeUnit(optTimeUnit);
@@ -221,9 +222,9 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 							sampleEntry.setTimeUnit("day");
 						
 						ArrayList<DataColumnHeader> replicates = experimentData.getReplicateColumns(myData, timeAndPlantName,
-											data_start_col, 1, row);
+								data_start_col, 1, row);
 						ArrayList<ReplicateDouble> measurements = experimentData
-											.getMeasurementValues(myData, replicates, row);
+								.getMeasurementValues(myData, replicates, row);
 						// int numRepl = replicates.size();
 						// ADD AVERAGE ENTRY
 						SampleAverage averageEntry = Experiment.getTypeManager().getNewSampleAverage(sampleEntry);
@@ -286,7 +287,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 	 * unit="&#00181;mol/g">125.640731640212</data> <data
 	 * unit="&#00181;mol/g">125.598092379386</data> ...
 	 */
-
+	
 	private ExperimentHeader getExperimentHeaderElement(File excelFile, TableData myData, ExperimentData experimentData) {
 		
 		ExperimentHeader res = new ExperimentHeader();

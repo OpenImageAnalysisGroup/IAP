@@ -72,7 +72,7 @@ public class CommandLineBackgroundTaskStatusProvider extends
 			System.out
 					.println("***********************************************************************************************");
 			System.out.println(SystemAnalysisExt.getCurrentTime()
-					+ "> INFO: Progress: " + getCurrentStatusValue() + "% // "
+					+ ">INFO: Progress: " + getCurrentStatusValue() + "% // "
 					+ getCurrentStatusMessage1() + " // "
 					+ getCurrentStatusMessage2() + " // Load: " + (int) (10d * SystemAnalysisExt.getRealSystemCpuLoad()) / 10
 					+ " // Mem: " + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB");
@@ -88,12 +88,16 @@ public class CommandLineBackgroundTaskStatusProvider extends
 				double fullTime = 100d / speed;
 				long finishTime = (long) (System.currentTimeMillis() + remainingTime);
 				System.out.println(SystemAnalysisExt.getCurrentTime()
-						+ "> INFO: Estimated finish time (100%): "
+						+ ">INFO: Estimated finish time     : "
 						+ SystemAnalysisExt.getCurrentTime(finishTime));
 				
 				String remain = SystemAnalysisExt.getWaitTime((long) fullTime);
 				System.out.println(SystemAnalysisExt.getCurrentTime()
-						+ "> INFO: Estimated overall run time: "
+						+ ">INFO: Estimated overall run time: "
+						+ remain);
+				remain = SystemAnalysisExt.getWaitTime((long) remainingTime);
+				System.out.println(SystemAnalysisExt.getCurrentTime()
+						+ ">INFO: Estimated remaining time  : "
 						+ remain);
 			}
 			System.out
