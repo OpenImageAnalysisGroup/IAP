@@ -11,6 +11,7 @@ import info.clearthought.layout.TableLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Date;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.TreeSet;
@@ -75,8 +76,8 @@ public class MyExperimentInfoPanel extends JPanel {
 	}
 	
 	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
-						JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField remark,
-						JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
+			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField remark,
+			JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
 		
 		editB.setEnabled(editPossible);
 		if (!editPossible)
@@ -169,8 +170,8 @@ public class MyExperimentInfoPanel extends JPanel {
 	}
 	
 	public void setExperimentInfo(final MongoDB m,
-						final ExperimentHeaderInterface experimentHeader,
-						boolean startEnabled, ExperimentInterface optExperiment) {
+			final ExperimentHeaderInterface experimentHeader,
+			boolean startEnabled, ExperimentInterface optExperiment) {
 		setLayout(new TableLayout(new double[][] { { 0, 400, 0 }, { 0, TableLayout.PREFERRED, 0 } }));
 		
 		setOpaque(false);
@@ -194,14 +195,14 @@ public class MyExperimentInfoPanel extends JPanel {
 		// getGroups(login, pass, experimentHeader.getImportusergroup(),
 		// editPossible);
 		experimentTypeSelection = getExperimentTypes(m, experimentHeader.getExperimentType(), editPossible);
-		expStart = new JDateChooser(experimentHeader.getStartdate());
-		expEnd = new JDateChooser(experimentHeader.getImportdate());
+		expStart = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getStartdate() : new Date(0l));
+		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
 		remark = new JTextField(experimentHeader.getRemark());
 		
 		fp.addGuiComponentRow(new JLabel("Name"), editName, false);
 		fp.addGuiComponentRow(new JLabel("ID"), disable(new JTextField(experimentHeader.getDatabaseId() + "")), false);
 		fp.addGuiComponentRow(new JLabel("Import by"), disable(new JTextField(experimentHeader.getImportusername())),
-							false);
+				false);
 		fp.addGuiComponentRow(new JLabel("Origin"), new JLabel(experimentHeader.getOriginDbId() + ""), false);
 		fp.addGuiComponentRow(new JLabel("Database"), new JLabel(experimentHeader.getDatabase() + ""), false);
 		
@@ -212,7 +213,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
-							+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
+				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
 		if (experimentHeader.getStorageTime() != null)
 			fp.addGuiComponentRow(new JLabel("Storage Time"), new JLabel(SystemAnalysisExt.getCurrentTime(experimentHeader.getStorageTime().getTime())), false);
 		fp.addGuiComponentRow(new JLabel("History"), new JLabel(getVersionString(experimentHeader)), false);
@@ -229,6 +230,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		// setText("Create Calendar Entry");
 		
 		editB.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean restore = false;
 				
@@ -239,7 +241,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				b = !b;
 				tso.setBval(0, b);
 				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark, editB,
-									saveB, editPossible, true);
+						saveB, editPossible, true);
 				
 				if (restore) {
 					saveB.setText("Save Changes");
@@ -259,6 +261,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		});
 		
 		saveB.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean editPossibleBBB = editPossible;
 				try {
@@ -303,16 +306,16 @@ public class MyExperimentInfoPanel extends JPanel {
 				b = !b;
 				tso.setBval(0, b);
 				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark, editB,
-									saveB, editPossibleBBB, false);
+						saveB, editPossibleBBB, false);
 			}
 		});
 		
 		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark,
-							editB, saveB, editPossible, true);
+				editB, saveB, editPossible, true);
 		
 		GuiRow gr = new GuiRow(TableLayout.getSplitVertical(null, TableLayout.get3Split(null, TableLayout.get3Split(
-							editB, null, saveB, TableLayout.PREFERRED, 10, TableLayout.PREFERRED), null, TableLayout.FILL,
-							TableLayout.PREFERRED, TableLayout.FILL), 5, TableLayout.PREFERRED), null);
+				editB, null, saveB, TableLayout.PREFERRED, 10, TableLayout.PREFERRED), null, TableLayout.FILL,
+				TableLayout.PREFERRED, TableLayout.FILL), 5, TableLayout.PREFERRED), null);
 		gr.span = true;
 		
 		// if (editPossible)

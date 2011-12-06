@@ -1002,13 +1002,13 @@ public class Experiment implements ExperimentInterface {
 	
 	public static ExperimentInterface loadFromFile(String fileName)
 			throws FileNotFoundException, IOException, ParserConfigurationException, SAXException {
-		try (InputStream in = new FileInputStream(fileName)) {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document w3Doc = builder.parse(in);
-			Experiment md = Experiment.getExperimentFromDOM(w3Doc);
-			return md;
-		}
+		InputStream in = new FileInputStream(fileName);
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document w3Doc = builder.parse(in);
+		in.close();
+		Experiment md = Experiment.getExperimentFromDOM(w3Doc);
+		return md;
 	}
 	
 	@Override
