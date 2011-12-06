@@ -44,7 +44,7 @@ public class ActionTrash extends AbstractNavigationAction {
 	public ActionTrash(Collection<ExperimentHeaderInterface> headers, DeletionCommand cmd, MongoDB m) {
 		super("Perform '" + cmd + "'-operation");
 		this.m = m;
-		LinkedHashSet<ExperimentHeaderInterface> set = new LinkedHashSet<>();
+		LinkedHashSet<ExperimentHeaderInterface> set = new LinkedHashSet<ExperimentHeaderInterface>();
 		set.addAll(headers);
 		this.setHeader(set);
 		this.cmd = cmd;
@@ -199,7 +199,7 @@ public class ActionTrash extends AbstractNavigationAction {
 	
 	private void setHeaders(Set<ExperimentHeaderInterface> headers) {
 		this.headers = headers;
-		LinkedHashSet<ExperimentHeaderInterface> toBeAdded = new LinkedHashSet<>();
+		LinkedHashSet<ExperimentHeaderInterface> toBeAdded = new LinkedHashSet<ExperimentHeaderInterface>();
 		for (ExperimentHeaderInterface h : this.headers)
 			toBeAdded.addAll(h.getHistory().values());
 		for (ExperimentHeaderInterface h : toBeAdded)

@@ -618,7 +618,7 @@ public class StringManipulationTools implements HelperClass {
 	}
 	
 	public static String getStringList(Object[] elements, String div) {
-		ArrayList<Object> al = new ArrayList<>();
+		ArrayList<Object> al = new ArrayList<Object>();
 		if (elements != null)
 			for (Object o : elements)
 				al.add(o);
