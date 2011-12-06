@@ -37,7 +37,7 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 						sub[idx++] = (0xFF << 24 | (rn & 0xFF) << 16) | ((rn & 0xFF) << 8) | ((rn & 0xFF) << 0);
 					}
 					new FlexibleImage(nirImage.getWidth(), nirImage.getHeight(), sub).
-						print("subtracted gray", debug);
+							print("subtracted gray", debug);
 					int[] nirArray = nirImage.getAs1A();
 					int[] nirRefArray = nirMask.getAs1A();
 					double sum = 0;
@@ -75,12 +75,12 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 				
 				if (options.isMaize())
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).
-						adaptiveThresholdForGrayscaleImage(50, average,
-							options.getBackground(), 0.10).getImage().print("ADAPT OUT", debug);
+							adaptiveThresholdForGrayscaleImage(50, average,
+									options.getBackground(), 0.10).getImage().print("ADAPT OUT", debug);
 				else {
-					double f  = 0.08;
+					double f = 0.08;
 					if (options.isBarleyInBarleySystem())
-						f = 0.15;
+						f = 0.06;
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
 							options.getBackground(), f).getImage().print("ADAPT OUT", debug);
 				}

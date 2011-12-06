@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class SkeletonGraph {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private final int w;
 	private final int h;
 	private final int[][] skelImg;
@@ -38,7 +38,7 @@ public class SkeletonGraph {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches
-							|| p == SkeletonProcessor2d.colorBloom) {
+						|| p == SkeletonProcessor2d.colorBloom) {
 					nPoints++;
 					Node n = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForNode(x, y));
 					n.setInteger("x", x);
@@ -93,7 +93,7 @@ public class SkeletonGraph {
 						}
 						if (DEBUG)
 							System.out.println("S: " + s + " ==> E: " + e + " //// " + startNode + " // " + endNode + " // "
-												+ (startNode == null || endNode == null ? "NULL" : ""));
+									+ (startNode == null || endNode == null ? "NULL" : ""));
 						if (startNode != null && endNode != null) {
 							Edge edge = graph.addEdge(startNode, endNode, true);
 							ObjectAttribute oa = new ObjectAttribute("info");
