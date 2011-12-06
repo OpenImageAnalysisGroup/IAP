@@ -24,6 +24,7 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
@@ -222,7 +223,7 @@ public class BlockPipeline {
 	public static void debugTryAnalysis(
 			final Collection<NumericMeasurementInterface> input,
 			final MongoDB m, AbstractPhenotypingTask analysisTask) {
-		final AbstractPhenotypingTask mat = analysisTask;
+		final AbstractPhenotypingTask analysisTaskFinal = analysisTask;
 		final LinkedHashSet<Sample3D> samples = new LinkedHashSet<Sample3D>();
 		HashMap<Sample3D, Sample3D> old2newSample = new HashMap<Sample3D, Sample3D>();
 		for (NumericMeasurementInterface nmi : input) {
@@ -238,17 +239,28 @@ public class BlockPipeline {
 					nmi.clone(old2newSample.get(nmi.getParentSample())));
 		}
 		
-		mat.setInput(samples, input, m, 0, 1);
+		analysisTaskFinal.setInput(samples, input, m, 0, 1);
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-				mat.getName(), mat.getTaskDescription());
+				analysisTaskFinal.getName(), analysisTaskFinal.getTaskDescription());
 		final Runnable backgroundTask = new Runnable() {
 			@Override
 			public void run() {
-				mat.debugOverrideAndEnableDebugStackStorage(true);
+				analysisTaskFinal.debugOverrideAndEnableDebugStackStorage(true);
 				try {
-					mat.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1,
+					analysisTaskFinal.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1,
 							status);
+					for (NumericMeasurementInterface nmi : analysisTaskFinal.getOutput()) {
+						if (nmi instanceof NumericMeasurement) {
+							NumericMeasurement nm = (NumericMeasurement) nmi;
+							String sub = nm.getParentSample().getParentCondition().getParentSubstance().getName();
+							if (!sub.contains("histogram"))
+								System.out.println("> "
+										+ nm.getQualityAnnotation() + " // day: " + nm.getParentSample().getTime() + " // condition: "
+										+ nm.getParentSample().getParentCondition().getConditionName() + " // "
+										+ sub + ": " + nm.getValue());
+						}
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -258,23 +270,23 @@ public class BlockPipeline {
 		Runnable finishSwingTask = new Runnable() {
 			@Override
 			public void run() {
-				if (mat.getForcedDebugStackStorageResult() == null
-						|| mat.getForcedDebugStackStorageResult().isEmpty()) {
+				if (analysisTaskFinal.getForcedDebugStackStorageResult() == null
+						|| analysisTaskFinal.getForcedDebugStackStorageResult().isEmpty()) {
 					MainFrame.showMessageDialog(
 							"No pipeline results available! (" + input.size()
 									+ " images input)", "Error");
 				} else {
 					int idx = 1;
-					int nn = mat.getForcedDebugStackStorageResult().size();
-					for (FlexibleImageStack fis : mat
+					int nn = analysisTaskFinal.getForcedDebugStackStorageResult().size();
+					for (FlexibleImageStack fis : analysisTaskFinal
 							.getForcedDebugStackStorageResult()) {
-						fis.print(mat.getName() + " // Result " + idx + "/"
+						fis.print(analysisTaskFinal.getName() + " // Result " + idx + "/"
 								+ nn, new Runnable() {
 							@Override
 							public void run() {
-								mat.setInput(samples, input, m, 0, 1);
+								analysisTaskFinal.setInput(samples, input, m, 0, 1);
 								BackgroundTaskHelper.issueSimpleTaskInWindow(
-										mat.getName(), "Analyze...",
+										analysisTaskFinal.getName(), "Analyze...",
 										backgroundTask,
 										(Runnable) finishSwingTaskRef
 												.getObject(), status, false,
@@ -287,7 +299,7 @@ public class BlockPipeline {
 			}
 		};
 		finishSwingTaskRef.setObject(finishSwingTask);
-		BackgroundTaskHelper.issueSimpleTaskInWindow(mat.getName(),
+		BackgroundTaskHelper.issueSimpleTaskInWindow(analysisTaskFinal.getName(),
 				"Analyze...", backgroundTask, finishSwingTask, status, false,
 				true);
 	}

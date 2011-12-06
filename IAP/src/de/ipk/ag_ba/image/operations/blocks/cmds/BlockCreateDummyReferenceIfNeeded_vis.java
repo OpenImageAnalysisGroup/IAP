@@ -4,6 +4,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 
 /**
  * Create a simulated, dummy reference image (in case the reference image is NULL).
@@ -17,32 +18,40 @@ public class BlockCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnaly
 	@Override
 	protected FlexibleImage processVISmask() {
 		if (getInput().getImages().getVis() != null && getInput().getMasks().getVis() == null)
-			return getInput().getImages().getVis().getIO().thresholdLAB(
+			return getInput().getImages().getVis().copy().getIO().thresholdLAB(
 					100, 150,
-					130, 500,
+					140, 500,
 					0, 500,
 					ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).
 					or(
-							getInput().getImages().getVis().getIO().thresholdLAB(
+							getInput().getImages().getVis().copy().getIO().thresholdLAB(
 									0, 100,
 									0, 500,
 									0, 500,
 									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).getImage()
 					).
 					or(
-							getInput().getImages().getVis().getIO().thresholdLAB(
+							getInput().getImages().getVis().copy().getIO().thresholdLAB(
 									200, 500,
 									0, 500,
 									0, 500,
 									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).getImage()
 					).
 					or(
-							getInput().getImages().getVis().getIO().thresholdLAB(
+							getInput().getImages().getVis().copy().getIO().thresholdLAB(
 									0, 200,
-									110, 500,
+									150, 500,
 									0, 140,
 									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).getImage()
-					).blur(2).
+					).
+					or(
+							getInput().getImages().getVis().copy().getIO().thresholdLAB(
+									0, 255,
+									100, 500,
+									0, 100,
+									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).print("FILTER 4", debug).getImage()
+					)
+					.blur(2).
 					getImage();
 		else
 			return super.processVISmask();
@@ -57,8 +66,8 @@ public class BlockCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnaly
 		// return ImageOperation.createColoredImage(w, h, new Color(3, 3, 3));
 		// } else
 		if (getInput().getImages().getFluo() != null && getInput().getMasks().getFluo() == null)
-			return getInput().getImages().getFluo().getIO().thresholdLAB(
-					0, 100,
+			return getInput().getImages().getFluo().getIO().blur(1).thresholdLAB(
+					0, 110,
 					0, 500,
 					0, 500,
 					ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).
@@ -79,5 +88,13 @@ public class BlockCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnaly
 					getImage();
 		else
 			return super.processNIRmask();
+	}
+	
+	@Override
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		super.postProcess(processedImages, processedMasks);
+		// FlexibleImage fi = processedMasks.getFluo().copy().getIO()
+		// .applyMask_ResizeMaskIfNeeded(processedMasks.getVis().copy().getIO().blur(4).getImage(), options.getBackground()).getImage();
+		// processedMasks.setFluo(fi);
 	}
 }

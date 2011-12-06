@@ -104,7 +104,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author Christian Klukas
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class TabStatistics extends InspectorTab implements ActionListener,
 		ContainsTabbedPane {
@@ -2599,6 +2599,8 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 					node2desc = AttributeHelper
 							.getNiceEdgeOrNodeLabel(ge2, "?");
 				}
+				System.out.println("INFO: Create scatter block " + x + ":" + y + " (size: " + graphElements.size() + "x" + graphElements.size() + "): " + node1desc
+						+ " vs " + node2desc);
 				List<SubstanceInterface> mappedDataList2 = Experiment2GraphHelper
 						.getMappedDataListFromGraphElement(ge2);
 				if (mappedDataList1 != null && mappedDataList2 != null) {

@@ -30,7 +30,7 @@ public class BlockFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		
 		ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
-		getInput().getImages().getVis();
+		
 		FlexibleImage vis = getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null) {
 			numericResult = getMarkers(vis);
@@ -68,7 +68,6 @@ public class BlockFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	// distances vertical
 	private void calculateDistanceBetweenMarkers(ArrayList<MarkerPair> numericResult, int imageWidth) {
-		boolean debug = false;
 		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y) != null
 				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y) != null) {
 			double markerPosOneLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y).getValue() * imageWidth;
