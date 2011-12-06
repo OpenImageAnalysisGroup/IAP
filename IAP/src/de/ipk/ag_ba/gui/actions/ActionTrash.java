@@ -2,6 +2,8 @@ package de.ipk.ag_ba.gui.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
@@ -22,7 +24,7 @@ public class ActionTrash extends AbstractNavigationAction {
 	
 	private final MongoDB m;
 	private String experimentName;
-	private Collection<ExperimentHeaderInterface> headers;
+	private Set<ExperimentHeaderInterface> headers;
 	private String message = "";
 	private DeletionCommand cmd;
 	
@@ -40,6 +42,15 @@ public class ActionTrash extends AbstractNavigationAction {
 	}
 	
 	public ActionTrash(Collection<ExperimentHeaderInterface> headers, DeletionCommand cmd, MongoDB m) {
+		super("Perform '" + cmd + "'-operation");
+		this.m = m;
+		LinkedHashSet<ExperimentHeaderInterface> set = new LinkedHashSet<>();
+		set.addAll(headers);
+		this.setHeader(set);
+		this.cmd = cmd;
+	}
+	
+	public ActionTrash(Set<ExperimentHeaderInterface> headers, DeletionCommand cmd, MongoDB m) {
 		super("Perform '" + cmd + "'-operation");
 		this.m = m;
 		this.setHeader(headers);
@@ -75,12 +86,12 @@ public class ActionTrash extends AbstractNavigationAction {
 							message += "<html><b>" + "Experiment " + experimentName + " has been deleted.";
 						} else {
 							Object[] res = MyInputHelper.getInput("<html>"
-												+ "You are about to delete a dataset from the database.<br>"
-												+ "This action can not be undone.<br>"
-												+ "Connected binary files are not immediately removed, but only<br>"
-												+ "during the process of database maintanance procedures.",
-												"Confirm final deletion operation", new Object[] {
-																	"Remove experiment " + ei.experimentName + " from database?", false });
+									+ "You are about to delete a dataset from the database.<br>"
+									+ "This action can not be undone.<br>"
+									+ "Connected binary files are not immediately removed, but only<br>"
+									+ "during the process of database maintanance procedures.",
+									"Confirm final deletion operation", new Object[] {
+											"Remove experiment " + ei.experimentName + " from database?", false });
 							if (res != null && (Boolean) res[0]) {
 								// CallDBE2WebService.setDeleteExperiment(login, pass,
 								// experimentName);
@@ -141,7 +152,7 @@ public class ActionTrash extends AbstractNavigationAction {
 	}
 	
 	public static NavigationButton getTrashEntity(final MongoDB m, final String experimentName,
-						GUIsetting guiSetting) {
+			GUIsetting guiSetting) {
 		NavigationAction trashAction = new ActionTrash(m, experimentName);
 		NavigationButton trash = new NavigationButton(trashAction, "Delete", "img/ext/edit-delete.png", guiSetting);
 		trash.setRightAligned(true);
@@ -149,32 +160,49 @@ public class ActionTrash extends AbstractNavigationAction {
 	}
 	
 	public static NavigationButton getTrashEntity(ExperimentHeaderInterface header, DeletionCommand cmd,
-						GUIsetting guiSetting, MongoDB m) {
+			GUIsetting guiSetting, MongoDB m) {
+		LinkedHashSet<ExperimentHeaderInterface> expAndHistory = new LinkedHashSet<ExperimentHeaderInterface>();
+		expAndHistory.add(header);
+		expAndHistory.addAll(header.getHistory().values());
 		NavigationAction trashAction = new ActionTrash(header, cmd, m);
 		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guiSetting);
 		trash.setRightAligned(cmd != DeletionCommand.UNTRASH);
 		return trash;
 	}
 	
-	public static NavigationButton getTrashEntity(ArrayList<ExperimentHeaderInterface> trashed, DeletionCommand cmd,
-						GUIsetting guiSetting, MongoDB m) {
+	public static NavigationButton getTrashEntity(Set<ExperimentHeaderInterface> trashed, DeletionCommand cmd,
+			GUIsetting guiSetting, MongoDB m) {
 		NavigationAction trashAction = new ActionTrash(trashed, cmd, m);
 		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guiSetting);
 		trash.setRightAligned(true);
 		return trash;
 	}
 	
-	private void setHeader(Collection<ExperimentHeaderInterface> headers) {
-		this.headers = headers;
+	private void setHeader(Set<ExperimentHeaderInterface> headers) {
+		this.setHeaders(headers);
 	}
 	
 	private void setHeader(ExperimentHeaderInterface header) {
-		Collection<ExperimentHeaderInterface> h = new ArrayList<ExperimentHeaderInterface>();
+		LinkedHashSet<ExperimentHeaderInterface> h = new LinkedHashSet<ExperimentHeaderInterface>();
 		h.add(header);
-		this.headers = h;
+		h.addAll(header.getHistory().values());
+		this.setHeaders(h);
 	}
 	
 	private Collection<ExperimentHeaderInterface> getHeader() {
+		return getHeaders();
+	}
+	
+	private Set<ExperimentHeaderInterface> getHeaders() {
 		return headers;
+	}
+	
+	private void setHeaders(Set<ExperimentHeaderInterface> headers) {
+		this.headers = headers;
+		LinkedHashSet<ExperimentHeaderInterface> toBeAdded = new LinkedHashSet<>();
+		for (ExperimentHeaderInterface h : this.headers)
+			toBeAdded.addAll(h.getHistory().values());
+		for (ExperimentHeaderInterface h : toBeAdded)
+			this.headers.add(h);
 	}
 }

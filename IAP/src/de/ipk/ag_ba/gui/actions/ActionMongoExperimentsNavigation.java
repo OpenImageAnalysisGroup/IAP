@@ -8,7 +8,9 @@
 package de.ipk.ag_ba.gui.actions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.TreeMap;
 
 import org.SystemAnalysis;
@@ -89,7 +91,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				res.add(Other.getServerStatusEntity(true, "Error Status", src.getGUIsetting()));
 			} else {
 				TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> experiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
-				ArrayList<ExperimentHeaderInterface> trashed = new ArrayList<ExperimentHeaderInterface>();
+				LinkedHashSet<ExperimentHeaderInterface> trashed = new LinkedHashSet<ExperimentHeaderInterface>();
 				for (ExperimentHeaderInterface eh : experimentList) {
 					String type = IAPservice.getSetting(IAPoptions.GROUP_BY_EXPERIMENT_TYPE) ? eh.getExperimentType() : eh.getImportusergroup();
 					if (type == null || type.length() == 0)
@@ -156,7 +158,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		return res;
 	}
 	
-	private NavigationAction getTrashedExperimentsAction(final ArrayList<ExperimentHeaderInterface> trashed, final MongoDB m) {
+	private NavigationAction getTrashedExperimentsAction(final LinkedHashSet<ExperimentHeaderInterface> trashed, final MongoDB m) {
 		NavigationAction res = new AbstractNavigationAction("Show content of trash can") {
 			
 			private NavigationButton src;
@@ -275,7 +277,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	}
 	
 	protected NavigationAction createMongoUserNavigationAction(final String user,
-			final ArrayList<ExperimentHeaderInterface> experiments) {
+			final Collection<ExperimentHeaderInterface> experiments) {
 		NavigationAction userNav = new AbstractNavigationAction("Show user folder") {
 			private NavigationButton src;
 			
@@ -331,7 +333,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		return userNav;
 	}
 	
-	protected NavigationAction createSubFolderActionForTemporaryResults(final ArrayList<ExperimentHeaderInterface> experiments) {
+	protected NavigationAction createSubFolderActionForTemporaryResults(final Collection<ExperimentHeaderInterface> experiments) {
 		NavigationAction userNav = new AbstractNavigationAction("Intermediate results of image analysis calculations") {
 			private NavigationButton src;
 			
@@ -398,7 +400,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		return userNav;
 	}
 	
-	protected NavigationAction createSubFolderActionForTemporaryResults2(final String displayName, final ArrayList<ExperimentHeaderInterface> experiments) {
+	protected NavigationAction createSubFolderActionForTemporaryResults2(final String displayName, final Collection<ExperimentHeaderInterface> experiments) {
 		NavigationAction userNav = new AbstractNavigationAction("Intermediate results of image analysis calculations") {
 			private NavigationButton src;
 			

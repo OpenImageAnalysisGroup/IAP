@@ -37,14 +37,14 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	private String domainUser;
 	private final String tt;
 	private String displayName;
-
+	
 	public ActionMongoOrLemnaTecExperimentNavigation(
 			ExperimentHeaderInterface ei, MongoDB m) {
 		super(
 				ei.getDatabaseId() != null
 						&& ei.getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
 						: "Access Systems Biology Cloud Data Set");
-
+		
 		this.tt = "<html><table>" + "<tr><td>Experiment</td><td>"
 				+ ei.getExperimentName() + "</td></tr>"
 				+ "<tr><td>Type</td><td>" + ei.getExperimentType()
@@ -53,22 +53,22 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 				+ "<tr><td>Import Time</td><td>" + ei.getImportdate()
 				+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark()
 				+ "</td></tr>";
-
+		
 		header = ei;
 		this.m = m;
 	}
-
+	
 	@Override
 	public String getDefaultTooltip() {
 		return tt;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		// actions.add(FileManager.getFileManagerEntity(login, pass,
 		// ei.experimentName));
-
+		
 		if (header != null
 				&& !header.getDatabaseId().startsWith("lemnatec:")
 				&& (header.getImportusername() == null
@@ -82,9 +82,10 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 							DeletionCommand.UNTRASH, src.getGUIsetting(), m));
 					actions.add(ActionTrash.getTrashEntity(header,
 							DeletionCommand.DELETE, src.getGUIsetting(), m));
-				} else
+				} else {
 					actions.add(ActionTrash.getTrashEntity(header,
 							DeletionCommand.TRASH, src.getGUIsetting(), m));
+				}
 		}
 		boolean add = true;
 		if (header != null && header.inTrash())
@@ -106,7 +107,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 		}
 		return actions;
 	}
-
+	
 	public static void getDefaultActions(ArrayList<NavigationButton> actions,
 			ExperimentInterface experiment, ExperimentHeaderInterface header,
 			boolean imageAnalysis, GUIsetting guiSetting, MongoDB m) {
@@ -130,7 +131,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 				}
 			}
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(
 			ArrayList<NavigationButton> currentSet) {
@@ -139,7 +140,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src)
 			throws Exception {
@@ -149,17 +150,18 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 					&& header.getDatabaseId().startsWith("lemnatec:"))
 				experiment = new LemnaTecDataExchange().getExperiment(header,
 						status);
-			else if (header.getDatabaseId() != null
-					&& header.getDatabaseId().startsWith("hsm:"))
-				experiment = HSMfolderTargetDataManager.getExperiment(header,
-						status);
 			else
-				experiment = m.getExperiment(header, true, status);
+				if (header.getDatabaseId() != null
+						&& header.getDatabaseId().startsWith("hsm:"))
+					experiment = HSMfolderTargetDataManager.getExperiment(header,
+							status);
+				else
+					experiment = m.getExperiment(header, true, status);
 			if (experiment != null)
 				experiment.setHeader(header);
 		}
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		if (header.getDatabaseId() != null
@@ -187,7 +189,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 			return "img/ext/image-x-generic-off.png";
 		}
 	}
-
+	
 	@Override
 	public String getDefaultNavigationImage() {
 		if (header.getDatabaseId() != null
@@ -215,7 +217,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 			return "img/ext/image-x-generic.png";
 		}
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		if (displayName != null)
@@ -223,22 +225,22 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 		else
 			return "" + header.getExperimentName();
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
 		ip.setExperimentInfo(m, header, true, experiment);
 		return new MainPanelComponent(ip, true);
 	}
-
+	
 	public ExperimentInterface getExperimentReference() {
 		return experiment;
 	}
-
+	
 	public void setLogin(String domainUser) {
 		this.domainUser = domainUser;
 	}
-
+	
 	public void setOverrideTitle(String displayName) {
 		this.displayName = displayName;
 	}

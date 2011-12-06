@@ -512,7 +512,7 @@ public class MongoDB {
 									// boolean direct = true;
 									// if (direct) {
 									res = saveImageFileDirect(db, id, overallFileSize,
-												keepDataLinksToDataSource_safe_space);
+											keepDataLinksToDataSource_safe_space);
 									
 									attributes.clear();
 									id.fillAttributeMap(attributes);
@@ -1159,9 +1159,30 @@ public class MongoDB {
 					DBCollection col = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 					if (optStatus != null)
 						optStatus.setCurrentStatusText1("Iterate Experiments");
+					HashMap<String, String> mapableNames = new HashMap<String, String>();
+					mapableNames.put("klukas", "Christian Klukas");
 					for (DBObject header : col.find()) {
 						ExperimentHeader h = new ExperimentHeader(header.toMap());
 						h.setStorageTime(new Date(((ObjectId) header.get("_id")).getTime()));
+						if (h.getImportusername() == null || h.getImportusername().isEmpty()) {
+							System.out.println(SystemAnalysisExt.getCurrentTime()
+									+ ">ERROR: FIXING INTERNAL PROBLEM: IMPORT USER NAME IS EMPTY, UPDATING INFO WITH LOCAL USER INFO");
+							h.setImportusername(SystemAnalysis.getUserName());
+							header.put("importusername", h.getImportusername());
+							if (h.getImportusername() != null && !h.getImportusername().isEmpty())
+								col.save(header, WriteConcern.SAFE);
+							else
+								System.out.println(SystemAnalysisExt.getCurrentTime()
+										+ ">ERROR: USER INFO COULD NOT BE UPDATED (LOCAL INFO IS NULL OR EMPTY)");
+						}
+						if (mapableNames.containsKey(h.getImportusername())) {
+							String newName = mapableNames.get(h.getImportusername());
+							System.out.println(SystemAnalysisExt.getCurrentTime()
+									+ ">INFO: FIXING ACCOUNT NAME (changing " + h.getImportusername() + " to " + newName + ")");
+							h.setImportusername(newName);
+							header.put("importusername", h.getImportusername());
+							col.save(header, WriteConcern.SAFE);
+						}
 						if (user == null ||
 								h.getImportusername() != null && h.getImportusername().equals(user) ||
 								LemnaTecDataExchange.getAdministrators().contains(user))
