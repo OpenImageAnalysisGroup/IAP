@@ -3,7 +3,7 @@
  *******************************************************************************/
 
 /*
- * $Id: PatternTabsForInspector.java,v 1.1 2011-01-31 09:00:38 klukas Exp $
+ * $Id: PatternTabsForInspector.java,v 1.2 2011-12-06 13:29:58 klukas Exp $
  */
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control;
 
@@ -35,10 +35,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.workflow.Wor
  * 
  * @author Christian Klukas Represents the main class of the
  *         InspectorLayoutControl plugin.
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class PatternTabsForInspector
-					extends DBE_EditorPluginAdapter {
+		extends DBE_EditorPluginAdapter {
 	
 	public PatternTabsForInspector() {
 		super();
@@ -68,8 +68,8 @@ public class PatternTabsForInspector
 		
 		if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR) {
 			attributeDescriptions = new org.graffiti.attributes.AttributeDescription[] {
-								new org.graffiti.attributes.AttributeDescription("role",
-													org.graffiti.attributes.StringAttribute.class, "SBGN:Role", true, true, null)
+					new org.graffiti.attributes.AttributeDescription("role",
+							org.graffiti.attributes.StringAttribute.class, "SBGN:Role", true, true, null)
 			};
 		}
 		
@@ -82,7 +82,7 @@ public class PatternTabsForInspector
 		Collection<InspectorTab> subtabsTools = new ArrayList<InspectorTab>();
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.KEGG_ACCESS_ENH))
 			subtabsTools.add(new TabKegg2());
-		if (!ReleaseInfo.isRunningAsApplet() && ReleaseInfo.getIsAllowedFeature(FeatureSet.STATISTIC_FUNCTIONS))
+		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.STATISTIC_FUNCTIONS)) // !ReleaseInfo.isRunningAsApplet() &&
 			subtabsTools.add(new TabStatistics());
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.TAB_PATTERNSEARCH))
 			subtabsTools.add(new TabPatternLayout());
@@ -96,7 +96,7 @@ public class PatternTabsForInspector
 	}
 	
 	private InspectorTab getSubtab(String title,
-						Collection<InspectorTab> subtabs) {
+			Collection<InspectorTab> subtabs) {
 		if (subtabs.size() == 1)
 			return subtabs.iterator().next();
 		else

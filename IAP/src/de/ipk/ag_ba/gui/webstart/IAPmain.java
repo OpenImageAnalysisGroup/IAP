@@ -273,14 +273,14 @@ public class IAPmain extends JApplet {
 			ArrayList<String> locations_exclude = new ArrayList<String>();
 			locations_exclude.addAll(new TextFile(rExcl));
 			
-			for (String ss : locations) {
-				// System.out.println(ss);
-				if (ss.indexOf("addon") >= 0) {
-					locations_exclude.add(ss);
-					System.out.println("Disable plugin " + ss);
-				}
-				
-			}
+			// for (String ss : locations) {
+			// // System.out.println(ss);
+			// if (ss.indexOf("addon") >= 0) {
+			// locations_exclude.add(ss);
+			// System.out.println("Disable plugin " + ss);
+			// }
+			//
+			// }
 			
 			for (Iterator<String> it = locations_exclude.iterator(); it.hasNext();) {
 				String remove = it.next();

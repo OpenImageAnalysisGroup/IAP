@@ -55,6 +55,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		parentSample.setParent(series);
 	}
 	
+	@Override
 	public void getString(StringBuilder r) {
 		r.append("<data");
 		getXMLAttributeString(r);
@@ -63,34 +64,41 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		r.append("</data>");
 	}
 	
+	@Override
 	public void getXMLAttributeString(StringBuilder r) {
 		Substance.getAttributeString(r, new String[] {
-					"replicates", "unit", "quality"
-			}, new Object[] {
-					replicateID, unit, quality
-			});
+				"replicates", "unit", "quality"
+		}, new Object[] {
+				replicateID, unit, quality
+		});
 	}
 	
+	@Override
 	public void getStringOfChildren(StringBuilder r) {
 		r.append(getValue());
 	}
 	
+	@Override
 	public double getValue() {
 		return value;
 	}
 	
+	@Override
 	public SampleInterface getParentSample() {
 		return parentSample;
 	}
 	
+	@Override
 	public String getUnit() {
 		return unit;
 	}
 	
+	@Override
 	public void setUnit(String unit) {
 		this.unit = unit;
 	}
 	
+	@Override
 	public boolean setData(Element averageElement) {
 		setValue(Double.NaN);
 		try {
@@ -112,6 +120,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		return true;
 	}
 	
+	@Override
 	public void setAttribute(Attribute attr) {
 		if (attr == null || attr.getValue() == null)
 			return;
@@ -139,22 +148,27 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 				} else
 					if (attr.getName().equals("quality")) {
 						setQualityAnnotation(attr.getValue());
-					} else
-						System.err.println("Internal Error: Unknown Data Attribute: " + attr.getName());
+					}
+		// } else
+		// System.err.println("Internal Error: Unknown Data Attribute: " + attr.getName());
 	}
 	
+	@Override
 	public void setDataOfChildElement(Element childElement) {
 		// no children
 	}
 	
+	@Override
 	public void setValue(double value) {
 		this.value = value;
 	}
 	
+	@Override
 	public void setReplicateID(int replicateID) {
 		this.replicateID = replicateID;
 	}
 	
+	@Override
 	public int getReplicateID() {
 		return replicateID;
 	}
@@ -169,10 +183,12 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		this.quality = quality;
 	}
 	
+	@Override
 	public void setParentSample(SampleInterface sample) {
 		parentSample = sample;
 	}
 	
+	@Override
 	public void fillAttributeMap(Map<String, Object> attributes) {
 		attributes.put("replicates", getReplicateID());
 		attributes.put("unit", getUnit());
@@ -180,6 +196,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		attributes.put("quality", getQualityAnnotation());
 	}
 	
+	@Override
 	public NumericMeasurementInterface clone(SampleInterface parent) {
 		NumericMeasurementInterface m = Experiment.getTypeManager().getNewMeasurement(parent);
 		m.setValue(getValue());
