@@ -74,7 +74,7 @@ public class CommandLineBackgroundTaskStatusProvider extends
 			System.out.println(SystemAnalysisExt.getCurrentTime()
 					+ ">INFO: Progress: " + getCurrentStatusValue() + "% // "
 					+ getCurrentStatusMessage1() + " // "
-					+ getCurrentStatusMessage2() + " // Load: " + (int) (10d * SystemAnalysisExt.getRealSystemCpuLoad()) / 10
+					+ getCurrentStatusMessage2() + " // Load: " + ((int) (10d * SystemAnalysisExt.getRealSystemCpuLoad())) / 10
 					+ " // Mem: " + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB");
 			if (firstProgressFineValue >= 0
 					&& firstProgressFineValue < getCurrentStatusValueFine()
