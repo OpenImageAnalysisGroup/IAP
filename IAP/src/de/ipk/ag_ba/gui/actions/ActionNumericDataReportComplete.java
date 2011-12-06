@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import javax.swing.JLabel;
-import javax.swing.JTable;
 
 import org.AttributeHelper;
 import org.StringManipulationTools;
@@ -38,17 +37,21 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
-	private JTable table;
+	
 	private static final String separator = "\t";
 	private final boolean exportIndividualAngles;
+	private final String[] variant;
 	
-	public ActionNumericDataReportComplete(String tooltip, boolean exportIndividualAngles) {
+	public ActionNumericDataReportComplete(String tooltip, boolean exportIndividualAngles, String[] variant) {
 		super(tooltip);
 		this.exportIndividualAngles = exportIndividualAngles;
+		this.variant = variant;
 	}
 	
-	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles) {
-		this("Show/export numeric data report" + (exportIndividualAngles ? " (for each angle)" : ""), exportIndividualAngles);
+	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles, String[] variant) {
+		this("Show/export numeric data report"
+				+ (exportIndividualAngles ? " (for each angle)" : " (" + StringManipulationTools.getStringList(variant, ", ") + ")"), exportIndividualAngles,
+				variant);
 		this.m = m;
 		this.experimentReference = experimentReference;
 	}
@@ -68,9 +71,10 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		if (SystemAnalysis.isHeadless())
-			return "Download Report Files" + (exportIndividualAngles ? " (side angles)" : " (average)");
+			return "Download Report Files"
+					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
 		else
-			return "Create PDF Report" + (exportIndividualAngles ? " (side angles)" : " (average)");
+			return "Create PDF Report" + (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
 	}
 	
 	@Override
@@ -184,7 +188,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 						"report2.tex"
 				});
 				
-				p.executeRstat();
+				p.executeRstat(variant);
 				
 				boolean ok = p.hasPDFcontent();
 				
@@ -232,8 +236,6 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 		}
 		
 		Object[][] rowdata = new Object[rows.size()][cols.size()];
-		
-		table = null;
 		
 	}
 	
