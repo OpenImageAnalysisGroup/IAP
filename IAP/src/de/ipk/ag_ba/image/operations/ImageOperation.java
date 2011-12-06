@@ -366,6 +366,44 @@ public class ImageOperation {
 	
 	/**
 	 * Copies the content of the stored image of this operation onto the given
+	 * mask (and returns the result). Pixels where the mask has the
+	 * background color are set according to the source image. Pixels with
+	 * no background color are not modified.
+	 * 
+	 * @param mask
+	 *           The mask which is used as a template.
+	 * @param background
+	 *           The color which is used to determine which parts of the mask
+	 *           are considered as background (empty), all other pixels are
+	 *           considered as foreground.
+	 * @return The source image, filtered by the given mask.
+	 */
+	public ImageOperation applyMaskInversed_ResizeMaskIfNeeded(FlexibleImage mask,
+			int background) {
+		
+		if (image.getWidth() != mask.getWidth()
+				|| image.getHeight() != mask.getHeight()) {
+			mask = new ImageOperation(mask).resize(image.getWidth(),
+					image.getHeight()).getImage();
+		}
+		
+		int[] maskPixels = mask.getAs1A();
+		int[] originalImage = ImageConverter.convertIJto1A(image);
+		
+		int idx = 0;
+		for (int maskPixel : maskPixels) {
+			if (maskPixel == background)
+				maskPixels[idx] = originalImage[idx];
+			else
+				maskPixels[idx] = background;
+			idx++;
+		}
+		
+		return new ImageOperation(maskPixels, mask.getWidth(), mask.getHeight());
+	}
+	
+	/**
+	 * Copies the content of the stored image of this operation onto the given
 	 * mask (and returns the result). Pixels where the mask has not the
 	 * background color are set according to the source image. Pixels with
 	 * background color are not modified.
@@ -1429,7 +1467,7 @@ public class ImageOperation {
 					public int compare(LargeCluster o1, LargeCluster o2) {
 						double d1 = largest.distanceTo(o1);
 						double d2 = largest.distanceTo(o2);
-						return d1 > d2 ? 1 : (d1==d2 ? 0 :-1);
+						return d1 > d2 ? 1 : (d1 == d2 ? 0 : -1);
 					}
 				});
 				for (LargeCluster lc : largeClusters) {
@@ -1684,11 +1722,13 @@ public class ImageOperation {
 	 * 
 	 * @param oi
 	 */
-	public static FlexibleImage thresholdLAB3(int width, int height, int[] imagePixels, int[] resultImage,
+	public static FlexibleImage thresholdLAB3(int width, int height,
+			int[] imagePixels, int[] resultImage,
 			int lowerValueOfL, int upperValueOfL,
 			int lowerValueOfA, int upperValueOfA,
 			int lowerValueOfB, int upperValueOfB,
-			int background, CameraPosition typ, boolean maize, boolean replaceBlueStick, int[][] oi, boolean getRemovedPixel) {
+			int background, CameraPosition typ, boolean maize,
+			boolean replaceBlueStick, int[][] oi, boolean getRemovedPixel) {
 		int c, x, y = 0;
 		int r, g, b;
 		int Li, ai, bi;

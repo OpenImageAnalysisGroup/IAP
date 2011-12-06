@@ -63,7 +63,7 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
 								options.getIntSetting(Setting.abDiff_VIS_TOP) * 0.5d,
 								back, false)
-							// .dilate().dilate().dilate()
+						// .dilate().dilate().dilate()
 						.border(2).getImage();
 				return getInput().getImages().getVis().getIO().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
 						.print("CLEAR RESULT", false).getImage();
@@ -86,7 +86,7 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 						.medianFilter32Bit()
 						.getImage()).compare()
 						.compareImages("fluo", getInput().getMasks().getFluo().getIO()
-								// .blur(1.5).print("Blurred 1.5 fluo mask", true)
+								.blur(1.1).print("Blurred 1.5 fluo mask", true)
 								.medianFilter32Bit()
 								.getImage(),
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
@@ -103,9 +103,9 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 								// .getIO().
 								// copyImagesParts(0.26, 0.3).print("cut out", true).getImage()
 								,
-								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
-								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
-								options.getIntSetting(Setting.abDiff_FLUO) * 0.5d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 2d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 2d,
+								options.getIntSetting(Setting.abDiff_FLUO) * 2d,
 								back).border(2).getImage();
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");

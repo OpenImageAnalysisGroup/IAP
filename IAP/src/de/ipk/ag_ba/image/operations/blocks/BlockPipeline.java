@@ -250,17 +250,19 @@ public class BlockPipeline {
 				try {
 					analysisTaskFinal.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1,
 							status);
-					for (NumericMeasurementInterface nmi : analysisTaskFinal.getOutput()) {
-						if (nmi instanceof NumericMeasurement) {
-							NumericMeasurement nm = (NumericMeasurement) nmi;
-							String sub = nm.getParentSample().getParentCondition().getParentSubstance().getName();
-							if (!sub.contains("histogram"))
-								System.out.println("> "
-										+ nm.getQualityAnnotation() + " // day: " + nm.getParentSample().getTime() + " // condition: "
-										+ nm.getParentSample().getParentCondition().getConditionName() + " // "
-										+ sub + ": " + nm.getValue());
+					Collection<NumericMeasurementInterface> out = analysisTaskFinal.getOutput();
+					if (out != null)
+						for (NumericMeasurementInterface nmi : out) {
+							if (nmi instanceof NumericMeasurement) {
+								NumericMeasurement nm = (NumericMeasurement) nmi;
+								String sub = nm.getParentSample().getParentCondition().getParentSubstance().getName();
+								if (!sub.contains("histogram"))
+									System.out.println("> "
+											+ nm.getQualityAnnotation() + " // day: " + nm.getParentSample().getTime() + " // condition: "
+											+ nm.getParentSample().getParentCondition().getConditionName() + " // "
+											+ sub + ": " + nm.getValue());
+							}
 						}
-					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

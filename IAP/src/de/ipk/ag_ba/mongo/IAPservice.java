@@ -518,7 +518,7 @@ public class IAPservice {
 			for (SubstanceInterface substance : experiment) {
 				for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
 					for (SampleInterface s : c) {
-						long time = s.getRowId();
+						Long time = s.getRowId();
 						
 						if (!timestampe2snapshot.containsKey(time)) {
 							SnapshotDataIAP ns = new SnapshotDataIAP();
