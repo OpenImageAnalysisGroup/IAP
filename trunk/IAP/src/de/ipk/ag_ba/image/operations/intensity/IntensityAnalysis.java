@@ -46,16 +46,20 @@ public class IntensityAnalysis {
 		result.incrementCounter();
 		
 		result.addValue("filled.pixels", plantImagePixelCnt);
-		result.addValue("filled.percent", (100d*pixels.length)/plantImagePixelCnt);
+		result.addValue("filled.percent", (100d * pixels.length) / plantImagePixelCnt);
 		if (multiLevel) {
 			if (plantImagePixelCnt > 0) {
 				result.addValue("intensity.chlorophyl.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
 				result.addValue("intensity.phenol.average", sumOfIntensityPhenol / plantImagePixelCnt / 255d);
+				result.addValue("intensity.chlorophyl.sum", sumOfIntensityChlorophyl);
+				result.addValue("intensity.phenol.sum", sumOfIntensityPhenol);
+				result.addValue("intensity.classic.sum", sumOfIntensityClassic);
 			}
 			if (sumOfIntensityChlorophyl > 0)
 				result.addValue("intensity.phenol.chlorophyl.ratio", sumOfIntensityPhenol / sumOfIntensityChlorophyl);
 			
-		}
+		} else
+			result.addValue("intensity.sum", sumOfIntensityChlorophyl);
 		result.addValue("intensity.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
 		
 		if (optDistHorizontal != null && optRealMarkerDistance != null) {

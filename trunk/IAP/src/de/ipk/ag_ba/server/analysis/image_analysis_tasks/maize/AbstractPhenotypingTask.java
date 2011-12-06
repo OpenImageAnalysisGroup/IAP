@@ -396,7 +396,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			ArrayList<TreeMap<String, ImageSet>> workload, int max,
 			boolean top, boolean side) {
 		TreeMap<String, TreeMap<String, ImageSet>> replicateId2ImageSetSide = new TreeMap<String, TreeMap<String, ImageSet>>();
-		
+		if (input == null)
+			return;
 		for (Sample3D ins : input)
 			for (Measurement md : ins) {
 				if (md instanceof ImageData) {

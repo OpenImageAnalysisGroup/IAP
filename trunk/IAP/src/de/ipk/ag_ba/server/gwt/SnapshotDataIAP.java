@@ -426,7 +426,8 @@ public class SnapshotDataIAP {
 					+ replaceNull(s.getGrowthCondition()) + separator
 					+ replaceNull(s.getTreatment()) + separator
 					+ replaceNull(s.getSequence()) + separator
-					+ s.getTimePoint() + separator + new Date(s.getSnapshotTime()).toString() + separator
+					+ s.getTimePoint() + separator +
+					new Date(s.getSnapshotTime() != null ? s.getSnapshotTime() : 0).toString() + separator
 					+ getNumbersFromString(s.getTimePoint()) + separator
 					+ weightBeforeWatering + separator
 					+ sumBA + separator
