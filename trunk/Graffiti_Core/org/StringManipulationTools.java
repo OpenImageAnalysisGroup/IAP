@@ -617,8 +617,15 @@ public class StringManipulationTools implements HelperClass {
 		return namenew;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static String getStringList(ArrayList elements, String div) {
+	public static String getStringList(Object[] elements, String div) {
+		ArrayList<Object> al = new ArrayList<>();
+		if (elements != null)
+			for (Object o : elements)
+				al.add(o);
+		return getStringList(al, div);
+	}
+	
+	public static String getStringList(ArrayList<?> elements, String div) {
 		if (elements == null || elements.size() <= 0)
 			return "";
 		else {

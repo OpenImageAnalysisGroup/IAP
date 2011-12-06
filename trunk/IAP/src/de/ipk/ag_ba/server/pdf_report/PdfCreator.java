@@ -68,7 +68,7 @@ public class PdfCreator {
 		fos.close();
 	}
 	
-	public void executeRstat() throws IOException {
+	public void executeRstat(final String[] parameter) throws IOException {
 		readAndModify("report2.tex");
 		
 		String name = tempDirectory.getAbsolutePath() + File.separator + "diagramIAP.cmd";
@@ -77,7 +77,7 @@ public class PdfCreator {
 		else {
 			new File(name).setExecutable(true);
 		}
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">EXECUTE: " + name);
+		System.out.println(SystemAnalysisExt.getCurrentTime() + ">EXECUTE: " + name + ", WITH PARAMETER (" + parameter + ")");
 		
 		final String nameF = name;
 		
@@ -87,7 +87,11 @@ public class PdfCreator {
 			@Override
 			public void run() {
 				try {
-					Process ls_proc = Runtime.getRuntime().exec(nameF);
+					Process ls_proc;
+					if (parameter != null && parameter.length > 0)
+						ls_proc = Runtime.getRuntime().exec(nameF);
+					else
+						ls_proc = Runtime.getRuntime().exec(nameF, parameter);
 					
 					myRef.setObject(ls_proc);
 					
@@ -155,10 +159,10 @@ public class PdfCreator {
 		c = StringManipulationTools.stringReplace(c, "--ImagesExp--", safe(experiment.getHeader().getNumberOfFiles() + ""));
 		
 		c = StringManipulationTools.stringReplace(c, "--StorageExp--",
-					safe(experiment.getHeader().getSizekb() + " KB"));
+				safe(experiment.getHeader().getSizekb() + " KB"));
 		
 		c = StringManipulationTools.stringReplace(c, "--RemarkExp--",
-					safe(experiment.getHeader().getRemark()));
+				safe(experiment.getHeader().getRemark()));
 		
 		TextFile.write(tempDirectory.getAbsolutePath() + File.separator + fn, c);
 	}
