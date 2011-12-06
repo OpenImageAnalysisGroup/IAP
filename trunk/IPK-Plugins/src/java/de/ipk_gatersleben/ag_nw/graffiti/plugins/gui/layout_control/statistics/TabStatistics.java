@@ -104,7 +104,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author Christian Klukas
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class TabStatistics extends InspectorTab implements ActionListener,
 		ContainsTabbedPane {
@@ -1269,7 +1269,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 								"Please select at least two nodes or edges which have experimental data assigned.",
 								"More than one node needs to be selected");
 			} else
-				createScatterPlotBlock(plotAverage, tickMarksVisible,
+				lastScatterPlot = createScatterPlotBlock(plotAverage, tickMarksVisible,
 						showRangeAxis, showLegend, minimumR,
 						outlineBorderWidth, mergeDataset, prob, rankOrder,
 						currGammaValue, colR_1, colR0, colR1, graphElements,
@@ -1307,7 +1307,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 		
 		double minimumR = 0;
 		
-		return createScatterPlotBlock(plotAverage, tickMarksVisible,
+		return (JComponent) createScatterPlotBlock(plotAverage, tickMarksVisible,
 				showRangeAxis, showLegend, minimumR, outlineBorderWidth,
 				mergeDataset, prob, rankOrder, currGammaValue, colR_1, colR0,
 				colR1, graphElements, graph, true, null, null);
@@ -2547,7 +2547,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 		// GraphHelper.issueCompleteRedrawForGraph(graph);
 	}
 	
-	public static JComponent createScatterPlotBlock(boolean plotAverage,
+	public static Component createScatterPlotBlock(boolean plotAverage,
 			boolean tickMarksVisible, boolean showRangeAxis,
 			boolean showLegend, double minimumR, float outlineBorderWidth,
 			boolean mergeDataset, double prob, boolean rankOrder,
@@ -2710,12 +2710,10 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 			}
 			placeForScatter.remove(lastScatterPlot);
 		}
-		
 		lastScatterPlot = scatterBlock.getChartPanel();
 		placeForScatter.add(lastScatterPlot, "1,4");
-		placeForScatter.validate();
-		
-		return null;
+		lastScatterPlot.getParent().doLayout();
+		return lastScatterPlot;
 	}
 	
 	public static Color getRcolor(float maxOrMinR) {
