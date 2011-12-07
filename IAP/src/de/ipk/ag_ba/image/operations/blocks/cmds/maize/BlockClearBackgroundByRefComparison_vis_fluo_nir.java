@@ -86,7 +86,7 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 						.medianFilter32Bit()
 						.getImage()).compare()
 						.compareImages("fluo", getInput().getMasks().getFluo().getIO()
-								.blur(1.1).print("Blurred 1.5 fluo mask", true)
+								.blur(1.1).print("Blurred 1.5 fluo mask", false)
 								.medianFilter32Bit()
 								.getImage(),
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
