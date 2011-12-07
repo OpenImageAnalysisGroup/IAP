@@ -59,6 +59,15 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						options.getBackground(), CameraPosition.SIDE, true).erode().dilate(2).getImage();
 				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
 				
+				// filter white pot
+				int an = 5, bn = 5;
+				toBeFiltered = result.getIO().thresholdLAB(
+						120, 255,
+						127 - an, 127 + an,
+						127 - bn, 127 + bn,
+						options.getBackground(), CameraPosition.SIDE, true).erode().dilate(2).getImage();
+				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				
 				toBeFiltered = result.getIO().thresholdLAB(
 						40, 230,
 						100, 500,
