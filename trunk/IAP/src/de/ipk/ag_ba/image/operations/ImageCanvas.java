@@ -71,6 +71,26 @@ public class ImageCanvas {
 		return this;
 	}
 	
+	public ImageCanvas fillRect(int x, int y, int w, int h, int color) {
+		int wi = image.getWidth();
+		int hi = image.getHeight();
+		int[] img = image.getAs1A();
+		
+		int red = (color & 0xff0000) >> 16;
+		int green = (color & 0x00ff00) >> 8;
+		int blue = (color & 0x0000ff);
+		
+		for (int xi = x; xi <= x + w; xi++)
+			for (int yi = y; yi <= y + h; yi++) {
+				int i = xi + yi * wi;
+				if (i >= 0 && i < img.length) {
+					img[i] = (0xFF << 24 | (red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
+				}
+			}
+		image = new FlexibleImage(wi, hi, img);
+		return this;
+	}
+	
 	/**
 	 * Draws the border of a Circle.(based on Bresenham-Algorithm, see Wikipedia)
 	 * 

@@ -1847,6 +1847,124 @@ public class ImageOperation {
 			return null;
 	}
 	
+	/**
+	 * @author klukas
+	 */
+	public ImageOperation hq_thresholdLAB(
+			int lowerValueOfL, int upperValueOfL,
+			int lowerValueOfA, int upperValueOfA,
+			int lowerValueOfB, int upperValueOfB,
+			int background, boolean getRemovedPixel) {
+		int c, x, y = 0;
+		int r, g, b;
+		int Li, ai, bi;
+		
+		int width = getWidth();
+		int height = getHeight();
+		
+		int[] imagePixels = getImageAs1array();
+		
+		int[] resultImage = new int[imagePixels.length];
+		
+		for (y = 0; y < height; y++) {
+			int yw = y * width;
+			for (x = 0; x < width; x++) {
+				int off = x + yw;
+				c = imagePixels[off];
+				
+				r = ((c & 0xff0000) >> 16);
+				g = ((c & 0x00ff00) >> 8);
+				b = (c & 0x0000ff);
+				
+				Li = (int) ImageOperation.labCube[r][g][b];
+				ai = (int) ImageOperation.labCube[r][g][b + 256];
+				bi = (int) ImageOperation.labCube[r][g][b + 512];
+				
+				if (resultImage[off] != background
+						&& (((Li > lowerValueOfL) && (Li < upperValueOfL)
+								&& (ai > lowerValueOfA) && (ai < upperValueOfA)
+								&& (bi > lowerValueOfB) && (bi < upperValueOfB)))) {
+					if (!getRemovedPixel)
+						resultImage[off] = imagePixels[off];
+					else
+						resultImage[off] = background;
+				} else {
+					if (!getRemovedPixel)
+						resultImage[off] = background;
+					else
+						resultImage[off] = imagePixels[off];
+				}
+			}
+		}
+		return new FlexibleImage(width, height, resultImage).getIO();
+	}
+	
+	public ImageOperation hq_thresholdLAB_multi_color_or(
+			int[] lowerValueOfL, int[] upperValueOfL,
+			int[] lowerValueOfA, int[] upperValueOfA,
+			int[] lowerValueOfB, int[] upperValueOfB,
+			int background, boolean getRemovedPixel) {
+		int c, x, y = 0;
+		int r, g, b;
+		int Li, ai, bi;
+		
+		int width = getWidth();
+		int height = getHeight();
+		
+		int[] imagePixels = getImageAs1array();
+		
+		int[] resultImage = new int[imagePixels.length];
+		
+		for (y = 0; y < height; y++) {
+			int yw = y * width;
+			for (x = 0; x < width; x++) {
+				int off = x + yw;
+				c = imagePixels[off];
+				
+				r = ((c & 0xff0000) >> 16);
+				g = ((c & 0x00ff00) >> 8);
+				b = (c & 0x0000ff);
+				
+				Li = (int) ImageOperation.labCube[r][g][b];
+				ai = (int) ImageOperation.labCube[r][g][b + 256];
+				bi = (int) ImageOperation.labCube[r][g][b + 512];
+				
+				if (resultImage[off] != background
+						&& hq_anyMatch(Li, ai, bi, lowerValueOfA, lowerValueOfB, lowerValueOfL, upperValueOfA, upperValueOfB, upperValueOfL)) {
+					if (!getRemovedPixel)
+						resultImage[off] = imagePixels[off];
+					else
+						resultImage[off] = background;
+				} else {
+					if (!getRemovedPixel)
+						resultImage[off] = background;
+					else
+						resultImage[off] = imagePixels[off];
+				}
+			}
+		}
+		return new FlexibleImage(width, height, resultImage).getIO();
+	}
+	
+	private boolean hq_anyMatch(int Li, int ai, int bi,
+			int[] lowerValueOfAa, int[] lowerValueOfBa, int[] lowerValueOfLa,
+			int[] upperValueOfAa, int[] upperValueOfBa, int[] upperValueOfLa) {
+		
+		for (int i = 0; i < lowerValueOfAa.length; i++) {
+			int lowerValueOfL = lowerValueOfLa[i];
+			int lowerValueOfA = lowerValueOfAa[i];
+			int lowerValueOfB = lowerValueOfBa[i];
+			int upperValueOfL = upperValueOfLa[i];
+			int upperValueOfA = upperValueOfAa[i];
+			int upperValueOfB = upperValueOfBa[i];
+			if (((Li > lowerValueOfL) && (Li < upperValueOfL)
+					&& (ai > lowerValueOfA) && (ai < upperValueOfA)
+					&& (bi > lowerValueOfB) && (bi < upperValueOfB)))
+				return true;
+		}
+		return false;
+	}
+	
 	public static float[][][] getLabCube() {
 		if (IAPservice.getCurrentTimeAsNiceString() == null)
 			System.out.println();
@@ -2746,6 +2864,35 @@ public class ImageOperation {
 				}
 			}
 		
+		return new ImageOperation(in, w, h);
+	}
+	
+	public ImageOperation border_left_right(int bb, int color) {
+		int[] in = getImageAs1array();
+		
+		int w = getImage().getWidth();
+		int h = getImage().getHeight();
+		
+		int backgroundColor = color;
+		
+		if (w > bb)
+			for (int y = 0; y < h; y++) {
+				for (int d = 0; d < bb; d++) {
+					in[d + y * w] = backgroundColor;
+					in[w - 1 - d + y * w] = backgroundColor;
+				}
+			}
+		
+		// top side:
+		/*
+		 * if (h > bb)
+		 * for (int x = 0; x < w; x++) {
+		 * for (int d = 0; d < bb; d++) {
+		 * in[x + d * w] = backgroundColor;
+		 * in[x + (h - 1 - d) * w] = backgroundColor;
+		 * }
+		 * }
+		 */
 		return new ImageOperation(in, w, h);
 	}
 	

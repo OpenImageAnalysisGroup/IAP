@@ -50,6 +50,8 @@ import java.awt.image.PixelGrabber;
 import java.util.Properties;
 import java.util.Vector;
 
+import de.ipk.ag_ba.image.operations.ImageOperation;
+
 /**
  * An ImagePlus contain an ImageProcessor (2D image) or an ImageStack (3D, 4D or 5D image).
  * It also includes metadata (spatial calibration and possibly the directory/file where
@@ -2112,7 +2114,13 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			case GRAY32:
 				return (", value=" + Float.intBitsToFloat(v[0]));
 			case COLOR_RGB:
-				return (", value=" + v[0] + "," + v[1] + "," + v[2]);
+				int r = v[0];
+				int g = v[1];
+				int b = v[2];
+				int Li = (int) ImageOperation.labCube[r][g][b];
+				int ai = (int) ImageOperation.labCube[r][g][b + 256];
+				int bi = (int) ImageOperation.labCube[r][g][b + 512];
+				return (", value=" + v[0] + "," + v[1] + "," + v[2] + " // L=" + Li + ", a=" + ai + ", b=" + bi);
 			default:
 				return ("");
 		}

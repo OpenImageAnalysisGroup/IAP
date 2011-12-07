@@ -3,6 +3,8 @@
  */
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -39,7 +41,8 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						.print("Gray filtered", debug);
 			} else {
 				dilate = 0;
-				result = labFilterVis(side, mask, orig, dilate, debug);
+				result = mask;
+				// labFilterVis(side, mask, orig, dilate, debug);
 				// fis.addImage("color_filtered", result);
 				// for (int a = -80; a <= 0; a += 20)
 				// for (int b = -40; b <= 20; b += 10) {
@@ -52,34 +55,72 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				// fis.addImage("blue0_filtered a=" +
 				// a + ", b=" + b, resultT);
 				// }
-				FlexibleImage toBeFiltered = result.getIO().thresholdLAB(
+				
+				// FlexibleImageStack fis = new FlexibleImageStack();
+				
+				FlexibleImage toBeFiltered = result.getIO().hq_thresholdLAB(
 						10, 240,
 						127 - 80, 500,
 						0, 127 - 10,
-						options.getBackground(), CameraPosition.SIDE, true).erode().dilate(2).getImage();
+						options.getBackground(), false).erode().dilate(2).getImage();
 				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				
+				// fis.addImage("step 1", result.copy());
 				
 				// filter white pot
-				int an = 5, bn = 5;
-				toBeFiltered = result.getIO().thresholdLAB(
-						120, 255,
-						127 - an, 127 + an,
-						127 - bn, 127 + bn,
-						options.getBackground(), CameraPosition.SIDE, true).erode().dilate(2).getImage();
-				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				int an = 5, bn = 7;
+				toBeFiltered = result.copy().getIO().hq_thresholdLAB(
+						50, 255,
+						120 - an, 120 + an,
+						120, 120 + 2 * bn,
+						options.getBackground(), true).getImage();
 				
-				toBeFiltered = result.getIO().thresholdLAB(
-						40, 230,
-						100, 500,
-						0, 100,
-						options.getBackground(), CameraPosition.SIDE, true).dilate(8).print("ABC", false).getImage();
+				// fis.addImage("step 2", toBeFiltered.copy());
+				
 				int w = toBeFiltered.getWidth();
 				int h = toBeFiltered.getHeight();
-				toBeFiltered = toBeFiltered.getIO().getCanvas().fillRect((int) (w * 0.2), 0, (int) (w * 0.6), h, options.getBackground(), 0d).getImage();
+				toBeFiltered = toBeFiltered.getIO().getCanvas()
+						.fillRect(0, 0, w, (int) (h * 0.98), Color.red.getRGB())
+						.fillRect(0, (int) (h * 0.98), (int) (0.4 * w), (int) (h * 0.02), Color.red.getRGB())
+						.fillRect((int) (w * 0.6), (int) (h * 0.98), (int) (0.4 * w), (int) (h * 0.02), Color.red.getRGB())
+						.getImage();
+				
+				// fis.addImage("step 3", toBeFiltered.copy());
+				
+				result = result.copy().getIO().applyMask_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				
+				// fis.addImage("step 4", result);
+				
+				// remove blue markers at the side
+				toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or(
+						new int[] { 110 }, new int[] { 190 },
+						new int[] { 127 - 5 }, new int[] { 127 + 5 },
+						new int[] { 90 - 5 }, new int[] { 90 + 5 },
+						options.getBackground(), false).dilate(20).print("removed blue markers at side", false).getImage();
+				toBeFiltered = toBeFiltered.getIO().getCanvas().fillRect((int) (w * 0.2), 0, (int) (w * 0.6), h, options.getBackground()).getImage();
+				// fis.addImage("step 5", toBeFiltered.copy());
 				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				
+				// fis.addImage("step 6", result);
+				// filter background noise
+				toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or(
+						// _______________________________light blue
+						new int[] { 225, 146 - 5, 250, 170 - 10, 151 - 20, 188 - 20 }, new int[] { 254, 146 + 5, 257, 170 + 10, 151 + 4, 211 + 20 },
+						new int[] { 120 - 5, 127 - 5, 118 - 10, 129 - 5, 129 - 4, 121 - 15 }, new int[] { 120 + 6, 127 + 5, 118 + 10, 129 + 5, 129 + 4, 121 + 5 },
+						new int[] { 122 - 14, 144 - 5, 124 - 10, 117 - 5, 114 - 4, 100 - 5 }, new int[] { 122 + 5, 144 + 5, 124 + 10, 117 + 5, 114 + 4, 100 + 8 },
+						options.getBackground(), false).
+						border_left_right((int) (w * 0.05), Color.red.getRGB()).
+						print("removed noise", false).getImage();
+				// fis.addImage("step 7", toBeFiltered.copy());
+				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				// fis.addImage("step 8", result);
+				if (debug)
+					result.copy().getIO().replaceColors(options.getBackground(), Color.black.getRGB()).print("Left-Over");
+				// fis.addImage("step 9", result);
+				
 				// fis.addImage("blue1_filtered", result.copy());
-				result = result.getIO().filterGray(220, 15, 15).getImage()
-						.print("Gray filtered", debug);
+				// result = result.getIO().filterGray(220, 15, 15).getImage()
+				// .print("Gray filtered", debug);
 				// fis.addImage("gray filtered", result);
 				// fis.print("lab filter vis");
 				return result;
@@ -172,28 +213,6 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				.dilateHor(2 + dilate * 3)
 				.debug(fis, "after hor dilate", debug).// blur(4).
 				getImage();// : null;
-		
-		// // move down the pot filtering by a number of pixels, in order not
-		// // delete leafs
-		// // that are visible within the pot / before the pot background
-		// if (!options.isMaize()) {
-		// potFiltered = labFilter(result.copy(),
-		// getInput().getImages().getVis().copy(),
-		// 100, // filter anything that is very dark
-		// 255,
-		// 0, // 127 - 10,
-		// 255, // 127 + 10,
-		// 0, // 127 - 10,
-		// 255, // 127 + 10,
-		// options.getCameraPosition(), options.isMaize(), false,
-		// true, options.getBackground())
-		// .getIO()
-		// .clearImageAbove(mask.getHeight() * 0.6,
-		// options.getBackground()).erode(1)
-		// .print("A: " + dilate, debug)
-		// .threshold(127, 1, ImageOperation.BACKGROUND_COLORint)
-		// .getImage();
-		// }
 		
 		if (debug) {
 			fis.addImage("removed black", potFiltered);
