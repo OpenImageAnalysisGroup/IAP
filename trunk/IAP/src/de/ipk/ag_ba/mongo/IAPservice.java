@@ -520,6 +520,9 @@ public class IAPservice {
 					for (SampleInterface s : c) {
 						Long time = s.getRowId();
 						
+						if (time == null)
+							continue;
+						
 						if (!timestampe2snapshot.containsKey(time)) {
 							SnapshotDataIAP ns = new SnapshotDataIAP();
 							timestampe2snapshot.put(time, ns);

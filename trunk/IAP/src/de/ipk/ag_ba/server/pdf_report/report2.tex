@@ -122,14 +122,15 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Legend for linear diagrams
 \end{itemize}
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{legende}}]~
+\item [{\includegraphics[width=13cm]{legend}}]~
 \end{lyxlist}
 
 \begin{itemize}
 \item Legend for stacked bar diagrams
 \end{itemize}
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{legendeBoxStacked}}]~
+\include{legendBoxStacked}
+%%\item [{\includegraphics[width=13cm]{legendeBoxStacked}}]~
 \end{lyxlist}
 
 \section{\noindent Weight and water consumption}
@@ -140,8 +141,8 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Colnum name: Weight A (g), Weight B (g)
 \item Unit: g\end{itemize}
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"Weight A (g)\string"}}]~
-\item [{\includegraphics[width=13cm]{\string"Weight B (g)\string"}}]~
+\item [{\includegraphics[width=13cm]{\string"Weight\lyxdot A\lyxdot \lyxdot g\lyxdot \string"}}]~
+\item [{\includegraphics[width=13cm]{\string"Weight\lyxdot B\lyxdot \lyxdot g\lyxdot \string"}}]~
 \end{lyxlist}
 
 \subsection{Watering amounts / consumption}
@@ -150,7 +151,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Colnum name: Watering (weight-diff)
 \item Unit: g\end{itemize}
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"Water (weight-diff)\string"}}]~
+\item [{\includegraphics[width=13cm]{\string"Water\lyxdot \lyxdot weight\lyxdot diff\lyxdot \string"}}]~
 \end{lyxlist}
 
 
@@ -190,7 +191,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Column name: side.height.norm
 \item Unit: mm
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot height\lyxdot norm (mm)\string"}}]~
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot height\lyxdot norm\lyxdot \lyxdot mm\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
@@ -200,7 +201,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Column name: side.width.norm
 \item Unit: mm
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot width\lyxdot norm (mm)\string"}}]~
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot width\lyxdot norm\lyxdot \lyxdot mm\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
@@ -210,7 +211,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Colum name: side.area.norm
 \item Unit: pixel\texttwosuperior{}
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot area\lyxdot norm (mm2)\string"}}]~
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot area\lyxdot norm\lyxdot \lyxdot mm2\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
@@ -224,7 +225,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Column name: side.fluo.intensity.chlorophyl.average
 \item Unit: relative intensity/pixel
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot fluo\lyxdot intensity\lyxdot chlorophyl\lyxdot average (relative)\string"}}]~
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot fluo\lyxdot intensity\lyxdot chlorophyl\lyxdot average\lyxdot \lyxdot relative\lyxdot \string"}}]~
 \include{side\lyxdot fluo\lyxdot normalized\lyxdot histogram\lyxdot bin\lyxdot 1\lyxdot 0_25;side\lyxdot fluo\lyxdot normalized\lyxdot histogr}
 \end{lyxlist}
 \end{itemize}
@@ -248,7 +249,7 @@ reflection.
 \item Column name: side.nir.intensity.average
 \item Unit: relative intensity/pixel
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot nir\lyxdot intensity\lyxdot average (relative)\string"}}]~
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot nir\lyxdot intensity\lyxdot average\lyxdot \lyxdot relative\lyxdot \string"}}]~
 \include{side\lyxdot nir\lyxdot normalized\lyxdot histogram\lyxdot bin\lyxdot 1\lyxdot 0_25;side\lyxdot nir\lyxdot normalized\lyxdot histogram}
 \end{lyxlist}
 \end{itemize}
@@ -262,7 +263,7 @@ reflection.
 \item Unit: leafs
 \item Hint: leaf-tips are shown as red retangles in the image
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot leaf\lyxdot count\lyxdot median (leafs)\string"}}]~
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot leaf\lyxdot count\lyxdot median\lyxdot \lyxdot leafs\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
@@ -273,7 +274,7 @@ reflection.
 \item Unit: tassel
 \item Hint: the number of blue retangles in the image
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot bloom\lyxdot count (tassel)\string"}}]~
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot bloom\lyxdot count\lyxdot \lyxdot tassel\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
@@ -284,7 +285,13 @@ reflection.
 \item Unit: mm
 \item Hint: the yellow line in the image
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot leaf\lyxdot length\lyxdot sum\lyxdot norm\lyxdot max (mm)\string"}}]~\end{lyxlist}
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot leaf\lyxdot length\lyxdot sum\lyxdot norm\lyxdot max\lyxdot \lyxdot mm\lyxdot \string"}}]~\end{lyxlist}
 \end{itemize}
+
+\section{Appendix}
+\begin{lyxlist}{00.00.0000}
+\include{appendixImage}
+\end{lyxlist}
+
 
 \end{document}
