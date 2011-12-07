@@ -6,17 +6,28 @@ INPUTFILE="report.csv"
 
 if [ $PARAM = 1 ]; then
 	TREAT=${1}
-	SEC=""
+	SEC="none"
+	THI="FALSE"
 elif [ $PARAM = 2 ]; then
 	TREAT=${1}
-	SEC=${2}	
+	SEC=${2}
+	THI="FALSE"	
+elif [ $PARAM = 3 ]; then
+	TREAT=${1}
+	SEC=${2}
+	THI=${3}
 else
-	TREAT="Treatment"
-	SEC=""
+	TREAT="Condition"
+	SEC="none"
+	THI="FALSE"
 fi
 
-Rscript createDiagramOneFile.r ${INPUTFILE} png FALSE ${TREAT} ${SEC}
-Rscript createDiagramOneFile.r ${INPUTFILE} png TRUE ${TREAT} ${SEC}
+if [ ${THI} = "TRUE" ]; then
+	Rscript createDiagramOneFile.r ${INPUTFILE} png FALSE ${TREAT} ${SEC}
+	Rscript createDiagramOneFile.r ${INPUTFILE} png TRUE ${TREAT} ${SEC}
+else
+	Rscript createDiagramOneFile.r ${INPUTFILE} png FALSE ${TREAT} ${SEC}
+fi
 
 echo "Create PDF..."
 /usr/texbin/pdflatex report2.tex
