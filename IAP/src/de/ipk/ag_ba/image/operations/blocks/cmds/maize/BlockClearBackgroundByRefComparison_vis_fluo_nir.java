@@ -81,7 +81,7 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 				FlexibleImage fluo = getInput().getImages().getFluo();
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
-				return new ImageOperation(fluo.getIO()
+				FlexibleImage result = new ImageOperation(fluo.getIO()
 						// .blur(1.5).print("Blurred 1.5 fluo image", true)
 						.medianFilter32Bit()
 						.getImage()).compare()
@@ -93,6 +93,21 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
 								options.getIntSetting(Setting.abDiff_FLUO) * 0.5d,
 								back).border(2).getImage();
+				
+				FlexibleImage toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or(
+						// black background and green pot (fluo of white pot)
+						new int[] { -1, 200 - 40 }, new int[] { 115, 200 + 20 },
+						new int[] { 90 - 5, 104 - 15 }, new int[] { 150 + 5, 104 + 15 },
+						new int[] { 116 - 5, 206 - 20 }, new int[] { 175 + 5, 206 + 20 },
+						options.getBackground(), false).
+						print("removed noise", debug).getImage();
+				
+				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				
+				if (debug)
+					result.copy().getIO().replaceColors(options.getBackground(), Color.YELLOW.getRGB()).print("Left-Over");
+				
+				return result;
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
