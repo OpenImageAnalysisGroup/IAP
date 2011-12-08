@@ -79,5 +79,4 @@ public class SampleAverage3D extends SampleAverage {
 			setValue(avg);
 		}
 	}
-	
 }

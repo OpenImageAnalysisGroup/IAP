@@ -162,7 +162,7 @@ public class FlexibleImage {
 	
 	public FlexibleImage print(String title) {
 		if (!SystemAnalysis.isHeadless()) {
-			PrintImage.printImage(image, title);
+			PrintImage.printImage(copy().image, title);
 			IAPmain.showImageJ();
 		}
 		return this;

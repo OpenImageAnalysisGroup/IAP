@@ -2225,33 +2225,59 @@ public class MongoDB {
 						+ SystemAnalysisExt.getCurrentTime());
 				res.append("REORGANIZATION: Stored binary files: " + numberOfBinaryFilesInDatabase + " // "
 						+ SystemAnalysisExt.getCurrentTime() + "<br>");
-				status.setCurrentStatusText1("Binary files: " + numberOfBinaryFilesInDatabase);
+				status.setCurrentStatusText2("Binary files: " + numberOfBinaryFilesInDatabase);
 				status.setCurrentStatusValueFine(100d / 5 * 1);
 				
 				ArrayList<ExperimentHeaderInterface> el = getExperimentList(null);
 				HashSet<String> linkedHashes = new HashSet<String>();
 				double smallStep = 100d / 5 * 1 / el.size();
-				HashSet<String> dbIdsOfSubstances = new HashSet<String>();
-				HashSet<String> dbIdsOfConditions = new HashSet<String>();
+				ArrayList<String> dbIdsOfSubstances = new ArrayList<String>();
+				ArrayList<String> dbIdsOfConditions = new ArrayList<String>();
+				status.setCurrentStatusText2("Read list of substances");
+				double oldStatus = status.getCurrentStatusValueFine();
+				status.setCurrentStatusValue(-1);
 				{
 					DBCollection substances = db.getCollection("substances");
-					DBCursor subCur = substances.find();
+					long nn = 0, max = substances.count();
+					status.setCurrentStatusText2("Read list of substances (" + max + ")");
+					DBCursor subCur = substances.find(new BasicDBObject(), new BasicDBObject("_id", 1));
 					while (subCur.hasNext()) {
 						DBObject subO = subCur.next();
 						dbIdsOfSubstances.add(subO.get("_id") + "");
+						nn++;
+						if (nn % 500 == 0) {
+							status.setCurrentStatusText2("Read list of substances (" + nn + "/" + max + ")");
+							status.setCurrentStatusValueFine(100d * nn / max);
+						}
 					}
+					status.setCurrentStatusText2("Read list of substances (" + nn + ")");
 				}
+				status.setCurrentStatusText1(status.getCurrentStatusMessage2());
+				status.setCurrentStatusText2("Read list of conditions");
 				{
 					DBCollection conditions = db.getCollection("conditions");
-					DBCursor condCur = conditions.find();
+					long nn = 0, max = conditions.count();
+					status.setCurrentStatusText2("Read list of conditions (" + max + ")");
+					DBCursor condCur = conditions.find(new BasicDBObject(), new BasicDBObject("_id", 1));
 					while (condCur.hasNext()) {
 						DBObject condO = condCur.next();
 						dbIdsOfSubstances.add(condO.get("_id") + "");
+						nn++;
+						if (nn % 500 == 0) {
+							status.setCurrentStatusText2("Read list of conditions (" + nn + "/" + max + ")");
+							status.setCurrentStatusValueFine(100d * nn / max);
+						}
+						
 					}
+					status.setCurrentStatusText2("Read list of conditions (" + nn + "/" + max + ")");
 				}
-				
+				status.setCurrentStatusText1("Create inventory");
+				status.setCurrentStatusValueFine(oldStatus);
+				int ii = 0;
+				int nn = el.size();
 				for (ExperimentHeaderInterface ehii : el) {
-					status.setCurrentStatusText2("Analyze " + ehii.getExperimentName());
+					ii++;
+					status.setCurrentStatusText2("Analyze " + ehii.getExperimentName() + " (" + ii + "/" + nn + ")");
 					ArrayList<DBObject> substanceObjects = new ArrayList<DBObject>();
 					ArrayList<DBObject> conditionObjects = new ArrayList<DBObject>();
 					ExperimentInterface exp = getExperiment(ehii, false, status, substanceObjects, conditionObjects);
@@ -2289,24 +2315,26 @@ public class MongoDB {
 				
 				{
 					DBCollection substances = db.getCollection("substances");
-					status.setCurrentStatusText1("Remove not linked substances: " + dbIdsOfSubstances.size());
+					status.setCurrentStatusText1("Remove stale substances: " + dbIdsOfSubstances.size());
 					int n = 0;
 					long max = dbIdsOfSubstances.size();
 					for (String subID : dbIdsOfSubstances) {
 						n++;
-						substances.remove(new BasicDBObject("_id", subID));
+						substances.remove(new BasicDBObject("_id", subID), WriteConcern.NONE);
 						status.setCurrentStatusValueFine(100d / max * n);
+						status.setCurrentStatusText2(n + "/" + max);
 					}
 				}
 				{
 					int n = 0;
 					long max = dbIdsOfConditions.size();
 					DBCollection conditions = db.getCollection("conditions");
-					status.setCurrentStatusText1("Remove not linked conditions: " + dbIdsOfConditions.size());
+					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size());
 					for (String condID : dbIdsOfConditions) {
 						n++;
-						conditions.remove(new BasicDBObject("_id", condID));
+						conditions.remove(new BasicDBObject("_id", condID), WriteConcern.NONE);
 						status.setCurrentStatusValueFine(100d / max * n);
+						status.setCurrentStatusText2(n + "/" + max);
 					}
 				}
 				
@@ -2315,6 +2343,7 @@ public class MongoDB {
 					System.out.println("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysisExt.getCurrentTime());
 					res.append("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysisExt.getCurrentTime() + "<br>");
 					status.setCurrentStatusText1("Linked files: " + linkedHashes.size());
+					status.setCurrentStatusText2("");
 					status.setCurrentStatusValueFine(100d / 5 * 2);
 					
 					double stepSize = 100d / 5 * 3 / MongoGridFS.getFileCollectionsInclPreview().size();

@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import java.awt.Color;
-
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -14,7 +12,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	boolean debug = true;
+	boolean debug = false;
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
@@ -26,11 +24,7 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 				// compare images
 				int blackDiff = 50; // options.getIntSetting(Setting.B_Diff_NIR);
 				int whiteDiff = 5; // options.getIntSetting(Setting.W_Diff_NIR);
-				if (options.isBarleyInBarleySystem()) {
-					// remove horizontal bar
-					nirImage = filterHorBar(nirImage);
-					nirMask = filterHorBar(nirMask);
-				}
+				
 				boolean advancedComparisonFilter = true;
 				if (advancedComparisonFilter) {
 					ImageOperation subtracted = nirImage.getIO().
@@ -108,36 +102,6 @@ public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 			}
 		}
 		return nirMask;
-	}
-	
-	private FlexibleImage filterHorBar(FlexibleImage nirImage) {
-		if (true)
-			return nirImage;
-		int[][] in = nirImage.getAs2A();
-		int width = nirImage.getWidth();
-		int height = nirImage.getHeight();
-		int gray = new Color(180, 180, 180).getRGB();
-		for (int y = 0; y < height; y++) {
-			double sum = 0;
-			int n = 0;
-			for (int x = 0; x < width; x++) {
-				float i = (float) ((in[x][y] & 0x0000ff) / 255.0); // B 0..1
-				sum = sum + i;
-				n++;
-			}
-			double avg = sum / n;
-			double differenceDistanceSum = 0;
-			for (int x = 0; x < width; x++) {
-				float i = (float) ((in[x][y] & 0x0000ff) / 255.0); // B 0..1
-				differenceDistanceSum += Math.abs(i - avg);
-			}
-			if (differenceDistanceSum / n < 0.12) {
-				for (int x = 0; x < width; x++) {
-					in[x][y] = gray;
-				}
-			}
-		}
-		return new FlexibleImage(in);
 	}
 	
 	private FlexibleImage MapOriginalOnSkel(FlexibleImage skeleton, FlexibleImage original, int back) {
