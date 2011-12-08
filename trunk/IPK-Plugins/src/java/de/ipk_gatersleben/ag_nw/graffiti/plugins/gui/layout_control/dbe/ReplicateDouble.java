@@ -10,8 +10,10 @@ public class ReplicateDouble {
 	private double measurementValue;
 	private String replicateNumber;
 	private final String optQualityAnnotation;
+	private final String optPosition;
 	
-	public ReplicateDouble(Object measurementValue, String replicateNumber, String optQualityAnnotation) {
+	public ReplicateDouble(Object measurementValue, String replicateNumber, String optQualityAnnotation, String optPosition) {
+		this.optPosition = optPosition;
 		if (measurementValue == null || (!(measurementValue instanceof Double)))
 			measurementValue = new Double(Double.NaN);
 		this.setMeasurementValue((Double) measurementValue);
@@ -44,5 +46,9 @@ public class ReplicateDouble {
 	
 	public double doubleValue() {
 		return measurementValue;
+	}
+	
+	public String getOptionalPosition() {
+		return optPosition;
 	}
 }

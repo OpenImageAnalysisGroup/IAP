@@ -92,7 +92,11 @@ public class ExperimentConstructor {
 		for (MemSample ms : samples) {
 			addCellDataDirect(xls, col("A"), row, ms.getPlantID()); // plant ID
 			if (ms.getOptQualityAnnotation() != null)
-				addCellDataDirect(xls, col("B"), row, ms.getReplicateID() + ";" + ms.getOptQualityAnnotation()); // replicate and quality annotation
+				addCellDataDirect(xls, col("B"), row, ms.getReplicateID() +
+						";" + ms.getOptQualityAnnotation() + ";" + ms.getPosition());
+			// replicate and quality
+			// annotation and
+			// position
 			else
 				addCellDataDirect(xls, col("B"), row, ms.getReplicateID()); // replicate
 			// #

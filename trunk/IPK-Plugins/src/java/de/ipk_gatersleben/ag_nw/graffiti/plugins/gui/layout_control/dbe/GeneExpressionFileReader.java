@@ -253,7 +253,10 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 							if (rd.getOptionalQualityAnnotation() != null)
 								mesEntry.setQualityAnnotation(rd.getOptionalQualityAnnotation());
 							mesEntry.setReplicateID(new Integer(rd.getReplicateNumber()));
+							if (rd.getOptionalPosition() != null)
+								mesEntry.setAttribute(new Attribute("position", rd.getOptionalPosition()));
 							mesEntry.setValue(value);
+							mesEntry.setParentSample(sampleEntry);
 							dataCount++;
 						}
 						status2 = dataCount + " measurement values processed";
