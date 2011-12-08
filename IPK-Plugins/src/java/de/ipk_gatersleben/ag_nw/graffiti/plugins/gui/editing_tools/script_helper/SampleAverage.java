@@ -13,6 +13,11 @@ public class SampleAverage implements SampleAverageInterface {
 	private final SampleInterface parentSample;
 	private String ownUnit = null;
 	
+	@Override
+	public String toString() {
+		return "[average=" + value + ", stddev=" + stddev + ", replicate=" + replicates + " / " + parentSample + "]";
+	}
+	
 	public SampleAverage(SampleInterface parent) {
 		this.parentSample = parent;
 		calculateValuesFromSampleData();
@@ -32,6 +37,7 @@ public class SampleAverage implements SampleAverageInterface {
 		}
 	}
 	
+	@Override
 	public void getString(StringBuilder r) {
 		r.append("<average");
 		Substance.getAttributeString(r, new String[] {
@@ -43,14 +49,17 @@ public class SampleAverage implements SampleAverageInterface {
 		r.append("</average>");
 	}
 	
+	@Override
 	public double getValue() {
 		return value;
 	}
 	
+	@Override
 	public SampleInterface getParentSample() {
 		return parentSample;
 	}
 	
+	@Override
 	public void calculateValuesFromSampleData() {
 		if (parentSample.size() == 0) {
 			setMin(Double.NaN);
@@ -104,10 +113,12 @@ public class SampleAverage implements SampleAverageInterface {
 		}
 	}
 	
+	@Override
 	public double getStdDev() {
 		return getStddev();
 	}
 	
+	@Override
 	public String getUnit() {
 		if (ownUnit == null)
 			return parentSample.getAverageUnit();
@@ -115,6 +126,7 @@ public class SampleAverage implements SampleAverageInterface {
 			return ownUnit;
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public boolean setData(Element averageElement) {
 		setMin(Double.NaN);
@@ -178,62 +190,77 @@ public class SampleAverage implements SampleAverageInterface {
 							System.err.println("Internal Error: Unknown Average Attribute: " + a.getName());
 	}
 	
+	@Override
 	public void setUnit(String ownUnit) {
 		this.ownUnit = ownUnit;
 	}
 	
+	@Override
 	public void setReplicateId(int replicates) {
 		this.replicates = replicates;
 	}
 	
+	@Override
 	public int getReplicateID() {
 		return replicates;
 	}
 	
+	@Override
 	public void setMax(double max) {
 		this.max = max;
 	}
 	
+	@Override
 	public double getMax() {
 		return max;
 	}
 	
+	@Override
 	public void setMin(double min) {
 		this.min = min;
 	}
 	
+	@Override
 	public double getMin() {
 		return min;
 	}
 	
+	@Override
 	public void setStddev(double stddev) {
 		this.stddev = stddev;
 	}
 	
+	@Override
 	public double getStddev() {
 		return stddev;
 	}
 	
+	@Override
 	public void setValue(double value) {
 		this.value = value;
 	}
 	
+	@Override
 	public void getStringOfChildren(StringBuilder r) {
 		// ?
 	}
 	
+	@Override
 	public void getXMLAttributeString(StringBuilder r) {
 		// ?
 	}
 	
+	@Override
 	public void setAttribute(Attribute attr) {
 		// ?
 	}
 	
+	@Override
 	public void setDataOfChildElement(Element childElement) {
 		// ?
 	}
 	
+	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
 		attributeValueMap.put("max", getMax());
 		attributeValueMap.put("min", getMin());

@@ -62,7 +62,7 @@ public class BlockLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						10, 240,
 						127 - 80, 500,
 						0, 127 - 10,
-						options.getBackground(), false).erode().dilate(2).getImage();
+						options.getBackground(), false).getImage();// .erode().dilate(2).getImage();
 				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
 				
 				// fis.addImage("step 1", result.copy());

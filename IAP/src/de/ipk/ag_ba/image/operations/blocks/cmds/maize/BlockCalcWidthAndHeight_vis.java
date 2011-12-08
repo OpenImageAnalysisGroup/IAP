@@ -18,26 +18,26 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockCalcWidthAndHeight_vis extends
 		AbstractSnapshotAnalysisBlockFIS {
-
+	
 	private static final boolean debug = false;
-
+	
 	@Override
 	protected boolean isChangingImages() {
 		return true;
 	}
-
+	
 	@Override
 	protected FlexibleImage processVISmask() {
-
+		
 		int background = options.getBackground();
 		double realMarkerDistHorizontal = options
 				.getIntSetting(Setting.REAL_MARKER_DISTANCE);
-
+		
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1,
 				PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
-
+		
 		boolean useFluo = false;// options.isMaize();
-
+		
 		int vertYsoilLevel = -1;
 		if (false) {
 			if (useFluo) {
@@ -61,15 +61,15 @@ public class BlockCalcWidthAndHeight_vis extends
 			}
 		}
 		final int vertYsoilLevelF = vertYsoilLevel;
-
+		
 		FlexibleImage visRes = getInput().getMasks().getVis();
-
+		
 		FlexibleImage img = useFluo ? getInput().getMasks().getFluo()
 				: getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && img != null) {
 			final TopBottomLeftRight temp = getWidthAndHeightSide(img,
 					background, vertYsoilLevel);
-
+			
 			double resf = useFluo ? (double) getInput().getMasks().getVis()
 					.getWidth()
 					/ (double) img.getWidth()
@@ -78,63 +78,64 @@ public class BlockCalcWidthAndHeight_vis extends
 					/ (getInput().getImages().getVis().getWidth() / (double) getInput()
 							.getImages().getVis().getHeight())
 					: 1.0;
-
+			
 			double resfww = useFluo ? (double) getInput().getMasks().getVis()
 					.getWidth()
 					/ (double) img.getWidth() : 1.0;
-
+			
 			final Point values = temp != null ? new Point(Math.abs(temp
 					.getRightX() - temp.getLeftX()), Math.abs(temp.getBottomY()
 					- temp.getTopY())) : null;
-
+			
 			if (values != null) {
-
-				if (!useFluo) {
-					getProperties().addImagePostProcessor(
-							new RunnableOnImageSet() {
-								@Override
-								public FlexibleImage postProcessVis(
-										FlexibleImage visRes) {
-									if (vertYsoilLevelF > 0)
-										visRes = visRes
-												.getIO()
-												.getCanvas()
-												.fillRect(
-														values.x
-																/ 2
-																+ temp.getLeftX(),
-														vertYsoilLevelF,
-														10,
-														vertYsoilLevelF
-																- values.y,
-														Color.BLUE.getRGB(),
-														255).getImage()
-												.print("DEBUG", debug);
-									else
-										visRes = visRes
-												.getIO()
-												.getCanvas()
-												.fillRect(
-														values.x
-																/ 2
-																+ temp.getLeftX(),
-														temp.getTopY(),
-														10,
-														temp.getBottomY()
-																- temp.getTopY(),
-														Color.RED.getRGB(), 255)
-												.getImage()
-												.print("DEBUG", debug);
-									return visRes;
-								}
-
-								@Override
-								public ImageConfiguration getConfig() {
-									return ImageConfiguration.RgbSide;
-								}
-							});
-				}
-
+				boolean drawVerticalHeightBar = false;
+				if (drawVerticalHeightBar)
+					if (!useFluo) {
+						getProperties().addImagePostProcessor(
+								new RunnableOnImageSet() {
+									@Override
+									public FlexibleImage postProcessVis(
+											FlexibleImage visRes) {
+										if (vertYsoilLevelF > 0)
+											visRes = visRes
+													.getIO()
+													.getCanvas()
+													.fillRect(
+															values.x
+																	/ 2
+																	+ temp.getLeftX(),
+															vertYsoilLevelF,
+															10,
+															vertYsoilLevelF
+																	- values.y,
+															Color.BLUE.getRGB(),
+															255).getImage()
+													.print("DEBUG", debug);
+										else
+											visRes = visRes
+													.getIO()
+													.getCanvas()
+													.fillRect(
+															values.x
+																	/ 2
+																	+ temp.getLeftX(),
+															temp.getTopY(),
+															10,
+															temp.getBottomY()
+																	- temp.getTopY(),
+															Color.RED.getRGB(), 255)
+													.getImage()
+													.print("DEBUG", debug);
+										return visRes;
+									}
+									
+									@Override
+									public ImageConfiguration getConfig() {
+										return ImageConfiguration.RgbSide;
+									}
+								});
+					}
+				
 				if (distHorizontal != null) {
 					getProperties()
 							.setNumericProperty(
@@ -155,10 +156,10 @@ public class BlockCalcWidthAndHeight_vis extends
 						"RESULT_side.width", values.x);
 				getProperties().setNumericProperty(getBlockPosition(),
 						"RESULT_side.height", values.y);
-
+				
 			}
 		}
-
+		
 		// if (options.getCameraTyp() == CameraTyp.TOP) {
 		// Point values = getWidthandHeightTop(getInput().getMasks().getFluo(),
 		// background);
@@ -186,7 +187,7 @@ public class BlockCalcWidthAndHeight_vis extends
 		// }
 		return visRes;
 	}
-
+	
 	private TopBottomLeftRight getWidthAndHeightSide(FlexibleImage vis,
 			int background, int vertYsoilLevel) {
 		TopBottomLeftRight temp = new ImageOperation(vis)
@@ -201,38 +202,38 @@ public class BlockCalcWidthAndHeight_vis extends
 		} else
 			return null;
 	}
-
+	
 	private Point getWidthandHeightTop(FlexibleImage image, int background) {
 		if (image == null) {
 			System.err
 					.println("ERROR: BlockCalculateWidthAndHeight: Flu Mask is NULL!");
 			return null;
 		}
-
+		
 		int imagecentx = image.getWidth() / 2;
 		int imagecenty = image.getHeight() / 2;
 		int diagonal = (int) Math.sqrt((image.getWidth() * image.getWidth())
 				+ (image.getHeight() * image.getHeight()));
-
+		
 		ImageOperation io = new ImageOperation(image);
 		BlockProperty pa = getProperties().getNumericProperty(0, 1,
 				PropertyNames.CENTROID_X);
 		BlockProperty pb = getProperties().getNumericProperty(0, 1,
 				PropertyNames.CENTROID_Y);
 		FlexibleImage resize = null;
-
+		
 		if (pa != null && pb != null) {
-
+			
 			Vector2d cent = io.getCentroid(background);
 			int centroidX = (int) cent.x;
 			int centroidY = (int) cent.y;
-
+			
 			// size vis and fluo are the same, scalefactor cant be calculated
 			// int paScale = (int) (pa.getValue() *
 			// (getInput().getMasks().getVis().getWidth() / image.getWidth()));
 			// int pbScale = (int) (pa.getValue() *
 			// (getInput().getMasks().getVis().getWidth() / image.getWidth()));
-
+			
 			if (image.getWidth() > image.getHeight()) {
 				resize = io.addBorder((diagonal - image.getWidth()) / 2,
 						(imagecentx - centroidX), (imagecenty - centroidY),
@@ -242,10 +243,10 @@ public class BlockCalcWidthAndHeight_vis extends
 						(imagecentx - centroidX), (imagecenty - centroidY),
 						background).getImage();
 			}
-
+			
 			int angle = (int) getProperties().getNumericProperty(0, 1,
 					PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION).getValue();
-
+			
 			if (resize != null) {
 				resize = new ImageOperation(resize).rotate(-angle).getImage();
 				// resize.print("resize");

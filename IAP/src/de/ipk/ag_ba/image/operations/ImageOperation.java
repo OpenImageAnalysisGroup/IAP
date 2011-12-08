@@ -66,7 +66,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class ImageOperation {
 	protected final ImagePlus image;
 	protected ResultsTable rt;
-	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);
+	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);// new Color(155, 155, 255, 255);
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
 	/**

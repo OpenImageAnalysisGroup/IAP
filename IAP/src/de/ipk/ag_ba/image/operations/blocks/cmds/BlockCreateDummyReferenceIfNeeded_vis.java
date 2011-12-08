@@ -66,7 +66,7 @@ public class BlockCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnaly
 		// return ImageOperation.createColoredImage(w, h, new Color(3, 3, 3));
 		// } else
 		if (getInput().getImages().getFluo() != null && getInput().getMasks().getFluo() == null)
-			return getInput().getImages().getFluo().getIO().blur(1).thresholdLAB(
+			return getInput().getImages().getFluo().copy().getIO().blur(2).thresholdLAB(
 					0, 110,
 					0, 500,
 					0, 500,
