@@ -21,8 +21,8 @@ import org.ErrorMsg;
  *         (c) 2004 IPK-Gatersleben
  */
 public class ExperimentData {
-	private Set<String> knownSubstanceNames = new LinkedHashSet<String>();
-	private Set<String> knownPlantOrLineNames = new LinkedHashSet<String>();
+	private final Set<String> knownSubstanceNames = new LinkedHashSet<String>();
+	private final Set<String> knownPlantOrLineNames = new LinkedHashSet<String>();
 	
 	/**
 	 * Initialize list of known Substance Names; use the data from the given column.
@@ -53,6 +53,7 @@ public class ExperimentData {
 	
 	public Iterator<TimeAndPlantName> getSampleTimeIterator(TableData myData, String plantOrLine, int data_start_col, int row, int check_datarow) {
 		SortedSet<TimeAndPlantName> result = new TreeSet<TimeAndPlantName>(new Comparator<Object>() {
+			@Override
 			public int compare(Object arg0, Object arg1) {
 				TimeAndPlantName o1, o2;
 				o1 = (TimeAndPlantName) arg0;
@@ -72,19 +73,19 @@ public class ExperimentData {
 	}
 	
 	public ArrayList<DataColumnHeader> getReplicateColumns(
-						TableData myData,
-						TimeAndPlantName timeAndPlantName,
-						int data_start_col,
-						int row,
-						int check_datarow) {
+			TableData myData,
+			TimeAndPlantName timeAndPlantName,
+			int data_start_col,
+			int row,
+			int check_datarow) {
 		
 		ArrayList<DataColumnHeader> result = new ArrayList<DataColumnHeader>();
 		for (int col = data_start_col; col <= myData.getMaximumCol(); col++) {
 			DataColumnHeader dch = new DataColumnHeader(myData.getUnicodeStringCellData(col, row), col);
 			if (dch.isValid()
-								&& dch.getPlant().equals(timeAndPlantName.getPlant())
-								&& dch.getTime() == timeAndPlantName.getTime()
-								&& myData.getCellData(col, check_datarow, null) != null) {
+					&& dch.getPlant().equals(timeAndPlantName.getPlant())
+					&& dch.getTime() == timeAndPlantName.getTime()
+					&& myData.getCellData(col, check_datarow, null) != null) {
 				result.add(dch);
 			}
 		}
@@ -96,14 +97,14 @@ public class ExperimentData {
 		for (DataColumnHeader dch : replicates) {
 			Object mes_val = myData.getCellData(dch.getColumn(), row, null);
 			if (mes_val != null && mes_val instanceof Double) {
-				ReplicateDouble rd = new ReplicateDouble(mes_val, new Integer(dch.getReplicateNumber()).toString(), null);
+				ReplicateDouble rd = new ReplicateDouble(mes_val, new Integer(dch.getReplicateNumber()).toString(), null, null);
 				result.add(rd);
 			}
 			if (mes_val != null && mes_val instanceof String) {
 				String mes_val_s = myData.getUnicodeStringCellData(dch.getColumn(), row);
 				if (mes_val_s != null && mes_val_s.length() > 0
-									&& (mes_val_s.equalsIgnoreCase("-") || mes_val_s.equalsIgnoreCase("n/a") || mes_val_s.equalsIgnoreCase("na"))) {
-					ReplicateDouble rd = new ReplicateDouble(Double.NaN, new Integer(dch.getReplicateNumber()).toString(), null);
+						&& (mes_val_s.equalsIgnoreCase("-") || mes_val_s.equalsIgnoreCase("n/a") || mes_val_s.equalsIgnoreCase("na"))) {
+					ReplicateDouble rd = new ReplicateDouble(Double.NaN, new Integer(dch.getReplicateNumber()).toString(), null, null);
 					result.add(rd);
 				} else {
 					try {
@@ -113,7 +114,7 @@ public class ExperimentData {
 							annotation = mes_val_s.substring(colPos + 1);
 							mes_val_s = mes_val_s.substring(0, colPos);
 						}
-						ReplicateDouble rd = new ReplicateDouble(Double.parseDouble(mes_val_s), new Integer(dch.getReplicateNumber()).toString(), annotation);
+						ReplicateDouble rd = new ReplicateDouble(Double.parseDouble(mes_val_s), new Integer(dch.getReplicateNumber()).toString(), annotation, null);
 						result.add(rd);
 					} catch (NumberFormatException nfe) {
 						ErrorMsg.addErrorMessage("Number Format Exception in row " + row + ", column " + dch.getColumn() + ", value: " + mes_val_s);

@@ -566,6 +566,7 @@ public class TableData {
 		//
 		String optQualityAnnotation = null;
 		Object replObj = getCellData(col("B"), row, null);
+		String optPosition = null;
 		if (replObj != null && replObj instanceof Double)
 			replicateNum = ((Double) replObj).toString();
 		else
@@ -574,12 +575,13 @@ public class TableData {
 			else {
 				if (replObj != null && replObj instanceof String) {
 					String replicateString = (String) replObj;
-					replicateNum = replicateString.split(";", 2)[0];
-					optQualityAnnotation = replicateString.split(";", 2)[1];
+					replicateNum = replicateString.split(";", 3)[0];
+					optQualityAnnotation = replicateString.split(";", 3)[1];
+					optPosition = replicateString.split(";", 3)[2];
 				}
 			}
 		
-		ReplicateDouble measureValue = new ReplicateDouble(val, replicateNum, optQualityAnnotation);
+		ReplicateDouble measureValue = new ReplicateDouble(val, replicateNum, optQualityAnnotation, optPosition);
 		
 		String timeUnit = getUnicodeStringCellData(col("D"), row);
 		if (timeUnit == null)

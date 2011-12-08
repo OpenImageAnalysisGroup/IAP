@@ -58,9 +58,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.statistics.M
 public class SOMguiHelper implements HelperClass {
 	
 	public static void showSOMcentroidsAndClusterAssignmentSettings(
-						Map som,
-						String[] columns,
-						Graph optSrcGraph) {
+			Map som,
+			String[] columns,
+			Graph optSrcGraph) {
 		
 		// int[] groupCount = new int[result.length];
 		// for (int i=0; i<result.length; i++)
@@ -75,7 +75,7 @@ public class SOMguiHelper implements HelperClass {
 		double[][] size =
 		{ { border, TableLayoutConstants.FILL, border }, // Columns
 				{ border, TableLayoutConstants.PREFERRED,
-												TableLayoutConstants.FILL, border }
+						TableLayoutConstants.FILL, border }
 		}; // Rows
 		newFrame.setLayout(new TableLayout(size));
 		newFrame.add(new JLabel("SOM Nodes / Prototypes; Select target cluster IDs:"), "1,1");
@@ -95,15 +95,16 @@ public class SOMguiHelper implements HelperClass {
 				CategoryDataset dataset = getDataset(som, nodeIndex, columns, timePoints);
 				
 				JFreeChart chart = createChart(dataset,
-									"Centroid " + (nodeIndex + 1) + "-> Cluster ID " + (nodeIndex + 1),
-									PlotOrientation.VERTICAL, false, null, null, true, (Integer) timePoints.getObject() > 1, 3, (Integer) timePoints.getObject(),
-									srcGraph);
+						"Centroid " + (nodeIndex + 1) + "-> Cluster ID " + (nodeIndex + 1),
+						PlotOrientation.VERTICAL, false, null, null, true, (Integer) timePoints.getObject() > 1, 3, (Integer) timePoints.getObject(),
+						srcGraph);
 				ChartPanel chartPanel = new ChartPanel(chart, true, true, true, true, true);
 				chartPanel.setToolTipText("Click to get details on data ordering");
 				final Color selectedColor = new Color(200, 200, 220);
 				chartPanel.getBackground();
 				selectedColor.brighter().brighter();
 				chartPanel.addMouseListener(new MouseListener() {
+					@Override
 					public void mouseClicked(MouseEvent e) {
 						String colDesc = "";
 						for (String col : columns) {
@@ -116,18 +117,22 @@ public class SOMguiHelper implements HelperClass {
 						MainFrame.showMessageDialogWithScrollBars(colDesc, "X-Axis");
 					}
 					
+					@Override
 					public void mousePressed(MouseEvent e) {
 					}
 					
+					@Override
 					public void mouseReleased(MouseEvent e) {
 					}
 					
+					@Override
 					public void mouseEntered(MouseEvent e) {
 						// ChartPanel src = (ChartPanel) e.getSource();
 						// if (src.getBackground()!=selectedColor)
 						// src.setBackground(hoverColor);
 					}
 					
+					@Override
 					public void mouseExited(MouseEvent e) {
 						// ChartPanel src = (ChartPanel) e.getSource();
 						// if (src.getBackground()!=selectedColor)
@@ -144,21 +149,22 @@ public class SOMguiHelper implements HelperClass {
 	}
 	
 	private static JComponent getChartPanelWithCommandButton(
-						final ChartPanel chartPanel, final int nodeIndex, int maxIndex, final Map som) {
+			final ChartPanel chartPanel, final int nodeIndex, int maxIndex, final Map som) {
 		JPanel resultPanel = new JPanel();
 		double border = 0;
 		double[][] size =
 		{ { border, TableLayoutConstants.FILL, border }, // Columns
 				{ border,
-												TableLayoutConstants.FILL,
-												TableLayoutConstants.PREFERRED,
-												border }
+						TableLayoutConstants.FILL,
+						TableLayoutConstants.PREFERRED,
+						border }
 		}; // Rows
 		resultPanel.setLayout(new TableLayout(size));
 		resultPanel.add(chartPanel, "1,1");
 		final JComboBox selectClusterID = new JComboBox(getSelections(nodeIndex, maxIndex));
 		selectClusterID.setSelectedIndex(nodeIndex);
 		selectClusterID.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (selectClusterID.getSelectedIndex() == selectClusterID.getItemCount() - 1) {
 					// ignore this SOM prototype!
@@ -185,9 +191,9 @@ public class SOMguiHelper implements HelperClass {
 	}
 	
 	private static JFreeChart createChart(CategoryDataset dataset, String title,
-						PlotOrientation orientation, boolean showLegend, String domainAxis,
-						String rangeAxis, boolean showRangeAxis, boolean showCategoryAxis,
-						float outlineBorderWidth, int timePoints, Graph srcGraph) {
+			PlotOrientation orientation, boolean showLegend, String domainAxis,
+			String rangeAxis, boolean showRangeAxis, boolean showCategoryAxis,
+			float outlineBorderWidth, int timePoints, Graph srcGraph) {
 		final JFreeChart chart;
 		if (timePoints > 1) {
 			chart = ChartFactory.createLineChart(title, // chart
@@ -223,7 +229,7 @@ public class SOMguiHelper implements HelperClass {
 	}
 	
 	public static Graph createCentroidNodesGraph(Map som,
-						String[] columns) {
+			String[] columns) {
 		Graph g = new AdjListGraph(new ListenerManager());
 		
 		double offX = 130;
@@ -284,7 +290,7 @@ public class SOMguiHelper implements HelperClass {
 			for (int column : columnsForThatSeriesAndTime) {
 				String replId = columns[column].substring(columns[column].lastIndexOf("§") + 1);
 				double value = som.getWeights()[column][nodeIndex];
-				measurements.add(new ReplicateDouble(value, replId, null));
+				measurements.add(new ReplicateDouble(value, replId, null, null));
 			}
 			double mean = ExperimentData.getAverage(measurements);
 			double standardDeviation = ExperimentData.getStddev(measurements);
@@ -344,7 +350,7 @@ public class SOMguiHelper implements HelperClass {
 				double value = som.getWeights()[column][nodeIndex];
 				// measurements.add(new ReplicateDouble(value, replId, null));
 				DataSetRow dsr = new DataSetRow("", "experiment", "Centroid " + (nodeIndex + 1), "1", species, genotype, "", seriesId, timeVal, timeUnit, replId,
-									value, "relative");
+						value, "relative");
 				System.out.println(dsr.toString());
 				dataset.add(dsr);
 			}

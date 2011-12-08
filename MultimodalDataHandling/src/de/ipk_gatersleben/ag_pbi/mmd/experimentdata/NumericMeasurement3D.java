@@ -64,10 +64,17 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	
 	@Override
 	public String toString() {
-		if (position != null && positionUnit != null)
-			return "Omics-value: " + getValue() + " (" + position + " " + positionUnit + ")" + " " + getUnit();
-		else
-			return "Omics-value: " + getValue() + " " + getUnit();
+		if (getQualityAnnotation() != null && getQualityAnnotation().length() > 0) {
+			if (position != null && positionUnit != null)
+				return "" + getValue() + " " + getUnit() + " (" + position + " " + positionUnit + ", " + getQualityAnnotation() + ")";
+			else
+				return "" + getValue() + " " + getUnit() + " (" + getQualityAnnotation() + ")";
+		} else {
+			if (position != null && positionUnit != null)
+				return "" + getValue() + " " + getUnit() + " (" + position + " " + positionUnit + ")";
+			else
+				return "" + getValue() + " " + getUnit();
+		}
 	}
 	
 	public MeasurementNodeType getType() {
@@ -93,12 +100,12 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	}
 	
 	public static HashMap<String, ArrayList<NumericMeasurementInterface>> getAllExperiments(
-						Collection<NumericMeasurementInterface> mappingfiles) {
+			Collection<NumericMeasurementInterface> mappingfiles) {
 		return getAllExperiments(mappingfiles, null);
 	}
 	
 	public static HashMap<String, ArrayList<NumericMeasurementInterface>> getAllExperiments(
-						Collection<NumericMeasurementInterface> mappingfiles, MeasurementNodeType type) {
+			Collection<NumericMeasurementInterface> mappingfiles, MeasurementNodeType type) {
 		HashMap<String, ArrayList<NumericMeasurementInterface>> exps = new HashMap<String, ArrayList<NumericMeasurementInterface>>();
 		
 		for (NumericMeasurementInterface md : mappingfiles)
@@ -209,7 +216,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	public boolean equalNumericMeasurement(NumericMeasurementInterface meas) {
 		String u1 = getReplicateID() + " " + getValue() + " " + getUnit() + " " + getPositionUnit() + " " + getPosition();
 		String u2 = meas.getReplicateID() + " " + meas.getValue() + " " + meas.getUnit() + " "
-							+ ((NumericMeasurement3D) meas).getPositionUnit() + " " + ((NumericMeasurement3D) meas).getPosition();
+				+ ((NumericMeasurement3D) meas).getPositionUnit() + " " + ((NumericMeasurement3D) meas).getPosition();
 		return u1.equals(u2);
 	}
 	

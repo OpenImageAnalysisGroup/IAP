@@ -15,6 +15,7 @@ public class MemSample {
 	private final Integer optTimeValueForComparison;
 	private Long optFineTimeValueForComparison;
 	private String optQualityAnnotation;
+	private Double position;
 	
 	public MemSample(double value, int replicate, long plantID, String unit, String optTimeUnit, Integer optTimeValueForComparision) {
 		this.value = value;
@@ -27,8 +28,11 @@ public class MemSample {
 	public MemSample(double value, String replicateAndOptQualityAnnotation, long plantID, String unit, String optTimeUnit,
 			String optTimeValueAndFineTimeValueForComparison) {
 		this.value = value;
-		this.replicate = Integer.parseInt(replicateAndOptQualityAnnotation.split(";", 2)[0]);
-		this.setOptQualityAnnotation(replicateAndOptQualityAnnotation.split(";", 2)[1]);
+		this.replicate = Integer.parseInt(replicateAndOptQualityAnnotation.split(";", 3)[0]);
+		this.setOptQualityAnnotation(replicateAndOptQualityAnnotation.split(";", 3)[1]);
+		String pos = replicateAndOptQualityAnnotation.split(";", 3)[2];
+		if (pos != null && pos.length() > 0)
+			this.setPosition(Double.parseDouble(pos));
 		this.plantID = plantID;
 		this.optTimeUnit = optTimeUnit;
 		this.optTimeValueForComparison = Integer.parseInt(optTimeValueAndFineTimeValueForComparison.split(";", 2)[0]);
@@ -65,5 +69,13 @@ public class MemSample {
 	
 	private void setOptQualityAnnotation(String optQualityAnnotation) {
 		this.optQualityAnnotation = optQualityAnnotation;
+	}
+	
+	public Double getPosition() {
+		return position;
+	}
+	
+	private void setPosition(Double position) {
+		this.position = position;
 	}
 }
