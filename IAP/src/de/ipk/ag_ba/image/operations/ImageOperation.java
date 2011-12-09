@@ -40,6 +40,9 @@ import org.ReleaseInfo;
 import org.SystemAnalysis;
 import org.Vector2d;
 import org.Vector2i;
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.SplineInterpolator;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
@@ -1899,11 +1902,14 @@ public class ImageOperation {
 		return new FlexibleImage(width, height, resultImage).getIO();
 	}
 	
-	public ImageOperation hq_thresholdLAB_multi_color_or(
+	public ImageOperation hq_thresholdLAB_multi_color_or_and_not(
 			int[] lowerValueOfL, int[] upperValueOfL,
 			int[] lowerValueOfA, int[] upperValueOfA,
 			int[] lowerValueOfB, int[] upperValueOfB,
-			int background, boolean getRemovedPixel) {
+			int background, boolean getRemovedPixel,
+			int[] plant_lowerValueOfL, int[] plant_upperValueOfL,
+			int[] plant_lowerValueOfA, int[] plant_upperValueOfA,
+			int[] plant_lowerValueOfB, int[] plant_upperValueOfB) {
 		int c, x, y = 0;
 		int r, g, b;
 		int Li, ai, bi;
@@ -1930,7 +1936,9 @@ public class ImageOperation {
 				bi = (int) ImageOperation.labCube[r][g][b + 512];
 				
 				if (resultImage[off] != background
-						&& hq_anyMatch(Li, ai, bi, lowerValueOfA, lowerValueOfB, lowerValueOfL, upperValueOfA, upperValueOfB, upperValueOfL)) {
+						&& hq_anyMatch(Li, ai, bi, lowerValueOfA, lowerValueOfB, lowerValueOfL, upperValueOfA, upperValueOfB, upperValueOfL)
+						&& !hq_anyMatch(Li, ai, bi, plant_lowerValueOfA, plant_lowerValueOfB, plant_lowerValueOfL, plant_upperValueOfA, plant_upperValueOfB,
+								plant_upperValueOfL)) {
 					if (!getRemovedPixel)
 						resultImage[off] = imagePixels[off];
 					else
@@ -3153,9 +3161,9 @@ public class ImageOperation {
 			}
 		}
 		if (rgbInfo.length > 6) {
-			double[] factorsTopRight = { brightness / rgbInfo[0] };
-			double[] factorsBottomLeft = { brightness / rgbInfo[3] };
-			double[] factorsCenter = { brightness / rgbInfo[6] };
+			double[] factorsTopRight = { brightness / rgbInfo[0] * 1.2 * 180 / 140 };
+			double[] factorsBottomLeft = { brightness / rgbInfo[3] * 1.2 * 180 / 140 };
+			double[] factorsCenter = { brightness / rgbInfo[6] * 0.8 * 180 / 140 };
 			
 			ImageOperation io = new ImageOperation(image);
 			res = io.rmCircleShade(factorsTopRight, factorsBottomLeft, factorsCenter);
@@ -3176,6 +3184,77 @@ public class ImageOperation {
 		return res;
 	}
 	
+	public ImageOperation rmCircleShadeFixed() {
+		int[][] img = getImageAs2array();
+		int w = img.length;
+		int h = img[0].length;
+		int cx = w / 2;
+		int cy = h / 2;
+		int maxDistToCenter = (int) Math.sqrt(cx * cx + cy * cy);
+		int distToCenter, pix;
+		double fac;
+		
+		// double[] calibrationCurveFromTopLeftToCenter = new double[] {
+		// 211, 210, 209, 205, 202, 200, 198, 194, 192, 190, 185, 183,
+		// 180, 175, 173, 170, 165, 162, 158, 155, 150, 145, 140, 135, 120, 95, 70
+		// };
+		//
+		// double[] indexArray = new double[30] {
+		// 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+		// 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27
+		// };
+		
+		double[] calibrationCurveFromTopLeftToCenter = new double[30];
+		double[] indexArray = new double[30];
+		
+		int len = indexArray.length;
+		for (int i = 0; i < len; i++) {
+			int s = (int) (5 + i * 15d / len);
+			int tx = (int) (i / (double) len * w / 2d);
+			int ty = h - (int) (i / (double) len * h / 2d);
+			float[] valuesCenter = getRGBAverage(tx - s, ty - s, 2 * s, 2 * s, -70, 500, true, false);
+			calibrationCurveFromTopLeftToCenter[i] = valuesCenter[0] * 255;
+			indexArray[i] = i + 1;
+		}
+		indexArray[0] = 0;
+		
+		SplineInterpolator spline = new SplineInterpolator();
+		UnivariateRealFunction func = spline.interpolate(indexArray, calibrationCurveFromTopLeftToCenter);
+		
+		int[][] res = new int[w][h];
+		try {
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
+					pix = img[x][y] & 0x0000ff;
+					// if (y <= h / 2)
+					double idx = (calibrationCurveFromTopLeftToCenter.length / (double) maxDistToCenter * distToCenter);
+					
+					if (idx < 0)
+						idx = 0;
+					else
+						if (idx >= calibrationCurveFromTopLeftToCenter.length)
+							idx = calibrationCurveFromTopLeftToCenter.length - 1;
+					
+					fac = 180d / func.value(len - idx);
+					
+					pix = (int) (pix * fac);
+					if (pix > 255)
+						pix = 255;
+					else
+						if (pix < 0)
+							pix = 0;
+					
+					res[x][y] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
+				}
+			}
+		} catch (FunctionEvaluationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new ImageOperation(res);
+	}
+	
 	private ImageOperation rmCircleShade(double[] factorsTopRight, double[] factorsBottomLeft, double[] factorsCenter) {
 		int[][] img = getImageAs2array();
 		int w = img.length;
@@ -3185,18 +3264,20 @@ public class ImageOperation {
 		int maxDistToCenter = (int) Math.sqrt(cx * cx + cy * cy);
 		int distToCenter, pix;
 		double fac;
+		
 		int[][] res = new int[w][h];
+		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
 				pix = img[x][y] & 0x0000ff;
 				// if (y <= h / 2)
 				double fff = (factorsTopRight[0] - factorsCenter[0]) / maxDistToCenter * distToCenter;
-				fac =
-						fff * fff * fff // 0....1 linear
-								+ factorsCenter[0];
+				fac = fff * fff * fff // 0....1 linear
+						+ factorsCenter[0];
 				// else
 				// fac = ((factorsBottomLeft[0] - factorsCenter[0]) / (double) maxDistToCenter * distToCenter + factorsBottomLeft[0]);
+				
 				pix = (int) (pix * fac);
 				if (pix > 255)
 					pix = 255;
@@ -3207,6 +3288,7 @@ public class ImageOperation {
 				res[x][y] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
 			}
 		}
+		
 		return new ImageOperation(res);
 	}
 	

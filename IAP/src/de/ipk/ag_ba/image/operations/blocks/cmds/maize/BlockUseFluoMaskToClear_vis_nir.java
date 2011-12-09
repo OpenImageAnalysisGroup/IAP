@@ -145,7 +145,7 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		if (processedMasks.getNir() == null || processedMasks.getFluo() == null ||
-				processedMasks.getVis()==null) {
+				processedMasks.getVis() == null) {
 			processedMasks.setNir(getInput().getMasks().getNir());
 			return;
 		}
@@ -154,14 +154,14 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 			// apply enlarged VIS mask to nir
 			ImageOperation nir = processedMasks.getNir().copy().getIO().print("NIRRRR", debug);
 			FlexibleImage mask = processedMasks.getVis().copy().getIO().or(
-						getInput().getMasks().getFluo()
-						).print("OR operation", debug).blur(20).
-						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
-			processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
-						mask,
-						options.getBackground()).print("FILTERED NIR MASK", debug).getImage());
-			int back = options.getBackground();
+					getInput().getMasks().getFluo()
+					).print("OR operation", debug).blur(20).
+					binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
 			int gray = new Color(180, 180, 180).getRGB();
+			processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
+					mask,
+					gray).print("FILTERED NIR MASK", debug).getImage());
+			int back = options.getBackground();
 			processedImages.setNir(processedImages.getNir().getIO().applyMask_ResizeMaskIfNeeded(
 					mask,
 					options.getBackground()).print("FILTERED NIR IMAGE", debug).

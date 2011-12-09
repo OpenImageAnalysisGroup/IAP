@@ -82,12 +82,12 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 				FlexibleImage fluo = getInput().getImages().getFluo();
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()),
 						(int) (scaleFactor * fluo.getHeight()));
-				FlexibleImage result = new ImageOperation(fluo.getIO()
-						// .blur(1.5).print("Blurred 1.5 fluo image", true)
+				FlexibleImage result = new ImageOperation(fluo.getIO().copy()
+						.blur(2).print("Blurred 1.5 fluo image", false)
 						.medianFilter32Bit()
 						.getImage()).compare()
 						.compareImages("fluo", getInput().getMasks().getFluo().getIO()
-								.blur(1.1).print("Blurred 1.5 fluo mask", false)
+								.blur(2).print("Blurred 1.5 fluo mask", false)
 								.medianFilter32Bit()
 								.getImage(),
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
@@ -95,12 +95,15 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 								options.getIntSetting(Setting.abDiff_FLUO) * 0.5d,
 								back).border(2).border_left_right((int) (fluo.getWidth() * 0.1), options.getBackground()).getImage();
 				
-				FlexibleImage toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or(
+				FlexibleImage toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or_and_not(
 						// black background and green pot (fluo of white pot)
-						new int[] { -1, 200 - 40 }, new int[] { 115, 200 + 20 },
-						new int[] { 90 - 5, 104 - 15 }, new int[] { 150 + 5, 104 + 15 },
-						new int[] { 116 - 5, 206 - 20 }, new int[] { 175 + 5, 206 + 20 },
-						options.getBackground(), false).
+						new int[] { -1, 200 - 40, 50 - 4, 0 }, new int[] { 115, 200 + 20, 50 + 4, 50 },
+						new int[] { 80 - 5, 104 - 15, 169 - 4, 0 }, new int[] { 140 + 5, 104 + 15, 169 + 4, 250 },
+						new int[] { 116 - 5, 206 - 20, 160 - 4, 0 }, new int[] { 175 + 5, 206 + 20, 160 + 4, 250 },
+						options.getBackground(), false,
+						new int[] {}, new int[] {},
+						new int[] {}, new int[] {},
+						new int[] {}, new int[] {}).
 						print("removed noise", debug).getImage();
 				
 				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
@@ -206,7 +209,7 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 				float i = (float) ((in[x][y] & 0x0000ff) / 255.0); // B 0..1
 				differenceDistanceSum += Math.abs(i - avg);
 			}
-			if (avg < 0.65) {
+			if (avg < 0.55) {
 				for (int x = 0; x < width; x++) {
 					in[x][y] = gray;
 				}

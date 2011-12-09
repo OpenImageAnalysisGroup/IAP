@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author pape, klukas
  */
-public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockColorBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	
@@ -51,47 +51,6 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		if (input != null)
 			res = balance(input, 255, invert);
 		else
-			res = input;
-		return res;
-	}
-	
-	@Override
-	protected FlexibleImage processNIRimage() {
-		FlexibleImage input = getInput().getImages().getNir();
-		FlexibleImage res;
-		int rr = 180;
-		if (input != null) {
-			if (options.getCameraPosition() == CameraPosition.TOP && !options.isMaize()) // for barley top, background is black
-			{
-				if (options.isBarleyInBarleySystem()) {
-					barleyInBarley = true;
-					rr = 80;
-				}
-			}
-			res = balance(input, rr, false);
-		} else
-			res = input;
-		return res;
-	}
-	
-	@Override
-	protected FlexibleImage processNIRmask() {
-		FlexibleImage inputMain = getInput().getImages().getNir();
-		if (inputMain == null)
-			return null;
-		FlexibleImage input = getInput().getMasks().getNir();
-		FlexibleImage res;
-		int rr = 180;
-		if (input != null) {
-			if (options.getCameraPosition() == CameraPosition.TOP && !options.isMaize()) // for barley top, background is black
-			{
-				if (options.isBarleyInBarleySystem()) {
-					barleyInBarley = true;
-					rr = 80;
-				}
-			}
-			res = balance(input, rr, false);
-		} else
 			res = input;
 		return res;
 	}
@@ -185,6 +144,7 @@ public class BlockColorBalancing_fluo_nir extends AbstractSnapshotAnalysisBlockF
 				// White Balancing
 				double[] pix;
 				if (invert) {
+					// NIR
 					ImageOperation io = new ImageOperation(input);
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, bpleft, bpright);
 					return io.invert().imageBalancing(whitePoint, pix).invert().getImage();
