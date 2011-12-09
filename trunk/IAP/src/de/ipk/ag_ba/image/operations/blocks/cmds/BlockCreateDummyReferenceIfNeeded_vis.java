@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -67,9 +69,9 @@ public class BlockCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnaly
 		// } else
 		if (getInput().getImages().getFluo() != null && getInput().getMasks().getFluo() == null)
 			return getInput().getImages().getFluo().copy().getIO().blur(2).thresholdLAB(
-					0, 110,
+					0, 50,
 					0, 500,
-					0, 500,
+					0, 155,
 					ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).
 					blur(2).
 					getImage();
@@ -79,14 +81,12 @@ public class BlockCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnaly
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (getInput().getImages().getNir() != null && getInput().getMasks().getNir() == null)
-			return getInput().getImages().getNir().getIO().thresholdLAB(
-					0, 150,
-					0, 500,
-					0, 500,
-					ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).
-					getImage();
-		else
+		FlexibleImage n = getInput().getImages().getNir();
+		if (n != null && getInput().getMasks().getNir() == null) {
+			int w = n.getWidth();
+			int h = n.getHeight();
+			return n.copy().getIO().getCanvas().fillRect(0, 0, w, h, new Color(180, 180, 180).getRGB()).getImage();
+		} else
 			return super.processNIRmask();
 	}
 	

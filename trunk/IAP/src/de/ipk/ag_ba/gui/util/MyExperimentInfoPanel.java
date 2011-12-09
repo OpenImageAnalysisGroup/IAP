@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.TreeSet;
 
@@ -28,6 +30,7 @@ import org.ErrorMsg;
 import org.FolderPanel;
 import org.GuiRow;
 import org.JMButton;
+import org.StringManipulationTools;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import com.toedter.calendar.JDateChooser;
@@ -37,9 +40,12 @@ import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataInfoPane;
 
 /**
@@ -172,7 +178,17 @@ public class MyExperimentInfoPanel extends JPanel {
 	public void setExperimentInfo(final MongoDB m,
 			final ExperimentHeaderInterface experimentHeader,
 			boolean startEnabled, ExperimentInterface optExperiment) {
-		setLayout(new TableLayout(new double[][] { { 0, 400, 0 }, { 0, TableLayout.PREFERRED, 0 } }));
+		
+		JComponent correlationInfo = getCorrelationInfo(optExperiment);
+		
+		boolean hasCorrelationTableData = correlationInfo != null;
+		
+		if (hasCorrelationTableData) {
+			setLayout(new TableLayout(new double[][] { { 0, TableLayout.PREFERRED, 0 },
+					{ 0, TableLayout.PREFERRED, 5, TableLayout.PREFERRED, 0 } }));
+			add(correlationInfo, "1,3");
+		} else
+			setLayout(new TableLayout(new double[][] { { 0, TableLayout.PREFERRED, 0 }, { 0, TableLayout.PREFERRED, 0 } }));
 		
 		setOpaque(false);
 		
@@ -185,7 +201,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		if (!editPossible)
 			startEnabled = true;
 		
-		FolderPanel fp = new FolderPanel("Experiment " + experimentHeader.getExperimentName(), false, false, false, null);
+		FolderPanel fp = new FolderPanel("Experiment " + experimentHeader.getExperimentName(), false, true, false, null);
 		Color c = new Color(220, 220, 220);
 		fp.setFrameColor(c, Color.BLACK, 4, 8);
 		
@@ -330,6 +346,93 @@ public class MyExperimentInfoPanel extends JPanel {
 		
 		// setBorder(BorderFactory.createEtchedBorder());
 		setBorder(BorderFactory.createLoweredBevelBorder());
+	}
+	
+	private JComponent getCorrelationInfo(ExperimentInterface optExperiment) {
+		if (optExperiment == null)
+			return null;
+		else {
+			ArrayList<GuiRow> rows = new ArrayList<GuiRow>();
+			
+			double width = 90, space = 15, border = 5;
+			
+			rows.add(new GuiRow(new JLabel("<html><br>Average visual property per plant vs. manual measurement<hr>"), null));
+			for (MatchInfo mi : match(optExperiment, new String[] { "corr.", ".avg" }, false)) {
+				JComponent desc, height, freshWeight, dryWeight;
+				desc = new JLabel(mi.getDesc());
+				height = new JLabel(mi.getHeight());
+				freshWeight = new JLabel(mi.getFreshWeight());
+				dryWeight = new JLabel(mi.getDryWeight());
+				JComponent right = TableLayout.get4Split(new JLabel(), height, freshWeight, dryWeight, width, space, border);
+				rows.add(new GuiRow(desc, right));
+			}
+			rows.add(new GuiRow(new JLabel(""), null));
+			rows.add(new GuiRow(new JLabel("<html><br>Visual property for each side view vs. manual measurement<hr>"), null));
+			for (MatchInfo mi : match(optExperiment, new String[] { "corr.", ".avg" }, true)) {
+				JComponent desc, height, freshWeight, dryWeight;
+				desc = new JLabel(mi.getDesc());
+				height = new JLabel(mi.getHeight());
+				freshWeight = new JLabel(mi.getFreshWeight());
+				dryWeight = new JLabel(mi.getDryWeight());
+				JComponent right = TableLayout.get4Split(new JLabel(), height, freshWeight, dryWeight, width, space, border);
+				rows.add(new GuiRow(desc, right));
+			}
+			if (rows.size() == 2)
+				return null;
+			
+			FolderPanel fp = new FolderPanel("<html>Correlations (Pearson&#39;s <i>r</i>)", false, true, false, null);
+			JComponent right = TableLayout.get4Split(new JLabel(), new JLabel("Height"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, space,
+					border);
+			fp.addGuiComponentRow(new JLabel("Visual Property"), right, false);
+			for (GuiRow row : rows)
+				fp.addGuiComponentRow(row, false);
+			fp.layoutRows();
+			return fp;
+		}
+	}
+	
+	private Collection<MatchInfo> match(ExperimentInterface optExperiment, String[] match, boolean inverseSecond) {
+		ArrayList<MatchInfo> res = new ArrayList<MatchInfo>();
+		for (SubstanceInterface si : optExperiment) {
+			if (si.getName().startsWith(match[0]) &&
+					(
+					(!inverseSecond && si.getName().contains(match[1])) ||
+					(inverseSecond && !si.getName().contains(match[1]))
+					)) {
+				MatchInfo mi = new MatchInfo(si.getName());
+				boolean matched = false;
+				for (ConditionInterface ci : si) {
+					if (ci.getConditionName().contains("dry weight")) {
+						for (SampleInterface sam : ci) {
+							mi.setDryWeight(
+									StringManipulationTools.formatNumber(
+											sam.getSampleAverage().getValue(), "#.###") + " " + sam.getAverageUnit());
+							matched = true;
+							break;
+						}
+					}
+					if (ci.getConditionName().contains("fresh weight")) {
+						for (SampleInterface sam : ci) {
+							mi.setFreshWeight(StringManipulationTools.formatNumber(
+									sam.getSampleAverage().getValue(), "#.###") + " " + sam.getAverageUnit());
+							matched = true;
+							break;
+						}
+					}
+					if (ci.getConditionName().contains("height")) {
+						for (SampleInterface sam : ci) {
+							mi.setHeight(StringManipulationTools.formatNumber(
+									sam.getSampleAverage().getValue(), "#.###") + " " + sam.getAverageUnit());
+							matched = true;
+							break;
+						}
+					}
+				}
+				if (matched)
+					res.add(mi);
+			}
+		}
+		return res;
 	}
 	
 	private String getVersionString(ExperimentHeaderInterface experimentHeader) {
