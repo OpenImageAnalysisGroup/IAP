@@ -732,7 +732,7 @@ initRfunction <- function(DEBUG = FALSE){
 	} else {	
 		options(error = NULL)
 	}
-	memory.limit(size=10000)
+	memory.limit(size=3500)
 
 	while(!is.null(dev.list())) {
 		dev.off()
