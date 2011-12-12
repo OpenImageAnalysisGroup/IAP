@@ -1,19 +1,42 @@
 package ij.gui;
 
-import java.awt.*;
-import java.util.Properties;
-import java.awt.image.*;
-import ij.process.*;
-import ij.measure.*;
+import ij.IJ;
+import ij.ImageJ;
+import ij.ImagePlus;
+import ij.Menus;
+import ij.Prefs;
+import ij.WindowManager;
+import ij.macro.Interpreter;
+import ij.macro.MacroRunner;
 import ij.plugin.WandToolOptions;
 import ij.plugin.frame.Recorder;
 import ij.plugin.frame.RoiManager;
-import ij.macro.*;
-import ij.*;
-import ij.util.*;
-import java.awt.event.*;
-import java.util.*;
-import java.awt.geom.*;
+import ij.util.Java2;
+import ij.util.Tools;
+
+import java.awt.BasicStroke;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Event;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.PopupMenu;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.IndexColorModel;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import de.ipk.ag_ba.image.operations.ImageOperation;
 
@@ -479,7 +502,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 * return g;
 	 * }
 	 */
-
+	
 	/** Returns the current cursor location in image coordinates. */
 	public Point getCursorLoc() {
 		return new Point(xMouse, yMouse);
@@ -973,7 +996,12 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		int ai = (int) ImageOperation.labCube[r][g][b + 256];
 		int bi = (int) ImageOperation.labCube[r][g][b + 512];
 		
-		IJ.showStatus("red=" + c.getRed() + ", green=" + c.getGreen() + ", blue=" + c.getBlue() + " // L=" + Li + ", a=" + ai + ", b=" + bi);
+		float[] hsv = new float[3];
+		Color.RGBtoHSB(r, g, b, hsv);
+		
+		IJ.showStatus("red=" + c.getRed() + ", green=" + c.getGreen() + ", blue=" + c.getBlue() + " // L=" + Li + ", a=" + ai + ", b=" + bi + " // H=" + hsv[0]
+				+ ", S="
+				+ hsv[1] + ", V=" + hsv[2]);
 	}
 	
 	private void setForegroundColor(Color c) {
@@ -988,6 +1016,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 			Recorder.record("setBackgroundColor", c.getRed(), c.getGreen(), c.getBlue());
 	}
 	
+	@Override
 	public void mousePressed(MouseEvent e) {
 		// if (ij==null) return;
 		showCursorStatus = true;
@@ -1171,6 +1200,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		}
 	}
 	
+	@Override
 	public void mouseExited(MouseEvent e) {
 		// autoScroll(e);
 		ImageWindow win = imp.getWindow();
@@ -1205,7 +1235,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 * scroll(screenX(xMouseStart+deltax), screenY(yMouseStart+deltay));
 	 * }
 	 */
-
+	
+	@Override
 	public void mouseDragged(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
@@ -1443,6 +1474,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		}
 	}
 	
+	@Override
 	public void mouseReleased(MouseEvent e) {
 		flags = e.getModifiers();
 		flags &= ~InputEvent.BUTTON1_MASK; // make sure button 1 bit is not set
@@ -1466,6 +1498,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		}
 	}
 	
+	@Override
 	public void mouseMoved(MouseEvent e) {
 		// if (ij==null) return;
 		int sx = e.getX();
@@ -1495,9 +1528,11 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		}
 	}
 	
+	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
 	
+	@Override
 	public void mouseEntered(MouseEvent e) {
 	}
 	

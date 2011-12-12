@@ -17,7 +17,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 /**
  * @author pape, klukas
  */
-public class BlockFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
+public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	

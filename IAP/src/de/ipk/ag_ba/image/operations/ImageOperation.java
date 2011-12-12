@@ -69,7 +69,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class ImageOperation {
 	protected final ImagePlus image;
 	protected ResultsTable rt;
-	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255);// new Color(155, 155, 255, 255);
+	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255); // new Color(155, 155, 255, 255);
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
 	/**
@@ -207,14 +207,7 @@ public class ImageOperation {
 		int h = image.getHeight();
 		int idx = 0;
 		float[] hsb = new float[3];
-		int x = 0;
-		int y = 0;
 		for (int c : in) {
-			x++;
-			if (x == w) {
-				y++;
-				x = 0;
-			}
 			if (c == background) {
 				in[idx++] = background;
 				continue;
@@ -235,12 +228,7 @@ public class ImageOperation {
 			float intensity = Float.NaN;
 			
 			intensity = 1 - rf / (float) ((255) + gf);
-			double min = 210f / 255f;
-			// if (y>h*0.90d)
-			
-			min = 150f / 255f;
-			
-			min = minimumIntensity / 255f;
+			double min = minimumIntensity / 255f;
 			
 			if (intensity > min)
 				intensity = 1;
@@ -266,7 +254,8 @@ public class ImageOperation {
 				}
 			
 			int i = (int) (intensity * 255d);
-			// in[x][y] = new Color(intensity, intensity, intensity).getRGB();
+			if (i > minimumIntensity)
+				i = 255;
 			int val = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
 			in[idx++] = val;
 		}
@@ -286,10 +275,6 @@ public class ImageOperation {
 			red = 1 - (f / (1 - yellow));
 		}
 		return red;
-	}
-	
-	private float max(int r, int g) {
-		return r > g ? r : g;
 	}
 	
 	public ImageOperation convertFluo2intensityOldRGBbased() {
@@ -1906,7 +1891,8 @@ public class ImageOperation {
 			int[] lowerValueOfL, int[] upperValueOfL,
 			int[] lowerValueOfA, int[] upperValueOfA,
 			int[] lowerValueOfB, int[] upperValueOfB,
-			int background, boolean getRemovedPixel,
+			int background, int potRemovalColorStartIndex,
+			boolean getRemovedPixel,
 			int[] plant_lowerValueOfL, int[] plant_upperValueOfL,
 			int[] plant_lowerValueOfA, int[] plant_upperValueOfA,
 			int[] plant_lowerValueOfB, int[] plant_upperValueOfB) {
@@ -1914,16 +1900,16 @@ public class ImageOperation {
 		int r, g, b;
 		int Li, ai, bi;
 		
-		int width = getWidth();
-		int height = getHeight();
+		int w = getWidth();
+		int h = getHeight();
 		
 		int[] imagePixels = getImageAs1array();
 		
 		int[] resultImage = new int[imagePixels.length];
 		
-		for (y = 0; y < height; y++) {
-			int yw = y * width;
-			for (x = 0; x < width; x++) {
+		for (y = 0; y < h; y++) {
+			int yw = y * w;
+			for (x = 0; x < w; x++) {
 				int off = x + yw;
 				c = imagePixels[off];
 				
@@ -1936,9 +1922,10 @@ public class ImageOperation {
 				bi = (int) ImageOperation.labCube[r][g][b + 512];
 				
 				if (resultImage[off] != background
-						&& hq_anyMatch(Li, ai, bi, lowerValueOfA, lowerValueOfB, lowerValueOfL, upperValueOfA, upperValueOfB, upperValueOfL)
+						&& hq_anyMatch(Li, ai, bi, lowerValueOfA, lowerValueOfB, lowerValueOfL, upperValueOfA, upperValueOfB, upperValueOfL,
+								potRemovalColorStartIndex, x, y, w, h)
 						&& !hq_anyMatch(Li, ai, bi, plant_lowerValueOfA, plant_lowerValueOfB, plant_lowerValueOfL, plant_upperValueOfA, plant_upperValueOfB,
-								plant_upperValueOfL)) {
+								plant_upperValueOfL, potRemovalColorStartIndex, x, y, w, h)) {
 					if (!getRemovedPixel)
 						resultImage[off] = imagePixels[off];
 					else
@@ -1951,14 +1938,17 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new FlexibleImage(width, height, resultImage).getIO();
+		return new FlexibleImage(w, h, resultImage).getIO();
 	}
 	
 	private boolean hq_anyMatch(int Li, int ai, int bi,
 			int[] lowerValueOfAa, int[] lowerValueOfBa, int[] lowerValueOfLa,
-			int[] upperValueOfAa, int[] upperValueOfBa, int[] upperValueOfLa) {
+			int[] upperValueOfAa, int[] upperValueOfBa, int[] upperValueOfLa,
+			int potRemovalColorStartIndex, int x, int y, int w, int h) {
 		
 		for (int i = 0; i < lowerValueOfAa.length; i++) {
+			if (i >= potRemovalColorStartIndex && (y < 0.8 * h || (Math.abs(w / 2 - x) > w * 0.1)))
+				return false; // &&
 			int lowerValueOfL = lowerValueOfLa[i];
 			int lowerValueOfA = lowerValueOfAa[i];
 			int lowerValueOfB = lowerValueOfBa[i];

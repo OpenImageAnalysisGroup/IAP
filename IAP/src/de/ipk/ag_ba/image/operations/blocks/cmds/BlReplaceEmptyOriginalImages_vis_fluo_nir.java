@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
-public class BlockReplaceEmptyOriginalImages_vis_fluo_nir extends AbstractBlock {
+public class BlReplaceEmptyOriginalImages_vis_fluo_nir extends AbstractBlock {
 	
 	private static final int sz = 128 - 5;
 	

@@ -11,7 +11,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockApplyMasksToImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCopyVisMaskToNirMask;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCropAllFixedPhytoOne;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockCrop_images_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockEnlargeVisAndFluoMasks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockFilterFluoMaskByValue30;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockMoveNirMaskAndImageFixedUp;
@@ -74,7 +74,7 @@ public class PhytochamberTopImageProcessor {
 		p.add(BlockApplyMasksToImages.class);
 		p.add(BlockSetMasksToNull.class);
 		if (cropResult)
-			p.add(BlockCrop_images_vis_fluo_nir.class);
+			p.add(BlCrop_images_vis_fluo_nir.class);
 		
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, input);
 		FlexibleMaskAndImageSet result = p.execute(options, workset, debugStack, settings, null);

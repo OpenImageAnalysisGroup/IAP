@@ -11,7 +11,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author klukas
  */
-public class BlockCrop_images_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCrop_images_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {

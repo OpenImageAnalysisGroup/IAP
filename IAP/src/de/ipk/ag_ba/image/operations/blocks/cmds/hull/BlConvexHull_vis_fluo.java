@@ -20,7 +20,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author klukas
  */
-public class BlockConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage image = getInput().getMasks().getVis();

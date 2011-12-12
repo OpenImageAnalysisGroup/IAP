@@ -249,6 +249,7 @@ class ColorCanvas extends Canvas implements MouseListener, MouseMotionListener {
 		g.drawImage(ip.createImage(), 0, 0, null);
 	}
 	
+	@Override
 	public void mousePressed(MouseEvent e) {
 		// IJ.log("mousePressed "+e);
 		ip.setLineWidth(1);
@@ -304,6 +305,7 @@ class ColorCanvas extends Canvas implements MouseListener, MouseMotionListener {
 		repaint();
 	}
 	
+	@Override
 	public void mouseMoved(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
@@ -316,7 +318,11 @@ class ColorCanvas extends Canvas implements MouseListener, MouseMotionListener {
 		int ai = (int) ImageOperation.labCube[r][g][b + 256];
 		int bi = (int) ImageOperation.labCube[r][g][b + 512];
 		
-		IJ.showStatus("red=" + pad(r) + ", green=" + pad(g) + ", blue=" + pad(b) + " // L=" + Li + ", a=" + ai + ", b=" + bi);
+		float[] hsv = new float[3];
+		Color.RGBtoHSB(r, g, b, hsv);
+		
+		IJ.showStatus("red=" + pad(r) + ", green=" + pad(g) + ", blue=" + pad(b) + " // L=" + Li + ", a=" + ai + ", b=" + bi + " // H=" + hsv[0] + ", S="
+				+ hsv[1] + ", V=" + hsv[2]);
 		
 	}
 	
@@ -360,18 +366,23 @@ class ColorCanvas extends Canvas implements MouseListener, MouseMotionListener {
 		repaint();
 	}
 	
+	@Override
 	public void mouseReleased(MouseEvent e) {
 	}
 	
+	@Override
 	public void mouseExited(MouseEvent e) {
 	}
 	
+	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
 	
+	@Override
 	public void mouseEntered(MouseEvent e) {
 	}
 	
+	@Override
 	public void mouseDragged(MouseEvent e) {
 	}
 	

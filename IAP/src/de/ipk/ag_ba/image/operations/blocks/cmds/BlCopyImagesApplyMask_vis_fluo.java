@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author klukas
  */
-public class BlockCopyImagesApplyMask_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCopyImagesApplyMask_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
