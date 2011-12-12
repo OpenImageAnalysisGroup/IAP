@@ -17,7 +17,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author pape, klukas
  */
-public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	int back = ImageOperation.BACKGROUND_COLORint;
 	
@@ -90,9 +90,9 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 								.blur(2).print("Blurred 1.5 fluo mask", false)
 								.medianFilter32Bit()
 								.getImage(),
-								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
-								options.getIntSetting(Setting.L_Diff_FLUO) * 0.5d,
-								options.getIntSetting(Setting.abDiff_FLUO) * 0.5d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.1d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.1d,
+								options.getIntSetting(Setting.abDiff_FLUO) * 0.1d,
 								back).border(2).border_left_right((int) (fluo.getWidth() * 0.1), options.getBackground()).getImage();
 				
 				FlexibleImage toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or_and_not(
@@ -100,7 +100,7 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 						new int[] { -1, 200 - 40, 50 - 4, 0 }, new int[] { 115, 200 + 20, 50 + 4, 50 },
 						new int[] { 80 - 5, 104 - 15, 169 - 4, 0 }, new int[] { 140 + 5, 104 + 15, 169 + 4, 250 },
 						new int[] { 116 - 5, 206 - 20, 160 - 4, 0 }, new int[] { 175 + 5, 206 + 20, 160 + 4, 250 },
-						options.getBackground(), false,
+						options.getBackground(), Integer.MAX_VALUE, false,
 						new int[] {}, new int[] {},
 						new int[] {}, new int[] {},
 						new int[] {}, new int[] {}).
@@ -122,9 +122,9 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 								// .getIO().
 								// copyImagesParts(0.26, 0.3).print("cut out", true).getImage()
 								,
-								options.getIntSetting(Setting.L_Diff_FLUO) * 2d,
-								options.getIntSetting(Setting.L_Diff_FLUO) * 2d,
-								options.getIntSetting(Setting.abDiff_FLUO) * 2d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.2d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.2d,
+								options.getIntSetting(Setting.abDiff_FLUO) * 0.2d,
 								back).border(2).getImage();
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");
@@ -209,7 +209,7 @@ public class BlockClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSn
 				float i = (float) ((in[x][y] & 0x0000ff) / 255.0); // B 0..1
 				differenceDistanceSum += Math.abs(i - avg);
 			}
-			if (avg < 0.55) {
+			if (avg < 0.6) {
 				for (int x = 0; x < width; x++) {
 					in[x][y] = gray;
 				}

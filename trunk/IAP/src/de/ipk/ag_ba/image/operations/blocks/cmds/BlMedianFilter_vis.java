@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author Klukas
  */
-public class BlockMedianFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
+public class BlMedianFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {

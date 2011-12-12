@@ -20,7 +20,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
  * @author klukas, pape
  *         status: ok, 23.11.2011, c. klukas
  */
-public class OK_NOV11_BlockCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected boolean isChangingImages() {

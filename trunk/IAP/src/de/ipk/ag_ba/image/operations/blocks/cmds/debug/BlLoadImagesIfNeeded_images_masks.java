@@ -14,7 +14,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
  * @author entzian, klukas
  */
 
-public class BlockLoadImagesIfNeeded_images_masks extends
+public class BlLoadImagesIfNeeded_images_masks extends
 		AbstractSnapshotAnalysisBlockFIS {
 
 	public enum BlockInfoProperty {

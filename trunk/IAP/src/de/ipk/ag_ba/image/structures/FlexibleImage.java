@@ -135,7 +135,14 @@ public class FlexibleImage {
 		int[] b = grayB.getAs1A();
 		int[] res = new int[r.length];
 		for (int i = 0; i < r.length; i++) {
-			int ci = (0xFF << 24 | (r[i] & 0xFF) << 16) | ((g[i] & 0xFF) << 8) | ((b[i] & 0xFF) << 0);
+			int ci, ri, gi, bi;
+			ri = r[i] & 0xFF;
+			gi = g[i] & 0xFF;
+			bi = b[i] & 0xFF;
+			if (ri == 255 && gi == 255 && bi == 255)
+				ci = ImageOperation.BACKGROUND_COLORint;
+			else
+				ci = (0xFF << 24 | ri << 16) | (gi << 8) | (bi << 0);
 			res[i] = ci;
 		}
 		return res;

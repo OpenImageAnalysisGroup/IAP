@@ -50,6 +50,8 @@ import java.awt.image.PixelGrabber;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.image.operations.ImageOperation;
 
 /**
@@ -1855,6 +1857,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	}
 	
 	/** Used by ImagePlus to monitor loading of images. */
+	@Override
 	public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h) {
 		imageUpdateY = y;
 		imageUpdateW = w;
@@ -2120,7 +2123,13 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				int Li = (int) ImageOperation.labCube[r][g][b];
 				int ai = (int) ImageOperation.labCube[r][g][b + 256];
 				int bi = (int) ImageOperation.labCube[r][g][b + 512];
-				return (", value=" + v[0] + "," + v[1] + "," + v[2] + " // L=" + Li + ", a=" + ai + ", b=" + bi);
+				
+				float[] hsv = new float[3];
+				Color.RGBtoHSB(r, g, b, hsv);
+				
+				return (", value=" + v[0] + "," + v[1] + "," + v[2] + " // L=" + Li + ", a=" + ai + ", b=" + bi + " // H="
+						+ StringManipulationTools.formatNumber(hsv[0], "#.###") + ", S="
+						+ StringManipulationTools.formatNumber(hsv[1], "#.###") + ", V=" + StringManipulationTools.formatNumber(hsv[2], "#.###"));
 			default:
 				return ("");
 		}

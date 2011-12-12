@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author pape, klukas
  */
-public class BlockNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	

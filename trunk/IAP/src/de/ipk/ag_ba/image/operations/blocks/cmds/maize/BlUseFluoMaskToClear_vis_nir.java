@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
-public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	
@@ -40,7 +40,7 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred fluo mask", debug).getImage();
 				return vis.applyMask_ResizeMaskIfNeeded(
 						mask,
-						options.getBackground()).print("FILTERED NIR", debug).getImage();
+						options.getBackground()).print("FILTERED VIS", debug).getImage();
 			}
 		}
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
@@ -112,8 +112,9 @@ public class BlockUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlo
 		positions.setLeft((int) (positions.getLeftX() * s - pl * inputToCut.getWidth()));
 		positions.setRight((int) (positions.getRightX() * s + pr * inputToCut.getWidth()));
 		
-		return ioInputForCut.clearImageLeft(positions.getLeftX(), bl).
-				clearImageRight(positions.getRightX(), br).clearImageAbove(positions.getTopY(), ba)
+		return ioInputForCut.clearImageLeft(options.isBarleyInBarleySystem() ? positions.getLeftX() * 0.7 : positions.getLeftX(), bl).
+				clearImageRight(options.isBarleyInBarleySystem() ? positions.getRightX() * 1.3 : positions.getRightX(), br)
+				.clearImageAbove(positions.getTopY() * 0.95, ba)
 				.getImage();
 		// return ioInputForCut.clearImageAbove(positions.getTopY(), ba).getImage();
 	}

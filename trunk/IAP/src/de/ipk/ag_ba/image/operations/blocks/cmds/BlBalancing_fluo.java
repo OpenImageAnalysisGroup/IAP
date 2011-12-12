@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author pape, klukas
  */
-public class BlockColorBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	

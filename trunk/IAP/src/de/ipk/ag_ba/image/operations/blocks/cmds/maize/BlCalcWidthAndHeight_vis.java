@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
-public class BlockCalcWidthAndHeight_vis extends
+public class BlCalcWidthAndHeight_vis extends
 		AbstractSnapshotAnalysisBlockFIS {
 	
 	private static final boolean debug = false;

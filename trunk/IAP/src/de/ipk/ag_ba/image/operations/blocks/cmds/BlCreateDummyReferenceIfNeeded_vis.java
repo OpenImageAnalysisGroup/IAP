@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
  * 
  * @author pape, klukas
  */
-public class BlockCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	

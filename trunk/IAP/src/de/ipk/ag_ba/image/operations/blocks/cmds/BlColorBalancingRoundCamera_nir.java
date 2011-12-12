@@ -6,7 +6,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 /**
  * @author klukas
  */
-public class BlockColorBalancingRoundCamera_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlColorBalancingRoundCamera_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRimage() {

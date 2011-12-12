@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 
-public class BlockIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
@@ -17,13 +17,14 @@ public class BlockIntensityConversion_fluo extends AbstractSnapshotAnalysisBlock
 		}
 		boolean debug = false;
 		ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
-		FlexibleImageStack fis = new FlexibleImageStack();
-		fis.addImage("FLUO", io.copy().getImage());
+		FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+		if (debug)
+			fis.addImage("FLUO", io.copy().getImage());
 		double min = 150;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			min = 210;
 		if (options.isBarleyInBarleySystem())
-			min = 230;
+			min = 225;
 		FlexibleImage resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, min).getImage();
 		FlexibleImage resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
 		FlexibleImage resClassic = io.convertFluo2intensity(FluoAnalysis.CLASSIC, min).getImage();

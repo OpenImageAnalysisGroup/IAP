@@ -18,7 +18,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockResizeMasksToLargest;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockTransferImageSet;
-import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlockLoadImagesIfNeeded_images_masks;
+import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchRotation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchScaling;
 import de.ipk.ag_ba.image.operations.blocks.cmds.parameter_search.BlockAutomaticParameterSearchTranslation;
@@ -66,7 +66,7 @@ public class BarleyTopImageProcessor {
 		BlockPipeline p = new BlockPipeline();
 		
 		if (automaticParameterSearch) {
-			p.add(BlockLoadImagesIfNeeded_images_masks.class);
+			p.add(BlLoadImagesIfNeeded_images_masks.class);
 			// p.add(BlockClearBackground.class);
 			p.add(BlockClosing_fluo.class);
 			p.add(BlockRemoveSmallClusters_vis_fluo.class);
@@ -96,7 +96,7 @@ public class BarleyTopImageProcessor {
 			// p.add(BlockPrintInfos.class);
 			p.add(BlockPostProcessEdgeErodeEnlargeOnFluo.class);
 			p.add(BlockApplyMaskButNotOnVIS.class);
-			p.add(BlockLoadImagesIfNeeded_images_masks.class);
+			p.add(BlLoadImagesIfNeeded_images_masks.class);
 			p.add(BlockTransferImageSet.class);
 			// p.add(BlockPrintInfosEND.class);
 			
