@@ -2,6 +2,7 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +12,7 @@ import java.util.Stack;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,8 +20,10 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import org.JMButton;
@@ -46,8 +50,8 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		final MyDropTarget targetDropTarget = currentDropTarget;
 		if (targetDropTarget == null) {
 			JOptionPane.showMessageDialog(this, "Images can not be added to current database node.\n"
-								+ "Select an valid experiment-data node and try again.", "Image upload not possible",
-								JOptionPane.INFORMATION_MESSAGE);
+					+ "Select an valid experiment-data node and try again.", "Image upload not possible",
+					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		
@@ -55,8 +59,8 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		// then reject drop
 		if (targetDropTarget.isTargetReadOnly()) {
 			JOptionPane.showMessageDialog(this, "Image can not be added to current database node.\n"
-								+ "This experiment is loaded in Read-Only Mode for your Accout!", "No write-access to experiment",
-								JOptionPane.INFORMATION_MESSAGE);
+					+ "This experiment is loaded in Read-Only Mode for your Accout!", "No write-access to experiment",
+					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		
@@ -69,6 +73,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 			
 			try {
 				MyThread writeThread = new MyThread(new Runnable() {
+					@Override
 					public void run() {
 						
 						for (int i = 0; i < files.length; i++) {
@@ -100,7 +105,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	DataSetFilePanel currentFilePanel = null;
 	
 	public SupplementaryFilePanelMongoDB(final MongoDB m, ExperimentInterface doc,
-						String experimentName) {
+			String experimentName) {
 		
 		final SupplementaryFilePanelMongoDB thisPanel = this;
 		
@@ -108,6 +113,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		
 		JButton addButton = new JMButton("Add Files...");
 		addButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				processEditAddFile();
 			}
@@ -124,10 +130,23 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		boolean readOnly = doc.getHeader().getDatabaseId() != null;
 		
 		expTree = new JTree(new DBEtreeModel(this, m, doc, readOnly));
+		
+		ToolTipManager.sharedInstance().registerComponent(expTree);
+		
 		expTree.setCellRenderer(new DBEtreeCellRenderer());
 		// myTrees.add(new WeakReference<JTree>(expTree));
-		
+		expTree.setCellRenderer(new DefaultTreeCellRenderer() {
+			
+			@Override
+			public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+				JLabel ccc = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+				String tt = ((MongoTreeNode) value).getTooltipInfo();
+				ccc.setToolTipText(tt);
+				return ccc;
+			}
+		});
 		expTree.addTreeSelectionListener(new TreeSelectionListener() {
+			@Override
 			public void valueChanged(TreeSelectionEvent e) {
 				if (e.getNewLeadSelectionPath() == null || e.getNewLeadSelectionPath().getLastPathComponent() == null)
 					return;
@@ -147,15 +166,17 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 					filePanel.setDropTarget(myDropTarget);
 					
 					filePanel.setFiller(new Runnable() {
+						@Override
 						public void run() {
 							filePanel.removeAll();
 							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
+							MongoTreeNode mtn = (MongoTreeNode) mt;
 							if (!((MongoTreeNodeBasis) mt).readOnly) {
 								String msg = "<font color='black'>You may also use drag+drop to upload files to the database and to assign them to this entry";
 								filePanel.setHeader(true, msg, false, true);
 							} else {
 								filePanel.setHeader(false,
-													"<font color='black'>You don't have write access to this experiment", true, true);
+										"<font color='black'>You don't have write access to this experiment", true, true);
 							}
 							
 							filePanel.validate();
@@ -183,12 +204,12 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							if (!((MongoTreeNodeBasis) mt).readOnly)
 								filePanel
 										.setHeader(
-																		false,
-																		"<font color='black'>To assign data, please select the experiment-node, a condition, timepoint or measurement value",
-																		true, true);
+												false,
+												"<font color='black'>To assign data, please select the experiment-node, a condition, timepoint or measurement value",
+												true, true);
 							else
 								filePanel.setHeader(false,
-													"<font color='black'>You don't have write access to this experiment", true, true);
+										"<font color='black'>You don't have write access to this experiment", true, true);
 							
 							filePanel.validate();
 							filePanel.repaint();
@@ -201,6 +222,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		});
 		
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					expTree.setSelectionPath(new TreePath(expTree.getModel().getRoot()));
@@ -214,7 +236,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		fileScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		filePanel.setScrollpane(fileScroller);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, new JScrollPane(expTree), TableLayout
-							.getSplitVertical(filePanelHeader, fileScroller, TableLayout.PREFERRED, TableLayout.FILL));
+				.getSplitVertical(filePanelHeader, fileScroller, TableLayout.PREFERRED, TableLayout.FILL));
 		splitPane.setOneTouchExpandable(true);
 		splitPane.setLastDividerLocation(200);
 		splitPane.setDividerLocation(200);
@@ -249,6 +271,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 			}
 		} else
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					if (expTree != null) {
 						expTree.invalidate();
@@ -263,17 +286,20 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		MainFrame.showMessageDialogWithScrollBars2(s, "Error: " + string);
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		repaintTree();
 	}
 	
+	@Override
 	public String getTitle() {
 		return "";
 	}
 	
+	@Override
 	public void setTitle(String message) {
 		if (currentFilePanel != null)
 			currentFilePanel.setHeader(currentFilePanel.getIsButtonEnabled(), "<code>"
-								+ StringManipulationTools.UnicodeToHtml(message), currentFilePanel.getIsWarningDisplayed(), false);
+					+ StringManipulationTools.UnicodeToHtml(message), currentFilePanel.getIsWarningDisplayed(), false);
 	}
 }

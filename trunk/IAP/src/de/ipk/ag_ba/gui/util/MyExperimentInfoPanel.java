@@ -63,6 +63,7 @@ public class MyExperimentInfoPanel extends JPanel {
 	JDateChooser expStart;
 	JDateChooser expEnd;
 	JTextField remark;
+	JTextField sequence;
 	
 	private RunnableWithExperimentInfo saveAction;
 	
@@ -82,7 +83,7 @@ public class MyExperimentInfoPanel extends JPanel {
 	}
 	
 	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
-			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField remark,
+			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField sequence, JTextField remark,
 			JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
 		
 		editB.setEnabled(editPossible);
@@ -101,6 +102,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		experimentTypeSelection.setEnabled(enabled);
 		expStart.setEnabled(enabled);
 		expEnd.setEnabled(enabled);
+		sequence.setEnabled(enabled);
 		remark.setEnabled(enabled);
 	}
 	
@@ -214,6 +216,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		expStart = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getStartdate() : new Date(0l));
 		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
 		remark = new JTextField(experimentHeader.getRemark());
+		sequence = new JTextField(experimentHeader.getSequence());
 		
 		fp.addGuiComponentRow(new JLabel("Name"), editName, false);
 		fp.addGuiComponentRow(new JLabel("ID"), disable(new JTextField(experimentHeader.getDatabaseId() + "")), false);
@@ -227,6 +230,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("Experiment-Type"), experimentTypeSelection, false);
 		fp.addGuiComponentRow(new JLabel("Start-Time"), expStart, false);
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
+		fp.addGuiComponentRow(new JLabel("Sequence"), sequence, false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
 				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
@@ -256,7 +260,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				boolean b = tso.getBval(0, false);
 				b = !b;
 				tso.setBval(0, b);
-				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark, editB,
+				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, editB,
 						saveB, editPossible, true);
 				
 				if (restore) {
@@ -271,6 +275,7 @@ public class MyExperimentInfoPanel extends JPanel {
 						experimentTypeSelection.setSelectedIndex(0);
 					expStart.setDate(experimentHeader.getStartdate());
 					expEnd.setDate(experimentHeader.getImportdate());
+					sequence.setText(experimentHeader.getSequence());
 					remark.setText(experimentHeader.getRemark());
 				}
 			}
@@ -288,6 +293,7 @@ public class MyExperimentInfoPanel extends JPanel {
 					experimentHeader.setExperimenttype((String) experimentTypeSelection.getSelectedItem());
 					experimentHeader.setStartdate(expStart.getDate());
 					experimentHeader.setImportdate(expEnd.getDate());
+					experimentHeader.setSequence(sequence.getText());
 					experimentHeader.setRemark(remark.getText());
 					experimentHeader.setCoordinator(coordinator.getText());
 					if (saveAction != null) {
@@ -321,12 +327,12 @@ public class MyExperimentInfoPanel extends JPanel {
 				boolean b = tso.getBval(0, false);
 				b = !b;
 				tso.setBval(0, b);
-				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark, editB,
+				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, editB,
 						saveB, editPossibleBBB, false);
 			}
 		});
 		
-		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, remark,
+		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark,
 				editB, saveB, editPossible, true);
 		
 		GuiRow gr = new GuiRow(TableLayout.getSplitVertical(null, TableLayout.get3Split(null, TableLayout.get3Split(

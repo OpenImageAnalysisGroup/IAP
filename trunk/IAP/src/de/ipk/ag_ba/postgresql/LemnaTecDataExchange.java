@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,13 +33,16 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -141,6 +145,7 @@ public class LemnaTecDataExchange {
 				ehi.setExperimentname(rs.getString(1));
 				ehi.setDatabase(database);
 				ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentName());
+				ehi.setOriginDbId("lemnatec:" + database + ":" + ehi.getExperimentName());
 				ehi.setImportusername(user != null ? user : SystemAnalysis.getUserName());
 				ehi.setImportusergroup("LemnaTec");
 				LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
@@ -446,7 +451,7 @@ public class LemnaTecDataExchange {
 					+ "	snapshot.id = tiled_image.snapshot_id and "
 					+ "	tiled_image.id = tile.tiled_image_id and "
 					+ "	tile.image_oid = image_file_table.id and "
-						+ "	snapshot.configuration_id = image_unit_configuration.id and"
+					+ "	snapshot.configuration_id = image_unit_configuration.id and"
 					// + "	image_unit_configuration.id = tiled_image.id";
 					+ "	image_unit_configuration.gid = tiled_image.camera_label";
 			// and "
@@ -499,23 +504,23 @@ public class LemnaTecDataExchange {
 	
 	private void getImageSnapshotsWithUnknownImageUnitConfiguration(String experiment, Collection<Snapshot> result, Connection connection,
 			HashMap<Long, String> id2path,
-				HashSet<Long> knownSnaphotIds) throws SQLException {
+			HashSet<Long> knownSnaphotIds) throws SQLException {
 		PreparedStatement ps;
 		ResultSet rs;
 		{
 			// load snapshots with images
 			String sqlText = "SELECT "
-						+ "	creator, measurement_label, camera_label, id_tag, path, "
-						+ "	time_stamp, water_amount, weight_after, weight_before, "
-						+ "	image_oid, null_image_oid, snapshot.id as snapshotID, "
-						+ "	image_file_table.id as image_file_tableID "
-						+ "FROM "
-						+ "	snapshot, tiled_image, tile, image_file_table "
-						+ "WHERE "
-						+ "	snapshot.measurement_label = ? and "
-						+ "	snapshot.id = tiled_image.snapshot_id and "
-						+ "	tiled_image.id = tile.tiled_image_id and "
-						+ "	tile.image_oid = image_file_table.id";
+					+ "	creator, measurement_label, camera_label, id_tag, path, "
+					+ "	time_stamp, water_amount, weight_after, weight_before, "
+					+ "	image_oid, null_image_oid, snapshot.id as snapshotID, "
+					+ "	image_file_table.id as image_file_tableID "
+					+ "FROM "
+					+ "	snapshot, tiled_image, tile, image_file_table "
+					+ "WHERE "
+					+ "	snapshot.measurement_label = ? and "
+					+ "	snapshot.id = tiled_image.snapshot_id and "
+					+ "	tiled_image.id = tile.tiled_image_id and "
+					+ "	tile.image_oid = image_file_table.id";
 			
 			ps = connection.prepareStatement(sqlText);
 			ps.setString(1, experiment);
@@ -550,7 +555,7 @@ public class LemnaTecDataExchange {
 				String s2 = id2path.get(rs.getLong("null_image_oid"));
 				snapshot.setPath_null_image(s2);
 				String s3 = getCompAngleFromConfigLabel(rs.getString("camera_label"));
-				// System.out.println(s3);
+				// System.out.println(rs.getString("camera_label") + " ==> " + s3);
 				snapshot.setPath_image_config_blob(s3);
 				
 				result.add(snapshot);
@@ -576,12 +581,10 @@ public class LemnaTecDataExchange {
 		return res;
 	}
 	
+	private static HashMap<String, String> config2numbers = new HashMap<String, String>();
 	
-	private static HashMap<String,String> config2numbers = new HashMap<String,String>();
-	
-
 	private synchronized String getCompAngleFromConfigLabel(String conf) {
-		if (config2numbers.containsKey(conf))
+		if (!config2numbers.containsKey(conf))
 			config2numbers.put(conf, StringManipulationTools.getNumbersFromString(conf));
 		String res = config2numbers.get(conf);
 		return res;
@@ -962,7 +965,30 @@ public class LemnaTecDataExchange {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Experiment created (" + numberOfImages + " images)");
 		experimentReq.setNumberOfFiles(numberOfImages);
+		String seq = experiment.getSequence();
 		experiment.setHeader(new ExperimentHeader(experimentReq));
+		experiment.getHeader().setSequence(seq);
+		if (seq != null && seq.contains("SeedDate")) {
+			String[] values = seq.split(";");
+			seedDateLookupLoop: for (String v : values) {
+				if (v.contains("SeedDate") && v.contains(":")) {
+					String[] descAndVal = v.split(":", 2);
+					String seedDate = descAndVal[1];
+					String[] dayMonthYear = seedDate.split("\\.", 3);
+					int year = Integer.parseInt(dayMonthYear[2].trim());
+					int month = Integer.parseInt(dayMonthYear[1].trim());
+					int day = Integer.parseInt(dayMonthYear[0].trim());
+					GregorianCalendar cal = new GregorianCalendar(year, month - 1, day);
+					Date seedDateDate = cal.getTime();
+					Date startDate = experiment.getHeader().getStartdate();
+					int days = DateUtil.getElapsedDays(seedDateDate, startDate);
+					if (startDate.before(seedDateDate))
+						days = -days;
+					updateSnapshotTimes(experiment, days, "das");
+					break seedDateLookupLoop;
+				}
+			}
+		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(100);
 		// Collections.sort(experiment, new Comparator<SubstanceInterface>() {
@@ -980,6 +1006,18 @@ public class LemnaTecDataExchange {
 		// });
 		// }
 		return experiment;
+	}
+	
+	private void updateSnapshotTimes(ExperimentInterface experiment, int add, String newTimeUnit) {
+		for (SubstanceInterface si : experiment) {
+			for (ConditionInterface ci : si) {
+				for (SampleInterface s : ci) {
+					int day = s.getTime() - 1;
+					s.setTime(day + add);
+					s.setTimeUnit(newTimeUnit);
+				}
+			}
+		}
 	}
 	
 	private static String digit3(int i) {
@@ -1068,7 +1106,7 @@ public class LemnaTecDataExchange {
 					
 					String metaName = rs.getString(2);
 					String metaValue = rs.getString(3);
-					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					if (!res.containsKey(plantID)) {
 						res.put(plantID, new Condition(null));
 						if (header.getDatabase().contains("BGH_"))
@@ -1097,9 +1135,9 @@ public class LemnaTecDataExchange {
 										res.get(plantID).setGrowthconditions(metaValue);
 									else
 										if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date"))
-											addSequenceInfo(res.get(plantID), "SeedDate: " + metaValue);
+											addSequenceInfo(res.get(plantID), "SeedDate: " + metaValue, header);
 										else
-											addSequenceInfo(res.get(plantID), metaName + ": " + metaValue);
+											addSequenceInfo(res.get(plantID), metaName + ": " + metaValue, header);
 					
 				}
 				rs.close();
@@ -1113,12 +1151,13 @@ public class LemnaTecDataExchange {
 		return res;
 	}
 	
-	private void addSequenceInfo(Condition condition, String value) {
+	private void addSequenceInfo(Condition condition, String value, ExperimentHeaderInterface header) {
 		String current = (condition.getSequence() != null) ? condition.getSequence() : "";
 		if (current.length() > 0)
 			current += ";";
 		current += value;
 		condition.setSequence(current);
+		header.setSequence(current);
 	}
 	
 	private String filterName(String metaValue) {

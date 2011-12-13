@@ -18,9 +18,10 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	private String size = "????????? kb";
 	private final ExperimentInterface experiment;
 	private final ActionListener sizeChangedListener;
+	private String tooltip;
 	
 	public MongoTreeNode(MongoTreeNode projectNode, ActionListener sizeChangedListener, ExperimentInterface doc,
-						MappingDataEntity tableName, String title, boolean readOnly) {
+			MappingDataEntity tableName, String title, boolean readOnly) {
 		super(readOnly);
 		this.experiment = doc;
 		this.projectNode = projectNode;
@@ -73,6 +74,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 			projectNode.updateSizeInfo(m, dataChangedListener);
 		} else {
 			MyThread infoThread = new MyThread(new Runnable() {
+				@Override
 				public void run() {
 					getCurrentProjectSize(m);
 					if (dataChangedListener != null)
@@ -136,4 +138,13 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	public boolean mayContainData() {
 		return true;
 	}
+	
+	public void setTooltipInfo(String tooltip) {
+		this.tooltip = tooltip;
+	}
+	
+	public String getTooltipInfo() {
+		return tooltip;
+	}
+	
 }
