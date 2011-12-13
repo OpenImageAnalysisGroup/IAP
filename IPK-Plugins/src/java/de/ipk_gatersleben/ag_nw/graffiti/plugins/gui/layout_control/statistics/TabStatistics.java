@@ -104,7 +104,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author Christian Klukas
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class TabStatistics extends InspectorTab implements ActionListener,
 		ContainsTabbedPane {
@@ -2648,7 +2648,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 						final CorrelationResult cr = calculateCorrelation(
 								dataset, node2desc, node1desc, mergeDataset, 0,
 								prob, rankOrder);
-						// chartPanel.setToolTipText("Mouse-Click for Details");
+						chartPanel.setToolTipText("r=" + cr.getMaxOrMinR2());
 						chartPanel.addMouseListener(new MouseListener() {
 							@Override
 							public void mouseClicked(MouseEvent e) {

@@ -78,6 +78,7 @@ public class Condition implements ConditionInterface {
 		}
 	}
 	
+	@Override
 	public void getString(StringBuilder r) {
 		r.append("<line");
 		getXMLAttributeString(r);
@@ -86,6 +87,7 @@ public class Condition implements ConditionInterface {
 		r.append("</line>");
 	}
 	
+	@Override
 	public void getXMLAttributeString(StringBuilder r) {
 		Substance.getAttributeString(r, attributeNames, getAttributeValues());
 	}
@@ -96,11 +98,13 @@ public class Condition implements ConditionInterface {
 				getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety() };
 	}
 	
+	@Override
 	public void getStringOfChildren(StringBuilder r) {
 		for (SampleInterface s : this)
 			s.getString(r);
 	}
 	
+	@Override
 	public String getExpAndConditionName() {
 		return getExperimentName() + ": " + getConditionName();
 	}
@@ -110,6 +114,7 @@ public class Condition implements ConditionInterface {
 		return getExpAndConditionName();
 	}
 	
+	@Override
 	public String getConditionName() {
 		return getConditionName(true);
 	}
@@ -124,7 +129,7 @@ public class Condition implements ConditionInterface {
 		if (!oldStyleIgnoringGrowthcondition) {
 			if (cached && conditionCache != null)
 				return conditionCache;
-			String res = /* getExperimentName() + ": " + */ getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
+			String res = /* getExperimentName() + ": " + */getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
 					+ getGrowthconditions() + " / " + getVariety() + "/" + getSequence();
 			if (cached)
 				conditionCache = res;
@@ -163,6 +168,7 @@ public class Condition implements ConditionInterface {
 			return false;
 	}
 	
+	@Override
 	public void getTimes(Set<Integer> times) {
 		for (SampleInterface s : this)
 			times.add(s.getTime());
@@ -176,26 +182,32 @@ public class Condition implements ConditionInterface {
 	// return samples;
 	// }
 	
+	@Override
 	public String getExperimentName() {
 		return header.getExperimentName();
 	}
 	
+	@Override
 	public String getDatabase() {
 		return header.getDatabase();
 	}
 	
+	@Override
 	public String getCoordinator() {
 		return getExperimentCoordinator();
 	}
 	
+	@Override
 	public Date getExperimentStartDate() {
 		return header.getStartdate();
 	}
 	
+	@Override
 	public int getConditionId() {
 		return getRowId();
 	}
 	
+	@Override
 	public Collection<MyComparableDataPoint> getMeanMCDPs() {
 		ArrayList<MyComparableDataPoint> result = new ArrayList<MyComparableDataPoint>();
 		for (SampleInterface s : this) {
@@ -220,6 +232,7 @@ public class Condition implements ConditionInterface {
 		return result;
 	}
 	
+	@Override
 	public ArrayList<MyComparableDataPoint> getMCDPs() {
 		ArrayList<MyComparableDataPoint> result = new ArrayList<MyComparableDataPoint>();
 		for (SampleInterface s : this) {
@@ -245,6 +258,7 @@ public class Condition implements ConditionInterface {
 		return result;
 	}
 	
+	@Override
 	public ArrayList<Double> getMeanValues() {
 		ArrayList<Double> result = new ArrayList<Double>();
 		for (SampleInterface s : this)
@@ -252,6 +266,7 @@ public class Condition implements ConditionInterface {
 		return result;
 	}
 	
+	@Override
 	public ArrayList<Integer> getMeanTimePoints() {
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		for (SampleInterface s : this)
@@ -259,6 +274,7 @@ public class Condition implements ConditionInterface {
 		return result;
 	}
 	
+	@Override
 	public ArrayList<String> getMeanTimeUnits() {
 		ArrayList<String> result = new ArrayList<String>();
 		for (SampleInterface s : this)
@@ -266,6 +282,7 @@ public class Condition implements ConditionInterface {
 		return result;
 	}
 	
+	@Override
 	public double calcAlpha() {
 		double alpha, y_, beta, x_;
 		x_ = getAvgI(getMeanTimePoints());
@@ -275,6 +292,7 @@ public class Condition implements ConditionInterface {
 		return alpha;
 	}
 	
+	@Override
 	public double calcBeta() {
 		ArrayList<Integer> x = getMeanTimePoints();
 		ArrayList<Double> y = getMeanValues();
@@ -318,30 +336,36 @@ public class Condition implements ConditionInterface {
 		return getSum(values) / values.size();
 	}
 	
+	@Override
 	public String getSpecies() {
 		if (species == null || species.equalsIgnoreCase(""))
 			species = ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING;
 		return species;
 	}
 	
+	@Override
 	public String getGenotype() {
 		if (genotype == null || genotype.equalsIgnoreCase(""))
 			genotype = ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING;
 		return genotype;
 	}
 	
+	@Override
 	public String getTreatment() {
 		return treatment;
 	}
 	
+	@Override
 	public int getSeriesId() {
 		return getRowId();
 	}
 	
+	@Override
 	public boolean setData(Element condition) {
 		return setData(condition, null);
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public boolean setData(Element conditionElement, Element experimentChildElement) {
 		
@@ -371,10 +395,12 @@ public class Condition implements ConditionInterface {
 		return true;
 	}
 	
+	@Override
 	public String getName() {
 		return getConditionName();
 	}
 	
+	@Override
 	public void setAttribute(Attribute attr) {
 		if (attr == null || attr.getValue() == null)
 			return;
@@ -452,6 +478,7 @@ public class Condition implements ConditionInterface {
 																								System.err.println("Internal Error: Unknown Condition Attribute: " + attr.getName());
 	}
 	
+	@Override
 	public void setDataOfChildElement(Element childElement) {
 		if (childElement.getName().equals("sample")) {
 			SampleInterface s = Experiment.getTypeManager().getNewSample(this);
@@ -460,18 +487,22 @@ public class Condition implements ConditionInterface {
 		}
 	}
 	
+	@Override
 	public void setExperimentName(String experimentName) {
 		header.setExperimentname(experimentName != null ? experimentName.intern() : null);
 	}
 	
+	@Override
 	public void setDatabase(String database) {
 		header.setDatabase(database != null ? database.intern() : null);
 	}
 	
+	@Override
 	public void setExperimentCoordinator(String experimentCoordinator) {
 		header.setCoordinator(experimentCoordinator != null ? experimentCoordinator.intern() : null);
 	}
 	
+	@Override
 	public void setExperimentDatabaseId(String databaseId) {
 		header.setDatabaseId(databaseId != null ? databaseId.intern() : null);
 	}
@@ -484,83 +515,103 @@ public class Condition implements ConditionInterface {
 		return header.getOriginDbId();
 	}
 	
+	@Override
 	public String getExperimentDatabaseId() {
 		return header.getDatabaseId();
 	}
 	
+	@Override
 	public String getExperimentCoordinator() {
 		return header.getCoordinator();
 	}
 	
+	@Override
 	public void setExperimentStartDate(Date experimentStartDate) {
 		header.setStartdate(experimentStartDate != null ? experimentStartDate : null);
 	}
 	
+	@Override
 	public void setExperimentStorageDate(Date experimentStorageDate) {
 		header.setStorageTime(experimentStorageDate != null ? experimentStorageDate : null);
 	}
 	
+	@Override
 	public Date getExperimentStorageDate() {
 		return header.getStorageTime();
 	}
 	
+	@Override
 	public void setSpecies(String species) {
 		this.species = species != null ? species.intern() : null;
 	}
 	
+	@Override
 	public void setGenotype(String genotype) {
 		this.genotype = genotype != null ? genotype.intern() : genotype;
 	}
 	
+	@Override
 	public void setGrowthconditions(String growthconditions) {
 		this.growthconditions = growthconditions != null ? growthconditions.intern() : null;
 	}
 	
+	@Override
 	public String getGrowthconditions() {
 		return growthconditions;
 	}
 	
+	@Override
 	public void setTreatment(String treatment) {
 		this.treatment = treatment != null ? treatment.intern() : null;
 	}
 	
+	@Override
 	public String getExperimentType() {
 		return header.getExperimentType();
 	}
 	
+	@Override
 	public String getSequence() {
 		return header.getSequence();
 	}
 	
+	@Override
 	public void setVariety(String variety) {
 		this.variety = variety != null ? variety.intern() : null;
 	}
 	
+	@Override
 	public String getVariety() {
 		return variety;
 	}
 	
+	@Override
 	public void setExperimentType(String experimenttype) {
 		header.setExperimenttype(experimenttype != null ? experimenttype.intern() : null);
 	}
 	
+	@Override
 	public void setSequence(String sequence) {
 		header.setSequence(sequence != null ? sequence.intern() : null);
 	}
 	
+	@Override
 	public void getExperimentHeader(StringBuilder r, int measurementcount) {
 		header.toString(r, measurementcount);
 	}
 	
+	@Override
 	public SubstanceInterface getParentSubstance() {
 		return parent;
 	}
 	
+	@Override
 	public void getXMLAttributeStringForDocument(StringBuilder r) {
 		Substance.getAttributeString(r, attributeNamesForDocument, new Object[] { getGenotype(), getGrowthconditions(),
 				getRowId(), getSpecies(), getTreatment(), getVariety() });
 	}
 	
+	@Override
 	public void getStringForDocument(StringBuilder r) {
 		r.append("<line");
 		getXMLAttributeStringForDocument(r);
@@ -569,34 +620,42 @@ public class Condition implements ConditionInterface {
 		r.append("</line>");
 	}
 	
+	@Override
 	public int compareTo(ConditionInterface otherSeries) {
 		return getConditionName(false, true).compareTo(((Condition) otherSeries).getConditionName(false, true));
 	}
 	
+	@Override
 	public void setRowId(int rowId) {
 		this.rowId = rowId;
 	}
 	
+	@Override
 	public int getRowId() {
 		return rowId;
 	}
 	
+	@Override
 	public void setExperimentImportdate(Date experimentimportdate) {
 		header.setImportdate(experimentimportdate);
 	}
 	
+	@Override
 	public Date getExperimentImportDate() {
 		return header.getImportdate();
 	}
 	
+	@Override
 	public void setExperimentRemark(String experimentRemark) {
 		header.setRemark(experimentRemark != null ? experimentRemark.intern() : null);
 	}
 	
+	@Override
 	public String getExperimentRemark() {
 		return header.getRemark();
 	}
 	
+	@Override
 	public SampleInterface addAndMerge(SampleInterface samplenew, boolean ignoreSnapshotFineTime) {
 		SampleInterface save = null;
 		for (SampleInterface s : this)
@@ -617,18 +676,22 @@ public class Condition implements ConditionInterface {
 		}
 	}
 	
+	@Override
 	public void setParent(SubstanceInterface md) {
 		parent = md;
 	}
 	
+	@Override
 	public void setExperimentInfo(ExperimentHeaderInterface header) {
 		this.header = header;
 	}
 	
+	@Override
 	public ExperimentHeaderInterface getExperimentHeader() {
 		return header;
 	}
 	
+	@Override
 	public boolean add(SampleInterface arg0) {
 		return samples.add(arg0);
 	}
@@ -637,50 +700,62 @@ public class Condition implements ConditionInterface {
 	 * Delegate Methods
 	 */
 	
+	@Override
 	public boolean addAll(Collection<? extends SampleInterface> arg0) {
 		return samples.addAll(arg0);
 	}
 	
+	@Override
 	public void clear() {
 		samples.clear();
 	}
 	
+	@Override
 	public boolean contains(Object arg0) {
 		return samples.contains(arg0);
 	}
 	
+	@Override
 	public boolean containsAll(Collection<?> arg0) {
 		return samples.containsAll(arg0);
 	}
 	
+	@Override
 	public boolean isEmpty() {
 		return samples.isEmpty();
 	}
 	
+	@Override
 	public boolean remove(Object arg0) {
 		return samples.remove(arg0);
 	}
 	
+	@Override
 	public boolean removeAll(Collection<?> arg0) {
 		return samples.removeAll(arg0);
 	}
 	
+	@Override
 	public boolean retainAll(Collection<?> arg0) {
 		return samples.retainAll(arg0);
 	}
 	
+	@Override
 	public int size() {
 		return samples.size();
 	}
 	
+	@Override
 	public Object[] toArray() {
 		return samples.toArray();
 	}
 	
+	@Override
 	public <T> T[] toArray(T[] arg0) {
 		return samples.toArray(arg0);
 	}
 	
+	@Override
 	public Iterator<SampleInterface> iterator() {
 		return samples.iterator();
 	}
@@ -691,6 +766,7 @@ public class Condition implements ConditionInterface {
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#fillAttributeMap(java.util.Map)
 	 */
+	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
 		Object[] values = getAttributeValues();
 		int idx = 0;
@@ -742,6 +818,7 @@ public class Condition implements ConditionInterface {
 		return s1.hashCode();
 	}
 	
+	@Override
 	public ConditionInterface clone(SubstanceInterface parent) {
 		ConditionInterface c = Experiment.getTypeManager().getNewCondition(parent);
 		c.setExperimentInfo(getExperimentHeader().clone());
@@ -752,6 +829,7 @@ public class Condition implements ConditionInterface {
 		c.setTreatment(getTreatment());
 		c.setVariety(getVariety());
 		c.setRowId(getRowId());
+		c.setSequence(getSequence());
 		return c;
 	}
 	

@@ -470,6 +470,7 @@ public class StringManipulationTools implements HelperClass {
 	 * @return
 	 */
 	final static String[] numbers = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+	final static Character[] numberChars = new Character[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 	
 	public static String removeNumbersFromString(String s) {
 		for (String r : numbers)
@@ -480,8 +481,8 @@ public class StringManipulationTools implements HelperClass {
 	public static String getNumbersFromString(String s) {
 		StringBuilder res = new StringBuilder();
 		for (Character c : s.toCharArray()) {
-			for (String n : numbers) {
-				if (n.equals(c + "")) {
+			for (Character n : numberChars) {
+				if (n.equals(c)) {
 					res.append(n);
 					break;
 				}

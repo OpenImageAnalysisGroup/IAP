@@ -3,7 +3,7 @@
  *******************************************************************************/
 
 /*
- * $Id: PatternTabsForInspector.java,v 1.2 2011-12-06 13:29:58 klukas Exp $
+ * $Id: PatternTabsForInspector.java,v 1.3 2011-12-13 10:49:10 klukas Exp $
  */
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control;
 
@@ -13,6 +13,7 @@ import java.util.Collection;
 import org.FeatureSet;
 import org.Release;
 import org.ReleaseInfo;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.Algorithm;
 import org.graffiti.plugin.inspector.InspectorTab;
 import org.graffiti.plugin.inspector.SubtabHostTab;
@@ -35,7 +36,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.workflow.Wor
  * 
  * @author Christian Klukas Represents the main class of the
  *         InspectorLayoutControl plugin.
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class PatternTabsForInspector
 		extends DBE_EditorPluginAdapter {
@@ -82,7 +83,7 @@ public class PatternTabsForInspector
 		Collection<InspectorTab> subtabsTools = new ArrayList<InspectorTab>();
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.KEGG_ACCESS_ENH))
 			subtabsTools.add(new TabKegg2());
-		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.STATISTIC_FUNCTIONS)) // !ReleaseInfo.isRunningAsApplet() &&
+		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.STATISTIC_FUNCTIONS) && !SystemAnalysis.isHeadless()) // !ReleaseInfo.isRunningAsApplet() &&
 			subtabsTools.add(new TabStatistics());
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.TAB_PATTERNSEARCH))
 			subtabsTools.add(new TabPatternLayout());
