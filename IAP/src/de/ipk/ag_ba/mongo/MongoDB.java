@@ -2373,7 +2373,7 @@ public class MongoDB {
 								free += f.getLength();
 								gridfs.remove(f);
 								fIdx++;
-								status.setCurrentStatusText1("File " + fIdx + "/" + fN);
+								status.setCurrentStatusText1("File " + fIdx + "/" + fN + " (" + (int) (100d * fIdx / fN) + "%)");
 								status.setCurrentStatusText2("Removed: " + free / 1024 / 1024 + " MB");
 								status.setCurrentStatusValueFine(fIdx * 100d / fN);
 							}
