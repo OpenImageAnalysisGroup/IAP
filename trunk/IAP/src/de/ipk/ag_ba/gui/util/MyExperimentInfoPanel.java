@@ -372,6 +372,15 @@ public class MyExperimentInfoPanel extends JPanel {
 				JComponent right = TableLayout.get4Split(new JLabel(), height, freshWeight, dryWeight, width, space, border);
 				rows.add(new GuiRow(desc, right));
 			}
+			for (MatchInfo mi : match(optExperiment, new String[] { "corr.", "volume." }, false)) {
+				JComponent desc, height, freshWeight, dryWeight;
+				desc = new JLabel(mi.getDesc());
+				height = new JLabel(mi.getHeight());
+				freshWeight = new JLabel(mi.getFreshWeight());
+				dryWeight = new JLabel(mi.getDryWeight());
+				JComponent right = TableLayout.get4Split(new JLabel(), height, freshWeight, dryWeight, width, space, border);
+				rows.add(new GuiRow(desc, right));
+			}
 			rows.add(new GuiRow(new JLabel(""), null));
 			rows.add(new GuiRow(new JLabel("<html><br>Visual property for each side view vs. manual measurement<hr>"), null));
 			for (MatchInfo mi : match(optExperiment, new String[] { "corr.", ".avg" }, true)) {
@@ -400,6 +409,7 @@ public class MyExperimentInfoPanel extends JPanel {
 	private Collection<MatchInfo> match(ExperimentInterface optExperiment, String[] match, boolean inverseSecond) {
 		ArrayList<MatchInfo> res = new ArrayList<MatchInfo>();
 		for (SubstanceInterface si : optExperiment) {
+			System.out.println(si.getName() + " <== match? " + match[0] + " / " + match[1]);
 			if (si.getName().startsWith(match[0]) &&
 					(
 					(!inverseSecond && si.getName().contains(match[1])) ||

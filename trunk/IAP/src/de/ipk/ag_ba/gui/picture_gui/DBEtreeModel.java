@@ -140,6 +140,8 @@ public class DBEtreeModel implements TreeModel {
 					sampleArray.add(sample);
 				}
 				for (SampleInterface si : samples.get(key)) {
+					if (si.getRowId() == null)
+						continue;
 					if (si.getRowId() < firstTime || firstTime == 0)
 						firstTime = si.getRowId();
 					if (si.getRowId() > lastTime || lastTime == 0)
@@ -181,7 +183,8 @@ public class DBEtreeModel implements TreeModel {
 							meas.toString(), readOnly);
 					measNode.setIsLeaf(true);
 					measNode.setIndex(p++);
-					measNode.setTooltipInfo(sdf.format(new Date(sample.getRowId())));
+					if (sample.getRowId() != null)
+						measNode.setTooltipInfo(sdf.format(new Date(sample.getRowId())));
 					children.add(measNode);
 				}
 			}
