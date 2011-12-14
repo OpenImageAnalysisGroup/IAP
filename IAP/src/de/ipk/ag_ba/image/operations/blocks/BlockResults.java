@@ -119,7 +119,7 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized ArrayList<BlockPropertyValue> getProperties(
+	public synchronized ArrayList<BlockPropertyValue> getPropertiesSearch(
 			String search) {
 		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
 		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
@@ -140,6 +140,44 @@ public class BlockResults implements BlockResultSet {
 								if (tm.get(key) != null) {
 									String name = key
 											.substring(search.length());
+									BlockPropertyValue p = new BlockPropertyValue(
+											name, getUnitFromName(name),
+											tm.get(key));
+									result.add(p);
+								}
+							} else {
+								BlockPropertyValue p = new BlockPropertyValue(
+										pn.getName(), pn.getUnit(), tm.get(key));
+								result.add(p);
+							}
+						}
+					}
+			}
+		return result;
+	}
+	
+	@Override
+	public synchronized ArrayList<BlockPropertyValue> getPropertiesExactMatch(
+			String match) {
+		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
+		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
+		if (sv != null)
+			for (TreeMap<String, Double> tm : sv) {
+				Set<String> ks = tm.keySet();
+				if (ks != null)
+					for (String key : ks) {
+						if (key.equals(match)) {
+							PropertyNames pn = null;
+							try {
+								pn = PropertyNames.valueOf(key);
+							} catch (Exception e) {
+								// ignore, not a parameter which has an enum
+								// constant
+							}
+							if (pn == null) {
+								if (tm.get(key) != null) {
+									String name = key
+											.substring(match.length());
 									BlockPropertyValue p = new BlockPropertyValue(
 											name, getUnitFromName(name),
 											tm.get(key));
@@ -248,6 +286,7 @@ public class BlockResults implements BlockResultSet {
 		res.put("side.leaf.length.avg.norm", "mm");
 		res.put("side.leaf.length.sum", "px");
 		res.put("side.leaf.length.sum.norm", "mm");
+		res.put("volume.iap_formula", "px^3");
 		res.put("side.area", "px");
 		res.put("side.area.norm", "mm^2");
 		res.put("side.border.length", "px");
@@ -315,7 +354,7 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized void printAnalysisResults() {
-		for (BlockPropertyValue bpv : getProperties("RESULT_")) {
+		for (BlockPropertyValue bpv : getPropertiesSearch("RESULT_")) {
 			if (bpv.getName() == null)
 				continue;
 			
