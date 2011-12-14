@@ -218,14 +218,14 @@ public class Condition implements ConditionInterface {
 			String serie = m.getParentSample().getParentCondition().getConditionName();
 			String timeUnitAndTime = m.getParentSample().getSampleTime();
 			String measurementUnit = m.getUnit();
-			int timeValueForComparison = m.getParentSample().getTime();
+			long timeValueForComparison = m.getParentSample().getRowId() > 0 ? m.getParentSample().getRowId() : m.getParentSample().getTime();
 			TtestInfo ttestInfo = m.getParentSample().getTtestInfo();
 			String timeUnit = m.getParentSample().getTimeUnit();
 			int seriesID = m.getParentSample().getParentCondition().getSeriesId();
 			int replicate = m.getParentSample().size();
 			Measurement reference = m;
 			MyComparableDataPoint mcdp = new MyComparableDataPoint(ismean, mean, stddev, serie, timeUnitAndTime,
-					measurementUnit, timeValueForComparison, ttestInfo == TtestInfo.REFERENCE, ttestInfo == TtestInfo.H1,
+					measurementUnit, timeValueForComparison, m.getParentSample().getTime(), ttestInfo == TtestInfo.REFERENCE, ttestInfo == TtestInfo.H1,
 					timeUnit, seriesID, replicate, reference);
 			result.add(mcdp);
 		}
@@ -243,14 +243,14 @@ public class Condition implements ConditionInterface {
 				String serie = m.getParentSample().getParentCondition().getConditionName();
 				String timeUnitAndTime = m.getParentSample().getSampleTime();
 				String measurementUnit = m.getUnit();
-				int timeValueForComparison = m.getParentSample().getTime();
+				long timeValueForComparison = m.getParentSample().getRowId() > 0 ? m.getParentSample().getRowId() : m.getParentSample().getTime();
 				TtestInfo ttestInfo = m.getParentSample().getTtestInfo();
 				String timeUnit = m.getParentSample().getTimeUnit();
 				int seriesID = m.getParentSample().getParentCondition().getSeriesId();
 				int replicate = m.getReplicateID();
 				Measurement reference = m;
 				MyComparableDataPoint mcdp = new MyComparableDataPoint(ismean, mean, stddev, serie, timeUnitAndTime,
-						measurementUnit, timeValueForComparison, ttestInfo == TtestInfo.REFERENCE, ttestInfo == TtestInfo.H1,
+						measurementUnit, timeValueForComparison, m.getParentSample().getTime(), ttestInfo == TtestInfo.REFERENCE, ttestInfo == TtestInfo.H1,
 						timeUnit, seriesID, replicate, reference);
 				result.add(mcdp);
 			}

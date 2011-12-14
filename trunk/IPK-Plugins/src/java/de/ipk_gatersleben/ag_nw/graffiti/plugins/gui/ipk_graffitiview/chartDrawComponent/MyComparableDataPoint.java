@@ -23,7 +23,7 @@ public class MyComparableDataPoint implements Comparable<Object> {
 	public String timeUnitAndTime;
 	public String measurementUnit;
 	public int replicate;
-	public int timeValueForComparision;
+	public long timeValueForComparision;
 	public boolean ttestIsReference;
 	public boolean ttestIsSignificantDifferent;
 	public Integer timeValue;
@@ -43,7 +43,7 @@ public class MyComparableDataPoint implements Comparable<Object> {
 	@Override
 	public String toString() {
 		return serie + ": avg=" + mean + " " + measurementUnit + ", stddev=" + getStddev() + " " + measurementUnit
-							+ ", time=" + timeUnitAndTime + ", replicate=" + replicate;
+				+ ", time=" + timeUnitAndTime + ", replicate=" + replicate;
 	}
 	
 	/**
@@ -54,8 +54,8 @@ public class MyComparableDataPoint implements Comparable<Object> {
 	 * @param reference
 	 */
 	public MyComparableDataPoint(boolean isMeanValue, double mean, double stddev, String serie, String timeUnitAndTime,
-						String measurementUnit, int timeValueForComparision, boolean ttestIsReference,
-						boolean ttestIsSignificantDifferent, String timeUnit, int seriesID, int replicate, Measurement reference) {
+			String measurementUnit, long timeValueForComparision, int displayTime, boolean ttestIsReference,
+			boolean ttestIsSignificantDifferent, String timeUnit, int seriesID, int replicate, Measurement reference) {
 		this.mean = mean;
 		this.isMeanValue = isMeanValue;
 		this.setStddev(stddev);
@@ -64,7 +64,7 @@ public class MyComparableDataPoint implements Comparable<Object> {
 		this.timeUnitAndTime = timeUnitAndTime;
 		this.timeUnit = timeUnit;
 		this.timeValueForComparision = timeValueForComparision;
-		this.timeValue = new Integer(timeValueForComparision);
+		this.timeValue = new Integer(displayTime);
 		this.measurementUnit = measurementUnit;
 		this.ttestIsReference = ttestIsReference;
 		this.ttestIsSignificantDifferent = ttestIsSignificantDifferent;
@@ -82,6 +82,7 @@ public class MyComparableDataPoint implements Comparable<Object> {
 	 * (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
+	@Override
 	public int compareTo(Object obj) {
 		MyComparableDataPoint ct = (MyComparableDataPoint) obj;
 		
@@ -107,7 +108,7 @@ public class MyComparableDataPoint implements Comparable<Object> {
 			return new String(serie + "§" + timeUnit + "§" + getZeros(timeValueForComparision, 9) + "§" + replicate);
 	}
 	
-	private String getZeros(int val, int len) {
+	private String getZeros(long val, int len) {
 		boolean negative = val < 0;
 		val = Math.abs(val);
 		String result = "" + val;

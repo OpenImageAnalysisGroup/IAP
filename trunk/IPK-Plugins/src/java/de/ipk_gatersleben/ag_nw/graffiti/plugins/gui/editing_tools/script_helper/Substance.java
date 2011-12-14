@@ -27,7 +27,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
 public class Substance implements SubstanceInterface {
 	
 	private String rowId, name, funcat, info, formula, substancegroup, cluster_id, spot, new_blast, new_blast_e_val,
-						new_blast_score, affy_hit, score, secure;
+			new_blast_score, affy_hit, score, secure;
 	
 	HashMap<Integer, String> synonyms = null; // new HashMap<Integer, String>()
 	
@@ -102,6 +102,7 @@ public class Substance implements SubstanceInterface {
 	 * unit="units">48.5313748658488</average> <data replicates=""
 	 * unit="">48.5313748658488</data> </sample> ...
 	 */
+	@Override
 	public boolean setMappedData(Element e, Element experimentChildElement) {
 		// setMappedData
 		
@@ -159,6 +160,7 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
+	@Override
 	public ConditionInterface addAndMergeData(ConditionInterface newCondition, boolean ignoreSnapshotFineTime) {
 		ConditionInterface targetCondition = null;
 		for (ConditionInterface cond : this)
@@ -182,6 +184,7 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
+	@Override
 	public String getXMLstring() {
 		return toString();
 	}
@@ -194,8 +197,8 @@ public class Substance implements SubstanceInterface {
 	}
 	
 	private static final String[] attributeNames = new String[] { "id", "name", "funcat", "info", "formula",
-						"substancegroup", "cluster_id", "spot", "new_blast", "new_blast_e_val", "new_blast_score", "affy_hit",
-						"score", "secure" };
+			"substancegroup", "cluster_id", "spot", "new_blast", "new_blast_e_val", "new_blast_score", "affy_hit",
+			"score", "secure" };
 	
 	private void getString(StringBuilder s) {
 		s.append("<substance");
@@ -205,6 +208,7 @@ public class Substance implements SubstanceInterface {
 		s.append("</substance>");
 	}
 	
+	@Override
 	public void getXMLAttributeString(StringBuilder s) {
 		getSynonymsString(s);
 		getAttributeString(s, attributeNames, getAttributeValues());
@@ -212,10 +216,11 @@ public class Substance implements SubstanceInterface {
 	
 	private Object[] getAttributeValues() {
 		return new Object[] { getRowId(), getName(), getFuncat(), getInfo(), getFormula(), getSubstancegroup(),
-							getClusterId(), getSpot(), getNewBlast(), getNewBlastEval(), getNewBlastScore(), getAffyHit(), getScore(),
-							getSecure() };
+				getClusterId(), getSpot(), getNewBlast(), getNewBlastEval(), getNewBlastScore(), getAffyHit(), getScore(),
+				getSecure() };
 	}
 	
+	@Override
 	public void getStringOfChildren(StringBuilder s) {
 		for (ConditionInterface c : conditions)
 			c.getString(s);
@@ -283,6 +288,7 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
+	@Override
 	public Collection<MyComparableDataPoint> getDataPoints(boolean returnAvgValues) {
 		ArrayList<MyComparableDataPoint> result = new ArrayList<MyComparableDataPoint>();
 		for (ConditionInterface c : conditions)
@@ -309,16 +315,19 @@ public class Substance implements SubstanceInterface {
 	/**
 	 * @return Null or eventually empty list of synonyms.
 	 */
+	@Override
 	public Collection<String> getSynonyms() {
 		if (synonyms == null)
 			synonyms = new HashMap<Integer, String>();
 		return synonyms.values();
 	}
 	
+	@Override
 	public HashMap<Integer, String> getSynonymMap() {
 		return synonyms;
 	}
 	
+	@Override
 	public int getNumberOfDifferentTimePoints() {
 		HashSet<Integer> times = new HashSet<Integer>();
 		for (ConditionInterface c : conditions)
@@ -326,6 +335,7 @@ public class Substance implements SubstanceInterface {
 		return times.size();
 	}
 	
+	@Override
 	public int clearSynonyms() {
 		if (synonyms == null)
 			return 0;
@@ -334,6 +344,7 @@ public class Substance implements SubstanceInterface {
 		return result;
 	}
 	
+	@Override
 	public void setSynonyme(int idx, String value) {
 		if (synonyms == null)
 			synonyms = new HashMap<Integer, String>();
@@ -345,18 +356,22 @@ public class Substance implements SubstanceInterface {
 		synonyms = hashMap;
 	}
 	
+	@Override
 	public String getSynonyme(int idx) {
 		return synonyms.get(idx);
 	}
 	
+	@Override
 	public String getFuncat() {
 		return funcat;
 	}
 	
+	@Override
 	public String getInfo() {
 		return info;
 	}
 	
+	@Override
 	public int getMaximumSynonymeIndex(int returnIfNoSynonymes) {
 		if (synonyms == null || synonyms.size() == 0)
 			return returnIfNoSynonymes;
@@ -371,6 +386,7 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
+	@Override
 	public double getAverage() {
 		double sum = 0;
 		double cnt = 0;
@@ -382,6 +398,7 @@ public class Substance implements SubstanceInterface {
 		return sum / cnt;
 	}
 	
+	@Override
 	public void setAttribute(Attribute attr) {
 		if (attr == null)
 			return;
@@ -444,14 +461,17 @@ public class Substance implements SubstanceInterface {
 																	System.err.println("Internal Error: Unknown Substance Attribute: " + attr.getName());
 	}
 	
+	@Override
 	public boolean setData(Element experimentElement) {
 		return setMappedData(experimentElement, null);
 	}
 	
+	@Override
 	public void setDataOfChildElement(Element childElement) {
 		setDataOfChildElement(childElement, null);
 	}
 	
+	@Override
 	public void setDataOfChildElement(Element childElement, Element experimentChildElement) {
 		if (childElement.getName().equals("line")) {
 			ConditionInterface c = Experiment.getTypeManager().getNewCondition(this);
@@ -460,130 +480,159 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
+	@Override
 	public void getSubstanceString(StringBuilder r) {
 		r.append("<substance");
 		getXMLAttributeString(r);
 		r.append(">");
 	}
 	
+	@Override
 	public int compareTo(SubstanceInterface o) {
 		return getName().compareTo(o.getName());
 	}
 	
+	@Override
 	public void setRowId(String rowId) {
 		this.rowId = rowId;
 	}
 	
+	@Override
 	public String getRowId() {
 		return rowId;
 	}
 	
+	@Override
 	public void setName(String name) {
 		assert name != null;
 		assert name.length() > 0;
 		this.name = name;
 	}
 	
+	@Override
 	public String getName() {
 		return name;
 	}
 	
+	@Override
 	public void setFuncat(String funcat) {
 		this.funcat = funcat;
 	}
 	
+	@Override
 	public void setInfo(String info) {
 		this.info = info;
 	}
 	
+	@Override
 	public void setFormula(String formula) {
 		this.formula = formula;
 	}
 	
+	@Override
 	public String getFormula() {
 		return formula;
 	}
 	
+	@Override
 	public void setSubstancegroup(String substancegroup) {
 		this.substancegroup = substancegroup;
 	}
 	
+	@Override
 	public String getSubstancegroup() {
 		return substancegroup;
 	}
 	
+	@Override
 	public void setClusterId(String cluster_id) {
 		this.cluster_id = cluster_id;
 	}
 	
+	@Override
 	public String getClusterId() {
 		return cluster_id;
 	}
 	
+	@Override
 	public void setSpot(String spot) {
 		this.spot = spot;
 	}
 	
+	@Override
 	public String getSpot() {
 		return spot;
 	}
 	
+	@Override
 	public void setNewBlast(String new_blast) {
 		// if (new_blast!=null && new_blast.indexOf("~")>0)
 		// new_blast = ErrorMsg.stringReplace(new_blast, "~", "_");
 		// this.new_blast = new_blast;
 	}
 	
+	@Override
 	public String getNewBlast() {
 		return new_blast;
 	}
 	
+	@Override
 	public void setNewBlastEval(String new_blast_e_val) {
 		this.new_blast_e_val = new_blast_e_val;
 	}
 	
+	@Override
 	public String getNewBlastEval() {
 		return new_blast_e_val;
 	}
 	
+	@Override
 	public void setNewBlastScore(String new_blast_score) {
 		this.new_blast_score = new_blast_score;
 	}
 	
+	@Override
 	public String getNewBlastScore() {
 		return new_blast_score;
 	}
 	
+	@Override
 	public void setAffyHit(String affy_hit) {
 		this.affy_hit = affy_hit;
 	}
 	
+	@Override
 	public String getAffyHit() {
 		return affy_hit;
 	}
 	
+	@Override
 	public void setScore(String score) {
 		this.score = score;
 	}
 	
+	@Override
 	public String getScore() {
 		return score;
 	}
 	
+	@Override
 	public void setSecure(String secure) {
 		this.secure = secure;
 	}
 	
+	@Override
 	public String getSecure() {
 		return secure;
 	}
 	
 	public static void validate(Document doc) throws Exception {
 		URL xsd = Substance.class.getClassLoader().getResource(
-							Substance.class.getPackage().getName().replace('.', '/') + "/" + "vanted.xsd");
+				Substance.class.getPackage().getName().replace('.', '/') + "/" + "vanted.xsd");
 		XMLHelper.validate(doc, xsd);
 	}
 	
+	@Override
 	public int getDataPointCount(boolean returnAvgValues) {
 		int res = 0;
 		for (ConditionInterface c : conditions)
@@ -595,6 +644,7 @@ public class Substance implements SubstanceInterface {
 		return res;
 	}
 	
+	@Override
 	public double getSum() {
 		double sum = 0;
 		for (ConditionInterface c : conditions)
@@ -606,6 +656,7 @@ public class Substance implements SubstanceInterface {
 		return sum;
 	}
 	
+	@Override
 	public Collection<ConditionInterface> getConditions(Collection<String> validConditons) {
 		if (validConditons == null)
 			return conditions;
@@ -624,54 +675,67 @@ public class Substance implements SubstanceInterface {
 	/*
 	 * Delegate Methods
 	 */
+	@Override
 	public boolean add(ConditionInterface e) {
 		return conditions.add(e);
 	}
 	
+	@Override
 	public Iterator<ConditionInterface> iterator() {
 		return conditions.iterator();
 	}
 	
+	@Override
 	public boolean addAll(Collection<? extends ConditionInterface> c) {
 		return conditions.addAll(c);
 	}
 	
+	@Override
 	public void clear() {
 		conditions.clear();
 	}
 	
+	@Override
 	public boolean contains(Object o) {
 		return conditions.contains(o);
 	}
 	
+	@Override
 	public boolean containsAll(Collection<?> c) {
 		return conditions.containsAll(c);
 	}
 	
+	@Override
 	public boolean isEmpty() {
 		return conditions.isEmpty();
 	}
 	
+	@Override
 	public boolean remove(Object o) {
 		return conditions.remove(o);
 	}
 	
+	@Override
 	public boolean removeAll(Collection<?> c) {
 		return conditions.removeAll(c);
 	}
 	
+	@Override
 	public boolean retainAll(Collection<?> c) {
 		return conditions.retainAll(c);
 	}
 	
+	@Override
 	public int size() {
 		return conditions.size();
 	}
 	
+	@Override
 	public Object[] toArray() {
 		return conditions.toArray();
 	}
 	
+	@Override
 	public <T> T[] toArray(T[] a) {
 		return conditions.toArray(a);
 	}
@@ -697,6 +761,7 @@ public class Substance implements SubstanceInterface {
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#fillAttributeMap(java.util.Map)
 	 */
+	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
 		if (synonyms == null || synonyms.size() == 0) {
 			// empty
@@ -746,10 +811,10 @@ public class Substance implements SubstanceInterface {
 			return false;
 		
 		String s1 = rowId + ";" + name + ";" + funcat + ";" + info + ";" + formula + ";" + substancegroup + ";" + cluster_id + ";" + spot + ";" +
-						new_blast + ";" + new_blast_e_val + ";" + new_blast_score + ";" + affy_hit + ";" + score + ";" + secure;
+				new_blast + ";" + new_blast_e_val + ";" + new_blast_score + ";" + affy_hit + ";" + score + ";" + secure;
 		Substance s = (Substance) obj;
 		String s2 = s.rowId + ";" + s.name + ";" + s.funcat + ";" + s.info + ";" + s.formula + ";" + s.substancegroup + ";" + s.cluster_id + ";" + s.spot + ";" +
-						s.new_blast + ";" + s.new_blast_e_val + ";" + s.new_blast_score + ";" + s.affy_hit + ";" + s.score + ";" + s.secure;
+				s.new_blast + ";" + s.new_blast_e_val + ";" + s.new_blast_score + ";" + s.affy_hit + ";" + s.score + ";" + s.secure;
 		return s1.equals(s2);
 	}
 	
@@ -808,6 +873,14 @@ public class Substance implements SubstanceInterface {
 	@Override
 	public List<ConditionInterface> subList(int fromIndex, int toIndex) {
 		return subList(fromIndex, toIndex);
+	}
+	
+	/**
+	 * @see See also #getDataPoints(boolean)
+	 */
+	@Override
+	public int getNumberOfMeasurements() {
+		return getDataPointCount(false);
 	}
 	
 }

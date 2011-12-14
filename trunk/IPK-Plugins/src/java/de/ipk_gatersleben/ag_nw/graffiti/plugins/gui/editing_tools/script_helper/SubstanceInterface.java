@@ -15,7 +15,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
 
 @TestValueRequired("name")
 public interface SubstanceInterface extends MappingDataEntity, Comparable<SubstanceInterface>,
-					List<ConditionInterface>, HelperClass {
+		List<ConditionInterface>, HelperClass {
 	
 	/**
 	 * Dataset, transformed for data mapping: <substance id="" name=""> <line
@@ -31,10 +31,13 @@ public interface SubstanceInterface extends MappingDataEntity, Comparable<Substa
 	
 	public abstract String getXMLstring();
 	
+	@Override
 	public abstract String toString();
 	
+	@Override
 	public abstract void getXMLAttributeString(StringBuilder s);
 	
+	@Override
 	public abstract void getStringOfChildren(StringBuilder s);
 	
 	public abstract Collection<MyComparableDataPoint> getDataPoints(boolean returnAvgValues);
@@ -62,16 +65,20 @@ public interface SubstanceInterface extends MappingDataEntity, Comparable<Substa
 	
 	public abstract double getAverage();
 	
+	@Override
 	public abstract void setAttribute(Attribute attr);
 	
+	@Override
 	public abstract boolean setData(Element experimentElement);
 	
+	@Override
 	public abstract void setDataOfChildElement(Element childElement);
 	
 	public abstract void setDataOfChildElement(Element childElement, Element experimentChildElement);
 	
 	public abstract void getSubstanceString(StringBuilder r);
 	
+	@Override
 	public abstract int compareTo(SubstanceInterface o);
 	
 	public abstract void setRowId(String rowId);
@@ -135,30 +142,43 @@ public interface SubstanceInterface extends MappingDataEntity, Comparable<Substa
 	/*
 	 * Delegate Methods
 	 */
+	@Override
 	public abstract boolean add(ConditionInterface e);
 	
+	@Override
 	public abstract Iterator<ConditionInterface> iterator();
 	
+	@Override
 	public abstract boolean addAll(Collection<? extends ConditionInterface> c);
 	
+	@Override
 	public abstract void clear();
 	
+	@Override
 	public abstract boolean contains(Object o);
 	
+	@Override
 	public abstract boolean containsAll(Collection<?> c);
 	
+	@Override
 	public abstract boolean isEmpty();
 	
+	@Override
 	public abstract boolean remove(Object o);
 	
+	@Override
 	public abstract boolean removeAll(Collection<?> c);
 	
+	@Override
 	public abstract boolean retainAll(Collection<?> c);
 	
+	@Override
 	public abstract int size();
 	
+	@Override
 	public abstract Object[] toArray();
 	
+	@Override
 	public abstract <T> T[] toArray(T[] a);
 	
 	/*
@@ -167,10 +187,13 @@ public interface SubstanceInterface extends MappingDataEntity, Comparable<Substa
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#fillAttributeMap(java.util.Map)
 	 */
+	@Override
 	public abstract void fillAttributeMap(Map<String, Object> attributeValueMap);
 	
 	public abstract void setSynonyme(HashMap<Integer, String> hashMap);
 	
 	public SubstanceInterface clone();
+	
+	public abstract int getNumberOfMeasurements();
 	
 }
