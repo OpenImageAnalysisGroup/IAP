@@ -104,7 +104,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author Christian Klukas
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class TabStatistics extends InspectorTab implements ActionListener,
 		ContainsTabbedPane {
@@ -2356,7 +2356,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 					sum_x, sum_y, sum_x_x, sum_y_y, sum_x_y, mergedSeries, n,
 					maxROW, rowDescription, rankOrder);
 		}
-		// System.out.println("N="+n+" (off="+dataset2offset+")");
+		System.out.println("N=" + n + " // " + calculationHistory.toString());
 		return corrRes;
 	}
 	

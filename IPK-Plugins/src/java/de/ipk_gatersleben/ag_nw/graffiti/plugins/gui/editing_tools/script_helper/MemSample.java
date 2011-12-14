@@ -28,9 +28,9 @@ public class MemSample {
 	public MemSample(double value, String replicateAndOptQualityAnnotation, long plantID, String unit, String optTimeUnit,
 			String optTimeValueAndFineTimeValueForComparison) {
 		this.value = value;
-		this.replicate = Integer.parseInt(replicateAndOptQualityAnnotation.split(";", 3)[0]);
-		this.setOptQualityAnnotation(replicateAndOptQualityAnnotation.split(";", 3)[1]);
-		String pos = replicateAndOptQualityAnnotation.split(";", 3)[2];
+		this.replicate = -1;// TODOOOOOOOOOOO Integer.parseInt(replicateAndOptQualityAnnotation.split(";", 3)[0]);
+		this.setOptQualityAnnotation(replicateAndOptQualityAnnotation.split(";", 3)[0]);
+		String pos = replicateAndOptQualityAnnotation.split(";", 3)[1];
 		if (pos != null && pos.length() > 0)
 			this.setPosition(Double.parseDouble(pos));
 		this.plantID = plantID;
