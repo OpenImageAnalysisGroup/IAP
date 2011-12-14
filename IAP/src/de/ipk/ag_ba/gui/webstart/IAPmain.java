@@ -83,6 +83,13 @@ public class IAPmain extends JApplet {
 	
 	static boolean myClassKnown = false;
 	
+	public static void main(String[] args) {
+		JFrame jf = new JFrame("IAP Main");
+		jf.add("Center", new IAPmain().getContentPane());
+		jf.pack();
+		jf.setVisible(true);
+	}
+	
 	public IAPmain() {
 		System.out.println("Initialize IAP applet start...");
 		ReleaseInfo.setRunningAsApplet(this);

@@ -54,7 +54,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					IOurl urlForCopiedData = dc.getURLforStoredData(url);
 					if (urlForCopiedData != null) {
 						InputStream is = urlForCopiedData.getInputStream();
-						if (is!=null)
+						if (is != null)
 							return is;
 					}
 				}
@@ -65,7 +65,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		if (url.isEqualPrefix(getPrefix())) {
 			boolean lokalCache = true;
 			if (lokalCache) {
-				for (String path : new String[] {"/Volumes/3TB_1/pgftp/", "I:/", "J:/"}) {
+				for (String path : new String[] { "/Volumes/3TB_1/pgftp/", "I:/", "J:/", "/data0/pgftp/" }) {
 					String detail = url.getDetail();
 					detail = path + detail.split("/", 2)[1];
 					String fn = detail;
@@ -73,9 +73,9 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					if (fff.exists()) {
 						IOurl u = FileSystemHandler.getURL(fff);
 						MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(u);
-						if (is!=null)
+						if (is != null)
 							return is;
-					} 
+					}
 				}
 			}
 			boolean useSCP = true;

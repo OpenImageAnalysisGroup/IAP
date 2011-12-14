@@ -4,7 +4,9 @@ import info.StopWatch;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -395,7 +397,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private void addTopOrSideImagesToWorkset(
 			ArrayList<TreeMap<String, ImageSet>> workload, int max,
 			boolean top, boolean side) {
-		TreeMap<String, TreeMap<String, ImageSet>> replicateId2ImageSetSide = new TreeMap<String, TreeMap<String, ImageSet>>();
+		TreeMap<String, TreeMap<String, ImageSet>> sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle = new TreeMap<String, TreeMap<String, ImageSet>>();
 		if (input == null)
 			return;
 		for (Sample3D ins : input)
@@ -403,71 +405,96 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (md instanceof ImageData) {
 					ImageData id = (ImageData) md;
 					
-					String keyA = id.getParentSample().getSampleTime() + ";"
+					String sampleTimeAndFullPlantAnnotation = id.getParentSample().getSampleTime() + ";"
 							+ id.getParentSample().getFullId() + ";"
 							+ id.getReplicateID();
-					if (!replicateId2ImageSetSide.containsKey(keyA)) {
-						replicateId2ImageSetSide.put(keyA,
+					if (!sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.containsKey(sampleTimeAndFullPlantAnnotation)) {
+						sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.put(sampleTimeAndFullPlantAnnotation,
 								new TreeMap<String, ImageSet>());
 					}
-					ImageConfiguration ic = ImageConfiguration.get(id
+					ImageConfiguration imageConfiguration = ImageConfiguration.get(id
 							.getSubstanceName());
-					if (ic == ImageConfiguration.Unknown) {
-						ic = ImageConfiguration.get(id.getURL().getFileName());
+					if (imageConfiguration == ImageConfiguration.Unknown) {
+						imageConfiguration = ImageConfiguration.get(id.getURL().getFileName());
 						System.out.println(SystemAnalysisExt.getCurrentTime()
 								+ ">INFO: IMAGE CONFIGURATION UNKNOWN ("
 								+ id.getSubstanceName() + "), "
 								+ "GUESSING FROM IMAGE NAME: " + id.getURL()
-								+ ", GUESS: " + ic);
+								+ ", GUESS: " + imageConfiguration);
 					}
-					if (ic == ImageConfiguration.Unknown) {
+					if (imageConfiguration == ImageConfiguration.Unknown) {
 						System.out
 								.println(SystemAnalysisExt.getCurrentTime()
 										+ ">ERROR: INVALID (UNKNOWN) IMAGE CONFIGURATION FOR IMAGE: "
 										+ id.getURL());
 					} else {
-						String icS = ic + "";
-						icS = icS.substring(icS.indexOf(".") + ".".length());
-						String keyB = id.getPosition() != null ? icS + ";"
-								+ id.getPosition() : icS + ";" + 0d;
-						if (!replicateId2ImageSetSide.get(keyA).containsKey(
-								keyB)) {
-							replicateId2ImageSetSide.get(keyA).put(
-									keyB,
-									new ImageSet(null, null, null, id
-											.getParentSample()));
+						String imageConfigurationName = imageConfiguration + "";
+						imageConfigurationName = imageConfigurationName.substring(imageConfigurationName.indexOf(".")
+								+ ".".length());
+						String imageConfigurationAndRotationAngle = id.getPosition() != null ? imageConfigurationName + ";"
+								+ id.getPosition() : imageConfigurationName + ";" + 0d;
+						if (!sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).containsKey(
+								imageConfigurationAndRotationAngle)) {
+							sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).put(
+									imageConfigurationAndRotationAngle,
+									new ImageSet(null, null, null, id.getParentSample()));
 						}
-						ImageSet is = replicateId2ImageSetSide.get(keyA).get(
-								keyB);
+						ImageSet is = sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).get(
+								imageConfigurationAndRotationAngle);
 						
-						is.setSide(ic.isSide());
-						if ((ic.isSide() && side) || (!ic.isSide() && top)) {
-							if (ic == ImageConfiguration.RgbSide
-									|| ic == ImageConfiguration.RgbTop)
+						is.setSide(imageConfiguration.isSide());
+						if ((imageConfiguration.isSide() && side) || (!imageConfiguration.isSide() && top)) {
+							if (imageConfiguration == ImageConfiguration.RgbSide
+									|| imageConfiguration == ImageConfiguration.RgbTop)
 								is.setVis(id);
-							if (ic == ImageConfiguration.FluoSide
-									|| ic == ImageConfiguration.FluoTop)
+							if (imageConfiguration == ImageConfiguration.FluoSide
+									|| imageConfiguration == ImageConfiguration.FluoTop)
 								is.setFluo(id);
-							if (ic == ImageConfiguration.NirSide
-									|| ic == ImageConfiguration.NirTop)
+							if (imageConfiguration == ImageConfiguration.NirSide
+									|| imageConfiguration == ImageConfiguration.NirTop)
 								is.setNir(id);
 						}
 					}
 				}
 			}
 		
-		int workLoadIndex = workOnSubset;
-		for (TreeMap<String, ImageSet> is : replicateId2ImageSetSide.values()) {
-			if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0) {
-				workLoadIndex++;
-				continue;
-			} else
-				workLoadIndex++;
-			workload.add(is);
+		{
+			// create list of replicates and plant IDs
+			int workLoadIndex = workOnSubset;
+			TreeSet<String> replicateIDandQualityList = new TreeSet<String>();
+			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
+				for (ImageSet i : is.values()) {
+					String val = i.getVIS().getReplicateID() + ";" + i.getVIS().getQualityAnnotation();
+					replicateIDandQualityList.add(val);
+				}
+			}
+			HashMap<String, Integer> replicateIDandQualityList2positionIndex = new HashMap<String, Integer>();
+			{
+				int idx = 0;
+				for (String val : replicateIDandQualityList) {
+					replicateIDandQualityList2positionIndex.put(val, idx);
+					idx++;
+				}
+			}
+			// processed are specific replicates, which means each compute node computes
+			// a specific plant in all time points, therefore it is possible for the block-postprocessing
+			// to process numeric analysis results from different timepoints and therefore directly
+			// to calculate relative values, such as relative growth rates
+			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
+				if (is.size() == 0)
+					continue;
+				String val = is.values().iterator().next().getVIS().getReplicateID() + ";" +
+						is.values().iterator().next().getVIS().getQualityAnnotation();
+				workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
+				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0)
+					continue;
+				System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Processing image sets with ID: " + val);
+				workload.add(is);
+			}
+			System.out.println(SystemAnalysisExt.getCurrentTime() + ">Processing "
+					+ workload.size() + " of " + sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.size()
+					+ " (subset " + workLoadIndex + "/" + numberOfSubsets + ")");
 		}
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">Processing "
-				+ workload.size() + " of " + replicateId2ImageSetSide.size()
-				+ " (subset " + workLoadIndex + "/" + numberOfSubsets + ")");
 		
 		if (max > 0)
 			while (workload.size() > max)
@@ -659,7 +686,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			if (bpv != null && m != null) {
 				m.setValue(bpv.getValue());
 				m.setUnit(bpv.getUnit());
-				
+				if (inSample.size() > 0) {
+					NumericMeasurement3D template = (NumericMeasurement3D) inSample.iterator().next();
+					m.setReplicateID(template.getReplicateID());
+					m.setQualityAnnotation(template.getQualityAnnotation());
+					m.setPosition(template.getPosition());
+					m.setPositionUnit(template.getPositionUnit());
+				}
 				output.add(m);
 			}
 		}
