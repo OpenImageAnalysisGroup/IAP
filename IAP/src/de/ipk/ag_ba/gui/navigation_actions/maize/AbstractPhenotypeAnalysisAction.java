@@ -34,6 +34,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author klukas
@@ -88,8 +89,20 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
-						if (filter == null || filter.isValidSample(sd3))
-							workload.add(sd3);
+						boolean containsAnOutlier = false;
+						outlierSearch: for (NumericMeasurementInterface nmi : sd3) {
+							if (nmi instanceof ImageData) {
+								ImageData id = (ImageData) nmi;
+								String o = id.getAnnotationField("outlier");
+								if (o != null && o.equals("1")) {
+									containsAnOutlier = true;
+									break outlierSearch;
+								}
+							}
+						}
+						if (!containsAnOutlier)
+							if (filter == null || filter.isValidSample(sd3))
+								workload.add(sd3);
 					}
 				}
 			}
@@ -241,11 +254,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	public void setFilter(SnapshotFilter filter) {
 		this.filter = filter;
 	}
-
+	
 	public RunnableWithMappingData getResultReceiver() {
 		return resultReceiver;
 	}
-
+	
 	public void setResultReceiver(RunnableWithMappingData resultReceiver) {
 		this.resultReceiver = resultReceiver;
 	}
