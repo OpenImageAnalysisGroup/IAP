@@ -531,70 +531,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		return new MyThread(r, "Save Image");
 	}
 	
-	// private MyThread load(final ImageData id, final FlexibleImageSet input,
-	// final FlexibleImageSet optImageMasks, final FlexibleImageType type,
-	// final MyByteArrayInputStream optMainImageContent,
-	// final MyByteArrayInputStream optLabelImageContent) {
-	// Runnable r = new Runnable() {
-	// @Override
-	// public void run() {
-	// try {
-	// LoadedImage li;
-	// if (optImageMasks != null) {
-	// final ObjectRef mainImg = new ObjectRef();
-	// final ObjectRef labelImg = new ObjectRef();
-	// Runnable r1 = new Runnable() {
-	// @Override
-	// public void run() {
-	// try {
-	// mainImg.setObject(ImageIO.read(optMainImageContent));
-	// } catch (Exception e) {
-	// System.out.println(">ERROR: Could not load main image: " + id);
-	// }
-	//
-	// }
-	// };
-	// Runnable r2 = new Runnable() {
-	// @Override
-	// public void run() {
-	// try {
-	// labelImg.setObject(optLabelImageContent != null ?
-	// ImageIO.read(optLabelImageContent) : null);
-	// } catch (Exception e) {
-	// System.out.println(">ERROR: Could not load label image: " + id);
-	// }
-	//
-	// }
-	// };
-	//
-	// MyThread a = BackgroundThreadDispatcher.addTask(r1, "Load main image",
-	// getParentPriority() + 1, getParentPriority() + 2);
-	// MyThread b = BackgroundThreadDispatcher.addTask(r2, "Load label image",
-	// getParentPriority() + 1, getParentPriority() + 2);
-	// BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b });
-	//
-	// li = new LoadedImage(id,
-	// (BufferedImage) mainImg.getObject(),
-	// (BufferedImage) labelImg.getObject());
-	// } else
-	// li = IOmodule.loadImageFromFileOrMongo(id, true, optImageMasks != null);
-	//
-	// input.set(new FlexibleImage(li.getLoadedImage(), type));
-	// if (optImageMasks != null)
-	// if (li.getLoadedImageLabelField() != null)
-	// optImageMasks.set(new FlexibleImage(li.getLoadedImageLabelField(),
-	// type));
-	// else
-	// System.out.println(">ERROR: Label field not available for:" + li);
-	// } catch (Exception e) {
-	// System.out.println(">ERROR: Could not load image: " + id);
-	// }
-	// }
-	// };
-	// return new MyThread(r, "Load Image " + (id != null && id.getURL() != null
-	// ? "" + id.getURL().getFileName() : "(null)"));
-	// }
-	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result,
 			DatabaseTarget storeResultInDatabase, boolean processLabelUrl) {
 		result.getURL().setFileName("c_" + result.getURL().getFileName());
@@ -647,102 +583,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		preProcessors.add(pre);
 	}
 	
-	// private void loadImages(ImageData inVis,
-	// ImageData inFluo, ImageData inNir,
-	// final FlexibleImageSet input, final FlexibleImageSet inputMasks,
-	// final int parentPriority)
-	// throws InterruptedException {
-	// StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">LOAD",
-	// false);
-	// MyThread a = null, b = null, c = null;
-	// if (inVis != null) {
-	// if (inVis.getAnnotationField("outlier") != null &&
-	// inVis.getAnnotationField("outlier").equals("1")) {
-	// System.out.println("INFO: Ignore marked outlier: " + inVis);
-	// } else
-	// if (inVis instanceof LoadedImage) {
-	// input.setVis(new FlexibleImage(((LoadedImage) inVis).getLoadedImage()));
-	// inputMasks.setVis(new FlexibleImage(((LoadedImage)
-	// inVis).getLoadedImageLabelField()));
-	// } else {
-	// try {
-	// MyByteArrayInputStream optMainImageContent =
-	// ResourceIOManager.getInputStreamMemoryCached(inVis.getURL());
-	// MyByteArrayInputStream optLabelImageContent = inVis.getLabelURL() != null
-	// ? ResourceIOManager.getInputStreamMemoryCached(inVis.getLabelURL())
-	// : null;
-	// a = load(inVis, input, inputMasks, FlexibleImageType.VIS,
-	// optMainImageContent, optLabelImageContent);
-	// } catch (Exception e) {
-	// System.out.println(">ERROR: Could not load VIS image or reference: " +
-	// inVis);
-	// }
-	// }
-	// }
-	//
-	// if (inFluo != null)
-	// if (inFluo.getAnnotationField("outlier") != null &&
-	// inVis.getAnnotationField("outlier").equals("1")) {
-	// System.out.println("INFO: Ignore marked outlier: " + inFluo);
-	// } else
-	// if (inFluo instanceof LoadedImage) {
-	// input.setFluo(new FlexibleImage(((LoadedImage)
-	// inFluo).getLoadedImage()));
-	// inputMasks.setFluo(new FlexibleImage(((LoadedImage)
-	// inFluo).getLoadedImageLabelField()));
-	// } else {
-	// try {
-	// MyByteArrayInputStream optMainImageContent =
-	// ResourceIOManager.getInputStreamMemoryCached(inFluo.getURL());
-	// MyByteArrayInputStream optLabelImageContent = inFluo.getLabelURL() !=
-	// null ? ResourceIOManager.getInputStreamMemoryCached(inFluo
-	// .getLabelURL())
-	// : null;
-	// b = load(inFluo, input, inputMasks, FlexibleImageType.FLUO,
-	// optMainImageContent, optLabelImageContent);
-	// } catch (Exception e) {
-	// System.out.println(">ERROR: Could not load FLUO image or reference: " +
-	// inFluo);
-	// }
-	// }
-	//
-	// if (inNir != null)
-	// if (inNir.getAnnotationField("outlier") != null &&
-	// inNir.getAnnotationField("outlier").equals("1")) {
-	// System.out.println("INFO: Ignore marked outlier: " + inNir);
-	// } else
-	// if (inNir instanceof LoadedImage) {
-	// input.setNir(new FlexibleImage(((LoadedImage) inNir).getLoadedImage()));
-	// inputMasks.setNir(new FlexibleImage(((LoadedImage)
-	// inNir).getLoadedImageLabelField()));
-	// } else {
-	// try {
-	// MyByteArrayInputStream optMainImageContent =
-	// ResourceIOManager.getInputStreamMemoryCached(inNir.getURL());
-	// MyByteArrayInputStream optLabelImageContent = inNir.getLabelURL() != null
-	// ? ResourceIOManager.getInputStreamMemoryCached(inNir.getLabelURL())
-	// : null;
-	// c = load(inNir, input, inputMasks, FlexibleImageType.NIR,
-	// optMainImageContent, optLabelImageContent);
-	// } catch (Exception e) {
-	// System.out.println(">ERROR: Could not load NIR image or reference: " +
-	// inNir);
-	// }
-	// }
-	// if (a != null)
-	// BackgroundThreadDispatcher.addTask(a, parentPriority + 1, parentPriority
-	// + 1);
-	// if (b != null)
-	// BackgroundThreadDispatcher.addTask(b, parentPriority + 1, parentPriority
-	// + 1);
-	// if (c != null)
-	// BackgroundThreadDispatcher.addTask(c, parentPriority + 1, parentPriority
-	// + 1);
-	// BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, });
-	//
-	// s.printTime();
-	// }
-	
 	private void processStatisticalOutput(ImageData inVis,
 			BlockResultSet analysisResults) {
 		if (output == null) {
@@ -750,7 +590,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
 		}
 		
-		for (BlockPropertyValue bpv : analysisResults.getProperties("RESULT_")) {
+		for (BlockPropertyValue bpv : analysisResults.getPropertiesSearch("RESULT_")) {
 			if (bpv.getName() == null)
 				continue;
 			
@@ -806,7 +646,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				
 			}
 		}
-		for (BlockPropertyValue bpv : analysisResults.getProperties("RESULT_")) {
+		for (BlockPropertyValue bpv : analysisResults.getPropertiesSearch("RESULT_")) {
 			if (bpv.getName() == null)
 				continue;
 			
@@ -897,20 +737,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		final FlexibleImageSet input = new FlexibleImageSet();
 		final FlexibleImageSet inputMasks = new FlexibleImageSet();
-		// if (status != null)
-		// status.setCurrentStatusText1("Load Images");
 		
-		// loadImages(inVis, inFluo, inNir, input, inputMasks, parentPriority +
-		// 1);
-		
-		// if (input.hasAllThreeImages() && input.getSmallestHeight(true, true,
-		// false) > 1) {
-		// if (status != null)
-		// status.setCurrentStatusText1("Images are loaded");
-		
-		// TODO: FIX THIS, ALL INFO SHOULD BE SUPPLIED USING THE
-		// ImageProcessorOptions, see below!!!
-		//
 		input.setImageInfo(inVis, inFluo, inNir);
 		inputMasks.setImageInfo(inVis, inFluo, inNir);
 		
@@ -932,54 +759,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			debugImageStack = new FlexibleImageStack();
 		}
 		
-		// input.setVis(new ImageOperation(input.getVis()).scale(0.2,
-		// 0.2).getImage());
-		// input.setFluo(new ImageOperation(input.getFluo()).scale(0.2,
-		// 0.2).getImage());
-		
-		// if (status != null)
-		// status.setCurrentStatusText1("Process Analysis Pipeline");
-		
 		BlockResultSet analysisResults = null;
 		
 		FlexibleImage resVis = null, resFluo = null, resNir = null;
 		{
 			ImageProcessor imageProcessor = getImageProcessor();
-			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-					"", "") {
-				double lastAdd = 0;
-				
-				@Override
-				public synchronized void setCurrentStatusValueFine(double value) {
-					super.setCurrentStatusValueFine(value);
-					if (value > 0) {
-						double add = value / workloadSnapshotAngles;
-						status.setCurrentStatusValueFineAdd(add - lastAdd);
-						lastAdd = add;
-					}
-				}
-				
-				@Override
-				public void setCurrentStatusText1(String s1) {
-					status.setCurrentStatusText1(s1);
-				}
-				
-				@Override
-				public void setCurrentStatusText2(String s2) {
-					status.setCurrentStatusText2(s2);
-				}
-				
-				@Override
-				public void setCurrentStatusValue(int value) {
-					setCurrentStatusValueFine(value);
-				}
-				
-			};
+			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
 			
 			// TODO FIX: debugImageStack should be no input, only an output
-			// TODO FIX: The Images Should be Loaded inside the pipeline,
-			// not supplied by parameters!
 			// TODO: maximumThreadCount... should be no parameter but a setting!
 			FlexibleMaskAndImageSet ret = imageProcessor.pipeline(options,
 					input, inputMasks, maximumThreadCountOnImageLevel,
@@ -1006,6 +794,40 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		// System.err.println("ERROR: Not all three snapshots images could be loaded!");
 		// return null;
 		// }
+	}
+	
+	private BackgroundTaskStatusProviderSupportingExternalCallImpl getStatusProcessor(final BackgroundTaskStatusProviderSupportingExternalCall status,
+			final int workloadSnapshotAngles) {
+		return new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+				"", "") {
+			double lastAdd = 0;
+			
+			@Override
+			public synchronized void setCurrentStatusValueFine(double value) {
+				super.setCurrentStatusValueFine(value);
+				if (value > 0) {
+					double add = value / workloadSnapshotAngles;
+					status.setCurrentStatusValueFineAdd(add - lastAdd);
+					lastAdd = add;
+				}
+			}
+			
+			@Override
+			public void setCurrentStatusText1(String s1) {
+				status.setCurrentStatusText1(s1);
+			}
+			
+			@Override
+			public void setCurrentStatusText2(String s2) {
+				status.setCurrentStatusText2(s2);
+			}
+			
+			@Override
+			public void setCurrentStatusValue(int value) {
+				setCurrentStatusValueFine(value);
+			}
+			
+		};
 	}
 	
 }

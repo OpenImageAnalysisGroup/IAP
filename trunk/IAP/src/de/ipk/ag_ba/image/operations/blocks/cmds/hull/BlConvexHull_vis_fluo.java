@@ -3,14 +3,20 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.hull;
 import ij.measure.ResultsTable;
 
 import java.awt.Color;
+import java.util.TreeMap;
+
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
@@ -59,11 +65,50 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		if (options.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
 			getProperties().storeResults(
 					"RESULT_side.", numericResults,
-							getBlockPosition());
+					getBlockPosition());
 		if (options.getCameraPosition() == CameraPosition.TOP && numericResults != null)
 			getProperties().storeResults(
 					"RESULT_top.", numericResults, getBlockPosition());
 		return res;
+	}
+	
+	@Override
+	public void postProcessResultsForAllAngles(
+			Sample3D inSample,
+			TreeMap<String, ImageData> inImages,
+			TreeMap<String, BlockResultSet> allResultsForSnapshot, BlockResultSet summaryResult,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		
+		double areaSum = 0;
+		int areaCnt = 0;
+		for (String key : allResultsForSnapshot.keySet()) {
+			BlockResultSet rt = allResultsForSnapshot.get(key);
+			for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.area")) {
+				if (v.getValue() != null) {
+					areaSum += v.getValue().doubleValue();
+					areaCnt += 1;
+				}
+			}
+		}
+		
+		double topAreaSum = 0;
+		double topAreaCnt = 0;
+		for (String key : allResultsForSnapshot.keySet()) {
+			BlockResultSet rt = allResultsForSnapshot.get(key);
+			for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top.area")) {
+				if (v.getValue() != null) {
+					topAreaSum += v.getValue().doubleValue();
+					topAreaCnt += 1;
+				}
+			}
+		}
+		
+		if (areaCnt > 0 && topAreaCnt > 0) {
+			double avgTopArea = topAreaSum / topAreaCnt;
+			double avgArea = areaSum / areaCnt;
+			double volume_iap = Math.sqrt(avgArea * avgArea * avgTopArea);
+			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap", volume_iap);
+		}
 	}
 	
 }

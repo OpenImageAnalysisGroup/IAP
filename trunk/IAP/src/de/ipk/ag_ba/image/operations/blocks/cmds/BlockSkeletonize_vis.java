@@ -268,7 +268,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 		Integer a = null;
 		searchLoop: for (String key : allResultsForSnapshot.keySet()) {
 			BlockResultSet rt = allResultsForSnapshot.get(key);
-			for (BlockPropertyValue v : rt.getProperties("RESULT_top.main.axis.rotation")) {
+			for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_top.main.axis.rotation")) {
 				if (v.getValue() != null) {
 					a = v.getValue().intValue();
 					// System.out.println("main.axis.rotation: " + a);
@@ -299,7 +299,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 			if (bestAngle != null && keyC.equals(bestAngle)) {
 				// System.out.println("Best side angle: " + bestAngle);
 				Double cnt = null;
-				for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.count")) {
+				for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.count")) {
 					if (v.getValue() != null)
 						cnt = v.getValue();
 				}
@@ -309,20 +309,20 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			}
 			
-			for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.count")) {
+			for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.count")) {
 				if (v.getValue() != null) {
 					if (v.getValue() > maxLeafcount)
 						maxLeafcount = v.getValue();
 					lc.add(v.getValue());
 				}
 			}
-			for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.length.sum")) {
+			for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.length.sum")) {
 				if (v.getValue() != null) {
 					if (v.getValue() > maxLeaflength)
 						maxLeaflength = v.getValue();
 				}
 			}
-			for (BlockPropertyValue v : rt.getProperties("RESULT_side.leaf.length.sum.norm")) {
+			for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.length.sum.norm")) {
 				if (v.getValue() != null) {
 					if (v.getValue() > maxLeaflengthNorm)
 						maxLeaflengthNorm = v.getValue();
