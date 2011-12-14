@@ -477,8 +477,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			}
 			// processed are specific replicates, which means each compute node computes
-			// a specific plant in all time points, therefore it is possible for the block-postprocessing
-			// to process numeric analysis results from different timepoints and therefore directly
+			// a specific plant in all time points, therefore it is possible for the block-post-processing
+			// to process numeric analysis results from different time points and therefore directly
 			// to calculate relative values, such as relative growth rates
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				if (is.size() == 0)

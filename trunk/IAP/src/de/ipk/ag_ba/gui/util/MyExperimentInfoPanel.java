@@ -203,7 +203,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		if (!editPossible)
 			startEnabled = true;
 		
-		FolderPanel fp = new FolderPanel("Experiment " + experimentHeader.getExperimentName(), false, true, false, null);
+		FolderPanel fp = new FolderPanel("Experiment " + experimentHeader.getExperimentName(), hasCorrelationTableData, true, false, null);
 		Color c = new Color(220, 220, 220);
 		fp.setFrameColor(c, Color.BLACK, 4, 8);
 		
@@ -372,15 +372,6 @@ public class MyExperimentInfoPanel extends JPanel {
 				JComponent right = TableLayout.get4Split(new JLabel(), height, freshWeight, dryWeight, width, space, border);
 				rows.add(new GuiRow(desc, right));
 			}
-			for (MatchInfo mi : match(optExperiment, new String[] { "corr.", "volume." }, false)) {
-				JComponent desc, height, freshWeight, dryWeight;
-				desc = new JLabel(mi.getDesc());
-				height = new JLabel(mi.getHeight());
-				freshWeight = new JLabel(mi.getFreshWeight());
-				dryWeight = new JLabel(mi.getDryWeight());
-				JComponent right = TableLayout.get4Split(new JLabel(), height, freshWeight, dryWeight, width, space, border);
-				rows.add(new GuiRow(desc, right));
-			}
 			rows.add(new GuiRow(new JLabel(""), null));
 			rows.add(new GuiRow(new JLabel("<html><br>Visual property for each side view vs. manual measurement<hr>"), null));
 			for (MatchInfo mi : match(optExperiment, new String[] { "corr.", ".avg" }, true)) {
@@ -392,8 +383,6 @@ public class MyExperimentInfoPanel extends JPanel {
 				JComponent right = TableLayout.get4Split(new JLabel(), height, freshWeight, dryWeight, width, space, border);
 				rows.add(new GuiRow(desc, right));
 			}
-			if (rows.size() == 2)
-				return null;
 			
 			FolderPanel fp = new FolderPanel("<html>Correlations (Pearson&#39;s <i>r</i>)", false, true, false, null);
 			JComponent right = TableLayout.get4Split(new JLabel(), new JLabel("Height"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, space,
@@ -402,6 +391,10 @@ public class MyExperimentInfoPanel extends JPanel {
 			for (GuiRow row : rows)
 				fp.addGuiComponentRow(row, false);
 			fp.layoutRows();
+			
+			if (rows.size() == 3)
+				return null;
+			
 			return fp;
 		}
 	}
