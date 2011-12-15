@@ -307,9 +307,8 @@ public class Substance3D extends Substance {
 										NumericMeasurement3D n3 = (de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D) nmi;
 										double n3p = n3.getPosition() != null ? n3
 												.getPosition() : 0;
-										if (n3.getReplicateID() == prototypeReplicateID
-												&& n3.getQualityAnnotation()
-														.equals(prototypeQualityAnnotation)
+										if (n3.getQualityAnnotation()
+												.equals(prototypeQualityAnnotation)
 												&& Math.abs(n3p
 														- prototypePosition) < 0.00001)
 											res.add(n3);

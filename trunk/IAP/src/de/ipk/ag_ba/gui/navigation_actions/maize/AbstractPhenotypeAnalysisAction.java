@@ -108,7 +108,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			}
 			
 			if (status != null)
-				status.setCurrentStatusText1("Experiment: " + workload.size() + " images");
+				status.setCurrentStatusText1("Experiment: " + workload.size() + " image snapshot sets (vis+fluo+nir)");
 			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setInt(1);
