@@ -80,9 +80,9 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	protected abstract BlockPipeline getPipeline(ImageProcessorOptions options);
 	
 	@Override
-	public BlockResultSet postProcessPipelineResults(Sample3D inSample,
-			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockResultSet> analysisResults,
+	public TreeMap<Long, BlockResultSet> postProcessPipelineResults(TreeMap<Long, Sample3D> inSample,
+			TreeMap<Long, TreeMap<String, ImageData>> inImages,
+			TreeMap<Long, TreeMap<String, BlockResultSet>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InstantiationException,
 			IllegalAccessException, InterruptedException {
 		BlockPipeline pipeline = getPipeline(null);
