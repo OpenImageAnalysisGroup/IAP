@@ -66,6 +66,10 @@ public class StopWatch {
 			System.out.println(desc + " took " + getTime() + " ms");
 	}
 	
+	public String getTimeString() {
+		return getTime() / 1000 + " s";
+	}
+	
 	public static String getNiceTime() {
 		return IAPservice.getCurrentTimeAsNiceString();
 	}
