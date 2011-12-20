@@ -13,8 +13,12 @@ package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeMap;
+import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -23,6 +27,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class MappingData3DPath {
 	
@@ -80,20 +85,49 @@ public class MappingData3DPath {
 		return merge(mappingpaths, ignoreSnapshotFineTime, null);
 	}
 	
-	public static ExperimentInterface merge(ArrayList<MappingData3DPath> mappingpaths, boolean ignoreSnapshotFineTime,
-				BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+	public static ExperimentInterface merge(ArrayList<MappingData3DPath> mappingpaths, final boolean ignoreSnapshotFineTime,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		
-		Experiment experiment = new Experiment();
-		
-		int idx = 0;
-		int max = mappingpaths.size();
-		for (MappingData3DPath p : mappingpaths) {
-			Substance.addAndMerge(experiment, p.getSubstance(), ignoreSnapshotFineTime);
-			idx++;
-			if (optStatus != null)
-				optStatus.setCurrentStatusValueFine(100d / max * idx);
+		final Experiment experiment = new Experiment();
+		try {
+			final ThreadSafeOptions idx = new ThreadSafeOptions();
+			final int max = mappingpaths.size();
+			final TreeMap<String, ArrayList<MappingData3DPath>> data = new TreeMap<String, ArrayList<MappingData3DPath>>();
+			for (MappingData3DPath p : mappingpaths) {
+				if (!data.containsKey(p.getSubstance().getName()))
+					data.put(p.getSubstance().getName(), new ArrayList<MappingData3DPath>());
+				data.get(p.getSubstance().getName()).add(p);
+			}
+			
+			final Semaphore lock = BackgroundTaskHelper.lockGetSemaphore(null, SystemAnalysis.getNumberOfCPUs());
+			for (String substance : data.keySet()) {
+				final String substanceF = substance;
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							for (MappingData3DPath p : data.get(substanceF)) {
+								Substance.addAndMerge(experiment, p.getSubstance(), ignoreSnapshotFineTime);
+								idx.addInt(1);
+								if (optStatus != null)
+									optStatus.setCurrentStatusValueFine(100d / max * idx.getInt());
+							}
+						} finally {
+							lock.release();
+						}
+					}
+				};
+				lock.acquire();
+				Thread t = new Thread(r);
+				t.setName("Process subtance " + substance);
+				t.start();
+			}
+			
+			lock.acquire(SystemAnalysis.getNumberOfCPUs());
+			lock.release(SystemAnalysis.getNumberOfCPUs());
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
 		}
-		
 		return experiment;
 	}
 	

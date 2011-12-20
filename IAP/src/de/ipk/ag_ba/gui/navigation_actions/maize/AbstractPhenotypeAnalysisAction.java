@@ -81,6 +81,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			ExperimentInterface experimentToBeAnalysed = experiment.getData(m);
 			
 			sw.printTime();
+			if (status != null)
+				status.setCurrentStatusText2("Load time: " + sw.getTimeString());
+			
 			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
 			for (SubstanceInterface m : experimentToBeAnalysed) {
@@ -107,8 +110,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				}
 			}
 			
-			if (status != null)
+			if (status != null) {
 				status.setCurrentStatusText1("Experiment: " + workload.size() + " image snapshot sets (vis+fluo+nir)");
+			}
 			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setInt(1);

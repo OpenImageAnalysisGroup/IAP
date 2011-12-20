@@ -697,7 +697,8 @@ public class MongoDB {
 	}
 	
 	public boolean saveImageFile(InputStream[] isImages, GridFS gridfs_images, GridFS gridfs_label_images,
-			GridFS gridfs_preview_files, ImageData image, String hashMain, String hashLabel, boolean storeMain, boolean storeLabel) throws IOException {
+			GridFS gridfs_preview_files, ImageData image, String hashMain, String hashLabel,
+			boolean storeMain, boolean storeLabel) throws IOException {
 		boolean allOK = true;
 		
 		try {
@@ -742,9 +743,9 @@ public class MongoDB {
 	
 	/**
 	 * @return -1 in case of error, 0 in case of existing storage, > 0 in case of new storage
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public long saveStream(String hash, InputStream is, GridFS fs) throws IOException {
+	public long saveStream(String hash, InputStream is, GridFS fs) throws Exception {
 		long result = -1;
 		
 		GridFSDBFile fff = fs.findOne(hash);
@@ -753,7 +754,10 @@ public class MongoDB {
 			fff = null;
 		}
 		
-		GridFSInputFile inputFile = fs.createFile(is, hash);
+		boolean compress = false;
+		
+		GridFSInputFile inputFile = fs.createFile(compress ?
+				ResourceIOManager.getCompressedInputStream((MyByteArrayInputStream) is) : is, hash);
 		// fs.getDB().setWriteConcern(WriteConcern.REPLICAS_SAFE);
 		inputFile.save();
 		result = inputFile.getLength();
@@ -2231,8 +2235,8 @@ public class MongoDB {
 				ArrayList<ExperimentHeaderInterface> el = getExperimentList(null);
 				HashSet<String> linkedHashes = new HashSet<String>();
 				double smallStep = 100d / 5 * 1 / el.size();
-				ArrayList<String> dbIdsOfSubstances = new ArrayList<String>();
-				ArrayList<String> dbIdsOfConditions = new ArrayList<String>();
+				HashSet<String> dbIdsOfSubstances = new HashSet<String>();
+				HashSet<String> dbIdsOfConditions = new HashSet<String>();
 				status.setCurrentStatusText2("Read list of substances");
 				double oldStatus = status.getCurrentStatusValueFine();
 				status.setCurrentStatusValue(-1);
@@ -2261,7 +2265,7 @@ public class MongoDB {
 					DBCursor condCur = conditions.find(new BasicDBObject(), new BasicDBObject("_id", 1));
 					while (condCur.hasNext()) {
 						DBObject condO = condCur.next();
-						dbIdsOfSubstances.add(condO.get("_id") + "");
+						dbIdsOfConditions.add(condO.get("_id") + "");
 						nn++;
 						if (nn % 500 == 0) {
 							status.setCurrentStatusText2("Read list of conditions (" + nn + "/" + max + ")");
@@ -2284,11 +2288,14 @@ public class MongoDB {
 					{
 						// check Ids of substances and conditions
 						for (DBObject subO : substanceObjects) {
+							int cnt = dbIdsOfSubstances.size();
 							dbIdsOfSubstances.remove(subO.get("_id") + "");
+							if (dbIdsOfSubstances.size() - cnt == 0)
+								System.out.println("ERRRRRRR");
 						}
 						substanceObjects = null;
-						for (DBObject subO : conditionObjects) {
-							dbIdsOfConditions.remove(subO.get("_id") + "");
+						for (DBObject condO : conditionObjects) {
+							dbIdsOfConditions.remove(condO.get("_id") + "");
 						}
 						conditionObjects = null;
 					}
@@ -2318,24 +2325,29 @@ public class MongoDB {
 					status.setCurrentStatusText1("Remove stale substances: " + dbIdsOfSubstances.size());
 					int n = 0;
 					long max = dbIdsOfSubstances.size();
+					long cnt = substances.count();
 					for (String subID : dbIdsOfSubstances) {
 						n++;
-						substances.remove(new BasicDBObject("_id", subID), WriteConcern.NONE);
+						DBObject del = substances.findOne(new BasicDBObject("_id", new ObjectId(subID)));
+						substances.remove(del, WriteConcern.NONE);
 						status.setCurrentStatusValueFine(100d / max * n);
 						status.setCurrentStatusText2(n + "/" + max);
 					}
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: REMOVED " + (cnt - substances.count()) + " SUBSTANCE OBJECTS");
 				}
 				{
 					int n = 0;
 					long max = dbIdsOfConditions.size();
 					DBCollection conditions = db.getCollection("conditions");
+					long cnt = conditions.count();
 					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size());
 					for (String condID : dbIdsOfConditions) {
 						n++;
-						conditions.remove(new BasicDBObject("_id", condID), WriteConcern.NONE);
+						conditions.remove(new BasicDBObject("_id", new ObjectId(condID)), WriteConcern.NONE);
 						status.setCurrentStatusValueFine(100d / max * n);
 						status.setCurrentStatusText2(n + "/" + max);
 					}
+					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: REMOVED " + (cnt - conditions.count()) + " CONDITION OBJECTS");
 				}
 				
 				if (linkedHashes.size() >= 0) {

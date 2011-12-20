@@ -61,7 +61,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
  * @author klukas
  */
 public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
-
+	
 	private final MongoDB m;
 	private final ExperimentReference experimentReference;
 	private NavigationButton src;
@@ -74,7 +74,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	private boolean includeMainImages = true;
 	private boolean includeReferenceImages = true;
 	private boolean includeAnnotationImages = true;
-
+	
 	public ActionDataExportToHsmFolder(MongoDB m,
 			ExperimentReference experimentReference, String hsmFolder) {
 		super("Save in HSM Archive (" + hsmFolder + ")");
@@ -82,12 +82,12 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		this.experimentReference = experimentReference;
 		this.hsmFolder = hsmFolder;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}
-
+	
 	@Override
 	public ParameterOptions getParameters() {
 		return new ParameterOptions(
@@ -99,7 +99,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 						"Copy reference images", includeReferenceImages,
 						"Copy annotation images", includeAnnotationImages });
 	}
-
+	
 	@Override
 	public void setParameters(Object[] parameters) {
 		super.setParameters(parameters);
@@ -110,7 +110,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			includeAnnotationImages = (Boolean) parameters[idx++];
 		}
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(
 			ArrayList<NavigationButton> currentSet) {
@@ -119,17 +119,17 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		// res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return "Save in HSM Archive";
 	}
-
+	
 	@Override
 	public String getDefaultImage() {
 		return IAPimages.saveToHsmArchive();
 	}
-
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src)
 			throws Exception {
@@ -139,31 +139,31 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			status.setCurrentStatusText1("Clone Experiment");
 			final ExperimentInterface experiment = experimentReference.getData(
 					m).clone();
-
+			
 			status.setCurrentStatusText1("Store Files...");
-
+			
 			experiment.setHeader(experimentReference.getHeader().clone());
-
+			
 			experiment.getHeader().setOriginDbId(
 					experimentReference.getHeader().getDatabaseId());
 			final ThreadSafeOptions written = new ThreadSafeOptions();
-
+			
 			this.files = determineNumberOfFilesInDataset(experiment);
 			int idx = 0;
-
+			
 			knownFiles = 0;
-
+			
 			errorCount = 0;
-
+			
 			final HSMfolderTargetDataManager hsmManager = new HSMfolderTargetDataManager(
 					hsmFolder);
-
+			
 			long startTime = System.currentTimeMillis();
-
+			
 			ExecutorService es = Executors.newFixedThreadPool(2);
-
+			
 			boolean simulate = false;
-
+			
 			for (SubstanceInterface su : experiment) {
 				final String substanceName = su.getName();
 				for (ConditionInterface co : su)
@@ -178,10 +178,10 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 						}
 					}
 			}
-
+			
 			es.shutdown();
 			es.awaitTermination(31, TimeUnit.DAYS);
-
+			
 			if (errorCount == 0) {
 				status.setCurrentStatusText1("Finalize storage");
 				status.setCurrentStatusText1("Write Index...");
@@ -205,29 +205,29 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					experiment.getHeader().getRemark()
 							+ " // HSM transfer errors: " + errorCount);
 			experiment.getHeader().setStorageTime(new Date());
-
+			
 			createIndexFiles(experiment, hsmManager, status);
 			status.setCurrentStatusValueFine(100d);
-
+			
 			this.mb = (written.getLong() / 1024 / 1024) + "";
 			tso.setParam(2, true);
 		} catch (Exception e) {
-
+			
 			errorCount++;
 			tso.setParam(2, true);
-
+			
 			if (fn != null && fn.trim().length() > 0 && new File(fn).exists())
 				new File(fn).delete();
 			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
 		}
 	}
-
+	
 	private int storeData(final ExperimentInterface experiment,
 			final ThreadSafeOptions written, int idx,
 			final HSMfolderTargetDataManager hsmManager, long startTime,
 			ExecutorService es, final String substanceName,
 			NumericMeasurementInterface nm) {
-
+		
 		// copy main binary file (url)
 		if (nm instanceof BinaryMeasurement) {
 			final BinaryMeasurement bm = (BinaryMeasurement) nm;
@@ -265,8 +265,8 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 											+ " // WILL RETRY IN 2 MINUTES // "
 											+ SystemAnalysisExt
 													.getCurrentTime());
-							Thread.sleep(120000);
-							// try 2nd time after 2 minutes
+							Thread.sleep(10 * 60 * 1000);
+							// try 2nd time after 10 minutes
 							fileContent = copyBinaryFileContentToTarget(
 									experiment, written, hsmManager, es,
 									bm.getURL(), null, t, targetFile, exists,
@@ -289,7 +289,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					}
 				}
 			}
-
+			
 			if (!targetExists)
 				if (nm instanceof ImageData) {
 					// store preview icon
@@ -345,26 +345,26 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			status.setCurrentStatusText1(pre + "files: " + (knownFiles + files)
 					+ ", copied: " + idx
 					+ (knownFiles > 0 ? ", skipped: " + knownFiles + "" : ""));
-
+			
 			long currTime = System.currentTimeMillis();
-
+			
 			double speed = written.getLong() * 1000d / (currTime - startTime)
 					/ 1024d / 1024d;
 			status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
 					+ " MB, " + (int) speed + " MB/s");
 		}
-
+		
 		// copy label binary file (label url)
 		if (nm instanceof BinaryMeasurement) {
 			final BinaryMeasurement bm = (BinaryMeasurement) nm;
 			if (bm.getLabelURL() == null)
 				return idx;
-
+			
 			if (!includeReferenceImages) {
 				bm.setLabelURL(null);
 			} else {
 				long t = nm.getParentSample().getRowId();
-
+				
 				final String zefn;
 				try {
 					if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
@@ -374,30 +374,30 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 								+ bm.getLabelURL().getDetail()
 								+ getFileExtension(bm.getLabelURL()
 										.getFileName());
-					else if (bm.getLabelURL().getPrefix()
-							.startsWith(LemnaTecFTPhandler.PREFIX)) {
-						String fn = bm.getLabelURL().getDetail();
-						zefn = "label_"
-								+ substanceName
-								+ "_"
-								+ fn.substring(fn.lastIndexOf("/")
-										+ "/".length())
-								+ getFileExtension(bm.getLabelURL()
-										.getFileName());
-						;
-					} else
-						zefn = "label_"
-								+ determineBinaryFileName(t, substanceName, nm,
-										bm);
-
+					else
+						if (bm.getLabelURL().getPrefix()
+								.startsWith(LemnaTecFTPhandler.PREFIX)) {
+							String fn = bm.getLabelURL().getDetail();
+							zefn = "label_"
+									+ substanceName
+									+ "_"
+									+ fn.substring(fn.lastIndexOf("/")
+											+ "/".length())
+									+ getFileExtension(bm.getLabelURL()
+											.getFileName());;
+						} else
+							zefn = "label_"
+									+ determineBinaryFileName(t, substanceName, nm,
+											bm);
+					
 					final File targetFile = new File(
 							hsmManager.prepareAndGetDataFileNameAndPath(
 									experiment.getHeader(), t, zefn));
-
+					
 					copyBinaryFileContentToTarget(experiment, written,
 							hsmManager, es, bm.getLabelURL(), null, t,
 							targetFile, targetFile.exists(), null);
-
+					
 				} catch (Exception e) {
 					System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE: "
 							+ e.getMessage() + " // "
@@ -406,14 +406,14 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					errorCount++;
 				}
 				long currTime = System.currentTimeMillis();
-
+				
 				double speed = written.getLong() * 1000d
 						/ (currTime - startTime) / 1024d / 1024d;
 				status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
 						+ " MB, " + (int) speed + " MB/s");
 			}
 		}
-
+		
 		// copy old reference label binary file (oldreference annotation)
 		if (nm instanceof ImageData) {
 			final ImageData id = (ImageData) nm;
@@ -425,30 +425,30 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				id.replaceAnnotationField("oldreference", updatedOldReference);
 			} else {
 				final IOurl oldRefUrl = new IOurl(oldRef);
-
+				
 				long t = nm.getParentSample().getRowId();
-
+				
 				final String zefn;
 				try {
 					if (oldRefUrl.getPrefix().startsWith("mongo_"))
 						zefn = "label_oldreference_" + substanceName + "_"
 								+ oldRefUrl.getDetail()
 								+ getFileExtension(oldRefUrl.getFileName());
-					else if (oldRefUrl.getPrefix().startsWith(
-							LemnaTecFTPhandler.PREFIX)) {
-						String fn = oldRefUrl.getDetail();
-						zefn = "label_oldreference_"
-								+ substanceName
-								+ "_"
-								+ fn.substring(fn.lastIndexOf("/")
-										+ "/".length())
-								+ getFileExtension(oldRefUrl.getFileName());
-						;
-					} else
-						zefn = "label_oldreference_"
-								+ determineBinaryFileName(t, substanceName, nm,
-										id);
-
+					else
+						if (oldRefUrl.getPrefix().startsWith(
+								LemnaTecFTPhandler.PREFIX)) {
+							String fn = oldRefUrl.getDetail();
+							zefn = "label_oldreference_"
+									+ substanceName
+									+ "_"
+									+ fn.substring(fn.lastIndexOf("/")
+											+ "/".length())
+									+ getFileExtension(oldRefUrl.getFileName());;
+						} else
+							zefn = "label_oldreference_"
+									+ determineBinaryFileName(t, substanceName, nm,
+											id);
+					
 					final File targetFile = new File(
 							hsmManager.prepareAndGetDataFileNameAndPath(
 									experiment.getHeader(), t, zefn));
@@ -473,30 +473,30 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					errorCount++;
 				}
 				long currTime = System.currentTimeMillis();
-
+				
 				double speed = written.getLong() * 1000d
 						/ (currTime - startTime) / 1024d / 1024d;
 				status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
 						+ " MB, " + (int) speed + " MB/s");
 			}
 		}
-
+		
 		return idx;
 	}
-
+	
 	private String getFileExtension(String fileName) {
 		if (fileName.indexOf(".") > 0)
 			return fileName.substring(fileName.lastIndexOf("."));
 		else
 			return "";
 	}
-
+	
 	private String extractLastFileName(String fileName) {
 		if (fileName.contains(File.separator))
 			fileName = fileName.substring(fileName.lastIndexOf(File.separator));
 		return fileName;
 	}
-
+	
 	private void createIndexFiles(final ExperimentInterface experiment,
 			final HSMfolderTargetDataManager hsmManager,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
@@ -516,7 +516,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Create Index File");
 				storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
-
+				
 				eidx++;
 			}
 			renameTempInProgressFilesToFinalFileNames(tempFile2fileName);
@@ -528,7 +528,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			ErrorMsg.addErrorMessage(err);
 		}
 	}
-
+	
 	private int determineNumberOfFilesInDataset(
 			final ExperimentInterface experiment) {
 		int files = 0;
@@ -546,7 +546,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				}
 		return files;
 	}
-
+	
 	private Future<MyByteArrayInputStream> copyBinaryFileContentToTarget(
 			final ExperimentInterface experiment,
 			final ThreadSafeOptions written,
@@ -617,13 +617,13 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			}
 		});
 	}
-
+	
 	private String determineBinaryFileName(long t, final String substanceName,
 			NumericMeasurementInterface nm, final BinaryMeasurement bm) {
 		final String zefn;
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.setTimeInMillis(t);
-
+		
 		ImageData id;
 		if (bm instanceof ImageData) {
 			id = (ImageData) bm;
@@ -663,13 +663,13 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 							.get(GregorianCalendar.SECOND))
 					+ " "
 					+ id.getURL().getFileName();
-
+			
 		} else {
 			zefn = bm.getURL().getFileName();
 		}
 		return zefn;
 	}
-
+	
 	private void renameTempInProgressFilesToFinalFileNames(
 			LinkedHashMap<File, String> tempFile2fileName) throws IOException {
 		// rename all temp files
@@ -687,10 +687,10 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				System.err.println("ERROR: Could not rename " + f.getName()
 						+ " to " + te.getName());
 			}
-
+			
 		}
 	}
-
+	
 	private void storeConditionIndexFile(
 			final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
 			HashMap<File, String> tempFile2fileName, ExperimentInterface ei)
@@ -705,10 +705,10 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 						.prepareAndGetTargetFileForConditionIndex("in_progress_"
 								+ UUID.randomUUID().toString()));
 		TextFile conditionIndexFileContent = new TextFile();
-
+		
 		TreeMap<String, ArrayList<String>> conditionString2substance = new TreeMap<String, ArrayList<String>>();
 		HashMap<String, ConditionInterface> conditionString2con = new HashMap<String, ConditionInterface>();
-
+		
 		for (SubstanceInterface si : ei) {
 			for (ConditionInterface ci : si) {
 				String cn = ci.getConditionName();
@@ -718,9 +718,9 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				conditionString2con.put(cn, ci);
 			}
 		}
-
+		
 		String experimentName = ei.getName();
-
+		
 		int conditionNumber = 0;
 		LinkedHashMap<String, Object> conditionFields = new LinkedHashMap<String, Object>();
 		for (String condString : conditionString2substance.keySet()) {
@@ -734,9 +734,9 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		for (String condString : conditionString2substance.keySet()) {
 			conditionFields.clear();
 			ConditionInterface ci = conditionString2con.get(condString);
-
+			
 			ci.fillAttributeMap(conditionFields);
-
+			
 			for (String key : conditionFields.keySet()) {
 				conditionIndexFileContent.add(experimentName + ","
 						+ conditionNumber + "," + ci.getConditionId() + ","
@@ -760,7 +760,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 						hsmManager
 								.prepareAndGetTargetFileForConditionIndex(conditionIndexFileName));
 	}
-
+	
 	private void storeIndexFile(final HSMfolderTargetDataManager hsmManager,
 			long tsave, int eidx, HashMap<File, String> tempFile2fileName,
 			ExperimentInterface ei) throws IOException {
@@ -769,7 +769,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				+ ".iap.index.csv";
 		indexFileName = StringManipulationTools.stringReplace(indexFileName,
 				":", "-");
-
+		
 		File indexFile = new File(
 				hsmManager
 						.prepareAndGetTargetFileForContentIndex("in_progress_"
@@ -787,7 +787,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		tempFile2fileName.put(indexFile, hsmManager
 				.prepareAndGetTargetFileForContentIndex(indexFileName));
 	}
-
+	
 	private void storeXMLdataset(final ExperimentInterface experiment,
 			final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
 			LinkedHashMap<File, String> tempFile2fileName,
@@ -814,7 +814,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				hsmManager.prepareAndGetDataFileNameAndPath(
 						experiment.getHeader(), null, xmlFileName));
 	}
-
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		if (errorMessage == null)
@@ -822,7 +822,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 		else {
 			errorMessage = " " + errorMessage + "";
 		}
-
+		
 		if (errorMessage.trim().length() > 0)
 			return new MainPanelComponent("Output incomplete. Error: "
 					+ errorMessage);
@@ -831,11 +831,11 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					+ mb + " MB, " + files + " files added, " + knownFiles
 					+ " existing files have been skipped)." + errorMessage);
 	}
-
+	
 	public ExperimentReference getExperimentReference() {
 		return experimentReference;
 	}
-
+	
 	public MongoDB getMongoInstance() {
 		return m;
 	}

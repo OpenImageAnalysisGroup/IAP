@@ -118,31 +118,39 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			status.setCurrentStatusText1("Start " + getName());
 			output = new ArrayList<NumericMeasurementInterface>();
 			
-			ArrayList<TreeMap<String, ImageSet>> workload = new ArrayList<TreeMap<String, ImageSet>>();
+			/**
+			 * ____A MAP FROM PLANT ID TO
+			 * ________LIST OF TIME POINTS
+			 * ____________TO ROTATION ANGLE TO
+			 * ________________IMAGE SNAPSHOT SET OF VIS/FLUO/NIR
+			 */
+			TreeMap<String, TreeMap<Integer, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles =
+					new TreeMap<String, TreeMap<Integer, TreeMap<String, ImageSet>>>();
 			
-			addTopOrSideImagesToWorkset(workload, 0, analyzeTopImages(),
+			addTopOrSideImagesToWorkset(workload_imageSetsWithSpecificAngles, 0, analyzeTopImages(),
 					analyzeSideImages());
 			
 			// workload = filterWorkload(workload, null);// "Athletico");//
 			// "Rainbow Amerindian"); // Athletico
 			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
-			final int workloadSnapshots = workload.size();
+			final int workloadSnapshots = workload_imageSetsWithSpecificAngles.size();
 			int snapshotsWithNotAllNeededImageTypes = 0;
 			int side = 0;
 			int top = 0;
-			for (TreeMap<String, ImageSet> tm : workload)
-				for (ImageSet md : tm.values()) {
-					if (!md.hasAllNeededImageTypes()) {
-						snapshotsWithNotAllNeededImageTypes++;
-						System.out.println(md.getVIS() + " / " + md.getFLUO()
-								+ " / " + md.getNIR());
+			for (TreeMap<Integer, TreeMap<String, ImageSet>> plants : workload_imageSetsWithSpecificAngles.values())
+				for (TreeMap<String, ImageSet> imageSetWithSpecificAngle : plants.values())
+					for (ImageSet md : imageSetWithSpecificAngle.values()) {
+						if (!md.hasAllNeededImageTypes()) {
+							snapshotsWithNotAllNeededImageTypes++;
+							System.out.println(md.getVIS() + " / " + md.getFLUO()
+									+ " / " + md.getNIR());
+						}
+						if (md.isSide())
+							side++;
+						else
+							top++;
 					}
-					if (md.isSide())
-						side++;
-					else
-						top++;
-				}
 			if (snapshotsWithNotAllNeededImageTypes > 0)
 				System.out.println(SystemAnalysisExt.getCurrentTime()
 						+ ">WARNING: not all three images available for "
@@ -152,46 +160,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final int workloadEqualAngleSnapshotSets = top + side;
 			
 			int nn = SystemAnalysis.getNumberOfCPUs();
-			if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
-				System.out
-						.println(SystemAnalysisExt.getCurrentTime()
-								+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY");
-				nn = 1;
-			}
-			if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
-				System.out
-						.println(SystemAnalysisExt.getCurrentTime()
-								+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY");
-				nn = 1;
-			}
-			if (SystemAnalysis.getMemoryMB() < 4000 && nn > 4) {
-				System.out
-						.println(SystemAnalysisExt.getCurrentTime()
-								+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY");
-				nn = 4;
-			}
+			nn = modifyConcurrencyDependingOnMemoryStatus(nn);
 			
-			if (nn > 1
-					&& SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-							.getMemoryMB() * 0.7d) {
-				System.out.println(SystemAnalysisExt.getCurrentTime()
-						+ ">HIGH MEMORY UTILIZATION, REDUCING CONCURRENCY");
-				nn = nn / 2;
-				if (nn < 1)
-					nn = 1;
-			}
-			
-			System.out
-					.println(SystemAnalysisExt.getCurrentTime()
-							+ ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: "
-							+ nn + ")");
-			
-			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(
-					null, nn);
+			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
 			final ThreadSafeOptions freed = new ThreadSafeOptions();
 			try {
-				for (TreeMap<String, ImageSet> tm : workload) {
-					final TreeMap<String, ImageSet> tmf = tm;
+				for (TreeMap<String, ImageSet> imageSetWithSpecificAngle : workload_imageSetsWithSpecificAngles) {
+					final TreeMap<String, ImageSet> imageSetWithSpecificAngle_f = imageSetWithSpecificAngle;
 					
 					maxCon.acquire(1);
 					try {
@@ -203,52 +178,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 											maximumThreadCountOnImageLevel,
 											status, tso, workloadSnapshots,
 											workloadEqualAngleSnapshotSets,
-											tmf, maxCon);
+											imageSetWithSpecificAngle_f, maxCon);
 								} catch (Exception err) {
-									System.err.println(SystemAnalysisExt
-											.getCurrentTime()
-											+ "> ERROR: "
-											+ err.getMessage());
-									System.err.println(SystemAnalysisExt
-											.getCurrentTime()
-											+ "> ERROR-CAUSE: SAMPLE: "
-											+ tmf.firstKey()
-											+ " / "
-											+ tmf.get(tmf.firstKey())
-													.getSampleInfo()
-											+ " / "
-											+ tmf.get(tmf.firstKey())
-													.getSampleInfo()
-													.getParentCondition());
-									err.printStackTrace();
+									printError(imageSetWithSpecificAngle_f, err);
 								} finally {
 									maxCon.release(1);
 									freed.setBval(0, true);
 								}
 							}
 						}, "Snapshot Analysis");
-						t.setPriority(Thread.MIN_PRIORITY);
-						if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-								.getMemoryMB() * 0.6) {
-							System.out.println();
-							System.out
-									.print(SystemAnalysisExt.getCurrentTime()
-											+ ">HIGH MEMORY UTILIZATION (>60%), ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB()
-											+ "/" + SystemAnalysis.getMemoryMB() + " MB)... ");
-							System.gc();
-							System.out.println("FINISHED GC (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis
-									.getMemoryMB() + " MB)");
-						}
-						if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-								.getMemoryMB() * 0.6) {
-							System.out.println();
-							System.out
-									.println(SystemAnalysisExt.getCurrentTime()
-											+ ">HIGH MEMORY UTILIZATION (>60%), REDUCING CONCURRENCY (THREAD.RUN)");
-							t.run();
-						} else {
-							t.start();
-						}
+						startThread(t);
 					} catch (Exception eeee) {
 						error = eeee;
 						if (!freed.getBval(0, false))
@@ -268,6 +207,68 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		input = null;
 	}
 	
+	private int modifyConcurrencyDependingOnMemoryStatus(int nn) {
+		if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
+			System.out
+					.println(SystemAnalysisExt.getCurrentTime()
+							+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY");
+			nn = 1;
+		}
+		if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
+			System.out
+					.println(SystemAnalysisExt.getCurrentTime()
+							+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY");
+			nn = 1;
+		}
+		if (SystemAnalysis.getMemoryMB() < 4000 && nn > 4) {
+			System.out
+					.println(SystemAnalysisExt.getCurrentTime()
+							+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY");
+			nn = 4;
+		}
+		
+		if (nn > 1
+				&& SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+						.getMemoryMB() * 0.7d) {
+			System.out.println(SystemAnalysisExt.getCurrentTime()
+					+ ">HIGH MEMORY UTILIZATION, REDUCING CONCURRENCY");
+			nn = nn / 2;
+			if (nn < 1)
+				nn = 1;
+		}
+		
+		System.out
+				.println(SystemAnalysisExt.getCurrentTime()
+						+ ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: "
+						+ nn + ")");
+		return nn;
+	}
+	
+	private void startThread(Thread t) {
+		t.setPriority(Thread.MIN_PRIORITY);
+		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+				.getMemoryMB() * 0.6) {
+			System.out.println();
+			System.out
+					.print(SystemAnalysisExt.getCurrentTime()
+							+ ">HIGH MEMORY UTILIZATION (>60%), ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB()
+							+ "/" + SystemAnalysis.getMemoryMB() + " MB)... ");
+			System.gc();
+			System.out.println("FINISHED GC (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis
+					.getMemoryMB() + " MB)");
+		}
+		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+				.getMemoryMB() * 0.6) {
+			System.out.println();
+			System.out
+					.println(SystemAnalysisExt.getCurrentTime()
+							+ ">HIGH MEMORY UTILIZATION (>60%), REDUCING CONCURRENCY (THREAD.RUN)");
+			t.run();
+		} else {
+			t.start();
+		}
+	}
+	
 	private int getParentPriority() {
 		return prio;
 	}
@@ -280,23 +281,23 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final ThreadSafeOptions tso, final int workloadSnapshots,
 			final int workloadEqualAngleSnapshotSets,
-			final TreeMap<String, ImageSet> tmf, final Semaphore optMaxCon)
+			final TreeMap<String, ImageSet> imageSetWithSpecificAngle, final Semaphore optMaxCon)
 			throws InterruptedException {
 		
 		Sample3D inSample = null;
 		final TreeMap<String, BlockResultSet> analysisResults = new TreeMap<String, BlockResultSet>();
 		final TreeMap<String, ImageData> analysisInput = new TreeMap<String, ImageData>();
 		ArrayList<MyThread> wait = new ArrayList<MyThread>();
-		if (tmf != null) {
-			for (final String configAndAngle : tmf.keySet()) {
+		if (imageSetWithSpecificAngle != null) {
+			for (final String configAndAngle : imageSetWithSpecificAngle.keySet()) {
 				if (status != null && status.wantsToStop())
 					break;
-				if (tmf.get(configAndAngle).getVIS() != null)
-					inSample = (Sample3D) tmf.get(configAndAngle).getVIS()
+				if (imageSetWithSpecificAngle.get(configAndAngle).getVIS() != null)
+					inSample = (Sample3D) imageSetWithSpecificAngle.get(configAndAngle).getVIS()
 							.getParentSample();
 				else
 					continue;
-				final ImageData inImage = tmf.get(configAndAngle).getVIS();
+				final ImageData inImage = imageSetWithSpecificAngle.get(configAndAngle).getVIS();
 				
 				Runnable r = new Runnable() {
 					@Override
@@ -304,7 +305,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						BlockResultSet results;
 						try {
 							results = processAngleWithinSnapshot(
-									tmf.get(configAndAngle),
+									imageSetWithSpecificAngle.get(configAndAngle),
 									maximumThreadCountOnImageLevel, status,
 									workloadEqualAngleSnapshotSets,
 									getParentPriority());
@@ -395,9 +396,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void addTopOrSideImagesToWorkset(
-			ArrayList<TreeMap<String, ImageSet>> workload, int max,
+			TreeMap<String, TreeMap<Integer, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles,
+			int max,
 			boolean top, boolean side) {
-		TreeMap<String, TreeMap<String, ImageSet>> sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle = new TreeMap<String, TreeMap<String, ImageSet>>();
+		TreeMap<String, TreeMap<String, ImageSet>> sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle =
+				new TreeMap<String, TreeMap<String, ImageSet>>();
 		if (input == null)
 			return;
 		for (Sample3D ins : input)
@@ -483,22 +486,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				if (is.size() == 0)
 					continue;
-				String val = is.values().iterator().next().getVIS().getReplicateID() + ";" +
-						is.values().iterator().next().getVIS().getQualityAnnotation();
+				String val = is.firstEntry().getValue().getVIS().getReplicateID() + ";" +
+						is.firstEntry().getValue().getVIS().getQualityAnnotation();
 				workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
 				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0)
 					continue;
 				System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Processing image sets with ID: " + val);
-				workload.add(is);
+				workload_imageSetsWithSpecificAngles.add(is);
 			}
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">Processing "
-					+ workload.size() + " of " + sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.size()
+					+ workload_imageSetsWithSpecificAngles.size() + " of " + sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.size()
 					+ " (subset " + workLoadIndex + "/" + numberOfSubsets + ")");
 		}
 		
 		if (max > 0)
-			while (workload.size() > max)
-				workload.remove(0);
+			while (workload_imageSetsWithSpecificAngles.size() > max)
+				workload_imageSetsWithSpecificAngles.remove(0);
 	}
 	
 	protected abstract boolean analyzeTopImages();
@@ -861,6 +864,25 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 			
 		};
+	}
+	
+	private void printError(final TreeMap<String, ImageSet> tmf, Exception err) {
+		System.err.println(SystemAnalysisExt
+				.getCurrentTime()
+				+ "> ERROR: "
+				+ err.getMessage());
+		System.err.println(SystemAnalysisExt
+				.getCurrentTime()
+				+ "> ERROR-CAUSE: SAMPLE: "
+				+ tmf.firstKey()
+				+ " / "
+				+ tmf.get(tmf.firstKey())
+						.getSampleInfo()
+				+ " / "
+				+ tmf.get(tmf.firstKey())
+						.getSampleInfo()
+						.getParentCondition());
+		err.printStackTrace();
 	}
 	
 }

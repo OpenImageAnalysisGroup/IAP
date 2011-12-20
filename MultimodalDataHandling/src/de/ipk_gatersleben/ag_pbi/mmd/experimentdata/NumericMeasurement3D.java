@@ -13,12 +13,15 @@ package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.Semaphore;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.jdom.Attribute;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -28,6 +31,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author rohn, klukas
@@ -128,25 +132,76 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	
 	public static ExperimentInterface getExperiment(ArrayList<NumericMeasurementInterface> measurements, boolean sortConditionsByName,
 			boolean ignoreSnapshotFineTime) {
-		return getExperiment(measurements, sortConditionsByName, ignoreSnapshotFineTime, true);
+		return getExperiment(measurements, sortConditionsByName, ignoreSnapshotFineTime, true, null);
 	}
 	
-	public static ExperimentInterface getExperiment(ArrayList<NumericMeasurementInterface> measurements, boolean sortConditionsByName,
-			boolean ignoreSnapshotFineTime, boolean cloneElements) {
-		ArrayList<MappingData3DPath> mappingpaths = new ArrayList<MappingData3DPath>();
+	public static ExperimentInterface getExperiment(final ArrayList<NumericMeasurementInterface> measurements, boolean sortConditionsByName,
+			boolean ignoreSnapshotFineTime, final boolean cloneElements,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		
-		for (NumericMeasurementInterface meas : measurements)
-			mappingpaths.add(new MappingData3DPath(meas, cloneElements));
+		final ThreadSafeOptions nextObjectIndex = new ThreadSafeOptions();
+		nextObjectIndex.setInt(-1);
 		
-		if (sortConditionsByName)
-			Collections.sort(mappingpaths, new Comparator<MappingData3DPath>() {
-				@Override
-				public int compare(MappingData3DPath arg0, MappingData3DPath arg1) {
-					return arg0.getConditionData().toString().compareTo(arg1.getConditionData().toString());
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Create Path Objects");
+		
+		int n = SystemAnalysis.getNumberOfCPUs();
+		final Semaphore lock = BackgroundTaskHelper.lockGetSemaphore(null, n);
+		
+		final TreeMap<String, ArrayList<MappingData3DPath>> result = new TreeMap<String, ArrayList<MappingData3DPath>>();
+		// sortConditionsByName is ignored! (always true)
+		
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					int nextObject = nextObjectIndex.addInt(1);
+					int measurementCnt = measurements.size();
+					while (nextObject < measurementCnt) {
+						NumericMeasurementInterface meas = measurements.get(nextObject);
+						MappingData3DPath res = new MappingData3DPath(meas, cloneElements);
+						String key = res.getConditionData().toString();
+						synchronized (result) {
+							if (!result.containsKey(key))
+								result.put(key, new ArrayList<MappingData3DPath>());
+							result.get(key).add(res);
+						}
+						nextObject = nextObjectIndex.addInt(1);
+					}
+				} finally {
+					lock.release();
 				}
-			});
+			}
+		};
 		
-		return new Experiment(MappingData3DPath.merge(mappingpaths, ignoreSnapshotFineTime));
+		try {
+			for (int i = 0; i < n; i++) {
+				lock.acquire();
+				Thread t = new Thread(r);
+				t.setName("MappingData3DPath construction");
+				t.start();
+			}
+			lock.acquire(n);
+			lock.release(n);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Merge Path Objects");
+		
+		int initialCapacity = 0;
+		for (ArrayList<MappingData3DPath> values : result.values())
+			initialCapacity += values.size();
+		
+		ArrayList<MappingData3DPath> mappingpaths = new ArrayList<MappingData3DPath>(initialCapacity);
+		for (ArrayList<MappingData3DPath> values : result.values())
+			mappingpaths.addAll(values);
+		
+		Experiment res = new Experiment(MappingData3DPath.merge(mappingpaths, ignoreSnapshotFineTime));
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Finished Construction");
+		return res;
 	}
 	
 	@Override

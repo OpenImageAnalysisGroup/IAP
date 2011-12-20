@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashSet;
+import java.util.zip.GZIPOutputStream;
+
+import org.SystemAnalysis;
 
 public class ResourceIOManager {
 	
@@ -59,7 +62,7 @@ public class ResourceIOManager {
 			if (is != null)
 				return is;
 			else {
-				//System.err.println("Could not create inputstream from URL " + url.toString() + "!");
+				// System.err.println("Could not create inputstream from URL " + url.toString() + "!");
 				return null;
 			}
 		}
@@ -151,10 +154,10 @@ public class ResourceIOManager {
 			if (mh.getPrefix().startsWith(prefix))
 				return mh;
 		
-//		if (prefix.contains("_"))
-//			return getHandlerFromPrefix(prefix.substring(0, prefix.indexOf("_")));
-//		else
-			return null;
+		// if (prefix.contains("_"))
+		// return getHandlerFromPrefix(prefix.substring(0, prefix.indexOf("_")));
+		// else
+		return null;
 	}
 	
 	public static byte[] getPreviewImageContent(IOurl ioUrl) throws Exception {
@@ -170,5 +173,24 @@ public class ResourceIOManager {
 		copyContent(in, output);
 		byte[] imageContent = output.getBuffTrimmed();
 		return imageContent;
+	}
+	
+	public static InputStream getCompressedInputStream(MyByteArrayInputStream is) throws IOException, Exception {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		GZIPOutputStream gzipOut = new GZIPOutputStream(bos);
+		copyContent(is, gzipOut);
+		int len1 = is.getCount();
+		int len2 = bos.size();
+		int saved = (int) ((len1 - len2) / 1024d / 1024d);
+		if (saved > 0) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Compress stream: " + (int) (100d * len2 / len2) + "% (saved " + saved + " MB)");
+			return new MyByteArrayInputStream(bos.toByteArray(), bos.size());
+		} else {
+			saved = ((len1 - len2));
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Compressed stream is not smaller, skipping (" + (int) (100d * len2 / len2) + "%, "
+					+ saved + " bytes difference)");
+			is.reset();
+			return is;
+		}
 	}
 }

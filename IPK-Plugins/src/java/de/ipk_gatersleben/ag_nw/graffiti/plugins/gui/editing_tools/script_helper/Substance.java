@@ -142,21 +142,27 @@ public class Substance implements SubstanceInterface {
 	
 	public static void addAndMerge(ExperimentInterface result, SubstanceInterface tobeMerged, boolean ignoreSnapshotFineTime) {
 		SubstanceInterface targetSubstance = null;
-		for (SubstanceInterface m : result)
-			if (tobeMerged.compareTo(m) == 0) {
-				targetSubstance = m;
-				break;
-			}
+		synchronized (result) {
+			for (SubstanceInterface m : result)
+				if (tobeMerged.compareTo(m) == 0) {
+					targetSubstance = m;
+					break;
+				}
+		}
 		
-		if (targetSubstance == null)
-			result.add(tobeMerged);
-		else {
-			for (ConditionInterface cond : tobeMerged) {
-				cond.setParent(targetSubstance);
-				targetSubstance.addAndMergeData(cond, ignoreSnapshotFineTime);
+		if (targetSubstance == null) {
+			synchronized (result) {
+				result.add(tobeMerged);
 			}
-			tobeMerged.clear();
-			tobeMerged.setName("INVALID_MERGED_SKIP");
+		} else {
+			synchronized (targetSubstance) {
+				for (ConditionInterface cond : tobeMerged) {
+					cond.setParent(targetSubstance);
+					targetSubstance.addAndMergeData(cond, ignoreSnapshotFineTime);
+				}
+				tobeMerged.clear();
+				tobeMerged.setName("INVALID_MERGED_SKIP");
+			}
 		}
 	}
 	

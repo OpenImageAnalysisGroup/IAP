@@ -33,7 +33,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * A list of image analysis "blocks" ({@link ImageAnalysisBlockFIS}) which may
- * be executed lineary in a row.
+ * be executed one after another.
  * 
  * @author klukas
  */

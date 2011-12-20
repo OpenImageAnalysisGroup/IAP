@@ -693,6 +693,16 @@ public class LemnaTecDataExchange {
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ")");
 			
+			String idTag = sn.getId_tag();
+			
+			Integer replicateID = idtag2replicateID.get(idTag);
+			
+			if (replicateID == null) {
+				System.out.println("Warning: internal IAP error. Could not create get replicate ID for ID tag '"
+						+ sn.getId_tag() + "'. Snapshot is ignored.");
+				continue;
+			}
+			
 			Condition conditionTemplate = idtag2condition.get(sn.getId_tag());
 			
 			species = conditionTemplate != null ? conditionTemplate.getSpecies() : "not specified";
@@ -709,32 +719,7 @@ public class LemnaTecDataExchange {
 				if (lbl != null && lbl.contains("#"))
 					lbl = lbl.substring(0, lbl.indexOf("#"));
 				
-				// if (lbl.endsWith("_HL2"))
-				// lbl = lbl.substring(0, lbl.length() - "_HL2".length());
-				// if (lbl.endsWith("HL2"))
-				// lbl = lbl.substring(0, lbl.length() - "HL2".length());
-				//
-				// for (int d = 0; d <= 360; d += 5) {
-				// if (lbl.endsWith("_" + d + "_Grad")) {
-				// lbl = lbl.substring(0, lbl.length() - ("_" + d +
-				// "_Grad").length());
-				// position = new Double(d);
-				// break;
-				// }
-				// }
-				// lbl = StringManipulationTools.stringReplace(lbl, "_", "");
-				
 				sn.setCamera_label(lbl);
-			}
-			
-			String idTag = sn.getId_tag();
-			
-			Integer replicateID = idtag2replicateID.get(idTag);
-			
-			if (replicateID == null) {
-				System.out.println("Warning: internal IAP error. Could not create get replicate ID for ID tag '"
-						+ sn.getId_tag() + "'. Snapshot is ignored.");
-				continue;
 			}
 			
 			int day = DateUtil.getElapsedDays(earliest, new Date(sn.getTimestamp().getTime())) + 1;
@@ -959,7 +944,7 @@ public class LemnaTecDataExchange {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
 		
-		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements, true, false, true);
+		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements, true, false, true, optStatus);
 		
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
 		if (optStatus != null)
@@ -972,19 +957,23 @@ public class LemnaTecDataExchange {
 			String[] values = seq.split(";");
 			seedDateLookupLoop: for (String v : values) {
 				if (v.contains("SeedDate") && v.contains(":")) {
-					String[] descAndVal = v.split(":", 2);
-					String seedDate = descAndVal[1];
-					String[] dayMonthYear = seedDate.split("\\.", 3);
-					int year = Integer.parseInt(dayMonthYear[2].trim());
-					int month = Integer.parseInt(dayMonthYear[1].trim());
-					int day = Integer.parseInt(dayMonthYear[0].trim());
-					GregorianCalendar cal = new GregorianCalendar(year, month - 1, day);
-					Date seedDateDate = cal.getTime();
-					Date startDate = experiment.getHeader().getStartdate();
-					int days = DateUtil.getElapsedDays(seedDateDate, startDate);
-					if (startDate.before(seedDateDate))
-						days = -days;
-					updateSnapshotTimes(experiment, days, "das");
+					try {
+						String[] descAndVal = v.split(":", 2);
+						String seedDate = descAndVal[1];
+						String[] dayMonthYear = seedDate.split("\\.", 3);
+						int year = Integer.parseInt(dayMonthYear[2].trim());
+						int month = Integer.parseInt(dayMonthYear[1].trim());
+						int day = Integer.parseInt(dayMonthYear[0].trim());
+						GregorianCalendar cal = new GregorianCalendar(year, month - 1, day);
+						Date seedDateDate = cal.getTime();
+						Date startDate = experiment.getHeader().getStartdate();
+						int days = DateUtil.getElapsedDays(seedDateDate, startDate);
+						if (startDate.before(seedDateDate))
+							days = -days;
+						updateSnapshotTimes(experiment, days, "das");
+					} catch (Exception err) {
+						System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: Invalid seed-date definition in plant mapping: " + v);
+					}
 					break seedDateLookupLoop;
 				}
 			}
@@ -1107,6 +1096,7 @@ public class LemnaTecDataExchange {
 					String metaName = rs.getString(2);
 					String metaValue = rs.getString(3);
 					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					
 					if (!res.containsKey(plantID)) {
 						res.put(plantID, new Condition(null));
 						if (header.getDatabase().contains("BGH_"))
@@ -1128,16 +1118,27 @@ public class LemnaTecDataExchange {
 							if (metaName.equalsIgnoreCase("Variety"))
 								res.get(plantID).setVariety(metaValue);
 							else
-								if (metaName.equalsIgnoreCase("Treatment") || metaName.equalsIgnoreCase("Typ"))
-									res.get(plantID).setTreatment(metaValue);
+								if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot"))
+									res.get(plantID).setGrowthconditions(metaValue);
 								else
-									if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot"))
-										res.get(plantID).setGrowthconditions(metaValue);
-									else
-										if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date"))
-											addSequenceInfo(res.get(plantID), "SeedDate: " + metaValue, header);
-										else
-											addSequenceInfo(res.get(plantID), metaName + ": " + metaValue, header);
+									if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date"))
+										addSequenceInfo(res.get(plantID), "SeedDate: " + metaValue, header);
+									else {
+										if (metaValue != null && metaValue.trim().length() > 0) {
+											String oldTreatment = res.get(plantID).getTreatment();
+											if (oldTreatment == null)
+												oldTreatment = "";
+											if (oldTreatment.length() > 0)
+												oldTreatment = oldTreatment + ";";
+											if (metaName.startsWith("Typ"))
+												res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
+											else {
+												if (metaName.startsWith("conditions "))
+													metaName = metaName.substring("conditions ".length()).trim();
+												res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
+											}
+										}
+									}
 					
 				}
 				rs.close();
