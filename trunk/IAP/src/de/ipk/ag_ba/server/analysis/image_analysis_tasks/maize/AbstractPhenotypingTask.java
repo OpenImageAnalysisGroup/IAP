@@ -124,8 +124,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			 * ____________TO ROTATION ANGLE TO
 			 * ________________IMAGE SNAPSHOT SET OF VIS/FLUO/NIR
 			 */
-			TreeMap<String, TreeMap<Integer, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles =
-					new TreeMap<String, TreeMap<Integer, TreeMap<String, ImageSet>>>();
+			TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles =
+					new TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>>();
 			
 			addTopOrSideImagesToWorkset(workload_imageSetsWithSpecificAngles, 0, analyzeTopImages(),
 					analyzeSideImages());
@@ -138,7 +138,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			int snapshotsWithNotAllNeededImageTypes = 0;
 			int side = 0;
 			int top = 0;
-			for (TreeMap<Integer, TreeMap<String, ImageSet>> plants : workload_imageSetsWithSpecificAngles.values())
+			for (TreeMap<Long, TreeMap<String, ImageSet>> plants : workload_imageSetsWithSpecificAngles.values())
 				for (TreeMap<String, ImageSet> imageSetWithSpecificAngle : plants.values())
 					for (ImageSet md : imageSetWithSpecificAngle.values()) {
 						if (!md.hasAllNeededImageTypes()) {
@@ -396,7 +396,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void addTopOrSideImagesToWorkset(
-			TreeMap<String, TreeMap<Integer, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles,
+			TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles,
 			int max,
 			boolean top, boolean side) {
 		TreeMap<String, TreeMap<String, ImageSet>> sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle =
@@ -492,7 +492,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0)
 					continue;
 				System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Processing image sets with ID: " + val);
-				workload_imageSetsWithSpecificAngles.add(is);
+				if (!workload_imageSetsWithSpecificAngles.containsKey(val))
+					workload_imageSetsWithSpecificAngles.put(val, new TreeMap<Long, TreeMap<String, ImageSet>>());;
+				long time = is.firstEntry().getValue().getVIS().getParentSample().getRowId();
+				if (!workload_imageSetsWithSpecificAngles.get(val).containsKey(time))
+					workload_imageSetsWithSpecificAngles.get(val).put(time, is);
 			}
 			System.out.println(SystemAnalysisExt.getCurrentTime() + ">Processing "
 					+ workload_imageSetsWithSpecificAngles.size() + " of " + sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.size()
