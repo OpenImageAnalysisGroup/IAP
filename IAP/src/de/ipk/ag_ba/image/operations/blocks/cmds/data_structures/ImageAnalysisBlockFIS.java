@@ -19,13 +19,14 @@ public interface ImageAnalysisBlockFIS {
 	
 	public FlexibleMaskAndImageSet process() throws InterruptedException;
 	
-	public void postProcessResultsForAllAngles(Sample3D inSample,
-			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockResultSet> allResultsForSnapshot, BlockResultSet summaryResult,
+	public void postProcessResultsForAllAngles(
+			TreeMap<Long, Sample3D> inSample,
+			TreeMap<Long, TreeMap<String, ImageData>> inImages,
+			TreeMap<Long, TreeMap<String, BlockResultSet>> allResultsForSnapshot,
+			TreeMap<Long, BlockResultSet> summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InterruptedException;
 	
-
 	/**
 	 * Returns a list of <code>Parameter</code> that are set for this
 	 * algorithm.
@@ -33,7 +34,7 @@ public interface ImageAnalysisBlockFIS {
 	 * @return a collection of <code>Parameter</code> that are needed by the <code>Algorithm</code>.
 	 */
 	public Parameter[] getParameters();
-
+	
 	/**
 	 * Sets the parameters for this algorithm. Must have the same types and
 	 * order as the array returned by <code>getParameter</code>.

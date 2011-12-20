@@ -74,42 +74,46 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	public void postProcessResultsForAllAngles(
-			Sample3D inSample,
-			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockResultSet> allResultsForSnapshot, BlockResultSet summaryResult,
+			TreeMap<Long, Sample3D> time2inSamples,
+			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
+			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,
+			TreeMap<Long, BlockResultSet> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		
-		double areaSum = 0;
-		int areaCnt = 0;
-		for (String key : allResultsForSnapshot.keySet()) {
-			BlockResultSet rt = allResultsForSnapshot.get(key);
-			for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.area")) {
-				if (v.getValue() != null) {
-					areaSum += v.getValue().doubleValue();
-					areaCnt += 1;
+		for (Long time : time2inSamples.keySet()) {
+			TreeMap<String, BlockResultSet> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+			BlockResultSet summaryResult = time2summaryResult.get(time);
+			double areaSum = 0;
+			int areaCnt = 0;
+			for (String key : allResultsForSnapshot.keySet()) {
+				BlockResultSet rt = allResultsForSnapshot.get(key);
+				for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.area")) {
+					if (v.getValue() != null) {
+						areaSum += v.getValue().doubleValue();
+						areaCnt += 1;
+					}
 				}
 			}
-		}
-		
-		double topAreaSum = 0;
-		double topAreaCnt = 0;
-		for (String key : allResultsForSnapshot.keySet()) {
-			BlockResultSet rt = allResultsForSnapshot.get(key);
-			for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top.area")) {
-				if (v.getValue() != null) {
-					topAreaSum += v.getValue().doubleValue();
-					topAreaCnt += 1;
+			
+			double topAreaSum = 0;
+			double topAreaCnt = 0;
+			for (String key : allResultsForSnapshot.keySet()) {
+				BlockResultSet rt = allResultsForSnapshot.get(key);
+				for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top.area")) {
+					if (v.getValue() != null) {
+						topAreaSum += v.getValue().doubleValue();
+						topAreaCnt += 1;
+					}
 				}
 			}
-		}
-		
-		if (areaCnt > 0 && topAreaCnt > 0) {
-			double avgTopArea = topAreaSum / topAreaCnt;
-			double avgArea = areaSum / areaCnt;
-			double volume_iap = Math.sqrt(avgArea * avgArea * avgTopArea);
-			volume_iap = Math.ceil(volume_iap);
-			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap", volume_iap);
+			
+			if (areaCnt > 0 && topAreaCnt > 0) {
+				double avgTopArea = topAreaSum / topAreaCnt;
+				double avgArea = areaSum / areaCnt;
+				double volume_iap = Math.sqrt(avgArea * avgArea * avgTopArea);
+				volume_iap = Math.ceil(volume_iap);
+				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap", volume_iap);
+			}
 		}
 	}
-	
 }

@@ -165,8 +165,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
 			final ThreadSafeOptions freed = new ThreadSafeOptions();
 			try {
-				for (TreeMap<String, ImageSet> imageSetWithSpecificAngle : workload_imageSetsWithSpecificAngles) {
-					final TreeMap<String, ImageSet> imageSetWithSpecificAngle_f = imageSetWithSpecificAngle;
+				for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
+					final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
 					
 					maxCon.acquire(1);
 					try {
@@ -186,7 +186,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 									freed.setBval(0, true);
 								}
 							}
-						}, "Snapshot Analysis");
+						}, "Snapshot Analysis (" + plantID + ")");
 						startThread(t);
 					} catch (Exception eeee) {
 						error = eeee;
@@ -281,84 +281,53 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final ThreadSafeOptions tso, final int workloadSnapshots,
 			final int workloadEqualAngleSnapshotSets,
-			final TreeMap<String, ImageSet> imageSetWithSpecificAngle, final Semaphore optMaxCon)
+			final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle, final Semaphore optMaxCon)
 			throws InterruptedException {
 		
-		Sample3D inSample = null;
-		final TreeMap<String, BlockResultSet> analysisResults = new TreeMap<String, BlockResultSet>();
-		final TreeMap<String, ImageData> analysisInput = new TreeMap<String, ImageData>();
-		ArrayList<MyThread> wait = new ArrayList<MyThread>();
+		TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
+		TreeMap<Long, TreeMap<String, BlockResultSet>> analysisResults = new TreeMap<Long, TreeMap<String, BlockResultSet>>();
+		TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
+		
 		if (imageSetWithSpecificAngle != null) {
-			for (final String configAndAngle : imageSetWithSpecificAngle.keySet()) {
-				if (status != null && status.wantsToStop())
-					break;
-				if (imageSetWithSpecificAngle.get(configAndAngle).getVIS() != null)
-					inSample = (Sample3D) imageSetWithSpecificAngle.get(configAndAngle).getVIS()
-							.getParentSample();
-				else
-					continue;
-				final ImageData inImage = imageSetWithSpecificAngle.get(configAndAngle).getVIS();
-				
-				Runnable r = new Runnable() {
-					@Override
-					public void run() {
-						BlockResultSet results;
-						try {
-							results = processAngleWithinSnapshot(
-									imageSetWithSpecificAngle.get(configAndAngle),
-									maximumThreadCountOnImageLevel, status,
-									workloadEqualAngleSnapshotSets,
-									getParentPriority());
-							if (results != null) {
-								analysisInput.put(configAndAngle, inImage);
-								analysisResults.put(configAndAngle, results);
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				};
-				boolean threaded = false;
-				if (!threaded) {
-					boolean lowMem = false;
-					long used = SystemAnalysis.getUsedMemoryInMB();
-					long avail = SystemAnalysis.getMemoryMB();
-					if (used > avail * 0.7d) {
-						System.out.println();
-						System.out
-								.print(SystemAnalysisExt.getCurrentTime()
-										+ ">HIGH MEMORY UTILIZATION ("
-										+ (100 * used / avail)
-										+ "%), REDUCING CONCURRENCY (AT SNAPSHOT LEVEL) || ");
-						lowMem = true;
-					}
-					if (!lowMem && optMaxCon != null && optMaxCon.tryAcquire(1)) {
-						MyThread mt = new MyThread(r, getName() + " "
-								+ System.currentTimeMillis());
-						mt.setFinishrunnable(new Runnable() {
-							@Override
-							public void run() {
-								optMaxCon.release(1);
-							}
-						});
-						mt.start();
-						wait.add(mt);
+			for (Long time : imageSetWithSpecificAngle.keySet())
+				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
+					if (status != null && status.wantsToStop())
+						break;
+					if (imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS() != null) {
+						Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS()
+								.getParentSample();
+						inSamples.put(time, inSample);
 					} else
-						r.run();
-				} else
-					wait.add(BackgroundThreadDispatcher.addTask(r,
-							"Analyze image within snapshot", -1000, -1000));
-			}
+						continue;
+					ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS();
+					
+					try {
+						BlockResultSet results = processAngleWithinSnapshot(
+								imageSetWithSpecificAngle.get(time).get(configAndAngle),
+								maximumThreadCountOnImageLevel, status,
+								workloadEqualAngleSnapshotSets,
+								getParentPriority());
+						processVolumeOutput(inSamples.get(time), results);
+						if (results != null) {
+							if (!analysisInput.containsKey(time))
+								analysisInput.put(time, new TreeMap<String, ImageData>());
+							if (!analysisResults.containsKey(time))
+								analysisResults.put(time, new TreeMap<String, BlockResultSet>());
+							analysisInput.get(time).put(configAndAngle, inImage);
+							analysisResults.get(time).put(configAndAngle, results);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 		}
-		BackgroundThreadDispatcher.waitFor(wait);
-		if (inSample != null && !analysisResults.isEmpty()) {
-			BlockResultSet postprocessingResults;
+		if (!analysisResults.isEmpty()) {
+			TreeMap<Long, BlockResultSet> postprocessingResults;
 			try {
 				postprocessingResults = getImageProcessor()
-						.postProcessPipelineResults(inSample, analysisInput,
+						.postProcessPipelineResults(inSamples, analysisInput,
 								analysisResults, status);
-				processStatisticalAndVolumeSampleOutput(inSample,
-						postprocessingResults);
+				processStatisticalOutputOnGlobalLevel(inSamples, postprocessingResults);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -368,31 +337,40 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				+ workloadSnapshots);
 	}
 	
-	private ArrayList<TreeMap<String, ImageSet>> filterWorkload(
-			ArrayList<TreeMap<String, ImageSet>> workload, String filter) {
-		// if (filter == null)
-		// return workload;
-		ArrayList<TreeMap<String, ImageSet>> res = new ArrayList<TreeMap<String, ImageSet>>();
-		for (TreeMap<String, ImageSet> tm : workload)
-			loopB: for (ImageSet is : tm.values()) {
-				if (is.getSampleInfo() != null)
-					if (filter == null) {
-						if (is.getSampleInfo().getTime() == 61) {
-							res.add(tm);
-							break loopB;
-						}
-						
-					} else
-						if (is.getSampleInfo().getParentCondition()
-								.toString().contains(filter)
-								&& !is.getSampleInfo().getParentCondition()
-										.toString().contains("wet"))
-							if (is.getSampleInfo().getTime() == 61) {
-								res.add(tm);
-								break loopB;
-							}
+	private void processVolumeOutput(Sample3D inSample, BlockResultSet analysisResults) {
+		for (String volumeID : analysisResults.getVolumeNames()) {
+			VolumeData v = analysisResults.getVolume(volumeID);
+			if (v != null) {
+				analysisResults.setVolume(volumeID, null);
+				
+				try {
+					StopWatch s = new StopWatch(
+							SystemAnalysisExt.getCurrentTime() + ">SAVE VOLUME");
+					if (databaseTarget != null) {
+						databaseTarget.saveVolume((LoadedVolume) v, inSample,
+								m, DBTable.SAMPLE, null, null);
+						VolumeData volumeInDatabase = new VolumeData(inSample,
+								v);
+						volumeInDatabase.getURL().setPrefix(
+								databaseTarget.getPrefix());
+						volumeInDatabase.getURL().setDetail(
+								v.getURL().getDetail());
+						output.add(volumeInDatabase);
+					} else {
+						System.out.println(SystemAnalysisExt.getCurrentTime()
+								+ ">Volume kept in memory: " + v);
+						output.add(v);
+					}
+					s.printTime();
+				} catch (Exception e) {
+					System.out.println(SystemAnalysisExt.getCurrentTime()
+							+ ">ERROR: Could not save volume data: "
+							+ e.getMessage());
+					e.printStackTrace();
+				}
+				
 			}
-		return res;
+		}
 	}
 	
 	private void addTopOrSideImagesToWorkset(
@@ -617,8 +595,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		preProcessors.add(pre);
 	}
 	
-	private void processStatisticalOutput(ImageData inVis,
-			BlockResultSet analysisResults) {
+	private void processStatisticalOutputImages(ImageData inVis, BlockResultSet analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
@@ -640,69 +617,38 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 	}
 	
-	private void processStatisticalAndVolumeSampleOutput(Sample3D inSample,
-			BlockResultSet analysisResults) {
+	private void processStatisticalOutputOnGlobalLevel(
+			TreeMap<Long, Sample3D> inSamples,
+			TreeMap<Long, BlockResultSet> analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 2");
 		}
 		
-		for (String volumeID : analysisResults.getVolumeNames()) {
-			VolumeData v = analysisResults.getVolume(volumeID);
-			if (v != null) {
-				analysisResults.setVolume(volumeID, null);
+		for (Long time : analysisResults.keySet())
+			for (BlockPropertyValue bpv : analysisResults.get(time).getPropertiesSearch("RESULT_")) {
+				if (bpv.getName() == null)
+					continue;
 				
-				try {
-					StopWatch s = new StopWatch(
-							SystemAnalysisExt.getCurrentTime() + ">SAVE VOLUME");
-					if (databaseTarget != null) {
-						databaseTarget.saveVolume((LoadedVolume) v, inSample,
-								m, DBTable.SAMPLE, null, null);
-						VolumeData volumeInDatabase = new VolumeData(inSample,
-								v);
-						volumeInDatabase.getURL().setPrefix(
-								databaseTarget.getPrefix());
-						volumeInDatabase.getURL().setDetail(
-								v.getURL().getDetail());
-						output.add(volumeInDatabase);
-					} else {
-						System.out.println(SystemAnalysisExt.getCurrentTime()
-								+ ">Volume kept in memory: " + v);
-						output.add(v);
+				NumericMeasurement3D m = new NumericMeasurement3D(
+						new NumericMeasurement(inSamples.get(time)), bpv.getName(), inSamples.get(time)
+								.getParentCondition().getExperimentName()
+								+ " ("
+								+ getName() + ")");
+				
+				if (bpv != null && m != null) {
+					m.setValue(bpv.getValue());
+					m.setUnit(bpv.getUnit());
+					if (inSamples.get(time).size() > 0) {
+						NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
+						m.setReplicateID(template.getReplicateID());
+						m.setQualityAnnotation(template.getQualityAnnotation());
+						m.setPosition(template.getPosition());
+						m.setPositionUnit(template.getPositionUnit());
 					}
-					s.printTime();
-				} catch (Exception e) {
-					System.out.println(SystemAnalysisExt.getCurrentTime()
-							+ ">ERROR: Could not save volume data: "
-							+ e.getMessage());
-					e.printStackTrace();
+					output.add(m);
 				}
-				
 			}
-		}
-		for (BlockPropertyValue bpv : analysisResults.getPropertiesSearch("RESULT_")) {
-			if (bpv.getName() == null)
-				continue;
-			
-			NumericMeasurement3D m = new NumericMeasurement3D(
-					new NumericMeasurement(inSample), bpv.getName(), inSample
-							.getParentCondition().getExperimentName()
-							+ " ("
-							+ getName() + ")");
-			
-			if (bpv != null && m != null) {
-				m.setValue(bpv.getValue());
-				m.setUnit(bpv.getUnit());
-				if (inSample.size() > 0) {
-					NumericMeasurement3D template = (NumericMeasurement3D) inSample.iterator().next();
-					m.setReplicateID(template.getReplicateID());
-					m.setQualityAnnotation(template.getQualityAnnotation());
-					m.setPosition(template.getPosition());
-					m.setPositionUnit(template.getPositionUnit());
-				}
-				output.add(m);
-			}
-		}
 	}
 	
 	private void processAndOrSaveTiffImagesOrResultImages(ImageSet id,
@@ -824,7 +770,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		
 		if (analysisResults != null) {
-			processStatisticalOutput(inVis, analysisResults);
+			processStatisticalOutputImages(inVis, analysisResults);
 			
 			processAndOrSaveTiffImagesOrResultImages(id, inVis, inFluo, inNir,
 					debugImageStack, resVis, resFluo, resNir, parentPriority);
@@ -870,22 +816,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		};
 	}
 	
-	private void printError(final TreeMap<String, ImageSet> tmf, Exception err) {
+	private void printError(final TreeMap<Long, TreeMap<String, ImageSet>> tmf, Exception err) {
 		System.err.println(SystemAnalysisExt
 				.getCurrentTime()
 				+ "> ERROR: "
 				+ err.getMessage());
-		System.err.println(SystemAnalysisExt
-				.getCurrentTime()
-				+ "> ERROR-CAUSE: SAMPLE: "
-				+ tmf.firstKey()
-				+ " / "
-				+ tmf.get(tmf.firstKey())
-						.getSampleInfo()
-				+ " / "
-				+ tmf.get(tmf.firstKey())
-						.getSampleInfo()
-						.getParentCondition());
+		// System.err.println(SystemAnalysisExt
+		// .getCurrentTime()
+		// + "> ERROR-CAUSE: SAMPLE: "
+		// + tmf.firstKey()
+		// + " / "
+		// + tmf.get(tmf.firstKey())
+		// .getSampleInfo()
+		// + " / "
+		// + tmf.get(tmf.firstKey())
+		// .getSampleInfo()
+		// .getParentCondition());
 		err.printStackTrace();
 	}
 	

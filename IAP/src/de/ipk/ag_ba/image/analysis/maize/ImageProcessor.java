@@ -26,9 +26,9 @@ public interface ImageProcessor {
 	
 	public abstract BackgroundTaskStatusProviderSupportingExternalCall getStatus();
 	
-	public abstract BlockResultSet postProcessPipelineResults(Sample3D inSample,
-			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockResultSet> analysisResults,
+	public abstract TreeMap<Long, BlockResultSet> postProcessPipelineResults(TreeMap<Long, Sample3D> inSample,
+			TreeMap<Long, TreeMap<String, ImageData>> inImages,
+			TreeMap<Long, TreeMap<String, BlockResultSet>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws Exception;
 }

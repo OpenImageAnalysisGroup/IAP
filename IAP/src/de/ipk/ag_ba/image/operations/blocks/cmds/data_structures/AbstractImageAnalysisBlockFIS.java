@@ -38,7 +38,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		this.blockPositionInPipeline = blockPositionInPipeline;
 		this.debugStack = debugStack;
 	}
-
+	
 	@Override
 	public final FlexibleMaskAndImageSet process() throws InterruptedException {
 		StopWatch w = debugStart(this.getClass().getSimpleName());
@@ -86,10 +86,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	@Override
-	public void postProcessResultsForAllAngles(Sample3D inSample,
-			TreeMap<String, ImageData> inImages,
-			TreeMap<String, BlockResultSet> allResultsForSnapshot,
-			BlockResultSet summaryResult,
+	public void postProcessResultsForAllAngles(
+			TreeMap<Long, Sample3D> inSample,
+			TreeMap<Long, TreeMap<String, ImageData>> inImages,
+			TreeMap<Long, TreeMap<String, BlockResultSet>> allResultsForSnapshot,
+			TreeMap<Long, BlockResultSet> summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
 	}
@@ -111,7 +112,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		// empty
 		return null;
 	}
-
+	
 	@Override
 	public void setParameters(Parameter[] params) {
 		// empty
