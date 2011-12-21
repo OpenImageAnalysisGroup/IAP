@@ -313,4 +313,9 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 		return res;
 	}
 	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
+	}
+	
 }

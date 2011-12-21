@@ -80,6 +80,14 @@ public class CloudHost extends BasicDBObject {
 		return (String) get("hostInfo");
 	}
 	
+	public void setStatus3(String status) {
+		put("statust", status);
+	}
+	
+	public String getStatus3() {
+		return (String) get("status3");
+	}
+	
 	public void setLastPipelineTime(int lastPipelineTime) {
 		put("lastPipelineTimeInSec", lastPipelineTime);
 	}

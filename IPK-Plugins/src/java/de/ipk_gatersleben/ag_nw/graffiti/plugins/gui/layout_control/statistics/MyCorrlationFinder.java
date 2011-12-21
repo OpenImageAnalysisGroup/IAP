@@ -49,9 +49,9 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 	private final boolean dontAddNewEdgesOnlyUpdateExisting;
 	
 	public MyCorrlationFinder(Collection<Node> nodes, Graph graph, EditorSession session, boolean considerTimeShifts,
-						boolean mergeDataset, boolean colorCodeEdgesWithCorrelationValue, double minimumR, int currGammaValue,
-						Color colR_1, Color colR0, Color colR1, Collection<Edge> correlationEdges, double prob, boolean plotAverage,
-						boolean rankOrder, boolean showStatusResult, boolean dontAddNewEdgesOnlyUpdateExisting) {
+			boolean mergeDataset, boolean colorCodeEdgesWithCorrelationValue, double minimumR, int currGammaValue,
+			Color colR_1, Color colR0, Color colR1, Collection<Edge> correlationEdges, double prob, boolean plotAverage,
+			boolean rankOrder, boolean showStatusResult, boolean dontAddNewEdgesOnlyUpdateExisting) {
 		this.nodes = nodes;
 		this.graph = graph;
 		this.session = session;
@@ -73,37 +73,46 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 			this.considerTimeShifts = false;
 	}
 	
+	@Override
 	public int getCurrentStatusValue() {
 		return (int) getCurrentStatusValueFine();
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		currentStatus = value;
 	}
 	
+	@Override
 	public double getCurrentStatusValueFine() {
 		return currentStatus;
 	}
 	
+	@Override
 	public String getCurrentStatusMessage1() {
 		return "Calculate Correlation Factors...";
 	}
 	
+	@Override
 	public String getCurrentStatusMessage2() {
 		return (process == null || process.length() <= 0) ? "Please wait..." : process;
 	}
 	
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
 	
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
 	
+	@Override
 	public void pleaseContinueRun() {
 	}
 	
+	@Override
 	public void run() {
 		List<ResultPair> result = new ArrayList<ResultPair>();
 		ArrayList<Node> processed = new ArrayList<Node>();
@@ -149,7 +158,7 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 								mappedDataList2 = Experiment2GraphHelper.getMappedDataListFromGraphElement(node2);
 								dataset = initDataset(mappedDataList1, mappedDataList2);
 								CorrelationResult correlation = TabStatistics.calculateCorrelation(dataset, node1desc,
-													node2desc, mergeDataset, offset, prob, rankOrder);
+										node2desc, mergeDataset, offset, prob, rankOrder);
 								if (correlation.isAnyOneSignificant(minimumR)) {
 									res.add(correlation);
 									rtimes += "r*=" + correlation.getMaxOrMinR2() + ", ";
@@ -177,7 +186,7 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 						} else {
 							MyXML_XYDataset dataset = initDataset(mappedDataList1, mappedDataList2);
 							CorrelationResult correlation = TabStatistics.calculateCorrelation(dataset, node1desc, node2desc,
-												mergeDataset, 0, prob, rankOrder);
+									mergeDataset, 0, prob, rankOrder);
 							if (correlation.isAnyOneSignificant(minimumR)) {
 								result.add(new ResultPair(node1, node2, correlation));
 							}
@@ -209,7 +218,7 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 						for (Edge nE : a.getEdges()) {
 							if ((nE.getSource() == a && nE.getTarget() == b) || (nE.getSource() == b && nE.getTarget() == a)) {
 								Color c = colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r, currGammaValue,
-													colR_1, colR0, colR1) : Color.BLACK;
+										colR_1, colR0, colR1) : Color.BLACK;
 								AttributeHelper.setFillColor(nE, c);
 								AttributeHelper.setOutlineColor(nE, c);
 								newEdge.add(nE);
@@ -218,9 +227,9 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 					}
 				} else {
 					Edge nE = graph.addEdge(a, b, false, AttributeHelper.getDefaultGraphicsAttributeForEdge(
-										(colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r, currGammaValue, colR_1, colR0,
-															colR1) : Color.BLACK), (colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r,
-															currGammaValue, colR_1, colR0, colR1) : Color.BLACK), false));
+							(colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r, currGammaValue, colR_1, colR0,
+									colR1) : Color.BLACK), (colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r,
+									currGammaValue, colR_1, colR0, colR1) : Color.BLACK), false));
 					newEdge.add(nE);
 				}
 				// EdgeGraphicAttribute ega = (EdgeGraphicAttribute)
@@ -229,15 +238,15 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 				int offset = rp.correlation.getDataset2offsetOfMaxOrMinR();
 				if (offset < 0) {
 					Edge nE = graph.addEdge(b, a, true, AttributeHelper.getDefaultGraphicsAttributeForEdge(
-										(colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r, currGammaValue, colR_1, colR0,
-															colR1) : Color.BLACK), (colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r,
-															currGammaValue, colR_1, colR0, colR1) : Color.BLACK), true));
+							(colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r, currGammaValue, colR_1, colR0,
+									colR1) : Color.BLACK), (colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r,
+									currGammaValue, colR_1, colR0, colR1) : Color.BLACK), true));
 					newEdge.add(nE);
 				} else {
 					Edge nE = graph.addEdge(a, b, true, AttributeHelper.getDefaultGraphicsAttributeForEdge(
-										(colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r, currGammaValue, colR_1, colR0,
-															colR1) : Color.BLACK), (colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r,
-															currGammaValue, colR_1, colR0, colR1) : Color.BLACK), true));
+							(colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r, currGammaValue, colR_1, colR0,
+									colR1) : Color.BLACK), (colorCodeEdgesWithCorrelationValue ? TabStatistics.getRcolor(r,
+									currGammaValue, colR_1, colR0, colR1) : Color.BLACK), true));
 					newEdge.add(nE);
 				}
 				if (offset == 0) {
@@ -301,5 +310,10 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 			dataset.addXmlDataSeries(xmldata1, xmldata2, "M" + series, plotAverage);
 		}
 		return dataset;
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

@@ -362,7 +362,7 @@ public class MongoDB {
 					DBObject o = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).findOne(obj);
 					if (o != null) {
 						WriteResult wr = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).remove(o);
-						System.out.println(SystemAnalysisExt.getCurrentTime() + ">DELETE WRITERESULT: ERROR? " + wr.getLastError().getErrorMessage());
+						System.out.println(SystemAnalysis.getCurrentTime() + ">DELETE WRITERESULT: ERROR? " + wr.getLastError().getErrorMessage());
 					}
 				}
 			}
@@ -404,7 +404,7 @@ public class MongoDB {
 			BackgroundTaskStatusProviderSupportingExternalCall status,
 			boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
 		
-		System.out.println(">>> " + SystemAnalysisExt.getCurrentTime());
+		System.out.println(">>> " + SystemAnalysis.getCurrentTime());
 		System.out.println("STORE EXPERIMENT: " + experiment.getName());
 		System.out.println("DB-ID           : " + experiment.getHeader().getDatabaseId());
 		System.out.println("DB              : " + experiment.getHeader().getDatabase());
@@ -433,7 +433,7 @@ public class MongoDB {
 				MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK });
 		
 		if (status != null || (status != null && !status.wantsToStop()))
-			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Determine Size");
+			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">Determine Size");
 		{
 			if (experiment.getHeader().getDatabaseId() != null && !experiment.getHeader().getDatabaseId().startsWith("hsm:")) {
 				long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
@@ -452,7 +452,7 @@ public class MongoDB {
 			if (status != null && status.wantsToStop())
 				break;
 			if (status != null)
-				status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE SUBSTANCE " + s.getName());
+				status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">SAVE SUBSTANCE " + s.getName());
 			attributes.clear();
 			s.fillAttributeMap(attributes);
 			BasicDBObject substance = new BasicDBObject(filter(attributes));
@@ -614,18 +614,18 @@ public class MongoDB {
 			
 		} // substance
 		
-		System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+		System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 				+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 		if (status != null)
-			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE SUB-ELEMENTS OF SUBSTANCES FINISHED");
+			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">SAVE SUB-ELEMENTS OF SUBSTANCES FINISHED");
 		
 		// if (substances != null && safeOneTimeSave)
 		// processSubstanceSaving(status, substances, conditions, dbSubstances, substance2conditions);
 		if (status != null)
-			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">SAVE OF SUBSTANCE-DB ELEMENTS FINISHED");
+			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">SAVE OF SUBSTANCE-DB ELEMENTS FINISHED");
 		
 		if (status != null || (status != null && !status.wantsToStop()))
-			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">Finalize Storage");
+			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">Finalize Storage");
 		
 		// l = overallFileSize.getLong(); // in case of update the written bytes are not the right size
 		experiment.getHeader().setStorageTime(new Date());
@@ -640,7 +640,7 @@ public class MongoDB {
 			experiments.insert(dbExperiment);
 			String id = dbExperiment.get("_id").toString();
 			System.out.println(">>> STORED EXPERIMENT " + experiment.getHeader().getExperimentName() + " // DB-ID: " + id + " // "
-					+ SystemAnalysisExt.getCurrentTime());
+					+ SystemAnalysis.getCurrentTime());
 			for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
 				eh.setDatabaseId(id);
 			}
@@ -648,7 +648,7 @@ public class MongoDB {
 		
 		updateExperimentSize(db, experiment, status);
 		
-		// System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+		// System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 		// + " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 		
 		if (errorCount > 0) {
@@ -662,7 +662,7 @@ public class MongoDB {
 	private void processSubstanceSaving(BackgroundTaskStatusProviderSupportingExternalCall status, DBCollection substances,
 			BasicDBObject dbSubstance, ArrayList<String> conditionIDs) {
 		if (status != null)
-			status.setCurrentStatusText1(SystemAnalysisExt.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
+			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
 		
 		dbSubstance.put("condition_ids", conditionIDs);
 		if (status == null || (status != null && !status.wantsToStop())) {
@@ -734,7 +734,7 @@ public class MongoDB {
 						allOK = false;
 			}
 		} catch (Exception e) {
-			System.err.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: SAVING IMAGE FILE TO MONGDB FAILED WITH EXCEPTION: " + e.getMessage());
+			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: SAVING IMAGE FILE TO MONGDB FAILED WITH EXCEPTION: " + e.getMessage());
 			e.printStackTrace();
 		}
 		
@@ -812,7 +812,7 @@ public class MongoDB {
 					// System.out.println("SAVED VOLUME: " + id.toString() + " // SIZE: " + inputFile.getLength());
 				} else {
 					// create 512x512 animated GIF instead of saving the full volume cube
-					StopWatch ss = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">CREATE GIF 512x512", true);
+					StopWatch ss = new StopWatch(SystemAnalysis.getCurrentTime() + ">CREATE GIF 512x512", true);
 					InputStream inps = IOmodule.getThreeDvolumeRenderViewGif(lv, optStatus);
 					ss.printTime();
 					GridFSInputFile inputFile = gridfs_volumes.createFile(inps, hash);
@@ -822,7 +822,7 @@ public class MongoDB {
 				GridFSDBFile fff = gridfs_preview.findOne(hash);
 				boolean removeExistingPreviewFile = true;
 				if (removeExistingPreviewFile && fff != null) {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">REMOVE EXISTING PREVIEW: " + hash);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">REMOVE EXISTING PREVIEW: " + hash);
 					gridfs_preview.remove(fff);
 					fff = null;
 				}
@@ -830,13 +830,13 @@ public class MongoDB {
 					try {
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("Render Side Views");
-						// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Create preview: render side views GIF...");
-						StopWatch ss = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">CREATE GIF 256x256", true);
+						// System.out.println(SystemAnalysis.getCurrentTime() + ">Create preview: render side views GIF...");
+						StopWatch ss = new StopWatch(SystemAnalysis.getCurrentTime() + ">CREATE GIF 256x256", true);
 						InputStream inps = IOmodule.getThreeDvolumePreviewIcon(lv, optStatus);
 						ss.printTime();
 						lv = null;
 						if (inps == null)
-							System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: No 3-D Preview Stream!");
+							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No 3-D Preview Stream!");
 						else {
 							if (optStatus != null)
 								optStatus.setCurrentStatusText1("Save Preview Icon");
@@ -848,14 +848,14 @@ public class MongoDB {
 							System.out.println("RES: " + wr.toString());
 							fff = gridfs_preview.findOne(hash);
 							if (fff != null && fff.getLength() > 0) {
-								System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: OK, VOLUME PREVIEW SAVED: " + hash);
+								System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: OK, VOLUME PREVIEW SAVED: " + hash);
 							} else
-								System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR #: VOLUME PREVIEW NOT SAVED: " + hash);
+								System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR #: VOLUME PREVIEW NOT SAVED: " + hash);
 							
-							System.out.println(SystemAnalysisExt.getCurrentTime() + ">SAVED PREVIEW: " + inputFilePreview.getLength() / 1024 + " KB, HASH: " + hash);
+							System.out.println(SystemAnalysis.getCurrentTime() + ">SAVED PREVIEW: " + inputFilePreview.getLength() / 1024 + " KB, HASH: " + hash);
 						}
 					} catch (Exception e) {
-						System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + e.getMessage());
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 					}
 				}
 			}
@@ -1009,20 +1009,20 @@ public class MongoDB {
 				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, optFileSize, optStatus, hash);
 				fff = gridfs_volumes.findOne(hash);
 				if (fff != null) {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">Delete generated volume from MongoDB file system (to save space and for debugging).");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Delete generated volume from MongoDB file system (to save space and for debugging).");
 					gridfs_volumes.remove(fff);
 				}
 				gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW_FILES.toString());
 				
 				fff = gridfs_preview.findOne(hash);
 				if (fff != null && fff.getLength() <= 0) {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: OK, VOLUME PREVIEW SAVED: " + hash);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: OK, VOLUME PREVIEW SAVED: " + hash);
 				} else
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: VOLUME PREVIEW NOT SAVED: " + hash);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: VOLUME PREVIEW NOT SAVED: " + hash);
 				return DatabaseStorageResult.STORED_IN_DB;
 			}
 		} catch (Exception e) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR during volume save: " + e.getMessage());
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR during volume save: " + e.getMessage());
 			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
 	}
@@ -1169,19 +1169,19 @@ public class MongoDB {
 						ExperimentHeader h = new ExperimentHeader(header.toMap());
 						h.setStorageTime(new Date(((ObjectId) header.get("_id")).getTime()));
 						if (h.getImportusername() == null || h.getImportusername().isEmpty()) {
-							System.out.println(SystemAnalysisExt.getCurrentTime()
+							System.out.println(SystemAnalysis.getCurrentTime()
 									+ ">ERROR: FIXING INTERNAL PROBLEM: IMPORT USER NAME IS EMPTY, UPDATING INFO WITH LOCAL USER INFO");
 							h.setImportusername(SystemAnalysis.getUserName());
 							header.put("importusername", h.getImportusername());
 							if (h.getImportusername() != null && !h.getImportusername().isEmpty())
 								col.save(header, WriteConcern.SAFE);
 							else
-								System.out.println(SystemAnalysisExt.getCurrentTime()
+								System.out.println(SystemAnalysis.getCurrentTime()
 										+ ">ERROR: USER INFO COULD NOT BE UPDATED (LOCAL INFO IS NULL OR EMPTY)");
 						}
 						if (mapableNames.containsKey(h.getImportusername())) {
 							String newName = mapableNames.get(h.getImportusername());
-							System.out.println(SystemAnalysisExt.getCurrentTime()
+							System.out.println(SystemAnalysis.getCurrentTime()
 									+ ">INFO: FIXING ACCOUNT NAME (changing " + h.getImportusername() + " to " + newName + ")");
 							h.setImportusername(newName);
 							header.put("importusername", h.getImportusername());
@@ -1482,7 +1482,8 @@ public class MongoDB {
 			final int blocksExecutedWithinLastMinute,
 			final int pipelineExecutedWithinCurrentHour,
 			final int tasksExecutedWithinLastMinute,
-			final double progress) throws Exception {
+			final double progress,
+			final String status3) throws Exception {
 		processDB(new RunnableOnDB() {
 			private DB db;
 			
@@ -1510,6 +1511,7 @@ public class MongoDB {
 					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
 					res.setTaskProgress(progress);
+					res.setStatus3(status3);
 					double load = SystemAnalysisExt.getRealSystemCpuLoad();
 					boolean monitor = !CloudComputingService.getInstance(MongoDB.this).getIsCalculationPossible();
 					int wl = BackgroundThreadDispatcher.getWorkLoad();
@@ -1737,7 +1739,7 @@ public class MongoDB {
 			return new ArrayList<BatchCmd>();
 		}
 		if (res.size() > 0) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">SCHEDULED FOR START: " + res.size());
+			System.out.println(SystemAnalysis.getCurrentTime() + ">SCHEDULED FOR START: " + res.size());
 			java.util.Collections.sort(res, new Comparator<BatchCmd>() {
 				@Override
 				public int compare(BatchCmd o1, BatchCmd o2) {
@@ -2216,8 +2218,8 @@ public class MongoDB {
 			
 			@Override
 			public void run() {
-				System.out.println("REORGANIZATION: Create inventory... // " + SystemAnalysisExt.getCurrentTime());
-				res.append("REORGANIZATION: Create inventory... // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+				System.out.println("REORGANIZATION: Create inventory... // " + SystemAnalysis.getCurrentTime());
+				res.append("REORGANIZATION: Create inventory... // " + SystemAnalysis.getCurrentTime() + "<br>");
 				status.setCurrentStatusText1("Create inventory");
 				status.setCurrentStatusValueFine(100d / 5 * 0);
 				long numberOfBinaryFilesInDatabase = 0;
@@ -2230,9 +2232,9 @@ public class MongoDB {
 					
 				}
 				System.out.println("REORGANIZATION: Stored binary files: " + numberOfBinaryFilesInDatabase + " // "
-						+ SystemAnalysisExt.getCurrentTime());
+						+ SystemAnalysis.getCurrentTime());
 				res.append("REORGANIZATION: Stored binary files: " + numberOfBinaryFilesInDatabase + " // "
-						+ SystemAnalysisExt.getCurrentTime() + "<br>");
+						+ SystemAnalysis.getCurrentTime() + "<br>");
 				status.setCurrentStatusText2("Binary files: " + numberOfBinaryFilesInDatabase);
 				status.setCurrentStatusValueFine(100d / 5 * 1);
 				
@@ -2337,7 +2339,7 @@ public class MongoDB {
 						status.setCurrentStatusValueFine(100d / max * n);
 						status.setCurrentStatusText2(n + "/" + max);
 					}
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: REMOVED " + (cnt - substances.count()) + " SUBSTANCE OBJECTS");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - substances.count()) + " SUBSTANCE OBJECTS");
 				}
 				{
 					int n = 0;
@@ -2351,13 +2353,13 @@ public class MongoDB {
 						status.setCurrentStatusValueFine(100d / max * n);
 						status.setCurrentStatusText2(n + "/" + max);
 					}
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: REMOVED " + (cnt - conditions.count()) + " CONDITION OBJECTS");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - conditions.count()) + " CONDITION OBJECTS");
 				}
 				
 				if (linkedHashes.size() >= 0) {
 					long freeAll = 0;
-					System.out.println("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysisExt.getCurrentTime());
-					res.append("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+					System.out.println("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysis.getCurrentTime());
+					res.append("REORGANIZATION: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysis.getCurrentTime() + "<br>");
 					status.setCurrentStatusText1("Linked files: " + linkedHashes.size());
 					status.setCurrentStatusText2("");
 					status.setCurrentStatusValueFine(100d / 5 * 2);
@@ -2379,9 +2381,9 @@ public class MongoDB {
 									toBeRemoved.add(f);
 							}
 							System.out.println("REORGANIZATION: Binary files that are not linked (" + mgfs + "): " + toBeRemoved.size() + " // "
-									+ SystemAnalysisExt.getCurrentTime());
+									+ SystemAnalysis.getCurrentTime());
 							res.append("REORGANIZATION: Binary files that are not linked (" + mgfs + "): " + toBeRemoved.size() + " // "
-									+ SystemAnalysisExt.getCurrentTime() + "<br>");
+									+ SystemAnalysis.getCurrentTime() + "<br>");
 							long free = 0;
 							int fIdx = 0;
 							int fN = toBeRemoved.size();
@@ -2394,12 +2396,12 @@ public class MongoDB {
 								status.setCurrentStatusValueFine(fIdx * 100d / fN);
 							}
 							System.out.println("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
-									+ SystemAnalysisExt.getCurrentTime());
+									+ SystemAnalysis.getCurrentTime());
 							res.append("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
-									+ SystemAnalysisExt.getCurrentTime() + "<br>");
+									+ SystemAnalysis.getCurrentTime() + "<br>");
 							if (compact_warningLongExecutionTime) {
-								System.out.println("Start compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime());
-								res.append("Start compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+								System.out.println("Start compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime());
+								res.append("Start compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime() + "<br>");
 								HashMap<String, Object> m = new HashMap<String, Object>();
 								m.put("compact", mgfs + ".files");
 								m.put("force", true);
@@ -2418,8 +2420,8 @@ public class MongoDB {
 								cmd = new BasicDBObject(m);
 								db.command(cmd);
 								
-								System.out.println("Finished compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime());
-								res.append("Finished compact collection (" + mgfs + ") // " + SystemAnalysisExt.getCurrentTime() + "<br>");
+								System.out.println("Finished compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime());
+								res.append("Finished compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime() + "<br>");
 							} else {
 								System.out.println("Compact operation was not requested. Database contains free space, free file system space is not increased!");
 							}
@@ -2428,10 +2430,10 @@ public class MongoDB {
 						status.setCurrentStatusValueFineAdd(stepSize);
 					}
 					System.out.println("REORGANIZATION: Overall deleted MB: " + freeAll / 1024 / 1024 + " // "
-							+ SystemAnalysisExt.getCurrentTime());
+							+ SystemAnalysis.getCurrentTime());
 					
 					res.append("REORGANIZATION: Overall deleted MB: " + freeAll / 1024 / 1024 + " // "
-							+ SystemAnalysisExt.getCurrentTime() + "<br>");
+							+ SystemAnalysis.getCurrentTime() + "<br>");
 					status.setCurrentStatusText1("Deleted MB: " + (freeAll / 1024 / 1024));
 					status.setCurrentStatusValueFine(100d / 5 * 5);
 				}
@@ -2505,14 +2507,14 @@ public class MongoDB {
 			try {
 				isMain = image.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
 			} catch (Exception e) {
-				System.out.println("Error: No Inputstream for " + image.getURL() + ". " + e.getMessage() + " // " + SystemAnalysisExt.getCurrentTime());
+				System.out.println("Error: No Inputstream for " + image.getURL() + ". " + e.getMessage() + " // " + SystemAnalysis.getCurrentTime());
 			}
 			try {
 				if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL()))
 					isLabel = image.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
 			} catch (Exception e) {
 				System.out.println("Error: No Inputstream for " + image.getLabelURL() + ". " + e.getMessage() + " // "
-						+ SystemAnalysisExt.getCurrentTime());
+						+ SystemAnalysis.getCurrentTime());
 			}
 		} finally {
 			// BackgroundTaskHelper.lockRelease(image.getURL() != null ? image.getURL().getPrefix() : "in");

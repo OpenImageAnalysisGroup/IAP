@@ -9,6 +9,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
@@ -21,7 +22,6 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.GenerationMode;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.MyPicture;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.ThreeDmodelGenerator;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
@@ -47,7 +47,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_REAL_VALUE, options.getDoubleSetting(Setting.REAL_MARKER_DISTANCE));
 		} else {
 			System.out.println();
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: NO VIS IMAGE TO BE STORED FOR LATER 3D GENRATION!");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: NO VIS IMAGE TO BE STORED FOR LATER 3D GENRATION!");
 		}
 		return super.processVISimage();
 	}
@@ -143,7 +143,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 					if (replicateIDsOfSampleMeasurements.size() == 1)
 						replicateID = replicateIDsOfSampleMeasurements.iterator().next();
 					else
-						System.out.println(SystemAnalysisExt.getCurrentTime()
+						System.out.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: 3D Volume generation block didn't find the expected single sample measurement replicate ID. It found "
 								+ replicateIDsOfSampleMeasurements.size() + " differing replicate IDs, instead! The generated volume possibly can't be related" +
 								"to a single set of side views of a single Snapshot. This is a internal error.");
@@ -190,7 +190,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	private void createSimpleDefaultSkeleton(BlockResultSet summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
 			double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume) {
 		int fire = ImageOperation.BACKGROUND_COLORint;
-		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create simple 3D skeleton", false);
+		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">Create simple 3D skeleton", false);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
 		boolean foundBorderVoxel = false;
 		do {
@@ -259,7 +259,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		lve.setVolume(new ByteShortIntArray(cube));
 		String n = lve.getURL().getFileName();
 		if (n == null)
-			n = SystemAnalysisExt.getCurrentTime() + " (NO VOLUME NAME, NULL ERROR 1)";
+			n = SystemAnalysis.getCurrentTime() + " (NO VOLUME NAME, NULL ERROR 1)";
 		n = StringManipulationTools.stringReplace(n, ".argb_volume", "");
 		lve.getURL().setFileName(n + ".(plant skeleton).argb_volume");
 		summaryResult.setVolume("RESULT_plant_skeleton", lve);
@@ -274,7 +274,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			double realMarkerDistHorizontal,
 			int[][][] probabilityCube, LoadedVolume volume) {
 		int empty = 0;
-		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">Create advanced probablity 3D skeleton", false);
+		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">Create advanced probablity 3D skeleton", false);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
 		boolean foundBorderVoxel = false;
 		do {
@@ -343,7 +343,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		lve.setVolume(new ByteShortIntArray(probabilityCube));
 		String n = lve.getURL().getFileName();
 		if (n == null)
-			n = SystemAnalysisExt.getCurrentTime() + " (NO VOLUME NAME, NULL ERROR 2)";
+			n = SystemAnalysis.getCurrentTime() + " (NO VOLUME NAME, NULL ERROR 2)";
 		n = StringManipulationTools.stringReplace(n, ".argb_volume", "");
 		lve.getURL().setFileName(n + ".(plant probability skeleton).argb_volume");
 		

@@ -3,10 +3,11 @@ package de.ipk.ag_ba.gui.actions;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 public class ExperimentHistoryNavigationAction extends AbstractNavigationAction {
@@ -54,7 +55,7 @@ public class ExperimentHistoryNavigationAction extends AbstractNavigationAction 
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		for (Long time : history.keySet()) {
 			ExperimentHeaderInterface ei = history.get(time);
-			String t = SystemAnalysisExt.getCurrentTime(time);
+			String t = SystemAnalysis.getCurrentTime(time);
 			res.add(0, new NavigationButton(t, new ActionMongoOrLemnaTecExperimentNavigation(ei, m), src.getGUIsetting()));
 		}
 		res.add(0, new NavigationButton(new ActionTrash(history.values(), DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m), src.getGUIsetting()));

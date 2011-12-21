@@ -31,7 +31,6 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -972,7 +971,7 @@ public class LemnaTecDataExchange {
 							days = -days;
 						updateSnapshotTimes(experiment, days, "das");
 					} catch (Exception err) {
-						System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: Invalid seed-date definition in plant mapping: " + v);
+						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Invalid seed-date definition in plant mapping: " + v);
 					}
 					break seedDateLookupLoop;
 				}
@@ -1037,7 +1036,7 @@ public class LemnaTecDataExchange {
 					}
 					buf = out.getBuff();
 				} catch (Exception err) {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: NO ROTATION ANGLE FOR URL " + url);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NO ROTATION ANGLE FOR URL " + url);
 					return Double.NaN;
 				}
 			}

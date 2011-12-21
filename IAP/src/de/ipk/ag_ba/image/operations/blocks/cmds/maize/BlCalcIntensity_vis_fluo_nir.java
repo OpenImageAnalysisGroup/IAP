@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import ij.measure.ResultsTable;
 
+import org.SystemAnalysis;
 import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
@@ -10,7 +11,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * Calculates overall properties of the vis, fluo and nir images, such as number of pixels, intensities, NDVI and more.
@@ -137,7 +137,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), false); // markerDistanceHorizontally
 				
 				if (options == null)
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
 				if (rt != null)
 					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.", rt, getBlockPosition());
 			}

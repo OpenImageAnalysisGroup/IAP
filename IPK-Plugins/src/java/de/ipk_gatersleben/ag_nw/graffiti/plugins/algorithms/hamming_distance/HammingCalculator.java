@@ -32,36 +32,36 @@ import org.graffiti.plugins.ios.importers.gml.GMLReader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class HammingCalculator implements Runnable,
-					BackgroundTaskStatusProvider {
+		BackgroundTaskStatusProvider {
 	
-	private Collection<Graph> listOfGraphs;
-	private int[][] hammingDistances;
-	private ArrayList<File> listOfGraphFileNames;
-	private boolean consNodes;
-	private boolean consEdges;
-	private boolean consEdgeLabels;
-	private int nodesDistance;
-	private boolean computeOrder;
-	private int edgesDistance;
+	private final Collection<Graph> listOfGraphs;
+	private final int[][] hammingDistances;
+	private final ArrayList<File> listOfGraphFileNames;
+	private final boolean consNodes;
+	private final boolean consEdges;
+	private final boolean consEdgeLabels;
+	private final int nodesDistance;
+	private final boolean computeOrder;
+	private final int edgesDistance;
 	private int numberOfGraphs;
-	private int[] newOrder;
+	private final int[] newOrder;
 	private double progress;
 	private String message1 = "Please wait...";
 	private String message2 = "";;
 	private boolean stopWanted;
-	private int validGraphIndex;
-	private String outputDir;
+	private final int validGraphIndex;
+	private final String outputDir;
 	
 	private static Integer fileLoader = new Integer(0); // dummy variable for synchronized file loading (only one file-load at a time)
 	
 	private static LinkedList<WorkTask> workQueue = new LinkedList<WorkTask>();
 	
 	public HammingCalculator(Collection<Graph> listOfGraphs, ArrayList<File> listOfGraphFileNames,
-						boolean consNodes,
-						boolean consEdges, boolean consEdgeLabels,
-						int nodesDistance, int edgesDistance,
-						boolean computeOrder, int validGraphIndex,
-						String outputDir) {
+			boolean consNodes,
+			boolean consEdges, boolean consEdgeLabels,
+			int nodesDistance, int edgesDistance,
+			boolean computeOrder, int validGraphIndex,
+			String outputDir) {
 		this.listOfGraphs = listOfGraphs;
 		this.listOfGraphFileNames = listOfGraphFileNames;
 		this.consNodes = consNodes;
@@ -82,6 +82,7 @@ public class HammingCalculator implements Runnable,
 		this.newOrder = new int[numberOfGraphs];
 	}
 	
+	@Override
 	public void run() {
 		/* Computes the hamming distances between all graphs */
 		HashMap<Integer, String> graphNames = computeHammingDistances(hammingDistances, listOfGraphs, listOfGraphFileNames, validGraphIndex);
@@ -95,34 +96,42 @@ public class HammingCalculator implements Runnable,
 		}
 	}
 	
+	@Override
 	public int getCurrentStatusValue() {
 		return (int) getCurrentStatusValueFine();
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		
 	}
 	
+	@Override
 	public double getCurrentStatusValueFine() {
 		return progress;
 	}
 	
+	@Override
 	public String getCurrentStatusMessage1() {
 		return message1;
 	}
 	
+	@Override
 	public String getCurrentStatusMessage2() {
 		return message2;
 	}
 	
+	@Override
 	public void pleaseStop() {
 		stopWanted = true;
 	}
 	
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
 	
+	@Override
 	public void pleaseContinueRun() {
 	}
 	
@@ -135,7 +144,7 @@ public class HammingCalculator implements Runnable,
 	 * @return A map which contains the graph names for each index
 	 */
 	private HashMap<Integer, String> computeHammingDistances(int[][] hammingDistances, Collection<Graph> listOfGraphs, Collection<File> listOfGraphFileNames,
-						int validGraphIndex2) {
+			int validGraphIndex2) {
 		/* The iterators for the graph list */
 		int i = 0;
 		int j = 0;
@@ -242,6 +251,7 @@ public class HammingCalculator implements Runnable,
 						final WorkTask wwtt = getNextWorkTask();
 						if (wwtt != null) {
 							Thread wt = new Thread(new Runnable() {
+								@Override
 								public void run() {
 									HammingCalculator.threadComputing(wwtt);
 								}
@@ -255,7 +265,7 @@ public class HammingCalculator implements Runnable,
 					message2 = "Queue-Size: " + getTaskQueueSize() + ", Active Threads: " + runningThreads.size();
 					synchronized (runningThreads) {
 						progress = 100d * ((double) i / numberOfGraphs + step
-											* ((double) (numberOfGraphs - (getTaskQueueSize() + runningThreads.size())) / numberOfGraphs));
+								* ((double) (numberOfGraphs - (getTaskQueueSize() + runningThreads.size())) / numberOfGraphs));
 					}
 					try {
 						Thread.sleep(100);
@@ -454,7 +464,7 @@ public class HammingCalculator implements Runnable,
 		}
 		
 		minSum =
-							computeSum(currentCombination, hammingDistances, numberOfGraphs);
+				computeSum(currentCombination, hammingDistances, numberOfGraphs);
 		
 		/* Initial combination of the graphs */
 		for (int i = 0; i < numberOfGraphs; i++) {
@@ -464,13 +474,13 @@ public class HammingCalculator implements Runnable,
 		while (currentCombination[0] < numberOfGraphs) {
 			/* Checks if the current combination is a valid permutation */
 			validCombination =
-								isValid(true, currentCombination, (numberOfGraphs - 1),
-													numberOfGraphs);
+					isValid(true, currentCombination, (numberOfGraphs - 1),
+							numberOfGraphs);
 			
 			if (validCombination) {
 				currentSum =
-									computeSum(currentCombination, hammingDistances,
-														numberOfGraphs);
+						computeSum(currentCombination, hammingDistances,
+								numberOfGraphs);
 				
 				// System.err.println("Valid permutation");
 				// for (int j = 0; j < numberOfGraphs; j++) {
@@ -488,7 +498,7 @@ public class HammingCalculator implements Runnable,
 			}
 			
 			nextCombination(currentCombination, (numberOfGraphs - 1),
-								numberOfGraphs);
+					numberOfGraphs);
 		}
 		
 		System.err.println("");
@@ -509,7 +519,7 @@ public class HammingCalculator implements Runnable,
 	 * @return DOCUMENT ME!
 	 */
 	private int computeSum(int[] permutation, int[][] hammingDistances,
-						int numberOfGraphs) {
+			int numberOfGraphs) {
 		int sum = 0;
 		
 		for (int i = 0; i < (numberOfGraphs - 1); i++) {
@@ -555,7 +565,7 @@ public class HammingCalculator implements Runnable,
 	 * @return DOCUMENT ME!
 	 */
 	private boolean isValid(boolean valid, int[] combination, int position,
-						int size) {
+			int size) {
 		if (position < 0) {
 			return valid;
 		}
@@ -693,7 +703,7 @@ public class HammingCalculator implements Runnable,
 		 * (NodeLabelAttribute) target.getAttribute("label");
 		 * String targetLabel = targetLabelAttr.getLabel();
 		 */
-
+		
 		/*
 		 * Look at all edges in the graph <code>graph</code> to find
 		 * an edge with the source and target nodes (labels)
@@ -717,9 +727,9 @@ public class HammingCalculator implements Runnable,
 			 * (NodeLabelAttribute) tmpTarget.getAttribute("label");
 			 * String tmpTargetLabel = tmpTargetLabelAttr.getLabel();
 			 */
-
+			
 			if (tmpSourceLabel.equals(sourceLabel)
-								&& tmpTargetLabel.equals(targetLabel)) {
+					&& tmpTargetLabel.equals(targetLabel)) {
 				/*
 				 * Either consider edge labels
 				 * or simply set <code>exists</code> true
@@ -741,6 +751,11 @@ public class HammingCalculator implements Runnable,
 		}
 		
 		return exists;
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 	
 }

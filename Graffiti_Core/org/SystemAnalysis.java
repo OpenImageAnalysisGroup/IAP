@@ -183,4 +183,14 @@ public class SystemAnalysis {
 	public static String getCurrentTime() {
 		return sdf.format(new Date());
 	}
+	
+	public static String getCurrentTime(long time) {
+		return sdf.format(new Date(time));
+	}
+
+	public static String getWaitTime(long fullTime) {
+		ProgressStatusService pss = new ProgressStatusService();
+		String res = pss.getRemainTimeString(-1, fullTime / 1000, 2);
+		return StringManipulationTools.stringReplace(res, "&nbsp;", " ");
+	}
 }

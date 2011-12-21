@@ -67,6 +67,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	
 	private static HashSet<String> selectedOrganisms = initSelectedOrganisms();
 	
+	@Override
 	public void finishedNewDownload() {
 		read_ko_DB_txt = false;
 		koDBrelease = "unknown";
@@ -137,6 +138,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 				read_ko_DB_txt = true;
 				final KoService ks = new KoService();
 				BackgroundTaskHelper bth = new BackgroundTaskHelper(new Runnable() {
+					@Override
 					public void run() {
 						statusVal = -1;
 						read_ko_DB_txt = true;
@@ -400,6 +402,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return statusVal;
 	}
@@ -410,6 +413,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return getCurrentStatusValue();
 	}
@@ -420,6 +424,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -430,6 +435,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -440,6 +446,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		// pleaseStop = true;
 	}
@@ -450,6 +457,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -460,18 +468,22 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusVal = value;
 	}
 	
+	@Override
 	public String getDescription() {
 		return "";
 	}
 	
+	@Override
 	public JComponent getStatusPane(boolean showEmpty) {
 		
 		FolderPanel res = new FolderPanel("<html>" + "KEGG Orthology (KO) Database<br><small>"
@@ -567,6 +579,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 				"Download Instructions", this);
 		
 		((JButton) a).addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String organisms = "";
 				for (String org : initSelectedOrganisms())
@@ -586,6 +599,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 		
 		JButton editOrgs = new JMButton("Edit");
 		editOrgs.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				finishedNewDownload();
 				AttributeHelper.showInBrowser(ReleaseInfo.getAppFolderWithFinalSep() + "organisms.txt");
@@ -764,6 +778,11 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 	public synchronized void freeMemory() {
 		if (doFreeMemory())
 			finishedNewDownload();
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 	
 	/*

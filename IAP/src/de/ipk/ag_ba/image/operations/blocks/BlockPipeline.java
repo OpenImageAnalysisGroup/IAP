@@ -23,7 +23,6 @@ import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -91,7 +90,7 @@ public class BlockPipeline {
 			try {
 				block = blockClass.newInstance();
 			} catch (Exception e) {
-				System.out.println(SystemAnalysisExt.getCurrentTime()
+				System.out.println(SystemAnalysis.getCurrentTime()
 						+ "> ERROR: COULD NOT INSTANCIATE BLOCK OF CLASS "
 						+ blockClass.getCanonicalName() + "!");
 				throw e;
@@ -104,7 +103,7 @@ public class BlockPipeline {
 			FlexibleMaskAndImageSet input2 = block.process();
 			if (n - input.getImageCount() > 0) {
 				System.out.println();
-				System.out.println(SystemAnalysisExt.getCurrentTime()
+				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">WARNING: BLOCK " + block.getClass().getSimpleName()
 						+ " HAS SET "
 						+ (n - input.getImageCount() + " IMAGE(S) TO NULL!"));
@@ -159,7 +158,7 @@ public class BlockPipeline {
 			}
 			System.out.println();
 			System.out
-					.print(SystemAnalysisExt.getCurrentTime()
+					.print(SystemAnalysis.getCurrentTime()
 							+ ">INFO: "
 							+ s5performance
 							+ pipelineExecutionsWithinCurrentHour

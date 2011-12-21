@@ -28,23 +28,23 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.KeggSer
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.OrganismEntry;
 
 public class AllSuperGraphsCreator implements BackgroundTaskStatusProvider,
-					Runnable {
+		Runnable {
 	
-	private Graph graph;
+	private final Graph graph;
 	private String message1 = "Please wait...";
 	private String message2 = "";
 	private boolean stop = false;
 	private double progress;
 	private String targetFolder;
-	private boolean convertKOsToGenes;
-	private boolean checkOrthologs;
-	private boolean checkEnzymes;
-	private boolean checkGlycans;
-	private boolean checkCompounds;
+	private final boolean convertKOsToGenes;
+	private final boolean checkOrthologs;
+	private final boolean checkEnzymes;
+	private final boolean checkGlycans;
+	private final boolean checkCompounds;
 	private OrganismEntry[] orgs;
 	
 	public AllSuperGraphsCreator(Graph graph, String targetFolder, OrganismEntry[] orgs,
-						boolean checkOrthologs, boolean checkEnzymes, boolean checkGlycans, boolean checkCompounds, boolean convertKOsToGenes) {
+			boolean checkOrthologs, boolean checkEnzymes, boolean checkGlycans, boolean checkCompounds, boolean convertKOsToGenes) {
 		this.graph = graph;
 		this.targetFolder = targetFolder;
 		this.orgs = orgs;
@@ -55,38 +55,47 @@ public class AllSuperGraphsCreator implements BackgroundTaskStatusProvider,
 		this.checkCompounds = checkCompounds;
 	}
 	
+	@Override
 	public int getCurrentStatusValue() {
 		return (int) getCurrentStatusValueFine();
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		// empty
 	}
 	
+	@Override
 	public double getCurrentStatusValueFine() {
 		return progress;
 	}
 	
+	@Override
 	public String getCurrentStatusMessage1() {
 		return message1;
 	}
 	
+	@Override
 	public String getCurrentStatusMessage2() {
 		return message2;
 	}
 	
+	@Override
 	public void pleaseStop() {
 		stop = true;
 	}
 	
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
 	
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void run() {
 		KeggHelper kegg = new KeggHelper();
 		try {
@@ -127,7 +136,7 @@ public class AllSuperGraphsCreator implements BackgroundTaskStatusProvider,
 				for (Node n : graphCopy.getNodes()) {
 					new NodeHelper(n);
 					String keggID = (String) AttributeHelper.getAttributeValue(n,
-										"kegg", "kegg_name", "", "");
+							"kegg", "kegg_name", "", "");
 					if (checkOrthologs)
 						if (keggID.startsWith("ko:"))
 							AttributeHelper.setAttribute(n, "kegg", "present", "not found");
@@ -148,8 +157,8 @@ public class AllSuperGraphsCreator implements BackgroundTaskStatusProvider,
 					map = StringManipulationTools.stringReplace(map, "map", sn);
 					message2 = "SOAP: Check present enzymes for map " + map + "...";
 					KeggService.colorizeEnzymesGlycansCompounds(graphCopy, map,
-										KeggService.getDefaultEnzymeColor(), false,
-										checkOrthologs, checkEnzymes, checkGlycans, checkCompounds, convertKOsToGenes);
+							KeggService.getDefaultEnzymeColor(), false,
+							checkOrthologs, checkEnzymes, checkGlycans, checkCompounds, convertKOsToGenes);
 					workI++;
 					progress = 100d * (current / max + step * workI / workLoad);
 					if (stop)
@@ -216,5 +225,10 @@ public class AllSuperGraphsCreator implements BackgroundTaskStatusProvider,
 		} catch (ServiceException e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

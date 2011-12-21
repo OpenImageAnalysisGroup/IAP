@@ -16,11 +16,11 @@ import org.graffiti.selection.Selection;
  *         (c) 2004 IPK-Gatersleben
  */
 public class MyNonInteractiveSpringEmb
-					implements Runnable, BackgroundTaskStatusProvider {
+		implements Runnable, BackgroundTaskStatusProvider {
 	
-	private Graph graph;
-	private Selection selection;
-	private int initMaxMove = 30;
+	private final Graph graph;
+	private final Selection selection;
+	private final int initMaxMove = 30;
 	ThreadSafeOptions tso;
 	
 	/**
@@ -37,6 +37,7 @@ public class MyNonInteractiveSpringEmb
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return (int) getCurrentStatusValueFine();
 	}
@@ -45,6 +46,7 @@ public class MyNonInteractiveSpringEmb
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		if (tso.temperature_max_move > 0 && tso.temperature_max_move <= initMaxMove && tso.runStatus != 3)
 			return 100f * (initMaxMove - tso.temperature_max_move) / initMaxMove;
@@ -56,6 +58,7 @@ public class MyNonInteractiveSpringEmb
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		String nme = graph.getName();
 		if (nme == null)
@@ -70,6 +73,7 @@ public class MyNonInteractiveSpringEmb
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return "";
 	}
@@ -78,6 +82,7 @@ public class MyNonInteractiveSpringEmb
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 	}
 	
@@ -85,6 +90,7 @@ public class MyNonInteractiveSpringEmb
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		final PatternSpringembedder pse = new PatternSpringembedder();
 		// pse.setControlInterface(tso, new JPanel());
@@ -114,6 +120,7 @@ public class MyNonInteractiveSpringEmb
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -122,12 +129,19 @@ public class MyNonInteractiveSpringEmb
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		// empty
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 	
 }

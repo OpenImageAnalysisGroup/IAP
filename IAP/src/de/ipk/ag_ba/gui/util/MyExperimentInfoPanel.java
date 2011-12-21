@@ -31,6 +31,7 @@ import org.FolderPanel;
 import org.GuiRow;
 import org.JMButton;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import com.toedter.calendar.JDateChooser;
@@ -38,7 +39,6 @@ import com.toedter.calendar.JDateChooser;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -235,7 +235,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
 				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
 		if (experimentHeader.getStorageTime() != null)
-			fp.addGuiComponentRow(new JLabel("Storage Time"), new JLabel(SystemAnalysisExt.getCurrentTime(experimentHeader.getStorageTime().getTime())), false);
+			fp.addGuiComponentRow(new JLabel("Storage Time"), new JLabel(SystemAnalysis.getCurrentTime(experimentHeader.getStorageTime().getTime())), false);
 		fp.addGuiComponentRow(new JLabel("History"), new JLabel(getVersionString(experimentHeader)), false);
 		if (optExperiment != null)
 			fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(optExperiment), false);
@@ -452,7 +452,7 @@ public class MyExperimentInfoPanel extends JPanel {
 			if (experimentHeader.getHistory().size() > 1)
 				s = "s";
 			return experimentHeader.getHistory().size() + " older version" + s + " (earliest " +
-					SystemAnalysisExt.getCurrentTime(experimentHeader.getHistory().firstEntry().getKey())
+					SystemAnalysis.getCurrentTime(experimentHeader.getHistory().firstEntry().getKey())
 					+ ")";
 		}
 	}

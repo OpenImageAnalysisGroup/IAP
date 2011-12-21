@@ -48,6 +48,7 @@ public class BriteService extends MemoryHog
 	private static int statusVal = -1;
 	private static String brite_version;
 	
+	@Override
 	public synchronized void finishedNewDownload() {
 		read_brite_DB_txt = false;
 		mapNumber2groupInfo = new HashMap<String, String>();
@@ -63,6 +64,7 @@ public class BriteService extends MemoryHog
 				final BriteService cs = new BriteService();
 				BackgroundTaskHelper bth = new BackgroundTaskHelper(
 						new Runnable() {
+							@Override
 							public void run() {
 								statusVal = -1;
 								read_brite_DB_txt = true;
@@ -201,6 +203,7 @@ public class BriteService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return statusVal;
 	}
@@ -209,6 +212,7 @@ public class BriteService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return getCurrentStatusValue();
 	}
@@ -217,6 +221,7 @@ public class BriteService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -225,6 +230,7 @@ public class BriteService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -233,6 +239,7 @@ public class BriteService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		// pleaseStop = true;
 	}
@@ -241,6 +248,7 @@ public class BriteService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -249,18 +257,22 @@ public class BriteService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusVal = value;
 	}
 	
+	@Override
 	public String getDescription() {
 		return "";
 	}
 	
+	@Override
 	public JComponent getStatusPane(boolean showEmpty) {
 		noteRequest();
 		
@@ -384,6 +396,7 @@ public class BriteService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see org.graffiti.editor.MemoryHog#freeMemory()
 	 */
+	@Override
 	public synchronized void freeMemory() {
 		if (doFreeMemory())
 			finishedNewDownload();
@@ -391,5 +404,10 @@ public class BriteService extends MemoryHog
 	
 	public static ArrayList<String> getKoNamesFromKO(String kid) {
 		return ko2nameInfo.get(kid);
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

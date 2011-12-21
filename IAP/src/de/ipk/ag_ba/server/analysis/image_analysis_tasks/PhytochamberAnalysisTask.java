@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -29,7 +30,6 @@ import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
@@ -214,7 +214,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 						// System.err.println("Warning: not all three image types available for snapshot!");
 						// }
 					} catch (Exception e) {
-						System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + e.getMessage());
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 					}
 					tso.addInt(1);
 					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);

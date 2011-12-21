@@ -86,6 +86,7 @@ public class BatchCmd extends BasicDBObject {
 			put("progress", statusProvider.getCurrentStatusValueFine());
 			put("line1", statusProvider.getCurrentStatusMessage1());
 			put("line2", statusProvider.getCurrentStatusMessage2());
+			put("line3", statusProvider.getCurrentStatusMessage3());
 			put("waitsForUser", statusProvider.pluginWaitsForUser());
 		}
 		m.batchClaim(this, status, true);
@@ -136,6 +137,10 @@ public class BatchCmd extends BasicDBObject {
 	
 	public String getCurrentStatusMessage2() {
 		return getString("line2");
+	}
+	
+	public String getCurrentStatusMessage3() {
+		return getString("line3");
 	}
 	
 	public void setSubTaskInfo(int id, int cnt) {

@@ -37,7 +37,7 @@ public class AlgorithmServices implements HelperClass {
 	 * @param runnable
 	 */
 	public static void doCircularEdgeCrossingsMinimization(
-						Object referenceObject, ArrayList<Node> nodes, Runnable threadUnsafePostTask) {
+			Object referenceObject, ArrayList<Node> nodes, Runnable threadUnsafePostTask) {
 		MyEdgeCrossingReduction mecr = new AlgorithmServices().new MyEdgeCrossingReduction(nodes, threadUnsafePostTask);
 		BackgroundTaskHelper bth = new BackgroundTaskHelper(mecr, mecr, "Reduce Edge Crossings", "Reduce Edge Crossings", true, false);
 		bth.startWork(referenceObject);
@@ -75,6 +75,7 @@ public class AlgorithmServices implements HelperClass {
 		 * (non-Javadoc)
 		 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusValue()
 		 */
+		@Override
 		public int getCurrentStatusValue() {
 			return (int) Math.round(statusProgress);
 		}
@@ -83,6 +84,7 @@ public class AlgorithmServices implements HelperClass {
 		 * (non-Javadoc)
 		 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 		 */
+		@Override
 		public String getCurrentStatusMessage1() {
 			return status1;
 		}
@@ -91,6 +93,7 @@ public class AlgorithmServices implements HelperClass {
 		 * (non-Javadoc)
 		 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 		 */
+		@Override
 		public String getCurrentStatusMessage2() {
 			return status2;
 		}
@@ -99,6 +102,7 @@ public class AlgorithmServices implements HelperClass {
 		 * (non-Javadoc)
 		 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#pleaseStop()
 		 */
+		@Override
 		public void pleaseStop() {
 			pleaseStop = true;
 		}
@@ -107,6 +111,7 @@ public class AlgorithmServices implements HelperClass {
 		 * (non-Javadoc)
 		 * @see java.lang.Runnable#run()
 		 */
+		@Override
 		public void run() {
 			// work
 			HashMap<Integer, Node> nodeAndCirclePosition = new HashMap<Integer, Node>();
@@ -208,14 +213,14 @@ public class AlgorithmServices implements HelperClass {
 									Integer mA = multiplicators.get(edgA);
 									if (mA == null) {
 										Integer edgeDoublingA = (Integer) AttributeHelper.getAttributeValue(
-															edgA, "cluster", "edgecount", new Integer(1), null);
+												edgA, "cluster", "edgecount", new Integer(1), null);
 										multiplicators.put(edgA, edgeDoublingA);
 										mA = edgeDoublingA;
 									}
 									Integer mB = multiplicators.get(edgB);
 									if (mB == null) {
 										Integer edgeDoublingB = (Integer) AttributeHelper.getAttributeValue(
-															edgB, "cluster", "edgecount", new Integer(1), null);
+												edgB, "cluster", "edgecount", new Integer(1), null);
 										multiplicators.put(edgB, edgeDoublingB);
 										mB = edgeDoublingB;
 									}
@@ -269,6 +274,7 @@ public class AlgorithmServices implements HelperClass {
 		 * (non-Javadoc)
 		 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 		 */
+		@Override
 		public double getCurrentStatusValueFine() {
 			return statusProgress;
 		}
@@ -277,6 +283,7 @@ public class AlgorithmServices implements HelperClass {
 		 * (non-Javadoc)
 		 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 		 */
+		@Override
 		public boolean pluginWaitsForUser() {
 			return false;
 		}
@@ -285,12 +292,19 @@ public class AlgorithmServices implements HelperClass {
 		 * (non-Javadoc)
 		 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 		 */
+		@Override
 		public void pleaseContinueRun() {
 			// empty
 		}
 		
+		@Override
 		public void setCurrentStatusValue(int value) {
 			statusProgress = value;
+		}
+		
+		@Override
+		public String getCurrentStatusMessage3() {
+			return null;
 		}
 	}
 	
@@ -301,7 +315,7 @@ public class AlgorithmServices implements HelperClass {
 	 * @param selection
 	 */
 	public static void selectAndRunLayoutAlgorithm(Graph clusterReferenceGraph, Selection selection, String commandTitle,
-						boolean executeMoveToTopAfterwards) {
+			boolean executeMoveToTopAfterwards) {
 		RunAlgorithmDialog rad = new RunAlgorithmDialog(commandTitle, clusterReferenceGraph, selection, false, executeMoveToTopAfterwards);
 		rad.setModal(true);
 		rad.setAlwaysOnTop(true);

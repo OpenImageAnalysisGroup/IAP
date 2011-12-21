@@ -41,9 +41,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.GUIhelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class CompoundService extends MemoryHog
-					implements
-					BackgroundTaskStatusProvider,
-					FileDownloadStatusInformationProvider, HelperClass {
+		implements
+		BackgroundTaskStatusProvider,
+		FileDownloadStatusInformationProvider, HelperClass {
 	private static boolean read_compound_DB_txt = false;
 	
 	private static String compoundDBrelease = "unknown";
@@ -68,6 +68,7 @@ public class CompoundService extends MemoryHog
 	private static String status2;
 	private static int statusVal = -1;
 	
+	@Override
 	public synchronized void finishedNewDownload() {
 		read_compound_DB_txt = false;
 		compoundEntries = Collections.synchronizedMap(new HashMap<String, CompoundEntry>());
@@ -83,19 +84,20 @@ public class CompoundService extends MemoryHog
 				read_compound_DB_txt = true;
 				final CompoundService cs = new CompoundService();
 				BackgroundTaskHelper bth = new BackgroundTaskHelper(
-									new Runnable() {
-										public void run() {
-											statusVal = -1;
-											read_compound_DB_txt = true;
-											readLigantTXTforReleaseInfo();
-											readCompoundDB();
-											statusVal = 100;
-										}
-									},
-									cs,
-									"Compound Database",
-									"Compound Database Service",
-									true, false);
+						new Runnable() {
+							@Override
+							public void run() {
+								statusVal = -1;
+								read_compound_DB_txt = true;
+								readLigantTXTforReleaseInfo();
+								readCompoundDB();
+								statusVal = 100;
+							}
+						},
+						cs,
+						"Compound Database",
+						"Compound Database Service",
+						true, false);
 				bth.startWork(MainFrame.getInstance());
 			}
 		} else {
@@ -196,10 +198,10 @@ public class CompoundService extends MemoryHog
 							compoundEntries.put(compEntry.getID(), compEntry);
 							status1 = "Analyse compound information (" + compoundEntries.size() + ")";
 							knownCompoundAlternativeNamesEntries.put(compEntry.getID()
-												.toUpperCase(), compEntry);
+									.toUpperCase(), compEntry);
 							for (String name : compEntry.getNames())
 								knownCompoundAlternativeNamesEntries.put(name
-													.toUpperCase(), compEntry);
+										.toUpperCase(), compEntry);
 						}
 					}
 				}
@@ -252,7 +254,7 @@ public class CompoundService extends MemoryHog
 		 * http://www.genome.jp/dbget-bin/www_bget?dbname1:identifier1+dbname2:identifier2+...
 		 * The first form is applicable only to multiple entries from a single database.
 		 */
-
+		
 		initService(false);
 		CompoundEntry result = compoundEntries.get(compoundIDorAnyName);
 		if (result == null) {
@@ -341,6 +343,7 @@ public class CompoundService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return statusVal;
 	}
@@ -349,6 +352,7 @@ public class CompoundService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return getCurrentStatusValue();
 	}
@@ -357,6 +361,7 @@ public class CompoundService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -365,6 +370,7 @@ public class CompoundService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -373,6 +379,7 @@ public class CompoundService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		// pleaseStop = true;
 	}
@@ -381,6 +388,7 @@ public class CompoundService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -389,31 +397,35 @@ public class CompoundService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusVal = value;
 	}
 	
+	@Override
 	public String getDescription() {
 		return "";
 	}
 	
+	@Override
 	public JComponent getStatusPane(boolean showEmpty) {
 		noteRequest();
 		
 		FolderPanel res = new FolderPanel("<html>" +
-							"KEGG Compound Database<br><small>" +
-							"(contains information about compound IDs, names and synonyms)");
+				"KEGG Compound Database<br><small>" +
+				"(contains information about compound IDs, names and synonyms)");
 		res.setFrameColor(Color.LIGHT_GRAY, null, 1, 5);
 		
 		if (!ReleaseInfo.getIsAllowedFeature(FeatureSet.KEGG_ACCESS)) {
 			res.addGuiComponentRow(null,
-								new JLabel("<html>" +
-													"KEGG features are disabled.<br>Use side panel Help/Settings to enable access. Then restart the program."),
-								false);
+					new JLabel("<html>" +
+							"KEGG features are disabled.<br>Use side panel Help/Settings to enable access. Then restart the program."),
+					false);
 			res.layoutRows();
 			return res;
 		}
@@ -433,8 +445,8 @@ public class CompoundService extends MemoryHog
 			status2 = "<html>Database file not available";
 		
 		String modifiedTime = GravistoService.getFileModificationDateAndTime(
-							getFile("compound"),
-							"unknown version (file not found)");
+				getFile("compound"),
+				"unknown version (file not found)");
 		File f = getFile("ko");
 		
 		if (externalAvailable) {
@@ -450,11 +462,11 @@ public class CompoundService extends MemoryHog
 			status2 = "<html><b>Bringing database online...</b><br>Please wait a few moments.";
 		
 		res.addGuiComponentRow(
-							new JLabel("<html>" +
-												"Downloaded Files:&nbsp;"),
-							FolderPanel.getBorderedComponent(
-												new JLabel(status2), b, b, b, b),
-							false);
+				new JLabel("<html>" +
+						"Downloaded Files:&nbsp;"),
+				FolderPanel.getBorderedComponent(
+						new JLabel(status2), b, b, b, b),
+				false);
 		
 		ArrayList<JComponent> actionButtons = new ArrayList<JComponent>();
 		if (!showEmpty) {
@@ -465,10 +477,10 @@ public class CompoundService extends MemoryHog
 		pretifyButtons(actionButtons);
 		
 		res.addGuiComponentRow(
-							new JLabel("<html>" +
-												"Visit Website(s)"),
-							TableLayout.getMultiSplit(actionButtons, TableLayout.PREFERRED, bB, bB, bB, bB),
-							false);
+				new JLabel("<html>" +
+						"Visit Website(s)"),
+				TableLayout.getMultiSplit(actionButtons, TableLayout.PREFERRED, bB, bB, bB, bB),
+				false);
 		
 		res.layoutRows();
 		return res;
@@ -477,45 +489,45 @@ public class CompoundService extends MemoryHog
 	private JComponent getDownloadButton() {
 		String status = "Download";
 		return GUIhelper.getWebsiteDownloadButton(
-							status,
-							"http://www.genome.jp/kegg/download/ftp.html",
-							// "http://www.genome.jp/kegg/kegg6.html",
+				status,
+				"http://www.genome.jp/kegg/download/ftp.html",
+				// "http://www.genome.jp/kegg/kegg6.html",
 				ReleaseInfo.getAppFolderWithFinalSep(),
-							"<html>" +
-												"The following URL and the target folder will be automatically opened in a few seconds:<br><br>" +
-												"<code><b>" +
-												"http://www.genome.jp/kegg/download/ftp.html" +
-												// "http://www.genome.jp/kegg/kegg6.html" +
-									"</b></code><br><br>" +
-												"Please (re)evaluate your KEGG license status, before proceeding with the following steps:<br>" +
-												"<ol>" +
-												"	<li>Click onto the FTP link: &quot;ligand/&quot; KEGG LIGAND (daily updated)" +
-												"	<li>Download the following file:" +
-												"		<ul>" +
-												"			<li>ligand.txt" +
-												"		</ul>" +
-												"	<li>Open the sub folder &quot;compound&quot;" +
-												"	<li>Download the following file:" +
-												"		<ul>" +
-												"			<li>compound" +
-												"		</ul>" +
-												"</ol>" +
-												"After downloading them, please move these files to the following location:<br><br>" +
-												"<code><b>" + ReleaseInfo.getAppFolder() + "</b></code><br><br>" +
-												"After closing and re-opening this application, the KEGG Compound database will be<br>" +
-												"available to the system.",
-							new String[] {
-												"ftp://ftp.genome.jp/pub/kegg/ligand/ligand.txt",
-												"ftp://ftp.genome.jp/pub/kegg/ligand/compound/compound"
+				"<html>" +
+						"The following URL and the target folder will be automatically opened in a few seconds:<br><br>" +
+						"<code><b>" +
+						"http://www.genome.jp/kegg/download/ftp.html" +
+						// "http://www.genome.jp/kegg/kegg6.html" +
+						"</b></code><br><br>" +
+						"Please (re)evaluate your KEGG license status, before proceeding with the following steps:<br>" +
+						"<ol>" +
+						"	<li>Click onto the FTP link: &quot;ligand/&quot; KEGG LIGAND (daily updated)" +
+						"	<li>Download the following file:" +
+						"		<ul>" +
+						"			<li>ligand.txt" +
+						"		</ul>" +
+						"	<li>Open the sub folder &quot;compound&quot;" +
+						"	<li>Download the following file:" +
+						"		<ul>" +
+						"			<li>compound" +
+						"		</ul>" +
+						"</ol>" +
+						"After downloading them, please move these files to the following location:<br><br>" +
+						"<code><b>" + ReleaseInfo.getAppFolder() + "</b></code><br><br>" +
+						"After closing and re-opening this application, the KEGG Compound database will be<br>" +
+						"available to the system.",
+				new String[] {
+						"ftp://ftp.genome.jp/pub/kegg/ligand/ligand.txt",
+						"ftp://ftp.genome.jp/pub/kegg/ligand/compound/compound"
 				},
-							"Manual download instructions (automatic download failure)",
-							this);
+				"Manual download instructions (automatic download failure)",
+				this);
 	}
 	
 	private JComponent getLicenseButton() {
 		return GUIhelper.getWebsiteButton("License",
-							"http://www.genome.jp/kegg/legal.html",
-							// "http://www.genome.jp/kegg/kegg6.html",
+				"http://www.genome.jp/kegg/legal.html",
+				// "http://www.genome.jp/kegg/kegg6.html",
 				null, null, null);
 	}
 	
@@ -602,9 +614,15 @@ public class CompoundService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see org.graffiti.editor.MemoryHog#freeMemory()
 	 */
+	@Override
 	public synchronized void freeMemory() {
 		if (doFreeMemory())
 			finishedNewDownload();
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 	
 }

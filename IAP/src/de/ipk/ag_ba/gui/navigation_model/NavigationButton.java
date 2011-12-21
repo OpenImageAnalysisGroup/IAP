@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.ProgressStatusService;
 import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 
@@ -50,7 +51,6 @@ import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.ProgressStatusService;
 
 /**
  * @author klukas
@@ -200,21 +200,26 @@ public class NavigationButton implements StyleAware {
 				s += "<code>[" + getProgress("#", "-", len + 5, dp) + "]</code>";
 			}
 			String line2 = "";
-			String sm1 = "", sm2 = "";
+			String sm1 = "", sm2 = "", sm3 = "";
 			if (action.getStatusProvider() != null) {
 				sm1 = action.getStatusProvider().getCurrentStatusMessage1();
 				sm2 = action.getStatusProvider().getCurrentStatusMessage2();
+				sm3 = action.getStatusProvider().getCurrentStatusMessage3();
 			}
 			if (sm1 != null && sm1.length() > 0)
 				line2 = sm1;
 			if (sm2 != null && sm2.length() > 0)
 				line2 += (sm1 != null && sm1.length() > 0 ? "<p>" : "") + sm2;
+			if (sm3 != null && sm3.length() > 0)
+				line2 += (line2 != null && line2.length() + sm2.length() > 0 ? "<p>" : "") + sm3;
+			
 			if (statusServer != null) {
 				String eta = statusServer.getRemainTime((int) dp == -1, dp);
 				if (eta.length() > 0) {
 					if (line2.length() > 0)
-						line2 += ", ";
-					line2 += "" + eta;
+						line2 += sm3.length() == 0 ? ", " : "<br>";
+					if (sm3.length() == 0)
+						line2 += "" + eta;
 				}
 			}
 			if (line2.length() > 0)
@@ -331,6 +336,7 @@ public class NavigationButton implements StyleAware {
 			return;
 		final ObjectRef rr = new ObjectRef();
 		Runnable r = new Runnable() {
+			@Override
 			public void run() {
 				if ((n.isProcessing() || n.requestsTitleUpdates()) && n1.isVisible()) {
 					n1.setText(n.getTitle());
@@ -354,6 +360,7 @@ public class NavigationButton implements StyleAware {
 			return;
 		final ObjectRef rr = new ObjectRef();
 		Runnable r = new Runnable() {
+			@Override
 			public void run() {
 				NavigationButton n = wn.get();
 				JButton n1 = wn1.get();
@@ -423,6 +430,7 @@ public class NavigationButton implements StyleAware {
 			
 			if (execute)
 				BackgroundTaskHelper.issueSimpleTask(srcNavGraphicslEntity.getTitle(), "Please wait...", new Runnable() {
+					@Override
 					public void run() {
 						try {
 							na.performActionCalculateResults(srcNavGraphicslEntity);
@@ -434,6 +442,7 @@ public class NavigationButton implements StyleAware {
 						}
 					}
 				}, new Runnable() {
+					@Override
 					public void run() {
 						try {
 							boolean reload = false;
@@ -675,11 +684,13 @@ public class NavigationButton implements StyleAware {
 			n1.setFont(new Font(n1.getFont().getName(), Font.PLAIN, 12));
 		}
 		n.setExecution(new Runnable() {
+			@Override
 			public void run() {
 				n.executeNavigation(target, navPanel, actionPanel, graphPanel, n1, null);
 			}
 		});
 		n1.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				n.performAction();
 			}

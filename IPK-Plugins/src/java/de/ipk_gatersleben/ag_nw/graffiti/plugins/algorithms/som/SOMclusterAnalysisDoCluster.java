@@ -35,6 +35,7 @@ public class SOMclusterAnalysisDoCluster extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#getName()
 	 */
+	@Override
 	public String getName() {
 		return "Step 2: Compare mapping-data to centroids and set cluster ID";
 	}
@@ -60,12 +61,12 @@ public class SOMclusterAnalysisDoCluster extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>" + "With this command, the trained SOM weight matrix is used for the<br>"
-							+ "assignment of cluster IDs. For each node or edge the data mapping is analysed<br>"
-							+ "and compared to the SOM centroids. The most similar centroid and the assignment<br>"
-							+ "of the cluster ID is determined and used to set the node or edge cluster ID.<br>"
-							+ "The result is not immediately visible (besides by looking at the graph elements<br>"
-							+ "attributes). You may make the node cluster distribution visible with the menu<br>"
-							+ "command Elements/Visualize Clusters";
+				+ "assignment of cluster IDs. For each node or edge the data mapping is analysed<br>"
+				+ "and compared to the SOM centroids. The most similar centroid and the assignment<br>"
+				+ "of the cluster ID is determined and used to set the node or edge cluster ID.<br>"
+				+ "The result is not immediately visible (besides by looking at the graph elements<br>"
+				+ "attributes). You may make the node cluster distribution visible with the menu<br>"
+				+ "command Elements/Visualize Clusters";
 	}
 	
 	@Override
@@ -85,17 +86,18 @@ public class SOMclusterAnalysisDoCluster extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 */
+	@Override
 	public void execute() {
 		SOMclusterService mcs = new SOMclusterService(getSelectedOrAllGraphElements());
 		
 		BackgroundTaskHelper bth = new BackgroundTaskHelper(mcs, mcs, "Clustering with trained SOM",
-							"Clustering with trained SOM", false, false);
+				"Clustering with trained SOM", false, false);
 		bth.startWork(this);
 	}
 }
 
 class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskStatusProviderSupportingExternalCall,
-					Runnable {
+		Runnable {
 	
 	double statusDouble = -1d;
 	boolean pleaseStop = false;
@@ -112,6 +114,7 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return (int) statusDouble;
 	}
@@ -121,6 +124,7 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return statusDouble;
 	}
@@ -130,6 +134,7 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -139,6 +144,7 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -149,6 +155,7 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#pleaseStop
 	 * ()
 	 */
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
@@ -157,6 +164,7 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		if (checkStop())
 			return;
@@ -166,7 +174,7 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 		boolean returnNaN = mydataset.getTrainedWithReturnNaN();
 		String cols[] = SOMplugin.getColumns();
 		String[] groups = SOMplugin.initDataSetWithSelection(mydataset, selection, returnNaN, SOMplugin
-							.getLastUseAverageSetting());
+				.getLastUseAverageSetting());
 		if (cols.length != groups.length) {
 			HashSet<String> g1 = new HashSet<String>();
 			for (String s : cols)
@@ -240,6 +248,7 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -250,26 +259,32 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusDouble = value;
 	}
 	
+	@Override
 	public void setCurrentStatusValueFine(double value) {
 		statusDouble = value;
 	}
 	
+	@Override
 	public boolean wantsToStop() {
 		return checkStop();
 	}
 	
+	@Override
 	public void setCurrentStatusText1(String status) {
 		status1 = status;
 	}
 	
+	@Override
 	public void setCurrentStatusText2(String status) {
 		status2 = status;
 	}
@@ -279,7 +294,13 @@ class SOMclusterService implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seeorg.BackgroundTaskStatusProviderSupportingExternalCall#
 	 * setCurrentStatusValueFineAdd(double)
 	 */
+	@Override
 	public void setCurrentStatusValueFineAdd(double smallProgressStep) {
 		statusDouble += smallProgressStep;
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

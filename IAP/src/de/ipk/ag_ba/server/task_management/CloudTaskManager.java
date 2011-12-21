@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -17,6 +18,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
  * @author klukas
@@ -79,16 +81,20 @@ public class CloudTaskManager {
 	private void run() throws Exception {
 		long startTime = System.currentTimeMillis();
 		try {
+			BackgroundTaskStatusProviderSupportingExternalCallImpl status3provider = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
 			double progressSum = -1;
 			do {
 				if (CloudTaskManager.this.process || fixedDisableProcess) {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
 					
+					status3provider.setCurrentStatusValueFine(progressSum);
+					
 					m.batchPingHost(hostName,
 							BlockPipeline.getBlockExecutionsWithinLastMinute(),
 							BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
-							progressSum);
+							progressSum,
+							status3provider.getCurrentStatusMessage3());
 					
 					int maxTasks = 1;
 					if (maxTasks < 1)
@@ -132,7 +138,7 @@ public class CloudTaskManager {
 						}
 					}
 					if (!commands_to_start.isEmpty())
-						System.out.println(SystemAnalysisExt.getCurrentTime() + ">TO BE STARTED: " + commands_to_start.size());
+						System.out.println(SystemAnalysis.getCurrentTime() + ">TO BE STARTED: " + commands_to_start.size());
 					
 					int nn = 0;
 					progressSum = 0;
@@ -175,10 +181,10 @@ public class CloudTaskManager {
 								t.start();
 								
 							} catch (Exception e) {
-								System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: BATCH-CMD COULD NOT BE STARTED: " + e.getMessage());
+								System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: BATCH-CMD COULD NOT BE STARTED: " + e.getMessage());
 							}
 						} else {
-							System.out.println(SystemAnalysisExt.getCurrentTime()
+							System.out.println(SystemAnalysis.getCurrentTime()
 									+ ">INFO: INTERNAL INFO: runningTasks already contains a cmd which was sheduled for start");
 						}
 					}
@@ -187,13 +193,13 @@ public class CloudTaskManager {
 					else
 						progressSum /= (nn);
 				} else {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysisExt.getCurrentTime());
+					System.out.println(SystemAnalysis.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysis.getCurrentTime());
 				}
 				Thread.sleep(1000);
 				if (autoClose && System.currentTimeMillis() - startTime > 10000) {
 					if (runningTasks.isEmpty()) {
-						System.out.println(SystemAnalysisExt.getCurrentTime() + "> Cluster Execution Mode is active // NO RUNNING TASK");
-						System.out.println(SystemAnalysisExt.getCurrentTime() + "> SYSTEM.EXIT");
+						System.out.println(SystemAnalysis.getCurrentTime() + "> Cluster Execution Mode is active // NO RUNNING TASK");
+						System.out.println(SystemAnalysis.getCurrentTime() + "> SYSTEM.EXIT");
 						System.exit(0);
 					}
 				} // else

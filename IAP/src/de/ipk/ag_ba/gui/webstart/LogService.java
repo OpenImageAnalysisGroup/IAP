@@ -2,9 +2,10 @@ package de.ipk.ag_ba.gui.webstart;
 
 import java.util.Stack;
 
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class LogService {
 	
@@ -15,7 +16,7 @@ public class LogService {
 		final Stack<String> news = new Stack<String>();
 		if (!ba13reachable) {
 			news.add(preLine
-					+ SystemAnalysisExt.getCurrentTime()
+					+ SystemAnalysis.getCurrentTime()
 					+ ": Data Processing database is not reachable at network level (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
 		} else {
 			try {
@@ -35,7 +36,7 @@ public class LogService {
 					long current = System.currentTimeMillis();
 					if (current - start > 1000) {
 						news.add(preLine
-								+ SystemAnalysisExt.getCurrentTime()
+								+ SystemAnalysis.getCurrentTime()
 								+ ": Could not access latest news (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
 						t.interrupt();
 						break;
@@ -43,7 +44,7 @@ public class LogService {
 				} while (t.isAlive());
 			} catch (Exception e) {
 				news.add(preLine
-						+ SystemAnalysisExt.getCurrentTime()
+						+ SystemAnalysis.getCurrentTime()
 						+ ": Could not access latest news (" + e.getMessage()
 						+ "). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
 			}

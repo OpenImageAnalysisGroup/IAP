@@ -25,7 +25,6 @@ import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -88,7 +87,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 			try {
 				errors.write(ReleaseInfo.getAppFolderWithFinalSep() + "performance_test_" + System.currentTimeMillis() + ".txt");
 			} catch (IOException e) {
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + e.getMessage());
+				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -175,12 +174,12 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 						ImageConfiguration icNF = ImageConfiguration.get(id.getSubstanceName());
 						if (icNF == ImageConfiguration.Unknown) {
 							icNF = ImageConfiguration.get(id.getURL().getFileName());
-							System.out.println(SystemAnalysisExt.getCurrentTime() +
+							System.out.println(SystemAnalysis.getCurrentTime() +
 									">INFO: IMAGE CONFIGURATION UNKNOWN (" + id.getSubstanceName() + "), " +
 											"GUESSING FROM IMAGE NAME: " + id.getURL() + ", GUESS: " + icNF);
 						}
 						if (icNF == ImageConfiguration.Unknown) {
-							System.out.println(SystemAnalysisExt.getCurrentTime() +
+							System.out.println(SystemAnalysis.getCurrentTime() +
 									">ERROR: INVALID (UNKNOWN) IMAGE CONFIGURATION FOR IMAGE: " + id.getURL());
 						}
 						final ImageConfiguration ic = icNF;
@@ -211,7 +210,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 										break;
 								}
 							} catch (Exception e) {
-								System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: DATA LOAD ERROR: " + e.getMessage() + ", IMAGE: " + id.getURL());
+								System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: DATA LOAD ERROR: " + e.getMessage() + ", IMAGE: " + id.getURL());
 								switch (ic) {
 									case FluoSide:
 										tsoLoadDataErrorsFLUOside.addInt(1);
@@ -352,7 +351,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		store(maximumThreadCountParallelImages, dummyImageData, "nir.top.errors.loading", tsoLoadDataErrorsNIRtop.getInt(), "images");
 		store(maximumThreadCountParallelImages, dummyImageData, "nir.top.errors.content", tsoLoadDataErrorsNIRtop.getLong(), "images");
 		
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR-STAT:");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR-STAT:");
 		System.out.println("CONFIG\t\tGET DATA ERRORS\t\tLOAD DATA ERRORS");
 		System.out.println("VIS SIDE\t\t" + tsoLoadDataErrorsVISside.getInt() + "\t\t" + tsoLoadDataErrorsVISside.getLong());
 		System.out.println("VIS TOP \t\t" + tsoLoadDataErrorsVIStop.getInt() + "\t\t" + tsoLoadDataErrorsVIStop.getLong());
@@ -361,7 +360,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		System.out.println("NIR SIDE\t\t" + tsoLoadDataErrorsNIRside.getInt() + "\t\t" + tsoLoadDataErrorsNIRside.getLong());
 		System.out.println("NIR TOP \t\t" + tsoLoadDataErrorsNIRtop.getInt() + "\t\t" + tsoLoadDataErrorsNIRtop.getLong());
 		
-		errors.add(SystemAnalysisExt.getCurrentTime() + ">ERROR-STAT:");
+		errors.add(SystemAnalysis.getCurrentTime() + ">ERROR-STAT:");
 		errors.add("CONFIG\t\tGET DATA ERRORS\t\tLOAD DATA ERRORS");
 		errors.add("VIS SIDE\t\t" + tsoLoadDataErrorsVISside.getInt() + "\t\t" + tsoLoadDataErrorsVISside.getLong());
 		errors.add("VIS TOP \t\t" + tsoLoadDataErrorsVIStop.getInt() + "\t\t" + tsoLoadDataErrorsVIStop.getLong());
@@ -370,7 +369,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		errors.add("NIR SIDE\t\t" + tsoLoadDataErrorsNIRside.getInt() + "\t\t" + tsoLoadDataErrorsNIRside.getLong());
 		errors.add("NIR TOP \t\t" + tsoLoadDataErrorsNIRtop.getInt() + "\t\t" + tsoLoadDataErrorsNIRtop.getLong());
 		
-		errors.add(SystemAnalysisExt.getCurrentTime() + ">OK-STAT:");
+		errors.add(SystemAnalysis.getCurrentTime() + ">OK-STAT:");
 		errors.add("CONFIG\t\tGET DATA OK\t\tLOAD DATA OK");
 		errors.add("VIS SIDE\t\t" + tsoLoadDataOkVISside.getInt() + "\t\t" + tsoLoadDataOkVISside.getLong());
 		errors.add("VIS TOP \t\t" + tsoLoadDataOkVIStop.getInt() + "\t\t" + tsoLoadDataOkVIStop.getLong());
@@ -399,9 +398,9 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	protected void imgReadError(String message, ImageData id, ImageConfiguration ic, ThreadSafeOptions tsoLoadDataErrorsFLUOside,
 			ThreadSafeOptions tsoLoadDataErrorsFLUOtop, ThreadSafeOptions tsoLoadDataErrorsNIRside, ThreadSafeOptions tsoLoadDataErrorsNIRtop,
 			ThreadSafeOptions tsoLoadDataErrorsVISside, ThreadSafeOptions tsoLoadDataErrorsVIStop) {
-		String sss = SystemAnalysisExt.getCurrentTime() + ">ERROR: CONVERTING IMAGE DATA TO IMAGE: " + message
+		String sss = SystemAnalysis.getCurrentTime() + ">ERROR: CONVERTING IMAGE DATA TO IMAGE: " + message
 				+ ", IMAGE: " + id.getURL() + ", TIME " + id.getParentSample().getTime() + " " + id.getParentSample().getTimeUnit() + ", "
-				+ id.getParentSample().getSampleTime() + ", " + SystemAnalysisExt.getCurrentTime(id.getParentSample().getRowId()) + ", ID "
+				+ id.getParentSample().getSampleTime() + ", " + SystemAnalysis.getCurrentTime(id.getParentSample().getRowId()) + ", ID "
 				+ id.getQualityAnnotation() + ", CONFIG: " + ic;
 		System.out.println(sss);
 		errors.add(sss);

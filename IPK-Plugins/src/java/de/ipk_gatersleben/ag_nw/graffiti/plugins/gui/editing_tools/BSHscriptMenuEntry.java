@@ -117,58 +117,78 @@ public class BSHscriptMenuEntry extends JMenuItem {
 				String status1 = "Perform Script Command...";
 				String status2 = "";
 				
+				@Override
 				public int getCurrentStatusValue() {
 					return (int) progress;
 				}
 				
+				@Override
 				public void setCurrentStatusValue(int value) {
 					progress = value;
 				}
 				
+				@Override
 				public double getCurrentStatusValueFine() {
 					return progress;
 				}
 				
+				@Override
 				public String getCurrentStatusMessage1() {
 					return status1;
 				}
 				
+				@Override
 				public String getCurrentStatusMessage2() {
 					return status2;
 				}
 				
+				@Override
 				public void pleaseStop() {
 					stop = true;
 				}
 				
+				@Override
 				public boolean pluginWaitsForUser() {
 					return false;
 				}
 				
+				@Override
 				public void pleaseContinueRun() {
 				}
 				
+				@Override
 				public void setCurrentStatusValueFine(double value) {
 					progress = value;
 				}
 				
+				@Override
 				public boolean wantsToStop() {
 					return stop;
 				}
 				
+				@Override
 				public void setCurrentStatusText1(String status) {
 					status1 = status;
 				}
 				
+				@Override
 				public void setCurrentStatusText2(String status) {
 					status2 = status;
 				}
 				
+				@Override
 				public void setCurrentStatusValueFineAdd(double smallProgressStep) {
 					progress += smallProgressStep;
 				}
+				
+				@Override
+				public String getCurrentStatusMessage3() {
+					// TODO Auto-generated method stub
+					return null;
+				}
 			};
 			BackgroundTaskHelper.issueSimpleTask(title, "Perform Script Command...", new Runnable() {
+				@Override
 				public void run() {
 					List<Node> nl = GraphHelper.getSelectedOrAllNodes(MainFrame.getInstance().getActiveEditorSession());
 					g.numberGraphElements();

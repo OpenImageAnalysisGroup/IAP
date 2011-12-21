@@ -7,9 +7,10 @@
 package de.ipk_gatersleben.ag_nw.graffiti.services.task;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemAnalysis;
 
 public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
-					BackgroundTaskStatusProviderSupportingExternalCall {
+		BackgroundTaskStatusProviderSupportingExternalCall {
 	
 	private String status1, status2;
 	private double currentProgress = -1d;
@@ -20,52 +21,69 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 		this.status2 = status2;
 	}
 	
+	@Override
 	public synchronized void setCurrentStatusValueFine(double value) {
 		currentProgress = value;
 	}
 	
+	@Override
 	public boolean wantsToStop() {
 		return stopRequested;
 	}
 	
+	@Override
 	public void setCurrentStatusText1(String status) {
 		status1 = status;
 	}
 	
+	@Override
 	public void setCurrentStatusText2(String status) {
 		status2 = status;
 	}
 	
+	@Override
 	public synchronized int getCurrentStatusValue() {
 		return (int) currentProgress;
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		currentProgress = value;
 	}
 	
+	@Override
 	public double getCurrentStatusValueFine() {
 		return currentProgress;
 	}
 	
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
 	
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
 	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return getProgressStatus();
+	}
+	
+	@Override
 	public void pleaseStop() {
 		stopRequested = true;
 	}
 	
 	boolean waitForUser = false;
 	
+	@Override
 	public boolean pluginWaitsForUser() {
 		return waitForUser;
 	}
 	
+	@Override
 	public void pleaseContinueRun() {
 		waitForUser = false;
 	}
@@ -78,7 +96,63 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 	 * (non-Javadoc)
 	 * @see org.BackgroundTaskStatusProviderSupportingExternalCall#setCurrentStatusValueFineAdd(double)
 	 */
+	@Override
 	public synchronized void setCurrentStatusValueFineAdd(double smallProgressStep) {
 		currentProgress += smallProgressStep;
+	}
+	
+	long lastOutput = -1;
+	long lastProgress = -100;
+	long firstProgressFineTime = -1;
+	double firstProgressFineValue = -1;
+	double lastPro = -1;
+	long lastProgressUpdateTime = -1;
+	
+	private synchronized String getProgressStatus() {
+		String result = "";
+		double currPro = getCurrentStatusValueFine();
+		if (currPro > lastPro)
+			lastProgressUpdateTime = System.currentTimeMillis();
+		
+		if (currPro < lastPro) {
+			lastOutput = -1;
+			lastProgress = -100;
+			firstProgressFineValue = -1;
+			lastPro = -1;
+			lastProgressUpdateTime = -1;
+		}
+		
+		lastPro = currPro;
+		
+		if (currPro > 0.5 && firstProgressFineValue >= 0
+				&& firstProgressFineValue < currPro
+				&& System.currentTimeMillis() - firstProgressFineTime > 0) {
+			long timeForProgress = lastProgressUpdateTime
+					- firstProgressFineTime;
+			double progress = currPro
+					- firstProgressFineValue;
+			double speed = progress / timeForProgress;
+			double remainingTime = (100 - progress) / speed;
+			double fullTime = 100d / speed;
+			long finishTime = (long) (lastProgressUpdateTime + remainingTime);
+			
+			result = "finish: " + SystemAnalysis.getCurrentTime(finishTime) + ", rem: " + SystemAnalysis.getWaitTime((long) remainingTime) + ", rt: "
+					+ SystemAnalysis.getWaitTime((long) fullTime);
+		} else
+			if (currPro > 0.1) {
+				firstProgressFineTime = System.currentTimeMillis();
+				firstProgressFineValue = currPro;
+			}
+		
+		lastOutput = System.currentTimeMillis();
+		lastProgress = getCurrentStatusValue();
+		
+		if (lastProgress > 0.1) {
+			if (firstProgressFineValue < 0) {
+				firstProgressFineValue = getCurrentStatusValueFine();
+				firstProgressFineTime = System.currentTimeMillis();
+			}
+		}
+		return result;
 	}
 }

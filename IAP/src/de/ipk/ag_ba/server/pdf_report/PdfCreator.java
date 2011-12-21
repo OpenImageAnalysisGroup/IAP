@@ -13,13 +13,13 @@ import org.AttributeHelper;
 import org.ObjectRef;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
@@ -77,7 +77,7 @@ public class PdfCreator {
 		else {
 			new File(name).setExecutable(true);
 		}
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">EXECUTE: " + name + ", WITH PARAMETER (" + parameter + ")");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">EXECUTE: " + name + ", WITH PARAMETER (" + parameter + ")");
 		
 		final String nameF = name;
 		
@@ -110,7 +110,7 @@ public class PdfCreator {
 					tso.setBval(1, true);
 				}
 				tso.setBval(0, true);
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">FINISHED PDF CREATION TASK");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">FINISHED PDF CREATION TASK");
 			}
 		};
 		
@@ -152,8 +152,8 @@ public class PdfCreator {
 		File fff = new File(tempDirectory.getAbsolutePath() + File.separator + fn);
 		String c = TextFile.read(fff);
 		c = StringManipulationTools.stringReplace(c, "--experimentname--", safe(experiment.getName()));
-		c = StringManipulationTools.stringReplace(c, "--StartExp--", safe(SystemAnalysisExt.getCurrentTime(experiment.getStartDate().getTime())));
-		c = StringManipulationTools.stringReplace(c, "--EndExp--", safe(SystemAnalysisExt.getCurrentTime(experiment.getImportDate().getTime())));
+		c = StringManipulationTools.stringReplace(c, "--StartExp--", safe(SystemAnalysis.getCurrentTime(experiment.getStartDate().getTime())));
+		c = StringManipulationTools.stringReplace(c, "--EndExp--", safe(SystemAnalysis.getCurrentTime(experiment.getImportDate().getTime())));
 		c = StringManipulationTools.stringReplace(c, "--NumExp--", safe(experiment.getNumberOfMeasurementValues() + ""));
 		
 		c = StringManipulationTools.stringReplace(c, "--ImagesExp--", safe(experiment.getHeader().getNumberOfFiles() + ""));

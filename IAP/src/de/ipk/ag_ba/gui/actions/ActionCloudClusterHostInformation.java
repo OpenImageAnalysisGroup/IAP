@@ -30,7 +30,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 		this.m = m;
 		
 		this.hostStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
-			private String hostInfo;
+			private String hostInfo, status3;
 			private double lastStatus = -1;
 			
 			@Override
@@ -69,6 +69,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 						}
 					}
 					hostInfo = hl_filtered.size() + " nodes";
+					
 					for (CloudHost ch : hl_filtered.values()) {
 						if (ch != null && ch.isClusterExecutionMode()) {
 							lastStatus = ch.getTaskProgress();
@@ -152,6 +153,11 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			public void setCurrentStatusValueFineAdd(double smallProgressStep) {
 				// TODO Auto-generated method stub
 				
+			}
+			
+			@Override
+			public String getCurrentStatusMessage3() {
+				return null;
 			}
 		};
 	}

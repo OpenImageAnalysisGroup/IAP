@@ -30,6 +30,7 @@ import javax.imageio.ImageIO;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
@@ -45,7 +46,6 @@ import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -190,7 +190,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 						+ experimentReference.getExperimentName()
 						+ " to HSM complete (saved " + idx
 						+ " files). Saving XML... // "
-						+ SystemAnalysisExt.getCurrentTime());
+						+ SystemAnalysis.getCurrentTime());
 				status.setCurrentStatusText1("Finalize storage");
 				status.setCurrentStatusText2("Index Created");
 			} else {
@@ -199,7 +199,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				System.out.println("ERROR: File transfer of experiment "
 						+ experimentReference.getExperimentName()
 						+ " to HSM incomplete (" + errorCount + " errors). // "
-						+ SystemAnalysisExt.getCurrentTime());
+						+ SystemAnalysis.getCurrentTime());
 			}
 			experiment.getHeader().setRemark(
 					experiment.getHeader().getRemark()
@@ -263,7 +263,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 									.println("ERROR: HSM TRANSFER AND DATA STORAGE: "
 											+ e.getMessage()
 											+ " // WILL RETRY IN 2 MINUTES // "
-											+ SystemAnalysisExt
+											+ SystemAnalysis
 													.getCurrentTime());
 							Thread.sleep(10 * 60 * 1000);
 							// try 2nd time after 10 minutes
@@ -284,7 +284,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 										+ " // "
 										+ zefn
 										+ " // "
-										+ SystemAnalysisExt.getCurrentTime());
+										+ SystemAnalysis.getCurrentTime());
 						errorCount++;
 					}
 				}
@@ -401,7 +401,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				} catch (Exception e) {
 					System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE: "
 							+ e.getMessage() + " // "
-							+ SystemAnalysisExt.getCurrentTime());
+							+ SystemAnalysis.getCurrentTime());
 					e.printStackTrace();
 					errorCount++;
 				}
@@ -468,7 +468,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 							.println("ERROR: HSM DATA TRANSFER AND STORAGE OF OLDREFERENCE: "
 									+ e.getMessage()
 									+ " // "
-									+ SystemAnalysisExt.getCurrentTime());
+									+ SystemAnalysis.getCurrentTime());
 					e.printStackTrace();
 					errorCount++;
 				}
@@ -524,7 +524,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			System.out.println("ERROR: Save XML of experiment "
 					+ experimentReference.getExperimentName() + " failed: "
 					+ err.getMessage() + " // "
-					+ SystemAnalysisExt.getCurrentTime());
+					+ SystemAnalysis.getCurrentTime());
 			ErrorMsg.addErrorMessage(err);
 		}
 	}
@@ -681,7 +681,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 					System.out.println("OK: Save XML of experiment "
 							+ experimentReference.getExperimentName() + " as "
 							+ te.getCanonicalPath() + " // "
-							+ SystemAnalysisExt.getCurrentTime());
+							+ SystemAnalysis.getCurrentTime());
 				}
 			} catch (Exception e) {
 				System.err.println("ERROR: Could not rename " + f.getName()

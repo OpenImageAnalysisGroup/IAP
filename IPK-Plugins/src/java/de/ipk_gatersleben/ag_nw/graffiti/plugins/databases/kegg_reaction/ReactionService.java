@@ -33,9 +33,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.FileDownloadStatusInf
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class ReactionService
-					implements
-					BackgroundTaskStatusProvider,
-					FileDownloadStatusInformationProvider, HelperClass {
+		implements
+		BackgroundTaskStatusProvider,
+		FileDownloadStatusInformationProvider, HelperClass {
 	private static boolean read_reaction_DB_txt = false;
 	
 	private static String reactionDBrelease = "unknown";
@@ -51,6 +51,7 @@ public class ReactionService
 	private static String status2;
 	private static int statusVal = -1;
 	
+	@Override
 	public synchronized void finishedNewDownload() {
 		read_reaction_DB_txt = false;
 		reactionDBrelease = "unknown";
@@ -68,19 +69,20 @@ public class ReactionService
 				read_reaction_DB_txt = true;
 				final ReactionService cs = new ReactionService();
 				BackgroundTaskHelper bth = new BackgroundTaskHelper(
-									new Runnable() {
-										public void run() {
-											statusVal = -1;
-											read_reaction_DB_txt = true;
-											readLigantTXTforReleaseInfo();
-											readReactionDB();
-											statusVal = 100;
-										}
-									},
-									cs,
-									"Reaction Database",
-									"Reaction Database Service",
-									true, false);
+						new Runnable() {
+							@Override
+							public void run() {
+								statusVal = -1;
+								read_reaction_DB_txt = true;
+								readLigantTXTforReleaseInfo();
+								readReactionDB();
+								statusVal = 100;
+							}
+						},
+						cs,
+						"Reaction Database",
+						"Reaction Database Service",
+						true, false);
 				bth.startWork(MainFrame.getInstance());
 			}
 		} else {
@@ -176,7 +178,7 @@ public class ReactionService
 							if (!reactionProductNamesEntries.containsKey(reacprod))
 								;
 							reactionProductNamesEntries.put(reacprod,
-												new HashSet<ReactionEntry>());
+									new HashSet<ReactionEntry>());
 							reactionProductNamesEntries.get(reacprod).add(reactionEntry);
 						}
 						for (String reacsub : reactionEntry.getSubstrateNames()) {
@@ -184,7 +186,7 @@ public class ReactionService
 							if (!reactionSubstrateNamesEntries.containsKey(reacsub))
 								;
 							reactionSubstrateNamesEntries.put(reacsub,
-												new HashSet<ReactionEntry>());
+									new HashSet<ReactionEntry>());
 							reactionSubstrateNamesEntries.get(reacsub).add(reactionEntry);
 						}
 					}
@@ -224,8 +226,8 @@ public class ReactionService
 	}
 	
 	private static ReactionEntry getInfo(
-						HashMap<String, ReactionEntry> entries,
-						String reactionID) {
+			HashMap<String, ReactionEntry> entries,
+			String reactionID) {
 		ReactionEntry result = entries.get(reactionID);
 		if (result == null) {
 			reactionID = StringManipulationTools.stringReplace(reactionID, "<html>", "");
@@ -258,6 +260,7 @@ public class ReactionService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return statusVal;
 	}
@@ -266,6 +269,7 @@ public class ReactionService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return getCurrentStatusValue();
 	}
@@ -274,6 +278,7 @@ public class ReactionService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -282,6 +287,7 @@ public class ReactionService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -290,6 +296,7 @@ public class ReactionService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		// abort of file loading not supported
 	}
@@ -298,6 +305,7 @@ public class ReactionService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -306,10 +314,12 @@ public class ReactionService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusVal = value;
 	}
@@ -319,14 +329,16 @@ public class ReactionService
 		return reactionIds.keySet();
 	}
 	
+	@Override
 	public String getDescription() {
 		return "";
 	}
 	
+	@Override
 	public JComponent getStatusPane(boolean showEmpty) {
 		FolderPanel res = new FolderPanel("<html>" +
-							"KEGG Reaction Database<br><small>" +
-							"(contains information about reaction substrates, products and enzymes)");
+				"KEGG Reaction Database<br><small>" +
+				"(contains information about reaction substrates, products and enzymes)");
 		res.setFrameColor(Color.LIGHT_GRAY, null, 1, 5);
 		
 		int b = 5; // normal border
@@ -343,11 +355,11 @@ public class ReactionService
 		status2 = "<html><b>Database check not yet implemented!";
 		
 		res.addGuiComponentRow(
-							new JLabel("<html>" +
-												"Downloaded File:&nbsp;"),
-							FolderPanel.getBorderedComponent(
-												new JLabel(status2), b, b, b, b),
-							false);
+				new JLabel("<html>" +
+						"Downloaded File:&nbsp;"),
+				FolderPanel.getBorderedComponent(
+						new JLabel(status2), b, b, b, b),
+				false);
 		
 		ArrayList<JComponent> actionButtons = new ArrayList<JComponent>();
 		actionButtons.add(new JButton("<html>Website"));
@@ -357,10 +369,10 @@ public class ReactionService
 		pretifyButtons(actionButtons);
 		
 		res.addGuiComponentRow(
-							new JLabel("<html>" +
-												"Visit Website(s)"),
-							TableLayout.getMultiSplit(actionButtons, TableLayoutConstants.PREFERRED, bB, bB, bB, bB),
-							false);
+				new JLabel("<html>" +
+						"Visit Website(s)"),
+				TableLayout.getMultiSplit(actionButtons, TableLayoutConstants.PREFERRED, bB, bB, bB, bB),
+				false);
 		
 		res.layoutRows();
 		return res;
@@ -370,5 +382,10 @@ public class ReactionService
 		for (JComponent jc : actionButtons) {
 			((JButton) jc).setBackground(Color.white);
 		}
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }
