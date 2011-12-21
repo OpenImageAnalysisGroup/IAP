@@ -1252,6 +1252,8 @@ public class MongoDB {
 								if (subr != null) {
 									DBObject substance = subr.fetch();
 									if (substance != null) {
+										if (optDBPbjectsOfSubstances != null)
+											optDBPbjectsOfSubstances.add(substance);
 										processSubstance(db, experiment, substance, optStatusProvider, 100d / l.size(), optDBPbjectsOfConditions);
 									}
 								}
@@ -1861,6 +1863,8 @@ public class MongoDB {
 		if (condList != null)
 			for (Object co : condList) {
 				DBObject cond = (DBObject) co;
+				if (optDBObjectsConditions != null)
+					optDBObjectsConditions.add(cond);
 				processCondition(s3d, cond);
 			}
 		if (ensureIndex)
@@ -2288,14 +2292,14 @@ public class MongoDB {
 					{
 						// check Ids of substances and conditions
 						for (DBObject subO : substanceObjects) {
-							int cnt = dbIdsOfSubstances.size();
-							dbIdsOfSubstances.remove(subO.get("_id") + "");
-							if (dbIdsOfSubstances.size() - cnt == 0)
-								System.out.println("ERRRRRRR");
+							String id = subO.get("_id") + "";
+							dbIdsOfSubstances.remove(id);
 						}
 						substanceObjects = null;
 						for (DBObject condO : conditionObjects) {
-							dbIdsOfConditions.remove(condO.get("_id") + "");
+							String id = condO.get("_id") + "";
+							if (dbIdsOfConditions.contains(id))
+								dbIdsOfConditions.remove(id);
 						}
 						conditionObjects = null;
 					}
@@ -2322,10 +2326,10 @@ public class MongoDB {
 				
 				{
 					DBCollection substances = db.getCollection("substances");
-					status.setCurrentStatusText1("Remove stale substances: " + dbIdsOfSubstances.size());
-					int n = 0;
-					long max = dbIdsOfSubstances.size();
 					long cnt = substances.count();
+					long max = dbIdsOfSubstances.size();
+					status.setCurrentStatusText1("Remove stale substances: " + max + "/" + cnt);
+					int n = 0;
 					for (String subID : dbIdsOfSubstances) {
 						n++;
 						DBObject del = substances.findOne(new BasicDBObject("_id", new ObjectId(subID)));
@@ -2340,7 +2344,7 @@ public class MongoDB {
 					long max = dbIdsOfConditions.size();
 					DBCollection conditions = db.getCollection("conditions");
 					long cnt = conditions.count();
-					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size());
+					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
 					for (String condID : dbIdsOfConditions) {
 						n++;
 						conditions.remove(new BasicDBObject("_id", new ObjectId(condID)), WriteConcern.NONE);

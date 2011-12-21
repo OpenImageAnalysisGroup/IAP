@@ -118,6 +118,7 @@ public class BackgroundTaskHelper implements HelperClass {
 					if (title != null) {
 						final ObjectRef tt = new ObjectRef();
 						ActionListener al = new ActionListener() {
+							@Override
 							public void actionPerformed(ActionEvent e) {
 								if (runThread.isAlive())
 									mf.addStatusPanel((JPanel) taskWindowF);
@@ -144,6 +145,7 @@ public class BackgroundTaskHelper implements HelperClass {
 			Timer checkStatus = new Timer(100, new ActionListener() {
 				boolean finishedCalled = false;
 				
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					if (!runThread.isAlive()) {
 						if (!finishedCalled) {
@@ -169,6 +171,7 @@ public class BackgroundTaskHelper implements HelperClass {
 			Timer checkStatus = new Timer(100, new ActionListener() {
 				boolean finishedCalled = false;
 				
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					if (!runThread.isAlive()) {
 						if (!finishedCalled) {
@@ -257,6 +260,7 @@ public class BackgroundTaskHelper implements HelperClass {
 	
 	public static void executeLaterOnSwingTask(int delay, final Runnable runnable) {
 		final Timer t = new Timer(delay, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				runnable.run();
 				((Timer) arg0.getSource()).stop();
@@ -328,6 +332,7 @@ class SimpleBackgroundTask implements Runnable, BackgroundTaskStatusProvider {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		if (finished || executingSwingTask)
 			return 100;
@@ -339,6 +344,7 @@ class SimpleBackgroundTask implements Runnable, BackgroundTaskStatusProvider {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return getCurrentStatusValue();
 	}
@@ -347,6 +353,7 @@ class SimpleBackgroundTask implements Runnable, BackgroundTaskStatusProvider {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return progressText1;
 	}
@@ -355,6 +362,7 @@ class SimpleBackgroundTask implements Runnable, BackgroundTaskStatusProvider {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return progressText2;
 	}
@@ -363,6 +371,7 @@ class SimpleBackgroundTask implements Runnable, BackgroundTaskStatusProvider {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
@@ -371,6 +380,7 @@ class SimpleBackgroundTask implements Runnable, BackgroundTaskStatusProvider {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -379,6 +389,7 @@ class SimpleBackgroundTask implements Runnable, BackgroundTaskStatusProvider {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
@@ -387,6 +398,7 @@ class SimpleBackgroundTask implements Runnable, BackgroundTaskStatusProvider {
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		finished = false;
 		if (runTask1 != null)
@@ -410,7 +422,13 @@ class SimpleBackgroundTask implements Runnable, BackgroundTaskStatusProvider {
 		finished = true;
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		// empty
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }
