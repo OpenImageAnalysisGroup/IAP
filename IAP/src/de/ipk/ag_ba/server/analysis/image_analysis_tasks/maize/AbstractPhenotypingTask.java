@@ -167,7 +167,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			try {
 				for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 					final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
-					
 					maxCon.acquire(1);
 					try {
 						Thread t = new Thread(new Runnable() {
