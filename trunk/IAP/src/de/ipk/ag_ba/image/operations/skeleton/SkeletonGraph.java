@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.AttributeHelper;
+import org.SystemAnalysis;
 import org.Vector2i;
 import org.graffiti.attributes.ObjectAttribute;
 import org.graffiti.graph.AdjListGraph;
@@ -12,7 +13,6 @@ import org.graffiti.graph.Edge;
 import org.graffiti.graph.Node;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class SkeletonGraph {
 	private static final boolean DEBUG = false;
@@ -140,7 +140,7 @@ public class SkeletonGraph {
 		ArrayList<Node> delN = new ArrayList<Node>();
 		for (Node n : graph.getNodes()) {
 			if (n.getDegree() > 4)
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">INTERNAL ERROR: FOUND HIGH SKELETON GRAPH NODE DEGREE: " + n.getDegree());
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INTERNAL ERROR: FOUND HIGH SKELETON GRAPH NODE DEGREE: " + n.getDegree());
 			else
 				if (n.getDegree() == 4) {
 					LimbInfo[] lia = new LimbInfo[4];

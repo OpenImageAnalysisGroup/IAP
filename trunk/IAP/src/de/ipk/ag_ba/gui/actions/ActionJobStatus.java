@@ -10,6 +10,7 @@ import org.ErrorMsg;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 public class ActionJobStatus extends AbstractNavigationAction {
 	
@@ -26,6 +27,8 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		this.jobStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
 			int remainingJobs = 0;
 			int part_cnt = 0;
+			
+			BackgroundTaskStatusProviderSupportingExternalCallImpl status3provider = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
 			
 			@Override
 			public void setCurrentStatusValue(int value) {
@@ -78,10 +81,14 @@ public class ActionJobStatus extends AbstractNavigationAction {
 				} catch (Exception e) {
 					System.out.println("ERROR: " + e.getMessage());
 				}
-				if (part_cnt > 0)
-					return 100d * (part_cnt - remainingJobs) / part_cnt;
-				else
+				if (part_cnt > 0) {
+					double value = 100d * (part_cnt - remainingJobs) / part_cnt;
+					status3provider.setCurrentStatusValueFine(value);
+					return value;
+				} else {
+					status3provider.setCurrentStatusValueFine(-1);
 					return -1;
+				}
 			}
 			
 			@Override
@@ -127,6 +134,11 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			public void setCurrentStatusValueFineAdd(double smallProgressStep) {
 				// TODO Auto-generated method stub
 				
+			}
+			
+			@Override
+			public String getCurrentStatusMessage3() {
+				return status3provider.getCurrentStatusMessage3();
 			}
 		};
 	}

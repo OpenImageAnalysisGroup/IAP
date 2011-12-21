@@ -24,7 +24,6 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
@@ -358,7 +357,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 					time2expList.get(submissionTime).add(exp);
 				}
 				for (Long time : time2expList.keySet()) {
-					String folderName = SystemAnalysisExt.getCurrentTime(time);
+					String folderName = SystemAnalysis.getCurrentTime(time);
 					res.add(new NavigationButton(createSubFolderActionForTemporaryResults2(folderName, time2expList.get(time)), src.getGUIsetting()));
 				}
 				NavigationButton tb = new NavigationButton(
@@ -528,7 +527,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				nn[0] = nn[0].substring(nn[0].lastIndexOf(".") + ".".length());
 			if (nn[3] != null && nn[3].contains(","))
 				nn[3] = nn[3].split(",")[0];
-			String start = SystemAnalysisExt.getCurrentTime(Long.parseLong(nn[3]));
+			String start = SystemAnalysis.getCurrentTime(Long.parseLong(nn[3]));
 			n = nn[0] + " (" + nn[1] + "/" + nn[2] + ") started " + start;
 		} catch (Exception err) {
 			System.err.println("ERROR: Problematic experiment name: " + exp.getExperimentName());

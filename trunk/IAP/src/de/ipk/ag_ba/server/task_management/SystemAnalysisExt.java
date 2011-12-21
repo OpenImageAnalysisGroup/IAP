@@ -13,7 +13,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,12 +20,12 @@ import java.util.HashSet;
 import org.AttributeHelper;
 import org.ErrorMsg;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.SystemInfo;
 
 import oshi.software.os.windows.WindowsHardwareAbstractionLayer;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.ProgressStatusService;
 
 public class SystemAnalysisExt {
 	
@@ -301,7 +300,7 @@ public class SystemAnalysisExt {
 					return addrs[i];
 			}
 		} catch (Exception e) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + e.getMessage());
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 		}
 		InetAddress[] addrs =
 				getAllLocalUsingNetworkInterface();
@@ -375,15 +374,7 @@ public class SystemAnalysisExt {
 		return iAddresses;
 	}
 	
-	private static SimpleDateFormat sdf = new SimpleDateFormat();
-	
-	public static String getCurrentTime() {
-		return sdf.format(new Date());
-	}
-	
-	public static String getCurrentTime(long time) {
-		return sdf.format(new Date(time));
-	}
+	public static SimpleDateFormat sdf = new SimpleDateFormat();
 	
 	private static long lastNanos = System.nanoTime();
 	private static long lastProcessCPUnanos = getProcessNanos();
@@ -503,11 +494,5 @@ public class SystemAnalysisExt {
 				res.add(hsm);
 		}
 		return res;
-	}
-	
-	public static String getWaitTime(long fullTime) {
-		ProgressStatusService pss = new ProgressStatusService();
-		String res = pss.getRemainTimeString(-1, fullTime / 1000, 2);
-		return StringManipulationTools.stringReplace(res, "&nbsp;", " ");
 	}
 }

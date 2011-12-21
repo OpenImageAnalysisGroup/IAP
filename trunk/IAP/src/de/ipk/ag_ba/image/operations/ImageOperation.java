@@ -57,7 +57,6 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.mongo.IAPservice;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -1173,7 +1172,7 @@ public class ImageOperation {
 	// ############# print #####################
 	
 	public void printImage() {
-		new FlexibleImage(image).print(SystemAnalysisExt.getCurrentTime());
+		new FlexibleImage(image).print(SystemAnalysis.getCurrentTime());
 	}
 	
 	public ImageOperation print(String title, boolean doIt) {

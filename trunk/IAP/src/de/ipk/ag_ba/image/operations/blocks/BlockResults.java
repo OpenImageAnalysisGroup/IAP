@@ -287,6 +287,7 @@ public class BlockResults implements BlockResultSet {
 		res.put("side.leaf.length.sum", "px");
 		res.put("side.leaf.length.sum.norm", "mm");
 		res.put("volume.iap", "px^3");
+		res.put("volume.lt", "px^3");
 		res.put("side.area", "px");
 		res.put("side.area.norm", "mm^2");
 		res.put("side.border.length", "px");

@@ -39,7 +39,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.pattern_springembedde
  *         (c) 2004 IPK-Gatersleben
  */
 public class KeggSoapAndPathwayService
-					implements Runnable, BackgroundTaskStatusProvider, HelperClass {
+		implements Runnable, BackgroundTaskStatusProvider, HelperClass {
 	
 	private String status1;
 	private String targetDirectory;
@@ -50,22 +50,22 @@ public class KeggSoapAndPathwayService
 	private Color enzymeColor;
 	
 	public void setOptions(String targetdirectory, ArrayList<KeggPathwayEntry> keggPathwayEntries,
-						Color enzymeColor) {
+			Color enzymeColor) {
 		this.targetDirectory = targetdirectory;
 		this.keggPathwayEntries = keggPathwayEntries;
 		this.enzymeColor = enzymeColor;
 	}
 	
 	private static Graph getKeggPathway(
-						int index,
-						ArrayList<KeggPathwayEntry> keggPathwayEntries,
-						Color enzymeColor) {
+			int index,
+			ArrayList<KeggPathwayEntry> keggPathwayEntries,
+			Color enzymeColor) {
 		if (index >= keggPathwayEntries.size() || index < 0)
 			return null;
 		else {
 			try {
 				return KeggService.getKeggPathwayGravistoGraph(keggPathwayEntries
-									.get(index), false, enzymeColor);
+						.get(index), false, enzymeColor);
 			} catch (MalformedURLException er) {
 				ErrorMsg.addErrorMessage(er);
 			} catch (IOException er) {
@@ -78,32 +78,32 @@ public class KeggSoapAndPathwayService
 	}
 	
 	public static void interpreteDatabaseIdentifiers(Collection<Node> nodes,
-						boolean storeOldId) {
+			boolean storeOldId) {
 		String oldid = "oldid";
 		if (!storeOldId)
 			oldid = null;
 		DatabaseBasedLabelReplacementService mrs = new DatabaseBasedLabelReplacementService(
-							nodes,
-							false, // compoundNameToID,
+				nodes,
+				false, // compoundNameToID,
 				true, // boolean compoundIDtoName,
 				false, // boolean ecNumberToName,
 				false, // boolean ecNameOrSynonymeToECnumber,
 				false, // boolean reactionNumberToName,
 				false, // boolean reactionNameToNo,
 				false,
-							false,
-							true,
-							false,
-							true, // boolean increaseNodeSize,
+				false,
+				true,
+				false,
+				true, // boolean increaseNodeSize,
 				false, // boolean useShortName
 				storeOldId,
-							true, // use greek name
+				true, // use greek name
 				oldid);
 		mrs.run();
 	}
 	
 	public static void interpreteDatabaseIdentifiers(Collection<Node> nodes,
-						boolean storeOldId, boolean resizeNodes) {
+			boolean storeOldId, boolean resizeNodes) {
 		String oldid = "oldlabel";
 		ArrayList<Node> validNodes = new ArrayList<Node>();
 		for (Node n : nodes) {
@@ -125,8 +125,8 @@ public class KeggSoapAndPathwayService
 		if (!storeOldId)
 			oldid = null;
 		DatabaseBasedLabelReplacementService mrs = new DatabaseBasedLabelReplacementService(
-							validNodes,
-							false, // compoundNameToID,
+				validNodes,
+				false, // compoundNameToID,
 				true, // boolean compoundIDtoName,
 				false, // boolean ecNumberToName,
 				false, // boolean ecNameOrSynonymeToECnumber,
@@ -139,7 +139,7 @@ public class KeggSoapAndPathwayService
 				resizeNodes, // boolean increaseNodeSize,
 				false, // boolean useShortName
 				storeOldId,
-							true, // use greek name
+				true, // use greek name
 				oldid);
 		mrs.run();
 	}
@@ -166,6 +166,7 @@ public class KeggSoapAndPathwayService
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		int i = 0;
 		Graph graph;
@@ -179,9 +180,9 @@ public class KeggSoapAndPathwayService
 			if (graph == null) {
 				errorCount++;
 				System.err.println("Kegg Pathway " + keggPathwayEntries.get(i - 1) + " could not be loaded or is empty." +
-									"<br>URL: " + keggPathwayEntries.get(i - 1).getPathwayURL());
+						"<br>URL: " + keggPathwayEntries.get(i - 1).getPathwayURL());
 				ErrorMsg.addErrorMessage("Kegg Pathway " + keggPathwayEntries.get(i - 1) + " could not be loaded or is empty." +
-									"<br>URL: " + keggPathwayEntries.get(i - 1).getPathwayURL());
+						"<br>URL: " + keggPathwayEntries.get(i - 1).getPathwayURL());
 				continue;
 			}
 			String errTxt = "";
@@ -215,7 +216,7 @@ public class KeggSoapAndPathwayService
 			statusFine = (i + 0.33d) / maxI * 100d;
 			interpreteDatabaseIdentifiers(graph.getNodes(), true);
 			String fileName = keggPathwayEntries.get(i - 1).getMapName() + "_" + keggPathwayEntries.get(i - 1).getPathwayName().replaceAll("/", "_").trim()
-								+ ".gml";
+					+ ".gml";
 			writeGML(graph, targetDirectory + fileName);
 			statusFine = (i + 0.66d) / maxI * 100d;
 			success++;
@@ -238,6 +239,7 @@ public class KeggSoapAndPathwayService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return (int) getCurrentStatusValueFine();
 	}
@@ -246,6 +248,7 @@ public class KeggSoapAndPathwayService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return statusFine;
 	}
@@ -254,6 +257,7 @@ public class KeggSoapAndPathwayService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -262,6 +266,7 @@ public class KeggSoapAndPathwayService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -270,6 +275,7 @@ public class KeggSoapAndPathwayService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
@@ -278,6 +284,7 @@ public class KeggSoapAndPathwayService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -286,12 +293,19 @@ public class KeggSoapAndPathwayService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusFine = value;
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 	
 	// private static void initKeggList() throws JaxenException, IOException, ServiceException {

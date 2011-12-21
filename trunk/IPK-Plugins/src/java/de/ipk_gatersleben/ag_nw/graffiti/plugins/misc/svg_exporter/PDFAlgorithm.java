@@ -32,9 +32,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  * @author Christian Klukas
  */
 public class PDFAlgorithm
-					extends AbstractAlgorithm
-					implements NeedsSwingThread,
-					BackgroundTaskStatusProvider {
+		extends AbstractAlgorithm
+		implements NeedsSwingThread,
+		BackgroundTaskStatusProvider {
 	
 	private int currentProgressStatusValue = -1;
 	private String currentStatus1;
@@ -65,6 +65,7 @@ public class PDFAlgorithm
 	 * 
 	 * @see org.graffiti.plugin.algorithm.Algorithm#getName()
 	 */
+	@Override
 	public String getName() {
 		return "Create PDF image";
 	}
@@ -99,6 +100,7 @@ public class PDFAlgorithm
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 * @see #setActiveSession(Session)
 	 */
+	@Override
 	public void execute() {
 		filename = GravistoService.getInstance().getMainFrame().getActiveEditorSession().getGraph().getName();
 		if (filename != null)
@@ -115,13 +117,14 @@ public class PDFAlgorithm
 		
 		MainFrame.showMessage("", MessageType.INFO, 10000);
 		BackgroundTaskHelper bth =
-							new BackgroundTaskHelper(new Runnable() {
-								public void run() {
-									createSVGandPDF(svgAlgo, newFileName);
-								}
-							},
-												this, "Create PDF...", "Create PDF Task", false, false
-							);
+				new BackgroundTaskHelper(new Runnable() {
+					@Override
+					public void run() {
+						createSVGandPDF(svgAlgo, newFileName);
+					}
+				},
+						this, "Create PDF...", "Create PDF Task", false, false
+				);
 		bth.startWork(this);
 	}
 	
@@ -210,7 +213,7 @@ public class PDFAlgorithm
 		 * "-m", "application/pdf"
 		 * });
 		 */
-
+		
 	}
 	
 	private void myMain(String fileName) {
@@ -230,6 +233,7 @@ public class PDFAlgorithm
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return currentProgressStatusValue;
 	}
@@ -238,6 +242,7 @@ public class PDFAlgorithm
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return currentStatus1;
 	}
@@ -246,6 +251,7 @@ public class PDFAlgorithm
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return currentStatus2;
 	}
@@ -254,6 +260,7 @@ public class PDFAlgorithm
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
@@ -262,6 +269,7 @@ public class PDFAlgorithm
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return getCurrentStatusValue();
 	}
@@ -270,6 +278,7 @@ public class PDFAlgorithm
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return userBreak;
 	}
@@ -278,11 +287,18 @@ public class PDFAlgorithm
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		userBreak = false;
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		currentProgressStatusValue = value;
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

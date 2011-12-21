@@ -41,9 +41,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.GUIhelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class TranspathService
-					implements
-					BackgroundTaskStatusProvider,
-					FileDownloadStatusInformationProvider, HelperClass {
+		implements
+		BackgroundTaskStatusProvider,
+		FileDownloadStatusInformationProvider, HelperClass {
 	private static boolean read_transpath_DB_txt = false;
 	
 	private static String transpathDBrelease = "unknown";
@@ -58,6 +58,7 @@ public class TranspathService
 	private static String status2;
 	private static int statusVal = -1;
 	
+	@Override
 	public synchronized void finishedNewDownload() {
 		read_transpath_DB_txt = false;
 		transpathDBrelease = "unknown";
@@ -77,19 +78,20 @@ public class TranspathService
 				read_transpath_DB_txt = true;
 				final TranspathService tps = new TranspathService();
 				BackgroundTaskHelper bth = new BackgroundTaskHelper(
-									new Runnable() {
-										public void run() {
-											statusVal = -1;
-											read_transpath_DB_txt = true;
-											readLigantTXTforReleaseInfo();
-											readTranspathDB();
-											statusVal = 100;
-										}
-									},
-									tps,
-									"<html>TRANSPATH &reg; Database",
-									"<html>TRANSPATH &reg; Database Service",
-									true, false);
+						new Runnable() {
+							@Override
+							public void run() {
+								statusVal = -1;
+								read_transpath_DB_txt = true;
+								readLigantTXTforReleaseInfo();
+								readTranspathDB();
+								statusVal = 100;
+							}
+						},
+						tps,
+						"<html>TRANSPATH &reg; Database",
+						"<html>TRANSPATH &reg; Database Service",
+						true, false);
 				bth.startWork(MainFrame.getInstance());
 			}
 		} else {
@@ -143,7 +145,7 @@ public class TranspathService
 	}
 	
 	private static void analyze(String fileName, String info, Class<?> entityType,
-						Map<String, TranspathEntityType> entries, double startProgress, double endProgress) {
+			Map<String, TranspathEntityType> entries, double startProgress, double endProgress) {
 		status1 = "Analyse " + info + " information...";
 		statusVal = (int) startProgress;
 		InputSource input = getFileInputSource(fileName);
@@ -228,6 +230,7 @@ public class TranspathService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return statusVal;
 	}
@@ -236,6 +239,7 @@ public class TranspathService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return getCurrentStatusValue();
 	}
@@ -244,6 +248,7 @@ public class TranspathService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -252,6 +257,7 @@ public class TranspathService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -260,6 +266,7 @@ public class TranspathService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		// pleaseStop = true;
 	}
@@ -268,6 +275,7 @@ public class TranspathService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -276,26 +284,30 @@ public class TranspathService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusVal = value;
 	}
 	
+	@Override
 	public String getDescription() {
 		return "";
 	}
 	
+	@Override
 	public JComponent getStatusPane(boolean showEmpty) {
 		
 		initService(false);
 		
 		FolderPanel res = new FolderPanel("<html>" +
-							"TRANSPATH &reg; Database<br><small>" +
-							"(" +
-							"contains information about signal transduction molecules and reactions)");
+				"TRANSPATH &reg; Database<br><small>" +
+				"(" +
+				"contains information about signal transduction molecules and reactions)");
 		res.setFrameColor(Color.LIGHT_GRAY, null, 1, 5);
 		
 		int b = 5; // normal border
@@ -315,11 +327,11 @@ public class TranspathService
 		}
 		
 		res.addGuiComponentRow(
-							new JLabel("<html>" +
-												"Downloaded Files:&nbsp;"),
-							FolderPanel.getBorderedComponent(
-												new JLabel(status2), b, b, b, b),
-							false);
+				new JLabel("<html>" +
+						"Downloaded Files:&nbsp;"),
+				FolderPanel.getBorderedComponent(
+						new JLabel(status2), b, b, b, b),
+				false);
 		
 		ArrayList<JComponent> actionButtons = new ArrayList<JComponent>();
 		actionButtons.add(getWebsiteButton());
@@ -329,10 +341,10 @@ public class TranspathService
 		pretifyButtons(actionButtons);
 		
 		res.addGuiComponentRow(
-							new JLabel("<html>" +
-												"Visit Website(s)"),
-							TableLayout.getMultiSplit(actionButtons, TableLayoutConstants.PREFERRED, bB, bB, bB, bB),
-							false);
+				new JLabel("<html>" +
+						"Visit Website(s)"),
+				TableLayout.getMultiSplit(actionButtons, TableLayoutConstants.PREFERRED, bB, bB, bB, bB),
+				false);
 		
 		res.layoutRows();
 		return res;
@@ -340,20 +352,20 @@ public class TranspathService
 	
 	private JComponent getDownloadButton() {
 		return GUIhelper.getWebsiteButton(
-							"Download",
-							"http://www.biobase-international.com", ReleaseInfo.getAppFolder(),
-							"<html>" +
-												"The TRANSPATH database is available from the website<br>" +
-												"http://www.biobase-international.com<br>" +
-												"A explanation on how to prepare the database files, available from<br>" +
-												"Biobase for free to academic users and at a cost for commercial users,<br>" +
-												"for this application may be inquired from the authors<br>" +
-												"of this application, and _not_ from biobase." +
-												"The specially prepared files need to be placed in following location:<br><br>" +
-												"<code><b>" + ReleaseInfo.getAppFolder() + "</b></code><br><br>" +
-												"After closing and re-opening this application, the TRANSPATH &reg; database<br>" +
-												"will be available to the system.",
-							"Download Instructions");
+				"Download",
+				"http://www.biobase-international.com", ReleaseInfo.getAppFolder(),
+				"<html>" +
+						"The TRANSPATH database is available from the website<br>" +
+						"http://www.biobase-international.com<br>" +
+						"A explanation on how to prepare the database files, available from<br>" +
+						"Biobase for free to academic users and at a cost for commercial users,<br>" +
+						"for this application may be inquired from the authors<br>" +
+						"of this application, and _not_ from biobase." +
+						"The specially prepared files need to be placed in following location:<br><br>" +
+						"<code><b>" + ReleaseInfo.getAppFolder() + "</b></code><br><br>" +
+						"After closing and re-opening this application, the TRANSPATH &reg; database<br>" +
+						"will be available to the system.",
+				"Download Instructions");
 	}
 	
 	private JComponent getLicenseButton() {
@@ -380,5 +392,11 @@ public class TranspathService
 	
 	public static TranspathMolecule getMolecule(String moleculeID) {
 		return tpMolecules.get(moleculeID);
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

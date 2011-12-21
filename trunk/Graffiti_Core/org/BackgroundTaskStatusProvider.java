@@ -53,6 +53,12 @@ public interface BackgroundTaskStatusProvider {
 	public abstract String getCurrentStatusMessage2();
 	
 	/**
+	 * Is mostly computed automatically, in this case it contains the
+	 * estimated finishing time/date, estimated remaining time, the overall run time.
+	 */
+	public abstract String getCurrentStatusMessage3();
+	
+	/**
 	 * If this method is called on the status provider, the linked work task
 	 * should stop its execution as soon as possible.
 	 */

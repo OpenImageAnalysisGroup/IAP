@@ -118,4 +118,13 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProviderSuppo
 		
 	}
 	
+	@Override
+	public String getCurrentStatusMessage3() {
+		try {
+			return cmd.getCurrentStatusMessage3();
+		} catch (NullPointerException npe) {
+			return "";
+		}
+	}
+	
 }

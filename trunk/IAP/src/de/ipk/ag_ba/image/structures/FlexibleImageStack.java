@@ -18,7 +18,6 @@ import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.utils.MyFileSaver;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class FlexibleImageStack {
 	
@@ -47,7 +46,7 @@ public class FlexibleImageStack {
 		try {
 			stack.addSlice(label, image.getAsImagePlus().getProcessor());
 		} catch (Exception e) {
-			System.err.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: COULD NOT ADD IMAGE TO IMAGE-STACK: " +
+			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: COULD NOT ADD IMAGE TO IMAGE-STACK: " +
 					e.getMessage());
 		}
 	}

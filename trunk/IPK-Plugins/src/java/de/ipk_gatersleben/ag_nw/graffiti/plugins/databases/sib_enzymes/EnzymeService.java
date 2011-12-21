@@ -64,6 +64,7 @@ public class EnzymeService extends MemoryHog
 	private static String status2;
 	private static int statusVal = -1;
 	
+	@Override
 	public synchronized void finishedNewDownload() {
 		read_enzclass_txt = false;
 		enzymeRelease = "unknown version";
@@ -97,6 +98,7 @@ public class EnzymeService extends MemoryHog
 				final EnzymeService enzS = new EnzymeService();
 				BackgroundTaskHelper bth = new BackgroundTaskHelper(
 						new Runnable() {
+							@Override
 							public void run() {
 								statusVal = -1;
 								if (todoReadEnzClass)
@@ -455,6 +457,7 @@ public class EnzymeService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return statusVal;
 	}
@@ -463,6 +466,7 @@ public class EnzymeService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return getCurrentStatusValue();
 	}
@@ -471,6 +475,7 @@ public class EnzymeService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -479,6 +484,7 @@ public class EnzymeService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -487,6 +493,7 @@ public class EnzymeService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		// pleaseStop = true;
 	}
@@ -495,6 +502,7 @@ public class EnzymeService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -503,18 +511,22 @@ public class EnzymeService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusVal = value;
 	}
 	
+	@Override
 	public String getDescription() {
 		return "";
 	}
 	
+	@Override
 	public JComponent getStatusPane(boolean showEmpty) {
 		FolderPanel res = new FolderPanel("<html>SIB Enzyme Database<br><small>" +
 				"(contains information about enzyme IDs, names and synonyms)");
@@ -678,8 +690,14 @@ public class EnzymeService extends MemoryHog
 	 * (non-Javadoc)
 	 * @see org.graffiti.editor.MemoryHog#freeMemory()
 	 */
+	@Override
 	public void freeMemory() {
 		if (doFreeMemory())
 			finishedNewDownload();
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

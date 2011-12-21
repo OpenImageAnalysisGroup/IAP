@@ -12,13 +12,13 @@ import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudHost;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * @author klukas
@@ -44,15 +44,15 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 					try {
 						String[] hhh = hostInfo.split("_", 2);
 						String host = hhh[0];
-						niceHostName = "" + host + "<br>(up " + SystemAnalysisExt.getCurrentTime(Long.parseLong(hhh[1])) + ")";
+						niceHostName = "" + host + "<br>(up " + SystemAnalysis.getCurrentTime(Long.parseLong(hhh[1])) + ")";
 						try {
 							InetAddress addr = InetAddress.getByName(host);
 							String hostname = addr.getHostName();
 							host = hostname;
 						} catch (Exception errr) {
-							niceHostName = host + "<br>(up " + SystemAnalysisExt.getCurrentTime(Long.parseLong(hhh[1])) + ")";
+							niceHostName = host + "<br>(up " + SystemAnalysis.getCurrentTime(Long.parseLong(hhh[1])) + ")";
 						}
-						niceHostName = host + "<br>(up " + SystemAnalysisExt.getCurrentTime(Long.parseLong(hhh[1])) + ")";
+						niceHostName = host + "<br>(up " + SystemAnalysis.getCurrentTime(Long.parseLong(hhh[1])) + ")";
 						
 					} catch (Exception err) {
 						// ignore unknown formatting
@@ -66,7 +66,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 		
 		this.hostStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
 			
-			private String hostInfo;
+			private String hostInfo, status3;
 			private double lastStatus = -1;
 			
 			@Override
@@ -92,6 +92,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 						ActionCloudHostInformation.this.ip = ch;
 						lastStatus = ch.getTaskProgress();
 						hostInfo = ch.getHostInfo();
+						status3 = ch.getStatus3();
 						String rA = "";
 						if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
 							rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
@@ -153,6 +154,11 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 			public void setCurrentStatusValueFineAdd(double smallProgressStep) {
 				// TODO Auto-generated method stub
 				
+			}
+			
+			@Override
+			public String getCurrentStatusMessage3() {
+				return status3;
 			}
 		};
 	}

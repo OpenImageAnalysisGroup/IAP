@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemAnalysis;
 
 import qmwi.kseg.som.SOM_ColorReduce;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /*
  * Created on Dec 17, 2009 by Christian Klukas
@@ -194,7 +194,7 @@ public class MyPicture {
 			}
 		}
 		if (nottransp / (double) allp > 0.50)
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">WARNING: High Picture Fill: " + (int) (100d * nottransp / allp) + "%");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: High Picture Fill: " + (int) (100d * nottransp / allp) + "%");
 		
 		// this.ta = ta;
 		

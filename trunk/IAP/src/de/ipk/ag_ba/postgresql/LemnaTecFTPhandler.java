@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -26,7 +27,6 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -105,11 +105,11 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					try {
 						MyAdvancedFTP.processFTPdownload(status, ur, bos);
 					} catch (Error e) {
-						System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: ERROR: FTP DOWNLOAD FAILED (" + e.getMessage() + ") // "
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: ERROR: FTP DOWNLOAD FAILED (" + e.getMessage() + ") // "
 								+ ur.substring(ur.indexOf("@")));
 						return null;
 					} catch (Exception e) {
-						System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: FTP DOWNLOAD FAILED (" + e.getMessage() + ") // "
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: FTP DOWNLOAD FAILED (" + e.getMessage() + ") // "
 								+ ur.substring(ur.indexOf("@")));
 						return null;
 					}

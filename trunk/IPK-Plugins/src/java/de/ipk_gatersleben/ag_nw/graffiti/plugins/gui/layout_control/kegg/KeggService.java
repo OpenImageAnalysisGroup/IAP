@@ -90,16 +90,16 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 				id2nh.put(id, nh);
 		}
 		tf.add("ROW" + "\t" + "ID" + "\t" + "MASS" + "\t" + "FORMULA" + "\t"
-							+ "NAME");
+				+ "NAME");
 		int row = 1;
 		for (String id : id2nh.keySet()) {
 			NodeHelper nh = id2nh.get(id);
 			String mass = (String) nh.getAttributeValue("kegg", "mass", "NA", "");
 			String formula = (String) nh.getAttributeValue("kegg", "formula",
-								"NA", "");
+					"NA", "");
 			String name = nh.getLabel();
 			tf.add(getNumString("" + row++, 3) + "\t" + id + "\t" + mass + "\t"
-								+ formula + "\t" + name);
+					+ formula + "\t" + name);
 		}
 		try {
 			tf.write("/home/klukas/steffen.txt");
@@ -123,31 +123,33 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	 * @param loadBlockingIntoThisGraph
 	 */
 	public static boolean loadKeggPathwayIntoEditor(
-						final KeggPathwayEntry myEntry, final Graph loadBlockingIntoThisGraph,
-						final Color enzymeColor, final boolean separateClusters,
-						final boolean processLabels) {
+			final KeggPathwayEntry myEntry, final Graph loadBlockingIntoThisGraph,
+			final Color enzymeColor, final boolean separateClusters,
+			final boolean processLabels) {
 		final ObjectRef objref = new ObjectRef();
 		objref.setObject(new Boolean(true));
 		final Thread t = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				Graph myGraph = null;
 				try {
 					myGraph = KeggService.getKeggPathwayGravistoGraph(myEntry,
-										false /* true */, enzymeColor);
+							false /* true */, enzymeColor);
 					
 					if (processLabels) {
 						MainFrame.showMessage("Interpret database identifiers",
-											MessageType.PERMANENT_INFO);
+								MessageType.PERMANENT_INFO);
 						KeggSoapAndPathwayService.interpreteDatabaseIdentifiers(
-											myGraph.getNodes(), true, false);
+								myGraph.getNodes(), true, false);
 					}
 					
 					MainFrame.showMessage(
-										"Pathway loaded and processed, creating view...",
-										MessageType.INFO);
+							"Pathway loaded and processed, creating view...",
+							MessageType.INFO);
 					if (loadBlockingIntoThisGraph == null) {
 						final Graph myGraphF = myGraph;
 						SwingUtilities.invokeLater(new Runnable() {
+							@Override
 							public void run() {
 								MainFrame.getInstance().showGraph(myGraphF, null);
 							}
@@ -156,23 +158,23 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 						loadBlockingIntoThisGraph.setName(myGraph.getName(true));
 						ArrayList<GraphElement> knownElements = new ArrayList<GraphElement>();
 						knownElements.addAll(loadBlockingIntoThisGraph
-											.getGraphElements());
+								.getGraphElements());
 						mergeKeggGraphs(loadBlockingIntoThisGraph, myGraph, myEntry
-											.getTargetPosition(), true, separateClusters);
+								.getTargetPosition(), true, separateClusters);
 						Selection sel = new Selection("");
 						for (GraphElement ge : loadBlockingIntoThisGraph
-											.getGraphElements()) {
+								.getGraphElements()) {
 							if (!knownElements.contains(ge))
 								sel.add(ge);
 						}
 						try {
 							if (MainFrame.getInstance().getActiveEditorSession() != null) {
 								if (MainFrame.getInstance().getActiveEditorSession()
-													.getGraph() == loadBlockingIntoThisGraph) {
+										.getGraph() == loadBlockingIntoThisGraph) {
 									MainFrame.getInstance().getActiveEditorSession()
-														.getSelectionModel().setActiveSelection(sel);
+											.getSelectionModel().setActiveSelection(sel);
 									MainFrame.getInstance().getActiveEditorSession()
-														.getSelectionModel().selectionChanged();
+											.getSelectionModel().selectionChanged();
 								}
 							}
 						} catch (Exception e) {
@@ -183,7 +185,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 					ErrorMsg.addErrorMessage(e.getLocalizedMessage());
 				} catch (IOException e) {
 					MainFrame.showMessage("Not available: "
-										+ myEntry.getPathwayURLstring(), MessageType.INFO);
+							+ myEntry.getPathwayURLstring(), MessageType.INFO);
 				}
 				String detailInfo;
 				if (myGraph == null) {
@@ -191,12 +193,12 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 					objref.setObject(new Boolean(false));
 				} else {
 					detailInfo = "graph with " + myGraph.getNumberOfNodes()
-										+ " nodes and " + myGraph.getNumberOfEdges()
-										+ " edges created";
+							+ " nodes and " + myGraph.getNumberOfEdges()
+							+ " edges created";
 					objref.setObject(new Boolean(true));
 				}
 				MainFrame.showMessage("Processing complete (" + detailInfo + ")",
-									MessageType.INFO);
+						MessageType.INFO);
 			}
 		});
 		if (loadBlockingIntoThisGraph == null) {
@@ -221,17 +223,17 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	}
 	
 	public static void mergeKeggGraphs(Graph mergeIntoThisGraph, Graph newGraph,
-						Vector2d centerOfNewGraph, boolean linkToExistingMaps,
-						boolean clusterSeparation) {
+			Vector2d centerOfNewGraph, boolean linkToExistingMaps,
+			boolean clusterSeparation) {
 		Collection<GraphElement> addedNodesAndEdges = mergeIntoThisGraph
-							.addGraph(newGraph);
+				.addGraph(newGraph);
 		if (centerOfNewGraph != null) {
 			Vector2d currentCenter = NodeTools.getCenter(addedNodesAndEdges);
 			for (GraphElement ge : addedNodesAndEdges) {
 				if (ge instanceof Node) {
 					NodeHelper nh = new NodeHelper((Node) ge);
 					nh.setPosition(nh.getX() - currentCenter.x + centerOfNewGraph.x,
-										nh.getY() - currentCenter.y + centerOfNewGraph.y);
+							nh.getY() - currentCenter.y + centerOfNewGraph.y);
 				}
 			}
 		}
@@ -253,17 +255,17 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 						NodeHelper snh = new NodeHelper(searchNode);
 						String sourcePathwayName = snh.getClusterID(null);
 						if (sourcePathwayName != null
-											&& sourcePathwayName.equalsIgnoreCase(kegg_map_link)) {
+								&& sourcePathwayName.equalsIgnoreCase(kegg_map_link)) {
 							String kegg_name_target = null;
 							String skid = KeggGmlHelper.getKeggId(searchNode);
 							if (skid != null && skid.startsWith("path:"))
 								kegg_name_target = skid;
 							if (kegg_name_source != null
-												&& kegg_name_target != null
-												&& kegg_name_source
-																	.equalsIgnoreCase(kegg_name_target)) {
+									&& kegg_name_target != null
+									&& kegg_name_source
+											.equalsIgnoreCase(kegg_name_target)) {
 								Edge ne = GraphHelperBio.addEdgeCopyIfNotExistant(e, a,
-													searchNode);
+										searchNode);
 								AttributeHelper.setArrowtail(ne, false);
 								AttributeHelper.setArrowhead(ne, false);
 								if (!toBeDeleted.contains(n))
@@ -279,19 +281,19 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 			HashMap<String, Node> mapName2node = new HashMap<String, Node>();
 			for (NodeHelper nh : GraphHelper.getHelperNodes(mergeIntoThisGraph)) {
 				String keggType = (String) nh.getAttributeValue("kegg",
-									"kegg_type", null, "");
+						"kegg_type", null, "");
 				if (keggType != null && keggType.equalsIgnoreCase("map")) {
 					String kegg_map_link = (String) nh.getAttributeValue("kegg",
-										"kegg_map_link", null, "");
+							"kegg_map_link", null, "");
 					if (kegg_map_link != null && kegg_map_link.length() > 0) {
 						kegg_map_link = StringManipulationTools.stringReplace(kegg_map_link,
-											"path:", "");
+								"path:", "");
 						if (mapName2node.containsKey(kegg_map_link)) {
 							Node existingMapNode = mapName2node.get(kegg_map_link);
 							for (Edge e : nh.getEdges()) {
 								mergeIntoThisGraph.addEdgeCopy(e, existingMapNode, (e
-													.getSource() == nh.getGraphNode() ? e.getTarget()
-													: e.getSource()));
+										.getSource() == nh.getGraphNode() ? e.getTarget()
+										: e.getSource()));
 							}
 							if (!toBeDeleted.contains(nh.getGraphNode()))
 								toBeDeleted.add(nh.getGraphNode());
@@ -319,24 +321,24 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	}
 	
 	public static void loadPathway(KeggPathwayEntry myEntry,
-						boolean processLabels) {
+			boolean processLabels) {
 		loadPathway(myEntry, null, processLabels);
 	}
 	
 	public static void loadPathway(KeggPathwayEntry myEntry, Graph targetGraph,
-						boolean processLabels) {
+			boolean processLabels) {
 		loadPathway(myEntry, targetGraph, null, processLabels);
 	}
 	
 	public static void loadPathway(KeggPathwayEntry myEntry, Graph targetGraph,
-						Node initialMapNode, boolean processLabels) {
+			Node initialMapNode, boolean processLabels) {
 		loadPathway(myEntry, targetGraph, initialMapNode, true, false,
-							processLabels);
+				processLabels);
 	}
 	
 	public static void loadPathway(KeggPathwayEntry myEntry, Graph targetGraph,
-						Node initialMapNode, boolean askForNewWindow,
-						boolean separateClusters, boolean processLabels) {
+			Node initialMapNode, boolean askForNewWindow,
+			boolean separateClusters, boolean processLabels) {
 		Object[] input;
 		if (!myEntry.isReferencePathway()) {
 			if (!askForNewWindow)
@@ -347,31 +349,31 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 						input = new Object[] { new Boolean(false), new Boolean(true) };
 					else
 						input = MyInputHelper.getInput(
-																"Please specify if you would like to load the pathway in a new window<br>"
-																					+ "or if you would like to add it to the current graph.",
-																"Load graph in new window?", new Object[] {
-																					null,
-																					null,
-																					(targetGraph == null ? null
-																										: "Load Graph in new Window?"),
-																					(targetGraph == null ? null : new Boolean(
-																										true)) });
+								"Please specify if you would like to load the pathway in a new window<br>"
+										+ "or if you would like to add it to the current graph.",
+								"Load graph in new window?", new Object[] {
+										null,
+										null,
+										(targetGraph == null ? null
+												: "Load Graph in new Window?"),
+										(targetGraph == null ? null : new Boolean(
+												true)) });
 				} else
 					input = MyInputHelper.getInput(
-															"Please specify if you would like to load the reference pathway<br>"
-																				+ "and use a color-code to mark organism-specific enzymes or if you<br>"
-																				+ "would like to load a organism-specific pathway.<br><br>"
-																				+ "The pathway with colored organism-specific enzymes looks closer<br>"
-																				+ "to the corresponding KEGG Pathway image. This is therefore the<br>"
-																				+ "recommended setting.",
-															"Colorize organism-specific Enzymes, load in new Window?",
-															new Object[] {
-																				"Colorize organism-specific Enzymes?",
-																				new Boolean(true),
-																				(targetGraph == null ? null
-																									: "Load Graph in new Window?"),
-																				(targetGraph == null ? null
-																									: new Boolean(true)) // ,
+							"Please specify if you would like to load the reference pathway<br>"
+									+ "and use a color-code to mark organism-specific enzymes or if you<br>"
+									+ "would like to load a organism-specific pathway.<br><br>"
+									+ "The pathway with colored organism-specific enzymes looks closer<br>"
+									+ "to the corresponding KEGG Pathway image. This is therefore the<br>"
+									+ "recommended setting.",
+							"Colorize organism-specific Enzymes, load in new Window?",
+							new Object[] {
+									"Colorize organism-specific Enzymes?",
+									new Boolean(true),
+									(targetGraph == null ? null
+											: "Load Graph in new Window?"),
+									(targetGraph == null ? null
+											: new Boolean(true)) // ,
 							// "Enzyme-Color",
 							// KeggService.getDefaultEnzymeColor()
 							});
@@ -384,15 +386,15 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 					input = new Object[] { new Boolean(false), new Boolean(true) };
 				else
 					input = MyInputHelper.getInput(
-															"Please specify if you would like to load the pathway in a new window<br>"
-																				+ "or if you would like to add it to the current graph.",
-															"Load graph in new window?",
-															new Object[] {
-																				null,
-																				null,
-																				(targetGraph == null ? null
-																									: "Load Graph in new Window?"),
-																				(targetGraph == null ? null : new Boolean(true)) });
+							"Please specify if you would like to load the pathway in a new window<br>"
+									+ "or if you would like to add it to the current graph.",
+							"Load graph in new window?",
+							new Object[] {
+									null,
+									null,
+									(targetGraph == null ? null
+											: "Load Graph in new Window?"),
+									(targetGraph == null ? null : new Boolean(true)) });
 		}
 		boolean deleteInitialMapNode = false;
 		if (input != null) {
@@ -408,28 +410,28 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 			Color enzymeColor = KeggService.getDefaultEnzymeColor();
 			if (useColor != null && useColor.booleanValue()) {
 				loadingOK = KeggService.loadKeggPathwayIntoEditor(
-									new KeggPathwayEntry(myEntry, true), targetGraph,
-									enzymeColor, separateClusters, processLabels);
+						new KeggPathwayEntry(myEntry, true), targetGraph,
+						enzymeColor, separateClusters, processLabels);
 			} else {
 				loadingOK = KeggService.loadKeggPathwayIntoEditor(myEntry,
-									targetGraph, enzymeColor, separateClusters, processLabels);
+						targetGraph, enzymeColor, separateClusters, processLabels);
 			}
 			if (deleteInitialMapNode && loadingOK && initialMapNode != null
-								&& initialMapNode.getGraph() != null)
+					&& initialMapNode.getGraph() != null)
 				initialMapNode.getGraph().deleteNode(initialMapNode);
 		}
 	}
 	
 	public static Graph getKeggPathwayGravistoGraph(KeggPathwayEntry myEntry,
-						boolean showErrorMessages, Color enzymeColors) throws JDOMException,
-						IOException, MalformedURLException {
+			boolean showErrorMessages, Color enzymeColors) throws JDOMException,
+			IOException, MalformedURLException {
 		return getKeggPathwayGravistoGraph(myEntry, showErrorMessages,
-							enzymeColors, true);
+				enzymeColors, true);
 	}
 	
 	public static Graph getKeggPathwayGravistoGraph(KeggPathwayEntry myEntry,
-						boolean showErrorMessages, Color enzymeColors, boolean includeMapNodes)
-						throws JDOMException, IOException, MalformedURLException {
+			boolean showErrorMessages, Color enzymeColors, boolean includeMapNodes)
+			throws JDOMException, IOException, MalformedURLException {
 		
 		InputStream inpStream = null;
 		Graph myGraph = new AdjListGraph();
@@ -437,7 +439,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 		try {
 			if (myEntry.getPathwayURLstring() != null)
 				AttributeHelper.setAttribute(myGraph, "kegg", "xml_url", myEntry
-									.getPathwayURLstring());
+						.getPathwayURLstring());
 			SAXBuilder builder = new SAXBuilder();
 			Document doc;
 			
@@ -452,24 +454,24 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 				
 				if (myEntry.isColorEnzymesAndUseReferencePathway()) {
 					colorizeEnzymesGlycansCompounds(myGraph, myEntry.getMapName(),
-										enzymeColors, true, true, false, false, false, true);
+							enzymeColors, true, true, false, false, false, true);
 					AttributeHelper.copyReplaceStringAttribute(myGraph, "kegg",
-										"xml_url", "xml_url_os", "map", myEntry
-															.getOrganismLetters());
+							"xml_url", "xml_url_os", "map", myEntry
+									.getOrganismLetters());
 					AttributeHelper.copyReplaceStringAttribute(myGraph, "kegg",
-										"xml_url", "xml_url_os", "ko", myEntry
-															.getOrganismLetters());
+							"xml_url", "xml_url_os", "ko", myEntry
+									.getOrganismLetters());
 				}
 				
 				MainFrame.showMessage("Pathway " + myEntry.getPathwayName()
-									+ " loaded", MessageType.INFO);
+						+ " loaded", MessageType.INFO);
 				if ((ErrorMsg.getErrorMsgCount() - startErrorMsgCnt > 0)
-									&& showErrorMessages) {
+						&& showErrorMessages) {
 					MainFrame.showMessageDialog(
-															"<html>The pathway might not be loaded completely.<br>Additional "
-																				+ (ErrorMsg.getErrorMsgCount() - startErrorMsgCnt)
-																				+ " detailed error messages should be checked with the command <i>Help/Error Messages</i>.",
-															"Data processing not error free");
+							"<html>The pathway might not be loaded completely.<br>Additional "
+									+ (ErrorMsg.getErrorMsgCount() - startErrorMsgCnt)
+									+ " detailed error messages should be checked with the command <i>Help/Error Messages</i>.",
+							"Data processing not error free");
 				}
 			}
 		} finally {
@@ -481,9 +483,9 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	}
 	
 	public static void colorizeEnzymesGlycansCompounds(Graph graph,
-						String mapName, Color enzymeColor, boolean markNotPresent,
-						boolean orthologs, boolean enzymes, boolean glycans,
-						boolean compounds, boolean convertTypeToGeneWhenProcessingOrthologs) {
+			String mapName, Color enzymeColor, boolean markNotPresent,
+			boolean orthologs, boolean enzymes, boolean glycans,
+			boolean compounds, boolean convertTypeToGeneWhenProcessingOrthologs) {
 		if (graph == null)
 			return;
 		if (orthologs) {
@@ -496,7 +498,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 				for (Node n : graph.getNodes()) {
 					boolean matched = false;
 					String kID = (String) AttributeHelper.getAttributeValue(n,
-										"kegg", "kegg_name", "", "");
+							"kegg", "kegg_name", "", "");
 					TreeSet<String> genelist = new TreeSet<String>();
 					for (String keggID : kID.split(" ")) {
 						keggID = keggID.trim();
@@ -505,10 +507,10 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 								if (keggID.equals(ko)) {
 									AttributeHelper.setFillColor(n, enzymeColor);
 									AttributeHelper.setAttribute(n, "kegg", "present",
-														"putative");
+											"putative");
 									if (convertTypeToGeneWhenProcessingOrthologs) {
 										Definition[] genes = serv.get_genes_by_ko(keggID,
-															org);
+												org);
 										for (Definition d : genes) {
 											genelist.add(d.getEntry_id());
 										}
@@ -518,7 +520,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 							}
 							if (!matched && markNotPresent)
 								AttributeHelper.setAttribute(n, "kegg", "present",
-													"not found");
+										"not found");
 						}
 					}
 					if (genelist.size() > 0) {
@@ -529,7 +531,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 							sb.append(s);
 						}
 						AttributeHelper.setAttribute(n, "kegg", "kegg_name", sb
-											.toString());
+								.toString());
 						AttributeHelper.setAttribute(n, "kegg", "kegg_name_old", kID);
 						KeggGmlHelper.setKeggType(n, "gene");
 					}
@@ -549,7 +551,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 				for (Node n : graph.getNodes()) {
 					boolean matched = false;
 					String kID = (String) AttributeHelper.getAttributeValue(n,
-										"kegg", "kegg_name", "", "");
+							"kegg", "kegg_name", "", "");
 					for (String keggID : kID.split(" ")) {
 						keggID = keggID.trim();
 						if (keggID.startsWith("ec:")) {
@@ -557,13 +559,13 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 								if (keggID.equals(enzyme)) {
 									AttributeHelper.setFillColor(n, enzymeColor);
 									AttributeHelper.setAttribute(n, "kegg", "present",
-														"putative");
+											"putative");
 									matched = true;
 								}
 							}
 							if (!matched && markNotPresent)
 								AttributeHelper.setAttribute(n, "kegg", "present",
-													"not found");
+										"not found");
 						}
 					}
 				}
@@ -582,7 +584,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 				for (Node n : graph.getNodes()) {
 					boolean matched = false;
 					String kID = (String) AttributeHelper.getAttributeValue(n,
-										"kegg", "kegg_name", "", "");
+							"kegg", "kegg_name", "", "");
 					for (String keggID : kID.split(" ")) {
 						keggID = keggID.trim();
 						if (keggID.startsWith("glycan:")) {
@@ -590,13 +592,13 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 								if (keggID.equals(enzyme)) {
 									AttributeHelper.setFillColor(n, enzymeColor);
 									AttributeHelper.setAttribute(n, "kegg", "present",
-														"putative");
+											"putative");
 									matched = true;
 								}
 							}
 							if (!matched && markNotPresent)
 								AttributeHelper.setAttribute(n, "kegg", "present",
-													"not found");
+										"not found");
 						}
 					}
 				}
@@ -615,7 +617,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 				for (Node n : graph.getNodes()) {
 					boolean matched = false;
 					String kID = (String) AttributeHelper.getAttributeValue(n,
-										"kegg", "kegg_name", "", "");
+							"kegg", "kegg_name", "", "");
 					for (String keggID : kID.split(" ")) {
 						keggID = keggID.trim();
 						if (keggID.startsWith("cpd:")) {
@@ -623,13 +625,13 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 								if (keggID.equals(enzyme)) {
 									AttributeHelper.setFillColor(n, enzymeColor);
 									AttributeHelper.setAttribute(n, "kegg", "present",
-														"putative");
+											"putative");
 									matched = true;
 								}
 							}
 							if (!matched && markNotPresent)
 								AttributeHelper.setAttribute(n, "kegg", "present",
-													"not found");
+										"not found");
 						}
 					}
 				}
@@ -646,8 +648,8 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	 * @param keggTree
 	 */
 	public void processKeggTree(
-						final JTree keggTree,
-						final HashMap<KeggPathwayEntry, MyDefaultMutableTreeNode> pathwayToTreeNodeMap) {
+			final JTree keggTree,
+			final HashMap<KeggPathwayEntry, MyDefaultMutableTreeNode> pathwayToTreeNodeMap) {
 		final List<KeggPathwayEntry> keggPathways = new ArrayList<KeggPathwayEntry>();
 		for (KeggPathwayEntry kpe : pathwayToTreeNodeMap.keySet())
 			keggPathways.add(kpe);
@@ -656,7 +658,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 		if (pathwayCnt <= 0) {
 			status1 = "";
 			MainFrame.showMessageDialog("<html>" + "Pathway list is empty.<br>"
-								+ "Can't proceed with analysis!", "Error");
+					+ "Can't proceed with analysis!", "Error");
 			return;
 		}
 		
@@ -665,8 +667,8 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 		projects.addAll(TabDBE.getProjectList());
 		if (projects.size() <= 0) {
 			MainFrame.showMessageDialog("<html>"
-								+ "No experimental data loaded.<br>"
-								+ "Can't proceed with analysis!", "Error");
+					+ "No experimental data loaded.<br>"
+					+ "Can't proceed with analysis!", "Error");
 			status1 = "";
 			return;
 		}
@@ -675,33 +677,35 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 			prettyFiedProjects.add("<html>" + o.toString());
 		}
 		Object sel = JOptionPane
-							.showInputDialog(
-												MainFrame.getInstance(),
-												"Select the Experiment for which the number of possible node mappings will be analysed.",
-												"Select Experiment", JOptionPane.QUESTION_MESSAGE, null,
-												prettyFiedProjects.toArray(), projects.iterator().next());
+				.showInputDialog(
+						MainFrame.getInstance(),
+						"Select the Experiment for which the number of possible node mappings will be analysed.",
+						"Select Experiment", JOptionPane.QUESTION_MESSAGE, null,
+						prettyFiedProjects.toArray(), projects.iterator().next());
 		if (sel != null)
 			sel = projects.get(prettyFiedProjects.indexOf(sel));
 		
 		if (sel instanceof ProjectEntity) {
 			ProjectEntity pe = (ProjectEntity) sel;
 			RunnableWithXMLexperimentData r = getPathwayMappingRunnable(keggTree,
-									keggPathways, pathwayToTreeNodeMap, getDefaultEnzymeColor());
+					keggPathways, pathwayToTreeNodeMap, getDefaultEnzymeColor());
 			r.setExperimenData(pe.getDocumentData());
 			r.run();
 		}
 	}
 	
 	private RunnableWithXMLexperimentData getPathwayMappingRunnable(
-						final JTree keggTree, final List<KeggPathwayEntry> keggPathways,
-						final HashMap pathwayToTreeNodeMap, final Color enzymeColor) {
+			final JTree keggTree, final List<KeggPathwayEntry> keggPathways,
+			final HashMap pathwayToTreeNodeMap, final Color enzymeColor) {
 		return new RunnableWithXMLexperimentData() {
 			private ExperimentInterface md = null;
 			
+			@Override
 			public void setExperimenData(ExperimentInterface md) {
 				this.md = md;
 			}
 			
+			@Override
 			public void run() {
 				progressVal = 0;
 				int cnt = 0;
@@ -712,25 +716,25 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 					try {
 						status2 = "Analyze Pathway " + myEntry.getPathwayName();
 						Graph myGraph = KeggService.getKeggPathwayGravistoGraph(
-											myEntry, false, enzymeColor);
+								myEntry, false, enzymeColor);
 						MapResult mapResult = new Experiment2GraphHelper()
-											.mapDataToGraphElements(true, md, myGraph
-																.getGraphElements(), null, false, GraffitiCharts.HIDDEN.getName(), 0, -1, true,
-																true, false, false, false);
+								.mapDataToGraphElements(true, md, myGraph
+										.getGraphElements(), null, false, GraffitiCharts.HIDDEN.getName(), 0, -1, true,
+										true, false, false, false);
 						DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) pathwayToTreeNodeMap
-											.get(myEntry);
+								.get(myEntry);
 						if (dmt != null) {
 							KeggPathwayEntry kpe = (KeggPathwayEntry) dmt
-												.getUserObject();
+									.getUserObject();
 							
 							int enzymeCount = EnzymeService
-												.getNumberOfEnzymeNodes(myGraph);
+									.getNumberOfEnzymeNodes(myGraph);
 							int compoundCount = CompoundService
-												.getNumberOfCompoundNodes(myGraph);
+									.getNumberOfCompoundNodes(myGraph);
 							
 							kpe.setMappingCount(mapResult.substanceCount + "/"
-												+ enzymeCount + "/" + compoundCount + "/"
-												+ myGraph.getNodes().size());
+									+ enzymeCount + "/" + compoundCount + "/"
+									+ myGraph.getNodes().size());
 							keggTree.repaint();
 						}
 						progressVal = ++cnt * 100 / keggPathways.size();
@@ -757,6 +761,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return progressVal;
 	}
@@ -766,6 +771,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return getCurrentStatusValue();
 	}
@@ -775,6 +781,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -784,6 +791,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -794,6 +802,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	 * de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#pleaseStop
 	 * ()
 	 */
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
@@ -804,6 +813,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -814,24 +824,31 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
 	public static void loadKeggPathwayIntoGraph(InputStream in, Graph g,
-						Color enzymeColor) {
+			Color enzymeColor) {
 		KeggPathwayEntry ke = new KeggPathwayEntry(in);
 		ke.setPathwayName("[Loaded from file]");
 		ke.setMapName("[Loaded from file]");
 		loadKeggPathwayIntoEditor(ke, g, enzymeColor, false, false);
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		progressVal = value;
 	}
 	
 	public static Color getDefaultEnzymeColor() {
 		return new Color(200, 255, 200);
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 	
 }

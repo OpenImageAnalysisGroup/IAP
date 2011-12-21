@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -22,7 +23,6 @@ import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -74,7 +74,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			return;
 		
 		try {
-			StopWatch sw = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">LOAD EXPERIMENT " + experiment.getExperimentName());
+			StopWatch sw = new StopWatch(SystemAnalysis.getCurrentTime() + ">LOAD EXPERIMENT " + experiment.getExperimentName());
 			
 			String dbID = experiment.getHeader().getDatabaseId();
 			

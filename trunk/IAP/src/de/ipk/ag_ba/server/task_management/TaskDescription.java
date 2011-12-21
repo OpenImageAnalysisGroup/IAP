@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
@@ -118,8 +119,8 @@ public class TaskDescription {
 				experiment.getHeader().setExperimentname(
 						cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§"
 								+ batch.getSubmissionTime());
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Received calculation results. Job has been submitted at "
-						+ SystemAnalysisExt.getCurrentTime(batch.getSubmissionTime()));
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Received calculation results. Job has been submitted at "
+						+ SystemAnalysis.getCurrentTime(batch.getSubmissionTime()));
 				experiment.getHeader().setImportusergroup("Temp");
 				// System.out.println("Received result: " + experiment.getName());
 				try {
@@ -127,7 +128,7 @@ public class TaskDescription {
 					if (bcmd != null)
 						if (SystemAnalysisExt.getHostName().equals(bcmd.getOwner())) {
 							m.batchClearJob(batch);
-							StopWatch sw = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">SAVE EXPERIMENT " + experiment.getName(), false);
+							StopWatch sw = new StopWatch(SystemAnalysis.getCurrentTime() + ">SAVE EXPERIMENT " + experiment.getName(), false);
 							m.saveExperiment(experiment, statusProvider, true);
 							sw.printTime();
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
@@ -204,7 +205,7 @@ public class TaskDescription {
 								long tProcessing = tFinish - tStart;
 								long minutes = tProcessing / 1000 / 60;
 								e.getHeader().setRemark(
-										e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " + SystemAnalysisExt.getCurrentTime());
+										e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " + SystemAnalysis.getCurrentTime());
 								System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 								System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
 								System.out.println("*****************************");
@@ -229,11 +230,11 @@ public class TaskDescription {
 								}
 							}
 						} else
-							System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostName()
+							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostName()
 									+ " has been claimed by " + bcmd.getOwner()
 									+ ". Therefore analysis result is not saved.");
 				} catch (Exception e) {
-					System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: " + e.getMessage());
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 					e.printStackTrace();
 				}
 				finished = true;

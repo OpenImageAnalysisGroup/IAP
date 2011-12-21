@@ -34,7 +34,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.graph_to_origin_mover
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class MyClusterGraphBasedReLayoutService
-					implements BackgroundTaskStatusProviderSupportingExternalCall, Runnable, HelperClass {
+		implements BackgroundTaskStatusProviderSupportingExternalCall, Runnable, HelperClass {
 	boolean userBreak = false;
 	double statusValue = -1;
 	boolean pleaseStop = false;
@@ -42,8 +42,8 @@ public class MyClusterGraphBasedReLayoutService
 	String status1, status2;
 	
 	private Algorithm layoutAlgorithm;
-	private boolean currentOptionWaitForLayout;
-	private Graph graph;
+	private final boolean currentOptionWaitForLayout;
+	private final Graph graph;
 	private Algorithm optLayoutAlgorithm2;
 	
 	public MyClusterGraphBasedReLayoutService(boolean waitForLayout, Graph g) {
@@ -55,6 +55,7 @@ public class MyClusterGraphBasedReLayoutService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return (int) statusValue;
 	}
@@ -68,6 +69,7 @@ public class MyClusterGraphBasedReLayoutService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return statusValue;
 	}
@@ -76,6 +78,7 @@ public class MyClusterGraphBasedReLayoutService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -84,6 +87,7 @@ public class MyClusterGraphBasedReLayoutService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -92,6 +96,7 @@ public class MyClusterGraphBasedReLayoutService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
@@ -100,6 +105,7 @@ public class MyClusterGraphBasedReLayoutService
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		if (checkStop())
 			return;
@@ -224,6 +230,7 @@ public class MyClusterGraphBasedReLayoutService
 				clusterGraph.setName("overview-graph (apply layout then click OK, you may then close this window)");
 				clusterGraph.setModified(false);
 				SwingUtilities.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						MainFrame.getInstance().showGraph(clusterGraph, null);
 					}
@@ -283,9 +290,9 @@ public class MyClusterGraphBasedReLayoutService
 					error = true;
 				} else {
 					Vector2d newPosition = new Vector2d(
-										currentPosition.x + (clusterAfter.x - clusterBefore.x),
-										currentPosition.y + (clusterAfter.y - clusterBefore.y)
-										);
+							currentPosition.x + (clusterAfter.x - clusterBefore.x),
+							currentPosition.y + (clusterAfter.y - clusterBefore.y)
+							);
 					nodes2newPositions.put(n, newPosition);
 				}
 			}
@@ -293,15 +300,16 @@ public class MyClusterGraphBasedReLayoutService
 		final boolean errorF = error;
 		final Graph mainGraphF = mainGraph;
 		BackgroundTaskHelper.executeLaterOnSwingTask(50, new Runnable() {
+			@Override
 			public void run() {
 				if (errorF)
 					MainFrame.showMessageDialog(
-										"<html>" +
-															"Some sub-graph positions could not be updated." +
-															"Eventually you closed the overview-graph window, before applying the layout to the<br>" +
-															"source graph. It is recommended, to first modify the overview-graph layout. Then<br>" +
-															"continue the re-layout operation by clicking onto the OK button in the progress panel.<br>" +
-															"Then you may close the overview-graph window.", "Error");
+							"<html>" +
+									"Some sub-graph positions could not be updated." +
+									"Eventually you closed the overview-graph window, before applying the layout to the<br>" +
+									"source graph. It is recommended, to first modify the overview-graph layout. Then<br>" +
+									"continue the re-layout operation by clicking onto the OK button in the progress panel.<br>" +
+									"Then you may close the overview-graph window.", "Error");
 				GraphHelper.applyUndoableNodePositionUpdate(nodes2newPositions, "Overview-Graph based layout");
 				for (Node n : mainGraphF.getNodes()) {
 					String clusterId = NodeTools.getClusterID(n, "no cluster");
@@ -309,8 +317,8 @@ public class MyClusterGraphBasedReLayoutService
 						NodeTools.setClusterID(n, "");
 				}
 				GravistoService.getInstance().runAlgorithm(
-									new CenterLayouterAlgorithm(), mainGraphF, new Selection(""),
-									null);
+						new CenterLayouterAlgorithm(), mainGraphF, new Selection(""),
+						null);
 			}
 		});
 		statusValue = 100;
@@ -333,6 +341,7 @@ public class MyClusterGraphBasedReLayoutService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return userBreak;
 	}
@@ -341,26 +350,32 @@ public class MyClusterGraphBasedReLayoutService
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		userBreak = false;
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusValue = value;
 	}
 	
+	@Override
 	public void setCurrentStatusValueFine(double value) {
 		statusValue = value;;
 	}
 	
+	@Override
 	public boolean wantsToStop() {
 		return pleaseStop;
 	}
 	
+	@Override
 	public void setCurrentStatusText1(String status) {
 		status1 = status;
 	}
 	
+	@Override
 	public void setCurrentStatusText2(String status) {
 		status2 = status;
 	}
@@ -369,7 +384,13 @@ public class MyClusterGraphBasedReLayoutService
 	 * (non-Javadoc)
 	 * @see org.BackgroundTaskStatusProviderSupportingExternalCall#setCurrentStatusValueFineAdd(double)
 	 */
+	@Override
 	public void setCurrentStatusValueFineAdd(double smallProgressStep) {
 		statusValue += smallProgressStep;
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

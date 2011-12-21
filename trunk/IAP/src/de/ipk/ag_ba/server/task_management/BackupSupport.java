@@ -12,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ReleaseInfo;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -109,16 +110,16 @@ public class BackupSupport {
 	}
 	
 	private void print(String msg) {
-		msg = SystemAnalysisExt.getCurrentTime() + ">" + msg;
+		msg = SystemAnalysis.getCurrentTime() + ">" + msg;
 		history.add(msg);
 		System.out.println(msg);
 	}
 	
 	private void makeBackupInnerCall() {
 		try {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">START BACKUP SYNC");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">START BACKUP SYNC");
 			
-			StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">INFO: LemnaTec to HSM Backup", false);
+			StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LemnaTec to HSM Backup", false);
 			
 			LemnaTecDataExchange lt = new LemnaTecDataExchange();
 			ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();
@@ -143,7 +144,7 @@ public class BackupSupport {
 					if (hsmExp.getOriginDbId() != null)
 						hsmIdArr.add(new IdTime(hsmExp.getOriginDbId(), hsmExp.getImportdate(), null));
 					else
-						System.out.println(SystemAnalysisExt.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN HSM!");
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN HSM!");
 				}
 			}
 			

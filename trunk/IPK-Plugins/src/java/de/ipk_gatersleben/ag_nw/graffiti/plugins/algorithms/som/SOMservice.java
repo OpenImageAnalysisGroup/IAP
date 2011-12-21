@@ -21,7 +21,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
 
 public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskStatusProviderSupportingExternalCall,
-					Runnable {
+		Runnable {
 	
 	double statusDouble = -1;
 	boolean pleaseStop = false;
@@ -42,9 +42,9 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	private final Graph optSrcGraph;
 	
 	SOMservice(int numberOfNeuronsParm, int widthOfSOMparm, double maxNeighbourHoodParm,
-						int decreaseNeighbourhoodAfterXiterationsParam, int typeOfNeighbourhoodFunctionParam,
-						int numberLearnIterationsParam, double betaParam, double gammaParam, Collection<GraphElement> selection,
-						boolean returnNaN, boolean useSampleAverageValues, boolean showCentroidNodes, Graph optSrcGraph) {
+			int decreaseNeighbourhoodAfterXiterationsParam, int typeOfNeighbourhoodFunctionParam,
+			int numberLearnIterationsParam, double betaParam, double gammaParam, Collection<GraphElement> selection,
+			boolean returnNaN, boolean useSampleAverageValues, boolean showCentroidNodes, Graph optSrcGraph) {
 		
 		this.numberOfNeuronsParm = numberOfNeuronsParm;
 		this.widthOfSOMparm = widthOfSOMparm;
@@ -66,6 +66,7 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return (int) statusDouble;
 	}
@@ -75,10 +76,12 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return statusDouble;
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		this.statusDouble = value;
 	}
@@ -88,6 +91,7 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -97,6 +101,7 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seede.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#
 	 * getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -107,6 +112,7 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#pleaseStop
 	 * ()
 	 */
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
@@ -115,6 +121,7 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		if (checkStop())
 			return;
@@ -126,7 +133,7 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 		
 		if (groups.length <= 0) {
 			MainFrame.showMessageDialog(
-								"<html>" + "Can not start SOM processing.<br>" + "No experimental data available.", "Missing Data");
+					"<html>" + "Can not start SOM processing.<br>" + "No experimental data available.", "Missing Data");
 			status1 = "Prepare Train-Dataset...";
 			status2 = "No data available!";
 			return;
@@ -139,7 +146,7 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 		if (checkStop())
 			return;
 		mydataset.initSOM(numberOfNeuronsParm, w, maxNeighbourHoodParm, decreaseNeighbourhoodAfterXiterationsParam,
-							mydataset.inputNeuronsNeededFor(null, groups), returnNaN);
+				mydataset.inputNeuronsNeededFor(null, groups), returnNaN);
 		mydataset.setBetaAndGamma(betaParam, gammaParam);
 		if (checkStop())
 			return;
@@ -147,7 +154,7 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 		status2 = "";
 		SOMplugin.setColumns(groups);
 		mydataset.trainOrUseSOM(true, typeOfNeighbourhoodFunctionParam, groups, numberLearnIterationsParam, this,
-							mydataset.getDataSetSize());
+				mydataset.getDataSetSize());
 		status2 = "Training finished.";
 		statusDouble = 100;
 		if (checkStop())
@@ -191,6 +198,7 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -201,22 +209,27 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider
 	 * #pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValueFine(double value) {
 		statusDouble = value;
 	}
 	
+	@Override
 	public boolean wantsToStop() {
 		return checkStop();
 	}
 	
+	@Override
 	public void setCurrentStatusText1(String status) {
 		status1 = status;
 	}
 	
+	@Override
 	public void setCurrentStatusText2(String status) {
 		status2 = status;
 	}
@@ -226,7 +239,13 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	 * @seeorg.BackgroundTaskStatusProviderSupportingExternalCall#
 	 * setCurrentStatusValueFineAdd(double)
 	 */
+	@Override
 	public void setCurrentStatusValueFineAdd(double smallProgressStep) {
 		statusDouble += smallProgressStep;
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

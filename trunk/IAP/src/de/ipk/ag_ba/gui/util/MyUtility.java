@@ -13,9 +13,9 @@ import netscape.javascript.JSObject;
 
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * @author klukas
@@ -45,7 +45,7 @@ public class MyUtility {
 				target = target.substring("Overview".length());
 			if (target.startsWith("."))
 				target = target.substring(".".length());
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">" + target);
+			System.out.println(SystemAnalysis.getCurrentTime() + ">" + target);
 			JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());
 			win.eval("window.location.hash='" + target + "';");
 			win.eval("document.title='IAP: " + ft + "';");

@@ -44,45 +44,45 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.KeggGmlHelper;
  *         (c) 2004 IPK-Gatersleben
  */
 public class DatabaseBasedLabelReplacementService implements Runnable,
-					BackgroundTaskStatusProvider, HelperClass {
+		BackgroundTaskStatusProvider, HelperClass {
 	
 	int statusVal = -1;
 	String status1 = "";
 	String status2 = "";
 	boolean pleaseStop = false;
 	Collection<Node> nodes;
-	private boolean ecNumberToName;
-	private boolean ecNameOrSynonymeToECnumber;
-	private boolean compIDtoName;
-	private boolean compNameToID;
-	private boolean increaseNodeSize;
-	private boolean useShortName;
-	private boolean preserveOldId;
-	private String oldIdIdentifier;
-	private boolean reactionIdToEcName;
-	private boolean reactionNameToId;
-	private boolean useGreekName;
-	private boolean processKeggId2EcAnnotation;
-	private boolean koId2koName;
+	private final boolean ecNumberToName;
+	private final boolean ecNameOrSynonymeToECnumber;
+	private final boolean compIDtoName;
+	private final boolean compNameToID;
+	private final boolean increaseNodeSize;
+	private final boolean useShortName;
+	private final boolean preserveOldId;
+	private final String oldIdIdentifier;
+	private final boolean reactionIdToEcName;
+	private final boolean reactionNameToId;
+	private final boolean useGreekName;
+	private final boolean processKeggId2EcAnnotation;
+	private final boolean koId2koName;
 	private final boolean briteKO2geneName;
 	private final boolean briteKO2ecName;
 	
 	public DatabaseBasedLabelReplacementService(
-						Collection<Node> nodes,
-						boolean compoundNameToID,
-						boolean compoundIDtoName,
-						boolean ecNumberToName,
-						boolean ecNameOrSynonymeToECnumber,
-						boolean reactionNameToEcId,
-						boolean reactionNameToNo,
-						boolean processKeggId2EcAnnotaion,
-						boolean koId2koName,
-						boolean briteKO2geneName,
-						boolean briteKO2ecName,
-						boolean increaseNodeSize,
-						boolean useShortName,
-						boolean preserveOldId,
-						boolean useGreekName, // for compounds
+			Collection<Node> nodes,
+			boolean compoundNameToID,
+			boolean compoundIDtoName,
+			boolean ecNumberToName,
+			boolean ecNameOrSynonymeToECnumber,
+			boolean reactionNameToEcId,
+			boolean reactionNameToNo,
+			boolean processKeggId2EcAnnotaion,
+			boolean koId2koName,
+			boolean briteKO2geneName,
+			boolean briteKO2ecName,
+			boolean increaseNodeSize,
+			boolean useShortName,
+			boolean preserveOldId,
+			boolean useGreekName, // for compounds
 			String oldIdIdentifier) {
 		this.nodes = nodes;
 		this.ecNumberToName = ecNumberToName;
@@ -106,6 +106,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		statusVal = 0;
 		status1 = "Rename nodes...";
@@ -278,7 +279,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 							for (String s : koName.split(",")) {
 								s = s.trim();
 								if (s.length() > 1 && s.startsWith("E") &&
-													s.length() - StringManipulationTools.stringReplace(s, ".", "").length() == 3) {
+										s.length() - StringManipulationTools.stringReplace(s, ".", "").length() == 3) {
 									s = s.substring(1);
 								}
 								koNamesTemp.add(s);
@@ -376,14 +377,14 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 					NodeGraphicAttribute na = (NodeGraphicAttribute) n.getAttribute(GraphicAttributeConstants.GRAPHICS);
 					if (na != null) {
 						if (na.getShape().equals(GraphicAttributeConstants.ELLIPSE_CLASSNAME) ||
-											na.getShape().equals(GraphicAttributeConstants.CIRCLE_CLASSNAME))
+								na.getShape().equals(GraphicAttributeConstants.CIRCLE_CLASSNAME))
 							processSize = false;
 					}
 					// / ************************************************************
 					if (processSize) {
 						border = ((Double) AttributeHelper.getAttributeValue(n,
-											"charting", "empty_border_width", new Double(2d), new Double(2d)))
-											.doubleValue();
+								"charting", "empty_border_width", new Double(2d), new Double(2d)))
+								.doubleValue();
 						
 						border += AttributeHelper.getFrameThickNess(n);
 						
@@ -398,9 +399,9 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 							double yd = border;
 							if (d.getWidth() - xd < newWidth || d.getHeight() - yd < newHeight)
 								AttributeHelper.setSize(n,
-													d.getWidth() - xd < newWidth ? newWidth + xd : d.getWidth(),
-													d.getHeight() - yd < newHeight ? newHeight + yd : d.getHeight()
-													);
+										d.getWidth() - xd < newWidth ? newWidth + xd : d.getWidth(),
+										d.getHeight() - yd < newHeight ? newHeight + yd : d.getHeight()
+										);
 						}
 					}
 				}
@@ -421,7 +422,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	}
 	
 	private String processCompoundInfo(Node n, String targetName,
-						CompoundEntry ce) {
+			CompoundEntry ce) {
 		if (compIDtoName) {
 			targetName = ce.getNames().iterator().next();
 			if (useShortName) {
@@ -456,6 +457,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return statusVal;
 	}
@@ -464,6 +466,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return statusVal;
 	}
@@ -472,6 +475,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -480,6 +484,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -488,6 +493,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
@@ -496,6 +502,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
@@ -504,11 +511,18 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusVal = value;
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

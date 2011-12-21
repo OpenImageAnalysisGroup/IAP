@@ -71,7 +71,7 @@ public class CommandLineBackgroundTaskStatusProvider extends
 			System.out.println();
 			System.out
 					.println("***********************************************************************************************");
-			System.out.println(SystemAnalysisExt.getCurrentTime()
+			System.out.println(SystemAnalysis.getCurrentTime()
 					+ ">INFO: Progress: " + getCurrentStatusValue() + "% // "
 					+ getCurrentStatusMessage1() + " // "
 					+ getCurrentStatusMessage2() + " // Load: " + ((int) (10d * SystemAnalysisExt.getRealSystemCpuLoad())) / 10
@@ -87,16 +87,16 @@ public class CommandLineBackgroundTaskStatusProvider extends
 				double remainingTime = (100 - progress) / speed;
 				double fullTime = 100d / speed;
 				long finishTime = (long) (System.currentTimeMillis() + remainingTime);
-				System.out.println(SystemAnalysisExt.getCurrentTime()
+				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">INFO: Estimated finish time     : "
-						+ SystemAnalysisExt.getCurrentTime(finishTime));
+						+ SystemAnalysis.getCurrentTime(finishTime));
 				
-				String remain = SystemAnalysisExt.getWaitTime((long) fullTime);
-				System.out.println(SystemAnalysisExt.getCurrentTime()
+				String remain = SystemAnalysis.getWaitTime((long) fullTime);
+				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">INFO: Estimated overall run time: "
 						+ remain);
-				remain = SystemAnalysisExt.getWaitTime((long) remainingTime);
-				System.out.println(SystemAnalysisExt.getCurrentTime()
+				remain = SystemAnalysis.getWaitTime((long) remainingTime);
+				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">INFO: Estimated remaining time  : "
 						+ remain);
 			}

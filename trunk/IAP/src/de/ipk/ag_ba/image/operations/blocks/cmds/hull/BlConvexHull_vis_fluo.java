@@ -85,12 +85,32 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			BlockResultSet summaryResult = time2summaryResult.get(time);
 			double areaSum = 0;
 			int areaCnt = 0;
+			double sideArea_for_angleNearestTo0 = Double.NaN;
+			double sideArea_for_angleNearestTo90 = Double.NaN;
+			double distanceTo0 = Double.MAX_VALUE;
+			double distanceTo90 = Double.MAX_VALUE;
 			for (String key : allResultsForSnapshot.keySet()) {
 				BlockResultSet rt = allResultsForSnapshot.get(key);
 				for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.area")) {
 					if (v.getValue() != null) {
 						areaSum += v.getValue().doubleValue();
 						areaCnt += 1;
+						
+						TreeMap<String, ImageData> tid = time2inImages.get(time);
+						if (tid != null) {
+							ImageData id = tid.get(key);
+							Double pos = id.getPosition();
+							if (pos == null)
+								pos = 0d;
+							if (Math.abs(pos - 0) < distanceTo0) {
+								distanceTo0 = Math.abs(pos - 0);
+								sideArea_for_angleNearestTo0 = v.getValue().doubleValue();
+							}
+							if (Math.abs(pos - 90) < distanceTo90) {
+								distanceTo0 = Math.abs(pos - 90);
+								sideArea_for_angleNearestTo90 = v.getValue().doubleValue();
+							}
+						}
 					}
 				}
 			}
@@ -113,7 +133,18 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				double volume_iap = Math.sqrt(avgArea * avgArea * avgTopArea);
 				volume_iap = Math.ceil(volume_iap);
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap", volume_iap);
+				
+				if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo90)) {
+					double volume_lt = Math.sqrt(sideArea_for_angleNearestTo0 * sideArea_for_angleNearestTo90 * avgTopArea);
+					volume_lt = Math.ceil(volume_lt);
+					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.lt", volume_lt);
+				}
 			}
 		}
+		
+		for (Long time : time2inSamples.keySet()) {
+			
+		}
+		
 	}
 }

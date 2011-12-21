@@ -52,6 +52,7 @@ public class ClusterIndividualLayout extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#getName()
 	 */
+	@Override
 	public String getName() {
 		if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR)
 			return "Layout Pathway-Subgraphs";
@@ -67,11 +68,11 @@ public class ClusterIndividualLayout extends AbstractAlgorithm {
 	@Override
 	public Parameter[] getParameters() {
 		BooleanParameter showClusterGraphs =
-							new BooleanParameter(currentOptionShowGraphs,
-												"Show Subgraphs", "If set to true, the extracted cluster graphs are shown in the editor");
+				new BooleanParameter(currentOptionShowGraphs,
+						"Show Subgraphs", "If set to true, the extracted cluster graphs are shown in the editor");
 		BooleanParameter waitForClusterLayout =
-							new BooleanParameter(currentOptionWaitForLayout,
-												"Wait for Layout", "If set to true, the layout of the cluster graphs is applied after the user confirms the action");
+				new BooleanParameter(currentOptionWaitForLayout,
+						"Wait for Layout", "If set to true, the layout of the cluster graphs is applied after the user confirms the action");
 		
 		return new Parameter[] { showClusterGraphs, waitForClusterLayout };
 	}
@@ -117,7 +118,7 @@ public class ClusterIndividualLayout extends AbstractAlgorithm {
 		}
 		if (clusters.size() <= 0)
 			throw new PreconditionException(
-								"No cluster information available for this graph!");
+					"No cluster information available for this graph!");
 		
 		// Graph clusterBackgroundGraph = (Graph) AttributeHelper.getAttributeValue(
 		// graph, "cluster", "clustergraph", null, new AdjListGraph());
@@ -139,13 +140,14 @@ public class ClusterIndividualLayout extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 */
+	@Override
 	public void execute() {
 		String cluster = "Cluster";
 		if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR)
 			cluster = "Pathway";
 		
 		RunAlgorithmDialog rad = new RunAlgorithmDialog("Select " + cluster + " Layout",
-							graph, selection, true, true);
+				graph, selection, true, true);
 		rad.setAlwaysOnTop(true);
 		rad.setVisible(true);
 		rad.requestFocusInWindow();
@@ -173,6 +175,7 @@ class MyActionListener implements ActionListener {
 	 * (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (!rad.isVisible() && rad.getAlgorithm() != null) {
 			tref.stop();
@@ -181,14 +184,14 @@ class MyActionListener implements ActionListener {
 			mcs.currentOptionWaitForLayout = currentOptionWaitForLayout;
 			mcs.setAlgorithm(rad.getAlgorithm());
 			BackgroundTaskHelper bth = new BackgroundTaskHelper(mcs, mcs, name,
-								name, true, false);
+					name, true, false);
 			bth.startWork(this);
 		} else
 			rad.setAlwaysOnTop(true);
 	}
 	
 	public void setOptions(String name, Timer t,
-						boolean currentOptionShowGraphs, boolean currentOptionWaitForLayout) {
+			boolean currentOptionShowGraphs, boolean currentOptionWaitForLayout) {
 		this.name = name;
 		tref = t;
 		this.currentOptionShowGraphs = currentOptionShowGraphs;
@@ -215,6 +218,7 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusValue()
 	 */
+	@Override
 	public int getCurrentStatusValue() {
 		return statusInt;
 	}
@@ -227,6 +231,7 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusValueFine()
 	 */
+	@Override
 	public double getCurrentStatusValueFine() {
 		return statusInt;
 	}
@@ -235,6 +240,7 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusMessage1()
 	 */
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
@@ -243,6 +249,7 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#getCurrentStatusMessage2()
 	 */
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
@@ -251,6 +258,7 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.BackgroundTaskStatusProvider#pleaseStop()
 	 */
+	@Override
 	public void pleaseStop() {
 		pleaseStop = true;
 	}
@@ -259,13 +267,14 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		if (checkStop())
 			return;
 		Graph mainGraph = null;
 		try {
 			mainGraph = GravistoService.getInstance().getMainFrame()
-								.getActiveSession().getGraph();
+					.getActiveSession().getGraph();
 		} catch (NullPointerException npe) {
 			ErrorMsg.addErrorMessage(npe.getLocalizedMessage());
 		}
@@ -301,7 +310,7 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 				if (checkStop())
 					break;
 				status1 = "Apply " + layoutAlgorithm.getName()
-									+ " to Subgraph (" + cluster4 + " " + clusterID + ")...";
+						+ " to Subgraph (" + cluster4 + " " + clusterID + ")...";
 				
 				status2 = "Extract Subgraph...";
 				final Graph clusterSubGraph = GraphHelper.getClusterSubGraph(mainGraph, clusterID);
@@ -379,8 +388,8 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 					} else {
 						if (newPosition != null) {
 							newPosition = new Point2D.Double(
-												newPosition.getX(),
-												newPosition.getY());
+									newPosition.getX(),
+									newPosition.getY());
 							// System.out.println(" ClusterTarget: " + targetPointForCluster + ", Center of Subgraph: " + centerOfSubGraph + ", NewPos: " +
 							// newPosition);
 							AttributeHelper.setPosition(n, newPosition);
@@ -418,6 +427,7 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()
 	 */
+	@Override
 	public boolean pluginWaitsForUser() {
 		return userBreak;
 	}
@@ -426,11 +436,18 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pleaseContinueRun()
 	 */
+	@Override
 	public void pleaseContinueRun() {
 		userBreak = false;
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		statusInt = value;
+	}
+	
+	@Override
+	public String getCurrentStatusMessage3() {
+		return null;
 	}
 }

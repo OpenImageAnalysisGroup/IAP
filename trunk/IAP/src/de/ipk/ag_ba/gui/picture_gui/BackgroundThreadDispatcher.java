@@ -18,7 +18,6 @@ import javax.swing.Timer;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 /**
  * @author klukas
@@ -112,18 +111,18 @@ public class BackgroundThreadDispatcher {
 		if (free < max * 0.1d) {
 			if (System.currentTimeMillis() - lastPrint > 1000) {
 				lastPrint = System.currentTimeMillis();
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
 						+ " MB");
 			}
 			if (System.currentTimeMillis() - lastGC > 1000 * 30) {
 				lastGC = System.currentTimeMillis();
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
 						+ " MB --- GARBAGE COLLECTION");
 				System.gc();
 				used = r.totalMemory() - r.freeMemory();
 				max = r.maxMemory();
 				free = max - used;
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">new memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">new memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
 						+ " MB");
 			}
 			return true;

@@ -41,7 +41,6 @@ import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -115,7 +114,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		maxInst.acquire();
 		try {
 			status.setCurrentStatusValue(0);
-			status.setCurrentStatusText1("Start " + getName());
+			status.setCurrentStatusText1("Execute " + getName());
 			output = new ArrayList<NumericMeasurementInterface>();
 			
 			/**
@@ -152,10 +151,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							top++;
 					}
 			if (snapshotsWithNotAllNeededImageTypes > 0)
-				System.out.println(SystemAnalysisExt.getCurrentTime()
+				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">WARNING: not all three images available for "
 						+ snapshotsWithNotAllNeededImageTypes + " snapshots!");
-			System.out.println(SystemAnalysisExt.getCurrentTime()
+			System.out.println(SystemAnalysis.getCurrentTime()
 					+ ">INFO: Workload Top/Side: " + top + "/" + side);
 			final int workloadEqualAngleSnapshotSets = top + side;
 			
@@ -165,15 +164,21 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
 			final ThreadSafeOptions freed = new ThreadSafeOptions();
 			try {
+				int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
+				int progress = 0;
 				for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 					final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
+					final String plantIDf = plantID;
 					maxCon.acquire(1);
 					try {
+						progress++;
+						final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID;
 						Thread t = new Thread(new Runnable() {
 							@Override
 							public void run() {
 								try {
 									processSnapshot(
+											plantIDf, preThreadName,
 											maximumThreadCountOnImageLevel,
 											status, tso, workloadSnapshots,
 											workloadEqualAngleSnapshotSets,
@@ -185,7 +190,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 									freed.setBval(0, true);
 								}
 							}
-						}, "Snapshot Analysis (" + plantID + ")");
+						}, preThreadName + ")");
 						startThread(t);
 					} catch (Exception eeee) {
 						error = eeee;
@@ -209,19 +214,19 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private int modifyConcurrencyDependingOnMemoryStatus(int nn) {
 		if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
 			System.out
-					.println(SystemAnalysisExt.getCurrentTime()
+					.println(SystemAnalysis.getCurrentTime()
 							+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY");
 			nn = 1;
 		}
 		if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
 			System.out
-					.println(SystemAnalysisExt.getCurrentTime()
+					.println(SystemAnalysis.getCurrentTime()
 							+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY");
 			nn = 1;
 		}
 		if (SystemAnalysis.getMemoryMB() < 4000 && nn > 4) {
 			System.out
-					.println(SystemAnalysisExt.getCurrentTime()
+					.println(SystemAnalysis.getCurrentTime()
 							+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY");
 			nn = 4;
 		}
@@ -229,7 +234,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (nn > 1
 				&& SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
 						.getMemoryMB() * 0.7d) {
-			System.out.println(SystemAnalysisExt.getCurrentTime()
+			System.out.println(SystemAnalysis.getCurrentTime()
 					+ ">HIGH MEMORY UTILIZATION, REDUCING CONCURRENCY");
 			nn = nn / 2;
 			if (nn < 1)
@@ -237,7 +242,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		
 		System.out
-				.println(SystemAnalysisExt.getCurrentTime()
+				.println(SystemAnalysis.getCurrentTime()
 						+ ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: "
 						+ nn + ")");
 		return nn;
@@ -249,7 +254,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				.getMemoryMB() * 0.6) {
 			System.out.println();
 			System.out
-					.print(SystemAnalysisExt.getCurrentTime()
+					.print(SystemAnalysis.getCurrentTime()
 							+ ">HIGH MEMORY UTILIZATION (>60%), ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB()
 							+ "/" + SystemAnalysis.getMemoryMB() + " MB)... ");
 			System.gc();
@@ -260,7 +265,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				.getMemoryMB() * 0.6) {
 			System.out.println();
 			System.out
-					.println(SystemAnalysisExt.getCurrentTime()
+					.println(SystemAnalysis.getCurrentTime()
 							+ ">HIGH MEMORY UTILIZATION (>60%), REDUCING CONCURRENCY (THREAD.RUN)");
 			t.run();
 		} else {
@@ -276,7 +281,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.prio = prio;
 	}
 	
-	private void processSnapshot(final int maximumThreadCountOnImageLevel,
+	private void processSnapshot(
+			String plantID, String preThreadName,
+			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final ThreadSafeOptions tso, final int workloadSnapshots,
 			final int workloadEqualAngleSnapshotSets,
@@ -288,7 +295,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
 		
 		if (imageSetWithSpecificAngle != null) {
-			for (Long time : imageSetWithSpecificAngle.keySet())
+			for (Long time : imageSetWithSpecificAngle.keySet()) {
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
 					if (status != null && status.wantsToStop())
 						break;
@@ -299,6 +306,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					} else
 						continue;
 					ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS();
+					
+					Thread.currentThread().setName(preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
+							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
 					
 					try {
 						BlockResultSet results = processAngleWithinSnapshot(
@@ -319,7 +329,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						e.printStackTrace();
 					}
 				}
+			}
 		}
+		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ", post-processing)");
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, BlockResultSet> postprocessingResults;
 			try {
@@ -334,6 +346,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		tso.addInt(1);
 		status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/"
 				+ workloadSnapshots);
+		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ")");
 	}
 	
 	private void processVolumeOutput(Sample3D inSample, BlockResultSet analysisResults) {
@@ -344,7 +357,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				
 				try {
 					StopWatch s = new StopWatch(
-							SystemAnalysisExt.getCurrentTime() + ">SAVE VOLUME");
+							SystemAnalysis.getCurrentTime() + ">SAVE VOLUME");
 					if (databaseTarget != null) {
 						databaseTarget.saveVolume((LoadedVolume) v, inSample,
 								m, DBTable.SAMPLE, null, null);
@@ -356,13 +369,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								v.getURL().getDetail());
 						output.add(volumeInDatabase);
 					} else {
-						System.out.println(SystemAnalysisExt.getCurrentTime()
+						System.out.println(SystemAnalysis.getCurrentTime()
 								+ ">Volume kept in memory: " + v);
 						output.add(v);
 					}
 					s.printTime();
 				} catch (Exception e) {
-					System.out.println(SystemAnalysisExt.getCurrentTime()
+					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: Could not save volume data: "
 							+ e.getMessage());
 					e.printStackTrace();
@@ -396,7 +409,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							.getSubstanceName());
 					if (imageConfiguration == ImageConfiguration.Unknown) {
 						imageConfiguration = ImageConfiguration.get(id.getURL().getFileName());
-						System.out.println(SystemAnalysisExt.getCurrentTime()
+						System.out.println(SystemAnalysis.getCurrentTime()
 								+ ">INFO: IMAGE CONFIGURATION UNKNOWN ("
 								+ id.getSubstanceName() + "), "
 								+ "GUESSING FROM IMAGE NAME: " + id.getURL()
@@ -404,7 +417,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					}
 					if (imageConfiguration == ImageConfiguration.Unknown) {
 						System.out
-								.println(SystemAnalysisExt.getCurrentTime()
+								.println(SystemAnalysis.getCurrentTime()
 										+ ">ERROR: INVALID (UNKNOWN) IMAGE CONFIGURATION FOR IMAGE: "
 										+ id.getURL());
 					} else {
@@ -468,14 +481,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
 				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0)
 					continue;
-				System.out.println(SystemAnalysisExt.getCurrentTime() + ">INFO: Processing image sets with ID: " + val);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Processing image sets with ID: " + val);
 				if (!workload_imageSetsWithSpecificAngles.containsKey(val))
 					workload_imageSetsWithSpecificAngles.put(val, new TreeMap<Long, TreeMap<String, ImageSet>>());;
 				long time = is.firstEntry().getValue().getVIS().getParentSample().getRowId();
 				if (!workload_imageSetsWithSpecificAngles.get(val).containsKey(time))
 					workload_imageSetsWithSpecificAngles.get(val).put(time, is);
 			}
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">Processing "
+			System.out.println(SystemAnalysis.getCurrentTime() + ">Processing "
 					+ workload_imageSetsWithSpecificAngles.size() + " of " + sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.size()
 					+ " (subset " + workLoadIndex + "/" + numberOfSubsets + ")");
 		}
@@ -513,7 +526,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 									output.add(imageRef);
 							} else
 								System.out
-										.println(SystemAnalysisExt
+										.println(SystemAnalysis
 												.getCurrentTime()
 												+ ">ERROR: SaveImageAndUpdateURL failed! (NULL Result)");
 						}
@@ -561,11 +574,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (result != null)
 					return new ImageData(result.getParentSample(), result);
 				else
-					System.out.println(SystemAnalysisExt.getCurrentTime()
+					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">Could not save in DB: "
 							+ lib.getURL().toString());
 			} else {
-				System.out.println(SystemAnalysisExt.getCurrentTime()
+				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">Result kept in memory: " + lib.getURL().toString());
 				return result;
 			}
@@ -715,7 +728,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		ImageData inNir = id.getNIR() != null ? id.getNIR().copy() : null;
 		
 		if (inVis == null && inFluo == null && inNir == null) {
-			System.out.println(SystemAnalysisExt.getCurrentTime()
+			System.out.println(SystemAnalysis.getCurrentTime()
 					+ ">ERROR: SNAPSHOT WITH NO VIS+FLUO+NIR IMAGES");
 			return null;
 		}
@@ -816,7 +829,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void printError(final TreeMap<Long, TreeMap<String, ImageSet>> tmf, Exception err) {
-		System.err.println(SystemAnalysisExt
+		System.err.println(SystemAnalysis
 				.getCurrentTime()
 				+ "> ERROR: "
 				+ err.getMessage());

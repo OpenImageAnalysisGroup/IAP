@@ -105,7 +105,7 @@ new HashMap<MongoDB,CloudComputingService>();
 		System.out.println("*  Jean-Michel Pape ............................. *");
 		System.out.println("*                                                 *");
 		System.out.println("***************************************************");
-		System.out.println(SystemAnalysisExt.getCurrentTime() + "> SYSTEM ANALYSIS");
+		System.out.println(SystemAnalysis.getCurrentTime() + "> SYSTEM ANALYSIS");
 		SystemAnalysis.simulateHeadless = true;
 		boolean clusterExecutionMode = false;
 		{
@@ -114,7 +114,7 @@ new HashMap<MongoDB,CloudComputingService>();
 				cc.setEnableCalculations(true);
 			}
 		}
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">DISABLE SUB-TASK MULTITHREADING");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">DISABLE SUB-TASK MULTITHREADING");
 		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
 			SystemInfoExt info = new SystemInfoExt();
 			System.out.println("Sockets        : " + info.getCpuSockets());
@@ -159,7 +159,7 @@ new HashMap<MongoDB,CloudComputingService>();
 										try {
 											System.out.println(":perf - perform performance test (TestPipelineMaize Copy)");
 											
-											StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">INFO: LabCube construction", false);
+											StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LabCube construction", false);
 											ImageOperation io = new ImageOperation(new int[][] { { 0, 0 } });
 											if (io != null)
 												s.printTime();
@@ -182,7 +182,7 @@ new HashMap<MongoDB,CloudComputingService>();
 										} else
 											if ((args[0] + "").toLowerCase().startsWith("monitor")) {
 												{
-													System.out.println(SystemAnalysisExt.getCurrentTime()
+													System.out.println(SystemAnalysis.getCurrentTime()
 															+ ">'monitor' - Report system info to cloud (join, but don't perform calculations)");
 													for (MongoDB m : MongoDB.getMongos()) {
 														CloudComputingService cc = CloudComputingService.getInstance(m);
@@ -231,17 +231,17 @@ new HashMap<MongoDB,CloudComputingService>();
 				si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
 				si.getCpuLogicalCores() + ", using " + SystemAnalysis.getNumberOfCPUs());
 		System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
-		System.out.println(SystemAnalysisExt.getCurrentTime() + ">");
-		System.out.println(SystemAnalysisExt.getCurrentTime() + "> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">");
+		System.out.println(SystemAnalysis.getCurrentTime() + "> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
 		
-		StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() + ">INFO: LabCube construction", false);
+		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LabCube construction", false);
 		ImageOperation io = new ImageOperation(new int[][] { { 0, 0 } });
 		if (io != null)
 			s.printTime();
 		
 		String hsm = IAPmain.getHSMfolder();
 		if (hsm != null && new File(hsm).exists()) {
-			System.out.println(SystemAnalysisExt.getCurrentTime() + ">HSM Folder: " + hsm);
+			System.out.println(SystemAnalysis.getCurrentTime() + ">HSM Folder: " + hsm);
 			Library lib = new Library();
 			HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsm,
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
@@ -314,8 +314,8 @@ new HashMap<MongoDB,CloudComputingService>();
 						}
 					}
 				}
-				System.out.println(SystemAnalysisExt.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
-				System.out.println(SystemAnalysisExt.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCnt() + ", FINISHED: " + knownResults.size());
+				System.out.println(SystemAnalysis.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
+				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCnt() + ", FINISHED: " + knownResults.size());
 				if (knownResults.size() + 1 < tempDataSetDescription.getPartCntI()) {
 					// not everything has been computed (internal error)
 					TreeSet<Integer> jobIDs = new TreeSet<Integer>();
@@ -360,7 +360,7 @@ new HashMap<MongoDB,CloudComputingService>();
 							Runnable rr = new Runnable() {
 								@Override
 								public void run() {
-									System.out.print(SystemAnalysisExt.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
+									System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
 											/ 1024
 											+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 									ExperimentInterface ei = m.getExperiment(i);
@@ -382,7 +382,7 @@ new HashMap<MongoDB,CloudComputingService>();
 						String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
 						if (sn.indexOf(".") > 0)
 							sn = sn.substring(sn.lastIndexOf(".") + 1);
-						e.getHeader().setExperimentname(sn + ": " + e.getName() + ", manual merge at " + SystemAnalysisExt.getCurrentTime());
+						e.getHeader().setExperimentname(sn + ": " + e.getName() + ", manual merge at " + SystemAnalysis.getCurrentTime());
 						e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
 						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
 						e.getHeader().setDatabaseId("");
@@ -400,7 +400,7 @@ new HashMap<MongoDB,CloudComputingService>();
 						long minutes = tProcessing / 1000 / 60;
 						e.getHeader().setRemark(
 								e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " +
-										SystemAnalysisExt.getCurrentTime());
+										SystemAnalysis.getCurrentTime());
 						System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 						System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
 						System.out.println("*****************************");
@@ -426,7 +426,7 @@ new HashMap<MongoDB,CloudComputingService>();
 										err.getMessage() + ")");
 							}
 						}
-						System.out.println(SystemAnalysisExt.getCurrentTime() + "> COMPLETED");
+						System.out.println(SystemAnalysis.getCurrentTime() + "> COMPLETED");
 					}
 			}
 		} catch (Exception e) {

@@ -21,6 +21,7 @@ import javax.swing.Timer;
 
 import org.BackgroundTaskStatusProvider;
 import org.FolderPanel;
+import org.ProgressStatusService;
 import org.StringManipulationTools;
 import org.SystemInfo;
 import org.graffiti.plugin.gui.ToolButton;
