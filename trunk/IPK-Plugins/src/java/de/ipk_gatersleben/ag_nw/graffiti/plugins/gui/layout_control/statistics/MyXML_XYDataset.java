@@ -183,11 +183,12 @@ public class MyXML_XYDataset extends AbstractXYDataset {
 			for (int i = 0; i < workQueue2.size(); i++) {
 				MyComparableDataPoint testMCDP = workQueue2.get(i);
 				sd2 = getSeriesDesc(testMCDP, seriesDescription);
-				if ((useSampleAverageValues || testMCDP.replicate == rep1)
-						&& sd1.equals(sd2) // mcdp1.serie.equalsIgnoreCase(testMCDP.serie)
-						&& mcdp1.timeValueForComparision == testMCDP.timeValueForComparision) {
-					mcdp2 = testMCDP;
-					break;
+				if ((useSampleAverageValues || testMCDP.replicate == rep1)) {
+					if (sd1.equals(sd2) // mcdp1.serie.equalsIgnoreCase(testMCDP.serie)
+							&& mcdp1.timeValueForComparision == testMCDP.timeValueForComparision) {
+						mcdp2 = testMCDP;
+						break;
+					}
 				}
 			}
 			if (mcdp2 == null)

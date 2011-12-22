@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
@@ -93,11 +94,15 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			double sideArea_for_angleNearestTo90 = Double.NaN;
 			double distanceTo0 = Double.MAX_VALUE;
 			double distanceTo90 = Double.MAX_VALUE;
+			DescriptiveStatistics areaStat = DescriptiveStatistics.newInstance();
+			
 			for (String key : allResultsForSnapshot.keySet()) {
 				BlockResultSet rt = allResultsForSnapshot.get(key);
 				for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.area")) {
 					if (v.getValue() != null) {
-						areaSum += v.getValue().doubleValue();
+						double area = v.getValue().doubleValue();
+						areaStat.addValue(area);
+						areaSum += area;
 						areaCnt += 1;
 						
 						TreeMap<String, ImageData> tid = time2inImages.get(time);
@@ -108,16 +113,21 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 								pos = 0d;
 							if (Math.abs(pos - 0) < distanceTo0) {
 								distanceTo0 = Math.abs(pos - 0);
-								sideArea_for_angleNearestTo0 = v.getValue().doubleValue();
+								sideArea_for_angleNearestTo0 = area;
 							}
 							if (Math.abs(pos - 90) < distanceTo90) {
 								distanceTo0 = Math.abs(pos - 90);
-								sideArea_for_angleNearestTo90 = v.getValue().doubleValue();
+								sideArea_for_angleNearestTo90 = area;
 							}
 						}
 					}
 				}
 			}
+			
+			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.min", areaStat.getMin());
+			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.max", areaStat.getMax());
+			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.median", areaStat.getPercentile(50));
+			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.avg", areaStat.getMean());
 			
 			double topAreaSum = 0;
 			double topAreaCnt = 0;
