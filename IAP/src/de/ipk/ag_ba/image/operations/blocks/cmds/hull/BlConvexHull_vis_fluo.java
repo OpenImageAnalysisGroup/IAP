@@ -11,6 +11,7 @@ import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition
 import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -82,7 +83,10 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		
 		for (Long time : time2inSamples.keySet()) {
 			TreeMap<String, BlockResultSet> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+			if (!time2summaryResult.containsKey(time))
+				time2summaryResult.put(time, new BlockResults());
 			BlockResultSet summaryResult = time2summaryResult.get(time);
+			
 			double areaSum = 0;
 			int areaCnt = 0;
 			double sideArea_for_angleNearestTo0 = Double.NaN;
