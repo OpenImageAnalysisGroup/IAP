@@ -38,14 +38,14 @@ public class SystemAnalysis {
 		if (fixedCPUload > 0)
 			return fixedCPUload;
 		boolean useHalfCPUpower = Runtime.getRuntime().availableProcessors() > 6;
-		// useHalfCPUpower = false;
+		 useHalfCPUpower = false;
 		if (fullPower)
 			useHalfCPUpower = false;
 		if (halfPower)
 			useHalfCPUpower = true;
 		int cpus = Runtime.getRuntime().availableProcessors();
 		if (useHalfCPUpower)
-			return (int) (cpus / 3d * 2d > 0 ? cpus / 3d * 2d : 1);
+			return (int) (cpus / 2d > 0 ? cpus / 2d : 1);
 		else
 			return cpus;
 	}
