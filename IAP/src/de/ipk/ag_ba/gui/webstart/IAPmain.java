@@ -394,7 +394,7 @@ public class IAPmain extends JApplet {
 			// these may be changed for interactive applet version !!!
 			switch (feature) {
 				case REMOTE_EXECUTION:
-					return false;
+					return true;
 				case SAVE_DEBUG_STACK:
 					return false;
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
