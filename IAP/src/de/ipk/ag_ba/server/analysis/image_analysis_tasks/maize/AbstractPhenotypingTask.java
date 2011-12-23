@@ -290,46 +290,72 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle, final Semaphore optMaxCon)
 			throws InterruptedException {
 		
-		TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
-		TreeMap<Long, TreeMap<String, BlockResultSet>> analysisResults = new TreeMap<Long, TreeMap<String, BlockResultSet>>();
-		TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
-		
+		final TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
+		final TreeMap<Long, TreeMap<String, BlockResultSet>> analysisResults = new TreeMap<Long, TreeMap<String, BlockResultSet>>();
+		final TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
 		if (imageSetWithSpecificAngle != null) {
-			for (Long time : imageSetWithSpecificAngle.keySet()) {
+			int threadsToStart = 0;
+			for (final Long time : imageSetWithSpecificAngle.keySet()) {
+				threadsToStart+=imageSetWithSpecificAngle.get(time).keySet().size();
+			}
+			final Semaphore innerLoopSemaphore = BackgroundTaskHelper.lockGetSemaphore(null, threadsToStart);
+			for (final Long time : imageSetWithSpecificAngle.keySet()) {
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
-					if (status != null && status.wantsToStop())
-						break;
 					if (imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS() != null) {
 						Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS()
 								.getParentSample();
 						inSamples.put(time, inSample);
 					} else
 						continue;
-					ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS();
+					final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS();
 					
 					Thread.currentThread().setName(preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
 							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
 					
-					try {
-						BlockResultSet results = processAngleWithinSnapshot(
-								imageSetWithSpecificAngle.get(time).get(configAndAngle),
-								maximumThreadCountOnImageLevel, status,
-								workloadEqualAngleSnapshotSets,
-								getParentPriority());
-						processVolumeOutput(inSamples.get(time), results);
-						if (results != null) {
-							if (!analysisInput.containsKey(time))
-								analysisInput.put(time, new TreeMap<String, ImageData>());
-							if (!analysisResults.containsKey(time))
-								analysisResults.put(time, new TreeMap<String, BlockResultSet>());
-							analysisInput.get(time).put(configAndAngle, inImage);
-							analysisResults.get(time).put(configAndAngle, results);
+					final boolean releaseCon = optMaxCon.tryAcquire();
+
+					Runnable r = new Runnable() {
+						@Override
+						public void run() {
+							try {
+								try {
+									BlockResultSet results = processAngleWithinSnapshot(
+											imageSetWithSpecificAngle.get(time).get(configAndAngle),
+											maximumThreadCountOnImageLevel, status,
+											workloadEqualAngleSnapshotSets,
+											getParentPriority());
+									processVolumeOutput(inSamples.get(time), results);
+									if (results != null) {
+										if (!analysisInput.containsKey(time))
+											analysisInput.put(time, new TreeMap<String, ImageData>());
+										if (!analysisResults.containsKey(time))
+											analysisResults.put(time, new TreeMap<String, BlockResultSet>());
+										analysisInput.get(time).put(configAndAngle, inImage);
+										analysisResults.get(time).put(configAndAngle, results);
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							} finally {
+								if (releaseCon)
+									optMaxCon.release();
+								innerLoopSemaphore.release();
+							}
 						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					};
+					Thread innerThread = new Thread(r);
+					innerThread.setName("Inner thread "+preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
+							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
+					innerThread.setPriority(Thread.MIN_PRIORITY);
+					innerLoopSemaphore.acquire();
+					if (releaseCon)
+						innerThread.start();
+					else
+						innerThread.run();
 				}
 			}
+			innerLoopSemaphore.acquire(threadsToStart);
+			innerLoopSemaphore.release(threadsToStart);			
 		}
 		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ", post-processing)");
 		if (!analysisResults.isEmpty()) {
@@ -846,5 +872,4 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		// .getParentCondition());
 		err.printStackTrace();
 	}
-	
 }
