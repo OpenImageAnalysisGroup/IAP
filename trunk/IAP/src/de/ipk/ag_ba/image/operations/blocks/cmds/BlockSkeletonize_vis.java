@@ -255,7 +255,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public void postProcessResultsForAllAngles(
+	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,

@@ -19,7 +19,7 @@ public interface ImageAnalysisBlockFIS {
 	
 	public FlexibleMaskAndImageSet process() throws InterruptedException;
 	
-	public void postProcessResultsForAllAngles(
+	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
 			TreeMap<Long, TreeMap<String, BlockResultSet>> allResultsForSnapshot,

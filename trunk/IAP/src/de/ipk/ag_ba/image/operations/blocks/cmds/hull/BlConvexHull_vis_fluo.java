@@ -75,12 +75,19 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public void postProcessResultsForAllAngles(
+	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,
 			TreeMap<Long, BlockResultSet> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		
+		Double lastVolumeIAP = null;
+		Long lastTimeVolumeIAP = null;
+		final long timeForOneDay = 1000 * 60 * 60 * 24;
+		
+		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
+				new String[] { "RESULT_side.area", "RESULT_top.area" });
 		
 		for (Long time : time2inSamples.keySet()) {
 			TreeMap<String, BlockResultSet> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
@@ -148,6 +155,15 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				volume_iap = Math.ceil(volume_iap);
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap", volume_iap);
 				
+				if (lastTimeVolumeIAP != null && lastVolumeIAP > 0) {
+					double ratio = volume_iap / lastVolumeIAP;
+					double ratioPerDay = ratio / (time - lastTimeVolumeIAP) * timeForOneDay;
+					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.relative", ratioPerDay);
+				}
+				
+				lastVolumeIAP = volume_iap;
+				lastTimeVolumeIAP = time;
+				
 				if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo90)) {
 					double volume_lt = Math.sqrt(sideArea_for_angleNearestTo0 * sideArea_for_angleNearestTo90 * avgTopArea);
 					volume_lt = Math.ceil(volume_lt);
@@ -155,10 +171,5 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			}
 		}
-		
-		for (Long time : time2inSamples.keySet()) {
-			
-		}
-		
 	}
 }

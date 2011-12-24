@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
+
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {

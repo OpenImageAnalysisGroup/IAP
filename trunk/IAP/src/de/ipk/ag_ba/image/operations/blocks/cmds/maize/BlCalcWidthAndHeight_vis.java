@@ -2,7 +2,9 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.TreeMap;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.Vector2d;
 
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
@@ -12,9 +14,12 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class BlCalcWidthAndHeight_vis extends
 		AbstractSnapshotAnalysisBlockFIS {
@@ -23,7 +28,7 @@ public class BlCalcWidthAndHeight_vis extends
 	
 	@Override
 	protected boolean isChangingImages() {
-		return true;
+		return false;
 	}
 	
 	@Override
@@ -39,7 +44,7 @@ public class BlCalcWidthAndHeight_vis extends
 		boolean useFluo = false;// options.isMaize();
 		
 		int vertYsoilLevel = -1;
-		if (false) {
+		if (!options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.SIDE) {
 			if (useFluo) {
 				if (getProperties().getNumericProperty(0, 1,
 						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
@@ -261,5 +266,18 @@ public class BlCalcWidthAndHeight_vis extends
 			}
 		} else
 			return null;
+	}
+	
+	@Override
+	public void postProcessResultsForAllTimesAndAngles(
+			TreeMap<Long, Sample3D> time2inSamples,
+			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
+			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,
+			TreeMap<Long, BlockResultSet> time2summaryResult,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
+		super.postProcessResultsForAllTimesAndAngles(time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus);
+		
+		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
+				new String[] { "RESULT_side.width", "RESULT_side.width", "RESULT_side.width.norm", "RESULT_side.height.norm" });
 	}
 }
