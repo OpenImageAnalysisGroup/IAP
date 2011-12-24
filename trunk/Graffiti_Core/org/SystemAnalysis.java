@@ -38,7 +38,7 @@ public class SystemAnalysis {
 		if (fixedCPUload > 0)
 			return fixedCPUload;
 		boolean useHalfCPUpower = Runtime.getRuntime().availableProcessors() > 6;
-		 useHalfCPUpower = false;
+		// useHalfCPUpower = false;
 		if (fullPower)
 			useHalfCPUpower = false;
 		if (halfPower)
@@ -187,7 +187,7 @@ public class SystemAnalysis {
 	public static String getCurrentTime(long time) {
 		return sdf.format(new Date(time));
 	}
-
+	
 	public static String getWaitTime(long fullTime) {
 		ProgressStatusService pss = new ProgressStatusService();
 		String res = pss.getRemainTimeString(-1, fullTime / 1000, 2);
