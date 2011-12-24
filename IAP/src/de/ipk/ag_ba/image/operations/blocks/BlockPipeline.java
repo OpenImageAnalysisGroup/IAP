@@ -317,7 +317,7 @@ public class BlockPipeline {
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			block.setInputAndOptions(null, null, null, index++, null);
-			block.postProcessResultsForAllAngles(inSample, inImages,
+			block.postProcessResultsForAllTimesAndAngles(inSample, inImages,
 					allResultsForSnapshot, summaryResult, optStatus);
 		}
 		
