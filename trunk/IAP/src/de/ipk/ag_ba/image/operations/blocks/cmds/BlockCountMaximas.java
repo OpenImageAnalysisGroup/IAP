@@ -5,7 +5,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import ij.measure.ResultsTable;
 import ij.plugin.filter.MaximumFinder;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;

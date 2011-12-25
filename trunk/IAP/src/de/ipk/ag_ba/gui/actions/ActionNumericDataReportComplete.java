@@ -71,10 +71,10 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		if (SystemAnalysis.isHeadless())
-			return "Download Report Files"
+			return "Download Report"
 					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
 		else
-			return "Create PDF Report" + (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
+			return "Create PDF" + (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
 	}
 	
 	@Override
