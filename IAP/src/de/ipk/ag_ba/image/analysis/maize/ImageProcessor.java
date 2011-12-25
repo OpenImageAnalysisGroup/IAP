@@ -26,7 +26,9 @@ public interface ImageProcessor {
 	
 	public abstract BackgroundTaskStatusProviderSupportingExternalCall getStatus();
 	
-	public abstract TreeMap<Long, BlockResultSet> postProcessPipelineResults(TreeMap<Long, Sample3D> inSample,
+	public abstract TreeMap<Long, BlockResultSet> postProcessPipelineResults(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
+			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
 			TreeMap<Long, TreeMap<String, BlockResultSet>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)

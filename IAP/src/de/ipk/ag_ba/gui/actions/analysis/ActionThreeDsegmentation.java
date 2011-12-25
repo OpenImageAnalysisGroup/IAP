@@ -18,6 +18,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.VolumeSegmentation;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -80,7 +81,9 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 			
 			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
 			VolumeSegmentation segmentationTask = new VolumeSegmentation(saveVolumesToDB);
-			segmentationTask.setInput(workset, null, m, 0, 1);
+			segmentationTask.setInput(
+					AbstractPhenotypingTask.getWateringInfo(res),
+					workset, null, m, 0, 1);
 			
 			segmentationTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 			
@@ -98,13 +101,13 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 			mpc = new MainPanelComponent(ip, true);
 			
 			storedActions.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(res),
-								src.getGUIsetting()));
+					src.getGUIsetting()));
 			
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m,
-								new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+					new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
 			ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(storedActions, res, res.getHeader(), false,
-								src.getGUIsetting(), m);
+					src.getGUIsetting(), m);
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();
 			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
@@ -135,12 +138,12 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 	}
 	
 	public static NavigationButton getThreeDsegmentationTaskEntity(final MongoDB m,
-						final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
-						GUIsetting guiSetting) {
+			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
+			GUIsetting guiSetting) {
 		
 		NavigationAction segmentationAction = new ActionThreeDsegmentation(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(segmentationAction, title,
-							"img/RotationReconstructionSegmentation.png", guiSetting);
+				"img/RotationReconstructionSegmentation.png", guiSetting);
 		return resultTaskButton;
 	}
 }

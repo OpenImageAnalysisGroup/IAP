@@ -3,6 +3,7 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -72,13 +73,13 @@ public class VolumeStatistics implements ImageAnalysisTask {
 	 */
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		
 		output = new ArrayList<NumericMeasurementInterface>();
 		
 		int background = new Color(ImageOperation.BACKGROUND_COLOR.getRed(),
-							ImageOperation.BACKGROUND_COLOR.getBlue(), ImageOperation.BACKGROUND_COLOR.getRed(), 0)
-							.getRGB();
+				ImageOperation.BACKGROUND_COLOR.getBlue(), ImageOperation.BACKGROUND_COLOR.getRed(), 0)
+				.getRGB();
 		long filled = 0, voxels = 0;
 		for (Sample3D ins : input) {
 			for (Measurement md : ins) {
@@ -99,20 +100,20 @@ public class VolumeStatistics implements ImageAnalysisTask {
 					voxels = lve.getVoxelCount();
 					
 					NumericMeasurement m = new NumericMeasurement(lv, "filled (voxel)", md.getParentSample()
-									.getParentCondition().getExperimentName()
-									+ " (" + getName() + ")");
+							.getParentCondition().getExperimentName()
+							+ " (" + getName() + ")");
 					m.setValue(filled);
 					output.add(m);
 					
 					m = new NumericMeasurement(lv, "cube volume (voxel)", md.getParentSample().getParentCondition()
-									.getExperimentName()
-									+ " (" + getName() + ")");
+							.getExperimentName()
+							+ " (" + getName() + ")");
 					m.setValue(voxels);
 					output.add(m);
 					
 					m = new NumericMeasurement(lv, "filled (percent)", md.getParentSample().getParentCondition()
-									.getExperimentName()
-									+ " (" + getName() + ")");
+							.getExperimentName()
+							+ " (" + getName() + ")");
 					m.setValue((double) filled / (double) voxels * 100d);
 					output.add(m);
 				}
@@ -132,7 +133,9 @@ public class VolumeStatistics implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<Sample3D> input,
+	public void setInput(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			Collection<Sample3D> input,
 			Collection<NumericMeasurementInterface> optValidMeasurements,
 			MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;

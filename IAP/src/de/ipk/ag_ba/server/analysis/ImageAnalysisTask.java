@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.server.analysis;
 
 import java.util.Collection;
+import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
@@ -16,7 +17,7 @@ public interface ImageAnalysisTask {
 	public String getTaskDescription();
 	
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-						BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException;
+			BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException;
 	
 	public String getName();
 	
@@ -24,7 +25,9 @@ public interface ImageAnalysisTask {
 	
 	public ImageAnalysisType[] getOutputTypes();
 	
-	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements,
+	public void setInput(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements,
 			MongoDB m, int workOnSubset,
 			int numberOfSubsets);
 	

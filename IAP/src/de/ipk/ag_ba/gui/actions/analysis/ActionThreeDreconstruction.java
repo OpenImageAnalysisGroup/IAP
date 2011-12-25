@@ -24,6 +24,7 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ThreeDreconstruction;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.VolumeStatistics;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -69,7 +70,7 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 		this.src = src;
 		
 		Object[] inp = MyInputHelper.getInput("Please specify the cube resolution:", "3-D Reconstruction", new Object[] {
-							"Resolution (X=Y=Z)", voxelresolution, "Trim Width? (0..100)", widthFactor });
+				"Resolution (X=Y=Z)", voxelresolution, "Trim Width? (0..100)", widthFactor });
 		if (inp == null)
 			return;
 		voxelresolution = (Integer) inp[0];
@@ -98,14 +99,16 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
 			
 			ThreeDreconstruction threeDreconstructionTask = new ThreeDreconstruction(saveVolumesToDB);
-			threeDreconstructionTask.setInput(workset, null, m, 0, 1);
+			threeDreconstructionTask.setInput(
+					AbstractPhenotypingTask.getWateringInfo(res),
+					workset, null, m, 0, 1);
 			threeDreconstructionTask.setResolution(voxelresolution, widthFactor);
 			threeDreconstructionTask.addResultProcessor(volumeStatistics);
 			
 			threeDreconstructionTask.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 2, status);
 			
 			HashMap<ImageAnalysisTask, ArrayList<NumericMeasurementInterface>> volumeStatisticsResults =
-						threeDreconstructionTask.getAdditionalResults();
+					threeDreconstructionTask.getAdditionalResults();
 			
 			ArrayList<NumericMeasurementInterface> statRes = volumeStatisticsResults.get(volumeStatistics);
 			if (statRes == null) {
@@ -126,13 +129,13 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 			mpc = new MainPanelComponent(ip, true);
 			
 			storedActions.add(ActionFileManager.getFileManagerEntity(m,
-								new ExperimentReference(statisticsResult), src.getGUIsetting()));
+					new ExperimentReference(statisticsResult), src.getGUIsetting()));
 			
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(
-								statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
+					statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
 			ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(storedActions, statisticsResult, statisticsResult
-								.getHeader(), false, src.getGUIsetting(), m);
+					.getHeader(), false, src.getGUIsetting(), m);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			mpc = null;
@@ -152,11 +155,11 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		if (!ImageAnalysis3D.isSaveInDatabase()) {
 			NavigationButton imageHistogram = new NavigationButton(TableLayout.get3Split(histogram, histogramG,
-								histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED), src.getGUIsetting());
+					histogramB, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED), src.getGUIsetting());
 			res.add(imageHistogram);
 			
 			NavigationButton imageZoom = new NavigationButton(ImageAnalysis3D.getImageZoomSlider(zoomedImages), src
-								.getGUIsetting());
+					.getGUIsetting());
 			res.add(imageZoom);
 		}
 		res.addAll(storedActions);
@@ -169,12 +172,12 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 	}
 	
 	public static NavigationButton getThreeDreconstructionTaskEntity(MongoDB m,
-						final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
-						GUIsetting guiSetting) {
+			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
+			GUIsetting guiSetting) {
 		
 		NavigationAction threeDreconstructionAction = new ActionThreeDreconstruction(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(threeDreconstructionAction, title,
-							"img/RotationReconstruction.png", guiSetting);
+				"img/RotationReconstruction.png", guiSetting);
 		return resultTaskButton;
 	}
 }

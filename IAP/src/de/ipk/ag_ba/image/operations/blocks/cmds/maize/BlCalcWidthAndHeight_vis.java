@@ -270,12 +270,14 @@ public class BlCalcWidthAndHeight_vis extends
 	
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,
 			TreeMap<Long, BlockResultSet> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
-		super.postProcessResultsForAllTimesAndAngles(time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus);
+		super.postProcessResultsForAllTimesAndAngles(plandID2time2waterData,
+				time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus);
 		
 		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
 				new String[] { "RESULT_side.width", "RESULT_side.width", "RESULT_side.width.norm", "RESULT_side.height.norm" });

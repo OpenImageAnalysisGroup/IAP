@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -55,6 +56,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	private final DatabaseTarget storeResultInDatabase;
 	private int workLoadIndex;
 	private int workLoadSize;
+	private TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData;
 	
 	public ThreeDreconstruction(DatabaseTarget storeResultInDatabase) {
 		this.storeResultInDatabase = storeResultInDatabase;
@@ -151,7 +153,8 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 					for (ImageAnalysisTask resultProcessor : resultProcessors) {
 						Collection<Sample3D> inp = new ArrayList<Sample3D>();
 						inp.add((Sample3D) volume.getParentSample());
-						resultProcessor.setInput(inp, null, m, 0, 1);
+						resultProcessor.setInput(plandID2time2waterData,
+								inp, null, m, 0, 1);
 						resultProcessor.performAnalysis(maximumThreadCountParallelImages, maximumThreadCountParallelImages,
 								status);
 						if (additionalResults.get(resultProcessor) == null)
@@ -321,8 +324,11 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements,
+	public void setInput(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements,
 			MongoDB m, int workLoadIndex, int workLoadSize) {
+		this.plandID2time2waterData = plandID2time2waterData;
 		this.input = input;
 		this.m = m;
 		this.workLoadIndex = workLoadIndex;
