@@ -41,9 +41,13 @@ import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
@@ -69,11 +73,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private MongoDB m;
 	private Exception error;
 	private boolean runOK;
+	private TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData;
 	
 	@Override
-	public void setInput(Collection<Sample3D> input,
+	public void setInput(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			Collection<Sample3D> input,
 			Collection<NumericMeasurementInterface> optValidMeasurements,
 			MongoDB m, int workOnSubset, int numberOfSubsets) {
+		this.plandID2time2waterData = plandID2time2waterData;
 		this.input = input;
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
@@ -178,6 +186,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							public void run() {
 								try {
 									processSnapshot(
+											plandID2time2waterData,
 											plantIDf, preThreadName,
 											maximumThreadCountOnImageLevel,
 											status, tso, workloadSnapshots,
@@ -282,6 +291,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void processSnapshot(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
 			String plantID, String preThreadName,
 			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
@@ -296,7 +306,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (imageSetWithSpecificAngle != null) {
 			int threadsToStart = 0;
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
-				threadsToStart+=imageSetWithSpecificAngle.get(time).keySet().size();
+				threadsToStart += imageSetWithSpecificAngle.get(time).keySet().size();
 			}
 			final Semaphore innerLoopSemaphore = BackgroundTaskHelper.lockGetSemaphore(null, threadsToStart);
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
@@ -313,7 +323,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
 					
 					final boolean releaseCon = optMaxCon.tryAcquire();
-
+					
 					Runnable r = new Runnable() {
 						@Override
 						public void run() {
@@ -344,7 +354,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						}
 					};
 					Thread innerThread = new Thread(r);
-					innerThread.setName("Inner thread "+preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
+					innerThread.setName("Inner thread " + preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
 							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
 					innerThread.setPriority(Thread.MIN_PRIORITY);
 					innerLoopSemaphore.acquire();
@@ -355,14 +365,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			}
 			innerLoopSemaphore.acquire(threadsToStart);
-			innerLoopSemaphore.release(threadsToStart);			
+			innerLoopSemaphore.release(threadsToStart);
 		}
 		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ", post-processing)");
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, BlockResultSet> postprocessingResults;
 			try {
 				postprocessingResults = getImageProcessor()
-						.postProcessPipelineResults(inSamples, analysisInput,
+						.postProcessPipelineResults(
+								plandID2time2waterData2,
+								inSamples, analysisInput,
 								analysisResults, status);
 				processStatisticalOutputOnGlobalLevel(inSamples, postprocessingResults);
 			} catch (Exception e) {
@@ -871,5 +883,33 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		// .getSampleInfo()
 		// .getParentCondition());
 		err.printStackTrace();
+	}
+	
+	public static TreeMap<String, TreeMap<Long, Double>> getWateringInfo(ExperimentInterface experiment) {
+		TreeMap<String, TreeMap<Long, Double>> result = new TreeMap<String, TreeMap<Long, Double>>();
+		if (experiment != null) {
+			for (SubstanceInterface si : experiment) {
+				if (si.getName().equals("water_sum")) {
+					for (ConditionInterface ci : si) {
+						for (SampleInterface sa : ci) {
+							long time = sa.getRowId();
+							for (NumericMeasurementInterface nmi : sa) {
+								String plantID = nmi.getReplicateID() + ";" + nmi.getQualityAnnotation();
+								if (!result.containsKey(plantID))
+									result.put(plantID, new TreeMap<Long, Double>());
+								if (result.get(plantID).containsKey(plantID))
+									result.get(plantID).put(time,
+											result.get(plantID).get(time) +
+													nmi.getValue());
+								else
+									result.get(plantID).put(time, nmi.getValue());
+							}
+							
+						}
+					}
+				}
+			}
+		}
+		return result;
 	}
 }

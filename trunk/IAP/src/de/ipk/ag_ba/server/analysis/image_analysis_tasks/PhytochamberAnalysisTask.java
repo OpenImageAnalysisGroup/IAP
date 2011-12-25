@@ -55,7 +55,9 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m, int workOnSubset,
+	public void setInput(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m, int workOnSubset,
 			int numberOfSubsets) {
 		this.input = input;
 		this.workOnSubset = workOnSubset;

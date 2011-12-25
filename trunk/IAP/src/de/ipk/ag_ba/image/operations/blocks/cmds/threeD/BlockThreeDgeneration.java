@@ -54,6 +54,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,

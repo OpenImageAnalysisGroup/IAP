@@ -14,6 +14,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -95,7 +96,9 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
 			// for (int pi = SystemAnalysis.getNumberOfCPUs(); pi >= 1; pi -= 1) {
 			long t1 = System.currentTimeMillis();
-			task.setInput(workload, null, m, 0, 1);
+			task.setInput(
+					AbstractPhenotypingTask.getWateringInfo(res),
+					workload, null, m, 0, 1);
 			task.performAnalysis(1, 1, status);
 			long t2 = System.currentTimeMillis();
 			statRes.addAll(task.getOutput());
@@ -165,11 +168,11 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, new ExperimentReference(
-							experimentResult), false, src.getGUIsetting()))
+				experimentResult), false, src.getGUIsetting()))
 			res.add(ne);
 		
 		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m, new ExperimentReference(
-							experimentResult), src.getGUIsetting())) {
+				experimentResult), src.getGUIsetting())) {
 			if (ne.getTitle().contains("Put data")) {
 				ne.setTitle("Analyze with VANTED");
 				res.add(ne);

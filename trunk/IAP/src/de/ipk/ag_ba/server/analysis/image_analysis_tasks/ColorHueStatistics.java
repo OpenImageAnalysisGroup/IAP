@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -86,7 +87,7 @@ public class ColorHueStatistics implements ImageAnalysisTask {
 	 */
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		ExecutorService run = Executors.newFixedThreadPool(maximumThreadCountParallelImages);
 		for (Sample3D s3d : input) {
 			Collection<NumericMeasurementInterface> il = s3d.getMeasurements(MeasurementNodeType.IMAGE);
@@ -120,7 +121,7 @@ public class ColorHueStatistics implements ImageAnalysisTask {
 							for (int c : rgbArray) {
 								Color c1 = new Color(c);
 								Color_CIE_Lab cCL1 = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(c1.getRed(), c1
-													.getGreen(), c1.getBlue()));
+										.getGreen(), c1.getBlue()));
 								double d = cCL1.getL();
 								int bin = (int) (d * colorCount);
 								histogram[bin]++;
@@ -159,7 +160,11 @@ public class ColorHueStatistics implements ImageAnalysisTask {
 	 * (java.util.Collection, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void setInput(Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m, int workLoadIndex, int workLoadSize) {
+	public void setInput(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			Collection<Sample3D> input,
+			Collection<NumericMeasurementInterface> optValidMeasurements,
+			MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;
 	}
 	

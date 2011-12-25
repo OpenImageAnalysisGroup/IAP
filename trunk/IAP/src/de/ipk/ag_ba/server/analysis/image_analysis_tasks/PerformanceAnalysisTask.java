@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -50,7 +51,9 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		// empty
 	}
 	
-	public void setInput(Collection<Sample3D> input,
+	public void setInput(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			Collection<Sample3D> input,
 			Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m,
 			int workLoadIndex, int workLoadSize) {
 		this.input = input;
@@ -94,7 +97,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	}
 	
 	private void performAnalysisIC(final int maximumThreadCountParallelImages,
-						final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		if (workLoadIndex != 0)
 			return;
 		
@@ -176,7 +179,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 							icNF = ImageConfiguration.get(id.getURL().getFileName());
 							System.out.println(SystemAnalysis.getCurrentTime() +
 									">INFO: IMAGE CONFIGURATION UNKNOWN (" + id.getSubstanceName() + "), " +
-											"GUESSING FROM IMAGE NAME: " + id.getURL() + ", GUESS: " + icNF);
+									"GUESSING FROM IMAGE NAME: " + id.getURL() + ", GUESS: " + icNF);
 						}
 						if (icNF == ImageConfiguration.Unknown) {
 							System.out.println(SystemAnalysis.getCurrentTime() +
@@ -276,7 +279,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 								if (tsoCurrentSecond.getInt() != currentSecond) {
 									tsoCurrentSecond.setInt(currentSecond);
 									double mbs = tsoBytesRead.getLong() / 1024d / 1024d * 1000d
-														/ (time - tsoStartTime.getLong());
+											/ (time - tsoStartTime.getLong());
 									status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 									long errorCnt =
 											tsoLoadDataErrorsFLUOside.getInt() + tsoLoadDataErrorsFLUOside.getLong() +
@@ -295,14 +298,14 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 													tsoLoadDataOkVIStop.getInt() + tsoLoadDataOkVIStop.getLong();
 									
 									status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl + ", " + (int) mbs
-														+ " MB/s" +
-														(maximumThreadCountParallelImages > 1 ?
-																" (" + maximumThreadCountParallelImages + " thread(s)" : "") +
-														", ok: " + okCnt + ", errors: " + errorCnt + ")");
+											+ " MB/s" +
+											(maximumThreadCountParallelImages > 1 ?
+													" (" + maximumThreadCountParallelImages + " thread(s)" : "") +
+											", ok: " + okCnt + ", errors: " + errorCnt + ")");
 									{
 										NumericMeasurement m = new NumericMeasurement(id, "read speed", id.getParentSample()
-															.getParentCondition().getExperimentName()
-															+ " (" + getName() + ")");
+												.getParentCondition().getExperimentName()
+												+ " (" + getName() + ")");
 										setAnno(maximumThreadCountParallelImages, m);
 										m.setValue(mbs);
 										m.setUnit("MB/s");
@@ -473,7 +476,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		performAnalysis(maximumThreadCountParallelImages, status);
 	}
 	
@@ -486,8 +489,8 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		tsoBytesRead.addLong(imgData.length);
 		{
 			NumericMeasurement m = new NumericMeasurement(id, "image size", id.getParentSample()
-								.getParentCondition().getExperimentName()
-								+ " (" + getName() + ")");
+					.getParentCondition().getExperimentName()
+					+ " (" + getName() + ")");
 			setAnno(maximumThreadCountParallelImages, m);
 			m.setValue(((int) (imgData.length / 1024d * 10d)) / 10d);
 			m.setUnit("KB");
@@ -495,8 +498,8 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		}
 		{
 			NumericMeasurement m = new NumericMeasurement(id, "read speed (single image)", id
-								.getParentSample().getParentCondition().getExperimentName()
-								+ " (" + getName() + ")");
+					.getParentSample().getParentCondition().getExperimentName()
+					+ " (" + getName() + ")");
 			setAnno(maximumThreadCountParallelImages, m);
 			m.setValue(((int) (imgData.length * 10d / 1024d / 1024d / (end - start) * 1000)) / 10d);
 			m.setUnit("MB/s");

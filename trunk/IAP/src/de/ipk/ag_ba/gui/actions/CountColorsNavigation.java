@@ -10,6 +10,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ColorHueStatistics;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -56,7 +57,9 @@ public class CountColorsNavigation extends AbstractExperimentAnalysisNavigation 
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setInt(1);
 		ColorHueStatistics task = new ColorHueStatistics(colorCount);
-		task.setInput(workload, null, m, workLoadIndex, workloadSize);
+		task.setInput(
+				AbstractPhenotypingTask.getWateringInfo(res),
+				workload, null, m, workLoadIndex, workloadSize);
 		task.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1, status);
 		// src.title = src.title.split("\\:")[0];
 	}

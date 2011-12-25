@@ -23,6 +23,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -220,6 +221,7 @@ public class BlockPipeline {
 	 *           Image set to be analyzed.
 	 */
 	public static void debugTryAnalysis(
+			final ExperimentInterface e,
 			final Collection<NumericMeasurementInterface> input,
 			final MongoDB m, AbstractPhenotypingTask analysisTask) {
 		final AbstractPhenotypingTask analysisTaskFinal = analysisTask;
@@ -238,7 +240,9 @@ public class BlockPipeline {
 					nmi.clone(old2newSample.get(nmi.getParentSample())));
 		}
 		
-		analysisTaskFinal.setInput(samples, input, m, 0, 1);
+		analysisTaskFinal.setInput(
+				AbstractPhenotypingTask.getWateringInfo(e),
+				samples, input, m, 0, 1);
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				analysisTaskFinal.getName(), analysisTaskFinal.getTaskDescription());
@@ -285,7 +289,7 @@ public class BlockPipeline {
 								+ nn, new Runnable() {
 							@Override
 							public void run() {
-								analysisTaskFinal.setInput(samples, input, m, 0, 1);
+								analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, m, 0, 1);
 								BackgroundTaskHelper.issueSimpleTaskInWindow(
 										analysisTaskFinal.getName(), "Analyze...",
 										backgroundTask,
@@ -306,6 +310,7 @@ public class BlockPipeline {
 	}
 	
 	public TreeMap<Long, BlockResultSet> postProcessPipelineResultsForAllAngles(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
 			TreeMap<Long, TreeMap<String, BlockResultSet>> allResultsForSnapshot,
@@ -317,7 +322,9 @@ public class BlockPipeline {
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
 			block.setInputAndOptions(null, null, null, index++, null);
-			block.postProcessResultsForAllTimesAndAngles(inSample, inImages,
+			block.postProcessResultsForAllTimesAndAngles(
+					plandID2time2waterData,
+					inSample, inImages,
 					allResultsForSnapshot, summaryResult, optStatus);
 		}
 		

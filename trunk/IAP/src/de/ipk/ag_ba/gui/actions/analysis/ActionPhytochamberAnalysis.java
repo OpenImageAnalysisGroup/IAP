@@ -18,6 +18,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhytochamberAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -98,7 +99,9 @@ public class ActionPhytochamberAnalysis extends AbstractNavigationAction impleme
 			
 			PhytochamberAnalysisTask task = new PhytochamberAnalysisTask();
 			
-			task.setInput(workload, null, m, workOnSubset, numberOfSubsets);
+			task.setInput(
+					AbstractPhenotypingTask.getWateringInfo(res),
+					workload, null, m, workOnSubset, numberOfSubsets);
 			task.performAnalysis(pi, ti, status);
 			
 			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();

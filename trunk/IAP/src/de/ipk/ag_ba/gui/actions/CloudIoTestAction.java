@@ -12,6 +12,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -86,7 +87,9 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
 			
 			long t1 = System.currentTimeMillis();
-			task.setInput(workload, null, m, workOnSubset, numberOfSubsets);
+			task.setInput(
+					AbstractPhenotypingTask.getWateringInfo(res),
+					workload, null, m, workOnSubset, numberOfSubsets);
 			task.performAnalysis(1, 1, status);
 			long t2 = System.currentTimeMillis();
 			statRes.addAll(task.getOutput());

@@ -8,6 +8,7 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -48,7 +49,7 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	@Override
 	public ImageAnalysisType[] getInputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_IMAGE, ImageAnalysisType.GRAY_VOLUME,
-							ImageAnalysisType.IMAGE };
+				ImageAnalysisType.IMAGE };
 	}
 	
 	@Override
@@ -64,7 +65,7 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	@Override
 	public ImageAnalysisType[] getOutputTypes() {
 		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_IMAGE, ImageAnalysisType.GRAY_VOLUME,
-							ImageAnalysisType.IMAGE };
+				ImageAnalysisType.IMAGE };
 	}
 	
 	@Override
@@ -74,13 +75,13 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	
 	@Override
 	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		if (output != null) {
 			input = null;
 			return;
 		}
 		Object[] res = MyInputHelper.getInput("Please specify the maximum number of segments:", "SOM Initialization",
-							new Object[] { "SOM-Size", somSize });
+				new Object[] { "SOM-Size", somSize });
 		if (res == null)
 			return;
 		somSize = (Integer) res[0];
@@ -95,7 +96,7 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 						volume.getURL().setFileName(volume.getURL().getFileName() + ".labelfield");
 						status.setCurrentStatusText1("Segmentation");
 						ThreeDsegmentationColored.segment(new LoadedVolumeExtension(volume), somSize, status, volume
-										.getDimensionX(), volume.getDimensionY(), volume.getDimensionZ());
+								.getDimensionX(), volume.getDimensionY(), volume.getDimensionZ());
 						
 						if (storeResultInDatabase != null) {
 							long bytes = volume.getDimensionX() * volume.getDimensionY() * volume.getDimensionZ() * 4;
@@ -104,12 +105,12 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 								status.setCurrentStatusText1("Saving (" + bytes / 1024 / 1024 + " MB)");
 								long t1 = System.currentTimeMillis();
 								storeResultInDatabase.saveVolume(volume, (Sample3D) volume.getParentSample(), m,
-												DBTable.SAMPLE, null, status);
+										DBTable.SAMPLE, null, status);
 								long t2 = System.currentTimeMillis();
 								if (t2 > t1)
 									System.out.println("Saved Volume ("
-													+ StringManipulationTools.formatNumber(bytes / (t2 - t1) * 1000d / 1024 / 1024, "#.##")
-													+ " MB/s, if already in DB, save is skipped)");
+											+ StringManipulationTools.formatNumber(bytes / (t2 - t1) * 1000d / 1024 / 1024, "#.##")
+											+ " MB/s, if already in DB, save is skipped)");
 								else
 									System.out.println("Volume saved in 0 ms, saving was not needed or error occured.");
 								status.setCurrentStatusText1("Finished");
@@ -132,7 +133,9 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void setInput(Collection<Sample3D> input,
+	public void setInput(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			Collection<Sample3D> input,
 			Collection<NumericMeasurementInterface> optValidMeasurements,
 			MongoDB m, int workLoadIndex, int workLoadSize) {
 		this.input = input;

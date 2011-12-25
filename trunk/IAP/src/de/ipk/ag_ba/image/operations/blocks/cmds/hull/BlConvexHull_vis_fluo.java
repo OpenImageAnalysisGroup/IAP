@@ -3,6 +3,8 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.hull;
 import ij.measure.ResultsTable;
 
 import java.awt.Color;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -76,6 +78,7 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,
@@ -85,6 +88,8 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		Double lastVolumeIAP = null;
 		Long lastTimeVolumeIAP = null;
 		final long timeForOneDay = 1000 * 60 * 60 * 24;
+		
+		String plantID = null;
 		
 		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
 				new String[] { "RESULT_side.area", "RESULT_top.area" });
@@ -115,6 +120,7 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						TreeMap<String, ImageData> tid = time2inImages.get(time);
 						if (tid != null) {
 							ImageData id = tid.get(key);
+							plantID = id.getReplicateID() + ";" + id.getQualityAnnotation();
 							Double pos = id.getPosition();
 							if (pos == null)
 								pos = 0d;
@@ -155,10 +161,21 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				volume_iap = Math.ceil(volume_iap);
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap", volume_iap);
 				
-				if (lastTimeVolumeIAP != null && lastVolumeIAP > 0) {
+				if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
 					double ratio = volume_iap / lastVolumeIAP;
 					double ratioPerDay = ratio / (time - lastTimeVolumeIAP) * timeForOneDay;
 					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.relative", ratioPerDay);
+					
+					double growthPerDay = (volume_iap - lastTimeVolumeIAP) / (time - lastTimeVolumeIAP) * timeForOneDay;
+					
+					Double waterUsePerDay = getWaterUsePerDay(
+							plandID2time2waterData.get(plantID),
+							time, lastTimeVolumeIAP, timeForOneDay);
+					
+					if (waterUsePerDay != null && waterUsePerDay > 0) {
+						double wue = growthPerDay / waterUsePerDay;
+						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.wue", wue);
+					}
 				}
 				
 				lastVolumeIAP = volume_iap;
@@ -170,6 +187,41 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.lt", volume_lt);
 				}
 			}
+		}
+	}
+	
+	private Double getWaterUsePerDay(
+			TreeMap<Long, Double> time2waterData,
+			Long endTime, Long startTime, long timeForOneDay) {
+		// time == startTime, OK
+		// time < endTime, OK
+		Double waterSum = 0d;
+		
+		GregorianCalendar gc = new GregorianCalendar();
+		gc.setTime(new Date(startTime));
+		gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
+		gc.set(GregorianCalendar.MINUTE, 0);
+		gc.set(GregorianCalendar.SECOND, 0);
+		gc.set(GregorianCalendar.MILLISECOND, 0);
+		startTime = gc.getTimeInMillis();
+		
+		Long firstWaterTime = null;
+		Long lastWaterTime = null;
+		
+		for (Long time : time2waterData.keySet()) {
+			if (time >= startTime && time < endTime) {
+				waterSum += time2waterData.get(time);
+				if (firstWaterTime == null || time < firstWaterTime)
+					firstWaterTime = time;
+				if (lastWaterTime == null || time > lastWaterTime)
+					lastWaterTime = time;
+			}
+		}
+		if (firstWaterTime == null || lastWaterTime == null)
+			return null;
+		else {
+			long duration = lastWaterTime - firstWaterTime;
+			return waterSum / duration * timeForOneDay;
 		}
 	}
 }
