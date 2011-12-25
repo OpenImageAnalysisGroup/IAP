@@ -897,7 +897,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								String plantID = nmi.getReplicateID() + ";" + nmi.getQualityAnnotation();
 								if (!result.containsKey(plantID))
 									result.put(plantID, new TreeMap<Long, Double>());
-								if (result.get(plantID).containsKey(plantID))
+								if (result.get(plantID).containsKey(time))
 									result.get(plantID).put(time,
 											result.get(plantID).get(time) +
 													nmi.getValue());
