@@ -2,10 +2,10 @@ package de.ipk.ag_ba.image.analysis.barley;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancingRoundCamera_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlBalancing_fluo;

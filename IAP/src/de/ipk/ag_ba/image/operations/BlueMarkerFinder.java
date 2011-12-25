@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 import org.Vector2d;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlueMarkerFinder {

@@ -5,7 +5,7 @@ import java.util.TreeMap;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.graffiti.plugin.parameter.Parameter;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;

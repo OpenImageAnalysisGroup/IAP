@@ -10,10 +10,10 @@ import org.ReleaseInfo;
 import org.junit.AfterClass;
 import org.junit.Test;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipeline;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;

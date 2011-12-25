@@ -2,9 +2,9 @@ package de.ipk.ag_ba.image.analysis.maize;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.gernally.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingForMaizeBloom_vis_stores_image;
