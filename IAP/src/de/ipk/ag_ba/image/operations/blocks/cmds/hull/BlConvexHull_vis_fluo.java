@@ -172,7 +172,7 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 							plandID2time2waterData.get(plantID),
 							time, lastTimeVolumeIAP, timeForOneDay);
 					
-					if (waterUsePerDay != null && waterUsePerDay > 0) {
+					if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay)) {
 						double wue = growthPerDay / waterUsePerDay;
 						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.wue", wue);
 					}
