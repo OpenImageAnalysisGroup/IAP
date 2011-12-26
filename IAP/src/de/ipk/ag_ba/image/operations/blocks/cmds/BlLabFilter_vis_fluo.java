@@ -120,7 +120,7 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 									new int[] {}, new int[] {},
 									new int[] {}, new int[] {},
 									new int[] {}, new int[] {}).
-							border_left_right((int) (w * 0.05), Color.red.getRGB()).
+							border_left_right((int) (options.isBarleyInBarleySystem() ? 0 : w * 0.05), Color.red.getRGB()).
 							print("removed noise", false).getImage();
 				else
 					toBeFiltered = result

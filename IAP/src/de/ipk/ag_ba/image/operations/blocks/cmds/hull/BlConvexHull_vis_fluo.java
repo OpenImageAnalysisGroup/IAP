@@ -158,8 +158,10 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				double avgTopArea = topAreaSum / topAreaCnt;
 				double avgArea = areaSum / areaCnt;
 				double volume_iap = Math.sqrt(avgArea * avgArea * avgTopArea);
-				volume_iap = Math.ceil(volume_iap);
+				double side = areaStat.getMax();
+				double volume_iap_max = Math.sqrt(side * side * avgTopArea);
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap", volume_iap);
+				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap_max", volume_iap_max);
 				
 				if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
 					double ratio = volume_iap / lastVolumeIAP;

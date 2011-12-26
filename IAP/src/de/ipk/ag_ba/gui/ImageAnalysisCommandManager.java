@@ -75,6 +75,16 @@ public class ImageAnalysisCommandManager {
 			}
 			
 			@Override
+			public String getDefaultTitle() {
+				return "Report Files";
+			}
+			
+			@Override
+			public String getDefaultTooltip() {
+				return super.getDefaultTooltip();
+			}
+			
+			@Override
 			public String getDefaultImage() {
 				return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
 			}
