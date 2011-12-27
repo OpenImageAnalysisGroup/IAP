@@ -8,7 +8,6 @@ package de.ipk.ag_ba.gui.util;
 
 import info.clearthought.layout.TableLayout;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
@@ -207,8 +206,9 @@ public class MyExperimentInfoPanel extends JPanel {
 			startEnabled = true;
 		
 		FolderPanel fp = new FolderPanel("Experiment " + experimentHeader.getExperimentName(), hasCorrelationTableData, true, false, null);
-		Color c = new Color(220, 220, 220);
-		fp.setFrameColor(c, Color.BLACK, 4, 8);
+		// Color c = new Color(220, 220, 220);
+		// fp.setFrameColor(c, Color.BLACK, 4, 8);
+		fp.addCollapseListenerDialogSizeUpdate();
 		
 		editName = new JTextField(experimentHeader.getExperimentName());
 		coordinator = new JTextField(experimentHeader.getCoordinator());

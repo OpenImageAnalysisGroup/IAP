@@ -77,7 +77,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	
 	public ActionDataExportToHsmFolder(MongoDB m,
 			ExperimentReference experimentReference, String hsmFolder) {
-		super("Save in HSM Archive (" + hsmFolder + ")");
+		super("Save in HSM (" + hsmFolder + ")");
 		this.m = m;
 		this.experimentReference = experimentReference;
 		this.hsmFolder = hsmFolder;
@@ -122,7 +122,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Save in HSM Archive";
+		return "Save in HSM";
 	}
 	
 	@Override
