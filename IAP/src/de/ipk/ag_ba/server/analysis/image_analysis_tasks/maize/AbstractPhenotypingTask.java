@@ -516,6 +516,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					continue;
 				String val = is.firstEntry().getValue().getVIS().getReplicateID() + ";" +
 						is.firstEntry().getValue().getVIS().getQualityAnnotation();
+				// if (!val.equals("11;1107BA1130"))
+				// continue;
 				workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
 				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0)
 					continue;

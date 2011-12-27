@@ -167,8 +167,8 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					double ratio = volume_iap / lastVolumeIAP;
 					double ratioPerDay = ratio / (time - lastTimeVolumeIAP) * timeForOneDay;
 					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.relative", ratioPerDay);
-					
-					double growthPerDay = (volume_iap - lastTimeVolumeIAP) / (time - lastTimeVolumeIAP) * timeForOneDay;
+					double days = 1d / (time - lastTimeVolumeIAP) * timeForOneDay;
+					double growthPerDay = (volume_iap - lastVolumeIAP) * days;
 					
 					Double waterUsePerDay = getWaterUsePerDay(
 							plandID2time2waterData.get(plantID),

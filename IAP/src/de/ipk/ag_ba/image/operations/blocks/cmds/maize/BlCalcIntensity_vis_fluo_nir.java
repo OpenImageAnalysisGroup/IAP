@@ -127,12 +127,13 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 						if (f > 100)
 							f = 100;
 						fSum += f;
+						filled++;
 					}
 				}
 				if (filled > 0) {
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", fSum / filled);
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", fSum / filled);
 				} else
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.avg", 0);
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0);
 				ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), false); // markerDistanceHorizontally
 				
