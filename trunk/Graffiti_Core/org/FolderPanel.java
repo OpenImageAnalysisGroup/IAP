@@ -69,7 +69,7 @@ public class FolderPanel extends JComponent {
 	private ImageIcon condensedIcon;
 	private ImageIcon uncondensedIcon;
 	
-	private List<ActionListener> collapse_listeners = new ArrayList<ActionListener>();
+	private final List<ActionListener> collapse_listeners = new ArrayList<ActionListener>();
 	
 	private JPanel rowPanel;
 	private static HashMap<String, Boolean> showCondensed = new HashMap<String, Boolean>();
@@ -80,10 +80,10 @@ public class FolderPanel extends JComponent {
 	
 	private boolean sortedRows;
 	
-	private ArrayList<GuiRow> guiComponentRows = new ArrayList<GuiRow>();
-	private ArrayList<GuiRow> guiComponentInvisibleRows = new ArrayList<GuiRow>();
+	private final ArrayList<GuiRow> guiComponentRows = new ArrayList<GuiRow>();
+	private final ArrayList<GuiRow> guiComponentInvisibleRows = new ArrayList<GuiRow>();
 	private ActionListener helpActionListener;
-	private CondenseButtonLayout condenseStyle = CondenseButtonLayout.LEFT;
+	private final CondenseButtonLayout condenseStyle = CondenseButtonLayout.LEFT;
 	private int maxRowCount = -1;
 	private int currentPage = 0;
 	private Color rowBackground0; // if <> null, it is used to set the
@@ -102,10 +102,10 @@ public class FolderPanel extends JComponent {
 	}
 	
 	public FolderPanel(String title, boolean openCondensed,
-						boolean showCondenseButton, boolean sortRows,
-						ActionListener helpActionListener) {
+			boolean showCondenseButton, boolean sortRows,
+			ActionListener helpActionListener) {
 		initComponent(title, openCondensed, showCondenseButton, sortRows,
-							helpActionListener);
+				helpActionListener);
 	}
 	
 	public void enableSearch(boolean enable) {
@@ -118,8 +118,8 @@ public class FolderPanel extends JComponent {
 	}
 	
 	private void initComponent(String title, boolean openCondensed,
-						boolean showCondenseButton, boolean sortRows,
-						ActionListener helpActionListener) {
+			boolean showCondenseButton, boolean sortRows,
+			ActionListener helpActionListener) {
 		this.title = title;
 		this.showCondenseButton = showCondenseButton;
 		this.condensedState = openCondensed;
@@ -136,11 +136,11 @@ public class FolderPanel extends JComponent {
 	}
 	
 	public FolderPanel(String title, boolean sortRows,
-						ActionListener helpActionListener, String helpTopic) {
+			ActionListener helpActionListener, String helpTopic) {
 		if (showCondensed.containsKey(title)) {
 			Boolean showFolded = showCondensed.get(title);
 			initComponent(title, showFolded.booleanValue(), true, sortRows,
-								helpActionListener);
+					helpActionListener);
 		} else
 			initComponent(title, false, true, sortRows, helpActionListener);
 	}
@@ -163,7 +163,7 @@ public class FolderPanel extends JComponent {
 	}
 	
 	public void setFrameColor(Color frameColor, Color headingColor,
-						int frameWidth, int emptyBorderWidth) {
+			int frameWidth, int emptyBorderWidth) {
 		this.frameColor = frameColor;
 		this.headingColor = headingColor;
 		this.frameWidth = frameWidth;
@@ -187,20 +187,20 @@ public class FolderPanel extends JComponent {
 	}
 	
 	public void addFirstGuiComponentRow(JComponent leftComponent,
-						JComponent rightComponent, boolean updateLayout, int spaceAroundComponents) {
+			JComponent rightComponent, boolean updateLayout, int spaceAroundComponents) {
 		int sp = spaceAroundComponents;
 		if (spaceAroundComponents == 0)
 			guiComponentRows.add(0, new GuiRow(leftComponent, rightComponent));
 		else
 			guiComponentRows.add(0, new GuiRow(
-								getBorderedComponent(leftComponent, sp, sp, sp, sp),
-								getBorderedComponent(rightComponent, sp, sp, sp, sp)));
+					getBorderedComponent(leftComponent, sp, sp, sp, sp),
+					getBorderedComponent(rightComponent, sp, sp, sp, sp)));
 		if (updateLayout)
 			layoutRows();
 	}
 	
 	public GuiRow addGuiComponentRow(JComponent leftComponent,
-						JComponent rightComponent, boolean updateLayout) {
+			JComponent rightComponent, boolean updateLayout) {
 		synchronized (guiComponentRows) {
 			GuiRow gr = new GuiRow(leftComponent, rightComponent);
 			guiComponentRows.add(gr);
@@ -251,7 +251,7 @@ public class FolderPanel extends JComponent {
 	}
 	
 	public static TableLayout getVSplitLayout(JComponent topComp,
-						JComponent bottomComp, double topSize, double bottomSize) {
+			JComponent bottomComp, double topSize, double bottomSize) {
 		double border = 0;
 		double[][] size = { { border, TableLayoutConstants.FILL, border }, // Columns
 				{ border, topSize, bottomSize, border } }; // Rows
@@ -259,7 +259,7 @@ public class FolderPanel extends JComponent {
 	}
 	
 	public static TableLayout getHSplitLayout(JComponent leftComponent,
-						JComponent rightComponent, double leftSize, double rightSize) {
+			JComponent rightComponent, double leftSize, double rightSize) {
 		double border = 0;
 		double[][] size = { { border, leftSize, rightSize, border }, // Columns
 				{ border, TableLayoutConstants.PREFERRED, border } // ROWS
@@ -270,6 +270,7 @@ public class FolderPanel extends JComponent {
 	public void layoutRows() {
 		if (!SwingUtilities.isEventDispatchThread()) {
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					layoutRows();
 					return;
@@ -283,13 +284,13 @@ public class FolderPanel extends JComponent {
 			rowPanel.removeAll();
 			ArrayList<GuiRow> guiComponentRowsForCurrentPage = new ArrayList<GuiRow>();
 			guiComponentRowsForCurrentPage
-								.addAll(getFilteredList(guiComponentRows));
+					.addAll(getFilteredList(guiComponentRows));
 			if (guiComponentRowsForCurrentPage.size() > maxRowCount
-								&& maxRowCount > 0) {
+					&& maxRowCount > 0) {
 				ArrayList<GuiRow> remove = new ArrayList<GuiRow>();
 				for (int i = 0; i < guiComponentRowsForCurrentPage.size(); i++) {
 					if (!(i >= currentPage * maxRowCount && i < (currentPage + 1)
-										* maxRowCount))
+							* maxRowCount))
 						remove.add(guiComponentRowsForCurrentPage.get(i));
 				}
 				if (remove.size() > 0) {
@@ -307,15 +308,15 @@ public class FolderPanel extends JComponent {
 			size[0][1] = columnStyle2; // TableLayoutConstants.FILL;
 			
 			rowPanel.setBorder(BorderFactory.createEmptyBorder(
-								maxY > 0 ? emptyBorderWidth : 0, maxY > 0 ? emptyBorderWidth
-													: 0, maxY > 0 ? emptyBorderWidth : 0,
-									maxY > 0 ? emptyBorderWidth : 0));
+					maxY > 0 ? emptyBorderWidth : 0, maxY > 0 ? emptyBorderWidth
+							: 0, maxY > 0 ? emptyBorderWidth : 0,
+					maxY > 0 ? emptyBorderWidth : 0));
 			titleLabel
-								.setForeground(maxY > 0 ? headingColor
-													: (headingColor != null ? headingColor.darker()
-																		: headingColor));
+					.setForeground(maxY > 0 ? headingColor
+							: (headingColor != null ? headingColor.darker()
+									: headingColor));
 			boolean hasData = guiComponentRowsForCurrentPage.size() > 0
-								|| guiComponentInvisibleRows.size() > 0;
+					|| guiComponentInvisibleRows.size() > 0;
 			titleLabel.setText(hasData ? title : title); // + " (no data)");
 			titleLabel.validate();
 			
@@ -329,7 +330,7 @@ public class FolderPanel extends JComponent {
 			
 			for (int y = 0; y < maxY; y++) {
 				if (workSet.get(y) != null && workSet.get(y).right != null &&
-									(workSet.get(y).right instanceof JScrollPane)) {
+						(workSet.get(y).right instanceof JScrollPane)) {
 					size[1][y] = TableLayoutConstants.FILL;
 					// workSet.get(y).right.setBorder(BorderFactory.createLineBorder(Color.red));
 				} else
@@ -342,13 +343,13 @@ public class FolderPanel extends JComponent {
 				if (rowSpacing > 0 || colSpacing > 0) {
 					if (gr.span) {
 						rowPanel.add(getBorderedComponent(gr.left, 0, 0, gr != workSet.get(workSet.size() - 1) ? rowSpacing : 0,
-											colSpacing), "0," + row + ", 1, " + row); // left orientation
+								colSpacing), "0," + row + ", 1, " + row); // left orientation
 					} else {
 						rowPanel.add(getBorderedComponent(gr.left, 0, 0, gr != workSet.get(workSet.size() - 1) ? rowSpacing : 0,
-											colSpacing), "0," + row + ", l"); // left orientation
+								colSpacing), "0," + row + ", l"); // left orientation
 						rowPanel.add(
-											getBorderedComponent(gr.right, 0, 0, gr != workSet.get(workSet.size() - 1) ? rowSpacing : 0, 0),
-											"1," + row);
+								getBorderedComponent(gr.right, 0, 0, gr != workSet.get(workSet.size() - 1) ? rowSpacing : 0, 0),
+								"1," + row);
 					}
 				} else {
 					if (gr.span) {
@@ -376,18 +377,18 @@ public class FolderPanel extends JComponent {
 				showHelpButton = false;
 			
 			if (showCondenseButton || showHelpButton || maxRowCount > 0
-								|| searchEnabled) {
+					|| searchEnabled) {
 				JComponent button1 = null, button2 = null;
 				JComponent titleComp = titleLabel;
 				if (searchEnabled) {
 					JComponent sfield = getSearchField();
 					titleComp = TableLayout.getSplit(titleLabel, sfield,
-										TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
+							TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
 				}
 				if (maxRowCount > 0) {
 					JComponent lrb = getLeftRightButton();
 					titleComp = TableLayout.getSplit(titleComp, lrb,
-										TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
+							TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
 				}
 				if (showCondenseButton) {
 					final JComponent condenseCmdPanel = getCondenseButton();
@@ -403,32 +404,32 @@ public class FolderPanel extends JComponent {
 				if (button1 != null && button2 == null) {
 					if (condenseStyle == CondenseButtonLayout.RIGHT)
 						labelPanel = TableLayout.getSplit(titleComp, button1,
-											TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
+								TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
 					else
 						labelPanel = TableLayout.getSplit(button1, titleComp,
-											TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL);
+								TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL);
 				}
 				if (button2 != null && button1 == null)
 					labelPanel = TableLayout.getSplit(titleComp, button2,
-										TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
+							TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
 				if (button1 != null && button2 != null) {
 					if (condenseStyle == CondenseButtonLayout.RIGHT)
 						labelPanel = TableLayout.getSplit(titleComp, TableLayout
-											.getSplit(button2, button1, TableLayoutConstants.PREFERRED,
-																TableLayoutConstants.PREFERRED), TableLayoutConstants.FILL,
-											TableLayoutConstants.PREFERRED);
+								.getSplit(button2, button1, TableLayoutConstants.PREFERRED,
+										TableLayoutConstants.PREFERRED), TableLayoutConstants.FILL,
+								TableLayoutConstants.PREFERRED);
 					else
 						labelPanel = TableLayout.getSplit(button1, TableLayout
-											.getSplit(titleComp, button2, TableLayoutConstants.FILL,
-																TableLayout.PREFERRED),
-											TableLayout.PREFERRED, TableLayout.FILL);
+								.getSplit(titleComp, button2, TableLayoutConstants.FILL,
+										TableLayout.PREFERRED),
+								TableLayout.PREFERRED, TableLayout.FILL);
 				}
 				setLayout(getVSplitLayout(labelPanel, rowPanel,
-									TableLayout.PREFERRED, TableLayout.FILL));
+						TableLayout.PREFERRED, TableLayout.FILL));
 				add(labelPanel, "1,1");
 			} else {
 				setLayout(getVSplitLayout(titleLabel, rowPanel,
-									TableLayout.PREFERRED, TableLayout.FILL));
+						TableLayout.PREFERRED, TableLayout.FILL));
 				add(titleLabel, "1,1");
 			}
 			add(rowPanel, "1,2");
@@ -438,6 +439,7 @@ public class FolderPanel extends JComponent {
 			
 			if (!hideSearch && lastSearchText.length() > 0 && currentSearchInputField != null) {
 				SwingUtilities.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						currentSearchInputField.requestFocusInWindow();
 					}
@@ -476,6 +478,7 @@ public class FolderPanel extends JComponent {
 		for (MouseListener m : ml)
 			titleLabel.removeMouseListener(m);
 		titleLabel.addMouseListener(new MouseListener() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				for (int i = 0; i < condenseCmdPanel.getComponentCount(); i++) {
 					Component c = condenseCmdPanel.getComponent(i);
@@ -487,20 +490,24 @@ public class FolderPanel extends JComponent {
 				}
 			}
 			
+			@Override
 			public void mousePressed(MouseEvent e) {
 				//
 				
 			}
 			
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				//
 				
 			}
 			
+			@Override
 			public void mouseEntered(MouseEvent e) {
 				// titleLabel.setBackground(frameColor.brighter());
 			}
 			
+			@Override
 			public void mouseExited(MouseEvent e) {
 				// titleLabel.setBackground(frameColor);
 			}
@@ -511,6 +518,7 @@ public class FolderPanel extends JComponent {
 	private ArrayList<GuiRow> getSortedRows(ArrayList<GuiRow> rows) {
 		GuiRow sorted[] = rows.toArray(new GuiRow[] {});
 		Arrays.sort(sorted, new Comparator() {
+			@Override
 			public int compare(Object o1, Object o2) {
 				GuiRow r1 = (GuiRow) o1;
 				GuiRow r2 = (GuiRow) o2;
@@ -566,7 +574,7 @@ public class FolderPanel extends JComponent {
 		tb.setOpaque(true);
 		tb.setBackground(frameColor);
 		tb.setLayout(new TableLayout(new double[][] { { TableLayout.FILL },
-							{ TableLayout.FILL } }));
+				{ TableLayout.FILL } }));
 		
 		final JButton cmdButton = new JButton();
 		// result.setContentAreaFilled(false);
@@ -589,6 +597,7 @@ public class FolderPanel extends JComponent {
 		else
 			cmdButton.setIcon(uncondensedIcon);
 		cmdButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				condensedState = !condensedState;
 				if (condensedState)
@@ -617,8 +626,8 @@ public class FolderPanel extends JComponent {
 		tb.setOpaque(false);
 		tb.setBackground(frameColor);
 		tb.setLayout(new TableLayout(new double[][] {
-							{ TableLayout.PREFERRED, TableLayout.PREFERRED, 40 },
-							{ TableLayout.FILL } }));
+				{ TableLayout.PREFERRED, TableLayout.PREFERRED, 40 },
+				{ TableLayout.FILL } }));
 		
 		final JButton cmdButtonS = new JButton();
 		cmdButtonS.setToolTipText(getSearchHintText());
@@ -628,38 +637,44 @@ public class FolderPanel extends JComponent {
 		currentSearchInputField = input;
 		input.setToolTipText(getSearchHintText());
 		input.setBorder(BorderFactory.createEtchedBorder(Color.WHITE,
-							Color.LIGHT_GRAY));
+				Color.LIGHT_GRAY));
 		input.setBackground(frameColor);
 		input.setOpaque(true);
 		input.setText(lastSearchText);
 		input.addKeyListener(new KeyListener() {
+			@Override
 			public void keyPressed(KeyEvent arg0) {
 			}
 			
+			@Override
 			public void keyReleased(KeyEvent arg0) {
 			}
 			
+			@Override
 			public void keyTyped(KeyEvent arg0) {
 				SwingUtilities.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						lastSearchText = input.getText();
 						currentPage = 0;
 						layoutRows();
 						for (ActionListener al : collapse_listeners) {
 							al.actionPerformed(new ActionEvent(this,
-												condensedState ? 0 : 1, "collapseevent"));
+									condensedState ? 0 : 1, "collapseevent"));
 						}
 					}
 				});
 			}
 		});
 		input.addFocusListener(new FocusListener() {
+			@Override
 			public void focusGained(FocusEvent e) {
 				input.setOpaque(true);
 				input.setBackground(Color.white);
 				input.repaint();
 			}
 			
+			@Override
 			public void focusLost(FocusEvent e) {
 				input.setOpaque(true);
 				input.setBackground(frameColor);
@@ -684,9 +699,9 @@ public class FolderPanel extends JComponent {
 		searchResLabel.setBackground(frameColor);
 		if (activeSearchResult > 0) {
 			if (activeSearchResult < guiComponentRows.size()
-								+ guiComponentInvisibleRows.size())
+					+ guiComponentInvisibleRows.size())
 				searchResLabel.setText("<html><font color='gray'><small>"
-									+ activeSearchResult + "&nbsp;");
+						+ activeSearchResult + "&nbsp;");
 		}
 		
 		// result.setOpaque(false);
@@ -711,7 +726,7 @@ public class FolderPanel extends JComponent {
 	public static ImageIcon getSearchIcon() {
 		ClassLoader cl = FolderPanel.class.getClassLoader();
 		String path = FolderPanel.class.getPackage().getName()
-							.replace('.', '/') + "/images";
+				.replace('.', '/') + "/images";
 		ImageIcon searchIcon = new ImageIcon(cl.getResource(path + "/lupe.png"));
 		return searchIcon;
 	}
@@ -724,9 +739,9 @@ public class FolderPanel extends JComponent {
 		tb.setOpaque(true);
 		tb.setBackground(frameColor);
 		tb.setLayout(new TableLayout(new double[][] {
-							{ TableLayout.PREFERRED, TableLayout.PREFERRED,
-												TableLayout.PREFERRED, TableLayout.PREFERRED,
-												TableLayout.PREFERRED }, { TableLayout.FILL } }));
+				{ TableLayout.PREFERRED, TableLayout.PREFERRED,
+						TableLayout.PREFERRED, TableLayout.PREFERRED,
+						TableLayout.PREFERRED }, { TableLayout.FILL } }));
 		
 		final JButton cmdButtonReduceMaximumRowCount = new JButton(); // less rows
 		final JButton cmdButtonIncreaseMaximumRowCount = new JButton(); // more rows
@@ -751,45 +766,49 @@ public class FolderPanel extends JComponent {
 		cmdButton2.setEnabled(currentPage + 1 < pages);
 		
 		cmdButtonReduceMaximumRowCount.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				maxRowCount--;
 				currentPage = 0;
 				layoutRows();
 				for (ActionListener al : collapse_listeners) {
 					al.actionPerformed(new ActionEvent(this, condensedState ? 0
-										: 1, "collapseevent"));
+							: 1, "collapseevent"));
 				}
 			}
 		});
 		cmdButtonIncreaseMaximumRowCount.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				maxRowCount++;
 				currentPage = 0;
 				layoutRows();
 				for (ActionListener al : collapse_listeners) {
 					al.actionPerformed(new ActionEvent(this, condensedState ? 0
-										: 1, "collapseevent"));
+							: 1, "collapseevent"));
 				}
 			}
 		});
 		
 		cmdButton1.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentPage--;
 				layoutRows();
 				for (ActionListener al : collapse_listeners) {
 					al.actionPerformed(new ActionEvent(this, condensedState ? 0
-										: 1, "collapseevent"));
+							: 1, "collapseevent"));
 				}
 			}
 		});
 		cmdButton2.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentPage++;
 				layoutRows();
 				for (ActionListener al : collapse_listeners) {
 					al.actionPerformed(new ActionEvent(this, condensedState ? 0
-										: 1, "collapseevent"));
+							: 1, "collapseevent"));
 				}
 			}
 		});
@@ -825,27 +844,27 @@ public class FolderPanel extends JComponent {
 		ImageIcon leftIcon = null;
 		ImageIcon rightIcon = null;
 		ImageIcon lessIcon = new ImageIcon(cl
-							.getResource(path + "/bw_fold.png"));
+				.getResource(path + "/bw_fold.png"));
 		ImageIcon moreIcon = new ImageIcon(cl.getResource(path
-							+ "/bw_unfold.png"));
+				+ "/bw_unfold.png"));
 		
 		if (bigIcons == Iconsize.LARGE) {
 			leftIcon = new ImageIcon(cl
-								.getResource(path + "/large_left.png"));
+					.getResource(path + "/large_left.png"));
 			rightIcon = new ImageIcon(cl.getResource(path
-								+ "/large_right.png"));
+					+ "/large_right.png"));
 		} else
 			if (bigIcons == Iconsize.MIDDLE) {
 				leftIcon = new ImageIcon(cl
-									.getResource(path + "/middle_left.png"));
+						.getResource(path + "/middle_left.png"));
 				rightIcon = new ImageIcon(cl.getResource(path
-									+ "/middle_right.png"));
+						+ "/middle_right.png"));
 			} else
 				if (bigIcons == Iconsize.SMALL) {
 					leftIcon = new ImageIcon(cl
-										.getResource(path + "/bw_left.png"));
+							.getResource(path + "/bw_left.png"));
 					rightIcon = new ImageIcon(cl.getResource(path
-										+ "/bw_right.png"));
+							+ "/bw_right.png"));
 				}
 		
 		cmdButton1.setIcon(leftIcon);
@@ -858,7 +877,7 @@ public class FolderPanel extends JComponent {
 		cmdButtonReduceMaximumRowCount.setMargin(new Insets(s, s, s, s));
 		cmdButtonIncreaseMaximumRowCount.setMargin(new Insets(s, s, s, s));
 		String pt = "<html><font color='gray'><small>" + (currentPage + 1)
-							+ "/" + (pages);
+				+ "/" + (pages);
 		if (((currentPage + 1) + "/" + (pages)).equals("1/0"))
 			pt = "";
 		JLabel pageLabel = new JLabel(pt);
@@ -883,21 +902,21 @@ public class FolderPanel extends JComponent {
 		
 		if (bigIcons == Iconsize.LARGE) {
 			leftIcon = new ImageIcon(cl
-								.getResource(path + "/large_left.png"));
+					.getResource(path + "/large_left.png"));
 			rightIcon = new ImageIcon(cl.getResource(path
-								+ "/large_right.png"));
+					+ "/large_right.png"));
 		} else
 			if (bigIcons == Iconsize.MIDDLE) {
 				leftIcon = new ImageIcon(cl
-									.getResource(path + "/middle_left.png"));
+						.getResource(path + "/middle_left.png"));
 				rightIcon = new ImageIcon(cl.getResource(path
-									+ "/middle_right.png"));
+						+ "/middle_right.png"));
 			} else
 				if (bigIcons == Iconsize.SMALL) {
 					leftIcon = new ImageIcon(cl
-										.getResource(path + "/bw_left.png"));
+							.getResource(path + "/bw_left.png"));
 					rightIcon = new ImageIcon(cl.getResource(path
-										+ "/bw_right.png"));
+							+ "/bw_right.png"));
 				}
 		if (left)
 			return leftIcon;
@@ -906,14 +925,14 @@ public class FolderPanel extends JComponent {
 	}
 	
 	public static JComponent getHelpButton(ActionListener helpActionListener,
-						Color frameColor) {
+			Color frameColor) {
 		JToolBar tb = new JToolBar();
 		tb.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		tb.setFloatable(false);
 		tb.setOpaque(false);
 		tb.setBackground(frameColor);
 		tb.setLayout(new TableLayout(new double[][] { { TableLayoutConstants.FILL },
-							{ TableLayoutConstants.FILL } }));
+				{ TableLayoutConstants.FILL } }));
 		// tb.setBackground(frameColor);
 		final JButton result = new JButton();
 		result.setBackground(frameColor);
@@ -922,7 +941,7 @@ public class FolderPanel extends JComponent {
 		result.setOpaque(frameColor != null);
 		ClassLoader cl = FolderPanel.class.getClassLoader();
 		String path = FolderPanel.class.getPackage().getName()
-							.replace('.', '/') + "/images";
+				.replace('.', '/') + "/images";
 		
 		result.setIcon(new ImageIcon(cl.getResource(path + "/help2.png")));
 		result.addActionListener(helpActionListener);
@@ -962,22 +981,22 @@ public class FolderPanel extends JComponent {
 	}
 	
 	public JComponent getBorderedComponent(int top, int left, int bottom,
-						int right) {
+			int right) {
 		JComponent result = TableLayout.getSplitVertical(this, null,
-							TableLayout.PREFERRED, 0);
+				TableLayout.PREFERRED, 0);
 		result.setBorder(BorderFactory.createEmptyBorder(top, left, bottom,
-							right));
+				right));
 		return result;
 	}
 	
 	public static JComponent getBorderedComponent(JComponent comp, int top,
-						int left, int bottom, int right) {
+			int left, int bottom, int right) {
 		if (comp == null)
 			return null;
 		JComponent result = TableLayout.getSplitVertical(comp, null,
-							TableLayoutConstants.PREFERRED, 0);
+				TableLayoutConstants.PREFERRED, 0);
 		result.setBorder(BorderFactory.createEmptyBorder(top, left, bottom,
-							right));
+				right));
 		result.setBackground(null);
 		return result;
 	}
@@ -987,14 +1006,14 @@ public class FolderPanel extends JComponent {
 	}
 	
 	public GuiRow addGuiComponentRow(JComponent left, JComponent right,
-						boolean updateLayout, int spaceAroundElements) {
+			boolean updateLayout, int spaceAroundElements) {
 		int sp = spaceAroundElements;
 		GuiRow gr = null;
 		if (spaceAroundElements == 0)
 			gr = addGuiComponentRow(left, right, updateLayout);
 		else
 			gr = addGuiComponentRow(getBorderedComponent(left, sp, sp, sp, sp),
-								getBorderedComponent(right, sp, sp, sp, sp), updateLayout);
+					getBorderedComponent(right, sp, sp, sp, sp), updateLayout);
 		if (right != null && right instanceof JButton)
 			((JButton) right).setOpaque(false);
 		return gr;
@@ -1005,7 +1024,7 @@ public class FolderPanel extends JComponent {
 			addComp(component);
 		else
 			addComp(getBorderedComponent(component, border, border, border,
-								border));
+					border));
 	}
 	
 	public void addComp(JComponent comp) {
@@ -1021,8 +1040,10 @@ public class FolderPanel extends JComponent {
 	public void addCollapseListenerDialogSizeUpdate() {
 		final FolderPanel fp = this;
 		ActionListener resizeListener = new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				SwingUtilities.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						Component pc = fp.getParent();
 						performDialogResize(pc);
@@ -1039,6 +1060,7 @@ public class FolderPanel extends JComponent {
 			final Component pc = fp.getParent();
 			if (!SwingUtilities.isEventDispatchThread())
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						performDialogResize(pc);
 					}
@@ -1053,7 +1075,7 @@ public class FolderPanel extends JComponent {
 	public static void performDialogResize(Component startComponent) {
 		Component pc = startComponent;
 		while (!((pc instanceof JDialog) || (pc instanceof JFrame))
-							&& pc != null) {
+				&& pc != null) {
 			// System.out.println(pc.getClass().getCanonicalName());
 			pc = pc.getParent();
 		}
@@ -1073,7 +1095,7 @@ public class FolderPanel extends JComponent {
 	public static void closeParentDialog(Component startComponent) {
 		Component pc = startComponent;
 		while (!((pc instanceof JDialog) || (pc instanceof JFrame))
-							&& pc != null) {
+				&& pc != null) {
 			pc = pc.getParent();
 		}
 		if (pc != null && pc instanceof JDialog) {
@@ -1184,6 +1206,7 @@ public class FolderPanel extends JComponent {
 	
 	public static SearchFilter getDefaultSearchFilter(final String optFixedSearch) {
 		return new SearchFilter() {
+			@Override
 			public boolean accept(GuiRow gr, String searchText) {
 				if (gr.left == null || gr.right == null || searchText == null)
 					return true;
@@ -1240,11 +1263,11 @@ public class FolderPanel extends JComponent {
 			}
 			
 			private JComponent findMyComponent(JComponent jc) {
-				if (jc instanceof JPanel) {
-					JPanel jp = (JPanel) jc;
-					return (JComponent) jp.getComponent(0);
-				} else
-					return jc;
+				// if (jc instanceof JPanel) {
+				// JPanel jp = (JPanel) jc;
+				// return (JComponent) jp.getComponent(0);
+				// } else
+				return jc;
 			}
 		};
 	}

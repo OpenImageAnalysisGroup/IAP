@@ -6,12 +6,24 @@ public class MatchInfo {
 	
 	final String desc;
 	
+	private Double cv;
+	
 	public MatchInfo(String desc) {
 		this.desc = desc;
 	}
 	
 	public String getDesc() {
-		return desc;
+		String res = desc;
+		if (res == null)
+			return res;
+		if (res.startsWith("corr."))
+			res = res.substring("corr.".length());
+		if (res.endsWith(".avg"))
+			res = res.substring(0, res.length() - ".avg".length());
+		else
+			if (res.endsWith(".angles"))
+				res = res.substring(0, res.length() - ".angles".length());
+		return res;
 	}
 	
 	public String getHeight() {
@@ -34,7 +46,15 @@ public class MatchInfo {
 		this.frWeight = frWeight;
 	}
 	
+	public void setComparisonValue(Double cv) {
+		this.cv = cv;
+	}
+	
 	public void setHeight(String height) {
 		this.height = height;
+	}
+	
+	public Double getComparisonValue() {
+		return cv;
 	}
 }

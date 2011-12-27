@@ -37,6 +37,7 @@ public class GrubbsTestAlgorithm extends AbstractAlgorithm {
 	private double alphavalue = 0.05d;
 	private boolean doRemoveOutliers = false;
 	
+	@Override
 	public String getName() {
 		return "Grubbs' Test (detect outliers)";
 	}
@@ -51,14 +52,15 @@ public class GrubbsTestAlgorithm extends AbstractAlgorithm {
 		return "Grubbs' Test for the identification of outliers";
 	}
 	
+	@Override
 	public void execute() {
 		graph.getListenerManager().transactionStarted(this);
 		
 		Selection sel = new Selection("id");
 		
 		sel
-							.addAll(doGrubbsTest(GraphHelper.getSelectedOrAllNodes(selection, graph), graph, alphavalue,
-												doRemoveOutliers));
+				.addAll(doGrubbsTest(GraphHelper.getSelectedOrAllNodes(selection, graph), graph, alphavalue,
+						doRemoveOutliers));
 		
 		MainFrame.getInstance().getActiveEditorSession().getSelectionModel().setActiveSelection(sel);
 		
@@ -72,9 +74,9 @@ public class GrubbsTestAlgorithm extends AbstractAlgorithm {
 		if (alphavalue < 0 || alphavalue > 1)
 			alphavalue = 0.05d;
 		return new Parameter[] {
-							new DoubleParameter(alphavalue, "alpha", "Use any alpha value, e.g. 0.05"),
-							new BooleanParameter(doRemoveOutliers, "Remove Outliers",
-												"If selected, all identified outliers will be removed from the dataset.") };
+				new DoubleParameter(alphavalue, "alpha", "Use any alpha value, e.g. 0.05"),
+				new BooleanParameter(doRemoveOutliers, "Remove Outliers",
+						"If selected, all identified outliers will be removed from the dataset.") };
 	}
 	
 	private static DistributionFactoryImpl distFact = new DistributionFactoryImpl();
@@ -95,7 +97,7 @@ public class GrubbsTestAlgorithm extends AbstractAlgorithm {
 				continue;
 			
 			for (SubstanceInterface xmldata : xa.getMappedData()) {
-				List<MyComparableDataPoint> allvalues = NodeTools.getSortedDataSetValues(xmldata);
+				List<MyComparableDataPoint> allvalues = NodeTools.getSortedDataSetValues(xmldata, null);
 				
 				HashSet<String> knownSeries = new HashSet<String>();
 				for (MyComparableDataPoint value : allvalues) {
@@ -186,7 +188,7 @@ public class GrubbsTestAlgorithm extends AbstractAlgorithm {
 	}
 	
 	private static List<MyComparableDataPoint> getValidValues(List<MyComparableDataPoint> valuesForSeries,
-						String timePoint) {
+			String timePoint) {
 		List<MyComparableDataPoint> values = new ArrayList<MyComparableDataPoint>();
 		for (MyComparableDataPoint mcdp : valuesForSeries) {
 			if (mcdp.timeUnitAndTime.equals(timePoint) && !mcdp.isOutlier())

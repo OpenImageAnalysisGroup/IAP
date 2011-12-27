@@ -15,6 +15,9 @@ import java.sql.Date;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
 
@@ -358,55 +361,97 @@ public class MyExperimentInfoPanel extends JPanel {
 		if (optExperiment == null)
 			return null;
 		else {
-			ArrayList<GuiRow> rows = new ArrayList<GuiRow>();
+			ArrayList<GuiRow> rows1 = new ArrayList<GuiRow>();
+			ArrayList<GuiRow> rows2 = new ArrayList<GuiRow>();
 			
 			double width = 90, space = 15, border = 5;
-			
-			rows.add(new GuiRow(new JLabel("<html><br>Average visual property per plant vs. manual measurement<hr>"), null));
-			for (MatchInfo mi : match(optExperiment, new String[] { "corr.", ".avg" }, false)) {
+			// rows.add(new GuiRow(new JLabel("<html><br>Average visual property per plant vs. manual measurement<hr>"), null));
+			Collection<MatchInfo> sortedMatch = match(optExperiment, new String[] { "corr.", ".avg" }, false);
+			Collections.sort((List<MatchInfo>) sortedMatch, new Comparator<MatchInfo>() {
+				@Override
+				public int compare(MatchInfo o1, MatchInfo o2) {
+					if (o1.getComparisonValue() == null)
+						return -1;
+					else
+						if (o2.getComparisonValue() == null)
+							return 1;
+						else
+							return o2.getComparisonValue().compareTo(o1.getComparisonValue());
+				}
+			});
+			for (MatchInfo mi : sortedMatch) {
 				JComponent desc, height, freshWeight, dryWeight;
 				desc = new JLabel(mi.getDesc());
 				height = new JLabel(mi.getHeight());
 				freshWeight = new JLabel(mi.getFreshWeight());
 				dryWeight = new JLabel(mi.getDryWeight());
-				JComponent right = TableLayout.get4Split(new JLabel(), height, freshWeight, dryWeight, width, space, border);
-				rows.add(new GuiRow(desc, right));
+				JComponent right = TableLayout.get3Split(height, freshWeight, dryWeight, width, width, width);
+				rows1.add(new GuiRow(desc, right));
 			}
-			rows.add(new GuiRow(new JLabel(""), null));
-			rows.add(new GuiRow(new JLabel("<html><br>Visual property for each side view vs. manual measurement<hr>"), null));
-			for (MatchInfo mi : match(optExperiment, new String[] { "corr.", ".avg" }, true)) {
+			// rows.add(new GuiRow(new JLabel(""), null));
+			// rows.add(new GuiRow(new JLabel("<html><br>Visual property for each side view vs. manual measurement<hr>"), null));
+			sortedMatch = match(optExperiment, new String[] { "corr.", ".avg" }, true);
+			Collections.sort((List<MatchInfo>) sortedMatch, new Comparator<MatchInfo>() {
+				@Override
+				public int compare(MatchInfo o1, MatchInfo o2) {
+					if (o1.getComparisonValue() == null)
+						return -1;
+					else
+						if (o2.getComparisonValue() == null)
+							return 1;
+						else
+							return o2.getComparisonValue().compareTo(o1.getComparisonValue());
+				}
+			});
+			for (MatchInfo mi : sortedMatch) {
 				JComponent desc, height, freshWeight, dryWeight;
 				desc = new JLabel(mi.getDesc());
 				height = new JLabel(mi.getHeight());
 				freshWeight = new JLabel(mi.getFreshWeight());
 				dryWeight = new JLabel(mi.getDryWeight());
-				JComponent right = TableLayout.get4Split(new JLabel(), height, freshWeight, dryWeight, width, space, border);
-				rows.add(new GuiRow(desc, right));
+				JComponent right = TableLayout.get3Split(height, freshWeight, dryWeight, width, width, width);
+				rows2.add(new GuiRow(desc, right));
 			}
 			
-			FolderPanel fp = new FolderPanel("<html>Correlations (Pearson&#39;s <i>r</i>)", false, true, false, null);
-			JComponent right = TableLayout.get4Split(new JLabel(), new JLabel("Height"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, space,
-					border);
-			fp.addGuiComponentRow(new JLabel("Visual Property"), right, false);
-			for (GuiRow row : rows)
-				fp.addGuiComponentRow(row, false);
-			fp.layoutRows();
+			FolderPanel fp1 = new FolderPanel("<html>Correlations (Pearson&#39;s <i>r</i>) (AVERAGE PLANT)", false, true, false, null);
+			FolderPanel fp2 = new FolderPanel("<html>Correlations (Pearson&#39;s <i>r</i>) (INDIVIDUAL SIDE VIEWS)", true, true, false, null);
+			fp1.setMaximumRowCount(10);
+			fp1.enableSearch(true);
+			fp2.setMaximumRowCount(10);
+			fp2.enableSearch(true);
+			JComponent right1 = TableLayout.get3Split(new JLabel("Height"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, width,
+					width);
+			JComponent right2 = TableLayout.get3Split(new JLabel("Height"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, width,
+					width);
+			fp1.addGuiComponentRow(new JLabel("Visual Property"), right1, false);
+			fp2.addGuiComponentRow(new JLabel("Visual Property"), right2, false);
 			
-			if (rows.size() == 3)
+			for (GuiRow row : rows1)
+				fp1.addGuiComponentRow(row, false);
+			fp1.addDefaultTextSearchFilter();
+			fp1.addCollapseListenerDialogSizeUpdate();
+			fp1.layoutRows();
+			
+			for (GuiRow row : rows2)
+				fp2.addGuiComponentRow(row, false);
+			fp2.addDefaultTextSearchFilter();
+			fp2.addCollapseListenerDialogSizeUpdate();
+			fp2.layoutRows();
+			
+			if (rows1.size() == 0)
 				return null;
 			
-			return fp;
+			return TableLayout.getSplitVertical(fp1, fp2, TableLayout.PREFERRED, TableLayout.PREFERRED);
 		}
 	}
 	
-	private Collection<MatchInfo> match(ExperimentInterface optExperiment, String[] match, boolean inverseSecond) {
+	private ArrayList<MatchInfo> match(ExperimentInterface optExperiment, String[] match, boolean inverseSecond) {
 		ArrayList<MatchInfo> res = new ArrayList<MatchInfo>();
 		for (SubstanceInterface si : optExperiment) {
-			System.out.println(si.getName() + " <== match? " + match[0] + " / " + match[1]);
 			if (si.getName().startsWith(match[0]) &&
 					(
-					(!inverseSecond && si.getName().contains(match[1])) ||
-					(inverseSecond && !si.getName().contains(match[1]))
+					(!inverseSecond && si.getName().endsWith(match[1])) ||
+					(inverseSecond && !si.getName().endsWith(match[1]))
 					)) {
 				MatchInfo mi = new MatchInfo(si.getName());
 				boolean matched = false;
@@ -422,6 +467,7 @@ public class MyExperimentInfoPanel extends JPanel {
 					}
 					if (ci.getConditionName().contains("fresh weight")) {
 						for (SampleInterface sam : ci) {
+							mi.setComparisonValue(sam.getSampleAverage().getValue());
 							mi.setFreshWeight(StringManipulationTools.formatNumber(
 									sam.getSampleAverage().getValue(), "#.###") + " " + sam.getAverageUnit());
 							matched = true;

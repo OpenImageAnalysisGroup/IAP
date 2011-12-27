@@ -298,7 +298,9 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 		
 	}
 	
-	private MyXML_XYDataset initDataset(ExperimentInterface mappedDataList1, ExperimentInterface mappedDataList2) {
+	private MyXML_XYDataset initDataset(
+			ExperimentInterface mappedDataList1,
+			ExperimentInterface mappedDataList2) {
 		Iterator<SubstanceInterface> itXml1 = mappedDataList1.iterator();
 		Iterator<SubstanceInterface> itXml2 = mappedDataList2.iterator();
 		MyXML_XYDataset dataset = new MyXML_XYDataset();
@@ -307,7 +309,7 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 			series++;
 			SubstanceInterface xmldata1 = itXml1.next();
 			SubstanceInterface xmldata2 = itXml2.next();
-			dataset.addXmlDataSeries(xmldata1, xmldata2, "M" + series, plotAverage);
+			dataset.addXmlDataSeries(xmldata1, xmldata2, "M" + series, plotAverage, null);
 		}
 		return dataset;
 	}

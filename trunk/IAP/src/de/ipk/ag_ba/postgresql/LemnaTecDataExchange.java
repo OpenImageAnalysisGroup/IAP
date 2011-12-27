@@ -1110,8 +1110,10 @@ public class LemnaTecDataExchange {
 						// res.get(plantID).setSpecies(filterName(metaValue));
 						res.get(plantID).setSpecies(metaValue);
 					else
-						if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname") || metaName.equalsIgnoreCase("Name")
-								|| metaName.equalsIgnoreCase("GENOTYP"))
+						if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname")
+								|| metaName.equalsIgnoreCase("Name")
+								|| metaName.equalsIgnoreCase("GENOTYP")
+								|| metaName.equalsIgnoreCase("TYP"))
 							res.get(plantID).setGenotype(metaValue);
 						else
 							if (metaName.equalsIgnoreCase("Variety"))
@@ -1129,13 +1131,18 @@ public class LemnaTecDataExchange {
 												oldTreatment = "";
 											if (oldTreatment.length() > 0)
 												oldTreatment = oldTreatment + ";";
-											if (metaName.startsWith("Typ"))
-												res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
-											else {
-												if (metaName.startsWith("conditions "))
-													metaName = metaName.substring("conditions ".length()).trim();
-												res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
-											}
+											if (metaName.startsWith("old ID")) {
+												if (!oldTreatment.contains("old IDs defined"))
+													res.get(plantID).setTreatment(oldTreatment + "old IDs defined");
+											} else
+												if (metaName.startsWith("Sorte")) {
+													if (!oldTreatment.contains(metaValue.trim()))
+														res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
+												} else {
+													if (metaName.startsWith("conditions "))
+														metaName = metaName.substring("conditions ".length()).trim();
+													res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
+												}
 										}
 									}
 					

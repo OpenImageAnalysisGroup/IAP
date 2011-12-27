@@ -588,7 +588,7 @@ public class Experiment2GraphHelper implements BackgroundTaskStatusProviderSuppo
 	}
 	
 	public static void addMappingData2Node(SubstanceInterface xmlSubstanceNode, org.graffiti.graph.Node graphNode) {
-		List<MyComparableDataPoint> testList = NodeTools.getSortedAverageDataSetValues(xmlSubstanceNode);
+		List<MyComparableDataPoint> testList = NodeTools.getSortedAverageDataSetValues(xmlSubstanceNode, null);
 		Set<String> times = new HashSet<String>();
 		for (MyComparableDataPoint mcdp : testList) {
 			times.add(mcdp.timeUnitAndTime);
