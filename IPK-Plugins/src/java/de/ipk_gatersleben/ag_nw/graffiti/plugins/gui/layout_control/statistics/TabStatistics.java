@@ -104,7 +104,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author Christian Klukas
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class TabStatistics extends InspectorTab implements ActionListener,
 		ContainsTabbedPane {
@@ -2764,16 +2764,16 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 			green = 0;
 		if (blue < 0)
 			blue = 0;
-		if (red > 1)
-			red = 1;
-		if (green > 1)
-			green = 1;
-		if (blue > 1)
-			blue = 1;
+		if (red > 255)
+			red = 255;
+		if (green > 255)
+			green = 255;
+		if (blue > 255)
+			blue = 255;
 		if (alpha < 0)
 			alpha = 0;
-		if (alpha > 1)
-			alpha = 1;
+		if (alpha > 255)
+			alpha = 255;
 		
 		return new Color(red / 255f, green / 255f, blue / 255f, alpha / 255f);
 	}
