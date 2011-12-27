@@ -104,7 +104,7 @@ public class XmlDataChartComponent extends JComponent {
 				chartType = getAutoChartTypeFor(xmldata).getName();
 			
 			boolean alsoUsedForPlottingStdDev = chartType.equals(GraffitiCharts.BAR_FLAT.getName())
-								|| (chartType.equals(GraffitiCharts.LINE.getName()) && (co.showStdDevAsT || co.showStdDevAsFillRange));
+					|| (chartType.equals(GraffitiCharts.LINE.getName()) && (co.showStdDevAsT || co.showStdDevAsFillRange));
 			
 			if (hmo == null && chartType.equals(GraffitiCharts.HEATMAP.getName()))
 				hmo = new HeatMapOptions(graph);
@@ -182,7 +182,7 @@ public class XmlDataChartComponent extends JComponent {
 	}
 	
 	public static JPanel prettifyChart(org.graffiti.graph.GraphElement ge,
-						ChartOptions co, String chartType, JFreeChart jfChart) {
+			ChartOptions co, String chartType, JFreeChart jfChart) {
 		if (jfChart.getTitle() != null) {
 			jfChart.getTitle().setFont(NodeTools.getChartTitleFont(ge));
 			jfChart.getTitle().setPaint(NodeTools.getChartTitleColor(ge));
@@ -190,7 +190,7 @@ public class XmlDataChartComponent extends JComponent {
 		JPanel chartPanel;
 		if (chartType.equals(GraffitiCharts.LEGEND_ONLY)) {
 			Double scale = (Double) AttributeHelper.getAttributeValue(ge, "charting", "legend_scale", new Double(
-								1.0d), new Double(1.0d));
+					1.0d), new Double(1.0d));
 			jfChart.getLegend().setAnchor(Legend.NORTH);
 			org.jfree.chart.StandardLegend sl = (StandardLegend) jfChart.getLegend();
 			sl.setBoundingBoxArcHeight(0);
@@ -367,8 +367,8 @@ public class XmlDataChartComponent extends JComponent {
 		// ////////////////////
 		
 		ChartColorAttribute chartColorAttribute = (ChartColorAttribute) AttributeHelper.getAttributeValue(co.graph,
-							ChartColorAttribute.attributeFolder, ChartColorAttribute.attributeName, new ChartColorAttribute(),
-							new ChartColorAttribute());
+				ChartColorAttribute.attributeFolder, ChartColorAttribute.attributeName, new ChartColorAttribute(),
+				new ChartColorAttribute());
 		
 		Collection<String> rowKeys;
 		try {
@@ -476,7 +476,7 @@ public class XmlDataChartComponent extends JComponent {
 	private void pretifyCategoryPlot(BarRenderer renderer, ChartOptions co) {
 		if (co.axisFontSize > 0) {
 			Font af = new Font(Axis.DEFAULT_AXIS_LABEL_FONT.getFontName(), Axis.DEFAULT_AXIS_LABEL_FONT.getStyle(),
-								co.axisFontSize);
+					co.axisFontSize);
 			renderer.getPlot().getRangeAxis().setTickLabelFont(af);
 			renderer.getPlot().getDomainAxis().setTickLabelFont(af);
 			renderer.getPlot().getDomainAxis().setLabelFont(af);
@@ -490,11 +490,11 @@ public class XmlDataChartComponent extends JComponent {
 		renderer.getPlot().setRangeGridlinesVisible(co.showGridRange);
 		if (co.gridWidth >= 0) {
 			renderer.getPlot().setRangeGridlineStroke(
-								new BasicStroke((float) co.gridWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.0f, new float[] {
-													(float) co.gridWidth * 8f, 2f }, 0.0f));
+					new BasicStroke((float) co.gridWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.0f, new float[] {
+							(float) co.gridWidth * 8f, 2f }, 0.0f));
 			renderer.getPlot().setDomainGridlineStroke(
-								new BasicStroke((float) co.gridWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.0f, new float[] {
-													(float) co.gridWidth * 8f, 2f }, 0.0f));
+					new BasicStroke((float) co.gridWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.0f, new float[] {
+							(float) co.gridWidth * 8f, 2f }, 0.0f));
 		}
 		if (co.gridColor != null) {
 			renderer.getPlot().setRangeGridlinePaint(co.gridColor);
@@ -546,12 +546,12 @@ public class XmlDataChartComponent extends JComponent {
 	public static void setSeriesColorsAndStroke(CategoryItemRenderer renderer, float outlineBorderWidth, Graph graph) {
 		
 		ChartColorAttribute chartColorAttribute = (ChartColorAttribute) AttributeHelper.getAttributeValue(graph,
-							ChartColorAttribute.attributeFolder, ChartColorAttribute.attributeName, new ChartColorAttribute(),
-							new ChartColorAttribute());
+				ChartColorAttribute.attributeFolder, ChartColorAttribute.attributeName, new ChartColorAttribute(),
+				new ChartColorAttribute());
 		
 		ArrayList<Color> colors1 = chartColorAttribute.getSeriesColors(renderer.getPlot().getDataset().getRowKeys());
 		ArrayList<Color> colors2 = chartColorAttribute.getSeriesOutlineColors(renderer.getPlot().getDataset()
-							.getRowKeys());
+				.getRowKeys());
 		
 		if (outlineBorderWidth >= 0)
 			renderer.setStroke(new BasicStroke(outlineBorderWidth));
@@ -614,7 +614,7 @@ public class XmlDataChartComponent extends JComponent {
 		if (co.orientation == PlotOrientation.VERTICAL) {
 			// if (Math.abs(co.axisRotation)>0.00001)
 			axis.setCategoryLabelPositions(CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 180
-								* co.axisRotation));
+					* co.axisRotation));
 			/*
 			 * else axis.setBottomCategoryLabelPosition(new CategoryLabelPosition(
 			 * RectangleAnchor.BOTTOM, TextBlockAnchor.BOTTOM_CENTER,
@@ -705,11 +705,11 @@ public class XmlDataChartComponent extends JComponent {
 		
 		if (co.gridWidth >= 0) {
 			renderer.getPlot().setRangeGridlineStroke(
-								new BasicStroke((float) co.gridWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.0f, new float[] {
-													(float) co.gridWidth * 8f, 2f }, 0.0f));
+					new BasicStroke((float) co.gridWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.0f, new float[] {
+							(float) co.gridWidth * 8f, 2f }, 0.0f));
 			renderer.getPlot().setDomainGridlineStroke(
-								new BasicStroke((float) co.gridWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.0f, new float[] {
-													(float) co.gridWidth * 8f, 2f }, 0.0f));
+					new BasicStroke((float) co.gridWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.0f, new float[] {
+							(float) co.gridWidth * 8f, 2f }, 0.0f));
 		}
 		
 		if (co.axisWidth >= 0) {
@@ -726,7 +726,7 @@ public class XmlDataChartComponent extends JComponent {
 		}
 		if (co.axisFontSize > 0) {
 			Font af = new Font(Axis.DEFAULT_AXIS_LABEL_FONT.getFontName(), Axis.DEFAULT_AXIS_LABEL_FONT.getStyle(),
-								co.axisFontSize);
+					co.axisFontSize);
 			renderer.getPlot().getRangeAxis().setTickLabelFont(af);
 			renderer.getPlot().getDomainAxis().setTickLabelFont(af);
 			renderer.getPlot().getDomainAxis().setLabelFont(af);
@@ -737,13 +737,13 @@ public class XmlDataChartComponent extends JComponent {
 	}
 	
 	protected BioStatisticalCategoryDataset getDataset(SubstanceInterface xmldata, Graph g,
-						boolean alsoUsedForPlottingStdDev, boolean showOnlyHalfErrorBar, boolean fillTimeGaps) {
+			boolean alsoUsedForPlottingStdDev, boolean showOnlyHalfErrorBar, boolean fillTimeGaps) {
 		Double markerSize = (Double) AttributeHelper.getAttributeValue(g, "", AttributeHelper.id_ttestCircleSize,
-							new Double(10.0d), new Double(10.0d));
+				new Double(10.0d), new Double(10.0d));
 		boolean useStdErrInsteadOfStdDev = ((Boolean) AttributeHelper.getAttributeValue(g, "", "node_useStdErr",
-							new Boolean(false), new Boolean(false))).booleanValue();
+				new Boolean(false), new Boolean(false))).booleanValue();
 		BioStatisticalCategoryDataset dataset = new BioStatisticalCategoryDataset(markerSize.floatValue());
-		List<MyComparableDataPoint> ss = NodeTools.getSortedAverageDataSetValues(xmldata);
+		List<MyComparableDataPoint> ss = NodeTools.getSortedAverageDataSetValues(xmldata, null);
 		SortedSet<Integer> timePoints = null;
 		if (fillTimeGaps)
 			timePoints = new TreeSet<Integer>();
@@ -754,8 +754,8 @@ public class XmlDataChartComponent extends JComponent {
 		String series = null;
 		for (MyComparableDataPoint mcdp : ss) {
 			dataset.add(mcdp.mean, mcdp.getStddev(useStdErrInsteadOfStdDev), mcdp.serie, mcdp.timeValue,
-								mcdp.ttestIsReference, mcdp.ttestIsSignificantDifferent, mcdp.measurementUnit, mcdp.timeUnit,
-								alsoUsedForPlottingStdDev, showOnlyHalfErrorBar);
+					mcdp.ttestIsReference, mcdp.ttestIsSignificantDifferent, mcdp.measurementUnit, mcdp.timeUnit,
+					alsoUsedForPlottingStdDev, showOnlyHalfErrorBar);
 			if (fillTimeGaps) {
 				if (measUnit == null && mcdp.measurementUnit != null)
 					measUnit = mcdp.measurementUnit;
@@ -784,7 +784,7 @@ public class XmlDataChartComponent extends JComponent {
 	}
 	
 	private void addMissingTimePoints(BioStatisticalCategoryDataset dataset, SortedSet<Integer> timePoints, int minTime,
-						int maxTime, String timeUnit, String measUnit, String series) {
+			int maxTime, String timeUnit, String measUnit, String series) {
 		int minDiff;
 		int maxDiff;
 		do {

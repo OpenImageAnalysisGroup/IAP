@@ -1020,4 +1020,13 @@ public class Experiment implements ExperimentInterface {
 		// stream.close();
 		
 	}
+	
+	@Override
+	public TreeSet<String> getTreatmentList() {
+		TreeSet<String> result = new TreeSet<String>();
+		for (SubstanceInterface si : this)
+			for (ConditionInterface ci : si)
+				result.add(ci.getTreatment());
+		return result;
+	}
 }

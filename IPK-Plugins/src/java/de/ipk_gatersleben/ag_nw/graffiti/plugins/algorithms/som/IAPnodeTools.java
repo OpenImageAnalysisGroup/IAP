@@ -23,8 +23,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
  * @author klukas
  */
 public class IAPnodeTools extends NodeTools {
-	public static SOMdataEntry getSOMdataSet(GraphElement n, int columnCount, String[] columnDesc, boolean returnNaN,
-						boolean useSampleAverageValues) {
+	public static SOMdataEntry getSOMdataSet(GraphElement n, int columnCount, String[] columnDesc,
+			boolean returnNaN,
+			boolean useSampleAverageValues) {
 		List<MyComparableDataPoint> mappedData = new ArrayList<MyComparableDataPoint>();
 		StringBuffer res = new StringBuffer();
 		int missingDataPoints = 0;
@@ -33,9 +34,9 @@ public class IAPnodeTools extends NodeTools {
 			for (SubstanceInterface mappingData : getMappedDataListFromNode(n)) {
 				List<MyComparableDataPoint> list;
 				if (useSampleAverageValues)
-					list = getSortedAverageDataSetValues(mappingData);
+					list = getSortedAverageDataSetValues(mappingData, null);
 				else
-					list = getSortedDataSetValues(mappingData);
+					list = getSortedDataSetValues(mappingData, null);
 				mappedData.addAll(list);
 			}
 			

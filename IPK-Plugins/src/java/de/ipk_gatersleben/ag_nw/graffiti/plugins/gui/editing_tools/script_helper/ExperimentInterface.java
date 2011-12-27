@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
@@ -136,4 +137,6 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	public void numberConditions();
 	
 	public void saveToFile(String string) throws IOException;
+	
+	public TreeSet<String> getTreatmentList();
 }

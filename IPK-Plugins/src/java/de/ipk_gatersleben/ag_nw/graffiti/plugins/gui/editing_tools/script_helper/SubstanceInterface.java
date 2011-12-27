@@ -40,7 +40,7 @@ public interface SubstanceInterface extends MappingDataEntity, Comparable<Substa
 	@Override
 	public abstract void getStringOfChildren(StringBuilder s);
 	
-	public abstract Collection<MyComparableDataPoint> getDataPoints(boolean returnAvgValues);
+	public abstract Collection<MyComparableDataPoint> getDataPoints(boolean returnAvgValues, String optTreatmentFilter);
 	
 	/**
 	 * @return Null or eventually empty list of synonyms.

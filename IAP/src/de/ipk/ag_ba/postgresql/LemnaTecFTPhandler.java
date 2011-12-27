@@ -36,11 +36,12 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	
 	public static final String PREFIX = "lemnatec-ftp";
 	
+	@Override
 	public String getPrefix() {
 		return PREFIX;
 	}
 	
-	public static boolean useCachedCloudDataIfAvailable = false;
+	public static boolean useCachedCloudDataIfAvailable = true;
 	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
@@ -101,7 +102,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 				if (advancedFTP) {
 					MyByteArrayOutputStream bos = new MyByteArrayOutputStream();
 					BackgroundTaskStatusProviderSupportingExternalCallImpl status = new CommandLineBackgroundTaskStatusProvider(
-										false);
+							false);
 					try {
 						MyAdvancedFTP.processFTPdownload(status, ur, bos);
 					} catch (Error e) {
@@ -180,7 +181,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
-						throws Exception {
+			throws Exception {
 		throw new Exception("LemnaTec FTP Output is not supported!");
 	}
 	

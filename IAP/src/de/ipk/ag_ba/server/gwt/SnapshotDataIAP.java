@@ -3,6 +3,7 @@ package de.ipk.ag_ba.server.gwt;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class SnapshotDataIAP {
 	public String plantId;
@@ -32,6 +33,8 @@ public class SnapshotDataIAP {
 	public String species, genotype, variety, growthCondition, treatment, sequence;
 	
 	public transient HashMap<Integer, Double> store;
+	
+	private transient HashMap<Integer, TreeMap<Double, Double>> position2store;
 	
 	public SnapshotDataIAP() {
 		// empty
@@ -539,11 +542,11 @@ public class SnapshotDataIAP {
 		return res.toString();
 	}
 	
-	private transient HashMap<String, Double> position2store;
-	
 	public void storeAngleValue(int idx, Double position, double value) {
 		if (position2store == null)
-			position2store = new HashMap<String, Double>();
-		position2store.put(idx + ";" + position, value);
+			position2store = new HashMap<Integer, TreeMap<Double, Double>>();
+		if (!position2store.containsKey(idx))
+			position2store.put(idx, new TreeMap<Double, Double>());
+		position2store.get(idx).put(position == null ? 0d : position, value);
 	}
 }

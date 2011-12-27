@@ -44,12 +44,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.pattern_springembedde
 public class NodeTools {
 	
 	public static Vector2d getMaximumXY(Collection nodeList, double factorXY, double minx, double miny,
-						boolean includeSizeInformation) {
+			boolean includeSizeInformation) {
 		return getMaximumXY(nodeList, factorXY, minx, miny, includeSizeInformation, false);
 	}
 	
 	public static Vector2d getMaximumXY(Collection nodeList, double factorXY, double minx, double miny,
-						boolean includeSizeInformation, boolean includeInvisibleNodes) {
+			boolean includeSizeInformation, boolean includeInvisibleNodes) {
 		
 		double maxx = 0, maxy = 0;
 		
@@ -81,12 +81,12 @@ public class NodeTools {
 	}
 	
 	public static Vector2d getMinimumXY(Collection nodeList, double factorXY, double subx, double suby,
-						boolean includeSizeInformation) {
+			boolean includeSizeInformation) {
 		return getMinimumXY(nodeList, factorXY, subx, suby, includeSizeInformation, false);
 	}
 	
 	public static Vector2d getMinimumXY(Collection nodeList, double factorXY, double subx, double suby,
-						boolean includeSizeInformation, boolean includeInvisibleNodes) {
+			boolean includeSizeInformation, boolean includeInvisibleNodes) {
 		
 		double minx = Double.MAX_VALUE, miny = Double.MAX_VALUE;
 		
@@ -289,7 +289,7 @@ public class NodeTools {
 		} catch (ClassCastException cce) {
 			// convert possible older integer id to string id
 			Integer oldval = (Integer) AttributeHelper
-								.getAttributeValue(node, "cluster", "cluster", null, new Integer(-1));
+					.getAttributeValue(node, "cluster", "cluster", null, new Integer(-1));
 			if (oldval != null) {
 				((CollectionAttribute) node.getAttribute("cluster")).remove("cluster");
 				setClusterID(node, oldval.toString());
@@ -313,9 +313,9 @@ public class NodeTools {
 		if (mappings != null) {
 			for (SubstanceInterface mapping : mappings) {
 				if (useSampleAverage)
-					mappedData.addAll(getSortedAverageDataSetValues(mapping));
+					mappedData.addAll(getSortedAverageDataSetValues(mapping, null));
 				else
-					mappedData.addAll(getSortedDataSetValues(mapping));
+					mappedData.addAll(getSortedDataSetValues(mapping, null));
 			}
 			
 			result.addAll(mappedData);
@@ -333,20 +333,21 @@ public class NodeTools {
 	 * 
 	 * @param xmldata
 	 *           A xml data node or a specific xml series data node.
+	 * @param optTreatmentFilter
 	 * @return A list of <code>MyComparableDataPoint</code> entries.
 	 */
-	public static List<MyComparableDataPoint> getSortedAverageDataSetValues(SubstanceInterface xmldata) {
-		return getSortedAverageOrDataSetValues(xmldata, "average");
+	public static List<MyComparableDataPoint> getSortedAverageDataSetValues(SubstanceInterface xmldata, String optTreatmentFilter) {
+		return getSortedAverageOrDataSetValues(xmldata, "average", optTreatmentFilter);
 	}
 	
 	private static List<MyComparableDataPoint> getSortedAverageOrDataSetValues(SubstanceInterface xmldata,
-						String avgOrDataIdentifier) {
+			String avgOrDataIdentifier, String optTreatmentFilter) {
 		
 		boolean returnAvgValues = avgOrDataIdentifier.equals("average");
 		
 		ArrayList<MyComparableDataPoint> ss = new ArrayList<MyComparableDataPoint>();
 		
-		ss.addAll(xmldata.getDataPoints(returnAvgValues));
+		ss.addAll(xmldata.getDataPoints(returnAvgValues, optTreatmentFilter));
 		
 		return ss;
 	}
@@ -358,6 +359,7 @@ public class NodeTools {
 				result.add(lines.item(i));
 		}
 		Collections.sort(result, new Comparator() {
+			@Override
 			public int compare(Object o1, Object o2) {
 				org.w3c.dom.Node a = (org.w3c.dom.Node) o1;
 				org.w3c.dom.Node b = (org.w3c.dom.Node) o2;
@@ -382,10 +384,12 @@ public class NodeTools {
 	/**
 	 * @param xmldata
 	 *           A xml data mapping node or a specific xml line data node
+	 * @param optTreatmentFilter
 	 * @return
 	 */
-	public static List<MyComparableDataPoint> getSortedDataSetValues(SubstanceInterface xmldata) {
-		return getSortedAverageOrDataSetValues(xmldata, "data");
+	public static List<MyComparableDataPoint> getSortedDataSetValues(SubstanceInterface xmldata,
+			String optTreatmentFilter) {
+		return getSortedAverageOrDataSetValues(xmldata, "data", optTreatmentFilter);
 	}
 	
 	// public synchronized static void setNodeComponentType(GraphElement ge, int
@@ -443,7 +447,7 @@ public class NodeTools {
 	
 	public static String getNodeComponentType(Node node) {
 		return (String) AttributeHelper.getAttributeValue(node, GraphicAttributeConstants.GRAPHICS, "component",
-							new String("unknown"), null);
+				new String("unknown"), null);
 	}
 	
 	public static Font getLabelFont(Node node) {
@@ -507,8 +511,8 @@ public class NodeTools {
 					HashMapAttribute ha = (HashMapAttribute) a;
 					a.getParent().remove(a.getId());
 					Attribute colAtt = StringAttribute.getTypedStringAttribute(
-										GraphicAttributeConstants.CHARTBACKGROUNDCOLOR + add, ColorUtil
-															.getHexFromColor(getColorFromHashMapAttribute(ha)));
+							GraphicAttributeConstants.CHARTBACKGROUNDCOLOR + add, ColorUtil
+									.getHexFromColor(getColorFromHashMapAttribute(ha)));
 					ge.addAttribute(colAtt, "charting");
 				} else {
 					a.getParent().remove(a.getId());
@@ -525,7 +529,7 @@ public class NodeTools {
 				return resultCol;
 		} catch (AttributeNotFoundException e) {
 			Attribute newAtt = StringAttribute.getTypedStringAttribute(GraphicAttributeConstants.CHARTBACKGROUNDCOLOR
-								+ add, ColorUtil.getHexFromColor(Color.BLACK));
+					+ add, ColorUtil.getHexFromColor(Color.BLACK));
 			ge.addAttribute(newAtt, "charting");
 			return null;
 		}
@@ -539,7 +543,7 @@ public class NodeTools {
 			return resultCol;
 		} catch (AttributeNotFoundException e) {
 			Attribute newAtt = StringAttribute.getTypedStringAttribute(GraphicAttributeConstants.GRIDCOLOR, ColorUtil
-								.getHexFromColor(defaultColor));
+					.getHexFromColor(defaultColor));
 			g.addAttribute(newAtt, "");
 			return defaultColor;
 		}
@@ -553,7 +557,7 @@ public class NodeTools {
 			return resultCol;
 		} catch (AttributeNotFoundException e) {
 			Attribute newAtt = StringAttribute.getTypedStringAttribute(GraphicAttributeConstants.AXISCOLOR, ColorUtil
-								.getHexFromColor(defaultColor));
+					.getHexFromColor(defaultColor));
 			g.addAttribute(newAtt, "");
 			return defaultColor;
 		}
@@ -574,7 +578,7 @@ public class NodeTools {
 			return resultCol;
 		} catch (AttributeNotFoundException e) {
 			Attribute newAtt = StringAttribute.getTypedStringAttribute(GraphicAttributeConstants.CATEGORY_BACKGROUND_A,
-								ColorUtil.getHexFromColor(defaultColor));
+					ColorUtil.getHexFromColor(defaultColor));
 			g.addAttribute(newAtt, "");
 			return defaultColor;
 		}
@@ -588,7 +592,7 @@ public class NodeTools {
 			return resultCol;
 		} catch (AttributeNotFoundException e) {
 			Attribute newAtt = StringAttribute.getTypedStringAttribute(GraphicAttributeConstants.CATEGORY_BACKGROUND_B,
-								ColorUtil.getHexFromColor(defaultColor));
+					ColorUtil.getHexFromColor(defaultColor));
 			g.addAttribute(newAtt, "");
 			return defaultColor;
 		}
@@ -602,7 +606,7 @@ public class NodeTools {
 			return resultCol;
 		} catch (AttributeNotFoundException e) {
 			Attribute newAtt = StringAttribute.getTypedStringAttribute(GraphicAttributeConstants.CATEGORY_BACKGROUND_C,
-								ColorUtil.getHexFromColor(defaultColor));
+					ColorUtil.getHexFromColor(defaultColor));
 			g.addAttribute(newAtt, "");
 			return defaultColor;
 		}

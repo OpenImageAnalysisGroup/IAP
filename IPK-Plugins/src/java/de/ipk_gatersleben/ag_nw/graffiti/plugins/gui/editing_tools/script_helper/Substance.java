@@ -295,13 +295,16 @@ public class Substance implements SubstanceInterface {
 	}
 	
 	@Override
-	public Collection<MyComparableDataPoint> getDataPoints(boolean returnAvgValues) {
+	public Collection<MyComparableDataPoint> getDataPoints(boolean returnAvgValues, String optTreatmentFilter) {
 		ArrayList<MyComparableDataPoint> result = new ArrayList<MyComparableDataPoint>();
-		for (ConditionInterface c : conditions)
+		for (ConditionInterface c : conditions) {
+			if (optTreatmentFilter != null && !(c.getTreatment() + "").equals(optTreatmentFilter))
+				continue;
 			if (returnAvgValues)
 				result.addAll(c.getMeanMCDPs());
 			else
 				result.addAll(c.getMCDPs());
+		}
 		return result;
 	}
 	

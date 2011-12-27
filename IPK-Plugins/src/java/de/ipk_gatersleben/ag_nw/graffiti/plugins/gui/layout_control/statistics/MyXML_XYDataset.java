@@ -144,9 +144,10 @@ public class MyXML_XYDataset extends AbstractXYDataset {
 	
 	public void addXmlDataSeries(SubstanceInterface xmldata1,
 			SubstanceInterface xmldata2, String seriesDescription,
-			boolean useSampleAverageValues) {
+			boolean useSampleAverageValues,
+			String optTreatmentFilter) {
 		addXmlDataSeries(xmldata1, xmldata2, seriesDescription,
-				useSampleAverageValues, null);
+				useSampleAverageValues, null, optTreatmentFilter);
 	}
 	
 	/**
@@ -156,16 +157,17 @@ public class MyXML_XYDataset extends AbstractXYDataset {
 	public void addXmlDataSeries(SubstanceInterface xmldata1,
 			SubstanceInterface xmldata2, String seriesDescription,
 			boolean useSampleAverageValues,
-			RunnableOnMatchedDataPoint optPostProcessor) {
+			RunnableOnMatchedDataPoint optPostProcessor,
+			String optTreatmentFilter) {
 		ranksCalculated = false;
 		calcOffset = Integer.MAX_VALUE;
 		List<MyComparableDataPoint> ss1, ss2;
 		if (useSampleAverageValues) {
-			ss1 = NodeTools.getSortedAverageDataSetValues(xmldata1);
-			ss2 = NodeTools.getSortedAverageDataSetValues(xmldata2);
+			ss1 = NodeTools.getSortedAverageDataSetValues(xmldata1, optTreatmentFilter);
+			ss2 = NodeTools.getSortedAverageDataSetValues(xmldata2, optTreatmentFilter);
 		} else {
-			ss1 = NodeTools.getSortedDataSetValues(xmldata1);
-			ss2 = NodeTools.getSortedDataSetValues(xmldata2);
+			ss1 = NodeTools.getSortedDataSetValues(xmldata1, optTreatmentFilter);
+			ss2 = NodeTools.getSortedDataSetValues(xmldata2, optTreatmentFilter);
 		}
 		ArrayList<MyComparableDataPoint> workQueue1 = new ArrayList<MyComparableDataPoint>();
 		workQueue1.addAll(ss1);
@@ -221,11 +223,11 @@ public class MyXML_XYDataset extends AbstractXYDataset {
 		calcOffset = Integer.MAX_VALUE;
 		List<MyComparableDataPoint> ss1, ss2;
 		if (useSampleAverageValues) {
-			ss1 = NodeTools.getSortedAverageDataSetValues(xmlSeries1);
-			ss2 = NodeTools.getSortedAverageDataSetValues(xmlSeries2);
+			ss1 = NodeTools.getSortedAverageDataSetValues(xmlSeries1, null);
+			ss2 = NodeTools.getSortedAverageDataSetValues(xmlSeries2, null);
 		} else {
-			ss1 = NodeTools.getSortedDataSetValues(xmlSeries1);
-			ss2 = NodeTools.getSortedDataSetValues(xmlSeries2);
+			ss1 = NodeTools.getSortedDataSetValues(xmlSeries1, null);
+			ss2 = NodeTools.getSortedDataSetValues(xmlSeries2, null);
 		}
 		ArrayList<MyComparableDataPoint> workQueue1 = new ArrayList<MyComparableDataPoint>();
 		workQueue1.addAll(ss1);

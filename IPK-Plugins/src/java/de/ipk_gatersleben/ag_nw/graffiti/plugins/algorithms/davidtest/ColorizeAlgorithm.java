@@ -47,6 +47,7 @@ public class ColorizeAlgorithm extends AbstractAlgorithm {
 	private Color maxColor = Color.RED;
 	private double gamma = 1d;
 	
+	@Override
 	public String getName() {
 		return null; // "Average Substance-Level > Background Color";
 	}
@@ -59,38 +60,41 @@ public class ColorizeAlgorithm extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>" + "With this algorithm the selected nodes will be colorized accordingly<br>"
-							+ "to the average of the mapped measurement values.<br>" + "<br>"
-							+ "The minimum and maximum value will be determined by the minimum<br>"
-							+ "and maximum of the average measurement for the selected nodes.<br>" + "<br>"
-							+ "<small>For details on this command open the documentation (? Button).<br><br>"
-							+ "The colors for the minimum and maximum values will be specified<br>"
-							+ "separately, after choosing OK.<br>" + "<br>"
-							+ "The diagrams, shown inside each node will be hidden after performing<br>" + "this command.<br>"
-							+ "Use the node-sidepanel, to re-enable the diagram view, if needed!";
+				+ "to the average of the mapped measurement values.<br>" + "<br>"
+				+ "The minimum and maximum value will be determined by the minimum<br>"
+				+ "and maximum of the average measurement for the selected nodes.<br>" + "<br>"
+				+ "<small>For details on this command open the documentation (? Button).<br><br>"
+				+ "The colors for the minimum and maximum values will be specified<br>"
+				+ "separately, after choosing OK.<br>" + "<br>"
+				+ "The diagrams, shown inside each node will be hidden after performing<br>" + "this command.<br>"
+				+ "Use the node-sidepanel, to re-enable the diagram view, if needed!";
 	}
 	
+	@Override
 	public void execute() {
 		JDialog dialog;
 		final FinalBoolean set = new FinalBoolean(false);
 		final JColorChooser colorChooser = new JColorChooser(minColor);
 		dialog = JColorChooser.createDialog(MainFrame.getInstance(), "Target Color for Minimum Value", true,
-							colorChooser, new ActionListener() {
-								public void actionPerformed(ActionEvent arg0) {
-									minColor = colorChooser.getColor();
-									set.set(true);
-								}
-							}, null);
+				colorChooser, new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						minColor = colorChooser.getColor();
+						set.set(true);
+					}
+				}, null);
 		dialog.setVisible(true);
 		if (!set.isSet())
 			return;
 		final JColorChooser colorChooserMax = new JColorChooser(maxColor);
 		dialog = JColorChooser.createDialog(MainFrame.getInstance(), "Target Color for Maximum Value", true,
-							colorChooserMax, new ActionListener() {
-								public void actionPerformed(ActionEvent arg0) {
-									maxColor = colorChooserMax.getColor();
-									set.set(true);
-								}
-							}, null);
+				colorChooserMax, new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						maxColor = colorChooserMax.getColor();
+						set.set(true);
+					}
+				}, null);
 		dialog.setVisible(true);
 		if (!set.isSet())
 			return;
@@ -104,7 +108,7 @@ public class ColorizeAlgorithm extends AbstractAlgorithm {
 				max = userMaxValue;
 			}
 			colorizeNodes(GraphHelper.getSelectedOrAllNodes(selection, graph), minColor, maxColor, gamma, min, max,
-								useRatio);
+					useRatio);
 		} finally {
 			graph.getListenerManager().transactionFinished(this);
 		}
@@ -113,22 +117,22 @@ public class ColorizeAlgorithm extends AbstractAlgorithm {
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] {
-							new DoubleParameter(gamma, "Gamma (1..n)", "Gamma (>=1), use 1 to disable gamma correction."),
-							new BooleanParameter(useUserMinMax, "<html>Disable Autoscaling?<br>"
-												+ "<small><small><font color=\"gray\">" + "(if the autoscaling is disabled the "
-												+ "user min./max values will be used)",
-												"If selected, the user provided minimum/maximum values are used"),
-							new DoubleParameter(userMinValue, "User Minimum Value", "User provided minimum value"),
-							new DoubleParameter(userMaxValue, "User Maximum Value", "User provided maximum value"),
-							new BooleanParameter(useRatio, "<html>Use ratio instead of average value?<br>"
-												+ "<small><small><font color=\"gray\">"
-												+ "(if selected, the average ratio from sample to sample will be used instead "
-												+ "of the average sample value)",
-												"If selected, the average ratio from sample to sample instead of the average sample value will be used"), };
+				new DoubleParameter(gamma, "Gamma (1..n)", "Gamma (>=1), use 1 to disable gamma correction."),
+				new BooleanParameter(useUserMinMax, "<html>Disable Autoscaling?<br>"
+						+ "<small><small><font color=\"gray\">" + "(if the autoscaling is disabled the "
+						+ "user min./max values will be used)",
+						"If selected, the user provided minimum/maximum values are used"),
+				new DoubleParameter(userMinValue, "User Minimum Value", "User provided minimum value"),
+				new DoubleParameter(userMaxValue, "User Maximum Value", "User provided maximum value"),
+				new BooleanParameter(useRatio, "<html>Use ratio instead of average value?<br>"
+						+ "<small><small><font color=\"gray\">"
+						+ "(if selected, the average ratio from sample to sample will be used instead "
+						+ "of the average sample value)",
+						"If selected, the average ratio from sample to sample instead of the average sample value will be used"), };
 	}
 	
 	public static void colorizeNodes(List<Node> nodes, Color minC, Color maxC, double gamma, double min, double max,
-						boolean useRatioCalculation) {
+			boolean useRatioCalculation) {
 		double minimum = Double.MAX_VALUE;
 		double maximum = Double.NEGATIVE_INFINITY;
 		if (Double.isNaN(min) || Double.isNaN(max)) {
@@ -138,11 +142,11 @@ public class ColorizeAlgorithm extends AbstractAlgorithm {
 					XMLAttribute xa = (XMLAttribute) ca.getAttribute(Experiment2GraphHelper.mapVarName);
 					List<MyComparableDataPoint> allvalues = new ArrayList<MyComparableDataPoint>();
 					for (SubstanceInterface xmldata : xa.getMappedData()) {
-						List<MyComparableDataPoint> mapvalues = NodeTools.getSortedAverageDataSetValues(xmldata);
+						List<MyComparableDataPoint> mapvalues = NodeTools.getSortedAverageDataSetValues(xmldata, null);
 						allvalues.addAll(mapvalues);
 					}
 					if (allvalues != null
-										&& ((!useRatioCalculation && allvalues.size() > 0) || (useRatioCalculation && allvalues.size() > 1))) {
+							&& ((!useRatioCalculation && allvalues.size() > 0) || (useRatioCalculation && allvalues.size() > 1))) {
 						double sum = 0d;
 						double sumratio = 0d;
 						boolean first = true;
@@ -174,13 +178,13 @@ public class ColorizeAlgorithm extends AbstractAlgorithm {
 		}
 		if (minimum == Double.MAX_VALUE || maximum == Double.NEGATIVE_INFINITY) {
 			MainFrame.showMessageDialog("<html>Minimum and/or maximum average sample values could not be determined!<br>"
-								+ "Select graph nodes with mapped measurement data.", "Missing sample data");
+					+ "Select graph nodes with mapped measurement data.", "Missing sample data");
 		}
 		if (Math.abs(maximum - minimum) < 0.000000000001d) {
 			MainFrame.showMessageDialog(
-								"<html>The minimum sample value equals the maximum value, node coloring can not proceed.<br>"
-													+ "Please select a number of nodes with non-constant average sample values.",
-								"Missing sample data");
+					"<html>The minimum sample value equals the maximum value, node coloring can not proceed.<br>"
+							+ "Please select a number of nodes with non-constant average sample values.",
+					"Missing sample data");
 		} else {
 			for (Node node : nodes) {
 				try {
@@ -188,7 +192,7 @@ public class ColorizeAlgorithm extends AbstractAlgorithm {
 					XMLAttribute xa = (XMLAttribute) ca.getAttribute(Experiment2GraphHelper.mapVarName);
 					List<MyComparableDataPoint> allvalues = new ArrayList<MyComparableDataPoint>();;
 					for (SubstanceInterface xmldata : xa.getMappedData()) {
-						List<MyComparableDataPoint> mapvalues = NodeTools.getSortedAverageDataSetValues(xmldata);
+						List<MyComparableDataPoint> mapvalues = NodeTools.getSortedAverageDataSetValues(xmldata, null);
 						allvalues.addAll(mapvalues);
 					}
 					if (allvalues != null && allvalues.size() > 0) {
@@ -227,11 +231,11 @@ public class ColorizeAlgorithm extends AbstractAlgorithm {
 				}
 			}
 			MainFrame.showMessage("<html>Selected nodes are now colored according to the average of the "
-								+ "mapped average sample values.<br>" + "<font color=\"" + ColorUtil.getHexFromColor(minC)
-								+ "\"><b>Color Min</b></font> for samples &lt;= " + StringManipulationTools.formatNumber(minimum, "#.####")
-								+ ", <font color=\"" + ColorUtil.getHexFromColor(maxC) + "\">Color Max</b></font> for samples &gt;= "
-								+ StringManipulationTools.formatNumber(maximum, "#.####") + ", "
-								+ " values inbetween are colored with a linear gradient.", MessageType.INFO);
+					+ "mapped average sample values.<br>" + "<font color=\"" + ColorUtil.getHexFromColor(minC)
+					+ "\"><b>Color Min</b></font> for samples &lt;= " + StringManipulationTools.formatNumber(minimum, "#.####")
+					+ ", <font color=\"" + ColorUtil.getHexFromColor(maxC) + "\">Color Max</b></font> for samples &gt;= "
+					+ StringManipulationTools.formatNumber(maximum, "#.####") + ", "
+					+ " values inbetween are colored with a linear gradient.", MessageType.INFO);
 			// if (nodes.size()>0)
 			// GraphHelper.issueCompleteRedrawForGraph(nodes.iterator().next().getGraph());
 		}

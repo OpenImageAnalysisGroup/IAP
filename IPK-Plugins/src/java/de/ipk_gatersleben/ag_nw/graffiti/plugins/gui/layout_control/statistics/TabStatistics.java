@@ -104,7 +104,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author Christian Klukas
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class TabStatistics extends InspectorTab implements ActionListener,
 		ContainsTabbedPane {
@@ -2015,7 +2015,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 			if (xa != null)
 				for (SubstanceInterface xmldata : xa.getMappedData()) {
 					List<MyComparableDataPoint> allvalues = NodeTools
-							.getSortedDataSetValues(xmldata);
+							.getSortedDataSetValues(xmldata, null);
 					
 					HashSet<String> knownSeries = new HashSet<String>();
 					for (MyComparableDataPoint value : allvalues) {
@@ -2346,7 +2346,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 				} else {
 					calcAndAddResult(dataset2offset, prob, corrRes,
 							calculationHistory, sum_x, sum_y, sum_x_x, sum_y_y,
-							sum_x_y, mergedSeries, n, maxROW, rowDescription,
+							sum_x_y, dataset.getSeriesName(series), n, maxROW, rowDescription,
 							rankOrder);
 				}
 			}
@@ -2356,7 +2356,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 					sum_x, sum_y, sum_x_x, sum_y_y, sum_x_y, mergedSeries, n,
 					maxROW, rowDescription, rankOrder);
 		}
-		System.out.println("N=" + n + " // " + calculationHistory.toString());
+		System.out.println("N=" + n);// + " // " + calculationHistory.toString());
 		return corrRes;
 	}
 	
@@ -2519,7 +2519,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 					SubstanceInterface xmldata1 = itXml1.next();
 					SubstanceInterface xmldata2 = itXml2.next();
 					dataset.addXmlDataSeries(xmldata2, xmldata1, "M" + series,
-							plotAverage);
+							plotAverage, null);
 				}
 				if (ge1 != ge2) {
 					CorrelationResult cr = calculateCorrelation(dataset,
@@ -2616,7 +2616,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 							SubstanceInterface xmldata1 = itXml1.next();
 							SubstanceInterface xmldata2 = itXml2.next();
 							dataset.addXmlDataSeries(xmldata2, xmldata1, "M"
-									+ series, plotAverage);
+									+ series, plotAverage, null);
 						}
 					}
 					JFreeChart chart;
