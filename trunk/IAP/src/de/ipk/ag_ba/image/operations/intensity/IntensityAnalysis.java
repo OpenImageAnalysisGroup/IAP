@@ -37,8 +37,10 @@ public class IntensityAnalysis {
 			int g_intensityChlorophyl = (c & 0x00ff00) >> 8;
 			int b_intensityPhenol = (c & 0x0000ff);
 			
-			double intensityChlorphyl = (255d - g_intensityChlorophyl) / 255d;
-			weightOfPlant += 1 / 7d + (1 - 1 / 7d) * intensityChlorphyl;
+			double intensityPhenol = (255d - b_intensityPhenol) / 255d;
+			weightOfPlant += (1d - (1 - 1 / 7d) * intensityPhenol);
+			// if (intensityPhenol > 0.1)
+			// System.out.println("PHENOL: " + intensityPhenol + ", pixel weight: " + (1d - (1 - 1 / 7d) * intensityPhenol));
 			
 			sumOfIntensityChlorophyl += (255 - g_intensityChlorophyl);
 			if (multiLevel) {
@@ -50,7 +52,11 @@ public class IntensityAnalysis {
 		
 		result.incrementCounter();
 		
-		result.addValue("intensity.chlorophyl.plant_weight", plantImagePixelCnt);
+		if (multiLevel) {
+			result.addValue("intensity.phenol.plant_weight", weightOfPlant);
+			result.addValue("intensity.phenol.plant_weight_drought_loss", plantImagePixelCnt - weightOfPlant);
+		}
+		
 		result.addValue("filled.pixels", plantImagePixelCnt);
 		result.addValue("filled.percent", (100d * pixels.length) / plantImagePixelCnt);
 		if (multiLevel) {

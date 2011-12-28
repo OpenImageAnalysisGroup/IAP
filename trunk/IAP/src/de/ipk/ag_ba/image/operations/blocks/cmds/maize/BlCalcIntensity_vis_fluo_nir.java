@@ -129,14 +129,18 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 							f = 100;
 						fSum += f;
 						filled++;
-						weightOfPlant += 1 / 7d + (1 - 1 / 7d) * f / 100d;
+						double realF = 1 - (x - 80d) / (160d - 80d);
+						realF *= 100;
+						weightOfPlant += 1 / 7d + (1 - 1 / 7d) * realF / 100d;
 					}
 				}
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight", weightOfPlant);
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight_drought_loss",
+						filled - weightOfPlant);
 				if (filled > 0) {
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", fSum / filled);
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.av", fSum / filled);
 				} else
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0);
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.av", 0d);
 				ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), false); // markerDistanceHorizontally
 				
