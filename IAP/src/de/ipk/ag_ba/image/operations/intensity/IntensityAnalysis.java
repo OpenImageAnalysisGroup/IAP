@@ -23,6 +23,8 @@ public class IntensityAnalysis {
 		double sumOfIntensityPhenol = 0;
 		double sumOfIntensityClassic = 0;
 		
+		double weightOfPlant = 0;
+		
 		int background = ImageOperation.BACKGROUND_COLORint;
 		
 		Histogram histChlorophyl = new Histogram(this.n);
@@ -35,6 +37,9 @@ public class IntensityAnalysis {
 			int g_intensityChlorophyl = (c & 0x00ff00) >> 8;
 			int b_intensityPhenol = (c & 0x0000ff);
 			
+			double intensityChlorphyl = (255d - g_intensityChlorophyl) / 255d;
+			weightOfPlant += 1 / 7d + (1 - 1 / 7d) * intensityChlorphyl;
+			
 			sumOfIntensityChlorophyl += (255 - g_intensityChlorophyl);
 			if (multiLevel) {
 				sumOfIntensityPhenol += (255 - b_intensityPhenol);
@@ -45,6 +50,7 @@ public class IntensityAnalysis {
 		
 		result.incrementCounter();
 		
+		result.addValue("intensity.chlorophyl.plant_weight", plantImagePixelCnt);
 		result.addValue("filled.pixels", plantImagePixelCnt);
 		result.addValue("filled.percent", (100d * pixels.length) / plantImagePixelCnt);
 		if (multiLevel) {

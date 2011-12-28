@@ -118,6 +118,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 				int filled = 0;
 				double fSum = 0;
 				int b = ImageOperation.BACKGROUND_COLORint;
+				double weightOfPlant = 0; // fully wet: 1 unit, fully dry: 1/7 unit
 				for (int x : nirImg) {
 					// Feuchtigkeit (%) = -7E-05x^3 + 0,0627x^2 - 15,416x + 1156,1 // Formel: E-Mail Alex 10.8.2011
 					if (x != b) {
@@ -128,8 +129,10 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 							f = 100;
 						fSum += f;
 						filled++;
+						weightOfPlant += 1 / 7d + (1 - 1 / 7d) * f / 100d;
 					}
 				}
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight", weightOfPlant);
 				if (filled > 0) {
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", fSum / filled);
 				} else
