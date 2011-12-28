@@ -225,7 +225,7 @@ public class BlockResults implements BlockResultSet {
 		res.put("top.nir.normalized.histogram.bin.5.145_182", "px");
 		res.put("top.nir.normalized.histogram.bin.6.182_218", "px");
 		res.put("top.nir.normalized.histogram.bin.7.218_255", "px");
-		res.put("top.nir.wetness.avg", "");
+		res.put("top.nir.wetness.average", "percent");
 		res.put("vis.side", "images");
 		res.put("fluo.top", "images");
 		res.put("nir.side", "images");
@@ -277,7 +277,7 @@ public class BlockResults implements BlockResultSet {
 		res.put("side.nir.normalized.histogram.bin.6.182_218", "px");
 		res.put("side.nir.normalized.histogram.bin.7.218_255", "px");
 		res.put("side.nir.skeleton.intensity.average", "relative");
-		res.put("side.nir.wetness.avg", "percent");
+		res.put("side.nir.wetness.average", "percent");
 		res.put("side.bloom", "0/1");
 		res.put("side.bloom.count", "tassel");
 		res.put("side.fluo.bloom.area.size", "mm^2");
