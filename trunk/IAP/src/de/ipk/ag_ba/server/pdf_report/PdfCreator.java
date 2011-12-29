@@ -240,4 +240,8 @@ public class PdfCreator {
 	public String getPDFurl() {
 		return new File(tempDirectory.getAbsolutePath() + File.separator + "report2.pdf").getAbsolutePath();
 	}
+	
+	public void openTargetDirectory() {
+		AttributeHelper.showInBrowser(tempDirectory + "");
+	}
 }

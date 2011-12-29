@@ -38,7 +38,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	
-	private static final String separator = "\t";
+	private static final String separator = ";";// "\t";
 	private final boolean exportIndividualAngles;
 	private final String[] variant;
 	
@@ -49,8 +49,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	}
 	
 	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles, String[] variant) {
-		this("Show/export numeric data report"
-				+ (exportIndividualAngles ? " (for each angle)" : " (" + StringManipulationTools.getStringList(variant, ", ") + ")"), exportIndividualAngles,
+		this("Create report" +
+				(exportIndividualAngles ? " CSV" : " PDF (" + StringManipulationTools.getStringList(variant, ", ") + ")"),
+				exportIndividualAngles,
 				variant);
 		this.m = m;
 		this.experimentReference = experimentReference;
@@ -70,6 +71,8 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
+		if (exportIndividualAngles)
+			return "Save CSV Data Table";
 		if (SystemAnalysis.isHeadless())
 			return "Download Report"
 					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
@@ -86,7 +89,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		ArrayList<String> cols = new ArrayList<String>();
-		Object[] columns;
+		// Object[] columns;
 		ExperimentInterface experiment = experimentReference.getData(m);
 		ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
 		if (SystemAnalysis.isHeadless()) {
@@ -97,7 +100,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 			// cols.add("Weight (before watering)");
 			// cols.add("Weight (after watering)");
 			// cols.add("Water");
-			columns = cols.toArray();
+			// columns = cols.toArray();
 			//
 			// for (SubstanceInterface su : experiment) {
 			// if (su.getName() == null)
@@ -157,7 +160,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				}
 				if (exportIndividualAngles) {
 					for (SnapshotDataIAP s : snapshots) {
-						boolean germanLanguage = false;
+						boolean germanLanguage = true;
 						csv.append(s.getCSVvalue(germanLanguage, separator));
 					}
 				} else {
@@ -188,13 +191,17 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 						"report2.tex"
 				});
 				
-				p.executeRstat(variant);
-				
-				boolean ok = p.hasPDFcontent();
-				
-				AttributeHelper.showInBrowser(p.getPDFurl());
-				
-				// p.deleteDirectory();
+				if (!exportIndividualAngles) {
+					p.executeRstat(variant);
+					
+					boolean ok = p.hasPDFcontent();
+					
+					AttributeHelper.showInBrowser(p.getPDFurl());
+					
+					// p.deleteDirectory();
+				} else {
+					p.openTargetDirectory();
+				}
 				
 			} else {
 				
@@ -204,7 +211,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				// cols.add("Measurement"); // substance
 				cols.add("Replicate ID"); // substance
 				// cols.add("Value");
-				columns = cols.toArray();
+				// columns = cols.toArray();
 				
 				HashMap<String, Integer> id2row = new HashMap<String, Integer>();
 				for (SubstanceInterface su : experiment) {
@@ -235,7 +242,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 			}
 		}
 		
-		Object[][] rowdata = new Object[rows.size()][cols.size()];
+		// Object[][] rowdata = new Object[rows.size()][cols.size()];
 		
 	}
 	
@@ -259,7 +266,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 		return "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator + "Variety" + separator + "GrowthCondition"
 				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int)"
 				+ separator + "Weight A (g)" + separator + "Weight B (g)" + separator +
-				"Water (weight-diff)" +
+				"Water (weight-diff)" + "Angle" +
 				// + separator + "Water (pumped)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "OTHER" +
 				"\r\n";
 	}
