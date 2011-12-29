@@ -2,10 +2,11 @@ package de.ipk.ag_ba.server.gwt;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 public class SnapshotDataIAP {
+	private static final Double NO_ANGLE = -720d;
+	
 	public String plantId;
 	
 	public transient StringBuilder rgbUrl = new StringBuilder();
@@ -19,7 +20,7 @@ public class SnapshotDataIAP {
 	public transient StringBuilder unknownUrlAngle = new StringBuilder();
 	
 	public String dataTransport;
-	public ArrayList<Double> storeValues;
+	public TreeMap<Double, ArrayList<Double>> storeValues;
 	
 	public Long snapshotTime;
 	public int day;
@@ -32,9 +33,7 @@ public class SnapshotDataIAP {
 	
 	public String species, genotype, variety, growthCondition, treatment, sequence;
 	
-	public transient HashMap<Integer, Double> store;
-	
-	private transient HashMap<Integer, TreeMap<Double, Double>> position2store;
+	private transient TreeMap<Double, TreeMap<Integer, Double>> position2store;
 	
 	public SnapshotDataIAP() {
 		// empty
@@ -337,13 +336,16 @@ public class SnapshotDataIAP {
 	}
 	
 	private void prepareStore() {
-		storeValues = new ArrayList<Double>();
-		if (store != null && !store.isEmpty())
-			for (Integer i : store.keySet()) {
-				while (storeValues.size() <= i)
-					storeValues.add(null);
-				storeValues.set(i, store.get(i));
-			}
+		storeValues = new TreeMap<Double, ArrayList<Double>>();
+		if (position2store != null && !position2store.isEmpty())
+			for (Double angle : position2store.keySet())
+				for (Integer i : position2store.get(angle).keySet()) {
+					if (!storeValues.containsKey(angle))
+						storeValues.put(angle, new ArrayList<Double>());
+					while (storeValues.get(angle).size() <= i)
+						storeValues.get(angle).add(null);
+					storeValues.get(angle).set(i, position2store.get(angle).get(i));
+				}
 	}
 	
 	public void prepareFieldsForUsageAfterDataTransport() {
@@ -370,12 +372,15 @@ public class SnapshotDataIAP {
 		}
 		
 		if (storeValues != null && storeValues.size() > 0) {
-			store = new HashMap<Integer, Double>();
-			int n = storeValues.size();
-			for (int i = 0; i < n; i++) {
-				Double d = storeValues.get(i);
-				if (d != null)
-					store.put(i, d);
+			position2store = new TreeMap<Double, TreeMap<Integer, Double>>();
+			for (Double angle : storeValues.keySet()) {
+				position2store.put(angle, new TreeMap<Integer, Double>());
+				int n = storeValues.get(angle).size();
+				for (int i = 0; i < n; i++) {
+					Double d = storeValues.get(angle).get(i);
+					if (d != null)
+						position2store.get(angle).put(i, d);
+				}
 			}
 		}
 	}
@@ -388,9 +393,9 @@ public class SnapshotDataIAP {
 		String sumBA = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null && s.getWeightOfWatering() != null ?
 				(s.getWeightBefore() + s.getWeightOfWatering()) + "" : "");
 		String waterAmount = enDe(numberFormat_deTrue_enFalse, s.getWaterAmount() != null ? s.getWaterAmount() + "" : "");
-		if (store == null) {
+		if (position2store == null) {
 			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;
-			return s.getPlantId() + separator
+			return "-720" + separator + s.getPlantId() + separator
 					+ s.getCondition() + separator
 					+ replaceNull(s.getSpecies()) + separator
 					+ replaceNull(s.getGenotype()) + separator
@@ -406,37 +411,43 @@ public class SnapshotDataIAP {
 					+ separator + s.getNirUrlCnt() + separator + s.getUnknownUrlCnt()
 					+ "\r\n";
 		} else {
-			StringBuilder columnData = new StringBuilder();
-			int n = storeValues.size();
-			for (int i = 0; i < n; i++) {
-				columnData.append(separator);
-				Double v = storeValues.get(i);
-				if (v != null && !Double.isNaN(v) && !Double.isInfinite(v)) {
-					if (!numberFormat_deTrue_enFalse)
-						columnData.append(v);
-					else {
-						String ss = v + "";
-						ss = ss.replace(".", ",");
-						columnData.append(ss);
+			StringBuilder result = new StringBuilder();
+			for (Double angle : storeValues.keySet()) {
+				StringBuilder columnData = new StringBuilder();
+				int n = storeValues.get(angle).size();
+				for (int i = 0; i < n; i++) {
+					columnData.append(separator);
+					Double v = storeValues.get(angle).get(i);
+					if (v != null && !Double.isNaN(v) && !Double.isInfinite(v)) {
+						if (!numberFormat_deTrue_enFalse)
+							columnData.append(v);
+						else {
+							String ss = v + "";
+							ss = ss.replace(".", ",");
+							columnData.append(ss);
+						}
 					}
 				}
+				String res = enDe(numberFormat_deTrue_enFalse, angle + "") + separator +
+						s.getPlantId() + separator
+						+ replaceNull(s.getCondition()) + separator
+						+ replaceNull(s.getSpecies()) + separator
+						+ replaceNull(s.getGenotype()) + separator
+						+ replaceNull(s.getVariety()) + separator
+						+ replaceNull(s.getGrowthCondition()) + separator
+						+ replaceNull(s.getTreatment()) + separator
+						+ replaceNull(s.getSequence()) + separator
+						+ s.getTimePoint() + separator +
+						new Date(s.getSnapshotTime() != null ? s.getSnapshotTime() : 0).toString() + separator
+						+ getNumbersFromString(s.getTimePoint()) + separator
+						+ weightBeforeWatering + separator
+						+ sumBA + separator
+						+ waterAmount
+						+ columnData
+						+ "\r\n";
+				result.append(res);
 			}
-			return s.getPlantId() + separator
-					+ replaceNull(s.getCondition()) + separator
-					+ replaceNull(s.getSpecies()) + separator
-					+ replaceNull(s.getGenotype()) + separator
-					+ replaceNull(s.getVariety()) + separator
-					+ replaceNull(s.getGrowthCondition()) + separator
-					+ replaceNull(s.getTreatment()) + separator
-					+ replaceNull(s.getSequence()) + separator
-					+ s.getTimePoint() + separator +
-					new Date(s.getSnapshotTime() != null ? s.getSnapshotTime() : 0).toString() + separator
-					+ getNumbersFromString(s.getTimePoint()) + separator
-					+ weightBeforeWatering + separator
-					+ sumBA + separator
-					+ waterAmount
-					+ columnData
-					+ "\r\n";
+			return result.toString();
 		}
 	}
 	
@@ -457,15 +468,17 @@ public class SnapshotDataIAP {
 	}
 	
 	public void storeValue(Integer idx, Double value) {
-		if (store == null)
-			store = new HashMap<Integer, Double>();
-		store.put(idx, value);
+		if (position2store == null)
+			position2store = new TreeMap<Double, TreeMap<Integer, Double>>();
+		if (!position2store.containsKey(NO_ANGLE))
+			position2store.put(NO_ANGLE, new TreeMap<Integer, Double>());
+		position2store.get(NO_ANGLE).put(idx, value);
 	}
 	
 	public Double getStoreValue(Integer idx) {
-		if (store == null)
+		if (position2store == null || !position2store.containsKey(NO_ANGLE))
 			return null;
-		return store.get(idx);
+		return position2store.get(NO_ANGLE).get(idx);
 	}
 	
 	public String getConditionLineByLine() {
@@ -543,10 +556,12 @@ public class SnapshotDataIAP {
 	}
 	
 	public void storeAngleValue(int idx, Double position, double value) {
+		if (position == null)
+			position = 0d;
 		if (position2store == null)
-			position2store = new HashMap<Integer, TreeMap<Double, Double>>();
-		if (!position2store.containsKey(idx))
-			position2store.put(idx, new TreeMap<Double, Double>());
-		position2store.get(idx).put(position == null ? 0d : position, value);
+			position2store = new TreeMap<Double, TreeMap<Integer, Double>>();
+		if (!position2store.containsKey(position))
+			position2store.put(position, new TreeMap<Integer, Double>());
+		position2store.get(position).put(idx, value);
 	}
 }

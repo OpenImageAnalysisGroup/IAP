@@ -9,15 +9,12 @@ package de.ipk.ag_ba.gui;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.SystemAnalysis;
-
 import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ActionDataExport;
 import de.ipk.ag_ba.gui.actions.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.gui.actions.ActionDataExportTar;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
-import de.ipk.ag_ba.gui.actions.ActionNumericDataReport;
 import de.ipk.ag_ba.gui.actions.ActionNumericDataReportComplete;
 import de.ipk.ag_ba.gui.actions.ActionPerformanceTest;
 import de.ipk.ag_ba.gui.actions.CloudIoTestAction;
@@ -92,19 +89,20 @@ public class ImageAnalysisCommandManager {
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
-				if (SystemAnalysis.isHeadless())
-					actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
-				// if (SystemAnalysis.isHeadless())
+				
+				// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
+				
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true, new String[] { "none", "none", "FALSE" }),
+						guiSetting));
 				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Condition", "none", "FALSE" }),
 						guiSetting));
 				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Condition", "none", "TRUE" }),
 						guiSetting));
 				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Treatment", "none", "TRUE" }),
 						guiSetting));
-				actions
-						.add(new NavigationButton(
-								new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Variety", "Treatment", "TRUE" }),
-								guiSetting));
+				actions.add(new NavigationButton(
+						new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Variety", "Treatment", "TRUE" }),
+						guiSetting));
 				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Species", "none", "TRUE" }),
 						guiSetting));
 				return actions;
