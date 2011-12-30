@@ -8,6 +8,10 @@ public class IAPimages {
 		return "img/ext/gpl2/Add-Files-To-Archive-64.png";
 	}
 	
+	public static String getDownloadIcon() {
+		return "img/ext/gpl2/Gnome-Emblem-Downloads-64.png";
+	}
+	
 	public static String getWebCam() {
 		return "img/ext/axis.png";
 		// return "img/ext/gpl2/Gnome-Camera-Web-64.png";
