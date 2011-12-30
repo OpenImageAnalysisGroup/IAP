@@ -100,8 +100,10 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				time2summaryResult.put(time, new BlockResults());
 			BlockResultSet summaryResult = time2summaryResult.get(time);
 			
-			double areaSum = 0;
-			int areaCnt = 0;
+			double areaSum = 0, areaSumFluo = 0, areaSumFluoWeight = 0;
+			int areaCnt = 0, areaCntFluo = 0, areaCntWeight = 0;
+			double topAreaSumFluo = 0, topAreaWeightSumFluo = 0;
+			int topAreaCntFluo = 0, topAreaCntWeightCnt = 0;
 			double sideArea_for_angleNearestTo0 = Double.NaN;
 			double sideArea_for_angleNearestTo90 = Double.NaN;
 			double distanceTo0 = Double.MAX_VALUE;
@@ -135,6 +137,47 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						}
 					}
 				}
+				for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.fluo.filled.pixels")) {
+					if (v.getValue() != null) {
+						double area = v.getValue().doubleValue();
+						areaSumFluo += area;
+						areaCntFluo += 1;
+					}
+				}
+				for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.fluo.intensity.phenol.plant_weight")) {
+					if (v.getValue() != null) {
+						double area = v.getValue().doubleValue();
+						areaSumFluoWeight += area;
+						areaCntWeight += 1;
+					}
+				}
+				for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top.fluo.filled.pixels")) {
+					if (v.getValue() != null) {
+						double area = v.getValue().doubleValue();
+						topAreaSumFluo += area;
+						topAreaCntFluo += 1;
+					}
+				}
+				for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top.fluo.intensity.phenol.plant_weight")) {
+					if (v.getValue() != null) {
+						double area = v.getValue().doubleValue();
+						topAreaWeightSumFluo += area;
+						topAreaCntWeightCnt += 1;
+					}
+				}
+			}
+			
+			if (areaCntFluo > 0 && topAreaCntFluo > 0) {
+				double avgTopArea = topAreaSumFluo / topAreaCntFluo;
+				double avgArea = areaSumFluo / areaCntFluo;
+				double volume_iap = Math.sqrt(avgArea * avgArea * avgTopArea);
+				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.fluo.iap", volume_iap);
+			}
+			if (areaCntWeight > 0 && topAreaCntWeightCnt > 0) {
+				double avgTopArea = topAreaWeightSumFluo / topAreaCntWeightCnt;
+				double avgArea = areaSumFluoWeight / areaCntWeight;
+				double volume_iap = Math.sqrt(avgArea * avgArea * avgTopArea);
+				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.fluo.plant_weight.iap", volume_iap);
 			}
 			
 			summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.min", areaStat.getMin());

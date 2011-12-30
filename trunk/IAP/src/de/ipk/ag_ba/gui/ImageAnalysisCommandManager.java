@@ -83,7 +83,8 @@ public class ImageAnalysisCommandManager {
 			
 			@Override
 			public String getDefaultImage() {
-				return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
+				return "img/ext/gpl2/Gnome-Emblem-Documents-64.png";
+				// return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
 			}
 			
 			@Override

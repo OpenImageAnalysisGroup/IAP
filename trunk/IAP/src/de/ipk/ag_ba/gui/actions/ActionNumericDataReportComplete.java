@@ -17,6 +17,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.IAPservice;
@@ -73,16 +74,32 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	public String getDefaultTitle() {
 		if (exportIndividualAngles)
 			return "Save CSV Data Table";
-		if (SystemAnalysis.isHeadless())
+		if (SystemAnalysis.isHeadless()) {
 			return "Download Report"
 					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
-		else
-			return "Create PDF" + (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
+		} else {
+			String filter = StringManipulationTools.getStringList(variant, ", ");
+			if (filter.endsWith(", TRUE"))
+				filter = filter.substring(0, filter.length() - ", TRUE".length());
+			if (filter.endsWith(", FALSE"))
+				filter = filter.substring(0, filter.length() - ", FALSE".length());
+			if (filter.endsWith(", none"))
+				filter = filter.substring(0, filter.length() - ", none".length());
+			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
+			if (variant[2].equals("TRUE"))
+				return "<html><center>Create full PDF report<br>"
+						+ (exportIndividualAngles ? " (side angles)" : " (" + filter + ")");
+			else
+				return "<html><center>Create short PDF report<br>(" + filter + ")";
+		}
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
+		if (exportIndividualAngles)
+			return IAPimages.getDownloadIcon();
+		else
+			return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
 	}
 	
 	@Override
