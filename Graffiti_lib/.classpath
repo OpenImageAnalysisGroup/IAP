@@ -46,10 +46,11 @@
 	<classpathentry kind="lib" path="xmlParserAPIs.jar"/>
 	<classpathentry kind="lib" path="commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="poi-3.7-20101029.jar"/>
-	<classpathentry kind="lib" path="poi-ooxml-schemas-3.7-20101029.jar"/>
 	<classpathentry kind="lib" path="junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="xbean.jar"/>
+	<classpathentry kind="lib" path="poi-3.8-beta5-20111217.jar"/>
+	<classpathentry kind="lib" path="poi-ooxml-3.8-beta5-20111217.jar"/>
+	<classpathentry kind="lib" path="poi-ooxml-schemas-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -22,5 +22,7 @@
 	<classpathentry kind="lib" path="lib/platform.jar"/>
 	<classpathentry kind="lib" path="lib/jsr166y.jar"/>
 	<classpathentry kind="lib" path="lib/bcprov-jdk16-146.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/poi-3.8-beta5-20111217.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

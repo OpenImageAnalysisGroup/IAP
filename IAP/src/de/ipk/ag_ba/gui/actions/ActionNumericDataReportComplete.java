@@ -15,6 +15,11 @@ import javax.swing.JLabel;
 import org.AttributeHelper;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -24,11 +29,7 @@ import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.pdf_report.PdfCreator;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
  * @author klukas
@@ -42,18 +43,21 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	private static final String separator = ";";// "\t";
 	private final boolean exportIndividualAngles;
 	private final String[] variant;
+	private final boolean xlsx;
 	
-	public ActionNumericDataReportComplete(String tooltip, boolean exportIndividualAngles, String[] variant) {
+	public ActionNumericDataReportComplete(String tooltip, boolean exportIndividualAngles, String[] variant, boolean xlsx) {
 		super(tooltip);
 		this.exportIndividualAngles = exportIndividualAngles;
 		this.variant = variant;
+		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles, String[] variant) {
+	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles, String[] variant, boolean xlsx) {
 		this("Create report" +
-				(exportIndividualAngles ? " CSV" : " PDF (" + StringManipulationTools.getStringList(variant, ", ") + ")"),
+				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
+						: " PDF (" + StringManipulationTools.getStringList(variant, ", ") + ")"),
 				exportIndividualAngles,
-				variant);
+				variant, xlsx);
 		this.m = m;
 		this.experimentReference = experimentReference;
 	}
@@ -73,9 +77,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		if (exportIndividualAngles)
-			return "Save CSV Data Table";
+			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table";
 		if (SystemAnalysis.isHeadless()) {
-			return "Download Report"
+			return "Download Report" + (xlsx ? " (XLSX)" : "")
 					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
 		} else {
 			String filter = StringManipulationTools.getStringList(variant, ", ");
@@ -105,45 +109,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		ArrayList<String> cols = new ArrayList<String>();
-		// Object[] columns;
 		ExperimentInterface experiment = experimentReference.getData(m);
-		ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
 		if (SystemAnalysis.isHeadless()) {
-			// cols.add("Plant");
-			// cols.add("Carrier");
-			// cols.add("Experiment");
-			// cols.add("Time");
-			// cols.add("Weight (before watering)");
-			// cols.add("Weight (after watering)");
-			// cols.add("Water");
-			// columns = cols.toArray();
-			//
-			// for (SubstanceInterface su : experiment) {
-			// if (su.getName() == null)
-			// continue;
-			//
-			// if (su.getName().equals("weight_before")) {
-			//
-			// }
-			// if (su.getName().equals("water_weight")) {
-			//
-			// }
-			// if (su.getName().equals("water_amount")) {
-			//
-			// }
-			// for (ConditionInterface c : su) {
-			// for (SampleInterface sa : c) {
-			// for (Measurement m : sa) {
-			// ReportRow r = new ReportRow();
-			// r.setPlant(c.getConditionId() + ": " + c.getConditionName());
-			// r.setCarrier(m.getReplicateID());
-			// r.setExperiment(experiment.getHeader().getExperimentname());
-			// r.setTime(sa.getSampleTime());
-			// }
-			// }
-			// }
-			// }
+			
 		} else {
 			boolean pdf = !SystemAnalysis.isHeadless();
 			
@@ -166,32 +134,67 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 						indexHeader.append(separator + val);
 					csvHeader = StringManipulationTools.stringReplace(csvHeader, "\r\n", "");
 					csvHeader = StringManipulationTools.stringReplace(csvHeader, "\n", "");
-					if (exportIndividualAngles)
-						csv.append("angle" + separator + csvHeader + indexHeader.toString() + "\r\n");
-					else
-						csv.append(csvHeader + indexHeader.toString() + "\r\n");
+					csv.append(csvHeader + indexHeader.toString() + "\r\n");
 				} else {
 					snapshots = IAPservice.getSnapshotsFromExperiment(
 							null, experiment, null, false, exportIndividualAngles);
 					csv.append(csvHeader);
 				}
-				if (exportIndividualAngles) {
-					for (SnapshotDataIAP s : snapshots) {
-						boolean germanLanguage = true;
-						csv.append(s.getCSVvalue(germanLanguage, separator));
-					}
-				} else {
-					for (SnapshotDataIAP s : snapshots) {
-						boolean germanLanguage = false;
-						csv.append(s.getCSVvalue(germanLanguage, separator));
-					}
+				Workbook wb = xlsx ? new XSSFWorkbook() : null;
+				Sheet sheet = xlsx ? wb.createSheet(experimentReference.getExperimentName()) : null;
+				if (sheet != null) {
+					Row row = sheet.createRow(0);
+					int col = 0;
+					String c = csv.toString().trim();
+					c = StringManipulationTools.stringReplace(c, "\r\n", "");
+					c = StringManipulationTools.stringReplace(c, "\n", "");
+					for (String h : c.split(separator))
+						row.createCell(col++).setCellValue(h);
 				}
-				byte[] result = csv.toString().getBytes();
+				
+				if (xlsx) {
+					int rowNum = 1;
+					for (SnapshotDataIAP s : snapshots) {
+						for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects()) {
+							Row row = sheet.createRow(rowNum++);
+							int colNum = 0;
+							for (DateDoubleString o : valueRow) {
+								if (o.getString() != null)
+									row.createCell(colNum++).setCellValue(o.getString());
+								else
+									if (o.getDouble() != null)
+										row.createCell(colNum++).setCellValue(o.getDouble());
+									else
+										if (o.getDate() != null)
+											row.createCell(colNum++).setCellValue(o.getDate());
+										else
+											colNum++;
+							}
+						}
+					}
+				} else
+					if (exportIndividualAngles) {
+						for (SnapshotDataIAP s : snapshots) {
+							boolean germanLanguage = true;
+							csv.append(s.getCSVvalue(germanLanguage, separator));
+						}
+					} else {
+						for (SnapshotDataIAP s : snapshots) {
+							boolean germanLanguage = false;
+							csv.append(s.getCSVvalue(germanLanguage, separator));
+						}
+					}
+				MyByteArrayOutputStream bos = xlsx ? new MyByteArrayOutputStream() : null;
+				if (xlsx)
+					wb.write(bos);
+				if (xlsx)
+					bos.close();
+				byte[] result = xlsx ? bos.getBuffTrimmed() : csv.toString().getBytes();
 				
 				PdfCreator p = new PdfCreator(experiment);
 				
 				p.prepareTempDirectory();
-				p.saveReportCSV(result);
+				p.saveReportCSV(result, xlsx);
 				// p.saveScripts(new String[] {
 				// "diagramForReportPDF.r",
 				// "diagramIAP.cmd",
@@ -199,16 +202,16 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				// "initLinux.r",
 				// "report2.tex", "createDiagramFromValuesLinux.r"
 				// });
+				if (!xlsx)
+					p.saveScripts(new String[] {
+							"createDiagramOneFile.r",
+							"diagramIAP.cmd",
+							"diagramIAP.bat",
+							"initLinux.r",
+							"report2.tex"
+					});
 				
-				p.saveScripts(new String[] {
-						"createDiagramOneFile.r",
-						"diagramIAP.cmd",
-						"diagramIAP.bat",
-						"initLinux.r",
-						"report2.tex"
-				});
-				
-				if (!exportIndividualAngles) {
+				if (!exportIndividualAngles && !xlsx) {
 					p.executeRstat(variant);
 					
 					boolean ok = p.hasPDFcontent();
@@ -220,47 +223,8 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 					p.openTargetDirectory();
 				}
 				
-			} else {
-				
-				cols.add("Condition");
-				cols.add("Time");
-				cols.add("Plant ID");
-				// cols.add("Measurement"); // substance
-				cols.add("Replicate ID"); // substance
-				// cols.add("Value");
-				// columns = cols.toArray();
-				
-				HashMap<String, Integer> id2row = new HashMap<String, Integer>();
-				for (SubstanceInterface su : experiment) {
-					String sid = su.getName();
-					String hue;
-					int hueVal = 0;
-					if (sid.contains("hue=")) {
-						hue = sid.substring(sid.indexOf("hue=") + "hue=".length()).trim();
-						try {
-							hueVal = Integer.parseInt(hue);
-						} catch (Exception e) {
-							// empty
-						}
-					} else
-						continue;
-					for (ConditionInterface c : su) {
-						String cid = sid + separator + c.getConditionId() + "-" + c.getConditionName();
-						for (SampleInterface sa : c) {
-							String said = cid + separator + sa.getSampleTime();
-							for (Measurement m : sa) {
-								String mid = said + separator + m.getReplicateID();
-								if (m.getValue() > 0)
-									System.out.println(mid + separator + hueVal + separator + m.getValue());
-							}
-						}
-					}
-				}
 			}
 		}
-		
-		// Object[][] rowdata = new Object[rows.size()][cols.size()];
-		
 	}
 	
 	@Override
@@ -280,11 +244,12 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	}
 	
 	public String getCSVheader() {
-		return "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator + "Variety" + separator + "GrowthCondition"
+		return "Angle" + separator + "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator + "Variety" + separator
+				+ "GrowthCondition"
 				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int)"
 				+ separator + "Weight A (g)" + separator + "Weight B (g)" + separator +
-				"Water (weight-diff)" + "Angle" +
-				// + separator + "Water (pumped)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "OTHER" +
+				"Water (weight-diff)" +
+				separator + "Water (pumped)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "OTHER" +
 				"\r\n";
 	}
 }
