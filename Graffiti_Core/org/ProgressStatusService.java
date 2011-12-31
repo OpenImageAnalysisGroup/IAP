@@ -105,7 +105,7 @@ public class ProgressStatusService implements HelperClass {
 				res[numberResults++] = (int) remainTimeWeeks + "&nbsp;week";
 			else
 				res[numberResults++] = (int) remainTimeWeeks + "&nbsp;weeks";
-		if (((int) remainTimeDays) > 1 && numberResults < nn)
+		if (((int) remainTimeDays) >= 1 && numberResults < nn)
 			if (remainTimeDays == 1)
 				res[numberResults++] = (int) remainTimeDays + "&nbsp;day";
 			else
