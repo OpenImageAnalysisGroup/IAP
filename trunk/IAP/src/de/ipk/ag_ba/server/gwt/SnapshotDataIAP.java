@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeMap;
 
+import de.ipk.ag_ba.gui.actions.DateDoubleString;
+
 public class SnapshotDataIAP {
 	private static final Double NO_ANGLE = -720d;
 	
@@ -563,5 +565,69 @@ public class SnapshotDataIAP {
 		if (!position2store.containsKey(position))
 			position2store.put(position, new TreeMap<Integer, Double>());
 		position2store.get(position).put(idx, value);
+	}
+	
+	public ArrayList<ArrayList<DateDoubleString>> getCSVobjects() {
+		SnapshotDataIAP s = this;
+		
+		ArrayList<ArrayList<DateDoubleString>> result = new ArrayList<ArrayList<DateDoubleString>>();
+		if (position2store == null) {
+			ArrayList<DateDoubleString> row = new ArrayList<DateDoubleString>();
+			row.add(new DateDoubleString(-720d));
+			row.add(new DateDoubleString(s.getPlantId()));
+			row.add(new DateDoubleString(s.getCondition()));
+			row.add(new DateDoubleString(s.getSpecies()));
+			row.add(new DateDoubleString(s.getGenotype()));
+			row.add(new DateDoubleString(s.getVariety()));
+			row.add(new DateDoubleString(s.getGrowthCondition()));
+			row.add(new DateDoubleString(s.getTreatment()));
+			row.add(new DateDoubleString(s.getSequence()));
+			row.add(new DateDoubleString(s.getTimePoint()));
+			row.add(new DateDoubleString(new Date(s.getSnapshotTime())));
+			row.add(new DateDoubleString(Double.parseDouble(getNumbersFromString(s.getTimePoint()))));
+			row.add(new DateDoubleString(s.getWeightBefore()));
+			row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
+			row.add(new DateDoubleString(s.getWeightOfWatering()));
+			row.add(new DateDoubleString(s.getWaterAmount()));
+			row.add(new DateDoubleString(s.getRgbUrlCnt()));
+			row.add(new DateDoubleString(s.getFluoUrlCnt()));
+			row.add(new DateDoubleString(s.getNirUrlCnt()));
+			row.add(new DateDoubleString(s.getUnknownUrlCnt()));
+			result.add(row);
+		} else {
+			for (Double angle : storeValues.keySet()) {
+				ArrayList<DateDoubleString> row = new ArrayList<DateDoubleString>();
+				row.add(new DateDoubleString(angle));
+				row.add(new DateDoubleString(s.getPlantId()));
+				row.add(new DateDoubleString(s.getCondition()));
+				row.add(new DateDoubleString(s.getSpecies()));
+				row.add(new DateDoubleString(s.getGenotype()));
+				row.add(new DateDoubleString(s.getVariety()));
+				row.add(new DateDoubleString(s.getGrowthCondition()));
+				row.add(new DateDoubleString(s.getTreatment()));
+				row.add(new DateDoubleString(s.getSequence()));
+				row.add(new DateDoubleString(s.getTimePoint()));
+				row.add(new DateDoubleString(new Date(s.getSnapshotTime())));
+				row.add(new DateDoubleString(Double.parseDouble(getNumbersFromString(s.getTimePoint()))));
+				row.add(new DateDoubleString(s.getWeightBefore()));
+				row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
+				row.add(new DateDoubleString(s.getWeightOfWatering()));
+				row.add(new DateDoubleString(s.getWaterAmount()));
+				row.add(new DateDoubleString(s.getRgbUrlCnt()));
+				row.add(new DateDoubleString(s.getFluoUrlCnt()));
+				row.add(new DateDoubleString(s.getNirUrlCnt()));
+				row.add(new DateDoubleString(s.getUnknownUrlCnt()));
+				int n = storeValues.get(angle).size();
+				for (int i = 0; i < n; i++) {
+					Double v = storeValues.get(angle).get(i);
+					if (v != null && !Double.isNaN(v) && !Double.isInfinite(v)) {
+						row.add(new DateDoubleString(v));
+					} else
+						row.add(new DateDoubleString());
+				}
+				result.add(row);
+			}
+		}
+		return result;
 	}
 }

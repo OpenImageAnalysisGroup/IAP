@@ -93,18 +93,22 @@ public class ImageAnalysisCommandManager {
 				
 				// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 				
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true, new String[] { "none", "none", "FALSE" }),
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true, new String[] { "none", "none", "FALSE" }, true),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Condition", "none", "FALSE" }),
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Condition", "none", "FALSE" },
+						false),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Condition", "none", "TRUE" }),
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Condition", "none", "TRUE" },
+						false),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Treatment", "none", "TRUE" }),
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Treatment", "none", "TRUE" },
+						false),
 						guiSetting));
 				actions.add(new NavigationButton(
-						new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Variety", "Treatment", "TRUE" }),
+						new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Variety", "Treatment", "TRUE" }, false),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Species", "none", "TRUE" }),
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Species", "none", "TRUE" },
+						false),
 						guiSetting));
 				return actions;
 			}

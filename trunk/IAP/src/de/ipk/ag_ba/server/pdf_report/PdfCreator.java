@@ -61,8 +61,8 @@ public class PdfCreator {
 		return temp;
 	}
 	
-	public void saveReportCSV(byte[] result) throws IOException {
-		File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report.csv");
+	public void saveReportCSV(byte[] result, boolean xlsx) throws IOException {
+		File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report." + (xlsx ? "xlsx" : "csv"));
 		FileOutputStream fos = new FileOutputStream(report);
 		fos.write(result);
 		fos.close();
