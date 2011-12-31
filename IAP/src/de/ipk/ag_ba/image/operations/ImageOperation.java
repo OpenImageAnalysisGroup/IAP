@@ -1945,8 +1945,11 @@ public class ImageOperation {
 			int[] upperValueOfAa, int[] upperValueOfBa, int[] upperValueOfLa,
 			int potRemovalColorStartIndex, int x, int y, int w, int h) {
 		
+		boolean a = y < 0.8 * h;
+		boolean b = (Math.abs(w / 2 - x) > w * 0.1);
+		
 		for (int i = 0; i < lowerValueOfAa.length; i++) {
-			if (i >= potRemovalColorStartIndex && (y < 0.8 * h || (Math.abs(w / 2 - x) > w * 0.1)))
+			if (i >= potRemovalColorStartIndex && (a || b))
 				return false; // &&
 			int lowerValueOfL = lowerValueOfLa[i];
 			int lowerValueOfA = lowerValueOfAa[i];
