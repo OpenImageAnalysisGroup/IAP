@@ -154,7 +154,7 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 							print("removed noise", false).getImage();
 				// fis.addImage("step 7", toBeFiltered.copy());
 				
-				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				result = result.getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage(); // copy().
 				// fis.addImage("step 8", result);
 				if (debug)
 					result.copy().getIO().replaceColors(options.getBackground(), Color.black.getRGB()).print("Left-Over", false);
