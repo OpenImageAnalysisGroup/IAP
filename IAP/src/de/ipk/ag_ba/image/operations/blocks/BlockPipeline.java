@@ -78,7 +78,7 @@ public class BlockPipeline {
 		int id = pipelineID.addInt(1);
 		
 		int index = 0;
-		boolean blockProgressOutput = false;
+		boolean blockProgressOutput = true;
 		
 		if (status != null)
 			status.setCurrentStatusValueFine(0);
@@ -120,7 +120,7 @@ public class BlockPipeline {
 			
 			// if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 			if (blockProgressOutput)
-				if (seconds >= 10)
+				if (seconds >= 6)
 					System.out.println("Pipeline " + id + ": finished block "
 							+ index + "/" + blocks.size() + ", took " + seconds
 							+ " sec., " + mseconds + " ms, time: "
