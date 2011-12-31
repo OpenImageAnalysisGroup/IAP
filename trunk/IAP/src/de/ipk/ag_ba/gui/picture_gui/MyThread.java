@@ -28,7 +28,7 @@ public class MyThread extends Thread implements Runnable {
 	private final Semaphore sem;
 	private String name;
 	private final Runnable runCode;
-
+	
 	private Runnable finishTask;
 	
 	public MyThread(Runnable r, String name) throws InterruptedException {
@@ -52,7 +52,7 @@ public class MyThread extends Thread implements Runnable {
 		} finally {
 			finished = true;
 			sem.release();
-			if (finishTask!=null)
+			if (finishTask != null)
 				finishTask.run();
 		}
 		// System.out.print("f");
@@ -113,7 +113,7 @@ public class MyThread extends Thread implements Runnable {
 	public void startNG(ExecutorService es) {
 		if (!started) {
 			started = true;
-			boolean direct = false;
+			boolean direct = true;
 			if (direct)
 				run();
 			else
@@ -128,8 +128,8 @@ public class MyThread extends Thread implements Runnable {
 				}
 		}
 	}
-
+	
 	public void setFinishrunnable(Runnable finishTask) {
-		this.finishTask = finishTask;		
+		this.finishTask = finishTask;
 	}
 }
