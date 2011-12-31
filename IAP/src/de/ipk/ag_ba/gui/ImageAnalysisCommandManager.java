@@ -15,6 +15,7 @@ import de.ipk.ag_ba.gui.actions.ActionDataExport;
 import de.ipk.ag_ba.gui.actions.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.gui.actions.ActionDataExportTar;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
+import de.ipk.ag_ba.gui.actions.ActionNumericDataReport;
 import de.ipk.ag_ba.gui.actions.ActionNumericDataReportComplete;
 import de.ipk.ag_ba.gui.actions.ActionPerformanceTest;
 import de.ipk.ag_ba.gui.actions.CloudIoTestAction;
@@ -115,7 +116,8 @@ public class ImageAnalysisCommandManager {
 		};
 		actions.add(new NavigationButton(defaultAction, guiSetting));
 		
-		// actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true), guiSetting));
+		actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
+		
 		String hsmf = IAPmain.getHSMfolder();
 		if (hsmf != null)
 			actions.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReference, hsmf), guiSetting));
