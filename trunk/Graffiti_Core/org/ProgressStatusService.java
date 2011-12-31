@@ -6,7 +6,6 @@
  */
 package org;
 
-
 /**
  * @author Christian Klukas
  *         (c) 2011 IPK-Gatersleben
@@ -106,7 +105,7 @@ public class ProgressStatusService implements HelperClass {
 			else
 				res[numberResults++] = (int) remainTimeWeeks + "&nbsp;weeks";
 		if (((int) remainTimeDays) >= 1 && numberResults < nn)
-			if (remainTimeDays == 1)
+			if ((int) remainTimeDays == 1)
 				res[numberResults++] = (int) remainTimeDays + "&nbsp;day";
 			else
 				res[numberResults++] = (int) remainTimeDays + "&nbsp;days";
