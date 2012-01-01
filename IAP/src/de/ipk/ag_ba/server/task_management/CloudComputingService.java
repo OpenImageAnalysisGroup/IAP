@@ -50,8 +50,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
  */
 public class CloudComputingService {
 	
-	static HashMap<MongoDB,CloudComputingService> instance = 
-new HashMap<MongoDB,CloudComputingService>();
+	static HashMap<MongoDB, CloudComputingService> instance =
+			new HashMap<MongoDB, CloudComputingService>();
 	
 	boolean active = false;
 	
@@ -64,7 +64,7 @@ new HashMap<MongoDB,CloudComputingService>();
 	public synchronized static CloudComputingService getInstance(MongoDB m) {
 		if (!instance.containsKey(m))
 			instance.put(m, new CloudComputingService());
-
+		
 		return instance.get(m);
 	}
 	
@@ -392,9 +392,12 @@ new HashMap<MongoDB,CloudComputingService>();
 								ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
 							}
 						}
-						ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
+						System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
+						ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
 						e.clear();
+						System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
 						e.addAndMerge(MappingData3DPath.merge(mdpl, false));
+						System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
 						long tStart = tempDataSetDescription.getSubmissionTimeL();
 						long tProcessing = tFinish - tStart;
 						long minutes = tProcessing / 1000 / 60;
