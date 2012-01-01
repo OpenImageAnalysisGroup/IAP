@@ -60,6 +60,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.Mongo;
+import com.mongodb.MongoInternalException;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
@@ -603,10 +604,12 @@ public class MongoDB {
 						sample.put("networks", dbVolumes);
 				} // sample
 				condition.put("samples", dbSamples);
-				
+				try {
 				conditions.insert(condition);
-				
 				conditionIDs.add((condition).getString("_id"));
+				} catch(MongoInternalException mie) {
+					System.out.println("Invalid condition: "+c);
+				}
 				
 			} // condition
 			processSubstanceSaving(status, substances, substance, conditionIDs);

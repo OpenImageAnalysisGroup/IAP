@@ -136,6 +136,8 @@ public class CloudHost extends BasicDBObject {
 	}
 	
 	public boolean isClusterExecutionMode() {
+		if (true)
+			return true;
 		if (get("clusterMode") != null)
 			return (Boolean) get("clusterMode");
 		return false;
