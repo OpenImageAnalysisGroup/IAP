@@ -323,7 +323,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
 					
 					final boolean releaseCon = optMaxCon.tryAcquire();
-					
+					if (!releaseCon)
+						System.out.print(">RUN");
+					else
+						System.out.print(">START");
 					Runnable r = new Runnable() {
 						@Override
 						public void run() {

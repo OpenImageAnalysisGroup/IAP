@@ -211,14 +211,14 @@ public class NavigationButton implements StyleAware {
 			if (sm2 != null && sm2.length() > 0)
 				line2 += (sm1 != null && sm1.length() > 0 ? "<p>" : "") + sm2;
 			if (sm3 != null && sm3.length() > 0)
-				line2 += (line2 != null && line2.length() + sm2.length() > 0 ? "<p>" : "") + sm3;
+				line2 += (line2 != null && sm2 != null && line2.length() + sm2.length() > 0 ? "<p>" : "") + sm3;
 			
 			if (statusServer != null) {
 				String eta = statusServer.getRemainTime((int) dp == -1, dp);
 				if (eta.length() > 0) {
-					if (line2.length() > 0)
+					if (line2.length() > 0 && sm3 != null)
 						line2 += sm3.length() == 0 ? ", " : "<br>";
-					if (sm3.length() == 0)
+					if (sm3 == null || sm3.length() == 0)
 						line2 += "" + eta;
 				}
 			}
