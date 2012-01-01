@@ -669,7 +669,7 @@ public class Condition implements ConditionInterface {
 			add(samplenew);
 			return samplenew;
 		} else {
-			for (NumericMeasurementInterface m : samplenew) {
+			for (NumericMeasurementInterface m : samplenew.toArray(new NumericMeasurementInterface[] {})) {
 				m.setParentSample(save);
 				save.add(m);
 			}
