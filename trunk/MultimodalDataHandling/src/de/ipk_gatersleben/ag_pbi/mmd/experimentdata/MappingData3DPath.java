@@ -99,6 +99,7 @@ public class MappingData3DPath {
 		// final Semaphore lock = BackgroundTaskHelper.lockGetSemaphore(null, SystemAnalysis.getNumberOfCPUs());
 		for (String substance : data.keySet()) {
 			final String substanceF = substance;
+			System.out.println("MERGE SUBSET SUBSTANCE " + substance + " (" + data.get(substance).size() + " values)...");
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {

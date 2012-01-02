@@ -160,8 +160,8 @@ public class Substance implements SubstanceInterface {
 					cond.setParent(targetSubstance);
 					targetSubstance.addAndMergeData(cond, ignoreSnapshotFineTime);
 				}
-				tobeMerged.clear();
-				tobeMerged.setName("INVALID_MERGED_SKIP");
+				// tobeMerged.clear();
+				// tobeMerged.setName("INVALID_MERGED_SKIP");
 			}
 		}
 	}
@@ -183,8 +183,8 @@ public class Substance implements SubstanceInterface {
 				s.setParent(targetCondition);
 				targetCondition.addAndMerge(s, ignoreSnapshotFineTime);
 			}
-			newCondition.clear();
-			newCondition.setGenotype("INVALID_MERGED_SKIP");
+			// newCondition.clear();
+			// newCondition.setGenotype("INVALID_MERGED_SKIP");
 			
 			return targetCondition;
 		}

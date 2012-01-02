@@ -122,17 +122,19 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						TreeMap<String, ImageData> tid = time2inImages.get(time);
 						if (tid != null) {
 							ImageData id = tid.get(key);
-							plantID = id.getReplicateID() + ";" + id.getQualityAnnotation();
-							Double pos = id.getPosition();
-							if (pos == null)
-								pos = 0d;
-							if (Math.abs(pos - 0) < distanceTo0) {
-								distanceTo0 = Math.abs(pos - 0);
-								sideArea_for_angleNearestTo0 = area;
-							}
-							if (Math.abs(pos - 90) < distanceTo90) {
-								distanceTo0 = Math.abs(pos - 90);
-								sideArea_for_angleNearestTo90 = area;
+							if (id != null) {
+								plantID = id.getReplicateID() + ";" + id.getQualityAnnotation();
+								Double pos = id.getPosition();
+								if (pos == null)
+									pos = 0d;
+								if (Math.abs(pos - 0) < distanceTo0) {
+									distanceTo0 = Math.abs(pos - 0);
+									sideArea_for_angleNearestTo0 = area;
+								}
+								if (Math.abs(pos - 90) < distanceTo90) {
+									distanceTo0 = Math.abs(pos - 90);
+									sideArea_for_angleNearestTo90 = area;
+								}
 							}
 						}
 					}

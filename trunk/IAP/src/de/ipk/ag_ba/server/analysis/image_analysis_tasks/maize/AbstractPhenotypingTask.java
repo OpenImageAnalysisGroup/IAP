@@ -494,7 +494,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		{
 			// create list of replicates and plant IDs
-			int workLoadIndex = workOnSubset;
 			TreeSet<String> replicateIDandQualityList = new TreeSet<String>();
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				for (ImageSet i : is.values()) {
@@ -521,8 +520,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						is.firstEntry().getValue().getVIS().getQualityAnnotation();
 				// if (!val.equals("11;1107BA1130"))
 				// continue;
-				workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
-				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != 0)
+				int workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
+				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != workOnSubset)
 					continue;
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Processing image sets with ID: " + val);
 				if (!workload_imageSetsWithSpecificAngles.containsKey(val))
@@ -533,7 +532,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">Processing "
 					+ workload_imageSetsWithSpecificAngles.size() + " of " + sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.size()
-					+ " (subset " + workLoadIndex + "/" + numberOfSubsets + ")");
+					+ " (subset " + workOnSubset + "/" + numberOfSubsets + ")");
 		}
 		
 		if (max > 0)

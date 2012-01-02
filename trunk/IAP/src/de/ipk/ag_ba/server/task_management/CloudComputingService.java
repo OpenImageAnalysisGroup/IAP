@@ -14,9 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
@@ -315,7 +312,8 @@ public class CloudComputingService {
 					}
 				}
 				System.out.println(SystemAnalysis.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
-				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCnt() + ", FINISHED: " + knownResults.size());
+				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
+						+ knownResults.size());
 				if (knownResults.size() + 1 < tempDataSetDescription.getPartCntI()) {
 					// not everything has been computed (internal error)
 					TreeSet<Integer> jobIDs = new TreeSet<Integer>();
@@ -346,39 +344,35 @@ public class CloudComputingService {
 						System.out.println("*****************************");
 						System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
 								+ ", RESULTS AVAILABLE: " + knownResults.size());
-						final Experiment e = new Experiment();
+						Experiment e = new Experiment();
 						long tFinish = System.currentTimeMillis();
 						final int wl = knownResults.size();
 						final ThreadSafeOptions tso = new ThreadSafeOptions();
 						final Runtime r = Runtime.getRuntime();
-						ExecutorService es = Executors.newFixedThreadPool(2);
 						HashMap<ExperimentHeaderInterface, String> experiment2id =
 								new HashMap<ExperimentHeaderInterface, String>();
 						for (ExperimentHeaderInterface ii : knownResults) {
 							experiment2id.put(ii, ii.getDatabaseId());
-							final ExperimentHeaderInterface i = ii;
-							Runnable rr = new Runnable() {
-								@Override
-								public void run() {
-									System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
-											/ 1024
-											+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
-									ExperimentInterface ei = m.getExperiment(i);
-									String[] cc = i.getExperimentName().split("§");
-									tso.addInt(1);
-									System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
-									
-									synchronized (e) {
-										StopWatch s = new StopWatch(">e.addMerge");
-										e.addAndMerge(ei);
-										s.printTime();
-									}
+							System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
+									/ 1024
+									+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
+							ExperimentInterface ei = m.getExperiment(ii);
+							TreeSet<String> condS = new TreeSet<String>();
+							for (SubstanceInterface s : ei) {
+								for (ConditionInterface ci : s) {
+									condS.add(ci.getConditionName());
 								}
-							};
-							es.execute(rr);
+							}
+							String[] cc = ii.getExperimentName().split("§");
+							tso.addInt(1);
+							System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
+							for (String c : condS)
+								System.out.println("Condition: " + c);
+							
+							StopWatch s = new StopWatch(">e.addMerge");
+							e.addAndMerge(ei);
+							s.printTime();
 						}
-						es.shutdown();
-						es.awaitTermination(31, TimeUnit.DAYS);
 						String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
 						if (sn.indexOf(".") > 0)
 							sn = sn.substring(sn.lastIndexOf(".") + 1);
@@ -392,12 +386,15 @@ public class CloudComputingService {
 								ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
 							}
 						}
-						System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
-						ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
-						e.clear();
-						System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
-						e.addAndMerge(MappingData3DPath.merge(mdpl, false));
-						System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
+						boolean superMerge = false;
+						if (superMerge) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
+							ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
+							e.clear();
+							System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
+							e = (Experiment) MappingData3DPath.merge(mdpl, false);
+							System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
+						}
 						long tStart = tempDataSetDescription.getSubmissionTimeL();
 						long tProcessing = tFinish - tStart;
 						long minutes = tProcessing / 1000 / 60;

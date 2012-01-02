@@ -605,10 +605,10 @@ public class MongoDB {
 				} // sample
 				condition.put("samples", dbSamples);
 				try {
-				conditions.insert(condition);
-				conditionIDs.add((condition).getString("_id"));
-				} catch(MongoInternalException mie) {
-					System.out.println("Invalid condition: "+c);
+					conditions.insert(condition);
+					conditionIDs.add((condition).getString("_id"));
+				} catch (MongoInternalException mie) {
+					System.out.println("Invalid condition: " + c + ", with " + c.size() + " samples");
 				}
 				
 			} // condition
@@ -1384,7 +1384,7 @@ public class MongoDB {
 				for (NumericMeasurementInterface nmd : abc) {
 					if (nmd instanceof BinaryMeasurement) {
 						n++;
-						if (optStatusProvider != null) {
+						if (optStatusProvider != null && n % 1000 == 0) {
 							optStatusProvider.setCurrentStatusValueFine(100d * n / max);
 							optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
 						}
@@ -1402,6 +1402,10 @@ public class MongoDB {
 							}
 						}
 					}
+				}
+				if (optStatusProvider != null) {
+					optStatusProvider.setCurrentStatusValueFine(100d * n / max);
+					optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
 				}
 				experiment.getHeader().setSizekb(newSize.getLong() / 1024);
 				setExperimentInfo(experiment.getHeader());
