@@ -31,7 +31,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.PositionableMeasurement;
 
 public class ImageData extends NumericMeasurement3D implements
 		BinaryMeasurement, PositionableMeasurement {
-
+	
 	private static final String[] additionalAttributeNames = new String[] {
 			"pixelsizex", "pixelsizey", "thickness", "id", "labelurl",
 			"positionInUniverse", "rotation" };
@@ -43,11 +43,11 @@ public class ImageData extends NumericMeasurement3D implements
 	private int id;
 	private String positionIn3D;
 	private String rotation;
-
+	
 	public ImageData(SampleInterface parent) {
 		super(parent);
 	}
-
+	
 	public ImageData(SampleInterface parent, Map<String, Object> map) {
 		super(parent, map);
 		if (map.containsKey("pixelsizex"))
@@ -63,12 +63,12 @@ public class ImageData extends NumericMeasurement3D implements
 		if (map.containsKey("labelurl"))
 			setLabelURL(new IOurl((String) map.get("labelurl")));
 	}
-
+	
 	@Override
 	public IOurl getURL() {
 		return url;
 	}
-
+	
 	@Override
 	public String toString() {
 		return /* "Image: " + pixelsizex + "x" + pixelsizey + " " + */getURL()
@@ -78,30 +78,30 @@ public class ImageData extends NumericMeasurement3D implements
 				+ "://"
 				+ getURL().getDetail();
 	}
-
+	
 	public ImageData(SampleInterface parent, ImageData other) {
 		this(parent, other.getAttributeMap());
 	}
-
+	
 	private Map<String, Object> getAttributeMap() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		fillAttributeMap(attributes);
 		return attributes;
 	}
-
+	
 	@Override
 	public NumericMeasurementInterface clone(SampleInterface parent) {
 		return new ImageData(parent, getAttributeMap());
 	}
-
+	
 	public void setRowID(int id) {
 		this.id = id;
 	}
-
+	
 	public int getRowID() {
 		return id;
 	}
-
+	
 	@Override
 	public void getString(StringBuilder r) {
 		r.append("<image");
@@ -110,17 +110,17 @@ public class ImageData extends NumericMeasurement3D implements
 		getStringOfChildren(r);
 		r.append("</image>");
 	}
-
+	
 	@Override
 	public void getStringOfChildren(StringBuilder r) {
 		r.append(getURL());
 	}
-
+	
 	@Override
 	public double getValue() {
 		return Double.NaN;
 	}
-
+	
 	@Override
 	public void getXMLAttributeString(StringBuilder r) {
 		StringBuilder rt = new StringBuilder();
@@ -138,7 +138,7 @@ public class ImageData extends NumericMeasurement3D implements
 		// System.out.println(rt.toString());
 		r.append(rt.toString());
 	}
-
+	
 	@Override
 	public void setAttribute(Attribute attr) {
 		if (attr == null || attr.getValue() == null)
@@ -149,35 +149,41 @@ public class ImageData extends NumericMeasurement3D implements
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
-		else if (attr.getName().equals(additionalAttributeNames[1]))
-			try {
-				setPixelsizeY(Double.parseDouble(attr.getValue()));
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-			}
-		else if (attr.getName().equals(additionalAttributeNames[2]))
-			try {
-				setThickness(Double.parseDouble(attr.getValue()));
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-			}
-
-		else if (attr.getName().equals(additionalAttributeNames[3]))
-			try {
-				setRowID(Integer.parseInt(attr.getValue()));
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-			}
-		else if (attr.getName().equals(additionalAttributeNames[4]))
-			setLabelURL(new IOurl(attr.getValue()));
-		else if (attr.getName().equals(additionalAttributeNames[5]))
-			setPositionIn3D(attr.getValue());
-		else if (attr.getName().equals(additionalAttributeNames[6]))
-			setRotation(attr.getValue());
 		else
-			super.setAttribute(attr);
+			if (attr.getName().equals(additionalAttributeNames[1]))
+				try {
+					setPixelsizeY(Double.parseDouble(attr.getValue()));
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+			else
+				if (attr.getName().equals(additionalAttributeNames[2]))
+					try {
+						setThickness(Double.parseDouble(attr.getValue()));
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				
+				else
+					if (attr.getName().equals(additionalAttributeNames[3]))
+						try {
+							setRowID(Integer.parseInt(attr.getValue()));
+						} catch (Exception e) {
+							ErrorMsg.addErrorMessage(e);
+						}
+					else
+						if (attr.getName().equals(additionalAttributeNames[4]))
+							setLabelURL(new IOurl(attr.getValue()));
+						else
+							if (attr.getName().equals(additionalAttributeNames[5]))
+								setPositionIn3D(attr.getValue());
+							else
+								if (attr.getName().equals(additionalAttributeNames[6]))
+									setRotation(attr.getValue());
+								else
+									super.setAttribute(attr);
 	}
-
+	
 	@Override
 	public boolean setData(Element averageElement) {
 		setURL(new IOurl(averageElement.getValue()));
@@ -192,46 +198,46 @@ public class ImageData extends NumericMeasurement3D implements
 		// no children
 		return true;
 	}
-
+	
 	@Override
 	public void setDataOfChildElement(Element childElement) {
 		// no children
 	}
-
+	
 	@Override
 	public MeasurementNodeType getType() {
 		return MeasurementNodeType.IMAGE;
 	}
-
+	
 	public void setPixelsizeX(double pixelsizex) {
 		this.pixelsizex = pixelsizex;
 	}
-
+	
 	public double getPixelsizeX() {
 		return pixelsizex;
 	}
-
+	
 	public void setPixelsizeY(double pixelsizey) {
 		this.pixelsizey = pixelsizey;
 	}
-
+	
 	public double getPixelsizeY() {
 		return pixelsizey;
 	}
-
+	
 	@Override
 	public void setURL(IOurl url) {
 		this.url = url;
 	}
-
+	
 	public void setThickness(double thickness) {
 		this.thickness = thickness;
 	}
-
+	
 	public double getThickness() {
 		return thickness;
 	}
-
+	
 	@Override
 	public boolean equalNumericMeasurement(NumericMeasurementInterface meas) {
 		ImageData id2 = ((ImageData) meas);
@@ -242,59 +248,76 @@ public class ImageData extends NumericMeasurement3D implements
 				&& (getPixelsizeY() + "").equals(id2.getPixelsizeY())
 				&& (getThickness() + "").equals(id2.getThickness() + "");
 	}
-
+	
 	@Override
 	public void fillAttributeMap(Map<String, Object> attributes) {
 		super.fillAttributeMap(attributes);
 		int idx = 0;
-		attributes.put(additionalAttributeNames[idx++], pixelsizex);
-		attributes.put(additionalAttributeNames[idx++], pixelsizex);
-		attributes.put(additionalAttributeNames[idx++], thickness);
+		if (pixelsizex > 0 && pixelsizey > 0) {
+			attributes.put(additionalAttributeNames[idx++], pixelsizex);
+			attributes.put(additionalAttributeNames[idx++], pixelsizey);
+		} else {
+			idx++;
+			idx++;
+		}
+		if (thickness > 0)
+			attributes.put(additionalAttributeNames[idx++], thickness);
+		else
+			idx++;
 		attributes.put(additionalAttributeNames[idx++], id);
 		if (labelurl != null)
 			attributes
 					.put(additionalAttributeNames[idx++], labelurl.toString());
 		else
 			idx++;
-		attributes.put(additionalAttributeNames[idx++], positionIn3D);
-		attributes.put(additionalAttributeNames[idx++], rotation);
-		attributes.put("filename", url + "");
+		if (positionIn3D != null && positionIn3D.length() > 0)
+			attributes.put(additionalAttributeNames[idx++], positionIn3D);
+		else
+			idx++;
+		
+		if (rotation != null && rotation.length() > 0)
+			attributes.put(additionalAttributeNames[idx++], rotation);
+		else
+			idx++;
+		
+		if (url != null && url.toString().length() > 0)
+			attributes.put("filename", url + "");
 	}
-
+	
 	@Override
 	public IOurl getLabelURL() {
 		return labelurl;
 	}
-
+	
 	@Override
 	public void setLabelURL(IOurl url) {
 		labelurl = url;
 	}
-
+	
 	@Override
 	public String getPositionIn3D() {
 		return positionIn3D;
 	}
-
+	
 	@Override
 	public void setPositionIn3D(String positionIn3D) {
 		this.positionIn3D = positionIn3D;
 	}
-
+	
 	@Override
 	public String getRotation() {
 		return rotation;
 	}
-
+	
 	@Override
 	public void setRotation(String rotation) {
 		this.rotation = rotation;
 	}
-
+	
 	public ImageData copy() {
 		return new ImageData(this.getParentSample(), this);
 	}
-
+	
 	public String getAnnotationField(String key) {
 		String a = getAnnotation();
 		if (a != null) {
@@ -308,7 +331,7 @@ public class ImageData extends NumericMeasurement3D implements
 		}
 		return null;
 	}
-
+	
 	public ArrayList<String> getAnnotationKeys(String search) {
 		ArrayList<String> result = new ArrayList<String>();
 		String a = getAnnotation();
@@ -323,7 +346,7 @@ public class ImageData extends NumericMeasurement3D implements
 		}
 		return result;
 	}
-
+	
 	public synchronized void addAnnotationField(String key, String value) {
 		if (key == null || value == null)
 			return;
@@ -337,7 +360,7 @@ public class ImageData extends NumericMeasurement3D implements
 			a += ";" + key + "#" + value;
 		setAnnotation(a);
 	}
-
+	
 	public boolean replaceAnnotationField(String key, String value) {
 		if (key == null || value == null)
 			return false;

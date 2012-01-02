@@ -282,9 +282,12 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	@Override
 	public void fillAttributeMap(Map<String, Object> attributes) {
 		super.fillAttributeMap(attributes);
-		attributes.put("position", position);
-		attributes.put("positionUnit", positionUnit);
-		attributes.put("annotation", annotation);
+		if (position != null)
+			attributes.put("position", position);
+		if (positionUnit != null)
+			attributes.put("positionUnit", positionUnit);
+		if (annotation != null)
+			attributes.put("annotation", annotation);
 	}
 	
 	@Override
