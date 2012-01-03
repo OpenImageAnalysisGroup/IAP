@@ -351,8 +351,17 @@ public class CloudComputingService {
 						final Runtime r = Runtime.getRuntime();
 						HashMap<ExperimentHeaderInterface, String> experiment2id =
 								new HashMap<ExperimentHeaderInterface, String>();
+						String originName = null;
 						for (ExperimentHeaderInterface ii : knownResults) {
 							experiment2id.put(ii, ii.getDatabaseId());
+							if (originName == null) {
+								String ori = ii.getOriginDbId();
+								ExperimentHeaderInterface oriH = m.getExperimentHeader(new ObjectId(ori));
+								String[] cc = ii.getExperimentName().split("§");
+								String ana = cc[0];
+								ana = ana.substring(ana.lastIndexOf(".") + ".".length());
+								originName = ana + ": " + oriH.getExperimentName();
+							}
 							System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
 									/ 1024
 									+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
@@ -398,6 +407,9 @@ public class CloudComputingService {
 						long tStart = tempDataSetDescription.getSubmissionTimeL();
 						long tProcessing = tFinish - tStart;
 						long minutes = tProcessing / 1000 / 60;
+						e.getHeader().setExperimentname(originName + " (manual merge " + SystemAnalysis.getCurrentTime() + ")");
+						e.getHeader().setExperimenttype("Analysis Results");
+						e.getHeader().setImportusergroup("Analysis Results");
 						e.getHeader().setRemark(
 								e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " +
 										SystemAnalysis.getCurrentTime());

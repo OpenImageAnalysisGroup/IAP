@@ -358,15 +358,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							}
 						}
 					};
-					Thread innerThread = new Thread(r);
-					innerThread.setName("Inner thread " + preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
-							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
-					innerThread.setPriority(Thread.MIN_PRIORITY);
 					innerLoopSemaphore.acquire();
-					if (releaseCon)
+					if (releaseCon) {
+						Thread innerThread = new Thread(r);
+						innerThread.setName("Inner thread " + preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
+								inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
+						innerThread.setPriority(Thread.MIN_PRIORITY);
+						
 						innerThread.start();
-					else
-						innerThread.run();
+					} else
+						r.run();
 				}
 			}
 			innerLoopSemaphore.acquire(threadsToStart);
