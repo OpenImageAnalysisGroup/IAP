@@ -19,6 +19,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir;
@@ -61,6 +62,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlLabFilter_vis_fluo.class);
 		p.add(BlMedianFilter_vis.class);
 		p.add(BlIntensityConversion_fluo.class);
+		p.add(BlockClearNirPot_nir.class);
 		p.add(BlMedianFilter_fluo.class);
 		p.add(BlUseFluoMaskToClear_vis_nir.class);
 		p.add(BlNirFilterSide_nir.class);

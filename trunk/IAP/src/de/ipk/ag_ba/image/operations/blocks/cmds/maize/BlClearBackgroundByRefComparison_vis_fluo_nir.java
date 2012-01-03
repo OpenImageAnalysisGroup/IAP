@@ -94,7 +94,8 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 								options.getIntSetting(Setting.L_Diff_FLUO) * 0.1d,
 								options.getIntSetting(Setting.abDiff_FLUO) * 0.1d,
 								back).border(2).border_left_right((int) (fluo.getWidth() * 0.1), options.getBackground()).getImage();
-				
+				double blueCurbWidthBarley0_1 = 0;
+				double blueCurbHeightEndBarly0_8 = 1;
 				FlexibleImage toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or_and_not(
 						// black background and green pot (fluo of white pot)
 						new int[] { -1, 200 - 40, 50 - 4, 0 }, new int[] { 115, 200 + 20, 50 + 4, 50 },
@@ -103,7 +104,9 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 						options.getBackground(), Integer.MAX_VALUE, false,
 						new int[] {}, new int[] {},
 						new int[] {}, new int[] {},
-						new int[] {}, new int[] {}).
+						new int[] {}, new int[] {},
+						blueCurbWidthBarley0_1,
+						blueCurbHeightEndBarly0_8).
 						print("removed noise", debug).getImage();
 				
 				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();

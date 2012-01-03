@@ -1894,7 +1894,9 @@ public class ImageOperation {
 			boolean getRemovedPixel,
 			int[] plant_lowerValueOfL, int[] plant_upperValueOfL,
 			int[] plant_lowerValueOfA, int[] plant_upperValueOfA,
-			int[] plant_lowerValueOfB, int[] plant_upperValueOfB) {
+			int[] plant_lowerValueOfB, int[] plant_upperValueOfB,
+			double blueCurbWidthBarley0_1,
+			double blueCurbHeightEndBarly0_8) {
 		int c, x, y = 0;
 		int r, g, b;
 		int Li, ai, bi;
@@ -1922,9 +1924,9 @@ public class ImageOperation {
 				
 				if (resultImage[off] != background
 						&& hq_anyMatch(Li, ai, bi, lowerValueOfA, lowerValueOfB, lowerValueOfL, upperValueOfA, upperValueOfB, upperValueOfL,
-								potRemovalColorStartIndex, x, y, w, h)
+								potRemovalColorStartIndex, x, y, w, h, blueCurbWidthBarley0_1, blueCurbHeightEndBarly0_8)
 						&& !hq_anyMatch(Li, ai, bi, plant_lowerValueOfA, plant_lowerValueOfB, plant_lowerValueOfL, plant_upperValueOfA, plant_upperValueOfB,
-								plant_upperValueOfL, potRemovalColorStartIndex, x, y, w, h)) {
+								plant_upperValueOfL, potRemovalColorStartIndex, x, y, w, h, blueCurbWidthBarley0_1, blueCurbHeightEndBarly0_8)) {
 					if (!getRemovedPixel)
 						resultImage[off] = imagePixels[off];
 					else
@@ -1943,10 +1945,12 @@ public class ImageOperation {
 	private boolean hq_anyMatch(int Li, int ai, int bi,
 			int[] lowerValueOfAa, int[] lowerValueOfBa, int[] lowerValueOfLa,
 			int[] upperValueOfAa, int[] upperValueOfBa, int[] upperValueOfLa,
-			int potRemovalColorStartIndex, int x, int y, int w, int h) {
+			int potRemovalColorStartIndex, int x, int y, int w, int h,
+			double blueCurbWidthBarley0_1,
+			double blueCurbHeightEndBarly0_8) {
 		
-		boolean a = y < 0.8 * h;
-		boolean b = (Math.abs(w / 2 - x) > w * 0.1);
+		boolean a = y < blueCurbHeightEndBarly0_8 * h;
+		boolean b = (Math.abs(w / 2 - x) > w * blueCurbWidthBarley0_1);
 		
 		for (int i = 0; i < lowerValueOfAa.length; i++) {
 			if (i >= potRemovalColorStartIndex && (a || b))
