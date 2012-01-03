@@ -253,18 +253,18 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 								if (bm instanceof ImageData) {
 									id = (ImageData) bm;
 									zefn =
-												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : nm.getReplicateID() + "") +
-														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
-														(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad" : "0Grad") : "") + " " +
-														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
-														gc.get(GregorianCalendar.YEAR) + "-" +
-														(gc.get(GregorianCalendar.MONTH) + 1) + "-" +
-														gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
-														gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
-														gc.get(GregorianCalendar.MINUTE) + "_" +
-														gc.get(GregorianCalendar.SECOND) + " ";
+											(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : nm.getReplicateID() + "") +
+													nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
+													(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad" : "0Grad") : "") + " " +
+													nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
+													gc.get(GregorianCalendar.YEAR) + "-" +
+													(gc.get(GregorianCalendar.MONTH) + 1) + "-" +
+													gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
+													gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
+													gc.get(GregorianCalendar.MINUTE) + "_" +
+													gc.get(GregorianCalendar.SECOND) + " ";
 									
-									zefn += filter(100 - zefn.length() - ".png".length(), nm.getParentSample().getParentCondition())
+									zefn += filter(90 - zefn.length() - ".png".length(), nm.getParentSample().getParentCondition())
 											+ ".png";
 									
 								} else {
