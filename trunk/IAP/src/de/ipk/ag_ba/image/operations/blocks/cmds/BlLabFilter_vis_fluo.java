@@ -27,7 +27,8 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				|| getInput().getImages().getVis() == null)
 			return null;
 		else {
-			FlexibleImageStack fis = new FlexibleImageStack();
+			FlexibleImageStack fis = debug ?
+					new FlexibleImageStack() : null;
 			int dilate;
 			FlexibleImage result;
 			FlexibleImage mask = getInput().getMasks().getVis();
@@ -49,8 +50,8 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				// 0, 127 - 10,
 				// options.getBackground(), false).print("BLUEEE", false).erode().dilate(0).getImage();// .erode().dilate(2).getImage();
 				// result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
-				
-				fis.addImage("step 1", result.copy());
+				if (fis != null)
+					fis.addImage("step 1", result.copy());
 				
 				// filter white pot
 				int an = 5, bn = 7;
@@ -69,7 +70,8 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						120 - offB, 120 + 2 * bn + offB2,
 						options.getBackground(), true).getImage();
 				
-				fis.addImage("step 2", toBeFiltered.copy());
+				if (fis != null)
+					fis.addImage("step 2", toBeFiltered.copy());
 				
 				int w = toBeFiltered.getWidth();
 				int h = toBeFiltered.getHeight();
@@ -94,11 +96,13 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 									(int) (0.3 * w), (int) (h * offH), Color.red.getRGB())
 							.getImage().getIO().medianFilter32Bit(3).erode().erode().dilate().dilate().getImage();
 				}
-				fis.addImage("step 3", toBeFiltered.copy());
+				if (fis != null)
+					fis.addImage("step 3", toBeFiltered.copy());
 				
 				result = result.copy().getIO().applyMask_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).print("unknown 1", false).getImage();
 				
-				fis.addImage("step 4", result);
+				if (fis != null)
+					fis.addImage("step 4", result);
 				
 				// remove blue markers at the side
 				double hhhh = options.isBarleyInBarleySystem() ? 1d : 0.9d;
@@ -115,10 +119,12 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				toBeFiltered = toBeFiltered.getIO().getCanvas().
 						fillRect((int) (w * 0.2), 0, (int) (w * 0.6), (int) (h * hhhh),
 								options.getBackground()).getImage();
-				fis.addImage("step 5", toBeFiltered.copy());
+				if (fis != null)
+					fis.addImage("step 5", toBeFiltered.copy());
 				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
 				
-				fis.addImage("step 6", result);
+				if (fis != null)
+					fis.addImage("step 6", result);
 				// filter background noise
 				double blueCurbWidthBarley0_1 = options.isBarleyInBarleySystem() ? 0.1 : 0.25;
 				double blueCurbHeightEndBarly0_8 = options.isBarleyInBarleySystem() ? 0.8 : 0.7;
@@ -167,27 +173,36 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 									// noise colors
 									new int[] { 215 - 5, 225, -1, 250, 170 - 10, 151 - 20, 188 - 20, 220 - 5, 195 - 5, 100 - 5, 197 - 5, 47 - 5, 205 - 5, 110 - 5,
 											50 - 5,
-											146 - 5, 184 - 5, 155 - 5, 155 - 5, 171 - 5, 153 - 5, 116 - 5, 115 - 5, 168 - 5, 0, 161 - 5, 135 - 5 },
+											146 - 5, 184 - 5, 155 - 5, 155 - 5, 171 - 5, 153 - 5, 116 - 5, 115 - 5, 168 - 5, 0, 161 - 5, 135 - 5,
+											130 - 5, 0 },
 									new int[] { 256, 256, 146 + 5, 257, 230 + 10, 151 + 4, 211 + 20, 220 + 5, 195 + 5, 218 + 5, 197 + 5, 91 + 5, 245 + 5, 144 + 5,
 											50 + 5,
-											146 + 5, 185 + 5, 155 + 5, 155 + 5, 199 + 5, 161 + 5, 172 + 5, 126 + 5, 168 + 5, 110 + 5, 161 + 5, 135 + 5 },
+											146 + 5, 185 + 5, 155 + 5, 155 + 5, 199 + 5, 161 + 5, 172 + 5, 126 + 5, 168 + 5, 110 + 5, 161 + 5, 135 + 5,
+											255, 190 + 5 },
 									new int[] { 120 - 5, 120 - 5, 127 - 5, 118 - 10, 129 - 5, 129 - 4, 121 - 15, 120 - 5, 123 - 5, 124 - 5, 121 - 4, 126 - 5, 117 - 5,
 											120 - 5,
-											138 - 5, 125 - 5, 113 - 5, 121 - 5, 118 - 5, 116 - 5, 128 - 5, 120 - 5, 130 - 5, 121 - 5, 137 - 10, 122 - 5, 127 - 5 },
+											138 - 5, 125 - 5, 113 - 5, 121 - 5, 118 - 5, 116 - 5, 128 - 5, 120 - 5, 130 - 5, 121 - 5, 137 - 10, 122 - 5, 127 - 5,
+											110 - 5, 115 - 5 },
 									new int[] { 120 + 5, 120 + 6, 127 + 5, 118 + 10, 129 + 5, 129 + 4, 121 + 5, 120 + 5, 123 + 5, 137 + 5, 121 + 4, 132 + 5, 123 + 5,
 											122 + 5,
-											138 + 5, 125 + 5, 123 + 5, 121 + 5, 118 + 5, 121 + 5, 132 + 5, 136 + 5, 134 + 5, 121 + 5, 137 + 10, 122 + 5, 127 + 5 },
+											138 + 5, 125 + 5, 123 + 5, 121 + 5, 118 + 5, 121 + 5, 132 + 5, 136 + 5, 134 + 5, 121 + 5, 137 + 10, 122 + 5, 127 + 5,
+											127 + 5, 134 + 5 },
 									new int[] { 117 - 2, 122 - 14, 144 - 5, 124 - 10, 117 - 5, 114 - 4, 100 - 5, 120 - 5, 118 - 5, 121 - 5, 123 - 4, 117 - 5, 116 - 5,
 											106 - 5,
-											96 - 5, 100 - 5, 116 - 5, 109 - 5, 119 - 5, 116 - 5, 107 - 5, 110 - 5, 131 - 5, 105 - 5, 118 - 10, 103 - 5, 99 - 5 },
+											96 - 5, 100 - 5, 116 - 5, 109 - 5, 119 - 5, 116 - 5, 107 - 5, 110 - 5, 131 - 5, 105 - 5, 118 - 10, 103 - 5, 99 - 5,
+											90 - 5, 90 - 5 },
 									new int[] { 125, 122 + 5, 144 + 5, 124 + 10, 117 + 5, 114 + 4, 100 + 8, 120 + 5, 118 + 5, 126 + 5, 123 + 4, 128 + 5, 123 + 5,
 											113 + 5,
-											96 + 5, 100 + 5, 120 + 5, 109 + 5, 119 + 5, 119 + 5, 111 + 5, 114 + 5, 131 + 5, 105 + 5, 118 + 10, 103 + 5, 99 + 5 },
+											96 + 5, 100 + 5, 120 + 5, 109 + 5, 119 + 5, 119 + 5, 111 + 5, 114 + 5, 131 + 5, 105 + 5, 118 + 10, 103 + 5, 99 + 5,
+											110 + 5, 149 + 5 },
 									options.getBackground(), Integer.MAX_VALUE, false,
 									// plant colors
-									new int[] { 120 - 5, 167 - 5 }, new int[] { 150 + 5, 191 + 5 },
-									new int[] { 120 - 5, 118 - 5 }, new int[] { 120 + 5, 122 + 5 },
-									new int[] { 128 - 5, 117 - 5 }, new int[] { 128 + 5, 123 },
+									options.isBarleyInBarleySystem() ? new int[] { 120 - 5, 167 - 5 } : new int[] {},
+									options.isBarleyInBarleySystem() ? new int[] { 150 + 5, 191 + 5 } : new int[] {},
+									options.isBarleyInBarleySystem() ? new int[] { 120 - 5, 118 - 5 } : new int[] {},
+									options.isBarleyInBarleySystem() ? new int[] { 120 + 5, 122 + 5 } : new int[] {},
+									options.isBarleyInBarleySystem() ? new int[] { 128 - 5, 117 - 5 } : new int[] {},
+									options.isBarleyInBarleySystem() ? new int[] { 128 + 5, 123 } : new int[] {},
 									blueCurbWidthBarley0_1,
 									blueCurbHeightEndBarly0_8).
 							border_left_right(
@@ -196,19 +211,25 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 											0,
 									Color.red.getRGB()).
 							print("removed noise", false).getImage();
-				fis.addImage("step 7", toBeFiltered.copy());
+				if (!options.isBarleyInBarleySystem())
+					toBeFiltered = toBeFiltered.getIO().medianFilter32Bit().medianFilter32Bit().getImage();
+				if (fis != null)
+					fis.addImage("step 7", toBeFiltered.copy());
 				
 				result = result.getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage(); // copy().
-				fis.addImage("step 8", result);
+				if (fis != null)
+					fis.addImage("step 8", result);
 				if (debug)
 					result.copy().getIO().replaceColors(options.getBackground(), Color.black.getRGB()).print("Left-Over", false);
-				fis.addImage("step 9", result);
+				if (fis != null)
+					fis.addImage("step 9", result);
 				
 				// fis.addImage("blue1_filtered", result.copy());
 				// result = result.getIO().filterGray(220, 15, 15).getImage()
 				// .print("Gray filtered", debug);
 				// fis.addImage("gray filtered", result);
-				fis.print("lab filter vis");
+				if (fis != null)
+					fis.print("lab filter vis");
 				return result;
 			}
 		}

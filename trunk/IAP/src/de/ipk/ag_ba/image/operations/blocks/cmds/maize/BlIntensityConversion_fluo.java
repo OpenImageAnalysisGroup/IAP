@@ -20,7 +20,7 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 		FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 		if (debug)
 			fis.addImage("FLUO", io.copy().getImage());
-		double min = 150;
+		double min = 200;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			min = 210;
 		if (options.isBarleyInBarleySystem())
