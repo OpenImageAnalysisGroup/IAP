@@ -681,7 +681,7 @@ public class StringManipulationTools implements HelperClass {
 	 * @param d
 	 *           e.g. 3.14159
 	 * @param pattern
-	 *           e.g. #.##
+	 *           e.g. #.##, e.g. 000.00
 	 * @return e.g. 3.14
 	 */
 	public static String formatNumber(double d, String pattern) {
