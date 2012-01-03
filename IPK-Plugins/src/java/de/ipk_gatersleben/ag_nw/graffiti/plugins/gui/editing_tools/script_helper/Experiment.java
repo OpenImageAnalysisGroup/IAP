@@ -1026,7 +1026,7 @@ public class Experiment implements ExperimentInterface {
 		TreeSet<String> result = new TreeSet<String>();
 		for (SubstanceInterface si : this)
 			for (ConditionInterface ci : si)
-				result.add(ci.getTreatment());
+				result.add(ci.getTreatment() != null ? ci.getTreatment() : "");
 		return result;
 	}
 }
