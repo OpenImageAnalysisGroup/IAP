@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.OpenFileDialogService;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
@@ -207,7 +208,9 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 										zefn =
 												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : id.getReplicateID() + "") +
 														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
-														(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad " : "0Grad") : "") + " " +
+														(id != null ? (id.getPosition() != null ?
+																StringManipulationTools.formatNumber(id.getPosition(), "###")
+																		+ "Grad " : "000Grad") : "") + " " +
 														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
 														gc.get(GregorianCalendar.YEAR) + "-" +
 														(gc.get(GregorianCalendar.MONTH) + 1) + "-" +
