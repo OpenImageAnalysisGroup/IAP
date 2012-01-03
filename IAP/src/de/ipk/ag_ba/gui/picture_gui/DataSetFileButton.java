@@ -850,7 +850,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							});
 						}
 					}, "database download");
-					BackgroundThreadDispatcher.addTask(download, 1 + 1000, 0);
+					BackgroundThreadDispatcher.addTask(download, 1 + 1000, 0, true);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

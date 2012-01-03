@@ -222,7 +222,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 					status.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 					status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/" + wl);
 				}
-			}, "process image " + idxxx, -10, 0);
+			}, "process image " + idxxx, -10, 0, false);
 			idxxx++;
 			wait.add(t);
 			
@@ -277,7 +277,7 @@ public class PhytochamberAnalysisTask implements ImageAnalysisTask {
 				}
 				// System.out.println("Finished Load Image");
 			}
-		}, "load " + type.name(), 0, 0);
+		}, "load " + type.name(), 0, 0, false);
 	}
 	
 	// public static ArrayList<NumericMeasurementInterface> statisticalAnalysisOfResultImage(LoadedImage limg,

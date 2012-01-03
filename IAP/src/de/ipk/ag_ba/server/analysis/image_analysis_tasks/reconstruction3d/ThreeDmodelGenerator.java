@@ -26,7 +26,7 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
  */
 public class ThreeDmodelGenerator {
 	
-	private int PROBABILITY_THRESHOLD = 50;// good for maize: 140;
+	private final int PROBABILITY_THRESHOLD = 50;// good for maize: 140;
 	
 	private ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 	
@@ -72,10 +72,10 @@ public class ThreeDmodelGenerator {
 	}
 	
 	public void calculateModel(final BackgroundTaskStatusProviderSupportingExternalCall status,
-						GenerationMode colorMode, int maxIndexedColorCount) throws InterruptedException {
+			GenerationMode colorMode, int maxIndexedColorCount) throws InterruptedException {
 		
 		status.setCurrentStatusText1("Init cube cut (" + maxVoxelPerSide + "x" + maxVoxelPerSide + "x" + maxVoxelPerSide
-							+ ")");
+				+ ")");
 		status.setCurrentStatusText2("Using " + SystemAnalysis.getNumberOfCPUs() + " threads");
 		status.setCurrentStatusValueFine(0);
 		
@@ -87,7 +87,7 @@ public class ThreeDmodelGenerator {
 		for (MyPicture p : pictures) {
 			final MyPicture fp = p;
 			wait.add(BackgroundThreadDispatcher.addTask(
-					cuttt2(status, tso, tsoRunCount, fp), "cube cut " + p.getAngle(), 20, 19));
+					cuttt2(status, tso, tsoRunCount, fp), "cube cut " + p.getAngle(), 20, 19, false));
 			
 			if (status.wantsToStop())
 				break;
@@ -121,8 +121,9 @@ public class ThreeDmodelGenerator {
 	
 	@SuppressWarnings("unused")
 	private Runnable cuttt1(final BackgroundTaskStatusProviderSupportingExternalCall status,
-						final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
+			final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
 		return new Runnable() {
+			@Override
 			public void run() {
 				tsoRunCount.addInt(1);
 				
@@ -150,31 +151,32 @@ public class ThreeDmodelGenerator {
 				// System.out.println("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
 				// + tsoRunCount.getInt() + " active)");
 				status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
-									+ tsoRunCount.getInt() + " active)");
+						+ tsoRunCount.getInt() + " active)");
 				tsoRunCount.addInt(-1);
 			}
 		};
 	}
 	
 	private Runnable cuttt2(final BackgroundTaskStatusProviderSupportingExternalCall status,
-						final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
+			final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
 		return new Runnable() {
+			@Override
 			public void run() {
 				tsoRunCount.addInt(1);
 				
 				cutModel2(fp, transparentVoxels, status, 100d * 1 / pictures.size());
 				
 				tso.addInt(1);
-				if (status!=null)
-				 status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
-				 + tsoRunCount.getInt() + " active)");
+				if (status != null)
+					status.setCurrentStatusText2("Finished cut " + tso.getInt() + "/" + pictures.size() + " ("
+							+ tsoRunCount.getInt() + " active)");
 				tsoRunCount.addInt(-1);
 			}
 		};
 	}
 	
 	private void colorModelRGB(final ArrayList<MyPicture> pictures, final ArrayList<Color> palette,
-						BackgroundTaskStatusProviderSupportingExternalCall status, final boolean rgb) throws InterruptedException {
+			BackgroundTaskStatusProviderSupportingExternalCall status, final boolean rgb) throws InterruptedException {
 		if (rgb)
 			System.out.println("Recolor Cube... (using true color RGBA generation mode)");
 		else
@@ -207,7 +209,7 @@ public class ThreeDmodelGenerator {
 						y += voxelSizeY;
 					}
 				}
-			}, "color rgb cube slice " + xi, 20, 19);
+			}, "color rgb cube slice " + xi, 20, 19, false);
 			wait.add(w);
 			x += voxelSizeX;
 		}
@@ -215,7 +217,7 @@ public class ThreeDmodelGenerator {
 	}
 	
 	private void processOneSlice(ArrayList<MyPicture> pictures, ArrayList<Color> palette, boolean rgb, double x, double y, double z, double voxelSizeZ, int xi,
-						int yi) {
+			int yi) {
 		for (int zi = 0; zi < maxVoxelPerSide; zi++) {
 			// determine color
 			ArrayList<Color> cc = new ArrayList<Color>();
@@ -271,7 +273,7 @@ public class ThreeDmodelGenerator {
 					// c = null;
 					if (c == null) {
 						XYcubePointRelative rel = getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
-											isTop));
+								isTop));
 						for (int sx = -20; sx <= 20; sx++)
 							for (int sy = -20; sy <= 20; sy++) {
 								c = p.getPixelColor(rel, sx, sy);
@@ -306,7 +308,7 @@ public class ThreeDmodelGenerator {
 	}
 	
 	private void cutModel1(MyPicture p, BitSet transparentVoxels,
-						BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
+			BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
 		
 		double angle = p.getAngle();
 		
@@ -331,7 +333,7 @@ public class ThreeDmodelGenerator {
 				z = -cubeSideLengthZ / 2d;
 				for (int zi = 0; zi < maxVoxelPerSide; zi++) {
 					if (p.isTransparentPixel(getTargetRelativePixel(getRotatedPoint(angle, x, y, z, cos, sin,
-										isTopViewPicture))))
+							isTopViewPicture))))
 						transparentVoxels.set(xi * maxVoxelPerSide * maxVoxelPerSide + yi * maxVoxelPerSide + zi);
 					z += voxelSizeZ;
 				}
@@ -343,7 +345,7 @@ public class ThreeDmodelGenerator {
 	}
 	
 	private void cutModel2(MyPicture p, byte[][][] transparentVoxels,
-						BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
+			BackgroundTaskStatusProviderSupportingExternalCall status, double progressStep) {
 		
 		double angle = p.getAngle();
 		
@@ -355,15 +357,15 @@ public class ThreeDmodelGenerator {
 		double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
 		double voxelSizeZ = cubeSideLengthZ / maxVoxelPerSide;
 		x = -cubeSideLengthX / 2d;
-		 long vcnt = (maxVoxelPerSide * maxVoxelPerSide * maxVoxelPerSide);
+		long vcnt = (maxVoxelPerSide * maxVoxelPerSide * maxVoxelPerSide);
 		double smallProgressStep = progressStep / maxVoxelPerSide;
 		boolean isTopViewPicture = p.getIsTop();
 		// System.out.println("CUTTT 2... (angle: " + angle + ")");
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
 			if (status.wantsToStop())
 				break;
-			if (status!=null)
-			 status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
+			if (status != null)
+				status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
 			y = -cubeSideLengthY / 2d;
 			for (int yi = 0; yi < maxVoxelPerSide; yi++) {
 				z = -cubeSideLengthZ / 2d;
@@ -381,7 +383,7 @@ public class ThreeDmodelGenerator {
 	}
 	
 	private XYZpointRealDistance getRotatedPoint(double angle, double x, double y, double z, double cos, double sin,
-						boolean isTop) {
+			boolean isTop) {
 		XYZpointRealDistance p = new XYZpointRealDistance(x, y, z);
 		if (isTop)
 			p.rotateForTopView();
@@ -486,6 +488,7 @@ public class ThreeDmodelGenerator {
 		for (int vvx = 0; vvx < maxVoxelPerSide; vvx++) {
 			final int vx = vvx;
 			run.submit(new Runnable() {
+				@Override
 				public void run() {
 					for (int vy = 0; vy < maxVoxelPerSide; vy++) {
 						if (status.wantsToStop())
@@ -498,7 +501,7 @@ public class ThreeDmodelGenerator {
 							Color c;
 							try {
 								c = vz < depth || depth == maxVoxelPerSide / 2 ? TRANSPARENT_COLOR : new Color(p1
-													.getRGB(ix, iy));
+										.getRGB(ix, iy));
 							} catch (Exception e) {
 								c = Color.BLUE;
 							}
@@ -523,7 +526,7 @@ public class ThreeDmodelGenerator {
 	}
 	
 	private static int getDepthOfPoint(final int rectWidth, final MyPicture p1, final MyPicture p2, int mx, int my,
-						int scanRange) {
+			int scanRange) {
 		double minDiff = Double.POSITIVE_INFINITY;
 		int minI = 0;
 		for (int i = -scanRange / 2; i < scanRange / 2; i++) {

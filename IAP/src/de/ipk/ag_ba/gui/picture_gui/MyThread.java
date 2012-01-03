@@ -110,10 +110,10 @@ public class MyThread extends Thread implements Runnable {
 		return "Background Task " + name;
 	}
 	
-	public void startNG(ExecutorService es) {
+	public void startNG(ExecutorService es, boolean interactive) {
 		if (!started) {
 			started = true;
-			boolean direct = true;
+			boolean direct = !interactive;
 			if (direct)
 				run();
 			else

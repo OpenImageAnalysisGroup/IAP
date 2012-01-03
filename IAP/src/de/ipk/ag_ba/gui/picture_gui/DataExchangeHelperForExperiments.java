@@ -58,26 +58,26 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  * @author Klukas
  */
 public class DataExchangeHelperForExperiments {
-
+	
 	public static int getSizeOfExperiment(MongoDB m,
 			ExperimentInterface experimentName) {
 		return -1;
 	}
-
+	
 	public static void downloadFile(MongoDB m, final String hash,
 			final File targetFile, final DataSetFileButton button,
 			final MongoCollection collection) {
 		try {
 			m.processDB(new RunnableOnDB() {
-
+				
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					try {
 						// Blob b = CallDBE2WebService.getBlob(user, pass,
 						// imageResult.getMd5());
-
+						
 						GridFS gridfs_images = new GridFS(db, collection
 								.toString());
 						System.out.println("Look for " + collection.toString()
@@ -89,7 +89,7 @@ public class DataExchangeHelperForExperiments {
 							System.out.println("FOUND, LENGTH="
 									+ fff.getLength());
 							InputStream bis = fff.getInputStream();
-
+							
 							FileOutputStream fos = new FileOutputStream(
 									targetFile);
 							int readBytes = 0;
@@ -115,7 +115,7 @@ public class DataExchangeHelperForExperiments {
 								e1);
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -125,16 +125,16 @@ public class DataExchangeHelperForExperiments {
 			SupplementaryFilePanelMongoDB.showError("IOException", e);
 		}
 	}
-
+	
 	public static DatabaseStorageResult insertHashedFile(final MongoDB m,
 			final File file, File createTempPreviewImage, int isJavaImage,
 			DataSetFileButton imageButton, MappingDataEntity tableName) {
-
+		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		try {
 			m.processDB(new RunnableOnDB() {
 				private DB db;
-
+				
 				@Override
 				public void run() {
 					String hash;
@@ -171,7 +171,7 @@ public class DataExchangeHelperForExperiments {
 						e1.printStackTrace();
 					}
 				}
-
+				
 				@Override
 				public void setDB(DB db) {
 					this.db = db;
@@ -185,7 +185,7 @@ public class DataExchangeHelperForExperiments {
 				.getParam(1, ""));
 		return (DatabaseStorageResult) tso.getParam(0, null);
 	}
-
+	
 	public static void fillFilePanel(final DataSetFilePanel filePanel,
 			final MongoTreeNode mtdbe, final JTree expTree, final MongoDB m)
 			throws InterruptedException {
@@ -195,17 +195,17 @@ public class DataExchangeHelperForExperiments {
 				addFilesToPanel(filePanel, mtdbe, expTree, m);
 			}
 		}, "add files to panel");
-		BackgroundThreadDispatcher.addTask(r, 1000, 0);
+		BackgroundThreadDispatcher.addTask(r, 1000, 0, true);
 	}
-
+	
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel,
 			final MongoTreeNode mt, final JTree expTree, MongoDB m) {
 		if (!mt.mayContainData())
 			return;
 		final StopObject stop = new StopObject(false);
-
+		
 		boolean cleared = false;
-
+		
 		try {
 			ArrayList<BinaryFileInfo> bbb = new ArrayList<BinaryFileInfo>();
 			BinaryFileInfo primary = null;
@@ -215,112 +215,117 @@ public class DataExchangeHelperForExperiments {
 					ImageData id = (ImageData) mde;
 					primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(),
 							true, id);
-				} else if (mde instanceof VolumeData) {
-					VolumeData id = (VolumeData) mde;
-					primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(),
-							true, id);
-				} else {
-					if (mde instanceof Substance3D) {
-						Substance3D sub = (Substance3D) mde;
-						primary = null;
-						for (ConditionInterface c : sub)
-							for (SampleInterface si : c) {
-								if (si instanceof Sample3D) {
-									Sample3D s3d = (Sample3D) si;
+				} else
+					if (mde instanceof VolumeData) {
+						VolumeData id = (VolumeData) mde;
+						primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(),
+								true, id);
+					} else {
+						if (mde instanceof Substance3D) {
+							Substance3D sub = (Substance3D) mde;
+							primary = null;
+							for (ConditionInterface c : sub)
+								for (SampleInterface si : c) {
+									if (si instanceof Sample3D) {
+										Sample3D s3d = (Sample3D) si;
+										for (NumericMeasurementInterface nmi : s3d
+												.getMeasurements((MeasurementNodeType) null)) {
+											if (nmi instanceof ImageData) {
+												ImageData id = (ImageData) nmi;
+												primary = new BinaryFileInfo(
+														id.getURL(),
+														id.getLabelURL(), true, id);
+											} else
+												if (nmi instanceof VolumeData) {
+													VolumeData id = (VolumeData) nmi;
+													primary = new BinaryFileInfo(
+															id.getURL(),
+															id.getLabelURL(), true, id);
+												}
+											if (primary != null)
+												bbb.add(primary);
+										}
+									}
+								}
+							primary = null;
+						} else
+							if (mde instanceof Sample3D) {
+								Sample3D s3dXX = (Sample3D) mde;
+								String a = s3dXX.getTime() + "/" + s3dXX.getTimeUnit();
+								primary = null;
+								for (SampleInterface s3dI : s3dXX.getParentCondition()
+										.getSortedSamples()) {
+									String b = s3dI.getTime() + "/"
+											+ s3dI.getTimeUnit();
+									if (!a.equals(b))
+										continue;
+									Sample3D s3d = (Sample3D) s3dI;
 									for (NumericMeasurementInterface nmi : s3d
 											.getMeasurements((MeasurementNodeType) null)) {
 										if (nmi instanceof ImageData) {
 											ImageData id = (ImageData) nmi;
-											primary = new BinaryFileInfo(
-													id.getURL(),
+											primary = new BinaryFileInfo(id.getURL(),
 													id.getLabelURL(), true, id);
-										} else if (nmi instanceof VolumeData) {
-											VolumeData id = (VolumeData) nmi;
-											primary = new BinaryFileInfo(
-													id.getURL(),
-													id.getLabelURL(), true, id);
-										}
+										} else
+											if (nmi instanceof VolumeData) {
+												VolumeData id = (VolumeData) nmi;
+												primary = new BinaryFileInfo(id.getURL(),
+														id.getLabelURL(), true, id);
+											}
 										if (primary != null)
 											bbb.add(primary);
 									}
 								}
-							}
-						primary = null;
-					} else if (mde instanceof Sample3D) {
-						Sample3D s3dXX = (Sample3D) mde;
-						String a = s3dXX.getTime() + "/" + s3dXX.getTimeUnit();
-						primary = null;
-						for (SampleInterface s3dI : s3dXX.getParentCondition()
-								.getSortedSamples()) {
-							String b = s3dI.getTime() + "/"
-									+ s3dI.getTimeUnit();
-							if (!a.equals(b))
-								continue;
-							Sample3D s3d = (Sample3D) s3dI;
-							for (NumericMeasurementInterface nmi : s3d
-									.getMeasurements((MeasurementNodeType) null)) {
-								if (nmi instanceof ImageData) {
-									ImageData id = (ImageData) nmi;
-									primary = new BinaryFileInfo(id.getURL(),
-											id.getLabelURL(), true, id);
-								} else if (nmi instanceof VolumeData) {
-									VolumeData id = (VolumeData) nmi;
-									primary = new BinaryFileInfo(id.getURL(),
-											id.getLabelURL(), true, id);
-								}
-								if (primary != null)
-									bbb.add(primary);
-							}
-						}
-						primary = null;
-					} else {
-						if (mde instanceof Condition3D) {
-							Condition3D c3d = (Condition3D) mde;
-							primary = null;
-							for (SampleInterface si : c3d) {
-								Sample3D s3d = (Sample3D) si;
-								for (NumericMeasurementInterface nmi : s3d
-										.getMeasurements((MeasurementNodeType) null)) {
-									if (nmi instanceof ImageData) {
-										ImageData id = (ImageData) nmi;
-										IOurl urlMain = new IOurl(id.getURL()
-												.toString()
-												+ " ("
-												+ s3d.toString() + ")");
-										IOurl urlLabel = new IOurl(id
-												.getLabelURL().toString()
-												+ " (" + s3d.toString() + ")");
-										primary = new BinaryFileInfo(urlMain,
-												urlLabel, true, id);
-									} else if (nmi instanceof VolumeData) {
-										VolumeData id = (VolumeData) nmi;
-										IOurl urlMain = new IOurl(id.getURL()
-												.toString()
-												+ " ("
-												+ s3d.toString() + ")");
-										IOurl urlLabel = new IOurl(id
-												.getLabelURL().toString()
-												+ " (" + s3d.toString() + ")");
-										primary = new BinaryFileInfo(urlMain,
-												urlLabel, true, id);
+								primary = null;
+							} else {
+								if (mde instanceof Condition3D) {
+									Condition3D c3d = (Condition3D) mde;
+									primary = null;
+									for (SampleInterface si : c3d) {
+										Sample3D s3d = (Sample3D) si;
+										for (NumericMeasurementInterface nmi : s3d
+												.getMeasurements((MeasurementNodeType) null)) {
+											if (nmi instanceof ImageData) {
+												ImageData id = (ImageData) nmi;
+												IOurl urlMain = new IOurl(id.getURL()
+														.toString()
+														+ " ("
+														+ s3d.toString() + ")");
+												IOurl urlLabel = new IOurl(id
+														.getLabelURL().toString()
+														+ " (" + s3d.toString() + ")");
+												primary = new BinaryFileInfo(urlMain,
+														urlLabel, true, id);
+											} else
+												if (nmi instanceof VolumeData) {
+													VolumeData id = (VolumeData) nmi;
+													IOurl urlMain = new IOurl(id.getURL()
+															.toString()
+															+ " ("
+															+ s3d.toString() + ")");
+													IOurl urlLabel = new IOurl(id
+															.getLabelURL().toString()
+															+ " (" + s3d.toString() + ")");
+													primary = new BinaryFileInfo(urlMain,
+															urlLabel, true, id);
+												}
+											if (primary != null)
+												bbb.add(primary);
+										}
 									}
-									if (primary != null)
-										bbb.add(primary);
+									primary = null;
 								}
 							}
-							primary = null;
-						}
 					}
-				}
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
 			if (primary != null)
 				bbb.add(primary);
-
+			
 			Map<String, Object> properties = new HashMap<String, Object>();
 			mt.getTargetEntity().fillAttributeMap(properties);
-
+			
 			search: for (Entry<String, Object> e : properties.entrySet()) {
 				if (e.getKey().startsWith("anno")) {
 					Object v = e.getValue();
@@ -345,7 +350,7 @@ public class DataExchangeHelperForExperiments {
 					}
 				}
 			}
-
+			
 			final ArrayList<MyThread> executeLater = new ArrayList<MyThread>();
 			BinaryFileInfo lastBBB = null;
 			if (bbb.size() > 0)
@@ -355,7 +360,7 @@ public class DataExchangeHelperForExperiments {
 					break;
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
 				boolean previewLoadAndConstructNeeded = false;
-
+				
 				ImageIcon previewImage = null;
 				// if
 				// (FileSystemHandler.isFileUrl(binaryFileInfo.getFileNameMain()))
@@ -376,7 +381,7 @@ public class DataExchangeHelperForExperiments {
 				// previewLoadAndConstructNeeded = true;
 				// } else {
 				if (DataSetFileButton.ICON_WIDTH == 128) { // binaryFileInfo.getFileNameMain().getPrefix().startsWith("mongo_")
-															// &&
+					// &&
 					try {
 						byte[] pi = ResourceIOManager
 								.getPreviewImageContent(binaryFileInfo
@@ -397,31 +402,31 @@ public class DataExchangeHelperForExperiments {
 						mt, imageResult, previewImage, mt.isReadOnly());
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
-
+				
 				imageButton.setDownloadNeeded(!FileSystemHandler
 						.isFileUrl(binaryFileInfo.getFileNameMain()));
 				imageButton.setVerticalTextPosition(SwingConstants.BOTTOM);
 				imageButton.setHorizontalTextPosition(SwingConstants.CENTER);
-
+				
 				if (!cleared) {
 					cleared = true;
 					clearPanel(filePanel, mt, expTree);
 				}
-
+				
 				final boolean previewLoadAndConstructNeededF = previewLoadAndConstructNeeded;
-
+				
 				final boolean fIsLast = binaryFileInfo == lastBBB;
-
+				
 				SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
 						stop, executeLater, binaryFileInfo, imageButton,
 						previewLoadAndConstructNeededF, fIsLast));
 			}
-
+			
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 	}
-
+	
 	private static Runnable processIcon(final DataSetFilePanel filePanel,
 			final MongoTreeNode mt, final JTree expTree, final StopObject stop,
 			final ArrayList<MyThread> executeLater,
@@ -496,7 +501,7 @@ public class DataExchangeHelperForExperiments {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-
+						
 					}
 					BackgroundTaskHelper.executeLaterOnSwingTask(10,
 							new Runnable() {
@@ -506,33 +511,33 @@ public class DataExchangeHelperForExperiments {
 									if (isLast)
 										for (MyThread ttt : executeLater)
 											BackgroundThreadDispatcher.addTask(
-													ttt, -1 + 1000, 0);
+													ttt, -1 + 1000, 0, true);
 								}
 							});
 				} else
 					stop.setStopWanted(true);
 			}
-
+			
 			private MouseListener getML(final AnnotationInfoPanel aip) {
 				return new MouseListener() {
 					@Override
 					public void mouseReleased(MouseEvent e) {
 					}
-
+					
 					@Override
 					public void mousePressed(MouseEvent e) {
 					}
-
+					
 					@Override
 					public void mouseExited(MouseEvent e) {
 						aip.removeGuiLater();
 					}
-
+					
 					@Override
 					public void mouseEntered(MouseEvent e) {
 						aip.addGui();
 					}
-
+					
 					@Override
 					public void mouseClicked(MouseEvent e) {
 					}
@@ -540,7 +545,7 @@ public class DataExchangeHelperForExperiments {
 			}
 		};
 	}
-
+	
 	private static void clearPanel(final DataSetFilePanel filePanel,
 			final MongoTreeNode mt, final JTree expTree) {
 		try {
@@ -566,7 +571,7 @@ public class DataExchangeHelperForExperiments {
 					"InvocationTargetException", e2);
 		}
 	}
-
+	
 	// private static File getPreviewFileFromDatabase(BlobPropertyExtended
 	// blobInfo) {
 	//

@@ -240,6 +240,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 				final String ffn = fileName;
 				
 				wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+					@Override
 					public void run() {
 						MyPicture p = new MyPicture();
 						
@@ -287,7 +288,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 								+ image.getPositionUnit() + ", is top: " + (getIsTopFromFileName(ffn)));
 						status.setCurrentStatusValueFineAdd(workloadStep);
 					}
-				}, "analyze input image for 3-D construction", 40, 39));
+				}, "analyze input image for 3-D construction", 40, 39, false));
 			}
 			
 			BackgroundThreadDispatcher.waitFor(wait);
