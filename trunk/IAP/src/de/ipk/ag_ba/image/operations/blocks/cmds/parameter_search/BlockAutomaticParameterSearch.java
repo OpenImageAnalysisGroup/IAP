@@ -269,7 +269,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		// intervallSteps, bestValueTS, bestParameterTS);
 		// } else {
 		zaehler = searchSingleThreaded(workMask, visMaskImage, borderLeft, borderRight, zaehler, scanParameterX, bestValueOfOtherTranslation, operation,
-					intervallSteps, bestValueTS, bestParameterTS);
+				intervallSteps, bestValueTS, bestParameterTS);
 		// }
 		
 		double newBorderLeft = bestParameterTS.getDouble() - intervallSteps;
@@ -316,7 +316,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 						public void run() {
 							innerLoop(workMask, visMaskImage, scanParameterX, bestValueOfOtherTranslation, operation, bestValueTS, bestParameterTS, fstep, null);
 						}
-					}, "Inner loop " + operation, 1, parentPriority));
+					}, "Inner loop " + operation, 1, parentPriority, false));
 		}
 		
 		BackgroundThreadDispatcher.waitFor(tl);
@@ -414,7 +414,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 			// changedMask = io.getImage();
 			// ImageOperation.showTwoImagesAsOne(visMaskImage.getBufferedImage(), io.getImageAsBufferedImage());
 			MaskOperation o = new MaskOperation(visMaskImage, io.getImage(), null,
-							options.getBackground(), Color.GRAY.getRGB());
+					options.getBackground(), Color.GRAY.getRGB());
 			o.mergeMasks();
 			// if (typ == MorphologicalOperationSearchType.SCALING) {
 			// correctionForDeletedArea = 1 / valueX;

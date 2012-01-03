@@ -754,9 +754,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			if (resNir != null)
 				rc = saveImage(inNir, resNir, buf, ".tiff");
 			
-			a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5);
-			b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5);
-			c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5);
+			a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false);
+			b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false);
+			c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false);
 			BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
 		}
 		// s.printTime();

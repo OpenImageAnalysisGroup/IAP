@@ -40,15 +40,15 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 	
-	public static MyThread addTask(Runnable r, String name, int userPriority, int parentPriority) throws InterruptedException {
-		return addTask(new MyThread(r, name), userPriority, parentPriority);
+	public static MyThread addTask(Runnable r, String name, int userPriority, int parentPriority, boolean interactive) throws InterruptedException {
+		return addTask(new MyThread(r, name), userPriority, parentPriority, interactive);
 	}
 	
-	public static MyThread addTask(MyThread t, int userPriority, int parentPriority) {
+	public static MyThread addTask(MyThread t, int userPriority, int parentPriority, boolean interactive) {
 		if (t == null)
 			return null;
 		
-		t.startNG(myInstance.es);
+		t.startNG(myInstance.es, interactive);
 		
 		return t;
 	}
@@ -67,6 +67,7 @@ public class BackgroundThreadDispatcher {
 			return;
 		
 		final Timer t = new Timer(500, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				String msg;
 				String indicatorStr = "";
