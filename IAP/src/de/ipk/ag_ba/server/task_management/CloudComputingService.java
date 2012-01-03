@@ -408,7 +408,7 @@ public class CloudComputingService {
 						System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
 						
 						System.out.println("> SAVE COMBINED EXPERIMENT...");
-						m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true));
+						m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true), true);
 						// System.out.println("> DELETE TEMP DATA IS DISABLED!");
 						// System.out.println("> DELETE TEMP DATA...");
 						System.out.println("> MARK TEMP DATA AS TRASHED...");
