@@ -209,7 +209,7 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : id.getReplicateID() + "") +
 														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
 														(id != null ? (id.getPosition() != null ?
-																StringManipulationTools.formatNumber(id.getPosition(), "###")
+																StringManipulationTools.formatNumber(id.getPosition(), "000")
 																		+ "Grad " : "000Grad") : "") + " " +
 														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
 														gc.get(GregorianCalendar.YEAR) + "-" +
