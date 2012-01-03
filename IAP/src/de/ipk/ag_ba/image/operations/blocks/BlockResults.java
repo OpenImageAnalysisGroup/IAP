@@ -163,13 +163,13 @@ public class BlockResults implements BlockResultSet {
 		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
 		if (sv != null)
 			for (TreeMap<String, Double> tm : sv) {
-				Set<String> ks = tm.keySet();
+				String[] ks = tm.keySet().toArray(new String[] {});
 				if (ks != null)
 					for (String key : ks) {
 						if (key.equals(match)) {
 							PropertyNames pn = null;
 							try {
-								pn = PropertyNames.valueOf(key);
+								pn = PropertyNames.valueOfCached(key);
 							} catch (Exception e) {
 								// ignore, not a parameter which has an enum
 								// constant

@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
 import info.StopWatch;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -130,6 +131,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		HashMap<String, TreeMap<String, Long>> prop2config2lastHeightAndWidthTime = new HashMap<String, TreeMap<String, Long>>();
 		HashMap<String, TreeMap<String, Double>> prop2config2lastHeightAndWidth = new HashMap<String, TreeMap<String, Double>>();
 		for (Long time : time2inSamples.keySet()) {
+			System.out.println(time);
 			TreeMap<String, BlockResultSet> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 			if (!time2summaryResult.containsKey(time))
 				time2summaryResult.put(time, new BlockResults());
@@ -138,7 +140,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			for (String key : allResultsForSnapshot.keySet()) {
 				BlockResultSet rt = allResultsForSnapshot.get(key);
 				for (String property : desiredProperties) {
-					for (BlockPropertyValue v : rt.getPropertiesExactMatch(property)) {
+					ArrayList<BlockPropertyValue> sr = rt.getPropertiesExactMatch(property);
+					for (BlockPropertyValue v : sr) {
 						if (v.getValue() != null) {
 							if (!prop2config2lastHeightAndWidth.containsKey(property))
 								prop2config2lastHeightAndWidth.put(property, new TreeMap<String, Double>());
