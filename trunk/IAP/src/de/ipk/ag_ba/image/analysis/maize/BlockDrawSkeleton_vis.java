@@ -12,8 +12,9 @@ public class BlockDrawSkeleton_vis extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 		FlexibleImage plantImg = getInput().getMasks().getVis();
 		boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
-		if (plantImg != null && getProperties().getImage("skeleton") != null)
-			return plantImg.getIO().drawSkeleton(getProperties().getImage("skeleton"), drawSkeleton).getImage();
+		FlexibleImage skel = getProperties().getImage("skeleton");
+		if (skel != null && plantImg != null)
+			return plantImg.getIO().drawSkeleton(skel, drawSkeleton).getImage();
 		else
 			return plantImg;
 	}

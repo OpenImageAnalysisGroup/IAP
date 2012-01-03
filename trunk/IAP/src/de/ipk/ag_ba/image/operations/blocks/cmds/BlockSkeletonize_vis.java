@@ -336,7 +336,7 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			}
 			
-			if (maxLeafcount > 0) {
+			if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.max", maxLeafcount);
 				// System.out.println("MAX leaf count: " + maxLeafcount);
 				Double[] lca = lc.toArray(new Double[] {});
