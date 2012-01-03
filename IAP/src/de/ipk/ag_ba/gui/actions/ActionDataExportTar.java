@@ -255,7 +255,9 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 									zefn =
 											(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : nm.getReplicateID() + "") +
 													nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
-													(id != null ? (id.getPosition() != null ? id.getPosition().intValue() + "Grad" : "0Grad") : "") + " " +
+													(id != null ? (id.getPosition() != null ?
+															StringManipulationTools.formatNumber(id.getPosition(), "###")
+																	+ "Grad" : "000Grad") : "") + " " +
 													nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
 													gc.get(GregorianCalendar.YEAR) + "-" +
 													(gc.get(GregorianCalendar.MONTH) + 1) + "-" +

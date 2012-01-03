@@ -339,20 +339,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 											getParentPriority());
 									processVolumeOutput(inSamples.get(time), results);
 									if (results != null) {
-										if (!analysisInput.containsKey(time))
-											analysisInput.put(time, new TreeMap<String, ImageData>());
-										if (!analysisResults.containsKey(time))
-											analysisResults.put(time, new TreeMap<String, BlockResultSet>());
-										analysisInput.get(time).put(configAndAngle, inImage);
-										analysisResults.get(time).put(configAndAngle, results);
+										synchronized (analysisInput) {
+											if (!analysisInput.containsKey(time))
+												analysisInput.put(time, new TreeMap<String, ImageData>());
+											if (!analysisResults.containsKey(time))
+												analysisResults.put(time, new TreeMap<String, BlockResultSet>());
+											analysisInput.get(time).put(configAndAngle, inImage);
+											analysisResults.get(time).put(configAndAngle, results);
+										}
 									}
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 							} finally {
+								innerLoopSemaphore.release();
 								if (releaseCon)
 									optMaxCon.release();
-								innerLoopSemaphore.release();
 							}
 						}
 					};
