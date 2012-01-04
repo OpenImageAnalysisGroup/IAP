@@ -1600,6 +1600,31 @@ public class ImageOperation {
 				.getHeight());
 	}
 	
+	public ImageOperation filterByHSV(double maxDist, double clearColorHUE) {
+		
+		double t = clearColorHUE;
+		float[] hsb = new float[3];
+		int r, g, b, rgb;
+		
+		int[] pixels = getImageAs1array();
+		for (int index = 0; index < pixels.length; index++) {
+			rgb = pixels[index];
+			// int a = ((rgb >> 24) & 0xff);
+			r = ((rgb >> 16) & 0xff);
+			g = ((rgb >> 8) & 0xff);
+			b = (rgb & 0xff);
+			
+			Color.RGBtoHSB(r, g, b, hsb);
+			
+			if (Math.abs(hsb[0] - t) > maxDist)
+				pixels[index] = BACKGROUND_COLORint;
+			else
+				pixels[index] = rgb;
+		}
+		return new ImageOperation(pixels, getImage().getWidth(), getImage()
+				.getHeight());
+	}
+	
 	public ImageOperation filterByHSV(double maxDist, int clearColor) {
 		
 		int rgb = clearColor;

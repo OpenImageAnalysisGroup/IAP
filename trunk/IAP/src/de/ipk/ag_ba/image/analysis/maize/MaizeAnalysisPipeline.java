@@ -6,8 +6,6 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingForMaizeBloom_vis_stores_image;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlBalancing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCopyImagesApplyMask_vis_fluo;
@@ -17,25 +15,27 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlLabFilter_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosingForMaizeBloom_vis_stores_image;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveMaizeBambooStick_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.OK_NOV11_BlockCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkers_vis_fluo_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearSides;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlFindBlueMarkers_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlIntensityConversion_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlUseFluoMaskToClear_vis_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkers_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearSides;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjects_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjects_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresUsingOpening_top_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlUseFluoMaskToClear_vis_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.OK_NOV11_BlockCalcMainAxis_vis;
 
 /**
  * Comprehensive corn image analysis pipeline, processing VIS, FLUO and NIR images. Depends on reference images for initial comparison
@@ -99,8 +99,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlCalcIntensity_vis_fluo_nir.class);
 		p.add(BlConvexHull_vis_fluo.class);
 		
-		p.add(BlockDrawSkeleton_vis.class);
 		// postprocessing
+		p.add(BlockDrawSkeleton_vis_fluo.class);
 		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
 		p.add(BlCrop_images_vis_fluo_nir.class);
 		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);

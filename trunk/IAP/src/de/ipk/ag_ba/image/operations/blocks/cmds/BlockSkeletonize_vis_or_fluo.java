@@ -16,6 +16,7 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -120,7 +121,8 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						if (sk != null) {
 							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 							res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
-							return res;
+							if (res != null)
+								getProperties().setImage("skeleton_fluo", sk);
 						}
 					}
 			}
@@ -136,7 +138,8 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						if (sk != null) {
 							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 							res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
-							return res;
+							if (res != null)
+								getProperties().setImage("skeleton_fluo", sk);
 						}
 					}
 			}
@@ -321,6 +324,8 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		
 		for (Long time : time2inSamples.keySet()) {
 			TreeMap<String, BlockResultSet> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+			if (!time2summaryResult.containsKey(time))
+				time2summaryResult.put(time, new BlockResults());
 			BlockResultSet summaryResult = time2summaryResult.get(time);
 			Double maxLeafcount = -1d;
 			Double maxLeaflength = -1d;
@@ -365,7 +370,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						if (v.getValue() != null)
 							cnt = v.getValue();
 					}
-					if (cnt != null) {
+					if (cnt != null && summaryResult != null) {
 						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.best", cnt);
 						// System.out.println("Leaf count for best side image: " + cnt);
 					}
@@ -400,9 +405,9 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				Double median = lca[lca.length / 2];
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.median", median);
 			}
-			if (maxLeaflength > 0)
+			if (maxLeaflength != null && maxLeaflength > 0)
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.max", maxLeaflength);
-			if (maxLeaflengthNorm > 0)
+			if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm);
 		}
 	}
