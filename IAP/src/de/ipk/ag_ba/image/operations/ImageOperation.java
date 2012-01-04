@@ -3867,4 +3867,17 @@ public class ImageOperation {
 		}
 		return new FlexibleImage(w, h, img);
 	}
+	
+	public ImageOperation filterRGB(int rMax, int gMax, int bMax) {
+		int[] res = getImageAs1array();
+		int r, g, b;
+		for (int i = 0; i < res.length; i++) {
+			r = ((res[i] & 0xff0000) >> 16);
+			g = ((res[i] & 0x00ff00) >> 8);
+			b = (res[i] & 0x0000ff);
+			if (!(r <= rMax && g <= gMax && b <= bMax))
+				res[i] = BACKGROUND_COLORint;
+		}
+		return new ImageOperation(res, getWidth(), getHeight());
+	}
 }
