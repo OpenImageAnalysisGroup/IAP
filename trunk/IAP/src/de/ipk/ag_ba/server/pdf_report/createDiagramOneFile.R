@@ -34,7 +34,7 @@
 "%getData%" <- function(englischVersion, fileName){	
 	#seperator <- ";"
 	if (englischVersion) {
-		return(read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8"))
+		return(read.csv(fileName, header=TRUE, sep=";", fileEncoding="ISO-8859-1", encoding="UTF-8"))
 	} else {
 		return(read.csv2(fileName, header=TRUE, sep=";", fileEncoding="ISO-8859-1", encoding="UTF-8"))
 	}
@@ -235,7 +235,8 @@ reduceWorkingDataSize <- function(overallList){
 }
 
 plotDummy <- function(overallList) {
-	
+	overallList$debug %debug% "plotDummy()"
+
 	for(sN in overallList$saveName){
 		openImageFile(overallList)
 		#Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste(sN,saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
@@ -429,8 +430,8 @@ normalizeToHundredPercent <-  function(whichRows, overallResult) {
 }
 
 writeLatexFile <- function(saveNameLatexFile, saveNameImageFile="", o="") {
-	
-	latexText <- paste( "\\item [{\\includegraphics[width=13cm]{",
+
+	latexText <- paste( "\\item [{\\includegraphics[height=\\ScaleIfNeeded,width=\\ConstForImageWidth, keepaspectratio]{",
 						"\\string\"",
 						gsub("\\.", "\\\\lyxdot ", ifelse(saveNameImageFile=="",saveNameLatexFile,saveNameImageFile),),
 						ifelse(o=="", "", paste("\\lyxdot ",gsub('[[:punct:]]'," ",o),sep="")),
@@ -497,7 +498,7 @@ makeLinearDiagram <- function(h, overallList) {
 		
 		#numberOfNaNOfEachColumn <- CheckIfOneColumnHasValues(overallList$overallResult)
 	
-	
+		firstPlot <- TRUE
 		for(y in overallList$symbolParameter) {	
 			numberOfNaN <- length(overallList$overallResult[y,]) - (length(overallList$overallResult[y,]) - sum(is.na(overallList$overallResult[y,]),na.rm=TRUE))
 			
@@ -517,7 +518,8 @@ makeLinearDiagram <- function(h, overallList) {
 				overallList$overallResult[y,naVector] <- newValue$y[overallList$filterXaxis[naVector]]
 				#overallList$filterXaxis[naVector]
 				
-				if (y == 1) {
+				if (firstPlot) {
+					firstPlot <- FALSE
 					plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="c", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
 				} else {
 					points(overallList$filterXaxis, overallList$overallResult[y,], type="c", col=overallList$color[y], pch=y, lty=1, lwd=3 )	
@@ -531,7 +533,8 @@ makeLinearDiagram <- function(h, overallList) {
 				points(overallList$filterXaxis, overallResultWithNaValues, type="p", col=overallList$color[y], pch=y, lty=1, lwd=3 )
 			} else if (numberOfNaN == 0 | (length(overallList$overallResult[y,])-1) == numberOfNaN){
 				#plotDiagram(y, overallList, type)
-				if (y==1) {
+				if (firstPlot) {
+					firstPlot <- FALSE
 					plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="b", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
 				} else {	
 					points(overallList$filterXaxis, overallList$overallResult[y,], type="b", col=overallList$color[y], pch=y, lty=1, lwd=3 )
@@ -635,13 +638,13 @@ buildLegend <- function(overallList) {
 	file <- paste(legendeFileName,overallList$saveFormat,sep=".")
 	
 	if(!file.exists(file)){
-		Cairo(width=as.numeric(overallList$imageWidth), height=length(legendText)*(as.numeric(overallList$dpi)-20),file=file,type=tolower(overallList$saveFormat),bg=overallList$bg,units="px",dpi=as.numeric(overallList$dpi), pointsize=20)
+		Cairo(width=as.numeric(overallList$imageWidth), height=length(legendText)*(2.4*20),file=file,type=tolower(overallList$saveFormat),bg=overallList$bg,units="px",dpi=as.numeric(overallList$dpi), pointsize=20)
 		par(mar = c(0,0,0,0))
 		plot.new()
 		legend("left", legendText, col= rev(overallList$color), pch=overallList$symbolParameter, bty="n",cex=2.0)
 		dev.off()
 	}
-	
+	##length(legendText)*(as.numeric(overallList$dpi)-20)
 }
 
 makeDiagrams <- function(overallList) {
@@ -753,7 +756,7 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 	saveFormat <- "png"
 	imageWidth <- "1280"
 	imageHeight <- "768"
-	dpi <- "90"
+	dpi <- "216" ##90
 	
 	isGray="FALSE"
 	bgColor <- "transparent"
@@ -808,16 +811,21 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 				descriptorSetName <- descriptorSet
 				
 			} else { #Report
-				descriptorSet <- c("Weight A (g)","Weight B (g)","Water (weight-diff)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)",
+				descriptorSet <- c("Weight A (g)","Weight B (g)","Water (weight-diff)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
 						"side.fluo.intensity.chlorophyl.average (relative)","side.fluo.intensity.phenol.average (relative)",
 						"side.nir.intensity.average (relative)","side.leaf.count.median (leafs)","side.bloom.count (tassel)",
-						"side.leaf.length.sum.norm.max (mm)")
-				
+						"side.leaf.length.sum.norm.max (mm)", "volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
+						"volume.iap.wue", "side.nir.wetness.plant_weight_drought_loss", "top.nir.wetness.plant_weight_drought_loss", "side.nir.wetness.av", "top.nir.wetness.av",
+						"side.area.relative", "side.height.norm.relative", "side.width.norm.relative", "top.area.relative", "side.area.relative", "volume.iap.relative")
+			
 				# "digital biomass IAP (pixel^3)","digital biomass KeyGene (pixel^3)", 
-				descriptorSetName <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "height (mm)", "width (mm)", "side area (pixel^2)",
+				descriptorSetName <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "height (mm)", "width (mm)", "side area (mm^2)", "top area (mm^2)",
 						"chlorophyl intensity (relative intensity/pixel)", "fluorescence intensity (relative intensity/pixel)", "nir intensity (relative intensity/pixel)",
-						"number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)")			
-			}
+						"number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)", "volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
+						"volume based water use efficiency", "weighted loss through drought stress (side)", "weighted loss through drought stress (top)", "Average wetness of side image", "Average wetness of top image",
+						"relative projected side area (%)", "relative plant height (%)", "relative plant width (%)", "relative projected top area (%)", "relative projected side area (%)", "relative volume (IAP based formular - RGB) (%)")			
+	
+		}
 			diagramTypVector <- rep.int("!boxplot", times=length(descriptorSetName))
 
 			#boxplotStacked
@@ -864,7 +872,7 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		#descriptorSet <- c("Plant ID$Treatment$Hallo$Wert1$Repl ID")
 		#descriptorSetName <- c("VariableMix")
 	
-		descriptorSet <- c("side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
+		#descriptorSet <- c("side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
 		#descriptorSetName <- c("red fluorescence histogram (%)")
 	
 	
@@ -916,8 +924,8 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		##treatment <- "Variety"
 		#treatment <- "none"
 		
-		diagramTyp="boxplotStacked"
-		#diagramTyp="!boxplot"
+		#diagramTyp="boxplotStacked"
+		diagramTyp="!boxplot"
 		#diagramTyp="boxplot"
 		
 		bgColor <- "transparent"
@@ -937,6 +945,7 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		#descriptor <- c("Plant ID","Treatment","Hallo","Wert1", "Repl ID")
 		#descriptor <- c("Repl ID")		
 		#descriptorSet <- c("Plant ID")
+		descriptorSet <- c("side.area.norm (mm^2)")
 		descriptorSetName <- c("Das ist ein Testname")
 
 		#descriptorSet <- c("Plant ID$Treatment$Hallo$Wert1$Repl ID")

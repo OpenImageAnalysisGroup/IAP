@@ -31,6 +31,17 @@
  \renewcommand{\makelabel}[1]{##1\hfil}}}
 {\end{list}}
 
+\def\ScaleIfNeeded{%
+	\ifdim\Gin@nat@height> 0.9\textheight
+		0.9\textheight
+	\else
+		\Gin@nat@height
+	\fi
+}
+
+\def\ConstForImageWidth{13cm}
+
+
 \makeatother
 
 \usepackage{babel}
@@ -67,10 +78,16 @@ of the group image analysis.
 
 \maketitle
 
+\clearpage
+\tableofcontents
+
+\clearpage
+
 \section{Experiment info}
+\subsection{Experiment properties}
+
 \begin{lyxlist}{00.00.0000}
-\item [{Experiment properties}]~
-\end{lyxlist}
+\item [{%
 \begin{tabular}{|c|c|c|}
 \hline 
 Experiment & --experimentname--\tabularnewline
@@ -86,10 +103,13 @@ Images & --ImagesExp-- \tabularnewline
 \hline 
 Storage & --StorageExp-- \tabularnewline
 \hline 
-\end{tabular}
-\begin{lyxlist}{00.00.0000}
-\item [{Remarks}]~
+\end{tabular}}]~
 \end{lyxlist}
+
+\subsection{Remarks}
+
+\begin{lyxlist}{00.00.0000}
+\item [{%
 \begin{tabular}{|c|c|}
 \hline 
 Notes\tabularnewline
@@ -97,11 +117,10 @@ Notes\tabularnewline
 \hline 
 --RemarkExp--\tabularnewline
 \hline 
-\end{tabular}
-
-\begin{lyxlist}{00.00.0000}
-\item [{Experiment factors}]~
+\end{tabular}}]~
 \end{lyxlist}
+
+\subsection{Experiment factors}
 
 \begin{lyxlist}{00.00.0000}
 \item [{%
@@ -115,34 +134,35 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \end{tabular}}]~
 \end{lyxlist}
 
-\begin{lyxlist}{00.00.0000}
-\item [{Legend}]~
-\end{lyxlist}
+%%\newpage
+
+\subsection{Legend} 
+\ \\
 \begin{itemize}
 \item Legend for linear diagrams
 \end{itemize}
-\begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{legend}}]~
-\end{lyxlist}
+\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"legend\string"}
 
+%%\newpage
 \begin{itemize}
 \item Legend for stacked bar diagrams
 \end{itemize}
 \begin{lyxlist}{00.00.0000}
 \include{legendBoxStacked}
-%%\item [{\includegraphics[width=13cm]{legendeBoxStacked}}]~
 \end{lyxlist}
 
+\clearpage
 \section{\noindent Weight and water consumption}
 
 \subsection{Weights (before and after watering)}
 \begin{itemize}
 \item Weight before and after watering.
 \item Colnum name: Weight A (g), Weight B (g)
-\item Unit: g\end{itemize}
+\item Unit: g
+\end{itemize}
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"Weight\lyxdot A\lyxdot \lyxdot g\lyxdot \string"}}]~
-\item [{\includegraphics[width=13cm]{\string"Weight\lyxdot B\lyxdot \lyxdot g\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"Weight\lyxdot A\lyxdot \lyxdot g\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"Weight\lyxdot B\lyxdot \lyxdot g\lyxdot \string"}}]~
 \end{lyxlist}
 
 \subsection{Watering amounts / consumption}
@@ -151,38 +171,78 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Colnum name: Watering (weight-diff)
 \item Unit: g\end{itemize}
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"Water\lyxdot \lyxdot weight\lyxdot diff\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"Water\lyxdot \lyxdot weight\lyxdot diff\lyxdot \string"}}]~
 \end{lyxlist}
 
-
+\clearpage
 \section{\noindent Biomass}
 \begin{itemize}
 \item Digital Biomass based on the side.area and top.area
 \item Unit: pixel\textthreesuperior{}
 \end{itemize}
 
-\subsection{IAP based formula}
+\subsection{IAP based formula - GRB}
 \begin{itemize}
 \item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
-\item Column name: digital.biomass.iap.norm\end{itemize}
+\item Column name: volume.iap
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{volume\lyxdot iap}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"volume\lyxdot iap\lyxdot \lyxdot px3\lyxdot \string"}}]~
 \end{lyxlist}
+\end{itemize}
+
+\subsection{IAP based formula - GRB max}
+\begin{itemize}
+\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{max\_image}^{2}*top.area_{max\_image}}$
+\item Column name: volume.iap\_max
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"volume\lyxdot iap_max\string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{IAP based formula - FLUO}
+\begin{itemize}
+\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
+\item Column name: volume.fluo.iap
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"volume\lyxdot fluo\lyxdot iap\string"}}]~
+\end{lyxlist}
+\end{itemize}
 
 \subsection{LemnaTec formula}
 \begin{itemize}
 \item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
-%\item Column name: digital.biomass.lemnatec.norm
+\item Column name: volume.lt
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"volume\lyxdot lt\lyxdot \lyxdot px3\lyxdot \string"}}]~
+\end{lyxlist}
 \end{itemize}
 
 \subsection{KeyGene formula}
 \begin{itemize}
 \item Equation: $Biomass_{KeyGene}=side.area_{0^{\circ}}+side.area_{90^{\circ}}+\log(\frac{top.area}{3})$
-\item Column name: digital.biomass.keygene.norm\end{itemize}
+\item Column name: digital.biomass.keygene.norm
 %\begin{lyxlist}{00.00.0000}
-%\item [{\includegraphics[width=13cm]{digital\lyxdot biomass\lyxdot keygene\lyxdot norm}}]~
+%\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{digital\lyxdot biomass\lyxdot keygene\lyxdot norm}}]~
 %\end{lyxlist}
+\end{itemize}
 
+\clearpage
+\section{\noindent Water use efficiency}
+\begin{itemize}
+\item Ratio of plant growth and water use.
+\end{itemize}
+
+\subsection{Volume based}
+\begin{itemize}
+\item The volume based on the IAP formula used for the value "plant growth".
+\item Colnum name: volume.iap.wue
+\item Unit: xxx
+\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"volume\lyxdot iap\lyxdot wue\string"}}]~
+\end{lyxlist}
+
+\clearpage
 \section{General growth related plant properties}
 
 \subsection{Plant height}
@@ -191,7 +251,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Column name: side.height.norm
 \item Unit: mm
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot height\lyxdot norm\lyxdot \lyxdot mm\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot height\lyxdot norm\lyxdot \lyxdot mm\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
@@ -201,7 +261,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Column name: side.width.norm
 \item Unit: mm
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot width\lyxdot norm\lyxdot \lyxdot mm\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot width\lyxdot norm\lyxdot \lyxdot mm\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
@@ -211,12 +271,94 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Colum name: side.area.norm
 \item Unit: pixel\texttwosuperior{}
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot area\lyxdot norm\lyxdot \lyxdot mm2\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot area\lyxdot norm\lyxdot \lyxdot mm2\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
-\section{Fluorescence intensity analysis}
+\subsection{Projected top area}
+\begin{itemize}
+\item Number of foreground pixels from top camera
+\item Colum name: top.area.norm
+\item Unit: pixel\texttwosuperior{}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"top\lyxdot area\lyxdot norm\lyxdot \lyxdot mm2\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
 
+
+\subsection{Relative volume (IAP based formula - GRB)}
+\begin{itemize}
+\item V
+\item Colum name: top.area.norm
+\item Unit: pixel\texttwosuperior{}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"top\lyxdot area\lyxdot norm\lyxdot \lyxdot mm2\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\clearpage
+\section{\noindent Relative values}
+\begin{itemize}
+\item Presented values in relative dependence.
+\item Unit: %
+\end{itemize}
+
+\subsection{Relative projected side area}
+\begin{itemize}
+\item Relative number of foreground pixels from side camera
+\item Colnum name: side.area.relative
+\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot area\lyxdot relative\string"}}]~
+\end{lyxlist}
+
+\subsection{Relative plant height}
+\begin{itemize}
+\item Relative plant height (mm) (normalized to distance of left and right marker)
+\item Colnum name: side.height.norm.relative
+\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot height\lyxdot norm\lyxdot relative\string"}}]~
+\end{lyxlist}
+
+\subsection{Relative plant width}
+\begin{itemize}
+\item Relative plant width (mm) (normalized to distance of left and right marker) 
+\item Colnum name: side.width.norm.relative
+\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot width\lyxdot norm\lyxdot relative\string"}}]~
+\end{lyxlist}
+
+\subsection{Relative projected top area}
+\begin{itemize}
+\item Relative number of foreground pixels from top camera
+\item Colnum name: top.area.relative
+\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"top\lyxdot area\lyxdot relative\string"}}]~
+\end{lyxlist}
+
+\subsection{Relative projected side area}
+\begin{itemize}
+\item Relative number of foreground pixels from side camera
+\item Colnum name: side.area.relative
+\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot area\lyxdot relative\string"}}]~
+\end{lyxlist}
+
+\subsection{Relative volume (IAP based formular - RGB)}
+\begin{itemize}
+\item Digital Biomass based on the side.area and top.area
+\item Colnum name: volume.iap.relative
+\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"volume\lyxdot iap\lyxdot relative\string"}}]~
+\end{lyxlist}
+
+\clearpage
+\section{Fluorescence intensity analysis}
 
 \subsection{Chlorophyl intensity}
 \begin{itemize}
@@ -225,7 +367,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Column name: side.fluo.intensity.chlorophyl.average
 \item Unit: relative intensity/pixel
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot fluo\lyxdot intensity\lyxdot chlorophyl\lyxdot average\lyxdot \lyxdot relative\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot fluo\lyxdot intensity\lyxdot chlorophyl\lyxdot average\lyxdot \lyxdot relative\lyxdot \string"}}]~
 \include{side\lyxdot fluo\lyxdot normalized\lyxdot histogram\lyxdot bin\lyxdot 1\lyxdot 0_25;side\lyxdot fluo\lyxdot normalized\lyxdot histogr}
 \end{lyxlist}
 \end{itemize}
@@ -238,7 +380,7 @@ reflection.
 \item Column name: side.fluo.intensity.phenol.average
 \item Unit: relative intensity/pixel
 %\begin{lyxlist}{00.00.0000}
-%\item [{\includegraphics[width=13cm]{\string"side\lyxdot fluo\lyxdot intensity\lyxdot phenol\lyxdot average\string"}}]~
+%\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot fluo\lyxdot intensity\lyxdot phenol\lyxdot average\string"}}]~
 %\end{lyxlist}
 \end{itemize}
 
@@ -249,11 +391,12 @@ reflection.
 \item Column name: side.nir.intensity.average
 \item Unit: relative intensity/pixel
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot nir\lyxdot intensity\lyxdot average\lyxdot \lyxdot relative\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot nir\lyxdot intensity\lyxdot average\lyxdot \lyxdot relative\lyxdot \string"}}]~
 \include{side\lyxdot nir\lyxdot normalized\lyxdot histogram\lyxdot bin\lyxdot 1\lyxdot 0_25;side\lyxdot nir\lyxdot normalized\lyxdot histogram}
 \end{lyxlist}
 \end{itemize}
 
+\clearpage
 \section{Plant structures}
 
 \subsection{Number of leafs}
@@ -263,7 +406,7 @@ reflection.
 \item Unit: leafs
 \item Hint: leaf-tips are shown as red retangles in the image
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot leaf\lyxdot count\lyxdot median\lyxdot \lyxdot leafs\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot leaf\lyxdot count\lyxdot median\lyxdot \lyxdot leafs\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
@@ -274,7 +417,7 @@ reflection.
 \item Unit: tassel
 \item Hint: the number of blue retangles in the image
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot bloom\lyxdot count\lyxdot \lyxdot tassel\lyxdot \string"}}]~
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot bloom\lyxdot count\lyxdot \lyxdot tassel\lyxdot \string"}}]~
 \end{lyxlist}
 \end{itemize}
 
@@ -285,9 +428,55 @@ reflection.
 \item Unit: mm
 \item Hint: the yellow line in the image
 \begin{lyxlist}{00.00.0000}
-\item [{\includegraphics[width=13cm]{\string"side\lyxdot leaf\lyxdot length\lyxdot sum\lyxdot norm\lyxdot max\lyxdot \lyxdot mm\lyxdot \string"}}]~\end{lyxlist}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot leaf\lyxdot length\lyxdot sum\lyxdot norm\lyxdot max\lyxdot \lyxdot mm\lyxdot \string"}}]~\end{lyxlist}
 \end{itemize}
 
+\clearpage
+\section{\noindent Wetness}
+\begin{itemize}
+\item Vales based on the NIR images
+\item Unit: xxx
+\end{itemize}
+
+\subsection{Average wetness of side image}
+\begin{itemize}
+\item Average wetness of the plants from NIR side camera
+\item Column name: side.nir.wetness.av
+\item Unit: xxx
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot nir\lyxdot wetness\lyxdot av\string"}}]~\end{lyxlist}
+\end{itemize}
+
+\subsection{Average wetness of top image}
+\begin{itemize}
+\item Average wetness of the plants from NIR top camera
+\item Column name: top.nir.wetness.av
+\item Unit: xxx
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"top\lyxdot nir\lyxdot wetness\lyxdot av\string"}}]~\end{lyxlist}
+\end{itemize}
+
+\subsection{Weighted loss through drought stress - side image}
+\begin{itemize}
+\item Number of foreground pixels from NIR side camera minus the weighted value of the plant
+\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
+\item Column name: side.nir.wetness.plant\_weight\_drought\_loss
+\item Unit: xxx
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot nir\lyxdot wetness\lyxdot plant_weight_drought_loss\string"}}]~\end{lyxlist}
+\end{itemize}
+
+\subsection{Weighted loss through drought stress - top image}
+\begin{itemize}
+\item Number of foreground pixels from NIR top camera minus the weighted value of the plant
+\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
+\item Column name: top.nir.wetness.plant\_weight\_drought\_loss
+\item Unit: xxx
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"top\lyxdot nir\lyxdot wetness\lyxdot plant_weight_drought_loss\string"}}]~\end{lyxlist}
+\end{itemize}
+
+\clearpage
 \section{Appendix}
 \begin{lyxlist}{00.00.0000}
 \include{appendixImage}
