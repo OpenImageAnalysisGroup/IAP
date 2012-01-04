@@ -47,7 +47,7 @@ public class SystemAnalysis {
 		if (useHalfCPUpower)
 			return (int) (cpus / 2d > 0 ? cpus / 2d : 1);
 		else
-			return cpus;
+			return (int) (cpus * 4d / 5d) > 1 ? (int) (cpus * 4d / 5d) : cpus;
 	}
 	
 	public static int getNumberOfCPUs(

@@ -26,10 +26,10 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			pix = getProbablyWhitePixels(vis, true, -10, 50);
+			pix = getProbablyWhitePixels(vis.copy().getIO().blur(5).getImage(), true, -10, 50);
 		} else
 			pix = getProbablyWhitePixels(vis, false, -10, 10);
-		return io.imageBalancing(255, pix).getImage().print("after", debug);
+		return io.imageBalancing(255, pix).getImage().print("after", false);
 	}
 	
 	@Override
@@ -40,10 +40,10 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis, true, -10, 50);
+			pix = getProbablyWhitePixels(vis.copy().getIO().blur(5).getImage(), true, -30, 50);
 		else
 			pix = getProbablyWhitePixels(vis, false, -10, 10);
-		return io.imageBalancing(255, pix).getImage().print("after", debug);
+		return io.imageBalancing(255, pix).getImage().print("after", false);
 	}
 	
 	/**
@@ -107,11 +107,11 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
 				valuesBottom = io.getRGBAverage(left, height - startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
 			} else {
-				int left = (int) (0.3 * width);
-				int right = (int) (width - 0.3 * width);
+				int left = (int) ((0.3 - 0.25) * width);
+				int right = (int) (left + 0.25 * width);
 				int scanHeight = (right - left) / 4;
 				int scanWidth = right - left;
-				int startHTop = (int) (height * 0.1 - scanHeight / 2);
+				int startHTop = (int) (height * 0.05 - scanHeight / 2);
 				
 				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
 				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, abThres, true, debug);
