@@ -222,8 +222,8 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		if (leafcount > 0) {
 			double filled = inp.getIO().countFilledPixels();
 			if (distHorizontal != null)
-				rt.addValue("leaf.width.avg.norm", (filled / leaflength) * normFactor);
-			rt.addValue("leaf.width.avg", filled / leaflength);
+				rt.addValue("leaf.average.width.norm", (filled / leaflength) * normFactor);
+			rt.addValue("leaf.average.width", filled / leaflength);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)

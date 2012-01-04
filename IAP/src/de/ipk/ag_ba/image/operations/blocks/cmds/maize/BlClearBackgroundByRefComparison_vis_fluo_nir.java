@@ -55,21 +55,24 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 						.print("CLEAR RESULT", false).getImage();
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP) {
-				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
+				// double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 				FlexibleImage visX = getInput().getImages().getVis().copy();
-				visX = visX.resize((int) (scaleFactor * visX.getWidth()), (int) (scaleFactor * visX.getHeight()));
+				// visX = visX.resize((int) (scaleFactor * visX.getWidth()), (int) (scaleFactor * visX.getHeight()));
 				FlexibleImage cleared = new ImageOperation(visX)
 						// .blur(3).printImage("median", false)
 						.compare()
-						.compareImages("vis", getInput().getMasks().getVis().getIO().blur(3).print("medianb", false).getImage(),
+						.compareImages("vis", getInput().getMasks().getVis().getIO().blur(3).print("medianb", debug).getImage(),
 								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
 								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
 								options.getIntSetting(Setting.abDiff_VIS_TOP) * 0.5d,
-								back, false)
+								back, false).
+						// protect blue: (will be removed later)
+						or(visX.copy().getIO().filterByHSV(0.02, 0.62).getImage()).
 						// .dilate().dilate().dilate()
-						.border(2).getImage();
+						border(1).
+						getImage();
 				return getInput().getImages().getVis().getIO().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
-						.print("CLEAR RESULT", false).getImage();
+						.print("CLEAR RESULT", debug).getImage();
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");
 		} else {
