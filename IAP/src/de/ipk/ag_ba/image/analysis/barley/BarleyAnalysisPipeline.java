@@ -3,6 +3,7 @@ package de.ipk.ag_ba.image.analysis.barley;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
+import de.ipk.ag_ba.image.analysis.maize.BlockDrawSkeleton_vis_fluo;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
@@ -75,8 +76,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlCalcWidthAndHeight_vis.class);
 		p.add(BlCalcIntensity_vis_fluo_nir.class);
 		p.add(BlConvexHull_vis_fluo.class);
-		p.add(BlockRunPostProcessors.class);
 		// postprocessing
+		p.add(BlockRunPostProcessors.class);
+		p.add(BlockDrawSkeleton_vis_fluo.class);
 		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
 		p.add(BlCrop_images_vis_fluo_nir.class);
 		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);

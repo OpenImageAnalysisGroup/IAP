@@ -355,6 +355,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								innerLoopSemaphore.release();
 								if (releaseCon)
 									optMaxCon.release();
+								
 							}
 						}
 					};

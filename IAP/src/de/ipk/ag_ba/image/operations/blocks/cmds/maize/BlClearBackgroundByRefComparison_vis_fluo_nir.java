@@ -47,7 +47,10 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 								options.getIntSetting(Setting.L_Diff_VIS_SIDE) * 0.5,
 								options.getIntSetting(Setting.L_Diff_VIS_SIDE) * 1.5,
 								options.getIntSetting(Setting.abDiff_VIS_SIDE) * 1.5,
-								back, true).border(2).getImage(); //
+								back, true).
+						// protect blue: (will be removed later)
+						or(visMsk.copy().getIO().filterByHSV(0.02, 0.62).getImage()).
+						border(2).getImage(); //
 				return getInput().getImages().getVis().getIO().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
 						.print("CLEAR RESULT", false).getImage();
 			}
