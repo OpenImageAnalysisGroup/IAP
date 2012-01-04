@@ -224,19 +224,19 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
 			System.out
 					.println(SystemAnalysis.getCurrentTime()
-							+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY");
+							+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY TO 1");
 			nn = 1;
 		}
 		if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
 			System.out
 					.println(SystemAnalysis.getCurrentTime()
-							+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY");
-			nn = 1;
+							+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY TO 2");
+			nn = 2;
 		}
 		if (SystemAnalysis.getMemoryMB() < 4000 && nn > 4) {
 			System.out
 					.println(SystemAnalysis.getCurrentTime()
-							+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY");
+							+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY TO 4");
 			nn = 4;
 		}
 		
