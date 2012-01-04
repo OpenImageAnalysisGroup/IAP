@@ -21,7 +21,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveMaizeBambooStick_vis
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir;
@@ -79,7 +79,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlUseFluoMaskToClear_vis_nir.class);
 		// "skelton" image is saved in the following block
 		// "beforeBloomEnhancement" is restored by the following block
-		p.add(BlockSkeletonize_vis.class);
+		p.add(BlockSkeletonize_vis_or_fluo.class);
 		
 		p.add(BlockRemoveSmallClusters_vis.class);
 		p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)

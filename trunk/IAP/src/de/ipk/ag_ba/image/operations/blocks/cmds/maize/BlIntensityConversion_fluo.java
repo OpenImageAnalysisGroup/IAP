@@ -24,7 +24,7 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			min = 210;
 		if (options.isBarleyInBarleySystem())
-			min = 225;
+			min = 190; // 225
 		FlexibleImage resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, min).getImage();
 		FlexibleImage resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
 		FlexibleImage resClassic = io.convertFluo2intensity(FluoAnalysis.CLASSIC, min).getImage();

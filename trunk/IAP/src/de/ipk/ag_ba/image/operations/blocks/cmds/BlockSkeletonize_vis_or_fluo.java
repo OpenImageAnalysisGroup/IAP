@@ -32,7 +32,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author pape
  */
-public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private final boolean debug = false;
 	private final boolean debug2 = false;
@@ -62,10 +62,57 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 			}
 		} else {
 			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
-						.dilate(3)
-						.blur(1)
-						.getImage().print("vis", debug);
+				if (false) {
+					FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
+							.dilate(3)
+							.blur(1)
+							.getImage().print("vis", debug);
+					
+					if (viswork != null)
+						if (vis != null && fluo != null) {
+							FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+							if (sk != null) {
+								boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
+								res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
+							}
+						}
+				}
+			}
+			if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
+				if (false) {
+					FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
+							.dilate(2)
+							.blur(1)
+							.getImage().print("vis", debug);
+					
+					if (viswork != null)
+						if (vis != null && fluo != null) {
+							FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+							if (sk != null) {
+								boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
+								res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
+							}
+						}
+				}
+			}
+			
+		}
+		return res;
+	}
+	
+	@Override
+	protected FlexibleImage processFLUOmask() {
+		FlexibleImage vis = getInput().getMasks().getVis();
+		FlexibleImage fluo = getInput().getMasks().getFluo() != null ? getInput().getMasks().getFluo().copy() : null;
+		FlexibleImage res = fluo.copy();
+		if (options.isMaize()) {
+			// empty
+		} else {
+			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
+				FlexibleImage viswork = fluo.copy().getIO()// .medianFilter32Bit()
+						.erode(1)
+						.blur(2)
+						.getImage().print("fluo", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -73,14 +120,15 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 						if (sk != null) {
 							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 							res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
+							return res;
 						}
 					}
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = vis.copy().getIO()// .medianFilter32Bit()
-						.dilate(2)
-						.blur(1)
-						.getImage().print("vis", debug);
+				FlexibleImage viswork = fluo.copy().getIO().filterRGB(150, 255, 255)
+						.erode(1)
+						.blur(2)
+						.getImage().print("fluo", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -88,12 +136,13 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 						if (sk != null) {
 							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 							res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
+							return res;
 						}
 					}
 			}
 			
 		}
-		return res;
+		return getInput().getMasks().getFluo();
 	}
 	
 	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo) {
@@ -165,6 +214,13 @@ public class BlockSkeletonize_vis extends AbstractSnapshotAnalysisBlockFIS {
 			if (distHorizontal != null)
 				rt.addValue("leaf.length.avg.norm", leaflength * normFactor / leafcount);
 			rt.addValue("leaf.length.avg", leaflength / leafcount);
+		}
+		
+		if (leafcount > 0) {
+			double filled = inp.getIO().countFilledPixels();
+			if (distHorizontal != null)
+				rt.addValue("leaf.width.avg.norm", (filled / leaflength) * normFactor);
+			rt.addValue("leaf.width.avg", filled / leaflength);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)
