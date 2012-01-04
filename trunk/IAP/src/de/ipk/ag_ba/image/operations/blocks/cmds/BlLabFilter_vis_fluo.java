@@ -214,11 +214,11 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 									options.isBarleyInBarleySystem() ? new int[] { 128 + 5, 123 } : new int[] {},
 									blueCurbWidthBarley0_1,
 									blueCurbHeightEndBarly0_8).
-							border_left_right(
-									options.isBarleyInBarleySystem() ?
-											(int) (w * 0.05) :
-											0,
-									Color.red.getRGB()).
+							// border_left_right(
+							// options.isBarleyInBarleySystem() ?
+							// (int) (w * 0.01) :
+							// 0,
+							// Color.red.getRGB()).
 							print("removed noise", false).getImage();
 				if (!options.isBarleyInBarleySystem())
 					toBeFiltered = toBeFiltered.getIO().medianFilter32Bit().medianFilter32Bit().getImage();
