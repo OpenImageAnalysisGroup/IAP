@@ -141,7 +141,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 					csv.append(csvHeader);
 				}
 				Workbook wb = xlsx ? new XSSFWorkbook() : null;
-				Sheet sheet = xlsx ? wb.createSheet(experimentReference.getExperimentName()) : null;
+				Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experimentReference.getExperimentName())) : null;
 				if (sheet != null) {
 					Row row = sheet.createRow(0);
 					int col = 0;
@@ -225,6 +225,11 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				
 			}
 		}
+	}
+	
+	private String replaceInvalidChars(String experimentName) {
+		String res = StringManipulationTools.stringReplace(experimentName, ":", "_");
+		return res;
 	}
 	
 	@Override
