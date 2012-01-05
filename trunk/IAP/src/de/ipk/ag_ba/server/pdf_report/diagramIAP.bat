@@ -28,3 +28,4 @@ Rscript createDiagramOneFile.r report.csv png FALSE %Treat% %Sec%
 )
 
 pdflatex report2.tex
+pdflatex report2.tex
