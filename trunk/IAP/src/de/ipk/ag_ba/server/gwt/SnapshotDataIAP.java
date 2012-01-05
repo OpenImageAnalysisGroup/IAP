@@ -456,8 +456,12 @@ public class SnapshotDataIAP {
 	private String replaceNull(String s) {
 		if (s == null || s.equals("null"))
 			return "";
-		else
-			return s;
+		else {
+			if (s.contains(";"))
+				return "\"" + s + "\"";
+			else
+				return s;
+		}
 	}
 	
 	private String enDe(boolean numberFormat_deTrue_enFalse, String v) {
