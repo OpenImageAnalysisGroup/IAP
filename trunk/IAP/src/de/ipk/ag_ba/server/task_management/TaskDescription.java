@@ -70,6 +70,11 @@ public class TaskDescription {
 	}
 	
 	@Override
+	public String toString() {
+		return ""+analysisActionClassName.substring(analysisActionClassName.lastIndexOf(".")+1)+": "+experimentInput.getExperimentName()+"";
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		return cmd.equals(((TaskDescription) obj).cmd);
 	}

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import org.ErrorMsg;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
@@ -138,7 +139,8 @@ public class CloudTaskManager {
 						}
 					}
 					if (!commands_to_start.isEmpty())
-						System.out.println(SystemAnalysis.getCurrentTime() + ">TO BE STARTED: " + commands_to_start.size());
+						System.out.println(SystemAnalysis.getCurrentTime() + ">TO BE STARTED: " + commands_to_start.size()+
+								" ("+StringManipulationTools.getStringList(commands_to_start, ", ")+")");
 					
 					int nn = 0;
 					progressSum = 0;
