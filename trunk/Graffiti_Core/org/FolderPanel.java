@@ -794,6 +794,8 @@ public class FolderPanel extends JComponent {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentPage--;
+				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK)
+					currentPage = 0;
 				layoutRows();
 				for (ActionListener al : collapse_listeners) {
 					al.actionPerformed(new ActionEvent(this, condensedState ? 0
@@ -805,6 +807,8 @@ public class FolderPanel extends JComponent {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentPage++;
+				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK)
+					currentPage = guiComponentRows.size() / maxRowCount;
 				layoutRows();
 				for (ActionListener al : collapse_listeners) {
 					al.actionPerformed(new ActionEvent(this, condensedState ? 0
@@ -835,8 +839,8 @@ public class FolderPanel extends JComponent {
 		
 		cmdButtonReduceMaximumRowCount.setToolTipText("reduce row count");
 		cmdButtonIncreaseMaximumRowCount.setToolTipText("increase row count");
-		cmdButton1.setToolTipText("turn page");
-		cmdButton2.setToolTipText("turn page");
+		cmdButton1.setToolTipText("turn page (hold Shift key to go to first page)");
+		cmdButton2.setToolTipText("turn page (hold Shift key to go to last page)");
 		
 		// result.setOpaque(false);
 		ClassLoader cl = FolderPanel.class.getClassLoader();

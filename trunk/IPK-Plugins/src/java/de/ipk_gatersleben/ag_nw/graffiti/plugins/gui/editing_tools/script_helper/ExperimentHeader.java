@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
+import org.StringManipulationTools;
 
 public class ExperimentHeader implements ExperimentHeaderInterface {
 	
@@ -39,7 +40,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	
 	public ExperimentHeader(ConditionInterface copyFrom) {
 		this();
-		experimentName = copyFrom.getExperimentName();
+		setExperimentName(copyFrom.getExperimentName());
 		remark = copyFrom.getExperimentRemark();
 		coordinator = copyFrom.getCoordinator();
 		importDate = copyFrom.getExperimentImportDate();
@@ -51,90 +52,112 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		originDatabaseId = copyFrom.getOriginDbId();
 	}
 	
+	@Override
 	public void setExperimentname(String experimentname) {
-		this.experimentName = experimentname;
+		this.setExperimentName(experimentname);
 	}
 	
+	@Override
 	public String getExperimentName() {
 		return experimentName;
 	}
 	
+	@Override
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
 	
+	@Override
 	public String getRemark() {
 		return remark;
 	}
 	
+	@Override
 	public void setCoordinator(String coordinator) {
 		this.coordinator = coordinator;
 	}
 	
+	@Override
 	public String getCoordinator() {
 		return coordinator;
 	}
 	
+	@Override
 	public void setImportusername(String importusername) {
 		this.importUserName = importusername;
 	}
 	
+	@Override
 	public String getImportusername() {
 		return importUserName;
 	}
 	
+	@Override
 	public void setImportusergroup(String importusergroup) {
 		this.importUserGroup = importusergroup;
 	}
 	
+	@Override
 	public String getImportusergroup() {
 		return importUserGroup;
 	}
 	
+	@Override
 	public void setImportdate(Date importdate) {
 		this.importDate = importdate;
 	}
 	
+	@Override
 	public Date getImportdate() {
 		return importDate;
 	}
 	
+	@Override
 	public void setStartdate(Date startdate) {
 		this.startDate = startdate;
 	}
 	
+	@Override
 	public Date getStartdate() {
 		return startDate;
 	}
 	
+	@Override
 	public void setNumberOfFiles(int imagefiles) {
 		this.imageFiles = imagefiles;
 	}
 	
+	@Override
 	public int getNumberOfFiles() {
 		return imageFiles;
 	}
 	
+	@Override
 	public void setSizekb(long sizekb) {
 		this.sizekb = sizekb;
 	}
 	
+	@Override
 	public long getSizekb() {
 		return sizekb;
 	}
 	
+	@Override
 	public void setExperimenttype(String experimenttype) {
 		this.experimentType = experimenttype;
 	}
 	
+	@Override
 	public String getExperimentType() {
 		return experimentType;
 	}
 	
+	@Override
 	public String getSequence() {
 		return sequence;
 	}
 	
+	@Override
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
 	}
@@ -146,6 +169,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		return sb.toString();
 	}
 	
+	@Override
 	public void toString(StringBuilder r, int measurementcount) {
 		r.append("<experiment experimentid=\"" + experimentID + "\">");
 		Substance.getAttributeString(r, new String[] {
@@ -153,7 +177,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 				"importusername", "importusergroup", "importdate", "startdate", "storagetime", "measurements", "imagefiles", "sizekb",
 				"origin"
 		}, new Object[] {
-				experimentName, database, remark, coordinator, experimentType, sequence, databaseId, importUserName,
+				getExperimentName(), database, remark, coordinator, experimentType, sequence, databaseId, importUserName,
 				importUserGroup, AttributeHelper.getDateString(importDate), AttributeHelper.getDateString(startDate), AttributeHelper.getDateString(storageTime),
 				measurementcount, (imageFiles == null ? 0 : imageFiles), sizekb,
 				originDatabaseId
@@ -230,7 +254,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	
 	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap, int measurementcount) {
-		attributeValueMap.put("experimentname", experimentName);
+		attributeValueMap.put("experimentname", getExperimentName());
 		if (database != null)
 			attributeValueMap.put("database", database);
 		attributeValueMap.put("remark", remark);
@@ -249,6 +273,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("origin", originDatabaseId);
 	}
 	
+	@Override
 	public String toStringLines() {
 		StringBuilder sb = new StringBuilder();
 		LinkedHashMap<String, Object> val = new LinkedHashMap<String, Object>();
@@ -262,22 +287,27 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		return sb.toString();
 	}
 	
+	@Override
 	public int getExperimentId() {
 		return experimentID;
 	}
 	
+	@Override
 	public void setExperimentId(int experimentId) {
 		this.experimentID = experimentId;
 	}
 	
+	@Override
 	public boolean inTrash() {
 		return getExperimentType() != null && getExperimentType().startsWith("Trash");
 	}
 	
+	@Override
 	public void setDatabase(String database) {
 		this.database = database;
 	}
 	
+	@Override
 	public String getDatabase() {
 		return database;
 	}
@@ -305,12 +335,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			if (!(obj instanceof ExperimentHeader))
 				return false;
 			ExperimentHeader e = (ExperimentHeader) obj;
-			String s1 = experimentName + ";" + remark + ";" + coordinator + ";" + databaseId + ";" + importUserName + ";"
+			String s1 = getExperimentName() + ";" + remark + ";" + coordinator + ";" + databaseId + ";" + importUserName + ";"
 					+ importUserGroup + ";" + imageFiles + ";" + sizekb + ";" + experimentType + ";" + sequence + ";"
 					+ experimentID + ";" + database + ";" + (importDate != null ? importDate.getTime() : "") + ";"
 					+ (startDate != null ? startDate.getTime() : "")
 					+ ";" + originDatabaseId;
-			String s2 = e.experimentName + ";" + e.remark + ";" + e.coordinator + ";" + e.databaseId + ";"
+			String s2 = e.getExperimentName() + ";" + e.remark + ";" + e.coordinator + ";" + e.databaseId + ";"
 					+ e.importUserName + ";" + e.importUserGroup + ";" + e.imageFiles + ";" + e.sizekb + ";"
 					+ e.experimentType + ";" + e.sequence + ";" + e.experimentID + ";" + e.database + ";"
 					+ (e.importDate != null ? e.importDate.getTime() : "") + ";" + (e.startDate != null ? e.startDate.getTime() : "")
@@ -402,5 +432,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Override
 	public String getOriginDbId() {
 		return originDatabaseId;
+	}
+	
+	private void setExperimentName(String experimentName) {
+		this.experimentName = experimentName;
+		if (this.experimentName != null && this.experimentName.contains("Â")) {
+			this.experimentName = StringManipulationTools.stringReplace(this.experimentName, "Â", "");
+		}
 	}
 }
