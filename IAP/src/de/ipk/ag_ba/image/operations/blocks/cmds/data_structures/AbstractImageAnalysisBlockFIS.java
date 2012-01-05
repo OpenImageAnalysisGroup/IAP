@@ -131,7 +131,6 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		HashMap<String, TreeMap<String, Long>> prop2config2lastHeightAndWidthTime = new HashMap<String, TreeMap<String, Long>>();
 		HashMap<String, TreeMap<String, Double>> prop2config2lastHeightAndWidth = new HashMap<String, TreeMap<String, Double>>();
 		for (Long time : time2inSamples.keySet()) {
-			System.out.println(time);
 			TreeMap<String, BlockResultSet> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 			if (!time2summaryResult.containsKey(time))
 				time2summaryResult.put(time, new BlockResults());
