@@ -196,7 +196,7 @@ public class CloudTaskManager {
 					System.out.println(SystemAnalysis.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysis.getCurrentTime());
 				}
 				Thread.sleep(1000);
-				if (autoClose && System.currentTimeMillis() - startTime > 10000) {
+				if (autoClose && System.currentTimeMillis() - startTime > 1000 * 60 * 30) {
 					if (runningTasks.isEmpty()) {
 						System.out.println(SystemAnalysis.getCurrentTime() + "> Cluster Execution Mode is active // NO RUNNING TASK");
 						System.out.println(SystemAnalysis.getCurrentTime() + "> SYSTEM.EXIT");
