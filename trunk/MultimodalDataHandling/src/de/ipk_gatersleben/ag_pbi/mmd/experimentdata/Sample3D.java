@@ -56,9 +56,12 @@ public class Sample3D extends Sample {
 				if (key.equals("measurements"))
 					continue;
 				Object o = map.get(key);
-				if (o instanceof String)
-					setAttribute(new Attribute(key, (String)o));
-				else
+				if (o == null)
+					continue;
+				if (o instanceof String) {
+					if (!((String) o).isEmpty())
+						setAttribute(new Attribute(key, (String) o));
+				} else
 					setAttribute(new Attribute(key, o + ""));
 			}
 		}
@@ -167,7 +170,7 @@ public class Sample3D extends Sample {
 	
 	@Override
 	public void setAttribute(Attribute attr) {
-		if (attr == null || attr.getValue() == null || attr.getValue().length()==0)
+		if (attr == null || attr.getValue() == null || attr.getValue().length() == 0)
 			return;
 		if (attr.getName().equals("component"))
 			setComponent(attr.getValue());
