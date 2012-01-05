@@ -27,6 +27,8 @@ public class SampleAverage implements SampleAverageInterface {
 	public SampleAverage(SampleInterface sample, Map map) {
 		this(sample);
 		for (Object key : map.keySet()) {
+			if (map.get(key) == null)
+				continue;
 			if (key instanceof String) {
 				if (key.equals("value")) {
 					setValue((Double) map.get("value"));
@@ -34,8 +36,11 @@ public class SampleAverage implements SampleAverageInterface {
 					if (map.get(key) != null) {
 						if (map.get(key) instanceof Double)
 							setValueFromAttribute((String) key, (Double) map.get(key));
-						else
-							setValueFromAttribute(new Attribute((String) key, map.get(key).toString()));
+						else {
+							String ss = map.get(key).toString();
+							if (!ss.isEmpty())
+								setValueFromAttribute(new Attribute((String) key, ss));
+						}
 					}
 			}
 		}

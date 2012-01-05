@@ -180,7 +180,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	@Override
 	public void setQualityAnnotation(String quality) {
-		this.quality = quality;
+		this.quality = quality != null ? quality.intern() : null;
 	}
 	
 	@Override
