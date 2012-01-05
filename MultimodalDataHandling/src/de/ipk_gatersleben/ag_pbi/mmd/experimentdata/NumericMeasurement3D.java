@@ -284,9 +284,9 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		super.fillAttributeMap(attributes);
 		if (position != null)
 			attributes.put("position", position);
-		if (positionUnit != null)
+		if (positionUnit != null && positionUnit.length() > 0)
 			attributes.put("positionUnit", positionUnit);
-		if (annotation != null)
+		if (annotation != null && annotation.length() > 0)
 			attributes.put("annotation", annotation);
 	}
 	
