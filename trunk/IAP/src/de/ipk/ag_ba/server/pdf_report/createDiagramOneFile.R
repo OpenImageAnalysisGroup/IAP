@@ -761,13 +761,15 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 						"side.nir.intensity.average (relative)","side.leaf.count.median (leafs)","side.bloom.count (tassel)",
 						"side.leaf.length.sum.norm.max (mm)", "volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
 						"volume.iap.wue", "side.nir.wetness.plant_weight_drought_loss", "top.nir.wetness.plant_weight_drought_loss", "side.nir.wetness.av", "top.nir.wetness.av",
-						"side.area.relative", "side.height.norm.relative", "side.width.norm.relative", "top.area.relative", "side.area.relative", "volume.iap.relative")
+						"side.area.relative", "side.height.norm.relative", "side.width.norm.relative", "top.area.relative", "side.area.relative", "volume.iap.relative",
+						"side.height (mm)","side.width (mm)","side.area (px)", "top.area (px)")
 			
-				descriptorSetName <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "height (mm)", "width (mm)", "side area (mm^2)", "top area (mm^2)",
+				descriptorSetName <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
 						"chlorophyl intensity (relative intensity/pixel)", "fluorescence intensity (relative intensity/pixel)", "nir intensity (relative intensity/pixel)",
 						"number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)", "volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
 						"volume based water use efficiency", "weighted loss through drought stress (side)", "weighted loss through drought stress (top)", "Average wetness of side image", "Average wetness of top image",
-						"relative projected side area (%)", "relative plant height (%)", "relative plant width (%)", "relative projected top area (%)", "relative projected side area (%)", "relative volume (IAP based formular - RGB) (%)")			
+						"relative projected side area (%)", "relative plant height (%)", "relative plant width (%)", "relative projected top area (%)", "relative projected side area (%)", "relative volume (IAP based formular - RGB) (%)",
+						"height (px)", "width (px)", "side area (px)", "top area (px)")			
 	
 		}
 			diagramTypVector <- rep.int("!boxplot", times=length(descriptorSetName))
@@ -782,9 +784,9 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 			
 			if(appendix) {
 				blacklist <- buildBlacklist(workingDataSet, descriptorSet)
-				descriptorSet <- colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet),'%in%', blacklist))[,1]])
-				descriptorSetName <- descriptorSet
-				diagramTypVector <- rep.int("!boxplot", times=length(descriptorSetName))
+				descriptorSetAppendix <- colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet),'%in%', blacklist))[,1]])
+				descriptorSetNameAppendix <- descriptorSetAppendix
+				diagramTypVectorAppendix <- rep.int("!boxplot", times=length(descriptorSetNameAppendix))
 			}
 		
 			saveFormat <- saveFormat %exists% args[2]
@@ -923,18 +925,34 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		stoppTheCalculation <- FALSE
 		
 }
-
+	
+	secondRun <- appendix
+	appendix <-  FALSE
+	
 	if(fileName != "error" & length(descriptorSet) > 0){
 		time <- system.time({
-			for (y in 1:length(descriptorSet)) {	
-				print(paste("... generate diagram of '", descriptorSet[y],"'",sep=""))
-				valuesAsDiagram(iniDataSet = workingDataSet, saveName = descriptorSet[y], saveFormat = saveFormat, imageWidth = imageWidth,
-								imageHeight = imageHeight, dpi = dpi, diagramTyp = diagramTypVector[y], isGray = isGray, treatment = treatment,
-								filterTreatment = filterTreatment, secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment,
-								filterXaxis = filterXaxis, xAxis = xAxis, descriptor = descriptorSet[y], showResultInR = showResultInR, 
-								xAxisName = xAxisName, yAxisName = descriptorSetName[y], bgColor = bgColor,	debug = DEBUG, appendix=appendix)
-				print("... ready")
+			repeat {
+				for (y in 1:length(descriptorSet)) {	
+					print(paste("... generate diagram of '", descriptorSet[y],"'",sep=""))
+					valuesAsDiagram(iniDataSet = workingDataSet, saveName = descriptorSet[y], saveFormat = saveFormat, imageWidth = imageWidth,
+									imageHeight = imageHeight, dpi = dpi, diagramTyp = diagramTypVector[y], isGray = isGray, treatment = treatment,
+									filterTreatment = filterTreatment, secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment,
+									filterXaxis = filterXaxis, xAxis = xAxis, descriptor = descriptorSet[y], showResultInR = showResultInR, 
+									xAxisName = xAxisName, yAxisName = descriptorSetName[y], bgColor = bgColor,	debug = DEBUG, appendix=appendix)
+					print("... ready")
+					
+				}
 				
+				if(secondRun) {
+					appendix = TRUE
+					secondRun = FALSE
+					print("... start with the Appendix ####################################################################################################")
+					descriptorSet <- descriptorSetAppendix
+					descriptorSetName <- descriptorSetNameAppendix
+					diagramTypVector <- diagramTypVectorAppendix
+				} else {
+					break
+				}
 			}
 			checkIfAllNecessaryFilesAreThere(saveFormat)
 		},TRUE)
