@@ -23,7 +23,6 @@ else
 fi
 
 if [ ${THI} = "TRUE" ]; then
-	Rscript createDiagramOneFile.r ${INPUTFILE} png FALSE ${TREAT} ${SEC}
 	Rscript createDiagramOneFile.r ${INPUTFILE} png TRUE ${TREAT} ${SEC}
 else
 	Rscript createDiagramOneFile.r ${INPUTFILE} png FALSE ${TREAT} ${SEC}

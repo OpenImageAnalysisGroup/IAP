@@ -247,6 +247,16 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \subsection{Plant height}
 \begin{itemize}
+\item Plant height (mm)
+\item Column name: side.height
+\item Unit: mm
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot height\lyxdot \lyxdot mm\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{Normalized plant height}
+\begin{itemize}
 \item Plant height (mm) (normalized to distance of left and right marker)
 \item Column name: side.height.norm
 \item Unit: mm
@@ -256,6 +266,16 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \end{itemize}
 
 \subsection{Plant width}
+\begin{itemize}
+\item Plant width (mm) 
+\item Column name: side.width
+\item Unit: mm
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot width\lyxdot \lyxdot mm\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{Normalized plant width}
 \begin{itemize}
 \item Plant width (mm) (normalized to distance of left and right marker) 
 \item Column name: side.width.norm
@@ -268,6 +288,16 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \subsection{Projected side area}
 \begin{itemize}
 \item Number of foreground pixels from side camera
+\item Colum name: side.area
+\item Unit: pixel\texttwosuperior{}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot area\lyxdot \lyxdot px\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{Normalized projected side area}
+\begin{itemize}
+\item Number of foreground pixels from side camera (normalized to distance of left and right marker)
 \item Colum name: side.area.norm
 \item Unit: pixel\texttwosuperior{}
 \begin{lyxlist}{00.00.0000}
@@ -278,6 +308,16 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \subsection{Projected top area}
 \begin{itemize}
 \item Number of foreground pixels from top camera
+\item Colum name: top.area
+\item Unit: pixel\texttwosuperior{}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"top\lyxdot area\lyxdot \lyxdot px\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{Normalized projected top area}
+\begin{itemize}
+\item Number of foreground pixels from top camera (normalized to distance of left and right marker)
 \item Colum name: top.area.norm
 \item Unit: pixel\texttwosuperior{}
 \begin{lyxlist}{00.00.0000}
@@ -353,7 +393,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \begin{itemize}
 \item Average activity of chlorophyl, based on red reflection.
 \item The darker the higher acitivity
-\item Column name: side.fluo.intensity.chlorophyl.average (relative)
+\item Column name: side.fluo.intensity.chlorophyl.average
 \item Unit: relative intensity/pixel
 \begin{lyxlist}{00.00.0000}
 \item [{\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{\string"side\lyxdot fluo\lyxdot intensity\lyxdot chlorophyl\lyxdot average\lyxdot \lyxdot relative\lyxdot \string"}}]~

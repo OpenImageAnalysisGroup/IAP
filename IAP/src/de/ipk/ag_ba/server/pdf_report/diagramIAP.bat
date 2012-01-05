@@ -16,16 +16,12 @@ SET Sec="none"
 )
 
 if "%~3" neq "" (
-
-	if "%~3"=="FALSE" (
-		Rscript createDiagramOneFile.r report.csv png FALSE %Treat% %Sec%
-	) ELSE (
-	  	Rscript createDiagramOneFile.r report.csv png FALSE %Treat% %Sec%
-	  	Rscript createDiagramOneFile.r report.csv png TRUE %Treat% %Sec%
-	)
+SET Appendix=%3
 ) ELSE (
-Rscript createDiagramOneFile.r report.csv png FALSE %Treat% %Sec%
+SET Appendix=FALSE
 )
+
+Rscript createDiagramOneFile.r report.csv png %Appendix% %Treat% %Sec%
 
 pdflatex report2.tex
 pdflatex report2.tex
