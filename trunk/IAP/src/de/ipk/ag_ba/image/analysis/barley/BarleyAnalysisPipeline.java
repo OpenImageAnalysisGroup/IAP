@@ -3,7 +3,6 @@ package de.ipk.ag_ba.image.analysis.barley;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
-import de.ipk.ag_ba.image.analysis.maize.BlockDrawSkeleton_vis_fluo;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
@@ -21,7 +20,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir;
@@ -69,7 +67,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlUseFluoMaskToClear_vis_nir.class);
 		p.add(BlNirFilterSide_nir.class);
 		p.add(BlCopyImagesApplyMask_vis_fluo.class);
-		p.add(BlockSkeletonize_vis_or_fluo.class);
+		// p.add(BlockSkeletonize_vis_or_fluo.class);
 		
 		// calculation of numeric values
 		p.add(OK_NOV11_BlockCalcMainAxis_vis.class);
@@ -78,7 +76,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlConvexHull_vis_fluo.class);
 		// postprocessing
 		p.add(BlockRunPostProcessors.class);
-		p.add(BlockDrawSkeleton_vis_fluo.class);
+		// p.add(BlockDrawSkeleton_vis_fluo.class);
 		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
 		p.add(BlCrop_images_vis_fluo_nir.class);
 		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);

@@ -5,6 +5,7 @@ import info.StopWatch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
@@ -517,6 +518,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			// a specific plant in all time points, therefore it is possible for the block-post-processing
 			// to process numeric analysis results from different time points and therefore directly
 			// to calculate relative values, such as relative growth rates
+			HashSet<String> knownOutput = new HashSet<String>();
+			String timeInfo = SystemAnalysis.getCurrentTime();
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				if (is.size() == 0)
 					continue;
@@ -527,7 +530,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				int workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
 				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != workOnSubset)
 					continue;
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Processing image sets with ID: " + val);
+				String info = timeInfo + ">INFO: Processing image sets with ID: " + val;
+				if (!knownOutput.contains(info))
+					System.out.println(info);
+				knownOutput.add(info);
 				if (!workload_imageSetsWithSpecificAngles.containsKey(val))
 					workload_imageSetsWithSpecificAngles.put(val, new TreeMap<Long, TreeMap<String, ImageSet>>());;
 				long time = is.firstEntry().getValue().getVIS().getParentSample().getRowId();
