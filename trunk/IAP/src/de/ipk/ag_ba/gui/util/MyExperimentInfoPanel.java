@@ -364,8 +364,8 @@ public class MyExperimentInfoPanel extends JPanel {
 			ArrayList<GuiRow> rows1 = new ArrayList<GuiRow>();
 			ArrayList<GuiRow> rows2 = new ArrayList<GuiRow>();
 			
-			double width = 90, space = 15, border = 5;
-			// rows.add(new GuiRow(new JLabel("<html><br>Average visual property per plant vs. manual measurement<hr>"), null));
+			double width = 90, space = 5, border = 2;
+			// rows.add(new GuiRow(new JLabel("<html><br>Average visual property per plant versus manual measurement<hr>"), null));
 			Collection<MatchInfo> sortedMatch = match(optExperiment, new String[] { "corr.", ".avg" }, false);
 			Collections.sort((List<MatchInfo>) sortedMatch, new Comparator<MatchInfo>() {
 				@Override
@@ -380,12 +380,13 @@ public class MyExperimentInfoPanel extends JPanel {
 				}
 			});
 			for (MatchInfo mi : sortedMatch) {
-				JComponent desc, height, freshWeight, dryWeight;
+				JComponent desc, height, leafWidth, freshWeight, dryWeight;
 				desc = new JLabel(mi.getDesc());
 				height = new JLabel(mi.getHeight());
+				leafWidth = new JLabel(mi.getLeafWidth());
 				freshWeight = new JLabel(mi.getFreshWeight());
 				dryWeight = new JLabel(mi.getDryWeight());
-				JComponent right = TableLayout.get3Split(height, freshWeight, dryWeight, width, width, width);
+				JComponent right = TableLayout.get4Split(height, leafWidth,freshWeight, dryWeight, width, space, border);
 				rows1.add(new GuiRow(desc, right));
 			}
 			// rows.add(new GuiRow(new JLabel(""), null));
@@ -404,12 +405,13 @@ public class MyExperimentInfoPanel extends JPanel {
 				}
 			});
 			for (MatchInfo mi : sortedMatch) {
-				JComponent desc, height, freshWeight, dryWeight;
+				JComponent desc, height, leafWidth, freshWeight, dryWeight;
 				desc = new JLabel(mi.getDesc());
 				height = new JLabel(mi.getHeight());
+				leafWidth = new JLabel(mi.getLeafWidth());
 				freshWeight = new JLabel(mi.getFreshWeight());
 				dryWeight = new JLabel(mi.getDryWeight());
-				JComponent right = TableLayout.get3Split(height, freshWeight, dryWeight, width, width, width);
+				JComponent right = TableLayout.get4Split(height, leafWidth, freshWeight, dryWeight, width, space, border);
 				rows2.add(new GuiRow(desc, right));
 			}
 			
@@ -419,10 +421,9 @@ public class MyExperimentInfoPanel extends JPanel {
 			fp1.enableSearch(true);
 			fp2.setMaximumRowCount(10);
 			fp2.enableSearch(true);
-			JComponent right1 = TableLayout.get3Split(new JLabel("Height"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, width,
-					width);
-			JComponent right2 = TableLayout.get3Split(new JLabel("Height"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, width,
-					width);
+			JComponent right1 = TableLayout.get4Split(new JLabel("Height"), new JLabel("Leaf Width"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, space,
+					border);
+			JComponent right2 = TableLayout.get4Split(new JLabel("Height"), new JLabel("Leaf Width"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, space, border);
 			fp1.addGuiComponentRow(new JLabel("Visual Property"), right1, false);
 			fp2.addGuiComponentRow(new JLabel("Visual Property"), right2, false);
 			
@@ -456,11 +457,21 @@ public class MyExperimentInfoPanel extends JPanel {
 				MatchInfo mi = new MatchInfo(si.getName());
 				boolean matched = false;
 				for (ConditionInterface ci : si) {
+					System.out.println(ci.getConditionName());
+					if (ci.getConditionName().contains("leaf width")) {
+						for (SampleInterface sam : ci) {
+							mi.setLeafWidth(
+									StringManipulationTools.formatNumber(
+											sam.getSampleAverage().getValue(), "#.###")+ (sam.getAverageUnit()!=null ? " "+sam.getAverageUnit():""));
+							matched = true;
+							break;
+						}
+					}
 					if (ci.getConditionName().contains("dry weight")) {
 						for (SampleInterface sam : ci) {
 							mi.setDryWeight(
 									StringManipulationTools.formatNumber(
-											sam.getSampleAverage().getValue(), "#.###") + " " + sam.getAverageUnit());
+											sam.getSampleAverage().getValue(), "#.###")+ (sam.getAverageUnit()!=null ? " "+sam.getAverageUnit():""));
 							matched = true;
 							break;
 						}
@@ -469,7 +480,7 @@ public class MyExperimentInfoPanel extends JPanel {
 						for (SampleInterface sam : ci) {
 							mi.setComparisonValue(sam.getSampleAverage().getValue());
 							mi.setFreshWeight(StringManipulationTools.formatNumber(
-									sam.getSampleAverage().getValue(), "#.###") + " " + sam.getAverageUnit());
+									sam.getSampleAverage().getValue(), "#.###")+ (sam.getAverageUnit()!=null ? " "+sam.getAverageUnit():""));
 							matched = true;
 							break;
 						}
@@ -477,7 +488,7 @@ public class MyExperimentInfoPanel extends JPanel {
 					if (ci.getConditionName().contains("height")) {
 						for (SampleInterface sam : ci) {
 							mi.setHeight(StringManipulationTools.formatNumber(
-									sam.getSampleAverage().getValue(), "#.###") + " " + sam.getAverageUnit());
+									sam.getSampleAverage().getValue(), "#.###")+ (sam.getAverageUnit()!=null ? " "+sam.getAverageUnit():""));
 							matched = true;
 							break;
 						}
