@@ -19,7 +19,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
-	boolean debug = false;
+	boolean debug = true;
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -31,7 +31,7 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
 		
-		FlexibleImage vis = getInput().getMasks().getVis();
+		FlexibleImage vis = getInput().getMasks().getVis().print("Used for Distance Calculation", false);
 		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null) {
 			numericResult = getMarkers(vis);
 			
@@ -102,10 +102,11 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 		// int maxDist = (int) Math.abs(getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X).getValue() - getProperties()
 		// .getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X).getValue() * imageWidth);
 		
-		getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT, maxDist);
+		if (maxDist > 0)
+			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT, maxDist);
 		
 		if (debug)
-			System.out.println("maxDist_horizontal: " + maxDist);
+			System.out.println("maxDist_horizontal: " + maxDist + " " + (maxDist == 0 ? "NO MARKERS FOUND" : ""));
 	}
 	
 	private int max(int[] distances) {

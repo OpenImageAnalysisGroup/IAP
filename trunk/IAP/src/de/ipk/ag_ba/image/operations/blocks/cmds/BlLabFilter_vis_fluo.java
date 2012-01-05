@@ -126,8 +126,8 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				if (fis != null)
 					fis.addImage("step 6", result);
 				// filter background noise
-				double blueCurbWidthBarley0_1 = options.isBarleyInBarleySystem() ? 0.1 : 0.25;
-				double blueCurbHeightEndBarly0_8 = options.isBarleyInBarleySystem() ? 0.8 : 0.7;
+				double blueCurbWidthBarley0_1 = options.isBarleyInBarleySystem() ? 0.1 : 0.28;
+				double blueCurbHeightEndBarly0_8 = options.isBarleyInBarleySystem() ? 0.75 : 0.7;
 				if (options.getCameraPosition() == CameraPosition.SIDE)
 					toBeFiltered = result
 							.getIO()
@@ -137,8 +137,8 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 											215 - 5, 225, 146 - 5, 250, 170 - 10, 151 - 20, 188 - 20, 220 - 5, 195 - 5, 100 - 5, 197 - 5, 47 - 5, 205 - 5, 110 - 5,
 											50 - 5,
 											146 - 5, 184 - 5, 155 - 5, 155 - 5, 171 - 5, 153 - 5, 116 - 5, 115 - 5, 168 - 5, 0, 161 - 5,
-											options.isBarleyInBarleySystem() ? 255 : 135 - 5,
-											options.isBarleyInBarleySystem() ? 255 : 120 - 5,
+											options.isBarleyInBarleySystem() ? 255 - 5 : 135 - 5,
+											options.isBarleyInBarleySystem() ? 120 - 5 : 120 - 5,
 											options.isBarleyInBarleySystem() ? 255 : 235 - 5 },
 									new int[] {
 											256, 256, 146 + 5, 257, 230 + 10, 151 + 4, 211 + 20, 220 + 5, 195 + 5, 218 + 5, 197 + 5, 91 + 5, 245 + 5, 144 + 5,
