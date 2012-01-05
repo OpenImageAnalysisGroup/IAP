@@ -285,12 +285,14 @@ reduceWorkingDataSize <- function(overallList){
 
 plotDummy <- function(overallList) {
 	overallList$debug %debug% "plotDummy()"
-
+	
 	for(sN in overallList$saveName){
-		openImageFile(overallList)
-		plot(0,0);
-		dev.off();
-		print(paste("... create dummy-plot for", sN))
+		filename <- preprocessingOfValues(sN, FALSE, FALSE)
+		createDefaultImage(paste(filename,overallList$saveFormat,sep="."))
+#		openImageFile(overallList)
+#		plot(0,0);
+#		dev.off();
+#		print(paste("... create dummy-plot for", sN))
 	}
 }
 
@@ -557,6 +559,9 @@ makeBoxplotDiagram <- function(h, overallList, horizontal=FALSE) {
 
 	if(horizontal) {
 		barplot(as.matrix(overallList$overallResult), beside= TRUE, axisnames=FALSE, main="", xlab=overallList$xAxisName, ylab=overallList$yAxisName, col=overallList$color, space=c(0,1), ylim=c(0,max(overallList$overallResult,na.rm=TRUE)))
+		#barplot(as.matrix(overallList$overallResult), beside=TRUE, horiz = T)
+		#print(as.matrix(overallList$overallResult))
+		
 	} else {
 		barplot(as.matrix(overallList$overallResult), beside= TRUE, main="", xlab=overallList$xAxisName, ylab=overallList$yAxisName, col=overallList$color, width=12, space=c(0,1), ylim=c(0,max(overallList$overallResult,na.rm=TRUE)))
 	}
@@ -634,6 +639,10 @@ checkIfAllNecessaryFilesAreThere <- function(saveFormat) {
 	#if(typOfStartOptions == "report") {
 		print("... check if the legend are there")
 		
+		if(!file.exists("noValues.png")){
+			createDefaultImage("noValues.png")
+		}
+		
 		file <- paste("legend",saveFormat,sep=".")
 		if(!file.exists(file)){
 			createDefaultImage("legend.png")
@@ -643,9 +652,6 @@ checkIfAllNecessaryFilesAreThere <- function(saveFormat) {
 		
 		for(i in file){
 			if(!file.exists(paste(i,".tex",sep=""))){
-				if(!file.exists("noValues.png")){
-					createDefaultImage("noValues.png")
-				}
 				print(paste("... create dummy: '",paste(i,".tex",sep=""),"'",sep=""))
 				writeLatexFile(i, "noValues")
 			}
@@ -726,6 +732,7 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 	
 	if (length(args) < 1) {
 		englischVersion <- FALSE
+		#englischVersion <- TRUE
 	} else {
 		englischVersion <- TRUE
 	}
@@ -735,8 +742,8 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		if (typOfStartOptions != "allmanual") {
 			fileName <- fileName %exists% args[1]
 		} else {
-			fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
-			#fileName <- "report.csv" ## englischVersion <- TRUE setzen!!
+			#fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
+			fileName <- "report.csv" ## englischVersion <- TRUE setzen!!
 			#fileName <- "testDataset3.csv"
 		}
 				
@@ -877,20 +884,23 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		isGray="FALSE"
 		#transparent <- "TRUE"
 		#legendUnderImage <- "TRUE"
-		showResultInR <- FALSE
+		showResultInR <- TRUE
 		
-		fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
+		#fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
 		#fileName <- "testDataset2.csv"
-		#fileName <- "report.csv"
+		fileName <- "report.csv"
 		#fileName <- "testDatenset3.csv"
-		englischVersion <- FALSE
+		#englischVersion <- FALSE
+		englischVersion <- TRUE
 		workingDataSet <- englischVersion %getData% fileName
 		
 		#descriptor <- c("Hallo2")
 		#descriptor <- c("Plant ID","Treatment","Hallo","Wert1", "Repl ID")
 		#descriptor <- c("Repl ID")		
 		#descriptorSet <- c("Plant ID")
-		descriptorSet <- c("side.area.norm (mm^2)")
+		descriptorSet <- c("side.width.norm (mm)")
+
+		#descriptorSet <- c("side.area.norm (mm^2)")
 		descriptorSetName <- c("Das ist ein Testname")
 
 		#descriptorSet <- c("Plant ID$Treatment$Hallo$Wert1$Repl ID")
