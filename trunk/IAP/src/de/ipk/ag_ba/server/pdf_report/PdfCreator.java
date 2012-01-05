@@ -77,7 +77,8 @@ public class PdfCreator {
 		else {
 			new File(name).setExecutable(true);
 		}
-		System.out.println(SystemAnalysis.getCurrentTime() + ">EXECUTE: " + name + ", WITH PARAMETER (" + parameter + ")");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">EXECUTE: " + name + ", WITH PARAMETER (" + StringManipulationTools.getStringList(parameter, " / ")
+				+ ")");
 		
 		final String nameF = name;
 		
