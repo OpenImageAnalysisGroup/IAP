@@ -1172,6 +1172,13 @@ public class MongoDB {
 								System.out.println(SystemAnalysis.getCurrentTime()
 										+ ">ERROR: USER INFO COULD NOT BE UPDATED (LOCAL INFO IS NULL OR EMPTY)");
 						}
+						if (h.getExperimentName() != null && h.getExperimentName().contains("(manual merge")) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">INFO: REMOVE _manual merge_ note from experiment name");
+							h.setExperimentname(h.getExperimentName().substring(0, h.getExperimentName().indexOf(" (manual merge")));
+							header.put("experimentname", h.getExperimentName());
+							col.save(header, WriteConcern.SAFE);
+						}
 						if (mapableNames.containsKey(h.getImportusername())) {
 							String newName = mapableNames.get(h.getImportusername());
 							System.out.println(SystemAnalysis.getCurrentTime()

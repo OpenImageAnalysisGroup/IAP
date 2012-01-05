@@ -407,12 +407,12 @@ public class CloudComputingService {
 						long tStart = tempDataSetDescription.getSubmissionTimeL();
 						long tProcessing = tFinish - tStart;
 						long minutes = tProcessing / 1000 / 60;
-						e.getHeader().setExperimentname(originName + " (manual merge " + SystemAnalysis.getCurrentTime() + ")");
+						e.getHeader().setExperimentname(originName);
 						e.getHeader().setExperimenttype("Analysis Results");
 						e.getHeader().setImportusergroup("Analysis Results");
 						e.getHeader().setRemark(
 								e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " +
-										SystemAnalysis.getCurrentTime());
+										SystemAnalysis.getCurrentTime()+" // manual merge");
 						System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 						System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
 						System.out.println("*****************************");
