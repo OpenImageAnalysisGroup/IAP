@@ -31,8 +31,12 @@ public class SampleAverage implements SampleAverageInterface {
 				if (key.equals("value")) {
 					setValue((Double) map.get("value"));
 				} else
-					if (map.get(key) != null)
-						setValueFromAttribute(new Attribute((String) key, map.get(key).toString()));
+					if (map.get(key) != null) {
+						if (map.get(key) instanceof Double)
+							setValueFromAttribute((String) key, (Double) map.get(key));
+						else
+							setValueFromAttribute(new Attribute((String) key, map.get(key).toString()));
+					}
 			}
 		}
 	}
@@ -188,6 +192,24 @@ public class SampleAverage implements SampleAverageInterface {
 							}
 						} else
 							System.err.println("Internal Error: Unknown Average Attribute: " + a.getName());
+	}
+	
+	private void setValueFromAttribute(String name, Double value) {
+		if (value == null)
+			return;
+		if (name.equals("max")) {
+			setMax(value);
+		} else
+			if (name.equals("min")) {
+				setMin(value);
+			} else
+				if (name.equals("replicates")) {
+					setReplicateId(value.intValue());
+				} else
+					if (name.equals("stddev")) {
+						setStddev(value);
+					} else
+						System.err.println("Internal Error: Unknown Average Attribute: " + name);
 	}
 	
 	@Override
