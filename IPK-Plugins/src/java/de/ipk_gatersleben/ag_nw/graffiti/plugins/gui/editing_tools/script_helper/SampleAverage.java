@@ -214,7 +214,7 @@ public class SampleAverage implements SampleAverageInterface {
 	
 	@Override
 	public void setUnit(String ownUnit) {
-		this.ownUnit = ownUnit;
+		this.ownUnit = ownUnit != null ? ownUnit.intern() : null;
 	}
 	
 	@Override

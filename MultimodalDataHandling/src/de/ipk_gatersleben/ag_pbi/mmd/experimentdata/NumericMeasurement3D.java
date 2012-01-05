@@ -253,7 +253,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	}
 	
 	public void setPositionUnit(String positionUnit) {
-		this.positionUnit = positionUnit;
+		this.positionUnit = positionUnit != null ? positionUnit.intern() : null;
 	}
 	
 	public String getPositionUnit() {
@@ -261,7 +261,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	}
 	
 	public void setAnnotation(String annotation) {
-		this.annotation = annotation;
+		this.annotation = annotation != null ? annotation.intern() : null;
 	}
 	
 	public String getAnnotation() {

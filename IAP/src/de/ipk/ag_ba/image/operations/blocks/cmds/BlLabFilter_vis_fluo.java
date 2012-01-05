@@ -109,16 +109,16 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or_and_not(
 						new int[] { 110 }, new int[] { 190 },
 						new int[] { 127 - 5 }, new int[] { 127 + 5 },
-						new int[] { 90 - 5 }, new int[] { 90 + 5 },
+						new int[] { 70 - 5 }, new int[] { 90 + 5 },
 						options.getBackground(), Integer.MAX_VALUE, false,
 						new int[] {}, new int[] {},
 						new int[] {}, new int[] {},
 						new int[] {}, new int[] {},
 						0, 1).dilate(20).
-						print("removed blue markers at side", false).getImage();
+						print("removed blue markers at side", debug).getImage();
 				toBeFiltered = toBeFiltered.getIO().getCanvas().
 						fillRect((int) (w * 0.2), 0, (int) (w * 0.6), (int) (h * hhhh),
-								options.getBackground()).getImage();
+								options.getBackground()).getImage().print("cleared blue", debug);
 				if (fis != null)
 					fis.addImage("step 5", toBeFiltered.copy());
 				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
