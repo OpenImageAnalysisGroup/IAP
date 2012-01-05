@@ -239,7 +239,7 @@ public class Sample implements SampleInterface {
 	
 	@Override
 	public void setMeasurementtool(String measurementtool) {
-		this.measurementtool = measurementtool;
+		this.measurementtool = measurementtool != null ? measurementtool.intern() : null;
 	}
 	
 	@Override
@@ -249,7 +249,7 @@ public class Sample implements SampleInterface {
 	
 	@Override
 	public void setTimeUnit(String timeUnit) {
-		this.timeUnit = timeUnit;
+		this.timeUnit = timeUnit != null ? timeUnit.intern() : null;
 	}
 	
 	@Override
