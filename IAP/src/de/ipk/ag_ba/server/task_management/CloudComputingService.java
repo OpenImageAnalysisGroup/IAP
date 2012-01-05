@@ -312,7 +312,7 @@ public class CloudComputingService {
 					}
 				}
 				System.out.println(SystemAnalysis.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
-				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
+				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
 						+ knownResults.size());
 				if (knownResults.size() + 1 < tempDataSetDescription.getPartCntI()) {
 					// not everything has been computed (internal error)
@@ -374,9 +374,9 @@ public class CloudComputingService {
 							}
 							String[] cc = ii.getExperimentName().split("§");
 							tso.addInt(1);
-							System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
+							System.out.println(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
 							for (String c : condS)
-								System.out.println("Condition: " + c);
+								System.out.println(">Condition: " + c);
 							
 							StopWatch s = new StopWatch(">e.addMerge");
 							e.addAndMerge(ei);

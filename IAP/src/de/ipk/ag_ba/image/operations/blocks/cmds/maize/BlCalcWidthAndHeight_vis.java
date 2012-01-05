@@ -84,9 +84,9 @@ public class BlCalcWidthAndHeight_vis extends
 							.getImages().getVis().getHeight())
 					: 1.0;
 			
-			double resfww = useFluo ? (double) getInput().getMasks().getVis()
-					.getWidth()
-					/ (double) img.getWidth() : 1.0;
+			// double resfww = useFluo ? (double) getInput().getMasks().getVis()
+			// .getWidth()
+			// / (double) img.getWidth() : 1.0;
 			
 			final Point values = temp != null ? new Point(Math.abs(temp
 					.getRightX() - temp.getLeftX()), Math.abs(temp.getBottomY()
@@ -148,7 +148,7 @@ public class BlCalcWidthAndHeight_vis extends
 									"RESULT_side.width.norm",
 									values.x
 											* (realMarkerDistHorizontal / distHorizontal
-													.getValue()) * resfww);
+													.getValue()) * resf);
 					getProperties()
 							.setNumericProperty(
 									getBlockPosition(),
