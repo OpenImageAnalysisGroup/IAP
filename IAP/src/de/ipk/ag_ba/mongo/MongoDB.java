@@ -673,16 +673,6 @@ public class MongoDB {
 		}
 	}
 	
-	private HashMap<String, Object> filter(HashMap<String, Object> attributes) {
-		HashSet<String> keys = new HashSet<String>();
-		keys.addAll(attributes.keySet());
-		for (String key : keys) {
-			if (attributes.get(key) == null)
-				attributes.remove(key);
-		}
-		return attributes;
-	}
-	
 	private int countMeasurementValues(ExperimentInterface experiment, MeasurementNodeType[] measurementNodeTypes) {
 		int res = 0;
 		for (MeasurementNodeType m : measurementNodeTypes) {
@@ -1925,7 +1915,7 @@ public class MongoDB {
 					for (Object m : imgList) {
 						DBObject img = (DBObject) m;
 						@SuppressWarnings("unchecked")
-						ImageData image = new ImageData(sample, img.toMap());
+						ImageData image = new ImageData(sample, filter(img.toMap()));
 						image.getURL().setPrefix(mh.getPrefix());
 						if (image.getLabelURL() != null)
 							image.getLabelURL().setPrefix(mh.getPrefix());
@@ -1961,6 +1951,19 @@ public class MongoDB {
 					}
 				}
 			}
+	}
+	
+	private Map filter(Map map) {
+		if (map == null || map.isEmpty())
+			return map;
+		for (Object key : map.keySet().toArray()) {
+			Object val = map.get(key);
+			if (val == null ||
+					((val instanceof String) && ((String) val).isEmpty())) {
+				map.remove(key);
+			}
+		}
+		return map;
 	}
 	
 	public String getDisplayName() {
