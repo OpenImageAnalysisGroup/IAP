@@ -105,6 +105,8 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processFLUOmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
 		FlexibleImage fluo = getInput().getMasks().getFluo() != null ? getInput().getMasks().getFluo().copy() : null;
+		if (fluo == null)
+			return fluo;
 		FlexibleImage res = fluo.copy();
 		if (options.isMaize()) {
 			// empty
