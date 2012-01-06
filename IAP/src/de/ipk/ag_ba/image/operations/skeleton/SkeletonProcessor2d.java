@@ -865,4 +865,8 @@ public class SkeletonProcessor2d {
 		}
 		return max;
 	}
+	
+	public ArrayList<Point> getBranches() {
+		return branches;
+	}
 }
