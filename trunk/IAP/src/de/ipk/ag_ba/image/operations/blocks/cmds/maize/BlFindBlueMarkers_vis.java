@@ -31,7 +31,7 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
 		
-		FlexibleImage vis = getInput().getMasks().getVis().print("Used for Distance Calculation", false);
+		FlexibleImage vis = getInput().getMasks().getVis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null) {
 			numericResult = getMarkers(vis);
 			
