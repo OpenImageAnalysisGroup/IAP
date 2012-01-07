@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.image.operations;
 
 import ij.measure.ResultsTable;
-import info.StopWatch;
 
 import java.awt.Color;
 import java.util.Stack;
@@ -190,7 +189,7 @@ public class BorderImageOperation {
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int filled = 0;
-		StopWatch sw = new StopWatch("Flood-fill");
+		// StopWatch sw = new StopWatch("Flood-fill");
 		for (int x = 0; x < w; x++) {
 			filled += floodFill(out, w, h, background, fill, x, 0);
 			filled += floodFill(out, w, h, background, fill, x, h - 1);
@@ -199,7 +198,7 @@ public class BorderImageOperation {
 			filled += floodFill(out, w, h, background, fill, 0, y);
 			filled += floodFill(out, w, h, background, fill, w - 1, y);
 		}
-		sw.printTime(0);
+		// sw.printTime(0);
 		ImageOperation res = new ImageOperation(new FlexibleImage(out));
 		if (rt == null)
 			rt = new ResultsTable();
