@@ -31,7 +31,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * calculate the skeleton to detect the leafs and the tassel.
  * REQUIRES FLUO image for bloom detection.
  * 
- * @author pape
+ * @author pape, klukas
  */
 public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -209,14 +209,19 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						if (tempImage[x][y] == clear)
 							ttt[x][y] = clear;
 					}
-				temp = new FlexibleImage(ttt).getIO().print("FINAL").getImage();
-				int leafArea = temp.getIO().countFilledPixels();
-				int skeletonLength = temp.getIO().skeletonize().print("SKELETON").countFilledPixels();
-				if (leafArea >= skeletonLength && skeletonLength > 0) {
-					leafWidthInPixels = leafArea / (double) skeletonLength;
-				}
+				temp = new FlexibleImage(ttt).getIO().print("FINAL", debug).getImage();
+				leafWidthInPixels = 0d;
+				int skeletonLength;
+				do {
+					skeletonLength = temp.getIO().skeletonize().print("SKELETON", false).countFilledPixels();
+					if (skeletonLength > 0)
+						leafWidthInPixels++;
+					temp = temp.getIO().erode().getImage();
+				} while (skeletonLength > 0);
 			}
 		}
+		
+		System.out.println("Leaf width: " + leafWidthInPixels);
 		
 		int leafcount = skel2d.endlimbs.size();
 		FlexibleImage skelres = skel2d.getAsFlexibleImage();
