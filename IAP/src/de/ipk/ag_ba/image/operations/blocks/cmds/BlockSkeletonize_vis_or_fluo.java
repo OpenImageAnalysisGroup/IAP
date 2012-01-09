@@ -254,7 +254,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 			int lw = (int) Math.ceil(leafWidthInPixels) * 3;
 			for (Point p : branchPoints)
 				canvas.fillRect(p.x - lw / 2, p.y - lw / 2, lw, lw, clear);
-			inputImage = canvas.getImage().print("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels);
+			inputImage = canvas.getImage().print("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels, debug);
 			
 			// repeat erode operation until no filled pixel
 			Double leafWidthInPixels2 = 0d;
