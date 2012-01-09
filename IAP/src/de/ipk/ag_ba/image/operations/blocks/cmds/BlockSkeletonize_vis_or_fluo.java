@@ -14,6 +14,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
+import de.ipk.ag_ba.image.operations.ImageCanvas;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
@@ -247,6 +248,14 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				inp2d[p.x][p.y] = clear;
 			
 			inputImage = new FlexibleImage(inp2d);
+			
+			ImageCanvas canvas = inputImage.getIO().getCanvas();
+			ArrayList<Point> branchPoints = skel2d.getBranches();
+			int lw = (int) Math.ceil(leafWidthInPixels) * 3;
+			for (Point p : branchPoints)
+				canvas.fillRect(p.x - lw / 2, p.y - lw / 2, lw, lw, clear);
+			inputImage = canvas.getImage().print("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels);
+			
 			// repeat erode operation until no filled pixel
 			Double leafWidthInPixels2 = 0d;
 			int skeletonLength;
