@@ -55,7 +55,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
-						FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 						if (sk != null)
 							getProperties().setImage("skeleton", sk);
 						res = getProperties().getImage("beforeBloomEnhancement");
@@ -71,7 +71,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 					
 					if (viswork != null)
 						if (vis != null && fluo != null) {
-							FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+							FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 							if (sk != null) {
 								boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 								res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
@@ -88,7 +88,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 					
 					if (viswork != null)
 						if (vis != null && fluo != null) {
-							FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+							FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 							if (sk != null) {
 								boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 								res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
@@ -119,7 +119,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
-						FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 						if (sk != null) {
 							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 							res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
@@ -136,7 +136,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
-						FlexibleImage sk = calcSkeleton(viswork, vis, fluo);
+						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 						if (sk != null) {
 							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 							res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
@@ -150,7 +150,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		return getInput().getMasks().getFluo();
 	}
 	
-	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo) {
+	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo, FlexibleImage inpFLUOunchanged) {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.getIO().skeletonize().getImage()));
 		skel2d.findEndpointsAndBranches2();
@@ -162,9 +162,6 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		int h = vis.getHeight();
 		
 		skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
-		if (skel2d.getMinLimbY() == null || skel2d.getMinLimbY().endpoint == null) {
-			
-		}
 		FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.getIO().blur(10).getImage().print("blurf", false), 0.075f, h, 20).getIO().// blur(3).
 				thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
 		
@@ -200,15 +197,17 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 					tempImage[p.x][p.y] = black;
 				FlexibleImage temp = new FlexibleImage(tempImage);
 				temp = temp.getIO().hull().setCustomBackgroundImageForDrawing(clearImage).
-						find(true, false, true, false, black, black, black, null, 0).getImage().print("INNER HULL", false);
-				temp = temp.getIO().border().floodFillFromOutside(clear, Color.BLACK.getRGB()).print("INNER LOGIC", false).getImage();
+						find(true, false, true, false, black, black, black, null, 0).getImage();
+				temp = temp.getIO().border().floodFillFromOutside(clear, black).getImage().print("INNER HULL", debug);
 				tempImage = temp.getAs2A();
-				int[][] ttt = inp.getAs2A();
+				int[][] ttt = inpFLUOunchanged.getAs2A();
 				for (int x = 0; x < w; x++)
 					for (int y = 0; y < h; y++) {
-						if (tempImage[x][y] == clear)
+						if (tempImage[x][y] != black)
 							ttt[x][y] = clear;
 					}
+				for (Point p : branchPoints)
+					ttt[p.x][p.y] = clear;
 				temp = new FlexibleImage(ttt).getIO().print("FINAL", debug).getImage();
 				leafWidthInPixels = 0d;
 				int skeletonLength;
@@ -220,8 +219,6 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				} while (skeletonLength > 0);
 			}
 		}
-		
-		System.out.println("Leaf width: " + leafWidthInPixels);
 		
 		int leafcount = skel2d.endlimbs.size();
 		FlexibleImage skelres = skel2d.getAsFlexibleImage();
@@ -241,6 +238,40 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		ResultsTable rt = new ResultsTable();
 		rt.incrementCounter();
 		
+		boolean specialSkeletonBasedLeafWidthCalculation = true;
+		if (specialSkeletonBasedLeafWidthCalculation) {
+			FlexibleImage inputImage = inpFLUOunchanged.copy().print(" inp img 2", false);
+			int clear = ImageOperation.BACKGROUND_COLORint;
+			int[][] inp2d = inputImage.getAs2A();
+			for (Point p : skel2d.branches)
+				inp2d[p.x][p.y] = clear;
+			
+			inputImage = new FlexibleImage(inp2d);
+			// repeat erode operation until no filled pixel
+			Double leafWidthInPixels2 = 0d;
+			int skeletonLength;
+			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+			do {
+				skeletonLength = inputImage.getIO().skeletonize().print("SKELETON2", false).countFilledPixels();
+				if (skeletonLength > 0)
+					leafWidthInPixels2++;
+				if (fis != null)
+					fis.addImage("Leaf width 1: " + leafWidthInPixels + ", Leaf width 2: " + leafWidthInPixels2, inputImage.copy());
+				inputImage = inputImage.getIO().erode().getImage();
+			} while (skeletonLength > 0);
+			if (fis != null) {
+				fis.addImage("LW=" + leafWidthInPixels, inputImage);
+				fis.print("SKEL2");
+			}
+			// number of repeats is 1/4 of maximum leaf width, but the actual number of repeats (not 4x) is stored
+			if (leafWidthInPixels2 != null && leafWidthInPixels2 > 0 && !Double.isNaN(leafWidthInPixels2) && !Double.isInfinite(leafWidthInPixels2)) {
+				if (distHorizontal != null)
+					rt.addValue("leaf.width.whole.max.norm", leafWidthInPixels2 * normFactor);
+				rt.addValue("leaf.width.whole.max", leafWidthInPixels2);
+			}
+			System.out.print("Leaf width: " + leafWidthInPixels + " // " + leafWidthInPixels2);
+		}
+		
 		rt.addValue("fluo.bloom.area.size", probablyBloomFluo.getIO().print("BLOOM AREA", debug2).countFilledPixels());
 		
 		rt.addValue("bloom.count", bloomLimbCount);
@@ -253,8 +284,8 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		
 		if (leafWidthInPixels != null && leafWidthInPixels > 0 && !Double.isNaN(leafWidthInPixels) && !Double.isInfinite(leafWidthInPixels)) {
 			if (distHorizontal != null)
-				rt.addValue("leaf.average.width.norm", leafWidthInPixels * normFactor);
-			rt.addValue("leaf.average.width", leafWidthInPixels);
+				rt.addValue("leaf.width.outer.max.norm", leafWidthInPixels * normFactor);
+			rt.addValue("leaf.width.outer.max", leafWidthInPixels);
 		}
 		
 		if (bloomLimbCount > 0)
@@ -264,16 +295,17 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		
 		if (leafcount > 0) {
 			if (distHorizontal != null)
-				rt.addValue("leaf.length.avg.norm", leaflength * normFactor / leafcount);
-			rt.addValue("leaf.length.avg", leaflength / leafcount);
+				rt.addValue("leaf.length.average.norm", leaflength * normFactor / leafcount);
+			rt.addValue("leaf.length.average", leaflength / leafcount);
 		}
 		
-		// if (leafcount > 0) {
-		// double filled = inp.getIO().countFilledPixels();
-		// if (distHorizontal != null)
-		// rt.addValue("leaf.average.width.norm", (filled / leaflength) * normFactor);
-		// rt.addValue("leaf.average.width", filled / leaflength);
-		// }
+		if (leafcount > 0) {
+			double filled = inp.getIO().countFilledPixels();
+			if (distHorizontal != null)
+				rt.addValue("leaf.width.average.norm", (filled / leaflength) * normFactor);
+			rt.addValue("leaf.width.average", filled / leaflength);
+			System.out.println(" // " + (int) (filled / leaflength));
+		}
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)
 			getProperties().storeResults(

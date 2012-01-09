@@ -236,6 +236,7 @@ public class MyXML_XYDataset extends AbstractXYDataset {
 		while (workQueue1.size() > 0 && workQueue2.size() > 0) {
 			MyComparableDataPoint mcdp1 = workQueue1.remove(0);
 			int rep1 = mcdp1.replicate;
+			
 			// search for corresponding measurement value, with the same
 			// replicate
 			// number
