@@ -2301,8 +2301,14 @@ public class MongoDB {
 				status.setCurrentStatusText1("Create inventory");
 				status.setCurrentStatusValueFine(oldStatus);
 				int ii = 0;
-				int nn = el.size();
+				ArrayList<ExperimentHeaderInterface> todo = new ArrayList<ExperimentHeaderInterface>();
 				for (ExperimentHeaderInterface ehii : el) {
+					todo.add(ehii);
+					for (ExperimentHeaderInterface old : ehii.getHistory().values())
+						todo.add(old);
+				}
+				int nn = todo.size();
+				for (ExperimentHeaderInterface ehii : todo) {
 					ii++;
 					status.setCurrentStatusText2("Analyze " + ehii.getExperimentName() + " (" + ii + "/" + nn + ")");
 					ArrayList<DBObject> substanceObjects = new ArrayList<DBObject>();
