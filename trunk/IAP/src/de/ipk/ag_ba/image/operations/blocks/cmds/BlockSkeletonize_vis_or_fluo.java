@@ -115,7 +115,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
 				FlexibleImage viswork = fluo.copy().getIO()// .medianFilter32Bit()
 						.erode(1)
-						.blur(2)
+						.blur(3)
 						.getImage().print("fluo", debug);
 				
 				if (viswork != null)
