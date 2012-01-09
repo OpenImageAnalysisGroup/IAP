@@ -578,6 +578,8 @@ public class StringManipulationTools implements HelperClass {
 			try {
 				code = s.substring(1, p2);
 			} catch (Exception err) {
+				if (html.contains("&#"))
+					return htmlToUnicode(StringManipulationTools.stringReplace(html, "&#", "~"));
 				System.err.println("Invalid String (Error Type 1): " + html);
 				ErrorMsg.addErrorMessage("Invalid String (Error Type 1): " + html);
 				break;
