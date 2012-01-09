@@ -333,14 +333,33 @@ buildRowForOverallList <- function(i, des, listOfValues, dataSet, day) {
 	return(rowString)
 } 
 
-fillOverallResult <- function(groupedDataFrame, overallList) {
+#fillOverallResult <- function(groupedDataFrame, overallList) {
+#	overallList$debug %debug% "fillOverallResult()"
+#	if(length(overallList$iniDataSet[,1]) > 0){
+#		for(i in 1:length(overallList$iniDataSet[,1])) {
+#		#for(i in 1:length(overallList$filterXaxis)) {
+#			for(des in overallList$descriptor) {
+#				rowAndColumn <- buildRowForOverallList(i,des, c(overallList$treatment, overallList$secondTreatment),overallList$iniDataSet, overallList$xAxis)
+#				overallList$overallResult[rowAndColumn$row, as.character(overallList$iniDataSet[i,overallList$xAxis])] <- overallList$iniDataSet[i,des]
+#			}
+#		}
+#	} else {
+#		print("... no Value for the OverallResult-DataFrame - Wrong filter!")
+#		overallList$stoppTheCalculation <- TRUE
+#	}
+#	return(overallList)
+#}
+
+fillOverallResult <- function(overallList, preErrorBars) {
 	overallList$debug %debug% "fillOverallResult()"
 	if(length(overallList$iniDataSet[,1]) > 0){
 		for(i in 1:length(overallList$iniDataSet[,1])) {
-		#for(i in 1:length(overallList$filterXaxis)) {
+			#for(i in 1:length(overallList$filterXaxis)) {
 			for(des in overallList$descriptor) {
 				rowAndColumn <- buildRowForOverallList(i,des, c(overallList$treatment, overallList$secondTreatment),overallList$iniDataSet, overallList$xAxis)
 				overallList$overallResult[rowAndColumn$row, as.character(overallList$iniDataSet[i,overallList$xAxis])] <- overallList$iniDataSet[i,des]
+				if(tolower(overallList$diagramTyp) != "boxplotstacked")
+					overallList$errorBars[rowAndColumn$row, as.character(overallList$iniDataSet[i,overallList$xAxis])] <- preErrorBars[i,des]
 			}
 		}
 	} else {
@@ -361,6 +380,21 @@ buildList <- function(overallList) {
 	return(newList)
 }
 
+conactAllWithAll <- function(value1, value2) {
+	
+	conactRow <- character()
+	for(k1 in value1){
+		if(k1 != "none") {
+			for(k2 in value2){
+				if(k2 != "none") {
+					conactRow <- c(conactRow, paste(k1,k2,sep = "#"))
+				}
+			}
+		}
+	}
+	return(conactRow)
+}
+
 getResultDataFrame <- function(overallList) {	
 	overallList$debug %debug% "getResultDataFrame()"
 	
@@ -368,14 +402,37 @@ getResultDataFrame <- function(overallList) {
 	colnames(overallResult) <- overallList$filterXaxis
 	rownames(overallResult) <- overallList$rowName 
 	overallList$overallResult <- as.data.frame(overallResult)
+	overallList$errorBars <- as.data.frame(overallResult)
 	
 	groupBy <- groupByFunction(list(overallList$treatment, overallList$secondTreatment, overallList$xAxis))
 	groupedDataFrame <- data.table(overallList$iniDataSet)
-	groupedDataFrame <- as.data.frame(groupedDataFrame[,lapply(.SD, mean, na.rm=TRUE), by=groupBy])
-	overallList$iniDataSet <- groupedDataFrame[getBooleanVectorForFilterValues(groupedDataFrame, buildList(overallList)),]
+	groupedDataFrameMean <- as.data.frame(groupedDataFrame[,lapply(.SD, mean, na.rm=TRUE), by=groupBy])
+	groupedDataFrameSD <- as.data.frame(groupedDataFrame[,lapply(.SD, sd, na.rm=TRUE), by=groupBy])
+	#groupedDataFrameMax <- as.data.frame(groupedDataFrame[,lapply(.SD, max, na.rm=TRUE), by=groupBy])
+	#groupedDataFrameMin <- as.data.frame(groupedDataFrame[,lapply(.SD, min, na.rm=TRUE), by=groupBy])
+	overallList$iniDataSet <- groupedDataFrameMean[getBooleanVectorForFilterValues(groupedDataFrameMean, buildList(overallList)),]
 	
-	return(fillOverallResult(groupedDataFrame, overallList))
+	return(fillOverallResult(overallList, groupedDataFrameSD))
+	#return(fillOverallResult(groupedDataFrameMean, overallList))
 }
+
+## don´t work with error.bars
+#getResultDataFrameOLD <- function(overallList) {	
+#	overallList$debug %debug% "getResultDataFrame()"
+#	
+#	overallResult <- matrix(ncol = length(overallList$filterXaxis), nrow = length(overallList$rowName))
+#	colnames(overallResult) <- overallList$filterXaxis
+#	rownames(overallResult) <- overallList$rowName 
+#	overallList$overallResult <- as.data.frame(overallResult)
+#	overallList$errorBars <- as.data.frame(overallResult)
+#	
+#	groupBy <- groupByFunction(list(overallList$treatment, overallList$secondTreatment, overallList$xAxis))
+#	groupedDataFrame <- data.table(overallList$iniDataSet)
+#	groupedDataFrame <- as.data.frame(groupedDataFrame[,lapply(.SD, mean, na.rm=TRUE), by=groupBy])
+#	overallList$iniDataSet <- groupedDataFrame[getBooleanVectorForFilterValues(groupedDataFrame, buildList(overallList)),]
+#	
+#	return(fillOverallResult(groupedDataFrame, overallList))
+#}
 
 setDefaultAxisNames <- function(overallList) {
 	overallList$debug %debug% "setDefaultAxisNames()"
@@ -453,9 +510,19 @@ CheckIfOneColumnHasOnlyValues <- function(overallResult) {
 	return(ifelse((sum((colSums(overallResult,na.rm=TRUE)) == 0)-length(overallResult)) == -1,TRUE, FALSE))
 }
 
+buildMyStats <- function(values, means, se) {
+	means <- as.data.frame(as.vector(means))
+	colnames(means) <- "means"
+	
+	se <- as.data.frame(as.vector(se))
+	colnames(se) <- "se"
+
+	return(data.frame(value=values,means=means, se=se))
+}
+
 makeLinearDiagram <- function(h, overallList) {
 	overallList$debug %debug% "makeLinearDiagram()"
-		overallList$symbolParameter <- 1:length(overallList$rowName)
+	overallList$symbolParameter <- 1:length(overallList$rowName)
 		
 	if(!CheckIfOneColumnHasOnlyValues(overallList$overallResult)) {
 		if (h==1) {
@@ -470,37 +537,56 @@ makeLinearDiagram <- function(h, overallList) {
 			if(numberOfNaN == length(overallList$overallResult[y,])) {
 				print(paste("... No Plotting of the treatment '",overallList$rowName[y],"'(No Values)"))
 				
-			} else if (numberOfNaN > 0 & numberOfNaN < (length(overallList$overallResult[y,])-1)) {
+			} else {
 				
-				## nicht löschen, ist die interpolation
-#				newCoords <- seq(min(overallList$filterXaxis,na.rm=TRUE),max(overallList$filterXaxis,na.rm=TRUE),1)
-#				newValue <- approx(overallList$filterXaxis, overallList$overallResult[y,],xout=newCoords,method="linear")
-#				
-#				naVector <- is.na(overallList$overallResult[y,])
-#				overallResultWithNaValues <- overallList$overallResult[y,]
-#				overallList$overallResult[y,naVector] <- newValue$y[overallList$filterXaxis[naVector]]
-
-						
+				myStats <- buildMyStats(overallList$filterXaxis, t(overallList$overallResult[y,]), t(overallList$errorBars[y,]))
 				if (firstPlot) {
 					firstPlot <- FALSE
-#					plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="c", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
-					plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="b", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
-				} else {
-#					points(overallList$filterXaxis, overallList$overallResult[y,], type="c", col=overallList$color[y], pch=y, lty=1, lwd=3 )	
-					points(overallList$filterXaxis, overallList$overallResult[y,], type="b", col=overallList$color[y], pch=y, lty=1, lwd=3 )
-				}
-				
-#				points(overallList$filterXaxis, overallResultWithNaValues, type="p", col=overallList$color[y], pch=y, lty=1, lwd=3 )
-			} else if (numberOfNaN == 0 | (length(overallList$overallResult[y,])-1) == numberOfNaN){
-				if (firstPlot) {
-					firstPlot <- FALSE
-					plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="b", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
+					error.bars(stats=myStats, main = "", type="b", xlab = overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult - overallList$errorBars - 10,na.rm=TRUE),max(overallList$overallResult + overallList$errorBars + 10,na.rm=TRUE)))
 				} else {	
-					points(overallList$filterXaxis, overallList$overallResult[y,], type="b", col=overallList$color[y], pch=y, lty=1, lwd=3 )
-				}	
+					error.bars(stats=myStats, type="b", col=overallList$color[y], pch=y, lty=1, lwd=3, add = TRUE)
+				}				
 			}
 		}
-	
+		
+#		firstPlot <- TRUE
+#		for(y in overallList$symbolParameter) {	
+#			numberOfNaN <- length(overallList$overallResult[y,]) - (length(overallList$overallResult[y,]) - sum(is.na(overallList$overallResult[y,]),na.rm=TRUE))
+#			
+#			if(numberOfNaN == length(overallList$overallResult[y,])) {
+#				print(paste("... No Plotting of the treatment '",overallList$rowName[y],"'(No Values)"))
+#				
+#			} else if (numberOfNaN > 0 & numberOfNaN < (length(overallList$overallResult[y,])-1)) {
+#				
+##!# nicht löschen, ist die interpolation (alles in dieser if Abfrage mit #!# makiert)
+##!#				newCoords <- seq(min(overallList$filterXaxis,na.rm=TRUE),max(overallList$filterXaxis,na.rm=TRUE),1)
+##!#				newValue <- approx(overallList$filterXaxis, overallList$overallResult[y,],xout=newCoords,method="linear")
+##!#				
+##!#				naVector <- is.na(overallList$overallResult[y,])
+##!#				overallResultWithNaValues <- overallList$overallResult[y,]
+##!#				overallList$overallResult[y,naVector] <- newValue$y[overallList$filterXaxis[naVector]]
+#				
+#				if (firstPlot) {
+#					firstPlot <- FALSE
+##!#				plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="c", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
+#					plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="b", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
+#				} else {
+##!#				points(overallList$filterXaxis, overallList$overallResult[y,], type="c", col=overallList$color[y], pch=y, lty=1, lwd=3 )	
+#					points(overallList$filterXaxis, overallList$overallResult[y,], type="b", col=overallList$color[y], pch=y, lty=1, lwd=3 )
+#				}
+##!#				points(overallList$filterXaxis, overallResultWithNaValues, type="p", col=overallList$color[y], pch=y, lty=1, lwd=3 )
+#			} else if (numberOfNaN == 0 | (length(overallList$overallResult[y,])-1) == numberOfNaN){
+			
+#				if (firstPlot) {
+#					firstPlot <- FALSE
+#					plot(overallList$filterXaxis, overallList$overallResult[y,], main="", type="b", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult,na.rm=TRUE),max(overallList$overallResult,na.rm=TRUE)))
+#				} else {	
+#					points(overallList$filterXaxis, overallList$overallResult[y,], type="b", col=overallList$color[y], pch=y, lty=1, lwd=3 )
+#				}
+#				
+#			}
+#		}		
+				
 		grid()
 		if(h==1) {
 			dev.off()
@@ -511,10 +597,23 @@ makeLinearDiagram <- function(h, overallList) {
 
 	} else {
 		print("... only one column has values, so it will be plot as depth plot!")
-		overallList$overallResult <- t(overallList$overallResult)
-		overallList$diagramTyp <- "boxplothorizontal"
-		overallList$xAxisName <- paste(overallList$xAxisName,rownames(overallList$overallResult)[!is.na(overallList$overallResult)])
-		overallList <- makeBoxplotDiagram(h, overallList, TRUE)
+		
+		
+		tempOverallResult <- as.data.frame(overallList$overallResult[!is.na(overallList$overallResult)])
+		rownames(tempOverallResult) <- rownames(overallList$overallResult)
+		colnames(tempOverallResult) <- colnames(overallList$overallResult)[!is.na(overallList$overallResult)[1,]]
+		overallList$overallResult <- tempOverallResult
+		
+		overallList$errorBars <- as.data.frame(overallList$errorBars[!is.na(overallList$errorBars)])
+		rownames(overallList$errorBars) <- rownames(tempOverallResult)
+		colnames(overallList$errorBars) <- colnames(tempOverallResult)
+		
+		overallList$colName <- colnames(tempOverallResult)
+		overallList$filterXaxis <- colnames(tempOverallResult)
+		#overallList$diagramTyp <- "boxplothorizontal"
+		#overallList$xAxisName <- paste(overallList$xAxisName,rownames(overallList$overallResult)[!is.na(overallList$overallResult)])
+		#overallList <- makeBoxplotDiagram(h, overallList, TRUE)
+		overallList <- makeBoxplotDiagram(h, overallList)
 	}
 	
 	return(overallList)
@@ -548,7 +647,7 @@ makeBoxplotStackedDiagram <- function(h, overallList) {
 	return(overallList)
 }	
 
-makeBoxplotDiagram <- function(h, overallList, horizontal=FALSE) {
+makeBoxplotDiagram <- function(h, overallList) {
 	overallList$debug %debug% "makeBoxplotDiagram()"
 	overallList$symbolParameter <- 15
 	
@@ -556,15 +655,9 @@ makeBoxplotDiagram <- function(h, overallList, horizontal=FALSE) {
 		openImageFile(overallList)
 	}
 	par(mar=c(4.1,4.1,2.1,2.1))
-
-	if(horizontal) {
-		barplot(as.matrix(overallList$overallResult), beside= TRUE, axisnames=FALSE, main="", xlab=overallList$xAxisName, ylab=overallList$yAxisName, col=overallList$color, space=c(0,1), ylim=c(0,max(overallList$overallResult,na.rm=TRUE)))
-		#barplot(as.matrix(overallList$overallResult), beside=TRUE, horiz = T)
-		#print(as.matrix(overallList$overallResult))
-		
-	} else {
-		barplot(as.matrix(overallList$overallResult), beside= TRUE, main="", xlab=overallList$xAxisName, ylab=overallList$yAxisName, col=overallList$color, width=12, space=c(0,1), ylim=c(0,max(overallList$overallResult,na.rm=TRUE)))
-	}
+	
+	myStats <- buildMyStats(overallList$filterXaxis, t(overallList$overallResult), t(overallList$errorBars))
+	error.bars(bars=TRUE, stats=myStats, main = "", xlab = overallList$xAxisName, col=overallList$color, ylab=overallList$yAxisName, ylim=c(0,max(overallList$overallResult + overallList$errorBars + 10,na.rm=TRUE)))
 	
 	grid()
 	if (h==1) {
@@ -576,6 +669,36 @@ makeBoxplotDiagram <- function(h, overallList, horizontal=FALSE) {
 	
 	return(overallList)
 }
+
+#makeBoxplotDiagram <- function(h, overallList, horizontal=FALSE) {
+#	overallList$debug %debug% "makeBoxplotDiagram()"
+#	overallList$symbolParameter <- 15
+#	
+#	if (h==1) {
+#		openImageFile(overallList)
+#	}
+#	par(mar=c(4.1,4.1,2.1,2.1))
+#
+#	myStats <- buildMyStats(overallList$filterXaxis, t(overallList$overallResult), t(overallList$errorBars))
+#	if(horizontal) {
+#		barplot(as.matrix(overallList$overallResult), beside= TRUE, axisnames=FALSE, main="", xlab=overallList$xAxisName, ylab=overallList$yAxisName, col=overallList$color, space=c(0,1), ylim=c(0,max(overallList$overallResult,na.rm=TRUE)))
+#		#barplot(as.matrix(overallList$overallResult), beside=TRUE, horiz = T)
+#				
+#		
+#	} else {
+#		barplot(as.matrix(overallList$overallResult), beside= TRUE, main="", xlab=overallList$xAxisName, ylab=overallList$yAxisName, col=overallList$color, width=12, space=c(0,1), ylim=c(0,max(overallList$overallResult,na.rm=TRUE)))
+#	}
+#	
+#	grid()
+#	if (h==1) {
+#		dev.off()
+#	}
+#	if(overallList$appendix) {
+#		writeLatexFile("appendixImage", overallList$saveName)
+#	}
+#	
+#	return(overallList)
+#}
 
 buildLegend <- function(overallList) {
 	overallList$debug %debug% "buildLegend()"
@@ -606,10 +729,15 @@ makeDiagrams <- function(overallList) {
 	
 	for(h in 1:durchlauf) {
 		
-		if (tolower(overallList$diagramTyp) == "boxplothorizontal") {
-			overallList <- makeBoxplotDiagram(h, overallList, TRUE)
-		} else if (tolower(overallList$diagramTyp) == "boxplot") {
-			overallList <- makeBoxplotDiagram(h, overallList, FALSE)
+#		if (tolower(overallList$diagramTyp) == "boxplothorizontal") {
+#			overallList <- makeBoxplotDiagram(h, overallList, TRUE)
+#		} else if (tolower(overallList$diagramTyp) == "boxplot") {
+#			overallList <- makeBoxplotDiagram(h, overallList, FALSE)	
+#		}
+		
+		
+		if (tolower(overallList$diagramTyp) == "boxplot") {
+			overallList <- makeBoxplotDiagram(h, overallList)
 			
 		} else if (tolower(overallList$diagramTyp) == "boxplotstacked") {
 			overallList <- makeBoxplotStackedDiagram(h, overallList)
@@ -742,8 +870,8 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		if (typOfStartOptions != "allmanual") {
 			fileName <- fileName %exists% args[1]
 		} else {
-			#fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
-			fileName <- "report.csv" ## englischVersion <- TRUE setzen!!
+			fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
+			#fileName <- "report.csv" ## englischVersion <- TRUE setzen!!
 			#fileName <- "testDataset3.csv"
 		}
 				
@@ -849,6 +977,7 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		#descriptorSet <- colnames(workingDataSet)
 		#descriptorSetName <- colnames(workingDataSet)
 		
+		#treatment <- "none"
 		#treatment <- "Treatment"
 		treatment <- "Condition"
 		#filterTreatment <- "dry$normal$wet"
@@ -891,7 +1020,7 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		#fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
 		#fileName <- "testDataset2.csv"
 		fileName <- "report.csv"
-		#fileName <- "testDatenset3.csv"
+		#fileName <- "testDataset3.csv"
 		#englischVersion <- FALSE
 		englischVersion <- TRUE
 		workingDataSet <- englischVersion %getData% fileName
@@ -899,8 +1028,9 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		#descriptor <- c("Hallo2")
 		#descriptor <- c("Plant ID","Treatment","Hallo","Wert1", "Repl ID")
 		#descriptor <- c("Repl ID")		
+		#descriptorSet <- c("nir.top")
 		#descriptorSet <- c("Plant ID")
-		descriptorSet <- c("side.width.norm (mm)")
+		descriptorSet <- c("side.height.norm (mm)")
 
 		#descriptorSet <- c("side.area.norm (mm^2)")
 		descriptorSetName <- c("Das ist ein Testname")
@@ -946,7 +1076,7 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 				if(secondRun) {
 					appendix = TRUE
 					secondRun = FALSE
-					print("... start with the Appendix ####################################################################################################")
+					print("... start with the Appendix")
 					descriptorSet <- descriptorSetAppendix
 					descriptorSetName <- descriptorSetNameAppendix
 					diagramTypVector <- diagramTypVectorAppendix
@@ -975,7 +1105,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 						secondTreatment=secondTreatment, filterSecondTreatment=filterSecondTreatment, filterXaxis=filterXaxis, xAxis=xAxis, descriptor=descriptor,
 						showResultInR=showResultInR, xAxisName=xAxisName, yAxisName=yAxisName, debug=debug, 
 						bgColor=bgColor, errorDescriptor=character(), rowName=character(), colName=character(),
-						overallResult=data.frame(), color=numeric(), symbolParameter=15, appendix=appendix, stoppTheCalculation=stoppTheCalculation)
+						overallResult=data.frame(), errorBars=data.frame(), color=numeric(), symbolParameter=15, appendix=appendix, stoppTheCalculation=stoppTheCalculation)
 		
 	#library for save images
 	#install.packages(c("Cairo"), repos="http://cran.r-project.org", dependencies = TRUE)
@@ -985,6 +1115,8 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 	library("RColorBrewer")
 	#install.packages(c("data.table"), repos="http://cran.r-project.org", dependencies = TRUE)
 	library(data.table)
+	#install.packages(c("psych"), repos="http://cran.r-project.org", dependencies = TRUE)
+	library(psych)
 	#install.packages(c(mvbutils), repos="http://cran.r-project.org", dependencies = TRUE)
 	#library(mvbutils)
 	
