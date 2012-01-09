@@ -260,8 +260,14 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		return positionUnit;
 	}
 	
+	private static HashMap<String, String> annotations = new HashMap<String, String>();
+	
 	public void setAnnotation(String annotation) {
-		this.annotation = annotation;
+		synchronized (annotations) {
+			if (!annotations.containsKey(annotation))
+				annotations.put(annotation, annotation);
+			this.annotation = annotations.get(annotation);
+		}
 		// this.annotation = annotation != null ? annotation.intern() : null;
 	}
 	
