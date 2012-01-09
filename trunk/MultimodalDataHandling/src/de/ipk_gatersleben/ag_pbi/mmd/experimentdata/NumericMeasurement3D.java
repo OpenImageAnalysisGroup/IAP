@@ -261,7 +261,8 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	}
 	
 	public void setAnnotation(String annotation) {
-		this.annotation = annotation != null ? annotation.intern() : null;
+		this.annotation = annotation;
+		// this.annotation = annotation != null ? annotation.intern() : null;
 	}
 	
 	public String getAnnotation() {
