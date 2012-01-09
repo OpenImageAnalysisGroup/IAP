@@ -126,7 +126,7 @@ public class BlLabFilter_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				if (fis != null)
 					fis.addImage("step 6", result);
 				// filter background noise
-				double blueCurbWidthBarley0_1 = options.isBarleyInBarleySystem() ? 0.1 : 0.28;
+				double blueCurbWidthBarley0_1 = options.isBarleyInBarleySystem() ? 0.15 : 0.28;
 				double blueCurbHeightEndBarly0_8 = options.isBarleyInBarleySystem() ? 0.75 : 0.7;
 				if (options.getCameraPosition() == CameraPosition.SIDE)
 					toBeFiltered = result
