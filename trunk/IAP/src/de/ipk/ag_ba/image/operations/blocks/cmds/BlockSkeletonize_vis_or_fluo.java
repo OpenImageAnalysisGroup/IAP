@@ -251,7 +251,11 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 			
 			ImageCanvas canvas = inputImage.getIO().getCanvas();
 			ArrayList<Point> branchPoints = skel2d.getBranches();
-			int lw = (int) Math.ceil(leafWidthInPixels) * 3;
+			int lw;
+			if (leafWidthInPixels != null)
+				lw = (int) Math.ceil(leafWidthInPixels) * 3;
+			else
+				lw = 1;
 			for (Point p : branchPoints)
 				canvas.fillRect(p.x - lw / 2, p.y - lw / 2, lw, lw, clear);
 			inputImage = canvas.getImage().print("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels, debug);
