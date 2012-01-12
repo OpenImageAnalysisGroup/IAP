@@ -237,6 +237,8 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
 				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
+		if (optExperiment != null)
+			fp.addGuiComponentRow(new JLabel("Numeric Values"), new JLabel(niceValue(optExperiment.getNumberOfMeasurementValues(), null)), false);
 		if (experimentHeader.getStorageTime() != null)
 			fp.addGuiComponentRow(new JLabel("Storage Time"), new JLabel(SystemAnalysis.getCurrentTime(experimentHeader.getStorageTime().getTime())), false);
 		fp.addGuiComponentRow(new JLabel("History"), new JLabel(getVersionString(experimentHeader)), false);
@@ -386,7 +388,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				leafWidth = new JLabel(mi.getLeafWidth());
 				freshWeight = new JLabel(mi.getFreshWeight());
 				dryWeight = new JLabel(mi.getDryWeight());
-				JComponent right = TableLayout.get4Split(height, leafWidth,freshWeight, dryWeight, width, space, border);
+				JComponent right = TableLayout.get4Split(height, leafWidth, freshWeight, dryWeight, width, space, border);
 				rows1.add(new GuiRow(desc, right));
 			}
 			// rows.add(new GuiRow(new JLabel(""), null));
@@ -421,9 +423,11 @@ public class MyExperimentInfoPanel extends JPanel {
 			fp1.enableSearch(true);
 			fp2.setMaximumRowCount(10);
 			fp2.enableSearch(true);
-			JComponent right1 = TableLayout.get4Split(new JLabel("Height"), new JLabel("Leaf Width"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, space,
+			JComponent right1 = TableLayout.get4Split(new JLabel("Height"), new JLabel("Leaf Width"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width,
+					space,
 					border);
-			JComponent right2 = TableLayout.get4Split(new JLabel("Height"), new JLabel("Leaf Width"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width, space, border);
+			JComponent right2 = TableLayout.get4Split(new JLabel("Height"), new JLabel("Leaf Width"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width,
+					space, border);
 			fp1.addGuiComponentRow(new JLabel("Visual Property"), right1, false);
 			fp2.addGuiComponentRow(new JLabel("Visual Property"), right2, false);
 			
@@ -462,7 +466,7 @@ public class MyExperimentInfoPanel extends JPanel {
 						for (SampleInterface sam : ci) {
 							mi.setLeafWidth(
 									StringManipulationTools.formatNumber(
-											sam.getSampleAverage().getValue(), "#.###")+ (sam.getAverageUnit()!=null ? " "+sam.getAverageUnit():""));
+											sam.getSampleAverage().getValue(), "#.###") + (sam.getAverageUnit() != null ? " " + sam.getAverageUnit() : ""));
 							matched = true;
 							break;
 						}
@@ -471,7 +475,7 @@ public class MyExperimentInfoPanel extends JPanel {
 						for (SampleInterface sam : ci) {
 							mi.setDryWeight(
 									StringManipulationTools.formatNumber(
-											sam.getSampleAverage().getValue(), "#.###")+ (sam.getAverageUnit()!=null ? " "+sam.getAverageUnit():""));
+											sam.getSampleAverage().getValue(), "#.###") + (sam.getAverageUnit() != null ? " " + sam.getAverageUnit() : ""));
 							matched = true;
 							break;
 						}
@@ -480,7 +484,7 @@ public class MyExperimentInfoPanel extends JPanel {
 						for (SampleInterface sam : ci) {
 							mi.setComparisonValue(sam.getSampleAverage().getValue());
 							mi.setFreshWeight(StringManipulationTools.formatNumber(
-									sam.getSampleAverage().getValue(), "#.###")+ (sam.getAverageUnit()!=null ? " "+sam.getAverageUnit():""));
+									sam.getSampleAverage().getValue(), "#.###") + (sam.getAverageUnit() != null ? " " + sam.getAverageUnit() : ""));
 							matched = true;
 							break;
 						}
@@ -488,7 +492,7 @@ public class MyExperimentInfoPanel extends JPanel {
 					if (ci.getConditionName().contains("height")) {
 						for (SampleInterface sam : ci) {
 							mi.setHeight(StringManipulationTools.formatNumber(
-									sam.getSampleAverage().getValue(), "#.###")+ (sam.getAverageUnit()!=null ? " "+sam.getAverageUnit():""));
+									sam.getSampleAverage().getValue(), "#.###") + (sam.getAverageUnit() != null ? " " + sam.getAverageUnit() : ""));
 							matched = true;
 							break;
 						}

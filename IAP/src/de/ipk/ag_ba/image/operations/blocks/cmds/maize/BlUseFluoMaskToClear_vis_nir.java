@@ -59,6 +59,19 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
+		if (getInput().getImages().getNir() == null || getInput().getMasks().getFluo() == null)
+			return getInput().getMasks().getNir();
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
+			FlexibleImage input = getInput().getMasks().getNir();
+			
+			return clearImageSide(input, getInput().getMasks().getFluo(), 0.01);
+		}
+		
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			FlexibleImage input = getInput().getMasks().getNir();
+			
+			return clearImageTop(input, getInput().getMasks().getFluo());
+		}
 		return getInput().getMasks().getNir();
 	}
 	
@@ -159,10 +172,10 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 					).print("OR operation", debug).blur(20).
 					binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
 			int gray = new Color(180, 180, 180).getRGB();
+			int back = options.getBackground();
 			processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
 					mask,
-					gray).print("FILTERED NIR MASK", debug).getImage());
-			int back = options.getBackground();
+					back).print("FILTERED NIR MASK", debug).getImage());
 			processedImages.setNir(processedImages.getNir().getIO().applyMask_ResizeMaskIfNeeded(
 					mask,
 					options.getBackground()).print("FILTERED NIR IMAGE", debug).
