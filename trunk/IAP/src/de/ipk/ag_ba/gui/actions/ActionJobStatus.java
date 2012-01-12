@@ -1,11 +1,13 @@
 package de.ipk.ag_ba.gui.actions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.StringManipulationTools;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -48,32 +50,38 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			public void pleaseContinueRun() {
 			}
 			
+			private String remain = "";
+			
 			@Override
 			public double getCurrentStatusValueFine() {
 				double finishedJobs = 0.00001;
 				HashSet<String> activeJobsIds = new HashSet<String>();
-				HashMap<Long, Integer> submissionTime2partCnt = new HashMap<Long, Integer>();
+				TreeMap<Long, Integer> submissionTime2partCnt = new TreeMap<Long, Integer>();
+				Long firstSubmission = null;
 				try {
 					for (BatchCmd b : ActionJobStatus.this.m.batchGetAllCommands()) {
 						String jid = b.getString("_id");
 						if (jid != null)
 							activeJobsIds.add(jid);
-						if (b.getCurrentStatusValueFine() > 0)
-							finishedJobs += b.getCurrentStatusValueFine() / 200;
+						double fs = b.getCurrentStatusValueFine();
+						if (fs >= 0)
+							finishedJobs += fs / 100d;
 						if (jid != null) {
 							jobIds.add(jid);
+							
+							long st = b.getSubmissionTime();
+							if (st > 0 && (firstSubmission == null || st < firstSubmission))
+								firstSubmission = st;
 							
 							if (!submissionTime2partCnt.containsKey(b.getSubmissionTime()))
 								submissionTime2partCnt.put(b.getSubmissionTime(), b.getPartCnt());
 						}
 					}
 					part_cnt = 0;
-					for (String id : jobIds) {
-						if (!activeJobsIds.contains(id))
-							finishedJobs += 1;
-					}
 					for (Integer cnt : submissionTime2partCnt.values())
 						part_cnt += cnt;
+					
+					finishedJobs += part_cnt - remainingJobs;
 					
 					remainingJobs = activeJobsIds.size();
 					if (remainingJobs == 0)
@@ -83,7 +91,22 @@ public class ActionJobStatus extends AbstractNavigationAction {
 				}
 				if (part_cnt > 0) {
 					double value = 100d * (part_cnt - remainingJobs) / part_cnt;
-					status3provider.setCurrentStatusValueFine(value);
+					// status3provider.setCurrentStatusValueFine(value);
+					
+					if (firstSubmission != null) {
+						long ct = System.currentTimeMillis();
+						long processingTime = ct - firstSubmission;
+						double progress = finishedJobs / part_cnt;
+						long fullTime = (long) (processingTime / progress);
+						remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", remain: " + SystemAnalysis.getWaitTime(fullTime);
+						ArrayList<String> s = new ArrayList<String>();
+						for (long l : submissionTime2partCnt.keySet())
+							s.add(SystemAnalysis.getCurrentTime(l));
+						remain += "<br>starts: " + StringManipulationTools.getStringList(s, ", ");
+						long partTime = fullTime / part_cnt;
+						remain += "<br>processed: " + StringManipulationTools.formatNumber(finishedJobs, "#.000") + " in "
+								+ SystemAnalysis.getWaitTime(processingTime) + ", 1 task takes " + SystemAnalysis.getWaitTime(partTime);
+					}
 					return value;
 				} else {
 					status3provider.setCurrentStatusValueFine(-1);
@@ -103,7 +126,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			@Override
 			public String getCurrentStatusMessage2() {
-				return null;
+				return remain;
 			}
 			
 			@Override
