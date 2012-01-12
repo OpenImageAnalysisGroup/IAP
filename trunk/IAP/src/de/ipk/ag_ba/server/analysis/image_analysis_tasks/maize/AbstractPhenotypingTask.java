@@ -502,6 +502,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			TreeSet<String> replicateIDandQualityList = new TreeSet<String>();
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				for (ImageSet i : is.values()) {
+					if (i.getVIS() == null)
+						continue;
 					String val = i.getVIS().getReplicateID() + ";" + i.getVIS().getQualityAnnotation();
 					replicateIDandQualityList.add(val);
 				}
@@ -522,6 +524,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			String timeInfo = SystemAnalysis.getCurrentTime();
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				if (is.size() == 0)
+					continue;
+				if (is.firstEntry().getValue().getVIS() == null)
 					continue;
 				String val = is.firstEntry().getValue().getVIS().getReplicateID() + ";" +
 						is.firstEntry().getValue().getVIS().getQualityAnnotation();

@@ -1113,7 +1113,8 @@ public class LemnaTecDataExchange {
 						if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname")
 								|| metaName.equalsIgnoreCase("Name")
 								|| metaName.equalsIgnoreCase("GENOTYP")
-								|| metaName.equalsIgnoreCase("TYP"))
+						// || metaName.equalsIgnoreCase("TYP")
+						)
 							res.get(plantID).setGenotype(metaValue);
 						else
 							if (metaName.equalsIgnoreCase("Variety"))
@@ -1122,26 +1123,40 @@ public class LemnaTecDataExchange {
 								if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot"))
 									res.get(plantID).setGrowthconditions(metaValue);
 								else
-									if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date"))
-										addSequenceInfo(res.get(plantID), "SeedDate: " + metaValue, header);
-									else {
+									if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("SEEDDATE") || metaName.equalsIgnoreCase("seed date")) {
+										if (metaName.equalsIgnoreCase("Sequence"))
+											addSequenceInfo(res.get(plantID), metaValue, header);
+										else
+											addSequenceInfo(res.get(plantID), "SeedDate: " + metaValue, header);
+									} else {
 										if (metaValue != null && metaValue.trim().length() > 0) {
 											String oldTreatment = res.get(plantID).getTreatment();
 											if (oldTreatment == null)
 												oldTreatment = "";
 											if (oldTreatment.length() > 0)
 												oldTreatment = oldTreatment + ";";
+											
+											String oldVariety = res.get(plantID).getVariety();
+											if (oldVariety == null)
+												oldVariety = "";
+											if (oldVariety.length() > 0)
+												oldVariety = oldVariety + ";";
+											
 											if (metaName.startsWith("old ID")) {
 												if (!oldTreatment.contains("old IDs defined"))
 													res.get(plantID).setTreatment(oldTreatment + "old IDs defined");
 											} else
 												if (metaName.startsWith("Sorte")) {
 													if (!oldTreatment.contains(metaValue.trim()))
-														res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
+														res.get(plantID).setVariety(oldVariety + metaValue.trim());
 												} else {
-													if (metaName.startsWith("conditions "))
-														metaName = metaName.substring("conditions ".length()).trim();
-													res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
+													if (metaName.equalsIgnoreCase("Typ"))
+														res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
+													else {
+														if (metaName.startsWith("conditions "))
+															metaName = metaName.substring("conditions ".length()).trim();
+														res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
+													}
 												}
 										}
 									}

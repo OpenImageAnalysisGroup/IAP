@@ -202,13 +202,16 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				temp = temp.getIO().border().floodFillFromOutside(clear, black).getImage().print("INNER HULL", debug);
 				tempImage = temp.getAs2A();
 				int[][] ttt = inpFLUOunchanged.getAs2A();
-				for (int x = 0; x < w; x++)
-					for (int y = 0; y < h; y++) {
+				int wf = inpFLUOunchanged.getWidth();
+				int hf = inpFLUOunchanged.getHeight();
+				for (int x = 0; x < wf; x++)
+					for (int y = 0; y < hf; y++) {
 						if (tempImage[x][y] != black)
 							ttt[x][y] = clear;
 					}
 				for (Point p : branchPoints)
-					ttt[p.x][p.y] = clear;
+					if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
+						ttt[p.x][p.y] = clear;
 				temp = new FlexibleImage(ttt).getIO().print("FINAL", debug).getImage();
 				leafWidthInPixels = 0d;
 				int skeletonLength;
@@ -244,8 +247,11 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 			FlexibleImage inputImage = inpFLUOunchanged.copy().print(" inp img 2", false);
 			int clear = ImageOperation.BACKGROUND_COLORint;
 			int[][] inp2d = inputImage.getAs2A();
+			int wf = inputImage.getWidth();
+			int hf = inputImage.getHeight();
 			for (Point p : skel2d.branches)
-				inp2d[p.x][p.y] = clear;
+				if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
+					inp2d[p.x][p.y] = clear;
 			
 			inputImage = new FlexibleImage(inp2d);
 			
