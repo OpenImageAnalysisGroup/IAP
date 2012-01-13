@@ -689,4 +689,11 @@ public class StringManipulationTools implements HelperClass {
 	public static String formatNumber(double d, String pattern) {
 		return ErrorMsg.getDecimalFormat(pattern).format(d);
 	}
+	
+	public static int count(String s, String find) {
+		if (s == null || s.isEmpty())
+			return 0;
+		else
+			return s.length() - StringManipulationTools.stringReplace(s, find, "").length();
+	}
 }
