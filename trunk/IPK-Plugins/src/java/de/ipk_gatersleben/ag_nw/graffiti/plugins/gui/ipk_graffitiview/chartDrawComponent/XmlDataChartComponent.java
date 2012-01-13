@@ -71,25 +71,27 @@ public class XmlDataChartComponent extends JComponent {
 		if (ge == null || ge.getGraph() == null)
 			return;
 		
-		ChartOptions co = new ChartOptions();
-		
 		ExperimentInterface experiment = Experiment2GraphHelper.getMappedDataListFromGraphElement(ge);
 		if (experiment == null)
 			return;
 		
 		Integer mappedDataListSize = experiment.size();
 		
-		int maxInRow = co.setLayoutOfChartComponent(ge, this, mappedDataListSize);
-		
-		co.readAttributes(ge);
-		
 		int currentXposition = 0;
 		int currentYposition = 2;
 		
 		HeatMapOptions hmo = null;
 		
+		Integer maxInRow = null;
+		
 		int idx = 0;
 		for (int index = 0; index < mappedDataListSize; index++) {
+			ChartOptions co = new ChartOptions();
+			
+			if (maxInRow == null)
+				maxInRow = co.setLayoutOfChartComponent(ge, this, mappedDataListSize);
+			
+			co.readAttributes(ge);
 			
 			SubstanceInterface xmldata = experiment.get(index);
 			

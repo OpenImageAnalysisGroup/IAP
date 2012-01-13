@@ -136,6 +136,9 @@ public class CloudHost extends BasicDBObject {
 	}
 	
 	public boolean isClusterExecutionMode() {
+		String h = getHostName();
+		if (h.startsWith("10."))
+			return true;
 		// if (true)
 		// return true;
 		if (get("clusterMode") != null)
