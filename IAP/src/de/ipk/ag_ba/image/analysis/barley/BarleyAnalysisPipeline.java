@@ -3,6 +3,7 @@ package de.ipk.ag_ba.image.analysis.barley;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
+import de.ipk.ag_ba.image.analysis.maize.BlockColorBalancing_vertical_nir;
 import de.ipk.ag_ba.image.analysis.maize.BlockDrawSkeleton_vis_fluo;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
@@ -54,7 +55,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlBalancing_fluo.class);
 		p.add(BlCreateDummyReferenceIfNeeded_vis.class);
 		p.add(BlColorBalancing_vis.class);
+		p.add(BlockColorBalancing_vertical_nir.class);
 		p.add(BlColorBalancingRoundCamera_vis_nir.class);
+		p.add(BlockColorBalancing_vertical_nir.class);
 		p.add(BlFindBlueMarkers_vis.class);
 		p.add(BlBalancing_fluo.class);
 		p.add(BlClearBackgroundByRefComparison_vis_fluo_nir.class);
