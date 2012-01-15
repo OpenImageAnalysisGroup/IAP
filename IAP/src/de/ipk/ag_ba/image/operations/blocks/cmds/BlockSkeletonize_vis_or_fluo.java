@@ -290,7 +290,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 					rt.addValue("leaf.width.whole.max.norm", leafWidthInPixels2 * normFactor);
 				rt.addValue("leaf.width.whole.max", leafWidthInPixels2);
 			}
-			System.out.print("Leaf width: " + leafWidthInPixels + " // " + leafWidthInPixels2);
+			// System.out.print("Leaf width: " + leafWidthInPixels + " // " + leafWidthInPixels2);
 		}
 		
 		rt.addValue("fluo.bloom.area.size", probablyBloomFluo.getIO().print("BLOOM AREA", debug2).countFilledPixels());
@@ -325,7 +325,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 			if (distHorizontal != null)
 				rt.addValue("leaf.width.average.norm", (filled / leaflength) * normFactor);
 			rt.addValue("leaf.width.average", filled / leaflength);
-			System.out.println(" // " + (int) (filled / leaflength));
+			// System.out.println(" // " + (int) (filled / leaflength));
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)
