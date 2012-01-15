@@ -36,7 +36,8 @@ public class BlColorBalancingRoundCamera_vis_nir extends AbstractSnapshotAnalysi
 		
 		FlexibleImage input = getInput().getImages().getNir();
 		
-		return input.getIO().rmCircleShadeFixedGray(180d).getImage();
+		return input.getIO().rmCircleShadeFixedGray(180d).
+				flipVert().rmCircleShadeFixedGray(180d).flipVert().getImage();
 	}
 	
 	@Override
@@ -46,7 +47,8 @@ public class BlColorBalancingRoundCamera_vis_nir extends AbstractSnapshotAnalysi
 		
 		FlexibleImage input = getInput().getMasks().getNir();
 		
-		return input.getIO().rmCircleShadeFixedGray(180d).getImage();
+		return input.getIO().rmCircleShadeFixedGray(180d).
+				flipVert().rmCircleShadeFixedGray(180d).flipVert().getImage();
 	}
 	
 }

@@ -3281,13 +3281,15 @@ public class ImageOperation {
 		int maxDistToCenter = (int) Math.sqrt(cx * cx + cy * cy);
 		int distToCenter, pix;
 		double fac;
+		int steps = whiteLevel_180d < 200 ? 150 : 50;
 		
-		double[] calibrationCurveFromTopLeftToCenter = new double[30];
-		double[] indexArray = new double[30];
-		
+		double[] calibrationCurveFromTopLeftToCenter = new double[steps];
+		double[] indexArray = new double[steps];
+		double s0 = whiteLevel_180d < 200 ? 5d : 5d;
+		double ss = whiteLevel_180d < 200 ? 15d : 15d;
 		int len = indexArray.length;
 		for (int i = 0; i < len; i++) {
-			int s = (int) (5 + i * 15d / len);
+			int s = (int) (s0 + i * ss / len);
 			if (whiteLevel_180d > 200)
 				s += 40;
 			int tx = (int) (i / (double) len * w / 2d);
@@ -3968,5 +3970,10 @@ public class ImageOperation {
 		return ImageOperation.removeSmallPartsOfImage(
 				true, getImage(), BACKGROUND_COLORint, cutOffMinimumArea, cutOffMinimumDimension,
 				NeighbourhoodSetting.NB4, CameraPosition.TOP, null, false).getIO();
+	}
+	
+	public ImageOperation flipVert() {
+		image.getProcessor().flipVertical();
+		return this;
 	}
 }
