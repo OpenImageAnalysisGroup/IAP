@@ -54,7 +54,7 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			return null;
 		}
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
-		if (distHorizontal != null || options.getCameraPosition() == CameraPosition.TOP) {
+		if (true) { // distHorizontal != null || options.getCameraPosition() == CameraPosition.TOP
 			int realDist = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
 			boolean drawHull = options.getBooleanSetting(Setting.DRAW_CONVEX_HULL);
 			res = new ImageOperation(image).hull().find(true, false, drawHull, drawHull, Color.RED.getRGB(),

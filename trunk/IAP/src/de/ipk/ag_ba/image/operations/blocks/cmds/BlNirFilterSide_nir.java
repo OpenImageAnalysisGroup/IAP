@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -18,61 +17,54 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processNIRmask() {
 		FlexibleImage nirImage = getInput().getImages().getNir();
 		FlexibleImage nirMask = getInput().getMasks().getNir();
-		int average = 150;
+		int average = 180;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (nirImage != null && nirMask != null) {
 				// compare images
-				int blackDiff = 50; // options.getIntSetting(Setting.B_Diff_NIR);
-				int whiteDiff = 5; // options.getIntSetting(Setting.W_Diff_NIR);
-				
-				boolean advancedComparisonFilter = true;
-				if (advancedComparisonFilter) {
-					ImageOperation subtracted = nirImage.getIO().
-							subtractGrayImages(nirMask).print("subimg", debug);
-					int[] sub = subtracted.copy().getImageAs1array();
-					int idx = 0;
-					for (int c : sub) {
-						int r = (c & 0xff0000) >> 16;
-						int b = (c & 0x0000ff);
-						int rn = Math.abs(r - b);
-						sub[idx++] = (0xFF << 24 | (rn & 0xFF) << 16) | ((rn & 0xFF) << 8) | ((rn & 0xFF) << 0);
-					}
-					new FlexibleImage(nirImage.getWidth(), nirImage.getHeight(), sub).
-							print("subtracted gray", debug);
-					int[] nirArray = nirImage.getAs1A();
-					int[] nirRefArray = nirMask.getAs1A();
-					double sum = 0;
-					int differenceCutOff = 15;
-					idx = 0;
-					for (int c : sub) {
-						if ((c & 0x0000ff) < differenceCutOff)
-							sum += (nirArray[idx++] & 0x0000ff);
-					}
-					if (idx > 0) {
-						average = (int) (sum / idx);
-						idx = 0;
-						int gray = (0xFF << 24 | (average & 0xFF) << 16) | ((average & 0xFF) << 8) | ((average & 0xFF) << 0);
-						for (int c : sub) {
-							if ((c & 0x0000ff) < differenceCutOff) {
-								nirArray[idx] = gray;
-								nirRefArray[idx] = gray;
-							}
-							idx++;
-						}
-						nirImage = new FlexibleImage(nirImage.getWidth(), nirImage.getHeight(), nirArray).
-								print("CLEANED UP INP", debug);
-						nirMask = new FlexibleImage(nirMask.getWidth(), nirMask.getHeight(), nirRefArray).
-								print("CLEANED UP REF", debug);
-					}
-				}
-				// if (options.isMaize())
-				// nirMask = new ImageOperation(nirImage).print("input", debug).compare()
-				// .compareGrayImages(nirMask.print("ref", debug),
-				// // 20, 12,
-				// blackDiff, whiteDiff,
-				// // 250, 12,
-				// // 40, 40,
-				// new Color(180, 180, 180).getRGB()).print("result of comparison", false).getImage(); // 150
+				// int blackDiff = 50; // options.getIntSetting(Setting.B_Diff_NIR);
+				// int whiteDiff = 5; // options.getIntSetting(Setting.W_Diff_NIR);
+				//
+				// boolean advancedComparisonFilter = true;
+				// if (advancedComparisonFilter) {
+				// ImageOperation subtracted = nirImage.getIO().
+				// subtractGrayImages(nirMask).print("subimg", debug);
+				// int[] sub = subtracted.copy().getImageAs1array();
+				// int idx = 0;
+				// for (int c : sub) {
+				// int r = (c & 0xff0000) >> 16;
+				// int b = (c & 0x0000ff);
+				// int rn = Math.abs(r - b);
+				// sub[idx++] = (0xFF << 24 | (rn & 0xFF) << 16) | ((rn & 0xFF) << 8) | ((rn & 0xFF) << 0);
+				// }
+				// if (debug)
+				// new FlexibleImage(nirImage.getWidth(), nirImage.getHeight(), sub).
+				// print("subtracted gray", debug);
+				// int[] nirArray = nirImage.getAs1A();
+				// int[] nirRefArray = nirMask.getAs1A();
+				// double sum = 0;
+				// int differenceCutOff = 15;
+				// idx = 0;
+				// for (int c : sub) {
+				// if ((c & 0x0000ff) < differenceCutOff)
+				// sum += (nirArray[idx++] & 0x0000ff);
+				// }
+				// if (idx > 0) {
+				// average = (int) (sum / idx);
+				// idx = 0;
+				// int gray = (0xFF << 24 | (average & 0xFF) << 16) | ((average & 0xFF) << 8) | ((average & 0xFF) << 0);
+				// for (int c : sub) {
+				// if ((c & 0x0000ff) < differenceCutOff) {
+				// nirArray[idx] = gray;
+				// nirRefArray[idx] = gray;
+				// }
+				// idx++;
+				// }
+				// nirImage = new FlexibleImage(nirImage.getWidth(), nirImage.getHeight(), nirArray).
+				// print("CLEANED UP INP", debug);
+				// nirMask = new FlexibleImage(nirMask.getWidth(), nirMask.getHeight(), nirRefArray).
+				// print("CLEANED UP REF", debug);
+				// }
+				// }
 				
 				if (options.isMaize())
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).
@@ -82,7 +74,8 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 					double f = 0.08;
 					if (options.isBarleyInBarleySystem()) {
 						f = 0.06;
-						// xxxxxxxxx
+						if (options.getCameraPosition() == CameraPosition.SIDE)
+							average = 180;
 					}
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
 							options.getBackground(), f).getImage().print("ADAPT OUT", debug);

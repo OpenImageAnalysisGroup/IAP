@@ -3205,7 +3205,74 @@ public class ImageOperation {
 		return res;
 	}
 	
-	public ImageOperation rmCircleShadeFixed() {
+	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d) {
+		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
+		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
+		FlexibleImage b = getB().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
+		return new FlexibleImage(r, g, b).getIO();
+	}
+	
+	/**
+	 * @return A gray image composed from the R channel.
+	 */
+	private ImageOperation getR() {
+		int[] img = copy().getImageAs1array();
+		int c, r, g, b;
+		for (int i = 0; i < img.length; i++) {
+			c = img[i];
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			g = r;
+			b = r;
+			
+			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new FlexibleImage(getWidth(), getHeight(), img).getIO();
+	}
+	
+	/**
+	 * @return A gray image composed from the G channel.
+	 */
+	private ImageOperation getG() {
+		int[] img = copy().getImageAs1array();
+		int c, r, g, b;
+		for (int i = 0; i < img.length; i++) {
+			c = img[i];
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			r = g;
+			b = g;
+			
+			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new FlexibleImage(getWidth(), getHeight(), img).getIO();
+	}
+	
+	/**
+	 * @return A gray image composed from the B channel.
+	 */
+	private ImageOperation getB() {
+		int[] img = copy().getImageAs1array();
+		int c, r, g, b;
+		for (int i = 0; i < img.length; i++) {
+			c = img[i];
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			r = b;
+			g = b;
+			
+			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new FlexibleImage(getWidth(), getHeight(), img).getIO();
+	}
+	
+	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d) {
 		int[][] img = getImageAs2array();
 		int w = img.length;
 		int h = img[0].length;
@@ -3215,22 +3282,14 @@ public class ImageOperation {
 		int distToCenter, pix;
 		double fac;
 		
-		// double[] calibrationCurveFromTopLeftToCenter = new double[] {
-		// 211, 210, 209, 205, 202, 200, 198, 194, 192, 190, 185, 183,
-		// 180, 175, 173, 170, 165, 162, 158, 155, 150, 145, 140, 135, 120, 95, 70
-		// };
-		//
-		// double[] indexArray = new double[30] {
-		// 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-		// 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27
-		// };
-		
 		double[] calibrationCurveFromTopLeftToCenter = new double[30];
 		double[] indexArray = new double[30];
 		
 		int len = indexArray.length;
 		for (int i = 0; i < len; i++) {
 			int s = (int) (5 + i * 15d / len);
+			if (whiteLevel_180d > 200)
+				s += 40;
 			int tx = (int) (i / (double) len * w / 2d);
 			int ty = h - (int) (i / (double) len * h / 2d);
 			float[] valuesCenter = getRGBAverage(tx - s, ty - s, 2 * s, 2 * s, -70, 500, true, false);
@@ -3257,9 +3316,9 @@ public class ImageOperation {
 						if (idx >= calibrationCurveFromTopLeftToCenter.length)
 							idx = calibrationCurveFromTopLeftToCenter.length - 1;
 					
-					fac = 180d / func.value(len - idx);
+					fac = whiteLevel_180d / func.value(len - idx);
 					
-					pix = (int) (pix * fac);
+					pix = (int) Math.ceil(pix * fac);
 					if (pix > 255)
 						pix = 255;
 					else
@@ -3270,8 +3329,7 @@ public class ImageOperation {
 				}
 			}
 		} catch (FunctionEvaluationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new UnsupportedOperationException(e);
 		}
 		return new ImageOperation(res);
 	}
@@ -3904,5 +3962,11 @@ public class ImageOperation {
 				res[i] = BACKGROUND_COLORint;
 		}
 		return new ImageOperation(res, getWidth(), getHeight());
+	}
+	
+	public ImageOperation removeSmallElements(int cutOffMinimumArea, int cutOffMinimumDimension) {
+		return ImageOperation.removeSmallPartsOfImage(
+				true, getImage(), BACKGROUND_COLORint, cutOffMinimumArea, cutOffMinimumDimension,
+				NeighbourhoodSetting.NB4, CameraPosition.TOP, null, false).getIO();
 	}
 }
