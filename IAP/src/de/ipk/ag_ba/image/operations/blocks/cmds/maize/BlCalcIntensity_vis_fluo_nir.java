@@ -99,9 +99,9 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		
-		if (getProperties().getImage("nir_skeleton") != null) {
-			double nirSkeletonIntensitySum = getProperties().getImage("nir_skeleton").getIO().intensitySumOfChannel(false, true, false, false);
+		FlexibleImage nirSkel = getProperties().getImage("nir_skeleton");
+		if (nirSkel != null) {
+			double nirSkeletonIntensitySum = nirSkel.getIO().intensitySumOfChannel(false, true, false, false);
 			double avgNirSkel = 1 - nirSkeletonIntensitySum / nirSkeletonFilledPixels;
 			getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.skeleton.intensity.average", avgNirSkel);
 		}

@@ -25,9 +25,12 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 			min = 210;
 		if (options.isBarleyInBarleySystem())
 			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 190;
+		
+		FlexibleImage resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, min).getImage();
 		FlexibleImage resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, min).getImage();
+		if (options.isBarleyInBarleySystem())
+			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 150;
 		FlexibleImage resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
-		FlexibleImage resClassic = io.convertFluo2intensity(FluoAnalysis.CLASSIC, min).getImage();
 		FlexibleImage r = new FlexibleImage(resClassic, resChlorophyll, resPhenol);
 		if (debug) {
 			// FlexibleImage black = new FlexibleImage(new int[resChlorophyll.getWidth()][resChlorophyll.getHeight()]).getIO().invert().getImage();
