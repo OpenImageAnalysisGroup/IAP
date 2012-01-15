@@ -6,3 +6,5 @@ install.packages(c("RColorBrewer"), repos="http://cran.r-project.org", dependenc
 library("RColorBrewer")
 install.packages("data.table")
 library("data.table")
+install.packages("psych")
+library("psych")
