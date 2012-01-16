@@ -254,10 +254,9 @@ public class ActionDataExport extends AbstractNavigationAction {
 								gc.setTime(t);
 								
 								final String zefn;
-								ImageData id = (ImageData) bm;
+								final ImageData id = (ImageData) bm;
 								try {
 									if (bm instanceof ImageData) {
-										id = (ImageData) bm;
 										zefn =
 												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : nm.getReplicateID() + "") +
 														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
@@ -292,6 +291,7 @@ public class ActionDataExport extends AbstractNavigationAction {
 															ZipArchiveEntry entry = new ZipArchiveEntry(zefn);
 															entry.setSize(in.getCount());
 															entry.setCrc(in.getCRC32());
+															entry.setTime(id.getParentSample().getRowId());
 															out.putNextEntry(entry);
 															out.write(in.getBuff(), 0, in.getCount());
 															out.closeEntry();

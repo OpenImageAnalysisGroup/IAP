@@ -189,7 +189,7 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 			for (SubstanceInterface su : experiment)
 				for (ConditionInterface co : su)
 					for (SampleInterface sa : co) {
-						for (NumericMeasurementInterface nm : sa) {
+						for (final NumericMeasurementInterface nm : sa) {
 							if (nm instanceof BinaryMeasurement) {
 								BinaryMeasurement bm = (BinaryMeasurement) nm;
 								if (bm.getURL() == null)
@@ -239,6 +239,8 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 														File f = new File(targetDirectory.getAbsolutePath() + File.separator + zefn);
 														OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
 														ResourceIOManager.copyContent(in, os);
+														f.setLastModified(nm.getParentSample().getRowId());
+														in.close();
 													} catch (IOException e) {
 														System.out.println("ERROR: " + e.getMessage());
 													}
@@ -248,14 +250,6 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 											}
 										});
 										
-										// int len;
-										// while ((len = in.read(buf)) > 0) {
-										// out.write(buf, 0, len);
-										// written += len;
-										// }
-										// Complete the entry
-										// out.closeEntry();
-										in.close();
 									}
 								} catch (Exception e) {
 									System.out.println("ERROR: " + e.getMessage());
