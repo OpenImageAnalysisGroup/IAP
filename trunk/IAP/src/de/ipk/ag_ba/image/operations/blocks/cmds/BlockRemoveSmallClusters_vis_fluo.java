@@ -26,24 +26,30 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 			if (options.isMaize()) {
 				// not for barley
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 100) * 2,
-								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 100) * 2,
+						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			} else {
-				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 300) * 1,
-								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+				if (options.isArabidopsis())
+					res = new ImageOperation(mask).removeSmallClusters(ngUse,
+							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS),
+							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS).intValue(),
+							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+				else
+					res = new ImageOperation(mask).removeSmallClusters(ngUse,
+							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 300) * 1,
+							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
 			return res;
 		} else {
 			if (options.isMaize()) {
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS), (mask.getWidth() / 100) * 2,
-								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS), (mask.getWidth() / 100) * 2,
+						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 				
 			} else {
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 3d, (mask.getWidth() / 100) / 2,
-								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 3d, (mask.getWidth() / 100) / 2,
+						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
 			return res;
 		}
@@ -59,16 +65,23 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 				return new ImageOperation(getInput().getMasks().getFluo()).
 						dilate().
 						removeSmallClusters(ngUse,
-						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d, 
-						(getInput().getMasks().getFluo().getWidth() / 100) * 1,
-						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
+								(getInput().getMasks().getFluo().getWidth() / 100) * 1,
+								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			} else {
-				return new ImageOperation(getInput().getMasks().getFluo()).
-						dilate().
-						removeSmallClusters(ngUse,
-						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d, 
-						(getInput().getMasks().getFluo().getWidth() / 300) * 1,
-						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+				if (options.isArabidopsis()) {
+					return new ImageOperation(getInput().getMasks().getFluo()).
+							removeSmallClusters(ngUse,
+									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
+									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO).intValue(),
+									options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+				} else
+					return new ImageOperation(getInput().getMasks().getFluo()).
+							dilate().
+							removeSmallClusters(ngUse,
+									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
+									(getInput().getMasks().getFluo().getWidth() / 300) * 1,
+									options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
 		} else {
 			int cut2 = (int) ((getInput().getMasks().getFluo().getWidth() / 100) * 0.5);

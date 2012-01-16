@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
+package de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis;
 
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.phytochamber.ArabidopsisAnalysisPipeline;
@@ -7,9 +7,9 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypi
 /**
  * @author klukas
  */
-public class PhytochamberAnalysisTask extends AbstractPhenotypingTask {
+public class ArabidopsisAnalysisTask extends AbstractPhenotypingTask {
 	
-	public PhytochamberAnalysisTask() {
+	public ArabidopsisAnalysisTask() {
 		// empty
 	}
 	

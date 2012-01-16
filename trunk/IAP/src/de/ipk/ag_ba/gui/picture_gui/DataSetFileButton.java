@@ -58,6 +58,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis.ArabidopsisAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.Maize3DanalysisTask;
@@ -355,6 +356,63 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 					
+					JMenuItem debugPipelineTest0 = new JMenuItem(
+							"Arabidopsis Analysis Pipeline (Image+Reference)");
+					debugPipelineTest0.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								Collection<NumericMeasurementInterface> match = IAPservice
+										.getMatchFor(imageResult
+												.getBinaryFileInfo()
+												.getFileNameMain(),
+												targetTreeNode.getExperiment());
+								
+								BlockPipeline.debugTryAnalysis(
+										targetTreeNode.getExperiment(),
+										match, m,
+										new ArabidopsisAnalysisTask());
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: "
+										+ err.getLocalizedMessage()
+										+ ". Command execution error.",
+										"Error",
+										JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTest00 = new JMenuItem(
+							"Arabidopsis Analysis Pipeline (Reference+Old Reference)");
+					debugPipelineTest00.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								Collection<NumericMeasurementInterface> match = IAPservice
+										.getMatchForReference(imageResult
+												.getBinaryFileInfo()
+												.getFileNameMain(),
+												targetTreeNode.getExperiment(),
+												m);
+								
+								BlockPipeline.debugTryAnalysis(
+										targetTreeNode.getExperiment(),
+										match, m,
+										new ArabidopsisAnalysisTask());
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: "
+										+ err.getLocalizedMessage()
+										+ ". Command execution error.",
+										"Error",
+										JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
 					JMenuItem debugPipelineTest1 = new JMenuItem(
 							"Maize Analysis Pipeline (Image+Reference)");
 					debugPipelineTest1.addActionListener(new ActionListener() {
@@ -588,6 +646,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					sn.add(debugShowSnapshot);
 					jp.add(sn);
 					
+					jp.add(debugPipelineTest0);
+					jp.add(debugPipelineTest00);
 					jp.add(debugPipelineTest1);
 					jp.add(debugPipelineTest2);
 					jp.add(debugPipelineTest3);

@@ -52,26 +52,26 @@ public class ImageProcessorOptions {
 		CLOSING_NIR_TOP, CLOSING_NIR_SIDE,
 		DEBUG_STACK_WIDTH, MAX_THREADS_PER_IMAGE,
 		FIND_MAXIMUM_TYP,
-
+		
 		// double
 		SCALE, ROTATION_ANGLE, SCALE_X, SCALE_Y, FLUO_EPSILON_A, FLUO_EPSILON_B, RGB_EPSILON_A, RGB_EPSILON_B, NIR_EPSILON_A, NIR_EPSILON_B, FIND_MAXIMUM_TOLERANCE,
-
+		
 		// boolean
 		PROCESS_NIR, DEBUG_TAKE_TIMES, DEBUG_OVERLAY_RESULT_IMAGE, IS_DEBUG_PRINT_EACH_STEP, IS_DEBUG_VIS, IS_DEBUG_FLUO, IS_DEBUG_NIR, REMOVE_SMALL_CLUSTER_SIZE_FLUO,
 		REMOVE_SMALL_CLUSTER_SIZE_VIS,
-
+		
 		LAB_MIN_L_VALUE_VIS, LAB_MAX_L_VALUE_VIS, LAB_MIN_A_VALUE_VIS, LAB_MAX_A_VALUE_VIS, LAB_MIN_B_VALUE_VIS, LAB_MAX_B_VALUE_VIS, LAB_MIN_L_VALUE_FLUO,
 		LAB_MAX_L_VALUE_FLUO, LAB_MIN_A_VALUE_FLUO, LAB_MAX_A_VALUE_FLUO, LAB_MIN_B_VALUE_FLUO, LAB_MAX_B_VALUE_FLUO, LAB_MIN_L_VALUE_NIR, LAB_MAX_L_VALUE_NIR,
 		LAB_MIN_A_VALUE_NIR, LAB_MAX_A_VALUE_NIR, LAB_MIN_B_VALUE_NIR, LAB_MAX_B_VALUE_NIR,
-
+		
 		L_Diff_VIS_TOP, abDiff_VIS_TOP, L_Diff_FLUO, abDiff_FLUO, B_Diff_NIR, W_Diff_NIR, B_Diff_NIR_TOP, W_Diff_NIR_TOP,
-
+		
 		IS_PARAMETER_SEARCH, IS_CROP_RESULT,
-
+		
 		SCALE_FACTOR_DECREASE_MASK, SCALE_FACTOR_DECREASE_IMG_AND_MASK,
-
+		
 		INPUT_VIS_IMAGE_ROTATION_ANGLE, L_Diff_VIS_SIDE, abDiff_VIS_SIDE,
-
+		
 		BOTTOM_CUT_OFFSET_VIS, REAL_MARKER_DISTANCE, DRAW_CONVEX_HULL, DRAW_SKELETON;
 	}
 	
@@ -319,8 +319,10 @@ public class ImageProcessorOptions {
 	}
 	
 	private Boolean isMaize = null;
-	private int nirBackground = new Color(180, 180, 180).getRGB();
+	private final int nirBackground = new Color(180, 180, 180).getRGB();
 	private boolean highResMaize;
+	private boolean isBarley;
+	private boolean isArabidopsis;
 	
 	public void setIsMaize(boolean isMaize) {
 		this.isMaize = isMaize;
@@ -346,5 +348,17 @@ public class ImageProcessorOptions {
 	
 	public boolean isHighResMaize() {
 		return highResMaize;
+	}
+	
+	public void setIsBarley(boolean isBarley) {
+		this.isBarley = isBarley;
+	}
+	
+	public void setIsArabidopsis(boolean isArabidopsis) {
+		this.isArabidopsis = isArabidopsis;
+	}
+	
+	public boolean isArabidopsis() {
+		return isArabidopsis;
 	}
 }
