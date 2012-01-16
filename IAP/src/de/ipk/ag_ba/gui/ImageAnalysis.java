@@ -52,9 +52,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class ImageAnalysis {
 	
 	public static NavigationButton getPhytochamberEntity(final MongoDB m,
-						final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
+			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 		
-		NavigationAction phenotypeAnalysisAction = new ActionPhytochamberAnalysis(m, epsilon, epsilon2, experiment);
+		NavigationAction phenotypeAnalysisAction = new ActionPhytochamberAnalysis(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}

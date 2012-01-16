@@ -140,7 +140,7 @@ public class ImageAnalysisCommandManager {
 				actions.add(new NavigationButton(new CloudIoTestAction(m, experimentReference), guiSetting));
 			
 			// TODO: Fix and test pipeline, probably the maize pipline structures and classes should be newly adapted
-			// actions.add(ImageAnalysis.getPhytochamberEntity(m, experimentReference, 10, 15, guiSetting));
+			actions.add(ImageAnalysis.getPhytochamberEntity(m, experimentReference, 10, 15, guiSetting));
 			
 			actions.add(ImageAnalysis.getMaizeEntity(m, experimentReference, 10, 15, guiSetting));
 			actions.add(ImageAnalysis.getBarleyEntity(m, experimentReference, 10, 15, guiSetting));
