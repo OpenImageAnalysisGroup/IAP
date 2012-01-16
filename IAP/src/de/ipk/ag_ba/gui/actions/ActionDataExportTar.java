@@ -276,33 +276,35 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 								
 								final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
 								
-								// out.putNextEntry(new ZipEntry(zefn));
 								final ObjectRef error = new ObjectRef();
-								final String zefnf = zefn;
-								if (in.getCount() > 0 && in.getBuff().length >= in.getCount()) {
-									while (written.getInt() > 0)
-										Thread.sleep(5);
-									written.setInt(1);
-									es.submit(new Runnable() {
-										@Override
-										public void run() {
-											try {
-												TarArchiveEntry entry = new TarArchiveEntry(zefnf);
-												entry.setSize(in.getCount());
-												entry.setModTime(sa.getRowId());
-												out.putArchiveEntry(entry);
-												out.write(in.getBuff(), 0, in.getCount());
-												out.closeArchiveEntry();
-												written.addLong(in.getCount());
-											} catch (Exception e) {
-												error.setObject(e);
+								if (in != null) {
+									// out.putNextEntry(new ZipEntry(zefn));
+									final String zefnf = zefn;
+									if (in.getCount() > 0 && in.getBuff().length >= in.getCount()) {
+										while (written.getInt() > 0)
+											Thread.sleep(5);
+										written.setInt(1);
+										es.submit(new Runnable() {
+											@Override
+											public void run() {
+												try {
+													TarArchiveEntry entry = new TarArchiveEntry(zefnf);
+													entry.setSize(in.getCount());
+													entry.setModTime(sa.getRowId());
+													out.putArchiveEntry(entry);
+													out.write(in.getBuff(), 0, in.getCount());
+													out.closeArchiveEntry();
+													written.addLong(in.getCount());
+												} catch (Exception e) {
+													error.setObject(e);
+												}
+												written.setInt(-1);
 											}
-											written.setInt(-1);
-										}
-									});
+										});
+									}
+									
+									in.close();
 								}
-								
-								in.close();
 								if (error.getObject() != null)
 									throw (Exception) error.getObject();
 								
