@@ -98,14 +98,15 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						long processingTime = ct - firstSubmission;
 						double progress = finishedJobs / part_cnt;
 						long fullTime = (long) (processingTime / progress);
-						remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", remain: " + SystemAnalysis.getWaitTime(fullTime);
+						remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", overall: "
+								+ SystemAnalysis.getWaitTimeShort(fullTime) + ", remain: " + SystemAnalysis.getWaitTimeShort(fullTime - processingTime);
 						ArrayList<String> s = new ArrayList<String>();
 						for (long l : submissionTime2partCnt.keySet())
 							s.add(SystemAnalysis.getCurrentTime(l));
 						remain += "<br>starts: " + StringManipulationTools.getStringList(s, ", ");
 						long partTime = fullTime / part_cnt;
 						remain += "<br>processed: " + StringManipulationTools.formatNumber(finishedJobs, "#.000") + " in "
-								+ SystemAnalysis.getWaitTime(processingTime) + ", 1 task takes " + SystemAnalysis.getWaitTime(partTime);
+								+ SystemAnalysis.getWaitTimeShort(processingTime) + ", 1 task takes " + SystemAnalysis.getWaitTimeShort(partTime);
 					}
 					return value;
 				} else {

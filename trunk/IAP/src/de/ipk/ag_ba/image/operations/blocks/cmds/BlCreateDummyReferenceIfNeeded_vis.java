@@ -22,34 +22,34 @@ public class BlCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnalysis
 		if (getInput().getImages().getVis() != null && getInput().getMasks().getVis() == null)
 			return getInput().getImages().getVis().copy().getIO().thresholdLAB(
 					100, 150,
-					140, 500,
-					0, 500,
-					ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).
+					140, 255,
+					0, 255,
+					ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).print("FILTER 0", debug).
 					or(
 							getInput().getImages().getVis().copy().getIO().thresholdLAB(
 									0, 100,
-									0, 500,
-									0, 500,
-									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).getImage()
+									0, 255,
+									0, 255,
+									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).print("FILTER 1", debug).getImage()
 					).
 					or(
 							getInput().getImages().getVis().copy().getIO().thresholdLAB(
-									200, 500,
-									0, 500,
-									0, 500,
-									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).getImage()
+									200, 255,
+									0, 255,
+									0, 140,
+									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).print("FILTER 2", debug).getImage()
 					).
 					or(
 							getInput().getImages().getVis().copy().getIO().thresholdLAB(
 									0, 200,
-									150, 500,
+									150, 255,
 									0, 140,
-									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).getImage()
+									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).print("FILTER 3", debug).getImage()
 					).
 					or(
 							getInput().getImages().getVis().copy().getIO().thresholdLAB(
 									0, 255,
-									100, 500,
+									100, 255,
 									0, 100,
 									ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).print("FILTER 4", debug).getImage()
 					)

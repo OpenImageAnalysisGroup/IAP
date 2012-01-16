@@ -226,35 +226,37 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 									
 									final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
 									
-									// out.putNextEntry(new ZipEntry(zefn));
-									while (written.getInt() > 0)
-										Thread.sleep(5);
-									written.addInt(1);
-									es.submit(new Runnable() {
-										@Override
-										public void run() {
-											synchronized (targetDirectory) {
-												try {
-													File f = new File(targetDirectory.getAbsolutePath() + File.separator + zefn);
-													OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-													ResourceIOManager.copyContent(in, os);
-												} catch (IOException e) {
-													System.out.println("ERROR: " + e.getMessage());
+									if (in != null) {
+										// out.putNextEntry(new ZipEntry(zefn));
+										while (written.getInt() > 0)
+											Thread.sleep(5);
+										written.addInt(1);
+										es.submit(new Runnable() {
+											@Override
+											public void run() {
+												synchronized (targetDirectory) {
+													try {
+														File f = new File(targetDirectory.getAbsolutePath() + File.separator + zefn);
+														OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+														ResourceIOManager.copyContent(in, os);
+													} catch (IOException e) {
+														System.out.println("ERROR: " + e.getMessage());
+													}
+													written.addLong(in.getCount());
+													written.addInt(-1);
 												}
-												written.addLong(in.getCount());
-												written.addInt(-1);
 											}
-										}
-									});
-									
-									// int len;
-									// while ((len = in.read(buf)) > 0) {
-									// out.write(buf, 0, len);
-									// written += len;
-									// }
-									// Complete the entry
-									// out.closeEntry();
-									in.close();
+										});
+										
+										// int len;
+										// while ((len = in.read(buf)) > 0) {
+										// out.write(buf, 0, len);
+										// written += len;
+										// }
+										// Complete the entry
+										// out.closeEntry();
+										in.close();
+									}
 								} catch (Exception e) {
 									System.out.println("ERROR: " + e.getMessage());
 								}

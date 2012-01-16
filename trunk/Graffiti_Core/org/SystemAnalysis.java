@@ -193,4 +193,20 @@ public class SystemAnalysis {
 		String res = pss.getRemainTimeString(-1, fullTime / 1000, 2);
 		return StringManipulationTools.stringReplace(res, "&nbsp;", " ");
 	}
+	
+	public static String getWaitTimeShort(long l) {
+		String w = getWaitTime(l);
+		w = StringManipulationTools.stringReplace(w, " years", "y");
+		w = StringManipulationTools.stringReplace(w, " year", "y");
+		w = StringManipulationTools.stringReplace(w, " weeks", "w");
+		w = StringManipulationTools.stringReplace(w, " week", "w");
+		w = StringManipulationTools.stringReplace(w, " days", "d");
+		w = StringManipulationTools.stringReplace(w, " day", "d");
+		w = StringManipulationTools.stringReplace(w, " hours", "h");
+		w = StringManipulationTools.stringReplace(w, " hour", "h");
+		w = StringManipulationTools.stringReplace(w, " min", "m");
+		w = StringManipulationTools.stringReplace(w, " hour", "h");
+		w = StringManipulationTools.stringReplace(w, " sec", "s");
+		return w;
+	}
 }
