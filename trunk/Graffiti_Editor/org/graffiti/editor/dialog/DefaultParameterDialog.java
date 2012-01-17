@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: DefaultParameterDialog.java,v 1.3 2011-08-11 09:18:50 klukas Exp $
+// $Id: DefaultParameterDialog.java,v 1.4 2012-01-17 15:47:00 klukas Exp $
 
 package org.graffiti.editor.dialog;
 
@@ -65,10 +65,10 @@ import org.graffiti.session.Session;
 /**
  * The default implementation of a parameter dialog.
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class DefaultParameterDialog extends AbstractParameterDialog implements
-					ActionListener, WindowListener {
+		ActionListener, WindowListener {
 	/**
 	 * Comment for <code>serialVersionUID</code>
 	 */
@@ -125,38 +125,38 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 	 *           for.
 	 */
 	public DefaultParameterDialog(EditComponentManager editComponentManager,
-						Component parent, Parameter[] parameters, Selection selection,
-						String algorithmName, Object description) {
+			Component parent, Parameter[] parameters, Selection selection,
+			String algorithmName, Object description) {
 		this(editComponentManager, parent, parameters, selection, algorithmName, description, null, true);
 	}
 	
 	public DefaultParameterDialog(EditComponentManager editComponentManager,
-						Component parent, Parameter[] parameters, Selection selection,
-						String algorithmName, Object description, boolean okOnly, boolean noButton, boolean allowMultipleGraphTargets) {
+			Component parent, Parameter[] parameters, Selection selection,
+			String algorithmName, Object description, boolean okOnly, boolean noButton, boolean allowMultipleGraphTargets) {
 		this(editComponentManager, parent, parameters, selection, algorithmName, description, null, okOnly, noButton, allowMultipleGraphTargets, "OK");
 	}
 	
 	public DefaultParameterDialog(EditComponentManager editComponentManager,
-						Component parent, Parameter[] parameters, Selection selection,
-						String algorithmName, Object descriptionOrComponent, JComponent descComponent, boolean allowMultipleGraphTargets) {
+			Component parent, Parameter[] parameters, Selection selection,
+			String algorithmName, Object descriptionOrComponent, JComponent descComponent, boolean allowMultipleGraphTargets) {
 		this(editComponentManager, parent, parameters, selection, algorithmName, descriptionOrComponent, descComponent, false, false, allowMultipleGraphTargets,
-							"OK");
+				"OK");
 	}
 	
 	public DefaultParameterDialog(EditComponentManager editComponentManager,
-						Component parent, Parameter[] parameters, Selection selection,
-						String algorithmName, Object descriptionOrComponent,
-						JComponent descComponent, boolean okOnly, boolean noButton, boolean allowMultipleGraphTargets,
-						String okOnlyButtonText) {
+			Component parent, Parameter[] parameters, Selection selection,
+			String algorithmName, Object descriptionOrComponent,
+			JComponent descComponent, boolean okOnly, boolean noButton, boolean allowMultipleGraphTargets,
+			String okOnlyButtonText) {
 		this(editComponentManager, parent, parameters, selection, algorithmName, descriptionOrComponent, descComponent, false, false, allowMultipleGraphTargets,
-							"OK", true);
+				"OK", true);
 	}
 	
 	public DefaultParameterDialog(EditComponentManager editComponentManager,
-						Component parent, Parameter[] parameters, Selection selection,
-						String algorithmNameUsedAsTitle, Object descriptionOrComponent,
-						JComponent descComponent, boolean okOnly, boolean noButton, boolean allowMultipleGraphTargets,
-						String okOnlyButtonText, boolean modal) {
+			Component parent, Parameter[] parameters, Selection selection,
+			String algorithmNameUsedAsTitle, Object descriptionOrComponent,
+			JComponent descComponent, boolean okOnly, boolean noButton, boolean allowMultipleGraphTargets,
+			String okOnlyButtonText, boolean modal) {
 		
 		super(parent instanceof Frame ? (Frame) parent : null, modal);
 		
@@ -211,7 +211,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 		// buttonsPanel.add(cancel);
 		
 		paramsPanel = createValueEditContainer(params, selection,
-							(description != null && description.length() > 0) ? description : "", algorithmNameUsedAsTitle, descComponent); // sBundle.getString("run.dialog.desc")
+				(description != null && description.length() > 0) ? description : "", algorithmNameUsedAsTitle, descComponent); // sBundle.getString("run.dialog.desc")
 		
 		// algorithmName + " parameters"
 		
@@ -222,12 +222,13 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 		getRootPane().getActionMap().put("escapeAction", new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 			
+			@Override
 			public void actionPerformed(ActionEvent event) {
 				DefaultParameterDialog.this.dispose();
 			}
 		});
 		getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-							.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "escapeAction");
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "escapeAction");
 		
 		defineLayout(okOnly, noButton, allowMultipleGraphTargets);
 		addListeners();
@@ -243,6 +244,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 	/**
 	 * @see org.graffiti.editor.dialog.ParameterDialog#getEditedParameters()
 	 */
+	@Override
 	public Parameter[] getEditedParameters() {
 		return this.paramEditPanel.getUpdatedParameters();
 	}
@@ -260,6 +262,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public boolean isOkSelected() {
 		return selectedOk;
 	}
@@ -267,12 +270,13 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 	/**
 	 * @see java.awt.event.ActionListener#actionPerformed(ActionEvent)
 	 */
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		
 		if (src == cancel) {
 			MainFrame.showMessage(algorithmName + " not started",
-								MessageType.INFO, 3000);
+					MessageType.INFO, 3000);
 			dispose();
 		} else
 			if (src == ok) {
@@ -283,18 +287,21 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 	/**
 	 * @see java.awt.event.WindowListener#windowActivated(WindowEvent)
 	 */
+	@Override
 	public void windowActivated(WindowEvent arg0) {
 	}
 	
 	/**
 	 * @see java.awt.event.WindowListener#windowClosed(WindowEvent)
 	 */
+	@Override
 	public void windowClosed(WindowEvent arg0) {
 	}
 	
 	/**
 	 * @see java.awt.event.WindowListener#windowClosing(WindowEvent)
 	 */
+	@Override
 	public void windowClosing(WindowEvent arg0) {
 		dispose();
 	}
@@ -302,24 +309,28 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 	/**
 	 * @see java.awt.event.WindowListener#windowDeactivated(WindowEvent)
 	 */
+	@Override
 	public void windowDeactivated(WindowEvent arg0) {
 	}
 	
 	/**
 	 * @see java.awt.event.WindowListener#windowDeiconified(WindowEvent)
 	 */
+	@Override
 	public void windowDeiconified(WindowEvent arg0) {
 	}
 	
 	/**
 	 * @see java.awt.event.WindowListener#windowIconified(WindowEvent)
 	 */
+	@Override
 	public void windowIconified(WindowEvent arg0) {
 	}
 	
 	/**
 	 * @see java.awt.event.WindowListener#windowOpened(WindowEvent)
 	 */
+	@Override
 	public void windowOpened(WindowEvent arg0) {
 	}
 	
@@ -343,9 +354,9 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 	 * @return DOCUMENT ME!
 	 */
 	private JPanel createValueEditContainer(Parameter[] parameters,
-						Selection selection, String title, String heading, JComponent descComponent) {
+			Selection selection, String title, String heading, JComponent descComponent) {
 		this.paramEditPanel = new ParameterEditPanel(parameters,
-							editComponentManager != null ? editComponentManager.getEditComponents() : null, selection, title, true, heading, descComponent);
+				editComponentManager != null ? editComponentManager.getEditComponents() : null, selection, title, true, heading, descComponent);
 		
 		return this.paramEditPanel;
 	}
@@ -356,8 +367,8 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 	private void defineLayout(boolean okOnly, boolean noButton, boolean allowMultipleGraphTargets) {
 		double border = 8d;
 		double[][] size = {
-							new double[] { border, TableLayoutConstants.FILL, border },
-							new double[] { border, TableLayoutConstants.FILL, border, TableLayoutConstants.PREFERRED, noButton ? 0 : border },
+				new double[] { border, TableLayoutConstants.FILL, border },
+				new double[] { border, TableLayoutConstants.FILL, border, TableLayoutConstants.PREFERRED, noButton ? 0 : border },
 		};
 		getContentPane().setLayout(new TableLayout(size));
 		
@@ -402,15 +413,15 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 		}
 		if (!noButton)
 			getContentPane().add(
-								TableLayout.get3Split(
-													sessionselpan,
-													TableLayout.getSplitVertical(null,
-															TableLayout.get3Split(ok, null, okOnly ? null : cancel, TableLayoutConstants.PREFERRED, border,
-																	TableLayoutConstants.PREFERRED),
-															TableLayout.FILL, TableLayoutConstants.PREFERRED), null,
-													TableLayout.FILL, TableLayoutConstants.PREFERRED, TableLayout.FILL, border, 0),
-									"1,3"
-								);
+					TableLayout.get3Split(
+							sessionselpan,
+							TableLayout.getSplitVertical(null,
+									TableLayout.get3Split(ok, null, okOnly ? null : cancel, TableLayoutConstants.PREFERRED, border,
+											TableLayoutConstants.PREFERRED),
+									TableLayout.FILL, TableLayoutConstants.PREFERRED), null,
+							TableLayout.FILL, TableLayoutConstants.PREFERRED, TableLayout.FILL, border, 0),
+					"1,3"
+					);
 		getContentPane().validate();
 	}
 	
@@ -428,15 +439,18 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 			res.setOpaque(false);
 			res.setToolTipText(getActiveWorkingSetDescriptionDetails());
 			MouseListener m = new MouseListener() {
+				@Override
 				public void mouseReleased(MouseEvent e) {
 				}
 				
+				@Override
 				public void mousePressed(MouseEvent e) {
 				}
 				
 				Color oldColor;
 				boolean oldOpaque;
 				
+				@Override
 				public void mouseExited(MouseEvent e) {
 					res.setOpaque(oldOpaque);
 					res.setBackground(oldColor);
@@ -444,6 +458,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 					res.setText(pre + getActiveWorkingSetDescription());
 				}
 				
+				@Override
 				public void mouseEntered(MouseEvent e) {
 					oldOpaque = res.isOpaque();
 					res.setOpaque(true);
@@ -452,6 +467,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 					res.setText(pre + hint);
 				}
 				
+				@Override
 				public void mouseClicked(MouseEvent e) {
 					if (validSessions.size() <= 1) {
 						validSessions.clear();
@@ -475,7 +491,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 		boolean isActiveGraph = false;
 		try {
 			if (validSessions.size() == 1 &&
-								MainFrame.getInstance().getActiveSession() == validSessions.iterator().next())
+					MainFrame.getInstance().getActiveSession() == validSessions.iterator().next())
 				isActiveGraph = true;
 		} catch (Exception e) {
 			// empty
@@ -536,7 +552,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 	 */
 	@SuppressWarnings("unchecked")
 	public static Object[] getInput(Object description, String title,
-						Object... parameters) {
+			Object... parameters) {
 		
 		title = StringManipulationTools.removeHTMLtags(title);
 		
@@ -551,7 +567,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 			Object desc = parameters[i * 2];
 			String nameTitle, nameTooltip;
 			String nameDesc = (String) desc;
-			if (nameDesc!=null && nameDesc.indexOf("@@") > 0) {
+			if (nameDesc != null && nameDesc.indexOf("@@") > 0) {
 				nameTitle = nameDesc.substring(0, nameDesc.indexOf("@@"));
 				nameTooltip = nameDesc.substring(nameDesc.indexOf("@@") + "@@".length());
 			} else {
@@ -638,12 +654,12 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 		}
 		if (description != null && description instanceof String) {
 			if (((String) description).indexOf("<") >= 0
-								&& ((String) description).indexOf(">") >= 0
-								&& !((String) description).toUpperCase().startsWith("<HTML>"))
+					&& ((String) description).indexOf(">") >= 0
+					&& !((String) description).toUpperCase().startsWith("<HTML>"))
 				description = "<html>" + (String) description;
 		}
 		
-		boolean vis = MainFrame.getInstance().isVisible();
+		boolean vis = MainFrame.getInstance() != null && MainFrame.getInstance().isVisible();
 		Component ref;
 		if (!vis)
 			ref = ReleaseInfo.getApplet();
@@ -651,14 +667,14 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 			ref = MainFrame.getInstance();
 		
 		DefaultParameterDialog paramDialog = new DefaultParameterDialog(
-							MainFrame.getInstance() != null ? MainFrame.getInstance().getEditComponentManager() : null,
-							ref,
-							p,
-							(MainFrame.getInstance() != null && MainFrame.getInstance().getActiveEditorSession() != null ?
-												MainFrame.getInstance().getActiveEditorSession().
-																	getSelectionModel().getActiveSelection() : null
-							),
-							title, description, null, showOnlyOneButton, noButton, false, buttonDesc, modal);
+				MainFrame.getInstance() != null ? MainFrame.getInstance().getEditComponentManager() : null,
+				ref,
+				p,
+				(MainFrame.getInstance() != null && MainFrame.getInstance().getActiveEditorSession() != null ?
+						MainFrame.getInstance().getActiveEditorSession().
+								getSelectionModel().getActiveSelection() : null
+				),
+				title, description, null, showOnlyOneButton, noButton, false, buttonDesc, modal);
 		if (paramDialog.isOkSelected()) {
 			Parameter[] pe = paramDialog.getEditedParameters();
 			Object[] result = new Object[pe.length];
@@ -682,6 +698,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 			return false;
 	}
 	
+	@Override
 	public Collection<Session> getTargetSessions() {
 		return validSessions;
 	}

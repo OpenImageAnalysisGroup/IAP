@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: ParameterEditPanel.java,v 1.2 2011-02-04 15:41:29 klukas Exp $
+// $Id: ParameterEditPanel.java,v 1.3 2012-01-17 15:47:01 klukas Exp $
 
 package org.graffiti.editor.dialog;
 
@@ -32,10 +32,12 @@ import javax.swing.SwingConstants;
 import org.AttributeHelper;
 import org.ErrorMsg;
 import org.FolderPanel;
+import org.graffiti.plugin.Displayable;
 import org.graffiti.plugin.ToolTipHelper;
 import org.graffiti.plugin.editcomponent.StandardValueEditComponent;
 import org.graffiti.plugin.editcomponent.ValueEditComponent;
 import org.graffiti.plugin.parameter.AbstractSingleParameter;
+import org.graffiti.plugin.parameter.BooleanParameter;
 import org.graffiti.plugin.parameter.Parameter;
 import org.graffiti.plugin.parameter.SelectionParameter;
 import org.graffiti.selection.Selection;
@@ -45,7 +47,7 @@ import org.graffiti.util.InstanceLoader;
 /**
  * Represents a parameter edit panel.
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ParameterEditPanel extends JPanel {
 	// ~ Instance fields ========================================================
@@ -76,12 +78,12 @@ public class ParameterEditPanel extends JPanel {
 	 */
 	
 	public ParameterEditPanel(Parameter[] parameters, Map<?, ?> editTypes,
-						Selection selection, String title, boolean fillSurroundingStyle, String heading) {
+			Selection selection, String title, boolean fillSurroundingStyle, String heading) {
 		this(parameters, editTypes, selection, title, fillSurroundingStyle, heading, null);
 	}
 	
 	public ParameterEditPanel(Parameter[] parameters, Map<?, ?> editTypes,
-						Selection selection, String title, boolean fillSurroundingStyle, String heading, JComponent descComponent) {
+			Selection selection, String title, boolean fillSurroundingStyle, String heading, JComponent descComponent) {
 		super();
 		
 		this.parameters = parameters;
@@ -112,8 +114,8 @@ public class ParameterEditPanel extends JPanel {
 		// }
 		
 		double[][] size = new double[][] {
-							{ TableLayoutConstants.FILL },
-							{ TableLayoutConstants.FILL }
+				{ TableLayoutConstants.FILL },
+				{ TableLayoutConstants.FILL }
 		};
 		
 		setLayout(new TableLayout(size));
@@ -204,15 +206,25 @@ public class ParameterEditPanel extends JPanel {
 	 * @return DOCUMENT ME!
 	 */
 	private ValueEditComponent getStandardEditComponent(Parameter parameter) {
-		ValueEditComponent vec = new StandardValueEditComponent(parameter);
+		ValueEditComponent vec = null;
 		
-		// JTextField textField = new JTextField(parameter.getValue().toString());
-		JTextField textField = (JTextField) vec.getComponent();
-		textField.setEditable(false);
-		textField.setMinimumSize(new Dimension(0, 20));
-		textField.setPreferredSize(new Dimension(100, 30));
-		textField.setMaximumSize(new Dimension(2000, 40));
-		
+		if (parameter != null && parameter instanceof BooleanParameter) {
+			try {
+				Class<?> vecClass = Class.forName("org.graffiti.plugins.editcomponents.defaults.BooleanEditComponent");
+				vec = (ValueEditComponent) vecClass.getDeclaredConstructor(Displayable.class).newInstance(parameter);
+			} catch (Exception e) {
+				throw new UnsupportedOperationException(e);
+			}
+		} else {
+			vec = new StandardValueEditComponent(parameter);
+			
+			// JTextField textField = new JTextField(parameter.getValue().toString());
+			JTextField textField = (JTextField) vec.getComponent();
+			textField.setEditable(false);
+			textField.setMinimumSize(new Dimension(0, 20));
+			textField.setPreferredSize(new Dimension(100, 30));
+			textField.setMaximumSize(new Dimension(2000, 40));
+		}
 		return vec;
 	}
 	
@@ -241,16 +253,16 @@ public class ParameterEditPanel extends JPanel {
 		
 		try {
 			editComp = (ValueEditComponent) InstanceLoader.createInstance(ecClass,
-								"org.graffiti.plugin.Displayable", parameter);
+					"org.graffiti.plugin.Displayable", parameter);
 			if (multiLine)
 				editComp.setParameter("multiline", true);
 			ToolTipHelper.addToolTip(editComp.getComponent(), parameter
-								.getDescription());
+					.getDescription());
 		} catch (InstanceCreationException ice) {
 			ErrorMsg.addErrorMessage(ice);
 			throw new RuntimeException(
-								"Could not create an instance of a ValueEditComponent class. "
-													+ ice);
+					"Could not create an instance of a ValueEditComponent class. "
+							+ ice);
 		}
 		
 		editComp.setDisplayable(parameter);
@@ -258,7 +270,7 @@ public class ParameterEditPanel extends JPanel {
 		JComponent editCompComp = editComp.getComponent();
 		// idPanel.add(textField);
 		if (parameter != null && (
-							(parameter instanceof AbstractSingleParameter && ((AbstractSingleParameter) parameter).isLeftAligned()))) {
+				(parameter instanceof AbstractSingleParameter && ((AbstractSingleParameter) parameter).isLeftAligned()))) {
 			myPanel.addGuiComponentRow(editCompComp, null, false);
 			editCompComp.setToolTipText(parameter.getDescription());
 		} else
@@ -288,13 +300,13 @@ public class ParameterEditPanel extends JPanel {
 	}
 	
 	private void addValueEditComponents(FolderPanel myPanel,
-						Selection selection) {
+			Selection selection) {
 		if (parameters != null)
 			for (int i = 0; i < parameters.length; i++) {
 				if (parameters[i] instanceof SelectionParameter) {
 					// use currently active (given) selection instead
 					parameters[i] = new SelectionParameter(parameters[i].getName(),
-										parameters[i].getDescription());
+							parameters[i].getDescription());
 					parameters[i].setValue(selection);
 				}
 				

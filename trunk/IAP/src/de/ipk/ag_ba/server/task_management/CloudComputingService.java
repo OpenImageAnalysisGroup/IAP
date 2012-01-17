@@ -32,6 +32,7 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -145,8 +146,10 @@ public class CloudComputingService {
 							} catch (Exception e) {
 								if ((args[0] + "").toLowerCase().equalsIgnoreCase("clear")) {
 									try {
-										MongoDB.getDefaultCloud().batchClearJobs();
-										System.out.println(":clear - cleared scheduled jobs in database " + MongoDB.getDefaultCloud().getDatabaseName());
+										for (MongoDB m : MongoDB.getMongos()) {
+											m.batchClearJobs();
+											System.out.println(":clear - cleared scheduled jobs in database " + m.getDatabaseName());
+										}
 										return;
 									} catch (Exception e1) {
 										e1.printStackTrace();
@@ -204,7 +207,12 @@ public class CloudComputingService {
 														// ignore, has been processed at the start of this method
 													} else {
 														if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
-															merge();
+															for (MongoDB m : MongoDB.getMongos()) {
+																System.out.println(":merge - about to merge temporary data sets in database " + m.getDatabaseName());
+																merge(m);
+																System.out.println(":merge - ^^^ merged temporary data sets in database " + m.getDatabaseName());
+															}
+															
 															return;
 														} else {
 															System.out.println(": Valid command line parameters:");
@@ -267,11 +275,10 @@ public class CloudComputingService {
 		cloudTaskManager.setClusterExecutionModeSingleTaskAndExit(autoClose);
 	}
 	
-	private static void merge() {
+	private static void merge(MongoDB m) {
 		try {
 			DataMappingTypeManager3D.replaceVantedMappingTypeManager();
 			
-			final MongoDB m = MongoDB.getDefaultCloud();
 			ArrayList<ExperimentHeaderInterface> el = m.getExperimentList(null);
 			HashSet<TempDataSetDescription> availableTempDatasets = new HashSet<TempDataSetDescription>();
 			HashSet<String> processedSubmissionTimes = new HashSet<String>();
@@ -314,30 +321,46 @@ public class CloudComputingService {
 				System.out.println(SystemAnalysis.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
 				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
 						+ knownResults.size());
+				
+				boolean addNewTasksIfMissing = false;
+				
+				Object[] res = MyInputHelper.getInput("<html>Process incomplete data sets? " +
+						"<br>TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
+						+ knownResults.size(), "Add compute tasks?", new Object[] {
+						"Add compute tasks for missing data?", addNewTasksIfMissing
+				});
+				if (res == null) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
+					System.exit(1);
+				} else
+					addNewTasksIfMissing = (Boolean) res[0];
+				
 				if (knownResults.size() + 1 < tempDataSetDescription.getPartCntI()) {
-					// not everything has been computed (internal error)
-					TreeSet<Integer> jobIDs = new TreeSet<Integer>();
-					{
-						int idx = 0;
-						while (idx < tempDataSetDescription.getPartCntI()) {
-							if (!added.contains(idx + "")) {
-								System.out.println("Missing: " + idx);
-								jobIDs.add(idx++);
-							} else
-								idx++;
+					if (addNewTasksIfMissing) {
+						// not everything has been computed (internal error)
+						TreeSet<Integer> jobIDs = new TreeSet<Integer>();
+						{
+							int idx = 0;
+							while (idx < tempDataSetDescription.getPartCntI()) {
+								if (!added.contains(idx + "")) {
+									System.out.println("Missing: " + idx);
+									jobIDs.add(idx++);
+								} else
+									idx++;
+							}
 						}
-					}
-					for (int jobID : jobIDs) {
-						BatchCmd cmd = new BatchCmd();
-						cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
-						cmd.setSubmissionTime(tempDataSetDescription.getSubmissionTimeL());
-						cmd.setTargetIPs(new HashSet<String>());
-						cmd.setSubTaskInfo(jobID, tempDataSetDescription.getPartCntI());
-						cmd.setRemoteCapableAnalysisActionClassName(tempDataSetDescription.getRemoteCapableAnalysisActionClassName());
-						cmd.setRemoteCapableAnalysisActionParams("");
-						cmd.setExperimentMongoID(tempDataSetDescription.getOriginDBid());
-						BatchCmd.enqueueBatchCmd(MongoDB.getDefaultCloud(), cmd);
-						System.out.println("Enqueue: " + jobID);
+						for (int jobID : jobIDs) {
+							BatchCmd cmd = new BatchCmd();
+							cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
+							cmd.setSubmissionTime(tempDataSetDescription.getSubmissionTimeL());
+							cmd.setTargetIPs(new HashSet<String>());
+							cmd.setSubTaskInfo(jobID, tempDataSetDescription.getPartCntI());
+							cmd.setRemoteCapableAnalysisActionClassName(tempDataSetDescription.getRemoteCapableAnalysisActionClassName());
+							cmd.setRemoteCapableAnalysisActionParams("");
+							cmd.setExperimentMongoID(tempDataSetDescription.getOriginDBid());
+							BatchCmd.enqueueBatchCmd(m, cmd);
+							System.out.println("Enqueue: " + jobID);
+						}
 					}
 				} else
 					if (knownResults.size() + 1 >= tempDataSetDescription.getPartCntI()) {
@@ -412,7 +435,7 @@ public class CloudComputingService {
 						e.getHeader().setImportusergroup("Analysis Results");
 						e.getHeader().setRemark(
 								e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " +
-										SystemAnalysis.getCurrentTime()+" // manual merge");
+										SystemAnalysis.getCurrentTime() + " // manual merge");
 						System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 						System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
 						System.out.println("*****************************");

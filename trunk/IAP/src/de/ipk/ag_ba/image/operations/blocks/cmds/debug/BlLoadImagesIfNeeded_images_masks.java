@@ -16,14 +16,14 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 
 public class BlLoadImagesIfNeeded_images_masks extends
 		AbstractSnapshotAnalysisBlockFIS {
-
+	
 	public enum BlockInfoProperty {
 		CONSOLE_OUTPUT, HEIGHT, WIDTH, CONSOLE_OUTPUT_VIS, CONSOLE_OUTPUT_FLUO, CONSOLE_OUTPUT_NIR
 	}
-
+	
 	HashMap<BlockInfoProperty, Boolean> infoMap = new HashMap<BlockInfoProperty, Boolean>() {
 		private static final long serialVersionUID = 1L;
-
+		
 		{
 			put(BlockInfoProperty.CONSOLE_OUTPUT, false);
 			put(BlockInfoProperty.CONSOLE_OUTPUT_VIS, false);
@@ -33,12 +33,12 @@ public class BlLoadImagesIfNeeded_images_masks extends
 			put(BlockInfoProperty.WIDTH, true);
 		}
 	};
-
+	
 	@Override
 	protected boolean isChangingImages() {
 		return false;
 	}
-
+	
 	@Override
 	protected void prepare() {
 		if (getInput() != null) {
@@ -49,7 +49,7 @@ public class BlLoadImagesIfNeeded_images_masks extends
 			if (getInput().getMasks() != null)
 				getInput()
 						.setMasks(new FlexibleImageSet(getInput().getMasks()));
-
+			
 			if (getInput().getImages().getVis() == null
 					&& getInput().getImages().getVisInfo() != null) {
 				IOurl url = getInput().getImages().getVisInfo().getURL();
@@ -84,7 +84,7 @@ public class BlLoadImagesIfNeeded_images_masks extends
 					}
 				}
 			}
-
+			
 			if (getInput().getImages().getFluo() == null
 					&& getInput().getImages().getFluoInfo() != null) {
 				IOurl url = getInput().getImages().getFluoInfo().getURL();
@@ -119,7 +119,7 @@ public class BlLoadImagesIfNeeded_images_masks extends
 					}
 				}
 			}
-
+			
 			if (getInput().getImages().getNir() == null
 					&& getInput().getImages().getNirInfo() != null) {
 				IOurl url = getInput().getImages().getNirInfo().getURL();
@@ -154,23 +154,23 @@ public class BlLoadImagesIfNeeded_images_masks extends
 					}
 				}
 			}
-
+			
 			// }
 		}
-
+		
 		checkForStrangeTVtestImageAndReplaceWithNull();
-
+		
 		printInfo(getInput().getMasks().getVis(), BlockPrintInfosTyp.VisMask);
 		printInfo(getInput().getImages().getVis(), BlockPrintInfosTyp.VisImage);
-
+		
 		printInfo(getInput().getMasks().getFluo(), BlockPrintInfosTyp.FluoMask);
 		printInfo(getInput().getImages().getFluo(),
 				BlockPrintInfosTyp.FluoImage);
-
+		
 		printInfo(getInput().getMasks().getNir(), BlockPrintInfosTyp.NirMask);
 		printInfo(getInput().getImages().getNir(), BlockPrintInfosTyp.NirImage);
 	}
-
+	
 	private void checkForStrangeTVtestImageAndReplaceWithNull() {
 		if (getInput().getImages().getVis() != null) {
 			// check for TV test image
@@ -233,7 +233,7 @@ public class BlLoadImagesIfNeeded_images_masks extends
 			}
 		}
 	}
-
+	
 	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp type) {
 		if (workImage == null) {
 			if (infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT)) {
@@ -242,66 +242,66 @@ public class BlLoadImagesIfNeeded_images_masks extends
 			return;
 		}
 		switch (type) {
-		case FluoImage:
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.HEIGHT_FLUO_IMAGE, workImage.getHeight());
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.WIDTH_FLUO_IMAGE, workImage.getWidth());
-			break;
-		case FluoMask:
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.HEIGHT_FLUO_MASK, workImage.getHeight());
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.WIDTH_FLUO_MASK, workImage.getWidth());
-			break;
-		case NirImage:
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.HEIGHT_NIR_IMAGE, workImage.getHeight());
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.WIDTH_NIR_IMAGE, workImage.getWidth());
-			break;
-		case NirMask:
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.HEIGHT_NIR_MASK, workImage.getHeight());
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.WIDTH_NIR_MASK, workImage.getWidth());
-			break;
-		case VisImage:
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.HEIGHT_VIS_IMAGE, workImage.getHeight());
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.WIDTH_VIS_IMAGE, workImage.getWidth());
-			break;
-		case VisMask:
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.HEIGHT_VIS_MASK, workImage.getHeight());
-			getProperties().setNumericProperty(getBlockPosition(),
-					PropertyNames.WIDTH_VIS_MASK, workImage.getWidth());
-			break;
-
+			case FluoImage:
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.HEIGHT_FLUO_IMAGE, workImage.getHeight());
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.WIDTH_FLUO_IMAGE, workImage.getWidth());
+				break;
+			case FluoMask:
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.HEIGHT_FLUO_MASK, workImage.getHeight());
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.WIDTH_FLUO_MASK, workImage.getWidth());
+				break;
+			case NirImage:
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.HEIGHT_NIR_IMAGE, workImage.getHeight());
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.WIDTH_NIR_IMAGE, workImage.getWidth());
+				break;
+			case NirMask:
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.HEIGHT_NIR_MASK, workImage.getHeight());
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.WIDTH_NIR_MASK, workImage.getWidth());
+				break;
+			case VisImage:
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.HEIGHT_VIS_IMAGE, workImage.getHeight());
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.WIDTH_VIS_IMAGE, workImage.getWidth());
+				break;
+			case VisMask:
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.HEIGHT_VIS_MASK, workImage.getHeight());
+				getProperties().setNumericProperty(getBlockPosition(),
+						PropertyNames.WIDTH_VIS_MASK, workImage.getWidth());
+				break;
+		
 		}
-
+		
 		if (infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT)) {
-
+			
 			if (type.name().contains("Vis")
 					&& infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT_VIS)
 					|| type.name().contains("Fluo")
 					&& infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT_FLUO)
 					|| type.name().contains("Nir")
 					&& infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT_NIR)) {
-
+				
 				System.out.println(type + " - Infos: ##### Start #####");
-
+				
 				if (infoMap.get(BlockInfoProperty.HEIGHT))
 					System.out.println("height: " + workImage.getHeight());
 				if (infoMap.get(BlockInfoProperty.WIDTH))
 					System.out.println("width: " + workImage.getWidth());
-
+				
 				System.out.println(type + " - Infos: **** End ****");
 			}
 		}
 	}
-
+	
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages,
 			FlexibleImageSet processedMasks) {
@@ -313,7 +313,7 @@ public class BlLoadImagesIfNeeded_images_masks extends
 					&& processedImages.getVis().getHeight() > processedImages
 							.getFluo().getHeight())
 				options.setHighResMaize(true);
-
+		
 		if (processedImages.getVis() != null
 				&& processedMasks.getVis() != null
 				&& processedImages.getVis().getWidth() != processedMasks
@@ -321,7 +321,7 @@ public class BlLoadImagesIfNeeded_images_masks extends
 			System.out
 					.println(SystemAnalysis.getCurrentTime()
 							+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (VIS)");
-			processedImages.setVis(null);
+			// processedImages.setVis(null);
 			processedMasks.setVis(null);
 		}
 		if (processedImages.getFluo() != null
@@ -331,7 +331,7 @@ public class BlLoadImagesIfNeeded_images_masks extends
 			System.out
 					.println(SystemAnalysis.getCurrentTime()
 							+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (FLUO)");
-			processedImages.setFluo(null);
+			// processedImages.setFluo(null);
 			processedMasks.setFluo(null);
 		}
 		if (processedImages.getNir() != null
@@ -341,9 +341,9 @@ public class BlLoadImagesIfNeeded_images_masks extends
 			System.out
 					.println(SystemAnalysis.getCurrentTime()
 							+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (NIR)");
-			processedImages.setNir(null);
+			// processedImages.setNir(null);
 			processedMasks.setNir(null);
 		}
-
+		
 	}
 }
