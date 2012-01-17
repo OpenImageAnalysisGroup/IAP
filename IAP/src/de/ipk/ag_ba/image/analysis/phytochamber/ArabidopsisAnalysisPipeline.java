@@ -152,9 +152,13 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 120); // 20
 		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 120); // 20
 		
-		options.clearAndAddDoubleSetting(
-				Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 40);
-		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 40);
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
+			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 30);
+			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 30);
+		} else {
+			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 40);
+			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 120);
+		}
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
 		options.addBooleanSetting(Setting.DRAW_SKELETON, true);
 	}

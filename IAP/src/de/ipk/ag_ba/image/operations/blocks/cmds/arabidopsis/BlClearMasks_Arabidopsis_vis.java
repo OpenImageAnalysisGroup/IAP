@@ -22,6 +22,15 @@ public class BlClearMasks_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	@Override
+	protected FlexibleImage processNIRimage() {
+		FlexibleImage img = getInput().getImages().getNir();
+		if (img != null) {
+			return img.copy().getIO().translate(-3, 0).getImage();
+		} else
+			return null;
+	}
+	
+	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage img = getInput().getImages().getVis();
 		if (img != null) {
