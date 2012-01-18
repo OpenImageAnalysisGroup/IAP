@@ -1652,7 +1652,7 @@ public class MongoDB {
 					// System.out.println("---");
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
-					for (DBObject dbo : collection.find()) {
+					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
 						BatchCmd batch = (BatchCmd) dbo;
 						res.add(batch);
 					}
@@ -1685,7 +1685,7 @@ public class MongoDB {
 						collection.setObjectClass(BatchCmd.class);
 						boolean added = false;
 						int addCnt = 0;
-						for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.SCHEDULED))) {
+						for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.SCHEDULED)).sort(new BasicDBObject("submission", 1)).limit(maxTasks)) {
 							BatchCmd batch = (BatchCmd) dbo;
 							if (batch.getCpuTargetUtilization() < maxTasks) {
 								if (batch.getExperimentHeader() == null)
@@ -1703,7 +1703,7 @@ public class MongoDB {
 						}
 						int claimed = 0;
 						if (addCnt < maxTasks)
-							for (DBObject dbo : collection.find()) {
+							for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (batch.getExperimentHeader() == null)
 									continue;
@@ -1717,7 +1717,7 @@ public class MongoDB {
 									}
 							}
 						if (addCnt < maxTasks)
-							for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.STARTING))) {
+							for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.STARTING)).sort(new BasicDBObject("submission", 1))) {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (batch.getExperimentHeader() == null)
 									continue;
