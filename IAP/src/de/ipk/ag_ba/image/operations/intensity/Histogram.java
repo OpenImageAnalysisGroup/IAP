@@ -1,6 +1,10 @@
 package de.ipk.ag_ba.image.operations.intensity;
 
 public class Histogram {
+	public static enum Mode {
+		MODE_GRAY, MODE_MULTI_LEVEL_RGB, MODE_HUE
+	}
+	
 	private final double[] freq; // freq[i] = # occurences of value i
 	private double max; // max frequency of any value
 	private final int n;

@@ -10,6 +10,8 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
+import de.ipk.ag_ba.image.operations.intensity.Histogram;
+import de.ipk.ag_ba.image.operations.intensity.Histogram.Mode;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
@@ -65,6 +67,10 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			double averageVisG = visibleIntensitySumG / visibleFilledPixels;
 			double averageVisB = visibleIntensitySumB / visibleFilledPixels;
 			
+			ResultsTable rt1 = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
+					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE);
+			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".vis.", rt1, getBlockPosition());
+			
 			ResultsTable rt = new ResultsTable();
 			rt.incrementCounter();
 			rt.addValue("ndvi.vis.red.intensity.average", averageVisR);
@@ -91,7 +97,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		if (getInput().getMasks().getFluo() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
 			ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
-					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), true); // markerDistanceHorizontally
+					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_MULTI_LEVEL_RGB); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return io.getImage();
@@ -143,7 +149,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 				} else
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0d);
 				ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
-						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), false); // markerDistanceHorizontally
+						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_GRAY); // markerDistanceHorizontally
 				
 				if (options == null)
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
