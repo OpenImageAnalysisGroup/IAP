@@ -59,7 +59,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlColorBalancing_vis.class);
 		p.add(BlockColorBalancing_vertical_nir.class);
 		p.add(BlColorBalancingRoundCamera_vis_nir.class);
-		// p.add(BlockColorBalancing_vertical_nir.class);
+		p.add(BlockColorBalancing_vertical_nir.class);
 		p.add(BlFindBlueMarkers_vis.class);
 		p.add(BlBalancing_fluo.class);
 		p.add(BlClearBackgroundByRefComparison_vis_fluo_nir.class);
