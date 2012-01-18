@@ -30,6 +30,8 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	private int visibleFilledPixels, nirFilledPixels, nirSkeletonFilledPixels;
 	BlockProperty markerDistanceHorizontally = null;
 	
+	FlexibleImage nirSkel = null;
+	
 	@Override
 	protected void prepare() {
 		super.prepare();
@@ -39,7 +41,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		if (getInput().getMasks().getNir() != null)
 			this.nirFilledPixels = getInput().getMasks().getNir().getIO().countFilledPixels();
 		
-		FlexibleImage nirSkel = getProperties().getImage("nir_skeleton");
+		nirSkel = getProperties().getImage("nir_skeleton");
 		if (nirSkel != null)
 			this.nirSkeletonFilledPixels = nirSkel.getIO().countFilledPixels();
 		
@@ -99,7 +101,6 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		FlexibleImage nirSkel = getProperties().getImage("nir_skeleton");
 		if (nirSkel != null) {
 			double nirSkeletonIntensitySum = nirSkel.getIO().intensitySumOfChannel(false, true, false, false);
 			double avgNirSkel = 1 - nirSkeletonIntensitySum / nirSkeletonFilledPixels;
@@ -138,14 +139,14 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight_drought_loss",
 						filled - weightOfPlant);
 				if (filled > 0) {
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.av", fSum / filled);
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", fSum / filled);
 				} else
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.av", 0d);
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0d);
 				ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), false); // markerDistanceHorizontally
 				
 				if (options == null)
-					System.out.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
+					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
 				if (rt != null)
 					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.", rt, getBlockPosition());
 			}

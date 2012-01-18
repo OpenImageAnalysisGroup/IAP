@@ -50,6 +50,8 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
 		modifySettings(options);
 		
+		boolean skelet = false;
+		
 		BlockPipeline p = new BlockPipeline();
 		p.add(BlLoadImagesIfNeeded_images_masks.class);
 		p.add(BlBalancing_fluo.class);
@@ -57,7 +59,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlColorBalancing_vis.class);
 		p.add(BlockColorBalancing_vertical_nir.class);
 		p.add(BlColorBalancingRoundCamera_vis_nir.class);
-		p.add(BlockColorBalancing_vertical_nir.class);
+		// p.add(BlockColorBalancing_vertical_nir.class);
 		p.add(BlFindBlueMarkers_vis.class);
 		p.add(BlBalancing_fluo.class);
 		p.add(BlClearBackgroundByRefComparison_vis_fluo_nir.class);
@@ -75,7 +77,8 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlNirFilterSide_nir.class);
 		p.add(BlCopyImagesApplyMask_vis_fluo.class);
 		
-		p.add(BlockSkeletonize_vis_or_fluo.class);
+		if (skelet)
+			p.add(BlockSkeletonize_vis_or_fluo.class);
 		
 		// calculation of numeric values
 		p.add(OK_NOV11_BlockCalcMainAxis_vis.class);
@@ -84,8 +87,8 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlConvexHull_vis_fluo.class);
 		// postprocessing
 		p.add(BlockRunPostProcessors.class);
-		
-		p.add(BlockDrawSkeleton_vis_fluo.class);
+		if (skelet)
+			p.add(BlockDrawSkeleton_vis_fluo.class);
 		
 		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
 		p.add(BlCrop_images_vis_fluo_nir.class);

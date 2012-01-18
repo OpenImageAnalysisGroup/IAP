@@ -179,9 +179,16 @@ public class BlockPipeline {
 		return input;
 	}
 	
+	private static long lastBlockUpdate = 0;
+	
+	public static long getLastBlockUpdateTime() {
+		return lastBlockUpdate;
+	}
+	
 	private void updateBlockStatistics(int nBlocks) {
 		Calendar calendar = new GregorianCalendar();
 		int minute = calendar.get(Calendar.MINUTE);
+		lastBlockUpdate = System.currentTimeMillis();
 		synchronized (BlockPipeline.class) {
 			blockExecutionsWithinCurrentMinute += nBlocks;
 			if (currentMinuteB != minute) {

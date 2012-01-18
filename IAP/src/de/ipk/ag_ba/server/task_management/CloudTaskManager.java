@@ -90,12 +90,26 @@ public class CloudTaskManager {
 					
 					status3provider.setCurrentStatusValueFine(progressSum);
 					
+					ArrayList<String> names = new ArrayList<String>();
+					ArrayList<String> progress = new ArrayList<String>();
+					try {
+						for (TaskDescription td : runningTasks) {
+							String name = td.getBatchCmd().getExperimentHeader().getExperimentName();
+							names.add(name);
+							progress.add(td.getBatchCmd().getCurrentStatusMessage3());
+						}
+					} catch (Exception e) {
+						// empty
+					}
+					
 					m.batchPingHost(hostName,
 							BlockPipeline.getBlockExecutionsWithinLastMinute(),
 							BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
 							progressSum,
-							status3provider.getCurrentStatusMessage3());
+							"Processing " + StringManipulationTools.getStringList(names, ", ") + "<br>" +
+									"Progress " + StringManipulationTools.getStringList(progress, ", ") + "<br>" +
+									status3provider.getCurrentStatusMessage3());
 					
 					int maxTasks = 1;
 					if (maxTasks < 1)
@@ -139,8 +153,8 @@ public class CloudTaskManager {
 						}
 					}
 					if (!commands_to_start.isEmpty())
-						System.out.println(SystemAnalysis.getCurrentTime() + ">TO BE STARTED: " + commands_to_start.size()+
-								" ("+StringManipulationTools.getStringList(commands_to_start, ", ")+")");
+						System.out.println(SystemAnalysis.getCurrentTime() + ">TO BE STARTED: " + commands_to_start.size() +
+								" (" + StringManipulationTools.getStringList(commands_to_start, ", ") + ")");
 					
 					int nn = 0;
 					progressSum = 0;
@@ -198,8 +212,8 @@ public class CloudTaskManager {
 					System.out.println(SystemAnalysis.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysis.getCurrentTime());
 				}
 				Thread.sleep(1000);
-				if (autoClose && System.currentTimeMillis() - startTime > 1000 * 60 * 30) {
-					if (runningTasks.isEmpty()) {
+				if (autoClose && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
+					if (runningTasks.isEmpty() && System.currentTimeMillis() - BlockPipeline.getLastBlockUpdateTime() > 1 * 60 * 1000) {
 						System.out.println(SystemAnalysis.getCurrentTime() + "> Cluster Execution Mode is active // NO RUNNING TASK");
 						System.out.println(SystemAnalysis.getCurrentTime() + "> SYSTEM.EXIT");
 						System.exit(0);

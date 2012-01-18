@@ -140,6 +140,48 @@ public class ImageOperation {
 				.getHeight());
 	}
 	
+	public ImageOperation replaceColorsScanLine(int search, int replace) {
+		int[][] source2d = getImageAs2array();
+		int[][] target = getImageAs2array();
+		
+		int w = getWidth(), h = getHeight();
+		for (int y = 0; y < h; y++) {
+			
+			for (int x = 0; x < w; x++) {
+				int v = source2d[x][y];
+				if (v != BACKGROUND_COLORint) {
+					replace = v;
+					break;
+				}
+			}
+			for (int x = 0; x < w; x++) {
+				int v = source2d[x][y];
+				if (v != search)
+					target[x][y] = v;
+				else
+					target[x][y] = replace;
+			}
+		}
+		return new ImageOperation(target);
+	}
+	
+	public ImageOperation replaceColors(int search, FlexibleImage replace) {
+		int[] source = getImageAs1array();
+		int[] target = new int[source.length];
+		
+		int[] replaceColors = replace.getAs1A();
+		
+		int idx = 0;
+		for (int v : source) {
+			if (v != search)
+				target[idx++] = v;
+			else
+				target[idx] = replaceColors[idx++];
+		}
+		return new ImageOperation(target, getImage().getWidth(), getImage()
+				.getHeight());
+	}
+	
 	/**
 	 * Rotates the image content. New clear regions are recolored to the
 	 * background color.
@@ -3281,7 +3323,7 @@ public class ImageOperation {
 		int maxDistToCenter = (int) Math.sqrt(cx * cx + cy * cy);
 		int distToCenter, pix;
 		double fac;
-		int steps = whiteLevel_180d < 200 ? 150 : 50;
+		int steps = whiteLevel_180d < 200 ? 180 : 50;
 		
 		double[] calibrationCurveFromTopLeftToCenter = new double[steps];
 		double[] indexArray = new double[steps];

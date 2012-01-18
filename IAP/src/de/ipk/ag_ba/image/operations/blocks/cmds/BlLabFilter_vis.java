@@ -118,8 +118,8 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 				double hhhh = options.isBarleyInBarleySystem() ? 1d : 0.9d;
 				toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or_and_not(
 						new int[] { 110 }, new int[] { 255 },
-						new int[] { 127 - 5 }, new int[] { 127 + 5 },
-						new int[] { 70 - 5 }, new int[] { 90 + 5 },
+						new int[] { 107 - 5 }, new int[] { 127 + 5 },
+						new int[] { 70 - 5 }, new int[] { 118 },
 						options.getBackground(), Integer.MAX_VALUE, false,
 						new int[] {}, new int[] {},
 						new int[] {}, new int[] {},
