@@ -52,86 +52,93 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 				// result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
 				if (fis != null)
 					fis.addImage("step 1", result.copy());
-				
-				// filter white pot
-				int an = 150, bn = 170;
-				int offB = 20, offB2 = 20;
-				int lowerLimit = options.isBarleyInBarleySystem() ? 0 : 0;
-				if (!options.isBarleyInBarleySystem()) {
-					an = 12;
-					bn = 7;
-					offB = 15;
-					offB2 = 5;
+				if (options.getCameraPosition() == CameraPosition.SIDE) {
+					// filter white pot
+					int an = 150, bn = 170;
+					int offB = 20, offB2 = 20;
+					if (!options.isBarleyInBarleySystem()) {
+						an = 12;
+						bn = 7;
+						offB = 15;
+						offB2 = 5;
+					} else {
+						an = 150;
+						bn = 6;
+						offB = 15;
+						offB2 = 5;
+					}
+					toBeFiltered = result.copy().getIO().hq_thresholdLAB(
+							0, options.isBarleyInBarleySystem() ? 255 : 130,
+							120 - an, 120 + an,
+							120 - offB, 120 + 2 * bn + offB2,
+							options.getBackground(), true).getImage();
+					
+					if (fis != null)
+						fis.addImage("step 2", toBeFiltered.copy());
 				}
-				int upperLimit = options.isBarleyInBarleySystem() ? 255 : 130;
-				toBeFiltered = result.copy().getIO().hq_thresholdLAB(
-						lowerLimit, upperLimit,
-						120 - an, 120 + an,
-						120 - offB, 120 + 2 * bn + offB2,
-						options.getBackground(), true).getImage();
-				
-				if (fis != null)
-					fis.addImage("step 2", toBeFiltered.copy());
-				
 				int w = toBeFiltered.getWidth();
 				int h = toBeFiltered.getHeight();
-				
-				if (options.isBarleyInBarleySystem()) {
-					double leftBlueMetal = 0.4;
-					double rightBlueMetal = 0.6;
-					toBeFiltered = toBeFiltered.getIO().getCanvas()
-							.fillRect(0, 0, w, (int) (h * 0.955), Color.red.getRGB())
-							.fillRect(0, (int) (h * 0.955), (int) (0.38 * w), (int) (h * 0.02), Color.red.getRGB())
-							.fillRect(
-									(int) (w * rightBlueMetal), (int) (h * 0.955),
-									(int) (leftBlueMetal * w), (int) (h * 0.02), Color.red.getRGB())
-							.getImage().getIO()
-							.or(result.copy().getIO().hq_thresholdLAB(
-									120, 255,
-									110, 255,
-									0, 130,
-									options.getBackground(), true).print("VOR REMOVAL 30-30", debug).getImage()
-							).getImage();
-				} else {
-					double potH = 0.9;
-					double offH = 0.05;
-					toBeFiltered = toBeFiltered.getIO().getCanvas()
-							.fillRect(0, 0, w, (int) (h * potH), Color.red.getRGB())
-							.fillRect(0, (int) (h * potH), (int) (0.25 * w), (int) (h * offH), Color.red.getRGB())
-							.fillRect(
-									(int) (w * 0.75), (int) (h * potH),
-									(int) (0.3 * w), (int) (h * offH), Color.red.getRGB())
-							.getImage().getIO().medianFilter32Bit(3).erode().erode().dilate().dilate().getImage();
+				if (options.getCameraPosition() == CameraPosition.SIDE) {
+					if (options.isBarleyInBarleySystem()) {
+						double leftBlueMetal = 0.4;
+						double rightBlueMetal = 0.6;
+						toBeFiltered = toBeFiltered.getIO().getCanvas()
+								.fillRect(0, 0, w, (int) (h * 0.955), Color.red.getRGB())
+								.fillRect(0, (int) (h * 0.955), (int) (0.38 * w), (int) (h * 0.02), Color.red.getRGB())
+								.fillRect(
+										(int) (w * rightBlueMetal), (int) (h * 0.955),
+										(int) (leftBlueMetal * w), (int) (h * 0.02), Color.red.getRGB())
+								.getImage().getIO()
+								.or(result.copy().getIO().hq_thresholdLAB(
+										120, 255,
+										110, 255,
+										0, 130,
+										options.getBackground(), true).print("VOR REMOVAL 30-30", false).getImage()
+								).getImage();
+					} else {
+						double potH = 0.9;
+						double offH = 0.05;
+						toBeFiltered = toBeFiltered.getIO().getCanvas()
+								.fillRect(0, 0, w, (int) (h * potH), Color.red.getRGB())
+								.fillRect(0, (int) (h * potH), (int) (0.25 * w), (int) (h * offH), Color.red.getRGB())
+								.fillRect(
+										(int) (w * 0.75), (int) (h * potH),
+										(int) (0.3 * w), (int) (h * offH), Color.red.getRGB())
+								.getImage().getIO().medianFilter32Bit(3).erode().erode().dilate().dilate().getImage();
+					}
+					if (fis != null)
+						fis.addImage("step 3", toBeFiltered.copy());
+					
+					result = result.copy().getIO().applyMask_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).
+							print("unknown 1", false).getImage();
+					
+					if (fis != null)
+						fis.addImage("step 4", result.copy());
 				}
-				if (fis != null)
-					fis.addImage("step 3", toBeFiltered.copy());
-				
-				result = result.copy().getIO().applyMask_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).
-						print("unknown 1", debug).getImage();
-				
 				// .removeSmallElements(30, 30).getImage().print("ORRR GREEN (NACH REMOVAL)", debug)
 				
-				if (fis != null)
-					fis.addImage("step 4", result);
-				
 				// remove blue markers at the side
-				double hhhh = options.isBarleyInBarleySystem() ? 1d : 0.9d;
-				toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or_and_not(
-						new int[] { 110 }, new int[] { 255 },
-						new int[] { 107 - 5 }, new int[] { 127 + 5 },
-						new int[] { 70 - 5 }, new int[] { 118 },
-						options.getBackground(), Integer.MAX_VALUE, false,
-						new int[] {}, new int[] {},
-						new int[] {}, new int[] {},
-						new int[] {}, new int[] {},
-						0, 1).dilate(20).
-						print("removed blue markers at side", debug).getImage();
-				toBeFiltered = toBeFiltered.getIO().getCanvas().
-						fillRect((int) (w * 0.2), 0, (int) (w * 0.6), (int) (h * hhhh),
-								options.getBackground()).getImage().print("cleared blue", debug);
-				if (fis != null)
-					fis.addImage("step 5", toBeFiltered.copy());
-				result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				if (options.getCameraPosition() == CameraPosition.SIDE) {
+					double hhhh = options.isBarleyInBarleySystem() ? 1d : 0.9d;
+					toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or_and_not(
+							new int[] { 110 }, new int[] { 255 },
+							new int[] { 107 - 5 }, new int[] { 127 + 5 },
+							new int[] { 70 - 5 }, new int[] { 118 },
+							options.getBackground(), Integer.MAX_VALUE, false,
+							new int[] {}, new int[] {},
+							new int[] {}, new int[] {},
+							new int[] {}, new int[] {},
+							0, 1).dilate(20).
+							print("removed blue markers at side", debug).getImage();
+					
+					toBeFiltered = toBeFiltered.getIO().getCanvas().
+							fillRect((int) (w * 0.2), 0, (int) (w * 0.6), (int) (h * hhhh),
+									options.getBackground()).getImage().print("cleared blue", debug);
+					
+					if (fis != null)
+						fis.addImage("step 5", toBeFiltered.copy());
+					result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				}
 				
 				if (fis != null)
 					fis.addImage("step 6", result);
@@ -214,14 +221,21 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 											113 + 5,
 											96 + 5, 100 + 5, 120 + 5, 109 + 5, 119 + 5, 119 + 5, 111 + 5, 114 + 5, 131 + 5, 105 + 5, 118 + 10, 103 + 5, 99 + 5,
 											110 + 5, 149 + 5, 102 + 5 },
-									options.getBackground(), Integer.MAX_VALUE, false,
+									options.getBackground(),
+									Integer.MAX_VALUE,
+									false,
 									// plant colors
-									options.isBarleyInBarleySystem() && false ? new int[] { 120 - 5, 167 - 5 } : new int[] {},
-									options.isBarleyInBarleySystem() && false ? new int[] { 150 + 5, 191 + 5 } : new int[] {},
-									options.isBarleyInBarleySystem() && false ? new int[] { 120 - 5, 118 - 5 } : new int[] {},
-									options.isBarleyInBarleySystem() && false ? new int[] { 120 + 5, 122 + 5 } : new int[] {},
-									options.isBarleyInBarleySystem() && false ? new int[] { 128 - 5, 117 - 5 } : new int[] {},
-									options.isBarleyInBarleySystem() && false ? new int[] { 128 + 5, 123 } : new int[] {},
+									options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.TOP ? new int[] { 70, 167 - 5 }
+											: new int[] {},
+									options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.TOP ? new int[] { 150 + 5, 191 + 5 }
+											: new int[] {},
+									options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.TOP ? new int[] { 120 - 5, 118 - 5 }
+											: new int[] {},
+									options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.TOP ? new int[] { 120 + 5, 122 + 5 }
+											: new int[] {},
+									options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.TOP ? new int[] { 128 - 5, 117 - 5 }
+											: new int[] {},
+									options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.TOP ? new int[] { 128 + 5, 123 } : new int[] {},
 									blueCurbWidthBarley0_1,
 									blueCurbHeightEndBarly0_8).
 							// border_left_right(

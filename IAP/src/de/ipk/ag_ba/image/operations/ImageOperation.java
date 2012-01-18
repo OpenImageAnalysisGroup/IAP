@@ -716,9 +716,10 @@ public class ImageOperation {
 	 * <br>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/commons/a/a2/MorphologicalClosing.png" >
 	 */
-	public void closing() { // es wird der 3x3 Minimum-Filter genutzt
+	public ImageOperation closing() { // es wird der 3x3 Minimum-Filter genutzt
 		image.getProcessor().dilate();
 		image.getProcessor().erode();
+		return this;
 	}
 	
 	public ImageOperation closing(int m, int n) { // es wird der 3x3 Minimum-Filter genutzt
