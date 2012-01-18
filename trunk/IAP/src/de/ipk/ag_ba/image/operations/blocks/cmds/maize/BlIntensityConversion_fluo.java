@@ -35,6 +35,7 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 150;
 		FlexibleImage resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
 		FlexibleImage r = new FlexibleImage(resClassic, resChlorophyll, resPhenol);
+		
 		if (debug) {
 			// FlexibleImage black = new FlexibleImage(new int[resChlorophyll.getWidth()][resChlorophyll.getHeight()]).getIO().invert().getImage();
 			// FlexibleImage chloro = new FlexibleImage(resChlorophyll, black, resChlorophyll).getIO().gamma(0.5d).getImage();
@@ -43,9 +44,9 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 			// FlexibleImage phenoCol = getColorGradient(resPhenol, 255);
 			// FlexibleImage diffChloroPheno = getDiffImg(resChlorophyll, resPhenol);
 			fis.addImage("ClChPh", r);
+			fis.addImage("CLASSIC", resClassic);
 			fis.addImage("CHLORO", resChlorophyll);
 			fis.addImage("PHENO", resPhenol);
-			fis.addImage("CLASSIC", resClassic);
 			// fis.addImage("chloro", chloro);
 			// fis.addImage("pheno", pheno);
 			// fis.addImage("cloro_neu", chloroCol);
