@@ -1,0 +1,357 @@
+/*******************************************************************************
+ * 
+ *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
+ * 
+ *******************************************************************************/
+/*
+ * Created on May 6, 2010 by Christian Klukas
+ */
+package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions;
+
+import info.clearthought.layout.TableLayout;
+
+import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import org.ErrorMsg;
+import org.ObjectRef;
+import org.StringManipulationTools;
+import org.graffiti.editor.MainFrame;
+import org.w3c.dom.Document;
+
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.DBEnavigationHelper;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.MainPanelComponent;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.calendar.Calendar;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.enums.DBEtype;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.RunnableWithExperimentInfo;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.DBEexperimentNavigation;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.DateUtils;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.MyExperimentInfoPanel;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_pbi.dbe2.dbManagement.UserLoginContainer;
+import de.ipk_gatersleben.ag_pbi.dbe2.webService.CallDBE2WebService;
+import de.ipk_gatersleben.ag_pbi.dbe2.webService.sets.ExperimentInfo;
+import de.ipk_gatersleben.ag_pbi.utilityClasses.Md5Handling;
+
+/**
+ * @author klukas
+ * 
+ */
+public class DBElogin extends AbstractNavigationAction implements NavigationAction {
+	private NavigationGraphicalEntity src;
+	private final ArrayList<NavigationGraphicalEntity> actions = new ArrayList<NavigationGraphicalEntity>();
+	private final boolean publicLogin;
+	private final JTextField login;
+	private final JTextField pass;
+	private Runnable oneTimeRun = null;
+	private final DBEtype dbeType;
+	public static String mempass = "";
+	public static String memlogin = "";
+
+	public DBElogin(DBEtype dbeType, boolean publicLogin, JTextField login, JTextField pass) {
+		super("Login into Database");
+		this.publicLogin = publicLogin;
+		this.login = login;
+		this.pass = pass;
+		this.dbeType = dbeType;
+	}
+
+	@Override
+	public void setOneTimeFinishAction(Runnable runnable) {
+		this.oneTimeRun = runnable;
+	}
+
+	@Override
+	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+		this.src = src;
+		actions.clear();
+		if (publicLogin) {
+			String p = "internet";
+			p = Md5Handling.computeMd5(p.getBytes());
+			UserLoginContainer.logIn("internet", p);
+
+			final TreeMap<String, Collection<ExperimentInfo>> group2ei = new TreeMap<String, Collection<ExperimentInfo>>();
+			ArrayList<NavigationGraphicalEntity> el = DBEnavigationHelper.getUserList(dbeType, "internet", p, "public",
+					group2ei);
+			NavigationGraphicalEntity calendarEntity = getCalendarEntity(group2ei, "internet", p);
+			actions.add(calendarEntity);
+			actions.addAll(el);
+			// login(refButtonOverview, refButtonDBE, refButtonUserLogin, null,
+			// "internet", p, null, jtp, jp1, jp2, graphPanel, "Public Access",
+			// "img/public.png");
+		} else {
+			final String l = login.getText();
+			String pp = pass.getText();
+
+			pp = Md5Handling.computeMd5(pp.getBytes());
+
+			final String p = pp;
+
+			if (l.length() <= 0 || p.length() <= 0) {
+				this.src = null;
+				login.requestFocus();
+				BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
+					public void run() {
+						login.setBackground(Color.RED);
+						pass.setBackground(Color.RED);
+					}
+				});
+				BackgroundTaskHelper.executeLaterOnSwingTask(500, new Runnable() {
+					public void run() {
+						login.setBackground(Color.WHITE);
+						pass.setBackground(Color.WHITE);
+					}
+				});
+			} else {
+				try {
+					if (!CallDBE2WebService.getExistsUser(l, p)) {
+						this.src = null;
+						login.requestFocus();
+						BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
+							public void run() {
+								login.setBackground(Color.RED);
+								pass.setBackground(Color.RED);
+								if (pass.getText().length() == 0) {
+									login.requestFocus();
+								}
+							}
+						});
+						BackgroundTaskHelper.executeLaterOnSwingTask(500, new Runnable() {
+							public void run() {
+								login.setBackground(Color.WHITE);
+								pass.setBackground(Color.WHITE);
+							}
+						});
+					} else {
+						UserLoginContainer.logIn(l, p);
+						DBElogin.setLoginData(l, pass.getText());
+						final ArrayList<ExperimentHeaderInterface> trashed = new ArrayList<ExperimentHeaderInterface>();
+						final TreeMap<String, Collection<ExperimentInfo>> group2ei = new TreeMap<String, Collection<ExperimentInfo>>();
+						for (ExperimentInfo ei : CallDBE2WebService.getExperimentInfos(l, p, CallDBE2WebService
+								.getAllExperimentsVisibleForUser(l, p))) {
+							if (ei.experimentType.equalsIgnoreCase("Trash")) {
+								trashed.add(DBEnavigationHelper.getExperimentInfo(ei));
+								continue;
+							}
+							// if (dbeType == DBEtype.Phenotyping &&
+							// !ei.experimentType.equals("Phenomics"))
+							// continue;
+							// if (dbeType != DBEtype.Phenotyping &&
+							// ei.experimentType.equals("Phenomics"))
+							// continue;
+
+							if (!group2ei.containsKey(ei.userGroup)) {
+								group2ei.put(ei.userGroup, new ArrayList<ExperimentInfo>());
+							}
+							group2ei.get(ei.userGroup).add(ei);
+						}
+
+						NavigationGraphicalEntity calendarEntity = getCalendarEntity(group2ei, l, p);
+						actions.add(calendarEntity);
+
+						// NavigationEntity addImagesEntity =
+						// getAddImagesToDatabaseEntity();
+						// actions.add(addImagesEntity);
+
+						// if (dbeType == DBEtype.Phenotyping) {
+						// NavigationGraphicalEntity addImagesEntity =
+						// getAddDatasetToDatabaseEntity(true);
+						// actions.add(addImagesEntity);
+						// } else {
+						// NavigationGraphicalEntity addExperimentsEntity =
+						// getAddDatasetToDatabaseEntity(false);
+						// actions.add(addExperimentsEntity);
+						// }
+
+						for (String group : group2ei.keySet()) {
+							final String fgroup = group;
+							NavigationAction action = new AbstractNavigationAction("Open Group-Folder") {
+								private ArrayList<NavigationGraphicalEntity> userActions = new ArrayList<NavigationGraphicalEntity>();
+								private NavigationGraphicalEntity src2;
+
+								@Override
+								public void performActionCalculateResults(NavigationGraphicalEntity src) {
+									final TreeMap<String, Collection<ExperimentInfo>> group2ei = new TreeMap<String, Collection<ExperimentInfo>>();
+									userActions = DBEnavigationHelper.getUserList(dbeType, l, p, fgroup, group2ei);
+									this.src2 = src;
+								}
+
+								@Override
+								public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
+										ArrayList<NavigationGraphicalEntity> currentSet) {
+									ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(
+											currentSet);
+									res.add(this.src2);
+									return res;
+								}
+
+								@Override
+								public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+									return userActions;
+								}
+							};
+							NavigationGraphicalEntity buttonGroup = new NavigationGraphicalEntity(action, group, // "img/ext/folder-remote-open.png",
+									"img/ext/network-workgroup-power.png", // "img/ext/folder-remote.png",
+									"img/ext/network-workgroup.png");
+							actions.add(buttonGroup);
+						}
+
+						NavigationAction trashAction = new AbstractNavigationAction("Show content of trash can") {
+							private ArrayList<NavigationGraphicalEntity> userActions;
+							private NavigationGraphicalEntity src2;
+
+							@Override
+							public void performActionCalculateResults(NavigationGraphicalEntity src) {
+								this.src2 = src;
+
+								userActions = getTrashedActions(l, p, trashed);
+							}
+
+							@Override
+							public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
+									ArrayList<NavigationGraphicalEntity> currentSet) {
+								ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+								res.add(this.src2);
+								return res;
+							}
+
+							@Override
+							public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+								return userActions;
+							}
+						};
+						if (trashed.size() > 0) {
+							NavigationGraphicalEntity buttonTrash = new NavigationGraphicalEntity(trashAction, "Trash",
+									"img/ext/edit-delete-gray.png");
+							actions.add(buttonTrash);
+						}
+					}
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+			}
+		}
+
+	}
+
+	protected ArrayList<NavigationGraphicalEntity> getTrashedActions(String login, String pass,
+			ArrayList<ExperimentHeaderInterface> trashed) {
+
+		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+		for (ExperimentHeaderInterface ei : trashed) {
+			NavigationGraphicalEntity exp = DBEexperiment.getExperimentButton(login, pass, ei);
+			res.add(exp);
+		}
+		return res;
+	}
+
+	// private NavigationGraphicalEntity getAddDatasetToDatabaseEntity(final
+	// boolean images) {
+	// NavigationAction addAction = new AddImagesToDatabase(images);
+	// NavigationGraphicalEntity addToDB = new
+	// NavigationGraphicalEntity(addAction, images ? "Import Images"
+	// : "Import Dataset", "img/ext/ccAddToDatabase.png");
+	//
+	// return addToDB;
+	// }
+
+
+
+	public static void setLoginData(String l, String text) {
+		memlogin = l;
+		mempass = text;
+	}
+
+	public static NavigationGraphicalEntity getDBEloginButton(DBEtype dbeType, final boolean publicLogin) {
+
+		final JTextField login = new JTextField(DBElogin.memlogin);
+		final JTextField pass = new JPasswordField(DBElogin.mempass);
+
+		String title;
+		if (publicLogin)
+			title = "DBE Public Access";
+		else
+			title = "DBE Login";
+		String img;
+		if (publicLogin)
+			img = "img/public.png";
+		else
+			img = "img/key.png";
+		final ObjectRef refButtonUserLogin = new ObjectRef();
+		NavigationAction action = new DBElogin(dbeType, publicLogin, login, pass);
+		final NavigationGraphicalEntity buttonLogin = new DBEexperimentNavigation(action, title, img, login, publicLogin,
+				pass);
+
+		login.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					pass.requestFocus();
+				}
+			}
+		});
+
+		pass.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					buttonLogin.performAction();
+				}
+			}
+		});
+
+		refButtonUserLogin.setObject(buttonLogin);
+		if (!publicLogin) {
+			JComponent loginFields = TableLayout.get3SplitVertical(TableLayout.get4SplitVertical(null, new JLabel(
+					"User/Password:"), null, login, 4, TableLayout.PREFERRED, 2, TableLayout.PREFERRED, 0, 0), null, pass,
+					TableLayout.PREFERRED, 1, TableLayout.PREFERRED);
+			buttonLogin.setSideGUI(loginFields, 5, 100);
+		}
+		return buttonLogin;
+	}
+}
