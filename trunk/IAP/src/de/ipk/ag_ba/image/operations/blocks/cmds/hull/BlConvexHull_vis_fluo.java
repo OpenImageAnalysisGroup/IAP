@@ -255,7 +255,10 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		Long firstWaterTime = null;
 		Long lastWaterTime = null;
 		boolean prolonged = false;
+		if (time2waterData!=null)
 		for (Long time : time2waterData.keySet()) {
+			if (time==null)
+				continue;
 			if (!prolonged && time >= endTime) {
 				prolonged = true;
 				endTime = time;
