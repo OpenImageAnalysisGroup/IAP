@@ -1,0 +1,60 @@
+package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions;
+
+import java.util.ArrayList;
+
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.MainPanelComponent;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.enums.DBEtype;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
+
+/**
+ * @author klukas
+ * 
+ */
+public class DBElogin2 extends AbstractNavigationAction {
+	NavigationGraphicalEntity src = null;
+
+	public DBElogin2() {
+		super("Login to the IPK-DBE Database");
+	}
+
+	@Override
+	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+		this.src = src;
+	}
+
+	@Override
+	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
+		ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+		res.add(src);
+		return res;
+	}
+
+	@Override
+	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+		ArrayList<NavigationGraphicalEntity> dbeSet = new ArrayList<NavigationGraphicalEntity>();
+
+		String url = "http://www.bioinfo.de/isb/2004050011/";
+		NavigationGraphicalEntity nn = new NavigationGraphicalEntity(new LiteratureReference(url, "Lit. Reference",
+				"img/dataset.png"));
+		nn.setToolTipText("Open " + url);
+		dbeSet.add(nn);
+
+		dbeSet.add(DBElogin.getDBEloginButton(DBEtype.Omics, true));
+		dbeSet.add(DBElogin.getDBEloginButton(DBEtype.Omics, false));
+
+		return dbeSet;
+	}
+
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		return new MainPanelComponent(
+				"<html>"
+						+ "<h2>Welcome to the DBE Information System - Data integration and analysis for Biological Experiments</h2>"
+						+ "You are accessing the database system &quot;DBE2&quot;, an extension of the original DBE system (see literature reference). "
+						+ "DBE2 adds Web Service functionality to the DBE system, as well as support for storing images, and volumetric "
+						+ "data as primary measurement entities. The Integrated Analysis Platform IAP provides graphical and interactive access "
+						+ "to the data stored in this database. In case VANTED is not started from within IAP, a "
+						+ "<a href=\"http://vanted.ipk-gatersleben.de/addons\">VANTED Add-on</a> "
+						+ "may be used to access DBE2 independently from IAP.");
+	}
+}
