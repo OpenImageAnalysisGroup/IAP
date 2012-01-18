@@ -179,7 +179,7 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 			processedImages.setNir(processedImages.getNir().getIO().applyMask_ResizeMaskIfNeeded(
 					mask,
 					options.getBackground()).print("FILTERED NIR IMAGE", debug).
-					replaceColors(back, gray).getImage());
+					replaceColors(back, gray).getImage().print("BLUR RRRRES"));
 			return;
 		}
 		// }
