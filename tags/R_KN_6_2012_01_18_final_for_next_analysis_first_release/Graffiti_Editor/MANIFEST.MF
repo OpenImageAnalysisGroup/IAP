@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Sealed: false
+Main-Class: org.graffiti.editor.GraffitiEditor
+Class-Path: Graffiti_Core.jar Graffiti_Editor.jar Graffiti_Plugins.jar Graffiti_lib/commons-beanutils.jar Graffiti_lib/commons-collections.jar Graffiti_lib/commons-digester.jar Graffiti_lib/commons-logging.jar Graffiti_lib/jlex_java_cup.jar

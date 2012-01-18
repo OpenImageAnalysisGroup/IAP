@@ -1,0 +1,65 @@
+/*******************************************************************************
+ * 
+ *    Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
+ * 
+ *******************************************************************************/
+/*
+ * Created on Aug 13, 2010 by Christian Klukas
+ */
+
+package rmi_server.databases;
+
+import java.io.InputStream;
+
+import rmi_server.analysis.IOmodule;
+import rmi_server.analysis.ImageUploadData;
+import rmi_server.analysis.LoadedImage;
+import rmi_server.analysis.VolumeUploadData;
+import rmi_server.analysis.image_analysis_tasks.LoadedVolume;
+import de.ipk_gatersleben.ag_pbi.dbe2.webService.CallDBE2WebService;
+import de.ipk_gatersleben.ag_pbi.dbe2.webService.enums.DBTable;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+
+/**
+ * @author klukas
+ * 
+ */
+public class DatabaseTargetDBE2 implements DatabaseTarget {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * rmi_server.analysis.image_analysis_tasks.DatabaseTargetInterface#saveImage
+	 * (rmi_server.analysis.LoadedImage,
+	 * de.ipk_gatersleben.ag_pbi.mmd.experimentdata.ImageData,
+	 * rmi_server.analysis.ImageUploadData, java.lang.String, java.lang.String)
+	 */
+	public LoadedImage saveImage(LoadedImage limg, String login, String pass) throws Exception {
+		ImageUploadData iud = limg.getImageUploadData();
+		String md5 = CallDBE2WebService.setBlobSupplementaryFile(login, pass, DBTable.IMAGE, limg.getRowID() + "", iud
+				.getInputStream(), limg.getURL().getFileName(), 1, iud.getPreviewInputStream());
+
+		System.out.println("Image Upload. MD5: " + md5);
+
+		return limg;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see rmi_server.databases.DatabaseTarget#saveVolume(java.lang.String,
+	 * java.lang.String, de.ipk_gatersleben.ag_pbi.dbe2.webService.enums.DBTable,
+	 * java.lang.String, java.io.InputStream, java.lang.String, int,
+	 * java.io.InputStream)
+	 */
+	@Override
+	public void saveVolume(final LoadedVolume volume, Sample3D s3d, String login, String pass, DBTable sample,
+			final VolumeUploadData threeDvolumeInputStream, InputStream threeDvolumePreviewIcon, long outputsize,
+			String md5) throws Exception {
+		CallDBE2WebService.setBlobSupplementaryFile(login, pass, DBTable.SAMPLE, s3d.getRowId() + "", IOmodule
+				.getThreeDvolumeInputStream(volume).getStream(), "ThreeDreconstruction.img", 0, IOmodule
+				.getThreeDvolumePreviewIcon(volume));
+	}
+
+}
