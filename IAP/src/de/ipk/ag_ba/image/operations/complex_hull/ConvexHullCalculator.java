@@ -142,7 +142,7 @@ public class ConvexHullCalculator {
 		if (rt == null)
 			rt = new ResultsTable();
 		
-		if (polygon != null && distHorizontal != null) {
+		if (polygon != null) {
 			rt.incrementCounter();
 			double normFactorArea = distHorizontal != null ? (realMarkerDist * realMarkerDist)
 					/ (distHorizontal.getValue() * distHorizontal.getValue())
