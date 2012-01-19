@@ -4,6 +4,7 @@ import info.StopWatch;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
 import org.ErrorMsg;
@@ -48,6 +49,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	ArrayList<ZoomedImage> zoomedImages = new ArrayList<ZoomedImage>();
 	protected Experiment experimentResult;
 	
+	private long startTime;
+	
 	// used when started as remote analysis task
 	private RunnableWithMappingData resultReceiver;
 	protected int workOnSubset;
@@ -68,6 +71,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	@Override
 	public void performActionCalculateResults(final NavigationButton src) {
 		this.src = src;
+		
+		startTime = System.currentTimeMillis();
 		
 		// BackgroundThreadDispatcher.useThreads = false;
 		
@@ -185,10 +190,20 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			}
 			
 			statisticsResult.getHeader().setOriginDbId(dbID);
+			statisticsResult.getHeader().setStartdate(new Date(startTime));
+			statisticsResult.getHeader().setStorageTime(new Date());
 			
 			if (getResultReceiver() == null) {
 				if (status != null)
 					status.setCurrentStatusText1("Ready");
+				
+				statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
+						experiment.getExperimentName());
+				statisticsResult.getHeader().setExperimenttype("Analysis Results");
+				statisticsResult.getHeader().setRemark(statisticsResult.getHeader().getRemark() + " // direct mode analysis // " +
+						"calculation time: " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime));
+				
+				m.saveExperiment(statisticsResult, getStatusProvider());
 				
 				MyExperimentInfoPanel info = new MyExperimentInfoPanel();
 				info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);

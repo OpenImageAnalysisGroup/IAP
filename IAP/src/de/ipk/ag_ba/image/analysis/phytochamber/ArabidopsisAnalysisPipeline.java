@@ -23,9 +23,9 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlClearMasks_Arabidopsis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLabFilter_Arabidopsis_vis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLoadImagesIfNeeded_images;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_vis_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlockSkeletonize_Arabidopsis_vis_or_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
@@ -51,7 +51,7 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 		modifySettings(options);
 		
 		BlockPipeline p = new BlockPipeline();
-		p.add(BlLoadImagesIfNeeded_images_masks.class);
+		p.add(BlLoadImagesIfNeeded_images.class);
 		p.add(BlBalancing_fluo.class);
 		p.add(BlClearMasks_Arabidopsis_vis.class);
 		p.add(BlColorBalancing_vis.class);

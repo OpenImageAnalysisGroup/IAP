@@ -312,7 +312,7 @@ public class BlLoadImagesIfNeeded_images_masks extends
 					&& processedImages.getFluo() != null
 					&& processedImages.getVis().getHeight() > processedImages
 							.getFluo().getHeight())
-				options.setHighResMaize(true);
+				options.setHighResVisCamera(true);
 		
 		if (processedImages.getVis() != null
 				&& processedMasks.getVis() != null

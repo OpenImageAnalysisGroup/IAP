@@ -342,7 +342,7 @@ public class ImageProcessorOptions {
 		return !isMaize() && !isHighResMaize();
 	}
 	
-	public void setHighResMaize(boolean highResMaize) {
+	public void setHighResVisCamera(boolean highResMaize) {
 		this.highResMaize = highResMaize;
 	}
 	
