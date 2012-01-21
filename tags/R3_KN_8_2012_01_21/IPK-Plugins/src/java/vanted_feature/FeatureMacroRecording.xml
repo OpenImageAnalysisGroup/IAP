@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE plugin
+  PUBLIC "-//GRAFFITI/DTD Plugin Descriptin 1.0//EN"
+   "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
+
+<plugin>
+	<author>Christian Klukas</author>
+	<description>Enables recording of VANTED action as Java script code (BSH). Available from the side panel Help/Macros.</description>
+
+	<plugindesc>
+	     <name>Macro recorder (in development)</name>
+         <main>vanted_feature.PluginFeatureMacroRecording</main>
+         <version>0.9 (in development)</version>
+         <optional>true</optional>
+         <optionaldefault>false</optionaldefault>
+         <priority>true</priority>
+         <available>http://vanted.ipk-gatersleben.de</available>
+    </plugindesc>
+</plugin>

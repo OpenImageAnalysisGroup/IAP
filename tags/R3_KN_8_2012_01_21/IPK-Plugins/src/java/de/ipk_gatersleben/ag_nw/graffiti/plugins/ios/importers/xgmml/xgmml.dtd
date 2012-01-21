@@ -1,0 +1,218 @@
+<!-- DTD for XGMML 1.0 -->
+<!-- Authors: John Punin and Mukkai Krishnamoorthy -->
+<!-- Computer Science Department -->
+<!-- Rensselaer Polytechnic Institute -->
+<!-- xgmml.dtd,v 1.0 06/27/2001 -->
+
+<!-- Boolean type -->
+<!ENTITY % boolean.type "(0|1)" >
+
+<!-- Positive number type -->
+<!ENTITY % number.type "NMTOKEN">
+
+<!-- ID type -->
+<!ENTITY % id.type "NMTOKEN">
+
+<!-- String type -->
+<!ENTITY % string.type "CDATA">
+
+
+<!-- Standard XML Namespace attribute -->
+<!ENTITY % nds 'xmlns'>
+
+<!-- URI type -->
+<!ENTITY % uri.type "%string.type;">
+
+<!-- Anchor type -->
+<!ENTITY % anchor.type "(c|n|ne|e|se|s|sw|w|nw)">
+
+<!-- Type of Graphics (GML types) -->
+<!ENTITY % type-graphics-gml.type "arc|bitmap|image|line|oval|polygon|
+                                   rectangle|text">
+
+<!-- Type of Graphics (New types) -->
+<!ENTITY % type-graphics-app.type "box|circle|ver_ellipsis|hor_ellipsis|
+                                    rhombus|triangle|pentagon|hexagon|
+                                    octagon">
+
+<!-- Line types -->
+<!-- Arrow type -->
+<!ENTITY % arrow.type "(none | first | last | both)">
+<!-- Capstyle type -->
+<!ENTITY % capstyle.type "(butt | projecting | round)">
+<!-- Joinstyle type -->
+<!ENTITY % joinstyle.type "(bevel | miter | round)">
+<!-- Arc style  type -->
+<!ENTITY % arcstyle.type "(pieslice | chord | arc)">
+
+<!-- Text types -->
+<!-- Text justification type -->
+<!ENTITY % justify.type "(left | right | center)">
+<!-- Font type -->
+<!ENTITY % font.type "%string.type;">
+<!-- Color type -->
+<!ENTITY % color.type "%string.type;">
+
+<!-- Angle type -->
+<!ENTITY % angle.type "%string.type;">
+
+<!-- Object type -->
+<!ENTITY % object.type "(list | string | real | integer)">
+
+<!-- Global Attributes -->
+<!ENTITY % global-atts "id %number.type; #IMPLIED
+                        name %string.type; #IMPLIED
+			label %string.type; #IMPLIED
+			labelanchor %string.type; #IMPLIED">
+
+<!-- Standard XML Attributes -->
+<!ENTITY % xml-atts "%nds; %uri.type; #FIXED 'http://www.cs.rpi.edu/XGMML' 
+                        xml:lang NMTOKEN #IMPLIED
+                        xml:space (default | preserve) #IMPLIED">
+
+<!-- Standard XLink Attributes -->
+<!ENTITY % xlink-atts 
+              "xmlns:xlink CDATA #FIXED 'http://www.w3.org/1999/xlink'
+               xlink:type (simple) #FIXED 'simple' 
+               xlink:role CDATA #IMPLIED
+               xlink:title CDATA #IMPLIED
+               xlink:show (new|embed|replace) #FIXED 'replace'
+               xlink:actuate (onLoad|onRequest) #FIXED 'onRequest'
+               xlink:href CDATA #IMPLIED">
+
+<!-- Safe Graph Attributes -->
+<!ENTITY % graph-atts-safe "directed %boolean.type; '0' ">		
+<!-- Unsafe Graph Attributes (GML) -->
+<!ENTITY % graph-atts-gml-unsafe "Vendor %string.type;  #IMPLIED">
+
+<!-- Unsafe Graph Attributes (new attributes) -->
+<!ENTITY % graph-atts-app-unsafe "Scale %number.type; #IMPLIED
+                                  Rootnode %number.type; #IMPLIED
+                                  Layout %string.type; #IMPLIED
+                                  Graphic %boolean.type; #IMPLIED">
+
+<!-- Graph Element -->
+<!ELEMENT graph (att*,(node | edge)*)>
+<!-- Graph Attributes -->
+<!ATTLIST graph
+          %global-atts;
+	  %xml-atts;
+	  %xlink-atts;
+	  %graph-atts-safe;
+	  %graph-atts-gml-unsafe;
+	  %graph-atts-app-unsafe;>
+
+<!-- Safe Node Attributes (GML) -->
+<!ENTITY % node-atts-gml-safe "edgeanchor %string.type; #IMPLIED">
+<!-- Safe Node Attributes (new attributes) -->
+<!ENTITY % node-atts-app-safe "weight %string.type;  #IMPLIED">
+
+<!-- Node Element -->
+<!ELEMENT node (graphics?,att*)>
+<!-- Node Attributes -->
+<!ATTLIST node
+          %global-atts;
+	  %xlink-atts;
+	  %node-atts-gml-safe;
+	  %node-atts-app-safe;>
+
+<!-- Safe Edge Attributes (GML) -->
+<!ENTITY % edge-atts-gml-safe "source %number.type; #REQUIRED
+                               target %number.type; #REQUIRED">
+<!-- Safe Edge Attributes (new attributes) -->
+<!ENTITY % edge-atts-app-safe "weight %string.type; #IMPLIED">
+
+<!-- Edge Element -->
+<!ELEMENT edge (graphics?,att*)>
+<!-- Edge Attributes -->
+<!ATTLIST edge
+          %global-atts;
+	  %xlink-atts;
+	  %edge-atts-gml-safe;
+	  %edge-atts-app-safe;>
+
+<!-- Graphics Type  -->
+<!ENTITY % graphics-type-att "type (%type-graphics-gml.type;|
+                                    %type-graphics-app.type;) #IMPLIED">
+
+<!-- Point Attributes (x,y,z)  -->
+<!ENTITY % point-atts "x %number.type; #IMPLIED
+	               y %number.type; #IMPLIED
+		       z %number.type; #IMPLIED">
+
+<!-- Dimension Attributes (width,height,depth)  -->
+<!ENTITY % dimension-atts "w %number.type; #IMPLIED
+	                   h %number.type; #IMPLIED
+			   d %number.type; #IMPLIED">
+
+<!-- External Attributes (Image and Bitmap)  -->
+<!ENTITY % external-atts "image %uri.type; #IMPLIED
+                 	  bitmap %uri.type; #IMPLIED">
+
+<!-- Line Attributes -->
+<!ENTITY % line-atts "width %number.type; #IMPLIED
+	              arrow %arrow.type; #IMPLIED
+                      capstyle %capstyle.type; #IMPLIED
+                      joinstyle %joinstyle.type; #IMPLIED
+		      smooth %boolean.type; #IMPLIED
+		      splinesteps %number.type; #IMPLIED">
+
+<!-- Text Attributes -->
+<!ENTITY % text-atts "justify %justify.type; #IMPLIED
+                      font  %font.type; #IMPLIED">
+
+<!-- Bitmap Attributes -->
+<!ENTITY % bitmap-atts "background %color.type; #IMPLIED
+                        foreground %color.type; #IMPLIED">
+
+<!-- Arc Attributes -->
+<!ENTITY % arc-atts "extent %angle.type; #IMPLIED
+	             start %angle.type; #IMPLIED
+		     style %arcstyle.type;  #IMPLIED">
+
+<!-- Graphical Object Attributes -->
+<!ENTITY % object-atts "stipple %string.type; #IMPLIED
+                        visible %boolean.type; #IMPLIED
+			fill %color.type; #IMPLIED
+			outline %color.type; #IMPLIED
+			anchor %anchor.type; #IMPLIED">
+
+<!-- Graphics Element -->
+<!ELEMENT graphics ((Line? | center?),att*)>
+<!-- Graphics Attributes -->
+<!ATTLIST graphics
+          %graphics-type-att;
+	  %point-atts;
+	  %dimension-atts;
+	  %external-atts;
+	  %line-atts;
+	  %text-atts;
+	  %bitmap-atts;
+	  %arc-atts;
+	  %object-atts;>
+
+<!-- Center Point Element -->
+<!ELEMENT center EMPTY>
+<!ATTLIST center 
+	  %point-atts;>
+
+<!-- Line Element -->
+<!ELEMENT Line (point,point+)>
+
+<!-- Point Element -->
+<!ELEMENT point EMPTY>
+<!ATTLIST point 
+	  %point-atts;>
+
+<!-- Value Attribute -->
+<!ENTITY % attribute-value "value %string.type; #IMPLIED">
+<!-- Type Attribute -->
+<!ENTITY % attribute-type "type %object.type;  #IMPLIED">
+
+<!-- Att Element -->
+<!ELEMENT att (#PCDATA | att | graph)*>
+<!-- Att Attributes -->
+<!ATTLIST att
+          %global-atts;
+	  %attribute-value;
+	  %attribute-type;>
