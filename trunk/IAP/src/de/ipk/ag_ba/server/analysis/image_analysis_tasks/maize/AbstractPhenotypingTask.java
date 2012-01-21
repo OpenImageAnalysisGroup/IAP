@@ -176,6 +176,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
 				int progress = 0;
 				for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
+					if (status.wantsToStop())
+						continue;
 					final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
 					final String plantIDf = plantID;
 					maxCon.acquire(1);
@@ -219,6 +221,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		status.setCurrentStatusValueFine(100d);
 		input = null;
+		
+		if (status.wantsToStop())
+			output = null;
 	}
 	
 	private int modifyConcurrencyDependingOnMemoryStatus(int nn) {
@@ -312,6 +317,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final Semaphore innerLoopSemaphore = BackgroundTaskHelper.lockGetSemaphore(null, threadsToStart);
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
+					if (status.wantsToStop())
+						continue;
 					if (imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS() != null) {
 						Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS()
 								.getParentSample();

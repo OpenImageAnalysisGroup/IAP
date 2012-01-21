@@ -9,7 +9,7 @@ package de.ipk.ag_ba.server.task_management;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
-import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -23,7 +23,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class BatchCmd extends BasicDBObject {
 	private static final long serialVersionUID = 1L;
-	private BackgroundTaskStatusProvider statusProvider;
+	private BackgroundTaskStatusProviderSupportingExternalCall statusProvider;
 	
 	public HashSet<String> getTargetIPs() {
 		HashSet<String> res = new HashSet<String>();
@@ -32,6 +32,10 @@ public class BatchCmd extends BasicDBObject {
 				res.add((String) e.getValue());
 		}
 		return res;
+	}
+	
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
+		return statusProvider;
 	}
 	
 	public void setTargetIPs(HashSet<String> ips) {
@@ -77,20 +81,27 @@ public class BatchCmd extends BasicDBObject {
 		put("submission", submission);
 	}
 	
-	public void setStatusProvider(BackgroundTaskStatusProvider statusProvider) {
+	public void setStatusProvider(BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
 		this.statusProvider = statusProvider;
 	}
 	
-	public void updateRunningStatus(MongoDB m, CloudAnalysisStatus status) {
+	public boolean updateRunningStatus(MongoDB m, CloudAnalysisStatus status) {
 		if (statusProvider != null) {
 			put("progress", statusProvider.getCurrentStatusValueFine());
 			put("line1", statusProvider.getCurrentStatusMessage1());
 			put("line2", statusProvider.getCurrentStatusMessage2());
 			put("line3", statusProvider.getCurrentStatusMessage3());
 			put("waitsForUser", statusProvider.pluginWaitsForUser());
+			
+			BatchCmd bcmd = m.batchGetCommand(this);
+			if (bcmd == null)
+				statusProvider.pleaseStop();
 		}
-		m.batchClaim(this, status, true);
-		setRunStatus(status);
+		if (m.batchClaim(this, status, true)) {
+			setRunStatus(status);
+			return true;
+		}
+		return false;
 		// statusProvider.pleaseStop() -->
 		// statusProvider.pleaseContinueRun() -->
 	}

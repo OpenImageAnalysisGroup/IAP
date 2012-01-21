@@ -140,7 +140,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			Collection<NumericMeasurementInterface> statRes = task.getOutput();
 			
 			if (statRes == null) {
-				ErrorMsg.addErrorMessage("Error: no statistics result");
+				System.err.println("Error: no statistics result");
 			} else {
 				for (NumericMeasurementInterface m : statRes) {
 					if (m == null)
@@ -150,74 +150,85 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				}
 			}
 			
-			// for (MappingData3DPath mp : newStatisticsData) {
-			// mp.getSampleData().setRowId(-1);
-			// }
-			//
-			if (status != null)
-				status.setCurrentStatusText1("Create result dataset");
-			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
-			statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
-			statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
-			for (SubstanceInterface s : statisticsResult) {
-				for (ConditionInterface c : s) {
-					c.setExperimentInfo(statisticsResult.getHeader());
-				}
-			}
-			
-			System.out.println("Statistics results: " + newStatisticsData.size());
-			// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
-			statisticsResult.setHeader(experiment.getHeader().clone());
-			statisticsResult.getHeader().setDatabaseId("");
-			if (statisticsResult.size() > 0) {
-				SubstanceInterface subst = statisticsResult.iterator().next();
-				if (subst.size() > 0) {
-					ConditionInterface cond = subst.iterator().next();
-					if (cond != null)
-						statisticsResult.setHeader(cond.getExperimentHeader());
-				}
-			}
-			boolean addWaterData = workOnSubset == 0;
-			if (addWaterData) {
-				for (SubstanceInterface si : experimentToBeAnalysed) {
-					if (si.getName() != null && (si.getName().equals("weight_before") ||
-							si.getName().equals("water_weight") || si.getName().equals("water_sum"))) {
-						statisticsResult.add(si);
-						for (ConditionInterface ci : si)
-							ci.setExperimentHeader(statisticsResult.getHeader());
+			if (statRes != null) {
+				// for (MappingData3DPath mp : newStatisticsData) {
+				// mp.getSampleData().setRowId(-1);
+				// }
+				//
+				if (status != null)
+					status.setCurrentStatusText1("Create result dataset");
+				final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
+				statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
+				statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
+				for (SubstanceInterface s : statisticsResult) {
+					for (ConditionInterface c : s) {
+						c.setExperimentInfo(statisticsResult.getHeader());
 					}
 				}
-			}
-			
-			statisticsResult.getHeader().setOriginDbId(dbID);
-			statisticsResult.getHeader().setStartdate(new Date(startTime));
-			statisticsResult.getHeader().setStorageTime(new Date());
-			
-			if (getResultReceiver() == null) {
-				if (status != null)
-					status.setCurrentStatusText1("Ready");
 				
-				statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
-						experiment.getExperimentName());
-				statisticsResult.getHeader().setExperimenttype("Analysis Results");
-				statisticsResult.getHeader().setRemark(statisticsResult.getHeader().getRemark() + " // direct mode analysis // " +
-						"calculation time: " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime));
+				System.out.println("Statistics results: " + newStatisticsData.size());
+				// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
+				statisticsResult.setHeader(experiment.getHeader().clone());
+				statisticsResult.getHeader().setDatabaseId("");
+				if (statisticsResult.size() > 0) {
+					SubstanceInterface subst = statisticsResult.iterator().next();
+					if (subst.size() > 0) {
+						ConditionInterface cond = subst.iterator().next();
+						if (cond != null)
+							statisticsResult.setHeader(cond.getExperimentHeader());
+					}
+				}
+				boolean addWaterData = workOnSubset == 0;
+				if (addWaterData) {
+					for (SubstanceInterface si : experimentToBeAnalysed) {
+						if (si.getName() != null && (si.getName().equals("weight_before") ||
+								si.getName().equals("water_weight") || si.getName().equals("water_sum"))) {
+							statisticsResult.add(si);
+							for (ConditionInterface ci : si)
+								ci.setExperimentHeader(statisticsResult.getHeader());
+						}
+					}
+				}
 				
-				m.saveExperiment(statisticsResult, getStatusProvider());
+				statisticsResult.getHeader().setOriginDbId(dbID);
+				statisticsResult.getHeader().setStartdate(new Date(startTime));
+				statisticsResult.getHeader().setStorageTime(new Date());
 				
-				MyExperimentInfoPanel info = new MyExperimentInfoPanel();
-				info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
-				mpc = new MainPanelComponent(info, true);
+				if (getResultReceiver() == null) {
+					if (status != null)
+						status.setCurrentStatusText1("Ready");
+					
+					statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
+							experiment.getExperimentName());
+					statisticsResult.getHeader().setExperimenttype("Analysis Results");
+					statisticsResult.getHeader().setRemark(statisticsResult.getHeader().getRemark() + " // direct mode analysis // " +
+							"calculation time: " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime));
+					
+					m.saveExperiment(statisticsResult, getStatusProvider());
+					
+					MyExperimentInfoPanel info = new MyExperimentInfoPanel();
+					info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
+					mpc = new MainPanelComponent(info, true);
+				} else {
+					// mpc = new MainPanelComponent("Running in batch-mode. Partial result is not shown at this place.");
+					if (status != null)
+						status.setCurrentStatusText1("Result-Receiver processes results");
+					getResultReceiver().setExperimenData(statisticsResult);
+					getResultReceiver().run();
+					if (status != null)
+						status.setCurrentStatusText1("Processing finished");
+				}
+				this.experimentResult = statisticsResult;
 			} else {
-				// mpc = new MainPanelComponent("Running in batch-mode. Partial result is not shown at this place.");
-				if (status != null)
-					status.setCurrentStatusText1("Result-Receiver processes results");
-				getResultReceiver().setExperimenData(statisticsResult);
-				getResultReceiver().run();
-				if (status != null)
-					status.setCurrentStatusText1("Processing finished");
+				this.experimentResult = null;
+				if (getResultReceiver() == null)
+					mpc = new MainPanelComponent("Stop requested, processing aborted, output set to NULL.");
+				else {
+					getResultReceiver().setExperimenData(null);
+					getResultReceiver().run();
+				}
 			}
-			this.experimentResult = statisticsResult;
+			
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			mpc = null;
