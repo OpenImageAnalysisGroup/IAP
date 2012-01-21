@@ -71,9 +71,9 @@ public class TaskDescription {
 	
 	@Override
 	public String toString() {
-		return ""+analysisActionClassName.substring(analysisActionClassName.lastIndexOf(".")+1)+": "+experimentInput.getExperimentName()+"";
+		return "" + analysisActionClassName.substring(analysisActionClassName.lastIndexOf(".") + 1) + ": " + experimentInput.getExperimentName() + "";
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		return cmd.equals(((TaskDescription) obj).cmd);
@@ -121,6 +121,10 @@ public class TaskDescription {
 			@Override
 			public void run() {
 				// store dataset in mongo
+				if (experiment == null) {
+					finished = true;
+					return;
+				}
 				experiment.getHeader().setExperimentname(
 						cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§"
 								+ batch.getSubmissionTime());

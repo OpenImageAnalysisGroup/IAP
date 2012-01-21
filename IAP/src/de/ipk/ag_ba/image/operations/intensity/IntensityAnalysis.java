@@ -101,9 +101,9 @@ public class IntensityAnalysis {
 			}
 			result.addValue("hue.average", sumOfHue / plantImagePixelCnt);
 			if (maxHue != null)
-				result.addValue("hue.max", maxHue / plantImagePixelCnt);
+				result.addValue("hue.max", maxHue);
 			if (minHue != null)
-				result.addValue("hue.min", minHue / plantImagePixelCnt);
+				result.addValue("hue.min", minHue);
 		} else {
 			if (multiLevel) {
 				result.addValue("intensity.phenol.plant_weight", weightOfPlant);

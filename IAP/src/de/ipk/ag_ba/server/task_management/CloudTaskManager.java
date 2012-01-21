@@ -165,7 +165,8 @@ public class CloudTaskManager {
 							td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.FINISHED);
 							del.add(td);
 						} else {
-							td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS);
+							if (!td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS))
+								td.getBatchCmd().getStatusProvider().pleaseStop();
 							progressSum += td.getBatchCmd().getCurrentStatusValueFine();
 							nn++;
 						}
@@ -178,24 +179,24 @@ public class CloudTaskManager {
 					for (TaskDescription td : commands_to_start) {
 						if (!runningTasks.contains(td)) {
 							try {
-								td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS);
-								runningTasks.add(td);
-								td.setSystemExitAfterCompletion(autoClose);
-								final TaskDescription tdf = td;
-								Runnable r = new Runnable() {
-									@Override
-									public void run() {
-										try {
-											tdf.startWork(tdf.getBatchCmd(), hostName, hostName, m);
-										} catch (Exception e) {
-											e.printStackTrace();
+								if (td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS)) {
+									runningTasks.add(td);
+									td.setSystemExitAfterCompletion(autoClose);
+									final TaskDescription tdf = td;
+									Runnable r = new Runnable() {
+										@Override
+										public void run() {
+											try {
+												tdf.startWork(tdf.getBatchCmd(), hostName, hostName, m);
+											} catch (Exception e) {
+												e.printStackTrace();
+											}
 										}
-									}
-								};
-								Thread t = new Thread(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName());
-								t.setPriority(Thread.MIN_PRIORITY);
-								t.start();
-								
+									};
+									Thread t = new Thread(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName());
+									t.setPriority(Thread.MIN_PRIORITY);
+									t.start();
+								}
 							} catch (Exception e) {
 								System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: BATCH-CMD COULD NOT BE STARTED: " + e.getMessage());
 							}

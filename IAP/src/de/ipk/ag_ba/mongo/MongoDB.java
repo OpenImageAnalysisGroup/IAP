@@ -1685,37 +1685,40 @@ public class MongoDB {
 						collection.setObjectClass(BatchCmd.class);
 						boolean added = false;
 						int addCnt = 0;
-						for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.SCHEDULED)).sort(new BasicDBObject("submission", 1)).limit(maxTasks)) {
+						for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.SCHEDULED)).sort(new BasicDBObject("submission", 1))
+								.limit(maxTasks)) {
 							BatchCmd batch = (BatchCmd) dbo;
 							if (batch.getCpuTargetUtilization() < maxTasks) {
 								if (batch.getExperimentHeader() == null)
 									continue;
 								if (batch.getOwner() == null)
-									batchClaim(batch, CloudAnalysisStatus.STARTING, false);
-								if (hostName.equals("" + batch.getOwner())) {
-									res.add(batch);
-									added = true;
-									addCnt += batch.getCpuTargetUtilization();
-									if (addCnt >= maxTasks)
-										break;
-								}
+									if (batchClaim(batch, CloudAnalysisStatus.STARTING, false))
+										if (hostName.equals("" + batch.getOwner())) {
+											res.add(batch);
+											added = true;
+											addCnt += batch.getCpuTargetUtilization();
+											if (addCnt >= maxTasks)
+												break;
+										}
 							}
 						}
 						int claimed = 0;
-						if (addCnt < maxTasks)
-							for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
+						if (addCnt < maxTasks) {
+							loop: for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (batch.getExperimentHeader() == null)
 									continue;
 								if (!added && batch.getCpuTargetUtilization() <= maxTasks)
-									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 30000)) {
-										// after 30 seconds tasks are taken away from other systems
-										batchClaim(batch, CloudAnalysisStatus.STARTING, false);
-										claimed++;
-										if (claimed >= maxTasks)
-											break;
+									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
+										// after 5 minutes tasks are taken away from other systems
+										if (batchClaim(batch, CloudAnalysisStatus.STARTING, false)) {
+											claimed++;
+											if (claimed >= maxTasks)
+												break loop;
+										}
 									}
 							}
+						}
 						if (addCnt < maxTasks)
 							for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.STARTING)).sort(new BasicDBObject("submission", 1))) {
 								BatchCmd batch = (BatchCmd) dbo;
@@ -1761,8 +1764,10 @@ public class MongoDB {
 		return res;
 	}
 	
-	public void batchClaim(final BatchCmd batch, final CloudAnalysisStatus starting, final boolean requireOwnership) {
+	public boolean batchClaim(final BatchCmd batch, final CloudAnalysisStatus starting, final boolean requireOwnership) {
 		// try to claim a batch cmd
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		tso.setBval(0, false);
 		try {
 			processDB(new RunnableOnDB() {
 				private DB db;
@@ -1784,6 +1789,9 @@ public class MongoDB {
 						batch.put("owner", SystemAnalysisExt.getHostName());
 						// WriteResult r =
 						collection.update(dbo, batch, false, false);
+						CommandResult cr = db.getLastError();
+						boolean success = cr.getBoolean("updatedExisting", false);
+						tso.setBval(0, success);
 						// System.out.println("Update status: " + rs + " --> " + starting.toString() + ", res: " + r.toString());
 					} catch (UnknownHostException e) {
 						ErrorMsg.addErrorMessage(e);
@@ -1798,6 +1806,7 @@ public class MongoDB {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+		return tso.getBval(0, false);
 	}
 	
 	public BatchCmd batchGetCommand(final BatchCmd batch) {
