@@ -670,9 +670,7 @@ public class MongoDB {
 			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
 		
 		dbSubstance.put("condition_ids", conditionIDs);
-		if (status == null) {
-			substances.insert(dbSubstance);
-		}
+		substances.insert(dbSubstance);
 	}
 	
 	private int countMeasurementValues(ExperimentInterface experiment, MeasurementNodeType[] measurementNodeTypes) {
