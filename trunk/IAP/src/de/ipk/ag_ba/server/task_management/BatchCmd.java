@@ -93,15 +93,20 @@ public class BatchCmd extends BasicDBObject {
 			put("line3", statusProvider.getCurrentStatusMessage3());
 			put("waitsForUser", statusProvider.pluginWaitsForUser());
 			
-			BatchCmd bcmd = m.batchGetCommand(this);
-			if (bcmd == null)
-				statusProvider.pleaseStop();
+			if (statusProvider.getCurrentStatusValue() < 100) {
+				BatchCmd bcmd = m.batchGetCommand(this);
+				if (bcmd == null)
+					statusProvider.pleaseStop();
+			}
 		}
 		if (m.batchClaim(this, status, true)) {
 			setRunStatus(status);
 			return true;
-		}
-		return false;
+		} else
+			if (statusProvider != null && statusProvider.getCurrentStatusValue() < 100)
+				return false;
+			else
+				return true;
 		// statusProvider.pleaseStop() -->
 		// statusProvider.pleaseContinueRun() -->
 	}

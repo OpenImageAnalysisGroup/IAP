@@ -127,8 +127,10 @@ public class MongoDB {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		
 		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
-		res.add(getDefaultCloud());
-		res.add(new MongoDB("Data Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
+		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de"))
+			res.add(getDefaultCloud());
+		if (IAPservice.isReachable("ba-24.ipk-gatersleben.de"))
+			res.add(new MongoDB("Data Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
 		// } else
 		// res.add(getLocalDB());
 		// }
@@ -433,7 +435,7 @@ public class MongoDB {
 		int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
 				MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK });
 		
-		if (status != null || (status != null && !status.wantsToStop()))
+		if (status != null)
 			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">Determine Size");
 		{
 			if (experiment.getHeader().getDatabaseId() != null && !experiment.getHeader().getDatabaseId().startsWith("hsm:")) {
@@ -450,8 +452,8 @@ public class MongoDB {
 		while (!sl.isEmpty()) {
 			SubstanceInterface s = sl.get(0);
 			sl.remove(0);
-			if (status != null && status.wantsToStop())
-				break;
+			// if (status != null && status.wantsToStop())
+			// break;
 			if (status != null)
 				status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">SAVE SUBSTANCE " + s.getName());
 			attributes.clear();
@@ -462,16 +464,16 @@ public class MongoDB {
 			ArrayList<String> conditionIDs = new ArrayList<String>();
 			
 			for (ConditionInterface c : s) {
-				if (status != null && status.wantsToStop())
-					break;
+				// if (status != null && status.wantsToStop())
+				// break;
 				attributes.clear();
 				c.fillAttributeMap(attributes);
 				BasicDBObject condition = new BasicDBObject(filter(attributes));
 				
 				List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
 				for (SampleInterface sa : c) {
-					if (status != null && status.wantsToStop())
-						break;
+					// if (status != null && status.wantsToStop())
+					// break;
 					attributes.clear();
 					sa.fillAttributeMap(attributes);
 					BasicDBObject sample = new BasicDBObject(filter(attributes));
@@ -627,7 +629,7 @@ public class MongoDB {
 		if (status != null)
 			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">SAVE OF SUBSTANCE-DB ELEMENTS FINISHED");
 		
-		if (status != null || (status != null && !status.wantsToStop()))
+		if (status != null)// || (status != null && !status.wantsToStop()))
 			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">Finalize Storage");
 		
 		// l = overallFileSize.getLong(); // in case of update the written bytes are not the right size
@@ -639,7 +641,7 @@ public class MongoDB {
 		
 		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
-		if (status == null || (status != null && !status.wantsToStop())) {
+		if (true) {// || (status != null && !status.wantsToStop())
 			experiments.insert(dbExperiment);
 			String id = dbExperiment.get("_id").toString();
 			System.out.println(">>> STORED EXPERIMENT " + experiment.getHeader().getExperimentName() + " // DB-ID: " + id + " // "
@@ -668,7 +670,7 @@ public class MongoDB {
 			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
 		
 		dbSubstance.put("condition_ids", conditionIDs);
-		if (status == null || (status != null && !status.wantsToStop())) {
+		if (status == null) {
 			substances.insert(dbSubstance);
 		}
 	}
