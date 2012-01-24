@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="javadoc" name="Graffiti_Plugins">
+
+    <target name="timestamp">
+		<tstamp>
+            <format property="time" pattern="yyyy-MM-dd hh:mm:ss aa z"/>
+		</tstamp>
+    </target>
+
+    <target name="javadoc" depends="timestamp">
+        <javadoc access="private" author="true"
+            classpath="../Graffiti_lib/jlex_java_cup.jar:../Graffiti_lib/scrollabledesktop.jar:../Graffiti_lib/commons-beanutils.jar:../Graffiti_lib/commons-collections.jar:../Graffiti_lib/commons-digester.jar:../Graffiti_lib/commons-logging.jar:../Graffiti_lib/junit.jar"
+            destdir="javadoc" doctitle="Graffiti_Plugins"
+            nodeprecated="false" nodeprecatedlist="false"
+            noindex="false" nonavbar="false" notree="false"
+            packagenames="
+            	org.graffiti.plugins.algorithms.apsp,
+            	org.graffiti.plugins.algorithms.bfs,
+            	org.graffiti.plugins.algorithms.bfstopsort,
+            	org.graffiti.plugins.algorithms.connect,
+            	org.graffiti.plugins.algorithms.connectspecial,
+            	org.graffiti.plugins.algorithms.fordfulkerson,
+            	org.graffiti.plugins.algorithms.generators,
+            	org.graffiti.plugins.algorithms.numbernodes,
+            	org.graffiti.plugins.algorithms.randomizedlabeling,
+            	org.graffiti.plugins.algorithms.springembedder,
+            	org.graffiti.plugins.algorithms.springembedderrestricted,
+            	org.graffiti.plugins.algorithms.trivialgrid,
+            	org.graffiti.plugins.algorithms.trivialgridrestricted,
+            	org.graffiti.plugins.attributecomponents.simplelabel,
+            	org.graffiti.plugins.attributes.defaults,
+            	org.graffiti.plugins.editcomponents.defaults,
+            	org.graffiti.plugins.guis.switchselections,
+            	org.graffiti.plugins.guis.switchselections,
+            	org.graffiti.plugins.inspectors.defaults,
+            	org.graffiti.plugins.ios.exporters.gml,
+            	org.graffiti.plugins.ios.exporters.gmlxml,
+            	org.graffiti.plugins.ios.exporters.graphml,
+            	org.graffiti.plugins.ios.exporters.graphviz,
+            	org.graffiti.plugins.ios.gml,
+            	org.graffiti.plugins.ios.gml.attributemapping,
+            	org.graffiti.plugins.ios.gml.gmlReader,
+            	org.graffiti.plugins.ios.gml.gmlReader.gml,
+            	org.graffiti.plugins.ios.gml.gmlReader.parser,
+            	org.graffiti.plugins.ios.gml.gmlReader.transform,
+            	org.graffiti.plugins.ios.gml.gmlWriter,
+            	org.graffiti.plugins.ios.gml.gmlWriter.gmlAttribute,
+            	org.graffiti.plugins.ios.importers.gml,
+            	org.graffiti.plugins.ios.importers.graphml,
+            	org.graffiti.plugins.ios.importers.graphml.parser,
+            	org.graffiti.plugins.modes.defaults,
+            	org.graffiti.plugins.modes.defaultEditMode,
+            	org.graffiti.plugins.tools.enhancedzoomtool,
+            	org.graffiti.plugins.tools.zoomtool,
+            	org.graffiti.plugins.views.defaults,
+            	org.graffiti.plugins.views.matrix"
+            source="1.4" sourcepath=".:../Graffiti_Core:../Graffiti_Editor" splitindex="true" use="true" version="true"
+            stylesheetfile="../Graffiti_Core/style.css"
+        >
+			<tag name="clientCardinality" description="Client Cardinality:"
+				enabled="false"/>
+			<link offline="true" href="http://www.infosun.fmi.uni-passau.de/br/projects/Graffiti/doc/api/Graffiti_Core/"   packagelistLoc="../Graffiti_Core/javadoc"/>
+			<link offline="true" href="http://www.infosun.fmi.uni-passau.de/br/projects/Graffiti/doc/api/Graffiti_Editor/" packagelistLoc="../Graffiti_Editor/javadoc"/>
+			<link href="http://java.sun.com/j2se/1.4.2/docs/api"/>
+			<bottom>Generated at ${time}</bottom>
+        </javadoc>
+    </target>
+    
+    <target name="javadoc-all" depends="timestamp">
+        <javadoc access="private" author="true"
+            classpath="../Graffiti_lib/jlex_java_cup.jar:../Graffiti_lib/scrollabledesktop.jar:../Graffiti_lib/commons-beanutils.jar:../Graffiti_lib/commons-collections.jar:../Graffiti_lib/commons-digester.jar:../Graffiti_lib/commons-logging.jar:../Graffiti_lib/junit.jar"
+            destdir="javadoc_all" doctitle="Graffiti"
+            nodeprecated="false" nodeprecatedlist="false"
+            noindex="false" nonavbar="false" notree="false"
+            packagenames="org.graffiti.*"
+            source="1.4" sourcepath=".:../Graffiti_Core:../Graffiti_Editor" splitindex="true" use="true" version="true"
+            stylesheetfile="../Graffiti_Core/style.css"
+        >
+			<tag name="clientCardinality" description="Client Cardinality:"
+				enabled="false"/>
+			<link href="http://java.sun.com/j2se/1.4.2/docs/api"/>
+			<group title="Graffiti_Core" packages="org.graffiti.managers.pluginmgr,org.graffiti.managers,org.graffiti.plugin.algorithm,org.graffiti.undo,org.graffiti.options,org.graffiti.event,org.graffiti.selection,org.graffiti.graph,org.graffiti.help,org.graffiti.attributes,org.graffiti.util,org.graffiti.plugin,org.graffiti.core,org.graffiti.plugin.io,org.graffiti.plugin.parameter,org.graffiti.util.logging"/>
+			<group title="Graffiti_Editor" packages="org.graffiti.editor,org.graffiti.editor.actions,org.graffiti.plugin.actions,org.graffiti.plugin.editcomponent,org.graffiti.editor.dialog,org.graffiti.plugin.inspector,org.graffiti.editor.options,org.graffiti.plugin.attributecomponent,org.graffiti.plugin.gui,org.graffiti.graphics,org.graffiti.session,org.graffiti.plugin.tool,org.graffiti.plugin.view,org.graffiti.plugin.mode"/>
+			<group title="Graffiti_Plugins" packages="org.graffiti.plugins.*"/>
+			<bottom>Generated at ${time}</bottom>
+        </javadoc>
+    </target>
+</project>
