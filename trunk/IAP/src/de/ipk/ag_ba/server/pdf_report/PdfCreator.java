@@ -62,10 +62,15 @@ public class PdfCreator {
 	}
 	
 	public void saveReportCSV(byte[] result, boolean xlsx) throws IOException {
-		File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report." + (xlsx ? "xlsx" : "csv"));
+		File report = getSaveFile(xlsx);
 		FileOutputStream fos = new FileOutputStream(report);
 		fos.write(result);
 		fos.close();
+	}
+	
+	public File getSaveFile(boolean xlsx) {
+		File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report." + (xlsx ? "xlsx" : "csv"));
+		return report;
 	}
 	
 	public void executeRstat(final String[] parameter) throws IOException {
