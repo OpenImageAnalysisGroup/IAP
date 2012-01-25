@@ -6,8 +6,11 @@
  */
 package de.ipk.ag_ba.gui.actions;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.TreeMap;
 
 import javax.swing.JLabel;
@@ -19,7 +22,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -152,9 +154,14 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 						row.createCell(col++).setCellValue(h);
 				}
 				
+				PdfCreator p = new PdfCreator(experiment);
+				experiment = null;
 				if (xlsx) {
+					Queue<SnapshotDataIAP> todo = new LinkedList<SnapshotDataIAP>(snapshots);
+					snapshots = null;
 					int rowNum = 1;
-					for (SnapshotDataIAP s : snapshots) {
+					while (!todo.isEmpty()) {
+						SnapshotDataIAP s = todo.poll();
 						for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects()) {
 							Row row = sheet.createRow(rowNum++);
 							int colNum = 0;
@@ -184,17 +191,15 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 							csv.append(s.getCSVvalue(germanLanguage, separator));
 						}
 					}
-				MyByteArrayOutputStream bos = xlsx ? new MyByteArrayOutputStream() : null;
 				if (xlsx)
-					wb.write(bos);
-				if (xlsx)
-					bos.close();
-				byte[] result = xlsx ? bos.getBuffTrimmed() : csv.toString().getBytes();
+					wb.write(new FileOutputStream(p.getSaveFile(xlsx), xlsx));
+				else {
+					byte[] result = csv.toString().getBytes();
+					
+					p.prepareTempDirectory();
+					p.saveReportCSV(result, xlsx);
+				}
 				
-				PdfCreator p = new PdfCreator(experiment);
-				
-				p.prepareTempDirectory();
-				p.saveReportCSV(result, xlsx);
 				// p.saveScripts(new String[] {
 				// "diagramForReportPDF.r",
 				// "diagramIAP.cmd",
