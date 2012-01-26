@@ -8,6 +8,7 @@ package de.ipk.ag_ba.server.task_management;
 
 import info.StopWatch;
 
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -324,11 +325,25 @@ public class CloudComputingService {
 				
 				boolean addNewTasksIfMissing = false;
 				
-				Object[] res = MyInputHelper.getInput("<html>Process incomplete data sets? " +
-						"<br>TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
-						+ knownResults.size(), "Add compute tasks?", new Object[] {
-						"Add compute tasks for missing data?", addNewTasksIfMissing
-				});
+				Object[] res;
+				if (GraphicsEnvironment.isHeadless()) {
+					System.out.println(">Process incomplete data sets? TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
+							+ knownResults.size());
+					System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
+					String in = System.console().readLine();
+					if (in == null)
+						res = null;
+					else
+						if (in.toUpperCase().contains("Y"))
+							res = new Object[] { true };
+						else
+							res = new Object[] { false };
+				} else
+					res = MyInputHelper.getInput("<html>Process incomplete data sets? " +
+							"<br>TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
+							+ knownResults.size(), "Add compute tasks?", new Object[] {
+							"Add compute tasks for missing data?", addNewTasksIfMissing
+					});
 				if (res == null) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
 					System.exit(1);
