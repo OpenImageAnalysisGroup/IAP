@@ -17,15 +17,15 @@ elif [ $PARAM = 3 ]; then
 	SEC=${2}
 	THI=${3}
 else
-	TREAT="Condition"
+	TREAT="Genotype"
 	SEC="none"
 	THI="FALSE"
 fi
 
 if [ ${THI} = "TRUE" ]; then
-	Rscript createDiagramOneFile.r ${INPUTFILE} png TRUE ${TREAT} ${SEC}
+	Rscript createDiagramOneFile.r ${INPUTFILE} pdf TRUE ${TREAT} ${SEC}
 else
-	Rscript createDiagramOneFile.r ${INPUTFILE} png FALSE ${TREAT} ${SEC}
+	Rscript createDiagramOneFile.r ${INPUTFILE} pdf FALSE ${TREAT} ${SEC}
 fi
 
 echo "Create PDF..."
