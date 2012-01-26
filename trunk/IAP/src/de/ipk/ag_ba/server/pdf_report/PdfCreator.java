@@ -30,10 +30,7 @@ public class PdfCreator {
 	final TreeMap<Long, String> output = new TreeMap<Long, String>();
 	final ThreadSafeOptions tso = new ThreadSafeOptions();
 	
-	private final ExperimentInterface experiment;
-	
-	public PdfCreator(ExperimentInterface experiment) {
-		this.experiment = experiment;
+	public PdfCreator() {
 	}
 	
 	public void prepareTempDirectory() throws IOException {
@@ -73,8 +70,8 @@ public class PdfCreator {
 		return report;
 	}
 	
-	public void executeRstat(final String[] parameter) throws IOException {
-		readAndModify("report2.tex");
+	public void executeRstat(final String[] parameter, ExperimentInterface exp) throws IOException {
+		readAndModify("report2.tex", exp);
 		
 		String name = tempDirectory.getAbsolutePath() + File.separator + "diagramIAP.cmd";
 		if (AttributeHelper.windowsRunning())
@@ -153,7 +150,7 @@ public class PdfCreator {
 	 *           file name
 	 * @throws IOException
 	 */
-	private void readAndModify(String fn) throws IOException {
+	private void readAndModify(String fn, ExperimentInterface experiment) throws IOException {
 		
 		File fff = new File(tempDirectory.getAbsolutePath() + File.separator + fn);
 		String c = TextFile.read(fff);

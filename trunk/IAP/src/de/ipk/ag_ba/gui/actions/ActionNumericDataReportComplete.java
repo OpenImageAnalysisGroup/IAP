@@ -123,6 +123,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				StringBuilder csv = new StringBuilder();
 				boolean water = false;
 				String csvHeader = getCSVheader();
+				if (status != null)
+					status.setCurrentStatusText2("Create snapshots");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set");
 				if (!water) {
 					HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 					snapshots = IAPservice.getSnapshotsFromExperiment(
@@ -142,6 +145,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 							null, experiment, null, false, exportIndividualAngles);
 					csv.append(csvHeader);
 				}
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Snapshot data set has been created");
 				Workbook wb = xlsx ? new XSSFWorkbook() : null;
 				Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experimentReference.getExperimentName())) : null;
 				if (sheet != null) {
@@ -154,19 +158,32 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 						row.createCell(col++).setCellValue(h);
 				}
 				
-				PdfCreator p = new PdfCreator(experiment);
-				experiment = null;
+				PdfCreator p = new PdfCreator();
 				if (xlsx) {
+					experiment = null;
+					if (status != null)
+						status.setCurrentStatusText2("Fill workbook");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
 					Queue<SnapshotDataIAP> todo = new LinkedList<SnapshotDataIAP>(snapshots);
 					snapshots = null;
 					int rowNum = 1;
+					Runtime r = Runtime.getRuntime();
 					while (!todo.isEmpty()) {
 						SnapshotDataIAP s = todo.poll();
+						if (status != null)
+							status.setCurrentStatusText1("Rows remaining: " + todo.size());
+						if (status != null)
+							status.setCurrentStatusText2("Memory status: "
+									+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+									+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
+						System.out.println(SystemAnalysis.getCurrentTime() + ">Filling workbook, todo: " + todo.size() + " "
+								+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+								+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
 						for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects()) {
 							Row row = sheet.createRow(rowNum++);
 							int colNum = 0;
 							for (DateDoubleString o : valueRow) {
-								if (o.getString() != null)
+								if (o.getString() != null && !o.getString().isEmpty())
 									row.createCell(colNum++).setCellValue(o.getString());
 								else
 									if (o.getDouble() != null)
@@ -179,6 +196,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 							}
 						}
 					}
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Workbook is filled");
 				} else
 					if (exportIndividualAngles) {
 						for (SnapshotDataIAP s : snapshots) {
@@ -191,8 +209,15 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 							csv.append(s.getCSVvalue(germanLanguage, separator));
 						}
 					}
-				if (xlsx)
+				if (xlsx) {
+					if (status != null)
+						status.setCurrentStatusText2("Save to file");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
 					wb.write(new FileOutputStream(p.getSaveFile(xlsx), xlsx));
+					System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved");
+					if (status != null)
+						status.setCurrentStatusText2("File saved");
+				}
 				else {
 					byte[] result = csv.toString().getBytes();
 					
@@ -217,7 +242,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 					});
 				
 				if (!exportIndividualAngles && !xlsx) {
-					p.executeRstat(variant);
+					p.executeRstat(variant, experiment);
 					
 					boolean ok = p.hasPDFcontent();
 					
