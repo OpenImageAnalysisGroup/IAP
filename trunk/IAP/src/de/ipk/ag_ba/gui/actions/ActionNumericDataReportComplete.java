@@ -213,6 +213,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 					if (status != null)
 						status.setCurrentStatusText2("Save to file");
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
+					p.prepareTempDirectory();
 					wb.write(new FileOutputStream(p.getSaveFile(xlsx), xlsx));
 					System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved");
 					if (status != null)
