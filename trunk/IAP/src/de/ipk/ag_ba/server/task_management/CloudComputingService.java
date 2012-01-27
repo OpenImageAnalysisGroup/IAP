@@ -28,6 +28,7 @@ import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.actions.Library;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.mongo.IAPservice;
@@ -339,8 +340,13 @@ public class CloudComputingService {
 						else
 							res = new Object[] { false };
 				} else
-					res = MyInputHelper.getInput("<html>Process incomplete data sets? " +
-							"<br>TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
+					res = MyInputHelper.getInput("<html>Process incomplete data sets? "
+							+
+							(knownResults.size() > 0 ?
+									"<br>Analyzed experiment: "
+											+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName()
+									: "")
+							+ "<br>TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
 							+ knownResults.size(), "Add compute tasks?", new Object[] {
 							"Add compute tasks for missing data?", addNewTasksIfMissing
 					});
@@ -403,7 +409,9 @@ public class CloudComputingService {
 							System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
 									/ 1024
 									+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
+							StopWatch s1 = new StopWatch(">m.getExperiment");
 							ExperimentInterface ei = m.getExperiment(ii);
+							s1.printTime();
 							TreeSet<String> condS = new TreeSet<String>();
 							for (SubstanceInterface s : ei) {
 								for (ConditionInterface ci : s) {
