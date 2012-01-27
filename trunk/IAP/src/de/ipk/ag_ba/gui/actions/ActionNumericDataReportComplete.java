@@ -42,7 +42,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	
-	private static final String separator = ";";// "\t";
+	private static final String separator = "\t";// ";";// "\t";
 	private final boolean exportIndividualAngles;
 	private final String[] variant;
 	private final boolean xlsx;

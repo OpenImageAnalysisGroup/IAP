@@ -414,10 +414,15 @@ public class SnapshotDataIAP {
 					+ "\r\n";
 		} else {
 			StringBuilder result = new StringBuilder();
+			int nmax = 0;
+			for (Double angle : storeValues.keySet()) {
+				int n = storeValues.get(angle).size();
+				if (n > nmax)
+					nmax = n;
+			}
 			for (Double angle : storeValues.keySet()) {
 				StringBuilder columnData = new StringBuilder();
-				int n = storeValues.get(angle).size();
-				for (int i = 0; i < n; i++) {
+				for (int i = 0; i < nmax; i++) {
 					columnData.append(separator);
 					Double v = storeValues.get(angle).get(i);
 					if (v != null && !Double.isNaN(v) && !Double.isInfinite(v)) {
