@@ -104,4 +104,20 @@ public class IAPimages {
 	public static String getFileRoller() {
 		return "img/ext/gpl2/File-Roller-64.png";
 	}
+	
+	public static String getToolbox() {
+		return "img/ext/gpl2/Gnome-Applications-System-64.png";
+	}
+	
+	public static String getTashWith2docs() {
+		return "img/ext/trash2.png";
+	}
+	
+	public static String getTashDeleteAll2() {
+		return "img/ext/trash-delete-all2.png";
+	}
+	
+	public static String getFileCleaner() {
+		return "img/ext/gpl2/Gnome-Edit-Clear-64.png";
+	}
 }

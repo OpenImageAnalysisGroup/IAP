@@ -209,4 +209,12 @@ public class SystemAnalysis {
 		w = StringManipulationTools.stringReplace(w, " sec", "s");
 		return w;
 	}
+	
+	public static void sleep(long ms) {
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }

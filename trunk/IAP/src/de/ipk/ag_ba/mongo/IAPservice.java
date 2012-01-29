@@ -62,14 +62,17 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.WebFolder;
+import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -780,6 +783,29 @@ public class IAPservice {
 			}
 		});
 		return ml;
+	}
+	
+	public static void getExperimentData(
+			ExperimentHeaderInterface header,
+			MongoDB m,
+			BackgroundTaskStatusProviderSupportingExternalCall status,
+			RunnableWithMappingData resultReceiver) throws Exception {
+		ExperimentInterface experiment = null;
+		if (header.getDatabaseId() != null
+				&& header.getDatabaseId().startsWith("lemnatec:"))
+			experiment = new de.ipk.ag_ba.postgresql.LemnaTecDataExchange().getExperiment(header,
+					status);
+		else
+			if (header.getDatabaseId() != null
+					&& header.getDatabaseId().startsWith("hsm:"))
+				experiment = HSMfolderTargetDataManager.getExperiment(header,
+						status);
+			else
+				experiment = m.getExperiment(header, true, status);
+		if (experiment != null)
+			experiment.setHeader(header);
+		
+		resultReceiver.setExperimenData(experiment);
 	}
 	
 }

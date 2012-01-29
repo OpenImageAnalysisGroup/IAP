@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -1293,6 +1294,62 @@ public class MongoDB {
 		return experiment;
 	}
 	
+	protected void visitExperiment(
+			final ExperimentHeaderInterface header,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider,
+			final RunnableProcessingDBid visitSubstance,
+			final RunnableProcessingDBid visitCondition,
+			final RunnableProcessingBinaryMeasurement visitBinaryMeasurement) {
+		
+		if (optStatusProvider != null)
+			optStatusProvider.setCurrentStatusValue(0);
+		try {
+			processDB(new RunnableOnDB() {
+				private DB db;
+				
+				@Override
+				public void run() {
+					DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
+					DBObject expref = dbr.fetch();
+					if (expref != null) {
+						BasicDBList subList = (BasicDBList) expref.get("substances");
+						if (subList != null)
+							for (Object co : subList) {
+								DBObject substance = (DBObject) co;
+								visitSubstance(db, substance, optStatusProvider, 100d / subList.size(),
+										visitCondition,
+										visitBinaryMeasurement);
+							}
+						if (ensureIndex)
+							db.getCollection("substances").ensureIndex("_id");
+						BasicDBList l = (BasicDBList) expref.get("substance_ids");
+						if (l != null)
+							for (Object o : l) {
+								if (o == null)
+									continue;
+								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
+								if (subr != null) {
+									DBObject substance = subr.fetch();
+									visitSubstance.setDBid(substance.get("_id") + "");
+									visitSubstance.run();
+									if (substance != null) {
+										visitSubstance(db, substance, optStatusProvider, 100d / l.size(), visitCondition, visitBinaryMeasurement);
+									}
+								}
+							}
+					}
+				}
+				
+				@Override
+				public void setDB(DB db) {
+					this.db = db;
+				}
+			});
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+	}
+	
 	public void setExperimentType(final ExperimentHeaderInterface header, final String experimentType) throws Exception {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		processDB(new RunnableOnDB() {
@@ -1901,6 +1958,90 @@ public class MongoDB {
 		}
 	}
 	
+	private void visitSubstance(DB db, DBObject substance,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep,
+			RunnableProcessingDBid visitCondition,
+			RunnableProcessingBinaryMeasurement visitBinary) {
+		@SuppressWarnings("unchecked")
+		Substance3D s3d = new Substance3D(substance.toMap());
+		BasicDBList condList = (BasicDBList) substance.get("conditions");
+		if (condList != null)
+			for (Object co : condList) {
+				DBObject cond = (DBObject) co;
+				visitCondition(s3d, cond, visitBinary);
+				
+			}
+		if (ensureIndex)
+			db.getCollection("conditions").ensureIndex("_id");
+		BasicDBList l = (BasicDBList) substance.get("condition_ids");
+		if (l != null) {
+			double max = l.size();
+			for (Object o : l) {
+				DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
+				DBObject cond = condr.fetch();
+				if (cond != null) {
+					visitCondition.setDBid(cond.get("_id") + "");
+					visitCondition.run();
+					visitCondition(s3d, cond, visitBinary);
+				}
+				if (optStatusProvider != null)
+					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
+			}
+		}
+	}
+	
+	private void visitCondition(Substance3D s3d, DBObject cond, final RunnableProcessingBinaryMeasurement visitBinary) {
+		BasicDBList sampList = (BasicDBList) cond.get("samples");
+		if (sampList != null)
+			for (Object so : sampList) {
+				DBObject sam = (DBObject) so;
+				// images
+				BasicDBList imgList = (BasicDBList) sam.get(MongoCollection.IMAGES.toString());
+				if (imgList != null) {
+					for (Object m : imgList) {
+						DBObject img = (DBObject) m;
+						@SuppressWarnings("unchecked")
+						ImageData image = new ImageData(null, filter(img.toMap()));
+						image.getURL().setPrefix(mh.getPrefix());
+						if (image.getLabelURL() != null)
+							image.getLabelURL().setPrefix(mh.getPrefix());
+						visitBinary.setBinaryMeasurement(image);
+						visitBinary.run();
+					}
+				}
+				// volumes
+				BasicDBList volList = (BasicDBList) sam.get(MongoCollection.VOLUMES.toString());
+				if (volList != null) {
+					for (Object v : volList) {
+						DBObject vol = (DBObject) v;
+						@SuppressWarnings("unchecked")
+						VolumeData volume = new VolumeData(null, vol.toMap());
+						if (volume.getURL() != null)
+							volume.getURL().setPrefix(mh.getPrefix());
+						if (volume.getLabelURL() != null)
+							volume.getLabelURL().setPrefix(mh.getPrefix());
+						visitBinary.setBinaryMeasurement(volume);
+						visitBinary.run();
+					}
+				}
+				// networks
+				BasicDBList netList = (BasicDBList) sam.get(MongoCollection.NETWORKS.toString());
+				if (netList != null) {
+					for (Object n : netList) {
+						DBObject net = (DBObject) n;
+						@SuppressWarnings("unchecked")
+						NetworkData network = new NetworkData(null, net.toMap());
+						if (network.getURL() != null)
+							network.getURL().setPrefix(mh.getPrefix());
+						if (network.getLabelURL() != null)
+							network.getLabelURL().setPrefix(mh.getPrefix());
+						visitBinary.setBinaryMeasurement(network);
+						visitBinary.run();
+					}
+				}
+			}
+	}
+	
 	private void processCondition(Substance3D s3d, DBObject cond) {
 		Condition3D condition = new Condition3D(s3d, cond.toMap());
 		s3d.add(condition);
@@ -2265,17 +2406,17 @@ public class MongoDB {
 				status.setCurrentStatusValueFine(100d / 5 * 1);
 				
 				ArrayList<ExperimentHeaderInterface> el = getExperimentList(null);
-				HashSet<String> linkedHashes = new HashSet<String>();
+				final HashSet<String> linkedHashes = new HashSet<String>();
 				double smallStep = 100d / 5 * 1 / el.size();
-				HashSet<String> dbIdsOfSubstances = new HashSet<String>();
-				HashSet<String> dbIdsOfConditions = new HashSet<String>();
+				final HashSet<String> dbIdsOfSubstances = new HashSet<String>();
+				final HashSet<String> dbIdsOfConditions = new HashSet<String>();
 				status.setCurrentStatusText2("Read list of substances");
 				double oldStatus = status.getCurrentStatusValueFine();
 				status.setCurrentStatusValue(-1);
 				{
 					DBCollection substances = db.getCollection("substances");
 					long nn = 0, max = substances.count();
-					status.setCurrentStatusText2("Read list of substances (" + max + ")");
+					status.setCurrentStatusText2("Read list of substance IDs (" + max + ")");
 					DBCursor subCur = substances.find(new BasicDBObject(), new BasicDBObject("_id", 1));
 					while (subCur.hasNext()) {
 						DBObject subO = subCur.next();
@@ -2286,26 +2427,26 @@ public class MongoDB {
 							status.setCurrentStatusValueFine(100d * nn / max);
 						}
 					}
-					status.setCurrentStatusText2("Read list of substances (" + nn + ")");
+					status.setCurrentStatusText2("Read list of substance IDs (" + nn + ")");
 				}
 				status.setCurrentStatusText1(status.getCurrentStatusMessage2());
-				status.setCurrentStatusText2("Read list of conditions");
+				status.setCurrentStatusText2("Read list of condition IDs");
 				{
 					DBCollection conditions = db.getCollection("conditions");
 					long nn = 0, max = conditions.count();
-					status.setCurrentStatusText2("Read list of conditions (" + max + ")");
+					status.setCurrentStatusText2("Read list of condition IDs (" + max + ")");
 					DBCursor condCur = conditions.find(new BasicDBObject(), new BasicDBObject("_id", 1));
 					while (condCur.hasNext()) {
 						DBObject condO = condCur.next();
 						dbIdsOfConditions.add(condO.get("_id") + "");
 						nn++;
 						if (nn % 500 == 0) {
-							status.setCurrentStatusText2("Read list of conditions (" + nn + "/" + max + ")");
+							status.setCurrentStatusText2("Read list of condition IDs (" + nn + "/" + max + ")");
 							status.setCurrentStatusValueFine(100d * nn / max);
 						}
 						
 					}
-					status.setCurrentStatusText2("Read list of conditions (" + nn + "/" + max + ")");
+					status.setCurrentStatusText2("Read list of condition IDs (" + nn + "/" + max + ")");
 				}
 				status.setCurrentStatusText1("Create inventory");
 				status.setCurrentStatusValueFine(oldStatus);
@@ -2320,33 +2461,44 @@ public class MongoDB {
 				for (ExperimentHeaderInterface ehii : todo) {
 					ii++;
 					status.setCurrentStatusText2("Analyze " + ehii.getExperimentName() + " (" + ii + "/" + nn + ")");
-					ArrayList<DBObject> substanceObjects = new ArrayList<DBObject>();
-					ArrayList<DBObject> conditionObjects = new ArrayList<DBObject>();
-					ExperimentInterface exp = getExperiment(ehii, false, status, substanceObjects, conditionObjects);
-					{
-						// check Ids of substances and conditions
-						for (DBObject subO : substanceObjects) {
-							String id = subO.get("_id") + "";
+					
+					RunnableProcessingDBid visitSubstance = new RunnableProcessingDBid() {
+						private String id;
+						
+						@Override
+						public void run() {
 							dbIdsOfSubstances.remove(id);
 						}
-						substanceObjects = null;
-						for (DBObject condO : conditionObjects) {
-							String id = condO.get("_id") + "";
-							if (dbIdsOfConditions.contains(id))
-								dbIdsOfConditions.remove(id);
+						
+						@Override
+						public void setDBid(String id) {
+							this.id = id;
 						}
-						conditionObjects = null;
-					}
-					List<NumericMeasurementInterface> binaryData = Substance3D.getAllFiles(exp);
-					for (NumericMeasurementInterface nmi : binaryData) {
-						if (nmi instanceof BinaryMeasurement) {
-							BinaryMeasurement bm = (BinaryMeasurement) nmi;
+					};
+					RunnableProcessingDBid visitCondition = new RunnableProcessingDBid() {
+						private String id;
+						
+						@Override
+						public void run() {
+							dbIdsOfConditions.remove(id);
+						}
+						
+						@Override
+						public void setDBid(String id) {
+							this.id = id;
+						}
+					};
+					RunnableProcessingBinaryMeasurement visitBinaryMeasurement = new RunnableProcessingBinaryMeasurement() {
+						private BinaryMeasurement bm;
+						
+						@Override
+						public void run() {
 							if (bm.getURL() != null)
 								linkedHashes.add(bm.getURL().getDetail());
 							if (bm.getLabelURL() != null)
 								linkedHashes.add(bm.getLabelURL().getDetail());
-							if (nmi instanceof ImageData) {
-								ImageData imData = (ImageData) nmi;
+							if (bm instanceof ImageData) {
+								ImageData imData = (ImageData) bm;
 								String oldRef = imData.getAnnotationField("oldreference");
 								if (oldRef != null && oldRef.length() > 0) {
 									IOurl u = new IOurl(oldRef);
@@ -2354,7 +2506,15 @@ public class MongoDB {
 								}
 							}
 						}
-					}
+						
+						@Override
+						public void setBinaryMeasurement(BinaryMeasurement bm) {
+							this.bm = bm;
+						}
+					};
+					
+					visitExperiment(ehii, status, visitSubstance, visitCondition, visitBinaryMeasurement);
+					
 					status.setCurrentStatusValueFineAdd(smallStep);
 				} // experiments
 				
@@ -2362,6 +2522,7 @@ public class MongoDB {
 					DBCollection substances = db.getCollection("substances");
 					long cnt = substances.count();
 					long max = dbIdsOfSubstances.size();
+					System.out.println("Remove stale substances: " + max + "/" + cnt);
 					status.setCurrentStatusText1("Remove stale substances: " + max + "/" + cnt);
 					int n = 0;
 					for (String subID : dbIdsOfSubstances) {
@@ -2378,6 +2539,7 @@ public class MongoDB {
 					long max = dbIdsOfConditions.size();
 					DBCollection conditions = db.getCollection("conditions");
 					long cnt = conditions.count();
+					System.out.println("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
 					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
 					for (String condID : dbIdsOfConditions) {
 						n++;
@@ -2431,32 +2593,7 @@ public class MongoDB {
 									+ SystemAnalysis.getCurrentTime());
 							res.append("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
 									+ SystemAnalysis.getCurrentTime() + "<br>");
-							if (compact_warningLongExecutionTime) {
-								System.out.println("Start compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime());
-								res.append("Start compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime() + "<br>");
-								HashMap<String, Object> m = new HashMap<String, Object>();
-								m.put("compact", mgfs + ".files");
-								m.put("force", true);
-								BasicDBObject cmd = new BasicDBObject(m);
-								db.command(cmd);
-								
-								m.clear();
-								m.put("compact", mgfs);
-								m.put("force", true);
-								cmd = new BasicDBObject(m);
-								db.command(cmd);
-								
-								m.clear();
-								m.put("compact", mgfs + ".chunks");
-								m.put("force", true);
-								cmd = new BasicDBObject(m);
-								db.command(cmd);
-								
-								System.out.println("Finished compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime());
-								res.append("Finished compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime() + "<br>");
-							} else {
-								System.out.println("Compact operation was not requested. Database contains free space, free file system space is not increased!");
-							}
+							
 							freeAll += free;
 						}
 						status.setCurrentStatusValueFineAdd(stepSize);
@@ -2469,6 +2606,65 @@ public class MongoDB {
 					status.setCurrentStatusText1("Deleted MB: " + (freeAll / 1024 / 1024));
 					status.setCurrentStatusValueFine(100d / 5 * 5);
 				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		return res.toString();
+	}
+	
+	public synchronized String compact(
+			final BackgroundTaskStatusProviderSupportingExternalCall status)
+			throws Exception {
+		final StringBuilder res = new StringBuilder();
+		processDB(new RunnableOnDB() {
+			
+			private DB db;
+			
+			@Override
+			public void run() {
+				Set<String> col = db.getCollectionNames();
+				int n = 0;
+				for (String mgfs : col) { // MongoGridFS.getFileCollectionsInclPreview()
+					System.out.println("Start compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime());
+					res.append("Start compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime() + "<br>");
+					status.setCurrentStatusText1("Start compact of " + mgfs + " at " + SystemAnalysis.getCurrentTime());
+					status.setCurrentStatusText2("Size: " + db.getCollection(mgfs).getCount());
+					HashMap<String, Object> m = new HashMap<String, Object>();
+					m.put("compact", mgfs);// + ".files");
+					m.put("force", true);
+					BasicDBObject cmd = new BasicDBObject(m);
+					db.command(cmd);
+					
+					SystemAnalysis.sleep(10000);
+					
+					// m.clear();
+					// m.put("compact", mgfs);
+					// m.put("force", true);
+					// cmd = new BasicDBObject(m);
+					// db.command(cmd);
+					//
+					// m.clear();
+					// m.put("compact", mgfs + ".chunks");
+					// m.put("force", true);
+					// cmd = new BasicDBObject(m);
+					// db.command(cmd);
+					
+					System.out.println("Finished compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime());
+					res.append("Finished compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime() + "<br>");
+					n++;
+					status.setCurrentStatusValueFine(100d * n / col.size());
+				}
+				System.out.println("COMPACT DATABASE FINISHED // "
+						+ SystemAnalysis.getCurrentTime());
+				
+				res.append("COMPACT DATABASE FINISHED // "
+						+ SystemAnalysis.getCurrentTime() + "<br>");
+				status.setCurrentStatusText1("Compact operation finished");
+				status.setCurrentStatusValueFine(100d);
 			}
 			
 			@Override
