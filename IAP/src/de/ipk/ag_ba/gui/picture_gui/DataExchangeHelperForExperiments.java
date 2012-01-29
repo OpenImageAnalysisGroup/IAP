@@ -291,9 +291,11 @@ public class DataExchangeHelperForExperiments {
 														.toString()
 														+ " ("
 														+ s3d.toString() + ")");
-												IOurl urlLabel = new IOurl(id
-														.getLabelURL().toString()
-														+ " (" + s3d.toString() + ")");
+												IOurl urlLabel =
+														new IOurl(
+																(id != null && id.getLabelURL() != null ?
+																		id.getLabelURL().toString() : "[no label URL]")
+																		+ " (" + s3d.toString() + ")");
 												primary = new BinaryFileInfo(urlMain,
 														urlLabel, true, id);
 											} else

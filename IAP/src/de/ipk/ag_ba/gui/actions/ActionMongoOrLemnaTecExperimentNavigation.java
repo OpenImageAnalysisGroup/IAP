@@ -19,17 +19,17 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
+import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 
 /**
  * @author klukas
  */
 public class ActionMongoOrLemnaTecExperimentNavigation extends
-		AbstractNavigationAction {
+		AbstractNavigationAction implements RunnableWithMappingData {
 	private final ExperimentHeaderInterface header;
 	private NavigationButton src;
 	private ExperimentInterface experiment;
@@ -146,19 +146,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 			throws Exception {
 		this.src = src;
 		if (experiment == null) {
-			if (header.getDatabaseId() != null
-					&& header.getDatabaseId().startsWith("lemnatec:"))
-				experiment = new LemnaTecDataExchange().getExperiment(header,
-						status);
-			else
-				if (header.getDatabaseId() != null
-						&& header.getDatabaseId().startsWith("hsm:"))
-					experiment = HSMfolderTargetDataManager.getExperiment(header,
-							status);
-				else
-					experiment = m.getExperiment(header, true, status);
-			if (experiment != null)
-				experiment.setHeader(header);
+			IAPservice.getExperimentData(header, m, status, this);
 		}
 	}
 	
@@ -243,5 +231,15 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	
 	public void setOverrideTitle(String displayName) {
 		this.displayName = displayName;
+	}
+	
+	@Override
+	public void setExperimenData(ExperimentInterface doc) {
+		experiment = doc;
+	}
+	
+	@Override
+	public void run() {
+		// empty
 	}
 }

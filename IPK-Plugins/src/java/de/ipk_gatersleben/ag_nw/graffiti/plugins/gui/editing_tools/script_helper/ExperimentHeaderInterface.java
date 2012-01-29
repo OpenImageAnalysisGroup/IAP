@@ -9,6 +9,7 @@ import unit_test_support.TestValueRequired;
 @TestValueRequired("experimentname")
 public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderInterface>, Cloneable {
 	
+	@Override
 	public boolean equals(Object obj);
 	
 	public void setExperimentname(String experimentname);
@@ -96,6 +97,7 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	
 	public void setDatabase(String database);
 	
+	@Override
 	public int hashCode();
 	
 	public ExperimentHeaderInterface clone();

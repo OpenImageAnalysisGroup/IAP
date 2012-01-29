@@ -17,20 +17,19 @@ import de.ipk.ag_ba.mongo.MongoDB;
 /**
  * @author klukas
  */
-public class ActionMongoDbReorganize extends AbstractNavigationAction implements NavigationAction {
+public class ActionMongoDbCompact extends AbstractNavigationAction implements NavigationAction {
 	
 	private final MongoDB m;
 	
-	public ActionMongoDbReorganize(MongoDB m) {
-		super("Delete stale binary files");
+	public ActionMongoDbCompact(MongoDB m) {
+		super("Compact database (may take several hours, database is offline during this time)");
 		this.m = m;
 	}
 	
 	private NavigationButton src;
 	
 	String result = "Internal Error";
-	
-	private boolean compactDatabase = false;
+	private static boolean started = false;
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
@@ -46,32 +45,10 @@ public class ActionMongoDbReorganize extends AbstractNavigationAction implements
 	}
 	
 	@Override
-	public ParameterOptions getParameters() {
-		return new ParameterOptions(
-				"<html>" +
-						"This command removes not linked database entries and files.<br><br>" +
-						"If enabled, not only internal database space is made available,<br>" +
-						"but also space in the file system.<br>" +
-						"This operation and especially this option may need a long time<br>" +
-						"to proceed (up to several hours).",
-				new Object[] {
-						"Compact database@@Warning: May take a very long time (up to several hours)", compactDatabase
-				});
-	}
-	
-	@Override
-	public void setParameters(Object[] parameters) {
-		super.setParameters(parameters);
-		if (parameters != null && parameters.length == 1) {
-			int idx = 0;
-			compactDatabase = (Boolean) parameters[idx++];
-		}
-	}
-	
-	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		result = m.cleanUp(status, compactDatabase);
+		started = true;
+		result = m.compact(status);
 	}
 	
 	@Override
@@ -81,17 +58,24 @@ public class ActionMongoDbReorganize extends AbstractNavigationAction implements
 	
 	@Override
 	public String getDefaultImage() {
-		return IAPimages.getFileCleaner();
+		return IAPimages.getFileRoller();
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return IAPimages.getFileCleaner();
+		return IAPimages.getFileRoller();
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Reorganize";
+		if (!started)
+			return "<html>Compact Database (free disk speace)<br>Warning: database goes offline, may take hours";
+		else
+			return "Compact Database";
 	}
 	
+	@Override
+	public boolean requestTitleUpdates() {
+		return false;
+	}
 }
