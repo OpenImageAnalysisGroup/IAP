@@ -96,10 +96,10 @@ public class ImageAnalysisCommandManager {
 				
 				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true, new String[] { "none", "none", "FALSE" }, true),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Condition", "none", "FALSE" },
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Genotype", "none", "FALSE" },
 						false),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Condition", "none", "TRUE" },
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Genotype", "none", "TRUE" },
 						false),
 						guiSetting));
 				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Treatment", "none", "TRUE" },
