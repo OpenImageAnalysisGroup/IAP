@@ -61,6 +61,7 @@ public class IntensityAnalysis {
 			if (calcHue) {
 				Color.RGBtoHSB(r_intensityClassic, g_intensityChlorophyl, b_intensityPhenol, hsb);
 				double h = hsb[0];
+				histPhenol.addDataPoint((int) (h * 255), 255);
 				sumOfHue += h;
 				if (minHue == null || h < minHue)
 					minHue = h;
