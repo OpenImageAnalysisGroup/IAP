@@ -42,7 +42,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	
-	private static final String separator = "\t";// ";";// "\t";
+	private static final String separator = ";";// "\t";// ";";// "\t";
 	private final boolean exportIndividualAngles;
 	private final String[] variant;
 	private final boolean xlsx;
@@ -200,7 +200,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				} else
 					if (exportIndividualAngles) {
 						for (SnapshotDataIAP s : snapshots) {
-							boolean germanLanguage = false;
+							boolean germanLanguage = true;
 							csv.append(s.getCSVvalue(germanLanguage, separator));
 						}
 					} else {
