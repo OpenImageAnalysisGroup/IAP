@@ -40,14 +40,27 @@
 	}
 }
 
-"%getData%" <- function(englischVersion, fileName){	
-	seperator <- ";"
+"%getData%" <- function(separation, fileName){	
+	#separation <- ";"
 	print("... Read input file")
-	if (englischVersion) {
-		return(read.csv(fileName, header=TRUE, sep=seperator, fileEncoding="ISO-8859-1", encoding="UTF-8"))
+	
+	preScanForPointOrComma <- scan(file=fileName, what=character(0), nlines=2, sep="\n")
+	preScanForPointOrComma <- paste(preScanForPointOrComma[2],",.", sep="")
+	allCharacterSeparated <- table(strsplit(toupper(preScanForPointOrComma), '')[[1]])
+	
+	if(allCharacterSeparated["."] > allCharacterSeparated[","]) {
+		print("... english Version")
+		return(read.csv(fileName, header=TRUE, sep=separation, fileEncoding="ISO-8859-1", encoding="UTF-8"))
 	} else {
-		return(read.csv2(fileName, header=TRUE, sep=seperator, fileEncoding="ISO-8859-1", encoding="UTF-8"))
+		print("... german Version")
+		return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="ISO-8859-1", encoding="UTF-8"))
 	}
+	
+#	if (englischVersion) {
+#		return(read.csv(fileName, header=TRUE, sep=separation, fileEncoding="ISO-8859-1", encoding="UTF-8"))
+#	} else {
+#		return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="ISO-8859-1", encoding="UTF-8"))
+#	}
 }
 
 "%checkIfDescriptorExists%" <- function(descriptor, dataSet) {
@@ -921,12 +934,13 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 	appendix <- FALSE
 	#appendix <- TRUE
 	
-	if (length(args) < 1) {
-		englischVersion <- FALSE
-		#englischVersion <- TRUE
-	} else {
-		englischVersion <- TRUE
-	}
+	separation <- ";"
+#	if (length(args) < 1) {
+#		englischVersion <- FALSE
+#		#englischVersion <- TRUE
+#	} else {
+#		englischVersion <- TRUE
+#	}
 
 	if (typOfStartOptions == "all" | typOfStartOptions == "report" | typOfStartOptions == "allmanual") {
 
@@ -939,7 +953,7 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		}
 		
 		if (fileName != "error") {
-			workingDataSet <- englischVersion %getData% fileName
+			workingDataSet <- separation %getData% fileName
 			
 			#!boxplot
 			if (typOfStartOptions == "all") {
@@ -1088,8 +1102,9 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		fileName <- "report.csv"
 		#fileName <- "testDataset3.csv"
 		#englischVersion <- FALSE
-		englischVersion <- TRUE
-		workingDataSet <- englischVersion %getData% fileName
+		#englischVersion <- TRUE
+		separation <- ";"
+		workingDataSet <- separation %getData% fileName
 		
 		#descriptor <- c("Hallo2")
 		#descriptor <- c("Plant ID","Treatment","Hallo","Wert1", "Repl ID")
