@@ -392,9 +392,9 @@ public class SnapshotDataIAP {
 		
 		String weightBeforeWatering = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null ? s.getWeightBefore() + "" : "");
 		String waterWeight = enDe(numberFormat_deTrue_enFalse, s.getWeightOfWatering() != null ? s.getWeightOfWatering() + "" : "");
+		String waterAmount = enDe(numberFormat_deTrue_enFalse, s.getWaterAmount() != null ? s.getWaterAmount() + "" : "");
 		String sumBA = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null && s.getWeightOfWatering() != null ?
 				(s.getWeightBefore() + s.getWeightOfWatering()) + "" : "");
-		String waterAmount = enDe(numberFormat_deTrue_enFalse, s.getWaterAmount() != null ? s.getWaterAmount() + "" : "");
 		if (position2store == null) {
 			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;
 			return "-720" + separator + s.getPlantId() + separator
@@ -449,11 +449,12 @@ public class SnapshotDataIAP {
 						+ getNumbersFromString(s.getTimePoint()) + separator
 						+ weightBeforeWatering + separator
 						+ sumBA + separator
+						+ waterWeight + separator
 						+ waterAmount + separator
 						+ s.getRgbUrlCnt() + separator
 						+ s.getFluoUrlCnt() + separator
 						+ s.getNirUrlCnt() + separator
-						+ s.getUnknownUrlCnt() + separator
+						+ s.getUnknownUrlCnt()
 						+ columnData
 						+ "\r\n";
 				result.append(res);
