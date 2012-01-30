@@ -449,7 +449,11 @@ public class SnapshotDataIAP {
 						+ getNumbersFromString(s.getTimePoint()) + separator
 						+ weightBeforeWatering + separator
 						+ sumBA + separator
-						+ waterAmount
+						+ waterAmount + separator
+						+ s.getRgbUrlCnt() + separator
+						+ s.getFluoUrlCnt() + separator
+						+ s.getNirUrlCnt() + separator
+						+ s.getUnknownUrlCnt() + separator
 						+ columnData
 						+ "\r\n";
 				result.append(res);
