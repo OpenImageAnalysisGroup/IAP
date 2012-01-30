@@ -200,7 +200,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction {
 				} else
 					if (exportIndividualAngles) {
 						for (SnapshotDataIAP s : snapshots) {
-							boolean germanLanguage = true;
+							boolean germanLanguage = false;
 							csv.append(s.getCSVvalue(germanLanguage, separator));
 						}
 					} else {
