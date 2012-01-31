@@ -81,7 +81,7 @@ public class CloudHost extends BasicDBObject {
 	}
 	
 	public void setStatus3(String status) {
-		put("statust", status);
+		put("status3", status);
 	}
 	
 	public String getStatus3() {

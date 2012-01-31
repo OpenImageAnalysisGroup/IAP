@@ -3122,6 +3122,8 @@ public class ImageOperation {
 				int index = (int) (lArray.size() * (-LThresh / 100d)) - 1;
 				index = lArray.size() - index;
 				Collections.sort(lArray);
+				if (index < 0)
+					index = 0;
 				LThresh = lArray.get(index).intValue() - 1;
 			}
 			

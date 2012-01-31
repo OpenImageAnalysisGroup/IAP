@@ -40,15 +40,14 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProviderSuppo
 	@Override
 	public double getCurrentStatusValueFine() {
 		double ret;
-		try {
-			cmd = m.batchGetCommand(cmd);
+		cmd = m.batchGetCommand(cmd);
+		if (cmd == null)
+			ret = -2;
+		else
 			if (cmd.getRunStatus() == CloudAnalysisStatus.SCHEDULED)
 				ret = -1;
 			else
 				ret = cmd.getCurrentStatusValueFine();
-		} catch (NullPointerException npe) {
-			ret = -2;
-		}
 		lastStatus = (int) Math.round(ret);
 		return ret;
 	}

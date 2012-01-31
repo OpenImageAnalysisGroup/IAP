@@ -28,7 +28,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 	private CloudHost ip;
 	private BackgroundTaskStatusProviderSupportingExternalCall hostStatus;
 	private NavigationButton src;
-	private MongoDB m;
+	private final MongoDB m;
 	String niceHostName;
 	
 	public ActionCloudHostInformation(final MongoDB m, final CloudHost ip) {
@@ -91,7 +91,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 					if (ch != null) {
 						ActionCloudHostInformation.this.ip = ch;
 						lastStatus = ch.getTaskProgress();
-						hostInfo = ch.getHostInfo();
+						hostInfo = "";// ch.getHostInfo();
 						status3 = ch.getStatus3();
 						String rA = "";
 						if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)

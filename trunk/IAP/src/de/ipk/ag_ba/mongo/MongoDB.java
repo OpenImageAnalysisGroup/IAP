@@ -317,6 +317,7 @@ public class MongoDB {
 					ok = true;
 					e = null;
 				} catch (Exception err) {
+					err.printStackTrace();
 					System.out.println("EXEC " + (nrep - repeats + 1) + " ERROR: " + err.getLocalizedMessage() + " T=" + IAPservice.getCurrentTimeAsNiceString());
 					e = err;
 					Thread.sleep(60 * 1000);
@@ -1589,14 +1590,15 @@ public class MongoDB {
 							diskHistory.append("<br>" + lfw.toString() + " -> " + free + " GB free (" + size + " GB, " + prc + "% used)");
 						}
 					}
-					res.setHostInfo(
-							(monitor ? "monitoring:<br>" : "") +
-									SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
-									SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
-									"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
-									(load > 0 ? " load "
-											+ StringManipulationTools.formatNumber(load, "#.#") + "" : "") +
-									(wl > 0 ? ", active: " + wl : "") + diskHistory.toString());
+					if (monitor)
+						res.setHostInfo(
+								(monitor ? "monitoring:<br>" : "") +
+										SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
+										SystemAnalysisExt.getPhysicalMemoryInGB() + " GB<br>" + SystemAnalysis.getNumberOfCPUs() +
+										"/" + SystemAnalysisExt.getNumberOfCpuPhysicalCores() + "/" + SystemAnalysisExt.getNumberOfCpuLogicalCores() + " CPUs" +
+										(load > 0 ? " load "
+												+ StringManipulationTools.formatNumber(load, "#.#") + "" : "") +
+										(wl > 0 ? ", active: " + wl : "") + diskHistory.toString());
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
 					if (add)
 						dbc.insert(res);
@@ -1789,6 +1791,20 @@ public class MongoDB {
 									break;
 								}
 							}
+						if (addCnt < maxTasks)
+							for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.FINISHED_INCOMPLETE)).sort(
+									new BasicDBObject("submission", 1))) {
+								BatchCmd batch = (BatchCmd) dbo;
+								if (batch.getExperimentHeader() == null)
+									continue;
+								if (batch.getCpuTargetUtilization() <= maxTasks && hostName.equals("" + batch.getOwner())) {
+									res.add(batch);
+									addCnt += batch.getCpuTargetUtilization();
+									if (addCnt >= maxTasks)
+										added = true;
+									break;
+								}
+							}
 					} catch (UnknownHostException e) {
 						ErrorMsg.addErrorMessage(e);
 					}
@@ -1878,7 +1894,7 @@ public class MongoDB {
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
 					DBObject dbo = new BasicDBObject();
-					if (batch.get("_id") != null) {
+					if (batch != null && batch.get("_id") != null && collection != null) {
 						dbo.put("_id", batch.get("_id"));
 						BatchCmd res = (BatchCmd) collection.findOne(dbo);
 						tso.setParam(0, res);

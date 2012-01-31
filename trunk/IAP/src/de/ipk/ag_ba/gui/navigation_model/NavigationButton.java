@@ -185,9 +185,6 @@ public class NavigationButton implements StyleAware {
 			String progress = "";
 			String s = "";
 			double dp = action.getStatusProvider().getCurrentStatusValueFine();
-			if (dp < -1.01) {
-				System.out.println("Button " + title + " should be removed...");
-			}
 			if (dp > 0) {
 				if (dp > 0)
 					progress = "" + (int) dp + "%";
@@ -225,7 +222,11 @@ public class NavigationButton implements StyleAware {
 			if (line2.length() > 0)
 				line2 = "<br>&nbsp;" + line2 + "&nbsp;";
 			dots = "<code>" + dots + "</code>";
-			return "<html><small><b><center>" + dots + " " + title + progress + " " + dots + "" + s + line2;
+			if (dp < -1.01) {
+				System.out.println("Command " + title + " has lost its connection to the status provider.");
+				return "<html><small><b><center>" + dots + " " + "[REMOVE FROM UPDATE] " + title + progress + " " + dots + "" + s + line2;
+			} else
+				return "<html><small><b><center>" + dots + " " + title + progress + " " + dots + "" + s + line2;
 		}
 	}
 	
@@ -344,7 +345,8 @@ public class NavigationButton implements StyleAware {
 					if (n1.getText().indexOf("Please wait") >= 0)
 						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
 					else
-						BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
+						if (!n1.getText().contains("[REMOVE FROM UPDATE]"))
+							BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
 				} else {
 					if (n1.isVisible())
 						n1.setText(n.getTitle());

@@ -94,9 +94,16 @@ public class CloudTaskManager {
 					ArrayList<String> progress = new ArrayList<String>();
 					try {
 						for (TaskDescription td : runningTasks) {
-							String name = td.getBatchCmd().getExperimentHeader().getExperimentName();
+							String name;
+							if (td.getBatchCmd() == null) {
+								name = "[BatchCmd==null]";
+								progress.add("n/a");
+							} else {
+								name = td.getBatchCmd().getExperimentHeader().getExperimentName() + " (" + td.getBatchCmd().getPartIdx() + "/"
+										+ td.getBatchCmd().getPartCnt() + ")";
+								progress.add(td.getBatchCmd().getCurrentStatusMessage3());
+							}
 							names.add(name);
-							progress.add(td.getBatchCmd().getCurrentStatusMessage3());
 						}
 					} catch (Exception e) {
 						// empty
@@ -107,8 +114,8 @@ public class CloudTaskManager {
 							BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
 							progressSum,
-							"Processing " + StringManipulationTools.getStringList(names, ", ") + "<br>" +
-									"Progress " + StringManipulationTools.getStringList(progress, ", ") + "<br>" +
+							"Process: " + StringManipulationTools.getStringList(names, ", ") + "<br>" +
+									"Progress: " + StringManipulationTools.getStringList(progress, ", ") + "<br>" +
 									status3provider.getCurrentStatusMessage3());
 					
 					int maxTasks = 1;
@@ -161,15 +168,19 @@ public class CloudTaskManager {
 					ArrayList<TaskDescription> del = new ArrayList<TaskDescription>();
 					// System.out.println("RUNNING: " + runningTasks.size());
 					for (TaskDescription td : runningTasks) {
-						if (td.analysisFinished()) {
+						if (td.analysisFinishedComplete()) {
 							td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.FINISHED);
 							del.add(td);
-						} else {
-							if (!td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS))
-								td.getBatchCmd().getStatusProvider().pleaseStop();
-							progressSum += td.getBatchCmd().getCurrentStatusValueFine();
-							nn++;
-						}
+						} else
+							if (td.analysisFinishedIncomplete()) {
+								td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.FINISHED_INCOMPLETE);
+								del.add(td);
+							} else {
+								if (!td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS))
+									td.getBatchCmd().getStatusProvider().pleaseStop();
+								progressSum += td.getBatchCmd().getCurrentStatusValueFine();
+								nn++;
+							}
 						progressSum += td.getBatchCmd().getCurrentStatusValueFine();
 						nn++;
 					}
