@@ -12,6 +12,7 @@ import org.SystemAnalysis;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
+import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 public class ActionJobStatus extends AbstractNavigationAction {
@@ -64,6 +65,8 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						if (jid != null)
 							activeJobsIds.add(jid);
 						double fs = b.getCurrentStatusValueFine();
+						if (b.getRunStatus() == CloudAnalysisStatus.FINISHED_INCOMPLETE)
+							fs = 0;
 						if (fs >= 0)
 							finishedJobs += fs / 100d;
 						if (jid != null) {
