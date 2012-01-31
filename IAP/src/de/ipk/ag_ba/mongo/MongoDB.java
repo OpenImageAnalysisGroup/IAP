@@ -838,8 +838,10 @@ public class MongoDB {
 							GridFSInputFile inputFilePreview = gridfs_preview.createFile(inps, hash);
 							// inputFilePreview.getMetaData().put("name", id.getURL().getFileName());
 							inputFilePreview.save();
+							gridfs_preview.getDB().requestStart();
 							saved += inputFilePreview.getLength();
 							CommandResult wr = gridfs_preview.getDB().getLastError(WriteConcern.SAFE);
+							gridfs_preview.getDB().requestDone();
 							System.out.println("RES: " + wr.toString());
 							fff = gridfs_preview.findOne(hash);
 							if (fff != null && fff.getLength() > 0) {
@@ -1860,10 +1862,15 @@ public class MongoDB {
 						batch.put("runstatus", starting.toString());
 						batch.put("lastupdate", System.currentTimeMillis());
 						batch.put("owner", SystemAnalysisExt.getHostName());
-						// WriteResult r =
-						collection.update(dbo, batch, false, false, WriteConcern.SAFE);
-						CommandResult cr = db.getLastError();
-						boolean success = cr.getBoolean("updatedExisting", false);
+						db.requestStart();
+						CommandResult cr = null;
+						try {
+							collection.update(dbo, batch, false, false, WriteConcern.NORMAL);
+							cr = db.getLastError();
+						} finally {
+							db.requestDone();
+						}
+						boolean success = cr != null && cr.getBoolean("updatedExisting", false);
 						if (!success) {
 							try {
 								DBObject dbo2 = new BasicDBObject();
@@ -1875,7 +1882,6 @@ public class MongoDB {
 								// empty
 							}
 						}
-						success = true;
 						tso.setBval(0, success);
 						// System.out.println("Update status: " + rs + " --> " + starting.toString() + ", res: " + r.toString());
 					} catch (UnknownHostException e) {
