@@ -103,10 +103,11 @@ public class BatchCmd extends BasicDBObject {
 			setRunStatus(status);
 			return true;
 		} else
-			if (statusProvider != null && statusProvider.getCurrentStatusValue() < 100)
-				return false;
-			else
-				return true;
+			m.batchClaim(this, status, true);
+		if (statusProvider != null && statusProvider.getCurrentStatusValue() < 100)
+			return false;
+		else
+			return true;
 		// statusProvider.pleaseStop() -->
 		// statusProvider.pleaseContinueRun() -->
 	}

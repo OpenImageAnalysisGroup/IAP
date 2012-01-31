@@ -1861,9 +1861,21 @@ public class MongoDB {
 						batch.put("lastupdate", System.currentTimeMillis());
 						batch.put("owner", SystemAnalysisExt.getHostName());
 						// WriteResult r =
-						collection.update(dbo, batch, false, false);
+						collection.update(dbo, batch, false, false, WriteConcern.SAFE);
 						CommandResult cr = db.getLastError();
 						boolean success = cr.getBoolean("updatedExisting", false);
+						if (!success) {
+							try {
+								DBObject dbo2 = new BasicDBObject();
+								dbo2.put("_id", batch.get("_id"));
+								dbo2 = collection.findOne(dbo2);
+								System.err.println();
+								System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: NEW OWNER: " + dbo2.get("owner"));
+							} catch (Exception e) {
+								// empty
+							}
+						}
+						success = true;
 						tso.setBval(0, success);
 						// System.out.println("Update status: " + rs + " --> " + starting.toString() + ", res: " + r.toString());
 					} catch (UnknownHostException e) {
