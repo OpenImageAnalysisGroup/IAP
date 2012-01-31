@@ -1,5 +1,5 @@
 #ImageJ 1.45g Preferences
-#Fri Dec 16 15:48:42 CET 2011
+#Mon Jan 09 10:40:16 CET 2012
 menu.size=14
 fps=7.0
 new.type=0

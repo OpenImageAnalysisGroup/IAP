@@ -10,6 +10,7 @@ package org;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -694,5 +695,9 @@ public class StringManipulationTools implements HelperClass {
 			return 0;
 		else
 			return s.length() - StringManipulationTools.stringReplace(s, find, "").length();
+	}
+	
+	public static String getStringList(Set<Integer> times, String div) {
+		return getStringList(times.toArray(new Integer[] {}), div);
 	}
 }

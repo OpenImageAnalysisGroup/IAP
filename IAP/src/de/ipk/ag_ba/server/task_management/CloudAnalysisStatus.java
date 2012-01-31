@@ -10,6 +10,5 @@ package de.ipk.ag_ba.server.task_management;
  * @author klukas
  */
 public enum CloudAnalysisStatus {
-	SCHEDULED, STARTING, IN_PROGRESS, FINISHED
-	
+	SCHEDULED, STARTING, IN_PROGRESS, FINISHED, FINISHED_INCOMPLETE
 }

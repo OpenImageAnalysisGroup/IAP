@@ -41,7 +41,7 @@ public class TaskDescription {
 	private String analysisActionClassName, params;
 	private long startTime;
 	
-	private boolean finished = false;
+	private boolean finishedIncomplete = false, finishedComplete = false;
 	
 	private ExperimentReference experimentInput;
 	
@@ -122,9 +122,13 @@ public class TaskDescription {
 			public void run() {
 				// store dataset in mongo
 				if (experiment == null) {
-					finished = true;
+					if (cmd != null && cmd.getStatusProvider() != null)
+						cmd.getStatusProvider().setCurrentStatusText2("ERROR: NULL RESULT");
+					finishedIncomplete = true;
 					return;
 				}
+				if (cmd != null && cmd.getStatusProvider() != null)
+					cmd.getStatusProvider().setCurrentStatusText2("INFO: SAVING RESULT");
 				experiment.getHeader().setExperimentname(
 						cmd.getRemoteCapableAnalysisActionClassName() + "§" + batch.getPartIdx() + "§" + batch.getPartCnt() + "§"
 								+ batch.getSubmissionTime());
@@ -246,7 +250,7 @@ public class TaskDescription {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 					e.printStackTrace();
 				}
-				finished = true;
+				finishedComplete = true;
 				if (autoClose) {
 					System.out.println("> Cluster Execution Mode is active // FINISHED COMPUTE TASK");
 					System.out.println("> SYSTEM.EXIT");
@@ -261,8 +265,12 @@ public class TaskDescription {
 		};
 	}
 	
-	public boolean analysisFinished() {
-		return finished;
+	public boolean analysisFinishedComplete() {
+		return finishedComplete;
+	}
+	
+	public boolean analysisFinishedIncomplete() {
+		return finishedIncomplete;
 	}
 	
 	public BatchCmd getBatchCmd() {

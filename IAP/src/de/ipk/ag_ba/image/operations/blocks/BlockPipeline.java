@@ -8,10 +8,13 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ObjectRef;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -132,10 +135,24 @@ public class BlockPipeline {
 			if (status != null) {
 				status.setCurrentStatusValueFine(100d * (index / (double) blocks
 						.size()));
-				status.setCurrentStatusText2("Finished " + index + "/"
-						+ blocks.size());// + "<br>" +"" +
-												// filter(blockClass.getSimpleName()));
-				// status.setCurrentStatusText1(block.getClass().getSimpleName());
+				try {
+					Set<Integer> times = new TreeSet<Integer>();
+					input.getImages().getVisInfo().getParentSample().getParentCondition().getTimes(times);
+					String timeInfo = "|" + StringManipulationTools.getStringList(times, "|") + "|.";
+					timeInfo = StringManipulationTools.stringReplace(timeInfo,
+							"|" + input.getImages().getVisInfo().getParentSample().getTime() + "|",
+							"|&gt;<b>" + input.getImages().getVisInfo().getParentSample().getTime() + "</b>&lt;|");
+					timeInfo = "</b>" + timeInfo.substring(1, timeInfo.length() - 2) + "<b>";
+					timeInfo = StringManipulationTools.stringReplace(timeInfo, "|", " ");
+					timeInfo = timeInfo.trim();
+					String p = timeInfo + " </b>(" +
+							input.getImages().getVisInfo().getQualityAnnotation() + ")<b>";
+					status.setCurrentStatusText2(p);
+				} catch (Exception e) {
+					status.setCurrentStatusText2("Finished " + index + "/"
+							+ blocks.size());// + "<br>" +"" +
+				} // filter(blockClass.getSimpleName()));
+					// status.setCurrentStatusText1(block.getClass().getSimpleName());
 				if (status.wantsToStop())
 					break;
 			};
