@@ -104,7 +104,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author Christian Klukas
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class TabStatistics extends InspectorTab implements ActionListener,
 		ContainsTabbedPane {
@@ -2527,6 +2527,10 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 							rankOrder);
 					if (showStatusResult)
 						AttributeHelper.setToolTipText(ge2, cr.getRlist());
+					
+					AttributeHelper.setAttribute(ge2, "statistics", "correlation_r", new Double(cr.getMaxR()));
+					AttributeHelper.setAttribute(ge2, "statistics", "correlation_prob", new Double(cr.getMaxTrueCorrProb()));
+					
 					float r = cr.getMaxR();
 					AttributeHelper.setFillColor(ge2,
 							getRcolor(r, currGammaValue, colR_1, colR0, colR1));

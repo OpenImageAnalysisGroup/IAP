@@ -38,14 +38,15 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class AddInterestingAttributes extends AbstractAlgorithm {
 	
 	private boolean doSetDegree, doSetInDegree, doSetOutDegree, doSetClusteringCoeffUndir, doSetClusteringCoeffDir,
-						doSetDataMappingCnt, doSetSampleCnt, doSetNumberOfSignificantDifferences,
-						doSetNumberOfInSignificantDifferences, doSetAvgDataMappingValue, doSetMinimumSampleValue,
-						doSetMaximumSampleValue, doSetAvgSampleStdDev, doSetMinimumSampleReplicateValue,
-						doSetMaximumSampleReplicateValue, doSetMinimumValue, doSetMaximumValue, doSetTimePointCount, doSetLineCount,
-						doCalcAlpha, doCalcBeta, doCalcRatio, doCalcLineCorr;
+			doSetDataMappingCnt, doSetSampleCnt, doSetNumberOfSignificantDifferences,
+			doSetNumberOfInSignificantDifferences, doSetAvgDataMappingValue, doSetMinimumSampleValue,
+			doSetMaximumSampleValue, doSetAvgSampleStdDev, doSetMinimumSampleReplicateValue,
+			doSetMaximumSampleReplicateValue, doSetMinimumValue, doSetMaximumValue, doSetTimePointCount, doSetLineCount,
+			doCalcAlpha, doCalcBeta, doCalcRatio, doCalcLineCorr;
 	
 	private String seriesA, seriesB;
 	
+	@Override
 	public String getName() {
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.DATAMAPPING))
 			return "Compute Properties";
@@ -61,11 +62,11 @@ public class AddInterestingAttributes extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>" + "With this command new attributes are added to the graph nodes and<br>"
-							+ "edges, depending on the settings you choose below.<br><br>"
-							+ "Uncheck any setting, to remove the result of prior calculations from the<br>"
-							+ "working-set of nodes and edges.<br>"
-							+ "Do not forget to perform this command again, as soon as new information<br>"
-							+ "should be processed.<br><br>";
+				+ "edges, depending on the settings you choose below.<br><br>"
+				+ "Uncheck any setting, to remove the result of prior calculations from the<br>"
+				+ "working-set of nodes and edges.<br>"
+				+ "Do not forget to perform this command again, as soon as new information<br>"
+				+ "should be processed.<br><br>";
 	}
 	
 	@Override
@@ -110,35 +111,35 @@ public class AddInterestingAttributes extends AbstractAlgorithm {
 		// allLines.clear();
 		
 		return new Parameter[] {
-							new BooleanParameter(true, "<html>" + "Node Centralities<small><ul><li>degree, clustering coeff.", ""),
-							hasMappingData ? new BooleanParameter(true, "<html>"
-												+ "Mapping Statistics<small><ul><li>number of mappings and number of lines", "") : null,
-							hasMappingData ? new BooleanParameter(true, "<html>" + "Significant Mean-Differences<br>"
-												+ "(requires prior t- or U-test)<small><ul>"
-												+ "<li>number of samples with (in)significant mean differences in comparison to control", "") : null,
-								hasMappingData ? new BooleanParameter(true, "<html>" + "Sample Statistics<small><ul>"
-													+ "<li>Number of samples" + "<li>Minimum/maximum/sum of sample averages"
-													+ "<li>Average of sample averages" + "<li>Average of sample standard deviations"
-													+ "<li>Minimum/maximum sample replicate count", "") : null,
-										hasMappingData ? new BooleanParameter(true, "<html>" + "Replicate-Value Statistics<small><ul>"
-															+ "<li>Minimum/maximum of all mapped values", "") : null,
-												hasMappingData ? new BooleanParameter(true,
-																	"<html>" + "Time-Series Statistics<small><ul>" + "<li>Number of different time points"
-																						+ "<li>Linear regression: calculate &#945; and &#946; values", "") : null,
-														allLines.size() >= 2 ? new BooleanParameter(true, "<html>"
-																			+ "Ratio and correlation calculation for selected lines<small><ul>" + "<li>"
-																			+ "For each time point the ratio of the sample values of the two selected<br>"
-																			+ "lines (A/B) is calculated. The individual ratios as well as the<br>"
-																			+ "min/max/avg ratios are calculated and stored.", "") : null,
-																allLines.size() >= 2 ? new BooleanParameter(true, "<html><small><ul>" + "<li>"
-																					+ "For each substance the correlation (different types and settings) between<br>"
-																					+ "the data for the selected lines is calculated.", "") : null,
-																		allLines.size() >= 2 ? new ObjectListParameter(seriesA, "<html><small><ul><li>Line Selection: Line A",
-																							"",
-																							allLines) : null,
-																				allLines.size() >= 2 ? new ObjectListParameter(seriesB,
-																									"<html><small><ul><li>Line Selection: Line B", "",
-																									allLines) : null };
+				new BooleanParameter(true, "<html>" + "Node Centralities<small><ul><li>degree, clustering coeff.", ""),
+				hasMappingData ? new BooleanParameter(true, "<html>"
+						+ "Mapping Statistics<small><ul><li>number of mappings and number of lines", "") : null,
+				hasMappingData ? new BooleanParameter(true, "<html>" + "Significant Mean-Differences<br>"
+						+ "(requires prior t- or U-test)<small><ul>"
+						+ "<li>number of samples with (in)significant mean differences in comparison to control", "") : null,
+				hasMappingData ? new BooleanParameter(true, "<html>" + "Sample Statistics<small><ul>"
+						+ "<li>Number of samples" + "<li>Minimum/maximum/sum of sample averages"
+						+ "<li>Average of sample averages" + "<li>Average of sample standard deviations"
+						+ "<li>Minimum/maximum sample replicate count", "") : null,
+				hasMappingData ? new BooleanParameter(true, "<html>" + "Replicate-Value Statistics<small><ul>"
+						+ "<li>Minimum/maximum of all mapped values", "") : null,
+				hasMappingData ? new BooleanParameter(true,
+						"<html>" + "Time-Series Statistics<small><ul>" + "<li>Number of different time points"
+								+ "<li>Linear regression: calculate &#945; and &#946; values", "") : null,
+				allLines.size() >= 2 ? new BooleanParameter(true, "<html>"
+						+ "Ratio and correlation calculation for selected lines<small><ul>" + "<li>"
+						+ "For each time point the ratio of the sample values of the two selected<br>"
+						+ "lines (A/B) is calculated. The individual ratios as well as the<br>"
+						+ "min/max/avg ratios are calculated and stored.", "") : null,
+				allLines.size() >= 2 ? new BooleanParameter(true, "<html><small><ul>" + "<li>"
+						+ "For each substance the correlation (different types and settings) between<br>"
+						+ "the data for the selected lines is calculated.", "") : null,
+				allLines.size() >= 2 ? new ObjectListParameter(seriesA, "<html><small><ul><li>Line Selection: Line A",
+						"",
+						allLines) : null,
+				allLines.size() >= 2 ? new ObjectListParameter(seriesB,
+						"<html><small><ul><li>Line Selection: Line B", "",
+						allLines) : null };
 	}
 	
 	@Override
@@ -209,12 +210,14 @@ public class AddInterestingAttributes extends AbstractAlgorithm {
 		}
 	}
 	
+	@Override
 	public void execute() {
 		final Graph graph2 = graph;
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-							"Evaluate Properties", "");
+				"Evaluate Properties", "");
 		final Collection<GraphElement> worklist = getSelectedOrAllGraphElements();
 		BackgroundTaskHelper.issueSimpleTask(getName(), "Please wait...", new Runnable() {
+			@Override
 			public void run() {
 				try {
 					status.setCurrentStatusText1("Process Data...");
@@ -771,9 +774,13 @@ public class AddInterestingAttributes extends AbstractAlgorithm {
 		// AttributeHelper.setToolTipText(ge,
 		// "<html><small><small>"+hist1+"<hr>"+hist2+"<hr>"+hist3+"<hr>"+hist4);
 		setAttribute(ge, folder, "corr_sample_avg_over_time_r", cr1.getMaxR());
+		setAttribute(ge, folder, "corr_sample_avg_over_time_prob", cr1.getMaxTrueCorrProb());
 		setAttribute(ge, folder, "corr_repl_values_r", cr2.getMaxR());
+		setAttribute(ge, folder, "corr_repl_values_prob", cr2.getMaxTrueCorrProb());
 		setAttribute(ge, folder, "corr_rank_sample_avg_over_time_r", cr3.getMaxR());
+		setAttribute(ge, folder, "corr_rank_sample_avg_over_time_prob", cr3.getMaxTrueCorrProb());
 		setAttribute(ge, folder, "corr_rank_repl_values_r", cr4.getMaxR());
+		setAttribute(ge, folder, "corr_rank_repl_values_prob", cr4.getMaxTrueCorrProb());
 	}
 	
 	private void setAttribute(GraphElement ge, String folder, String name, Double value) {
