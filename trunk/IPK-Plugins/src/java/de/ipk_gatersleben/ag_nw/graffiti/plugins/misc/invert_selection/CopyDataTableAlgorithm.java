@@ -24,6 +24,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.KeggGmlHelper;
 public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 	boolean rownum = false;
 	boolean label = true;
+	boolean tooltip = false;
 	boolean keggID = false;
 	boolean cluster = false;
 	boolean userURL = false;
@@ -34,6 +35,7 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 	boolean values = false;
 	boolean valuesAvg = false;
 	
+	@Override
 	public void execute() {
 		StringBuilder result = new StringBuilder();
 		StringBuilder curRow = new StringBuilder();
@@ -42,6 +44,8 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 			addCol(result, curRow, "Row");
 		if (label)
 			addCol(result, curRow, "Label");
+		if (tooltip)
+			addCol(result, curRow, "Tooltip");
 		if (keggID)
 			addCol(result, curRow, "KEGG ID");
 		if (cluster)
@@ -104,6 +108,8 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 				addCol(result, curRow, row + "");
 			if (label)
 				addCol(result, curRow, nh.getLabel());
+			if (tooltip)
+				addCol(result, curRow, nh.getTooltip());
 			if (keggID)
 				addCol(result, curRow, KeggGmlHelper.getKeggId(n));
 			if (cluster)
@@ -160,7 +166,7 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 	}
 	
 	private void addCols(StringBuilder result, StringBuilder curRow,
-						Stack<Double> values2) {
+			Stack<Double> values2) {
 		if (values2 != null) {
 			ArrayList<Object> vals = new ArrayList<Object>(values2);
 			addCols(result, curRow, vals);
@@ -210,24 +216,25 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>" +
-							"With this command you may transfer selected information<br>" +
-							"to the clipboard. Please specify relevant columns:";
+				"With this command you may transfer selected information<br>" +
+				"to the clipboard. Please specify relevant columns:";
 	}
 	
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] {
-							new BooleanParameter(rownum, "Row", null),
-							new BooleanParameter(label, "Label", null),
-							new BooleanParameter(keggID, "KEGG ID", null),
-							new BooleanParameter(cluster, "Cluster ID", null),
-							new BooleanParameter(userURL, "User URL", null),
-							new BooleanParameter(keggURL, "KEGG Ref URL", null),
-							new BooleanParameter(pos, "X/Y-Pos", null),
-							new BooleanParameter(size, "Size", null),
-							new BooleanParameter(altIDs, "Alternative IDs", null),
-							new BooleanParameter(values, "Data mapping values", null),
-							new BooleanParameter(valuesAvg, "Average data mapping values", null) };
+				new BooleanParameter(rownum, "Row", null),
+				new BooleanParameter(label, "Label", null),
+				new BooleanParameter(tooltip, "Tooltip", null),
+				new BooleanParameter(keggID, "KEGG ID", null),
+				new BooleanParameter(cluster, "Cluster ID", null),
+				new BooleanParameter(userURL, "User URL", null),
+				new BooleanParameter(keggURL, "KEGG Ref URL", null),
+				new BooleanParameter(pos, "X/Y-Pos", null),
+				new BooleanParameter(size, "Size", null),
+				new BooleanParameter(altIDs, "Alternative IDs", null),
+				new BooleanParameter(values, "Data mapping values", null),
+				new BooleanParameter(valuesAvg, "Average data mapping values", null) };
 	}
 	
 	@Override
@@ -235,6 +242,7 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 		int i = 0;
 		rownum = ((BooleanParameter) params[i++]).getBoolean().booleanValue();
 		label = ((BooleanParameter) params[i++]).getBoolean().booleanValue();
+		tooltip = ((BooleanParameter) params[i++]).getBoolean().booleanValue();
 		keggID = ((BooleanParameter) params[i++]).getBoolean().booleanValue();
 		cluster = ((BooleanParameter) params[i++]).getBoolean().booleanValue();
 		userURL = ((BooleanParameter) params[i++]).getBoolean().booleanValue();
@@ -246,6 +254,7 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 		valuesAvg = ((BooleanParameter) params[i++]).getBoolean().booleanValue();
 	}
 	
+	@Override
 	public String getName() {
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.DATAMAPPING))
 			return "Copy Data Table...";
