@@ -40,7 +40,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class GravistoMain extends JApplet {
 	// ~ Static fields/initializers =============================================
@@ -56,7 +56,7 @@ public class GravistoMain extends JApplet {
 	MainFrame mainFrame;
 	
 	/** The editor's plugin manager. */
-	private PluginManager pluginManager;
+	private final PluginManager pluginManager;
 	
 	// ~ Constructors ===========================================================
 	
@@ -66,24 +66,25 @@ public class GravistoMain extends JApplet {
 	public GravistoMain(final boolean showMainFrame, String applicationName) {
 		// URL config,
 		SplashScreenInterface splashScreen = new DBEsplashScreen(applicationName,
-							"", new Runnable() {
-								public void run() {
-									if (showMainFrame) {
-										ClassLoader cl = this.getClass().getClassLoader();
-										String path = this.getClass().getPackage().getName()
-															.replace('.', '/');
-										ImageIcon icon = new ImageIcon(cl.getResource(path
-															+ "/ipklogo16x16_5.png"));
-										mainFrame.setIconImage(icon.getImage());
-										mainFrame.setVisible(true);
-									}
-								}
-							});
+				"", new Runnable() {
+					@Override
+					public void run() {
+						if (showMainFrame) {
+							ClassLoader cl = this.getClass().getClassLoader();
+							String path = this.getClass().getPackage().getName()
+									.replace('.', '/');
+							ImageIcon icon = new ImageIcon(cl.getResource(path
+									+ "/ipklogo16x16_5.png"));
+							mainFrame.setIconImage(icon.getImage());
+							mainFrame.setVisible(true);
+						}
+					}
+				});
 		ClassLoader cl = this.getClass().getClassLoader();
 		String path = this.getClass().getPackage().getName()
-							.replace('.', '/');
+				.replace('.', '/');
 		ImageIcon icon = new ImageIcon(cl.getResource(path
-							+ "/ipklogo16x16_5.png"));
+				+ "/ipklogo16x16_5.png"));
 		((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
 		splashScreen.setVisible(true);
 		
@@ -92,7 +93,7 @@ public class GravistoMain extends JApplet {
 		splashScreen.setText("Read plugin information");
 		
 		GravistoPreferences prefs = GravistoPreferences
-							.userNodeForPackage(GravistoMain.class);
+				.userNodeForPackage(GravistoMain.class);
 		pluginManager = GravistoMainHelper.getNewPluginManager();
 		
 		splashScreen.setText("Read plugin information.");
@@ -134,11 +135,11 @@ public class GravistoMain extends JApplet {
 			ArrayList<String> locations_exclude = new ArrayList<String>();
 			locations_exclude.addAll(new TextFile(rExcl));
 			for (Iterator<String> it = locations_exclude.iterator(); it.hasNext();) {
-				String remove = (String) it.next();
+				String remove = it.next();
 				if (!locations.remove(remove)) {
 					// windows compatibility remove also not exact matches
 					for (Iterator<String> itl = locations.iterator(); itl.hasNext();) {
-						String loc = (String) itl.next();
+						String loc = itl.next();
 						remove = remove.toUpperCase();
 						remove = StringManipulationTools.stringReplace(remove, "./", "");
 						remove = StringManipulationTools.stringReplace(remove, "\"", "");
@@ -164,12 +165,12 @@ public class GravistoMain extends JApplet {
 			System.err.println("See make - intro.txt for details.");
 			System.err.println("-- Program needs to be stopped");
 			JOptionPane.showMessageDialog(
-								null,
-								"<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
-													+ "Program execution can not continue.<br>"
-													+ "Don't forget to start createfilelist from the make folder.<br>"
-													+ "See make - intro.txt for details.<br>"
-													+ "The application needs to be closed.</html>");
+					null,
+					"<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
+							+ "Program execution can not continue.<br>"
+							+ "Don't forget to start createfilelist from the make folder.<br>"
+							+ "See make - intro.txt for details.<br>"
+							+ "The application needs to be closed.</html>");
 			System.err.println("EXIT");
 			System.exit(1);
 			
@@ -185,6 +186,7 @@ public class GravistoMain extends JApplet {
 		}
 		
 		Thread t = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				JMenu dummyScipt = new JMenu("Dummy Script");
 				DefaultContextMenuManager.returnScriptMenu(dummyScipt);
@@ -211,7 +213,7 @@ public class GravistoMain extends JApplet {
 		
 		try {
 			UIManager.setLookAndFeel(
-								UIManager.getCrossPlatformLookAndFeelClassName());
+					UIManager.getCrossPlatformLookAndFeelClassName());
 			// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 			// empty
@@ -231,8 +233,8 @@ public class GravistoMain extends JApplet {
 		setLayout(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.FILL } }));
 		JMenuBar mb = mainFrame.getJMenuBar();
 		add(TableLayout.getSplitVertical(
-							(JComponent) mb, mainFrame.getContentPane(), TableLayout.PREFERRED, TableLayout.FILL)
-							, "0,0");
+				mb, mainFrame.getContentPane(), TableLayout.PREFERRED, TableLayout.FILL)
+				, "0,0");
 		validate();
 		
 		Thread t = new Thread() {
@@ -251,63 +253,70 @@ public class GravistoMain extends JApplet {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
 		DBEgravistoHelper.DBE_GRAVISTO_NAME = "" + stS + "DBE-Gravisto" + stE + "<br><small>* "
-							+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments<br>* "
-							+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "alisation " + stS + " to" + stE + "olkit<br></small>";
-		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-VANTED applet";
+				+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments<br>* "
+				+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "alisation " + stS + " to" + stE + "olkit<br></small>";
+		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-Data-Navigator applet";
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "IAP - Integrated Analysis Platform";// CK 31.7.2011 //
 		
 		// AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
 		String name = stS + "DBE-Gravisto" + stE + " - "
-							+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments, "
-							+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "ualisation " + stS + "to" + stE + "olkit";
+				+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments, "
+				+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "ualisation " + stS + "to" + stE + "olkit";
 		JComponent result = new JPanel();
 		result.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		
 		String s = ""
-							+
-							"<html><small><br>&nbsp;&nbsp;&nbsp;</small>Welcome to "
-							+ name
-							+ "!<br>"
-							+
-							"<small>"
-							+
-							"&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
-							+
-							"&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
-							+
-							"&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
+				+
+				"<html><small><br>&nbsp;&nbsp;&nbsp;</small>Welcome to "
+				+ name
+				+ "!<br>"
+				+
+				"<small>"
+				+
+				"&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
+				+
+				"&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
+				+
+				"&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
 		
 		ReleaseInfo.setHelpIntroductionText(s);
 		
 		// URL config,
 		final SplashScreenInterface splashScreen = new SplashScreenInterface() {
 			
+			@Override
 			public void setVisible(boolean b) {
 			}
 			
+			@Override
 			public void setValue(int value) {
 				
 			}
 			
+			@Override
 			public void setText(String text) {
 				MainFrame.showMessage(text, MessageType.PERMANENT_INFO);
 			}
 			
+			@Override
 			public void setMaximum(int maximum) {
 				//
 				
 			}
 			
+			@Override
 			public void setInitialisationFinished() {
 				MainFrame.showMessage("", MessageType.INFO);
 			}
 			
+			@Override
 			public int getValue() {
 				//
 				return 0;
 			}
 			
+			@Override
 			public int getMaximum() {
 				//
 				return 0;
@@ -318,7 +327,7 @@ public class GravistoMain extends JApplet {
 		String path = // this.getClass().getPackage().getName()
 		"de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart".replace('.', '/');
 		ImageIcon icon = new ImageIcon(cl.getResource(path
-							+ "/ipklogo16x16_5.png"));
+				+ "/ipklogo16x16_5.png"));
 		if (splashScreen instanceof DBEsplashScreen)
 			((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
 		// splashScreen.setVisible(true);
@@ -347,11 +356,11 @@ public class GravistoMain extends JApplet {
 			ArrayList<String> locations_exclude = new ArrayList<String>();
 			locations_exclude.addAll(new TextFile(rExcl));
 			for (Iterator<String> it = locations_exclude.iterator(); it.hasNext();) {
-				String remove = (String) it.next();
+				String remove = it.next();
 				if (!locations.remove(remove)) {
 					// windows compatibility remove also not exact matches
 					for (Iterator<String> itl = locations.iterator(); itl.hasNext();) {
-						String loc = (String) itl.next();
+						String loc = itl.next();
 						remove = remove.toUpperCase();
 						remove = StringManipulationTools.stringReplace(remove, "./", "");
 						remove = StringManipulationTools.stringReplace(remove, "\"", "");
@@ -373,13 +382,13 @@ public class GravistoMain extends JApplet {
 			ErrorMsg.addErrorMessage(e.getLocalizedMessage());
 		} catch (NullPointerException npe) {
 			System.err
-								.println("Internal error: Plugin Description files could not be loaded.");
+					.println("Internal error: Plugin Description files could not be loaded.");
 			System.err.println("-- Program needs to be stopped");
 			JOptionPane.showMessageDialog(
-								null,
-								"<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
-													+ "Program execution can not continue.<br>"
-													+ "The application needs to be closed.</html>");
+					null,
+					"<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
+							+ "Program execution can not continue.<br>"
+							+ "The application needs to be closed.</html>");
 			System.err.println("EXIT");
 			System.exit(1);
 		}
@@ -449,37 +458,37 @@ public class GravistoMain extends JApplet {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
 		DBEgravistoHelper.DBE_GRAVISTO_NAME = "" + stS + "DBE-Gravisto" + stE + "<br><small>* "
-							+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments<br>* "
-							+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "alisation " + stS + " to" + stE + "olkit<br></small>";
+				+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments<br>* "
+				+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "alisation " + stS + " to" + stE + "olkit<br></small>";
 		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "DBE-Gravisto";
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "";
 		
 		AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
 		String name = stS + "DBE-Gravisto" + stE + " - "
-							+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments, "
-							+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "ualisation " + stS + "to" + stE + "olkit";
+				+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments, "
+				+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "ualisation " + stS + "to" + stE + "olkit";
 		JComponent result = new JPanel();
 		result.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		
 		String s = ""
-							+
-							"<html><small><br>&nbsp;&nbsp;&nbsp;</small>Welcome to "
-							+ name
-							+ "!<br>"
-							+
-							"<small>"
-							+
-							"&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
-							+
-							"&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
-							+
-							"&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
+				+
+				"<html><small><br>&nbsp;&nbsp;&nbsp;</small>Welcome to "
+				+ name
+				+ "!<br>"
+				+
+				"<small>"
+				+
+				"&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
+				+
+				"&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
+				+
+				"&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
 		
 		ReleaseInfo.setHelpIntroductionText(s);
 		
 		GravistoMain e = new GravistoMain(true,
-							DBEgravistoHelper.DBE_GRAVISTO_VERSION);
+				DBEgravistoHelper.DBE_GRAVISTO_VERSION);
 		if (e == null)
 			System.err.println("MainFrame not created.");
 	}

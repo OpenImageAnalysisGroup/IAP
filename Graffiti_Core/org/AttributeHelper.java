@@ -75,7 +75,7 @@ import org.graffiti.graphics.NodeLabelAttribute;
  * attributes.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class AttributeHelper implements HelperClass {
 	
@@ -1821,7 +1821,7 @@ public class AttributeHelper implements HelperClass {
 		setAttribute(atta, "", "tooltip", statusText);
 	}
 	
-	public static String getToolTipText(Node atta) {
+	public static String getToolTipText(GraphElement atta) {
 		String res = (String) getAttributeValue(atta, "", "tooltip", null, new String(""));
 		if (res != null && res.length() == 0)
 			return null;

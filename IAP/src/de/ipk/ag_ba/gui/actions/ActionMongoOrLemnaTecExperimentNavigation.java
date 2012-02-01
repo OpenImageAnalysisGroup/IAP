@@ -126,7 +126,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 					.getProcessExperimentDataWithVantedEntities(m,
 							new ExperimentReference(experiment), guiSetting)) {
 				if (ne.getTitle().contains("Put data")) {
-					ne.setTitle("Analyze with IAP-VANTED");
+					ne.setTitle("Show in IAP-Data-Navigator");
 					actions.add(ne);
 				}
 			}

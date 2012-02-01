@@ -41,7 +41,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.MenuItemInf
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class Main {
 	// ~ Static fields/initializers =============================================
@@ -81,6 +81,7 @@ public class Main {
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			splashScreen = new DBEsplashScreen(applicationName,
 					"", new Runnable() {
+						@Override
 						public void run() {
 							if (showMainFrame) {
 								String path = this.getClass().getPackage().getName()
@@ -94,6 +95,7 @@ public class Main {
 									System.err.println("Internal Error: MainFrame is NULL");
 								else {
 									Thread t = new Thread(new Runnable() {
+										@Override
 										public void run() {
 											long waitTime = 0;
 											long start = System.currentTimeMillis();
@@ -107,6 +109,7 @@ public class Main {
 												waitTime = System.currentTimeMillis() - start;
 											} while (waitTime < 2000);
 											SwingUtilities.invokeLater(new Runnable() {
+												@Override
 												public void run() {
 													SplashScreenInterface ss = (SplashScreenInterface) tso.getParam(0, null);
 													ss.setVisible(false);
@@ -294,9 +297,8 @@ public class Main {
 		
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
-		String name = stS + "IAP-VANTED" + stE + " - "
-				+ stS + "V" + stE + "isualization and " + stS + "A" + stE + "nalysis of " + stS + "N" + stE + "e" + stS + "t" + stE
-				+ "works <br>containing " + stS + "E" + stE + "xperimental " + stS + "D" + stE + "ata";
+		String name = stS + "IAP-Data-Navigator" + stE + " - "
+				+ stS + "I" + stE + "ntegrated " + stS + "A" + stE + "nalysis " + stS + "P" + stE + "latform";
 		JComponent result = new JPanel();
 		result.setLayout(TableLayout.getLayout(TableLayoutConstants.FILL, TableLayoutConstants.FILL));
 		
@@ -322,11 +324,11 @@ public class Main {
 		
 		ReleaseInfo.setHelpIntroductionText(s);
 		
-		DBEgravistoHelper.DBE_GRAVISTO_VERSION = "IAP-VANTED " + DBEgravistoHelper.DBE_GRAVISTO_VERSION_CODE;
-		DBEgravistoHelper.DBE_GRAVISTO_NAME = stS + "IAP-VANTED" + stE + "&nbsp;-&nbsp;"
+		DBEgravistoHelper.DBE_GRAVISTO_VERSION = "IAP-Data-Navigator " + DBEgravistoHelper.DBE_GRAVISTO_VERSION_CODE;
+		DBEgravistoHelper.DBE_GRAVISTO_NAME = stS + "IAP-Data-Navigator" + stE + "&nbsp;-&nbsp;"
 				+ stS + "V" + stE + "isualization&nbsp;and&nbsp;" + stS + "A" + stE + "nalysis&nbsp;of&nbsp;" + stS + "N" + stE + "e" + stS + "t" + stE
 				+ "works&nbsp;<br>containing&nbsp;" + stS + "E" + stE + "xperimental&nbsp;" + stS + "D" + stE + "ata<br>";
-		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-VANTED";
+		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-Data-Navigator";
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "IAP - Integrated Analysis Platform";// CK 31.7.2011 //
 		
 		AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);

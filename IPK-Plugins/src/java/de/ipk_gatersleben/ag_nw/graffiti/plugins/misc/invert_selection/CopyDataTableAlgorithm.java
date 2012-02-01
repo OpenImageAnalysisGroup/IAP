@@ -6,17 +6,21 @@ import java.util.HashSet;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import org.AttributeHelper;
 import org.FeatureSet;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
 import org.graffiti.editor.actions.ClipboardService;
+import org.graffiti.graph.Edge;
+import org.graffiti.graph.GraphElement;
 import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.AbstractAlgorithm;
 import org.graffiti.plugin.parameter.BooleanParameter;
 import org.graffiti.plugin.parameter.Parameter;
 
+import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.DataMappingId;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.KeggGmlHelper;
@@ -72,7 +76,7 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 				TreeMap<DataMappingId, Stack<Double>> id2value_n1 = nh.getIdsAndValues(null);
 				for (DataMappingId did : id2value_n1.keySet()) {
 					String id = did.toString();
-					id = StringManipulationTools.stringReplace(id, "_�_", "/");
+					id = StringManipulationTools.stringReplace(id, "_§_", "/");
 					if (!dataCols.contains(id)) {
 						dataCols.add(id);
 						dataColsArr.add(id);
@@ -89,7 +93,7 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 				TreeMap<DataMappingId, Stack<Double>> id2value_n1 = nh.getIdsAndAverageValues();
 				for (DataMappingId did : id2value_n1.keySet()) {
 					String id = did.toString();
-					id = StringManipulationTools.stringReplace(id, "_�_", "/");
+					id = StringManipulationTools.stringReplace(id, "_§_", "/");
 					if (!dataCols.contains(id)) {
 						dataCols.add(id);
 						dataColsArrAvg.add(id);
@@ -101,40 +105,75 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 		}
 		curRow = addRow(result);
 		int row = 0;
-		for (Node n : getSelectedOrAllNodes()) {
-			NodeHelper nh = new NodeHelper(n);
+		for (GraphElement n : getSelectedOrAllGraphElements()) {
 			row++;
 			if (rownum)
 				addCol(result, curRow, row + "");
-			if (label)
-				addCol(result, curRow, nh.getLabel());
+			if (label) {
+				if (n instanceof Node)
+					addCol(result, curRow, AttributeHelper.getLabel(n, null));
+				else {
+					Edge e = (Edge) n;
+					if (AttributeHelper.getLabel(n, null) != null)
+						addCol(result, curRow, AttributeHelper.getLabel(n, null));
+					else {
+						addCol(result, curRow, AttributeHelper.getLabel(e.getSource(), null + "^" + AttributeHelper.getLabel(e.getTarget(), null)));
+					}
+				}
+			}
 			if (tooltip)
-				addCol(result, curRow, nh.getTooltip());
+				addCol(result, curRow, AttributeHelper.getToolTipText(n));
 			if (keggID)
 				addCol(result, curRow, KeggGmlHelper.getKeggId(n));
-			if (cluster)
-				addCol(result, curRow, nh.getClusterID(null));
+			if (cluster) {
+				if (n instanceof Node) {
+					addCol(result, curRow, NodeTools.getClusterID(n, null));
+				} else {
+					if (NodeTools.getClusterID(n, null) != null)
+						addCol(result, curRow, NodeTools.getClusterID(n, null));
+					else {
+						Edge e = (Edge) n;
+						addCol(result, curRow, NodeTools.getClusterID(e.getSource(), null) + "^" + NodeTools.getClusterID(e.getTarget(), null));
+					}
+				}
+			}
 			if (userURL)
-				addCol(result, curRow, nh.getURL());
+				addCol(result, curRow, AttributeHelper.getReferenceURL(n));
 			if (keggURL)
 				addCol(result, curRow, KeggGmlHelper.getKeggLinkUrl(n));
-			if (pos)
-				addCol(result, curRow, nh.getX() + "");
-			if (pos)
-				addCol(result, curRow, nh.getY() + "");
-			if (size)
-				addCol(result, curRow, nh.getWidth() + "");
-			if (size)
-				addCol(result, curRow, nh.getHeight() + "");
-			if (altIDs)
-				addCol(result, curRow, nh.getAlternativeIDs() + "");
+			if (n instanceof Node) {
+				NodeHelper nh = new NodeHelper((Node) n);
+				if (pos)
+					addCol(result, curRow, nh.getX() + "");
+				if (pos)
+					addCol(result, curRow, nh.getY() + "");
+				if (size)
+					addCol(result, curRow, nh.getWidth() + "");
+				if (size)
+					addCol(result, curRow, nh.getHeight() + "");
+			} else {
+				Edge e = (Edge) n;
+				NodeHelper nh1 = new NodeHelper(e.getSource());
+				NodeHelper nh2 = new NodeHelper(e.getTarget());
+				if (pos)
+					addCol(result, curRow, nh1.getX() + "");
+				if (pos)
+					addCol(result, curRow, nh1.getY() + "");
+				if (size)
+					addCol(result, curRow, (nh2.getX() - nh1.getX()) + "");
+				if (size)
+					addCol(result, curRow, (nh2.getY() - nh1.getY()) + "");
+			}
+			if (altIDs) {
+				addCol(result, curRow, NodeHelper.getAlternativeIDs(n) + "");
+			}
 			if (values) {
-				TreeMap<DataMappingId, Stack<Double>> id2value_n1 = nh.getIdsAndValues(null);
+				TreeMap<DataMappingId, Stack<Double>> id2value_n1 = NodeHelper.getIdsAndValues(n, null);
 				for (String col : dataColsArr) {
 					Stack<Double> values = null;
 					for (DataMappingId dmi : id2value_n1.keySet()) {
 						String id = dmi.toString();
-						id = StringManipulationTools.stringReplace(id, "_�_", "/");
+						id = StringManipulationTools.stringReplace(id, "_§_", "/");
 						if (id.equals(col)) {
 							values = id2value_n1.get(dmi);
 							break;
@@ -144,12 +183,12 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 				}
 			}
 			if (valuesAvg) {
-				TreeMap<DataMappingId, Stack<Double>> id2value_n1 = nh.getIdsAndAverageValues();
+				TreeMap<DataMappingId, Stack<Double>> id2value_n1 = NodeHelper.getIdsAndAverageValues(n);
 				for (String col : dataColsArrAvg) {
 					Stack<Double> values = null;
 					for (DataMappingId dmi : id2value_n1.keySet()) {
 						String id = dmi.toString();
-						id = StringManipulationTools.stringReplace(id, "_�_", "/");
+						id = StringManipulationTools.stringReplace(id, "_§_", "/");
 						if (id.equals(col)) {
 							values = id2value_n1.get(dmi);
 							break;
@@ -217,7 +256,8 @@ public class CopyDataTableAlgorithm extends AbstractAlgorithm {
 	public String getDescription() {
 		return "<html>" +
 				"With this command you may transfer selected information<br>" +
-				"to the clipboard. Please specify relevant columns:";
+				"to the clipboard. Nodes and edges are processed.<br>" +
+				"Please specify relevant columns:";
 	}
 	
 	@Override

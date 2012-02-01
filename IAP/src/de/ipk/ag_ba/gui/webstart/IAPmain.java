@@ -172,15 +172,13 @@ public class IAPmain extends JApplet {
 	public void myAppletLoad(MainFrame statusPanel, final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
-		String name = stS + "IAP-VANTED" + stE + " - " + stS + "V" + stE + "isualization and " + stS + "A" + stE
+		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-Data-Navigator";
+		String name = stS + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + stE + " - " + stS + "V" + stE + "isualization and " + stS + "A" + stE
 				+ "nalysis of " + stS + "N" + stE + "e" + stS + "t" + stE + "works <br>containing " + stS + "E" + stE
 				+ "xperimental " + stS + "D" + stE + "ata";
-		DBEgravistoHelper.DBE_GRAVISTO_VERSION = "IAP-VANTED V" + DBEgravistoHelper.DBE_GRAVISTO_VERSION_CODE;
-		DBEgravistoHelper.DBE_GRAVISTO_NAME = stS + "IAP-VANTED" + stE + "&nbsp;-&nbsp;" + stS + "V" + stE
-				+ "isualization&nbsp;and&nbsp;" + stS + "A" + stE + "nalysis&nbsp;of&nbsp;" + stS + "N" + stE + "e" + stS
-				+ "t" + stE + "works&nbsp;<br>containing&nbsp;" + stS + "E" + stE + "xperimental&nbsp;" + stS + "D" + stE
-				+ "ata<br>";
-		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-VANTED";
+		DBEgravistoHelper.DBE_GRAVISTO_VERSION = DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + " V" + DBEgravistoHelper.DBE_GRAVISTO_VERSION_CODE;
+		DBEgravistoHelper.DBE_GRAVISTO_NAME = stS + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + stE + "&nbsp;-&nbsp;" + stS + "I" + stE
+				+ "ntegrated&nbsp;" + stS + "A" + stE + "nalysis&nbsp;" + stS + "P" + stE + "latform<br>";
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "Integrated Analysis Platform";
 		
 		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "";

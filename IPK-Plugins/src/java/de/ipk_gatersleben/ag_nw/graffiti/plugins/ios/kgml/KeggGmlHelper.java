@@ -23,6 +23,7 @@ import org.graffiti.attributes.AttributeNotFoundException;
 import org.graffiti.attributes.HashMapAttribute;
 import org.graffiti.graph.Edge;
 import org.graffiti.graph.Graph;
+import org.graffiti.graph.GraphElement;
 import org.graffiti.graph.Node;
 import org.graffiti.plugins.views.defaults.CircleNodeShape;
 import org.graffiti.plugins.views.defaults.RectangleNodeShape;
@@ -49,7 +50,7 @@ public class KeggGmlHelper implements HelperClass {
 		return (String) AttributeHelper.getAttributeValue(graph, "", "kegg_name", null, "");
 	}
 	
-	public static String getKeggId(Node n) {
+	public static String getKeggId(GraphElement n) {
 		return (String) AttributeHelper.getAttributeValue(n, "kegg", "kegg_name", null, "");
 	}
 	
@@ -109,7 +110,7 @@ public class KeggGmlHelper implements HelperClass {
 		return (String) AttributeHelper.getAttributeValue(graph, "", "kegg_link", null, "");
 	}
 	
-	public static String getKeggLinkUrl(Node n) {
+	public static String getKeggLinkUrl(GraphElement n) {
 		return (String) AttributeHelper.getAttributeValue(n, "kegg", "kegg_link", null, "");
 	}
 	
@@ -308,7 +309,7 @@ public class KeggGmlHelper implements HelperClass {
 	}
 	
 	private static ArrayList<IndexAndString> getIndexAndStringValuesFromHashMapAttribute(
-						Attributable attributeable, String path, String prefixOfAttributeName) {
+			Attributable attributeable, String path, String prefixOfAttributeName) {
 		ArrayList<IndexAndString> result = new ArrayList<IndexAndString>();
 		try {
 			HashMapAttribute hma = (HashMapAttribute) attributeable.getAttribute(path);
@@ -395,7 +396,7 @@ public class KeggGmlHelper implements HelperClass {
 					} else {
 						// error: neither e1 nor e2 are corresponding to one of the end nodes of e
 						ErrorMsg
-											.addErrorMessage("Internal Error: Could not find corresponding Source or Target KeggId for end point nodes of edge, representing a relation.");
+								.addErrorMessage("Internal Error: Could not find corresponding Source or Target KeggId for end point nodes of edge, representing a relation.");
 						sourceKeggId = null;
 						targetKeggId = null;
 					}
@@ -419,7 +420,7 @@ public class KeggGmlHelper implements HelperClass {
 	 * @param node2upperLeftPos
 	 */
 	public static Set<Node> getNodesInsideThisNode(Node bigNode, Collection<Node> nodes,
-						HashMap<Node, Vector2d> node2upperLeftPos, HashMap<Node, Vector2d> node2lowerRightPos) {
+			HashMap<Node, Vector2d> node2upperLeftPos, HashMap<Node, Vector2d> node2lowerRightPos) {
 		HashSet<Node> result = new HashSet<Node>();
 		for (Node n : nodes)
 			if (isInside(bigNode, n, node2upperLeftPos, node2lowerRightPos))
