@@ -44,16 +44,20 @@
 	#separation <- ";"
 	print("... Read input file")
 	
-	preScanForPointOrComma <- scan(file=fileName, what=character(0), nlines=2, sep="\n")
-	preScanForPointOrComma <- paste(preScanForPointOrComma[2],",.", sep="")
-	allCharacterSeparated <- table(strsplit(toupper(preScanForPointOrComma), '')[[1]])
-	
-	if(allCharacterSeparated["."] > allCharacterSeparated[","]) {
-		print("... english Version")
-		return(read.csv(fileName, header=TRUE, sep=separation, fileEncoding="ISO-8859-1", encoding="UTF-8"))
+	if(file.exists(fileName)) {
+		preScanForPointOrComma <- scan(file=fileName, what=character(0), nlines=2, sep="\n")
+		preScanForPointOrComma <- paste(preScanForPointOrComma[2],",.", sep="")
+		allCharacterSeparated <- table(strsplit(toupper(preScanForPointOrComma), '')[[1]])
+		
+		if(allCharacterSeparated["."] > allCharacterSeparated[","]) {
+			print("... english Version")
+			return(read.csv(fileName, header=TRUE, sep=separation, fileEncoding="ISO-8859-1", encoding="UTF-8"))
+		} else {
+			print("... german Version")
+			return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="ISO-8859-1", encoding="UTF-8"))
+		}
 	} else {
-		print("... german Version")
-		return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="ISO-8859-1", encoding="UTF-8"))
+		return("error")
 	}
 	
 #	if (englischVersion) {
@@ -419,36 +423,75 @@ getResultDataFrame <- function(overallList) {
 	overallList$debug %debug% "getResultDataFrame()"
 	groupBy <- groupByFunction(list(overallList$treatment, overallList$secondTreatment))
 	
-	if(tolower(overallList$diagramTyp) == "!boxplot") {
+	if(tolower(overallList$diagramTyp) == "nboxplot") {
 		colOfXaxis <- "xAxis"
 		colOfMean <- "mean"
 		colOfSD <- "se"
+	} else if(tolower(overallList$diagramTyp) == "boxplot") {
+		colOfXaxis <- "xAxis"
+		colOfMean <- "value"
+		
 	} else {			
 		colOfXaxis <- overallList$xAxis
 		colOfMean <- overallList$descriptor
 		colOfName <- "name"
 	}
 	
-	groupedDataFrame <- data.table(overallList$iniDataSet)
-	groupedDataFrameMean <- as.data.frame(groupedDataFrame[,lapply(.SD, mean, na.rm=TRUE), by=c(groupBy,overallList$xAxis)])
-	
-	if(tolower(overallList$diagramTyp) == "!boxplot") {
-		colNamesOfTheRest <- colOfMean
-	} else {
-		colNamesOfTheRest <- groupedDataFrameMean %allColnamesWithoutThisOnes% c(groupBy, overallList$xAxis)
+	if(tolower(overallList$diagramTyp) != "boxplot") {
+		groupedDataFrame <- data.table(overallList$iniDataSet)
 	}
 	
-	colnames(groupedDataFrameMean) <- c(groupBy, colOfXaxis, colNamesOfTheRest)
+	if(tolower(overallList$diagramTyp) == "boxplot") {
+		groupedDataFrameMean <- overallList$iniDataSet[groupBy[1]]
+		
+		groupByReduce <- groupBy[groupBy!=groupBy[1]]
+		for(n in c(groupByReduce,  overallList$xAxis, overallList$descriptor)) {
+			groupedDataFrameMean <- cbind(groupedDataFrameMean,  overallList$iniDataSet[n])
+		}	
+		
+####################
+#		Alternative, den Boxplot selber zu bauen!!
+#		test <- overallList$iniDataSet %allColnamesWithoutThisOnes% c(groupBy, overallList$xAxis)
+#		myQuantile <- as.data.frame(groupedDataFrame[,lapply(.SD,quantile, probs=c(0,0.25,0.5,0.75,1), na.rm=TRUE), by=groupBy])
+#		numberOfGroubingElements <- length(myQuantile[,1]) / 5
+#		
+#		testData <- data.frame()
+#		for(n in seq(1, length(myQuantile[,1]), by=5)) {
+#			testData <- rbind(testData, myQuantile[n:(n+4),test])
+#		}
+#		colnames(testData) <- c("q0", "q25", "q50", "q75", "q100")
+#		rownames(testData) <- unique(myQuantile[,1])
+#		
+#		ggplot(overallList$iniDataSet, aes(x=rownames(testData), ymin=testData[,1], lower=testData[,2], middle=testData[,3], upper=testData[,4], ymax=testData[,5])) + 
+#				geom_boxplot(stat="identity")
+#####################		
+			
+		
+	} else {
+		groupedDataFrameMean <- as.data.frame(groupedDataFrame[,lapply(.SD, mean, na.rm=TRUE), by=c(groupBy,overallList$xAxis)])
+	}
 	
-	if(tolower(overallList$diagramTyp) == "!boxplot") {
+		if(tolower(overallList$diagramTyp) == "nboxplot" || tolower(overallList$diagramTyp) == "boxplot") {
+			colNamesOfTheRest <- colOfMean
+		} else {
+			colNamesOfTheRest <- groupedDataFrameMean %allColnamesWithoutThisOnes% c(groupBy, overallList$xAxis)
+		}
+		
+		colnames(groupedDataFrameMean) <- c(groupBy, colOfXaxis, colNamesOfTheRest)
+	
+	if(tolower(overallList$diagramTyp) == "nboxplot") {
 		groupedDataFrameSD <- as.data.frame(groupedDataFrame[,lapply(.SD, sd, na.rm=TRUE), by=c(groupBy,overallList$xAxis)])
 		colnames(groupedDataFrameSD) <- c(groupBy, colOfXaxis, colOfSD)
 	}
 	
 	booleanVector <- getBooleanVectorForFilterValues(groupedDataFrameMean, buildList(overallList, colOfXaxis))
 	
-	if(tolower(overallList$diagramTyp) == "!boxplot") {
+	if(tolower(overallList$diagramTyp) == "nboxplot") {
 		overallList$iniDataSet <- merge(sort=FALSE, groupedDataFrameMean[booleanVector,], groupedDataFrameSD[booleanVector,], by = c(groupBy, colOfXaxis))
+		overallList$overallResult <- buildRowName(overallList$iniDataSet,groupBy, overallList$yAxisName)
+		
+	} else if(tolower(overallList$diagramTyp) == "boxplot") {
+		overallList$iniDataSet <- groupedDataFrameMean[booleanVector,]
 		overallList$overallResult <- buildRowName(overallList$iniDataSet,groupBy, overallList$yAxisName)
 		
 	} else {
@@ -551,7 +594,7 @@ CheckIfOneColumnHasOnlyValues <- function(overallList) {
 	max <- -1	
 	for(index in 1:length(unlist(levels(overallList$overallResult$name)))){
 		
-		if(tolower(overallList$diagramTyp) == "!boxplot") {
+		if(tolower(overallList$diagramTyp) == "nboxplot") {
 			temp <- sum(!is.na(overallList$overallResult$mean[overallList$overallResult$name == unlist(levels(overallList$overallResult$name))[[index]]]))
 		} else {
 			boolVec <- overallList$overallResult$name == unlist(levels(overallList$overallResult$name))[[index]]
@@ -591,13 +634,13 @@ makeLinearDiagram <- function(h, overallList) {
 	overallList$debug %debug% "makeLinearDiagram()"
 		
 	if(!CheckIfOneColumnHasOnlyValues(overallList)) {	
-		if(tolower(overallList$diagramTyp) == "!boxplot") {
+		if(tolower(overallList$diagramTyp) == "nboxplot") {
 	
 #			myDataSet <- data.frame(name=c("normal","wet","dry","normal","wet","dry","normal","wet","dry"), 
 #									xAxis=c(6,6,6,8,8,8,10,10,10),		
 #									mean=c(4883,6224,4630,6047,5790,7758,7349,7778,9725), 
 #									se=c(1515,1190,1670,1831,2013,1318,2387,2182,1499))
-			
+					
 			plot <-	ggplot(data=overallList$overallResult, aes(x=xAxis, y=mean, shape=name)) +
 					#geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="identity", alpha=0.1) +
 					geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1) +
@@ -667,10 +710,10 @@ makeLinearDiagram <- function(h, overallList) {
 #			} 
 
 		if(h==1) {
-			saveImageFile(overallList, plot)
+			saveImageFile(overallList, plot, overallList$diagramTyp)
 		}
 		if(overallList$appendix) {
-			writeLatexFile("appendixImage", overallList$saveName)
+			writeLatexFile("appendixImage", overallList$saveName, overallList$diagramTyp)
 		}
 	
 	} else {
@@ -678,8 +721,8 @@ makeLinearDiagram <- function(h, overallList) {
 
 		day <- overallList$overallResult$xAxis[!is.na(overallList$overallResult$mean)][1]
 		overallList$xAxisName <- paste(overallList$xAxisName,day)
-		overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
-		overallList <- makeBoxplotDiagram(h, overallList, TRUE)
+		#overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
+		overallList <- makeBarDiagram(h, overallList, TRUE)
 	}
 	return(overallList)
 }
@@ -788,9 +831,9 @@ makeBoxplotStackedDiagram <- function(h, overallList) {
 	return(overallList)
 }	
 
-
-makeBoxplotDiagram <- function(h, overallList, isOnlyOneValue = FALSE) {
-	overallList$debug %debug% "makeBoxplotDiagram()"
+makeBarDiagram <- function(h, overallList, isOnlyOneValue = FALSE) {
+	overallList$debug %debug% "makeBarDiagram()"
+	overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
 	
 	if(isOnlyOneValue) {
 		myPlot <- ggplot(data=overallList$overallResult, aes(x=name, y=mean))
@@ -798,35 +841,80 @@ makeBoxplotDiagram <- function(h, overallList, isOnlyOneValue = FALSE) {
 		myPlot <- ggplot(data=overallList$overallResult, aes(x=xAxis, y=mean))
 	}
 	
-	myPlot <- myPlot + 				
-#	myPlot <-ggplot(data=myDataSet, aes(x=name, y=mean)) +		
-	geom_bar(stat="identity", aes(fill=name), colour="Grey", size=0.1) +
-	geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
-	#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
-	ylab(overallList$yAxisName) +
-	coord_cartesian(ylim=c(0,max(overallList$overallResult$mean + overallList$overallResult$se + 10,na.rm=TRUE))) +
-	xlab(overallList$xAxisName) +
-	scale_fill_manual(values = overallList$color) +
-	theme_bw() +
-	opts(legend.position="none",
-			plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"),
-			axis.title.x = theme_text(face="bold", size=11),
-			axis.title.y = theme_text(face="bold", size=11, angle=90),
-			panel.grid.minor = theme_blank(),
-			panel.border = theme_rect(colour="Grey", size=0.1)
-	)
-
+	myPlot <- myPlot + 						
+			geom_bar(stat="identity", aes(fill=name), colour="Grey", size=0.1) +
+			geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
+			#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
+			ylab(overallList$yAxisName) +
+			coord_cartesian(ylim=c(0,max(overallList$overallResult$mean + overallList$overallResult$se + 10,na.rm=TRUE))) +
+			xlab(overallList$xAxisName) +
+			scale_fill_manual(values = overallList$color) +
+			theme_bw() +
+			opts(legend.position="none",
+					plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"),
+					axis.title.x = theme_text(face="bold", size=11),
+					axis.title.y = theme_text(face="bold", size=11, angle=90),
+					panel.grid.minor = theme_blank(),
+					panel.border = theme_rect(colour="Grey", size=0.1)
+			)
+	
 	if(length(overallList$color) > 10) {
 		myPlot <- myPlot + opts(axis.text.x = theme_text(size=6, angle=90))
-	} 
+	}
 	
 	if (h==1) {
-		saveImageFile(overallList, myPlot)
+		saveImageFile(overallList, myPlot, overallList$diagramTyp)
 	} else {
 		print(myPlot)
 	}
 	if(overallList$appendix) {
-		writeLatexFile("appendixImage", overallList$saveName)
+		writeLatexFile("appendixImage", overallList$saveName, overallList$diagramTyp)
+	}
+	
+	return(overallList)
+}
+
+##Problem: der median wird nicht angezeigt!
+makeBoxplotDiagram <- function(h, overallList) {
+	overallList$debug %debug% "makeBoxplotDiagram()"
+	#overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
+	
+	# confidence interval calculated by `boxplot.stats`
+	f <- function(x) {
+		ans <- boxplot.stats(x)
+		data.frame(ymin = ans$conf[1], ymax = ans$conf[2])
+	}
+		
+	#myPlot <- ggplot(overallList$overallResult, aes(factor(name), value, fill=name, colour=name)) + 
+	myPlot <- ggplot(overallList$overallResult, aes(factor(name), value, fill=name)) +
+			geom_boxplot() +
+			ylab(overallList$yAxisName) +
+			#coord_cartesian(ylim=c(0,max(overallList$overallResult$mean + overallList$overallResult$se + 10,na.rm=TRUE))) +
+			xlab(overallList$xAxisName) +
+			scale_fill_manual(values = overallList$color) +
+			#stat_summary(fun.data = f, geom = "crossbar", height = 0.1,	colour = NA, fill = "skyblue", width = 0.8, alpha = 0.5) +
+			theme_bw() +
+			opts(legend.position="none",
+					plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"),
+					axis.title.x = theme_text(face="bold", size=11),
+					axis.title.y = theme_text(face="bold", size=11, angle=90),
+					panel.grid.minor = theme_blank(),
+					panel.border = theme_rect(colour="Grey", size=0.1)
+			)
+
+	if(length(overallList$color) > 10) {
+		myPlot <- myPlot + opts(axis.text.x = theme_text(size=6, angle=90))
+	}	
+	
+	#print(myPlot)
+	
+	if (h==1) {
+		saveImageFile(overallList, myPlot, overallList$diagramTyp)
+	} else {
+		print(myPlot)
+	}
+	if(overallList$appendix) {
+		writeLatexFile("appendixImage", overallList$saveName, overallList$diagramTyp)
 	}
 	
 	return(overallList)
@@ -837,16 +925,18 @@ makeDiagrams <- function(overallList) {
 	durchlauf <- ifelse(overallList$showResultInR, 2, 1)
 	
 	for(h in 1:durchlauf) {
-				
+						
 		if (tolower(overallList$diagramTyp) == "boxplot") {
 			overallList <- makeBoxplotDiagram(h, overallList)
 			
 		} else if (tolower(overallList$diagramTyp) == "boxplotstacked") {
 			overallList <- makeBoxplotStackedDiagram(h, overallList)
 			
-		} else if(tolower(overallList$diagramTyp) == "!boxplot"){
+		} else if(tolower(overallList$diagramTyp) == "nboxplot"){
 			overallList <- makeLinearDiagram(h, overallList)
 			
+		}  else if (tolower(overallList$diagramTyp) == "barplot") {
+			overallList <- makeBarDiagram(h, overallList)
 		} else {
 			print("Error - overallList$diagramTyp is undefined!")
 		}
@@ -955,51 +1045,71 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		if (fileName != "error") {
 			workingDataSet <- separation %getData% fileName
 			
-			#!boxplot
-			if (typOfStartOptions == "all") {
-				descriptorSet <- colnames(workingDataSet)
-				descriptorSetName <- descriptorSet
+			if(workingDataSet != "error") {
+				#nboxplot
+				if (typOfStartOptions == "all") {
+					descriptorSet <- colnames(workingDataSet)
+					descriptorSetName <- descriptorSet
+					
+				} else { #Report
+					descriptorSet <- c("Weight A (g)","Weight B (g)","Water (weight-diff)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
+							"side.fluo.intensity.chlorophyl.average (relative)","side.fluo.intensity.phenol.average (relative)",
+							"side.nir.intensity.average (relative)","side.leaf.count.median (leafs)","side.bloom.count (tassel)",
+							"side.leaf.length.sum.norm.max (mm)", "volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
+							"volume.iap.wue", "side.nir.wetness.plant_weight_drought_loss", "top.nir.wetness.plant_weight_drought_loss", "side.nir.wetness.av", "top.nir.wetness.av",
+							"side.area.relative", "side.height.norm.relative", "side.width.norm.relative", "top.area.relative", "side.area.relative", "volume.iap.relative",
+							"side.height (mm)","side.width (mm)","side.area (px)", "top.area (px)")
 				
-			} else { #Report
-				descriptorSet <- c("Weight A (g)","Weight B (g)","Water (weight-diff)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
-						"side.fluo.intensity.chlorophyl.average (relative)","side.fluo.intensity.phenol.average (relative)",
-						"side.nir.intensity.average (relative)","side.leaf.count.median (leafs)","side.bloom.count (tassel)",
-						"side.leaf.length.sum.norm.max (mm)", "volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
-						"volume.iap.wue", "side.nir.wetness.plant_weight_drought_loss", "top.nir.wetness.plant_weight_drought_loss", "side.nir.wetness.av", "top.nir.wetness.av",
-						"side.area.relative", "side.height.norm.relative", "side.width.norm.relative", "top.area.relative", "side.area.relative", "volume.iap.relative",
+					descriptorSetName <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
+							"chlorophyl intensity (relative intensity/pixel)", "fluorescence intensity (relative intensity/pixel)", "nir intensity (relative intensity/pixel)",
+							"number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)", "volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
+							"volume based water use efficiency", "weighted loss through drought stress (side)", "weighted loss through drought stress (top)", "Average wetness of side image", "Average wetness of top image",
+							"relative projected side area (%)", "relative plant height (%)", "relative plant width (%)", "relative projected top area (%)", "relative projected side area (%)", "relative volume (IAP based formular - RGB) (%)",
+							"height (px)", "width (px)", "side area (px)", "top area (px)")		
+				}
+				diagramTypVector <- rep.int("nboxplot", times=length(descriptorSetName))
+	
+				
+				#boxplot
+				descriptorSetBox <- c("side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
+						"volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
 						"side.height (mm)","side.width (mm)","side.area (px)", "top.area (px)")
+				
+				descriptorSetNameBox <- c("normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
+						"volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
+						"height (px)", "width (px)", "side area (px)", "top area (px)")	
+				
+				diagramTypVectorBox <- rep.int("boxplot", times=length(descriptorSetBox))
+				
+				descriptorSet <- c(descriptorSet, descriptorSetBox)
+				descriptorSetName <- c(descriptorSetName, descriptorSetNameBox)
+				diagramTypVector <- c(diagramTypVector, diagramTypVectorBox)
+				
+				#boxplotStacked
+				descriptorSet <- c(descriptorSet, "side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
+								   				  "side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
+				descriptorSetName <- c(descriptorSetName, "NIR absorption class (%)", "red fluorescence histogram (%)")
+				diagramTypVector <- c(diagramTypVector, "boxplotStacked", "boxplotStacked")
+				
+				appendix <- appendix %exists% args[3]
+				
+				if(appendix) {
+					blacklist <- buildBlacklist(workingDataSet, descriptorSet)
+					descriptorSetAppendix <- colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet),'%in%', blacklist))[,1]])
+					descriptorSetNameAppendix <- descriptorSetAppendix
+					diagramTypVectorAppendix <- rep.int("nboxplot", times=length(descriptorSetNameAppendix))
+				}
 			
-				descriptorSetName <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
-						"chlorophyl intensity (relative intensity/pixel)", "fluorescence intensity (relative intensity/pixel)", "nir intensity (relative intensity/pixel)",
-						"number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)", "volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
-						"volume based water use efficiency", "weighted loss through drought stress (side)", "weighted loss through drought stress (top)", "Average wetness of side image", "Average wetness of top image",
-						"relative projected side area (%)", "relative plant height (%)", "relative plant width (%)", "relative projected top area (%)", "relative projected side area (%)", "relative volume (IAP based formular - RGB) (%)",
-						"height (px)", "width (px)", "side area (px)", "top area (px)")		
-		}
-			diagramTypVector <- rep.int("!boxplot", times=length(descriptorSetName))
-
-			#boxplotStacked
-			descriptorSet <- c(descriptorSet, "side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
-							   				  "side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
-			descriptorSetName <- c(descriptorSetName, "NIR absorption class (%)", "red fluorescence histogram (%)")
-			diagramTypVector <- c(diagramTypVector, "boxplotStacked", "boxplotStacked")
-			
-			appendix <- appendix %exists% args[3]
-			
-			if(appendix) {
-				blacklist <- buildBlacklist(workingDataSet, descriptorSet)
-				descriptorSetAppendix <- colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet),'%in%', blacklist))[,1]])
-				descriptorSetNameAppendix <- descriptorSetAppendix
-				diagramTypVectorAppendix <- rep.int("!boxplot", times=length(descriptorSetNameAppendix))
+				saveFormat <- saveFormat %exists% args[2]
+							
+				listOfTreatAndFilterTreat <- checkOfTreatments(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, DEBUG)
+				treatment <- listOfTreatAndFilterTreat[[1]][[1]]
+				secondTreatment <- listOfTreatAndFilterTreat[[1]][[2]]
+				filterTreatment <- listOfTreatAndFilterTreat[[2]][[1]]
+				filterSecondTreatment <- listOfTreatAndFilterTreat[[2]][[2]]
+			} else {
+				fileName = "error"
 			}
-		
-			saveFormat <- saveFormat %exists% args[2]
-						
-			listOfTreatAndFilterTreat <- checkOfTreatments(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, DEBUG)
-			treatment <- listOfTreatAndFilterTreat[[1]][[1]]
-			secondTreatment <- listOfTreatAndFilterTreat[[1]][[2]]
-			filterTreatment <- listOfTreatAndFilterTreat[[2]][[1]]
-			filterSecondTreatment <- listOfTreatAndFilterTreat[[2]][[2]]
 		}
 		
 	} else if (typOfStartOptions == "test"){
@@ -1030,9 +1140,9 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		#descriptorSet <- c("Plant ID$Treatment$Hallo$Wert1$Repl ID")
 		#descriptorSetName <- c("VariableMix")
 	
-		descriptorSet <- c("side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
-		#descriptorSet <- c("side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
-		descriptorSetName <- c("red fluorescence histogram (%)")
+#		descriptorSet <- c("side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
+#		#descriptorSet <- c("side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
+#		descriptorSetName <- c("red fluorescence histogram (%)")
 	
 	
 		#descriptorSet <- c("Weight B (g)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)",
@@ -1086,9 +1196,9 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		##treatment <- "Variety"
 		#treatment <- "none"
 		
-		diagramTyp="boxplotStacked"
-		#diagramTyp="!boxplot"
-		#diagramTyp="boxplot"
+		#diagramTyp="boxplotStacked"
+		#diagramTyp="nboxplot"
+		diagramTyp="boxplot"
 		
 		bgColor <- "transparent"
 		isGray="FALSE"
@@ -1111,10 +1221,10 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 		#descriptor <- c("Repl ID")		
 		#descriptorSet <- c("nir.top")
 		#descriptorSet <- c("Plant ID")
-#		descriptorSet <- c("side.height.norm (mm)")
+		descriptorSet <- c("side.height.norm (mm)")
 
 		#descriptorSet <- c("side.area.norm (mm^2)")
-#		descriptorSetName <- c("Das ist ein Testname")
+		descriptorSetName <- c("Das ist ein Testname")
 
 		#descriptorSet <- c("Plant ID$Treatment$Hallo$Wert1$Repl ID")
 		
@@ -1172,10 +1282,11 @@ startOptions <- function(typOfStartOptions = "test", DEBUG=FALSE){
 	
 	} else {
 		print("No filename or no descriptor!")
+		checkIfAllNecessaryFilesAreThere()
 	}
 }
 
-valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="pdf", dpi="90", diagramTyp="!boxplot", isGray="false", treatment="Treatment",
+valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="pdf", dpi="90", diagramTyp="nboxplot", isGray="false", treatment="Treatment",
 		filterTreatment="none", secondTreatment="none", filterSecondTreatment="none", 
 		filterXaxis="none", xAxis="Day (Int)", descriptor="side.area", showResultInR=FALSE, xAxisName="none", yAxisName="none",
 		debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE) {			
@@ -1206,6 +1317,21 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 	
 	overallList$saveName <- changeSaveName(overallList$saveName)
 	overallList <- preprocessingOfDescriptor(overallList)
+	
+	
+###############################	
+#	overallList <- preprocessingOfxAxisValue(overallList)
+#	overallList <- preprocessingOfTreatment(overallList)
+#	overallList <- preprocessingOfSecondTreatment(overallList)
+#	overallList <- checkIfDescriptorIsNaOrAllZero(overallList)
+#	overallList <- reduceWorkingDataSize(overallList)
+#	overallList <- setDefaultAxisNames(overallList)	
+#	overallList <- getResultDataFrame(overallList)
+#	overallList$color <- setColor(overallList) 
+#	makeDiagrams(overallList)
+###############################
+
+
 	
 	if(!overallList$stoppTheCalculation) {
 		overallList <- preprocessingOfxAxisValue(overallList)
