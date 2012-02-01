@@ -89,7 +89,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				
 				NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
 				
-				NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Add Files", "img/ext/user-desktop.png",
+				NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Load Files", "img/ext/user-desktop.png",
 						"img/ext/user-desktop.png", src.getGUIsetting());
 				res.add(uploadFilesEntity);
 			}

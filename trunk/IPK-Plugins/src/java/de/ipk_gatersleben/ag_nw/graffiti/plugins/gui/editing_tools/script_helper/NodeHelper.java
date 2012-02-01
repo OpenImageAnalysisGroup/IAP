@@ -64,8 +64,12 @@ public class NodeHelper implements Node, HelperClass {
 	 *         data.
 	 */
 	public ArrayList<String> getAlternativeIDs() {
+		return getAlternativeIDs(n);
+	}
+	
+	public static ArrayList<String> getAlternativeIDs(GraphElement ge) {
 		ArrayList<String> result = new ArrayList<String>();
-		for (SubstanceInterface md : getDataMappings()) {
+		for (SubstanceInterface md : getDataMappings(ge)) {
 			result.addAll(md.getSynonyms());
 		}
 		return result;
@@ -370,8 +374,12 @@ public class NodeHelper implements Node, HelperClass {
 	}
 	
 	public ExperimentInterface getDataMappings() {
+		return getDataMappings(n);
+	}
+	
+	public static ExperimentInterface getDataMappings(GraphElement ge) {
 		try {
-			CollectionAttribute ca = (CollectionAttribute) n
+			CollectionAttribute ca = (CollectionAttribute) ge
 					.getAttribute(Experiment2GraphHelper.mapFolder);
 			XMLAttribute xa = (XMLAttribute) ca
 					.getAttribute(Experiment2GraphHelper.mapVarName);
@@ -430,8 +438,12 @@ public class NodeHelper implements Node, HelperClass {
 	// }
 	
 	public ArrayList<NumericMeasurementInterface> getMappedSampleData() {
+		return getMappedSampleData(n);
+	}
+	
+	public static ArrayList<NumericMeasurementInterface> getMappedSampleData(GraphElement ge) {
 		ArrayList<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
-		for (SubstanceInterface md : getDataMappings()) {
+		for (SubstanceInterface md : getDataMappings(ge)) {
 			for (ConditionInterface sd : md) {
 				for (SampleInterface s : sd)
 					result.addAll(s);
@@ -441,8 +453,12 @@ public class NodeHelper implements Node, HelperClass {
 	}
 	
 	public ArrayList<SampleAverageInterface> getMappedAverageSampleData() {
+		return getMappedAverageSampleData(n);
+	}
+	
+	public static ArrayList<SampleAverageInterface> getMappedAverageSampleData(GraphElement ge) {
 		ArrayList<SampleAverageInterface> result = new ArrayList<SampleAverageInterface>();
-		for (SubstanceInterface md : getDataMappings()) {
+		for (SubstanceInterface md : getDataMappings(ge)) {
 			for (ConditionInterface sd : md) {
 				for (SampleInterface s : sd)
 					result.add(s.getSampleAverage());
@@ -1058,10 +1074,13 @@ public class NodeHelper implements Node, HelperClass {
 		}
 	}
 	
-	public TreeMap<DataMappingId, Stack<Double>> getIdsAndValues(
-			Integer overrideReplicateId) {
+	public TreeMap<DataMappingId, Stack<Double>> getIdsAndValues(Integer overrideReplicateId) {
+		return getIdsAndValues(n, overrideReplicateId);
+	}
+	
+	public static TreeMap<DataMappingId, Stack<Double>> getIdsAndValues(GraphElement ge, Integer overrideReplicateId) {
 		TreeMap<DataMappingId, Stack<Double>> result = new TreeMap<DataMappingId, Stack<Double>>();
-		for (NumericMeasurementInterface sd : getMappedSampleData()) {
+		for (NumericMeasurementInterface sd : getMappedSampleData(ge)) {
 			DataMappingId sid = sd.getParentSample().getFullId();
 			
 			DataMappingId fullId;
@@ -1080,8 +1099,12 @@ public class NodeHelper implements Node, HelperClass {
 	}
 	
 	public TreeMap<DataMappingId, Stack<Double>> getIdsAndAverageValues() {
+		return getIdsAndAverageValues(n);
+	}
+	
+	public static TreeMap<DataMappingId, Stack<Double>> getIdsAndAverageValues(GraphElement ge) {
 		TreeMap<DataMappingId, Stack<Double>> result = new TreeMap<DataMappingId, Stack<Double>>();
-		for (SampleAverageInterface sd : getMappedAverageSampleData()) {
+		for (SampleAverageInterface sd : getMappedAverageSampleData(ge)) {
 			DataMappingId sid = sd.getParentSample().getFullId();
 			
 			DataMappingId fullId;
