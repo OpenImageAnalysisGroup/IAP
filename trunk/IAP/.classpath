@@ -17,12 +17,12 @@
 	<classpathentry kind="lib" path="lib/jai_codec.jar"/>
 	<classpathentry kind="lib" path="lib/jai_core.jar"/>
 	<classpathentry kind="lib" path="lib/commons-compress-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/mongo-2.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/platform.jar"/>
 	<classpathentry kind="lib" path="lib/jsr166y.jar"/>
 	<classpathentry kind="lib" path="lib/bcprov-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/poi-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.8-beta5-20111217.jar"/>
+	<classpathentry kind="lib" path="lib/mongo-2.7.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
