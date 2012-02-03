@@ -1,0 +1,513 @@
+%% LyX 2.0.0 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[oneside,english]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{textcomp}
+\usepackage{amsthm}
+\usepackage{amstext}
+\usepackage{graphicx}
+\usepackage{here}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\newcommand{\lyxmathsym}[1]{\ifmmode\begingroup\def\b@ld{bold}
+  \text{\ifx\math@version\b@ld\bfseries\fi#1}\endgroup\else#1\fi}
+
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+%% A simple dot to overcome graphicx limitations
+\newcommand{\lyxdot}{.}
+
+\newcommand{\ImageFormat}{.png}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\newenvironment{lyxlist}[1]
+{\begin{list}{}
+{\settowidth{\labelwidth}{#1}
+ \setlength{\leftmargin}{\labelwidth}
+ \addtolength{\leftmargin}{\labelsep}
+ \renewcommand{\makelabel}[1]{##1\hfil}}}
+{\end{list}}
+
+\def\ScaleIfNeeded{%
+	\ifdim\Gin@nat@height> 0.9\textheight
+		0.9\textheight
+	\else
+		\Gin@nat@height
+	\fi
+}
+
+\def\ConstForImageWidth{8cm}
+
+\newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{#1} \end{center} \end{figure}}{\begin{figure}[!h] \centering \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{figure}}}
+\newcommand{\loadTex}[1]{\IfFileExists{#1}{\include{#1}}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{center} \end{figure}}}
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{Analysis of Experiment --experimentname--}
+
+
+\author{Research Group Image Analysis\\ \\ IPK-Gatersleben\\ \\ C. Klukas \& A. Entzian}
+
+
+\date{29.09.2011}
+
+
+\address{Leibniz Institute of Plant Genetics and Crop Plant Research, Group
+Image Analysis, Corrensstr. 3, 06466 Gatersleben, Germany}
+
+
+\email{klukas@ipk-gatersleben.de, entzian@ipk-gatersleben.de}
+
+
+\urladdr{http://ba-13.ipk-gatersleben.de}
+\begin{abstract}
+This document is automatically created based on the automated image analysis performed 
+inside the integrated analysis platform IAP. Currently the pipelines and data analysis tools are in beta status, 
+which means that we are working on makeing the analysis procedures, statistical operations, diagram output and report
+generation more stable and suitable to the needs of any user of the automated imaging infrastructure at the IPK.
+
+If you have any hints, comments or suggestions for improvements, please don't hesitate to contact any member
+of the group image analysis.
+\end{abstract}
+
+\keywords{image analysis, phenotyping, maize }
+
+\maketitle
+
+\clearpage
+\tableofcontents
+
+\clearpage
+
+\section{Experiment info}
+\subsection{Experiment properties}
+
+\begin{lyxlist}{00.00.0000}
+\item [{%
+\begin{tabular}{|c|c|c|}
+\hline 
+Experiment & --experimentname--\tabularnewline
+\hline 
+\hline 
+Start & --StartExp--\tabularnewline
+\hline 
+End & --EndExp--\tabularnewline
+\hline 
+Numeric values & --NumExp-- \tabularnewline
+\hline 
+Images & --ImagesExp-- \tabularnewline
+\hline 
+Storage & --StorageExp-- \tabularnewline
+\hline 
+\end{tabular}}]~
+\end{lyxlist}
+
+\subsection{Remarks}
+
+\begin{lyxlist}{00.00.0000}
+\item [{%
+\begin{tabular}{|c|c|}
+\hline 
+Notes\tabularnewline
+\hline 
+\hline 
+--RemarkExp--\tabularnewline
+\hline 
+\end{tabular}}]~
+\end{lyxlist}
+
+\subsection{Experiment factors}
+
+\begin{lyxlist}{00.00.0000}
+\item [{%
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline 
+ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
+\hline 
+\hline 
+--ID-- & --Genotype-- & --Variety-- & --Treatment-- & --Sequence-- & --xyz--\tabularnewline
+\hline 
+\end{tabular}}]~
+\end{lyxlist}
+
+%%\newpage
+\clearpage
+\section{\noindent Weight and water consumption}
+
+\subsection{Weights (before and after watering)}
+\begin{itemize}
+\item Weight before and after watering.
+\item Colnum name: Weight A (g), Weight B (g)
+\item Unit: g
+\end{itemize}
+\loadImage{Weight_A__g_nboxplot.pdf}
+\loadImage{Weight_B__g_nboxplot.pdf}
+
+
+
+\subsection{Watering amounts / consumption}
+\begin{itemize}
+\item Consumption of water based of weight measurments.
+\item Colnum name: Watering (weight-diff)
+\item Unit: g
+\end{itemize}
+\loadImage{Water__weight_diff_nboxplot.pdf}
+
+
+\clearpage
+\section{\noindent Biomass}
+\begin{itemize}
+\item Digital Biomass based on the side.area and top.area
+\item Unit: pixel\textthreesuperior{}
+\end{itemize}
+
+\subsection{IAP based formula - GRB}
+\begin{itemize}
+\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
+\item Column name: volume.iap
+\end{itemize}
+\loadImage{volume_iap__px3_boxplot.pdf}
+\loadImage{volume_iap__px3_nboxplot.pdf}
+
+
+
+\subsection{IAP based formula - GRB max}
+\begin{itemize}
+\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{max\_image}^{2}*top.area_{max\_image}}$
+\item Column name: volume.iap\_max
+\end{itemize}
+\loadImage{volume_iap_maxboxplot.pdf}
+\loadImage{volume_iap_maxnboxplot.pdf}
+
+
+\subsection{IAP based formula - FLUO}
+\begin{itemize}
+\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
+\item Column name: volume.fluo.iap
+\end{itemize}
+\loadImage{volume_fluo_iapboxplot.pdf}
+\loadImage{volume_fluo_iapnboxplot.pdf}
+
+
+\subsection{LemnaTec formula}
+\begin{itemize}
+\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
+\item Column name: volume.lt
+\end{itemize}
+\loadImage{volume_lt__px3_boxplot.pdf}
+\loadImage{volume_lt__px3_nboxplot.pdf}
+
+
+\subsection{KeyGene formula}
+\begin{itemize}
+\item Equation: $Biomass_{KeyGene}=side.area_{0^{\circ}}+side.area_{90^{\circ}}+\log(\frac{top.area}{3})$
+\item Column name: digital.biomass.keygene.norm
+\end{itemize}
+
+%\loadImage{digital_biomass_keygene_normnboxplot.pdf}
+
+
+\clearpage
+\section{\noindent Water use efficiency}
+\begin{itemize}
+\item Ratio of plant growth and water use.
+\end{itemize}
+
+\subsection{Volume based}
+\begin{itemize}
+\item The volume based on the IAP formula used for the value "plant growth".
+\item Colnum name: volume.iap.wue
+\item Unit: .
+\end{itemize}
+
+\loadImage{volume_iap_wuenboxplot.pdf}
+
+
+
+\clearpage
+\section{General growth related plant properties}
+
+\subsection{Plant height}
+\begin{itemize}
+\item Plant height (mm)
+\item Column name: side.height
+\item Unit: mm
+\end{itemize}
+\loadImage{side_height__mm_boxplot.pdf}
+\loadImage{side_height__mm_nboxplot.pdf}
+
+
+\subsection{Normalized plant height}
+\begin{itemize}
+\item Plant height (mm) (normalized to distance of left and right marker)
+\item Column name: side.height.norm
+\item Unit: mm
+\end{itemize}
+\loadImage{side_height_norm__mm_boxplot.pdf}
+\loadImage{side_height_norm__mm_nboxplot.pdf}
+
+
+\subsection{Plant width}
+\begin{itemize}
+\item Plant width (mm) 
+\item Column name: side.width
+\item Unit: mm
+\end{itemize}
+\loadImage{side_width__mm_boxplot.pdf}
+\loadImage{side_width__mm_nboxplot.pdf}
+
+
+\subsection{Normalized plant width}
+\begin{itemize}
+\item Plant width (mm) (normalized to distance of left and right marker) 
+\item Column name: side.width.norm
+\item Unit: mm
+\end{itemize}
+\loadImage{side_width_norm__mm_boxplot.pdf}
+\loadImage{side_width_norm__mm_nboxplot.pdf}
+
+
+\subsection{Projected side area}
+\begin{itemize}
+\item Number of foreground pixels from side camera
+\item Colum name: side.area
+\item Unit: pixel\texttwosuperior{}
+\end{itemize}
+\loadImage{side_area__px_boxplot.pdf}
+\loadImage{side_area__px_nboxplot.pdf}
+
+
+\subsection{Normalized projected side area}
+\begin{itemize}
+\item Number of foreground pixels from side camera (normalized to distance of left and right marker)
+\item Colum name: side.area.norm
+\item Unit: pixel\texttwosuperior{}
+\end{itemize}
+\loadImage{side_area_norm__mm2_boxplot.pdf}
+\loadImage{side_area_norm__mm2_nboxplot.pdf}
+
+
+\subsection{Projected top area}
+\begin{itemize}
+\item Number of foreground pixels from top camera
+\item Colum name: top.area
+\item Unit: pixel\texttwosuperior{}
+\end{itemize}
+\loadImage{top_area__px_boxplot.pdf}
+\loadImage{top_area__px_nboxplot.pdf}
+
+
+\subsection{Normalized projected top area}
+\begin{itemize}
+\item Number of foreground pixels from top camera (normalized to distance of left and right marker)
+\item Colum name: top.area.norm
+\item Unit: pixel\texttwosuperior{}
+\end{itemize}
+
+\loadImage{top_area_norm__mm2_nboxplot.pdf}
+
+
+\clearpage
+\section{\noindent Relative values}
+\begin{itemize}
+\item Presented values in relative dependence.
+\item Unit: \%
+\end{itemize}
+
+\subsection{Relative projected side area}
+\begin{itemize}
+\item Relative number of foreground pixels from side camera
+\item Colnum name: side.area.relative
+\end{itemize}
+
+\loadImage{side_area_relativenboxplot.pdf}
+
+
+
+\subsection{Relative plant height}
+\begin{itemize}
+\item Relative plant height (mm) (normalized to distance of left and right marker)
+\item Colnum name: side.height.norm.relative
+\end{itemize}
+
+\loadImage{side_height_norm_relativenboxplot.pdf}
+
+
+\subsection{Relative plant width}
+\begin{itemize}
+\item Relative plant width (mm) (normalized to distance of left and right marker) 
+\item Colnum name: side.width.norm.relative
+\end{itemize}
+
+\loadImage{side_width_norm_relativenboxplot.pdf}
+
+
+\subsection{Relative projected top area}
+\begin{itemize}
+\item Relative number of foreground pixels from top camera
+\item Colnum name: top.area.relative
+\end{itemize}
+
+\loadImage{top_area_relativenboxplot.pdf}
+
+
+\subsection{Relative projected side area}
+\begin{itemize}
+\item Relative number of foreground pixels from side camera
+\item Colnum name: side.area.relative
+\end{itemize}
+
+\loadImage{side_area_relativenboxplot.pdf}
+
+
+\subsection{Relative volume (IAP based formular - RGB)}
+\begin{itemize}
+\item Digital Biomass based on the side.area and top.area
+\item Colnum name: volume.iap.relative
+\end{itemize}
+
+\loadImage{volume_iap_relativenboxplot.pdf}
+
+
+\clearpage
+\section{Fluorescence intensity analysis}
+
+\subsection{Chlorophyl intensity}
+\begin{itemize}
+\item Average activity of chlorophyl, based on red reflection.
+\item The darker the higher acitivity
+\item Column name: side.fluo.intensity.chlorophyl.average
+\item Unit: relative intensity/pixel
+\end{itemize}
+
+%%\loadImage{side_fluo_intensity_chlorophyl_average__relative_.pdf}
+\loadTex{side_fluo_normalized_histogram_bin_1_0_25_side_fluo_normalized_histogrstackedOverallImage}
+
+
+\subsection{Phenols and other fluorescence intensity}
+\begin{itemize}
+\item Average activity without chlorohyll (e. g. phenol), based of yellow
+reflection.
+\item The darker the higher acitivity
+\item Column name: side.fluo.intensity.phenol.average
+\item Unit: relative intensity/pixel
+\end{itemize}
+
+%\loadImage{side_fluo_intensity_phenol_average.pdf}
+
+
+\subsection{Near-infrared intensity}
+\begin{itemize}
+\item Average intensity of near infrared (NIR)
+\item Represents the water content of the plant
+\item Column name: side.nir.intensity.average
+\item Unit: relative intensity/pixel
+\end{itemize}
+
+%%\loadImage{side_nir_intensity_average__relative_.pdf}
+\loadTex{side_nir_normalized_histogram_bin_1_0_25_side_nir_normalized_histogramstackedOverallImage}
+
+
+
+\clearpage
+\section{Plant structures}
+
+\subsection{Number of leafs}
+\begin{itemize}
+\item Number of leafs-tips
+\item Colum name: side.leaf.count.median
+\item Unit: leafs
+\item Hint: leaf-tips are shown as red retangles in the image
+\end{itemize}
+
+\loadImage{side_leaf_count_median__leafs_nboxplot.pdf}
+
+
+\subsection{Tassel (for maize plants)}
+\begin{itemize}
+\item Male flower count
+\item Colum name: side.bloom.count
+\item Unit: tassel
+\item Hint: the number of blue retangles in the image
+\end{itemize}
+
+\loadImage{side_bloom_count__tassel_nboxplot.pdf}
+
+
+\subsection{Leaf lengths}
+\begin{itemize}
+\item Length of all leafs plus stem
+\item Column name: side.leaf.length.sum.norm.max
+\item Unit: mm
+\item Hint: the yellow line in the image
+\end{itemize}
+
+\loadImage{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}
+
+
+\clearpage
+\section{\noindent Wetness}
+\begin{itemize}
+\item Vales based on the NIR images
+\item Unit: .
+\end{itemize}
+
+\subsection{Average wetness of side image}
+\begin{itemize}
+\item Average wetness of the plants from NIR side camera
+\item Column name: side.nir.wetness.av
+\item Unit: .
+\end{itemize}
+
+\loadImage{side_nir_wetness_av.pdf}
+
+
+\subsection{Average wetness of top image}
+\begin{itemize}
+\item Average wetness of the plants from NIR top camera
+\item Column name: top.nir.wetness.av
+\item Unit: .
+\end{itemize}
+
+\loadImage{top_nir_wetness_avnboxplot.pdf}
+
+
+\subsection{Weighted loss through drought stress - side image}
+\begin{itemize}
+\item Number of foreground pixels from NIR side camera minus the weighted value of the plant
+\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
+\item Column name: side.nir.wetness.plant\_weight\_drought\_loss
+\item Unit: .
+\end{itemize}
+
+\loadImage{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}
+
+
+
+\subsection{Weighted loss through drought stress - top image}
+\begin{itemize}
+\item Number of foreground pixels from NIR top camera minus the weighted value of the plant
+\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
+\item Column name: top.nir.wetness.plant\_weight\_drought\_loss
+\item Unit: .
+\end{itemize}
+
+\loadImage{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}
+
+
+\clearpage
+\section{Appendix}
+
+\loadTex{appendixImage}
+
+
+
+\end{document}
