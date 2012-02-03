@@ -7,14 +7,14 @@ import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhytochamberAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhytochamberAnalysisBlueRubberTask;
 
 /**
  * @author klukas
  */
-public class ActionPhytochamberAnalysis extends AbstractPhenotypeAnalysisAction {
-	public ActionPhytochamberAnalysis(MongoDB m, ExperimentReference experiment) {
-		super("Analyze Phenotype (Arabidopsis middle to large, without soil cover)");
+public class ActionPhytochamberBlueRubberAnalysis extends AbstractPhenotypeAnalysisAction {
+	public ActionPhytochamberBlueRubberAnalysis(MongoDB m, ExperimentReference experiment) {
+		super("Analyze Phenotype (Arabidopsis small to middle, with blue rubber mat)");
 		this.m = m;
 		this.experiment = experiment;
 		this.experimentResult = null;
@@ -22,13 +22,13 @@ public class ActionPhytochamberAnalysis extends AbstractPhenotypeAnalysisAction 
 			this.mongoDatasetID = experiment.getHeader().getDatabaseId();
 	}
 	
-	public ActionPhytochamberAnalysis() {
-		super("Analyze Phenotype (Arabidopsis middle to large, without soil cover)");
+	public ActionPhytochamberBlueRubberAnalysis() {
+		super("Analyze Phenotype (Arabidopsis small to middle, with blue rubber mat)");
 	}
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new PhytochamberAnalysisTask();
+		return new PhytochamberAnalysisBlueRubberTask();
 	}
 	
 	@Override
@@ -54,12 +54,12 @@ public class ActionPhytochamberAnalysis extends AbstractPhenotypeAnalysisAction 
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/arabidopsis.large.no.cover.png";
+		return "img/ext/arabidopsis.middle.blue.cover.png";
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return "<html><center>Arabidopsis Analysis<br>(no cover)";
+		return "<html><center>Arabidopsis Analysis<br>(blue cover)";
 	}
 	
 }
