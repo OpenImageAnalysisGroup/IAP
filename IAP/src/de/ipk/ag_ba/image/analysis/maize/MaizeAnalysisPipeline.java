@@ -34,7 +34,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearSides;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjects_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveLevitatingObjects_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockRemoveSmallStructuresUsingOpening_top_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.OK_NOV11_BlockCalcMainAxis_vis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 
 /**
  * Comprehensive corn image analysis pipeline, processing VIS, FLUO and NIR images. Depends on reference images for initial comparison
@@ -93,7 +93,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlCopyImagesApplyMask_vis_fluo.class); // without nir
 		
 		// calculation of numeric values
-		p.add(OK_NOV11_BlockCalcMainAxis_vis.class);
+		p.add(BlCalcMainAxis_vis.class);
 		p.add(BlCalcWidthAndHeight_vis.class);
 		p.add(BlCalcIntensity_vis_fluo_nir.class);
 		p.add(BlConvexHull_vis_fluo.class);
