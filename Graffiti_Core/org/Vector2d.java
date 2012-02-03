@@ -92,4 +92,10 @@ public class Vector2d {
 	public Vector2d scale(double scalingFactor) {
 		return new Vector2d(x * scalingFactor, y * scalingFactor);
 	}
+	
+	public Vector2d rotate(double n) {
+		double rx = (this.x * Math.cos(n)) - (this.y * Math.sin(n));
+		double ry = (this.x * Math.sin(n)) + (this.y * Math.cos(n));
+		return new Vector2d(rx, ry);
+	}
 }

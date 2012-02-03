@@ -36,6 +36,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.ipk.ag_ba.gui.actions.analysis.ActionPhytochamberAnalysis;
+import de.ipk.ag_ba.gui.actions.analysis.ActionPhytochamberBlueRubberAnalysis;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.BarleyAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.Maize3DanalysisAction;
@@ -55,6 +56,14 @@ public class ImageAnalysis {
 			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
 		
 		NavigationAction phenotypeAnalysisAction = new ActionPhytochamberAnalysis(m, experiment);
+		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
+		return resultTaskButton;
+	}
+	
+	public static NavigationButton getPhytochamberEntityBlueRubber(final MongoDB m,
+			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
+		
+		NavigationAction phenotypeAnalysisAction = new ActionPhytochamberBlueRubberAnalysis(m, experiment);
 		NavigationButton resultTaskButton = new NavigationButton(phenotypeAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}
