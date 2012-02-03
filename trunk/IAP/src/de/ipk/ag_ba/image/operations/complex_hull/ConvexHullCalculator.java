@@ -131,7 +131,7 @@ public class ConvexHullCalculator {
 		
 		if (drawInputimage) {
 			ImageOperation inDrawing = customImage != null ? customImage.getIO() : io;
-			FlexibleImage border = new FlexibleImage(borderImage).copy();
+			// FlexibleImage border = new FlexibleImage(borderImage).copy();
 			overDrawBorderImage(w, h, inDrawing.getImageAs2array(), borderImage,
 					borderColor, drawBorder);
 		}
@@ -159,34 +159,28 @@ public class ConvexHullCalculator {
 					(borderPixels * borderPixels / filledArea));
 			if (distHorizontal != null) {
 				rt.addValue("area.norm", filledArea * normFactorArea);
-				double fn = filledArea * normFactorArea;
-				// rt.addValue("area.norm3", Math.sqrt(fn * fn * fn));
 				rt.addValue("hull.area.norm", polygon.area() * normFactorArea);
 				rt.addValue("border.length.norm", borderPixels * normFactor);
 			}
 			rt.addValue("area", filledArea);
-			// rt.addValue("area3",
-			// Math.sqrt(filledArea * filledArea * filledArea));
 			rt.addValue("hull.area", polygon.area());
 			rt.addValue("border.length", borderPixels);
 			
-			// rt.addValue("hull.signedarea", polygon.signedArea() *
-			// normFactorArea);
 			rt.addValue("hull.circularity", circularity());
 			
 			Circle circumcircle = polygon.calculateminimalcircumcircle();
 			
 			if (circumcircle != null) {
 				if (distHorizontal != null) {
-					rt.addValue("hull.circumcircle.x.norm", circumcircle.x
-							* normFactor);
-					rt.addValue("hull.circumcircle.y.norm", circumcircle.y
-							* normFactor);
+					// rt.addValue("hull.circumcircle.x.norm", circumcircle.x
+					// * normFactor);
+					// rt.addValue("hull.circumcircle.y.norm", circumcircle.y
+					// * normFactor);
 					rt.addValue("hull.circumcircle.d.norm", circumcircle.d
 							* normFactor);
 				}
-				rt.addValue("hull.circumcircle.x", circumcircle.x);
-				rt.addValue("hull.circumcircle.y", circumcircle.y);
+				// rt.addValue("hull.circumcircle.x", circumcircle.x);
+				// rt.addValue("hull.circumcircle.y", circumcircle.y);
 				rt.addValue("hull.circumcircle.d", circumcircle.d);
 			}
 			
@@ -194,12 +188,19 @@ public class ConvexHullCalculator {
 			
 			centroid = polygon.centroid();
 			
+			Line sp = polygon.getMaxSpan();
+			double span = sp.getlength();
+			rt.addValue("hull.maxspan", span);
+			double span2 = polygon.getMaxSpan2len(sp);
+			rt.addValue("hull.maxspan2", span2);
 			if (distHorizontal != null) {
-				rt.addValue("hull.centroid.x.norm", centroid.x * normFactor);
-				rt.addValue("hull.centroid.y.norm", centroid.y * normFactor);
+				rt.addValue("hull.maxspan.norm", span * normFactor);
+				rt.addValue("hull.maxspan2.norm", span2 * normFactor);
+				// rt.addValue("hull.centroid.x.norm", centroid.x * normFactor);
+				// rt.addValue("hull.centroid.y.norm", centroid.y * normFactor);
 			}
-			rt.addValue("hull.centroid.x", centroid.x);
-			rt.addValue("hull.centroid.y", centroid.y);
+			// rt.addValue("hull.centroid.x", centroid.x);
+			// rt.addValue("hull.centroid.y", centroid.y);
 		}
 		res.setResultsTable(rt);
 		

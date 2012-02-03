@@ -32,7 +32,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlFindBlueMarkers_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlIntensityConversion_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.OK_NOV11_BlockCalcMainAxis_vis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProcessors;
 
 /**
@@ -76,7 +76,7 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockSkeletonize_Arabidopsis_vis_or_fluo.class);
 		
 		// calculation of numeric values
-		p.add(OK_NOV11_BlockCalcMainAxis_vis.class);
+		p.add(BlCalcMainAxis_vis.class);
 		p.add(BlCalcWidthAndHeight_vis.class);
 		p.add(BlCalcIntensity_vis_fluo_nir.class);
 		p.add(BlConvexHull_vis_fluo.class);

@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.complex_hull;
 
 import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 
 /*************************************************************************
  * Compilation: javac Polygon.java
@@ -12,7 +13,7 @@ import java.awt.Rectangle;
 /**
  * @see http://introcs.cs.princeton.edu/35purple/Polygon.java.html
  *      Public domain?!
- *      Removed all unneeded methods.
+ *      Removed all unneeded methods, added some new code.
  */
 class Polygon {
 	private final int N; // number of points in the polygon
@@ -173,7 +174,7 @@ class Polygon {
 		return temp.distEuclid(point);
 	}
 	
-	private Line getMaxSpan() {
+	public Line getMaxSpan() {
 		double maxDist = 0;
 		Line result = null;
 		
@@ -219,6 +220,18 @@ class Polygon {
 				yMax = (int) p.y;
 		}
 		Rectangle res = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
+		return res;
+	}
+	
+	public double getMaxSpan2len(Line span) {
+		double res = Double.NaN;
+		Line2D.Double l = new Line2D.Double(span.getP0().x, span.getP0().y, span.getP1().x, span.getP1().y);
+		for (int i = 0; i < points.length; i++) {
+			double dist = l.ptLineDist(points[i].x, points[i].y);
+			if (Double.isNaN(res) || dist > res)
+				res = dist;
+		}
+		
 		return res;
 	}
 }

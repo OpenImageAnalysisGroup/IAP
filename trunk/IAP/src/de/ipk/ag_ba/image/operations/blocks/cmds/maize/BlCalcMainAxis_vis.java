@@ -23,7 +23,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author pape, klukas
  */
-public class OK_NOV11_BlockCalcMainAxis_vis extends
+public class BlCalcMainAxis_vis extends
 		AbstractSnapshotAnalysisBlockFIS {
 
 	@Override
