@@ -237,6 +237,12 @@ public class FlexibleImage {
 		return io.getImage();
 	}
 	
+	// public FlexibleImage cropKeepingAspectRatio() {
+	// ImageOperation io = new ImageOperation(image);
+	// io = io.cropKeepingAspectRatio();
+	// return io.getImage();
+	// }
+	
 	/**
 	 * @param pLeft
 	 *           0..1 percentage cut left

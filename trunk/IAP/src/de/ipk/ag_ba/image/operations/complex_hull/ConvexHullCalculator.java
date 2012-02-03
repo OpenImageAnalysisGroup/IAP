@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import de.ipk.ag_ba.image.operations.ImageCanvas;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -189,16 +190,35 @@ public class ConvexHullCalculator {
 			centroid = polygon.centroid();
 			
 			Line sp = polygon.getMaxSpan();
-			double span = sp.getlength();
-			rt.addValue("hull.maxspan", span);
-			double span2 = polygon.getMaxSpan2len(sp);
-			rt.addValue("hull.maxspan2", span2);
-			if (distHorizontal != null) {
-				rt.addValue("hull.maxspan.norm", span * normFactor);
-				rt.addValue("hull.maxspan2.norm", span2 * normFactor);
-				// rt.addValue("hull.centroid.x.norm", centroid.x * normFactor);
-				// rt.addValue("hull.centroid.y.norm", centroid.y * normFactor);
+			if (sp != null) {
+				double span = sp.getlength();
+				rt.addValue("hull.pc1", span);
+				Span2result span2 = polygon.getMaxSpan2len(sp);
+				rt.addValue("hull.pc2", span2.getLengthPC2());
+				if (distHorizontal != null) {
+					rt.addValue("hull.pc1.norm", span * normFactor);
+					rt.addValue("hull.pc2.norm", span2.getLengthPC2() * normFactor);
+					// rt.addValue("hull.centroid.x.norm", centroid.x * normFactor);
+					// rt.addValue("hull.centroid.y.norm", centroid.y * normFactor);
+				}
+				
+				if (drawInputimage) {
+					FlexibleImage inDrawing = res.getImage();
+					ImageCanvas a = inDrawing.getIO().getCanvas().drawLine(sp, Color.BLUE.getRGB(), 0.5, 1);
+					if (span2.getP1() != null && span2.getP1l() != null) {
+						a = a.drawLine(span2.getP1(), span2.getP1l(), Color.ORANGE.getRGB(), 0.5, 1);
+						// a = a.drawCircle((int) span2.getP1().x, (int) span2.getP1().y, 25, Color.RED.getRGB(), 0, 2);
+					}
+					
+					if (span2.getP2() != null && span2.getP2l() != null) {
+						a = a.drawLine(span2.getP2(), span2.getP2l(), Color.ORANGE.getRGB(), 0.5, 1);
+						// a = a.drawCircle((int) span2.getP2().x, (int) span2.getP2().y, 25, Color.ORANGE.getRGB(), 0, 2);
+					}
+					res = new ImageOperation(a.getImage(),
+							res.getResultsTable());
+				}
 			}
+			
 			// rt.addValue("hull.centroid.x", centroid.x);
 			// rt.addValue("hull.centroid.y", centroid.y);
 		}

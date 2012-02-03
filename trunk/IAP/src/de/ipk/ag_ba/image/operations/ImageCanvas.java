@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
+import de.ipk.ag_ba.image.operations.complex_hull.Line;
+import de.ipk.ag_ba.image.operations.complex_hull.Point;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class ImageCanvas {
@@ -15,6 +17,11 @@ public class ImageCanvas {
 		this.image = image;
 	}
 	
+	/**
+	 * @param alpha
+	 *           0..1 (0 == solid)
+	 *           - opacity of the filled rectangle, Wikipedia: Alpha_Blending C = αAA + (1 − αA)B
+	 */
 	public ImageCanvas drawLine(int x0, int y0, int x1, int y1, int color, double alpha, int size) {
 		int dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
 		int dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
@@ -39,8 +46,8 @@ public class ImageCanvas {
 	
 	/**
 	 * @param alpha
+	 *           0..1 (0 == solid)
 	 *           - opacity of the filled rectangle, Wikipedia: Alpha_Blending C = αAA + (1 − αA)B
-	 * @return
 	 */
 	public ImageCanvas fillRect(int x, int y, int w, int h, int color, double alpha) {
 		int wi = image.getWidth();
@@ -209,4 +216,18 @@ public class ImageCanvas {
 	public void updateFromGraphics() {
 		image = new FlexibleImage(buf);
 	}
+	
+	/**
+	 * @param alpha
+	 *           0..1 (0 == solid)
+	 *           - opacity of the filled rectangle, Wikipedia: Alpha_Blending C = αAA + (1 − αA)B
+	 */
+	public ImageCanvas drawLine(Line sp, int color, double alpha, int size) {
+		return drawLine((int) sp.getP0().x, (int) sp.getP0().y, (int) sp.getP1().x, (int) sp.getP1().y, color, alpha, size);
+	}
+	
+	public ImageCanvas drawLine(Point p1, Point p2, int color, double alpha, int size) {
+		return drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y, color, alpha, size);
+	}
+	
 }
