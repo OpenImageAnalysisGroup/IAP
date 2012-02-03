@@ -3,11 +3,12 @@ package de.ipk.ag_ba.image.operations.complex_hull;
 import java.awt.geom.Point2D;
 
 import org.graffiti.plugins.views.defaults.Point2Dfix;
+
 /**
  * @see http://www.iti.fh-flensburg.de/lang/algorithmen/geo/polygon.htm
  *      Public domain information ?!
  */
-class Point {
+public class Point {
 	public double x, y;
 	
 	public Point(double x, double y) {
@@ -92,13 +93,14 @@ class Point {
 	}
 	
 	public double distEuclid(Point p) {
-		return Math.sqrt((x-p.x)*(x-p.x)+(y-p.y)*(y-p.y));
-	}
-
-	public Point2D toPoint2D() {
-		return new Point2Dfix(x,y);
+		return Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
 	}
 	
+	public Point2D toPoint2D() {
+		return new Point2Dfix(x, y);
+	}
+	
+	@Override
 	public String toString() {
 		return "x: " + x + ", y: " + y;
 	}

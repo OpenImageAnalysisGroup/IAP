@@ -223,15 +223,45 @@ class Polygon {
 		return res;
 	}
 	
-	public double getMaxSpan2len(Line span) {
+	public Span2result getMaxSpan2len(Line span) {
 		double res = Double.NaN;
 		Line2D.Double l = new Line2D.Double(span.getP0().x, span.getP0().y, span.getP1().x, span.getP1().y);
+		Point p1 = null, p1l = null;
+		double distP1 = Double.NaN;
+		Point p2 = null, p2l = null;
+		double distP2 = Double.NaN;
 		for (int i = 0; i < points.length; i++) {
 			double dist = l.ptLineDist(points[i].x, points[i].y);
 			if (Double.isNaN(res) || dist > res)
 				res = dist;
+			
+			int ccw = l.relativeCCW(points[i].x, points[i].y);
+			if (ccw < 0) {
+				if ((Double.isNaN(distP1) || dist > distP1) && dist >= 1) {
+					p1 = points[i];
+					distP1 = dist;
+					org.Vector2d vec = new org.Vector2d(l.x2 - l.x1, l.y2 - l.y1);
+					vec = vec.scale(1 / vec.distance(0, 0) * distP1);
+					vec = vec.rotate(-Math.PI / 2d);
+					vec.x += p1.x;
+					vec.y += p1.y;
+					p1l = new Point(vec.x, vec.y);
+				}
+			}
+			if (ccw > 0) {
+				if ((Double.isNaN(distP2) || dist > distP2) && dist >= 1) {
+					p2 = points[i];
+					distP2 = dist;
+					org.Vector2d vec = new org.Vector2d(l.x2 - l.x1, l.y2 - l.y1);
+					vec = vec.scale(1 / vec.distance(0, 0) * distP2);
+					vec = vec.rotate(Math.PI / 2d);
+					vec.x += p2.x;
+					vec.y += p2.y;
+					p2l = new Point(vec.x, vec.y);
+				}
+			}
 		}
 		
-		return res;
+		return new Span2result(res, p1, p2, p1l, p2l, distP1, distP2);
 	}
 }
