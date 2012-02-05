@@ -1147,7 +1147,16 @@ public class MongoDB {
 		return getExperimentList(user, null);
 	}
 	
-	public ArrayList<ExperimentHeaderInterface> getExperimentList(final String user, final BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+	public ArrayList<ExperimentHeaderInterface> getExperimentList(
+			final String user,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		return getExperimentList(user, optStatus, null);
+	}
+	
+	public ArrayList<ExperimentHeaderInterface> getExperimentList(
+			final String user,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			final ThreadSafeOptions opt_last_ping) {
 		final ArrayList<ExperimentHeaderInterface> res = new ArrayList<ExperimentHeaderInterface>();
 		try {
 			processDB(new RunnableOnDB() {
@@ -1163,6 +1172,7 @@ public class MongoDB {
 					HashMap<String, String> mapableNames = new HashMap<String, String>();
 					mapableNames.put("klukas", "Christian Klukas");
 					for (DBObject header : col.find()) {
+						opt_last_ping.setLong(System.currentTimeMillis());
 						ExperimentHeader h = new ExperimentHeader(header.toMap());
 						h.setStorageTime(new Date(((ObjectId) header.get("_id")).getTime()));
 						if (h.getImportusername() == null || h.getImportusername().isEmpty()) {
@@ -1876,7 +1886,6 @@ public class MongoDB {
 								DBObject dbo2 = new BasicDBObject();
 								dbo2.put("_id", batch.get("_id"));
 								dbo2 = collection.findOne(dbo2);
-								System.err.println();
 								System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: NEW OWNER: " + dbo2.get("owner"));
 							} catch (Exception e) {
 								// empty
