@@ -14,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.TreeMap;
 
 import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
@@ -495,10 +496,12 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		status.setCurrentStatusText1("Establishing Connection");
+		final ThreadSafeOptions tso_LastDbResult = new ThreadSafeOptions();
+		tso_LastDbResult.setLong(System.currentTimeMillis());
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
-				experimentList = m.getExperimentList(currentUser, status);
+				experimentList = m.getExperimentList(currentUser, status, tso_LastDbResult);
 			}
 		};
 		error = false;
@@ -506,11 +509,10 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		
 		Thread t = new Thread(r, "Read MonogDB Experiment List");
 		t.start();
-		long start = System.currentTimeMillis();
 		do {
-			Thread.sleep(10);
+			Thread.sleep(100);
 			long current = System.currentTimeMillis();
-			if (current - start > 15000) {
+			if (current - tso_LastDbResult.getLong() > 15000) {
 				t.interrupt();
 				error = true;
 				errorMsg = "time out";
