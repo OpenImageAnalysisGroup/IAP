@@ -58,6 +58,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis.ArabidopsisAnalysisSmallBlueRubberTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis.ArabidopsisAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
@@ -356,9 +357,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 					
-					JMenuItem debugPipelineTest0 = new JMenuItem(
-							"Arabidopsis Analysis Pipeline (Image+Reference)");
-					debugPipelineTest0.addActionListener(new ActionListener() {
+					JMenuItem debugPipelineTest0a = new JMenuItem(
+							"Arabidopsis Analysis Large No Rubber (Image+Reference)");
+					debugPipelineTest0a.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
@@ -384,9 +385,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 					
-					JMenuItem debugPipelineTest00 = new JMenuItem(
-							"Arabidopsis Analysis Pipeline (Reference+Old Reference)");
-					debugPipelineTest00.addActionListener(new ActionListener() {
+					JMenuItem debugPipelineTest00a = new JMenuItem(
+							"Arabidopsis Analysis Large No Rubber (Reference+Old Reference)");
+					debugPipelineTest00a.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
@@ -401,6 +402,63 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										targetTreeNode.getExperiment(),
 										match, m,
 										new ArabidopsisAnalysisTask());
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: "
+										+ err.getLocalizedMessage()
+										+ ". Command execution error.",
+										"Error",
+										JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTest0b = new JMenuItem(
+							"Arabidopsis Analysis Small Blue Rubber (Image+Reference)");
+					debugPipelineTest0b.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								Collection<NumericMeasurementInterface> match = IAPservice
+										.getMatchFor(imageResult
+												.getBinaryFileInfo()
+												.getFileNameMain(),
+												targetTreeNode.getExperiment());
+								
+								BlockPipeline.debugTryAnalysis(
+										targetTreeNode.getExperiment(),
+										match, m,
+										new ArabidopsisAnalysisSmallBlueRubberTask());
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: "
+										+ err.getLocalizedMessage()
+										+ ". Command execution error.",
+										"Error",
+										JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+					
+					JMenuItem debugPipelineTest00b = new JMenuItem(
+							"Arabidopsis Analysis Small Blue Rubber (Reference+Old Reference)");
+					debugPipelineTest00b.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								Collection<NumericMeasurementInterface> match = IAPservice
+										.getMatchForReference(imageResult
+												.getBinaryFileInfo()
+												.getFileNameMain(),
+												targetTreeNode.getExperiment(),
+												m);
+								
+								BlockPipeline.debugTryAnalysis(
+										targetTreeNode.getExperiment(),
+										match, m,
+										new ArabidopsisAnalysisSmallBlueRubberTask());
 							} catch (Exception err) {
 								JOptionPane.showMessageDialog(null, "Error: "
 										+ err.getLocalizedMessage()
@@ -646,8 +704,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					sn.add(debugShowSnapshot);
 					jp.add(sn);
 					
-					jp.add(debugPipelineTest0);
-					jp.add(debugPipelineTest00);
+					jp.add(debugPipelineTest0a);
+					jp.add(debugPipelineTest00a);
+					jp.add(debugPipelineTest0b);
+					jp.add(debugPipelineTest00b);
 					jp.add(debugPipelineTest1);
 					jp.add(debugPipelineTest2);
 					jp.add(debugPipelineTest3);

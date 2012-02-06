@@ -328,7 +328,7 @@ public class CloudComputingService {
 				
 				Object[] res;
 				if (GraphicsEnvironment.isHeadless()) {
-					System.out.println(">Process incomplete data sets? TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
+					System.out.println(">Process incomplete data sets? TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
 							+ knownResults.size());
 					System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
 					String in = System.console().readLine();
@@ -346,7 +346,7 @@ public class CloudComputingService {
 									"<br>Analyzed experiment: "
 											+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName()
 									: "")
-							+ "<br>TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
+							+ "<br>TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
 							+ knownResults.size(), "Add compute tasks?", new Object[] {
 							"Add compute tasks for missing data?", addNewTasksIfMissing
 					});

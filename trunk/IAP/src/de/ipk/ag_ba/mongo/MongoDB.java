@@ -1172,7 +1172,8 @@ public class MongoDB {
 					HashMap<String, String> mapableNames = new HashMap<String, String>();
 					mapableNames.put("klukas", "Christian Klukas");
 					for (DBObject header : col.find()) {
-						opt_last_ping.setLong(System.currentTimeMillis());
+						if (opt_last_ping != null)
+							opt_last_ping.setLong(System.currentTimeMillis());
 						ExperimentHeader h = new ExperimentHeader(header.toMap());
 						h.setStorageTime(new Date(((ObjectId) header.get("_id")).getTime()));
 						if (h.getImportusername() == null || h.getImportusername().isEmpty()) {
