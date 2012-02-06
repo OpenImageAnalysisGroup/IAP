@@ -154,8 +154,8 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 30);
 			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 30);
 		} else {
-			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 5);
-			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 5);
+			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 10);
+			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 10);
 		}
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
 		options.addBooleanSetting(Setting.DRAW_SKELETON, true);
