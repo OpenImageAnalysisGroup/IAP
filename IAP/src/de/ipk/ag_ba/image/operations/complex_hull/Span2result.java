@@ -33,8 +33,7 @@ public class Span2result {
 	}
 	
 	public double getLengthPC2() {
-		double res = Double.NaN;
-		
+		double res = p1len + p2len;
 		return res;
 	}
 	
