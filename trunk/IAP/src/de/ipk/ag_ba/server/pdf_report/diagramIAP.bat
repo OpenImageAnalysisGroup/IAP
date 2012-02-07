@@ -16,8 +16,10 @@ SET Sec="none"
 )
 
 if "%~3" neq "" (
+echo CREATE APPENDIX
 SET Appendix=%3
 ) ELSE (
+echo NO APPENDIX
 SET Appendix=FALSE
 )
 

@@ -246,10 +246,12 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			
 			if (!exportIndividualAngles && !xlsx) {
 				p.executeRstat(variant, experiment);
-				
+				p.getOutput();
 				boolean ok = p.hasPDFcontent();
-				
-				AttributeHelper.showInBrowser(p.getPDFurl());
+				if (ok)
+					AttributeHelper.showInBrowser(p.getPDFurl());
+				else
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No output file available");
 				
 				// p.deleteDirectory();
 			} else {

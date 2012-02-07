@@ -8,6 +8,7 @@
 package org;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -630,13 +631,14 @@ public class StringManipulationTools implements HelperClass {
 		return getStringList(al, div);
 	}
 	
-	public static String getStringList(ArrayList<?> elements, String div) {
+	public static String getStringList(Collection<?> elements, String div) {
 		if (elements == null || elements.size() <= 0)
 			return "";
 		else {
 			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < elements.size(); i++) {
-				sb.append(elements.get(i));
+			int i = 0;
+			for (Object e : elements) {
+				sb.append(e + "");
 				if (i < elements.size() - 1)
 					sb.append(div);
 			}

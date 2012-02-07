@@ -55,7 +55,7 @@ public class DayComponent extends JComponent {
 	private String day;
 	
 	public DayComponent(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, boolean main,
-						boolean mark, GregorianCalendar calendar, Calendar2 calEnt) {
+			boolean mark, GregorianCalendar calendar, Calendar2 calEnt) {
 		this.group2ei = group2ei;
 		this.main = main;
 		this.mark = mark;
@@ -89,8 +89,9 @@ public class DayComponent extends JComponent {
 		for (String s : group2ei.keySet())
 			for (String s2 : group2ei.get(s).keySet())
 				if (group2ei.get(s) != null)
-					for (ExperimentHeaderInterface ehi : group2ei.get(s).get(s2))
-						experiments.add(ehi);
+					if (group2ei.get(s).get(s2) != null)
+						for (ExperimentHeaderInterface ehi : group2ei.get(s).get(s2))
+							experiments.add(ehi);
 		for (ExperimentHeaderInterface ei : experiments) {
 			if (ei.getStartdate() == null)
 				continue;
@@ -189,7 +190,7 @@ public class DayComponent extends JComponent {
 			public void mouseClicked(MouseEvent e) {
 				calEnt.setShowSpecificDay(true);
 				calEnt.getCalendar().set(calendar.get(GregorianCalendar.YEAR), calendar.get(GregorianCalendar.MONTH),
-									calendar.get(GregorianCalendar.DAY_OF_MONTH));
+						calendar.get(GregorianCalendar.DAY_OF_MONTH));
 				calEnt.updateGUI();
 				calEnt.performAction();
 				// calendarGUI.cal.set(
@@ -279,7 +280,7 @@ public class DayComponent extends JComponent {
 		return "<td bgcolor=\"" + ColorUtil.getHexFromColor(backgroundColor) + "\"><center>" +
 				"<abbr title=\"" + tooltip + "\" style=\"color:"
 				+ ColorUtil.getHexFromColor(Color.BLACK) + "\">" + lbl + "" +
-						"</abbr></center></td>"; // foregroundColor
+				"</abbr></center></td>"; // foregroundColor
 	}
 	
 	public String getAsHTML() {
