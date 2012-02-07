@@ -240,4 +240,8 @@ public class PdfCreator {
 	public void openTargetDirectory() {
 		AttributeHelper.showInBrowser(tempDirectory + "");
 	}
+	
+	public String getOutput() {
+		return "<html>" + StringManipulationTools.getStringList(output.values(), "<br>");
+	}
 }

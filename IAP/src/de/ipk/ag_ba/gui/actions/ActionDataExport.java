@@ -447,7 +447,7 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 				else
 					return false;
 			}
-			System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Output to " + f.getAbsolutePath());
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Output to " + f.getAbsolutePath());
 			// if (!f.canWrite()) {
 			// System.out.println(SystemAnalysis.getCurrentTime() + "ERROR: Can't write to file (" + f.getAbsolutePath() + ")");
 			// return false;
