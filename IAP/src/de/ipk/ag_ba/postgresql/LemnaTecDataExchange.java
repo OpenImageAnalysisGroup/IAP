@@ -126,7 +126,7 @@ public class LemnaTecDataExchange {
 	
 	private Collection<ExperimentHeaderInterface> getExperimentsInDatabaseIC(String user, String database)
 			throws SQLException, ClassNotFoundException {
-		System.out.println("GET EXP LIST LT");
+		// System.out.println("GET EXP LIST LT");
 		String sqlText = "SELECT distinct(measurement_label) FROM snapshot ORDER BY measurement_label";
 		
 		Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
@@ -177,6 +177,8 @@ public class LemnaTecDataExchange {
 					"WHERE measurement_label=?";// ; AND tiled_image.snapshot_id=snapshot.id";
 			ps = connection.prepareStatement(sqlText);
 			for (ExperimentHeaderInterface ehi : result) {
+				if (ehi.getExperimentName() == null)
+					continue;
 				ps.setString(1, ehi.getExperimentName());
 				rs = ps.executeQuery();
 				while (rs.next()) {
@@ -1094,7 +1096,7 @@ public class LemnaTecDataExchange {
 					
 					String metaName = rs.getString(2);
 					String metaValue = rs.getString(3);
-					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					
 					if (!res.containsKey(plantID)) {
 						res.put(plantID, new Condition(null));

@@ -166,9 +166,13 @@ public class IAPservice {
 					@Override
 					public MainPanelComponent getResultMainPanel() {
 						JComponent gui = IAPmain.showVANTED(true);
-						gui.setBorder(BorderFactory.createLoweredBevelBorder());
-						if (g != null)
-							MainFrame.getInstance().showGraph(g, null, LoadSetting.VIEW_CHOOSER_NEVER);
+						if (gui != null)
+							gui.setBorder(BorderFactory.createLoweredBevelBorder());
+						if (g != null) {
+							MainFrame i = MainFrame.getInstance();
+							if (i != null)
+								i.showGraph(g, null, LoadSetting.VIEW_CHOOSER_NEVER);
+						}
 						return gui != null ? new MainPanelComponent(gui) : null;
 					}
 					

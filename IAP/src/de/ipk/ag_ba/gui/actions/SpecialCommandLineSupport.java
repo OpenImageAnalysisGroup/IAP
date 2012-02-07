@@ -8,4 +8,5 @@ public interface SpecialCommandLineSupport {
 	public boolean prepareCommandLineExecution() throws Exception;
 	
 	public void postProcessCommandLineExecution();
+	
 }

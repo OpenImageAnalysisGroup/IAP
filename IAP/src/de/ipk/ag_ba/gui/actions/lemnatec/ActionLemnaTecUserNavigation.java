@@ -44,7 +44,7 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		for (String user : userName2dbAndExperiment.keySet()) {
 			result.add(new NavigationButton(new ActionLemnaUser(user, userName2dbAndExperiment.get(user)), src
-								.getGUIsetting()));
+					.getGUIsetting()));
 		}
 		return result;
 	}
@@ -83,27 +83,46 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 						set = true;
 					}
 					String id = experiment.getDatabase() + ":" + experiment.getExperimentName();
-					for (Snapshot s : new LemnaTecDataExchange().getSnapshotsOfExperiment(experiment.getDatabase(),
-										experiment.getExperimentName())) {
-						String c = s.getCreator();
-						if (c.length() == 0)
+					boolean quickAnalysis = true;
+					
+					if (quickAnalysis) {
+						String r = experiment.getRemark();
+						if (r == null || r.length() == 0)
 							continue;
-						usersUnformatted.add(c);
-						if (c.length() > 3) {
-							c = c.substring(0, 1).toUpperCase() + c.substring(1);
+						if (r.startsWith("Snapshot creators: "))
+							r = r.substring("Snapshot creators: ".length());
+						for (String c : r.split(";")) {
+							usersUnformatted.add(c);
+							if (c.length() > 3) {
+								c = c.substring(0, 1).toUpperCase() + c.substring(1);
+							}
+							if (!userName2dbAndExperiment.containsKey(c)) {
+								userName2dbAndExperiment.put(c, new TreeSet<ExperimentHeaderInterface>());
+							}
+							userName2dbAndExperiment.get(c).add(experiment);
+							experimentNames.add(id);
 						}
-						if (!userName2dbAndExperiment.containsKey(c)) {
-							userName2dbAndExperiment.put(c, new TreeSet<ExperimentHeaderInterface>());
+					} else
+						for (Snapshot s : new LemnaTecDataExchange().getSnapshotsOfExperiment(experiment.getDatabase(),
+								experiment.getExperimentName())) {
+							String c = s.getCreator();
+							if (c.length() == 0)
+								continue;
+							usersUnformatted.add(c);
+							if (c.length() > 3) {
+								c = c.substring(0, 1).toUpperCase() + c.substring(1);
+							}
+							if (!userName2dbAndExperiment.containsKey(c)) {
+								userName2dbAndExperiment.put(c, new TreeSet<ExperimentHeaderInterface>());
+							}
+							userName2dbAndExperiment.get(c).add(experiment);
+							experimentNames.add(id);
+							snapshots++;
 						}
-						userName2dbAndExperiment.get(c).add(experiment);
-						experimentNames.add(id);
-						snapshots++;
-					}
 				}
 			} catch (Exception e) {
-				System.out.println("Database " + db + " problem: " + e.getMessage());
-				// e.printStackTrace();
-				// empty
+				if (e.getMessage() == null || !e.getMessage().equals("ERROR: relation \"snapshot\" does not exist"))
+					System.out.println("Database " + db + " problem: " + e.getMessage());
 				errorList.add(db);
 				error++;
 			}
@@ -112,21 +131,21 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 		users = userName2dbAndExperiment.size();
 		
 		message = "<html><h2>Database Content</h2>"
-							+ "<ul>"
-							+ "<li>Databases: "
-							+ dbs.size()
-							+ "<li>Users: "
-							+ users
-							+ "<li>Experiments: "
-							+ experimentNames.size()
-							+ "<li>Snapshots: "
-							+ snapshots
-							+ (error > 0 ? "<li>Empty databases: " + error + " ("
-												+ StringManipulationTools.getStringList(errorList, ", ") + ")" : "")
-							+ "</ul>"
-							+ "<br>Remark: Multiple users may contribute data to a single experiment. This depends on which user is logged-in into a LemnaTec PC, while imaging takes place.<br><br>"
-							+ "Complete list of snapshot-creators (" + usersUnformatted.size() + ", unformatted): "
-							+ StringManipulationTools.getStringList(getArray(usersUnformatted), ", ");
+				+ "<ul>"
+				+ "<li>Databases: "
+				+ dbs.size()
+				+ "<li>Users: "
+				+ users
+				+ "<li>Experiments: "
+				+ experimentNames.size()
+				+ "<li>Snapshots: "
+				+ snapshots
+				+ (error > 0 ? "<li>Empty databases: " + error + " ("
+						+ StringManipulationTools.getStringList(errorList, ", ") + ")" : "")
+				+ "</ul>"
+				+ "<br>Remark: Multiple users may contribute data to a single experiment. This depends on which user is logged-in into a LemnaTec PC, while imaging takes place.<br><br>"
+				+ "Complete list of snapshot-creators (" + usersUnformatted.size() + ", unformatted): "
+				+ StringManipulationTools.getStringList(getArray(usersUnformatted), ", ");
 		
 		status.setCurrentStatusText1("");
 	}
