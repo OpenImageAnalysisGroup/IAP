@@ -486,7 +486,7 @@ public class IAPservice {
 			float x = lo + i * (up - lo) / n;
 			res[i] = (float) Math.pow(x, sq);
 		}
-		s.printTime();
+		s.printTime(1000);
 		return res;
 	}
 	
