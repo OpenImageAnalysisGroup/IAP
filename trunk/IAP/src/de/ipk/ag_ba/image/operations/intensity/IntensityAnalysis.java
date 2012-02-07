@@ -101,10 +101,10 @@ public class IntensityAnalysis {
 						"hue.histogram.ratio.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255), histHue.getFreqAt(i));
 			}
 			result.addValue("hue.average", sumOfHue / plantImagePixelCnt);
-			if (maxHue != null)
-				result.addValue("hue.max", maxHue);
-			if (minHue != null)
-				result.addValue("hue.min", minHue);
+			// if (maxHue != null)
+			// result.addValue("hue.max", maxHue);
+			// if (minHue != null)
+			// result.addValue("hue.min", minHue);
 		} else {
 			if (multiLevel) {
 				result.addValue("intensity.phenol.plant_weight", weightOfPlant);
