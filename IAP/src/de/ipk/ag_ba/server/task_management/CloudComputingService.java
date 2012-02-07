@@ -96,7 +96,7 @@ public class CloudComputingService {
 		System.out.println("*                                                 *");
 		System.out.println("*      --  Systems Biology Cloud Computing --     *");
 		System.out.println("*                                                 *");
-		System.out.println("*     (c) 2010-2011 IPK, Group Image Analysis     *");
+		System.out.println("*     (c) 2010-2012 IPK, Group Image Analysis     *");
 		System.out.println("*                                                 *");
 		System.out.println("***************************************************");
 		System.out.println("*                                                 *");

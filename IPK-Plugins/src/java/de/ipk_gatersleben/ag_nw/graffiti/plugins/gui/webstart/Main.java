@@ -41,7 +41,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.MenuItemInf
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class Main {
 	// ~ Static fields/initializers =============================================
@@ -69,14 +69,13 @@ public class Main {
 		}
 	}
 	
-	/**
-	 * Constructs a new instance of the editor.
-	 */
 	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon) {
-		
+		this(showMainFrame, applicationName, args, addon, null);
+	}
+	
+	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon, SplashScreenInterface splashScreen) {
 		setupLogger();
 		final ClassLoader cl = this.getClass().getClassLoader();
-		SplashScreenInterface splashScreen = null;
 		if (showMainFrame) {
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			splashScreen = new DBEsplashScreen(applicationName,
@@ -133,41 +132,42 @@ public class Main {
 			
 			splashScreen.setVisible(showMainFrame);
 		} else
-			splashScreen = new SplashScreenInterface() {
-				
-				@Override
-				public int getMaximum() {
-					return 10;
-				}
-				
-				@Override
-				public void setVisible(boolean b) {
-				}
-				
-				@Override
-				public void setValue(int value) {
-				}
-				
-				@Override
-				public void setText(String text) {
-					System.out.println(text);
-				}
-				
-				@Override
-				public void setMaximum(int maximum) {
+			if (splashScreen == null)
+				splashScreen = new SplashScreenInterface() {
 					
-				}
-				
-				@Override
-				public void setInitialisationFinished() {
+					@Override
+					public int getMaximum() {
+						return 10;
+					}
 					
-				}
-				
-				@Override
-				public int getValue() {
-					return 0;
-				}
-			};
+					@Override
+					public void setVisible(boolean b) {
+					}
+					
+					@Override
+					public void setValue(int value) {
+					}
+					
+					@Override
+					public void setText(String text) {
+						System.out.println(text);
+					}
+					
+					@Override
+					public void setMaximum(int maximum) {
+						
+					}
+					
+					@Override
+					public void setInitialisationFinished() {
+						
+					}
+					
+					@Override
+					public int getValue() {
+						return 0;
+					}
+				};
 		if (!ReleaseInfo.isRunningAsApplet())
 			if (splashScreen != null)
 				GravistoMainHelper.createApplicationSettingsFolder(splashScreen);

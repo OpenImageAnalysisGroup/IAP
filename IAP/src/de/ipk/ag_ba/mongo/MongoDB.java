@@ -271,14 +271,14 @@ public class MongoDB {
 							m.get(key).slaveOk();
 							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
-							s.printTime();
+							s.printTime(1000);
 						}
 						if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains("admin")) {
 							DB dbAdmin = m.get(key).getDB("admin");
 							try {
 								StopWatch s = new StopWatch("INFO: dbAdmin.authenticate()");
 								dbAdmin.authenticate(optLogin, optPass.toCharArray());
-								s.printTime();
+								s.printTime(1000);
 								if (authenticatedDBs.get(m.get(key)) == null)
 									authenticatedDBs.put(m.get(key), new HashSet<String>());
 								authenticatedDBs.get(m.get(key)).add(database);
@@ -1573,7 +1573,7 @@ public class MongoDB {
 				CloudHost res = (CloudHost) dbc.findOne(query);
 				boolean add = false;
 				if (res == null) {
-					System.out.println("INSERT: " + query);
+					// System.out.println("INSERT: " + query);
 					res = new CloudHost();
 					add = true;
 				}
