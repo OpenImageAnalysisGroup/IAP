@@ -169,7 +169,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Unit: pixel\textthreesuperior{}
 \end{itemize}
 
-\subsection{IAP based formula - GRB}
+\subsection{IAP based formula - Visible Light}
 \begin{itemize}
 \item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
 \item Column name: volume.iap
@@ -179,7 +179,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 
 
-\subsection{IAP based formula - GRB max}
+\subsection{IAP based formula - Visible Light (max of side area)}
 \begin{itemize}
 \item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{max\_image}^{2}*top.area_{max\_image}}$
 \item Column name: volume.iap\_max
@@ -316,15 +316,15 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 
 \clearpage
-\section{\noindent Relative values}
+\section{\noindent Relative values (changes in percent, per day)}
 \begin{itemize}
 \item Presented values in relative dependence.
 \item Unit: \%
 \end{itemize}
 
-\subsection{Relative projected side area}
+\subsection{Relative projected side area growth}
 \begin{itemize}
-\item Relative number of foreground pixels from side camera
+\item Relative growth of number of foreground pixels from side camera
 \item Colnum name: side.area.relative
 \end{itemize}
 
@@ -332,45 +332,45 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 
 
-\subsection{Relative plant height}
+\subsection{Relative plant height growth}
 \begin{itemize}
-\item Relative plant height (mm) (normalized to distance of left and right marker)
+\item Relative growth of plant height in percent (normalized to distance of left and right marker)
 \item Colnum name: side.height.norm.relative
 \end{itemize}
 
 \loadImage{side_height_norm_relativenboxplot.pdf}
 
 
-\subsection{Relative plant width}
+\subsection{Relative plant width growth}
 \begin{itemize}
-\item Relative plant width (mm) (normalized to distance of left and right marker) 
+\item Relative plant width growth in percent (normalized to distance of left and right marker) 
 \item Colnum name: side.width.norm.relative
 \end{itemize}
 
 \loadImage{side_width_norm_relativenboxplot.pdf}
 
 
-\subsection{Relative projected top area}
+\subsection{Relative projected top area growth}
 \begin{itemize}
-\item Relative number of foreground pixels from top camera
+\item Relative growth of number of foreground pixels from top camera
 \item Colnum name: top.area.relative
 \end{itemize}
 
 \loadImage{top_area_relativenboxplot.pdf}
 
 
-\subsection{Relative projected side area}
+\subsection{Relative projected side area growth}
 \begin{itemize}
-\item Relative number of foreground pixels from side camera
+\item Relative growth of number of foreground pixels from side camera
 \item Colnum name: side.area.relative
 \end{itemize}
 
 \loadImage{side_area_relativenboxplot.pdf}
 
 
-\subsection{Relative volume (IAP based formular - RGB)}
+\subsection{Relative growth of volume (IAP based formular - visible light)}
 \begin{itemize}
-\item Digital Biomass based on the side.area and top.area
+\item Digital biomass growth in percent (per day) based on the side.area and top.area
 \item Colnum name: volume.iap.relative
 \end{itemize}
 
@@ -507,7 +507,5 @@ reflection.
 \section{Appendix}
 
 \loadTex{appendixImage}
-
-
 
 \end{document}
