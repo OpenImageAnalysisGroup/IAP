@@ -38,21 +38,21 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 		ArrayList<NavigationButton> phenoDBcommands = new ArrayList<NavigationButton>();
 		
 		NavigationAction saveExperimentAction = new SaveExperimentInCloud(false);
-		NavigationButton uploadDataEntity = new NavigationButton(saveExperimentAction, "Process Files",
+		NavigationButton uploadDataEntity = new NavigationButton(saveExperimentAction, "Process files",
 				"img/ext/user-desktop.png",
 				"img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
 		phenoDBcommands.add(uploadDataEntity);
 		
 		NavigationAction lemnaExperiments = new ActionLemnaTecNavigation();
 		NavigationButton lemnaEntity = new NavigationButton(lemnaExperiments, src != null ? src.getGUIsetting()
-							: guiSetting);
+				: guiSetting);
 		if (IAPservice.isReachable("lemna-db.ipk-gatersleben.de"))
 			phenoDBcommands.add(lemnaEntity);
 		
 		for (MongoDB m : MongoDB.getMongos()) {
 			NavigationAction mongoExperiments = new ActionMongoExperimentsNavigation(m, false, false);
 			NavigationButton mongo = new NavigationButton(mongoExperiments, m.getDisplayName(), "img/ext/network-mongo.png",
-								"img/ext/network-mongo-gray.png", src != null ? src.getGUIsetting() : guiSetting);
+					"img/ext/network-mongo-gray.png", src != null ? src.getGUIsetting() : guiSetting);
 			
 			phenoDBcommands.add(mongo);
 		}

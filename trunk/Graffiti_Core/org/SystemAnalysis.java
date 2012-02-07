@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 
 import org.junit.Test;
 
@@ -215,5 +216,16 @@ public class SystemAnalysis {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getCommandLineInput() {
+		String input = null;
+		if (System.console() == null) {
+			Scanner sc = new Scanner(System.in);
+			input = sc.next();
+		} else {
+			input = System.console().readLine();
+		}
+		return input;
 	}
 }

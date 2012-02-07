@@ -376,6 +376,8 @@ public class StringManipulationTools implements HelperClass {
 	public static String removeHTMLtags(String textWithHtmlTags) {
 		if (textWithHtmlTags == null)
 			return null;
+		textWithHtmlTags = stringReplace(textWithHtmlTags, "<p>", " ");
+		textWithHtmlTags = stringReplace(textWithHtmlTags, "<br>", " ");
 		String res = StringManipulationTools.removeTags(textWithHtmlTags, "<", ">");
 		res = stringReplace(res, "&nbsp;", " ");
 		res = stringReplace(res, "%20", " ");

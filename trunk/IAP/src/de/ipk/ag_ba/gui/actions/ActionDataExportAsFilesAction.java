@@ -42,7 +42,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author klukas
  */
-public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
+public class ActionDataExportAsFilesAction extends AbstractNavigationAction implements SpecialCommandLineSupport {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
@@ -79,7 +79,7 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Export Files";
+		return "Export files";
 	}
 	
 	@Override
@@ -134,10 +134,13 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 		} while (!finished);
 	}
 	
+	ThreadSafeOptions written;
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		this.errorMessage = null;
+		this.written = new ThreadSafeOptions();
 		try {
 			status.setCurrentStatusText1("Load Experiment");
 			ExperimentInterface experiment = experimentReference.getData(m);
@@ -150,7 +153,8 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 				if (targetDirectory == null)
 					return;
 			} else {
-				throw new UnsupportedOperationException("This command can't be executed in this environment.");
+				if (targetDirectory == null)
+					throw new UnsupportedOperationException("This command can't be executed in this environment.");
 			}
 			status.setCurrentStatusText1("Data Export@MSG:Download initiated..." + fsinfo);
 			Thread.sleep(1000);
@@ -164,8 +168,6 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 			// plantID SNAPSHOTNAME DATUM ZEIT.png
 			
 			GregorianCalendar gc = new GregorianCalendar();
-			
-			final ThreadSafeOptions written = new ThreadSafeOptions();
 			
 			this.files = 0;
 			for (SubstanceInterface su : experiment)
@@ -275,6 +277,8 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 			tso.setParam(2, true);
 			
 			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
+			System.out.println();
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 		}
 		
 		// ArrayList<String> cols = new ArrayList<String>();
@@ -356,4 +360,62 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction {
 	public MongoDB getMongoInstance() {
 		return m;
 	}
+	
+	long startTime;
+	File ff;
+	
+	@Override
+	public boolean prepareCommandLineExecution() throws Exception {
+		targetDirectory = null;
+		System.out.println();
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Current directory is " + (new File("").getAbsolutePath()));
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Command requires specification of an empty output directory name.");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: If a part of the specified path is not existing, it will be created.");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">READY: PLEASE ENTER DIRECTORY STRUCTURE (ENTER NOTHING TO CANCEL OPERATION):");
+		String outputDir = SystemAnalysis.getCommandLineInput();
+		if (outputDir == null || outputDir.trim().isEmpty())
+			return false;
+		else {
+			File f = new File(outputDir);
+			if (!f.exists()) {
+				if (!f.mkdirs()) {
+					System.out.print(SystemAnalysis.getCurrentTime() + ">ERROR: Could not create directory structure (" + f.getAbsolutePath() + ")");
+					System.out.println();
+					return false;
+				}
+			}
+			if (!f.isDirectory()) {
+				System.out.print(SystemAnalysis.getCurrentTime() + ">ERROR: Output specifies a file instead of a directory (" + f.getAbsolutePath() + ")");
+				System.out.println();
+				return false;
+			}
+			String[] fl = f.list();
+			if (fl.length > 0) {
+				System.out.print(SystemAnalysis.getCurrentTime() + ">ERROR: Output directory contains " + fl.length + " files. It needs to be empty.");
+				System.out.println();
+				return false;
+			}
+			
+			System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Output to " + f.getAbsolutePath());
+			// if (!f.canWrite()) {
+			// System.out.println(SystemAnalysis.getCurrentTime() + "ERROR: Can't write to file (" + f.getAbsolutePath() + ")");
+			// return false;
+			// }
+			targetDirectory = f;
+			startTime = System.currentTimeMillis();
+			ff = f;
+			return true;
+		}
+	}
+	
+	@Override
+	public void postProcessCommandLineExecution() {
+		long fs = written.getLong();
+		double mbps = fs / 1024d / 1024d / ((System.currentTimeMillis() - startTime) / 1000d);
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: " +
+				"Overall size of files is " + fs / 1024 / 1024 + " MB, " +
+				"t=" + SystemAnalysis.getWaitTimeShort(System.currentTimeMillis() - startTime - 1000) + ", " +
+				"speed=" + StringManipulationTools.formatNumber(mbps, "#.#") + " MB/s");
+	}
+	
 }
