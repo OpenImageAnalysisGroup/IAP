@@ -30,32 +30,25 @@ public class PdfCreator {
 	final TreeMap<Long, String> output = new TreeMap<Long, String>();
 	final ThreadSafeOptions tso = new ThreadSafeOptions();
 	
-	public PdfCreator() {
+	private final File optTargetDirectoryOrTargetFile;
+	
+	public PdfCreator(File optTargetDirectoryOrTargetFile) {
+		this.optTargetDirectoryOrTargetFile = optTargetDirectoryOrTargetFile;
 	}
 	
 	public void prepareTempDirectory() throws IOException {
-		String fn = ReleaseInfo.getAppFolderWithFinalSep() + System.nanoTime();
-		this.tempDirectory = new File(fn);
-		boolean res = tempDirectory.mkdir();
-		if (!res)
-			output.put(System.nanoTime(), "ERROR: Could not create temp directory: " + fn);
-		else
-			output.put(System.nanoTime(), "INFO: Created temp directory: " + fn);
-		
+		if (optTargetDirectoryOrTargetFile != null) {
+			this.tempDirectory = optTargetDirectoryOrTargetFile;
+		} else {
+			String fn = ReleaseInfo.getAppFolderWithFinalSep() + System.nanoTime();
+			this.tempDirectory = new File(fn);
+			boolean res = tempDirectory.mkdir();
+			if (!res)
+				output.put(System.nanoTime(), "ERROR: Could not create temp directory: " + fn);
+			else
+				output.put(System.nanoTime(), "INFO: Created temp directory: " + fn);
+		}
 		output.put(System.nanoTime(), "INFO: Temp directory existing?: " + tempDirectory.canRead());
-		// createTempDirectory();
-	}
-	
-	private File createTempDirectory() throws IOException {
-		File temp = File.createTempFile("temp", Long.toString(System.nanoTime()));
-		
-		if (!(temp.delete()))
-			throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
-		
-		if (!(temp.mkdir()))
-			throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
-		
-		return temp;
 	}
 	
 	public void saveReportCSV(byte[] result, boolean xlsx) throws IOException {

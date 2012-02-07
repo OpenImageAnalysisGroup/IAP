@@ -1303,7 +1303,7 @@ public class MongoDB {
 				if (si.size() < nmin)
 					nmin = si.size();
 			}
-			System.out.println("Condition-Count: " + nmin + "..." + nmax);
+			// System.out.println("Condition-Count: " + nmin + "..." + nmax);
 		}
 		return experiment;
 	}

@@ -159,4 +159,10 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 		//
 	}
 	
+	@Override
+	public void setStatusProvider(BackgroundTaskStatusProviderSupportingExternalCall status) {
+		if (remoteAction != null)
+			remoteAction.setStatusProvider(status);
+	}
+	
 }

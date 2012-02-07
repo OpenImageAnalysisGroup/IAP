@@ -21,6 +21,8 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 public interface NavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception;
 	
+	public void setStatusProvider(BackgroundTaskStatusProviderSupportingExternalCall status);
+	
 	/**
 	 * @param currentSet
 	 * @return List of resulting navigation buttons, shown after performing the

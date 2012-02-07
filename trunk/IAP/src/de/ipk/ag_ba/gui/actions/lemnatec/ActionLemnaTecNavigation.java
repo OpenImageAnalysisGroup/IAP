@@ -97,21 +97,22 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 				try {
 					if (!experimentMap.containsKey(db))
 						experimentMap.put(db, new LemnaTecDataExchange()
-										.getExperimentsInDatabase(login, db));
+								.getExperimentsInDatabase(login, db));
 					Collection<ExperimentHeaderInterface> experiments = experimentMap.get(db);
 					if (experiments.size() > 0) {
 						if (!known(db))
 							unsorted.add(new NavigationButton(new ActionLemnaDb(db, experiments), src.getGUIsetting()));
 						else
 							result.add(new NavigationButton(new ActionLemnaDb(db, experiments), src.getGUIsetting()));
-					} else
-						System.out.println("Database " + db + " is empty.");
+					}
+					// else System.out.println("Database " + db + " is empty.");
 					for (ExperimentHeaderInterface ehi : experiments) {
 						allExperiments.get("").get("").add(ehi);
 					}
 					
 				} catch (Exception e) {
-					System.out.println("Database " + db + " could not be processed. (" + e.getMessage() + ")");
+					if (e.getMessage() == null || !e.getMessage().equals("ERROR: relation \"snapshot\" does not exist"))
+						System.out.println("Database " + db + " could not be processed. (" + e.getMessage() + ")");
 				}
 			}
 			if (unsorted.size() > 0)
