@@ -56,7 +56,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) {
 		
 		Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
-							"Target", MongoDB.getMongos()
+				"Target", MongoDB.getMongos()
 		});
 		
 		if (sel == null)
@@ -97,7 +97,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 					}
 					ExperimentReference exRef = new ExperimentReference(newExperiment);
 					for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, exRef,
-										src.getGUIsetting()))
+							src.getGUIsetting()))
 						res.add(ne);
 				} catch (Exception e1) {
 					newExperiment = null;
@@ -118,7 +118,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		if (newExperiment != null) {
 			res.add(src);
 			res.add(ActionMongoExperimentsNavigation.getMongoExperimentButton(newExperiment.getHeader(),
-								src.getGUIsetting(), m));
+					src.getGUIsetting(), m));
 		}
 		return res;
 	}
@@ -129,7 +129,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	}
 	
 	private static void processData(RunnableWithMappingData resultProcessor, ImageLoader il, ArrayList<File> fileList,
-						AnnotationFromGraphFileNameProvider provider) {
+			AnnotationFromGraphFileNameProvider provider) {
 		for (ExperimentInterface mdl : il.process(fileList, provider)) {
 			if (mdl != null) {
 				if (resultProcessor != null) {
@@ -146,6 +146,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		if (fileList == null)
 			return;
 		Collections.sort(fileList, new Comparator<File>() {
+			@Override
 			public int compare(File o1, File o2) {
 				return o1.getName().compareTo(o2.getName());
 			}
@@ -155,11 +156,11 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		HashMap<Integer, Condition> replicateNumber2conditionTemplate = null;
 		
 		Object[] lm = MyInputHelper.getInput(
-							"[Yes;No]Load meta data (mapping from plant ID to condition annotation) from file?<br><br>"
-												+ "The provided table needs to contain at least two columns,<br>"
-												+ "the first needs to contain the plant ID, the following columns,<br>"
-												+ "need to contain annotation information about experiment conditions<br>"
-												+ "such as species, genotype or treatment.<br><br>", "Load Meta Data?", new Object[] {});
+				"[Yes;No]Load meta data (mapping from plant ID to condition annotation) from file?<br><br>"
+						+ "The provided table needs to contain at least two columns,<br>"
+						+ "the first needs to contain the plant ID, the following columns,<br>"
+						+ "need to contain annotation information about experiment conditions<br>"
+						+ "such as species, genotype or treatment.<br><br>", "Load Meta Data?", new Object[] {});
 		if (lm != null) {
 			// yes answered
 			// load meta data file
@@ -181,11 +182,11 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 						inp.add(val);
 					}
 					Object[] columnTypes = MyInputHelper
-										.getInput(
-															"<html>"
-																				+ "Please specify the column contents:<br><br>"
-																				+ "<b>Warning: Currently only the fields Species, Genotype and Treatment are processed correctly!</b><br><hl><br>",
-															"Meta Data / Condition Annotation", inp.toArray());
+							.getInput(
+									"<html>"
+											+ "Please specify the column contents:<br><br>"
+											+ "<b>Warning: Currently only the fields Species, Genotype and Treatment are processed correctly!</b><br><hl><br>",
+									"Meta Data / Condition Annotation", inp.toArray());
 					if (columnTypes != null) {
 						replicateNumber2conditionTemplate = new HashMap<Integer, Condition>();
 						for (int row = 1; row <= myData.getMaximumRow(); row++) {
@@ -203,7 +204,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 									}
 									if (replicateNumber2conditionTemplate.containsKey(replicateID))
 										ErrorMsg.addErrorMessage("Duplicate annotation information definition for replicate ID "
-															+ replicateID + " in row " + row + " - ignored!");
+												+ replicateID + " in row " + row + " - ignored!");
 									else
 										replicateNumber2conditionTemplate.put(replicateID, c);
 								}
@@ -218,7 +219,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		}
 		
 		MyScanner[] replicateIDs = AnnotationFromGraphFileNameProvider.getFileNameInfos(fileList, providedFileNameFormat,
-							replicateNumber2conditionTemplate);
+				replicateNumber2conditionTemplate);
 		HashSet<String> detectedConditions = getConditions(replicateIDs);
 		if (replicateIDs == null || replicateIDs.length == 0) {
 			processData(resultProcessor, il, fileList, null);
@@ -232,11 +233,11 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 				for (MyScanner rId : filename2scanner.values())
 					replId2ConditionInfo.put(rId.getReplicateID(), getCondition(rId));
 				AnnotationFromGraphFileNameProvider provider = new AnnotationFromGraphFileNameProvider(replId2ConditionInfo,
-									filename2scanner);
+						filename2scanner);
 				processData(resultProcessor, il, fileList, provider);
 			} else {
 				Object[] con = MyInputHelper.getInput("Experiment condition specification:", "Number of conditions?",
-									new Object[] { "Number of conditions", 1 });
+						new Object[] { "Number of conditions", 1 });
 				if (con != null) {
 					Integer conditionCount = (Integer) con[0];
 					ArrayList<Object> paramList = new ArrayList<Object>();
@@ -244,7 +245,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 					int last = lowestOrHighestReplicateID(false, replicateIDs);
 					for (int n = 0; n < conditionCount; n++) {
 						paramList.add("Specify details of condition " + (n + 1) + ".<br>"
-											+ "The dataset contains replicate IDs ranging from " + first + " to " + last + ".");
+								+ "The dataset contains replicate IDs ranging from " + first + " to " + last + ".");
 						paramList.add("Condition " + (n + 1));
 						ArrayList<Object> ppp = new ArrayList<Object>();
 						ppp.add("First replicate ID");
@@ -286,7 +287,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 							rrr.put(s.getFileName(), s);
 						}
 						AnnotationFromGraphFileNameProvider provider = new AnnotationFromGraphFileNameProvider(
-											replId2ConditionInfo, rrr);
+								replId2ConditionInfo, rrr);
 						processData(resultProcessor, il, fileList, provider);
 					}
 				}
@@ -346,7 +347,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Add Files";
+		return "Add files";
 	}
 	
 	@Override

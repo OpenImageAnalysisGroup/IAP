@@ -46,7 +46,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author klukas
  */
-public class ActionDataExportTar extends AbstractNavigationAction {
+public class ActionDataExportTar extends AbstractNavigationAction implements SpecialCommandLineSupport {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
@@ -83,7 +83,7 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Download TAR Archive";
+		return "Create TAR file";
 	}
 	
 	@Override
@@ -433,4 +433,50 @@ public class ActionDataExportTar extends AbstractNavigationAction {
 	public MongoDB getMongoInstance() {
 		return m;
 	}
+	
+	long startTime;
+	File ff;
+	
+	@Override
+	public boolean prepareCommandLineExecution() throws Exception {
+		System.out.println();
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Command requires specification of an output file name.");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: If no path is specified, the file will be placed in the current directory.");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">READY: PLEASE ENTER FILENAME (ENTER NOTHING TO CANCEL OPERATION):");
+		String fileName = SystemAnalysis.getCommandLineInput();
+		if (fileName == null || fileName.trim().isEmpty())
+			return false;
+		else {
+			File f = new File(fileName);
+			if (f.exists()) {
+				System.out.println(SystemAnalysis.getCurrentTime() + "WARNING: File exists (" + f.getAbsolutePath() + ")");
+				System.out.println(SystemAnalysis.getCurrentTime() + "READY: Enter \"yes\" to overwrite, otherwise operation will be cancelled");
+				String confirm = SystemAnalysis.getCommandLineInput();
+				if (confirm != null && confirm.toUpperCase().indexOf("Y") >= 0)
+					; // OK
+				else
+					return false;
+			}
+			System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Output to " + f.getAbsolutePath());
+			// if (!f.canWrite()) {
+			// System.out.println(SystemAnalysis.getCurrentTime() + "ERROR: Can't write to file (" + f.getAbsolutePath() + ")");
+			// return false;
+			// }
+			tso.setParam(0, new FileOutputStream(f));
+			startTime = System.currentTimeMillis();
+			ff = f;
+			return true;
+		}
+	}
+	
+	@Override
+	public void postProcessCommandLineExecution() {
+		long fs = ff.length();
+		double mbps = fs / 1024d / 1024d / ((System.currentTimeMillis() - startTime) / 1000d);
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: " +
+				"File size " + fs / 1024 / 1024 + " MB, " +
+				"t=" + SystemAnalysis.getWaitTimeShort(System.currentTimeMillis() - startTime - 1000) + ", " +
+				"speed=" + StringManipulationTools.formatNumber(mbps, "#.#") + " MB/s");
+	}
+	
 }

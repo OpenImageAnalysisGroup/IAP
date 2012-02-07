@@ -72,7 +72,7 @@ public class ResourceIOManager {
 	 * @return new url or null, if not copied
 	 */
 	public static IOurl copyDataAndReplaceURLPrefix(String targetHandlerPrefix, IOurl sourceURL,
-						ResourceIOConfigObject config) throws Exception {
+			ResourceIOConfigObject config) throws Exception {
 		if (sourceURL == null)
 			return null;
 		
@@ -83,7 +83,7 @@ public class ResourceIOManager {
 	}
 	
 	public static IOurl copyDataAndReplaceURLPrefix(String targetHandlerPrefix, String srcFileName, InputStream is,
-						ResourceIOConfigObject config) throws Exception {
+			ResourceIOConfigObject config) throws Exception {
 		if (is == null || srcFileName == null)
 			return null;
 		
@@ -108,7 +108,7 @@ public class ResourceIOManager {
 			return (MyByteArrayInputStream) is;
 		} else {
 			ResourceIOManager.copyContent(is, bos);
-			System.out.print(".");
+			// System.out.print(".");
 			return new MyByteArrayInputStream(bos.toByteArray(), bos.size());
 		}
 	}
