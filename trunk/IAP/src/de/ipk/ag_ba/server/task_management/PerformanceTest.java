@@ -15,8 +15,8 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -41,10 +41,12 @@ public class PerformanceTest {
 		FlexibleImage imgVis = PerformanceTestImages.getImage(ImageNames.MAIZE_VIS_SIDE_BELONG_TO_REFERENCE_1386);
 		FlexibleImage imgFluo = PerformanceTestImages.getImage(ImageNames.MAIZE_FLU_SIDE_BELONG_TO_REFERENCE_1386);
 		FlexibleImage imgNir = PerformanceTestImages.getImage(ImageNames.MAIZE_NIR_SIDE_BELONG_TO_REFERENCE_1386);
+		FlexibleImage imgIr = null;
 		
 		FlexibleImage imgVisRef = PerformanceTestImages.getImage(ImageNames.MAIZE_VIS_SIDE_REFERENCE_1386);
 		FlexibleImage imgFluoRef = PerformanceTestImages.getImage(ImageNames.MAIZE_FLU_SIDE_REFERENCE_1386);
 		FlexibleImage imgNirRef = PerformanceTestImages.getImage(ImageNames.MAIZE_NIR_SIDE_REFERENCE_1386);
+		FlexibleImage imgIrRef = null;
 		StopWatch school;
 		boolean oldschool = false;
 		if (oldschool) {
@@ -53,25 +55,27 @@ public class PerformanceTest {
 			FlexibleImage fc = imgFluo.copy();
 			FlexibleImage nc = imgFluoRef.copy();
 			school = new StopWatch("oldschool");
-			testSide("oldschool", imgVis, imgVisRef, fc, nc, imgNir, imgNirRef, "1");
+			testSide("oldschool", imgVis, imgVisRef, fc, nc, imgNir, imgNirRef, imgIr, imgIrRef, "1");
 			school.printTime();
 		}
 		BlockRemoveSmallClustersOnFluo.ngUse = true;
 		BlockRemoveSmallClusters_vis_fluo.ngUse = true;
 		school = new StopWatch("newschool");
-		testSide("newschool", imgVis, imgVisRef, imgFluo, imgFluoRef, imgNir, imgNirRef, "1");
+		testSide("newschool", imgVis, imgVisRef, imgFluo, imgFluoRef, imgNir, imgNirRef, imgIr, imgIrRef, "1");
 		school.printTime();
 	}
 	
-	public void testSide(String debugInfo, FlexibleImage imgVis, FlexibleImage imgVisRef, FlexibleImage imgFluo, FlexibleImage imgFluoRef, FlexibleImage imgNir,
-			FlexibleImage imgNirRef, String name) throws IOException, Exception, InstantiationException, IllegalAccessException, InterruptedException,
+	public void testSide(String debugInfo, FlexibleImage imgVis, FlexibleImage imgVisRef, FlexibleImage imgFluo, FlexibleImage imgFluoRef,
+			FlexibleImage imgNir, FlexibleImage imgNirRef,
+			FlexibleImage imgIr, FlexibleImage imgIrRef,
+			String name) throws IOException, Exception, InstantiationException, IllegalAccessException, InterruptedException,
 			FileNotFoundException {
 		
 		System.out.println("\n" + "TestMaizePipline - Side");
 		
-		final FlexibleImageSet input = new FlexibleImageSet(imgVis, imgFluo, imgNir);
+		final FlexibleImageSet input = new FlexibleImageSet(imgVis, imgFluo, imgNir, imgIr);
 		
-		final FlexibleImageSet ref_input = new FlexibleImageSet(imgVisRef, imgFluoRef, imgNirRef);
+		final FlexibleImageSet ref_input = new FlexibleImageSet(imgVisRef, imgFluoRef, imgNirRef, imgIrRef);
 		
 		ImageProcessorOptions options = new ImageProcessorOptions(scale);
 		
@@ -99,6 +103,7 @@ public class PerformanceTest {
 	
 	private Runnable getReRunCode(final FlexibleImageSet input, final FlexibleImageSet ref_input) {
 		Runnable reRun = new Runnable() {
+			@Override
 			public void run() {
 				ImageProcessorOptions options = new ImageProcessorOptions(scale);
 				options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
@@ -119,14 +124,18 @@ public class PerformanceTest {
 		
 	}
 	
-	public void testTop(FlexibleImage imgVis, FlexibleImage imgVisRef, FlexibleImage imgFluo, FlexibleImage imgFluoRef, FlexibleImage imgNir,
-			FlexibleImage imgNirRef) throws IOException, Exception, InstantiationException, IllegalAccessException, InterruptedException, FileNotFoundException {
+	public void testTop(FlexibleImage imgVis, FlexibleImage imgVisRef, FlexibleImage imgFluo, FlexibleImage imgFluoRef,
+			FlexibleImage imgNir,
+			FlexibleImage imgNirRef,
+			FlexibleImage imgIr,
+			FlexibleImage imgIrRef
+			) throws IOException, Exception, InstantiationException, IllegalAccessException, InterruptedException, FileNotFoundException {
 		
 		System.out.println("\n" + "TestMaizePipline - Top");
 		
-		FlexibleImageSet input = new FlexibleImageSet(imgVis, imgFluo, imgNir);
+		FlexibleImageSet input = new FlexibleImageSet(imgVis, imgFluo, imgNir, imgIr);
 		
-		FlexibleImageSet ref_input = new FlexibleImageSet(imgVisRef, imgFluoRef, imgNirRef);
+		FlexibleImageSet ref_input = new FlexibleImageSet(imgVisRef, imgFluoRef, imgNirRef, imgIrRef);
 		
 		ImageProcessorOptions options = new ImageProcessorOptions(scale);
 		

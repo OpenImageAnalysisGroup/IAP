@@ -20,6 +20,8 @@ public enum ImageConfiguration {
 	RgbTop("vis.top", "rgb.top", "rgb_top_image_unit", "RgbTop"),
 	NirTop("nir.top", "nir_top_image_unit", "NirTop"),
 	NirSide("nir.side", "nir_side_image_unit"),
+	IrSide("ir.side", "ir_side_image_unit"),
+	IrTop("ir.top", "ir_top_image_unit", "IrTop"),
 	Unknown("unknown");
 	
 	private String name, name2, name3, name4;
@@ -49,7 +51,7 @@ public enum ImageConfiguration {
 	public static ImageConfiguration get(String name) {
 		for (ImageConfiguration i : values()) {
 			if (name.equalsIgnoreCase(i.name) || name.equalsIgnoreCase(i.name2) || name.equalsIgnoreCase(i.name3)
-								|| name.equalsIgnoreCase(i.name4))
+					|| name.equalsIgnoreCase(i.name4))
 				return i;
 		}
 		return guess(name);

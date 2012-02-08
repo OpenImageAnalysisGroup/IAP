@@ -112,7 +112,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				JFrame jff = new JFrame("IAP Cloud Storage, Analysis and Visualization System");
 				jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 				BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-									"", "");
+						"", "");
 				jff.add(IAPgui.getNavigation(myStatus, true), "0,0");
 				jff.validate();
 				jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -148,6 +148,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	private void updateGUI() {
+		transferFocusUpCycle();
 		removeAll();
 		if (set != null) {
 			ButtonDrawStyle buttonStyleToUse = buttonStyle;
@@ -206,7 +207,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 								graphPanel));
 					else
 						add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), getTheOther(), this,
-											graphPanel));
+								graphPanel));
 				}
 			}
 			if (!firstStar) {
@@ -274,14 +275,14 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							i = GravistoService.getBufferedImage(ne.getIcon().getImage());
 						else
 							i = GravistoService.getBufferedImage(GravistoService.loadIcon(IAPmain.class,
-												ne.getNavigationImage()).getImage());
+									ne.getNavigationImage()).getImage());
 						// add bookmark
 						String target = getTargetPath(ne);
 						if (target != null) {
 							if (Bookmark.add(ne.getTitle(), target, i)) {
 								if (!set.isEmpty())
 									set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
-														theOther, graphPanel, null, null);
+											theOther, graphPanel, null, null);
 							} else
 								MainFrame.getInstance().showMessageDialog("Could not add bookmark.");
 						} else
@@ -346,7 +347,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	private MouseListener getDeleteBookmarkActionListener(final JLabel lbl, final ObjectRef right,
-						final NavigationAction action) {
+			final NavigationAction action) {
 		MouseListener res = new MouseListener() {
 			
 			@Override
@@ -359,7 +360,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						} else {
 							if (!set.isEmpty())
 								set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
-													theOther, graphPanel, null, null);
+										theOther, graphPanel, null, null);
 						}
 					}
 				}

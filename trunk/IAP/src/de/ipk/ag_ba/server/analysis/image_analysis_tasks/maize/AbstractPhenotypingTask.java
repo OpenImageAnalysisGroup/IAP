@@ -483,7 +483,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								imageConfigurationAndRotationAngle)) {
 							sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).put(
 									imageConfigurationAndRotationAngle,
-									new ImageSet(null, null, null, id.getParentSample()));
+									new ImageSet(null, null, null, null, id.getParentSample()));
 						}
 						ImageSet is = sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).get(
 								imageConfigurationAndRotationAngle);
@@ -499,6 +499,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							if (imageConfiguration == ImageConfiguration.NirSide
 									|| imageConfiguration == ImageConfiguration.NirTop)
 								is.setNir(id);
+							if (imageConfiguration == ImageConfiguration.IrSide
+									|| imageConfiguration == ImageConfiguration.IrTop)
+								is.setIr(id);
 						}
 					}
 				}
@@ -789,6 +792,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		ImageData inVis = id.getVIS() != null ? id.getVIS().copy() : null;
 		ImageData inFluo = id.getFLUO() != null ? id.getFLUO().copy() : null;
 		ImageData inNir = id.getNIR() != null ? id.getNIR().copy() : null;
+		ImageData inIr = id.getIR() != null ? id.getIR().copy() : null;
 		
 		if (inVis == null && inFluo == null && inNir == null) {
 			System.out.println(SystemAnalysis.getCurrentTime()
@@ -799,8 +803,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final FlexibleImageSet input = new FlexibleImageSet();
 		final FlexibleImageSet inputMasks = new FlexibleImageSet();
 		
-		input.setImageInfo(inVis, inFluo, inNir);
-		inputMasks.setImageInfo(inVis, inFluo, inNir);
+		input.setImageInfo(inVis, inFluo, inNir, inIr);
+		inputMasks.setImageInfo(inVis, inFluo, inNir, inIr);
 		
 		boolean side = id.isSide();
 		
