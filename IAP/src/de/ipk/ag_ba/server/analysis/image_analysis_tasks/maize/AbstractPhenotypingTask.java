@@ -152,7 +152,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						if (!md.hasAllNeededImageTypes()) {
 							snapshotsWithNotAllNeededImageTypes++;
 							System.out.println(md.getVIS() + " / " + md.getFLUO()
-									+ " / " + md.getNIR());
+									+ " / " + md.getNIR() + "/" + md.getIR());
 						}
 						if (md.isSide())
 							side++;
@@ -803,9 +803,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		ImageData inNir = id.getNIR() != null ? id.getNIR().copy() : null;
 		ImageData inIr = id.getIR() != null ? id.getIR().copy() : null;
 		
-		if (inVis == null && inFluo == null && inNir == null) {
+		if (inVis == null && inFluo == null && inNir == null && inIr == null) {
 			System.out.println(SystemAnalysis.getCurrentTime()
-					+ ">ERROR: SNAPSHOT WITH NO VIS+FLUO+NIR IMAGES");
+					+ ">ERROR: SNAPSHOT WITH NO VIS+FLUO+NIR+IR IMAGES");
 			return null;
 		}
 		
@@ -841,8 +841,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
 			
-			// TODO FIX: debugImageStack should be no input, only an output
-			// TODO: maximumThreadCount... should be no parameter but a setting!
 			FlexibleMaskAndImageSet ret = imageProcessor.pipeline(options,
 					input, inputMasks, maximumThreadCountOnImageLevel,
 					debugImageStack);

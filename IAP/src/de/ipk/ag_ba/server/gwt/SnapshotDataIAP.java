@@ -14,11 +14,13 @@ public class SnapshotDataIAP {
 	public transient StringBuilder rgbUrl = new StringBuilder();
 	public transient StringBuilder fluoUrl = new StringBuilder();
 	public transient StringBuilder nirUrl = new StringBuilder();
+	public transient StringBuilder irUrl = new StringBuilder();
 	public transient StringBuilder unknownUrl = new StringBuilder();
 	
 	public transient StringBuilder rgbUrlAngle = new StringBuilder();
 	public transient StringBuilder fluoUrlAngle = new StringBuilder();
 	public transient StringBuilder nirUrlAngle = new StringBuilder();
+	public transient StringBuilder irUrlAngle = new StringBuilder();
 	public transient StringBuilder unknownUrlAngle = new StringBuilder();
 	
 	public String dataTransport;
@@ -69,6 +71,10 @@ public class SnapshotDataIAP {
 		return getLongArray(nirUrl);
 	}
 	
+	public Long[] getIrUrlArr() {
+		return getLongArray(irUrl);
+	}
+	
 	public Long[] getUnknownUrlArr() {
 		return getLongArray(unknownUrl);
 	}
@@ -83,6 +89,10 @@ public class SnapshotDataIAP {
 	
 	public int[] getNirUrlAngleArr() {
 		return getIntArray(getNirUrlAngle());
+	}
+	
+	public int[] getIrUrlAngleArr() {
+		return getIntArray(getIrUrlAngle());
 	}
 	
 	public int[] getUnknownUrlAngleArr() {
@@ -186,6 +196,15 @@ public class SnapshotDataIAP {
 		}
 		nirUrl.append(url);
 		nirUrlAngle.append(angle);
+	}
+	
+	public void addIr(long url, int angle) {
+		if (irUrl.length() > 0) {
+			irUrl.append(":");
+			irUrlAngle.append(":");
+		}
+		irUrl.append(url);
+		irUrlAngle.append(angle);
 	}
 	
 	public boolean hasImages() {
@@ -311,6 +330,10 @@ public class SnapshotDataIAP {
 	
 	public StringBuilder getNirUrlAngle() {
 		return nirUrlAngle;
+	}
+	
+	public StringBuilder getIrUrlAngle() {
+		return irUrlAngle;
 	}
 	
 	public void setUnknownUrlAngle(StringBuilder unknownUrlAngle) {
