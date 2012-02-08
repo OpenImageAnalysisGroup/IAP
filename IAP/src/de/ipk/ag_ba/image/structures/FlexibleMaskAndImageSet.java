@@ -73,7 +73,7 @@ public class FlexibleMaskAndImageSet {
 		int[][] imgVis = resizedImages.getVis() != null ? resizedImages.getVis().getAs2A() : null;
 		int[][] imgFluo = resizedImages.getFluo() != null ? resizedImages.getFluo().getAs2A() : null;
 		int[][] imgNir = resizedImages.getNir() != null ? resizedImages.getNir().getAs2A() : null;
-		int[][] imgIr = resizedImages.getNir() != null ? resizedImages.getIr().getAs2A() : null;
+		int[][] imgIr = resizedImages.getIr() != null ? resizedImages.getIr().getAs2A() : null;
 		
 		ImageOperation io = new ImageOperation(image);
 		

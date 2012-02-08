@@ -55,7 +55,6 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			int maxThreadsPerImage,
 			FlexibleImageStack debugStack)
 			throws Exception {
-		
 		BlockPipeline pipeline = getPipeline(options);
 		
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);

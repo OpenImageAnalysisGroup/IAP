@@ -52,7 +52,7 @@ public class FlexibleImageSet {
 		if (nir != null)
 			nir.setType(FlexibleImageType.NIR);
 		if (ir != null)
-			nir.setType(FlexibleImageType.IR);
+			ir.setType(FlexibleImageType.IR);
 		
 		this.vis = vis;
 		this.fluo = fluo;

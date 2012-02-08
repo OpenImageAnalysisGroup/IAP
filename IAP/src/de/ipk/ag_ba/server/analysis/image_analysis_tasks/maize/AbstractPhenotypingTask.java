@@ -730,9 +730,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void processAndOrSaveTiffImagesOrResultImages(ImageSet id,
-			ImageData inVis, ImageData inFluo, ImageData inNir,
+			ImageData inVis, ImageData inFluo, ImageData inNir, ImageData inIr,
 			FlexibleImageStack debugImageStack, FlexibleImage resVis,
-			FlexibleImage resFluo, FlexibleImage resNir, int parentPriority)
+			FlexibleImage resFluo, FlexibleImage resNir, FlexibleImage resIr, int parentPriority)
 			throws InterruptedException {
 		// StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() +
 		// ">SAVE IMAGE RESULTS", false);
@@ -757,6 +757,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (inNir != null && inNir.getLabelURL() != null)
 					inNir.addAnnotationField("oldreference", inNir
 							.getLabelURL().toString());
+				if (inIr != null && inIr.getLabelURL() != null)
+					inIr.addAnnotationField("oldreference", inIr
+							.getLabelURL().toString());
 				
 				if (id.getVIS() != null && id.getVIS().getURL() != null)
 					inVis.setLabelURL(id.getVIS().getURL().copy());
@@ -766,8 +769,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (inNir != null && id != null && id.getNIR() != null
 						&& id.getNIR().getURL() != null)
 					inNir.setLabelURL(id.getNIR().getURL().copy());
+				if (inIr != null && id != null && id.getIR() != null
+						&& id.getIR().getURL() != null)
+					inIr.setLabelURL(id.getIR().getURL().copy());
 			}
-			MyThread a = null, b = null, c = null, ra = null, rb = null, rc = null;
+			MyThread a = null, b = null, c = null, d = null, ra = null, rb = null, rc = null, rd = null;
 			
 			if (resVis != null)
 				ra = saveImage(inVis, resVis, buf, ".tiff");
@@ -775,11 +781,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				rb = saveImage(inFluo, resFluo, buf, ".tiff");
 			if (resNir != null)
 				rc = saveImage(inNir, resNir, buf, ".tiff");
+			if (resIr != null)
+				rd = saveImage(inIr, resIr, buf, ".tiff");
 			
 			a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false);
 			b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false);
 			c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false);
-			BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c });
+			d = BackgroundThreadDispatcher.addTask(rd, parentPriority + 1, 5, false);
+			BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, d });
 		}
 		// s.printTime();
 	}
@@ -826,7 +835,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		BlockResultSet analysisResults = null;
 		
-		FlexibleImage resVis = null, resFluo = null, resNir = null;
+		FlexibleImage resVis = null, resFluo = null, resNir = null, resIr = null;
 		{
 			ImageProcessor imageProcessor = getImageProcessor();
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
@@ -844,6 +853,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				resVis = pipelineResult.getVis();
 				resFluo = pipelineResult.getFluo();
 				resNir = pipelineResult.getNir();
+				resIr = pipelineResult.getIr();
 				analysisResults = imageProcessor.getSettings();
 			}
 		}
@@ -851,8 +861,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (analysisResults != null) {
 			processStatisticalOutputImages(inVis, analysisResults);
 			
-			processAndOrSaveTiffImagesOrResultImages(id, inVis, inFluo, inNir,
-					debugImageStack, resVis, resFluo, resNir, parentPriority);
+			processAndOrSaveTiffImagesOrResultImages(id, inVis, inFluo, inNir, inIr,
+					debugImageStack, resVis, resFluo, resNir, resIr, parentPriority);
 		}
 		return analysisResults;
 		// } else {
