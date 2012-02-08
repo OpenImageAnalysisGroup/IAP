@@ -86,6 +86,11 @@ public enum ImageConfiguration {
 		if (name.contains("NIR"))
 			return ImageConfiguration.NirSide;
 		
+		if (name.contains("IR") && name.contains("TOP"))
+			return ImageConfiguration.IrTop;
+		if (name.contains("IR"))
+			return ImageConfiguration.IrSide;
+		
 		return Unknown;
 	}
 	
@@ -94,6 +99,7 @@ public enum ImageConfiguration {
 		res.add(RgbTop);
 		res.add(FluoTop);
 		res.add(NirTop);
+		res.add(IrTop);
 		return res;
 	}
 	
@@ -102,6 +108,7 @@ public enum ImageConfiguration {
 		res.add(RgbSide);
 		res.add(FluoSide);
 		res.add(NirSide);
+		res.add(IrSide);
 		return res;
 	}
 	
@@ -110,10 +117,12 @@ public enum ImageConfiguration {
 			case RgbSide:
 			case FluoSide:
 			case NirSide:
+			case IrSide:
 				return true;
 			case RgbTop:
 			case FluoTop:
 			case NirTop:
+			case IrTop:
 				return false;
 			case Unknown:
 				throw new UnsupportedOperationException(

@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 
-import java.util.HashMap;
-
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -15,23 +13,6 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 
 public class BlLoadImagesIfNeeded_images extends
 		AbstractSnapshotAnalysisBlockFIS {
-	
-	public enum BlockInfoProperty {
-		CONSOLE_OUTPUT, HEIGHT, WIDTH, CONSOLE_OUTPUT_VIS, CONSOLE_OUTPUT_FLUO, CONSOLE_OUTPUT_NIR
-	}
-	
-	HashMap<BlockInfoProperty, Boolean> infoMap = new HashMap<BlockInfoProperty, Boolean>() {
-		private static final long serialVersionUID = 1L;
-		
-		{
-			put(BlockInfoProperty.CONSOLE_OUTPUT, false);
-			put(BlockInfoProperty.CONSOLE_OUTPUT_VIS, false);
-			put(BlockInfoProperty.CONSOLE_OUTPUT_FLUO, true);
-			put(BlockInfoProperty.CONSOLE_OUTPUT_NIR, false);
-			put(BlockInfoProperty.HEIGHT, true);
-			put(BlockInfoProperty.WIDTH, true);
-		}
-	};
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -98,6 +79,24 @@ public class BlLoadImagesIfNeeded_images extends
 				} catch (Exception e) {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: NIR-MAIN: " + e.getMessage() + " // "
+							+ url);
+				}
+			}
+			
+			if (getInput().getImages().getIr() == null
+					&& getInput().getImages().getIrInfo() != null) {
+				IOurl url = getInput().getImages().getIrInfo().getURL();
+				try {
+					FlexibleImage fi = new FlexibleImage(url);
+					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
+						getInput().getImages().setIr(fi);
+				} catch (Error e) {
+					System.out.println(SystemAnalysis.getCurrentTime()
+							+ ">ERROR: ERROR: IR-MAIN: " + e.getMessage()
+							+ " // " + url);
+				} catch (Exception e) {
+					System.out.println(SystemAnalysis.getCurrentTime()
+							+ ">ERROR: IR-MAIN: " + e.getMessage() + " // "
 							+ url);
 				}
 			}
