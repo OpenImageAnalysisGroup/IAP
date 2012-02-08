@@ -93,11 +93,20 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			});
 			ArrayList<NavigationButton> unsorted = new ArrayList<NavigationButton>();
 			NavigationButton nb = new NavigationButton(new ActionLemnaTecDatabaseCollection(unsorted), src.getGUIsetting());
+			int n = 0;
+			int idx = -1;
+			int max = listOfDatabases.size();
+			
 			for (String db : listOfDatabases) {
+				idx++;
+				status.setCurrentStatusValueFine(idx / (double) max * 100d);
+				status.setCurrentStatusText1(n + " experiments");
 				try {
-					if (!experimentMap.containsKey(db))
-						experimentMap.put(db, new LemnaTecDataExchange()
-								.getExperimentsInDatabase(login, db));
+					if (!experimentMap.containsKey(db)) {
+						Collection<ExperimentHeaderInterface> res = new LemnaTecDataExchange().getExperimentsInDatabase(login, db, null);
+						n += res.size();
+						experimentMap.put(db, res);
+					}
 					Collection<ExperimentHeaderInterface> experiments = experimentMap.get(db);
 					if (experiments.size() > 0) {
 						if (!known(db))
@@ -128,9 +137,12 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			result.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
 			
 			result.add(ActionLemnaCam.getLemnaCamButton(src.getGUIsetting()));
+			status.setCurrentStatusValueFine(100d);
+			status.setCurrentStatusText1("Found " + n + " experiments");
 			
 		} catch (Exception e) {
 			// error
+			status.setCurrentStatusText2("Error: " + e.getMessage());
 		}
 	}
 	

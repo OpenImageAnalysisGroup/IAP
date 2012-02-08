@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
@@ -29,7 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 
-public class ActionCalendar extends AbstractNavigationAction {
+public class ActionCalendar extends AbstractNavigationAction implements SpecialCommandLineSupport {
 	
 	private NavigationButton src;
 	private final ObjectRef refCalEnt;
@@ -47,7 +48,13 @@ public class ActionCalendar extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Calendar";
+		Calendar c = (Calendar) refCalGui.getObject();
+		if (c == null)
+			return "Calendar";
+		else
+			return c.getCalendar().getDisplayName(GregorianCalendar.MONTH, GregorianCalendar.LONG, Locale.ENGLISH) + " "
+					+ c.getCalendar().get(GregorianCalendar.YEAR);
+		
 	}
 	
 	@Override
@@ -76,6 +83,18 @@ public class ActionCalendar extends AbstractNavigationAction {
 		// String m = sdf.format(c.getTime());
 		NavigationButton nav = new NavigationButton(new AbstractNavigationAction("Select month") {
 			@Override
+			public String getDefaultTitle() {
+				Calendar c = (Calendar) refCalGui.getObject();
+				GregorianCalendar gc = new GregorianCalendar();
+				gc.setTimeInMillis(c.getCalendar().getTimeInMillis());
+				if (nextMonth)
+					gc.add(GregorianCalendar.MONTH, 1);
+				else
+					gc.add(GregorianCalendar.MONTH, -1);
+				return gc.getDisplayName(GregorianCalendar.MONTH, GregorianCalendar.LONG, Locale.ENGLISH);
+			}
+			
+			@Override
 			public void performActionCalculateResults(NavigationButton src) {
 			}
 			
@@ -97,14 +116,16 @@ public class ActionCalendar extends AbstractNavigationAction {
 				ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Phenotyping, group2ei, m, refCalEnt, refCalGui, guIsetting);
 				return res;
 			}
-		}, nextMonth ? "Next" : "Previous", nextMonth ? "img/large_right.png" : "img/large_left.png", guIsetting);
+		},
+				null, // nextMonth ? "Next" : "Previous",
+				nextMonth ? "img/large_right.png" : "img/large_left.png", guIsetting);
 		return nav;
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = getExperimentNavigationActions(DBEtype.Omics, group2ei, m,
-					refCalEnt, refCalGui, src.getGUIsetting());
+				refCalEnt, refCalGui, src.getGUIsetting());
 		return res;
 	}
 	
@@ -234,5 +255,18 @@ public class ActionCalendar extends AbstractNavigationAction {
 			}
 		}
 		return res;
+	}
+	
+	@Override
+	public boolean prepareCommandLineExecution() throws Exception {
+		Calendar2 calEnt = (Calendar2) refCalEnt.getObject();
+		if (calEnt != null)
+			calEnt.setShowSpecificDay(false);
+		return true;
+	}
+	
+	@Override
+	public void postProcessCommandLineExecution() {
+		// empty
 	}
 }

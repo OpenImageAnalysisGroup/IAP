@@ -113,25 +113,34 @@ public class LemnaTecDataExchange {
 	private static HashMap<String, Collection<ExperimentHeaderInterface>> memRes1 = new HashMap<String, Collection<ExperimentHeaderInterface>>();
 	private static long updateTime = -1;
 	
-	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database)
+	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database) throws ClassNotFoundException, SQLException {
+		return getExperimentsInDatabase(user, database, null);
+	}
+	
+	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws SQLException, ClassNotFoundException {
 		Collection<ExperimentHeaderInterface> res = memRes1.get(user + ";" + database);
 		if (res == null || System.currentTimeMillis() - updateTime > 2 * 60 * 1000) {
-			res = getExperimentsInDatabaseIC(user, database);
+			res = getExperimentsInDatabaseIC(user, database, optStatus);
 			updateTime = System.currentTimeMillis();
 			memRes1.put(user + ";" + database, res);
 		}
 		return res;
 	}
 	
-	private Collection<ExperimentHeaderInterface> getExperimentsInDatabaseIC(String user, String database)
+	private Collection<ExperimentHeaderInterface> getExperimentsInDatabaseIC(String user, String database,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws SQLException, ClassNotFoundException {
 		// System.out.println("GET EXP LIST LT");
 		String sqlText = "SELECT distinct(measurement_label) FROM snapshot ORDER BY measurement_label";
 		
 		Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
-		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Connect to database...");
 		Connection connection = openConnectionToDatabase(database);
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Get list of experiments");
 		try {
 			PreparedStatement ps = connection.prepareStatement(sqlText);
 			
@@ -171,6 +180,9 @@ public class LemnaTecDataExchange {
 			rs.close();
 			ps.close();
 			
+			if (optStatus != null)
+				optStatus.setCurrentStatusText2("Determine time stamps");
+			
 			sqlText = "" +
 					"SELECT min(time_stamp), max(time_stamp), count(*) " +
 					"FROM snapshot " + // ,tiled_image " +
@@ -202,6 +214,9 @@ public class LemnaTecDataExchange {
 			}
 			
 			HashMap<ExperimentHeaderInterface, HashSet<String>> people = new HashMap<ExperimentHeaderInterface, HashSet<String>>();
+			
+			if (optStatus != null)
+				optStatus.setCurrentStatusText2("Determine user names (import_data)");
 			
 			ArrayList<String> names = new ArrayList<String>();
 			try {
@@ -235,6 +250,9 @@ public class LemnaTecDataExchange {
 					ehi.setCoordinator(null);
 				}
 			}
+			
+			if (optStatus != null)
+				optStatus.setCurrentStatusText2("Determine user names (snapshot)");
 			
 			sqlText = "SELECT distinct(creator) FROM snapshot WHERE measurement_label=?";
 			ps = connection.prepareStatement(sqlText);
@@ -270,6 +288,8 @@ public class LemnaTecDataExchange {
 		} finally {
 			closeDatabaseConnection(connection);
 		}
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Found " + result.size() + " experiments in db " + database);
 		return result;
 	}
 	
@@ -714,12 +734,12 @@ public class LemnaTecDataExchange {
 			
 			{
 				String lbl = sn.getCamera_label();
-				
 				if (lbl != null && lbl.startsWith("imagingunits."))
 					lbl = lbl.substring("imagingunits.".length());
 				if (lbl != null && lbl.contains("#"))
 					lbl = lbl.substring(0, lbl.indexOf("#"));
-				
+				if (lbl != null && lbl.equals("top"))
+					lbl = "ir.top";
 				sn.setCamera_label(lbl);
 			}
 			

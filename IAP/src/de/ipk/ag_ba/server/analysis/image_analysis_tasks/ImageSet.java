@@ -7,17 +7,19 @@ public class ImageSet {
 	private ImageData vis;
 	private ImageData fluo;
 	private ImageData nir;
+	private ImageData ir;
 	private boolean isSide;
 	private final SampleInterface sampleInfo;
 	
-	public ImageSet(ImageData vis, ImageData fluo, ImageData nir) {
-		this(vis, fluo, nir, null);
+	public ImageSet(ImageData vis, ImageData fluo, ImageData nir, ImageData ir) {
+		this(vis, fluo, nir, ir, null);
 	}
 	
-	public ImageSet(ImageData vis, ImageData fluo, ImageData nir, SampleInterface optSampleInfo) {
+	public ImageSet(ImageData vis, ImageData fluo, ImageData nir, ImageData ir, SampleInterface optSampleInfo) {
 		this.vis = vis;
 		this.fluo = fluo;
 		this.nir = nir;
+		this.ir = ir;
 		sampleInfo = optSampleInfo;
 	}
 	
@@ -33,6 +35,10 @@ public class ImageSet {
 		return nir;
 	}
 	
+	public ImageData getIR() {
+		return ir;
+	}
+	
 	public void setVis(ImageData id) {
 		vis = id;
 	}
@@ -43,6 +49,10 @@ public class ImageSet {
 	
 	public void setNir(ImageData id) {
 		nir = id;
+	}
+	
+	public void setIr(ImageData id) {
+		ir = id;
 	}
 	
 	/**

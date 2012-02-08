@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -357,7 +358,7 @@ public class GravistoService implements HelperClass {
 						ProvidesGeneralContextMenu acm = (ProvidesGeneralContextMenu) myAlgos[i];
 						
 						if (acm.getCurrentContextMenuItem().toString().equalsIgnoreCase(name)
-											|| myAlgos[i].getName().equalsIgnoreCase(name)) {
+								|| myAlgos[i].getName().equalsIgnoreCase(name)) {
 							return myAlgos[i];
 						}
 					}
@@ -509,7 +510,7 @@ public class GravistoService implements HelperClass {
 	 * @param nonInteractiveSelection
 	 */
 	public void runAlgorithm(Algorithm algorithm, Graph graph, Selection selection,
-						boolean enableMultipleSessionProcessing, ActionEvent event) {
+			boolean enableMultipleSessionProcessing, ActionEvent event) {
 		algorithm.attach(graph, selection);
 		algorithm.setActionEvent(event);
 		try {
@@ -526,7 +527,7 @@ public class GravistoService implements HelperClass {
 			boolean doReturn = false;
 			
 			doReturn = doThreadSafe(algorithm, selection, enableMultipleSessionProcessing, parameters, doReturn,
-								tsoParamDialogReturn);
+					tsoParamDialogReturn);
 			
 			if (doReturn)
 				return;
@@ -540,11 +541,11 @@ public class GravistoService implements HelperClass {
 		
 		boolean stop = false;
 		if (!(algorithm instanceof AlgorithmWithComponentDescription) && algorithm.getDescription() != null
-							&& algorithm.getDescription().trim().length() > 0 && (parameters == null || parameters.length <= 0)
-							&& SwingUtilities.isEventDispatchThread()) {
+				&& algorithm.getDescription().trim().length() > 0 && (parameters == null || parameters.length <= 0)
+				&& SwingUtilities.isEventDispatchThread()) {
 			int res = JOptionPane.showConfirmDialog(MainFrame.getInstance(), algorithm.getDescription(),
-								StringManipulationTools.removeHTMLtags(algorithm.getName()), JOptionPane.OK_CANCEL_OPTION,
-								JOptionPane.PLAIN_MESSAGE, null);
+					StringManipulationTools.removeHTMLtags(algorithm.getName()), JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE, null);
 			if (res == JOptionPane.CANCEL_OPTION) {
 				stop = true;
 				MainFrame.showMessage(algorithm.getName() + " not started", MessageType.INFO);
@@ -560,7 +561,7 @@ public class GravistoService implements HelperClass {
 				ScenarioService.postWorkflowStep(algorithm, params);
 				if (algorithm instanceof CalculatingAlgorithm) {
 					JOptionPane.showMessageDialog(null, "<html>Result of algorithm:<p>"
-										+ ((CalculatingAlgorithm) algorithm).getResult().toString());
+							+ ((CalculatingAlgorithm) algorithm).getResult().toString());
 				}
 				algorithm.reset();
 			}
@@ -569,14 +570,14 @@ public class GravistoService implements HelperClass {
 	}
 	
 	private boolean doThreadSafe(final Algorithm algorithm, final Selection selection,
-						final boolean enableMultipleSessionProcessing, final Parameter[] parameters, final boolean doReturn,
-						final ThreadSafeOptions tsoParamDialogReturn) {
+			final boolean enableMultipleSessionProcessing, final Parameter[] parameters, final boolean doReturn,
+			final ThreadSafeOptions tsoParamDialogReturn) {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.executeThreadSafe(new Runnable() {
 			@Override
 			public void run() {
 				boolean res = doThreadSafeDoIt(algorithm, selection, enableMultipleSessionProcessing, parameters, doReturn,
-									tsoParamDialogReturn);
+						tsoParamDialogReturn);
 				tso.setParam(0, res);
 			}
 		});
@@ -584,7 +585,7 @@ public class GravistoService implements HelperClass {
 	}
 	
 	private boolean doThreadSafeDoIt(Algorithm algorithm, Selection selection, boolean enableMultipleSessionProcessing,
-						Parameter[] parameters, boolean doReturn, ThreadSafeOptions tsoParamDialogReturn) {
+			Parameter[] parameters, boolean doReturn, ThreadSafeOptions tsoParamDialogReturn) {
 		ParameterDialog paramDialog = null;
 		if (algorithm instanceof EditorAlgorithm) {
 			paramDialog = ((EditorAlgorithm) algorithm).getParameterDialog(selection);
@@ -605,8 +606,8 @@ public class GravistoService implements HelperClass {
 				algName = ((EditorAlgorithm) algorithm).getShortName();
 			}
 			paramDialog = new DefaultParameterDialog(getMainFrame().getEditComponentManager(), getMainFrame(), parameters,
-								selection, StringManipulationTools.removeHTMLtags(algName), algorithm.getDescription(), desc,
-								checkRelease(algorithm.mayWorkOnMultipleGraphs() && enableMultipleSessionProcessing));
+					selection, StringManipulationTools.removeHTMLtags(algName), algorithm.getDescription(), desc,
+					checkRelease(algorithm.mayWorkOnMultipleGraphs() && enableMultipleSessionProcessing));
 		}
 		
 		if (!paramDialog.isOkSelected()) {
@@ -617,7 +618,7 @@ public class GravistoService implements HelperClass {
 	}
 	
 	private void multiGraphExecution(Algorithm algorithm, Graph graph, Selection selection, ActionEvent event,
-						ParameterDialog paramDialog, Parameter[] params, StringBuilder errors) {
+			ParameterDialog paramDialog, Parameter[] params, StringBuilder errors) {
 		Collection<Session> sessions;
 		if (paramDialog != null)
 			sessions = paramDialog.getTargetSessions();
@@ -630,8 +631,8 @@ public class GravistoService implements HelperClass {
 				if (MainFrame.getSessions().size() > 1) {
 					Object[] options = { "Active Graph", "Open Graphs (" + MainFrame.getSessions().size() + ")" };
 					int res = JOptionPane.showOptionDialog(MainFrame.getInstance(), "Please select the working set.",
-										StringManipulationTools.removeHTMLtags(algorithm.getName()), JOptionPane.YES_NO_OPTION,
-										JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+							StringManipulationTools.removeHTMLtags(algorithm.getName()), JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 					if (res == JOptionPane.YES_OPTION) {
 						sessions.add(MainFrame.getInstance().getActiveSession());
 					} else
@@ -660,7 +661,7 @@ public class GravistoService implements HelperClass {
 				runnn = true;
 				if (algorithm instanceof CalculatingAlgorithm) {
 					JOptionPane.showMessageDialog(null, "<html>Result of algorithm:<p>"
-										+ ((CalculatingAlgorithm) algorithm).getResult().toString());
+							+ ((CalculatingAlgorithm) algorithm).getResult().toString());
 				}
 			} catch (PreconditionException e) {
 				processError(algorithm, g, errors, e);
@@ -678,7 +679,7 @@ public class GravistoService implements HelperClass {
 				ScenarioService.postWorkflowStep(algorithm, params);
 				if (algorithm instanceof CalculatingAlgorithm) {
 					JOptionPane.showMessageDialog(null, "<html>Result of algorithm:<p>"
-										+ ((CalculatingAlgorithm) algorithm).getResult().toString());
+							+ ((CalculatingAlgorithm) algorithm).getResult().toString());
 				}
 				algorithm.reset();
 			} catch (PreconditionException e) {
@@ -704,7 +705,7 @@ public class GravistoService implements HelperClass {
 		}
 		if (graph != null)
 			errors.append("Can not start <i>" + name + "</i> on graph " + graph.getName() + ":<br><br>" + e.getMessage()
-								+ "<br><br>");
+					+ "<br><br>");
 		else
 			errors.append("Can not start <i>" + name + "</i>" + ":<br><br>" + e.getMessage() + "<br><br>");
 	}
@@ -810,7 +811,7 @@ public class GravistoService implements HelperClass {
 	 */
 	public static BufferedImage getScaledImage(Image icon, int w, int h) {
 		BufferedImage destImage = new BufferedImage(icon.getWidth(null), icon.getHeight(null),
-							BufferedImage.TYPE_INT_ARGB);
+				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = destImage.createGraphics();
 		graphics.drawImage(icon, 0, 0, null);
 		return getScaledImage(destImage, w, h);
@@ -818,7 +819,7 @@ public class GravistoService implements HelperClass {
 	
 	public static BufferedImage getBufferedImage(Image icon) {
 		BufferedImage destImage = new BufferedImage(icon.getWidth(null), icon.getHeight(null),
-							BufferedImage.TYPE_INT_ARGB);
+				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = destImage.createGraphics();
 		graphics.drawImage(icon, 0, 0, null);
 		return destImage;
@@ -905,7 +906,7 @@ public class GravistoService implements HelperClass {
 				memLabel.setText(getCurrentMemoryInfo(shortInfo));
 				if (shortInfo)
 					memLabel.setToolTipText(getCurrentMemoryInfo(false).replaceFirst(":", " (click to garbage-collect):")
-										.replaceFirst("<font color='gray'>", ""));
+							.replaceFirst("<font color='gray'>", ""));
 				memLabel.repaint(1000);
 			}
 		});
@@ -919,15 +920,15 @@ public class GravistoService implements HelperClass {
 		String memoryConfig;
 		if (shortInfo) {
 			memoryConfig = ((r.totalMemory() / divisor / divisor) - (r.freeMemory() / divisor / divisor)) + ""
-								+ "&nbsp;MB";
+					+ "&nbsp;MB";
 			return "<html>" + "<font color='gray'><small>" + memoryConfig + "<br>"
-								+ MainFrame.getInstance().getNumberOfOpenSessions() + "&nbsp;ES";
+					+ MainFrame.getInstance().getNumberOfOpenSessions() + "&nbsp;ES";
 			
 		} else {
 			memoryConfig = ((r.totalMemory() / divisor / divisor) - (r.freeMemory() / divisor / divisor)) + "" + " MB, "
-								+ (r.totalMemory() / divisor / divisor) + " MB, " + (r.maxMemory() / divisor / divisor) + " MB";
+					+ (r.totalMemory() / divisor / divisor) + " MB, " + (r.maxMemory() / divisor / divisor) + " MB";
 			return "<html>" + "<font color='gray'><small>Memory info:<br>&nbsp;&nbsp;&nbsp;active, alloc, max memory: "
-								+ memoryConfig;
+					+ memoryConfig;
 		}
 	}
 	
@@ -940,13 +941,21 @@ public class GravistoService implements HelperClass {
 			return new ImageIcon(url);
 	}
 	
+	private static HashMap<String, ImageIcon> cachedIcons = new HashMap<String, ImageIcon>();
+	
 	@SuppressWarnings("unchecked")
 	public static ImageIcon loadIcon(Class class1, String name, int w, int h) {
+		String id = class1.getCanonicalName() + ";" + name + ";" + w + ";" + h;
+		if (cachedIcons.containsKey(id))
+			return cachedIcons.get(id);
+		ImageIcon result = null;
 		URL url = getResource(class1, name);
 		if (url == null)
-			return null;
+			result = null;
 		else
-			return new ImageIcon(GravistoService.getScaledImage(new ImageIcon(url).getImage(), w, h));
+			result = new ImageIcon(GravistoService.getScaledImage(new ImageIcon(url).getImage(), w, h));
+		cachedIcons.put(id, result);
+		return result;
 	}
 	
 	public static BufferedImage loadImage(@SuppressWarnings("rawtypes") Class class1, String name, int w, int h) throws Exception {
@@ -1085,7 +1094,7 @@ public class GravistoService implements HelperClass {
 				
 				if (!entry.isDirectory()) {
 					BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(
-										new File(destDir, entryFileName)));
+							new File(destDir, entryFileName)));
 					BufferedInputStream bis = new BufferedInputStream(zipFile.getInputStream(entry));
 					
 					while ((len = bis.read(buffer)) > 0) {
@@ -1114,7 +1123,7 @@ public class GravistoService implements HelperClass {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void saveRessource(Class reference, String folder, String fileName, String targetFileName)
-						throws IOException {
+			throws IOException {
 		ClassLoader cl = reference.getClassLoader();
 		
 		String path = reference.getPackage().getName().replace('.', '/');
@@ -1238,7 +1247,7 @@ public class GravistoService implements HelperClass {
 	 * @return DOCUMENT ME!
 	 */
 	public JScrollPane showViewChooserDialog(final EditorSession session, boolean returnScrollPane, ActionEvent e,
-						LoadSetting interaction, final ConfigureViewAction configNewView) {
+			LoadSetting interaction, final ConfigureViewAction configNewView) {
 		if (!returnScrollPane && !SwingUtilities.isEventDispatchThread())
 			ErrorMsg.addErrorMessage("Internal Error: showViewChooserDialog not on event dispatch thread");
 		String[] views;
@@ -1255,15 +1264,15 @@ public class GravistoService implements HelperClass {
 					return MainFrame.getInstance().createInternalFrame(views[0], session.getGraph().getName(), returnScrollPane, false);
 				} else {
 					JScrollPane jsp = (JScrollPane) MainFrame.getInstance().createInternalFrame(views[0], session.getGraph().getName(), session,
-										returnScrollPane, false, false, configNewView, true);
+							returnScrollPane, false, false, configNewView, true);
 					return jsp;
 				}
 			} else {
 				if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR) {
 					if (interaction == LoadSetting.VIEW_CHOOSER_FOR_LARGE_GRAPHS_ONLY
-										&& session.getGraph() != null
-										&& ((session.getGraph().getNumberOfNodes() + session.getGraph().getNumberOfEdges() > 1000) || ((e != null && (e
-															.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK))))
+							&& session.getGraph() != null
+							&& ((session.getGraph().getNumberOfNodes() + session.getGraph().getNumberOfEdges() > 1000) || ((e != null && (e
+									.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK))))
 						interaction = LoadSetting.VIEW_CHOOSER_ALWAYS; // show view
 					// chooser dialog
 					// in case the
@@ -1277,11 +1286,11 @@ public class GravistoService implements HelperClass {
 				// VIEW_CHOOSER_NEVER_ALWAYS_DEFAULT should be set
 				
 				if (interaction == LoadSetting.VIEW_CHOOSER_NEVER
-									|| interaction == LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION) {
+						|| interaction == LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION) {
 					String defaultView = ManagerManager.getInstance(null).viewManager.getDefaultView();
 					if (MainFrame.getInstance() != null && MainFrame.getInstance().sessions.contains(session)) {
 						return MainFrame.getInstance().createInternalFrame(defaultView, session.getGraph().getName(), session, returnScrollPane, false,
-											configNewView);
+								configNewView);
 					} else {
 						Graph g = session.getGraph();
 						String name = null;
@@ -1290,14 +1299,14 @@ public class GravistoService implements HelperClass {
 						if (name == null)
 							name = "[NULL]";
 						JScrollPane jsp = (JScrollPane) MainFrame.getInstance().createInternalFrame(defaultView, name, session, returnScrollPane, false,
-											false, configNewView, interaction != LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION);
+								false, configNewView, interaction != LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION);
 						return jsp;
 					}
 				} else {
 					// interaction is VIEW_CHOOSER_ALWAYS
 					ViewTypeChooser viewChooser = new ViewTypeChooser(MainFrame.getInstance(), MainFrame.getInstance().sBundle.getString("viewchooser.title") + " ("
-										+ session.getGraph().getNumberOfNodes() + " nodes, " + session.getGraph().getNumberOfEdges()
-										+ " edges)", ManagerManager.getInstance(null).viewManager.getViewDescriptions());
+							+ session.getGraph().getNumberOfNodes() + " nodes, " + session.getGraph().getNumberOfEdges()
+							+ " edges)", ManagerManager.getInstance(null).viewManager.getViewDescriptions());
 					
 					viewChooser.setLocationRelativeTo(MainFrame.getInstance());
 					viewChooser.setVisible(true);
@@ -1313,17 +1322,18 @@ public class GravistoService implements HelperClass {
 						if (selectedView != null) {
 							if (MainFrame.getInstance().sessions.contains(session)) {
 								return MainFrame.getInstance().createInternalFrame(selectedView, session.getGraph().getName(), session, returnScrollPane,
-													false, configNewView);
+										false, configNewView);
 							} else {
 								return (JScrollPane) MainFrame.getInstance().createInternalFrame(selectedView, session.getGraph().getName(), session,
-													returnScrollPane, false, false, configNewView, true);
+										returnScrollPane, false, false, configNewView, true);
 							}
 						}
 					} else {
 						SwingUtilities.invokeLater(new Runnable() {
+							@Override
 							public void run() {
 								GraffitiInternalFrame gif = (GraffitiInternalFrame) MainFrame.getInstance().createInternalFrame(selectedView, session
-													.getGraph().getName(), session, false, true, false, configNewView, true);
+										.getGraph().getName(), session, false, true, false, configNewView, true);
 								GraffitiFrame gf = new GraffitiFrame(gif, false);
 								gf.setExtendedState(Frame.MAXIMIZED_BOTH);
 								gf.setVisible(true);

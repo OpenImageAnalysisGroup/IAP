@@ -59,6 +59,8 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		FlexibleImage fluoImage = null;
 		FlexibleImage nirMask = null;
 		FlexibleImage nirImage = null;
+		FlexibleImage irMask = null;
+		FlexibleImage irImage = null;
 		
 		// OK
 		// ImageOperation.showTwoImagesAsOne(getInput().getMasks().getVis().getBufferedImage(), getInput().getMasks().getFluo().getBufferedImage());
@@ -122,8 +124,8 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 				break;
 		}
 		
-		FlexibleImageSet processedImages = new FlexibleImageSet(getInput().getImages().getVis(), fluoImage, nirImage);
-		FlexibleImageSet processedMasks = new FlexibleImageSet(getInput().getMasks().getVis(), fluoMask, nirMask);
+		FlexibleImageSet processedImages = new FlexibleImageSet(getInput().getImages().getVis(), fluoImage, nirImage, irImage);
+		FlexibleImageSet processedMasks = new FlexibleImageSet(getInput().getMasks().getVis(), fluoMask, nirMask, irMask);
 		
 		return new FlexibleMaskAndImageSet(processedImages, processedMasks);
 	}

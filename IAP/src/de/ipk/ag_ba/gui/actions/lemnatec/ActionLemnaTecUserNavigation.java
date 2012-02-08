@@ -74,14 +74,17 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 		ArrayList<String> errorList = new ArrayList<String>();
 		HashSet<String> experimentNames = new HashSet<String>();
 		TreeSet<String> usersUnformatted = new TreeSet<String>();
+		int n = 0;
+		int idx = -1;
+		int max = dbs.size();
 		for (String db : dbs) {
-			boolean set = false;
+			idx++;
+			status.setCurrentStatusValueFine(idx / (double) max * 100d);
 			try {
-				for (ExperimentHeaderInterface experiment : new LemnaTecDataExchange().getExperimentsInDatabase(user, db)) {
-					if (!set) {
-						status.setCurrentStatusText1(db);
-						set = true;
-					}
+				status.setCurrentStatusText1(n + " experiments");
+				Collection<ExperimentHeaderInterface> res = new LemnaTecDataExchange().getExperimentsInDatabase(user, db, null);
+				n += res.size();
+				for (ExperimentHeaderInterface experiment : res) {
 					String id = experiment.getDatabase() + ":" + experiment.getExperimentName();
 					boolean quickAnalysis = true;
 					
@@ -127,6 +130,10 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 				error++;
 			}
 		}
+		status.setCurrentStatusValueFine(100d);
+		status.setCurrentStatusText1("Found " + n + " experiments");
+		if (error > 0)
+			status.setCurrentStatusText2("Errors: " + error);
 		
 		users = userName2dbAndExperiment.size();
 		
@@ -138,8 +145,9 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 				+ users
 				+ "<li>Experiments: "
 				+ experimentNames.size()
-				+ "<li>Snapshots: "
-				+ snapshots
+				+ (snapshots > 0 ?
+						"<li>Snapshots: "
+								+ snapshots : "")
 				+ (error > 0 ? "<li>Empty databases: " + error + " ("
 						+ StringManipulationTools.getStringList(errorList, ", ") + ")" : "")
 				+ "</ul>"
