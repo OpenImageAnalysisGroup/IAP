@@ -645,6 +645,8 @@ public class IAPservice {
 											sn.addFluo(urlId, p);
 										if (ic == ImageConfiguration.NirSide)
 											sn.addNir(urlId, p);
+										if (ic == ImageConfiguration.IrSide)
+											sn.addIr(urlId, p);
 										
 										if (ic == ImageConfiguration.RgbTop)
 											sn.addRgb(urlId, p < 1 ? -1 : -p);
@@ -652,6 +654,8 @@ public class IAPservice {
 											sn.addFluo(urlId, p < 1 ? -1 : -p);
 										if (ic == ImageConfiguration.NirTop)
 											sn.addNir(urlId, p < 1 ? -1 : -p);
+										if (ic == ImageConfiguration.IrTop)
+											sn.addIr(urlId, p < 1 ? -1 : -p);
 									}
 								}
 								if (ii instanceof VolumeData) {

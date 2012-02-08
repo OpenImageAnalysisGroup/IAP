@@ -19,8 +19,8 @@ public class Snapshot {
 	@Override
 	public String toString() {
 		return "creator=" + creator + ", label=" + measurement_label + ", id_tag=" + id_tag + ", camera_label="
-							+ camera_label + ", user_camera_label=" + userDefinedCameraLabel + ", image=" + path_image
-							+ ", null_image=" + path_null_image + ", config_blob=" + path_image_config_blob;
+				+ camera_label + ", user_camera_label=" + userDefinedCameraLabel + ", image=" + path_image
+				+ ", null_image=" + path_null_image + ", config_blob=" + path_image_config_blob;
 		
 	}
 	

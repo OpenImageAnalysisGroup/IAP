@@ -349,6 +349,7 @@ public class LemnaTecDataExchange {
 		if (id2coo == null) {
 			id2coo = new HashMap<String, String>();
 			id2coo.put("AC", "Arana, Dr. Fernando (HET)");
+			id2coo.put("FA", "Arana, Dr. Fernando (HET)");
 			id2coo.put("MM", "Muraya, Moses Mahugu (HET)");
 			id2coo.put("KN", "Neumann, Kerstin (GED)");
 			id2coo.put("KW", "Weigelt-Fischer, Dr. Kathleen (HET)");
@@ -595,6 +596,10 @@ public class LemnaTecDataExchange {
 			res += "vis.";
 		if (conf.toUpperCase().contains("FLU"))
 			res += "fluo.";
+		if (conf.toUpperCase().contains("FLOU"))
+			res += "fluo.";
+		if (res.length() == 0)
+			res += "ir.";
 		if (conf.toUpperCase().contains("TOP"))
 			res += "top";
 		if (conf.toUpperCase().contains("SIDE"))
@@ -738,8 +743,8 @@ public class LemnaTecDataExchange {
 					lbl = lbl.substring("imagingunits.".length());
 				if (lbl != null && lbl.contains("#"))
 					lbl = lbl.substring(0, lbl.indexOf("#"));
-				if (lbl != null && lbl.equals("top"))
-					lbl = "ir.top";
+				// if (lbl != null && lbl.equals("top"))
+				// lbl = "ir.top";
 				sn.setCamera_label(lbl);
 			}
 			
