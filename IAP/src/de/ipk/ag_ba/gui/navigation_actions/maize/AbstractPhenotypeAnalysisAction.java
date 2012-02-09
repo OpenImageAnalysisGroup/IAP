@@ -18,6 +18,7 @@ import de.ipk.ag_ba.gui.actions.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.actions.ActionFileManager;
 import de.ipk.ag_ba.gui.actions.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.actions.ImageConfiguration;
+import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
@@ -193,16 +194,24 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				statisticsResult.getHeader().setOriginDbId(dbID);
 				statisticsResult.getHeader().setStartdate(new Date(startTime));
 				statisticsResult.getHeader().setStorageTime(new Date());
+				statisticsResult.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
 				
 				if (getResultReceiver() == null) {
 					if (status != null)
 						status.setCurrentStatusText1("Ready");
 					
-					statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
-							experiment.getExperimentName());
-					statisticsResult.getHeader().setExperimenttype("Analysis Results");
-					statisticsResult.getHeader().setRemark(statisticsResult.getHeader().getRemark() + " // direct mode analysis // " +
-							"calculation time: " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime));
+					statisticsResult.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
+					statisticsResult.getHeader().setExperimentname(
+							getImageAnalysisTask().getClass().getCanonicalName() + ": " +
+									experiment.getExperimentName());
+					
+					statisticsResult.getHeader().setRemark(
+							statisticsResult.getHeader().getRemark() +
+									" // finished: " + SystemAnalysis.getCurrentTime() +
+									" // processing time: " +
+									SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime) +
+									" // finished: " + SystemAnalysis.getCurrentTime() +
+									" // direct mode analysis");
 					
 					m.saveExperiment(statisticsResult, getStatusProvider());
 					
