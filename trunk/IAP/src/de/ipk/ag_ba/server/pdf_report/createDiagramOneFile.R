@@ -1839,5 +1839,5 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", TRUE)
+startOptions("report", FALSE)
 rm(list=ls(all=TRUE))
