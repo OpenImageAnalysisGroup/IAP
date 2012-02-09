@@ -431,9 +431,6 @@ public class CloudComputingService {
 						String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
 						if (sn.indexOf(".") > 0)
 							sn = sn.substring(sn.lastIndexOf(".") + 1);
-						e.getHeader().setExperimentname(sn + ": " + e.getName() + ", manual merge at " + SystemAnalysis.getCurrentTime());
-						e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
-						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
 						e.getHeader().setDatabaseId("");
 						for (SubstanceInterface si : e) {
 							for (ConditionInterface ci : si) {
@@ -452,15 +449,15 @@ public class CloudComputingService {
 						}
 						long tStart = tempDataSetDescription.getSubmissionTimeL();
 						long tProcessing = tFinish - tStart;
-						long minutes = tProcessing / 1000 / 60;
 						e.getHeader().setExperimentname(originName);
-						e.getHeader().setExperimenttype("Analysis Results");
-						e.getHeader().setImportusergroup("Analysis Results");
+						e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
+						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
 						e.getHeader().setRemark(
-								e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " +
+								e.getHeader().getRemark() + " // processing time: " +
+										SystemAnalysis.getWaitTime(tProcessing) + " // finished: " +
 										SystemAnalysis.getCurrentTime() + " // manual merge");
 						System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
-						System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
+						System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
 						System.out.println("*****************************");
 						System.out.println("Merged Experiment: " + e.getName());
 						System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
