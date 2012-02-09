@@ -42,10 +42,10 @@
 	\fi
 }
 
-\def\ConstForImageWidth{7cm}
+\def\ConstForImageWidth{9cm}
 
 \newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{#1} \end{center} \end{figure}}{\begin{figure}[!h] \centering \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{figure}}}
-\newcommand{\loadTex}[1]{\IfFileExists{#1}{\include{#1}}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{center} \end{figure}}}
+\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{center} \end{figure}}}
 \makeatother
 
 \usepackage{babel}

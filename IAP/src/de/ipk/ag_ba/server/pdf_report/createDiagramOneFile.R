@@ -938,7 +938,7 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 }
 
 
-makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList) {
+makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, diagramTypSave="nboxplot") {
 ########################		
 #	h=h 
 #	overallResult = overallList$overallResult_nBoxDes
@@ -1017,12 +1017,12 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 		#			} 
 		
 				if(h==1) {
-					saveImageFile(overallList, plot, overallSaveName[[imagesIndex]], "nboxplot")
+					saveImageFile(overallList, plot, overallSaveName[[imagesIndex]], diagramTypSave)
 				} else {
 					print(plot)
 				}
 				if(overallList$appendix) {
-					writeLatexFile("appendixImage", overallSaveName[[imagesIndex]], "nboxplot")
+					writeLatexFile("appendixImage", overallSaveName[[imagesIndex]], diagramTypSave)
 				}
 			
 			} else {
@@ -1031,7 +1031,7 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 				day <- overallResult$xAxis[!is.na(overallResult$mean)][1]
 				overallList$xAxisName <- paste(overallList$xAxisName,day)
 				#overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
-				overallList <- makeBarDiagram(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, TRUE)
+				overallList <- makeBarDiagram(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, TRUE, diagramTypSave)
 			}
 		}
 	}
@@ -1181,7 +1181,7 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 	#return(overallList)
 }	
 
-makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, isOnlyOneValue = FALSE) {
+makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, isOnlyOneValue = FALSE, diagramTyp="barplot") {
 	########################		
 #	h=h 
 #	overallResult = overallList$overallResult_nBoxDes
@@ -1230,12 +1230,12 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 			print(myPlot)
 			
 			if (h==1) {
-				saveImageFile(overallList, myPlot, overallSaveName[[imagesIndex]], "barplot")
+				saveImageFile(overallList, myPlot, overallSaveName[[imagesIndex]], diagramTyp)
 			} else {
 				print(myPlot)
 			}
 			if(overallList$appendix) {
-				writeLatexFile("appendixImage", overallSaveName[[imagesIndex]], "barplot")
+				writeLatexFile("appendixImage", overallSaveName[[imagesIndex]], diagramTyp)
 			}
 		}
 	}
@@ -1243,7 +1243,7 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 }
 
 ##Problem: der median wird nicht angezeigt!
-makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList) {
+makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, diagramTypSave="boxplot") {
 	########################		
 #	h=h 
 #	overallResult = overallList$overallResult_boxDes
@@ -1289,12 +1289,12 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 		#	print(myPlot)
 
 			if (h==1) {
-				saveImageFile(overallList, myPlot, overallSaveName[[imagesIndex]], "boxplot")
+				saveImageFile(overallList, myPlot, overallSaveName[[imagesIndex]], diagramTypSave)
 			} else {
 				print(myPlot)
 			}
 			if(overallList$appendix) {
-				writeLatexFile("appendixImage", overallSaveName[[imagesIndex]], "boxplot")
+				writeLatexFile("appendixImage", overallSaveName[[imagesIndex]], diagramTypSave)
 			}
 		}
 	}
