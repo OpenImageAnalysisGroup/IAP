@@ -603,7 +603,7 @@ getPlotNumber <- function(colNameWichMustBind, descriptorList) {
 			return(n)
 		}
 	}
-	return(0)
+	return(-1)
 }
 #descriptorName kann entfernt werden
 getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, colNames, booleanVectorList, debug) {	
@@ -711,12 +711,15 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 		for(colNameWichMustBind in buildRowNameDataSet %allColnamesWithoutThisOnes% c(colNames$xAxis, colNames$colName, "primaerTreatment")) {
 #			count <- count+1
 			plot = getPlotNumber(colNameWichMustBind, descriptorList)
-			colNameWichMustBindReNamed <- reNameHist(colNameWichMustBind)
-	
-			if(is.null(buildRowNameDataSet$primaerTreatment)){	
-				temp <- rbind(temp,data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[,colNameWichMustBind])), values=buildRowNameDataSet[,colNameWichMustBind], xAxis=buildRowNameDataSet[,colNames$colOfXaxis], name=buildRowNameDataSet[,colNames$colName], plot=plot))			
-			} else {
-				temp <- rbind(temp,data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[,colNameWichMustBind])), primaerTreatment=buildRowNameDataSet[,"primaerTreatment"], values=buildRowNameDataSet[,colNameWichMustBind], xAxis=buildRowNameDataSet[,colNames$colOfXaxis], name=buildRowNameDataSet[,colNames$colName], plot = plot))			
+		
+			if(plot!=-1) {
+				colNameWichMustBindReNamed <- reNameHist(colNameWichMustBind)
+		
+				if(is.null(buildRowNameDataSet$primaerTreatment)){	
+					temp <- rbind(temp,data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[,colNameWichMustBind])), values=buildRowNameDataSet[,colNameWichMustBind], xAxis=buildRowNameDataSet[,colNames$colOfXaxis], name=buildRowNameDataSet[,colNames$colName], plot=plot))			
+				} else {
+					temp <- rbind(temp,data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[,colNameWichMustBind])), primaerTreatment=buildRowNameDataSet[,"primaerTreatment"], values=buildRowNameDataSet[,colNameWichMustBind], xAxis=buildRowNameDataSet[,colNames$colOfXaxis], name=buildRowNameDataSet[,colNames$colName], plot = plot))			
+				}
 			}
 		}
 		overallResult <- temp		
@@ -922,7 +925,11 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 			colNames <- c("value")
 		} 
 		
-		standardColumnName <- c("name", "primaerTreatment", "xAxis")
+		if("primaerTreatment" %in% tempOverallResult) {
+			standardColumnName <- c("name", "primaerTreatment", "xAxis")
+		} else {
+			standardColumnName <- c("name", "xAxis")
+		}
 		
 		workingDataSet <- buildDataSet(tempOverallResult[,standardColumnName], tempOverallResult, colNames, imagesIndex)
 		colnames(workingDataSet) <- c(standardColumnName, colNames)
@@ -942,12 +949,13 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 #########################
 	
 	overallList$debug %debug% "makeLinearDiagram()"	
+	print("... nBoxplot")
 	
 	tempOverallResult <-  overallResult
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		if(!is.na(overallDescriptor[[imagesIndex]])) {
-			print(paste("... images",imagesIndex))
+			print(paste("... image",imagesIndex))
 			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "nboxplot")
 			
 			if(!CheckIfOneColumnHasOnlyValues(overallResult)) {	
@@ -1043,63 +1051,72 @@ getColor <- function(overallColorIndex, overallResult) {
 
 plotStackedImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, minor_breaks=TRUE, overallColor, overallDesName, imagesIndex, overallSaveName) {
 	overallList$debug %debug% "plotStackedImage()"	
+		
 	if(length(overallResult[,1]) > 0) {
 
-		plot <- ggplot(overallResult, aes(xAxis, values, fill=hist)) + 
-				geom_bar(stat="identity", position = "fill") +
-			 	ylab(overallDesName[[imagesIndex]]) 
-				#coord_cartesian(ylim=c(0,1)) +
-			
-		if(minor_breaks) {
-			plot <- plot + scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(overallResult$xAxis):max(overallResult$xAxis))
-		} else {
-			plot <- plot + xlab(overallList$xAxisName)
+		if(length(overallList$stackedBarOptions$typOfGeomBar) == 0) {
+			overallList$stackedBarOptions$typOfGeomBar <- c("fill")
 		}
+		
+		for(positionTyp in overallList$stackedBarOptions$typOfGeomBar) {
+		
+		
+			plot <- ggplot(overallResult, aes(xAxis, values, fill=hist)) + 
+					geom_bar(stat="identity", position = positionTyp) +
+				 	ylab(overallDesName[[imagesIndex]]) 
+					#coord_cartesian(ylim=c(0,1)) +
 				
-		plot <- plot +		
-				scale_fill_manual(values = getColor(overallColor[[imagesIndex]], overallResult), name="") +
-				theme_bw() +
-				opts(axis.title.x = theme_text(face="bold", size=11),
-						axis.title.y = theme_text(face="bold", size=11, angle=90),
-						plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"),
-						#panel.background = theme_rect(linetype = "dotted"),
-						panel.border = theme_rect(colour="Grey", size=0.1),
-						strip.background = theme_rect(colour=NA)
-#						plot.title = theme_text(size=10),
-#						plot.title = theme_rect(colour="Pink", size=0.1),
-				) 
-		
-		if(!legende) {
-			plot <- plot + opts(legend.position="none")
-		} else {
-			plot <- plot + opts(legend.position="right", 
-								legend.title = theme_blank(),
-								legend.text = theme_text(size=11),
-								legend.key = theme_blank())
-		}
-		
-		if(title != "") {
-			plot <- plot + opts(title = title)
-		}
-		
-		if(!minor_breaks) {
-			plot <- plot + opts(panel.grid.minor = theme_blank())
-		}
-		
-		if(makeOverallImage) {
-			#plot <- plot + facet_wrap(~ name, drop=TRUE)
-			plot <- plot + facet_wrap(~ name)
-		}
-		
-		if (h==1) {
-			saveImageFile(overallList, plot, overallSaveName[[imagesIndex]], paste("overall", title, sep=""))
-			if(makeOverallImage) {
-				writeLatexFile(paste(overallSaveName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallSaveName[[imagesIndex]],"overall",title, sep=""))	
+			if(minor_breaks) {
+				plot <- plot + scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(overallResult$xAxis):max(overallResult$xAxis))
 			} else {
-				writeLatexFile(overallSaveName[[imagesIndex]], paste(overallSaveName[[imagesIndex]],"overall",title, sep=""))	
+				plot <- plot + xlab(overallList$xAxisName)
 			}
-		} else {
-			print(plot)
+					
+			plot <- plot +		
+					scale_fill_manual(values = getColor(overallColor[[imagesIndex]], overallResult), name="") +
+					theme_bw() +
+					opts(axis.title.x = theme_text(face="bold", size=11),
+							axis.title.y = theme_text(face="bold", size=11, angle=90),
+							plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"),
+							#panel.background = theme_rect(linetype = "dotted"),
+							panel.border = theme_rect(colour="Grey", size=0.1),
+							strip.background = theme_rect(colour=NA)
+	#						plot.title = theme_text(size=10),
+	#						plot.title = theme_rect(colour="Pink", size=0.1),
+					) 
+			
+			if(!legende) {
+				plot <- plot + opts(legend.position="none")
+			} else {
+				plot <- plot + opts(legend.position="right", 
+									legend.title = theme_blank(),
+									legend.text = theme_text(size=11),
+									legend.key = theme_blank())
+			}
+			
+			if(title != "") {
+				plot <- plot + opts(title = title)
+			}
+			
+			if(!minor_breaks) {
+				plot <- plot + opts(panel.grid.minor = theme_blank())
+			}
+			
+			if(makeOverallImage) {
+				#plot <- plot + facet_wrap(~ name, drop=TRUE)
+				plot <- plot + facet_wrap(~ name)
+			}
+			
+			if (h==1) {
+				saveImageFile(overallList, plot, overallSaveName[[imagesIndex]], paste("overall", title, positionTyp, sep=""))
+				if(makeOverallImage) {
+					writeLatexFile(paste(overallSaveName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallSaveName[[imagesIndex]],"overall",title, positionTyp, sep=""))	
+				} else {
+					writeLatexFile(overallSaveName[[imagesIndex]], paste(overallSaveName[[imagesIndex]],"overall",title,positionTyp, sep=""))	
+				}
+			} else {
+				print(plot)
+			}
 		}
 	}
 }
@@ -1150,11 +1167,12 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 	
 	
 	overallList$debug %debug% "makeBoxplotStackedDiagram()"
+	print("... stacked Bockplot")
 	overallResult[is.na(overallResult)] <- 0
 	tempOverallResult <- overallResult
 	
 	for(imagesIndex in names(overallDescriptor)) {
-		
+		print(paste("... image",imagesIndex))
 		overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplotstacked")
 	
 		PreWorkForMakeBigOverallImage(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, imagesIndex)
@@ -1237,11 +1255,13 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 	
 	overallList$debug %debug% "makeBoxplotDiagram()"
 	#overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
-
+	print("... Boxplot")
+	
 	tempOverallResult <-  overallResult
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		if(!is.na(overallDescriptor[[imagesIndex]])) {
+			print(paste("... image",imagesIndex))
 			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
 			
 			
@@ -1266,8 +1286,8 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 				myPlot <- myPlot + opts(axis.text.x = theme_text(size=6, angle=90))
 			}	
 			
-	#		print(myPlot)
-			
+		#	print(myPlot)
+
 			if (h==1) {
 				saveImageFile(overallList, myPlot, overallSaveName[[imagesIndex]], "boxplot")
 			} else {
@@ -1463,9 +1483,11 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 							"relative projected side area (%)", "relative plant height (%)", "relative plant width (%)", "relative projected top area (%)", "relative projected side area (%)", "relative volume (IAP based formular - RGB) (%)",
 							"height (px)", "width (px)", "side area (px)", "top area (px)")		
 				}
-				#diagramTypVector <- rep.int("nboxplot", times=length(descriptorSetName))
 	
-				
+				nBoxOptions= NULL
+				#diagramTypVector <- rep.int("nboxplot", times=length(descriptorSetName))
+		
+		
 				#boxplot
 				descriptorSet_boxplot <- c("side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
 						"volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
@@ -1475,6 +1497,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 						"volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
 						"height (px)", "width (px)", "side area (px)", "top area (px)")	
 				
+				boxOptions= NULL
 				#diagramTypVectorBox <- rep.int("boxplot", times=length(descriptorSetBox))
 				
 				#descriptorSet <- c(descriptorSet, descriptorSetBox)
@@ -1512,6 +1535,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 													  "red top fluorescence histogram (%)", "yellow top fluorescence histogram (%)","fluo top ratio histogramm (%)",
 													  "NIR top (%)", "NIR top phenol histogram (%)","NIR top ratio histogramm (%)",
 													  "VIS HUE top ratio histogramm (%)")
+											  
+				stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
 				#diagramTypVector <- c(diagramTypVector, "boxplotStacked", "boxplotStacked")
 				
 				appendix <- appendix %exists% args[3]
@@ -1588,7 +1613,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 		#descriptorSetName <- colnames(workingDataSet)
 		
 		#treatment <- "none"
-		treatment <- "Treatment"
+		treatment <- "Genotype"
+		#treatment <- "Treatment"
 		#treatment <- "Condition"
 		#filterTreatment <- "dry$normal$wet"
 		#filterTreatment <- "dry$normal"
@@ -1597,8 +1623,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 		filterTreatment <- "none"
 		##filterTreatment <- "Deutschland$Spanien$Italien$China"
 		
-		secondTreatment <- "Genotype"
-		#secondTreatment <- "none"
+		#secondTreatment <- "Genotype"
+		secondTreatment <- "none"
 		#secondTreatment <- "Species"
 		#secondTreatment <- "Variety"
 		filterSecondTreatment <- "none"
@@ -1648,7 +1674,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 
 		#descriptorSet <- c("side.area.norm (mm^2)")
 		#descriptorSetName <- c("Das ist ein Testname")
-		if(FALSE) {
+		if(TRUE) {
 			
 			descriptorSet_nBoxplot <- c("Weight A (g)","Weight B (g)","Water (weight-diff)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
 					"side.fluo.intensity.chlorophyl.average (relative)","side.fluo.intensity.phenol.average (relative)",
@@ -1664,18 +1690,61 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 					"volume based water use efficiency", "weighted loss through drought stress (side)", "weighted loss through drought stress (top)", "Average wetness of side image", "Average wetness of top image",
 					"relative projected side area (%)", "relative plant height (%)", "relative plant width (%)", "relative projected top area (%)", "relative projected side area (%)", "relative volume (IAP based formular - RGB) (%)",
 					"height (px)", "width (px)", "side area (px)", "top area (px)")		
-			
-			descriptorSet_boxplot <- c("side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
-					"volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
-					"side.height (mm)","side.width (mm)","side.area (px)", "top.area (px)")
-			
-			descriptorSetName_boxplot <- c("normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
-					"volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
-					"height (px)", "width (px)", "side area (px)", "top area (px)")	
-			
-			descriptorSet_boxplotStacked <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
-					"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255")
-			descriptorSetName_boxplotStacked <- c("NIR side (%)", "red side fluorescence histogram (%)")
+		
+		nBoxOptions= NULL
+		#diagramTypVector <- rep.int("nboxplot", times=length(descriptorSetName))
+		
+		
+		#boxplot
+		descriptorSet_boxplot <- c("side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
+				"volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
+				"side.height (mm)","side.width (mm)","side.area (px)", "top.area (px)")
+		
+		descriptorSetName_boxplot <- c("normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
+				"volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
+				"height (px)", "width (px)", "side area (px)", "top area (px)")	
+		
+		boxOptions= NULL
+		#diagramTypVectorBox <- rep.int("boxplot", times=length(descriptorSetBox))
+		
+		#descriptorSet <- c(descriptorSet, descriptorSetBox)
+		#descriptorSetName <- c(descriptorSetName, descriptorSetNameBox)
+		#diagramTypVector <- c(diagramTypVector, diagramTypVectorBox)
+		
+		#boxplotStacked
+		descriptorSet_boxplotStacked <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
+				"side.fluo.histogram.bin.1.0_25$side.fluo.histogram.bin.2.25_51$side.fluo.histogram.bin.3.51_76$side.fluo.histogram.bin.4.76_102$side.fluo.histogram.bin.5.102_127$side.fluo.histogram.bin.6.127_153$side.fluo.histogram.bin.7.153_178$side.fluo.histogram.bin.8.178_204$side.fluo.histogram.bin.9.204_229$side.fluo.histogram.bin.10.229_255",
+				"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
+				"side.fluo.histogram.phenol.bin.1.0_25$side.fluo.histogram.phenol.bin.2.25_51$side.fluo.histogram.phenol.bin.3.51_76$side.fluo.histogram.phenol.bin.4.76_102$side.fluo.histogram.phenol.bin.5.102_127$side.fluo.histogram.phenol.bin.6.127_153$side.fluo.histogram.phenol.bin.7.153_178$side.fluo.histogram.phenol.bin.8.178_204$side.fluo.histogram.phenol.bin.9.204_229$side.fluo.histogram.phenol.bin.10.229_255",
+				"side.fluo.histogram.ratio.bin.1.0_25$side.fluo.histogram.ratio.bin.2.25_51$side.fluo.histogram.ratio.bin.3.51_76$side.fluo.histogram.ratio.bin.4.76_102$side.fluo.histogram.ratio.bin.5.102_127$side.fluo.histogram.ratio.bin.6.127_153$side.fluo.histogram.ratio.bin.7.153_178$side.fluo.histogram.ratio.bin.8.178_204$side.fluo.histogram.ratio.bin.9.204_229$side.fluo.histogram.ratio.bin.10.229_255",
+				"side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
+				"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255",
+				"side.fluo.normalized.histogram.phenol.bin.1.0_25$side.fluo.normalized.histogram.phenol.bin.2.25_51$side.fluo.normalized.histogram.phenol.bin.3.51_76$side.fluo.normalized.histogram.phenol.bin.4.76_102$side.fluo.normalized.histogram.phenol.bin.5.102_127$side.fluo.normalized.histogram.phenol.bin.6.127_153$side.fluo.normalized.histogram.phenol.bin.7.153_178$side.fluo.normalized.histogram.phenol.bin.8.178_204$side.fluo.normalized.histogram.phenol.bin.9.204_229$side.fluo.normalized.histogram.phenol.bin.10.229_255",
+				"side.fluo.normalized.histogram.ratio.bin.1.0_25$side.fluo.normalized.histogram.ratio.bin.2.25_51$side.fluo.normalized.histogram.ratio.bin.3.51_76$side.fluo.normalized.histogram.ratio.bin.4.76_102$side.fluo.normalized.histogram.ratio.bin.5.102_127$side.fluo.normalized.histogram.ratio.bin.6.127_153$side.fluo.normalized.histogram.ratio.bin.7.153_178$side.fluo.normalized.histogram.ratio.bin.8.178_204$side.fluo.normalized.histogram.ratio.bin.9.204_229$side.fluo.normalized.histogram.ratio.bin.10.229_255",
+				"side.nir.histogram.phenol.bin.1.0_25$side.nir.histogram.phenol.bin.2.25_51$side.nir.histogram.phenol.bin.3.51_76$side.nir.histogram.phenol.bin.4.76_102$side.nir.histogram.phenol.bin.5.102_127$side.nir.histogram.phenol.bin.6.127_153$side.nir.histogram.phenol.bin.7.153_178$side.nir.histogram.phenol.bin.8.178_204$side.nir.histogram.phenol.bin.9.204_229$side.nir.histogram.phenol.bin.10.229_255",
+				"side.nir.histogram.ratio.bin.1.0_25$side.nir.histogram.ratio.nir.2.25_51$side.nir.histogram.ratio.bin.3.51_76$side.nir.histogram.ratio.bin.4.76_102$side.nir.histogram.ratio.bin.5.102_127$side.nir.histogram.ratio.bin.6.127_153$side.nir.histogram.ratio.bin.7.153_178$side.nir.histogram.ratio.bin.8.178_204$side.nir.histogram.ratio.bin.9.204_229$side.nir.histogram.ratio.bin.10.229_255",
+				"side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.nir.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
+				"side.vis.normalized.histogram.ratio.bin.1.0_25$side.vis.normalized.histogram.ratio.bin.2.25_51$side.vis.normalized.histogram.ratio.bin.3.51_76$side.vis.normalized.histogram.ratio.bin.4.76_102$side.vis.normalized.histogram.ratio.bin.5.102_127$side.vis.normalized.histogram.ratio.bin.6.127_153$side.vis.normalized.histogram.ratio.bin.7.153_178$side.vis.normalized.histogram.ratio.bin.8.178_204$side.vis.normalized.histogram.ratio.bin.9.204_229$side.vis.normalized.histogram.ratio.bin.10.229_255",
+				"top.fluo.histogram.bin.1.0_25$top.fluo.histogram.bin.2.25_51$top.fluo.histogram.bin.3.51_76$top.fluo.histogram.bin.4.76_102$top.fluo.histogram.bin.5.102_127$top.fluo.histogram.bin.6.127_153$top.fluo.histogram.bin.7.153_178$top.fluo.histogram.bin.8.178_204$top.fluo.histogram.bin.9.204_229$top.fluo.histogram.bin.10.229_255",
+				"top.fluo.histogram.phenol.bin.1.0_25$top.fluo.histogram.phenol.bin.2.25_51$top.fluo.histogram.phenol.bin.3.51_76$top.fluo.histogram.phenol.bin.4.76_102$top.fluo.histogram.phenol.bin.5.102_127$top.fluo.histogram.phenol.bin.6.127_153$top.fluo.histogram.phenol.bin.7.153_178$top.fluo.histogram.phenol.bin.8.178_204$top.fluo.histogram.phenol.bin.9.204_229$top.fluo.histogram.phenol.bin.10.229_255",
+				"top.fluo.histogram.ratio.bin.1.0_25$top.fluo.histogram.ratio.bin.2.25_51$top.fluo.histogram.ratio.bin.3.51_76$top.fluo.histogram.ratio.bin.4.76_102$top.fluo.histogram.ratio.bin.5.102_127$top.fluo.histogram.ratio.bin.6.127_153$top.fluo.histogram.ratio.bin.7.153_178$top.fluo.histogram.ratio.bin.8.178_204$top.fluo.histogram.ratio.bin.9.204_229$top.fluo.histogram.ratio.bin.10.229_255",
+				"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
+				"top.nir.histogram.phenol.bin.1.0_25$top.nir.histogram.phenol.bin.2.25_51$top.nir.histogram.phenol.bin.3.51_76$top.nir.histogram.phenol.bin.4.76_102$top.nir.histogram.phenol.bin.5.102_127$top.nir.histogram.phenol.bin.6.127_153$top.nir.histogram.phenol.bin.7.153_178$top.nir.histogram.phenol.bin.8.178_204$top.nir.histogram.phenol.bin.9.204_229$top.nir.histogram.phenol.bin.10.229_255",
+				"top.nir.histogram.ratio.bin.1.0_25$top.nir.histogram.ratio.bin.2.25_51$top.nir.histogram.ratio.bin.3.51_76$top.nir.histogram.ratio.bin.4.76_102$top.nir.histogram.ratio.bin.5.102_127$top.nir.histogram.ratio.bin.6.127_153$top.nir.histogram.ratio.bin.7.153_178$top.nir.histogram.ratio.bin.8.178_204$top.nir.histogram.ratio.bin.9.204_229$top.nir.histogram.ratio.bin.10.229_255",
+				"top.vis.hue.histogram.ratio.bin.1.0_25$top.vis.hue.histogram.ratio.nir.2.25_51$top.vis.hue.histogram.ratio.bin.3.51_76$top.vis.hue.histogram.ratio.bin.4.76_102$top.vis.hue.histogram.ratio.bin.5.102_127$top.vis.hue.histogram.ratio.bin.6.127_153$top.vis.hue.histogram.ratio.bin.7.153_178$top.vis.hue.histogram.ratio.bin.8.178_204$top.vis.hue.histogram.ratio.bin.9.204_229$top.vis.hue.histogram.ratio.bin.10.229_255")
+		
+		
+		
+		
+		descriptorSetName_boxplotStacked <- c("NIR side (%)", "red side fluorescence histogram (%)", "NIR top (%)", "yellow side fluorescence histogram (%)", "fluo side ratio histogramm (%)",
+				"NIR side normalized (%)", "red side normalized fluo histogramm (%)", "yellow side normalized fluo histogramm (%)", "fluo side normalized ratio histogramm (%)",
+				"NIR side phenol (%)", "NIR side ratio histogramm (%)", "VIS HUE side ratio histogramm (%)", "VIS side normalized ratio histogramm (%)",
+				"red top fluorescence histogram (%)", "yellow top fluorescence histogram (%)","fluo top ratio histogramm (%)",
+				"NIR top (%)", "NIR top phenol histogram (%)","NIR top ratio histogramm (%)",
+				"VIS HUE top ratio histogramm (%)")
+		
+		stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
+		#diagramTypVector <- c(diagramTypVector, "boxplotStacked", "boxplotStacked")
 		} else {
 
 			descriptorSet_nBoxplot <- c("side.area.norm (mm^2)", "Weight A (g)","side.height.norm (mm)")
@@ -1693,6 +1762,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 			
 			descriptorSetName_boxplotStacked <- c("red fluorescence histogram (%)", "NIR absorption class (%)", "NIR Top")
 		
+			
+			nBoxOptions= NULL
+			boxOptions= NULL
+			stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
 		}	
 	
 		
@@ -1737,6 +1810,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 					valuesAsDiagram(iniDataSet = workingDataSet, saveFormat = saveFormat, dpi = dpi, isGray = isGray,
 									nBoxDes = descriptorSet_nBoxplot, boxDes = descriptorSet_boxplot, boxStackDes = descriptorSet_boxplotStacked,
 									nBoxDesName = descriptorSetName_nBoxplot, boxDesName = descriptorSetName_boxplot, boxStackDesName = descriptorSetName_boxplotStacked,
+									nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, 
 									treatment = treatment, filterTreatment = filterTreatment, 
 									secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
 									showResultInR = showResultInR, xAxisName = xAxisName, debug = debug, appendix=appendix)
@@ -1772,6 +1846,7 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 		nBoxDes = NULL, boxDes = NULL, boxStackDes = NULL,
 		#saveName_nBoxDes = NULL, saveName_boxDes = NULL, saveName_boxStackDes = NULL,
 		nBoxDesName = NULL, boxDesName = NULL, boxStackDesName = NULL,
+		nBoxOptions= NULL, boxOptions= NULL, stackedBarOptions = NULL, 
 		treatment="Treatment", filterTreatment="none",
 		secondTreatment="none", filterSecondTreatment="none", filterXaxis="none", xAxis="Day (Int)",
 		showResultInR=FALSE, xAxisName="none", debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE) {		
@@ -1780,6 +1855,7 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 						nBoxDes = nBoxDes, boxDes = boxDes, boxStackDes = boxStackDes,
 						saveName_nBoxDes = nBoxDes, saveName_boxDes = boxDes, saveName_boxStackDes = boxStackDes,
 						nBoxDesName = nBoxDesName, boxDesName = boxDesName, boxStackDesName = boxStackDesName,
+						nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, 
 						treatment=treatment, filterTreatment=filterTreatment,
 						secondTreatment=secondTreatment, filterSecondTreatment=filterSecondTreatment, filterXaxis=filterXaxis, xAxis=xAxis,
 						showResultInR=showResultInR, xAxisName=xAxisName, debug=debug, 
@@ -1828,7 +1904,7 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 			overallList <- setDefaultAxisNames(overallList)	
 			overallList <- overallGetResultDataFrame(overallList)
 			if(!overallList$stoppTheCalculation) {
-				overallList$color <- setColor(overallList) 
+				overallList <- setColor(overallList) 
 				makeDiagrams(overallList)
 			}
 		}
