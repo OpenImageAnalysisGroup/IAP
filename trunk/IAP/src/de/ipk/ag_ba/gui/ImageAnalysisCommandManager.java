@@ -8,6 +8,7 @@ package de.ipk.ag_ba.gui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeSet;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionCopyToMongo;
@@ -28,6 +29,9 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
  * @author klukas
@@ -60,9 +64,49 @@ public class ImageAnalysisCommandManager {
 			
 			private NavigationButton src;
 			
+			TreeSet<String> cs = new TreeSet<String>();
+			TreeSet<String> ss = new TreeSet<String>();
+			TreeSet<String> gs = new TreeSet<String>();
+			TreeSet<String> vs = new TreeSet<String>();
+			TreeSet<String> ts = new TreeSet<String>();
+			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) throws Exception {
 				this.src = src;
+				
+				ExperimentInterface e = experimentReference.getData(m, false);
+				for (SubstanceInterface si : e) {
+					for (ConditionInterface ci : si) {
+						String condition = ci.getConditionName();
+						String species = ci.getSpecies();
+						String genotype = ci.getGenotype();
+						String variety = ci.getVariety();
+						String treatment = ci.getTreatment();
+						
+						if (condition != null)
+							cs.add(condition);
+						if (species != null)
+							ss.add(species);
+						if (genotype != null)
+							gs.add(genotype);
+						if (variety != null)
+							vs.add(variety);
+						if (treatment != null)
+							ts.add(treatment);
+					}
+				}
+				
+			}
+			
+			@Override
+			public MainPanelComponent getResultMainPanel() {
+				ArrayList<String> htmlTextPanels = new ArrayList<String>();
+				// htmlTextPanels.add(getList("Conditions", cs));
+				htmlTextPanels.add(getList("Species", ss));
+				htmlTextPanels.add(getList("Genotypes", gs));
+				htmlTextPanels.add(getList("Varieties", vs));
+				htmlTextPanels.add(getList("Treatments", ts));
+				return new MainPanelComponent(htmlTextPanels);
 			}
 			
 			@Override
@@ -74,7 +118,7 @@ public class ImageAnalysisCommandManager {
 			
 			@Override
 			public String getDefaultTitle() {
-				return "Report Files";
+				return "Data Report";
 			}
 			
 			@Override
@@ -176,5 +220,17 @@ public class ImageAnalysisCommandManager {
 		}
 		
 		return actions;
+	}
+	
+	protected static String getList(String heading, TreeSet<String> cs) {
+		StringBuilder res = new StringBuilder();
+		res.append(heading + "<ul>");
+		if (cs.size() == 0)
+			res.append("<li>[NOT SPECIFIED]");
+		else
+			for (String c : cs)
+				res.append("<li>" + c);
+		res.append("</ul>");
+		return res.toString();
 	}
 }

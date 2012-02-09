@@ -77,6 +77,7 @@ public class NavigationButton implements StyleAware {
 	private final GUIsetting guiSetting;
 	private String optStaticIconId;
 	private String overrideTitle;
+	private boolean iconUpdated;
 	
 	public NavigationButton(String overrideTitle, NavigationAction navigationAction, GUIsetting guiSetting) {
 		this(navigationAction, guiSetting);
@@ -93,8 +94,8 @@ public class NavigationButton implements StyleAware {
 						new NavigationButton(ra, guiSetting));
 			}
 			this.setTitle(navigationAction.getDefaultTitle());
-			this.navigationImage = navigationAction.getDefaultNavigationImage();
-			this.actionImage = navigationAction.getDefaultImage();
+			this.navigationImage = null;
+			this.actionImage = null;
 		}
 		// if (guiSetting == null)
 		// System.out.println("ERROR: GUI-SETTING VARIABLE NOT ASSIGNED (INTERNAL ERROR)");
@@ -137,11 +138,23 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public String getNavigationImage() {
-		return navigationImage;
+		if (navigationImage != null)
+			return navigationImage;
+		else
+			if (action != null)
+				return action.getDefaultNavigationImage();
+			else
+				return null;
 	}
 	
 	public String getActionImage() {
-		return actionImage;
+		if (actionImage != null)
+			return actionImage;
+		else
+			if (action != null)
+				return action.getDefaultImage();
+			else
+				return null;
 	}
 	
 	public String getTitle() {
@@ -149,8 +162,9 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public String getTitle(boolean forceProgressText) {
-		if (action != null && action.getDefaultTitle() != null && action.getDefaultTitle().length() > 0)
-			title = action.getDefaultTitle();
+		String adt = action != null ? action.getDefaultTitle() : null;
+		if (action != null && adt != null && adt.length() > 0)
+			title = adt;
 		
 		if (overrideTitle != null)
 			title = overrideTitle;
@@ -174,12 +188,12 @@ public class NavigationButton implements StyleAware {
 			
 			if (requestsTitleUpdates()) {
 				if (ndots < 2)
-					cc = "&nbsp;";
+					cc = "";
 				else
-					cc = "&nbsp;";
+					cc = "";
 			}
 			
-			while (dots.length() < 1)
+			while (dots.length() < 1 && cc.length() > 0)
 				dots += cc;
 			
 			String progress = "";
@@ -194,7 +208,7 @@ public class NavigationButton implements StyleAware {
 				
 				s = "<br>";
 				int len = (dots + " " + title + progress).length();
-				s += "<code>[" + getProgress("#", "-", len + 5, dp) + "]</code>";
+				s += "[" + getProgress("#", "-", len + 5, dp) + "]";
 			}
 			String line2 = "";
 			String sm1 = "", sm2 = "", sm3 = "";
@@ -221,12 +235,12 @@ public class NavigationButton implements StyleAware {
 			}
 			if (line2.length() > 0)
 				line2 = "<br>&nbsp;" + line2 + "&nbsp;";
-			dots = "<code>" + dots + "</code>";
+			dots = "" + dots + "";
 			if (dp < -1.01) {
 				System.out.println("Command " + title + " has lost its connection to the status provider.");
-				return "<html><small><b><center>" + dots + " " + "[REMOVE FROM UPDATE] " + title + progress + " " + dots + "" + s + line2;
+				return "<html><center>" + dots + " " + "[REMOVE FROM UPDATE] " + title + progress + " " + dots + "" + s + line2;
 			} else
-				return "<html><small><b><center>" + dots + " " + title + progress + " " + dots + "" + s + line2;
+				return "<html><center>" + dots + " " + title + progress + " " + dots + "" + s + line2;
 		}
 	}
 	
@@ -286,8 +300,13 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public void setIcon(ImageIcon i, String optStaticIconId) {
+		iconUpdated = i != icon;
 		this.icon = i;
 		this.optStaticIconId = optStaticIconId;
+	}
+	
+	public boolean isIconUpdated() {
+		return iconUpdated;
 	}
 	
 	public ImageIcon getIcon() {
@@ -332,14 +351,25 @@ public class NavigationButton implements StyleAware {
 		// empty, override if needed
 	}
 	
-	public static void checkButtonTitle(final NavigationButton n, final JButton n1) {
+	public static void checkButtonTitle(final NavigationButton n, final JButton n1,
+			final Runnable iconUpdateCheck) {
 		if (n1 == null)
 			return;
 		final ObjectRef rr = new ObjectRef();
 		Runnable r = new Runnable() {
+			String lastImage = null;
+			
 			@Override
 			public void run() {
 				if ((n.isProcessing() || n.requestsTitleUpdates()) && n1.isVisible()) {
+					String ai = n.getNavigationImage();
+					if (lastImage == null)
+						lastImage = ai;
+					if (ai != null && !ai.equals(lastImage)) {
+						lastImage = ai;
+						if (iconUpdateCheck != null)
+							iconUpdateCheck.run();
+					}
 					n1.setText(n.getTitle());
 					// System.out.println(n.getTitle());
 					if (n1.getText().indexOf("Please wait") >= 0)
@@ -357,7 +387,9 @@ public class NavigationButton implements StyleAware {
 		r.run();
 	}
 	
-	public static void checkButtonTitle(final WeakReference<NavigationButton> wn, final WeakReference<JButton> wn1) {
+	public static void checkButtonTitle(
+			final WeakReference<NavigationButton> wn,
+			final WeakReference<JButton> wn1) {
 		if (wn1 == null || wn == null)
 			return;
 		final ObjectRef rr = new ObjectRef();
@@ -412,7 +444,7 @@ public class NavigationButton implements StyleAware {
 			
 			srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(-1);
 			srcNavGraphicslEntity.setProcessing(true);
-			NavigationButton.checkButtonTitle(srcNavGraphicslEntity, n1);
+			NavigationButton.checkButtonTitle(srcNavGraphicslEntity, n1, null);
 			MyUtility.navigate(navPanel.getEntitySet(false), srcNavGraphicslEntity.getTitle());
 			final NavigationAction na = srcNavGraphicslEntity.getAction();
 			
@@ -594,6 +626,8 @@ public class NavigationButton implements StyleAware {
 			else
 				icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS);
 		}
+		if (icon != null)
+			icon.setDescription(imgS + "");
 		
 		final JButton n1 = new JButton("" + n.getTitle());
 		switch (style) {
@@ -669,8 +703,28 @@ public class NavigationButton implements StyleAware {
 		if (icon != null)
 			n1.setIcon(icon);
 		
+		final int imgSf = imgS;
+		
+		Runnable iconUpdateCheck = new Runnable() {
+			@Override
+			public void run() {
+				ImageIcon icon;
+				if (n.getIcon() != null) {
+					icon = new ImageIcon(GravistoService.getScaledImage(n.getIcon().getImage(), -imgSf, imgSf));
+				} else {
+					if (target == PanelTarget.NAVIGATION)
+						icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgSf, imgSf);
+					else
+						icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgSf, imgSf);
+				}
+				if (icon != null)
+					icon.setDescription(imgSf + "");
+				n1.setIcon(icon);
+			}
+		};
+		
 		if (n.isProcessing() || n.requestsTitleUpdates()) {
-			NavigationButton.checkButtonTitle(n, n1);
+			NavigationButton.checkButtonTitle(n, n1, iconUpdateCheck);
 		} else {
 			WeakReference<JButton> wn1 = new WeakReference<JButton>(n1);
 			WeakReference<NavigationButton> wn = new WeakReference<NavigationButton>(n);

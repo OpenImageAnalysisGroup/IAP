@@ -3,19 +3,23 @@ package de.ipk.ag_ba.commands;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 public class ActionToggle extends AbstractNavigationAction {
 	
-	private boolean enabled = true;
 	private final String setting;
+	private final ThreadSafeOptions option;
 	
-	public ActionToggle(String tooltip, String setting) {
+	public ActionToggle(String tooltip, String setting, ThreadSafeOptions option) {
 		super(tooltip);
 		this.setting = setting;
+		this.option = option;
 	}
 	
 	@Override
@@ -24,18 +28,29 @@ public class ActionToggle extends AbstractNavigationAction {
 	}
 	
 	@Override
+	public boolean getProvidesActions() {
+		return false;
+	}
+	
+	@Override
 	public String getDefaultTitle() {
-		return (enabled ? "Include " : "Exclude ") + setting;
+		if (SystemAnalysis.isHeadless())
+			return (option.getBval(0, true) ? "Include " : "Exclude ") + setting;
+		else
+			return setting;
 	}
 	
 	@Override
 	public NavigationImage getImageIcon() {
-		return super.getImageIcon();
+		if (option.getBval(0, true))
+			return IAPmain.loadIcon("img/ext/gpl2/gtce.png");
+		else
+			return IAPmain.loadIcon("img/ext/gpl2/gtcd.png");
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		if (enabled)
+		if (option.getBval(0, true))
 			return "img/ext/gpl2/gtce.png";
 		else
 			return "img/ext/gpl2/gtcd.png";
@@ -43,7 +58,7 @@ public class ActionToggle extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		enabled = !enabled;
+		option.setBval(0, !option.getBval(0, true));
 	}
 	
 	@Override

@@ -221,7 +221,7 @@ public class CloudTaskManager {
 					else
 						progressSum /= (nn);
 				} else {
-					System.out.println(SystemAnalysis.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysis.getCurrentTime());
+					// System.out.println(SystemAnalysis.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysis.getCurrentTime());
 				}
 				Thread.sleep(1000);
 				if (autoClose && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {

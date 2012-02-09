@@ -11,8 +11,8 @@ import java.util.TreeSet;
 
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -35,6 +35,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	private final boolean xlsx;
 	
 	private final ArrayList<NavigationButton> settings = new ArrayList<NavigationButton>();
+	private ArrayList<ThreadSafeOptions> toggles;
 	
 	public ActionNumericDataReportSetup(String tooltip, boolean exportIndividualAngles, String[] variant, boolean xlsx) {
 		super(tooltip);
@@ -59,10 +60,10 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportComplete(
 						m, experimentReference, false, new String[] {
-								variant[0], variant[1], "TRUE" }, false), src.getGUIsetting()));
+								variant[0], variant[1], "TRUE" }, false, toggles), src.getGUIsetting()));
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportComplete(m, experimentReference, false, new String[] {
-						variant[0], variant[1], "FALSE" }, false), src.getGUIsetting()));
+						variant[0], variant[1], "FALSE" }, false, toggles), src.getGUIsetting()));
 		
 		for (NavigationButton s : settings)
 			actions.add(s);
@@ -146,29 +147,83 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 			}
 		}
 		
+		this.toggles = new ArrayList<ThreadSafeOptions>();
+		
+		int idx = settings.size();
+		
 		for (String setting : variant) {
 			if (setting.equalsIgnoreCase("Condition"))
-				for (String c : cs)
-					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "condition " + c), src.getGUIsetting()));
+				for (String c : cs) {
+					ThreadSafeOptions tso = new ThreadSafeOptions();
+					tso.setParam(0, setting);
+					tso.setParam(1, c);
+					toggles.add(tso);
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
+				}
 			if (setting.equalsIgnoreCase("Species"))
-				for (String c : ss)
-					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "species " + c), src.getGUIsetting()));
+				for (String c : ss) {
+					ThreadSafeOptions tso = new ThreadSafeOptions();
+					tso.setParam(0, setting);
+					tso.setParam(1, c);
+					toggles.add(tso);
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
+				}
 			if (setting.equalsIgnoreCase("Genotype"))
-				for (String c : gs)
-					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "genotype " + c), src.getGUIsetting()));
+				for (String c : gs) {
+					ThreadSafeOptions tso = new ThreadSafeOptions();
+					tso.setParam(0, setting);
+					tso.setParam(1, c);
+					toggles.add(tso);
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
+				}
 			if (setting.equalsIgnoreCase("Variety"))
-				for (String c : vs)
-					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "variety " + c), src.getGUIsetting()));
+				for (String c : vs) {
+					ThreadSafeOptions tso = new ThreadSafeOptions();
+					tso.setParam(0, setting);
+					tso.setParam(1, c);
+					toggles.add(tso);
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
+				}
 			if (setting.equalsIgnoreCase("Treatment"))
-				for (String c : ts)
-					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "treatment " + c), src.getGUIsetting()));
+				for (String c : ts) {
+					ThreadSafeOptions tso = new ThreadSafeOptions();
+					tso.setParam(0, setting);
+					tso.setParam(1, c);
+					toggles.add(tso);
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
+				}
+			
+			if (toggles.size() > 0)
+				settings.add(idx, new NavigationButton(new AbstractNavigationAction("Toggle all settings") {
+					@Override
+					public void performActionCalculateResults(NavigationButton src) throws Exception {
+						for (ThreadSafeOptions tso : toggles) {
+							tso.setBval(0, !tso.getBval(0, true));
+						}
+					}
+					
+					@Override
+					public String getDefaultTitle() {
+						return "Toggle";
+					}
+					
+					@Override
+					public String getDefaultImage() {
+						return "img/ext/gpl2/gtcf.png";
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+						return null;
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewActionSet() {
+						return null;
+					}
+				}, src.getGUIsetting()));
+			
 		}
-		
-	}
-	
-	@Override
-	public MainPanelComponent getResultMainPanel() {
-		return null;
 	}
 	
 	@Override
@@ -202,5 +257,4 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	public void postProcessCommandLineExecutionDirectory() {
 		// empty
 	}
-	
 }
