@@ -2,7 +2,7 @@ package de.ipk.ag_ba.gui.navigation_actions.maize;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
+import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;

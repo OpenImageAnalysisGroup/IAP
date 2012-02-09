@@ -32,7 +32,7 @@ import org.Colors;
 import org.StringManipulationTools;
 import org.color.ColorUtil;
 
-import de.ipk.ag_ba.gui.actions.Calendar2;
+import de.ipk.ag_ba.commands.Calendar2;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**

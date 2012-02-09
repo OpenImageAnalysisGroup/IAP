@@ -24,10 +24,10 @@ import netscape.javascript.JSObject;
 import org.ErrorMsg;
 import org.ReleaseInfo;
 
+import de.ipk.ag_ba.commands.ActionIapHome;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
-import de.ipk.ag_ba.gui.actions.ActionIapHome;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;

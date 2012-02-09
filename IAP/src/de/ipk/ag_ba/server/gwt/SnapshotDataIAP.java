@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeMap;
 
-import de.ipk.ag_ba.gui.actions.DateDoubleString;
+import de.ipk.ag_ba.commands.DateDoubleString;
 
 public class SnapshotDataIAP {
 	private static final Double NO_ANGLE = -720d;

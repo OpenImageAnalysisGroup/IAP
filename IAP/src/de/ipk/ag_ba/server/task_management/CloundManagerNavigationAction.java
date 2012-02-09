@@ -10,12 +10,12 @@ import java.util.ArrayList;
 
 import org.ErrorMsg;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.ActionCloudClusterHostInformation;
+import de.ipk.ag_ba.commands.ActionCloudHostInformation;
+import de.ipk.ag_ba.commands.ActionJobStatus;
+import de.ipk.ag_ba.commands.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.actions.ActionCloudClusterHostInformation;
-import de.ipk.ag_ba.gui.actions.ActionCloudHostInformation;
-import de.ipk.ag_ba.gui.actions.ActionJobStatus;
-import de.ipk.ag_ba.gui.actions.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;

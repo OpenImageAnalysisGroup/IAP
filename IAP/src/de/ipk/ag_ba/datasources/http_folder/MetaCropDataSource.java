@@ -7,8 +7,8 @@
 
 package de.ipk.ag_ba.datasources.http_folder;
 
-import de.ipk.ag_ba.gui.actions.Book;
-import de.ipk.ag_ba.gui.actions.Library;
+import de.ipk.ag_ba.commands.Book;
+import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 /**

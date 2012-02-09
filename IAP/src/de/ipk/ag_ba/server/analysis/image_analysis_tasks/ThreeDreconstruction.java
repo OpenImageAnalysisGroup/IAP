@@ -13,7 +13,7 @@ import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
+import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.mongo.MongoDB;

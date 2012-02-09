@@ -11,8 +11,8 @@ import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
-import de.ipk.ag_ba.gui.actions.Book;
-import de.ipk.ag_ba.gui.actions.Library;
+import de.ipk.ag_ba.commands.Book;
+import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.WebFolder;
