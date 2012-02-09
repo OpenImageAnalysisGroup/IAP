@@ -33,13 +33,13 @@ import org.ProgressStatusService;
 import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 
+import de.ipk.ag_ba.commands.BookmarkAction;
+import de.ipk.ag_ba.commands.Calendar2;
+import de.ipk.ag_ba.commands.ParameterOptions;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
-import de.ipk.ag_ba.gui.actions.BookmarkAction;
-import de.ipk.ag_ba.gui.actions.Calendar2;
-import de.ipk.ag_ba.gui.actions.ParameterOptions;
 import de.ipk.ag_ba.gui.calendar.MyCalendarIcon;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;

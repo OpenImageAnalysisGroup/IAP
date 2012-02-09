@@ -7,9 +7,9 @@ import java.util.TreeSet;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 
+import de.ipk.ag_ba.commands.ParameterOptions;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.actions.ParameterOptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;

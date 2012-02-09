@@ -21,7 +21,7 @@ import javax.swing.ImageIcon;
 
 import org.graffiti.editor.GravistoService;
 
-import de.ipk.ag_ba.gui.actions.Calendar2;
+import de.ipk.ag_ba.commands.Calendar2;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 /**

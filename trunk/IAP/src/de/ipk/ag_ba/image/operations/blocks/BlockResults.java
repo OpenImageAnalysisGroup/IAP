@@ -10,7 +10,7 @@ import java.util.TreeMap;
 
 import org.StringManipulationTools;
 
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
+import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;

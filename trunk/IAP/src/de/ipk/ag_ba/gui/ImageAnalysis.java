@@ -35,8 +35,8 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.ipk.ag_ba.gui.actions.analysis.ActionPhytochamberAnalysis;
-import de.ipk.ag_ba.gui.actions.analysis.ActionPhytochamberBlueRubberAnalysis;
+import de.ipk.ag_ba.commands.analysis.ActionPhytochamberAnalysis;
+import de.ipk.ag_ba.commands.analysis.ActionPhytochamberBlueRubberAnalysis;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.BarleyAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.Maize3DanalysisAction;

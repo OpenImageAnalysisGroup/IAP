@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.Vector2d;
 
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
+import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;

@@ -3,9 +3,9 @@ package de.ipk.ag_ba.datasources.file_system;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.ipk.ag_ba.commands.Book;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
-import de.ipk.ag_ba.gui.actions.Book;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;

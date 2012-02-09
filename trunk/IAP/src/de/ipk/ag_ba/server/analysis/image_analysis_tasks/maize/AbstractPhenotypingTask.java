@@ -17,9 +17,9 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
+import de.ipk.ag_ba.commands.ImageConfiguration;
+import de.ipk.ag_ba.commands.ImagePreProcessor;
 import de.ipk.ag_ba.gui.IAPfeature;
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
-import de.ipk.ag_ba.gui.actions.ImagePreProcessor;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.gui.webstart.IAPmain;

@@ -7,8 +7,8 @@
 
 package de.ipk.ag_ba.server.analysis;
 
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
-import de.ipk.ag_ba.gui.actions.ImagePreProcessor;
+import de.ipk.ag_ba.commands.ImageConfiguration;
+import de.ipk.ag_ba.commands.ImagePreProcessor;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 /**

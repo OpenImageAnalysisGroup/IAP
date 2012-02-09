@@ -17,9 +17,9 @@ import java.util.TreeMap;
 
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.commands.ActionDomainLogout;
+import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
-import de.ipk.ag_ba.gui.actions.ActionDomainLogout;
-import de.ipk.ag_ba.gui.actions.Library;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.hsm.HsmResourceIoHandler;

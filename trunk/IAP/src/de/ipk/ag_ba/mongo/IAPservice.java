@@ -53,11 +53,11 @@ import org.graffiti.plugin.view.View;
 import org.graffiti.plugins.views.defaults.GraffitiView;
 import org.graffiti.session.EditorSession;
 
+import de.ipk.ag_ba.commands.AbstractGraphUrlNavigationAction;
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.actions.AbstractGraphUrlNavigationAction;
-import de.ipk.ag_ba.gui.actions.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.actions.ImageConfiguration;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
