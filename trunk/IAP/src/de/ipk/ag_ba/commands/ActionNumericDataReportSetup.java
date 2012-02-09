@@ -7,6 +7,7 @@
 package de.ipk.ag_ba.commands;
 
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -16,6 +17,9 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
  * @author klukas
@@ -29,6 +33,8 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	private final boolean exportIndividualAngles;
 	private final String[] variant;
 	private final boolean xlsx;
+	
+	private final ArrayList<NavigationButton> settings = new ArrayList<NavigationButton>();
 	
 	public ActionNumericDataReportSetup(String tooltip, boolean exportIndividualAngles, String[] variant, boolean xlsx) {
 		super(tooltip);
@@ -57,6 +63,10 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportComplete(m, experimentReference, false, new String[] {
 						variant[0], variant[1], "FALSE" }, false), src.getGUIsetting()));
+		
+		for (NavigationButton s : settings)
+			actions.add(s);
+		
 		return actions;
 	}
 	
@@ -105,6 +115,55 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
+		
+		settings.clear();
+		
+		TreeSet<String> cs = new TreeSet<String>();
+		TreeSet<String> ss = new TreeSet<String>();
+		TreeSet<String> gs = new TreeSet<String>();
+		TreeSet<String> vs = new TreeSet<String>();
+		TreeSet<String> ts = new TreeSet<String>();
+		
+		ExperimentInterface e = experimentReference.getData(m, false);
+		for (SubstanceInterface si : e) {
+			for (ConditionInterface ci : si) {
+				String condition = ci.getConditionName();
+				String species = ci.getSpecies();
+				String genotype = ci.getGenotype();
+				String variety = ci.getVariety();
+				String treatment = ci.getTreatment();
+				
+				if (condition != null)
+					cs.add(condition);
+				if (species != null)
+					ss.add(species);
+				if (genotype != null)
+					gs.add(genotype);
+				if (variety != null)
+					vs.add(variety);
+				if (treatment != null)
+					ts.add(treatment);
+			}
+		}
+		
+		for (String setting : variant) {
+			if (setting.equalsIgnoreCase("Condition"))
+				for (String c : cs)
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "condition " + c), src.getGUIsetting()));
+			if (setting.equalsIgnoreCase("Species"))
+				for (String c : ss)
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "species " + c), src.getGUIsetting()));
+			if (setting.equalsIgnoreCase("Genotype"))
+				for (String c : gs)
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "genotype " + c), src.getGUIsetting()));
+			if (setting.equalsIgnoreCase("Variety"))
+				for (String c : vs)
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "variety " + c), src.getGUIsetting()));
+			if (setting.equalsIgnoreCase("Treatment"))
+				for (String c : ts)
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", "treatment " + c), src.getGUIsetting()));
+		}
+		
 	}
 	
 	@Override
