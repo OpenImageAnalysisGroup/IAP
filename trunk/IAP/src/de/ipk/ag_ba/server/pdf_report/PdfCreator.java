@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.TreeMap;
 
 import org.AttributeHelper;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ObjectRef;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
@@ -63,7 +64,8 @@ public class PdfCreator {
 		return report;
 	}
 	
-	public void executeRstat(final String[] parameter, ExperimentInterface exp) throws IOException {
+	public void executeRstat(final String[] parameter, ExperimentInterface exp,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws IOException {
 		readAndModify("report2.tex", exp);
 		
 		String name = tempDirectory.getAbsolutePath() + File.separator + "diagramIAP.cmd";
@@ -97,12 +99,28 @@ public class PdfCreator {
 					String response;
 					while ((response = ls_in.readLine()) != null) {
 						output.put(System.nanoTime(), "INFO:  " + response);
+						if (optStatus != null && response != null && response.trim().length() > 0)
+							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
+						if (optStatus != null && response != null && response.trim().length() > 0)
+							optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": " + response);
 					}
 					while ((response = ls_in2.readLine()) != null) {
 						output.put(System.nanoTime(), "ERROR: " + response);
+						if (optStatus != null && response != null && response.trim().length() > 0)
+							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
+						if (optStatus != null && response != null && response.trim().length() > 0)
+							optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": ERROR: " + response);
 					}
+					if (optStatus != null)
+						optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
+					if (optStatus != null)
+						optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": Finished PDF creation");
 				} catch (IOException e) {
 					output.put(System.nanoTime(), "ERROR: EXCEPTION: " + e.getMessage());
+					if (optStatus != null)
+						optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
+					if (optStatus != null)
+						optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": ERROR: " + e.getMessage());
 					tso.setBval(1, true);
 				}
 				tso.setBval(0, true);
