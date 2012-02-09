@@ -23,6 +23,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -49,6 +50,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	private final boolean xlsx;
 	
 	private File targetDirectoryOrTargetFile = null;
+	private ArrayList<ThreadSafeOptions> toggles;
 	
 	public ActionNumericDataReportComplete(String tooltip, boolean exportIndividualAngles, String[] variant, boolean xlsx) {
 		super(tooltip);
@@ -57,7 +59,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles, String[] variant, boolean xlsx) {
+	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference,
+			boolean exportIndividualAngles, String[] variant, boolean xlsx,
+			ArrayList<ThreadSafeOptions> toggles) {
 		this("Create report" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
 						: " PDF (" + StringManipulationTools.getStringList(variant, ", ") + ")"),
@@ -65,6 +69,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				variant, xlsx);
 		this.m = m;
 		this.experimentReference = experimentReference;
+		this.toggles = toggles;
 	}
 	
 	@Override
@@ -81,16 +86,27 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	
 	@Override
 	public boolean requestTitleUpdates() {
-		return false;
+		return true;
 	}
 	
 	@Override
 	public String getDefaultTitle() {
+		String add = "";
+		boolean foundTrue = false;
+		if (toggles == null || toggles.size() == 0)
+			foundTrue = true;
+		else
+			for (ThreadSafeOptions tso : toggles) {
+				if (tso.getBval(0, true))
+					foundTrue = true;
+			}
+		if (!foundTrue)
+			add = "<br>[NO INPUT]";
 		if (exportIndividualAngles)
-			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table";
+			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table" + add;
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
-					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
+					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")") + add;
 		} else {
 			String filter = StringManipulationTools.getStringList(variant, ", ");
 			if (filter.endsWith(", TRUE"))
@@ -101,9 +117,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				filter = filter.substring(0, filter.length() - ", none".length());
 			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
 			if (variant[2].equals("TRUE"))
-				return "Create PDF with Appendix (all diagrams)";
+				return "Create PDF with Appendix (all diagrams)" + add;
 			else
-				return "Create short PDF";
+				return "Create short PDF" + add;
 		}
 	}
 	
