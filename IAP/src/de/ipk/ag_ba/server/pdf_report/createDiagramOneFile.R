@@ -912,6 +912,7 @@ reduceOverallResult <- function(tempOverallList, imagesIndex) {
 reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, debug, diagramTyp="nboxplot") {
 	debug %debug% "reduceWholeOverallResultToOneValue()"
 	
+	
 	if(diagramTyp == "boxplotstacked") {
 		
 		workingDataSet <- tempOverallResult[tempOverallResult$plot == imagesIndex,]
@@ -930,9 +931,12 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 		} else {
 			standardColumnName <- c("name", "xAxis")
 		}
-		
-		workingDataSet <- buildDataSet(tempOverallResult[,standardColumnName], tempOverallResult, colNames, imagesIndex)
-		colnames(workingDataSet) <- c(standardColumnName, colNames)
+		if(sum(!(colNames %in% colnames(tempOverallResult)))>0) {
+			workingDataSet <- buildDataSet(tempOverallResult[,standardColumnName], tempOverallResult, colNames, imagesIndex)
+			colnames(workingDataSet) <- c(standardColumnName, colNames)
+		} else {
+			workingDataSet <- tempOverallResult
+		}
 	}
 	return(workingDataSet)	
 }
@@ -946,6 +950,7 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 ##	debug = overallList$debug
 #	overallDescriptor = overallList$nBoxDes
 #	overallDesName = overallList$nBoxDesName
+#	overallSaveName = overallList$saveName_nBoxDes
 #########################
 	
 	overallList$debug %debug% "makeLinearDiagram()"	
@@ -1031,7 +1036,7 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 				day <- overallResult$xAxis[!is.na(overallResult$mean)][1]
 				overallList$xAxisName <- paste(overallList$xAxisName,day)
 				#overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
-				overallList <- makeBarDiagram(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, TRUE, diagramTypSave)
+				overallList <- makeBarDiagram(h, overallResult, overallDescriptor[imagesIndex], overallColor[imagesIndex], overallDesName[imagesIndex], overallSaveName[imagesIndex], overallList, TRUE, diagramTypSave)
 			}
 		}
 	}
@@ -1181,8 +1186,8 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 	#return(overallList)
 }	
 
-makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, isOnlyOneValue = FALSE, diagramTyp="barplot") {
-	########################		
+makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot") {
+###############################		
 #	h=h 
 #	overallResult = overallList$overallResult_nBoxDes
 #	overallColor=overallList$color_nBox
@@ -1190,7 +1195,17 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 #	overallDescriptor = overallList$nBoxDes
 #	overallDesName = overallList$nBoxDesName
 #	isOnlyOneValue = FALSE
-	#########################
+################################	
+#	h=h
+#	overallResult=overallResult
+#	overallDescriptor=overallDescriptor[imagesIndex]
+#	overallColor=overallColor[imagesIndex]
+#	overallDesName=overallDesName[imagesIndex]
+#	overallSaveName=overallSaveName[imagesIndex]
+#	overallList=overallList
+#	isOnlyOneValue=TRUE
+#	diagramTypSave="nboxplot"
+################################
 
 	overallList$debug %debug% "makeBarDiagram()"
 
@@ -1198,6 +1213,7 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		if(!is.na(overallDescriptor[[imagesIndex]])) {
+			
 			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "barplot")
 			overallResult <- overallResult[!is.na(overallResult$mean),]
 			
@@ -1227,15 +1243,15 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 			if(length(overallColor[[imagesIndex]]) > 10) {
 				myPlot <- myPlot + opts(axis.text.x = theme_text(size=6, angle=90))
 			}
-			print(myPlot)
+			#print(myPlot)
 			
 			if (h==1) {
-				saveImageFile(overallList, myPlot, overallSaveName[[imagesIndex]], diagramTyp)
+				saveImageFile(overallList, myPlot, overallSaveName[[imagesIndex]], diagramTypSave)
 			} else {
 				print(myPlot)
 			}
 			if(overallList$appendix) {
-				writeLatexFile("appendixImage", overallSaveName[[imagesIndex]], diagramTyp)
+				writeLatexFile("appendixImage", overallSaveName[[imagesIndex]], diagramTypSave)
 			}
 		}
 	}
@@ -1245,12 +1261,12 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 ##Problem: der median wird nicht angezeigt!
 makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, diagramTypSave="boxplot") {
 	########################		
-#	h=h 
-#	overallResult = overallList$overallResult_boxDes
-#	overallColor=overallList$color_box
-##	debug = overallList$debug
-#	overallDescriptor = overallList$boxDes
-#	overallDesName = overallList$boxDesName
+	h=h 
+	overallResult = overallList$overallResult_boxDes
+	overallColor=overallList$color_box
+#	debug = overallList$debug
+	overallDescriptor = overallList$boxDes
+	overallDesName = overallList$boxDesName
 	#########################
 	
 	overallList$debug %debug% "makeBoxplotDiagram()"
@@ -1270,7 +1286,7 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 					geom_boxplot() +
 					ylab(overallDesName[[imagesIndex]]) +
 					#coord_cartesian(ylim=c(0,max(overallList$overallResult$mean + overallList$overallResult$se + 10,na.rm=TRUE))) +
-					xlab(overallList$xAxisName) +
+					xlab(paste(min(overallResult$xAxis),overallList$xAxisName,"..",max(overallResult$xAxis), overallList$xAxisName)) +
 					scale_fill_manual(values = overallColor[[imagesIndex]]) +
 					#stat_summary(fun.data = f, geom = "crossbar", height = 0.1,	colour = NA, fill = "skyblue", width = 0.8, alpha = 0.5) +
 					theme_bw() +
@@ -1508,32 +1524,32 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 				descriptorSet_boxplotStacked <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
 								   				  "side.fluo.histogram.bin.1.0_25$side.fluo.histogram.bin.2.25_51$side.fluo.histogram.bin.3.51_76$side.fluo.histogram.bin.4.76_102$side.fluo.histogram.bin.5.102_127$side.fluo.histogram.bin.6.127_153$side.fluo.histogram.bin.7.153_178$side.fluo.histogram.bin.8.178_204$side.fluo.histogram.bin.9.204_229$side.fluo.histogram.bin.10.229_255",
 										  		  "top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
-												  "side.fluo.histogram.phenol.bin.1.0_25$side.fluo.histogram.phenol.bin.2.25_51$side.fluo.histogram.phenol.bin.3.51_76$side.fluo.histogram.phenol.bin.4.76_102$side.fluo.histogram.phenol.bin.5.102_127$side.fluo.histogram.phenol.bin.6.127_153$side.fluo.histogram.phenol.bin.7.153_178$side.fluo.histogram.phenol.bin.8.178_204$side.fluo.histogram.phenol.bin.9.204_229$side.fluo.histogram.phenol.bin.10.229_255",
 												  "side.fluo.histogram.ratio.bin.1.0_25$side.fluo.histogram.ratio.bin.2.25_51$side.fluo.histogram.ratio.bin.3.51_76$side.fluo.histogram.ratio.bin.4.76_102$side.fluo.histogram.ratio.bin.5.102_127$side.fluo.histogram.ratio.bin.6.127_153$side.fluo.histogram.ratio.bin.7.153_178$side.fluo.histogram.ratio.bin.8.178_204$side.fluo.histogram.ratio.bin.9.204_229$side.fluo.histogram.ratio.bin.10.229_255",
 												  "side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
 												  "side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255",
-												  "side.fluo.normalized.histogram.phenol.bin.1.0_25$side.fluo.normalized.histogram.phenol.bin.2.25_51$side.fluo.normalized.histogram.phenol.bin.3.51_76$side.fluo.normalized.histogram.phenol.bin.4.76_102$side.fluo.normalized.histogram.phenol.bin.5.102_127$side.fluo.normalized.histogram.phenol.bin.6.127_153$side.fluo.normalized.histogram.phenol.bin.7.153_178$side.fluo.normalized.histogram.phenol.bin.8.178_204$side.fluo.normalized.histogram.phenol.bin.9.204_229$side.fluo.normalized.histogram.phenol.bin.10.229_255",
 												  "side.fluo.normalized.histogram.ratio.bin.1.0_25$side.fluo.normalized.histogram.ratio.bin.2.25_51$side.fluo.normalized.histogram.ratio.bin.3.51_76$side.fluo.normalized.histogram.ratio.bin.4.76_102$side.fluo.normalized.histogram.ratio.bin.5.102_127$side.fluo.normalized.histogram.ratio.bin.6.127_153$side.fluo.normalized.histogram.ratio.bin.7.153_178$side.fluo.normalized.histogram.ratio.bin.8.178_204$side.fluo.normalized.histogram.ratio.bin.9.204_229$side.fluo.normalized.histogram.ratio.bin.10.229_255",
-												  "side.nir.histogram.phenol.bin.1.0_25$side.nir.histogram.phenol.bin.2.25_51$side.nir.histogram.phenol.bin.3.51_76$side.nir.histogram.phenol.bin.4.76_102$side.nir.histogram.phenol.bin.5.102_127$side.nir.histogram.phenol.bin.6.127_153$side.nir.histogram.phenol.bin.7.153_178$side.nir.histogram.phenol.bin.8.178_204$side.nir.histogram.phenol.bin.9.204_229$side.nir.histogram.phenol.bin.10.229_255",
-												  "side.nir.histogram.ratio.bin.1.0_25$side.nir.histogram.ratio.bin.2.25_51$side.nir.histogram.ratio.bin.3.51_76$side.nir.histogram.ratio.bin.4.76_102$side.nir.histogram.ratio.bin.5.102_127$side.nir.histogram.ratio.bin.6.127_153$side.nir.histogram.ratio.bin.7.153_178$side.nir.histogram.ratio.bin.8.178_204$side.nir.histogram.ratio.bin.9.204_229$side.nir.histogram.ratio.bin.10.229_255",
 												  "side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.nir.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
 												  "side.vis.normalized.histogram.ratio.bin.1.0_25$side.vis.normalized.histogram.ratio.bin.2.25_51$side.vis.normalized.histogram.ratio.bin.3.51_76$side.vis.normalized.histogram.ratio.bin.4.76_102$side.vis.normalized.histogram.ratio.bin.5.102_127$side.vis.normalized.histogram.ratio.bin.6.127_153$side.vis.normalized.histogram.ratio.bin.7.153_178$side.vis.normalized.histogram.ratio.bin.8.178_204$side.vis.normalized.histogram.ratio.bin.9.204_229$side.vis.normalized.histogram.ratio.bin.10.229_255",
 												  "top.fluo.histogram.bin.1.0_25$top.fluo.histogram.bin.2.25_51$top.fluo.histogram.bin.3.51_76$top.fluo.histogram.bin.4.76_102$top.fluo.histogram.bin.5.102_127$top.fluo.histogram.bin.6.127_153$top.fluo.histogram.bin.7.153_178$top.fluo.histogram.bin.8.178_204$top.fluo.histogram.bin.9.204_229$top.fluo.histogram.bin.10.229_255",
-												  "top.fluo.histogram.phenol.bin.1.0_25$top.fluo.histogram.phenol.bin.2.25_51$top.fluo.histogram.phenol.bin.3.51_76$top.fluo.histogram.phenol.bin.4.76_102$top.fluo.histogram.phenol.bin.5.102_127$top.fluo.histogram.phenol.bin.6.127_153$top.fluo.histogram.phenol.bin.7.153_178$top.fluo.histogram.phenol.bin.8.178_204$top.fluo.histogram.phenol.bin.9.204_229$top.fluo.histogram.phenol.bin.10.229_255",
 												  "top.fluo.histogram.ratio.bin.1.0_25$top.fluo.histogram.ratio.bin.2.25_51$top.fluo.histogram.ratio.bin.3.51_76$top.fluo.histogram.ratio.bin.4.76_102$top.fluo.histogram.ratio.bin.5.102_127$top.fluo.histogram.ratio.bin.6.127_153$top.fluo.histogram.ratio.bin.7.153_178$top.fluo.histogram.ratio.bin.8.178_204$top.fluo.histogram.ratio.bin.9.204_229$top.fluo.histogram.ratio.bin.10.229_255",
 												  "top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
-												  "top.nir.histogram.phenol.bin.1.0_25$top.nir.histogram.phenol.bin.2.25_51$top.nir.histogram.phenol.bin.3.51_76$top.nir.histogram.phenol.bin.4.76_102$top.nir.histogram.phenol.bin.5.102_127$top.nir.histogram.phenol.bin.6.127_153$top.nir.histogram.phenol.bin.7.153_178$top.nir.histogram.phenol.bin.8.178_204$top.nir.histogram.phenol.bin.9.204_229$top.nir.histogram.phenol.bin.10.229_255",
-												  "top.nir.histogram.ratio.bin.1.0_25$top.nir.histogram.ratio.bin.2.25_51$top.nir.histogram.ratio.bin.3.51_76$top.nir.histogram.ratio.bin.4.76_102$top.nir.histogram.ratio.bin.5.102_127$top.nir.histogram.ratio.bin.6.127_153$top.nir.histogram.ratio.bin.7.153_178$top.nir.histogram.ratio.bin.8.178_204$top.nir.histogram.ratio.bin.9.204_229$top.nir.histogram.ratio.bin.10.229_255",
 												  "top.vis.hue.histogram.ratio.bin.1.0_25$top.vis.hue.histogram.ratio.bin.2.25_51$top.vis.hue.histogram.ratio.bin.3.51_76$top.vis.hue.histogram.ratio.bin.4.76_102$top.vis.hue.histogram.ratio.bin.5.102_127$top.vis.hue.histogram.ratio.bin.6.127_153$top.vis.hue.histogram.ratio.bin.7.153_178$top.vis.hue.histogram.ratio.bin.8.178_204$top.vis.hue.histogram.ratio.bin.9.204_229$top.vis.hue.histogram.ratio.bin.10.229_255")
 												  
 										  
 										  
 										  
-				descriptorSetName_boxplotStacked <- c("NIR side (%)", "red side fluorescence histogram (%)", "NIR top (%)", "yellow side fluorescence histogram (%)", "fluo side ratio histogramm (%)",
-													  "NIR side normalized (%)", "red side normalized fluo histogramm (%)", "yellow side normalized fluo histogramm (%)", "fluo side normalized ratio histogramm (%)",
-													  "NIR side phenol (%)", "NIR side ratio histogramm (%)", "VIS HUE side ratio histogramm (%)", "VIS side normalized ratio histogramm (%)",
-													  "red top fluorescence histogram (%)", "yellow top fluorescence histogram (%)","fluo top ratio histogramm (%)",
-													  "NIR top (%)", "NIR top phenol histogram (%)","NIR top ratio histogramm (%)",
+				descriptorSetName_boxplotStacked <- c("NIR side (%)", 
+													  "red side fluorescence histogram (%)", 
+													  "NIR top (%)", 
+													  "fluo side ratio histogramm (%)",
+													  "NIR side normalized (%)", 
+													  "red side normalized fluo histogramm (%)", 
+													  "fluo side normalized ratio histogramm (%)",
+													  "VIS HUE side ratio histogramm (%)", 
+													  "VIS side normalized ratio histogramm (%)",
+													  "red top fluorescence histogram (%)", 
+													  "fluo top ratio histogramm (%)",
+													  "NIR top (%)", 
 													  "VIS HUE top ratio histogramm (%)")
 											  
 				stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
@@ -1881,15 +1897,15 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 	
 	
 ###############################	
-#	overallList <- preprocessingOfxAxisValue(overallList)
-#	overallList <- preprocessingOfTreatment(overallList)
-#	overallList <- preprocessingOfSecondTreatment(overallList)
-#	overallList <- overallCheckIfDescriptorIsNaOrAllZero(overallList)
-#	overallList <- reduceWorkingDataSize(overallList)
-#	overallList <- setDefaultAxisNames(overallList)	
-#	overallList <- overallGetResultDataFrame(overallList)
-#	overallList <- setColor(overallList) 
-#	makeDiagrams(overallList)
+	overallList <- preprocessingOfxAxisValue(overallList)
+	overallList <- preprocessingOfTreatment(overallList)
+	overallList <- preprocessingOfSecondTreatment(overallList)
+	overallList <- overallCheckIfDescriptorIsNaOrAllZero(overallList)
+	overallList <- reduceWorkingDataSize(overallList)
+	overallList <- setDefaultAxisNames(overallList)	
+	overallList <- overallGetResultDataFrame(overallList)
+	overallList <- setColor(overallList) 
+	makeDiagrams(overallList)
 ###############################
 
 
