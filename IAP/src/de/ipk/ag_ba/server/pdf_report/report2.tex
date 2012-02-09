@@ -42,7 +42,7 @@
 	\fi
 }
 
-\def\ConstForImageWidth{8cm}
+\def\ConstForImageWidth{7cm}
 
 \newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{#1} \end{center} \end{figure}}{\begin{figure}[!h] \centering \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{figure}}}
 \newcommand{\loadTex}[1]{\IfFileExists{#1}{\include{#1}}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{center} \end{figure}}}
@@ -375,6 +375,28 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \end{itemize}
 
 \loadImage{volume_iap_relativenboxplot.pdf}
+
+\clearpage
+\section{VIS intensity analysis}
+
+\subsection{VIS normalized intensity}
+\begin{itemize}
+\item Average activity of the normalized VIS images.
+\item The darker the higher acitivity
+\item Column name: xxx
+\item Unit: %
+\end{itemize}
+\loadTex{side.vis.normalized.histogram.ratio.bin.1.0_25;side.vis.normalized.his}
+
+\subsection{VIS ratio intensity}
+\begin{itemize}
+\item Average activity of the normalized VIS images.
+\item The darker the higher acitivity
+\item Column name: xxx
+\item Unit: %
+\end{itemize}
+\loadTex{side.vis.hue.histogram.ratio.bin.1.0_25;side.vis.hue.histogram.ratio.n}
+\loadTex{top.vis.hue.histogram.ratio.bin.1.0_25;top.vis.hue.histogram.ratio.bin}
 
 
 \clearpage
