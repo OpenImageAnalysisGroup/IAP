@@ -80,6 +80,11 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	}
 	
 	@Override
+	public boolean requestTitleUpdates() {
+		return false;
+	}
+	
+	@Override
 	public String getDefaultTitle() {
 		if (exportIndividualAngles)
 			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table";
@@ -96,10 +101,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				filter = filter.substring(0, filter.length() - ", none".length());
 			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
 			if (variant[2].equals("TRUE"))
-				return "<html><center>Create full PDF report<br>"
-						+ (exportIndividualAngles ? " (side angles)" : " (" + filter + ")");
+				return "Create PDF with Appendix (all diagrams)";
 			else
-				return "<html><center>Create short PDF report<br>(" + filter + ")";
+				return "Create short PDF";
 		}
 	}
 	
@@ -159,6 +163,8 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			
 			PdfCreator p = new PdfCreator(targetDirectoryOrTargetFile);
 			if (xlsx) {
+				if (status != null)
+					status.setCurrentStatusText2("Create XLSX");
 				experiment = null;
 				if (status != null)
 					status.setCurrentStatusText2("Fill workbook");
@@ -197,17 +203,19 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				}
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Workbook is filled");
 			} else
-				if (exportIndividualAngles) {
-					for (SnapshotDataIAP s : snapshots) {
-						boolean germanLanguage = false;
-						csv.append(s.getCSVvalue(germanLanguage, separator));
-					}
-				} else {
-					for (SnapshotDataIAP s : snapshots) {
-						boolean germanLanguage = false;
-						csv.append(s.getCSVvalue(germanLanguage, separator));
-					}
+				if (status != null)
+					status.setCurrentStatusText2("Create CSV file");
+			if (exportIndividualAngles) {
+				for (SnapshotDataIAP s : snapshots) {
+					boolean germanLanguage = false;
+					csv.append(s.getCSVvalue(germanLanguage, separator));
 				}
+			} else {
+				for (SnapshotDataIAP s : snapshots) {
+					boolean germanLanguage = false;
+					csv.append(s.getCSVvalue(germanLanguage, separator));
+				}
+			}
 			if (xlsx) {
 				if (status != null)
 					status.setCurrentStatusText2("Save to file");
@@ -245,13 +253,17 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				});
 			
 			if (!exportIndividualAngles && !xlsx) {
-				p.executeRstat(variant, experiment);
+				if (status != null)
+					status.setCurrentStatusText2("Generate report images and PDF");
+				p.executeRstat(variant, experiment, status);
 				p.getOutput();
 				boolean ok = p.hasPDFcontent();
 				if (ok)
 					AttributeHelper.showInBrowser(p.getPDFurl());
 				else
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No output file available");
+				if (status != null)
+					status.setCurrentStatusText2("Processing finished");
 				
 				// p.deleteDirectory();
 			} else {

@@ -641,6 +641,7 @@ public class StringManipulationTools implements HelperClass {
 				sb.append(e + "");
 				if (i < elements.size() - 1)
 					sb.append(div);
+				i++;
 			}
 			return sb.toString();
 		}

@@ -16,7 +16,7 @@ import de.ipk.ag_ba.commands.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.commands.ActionDataExportTar;
 import de.ipk.ag_ba.commands.ActionFileManager;
 import de.ipk.ag_ba.commands.ActionNumericDataReport;
-import de.ipk.ag_ba.commands.ActionNumericDataReportComplete;
+import de.ipk.ag_ba.commands.ActionNumericDataReportSetup;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
 import de.ipk.ag_ba.commands.CloudIoTestAction;
 import de.ipk.ag_ba.commands.analysis.ActionThreeDreconstruction;
@@ -94,21 +94,35 @@ public class ImageAnalysisCommandManager {
 				
 				// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 				
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true, new String[] { "none", "none", "FALSE" }, true),
+				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, true, new String[] {
+						"none", "none" }, true),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Genotype", "none", "FALSE" },
+				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
+						"Condition", "none" },
 						false),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Genotype", "none", "TRUE" },
+				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
+						"Genotype", "none" },
 						false),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Treatment", "none", "TRUE" },
+				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
+						"Treatment", "none" },
 						false),
 						guiSetting));
 				actions.add(new NavigationButton(
-						new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Variety", "Treatment", "TRUE" }, false),
+						new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
+								"Variety", "none" }, false),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, false, new String[] { "Species", "none", "TRUE" },
+				actions.add(new NavigationButton(
+						new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
+								"Variety", "Treatment" }, false),
+						guiSetting));
+				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
+						"Species", "none" },
+						false),
+						guiSetting));
+				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
+						"Species", "Treatment" },
 						false),
 						guiSetting));
 				return actions;
