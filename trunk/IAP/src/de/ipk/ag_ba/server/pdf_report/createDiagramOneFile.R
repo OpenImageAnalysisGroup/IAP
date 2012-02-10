@@ -3,6 +3,21 @@
 # Author: Entzian
 ###############################################################################
 
+#	requestList$KN$barley
+#	requestList[["KN"]][["barley"]]
+#	requestList$'KN'$'barley'
+getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
+	
+	requestList <- list(
+			KN = list(barley = list(boxplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")))
+			)
+#				BA = list(barley = list(boxplot = list(daysOfBoxplotNeeds = c("test1")), nBoxplot = list(doannyThingOther = c("test3"))),
+#						  maize = list(boxplot = list(daysOfBoxplotNeeds = c("test2")))
+#		  			 )
+	)				
+	return(requestList)
+}
+
 "%debug%" <- function(debug, debugNumber) {
 	if (debug) {
 		print(paste("DebugBreakPoint: ", debugNumber))
@@ -286,6 +301,92 @@ overallChangeName <- function(overallList) {
 	return(overallList)
 }
 
+setOptions <- function(overallList, typOfPlot, typOfOptions, listOfExtraOptions) {
+	overallList$debug %debug% "setOptions()"
+	
+	for(values in names(listOfExtraOptions[[typOfPlot]])) {
+		if(values %in% names(overallList[[typOfOptions]])){
+			overallList[[typOfOptions]][[values]] <- c(overallList[[typOfOptions]][[values]], listOfExtraOptions[[typOfPlot]][[values]])
+		} else {
+			overallList[[typOfOptions]][[values]] <- c(listOfExtraOptions[[typOfPlot]][[values]])
+		}
+	}
+	return(overallList)
+}
+
+
+setSomePrintingOptions <- function(overallList) {
+	overallList$debug %debug% "setSomePrintingOptions()"
+
+	requestList <- 	getSpecialRequestDependentOfUserAndTypOfExperiment()
+	if(!(overallList$user == "none" & overallList$typOfExperiment == "none")) {
+		listOfExtraOptions <- requestList[[overallList$user]][[overallList$typOfExperiment]]	
+		for(n in names(listOfExtraOptions)) {
+			if(n == "boxplot") {
+				return(setOptions(overallList, "boxplot", "boxOptions", listOfExtraOptions))				
+#				for(option in names(listOfExtraOptions$boxplot)) {
+#					if(option %in% names(overallList$boxOptions)){
+#						overallList$boxOptions[[option]] <- c(overallList$boxOptions[[option]], listOfExtraOptions$boxplot[[option]])
+#					} else {
+#						overallList$boxOptions[[option]] <- c(listOfExtraOptions$boxplot[[option]])
+#					}
+#				}				
+			} else if(n == "nBoxplot") {
+				return(setOptions(overallList, "nBoxplot", "nBoxOptions", listOfExtraOptions))
+#				for(option in names(listOfExtraOptions$nBoxplot)) {
+#					if(option %in% names(overallList$nBoxOptions)){
+#						overallList$nBoxOptions[[option]] <- c(overallList$nBoxOptions[[option]], listOfExtraOptions$nBoxplot[[option]])
+#					} else {
+#						overallList$nBoxOptions[[option]] <- c(listOfExtraOptions$nBoxplot[[option]])
+#					}
+#				}
+			} else if(n == "stackBoxplot") {
+				return(setOptions(overallList, "stackBoxplot", "stackedBarOptions", listOfExtraOptions))
+#				for(option in names(listOfExtraOptions$stackBoxplot)) {
+#					if(option %in% names(overallList$stackedBarOptions)){
+#						overallList$stackedBarOptions[[option]] <- c(overallList$stackedBarOptions[[option]], listOfExtraOptions$stackBoxplot[[option]])
+#					} else {
+#						overallList$stackedBarOptions[[option]] <- c(listOfExtraOptions$stackBoxplot[[option]])
+#					}
+#				}
+			}	
+		}		
+	}
+	
+	return(overallList)
+}
+
+checkUserOfExperiment <- function(overallList) {
+	overallList$debug %debug% "checkUserOfExperiment()"
+
+	user <- "none"
+	if("Plant.ID" %in% colnames(overallList$iniDataSet)) {
+		user <- substr(overallList$iniDataSet$'Plant.ID'[1],5,6)		
+	}
+	overallList$user <- user
+	return(overallList)
+}
+
+
+checkTypOfExperiment <- function(overallList) {
+	overallList$debug %debug% "checkTypOfExperiment()"
+
+	typ <- "none"
+	if("Species" %in% colnames(overallList$iniDataSet)) {
+		if(length(grep("barley",overallList$iniDataSet$Species[1], ignore.case=TRUE)) > 0) {
+			typ <- "barley"
+		} else if(length(grep("maize",overallList$iniDataSet$Species[1], ignore.case=TRUE)) > 0) {
+			typ <- "maize"
+		} else if(length(grep("arabidopsis",overallList$iniDataSet$Species[1], ignore.case=TRUE)) > 0) {
+			typ <- "arabidopsis"
+		}	
+	}
+	
+	overallList$typOfExperiment <- typ
+	return(overallList)	
+}
+
+
 changeSaveName <- function(saveNameVector) {
 	#Sollte hier nicht noch die Leerzeichen durch Punkte ersetzt werden?
 	saveNameVector <- gsub("\\$",";",substr(saveNameVector,1,70))
@@ -554,6 +655,41 @@ buildRowName <- function(mergeDataSet,groupBy, yName = "value") {
 	}	
 }
 
+getToPlottedDays <- function(xAxis, changes=NULL) {
+	#######
+#	xAxis <- overallResult$xAxis
+	#######
+	
+	uniqueDays <- unique(xAxis)
+	daysMedian <- median(uniqueDays)
+
+	days <- median(uniqueDays[uniqueDays<=daysMedian])
+	days <- c(days, floor(daysMedian))
+	days <- c(days, median(uniqueDays[uniqueDays>=daysMedian]))
+	days <- c(days, uniqueDays[length(uniqueDays)])
+	 
+	if(!is.null(changes)) {
+		days <- c(as.numeric(changes), days[(length(changes)+1):4])
+	}
+	
+	return(days)
+}
+
+setxAxisfactor <- function(xAxisValue, options) {
+	
+	if(!is.null(options$daysOfBoxplotNeedsReplace)){
+		whichDayShouldBePlot <- getToPlottedDays(xAxisValue, options$daysOfBoxplotNeedsReplace)
+	} else {
+		whichDayShouldBePlot <- getToPlottedDays(xAxisValue)
+	}
+	
+	xAxisfactor <- factor(xAxisValue, levels=whichDayShouldBePlot)
+	xAxisfactor <- paste("DAS", xAxisfactor)
+	xAxisfactor[xAxisfactor == "DAS NA"] <- NA
+	return(xAxisfactor)
+}
+
+
 overallGetResultDataFrame <- function(overallList) {
 	overallList$debug %debug% "overallGetResultDataFrame()"	
 	groupBy <- groupByFunction(list(overallList$treatment, overallList$secondTreatment))
@@ -769,12 +905,15 @@ setColorListHist <- function(descriptorList) {
 
 setColorList <- function(diagramTyp, descriptorList, overallResult, isGray) {
 #################	
-#diagramTyp = "boxplotStacked"
-#descriptorList = overallList$boxStackDes
-#isGrey = overallList$isGray
-#	overallResult=overallList$overallResult_nBoxDes
 #	diagramTyp = "boxplotStacked"
-#	descriptorList = overallList$nBoxDes	
+#	descriptorList = overallList$boxStackDes
+#	isGrey = overallList$isGray
+#	overallResult=overallList$overallResult_boxStackDes
+############	
+#	diagramTyp = "nboxplot"
+#	descriptorList = overallList$nBoxDes
+#	isGrey = overallList$isGray
+#	overallResult=overallList$overallResult_nBoxDes
 ##################
 	
 	if(!as.logical(isGray)) {
@@ -786,7 +925,8 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray) {
 	colorList <- list()
 	if(diagramTyp == "nboxplot" || diagramTyp == "boxplot") {
 		for(n in names(descriptorList)) {
-			if(!is.na(descriptorList[[n]])) {
+			#if(!is.na(descriptorList[[n]])) {
+			if(sum(!is.na(descriptorList[[n]])) > 0) {
 				colorList[[n]] <- colorRampPalette(colorVector)(length(unique(overallResult$name)))
 			} else {
 				print("... all values are 'NA'")
@@ -794,7 +934,7 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray) {
 		}
 	} else {
 		for(n in names(descriptorList)) {
-			if(!is.na(descriptorList[[n]])) {
+			if(sum(!is.na(descriptorList[[n]])) > 0) {
 				colorList[[n]] <- setColorListHist(descriptorList[n])
 			} else {
 				print("... all values are 'NA'")
@@ -1034,9 +1174,11 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 				print("... only one column has values, so it will be plot as barplot!")
 		
 				day <- overallResult$xAxis[!is.na(overallResult$mean)][1]
+				tempXaxisName <- overallList$xAxisName
 				overallList$xAxisName <- paste(overallList$xAxisName,day)
 				#overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
-				overallList <- makeBarDiagram(h, overallResult, overallDescriptor[imagesIndex], overallColor[imagesIndex], overallDesName[imagesIndex], overallSaveName[imagesIndex], overallList, TRUE, diagramTypSave)
+				makeBarDiagram(h, overallResult, overallDescriptor[imagesIndex], overallColor[imagesIndex], overallDesName[imagesIndex], overallSaveName[imagesIndex], overallList, TRUE, diagramTypSave)
+				overallList$xAxisName <- tempXaxisName
 			}
 		}
 	}
@@ -1259,48 +1401,58 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 }
 
 ##Problem: der median wird nicht angezeigt!
-makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, diagramTypSave="boxplot") {
+makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, options, overallList, diagramTypSave="boxplot") {
 	########################		
-	h=h 
-	overallResult = overallList$overallResult_boxDes
-	overallColor=overallList$color_box
-#	debug = overallList$debug
-	overallDescriptor = overallList$boxDes
-	overallDesName = overallList$boxDesName
+#	h=h 
+#	overallResult = overallList$overallResult_boxDes
+#	overallColor=overallList$color_box
+##	debug = overallList$debug
+#	overallDescriptor = overallList$boxDes
+#	overallDesName = overallList$boxDesName
+#	options =overallList$boxOptions
 	#########################
 	
 	overallList$debug %debug% "makeBoxplotDiagram()"
 	#overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
 	print("... Boxplot")
-	
+	overallResult[is.na(overallResult)] <- 0
 	tempOverallResult <-  overallResult
+	
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		if(!is.na(overallDescriptor[[imagesIndex]])) {
 			print(paste("... image",imagesIndex))
 			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
+				
+			#for(opt in names(options))
 			
+			overallResult$xAxisfactor <- setxAxisfactor(overallResult$xAxis, options)
 			
 			#myPlot <- ggplot(overallList$overallResult, aes(factor(name), value, fill=name, colour=name)) + 
+			#myPlot <- ggplot(overallResult, aes(factor(name), value, fill=name)) +
+			
 			myPlot <- ggplot(overallResult, aes(factor(name), value, fill=name)) +
 					geom_boxplot() +
 					ylab(overallDesName[[imagesIndex]]) +
 					#coord_cartesian(ylim=c(0,max(overallList$overallResult$mean + overallList$overallResult$se + 10,na.rm=TRUE))) +
-					xlab(paste(min(overallResult$xAxis),overallList$xAxisName,"..",max(overallResult$xAxis), overallList$xAxisName)) +
+					#xlab(paste(min(overallResult$xAxis),overallList$xAxisName,"..",max(overallResult$xAxis), overallList$xAxisName)) +
 					scale_fill_manual(values = overallColor[[imagesIndex]]) +
 					#stat_summary(fun.data = f, geom = "crossbar", height = 0.1,	colour = NA, fill = "skyblue", width = 0.8, alpha = 0.5) +
 					theme_bw() +
 					opts(legend.position="none",
 							plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"),
-							axis.title.x = theme_text(face="bold", size=11),
+							axis.title.x = theme_blank(),
 							axis.title.y = theme_text(face="bold", size=11, angle=90),
 							panel.grid.minor = theme_blank(),
 							panel.border = theme_rect(colour="Grey", size=0.1)
+							
 					)
 		
 			if(length(overallColor[[imagesIndex]]) > 10) {
 				myPlot <- myPlot + opts(axis.text.x = theme_text(size=6, angle=90))
 			}	
+			
+			myPlot <- myPlot + facet_wrap(~ xAxisfactor, drop=FALSE)
 			
 		#	print(myPlot)
 
@@ -1332,7 +1484,7 @@ makeDiagrams <- function(overallList) {
 		
 		if(sum(!is.na(overallList$boxDes)) > 0) {
 			if(overallList$debug) {print("... Boxplot")}
-			makeBoxplotDiagram(h, overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$saveName_boxDes, overallList)
+			makeBoxplotDiagram(h, overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$saveName_boxDes, overallList$boxOptions, overallList)
 		} else {
 			print("... all in Boxplot is 'NA'")
 		}
@@ -1513,7 +1665,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 						"volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
 						"height (px)", "width (px)", "side area (px)", "top area (px)")	
 				
-				boxOptions= NULL
+				boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
 				#diagramTypVectorBox <- rep.int("boxplot", times=length(descriptorSetBox))
 				
 				#descriptorSet <- c(descriptorSet, descriptorSetBox)
@@ -1720,7 +1872,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 				"volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
 				"height (px)", "width (px)", "side area (px)", "top area (px)")	
 		
-		boxOptions= NULL
+		boxOptions= list(daysOfBoxplotNeeds=c("all"))
 		#diagramTypVectorBox <- rep.int("boxplot", times=length(descriptorSetBox))
 		
 		#descriptorSet <- c(descriptorSet, descriptorSetBox)
@@ -1728,36 +1880,36 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 		#diagramTypVector <- c(diagramTypVector, diagramTypVectorBox)
 		
 		#boxplotStacked
-		descriptorSet_boxplotStacked <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
-				"side.fluo.histogram.bin.1.0_25$side.fluo.histogram.bin.2.25_51$side.fluo.histogram.bin.3.51_76$side.fluo.histogram.bin.4.76_102$side.fluo.histogram.bin.5.102_127$side.fluo.histogram.bin.6.127_153$side.fluo.histogram.bin.7.153_178$side.fluo.histogram.bin.8.178_204$side.fluo.histogram.bin.9.204_229$side.fluo.histogram.bin.10.229_255",
-				"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
-				"side.fluo.histogram.phenol.bin.1.0_25$side.fluo.histogram.phenol.bin.2.25_51$side.fluo.histogram.phenol.bin.3.51_76$side.fluo.histogram.phenol.bin.4.76_102$side.fluo.histogram.phenol.bin.5.102_127$side.fluo.histogram.phenol.bin.6.127_153$side.fluo.histogram.phenol.bin.7.153_178$side.fluo.histogram.phenol.bin.8.178_204$side.fluo.histogram.phenol.bin.9.204_229$side.fluo.histogram.phenol.bin.10.229_255",
-				"side.fluo.histogram.ratio.bin.1.0_25$side.fluo.histogram.ratio.bin.2.25_51$side.fluo.histogram.ratio.bin.3.51_76$side.fluo.histogram.ratio.bin.4.76_102$side.fluo.histogram.ratio.bin.5.102_127$side.fluo.histogram.ratio.bin.6.127_153$side.fluo.histogram.ratio.bin.7.153_178$side.fluo.histogram.ratio.bin.8.178_204$side.fluo.histogram.ratio.bin.9.204_229$side.fluo.histogram.ratio.bin.10.229_255",
-				"side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
-				"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255",
-				"side.fluo.normalized.histogram.phenol.bin.1.0_25$side.fluo.normalized.histogram.phenol.bin.2.25_51$side.fluo.normalized.histogram.phenol.bin.3.51_76$side.fluo.normalized.histogram.phenol.bin.4.76_102$side.fluo.normalized.histogram.phenol.bin.5.102_127$side.fluo.normalized.histogram.phenol.bin.6.127_153$side.fluo.normalized.histogram.phenol.bin.7.153_178$side.fluo.normalized.histogram.phenol.bin.8.178_204$side.fluo.normalized.histogram.phenol.bin.9.204_229$side.fluo.normalized.histogram.phenol.bin.10.229_255",
-				"side.fluo.normalized.histogram.ratio.bin.1.0_25$side.fluo.normalized.histogram.ratio.bin.2.25_51$side.fluo.normalized.histogram.ratio.bin.3.51_76$side.fluo.normalized.histogram.ratio.bin.4.76_102$side.fluo.normalized.histogram.ratio.bin.5.102_127$side.fluo.normalized.histogram.ratio.bin.6.127_153$side.fluo.normalized.histogram.ratio.bin.7.153_178$side.fluo.normalized.histogram.ratio.bin.8.178_204$side.fluo.normalized.histogram.ratio.bin.9.204_229$side.fluo.normalized.histogram.ratio.bin.10.229_255",
-				"side.nir.histogram.phenol.bin.1.0_25$side.nir.histogram.phenol.bin.2.25_51$side.nir.histogram.phenol.bin.3.51_76$side.nir.histogram.phenol.bin.4.76_102$side.nir.histogram.phenol.bin.5.102_127$side.nir.histogram.phenol.bin.6.127_153$side.nir.histogram.phenol.bin.7.153_178$side.nir.histogram.phenol.bin.8.178_204$side.nir.histogram.phenol.bin.9.204_229$side.nir.histogram.phenol.bin.10.229_255",
-				"side.nir.histogram.ratio.bin.1.0_25$side.nir.histogram.ratio.bin.2.25_51$side.nir.histogram.ratio.bin.3.51_76$side.nir.histogram.ratio.bin.4.76_102$side.nir.histogram.ratio.bin.5.102_127$side.nir.histogram.ratio.bin.6.127_153$side.nir.histogram.ratio.bin.7.153_178$side.nir.histogram.ratio.bin.8.178_204$side.nir.histogram.ratio.bin.9.204_229$side.nir.histogram.ratio.bin.10.229_255",
-				"side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.nir.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
-				"side.vis.normalized.histogram.ratio.bin.1.0_25$side.vis.normalized.histogram.ratio.bin.2.25_51$side.vis.normalized.histogram.ratio.bin.3.51_76$side.vis.normalized.histogram.ratio.bin.4.76_102$side.vis.normalized.histogram.ratio.bin.5.102_127$side.vis.normalized.histogram.ratio.bin.6.127_153$side.vis.normalized.histogram.ratio.bin.7.153_178$side.vis.normalized.histogram.ratio.bin.8.178_204$side.vis.normalized.histogram.ratio.bin.9.204_229$side.vis.normalized.histogram.ratio.bin.10.229_255",
-				"top.fluo.histogram.bin.1.0_25$top.fluo.histogram.bin.2.25_51$top.fluo.histogram.bin.3.51_76$top.fluo.histogram.bin.4.76_102$top.fluo.histogram.bin.5.102_127$top.fluo.histogram.bin.6.127_153$top.fluo.histogram.bin.7.153_178$top.fluo.histogram.bin.8.178_204$top.fluo.histogram.bin.9.204_229$top.fluo.histogram.bin.10.229_255",
-				"top.fluo.histogram.phenol.bin.1.0_25$top.fluo.histogram.phenol.bin.2.25_51$top.fluo.histogram.phenol.bin.3.51_76$top.fluo.histogram.phenol.bin.4.76_102$top.fluo.histogram.phenol.bin.5.102_127$top.fluo.histogram.phenol.bin.6.127_153$top.fluo.histogram.phenol.bin.7.153_178$top.fluo.histogram.phenol.bin.8.178_204$top.fluo.histogram.phenol.bin.9.204_229$top.fluo.histogram.phenol.bin.10.229_255",
-				"top.fluo.histogram.ratio.bin.1.0_25$top.fluo.histogram.ratio.bin.2.25_51$top.fluo.histogram.ratio.bin.3.51_76$top.fluo.histogram.ratio.bin.4.76_102$top.fluo.histogram.ratio.bin.5.102_127$top.fluo.histogram.ratio.bin.6.127_153$top.fluo.histogram.ratio.bin.7.153_178$top.fluo.histogram.ratio.bin.8.178_204$top.fluo.histogram.ratio.bin.9.204_229$top.fluo.histogram.ratio.bin.10.229_255",
-				"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
-				"top.nir.histogram.phenol.bin.1.0_25$top.nir.histogram.phenol.bin.2.25_51$top.nir.histogram.phenol.bin.3.51_76$top.nir.histogram.phenol.bin.4.76_102$top.nir.histogram.phenol.bin.5.102_127$top.nir.histogram.phenol.bin.6.127_153$top.nir.histogram.phenol.bin.7.153_178$top.nir.histogram.phenol.bin.8.178_204$top.nir.histogram.phenol.bin.9.204_229$top.nir.histogram.phenol.bin.10.229_255",
-				"top.nir.histogram.ratio.bin.1.0_25$top.nir.histogram.ratio.bin.2.25_51$top.nir.histogram.ratio.bin.3.51_76$top.nir.histogram.ratio.bin.4.76_102$top.nir.histogram.ratio.bin.5.102_127$top.nir.histogram.ratio.bin.6.127_153$top.nir.histogram.ratio.bin.7.153_178$top.nir.histogram.ratio.bin.8.178_204$top.nir.histogram.ratio.bin.9.204_229$top.nir.histogram.ratio.bin.10.229_255",
-				"top.vis.hue.histogram.ratio.bin.1.0_25$top.vis.hue.histogram.ratio.bin.2.25_51$top.vis.hue.histogram.ratio.bin.3.51_76$top.vis.hue.histogram.ratio.bin.4.76_102$top.vis.hue.histogram.ratio.bin.5.102_127$top.vis.hue.histogram.ratio.bin.6.127_153$top.vis.hue.histogram.ratio.bin.7.153_178$top.vis.hue.histogram.ratio.bin.8.178_204$top.vis.hue.histogram.ratio.bin.9.204_229$top.vis.hue.histogram.ratio.bin.10.229_255")
-		
-		
-		
-		
-		descriptorSetName_boxplotStacked <- c("NIR side (%)", "red side fluorescence histogram (%)", "NIR top (%)", "yellow side fluorescence histogram (%)", "fluo side ratio histogramm (%)",
-				"NIR side normalized (%)", "red side normalized fluo histogramm (%)", "yellow side normalized fluo histogramm (%)", "fluo side normalized ratio histogramm (%)",
-				"NIR side phenol (%)", "NIR side ratio histogramm (%)", "VIS HUE side ratio histogramm (%)", "VIS side normalized ratio histogramm (%)",
-				"red top fluorescence histogram (%)", "yellow top fluorescence histogram (%)","fluo top ratio histogramm (%)",
-				"NIR top (%)", "NIR top phenol histogram (%)","NIR top ratio histogramm (%)",
-				"VIS HUE top ratio histogramm (%)")
+descriptorSet_boxplotStacked <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
+		"side.fluo.histogram.bin.1.0_25$side.fluo.histogram.bin.2.25_51$side.fluo.histogram.bin.3.51_76$side.fluo.histogram.bin.4.76_102$side.fluo.histogram.bin.5.102_127$side.fluo.histogram.bin.6.127_153$side.fluo.histogram.bin.7.153_178$side.fluo.histogram.bin.8.178_204$side.fluo.histogram.bin.9.204_229$side.fluo.histogram.bin.10.229_255",
+		"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
+		"side.fluo.histogram.ratio.bin.1.0_25$side.fluo.histogram.ratio.bin.2.25_51$side.fluo.histogram.ratio.bin.3.51_76$side.fluo.histogram.ratio.bin.4.76_102$side.fluo.histogram.ratio.bin.5.102_127$side.fluo.histogram.ratio.bin.6.127_153$side.fluo.histogram.ratio.bin.7.153_178$side.fluo.histogram.ratio.bin.8.178_204$side.fluo.histogram.ratio.bin.9.204_229$side.fluo.histogram.ratio.bin.10.229_255",
+		"side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
+		"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255",
+		"side.fluo.normalized.histogram.ratio.bin.1.0_25$side.fluo.normalized.histogram.ratio.bin.2.25_51$side.fluo.normalized.histogram.ratio.bin.3.51_76$side.fluo.normalized.histogram.ratio.bin.4.76_102$side.fluo.normalized.histogram.ratio.bin.5.102_127$side.fluo.normalized.histogram.ratio.bin.6.127_153$side.fluo.normalized.histogram.ratio.bin.7.153_178$side.fluo.normalized.histogram.ratio.bin.8.178_204$side.fluo.normalized.histogram.ratio.bin.9.204_229$side.fluo.normalized.histogram.ratio.bin.10.229_255",
+		"side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.nir.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
+		"side.vis.normalized.histogram.ratio.bin.1.0_25$side.vis.normalized.histogram.ratio.bin.2.25_51$side.vis.normalized.histogram.ratio.bin.3.51_76$side.vis.normalized.histogram.ratio.bin.4.76_102$side.vis.normalized.histogram.ratio.bin.5.102_127$side.vis.normalized.histogram.ratio.bin.6.127_153$side.vis.normalized.histogram.ratio.bin.7.153_178$side.vis.normalized.histogram.ratio.bin.8.178_204$side.vis.normalized.histogram.ratio.bin.9.204_229$side.vis.normalized.histogram.ratio.bin.10.229_255",
+		"top.fluo.histogram.bin.1.0_25$top.fluo.histogram.bin.2.25_51$top.fluo.histogram.bin.3.51_76$top.fluo.histogram.bin.4.76_102$top.fluo.histogram.bin.5.102_127$top.fluo.histogram.bin.6.127_153$top.fluo.histogram.bin.7.153_178$top.fluo.histogram.bin.8.178_204$top.fluo.histogram.bin.9.204_229$top.fluo.histogram.bin.10.229_255",
+		"top.fluo.histogram.ratio.bin.1.0_25$top.fluo.histogram.ratio.bin.2.25_51$top.fluo.histogram.ratio.bin.3.51_76$top.fluo.histogram.ratio.bin.4.76_102$top.fluo.histogram.ratio.bin.5.102_127$top.fluo.histogram.ratio.bin.6.127_153$top.fluo.histogram.ratio.bin.7.153_178$top.fluo.histogram.ratio.bin.8.178_204$top.fluo.histogram.ratio.bin.9.204_229$top.fluo.histogram.ratio.bin.10.229_255",
+		"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
+		"top.vis.hue.histogram.ratio.bin.1.0_25$top.vis.hue.histogram.ratio.bin.2.25_51$top.vis.hue.histogram.ratio.bin.3.51_76$top.vis.hue.histogram.ratio.bin.4.76_102$top.vis.hue.histogram.ratio.bin.5.102_127$top.vis.hue.histogram.ratio.bin.6.127_153$top.vis.hue.histogram.ratio.bin.7.153_178$top.vis.hue.histogram.ratio.bin.8.178_204$top.vis.hue.histogram.ratio.bin.9.204_229$top.vis.hue.histogram.ratio.bin.10.229_255")
+
+
+
+
+descriptorSetName_boxplotStacked <- c("NIR side (%)", 
+		"red side fluorescence histogram (%)", 
+		"NIR top (%)", 
+		"fluo side ratio histogramm (%)",
+		"NIR side normalized (%)", 
+		"red side normalized fluo histogramm (%)", 
+		"fluo side normalized ratio histogramm (%)",
+		"VIS HUE side ratio histogramm (%)", 
+		"VIS side normalized ratio histogramm (%)",
+		"red top fluorescence histogram (%)", 
+		"fluo top ratio histogramm (%)",
+		"NIR top (%)", 
+		"VIS HUE top ratio histogramm (%)")
 		
 		stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
 		#diagramTypVector <- c(diagramTypVector, "boxplotStacked", "boxplotStacked")
@@ -1780,7 +1932,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 		
 			
 			nBoxOptions= NULL
-			boxOptions= NULL
+			boxOptions= list(daysOfBoxplotNeeds=c("all"))
 			stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
 		}	
 	
@@ -1877,7 +2029,7 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 						showResultInR=showResultInR, xAxisName=xAxisName, debug=debug, 
 						appendix=appendix, stoppTheCalculation=stoppTheCalculation,
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(),
-						color_nBox = list(), color_box=list(), color_boxStack=list())	
+						color_nBox = list(), color_box=list(), color_boxStack=list(), user="none", typ="none")	
 				
 	#install.packages(c("Cairo"), repos="http://cran.r-project.org", dependencies = TRUE)
 	library("Cairo")
@@ -1892,20 +2044,23 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 	
 	overallList$debug %debug% "Start"
 	
+	overallList <- checkTypOfExperiment(overallList)
+	overallList <- checkUserOfExperiment(overallList)
+	overallList <- setSomePrintingOptions(overallList)
 	overallList <- overallChangeName(overallList)
 	overallList <- overallPreprocessingOfDescriptor(overallList)
 	
 	
 ###############################	
-	overallList <- preprocessingOfxAxisValue(overallList)
-	overallList <- preprocessingOfTreatment(overallList)
-	overallList <- preprocessingOfSecondTreatment(overallList)
-	overallList <- overallCheckIfDescriptorIsNaOrAllZero(overallList)
-	overallList <- reduceWorkingDataSize(overallList)
-	overallList <- setDefaultAxisNames(overallList)	
-	overallList <- overallGetResultDataFrame(overallList)
-	overallList <- setColor(overallList) 
-	makeDiagrams(overallList)
+#	overallList <- preprocessingOfxAxisValue(overallList)
+#	overallList <- preprocessingOfTreatment(overallList)
+#	overallList <- preprocessingOfSecondTreatment(overallList)
+#	overallList <- overallCheckIfDescriptorIsNaOrAllZero(overallList)
+#	overallList <- reduceWorkingDataSize(overallList)
+#	overallList <- setDefaultAxisNames(overallList)	
+#	overallList <- overallGetResultDataFrame(overallList)
+#	overallList <- setColor(overallList) 
+#	makeDiagrams(overallList)
 ###############################
 
 
