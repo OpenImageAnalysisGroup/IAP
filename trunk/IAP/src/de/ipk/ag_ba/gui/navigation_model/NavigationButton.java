@@ -236,6 +236,10 @@ public class NavigationButton implements StyleAware {
 			if (line2.length() > 0)
 				line2 = "<br>&nbsp;" + line2 + "&nbsp;";
 			dots = "" + dots + "";
+			
+			line2 = StringManipulationTools.stringReplace(line2, "<br><hr>", "<hr>");
+			line2 = StringManipulationTools.stringReplace(line2, "<p><hr>", "<hr>");
+			
 			if (dp < -1.01) {
 				System.out.println("Command " + title + " has lost its connection to the status provider.");
 				return "<html><center>" + dots + " " + "[REMOVE FROM UPDATE] " + title + progress + " " + dots + "" + s + line2;
