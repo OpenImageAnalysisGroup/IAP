@@ -191,6 +191,8 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				Runtime r = Runtime.getRuntime();
 				while (!todo.isEmpty()) {
 					SnapshotDataIAP s = todo.poll();
+					if (filterOut(toggles, s))
+						continue;
 					if (status != null)
 						status.setCurrentStatusText1("Rows remaining: " + todo.size());
 					if (status != null)
@@ -223,11 +225,15 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 					status.setCurrentStatusText2("Create CSV file");
 			if (exportIndividualAngles) {
 				for (SnapshotDataIAP s : snapshots) {
+					if (filterOut(toggles, s))
+						continue;
 					boolean germanLanguage = false;
 					csv.append(s.getCSVvalue(germanLanguage, separator));
 				}
 			} else {
 				for (SnapshotDataIAP s : snapshots) {
+					if (filterOut(toggles, s))
+						continue;
 					boolean germanLanguage = false;
 					csv.append(s.getCSVvalue(germanLanguage, separator));
 				}
@@ -286,6 +292,49 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				p.openTargetDirectory();
 			}
 		}
+	}
+	
+	private boolean filterOut(ArrayList<ThreadSafeOptions> toggles, SnapshotDataIAP s) {
+		if (toggles == null)
+			return false;
+		for (ThreadSafeOptions t : toggles) {
+			if (match(t, s))
+				return true;
+		}
+		return false;
+	}
+	
+	private boolean match(ThreadSafeOptions t, SnapshotDataIAP s) {
+		if (t.getBval(0, true))
+			return false;
+		// filter is active, check if snapshot matches criteria
+		// e.g. tso.setParam(0, setting); // Condition, Species, Genotype, Variety, Treatment
+		// e.g. tso.setParam(1, c);
+		
+		String field = (String) t.getParam(0, "");
+		String content = (String) t.getParam(1, "");
+		String value = null;
+		if (field.equals("Condition"))
+			value = s.getCondition();
+		else
+			if (field.equals("Species"))
+				value = s.getSpecies();
+			else
+				if (field.equals("Genotype"))
+					value = s.getGenotype();
+				else
+					if (field.equals("Variety"))
+						value = s.getVariety();
+					else
+						if (field.equals("Treatment"))
+							value = s.getTreatment();
+		if (value == null)
+			value = "(not specified)";
+		else
+			if (value.isEmpty())
+				value = "(not specified)";
+		
+		return value.equals(content);
 	}
 	
 	private String replaceInvalidChars(String experimentName) {

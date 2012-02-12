@@ -1121,6 +1121,8 @@ public class LemnaTecDataExchange {
 					
 					String metaName = rs.getString(2);
 					String metaValue = rs.getString(3);
+					if (metaValue != null)
+						metaValue = metaValue.trim();
 					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					
 					if (!res.containsKey(plantID)) {
@@ -1178,12 +1180,14 @@ public class LemnaTecDataExchange {
 														res.get(plantID).setVariety(oldVariety + metaValue.trim());
 												} else {
 													if (metaName.equalsIgnoreCase("Typ"))
-														res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
-													else {
-														if (metaName.startsWith("conditions "))
-															metaName = metaName.substring("conditions ".length()).trim();
-														res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
-													}
+														if (!oldTreatment.contains(metaValue))
+															res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
+														else {
+															if (metaName.startsWith("conditions "))
+																metaName = metaName.substring("conditions ".length()).trim();
+															if (!oldTreatment.contains(metaName + ": " + metaValue.trim()))
+																res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
+														}
 												}
 										}
 									}

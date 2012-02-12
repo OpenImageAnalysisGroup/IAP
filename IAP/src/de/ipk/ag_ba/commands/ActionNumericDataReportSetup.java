@@ -134,16 +134,26 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 				String variety = ci.getVariety();
 				String treatment = ci.getTreatment();
 				
-				if (condition != null)
+				if (condition != null && !condition.isEmpty())
 					cs.add(condition);
-				if (species != null)
+				else
+					cs.add("(not specified)");
+				if (species != null && !species.isEmpty())
 					ss.add(species);
-				if (genotype != null)
+				else
+					ss.add("(not specified)");
+				if (genotype != null && !genotype.isEmpty())
 					gs.add(genotype);
-				if (variety != null)
+				else
+					gs.add("(not specified)");
+				if (variety != null && !variety.isEmpty())
 					vs.add(variety);
-				if (treatment != null)
+				else
+					vs.add("(not specified)");
+				if (treatment != null && !treatment.isEmpty())
 					ts.add(treatment);
+				else
+					ts.add("(not specified)");
 			}
 		}
 		
@@ -192,38 +202,36 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					toggles.add(tso);
 					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
 				}
-			
-			if (toggles.size() > 0)
-				settings.add(idx, new NavigationButton(new AbstractNavigationAction("Toggle all settings") {
-					@Override
-					public void performActionCalculateResults(NavigationButton src) throws Exception {
-						for (ThreadSafeOptions tso : toggles) {
-							tso.setBval(0, !tso.getBval(0, true));
-						}
-					}
-					
-					@Override
-					public String getDefaultTitle() {
-						return "Toggle";
-					}
-					
-					@Override
-					public String getDefaultImage() {
-						return "img/ext/gpl2/gtcf.png";
-					}
-					
-					@Override
-					public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-						return null;
-					}
-					
-					@Override
-					public ArrayList<NavigationButton> getResultNewActionSet() {
-						return null;
-					}
-				}, src.getGUIsetting()));
-			
 		}
+		if (toggles.size() > 0)
+			settings.add(idx, new NavigationButton(new AbstractNavigationAction("Toggle all settings") {
+				@Override
+				public void performActionCalculateResults(NavigationButton src) throws Exception {
+					for (ThreadSafeOptions tso : toggles) {
+						tso.setBval(0, !tso.getBval(0, true));
+					}
+				}
+				
+				@Override
+				public String getDefaultTitle() {
+					return "Toggle";
+				}
+				
+				@Override
+				public String getDefaultImage() {
+					return "img/ext/gpl2/gtcf.png";
+				}
+				
+				@Override
+				public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+					return null;
+				}
+				
+				@Override
+				public ArrayList<NavigationButton> getResultNewActionSet() {
+					return null;
+				}
+			}, src.getGUIsetting()));
 	}
 	
 	@Override
