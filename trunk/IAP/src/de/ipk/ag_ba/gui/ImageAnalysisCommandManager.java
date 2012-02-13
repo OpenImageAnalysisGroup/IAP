@@ -17,6 +17,7 @@ import de.ipk.ag_ba.commands.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.commands.ActionDataExportTar;
 import de.ipk.ag_ba.commands.ActionFileManager;
 import de.ipk.ag_ba.commands.ActionNumericDataReport;
+import de.ipk.ag_ba.commands.ActionNumericDataReportComplete;
 import de.ipk.ag_ba.commands.ActionNumericDataReportSetup;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
 import de.ipk.ag_ba.commands.CloudIoTestAction;
@@ -138,8 +139,8 @@ public class ImageAnalysisCommandManager {
 				
 				// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 				
-				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, true, new String[] {
-						"none", "none" }, true),
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true, new String[] {
+						"none", "none" }, true, null),
 						guiSetting));
 				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
 						"Condition", "none" },
