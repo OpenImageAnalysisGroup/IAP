@@ -966,7 +966,7 @@ writeLatexFile <- function(saveNameLatexFile, saveNameImageFile="", o="") {
 	latexText <- paste("\\loadImage{",
 					   ifelse(saveNameImageFile=="",saveNameLatexFile,saveNameImageFile),
 					   ifelse(o=="", "", paste("_",o ,sep="")),
-					   ".pdf}", sep="")
+					   ".pdf} \\clearpage", sep="")
 	
 	write(x=latexText, append=TRUE, file=paste(saveNameLatexFile,"tex",sep="."))
 	

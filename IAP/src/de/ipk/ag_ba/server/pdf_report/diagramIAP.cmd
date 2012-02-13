@@ -29,6 +29,7 @@ else
 fi
 
 echo "Create PDF..."
-/usr/texbin/pdflatex report2.tex
 /usr/bin/pdflatex report2.tex
+/usr/texbin/pdflatex report2.tex
+echo ""
 echo "Finished"
