@@ -177,27 +177,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \loadImage{volume_iap__px3_boxplot.pdf}
 \loadImage{volume_iap__px3_nboxplot.pdf}
 
-
-
-\subsection{IAP based formula - Visible Light (max of side area)}
-\begin{itemize}
-\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{max\_image}^{2}*top.area_{max\_image}}$
-\item Column name: volume.iap\_max
-\end{itemize}
-\loadImage{volume_iap_maxboxplot.pdf}
-\loadImage{volume_iap_maxnboxplot.pdf}
-
-
-\subsection{IAP based formula - FLUO}
-\begin{itemize}
-\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
-\item Column name: volume.fluo.iap
-\end{itemize}
-\loadImage{volume_fluo_iapboxplot.pdf}
-\loadImage{volume_fluo_iapnboxplot.pdf}
-
-
-\subsection{LemnaTec formula}
+\subsection{Volume (LT-Formel)}
 \begin{itemize}
 \item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
 \item Column name: volume.lt
@@ -223,7 +203,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \subsection{Volume based}
 \begin{itemize}
-\item The volume based on the IAP formula used for the value "plant growth".
+\item Growth per day divided by water usage per day.
 \item Colnum name: volume.iap.wue
 \item Unit: .
 \end{itemize}
@@ -237,9 +217,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \subsection{Plant height}
 \begin{itemize}
-\item Plant height (mm)
+\item Plant height (px)
 \item Column name: side.height
-\item Unit: mm
+\item Unit: px
 \end{itemize}
 \loadImage{side_height__mm_boxplot.pdf}
 \loadImage{side_height__mm_nboxplot.pdf}
@@ -257,9 +237,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \subsection{Plant width}
 \begin{itemize}
-\item Plant width (mm) 
+\item Plant width (px) 
 \item Column name: side.width
-\item Unit: mm
+\item Unit: px
 \end{itemize}
 \loadImage{side_width__mm_boxplot.pdf}
 \loadImage{side_width__mm_nboxplot.pdf}
@@ -277,9 +257,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \subsection{Projected side area}
 \begin{itemize}
-\item Number of foreground pixels from side camera
+\item Number of foreground pixels
 \item Colum name: side.area
-\item Unit: pixel\texttwosuperior{}
+\item Unit: px
 \end{itemize}
 \loadImage{side_area__px_boxplot.pdf}
 \loadImage{side_area__px_nboxplot.pdf}
@@ -289,7 +269,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \begin{itemize}
 \item Number of foreground pixels from side camera (normalized to distance of left and right marker)
 \item Colum name: side.area.norm
-\item Unit: pixel\texttwosuperior{}
+\item Unit: mm\texttwosuperior{}
 \end{itemize}
 \loadImage{side_area_norm__mm2_boxplot.pdf}
 \loadImage{side_area_norm__mm2_nboxplot.pdf}
@@ -297,9 +277,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \subsection{Projected top area}
 \begin{itemize}
-\item Number of foreground pixels from top camera
+\item Number of foreground pixels
 \item Colum name: top.area
-\item Unit: pixel\texttwosuperior{}
+\item Unit: px
 \end{itemize}
 \loadImage{top_area__px_boxplot.pdf}
 \loadImage{top_area__px_nboxplot.pdf}
@@ -309,7 +289,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \begin{itemize}
 \item Number of foreground pixels from top camera (normalized to distance of left and right marker)
 \item Colum name: top.area.norm
-\item Unit: pixel\texttwosuperior{}
+\item Unit: mm\texttwosuperior{}
 \end{itemize}
 
 \loadImage{top_area_norm__mm2_nboxplot.pdf}
@@ -368,9 +348,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \loadImage{side_area_relativenboxplot.pdf}
 
 
-\subsection{Relative growth of volume (IAP based formular - visible light)}
+\subsection{Relative growth of volume (IAP based formular)}
 \begin{itemize}
-\item Digital biomass growth in percent (per day) based on the side.area and top.area
+\item Digital biomass growth in percent (per day) based on the side.area and top.area observed from the visible light camera.
 \item Colnum name: volume.iap.relative
 \end{itemize}
 
