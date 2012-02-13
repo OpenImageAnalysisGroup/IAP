@@ -965,8 +965,9 @@ writeLatexFile <- function(saveNameLatexFile, saveNameImageFile="", o="") {
 	
 	latexText <- paste("\\loadImage{",
 					   ifelse(saveNameImageFile=="",saveNameLatexFile,saveNameImageFile),
-					   ifelse(o=="", "", paste("_",o ,sep="")),
-					   ".pdf} \\clearpage", sep="")
+					  #ifelse(o=="", "", paste("_",o ,sep="")),
+					   ifelse(o=="", "",o),
+					   ".pdf}", sep="")
 	
 	write(x=latexText, append=TRUE, file=paste(saveNameLatexFile,"tex",sep="."))
 	
@@ -1081,6 +1082,9 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 	return(workingDataSet)	
 }
 
+createOuputOverview <- function(actualImage, maxImage) {
+	print(paste("Create image ",actualImage,"|",maxImage,sep=""))
+}
 
 makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, diagramTypSave="nboxplot") {
 ########################		
@@ -1100,7 +1104,7 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		if(!is.na(overallDescriptor[[imagesIndex]])) {
-			print(paste("... image",imagesIndex))
+			createOuputOverview(imagesIndex, length(names(overallDescriptor)))
 			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "nboxplot")
 			
 			if(!CheckIfOneColumnHasOnlyValues(overallResult)) {	
@@ -1319,7 +1323,7 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 	tempOverallResult <- overallResult
 	
 	for(imagesIndex in names(overallDescriptor)) {
-		print(paste("... image",imagesIndex))
+		createOuputOverview(imagesIndex, length(names(overallDescriptor)))
 		overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplotstacked")
 	
 		PreWorkForMakeBigOverallImage(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, imagesIndex)
@@ -1421,7 +1425,7 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		if(!is.na(overallDescriptor[[imagesIndex]])) {
-			print(paste("... image",imagesIndex))
+			createOuputOverview(imagesIndex, length(names(overallDescriptor)))
 			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
 				
 			#for(opt in names(options))
@@ -1779,7 +1783,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 				appendix <- appendix %exists% args[3]
 				
 				if(appendix) {
-					blacklist <- buildBlacklist(workingDataSet, descriptorSet)
+					blacklist <- buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
 					descriptorSetAppendix <- colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet),'%in%', blacklist))[,1]])
 					descriptorSetNameAppendix <- descriptorSetAppendix
 					#diagramTypVectorAppendix <- rep.int("nboxplot", times=length(descriptorSetNameAppendix))

@@ -1,29 +1,22 @@
-%% LyX 2.0.0 created this file.  For more info, see http://www.lyx.org/.
-%% Do not edit unless you really know what you are doing.
 \documentclass[oneside,english]{amsart}
+%%\documentclass[oneside,english]{scrreprt}
 \usepackage[T1]{fontenc}
-\usepackage[latin9]{inputenc}
+%%\usepackage[latin9]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
+\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
 \usepackage{textcomp}
 \usepackage{amsthm}
 \usepackage{amstext}
 \usepackage{graphicx}
 \usepackage{here}
+\usepackage{ellipsis} % kümmert sich um den Leerraum rund um die Auslassungspunkte
+\usepackage[english]{babel} % Anpassung der Überschriften (chapter, chapitre, Kapitel …) und die richtige Silbentrennung
 
 \makeatletter
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
-\newcommand{\lyxmathsym}[1]{\ifmmode\begingroup\def\b@ld{bold}
-  \text{\ifx\math@version\b@ld\bfseries\fi#1}\endgroup\else#1\fi}
-
-%% Because html converters don't know tabularnewline
 \providecommand{\tabularnewline}{\\}
-%% A simple dot to overcome graphicx limitations
-\newcommand{\lyxdot}{.}
 
 \newcommand{\ImageFormat}{.png}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
 \numberwithin{equation}{section}
 \numberwithin{figure}{section}
 \newenvironment{lyxlist}[1]
@@ -44,11 +37,28 @@
 
 \def\ConstForImageWidth{9cm}
 
-\newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{#1} \end{center} \end{figure}}{\begin{figure}[!h] \centering \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{figure}}}
-\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{center} \end{figure}}}
+%\newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{#1} \end{center} \end{figure}}{\begin{figure}[!htb] \centering \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{figure}}}
+%\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{center} \end{figure}}}
+\newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{#1} \end{OwnLoadImage}}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{OwnLoadImage}}}
+\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{OwnLoadImage}}}
+
+\newenvironment{OwnLoadImage}
+  {\par\raggedbottom\null\vfill\noindent\minipage{\textwidth}\centering}
+  {\endminipage\par\vfill\vfill}
+
+
+\renewcommand{\topfraction}{.85} % maximaler Abstand von Seitenoberseite, bis zu welchem Gleitumgebungen noch plaziert werden dürfen
+\renewcommand{\bottomfraction}{.7} % maximaler Anteil welchen Gleitumgebungen am unteren Seitenrand einnehmen dürfen
+\renewcommand{\textfraction}{.15} % Anteil einer Seite mit Gleitumgebungen, welcher mindestens von Text belegt sein muss -> ansonsten kein Text auf der Seite
+\renewcommand{\floatpagefraction}{.66} % minimaler Seitenanteil welcher besetzt sein muss, bevor eine neue Seite für Gleitumgebungen angelegt wird
+\setcounter{topnumber}{3} % maximale Anzahl Gleitobjekte am oberen Seitenrand
+\setcounter{bottomnumber}{3} % maximale Anzahl Gleitobjekte am unteren Seitenrand
+\setcounter{totalnumber}{6} % maximale Anzahl Gleitobjekte pro Seite
+
+
 \makeatother
 
-\usepackage{babel}
+
 \begin{document}
 
 \title{Analysis of Experiment --experimentname--}
