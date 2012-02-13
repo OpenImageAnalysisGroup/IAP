@@ -224,12 +224,13 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				if (status != null)
 					status.setCurrentStatusText2("Create CSV file");
 			if (exportIndividualAngles) {
-				for (SnapshotDataIAP s : snapshots) {
-					if (filterOut(toggles, s))
-						continue;
-					boolean germanLanguage = false;
-					csv.append(s.getCSVvalue(germanLanguage, separator));
-				}
+				if (!xlsx)
+					for (SnapshotDataIAP s : snapshots) {
+						if (filterOut(toggles, s))
+							continue;
+						boolean germanLanguage = false;
+						csv.append(s.getCSVvalue(germanLanguage, separator));
+					}
 			} else {
 				for (SnapshotDataIAP s : snapshots) {
 					if (filterOut(toggles, s))
