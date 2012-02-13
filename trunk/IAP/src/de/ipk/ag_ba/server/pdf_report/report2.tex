@@ -1,38 +1,76 @@
-\documentclass[oneside,english]{amsart}
+%%%%%%%%%%%%% Klassen-Optionen
+\documentclass[%
+  paper=a4, % Stellt auf A4-Papier ein
+  pagesize, % Diese Option reicht die Papiergröße an
+            % alle Ausgabeformate weiter
+  DIV=calc, % Errechnet einen guten Satzspiegel
+%  BCOR=1cm, % Weil bei mir immer 1cm in der Bindung
+            % der Klemmmappe verschwindet
+  headings=small,% Für etwas kleinere Überschriften
+  english,   % englische Rechtschreibung d.\,h. (Silbentrennung)
+  oneside
+]{scrartcl}  % Eine Klasse für einseitige Texte mit Kapiteln  
+            %
+% \documentclass[oneside,english]{article}
+                  
 %%\documentclass[oneside,english]{scrreprt}
 \usepackage[T1]{fontenc}
-%%\usepackage[latin9]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
-\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
-\usepackage{textcomp}
-\usepackage{amsthm}
-\usepackage{amstext}
-\usepackage{graphicx}
-\usepackage{here}
-\usepackage{ellipsis} % kümmert sich um den Leerraum rund um die Auslassungspunkte
+\usepackage[latin9]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
+%%\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
+\usepackage{fixltx2e}
 \usepackage[english]{babel} % Anpassung der Überschriften (chapter, chapitre, Kapitel …) und die richtige Silbentrennung
+
+%%%%%%%%%%%%% Typografisch empfehlenswerte Pakete
+\usepackage{% 
+  ellipsis, % Korrigiert den Weißraum um Auslassungspunkte
+  ragged2e, % Ermöglicht Flattersatz mit Silbentrennung
+ marginnote,% Für bessere Randnotizen mit \marginnote statt
+            % \marginline 
+}
+\usepackage[tracking=true]{microtype}% 
+            % Microtype ist einfach super, aber lesen Sie
+            % unbedingt die Anleitung um das Folgende zu
+            % verstehen.
+\DeclareMicrotypeSet*[tracking]{my}% 
+  { font = */*/*/sc/* }% 
+\SetTracking{ encoding = *, shape = sc }{ 45 }% Hier wird festgelegt,
+            % dass alle Passagen in Kapitälchen automatisch leicht
+            % gesperrt werden. Das Paket soul, das ich früher empfohlen
+            % habe ist damit für diese Zwecke nicht mehr nötig.
+            %
+
+\usepackage{%
+  lmodern, % A) Latin Modern Fonts sind die Nachfolger von Computer
+            % Modern, den LaTeX-Standardfonts
+%  hfoldsty % B) Diese Schrift stellt alle Ziffern, außer
+            % im Mathemodus, auf Minuskel- oder Mediäval-Ziffern um.
+            % Wenn Ihre pdfs unscharf aussehen installieren Sie bitte
+            % die cm-super-Fonts (Type1-Fonts).
+% charter   % C) Diese Zeile lädt die Charter als Schriftart
+}
+% \usepackage[osf,sc]{mathpazo}% D) So erreichen Sie Palatino als
+            % Schrift mit Minuskel-Ziffern und echten Kapitälchen
+            %
+
+\usepackage{here}
+%\usepackage{scrpage2} 
+%\usepackage{tocloft}
+\usepackage{graphicx}
+%\usepackage{amsmath} 
 
 \makeatletter
 
 \providecommand{\tabularnewline}{\\}
 
-\newcommand{\ImageFormat}{.png}
-
-\numberwithin{equation}{section}
-\numberwithin{figure}{section}
-\newenvironment{lyxlist}[1]
-{\begin{list}{}
-{\settowidth{\labelwidth}{#1}
- \setlength{\leftmargin}{\labelwidth}
- \addtolength{\leftmargin}{\labelsep}
- \renewcommand{\makelabel}[1]{##1\hfil}}}
-{\end{list}}
+% \numberwithin{equation}{section}
+% \numberwithin{figure}{section}
 
 \def\ScaleIfNeeded{%
 	\ifdim\Gin@nat@height> 0.9\textheight
 		0.9\textheight
 	\else
 		\Gin@nat@height
-	\fi
+	\fi 
 }
 
 \def\ConstForImageWidth{9cm}
@@ -43,10 +81,14 @@
 \newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{OwnLoadImage}}}
 
 \newenvironment{OwnLoadImage}
-  {\par\raggedbottom\null\vfill\noindent\minipage{\textwidth}\centering}
-  {\endminipage\par\vfill\vfill}
+  {\par\noindent\minipage{\textwidth}\centering}
+  {\endminipage}
 
 
+% \newenvironment{OwnLoadImage}
+%   {\par\raggedbottom\null\vfill\noindent\minipage{\textwidth}\centering}
+%   {\endminipage\par\vfill\vfill}
+  
 \renewcommand{\topfraction}{.85} % maximaler Abstand von Seitenoberseite, bis zu welchem Gleitumgebungen noch plaziert werden dürfen
 \renewcommand{\bottomfraction}{.7} % maximaler Anteil welchen Gleitumgebungen am unteren Seitenrand einnehmen dürfen
 \renewcommand{\textfraction}{.15} % Anteil einer Seite mit Gleitumgebungen, welcher mindestens von Text belegt sein muss -> ansonsten kein Text auf der Seite
@@ -55,29 +97,18 @@
 \setcounter{bottomnumber}{3} % maximale Anzahl Gleitobjekte am unteren Seitenrand
 \setcounter{totalnumber}{6} % maximale Anzahl Gleitobjekte pro Seite
 
-
+ 
 \makeatother
 
 
 \begin{document}
 
+
 \title{Analysis of Experiment --experimentname--}
-
-
 \author{Research Group Image Analysis\\ \\ IPK-Gatersleben\\ \\ C. Klukas \& A. Entzian}
-
-
 \date{\today}
 
-
-\address{Leibniz Institute of Plant Genetics and Crop Plant Research, Group
-Image Analysis, Corrensstr. 3, 06466 Gatersleben, Germany}
-
-
-\email{klukas@ipk-gatersleben.de, entzian@ipk-gatersleben.de}
-
-
-\urladdr{http://ba-13.ipk-gatersleben.de}
+\maketitle  
 \begin{abstract}
 This document is automatically created based on the automated image analysis performed 
 inside the integrated analysis platform IAP. Currently the pipelines and data analysis tools are in beta status, 
@@ -87,21 +118,21 @@ generation more stable and suitable to the needs of any user of the automated im
 If you have any hints, comments or suggestions for improvements, please don't hesitate to contact any member
 of the group image analysis.
 \end{abstract}
-
-\keywords{image analysis, phenotyping, maize }
-
-\maketitle
+\vfill
+\small{\textit{E-mail address:} klukas@ipk-gatersleben.de, entzian@ipk-gatersleben.de}
+\newline 
+\small{\textit{Key words and phrases:} image analysis, phenotyping, maize }
+ 
 
 \clearpage
 \tableofcontents
 
 \clearpage
-
-\section{Experiment info}
+\pagestyle{headings}
+\section{Experiment info} 
 \subsection{Experiment properties}
 
-\begin{lyxlist}{00.00.0000}
-\item [{%
+
 \begin{tabular}{|c|c|c|}
 \hline 
 Experiment & --experimentname--\tabularnewline
@@ -117,13 +148,12 @@ Images & --ImagesExp-- \tabularnewline
 \hline 
 Storage & --StorageExp-- \tabularnewline
 \hline 
-\end{tabular}}]~
-\end{lyxlist}
+\end{tabular}
+
 
 \subsection{Remarks}
 
-\begin{lyxlist}{00.00.0000}
-\item [{%
+
 \begin{tabular}{|c|c|}
 \hline 
 Notes\tabularnewline
@@ -131,13 +161,11 @@ Notes\tabularnewline
 \hline 
 --RemarkExp--\tabularnewline
 \hline 
-\end{tabular}}]~
-\end{lyxlist}
+\end{tabular}
 
 \subsection{Experiment factors}
 
-\begin{lyxlist}{00.00.0000}
-\item [{%
+
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline 
 ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
@@ -145,8 +173,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \hline 
 --ID-- & --Genotype-- & --Variety-- & --Treatment-- & --Sequence-- & --xyz--\tabularnewline
 \hline 
-\end{tabular}}]~
-\end{lyxlist}
+\end{tabular}
 
 %%\newpage
 \clearpage
@@ -176,7 +203,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \section{\noindent Biomass}
 \begin{itemize}
 \item Digital Biomass based on the side.area and top.area
-\item Unit: pixel\textthreesuperior{}
+\item Unit: $pixel^2$
 \end{itemize}
 
 \subsection{IAP based formula - Visible Light}
@@ -279,7 +306,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \begin{itemize}
 \item Number of foreground pixels from side camera (normalized to distance of left and right marker)
 \item Colum name: side.area.norm
-\item Unit: mm\texttwosuperior{}
+\item Unit: $mm^2$
 \end{itemize}
 \loadImage{side_area_norm__mm2_boxplot.pdf}
 \loadImage{side_area_norm__mm2_nboxplot.pdf}
@@ -299,7 +326,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \begin{itemize}
 \item Number of foreground pixels from top camera (normalized to distance of left and right marker)
 \item Colum name: top.area.norm
-\item Unit: mm\texttwosuperior{}
+\item Unit: $mm^2$
 \end{itemize}
 
 \loadImage{top_area_norm__mm2_nboxplot.pdf}
@@ -541,5 +568,8 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \section{Appendix}
 
 \loadTex{appendixImage}
-
+\vfill
+\small{Leibniz Institute of Plant Genetics and Crop Plant Research, Group Image Analysis, Corrensstr. 3, 06466 Gatersleben, Germany}
+\newline
+\small{\textit{URL:} http://ba-13.ipk-gatersleben.de}
 \end{document}
