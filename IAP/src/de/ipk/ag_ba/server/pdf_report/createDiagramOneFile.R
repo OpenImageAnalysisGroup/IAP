@@ -1636,20 +1636,71 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 					descriptorSetName_nBoxplot <- descriptorSet
 					
 				} else { #Report	
-					descriptorSet_nBoxplot <- c("Weight A (g)","Weight B (g)","Water (weight-diff)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
-							"side.fluo.intensity.chlorophyl.average (relative)","side.fluo.intensity.phenol.average (relative)",
-							"side.nir.intensity.average (relative)","side.leaf.count.median (leafs)","side.bloom.count (tassel)",
-							"side.leaf.length.sum.norm.max (mm)", "volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
-							"volume.iap.wue", "side.nir.wetness.plant_weight_drought_loss", "top.nir.wetness.plant_weight_drought_loss", "side.nir.wetness.av", "top.nir.wetness.av",
-							"side.area.relative", "side.height.norm.relative", "side.width.norm.relative", "top.area.relative", "side.area.relative", "volume.iap.relative",
-							"side.height (mm)","side.width (mm)","side.area (px)", "top.area (px)")
+					descriptorSet_nBoxplot <- c("Weight A (g)",
+												"Weight B (g)",
+												"Water (weight-diff)",
+												"side.height.norm (mm)",
+												"side.width.norm (mm)",
+												"side.area.norm (mm^2)", 
+												"top.area.norm (mm^2)",											
+												"side.fluo.intensity.chlorophyl.average (relative)",
+												"side.fluo.intensity.phenol.average (relative)",
+												"side.nir.intensity.average (relative)",
+												"side.leaf.count.median (leafs)",
+												"side.bloom.count (tassel)",
+												"side.leaf.length.sum.norm.max (mm)", 
+												
+												"volume.iap (px^3)", 
+												
+												"volume.lt (px^3)",
+												"volume.iap.wue", 
+												"side.nir.wetness.plant_weight_drought_loss", 
+												"top.nir.wetness.plant_weight_drought_loss", 
+												"side.nir.wetness.av", 
+												"top.nir.wetness.av",
+												"side.area.relative", 
+												"side.height.norm.relative", 
+												"side.width.norm.relative", 
+												"top.area.relative", 
+												"side.area.relative", 
+												"volume.iap.relative",
+												"side.height (mm)",
+												"side.width (mm)",
+												"side.area (px)", 
+												"top.area (px)")
 				
-					descriptorSetName_nBoxplot <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
-							"chlorophyl intensity (relative intensity/pixel)", "fluorescence intensity (relative intensity/pixel)", "nir intensity (relative intensity/pixel)",
-							"number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)", "volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
-							"volume based water use efficiency", "weighted loss through drought stress (side)", "weighted loss through drought stress (top)", "Average wetness of side image", "Average wetness of top image",
-							"relative projected side area (%)", "relative plant height (%)", "relative plant width (%)", "relative projected top area (%)", "relative projected side area (%)", "relative volume (IAP based formular - RGB) (%)",
-							"height (px)", "width (px)", "side area (px)", "top area (px)")		
+					descriptorSetName_nBoxplot <- c("weight before watering (g)",
+													"weight after watering (g)", 
+													"water weight (g)", 
+													"plant height (mm)", 
+													"normalized width (mm)", 
+													"normalized side area (mm^2)", 
+													"normalized top area (mm^2)",
+													"chlorophyl intensity (relative intensity/pixel)", 
+													"fluorescence intensity (relative intensity/pixel)", 
+													"nir intensity (relative intensity/pixel)",
+													"number of leafs (leaf)", 
+													"number of tassels (tassel)", 
+													"length of leafs plus stem (mm)", 
+													 
+													"volume based on RGB (IAP) (px^3)", 
+													 
+													"volume based on RGB (LemnaTec) (px^3)",
+													"volume based water use efficiency", 
+													"weighted loss through drought stress (side)", 
+													"weighted loss through drought stress (top)", 
+													"Average wetness of side image", 
+													"Average wetness of top image",
+													"growth in %/day", 
+													"relative plant height (%)", 
+													"relative plant width (%)", 
+													"relative projected top area (%)", 
+													"relative projected side area (%)", 
+													"relative volume (IAP based formular - RGB) (%)",
+													"height (px)", 
+													"width (px)", 
+													"side area (px)", 
+													"top area (px)")		
 				}
 	
 				nBoxOptions= NULL
@@ -1657,13 +1708,31 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 		
 		
 				#boxplot
-				descriptorSet_boxplot <- c("side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
-						"volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
-						"side.height (mm)","side.width (mm)","side.area (px)", "top.area (px)")
+				descriptorSet_boxplot <- c("side.height.norm (mm)",
+										   "side.width.norm (mm)",
+										   "side.area.norm (mm^2)", 
+										   "top.area.norm (mm^2)",
+										   "volume.fluo.iap",
+										   "volume.iap (px^3)", 
+										  
+										   "volume.lt (px^3)",
+										   "side.height (mm)",
+										   "side.width (mm)",
+										   "side.area (px)", 
+										   "top.area (px)")
 				
-				descriptorSetName_boxplot <- c("normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
-						"volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
-						"height (px)", "width (px)", "side area (px)", "top area (px)")	
+				descriptorSetName_boxplot <- c("plant height (mm)", 
+										  	   "normalized width (mm)", 
+											   "normalized side area (mm^2)", 
+											   "normalized top area (mm^2)",
+											   "volume based on FLUO (IAP) (px^3)", 
+											   "volume based on RGB (IAP) (px^3)",
+											 
+											   "volume based on RGB (LemnaTec) (px^3)",
+											   "height (px)",
+											   "width (px)", 
+											   "side area (px)",
+											   "top area (px)")	
 				
 				boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
 				#diagramTypVectorBox <- rep.int("boxplot", times=length(descriptorSetBox))
