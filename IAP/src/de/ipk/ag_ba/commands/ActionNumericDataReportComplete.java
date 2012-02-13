@@ -44,6 +44,8 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	
+	ArrayList<String> lastOutput = new ArrayList<String>();
+	
 	private static final String separator = ";";// "\t";// ";";// "\t";
 	private final boolean exportIndividualAngles;
 	private final String[] variant;
@@ -80,7 +82,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-		res.add(src);
+		// res.add(src);
 		return res;
 	}
 	
@@ -278,7 +280,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			if (!exportIndividualAngles && !xlsx) {
 				if (status != null)
 					status.setCurrentStatusText2("Generate report images and PDF");
-				p.executeRstat(variant, experiment, status);
+				p.executeRstat(variant, experiment, status, lastOutput);
 				p.getOutput();
 				boolean ok = p.hasPDFcontent();
 				if (ok)
@@ -303,6 +305,15 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public String getDefaultTooltip() {
+		String res = "<html>" + super.getDefaultTooltip();
+		synchronized (lastOutput) {
+			res += "<br>Last output:<br>" + StringManipulationTools.getStringList(lastOutput, "<br>");
+		}
+		return res;
 	}
 	
 	private boolean match(ThreadSafeOptions t, SnapshotDataIAP s) {
