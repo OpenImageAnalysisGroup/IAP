@@ -265,10 +265,13 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public String getToolTip() {
-		if (tooltipHint != null)
-			return tooltipHint;
-		else
-			return action != null ? action.getDefaultTooltip() : null;
+		// if (tooltipHint != null)
+		// return tooltipHint;
+		// else
+		String res = action != null ? action.getDefaultTooltip() : tooltipHint;
+		if (res == null)
+			res = tooltipHint;
+		return res;
 	}
 	
 	public void setProcessing(boolean b) {
@@ -633,7 +636,17 @@ public class NavigationButton implements StyleAware {
 		if (icon != null)
 			icon.setDescription(imgS + "");
 		
-		final JButton n1 = new JButton("" + n.getTitle());
+		final JButton n1 = new JButton("" + n.getTitle()) {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public String getToolTipText(MouseEvent e) {
+				return n.getToolTip();
+			}
+			
+		};
+		n1.setToolTipText(n.getToolTip());
+		
 		switch (style) {
 			case FLAT:
 			case COMPACT_LIST:
@@ -658,7 +671,6 @@ public class NavigationButton implements StyleAware {
 				n1.setContentAreaFilled(true);
 		}
 		
-		n1.setToolTipText(n.getToolTip());
 		n1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		n1.addMouseListener(new MouseListener() {
 			@Override

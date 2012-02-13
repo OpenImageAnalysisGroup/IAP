@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.AttributeHelper;
@@ -32,6 +33,8 @@ public class PdfCreator {
 	final ThreadSafeOptions tso = new ThreadSafeOptions();
 	
 	private final File optTargetDirectoryOrTargetFile;
+	
+	private ArrayList<String> lastOutput;
 	
 	public PdfCreator(File optTargetDirectoryOrTargetFile) {
 		this.optTargetDirectoryOrTargetFile = optTargetDirectoryOrTargetFile;
@@ -65,7 +68,8 @@ public class PdfCreator {
 	}
 	
 	public void executeRstat(final String[] parameter, ExperimentInterface exp,
-			final BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws IOException {
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput) throws IOException {
+		this.lastOutput = lastOutput;
 		readAndModify("report2.tex", exp);
 		
 		String name = tempDirectory.getAbsolutePath() + File.separator + "diagramIAP.cmd";
@@ -103,6 +107,11 @@ public class PdfCreator {
 							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 						if (optStatus != null && response != null && response.trim().length() > 0)
 							optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": " + response);
+						synchronized (lastOutput) {
+							lastOutput.add(SystemAnalysis.getCurrentTime() + ": " + response);
+							while (lastOutput.size() > 20)
+								lastOutput.remove(0);
+						}
 					}
 					while ((response = ls_in2.readLine()) != null) {
 						output.put(System.nanoTime(), "ERROR: " + response);
@@ -110,6 +119,11 @@ public class PdfCreator {
 							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 						if (optStatus != null && response != null && response.trim().length() > 0)
 							optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": ERROR: " + response);
+						synchronized (lastOutput) {
+							lastOutput.add(SystemAnalysis.getCurrentTime() + ": ERROR: " + response);
+							while (lastOutput.size() > 20)
+								lastOutput.remove(0);
+						}
 					}
 					if (optStatus != null)
 						optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
