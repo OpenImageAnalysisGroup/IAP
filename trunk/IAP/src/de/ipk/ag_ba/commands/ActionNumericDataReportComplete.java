@@ -166,7 +166,8 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 						null, experiment, null, false, exportIndividualAngles);
 				csv.append(csvHeader);
 			}
-			System.out.println(SystemAnalysis.getCurrentTime() + ">Snapshot data set has been created");
+			System.out.println(SystemAnalysis.getCurrentTime() +
+					">Snapshot data set has been created (" + snapshots.size() + " snapshots)");
 			Workbook wb = xlsx ? new XSSFWorkbook() : null;
 			Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experimentReference.getExperimentName())) : null;
 			if (sheet != null) {
