@@ -90,10 +90,12 @@ public class PdfCreator {
 			public void run() {
 				try {
 					Process ls_proc;
-					if (parameter != null && parameter.length > 0)
-						ls_proc = Runtime.getRuntime().exec(nameF);
-					else
-						ls_proc = Runtime.getRuntime().exec(nameF, parameter);
+					String[] nameArray = new String[parameter.length + 1];
+					nameArray[0] = nameF;
+					for (int i = 0; i < parameter.length; i++)
+						nameArray[i + 1] = parameter[i];
+					
+					ls_proc = Runtime.getRuntime().exec(nameArray, null, null);
 					
 					myRef.setObject(ls_proc);
 					
@@ -103,6 +105,7 @@ public class PdfCreator {
 					String response;
 					while ((response = ls_in.readLine()) != null) {
 						output.put(System.nanoTime(), "INFO:  " + response);
+						System.out.println("INFO:  " + response);
 						if (optStatus != null && response != null && response.trim().length() > 0)
 							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 						if (optStatus != null && response != null && response.trim().length() > 0)
@@ -115,6 +118,7 @@ public class PdfCreator {
 					}
 					while ((response = ls_in2.readLine()) != null) {
 						output.put(System.nanoTime(), "ERROR: " + response);
+						System.out.println("ERROR: " + response);
 						if (optStatus != null && response != null && response.trim().length() > 0)
 							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 						if (optStatus != null && response != null && response.trim().length() > 0)

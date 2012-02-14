@@ -1083,7 +1083,7 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 }
 
 createOuputOverview <- function(actualImage, maxImage) {
-	print(paste("Create image ",actualImage,"|",maxImage,sep=""))
+	print(paste("Create image ",actualImage,"/",maxImage,sep=""))
 }
 
 makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, diagramTypSave="nboxplot") {

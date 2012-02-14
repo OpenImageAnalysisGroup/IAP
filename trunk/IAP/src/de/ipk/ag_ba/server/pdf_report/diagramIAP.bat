@@ -3,27 +3,11 @@ cd /d %~dp0
 echo Current directory:
 cd
 
-IF "%~1" neq "" (
-SET Treat=%1
-) ELSE (
-SET Treat=Genotype
-)
+echo Condition 1: %1
+echo Condition 2: %2
+echo Appendix?  : %3
 
-if "%~2" neq "" (
-SET Sec=%2
-) ELSE (
-SET Sec="none"
-)
-
-if "%~3" neq "" (
-echo CREATE APPENDIX
-SET Appendix=%3
-) ELSE (
-echo NO APPENDIX
-SET Appendix=FALSE
-)
-
-Rscript createDiagramOneFile.r report.csv pdf %Appendix% %Treat% %Sec%
+Rscript createDiagramOneFile.r report.csv pdf %3 %1 %2
 
 pdflatex report2.tex
 pdflatex report2.tex
