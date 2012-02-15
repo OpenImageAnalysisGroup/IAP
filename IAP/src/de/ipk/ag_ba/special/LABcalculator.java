@@ -9,7 +9,7 @@ import org.OpenFileDialogService;
 import org.StringManipulationTools;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 
@@ -52,16 +52,32 @@ public class LABcalculator {
 				b1 = lab1[2][i];
 				b2 = lab2[2][i];
 				
-				if (i % 2000 == 0)
+				if (i % 10000 == 0)
 					System.out.println("Progress: " + StringManipulationTools.formatNumber(100d * i / lab1[0].length, "#.##") + "%");
 				
 				int r, g, b;
 				boolean lab = true;
 				if (lab) {
-					float lf = l2 - l1 > 0 ? l2 - l1 : 0;
-					float af = (a1 + a2) / 2f;
-					float bf = (b1 + b2) / 2f;
-					ress[i] = ImageOperation.searchRGBfromLAB(lf, af, bf);
+					float lf = l1 - l2 > 0 ? l1 - l2 : 0;
+					float af = a2 - a1;// (a1 + a2) / 2f;
+					float bf = b2 - b1;// (b1 + b2) / 2f;
+					// ress[i] = ImageOperation.searchRGBfromLAB(lf, af, bf);
+					// Color sc = new Color(ImageOperation.searchRGBfromLAB(lf, af, bf));
+					Color c = new Color_CIE_Lab((lf - 40) / 2.1, af - 98, bf - 97 - 6).getColor();
+					
+					// c = sc;
+					
+					// float l3 = ImageOperation.labCube[c.getRed()][c.getGreen()][c.getBlue()];
+					// float a3 = ImageOperation.labCube[c.getRed()][c.getGreen()][c.getBlue() + 256];
+					// float b3 = ImageOperation.labCube[c.getRed()][c.getGreen()][c.getBlue() + 512];
+					
+					// System.out.println("l: " + lf + " => " + l3);
+					// System.out.println("a: " + af + " => " + a3);
+					// System.out.println("b: " + bf + " => " + b3);
+					
+					// System.out.println("R[" + sc.getRed() + "/" + c.getRed() + "] || G[" + sc.getGreen() + "/" + c.getGreen() + "] || B[" + sc.getBlue() + "/"
+					// + c.getBlue() + "]");
+					ress[i] = c.getRGB();
 				} else {
 					if (l1 < l2) {
 						r = (int) (l2 - l1);
