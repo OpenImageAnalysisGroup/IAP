@@ -661,11 +661,11 @@ getToPlottedDays <- function(xAxis, changes=NULL) {
 	#######
 	
 	uniqueDays <- unique(xAxis)
-	daysMedian <- median(uniqueDays)
+	daysMedian <- floor(median(uniqueDays))
 
-	days <- median(uniqueDays[uniqueDays<=daysMedian])
-	days <- c(days, floor(daysMedian))
-	days <- c(days, median(uniqueDays[uniqueDays>=daysMedian]))
+	days <- floor(median(uniqueDays[uniqueDays<=daysMedian]))
+	days <- c(days, daysMedian)
+	days <- c(days, floor(median(uniqueDays[uniqueDays>=daysMedian])))
 	days <- c(days, uniqueDays[length(uniqueDays)])
 	 
 	if(!is.null(changes)) {
@@ -682,7 +682,7 @@ setxAxisfactor <- function(xAxisValue, options) {
 	} else {
 		whichDayShouldBePlot <- getToPlottedDays(xAxisValue)
 	}
-	
+		
 	xAxisfactor <- factor(xAxisValue, levels=whichDayShouldBePlot)
 	xAxisfactor <- paste("DAS", xAxisfactor)
 	xAxisfactor[xAxisfactor == "DAS NA"] <- NA
@@ -1082,8 +1082,8 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 	return(workingDataSet)	
 }
 
-createOuputOverview <- function(actualImage, maxImage) {
-	print(paste("Create image ",actualImage,"/",maxImage,sep=""))
+createOuputOverview <- function(typ, actualImage, maxImage) {
+	print(paste("Create image (",typ,") ",actualImage,"/",maxImage,sep=""))
 }
 
 makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, diagramTypSave="nboxplot") {
@@ -1098,13 +1098,13 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 #########################
 	
 	overallList$debug %debug% "makeLinearDiagram()"	
-	print("... nBoxplot")
+	print("... linear Plot")
 	
 	tempOverallResult <-  overallResult
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		if(!is.na(overallDescriptor[[imagesIndex]])) {
-			createOuputOverview(imagesIndex, length(names(overallDescriptor)))
+			createOuputOverview("linear Plot", imagesIndex, length(names(overallDescriptor)))
 			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "nboxplot")
 			
 			if(!CheckIfOneColumnHasOnlyValues(overallResult)) {	
@@ -1318,12 +1318,12 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 	
 	
 	overallList$debug %debug% "makeBoxplotStackedDiagram()"
-	print("... stacked Bockplot")
+	print("... stacked Barplot")
 	overallResult[is.na(overallResult)] <- 0
 	tempOverallResult <- overallResult
 	
 	for(imagesIndex in names(overallDescriptor)) {
-		createOuputOverview(imagesIndex, length(names(overallDescriptor)))
+		createOuputOverview("stacked Barplot", imagesIndex, length(names(overallDescriptor)))
 		overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplotstacked")
 	
 		PreWorkForMakeBigOverallImage(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, imagesIndex)
@@ -1404,7 +1404,6 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 	#return(overallList)
 }
 
-##Problem: der median wird nicht angezeigt!
 makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, options, overallList, diagramTypSave="boxplot") {
 	########################		
 #	h=h 
@@ -1425,7 +1424,7 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		if(!is.na(overallDescriptor[[imagesIndex]])) {
-			createOuputOverview(imagesIndex, length(names(overallDescriptor)))
+			createOuputOverview("Boxplot", imagesIndex, length(names(overallDescriptor)))
 			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
 				
 			#for(opt in names(options))
@@ -1450,13 +1449,14 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 							panel.grid.minor = theme_blank(),
 							panel.border = theme_rect(colour="Grey", size=0.1)
 							
-					)
+					) +
+					opts(axis.text.x = theme_text(size=6, angle=90)) +
+					facet_wrap(~ xAxisfactor, drop=FALSE)
 		
-			if(length(overallColor[[imagesIndex]]) > 10) {
-				myPlot <- myPlot + opts(axis.text.x = theme_text(size=6, angle=90))
-			}	
-			
-			myPlot <- myPlot + facet_wrap(~ xAxisfactor, drop=FALSE)
+#			if(length(overallColor[[imagesIndex]]) > 10) {
+#				myPlot <- myPlot + opts(axis.text.x = theme_text(size=6, angle=90))
+#			}	
+#			myPlot <- myPlot + facet_wrap(~ xAxisfactor, drop=FALSE)
 			
 		#	print(myPlot)
 
