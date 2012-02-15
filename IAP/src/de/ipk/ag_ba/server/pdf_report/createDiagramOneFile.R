@@ -661,11 +661,11 @@ getToPlottedDays <- function(xAxis, changes=NULL) {
 	#######
 	
 	uniqueDays <- unique(xAxis)
-	daysMedian <- floor(median(uniqueDays))
+	medianPosition <- floor(median(1:length(uniqueDays)))
 
-	days <- floor(median(uniqueDays[uniqueDays<=daysMedian]))
-	days <- c(days, daysMedian)
-	days <- c(days, floor(median(uniqueDays[uniqueDays>=daysMedian])))
+	days <- uniqueDays[floor(median(1:length(uniqueDays[uniqueDays<=uniqueDays[medianPosition]])))]
+	days <- c(days, uniqueDays[medianPosition])
+	days <- c(days,uniqueDays[floor(median(length(uniqueDays[uniqueDays>=uniqueDays[medianPosition]]):length(uniqueDays)))])
 	days <- c(days, uniqueDays[length(uniqueDays)])
 	 
 	if(!is.null(changes)) {
@@ -1418,18 +1418,17 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 	overallList$debug %debug% "makeBoxplotDiagram()"
 	#overallList$overallResult <- overallList$overallResult[!is.na(overallList$overallResult$mean),]
 	print("... Boxplot")
-	overallResult[is.na(overallResult)] <- 0
-	tempOverallResult <-  overallResult
+#	overallResult[is.na(overallResult)] <- 0
+#	tempOverallResult <-  overallResult
+	tempOverallResult <-  na.omit(overallResult)
 	
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		if(!is.na(overallDescriptor[[imagesIndex]])) {
 			createOuputOverview("Boxplot", imagesIndex, length(names(overallDescriptor)))
-			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
-				
-			#for(opt in names(options))
 			
-			overallResult$xAxisfactor <- setxAxisfactor(overallResult$xAxis, options)
+			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
+			overallResult$xAxisfactor <- setxAxisfactor(overallResult$xAxis, options)	
 			
 			#myPlot <- ggplot(overallList$overallResult, aes(factor(name), value, fill=name, colour=name)) + 
 			#myPlot <- ggplot(overallResult, aes(factor(name), value, fill=name)) +
@@ -1854,21 +1853,24 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 		#descriptorSetName <- colnames(workingDataSet)
 		
 		#treatment <- "none"
-		treatment <- "Genotype"
+		#treatment <- "Genotype"
+		treatment <- "Species"
 		#treatment <- "Treatment"
 		#treatment <- "Condition"
 		#filterTreatment <- "dry$normal$wet"
 		#filterTreatment <- "dry$normal"
 		#filterTreatment <- "normal bewaessert$Trockentress"
-		#filterTreatment <- "ganz"
-		filterTreatment <- "none"
+		filterTreatment <- "Aromatnaja$Athletico$Cukrova Cervena"
+		#filterTreatment <- "none"
 		##filterTreatment <- "Deutschland$Spanien$Italien$China"
 		
 		#secondTreatment <- "Genotype"
-		secondTreatment <- "none"
+		#secondTreatment <- "none"
 		#secondTreatment <- "Species"
 		#secondTreatment <- "Variety"
-		filterSecondTreatment <- "none"
+		secondTreatment <- "Treatment"
+		#filterSecondTreatment <- "none"
+		filterSecondTreatment <- "dry$normal"
 		
 		#secondTreatment <- "secondTreatment"
 		#filterSecondTreatment <- "a$c"
@@ -1917,75 +1919,144 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 		#descriptorSetName <- c("Das ist ein Testname")
 		if(TRUE) {
 			
-			descriptorSet_nBoxplot <- c("Weight A (g)","Weight B (g)","Water (weight-diff)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
-					"side.fluo.intensity.chlorophyl.average (relative)","side.fluo.intensity.phenol.average (relative)",
-					"side.nir.intensity.average (relative)","side.leaf.count.median (leafs)","side.bloom.count (tassel)",
-					"side.leaf.length.sum.norm.max (mm)", "volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
-					"volume.iap.wue", "side.nir.wetness.plant_weight_drought_loss", "top.nir.wetness.plant_weight_drought_loss", "side.nir.wetness.av", "top.nir.wetness.av",
-					"side.area.relative", "side.height.norm.relative", "side.width.norm.relative", "top.area.relative", "side.area.relative", "volume.iap.relative",
-					"side.height (mm)","side.width (mm)","side.area (px)", "top.area (px)")
+			descriptorSet_nBoxplot <- c("Weight A (g)",
+					"Weight B (g)",
+					"Water (weight-diff)",
+					"side.height.norm (mm)",
+					"side.width.norm (mm)",
+					"side.area.norm (mm^2)", 
+					"top.area.norm (mm^2)",											
+					"side.fluo.intensity.chlorophyl.average (relative)",
+					"side.fluo.intensity.phenol.average (relative)",
+					"side.nir.intensity.average (relative)",
+					"side.leaf.count.median (leafs)",
+					"side.bloom.count (tassel)",
+					"side.leaf.length.sum.norm.max (mm)", 
+					
+					"volume.iap (px^3)", 
+					
+					"volume.lt (px^3)",
+					"volume.iap.wue", 
+					"side.nir.wetness.plant_weight_drought_loss", 
+					"top.nir.wetness.plant_weight_drought_loss", 
+					"side.nir.wetness.av", 
+					"top.nir.wetness.av",
+					"side.area.relative", 
+					"side.height.norm.relative", 
+					"side.width.norm.relative", 
+					"top.area.relative", 
+					"side.area.relative", 
+					"volume.iap.relative",
+					"side.height (mm)",
+					"side.width (mm)",
+					"side.area (px)", 
+					"top.area (px)")
 			
-			descriptorSetName_nBoxplot <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
-					"chlorophyl intensity (relative intensity/pixel)", "fluorescence intensity (relative intensity/pixel)", "nir intensity (relative intensity/pixel)",
-					"number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)", "volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
-					"volume based water use efficiency", "weighted loss through drought stress (side)", "weighted loss through drought stress (top)", "Average wetness of side image", "Average wetness of top image",
-					"relative projected side area (%)", "relative plant height (%)", "relative plant width (%)", "relative projected top area (%)", "relative projected side area (%)", "relative volume (IAP based formular - RGB) (%)",
-					"height (px)", "width (px)", "side area (px)", "top area (px)")		
+			descriptorSetName_nBoxplot <- c("weight before watering (g)",
+					"weight after watering (g)", 
+					"water weight (g)", 
+					"plant height (mm)", 
+					"normalized width (mm)", 
+					"normalized side area (mm^2)", 
+					"normalized top area (mm^2)",
+					"chlorophyl intensity (relative intensity/pixel)", 
+					"fluorescence intensity (relative intensity/pixel)", 
+					"nir intensity (relative intensity/pixel)",
+					"number of leafs (leaf)", 
+					"number of tassels (tassel)", 
+					"length of leafs plus stem (mm)", 
+					
+					"volume based on RGB (IAP) (px^3)", 
+					
+					"volume based on RGB (LemnaTec) (px^3)",
+					"volume based water use efficiency", 
+					"weighted loss through drought stress (side)", 
+					"weighted loss through drought stress (top)", 
+					"Average wetness of side image", 
+					"Average wetness of top image",
+					"growth in %/day", 
+					"relative plant height (%)", 
+					"relative plant width (%)", 
+					"relative projected top area (%)", 
+					"relative projected side area (%)", 
+					"relative volume (IAP based formular - RGB) (%)",
+					"height (px)", 
+					"width (px)", 
+					"side area (px)", 
+					"top area (px)")		
 		
-		nBoxOptions= NULL
-		#diagramTypVector <- rep.int("nboxplot", times=length(descriptorSetName))
+			nBoxOptions= NULL
+			#diagramTypVector <- rep.int("nboxplot", times=length(descriptorSetName))
+			
+			
+			#boxplot
+			descriptorSet_boxplot <- c("side.height.norm (mm)",
+					"side.width.norm (mm)",
+					"side.area.norm (mm^2)", 
+					"top.area.norm (mm^2)",
+					"volume.fluo.iap",
+					"volume.iap (px^3)", 
+					
+					"volume.lt (px^3)",
+					"side.height (mm)",
+					"side.width (mm)",
+					"side.area (px)", 
+					"top.area (px)")
+			
+			descriptorSetName_boxplot <- c("plant height (mm)", 
+					"normalized width (mm)", 
+					"normalized side area (mm^2)", 
+					"normalized top area (mm^2)",
+					"volume based on FLUO (IAP) (px^3)", 
+					"volume based on RGB (IAP) (px^3)",
+					
+					"volume based on RGB (LemnaTec) (px^3)",
+					"height (px)",
+					"width (px)", 
+					"side area (px)",
+					"top area (px)")	
+			
+			boxOptions= list(daysOfBoxplotNeeds=c("all"))
+			#diagramTypVectorBox <- rep.int("boxplot", times=length(descriptorSetBox))
+			
+			#descriptorSet <- c(descriptorSet, descriptorSetBox)
+			#descriptorSetName <- c(descriptorSetName, descriptorSetNameBox)
+			#diagramTypVector <- c(diagramTypVector, diagramTypVectorBox)
+			
+			#boxplotStacked
+			descriptorSet_boxplotStacked <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
+					"side.fluo.histogram.bin.1.0_25$side.fluo.histogram.bin.2.25_51$side.fluo.histogram.bin.3.51_76$side.fluo.histogram.bin.4.76_102$side.fluo.histogram.bin.5.102_127$side.fluo.histogram.bin.6.127_153$side.fluo.histogram.bin.7.153_178$side.fluo.histogram.bin.8.178_204$side.fluo.histogram.bin.9.204_229$side.fluo.histogram.bin.10.229_255",
+					"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
+					"side.fluo.histogram.ratio.bin.1.0_25$side.fluo.histogram.ratio.bin.2.25_51$side.fluo.histogram.ratio.bin.3.51_76$side.fluo.histogram.ratio.bin.4.76_102$side.fluo.histogram.ratio.bin.5.102_127$side.fluo.histogram.ratio.bin.6.127_153$side.fluo.histogram.ratio.bin.7.153_178$side.fluo.histogram.ratio.bin.8.178_204$side.fluo.histogram.ratio.bin.9.204_229$side.fluo.histogram.ratio.bin.10.229_255",
+					"side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
+					"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255",
+					"side.fluo.normalized.histogram.ratio.bin.1.0_25$side.fluo.normalized.histogram.ratio.bin.2.25_51$side.fluo.normalized.histogram.ratio.bin.3.51_76$side.fluo.normalized.histogram.ratio.bin.4.76_102$side.fluo.normalized.histogram.ratio.bin.5.102_127$side.fluo.normalized.histogram.ratio.bin.6.127_153$side.fluo.normalized.histogram.ratio.bin.7.153_178$side.fluo.normalized.histogram.ratio.bin.8.178_204$side.fluo.normalized.histogram.ratio.bin.9.204_229$side.fluo.normalized.histogram.ratio.bin.10.229_255",
+					"side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.nir.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
+					"side.vis.normalized.histogram.ratio.bin.1.0_25$side.vis.normalized.histogram.ratio.bin.2.25_51$side.vis.normalized.histogram.ratio.bin.3.51_76$side.vis.normalized.histogram.ratio.bin.4.76_102$side.vis.normalized.histogram.ratio.bin.5.102_127$side.vis.normalized.histogram.ratio.bin.6.127_153$side.vis.normalized.histogram.ratio.bin.7.153_178$side.vis.normalized.histogram.ratio.bin.8.178_204$side.vis.normalized.histogram.ratio.bin.9.204_229$side.vis.normalized.histogram.ratio.bin.10.229_255",
+					"top.fluo.histogram.bin.1.0_25$top.fluo.histogram.bin.2.25_51$top.fluo.histogram.bin.3.51_76$top.fluo.histogram.bin.4.76_102$top.fluo.histogram.bin.5.102_127$top.fluo.histogram.bin.6.127_153$top.fluo.histogram.bin.7.153_178$top.fluo.histogram.bin.8.178_204$top.fluo.histogram.bin.9.204_229$top.fluo.histogram.bin.10.229_255",
+					"top.fluo.histogram.ratio.bin.1.0_25$top.fluo.histogram.ratio.bin.2.25_51$top.fluo.histogram.ratio.bin.3.51_76$top.fluo.histogram.ratio.bin.4.76_102$top.fluo.histogram.ratio.bin.5.102_127$top.fluo.histogram.ratio.bin.6.127_153$top.fluo.histogram.ratio.bin.7.153_178$top.fluo.histogram.ratio.bin.8.178_204$top.fluo.histogram.ratio.bin.9.204_229$top.fluo.histogram.ratio.bin.10.229_255",
+					"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
+					"top.vis.hue.histogram.ratio.bin.1.0_25$top.vis.hue.histogram.ratio.bin.2.25_51$top.vis.hue.histogram.ratio.bin.3.51_76$top.vis.hue.histogram.ratio.bin.4.76_102$top.vis.hue.histogram.ratio.bin.5.102_127$top.vis.hue.histogram.ratio.bin.6.127_153$top.vis.hue.histogram.ratio.bin.7.153_178$top.vis.hue.histogram.ratio.bin.8.178_204$top.vis.hue.histogram.ratio.bin.9.204_229$top.vis.hue.histogram.ratio.bin.10.229_255")
+			
+			
+			
+			
+			descriptorSetName_boxplotStacked <- c("NIR side (%)", 
+					"red side fluorescence histogram (%)", 
+					"NIR top (%)", 
+					"fluo side ratio histogramm (%)",
+					"NIR side normalized (%)", 
+					"red side normalized fluo histogramm (%)", 
+					"fluo side normalized ratio histogramm (%)",
+					"VIS HUE side ratio histogramm (%)", 
+					"VIS side normalized ratio histogramm (%)",
+					"red top fluorescence histogram (%)", 
+					"fluo top ratio histogramm (%)",
+					"NIR top (%)", 
+					"VIS HUE top ratio histogramm (%)")
 		
-		
-		#boxplot
-		descriptorSet_boxplot <- c("side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)", "top.area.norm (mm^2)",
-				"volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)",
-				"side.height (mm)","side.width (mm)","side.area (px)", "top.area (px)")
-		
-		descriptorSetName_boxplot <- c("normalized height (mm)", "normalized width (mm)", "normalized side area (mm^2)", "normalized top area (mm^2)",
-				"volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)",
-				"height (px)", "width (px)", "side area (px)", "top area (px)")	
-		
-		boxOptions= list(daysOfBoxplotNeeds=c("all"))
-		#diagramTypVectorBox <- rep.int("boxplot", times=length(descriptorSetBox))
-		
-		#descriptorSet <- c(descriptorSet, descriptorSetBox)
-		#descriptorSetName <- c(descriptorSetName, descriptorSetNameBox)
-		#diagramTypVector <- c(diagramTypVector, diagramTypVectorBox)
-		
-		#boxplotStacked
-descriptorSet_boxplotStacked <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
-		"side.fluo.histogram.bin.1.0_25$side.fluo.histogram.bin.2.25_51$side.fluo.histogram.bin.3.51_76$side.fluo.histogram.bin.4.76_102$side.fluo.histogram.bin.5.102_127$side.fluo.histogram.bin.6.127_153$side.fluo.histogram.bin.7.153_178$side.fluo.histogram.bin.8.178_204$side.fluo.histogram.bin.9.204_229$side.fluo.histogram.bin.10.229_255",
-		"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
-		"side.fluo.histogram.ratio.bin.1.0_25$side.fluo.histogram.ratio.bin.2.25_51$side.fluo.histogram.ratio.bin.3.51_76$side.fluo.histogram.ratio.bin.4.76_102$side.fluo.histogram.ratio.bin.5.102_127$side.fluo.histogram.ratio.bin.6.127_153$side.fluo.histogram.ratio.bin.7.153_178$side.fluo.histogram.ratio.bin.8.178_204$side.fluo.histogram.ratio.bin.9.204_229$side.fluo.histogram.ratio.bin.10.229_255",
-		"side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
-		"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255",
-		"side.fluo.normalized.histogram.ratio.bin.1.0_25$side.fluo.normalized.histogram.ratio.bin.2.25_51$side.fluo.normalized.histogram.ratio.bin.3.51_76$side.fluo.normalized.histogram.ratio.bin.4.76_102$side.fluo.normalized.histogram.ratio.bin.5.102_127$side.fluo.normalized.histogram.ratio.bin.6.127_153$side.fluo.normalized.histogram.ratio.bin.7.153_178$side.fluo.normalized.histogram.ratio.bin.8.178_204$side.fluo.normalized.histogram.ratio.bin.9.204_229$side.fluo.normalized.histogram.ratio.bin.10.229_255",
-		"side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.nir.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
-		"side.vis.normalized.histogram.ratio.bin.1.0_25$side.vis.normalized.histogram.ratio.bin.2.25_51$side.vis.normalized.histogram.ratio.bin.3.51_76$side.vis.normalized.histogram.ratio.bin.4.76_102$side.vis.normalized.histogram.ratio.bin.5.102_127$side.vis.normalized.histogram.ratio.bin.6.127_153$side.vis.normalized.histogram.ratio.bin.7.153_178$side.vis.normalized.histogram.ratio.bin.8.178_204$side.vis.normalized.histogram.ratio.bin.9.204_229$side.vis.normalized.histogram.ratio.bin.10.229_255",
-		"top.fluo.histogram.bin.1.0_25$top.fluo.histogram.bin.2.25_51$top.fluo.histogram.bin.3.51_76$top.fluo.histogram.bin.4.76_102$top.fluo.histogram.bin.5.102_127$top.fluo.histogram.bin.6.127_153$top.fluo.histogram.bin.7.153_178$top.fluo.histogram.bin.8.178_204$top.fluo.histogram.bin.9.204_229$top.fluo.histogram.bin.10.229_255",
-		"top.fluo.histogram.ratio.bin.1.0_25$top.fluo.histogram.ratio.bin.2.25_51$top.fluo.histogram.ratio.bin.3.51_76$top.fluo.histogram.ratio.bin.4.76_102$top.fluo.histogram.ratio.bin.5.102_127$top.fluo.histogram.ratio.bin.6.127_153$top.fluo.histogram.ratio.bin.7.153_178$top.fluo.histogram.ratio.bin.8.178_204$top.fluo.histogram.ratio.bin.9.204_229$top.fluo.histogram.ratio.bin.10.229_255",
-		"top.nir.histogram.bin.1.0_25$top.nir.histogram.bin.2.25_51$top.nir.histogram.bin.3.51_76$top.nir.histogram.bin.4.76_102$top.nir.histogram.bin.5.102_127$top.nir.histogram.bin.6.127_153$top.nir.histogram.bin.7.153_178$top.nir.histogram.bin.8.178_204$top.nir.histogram.bin.9.204_229$top.nir.histogram.bin.10.229_255",
-		"top.vis.hue.histogram.ratio.bin.1.0_25$top.vis.hue.histogram.ratio.bin.2.25_51$top.vis.hue.histogram.ratio.bin.3.51_76$top.vis.hue.histogram.ratio.bin.4.76_102$top.vis.hue.histogram.ratio.bin.5.102_127$top.vis.hue.histogram.ratio.bin.6.127_153$top.vis.hue.histogram.ratio.bin.7.153_178$top.vis.hue.histogram.ratio.bin.8.178_204$top.vis.hue.histogram.ratio.bin.9.204_229$top.vis.hue.histogram.ratio.bin.10.229_255")
-
-
-
-
-descriptorSetName_boxplotStacked <- c("NIR side (%)", 
-		"red side fluorescence histogram (%)", 
-		"NIR top (%)", 
-		"fluo side ratio histogramm (%)",
-		"NIR side normalized (%)", 
-		"red side normalized fluo histogramm (%)", 
-		"fluo side normalized ratio histogramm (%)",
-		"VIS HUE side ratio histogramm (%)", 
-		"VIS side normalized ratio histogramm (%)",
-		"red top fluorescence histogram (%)", 
-		"fluo top ratio histogramm (%)",
-		"NIR top (%)", 
-		"VIS HUE top ratio histogramm (%)")
-		
-		stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
-		#diagramTypVector <- c(diagramTypVector, "boxplotStacked", "boxplotStacked")
+			stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
+			#diagramTypVector <- c(diagramTypVector, "boxplotStacked", "boxplotStacked")
 		} else {
 
 			descriptorSet_nBoxplot <- c("side.area.norm (mm^2)", "Weight A (g)","side.height.norm (mm)")
