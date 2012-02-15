@@ -975,7 +975,7 @@ writeLatexFile <- function(saveNameLatexFile, saveNameImageFile="", o="") {
 
 saveImageFile <- function(overallList, plot, saveName, extraString="") {
 	filename <- preprocessingOfValues(paste(saveName,extraString,sep=""), FALSE,replaceString = "_")	
-	ggsave (filename=paste(filename,overallList$saveFormat,sep="."), plot = plot, dpi=as.numeric(overallList$dpi))
+	ggsave (filename=paste(filename,overallList$saveFormat,sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=14, height=7)
 
 }
 
@@ -1208,13 +1208,22 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 		if(length(overallList$stackedBarOptions$typOfGeomBar) == 0) {
 			overallList$stackedBarOptions$typOfGeomBar <- c("fill")
 		}
-		
+	
 		for(positionTyp in overallList$stackedBarOptions$typOfGeomBar) {
 		
 		
-			plot <- ggplot(overallResult, aes(xAxis, values, fill=hist)) + 
-					geom_bar(stat="identity", position = positionTyp) +
-				 	ylab(overallDesName[[imagesIndex]]) 
+		#	plot <- ggplot(overallResult, aes(xAxis, values, fill=hist)) 
+					
+				if(positionTyp == "dodge" & FALSE) {
+					plot <- ggplot(overallResult, aes(value, colour=hist)) +
+							geom_density()
+					print(plot)
+				} else {
+					plot <- ggplot(overallResult, aes(xAxis, values, fill=hist)) +
+							geom_bar(stat="identity", position = positionTyp)
+				}
+					
+				 	plot <- plot + ylab(overallDesName[[imagesIndex]]) 
 					#coord_cartesian(ylim=c(0,1)) +
 				
 			if(minor_breaks) {
@@ -1587,7 +1596,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 	print("####")
 	
 	saveFormat <- "pdf"	
-	dpi <- "150" ##90
+	dpi <- "150" ##90	
 	
 	isGray <- FALSE
 	showResultInR <- FALSE
@@ -1752,7 +1761,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 												  "side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
 												  "side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255",
 												  "side.fluo.normalized.histogram.ratio.bin.1.0_25$side.fluo.normalized.histogram.ratio.bin.2.25_51$side.fluo.normalized.histogram.ratio.bin.3.51_76$side.fluo.normalized.histogram.ratio.bin.4.76_102$side.fluo.normalized.histogram.ratio.bin.5.102_127$side.fluo.normalized.histogram.ratio.bin.6.127_153$side.fluo.normalized.histogram.ratio.bin.7.153_178$side.fluo.normalized.histogram.ratio.bin.8.178_204$side.fluo.normalized.histogram.ratio.bin.9.204_229$side.fluo.normalized.histogram.ratio.bin.10.229_255",
-												  "side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.nir.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
+												  "side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.bin.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
 												  "side.vis.normalized.histogram.ratio.bin.1.0_25$side.vis.normalized.histogram.ratio.bin.2.25_51$side.vis.normalized.histogram.ratio.bin.3.51_76$side.vis.normalized.histogram.ratio.bin.4.76_102$side.vis.normalized.histogram.ratio.bin.5.102_127$side.vis.normalized.histogram.ratio.bin.6.127_153$side.vis.normalized.histogram.ratio.bin.7.153_178$side.vis.normalized.histogram.ratio.bin.8.178_204$side.vis.normalized.histogram.ratio.bin.9.204_229$side.vis.normalized.histogram.ratio.bin.10.229_255",
 												  "top.fluo.histogram.bin.1.0_25$top.fluo.histogram.bin.2.25_51$top.fluo.histogram.bin.3.51_76$top.fluo.histogram.bin.4.76_102$top.fluo.histogram.bin.5.102_127$top.fluo.histogram.bin.6.127_153$top.fluo.histogram.bin.7.153_178$top.fluo.histogram.bin.8.178_204$top.fluo.histogram.bin.9.204_229$top.fluo.histogram.bin.10.229_255",
 												  "top.fluo.histogram.ratio.bin.1.0_25$top.fluo.histogram.ratio.bin.2.25_51$top.fluo.histogram.ratio.bin.3.51_76$top.fluo.histogram.ratio.bin.4.76_102$top.fluo.histogram.ratio.bin.5.102_127$top.fluo.histogram.ratio.bin.6.127_153$top.fluo.histogram.ratio.bin.7.153_178$top.fluo.histogram.ratio.bin.8.178_204$top.fluo.histogram.ratio.bin.9.204_229$top.fluo.histogram.ratio.bin.10.229_255",
@@ -2031,7 +2040,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 					"side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
 					"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255",
 					"side.fluo.normalized.histogram.ratio.bin.1.0_25$side.fluo.normalized.histogram.ratio.bin.2.25_51$side.fluo.normalized.histogram.ratio.bin.3.51_76$side.fluo.normalized.histogram.ratio.bin.4.76_102$side.fluo.normalized.histogram.ratio.bin.5.102_127$side.fluo.normalized.histogram.ratio.bin.6.127_153$side.fluo.normalized.histogram.ratio.bin.7.153_178$side.fluo.normalized.histogram.ratio.bin.8.178_204$side.fluo.normalized.histogram.ratio.bin.9.204_229$side.fluo.normalized.histogram.ratio.bin.10.229_255",
-					"side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.nir.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
+					"side.vis.hue.histogram.ratio.bin.1.0_25$side.vis.hue.histogram.ratio.bin.2.25_51$side.vis.hue.histogram.ratio.bin.3.51_76$side.vis.hue.histogram.ratio.bin.4.76_102$side.vis.hue.histogram.ratio.bin.5.102_127$side.vis.hue.histogram.ratio.bin.6.127_153$side.vis.hue.histogram.ratio.bin.7.153_178$side.vis.hue.histogram.ratio.bin.8.178_204$side.vis.hue.histogram.ratio.bin.9.204_229$side.vis.hue.histogram.ratio.bin.10.229_255",
 					"side.vis.normalized.histogram.ratio.bin.1.0_25$side.vis.normalized.histogram.ratio.bin.2.25_51$side.vis.normalized.histogram.ratio.bin.3.51_76$side.vis.normalized.histogram.ratio.bin.4.76_102$side.vis.normalized.histogram.ratio.bin.5.102_127$side.vis.normalized.histogram.ratio.bin.6.127_153$side.vis.normalized.histogram.ratio.bin.7.153_178$side.vis.normalized.histogram.ratio.bin.8.178_204$side.vis.normalized.histogram.ratio.bin.9.204_229$side.vis.normalized.histogram.ratio.bin.10.229_255",
 					"top.fluo.histogram.bin.1.0_25$top.fluo.histogram.bin.2.25_51$top.fluo.histogram.bin.3.51_76$top.fluo.histogram.bin.4.76_102$top.fluo.histogram.bin.5.102_127$top.fluo.histogram.bin.6.127_153$top.fluo.histogram.bin.7.153_178$top.fluo.histogram.bin.8.178_204$top.fluo.histogram.bin.9.204_229$top.fluo.histogram.bin.10.229_255",
 					"top.fluo.histogram.ratio.bin.1.0_25$top.fluo.histogram.ratio.bin.2.25_51$top.fluo.histogram.ratio.bin.3.51_76$top.fluo.histogram.ratio.bin.4.76_102$top.fluo.histogram.ratio.bin.5.102_127$top.fluo.histogram.ratio.bin.6.127_153$top.fluo.histogram.ratio.bin.7.153_178$top.fluo.histogram.ratio.bin.8.178_204$top.fluo.histogram.ratio.bin.9.204_229$top.fluo.histogram.ratio.bin.10.229_255",
@@ -2196,15 +2205,15 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 	
 	
 ###############################	
-#	overallList <- preprocessingOfxAxisValue(overallList)
-#	overallList <- preprocessingOfTreatment(overallList)
-#	overallList <- preprocessingOfSecondTreatment(overallList)
-#	overallList <- overallCheckIfDescriptorIsNaOrAllZero(overallList)
-#	overallList <- reduceWorkingDataSize(overallList)
-#	overallList <- setDefaultAxisNames(overallList)	
-#	overallList <- overallGetResultDataFrame(overallList)
-#	overallList <- setColor(overallList) 
-#	makeDiagrams(overallList)
+	overallList <- preprocessingOfxAxisValue(overallList)
+	overallList <- preprocessingOfTreatment(overallList)
+	overallList <- preprocessingOfSecondTreatment(overallList)
+	overallList <- overallCheckIfDescriptorIsNaOrAllZero(overallList)
+	overallList <- reduceWorkingDataSize(overallList)
+	overallList <- setDefaultAxisNames(overallList)	
+	overallList <- overallGetResultDataFrame(overallList)
+	overallList <- setColor(overallList) 
+	makeDiagrams(overallList)
 ###############################
 
 
