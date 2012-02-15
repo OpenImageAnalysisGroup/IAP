@@ -19,6 +19,7 @@
 %%\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
 \usepackage{fixltx2e}
 \usepackage[english]{babel} % Anpassung der Überschriften (chapter, chapitre, Kapitel …) und die richtige Silbentrennung
+\usepackage{hyperref}
 
 %%%%%%%%%%%%% Typografisch empfehlenswerte Pakete
 \usepackage{% 
@@ -73,7 +74,7 @@
 	\fi 
 }
 
-\def\ConstForImageWidth{9cm}
+\def\ConstForImageWidth{\textwidth}
 
 %\newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{#1} \end{center} \end{figure}}{\begin{figure}[!htb] \centering \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{figure}}}
 %\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{center} \end{figure}}}
@@ -412,8 +413,8 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Column name: xxx
 \item Unit: %
 \end{itemize}
-\loadTex{side.vis.hue.histogram.ratio.bin.1.0_25;side.vis.hue.histogram.ratio.n}
-\loadTex{top.vis.hue.histogram.ratio.bin.1.0_25;top.vis.hue.histogram.ratio.bin}
+\loadTex{side_vis_hue_histogram_ratio_bin_1_0_25_side_vis_hue_histogram_ratio_bstackedOverallImage}
+\loadTex{top_vis_hue_histogram_ratio_bin_1_0_25_top_vis_hue_histogram_ratio_binstackedOverallImage}
 
 
 \clearpage
