@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -4084,5 +4085,45 @@ public class ImageOperation {
 					res[x][y] = BACKGROUND_COLORint;
 			}
 		return new ImageOperation(res);
+	}
+	
+	private static TreeMap<Integer, TreeMap<Integer, TreeMap<Integer, Integer>>> lab2rgb = new TreeMap<Integer, TreeMap<Integer, TreeMap<Integer, Integer>>>();
+	
+	public static int searchRGBfromLAB(float lf, float af, float bf) {
+		int li = (int) lf;
+		int ai = (int) af;
+		int bi = (int) bf;
+		
+		if (lab2rgb.containsKey(li) && lab2rgb.get(li).containsKey(ai) && lab2rgb.get(li).get(ai).containsKey(bi)) {
+			return lab2rgb.get(li).get(ai).get(bi);
+		}
+		
+		int minR = 0, minG = 0, minB = 0;
+		float minDist = Float.MAX_VALUE;
+		for (int r = 0; r < 255; r++)
+			for (int g = 0; g < 255; g++)
+				for (int b = 0; b < 255; b++) {
+					float l2 = labCube[r][g][b];
+					float a2 = labCube[r][g][b + 256];
+					float b2 = labCube[r][g][b + 512];
+					float dist = Math.abs(lf - l2) + Math.abs(af - a2) + Math.abs(bf - b2);
+					if (dist < minDist) {
+						minDist = dist;
+						minR = r;
+						minG = g;
+						minB = b;
+					}
+				}
+		
+		int res = new Color(minR, minG, minB).getRGB();
+		
+		if (!lab2rgb.containsKey(li))
+			lab2rgb.put(li, new TreeMap<Integer, TreeMap<Integer, Integer>>());
+		if (!lab2rgb.get(li).containsKey(ai))
+			lab2rgb.get(li).put(ai, new TreeMap<Integer, Integer>());
+		if (!lab2rgb.get(li).get(ai).containsKey(bi))
+			lab2rgb.get(li).get(ai).put(bi, res);
+		
+		return res;
 	}
 }
