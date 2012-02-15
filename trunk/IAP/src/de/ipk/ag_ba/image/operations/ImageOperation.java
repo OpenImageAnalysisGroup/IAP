@@ -4099,16 +4099,20 @@ public class ImageOperation {
 		}
 		
 		int minR = 0, minG = 0, minB = 0;
-		float minDist = Float.MAX_VALUE;
+		float minDistL = Float.MAX_VALUE;
+		float minDistAB = Float.MAX_VALUE;
+		
 		for (int r = 0; r < 255; r++)
 			for (int g = 0; g < 255; g++)
 				for (int b = 0; b < 255; b++) {
 					float l2 = labCube[r][g][b];
 					float a2 = labCube[r][g][b + 256];
 					float b2 = labCube[r][g][b + 512];
-					float dist = Math.abs(lf - l2) + Math.abs(af - a2) + Math.abs(bf - b2);
-					if (dist < minDist) {
-						minDist = dist;
+					float distL = Math.abs(lf - l2);
+					float distAB = Math.abs(af - a2) + Math.abs(bf - b2);
+					if (distL < minDistL && distAB < minDistAB) {
+						minDistL = distL;
+						minDistAB = distAB;
 						minR = r;
 						minG = g;
 						minB = b;
@@ -4121,8 +4125,9 @@ public class ImageOperation {
 			lab2rgb.put(li, new TreeMap<Integer, TreeMap<Integer, Integer>>());
 		if (!lab2rgb.get(li).containsKey(ai))
 			lab2rgb.get(li).put(ai, new TreeMap<Integer, Integer>());
-		if (!lab2rgb.get(li).get(ai).containsKey(bi))
+		if (!lab2rgb.get(li).get(ai).containsKey(bi)) {
 			lab2rgb.get(li).get(ai).put(bi, res);
+		}
 		
 		return res;
 	}

@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.color;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.operations.ImageOperation;
 
 /*
@@ -111,6 +113,10 @@ public class Color_CIE_Lab {
 	
 	public int getRGB() {
 		return getColorXYZ().getColor().getRGB();
+	}
+	
+	public Color getColor() {
+		return getColorXYZ().getColor();
 	}
 	
 	@Override
