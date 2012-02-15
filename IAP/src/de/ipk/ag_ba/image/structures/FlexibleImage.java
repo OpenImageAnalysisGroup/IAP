@@ -38,6 +38,7 @@ public class FlexibleImage {
 	private final ImagePlus image;
 	private final int w, h;
 	private FlexibleImageType type = FlexibleImageType.UNKNOWN;
+	private String fileName;
 	
 	@Override
 	public String toString() {
@@ -77,6 +78,9 @@ public class FlexibleImage {
 				new ColorProcessor(img.getWidth(), img.getHeight(), ImageConverter.convertBIto1A(img)));
 		w = image.getWidth();
 		h = image.getHeight();
+		
+		if (url != null && url.getFileName() != null)
+			this.fileName = url.getFileName();
 	}
 	
 	public FlexibleImage(ImagePlus image) {
@@ -348,5 +352,22 @@ public class FlexibleImage {
 			result[idx] = f;
 		}
 		return result;
+	}
+	
+	/**
+	 * @return File name (if available), or NULL.
+	 */
+	public String getFileName() {
+		return fileName;
+	}
+	
+	/**
+	 * Saves the image as an PNG.
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	public void saveToFile(String fileName) {
+		getIO().saveImage(fileName);
 	}
 }
