@@ -12,7 +12,7 @@ public class BlSmoothShape_vis extends AbstractBlock {
 	protected FlexibleImage processMask(FlexibleImage mask) {
 		if (mask.getType() == FlexibleImageType.VIS) {
 			return mask.getIO().applyMask_ResizeMaskIfNeeded(
-					mask.copy().getIO().dilate(2).erode(7).blur(2).erode().print("blurred mask", debug).getImage(),
+					mask.copy().getIO().erode(3).blur(2).erode().erode().print("blurred mask", debug).getImage(),
 					options.getBackground()).getImage();
 		} else
 			return mask;
