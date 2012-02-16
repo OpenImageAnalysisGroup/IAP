@@ -27,12 +27,12 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlFindBlueMarkers_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlIntensityConversion_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlUseFluoMaskToClear_vis_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProcessors;
 
 /**
@@ -50,7 +50,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
 		modifySettings(options);
 		
-		boolean skelet = false;
+		boolean skelet = true;
 		
 		BlockPipeline p = new BlockPipeline();
 		if (false)
