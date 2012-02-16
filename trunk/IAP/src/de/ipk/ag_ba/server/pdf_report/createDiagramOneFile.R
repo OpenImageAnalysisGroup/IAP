@@ -1214,10 +1214,28 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 		
 		#	plot <- ggplot(overallResult, aes(xAxis, values, fill=hist)) 
 					
-				if(positionTyp == "dodge" & FALSE) {
-					plot <- ggplot(overallResult, aes(value, colour=hist)) +
-							geom_density()
-					print(plot)
+				if(FALSE) {
+					
+#					ggplot(overallResult, aes(x=hist, colour=hist, group=c(hist))) + geom_density(fill=NA) + aes(y = ..count..)
+#					
+#					plot <- ggplot(overallResult, aes(x=xAxis)) +
+#							geom_bar(aes(y=values), stat="identity", position = positionTyp) +
+#							geom_density(aes(y=values, x=xAxis))
+#					print(plot)
+#					
+#					
+#					DF <- data.frame(t=rnorm(500))
+#					ggplot(DF, aes(x=t)) +
+#							geom_histogram(fill="blue", colour="black", binwidth=0.2) +
+#							geom_density(aes(y=0.2*..count..), colour="black", adjust=4) +
+#							opts(title="Normal Random Sample")
+#					
+#					ggplot(overallResult, aes(y = ..scaled.., x=values, colour=hist)) + geom_density() 
+#					ggplot(overallResult, aes(y= ..scaled.. , x= values, fill=xAxis)) + geom_density(alpha=0.3) +  facet_wrap(~hist) 
+					#print(plot)
+					
+				
+					#ggplot(diamonds, aes(carat, colour=color)) + geom_density()
 				} else {
 					plot <- ggplot(overallResult, aes(xAxis, values, fill=hist)) +
 							geom_bar(stat="identity", position = positionTyp)
@@ -2205,15 +2223,15 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 	
 	
 ###############################	
-	overallList <- preprocessingOfxAxisValue(overallList)
-	overallList <- preprocessingOfTreatment(overallList)
-	overallList <- preprocessingOfSecondTreatment(overallList)
-	overallList <- overallCheckIfDescriptorIsNaOrAllZero(overallList)
-	overallList <- reduceWorkingDataSize(overallList)
-	overallList <- setDefaultAxisNames(overallList)	
-	overallList <- overallGetResultDataFrame(overallList)
-	overallList <- setColor(overallList) 
-	makeDiagrams(overallList)
+#	overallList <- preprocessingOfxAxisValue(overallList)
+#	overallList <- preprocessingOfTreatment(overallList)
+#	overallList <- preprocessingOfSecondTreatment(overallList)
+#	overallList <- overallCheckIfDescriptorIsNaOrAllZero(overallList)
+#	overallList <- reduceWorkingDataSize(overallList)
+#	overallList <- setDefaultAxisNames(overallList)	
+#	overallList <- overallGetResultDataFrame(overallList)
+#	overallList <- setColor(overallList) 
+#	makeDiagrams(overallList)
 ###############################
 
 
