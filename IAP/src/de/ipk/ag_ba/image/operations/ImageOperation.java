@@ -1656,9 +1656,9 @@ public class ImageOperation {
 		int h = image.getHeight();
 		
 		int smallestX = (int) (w * pLeft);
-		int largestX = (int) (w * (1 - pRight));
+		int largestX = (int) (w * (1 - pRight)) - 1;
 		int smallestY = (int) (h * pTop);
-		int largestY = (int) (h * (1 - pBottom));
+		int largestY = (int) (h * (1 - pBottom)) - 1;
 		
 		int[][] img = getImageAs2array();
 		

@@ -19,6 +19,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlSmoothShape_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlClearMasks_Arabidopsis_vis;
@@ -28,11 +29,12 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlUseFluoMaskToClea
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlockSkeletonize_Arabidopsis_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlFindBlueMarkers_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlIntensityConversion_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlUseVisMaskToClearFluo_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProcessors;
 
 /**
@@ -67,7 +69,11 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockClearNirPot_nir.class);
 		p.add(BlMedianFilter_fluo.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class);
+		p.add(BlUseVisMaskToClearFluo_fluo.class);
 		p.add(BlUseFluoMaskToClear_Arabidopsis_vis_nir.class);
+		
+		p.add(BlSmoothShape_vis.class);
+		
 		p.add(BlMedianFilter_vis.class);
 		p.add(BlMedianFilter_vis.class);
 		p.add(BlNirFilterSide_nir.class);
