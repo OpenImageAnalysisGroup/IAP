@@ -1208,7 +1208,7 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 		if(length(overallList$stackedBarOptions$typOfGeomBar) == 0) {
 			overallList$stackedBarOptions$typOfGeomBar <- c("fill")
 		}
-	
+		
 		for(positionTyp in overallList$stackedBarOptions$typOfGeomBar) {
 					
 				if(positionTyp=="dodge") {
@@ -1229,7 +1229,6 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 					name <- overallDesName[[imagesIndex]]
 				}
 				
-				
 				 	plot <- plot + ylab(name) 
 					#coord_cartesian(ylim=c(0,1)) +
 				
@@ -1238,10 +1237,6 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 			} else {
 				plot <- plot + xlab(overallList$xAxisName)
 			}
-			
-#			if(positionTyp=="fill") {
-#				plot <- plot + scale_y_dicrete(labels=c(1:100))
-#			}
 							
 			plot <- plot +		
 					scale_fill_manual(values = getColor(overallColor[[imagesIndex]], overallResult), name="") +
@@ -1273,10 +1268,9 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 				plot <- plot + opts(panel.grid.minor = theme_blank())
 			}
 			
-#			if(positionTyp=="fill") {
-#				#plot <- plot + opts(axis.text.y = theme_blank())
-#				plot <- plot + scale_x_discrete(labels=seq(0,100,20), breaks=seq(0,100,20))
-#			}
+			if(positionTyp=="fill") {
+				plot <- plot + scale_y_continuous(labels=seq(0,100,20), breaks=seq(0,1,0.2))
+			}
 			
 			if(makeOverallImage) {
 				#plot <- plot + facet_wrap(~ name, drop=TRUE)
