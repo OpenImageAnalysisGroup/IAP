@@ -1275,8 +1275,11 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 			if(makeOverallImage) {
 				#plot <- plot + facet_wrap(~ name, drop=TRUE)
 				#plot <- plot + facet_wrap(~ name)
-				plot <- plot + facet_wrap(~ primaerTreatment)
-				
+				if("primaerTreatment" %in% colnames(overallResult)) {				
+					plot <- plot + facet_wrap(~ primaerTreatment)
+				} else {
+					plot <- plot + facet_wrap(~ name)
+				}
 			}
 			
 			if (h==1) {
@@ -1876,23 +1879,23 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 		
 		#treatment <- "none"
 		#treatment <- "Genotype"
-		treatment <- "Species"
-		#treatment <- "Treatment"
+		#treatment <- "Species"
+		treatment <- "Treatment"
 		#treatment <- "Condition"
 		#filterTreatment <- "dry$normal$wet"
 		#filterTreatment <- "dry$normal"
 		#filterTreatment <- "normal bewaessert$Trockentress"
-		filterTreatment <- "Aromatnaja$Athletico$Cukrova Cervena"
+		#filterTreatment <- "Aromatnaja$Athletico$Cukrova Cervena"
 		#filterTreatment <- "none"
 		##filterTreatment <- "Deutschland$Spanien$Italien$China"
 		
 		#secondTreatment <- "Genotype"
-		#secondTreatment <- "none"
+		secondTreatment <- "none"
 		#secondTreatment <- "Species"
 		#secondTreatment <- "Variety"
-		secondTreatment <- "Treatment"
-		#filterSecondTreatment <- "none"
-		filterSecondTreatment <- "dry$normal"
+		#secondTreatment <- "Treatment"
+		filterSecondTreatment <- "none"
+		#filterSecondTreatment <- "dry$normal"
 		
 		#secondTreatment <- "secondTreatment"
 		#filterSecondTreatment <- "a$c"
