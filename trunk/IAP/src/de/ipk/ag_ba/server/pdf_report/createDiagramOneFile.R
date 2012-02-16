@@ -1210,38 +1210,27 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 		}
 	
 		for(positionTyp in overallList$stackedBarOptions$typOfGeomBar) {
-		
-		
-		#	plot <- ggplot(overallResult, aes(xAxis, values, fill=hist)) 
 					
-				if(FALSE) {
+				if(positionTyp=="dodge") {
+							
+					plot <- ggplot(overallResult, aes(x=xAxis, y=values, colour=hist)) +
+							geom_line(position="identity") + 
+							#scale_fill_manual(values = overallColor[[imagesIndex]]) +
+							scale_colour_manual(values= getColor(overallColor[[imagesIndex]], overallResult)) 
 					
-#					ggplot(overallResult, aes(x=hist, colour=hist, group=c(hist))) + geom_density(fill=NA) + aes(y = ..count..)
-#					
-#					plot <- ggplot(overallResult, aes(x=xAxis)) +
-#							geom_bar(aes(y=values), stat="identity", position = positionTyp) +
-#							geom_density(aes(y=values, x=xAxis))
-#					print(plot)
-#					
-#					
-#					DF <- data.frame(t=rnorm(500))
-#					ggplot(DF, aes(x=t)) +
-#							geom_histogram(fill="blue", colour="black", binwidth=0.2) +
-#							geom_density(aes(y=0.2*..count..), colour="black", adjust=4) +
-#							opts(title="Normal Random Sample")
-#					
-#					ggplot(overallResult, aes(y = ..scaled.., x=values, colour=hist)) + geom_density() 
-#					ggplot(overallResult, aes(y= ..scaled.. , x= values, fill=xAxis)) + geom_density(alpha=0.3) +  facet_wrap(~hist) 
-					#print(plot)
-					
-				
-					#ggplot(diamonds, aes(carat, colour=color)) + geom_density()
 				} else {
 					plot <- ggplot(overallResult, aes(xAxis, values, fill=hist)) +
 							geom_bar(stat="identity", position = positionTyp)
 				}
-					
-				 	plot <- plot + ylab(overallDesName[[imagesIndex]]) 
+				
+				if(positionTyp=="dodge") {
+					name <- sub("%", "px", overallDesName[[imagesIndex]])
+				} else {
+					name <- overallDesName[[imagesIndex]]
+				}
+				
+				
+				 	plot <- plot + ylab(name) 
 					#coord_cartesian(ylim=c(0,1)) +
 				
 			if(minor_breaks) {
@@ -1249,7 +1238,11 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 			} else {
 				plot <- plot + xlab(overallList$xAxisName)
 			}
-					
+			
+#			if(positionTyp=="fill") {
+#				plot <- plot + scale_y_dicrete(labels=c(1:100))
+#			}
+							
 			plot <- plot +		
 					scale_fill_manual(values = getColor(overallColor[[imagesIndex]], overallResult), name="") +
 					theme_bw() +
@@ -1280,9 +1273,16 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 				plot <- plot + opts(panel.grid.minor = theme_blank())
 			}
 			
+#			if(positionTyp=="fill") {
+#				#plot <- plot + opts(axis.text.y = theme_blank())
+#				plot <- plot + scale_x_discrete(labels=seq(0,100,20), breaks=seq(0,100,20))
+#			}
+			
 			if(makeOverallImage) {
 				#plot <- plot + facet_wrap(~ name, drop=TRUE)
-				plot <- plot + facet_wrap(~ name)
+				#plot <- plot + facet_wrap(~ name)
+				plot <- plot + facet_wrap(~ primaerTreatment)
+				
 			}
 			
 			if (h==1) {
@@ -1312,7 +1312,7 @@ PreWorkForMakeBigOverallImage <- function(h, overallResult, overallDescriptor, o
 			plottedName <- overallList$filterTreatment %contactAllWithAll% value
 			booleanVector <- getBooleanVectorForFilterValues(overallResult, list(name = plottedName))
 			plotThisValues <- overallResult[booleanVector,]
-			plotThisValues <- reNameColumn(plotThisValues, "name", "primaerTreatment")
+		#	plotThisValues <- reNameColumn(plotThisValues, "name", "primaerTreatment")
 			plotStackedImage(h, overallList, plotThisValues, title = title, makeOverallImage = TRUE,  legende=TRUE, minor_breaks=FALSE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallSaveName=overallSaveName)
 		}	 
 	}
@@ -1346,8 +1346,9 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 	
 	overallList$debug %debug% "makeBoxplotStackedDiagram()"
 	print("... stacked Barplot")
-	overallResult[is.na(overallResult)] <- 0
-	tempOverallResult <- overallResult
+	#overallResult[is.na(overallResult)] <- 0
+	tempOverallResult <-  na.omit(overallResult)
+	#tempOverallResult <- overallResult
 	
 	for(imagesIndex in names(overallDescriptor)) {
 		createOuputOverview("stacked Barplot", imagesIndex, length(names(overallDescriptor)))
