@@ -28,7 +28,9 @@ public class BlCalcWidthAndHeight_vis extends
 	
 	@Override
 	protected boolean isChangingImages() {
-		return false;
+		// if set to true, below, the height properties are drawn as a bar
+		// if set to false, the height is calculated but not drawn inside the image
+		return true;
 	}
 	
 	@Override
@@ -93,7 +95,7 @@ public class BlCalcWidthAndHeight_vis extends
 					- temp.getTopY())) : null;
 			
 			if (values != null) {
-				boolean drawVerticalHeightBar = false;
+				boolean drawVerticalHeightBar = isChangingImages();
 				if (drawVerticalHeightBar)
 					if (!useFluo) {
 						getProperties().addImagePostProcessor(
