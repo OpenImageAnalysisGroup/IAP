@@ -24,13 +24,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public class BlCalcWidthAndHeight_vis extends
 		AbstractSnapshotAnalysisBlockFIS {
 	
-	private static final boolean debug = false;
+	boolean debug = false;
 	
 	@Override
 	protected boolean isChangingImages() {
-		// if set to true, below, the height properties are drawn as a bar
-		// if set to false, the height is calculated but not drawn inside the image
-		return true;
+		return false;
 	}
 	
 	@Override
@@ -95,7 +93,7 @@ public class BlCalcWidthAndHeight_vis extends
 					- temp.getTopY())) : null;
 			
 			if (values != null) {
-				boolean drawVerticalHeightBar = isChangingImages();
+				boolean drawVerticalHeightBar = true;
 				if (drawVerticalHeightBar)
 					if (!useFluo) {
 						getProperties().addImagePostProcessor(
@@ -111,12 +109,16 @@ public class BlCalcWidthAndHeight_vis extends
 															values.x
 																	/ 2
 																	+ temp.getLeftX(),
-															vertYsoilLevelF,
+															vertYsoilLevelF - values.y,
 															10,
-															vertYsoilLevelF
-																	- values.y,
-															Color.BLUE.getRGB(),
-															255).getImage()
+															values.y,
+															Color.MAGENTA.getRGB(),
+															255)
+													.drawLine(values.x / 2 + temp.getLeftX() - 50, vertYsoilLevelF - values.y, values.x / 2 + temp.getLeftX() + 50,
+															vertYsoilLevelF - values.y, Color.MAGENTA.getRGB(), 0.5, 5)
+													.drawLine(values.x / 2 + temp.getLeftX() - 50, vertYsoilLevelF, values.x / 2 + temp.getLeftX() + 50,
+															vertYsoilLevelF, Color.MAGENTA.getRGB(), 0.5, 5)
+													.getImage()
 													.print("DEBUG", debug);
 										else
 											visRes = visRes
@@ -126,7 +128,8 @@ public class BlCalcWidthAndHeight_vis extends
 															values.x
 																	/ 2
 																	+ temp.getLeftX(),
-															temp.getTopY(),
+															temp.getTopY() - temp.getBottomY()
+																	+ temp.getTopY(),
 															10,
 															temp.getBottomY()
 																	- temp.getTopY(),
