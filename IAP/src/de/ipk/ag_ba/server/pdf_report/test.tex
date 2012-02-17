@@ -1,0 +1,63 @@
+%%%%%%%%%%%%% Klassen-Optionen
+\documentclass[%
+  paper=A4, % Stellt auf A4-Papier ein
+  pagesize, % Diese Option reicht die Papiergröße an
+            % alle Ausgabeformate weiter
+  DIV=calc, % Errechnet einen guten Satzspiegel
+  BCOR=1cm, % Weil bei mir immer 1cm in der Bindung
+            % der Klemmmappe verschwindet
+  smallheadings,% Für etwas kleinere Überschriften
+  ngerman   % Neue Rechtschreibung, d.\,h. (Silbentrennung)
+]{scrbook}  % Eine Klasse für beidseitige Texte mit Kapiteln 
+            %
+%%%%%%%%%%%%% Unverzichtbare Pakte
+\usepackage[T1]{fontenc}% fontenc und inputenc ermöglichen
+\usepackage[latin1]{inputenc}% Silbentrennung und
+                             % Eingabe von Umlauten.
+\usepackage{% Man kann auch mehrere Pakete ohne Optionen
+            % in einen \usepackage-Befehl packen.
+  babel,    % Babel für diverse Sprachanpassungen
+  fixltx2e  % Verbessert einige Kernkompetenzen von LaTeX2e
+}
+            %
+%%%%%%%%%%%%% Typografisch empfehlenswerte Pakete
+\usepackage{% 
+  ellipsis, % Korrigiert den Weißraum um Auslassungspunkte
+  ragged2e, % Ermöglicht Flattersatz mit Silbentrennung
+ marginnote,% Für bessere Randnotizen mit \marginnote statt
+            % \marginline
+}
+\usepackage[tracking=true]{microtype}%
+            % Microtype ist einfach super, aber lesen Sie
+            % unbedingt die Anleitung um das Folgende zu
+            % verstehen.
+\DeclareMicrotypeSet*[tracking]{my}% 
+  { font = */*/*/sc/* }% 
+\SetTracking{ encoding = *, shape = sc }{ 45 }% Hier wird festgelegt,
+            % dass alle Passagen in Kapitälchen automatisch leicht
+            % gesperrt werden. Das Paket soul, das ich früher empfohlen
+            % habe ist damit für diese Zwecke nicht mehr nötig.
+            %
+%%%%%%%%%%%%% Verschiedene Schriften, die ich nutze:
+            % Es ist natürlich nicht sinnvoll mehrere Pakete zu
+            % laden, die immer wieder die Serifenschrift umstellen.
+            % Suchen Sie /eine/ aus und löschen Sie das erste
+            % Prozent-Zeichen in der Zeile A) oder B) oder ...  
+\usepackage{%
+%  lmodern, % A) Latin Modern Fonts sind die Nachfolger von Computer
+            % Modern, den LaTeX-Standardfonts
+%  hfoldsty % B) Diese Schrift stellt alle Ziffern, außer
+            % im Mathemodus, auf Minuskel- oder Mediäval-Ziffern um.
+            % Wenn Ihre pdfs unscharf aussehen installieren Sie bitte
+            % die cm-super-Fonts (Type1-Fonts).
+% charter   % C) Diese Zeile lädt die Charter als Schriftart
+}
+% \usepackage[osf,sc]{mathpazo}% D) So erreichen Sie Palatino als
+            % Schrift mit Minuskel-Ziffern und echten Kapitälchen
+            %
+%%%%%%%%%%%%% Ende des Vorspanns
+\begin{document}
+Hier steht dann z.\,B. die Seminararbeit, die Staatsarbeit,
+Magisterarbeit oder Dissertation, Habilitation \dots. Probehalber mal was
+mit \textsc{Kapitälchen}~-- sind diese gesperrt?
+\end{document}

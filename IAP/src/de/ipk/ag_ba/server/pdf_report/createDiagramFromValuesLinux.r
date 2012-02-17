@@ -8,7 +8,7 @@
 ##
 #		FOR TEST, Don´t remove it!!
 ##
-if(FALSE){
+if(TRUE){
 	
 	rm(list=ls(all=TRUE))
 	
@@ -26,10 +26,13 @@ if(FALSE){
 		#q()
 	}))
 	
+	#Wenn die Daten von IAP verwendet werden, dann read.csv da diese mit "." als Dezimaltrenner abgespeichert werden
+	#Beim testen die read.csv2 nutzen da die werte mit "," als Dezimaltrenner abgespeichert wurden
 	
-	#fileName <- "report.csv"
-	#fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv"
-	fileName <- "testDataset2.csv"
+	#fileName <- "report.csv" #--> use read.csv2
+	fileName <- "numeric_data.MaizeAnalysisAction_ 1116BA_new3.csv" #--> use read.csv2
+	#fileName <- "Test2.csv" #--> use read.csv2
+	#fileName <- "testDataset2.csv" #--> use read.csv2 (geht aber mit beiden, da keine Kommas vorhanden sind
 	#fileName <- "1107BA_Corn_new2.csv"
 	#saveName="OutputDiagramm"
 	saveFormat="png"
@@ -41,18 +44,24 @@ if(FALSE){
 	#boxplot <- Standard Boxplot
 	#!boxplot <- für xy-Diagramm (vorerst Descriptor vs. Day)
 	
-	#diagramTyp="boxplotStacked"
-	diagramTyp="!boxplot"
+	diagramTyp="boxplotStacked"
+	#diagramTyp="!boxplot"
 	isGray="false"
 	#isGray="true"
 	treatment="Treatment"
 	#treatment="none"
 	#filterTreatment="none"
-	filterTreatment="dry"
-	secondTreatment="Day (Int)"
-	filterSecondTreatment="8$12"
+	#filterTreatment="normal"
+	filterTreatment <- "dry$normal"
+	#secondTreatment="Day (Int)"
+	secondTreatment="none"
+	#secondTreatment <- "secondTreatment"
+	#filterSecondTreatment <- "a$c"
+	#filterSecondTreatment="8$12"
+	filterSecondTreatment="none"
 	filterXaxis="none"
-	#filterXaxis=c("6$8$10$12")
+	#filterXaxis <- c("6$8$13")
+	#filterXaxis=c("21")
 	xAxis="Day (Int)"
 	#descriptor="Water (weight-diff)"
 	#descriptor="Repl.ID"
@@ -61,9 +70,13 @@ if(FALSE){
 	#descriptor <- c("Wert1$Wert2$Wert3$Wert4")
 	
 	#descriptor <- "Treatment"
-	descriptor <- "Plant ID$Repl ID"
+	#descriptor <- "Plant ID$Repl ID"
 	#descriptor <- "top.fluo.normalized.histogram.bin.2.25_51"
-	#descriptor <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255")
+	descriptor <- c("side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255")
+	#descriptor <- c("Plant ID$Treatment$Hallo$Wert1$Repl ID")
+	#descriptor <- c("side.area.norm (mm^2)")
+	#descriptor <- c("side.nir.normalized.histogram.bin.3.51_76")
+	#descriptor <- c("value")
 	yAxisName <- c("NIR absorption class (%)")
 	
 	showResultInR=TRUE
@@ -74,7 +87,8 @@ if(FALSE){
 	legendUnderImage = TRUE
 	saveName = descriptor
 	#iniDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-8859-1", encoding="UTF-8")
-	iniDataSet <- read.csv(fileName, header=TRUE, sep=";", fileEncoding="ISO-8859-1", encoding="UTF-8")
+	iniDataSet <- read.csv2(fileName, header=TRUE, sep=";", fileEncoding="ISO-8859-1", encoding="UTF-8")
+
 	appendix=FALSE
 }
 ##
@@ -82,11 +96,13 @@ if(FALSE){
 ##
 ###############################################################################
 
-valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="png", imageWidth="1280",
-		imageHeight="768", dpi="90", diagramTyp="!boxplot", isGray="false", treatment="Treatment",
-		filterTreatment="none", secondTreatment="none", filterSecondTreatment="none", 
-		filterXaxis="none", xAxis="Day (Int)", descriptor="side.area", showResultInR=FALSE, xAxisName="none", yAxisName="none",
-		transparent=TRUE, legendUnderImage=TRUE, appendix=FALSE) {			
+#valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="png", imageWidth="1280",
+#		imageHeight="768", dpi="90", diagramTyp="!boxplot", isGray="false", treatment="Treatment",
+#		filterTreatment="none", secondTreatment="none", filterSecondTreatment="none", 
+#		filterXaxis="none", xAxis="Day (Int)", descriptor="side.area", showResultInR=FALSE, xAxisName="none", yAxisName="none",
+#		transparent=TRUE, legendUnderImage=TRUE, appendix=FALSE) {			
+
+time <- system.time({
 
 #library for save images
 #install.packages(c("Cairo"), repos="http://cran.r-project.org", dependencies = TRUE)
@@ -327,11 +343,17 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 			rownames(overallResult) <- rowName
 			
 			#print(tempWorkingDatasetDesc)
+			#print(multiDescriptor)
+			#print(treatment)
+			#print(days)
 			for (d in 1:length(multiDescriptor)) {
 				for (y in 1:length(treatment)) {
 					for (i in 1:length(days)) {
 						if (!noTreatment) {	##if treatment[y] == days[i]
-							result <- c(result,mean(as.numeric(CalculateMeanWorkingDataSet[(CalculateMeanWorkingDataSet[treatmentName]==treatment[y] & CalculateMeanWorkingDataSet[xAxis]==days[i] & tempWorkingDatasetDesc[,multiDescriptor[d]]),descriptorName[d]]),na.rm=TRUE))
+							zwischenErgebnis <- (CalculateMeanWorkingDataSet[treatmentName]==treatment[y] & CalculateMeanWorkingDataSet[xAxis]==days[i] & tempWorkingDatasetDesc[,multiDescriptor[d]])
+							factorTemp <- CalculateMeanWorkingDataSet[zwischenErgebnis,descriptorName[d]]
+							result <- c(result,mean(as.numeric(factorTemp),na.rm=TRUE))
+						#print(result)
 						} else {
 							result <- c(result,mean(as.numeric(CalculateMeanWorkingDataSet[(CalculateMeanWorkingDataSet[xAxis]==days[i] & tempWorkingDatasetDesc[,multiDescriptor[d]]),descriptorName[d]]),na.rm=TRUE))
 						}
@@ -346,7 +368,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 			#rownames(overallResult) <- rowName
 			#colnames(overallResult) <- colName
 			workingDataSet <- overallResult
-			
+			#print(workingDataSet)
 			##################################### valuesAsDiagram #############################################
 			
 			
@@ -413,7 +435,9 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 							rowWhichPlotInOneDiagram <- grep(paste(" ",resFilterTreatment[o],sep=""), rownames(workingDataSet))
 							
 							for (d in 1:length(workingDataSet[1,])) {
+								#print(workingDataSet)
 								hundredPercentValue	 <- sum(workingDataSet[rowWhichPlotInOneDiagram,d],na.rm=TRUE)
+								#print(hundredPercentValue)
 								if (hundredPercentValue > 0) {
 									for(k in 1:length(workingDataSet[rowWhichPlotInOneDiagram,d])) {
 										workingDataSet[rowWhichPlotInOneDiagram[k],d] <- (100*workingDataSet[rowWhichPlotInOneDiagram[k],d])/hundredPercentValue
@@ -429,7 +453,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 								usedColor <- colorRampPalette(c(brewer.pal(9, "Greys")))(length(rowWhichPlotInOneDiagram))
 							}
 							
-							barplot(workingDataSet[rowWhichPlotInOneDiagram,], col=usedColor, main=resFilterTreatment[o], xlab=xAxisName, ylab=yAxisName, ylim=c(0,100))
+							barplot(workingDataSet[rowWhichPlotInOneDiagram,], col=rev(usedColor), main=resFilterTreatment[o], xlab=xAxisName, ylab=yAxisName, ylim=c(0,100))
 							#par(mar=c(0.1,0.1,0.1,0.1))
 							#barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig
 							#legend("left", rownames(workingDataSet[rowWhichPlotInOneDiagram,]), col= usedColor, pch=symbolParameter, bty="n")
@@ -458,7 +482,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 						if (h==1) {
 							Cairo(width=as.numeric(imageWidth), height=as.numeric(40*length(rownames(workingDataSet))),file=paste("legendeBoxStacked",saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
 							barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig			
-							legend("left", substr(rownames(workingDataSet[rowWhichPlotInOneDiagram,]),1, str_locate(rownames(workingDataSet[rowWhichPlotInOneDiagram,])," ")-1), col= usedColor, pch=symbolParameter, bty="n")
+							legend("left", substr(rownames(workingDataSet[rowWhichPlotInOneDiagram,]),1, str_locate(rownames(workingDataSet[rowWhichPlotInOneDiagram,])," ")-1), col= rev(usedColor), pch=symbolParameter, bty="n")
 							#legend("topleft", rownames(workingDataSet), col= usedColor, pch=symbolParameter)
 							#legend("bottomleft", resFilterTreatment, col= usedColor, pch=symbolParameter)
 							dev.off()
@@ -483,7 +507,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 						}
 						
 						#print(workingDataSet)
-						barplot(workingDataSet, col=usedColor, main="", xlab=xAxisName, ylab=yAxisName, ylim=c(0,100))
+						barplot(workingDataSet, col=rev(usedColor), main="", xlab=xAxisName, ylab=yAxisName, ylim=c(0,100))
 						
 						symbolParameter <- 15
 						if (h==1) {
@@ -491,7 +515,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 							#Cairo(width=as.numeric(imageWidth), height=as.numeric(imageHeight),file=paste("legendeBoxStacked",saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
 		Cairo(width=as.numeric(imageWidth), height=as.numeric(40*length(rownames(workingDataSet))),file=paste("legendeBoxStacked",saveFormat,sep="."),type=tolower(saveFormat),bg=bg,units="px",dpi=as.numeric(dpi), pointsize=20)
 							barplot(1:1, main="", col=NA, border="NA", axes=FALSE)	#dummy plot -> ist notwendig			
-							legend("left", substr(rownames(workingDataSet),1, str_locate(rownames(workingDataSet)," ")-1), col= usedColor, pch=symbolParameter, bty="n")
+							legend("left", substr(rownames(workingDataSet),1, str_locate(rownames(workingDataSet)," ")-1), col= rev(usedColor), pch=symbolParameter, bty="n")
 							#legend("topleft", rownames(workingDataSet), col= usedColor, pch=symbolParameter)
 							#legend("bottomleft", resFilterTreatment, col= usedColor, pch=symbolParameter)
 							dev.off()
@@ -527,7 +551,7 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 					for(y in 1:length(workingDataSet[,1])) {
 						
 						zaehlerNAN <- 0
-						zaehlerNAN <- sum(match(is.nan(workingDataSet[y,]),FALSE),na.rm=TRUE)			
+						zaehlerNAN <- sum(match(is.nan(workingDataSet[y,]),FALSE),na.rm=TRUE)
 						
 						if (zaehlerNAN > 1) {	
 							
@@ -629,4 +653,9 @@ valuesAsDiagram <- function(iniDataSet, saveName="OutputDiagramm", saveFormat="p
 		dev.off();
 		print(paste("No plotting, because the descriptor(s)",descriptor,"don't exist!"))
 	}
-}
+	
+},TRUE)
+print(time)	
+	
+#}
+

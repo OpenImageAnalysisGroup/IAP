@@ -116,6 +116,32 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	return(colnames(dataSet)[!colnames(dataSet) %in% withoutColNamesVector])
 }
 
+loadAndInstallPackages <- function(install=FALSE, useDev=FALSE){
+	
+	if(install) {
+		install.packages(c("Cairo"), repos="http://cran.r-project.org", dependencies = TRUE)
+		install.packages(c("RColorBrewer"), repos="http://cran.r-project.org", dependencies = TRUE)
+		install.packages(c("data.table"), repos="http://cran.r-project.org", dependencies = TRUE)
+		install.packages(c("ggplot2"), repos="http://cran.r-project.org", dependencies = TRUE)
+		
+		if(useDev) {
+			install.packages(c("devtools"), repos="http://cran.r-project.org", dependencies = TRUE)
+			dev_mode()
+			install_github("ggplot2")
+		}
+	}
+		
+	library("Cairo")
+	library("RColorBrewer")
+	library(data.table)
+	
+	if(useDev) {
+		library("devtools")
+	}
+	
+	library(ggplot2)	
+}
+
 buildDataSet <- function(workingDataSet, overallResult, colname, index) {
 	
 	if(length(colname) > 0) {
@@ -2199,17 +2225,8 @@ valuesAsDiagram <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="fals
 						appendix=appendix, stoppTheCalculation=stoppTheCalculation,
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(),
 						color_nBox = list(), color_box=list(), color_boxStack=list(), user="none", typ="none")	
-				
-	#install.packages(c("Cairo"), repos="http://cran.r-project.org", dependencies = TRUE)
-	library("Cairo")
-	#install.packages(c("RColorBrewer"), repos="http://cran.r-project.org", dependencies = TRUE)
-	library("RColorBrewer")
-	#install.packages(c("data.table"), repos="http://cran.r-project.org", dependencies = TRUE)
-	library(data.table)
-	#install.packages(c("ggplot2"), repos="http://cran.r-project.org", dependencies = TRUE)
-	library(ggplot2)
-	#install.packages(c("Hmisc"), repos="http://cran.r-project.org", dependencies = TRUE)
-	#library("Hmisc")
+	
+	loadAndInstallPackages(FALSE, FALSE)
 	
 	overallList$debug %debug% "Start"
 	

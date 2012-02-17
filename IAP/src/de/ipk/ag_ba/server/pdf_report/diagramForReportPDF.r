@@ -24,7 +24,7 @@ workingDataSet <- read.csv(fileName, header=TRUE, sep="\t", fileEncoding="ISO-88
 descriptorSetList <- list(boxplot = c("Weight A (g)","Weight B (g)","Water (weight-diff)","side.height.norm (mm)","side.width.norm (mm)","side.area.norm (mm^2)",
 					"side.fluo.intensity.chlorophyl.average (relative)","side.fluo.intensity.phenol.average (relative)",
 					"side.nir.intensity.average (relative)","side.leaf.count.median (leafs)","side.bloom.count (tassel)",
-					"side.leaf.length.sum.norm.max (mm)"),
+					"side.leaf.length.sum.norm.max (mm)","volume.fluo.iap","volume.iap (px^3)", "volume.iap_max", "volume.lt (px^3)"), 
 				boxplotStacked = c(
 					"side.nir.normalized.histogram.bin.1.0_25$side.nir.normalized.histogram.bin.2.25_51$side.nir.normalized.histogram.bin.3.51_76$side.nir.normalized.histogram.bin.4.76_102$side.nir.normalized.histogram.bin.5.102_127$side.nir.normalized.histogram.bin.6.127_153$side.nir.normalized.histogram.bin.7.153_178$side.nir.normalized.histogram.bin.8.178_204$side.nir.normalized.histogram.bin.9.204_229$side.nir.normalized.histogram.bin.10.229_255",
 					"side.fluo.normalized.histogram.bin.1.0_25$side.fluo.normalized.histogram.bin.2.25_51$side.fluo.normalized.histogram.bin.3.51_76$side.fluo.normalized.histogram.bin.4.76_102$side.fluo.normalized.histogram.bin.5.102_127$side.fluo.normalized.histogram.bin.6.127_153$side.fluo.normalized.histogram.bin.7.153_178$side.fluo.normalized.histogram.bin.8.178_204$side.fluo.normalized.histogram.bin.9.204_229$side.fluo.normalized.histogram.bin.10.229_255"
@@ -42,7 +42,7 @@ if(tolower(diagramTyp) == tolower("!boxplot")){
 	# "digital biomass IAP (pixel^3)","digital biomass KeyGene (pixel^3)", 
 	descriptorSetName <- c("weight before watering (g)","weight after watering (g)", "water weight (g)", "height (mm)", "width (mm)", "side area (pixel^2)",
 						   "chlorophyl intensity (relative intensity/pixel)", "fluorescence intensity (relative intensity/pixel)", "nir intensity (relative intensity/pixel)",
-						   "number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)")
+						   "number of leafs (leaf)", "number of tassels (tassel)", "length of leafs plus stem (mm)", "volume based on FLUO (IAP) (px^3)", "volume based on RGB (IAP) (px^3)", "volume based on max RGB-image (IAP) (px^3)", "volume based on RGB (LemnaTec) (px^3)")
 	appendix = FALSE
 				   
 } else if(tolower(diagramTyp) == tolower("boxplotStacked")) {
