@@ -110,7 +110,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		if (exportIndividualAngles)
 			return IAPimages.getDownloadIcon();
 		else
-			return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
+			return "img/ext/gpl2/Gnome-Text-X-Script-64.png";// Gnome-X-Office-Spreadsheet-64.png";
 	}
 	
 	@Override
