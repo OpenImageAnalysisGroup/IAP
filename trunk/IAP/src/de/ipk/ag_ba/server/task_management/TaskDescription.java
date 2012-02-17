@@ -193,13 +193,13 @@ public class TaskDescription {
 								if (sn.indexOf(".") > 0)
 									sn = sn.substring(sn.lastIndexOf(".") + 1);
 								e.getHeader().setExperimentname(sn + ": " + experimentInput.getExperimentName());
-								e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
-								e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
+								e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+								e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
 								e.getHeader().setDatabaseId("");
 								for (SubstanceInterface si : e) {
 									for (ConditionInterface ci : si) {
 										ci.setExperimentName(e.getHeader().getExperimentName());
-										ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
+										ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
 									}
 								}
 								boolean superMerge = false;

@@ -158,18 +158,18 @@ public class LemnaTecDataExchange {
 				ehi.setImportusergroup("LemnaTec");
 				LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
 				if (system == LemnaTecSystem.Barley) {
-					ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse);
+					ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse + "");
 					ehi.setImportusergroup("LemnaTec (BGH)");
 				} else
 					if (system == LemnaTecSystem.Maize) {
-						ehi.setExperimenttype(IAPexperimentTypes.MaizeGreenhouse);
+						ehi.setExperimenttype(IAPexperimentTypes.MaizeGreenhouse + "");
 						ehi.setImportusergroup("LemnaTec (CGH)");
 					} else
 						if (system == LemnaTecSystem.Phytochamber) {
-							ehi.setExperimenttype(IAPexperimentTypes.Phytochamber);
+							ehi.setExperimenttype(IAPexperimentTypes.Phytochamber + "");
 							ehi.setImportusergroup("LemnaTec (APH)");
 						} else {
-							ehi.setExperimenttype(IAPexperimentTypes.UnknownGreenhouse);
+							ehi.setExperimenttype(IAPexperimentTypes.UnknownGreenhouse + "");
 							ehi.setImportusergroup("LemnaTec (Other)");
 						}
 				ehi.setSequence("");

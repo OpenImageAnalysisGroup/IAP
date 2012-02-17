@@ -57,7 +57,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			public double getCurrentStatusValueFine() {
 				double finishedJobs = 0.00001;
 				HashSet<String> activeJobsIds = new HashSet<String>();
-				TreeMap<Long, Integer> submissionTime2partCnt = new TreeMap<Long, Integer>();
+				TreeMap<String, Integer> submission2partCnt = new TreeMap<String, Integer>();
 				Long firstSubmission = null;
 				try {
 					for (BatchCmd b : ActionJobStatus.this.m.batchGetAllCommands()) {
@@ -76,12 +76,14 @@ public class ActionJobStatus extends AbstractNavigationAction {
 							if (st > 0 && (firstSubmission == null || st < firstSubmission))
 								firstSubmission = st;
 							
-							if (!submissionTime2partCnt.containsKey(b.getSubmissionTime()))
-								submissionTime2partCnt.put(b.getSubmissionTime(), b.getPartCnt());
+							String id = b.getRemoteCapableAnalysisActionClassName() + "$" + b.getExperimentDatabaseId() + "$" + b.getSubmissionTime();
+							
+							if (!submission2partCnt.containsKey(id))
+								submission2partCnt.put(id, b.getPartCnt());
 						}
 					}
 					part_cnt = 0;
-					for (Integer cnt : submissionTime2partCnt.values())
+					for (Integer cnt : submission2partCnt.values())
 						part_cnt += cnt;
 					
 					finishedJobs += part_cnt - remainingJobs;
@@ -104,8 +106,10 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", overall: "
 								+ SystemAnalysis.getWaitTimeShort(fullTime) + ", remain: " + SystemAnalysis.getWaitTimeShort(fullTime - processingTime);
 						ArrayList<String> s = new ArrayList<String>();
-						for (long l : submissionTime2partCnt.keySet())
+						for (String ss : submission2partCnt.keySet()) {
+							long l = Long.parseLong(ss.substring(ss.lastIndexOf("$") + "$".length()));
 							s.add(SystemAnalysis.getCurrentTime(l));
+						}
 						remain += "<br>starts: " + StringManipulationTools.getStringList(s, ", ");
 						long partTime = fullTime / part_cnt;
 						remain += "<br>processed: " + StringManipulationTools.formatNumber(finishedJobs, "#.000") + " in "

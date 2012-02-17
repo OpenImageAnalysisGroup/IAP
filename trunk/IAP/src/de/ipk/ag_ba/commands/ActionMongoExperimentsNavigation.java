@@ -81,6 +81,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 							"Database Management",
 							"Database Management",
 							new NavigationAction[] {
+									new ActionAnalyzeAllExperiments(m, experimentList),
 									new ActionMongoDbReorganize(m),
 									new ActionMongoDbCompact(m),
 									new ActionDeleteHistoryOfAllExperiments(m)
@@ -238,13 +239,15 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			public String getDefaultImage() {
 				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
 					return IAPimages.getCloudResult();
-				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.startsWith(IAPexperimentTypes.Phytochamber))
+				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.startsWith(IAPexperimentTypes.Phytochamber + ""))
 					return IAPimages.getPhytochamber();
 				else
-					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)") || group.startsWith(IAPexperimentTypes.BarleyGreenhouse))
+					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)")
+							|| group.startsWith(IAPexperimentTypes.BarleyGreenhouse + ""))
 						return IAPimages.getBarleyGreenhouse();
 					else
-						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)") || group.startsWith(IAPexperimentTypes.MaizeGreenhouse))
+						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)")
+								|| group.startsWith(IAPexperimentTypes.MaizeGreenhouse + ""))
 							return IAPimages.getMaizeGreenhouse();
 						else
 							return "img/ext/network-workgroup.png";
@@ -254,13 +257,15 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			public String getDefaultNavigationImage() {
 				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
 					return IAPimages.getCloudResultActive();
-				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.startsWith(IAPexperimentTypes.Phytochamber))
+				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.startsWith(IAPexperimentTypes.Phytochamber + ""))
 					return IAPimages.getPhytochamber();
 				else
-					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)") || group.startsWith(IAPexperimentTypes.BarleyGreenhouse))
+					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)")
+							|| group.startsWith(IAPexperimentTypes.BarleyGreenhouse + ""))
 						return IAPimages.getBarleyGreenhouse();
 					else
-						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)") || group.startsWith(IAPexperimentTypes.MaizeGreenhouse))
+						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)")
+								|| group.startsWith(IAPexperimentTypes.MaizeGreenhouse + ""))
 							return IAPimages.getMaizeGreenhouse();
 						else
 							return "img/ext/network-workgroup-power.png";
