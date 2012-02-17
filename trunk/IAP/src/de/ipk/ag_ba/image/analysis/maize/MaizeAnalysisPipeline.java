@@ -92,9 +92,9 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		// calculation of numeric values
 		p.add(BlCalcMainAxis_vis.class);
-		p.add(BlCalcWidthAndHeight_vis.class);
 		p.add(BlCalcIntensity_vis_fluo_nir.class);
 		p.add(BlConvexHull_vis_fluo.class);
+		p.add(BlCalcWidthAndHeight_vis.class);
 		
 		// postprocessing
 		p.add(BlockDrawSkeleton_vis_fluo.class);
