@@ -98,6 +98,12 @@
 	\IfFileExists{#1}{\setboolean{isFile1}{true}}{}
 	\IfFileExists{#2}{\setboolean{isFile2}{true}}{}
 	}
+	
+\newcommand{\checkFileNoReset}[2]{
+	\IfFileExists{#1}{\setboolean{isFile1}{true}}{}
+	\IfFileExists{#2}{\setboolean{isFile2}{true}}{}
+	}
+	
 
 % \newenvironment{OwnLoadImage}
 %   {\par\raggedbottom\null\vfill\noindent\minipage{\textwidth}\centering}
@@ -249,6 +255,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
 	\subsection{LemnaTec formula}
 	\begin{itemize}
 	\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
@@ -265,6 +272,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{digital_biomass_keygene_normnboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{KeyGene formula}
 	\begin{itemize}
 	\item Equation: $Biomass_{KeyGene}=side.area_{0^{\circ}}+side.area_{90^{\circ}}+\log(\frac{top.area}{3})$
@@ -274,14 +282,14 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 }{}
 
 
-\clearpage
-\section{\noindent Water use efficiency}
-\begin{itemize}
-\item Ratio of plant growth and water use.
-\end{itemize}
-
 \checkFile{volume_iap_wuenboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
+	\section{\noindent Water use efficiency}
+	\begin{itemize}
+	\item Ratio of plant growth and water use.
+	\end{itemize}
+	
 	\subsection{Based on digital biomass}
 	\begin{itemize}
 	\item Growth per day divided by water usage per day.
@@ -290,7 +298,6 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\end{itemize}
 	\loadImage{volume_iap_wuenboxplot.pdf}
 }{}
-
 
 \clearpage
 \section{General growth related plant properties}
@@ -314,6 +321,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_height_norm__mm_boxplot.pdf}{side_height_norm__mm_nboxplot.pdf}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
 	\subsection{Height (zoom corrected)}
 	\begin{itemize}
 	\item Plant height (mm) (normalized to distance of left and right marker)
@@ -331,6 +339,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_width__mm_boxplot.pdf}{side_width__mm_nboxplot.pdf}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
 	\subsection{Width}
 	\begin{itemize}
 	\item Plant width (px) 
@@ -348,6 +357,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_width_norm__mm_boxplot.pdf}{side_width_norm__mm_nboxplot.pdf}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
 	\subsection{Width (zoom corrected)}
 	\begin{itemize}
 	\item Plant width (mm) (normalized to distance of left and right marker) 
@@ -365,6 +375,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_area__px_boxplot.pdf}{side_area__px_nboxplot.pdf}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
 	\subsection{Projected side area}
 	\begin{itemize}
 	\item Number of foreground pixels
@@ -382,6 +393,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_area_norm__mm2_boxplot.pdf}{side_area_norm__mm2_nboxplot.pdf}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
 	\subsection{Projected side area (zoom corrected)}
 	\begin{itemize}
 	\item Number of foreground pixels from side camera (normalized to distance of left and right marker)
@@ -399,6 +411,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{top_area__px_boxplot.pdf}{top_area__px_nboxplot.pdf}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
 	\subsection{Projected top area}
 	\begin{itemize}
 	\item Number of foreground pixels
@@ -416,6 +429,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{top_area_norm__mm2_nboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Projected top area (zoom corrected)}
 	\begin{itemize}
 	\item Number of foreground pixels from top camera (normalized to distance of left and right marker)
@@ -446,6 +460,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_height_norm_relativenboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Height}
 	\begin{itemize}
 	\item Relative growth of plant height in percent (normalized to distance of left and right marker)
@@ -457,6 +472,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_width_norm_relativenboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Width}
 	\begin{itemize}
 	\item Relative plant width growth in percent (normalized to distance of left and right marker) 
@@ -467,6 +483,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{top_area_relativenboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Projected top area}
 	\begin{itemize}
 	\item Relative growth of number of foreground pixels from top camera
@@ -478,6 +495,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_area_relativenboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Projected side area}
 	\begin{itemize}
 	\item Relative growth of number of foreground pixels from side camera
@@ -488,6 +506,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{volume_iap_relativenboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Digital biomass (IAP formula)}
 	\begin{itemize}
 	\item Digital biomass growth in percent (per day) based on the side.area and top.area observed from the visible light camera.
@@ -497,12 +516,10 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 }{}
 
 
-\clearpage
-\section{VIS ligth color histogram}
-
-
 \checkFile{side_vis_hue_histogram_ratio_bin_1_0_25_side_vis_hue_histogram_ratio_bstackedOverallImage.tex}{top_vis_hue_histogram_ratio_bin_1_0_25_top_vis_hue_histogram_ratio_binstackedOverallImage.tex}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
+	\section{Visible light color histogram}
 	\subsection{Color histogram}
 	\begin{itemize}
 	\item Average activity of the normalized VIS images
@@ -521,6 +538,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_vis_normalized_histogram_ratio_bin_1_0_25_side_vis_normalized_his.tex}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Color histogram (zoom corrected)}
 	\begin{itemize}
 	\item Average activity of the normalized VIS images
@@ -532,12 +550,11 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 
 
-\clearpage
-\section{Fluorescence activity histogram}
-
-
 \checkFile{side_fluo_histogram_bin_1_0_25_side_fluo_histogram_bin_2_25_51_side_flstackedOverallImage.tex}{top_fluo_histogram_bin_1_0_25_top_fluo_histogram_bin_2_25_51_top_fluo_stackedOverallImage.tex}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
+	\section{Fluorescence activity histogram}
+
 	\subsection{Fluorescence spectra}
 	\begin{itemize}
 	\item Histogram of observed fluorescence colors
@@ -553,6 +570,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_fluo_normalized_histogram_bin_1_0_25_side_fluo_normalized_histogrstackedOverallImage.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Fluorescence spectra (zoom corrected)}
 	\begin{itemize}
 	\item Histogram of observed fluorescence colors
@@ -562,6 +580,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_fluo_histogram_ratio_bin_1_0_25_side_fluo_histogram_ratio_bin_2_2stackedOverallImage.tex}{top_fluo_histogram_ratio_bin_1_0_25_top_fluo_histogram_ratio_bin_2_25_stackedOverallImage.tex}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\clearpage
 	\subsection{Fluo ratio intensity (to do: check!!!!!)}
 	\begin{itemize}
 	\item xxx
@@ -580,6 +599,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_fluo_normalized_histogram_ratio_bin_1_0_25_side_fluo_normalized_hstackedOverallImage.tex}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Fluo ratio intensity (zoom corrected) (to do: check!!!!!)}
 	\begin{itemize}
 	\item xxx
@@ -615,6 +635,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_nir_normalized_histogram_bin_1_0_25_side_nir_normalized_histogramstackedOverallImage.tex}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Intensity histogram (zoom corrected)}
 	\begin{itemize}
 	\item Average intensity of normalized near infrared (NIR)
@@ -626,10 +647,16 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 }{}
 
 
+\checkFile{side_leaf_count_median__leafs_nboxplot.pdf}{}
+\checkFileNoReset{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}
+\checkFileNoReset{side_bloom_count__tassel_nboxplot.pdf}{}
+
+\ifthenelse{\boolean{isFile1}}{
 \clearpage
 \section{Plant structures}
-% http://upload.wikimedia.org/wikipedia/commons/9/98/Maize_plant_diagram.svg
+}{}
 
+% http://upload.wikimedia.org/wikipedia/commons/9/98/Maize_plant_diagram.svg
 
 \checkFile{side_leaf_count_median__leafs_nboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
@@ -646,6 +673,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Leaf lengths}
 	\begin{itemize}
 	\item Length of all leafs plus stem
@@ -658,7 +686,8 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 
 \checkFile{side_bloom_count__tassel_nboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{	
+\ifthenelse{\boolean{isFile1}}{
+	\clearpage	
 	\subsection{Flower detection}
 	\begin{itemize}
 	\item Number of tassel florets
@@ -672,7 +701,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \section{\noindent Wetness}
 
 \begin{itemize}
-\item Vales based on the NIR images
+\item Near-infrared analysis
 \end{itemize}
 
 \checkFile{side_nir_wetness_average__percent_.pdf}{}
@@ -688,7 +717,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 
 \checkFile{top_nir_wetness_average__percent_nboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{	
+\ifthenelse{\boolean{isFile1}}{
 	\subsection{Average wetness of top image}
 	\begin{itemize}
 	\item Average wetness of the plants from NIR top camera
@@ -700,7 +729,8 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	
 	
 \checkFile{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{	
+\ifthenelse{\boolean{isFile1}}{
+	\clearpage	
 	\subsection{Weighted loss through drought stress - side image}
 	\begin{itemize}
 	\item Number of foreground pixels from NIR side camera minus the weighted value of the plant
@@ -714,6 +744,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 \checkFile{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	\clearpage
 	\subsection{Weighted loss through drought stress - top image}
 	\begin{itemize}
 	\item Number of foreground pixels from NIR top camera minus the weighted value of the plant

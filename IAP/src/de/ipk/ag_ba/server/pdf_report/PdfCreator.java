@@ -109,9 +109,9 @@ public class PdfCreator {
 						if (optStatus != null && response != null && response.trim().length() > 0)
 							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 						if (optStatus != null && response != null && response.trim().length() > 0)
-							optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": " + response);
+							optStatus.setCurrentStatusText2(StringManipulationTools.stringReplace(response, "\"", ""));
 						synchronized (lastOutput) {
-							lastOutput.add(SystemAnalysis.getCurrentTime() + ": " + response);
+							lastOutput.add(response);
 							while (lastOutput.size() > 20)
 								lastOutput.remove(0);
 						}
@@ -122,7 +122,7 @@ public class PdfCreator {
 						if (optStatus != null && response != null && response.trim().length() > 0)
 							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 						if (optStatus != null && response != null && response.trim().length() > 0)
-							optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": ERROR: " + response);
+							optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": ERROR: " + StringManipulationTools.stringReplace(response, "\"", ""));
 						synchronized (lastOutput) {
 							lastOutput.add(SystemAnalysis.getCurrentTime() + ": ERROR: " + response);
 							while (lastOutput.size() > 20)
@@ -195,6 +195,8 @@ public class PdfCreator {
 		
 		c = StringManipulationTools.stringReplace(c, "--RemarkExp--",
 				safe(experiment.getHeader().getRemark()));
+		
+		c = StringManipulationTools.stringReplace(c, " // ", " \\tabularnewline ");
 		
 		TextFile.write(tempDirectory.getAbsolutePath() + File.separator + fn, c);
 	}

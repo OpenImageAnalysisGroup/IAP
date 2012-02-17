@@ -1001,7 +1001,7 @@ writeLatexFile <- function(saveNameLatexFile, saveNameImageFile="", o="") {
 
 saveImageFile <- function(overallList, plot, saveName, extraString="") {
 	filename <- preprocessingOfValues(paste(saveName,extraString,sep=""), FALSE,replaceString = "_")	
-	ggsave (filename=paste(filename,overallList$saveFormat,sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=14, height=7)
+	ggsave (filename=paste(filename,overallList$saveFormat,sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
 
 }
 
@@ -1638,7 +1638,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 	print("####")
 	
 	saveFormat <- "pdf"	
-	dpi <- "120" ##90	
+	dpi <- "90" ##90 ## CK: seems to change nothing for ggplot2 // 17.2.2012	
 	
 	isGray <- FALSE
 	showResultInR <- FALSE
