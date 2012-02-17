@@ -16,7 +16,8 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 			return null;
 		}
 		boolean debug = false;
-		ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
+		ImageOperation io = new ImageOperation(getInput().getMasks().getFluo()).applyMask_ResizeSourceIfNeeded(getInput().getImages().getFluo(),
+				options.getBackground());
 		FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 		if (debug)
 			fis.addImage("FLUO", io.copy().getImage());

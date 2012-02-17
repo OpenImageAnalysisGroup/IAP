@@ -65,6 +65,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						if (jid != null)
 							activeJobsIds.add(jid);
 						double fs = b.getCurrentStatusValueFine();
+						
 						if (b.getRunStatus() == CloudAnalysisStatus.FINISHED_INCOMPLETE)
 							fs = 0;
 						if (fs >= 0)
