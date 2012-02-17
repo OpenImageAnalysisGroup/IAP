@@ -59,7 +59,9 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 						if (sk != null)
 							getProperties().setImage("skeleton", sk);
-						res = getProperties().getImage("beforeBloomEnhancement");
+						FlexibleImage rrr = getProperties().getImage("beforeBloomEnhancement");
+						if (rrr != null)
+							res = rrr;
 					}
 			}
 		} else {
