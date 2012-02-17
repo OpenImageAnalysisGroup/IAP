@@ -120,6 +120,10 @@ public class BatchCmd extends BasicDBObject {
 		put("experiment", id);
 	}
 	
+	public String getExperimentDatabaseId() {
+		return getString("experiment");
+	}
+	
 	public long getLastUpdateTime() {
 		return getLong("lastupdate");
 	}

@@ -1,11 +1,21 @@
 package de.ipk.ag_ba.gui.images;
 
-public class IAPexperimentTypes {
+public enum IAPexperimentTypes {
+	Phytochamber("Arabidopsis"),
+	PhytochamberBlueRubber("Arabidopsis (blue rubber cover)"),
+	BarleyGreenhouse("Barley"),
+	MaizeGreenhouse("Maize"),
+	UnknownGreenhouse("LemnaTec (Other)"),
+	AnalysisResults("Analysis Results");
 	
-	public static final String Phytochamber = "Phytochamber";
-	public static final String BarleyGreenhouse = "Barley Greenhouse";
-	public static final String MaizeGreenhouse = "Maize Greenhouse";
-	public static final String UnknownGreenhouse = "LemnaTec (Other)";
-	public static final String AnalysisResults = "Analysis Results";
+	private String title;
 	
+	IAPexperimentTypes(String title) {
+		this.title = title;
+	}
+	
+	@Override
+	public String toString() {
+		return title;
+	}
 }

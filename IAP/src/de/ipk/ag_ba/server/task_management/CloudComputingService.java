@@ -435,7 +435,7 @@ public class CloudComputingService {
 						for (SubstanceInterface si : e) {
 							for (ConditionInterface ci : si) {
 								ci.setExperimentName(e.getHeader().getExperimentName());
-								ci.setExperimentType(IAPexperimentTypes.AnalysisResults);
+								ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
 							}
 						}
 						boolean superMerge = false;
@@ -450,8 +450,8 @@ public class CloudComputingService {
 						long tStart = tempDataSetDescription.getSubmissionTimeL();
 						long tProcessing = tFinish - tStart;
 						e.getHeader().setExperimentname(originName);
-						e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
-						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
+						e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
 						e.getHeader().setRemark(
 								e.getHeader().getRemark() + " // processing time: " +
 										SystemAnalysis.getWaitTime(tProcessing) + " // finished: " +

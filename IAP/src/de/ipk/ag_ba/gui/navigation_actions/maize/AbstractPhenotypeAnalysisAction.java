@@ -194,13 +194,13 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				statisticsResult.getHeader().setOriginDbId(dbID);
 				statisticsResult.getHeader().setStartdate(new Date(startTime));
 				statisticsResult.getHeader().setStorageTime(new Date());
-				statisticsResult.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults);
+				statisticsResult.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
 				
 				if (getResultReceiver() == null) {
 					if (status != null)
 						status.setCurrentStatusText1("Ready");
 					
-					statisticsResult.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults);
+					statisticsResult.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
 					statisticsResult.getHeader().setExperimentname(
 							getImageAnalysisTask().getClass().getCanonicalName() + ": " +
 									experiment.getExperimentName());

@@ -120,4 +120,8 @@ public class IAPimages {
 	public static String getFileCleaner() {
 		return "img/ext/gpl2/Gnome-Edit-Clear-64.png";
 	}
+	
+	public static String getAnalyzeAll() {
+		return "img/ext/gpl2/Gnome-Application-X-Executable-64.png";
+	}
 }
