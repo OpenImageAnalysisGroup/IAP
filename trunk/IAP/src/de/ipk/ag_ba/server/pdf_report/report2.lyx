@@ -1,126 +1,158 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX file created by tex2lyx 2.0.0
+\lyxformat 345
 \begin_document
 \begin_header
 \textclass amsart
 \use_default_options false
-\begin_modules
-theorems-ams
-eqs-within-sections
-figs-within-sections
-\end_modules
-\maintain_unincluded_children false
 \language english
-\language_package default
 \inputencoding latin9
-\fontencoding global
 \font_roman default
 \font_sans default
 \font_typewriter default
 \font_default_family default
-\use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
-\default_output_format default
-\output_sync 0
-\bibtex_command default
-\index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref 0
 \papersize default
 \use_geometry false
 \use_amsmath 1
 \use_esint 1
-\use_mhchem 1
-\use_mathdots 1
 \cite_engine basic
 \use_bibtopic false
-\use_indices false
 \paperorientation portrait
-\suppress_date false
-\use_refstyle 0
-\index Index
-\shortcut idx
-\color #008000
-\end_index
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\paragraph_indentation default
+\defskip medskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
 \tracking_changes false
 \output_changes false
-\html_math_output 0
-\html_css_as_file 0
-\html_be_strict false
 \end_header
 
 \begin_body
 
 \begin_layout Title
-Analysis of Experiment [experimentname]
+
+Analysis of Experiment --experimentname--
 \end_layout
 
 \begin_layout Author
+
 Research Group Image Analysis
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset Newline newline
+\end_inset
+
+ IPK-Gatersleben
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset Newline newline
+\end_inset
+
+ C. Klukas & A. Entzian
 \end_layout
 
 \begin_layout Date
-19.09.2011
+
+29.09.2011
 \end_layout
 
 \begin_layout Address
-Leibniz Institute of Plant Genetics and Crop Plant Research, Group Image
- Analysis, Corrensstr.
- 3, 06466 Gatersleben, Germany
+
+Leibniz Institute of Plant Genetics and Crop Plant Research, Group Image Analysis, Corrensstr. 3, 06466 Gatersleben, Germany
 \end_layout
 
 \begin_layout Email
+
 klukas@ipk-gatersleben.de, entzian@ipk-gatersleben.de
 \end_layout
 
 \begin_layout URL
+
 http://ba-13.ipk-gatersleben.de
 \end_layout
 
 \begin_layout Abstract
-This document is automatically created.
- 
+
+This document is automatically created based on the automated image analysis performed inside the integrated analysis platform IAP. Currently the pipelines and data analysis tools are in beta status, which means that we are working on makeing the analysis procedures, statistical operations, diagram output and report generation more stable and suitable to the needs of any user of the automated imaging infrastructure at the IPK.
+\end_layout
+
+\begin_layout Abstract
+
+If you have any hints, comments or suggestions for improvements, please don't hesitate to contact any member of the group image analysis. 
 \end_layout
 
 \begin_layout Keywords
+
 image analysis, phenotyping, maize 
 \end_layout
 
 \begin_layout Section
-Overview
+
+Experiment info
 \end_layout
 
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-Overview 
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Experiment properties
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
-\begin_inset Tabular
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="6" columns="3">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Experiment 
 \end_layout
 
@@ -129,18 +161,15 @@ Experiment
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-Experimentname 
+\begin_layout Standard
+
+--experimentname--
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-Analysis
-\end_layout
 
 \end_inset
 </cell>
@@ -149,7 +178,8 @@ Analysis
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Start 
 \end_layout
 
@@ -158,18 +188,15 @@ Start
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[StartExp] 
+\begin_layout Standard
+
+--StartExp--
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-[StartAna]
-\end_layout
 
 \end_inset
 </cell>
@@ -178,7 +205,8 @@ Start
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 End 
 \end_layout
 
@@ -187,18 +215,15 @@ End
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[EndExp] 
+\begin_layout Standard
+
+--EndExp--
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-[EndAna]
-\end_layout
 
 \end_inset
 </cell>
@@ -207,7 +232,8 @@ End
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Numeric values 
 \end_layout
 
@@ -216,18 +242,15 @@ Numeric values
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[NumExp] 
+\begin_layout Standard
+
+--NumExp-- 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-[NumAna]
-\end_layout
 
 \end_inset
 </cell>
@@ -236,7 +259,8 @@ Numeric values
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Images 
 \end_layout
 
@@ -245,18 +269,15 @@ Images
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[ImagesExp] 
+\begin_layout Standard
+
+--ImagesExp-- 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-[ImagesAna]
-\end_layout
 
 \end_inset
 </cell>
@@ -265,7 +286,8 @@ Images
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Storage 
 \end_layout
 
@@ -274,18 +296,15 @@ Storage
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[StorageExp] 
+\begin_layout Standard
+
+--StorageExp-- 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-[StorageAna]
-\end_layout
 
 \end_inset
 </cell>
@@ -299,31 +318,58 @@ Storage
 
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-Overview2
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Remarks
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
-\begin_inset Tabular
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-Notes 
+\begin_layout Standard
+
+Notes
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-Remarks
-\end_layout
 
 \end_inset
 </cell>
@@ -332,18 +378,15 @@ Remarks
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[Notes] 
+\begin_layout Standard
+
+--RemarkExp--
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-[Remarks]
-\end_layout
 
 \end_inset
 </cell>
@@ -355,26 +398,74 @@ Remarks
 
 \end_layout
 
-\begin_layout Section
-Experiment Factors
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Experiment factors
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout --Separator--
+
+
 \end_layout
 
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Tabular
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="2" columns="6">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 ID 
 \end_layout
 
@@ -383,7 +474,8 @@ ID
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Genotype 
 \end_layout
 
@@ -392,7 +484,8 @@ Genotype
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Variety 
 \end_layout
 
@@ -401,7 +494,8 @@ Variety
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Treatment 
 \end_layout
 
@@ -410,7 +504,8 @@ Treatment
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Sequence 
 \end_layout
 
@@ -419,7 +514,8 @@ Sequence
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 xyz
 \end_layout
 
@@ -430,8 +526,9 @@ xyz
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[ID] 
+\begin_layout Standard
+
+--ID-- 
 \end_layout
 
 \end_inset
@@ -439,8 +536,9 @@ xyz
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[Genotype] 
+\begin_layout Standard
+
+--Genotype-- 
 \end_layout
 
 \end_inset
@@ -448,8 +546,9 @@ xyz
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[Variety] 
+\begin_layout Standard
+
+--Variety-- 
 \end_layout
 
 \end_inset
@@ -457,8 +556,9 @@ xyz
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[Treatment] 
+\begin_layout Standard
+
+--Treatment-- 
 \end_layout
 
 \end_inset
@@ -466,8 +566,9 @@ xyz
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[Sequence] 
+\begin_layout Standard
+
+--Sequence-- 
 \end_layout
 
 \end_inset
@@ -475,8 +576,9 @@ xyz
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-[xyz]
+\begin_layout Standard
+
+--xyz--
 \end_layout
 
 \end_inset
@@ -487,73 +589,338 @@ xyz
 \end_inset
 
 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
 \end_layout
 
-\begin_layout Section
-Water
-\end_layout
+\end_inset
 
-\begin_layout Subsection
-Target Weight
-\end_layout
+ 
+\begin_inset space ~
 
-\begin_layout Itemize
-Weight after watering (target weight).
+\end_inset
+
  
 \end_layout
 
-\begin_layout Itemize
-Colnum name: weight.b 
-\end_layout
+\begin_layout --Separator--
 
-\begin_layout Itemize
-Unit: g
+
 \end_layout
 
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename weight.b.png
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Legend
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+
+Legend for linear diagrams 
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename legende
 	width 13cm
 
 \end_inset
 
 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
 \end_layout
 
-\begin_layout Subsection
-Water consumption
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Itemize
-Consumption of water based of weight measurments 
+
+Legend for stacked bar diagrams 
 \end_layout
 
-\begin_layout Itemize
-Column name: water 
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
 \end_layout
 
-\begin_layout Itemize
-Unit: g 
+\end_inset
+
+
+\begin_inset Graphics 
+	filename legendeBoxStacked.png
+	width 13cm
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Section
+
+Weight and water consumption
+\end_layout
+
+\begin_layout Subsection
+
+Weights (before and after watering)
+\end_layout
+
+\begin_layout Itemize
+
+Weight before and after watering. 
+\end_layout
+
+\begin_layout Itemize
+
+Colnum name: Weight A (g), Weight B (g) 
+\end_layout
+
+\begin_layout Itemize
+
+Unit: g
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"Weight A (g)\string
+	width 13cm
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Labeling
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"Weight B (g)\string
+	width 13cm
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection
+
+Watering amounts / consumption
+\end_layout
+
+\begin_layout Itemize
+
+Consumption of water based of weight measurments. 
+\end_layout
+
+\begin_layout Itemize
+
+Colnum name: Watering (weight-diff) 
+\end_layout
+
+\begin_layout Itemize
+
+Unit: g
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"Water (weight-diff)\string
+	width 13cm
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+
 Biomass
 \end_layout
 
 \begin_layout Itemize
+
 Digital Biomass based on the side.area and top.area 
 \end_layout
 
 \begin_layout Itemize
+
 Unit: pixel³ 
 \end_layout
 
 \begin_layout Subsection
-IAP
+
+IAP based formula
 \end_layout
 
 \begin_layout Itemize
+
 Equation: 
 \begin_inset Formula $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
 \end_inset
@@ -562,14 +929,71 @@ Equation:
 \end_layout
 
 \begin_layout Itemize
+
 Column name: digital.biomass.iap.norm
 \end_layout
 
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename digital.biomass.iap.norm.png
-	width 13cm
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+begin{lyxlist}{00.00.0000}
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+item [{
+\backslash
+includegraphics[width=13cm]{digital
+\backslash
+lyxdot biomass
+\backslash
+lyxdot iap
+\backslash
+lyxdot norm}}]~
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+end{lyxlist}
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
 
 \end_inset
 
@@ -577,42 +1001,117 @@ Column name: digital.biomass.iap.norm
 \end_layout
 
 \begin_layout Subsection
-LemnaTec
+
+LemnaTec formula
 \end_layout
 
 \begin_layout Itemize
+
 Equation: 
-\begin_inset Formula $Biomass_{LemnaTec}=\sqrt{side.area_{0ï¿œ}*side.area_{90\text{ï¿œ}}*top.area}$
+\begin_inset Formula $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
 \end_inset
 
  
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+item Column name: digital.biomass.lemnatec.norm
 \end_layout
 
-\begin_layout Itemize
-Column name: digital.biomass.lemnatec.norm 
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
-KeyGene
+
+KeyGene formula
 \end_layout
 
 \begin_layout Itemize
+
 Equation: 
-\begin_inset Formula $Biomass_{KeyGene}=side.area_{0\text{ï¿œ}}+side.area_{90\text{ï¿œ}}+\log(\frac{top.area}{3})$
+\begin_inset Formula $Biomass_{KeyGene}=side.area_{0^{\circ}}+side.area_{90^{\circ}}+\log(\frac{top.area}{3})$
 \end_inset
 
  
 \end_layout
 
 \begin_layout Itemize
+
 Column name: digital.biomass.keygene.norm
 \end_layout
 
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename digital.biomass.keygene.norm.png
-	width 13cm
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+begin{lyxlist}{00.00.0000}
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+item [{
+\backslash
+includegraphics[width=13cm]{digital
+\backslash
+lyxdot biomass
+\backslash
+lyxdot keygene
+\backslash
+lyxdot norm}}]~
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+end{lyxlist}
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
 
 \end_inset
 
@@ -620,165 +1119,363 @@ Column name: digital.biomass.keygene.norm
 \end_layout
 
 \begin_layout Section
-General Descriptors
+
+General growth related plant properties
 \end_layout
 
 \begin_layout Subsection
-Height
+
+Plant height
 \end_layout
 
 \begin_layout Itemize
+
 Plant height (mm) (normalized to distance of left and right marker) 
 \end_layout
 
 \begin_layout Itemize
+
 Column name: side.height.norm 
 \end_layout
 
 \begin_layout Itemize
-Unit: mm
+
+Unit: mm 
 \end_layout
 
+\begin_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.height.norm.png
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"side.height.norm (mm)\string
 	width 13cm
 
 \end_inset
 
 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
 \end_layout
 
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
-Width
+
+Plant width
 \end_layout
 
 \begin_layout Itemize
+
 Plant width (mm) (normalized to distance of left and right marker) 
 \end_layout
 
 \begin_layout Itemize
+
 Column name: side.width.norm 
 \end_layout
 
 \begin_layout Itemize
-Unit: mm
+
+Unit: mm 
 \end_layout
 
+\begin_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.width.norm.png
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"side.width.norm (mm)\string
 	width 13cm
 
 \end_inset
 
 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
 \end_layout
 
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
-Projected Side Area
+
+Projected side area
 \end_layout
 
 \begin_layout Itemize
+
 Number of foreground pixels from side camera 
 \end_layout
 
 \begin_layout Itemize
+
 Colum name: side.area.norm 
 \end_layout
 
 \begin_layout Itemize
-Unit: pixel²
+
+Unit: pixel² 
 \end_layout
 
+\begin_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.area.norm.png
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"side.area.norm (mm2)\string
 	width 13cm
 
 \end_inset
 
 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
 \end_layout
 
-\begin_layout Section
-Fluorescence
-\end_layout
+\end_inset
 
-\begin_layout Subsection
-Chlorophyll
-\end_layout
+ 
+\begin_inset space ~
 
-\begin_layout Itemize
-Average activity of chlorophyll, based on red reflection.
+\end_inset
+
  
 \end_layout
 
+\end_deeper
+\begin_layout Section
+
+Fluorescence intensity analysis
+\end_layout
+
+\begin_layout Subsection
+
+Chlorophyl intensity
+\end_layout
+
 \begin_layout Itemize
+
+Average activity of chlorophyl, based on red reflection. 
+\end_layout
+
+\begin_layout Itemize
+
 The darker the higher acitivity 
 \end_layout
 
 \begin_layout Itemize
+
 Column name: side.fluo.intensity.chlorophyl.average 
 \end_layout
 
 \begin_layout Itemize
-Unit: relative intensity/pixel
+
+Unit: relative intensity/pixel 
 \end_layout
 
+\begin_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.fluo.intensity.chlorophyl.average.png
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"side.fluo.intensity.chlorophyl.average (relative)\string
 	width 13cm
 
 \end_inset
 
 
-\end_layout
+\begin_inset ERT
+status collapsed
 
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.fluo.chlorophyl.normalized.histogram.bin.1.0_36;side.fluo.chlorop.png
-	width 13cm
+\begin_layout Standard
+
+}
+\end_layout
 
 \end_inset
 
+ 
+\begin_inset space ~
 
-\end_layout
+\end_inset
 
-\begin_layout Subsection
-Other
-\end_layout
+ 
+\begin_inset CommandInset include
+LatexCommand include
+preview false
+filename "side.fluo.normalized.histogram.bin.1.0_25;side.fluo.normalized.histogr"
 
-\begin_layout Itemize
-Average activity without chlorohyll (e.
- g.
- phenol), based of yellow reflection.
+\end_inset
+
  
 \end_layout
 
+\end_deeper
+\begin_layout Subsection
+
+Phenols and other fluorescence intensity
+\end_layout
+
 \begin_layout Itemize
+
+Average activity without chlorohyll (e. g. phenol), based of yellow reflection. 
+\end_layout
+
+\begin_layout Itemize
+
 The darker the higher acitivity 
 \end_layout
 
 \begin_layout Itemize
+
 Column name: side.fluo.intensity.phenol.average 
 \end_layout
 
 \begin_layout Itemize
-Unit: relative intensity/pixel
+
+Unit: relative intensity/pixel 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+begin{lyxlist}{00.00.0000}
 \end_layout
 
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.fluo.intensity.phenol.average.png
-	width 13cm
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+item [{
+\backslash
+includegraphics[width=13cm]{
+\backslash
+string"side
+\backslash
+lyxdot fluo
+\backslash
+lyxdot intensity
+\backslash
+lyxdot phenol
+\backslash
+lyxdot average
+\backslash
+string"}}]~
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+end{lyxlist}
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
 
 \end_inset
 
@@ -786,143 +1483,306 @@ Unit: relative intensity/pixel
 \end_layout
 
 \begin_layout Subsection
-NIR Intensity
+
+Near-infrared intensity
 \end_layout
 
 \begin_layout Itemize
+
 Average intensity of near infrared (NIR) 
 \end_layout
 
 \begin_layout Itemize
+
 Represents the water content of the plant 
 \end_layout
 
 \begin_layout Itemize
-Column name: side.nir.intensity.average.norm 
+
+Column name: side.nir.intensity.average 
 \end_layout
 
 \begin_layout Itemize
-Unit: relative intensity/pixel
+
+Unit: relative intensity/pixel 
 \end_layout
 
+\begin_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.nir.intensity.average.norm.png
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"side.nir.intensity.average (relative)\string
 	width 13cm
 
 \end_inset
 
 
-\end_layout
+\begin_inset ERT
+status collapsed
 
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.nir.histogram.bin.1.0_36;side.nir.histogram.bin.2.36_72;side.nir..png
-	width 13cm
+\begin_layout Standard
+
+}
+\end_layout
 
 \end_inset
 
+ 
+\begin_inset space ~
 
+\end_inset
+
+ 
+\begin_inset CommandInset include
+LatexCommand include
+preview false
+filename "side.nir.normalized.histogram.bin.1.0_25;side.nir.normalized.histogram.lyx"
+
+\end_inset
+
+ 
 \end_layout
 
+\end_deeper
 \begin_layout Section
-Plant Structure
+
+Plant structures
 \end_layout
 
 \begin_layout Subsection
+
 Number of leafs
 \end_layout
 
 \begin_layout Itemize
+
 Number of leafs-tips 
 \end_layout
 
 \begin_layout Itemize
+
 Colum name: side.leaf.count.median 
 \end_layout
 
 \begin_layout Itemize
+
 Unit: leafs 
 \end_layout
 
 \begin_layout Itemize
-Hint: leaf-tips are shown as red retangles in the image
+
+Hint: leaf-tips are shown as red retangles in the image 
 \end_layout
 
+\begin_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.leaf.count.median.png
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"side.leaf.count.median (leafs)\string
 	width 13cm
 
 \end_inset
 
 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
 \end_layout
 
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
-Tassel
+
+Tassel (for maize plants)
 \end_layout
 
 \begin_layout Itemize
+
 Male flower count 
 \end_layout
 
 \begin_layout Itemize
+
 Colum name: side.bloom.count 
 \end_layout
 
 \begin_layout Itemize
+
 Unit: tassel 
 \end_layout
 
 \begin_layout Itemize
-Hint: the number of blue retangles in the image
+
+Hint: the number of blue retangles in the image 
 \end_layout
 
+\begin_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.bloom.count.png
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"side.bloom.count (tassel)\string
 	width 13cm
 
 \end_inset
 
 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
 \end_layout
 
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
-Length
+
+Leaf lengths
 \end_layout
 
 \begin_layout Itemize
+
 Length of all leafs plus stem 
 \end_layout
 
 \begin_layout Itemize
+
 Column name: side.leaf.length.sum.norm.max 
 \end_layout
 
 \begin_layout Itemize
+
 Unit: mm 
 \end_layout
 
 \begin_layout Itemize
-Hint: the yellow line in the image
+
+Hint: the yellow line in the image 
 \end_layout
 
+\begin_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Graphics
-	filename side.leaf.length.sum.norm.max.png
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics 
+	filename \string"side.leaf.length.sum.norm.max (mm)\string
 	width 13cm
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
 
 \end_inset
 
 
 \end_layout
 
+\end_deeper
+\begin_layout Section
+
+Appendix
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\labelwidthstring 00.00.0000
+
+
+\begin_inset CommandInset include
+LatexCommand include
+preview false
+filename "appendix.lyx"
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
 \end_body
 \end_document
