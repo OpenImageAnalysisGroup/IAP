@@ -1,0 +1,323 @@
+%% LyX 2.0.0 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[oneside,english]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{textcomp}
+\usepackage{amsthm}
+\usepackage{amstext}
+\usepackage{graphicx}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\newcommand{\lyxmathsym}[1]{\ifmmode\begingroup\def\b@ld{bold}
+  \text{\ifx\math@version\b@ld\bfseries\fi#1}\endgroup\else#1\fi}
+
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+%% A simple dot to overcome graphicx limitations
+\newcommand{\lyxdot}{.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\newenvironment{lyxlist}[1]
+{\begin{list}{}
+{\settowidth{\labelwidth}{#1}
+ \setlength{\leftmargin}{\labelwidth}
+ \addtolength{\leftmargin}{\labelsep}
+ \renewcommand{\makelabel}[1]{##1\hfil}}}
+{\end{list}}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{Analysis of Experiment --experimentname--}
+
+
+\author{Research Group Image Analysis\\ \\ IPK-Gatersleben\\ \\ C. Klukas \& A. Entzian}
+
+
+\date{29.09.2011}
+
+
+\address{Leibniz Institute of Plant Genetics and Crop Plant Research, Group
+Image Analysis, Corrensstr. 3, 06466 Gatersleben, Germany}
+
+
+\email{klukas@ipk-gatersleben.de, entzian@ipk-gatersleben.de}
+
+
+\urladdr{http://ba-13.ipk-gatersleben.de}
+\begin{abstract}
+This document is automatically created based on the automated image analysis performed 
+inside the integrated analysis platform IAP. Currently the pipelines and data analysis tools are in beta status, 
+which means that we are working on makeing the analysis procedures, statistical operations, diagram output and report
+generation more stable and suitable to the needs of any user of the automated imaging infrastructure at the IPK.
+
+If you have any hints, comments or suggestions for improvements, please don't hesitate to contact any member
+of the group image analysis.
+\end{abstract}
+
+\keywords{image analysis, phenotyping, maize }
+
+\maketitle
+
+\section{Experiment info}
+\begin{lyxlist}{00.00.0000}
+\item [{Experiment properties}]~
+\end{lyxlist}
+\begin{tabular}{|c|c|c|}
+\hline 
+Experiment & --experimentname--\tabularnewline
+\hline 
+\hline 
+Start & --StartExp--\tabularnewline
+\hline 
+End & --EndExp--\tabularnewline
+\hline 
+Numeric values & --NumExp-- \tabularnewline
+\hline 
+Images & --ImagesExp-- \tabularnewline
+\hline 
+Storage & --StorageExp-- \tabularnewline
+\hline 
+\end{tabular}
+\begin{lyxlist}{00.00.0000}
+\item [{Remarks}]~
+\end{lyxlist}
+\begin{tabular}{|c|c|}
+\hline 
+Notes\tabularnewline
+\hline 
+\hline 
+--RemarkExp--\tabularnewline
+\hline 
+\end{tabular}
+
+\begin{lyxlist}{00.00.0000}
+\item [{Experiment factors}]~
+\end{lyxlist}
+
+\begin{lyxlist}{00.00.0000}
+\item [{%
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline 
+ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
+\hline 
+\hline 
+--ID-- & --Genotype-- & --Variety-- & --Treatment-- & --Sequence-- & --xyz--\tabularnewline
+\hline 
+\end{tabular}}]~
+\end{lyxlist}
+
+\newpage
+\begin{lyxlist}{00.00.0000}
+\item [{Legend}]~
+\end{lyxlist}
+\begin{itemize}
+\item Legend for linear diagrams
+
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{legend}}]~
+\end{lyxlist}
+\end{itemize}
+
+
+\begin{itemize}
+\item Legend for stacked bar diagrams
+\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\include{legendBoxStacked}
+%%\item [{\includegraphics[width=13cm]{legendeBoxStacked}}]~
+\end{lyxlist}
+\newpage
+\section{\noindent Weight and water consumption}
+
+\subsection{Weights (before and after watering)}
+\begin{itemize}
+\item Weight before and after watering.
+\item Colnum name: Weight A (g), Weight B (g)
+\item Unit: g\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"Weight\lyxdot A\lyxdot \lyxdot g\lyxdot \string"}}]~
+\item [{\includegraphics[width=13cm]{\string"Weight\lyxdot B\lyxdot \lyxdot g\lyxdot \string"}}]~
+\end{lyxlist}
+
+\subsection{Watering amounts / consumption}
+\begin{itemize}
+\item Consumption of water based of weight measurments.
+\item Colnum name: Watering (weight-diff)
+\item Unit: g\end{itemize}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"Water\lyxdot \lyxdot weight\lyxdot diff\lyxdot \string"}}]~
+\end{lyxlist}
+
+
+\section{\noindent Biomass}
+\begin{itemize}
+\item Digital Biomass based on the side.area and top.area
+\item Unit: pixel\textthreesuperior{}
+\end{itemize}
+
+\subsection{IAP based formula - GRB}
+\begin{itemize}
+\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
+\item Column name: volume.iap
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"volume\lyxdot iap\lyxdot \lyxdot px3\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{IAP based formula - GRB max}
+\begin{itemize}
+\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{max\_image}^{2}*top.area_{max\_image}}$
+\item Column name: volume.iap\_max
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"volume\lyxdot iap_max\string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{IAP based formula - FLUO}
+\begin{itemize}
+\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
+\item Column name: volume.fluo.iap
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"volume\lyxdot fluo\lyxdot iap\string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{LemnaTec formula}
+\begin{itemize}
+\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
+\item Column name: volume.lt
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"volume\lyxdot lt\lyxdot \lyxdot px3\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{KeyGene formula}
+\begin{itemize}
+\item Equation: $Biomass_{KeyGene}=side.area_{0^{\circ}}+side.area_{90^{\circ}}+\log(\frac{top.area}{3})$
+\item Column name: digital.biomass.keygene.norm
+%\begin{lyxlist}{00.00.0000}
+%\item [{\includegraphics[width=13cm]{digital\lyxdot biomass\lyxdot keygene\lyxdot norm}}]~
+%\end{lyxlist}
+\end{itemize}
+
+\section{General growth related plant properties}
+
+\subsection{Plant height}
+\begin{itemize}
+\item Plant height (mm) (normalized to distance of left and right marker)
+\item Column name: side.height.norm
+\item Unit: mm
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot height\lyxdot norm\lyxdot \lyxdot mm\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{Plant width}
+\begin{itemize}
+\item Plant width (mm) (normalized to distance of left and right marker) 
+\item Column name: side.width.norm
+\item Unit: mm
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot width\lyxdot norm\lyxdot \lyxdot mm\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{Projected side area}
+\begin{itemize}
+\item Number of foreground pixels from side camera
+\item Colum name: side.area.norm
+\item Unit: pixel\texttwosuperior{}
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot area\lyxdot norm\lyxdot \lyxdot mm2\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\section{Fluorescence intensity analysis}
+
+
+\subsection{Chlorophyl intensity}
+\begin{itemize}
+\item Average activity of chlorophyl, based on red reflection.
+\item The darker the higher acitivity
+\item Column name: side.fluo.intensity.chlorophyl.average
+\item Unit: relative intensity/pixel
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot fluo\lyxdot intensity\lyxdot chlorophyl\lyxdot average\lyxdot \lyxdot relative\lyxdot \string"}}]~
+\include{side\lyxdot fluo\lyxdot normalized\lyxdot histogram\lyxdot bin\lyxdot 1\lyxdot 0_25;side\lyxdot fluo\lyxdot normalized\lyxdot histogr}
+\end{lyxlist}
+\end{itemize}
+
+\subsection{Phenols and other fluorescence intensity}
+\begin{itemize}
+\item Average activity without chlorohyll (e. g. phenol), based of yellow
+reflection.
+\item The darker the higher acitivity
+\item Column name: side.fluo.intensity.phenol.average
+\item Unit: relative intensity/pixel
+%\begin{lyxlist}{00.00.0000}
+%\item [{\includegraphics[width=13cm]{\string"side\lyxdot fluo\lyxdot intensity\lyxdot phenol\lyxdot average\string"}}]~
+%\end{lyxlist}
+\end{itemize}
+
+\subsection{Near-infrared intensity}
+\begin{itemize}
+\item Average intensity of near infrared (NIR)
+\item Represents the water content of the plant
+\item Column name: side.nir.intensity.average
+\item Unit: relative intensity/pixel
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot nir\lyxdot intensity\lyxdot average\lyxdot \lyxdot relative\lyxdot \string"}}]~
+\include{side\lyxdot nir\lyxdot normalized\lyxdot histogram\lyxdot bin\lyxdot 1\lyxdot 0_25;side\lyxdot nir\lyxdot normalized\lyxdot histogram}
+\end{lyxlist}
+\end{itemize}
+
+\section{Plant structures}
+
+\subsection{Number of leafs}
+\begin{itemize}
+\item Number of leafs-tips
+\item Colum name: side.leaf.count.median
+\item Unit: leafs
+\item Hint: leaf-tips are shown as red retangles in the image
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot leaf\lyxdot count\lyxdot median\lyxdot \lyxdot leafs\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{Tassel (for maize plants)}
+\begin{itemize}
+\item Male flower count
+\item Colum name: side.bloom.count
+\item Unit: tassel
+\item Hint: the number of blue retangles in the image
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot bloom\lyxdot count\lyxdot \lyxdot tassel\lyxdot \string"}}]~
+\end{lyxlist}
+\end{itemize}
+
+\subsection{Leaf lengths}
+\begin{itemize}
+\item Length of all leafs plus stem
+\item Column name: side.leaf.length.sum.norm.max
+\item Unit: mm
+\item Hint: the yellow line in the image
+\begin{lyxlist}{00.00.0000}
+\item [{\includegraphics[width=13cm]{\string"side\lyxdot leaf\lyxdot length\lyxdot sum\lyxdot norm\lyxdot max\lyxdot \lyxdot mm\lyxdot \string"}}]~\end{lyxlist}
+\end{itemize}
+
+\section{Appendix}
+\begin{lyxlist}{00.00.0000}
+\include{appendixImage}
+\end{lyxlist}
+
+
+\end{document}
