@@ -675,7 +675,7 @@ buildRowName <- function(mergeDataSet,groupBy, yName = "value") {
 	} else {		
 		temp <- mergeDataSet[,groupBy[1]]
 		for(h in 2:length(groupBy)) {
-			temp <- paste(temp, mergeDataSet[,groupBy[h]], sep = "#")
+			temp <- paste(temp, mergeDataSet[,groupBy[h]], sep = "/")
 		}
 		return(data.frame(name=temp, primaerTreatment= mergeDataSet[,groupBy[1]], mergeDataSet[,mergeDataSet %allColnamesWithoutThisOnes% groupBy]))
 	}	
@@ -1109,7 +1109,7 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 }
 
 createOuputOverview <- function(typ, actualImage, maxImage) {
-	print(paste("Create image (",typ,") ",actualImage,"/",maxImage,sep=""))
+	print(paste("Create ",typ, " ", actualImage,"/",maxImage,sep=""))
 }
 
 makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallSaveName, overallList, diagramTypSave="nboxplot") {
@@ -1249,7 +1249,7 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 							geom_bar(stat="identity", position = positionTyp)
 				}
 				
-				if(positionTyp=="dodge") {
+				if(positionTyp=="dodge" || positionTyp == "stack") {
 					name <- sub("%", "px", overallDesName[[imagesIndex]])
 				} else {
 					name <- overallDesName[[imagesIndex]]
@@ -1313,7 +1313,7 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 				if(makeOverallImage) {
 					writeLatexFile(paste(overallSaveName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallSaveName[[imagesIndex]],"overall",title, positionTyp, sep=""))	
 				} else {
-					writeLatexFile(overallSaveName[[imagesIndex]], paste(overallSaveName[[imagesIndex]],"overall",title,positionTyp, sep=""))	
+					writeLatexFile(overallSaveName[[imagesIndex]], paste(overallSaveName[[imagesIndex]],"overall",positionTyp,title, sep="_"))	
 				}
 			} else {
 				print(plot)
@@ -1638,7 +1638,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 	print("####")
 	
 	saveFormat <- "pdf"	
-	dpi <- "150" ##90	
+	dpi <- "120" ##90	
 	
 	isGray <- FALSE
 	showResultInR <- FALSE
@@ -1710,8 +1710,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 												"volume.iap.wue", 
 												"side.nir.wetness.plant_weight_drought_loss", 
 												"top.nir.wetness.plant_weight_drought_loss", 
-												"side.nir.wetness.av", 
-												"top.nir.wetness.av",
+												"side.nir.wetness.average (percent)", 
+												"top.nir.wetness.average (percent)",
 												"side.area.relative", 
 												"side.height.norm.relative", 
 												"side.width.norm.relative", 
@@ -1733,8 +1733,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 													"chlorophyl intensity (relative intensity/pixel)", 
 													"fluorescence intensity (relative intensity/pixel)", 
 													"nir intensity (relative intensity/pixel)",
-													"number of leafs (leaf)", 
-													"number of tassels (tassel)", 
+													"number of leafs", 
+													"number of tassel florets", 
 													"length of leafs plus stem (mm)", 
 													 
 													"volume based on RGB (IAP) (px^3)", 
@@ -1814,15 +1814,15 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE){
 										  
 										  
 				descriptorSetName_boxplotStacked <- c("NIR side (%)", 
-													  "red side fluorescence histogram (%)", 
+													  "side fluorescence color spectra (%)", 
 													  "NIR top (%)", 
 													  "fluo side ratio histogramm (%)",
 													  "NIR side normalized (%)", 
-													  "red side normalized fluo histogramm (%)", 
+													  "side fluorescence color spectra (zoom corrected) (%)", 
 													  "fluo side normalized ratio histogramm (%)",
 													  "VIS HUE side ratio histogramm (%)", 
 													  "VIS side normalized ratio histogramm (%)",
-													  "red top fluorescence histogram (%)", 
+													  "top fluorescence color spectra (%)", 
 													  "fluo top ratio histogramm (%)",
 													  "NIR top (%)", 
 													  "VIS HUE top ratio histogramm (%)")
