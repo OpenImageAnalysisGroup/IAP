@@ -131,7 +131,7 @@ public class MongoDB {
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de"))
 			res.add(getDefaultCloud());
 		if (IAPservice.isReachable("ba-24.ipk-gatersleben.de"))
-			res.add(new MongoDB("Data Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
+			res.add(new MongoDB("Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
 		// } else
 		// res.add(getLocalDB());
 		// }
@@ -157,7 +157,7 @@ public class MongoDB {
 	
 	public static MongoDB getDefaultCloud() {
 		if (defaultCloudInstance == null) {
-			defaultCloudInstance = new MongoDB("Data Processing", "cloud1", getDefaultCloudHostName(), "iap", "iap#2011", HashType.MD5);
+			defaultCloudInstance = new MongoDB("Storage 1", "cloud1", getDefaultCloudHostName(), "iap", "iap#2011", HashType.MD5);
 		}
 		return defaultCloudInstance;
 		// return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
@@ -2806,7 +2806,7 @@ public class MongoDB {
 				new MyByteArrayInputStream(isMain),
 				isLabel != null ? new MyByteArrayInputStream(isLabel) : null
 		},
-				new ObjectRef[] { fileSize, fileSize }, getHashType(), true);
+				new ObjectRef[] { fileSize, fileSize }, getHashType(), false);
 		
 		String hashMain = hashes[0];
 		String hashLabel = hashes[1];

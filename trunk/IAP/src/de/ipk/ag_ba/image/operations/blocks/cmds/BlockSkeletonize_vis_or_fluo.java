@@ -40,7 +40,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 	private final boolean debug2 = false;
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected synchronized FlexibleImage processVISmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
 		FlexibleImage fluo = getInput().getMasks().getFluo() != null ? getInput().getMasks().getFluo().copy() : null;
 		FlexibleImage res = vis;
@@ -105,7 +105,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected synchronized FlexibleImage processFLUOmask() {
 		FlexibleImage vis = getInput().getMasks().getVis();
 		FlexibleImage fluo = getInput().getMasks().getFluo() != null ? getInput().getMasks().getFluo().copy() : null;
 		if (fluo == null)
@@ -155,7 +155,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		return getInput().getMasks().getFluo();
 	}
 	
-	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo, FlexibleImage inpFLUOunchanged) {
+	public synchronized FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo, FlexibleImage inpFLUOunchanged) {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.getIO().skeletonize().getImage()));
 		skel2d.findEndpointsAndBranches2();
@@ -272,16 +272,17 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 			
 			// repeat erode operation until no filled pixel
 			Double leafWidthInPixels2 = 0d;
-			int skeletonLength;
+			int filled;
 			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+			ImageOperation ioo = inputImage.getIO();
 			do {
-				skeletonLength = inputImage.getIO().skeletonize().print("SKELETON2", false).countFilledPixels();
-				if (skeletonLength > 0)
+				filled = ioo.countFilledPixels();
+				if (filled > 0)
 					leafWidthInPixels2++;
 				if (fis != null)
 					fis.addImage("Leaf width 1: " + leafWidthInPixels + ", Leaf width 2: " + leafWidthInPixels2, inputImage.copy());
-				inputImage = inputImage.getIO().erode().getImage();
-			} while (skeletonLength > 0);
+				ioo.erode();
+			} while (filled > 0);
 			if (fis != null) {
 				fis.addImage("LW=" + leafWidthInPixels, inputImage);
 				fis.print("SKEL2");
@@ -342,7 +343,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		return skel2d.getAsFlexibleImage();
 	}
 	
-	private FlexibleImage MapOriginalOnSkelUseingMedian(FlexibleImage skeleton, FlexibleImage original, int back) {
+	private synchronized FlexibleImage MapOriginalOnSkelUseingMedian(FlexibleImage skeleton, FlexibleImage original, int back) {
 		int w = skeleton.getWidth();
 		int h = skeleton.getHeight();
 		int[] img = skeleton.getAs1A().clone();
@@ -396,7 +397,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 	 * @param input
 	 * @return
 	 */
-	private FlexibleImage getInvert(FlexibleImage input) {
+	private synchronized FlexibleImage getInvert(FlexibleImage input) {
 		int[][] img = input.getAs2A();
 		int width = img.length;
 		int height = img[0].length;
@@ -418,7 +419,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	@Override
-	public void postProcessResultsForAllTimesAndAngles(
+	public synchronized void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
