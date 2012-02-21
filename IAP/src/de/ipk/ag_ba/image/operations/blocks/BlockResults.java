@@ -404,9 +404,25 @@ public class BlockResults implements BlockResultSet {
 			ImageConfiguration conf) {
 		ArrayList<RunnableOnImageSet> res = new ArrayList<RunnableOnImageSet>();
 		for (RunnableOnImageSet ros : storedPostProcessors) {
-			if (ros.getConfig() == conf)
+			if (ros.getConfig() == conf) {
 				res.add(ros);
+			}
 		}
+		for (RunnableOnImageSet ros : res)
+			storedPostProcessors.remove(ros);
 		return res;
+	}
+	
+	@Override
+	public void clearStore() {
+		if (storedImages.size() > 0)
+			System.out.println("WARNING: Stored images size > 0");
+		storedImages.clear();
+		if (storedVolumes.size() > 0)
+			System.out.println("WARNING: Stored volumes size > 0");
+		storedVolumes.clear();
+		if (storedPostProcessors.size() > 0)
+			System.out.println("WARNING: Stored postprocessors size > 0");
+		storedPostProcessors.clear();
 	}
 }

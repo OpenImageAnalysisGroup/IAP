@@ -66,4 +66,6 @@ public interface BlockResultSet {
 	
 	public ArrayList<RunnableOnImageSet> getStoredPostProcessors(
 			ImageConfiguration rgbside);
+	
+	public void clearStore();
 }

@@ -216,11 +216,11 @@ public class TaskDescription {
 								
 								long tStart = cmd.getSubmissionTime();
 								long tProcessing = tFinish - tStart;
-								long minutes = tProcessing / 1000 / 60;
 								e.getHeader().setRemark(
-										e.getHeader().getRemark() + " // processing time (min): " + minutes + " // finished: " + SystemAnalysis.getCurrentTime());
+										e.getHeader().getRemark() + " // processing time: " + SystemAnalysis.getWaitTime(tProcessing) + " // finished: "
+												+ SystemAnalysis.getCurrentTime());
 								System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
-								System.out.println("> PIPELINE PROCESSING TIME (min)=" + minutes);
+								System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
 								System.out.println("*****************************");
 								System.out.println("Merged Experiment: " + e.getName());
 								// System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
