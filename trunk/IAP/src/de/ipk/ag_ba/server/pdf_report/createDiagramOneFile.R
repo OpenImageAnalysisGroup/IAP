@@ -37,7 +37,7 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	#overallList$debug %debug% "%errorReport%"
 	if (length(errorDescriptor) > 0) {
 		if (tolower(typOfError) == "notexists"){
-			print(paste("No plotting, because the descriptor(s) (",errorDescriptor,") don't exists!", sep=""))
+			print(paste("No plot, because the descriptor (",errorDescriptor,") is missing!", sep=""))
 			
 		} else if (tolower(typOfError) == "notnumericorallzero") {
 			#plotDummy(overallList)

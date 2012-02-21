@@ -348,6 +348,7 @@ public class LemnaTecDataExchange {
 	private String getCoordinatorFromNameID(String kuerzel) {
 		if (id2coo == null) {
 			id2coo = new HashMap<String, String>();
+			id2coo.put("IL", "Lermontova, Dr. Inna (KTE)");
 			id2coo.put("AC", "Arana, Dr. Fernando (HET)");
 			id2coo.put("FA", "Arana, Dr. Fernando (HET)");
 			id2coo.put("MM", "Muraya, Moses Mahugu (HET)");
@@ -481,12 +482,36 @@ public class LemnaTecDataExchange {
 			// + "	snapshot.configuration_id = image_unit_configuration.id and "
 			// + "	tiled_image.snapshot_id = snapshot.id";
 			
+			boolean b = true;
+			if (b)
+				sqlText = "SELECT "
+						+ "	creator, measurement_label, camera_label, id_tag, path, "
+						+ "	time_stamp, water_amount, weight_after, weight_before, compname, xfactor, yfactor, "
+						+ "	image_parameter_oid, image_oid, null_image_oid, snapshot.id as snapshotID, "
+						+ "	image_file_table.id as image_file_tableID, compname "
+						+ "FROM "
+						+ "	snapshot, tiled_image, tile, image_file_table, image_unit_configuration "
+						+ "WHERE "
+						+ "	snapshot.measurement_label = ? and "
+						+ "	snapshot.id = tiled_image.snapshot_id and "
+						+ "	tiled_image.id = tile.tiled_image_id and "
+						+ "	tile.image_oid = image_file_table.id and"
+						// and "
+						// + "	snapshot.configuration_id = image_unit_configuration.id";// and"
+						+ "	image_unit_configuration.gid = tiled_image.camera_label";
 			ps = connection.prepareStatement(sqlText);
 			ps.setString(1, experiment);
 			
 			rs = ps.executeQuery();
-			
+			HashSet<Long> known = new HashSet<Long>();
 			while (rs.next()) {
+				
+				long ll = rs.getLong("image_oid");
+				if (known.contains(ll))
+					continue;
+				else
+					known.add(ll);
+				
 				Snapshot snapshot = new Snapshot();
 				
 				knownSnaphotIds.add(rs.getLong("snapshotID"));
@@ -506,6 +531,7 @@ public class LemnaTecDataExchange {
 					snapshot.setWeight_before(w);
 				
 				snapshot.setCamera_label(rs.getString("compname"));
+				System.out.println("LABLAB: " + rs.getString("compname"));
 				snapshot.setXfactor(rs.getDouble("xfactor"));
 				snapshot.setYfactor(rs.getDouble("yfactor"));
 				
@@ -519,6 +545,7 @@ public class LemnaTecDataExchange {
 				
 				result.add(snapshot);
 			}
+			System.out.println("SNAPSHOTS: " + result.size());
 			rs.close();
 			ps.close();
 		}
@@ -568,7 +595,9 @@ public class LemnaTecDataExchange {
 				if (w >= 0 && w <= 100000)
 					snapshot.setWeight_before(w);
 				
-				snapshot.setCamera_label(getCompNameFromConfigLabel(rs.getString("camera_label")));// rs.getString("compname"));
+				String camLbl = rs.getString("camera_label");
+				String lbl = getCompNameFromConfigLabel(camLbl);
+				snapshot.setCamera_label(lbl);// rs.getString("compname"));
 				snapshot.setXfactor(0);// rs.getDouble("xfactor"));
 				snapshot.setYfactor(0);// rs.getDouble("yfactor"));
 				
@@ -1123,7 +1152,7 @@ public class LemnaTecDataExchange {
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					
 					if (!res.containsKey(plantID)) {
 						res.put(plantID, new Condition(null));
@@ -1135,7 +1164,8 @@ public class LemnaTecDataExchange {
 							res.get(plantID).setSpecies("Maize");
 					}
 					
-					if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart"))
+					if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart") ||
+							metaName.equalsIgnoreCase("Plant"))
 						// res.get(plantID).setSpecies(filterName(metaValue));
 						res.get(plantID).setSpecies(metaValue);
 					else
@@ -1179,7 +1209,7 @@ public class LemnaTecDataExchange {
 													if (!oldTreatment.contains(metaValue.trim()))
 														res.get(plantID).setVariety(oldVariety + metaValue.trim());
 												} else {
-													if (metaName.equalsIgnoreCase("Typ"))
+													if (metaName.equalsIgnoreCase("Typ")) {
 														if (!oldTreatment.contains(metaValue))
 															res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
 														else {
@@ -1188,6 +1218,15 @@ public class LemnaTecDataExchange {
 															if (!oldTreatment.contains(metaName + ": " + metaValue.trim()))
 																res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
 														}
+													} else {
+														if (metaValue != null && metaValue.length() > 0) {
+															if (oldTreatment != null && oldTreatment.length() > 0) {
+																if (!oldTreatment.contains(metaValue))
+																	res.get(plantID).setTreatment(oldTreatment + ";" + metaValue);
+															} else
+																res.get(plantID).setTreatment(metaValue);
+														}
+													}
 												}
 										}
 									}

@@ -67,7 +67,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			double averageVisG = visibleIntensitySumG / visibleFilledPixels;
 			double averageVisB = visibleIntensitySumB / visibleFilledPixels;
 			
-			ResultsTable rt1 = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
+			ResultsTable rt1 = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
 					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE);
 			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".vis.", rt1, getBlockPosition());
 			
@@ -96,7 +96,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
-			ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
+			ResultsTable rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
 					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_MULTI_LEVEL_RGB); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
@@ -120,35 +120,37 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannel(false, true, false, false);
 				double avgNir = 1 - nirIntensitySum / nirFilledPixels;
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.intensity.average", avgNir);
-				
-				int[] nirImg = getInput().getMasks().getNir().getAs1A();
-				int filled = 0;
-				double fSum = 0;
-				int b = ImageOperation.BACKGROUND_COLORint;
-				double weightOfPlant = 0; // fully wet: 1 unit, fully dry: 1/7 unit
-				for (int x : nirImg) {
-					// Feuchtigkeit (%) = -7E-05x^3 + 0,0627x^2 - 15,416x + 1156,1 // Formel: E-Mail Alex 10.8.2011
-					if (x != b) {
-						double f = -7E-05 * x * x * x + 0.0627 * x * x - 15.416 * x + 1156.1;
-						if (f < 0)
-							f = 0;
-						if (f > 100)
-							f = 100;
-						fSum += f;
-						filled++;
-						double realF = 1 - (x - 80d) / (160d - 80d);
-						realF *= 100;
-						weightOfPlant += 1 / 7d + (1 - 1 / 7d) * realF / 100d;
+				boolean wetnessAnalysis = false;
+				if (wetnessAnalysis) {
+					int[] nirImg = getInput().getMasks().getNir().getAs1A();
+					int filled = 0;
+					double fSum = 0;
+					int b = ImageOperation.BACKGROUND_COLORint;
+					double weightOfPlant = 0; // fully wet: 1 unit, fully dry: 1/7 unit
+					for (int x : nirImg) {
+						// Feuchtigkeit (%) = -7E-05x^3 + 0,0627x^2 - 15,416x + 1156,1 // Formel: E-Mail Alex 10.8.2011
+						if (x != b) {
+							double f = -7E-05 * x * x * x + 0.0627 * x * x - 15.416 * x + 1156.1;
+							if (f < 0)
+								f = 0;
+							if (f > 100)
+								f = 100;
+							fSum += f;
+							filled++;
+							double realF = 1 - (x - 80d) / (160d - 80d);
+							realF *= 100;
+							weightOfPlant += 1 / 7d + (1 - 1 / 7d) * realF / 100d;
+						}
 					}
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight", weightOfPlant);
+					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight_drought_loss",
+							filled - weightOfPlant);
+					if (filled > 0) {
+						getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", fSum / filled);
+					} else
+						getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0d);
 				}
-				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight", weightOfPlant);
-				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight_drought_loss",
-						filled - weightOfPlant);
-				if (filled > 0) {
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", fSum / filled);
-				} else
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0d);
-				ResultsTable rt = io.intensity(10).calculateHistorgram(markerDistanceHorizontally,
+				ResultsTable rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_GRAY); // markerDistanceHorizontally
 				
 				if (options == null)

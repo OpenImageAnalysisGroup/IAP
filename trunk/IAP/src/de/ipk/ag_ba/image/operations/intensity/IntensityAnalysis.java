@@ -61,7 +61,8 @@ public class IntensityAnalysis {
 			if (calcHue) {
 				Color.RGBtoHSB(r_intensityClassic, g_intensityChlorophyl, b_intensityPhenol, hsb);
 				double h = hsb[0];
-				histHue.addDataPoint((int) (h * 255), 255);
+				if ((int) (h * 255) > 0)
+					histHue.addDataPoint((int) (h * 255), 255);
 				sumOfHue += h;
 				if (minHue == null || h < minHue)
 					minHue = h;
@@ -79,8 +80,10 @@ public class IntensityAnalysis {
 					sumOfIntensityPhenol += (255 - b_intensityPhenol);
 					sumOfIntensityClassic += (255 - r_intensityClassic);
 				}
-				histChlorophyl.addDataPoint(g_intensityChlorophyl, 255);
-				histPhenol.addDataPoint(b_intensityPhenol, 255);
+				if (g_intensityChlorophyl > 0)
+					histChlorophyl.addDataPoint(g_intensityChlorophyl, 255);
+				if (b_intensityPhenol > 0)
+					histPhenol.addDataPoint(b_intensityPhenol, 255);
 				if (intensityPhenol + intensityChloro > 0)
 					histRatio.addDataPoint((int) Math.round(intensityPhenol / (intensityPhenol + intensityChloro) * 255d), 255);
 			}
