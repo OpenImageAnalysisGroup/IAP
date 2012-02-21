@@ -218,13 +218,15 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						ttt[p.x][p.y] = clear;
 				temp = new FlexibleImage(ttt).getIO().print("FINAL", debug).getImage();
 				leafWidthInPixels = 0d;
-				int skeletonLength;
+				int filled;
+				ImageOperation tio = temp.getIO();
+				temp = null;
 				do {
-					skeletonLength = temp.getIO().skeletonize().print("SKELETON", false).countFilledPixels();
-					if (skeletonLength > 0)
+					filled = tio.countFilledPixels();
+					if (filled > 0)
 						leafWidthInPixels++;
-					temp = temp.getIO().erode().getImage();
-				} while (skeletonLength > 0);
+					tio.erode();
+				} while (filled > 0);
 			}
 		}
 		
