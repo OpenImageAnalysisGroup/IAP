@@ -11,7 +11,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected synchronized FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() == null) {
 			return null;
 		}

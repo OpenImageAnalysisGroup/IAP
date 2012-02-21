@@ -70,7 +70,10 @@ public class GravistoServiceExt {
 				}
 			}, "Hash Calculation (Stream " + i + ")");
 			sema.acquire(1);
-			t.start();
+			if (threaded)
+				t.start();
+			else
+				t.run();
 		}
 		sema.acquire(iss.length);
 		sema.release(iss.length);

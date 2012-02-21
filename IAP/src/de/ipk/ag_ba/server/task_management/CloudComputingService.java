@@ -105,7 +105,6 @@ public class CloudComputingService {
 		System.out.println("*  Jean-Michel Pape ............................. *");
 		System.out.println("*                                                 *");
 		System.out.println("***************************************************");
-		System.out.println(SystemAnalysis.getCurrentTime() + "> SYSTEM ANALYSIS");
 		SystemAnalysis.simulateHeadless = true;
 		boolean clusterExecutionMode = false;
 		{
@@ -114,7 +113,6 @@ public class CloudComputingService {
 				cc.setEnableCalculations(true);
 			}
 		}
-		System.out.println(SystemAnalysis.getCurrentTime() + ">DISABLE SUB-TASK MULTITHREADING");
 		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
 			SystemInfoExt info = new SystemInfoExt();
 			System.out.println("Sockets        : " + info.getCpuSockets());
@@ -265,7 +263,7 @@ public class CloudComputingService {
 			CloudComputingService cc = CloudComputingService.getInstance(m);
 			cc.setClusterExecutionModeSingleTaskAndExit(clusterExecutionMode);
 			cc.switchStatus(m);
-			System.out.println("START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());
+			System.out.println(SystemAnalysis.getCurrentTime() + ">START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());
 		}
 	}
 	
