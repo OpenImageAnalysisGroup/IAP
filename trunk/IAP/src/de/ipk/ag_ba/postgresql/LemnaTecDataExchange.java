@@ -1219,12 +1219,13 @@ public class LemnaTecDataExchange {
 																res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
 														}
 													} else {
-														if (metaValue != null && metaValue.length() > 0) {
+														if (metaValue != null && metaValue.trim().length() > 0) {
+															String ss = metaName + "=" + metaValue;
 															if (oldTreatment != null && oldTreatment.length() > 0) {
-																if (!oldTreatment.contains(metaValue))
-																	res.get(plantID).setTreatment(oldTreatment + ";" + metaValue);
+																if (!oldTreatment.contains(ss))
+																	res.get(plantID).setTreatment(oldTreatment + ss);
 															} else
-																res.get(plantID).setTreatment(metaValue);
+																res.get(plantID).setTreatment(ss);
 														}
 													}
 												}
