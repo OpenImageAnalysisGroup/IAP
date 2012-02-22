@@ -321,7 +321,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	
 	@Override
 	public int compareTo(ExperimentHeaderInterface o) {
-		return getExperimentName().compareTo(o.getExperimentName());
+		return (getExperimentName() + "").compareTo("" + o.getExperimentName());
 	}
 	
 	@Override
