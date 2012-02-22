@@ -20,6 +20,7 @@ import org.bson.types.ObjectId;
 
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -216,8 +217,13 @@ public class TaskDescription {
 								
 								long tStart = cmd.getSubmissionTime();
 								long tProcessing = tFinish - tStart;
+								int nFinish = mmm;
+								int nToDo = batch.getPartCnt();
 								e.getHeader().setRemark(
-										e.getHeader().getRemark() + " // processing time: " + SystemAnalysis.getWaitTime(tProcessing) + " // finished: "
+										e.getHeader().getRemark() +
+												" // IAP image analysis release " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS +
+												" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
+												" // processing time: " + SystemAnalysis.getWaitTime(tProcessing) + " // finished: "
 												+ SystemAnalysis.getCurrentTime());
 								System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 								System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));

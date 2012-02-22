@@ -19,11 +19,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
-	boolean debug = false;
+	boolean debug = true;
 	
 	@Override
 	protected boolean isChangingImages() {
-		return false;
+		return true;
 	}
 	
 	@Override

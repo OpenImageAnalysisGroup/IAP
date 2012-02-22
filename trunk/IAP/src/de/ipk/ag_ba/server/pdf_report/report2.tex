@@ -521,16 +521,17 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\clearpage
 	\section{Visible light color histogram}
 	\subsection{Color histogram}
-	\begin{itemize}
-	\item Average activity of the normalized VIS images
-	\item The darker the higher acitivity
-	\item Column name: xxx
-	\item Unit: %
-	\end{itemize}
+
 	\ifthenelse{\boolean{isFile1}}{
+	
+		Visible hue histogram for side view:
+	
 		\loadTex{side_vis_hue_histogram_ratio_bin_1_0_25_side_vis_hue_histogram_ratio_bstackedOverallImage}
 	}{}	
-	\ifthenelse{\boolean{isFile2}}{	
+	\ifthenelse{\boolean{isFile2}}{
+	
+		Visible hue histogram for top view:
+		
 		\loadTex{top_vis_hue_histogram_ratio_bin_1_0_25_top_vis_hue_histogram_ratio_binstackedOverallImage}
 	}{}
 }{}
@@ -540,12 +541,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \ifthenelse{\boolean{isFile1}}{
 	\clearpage
 	\subsection{Color histogram (zoom corrected)}
-	\begin{itemize}
-	\item Average activity of the normalized VIS images
-	\item The darker the higher acitivity
-	\item Column name: xxx
-	\item Unit: %
-	\end{itemize}
+
+	Visible hue histogram (zoom corrected) for side view:
+
 	\loadTex{side_vis_normalized_histogram_ratio_bin_1_0_25_side_vis_normalized_his}
 	}{}
 
@@ -560,9 +558,15 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\item Histogram of observed fluorescence colors
 	\end{itemize}
 	\ifthenelse{\boolean{isFile1}}{
+	
+		Fluorescence activity distribution for side view:
+	
 		\loadTex{side_fluo_histogram_bin_1_0_25_side_fluo_histogram_bin_2_25_51_side_flstackedOverallImage}
 	}{}
-	\ifthenelse{\boolean{isFile2}}{	
+	\ifthenelse{\boolean{isFile2}}{
+	
+		Fluorescence activity distribution for top view:
+		
 		\loadTex{top_fluo_histogram_bin_1_0_25_top_fluo_histogram_bin_2_25_51_top_fluo_stackedOverallImage}
 	}{}
 }{}
@@ -575,41 +579,39 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\begin{itemize}
 	\item Histogram of observed fluorescence colors
 	\end{itemize}
+	
+	Fluorescence activity distribution (zoom corrected) for side view:
+	
 	\loadTex{side_fluo_normalized_histogram_bin_1_0_25_side_fluo_normalized_histogrstackedOverallImage}
 }{}
 
-\checkFile{side_fluo_histogram_ratio_bin_1_0_25_side_fluo_histogram_ratio_bin_2_2stackedOverallImage.tex}{top_fluo_histogram_ratio_bin_1_0_25_top_fluo_histogram_ratio_bin_2_25_stackedOverallImage.tex}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\clearpage
-	\subsection{Fluo ratio intensity (to do: check!!!!!)}
-	\begin{itemize}
-	\item xxx
-	\item The darker the higher acitivity
-	\item Column name: xxx
-	\item Unit: %
-	\end{itemize}
-	\ifthenelse{\boolean{isFile1}}{
-		\loadTex{side_fluo_histogram_ratio_bin_1_0_25_side_fluo_histogram_ratio_bin_2_2stackedOverallImage}
-	}{}
-	\ifthenelse{\boolean{isFile2}}{	
-		\loadTex{top_fluo_histogram_ratio_bin_1_0_25_top_fluo_histogram_ratio_bin_2_25_stackedOverallImage}
-	}{}
-}{}
-
-
-\checkFile{side_fluo_normalized_histogram_ratio_bin_1_0_25_side_fluo_normalized_hstackedOverallImage.tex}{}
-\ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{Fluo ratio intensity (zoom corrected) (to do: check!!!!!)}
-	\begin{itemize}
-	\item xxx
-	\item The darker the higher acitivity
-	\item Column name: xxx
-	\item Unit: %
-	\end{itemize}
-	\loadTex{side_fluo_normalized_histogram_ratio_bin_1_0_25_side_fluo_normalized_hstackedOverallImage}
-}{}
-
+%\checkFile{side_fluo_histogram_ratio_bin_1_0_25_side_fluo_histogram_ratio_bin_2_2stackedOverallImage.tex}{top_fluo_histogram_ratio_bin_1_0_25_top_fluo_histogram_ratio_bin_2_25_stackedOverallImage.tex}
+%\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+%	\clearpage
+%	\subsection{Fluo ratio intensity (to do: check!!!!!)}
+%	\begin{itemize}
+%	\end{itemize}
+%	\ifthenelse{\boolean{isFile1}}{
+%		\loadTex{side_fluo_histogram_ratio_bin_1_0_25_side_fluo_histogram_ratio_bin_2_2stackedOverallImage}
+%	}{}
+%	\ifthenelse{\boolean{isFile2}}{	
+%		\loadTex{top_fluo_histogram_ratio_bin_1_0_25_top_fluo_histogram_ratio_bin_2_25_stackedOverallImage}
+%	}{}
+%}{}
+%
+%
+%\checkFile{side_fluo_normalized_histogram_ratio_bin_1_0_25_side_fluo_normalized_hstackedOverallImage.tex}{}
+%\ifthenelse{\boolean{isFile1}}{
+%	\clearpage
+%	\subsection{Fluo ratio intensity (zoom corrected) (to do: check!!!!!)}
+%	\begin{itemize}
+%	\item xxx
+%	\item The darker the higher acitivity
+%	\item Column name: xxx
+%	\item Unit: %
+%	\end{itemize}
+%	\loadTex{side_fluo_normalized_histogram_ratio_bin_1_0_25_side_fluo_normalized_hstackedOverallImage}
+%}{}
 
 \clearpage
 \section{Near-infrared intensity histogram}
@@ -621,13 +623,17 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\begin{itemize}
 	\item Average intensity of near infrared (NIR)
 	\item Represents the water content of the plant
-	\item Column name: xxx
-	\item Unit: %
 	\end{itemize}
 	\ifthenelse{\boolean{isFile1}}{
+	
+		NIR intensity distribution for side view:
+	
 		\loadTex{side_nir_histogram_bin_1_0_25_side_nir_histogram_bin_2_25_51_side_nhisstackedOverallImage}
 	}{}
 	\ifthenelse{\boolean{isFile2}}{
+	
+		NIR intensity distribution for top view:
+	
 		\loadTex{top_nir_histogram_bin_1_0_25_top_nir_histogram_bin_2_25_51_top_nir_hisstackedOverallImage}
 	}{}
 }{}
@@ -638,11 +644,12 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\clearpage
 	\subsection{Intensity histogram (zoom corrected)}
 	\begin{itemize}
-	\item Average intensity of normalized near infrared (NIR)
+	\item Average intensity of near infrared (NIR)
 	\item Represents the water content of the plant
-	\item Column name: xxx
-	\item Unit: %
 	\end{itemize}
+	
+	NIR intensity distribution for side view (zoom corrected):
+	
 	\loadTex{side_nir_normalized_histogram_bin_1_0_25_side_nir_normalized_histogramstackedOverallImage}
 }{}
 
