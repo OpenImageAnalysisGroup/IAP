@@ -985,11 +985,15 @@ public class ImageOperation {
 		image.getProcessor().drawRect(leftX, leftY, width, heigh);
 	}
 	
-	@Deprecated
 	public void fillRect(int leftX, int leftY, int width, int heigh) {
 		image.getProcessor().fill(new Roi(leftX, leftY, width, heigh));
 	}
 	
+	/**
+	 * Todo: Speed of this operation may not be optimal (getBufferedImage). Needs to be checked, if
+	 * the imagePlus variable instead could be used or if simple "return this" would give
+	 * better performance and if this then has no side effects.
+	 */
 	public ImageOperation fillRect2(int leftX, int leftY, int width, int heigh) {
 		image.getProcessor().fill(new Roi(leftX, leftY, width, heigh));
 		return new ImageOperation(image.getProcessor().getBufferedImage());
@@ -3236,7 +3240,7 @@ public class ImageOperation {
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {
 		ImageOperation a = new ImageOperation(this.getImage());
-		int s = 30;
+		int s = 3;
 		image.setColor(Color.YELLOW);
 		for (MarkerPair mp : numericResult)
 			if (mp.getLeft() != null)

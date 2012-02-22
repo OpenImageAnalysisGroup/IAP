@@ -319,14 +319,14 @@ public class CloudComputingService {
 					}
 				}
 				System.out.println(SystemAnalysis.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
-				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + (tempDataSetDescription.getPartCntI()) + ", FINISHED: "
+				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
 						+ knownResults.size());
 				
 				boolean addNewTasksIfMissing = false;
 				
 				Object[] res;
 				if (GraphicsEnvironment.isHeadless()) {
-					System.out.println(">Process incomplete data sets? TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
+					System.out.println(">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
 							+ knownResults.size());
 					System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
 					String in = System.console().readLine();
@@ -354,7 +354,7 @@ public class CloudComputingService {
 				} else
 					addNewTasksIfMissing = (Boolean) res[0];
 				
-				if (knownResults.size() + 1 < tempDataSetDescription.getPartCntI()) {
+				if (knownResults.size() < tempDataSetDescription.getPartCntI()) {
 					if (addNewTasksIfMissing) {
 						// not everything has been computed (internal error)
 						TreeSet<Integer> jobIDs = new TreeSet<Integer>();
@@ -382,7 +382,7 @@ public class CloudComputingService {
 						}
 					}
 				} else
-					if (knownResults.size() + 1 >= tempDataSetDescription.getPartCntI()) {
+					if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
 						System.out.println("*****************************");
 						System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
 								+ ", RESULTS AVAILABLE: " + knownResults.size());
@@ -447,11 +447,16 @@ public class CloudComputingService {
 						}
 						long tStart = tempDataSetDescription.getSubmissionTimeL();
 						long tProcessing = tFinish - tStart;
+						int nToDo = tempDataSetDescription.getPartCntI();
+						int nFinish = knownResults.size();
 						e.getHeader().setExperimentname(originName);
 						e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
 						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
 						e.getHeader().setRemark(
-								e.getHeader().getRemark() + " // processing time: " +
+								e.getHeader().getRemark() +
+										" // IAP image analysis release " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS +
+										" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
+										" // processing time: " +
 										SystemAnalysis.getWaitTime(tProcessing) + " // finished: " +
 										SystemAnalysis.getCurrentTime() + " // manual merge");
 						System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
