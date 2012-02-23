@@ -231,7 +231,7 @@ overallCheckIfDescriptorIsNaOrAllZero = function(overallList) {
 	overallList$debug %debug% "overallCheckIfDescriptorIsNaOrAllZero()"	
 	
 	if (sum(!is.na(overallList$nBoxDes)) > 0) {
-		if (overallList$debug) {print("nBoxplot...")}
+		if (overallList$debug) {print(paste(length(overallList$nBoxDes), " nBoxplots..."))}
 		for (n in 1:length(overallList$nBoxDes)) {
 			if (!is.na(overallList$nBoxDes[[n]])) {
 				overallList$nBoxDes[n] = checkIfDescriptorIsNaOrAllZero(overallList$nBoxDes[[n]], overallList$iniDataSet)
@@ -243,7 +243,7 @@ overallCheckIfDescriptorIsNaOrAllZero = function(overallList) {
 	}
 	
 	if (sum(!is.na(overallList$boxDes)) > 0) {
-		if (overallList$debug) {print("Boxplot...")}
+		if (overallList$debug) {print(paste(length(overallList$boxDes), " Boxplots..."))}
 		for (n in 1:length(overallList$boxDes)) {
 			if (!is.na(overallList$boxDes[[n]])) {
 				overallList$boxDes[[n]] = checkIfDescriptorIsNaOrAllZero(overallList$boxDes[[n]], overallList$iniDataSet)
@@ -255,7 +255,7 @@ overallCheckIfDescriptorIsNaOrAllZero = function(overallList) {
 	}
 
 	if (sum(!is.na(overallList$boxStackDes)) > 0) {
-		if (overallList$debug) {print("StackedBoxplot...")}
+		if (overallList$debug) {print(paste(length(overallList$boxStackDes), " tacked boxplots..."))}
 		for (n in 1:length(overallList$boxStackDes)) {
 			if (!is.na(overallList$boxStackDes[[n]])) {
 				overallList$boxStackDes[[n]] = checkIfDescriptorIsNaOrAllZero(overallList$boxStackDes[[n]], overallList$iniDataSet)
@@ -301,7 +301,7 @@ overallChangeName = function(overallList) {
 	overallList$debug %debug% "overallChangeSaveName()"	
 	
 	if (!is.null(overallList$saveName_nBoxDes)) {
-		if (overallList$debug) {print("nBoxplot...")}
+		if (overallList$debug) {print("nBoxplots...")}
 		overallList$saveName_nBoxDes = changeSaveName(overallList$saveName_nBoxDes)
 		names(overallList$saveName_nBoxDes) = c(1:length(overallList$saveName_nBoxDes))
 		
@@ -310,7 +310,7 @@ overallChangeName = function(overallList) {
 	}
 	
 	if (!is.null(overallList$saveName_boxDes)) {
-		if (overallList$debug) {print("Boxplot...")}
+		if (overallList$debug) {print("Boxplots...")}
 		overallList$saveName_boxDes = changeSaveName(overallList$saveName_boxDes)
 		names(overallList$saveName_boxDes) = c(1:length(overallList$saveName_boxDes))
 		
@@ -319,7 +319,7 @@ overallChangeName = function(overallList) {
 	}
 	
 	if (!is.null(overallList$saveName_boxStackDes)) {
-		if (overallList$debug) {print("stackedBoxplot...")}
+		if (overallList$debug) {print("Stacked Boxplots...")}
 		overallList$saveName_boxStackDes = changeSaveName(overallList$saveName_boxStackDes)
 		names(overallList$saveName_boxStackDes) = c(1:length(overallList$saveName_boxStackDes))
 		
@@ -850,10 +850,8 @@ getResultDataFrame = function(diagramTyp, descriptorList, iniDataSet, groupBy, c
 		#buildRowNameDataSet = buildRowName(iniDataSet, groupBy, descriptorName)
 		buildRowNameDataSet = buildRowName(iniDataSet, groupBy)
 		temp = data.frame()
-#		count = 0
 		
 		for (colNameWichMustBind in buildRowNameDataSet %allColnamesWithoutThisOnes% c(colNames$xAxis, colNames$colName, "primaerTreatment")) {
-#			count = count+1
 			plot = getPlotNumber(colNameWichMustBind, descriptorList)
 		
 			if (plot!=-1) {
@@ -888,42 +886,36 @@ setColorListHist = function(descriptorList) {
 	interval = seq(0.05, 0.95, by=0.1)
 	intervalSat = rep.int(c(0.8, 1.0), 5)
 	intervalFluo = seq(0, 0.166666666666, by=0.01666666)
+
+	interval20 = seq(0.025, 0.975, by=0.05)
+	intervalSat20 = rep.int(c(0.8, 1.0), 10)
+	intervalFluo20 = seq(0, 0.166666666666, by=0.0088888888)
 	
 	if (length(grep("fluo", getVector(descriptorList), ignore.case=TRUE)) > 0) { #rot			
-		#colorList = as.list(rgb(255, seq(256/10/2, 255, by=255/10), 255, max = 255))
-		#colorList = as.list(rgb(1, interval, 0, max = 1))
-		colorList = as.list(hsv(h=rev(intervalFluo), s=intervalSat, v=1))
-		
-	} else if (length(grep("phenol", getVector(descriptorList), ignore.case=TRUE)) > 0) { #gelb
-		#colorList = as.list(rgb(255, rev(seq(256/10/2, 255, by=255/10)), 255, max = 255))
-		#colorList = as.list(rgb(1, rev(interval), 0, max = 1))
-		colorList = as.list(hsv(h=intervalFluo, s=intervalSat, v=1))
-		
-	} else if (length(grep("vis", getVector(descriptorList), ignore.case=TRUE)) > 0) {
-		colorList = as.list(hsv(h=interval, s=1, v=intervalSat))
-		
-	} else if (length(grep("nir", getVector(descriptorList), ignore.case=TRUE)) > 0) {
-		colorList = as.list(rgb(rev(interval), rev(interval), rev(interval), max = 1))		
+		colorList = as.list(hsv(h=c(rev(intervalFluo), rev(intervalFluo20)), s=c(intervalSat, intervalSat20), v=1))
+	} else 
+	if (length(grep("phenol", getVector(descriptorList), ignore.case=TRUE)) > 0) { #gelb
+		colorList = as.list(hsv(h=c(intervalFluo, intervalFluo20), s=c(intervalSat, intervalSat20), v=1))
+	} else 
+	if (length(grep("vis", getVector(descriptorList), ignore.case=TRUE)) > 0) {
+		colorList = as.list(hsv(h=c(interval, interval20), s=1, v=c(intervalSat, intervalSat20)))
+	} else 
+	if (length(grep("nir", getVector(descriptorList), ignore.case=TRUE)) > 0) {
+		colorList = as.list(rgb(c(rev(interval), rev(interval20)), c(rev(interval), rev(interval20)), c(rev(interval),rev(interval20)), max = 1))		
 	} else {
 		return(list(0))
 	}
-	names(colorList) = c("0..25", "25..51", "51..76", "76..102", "102..127", "127..153", "153..178", "178..204", "204..229", "229..255")
+	names(colorList) = c(
+		"0..25", "25..51", "51..76", "76..102", "102..127", 
+		"127..153", "153..178", "178..204", "204..229", "229..255", 
+		"0..12", "12..25", "25..38", "38..51", "51..63", "63..76", "76..89", 
+		"89..102", "102..114", "114..127", "127..140", "140..153", "153..165", 
+		"165..178", "178..191", "191..204", "204..216", "216..229", "229..242", 
+		"242..255")
 	return(colorList)
 }
 
 setColorList = function(diagramTyp, descriptorList, overallResult, isGray) {
-#################	
-#	diagramTyp = "boxplotStacked"
-#	descriptorList = overallList$boxStackDes
-#	isGrey = overallList$isGray
-#	overallResult=overallList$overallResult_boxStackDes
-############	
-#	diagramTyp = "nboxplot"
-#	descriptorList = overallList$nBoxDes
-#	isGrey = overallList$isGray
-#	overallResult=overallList$overallResult_nBoxDes
-##################
-	
 	if (!as.logical(isGray)) {
 		colorVector = c(brewer.pal(11, "Spectral"))
 	} else {
@@ -1446,7 +1438,7 @@ makeBoxplotDiagram = function(h, overallResult, overallDescriptor, overallColor,
 	
 	overallList$debug %debug% "makeBoxplotDiagram()"
 	#overallList$overallResult = overallList$overallResult[!is.na(overallList$overallResult$mean), ]
-	print("Boxplot...")
+	print("Create boxplot...")
 #	overallResult[is.na(overallResult)] = 0
 #	tempOverallResult =  overallResult
 	tempOverallResult =  na.omit(overallResult)

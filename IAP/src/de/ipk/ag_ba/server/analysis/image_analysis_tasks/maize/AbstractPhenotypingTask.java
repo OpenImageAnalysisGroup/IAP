@@ -591,10 +591,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								if (output != null)
 									output.add(imageRef);
 							} else
-								System.out
-										.println(SystemAnalysis
-												.getCurrentTime()
-												+ ">ERROR: SaveImageAndUpdateURL failed! (NULL Result)");
+								System.out.println(SystemAnalysis.getCurrentTime()
+										+ ">ERROR: SaveImageAndUpdateURL failed! (NULL Result)");
 						}
 					}
 				} else {
@@ -644,9 +642,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							+ ">Could not save in DB: "
 							+ lib.getURL().toString());
 			} else {
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">Result kept in memory: " + lib.getURL().toString());
-				return result;
+				boolean clearmemory = true;
+				if (clearmemory) {
+					System.out.println(SystemAnalysis.getCurrentTime()
+							+ ">Image result not saved and removed from result set: " + lib.getURL().toString());
+					return null;
+				} else {
+					System.out.println(SystemAnalysis.getCurrentTime()
+							+ ">Image result kept in memory: " + lib.getURL().toString());
+					return result;
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

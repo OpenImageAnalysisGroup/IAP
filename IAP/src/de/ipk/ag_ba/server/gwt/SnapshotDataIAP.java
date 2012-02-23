@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeMap;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.commands.DateDoubleString;
 
 public class SnapshotDataIAP {
@@ -491,7 +493,7 @@ public class SnapshotDataIAP {
 			return "";
 		else {
 			if (s.contains(";"))
-				return "\"" + s + "\"";
+				return StringManipulationTools.stringReplace(s, ";", "//"); // "\"" + s + "\"";
 			else
 				return s;
 		}

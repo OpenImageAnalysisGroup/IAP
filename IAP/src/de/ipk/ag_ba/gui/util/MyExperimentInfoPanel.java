@@ -311,8 +311,12 @@ public class MyExperimentInfoPanel extends JPanel {
 									|| experimentHeader.getDatabaseId().isEmpty()) {
 								saveB.setText("Updated (in memory)");
 							} else {
-								m.setExperimentInfo(experimentHeader);
-								saveB.setText("Updated in Cloud DB");
+								if (m != null)
+									m.setExperimentInfo(experimentHeader);
+								if (m != null)
+									saveB.setText("Updated in Cloud DB");
+								else
+									saveB.setText("MongoDB instance not defined");
 							}
 						} else {
 							Experiment exp = new Experiment();
