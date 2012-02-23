@@ -45,7 +45,10 @@ getSpecialRequestDependentOfUserAndTypOfExperiment = function() {
 	}
 }
 
-"%getData%" = function(separation, fileName) {	
+"%getData%" = function(separation, fileName) {
+
+	loadAndInstallPackages(TRUE, FALSE)
+	
 	#separation = ";"
 	print(paste("Read input file", fileName))
 	
@@ -92,13 +95,40 @@ getSpecialRequestDependentOfUserAndTypOfExperiment = function() {
 	return(colnames(dataSet)[!colnames(dataSet) %in% withoutColNamesVector])
 }
 
+InstalledPackage <- function(package) 
+{
+    available <- suppressMessages(suppressWarnings(sapply(package, require, quietly = TRUE, character.only = TRUE, warn.conflicts = FALSE)))
+    missing <- package[!available]
+    if (length(missing) > 0) return(FALSE)
+    return(TRUE)
+}
+
+CRANChoosen <- function()
+{
+    return(getOption("repos")["CRAN"] != "@CRAN@")
+}
+
+UsePackage <- function(package, defaultCRANmirror = "http://cran.at.r-project.org") 
+{
+    if(!InstalledPackage(package))
+    {
+        options(repos = c(CRAN = defaultCRANmirror))
+        suppressMessages(suppressWarnings(install.packages(package)))
+        if(!InstalledPackage(package)) return(FALSE)
+    }
+    return(TRUE)
+}
+
 loadAndInstallPackages = function(install=FALSE, useDev=FALSE) {
 	if (install) {
-		install.packages(c("Cairo"), repos="http://cran.r-project.org", dependencies = TRUE)
-		install.packages(c("RColorBrewer"), repos="http://cran.r-project.org", dependencies = TRUE)
-		install.packages(c("data.table"), repos="http://cran.r-project.org", dependencies = TRUE)
-		install.packages(c("ggplot2"), repos="http://cran.r-project.org", dependencies = TRUE)
-		
+		libraries <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych")
+		for(library in libraries) 
+		{ 
+    		if(!UsePackage(library))
+    		{
+        		stop("Error!", library)
+    		}
+		}
 		if (useDev) {
 			install.packages(c("devtools"), repos="http://cran.r-project.org", dependencies = TRUE)
 			dev_mode()
@@ -109,12 +139,12 @@ loadAndInstallPackages = function(install=FALSE, useDev=FALSE) {
 	library("Cairo")
 	library("RColorBrewer")
 	library(data.table)
+	library(ggplot2)	
+	library("psych")
 	
 	if (useDev) {
 		library("devtools")
-	}
-	
-	library(ggplot2)	
+	}	
 }
 
 buildDataSet = function(workingDataSet, overallResult, colname, index) {
