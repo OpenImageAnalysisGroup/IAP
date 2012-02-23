@@ -111,6 +111,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 								}
 							}
 						}
+						if (sd3.getTime() != 29)
+							continue;
 						if (!containsAnOutlier)
 							if (filter == null || filter.isValidSample(sd3))
 								workload.add(sd3);
@@ -216,7 +218,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 									" // finished: " + SystemAnalysis.getCurrentTime() +
 									" // direct mode analysis");
 					
-					m.saveExperiment(statisticsResult, getStatusProvider());
+					if (m != null)
+						m.saveExperiment(statisticsResult, getStatusProvider());
 					
 					MyExperimentInfoPanel info = new MyExperimentInfoPanel();
 					info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);

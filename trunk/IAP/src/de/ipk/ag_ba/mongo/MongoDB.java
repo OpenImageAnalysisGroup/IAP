@@ -130,8 +130,10 @@ public class MongoDB {
 		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
 		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de"))
 			res.add(getDefaultCloud());
-		if (IAPservice.isReachable("ba-24.ipk-gatersleben.de"))
+		if (IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
 			res.add(new MongoDB("Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
+			res.add(new MongoDB("Storage 3 (BA-24)", "cloud3", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
+		}
 		// } else
 		// res.add(getLocalDB());
 		// }
@@ -157,7 +159,7 @@ public class MongoDB {
 	
 	public static MongoDB getDefaultCloud() {
 		if (defaultCloudInstance == null) {
-			defaultCloudInstance = new MongoDB("Storage 1", "cloud1", getDefaultCloudHostName(), "iap", "iap#2011", HashType.MD5);
+			defaultCloudInstance = new MongoDB("Storage 1 (BA-13)", "cloud1", getDefaultCloudHostName(), "iap", "iap#2011", HashType.MD5);
 		}
 		return defaultCloudInstance;
 		// return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
@@ -743,11 +745,11 @@ public class MongoDB {
 	public long saveStream(String hash, InputStream is, GridFS fs) throws Exception {
 		long result = -1;
 		
-		GridFSDBFile fff = fs.findOne(hash);
-		if (fff != null) {
-			fs.remove(fff);
-			fff = null;
-		}
+		// GridFSDBFile fff = fs.findOne(hash);
+		// if (fff != null) {
+		// fs.remove(fff);
+		// fff = null;
+		// }
 		
 		boolean compress = false;
 		
@@ -755,7 +757,7 @@ public class MongoDB {
 				ResourceIOManager.getCompressedInputStream((MyByteArrayInputStream) is) : is, hash);
 		// fs.getDB().setWriteConcern(WriteConcern.REPLICAS_SAFE);
 		inputFile.save();
-		result = inputFile.getLength();
+		result = 1;// inputFile.getLength();
 		is.close();
 		// CommandResult cr = fs.getDB().getLastError(WriteConcern.REPLICAS_SAFE);
 		// if (!cr.ok())
@@ -2861,7 +2863,7 @@ public class MongoDB {
 			fffLabel = gridfs_label_files.findOne(hashLabel);
 		}
 		
-		GridFSDBFile fffPreview = gridfs_preview_files.findOne(hashMain);
+		// GridFSDBFile fffPreview = null;// gridfs_preview_files.findOne(hashMain);
 		
 		if (fffMain != null && fffMain.getLength() <= 0) {
 			gridfs_images.remove(fffMain);
@@ -2871,10 +2873,10 @@ public class MongoDB {
 			gridfs_images.remove(fffLabel);
 			fffLabel = null;
 		}
-		if (fffPreview != null && fffPreview.getLength() <= 0) {
-			gridfs_images.remove(fffPreview);
-			fffPreview = null;
-		}
+		// if (fffPreview != null && fffPreview.getLength() <= 0) {
+		// gridfs_images.remove(fffPreview);
+		// fffPreview = null;
+		// }
 		
 		if (hashLabel != null && image.getLabelURL() != null) {
 			if (fffLabel != null) {
@@ -2883,7 +2885,7 @@ public class MongoDB {
 			}
 		}
 		
-		if (fffMain != null && fffLabel != null && fffPreview != null) {
+		if (fffMain != null && fffLabel != null) {// && fffPreview != null) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
 			boolean saved;
