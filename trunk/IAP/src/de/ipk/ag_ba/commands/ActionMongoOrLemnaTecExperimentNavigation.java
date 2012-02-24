@@ -69,24 +69,6 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 		// actions.add(FileManager.getFileManagerEntity(login, pass,
 		// ei.experimentName));
 		
-		if (header != null
-				&& !header.getDatabaseId().startsWith("lemnatec:")
-				&& (header.getImportusername() == null
-						|| header.getImportusername().equals("tomcat") || header
-						.getImportusername().equals(
-								SystemAnalysis.getUserName()))
-				|| !SystemAnalysis.isHeadless()) {
-			if (m != null)
-				if (header.inTrash()) {
-					actions.add(ActionTrash.getTrashEntity(header,
-							DeletionCommand.UNTRASH, src.getGUIsetting(), m));
-					actions.add(ActionTrash.getTrashEntity(header,
-							DeletionCommand.DELETE, src.getGUIsetting(), m));
-				} else {
-					actions.add(ActionTrash.getTrashEntity(header,
-							DeletionCommand.TRASH, src.getGUIsetting(), m));
-				}
-		}
 		boolean add = true;
 		if (header != null && header.inTrash())
 			add = false;
@@ -105,6 +87,26 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 					new ExperimentHistoryNavigationAction(header.getHistory(),
 							m), src.getGUIsetting()));
 		}
+		
+		if (header != null
+				&& !header.getDatabaseId().startsWith("lemnatec:")
+				&& (header.getImportusername() == null
+						|| header.getImportusername().equals("tomcat") || header
+						.getImportusername().equals(
+								SystemAnalysis.getUserName()))
+				|| !SystemAnalysis.isHeadless()) {
+			if (m != null)
+				if (header.inTrash()) {
+					actions.add(ActionTrash.getTrashEntity(header,
+							DeletionCommand.UNTRASH, src.getGUIsetting(), m));
+					actions.add(ActionTrash.getTrashEntity(header,
+							DeletionCommand.DELETE, src.getGUIsetting(), m));
+				} else {
+					actions.add(ActionTrash.getTrashEntity(header,
+							DeletionCommand.TRASH, src.getGUIsetting(), m));
+				}
+		}
+		
 		return actions;
 	}
 	

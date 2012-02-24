@@ -39,7 +39,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class IAPgui {
 	
 	public static JComponent getNavigation(final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
-						boolean secondWindow) {
+			boolean secondWindow) {
 		
 		final JPanel graphPanel = new JPanel();
 		
@@ -64,6 +64,10 @@ public class IAPgui {
 		
 		ActionIapHome home = new ActionIapHome(myStatus);
 		GUIsetting guiSetting = new GUIsetting(navigationPanel, actionPanel, graphPanel);
+		
+		navigationPanel.setGuiSetting(guiSetting);
+		actionPanel.setGuiSetting(guiSetting);
+		
 		final NavigationButton overView = new NavigationButton(home, guiSetting);
 		
 		overView.setTitle("Initialize");
@@ -76,6 +80,7 @@ public class IAPgui {
 		
 		ErrorMsg.addOnAppLoadingFinishedAction(new Runnable() {
 			// ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {
+			@Override
 			public void run() {
 				overView.setTitle("Overview");
 				overView.setProcessing(false);
@@ -118,8 +123,8 @@ public class IAPgui {
 		graphPanel.validate();
 		
 		JComponent res = TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionPanel,
-							actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
-							TableLayout.PREFERRED, TableLayout.FILL);
+				actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
+				TableLayout.PREFERRED, TableLayout.FILL);
 		
 		navigateTo("IAP", navigationPanel, actionPanel, graphPanel);
 		
@@ -128,18 +133,18 @@ public class IAPgui {
 	
 	public static String getIntroTxt() {
 		return "<html><h2>Welcome to IAP - the Integrated Analysis Platform!</h2>"
-							+ "The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
-							+ "developed by the IPK research group Image Analysis.<br>"
-							+ "<br>"
-							+ "This information system is in alpha-stage. "
-							+ "It may not work reliable, only a small subset of future functions are implemented.<br>"
-							+ "<br>"
-							+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
-							+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
-							new LogService().getLatestNews(5,
-									"<br>" +
-											"<p>Latest changes:<br><br><ul>",
-									"<li>", "", "<br><br>");
+				+ "The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
+				+ "developed by the IPK research group Image Analysis.<br>"
+				+ "<br>"
+				+ "This information system is in alpha-stage. "
+				+ "It may not work reliable, only a small subset of future functions are implemented.<br>"
+				+ "<br>"
+				+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
+				+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
+				new LogService().getLatestNews(5,
+						"<br>" +
+								"<p>Latest changes:<br><br><ul>",
+						"<li>", "", "<br><br>");
 	}
 	
 	public static void navigateTo(final String target, NavigationButton src) {
@@ -166,7 +171,7 @@ public class IAPgui {
 	}
 	
 	private static void navigateTo(String target, final MyNavigationPanel navigationPanel,
-						final MyNavigationPanel actionPanel, final JComponent graphPanel) {
+			final MyNavigationPanel actionPanel, final JComponent graphPanel) {
 		
 		if (target == null || target.length() == 0)
 			return;
@@ -191,7 +196,7 @@ public class IAPgui {
 		String thisTarget = target.split("\\.", 2)[0];
 		if (thisTarget != null && thisTarget.length() > 0) {
 			final String nextTarget = target.length() - thisTarget.length() > 1 ? target.substring(thisTarget.length()
-							+ ".".length()) : "";
+					+ ".".length()) : "";
 			NavigationButton button = knownEntities.get(thisTarget);
 			if (button == null && thisTarget.contains("(")) {
 				button = knownEntities.get(thisTarget.substring(0, thisTarget.lastIndexOf("(")).trim());
@@ -209,7 +214,7 @@ public class IAPgui {
 			} else {
 				System.out.println("WARNING: Could not find target action: " + thisTarget);
 				navigationPanel.getEntitySet(false).iterator().next().executeNavigation(
-							PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, null);
+						PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, null);
 			}
 		}
 	}

@@ -59,7 +59,15 @@ public class ActionTrash extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return cmd.toString();
+		String desc = "";
+		if (headers.size() == 1)
+			desc = "";// headers.iterator().next().getExperimentName();
+		else
+			desc = headers.size() + " experiments";
+		if (!desc.isEmpty())
+			return "<html><center>" + cmd.toString() + "<br>(" + desc + ")</center>";
+		else
+			return cmd.toString();
 	}
 	
 	@Override
@@ -165,8 +173,9 @@ public class ActionTrash extends AbstractNavigationAction {
 		expAndHistory.add(header);
 		expAndHistory.addAll(header.getHistory().values());
 		NavigationAction trashAction = new ActionTrash(header, cmd, m);
-		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(), guiSetting);
-		trash.setRightAligned(cmd != DeletionCommand.UNTRASH);
+		NavigationButton trash = new NavigationButton(trashAction, cmd.toString(), cmd.getImg(),
+				guiSetting);
+		// trash.setRightAligned(cmd != DeletionCommand.UNTRASH);
 		return trash;
 	}
 	

@@ -3,6 +3,7 @@ package de.ipk.ag_ba.commands;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -17,7 +18,7 @@ public class ActionToggle extends AbstractNavigationAction {
 	private final ThreadSafeOptions option;
 	
 	public ActionToggle(String tooltip, String setting, ThreadSafeOptions option) {
-		super(tooltip);
+		super("<html>" + StringManipulationTools.stringReplace(tooltip, ";", ";<br>"));
 		this.setting = setting;
 		this.option = option;
 	}
@@ -35,9 +36,16 @@ public class ActionToggle extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		if (SystemAnalysis.isHeadless())
-			return (option.getBval(0, true) ? "Include " : "Exclude ") + setting;
+			return (option.getBval(0, true) ? "Include " : "Exclude ") + pretty(setting);
 		else
-			return setting;
+			return pretty(setting);
+	}
+	
+	private String pretty(String s) {
+		if (s == null || s.length() < 50)
+			return s;
+		else
+			return s.substring(0, 47) + "...";
 	}
 	
 	@Override

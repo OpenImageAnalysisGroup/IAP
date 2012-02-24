@@ -118,6 +118,9 @@ public class MyExperimentInfoPanel extends JPanel {
 		typeset.add(IAPexperimentTypes.MaizeGreenhouse + "");
 		typeset.add("Analysis Results");
 		typeset.add("Imported Analysis Results");
+		typeset.add("Climate (Phytochamber)");
+		typeset.add("Climate (Barley GH)");
+		typeset.add("Climate (Large GH)");
 		typeset.add("Imported Dataset");
 		typeset.add("Test (Delete OK)");
 		String[] types = typeset.toArray(new String[] {});

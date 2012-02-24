@@ -48,9 +48,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  */
 public class WebFolder {
 	public static NavigationButton getBrowserNavigationEntity(final Library lib, String title,
-						String icon, final String url, final String referenceTitle, final String referenceImage,
-						final String referenceURL, final String[] valid, final String introTxt,
-						final String optSubFolderForFolderItems, GUIsetting guiSetting) {
+			String icon, final String url, final String referenceTitle, final String referenceImage,
+			final String referenceURL, final String[] valid, final String introTxt,
+			final String optSubFolderForFolderItems, GUIsetting guiSetting) {
 		
 		NavigationButton nav = new NavigationButton(new AbstractNavigationAction("Open web-folder content") {
 			private NavigationButton src;
@@ -93,7 +93,7 @@ public class WebFolder {
 						}
 					};
 					NavigationButton website = new NavigationButton(action, referenceTitle, referenceImage,
-										src.getGUIsetting());
+							src.getGUIsetting());
 					website.setToolTipText("Open " + referenceURL);
 					actions.add(website);
 				}
@@ -124,7 +124,7 @@ public class WebFolder {
 						};
 						
 						NavigationButton website = new NavigationButton(action, fp.getTitle(), "img/dataset.png",
-											src.getGUIsetting());
+								src.getGUIsetting());
 						website.setToolTipText("Open " + fp.getUrl());
 						actions.add(website);
 					}
@@ -133,7 +133,7 @@ public class WebFolder {
 				NavigationAction subFolderAction = null;
 				if (optSubFolderForFolderItems != null && optSubFolderForFolderItems.length() > 0) {
 					subFolderAction = new EmptyNavigationAction(optSubFolderForFolderItems, "Show List of Web-Ressources",
-										"img/ext/folder.png", "img/ext/folder-drag-accept.png");
+							"img/ext/folder.png", "img/ext/folder-drag-accept.png");
 					NavigationButton subFolder = new NavigationButton(subFolderAction, src.getGUIsetting());
 					actions.add(subFolder);
 				}
@@ -144,7 +144,7 @@ public class WebFolder {
 				
 				try {
 					Collection<PathwayWebLinkItem> mainList = WebDirectoryFileListAccess.getWebDirectoryFileListItems(url,
-										valid, false);
+							valid, false);
 					for (PathwayWebLinkItem i : mainList) {
 						if (i.getGroup1() != null && i.getGroup1().length() > 0) {
 							folders.add(i.getGroup1());
@@ -189,7 +189,7 @@ public class WebFolder {
 							ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 							
 							NavigationButton website = new NavigationButton(new AbstractNavigationAction(
-													"Show web-resource") {
+									"Show web-resource") {
 								@Override
 								public void performActionCalculateResults(NavigationButton src) {
 									AttributeHelper.showInBrowser(url);
@@ -197,7 +197,7 @@ public class WebFolder {
 								
 								@Override
 								public ArrayList<NavigationButton> getResultNewNavigationSet(
-														ArrayList<NavigationButton> currentSet) {
+										ArrayList<NavigationButton> currentSet) {
 									return null;
 								}
 								
@@ -205,14 +205,14 @@ public class WebFolder {
 								public ArrayList<NavigationButton> getResultNewActionSet() {
 									return null;
 								}
-							}, referenceTitle, "img/dataset.png", src.getGUIsetting());
+							}, referenceTitle, "img/dataset.png", guiSetting);
 							website.setToolTipText("Open " + url);
 							res.add(website);
 							
 							// "img/ext/folder-drag-accept.png"
 							
 							for (PathwayWebLinkItem mc : folder2file.get(ff)) {
-								NavigationButton j = IAPservice.getPathwayViewEntity(mc, src.getGUIsetting());
+								NavigationButton j = IAPservice.getPathwayViewEntity(mc, guiSetting);
 								res.add(j);
 							}
 							
@@ -272,6 +272,7 @@ public class WebFolder {
 		sliderZoom.setOpaque(false);
 		sliderZoom.setVisible(false);
 		BackgroundTaskHelper.executeLaterOnSwingTask(200, new Runnable() {
+			@Override
 			public void run() {
 				sliderZoom.setVisible(true);
 			}
@@ -285,6 +286,7 @@ public class WebFolder {
 		}
 		
 		sliderZoom.addChangeListener(new ChangeListener() {
+			@Override
 			public void stateChanged(ChangeEvent e) {
 				JSlider s = (JSlider) e.getSource();
 				int val = s.getValue() - s.getValue() % 5;
@@ -328,7 +330,7 @@ public class WebFolder {
 	}
 	
 	public static NavigationButton getURLentity(String title, final String referenceURL, String image,
-						GUIsetting guiSetting) {
+			GUIsetting guiSetting) {
 		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {

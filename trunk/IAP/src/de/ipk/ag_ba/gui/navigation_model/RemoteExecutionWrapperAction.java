@@ -165,4 +165,8 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			remoteAction.setStatusProvider(status);
 	}
 	
+	@Override
+	public void setSource(NavigationAction navigationAction, GUIsetting guiSetting) {
+	}
+	
 }

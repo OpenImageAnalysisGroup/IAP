@@ -39,11 +39,16 @@ import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 
+import de.ipk.ag_ba.commands.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.commands.BookmarkAction;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
+import de.ipk.ag_ba.gui.navigation_actions.ActionClearClipboard;
+import de.ipk.ag_ba.gui.navigation_actions.ActionMergeClipboard;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.PopupListener;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
@@ -66,6 +71,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	private final JCheckBoxMenuItem menuItemButtons;
 	private JScrollPane scrollpane;
 	private int maxYY;
+	private GUIsetting guiSettting;
 	
 	public MyNavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
 		this.target = target;
@@ -143,7 +149,27 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	public void setEntitySet(ArrayList<NavigationButton> set) {
 		if (set == null)
 			return;
-		this.set = set;
+		this.set = new ArrayList<NavigationButton>(set);
+		if (target == PanelTarget.ACTION) {
+			if (guiSettting.getClipboardItems().size() > 0) {
+				NavigationAction na = new ActionClearClipboard("Remove all entries from the clipboard");
+				NavigationButton nb = new NavigationButton(na, guiSettting);
+				nb.setRightAligned(true);
+				this.set.add(nb);
+			}
+			if (guiSettting.getClipboardItems().size() > 1) {
+				NavigationAction na = new ActionMergeClipboard("Merge clipboard data set");
+				NavigationButton nb = new NavigationButton(na, guiSettting);
+				nb.setRightAligned(true);
+				this.set.add(nb);
+			}
+			for (ExperimentReference clipboardItem : guiSettting.getClipboardItems()) {
+				NavigationAction na = new ActionMongoOrLemnaTecExperimentNavigation(clipboardItem.getHeader(), clipboardItem.m);
+				NavigationButton nb = new NavigationButton("Clipboard item " + clipboardItem.getExperimentName() + "", na, guiSettting);
+				nb.setRightAligned(true);
+				this.set.add(nb);
+			}
+		}
 		updateGUI();
 	}
 	
@@ -533,6 +559,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	
 	public int getMaxYY() {
 		return maxYY;
+	}
+	
+	public void setGuiSetting(GUIsetting guiSetting) {
+		this.guiSettting = guiSetting;
 	}
 	
 }
