@@ -18,7 +18,6 @@ import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
@@ -30,8 +29,9 @@ public class ExperimentReference {
 	private final String experimentName;
 	private ExperimentInterface experiment;
 	private ExperimentHeaderInterface header;
+	public MongoDB m;
 	
-	private static WeakHashMap<String, ExperimentInterface> weakId2exp = 
+	private static WeakHashMap<String, ExperimentInterface> weakId2exp =
 			new WeakHashMap<String, ExperimentInterface>();
 	
 	public ExperimentReference(ExperimentHeaderInterface header) {
@@ -91,18 +91,21 @@ public class ExperimentReference {
 			return experiment;
 		else {
 			synchronized (ExperimentReference.class) {
-			ExperimentInterface res = weakId2exp.get(header.getDatabaseId());
-			if (res!=null)
+				ExperimentInterface res = weakId2exp.get(header.getDatabaseId());
+				if (res != null)
+					return res;
+				if (header.getDatabaseId().startsWith("lemnatec:"))
+					res = new LemnaTecDataExchange().getExperiment(header, null);
+				else
+					if (header.getDatabaseId().startsWith("hsm:")) {
+						res = HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
+					} else
+						if (m != null)
+							res = m.getExperiment(header, interactiveGetExperimentSize, null);
+						else
+							res = this.m.getExperiment(header, interactiveGetExperimentSize, null);
+				weakId2exp.put(header.getDatabaseId(), res);
 				return res;
-			if (header.getDatabaseId().startsWith("lemnatec:"))
-				res = new LemnaTecDataExchange().getExperiment(header, null);
-			else
-				if (header.getDatabaseId().startsWith("hsm:")) {
-						res=HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
-				} else
-					res=m.getExperiment(header, interactiveGetExperimentSize, null);
-			weakId2exp.put(header.getDatabaseId(), res);
-			return res;
 			}
 		}
 	}

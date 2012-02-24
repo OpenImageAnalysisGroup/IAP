@@ -31,31 +31,30 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	private NavigationButton src;
 	
 	private final boolean exportIndividualAngles;
-	private final String[] variant;
 	private final boolean xlsx;
 	
 	private final ArrayList<NavigationButton> settings = new ArrayList<NavigationButton>();
 	private ArrayList<ThreadSafeOptions> toggles;
 	
-	public ActionNumericDataReportSetup(String tooltip, boolean exportIndividualAngles, String[] variant, boolean xlsx) {
+	public ActionNumericDataReportSetup(String tooltip, boolean exportIndividualAngles, boolean xlsx) {
 		super(tooltip);
 		this.exportIndividualAngles = exportIndividualAngles;
-		this.variant = variant;
 		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportSetup(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles, String[] variant, boolean xlsx) {
+	public ActionNumericDataReportSetup(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles, boolean xlsx) {
 		this("Specify report options" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
-						: " PDF (" + StringManipulationTools.getStringList(variant, ", ") + ")"),
+						: " PDF"),
 				exportIndividualAngles,
-				variant, xlsx);
+				xlsx);
 		this.m = m;
 		this.experimentReference = experimentReference;
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
+		String[] variant = new String[] { "none", "none" };
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportComplete(
@@ -89,8 +88,9 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table";
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
-					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")");
+					+ (exportIndividualAngles ? " (side angles)" : " (avg)");
 		} else {
+			String[] variant = new String[] { "none", "none" };
 			String filter = StringManipulationTools.getStringList(variant, ", ");
 			if (filter.endsWith(", TRUE"))
 				filter = filter.substring(0, filter.length() - ", TRUE".length());
@@ -160,6 +160,8 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		this.toggles = new ArrayList<ThreadSafeOptions>();
 		
 		int idx = settings.size();
+		
+		String[] variant = new String[] { "none", "none" };
 		
 		for (String setting : variant) {
 			if (setting.equalsIgnoreCase("Condition"))

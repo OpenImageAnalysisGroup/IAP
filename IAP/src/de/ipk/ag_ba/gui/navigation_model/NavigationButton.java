@@ -93,6 +93,7 @@ public class NavigationButton implements StyleAware {
 				navigationAction = new RemoteExecutionWrapperAction(navigationAction,
 						new NavigationButton(ra, guiSetting));
 			}
+			navigationAction.setSource(navigationAction, guiSetting);
 			this.setTitle(navigationAction.getDefaultTitle());
 			this.navigationImage = null;
 			this.actionImage = null;

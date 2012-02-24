@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.ActionDataExport;
@@ -25,6 +27,7 @@ import de.ipk.ag_ba.commands.analysis.ActionThreeDreconstruction;
 import de.ipk.ag_ba.commands.analysis.ActionThreeDsegmentation;
 import de.ipk.ag_ba.commands.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_actions.ActionCopyToClipboard;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -61,121 +64,13 @@ public class ImageAnalysisCommandManager {
 		// CountColorsNavigation(m, 40, experimentReference),
 		// "Hue Histogram", "img/colorhistogram.png"));
 		
-		NavigationAction defaultAction = new AbstractNavigationAction("Create Report Files") {
-			
-			private NavigationButton src;
-			
-			TreeSet<String> cs = new TreeSet<String>();
-			TreeSet<String> ss = new TreeSet<String>();
-			TreeSet<String> gs = new TreeSet<String>();
-			TreeSet<String> vs = new TreeSet<String>();
-			TreeSet<String> ts = new TreeSet<String>();
-			
-			@Override
-			public void performActionCalculateResults(NavigationButton src) throws Exception {
-				this.src = src;
-				
-				ExperimentInterface e = experimentReference.getData(m, false);
-				for (SubstanceInterface si : e) {
-					for (ConditionInterface ci : si) {
-						String condition = ci.getConditionName();
-						String species = ci.getSpecies();
-						String genotype = ci.getGenotype();
-						String variety = ci.getVariety();
-						String treatment = ci.getTreatment();
-						
-						if (condition != null)
-							cs.add(condition);
-						if (species != null)
-							ss.add(species);
-						if (genotype != null)
-							gs.add(genotype);
-						if (variety != null)
-							vs.add(variety);
-						if (treatment != null)
-							ts.add(treatment);
-					}
-				}
-				
-			}
-			
-			@Override
-			public MainPanelComponent getResultMainPanel() {
-				ArrayList<String> htmlTextPanels = new ArrayList<String>();
-				// htmlTextPanels.add(getList("Conditions", cs));
-				htmlTextPanels.add(getList("Species", ss));
-				htmlTextPanels.add(getList("Genotypes", gs));
-				htmlTextPanels.add(getList("Varieties", vs));
-				htmlTextPanels.add(getList("Treatments", ts));
-				return new MainPanelComponent(htmlTextPanels);
-			}
-			
-			@Override
-			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-				res.add(src);
-				return res;
-			}
-			
-			@Override
-			public String getDefaultTitle() {
-				return "Data Report";
-			}
-			
-			@Override
-			public String getDefaultTooltip() {
-				return super.getDefaultTooltip();
-			}
-			
-			@Override
-			public String getDefaultImage() {
-				return "img/ext/gpl2/Gnome-Emblem-Documents-64.png";
-				// return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
-			}
-			
-			@Override
-			public ArrayList<NavigationButton> getResultNewActionSet() {
-				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
-				
-				// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
-				
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true, new String[] {
-						"none", "none" }, true, null),
-						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
-						"Condition", "none" },
-						false),
-						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
-						"Genotype", "none" },
-						false),
-						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
-						"Treatment", "none" },
-						false),
-						guiSetting));
-				actions.add(new NavigationButton(
-						new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
-								"Variety", "none" }, false),
-						guiSetting));
-				actions.add(new NavigationButton(
-						new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
-								"Variety", "Treatment" }, false),
-						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
-						"Species", "none" },
-						false),
-						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false, new String[] {
-						"Species", "Treatment" },
-						false),
-						guiSetting));
-				return actions;
-			}
-		};
+		NavigationAction defaultAction = getDataReportAction(m, experimentReference, guiSetting);
+		
 		actions.add(new NavigationButton(defaultAction, guiSetting));
 		
 		actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
+		
+		actions.add(new NavigationButton(new ActionCopyToClipboard(m, experimentReference), guiSetting));
 		
 		String hsmf = IAPmain.getHSMfolder();
 		if (hsmf != null)
@@ -223,6 +118,101 @@ public class ImageAnalysisCommandManager {
 		return actions;
 	}
 	
+	private static AbstractNavigationAction getDataReportAction(final MongoDB m, final ExperimentReference experimentReference, final GUIsetting guiSetting) {
+		return new AbstractNavigationAction("Create Report Files") {
+			
+			private NavigationButton src;
+			
+			TreeSet<String> cs = new TreeSet<String>();
+			TreeSet<String> ss = new TreeSet<String>();
+			TreeSet<String> gs = new TreeSet<String>();
+			TreeSet<String> vs = new TreeSet<String>();
+			TreeSet<String> gc = new TreeSet<String>();
+			TreeSet<String> ts = new TreeSet<String>();
+			
+			@Override
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
+				this.src = src;
+				
+				ExperimentInterface e = experimentReference.getData(m, false);
+				for (SubstanceInterface si : e) {
+					for (ConditionInterface ci : si) {
+						String condition = ci.getConditionName();
+						String species = ci.getSpecies();
+						String genotype = ci.getGenotype();
+						String variety = ci.getVariety();
+						String growthCon = ci.getGrowthconditions();
+						String treatment = ci.getTreatment();
+						
+						if (condition != null)
+							cs.add(condition);
+						if (species != null)
+							ss.add(species);
+						if (genotype != null)
+							gs.add(genotype);
+						if (variety != null)
+							vs.add(variety);
+						if (growthCon != null)
+							gc.add(growthCon);
+						if (treatment != null)
+							ts.add(treatment);
+					}
+				}
+				
+			}
+			
+			@Override
+			public MainPanelComponent getResultMainPanel() {
+				ArrayList<String> htmlTextPanels = new ArrayList<String>();
+				// htmlTextPanels.add(getList("Conditions", cs));
+				htmlTextPanels.add(getList("Species", ss));
+				htmlTextPanels.add(getList("Genotypes", gs));
+				htmlTextPanels.add(getList("Varieties", vs));
+				htmlTextPanels.add(getList("Growth conditions", gc));
+				htmlTextPanels.add(getList("Treatments", ts));
+				return new MainPanelComponent(htmlTextPanels);
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
+				res.add(src);
+				return res;
+			}
+			
+			@Override
+			public String getDefaultTitle() {
+				return "Data Report";
+			}
+			
+			@Override
+			public String getDefaultTooltip() {
+				return super.getDefaultTooltip();
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return "img/ext/gpl2/Gnome-Emblem-Documents-64.png";
+				// return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
+				
+				// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
+				
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true, new String[] {
+						"none", "none" }, true, null),
+						guiSetting));
+				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false,
+						false),
+						guiSetting));
+				return actions;
+			}
+		};
+	}
+	
 	protected static String getList(String heading, TreeSet<String> cs) {
 		StringBuilder res = new StringBuilder();
 		res.append(heading + "<ul>");
@@ -230,7 +220,7 @@ public class ImageAnalysisCommandManager {
 			res.append("<li>[NOT SPECIFIED]");
 		else
 			for (String c : cs)
-				res.append("<li>" + c);
+				res.append("<li>" + StringManipulationTools.stringReplace(c, ";", ";<br>"));
 		res.append("</ul>");
 		return res.toString();
 	}

@@ -13,6 +13,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
@@ -25,6 +26,8 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	protected BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
 	
 	private final String tooltip;
+	protected NavigationAction src;
+	protected GUIsetting guiSetting;
 	
 	public AbstractNavigationAction(String tooltip) {
 		this.tooltip = tooltip;
@@ -104,5 +107,11 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	@Override
 	public NavigationImage getImageIcon() {
 		return null;
+	}
+	
+	@Override
+	public void setSource(NavigationAction src, GUIsetting guiSetting) {
+		this.src = src;
+		this.guiSetting = guiSetting;
 	}
 }
