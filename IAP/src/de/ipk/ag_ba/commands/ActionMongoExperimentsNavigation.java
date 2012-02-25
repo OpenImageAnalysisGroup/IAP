@@ -22,6 +22,7 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
@@ -200,8 +201,10 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 				actions.add(ActionTrash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
 						src.getGUIsetting(), m));
-				for (ExperimentHeaderInterface exp : trashed)
-					actions.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
+				for (ExperimentHeaderInterface ehi : trashed) {
+					ExperimentReference exp = new ExperimentReference(ehi);
+					actions.add(getMongoExperimentButton(exp, src.getGUIsetting()));
+				}
 				return actions;
 			}
 		};
@@ -303,8 +306,10 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 					String n = exp.getExperimentName();
 					if (n.replaceAll("§", "").length() == n.length() - 3)
 						tempResults.add(exp);
-					else
-						res.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
+					else {
+						ExperimentReference e = new ExperimentReference(exp, m);
+						res.add(getMongoExperimentButton(e, src.getGUIsetting()));
+					}
 				}
 				if (tempResults.size() > 0)
 					res.add(new NavigationButton(createSubFolderActionForTemporaryResults(tempResults), src.getGUIsetting()));
@@ -422,7 +427,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (ExperimentHeaderInterface exp : experiments) {
-					res.add(getMongoExperimentButton(exp, src.getGUIsetting(), m));
+					ExperimentReference e = new ExperimentReference(exp, m);
+					res.add(getMongoExperimentButton(e, src.getGUIsetting()));
 				}
 				NavigationButton tb = new NavigationButton(
 						new ActionTrash(experiments, DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m),
@@ -463,13 +469,16 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		return userNav;
 	}
 	
-	public static NavigationButton getMongoExperimentButton(ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
+	public static NavigationButton getMongoExperimentButton(ExperimentReference ei, GUIsetting guiSetting) {
 		return getMongoExperimentButton(
-				ActionMongoExperimentsNavigation.getTempdataExperimentName(ei), ei, guiSetting, m);
+				ActionMongoExperimentsNavigation.getTempdataExperimentName(ei), ei, guiSetting);
 	}
 	
-	public static NavigationButton getMongoExperimentButton(final String displayName, ExperimentHeaderInterface ei, GUIsetting guiSetting, MongoDB m) {
-		ActionMongoOrLemnaTecExperimentNavigation action = new ActionMongoOrLemnaTecExperimentNavigation(ei, m);
+	public static NavigationButton getMongoExperimentButton(
+			final String displayName,
+			ExperimentReference ei, GUIsetting guiSetting) {
+		ActionMongoOrLemnaTecExperimentNavigation action =
+				new ActionMongoOrLemnaTecExperimentNavigation(ei);
 		action.setOverrideTitle(displayName);
 		
 		NavigationButton exp = new NavigationButton(action, guiSetting);
@@ -533,7 +542,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		this.currentUser = user;
 	}
 	
-	public static String getTempdataExperimentName(ExperimentHeaderInterface exp) {
+	public static String getTempdataExperimentName(ExperimentReference exp) {
 		String n = exp.getExperimentName();
 		if (n == null || !n.contains("§"))
 			return n;

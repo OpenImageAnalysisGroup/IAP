@@ -117,8 +117,9 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		res.addAll(currentSet);
 		if (newExperiment != null) {
 			res.add(src);
-			res.add(ActionMongoExperimentsNavigation.getMongoExperimentButton(newExperiment.getHeader(),
-					src.getGUIsetting(), m));
+			res.add(ActionMongoExperimentsNavigation.getMongoExperimentButton(
+					new ExperimentReference(newExperiment.getHeader(), m),
+					src.getGUIsetting()));
 		}
 		return res;
 	}

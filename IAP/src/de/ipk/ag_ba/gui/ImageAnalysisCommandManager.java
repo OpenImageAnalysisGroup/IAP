@@ -134,7 +134,7 @@ public class ImageAnalysisCommandManager {
 			public void performActionCalculateResults(NavigationButton src) throws Exception {
 				this.src = src;
 				
-				ExperimentInterface e = experimentReference.getData(m, false);
+				ExperimentInterface e = experimentReference.getData(m, false, status);
 				for (SubstanceInterface si : e) {
 					for (ConditionInterface ci : si) {
 						String condition = ci.getConditionName();

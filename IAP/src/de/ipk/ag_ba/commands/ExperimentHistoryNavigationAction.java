@@ -7,6 +7,7 @@ import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -56,7 +57,9 @@ public class ExperimentHistoryNavigationAction extends AbstractNavigationAction 
 		for (Long time : history.keySet()) {
 			ExperimentHeaderInterface ei = history.get(time);
 			String t = SystemAnalysis.getCurrentTime(time);
-			res.add(0, new NavigationButton(t, new ActionMongoOrLemnaTecExperimentNavigation(ei, m), src.getGUIsetting()));
+			ExperimentReference exp = new ExperimentReference(ei);
+			exp.m = m;
+			res.add(0, new NavigationButton(t, new ActionMongoOrLemnaTecExperimentNavigation(exp), src.getGUIsetting()));
 		}
 		res.add(0, new NavigationButton(new ActionTrash(history.values(), DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m), src.getGUIsetting()));
 		return res;

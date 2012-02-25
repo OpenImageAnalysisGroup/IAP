@@ -22,6 +22,7 @@ import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.DateUtils;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
@@ -220,32 +221,37 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 		for (String k : group2ei.keySet()) {
 			for (Collection<ExperimentHeaderInterface> eil : group2ei.get(k).values()) {
 				if (eil != null)
-					for (ExperimentHeaderInterface ei : eil) {
-						if (ei == null || ei.getStartdate() == null)
+					for (ExperimentHeaderInterface ehi : eil) {
+						if (ehi == null || ehi.getStartdate() == null)
 							continue;
+						ExperimentReference ei = new ExperimentReference(ehi, m);
 						if (calEnt.isShowSpecificDay()) {
-							String dayA = DateUtils.getDayInfo(ei.getStartdate());
-							String dayB = DateUtils.getDayInfo(ei.getImportdate());
+							String dayA = DateUtils.getDayInfo(ei.getHeader().getStartdate());
+							String dayB = DateUtils.getDayInfo(ei.getHeader().getImportdate());
 							if (dayA.equals(dayInfo) || dayB.equals(dayInfo)) {
-								NavigationButton exp = ActionMongoExperimentsNavigation.getMongoExperimentButton(ei, guIsetting, m);
+								NavigationButton exp =
+										ActionMongoExperimentsNavigation.getMongoExperimentButton(
+												ei, guIsetting);
 								res.add(exp);
 							} else {
-								if (calEnt.getCalendar().getTime().after(ei.getStartdate())
-										&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
-									NavigationButton exp = ActionMongoExperimentsNavigation.getMongoExperimentButton(ei, guIsetting, m);
+								if (calEnt.getCalendar().getTime().after(ei.getHeader().getStartdate())
+										&& calEnt.getCalendar().getTime().before(ei.getHeader().getImportdate())) {
+									NavigationButton exp =
+											ActionMongoExperimentsNavigation.getMongoExperimentButton(
+													ei, guIsetting);
 									res.add(exp);
 								}
 							}
 						} else {
-							String mA = DateUtils.getMonthInfo(ei.getStartdate());
-							String mB = DateUtils.getMonthInfo(ei.getImportdate());
+							String mA = DateUtils.getMonthInfo(ei.getHeader().getStartdate());
+							String mB = DateUtils.getMonthInfo(ei.getHeader().getImportdate());
 							if (mA.equals(monthInfo) || mB.equals(monthInfo)) {
-								NavigationButton exp = ActionMongoExperimentsNavigation.getMongoExperimentButton(ei, guIsetting, m);
+								NavigationButton exp = ActionMongoExperimentsNavigation.getMongoExperimentButton(ei, guIsetting);
 								res.add(exp);
 							} else {
-								if (calEnt.getCalendar().getTime().after(ei.getStartdate())
-										&& calEnt.getCalendar().getTime().before(ei.getImportdate())) {
-									NavigationButton exp = ActionMongoExperimentsNavigation.getMongoExperimentButton(ei, guIsetting, m);
+								if (calEnt.getCalendar().getTime().after(ei.getHeader().getStartdate())
+										&& calEnt.getCalendar().getTime().before(ei.getHeader().getImportdate())) {
+									NavigationButton exp = ActionMongoExperimentsNavigation.getMongoExperimentButton(ei, guIsetting);
 									res.add(exp);
 								}
 							}

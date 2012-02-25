@@ -75,7 +75,8 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 			}
 		}
 		for (ExperimentReference er : getDataSourceLevel().getExperiments()) {
-			NavigationButton ne = ActionMongoExperimentsNavigation.getMongoExperimentButton(er.getHeader(), src.getGUIsetting(), null);
+			NavigationButton ne = ActionMongoExperimentsNavigation.getMongoExperimentButton(
+					er, src.getGUIsetting());
 			actions.add(ne);
 		}
 	}

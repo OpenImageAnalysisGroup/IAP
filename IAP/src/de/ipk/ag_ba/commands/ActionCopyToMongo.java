@@ -62,11 +62,11 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 		
 		try {
 			active = true;
-
+			
 			ExperimentInterface exp = experiment.getData(m); // .clone();
 			
 			exp.getHeader().setOriginDbId(experiment.getHeader().getDatabaseId());
-
+			
 			m.saveExperiment(exp, status);
 		} finally {
 			active = false;
@@ -93,6 +93,6 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy " + ActionMongoExperimentsNavigation.getTempdataExperimentName(experiment.getHeader());
+		return "Copy " + ActionMongoExperimentsNavigation.getTempdataExperimentName(experiment);
 	}
 }

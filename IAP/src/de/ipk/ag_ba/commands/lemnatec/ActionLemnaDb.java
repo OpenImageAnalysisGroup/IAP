@@ -13,6 +13,7 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
@@ -33,8 +34,9 @@ public class ActionLemnaDb extends AbstractNavigationAction implements Navigatio
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
-		for (ExperimentHeaderInterface experiment : experiments) {
-			result.add(new NavigationButton(new ActionMongoOrLemnaTecExperimentNavigation(experiment, null), src.getGUIsetting()));
+		for (ExperimentHeaderInterface ehi : experiments) {
+			ExperimentReference experiment = new ExperimentReference(ehi);
+			result.add(new NavigationButton(new ActionMongoOrLemnaTecExperimentNavigation(experiment), src.getGUIsetting()));
 		}
 		return result;
 	}
