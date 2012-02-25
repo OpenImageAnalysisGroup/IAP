@@ -49,7 +49,7 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 			ids.add(id);
 			String seq = i.getHeader().getSequence() + "";
 			sequences.add(seq);
-			ExperimentInterface ei = i.getData(i.m, false);
+			ExperimentInterface ei = i.getData(i.m, false, status);
 			names.add(ei.getName());
 			ExperimentInterface eCopy = ei.clone();
 			if (firstExperimentStart == null)

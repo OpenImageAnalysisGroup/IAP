@@ -20,7 +20,6 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -31,32 +30,29 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Runnable
  */
 public class ActionMongoOrLemnaTecExperimentNavigation extends
 		AbstractNavigationAction implements RunnableWithMappingData {
-	private final ExperimentHeaderInterface header;
 	private NavigationButton src;
-	private ExperimentInterface experiment;
-	private final MongoDB m;
 	private String domainUser;
 	private final String tt;
 	private String displayName;
+	private ExperimentReference experimentReference;
 	
 	public ActionMongoOrLemnaTecExperimentNavigation(
-			ExperimentHeaderInterface ei, MongoDB m) {
+			ExperimentReference exp) {
 		super(
-				ei.getDatabaseId() != null
-						&& ei.getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
+				exp.getHeader().getDatabaseId() != null
+						&& exp.getHeader().getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
 						: "Access Systems Biology Cloud Data Set");
 		
 		this.tt = "<html><table>" + "<tr><td>Experiment</td><td>"
-				+ ei.getExperimentName() + "</td></tr>"
-				+ "<tr><td>Type</td><td>" + ei.getExperimentType()
+				+ exp.getExperimentName() + "</td></tr>"
+				+ "<tr><td>Type</td><td>" + exp.getHeader().getExperimentType()
 				+ "</td></tr>" + "<tr><td>Owner</td><td>"
-				+ ei.getImportusername() + "</td></tr>"
-				+ "<tr><td>Import Time</td><td>" + ei.getImportdate()
-				+ "</td></tr>" + "<tr><td>Remark</td><td>" + StringManipulationTools.stringReplace(ei.getRemark(), " // ", "<br>")
+				+ exp.getHeader().getImportusername() + "</td></tr>"
+				+ "<tr><td>Import Time</td><td>" + exp.getHeader().getImportdate()
+				+ "</td></tr>" + "<tr><td>Remark</td><td>" + StringManipulationTools.stringReplace(exp.getHeader().getRemark(), " // ", "<br>")
 				+ "</td></tr>";
 		
-		header = ei;
-		this.m = m;
+		this.experimentReference = exp;
 	}
 	
 	@Override
@@ -70,6 +66,8 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 		// actions.add(FileManager.getFileManagerEntity(login, pass,
 		// ei.experimentName));
 		
+		ExperimentHeaderInterface header = experimentReference.getHeader();
+		
 		boolean add = true;
 		if (header != null && header.inTrash())
 			add = false;
@@ -77,16 +75,20 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 			add = true;
 		}
 		if (add) {
-			boolean imageAnalysis = m != null
+			boolean imageAnalysis = experimentReference.m != null
 					|| header.getDatabaseId().startsWith("hsm:")
 					|| header.getDatabaseId().startsWith("lemnatec:");
-			getDefaultActions(actions, experiment, header, imageAnalysis,
-					src.getGUIsetting(), m);
+			getDefaultActions(
+					actions,
+					experimentReference.experiment,
+					header,
+					imageAnalysis,
+					src.getGUIsetting(), experimentReference.m);
 		}
 		if (header.getHistory() != null && !header.getHistory().isEmpty()) {
 			actions.add(new NavigationButton(
 					new ExperimentHistoryNavigationAction(header.getHistory(),
-							m), src.getGUIsetting()));
+							experimentReference.m), src.getGUIsetting()));
 		}
 		
 		if (header != null
@@ -96,15 +98,15 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 						.getImportusername().equals(
 								SystemAnalysis.getUserName()))
 				|| !SystemAnalysis.isHeadless()) {
-			if (m != null)
+			if (experimentReference.m != null)
 				if (header.inTrash()) {
 					actions.add(ActionTrash.getTrashEntity(header,
-							DeletionCommand.UNTRASH, src.getGUIsetting(), m));
+							DeletionCommand.UNTRASH, src.getGUIsetting(), experimentReference.m));
 					actions.add(ActionTrash.getTrashEntity(header,
-							DeletionCommand.DELETE, src.getGUIsetting(), m));
+							DeletionCommand.DELETE, src.getGUIsetting(), experimentReference.m));
 				} else {
 					actions.add(ActionTrash.getTrashEntity(header,
-							DeletionCommand.TRASH, src.getGUIsetting(), m));
+							DeletionCommand.TRASH, src.getGUIsetting(), experimentReference.m));
 				}
 		}
 		
@@ -148,13 +150,15 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	public void performActionCalculateResults(NavigationButton src)
 			throws Exception {
 		this.src = src;
-		if (experiment == null) {
-			IAPservice.getExperimentData(header, m, status, this);
+		if (experimentReference.experiment == null) {
+			ExperimentInterface ei = experimentReference.getData(status);
+			experimentReference.experiment = ei;
 		}
 	}
 	
 	@Override
 	public String getDefaultImage() {
+		ExperimentHeaderInterface header = experimentReference.getHeader();
 		if (header.getDatabaseId() != null
 				&& header.getDatabaseId().contains("APH_"))
 			return "img/ext/phyto.png";
@@ -183,6 +187,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	
 	@Override
 	public String getDefaultNavigationImage() {
+		ExperimentHeaderInterface header = experimentReference.getHeader();
 		if (header.getDatabaseId() != null
 				&& header.getDatabaseId().contains("APH_"))
 			return "img/ext/phyto.png";
@@ -211,6 +216,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	
 	@Override
 	public String getDefaultTitle() {
+		ExperimentHeaderInterface header = experimentReference.getHeader();
 		if (displayName != null)
 			return displayName;
 		else
@@ -220,12 +226,16 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
-		ip.setExperimentInfo(m, header, true, experiment);
+		ip.setExperimentInfo(
+				experimentReference.m,
+				experimentReference.getHeader(),
+				true,
+				experimentReference.experiment);
 		return new MainPanelComponent(ip, true);
 	}
 	
 	public ExperimentInterface getExperimentReference() {
-		return experiment;
+		return experimentReference.experiment;
 	}
 	
 	public void setLogin(String domainUser) {
@@ -238,7 +248,8 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	
 	@Override
 	public void setExperimenData(ExperimentInterface doc) {
-		experiment = doc;
+		experimentReference = new ExperimentReference(doc.getHeader());
+		experimentReference.experiment = doc;
 	}
 	
 	@Override

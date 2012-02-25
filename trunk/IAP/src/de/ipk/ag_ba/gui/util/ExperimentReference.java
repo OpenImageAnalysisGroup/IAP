@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.WeakHashMap;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 
@@ -27,7 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ExperimentReference {
 	
 	private final String experimentName;
-	private ExperimentInterface experiment;
+	public ExperimentInterface experiment;
 	private ExperimentHeaderInterface header;
 	public MongoDB m;
 	
@@ -82,11 +83,18 @@ public class ExperimentReference {
 		this.header = experiment.getHeader();
 	}
 	
-	public ExperimentInterface getData(MongoDB m) throws Exception {
-		return getData(m, false);
+	public ExperimentReference(ExperimentHeaderInterface ehi, MongoDB m) {
+		this(ehi);
+		this.m = m;
 	}
 	
-	public synchronized ExperimentInterface getData(MongoDB m, boolean interactiveGetExperimentSize) throws Exception {
+	public ExperimentInterface getData(MongoDB m) throws Exception {
+		return getData(m, false, null);
+	}
+	
+	public synchronized ExperimentInterface getData(MongoDB m,
+			boolean interactiveGetExperimentSize,
+			BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
 		if (experiment != null)
 			return experiment;
 		else {
@@ -95,15 +103,15 @@ public class ExperimentReference {
 				if (res != null)
 					return res;
 				if (header.getDatabaseId().startsWith("lemnatec:"))
-					res = new LemnaTecDataExchange().getExperiment(header, null);
+					res = new LemnaTecDataExchange().getExperiment(header, status);
 				else
 					if (header.getDatabaseId().startsWith("hsm:")) {
 						res = HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
 					} else
 						if (m != null)
-							res = m.getExperiment(header, interactiveGetExperimentSize, null);
+							res = m.getExperiment(header, interactiveGetExperimentSize, status);
 						else
-							res = this.m.getExperiment(header, interactiveGetExperimentSize, null);
+							res = this.m.getExperiment(header, interactiveGetExperimentSize, status);
 				weakId2exp.put(header.getDatabaseId(), res);
 				return res;
 			}
@@ -126,5 +134,9 @@ public class ExperimentReference {
 				return null;
 		} else
 			return header;
+	}
+	
+	public ExperimentInterface getData(BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
+		return getData(m, status != null, status);
 	}
 }

@@ -164,7 +164,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				this.set.add(nb);
 			}
 			for (ExperimentReference clipboardItem : guiSettting.getClipboardItems()) {
-				NavigationAction na = new ActionMongoOrLemnaTecExperimentNavigation(clipboardItem.getHeader(), clipboardItem.m);
+				NavigationAction na = new ActionMongoOrLemnaTecExperimentNavigation(clipboardItem);
 				NavigationButton nb = new NavigationButton("Clipboard item " + clipboardItem.getExperimentName() + "", na, guiSettting);
 				nb.setRightAligned(true);
 				this.set.add(nb);

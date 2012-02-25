@@ -125,7 +125,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		TreeSet<String> vs = new TreeSet<String>();
 		TreeSet<String> ts = new TreeSet<String>();
 		
-		ExperimentInterface e = experimentReference.getData(m, false);
+		ExperimentInterface e = experimentReference.getData(m, false, status);
 		for (SubstanceInterface si : e) {
 			for (ConditionInterface ci : si) {
 				String condition = ci.getConditionName();
