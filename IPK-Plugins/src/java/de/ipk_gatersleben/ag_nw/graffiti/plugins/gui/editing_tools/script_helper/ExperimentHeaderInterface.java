@@ -125,4 +125,15 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	public void setOriginDbId(String databaseId);
 	
 	public String getOriginDbId();
+	
+	/**
+	 * Stores information about a list of global outliers, e.g. everything from a certain day,
+	 * everything until a certain day, from a certain day. Or all data for a certain replicate.
+	 * This information is currently utilized only by selected and few system functions.
+	 * 
+	 * @param outliers
+	 */
+	public void setGlobalOutlierInfo(String outliers);
+	
+	public String getGlobalOutlierInfo();
 }

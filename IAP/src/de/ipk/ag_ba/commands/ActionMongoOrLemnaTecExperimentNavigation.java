@@ -10,6 +10,7 @@ package de.ipk.ag_ba.commands;
 import java.util.ArrayList;
 
 import org.ErrorMsg;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
@@ -51,7 +52,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 				+ "</td></tr>" + "<tr><td>Owner</td><td>"
 				+ ei.getImportusername() + "</td></tr>"
 				+ "<tr><td>Import Time</td><td>" + ei.getImportdate()
-				+ "</td></tr>" + "<tr><td>Remark</td><td>" + ei.getRemark()
+				+ "</td></tr>" + "<tr><td>Remark</td><td>" + StringManipulationTools.stringReplace(ei.getRemark(), " // ", "<br>")
 				+ "</td></tr>";
 		
 		header = ei;

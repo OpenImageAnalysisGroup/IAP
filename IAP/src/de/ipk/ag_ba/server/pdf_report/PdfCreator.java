@@ -70,7 +70,7 @@ public class PdfCreator {
 	public void executeRstat(final String[] parameter, ExperimentInterface exp,
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput) throws IOException {
 		this.lastOutput = lastOutput;
-		readAndModify("report2.tex", exp);
+		readAndModify("report.tex", exp);
 		
 		String name = tempDirectory.getAbsolutePath() + File.separator + "diagramIAP.cmd";
 		if (AttributeHelper.windowsRunning())
@@ -228,12 +228,12 @@ public class PdfCreator {
 	}
 	
 	public byte[] getPDFcontent() throws IOException, Exception {
-		IOurl url = FileSystemHandler.getURL(new File(tempDirectory.getAbsolutePath() + File.separator + "report2.pdf"));
+		IOurl url = FileSystemHandler.getURL(new File(tempDirectory.getAbsolutePath() + File.separator + "report.pdf"));
 		return ResourceIOManager.getInputStreamMemoryCached(url).getBuffTrimmed();
 	}
 	
 	public boolean hasPDFcontent() {
-		File f = new File(tempDirectory.getAbsolutePath() + File.separator + "report2.pdf");
+		File f = new File(tempDirectory.getAbsolutePath() + File.separator + "report.pdf");
 		return f.canRead() && !tso.getBval(1, false);
 	}
 	
@@ -272,7 +272,7 @@ public class PdfCreator {
 	}
 	
 	public String getPDFurl() {
-		return new File(tempDirectory.getAbsolutePath() + File.separator + "report2.pdf").getAbsolutePath();
+		return new File(tempDirectory.getAbsolutePath() + File.separator + "report.pdf").getAbsolutePath();
 	}
 	
 	public void openTargetDirectory() {

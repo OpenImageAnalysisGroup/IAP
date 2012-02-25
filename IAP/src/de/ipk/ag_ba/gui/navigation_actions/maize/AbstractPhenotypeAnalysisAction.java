@@ -111,8 +111,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 								}
 							}
 						}
-						if (sd3.getTime() != 29)
-							continue;
+						// if (sd3.getTime() != 29)
+						// continue;
 						if (!containsAnOutlier)
 							if (filter == null || filter.isValidSample(sd3))
 								workload.add(sd3);

@@ -12,7 +12,6 @@ import java.util.TreeMap;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
-import org.StringManipulationTools;
 
 public class ExperimentHeader implements ExperimentHeaderInterface {
 	
@@ -28,7 +27,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	private String experimentType, sequence;
 	private long sizekb;
 	private int experimentID = -1;
-	private String database, originDatabaseId;
+	private String database, originDatabaseId, globalOutliers;
 	
 	public ExperimentHeader() {
 		//
@@ -49,7 +48,8 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		experimentType = copyFrom.getExperimentType();
 		sequence = copyFrom.getSequence();
 		database = copyFrom.getDatabase();
-		originDatabaseId = copyFrom.getOriginDbId();
+		originDatabaseId = copyFrom.getExperimentOriginDbId();
+		globalOutliers = copyFrom.getExperimentGlobalOutlierInfo();
 	}
 	
 	@Override
@@ -175,12 +175,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		Substance.getAttributeString(r, new String[] {
 				"experimentname", "database", "remark", "coordinator", "experimenttype", "sequence", "excelfileid",
 				"importusername", "importusergroup", "importdate", "startdate", "storagetime", "measurements", "imagefiles", "sizekb",
-				"origin"
+				"origin", "outlier"
 		}, new Object[] {
 				getExperimentName(), database, remark, coordinator, experimentType, sequence, databaseId, importUserName,
 				importUserGroup, AttributeHelper.getDateString(importDate), AttributeHelper.getDateString(startDate), AttributeHelper.getDateString(storageTime),
 				measurementcount, (imageFiles == null ? 0 : imageFiles), sizekb,
-				originDatabaseId
+				originDatabaseId, globalOutliers
 		}, true);
 		r.append("</experiment>");
 	}
@@ -245,6 +245,8 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			setSizekb(map.get("sizekb") != null ? ((Long) map.get("sizekb")) : 0);
 		if (map.get("origin") != null && map.get("origin") instanceof String)
 			setOriginDbId((String) map.get("origin"));
+		if (map.get("outlier") != null && map.get("outlier") instanceof String)
+			setGlobalOutlierInfo((String) map.get("outlier"));
 	}
 	
 	public ExperimentHeader(String experimentname) {
@@ -271,6 +273,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("imagefiles", (imageFiles == null ? 0 : imageFiles));
 		attributeValueMap.put("sizekb", sizekb);
 		attributeValueMap.put("origin", originDatabaseId);
+		attributeValueMap.put("outliers", globalOutliers);
 	}
 	
 	@Override
@@ -339,12 +342,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 					+ importUserGroup + ";" + imageFiles + ";" + sizekb + ";" + experimentType + ";" + sequence + ";"
 					+ experimentID + ";" + database + ";" + (importDate != null ? importDate.getTime() : "") + ";"
 					+ (startDate != null ? startDate.getTime() : "")
-					+ ";" + originDatabaseId;
+					+ ";" + originDatabaseId + ";" + globalOutliers;
 			String s2 = e.getExperimentName() + ";" + e.remark + ";" + e.coordinator + ";" + e.databaseId + ";"
 					+ e.importUserName + ";" + e.importUserGroup + ";" + e.imageFiles + ";" + e.sizekb + ";"
 					+ e.experimentType + ";" + e.sequence + ";" + e.experimentID + ";" + e.database + ";"
 					+ (e.importDate != null ? e.importDate.getTime() : "") + ";" + (e.startDate != null ? e.startDate.getTime() : "")
-					+ ";" + originDatabaseId;
+					+ ";" + originDatabaseId + ";" + globalOutliers;
 			return s1.equals(s2);
 		}
 	}
@@ -359,16 +362,6 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		return super.hashCode();
 	}
 	
-	// @Deprecated
-	// public void setExcelfileid(String excelfileid) {
-	// setDatabaseId(excelfileid);
-	// }
-	//
-	// @Deprecated
-	// public String getExcelfileid() {
-	// return getDatabaseId();
-	// }
-	//
 	@Override
 	public void setDatabaseId(String excelfileid) {
 		databaseId = excelfileid;
@@ -436,8 +429,15 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	
 	private void setExperimentName(String experimentName) {
 		this.experimentName = experimentName;
-		if (this.experimentName != null && this.experimentName.contains("Â")) {
-			this.experimentName = StringManipulationTools.stringReplace(this.experimentName, "Â", "");
-		}
+	}
+	
+	@Override
+	public void setGlobalOutlierInfo(String outliers) {
+		this.globalOutliers = outliers;
+	}
+	
+	@Override
+	public String getGlobalOutlierInfo() {
+		return globalOutliers;
 	}
 }

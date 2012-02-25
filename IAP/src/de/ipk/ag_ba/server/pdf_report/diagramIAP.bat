@@ -7,7 +7,7 @@ echo Condition 1: %1
 echo Condition 2: %2
 echo Appendix?  : %3
 
-Rscript createDiagramOneFile.r report.csv pdf %3 %1 %2
+Rscript createDiagrams.r report.csv pdf %3 %1 %2
 
-pdflatex report2.tex
-pdflatex report2.tex
+pdflatex report.tex
+pdflatex report.tex
