@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import org.StringManipulationTools;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionCopyToMongo;
@@ -22,6 +23,7 @@ import de.ipk.ag_ba.commands.ActionNumericDataReport;
 import de.ipk.ag_ba.commands.ActionNumericDataReportComplete;
 import de.ipk.ag_ba.commands.ActionNumericDataReportSetup;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
+import de.ipk.ag_ba.commands.ActionToggle;
 import de.ipk.ag_ba.commands.CloudIoTestAction;
 import de.ipk.ag_ba.commands.analysis.ActionThreeDreconstruction;
 import de.ipk.ag_ba.commands.analysis.ActionThreeDsegmentation;
@@ -202,12 +204,45 @@ public class ImageAnalysisCommandManager {
 				
 				// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 				
-				actions.add(new NavigationButton(new ActionNumericDataReportComplete(m, experimentReference, true, new String[] {
-						"none", "none" }, true, null),
+				ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
+				
+				actions.add(new NavigationButton(new ActionNumericDataReportComplete(
+						m, experimentReference, true,
+						toggles,
+						true, null),
 						guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportSetup(m, experimentReference, false,
-						false),
-						guiSetting));
+				actions.add(
+						new NavigationButton(
+								new ActionNumericDataReportSetup(m, experimentReference, false, false),
+								guiSetting));
+				
+				ThreadSafeOptions tsoA = new ThreadSafeOptions();
+				tsoA.setParam(0, "Appendix");
+				tsoA.setBval(0, false);
+				toggles.add(tsoA);
+				actions.add(new NavigationButton(new ActionToggle("Plot and include all calculated properties?", "Create Appendix?", tsoA),
+						src.getGUIsetting()));
+				
+				for (String c : new String[] {
+						"Condition", "Species", "Genotype", "Variety",
+						"Growth condition", "Treatment" }) {
+					if (c.equals("Species") && ss.size() <= 1)
+						continue;
+					if (c.equals("Genotype") && gs.size() <= 1)
+						continue;
+					if (c.equals("Variety") && vs.size() <= 1)
+						continue;
+					if (c.equals("Growth condition") && gc.size() <= 1)
+						continue;
+					if (c.equals("Treatment") && ts.size() <= 1)
+						continue;
+					ThreadSafeOptions tso = new ThreadSafeOptions();
+					tso.setParam(0, c);
+					toggles.add(tso);
+					tso.setBval(0, false);
+					actions.add(new NavigationButton(
+							new ActionToggle("Group by " + c + "?", "Group by " + c, tso), src.getGUIsetting()));
+				}
 				return actions;
 			}
 		};
