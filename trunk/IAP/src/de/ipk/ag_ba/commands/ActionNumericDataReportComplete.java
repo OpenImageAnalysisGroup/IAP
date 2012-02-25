@@ -48,30 +48,41 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	
 	private static final String separator = ";";// "\t";// ";";// "\t";
 	private final boolean exportIndividualAngles;
-	private final String[] variant;
 	private final boolean xlsx;
 	
 	private File targetDirectoryOrTargetFile = null;
 	private ArrayList<ThreadSafeOptions> toggles;
+	private final ArrayList<ThreadSafeOptions> divideDatasetBy;
 	
-	public ActionNumericDataReportComplete(String tooltip, boolean exportIndividualAngles, String[] variant, boolean xlsx) {
+	public ActionNumericDataReportComplete(String tooltip,
+			boolean exportIndividualAngles,
+			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx) {
 		super(tooltip);
 		this.exportIndividualAngles = exportIndividualAngles;
-		this.variant = variant;
+		this.divideDatasetBy = divideDatasetBy;
 		this.xlsx = xlsx;
 	}
 	
 	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference,
-			boolean exportIndividualAngles, String[] variant, boolean xlsx,
+			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
 			ArrayList<ThreadSafeOptions> toggles) {
 		this("Create report" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
-						: " PDF (" + StringManipulationTools.getStringList(variant, ", ") + ")"),
+						: " PDF (" + StringManipulationTools.getStringList(getArrayFrom(divideDatasetBy), ", ") + ")"),
 				exportIndividualAngles,
-				variant, xlsx);
+				divideDatasetBy, xlsx);
 		this.m = m;
 		this.experimentReference = experimentReference;
 		this.toggles = toggles;
+	}
+	
+	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2) {
+		ArrayList<String> res = new ArrayList<String>();
+		for (ThreadSafeOptions tso : divideDatasetBy2) {
+			if (tso.getBval(0, false))
+				res.add((String) tso.getParam(0, "(internal error)"));
+		}
+		return res.toArray(new String[] {});
 	}
 	
 	@Override
@@ -108,9 +119,12 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table" + add;
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
-					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" + StringManipulationTools.getStringList(variant, ", ") + ")") + add;
+					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" +
+							StringManipulationTools.getStringList(
+									getArrayFrom(divideDatasetBy), ", ") + ")") + add;
 		} else {
-			String filter = StringManipulationTools.getStringList(variant, ", ");
+			String filter = StringManipulationTools.getStringList(
+					getArrayFrom(divideDatasetBy), ", ");
 			if (filter.endsWith(", TRUE"))
 				filter = filter.substring(0, filter.length() - ", TRUE".length());
 			if (filter.endsWith(", FALSE"))
@@ -118,7 +132,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			if (filter.endsWith(", none"))
 				filter = filter.substring(0, filter.length() - ", none".length());
 			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
-			if (variant[2].equals("TRUE"))
+			if (getArrayFrom(divideDatasetBy)[2].equals("TRUE"))
 				return "Create PDF with Appendix (all diagrams)" + add;
 			else
 				return "Create short PDF" + add;
@@ -282,7 +296,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			if (!exportIndividualAngles && !xlsx) {
 				if (status != null)
 					status.setCurrentStatusText2("Generate report images and PDF");
-				p.executeRstat(variant, experiment, status, lastOutput);
+				p.executeRstat(getArrayFrom(divideDatasetBy), experiment, status, lastOutput);
 				p.getOutput();
 				boolean ok = p.hasPDFcontent();
 				if (ok)

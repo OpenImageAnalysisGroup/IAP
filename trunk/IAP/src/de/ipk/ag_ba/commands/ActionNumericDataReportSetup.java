@@ -54,15 +54,10 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		String[] variant = new String[] { "none", "none" };
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportComplete(
-						m, experimentReference, false, new String[] {
-								variant[0], variant[1], "TRUE" }, false, toggles), src.getGUIsetting()));
-		actions.add(new NavigationButton(
-				new ActionNumericDataReportComplete(m, experimentReference, false, new String[] {
-						variant[0], variant[1], "FALSE" }, false, toggles), src.getGUIsetting()));
+						m, experimentReference, false, toggles, false, toggles), src.getGUIsetting()));
 		
 		for (NavigationButton s : settings)
 			actions.add(s);
@@ -123,6 +118,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		TreeSet<String> ss = new TreeSet<String>();
 		TreeSet<String> gs = new TreeSet<String>();
 		TreeSet<String> vs = new TreeSet<String>();
+		TreeSet<String> gc = new TreeSet<String>();
 		TreeSet<String> ts = new TreeSet<String>();
 		
 		ExperimentInterface e = experimentReference.getData(m, false, status);
@@ -132,6 +128,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 				String species = ci.getSpecies();
 				String genotype = ci.getGenotype();
 				String variety = ci.getVariety();
+				String growthcondition = ci.getGrowthconditions();
 				String treatment = ci.getTreatment();
 				
 				if (condition != null && !condition.isEmpty())
@@ -150,6 +147,10 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					vs.add(variety);
 				else
 					vs.add("(not specified)");
+				if (growthcondition != null && !growthcondition.isEmpty())
+					gc.add(growthcondition);
+				else
+					gc.add("(not specified)");
 				if (treatment != null && !treatment.isEmpty())
 					ts.add(treatment);
 				else
@@ -162,6 +163,12 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		int idx = settings.size();
 		
 		String[] variant = new String[] { "none", "none" };
+		
+		ThreadSafeOptions tsoA = new ThreadSafeOptions();
+		tsoA.setParam(0, "Appendix");
+		toggles.add(tsoA);
+		settings.add(new NavigationButton(new ActionToggle("Create appendix?", "Appendix", tsoA),
+				src.getGUIsetting()));
 		
 		for (String setting : variant) {
 			if (setting.equalsIgnoreCase("Condition"))
@@ -190,6 +197,14 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 				}
 			if (setting.equalsIgnoreCase("Variety"))
 				for (String c : vs) {
+					ThreadSafeOptions tso = new ThreadSafeOptions();
+					tso.setParam(0, setting);
+					tso.setParam(1, c);
+					toggles.add(tso);
+					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
+				}
+			if (setting.equalsIgnoreCase("Growth condition"))
+				for (String c : gc) {
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
