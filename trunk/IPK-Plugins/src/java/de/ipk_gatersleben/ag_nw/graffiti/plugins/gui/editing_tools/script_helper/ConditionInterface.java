@@ -17,12 +17,15 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public void getString(StringBuilder r);
 	
+	@Override
 	public void getXMLAttributeString(StringBuilder r);
 	
+	@Override
 	public void getStringOfChildren(StringBuilder r);
 	
 	public String getExpAndConditionName();
 	
+	@Override
 	public String toString();
 	
 	public String getConditionName();
@@ -65,14 +68,17 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public int getSeriesId();
 	
+	@Override
 	public boolean setData(Element condition);
 	
 	public boolean setData(Element conditionElement, Element experimentChildElement);
 	
 	public String getName();
 	
+	@Override
 	public void setAttribute(Attribute attr);
 	
+	@Override
 	public void setDataOfChildElement(Element childElement);
 	
 	public void setExperimentName(String experimentName);
@@ -115,6 +121,7 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public void getStringForDocument(StringBuilder r);
 	
+	@Override
 	public int compareTo(ConditionInterface otherSeries);
 	
 	public void setRowId(int rowId);
@@ -141,44 +148,61 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public ExperimentHeaderInterface getExperimentHeader();
 	
+	@Override
 	public boolean add(SampleInterface arg0);
 	
+	@Override
 	public boolean addAll(Collection<? extends SampleInterface> arg0);
 	
+	@Override
 	public void clear();
 	
+	@Override
 	public boolean contains(Object arg0);
 	
+	@Override
 	public boolean containsAll(Collection<?> arg0);
 	
+	@Override
 	public boolean isEmpty();
 	
+	@Override
 	public boolean remove(Object arg0);
 	
+	@Override
 	public boolean removeAll(Collection<?> arg0);
 	
+	@Override
 	public boolean retainAll(Collection<?> arg0);
 	
+	@Override
 	public int size();
 	
+	@Override
 	public Object[] toArray();
 	
+	@Override
 	public <T> T[] toArray(T[] arg0);
 	
+	@Override
 	public Iterator<SampleInterface> iterator();
 	
+	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap);
 	
+	@Override
 	public boolean equals(Object obj);
 	
+	@Override
 	public int hashCode();
 	
 	public ConditionInterface clone(SubstanceInterface parent);
 	
 	public ArrayList<SampleInterface> getSortedSamples();
 	
-	public String getOriginDbId();
+	public String getExperimentOriginDbId();
 	
 	public void setExperimentHeader(ExperimentHeaderInterface header);
 	
+	public String getExperimentGlobalOutlierInfo();
 }

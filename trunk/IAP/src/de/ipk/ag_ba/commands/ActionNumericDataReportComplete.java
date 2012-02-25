@@ -243,6 +243,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				}
 			}
 			if (xlsx) {
+				csv = null;
 				if (status != null)
 					status.setCurrentStatusText2("Save to file");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
@@ -257,7 +258,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			}
 			else {
 				byte[] result = csv.toString().getBytes();
-				
+				csv = null;
 				p.prepareTempDirectory();
 				p.saveReportCSV(result, xlsx);
 			}
@@ -271,11 +272,11 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			// });
 			if (!xlsx)
 				p.saveScripts(new String[] {
-						"createDiagramOneFile.r",
+						"createDiagrams.r",
 						"diagramIAP.cmd",
 						"diagramIAP.bat",
 						"initLinux.r",
-						"report2.tex"
+						"report.tex"
 				});
 			
 			if (!exportIndividualAngles && !xlsx) {
@@ -339,8 +340,11 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 					if (field.equals("Variety"))
 						value = s.getVariety();
 					else
-						if (field.equals("Treatment"))
-							value = s.getTreatment();
+						if (field.equals("Growth condition"))
+							value = s.getGrowthCondition();
+						else
+							if (field.equals("Treatment"))
+								value = s.getTreatment();
 		if (value == null)
 			value = "(not specified)";
 		else

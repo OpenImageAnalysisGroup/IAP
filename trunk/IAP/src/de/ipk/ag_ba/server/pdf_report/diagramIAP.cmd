@@ -23,13 +23,15 @@ else
 fi
 
 if [ ${THI} = "TRUE" ]; then
-	Rscript createDiagramOneFile.r ${INPUTFILE} pdf TRUE ${TREAT} ${SEC}
+	Rscript createDiagrams.r ${INPUTFILE} pdf TRUE ${TREAT} ${SEC}
 else
-	Rscript createDiagramOneFile.r ${INPUTFILE} pdf FALSE ${TREAT} ${SEC}
+	Rscript createDiagrams.r ${INPUTFILE} pdf FALSE ${TREAT} ${SEC}
 fi
 
 echo "Create PDF..."
-/usr/bin/pdflatex report2.tex
-/usr/texbin/pdflatex report2.tex
+/usr/bin/pdflatex report.tex
+/usr/texbin/pdflatex report.tex
+/usr/bin/pdflatex report.tex
+/usr/texbin/pdflatex report.tex
 echo ""
 echo "Finished"
