@@ -148,7 +148,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				filter = filter.substring(0, filter.length() - ", none".length());
 			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
 			if (arr[2].equals("TRUE"))
-				return "Create PDF with Appendix (all diagrams)" + add;
+				return "<html><center>Create PDF with Appendix<br>(all diagrams)" + add;
 			else
 				return "Create short PDF" + add;
 		}
