@@ -302,7 +302,7 @@ public class LemnaTecDataExchange {
 			login2niceName.put("Gramel-Eikenroth", "Gramel-Eikenroth (LemnaTec)");
 			login2niceName.put("LTAdmin", "LTAdmin (LemnaTec)");
 			login2niceName.put("LemnaTec Support", "LemnaTec Support (LemnaTec)");
-			login2niceName.put("entzian", "Entzian, Alexander (BA)");
+			login2niceName.put("entzian", "Entzian, Dr. Alexander (BA)");
 			login2niceName.put("neumannk", "Neumann, Kerstin (GED)");
 			login2niceName.put("hartmann", "Hartmann, Anja (PBI)");
 			login2niceName.put("mary", "Ziems, Mary (GED");
@@ -310,8 +310,8 @@ public class LemnaTecDataExchange {
 			login2niceName.put("stein", "Stein, Dr. Nils (GED");
 			login2niceName.put("altmann", "Altmann, Prof. Dr. Thomas (MOG)");
 			login2niceName.put("meyer", "Meyer, Dr. Rhonda (HET)");
-			login2niceName.put("muraya", "Muraya, Moses Mahugu (HET)");
-			login2niceName.put("Muraya", "Muraya, Moses Mahugu (HET)");
+			login2niceName.put("muraya", "Muraya, Dr. Moses Mahugu (HET)");
+			login2niceName.put("Muraya", "Muraya, Dr. Moses Mahugu (HET)");
 			login2niceName.put("weigelt", "Weigelt-Fischer, Dr. Kathleen (HET)");
 			login2niceName.put("Muecke", "Muecke, Ingo (BA)");
 			login2niceName.put("muecke", "Muecke, Ingo (BA)");
@@ -351,7 +351,7 @@ public class LemnaTecDataExchange {
 			id2coo.put("IL", "Lermontova, Dr. Inna (KTE)");
 			id2coo.put("AC", "Arana, Dr. Fernando (HET)");
 			id2coo.put("FA", "Arana, Dr. Fernando (HET)");
-			id2coo.put("MM", "Muraya, Moses Mahugu (HET)");
+			id2coo.put("MM", "Muraya, Dr. Moses Mahugu (HET)");
 			id2coo.put("KN", "Neumann, Kerstin (GED)");
 			id2coo.put("KW", "Weigelt-Fischer, Dr. Kathleen (HET)");
 			id2coo.put("BA", "Klukas, Dr. Christian (BA)");

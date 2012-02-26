@@ -78,10 +78,24 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	
 	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2) {
 		ArrayList<String> res = new ArrayList<String>();
+		boolean appendix = false;
 		for (ThreadSafeOptions tso : divideDatasetBy2) {
-			if (tso.getBval(0, false))
-				res.add((String) tso.getParam(0, "(internal error)"));
+			String s = (String) tso.getParam(0, "");
+			if (tso.getBval(0, false)) {
+				if (s.equals("Appendix"))
+					appendix = true;
+				else
+					res.add(s);
+			}
 		}
+		while (res.size() < 2)
+			res.add("none");
+		if (appendix)
+			res.add("TRUE");
+		else
+			res.add("FALSE");
+		if (res.size() != 3)
+			System.out.println("WARNING: " + res.size());
 		return res.toArray(new String[] {});
 	}
 	
@@ -123,8 +137,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 							StringManipulationTools.getStringList(
 									getArrayFrom(divideDatasetBy), ", ") + ")") + add;
 		} else {
+			String[] arr = getArrayFrom(divideDatasetBy);
 			String filter = StringManipulationTools.getStringList(
-					getArrayFrom(divideDatasetBy), ", ");
+					arr, ", ");
 			if (filter.endsWith(", TRUE"))
 				filter = filter.substring(0, filter.length() - ", TRUE".length());
 			if (filter.endsWith(", FALSE"))
@@ -132,7 +147,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			if (filter.endsWith(", none"))
 				filter = filter.substring(0, filter.length() - ", none".length());
 			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
-			if (getArrayFrom(divideDatasetBy)[2].equals("TRUE"))
+			if (arr[2].equals("TRUE"))
 				return "Create PDF with Appendix (all diagrams)" + add;
 			else
 				return "Create short PDF" + add;

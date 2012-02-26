@@ -791,6 +791,11 @@ public class NavigationButton implements StyleAware {
 		return rr;
 	}
 	
+	@Override
+	public String toString() {
+		return StringManipulationTools.removeHTMLtags(getTitle());
+	}
+	
 	public GUIsetting getGUIsetting() {
 		return guiSetting;
 	}

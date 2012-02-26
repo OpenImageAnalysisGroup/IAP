@@ -213,7 +213,8 @@ public class ImageAnalysisCommandManager {
 						guiSetting));
 				actions.add(
 						new NavigationButton(
-								new ActionNumericDataReportSetup(m, experimentReference, false, false),
+								new ActionNumericDataReportSetup(m, experimentReference, false, false,
+										toggles),
 								guiSetting));
 				
 				ThreadSafeOptions tsoA = new ThreadSafeOptions();

@@ -67,6 +67,7 @@ public class ActionToggle extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		option.setBval(0, !option.getBval(0, true));
+		option.setLong(System.currentTimeMillis());
 	}
 	
 	@Override

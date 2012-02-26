@@ -7,6 +7,8 @@
 package de.ipk.ag_ba.commands;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeSet;
 
 import org.StringManipulationTools;
@@ -33,21 +35,28 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	private final boolean exportIndividualAngles;
 	private final boolean xlsx;
 	
-	private final ArrayList<NavigationButton> settings = new ArrayList<NavigationButton>();
-	private ArrayList<ThreadSafeOptions> toggles;
+	private boolean executed = false;
 	
-	public ActionNumericDataReportSetup(String tooltip, boolean exportIndividualAngles, boolean xlsx) {
+	private final ArrayList<NavigationButton> settings = new ArrayList<NavigationButton>();
+	private final ArrayList<ThreadSafeOptions> toggles;
+	private ArrayList<ThreadSafeOptions> togglesForReport;
+	
+	public ActionNumericDataReportSetup(String tooltip, boolean exportIndividualAngles,
+			boolean xlsx, ArrayList<ThreadSafeOptions> toggles) {
 		super(tooltip);
 		this.exportIndividualAngles = exportIndividualAngles;
 		this.xlsx = xlsx;
+		this.toggles = toggles;
 	}
 	
-	public ActionNumericDataReportSetup(MongoDB m, ExperimentReference experimentReference, boolean exportIndividualAngles, boolean xlsx) {
+	public ActionNumericDataReportSetup(MongoDB m,
+			ExperimentReference experimentReference, boolean exportIndividualAngles, boolean xlsx,
+			ArrayList<ThreadSafeOptions> toggles) {
 		this("Specify report options" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
 						: " PDF"),
 				exportIndividualAngles,
-				xlsx);
+				xlsx, toggles);
 		this.m = m;
 		this.experimentReference = experimentReference;
 	}
@@ -57,7 +66,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportComplete(
-						m, experimentReference, false, toggles, false, toggles), src.getGUIsetting()));
+						m, experimentReference, false, togglesForReport, false, togglesForReport), src.getGUIsetting()));
 		
 		for (NavigationButton s : settings)
 			actions.add(s);
@@ -74,7 +83,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	
 	@Override
 	public boolean requestTitleUpdates() {
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -85,18 +94,45 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
 					+ (exportIndividualAngles ? " (side angles)" : " (avg)");
 		} else {
-			String[] variant = new String[] { "none", "none" };
-			String filter = StringManipulationTools.getStringList(variant, ", ");
-			if (filter.endsWith(", TRUE"))
-				filter = filter.substring(0, filter.length() - ", TRUE".length());
-			if (filter.endsWith(", FALSE"))
-				filter = filter.substring(0, filter.length() - ", FALSE".length());
-			if (filter.endsWith(", none"))
-				filter = filter.substring(0, filter.length() - ", none".length());
-			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
+			ArrayList<String> settings = new ArrayList<String>();
+			ArrayList<ThreadSafeOptions> settingsTsos = new ArrayList<ThreadSafeOptions>();
+			boolean appendix = false;
 			
-			return "<html><center>Report<br>"
-					+ (exportIndividualAngles ? " (side angles)" : " (divided by " + filter + ")");
+			Collections.sort(toggles, new Comparator<ThreadSafeOptions>() {
+				@Override
+				public int compare(ThreadSafeOptions o1, ThreadSafeOptions o2) {
+					return ((Long) o1.getLong()).compareTo(o2.getLong());
+				}
+			});
+			
+			for (ThreadSafeOptions tso : toggles) {
+				if (((String) tso.getParam(0, "")).equals("Appendix"))
+					appendix = tso.getBval(0, false);
+				else {
+					if (tso.getBval(0, false)) {
+						if (settings.size() >= 2) {
+							settingsTsos.get(0).setBval(0, false);
+							settingsTsos.remove(0);
+							settings.remove(0);
+						}
+						settings.add((String) tso.getParam(0, ""));
+						settingsTsos.add(tso);
+					}
+				}
+			}
+			if (executed)
+				return "<html>Group definition:<br>" +
+						(settings.size() > 0 ?
+								"" + StringManipulationTools.getStringList(settings, "<br>and ") + ""
+								: "no (overall average)")
+						+ "";
+			else
+				return "<html><center>About to create a<br>" + (appendix ? "full " : "short ") + "report<br>"
+						+ (exportIndividualAngles ? " (side angles)" :
+								(settings.size() > 0 ?
+										"- divided by " + StringManipulationTools.getStringList(settings, "<br>and ") + " -"
+										: "- overall average -")
+						) + "<br>(click here to continue)";
 		}
 	}
 	
@@ -111,6 +147,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
+		executed = true;
 		
 		settings.clear();
 		
@@ -158,25 +195,29 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 			}
 		}
 		
-		this.toggles = new ArrayList<ThreadSafeOptions>();
-		
 		int idx = settings.size();
 		
-		String[] variant = new String[] { "none", "none" };
+		this.togglesForReport = new ArrayList<ThreadSafeOptions>();
 		
-		ThreadSafeOptions tsoA = new ThreadSafeOptions();
-		tsoA.setParam(0, "Appendix");
-		toggles.add(tsoA);
-		settings.add(new NavigationButton(new ActionToggle("Create appendix?", "Appendix", tsoA),
-				src.getGUIsetting()));
+		// ThreadSafeOptions tsoA = new ThreadSafeOptions();
+		// tsoA.setParam(0, "Appendix");
+		// toggles.add(tsoA);
+		// settings.add(new NavigationButton(new ActionToggle("Create appendix?", "Appendix", tsoA),
+		// src.getGUIsetting()));
 		
-		for (String setting : variant) {
+		for (ThreadSafeOptions ttt : toggles) {
+			String setting = (String) ttt.getParam(0, "");
+			if (!ttt.getBval(0, false)) {
+				System.out.println("Setting " + setting + ": NO");
+				continue;
+			}
+			System.out.println("Setting " + setting + ": YES");
 			if (setting.equalsIgnoreCase("Condition"))
 				for (String c : cs) {
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
-					toggles.add(tso);
+					togglesForReport.add(tso);
 					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Species"))
@@ -184,7 +225,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
-					toggles.add(tso);
+					togglesForReport.add(tso);
 					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Genotype"))
@@ -192,7 +233,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
-					toggles.add(tso);
+					togglesForReport.add(tso);
 					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Variety"))
@@ -200,7 +241,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
-					toggles.add(tso);
+					togglesForReport.add(tso);
 					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Growth condition"))
@@ -208,7 +249,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
-					toggles.add(tso);
+					togglesForReport.add(tso);
 					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Treatment"))
@@ -216,15 +257,15 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
-					toggles.add(tso);
+					togglesForReport.add(tso);
 					settings.add(new NavigationButton(new ActionToggle("Include " + c + "?", c, tso), src.getGUIsetting()));
 				}
 		}
-		if (toggles.size() > 0)
+		if (togglesForReport.size() > 0)
 			settings.add(idx, new NavigationButton(new AbstractNavigationAction("Toggle all settings") {
 				@Override
 				public void performActionCalculateResults(NavigationButton src) throws Exception {
-					for (ThreadSafeOptions tso : toggles) {
+					for (ThreadSafeOptions tso : togglesForReport) {
 						tso.setBval(0, !tso.getBval(0, true));
 					}
 				}
