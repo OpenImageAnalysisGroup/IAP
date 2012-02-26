@@ -218,7 +218,9 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
 					togglesForReport.add(tso);
-					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " " + c + "?", c, tso), src.getGUIsetting()));
+					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
+							src
+									.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Species"))
 				for (String c : ss) {
@@ -226,7 +228,9 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
 					togglesForReport.add(tso);
-					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " " + c + "?", c, tso), src.getGUIsetting()));
+					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
+							src
+									.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Genotype"))
 				for (String c : gs) {
@@ -234,7 +238,9 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
 					togglesForReport.add(tso);
-					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " " + c + "?", c, tso), src.getGUIsetting()));
+					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
+							src
+									.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Variety"))
 				for (String c : vs) {
@@ -242,7 +248,9 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
 					togglesForReport.add(tso);
-					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " " + c + "?", c, tso), src.getGUIsetting()));
+					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
+							src
+									.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Growth condition"))
 				for (String c : gc) {
@@ -250,7 +258,9 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
 					togglesForReport.add(tso);
-					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " " + c + "?", c, tso), src.getGUIsetting()));
+					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
+							src
+									.getGUIsetting()));
 				}
 			if (setting.equalsIgnoreCase("Treatment"))
 				for (String c : ts) {
@@ -258,7 +268,9 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					tso.setParam(0, setting);
 					tso.setParam(1, c);
 					togglesForReport.add(tso);
-					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " " + c + "?", c, tso), src.getGUIsetting()));
+					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
+							src
+									.getGUIsetting()));
 				}
 		}
 		if (togglesForReport.size() > 0)
@@ -272,7 +284,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 				
 				@Override
 				public String getDefaultTitle() {
-					return "Toggle";
+					return "<html><center>Toggle<br>settings";
 				}
 				
 				@Override
