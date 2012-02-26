@@ -66,7 +66,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportComplete(
-						m, experimentReference, false, togglesForReport, false, togglesForReport), src.getGUIsetting()));
+						m, experimentReference, false, toggles, false, togglesForReport), src.getGUIsetting()));
 		
 		for (NavigationButton s : settings)
 			actions.add(s);
@@ -83,7 +83,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	
 	@Override
 	public boolean requestTitleUpdates() {
-		return true;
+		return !executed;
 	}
 	
 	@Override
