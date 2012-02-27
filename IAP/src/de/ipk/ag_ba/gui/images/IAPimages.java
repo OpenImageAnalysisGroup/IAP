@@ -132,4 +132,8 @@ public class IAPimages {
 	public static String getMergeDatasets() {
 		return "img/ext/gpl2/Gnome-Text-X-Script-64.png";
 	}
+	
+	public static String getClimaImport() {
+		return "img/ext/gpl2/Gnome-Weather-Few-Clouds-64.png";
+	}
 }

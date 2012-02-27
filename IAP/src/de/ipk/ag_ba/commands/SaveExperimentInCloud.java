@@ -55,14 +55,16 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
 		
-		Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
-				"Target", MongoDB.getMongos()
-		});
-		
-		if (sel == null)
-			return;
-		
-		this.m = (MongoDB) sel[0];
+		if (m == null) {
+			Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
+					"Target", MongoDB.getMongos()
+			});
+			
+			if (sel == null)
+				return;
+			
+			this.m = (MongoDB) sel[0];
+		}
 		
 		this.src = src;
 		this.newExperiment = null;
@@ -356,4 +358,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		return "img/ext/user-desktop.png";
 	}
 	
+	public void setMongoDB(MongoDB m) {
+		this.m = m;
+	}
 }

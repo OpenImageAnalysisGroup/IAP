@@ -6,7 +6,9 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Scanner;
 
 import org.junit.Test;
@@ -228,5 +230,15 @@ public class SystemAnalysis {
 			input = System.console().readLine();
 		}
 		return input;
+	}
+	
+	private static final long MILLISECS_PER_MINUTE = 60 * 1000;
+	private static final long MILLISECS_PER_HOUR = 60 * MILLISECS_PER_MINUTE;
+	private static final long MILLISECS_PER_DAY = 24 * MILLISECS_PER_HOUR;
+	
+	public static long getUnixDay(long time, GregorianCalendar gc) {
+		long offset = gc.get(Calendar.ZONE_OFFSET) + gc.get(Calendar.DST_OFFSET);
+		long day = (long) Math.floor((time + offset) / ((double) MILLISECS_PER_DAY));
+		return day;
 	}
 }

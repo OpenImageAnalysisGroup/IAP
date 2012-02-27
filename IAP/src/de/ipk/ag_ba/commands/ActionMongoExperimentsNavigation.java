@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.commands.clima.ActionImportClimateData;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -90,11 +91,14 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 							src.getGUIsetting()), src.getGUIsetting()));
 				}
 				
-				NavigationAction saveInCloudAction = new SaveExperimentInCloud(true);
-				
+				SaveExperimentInCloud saveInCloudAction = new SaveExperimentInCloud(true);
+				saveInCloudAction.setMongoDB(m);
 				NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Load Files", "img/ext/user-desktop.png",
 						"img/ext/user-desktop.png", src.getGUIsetting());
 				res.add(uploadFilesEntity);
+				
+				res.add(new NavigationButton(new ActionImportClimateData(
+						"Import greenhouse temperature data"), src.getGUIsetting()));
 			}
 			// gruppe => user => experiment
 			
