@@ -37,11 +37,11 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> phenoDBcommands = new ArrayList<NavigationButton>();
 		
-		NavigationAction saveExperimentAction = new SaveExperimentInCloud(false);
-		NavigationButton uploadDataEntity = new NavigationButton(saveExperimentAction, "Process files",
-				"img/ext/user-desktop.png",
-				"img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
-		phenoDBcommands.add(uploadDataEntity);
+		// NavigationAction saveExperimentAction = new SaveExperimentInCloud(false);
+		// NavigationButton uploadDataEntity = new NavigationButton(saveExperimentAction, "Process files",
+		// "img/ext/user-desktop.png",
+		// "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
+		// phenoDBcommands.add(uploadDataEntity);
 		
 		NavigationAction lemnaExperiments = new ActionLemnaTecNavigation();
 		NavigationButton lemnaEntity = new NavigationButton(lemnaExperiments, src != null ? src.getGUIsetting()

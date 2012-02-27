@@ -26,7 +26,7 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	protected BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
 	
 	private final String tooltip;
-	protected NavigationAction src;
+	protected NavigationAction srcAction;
 	protected GUIsetting guiSetting;
 	
 	public AbstractNavigationAction(String tooltip) {
@@ -111,7 +111,7 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	
 	@Override
 	public void setSource(NavigationAction src, GUIsetting guiSetting) {
-		this.src = src;
+		this.srcAction = src;
 		this.guiSetting = guiSetting;
 	}
 }
