@@ -573,82 +573,88 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 }{}
 
 \resetBoolean
-\checkFileNoReset{side_area_relativenboxplot.pdf}{}
-\checkFileNoReset{side_height_norm_relativenboxplot.pdf}{}
-\checkFileNoReset{side_width_norm_relativenboxplot.pdf}{}
-\checkFileNoReset{top_area_relativenboxplot.pdf}{}
-\checkFileNoReset{side_area_relativenboxplot.pdf}{}
-\checkFileNoReset{volume_iap_relativenboxplot.pdf}{}
-%\ifthenelse{\boolean{isFile1}}{
+\checkFileNoReset{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}
+\checkFileNoReset{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}
+\checkFileNoReset{side_vis_normalized_histogram_ratio_bin_.tex}{}
+\ifthenelse{\boolean{isFile1}}{
 
-\checkFile{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 	\clearpage
 	\section{Visible light color histogram}
-	\subsection{Color histogram}
-
-	\ifthenelse{\boolean{isFile1}}{
 	
-		Visible hue histogram for side view:
+	\checkFile{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 	
-		\loadTex{side_vis_hue_histogram_ratio_bin_stackedOverallImage}
-	}{}	
-	\ifthenelse{\boolean{isFile2}}{
-	
-		Visible hue histogram for top view:
+		\subsection{Color histogram}
+		\ifthenelse{\boolean{isFile1}}{
+			Visible hue histogram for side view:
 		
-		\loadTex{top_vis_hue_histogram_ratio_bin_stackedOverallImage}
+			\loadTex{side_vis_hue_histogram_ratio_bin_stackedOverallImage}
+		}{}	
+		\ifthenelse{\boolean{isFile2}}{
+		
+			Visible hue histogram for top view:
+			
+			\loadTex{top_vis_hue_histogram_ratio_bin_stackedOverallImage}
+		}{}
+	}{}
+	
+	
+	\checkFile{side_vis_normalized_histogram_ratio_bin_.tex}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\clearpage
+		\subsection{Color histogram (zoom corrected)}
+		Visible hue histogram (zoom corrected) for side view:
+	
+		\loadTex{side_vis_normalized_histogram_ratio_bin_}
 	}{}
 }{}
 
 
-\checkFile{side_vis_normalized_histogram_ratio_bin_.tex}{}
+\resetBoolean
+\checkFileNoReset{side_fluo_histogram_bin_stackedOverallImage.tex}{}
+\checkFileNoReset{top_fluo_histogram_bin_stackedOverallImage.tex}{}
+\checkFileNoReset{side_fluo_normalized_histogram_bin_stackedOverallImage.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{Color histogram (zoom corrected)}
 
-	Visible hue histogram (zoom corrected) for side view:
-
-	\loadTex{side_vis_normalized_histogram_ratio_bin_}
-	}{}
-
-
-\checkFile{side_fluo_histogram_bin_stackedOverallImage.tex}{top_fluo_histogram_bin_stackedOverallImage.tex}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 	\clearpage
 	\section{Fluorescence activity histogram}
 
-	\subsection{Fluorescence spectra}
-	\begin{itemize}
-	\item Histogram of observed fluorescence colors
-	\end{itemize}
-	\ifthenelse{\boolean{isFile1}}{
+	\checkFile{side_fluo_histogram_bin_stackedOverallImage.tex}{top_fluo_histogram_bin_stackedOverallImage.tex}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 	
-		Fluorescence activity distribution for side view:
-	
-		\loadTex{side_fluo_histogram_bin_stackedOverallImage}
-	}{}
-	\ifthenelse{\boolean{isFile2}}{
-	
-		Fluorescence activity distribution for top view:
+		\subsection{Fluorescence spectra}
+		\begin{itemize}
+		\item Histogram of observed fluorescence colors
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
 		
-		\loadTex{top_fluo_histogram_bin_stackedOverallImage}
+			Fluorescence activity distribution for side view:
+		
+			\loadTex{side_fluo_histogram_bin_stackedOverallImage}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+		
+			Fluorescence activity distribution for top view:
+			
+			\loadTex{top_fluo_histogram_bin_stackedOverallImage}
+		}{}
+	}{}
+	
+	
+	\checkFile{side_fluo_normalized_histogram_bin_stackedOverallImage.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\clearpage
+		\subsection{Fluorescence spectra (zoom corrected)}
+		\begin{itemize}
+		\item Histogram of observed fluorescence colors
+		\end{itemize}
+		
+		Fluorescence activity distribution (zoom corrected) for side view:
+		
+		\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
 	}{}
 }{}
 
-
-\checkFile{side_fluo_normalized_histogram_bin_stackedOverallImage.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{Fluorescence spectra (zoom corrected)}
-	\begin{itemize}
-	\item Histogram of observed fluorescence colors
-	\end{itemize}
-	
-	Fluorescence activity distribution (zoom corrected) for side view:
-	
-	\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
-}{}
 
 %\checkFile{side_fluo_histogram_ratio_bin_1_0_25_side_fluo_histogram_ratio_bin_2_2stackedOverallImage.tex}{top_fluo_histogram_ratio_bin_1_0_25_top_fluo_histogram_ratio_bin_2_25_stackedOverallImage.tex}
 %\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
@@ -678,54 +684,61 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 %	\loadTex{side_fluo_normalized_histogram_ratio_bin_1_0_25_side_fluo_normalized_hstackedOverallImage}
 %}{}
 
-\clearpage
-\section{Near-infrared intensity histogram}
-
-
-\checkFile{side_nir_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\subsection{Intensity histogram}
-	\begin{itemize}
-	\item Average intensity of near infrared (NIR)
-	\item Represents the water content of the plant
-	\end{itemize}
-	\ifthenelse{\boolean{isFile1}}{
-	
-		NIR intensity distribution for side view:
-	
-		\loadTex{side_nir_histogram_bin_stackedOverallImage}
-	}{}
-	\ifthenelse{\boolean{isFile2}}{
-	
-		NIR intensity distribution for top view:
-	
-		\loadTex{top_nir_histogram_bin_stackedOverallImage}
-	}{}
-}{}
-
-
-\checkFile{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
+\resetBoolean
+\checkFileNoReset{side_nir_histogram_bin_stackedOverallImage.tex}{}
+\checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}
+\checkFileNoReset{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
 \ifthenelse{\boolean{isFile1}}{
+
 	\clearpage
-	\subsection{Intensity histogram (zoom corrected)}
-	\begin{itemize}
-	\item Average intensity of near infrared (NIR)
-	\item Represents the water content of the plant
-	\end{itemize}
+	\section{Near-infrared intensity histogram}
 	
-	NIR intensity distribution for side view (zoom corrected):
+	\checkFile{side_nir_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\subsection{Intensity histogram}
+		\begin{itemize}
+		\item Average intensity of near infrared (NIR)
+		\item Represents the water content of the plant
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+		
+			NIR intensity distribution for side view:
+		
+			\loadTex{side_nir_histogram_bin_stackedOverallImage}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+		
+			NIR intensity distribution for top view:
+		
+			\loadTex{top_nir_histogram_bin_stackedOverallImage}
+		}{}
+	}{}
 	
-	\loadTex{side_nir_normalized_histogram_bin_stackedOverallImage}
+	
+	\checkFile{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\clearpage
+		\subsection{Intensity histogram (zoom corrected)}
+		\begin{itemize}
+		\item Average intensity of near infrared (NIR)
+		\item Represents the water content of the plant
+		\end{itemize}
+		
+		NIR intensity distribution for side view (zoom corrected):
+		
+		\loadTex{side_nir_normalized_histogram_bin_stackedOverallImage}
+	}{}
 }{}
+
 
 \resetBoolean
 \checkFileNoReset{side_leaf_count_median__leafs_nboxplot.pdf}{}
 \checkFileNoReset{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}
 \checkFileNoReset{side_bloom_count__tassel_nboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
+	
 	\clearpage
 	\section{Plant structures}
-
 
 	% http://upload.wikimedia.org/wikipedia/commons/9/98/Maize_plant_diagram.svg
 	
@@ -770,63 +783,73 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 }{}
 
-\checkFile{side_nir_wetness_average__percent_.pdf}{}
+
+\resetBoolean
+\checkFileNoReset{side_nir_wetness_average__percent_.pdf}{}
+\checkFileNoReset{top_nir_wetness_average__percent_nboxplot.pdf}{}
+\checkFileNoReset{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
+\checkFileNoReset{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
-\clearpage
-\section{\noindent Wetness}
 
-\begin{itemize}
-\item Near-infrared analysis
-\end{itemize}
-
-
-	\subsection{Average wetness of side image}
-	\begin{itemize}
-	\item Average wetness of the plants from NIR side camera
-	\item Column name: side.nir.wetness.av
-	\item Unit: .
-	\end{itemize}
-	\loadImage{side_nir_wetness_average__percent_.pdf}
-}{}
-
-
-\checkFile{top_nir_wetness_average__percent_nboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\subsection{Average wetness of top image}
-	\begin{itemize}
-	\item Average wetness of the plants from NIR top camera
-	\item Column name: top.nir.wetness.av
-	\item Unit: .
-	\end{itemize}
-	\loadImage{top_nir_wetness_average__percent_nboxplot.pdf}
-}{}	
-	
-	
-\checkFile{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\clearpage	
-	\subsection{Weighted loss through drought stress - side image}
-	\begin{itemize}
-	\item Number of foreground pixels from NIR side camera minus the weighted value of the plant
-	\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
-	\item Column name: side.nir.wetness.plant\_weight\_drought\_loss
-	\item Unit: .
-	\end{itemize}
-	\loadImage{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}
-}{}
-
-
-\checkFile{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
 	\clearpage
-	\subsection{Weighted loss through drought stress - top image}
+	\section{\noindent Wetness}
+	
 	\begin{itemize}
-	\item Number of foreground pixels from NIR top camera minus the weighted value of the plant
-	\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
-	\item Column name: top.nir.wetness.plant\_weight\_drought\_loss
-	\item Unit: .
+	\item Near-infrared analysis
 	\end{itemize}
-	\loadImage{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}
+	
+	
+	\checkFile{side_nir_wetness_average__percent_.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+	
+		\subsection{Average wetness of side image}
+		\begin{itemize}
+		\item Average wetness of the plants from NIR side camera
+		\item Column name: side.nir.wetness.av
+		\item Unit: .
+		\end{itemize}
+		\loadImage{side_nir_wetness_average__percent_.pdf}
+	}{}
+	
+	
+	\checkFile{top_nir_wetness_average__percent_nboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\subsection{Average wetness of top image}
+		\begin{itemize}
+		\item Average wetness of the plants from NIR top camera
+		\item Column name: top.nir.wetness.av
+		\item Unit: .
+		\end{itemize}
+		\loadImage{top_nir_wetness_average__percent_nboxplot.pdf}
+	}{}	
+		
+		
+	\checkFile{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\clearpage	
+		\subsection{Weighted loss through drought stress - side image}
+		\begin{itemize}
+		\item Number of foreground pixels from NIR side camera minus the weighted value of the plant
+		\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
+		\item Column name: side.nir.wetness.plant\_weight\_drought\_loss
+		\item Unit: .
+		\end{itemize}
+		\loadImage{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}
+	}{}
+	
+	
+	\checkFile{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\clearpage
+		\subsection{Weighted loss through drought stress - top image}
+		\begin{itemize}
+		\item Number of foreground pixels from NIR top camera minus the weighted value of the plant
+		\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
+		\item Column name: top.nir.wetness.plant\_weight\_drought\_loss
+		\item Unit: .
+		\end{itemize}
+		\loadImage{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}
+	}{}
 }{}
 
 
