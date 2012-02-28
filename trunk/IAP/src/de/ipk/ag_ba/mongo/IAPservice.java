@@ -574,7 +574,7 @@ public class IAPservice {
 					hasTemperatureData = !timeDay2averageTemp.isEmpty();
 				}
 			}
-			hasTemperatureData = false;
+			
 			if (hasTemperatureData) {
 				experiment = experiment.clone();
 				for (SubstanceInterface substance : experiment) {
