@@ -8,7 +8,9 @@
 package de.ipk.ag_ba.gui.navigation_model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -25,7 +27,7 @@ public class GUIsetting {
 	private final MyNavigationPanel navigationPanel;
 	private final MyNavigationPanel actionPanel;
 	private final JPanel graphPanel;
-	private final ArrayList<ExperimentReference> clipboardExperiments = new ArrayList<ExperimentReference>();
+	private final LinkedHashSet<ExperimentReference> clipboardExperiments = new LinkedHashSet<ExperimentReference>();
 	private final HashSet<String> clipboardExperimentDatabaseIds = new HashSet<String>();
 	
 	public GUIsetting(MyNavigationPanel navigationPanel, MyNavigationPanel actionPanel, JPanel graphPanel) {
@@ -50,6 +52,17 @@ public class GUIsetting {
 		return clipboardExperimentDatabaseIds.contains(databaseId);
 	}
 	
+	public boolean isInClipboard(ExperimentReference experimentReference) {
+		boolean found = clipboardExperiments.contains(experimentReference);
+		if (!found && experimentReference.experiment != null) {
+			for (ExperimentReference er : clipboardExperiments) {
+				if (er.experiment == experimentReference.experiment)
+					return true;
+			}
+		}
+		return found;
+	}
+	
 	public void addClipboardItem(ExperimentReference experimentReference, MongoDB m) {
 		// add only the header to the clipboard, as storing the whole experiment may
 		// require a lot of memory
@@ -70,14 +83,14 @@ public class GUIsetting {
 		clipboardExperimentDatabaseIds.remove(experimentReference.getHeader().getDatabaseId());
 		ArrayList<ExperimentReference> toBeRemoved = new ArrayList<ExperimentReference>();
 		for (ExperimentReference er : clipboardExperiments) {
-			if (er.getHeader().getDatabaseId().equals(del) || er == experimentReference)
+			if (er.getHeader().getDatabaseId().equals(del) || er == experimentReference || er.experiment == experimentReference.experiment)
 				toBeRemoved.add(er);
 		}
 		for (ExperimentReference d : toBeRemoved)
 			clipboardExperiments.remove(d);
 	}
 	
-	public ArrayList<ExperimentReference> getClipboardItems() {
+	public Collection<ExperimentReference> getClipboardItems() {
 		return clipboardExperiments;
 	}
 	

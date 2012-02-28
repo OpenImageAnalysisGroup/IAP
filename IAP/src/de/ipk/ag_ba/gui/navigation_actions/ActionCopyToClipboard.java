@@ -27,7 +27,8 @@ public class ActionCopyToClipboard extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		if (guiSetting.isInClipboard(experimentReference.getHeader().getDatabaseId()))
+		if (guiSetting.isInClipboard(experimentReference.getHeader().getDatabaseId()) ||
+				guiSetting.isInClipboard(experimentReference))
 			src.getGUIsetting().removeClipboardItem(experimentReference);
 		else
 			src.getGUIsetting().addClipboardItem(experimentReference, m);
@@ -45,7 +46,8 @@ public class ActionCopyToClipboard extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		if (guiSetting.isInClipboard(experimentReference.getHeader().getDatabaseId()))
+		if (guiSetting.isInClipboard(experimentReference.getHeader().getDatabaseId()) ||
+				guiSetting.isInClipboard(experimentReference))
 			return "Remove from clipboard";
 		else
 			return "Add to clipboard";

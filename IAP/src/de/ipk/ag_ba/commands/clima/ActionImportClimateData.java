@@ -56,7 +56,6 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 			res.append("<li>Selected input file: " + excelFile.getAbsolutePath());
 			TableData myData = ExperimentDataFileReader.getExcelTableData(excelFile);
 			// A1: Uhrzeit, B1: Datum
-			myData.showDataDialog();
 			String check1time = myData.getCellData(1, 1, "") + "";
 			String check2date = myData.getCellData(1, 1, "") + "";
 			if (!check1time.equals("Uhrzeit"))
@@ -128,10 +127,14 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 							ExperimentHeaderInterface ehi = processData(excelFile, gc, day2avg, day2min, day2max, tm, e);
 							ehi.setDatabase("");
 							ehi.setDatabaseId("");
+							ehi.setExperimenttype("Climate");
 							ehi.setOriginDbId(excelFile.getAbsolutePath());
 							ehi.setImportusername(SystemAnalysis.getUserName());
 							ehi.setNumberOfFiles(0);
-							ehi.setExperimentname(excelFile.getName());
+							String fn = excelFile.getName();
+							if (fn.contains("."))
+								fn = fn.substring(0, fn.lastIndexOf("."));
+							ehi.setExperimentname(fn);
 							for (SubstanceInterface si : e)
 								for (ConditionInterface ci : si)
 									ci.setExperimentHeader(ehi);
@@ -143,7 +146,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 					}
 				}
 		} else
-			res.append("<li>Selected input file: no file selected!");
+			res.append("<li>No input file file selected!");
 	}
 	
 	private ExperimentHeaderInterface processData(File excelFile, GregorianCalendar gc, TreeMap<Date, Double> day2avg, TreeMap<Date, Double> day2min,
@@ -172,6 +175,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 				gc.setTime(date);
 				SampleInterface si = tm.getNewSample(ci);
 				ci.add(si);
+				si.setRowId(date.getTime());
 				si.setTime((int) SystemAnalysis.getUnixDay(date.getTime(), gc));
 				si.setTimeUnit("unix day");
 				
@@ -190,6 +194,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 				gc.setTime(date);
 				SampleInterface si = tm.getNewSample(ci);
 				ci.add(si);
+				si.setRowId(date.getTime());
 				si.setTime((int) SystemAnalysis.getUnixDay(date.getTime(), gc));
 				si.setTimeUnit("unix day");
 				
@@ -208,6 +213,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 				gc.setTime(date);
 				SampleInterface si = tm.getNewSample(ci);
 				ci.add(si);
+				si.setRowId(date.getTime());
 				si.setTime((int) SystemAnalysis.getUnixDay(date.getTime(), gc));
 				si.setTimeUnit("unix day");
 				
