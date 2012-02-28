@@ -25,7 +25,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -39,7 +41,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.ReleaseInfo;
-import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.Vector2d;
 import org.graffiti.editor.ConfigureViewAction;
@@ -68,7 +69,6 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -543,6 +543,60 @@ public class IAPservice {
 			e.sortSubstances();
 		}
 		
+		boolean hasTemperatureData = false;
+		TreeMap<Long, Double> timeDay2averageTemp = new TreeMap<Long, Double>();
+		
+		if (experiment != null) {
+			double ggd_baseline = 10;
+			String type = experiment.getHeader().getExperimentType();
+			if (type.equals("Barley")) {
+				ggd_baseline = 5.5;
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using baseline for Barley, 5.5°C");
+			}
+			if (type.equals("Maize")) {
+				ggd_baseline = 10;
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using baseline for Maize, 10°C");
+			}
+			GregorianCalendar gc = new GregorianCalendar();
+			for (SubstanceInterface substance : experiment) {
+				if (substance.getName() != null && substance.getName().equals("temp.air")) {
+					for (ConditionInterface ci : substance) {
+						if (ci.getSpecies() != null && ci.getSpecies().equals("avg")) {
+							for (SampleInterface sa : ci) {
+								long time = sa.getRowId();
+								double temp = sa.getSampleAverage().getValue();
+								timeDay2averageTemp.put(SystemAnalysis.getUnixDay(time, gc), temp - ggd_baseline);
+							}
+						}
+					}
+					hasTemperatureData = !timeDay2averageTemp.isEmpty();
+				}
+			}
+			if (hasTemperatureData)
+				for (SubstanceInterface substance : experiment) {
+					for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
+						for (SampleInterface s : c) {
+							Long time = s.getRowId();
+							if (time == null)
+								continue;
+							// replace DAY X or DAS X with GDD Y, based on temperature data
+							if (s.getTimeUnit().equalsIgnoreCase("day") || s.getTimeUnit().equalsIgnoreCase("das")) {
+								long unixDay = SystemAnalysis.getUnixDay(time, gc);
+								double ggd = getGGD(unixDay - s.getTime(), unixDay, timeDay2averageTemp);
+								s.setTime((int) ggd);
+								s.setTimeUnit("GDD");
+							}
+							if (s.getTimeUnit().equalsIgnoreCase("unix day")) {
+								long unixDay = s.getTime();
+								double ggd = getGGD(unixDay, unixDay, timeDay2averageTemp);
+								s.setTime((int) ggd);
+								s.setTimeUnit("GDD");
+								
+							}
+						}
+					}
+				}
+		}
 		if (experiment != null)
 			for (SubstanceInterface substance : experiment) {
 				for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
@@ -724,38 +778,6 @@ public class IAPservice {
 		
 		sw.printTime(100);
 		
-		// sw = new StopWatch("Sort Snapshot URLs");
-		// for (SnapshotData sn : result) {
-		// {
-		// long[] urls = sn.getRgbUrl();
-		// integer[] pos = sn.getRgbUrlAngles();
-		// if (urls != null && pos != null && urls.length > 0) {
-		// new SpecialUtilities().mergeSort(urls, pos);
-		// sn.setRgbUrl(urls);
-		// sn.setRgbUrlAngle(pos);
-		// }
-		// }
-		// {
-		// Long[] urls = sn.getFluoUrl();
-		// Integer[] pos = sn.getFluoUrlAngles();
-		// if (urls != null && pos != null && urls.length > 0) {
-		// new SpecialUtilities().mergeSort(urls, pos);
-		// sn.setFluoUrl(urls);;
-		// sn.setFluoUrlAngle(pos);
-		// }
-		// }
-		// {
-		// Long[] urls = sn.getNirUrl();
-		// Integer[] pos = sn.getNirUrlAngles();
-		// if (urls != null && pos != null && urls.length > 0) {
-		// new SpecialUtilities().mergeSort(urls, pos);
-		// sn.setNirUrl(urls);
-		// sn.setNirUrlAngle(pos);
-		// }
-		// }
-		// }
-		// sw.printTime(50);
-		//
 		sw = new StopWatch("Sort Snapshots");
 		Collections.sort(result, new Comparator<SnapshotDataIAP>() {
 			@Override
@@ -784,6 +806,16 @@ public class IAPservice {
 			sd.prepareFieldsForDataTransport();
 		
 		return result;
+	}
+	
+	private static double getGGD(long startUnixDay, long currentUnixDay, TreeMap<Long, Double> timeDay2averageTemp) {
+		double sum = 0;
+		for (long d = startUnixDay; d <= currentUnixDay; d++) {
+			Double gdd = timeDay2averageTemp.get(d);
+			if (gdd != null)
+				sum += gdd;
+		}
+		return sum;
 	}
 	
 	public static Collection<NumericMeasurementInterface> sortImages(Collection<NumericMeasurementInterface> measurements) {

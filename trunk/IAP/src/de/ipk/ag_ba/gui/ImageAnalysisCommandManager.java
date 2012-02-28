@@ -25,8 +25,6 @@ import de.ipk.ag_ba.commands.ActionNumericDataReportSetup;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
 import de.ipk.ag_ba.commands.ActionToggle;
 import de.ipk.ag_ba.commands.CloudIoTestAction;
-import de.ipk.ag_ba.commands.analysis.ActionThreeDreconstruction;
-import de.ipk.ag_ba.commands.analysis.ActionThreeDsegmentation;
 import de.ipk.ag_ba.commands.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.ActionCopyToClipboard;
@@ -103,10 +101,10 @@ public class ImageAnalysisCommandManager {
 			
 			actions.add(ImageAnalysis.getMaize3dEntity(m, experimentReference, 10, 15, guiSetting));
 			
-			actions.add(ActionThreeDreconstruction.getThreeDreconstructionTaskEntity(m, experimentReference,
-					"3-D Reconstruction", 15, 25, guiSetting));
-			actions.add(ActionThreeDsegmentation.getThreeDsegmentationTaskEntity(m, experimentReference,
-					"3-D Segmentation", 15, 25, guiSetting));
+			// actions.add(ActionThreeDreconstruction.getThreeDreconstructionTaskEntity(m, experimentReference,
+			// "3-D Reconstruction", 15, 25, guiSetting));
+			// actions.add(ActionThreeDsegmentation.getThreeDsegmentationTaskEntity(m, experimentReference,
+			// "3-D Segmentation", 15, 25, guiSetting));
 		}
 		
 		try {
