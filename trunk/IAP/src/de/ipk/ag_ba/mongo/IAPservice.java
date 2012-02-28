@@ -813,13 +813,37 @@ public class IAPservice {
 		return result;
 	}
 	
+	/**
+	 * If a day is missing in the temperature data, it will be looked up from the nearest timepoint with data.
+	 * If the day before and the day after the day with missing data has data available, the day before will be used.
+	 * 
+	 * @return the sum of temperatures within the specified duration (including first and last day).
+	 */
 	private static double getGGD(long startUnixDay, long currentUnixDay, TreeMap<Long, Double> timeDay2averageTemp) {
 		double sum = 0;
-		for (long d = startUnixDay; d <= currentUnixDay; d++) {
-			Double gdd = timeDay2averageTemp.get(d);
-			if (gdd != null)
-				sum += gdd;
-		}
+		if (!timeDay2averageTemp.isEmpty())
+			for (long d = startUnixDay; d <= currentUnixDay; d++) {
+				Double gdd = timeDay2averageTemp.get(d);
+				if (gdd != null)
+					sum += gdd;
+				else {
+					boolean found = false;
+					int distance = 1;
+					do {
+						Double gdd_A = timeDay2averageTemp.get(d - distance);
+						Double gdd_B = timeDay2averageTemp.get(d + distance);
+						if (gdd_A != null) {
+							sum += gdd_A;
+							found = true;
+						} else
+							if (gdd_B != null) {
+								sum += gdd_B;
+								found = true;
+							}
+						distance++;
+					} while (!found);
+				}
+			}
 		return sum;
 	}
 	
