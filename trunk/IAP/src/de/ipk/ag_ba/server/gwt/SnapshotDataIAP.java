@@ -493,7 +493,7 @@ public class SnapshotDataIAP {
 			return "";
 		else {
 			if (s.contains(";"))
-				return StringManipulationTools.stringReplace(s, ";", "//"); // "\"" + s + "\"";
+				return "\"" + StringManipulationTools.stringReplace(s, ";", "/") + "\""; // "\"" + s + "\"";
 			else
 				return s;
 		}

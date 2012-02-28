@@ -41,6 +41,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.ReleaseInfo;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.Vector2d;
 import org.graffiti.editor.ConfigureViewAction;
@@ -69,6 +70,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -563,16 +565,20 @@ public class IAPservice {
 					for (ConditionInterface ci : substance) {
 						if (ci.getSpecies() != null && ci.getSpecies().equals("avg")) {
 							for (SampleInterface sa : ci) {
-								long time = sa.getRowId();
-								double temp = sa.getSampleAverage().getValue();
-								timeDay2averageTemp.put(SystemAnalysis.getUnixDay(time, gc), temp - ggd_baseline);
+								Long time = sa.getRowId();
+								if (time != null) {
+									double temp = sa.getSampleAverage().getValue();
+									timeDay2averageTemp.put(SystemAnalysis.getUnixDay(time, gc), temp - ggd_baseline);
+								}
 							}
 						}
 					}
 					hasTemperatureData = !timeDay2averageTemp.isEmpty();
 				}
 			}
-			if (hasTemperatureData)
+			hasTemperatureData = false;
+			if (hasTemperatureData) {
+				experiment = experiment.clone();
 				for (SubstanceInterface substance : experiment) {
 					for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
 						for (SampleInterface s : c) {
@@ -596,6 +602,7 @@ public class IAPservice {
 						}
 					}
 				}
+			}
 		}
 		if (experiment != null)
 			for (SubstanceInterface substance : experiment) {
