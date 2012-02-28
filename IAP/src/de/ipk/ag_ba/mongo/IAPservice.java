@@ -39,6 +39,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.ReleaseInfo;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.Vector2d;
 import org.graffiti.editor.ConfigureViewAction;
@@ -67,6 +68,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -520,6 +522,26 @@ public class IAPservice {
 		HashMap<Long, SnapshotDataIAP> timestampe2snapshot = new HashMap<Long, SnapshotDataIAP>();
 		
 		ArrayList<SnapshotDataIAP> result = new ArrayList<SnapshotDataIAP>();
+		
+		if (experiment != null) {
+			for (SubstanceInterface substance : experiment)
+				if (substance.getName() != null && substance.getName().contains(".bin.")) {
+					String oldName = substance.getName();
+					oldName = StringManipulationTools.stringReplace(oldName, ".0.", ".00.");
+					oldName = StringManipulationTools.stringReplace(oldName, ".1.", ".01.");
+					oldName = StringManipulationTools.stringReplace(oldName, ".2.", ".02.");
+					oldName = StringManipulationTools.stringReplace(oldName, ".3.", ".03.");
+					oldName = StringManipulationTools.stringReplace(oldName, ".4.", ".04.");
+					oldName = StringManipulationTools.stringReplace(oldName, ".5.", ".05.");
+					oldName = StringManipulationTools.stringReplace(oldName, ".6.", ".06.");
+					oldName = StringManipulationTools.stringReplace(oldName, ".7.", ".07.");
+					oldName = StringManipulationTools.stringReplace(oldName, ".8.", ".08.");
+					oldName = StringManipulationTools.stringReplace(oldName, ".9.", ".09.");
+					substance.setName(oldName);
+				}
+			Experiment e = (Experiment) experiment;
+			e.sortSubstances();
+		}
 		
 		if (experiment != null)
 			for (SubstanceInterface substance : experiment) {

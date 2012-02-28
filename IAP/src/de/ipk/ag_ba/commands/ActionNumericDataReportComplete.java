@@ -38,9 +38,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ActionNumericDataReportComplete
-		extends AbstractNavigationAction
-		implements SpecialCommandLineSupport {
+public class ActionNumericDataReportComplete extends AbstractNavigationAction implements SpecialCommandLineSupport {
+	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
@@ -305,7 +304,6 @@ public class ActionNumericDataReportComplete
 						"createDiagrams.r",
 						"diagramIAP.cmd",
 						"diagramIAP.bat",
-						"initLinux.r",
 						"report.tex"
 				});
 			
