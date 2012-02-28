@@ -138,6 +138,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 							for (SubstanceInterface si : e)
 								for (ConditionInterface ci : si)
 									ci.setExperimentHeader(ehi);
+							e.numberConditions();
 							MyExperimentInfoPanel info = new MyExperimentInfoPanel();
 							info.setExperimentInfo(null, ehi, true, e);
 							mpc = new MainPanelComponent(info, true);
