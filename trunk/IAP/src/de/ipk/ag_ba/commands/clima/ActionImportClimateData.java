@@ -163,14 +163,14 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 		ehi.setRemark("Import at " + SystemAnalysis.getCurrentTime() + " by " + SystemAnalysis.getUserName());
 		e.setHeader(ehi);
 		
-		SubstanceInterface s = tm.getNewSubstance();
-		e.add(s);
-		s.setName("temp.air");
-		
 		{
+			SubstanceInterface s = tm.getNewSubstance();
+			e.add(s);
+			s.setName("temp.air.avg");
+			
 			ConditionInterface ci = tm.getNewCondition(s);
 			s.add(ci);
-			ci.setSpecies("avg");
+			ci.setSpecies("average");
 			
 			for (Date date : day2avg.keySet()) {
 				gc.setTime(date);
@@ -187,9 +187,13 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 			}
 		}
 		{
+			SubstanceInterface s = tm.getNewSubstance();
+			e.add(s);
+			s.setName("temp.air.min");
+			
 			ConditionInterface ci = tm.getNewCondition(s);
 			s.add(ci);
-			ci.setSpecies("min");
+			ci.setSpecies("minimum");
 			
 			for (Date date : day2avg.keySet()) {
 				gc.setTime(date);
@@ -206,9 +210,13 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 			}
 		}
 		{
+			SubstanceInterface s = tm.getNewSubstance();
+			e.add(s);
+			s.setName("temp.air.max");
+			
 			ConditionInterface ci = tm.getNewCondition(s);
 			s.add(ci);
-			ci.setSpecies("max");
+			ci.setSpecies("maximum");
 			
 			for (Date date : day2avg.keySet()) {
 				gc.setTime(date);

@@ -561,15 +561,13 @@ public class IAPservice {
 			}
 			GregorianCalendar gc = new GregorianCalendar();
 			for (SubstanceInterface substance : experiment) {
-				if (substance.getName() != null && substance.getName().equals("temp.air")) {
+				if (substance.getName() != null && substance.getName().equals("temp.air.avg")) {
 					for (ConditionInterface ci : substance) {
-						if (ci.getSpecies() != null && ci.getSpecies().equals("avg")) {
-							for (SampleInterface sa : ci) {
-								Long time = sa.getRowId();
-								if (time != null) {
-									double temp = sa.getSampleAverage().getValue();
-									timeDay2averageTemp.put(SystemAnalysis.getUnixDay(time, gc), temp - ggd_baseline);
-								}
+						for (SampleInterface sa : ci) {
+							Long time = sa.getRowId();
+							if (time != null) {
+								double temp = sa.getSampleAverage().getValue();
+								timeDay2averageTemp.put(SystemAnalysis.getUnixDay(time, gc), temp - ggd_baseline);
 							}
 						}
 					}
@@ -589,13 +587,13 @@ public class IAPservice {
 							if (s.getTimeUnit().equalsIgnoreCase("day") || s.getTimeUnit().equalsIgnoreCase("das")) {
 								long unixDay = SystemAnalysis.getUnixDay(time, gc);
 								double ggd = getGGD(unixDay - s.getTime(), unixDay, timeDay2averageTemp);
-								s.setTime((int) ggd);
+								s.setTime((int) Math.round(ggd));
 								s.setTimeUnit("GDD");
 							}
 							if (s.getTimeUnit().equalsIgnoreCase("unix day")) {
 								long unixDay = s.getTime();
 								double ggd = getGGD(unixDay, unixDay, timeDay2averageTemp);
-								s.setTime((int) ggd);
+								s.setTime((int) Math.round(ggd));
 								s.setTimeUnit("GDD");
 								
 							}
