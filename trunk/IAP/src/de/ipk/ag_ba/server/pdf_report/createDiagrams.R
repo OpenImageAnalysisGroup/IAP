@@ -55,7 +55,7 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 #		print("... German version")
 #		return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8", encoding="UTF-8"))
 	} else {
-		return("error")
+		return(NULL)
 	}
 }
 
@@ -1114,7 +1114,6 @@ getColor <- function(overallColorIndex, overallResult) {
 
 plotStackedImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, minor_breaks=TRUE, overallColor, overallDesName, imagesIndex, overallFileName) {
 	overallList$debug %debug% "plotStackedImage()"	
-		
 	if (length(overallResult[, 1]) > 0) {
 
 		if (length(overallList$stackedBarOptions$typOfGeomBar) == 0) {
@@ -1132,16 +1131,16 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 					plot = ggplot(overallResult, aes(xAxis, values, fill=hist)) +
 							geom_bar(stat="identity", position = positionType)
 				}
-				
+								
 				if (positionType == "dodge" || positionType == "stack") {
 					name = sub("%", "px", overallDesName[[imagesIndex]])
 				} else {
 					name = overallDesName[[imagesIndex]]
 				}
-				
+
 				 	plot = plot + ylab(name) 
 					#coord_cartesian(ylim=c(0, 1)) +
-				
+			
 			if (minor_breaks) {
 				plot = plot + scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(overallResult$xAxis):max(overallResult$xAxis))
 			} else {
@@ -1244,8 +1243,10 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 	for (imagesIndex in names(overallDescriptor)) {
 		createOuputOverview("stacked barplot", imagesIndex, length(names(overallDescriptor)))
 		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplotstacked")
-	
-		PreWorkForMakeBigOverallImage(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex)
+
+		if (length(overallResult[, 1]) > 0) {
+			PreWorkForMakeBigOverallImage(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex)
+		}
 		#PreWorkForMakeNormalImages(h, overallList)
 	}
 	#return(overallList)
@@ -1306,7 +1307,7 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 
 makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, options, overallList, diagramTypSave="boxplot") {	
 	overallList$debug %debug% "makeBoxplotDiagram()"
-	print("Create boxplot...")
+	print("create boxplot...")
 	tempOverallResult =  na.omit(overallResult)
 	
 	for (imagesIndex in names(overallDescriptor)) {
@@ -1390,11 +1391,11 @@ makeDiagrams <- function(overallList) {
 addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet) {
 	
 	addDescSet = character()
-	addDescSetNames = character()
-	i = 0
+	#addDescSetNames = character()
+	#i = 0
 	for (ds in descriptorSet_boxplotStacked) {
 		addCol = ""
-		addColDesc = ""
+		#addColDesc = ""
 		for (col in colnames(workingDataSet)) {	
 			if (nchar(ds)>5) {
 				last4chars = substr(col, nchar(ds)-4, nchar(ds))
@@ -1409,18 +1410,28 @@ addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotSta
 				}
 			}
 		}
-		i=i+1
-		addColDesc = descriptorSetName_boxplotStacked[i]
+		#i=i+1
+		#addColDesc = descriptorSetName_boxplotStacked[i]
 		if (nchar(addCol)>0) {
-			print(paste("Adding ", addCol, "with description", addColDesc))
+			#print(paste("Adding ", addCol, "with description", addColDesc))
 			addDescSet = c(addDescSet, addCol)
-			addDescSetNames = c(addDescSetNames, addColDesc)
+			#addDescSetNames = c(addDescSetNames, addColDesc)
 		}
 	}
-	descriptorSet_boxplotStacked = c(descriptorSet_boxplotStacked, addDescSet) 
-	descriptorSet_boxplotStacked = c(descriptorSet_boxplotStacked, addDescSetNames) 
+	descriptorSet_boxplotStacked = addDescSet
+	#descriptorSet_boxplotStacked = c(descriptorSet_boxplotStacked, addDescSetNames) 
 		
 	return(descriptorSet_boxplotStacked)
+}
+
+changeXAxisName <- function(overallList) {
+	
+	if(length(overallList$iniDataSet$Day..Int.) > 1 ){
+		day_int <- as.character(overallList$iniDataSet$Day..Int.[1])
+		day <- as.character(overallList$iniDataSet$Day[1])
+		overallList$xAxisName <- substr(day, 1, nchar(day)-(nchar(day_int)+1))
+	}
+	return(overallList)
 }
 
 
@@ -1506,9 +1517,13 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 		if (fileName != "error") {
 			workingDataSet = separation %readInputDataFile% fileName
+			descriptorSet_nBoxplot <- vector()
+			descriptorSet_boxplot <- vector()
+			descriptorSet_boxplotStacked <- vector()
 			
-			if (workingDataSet != "error") {
+			if (length(workingDataSet[,1]) > 0) {
 				#nboxplot
+
 				if (typOfStartOptions == "all") {
 					descriptorSet_nBoxplot = colnames(workingDataSet)
 					descriptorSetName_nBoxplot = descriptorSet
@@ -1643,12 +1658,11 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 													  "VIS HUE top ratio histogramm (%)")
 				
 				descriptorSet_boxplotStacked <- addDesSet(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet)
-															  
 				stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
 				#diagramTypVector = c(diagramTypVector, "boxplotStacked", "boxplotStacked")
 				
 				appendix = appendix %exists% args[3]
-				
+
 				if (appendix) {
 					blacklist = buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
 					descriptorSetAppendix = colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet), '%in%', blacklist))[, 1]])
@@ -1657,16 +1671,17 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				}
 			
 				saveFormat = saveFormat %exists% args[2]
-							
+			
 				listOfTreatAndFilterTreat = checkOfTreatments(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug)
 				treatment = listOfTreatAndFilterTreat[[1]][[1]]
 				secondTreatment = listOfTreatAndFilterTreat[[1]][[2]]
 				filterTreatment = listOfTreatAndFilterTreat[[2]][[1]]
 				filterSecondTreatment = listOfTreatAndFilterTreat[[2]][[2]]
-				
+
 				if(treatment == "noneTreatment") {
 					workingDataSet <- cbind(workingDataSet, noneTreatment=rep.int("average", times = length(workingDataSet[,1])))	
 				}
+
 			} else {
 				fileName = "error"
 			}
@@ -1745,6 +1760,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 	overallList = checkUserOfExperiment(overallList)
 	overallList = setSomePrintingOptions(overallList)
 	overallList = overallChangeName(overallList)
+	overallList = changeXAxisName(overallList)
 	overallList = overallPreprocessingOfDescriptor(overallList)
 	
 	if (!overallList$stoppTheCalculation) {
@@ -1769,5 +1785,5 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))
