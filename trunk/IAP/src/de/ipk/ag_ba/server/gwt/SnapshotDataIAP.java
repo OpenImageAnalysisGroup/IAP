@@ -422,8 +422,8 @@ public class SnapshotDataIAP {
 				(s.getWeightBefore() + s.getWeightOfWatering()) + "" : "");
 		if (position2store == null) {
 			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;
-			return "-720" + separator + s.getPlantId() + separator
-					+ s.getCondition() + separator
+			return "-720" + separator + replaceNull(s.getPlantId()) + separator
+					+ replaceNull(s.getCondition()) + separator
 					+ replaceNull(s.getSpecies()) + separator
 					+ replaceNull(s.getGenotype()) + separator
 					+ replaceNull(s.getVariety()) + separator
@@ -461,7 +461,7 @@ public class SnapshotDataIAP {
 					}
 				}
 				String res = enDe(numberFormat_deTrue_enFalse, angle + "") + separator +
-						s.getPlantId() + separator
+						replaceNull(s.getPlantId()) + separator
 						+ replaceNull(s.getCondition()) + separator
 						+ replaceNull(s.getSpecies()) + separator
 						+ replaceNull(s.getGenotype()) + separator

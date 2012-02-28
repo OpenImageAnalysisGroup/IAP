@@ -274,6 +274,7 @@ checkIfDescriptorIsNaOrAllZero <- function(descriptorVector, iniDataSet, isDescr
 	descriptorVector = as.vector(descriptorVector)
 	#descriptorVector = getVector(descriptorVector)
 	tempDescriptor = descriptorVector 
+	
 	if (isDescriptor) {
 		descriptorVector = descriptorVector[colSums(!is.na(iniDataSet[descriptorVector])) != 0 & colSums(iniDataSet[descriptorVector] *1, na.rm = TRUE) > 0]
 	} else {
@@ -1014,8 +1015,9 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "nboxplot")
 			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
 			overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
-
+			
 			if (length(overallResult[, 1]) > 0) {
+				
 				if (!CheckIfOneColumnHasOnlyValues(overallResult)) {
 
 					plot <-	ggplot(data=overallResult, aes(x=xAxis, y=mean, shape=name)) +
@@ -1234,13 +1236,13 @@ PreWorkForMakeNormalImages <- function(h, overallList) {
 
 makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList) {
 	overallList$debug %debug% "makeBoxplotStackedDiagram()"
-	print("Stacked Barplot...")
+	print("stacked barplot...")
 	#overallResult[is.na(overallResult)] = 0
 	tempOverallResult =  na.omit(overallResult)
 	#tempOverallResult = overallResult
 	
 	for (imagesIndex in names(overallDescriptor)) {
-		createOuputOverview("stacked Barplot", imagesIndex, length(names(overallDescriptor)))
+		createOuputOverview("stacked barplot", imagesIndex, length(names(overallDescriptor)))
 		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplotstacked")
 	
 		PreWorkForMakeBigOverallImage(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex)
