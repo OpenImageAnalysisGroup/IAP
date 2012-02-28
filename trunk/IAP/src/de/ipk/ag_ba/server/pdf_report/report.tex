@@ -21,6 +21,7 @@
 \usepackage[english]{babel} % Anpassung der Überschriften (chapter, chapitre, Kapitel …) und die richtige Silbentrennung
 \usepackage{hyperref}
 \usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{datetime}
 
 %%%%%%%%%%%%% Typografisch empfehlenswerte Pakete
 \usepackage{% 
@@ -91,19 +92,26 @@
 \newboolean{isFile1}
 \newboolean{isFile2}
 
-
-\newcommand{\checkFile}[2]{
+\newcommand{\resetBoolean}{
 	\setboolean{isFile1}{false}
 	\setboolean{isFile2}{false}
-	\IfFileExists{#1}{\setboolean{isFile1}{true}}{}
-	\IfFileExists{#2}{\setboolean{isFile2}{true}}{}
 	}
-	
+
 \newcommand{\checkFileNoReset}[2]{
 	\IfFileExists{#1}{\setboolean{isFile1}{true}}{}
 	\IfFileExists{#2}{\setboolean{isFile2}{true}}{}
 	}
+
+\newcommand{\checkFile}[2]{
+	\resetBoolean
+	\checkFileNoReset{#1}{#2}
+	%\setboolean{isFile1}{false}
+	%\setboolean{isFile2}{false}
+	%\IfFileExists{#1}{\setboolean{isFile1}{true}}{}
+	%\IfFileExists{#2}{\setboolean{isFile2}{true}}{}
+	}
 	
+
 
 % \newenvironment{OwnLoadImage}
 %   {\par\raggedbottom\null\vfill\noindent\minipage{\textwidth}\centering}
@@ -127,7 +135,8 @@
 \title{Experiment --experimentname--}
 \author{Research Group Image Analysis\tabularnewline \tabularnewline
 IPK-Gatersleben\tabularnewline \tabularnewline C. Klukas \& A. Entzian}
-\date{\today}
+
+\date{\today ~(\currenttime )}
 
 \maketitle
 \thispagestyle{empty}  
@@ -197,326 +206,382 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \hline 
 \end{tabular}
 
-\clearpage
-\section{\noindent Weight and water consumption}
 
-
-\checkFile{Weight_A__g_nboxplot.pdf}{Weight_B__g_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\subsection{Weights (before and after watering)}
-	\begin{itemize}
-	\item Weight before and after watering.
-	\item Colnum name: Weight A (g), Weight B (g)
-	\item Unit: g
-	\end{itemize}
-	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{Weight_A__g_nboxplot.pdf}
-	}{}
-	\ifthenelse{\boolean{isFile2}}{
-		\loadImage{Weight_B__g_nboxplot.pdf}
-	}{}
-}{}
-
-
-\checkFile{Water__weight_diff_nboxplot.pdf}{}
+\resetBoolean
+\checkFileNoReset{Weight_A__g_nboxplot.pdf}{}
+\checkFileNoReset{Weight_B__g_nboxplot.pdf}{}
+\checkFileNoReset{Water__weight_diff_nboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
-	\subsection{Watering amounts / consumption}
-	\begin{itemize}
-	\item Consumption of water based of weight measurments.
-	\item Colnum name: Watering (weight-diff)
-	\item Unit: g
-	\end{itemize}
-	\loadImage{Water__weight_diff_nboxplot.pdf}
-}{}
 
-
-\clearpage
-\section{\noindent Digital biomass}
-\begin{itemize}
-\item Digital Biomass based on the side.area and top.area
-\item Unit: $pixel^2$
-\end{itemize}
-
-\checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\subsection{IAP formula}
-	\begin{itemize}
-	\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
-	\item Column name: volume.iap
-	\end{itemize}
+	\clearpage
+	\section{\noindent Weight and water consumption}
+		
+	\checkFile{Weight_A__g_nboxplot.pdf}{Weight_B__g_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\subsection{Weights (before and after watering)}
+		\begin{itemize}
+		\item Weight before and after watering.
+		\item Colnum name: Weight A (g), Weight B (g)
+		\item Unit: g
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{Weight_A__g_nboxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{Weight_B__g_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{Water__weight_diff_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{volume_iap__px3_boxplot.pdf}
-	}{}
-	\ifthenelse{\boolean{isFile2}}{
-		\loadImage{volume_iap__px3_nboxplot.pdf}
-	}{}
-}{}
-
-
-\checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\clearpage
-	\subsection{LemnaTec formula}
-	\begin{itemize}
-	\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
-	\item Column name: volume.lt
-	\end{itemize}
-	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{volume_lt__px3_boxplot.pdf}
-	}{}
-	\ifthenelse{\boolean{isFile2}}{
-		\loadImage{volume_lt__px3_nboxplot.pdf}
+		\subsection{Watering amounts / consumption}
+		\begin{itemize}
+		\item Consumption of water based of weight measurments.
+		\item Colnum name: Watering (weight-diff)
+		\item Unit: g
+		\end{itemize}
+		\loadImage{Water__weight_diff_nboxplot.pdf}
 	}{}
 }{}
 
 
-\checkFile{digital_biomass_keygene_normnboxplot.pdf}{}
+\resetBoolean
+\checkFileNoReset{volume_iap__px3_boxplot.pdf}{}
+\checkFileNoReset{volume_iap__px3_nboxplot.pdf}{}
+\checkFileNoReset{volume_iap__px3_boxplot.pdf}{}
+\checkFileNoReset{volume_iap__px3_nboxplot.pdf}{}
+\checkFileNoReset{digital_biomass_keygene_normnboxplot.pdf}{}
+\checkFileNoReset{volume_iap_wuenboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{KeyGene formula}
-	\begin{itemize}
-	\item Equation: $Biomass_{KeyGene}=side.area_{0^{\circ}}+side.area_{90^{\circ}}+\log(\frac{top.area}{3})$
-	\item Column name: digital.biomass.keygene.norm
-	\end{itemize}
-	\loadImage{digital_biomass_keygene_normnboxplot.pdf}
-}{}
 
-
-\checkFile{volume_iap_wuenboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
 	\clearpage
-	\section{\noindent Water use efficiency}
+	\section{\noindent Digital biomass}
 	\begin{itemize}
-	\item Ratio of plant growth and water use.
+	\item Digital Biomass based on the side.area and top.area
+	\item Unit: $pixel^2$
 	\end{itemize}
 	
-	\subsection{Based on digital biomass}
-	\begin{itemize}
-	\item Growth per day divided by water usage per day.
-	\item Colnum name: volume.iap.wue
-	\item Unit: .
-	\end{itemize}
-	\loadImage{volume_iap_wuenboxplot.pdf}
-}{}
-
-\clearpage
-\section{General growth related plant properties}
-
-\checkFile{side_height__mm_boxplot.pdf}{side_height__mm_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\subsection{Height}
-	\begin{itemize}
-	\item Plant height (px)
-	\item Column name: side.height
-	\item Unit: px
-	\end{itemize}
+	\checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\subsection{IAP formula}
+		\begin{itemize}
+		\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
+		\item Column name: volume.iap
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{volume_iap__px3_boxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{volume_iap__px3_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\clearpage
+		\subsection{LemnaTec formula}
+		\begin{itemize}
+		\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
+		\item Column name: volume.lt
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{volume_lt__px3_boxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{volume_lt__px3_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{digital_biomass_keygene_normnboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{side_height__mm_boxplot.pdf}
+		\clearpage
+		\subsection{KeyGene formula}
+		\begin{itemize}
+		\item Equation: $Biomass_{KeyGene}=side.area_{0^{\circ}}+side.area_{90^{\circ}}+\log(\frac{top.area}{3})$
+		\item Column name: digital.biomass.keygene.norm
+		\end{itemize}
+		\loadImage{digital_biomass_keygene_normnboxplot.pdf}
 	}{}
-	\ifthenelse{\boolean{isFile2}}{
-		\loadImage{side_height__mm_nboxplot.pdf}
-	}{}
-}{}
-
-
-\checkFile{side_height_norm__mm_boxplot.pdf}{side_height_norm__mm_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\clearpage
-	\subsection{Height (zoom corrected)}
-	\begin{itemize}
-	\item Plant height (mm) (normalized to distance of left and right marker)
-	\item Column name: side.height.norm
-	\item Unit: mm
-	\end{itemize}
+	
+	
+	\checkFile{volume_iap_wuenboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{side_height_norm__mm_boxplot.pdf}
-	}{}	
-	\ifthenelse{\boolean{isFile2}}{	
-		\loadImage{side_height_norm__mm_nboxplot.pdf}
+		\clearpage
+		\section{\noindent Water use efficiency}
+		\begin{itemize}
+		\item Ratio of plant growth and water use.
+		\end{itemize}
+		
+		\subsection{Based on digital biomass}
+		\begin{itemize}
+		\item Growth per day divided by water usage per day.
+		\item Colnum name: volume.iap.wue
+		\item Unit: .
+		\end{itemize}
+		\loadImage{volume_iap_wuenboxplot.pdf}
 	}{}
 }{}
 
 
-\checkFile{side_width__mm_boxplot.pdf}{side_width__mm_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+\resetBoolean
+\checkFileNoReset{side_height__mm_boxplot.pdf}{}
+\checkFileNoReset{side_height__mm_nboxplot.pdf}{}
+\checkFileNoReset{side_height_norm__mm_boxplot.pdf}{}
+\checkFileNoReset{side_height_norm__mm_nboxplot.pdf}{}
+\checkFileNoReset{side_width__mm_boxplot.pdf}{}
+\checkFileNoReset{side_width__mm_nboxplot.pdf}{}
+\checkFileNoReset{side_width_norm__mm_boxplot.pdf}{}
+\checkFileNoReset{side_width_norm__mm_nboxplot.pdf}{}
+\checkFileNoReset{side_area__px_boxplot.pdf}{}
+\checkFileNoReset{side_area__px_nboxplot.pdf}{}
+\checkFileNoReset{side_area_norm__mm2_boxplot.pdf}{}
+\checkFileNoReset{side_area_norm__mm2_nboxplot.pdf}{}
+\checkFileNoReset{top_area__px_boxplot.pdf}{}
+\checkFileNoReset{top_area__px_nboxplot.pdf}{}
+\checkFileNoReset{top_area_norm__mm2_nboxplot.pdf}{}
+\ifthenelse{\boolean{isFile1}}{
+
 	\clearpage
-	\subsection{Width}
-	\begin{itemize}
-	\item Plant width (px) 
-	\item Column name: side.width
-	\item Unit: px
-	\end{itemize}
+	\section{General growth related plant properties}
+	
+	\checkFile{side_height__mm_boxplot.pdf}{side_height__mm_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\subsection{Height}
+		\begin{itemize}
+		\item Plant height (px)
+		\item Column name: side.height
+		\item Unit: px
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{side_height__mm_boxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{side_height__mm_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{side_height_norm__mm_boxplot.pdf}{side_height_norm__mm_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\clearpage
+		\subsection{Height (zoom corrected)}
+		\begin{itemize}
+		\item Plant height (mm) (normalized to distance of left and right marker)
+		\item Column name: side.height.norm
+		\item Unit: mm
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{side_height_norm__mm_boxplot.pdf}
+		}{}	
+		\ifthenelse{\boolean{isFile2}}{	
+			\loadImage{side_height_norm__mm_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{side_width__mm_boxplot.pdf}{side_width__mm_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\clearpage
+		\subsection{Width}
+		\begin{itemize}
+		\item Plant width (px) 
+		\item Column name: side.width
+		\item Unit: px
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{side_width__mm_boxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{	
+			\loadImage{side_width__mm_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{side_width_norm__mm_boxplot.pdf}{side_width_norm__mm_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\clearpage
+		\subsection{Width (zoom corrected)}
+		\begin{itemize}
+		\item Plant width (mm) (normalized to distance of left and right marker) 
+		\item Column name: side.width.norm
+		\item Unit: mm
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{side_width_norm__mm_boxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{	
+			\loadImage{side_width_norm__mm_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{side_area__px_boxplot.pdf}{side_area__px_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\clearpage
+		\subsection{Projected side area}
+		\begin{itemize}
+		\item Number of foreground pixels
+		\item Colum name: side.area
+		\item Unit: px
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{side_area__px_boxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{side_area__px_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{side_area_norm__mm2_boxplot.pdf}{side_area_norm__mm2_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\clearpage
+		\subsection{Projected side area (zoom corrected)}
+		\begin{itemize}
+		\item Number of foreground pixels from side camera (normalized to distance of left and right marker)
+		\item Colum name: side.area.norm
+		\item Unit: $mm^2$
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{side_area_norm__mm2_boxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{side_area_norm__mm2_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{top_area__px_boxplot.pdf}{top_area__px_nboxplot.pdf}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\clearpage
+		\subsection{Projected top area}
+		\begin{itemize}
+		\item Number of foreground pixels
+		\item Colum name: top.area
+		\item Unit: px
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{top_area__px_boxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{top_area__px_nboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\checkFile{top_area_norm__mm2_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{side_width__mm_boxplot.pdf}
-	}{}
-	\ifthenelse{\boolean{isFile2}}{	
-		\loadImage{side_width__mm_nboxplot.pdf}
+		\clearpage
+		\subsection{Projected top area (zoom corrected)}
+		\begin{itemize}
+		\item Number of foreground pixels from top camera (normalized to distance of left and right marker)
+		\item Colum name: top.area.norm
+		\item Unit: $mm^2$
+		\end{itemize}
+		\loadImage{top_area_norm__mm2_nboxplot.pdf}
 	}{}
 }{}
 
 
-\checkFile{side_width_norm__mm_boxplot.pdf}{side_width_norm__mm_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+\resetBoolean
+\checkFileNoReset{side_area_relativenboxplot.pdf}{}
+\checkFileNoReset{side_height_norm_relativenboxplot.pdf}{}
+\checkFileNoReset{side_width_norm_relativenboxplot.pdf}{}
+\checkFileNoReset{top_area_relativenboxplot.pdf}{}
+\checkFileNoReset{side_area_relativenboxplot.pdf}{}
+\checkFileNoReset{volume_iap_relativenboxplot.pdf}{}
+\ifthenelse{\boolean{isFile1}}{
+
 	\clearpage
-	\subsection{Width (zoom corrected)}
+	\section{\noindent Relative changes per day}
 	\begin{itemize}
-	\item Plant width (mm) (normalized to distance of left and right marker) 
-	\item Column name: side.width.norm
-	\item Unit: mm
+	\item Presented values in relative dependence.
+	\item Unit: \%
 	\end{itemize}
+	
+	
+	\checkFile{side_area_relativenboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{side_width_norm__mm_boxplot.pdf}
+		\subsection{Projected side area}
+		\begin{itemize}
+		\item Relative growth of number of foreground pixels from side camera
+		\item Colnum name: side.area.relative
+		\end{itemize}
+		\loadImage{side_area_relativenboxplot.pdf}
 	}{}
-	\ifthenelse{\boolean{isFile2}}{	
-		\loadImage{side_width_norm__mm_nboxplot.pdf}
-	}{}
-}{}
-
-
-\checkFile{side_area__px_boxplot.pdf}{side_area__px_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\clearpage
-	\subsection{Projected side area}
-	\begin{itemize}
-	\item Number of foreground pixels
-	\item Colum name: side.area
-	\item Unit: px
-	\end{itemize}
+	
+	
+	\checkFile{side_height_norm_relativenboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{side_area__px_boxplot.pdf}
+		\clearpage
+		\subsection{Height}
+		\begin{itemize}
+		\item Relative growth of plant height in percent (normalized to distance of left and right marker)
+		\item Colnum name: side.height.norm.relative
+		\end{itemize}
+		\loadImage{side_height_norm_relativenboxplot.pdf}
 	}{}
-	\ifthenelse{\boolean{isFile2}}{
-		\loadImage{side_area__px_nboxplot.pdf}
-	}{}
-}{}
-
-
-\checkFile{side_area_norm__mm2_boxplot.pdf}{side_area_norm__mm2_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\clearpage
-	\subsection{Projected side area (zoom corrected)}
-	\begin{itemize}
-	\item Number of foreground pixels from side camera (normalized to distance of left and right marker)
-	\item Colum name: side.area.norm
-	\item Unit: $mm^2$
-	\end{itemize}
+	
+	
+	\checkFile{side_width_norm_relativenboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{side_area_norm__mm2_boxplot.pdf}
+		\clearpage
+		\subsection{Width}
+		\begin{itemize}
+		\item Relative plant width growth in percent (normalized to distance of left and right marker) 
+		\item Colnum name: side.width.norm.relative
+		\end{itemize}
+		\loadImage{side_width_norm_relativenboxplot.pdf}
 	}{}
-	\ifthenelse{\boolean{isFile2}}{
-		\loadImage{side_area_norm__mm2_nboxplot.pdf}
-	}{}
-}{}
-
-
-\checkFile{top_area__px_boxplot.pdf}{top_area__px_nboxplot.pdf}
-\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	\clearpage
-	\subsection{Projected top area}
-	\begin{itemize}
-	\item Number of foreground pixels
-	\item Colum name: top.area
-	\item Unit: px
-	\end{itemize}
+	
+	\checkFile{top_area_relativenboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\loadImage{top_area__px_boxplot.pdf}
+		\clearpage
+		\subsection{Projected top area}
+		\begin{itemize}
+		\item Relative growth of number of foreground pixels from top camera
+		\item Colnum name: top.area.relative
+		\end{itemize}
+		\loadImage{top_area_relativenboxplot.pdf}
 	}{}
-	\ifthenelse{\boolean{isFile2}}{
-		\loadImage{top_area__px_nboxplot.pdf}
+	
+	
+	\checkFile{side_area_relativenboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\clearpage
+		\subsection{Projected side area}
+		\begin{itemize}
+		\item Relative growth of number of foreground pixels from side camera
+		\item Colnum name: side.area.relative
+		\end{itemize}
+		\loadImage{side_area_relativenboxplot.pdf}
+	}{}
+	
+	\checkFile{volume_iap_relativenboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\clearpage
+		\subsection{Digital biomass (IAP formula)}
+		\begin{itemize}
+		\item Digital biomass growth in percent (per day) based on the side.area and top.area observed from the visible light camera.
+		\item Colnum name: volume.iap.relative
+		\end{itemize}
+		\loadImage{volume_iap_relativenboxplot.pdf}
 	}{}
 }{}
 
+\resetBoolean
+\checkFileNoReset{side_area_relativenboxplot.pdf}{}
+\checkFileNoReset{side_height_norm_relativenboxplot.pdf}{}
+\checkFileNoReset{side_width_norm_relativenboxplot.pdf}{}
+\checkFileNoReset{top_area_relativenboxplot.pdf}{}
+\checkFileNoReset{side_area_relativenboxplot.pdf}{}
+\checkFileNoReset{volume_iap_relativenboxplot.pdf}{}
+%\ifthenelse{\boolean{isFile1}}{
 
-\checkFile{top_area_norm__mm2_nboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{Projected top area (zoom corrected)}
-	\begin{itemize}
-	\item Number of foreground pixels from top camera (normalized to distance of left and right marker)
-	\item Colum name: top.area.norm
-	\item Unit: $mm^2$
-	\end{itemize}
-	\loadImage{top_area_norm__mm2_nboxplot.pdf}
-}{}
-
-\clearpage
-\section{\noindent Relative changes per day}
-\begin{itemize}
-\item Presented values in relative dependence.
-\item Unit: \%
-\end{itemize}
-
-
-\checkFile{side_area_relativenboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\subsection{Projected side area}
-	\begin{itemize}
-	\item Relative growth of number of foreground pixels from side camera
-	\item Colnum name: side.area.relative
-	\end{itemize}
-	\loadImage{side_area_relativenboxplot.pdf}
-}{}
-
-
-\checkFile{side_height_norm_relativenboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{Height}
-	\begin{itemize}
-	\item Relative growth of plant height in percent (normalized to distance of left and right marker)
-	\item Colnum name: side.height.norm.relative
-	\end{itemize}
-	\loadImage{side_height_norm_relativenboxplot.pdf}
-}{}
-
-
-\checkFile{side_width_norm_relativenboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{Width}
-	\begin{itemize}
-	\item Relative plant width growth in percent (normalized to distance of left and right marker) 
-	\item Colnum name: side.width.norm.relative
-	\end{itemize}
-	\loadImage{side_width_norm_relativenboxplot.pdf}
-}{}
-
-\checkFile{top_area_relativenboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{Projected top area}
-	\begin{itemize}
-	\item Relative growth of number of foreground pixels from top camera
-	\item Colnum name: top.area.relative
-	\end{itemize}
-	\loadImage{top_area_relativenboxplot.pdf}
-}{}
-
-
-\checkFile{side_area_relativenboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{Projected side area}
-	\begin{itemize}
-	\item Relative growth of number of foreground pixels from side camera
-	\item Colnum name: side.area.relative
-	\end{itemize}
-	\loadImage{side_area_relativenboxplot.pdf}
-}{}
-
-\checkFile{volume_iap_relativenboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\clearpage
-	\subsection{Digital biomass (IAP formula)}
-	\begin{itemize}
-	\item Digital biomass growth in percent (per day) based on the side.area and top.area observed from the visible light camera.
-	\item Colnum name: volume.iap.relative
-	\end{itemize}
-	\loadImage{volume_iap_relativenboxplot.pdf}
-}{}
-
-
-\checkFile{side_vis_hue_histogram_ratio_bin_1_0_25_side_vis_hue_histogram_ratio_bstackedOverallImage.tex}{top_vis_hue_histogram_ratio_bin_1_0_25_top_vis_hue_histogram_ratio_binstackedOverallImage.tex}
+\checkFile{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 	\clearpage
 	\section{Visible light color histogram}
@@ -526,29 +591,29 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	
 		Visible hue histogram for side view:
 	
-		\loadTex{side_vis_hue_histogram_ratio_bin_1_0_25_side_vis_hue_histogram_ratio_bstackedOverallImage}
+		\loadTex{side_vis_hue_histogram_ratio_bin_stackedOverallImage}
 	}{}	
 	\ifthenelse{\boolean{isFile2}}{
 	
 		Visible hue histogram for top view:
 		
-		\loadTex{top_vis_hue_histogram_ratio_bin_1_0_25_top_vis_hue_histogram_ratio_binstackedOverallImage}
+		\loadTex{top_vis_hue_histogram_ratio_bin_stackedOverallImage}
 	}{}
 }{}
 
 
-\checkFile{side_vis_normalized_histogram_ratio_bin_1_0_25_side_vis_normalized_his.tex}{}
+\checkFile{side_vis_normalized_histogram_ratio_bin_.tex}{}
 \ifthenelse{\boolean{isFile1}}{
 	\clearpage
 	\subsection{Color histogram (zoom corrected)}
 
 	Visible hue histogram (zoom corrected) for side view:
 
-	\loadTex{side_vis_normalized_histogram_ratio_bin_1_0_25_side_vis_normalized_his}
+	\loadTex{side_vis_normalized_histogram_ratio_bin_}
 	}{}
 
 
-\checkFile{side_fluo_histogram_bin_1_0_25_side_fluo_histogram_bin_2_25_51_side_flstackedOverallImage.tex}{top_fluo_histogram_bin_1_0_25_top_fluo_histogram_bin_2_25_51_top_fluo_stackedOverallImage.tex}
+\checkFile{side_fluo_histogram_bin_stackedOverallImage.tex}{top_fluo_histogram_bin_stackedOverallImage.tex}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 	\clearpage
 	\section{Fluorescence activity histogram}
@@ -561,18 +626,18 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	
 		Fluorescence activity distribution for side view:
 	
-		\loadTex{side_fluo_histogram_bin_1_0_25_side_fluo_histogram_bin_2_25_51_side_flstackedOverallImage}
+		\loadTex{side_fluo_histogram_bin_stackedOverallImage}
 	}{}
 	\ifthenelse{\boolean{isFile2}}{
 	
 		Fluorescence activity distribution for top view:
 		
-		\loadTex{top_fluo_histogram_bin_1_0_25_top_fluo_histogram_bin_2_25_51_top_fluo_stackedOverallImage}
+		\loadTex{top_fluo_histogram_bin_stackedOverallImage}
 	}{}
 }{}
 
 
-\checkFile{side_fluo_normalized_histogram_bin_1_0_25_side_fluo_normalized_histogrstackedOverallImage.pdf}{}
+\checkFile{side_fluo_normalized_histogram_bin_stackedOverallImage.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
 	\clearpage
 	\subsection{Fluorescence spectra (zoom corrected)}
@@ -582,7 +647,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	
 	Fluorescence activity distribution (zoom corrected) for side view:
 	
-	\loadTex{side_fluo_normalized_histogram_bin_1_0_25_side_fluo_normalized_histogrstackedOverallImage}
+	\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
 }{}
 
 %\checkFile{side_fluo_histogram_ratio_bin_1_0_25_side_fluo_histogram_ratio_bin_2_2stackedOverallImage.tex}{top_fluo_histogram_ratio_bin_1_0_25_top_fluo_histogram_ratio_bin_2_25_stackedOverallImage.tex}
@@ -617,7 +682,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \section{Near-infrared intensity histogram}
 
 
-\checkFile{side_nir_histogram_bin_1_0_25_side_nir_histogram_bin_2_25_51_side_nhisstackedOverallImage.tex}{top_nir_histogram_bin_1_0_25_top_nir_histogram_bin_2_25_51_top_nir_hisstackedOverallImage.tex}
+\checkFile{side_nir_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}
 \ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 	\subsection{Intensity histogram}
 	\begin{itemize}
@@ -628,18 +693,18 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	
 		NIR intensity distribution for side view:
 	
-		\loadTex{side_nir_histogram_bin_1_0_25_side_nir_histogram_bin_2_25_51_side_nhisstackedOverallImage}
+		\loadTex{side_nir_histogram_bin_stackedOverallImage}
 	}{}
 	\ifthenelse{\boolean{isFile2}}{
 	
 		NIR intensity distribution for top view:
 	
-		\loadTex{top_nir_histogram_bin_1_0_25_top_nir_histogram_bin_2_25_51_top_nir_hisstackedOverallImage}
+		\loadTex{top_nir_histogram_bin_stackedOverallImage}
 	}{}
 }{}
 
 
-\checkFile{side_nir_normalized_histogram_bin_1_0_25_side_nir_normalized_histogramstackedOverallImage.tex}{}
+\checkFile{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
 \ifthenelse{\boolean{isFile1}}{
 	\clearpage
 	\subsection{Intensity histogram (zoom corrected)}
@@ -650,60 +715,63 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	
 	NIR intensity distribution for side view (zoom corrected):
 	
-	\loadTex{side_nir_normalized_histogram_bin_1_0_25_side_nir_normalized_histogramstackedOverallImage}
+	\loadTex{side_nir_normalized_histogram_bin_stackedOverallImage}
 }{}
 
-
-\checkFile{side_leaf_count_median__leafs_nboxplot.pdf}{}
+\resetBoolean
+\checkFileNoReset{side_leaf_count_median__leafs_nboxplot.pdf}{}
 \checkFileNoReset{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}
 \checkFileNoReset{side_bloom_count__tassel_nboxplot.pdf}{}
-
-\ifthenelse{\boolean{isFile1}}{
-\clearpage
-\section{Plant structures}
-}{}
-
-% http://upload.wikimedia.org/wikipedia/commons/9/98/Maize_plant_diagram.svg
-
-\checkFile{side_leaf_count_median__leafs_nboxplot.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
-	\subsection{Number of leafs}
-	\begin{itemize}
-	\item Number of leafs-tips
-	\item Colum name: side.leaf.count.median
-	\item Unit: leafs
-	\item Hint: leaf-tips are shown as red retangles in the image
-	\end{itemize}
-	\loadImage{side_leaf_count_median__leafs_nboxplot.pdf}
-}{}
-
-
-\checkFile{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
 	\clearpage
-	\subsection{Leaf lengths}
-	\begin{itemize}
-	\item Length of all leafs plus stem
-	\item Column name: side.leaf.length.sum.norm.max
-	\item Unit: mm
-	\item Hint: the yellow line in the image
-	\end{itemize}
-	\loadImage{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}
+	\section{Plant structures}
+
+
+	% http://upload.wikimedia.org/wikipedia/commons/9/98/Maize_plant_diagram.svg
+	
+	\checkFile{side_leaf_count_median__leafs_nboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\subsection{Number of leafs}
+		\begin{itemize}
+		\item Number of leafs-tips
+		\item Colum name: side.leaf.count.median
+		\item Unit: leafs
+		\item Hint: leaf-tips are shown as red retangles in the image
+		\end{itemize}
+		\loadImage{side_leaf_count_median__leafs_nboxplot.pdf}
+	}{}
+	
+	
+	\checkFile{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\clearpage
+		\subsection{Leaf lengths}
+		\begin{itemize}
+		\item Length of all leafs plus stem
+		\item Column name: side.leaf.length.sum.norm.max
+		\item Unit: mm
+		\item Hint: the yellow line in the image
+		\end{itemize}
+		\loadImage{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}
+	}{}
+	
+	
+	\checkFile{side_bloom_count__tassel_nboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\clearpage	
+		\subsection{Flower detection}
+		\begin{itemize}
+		\item Number of tassel florets
+		\item Colum name: side.bloom.count
+		\item Hint: the number of blue retangles in the image
+		\end{itemize}
+		\loadImage{side_bloom_count__tassel_nboxplot.pdf}
+	}{}
+
 }{}
 
-
-\checkFile{side_bloom_count__tassel_nboxplot.pdf}{}
+\checkFile{side_nir_wetness_average__percent_.pdf}{}
 \ifthenelse{\boolean{isFile1}}{
-	\clearpage	
-	\subsection{Flower detection}
-	\begin{itemize}
-	\item Number of tassel florets
-	\item Colum name: side.bloom.count
-	\item Hint: the number of blue retangles in the image
-	\end{itemize}
-	\loadImage{side_bloom_count__tassel_nboxplot.pdf}
-}{}
-
 \clearpage
 \section{\noindent Wetness}
 
@@ -711,8 +779,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \item Near-infrared analysis
 \end{itemize}
 
-\checkFile{side_nir_wetness_average__percent_.pdf}{}
-\ifthenelse{\boolean{isFile1}}{
+
 	\subsection{Average wetness of side image}
 	\begin{itemize}
 	\item Average wetness of the plants from NIR side camera
