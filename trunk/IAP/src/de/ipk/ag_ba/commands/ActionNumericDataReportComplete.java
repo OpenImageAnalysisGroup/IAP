@@ -90,12 +90,13 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 		}
 		while (res.size() < 2)
 			res.add("none");
+		while (res.size() > 2)
+			res.remove(2);
 		if (appendix)
 			res.add("TRUE");
 		else
 			res.add("FALSE");
-		if (res.size() != 3)
-			System.out.println("WARNING: " + res.size());
+		
 		return res.toArray(new String[] {});
 	}
 	
