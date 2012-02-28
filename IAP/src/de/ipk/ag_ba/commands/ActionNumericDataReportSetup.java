@@ -110,11 +110,11 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 					appendix = tso.getBval(0, false);
 				else {
 					if (tso.getBval(0, false)) {
-						if (settings.size() >= 2) {
-							settingsTsos.get(0).setBval(0, false);
-							settingsTsos.remove(0);
-							settings.remove(0);
-						}
+						// if (settings.size() >= 2) {
+						// settingsTsos.get(0).setBval(0, false);
+						// settingsTsos.remove(0);
+						// settings.remove(0);
+						// }
 						settings.add((String) tso.getParam(0, ""));
 						settingsTsos.add(tso);
 					}
