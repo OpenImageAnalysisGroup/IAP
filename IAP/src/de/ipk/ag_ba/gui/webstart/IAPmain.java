@@ -388,7 +388,7 @@ public class IAPmain extends JApplet {
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
 					return false;
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
-					return false;
+					return true;
 			}
 		} else {
 			// these may be changed for interactive applet version !!!
