@@ -228,7 +228,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	if (sum(!is.na(overallList$nBoxDes)) > 0) {
 		if (overallList$debug) {print(paste(length(overallList$nBoxDes), "nBoxplots..."))}
 		for (n in 1:length(overallList$nBoxDes)) {
-			if (!is.na(overallList$nBoxDes[[n]][1])) {
+			if (!is.na(overallList$nBoxDes[[n]])) {
 				overallList$nBoxDes[n] = checkIfDescriptorIsNaOrAllZero(overallList$nBoxDes[[n]], overallList$iniDataSet)
 			}
 		}
@@ -240,7 +240,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	if (sum(!is.na(overallList$boxDes)) > 0) {
 		if (overallList$debug) {print(paste(length(overallList$boxDes), "Boxplots..."))}
 		for (n in 1:length(overallList$boxDes)) {
-			if (!is.na(overallList$boxDes[[n]][1])) {
+			if (!is.na(overallList$boxDes[[n]])) {
 				overallList$boxDes[[n]] = checkIfDescriptorIsNaOrAllZero(overallList$boxDes[[n]], overallList$iniDataSet)
 			}
 		}
@@ -252,7 +252,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	if (sum(!is.na(overallList$boxStackDes)) > 0) {
 		if (overallList$debug) {print(paste(length(overallList$boxStackDes), "stacked boxplots..."))}
 		for (n in 1:length(overallList$boxStackDes)) {
-			if (!is.na(overallList$boxStackDes[[n]][1])) {
+			if (!is.na(overallList$boxStackDes[[n]])) {
 				overallList$boxStackDes[[n]] = checkIfDescriptorIsNaOrAllZero(overallList$boxStackDes[[n]], overallList$iniDataSet)
 			}
 		}
@@ -998,8 +998,8 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 	return(workingDataSet)	
 }
 
-createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
-	print(paste("create ", typ, " ", actualImage, "/", maxImage, ": '",imageName, "'", sep=""))
+createOuputOverview <- function(typ, actualImage, maxImage) {
+	print(paste("Create ", typ, " ", actualImage, "/", maxImage, sep=""))
 }
 
 makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot") {
@@ -1011,7 +1011,7 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]])) {
-			createOuputOverview("line plot", imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
+			createOuputOverview("line plot", imagesIndex, length(names(overallDescriptor)))
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "nboxplot")
 			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
 			overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
@@ -1241,7 +1241,7 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 	#tempOverallResult = overallResult
 	
 	for (imagesIndex in names(overallDescriptor)) {
-		createOuputOverview("stacked barplot", imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
+		createOuputOverview("stacked barplot", imagesIndex, length(names(overallDescriptor)))
 		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplotstacked")
 
 		if (length(overallResult[, 1]) > 0) {
@@ -1312,8 +1312,8 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 	
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]])) {
-			#print(paste("Process ", overallDesName[[imagesIndex]]))
-			createOuputOverview("boxplot", imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
+			print(paste("Process ", overallDesName[[imagesIndex]]))
+			createOuputOverview("boxplot", imagesIndex, length(names(overallDescriptor)))
 			
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
 			if (length(overallResult[, 1]) > 0) {
@@ -1418,14 +1418,10 @@ addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotSta
 			#addDescSetNames = c(addDescSetNames, addColDesc)
 		}
 	}
-	
-	if(length(addDescSet) > 0) {
-		return(addDescSet)
-	} else {
-		return(descriptorSet_boxplotStacked)
-	}
-	#descriptorSet_boxplotStacked = c(descriptorSet_boxplotStacked, addDescSetNames) 	
-	#return(descriptorSet_boxplotStacked)
+	descriptorSet_boxplotStacked = addDescSet
+	#descriptorSet_boxplotStacked = c(descriptorSet_boxplotStacked, addDescSetNames) 
+		
+	return(descriptorSet_boxplotStacked)
 }
 
 changeXAxisName <- function(overallList) {
@@ -1473,21 +1469,10 @@ initRfunction <- function(DEBUG = FALSE) {
 			#sink(file=NULL);		
 			#q()
 		}))
-		options(show.error.messages = TRUE)
-		#options(showWarnCalls = TRUE)
-		#options(showErrorCalls = TRUE)
-		options(warn = 0)
 	} else {	
 		options(error = NULL)
-		#options(showWarnCalls = FALSE)
-		#options(showErrorCalls = FALSE)
-		options(warn = -1)
-		options(show.error.messages = FALSE)
 	}
-	if(memory.limit() < 3500) {
-		memory.limit(size=3500)
-	}
-	
+	memory.limit(size=3500)
 	while(!is.null(dev.list())) {
 		dev.off()
 	}
@@ -1744,10 +1729,6 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		print("No filename or no descriptor!")
 		checkIfAllNecessaryFilesAreThere()
 	}
-	
-	if(debug) {
-		print(warnings())
-	}
 }
 
 createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false", 
@@ -1804,5 +1785,5 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))
