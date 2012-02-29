@@ -6,6 +6,7 @@
         <jar destfile="release/iap.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="../IAP/bin"/>
             <fileset dir="../Graffiti_Core/build/classes"/>
+            <fileset dir="../IAP CONSOLE/bin"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-beanutils.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-digester.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jdom.jar"/>

@@ -46,8 +46,8 @@ public class ActionCopyToClipboard extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		if (guiSetting.isInClipboard(experimentReference.getHeader().getDatabaseId()) ||
-				guiSetting.isInClipboard(experimentReference))
+		if (guiSetting != null && (guiSetting.isInClipboard(experimentReference.getHeader().getDatabaseId()) ||
+				guiSetting.isInClipboard(experimentReference)))
 			return "Remove from clipboard";
 		else
 			return "Add to clipboard";

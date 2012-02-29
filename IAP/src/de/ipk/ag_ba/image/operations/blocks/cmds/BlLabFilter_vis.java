@@ -335,7 +335,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage potFiltered = labFilter(
 				// options.isMaize() ?
 				result.copy(), getInput().getImages().getVis().copy(),
-				100, // filter anything that is very dark
+				70, // filter anything that is very dark
 				255,
 				0, // 127 - 10,
 				255, // 127 + 10,
