@@ -9,6 +9,16 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	return(requestList)
 }
 
+"%break%" <- function(typOfBreak, breakValue) {
+	if(typOfBreak == 0) {
+		stop(call. = FALSE)
+	} else {
+		print(paste("Script will stopped for ",breakValue, " sec!", sep=""))
+		Sys.sleep(breakValue)
+		print("Break ends!")
+	}
+}
+
 "%debug%" <- function(debug, debugNumber) {
 	if (debug) {
 		print(paste("DebugBreakPoint: ", debugNumber))
@@ -28,9 +38,9 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	#overallList$debug %debug% "%errorReport%"
 	if (length(errorDescriptor) > 0) {
 		if (tolower(typOfError) == "notexists") {
-			print(paste("No plot, because the descriptor (", errorDescriptor, ") is missing!", sep=""))
+			print(paste("the descriptor '", errorDescriptor, "' won´t plot because he is missing!", sep=""))
 		} else if (tolower(typOfError) == "notnumericorallzero") {
-			print(paste("Dummy plotting for this descriptor(s) ((", errorDescriptor, "), because all values are zero or not numeric!", sep=""))
+			print(paste("the values of the descriptor(s) '", errorDescriptor, "', are all zero or not numeric!", sep=""))
 		}
 	}
 }
@@ -81,7 +91,7 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 		if (k == "none") {
 			vectorTemp = c(vectorTemp, vector1)
 		} else {
-			vectorTemp = c(vectorTemp, paste(vector1, k, sep = "#"))
+			vectorTemp = c(vectorTemp, paste(vector1, k, sep = "/")) #    #/#
 		}
 	}
 	return(vectorTemp)
@@ -579,11 +589,18 @@ groupByFunction <- function(groupByList) {
 	return(unlist(groupByList[ifelse(groupByList != "none", TRUE, FALSE)]))
 }
 
-getBooleanVectorForFilterValues <- function(groupedDataFrame, listOfValues) {
-	tempVector = rep.int(TRUE, times=length(groupedDataFrame[, 1]))
+getBooleanVectorForFilterValues <- function(groupedDataFrame, listOfValues, plot=FALSE) {
+	
+	iniType = !plot
+	tempVector = rep.int(iniType, times=length(groupedDataFrame[, 1]))
+	
 	for (h in names(listOfValues)) {
 		if (h != "none" & !is.null(groupedDataFrame[[h]])) {
-			tempVector = tempVector & groupedDataFrame[[h]] %in% listOfValues[[h]]
+			if(plot) {
+				tempVector = tempVector | groupedDataFrame[[h]] %in% listOfValues[[h]]
+			} else {
+				tempVector = tempVector & groupedDataFrame[[h]] %in% listOfValues[[h]]
+			}
 		}
 	}
 	return(tempVector)
@@ -636,7 +653,7 @@ buildRowName <- function(mergeDataSet, groupBy, yName = "value") {
 	} else {		
 		temp = mergeDataSet[, groupBy[1]]
 		for (h in 2:length(groupBy)) {
-			temp = paste(temp, mergeDataSet[, groupBy[h]], sep = "/")
+			temp = paste(temp, mergeDataSet[, groupBy[h]], sep = "/") #  #/#
 		}
 		return(data.frame(name=temp, primaerTreatment= mergeDataSet[, groupBy[1]], mergeDataSet[, mergeDataSet %allColnamesWithoutThisOnes% groupBy]))
 	}	
@@ -1047,10 +1064,14 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 									panel.border = theme_rect(colour="Grey", size=0.1)
 							)
 					
-					if (length(overallColor[[imagesIndex]]) > 25) {
+					if (length(overallColor[[imagesIndex]]) > 25 & length(overallColor[[imagesIndex]]) < 35) {
 						plot = plot + opts(legend.text = theme_text(size=6), 
 											legend.key.size = unit(0.7, "lines")
 											)
+					} else if(length(overallColor[[imagesIndex]]) >= 35) {
+						plot = plot + opts(legend.text = theme_text(size=4), 
+											legend.key.size = unit(0.4, "lines")
+						)
 					} else {
 						plot = plot + opts(legend.text = theme_text(size=11))
 					}
@@ -1804,5 +1825,5 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))
