@@ -422,9 +422,9 @@ public class IAPservice {
 		return array;
 	}
 	
-	public static Collection<NumericMeasurementInterface> getMatchFor(IOurl url, ExperimentInterface experiment) {
+	public static ArrayList<NumericMeasurementInterface> getMatchFor(IOurl url, ExperimentInterface experiment) {
 		
-		Collection<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
+		ArrayList<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
 		
 		String search = url.toString();
 		String searchKey = null;
