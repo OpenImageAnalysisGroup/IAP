@@ -534,7 +534,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
-								Collection<NumericMeasurementInterface> match = IAPservice
+								ArrayList<NumericMeasurementInterface> match = IAPservice
 										.getMatchFor(imageResult
 												.getBinaryFileInfo()
 												.getFileNameMain(),
