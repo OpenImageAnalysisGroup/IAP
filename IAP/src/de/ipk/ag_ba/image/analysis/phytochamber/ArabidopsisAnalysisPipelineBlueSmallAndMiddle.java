@@ -32,6 +32,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlIntensityConversion_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlUseVisMaskToClearFluo_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProcessors;
 
 /**
@@ -65,6 +66,7 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 		p.add(BlockClearNirPot_nir.class);
 		p.add(BlMedianFilter_fluo.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class);
+		p.add(BlUseVisMaskToClearFluo_fluo.class);
 		p.add(BlUseFluoMaskToClear_Arabidopsis_vis_nir.class);
 		p.add(BlMedianFilter_vis.class);
 		p.add(BlMedianFilter_vis.class);
