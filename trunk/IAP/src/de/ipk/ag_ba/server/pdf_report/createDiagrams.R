@@ -58,12 +58,19 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	
 	#separation = ";"
 	print(paste("Read input file", fileName))
-	
 	if (file.exists(fileName)) {
-#		print("... English version")
-		return(read.csv(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8", encoding="UTF-8"))
-#		print("... German version")
-#		return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8", encoding="UTF-8"))
+		
+		preScanForPointOrComma <- scan(file=fileName, what=character(0), nlines=2, sep="\n")
+		preScanForPointOrComma <- paste(preScanForPointOrComma[2],",.", sep="")
+		allCharacterSeparated <- table(strsplit(toupper(preScanForPointOrComma), '')[[1]])
+		
+		if(allCharacterSeparated["."] > allCharacterSeparated[","]) {
+	#		print("... English version")
+			return(read.csv(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8", encoding="UTF-8"))
+		} else {
+	#		print("... German version")
+			return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8", encoding="UTF-8"))
+		}
 	} else {
 		return(NULL)
 	}
@@ -121,7 +128,7 @@ UsePackage  <- function(package, defaultCRANmirror = "http://cran.at.r-project.o
     return(TRUE)
 }
 
-loadAndInstallPackages <- function(install=FALSE, useDev=FALSE) {
+loadAndInstallPackages <- function(install=FALSE, useDev=FALSE) {	
 	if (install) {
 		libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych")
 		for(library in libraries) { 
@@ -138,9 +145,9 @@ loadAndInstallPackages <- function(install=FALSE, useDev=FALSE) {
 		
 	library("Cairo")
 	library("RColorBrewer")
-	library(data.table)
-	library(ggplot2)	
-	library("psych") ##???
+	library("data.table")
+	library("ggplot2")
+	library("psych")
 	
 	if (useDev) {
 		library("devtools")
@@ -1412,8 +1419,8 @@ makeDiagrams <- function(overallList) {
 addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet) {
 	
 	addDescSet = character()
-	#addDescSetNames = character()
-	#i = 0
+	addDescSetNames = character()
+	i = 0
 	for (ds in descriptorSet_boxplotStacked) {
 		addCol = ""
 		#addColDesc = ""
@@ -1431,19 +1438,19 @@ addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotSta
 				}
 			}
 		}
-		#i=i+1
-		#addColDesc = descriptorSetName_boxplotStacked[i]
+		i=i+1
+		addColDesc = descriptorSetName_boxplotStacked[i]
 		if (nchar(addCol)>0) {
 			#print(paste("Adding ", addCol, "with description", addColDesc))
 			addDescSet = c(addDescSet, addCol)
-			#addDescSetNames = c(addDescSetNames, addColDesc)
+			addDescSetNames = c(addDescSetNames, addColDesc)
 		}
 	}
 	
 	if(length(addDescSet) > 0) {
-		return(addDescSet)
+		return(list(desSet=addDescSet, desName = addDescSetNames))
 	} else {
-		return(descriptorSet_boxplotStacked)
+		return(list(desSet=descriptorSet_boxplotStacked, desName = descriptorSetName_boxplotStacked))
 	}
 	#descriptorSet_boxplotStacked = c(descriptorSet_boxplotStacked, addDescSetNames) 	
 	#return(descriptorSet_boxplotStacked)
@@ -1506,7 +1513,7 @@ initRfunction <- function(DEBUG = FALSE) {
 		options(show.error.messages = FALSE)
 	}
 	if(memory.limit() < 3500) {
-		memory.limit(size=3500)
+		memory.limit(size=10000)
 	}
 	
 	while(!is.null(dev.list())) {
@@ -1599,9 +1606,9 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 					descriptorSetName_nBoxplot = c("weight before watering (g)", 
 													"weight after watering (g)", 
 													"water weight (g)", 
-													"plant height (mm)", 
-													"width (zoome corrected) (mm)", 
-													"side area (zoome corrected) (mm^2)", 
+													"height (mm)", 
+													"width (zoom corrected) (mm)", 
+													"side area (zoom corrected) (mm^2)", 
 													"top area (zoome corrected) (mm^2)", 
 													"chlorophyl intensity (relative intensity/pixel)", 
 													"fluorescence intensity (relative intensity/pixel)", 
@@ -1609,8 +1616,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 													"number of leafs", 
 													"number of tassel florets", 
 													"length of leafs plus stem (mm)", 			 
-													"volume based on RGB (IAP) (px^3)", 
-													"volume based on RGB (LemnaTec) (px^3)", 
+													"digital biomass (visible light images, IAP formula) (px^3)", 
+													"digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
 													"volume based water use efficiency", 
 													"weighted loss through drought stress (side)", 
 													"weighted loss through drought stress (top)", 
@@ -1644,13 +1651,13 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 										   "side.area (px)", 
 										   "top.area (px)")
 				
-				descriptorSetName_boxplot = c("plant height (side, zoom corrected) (mm)", 
+				descriptorSetName_boxplot = c("height (zoom corrected) (mm)", 
 										  	   "width (zoom corrected) (mm)", 
 											   "side area (zoom corrected) (mm^2)", 
 											   "top area (zoom corrected) (mm^2)", 
-											   "digital biomass (flurescence images, IAP formula)", 
-											   "digital biomass (visible light images, IAP formula)", 
-											   "digital biomass (visible light, LemnaTec 0,90 formula)", 
+											   "digital biomass (flurescence images, IAP formula) (px^3)", 
+											   "digital biomass (visible light images, IAP formula) (px^3)", 
+											   "digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
 											   "height (px)", 
 											   "width (px)", 
 											   "side area (px)", 
@@ -1681,22 +1688,25 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 										  
 				descriptorSetName_boxplotStacked = c("side near-infrared intensities (zoom corrected) (%)", 
 													  "side fluorescence color spectra (%)", 
-													  "to near-infrared intensities (%)", 
+													  "top near-infrared intensities (%)", 
 													  "side fluorescence ratio histogramm (%)", 
-													  "near-infrared side (zoom corrected) (%)", 
+													  "side near-infrared (zoom corrected) (%)", 
 													  "side fluorescence color spectra (zoom corrected) (%)", 
 													  "side fluoresence color spectra (%)", 
 													  "side visible light color histogramm (%)", 
 													  "side visible light ratio histogramm (zoom correcte) (%)", 
 													  "top fluorescence color spectra (%)", 
-													  "fluo top ratio histogramm (%)", 
-													  "NIR top (%)", 
+													  "top fluo ratio histogramm (%)", 
+													  "NIR top histogramm (%)", 
 													  "VIS HUE top ratio histogramm (%)")
 				
-				descriptorSet_boxplotStacked <- addDesSet(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet)
+				descriptorList <- addDesSet(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet)
+				descriptorSet_boxplotStacked <- descriptorList$desSet
+				descriptorSetName_boxplotStacked <- descriptorList$desName
+				
 				stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
 				#diagramTypVector = c(diagramTypVector, "boxplotStacked", "boxplotStacked")
-				
+					
 				appendix = appendix %exists% args[3]
 
 				if (appendix) {

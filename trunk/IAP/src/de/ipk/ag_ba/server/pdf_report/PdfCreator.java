@@ -184,6 +184,7 @@ public class PdfCreator {
 		File fff = new File(tempDirectory.getAbsolutePath() + File.separator + fn);
 		String c = TextFile.read(fff);
 		c = StringManipulationTools.stringReplace(c, "--experimentname--", safe(experiment.getName()));
+		c = StringManipulationTools.stringReplace(c, "--coordinator--", safe(experiment.getCoordinator()));
 		c = StringManipulationTools.stringReplace(c, "--StartExp--", safe(SystemAnalysis.getCurrentTime(experiment.getStartDate().getTime())));
 		c = StringManipulationTools.stringReplace(c, "--EndExp--", safe(SystemAnalysis.getCurrentTime(experiment.getImportDate().getTime())));
 		c = StringManipulationTools.stringReplace(c, "--NumExp--", safe(experiment.getNumberOfMeasurementValues() + ""));
