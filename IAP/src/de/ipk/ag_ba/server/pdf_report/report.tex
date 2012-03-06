@@ -132,9 +132,11 @@
 \begin{document}
 
 
-\title{Experiment --experimentname--}
-\author{Research Group Image Analysis\tabularnewline \tabularnewline
-IPK-Gatersleben\tabularnewline \tabularnewline C. Klukas \& A. Entzian}
+\title{Experiment --experimentname-- \\ \large{--coordinator--}}
+
+\author{Automatic analysis report by\tabularnewline Research
+Group Image Analysis - IPK-Gatersleben\tabularnewline \tabularnewline C. Klukas
+\& A. Entzian}
 
 \date{\today ~(\currenttime )}
 
@@ -259,7 +261,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\section{\noindent Digital biomass}
 	\begin{itemize}
 	\item Digital Biomass based on the side.area and top.area
-	\item Unit: $pixel^2$
+	\item Unit: $pixel^3$
 	\end{itemize}
 	
 	\checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}
@@ -319,7 +321,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\begin{itemize}
 		\item Growth per day divided by water usage per day.
 		\item Colnum name: volume.iap.wue
-		\item Unit: .
+		\item Unit: $pixel^3/g$
 		\end{itemize}
 		\loadImage{volume_iap_wuenboxplot.pdf}
 	}{}
@@ -498,8 +500,8 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\clearpage
 	\section{\noindent Relative changes per day}
 	\begin{itemize}
-	\item Presented values in relative dependence.
-	\item Unit: \%
+	\item Presented values in relative dependence per day.
+	\item Unit: $\%/day$
 	\end{itemize}
 	
 	
@@ -748,8 +750,6 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\begin{itemize}
 		\item Number of leafs-tips
 		\item Colum name: side.leaf.count.median
-		\item Unit: leafs
-		\item Hint: leaf-tips are shown as red retangles in the image
 		\end{itemize}
 		\loadImage{side_leaf_count_median__leafs_nboxplot.pdf}
 	}{}
@@ -806,7 +806,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\begin{itemize}
 		\item Average wetness of the plants from NIR side camera
 		\item Column name: side.nir.wetness.av
-		\item Unit: .
+		\item Unit: \%
 		\end{itemize}
 		\loadImage{side_nir_wetness_average__percent_.pdf}
 	}{}
@@ -818,7 +818,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\begin{itemize}
 		\item Average wetness of the plants from NIR top camera
 		\item Column name: top.nir.wetness.av
-		\item Unit: .
+		\item Unit: \%
 		\end{itemize}
 		\loadImage{top_nir_wetness_average__percent_nboxplot.pdf}
 	}{}	
@@ -832,7 +832,6 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\item Number of foreground pixels from NIR side camera minus the weighted value of the plant
 		\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
 		\item Column name: side.nir.wetness.plant\_weight\_drought\_loss
-		\item Unit: .
 		\end{itemize}
 		\loadImage{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}
 	}{}
@@ -846,7 +845,6 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\item Number of foreground pixels from NIR top camera minus the weighted value of the plant
 		\item weightOfPlant = fully wet: 1 unit, fully dry: 1/7 unit
 		\item Column name: top.nir.wetness.plant\_weight\_drought\_loss
-		\item Unit: .
 		\end{itemize}
 		\loadImage{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}
 	}{}
