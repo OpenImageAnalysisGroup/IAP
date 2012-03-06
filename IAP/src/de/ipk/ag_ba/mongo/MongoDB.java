@@ -1206,7 +1206,8 @@ public class MongoDB {
 						}
 						if (user == null ||
 								h.getImportusername() != null && h.getImportusername().equals(user) ||
-								LemnaTecDataExchange.getAdministrators().contains(user))
+								LemnaTecDataExchange.getAdministrators().contains(user) ||
+								h.getCoordinator().toUpperCase().contains(user.toUpperCase()))
 							res.add(h);
 					}
 				}
