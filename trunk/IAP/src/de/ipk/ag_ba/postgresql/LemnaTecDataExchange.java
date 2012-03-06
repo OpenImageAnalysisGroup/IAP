@@ -365,7 +365,6 @@ public class LemnaTecDataExchange {
 		res.add("entzian");
 		res.add("muecke");
 		res.add("Muecke");
-		res.add("pape");
 		return res;
 	}
 	

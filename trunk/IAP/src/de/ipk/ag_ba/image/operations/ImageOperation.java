@@ -4098,16 +4098,18 @@ public class ImageOperation {
 		int ai = (int) af;
 		int bi = (int) bf;
 		
-		if (lab2rgb.containsKey(li) && lab2rgb.get(li).containsKey(ai) && lab2rgb.get(li).get(ai).containsKey(bi)) {
-			return lab2rgb.get(li).get(ai).get(bi);
+		synchronized (lab2rgb) {
+			if (lab2rgb.containsKey(li) && lab2rgb.get(li).containsKey(ai) && lab2rgb.get(li).get(ai).containsKey(bi)) {
+				return lab2rgb.get(li).get(ai).get(bi);
+			}
 		}
 		
-		int minR = 0, minG = 0, minB = 0;
+		int minR = 255, minG = 255, minB = 255;
 		float minDistL = Float.MAX_VALUE;
 		float minDistAB = Float.MAX_VALUE;
-		
-		for (int r = 0; r < 255; r++)
-			for (int g = 0; g < 255; g++)
+		float minL = 0, minAa = 0, minBb = 0;
+		for (int r = 0; r < 255; r++) {
+			for (int g = 0; g < 255; g++) {
 				for (int b = 0; b < 255; b++) {
 					float l2 = labCube[r][g][b];
 					float a2 = labCube[r][g][b + 256];
@@ -4120,19 +4122,28 @@ public class ImageOperation {
 						minR = r;
 						minG = g;
 						minB = b;
+						minL = l2;
+						minAa = a2;
+						minBb = b2;
 					}
 				}
-		
+			}
+		}
 		int res = new Color(minR, minG, minB).getRGB();
 		
-		if (!lab2rgb.containsKey(li))
-			lab2rgb.put(li, new TreeMap<Integer, TreeMap<Integer, Integer>>());
-		if (!lab2rgb.get(li).containsKey(ai))
-			lab2rgb.get(li).put(ai, new TreeMap<Integer, Integer>());
-		if (!lab2rgb.get(li).get(ai).containsKey(bi)) {
-			lab2rgb.get(li).get(ai).put(bi, res);
-		}
+		// System.out.println("minDistL=" + minDistL);
+		// System.out.println("minDistAB=" + minDistAB);
+		// System.out.println("lab:" + (int) lf + "," + (int) af + "," + (int) bf + " ==> " + minL + "," + minAa + "," + minBb);
 		
+		synchronized (lab2rgb) {
+			if (!lab2rgb.containsKey(li))
+				lab2rgb.put(li, new TreeMap<Integer, TreeMap<Integer, Integer>>());
+			if (!lab2rgb.get(li).containsKey(ai))
+				lab2rgb.get(li).put(ai, new TreeMap<Integer, Integer>());
+			if (!lab2rgb.get(li).get(ai).containsKey(bi)) {
+				lab2rgb.get(li).get(ai).put(bi, res);
+			}
+		}
 		return res;
 	}
 }
