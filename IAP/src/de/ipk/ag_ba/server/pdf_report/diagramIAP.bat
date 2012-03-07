@@ -9,5 +9,5 @@ echo Appendix?  : %3
 
 Rscript createDiagrams.r report.csv pdf %3 %1 %2
 
-rem pdflatex report.tex
-rem pdflatex report.tex
+pdflatex report.tex
+pdflatex report.tex

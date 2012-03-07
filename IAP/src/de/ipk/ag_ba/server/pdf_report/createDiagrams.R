@@ -1516,7 +1516,6 @@ initRfunction <- function(DEBUG = FALSE) {
 		#options(showErrorCalls = FALSE)
 		options(warn = -1)
 		options(show.error.messages = FALSE)
-		options(echo = FALSE)
 	}
 	if(memory.limit() < 3500) {
 		memory.limit(size=10000)
