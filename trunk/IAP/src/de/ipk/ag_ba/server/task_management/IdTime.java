@@ -2,15 +2,18 @@ package de.ipk.ag_ba.server.task_management;
 
 import java.util.Date;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 public class IdTime {
 	
 	public Date time;
 	public String Id;
-	private ExperimentHeaderInterface exp;
+	private final ExperimentHeaderInterface exp;
+	private final MongoDB m;
 	
-	public IdTime(String Id, Date date, ExperimentHeaderInterface exp) {
+	public IdTime(MongoDB m, String Id, Date date, ExperimentHeaderInterface exp) {
+		this.m = m;
 		this.Id = Id;
 		if (Id == null) {
 			System.out.println("ERR");
@@ -31,5 +34,9 @@ public class IdTime {
 	@Override
 	public boolean equals(Object obj) {
 		return Id.equals(((IdTime) obj).Id);
+	}
+	
+	public MongoDB getMongoDB() {
+		return m;
 	}
 }
