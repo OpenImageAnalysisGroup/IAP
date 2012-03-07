@@ -34,6 +34,7 @@ import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BackupSupport;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
+import de.ipk.ag_ba.server.task_management.MassCopySupport;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -129,7 +130,7 @@ public class Other {
 	
 	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus,
 			GUIsetting guIsetting) {
-		return getServerStatusEntity(includeLemnaTecStatus, "Check Status", guIsetting);
+		return getServerStatusEntity(includeLemnaTecStatus, "System Status", guIsetting);
 	}
 	
 	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus, String title,
@@ -147,6 +148,7 @@ public class Other {
 				
 				// BackgroundTaskHelper.isTaskWithGivenReferenceRunning(referenceObject)
 				
+				ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
 				for (MongoDB m : MongoDB.getMongos()) {
 					CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m,
 							null,
@@ -154,54 +156,32 @@ public class Other {
 					try {
 						cmna.performActionCalculateResults(src);
 						for (NavigationButton o : cmna.getResultNewActionSet())
-							resultNavigationButtons.add(o);
+							cloudHostList.add(o.getAction());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 				
-				resultNavigationButtons.add(new NavigationButton(new AbstractNavigationAction("Show full backup history") {
-					
-					private NavigationButton src;
-					
-					@Override
-					public void performActionCalculateResults(NavigationButton src) throws Exception {
-						this.src = src;
-					}
-					
-					@Override
-					public String getDefaultImage() {
-						return IAPimages.getArchive();
-					}
-					
-					@Override
-					public String getDefaultTitle() {
-						return "Backup History";
-					}
-					
-					@Override
-					public MainPanelComponent getResultMainPanel() {
-						ArrayList<String> htmlTextPanels = new ArrayList<String>();
-						htmlTextPanels.add(BackupSupport.getInstance().getHistory(Integer.MAX_VALUE,
-								"<br>" +
-										"<p>Full Backup-History:<br><br><ul>",
-								"<li>", "", ""));
-						
-						return new MainPanelComponent(htmlTextPanels);
-					}
-					
-					@Override
-					public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-						ArrayList<NavigationButton> set = new ArrayList<NavigationButton>(currentSet);
-						set.add(src);
-						return set;
-					}
-					
-					@Override
-					public ArrayList<NavigationButton> getResultNewActionSet() {
-						return new ArrayList<NavigationButton>();
-					}
-				}, src.getGUIsetting()));
+				if (cloudHostList.size() > 0) {
+					ActionFolder cloudHosts = new ActionFolder(
+							"Cloud Hosts", "Show overview of cloud computing hosts",
+							cloudHostList.toArray(new NavigationAction[] {}), src.getGUIsetting());
+					resultNavigationButtons.add(new NavigationButton(cloudHosts, src.getGUIsetting()));
+				}
+				
+				resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(
+						"Enable or disable the automated backup of LT data sets to the HSM file system",
+						"Automatic Backup to HSM",
+						"backup"), src.getGUIsetting()));
+				
+				resultNavigationButtons.add(new NavigationButton(new ActionBackupHistory("Show full backup history"), src.getGUIsetting()));
+				
+				resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(
+						"Enable or disable the automated copy of LT data sets to the MongoDB DBs",
+						"Automatic DB-Copy",
+						"sync"), src.getGUIsetting()));
+				
+				resultNavigationButtons.add(new NavigationButton(new ActionMassCopyHistory("Show DB-Copy history"), src.getGUIsetting()));
 				
 				if (includeLemnaTecStatus) {
 					resultNavigationButtons.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
@@ -226,28 +206,31 @@ public class Other {
 				// if (!rLocal)
 				// resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				
-				boolean rBA13 = IAPservice.isReachable("ba-13.ipk-gatersleben.de");
-				if (!rBA13) {
-					resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-13",
-							simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
-							.getGUIsetting()));
-					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
-				}
-				
-				boolean rBA24 = IAPservice.isReachable("ba-24.ipk-gatersleben.de");
-				if (!rBA24) {
-					resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-24",
-							simpleIcons ? (rBA24 ? pc : pcOff) : "img/ext/macPro.png"), src
-							.getGUIsetting()));
-					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
-				}
-				
-				boolean rLemnaDB = IAPservice.isReachable("lemna-db.ipk-gatersleben.de");
-				if (!rLemnaDB) {
-					resultNavigationButtons.add(new NavigationButton(new ActionPortScan("lemna-db",
-							simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
-							.getGUIsetting()));
-					resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+				boolean checkServerAvailability = false;
+				if (checkServerAvailability) {
+					boolean rBA13 = IAPservice.isReachable("ba-13.ipk-gatersleben.de");
+					if (!rBA13) {
+						resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-13",
+								simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
+								.getGUIsetting()));
+						resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+					}
+					
+					boolean rBA24 = IAPservice.isReachable("ba-24.ipk-gatersleben.de");
+					if (!rBA24) {
+						resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-24",
+								simpleIcons ? (rBA24 ? pc : pcOff) : "img/ext/macPro.png"), src
+								.getGUIsetting()));
+						resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+					}
+					
+					boolean rLemnaDB = IAPservice.isReachable("lemna-db.ipk-gatersleben.de");
+					if (!rLemnaDB) {
+						resultNavigationButtons.add(new NavigationButton(new ActionPortScan("lemna-db",
+								simpleIcons ? "img/ext/network-server.png" : "img/ext/dellR810_3.png"), src
+								.getGUIsetting()));
+						resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
+					}
 				}
 				
 				// boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
@@ -281,14 +264,19 @@ public class Other {
 			@Override
 			public MainPanelComponent getResultMainPanel() {
 				ArrayList<String> htmlTextPanels = new ArrayList<String>();
-				htmlTextPanels.add(BackupSupport.getInstance().getHistory(10,
-						"<br>" +
+				htmlTextPanels.add(BackupSupport.getInstance().getHistory(4,
+						"" +
 								"<p>Backup-Status:<br><br><ul>",
 						"<li>", "", ""));
 				
-				htmlTextPanels.add(SystemAnalysisExt.getStatus("<br><p>System-Status:<br><br><ul>", "<li>", "", ""));
+				htmlTextPanels.add(MassCopySupport.getInstance().getHistory(4,
+						"" +
+								"<p>Automatic Copy-Status:<br><br><ul>",
+						"<li>", "", ""));
 				
-				htmlTextPanels.add(SystemAnalysisExt.getStorageStatus("<br><p>Storage-Status:<br><br><ul>", "<li>", "", ""));
+				htmlTextPanels.add(SystemAnalysisExt.getStatus("<p>System-Status:<br><br><ul>", "<li>", "", ""));
+				
+				htmlTextPanels.add(SystemAnalysisExt.getStorageStatus("<p>Storage-Status:<br><br><ul>", "<li>", "", ""));
 				
 				return new MainPanelComponent(htmlTextPanels);
 			}

@@ -178,7 +178,7 @@ public class MassCopySupport {
 					m = MongoDB.getMongos().get(MongoDB.getMongos().size() - 1);
 				}
 				ExperimentHeaderInterface src = it.getExperimentHeader();
-				print("START MASS COPY OF EXPERIMENT: " + it.Id + " to MongoDB " + m.getDatabaseName() + "@" + m.getDefaultHost());
+				print("START COPY OF EXPERIMENT: " + it.Id + " to MongoDB " + m.getDatabaseName() + "@" + m.getDefaultHost());
 				
 				ExperimentReference er = new ExperimentReference(src);
 				ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
@@ -198,7 +198,7 @@ public class MassCopySupport {
 	public void scheduleMassCopy() {
 		String hsmFolder = IAPmain.getHSMfolder();
 		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			print("AUTOMATIC MASS COPY FROM LT TO MongoDB (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT MIDNIGHT");
+			print("AUTOMATIC MASS COPY FROM LT TO MongoDB (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT 20:00");
 			Timer t = new Timer("IAP 24h-Backup-Timer");
 			long period = 1000 * 60 * 60 * 24; // 24 Hours
 			TimerTask tT = new TimerTask() {
@@ -213,10 +213,10 @@ public class MassCopySupport {
 					}
 				}
 			};
-			Date startTime = new Date(); // current day at 23:59:39
-			startTime.setHours(23);
-			startTime.setMinutes(59);
-			startTime.setSeconds(59);
+			Date startTime = new Date(); // current day at 20:00:00
+			startTime.setHours(20);
+			startTime.setMinutes(00);
+			startTime.setSeconds(00);
 			t.scheduleAtFixedRate(tT, startTime, period);
 		} else {
 			print("WARNING: NO AUTOMATIC MASS COPY SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
