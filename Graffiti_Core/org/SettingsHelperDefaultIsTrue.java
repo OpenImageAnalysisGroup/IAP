@@ -15,8 +15,8 @@ import javax.swing.Timer;
 public class SettingsHelperDefaultIsTrue implements HelperClass {
 	
 	public boolean isEnabled(String name) {
-		if (ReleaseInfo.isRunningAsApplet())
-			return true;
+		// if (ReleaseInfo.isRunningAsApplet())
+		// return true;
 		return !new File(ReleaseInfo.getAppFolderWithFinalSep() + "feature_disabled_" + encode(name)).exists();
 	}
 	
@@ -40,6 +40,7 @@ public class SettingsHelperDefaultIsTrue implements HelperClass {
 		final JCheckBox result = new JCheckBox(description, isEnabled(option));
 		result.setOpaque(false);
 		result.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean enabled = isEnabled(option);
 				enabled = !enabled;
@@ -54,6 +55,7 @@ public class SettingsHelperDefaultIsTrue implements HelperClass {
 			}
 		});
 		Timer t = new Timer(1000, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean active = isEnabled(option);
 				boolean b = active;
