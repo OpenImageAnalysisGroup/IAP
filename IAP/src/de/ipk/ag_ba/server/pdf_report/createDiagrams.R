@@ -690,7 +690,7 @@ setxAxisfactor <- function(xAxisName, xAxisValue, options) {
 	}
 		
 	xAxisfactor = factor(xAxisValue, levels=whichDayShouldBePlot)
-	
+
 	xAxisfactor = paste(xAxisName, xAxisfactor)
 	naString = paste(xAxisName, "NA")
 	xAxisfactor[xAxisfactor == naString] = NA
@@ -1350,7 +1350,7 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 			
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
 			if (length(overallResult[, 1]) > 0) {
-				overallResult$xAxisfactor = setxAxisfactor(overallResult$xAxisName, overallResult$xAxis, options)	
+				overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName, overallResult$xAxis, options)	
 			
 				#myPlot = ggplot(overallList$overallResult, aes(factor(name), value, fill=name, colour=name)) + 
 				#myPlot = ggplot(overallResult, aes(factor(name), value, fill=name)) +
@@ -1516,6 +1516,7 @@ initRfunction <- function(DEBUG = FALSE) {
 		#options(showErrorCalls = FALSE)
 		options(warn = -1)
 		options(show.error.messages = FALSE)
+		options(echo = FALSE)
 	}
 	if(memory.limit() < 3500) {
 		memory.limit(size=10000)
