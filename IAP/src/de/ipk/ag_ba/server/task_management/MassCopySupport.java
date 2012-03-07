@@ -17,9 +17,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.commands.Library;
-import de.ipk.ag_ba.commands.hsm.ActionDataExportToHsmFolder;
-import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
+import de.ipk.ag_ba.commands.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -30,21 +28,21 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 
-public class BackupSupport {
+public class MassCopySupport {
 	
-	private static BackupSupport instance = null;
+	private static MassCopySupport instance = null;
 	
 	private final ArrayList<String> history = new ArrayList<String>();
 	
-	public static synchronized BackupSupport getInstance() {
+	public static synchronized MassCopySupport getInstance() {
 		if (instance == null)
-			instance = new BackupSupport();
+			instance = new MassCopySupport();
 		return instance;
 	}
 	
-	private boolean backupRunning = false;
+	private boolean massCopyRunning = false;
 	
-	private BackupSupport() {
+	private MassCopySupport() {
 		new MultimodalDataHandlingAddon();
 		
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
@@ -52,15 +50,15 @@ public class BackupSupport {
 			for (ResourceIOHandler handler : m.getHandlers())
 				ResourceIOManager.registerIOHandler(handler);
 		}
-		final String fn = ReleaseInfo.getAppFolderWithFinalSep() + "iap_backup_history.txt";
+		final String fn = ReleaseInfo.getAppFolderWithFinalSep() + "iap_mass_copy_history.txt";
 		try {
 			TextFile tf = new TextFile(fn);
 			history.addAll(tf);
-			print("INFO: BACKUP HISTORY LOADED (" + fn + ")");
+			print("INFO: MASS COPY HISTORY LOADED (" + fn + ")");
 		} catch (IOException e) {
-			print("INFO: NO BACKUP HISTORY TO LOAD (" + fn + ": " + e.getMessage() + ")");
+			print("INFO: NO MASS COPY HISTORY TO LOAD (" + fn + ": " + e.getMessage() + ")");
 		}
-		Timer t = new Timer("IAP Backup-History Saver");
+		Timer t = new Timer("IAP MASS-COPY-History Saver");
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		TimerTask tT = new TimerTask() {
 			@Override
@@ -73,13 +71,13 @@ public class BackupSupport {
 					tf.write(fn);
 					tso.setInt(history.size());
 				} catch (IOException e) {
-					print("ERROR: BACKUP HISTORY COULD NOT BE SAVED (" + e.getMessage() + " - " + fn + ")");
+					print("ERROR: MASS COPY HISTORY COULD NOT BE SAVED (" + e.getMessage() + " - " + fn + ")");
 				}
 			}
 		};
 		tT.run();
 		t.scheduleAtFixedRate(tT, new Date(), 1 * 60 * 1000);
-		print("INFO: BACKUP SUPPORT READY");
+		print("INFO: MASS COPY SUPPORT READY");
 		String hsmFolder = IAPmain.getHSMfolder();
 		if (hsmFolder != null && new File(hsmFolder).exists()) {
 			if (new File(hsmFolder).canRead())
@@ -96,16 +94,16 @@ public class BackupSupport {
 		}
 	}
 	
-	public void makeBackup() {
-		if (backupRunning) {
-			print("INFO: BACKUP PROCEDURE IS SKIPPED, BECAUSE PREVIOUS BACKUP OPERATION IS STILL RUNNING");
+	public void performMassCopy() {
+		if (massCopyRunning) {
+			print("INFO: MASS COPY PROCEDURE IS SKIPPED, BECAUSE PREVIOUS MASS COPY OPERATION IS STILL RUNNING");
 			return;
 		}
-		backupRunning = true;
+		massCopyRunning = true;
 		try {
-			makeBackupInnerCall();
+			makeCopyInnerCall();
 		} finally {
-			backupRunning = false;
+			massCopyRunning = false;
 		}
 	}
 	
@@ -115,15 +113,15 @@ public class BackupSupport {
 		System.out.println(msg);
 	}
 	
-	private void makeBackupInnerCall() {
+	private void makeCopyInnerCall() {
 		try {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">START BACKUP SYNC");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">START MASS COPY SYNC");
 			
-			StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LemnaTec to HSM Backup", false);
+			StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LemnaTec to MongoDBs (MASS COPY)", false);
 			
 			LemnaTecDataExchange lt = new LemnaTecDataExchange();
 			ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();
-			ArrayList<IdTime> hsmIdArr = new ArrayList<IdTime>();
+			ArrayList<IdTime> mongoIdsArr = new ArrayList<IdTime>();
 			ArrayList<IdTime> toSave = new ArrayList<IdTime>();
 			
 			for (String db : lt.getDatabases()) {
@@ -132,19 +130,13 @@ public class BackupSupport {
 				}
 			}
 			
-			String hsmFolder = IAPmain.getHSMfolder();
-			if (hsmFolder != null && new File(hsmFolder).exists()) {
-				print("HSM Folder: " + hsmFolder);
-				Library lib = new Library();
-				HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsmFolder,
-						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-						IAPmain.loadIcon("img/ext/folder-remote.png"));
-				dataSourceHsm.readDataSource();
-				for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {
+			for (MongoDB m : MongoDB.getMongos()) {
+				print("MongoDB: " + m.getDatabaseName() + "@" + m.getDefaultHost());
+				for (ExperimentHeaderInterface hsmExp : m.getExperimentList(null)) {
 					if (hsmExp.getOriginDbId() != null)
-						hsmIdArr.add(new IdTime(null, hsmExp.getOriginDbId(), hsmExp.getImportdate(), null));
+						mongoIdsArr.add(new IdTime(m, hsmExp.getOriginDbId(), hsmExp.getImportdate(), null));
 					else
-						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN HSM!");
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN MongoDB (" + m.getDatabaseName() + ")!");
 				}
 			}
 			
@@ -160,10 +152,10 @@ public class BackupSupport {
 					}
 				
 				boolean found = false;
-				for (IdTime h : hsmIdArr) {
+				for (IdTime h : mongoIdsArr) {
 					if (h.equals(it)) {
 						if (it.time.getTime() - h.time.getTime() > 1000) {
-							print("BACKUP NEEDED (NEW DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+							print("MASS COPY INTENDED (NEW DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 							toSave.add(it);
 						}
 						found = true;
@@ -173,36 +165,40 @@ public class BackupSupport {
 				
 				if (!found) {
 					toSave.add(it);
-					print("BACKUP NEEDED (NEW EXPERIMENT): " + it.Id + " (DB: "
+					print("MASS COPY INTENDED (NEW EXPERIMENT): " + it.Id + " (DB: "
 							+ it.getExperimentHeader().getDatabase() + ")");
 				}
 			}
 			
-			print("START BACKUP OF " + toSave.size() + " EXPERIMENTS!");
-			MongoDB m = MongoDB.getDefaultCloud();
+			print("START MASS COPY OF " + toSave.size() + " EXPERIMENTS!");
 			for (IdTime it : toSave) {
+				MongoDB m = it.getMongoDB();
+				if (m == null) {
+					// new data set, copy to last mongo instance
+					m = MongoDB.getMongos().get(MongoDB.getMongos().size() - 1);
+				}
 				ExperimentHeaderInterface src = it.getExperimentHeader();
-				print("START BACKUP OF EXPERIMENT: " + it.Id);
+				print("START MASS COPY OF EXPERIMENT: " + it.Id + " to MongoDB " + m.getDatabaseName() + "@" + m.getDefaultHost());
 				
 				ExperimentReference er = new ExperimentReference(src);
-				
-				ActionDataExportToHsmFolder copyAction = new ActionDataExportToHsmFolder(m, er,
-						hsmFolder);
+				ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
 				boolean enabled = true;
 				copyAction.setStatusProvider(new BackgroundTaskConsoleLogger("", "", enabled));
-				copyAction.performActionCalculateResults(null);
-				print("FINISHED BACKUP OF EXPERIMENT: " + it.Id);
+				boolean simulate = true;
+				if (!simulate)
+					copyAction.performActionCalculateResults(null);
+				print("FINISHED COPY OF EXPERIMENT: " + it.Id + " to MongoDB " + m.getDatabaseName() + "@" + m.getDefaultHost());
 			}
 			s.printTime();
 		} catch (Exception e1) {
-			print("ERROR: BACKUP INNER-CALL ERROR (" + e1.getMessage() + ")");
+			print("ERROR: MASS COPY INNER-CALL ERROR (" + e1.getMessage() + ")");
 		}
 	}
 	
-	public void scheduleBackup() {
+	public void scheduleMassCopy() {
 		String hsmFolder = IAPmain.getHSMfolder();
 		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			print("AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT MIDNIGHT");
+			print("AUTOMATIC MASS COPY FROM LT TO MongoDB (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT MIDNIGHT");
 			Timer t = new Timer("IAP 24h-Backup-Timer");
 			long period = 1000 * 60 * 60 * 24; // 24 Hours
 			TimerTask tT = new TimerTask() {
@@ -210,8 +206,8 @@ public class BackupSupport {
 				public void run() {
 					try {
 						Thread.sleep(1000);
-						BackupSupport sb = BackupSupport.getInstance();
-						sb.makeBackup();
+						MassCopySupport sb = MassCopySupport.getInstance();
+						sb.performMassCopy();
 					} catch (InterruptedException e) {
 						print("INFO: PROCESSING INTERRUPTED (" + e.getMessage() + ")");
 					}
@@ -223,7 +219,7 @@ public class BackupSupport {
 			startTime.setSeconds(59);
 			t.scheduleAtFixedRate(tT, startTime, period);
 		} else {
-			print("WARNING: NO AUTOMATIC BACKUP SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
+			print("WARNING: NO AUTOMATIC MASS COPY SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
 		}
 	}
 	
