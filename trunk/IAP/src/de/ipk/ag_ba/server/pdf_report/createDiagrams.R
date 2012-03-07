@@ -682,7 +682,7 @@ getToPlottedDays <- function(xAxis, changes=NULL) {
 	return(days)
 }
 
-setxAxisfactor <- function(xAxisValue, options) {
+setxAxisfactor <- function(xAxisName, xAxisValue, options) {
 	if (!is.null(options$daysOfBoxplotNeedsReplace)) {
 		whichDayShouldBePlot = getToPlottedDays(xAxisValue, options$daysOfBoxplotNeedsReplace)
 	} else {
@@ -690,8 +690,13 @@ setxAxisfactor <- function(xAxisValue, options) {
 	}
 		
 	xAxisfactor = factor(xAxisValue, levels=whichDayShouldBePlot)
-	xAxisfactor = paste("DAS", xAxisfactor)
-	xAxisfactor[xAxisfactor == "DAS NA"] = NA
+	
+	xAxisfactor = paste(xAxisName, xAxisfactor)
+	naString = paste(xAxisName, "NA")
+	xAxisfactor[xAxisfactor == naString] = NA
+	
+#	xAxisfactor = paste("DAS", xAxisfactor)
+#	xAxisfactor[xAxisfactor == "DAS NA"] = NA
 	return(xAxisfactor)
 }
 
@@ -1345,7 +1350,7 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 			
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
 			if (length(overallResult[, 1]) > 0) {
-				overallResult$xAxisfactor = setxAxisfactor(overallResult$xAxis, options)	
+				overallResult$xAxisfactor = setxAxisfactor(overallResult$xAxisName, overallResult$xAxis, options)	
 			
 				#myPlot = ggplot(overallList$overallResult, aes(factor(name), value, fill=name, colour=name)) + 
 				#myPlot = ggplot(overallResult, aes(factor(name), value, fill=name)) +
@@ -1528,7 +1533,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	
 	args = commandArgs(TRUE)
 	
-	saveFormat = "pdf"	
+	saveFormat = "pdf"
 	dpi = "90" ##90 ## CK: seems to change nothing for ggplot2 instead the output size should be modified, if needed // 17.2.2012	
 	
 	isGray = FALSE
