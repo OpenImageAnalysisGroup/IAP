@@ -249,8 +249,8 @@ public class MongoDB {
 		Exception e = null;
 		try {
 			boolean ok = false;
-			int nrep = 5;
-			int repeats = 5;
+			int nrep = 0;
+			int repeats = 0;
 			// BackgroundTaskHelper.lockAquire(dataBase, 2);
 			do {
 				try {
@@ -322,7 +322,8 @@ public class MongoDB {
 					err.printStackTrace();
 					System.out.println("EXEC " + (nrep - repeats + 1) + " ERROR: " + err.getLocalizedMessage() + " T=" + IAPservice.getCurrentTimeAsNiceString());
 					e = err;
-					Thread.sleep(60 * 1000);
+					if (repeats - 1 > 0)
+						Thread.sleep(60 * 1000);
 				}
 				repeats--;
 			} while (!ok && repeats > 0);
@@ -1526,25 +1527,29 @@ public class MongoDB {
 			
 			@Override
 			public void run() {
-				DBCollection dbc = db.getCollection("compute_hosts");
-				dbc.setObjectClass(CloudHost.class);
-				
-				ArrayList<CloudHost> del = new ArrayList<CloudHost>();
-				
-				DBCursor cursor = dbc.find();
-				final long curr = System.currentTimeMillis();
-				while (cursor.hasNext()) {
-					CloudHost h = (CloudHost) cursor.next();
-					if (curr - h.getLastUpdateTime() < maxUpdate) {
-						res.add(h);
-					} else {
-						long age = curr - h.getLastUpdateTime();
-						if (age > 1000 * 60 * 15)
-							del.add(h);
+				try {
+					DBCollection dbc = db.getCollection("compute_hosts");
+					dbc.setObjectClass(CloudHost.class);
+					
+					ArrayList<CloudHost> del = new ArrayList<CloudHost>();
+					
+					DBCursor cursor = dbc.find();
+					final long curr = System.currentTimeMillis();
+					while (cursor.hasNext()) {
+						CloudHost h = (CloudHost) cursor.next();
+						if (curr - h.getLastUpdateTime() < maxUpdate) {
+							res.add(h);
+						} else {
+							long age = curr - h.getLastUpdateTime();
+							if (age > 1000 * 60 * 15)
+								del.add(h);
+						}
 					}
+					for (CloudHost d : del)
+						dbc.remove(d);
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
 				}
-				for (CloudHost d : del)
-					dbc.remove(d);
 			}
 			
 			@Override

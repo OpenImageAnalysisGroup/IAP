@@ -11,7 +11,9 @@ import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ReleaseInfo;
+import org.SettingsHelperDefaultIsFalse;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
@@ -25,7 +27,7 @@ import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
-import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 
 public class MassCopySupport {
@@ -41,6 +43,8 @@ public class MassCopySupport {
 	}
 	
 	private boolean massCopyRunning = false;
+	
+	private final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
 	
 	private MassCopySupport() {
 		new MultimodalDataHandlingAddon();
@@ -78,28 +82,39 @@ public class MassCopySupport {
 		tT.run();
 		t.scheduleAtFixedRate(tT, new Date(), 1 * 60 * 1000);
 		print("INFO: MASS COPY SUPPORT READY");
-		String hsmFolder = IAPmain.getHSMfolder();
-		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			if (new File(hsmFolder).canRead())
-				print("INFO: HSM FOLDER CAN BE READ");
-			else
-				print("ERROR: HSM FOLDER CAN NOT BE READ");
-			if (new File(hsmFolder).canWrite())
-				print("INFO: HSM FOLDER IS WRITABLE");
-			else
-				print("ERROR: CAN NOT WRITE TO HSM FOLDER");
-			
-		} else {
-			print("WARNING: HSM FOLDER NOT AVAILABLE: " + hsmFolder);
-		}
 	}
 	
-	public void performMassCopy() {
+	public void performMassCopy() throws InterruptedException {
 		if (massCopyRunning) {
 			print("INFO: MASS COPY PROCEDURE IS SKIPPED, BECAUSE PREVIOUS MASS COPY OPERATION IS STILL RUNNING");
 			return;
 		}
 		massCopyRunning = true;
+		
+		boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+		if (!en)
+			return;
+		for (int i = 30; i >= 0; i--) {
+			status.setCurrentStatusText1("Countdown");
+			status.setCurrentStatusText2("Start sync in " + i + " seconds...");
+			Thread.sleep(1000);
+			en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+			if (!en) {
+				massCopyRunning = false;
+				status.setCurrentStatusText1("Sync cancelled");
+				status.setCurrentStatusText2("");
+				Thread.sleep(5000);
+				if (!massCopyRunning) {
+					status.setCurrentStatusText1("");
+					status.setCurrentStatusText2("");
+				}
+				return;
+			}
+		}
+		status.setCurrentStatusText1("Sync initiated");
+		status.setCurrentStatusText2("Analyze data status...");
+		Thread.sleep(1000);
+		
 		try {
 			makeCopyInnerCall();
 		} finally {
@@ -111,12 +126,13 @@ public class MassCopySupport {
 		msg = SystemAnalysis.getCurrentTime() + ">" + msg;
 		history.add(msg);
 		System.out.println(msg);
+		status.setCurrentStatusText2(msg);
 	}
 	
 	private void makeCopyInnerCall() {
 		try {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">START MASS COPY SYNC");
-			
+			status.setCurrentStatusText1("Start sync...");
 			StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LemnaTec to MongoDBs (MASS COPY)", false);
 			
 			LemnaTecDataExchange lt = new LemnaTecDataExchange();
@@ -125,18 +141,26 @@ public class MassCopySupport {
 			ArrayList<IdTime> toSave = new ArrayList<IdTime>();
 			
 			for (String db : lt.getDatabases()) {
-				for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
-					ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(), ltExp.getImportdate(), ltExp));
+				try {
+					for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
+						ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(), ltExp.getImportdate(), ltExp));
+					}
+				} catch (Exception e) {
+					print("Cant process DB " + db + ": " + e.getMessage());
 				}
 			}
 			
 			for (MongoDB m : MongoDB.getMongos()) {
-				print("MongoDB: " + m.getDatabaseName() + "@" + m.getDefaultHost());
-				for (ExperimentHeaderInterface hsmExp : m.getExperimentList(null)) {
-					if (hsmExp.getOriginDbId() != null)
-						mongoIdsArr.add(new IdTime(m, hsmExp.getOriginDbId(), hsmExp.getImportdate(), null));
-					else
-						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN MongoDB (" + m.getDatabaseName() + ")!");
+				try {
+					print("MongoDB: " + m.getDatabaseName() + "@" + m.getDefaultHost());
+					for (ExperimentHeaderInterface hsmExp : m.getExperimentList(null)) {
+						if (hsmExp.getOriginDbId() != null)
+							mongoIdsArr.add(new IdTime(m, hsmExp.getOriginDbId(), hsmExp.getImportdate(), null));
+						else
+							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN MongoDB (" + m.getDatabaseName() + ")!");
+					}
+				} catch (Exception e) {
+					print("Cant process mongo DB " + m.getDatabaseName() + ": " + e.getMessage());
 				}
 			}
 			
@@ -171,24 +195,34 @@ public class MassCopySupport {
 			}
 			
 			print("START MASS COPY OF " + toSave.size() + " EXPERIMENTS!");
+			status.setCurrentStatusText1("Start copy of " + toSave.size() + " experiments...");
+			int done = 0;
 			for (IdTime it : toSave) {
+				boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+				if (!en)
+					continue;
+				status.setCurrentStatusText1("Copy " + toSave.size() + " experiments (" + done + " finished)");
 				MongoDB m = it.getMongoDB();
 				if (m == null) {
 					// new data set, copy to last mongo instance
 					m = MongoDB.getMongos().get(MongoDB.getMongos().size() - 1);
 				}
 				ExperimentHeaderInterface src = it.getExperimentHeader();
-				print("START COPY OF EXPERIMENT: " + it.Id + " to MongoDB " + m.getDatabaseName() + "@" + m.getDefaultHost());
-				
+				print("Copy " + it.Id + " to " + m.getDatabaseName());
 				ExperimentReference er = new ExperimentReference(src);
 				ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
-				boolean enabled = true;
-				copyAction.setStatusProvider(new BackgroundTaskConsoleLogger("", "", enabled));
+				copyAction.setStatusProvider(status);
 				boolean simulate = true;
 				if (!simulate)
 					copyAction.performActionCalculateResults(null);
-				print("FINISHED COPY OF EXPERIMENT: " + it.Id + " to MongoDB " + m.getDatabaseName() + "@" + m.getDefaultHost());
+				print("Copied " + it.Id + " to " + m.getDatabaseName());
+				done++;
+				status.setCurrentStatusValueFine(100d * done / toSave.size());
+				Thread.sleep(1000);
 			}
+			status.setCurrentStatusText1("Copy complete (" + done + " finished)");
+			status.setCurrentStatusText2("Next sync at 8 PM");
+			status.setCurrentStatusValueFine(100d);
 			s.printTime();
 		} catch (Exception e1) {
 			print("ERROR: MASS COPY INNER-CALL ERROR (" + e1.getMessage() + ")");
@@ -206,6 +240,12 @@ public class MassCopySupport {
 				public void run() {
 					try {
 						Thread.sleep(1000);
+						boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+						if (!en)
+							return;
+						
+						Thread.sleep(1000);
+						
 						MassCopySupport sb = MassCopySupport.getInstance();
 						sb.performMassCopy();
 					} catch (InterruptedException e) {
@@ -244,5 +284,9 @@ public class MassCopySupport {
 			return pre + res.toString() + follow;
 		else
 			return res.toString();
+	}
+	
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
+		return status;
 	}
 }
