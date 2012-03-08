@@ -15,9 +15,15 @@ public class ActionToggleSettingDefaultIsFalse extends AbstractNavigationAction 
 	
 	private final String setting;
 	private final String settingDefaultIsFalse;
+	private final BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider;
+	private final Runnable startAction;
 	
-	public ActionToggleSettingDefaultIsFalse(String tooltip, String setting, String settingDefaultIsFalse) {
+	public ActionToggleSettingDefaultIsFalse(BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, Runnable startAction, String tooltip,
+			String setting,
+			String settingDefaultIsFalse) {
 		super("<html>" + StringManipulationTools.stringReplace(tooltip, ";", ";<br>"));
+		this.optStatusProvider = optStatusProvider;
+		this.startAction = startAction;
 		this.setting = setting;
 		this.settingDefaultIsFalse = settingDefaultIsFalse;
 	}
@@ -35,7 +41,13 @@ public class ActionToggleSettingDefaultIsFalse extends AbstractNavigationAction 
 	@Override
 	public String getDefaultTitle() {
 		boolean enabled = new SettingsHelperDefaultIsFalse().isEnabled(settingDefaultIsFalse);
-		return pretty(setting) + (enabled ? " (on)" : " (off)");
+		if (optStatusProvider != null)
+			return "<html><center>" + pretty(setting) + (enabled ? " (on)" : " (off)") + "<br>"
+					+ optStatusProvider.getCurrentStatusMessage1() + "<br>"
+					+ optStatusProvider.getCurrentStatusMessage2() +
+					"</center>";
+		else
+			return pretty(setting) + (enabled ? " (on)" : " (off)");
 	}
 	
 	private String pretty(String s) {
@@ -67,7 +79,10 @@ public class ActionToggleSettingDefaultIsFalse extends AbstractNavigationAction 
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		synchronized (this.getClass()) {
 			boolean enabled = new SettingsHelperDefaultIsFalse().isEnabled(settingDefaultIsFalse);
-			new SettingsHelperDefaultIsFalse().setEnabled(settingDefaultIsFalse, !enabled);
+			enabled = !enabled;
+			new SettingsHelperDefaultIsFalse().setEnabled(settingDefaultIsFalse, enabled);
+			if (enabled && startAction != null)
+				startAction.run();
 		}
 	}
 	

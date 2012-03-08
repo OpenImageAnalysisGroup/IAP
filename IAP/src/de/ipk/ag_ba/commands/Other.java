@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.graffiti.editor.GravistoService;
@@ -150,15 +151,20 @@ public class Other {
 				
 				ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
 				for (MongoDB m : MongoDB.getMongos()) {
-					CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m,
-							null,
-							true);
 					try {
-						cmna.performActionCalculateResults(src);
-						for (NavigationButton o : cmna.getResultNewActionSet())
-							cloudHostList.add(o.getAction());
+						m.batchGetWorkTasksScheduledForStart(0);
+						CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m,
+								null,
+								true);
+						try {
+							cmna.performActionCalculateResults(src);
+							for (NavigationButton o : cmna.getResultNewActionSet())
+								cloudHostList.add(o.getAction());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						System.out.println(m.getDatabaseName() + " is not accessible!");
 					}
 				}
 				
@@ -170,13 +176,32 @@ public class Other {
 				}
 				
 				resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(
+						null, null,
 						"Enable or disable the automated backup of LT data sets to the HSM file system",
 						"Automatic Backup to HSM",
 						"backup"), src.getGUIsetting()));
 				
 				resultNavigationButtons.add(new NavigationButton(new ActionBackupHistory("Show full backup history"), src.getGUIsetting()));
 				
-				resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(
+				BackgroundTaskStatusProviderSupportingExternalCall copyToHsmStatus = MassCopySupport.getInstance().getStatusProvider();
+				Runnable startAction = new Runnable() {
+					@Override
+					public void run() {
+						Thread t = new Thread(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									MassCopySupport.getInstance().performMassCopy();
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
+						}, "mass copy sync");
+						t.start();
+					}
+				};
+				resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(copyToHsmStatus,
+						startAction,
 						"Enable or disable the automated copy of LT data sets to the MongoDB DBs",
 						"Automatic DB-Copy",
 						"sync"), src.getGUIsetting()));
