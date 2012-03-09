@@ -209,6 +209,11 @@ public class ImageAnalysisCommandManager {
 						toggles,
 						true, null),
 						guiSetting));
+				// actions.add(new NavigationButton(new ActionNumericDataReportComplete(
+				// m, experimentReference, false,
+				// toggles,
+				// true, null),
+				// guiSetting));
 				actions.add(
 						new NavigationButton(
 								new ActionNumericDataReportSetup(m, experimentReference, false, false,

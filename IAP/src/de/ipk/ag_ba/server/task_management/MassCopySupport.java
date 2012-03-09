@@ -212,7 +212,7 @@ public class MassCopySupport {
 				ExperimentReference er = new ExperimentReference(src);
 				ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
 				copyAction.setStatusProvider(status);
-				boolean simulate = true;
+				boolean simulate = false;
 				if (!simulate)
 					copyAction.performActionCalculateResults(null);
 				print("Copied " + it.Id + " to " + m.getDatabaseName());

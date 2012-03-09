@@ -46,13 +46,16 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		Object[] sel = null;
-		if (MongoDB.getMongos().size() > 1) {
-			sel = MyInputHelper.getInput(
-					"Select the database-target:",
-					"Target Selection", new Object[] { "Target", MongoDB.getMongos() });
-		} else
-			sel = new Object[] { MongoDB.getMongos().iterator().next() };
-		
+		if (m != null)
+			sel = new Object[] { m };
+		else {
+			if (MongoDB.getMongos().size() > 1) {
+				sel = MyInputHelper.getInput(
+						"Select the database-target:",
+						"Target Selection", new Object[] { "Target", MongoDB.getMongos() });
+			} else
+				sel = new Object[] { MongoDB.getMongos().iterator().next() };
+		}
 		if (sel == null)
 			return;
 		
