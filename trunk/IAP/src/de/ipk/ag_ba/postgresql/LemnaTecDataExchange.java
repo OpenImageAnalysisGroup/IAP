@@ -530,7 +530,7 @@ public class LemnaTecDataExchange {
 					snapshot.setWeight_before(w);
 				
 				snapshot.setCamera_label(rs.getString("compname"));
-				System.out.println("LABLAB: " + rs.getString("compname"));
+				// System.out.println("LABLAB: " + rs.getString("compname"));
 				snapshot.setXfactor(rs.getDouble("xfactor"));
 				snapshot.setYfactor(rs.getDouble("yfactor"));
 				
@@ -1151,7 +1151,7 @@ public class LemnaTecDataExchange {
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					
 					if (!res.containsKey(plantID)) {
 						res.put(plantID, new Condition(null));
