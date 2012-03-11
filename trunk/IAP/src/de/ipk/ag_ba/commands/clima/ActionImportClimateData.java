@@ -92,12 +92,12 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 						Double temp_Night = (Double) myData.getCellData(tempCol_Night, row, null);
 						if (time_Sun_Morning != null && time_Sun_Evening != null && temp_Day != null && temp_Night != null && date != null) {
 							double hourProgress_Day = (time_Sun_Evening - time_Sun_Morning) * 24d;
-							hours.add(-12d);
+							hours.add(-13d);
 							days.add(date);
 							temps.add(temp_Day);
 							
 							double hourProgress_Night = 24d - (time_Sun_Evening - time_Sun_Morning) * 24d;
-							hours.add(-12d);
+							hours.add(-11d);
 							days.add(date);
 							temps.add(temp_Night);
 						}

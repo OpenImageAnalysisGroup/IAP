@@ -21,6 +21,7 @@ import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.navigation_model.RemoteExecutionWrapperAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
@@ -42,15 +43,38 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		this.n = 0;
 		
 		for (ExperimentHeaderInterface eh : experimentList) {
-			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
-				n++;
-			if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + ""))
-				n++;
-			if (eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + ""))
-				n++;
-			if (eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + ""))
-				n++;
+			if (eh.getRemark() != null && eh.getRemark().contains("IAP image analysis"))
+				continue;
+			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + "")) {
+				if (!knownAnalysis(eh, experimentList))
+					n++;
+			}
+			if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + "")) {
+				if (!knownAnalysis(eh, experimentList))
+					n++;
+			}
+			if (eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + "")) {
+				if (!knownAnalysis(eh, experimentList))
+					n++;
+			}
+			if (eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + "")) {
+				if (!knownAnalysis(eh, experimentList))
+					n++;
+			}
 		}
+	}
+	
+	private boolean knownAnalysis(ExperimentHeaderInterface eh, ArrayList<ExperimentHeaderInterface> experimentList2) {
+		if (eh == null || experimentList2 == null || experimentList2.size() == 0 || eh.getDatabaseId() == null || eh.getDatabaseId().length() == 0)
+			return false;
+		String dbID = eh.getDatabaseId();
+		for (ExperimentHeaderInterface e : experimentList2) {
+			if (e.getOriginDbId() != null && e.getOriginDbId().equals(dbID)) {
+				if (e.getRemark().contains(IAPmain.RELEASE_IAP_IMAGE_ANALYSIS))
+					return true;
+			}
+		}
+		return false;
 	}
 	
 	private NavigationButton src;
@@ -76,6 +100,13 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		StringBuilder res = new StringBuilder();
 		res.append("Experiments:<ul>");
 		for (ExperimentHeaderInterface eh : experimentList) {
+			if (eh.getRemark() != null && eh.getRemark().contains("IAP image analysis"))
+				continue;
+			if (knownAnalysis(eh, experimentList)) {
+				res.append("<li>Analysis result with current image analysis pipeline (" + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS + ") available for "
+						+ eh.getExperimentName());
+				continue;
+			}
 			NavigationAction navigationAction = null;
 			System.out.println("Experiment-type: " + eh.getExperimentType());
 			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
