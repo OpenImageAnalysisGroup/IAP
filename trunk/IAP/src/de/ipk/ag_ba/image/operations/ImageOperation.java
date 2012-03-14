@@ -310,7 +310,7 @@ public class ImageOperation {
 	public static float distanceToRed(float f) {
 		float red = 0;
 		float yellow = 60f / 360f;
-		if (f < yellow) { // 0 - 0.16)
+		if (f <= yellow) { // 0 - 0.16)
 			red = f / yellow;
 		} else { // 0.16 - 1
 			f -= yellow;
