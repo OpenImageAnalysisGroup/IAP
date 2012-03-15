@@ -117,6 +117,10 @@ public class LemnaTecDataExchange {
 		return getExperimentsInDatabase(user, database, null);
 	}
 	
+	public static boolean known(String dbName) {
+		return dbName != null && (dbName.startsWith("CGH_") || dbName.startsWith("BGH_") || dbName.startsWith("APH_"));
+	}
+	
 	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws SQLException, ClassNotFoundException {
@@ -150,7 +154,13 @@ public class LemnaTecDataExchange {
 			
 			while (rs.next()) {
 				ExperimentHeaderInterface ehi = new ExperimentHeader();
-				ehi.setExperimentname(rs.getString(1));
+				String name = rs.getString(1);
+				
+				if (known(database))
+					ehi.setExperimentname(name);
+				else
+					ehi.setExperimentname(name + " (" + database + ")");
+				
 				ehi.setDatabase(database);
 				ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentName());
 				ehi.setOriginDbId("lemnatec:" + database + ":" + ehi.getExperimentName());
@@ -406,10 +416,10 @@ public class LemnaTecDataExchange {
 			rs.close();
 			ps.close();
 			HashSet<Long> knownSnaphotIds = new HashSet<Long>();
-			getProperImageSnapshots(experiment, result, connection, id2path, knownSnaphotIds);
-			if (result.size() == 0) {
-				getImageSnapshotsWithUnknownImageUnitConfiguration(experiment, result, connection, id2path, knownSnaphotIds);
-			}
+			// getProperImageSnapshots(experiment, result, connection, id2path, knownSnaphotIds);
+			// if (result.size() == 0) {
+			getImageSnapshotsWithUnknownImageUnitConfiguration(experiment, result, connection, id2path, knownSnaphotIds);
+			// }
 			{
 				// load snapshots without images
 				String sqlText = "SELECT "
@@ -530,7 +540,7 @@ public class LemnaTecDataExchange {
 					snapshot.setWeight_before(w);
 				
 				snapshot.setCamera_label(rs.getString("compname"));
-				// System.out.println("LABLAB: " + rs.getString("compname"));
+				System.out.println("LABLAB: " + rs.getString("compname"));
 				snapshot.setXfactor(rs.getDouble("xfactor"));
 				snapshot.setYfactor(rs.getDouble("yfactor"));
 				

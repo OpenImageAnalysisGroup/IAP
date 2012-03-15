@@ -84,9 +84,9 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			Collections.sort(listOfDatabases, new Comparator<String>() {
 				@Override
 				public int compare(String arg0, String arg1) {
-					if (known(arg0) && !known(arg1))
+					if (LemnaTecDataExchange.known(arg0) && !LemnaTecDataExchange.known(arg1))
 						return -1;
-					if (!known(arg0) && known(arg1))
+					if (!LemnaTecDataExchange.known(arg0) && LemnaTecDataExchange.known(arg1))
 						return 1;
 					return arg0.compareTo(arg1);
 				}
@@ -109,7 +109,7 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 					}
 					Collection<ExperimentHeaderInterface> experiments = experimentMap.get(db);
 					if (experiments.size() > 0) {
-						if (!known(db))
+						if (!LemnaTecDataExchange.known(db))
 							unsorted.add(new NavigationButton(new ActionLemnaDb(db, experiments), src.getGUIsetting()));
 						else
 							result.add(new NavigationButton(new ActionLemnaDb(db, experiments), src.getGUIsetting()));
@@ -144,10 +144,6 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			// error
 			status.setCurrentStatusText2("Error: " + e.getMessage());
 		}
-	}
-	
-	protected boolean known(String arg1) {
-		return arg1 != null && (arg1.startsWith("CGH_") || arg1.startsWith("BGH_") || arg1.startsWith("APH_"));
 	}
 	
 	@Override

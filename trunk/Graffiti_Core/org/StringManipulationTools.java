@@ -647,6 +647,22 @@ public class StringManipulationTools implements HelperClass {
 		}
 	}
 	
+	public static String getStringList(String pre, Collection<?> elements, String div) {
+		if (elements == null || elements.size() <= 0)
+			return "";
+		else {
+			StringBuilder sb = new StringBuilder();
+			int i = 0;
+			for (Object e : elements) {
+				sb.append(pre + e + "");
+				if (i < elements.size() - 1)
+					sb.append(div);
+				i++;
+			}
+			return sb.toString();
+		}
+	}
+	
 	public static String[] splitSafe(String str, String delimiter) {
 		String[] stringPieces;
 		try {

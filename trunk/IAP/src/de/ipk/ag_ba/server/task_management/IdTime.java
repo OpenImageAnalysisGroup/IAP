@@ -9,12 +9,15 @@ public class IdTime {
 	
 	public Date time;
 	public String Id;
-	private final ExperimentHeaderInterface exp;
+	private final ExperimentHeaderInterface optExp;
 	private final MongoDB m;
+	private int numberOfFiles;
 	
-	public IdTime(MongoDB m, String Id, Date date, ExperimentHeaderInterface exp) {
+	public IdTime(MongoDB m, String Id, Date date,
+			ExperimentHeaderInterface optExp, int numberOfFiles) {
 		this.m = m;
 		this.Id = Id;
+		setNumberOfFiles(numberOfFiles);
 		if (Id == null) {
 			System.out.println("ERR");
 			this.Id = "";
@@ -24,11 +27,11 @@ public class IdTime {
 			date = new Date();
 		}
 		this.time = date;
-		this.exp = exp;
+		this.optExp = optExp;
 	}
 	
 	public ExperimentHeaderInterface getExperimentHeader() {
-		return exp;
+		return optExp;
 	}
 	
 	@Override
@@ -38,5 +41,13 @@ public class IdTime {
 	
 	public MongoDB getMongoDB() {
 		return m;
+	}
+	
+	public int getNumberOfFiles() {
+		return numberOfFiles;
+	}
+	
+	private void setNumberOfFiles(int numberOfFiles) {
+		this.numberOfFiles = numberOfFiles;
 	}
 }

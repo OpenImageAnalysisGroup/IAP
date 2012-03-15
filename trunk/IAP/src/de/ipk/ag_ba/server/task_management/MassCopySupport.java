@@ -143,7 +143,8 @@ public class MassCopySupport {
 			for (String db : lt.getDatabases()) {
 				try {
 					for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
-						ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(), ltExp.getImportdate(), ltExp));
+						ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(),
+								ltExp.getImportdate(), ltExp, ltExp.getNumberOfFiles()));
 					}
 				} catch (Exception e) {
 					print("Cant process DB " + db + ": " + e.getMessage());
@@ -155,7 +156,8 @@ public class MassCopySupport {
 					print("MongoDB: " + m.getDatabaseName() + "@" + m.getDefaultHost());
 					for (ExperimentHeaderInterface hsmExp : m.getExperimentList(null)) {
 						if (hsmExp.getOriginDbId() != null)
-							mongoIdsArr.add(new IdTime(m, hsmExp.getOriginDbId(), hsmExp.getImportdate(), null));
+							mongoIdsArr.add(new IdTime(m, hsmExp.getOriginDbId(),
+									hsmExp.getImportdate(), null, hsmExp.getNumberOfFiles()));
 						else
 							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN MongoDB (" + m.getDatabaseName() + ")!");
 					}
@@ -179,8 +181,14 @@ public class MassCopySupport {
 				for (IdTime h : mongoIdsArr) {
 					if (h.equals(it)) {
 						if (it.time.getTime() - h.time.getTime() > 1000) {
-							print("MASS COPY INTENDED (NEW DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+							print("MASS COPY INTENDED (MORE CURRENT DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 							toSave.add(it);
+						} else {
+							// if (it.getNumberOfFiles() != h.getNumberOfFiles()) {
+							// print("MASS COPY INTENDED (MORE IMAGES INSIDE EXPERIMENT): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() +
+							// ", LT:" + it.getNumberOfFiles() + " != M:" + h.getNumberOfFiles() + ")");
+							// toSave.add(it);
+							// }
 						}
 						found = true;
 						break;

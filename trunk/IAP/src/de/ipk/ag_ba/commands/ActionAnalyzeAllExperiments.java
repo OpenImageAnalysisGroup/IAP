@@ -26,6 +26,7 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderService;
 
 /**
  * @author klukas
@@ -34,47 +35,54 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 	
 	private final MongoDB m;
 	private final ArrayList<ExperimentHeaderInterface> experimentList;
-	private int n;
+	private int n = 0;
+	private String names = "";
 	
 	public ActionAnalyzeAllExperiments(MongoDB m, ArrayList<ExperimentHeaderInterface> experimentList) {
 		super("(Re)analyze all experiments");
 		this.m = m;
-		this.experimentList = experimentList;
+		this.experimentList = ExperimentHeaderService.filterNewest(experimentList);
 		this.n = 0;
-		
-		for (ExperimentHeaderInterface eh : experimentList) {
+		ArrayList<String> nn = new ArrayList<String>();
+		for (ExperimentHeaderInterface eh : this.experimentList) {
 			if (eh.getRemark() != null && eh.getRemark().contains("IAP image analysis"))
 				continue;
-			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + "")) {
-				if (!knownAnalysis(eh, experimentList))
+			AnalysisStatus status = knownAnalysis(eh, this.experimentList);
+			
+			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + "") ||
+					eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + "") ||
+					eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + "") ||
+					eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + "")) {
+				if (status != AnalysisStatus.CURRENT) {
+					nn.add(eh.getExperimentName() + " (" + status + ")");
 					n++;
-			}
-			if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + "")) {
-				if (!knownAnalysis(eh, experimentList))
-					n++;
-			}
-			if (eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + "")) {
-				if (!knownAnalysis(eh, experimentList))
-					n++;
-			}
-			if (eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + "")) {
-				if (!knownAnalysis(eh, experimentList))
-					n++;
+				}
 			}
 		}
+		names = StringManipulationTools.getStringList("<li>", nn, "");
 	}
 	
-	private boolean knownAnalysis(ExperimentHeaderInterface eh, ArrayList<ExperimentHeaderInterface> experimentList2) {
+	private AnalysisStatus knownAnalysis(ExperimentHeaderInterface eh, ArrayList<ExperimentHeaderInterface> experimentList2) {
 		if (eh == null || experimentList2 == null || experimentList2.size() == 0 || eh.getDatabaseId() == null || eh.getDatabaseId().length() == 0)
-			return false;
+			return AnalysisStatus.NOT_FOUND;
+		if (eh.getImportusergroup() != null && eh.getImportusergroup().equals("Analysis Results"))
+			return AnalysisStatus.CURRENT;
+		AnalysisStatus res = AnalysisStatus.NOT_FOUND;
 		String dbID = eh.getDatabaseId();
 		for (ExperimentHeaderInterface e : experimentList2) {
 			if (e.getOriginDbId() != null && e.getOriginDbId().equals(dbID)) {
 				if (e.getRemark().contains(IAPmain.RELEASE_IAP_IMAGE_ANALYSIS))
-					return true;
+					return AnalysisStatus.CURRENT;
+				else {
+					if (e.getImportusergroup() != null && e.getImportusergroup().equals("Temp")) {
+						// temporary results are available, so an analysis is probably already running
+						return AnalysisStatus.CURRENT;
+					} else
+						res = AnalysisStatus.NON_CURRENT;
+				}
 			}
 		}
-		return false;
+		return res;
 	}
 	
 	private NavigationButton src;
@@ -102,7 +110,7 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		for (ExperimentHeaderInterface eh : experimentList) {
 			if (eh.getRemark() != null && eh.getRemark().contains("IAP image analysis"))
 				continue;
-			if (knownAnalysis(eh, experimentList)) {
+			if (knownAnalysis(eh, experimentList) == AnalysisStatus.CURRENT) {
 				res.append("<li>Analysis result with current image analysis pipeline (" + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS + ") available for "
 						+ eh.getExperimentName());
 				continue;
@@ -146,6 +154,12 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 	@Override
 	public String getDefaultNavigationImage() {
 		return IAPimages.getAnalyzeAll();
+	}
+	
+	@Override
+	public String getDefaultTooltip() {
+		return "<html>Analyze " + n + " experiments" +
+				(n > 0 ? "<br><ul>" + names + "</ul>" : "");
 	}
 	
 	@Override
