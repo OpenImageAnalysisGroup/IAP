@@ -128,7 +128,8 @@ public class BackupSupport {
 			
 			for (String db : lt.getDatabases()) {
 				for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
-					ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(), ltExp.getImportdate(), ltExp));
+					ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(),
+							ltExp.getImportdate(), ltExp, ltExp.getNumberOfFiles()));
 				}
 			}
 			
@@ -142,7 +143,8 @@ public class BackupSupport {
 				dataSourceHsm.readDataSource();
 				for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {
 					if (hsmExp.getOriginDbId() != null)
-						hsmIdArr.add(new IdTime(null, hsmExp.getOriginDbId(), hsmExp.getImportdate(), null));
+						hsmIdArr.add(new IdTime(null, hsmExp.getOriginDbId(),
+								hsmExp.getImportdate(), null, hsmExp.getNumberOfFiles()));
 					else
 						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN HSM!");
 				}
