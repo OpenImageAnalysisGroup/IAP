@@ -29,7 +29,6 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		return false;
 	}
 	
-	private int visibleFilledPixels, nirFilledPixels, nirSkeletonFilledPixels;
 	BlockProperty markerDistanceHorizontally = null;
 	
 	FlexibleImage nirSkel = null;
@@ -37,15 +36,6 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	@Override
 	protected void prepare() {
 		super.prepare();
-		if (getInput().getMasks().getVis() != null)
-			this.visibleFilledPixels = getInput().getMasks().getVis().getIO().countFilledPixels();
-		
-		if (getInput().getMasks().getNir() != null)
-			this.nirFilledPixels = getInput().getMasks().getNir().getIO().countFilledPixels();
-		
-		nirSkel = getProperties().getImage("nir_skeleton");
-		if (nirSkel != null)
-			this.nirSkeletonFilledPixels = nirSkel.getIO().countFilledPixels();
 		
 		if (getProperties() != null && getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
 			markerDistanceHorizontally = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
@@ -59,7 +49,13 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		
 		if (getInput().getMasks().getVis() != null) {
 			
-			ImageOperation io = new ImageOperation(getInput().getMasks().getVis());
+			ImageOperation io = new ImageOperation(getInput().getMasks().getVis().copy()).print("BEFORE TRIMM", false).
+					erode(2);
+			io = getInput().getMasks().getVis().copy().getIO().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
+					.print("AFTER ERODE", false);
+			
+			int visibleFilledPixels = io.countFilledPixels();
+			
 			double visibleIntensitySumR = io.intensitySumOfChannel(false, true, false, false);
 			double visibleIntensitySumG = io.intensitySumOfChannel(false, false, true, false);
 			double visibleIntensitySumB = io.intensitySumOfChannel(false, false, false, true);
@@ -79,6 +75,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			
 			if (getInput().getMasks().getNir() != null) {
 				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannel(false, true, false, false);
+				int nirFilledPixels = getInput().getMasks().getNir().getIO().countFilledPixels();
 				double averageNir = 1 - nirIntensitySum / nirFilledPixels;
 				// rt.addValue("ndvi.nir.intensity.average", averageNir);
 				
@@ -95,19 +92,24 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		if (getInput().getMasks().getFluo() != null) {
-			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo());
+			ImageOperation io = new ImageOperation(getInput().getMasks().getFluo().copy()).print("BEFORE TRIMM", false).
+					erode(2);
+			io = getInput().getMasks().getFluo().copy().getIO().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
+					.print("AFTER ERODE", false);
 			ResultsTable rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
 					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_MULTI_LEVEL_RGB); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
-			return io.getImage();
+			return getInput().getMasks().getFluo();// io.getImage();
 		} else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
+		nirSkel = getProperties().getImage("nir_skeleton");
 		if (nirSkel != null) {
+			int nirSkeletonFilledPixels = nirSkel.getIO().countFilledPixels();
 			double nirSkeletonIntensitySum = nirSkel.getIO().intensitySumOfChannel(false, true, false, false);
 			double avgNirSkel = 1 - nirSkeletonIntensitySum / nirSkeletonFilledPixels;
 			getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.skeleton.intensity.average", avgNirSkel);
@@ -116,7 +118,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 		if (getInput().getMasks().getNir() != null) {
 			ImageOperation io = new ImageOperation(getInput().getMasks().getNir());
 			if (getInput().getMasks().getNir().getHeight() > 1) {
-				
+				int nirFilledPixels = getInput().getMasks().getNir().getIO().countFilledPixels();
 				double nirIntensitySum = getInput().getMasks().getNir().getIO().intensitySumOfChannel(false, true, false, false);
 				double avgNir = 1 - nirIntensitySum / nirFilledPixels;
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.intensity.average", avgNir);
