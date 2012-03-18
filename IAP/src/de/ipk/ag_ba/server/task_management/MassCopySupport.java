@@ -147,7 +147,8 @@ public class MassCopySupport {
 								ltExp.getImportdate(), ltExp, ltExp.getNumberOfFiles()));
 					}
 				} catch (Exception e) {
-					print("Cant process DB " + db + ": " + e.getMessage());
+					if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
+						print("Cant process DB " + db + ": " + e.getMessage());
 				}
 			}
 			
@@ -169,11 +170,11 @@ public class MassCopySupport {
 			for (IdTime it : ltIdArr) {
 				String db = it.getExperimentHeader().getDatabase();
 				if (db == null || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
-					print("DATASET IGNORED (INVALID DB): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+					// print("DATASET IGNORED (INVALID DB): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 					continue;
 				} else
 					if (it.getExperimentHeader().getExperimentName().equals("unknown")) {
-						print("DATASET IGNORED (INVALID UKNOWN EXPERIMENT NAME): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+						// print("DATASET IGNORED (INVALID UKNOWN EXPERIMENT NAME): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 						continue;
 					}
 				
@@ -183,13 +184,12 @@ public class MassCopySupport {
 						if (it.time.getTime() - h.time.getTime() > 1000) {
 							print("MASS COPY INTENDED (MORE CURRENT DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 							toSave.add(it);
-						} else {
-							// if (it.getNumberOfFiles() != h.getNumberOfFiles()) {
-							// print("MASS COPY INTENDED (MORE IMAGES INSIDE EXPERIMENT): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() +
-							// ", LT:" + it.getNumberOfFiles() + " != M:" + h.getNumberOfFiles() + ")");
-							// toSave.add(it);
-							// }
-						}
+						} else
+							if (it.getNumberOfFiles() != h.getNumberOfFiles()) {
+								print("MASS COPY INTENDED (MORE IMAGES INSIDE EXPERIMENT): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() +
+										", LT:" + it.getNumberOfFiles() + " != M:" + h.getNumberOfFiles() + ")");
+								toSave.add(it);
+							}
 						found = true;
 						break;
 					}

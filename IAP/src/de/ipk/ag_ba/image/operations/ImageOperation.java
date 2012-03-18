@@ -310,7 +310,7 @@ public class ImageOperation {
 	public static float distanceToRed(float f) {
 		float red = 0;
 		float yellow = 60f / 360f;
-		if (f <= yellow) { // 0 - 0.16)
+		if (f < yellow) { // 0 - 0.16)
 			red = f / yellow;
 		} else { // 0.16 - 1
 			f -= yellow;
@@ -539,8 +539,10 @@ public class ImageOperation {
 	 * Reduce area of mask.
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
+	 * 
+	 * @return
 	 */
-	public void erode(int[][] mask) {
+	public ImageOperation erode(int[][] mask) {
 		int jM = (mask.length - 1) / 2;
 		int iM = (mask[0].length - 1) / 2;
 		
@@ -557,6 +559,7 @@ public class ImageOperation {
 		// tempImage.copyBits(processor, j - jM, i - iM, Blitter.MAX);
 		
 		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.COPY);
+		return this;
 	}
 	
 	/**

@@ -128,6 +128,18 @@ public class BatchCmd extends BasicDBObject {
 		return getLong("lastupdate");
 	}
 	
+	public String getCompatibleImageAnalysisPipelineName() {
+		String release = getString("release");
+		if (release == null)
+			return "";
+		else
+			return release;
+	}
+	
+	public void setCompatibleImageAnalysisPipelineName(String pipline_id) {
+		put("release", pipline_id);
+	}
+	
 	public CloudAnalysisStatus getRunStatus() {
 		return CloudAnalysisStatus.valueOf(getString("runstatus"));
 	}

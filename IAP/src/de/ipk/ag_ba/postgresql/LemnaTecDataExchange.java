@@ -156,10 +156,7 @@ public class LemnaTecDataExchange {
 				ExperimentHeaderInterface ehi = new ExperimentHeader();
 				String name = rs.getString(1);
 				
-				if (known(database))
-					ehi.setExperimentname(name);
-				else
-					ehi.setExperimentname(name + " (" + database + ")");
+				ehi.setExperimentname(name);
 				
 				ehi.setDatabase(database);
 				ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentName());
@@ -206,9 +203,10 @@ public class LemnaTecDataExchange {
 				while (rs.next()) {
 					Timestamp min = rs.getTimestamp(1);
 					Timestamp max = rs.getTimestamp(2);
-					if (min == null || max == null)
+					if (min == null || max == null) {
 						System.out.println("Warning: No snapshot times stored for experiment " + ehi.getExperimentName()
 								+ " in database " + ehi.getDatabase() + "!");
+					}
 					if (min != null)
 						ehi.setStartdate(new Date(min.getTime()));
 					else
@@ -217,7 +215,30 @@ public class LemnaTecDataExchange {
 						ehi.setImportdate(new Date(max.getTime()));
 					else
 						ehi.setImportdate(new Date());
-					ehi.setNumberOfFiles(rs.getInt(3));
+					// ehi.setNumberOfFiles(rs.getInt(3));
+					break;
+				}
+				rs.close();
+			}
+			ps.close();
+			
+			sqlText = "SELECT "
+					+ "	count(*) "
+					+ "FROM "
+					+ "	snapshot, tiled_image, tile, image_file_table "
+					+ "WHERE "
+					+ "	snapshot.measurement_label = ? and "
+					+ "	snapshot.id = tiled_image.snapshot_id and "
+					+ "	tiled_image.id = tile.tiled_image_id and "
+					+ "	tile.image_oid = image_file_table.id";
+			ps = connection.prepareStatement(sqlText);
+			for (ExperimentHeaderInterface ehi : result) {
+				if (ehi.getExperimentName() == null)
+					continue;
+				ps.setString(1, ehi.getExperimentName());
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					ehi.setNumberOfFiles(rs.getInt(1));
 					break;
 				}
 				rs.close();
@@ -294,9 +315,14 @@ public class LemnaTecDataExchange {
 						}
 					}
 			}
-			ps.close();
 		} finally {
 			closeDatabaseConnection(connection);
+		}
+		for (ExperimentHeaderInterface ehi : result) {
+			String db = ehi.getDatabase();
+			String name = ehi.getExperimentName();
+			if (!known(db))
+				ehi.setExperimentname(name + " (" + db + ")");
 		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Found " + result.size() + " experiments in db " + database);

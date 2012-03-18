@@ -290,7 +290,8 @@ public class CloudComputingService {
 					String partCnt = cc[2];
 					String submTime = cc[3];
 					if (!processedSubmissionTimes.contains(submTime))
-						availableTempDatasets.add(new TempDataSetDescription(className, partCnt, submTime, i.getOriginDbId()));
+						availableTempDatasets.add(new TempDataSetDescription(className, partCnt, submTime, i.getOriginDbId(),
+								IAPmain.RELEASE_IAP_IMAGE_ANALYSIS));
 					processedSubmissionTimes.add(submTime);
 				}
 			}
@@ -377,6 +378,7 @@ public class CloudComputingService {
 							cmd.setRemoteCapableAnalysisActionClassName(tempDataSetDescription.getRemoteCapableAnalysisActionClassName());
 							cmd.setRemoteCapableAnalysisActionParams("");
 							cmd.setExperimentMongoID(tempDataSetDescription.getOriginDBid());
+							cmd.setCompatibleImageAnalysisPipelineName(tempDataSetDescription.getReleaseIAP());
 							BatchCmd.enqueueBatchCmd(m, cmd);
 							System.out.println("Enqueue: " + jobID);
 						}
