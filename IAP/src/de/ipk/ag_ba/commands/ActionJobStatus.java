@@ -111,7 +111,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 							long l = Long.parseLong(ss.substring(ss.lastIndexOf("$") + "$".length()));
 							s.add(SystemAnalysis.getCurrentTime(l));
 						}
-						remain += "<br>starts: " + StringManipulationTools.getStringList(s, ", ");
+						remain += "<br>starts: " + StringManipulationTools.getStringListMerge(s, ", ");
 						long partTime = fullTime / part_cnt;
 						remain += "<br>processed: " + StringManipulationTools.formatNumber(finishedJobs, "#.000") + " in "
 								+ SystemAnalysis.getWaitTimeShort(processingTime) + ", 1 task takes " + SystemAnalysis.getWaitTimeShort(partTime);
