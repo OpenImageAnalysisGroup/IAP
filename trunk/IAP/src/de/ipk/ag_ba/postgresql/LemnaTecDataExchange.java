@@ -414,6 +414,8 @@ public class LemnaTecDataExchange {
 	
 	public Collection<Snapshot> getSnapshotsOfExperiment(String database, String experiment) throws SQLException,
 			ClassNotFoundException {
+		if (experiment != null && experiment.endsWith(" (" + database + ")"))
+			experiment = experiment.substring(0, experiment.length() - (" (" + database + ")").length());
 		Collection<Snapshot> result = new ArrayList<Snapshot>();
 		Connection connection = openConnectionToDatabase(database);
 		try {

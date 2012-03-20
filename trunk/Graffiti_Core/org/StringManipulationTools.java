@@ -9,6 +9,7 @@ package org;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -642,6 +643,38 @@ public class StringManipulationTools implements HelperClass {
 				if (i < elements.size() - 1)
 					sb.append(div);
 				i++;
+			}
+			return sb.toString();
+		}
+	}
+	
+	public static String getStringListMerge(Collection<?> elements, String div) {
+		if (elements == null || elements.size() <= 0)
+			return "";
+		else {
+			HashMap<String, Integer> known2cnt = new HashMap<String, Integer>();
+			for (Object e : elements) {
+				String s = e + "";
+				if (!known2cnt.containsKey(s))
+					known2cnt.put(s, 1);
+				else
+					known2cnt.put(s, known2cnt.get(s) + 1);
+			}
+			HashSet<String> added = new HashSet<String>();
+			StringBuilder sb = new StringBuilder();
+			for (Object e : elements) {
+				String s = e + "";
+				if (added.contains(s))
+					continue;
+				else
+					added.add(s);
+				if (sb.length() > 0)
+					sb.append(div);
+				int n = known2cnt.get(s);
+				if (n > 1)
+					sb.append(s + " (" + n + ")");
+				else
+					sb.append(s);
 			}
 			return sb.toString();
 		}
