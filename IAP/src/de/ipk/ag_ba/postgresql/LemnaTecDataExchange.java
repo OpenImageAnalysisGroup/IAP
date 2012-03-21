@@ -387,6 +387,7 @@ public class LemnaTecDataExchange {
 			id2coo.put("IL", "Lermontova, Dr. Inna (KTE)");
 			id2coo.put("AC", "Arana, Dr. Fernando (HET)");
 			id2coo.put("FA", "Arana, Dr. Fernando (HET)");
+			id2coo.put("RM", "Meyer, Dr. Rhonda (HET)");
 			id2coo.put("MM", "Muraya, Dr. Moses Mahugu (HET)");
 			id2coo.put("KN", "Neumann, Kerstin (GED)");
 			id2coo.put("KW", "Weigelt-Fischer, Dr. Kathleen (HET)");
