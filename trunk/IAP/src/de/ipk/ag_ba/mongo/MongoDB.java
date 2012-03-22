@@ -113,7 +113,7 @@ public class MongoDB {
 	
 	private static final ArrayList<MongoDB> mongos = initMongoList();
 	
-	private static boolean ensureIndex = true;
+	private static boolean ensureIndex = false;
 	
 	public static ArrayList<MongoDB> getMongos() {
 		return mongos;
