@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.commands.hsm.ActionHsmDataSourceNavigation;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
+import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.IAPnewsLinksSource;
 import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
@@ -68,7 +70,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		
 		NavigationButton serverStatusEntity = Other.getServerStatusEntity(false, src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
-
+		
 		String hsm = IAPmain.getHSMfolder();
 		if (hsm != null && new File(hsm).exists()) {
 			// add HSM entry
@@ -81,18 +83,33 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			homePrimaryActions.add(hsmSrc);
 		}
 		
+		boolean vfs = true;
+		if (vfs) {
+			// add VFS entries
+			for (VirtualFileSystem entry : VirtualFileSystem.getKnown()) {
+				Library lib = new Library();
+				DataSource dataSourceHsm = new VfsFileSystemSource(lib, entry.getTargetName(), entry,
+						new String[] {},
+						IAPmain.loadIcon("img/ext/folder-remote.png"),
+						IAPmain.loadIcon("img/ext/folder-remote.png"));
+				NavigationButton hsmSrc = new NavigationButton(new ActionHsmDataSourceNavigation(dataSourceHsm), guiSetting);
+				hsmSrc.setToolTipText("Target: " + entry.getTargetPathName() + " via " + entry.getTransferProtocolName());
+				homePrimaryActions.add(hsmSrc);
+			}
+		}
+		
 		{
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
-								"General Bioinformatics Ressources", "img/dbelogo2.png", "img/dbelogo2.png");
+					"General Bioinformatics Ressources", "img/dbelogo2.png", "img/dbelogo2.png");
 			ipkBioInf.setIntroductionText(
-						"<h2>Bioinformatics@IPK</h2>IAP additionally provides access and links to various bioinformatics ressources, "
-								+ "developed at the IPK. The included data sources and tools have been "
-								+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis, "
-								+ "partly with contributions from the group Bioinformatics and Information Technology. "
-								+ "To get details about the included data sources and information systems, click the included Website- and Reference-Links."
-						);
+					"<h2>Bioinformatics@IPK</h2>IAP additionally provides access and links to various bioinformatics ressources, "
+							+ "developed at the IPK. The included data sources and tools have been "
+							+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis, "
+							+ "partly with contributions from the group Bioinformatics and Information Technology. "
+							+ "To get details about the included data sources and information systems, click the included Website- and Reference-Links."
+					);
 			ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://bioinformatics.ipk-gatersleben.de",
-								"img/browser.png", src != null ? src.getGUIsetting() : null));
+					"img/browser.png", src != null ? src.getGUIsetting() : null));
 			for (NavigationButton nge : homeActions)
 				ipkBioInf.addAdditionalEntity(nge);
 			homePrimaryActions.add(new NavigationButton(ipkBioInf, guiSetting));
