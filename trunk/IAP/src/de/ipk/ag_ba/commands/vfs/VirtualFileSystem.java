@@ -1,36 +1,37 @@
 package de.ipk.ag_ba.commands.vfs;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ReleaseInfo;
 import org.graffiti.plugin.io.resources.IOurl;
+
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 
 /**
  * @author klukas
  */
-public class VirtualFileSystem {
+public abstract class VirtualFileSystem {
 	
 	public static Collection<VirtualFileSystem> getKnown() {
 		ArrayList<VirtualFileSystem> res = new ArrayList<VirtualFileSystem>();
-		res.add(new VirtualFileSystem());
+		res.add(new VirtualFileSystemFolderStorage(
+				"file-desktop",
+				"File I/O",
+				"Desktop" + File.separator + "VFS",
+				ReleaseInfo.getDesktopFolder() + File.separator + "VFS"));
 		return res;
 	}
 	
-	public String getTargetName() {
-		return "My FTP Server 1";
-	}
+	public abstract String getTargetName();
 	
-	public String getTransferProtocolName() {
-		return "FTP";
-	}
+	public abstract String getTransferProtocolName();
 	
-	public String getTargetPathName() {
-		return "storage_1";
-	}
+	public abstract String getTargetPathName();
 	
-	public String getPrefix() {
-		return "vfs-ftp";
-	}
+	public abstract String getPrefix();
 	
 	public String getResultPathNameForUrl() {
 		// TODO Auto-generated method stub
@@ -40,14 +41,13 @@ public class VirtualFileSystem {
 	/**
 	 * @return List of file names found at root of VFS source
 	 */
-	public ArrayList<String> listFiles() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract ArrayList<String> listFiles();
 	
-	public IOurl getIOurlFor(String fileName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract IOurl getIOurlFor(String fileName);
 	
+	public void saveExperiment(ExperimentReference experimentReference,
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
+		ActionDataExportToVfs a = new ActionDataExportToVfs(null, experimentReference, this);
+		a.performActionCalculateResults(null);
+	}
 }

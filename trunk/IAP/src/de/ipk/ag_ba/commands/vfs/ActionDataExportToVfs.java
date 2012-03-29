@@ -213,8 +213,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			errorCount++;
 			tso.setParam(2, true);
 			
-			if (fn != null && fn.trim().length() > 0 && new VfsFile(fn).exists())
-				new VfsFile(fn).delete();
+			if (fn != null && fn.trim().length() > 0 && new VfsFilesystemFile(fn).exists())
+				new VfsFilesystemFile(fn).delete();
 			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
 		}
 	}
@@ -244,7 +244,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					String zefn = null;
 					try {
 						zefn = determineBinaryFileName(t, substanceName, nm, bm);
-						final VfsFile targetFile = new VfsFile(
+						final VfsFile targetFile = new VfsFilesystemFile(
 								hsmManager.prepareAndGetDataFileNameAndPath(
 										experiment.getHeader(), t, zefn));
 						boolean exists = targetFile.exists()
@@ -293,7 +293,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					String zefn = null;
 					try {
 						zefn = determineBinaryFileName(t, substanceName, nm, bm);
-						final VfsFile targetFile = new VfsFile(
+						final VfsFile targetFile = new VfsFilesystemFile(
 								hsmManager.prepareAndGetPreviewFileNameAndPath(
 										experiment.getHeader(), t, zefn));
 						boolean exists = targetFile.exists()
@@ -387,7 +387,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									+ determineBinaryFileName(t, substanceName, nm,
 											bm);
 					
-					final VfsFile targetFile = new VfsFile(
+					final VfsFile targetFile = new VfsFilesystemFile(
 							hsmManager.prepareAndGetDataFileNameAndPath(
 									experiment.getHeader(), t, zefn));
 					
@@ -446,7 +446,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									+ determineBinaryFileName(t, substanceName, nm,
 											id);
 					
-					final VfsFile targetFile = new VfsFile(
+					final VfsFile targetFile = new VfsFilesystemFile(
 							hsmManager.prepareAndGetDataFileNameAndPath(
 									experiment.getHeader(), t, zefn));
 					Runnable postProcess = new Runnable() {
@@ -500,22 +500,23 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		try {
 			long tsave = System.currentTimeMillis();
 			int eidx = 0;
-			LinkedHashMap<VfsFile, String> tempFile2fileName = new LinkedHashMap<VfsFile, String>();
-			for (ExperimentInterface ei : experiment.split()) {
-				if (optStatus != null)
-					optStatus.setCurrentStatusText1("Create XML File");
-				storeXMLdataset(experiment, hsmManager, tsave, eidx,
-						tempFile2fileName, ei, optStatus);
-				if (optStatus != null)
-					optStatus.setCurrentStatusText1("Create Condition File");
-				storeConditionIndexFile(hsmManager, tsave, eidx,
-						tempFile2fileName, ei);
-				if (optStatus != null)
-					optStatus.setCurrentStatusText1("Create Index File");
-				storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
-				
-				eidx++;
-			}
+			LinkedHashMap<VfsFilesystemFile, String> tempFile2fileName = new LinkedHashMap<VfsFilesystemFile, String>();
+			// for (ExperimentInterface ei : experiment.split()) {
+			ExperimentInterface ei = experiment;
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Create XML File");
+			storeXMLdataset(experiment, hsmManager, tsave, eidx,
+					tempFile2fileName, ei, optStatus);
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Create Condition File");
+			storeConditionIndexFile(hsmManager, tsave, eidx,
+					tempFile2fileName, ei);
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Create Index File");
+			storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
+			
+			eidx++;
+			// }
 			renameTempInProgressFilesToFinalFileNames(tempFile2fileName);
 		} catch (Exception err) {
 			System.out.println("ERROR: Save XML of experiment "
@@ -567,7 +568,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									.getInputStreamMemoryCached(url)
 									: optUrlContent;
 							synchronized (es) {
-								VfsFile f = new VfsFile(hsmManager
+								VfsFilesystemFile f = new VfsFilesystemFile(hsmManager
 										.prepareAndGetDataFileNameAndPath(
 												experiment.getHeader(), t,
 												"in_progress_"
@@ -665,10 +666,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	}
 	
 	private void renameTempInProgressFilesToFinalFileNames(
-			LinkedHashMap<VfsFile, String> tempFile2fileName) throws IOException {
+			LinkedHashMap<VfsFilesystemFile, String> tempFile2fileName) throws IOException {
 		// rename all temp files
 		for (VfsFile f : tempFile2fileName.keySet()) {
-			VfsFile te = new VfsFile(tempFile2fileName.get(f));
+			VfsFilesystemFile te = new VfsFilesystemFile(tempFile2fileName.get(f));
 			try {
 				if (f != null && f.exists()) {
 					f.renameTo(te);
@@ -687,14 +688,14 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	private void storeConditionIndexFile(
 			final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
-			HashMap<VfsFile, String> tempFile2fileName, ExperimentInterface ei)
+			HashMap<VfsFilesystemFile, String> tempFile2fileName, ExperimentInterface ei)
 			throws IOException {
 		String conditionIndexFileName = tsave + "_" + eidx + "_"
 				+ ei.getHeader().getImportusername() + "_" + ei.getName()
 				+ ".iap.index.csv";
 		conditionIndexFileName = StringManipulationTools.stringReplace(
 				conditionIndexFileName, ":", "-");
-		VfsFile conditionFile = new VfsFile(
+		VfsFilesystemFile conditionFile = new VfsFilesystemFile(
 				hsmManager
 						.prepareAndGetTargetFileForConditionIndex("in_progress_"
 								+ UUID.randomUUID().toString()));
@@ -756,7 +757,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	}
 	
 	private void storeIndexFile(final HSMfolderTargetDataManager hsmManager,
-			long tsave, int eidx, HashMap<VfsFile, String> tempFile2fileName,
+			long tsave, int eidx, HashMap<VfsFilesystemFile, String> tempFile2fileName,
 			ExperimentInterface ei) throws IOException {
 		String indexFileName = tsave + "_" + eidx + "_"
 				+ ei.getHeader().getImportusername() + "_" + ei.getName()
@@ -764,7 +765,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		indexFileName = StringManipulationTools.stringReplace(indexFileName,
 				":", "-");
 		
-		VfsFile indexFile = new VfsFile(
+		VfsFilesystemFile indexFile = new VfsFilesystemFile(
 				hsmManager
 						.prepareAndGetTargetFileForContentIndex("in_progress_"
 								+ UUID.randomUUID().toString()));
@@ -784,13 +785,13 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	private void storeXMLdataset(final ExperimentInterface experiment,
 			final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
-			LinkedHashMap<VfsFile, String> tempFile2fileName,
+			LinkedHashMap<VfsFilesystemFile, String> tempFile2fileName,
 			ExperimentInterface ei,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws IOException {
 		TextFile tf = new TextFile();
 		tf.add(Experiment.getString(ei, optStatus));
-		VfsFile f = new VfsFile(hsmManager.prepareAndGetDataFileNameAndPath(
+		VfsFilesystemFile f = new VfsFilesystemFile(hsmManager.prepareAndGetDataFileNameAndPath(
 				experiment.getHeader(), null, "in_progress_"
 						+ UUID.randomUUID().toString()));
 		tf.write(f.getOutputStream()); // to temp file

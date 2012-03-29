@@ -43,7 +43,7 @@ public class HsmFileSystemSource extends FileSystemSource {
 			NavigationImage folderIcon) {
 		super(lib, dataSourceName, folder, new String[] {}, mainDataSourceIcon, folderIcon);
 		
-		if (!registeredFolders.contains(folder)) {
+		if (folder != null && !registeredFolders.contains(folder)) {
 			ResourceIOManager.registerIOHandler(new HsmResourceIoHandler(folder));
 			registeredFolders.add(folder);
 		}
@@ -96,7 +96,7 @@ public class HsmFileSystemSource extends FileSystemSource {
 		((HsmMainDataSourceLevel) thisLevel).setHsmFileSystemSource(this);
 	}
 	
-	public static ExperimentHeader getHSMexperimentHeaderFromFileName(String optUrl, String fileName) throws IOException {
+	protected ExperimentHeader getHSMexperimentHeaderFromFileName(String optUrl, String fileName) throws IOException {
 		String url = optUrl != null ? optUrl + File.separator : "";
 		String folder = url + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME;
 		HashMap<String, String> properties = new HashMap<String, String>();
@@ -136,7 +136,7 @@ public class HsmFileSystemSource extends FileSystemSource {
 		this.login = login;
 	}
 	
-	private boolean accessOK(ExperimentHeader eh) {
+	protected boolean accessOK(ExperimentHeader eh) {
 		if (login == null)
 			return true;
 		else {
