@@ -7,181 +7,88 @@
 
 package de.ipk.ag_ba.datasources.file_system;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.TreeMap;
 
-import org.ErrorMsg;
 import org.graffiti.plugin.io.resources.IOurl;
-import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
 
-import de.ipk.ag_ba.commands.Book;
 import de.ipk.ag_ba.commands.Library;
-import de.ipk.ag_ba.commands.vfs.VfsFile;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
-import de.ipk.ag_ba.datasources.DataSource;
-import de.ipk.ag_ba.datasources.DataSourceLevel;
-import de.ipk.ag_ba.datasources.http_folder.HTTPdataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
-import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 /**
  * @author klukas
  */
-public class VfsFileSystemSource implements DataSource {
+public class VfsFileSystemSource extends HsmFileSystemSource {
 	
 	protected final VirtualFileSystem url;
-	private final String[] validExtensions;
-	protected Collection<PathwayWebLinkItem> mainList;
-	private final NavigationImage mainDataSourceIcon;
-	private final String dataSourceName;
-	private final NavigationImage folderIcon;
-	protected boolean read;
-	protected DataSourceLevel thisLevel;
-	private final Library lib;
-	private String description;
+	private final String[] validExtensions2;
 	
-	public VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder, String[] validExtensions,
+	public VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder,
+			String[] validExtensions,
 			NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
-		this.lib = lib;
+		super(lib, dataSourceName, null, mainDataSourceIcon, folderIcon);
 		this.url = folder;
-		this.validExtensions = validExtensions;
-		this.mainDataSourceIcon = mainDataSourceIcon;
-		this.folderIcon = folderIcon;
-		this.dataSourceName = dataSourceName;
-	}
-	
-	@Override
-	public void setLogin(String login, String password) {
-		// empty
+		validExtensions2 = validExtensions;
 	}
 	
 	@Override
 	public void readDataSource() throws Exception {
-		mainList = FileSystemAccess.getWebDirectoryFileListItems(url, validExtensions, false);
-		thisLevel = new HTTPdataSourceLevel(lib, dataSourceName, mainList, mainDataSourceIcon, folderIcon);
-		read = true;
+		this.read = true;
+		this.mainList = new ArrayList<PathwayWebLinkItem>();
+		// read HSM index
+		String folder = url + File.separator + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME;
+		File dir = new File(folder);
+		String[] entries = dir.list(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".iap.index.csv");
+			}
+		});
+		
+		HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data =
+				new HashMap<String, TreeMap<Long, ExperimentHeaderInterface>>();
+		
+		if (entries != null)
+			for (String fileName : entries) {
+				long saveTime = Long.parseLong(fileName.substring(0, fileName.indexOf("_")));
+				
+				ExperimentHeader eh = getHSMexperimentHeaderFromFileName(url, fileName);
+				
+				if (accessOK(eh)) {
+					String experimentName = eh.getExperimentName();
+					if (!experimentName2saveTime2data.containsKey(experimentName))
+						experimentName2saveTime2data.put(experimentName, new TreeMap<Long, ExperimentHeaderInterface>());
+					experimentName2saveTime2data.get(experimentName).put(saveTime, eh);
+					eh.addHistoryItems(experimentName2saveTime2data.get(experimentName));
+				}
+			}
+		
+		this.thisLevel = new HsmMainDataSourceLevel(experimentName2saveTime2data);
+		((HsmMainDataSourceLevel) thisLevel).setHsmFileSystemSource(this);
 	}
 	
-	@Override
-	public Collection<DataSourceLevel> getSubLevels() {
-		try {
-			if (!read)
-				readDataSource();
-			return thisLevel.getSubLevels();
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-			return new ArrayList<DataSourceLevel>();
+	protected ExperimentHeader getHSMexperimentHeaderFromFileName(VirtualFileSystem url, String fileName) throws Exception {
+		HashMap<String, String> properties = new HashMap<String, String>();
+		IOurl ioUrl = url.getIOurlFor(HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
+		InputStream is = ioUrl.getInputStream();
+		TextFile tf = new TextFile(is, -1);
+		properties.put("_id", url.getPrefix() + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
+		for (String p : tf) {
+			String[] entry = p.split(",", 3);
+			properties.put(entry[1], entry[2]);
 		}
+		ExperimentHeader eh = new ExperimentHeader(properties);
+		return eh;
 	}
 	
-	@Override
-	public Collection<ExperimentReference> getExperiments() {
-		try {
-			if (!read)
-				readDataSource();
-			return thisLevel.getExperiments();
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-			return new ArrayList<ExperimentReference>();
-		}
-	}
-	
-	@Override
-	public Collection<PathwayWebLinkItem> getPathways() {
-		try {
-			if (!read)
-				readDataSource();
-			return thisLevel.getPathways();
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-			return new ArrayList<PathwayWebLinkItem>();
-		}
-	}
-	
-	@Override
-	public NavigationImage getIcon() {
-		return mainDataSourceIcon;
-	}
-	
-	@Override
-	public String getName() {
-		return dataSourceName;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see de.ipk.ag_ba.datasources.DataSourceLevel#getBookReferencesAtThisLevel()
-	 */
-	@Override
-	public ArrayList<Book> getReferenceInfos() {
-		try {
-			if (!read)
-				readDataSource();
-			return thisLevel.getReferenceInfos();
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-			return new ArrayList<Book>();
-		}
-	}
-	
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
-	public String getDescription() {
-		return description;
-	}
-	
-	@Override
-	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
-		return new ArrayList<NavigationButton>();
-	}
-	
-	@Override
-	public String getPrefix() {
-		return url.getPrefix();
-	}
-	
-	@Override
-	public InputStream getInputStream(IOurl url) throws Exception {
-		return new VfsFile(url).getInputStream();
-	}
-	
-	@Override
-	public InputStream getPreviewInputStream(IOurl url) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public InputStream getPreviewInputStream(IOurl url, int size) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public IOurl saveAs(IOurl source, String targetFilename) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public IOurl save(IOurl source) throws Exception {
-		// this is only important for graph saving from within IAP/VANTED
-		return null;
-	}
-	
-	@Override
-	public Long getStreamLength(IOurl url) throws Exception {
-		return this.getStreamLength(url);
-	}
 }

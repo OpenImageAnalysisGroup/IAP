@@ -1,71 +1,34 @@
 package de.ipk.ag_ba.commands.vfs;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.graffiti.plugin.io.resources.IOurl;
-
-public class VfsFile {
+public interface VfsFile {
 	
-	public VfsFile(String prepareAndGetDataFileNameAndPath) {
-		// TODO Auto-generated constructor stub
-	}
+	public abstract InputStream getInputStream() throws FileNotFoundException;
 	
-	public VfsFile(IOurl url) {
-		// TODO Auto-generated constructor stub
-	}
+	public abstract String getAbsolutePath();
 	
-	public void setLastModified(long time) {
-		// TODO Auto-generated method stub
-	}
+	public abstract String getCanonicalPath() throws IOException;
 	
-	public void setWritable(boolean b) {
-		// TODO Auto-generated method stub
-	}
+	public abstract long length();
 	
-	public void setExecutable(boolean b) {
-		// TODO Auto-generated method stub
-	}
+	public abstract OutputStream getOutputStream() throws FileNotFoundException;
 	
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract void delete();
 	
-	public void renameTo(VfsFile te) {
-		// TODO Auto-generated method stub
-	}
+	public abstract boolean exists();
 	
-	public boolean exists() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	public abstract void renameTo(VfsFile te);
 	
-	public void delete() {
-		// TODO Auto-generated method stub
-	}
+	public abstract String getName();
 	
-	public OutputStream getOutputStream() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract void setExecutable(boolean executable);
 	
-	public int length() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public abstract void setWritable(boolean writable);
 	
-	public String getCanonicalPath() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract void setLastModified(long time);
 	
-	public String getAbsolutePath() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	public InputStream getInputStream() {
-		return null;
-	}
 }

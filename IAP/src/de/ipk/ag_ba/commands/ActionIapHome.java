@@ -92,7 +92,8 @@ public final class ActionIapHome extends AbstractNavigationAction {
 						new String[] {},
 						IAPmain.loadIcon("img/ext/folder-remote.png"),
 						IAPmain.loadIcon("img/ext/folder-remote.png"));
-				NavigationButton hsmSrc = new NavigationButton(new ActionHsmDataSourceNavigation(dataSourceHsm), guiSetting);
+				ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
+				NavigationButton hsmSrc = new NavigationButton(entry.getTargetName(), action, guiSetting);
 				hsmSrc.setToolTipText("Target: " + entry.getTargetPathName() + " via " + entry.getTransferProtocolName());
 				homePrimaryActions.add(hsmSrc);
 			}
