@@ -136,4 +136,8 @@ public class IAPimages {
 	public static String getClimaImport() {
 		return "img/ext/gpl2/Gnome-Weather-Few-Clouds-64.png";
 	}
+	
+	public static String copyToServer() {
+		return "img/ext/transfer2.png";
+	}
 }
