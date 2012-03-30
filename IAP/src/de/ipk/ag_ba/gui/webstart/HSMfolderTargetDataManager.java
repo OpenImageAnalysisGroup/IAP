@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.webstart;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -8,12 +9,14 @@ import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.databases.DBTable;
@@ -45,7 +48,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
  */
 public class HSMfolderTargetDataManager implements DatabaseTarget {
 	public static final String DIRECTORY_FOLDER_NAME = "index";
-	
+	public static final String DATA_FOLDER_NAME = "data";
 	private static final String CONDITION_FOLDER_NAME = "conditions";
 	
 	private final String path;
@@ -77,7 +80,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		if (subPath.startsWith(DIRECTORY_FOLDER_NAME) || subPath.startsWith("bbb_"))
 			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentName()
 					+ ". May not start with " + DIRECTORY_FOLDER_NAME + " or " + CONDITION_FOLDER_NAME + "!");
-		String res = path + File.separator + "data" + File.separator + subPath;
+		String res = path + File.separator + DATA_FOLDER_NAME + File.separator + subPath;
 		if (!new File(res).exists())
 			new File(res).mkdirs();
 		return res + File.separator + filterBadChars(zefn);
@@ -107,7 +110,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		return s;
 	}
 	
-	private String getTargetDirectory(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime) {
+	public String getTargetDirectory(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime) {
 		GregorianCalendar cal = new GregorianCalendar();
 		if (optSnapshotTime != null)
 			cal.setTime(new Date(optSnapshotTime));
@@ -153,9 +156,15 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		String experimentDirectory = hsm.getTargetDirectory(header, null);
 		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm/Phenotyping\ Experiment\ \(unknown\ greenhouse\)/LemnaTec\ \(APH\)/klukas/WT_H3
 		String fileNameOfExperimentFile = fileName.substring(0, fileName.length() - ".iap.index.csv".length()) + ".iap.vanted.bin";
-		String loadFile = hsmFolder + File.separator + "data" + File.separator + experimentDirectory + File.separator + fileNameOfExperimentFile;
+		String loadFile = hsmFolder + File.separator + DATA_FOLDER_NAME + File.separator + experimentDirectory + File.separator + fileNameOfExperimentFile;
 		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm/Phenotyping\ Experiment\ \(unknown\ greenhouse\)/LemnaTec\
 		// \(APH\)/klukas/WT_H3/1303994908266_0_klukas_WT_H3.iap.vanted.bin
+		Experiment md = loadExperimentFromFile(header, status, loadFile);
+		return md;
+	}
+	
+	protected static Experiment loadExperimentFromFile(ExperimentHeaderInterface header, BackgroundTaskStatusProviderSupportingExternalCall status,
+			String loadFile) throws ParserConfigurationException, SAXException, IOException {
 		if (status != null)
 			status.setCurrentStatusText1("Create XML DOM...");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

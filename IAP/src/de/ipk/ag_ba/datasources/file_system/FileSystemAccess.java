@@ -67,7 +67,7 @@ public class FileSystemAccess {
 		// Read all the text returned by the server
 		HashSet<String> knownImages = new HashSet<String>();
 		HashMap<String, PathwayWebLinkItem> knownPWL = new HashMap<String, PathwayWebLinkItem>();
-		for (String str : webAddress.listFiles()) {
+		for (String str : webAddress.listFiles(null)) {
 			{
 				boolean containsImageExtension = false;
 				for (String ext : new String[] { ".png" })

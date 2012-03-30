@@ -44,7 +44,8 @@ public class HsmFileSystemSource extends FileSystemSource {
 		super(lib, dataSourceName, folder, new String[] {}, mainDataSourceIcon, folderIcon);
 		
 		if (folder != null && !registeredFolders.contains(folder)) {
-			ResourceIOManager.registerIOHandler(new HsmResourceIoHandler(folder));
+			HsmResourceIoHandler rio = new HsmResourceIoHandler(folder);
+			ResourceIOManager.registerIOHandler(rio);
 			registeredFolders.add(folder);
 		}
 	}

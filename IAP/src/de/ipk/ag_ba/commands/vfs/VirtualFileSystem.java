@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.vfs;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -41,7 +42,7 @@ public abstract class VirtualFileSystem {
 	/**
 	 * @return List of file names found at root of VFS source
 	 */
-	public abstract ArrayList<String> listFiles();
+	public abstract ArrayList<String> listFiles(String optSubDirectory);
 	
 	public abstract IOurl getIOurlFor(String fileName);
 	
@@ -49,5 +50,14 @@ public abstract class VirtualFileSystem {
 			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
 		ActionDataExportToVfs a = new ActionDataExportToVfs(null, experimentReference, this);
 		a.performActionCalculateResults(null);
+	}
+	
+	public String[] listFiles(String subdirectory, FilenameFilter optFilenameFilter) {
+		ArrayList<String> files = new ArrayList<String>();
+		for (String s : listFiles(subdirectory)) {
+			if (optFilenameFilter == null || optFilenameFilter.accept(null, s))
+				files.add(s);
+		}
+		return files.toArray(new String[] {});
 	}
 }

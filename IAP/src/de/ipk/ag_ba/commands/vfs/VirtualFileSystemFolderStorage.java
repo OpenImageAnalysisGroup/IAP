@@ -3,6 +3,7 @@ package de.ipk.ag_ba.commands.vfs;
 import java.io.File;
 import java.util.ArrayList;
 
+import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
 public class VirtualFileSystemFolderStorage extends VirtualFileSystem {
@@ -44,9 +45,9 @@ public class VirtualFileSystemFolderStorage extends VirtualFileSystem {
 	}
 	
 	@Override
-	public ArrayList<String> listFiles() {
+	public ArrayList<String> listFiles(String optSubDirectory) {
 		ArrayList<String> res = new ArrayList<String>();
-		for (String f : new File(path).list())
+		for (String f : new File(path + (optSubDirectory != null ? File.separator + optSubDirectory : "")).list())
 			res.add(f);
 		return res;
 	}
@@ -58,7 +59,7 @@ public class VirtualFileSystemFolderStorage extends VirtualFileSystem {
 	
 	@Override
 	public IOurl getIOurlFor(String fileName) {
-		return null;
+		return FileSystemHandler.getURL(new File(path + File.separator + fileName));
 	}
 	
 }

@@ -28,7 +28,9 @@ import javax.xml.transform.TransformerException;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.plugin.XMLHelper;
+import org.graffiti.plugin.io.resources.IOurl;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -1007,6 +1009,18 @@ public class Experiment implements ExperimentInterface {
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document w3Doc = builder.parse(in);
 		in.close();
+		Experiment md = Experiment.getExperimentFromDOM(w3Doc);
+		return md;
+	}
+	
+	public static ExperimentInterface loadFromIOurl(IOurl url)
+			throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		InputStream is = url.getInputStream();
+		if (is == null)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No input stream for URL " + url);
+		Document w3Doc = builder.parse(is);
 		Experiment md = Experiment.getExperimentFromDOM(w3Doc);
 		return md;
 	}
