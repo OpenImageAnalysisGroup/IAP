@@ -26,16 +26,16 @@ public class VANTEDdataSource extends HTTPfolderSource {
 	
 	public VANTEDdataSource() {
 		super(getLibrary(),
-							VANTED,
-							"http://vanted.ipk-gatersleben.de/examplefiles/",
-							new String[] { ".gml", ".graphml" },
-							IAPmain.loadIcon("img/vanted1_0_doku.png"), // vanted1_0.png"),
+				VANTED,
+				"http://vanted.ipk-gatersleben.de/examplefiles/",
+				new String[] { ".gml", ".graphml" },
+				IAPmain.loadIcon("img/vanted1_0_doku.png"), // vanted1_0.png"),
 				IAPmain.loadIcon("img/ext/folder-remote.png"));
 		setDescription("<h2>Welcome to VANTED - Visualization and Analysis of Networks containing Experimental Data</h2>"
-							+ "This system makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
-							+ "It is possible to map experimental datasets onto the graph elements and visualize time series data or data of different "
-							+ "genotypes or environmental conditions in the context of a the underlying biological processes. Built-in statistic "
-							+ "functions allow a fast evaluation of the data (e.g. t-Test or correlation analysis).");
+				+ "This system makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
+				+ "It is possible to map experimental datasets onto the graph elements and visualize time series data or data of different "
+				+ "genotypes or environmental conditions in the context of a the underlying biological processes. Built-in statistic "
+				+ "functions allow a fast evaluation of the data (e.g. t-Test or correlation analysis).");
 	}
 	
 	@Override
@@ -73,8 +73,13 @@ public class VANTEDdataSource extends HTTPfolderSource {
 			}
 			
 			@Override
-			public NavigationImage getIcon() {
+			public NavigationImage getIconInactive() {
 				return IAPmain.loadIcon("img/ext/folder-remote.png");
+			}
+			
+			@Override
+			public NavigationImage getIconActive() {
+				return IAPmain.loadIcon("img/ext/folder-remote-open.png");
 			}
 			
 			@Override

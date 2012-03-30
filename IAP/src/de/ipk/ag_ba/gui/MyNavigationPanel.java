@@ -11,7 +11,6 @@ import info.clearthought.layout.TableLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -251,7 +250,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 					actionPanelRight.setBackground(new Color(255, 220, 220));
 					actionPanelRight.setLayout(TableLayout.getLayout(TableLayout.PREFERRED, TableLayout.PREFERRED));
 					actionPanelRight.removeAll();
-					actionPanelRight.add(TableLayout.getMultiSplit(	right, 100, 6, 6, 5, 5), "0,0");
+					actionPanelRight.add(TableLayout.getMultiSplit(right, 100, 6, 6, 5, 5), "0,0");
 				} else {
 					actionPanelRight.setLayout(TableLayout.getLayout(TableLayout.PREFERRED, TableLayout.PREFERRED));
 					actionPanelRight.removeAll();
@@ -298,8 +297,8 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 					if (lbl.contains(e.getX(), e.getY())) {
 						System.out.println(ne.getTitle());
 						BufferedImage i;
-						if (ne.getIcon() != null)
-							i = GravistoService.getBufferedImage(ne.getIcon().getImage());
+						if (ne.getIconInactive() != null)
+							i = GravistoService.getBufferedImage(ne.getIconInactive().getImage());
 						else
 							i = GravistoService.getBufferedImage(GravistoService.loadIcon(IAPmain.class,
 									ne.getNavigationImage()).getImage());

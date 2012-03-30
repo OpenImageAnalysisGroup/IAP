@@ -317,10 +317,18 @@ public class NavigationButton implements StyleAware {
 		return iconUpdated;
 	}
 	
-	public ImageIcon getIcon() {
+	public ImageIcon getIconInactive() {
 		if (action != null) {
-			if (action.getImageIcon() != null)
-				return action.getImageIcon().getImageIcon();
+			if (action.getImageIconInactive() != null)
+				return action.getImageIconInactive().getImageIcon();
+		}
+		return icon;
+	}
+	
+	public ImageIcon getIconActive() {
+		if (action != null) {
+			if (action.getImageIconActive() != null)
+				return action.getImageIconActive().getImageIcon();
 		}
 		return icon;
 	}
@@ -626,14 +634,17 @@ public class NavigationButton implements StyleAware {
 				imgS = 48;
 		
 		ImageIcon icon;
-		if (n.getIcon() != null) {
-			icon = new ImageIcon(GravistoService.getScaledImage(n.getIcon().getImage(), -imgS, imgS));
-		} else {
-			if (target == PanelTarget.NAVIGATION)
-				icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS);
-			else
-				icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS);
-		}
+		if (target == PanelTarget.NAVIGATION && n.getIconActive() != null) {
+			icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgS, imgS));
+		} else
+			if (target == PanelTarget.ACTION && n.getIconInactive() != null) {
+				icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgS, imgS));
+			} else {
+				if (target == PanelTarget.NAVIGATION)
+					icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS);
+				else
+					icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS);
+			}
 		if (icon != null)
 			icon.setDescription(imgS + "");
 		
@@ -726,14 +737,18 @@ public class NavigationButton implements StyleAware {
 			@Override
 			public void run() {
 				ImageIcon icon;
-				if (n.getIcon() != null) {
-					icon = new ImageIcon(GravistoService.getScaledImage(n.getIcon().getImage(), -imgSf, imgSf));
-				} else {
-					if (target == PanelTarget.NAVIGATION)
-						icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgSf, imgSf);
-					else
-						icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgSf, imgSf);
-				}
+				if (target == PanelTarget.NAVIGATION && n.getIconActive() != null) {
+					icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgSf, imgSf));
+				} else
+					if (target == PanelTarget.ACTION && n.getIconInactive() != null) {
+						icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgSf, imgSf));
+					}
+					else {
+						if (target == PanelTarget.NAVIGATION)
+							icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgSf, imgSf);
+						else
+							icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgSf, imgSf);
+					}
 				if (icon != null)
 					icon.setDescription(imgSf + "");
 				n1.setIcon(icon);

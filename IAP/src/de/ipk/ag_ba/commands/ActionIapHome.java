@@ -16,6 +16,7 @@ import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
 import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.nav.RimasNav;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -77,6 +78,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			Library lib = new Library();
 			DataSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsm,
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 					IAPmain.loadIcon("img/ext/folder-remote.png"));
 			NavigationButton hsmSrc = new NavigationButton(new ActionHsmDataSourceNavigation(dataSourceHsm), guiSetting);
 			hsmSrc.setToolTipText("Target: " + hsm);
@@ -88,11 +90,23 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			// add VFS entries
 			for (VirtualFileSystem entry : VirtualFileSystem.getKnown()) {
 				Library lib = new Library();
-				DataSource dataSourceHsm = new VfsFileSystemSource(lib, entry.getTargetName(), entry,
+				String ico = "img/ext/folder-remote.png";
+				String ico2 = "img/ext/folder-remote-open.png";
+				String ico3 = "img/ext/folder-remote.png";
+				if (entry.getTransferProtocolName().contains("UDP")) {
+					ico = "img/ext/network-workgroup.png";
+					ico2 = "img/ext/network-workgroup-power.png";
+					ico3 = "img/ext/folder-remote.png";
+				}
+				VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, entry.getTargetName(), entry,
 						new String[] {},
-						IAPmain.loadIcon("img/ext/folder-remote.png"),
-						IAPmain.loadIcon("img/ext/folder-remote.png"));
+						IAPmain.loadIcon(ico),
+						IAPmain.loadIcon(ico2),
+						IAPmain.loadIcon(ico3));
 				ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
+				for (NavigationAction na : entry.getAdditionalNavigationActions()) {
+					action.addAdditionalEntity(new NavigationButton(na, guiSetting));
+				}
 				NavigationButton hsmSrc = new NavigationButton(entry.getTargetName(), action, guiSetting);
 				hsmSrc.setToolTipText("Target: " + entry.getTargetPathName() + " via " + entry.getTransferProtocolName());
 				homePrimaryActions.add(hsmSrc);

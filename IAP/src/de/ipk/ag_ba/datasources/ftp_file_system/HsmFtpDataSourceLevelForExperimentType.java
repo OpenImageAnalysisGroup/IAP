@@ -48,7 +48,7 @@ public class HsmFtpDataSourceLevelForExperimentType implements DataSourceLevel {
 	}
 	
 	@Override
-	public NavigationImage getIcon() {
+	public NavigationImage getIconInactive() {
 		String group = type;
 		if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.equals(IAPexperimentTypes.Phytochamber))
 			return IAPmain.loadIcon(IAPimages.getPhytochamber());
@@ -60,6 +60,10 @@ public class HsmFtpDataSourceLevelForExperimentType implements DataSourceLevel {
 					return IAPmain.loadIcon(IAPimages.getMaizeGreenhouse());
 				else
 					return IAPmain.loadIcon(IAPimages.getFolderRemoteClosed());
+	}
+	
+	public NavigationImage getIconActive() {
+		return getIconInactive();
 	}
 	
 	@Override

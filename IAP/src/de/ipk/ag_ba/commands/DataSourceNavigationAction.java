@@ -30,8 +30,13 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public NavigationImage getImageIcon() {
-		return getDataSourceLevel().getIcon();
+	public NavigationImage getImageIconInactive() {
+		return getDataSourceLevel().getIconInactive();
+	}
+	
+	@Override
+	public NavigationImage getImageIconActive() {
+		return getDataSourceLevel().getIconActive();
 	}
 	
 	@Override

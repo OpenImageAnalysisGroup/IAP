@@ -27,7 +27,9 @@ public interface DataSourceLevel {
 	
 	public Collection<PathwayWebLinkItem> getPathways();
 	
-	public NavigationImage getIcon();
+	public NavigationImage getIconInactive();
+	
+	public NavigationImage getIconActive();
 	
 	public String getName();
 	

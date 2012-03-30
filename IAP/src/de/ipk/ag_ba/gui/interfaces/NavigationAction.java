@@ -52,7 +52,9 @@ public interface NavigationAction {
 	
 	public boolean getProvidesActions();
 	
-	public NavigationImage getImageIcon();
+	public NavigationImage getImageIconInactive();
+	
+	public NavigationImage getImageIconActive();
 	
 	public boolean requestTitleUpdates();
 	

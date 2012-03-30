@@ -3,7 +3,7 @@
  *******************************************************************************/
 
 /*
- * $Id: PatternTabsForInspector.java,v 1.3 2011-12-13 10:49:10 klukas Exp $
+ * $Id: PatternTabsForInspector.java,v 1.4 2012-03-30 14:44:56 klukas Exp $
  */
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control;
 
@@ -27,6 +27,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.TabKegg
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.TabKegg2;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.RimasTab;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.TabMetaCrop;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabAglet;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.sbgn.TabSBGN;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.statistics.TabStatistics;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.workflow.WorkflowHelper;
@@ -36,7 +37,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.workflow.Wor
  * 
  * @author Christian Klukas Represents the main class of the
  *         InspectorLayoutControl plugin.
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class PatternTabsForInspector
 		extends DBE_EditorPluginAdapter {
@@ -52,6 +53,8 @@ public class PatternTabsForInspector
 			ExperimentDataProcessingManager.addExperimentDataProcessor(new PutIntoSidePanel());
 			tablist.add(new TabDBE());
 		}
+		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.AGLET_NETWORK))
+			tablist.add(new TabAglet());
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.DATAMAPPING))
 			algorithms = new Algorithm[] { new DataMapping() };
 		

@@ -38,21 +38,24 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.network.BroadCastService;
  * Represents the tab, which contains the functionality to edit the attributes
  * of the current graph object.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TabAglet
-					extends InspectorTab implements Runnable {
+		extends InspectorTab implements Runnable {
 	
 	public static String newline = System.getProperty("line.separator");
 	
 	private static final long serialVersionUID = 1L;
 	
 	private Timer networkBroadCast;
-	private BroadCastService broadCastService = new BroadCastService(9900, 9910, 1000);
+	private BroadCastService broadCastService = new BroadCastService(9900, 9910, 512);
 	private BroadCastTask broadCastTask;
 	
 	private JCheckBox runService = new JCheckBox("Allow Network Broadcast (udp-port " +
-						broadCastService.getStartPort() + "-" + broadCastService.getEndPort() + ")", false);
+			broadCastService.getStartPort() + "-" + broadCastService.getEndPort() + ")", false);
+	
+	public static JCheckBox enabler = null;
+	
 	private JLabel myStatusLabel = new JLabel();
 	private JTextArea myDataIn = new JTextArea();
 	private JTextField inputField = new JTextField();
@@ -64,7 +67,7 @@ public class TabAglet
 		double border = 2;
 		double[][] size =
 		{
-							{ border, TableLayoutConstants.FILL, border }, // Columns
+				{ border, TableLayoutConstants.FILL, border }, // Columns
 				{ border, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL, 30, border }
 		}; // Rows
 		this.setLayout(new TableLayout(size));
@@ -92,10 +95,10 @@ public class TabAglet
 		this.add(myStatusLabel, "1,2");
 		this.add(myDataIn, "1,3");
 		this.add(
-							TableLayout.
-												getSplit(
-																	inputField, sendButton,
-																	TableLayoutConstants.FILL, 80), "1,4");
+				TableLayout.
+						getSplit(
+								inputField, sendButton,
+								TableLayoutConstants.FILL, 80), "1,4");
 		sendButton.setMnemonic('S');
 		sendButton.setEnabled(false);
 		sendButton.addActionListener(new ActionListener() {
@@ -118,6 +121,8 @@ public class TabAglet
 		updateNetStatus.start();
 		
 		this.revalidate();
+		
+		enabler = runService;
 	}
 	
 	/**
@@ -230,11 +235,11 @@ public class TabAglet
 				netW = "Broadcast disabled";
 			
 			myStatusLabel.setText("<html><small>" + netW + " (in/out/other in, listener-port): "
-								+ broadCastService.getInCount() + "/"
-								+ broadCastService.getOutCount() + "/"
-								+ broadCastService.getOtherInCount() +
-								", " + broadCastService.getBindPort() +
-								"<br>Active Hosts (" + hosts.size() + "): " + hostList);
+					+ broadCastService.getInCount() + "/"
+					+ broadCastService.getOutCount() + "/"
+					+ broadCastService.getOtherInCount() +
+					", " + broadCastService.getBindPort() +
+					"<br>Active Hosts (" + hosts.size() + "): " + hostList);
 		}
 	}
 	

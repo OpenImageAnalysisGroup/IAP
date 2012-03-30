@@ -39,10 +39,11 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	
 	public VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder,
 			String[] validExtensions,
-			NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
+			NavigationImage mainDataSourceIcon, NavigationImage mainDataSourceIconActive,
+			NavigationImage folderIcon) {
 		super(lib, dataSourceName,
 				((VirtualFileSystemFolderStorage) folder).getTargetPathName(),
-				mainDataSourceIcon, folderIcon);
+				mainDataSourceIcon, mainDataSourceIcon, folderIcon);
 		this.url = folder;
 		validExtensions2 = validExtensions;
 	}
