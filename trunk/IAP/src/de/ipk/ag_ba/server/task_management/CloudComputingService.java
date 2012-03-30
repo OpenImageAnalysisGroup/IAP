@@ -250,6 +250,7 @@ public class CloudComputingService {
 			Library lib = new Library();
 			HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsm,
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 					IAPmain.loadIcon("img/ext/folder-remote.png"));
 		}
 		// register extended hierarchy and loaded image loaders (and more)

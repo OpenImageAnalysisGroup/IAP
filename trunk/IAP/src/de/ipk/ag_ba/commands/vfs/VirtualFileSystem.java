@@ -9,7 +9,10 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ReleaseInfo;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.commands.ActionToggleSettingDefaultIsFalse;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabAglet;
 
 /**
  * @author klukas
@@ -23,7 +26,35 @@ public abstract class VirtualFileSystem {
 				"File I/O",
 				"Desktop" + File.separator + "VFS",
 				ReleaseInfo.getDesktopFolder() + File.separator + "VFS"));
+		VirtualFileSystem vfsUdp = new VirtualFileSystemFolderStorage(
+				"file-udp",
+				"Network UDP Receiver",
+				"Desktop" + File.separator + "UDP",
+				ReleaseInfo.getDesktopFolder() + File.separator + "UDP");
+		Runnable startAction = new Runnable() {
+			@Override
+			public void run() {
+				TabAglet.enabler.doClick();
+			}
+		};
+		ActionToggleSettingDefaultIsFalse toggleUdpReceive = new ActionToggleSettingDefaultIsFalse(
+				null, startAction,
+				"Enable receiving of experiment data by opening a UDP port",
+				"Receive Experiments (UDP)",
+				"udp_reciever");
+		vfsUdp.addNavigationAction(toggleUdpReceive);
+		res.add(vfsUdp);
 		return res;
+	}
+	
+	private ArrayList<NavigationAction> additionalNavigationActions = new ArrayList<NavigationAction>();
+	
+	private void addNavigationAction(ActionToggleSettingDefaultIsFalse navAction) {
+		additionalNavigationActions.add(navAction);
+	}
+	
+	public ArrayList<NavigationAction> getAdditionalNavigationActions() {
+		return additionalNavigationActions;
 	}
 	
 	public abstract String getTargetName();
@@ -59,5 +90,9 @@ public abstract class VirtualFileSystem {
 				files.add(s);
 		}
 		return files.toArray(new String[] {});
+	}
+	
+	public ArrayList<NavigationAction> getAdditionalEntries() {
+		return new ArrayList<NavigationAction>();
 	}
 }

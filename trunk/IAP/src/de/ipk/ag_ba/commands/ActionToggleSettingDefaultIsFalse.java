@@ -58,12 +58,17 @@ public class ActionToggleSettingDefaultIsFalse extends AbstractNavigationAction 
 	}
 	
 	@Override
-	public NavigationImage getImageIcon() {
+	public NavigationImage getImageIconInactive() {
 		boolean enabled = new SettingsHelperDefaultIsFalse().isEnabled(settingDefaultIsFalse);
 		if (enabled)
 			return IAPmain.loadIcon("img/ext/gpl2/gtcf.png");
 		else
 			return IAPmain.loadIcon("img/ext/gpl2/gtcd.png");
+	}
+	
+	@Override
+	public NavigationImage getImageIconActive() {
+		return getImageIconInactive();
 	}
 	
 	@Override

@@ -139,6 +139,7 @@ public class BackupSupport {
 				Library lib = new Library();
 				HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsmFolder,
 						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 						IAPmain.loadIcon("img/ext/folder-remote.png"));
 				dataSourceHsm.readDataSource();
 				for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {

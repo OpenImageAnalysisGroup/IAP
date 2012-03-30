@@ -34,7 +34,8 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	protected final String url;
 	private final String[] validExtensions;
 	protected Collection<PathwayWebLinkItem> mainList;
-	private final NavigationImage mainDataSourceIcon;
+	private final NavigationImage mainDataSourceIconInactive;
+	private final NavigationImage mainDataSourceIconActive;
 	private final String dataSourceName;
 	private final NavigationImage folderIcon;
 	protected boolean read;
@@ -43,11 +44,14 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	private String description;
 	
 	public FileSystemSource(Library lib, String dataSourceName, String folder, String[] validExtensions,
-			NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
+			NavigationImage mainDataSourceIcon,
+			NavigationImage mainDataSourceIconActive,
+			NavigationImage folderIcon) {
 		this.lib = lib;
 		this.url = folder;
 		this.validExtensions = validExtensions;
-		this.mainDataSourceIcon = mainDataSourceIcon;
+		this.mainDataSourceIconInactive = mainDataSourceIcon;
+		this.mainDataSourceIconActive = mainDataSourceIcon;
 		this.folderIcon = folderIcon;
 		this.dataSourceName = dataSourceName;
 		
@@ -62,7 +66,11 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	@Override
 	public void readDataSource() throws Exception {
 		mainList = FileSystemAccess.getWebDirectoryFileListItems(url, validExtensions, false);
-		thisLevel = new HTTPdataSourceLevel(lib, dataSourceName, mainList, mainDataSourceIcon, folderIcon);
+		thisLevel = new HTTPdataSourceLevel(
+				lib, dataSourceName, mainList,
+				mainDataSourceIconInactive,
+				mainDataSourceIconActive,
+				folderIcon);
 		read = true;
 	}
 	
@@ -83,7 +91,10 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 		try {
 			if (!read)
 				readDataSource();
-			return thisLevel.getExperiments();
+			if (thisLevel != null)
+				return thisLevel.getExperiments();
+			else
+				return new ArrayList<ExperimentReference>();
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return new ArrayList<ExperimentReference>();
@@ -103,8 +114,13 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	}
 	
 	@Override
-	public NavigationImage getIcon() {
-		return mainDataSourceIcon;
+	public NavigationImage getIconInactive() {
+		return mainDataSourceIconInactive;
+	}
+	
+	@Override
+	public NavigationImage getIconActive() {
+		return mainDataSourceIconActive;
 	}
 	
 	@Override

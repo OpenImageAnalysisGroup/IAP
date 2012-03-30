@@ -39,9 +39,14 @@ public class HsmFileSystemSource extends FileSystemSource {
 	private static HashSet<String> registeredFolders = new HashSet<String>();
 	private String login;
 	
-	public HsmFileSystemSource(Library lib, String dataSourceName, String folder, NavigationImage mainDataSourceIcon,
+	public HsmFileSystemSource(Library lib, String dataSourceName, String folder,
+			NavigationImage mainDataSourceIcon,
+			NavigationImage mainDataSourceIconActive,
 			NavigationImage folderIcon) {
-		super(lib, dataSourceName, folder, new String[] {}, mainDataSourceIcon, folderIcon);
+		super(lib, dataSourceName, folder, new String[] {},
+				mainDataSourceIcon,
+				mainDataSourceIconActive,
+				folderIcon);
 		
 		if (folder != null && !registeredFolders.contains(folder)) {
 			HsmResourceIoHandler rio = new HsmResourceIoHandler(folder);

@@ -60,7 +60,10 @@ public class FtpFileSystemSource extends HTTPhandler implements DataSource {
 	@Override
 	public void readDataSource() throws Exception {
 		mainList = FtpFileSystemAccess.getWebDirectoryFileListItems(url, validExtensions, false);
-		thisLevel = new HTTPdataSourceLevel(lib, dataSourceName, mainList, mainDataSourceIcon, folderIcon);
+		thisLevel = new HTTPdataSourceLevel(lib, dataSourceName, mainList,
+				mainDataSourceIcon,
+				mainDataSourceIcon,
+				folderIcon);
 		read = true;
 	}
 	
@@ -101,7 +104,12 @@ public class FtpFileSystemSource extends HTTPhandler implements DataSource {
 	}
 	
 	@Override
-	public NavigationImage getIcon() {
+	public NavigationImage getIconInactive() {
+		return mainDataSourceIcon;
+	}
+	
+	@Override
+	public NavigationImage getIconActive() {
 		return mainDataSourceIcon;
 	}
 	

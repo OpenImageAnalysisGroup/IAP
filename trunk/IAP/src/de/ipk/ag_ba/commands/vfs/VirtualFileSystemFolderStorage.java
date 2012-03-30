@@ -3,6 +3,7 @@ package de.ipk.ag_ba.commands.vfs;
 import java.io.File;
 import java.util.ArrayList;
 
+import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -47,8 +48,16 @@ public class VirtualFileSystemFolderStorage extends VirtualFileSystem {
 	@Override
 	public ArrayList<String> listFiles(String optSubDirectory) {
 		ArrayList<String> res = new ArrayList<String>();
-		for (String f : new File(path + (optSubDirectory != null ? File.separator + optSubDirectory : "")).list())
-			res.add(f);
+		File ff = new File(path + (optSubDirectory != null ? File.separator + optSubDirectory : ""));
+		if (!ff.exists()) {
+			boolean createSubFolder = false; // not needed
+			if (createSubFolder) {
+				ff.mkdirs();
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Directory " + ff.getAbsolutePath() + " has been created!");
+			}
+		} else
+			for (String f : ff.list())
+				res.add(f);
 		return res;
 	}
 	

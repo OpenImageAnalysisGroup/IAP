@@ -104,7 +104,7 @@ public class BroadCastService implements HelperClass {
 	 * 
 	 * @throws IOException
 	 */
-	public UDPreceiveStructure receiveBroadcast(int timeout) throws IOException {
+	public UDPreceiveStructure receiveBroadcast(int timeout_ms) throws IOException {
 		
 		if (udpBindPort == -1)
 			udpBindPort = udpPortStart;
@@ -116,8 +116,8 @@ public class BroadCastService implements HelperClass {
 			try {
 				if (ds == null)
 					ds = new DatagramSocket(udpBindPort);
-				if (timeout > 0) {
-					ds.setSoTimeout(timeout);
+				if (timeout_ms > 0) {
+					ds.setSoTimeout(timeout_ms);
 				}
 				byte[] buf = new byte[maxMessageLen];
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);

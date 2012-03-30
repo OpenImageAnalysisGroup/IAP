@@ -105,7 +105,12 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	}
 	
 	@Override
-	public NavigationImage getImageIcon() {
+	public NavigationImage getImageIconInactive() {
+		return null;
+	}
+	
+	@Override
+	public NavigationImage getImageIconActive() {
 		return null;
 	}
 	

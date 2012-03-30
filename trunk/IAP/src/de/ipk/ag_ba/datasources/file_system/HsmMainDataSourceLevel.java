@@ -55,7 +55,12 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 	}
 	
 	@Override
-	public NavigationImage getIcon() {
+	public NavigationImage getIconInactive() {
+		return IAPmain.loadIcon("img/ext/Gnome-Media-Tape-64.png");
+	}
+	
+	@Override
+	public NavigationImage getIconActive() {
 		return IAPmain.loadIcon("img/ext/Gnome-Media-Tape-64.png");
 	}
 	

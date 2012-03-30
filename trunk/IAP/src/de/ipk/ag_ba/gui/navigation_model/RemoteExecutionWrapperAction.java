@@ -142,8 +142,13 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	}
 	
 	@Override
-	public NavigationImage getImageIcon() {
+	public NavigationImage getImageIconInactive() {
 		return null;
+	}
+	
+	@Override
+	public NavigationImage getImageIconActive() {
+		return getImageIconInactive();
 	}
 	
 	@Override
