@@ -10,6 +10,7 @@ package de.ipk.ag_ba.datasources.file_system;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.plugin.io.resources.HTTPhandler;
 
@@ -21,6 +22,8 @@ import de.ipk.ag_ba.datasources.http_folder.HTTPdataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 
 /**
@@ -40,13 +43,15 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	private String description;
 	
 	public FileSystemSource(Library lib, String dataSourceName, String folder, String[] validExtensions,
-						NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
+			NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
 		this.lib = lib;
 		this.url = folder;
 		this.validExtensions = validExtensions;
 		this.mainDataSourceIcon = mainDataSourceIcon;
 		this.folderIcon = folderIcon;
 		this.dataSourceName = dataSourceName;
+		
+		ExperimentReference.registerExperimentLoader(this);
 	}
 	
 	@Override
@@ -134,5 +139,16 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	@Override
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
 		return new ArrayList<NavigationButton>();
+	}
+	
+	@Override
+	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq, boolean interactiveGetExperimentSize,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+		throw new UnsupportedOperationException("TODO");
+	}
+	
+	@Override
+	public boolean canHandle(String databaseId) {
+		return false;
 	}
 }

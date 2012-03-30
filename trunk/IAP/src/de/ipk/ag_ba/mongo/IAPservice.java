@@ -885,6 +885,7 @@ public class IAPservice {
 		if (header.getDatabaseId() != null
 				&& header.getDatabaseId().startsWith("lemnatec:"))
 			experiment = new de.ipk.ag_ba.postgresql.LemnaTecDataExchange().getExperiment(header,
+					false,
 					status);
 		else
 			if (header.getDatabaseId() != null

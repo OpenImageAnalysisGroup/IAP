@@ -8,6 +8,7 @@ package de.ipk.ag_ba.gui.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.WeakHashMap;
 
@@ -15,6 +16,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 
+import de.ipk.ag_ba.datasources.ExperimentLoader;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -31,6 +33,8 @@ public class ExperimentReference {
 	public ExperimentInterface experiment;
 	private ExperimentHeaderInterface header;
 	public MongoDB m;
+	
+	private static ArrayList<ExperimentLoader> knownExperimentLoaders = new ArrayList<ExperimentLoader>();
 	
 	private static WeakHashMap<String, ExperimentInterface> weakId2exp =
 			new WeakHashMap<String, ExperimentInterface>();
@@ -92,6 +96,11 @@ public class ExperimentReference {
 		return getData(m, false, null);
 	}
 	
+	public static void registerExperimentLoader(ExperimentLoader loader) {
+		if (!knownExperimentLoaders.contains(loader))
+			knownExperimentLoaders.add(loader);
+	}
+	
 	public synchronized ExperimentInterface getData(MongoDB m,
 			boolean interactiveGetExperimentSize,
 			BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
@@ -99,20 +108,28 @@ public class ExperimentReference {
 			return experiment;
 		else {
 			synchronized (ExperimentReference.class) {
-				ExperimentInterface res = weakId2exp.get(header.getDatabaseId());
+				String databaseId = header.getDatabaseId();
+				ExperimentInterface res = weakId2exp.get(databaseId);
 				if (res != null)
 					return res;
-				if (header.getDatabaseId().startsWith("lemnatec:"))
-					res = new LemnaTecDataExchange().getExperiment(header, status);
+				for (ExperimentLoader loader : knownExperimentLoaders) {
+					if (loader.canHandle(databaseId)) {
+						res = loader.getExperiment(header, interactiveGetExperimentSize, status);
+						if (res != null)
+							return res;
+					}
+				}
+				if (databaseId.startsWith("lemnatec:"))
+					res = new LemnaTecDataExchange().getExperiment(header, interactiveGetExperimentSize, status);
 				else
-					if (header.getDatabaseId().startsWith("hsm:")) {
-						res = HSMfolderTargetDataManager.getExperiment(header.getDatabaseId());
+					if (databaseId.startsWith("hsm:")) {
+						res = HSMfolderTargetDataManager.getExperiment(databaseId);
 					} else
 						if (m != null)
 							res = m.getExperiment(header, interactiveGetExperimentSize, status);
 						else
 							res = this.m.getExperiment(header, interactiveGetExperimentSize, status);
-				weakId2exp.put(header.getDatabaseId(), res);
+				weakId2exp.put(databaseId, res);
 				return res;
 			}
 		}

@@ -2,6 +2,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -188,6 +189,14 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@SuppressWarnings("unchecked")
 	public ExperimentHeader(Map map) {
 		this();
+		ArrayList<Object> del = new ArrayList<Object>();
+		for (Object key : map.keySet()) {
+			Object val = map.get(key);
+			if (val != null && val instanceof String && val.equals("null"))
+				del.add(key);
+		}
+		for (Object d : del)
+			map.remove(d);
 		setExperimentname((String) map.get("experimentname"));
 		if (getExperimentName() == null)
 			setExperimentname(ExperimentInterface.UNSPECIFIED_EXPERIMENTNAME);

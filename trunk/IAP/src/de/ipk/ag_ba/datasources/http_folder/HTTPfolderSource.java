@@ -10,6 +10,7 @@ package de.ipk.ag_ba.datasources.http_folder;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.plugin.io.resources.HTTPhandler;
 
@@ -19,6 +20,8 @@ import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.WebDirectoryFileListAccess;
 
@@ -39,7 +42,7 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 	private String description;
 	
 	public HTTPfolderSource(Library lib, String dataSourceName, String url, String[] validExtensions,
-						NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
+			NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
 		this.lib = lib;
 		this.url = url;
 		this.validExtensions = validExtensions;
@@ -133,5 +136,16 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 	@Override
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
 		return new ArrayList<NavigationButton>();
+	}
+	
+	@Override
+	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq, boolean interactiveGetExperimentSize,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+		throw new UnsupportedOperationException("TODO");
+	}
+	
+	@Override
+	public boolean canHandle(String databaseId) {
+		return false;
 	}
 }

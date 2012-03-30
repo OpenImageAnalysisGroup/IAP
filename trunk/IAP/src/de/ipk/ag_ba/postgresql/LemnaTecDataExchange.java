@@ -30,6 +30,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
+import de.ipk.ag_ba.datasources.ExperimentLoader;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -51,7 +52,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author entzian, klukas
  */
-public class LemnaTecDataExchange {
+public class LemnaTecDataExchange implements ExperimentLoader {
 	private final String user;
 	private final String password;
 	private final String port;
@@ -725,6 +726,7 @@ public class LemnaTecDataExchange {
 	private static final HashMap<String, Double> blob2angle = new HashMap<String, Double>();
 	
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
+			boolean interactiveGetExperimentSize_notUsedHere,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
 		
@@ -1335,5 +1337,10 @@ public class LemnaTecDataExchange {
 			closeDatabaseConnection(connection);
 		}
 		return ok;
+	}
+	
+	@Override
+	public boolean canHandle(String databaseId) {
+		return databaseId.startsWith(LemnaTecFTPhandler.PREFIX + ":");
 	}
 }

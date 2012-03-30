@@ -270,8 +270,8 @@ public class MyExperimentInfoPanel extends JPanel {
 				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, editB,
 						saveB, editPossible, true);
 				
+				saveB.setText("Save Changes");
 				if (restore) {
-					saveB.setText("Save Changes");
 					editName.setText(experimentHeader.getExperimentName());
 					coordinator.setText(experimentHeader.getCoordinator());
 					groupVisibility.setText(experimentHeader.getImportusergroup());
@@ -308,22 +308,17 @@ public class MyExperimentInfoPanel extends JPanel {
 							saveAction.run(experimentHeader);
 					} else {
 						if (editPossibleBBB) {
-							if (experimentHeader.getDatabaseId().startsWith("lemnatec:") || experimentHeader.getDatabaseId().startsWith("hsm:")
-									|| experimentHeader.getDatabaseId().isEmpty()) {
+							if (m != null)
+								m.setExperimentInfo(experimentHeader);
+							if (m != null)
+								saveB.setText("Updated in database");
+							else
 								saveB.setText("Updated (in memory)");
-							} else {
-								if (m != null)
-									m.setExperimentInfo(experimentHeader);
-								if (m != null)
-									saveB.setText("Updated in Cloud DB");
-								else
-									saveB.setText("MongoDB instance not defined");
-							}
 						} else {
 							Experiment exp = new Experiment();
 							exp.setHeader(experimentHeader);
 							m.saveExperiment(exp, null);
-							saveB.setText("Experiment Saved in Cloud DB");
+							saveB.setText("Experiment saved in database");
 							editPossibleBBB = false;
 						}
 					}
