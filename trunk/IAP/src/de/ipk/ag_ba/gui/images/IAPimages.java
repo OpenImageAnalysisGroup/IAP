@@ -140,4 +140,8 @@ public class IAPimages {
 	public static String copyToServer() {
 		return "img/ext/transfer2.png";
 	}
+	
+	public static String getNetworkedServers() {
+		return "img/ext/network.png";
+	}
 }

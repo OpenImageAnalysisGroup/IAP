@@ -14,7 +14,6 @@ import org.StringManipulationTools;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.ActionDataExport;
 import de.ipk.ag_ba.commands.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.commands.ActionDataExportTar;
@@ -27,6 +26,7 @@ import de.ipk.ag_ba.commands.ActionToggle;
 import de.ipk.ag_ba.commands.CloudIoTestAction;
 import de.ipk.ag_ba.commands.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_actions.ActionCopyCommandList;
 import de.ipk.ag_ba.gui.navigation_actions.ActionCopyToClipboard;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -107,13 +107,7 @@ public class ImageAnalysisCommandManager {
 			// "3-D Segmentation", 15, 25, guiSetting));
 		}
 		
-		try {
-			// if (experimentReference.getData(m).getHeader().getExcelfileid().startsWith("lemnatec:"))
-			// if (!analysis)
-			actions.add(new NavigationButton(new ActionCopyToMongo(m, experimentReference), guiSetting));
-		} catch (Exception e) {
-			// empty
-		}
+		actions.add(new NavigationButton(new ActionCopyCommandList(m, experimentReference, guiSetting), guiSetting));
 		
 		return actions;
 	}
