@@ -49,6 +49,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataInfoPane;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author klukas
@@ -74,11 +75,53 @@ public class MyExperimentInfoPanel extends JPanel {
 	 * @return
 	 */
 	private JComponent getShowDataButton(final ExperimentInterface experiment) {
-		JMButton res = new JMButton("Show XML");
+		final JMButton res = new JMButton("Generate and show XML");
 		res.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ExperimentDataInfoPane.showXMLdata(experiment);
+				res.setText("Prepare document... please wait");
+				BackgroundTaskHelper.executeLaterOnSwingTask(5, new Runnable() {
+					@Override
+					public void run() {
+						ExperimentDataInfoPane.showXMLdata(experiment);
+					}
+				});
+				BackgroundTaskHelper.executeLaterOnSwingTask(3000, new Runnable() {
+					@Override
+					public void run() {
+						res.setText("This may take a few moments!");
+					}
+				});
+				BackgroundTaskHelper.executeLaterOnSwingTask(6000, new Runnable() {
+					@Override
+					public void run() {
+						res.setText("<html>This process continues in the background until completion!");
+					}
+				});
+				BackgroundTaskHelper.executeLaterOnSwingTask(7000, new Runnable() {
+					@Override
+					public void run() {
+						res.setText("<html><u>This process continues in the background until completion!");
+					}
+				});
+				BackgroundTaskHelper.executeLaterOnSwingTask(7500, new Runnable() {
+					@Override
+					public void run() {
+						res.setText("<html>This process continues in the background until completion!");
+					}
+				});
+				BackgroundTaskHelper.executeLaterOnSwingTask(8000, new Runnable() {
+					@Override
+					public void run() {
+						res.setText("<html><u>This process continues in the background until completion!");
+					}
+				});
+				BackgroundTaskHelper.executeLaterOnSwingTask(12000, new Runnable() {
+					@Override
+					public void run() {
+						res.setText("Generate and show XML");
+					}
+				});
 			}
 		});
 		return res;

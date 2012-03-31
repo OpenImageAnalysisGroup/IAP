@@ -36,7 +36,7 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	@Override
 	public String getDefaultTooltip() {
 		ExperimentHeaderInterface ei = experiment.getHeader();
-		return "<html>Copy Dataset:" +
+		return "<html><b>Save in database:</b>" +
 				"<html><table>" + "<tr><td>Experiment</td><td>" + ei.getExperimentName() + "</td></tr>"
 				+ "<tr><td>Type</td><td>" + ei.getExperimentType() + "</td></tr>" + "<tr><td>Owner</td><td>"
 				+ ei.getImportusername() + "</td></tr>" + "<tr><td>Import Time</td><td>" + ei.getImportdate()
@@ -96,6 +96,10 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy " + ActionMongoExperimentsNavigation.getTempdataExperimentName(experiment);
+		if (m == null)
+			return "Save in Database";
+		else
+			return "Save in " + m.getDisplayName();
+		// return "<html><center>Save in database<br>(" + ActionMongoExperimentsNavigation.getTempdataExperimentName(experiment) + ")";
 	}
 }

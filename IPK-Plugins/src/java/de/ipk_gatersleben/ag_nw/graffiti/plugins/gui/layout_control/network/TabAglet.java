@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
+ * (c) 2012 Image Analysis Group
  *******************************************************************************/
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network;
@@ -17,12 +18,13 @@ import java.util.List;
 import java.util.Timer;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.ErrorMsg;
+import org.SettingsHelperDefaultIsFalse;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
 import org.graffiti.event.AttributeEvent;
@@ -34,12 +36,6 @@ import org.graffiti.session.Session;
 
 import de.ipk_gatersleben.ag_nw.graffiti.services.network.BroadCastService;
 
-/**
- * Represents the tab, which contains the functionality to edit the attributes
- * of the current graph object.
- * 
- * @version $Revision: 1.2 $
- */
 public class TabAglet
 		extends InspectorTab implements Runnable {
 	
@@ -47,14 +43,17 @@ public class TabAglet
 	
 	private static final long serialVersionUID = 1L;
 	
+	public static final String ENABLE_BROADCAST_SETTING = "udp_broadcast";
+	
 	private Timer networkBroadCast;
 	private BroadCastService broadCastService = new BroadCastService(9900, 9910, 512);
 	private BroadCastTask broadCastTask;
 	
-	private JCheckBox runService = new JCheckBox("Allow Network Broadcast (udp-port " +
-			broadCastService.getStartPort() + "-" + broadCastService.getEndPort() + ")", false);
-	
-	public static JCheckBox enabler = null;
+	private JComponent runService =
+			new SettingsHelperDefaultIsFalse().getBooleanSettingsEditor(
+					"Allow Network Broadcast (udp-port " +
+							broadCastService.getStartPort() + "-" + broadCastService.getEndPort() + ")",
+					ENABLE_BROADCAST_SETTING, null, null);
 	
 	private JLabel myStatusLabel = new JLabel();
 	private JTextArea myDataIn = new JTextArea();
@@ -71,25 +70,6 @@ public class TabAglet
 				{ border, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL, 30, border }
 		}; // Rows
 		this.setLayout(new TableLayout(size));
-		
-		final TabAglet thisTabAglet = this;
-		
-		runService.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JCheckBox src = (JCheckBox) e.getSource();
-				if (src.isSelected()) {
-					networkBroadCast = new Timer("Aglet Network Broadcast");
-					broadCastTask = new BroadCastTask(broadCastService, thisTabAglet);
-					networkBroadCast.schedule(broadCastTask, 0, BroadCastTask.timeDefaultBeatTime);
-					sendButton.setEnabled(true);
-				} else {
-					broadCastTask.cancel();
-					networkBroadCast.cancel();
-					sendButton.setEnabled(false);
-				}
-				updateNetworkStatus();
-			}
-		});
 		
 		this.add(runService, "1,1");
 		this.add(myStatusLabel, "1,2");
@@ -121,8 +101,6 @@ public class TabAglet
 		updateNetStatus.start();
 		
 		this.revalidate();
-		
-		enabler = runService;
 	}
 	
 	/**
@@ -213,6 +191,13 @@ public class TabAglet
 	}
 	
 	private void updateNetworkStatus() {
+		boolean on = new SettingsHelperDefaultIsFalse().isEnabled(ENABLE_BROADCAST_SETTING);
+		if (on && !enabled)
+			enableTimers();
+		else
+			if (!on && enabled)
+				disableTimers();
+		
 		if (broadCastTask == null) {
 			myStatusLabel.setText("<html><small>Network functions are disabled");
 		} else {
@@ -229,7 +214,7 @@ public class TabAglet
 			else
 				hostList = hostList.substring(2);
 			String netW;
-			if (runService.isSelected())
+			if (on)
 				netW = "Broadcast enabled";
 			else
 				netW = "Broadcast disabled";
@@ -264,5 +249,30 @@ public class TabAglet
 	@Override
 	public boolean visibleForView(View v) {
 		return v == null || v instanceof GraphView;
+	}
+	
+	private boolean enabled = false;
+	
+	public synchronized void enableTimers() {
+		if (!enabled) {
+			enabled = true;
+			networkBroadCast = new Timer("Aglet Network Broadcast");
+			broadCastTask = new BroadCastTask(broadCastService, this);
+			networkBroadCast.schedule(broadCastTask, 0, BroadCastTask.timeDefaultBeatTime);
+			if (sendButton != null)
+				sendButton.setEnabled(true);
+		}
+	}
+	
+	public synchronized void disableTimers() {
+		if (enabled) {
+			enabled = false;
+			if (broadCastTask != null)
+				broadCastTask.cancel();
+			if (networkBroadCast != null)
+				networkBroadCast.cancel();
+			if (sendButton != null)
+				sendButton.setEnabled(false);
+		}
 	}
 }
