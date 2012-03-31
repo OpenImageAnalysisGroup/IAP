@@ -3,7 +3,6 @@ package de.ipk.ag_ba.commands.vfs;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ReleaseInfo;
@@ -19,7 +18,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabA
  */
 public abstract class VirtualFileSystem {
 	
-	public static Collection<VirtualFileSystem> getKnown() {
+	public static ArrayList<VirtualFileSystem> getKnown() {
 		ArrayList<VirtualFileSystem> res = new ArrayList<VirtualFileSystem>();
 		res.add(new VirtualFileSystemFolderStorage(
 				"file-desktop",

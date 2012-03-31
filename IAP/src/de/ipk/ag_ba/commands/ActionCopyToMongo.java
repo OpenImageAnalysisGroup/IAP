@@ -96,10 +96,7 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	
 	@Override
 	public String getDefaultTitle() {
-		if (m == null)
-			return "Save in Database";
-		else
-			return "Save in " + m.getDisplayName();
+		return "Copy to " + m.getDisplayName();
 		// return "<html><center>Save in database<br>(" + ActionMongoExperimentsNavigation.getTempdataExperimentName(experiment) + ")";
 	}
 }

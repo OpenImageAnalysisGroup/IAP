@@ -128,12 +128,11 @@ public class MongoDB {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		
 		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
-		if (IAPservice.isReachable("ba-13.ipk-gatersleben.de"))
-			res.add(getDefaultCloud());
-		if (IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
-			// res.add(new MongoDB("Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
-			res.add(new MongoDB("Storage 2 (BA-24)", "cloud3", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
-		}
+		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de"))
+		res.add(getDefaultCloud());
+		// if (IAPservice.isReachable("ba-24.ipk-gatersleben.de"))
+		res.add(new MongoDB("Storage 2 (BA-24)", "cloud3", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
+		// res.add(new MongoDB("Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
 		// } else
 		// res.add(getLocalDB());
 		// }
