@@ -38,6 +38,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataInfoPane;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.JDOM2DOM;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_classes.TimeAndTimeUnit;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_classes.XPathHelper;
@@ -1042,5 +1043,9 @@ public class Experiment implements ExperimentInterface {
 			for (ConditionInterface ci : si)
 				result.add(ci.getTreatment() != null ? ci.getTreatment() : "");
 		return result;
+	}
+	
+	public void showXMLtoUser() {
+		ExperimentDataInfoPane.showXMLdata(this);
 	}
 }

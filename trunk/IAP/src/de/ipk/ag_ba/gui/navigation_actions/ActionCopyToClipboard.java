@@ -48,9 +48,9 @@ public class ActionCopyToClipboard extends AbstractNavigationAction {
 	public String getDefaultTitle() {
 		if (guiSetting != null && (guiSetting.isInClipboard(experimentReference.getHeader().getDatabaseId()) ||
 				guiSetting.isInClipboard(experimentReference)))
-			return "Remove from clipboard";
+			return "Remove from Clipboard";
 		else
-			return "Add to clipboard";
+			return "Add to Clipboard";
 	}
 	
 	@Override

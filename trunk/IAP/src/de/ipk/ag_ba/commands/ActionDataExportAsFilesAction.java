@@ -79,7 +79,7 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction impl
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Export files";
+		return "Export Files";
 	}
 	
 	@Override

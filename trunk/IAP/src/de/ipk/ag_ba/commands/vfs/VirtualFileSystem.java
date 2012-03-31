@@ -31,17 +31,12 @@ public abstract class VirtualFileSystem {
 				"Network UDP Receiver",
 				"Desktop" + File.separator + "UDP",
 				ReleaseInfo.getDesktopFolder() + File.separator + "UDP");
-		Runnable startAction = new Runnable() {
-			@Override
-			public void run() {
-				TabAglet.enabler.doClick();
-			}
-		};
+		
 		ActionToggleSettingDefaultIsFalse toggleUdpReceive = new ActionToggleSettingDefaultIsFalse(
-				null, startAction,
+				null, null,
 				"Enable receiving of experiment data by opening a UDP port",
 				"Receive Experiments (UDP)",
-				"udp_reciever");
+				TabAglet.ENABLE_BROADCAST_SETTING);
 		vfsUdp.addNavigationAction(toggleUdpReceive);
 		res.add(vfsUdp);
 		return res;
