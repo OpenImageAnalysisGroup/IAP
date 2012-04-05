@@ -91,27 +91,83 @@
 
 \newboolean{isFile1}
 \newboolean{isFile2}
+\newboolean{isFile3}
 
 \newcommand{\resetBoolean}{
 	\setboolean{isFile1}{false}
 	\setboolean{isFile2}{false}
+	\setboolean{isFile3}{false}
 	}
 
-\newcommand{\checkFileNoReset}[2]{
+\newcommand{\checkFileNoReset}[3]{
 	\IfFileExists{#1}{\setboolean{isFile1}{true}}{}
 	\IfFileExists{#2}{\setboolean{isFile2}{true}}{}
+	\IfFileExists{#3}{\setboolean{isFile3}{true}}{}
 	}
 
-\newcommand{\checkFile}[2]{
+\newcommand{\checkFile}[3]{
 	\resetBoolean
-	\checkFileNoReset{#1}{#2}
+	\checkFileNoReset{#1}{#2}{#3}
 	%\setboolean{isFile1}{false}
 	%\setboolean{isFile2}{false}
 	%\IfFileExists{#1}{\setboolean{isFile1}{true}}{}
 	%\IfFileExists{#2}{\setboolean{isFile2}{true}}{}
 	}
-	
 
+\newboolean{isClearPage}
+\setboolean{isClearPage}{true}
+
+\newboolean{isClearPageSub}
+\setboolean{isClearPageSub}{true}
+
+\newcommand{\resetClear}{
+	\setboolean{isClearPage}{true}
+}
+
+\newcommand{\resetClearSub}{
+	\setboolean{isClearPageSub}{true}
+}
+
+
+\newcommand{\ownClearPage}{
+
+	\ifthenelse{\boolean{isClearPage}}{
+		\setboolean{isClearPage}{false}
+	}{
+		\clearpage
+	}
+}
+
+\newcommand{\ownClearPageSub}{
+
+	\ifthenelse{\boolean{isClearPageSub}}{
+		\setboolean{isClearPageSub}{false}
+	}{
+		\clearpage
+	}
+}
+
+% \newboolean{forceClearPage}
+% \setboolean{forceClearPage}{true}
+% 
+% \newboolean{noForceClearPage}
+% \setboolean{noForceClearPage}{false}
+
+% \newcommand{\ownClearPage}[1]{
+% 	
+% 	\ifthenelse{#1}{
+% 		\setboolean{isClearPage}{true}
+% 		\clearpage	
+% 	}{
+% 		\ifthenelse{\boolean{isClearPage}}{
+% 			\setboolean{isClearPage}{false}
+% 		}{
+% 			\setboolean{isClearPage}{true}
+% 			\clearpage
+% 		}
+% 	}
+% }
+	
 
 % \newenvironment{OwnLoadImage}
 %   {\par\raggedbottom\null\vfill\noindent\minipage{\textwidth}\centering}
@@ -210,15 +266,15 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 
 \resetBoolean
-\checkFileNoReset{Weight_A__g_nboxplot.pdf}{}
-\checkFileNoReset{Weight_B__g_nboxplot.pdf}{}
-\checkFileNoReset{Water__weight_diff_nboxplot.pdf}{}
+\checkFileNoReset{Weight_A__g_nboxplot.pdf}{}{}
+\checkFileNoReset{Weight_B__g_nboxplot.pdf}{}{}
+\checkFileNoReset{Water__weight_diff_nboxplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
 	\clearpage
 	\section{\noindent Weight and water consumption}
 		
-	\checkFile{Weight_A__g_nboxplot.pdf}{Weight_B__g_nboxplot.pdf}
+	\checkFile{Weight_A__g_nboxplot.pdf}{Weight_B__g_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 		\subsection{Weights (before and after watering)}
 		\begin{itemize}
@@ -233,9 +289,8 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 			\loadImage{Weight_B__g_nboxplot.pdf}
 		}{}
 	}{}
-	
-	
-	\checkFile{Water__weight_diff_nboxplot.pdf}{}
+		
+	\checkFile{Water__weight_diff_nboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
 		\subsection{Watering amounts / consumption}
 		\begin{itemize}
@@ -249,14 +304,15 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 
 \resetBoolean
-\checkFileNoReset{volume_iap__px3_boxplot.pdf}{}
-\checkFileNoReset{volume_iap__px3_nboxplot.pdf}{}
-\checkFileNoReset{volume_iap__px3_boxplot.pdf}{}
-\checkFileNoReset{volume_iap__px3_nboxplot.pdf}{}
-\checkFileNoReset{digital_biomass_keygene_normnboxplot.pdf}{}
-\checkFileNoReset{volume_iap_wuenboxplot.pdf}{}
+\checkFileNoReset{volume_iap__px3_boxplot.pdf}{}{}
+\checkFileNoReset{volume_iap__px3_nboxplot.pdf}{}{}
+\checkFileNoReset{volume_iap__px3_boxplot.pdf}{}{}
+\checkFileNoReset{volume_iap__px3_nboxplot.pdf}{}{}
+\checkFileNoReset{digital_biomass_keygene_normnboxplot.pdf}{}{}
+\checkFileNoReset{volume_iap_wuenboxplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
+	\resetClear
 	\clearpage
 	\section{\noindent Digital biomass}
 	\begin{itemize}
@@ -264,8 +320,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\item Unit: $pixel^3$
 	\end{itemize}
 	
-	\checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}
+	\checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\ownClearPage
 		\subsection{IAP formula}
 		\begin{itemize}
 		\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
@@ -280,9 +337,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}
+	\checkFile{volume_iap__px3_boxplot.pdf}{volume_iap__px3_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-		\clearpage
+		\ownClearPage
 		\subsection{LemnaTec formula}
 		\begin{itemize}
 		\item Equation: $Biomass_{LemnaTec}=\sqrt{side.area_{0^{\circ}}*side.area_{90^{\circ}}*top.area}$
@@ -297,9 +354,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{digital_biomass_keygene_normnboxplot.pdf}{}
+	\checkFile{digital_biomass_keygene_normnboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+		\ownClearPage
 		\subsection{KeyGene formula}
 		\begin{itemize}
 		\item Equation: $Biomass_{KeyGene}=side.area_{0^{\circ}}+side.area_{90^{\circ}}+\log(\frac{top.area}{3})$
@@ -309,9 +366,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{volume_iap_wuenboxplot.pdf}{}
+	\checkFile{volume_iap_wuenboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+		\ownClearPage
 		\section{\noindent Water use efficiency}
 		\begin{itemize}
 		\item Ratio of plant growth and water use.
@@ -329,174 +386,204 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 
 \resetBoolean
-\checkFileNoReset{side_height__mm_boxplot.pdf}{}
-\checkFileNoReset{side_height__mm_nboxplot.pdf}{}
-\checkFileNoReset{side_height_norm__mm_boxplot.pdf}{}
-\checkFileNoReset{side_height_norm__mm_nboxplot.pdf}{}
-\checkFileNoReset{side_width__mm_boxplot.pdf}{}
-\checkFileNoReset{side_width__mm_nboxplot.pdf}{}
-\checkFileNoReset{side_width_norm__mm_boxplot.pdf}{}
-\checkFileNoReset{side_width_norm__mm_nboxplot.pdf}{}
-\checkFileNoReset{side_area__px_boxplot.pdf}{}
-\checkFileNoReset{side_area__px_nboxplot.pdf}{}
-\checkFileNoReset{side_area_norm__mm2_boxplot.pdf}{}
-\checkFileNoReset{side_area_norm__mm2_nboxplot.pdf}{}
-\checkFileNoReset{top_area__px_boxplot.pdf}{}
-\checkFileNoReset{top_area__px_nboxplot.pdf}{}
-\checkFileNoReset{top_area_norm__mm2_nboxplot.pdf}{}
+\checkFileNoReset{side_height__mm_boxplot.pdf}{}{}
+\checkFileNoReset{side_height__mm_nboxplot.pdf}{}{}
+\checkFileNoReset{side_height_norm__mm_boxplot.pdf}{}{}
+\checkFileNoReset{side_height_norm__mm_nboxplot.pdf}{}{}
+\checkFileNoReset{side_width__mm_boxplot.pdf}{}{}
+\checkFileNoReset{side_width__mm_nboxplot.pdf}{}{}
+\checkFileNoReset{side_width_norm__mm_boxplot.pdf}{}{}
+\checkFileNoReset{side_width_norm__mm_nboxplot.pdf}{}{}
+\checkFileNoReset{side_area__px_boxplot.pdf}{}{}
+\checkFileNoReset{side_area__px_nboxplot.pdf}{}{}
+\checkFileNoReset{side_area_norm__mm2_boxplot.pdf}{}{}
+\checkFileNoReset{side_area_norm__mm2_nboxplot.pdf}{}{}
+\checkFileNoReset{top_area__px_boxplot.pdf}{}{}
+\checkFileNoReset{top_area__px_nboxplot.pdf}{}{}
+\checkFileNoReset{top_area_norm__mm2_nboxplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
+	\resetClear
 	\clearpage
 	\section{General growth related plant properties}
-	
-	\checkFile{side_height__mm_boxplot.pdf}{side_height__mm_nboxplot.pdf}
-	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-		\subsection{Height}
-		\begin{itemize}
-		\item Plant height (px)
-		\item Column name: side.height
-		\item Unit: px
-		\end{itemize}
-		\ifthenelse{\boolean{isFile1}}{
-			\loadImage{side_height__mm_boxplot.pdf}
-		}{}
-		\ifthenelse{\boolean{isFile2}}{
-			\loadImage{side_height__mm_nboxplot.pdf}
-		}{}
-	}{}
-	
-	
-	\checkFile{side_height_norm__mm_boxplot.pdf}{side_height_norm__mm_nboxplot.pdf}
-	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-		\clearpage
+		
+	\resetBoolean
+	\checkFileNoReset{side_height__mm_boxplot.pdf}{}{}
+	\checkFileNoReset{side_height__mm_nboxplot.pdf}{}{}
+	\checkFileNoReset{}{side_height_norm__mm_boxplot.pdf}{}
+	\checkFileNoReset{}{side_height_norm__mm_nboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile2}}{
+		
+		\ownClearPage
 		\subsection{Height (zoom corrected)}
 		\begin{itemize}
 		\item Plant height (mm) (normalized to distance of left and right marker)
 		\item Column name: side.height.norm
 		\item Unit: mm
 		\end{itemize}
+		\checkFile{side_height_norm__mm_boxplot.pdf}{side_height_norm__mm_nboxplot.pdf}{}
 		\ifthenelse{\boolean{isFile1}}{
 			\loadImage{side_height_norm__mm_boxplot.pdf}
 		}{}	
 		\ifthenelse{\boolean{isFile2}}{	
 			\loadImage{side_height_norm__mm_nboxplot.pdf}
 		}{}
-	}{}
-	
-	
-	\checkFile{side_width__mm_boxplot.pdf}{side_width__mm_nboxplot.pdf}
-	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-		\clearpage
-		\subsection{Width}
-		\begin{itemize}
-		\item Plant width (px) 
-		\item Column name: side.width
-		\item Unit: px
-		\end{itemize}
+	}{
 		\ifthenelse{\boolean{isFile1}}{
-			\loadImage{side_width__mm_boxplot.pdf}
+			
+			\ownClearPage
+			\subsection{Height}
+			\begin{itemize}
+			\item Plant height (px)
+			\item Column name: side.height
+			\item Unit: px
+			\end{itemize}
+			\checkFile{side_height__mm_boxplot.pdf}{side_height__mm_nboxplot.pdf}{}
+			\ifthenelse{\boolean{isFile1}}{
+				\loadImage{side_height__mm_boxplot.pdf}
+			}{}
+			\ifthenelse{\boolean{isFile2}}{
+				\loadImage{side_height__mm_nboxplot.pdf}
+			}{}
 		}{}
-		\ifthenelse{\boolean{isFile2}}{	
-			\loadImage{side_width__mm_nboxplot.pdf}
-		}{}
-	}{}
+	}	
 	
-	
-	\checkFile{side_width_norm__mm_boxplot.pdf}{side_width_norm__mm_nboxplot.pdf}
-	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-		\clearpage
+	\resetBoolean
+	\checkFileNoReset{side_width__mm_boxplot.pdf}{}{}
+	\checkFileNoReset{side_width__mm_nboxplot.pdf}{}{}
+	\checkFileNoReset{}{side_width_norm__mm_boxplot.pdf}{}
+	\checkFileNoReset{}{side_width_norm__mm_nboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile2}}{
+		
+		\ownClearPage
 		\subsection{Width (zoom corrected)}
 		\begin{itemize}
 		\item Plant width (mm) (normalized to distance of left and right marker) 
 		\item Column name: side.width.norm
 		\item Unit: mm
 		\end{itemize}
+		\checkFile{side_width_norm__mm_boxplot.pdf}{side_width_norm__mm_nboxplot.pdf}{}
 		\ifthenelse{\boolean{isFile1}}{
 			\loadImage{side_width_norm__mm_boxplot.pdf}
 		}{}
 		\ifthenelse{\boolean{isFile2}}{	
 			\loadImage{side_width_norm__mm_nboxplot.pdf}
 		}{}
-	}{}
-	
-	
-	\checkFile{side_area__px_boxplot.pdf}{side_area__px_nboxplot.pdf}
-	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-		\clearpage
-		\subsection{Projected side area}
-		\begin{itemize}
-		\item Number of foreground pixels
-		\item Colum name: side.area
-		\item Unit: px
-		\end{itemize}
+	}{
 		\ifthenelse{\boolean{isFile1}}{
-			\loadImage{side_area__px_boxplot.pdf}
-		}{}
-		\ifthenelse{\boolean{isFile2}}{
-			\loadImage{side_area__px_nboxplot.pdf}
-		}{}
-	}{}
+	
+			\ownClearPage
+			\subsection{Width}
+			\begin{itemize}
+			\item Plant width (px) 
+			\item Column name: side.width
+			\item Unit: px
+			\end{itemize}
+			\checkFile{side_width__mm_boxplot.pdf}{side_width__mm_nboxplot.pdf}{}
+			\ifthenelse{\boolean{isFile1}}{
+				\loadImage{side_width__mm_boxplot.pdf}
+			}{}
+			\ifthenelse{\boolean{isFile2}}{	
+				\loadImage{side_width__mm_nboxplot.pdf}
+			}{}
+		}{}	
+	}
 	
 	
-	\checkFile{side_area_norm__mm2_boxplot.pdf}{side_area_norm__mm2_nboxplot.pdf}
-	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-		\clearpage
+	\resetBoolean
+	\checkFileNoReset{side_area__px_boxplot.pdf}{}{}
+	\checkFileNoReset{side_area__px_nboxplot.pdf}{}{}
+	\checkFileNoReset{}{side_area_norm__mm2_boxplot.pdf}{}
+	\checkFileNoReset{}{side_area_norm__mm2_nboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile2}}{
+		
+		\ownClearPage
 		\subsection{Projected side area (zoom corrected)}
 		\begin{itemize}
 		\item Number of foreground pixels from side camera (normalized to distance of left and right marker)
 		\item Colum name: side.area.norm
 		\item Unit: $mm^2$
 		\end{itemize}
+		\checkFile{side_area_norm__mm2_boxplot.pdf}{side_area_norm__mm2_nboxplot.pdf}{}
 		\ifthenelse{\boolean{isFile1}}{
 			\loadImage{side_area_norm__mm2_boxplot.pdf}
 		}{}
 		\ifthenelse{\boolean{isFile2}}{
 			\loadImage{side_area_norm__mm2_nboxplot.pdf}
 		}{}
-	}{}
 	
-	
-	\checkFile{top_area__px_boxplot.pdf}{top_area__px_nboxplot.pdf}
-	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-		\clearpage
-		\subsection{Projected top area}
-		\begin{itemize}
-		\item Number of foreground pixels
-		\item Colum name: top.area
-		\item Unit: px
-		\end{itemize}
+	}{	
 		\ifthenelse{\boolean{isFile1}}{
-			\loadImage{top_area__px_boxplot.pdf}
-		}{}
-		\ifthenelse{\boolean{isFile2}}{
-			\loadImage{top_area__px_nboxplot.pdf}
-		}{}
-	}{}
+			
+			\ownClearPage
+			\subsection{Projected side area}
+			\begin{itemize}
+			\item Number of foreground pixels
+			\item Colum name: side.area
+			\item Unit: px
+			\end{itemize}
+			\checkFile{side_area__px_boxplot.pdf}{side_area__px_nboxplot.pdf}{}
+			\ifthenelse{\boolean{isFile1}}{
+				\loadImage{side_area__px_boxplot.pdf}
+			}{}
+			\ifthenelse{\boolean{isFile2}}{
+				\loadImage{side_area__px_nboxplot.pdf}
+			}{}
+		}{}	
+	}
 	
 	
-	\checkFile{top_area_norm__mm2_nboxplot.pdf}{}
-	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+	\resetBoolean
+	\checkFileNoReset{top_area__px_boxplot.pdf}{}{}
+	\checkFileNoReset{top_area__px_nboxplot.pdf}{}{}
+	\checkFileNoReset{}{top_area_norm__mm2_nboxplot.pdf}{}
+	%\checkFileNoReset{}{top_area_norm__mm2_boxplot.pdf}{}
+	\ifthenelse{\boolean{isFile2}}{
+		
+		\ownClearPage
 		\subsection{Projected top area (zoom corrected)}
 		\begin{itemize}
 		\item Number of foreground pixels from top camera (normalized to distance of left and right marker)
 		\item Colum name: top.area.norm
 		\item Unit: $mm^2$
 		\end{itemize}
+		%\checkFile{top_area_norm__mm2_nboxplot.pdf}{}{}
 		\loadImage{top_area_norm__mm2_nboxplot.pdf}
-	}{}
+	
+	}{
+		\ifthenelse{\boolean{isFile1}}{
+			
+			\ownClearPage
+			\subsection{Projected top area}
+			\begin{itemize}
+			\item Number of foreground pixels
+			\item Colum name: top.area
+			\item Unit: px
+			\end{itemize}
+			\checkFile{top_area__px_boxplot.pdf}{top_area__px_nboxplot.pdf}{}
+			\ifthenelse{\boolean{isFile1}}{
+				\loadImage{top_area__px_boxplot.pdf}
+			}{}
+			\ifthenelse{\boolean{isFile2}}{
+				\loadImage{top_area__px_nboxplot.pdf}
+			}{}
+		}{}
+	}
+	
+	
 }{}
 
 
 \resetBoolean
-\checkFileNoReset{side_area_relativenboxplot.pdf}{}
-\checkFileNoReset{side_height_norm_relativenboxplot.pdf}{}
-\checkFileNoReset{side_width_norm_relativenboxplot.pdf}{}
-\checkFileNoReset{top_area_relativenboxplot.pdf}{}
-\checkFileNoReset{side_area_relativenboxplot.pdf}{}
-\checkFileNoReset{volume_iap_relativenboxplot.pdf}{}
+\checkFileNoReset{side_area_relativenboxplot.pdf}{}{}
+\checkFileNoReset{side_height_norm_relativenboxplot.pdf}{}{}
+\checkFileNoReset{side_width_norm_relativenboxplot.pdf}{}{}
+\checkFileNoReset{top_area_relativenboxplot.pdf}{}{}
+\checkFileNoReset{side_area_relativenboxplot.pdf}{}{}
+\checkFileNoReset{volume_iap_relativenboxplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
+	\resetClear
 	\clearpage
 	\section{\noindent Relative changes per day}
 	\begin{itemize}
@@ -505,8 +592,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\end{itemize}
 	
 	
-	\checkFile{side_area_relativenboxplot.pdf}{}
+	\checkFile{side_area_relativenboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
+		\ownClearPage
 		\subsection{Projected side area}
 		\begin{itemize}
 		\item Relative growth of number of foreground pixels from side camera
@@ -516,9 +604,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{side_height_norm_relativenboxplot.pdf}{}
+	\checkFile{side_height_norm_relativenboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+		\ownClearPage
 		\subsection{Height}
 		\begin{itemize}
 		\item Relative growth of plant height in percent (normalized to distance of left and right marker)
@@ -528,9 +616,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{side_width_norm_relativenboxplot.pdf}{}
+	\checkFile{side_width_norm_relativenboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+		\ownClearPage
 		\subsection{Width}
 		\begin{itemize}
 		\item Relative plant width growth in percent (normalized to distance of left and right marker) 
@@ -539,9 +627,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\loadImage{side_width_norm_relativenboxplot.pdf}
 	}{}
 	
-	\checkFile{top_area_relativenboxplot.pdf}{}
+	\checkFile{top_area_relativenboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+		\ownClearPage
 		\subsection{Projected top area}
 		\begin{itemize}
 		\item Relative growth of number of foreground pixels from top camera
@@ -551,9 +639,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{side_area_relativenboxplot.pdf}{}
+	\checkFile{side_area_relativenboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+		\ownClearPage
 		\subsection{Projected side area}
 		\begin{itemize}
 		\item Relative growth of number of foreground pixels from side camera
@@ -562,9 +650,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\loadImage{side_area_relativenboxplot.pdf}
 	}{}
 	
-	\checkFile{volume_iap_relativenboxplot.pdf}{}
+	\checkFile{volume_iap_relativenboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+		\ownClearPage
 		\subsection{Digital biomass (IAP formula)}
 		\begin{itemize}
 		\item Digital biomass growth in percent (per day) based on the side.area and top.area observed from the visible light camera.
@@ -575,86 +663,156 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 }{}
 
 \resetBoolean
-\checkFileNoReset{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}
-\checkFileNoReset{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}
-\checkFileNoReset{side_vis_normalized_histogram_ratio_bin_.tex}{}
+\checkFileNoReset{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{side_vis_normalized_histogram_ratio_bin_.tex}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
+	\resetClear
 	\clearpage
-	\section{Visible light color histogram}
+	\section{Visible light color}
+	\begin{itemize}
+	\item HUE means the color as color angle of the color circle (e. g. 0$^\circ$
+	= red, 120$^\circ$ = green, 240$^\circ$ = blue)
+	\item also standardised between 0 and 1
+	\end{itemize}
 	
-	\checkFile{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}
+	\resetBoolean
+	\checkFileNoReset{HSV_Farbtonskala.png}{}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\loadImage{HSV_Farbtonskala.png}
+	}{}
+	
+	
+	\checkFile{side_vis_hue_averagenboxplot.pdf}{top_vis_hue_averagenboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 	
-		\subsection{Color histogram}
+	%%side.vis.hue.average
+		\ownClearPage
+		\subsection{Average HUE}
+		
 		\ifthenelse{\boolean{isFile1}}{
-			Visible hue histogram for side view:
-		
-			\loadTex{side_vis_hue_histogram_ratio_bin_stackedOverallImage}
+			Visible hue average histogram for side view:
+			\loadImage{side_vis_hue_averagenboxplot.pdf}
 		}{}	
-		\ifthenelse{\boolean{isFile2}}{
 		
-			Visible hue histogram for top view:
+	%%top.vis.hue.average
+		\ifthenelse{\boolean{isFile2}}{
+			Visible hue average histogram for top view:
 			
-			\loadTex{top_vis_hue_histogram_ratio_bin_stackedOverallImage}
+			\loadImage{top_vis_hue_averagenboxplot.pdf}
 		}{}
 	}{}
 	
 	
-	\checkFile{side_vis_normalized_histogram_ratio_bin_.tex}{}
-	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+	\resetBoolean
+	\checkFileNoReset{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{}{side_vis_normalized_histogram_ratio_bin_.tex}{}
+	%\checkFileNoReset{}{side_vis_normalized_histogram_ratio_bin_.tex}{}
+	\ifthenelse{\boolean{isFile2}}{
+				
+		%\checkFile{side_vis_normalized_histogram_ratio_bin_.tex}{}{}
+		\ownClearPage
 		\subsection{Color histogram (zoom corrected)}
 		Visible hue histogram (zoom corrected) for side view:
-	
 		\loadTex{side_vis_normalized_histogram_ratio_bin_}
-	}{}
+	
+	}{
+		\ifthenelse{\boolean{isFile1}}{
+		
+			\ownClearPage
+			\subsection{Color histogram}
+			\checkFile{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}
+			\ifthenelse{\boolean{isFile1}}{
+				Visible hue histogram for side view:
+				\loadTex{side_vis_hue_histogram_ratio_bin_stackedOverallImage}
+			}{}	
+			\ifthenelse{\boolean{isFile2}}{
+			
+				Visible hue histogram for top view:
+				
+				\loadTex{top_vis_hue_histogram_ratio_bin_stackedOverallImage}
+			}{}
+		}{}	
+	}	
 }{}
 
 
 \resetBoolean
-\checkFileNoReset{side_fluo_histogram_bin_stackedOverallImage.tex}{}
-\checkFileNoReset{top_fluo_histogram_bin_stackedOverallImage.tex}{}
-\checkFileNoReset{side_fluo_normalized_histogram_bin_stackedOverallImage.pdf}{}
+\checkFileNoReset{side_fluo_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_fluo_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{side_fluo_normalized_histogram_bin_stackedOverallImage.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
+	\resetClear
 	\clearpage
-	\section{Fluorescence activity histogram}
+	\section{Fluorescence activity}
 
-	\checkFile{side_fluo_histogram_bin_stackedOverallImage.tex}{top_fluo_histogram_bin_stackedOverallImage.tex}
+	\checkFile{side_fluo_intensity_average__relative_nboxplot.pdf}{top_fluo_intensity_average__relative___pix_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-	
-		\subsection{Fluorescence spectra}
-		\begin{itemize}
-		\item Histogram of observed fluorescence colors
-		\end{itemize}
+		
+		\ownClearPage
+		\subsection{Average Fluo intensity}
+
 		\ifthenelse{\boolean{isFile1}}{
 		
-			Fluorescence activity distribution for side view:
+			Average Fluorescence intensity for side view:
 		
-			\loadTex{side_fluo_histogram_bin_stackedOverallImage}
+			\loadImage{side_fluo_intensity_average__relative_nboxplot.pdf}
 		}{}
 		\ifthenelse{\boolean{isFile2}}{
 		
-			Fluorescence activity distribution for top view:
+			Average Fluorescence intensity for top view:
 			
-			\loadTex{top_fluo_histogram_bin_stackedOverallImage}
+			\loadImage{top_fluo_intensity_average__relative___pix_nboxplot.pdf}
 		}{}
 	}{}
-	
-	
-	\checkFile{side_fluo_normalized_histogram_bin_stackedOverallImage.pdf}{}
-	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+
+	\resetBoolean
+	\checkFileNoReset{side_fluo_histogram_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{top_fluo_histogram_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{}{side_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
+	\checkFileNoReset{}{top_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
+	\ifthenelse{\boolean{isFile2}}{
+
+		\ownClearPage
 		\subsection{Fluorescence spectra (zoom corrected)}
 		\begin{itemize}
 		\item Histogram of observed fluorescence colors
 		\end{itemize}
+		\checkFile{side_fluo_normalized_histogram_bin_stackedOverallImage.tex}{top_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
+		\ifthenelse{\boolean{isFile1}}{
+			Fluorescence activity distribution (zoom corrected) for side view:
+			\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
+		}{}
 		
-		Fluorescence activity distribution (zoom corrected) for side view:
+		\ifthenelse{\boolean{isFile2}}{
+			Fluorescence activity distribution (not zoom corrected) for top view:
+			\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
+		}{}
+	
+	}{
+		\ifthenelse{\boolean{isFile1}}{
 		
-		\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
-	}{}
+			\ownClearPage
+			\subsection{Fluorescence spectra}
+			\begin{itemize}
+			\item Histogram of observed fluorescence colors
+			\end{itemize}
+			\checkFile{side_fluo_histogram_bin_stackedOverallImage.tex}{top_fluo_histogram_bin_stackedOverallImage.tex}{}
+			\ifthenelse{\boolean{isFile1}}{
+			
+				Fluorescence activity distribution for side view:
+				\loadTex{side_fluo_histogram_bin_stackedOverallImage}
+			}{}
+			\ifthenelse{\boolean{isFile2}}{
+			
+				Fluorescence activity distribution for top view:
+				\loadTex{top_fluo_histogram_bin_stackedOverallImage}
+			}{}
+		}{}
+	}
 }{}
 
 
@@ -687,65 +845,103 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 %}{}
 
 \resetBoolean
-\checkFileNoReset{side_nir_histogram_bin_stackedOverallImage.tex}{}
-\checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}
-\checkFileNoReset{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
+\checkFileNoReset{side_nir_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
+	\resetClear
 	\clearpage
-	\section{Near-infrared intensity histogram}
+	\section{Near-infrared intensity}
 	
-	\checkFile{side_nir_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}
+	\checkFile{side_nir_intensity_average__relative_nboxplot.pdf}{top_nir_intensity_average__relative___pix_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
-		\subsection{Intensity histogram}
-		\begin{itemize}
-		\item Average intensity of near infrared (NIR)
-		\item Represents the water content of the plant
-		\end{itemize}
+		\ownClearPage
+		\subsection{Average NIR intensity}
+
 		\ifthenelse{\boolean{isFile1}}{
 		
-			NIR intensity distribution for side view:
-		
-			\loadTex{side_nir_histogram_bin_stackedOverallImage}
+			Average NIR intensity for side view:
+			\loadImage{side_nir_intensity_average__relative_nboxplot.pdf}
 		}{}
 		\ifthenelse{\boolean{isFile2}}{
 		
-			NIR intensity distribution for top view:
-		
-			\loadTex{top_nir_histogram_bin_stackedOverallImage}
+			Average NIR intensity for top view:
+			\loadImage{top_nir_intensity_average__relative___pix_nboxplot.pdf}
 		}{}
 	}{}
 	
 	
-	\checkFile{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
-	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
-		\subsection{Intensity histogram (zoom corrected)}
-		\begin{itemize}
-		\item Average intensity of near infrared (NIR)
-		\item Represents the water content of the plant
-		\end{itemize}
+	\resetBoolean
+	\checkFileNoReset{side_nir_histogram_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{}{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
+	\checkFileNoReset{}{top_nir_histogram_bin_stackedOverallImage.tex}{}
+	\ifthenelse{\boolean{isFile2}}{
+			
 		
-		NIR intensity distribution for side view (zoom corrected):
 		
-		\loadTex{side_nir_normalized_histogram_bin_stackedOverallImage}
-	}{}
+		
+		
+		
+		
+			\ownClearPage
+			\subsection{Intensity histogram (zoom corrected)}
+			\begin{itemize}
+			\item Average intensity of near infrared (NIR)
+			\item Represents the water content of the plant
+			\end{itemize}
+			
+			\checkFile{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}{}
+			\ifthenelse{\boolean{isFile1}}{
+				NIR intensity distribution for side view (zoom corrected):
+				\loadTex{side_nir_normalized_histogram_bin_stackedOverallImage}
+			}{}
+			\ifthenelse{\boolean{isFile2}}{
+				NIR intensity distribution for top view (not zoom corrected):
+				\loadTex{side_nir_normalized_histogram_bin_stackedOverallImage}
+			}{}
+	
+	}{
+		\ifthenelse{\boolean{isFile1}}{
+		
+			\ownClearPage
+			\subsection{Intensity histogram}
+			\begin{itemize}
+			\item Average intensity of near infrared (NIR)
+			\item Represents the water content of the plant
+			\end{itemize}
+			\checkFile{side_nir_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}{}
+			\ifthenelse{\boolean{isFile1}}{
+			
+				NIR intensity distribution for side view:
+				\loadTex{side_nir_histogram_bin_stackedOverallImage}
+			}{}
+			\ifthenelse{\boolean{isFile2}}{
+			
+				NIR intensity distribution for top view:
+				\loadTex{top_nir_histogram_bin_stackedOverallImage}
+			}{}
+		}{}
+	}
 }{}
 
 
 \resetBoolean
-\checkFileNoReset{side_leaf_count_median__leafs_nboxplot.pdf}{}
-\checkFileNoReset{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}
-\checkFileNoReset{side_bloom_count__tassel_nboxplot.pdf}{}
+\checkFileNoReset{side_leaf_count_median__leafs_nboxplot.pdf}{}{}
+\checkFileNoReset{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}{}
+\checkFileNoReset{side_bloom_count__tassel_nboxplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 	
+	\resetClear
 	\clearpage
 	\section{Plant structures}
 
 	% http://upload.wikimedia.org/wikipedia/commons/9/98/Maize_plant_diagram.svg
 	
-	\checkFile{side_leaf_count_median__leafs_nboxplot.pdf}{}
+	\checkFile{side_leaf_count_median__leafs_nboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
+		\ownClearPage
 		\subsection{Number of leafs}
 		\begin{itemize}
 		\item Number of leafs-tips
@@ -755,9 +951,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}
+	\checkFile{side_leaf_length_sum_norm_max__mm_nboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+		\ownClearPage
 		\subsection{Leaf lengths}
 		\begin{itemize}
 		\item Length of all leafs plus stem
@@ -769,9 +965,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{side_bloom_count__tassel_nboxplot.pdf}{}
+	\checkFile{side_bloom_count__tassel_nboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage	
+		\ownClearPage	
 		\subsection{Flower detection}
 		\begin{itemize}
 		\item Number of tassel florets
@@ -785,12 +981,13 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 
 \resetBoolean
-\checkFileNoReset{side_nir_wetness_average__percent_.pdf}{}
-\checkFileNoReset{top_nir_wetness_average__percent_nboxplot.pdf}{}
-\checkFileNoReset{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
-\checkFileNoReset{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
+\checkFileNoReset{side_nir_wetness_average__percent_.pdf}{}{}
+\checkFileNoReset{top_nir_wetness_average__percent_nboxplot.pdf}{}{}
+\checkFileNoReset{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}{}
+\checkFileNoReset{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
+	\resetClear
 	\clearpage
 	\section{\noindent Wetness}
 	
@@ -799,9 +996,10 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\end{itemize}
 	
 	
-	\checkFile{side_nir_wetness_average__percent_.pdf}{}
+	\checkFile{side_nir_wetness_average__percent_.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
 	
+		\ownClearPage
 		\subsection{Average wetness of side image}
 		\begin{itemize}
 		\item Average wetness of the plants from NIR side camera
@@ -812,8 +1010,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{top_nir_wetness_average__percent_nboxplot.pdf}{}
+	\checkFile{top_nir_wetness_average__percent_nboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
+		\ownClearPage
 		\subsection{Average wetness of top image}
 		\begin{itemize}
 		\item Average wetness of the plants from NIR top camera
@@ -824,9 +1023,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}	
 		
 		
-	\checkFile{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
+	\checkFile{side_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage	
+		\ownClearPage	
 		\subsection{Weighted loss through drought stress - side image}
 		\begin{itemize}
 		\item Number of foreground pixels from NIR side camera minus the weighted value of the plant
@@ -837,9 +1036,9 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 	
 	
-	\checkFile{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}
+	\checkFile{top_nir_wetness_plant_weight_drought_lossnboxplot.pdf}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\clearpage
+		\ownClearPage
 		\subsection{Weighted loss through drought stress - top image}
 		\begin{itemize}
 		\item Number of foreground pixels from NIR top camera minus the weighted value of the plant
@@ -851,8 +1050,259 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 }{}
 
 
-\checkFile{appendixImage.tex}{}
+\resetBoolean
+\checkFileNoReset{side_hull_area__px_nboxplot.pdf}{}{}
+\checkFileNoReset{side_hull_area_norm__mm_2_nboxplot.pdf}{}{}
+\checkFileNoReset{side_hull_pc1nboxplot.pdf}{}{}
+\checkFileNoReset{side_hull_pc1_normnboxplot.pdf}{}{}
+\checkFileNoReset{side_hull_pc2nboxplot.pdf}{}{}
+\checkFileNoReset{side_hull_pc2_normnboxplot.pdf}{}{}
+\checkFileNoReset{side_hull_fillgrade__percent_nboxplot.pdf}{}{}
+\checkFileNoReset{top_hull_area__px_nboxplot.pdf}{}{}
+\checkFileNoReset{top_hull_area_norm__mm_2_nboxplot.pdf}{}{}
+\checkFileNoReset{top_hull_pc1nboxplot.pdf}{}{}
+\checkFileNoReset{top_hull_pc1_normnboxplot.pdf}{}{}
+\checkFileNoReset{top_hull_pc2nboxplot.pdf}{}{}
+\checkFileNoReset{top_hull_pc2_normnboxplot.pdf}{}{}
+\checkFileNoReset{top_hull_fillgrade__percent_nboxplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
+
+	\resetClear
+	\clearpage
+	\section{Convex hull}
+
+	In mathematics, the convex hull or convex envelope for a set of points X in a
+	real vector space V (for example, usual 2- or 3-dimensional space) is the
+	minimal convex set containing X. When the set X is a finite subset of the
+	plane, we may imagine stretching a rubber band so that it surrounds the entire
+	set X and then releasing it, allowing it to contract; when it becomes taut, it
+	encloses the convex hull of X.
+	
+ 	\begin{tiny}
+ 	Wikipedia contributors, "Convex hull,"
+ 	Wikipedia, The Free Encyclopedia,
+	\url{http://en.wikipedia.org/w/index.php?title=Convex_hull&oldid=482955324}
+	(accessed March 30, 2012).
+	\end{tiny}
+
+	\resetBoolean
+	\checkFileNoReset{side_hull_area__px_nboxplot.pdf}{}{}
+	\checkFileNoReset{side_hull_area_norm__mm_2_nboxplot.pdf}{}{}
+	\checkFileNoReset{side_hull_pc1nboxplot.pdf}{}{}
+	\checkFileNoReset{side_hull_pc1_normnboxplot.pdf}{}{}
+	\checkFileNoReset{side_hull_pc2nboxplot.pdf}{}{}
+	\checkFileNoReset{side_hull_pc2_normnboxplot.pdf}{}{}
+	\checkFileNoReset{side_hull_fillgrade__percent_nboxplot.pdf}{}{}
+	\ifthenelse{\boolean{isFile1}}{
+ 		
+ 		\resetClearSub
+ 		\ownClearPage
+ 		\subsection{Side}
+
+		\checkFile{side_hull_area__px_nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{Area}
+			\begin{itemize}
+			\item Area which is enclosed of the convex hull
+			\item Unit: px
+			\end{itemize}
+			\loadImage{side_hull_area__px_nboxplot.pdf}
+		}{}
+
+		\checkFile{side_hull_area_norm__mm_2_nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{Area (zoom corrected)}
+			\begin{itemize}
+			\item Area which is enclosed of the convex hull (zoom corrected)
+			\item Unit: px
+			\end{itemize}
+			\loadImage{side_hull_area_norm__mm_2_nboxplot.pdf}
+		}{}
+
+		\checkFile{side_hull_pc1nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC1 - maximum distance}
+			\begin{itemize}
+			\item Maximum extension of the plant
+			\item Unit: px
+			\end{itemize}
+			\loadImage{side_hull_pc1nboxplot.pdf}
+		}{}
+
+		\checkFile{side_hull_pc1_normnboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC1 - maximum distance (zoom corrected)}
+			\begin{itemize}
+			\item Maximum extension of the plant (zoom corrected)
+			\item Unit: mm
+			\end{itemize}
+			\loadImage{side_hull_pc1_normnboxplot.pdf}
+		}{}
+
+		\checkFile{side_hull_pc2nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC2 - Opposite direction maxmium distance}
+			\begin{itemize}
+			\item Opposite direction of the maximum extension of the plant
+			\item Unit: px
+			\end{itemize}
+			\loadImage{side_hull_pc2nboxplot.pdf}
+		}{}
+
+		\checkFile{side_hull_pc2_normnboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC2 - Opposite direction maxmium distance (zoom corrected)}
+			\begin{itemize}
+			\item Opposite direction of the maximum extension of the plant (zoom corrected)
+			\item Unit: mm
+			\end{itemize}
+			\loadImage{side_hull_pc2_normnboxplot.pdf}
+		}{}
+
+		\checkFile{side_hull_fillgrade__percent_nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC2 - Opposite direction maxmium distance}
+			\begin{itemize}
+			\item Ratio of the area of the whole convex hull and the area of the plant
+			(green pixel)
+			\item Unit: none
+			\end{itemize}
+			\loadImage{side_hull_fillgrade__percent_nboxplot.pdf}
+		}{}
+
+}{}
+
+
+	\resetBoolean
+	\checkFileNoReset{top_hull_area__px_nboxplot.pdf}{}{}
+	\checkFileNoReset{top_hull_area_norm__mm_2_nboxplot.pdf}{}{}
+	\checkFileNoReset{top_hull_pc1nboxplot.pdf}{}{}
+	\checkFileNoReset{top_hull_pc1_normnboxplot.pdf}{}{}
+	\checkFileNoReset{top_hull_pc2nboxplot.pdf}{}{}
+	\checkFileNoReset{top_hull_pc2_normnboxplot.pdf}{}{}
+	\checkFileNoReset{top_hull_fillgrade__percent_nboxplot.pdf}{}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\resetClearSub
+		\ownClearPage
+		\subsection{Top}
+
+		\checkFile{top_hull_area__px_nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{Area}
+			\begin{itemize}
+			\item Area which is enclosed of the convex hull
+			\item Unit: px
+			\end{itemize}
+			\loadImage{top_hull_area__px_nboxplot.pdf}
+		}{}
+
+		\checkFile{top_hull_area_norm__mm_2_nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{Area (zoom corrected)}
+			\begin{itemize}
+			\item Area which is enclosed of the convex hull (zoom corrected)
+			\item Unit: px
+			\end{itemize}
+			\loadImage{top_hull_area_norm__mm_2_nboxplot.pdf}
+		}{}
+
+		\checkFile{top_hull_pc1nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC1 - maximum distance}
+			\begin{itemize}
+			\item Maximum extension of the plant
+			\item Unit: px
+			\end{itemize}
+			\loadImage{top_hull_pc1nboxplot.pdf}
+		}{}
+
+		\checkFile{top_hull_pc1_normnboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC1 - maximum distance (zoom corrected)}
+			\begin{itemize}
+			\item Maximum extension of the plant (zoom corrected)
+			\item Unit: mm
+			\end{itemize}
+			\loadImage{top_hull_pc1_normnboxplot.pdf}
+		}{}
+
+		\checkFile{top_hull_pc2nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC2 - Opposite direction maxmium distance}
+			\begin{itemize}
+			\item Opposite direction of the maximum extension of the plant
+			\item Unit: px
+			\end{itemize}
+			\loadImage{top_hull_pc2nboxplot.pdf}
+		}{}
+
+		\checkFile{top_hull_pc2_normnboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC2 - Opposite direction maxmium distance (zoom corrected)}
+			\begin{itemize}
+			\item Opposite direction of the maximum extension of the plant (zoom corrected)
+			\item Unit: mm
+			\end{itemize}
+			\loadImage{top_hull_pc2_normnboxplot.pdf}
+		}{}
+
+		\checkFile{top_hull_fillgrade__percent_nboxplot.pdf}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{PC2 - Opposite direction maxmium distance}
+			\begin{itemize}
+			\item Ratio of the area of the whole convex hull and the area of the plant
+			(``green pixel'')
+			\item Unit: none
+			\end{itemize}
+			\loadImage{top_hull_fillgrade__percent_nboxplot.pdf}
+		}{}
+	}{}
+}{}
+
+\checkFile{side_height__mm__side_width__mm__side_area__mm2__top_area__mm2__sidespiderOverallImage.tex}{}{}
+\checkFile{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
+\ifthenelse{\boolean{isFile1}}{
+
+	\resetClear
+	\clearpage
+	\section{Spider diagram}
+	
+	\checkFile{side_height__mm__side_width__mm__side_area__mm2__top_area__mm2__sidespiderOverallImage.tex}{}{}
+	\ifthenelse{\boolean{isFile1}}{
+	
+		\ownClearPage
+		\subsection{Spider diagram 1}
+		\loadTex{side_height__mm__side_width__mm__side_area__mm2__top_area__mm2__sidespiderOverallImage}
+	}{}
+	
+	\checkFile{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
+	\ifthenelse{\boolean{isFile1}}{
+	
+		\ownClearPage
+		\subsection{Spider diagram 2}
+		\loadTex{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage}
+	}{}
+	
+}{}
+
+\checkFile{appendixImage.tex}{}{}
+\ifthenelse{\boolean{isFile1}}{
+
+	\resetClear
 	\clearpage
 	\section{Appendix}
 	\loadTex{appendixImage}

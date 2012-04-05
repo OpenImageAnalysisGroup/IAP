@@ -12,6 +12,8 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 	
 	@Override
 	protected synchronized FlexibleImage processFLUOmask() {
+		
+		// getInput().getMasks().getFluo().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeFLUOMask2.png");
 		if (getInput().getMasks().getFluo() == null) {
 			return null;
 		}
