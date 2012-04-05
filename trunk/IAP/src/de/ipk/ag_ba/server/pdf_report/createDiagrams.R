@@ -3,7 +3,8 @@
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	requestList = list(
-			KN = list(barley = list(boxplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")))
+			KN = list(barley = list(boxplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")),
+									spiderplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")))
 			)
 	)				
 	return(requestList)
@@ -130,7 +131,7 @@ UsePackage  <- function(package, defaultCRANmirror = "http://cran.at.r-project.o
 
 loadAndInstallPackages <- function(install=FALSE, useDev=FALSE) {	
 	if (install) {
-		libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych")
+		libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych", "fmsb", "plotrix")
 		for(library in libraries) { 
     		if(!UsePackage(library)) {
         		stop("Error!", library)
@@ -143,27 +144,46 @@ loadAndInstallPackages <- function(install=FALSE, useDev=FALSE) {
 		}
 	}
 		
-	library("Cairo")
-	library("RColorBrewer")
-	library("data.table")
-	library("ggplot2")
+	library("Cairo") # save images (default image)
+	library("RColorBrewer") #color space
+	library("data.table") #fast grouping
+	library("ggplot2") #plotting system (also save images)
 	library("psych")
+	library("fmsb")	#radarchart
+	library("plotrix") # second radarchart -> radial.plot
 	
 	if (useDev) {
 		library("devtools")
 	}	
 }
 
-buildDataSet <- function(workingDataSet, overallResult, colname, index) {
+buildDataSet <- function(workingDataSet, overallResult, colname, index, diagramTyp = "none") {
 	if (length(colname) > 0) {
 		for (n in 1:length(colname)) {
-			workingDataSet = cbind(workingDataSet, overallResult[paste(colname[n], index, sep="")])
+			if(diagramTyp == "spiderplot") {
+				searchVector <- gsub("\\.[0-9]*","",colnames(overallResult)) %in% paste(colname[n], index, sep="")	
+			} else {
+				searchVector <- paste(colname[n], index, sep="")
+			}		
+			workingDataSet = cbind(workingDataSet, overallResult[searchVector])
 		}	
 		return(workingDataSet)
 	}
 }
 
-reNameHist =  function(colNameWichMustBind) {
+reNameSpin <- function(colNameWichMustBind, colNames) {
+	
+	descriptorListIndex <- strsplit(substr(colNameWichMustBind,nchar(colNames$colOfMean)+1, nchar(colNameWichMustBind)),"\\.")
+	
+	if(descriptorListIndex[[1]][1] != "" & descriptorListIndex[[1]][2] != "") {
+		return(colNames$desNames[[descriptorListIndex[[1]][1]]][descriptorListIndex[[1]][2],])
+	} else {
+		return(colNameWichMustBind)
+	}
+}
+
+
+reNameHist <-  function(colNameWichMustBind) {
 	colNameWichMustBind = as.character(colNameWichMustBind)
 	positions = which(strsplit(colNameWichMustBind, '')[[1]] == '.')
 	colNameWichMustBind = substr(colNameWichMustBind, positions[length(positions)]+1, nchar(colNameWichMustBind))
@@ -174,7 +194,7 @@ reNameHist =  function(colNameWichMustBind) {
 	return(colNameWichMustBind)	
 }
 
-reNameColumn =  function(plotThisValues, columnNameReplace="name", columnNameWhichUsedToReplace="primaerTreatment") {
+reNameColumn <-  function(plotThisValues, columnNameReplace="name", columnNameWhichUsedToReplace="primaerTreatment") {
 	if (!is.null(plotThisValues[columnNameWhichUsedToReplace])) {
 		plotThisValues[columnNameReplace] = plotThisValues[columnNameWhichUsedToReplace]
 	}
@@ -277,8 +297,25 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	} else {
 		print("All values in stackedBoxplot are 'NA'")
 	}
+
+	if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
+		if (overallList$debug) {print(paste(length(overallList$boxSpiderDes), "spiderplots..."))}
+		for (n in 1:length(overallList$boxSpiderDes)) {
+			if (!is.na(overallList$boxSpiderDes[[n]][1])) {
+				initDescriptor <- overallList$boxSpiderDes[[n]]
+				overallList$boxSpiderDes[[n]] = checkIfDescriptorIsNaOrAllZero(overallList$boxSpiderDes[[n]], overallList$iniDataSet)
+				booleanVector <- unlist(initDescriptor) %in% unlist(overallList$boxSpiderDes[[n]])
+				overallList$boxSpiderDesName[[n]] = as.data.frame(overallList$boxSpiderDesName[[n]][booleanVector])
+				
+			}
+		}
+		names(overallList$boxSpiderDes) = c(1:length(overallList$boxSpiderDes))
+		names(overallList$boxSpiderDesName) = c(1:length(overallList$boxSpiderDesName))
+	} else {
+		print("All values for Spiderplot are 'NA'")
+	}
 	
-	if (!sum(!is.na(overallList$boxStackDes)) > 0 && !sum(!is.na(overallList$boxDes)) > 0 && !sum(!is.na(overallList$nBoxDes)) > 0) {
+	if (!sum(!is.na(overallList$boxStackDes)) > 0 && !sum(!is.na(overallList$boxDes)) > 0 && !sum(!is.na(overallList$nBoxDes)) > 0 && !sum(!is.na(overallList$boxSpiderDes)) > 0) {
 		print("No descriptor set (all descriptors are zero or NA) - the program needs to stop!")
 		overallList$stoppTheCalculation = TRUE 
 	}
@@ -340,6 +377,15 @@ overallChangeName <- function(overallList) {
 		names(overallList$boxStackDesName) = c(1:length(overallList$boxStackDesName))
 	}
 	
+	if (!is.null(overallList$imageFileNames_SpiderPlots)) {
+		if (overallList$debug) {print("spiderplots...")}
+		overallList$imageFileNames_SpiderPlots = changefileName(overallList$imageFileNames_SpiderPlots)
+		names(overallList$imageFileNames_SpiderPlots) = c(1:length(overallList$imageFileNames_SpiderPlots))
+		
+		#overallList$boxSpiderDesName = as.list(overallList$boxSpiderDesName)
+		#names(overallList$boxSpiderDesName) = c(1:length(overallList$boxSpiderDesName))
+	}
+	
 	return(overallList)
 }
 
@@ -370,7 +416,9 @@ setSomePrintingOptions <- function(overallList) {
 				return(setOptions(overallList, "nBoxplot", "nBoxOptions", listOfExtraOptions))
 			} else if (n == "stackBoxplot") {
 				return(setOptions(overallList, "stackBoxplot", "stackedBarOptions", listOfExtraOptions))
-			}	
+			} else if (n == "spiderplot") {
+				return(setOptions(overallList, "spiderplot", "spiderOptions", listOfExtraOptions))
+			}		
 		}		
 	}
 	
@@ -424,14 +472,17 @@ changefileName <- function(fileNameVector) {
 	return(as.list(fileNameVector))
 }
 
-preprocessingOfValues <- function(value, isColValue=FALSE, replaceString=".") {
+preprocessingOfValues <- function(value, isColValue=FALSE, replaceString=".", isColName=FALSE) {
 	if (!is.null(value)) {
 		regExpressionCol = "[^[:alnum:]|^_]|[[:space:]|\\^]"
-		if (isColValue) {
-			value = strsplit(value, "$", fixed=TRUE)
+		if (isColValue || isColName) {
+			value = strsplit(as.character(value), "$", fixed=TRUE)
 		}
-		for (n in 1:length(value)) {
-			value[[n]] = gsub(regExpressionCol, replaceString, value[[n]])
+		
+		if(!isColName){
+			for (n in 1:length(value)) {
+				value[[n]] = gsub(regExpressionCol, replaceString, value[[n]])
+			}
 		}
 	} else {
 		return("none")
@@ -468,8 +519,20 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	} else {
 		print("stackedBoxplot is NULL")
 	} 
+
+	if (!is.null(overallList$boxSpiderDes)) {
+		if (overallList$debug) {print("spider plot")}
+		for (n in 1:length(overallList$boxSpiderDes)) {
+			initDescriptor <- preprocessingOfValues(overallList$boxSpiderDes[n], isColValue = TRUE)
+			overallList$boxSpiderDes[n] = preprocessingOfDescriptor(overallList$boxSpiderDes[[n]], overallList$iniDataSet)
+			booleanVector <- initDescriptor[[1]] %in% overallList$boxSpiderDes[n][[1]]
+			overallList$boxSpiderDesName[n] = as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+		}
+	} else {
+		print("Spider plot is NULL")
+	} 
 	
-	if (!sum(!is.na(overallList$boxStackDes)) > 0 && !sum(!is.na(overallList$boxDes)) > 0 && !sum(!is.na(overallList$nBoxDes)) > 0) {
+	if (!sum(!is.na(overallList$boxStackDes)) > 0 && !sum(!is.na(overallList$boxDes)) > 0 && !sum(!is.na(overallList$nBoxDes)) > 0 && !sum(!is.na(overallList$boxSpiderDes)) > 0) {
 		print("No descriptor set - this run needs to stop!")
 		overallList$stoppTheCalculation = TRUE
 	}
@@ -478,7 +541,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 
 preprocessingOfDescriptor <- function(descriptorVector, iniDataSet) {
 	#overallList$debug %debug% "preprocessingOfDescriptor()"
-	descriptorVector = unlist(preprocessingOfValues(descriptorVector, TRUE))	#descriptor is value for yAxis
+	descriptorVector = unlist(preprocessingOfValues(descriptorVector, isColValue = TRUE))	#descriptor is value for yAxis
 	
 	errorDescriptor = descriptorVector %GetDescriptorAfterCheckIfDescriptorNotExists% iniDataSet 
 	descriptorVector = descriptorVector %GetDescriptorsAfterCheckIfDescriptorExists% iniDataSet
@@ -560,6 +623,7 @@ preprocessingOfSecondTreatment <- function(overallList) {
 check <- function(value, checkValue=c("none", NA)) {
 	if (!is.null(value)) {
 		return(value %GetDescriptorAfterCheckIfDescriptorNotExists% checkValue)
+		#return(unique(value %GetDescriptorAfterCheckIfDescriptorNotExists% checkValue))
 	} else {
 		return(character(0))
 	}
@@ -578,7 +642,7 @@ getVector <- function(descriptorSet) {
 
 reduceWorkingDataSize <- function(overallList) {
 	overallList$debug %debug% "reduceWorkingDataSize()"
-	overallList$iniDataSet = overallList$iniDataSet[unique(c(check(getVector(overallList$nBoxDes)), check(getVector(overallList$boxDes)), check(getVector(overallList$boxStackDes)), check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment)))]
+	overallList$iniDataSet = overallList$iniDataSet[unique(c(check(getVector(overallList$nBoxDes)), check(getVector(overallList$boxDes)), check(getVector(overallList$boxStackDes)), check(getVector(overallList$boxSpiderDes)), check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment)))]
 	return(overallList)
 }
 
@@ -735,30 +799,72 @@ overallGetResultDataFrame <- function(overallList) {
 		print("All values for stackedBoxplot are 'NA'")
 	}
 	
-	if (is.null(overallList$boxStackDes) && is.null(overallList$boxDes) && is.null(overallList$nBoxDes)) {
+	if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
+		if (overallList$debug) {print("spider plot")}
+		#colNames$colOfMean = check(getVector(overallList$boxSpiderDes))
+		colNames$colOfMean = "value"
+		colNames$colOfXaxis = overallList$xAxis
+		colNames$desNames = overallList$boxSpiderDesName
+		columns = c(columnsStandard, check(getVector(overallList$boxSpiderDes)))
+		overallList$overallResult_boxSpiderDes = getResultDataFrame("spiderplot", overallList$boxSpiderDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug)
+	} else {
+		print("All values for spider plot are 'NA'")
+	}
+	
+	if (is.null(overallList$boxStackDes) && is.null(overallList$boxDes) && is.null(overallList$nBoxDes) && is.null(overallList$boxSpiderDes)) {
 		print("No descriptor set - this run needs to stop!")
 		overallList$stoppTheCalculation = TRUE
 	}
 	return(overallList)
 }
 
-getPlotNumber <- function(colNameWichMustBind, descriptorList) {
-	for (n in names(descriptorList)) {
-		if (colNameWichMustBind %in% as.vector(unlist(descriptorList[[n]]))) {
-			return(n)
+getPlotNumber <- function(colNameWichMustBind, descriptorList, diagramTyp) {
+	
+	if(diagramTyp == "boxplotStacked") {
+	
+		for (n in names(descriptorList)) {
+			if (colNameWichMustBind %in% as.vector(unlist(descriptorList[[n]]))) {
+				return(n)
+			}
 		}
+		return(-1)
+	} else if(diagramTyp == "spiderplot") {
+		return(strsplit(substring(colNameWichMustBind,nchar("value")+1),"\\.")[[1]][1])
 	}
-	return(-1)
 }
-#descriptorName kann entfernt werden
+
+
 getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, colNames, booleanVectorList, debug) {	
+#############################
+#	diagramTyp = "spiderplot"
+#	descriptorList = overallList$boxSpiderDes
+#	iniDataSet = overallList$iniDataSet[columns]
+#	debug = overallList$debug
+#########################	
+#	diagramTyp = "boxplotStacked"
+#	descriptorList = overallList$boxStackDes
+#	iniDataSet = overallList$iniDataSet[columns]
+#	debug = overallList$debug	
+#########################
+
+
 	debug %debug% "getResultDataFrame()"
 	
 	descriptor = getVector(descriptorList)
-	descriptorName = seq(1:length(descriptor))
+
+	if(diagramTyp == "spiderplot") {
+		descriptorName <- character()
+		for(n in 1:length(descriptorList)){
+			lengthVector <- length(descriptorList[[n]][,1])
+			descriptorName <- c(descriptorName, paste(rep.int(n, lengthVector),c(1:lengthVector), sep="."))		
+		}
+	} else {	
+		descriptorName = seq(1:length(descriptor))
+	}
 	
 	descriptorName = descriptorName[!is.na(descriptor)]
 	descriptor = descriptor[!is.na(descriptor)]
+	
 	
 	if (diagramTyp != "boxplot") {
 		groupedDataFrame = data.table(iniDataSet)
@@ -777,7 +883,7 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 		#groupedDataFrameMean = as.data.frame(groupedDataFrame[, lapply(colnames(groupedDataFrame), mean, na.rm=TRUE), by=c(groupBy, colNames$xAxis)])
 	}
 	
-	if (diagramTyp == "nboxplot" || diagramTyp == "boxplot") {
+	if (diagramTyp == "nboxplot" || diagramTyp == "boxplot" || diagramTyp == "spiderplot") {
 		#colNamesOfTheRest = paste(colNames$colOfMean, seq(1:length(descriptor)), sep="")	
 		colNamesOfTheRest = paste(colNames$colOfMean, descriptorName, sep="")	
 	} else {
@@ -796,21 +902,39 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 	
 	if (diagramTyp == "nboxplot") {
 		iniDataSet = merge(sort=FALSE, groupedDataFrameMean[booleanVector, ], groupedDataFrameSD[booleanVector, ], by = c(groupBy, colNames$colOfXaxis))
-		#overallResult = buildRowName(iniDataSet, groupBy, descriptorName)
 		overallResult = buildRowName(iniDataSet, groupBy)
-	} else
-	if (diagramTyp == "boxplot") {
+	} else	if (diagramTyp == "boxplot") {
+		#|| diagramTyp == "spiderplot"
 		iniDataSet = groupedDataFrameMean[booleanVector, ]
-		#overallResult = buildRowName(iniDataSet, groupBy, descriptorName)
 		overallResult = buildRowName(iniDataSet, groupBy)
-	} else {
+	} 
+	else if (diagramTyp == "spiderplot") {
+		iniDataSet = groupedDataFrameMean[booleanVector, ]
+		buildRowNameDataSet = buildRowName(iniDataSet, groupBy)
+		temp = data.frame()
+
+		
+		for (colNameWichMustBind in buildRowNameDataSet %allColnamesWithoutThisOnes% c(colNames$xAxis, colNames$colName, "primaerTreatment")) {
+			plot = getPlotNumber(colNameWichMustBind, descriptorList, diagramTyp)
+			
+			colNameWichMustBindReNamed <- reNameSpin(colNameWichMustBind, colNames)
+		
+			if (is.null(buildRowNameDataSet$primaerTreatment)) {	
+				temp = rbind(temp, data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[, colNameWichMustBind])), values=buildRowNameDataSet[, colNameWichMustBind], xAxis=buildRowNameDataSet[, colNames$colOfXaxis], name=buildRowNameDataSet[, colNames$colName], plot=plot))			
+			} else {
+				temp = rbind(temp, data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[, colNameWichMustBind])), primaerTreatment=buildRowNameDataSet[, "primaerTreatment"], values=buildRowNameDataSet[, colNameWichMustBind], xAxis=buildRowNameDataSet[, colNames$colOfXaxis], name=buildRowNameDataSet[, colNames$colName], plot = plot))			
+			}
+		}
+		overallResult = temp
+		
+	}
+	else {
 		iniDataSet = groupedDataFrameMean[booleanVector, ]		
-		#buildRowNameDataSet = buildRowName(iniDataSet, groupBy, descriptorName)
 		buildRowNameDataSet = buildRowName(iniDataSet, groupBy)
 		temp = data.frame()
 		
 		for (colNameWichMustBind in buildRowNameDataSet %allColnamesWithoutThisOnes% c(colNames$xAxis, colNames$colName, "primaerTreatment")) {
-			plot = getPlotNumber(colNameWichMustBind, descriptorList)
+			plot = getPlotNumber(colNameWichMustBind, descriptorList, diagramTyp)
 		
 			if (plot!=-1) {
 				colNameWichMustBindReNamed = reNameHist(colNameWichMustBind)
@@ -873,8 +997,17 @@ setColorListHist <- function(descriptorList) {
 }
 
 setColorList <- function(diagramTyp, descriptorList, overallResult, isGray) {
+######################
+#diagramTyp <- "spiderplot"
+#descriptorList <- overallList$boxSpiderDes
+#overallResult <- overallList$overallResult_boxSpiderDes
+#isGray <- overallList$isGray
+######################	
+		
 	if (!as.logical(isGray)) {
-		colorVector = c(brewer.pal(11, "Spectral"))
+		colorVector = c(brewer.pal(8, "Set1"))
+		#colorVector = c(brewer.pal(7, "Dark2"))
+		#colorVector = c(brewer.pal(11, "Spectral")) # sometimes very pale colors
 	} else {
 		colorVector = c(brewer.pal(9, "Greys"))
 	}
@@ -885,6 +1018,15 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray) {
 			#if (!is.na(descriptorList[[n]])) {
 			if (sum(!is.na(descriptorList[[n]])) > 0) {
 				colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
+			} else {
+				#print("All values are 'NA'")
+			}
+		}
+	} else if (diagramTyp == "spiderplot") {
+		for (n in names(descriptorList)) {
+			#if (!is.na(descriptorList[[n]])) {
+			if (sum(!is.na(descriptorList[[n]])) > 0) {
+				colorList[[n]] = colorRampPalette(colorVector)(length(descriptorList[[n]][,1]))
 			} else {
 				#print("All values are 'NA'")
 			}
@@ -906,6 +1048,7 @@ setColor <- function(overallList) {
 	overallList$color_nBox = setColorList("nboxplot", overallList$nBoxDes, overallList$overallResult_nBoxDes, overallList$isGray)
 	overallList$color_box = setColorList("boxplot", overallList$boxDes, overallList$overallResult_boxDes, overallList$isGray)
 	overallList$color_boxStack = setColorList("boxplotStacked", overallList$boxStackDes, overallList$overallResult_boxStackDes, overallList$isGray)
+	overallList$color_spider = setColorList("spiderplot", overallList$boxSpiderDes, overallList$overallResult_boxSpiderDes, overallList$isGray)
 	return(overallList)
 }
 
@@ -929,7 +1072,10 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", o="") {
 
 saveImageFile <- function(overallList, plot, fileName, extraString="") {
 	filename = preprocessingOfValues(paste(fileName, extraString, sep=""), FALSE, replaceString = "_")	
+
 	ggsave (filename=paste(filename, overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
+
+
 }
 
 makeDepthBoxplotDiagram <- function(h, overallList) {
@@ -1002,7 +1148,7 @@ reduceOverallResult <- function(tempOverallList, imagesIndex) {
 reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, debug, diagramTyp="nboxplot") {
 	debug %debug% "reduceWholeOverallResultToOneValue()"
 	
-	if (diagramTyp == "boxplotstacked") {
+	if (diagramTyp == "boxplotstacked" || diagramTyp == "spiderplot") {
 		workingDataSet = tempOverallResult[tempOverallResult$plot == imagesIndex, ]
 		workingDataSet$hist = factor(workingDataSet$hist, unique(workingDataSet$hist))
 	} else {
@@ -1018,10 +1164,28 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 		} else {
 			standardColumnName = c("name", "xAxis")
 		}
-				
+
 		if (sum(!(colNames %in% colnames(tempOverallResult)))>0) {
-			workingDataSet = buildDataSet(tempOverallResult[, standardColumnName], tempOverallResult, colNames, imagesIndex)
-			colnames(workingDataSet) = c(standardColumnName, colNames)
+
+			workingDataSet = buildDataSet(tempOverallResult[, standardColumnName], tempOverallResult, colNames, imagesIndex, diagramTyp)
+			lengthOfNewColumns <- length(colnames(workingDataSet[,-c(1:length(standardColumnName))]))
+			
+#			if(diagramTyp == "spiderplot") {
+#				if(lengthOfNewColumns > 1) {
+#					colnames(workingDataSet) = c(standardColumnName, paste(rep.int(colNames,lengthOfNewColumns),1:lengthOfNewColumns, sep=""))
+#				}else {
+#					colnames(workingDataSet) = c(standardColumnName, colNames)
+#				}
+#			} else {
+				colnames(workingDataSet) = c(standardColumnName, colNames)
+#			}
+		
+#			if(lengthOfNewColumns > 1) {
+#				colnames(workingDataSet) = c(standardColumnName, paste(rep.int(colNames,lengthOfNewColumns),1:lengthOfNewColumns, sep=""))
+#			} else {
+#				colnames(workingDataSet) = c(standardColumnName, colNames)
+#			}
+			
 		} else {
 			workingDataSet = tempOverallResult
 		}
@@ -1287,6 +1451,236 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 	#return(overallList)
 }	
 
+removeNAsSpider <- function(overallResult, xAxisPosition) {
+	overallResultStart <- overallResult[1:xAxisPosition]
+	overallResult <- overallResult[(xAxisPosition+1):length(colnames(overallResult))]
+	booleanVector <- !apply(overallResult,1,function(x)all(is.na(x)))
+	
+	return(cbind(overallResultStart[booleanVector,], overallResult[booleanVector,]))
+}
+
+
+openPlotDevice <- function(overallList, fileName, extraString, h) {
+	if(h==1) {
+		filename = preprocessingOfValues(paste(fileName, extraString, sep=""), FALSE, replaceString = "_")
+		Cairo(width=10, height=7, file=paste(filename, overallList$saveFormat, sep="."), type=overallList$saveFormat, bg="transparent", units="in", dpi=as.numeric(overallList$dpi))
+	}
+}
+
+closePlotDevice <- function(h) {
+	if(h==1) {
+		dev.off()
+	}
+}
+
+transferIntoPercentValues <- function(overallResult, xAxisPosition) {
+	overallResultCalulate <- overallResult[(xAxisPosition+1):(length(colnames(overallResult))-1)]
+	overallResultCalulate <- (overallResultCalulate * 100) / max(overallResultCalulate)
+	
+	return(data.frame(overallResult[c(1:xAxisPosition)], overallResultCalulate, overallResult[length(colnames(overallResult))]))
+}
+
+normalizeEachDescriptor <- function(overallResult) {
+
+	for(name in unique(overallResult$hist)) {
+		overallResult[overallResult$hist == name,]$values <- sapply(overallResult[overallResult$hist == name,]$values,  function(x,y) {(x/y)}, y=max(overallResult[overallResult$hist == name,]$values))
+	}
+	return(overallResult)
+}
+
+makeSpiderPlotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, options, overallList, diagramTypSave="spiderplot") {
+	################
+#	overallResult <- overallList$overallResult_boxSpiderDes
+#	overallDescriptor <- overallList$boxSpiderDes
+#	overallColor <- overallList$color_spider
+#	overallDesName <- overallList$boxSpiderDesName
+#	overallFileName <- overallList$imageFileNames_SpiderPlots
+#	options <- overallList$boxOptions
+#	diagramTypSave <- "spiderplot"
+	####################	
+	
+	overallList$debug %debug% "makeSpiderPlotDiagram()"
+	print("spider plot...")
+
+	tempOverallResult =  na.omit(overallResult)
+	
+	for (imagesIndex in names(overallDescriptor)) {
+		createOuputOverview("spider plot", imagesIndex, length(names(overallDescriptor)), getVector(overallDesName[[imagesIndex]]))
+		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, diagramTypSave)
+		
+		if (length(overallResult[, 1]) > 0) {
+			PreWorkForMakeBigOverallImageSpin(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave)
+		}
+		#PreWorkForMakeNormalImages(h, overallList)
+	}
+	#return(overallList)
+}	
+
+
+PreWorkForMakeBigOverallImageSpin <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave) {
+	overallList$debug %debug% "PreWorkForMakeBigOverallImageSpin()"	
+	
+	overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName, overallResult$xAxis, options)
+	overallResult <- na.omit(overallResult)
+	overallResult <- normalizeEachDescriptor(overallResult)	
+	groupBy = groupByFunction(list(overallList$treatment, overallList$secondTreatment))
+	
+	if (length(groupBy) == 0 || length(groupBy) == 1) {
+		plotSpiderImage(h = h, overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave=diagramTypSave)	
+	} else {
+		for (value in overallList$filterSecondTreatment) {
+			title = value
+			plottedName = overallList$filterTreatment %contactAllWithAll% value
+			booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = plottedName))
+			plotThisValues = overallResult[booleanVector, ]
+			#	plotThisValues = reNameColumn(plotThisValues, "name", "primaerTreatment")
+			plotSpiderImage(h, overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave=diagramTypSave)
+		}	 
+	}
+}
+
+plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
+################
+#	makeOverallImage = TRUE
+#	legende=TRUE
+#
+#	overallResult <- plotThisValues
+#################
+
+
+
+	overallList$debug %debug% "plotSpiderImage()"	
+	if (length(overallResult[, 1]) > 0) {		
+		for (positionType in overallList$spiderOptions$typOfGeomBar) {
+		
+			plot <- ggplot(data=overallResult, aes(x=hist, y=values, fill=hist)) +
+						geom_bar(width=1)
+					
+					
+			if (positionType == "x") {			
+				plot <- plot + coord_polar(theta="x")
+			} else {
+				plot <- plot + coord_polar(theta="y")
+			}
+				
+				plot <- plot + 
+						scale_fill_manual(values = overallColor[[imagesIndex]]) +
+						scale_y_continuous(formatter = "comma") +
+						theme_bw() +
+						opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+								axis.title.x = theme_blank(), 
+								axis.title.y = theme_blank(),
+#									axis.title.y = theme_text(face="bold", size=11, angle=90), 
+								panel.grid.minor = theme_blank(), 
+								panel.border = theme_rect(colour="Grey", size=0.1),
+								axis.text.x = theme_blank()
+						) 
+			if (positionType == "y") {
+				plot <- plot + 
+						opts(axis.text.y = theme_blank(),
+								axis.ticks	= theme_blank()	
+						)
+			}	
+				
+			if (!legende) {
+				plot = plot + opts(legend.position="none")
+			} else {
+				plot = plot + 
+					   opts(legend.justification = 'bottom', 
+							   legend.direction="vertical",
+							   legend.position="bottom",
+							   #legend.position=c(0.5,0),
+							   legend.title = theme_blank(),
+							   legend.key = theme_blank()
+			   			)
+				
+				
+				if (length(overallColor[[imagesIndex]]) > 3 & length(overallColor[[imagesIndex]]) < 6) {
+					plot = plot + opts(legend.text = theme_text(size=6), 
+							legend.key.size = unit(0.7, "lines")
+					)
+				} else if(length(overallColor[[imagesIndex]]) >= 6) {
+					plot = plot + opts(legend.text = theme_text(size=4), 
+							legend.key.size = unit(0.4, "lines")
+					)
+				} else {
+					plot = plot + opts(legend.text = theme_text(size=11))
+				}	
+			}		
+			
+			if (title != "") {
+				plot = plot + opts(title = title)
+			}
+			
+			if (makeOverallImage) {
+				if ("primaerTreatment" %in% colnames(overallResult)) {				
+					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
+				} else {
+					plot = plot + facet_grid(name ~ xAxisfactor)
+				}
+			}
+			
+			#print(plot)
+			
+			#plot = plot + facet_grid(name ~ xAxisfactor)
+			
+			if (h == 1) {
+				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
+				if (makeOverallImage) {
+					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
+				} else {
+					writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
+				}
+			} else {
+				print(plot)
+			}
+		
+		
+		}
+	}	
+		
+		
+#	ggplot(data=overallResult, aes(x=hist, y=values, fill=hist)) +
+#			geom_bar(width=1)+
+#			geom_bar(width=1, colour="black", show_guid=FALSE)+
+#			coord_polar(theta="x") +
+#		#	xlab(NULL) +
+#		#	ylab("normalized values") +
+#			scale_fill_manual(values = overallColor[[imagesIndex]]) +
+#			scale_y_continuous(formatter = "comma") + 
+#			theme_bw() +
+#			opts( 
+#					plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+#					axis.title.x = theme_blank(), 
+#					axis.title.y = theme_blank(),
+#					#axis.title.x = theme_text(hjust=0, angle=90),
+#					axis.title.y = theme_text(face="bold", size=11, angle=90), 
+#					panel.grid.minor = theme_blank(), 
+#					panel.border = theme_rect(colour="Grey", size=0.1),
+#					axis.text.x = theme_blank()
+#					#axis.text.x = theme_text(hjust=0, angle=90)
+#			) +
+#			#opts(panel.grid.minor = theme_blank())+
+#			#legend.position="bottom",
+#			opts(legend.justification = 'bottom',
+#					#legend.position=c(0.5,0.15),
+#					#legend.direction="horizontal",
+#					legend.direction="vertical",
+#					#legend.position="bottom",
+#					legend.position=c(0.5,0),
+#					legend.title = theme_blank(), 
+#					legend.text = theme_text(size=9),
+#					legend.key.size = unit(0.7, "lines"),
+#					legend.key = theme_blank()
+#			) +
+#			#opts(strip.background = theme_rect(colour = 'purple', fill = 'pink', size = 3, linetype='dashed'))+
+#			#opts(axis.text.x = theme_text(size=6, angle=90)) +
+#			#facet_grid(name ~ xAxisfactor, as.table=TRUE)
+#			facet_grid(primaerTreatment ~ xAxisfactor)
+#			#facet_wrap( name ~ xAxisfactor, nrow=2, drop=FALSE) 
+			
+}
+
 makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot") {
 	overallList$debug %debug% "makeBarDiagram()"
 
@@ -1395,6 +1789,7 @@ makeDiagrams <- function(overallList) {
 	run = ifelse(overallList$showResultInR, 2, 1)
 	
 	for (h in 1:run) {
+		
 		if (sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {print("nBoxplot...")}
 			makeLinearDiagram(h, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
@@ -1412,6 +1807,13 @@ makeDiagrams <- function(overallList) {
 		if (sum(!is.na(overallList$boxStackDes)) > 0) {
 			if (overallList$debug) {print("Stacked Boxplot...")}
 			makeBoxplotStackedDiagram(h, overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
+		} else {
+			print("All values for stacked Boxplot are 'NA'...")
+		}
+
+		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
+			if (overallList$debug) {print("Spider plot...")}
+			makeSpiderPlotDiagram(h, overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$boxOptions, overallList)
 		} else {
 			print("All values for stacked Boxplot are 'NA'...")
 		}
@@ -1579,7 +1981,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 					descriptorSetName_nBoxplot = descriptorSet
 					
 				} else { #Report	
-					descriptorSet_nBoxplot = c("Weight A (g)", 
+					descriptorSet_nBoxplot = c(#"volume.my", "volume.fluo.plant_weight.iap"
+							 					"Weight A (g)", 
 												"Weight B (g)", 
 												"Water (weight-diff)", 
 												"side.height.norm (mm)", 
@@ -1608,12 +2011,31 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 												"side.height (mm)", 
 												"side.width (mm)", 
 												"side.area (px)", 
-												"top.area (px)")
+												"top.area (px)",
+												############ new #######
+												"side.hull.area (px)",
+												"side.hull.area.norm (mm^2)",
+												"side.hull.pc1 (px)",
+												"side.hull.pc1.norm",
+												"side.hull.pc2",
+												"side.hull.pc2.norm",
+												"side.hull.fillgrade (percent)",		
+												"top.hull.area (px)",
+												"top.hull.area.norm (mm^2)",
+												"top.hull.pc1 (px)",
+												"top.hull.pc1.norm",
+												"top.hull.pc2",
+												"top.hull.pc2.norm",
+												"top.hull.fillgrade (percent)",
+												"side.vis.hue.average",
+												"top.vis.hue.average"
+												)
 				
-					descriptorSetName_nBoxplot = c("weight before watering (g)", 
+					descriptorSetName_nBoxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)", "yellow spectra normed to the realtionship between dry and normal"
+													"weight before watering (g)", 
 													"weight after watering (g)", 
 													"water weight (g)", 
-													"height (mm)", 
+													"height (zoom corrected) (mm)", 
 													"width (zoom corrected) (mm)", 
 													"side area (zoom corrected) (mm^2)", 
 													"top area (zoome corrected) (mm^2)", 
@@ -1639,14 +2061,33 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 													"height (px)", 
 													"width (px)", 
 													"side area (px)", 
-													"top area (px)")		
+													"top area (px)",
+													####### new #######
+													"side area of convex hull (px)",
+													"side area of convex hull (zoom corrected) (mm^2)",
+													"side maximum extension (px)",
+													"side maximum extension (zoom corrected) (mm)",
+													"opposite direction of the side maximum extension (px)",
+													"opposite direction of the side maximum extension (zoom corrected) (mm)",
+													"fillgrade of side convex hull (%)",
+													"top area of convex hull (px)",
+													"top area of convex hull (zoom corrected) (mm^2)",
+													"top maximum extension (px)",
+													"top maximum extension (zoom corrected) (mm)",
+													"opposite direction of the top maximum extension (px)",
+													"opposite direction of the top maximum extension (zoom corrected) (mm)",
+													"fillgrade of top convex hull (%)",
+													"side visible hue average value",
+													"top visible hue average value"
+													)		
 				}
 	
 				nBoxOptions= NULL
 				#diagramTypVector = rep.int("nboxplot", times=length(descriptorSetName))
 		
 				#boxplot
-				descriptorSet_boxplot = c("side.height.norm (mm)", 
+				descriptorSet_boxplot = c(#"volume.my"
+										   "side.height.norm (mm)", 
 										   "side.width.norm (mm)", 
 										   "side.area.norm (mm^2)", 
 										   "top.area.norm (mm^2)", 
@@ -1656,9 +2097,11 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 										   "side.height (mm)", 
 										   "side.width (mm)", 
 										   "side.area (px)", 
-										   "top.area (px)")
+										   "top.area (px)"
+											)
 				
-				descriptorSetName_boxplot = c("height (zoom corrected) (mm)", 
+				descriptorSetName_boxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
+											   "height (zoom corrected) (mm)", 
 										  	   "width (zoom corrected) (mm)", 
 											   "side area (zoom corrected) (mm^2)", 
 											   "top area (zoom corrected) (mm^2)", 
@@ -1668,14 +2111,28 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 											   "height (px)", 
 											   "width (px)", 
 											   "side area (px)", 
-											   "top area (px)")	
+											   "top area (px)"
+												)	
+				#boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
+				boxOptions= NULL
 				
-				boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
-				#diagramTypVectorBox = rep.int("boxplot", times=length(descriptorSetBox))
+				#spiderplot
+				descriptorSet_spiderplot = c(#"volume.my"
+						"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)",
+						"side.height (mm)$side.width (mm)$side.area (mm^2)$top.area (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)"
+
+				)
 				
-				#descriptorSet = c(descriptorSet, descriptorSetBox)
-				#descriptorSetName = c(descriptorSetName, descriptorSetNameBox)
-				#diagramTypVector = c(diagramTypVector, diagramTypVectorBox)
+				descriptorSetName_spiderplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
+						"height (zoom corrected) (mm)$width (zoom corrected) (mm)$side area (zoom corrected) (mm^2)$top area (zoom corrected) (mm^2)$side fluo intensity$side nir intensity",
+						"height (px)$width (px)$side area (px)$top area (px)$side fluo intensity$side nir intensity"
+#						"Zoom corrected Spiderchart", 
+#						"Spiderchart"
+				)	
+
+				#boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
+				spiderOptions= list(typOfGeomBar=c("x", "y"))
+				
 				
 				#boxplotStacked
 				descriptorSet_boxplotStacked = c("side.nir.normalized.histogram.bin.", 
@@ -1690,22 +2147,24 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 												  "top.fluo.histogram.bin.", 
 												  "top.fluo.histogram.ratio.bin.", 
 												  "top.nir.histogram.bin.", 
-												  "top.vis.hue.histogram.ratio.bin.")
+												  "top.vis.hue.histogram.ratio.bin."
+													)
 												  
 										  
 				descriptorSetName_boxplotStacked = c("side near-infrared intensities (zoom corrected) (%)", 
 													  "side fluorescence color spectra (%)", 
 													  "top near-infrared intensities (%)", 
-													  "side fluorescence ratio histogramm (%)", 
+													  "side fluorescence ratio histogram (%)", 
 													  "side near-infrared (zoom corrected) (%)", 
 													  "side fluorescence color spectra (zoom corrected) (%)", 
 													  "side fluoresence color spectra (%)", 
-													  "side visible light color histogramm (%)", 
-													  "side visible light ratio histogramm (zoom correcte) (%)", 
+													  "side visible light color histogram (%)", 
+													  "side visible light ratio histogram (zoom correcte) (%)", 
 													  "top fluorescence color spectra (%)", 
-													  "top fluo ratio histogramm (%)", 
+													  "top fluo ratio histogram (%)", 
 													  "NIR top histogramm (%)", 
-													  "VIS HUE top ratio histogramm (%)")
+													  "top visible light color histogram (%)"
+														)
 				
 				descriptorList <- addDesSet(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet)
 				descriptorSet_boxplotStacked <- descriptorList$desSet
@@ -1740,7 +2199,232 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 			}
 		}
 		
-	} 
+	}  else if (typOfStartOptions == "test"){
+		
+		treatment <- "Treatment"
+		filterTreatment <- "none"
+		
+		secondTreatment <- "Genotype"
+		filterSecondTreatment <- "BCC1367$BCC1391$BCC1529"
+		filterXaxis <- "none"
+
+		bgColor <- "transparent"
+		isGray="FALSE"
+		showResultInR <- FALSE
+		
+		fileName <- "report.csv"
+		separation <- ";"
+		workingDataSet <- separation %readInputDataFile% fileName
+		
+		saveName <- "test2"
+		yAxisName <- "test2"
+		debug <- TRUE
+		
+		stoppTheCalculation <- FALSE
+		iniDataSet = workingDataSet
+		
+		
+		descriptorSet_nBoxplot = c(#"volume.my", "volume.fluo.plant_weight.iap"
+				"Weight A (g)", 
+				"Weight B (g)", 
+				"Water (weight-diff)", 
+				"side.height.norm (mm)", 
+				"side.width.norm (mm)", 
+				"side.area.norm (mm^2)", 
+				"top.area.norm (mm^2)", 											
+				"side.fluo.intensity.chlorophyl.average (relative)", 
+				"side.fluo.intensity.phenol.average (relative)", 
+				"side.nir.intensity.average (relative)", 
+				"side.leaf.count.median (leafs)", 
+				"side.bloom.count (tassel)", 
+				"side.leaf.length.sum.norm.max (mm)", 
+				"volume.iap (px^3)", 
+				"volume.lt (px^3)", 
+				"volume.iap.wue", 
+				"side.nir.wetness.plant_weight_drought_loss", 
+				"top.nir.wetness.plant_weight_drought_loss", 
+				"side.nir.wetness.average (percent)", 
+				"top.nir.wetness.average (percent)", 
+				"side.area.relative", 
+				"side.height.norm.relative", 
+				"side.width.norm.relative", 
+				"top.area.relative", 
+				"side.area.relative", 
+				"volume.iap.relative", 
+				"side.height (mm)", 
+				"side.width (mm)", 
+				"side.area (px)", 
+				"top.area (px)",
+				"side.hull.area (px)",
+				"side.hull.area.norm (mm^2)",
+				"side.hull.pc1 (px)",
+				"side.hull.pc1.norm",
+				"side.hull.pc2",
+				"side.hull.pc2.norm",
+				"side.hull.fillgrade (percent)",		
+				"top.hull.area (px)",
+				"top.hull.area.norm (mm^2)",
+				"top.hull.pc1 (px)",
+				"top.hull.pc1.norm",
+				"top.hull.pc2",
+				"top.hull.pc2.norm",
+				"top.hull.fillgrade (percent)",
+				"side.vis.hue.average",
+				"top.vis.hue.average"
+		)
+		
+		descriptorSetName_nBoxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)", "yellow spectra normed to the realtionship between dry and normal"
+				"weight before watering (g)", 
+				"weight after watering (g)", 
+				"water weight (g)", 
+				"height (zoom corrected) (mm)", 
+				"width (zoom corrected) (mm)", 
+				"side area (zoom corrected) (mm^2)", 
+				"top area (zoome corrected) (mm^2)", 
+				"chlorophyl intensity (relative intensity/pixel)", 
+				"fluorescence intensity (relative intensity/pixel)", 
+				"nir intensity (relative intensity/pixel)", 
+				"number of leafs", 
+				"number of tassel florets", 
+				"length of leafs plus stem (mm)", 			 
+				"digital biomass (visible light images, IAP formula) (px^3)", 
+				"digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
+				"volume based water use efficiency", 
+				"weighted loss through drought stress (side)", 
+				"weighted loss through drought stress (top)", 
+				"Average wetness of side image", 
+				"Average wetness of top image", 
+				"growth in %/day", 
+				"plant height growth rate (%/day)", 
+				"plant width growth rate (%/day)", 
+				"top area growth rate (%/day)", 
+				"side area growth rate (%/day)", 
+				"volume groeth (visible light images, IAP based formula) (%/day)", 
+				"height (px)", 
+				"width (px)", 
+				"side area (px)", 
+				"top area (px)",
+				"side area of convex hull (px)",
+				"side area of convex hull (zoom corrected) (mm^2)",
+				"side maximum extension (px)",
+				"side maximum extension (zoom corrected) (mm)",
+				"opposite direction of the side maximum extension (px)",
+				"opposite direction of the side maximum extension (zoom corrected) (mm)",
+				"fillgrade of side convex hull (%)",
+				"top area of convex hull (px)",
+				"top area of convex hull (zoom corrected) (mm^2)",
+				"top maximum extension (px)",
+				"top maximum extension (zoom corrected) (mm)",
+				"opposite direction of the top maximum extension (px)",
+				"opposite direction of the top maximum extension (zoom corrected) (mm)",
+				"fillgrade of top convex hull (%)",
+				"side visible hue average value",
+				"top visible hue average value"
+		)		
+	
+	nBoxOptions= NULL
+	
+	#boxplot
+	descriptorSet_boxplot = c(#"volume.my"
+			"side.height.norm (mm)", 
+			"side.width.norm (mm)", 
+			"side.area.norm (mm^2)", 
+			"top.area.norm (mm^2)", 
+			"volume.fluo.iap", 
+			"volume.iap (px^3)", 
+			"volume.lt (px^3)", 
+			"side.height (mm)", 
+			"side.width (mm)", 
+			"side.area (px)", 
+			"top.area (px)"
+	)
+	
+	descriptorSetName_boxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
+			"height (zoom corrected) (mm)", 
+			"width (zoom corrected) (mm)", 
+			"side area (zoom corrected) (mm^2)", 
+			"top area (zoom corrected) (mm^2)", 
+			"digital biomass (flurescence images, IAP formula) (px^3)", 
+			"digital biomass (visible light images, IAP formula) (px^3)", 
+			"digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
+			"height (px)", 
+			"width (px)", 
+			"side area (px)", 
+			"top area (px)"
+	)	
+	
+	boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
+	
+	#boxplotStacked
+	descriptorSet_boxplotStacked = c("side.nir.normalized.histogram.bin.", 
+			"side.fluo.histogram.bin.", 
+			"top.nir.histogram.bin.", 
+			"side.fluo.histogram.ratio.bin.", 
+			"side.nir.normalized.histogram.bin.", 
+			"side.fluo.normalized.histogram.bin.", 
+			"side.fluo.normalized.histogram.ratio.bin.", 
+			"side.vis.hue.histogram.ratio.bin.", 
+			"side.vis.normalized.histogram.ratio.bin.", 
+			"top.fluo.histogram.bin.", 
+			"top.fluo.histogram.ratio.bin.", 
+			"top.nir.histogram.bin.", 
+			"top.vis.hue.histogram.ratio.bin."
+	)
+	
+	
+	descriptorSetName_boxplotStacked = c("side near-infrared intensities (zoom corrected) (%)", 
+			"side fluorescence color spectra (%)", 
+			"top near-infrared intensities (%)", 
+			"side fluorescence ratio histogram (%)", 
+			"side near-infrared (zoom corrected) (%)", 
+			"side fluorescence color spectra (zoom corrected) (%)", 
+			"side fluoresence color spectra (%)", 
+			"side visible light color histogram (%)", 
+			"side visible light ratio histogram (zoom correcte) (%)", 
+			"top fluorescence color spectra (%)", 
+			"top fluo ratio histogram (%)", 
+			"NIR top histogramm (%)", 
+			"top visible light color histogram (%)"
+	)
+	
+	#spiderplot
+	descriptorSet_spiderplot = c(#"volume.my"
+			"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)",
+			"side.height (mm)$side.width (mm)$side.area (mm^2)$top.area (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)"
+	
+	)
+	
+	descriptorSetName_spiderplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
+			"height (zc) (mm)$width (zc) (mm)$side area (zc) (mm^2)$top area (zc) (mm^2)$side fluo intensity$side nir intensity",
+			"height (px)$width (px)$side area (px)$top area (px)$side fluo intensity$side nir intensity"
+#						"Zoom corrected Spiderchart", 
+#						"Spiderchart"
+	)	
+	
+	#boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
+	spiderOptions= list(typOfGeomBar=c("x", "y"))
+	
+	descriptorList <- addDesSet(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet)
+	descriptorSet_boxplotStacked <- descriptorList$desSet
+	descriptorSetName_boxplotStacked <- descriptorList$desName
+	
+	stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
+		
+		
+		boxDes = descriptorSet_boxplot
+		boxStackDes = descriptorSet_boxplotStacked 
+		boxDesName = descriptorSetName_boxplot
+		boxStackDesName = descriptorSetName_boxplotStacked 
+		nBoxOptions= nBoxOptions
+		boxOptions= boxOptions
+		stackedBarOptions = stackedBarOptions
+		nBoxDes <- descriptorSet_nBoxplot
+		nBoxDesName <- descriptorSetName_nBoxplot
+		boxSpiderDes <- descriptorSet_spiderplot
+		boxSpiderDesName = descriptorSetName_spiderplot
+		
+		appendix <- FALSE
+	}
 	
 	secondRun = appendix
 	appendix =  FALSE
@@ -1753,9 +2437,9 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				else
 					print("Generate diagrams for main descriptors...")
 				createDiagrams(iniDataSet = workingDataSet, saveFormat = saveFormat, dpi = dpi, isGray = isGray, 
-									nBoxDes = descriptorSet_nBoxplot, boxDes = descriptorSet_boxplot, boxStackDes = descriptorSet_boxplotStacked, 
-									nBoxDesName = descriptorSetName_nBoxplot, boxDesName = descriptorSetName_boxplot, boxStackDesName = descriptorSetName_boxplotStacked, 
-									nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, 
+									nBoxDes = descriptorSet_nBoxplot, boxDes = descriptorSet_boxplot, boxStackDes = descriptorSet_boxplotStacked, boxSpiderDes = descriptorSet_spiderplot,
+									nBoxDesName = descriptorSetName_nBoxplot, boxDesName = descriptorSetName_boxplot, boxStackDesName = descriptorSetName_boxplotStacked, boxSpiderDesName = descriptorSetName_spiderplot,
+									nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions,
 									treatment = treatment, filterTreatment = filterTreatment, 
 									secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
 									showResultInR = showResultInR, xAxisName = xAxisName, debug = debug, appendix=appendix)
@@ -1769,6 +2453,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 					descriptorSetName_boxplot = NULL
 					descriptorSet_boxplotStacked = NULL
 					descriptorSetName_boxplotStacked = NULL
+					descriptorSet_spiderplot = NULL
+					descriptorSetName_spiderplot = NULL
 				} else {
 					break
 				}
@@ -1789,25 +2475,24 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 }
 
 createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false", 
-		nBoxDes = NULL, boxDes = NULL, boxStackDes = NULL, 
-		#imageFileNames_nBoxplots = NULL, imageFileNames_Boxplots = NULL, imageFileNames_StackedPlots = NULL, 
-		nBoxDesName = NULL, boxDesName = NULL, boxStackDesName = NULL, 
-		nBoxOptions= NULL, boxOptions= NULL, stackedBarOptions = NULL, 
+		nBoxDes = NULL, boxDes = NULL, boxStackDes = NULL, boxSpiderDes = NULL,
+		nBoxDesName = NULL, boxDesName = NULL, boxStackDesName = NULL, boxSpiderDesName = NULL,
+		nBoxOptions= NULL, boxOptions= NULL, stackedBarOptions = NULL, spiderOptions = NULL,
 		treatment="Treatment", filterTreatment="none", 
 		secondTreatment="none", filterSecondTreatment="none", filterXaxis="none", xAxis="Day (Int)", 
 		showResultInR=FALSE, xAxisName="none", debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE) {		
-			
+
 	overallList = list(iniDataSet=iniDataSet, saveFormat=saveFormat, dpi=dpi, isGray=isGray, 
-						nBoxDes = nBoxDes, boxDes = boxDes, boxStackDes = boxStackDes, 
-						imageFileNames_nBoxplots = nBoxDes, imageFileNames_Boxplots = boxDes, imageFileNames_StackedPlots = boxStackDes, 
-						nBoxDesName = nBoxDesName, boxDesName = boxDesName, boxStackDesName = boxStackDesName, 
-						nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, 
+						nBoxDes = nBoxDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes,
+						imageFileNames_nBoxplots = nBoxDes, imageFileNames_Boxplots = boxDes, imageFileNames_StackedPlots = boxStackDes, imageFileNames_SpiderPlots = boxSpiderDes,
+						nBoxDesName = nBoxDesName, boxDesName = boxDesName, boxStackDesName = boxStackDesName, boxSpiderDesName = boxSpiderDesName,
+						nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions,
 						treatment=treatment, filterTreatment=filterTreatment, 
 						secondTreatment=secondTreatment, filterSecondTreatment=filterSecondTreatment, filterXaxis=filterXaxis, xAxis=xAxis, 
 						showResultInR=showResultInR, xAxisName=xAxisName, debug=debug, 
 						appendix=appendix, stoppTheCalculation=stoppTheCalculation, 
-						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), 
-						color_nBox = list(), color_box=list(), color_boxStack=list(), user="none", typ="none")	
+						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(),
+						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), user="none", typ="none")	
 	
 	loadAndInstallPackages(FALSE, FALSE)
 	
@@ -1819,6 +2504,17 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 	overallList = overallChangeName(overallList)
 	overallList = changeXAxisName(overallList)
 	overallList = overallPreprocessingOfDescriptor(overallList)
+	
+#	overallList = preprocessingOfxAxisValue(overallList)
+#	overallList = preprocessingOfTreatment(overallList)
+#	overallList = preprocessingOfSecondTreatment(overallList)
+#	overallList = overallCheckIfDescriptorIsNaOrAllZero(overallList)
+#	overallList = reduceWorkingDataSize(overallList)
+#	overallList = setDefaultAxisNames(overallList)
+#	overallList = overallGetResultDataFrame(overallList)
+#	overallList = setColor(overallList) 
+#	makeDiagrams(overallList)
+	
 	
 	if (!overallList$stoppTheCalculation) {
 		overallList = preprocessingOfxAxisValue(overallList)

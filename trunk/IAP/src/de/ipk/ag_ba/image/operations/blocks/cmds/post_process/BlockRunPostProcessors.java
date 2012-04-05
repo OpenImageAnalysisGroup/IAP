@@ -6,10 +6,11 @@ import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
-
+	
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage fi = getInput().getMasks().getVis();
+		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMask.png");
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.RgbSide)) {
@@ -18,10 +19,11 @@ public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		return fi;
 	}
-
+	
 	@Override
 	protected FlexibleImage processVISimage() {
 		FlexibleImage fi = getInput().getImages().getVis();
+		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISImage.png");
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.RgbSide)) {
@@ -30,7 +32,7 @@ public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		return fi;
 	}
-
+	
 	@Override
 	protected boolean isChangingImages() {
 		return true;

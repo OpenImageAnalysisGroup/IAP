@@ -9,5 +9,11 @@ echo Appendix?  : %3
 
 Rscript createDiagrams.r report.csv pdf %3 %1 %2
 
+rem The delete option is important at the development phase
+rem del /s report.aux
+rem del /s report.out
+rem del /s report.toc
+
 pdflatex report.tex
 pdflatex report.tex
+

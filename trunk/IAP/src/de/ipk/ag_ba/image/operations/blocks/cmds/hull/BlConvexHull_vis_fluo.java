@@ -33,6 +33,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
+		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMask.png");
 		FlexibleImage image = getInput().getMasks().getVis();
 		ImageData info = getInput().getImages().getVisInfo();
 		ImageOperation res = processImage(image, info);
@@ -255,22 +256,22 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		Long firstWaterTime = null;
 		Long lastWaterTime = null;
 		boolean prolonged = false;
-		if (time2waterData!=null)
-		for (Long time : time2waterData.keySet()) {
-			if (time==null)
-				continue;
-			if (!prolonged && time >= endTime) {
-				prolonged = true;
-				endTime = time;
+		if (time2waterData != null)
+			for (Long time : time2waterData.keySet()) {
+				if (time == null)
+					continue;
+				if (!prolonged && time >= endTime) {
+					prolonged = true;
+					endTime = time;
+				}
+				if (time >= startTime && time < endTime) {
+					waterSum += time2waterData.get(time);
+					if (firstWaterTime == null || time < firstWaterTime)
+						firstWaterTime = time;
+					if (lastWaterTime == null || time > lastWaterTime)
+						lastWaterTime = time;
+				}
 			}
-			if (time >= startTime && time < endTime) {
-				waterSum += time2waterData.get(time);
-				if (firstWaterTime == null || time < firstWaterTime)
-					firstWaterTime = time;
-				if (lastWaterTime == null || time > lastWaterTime)
-					lastWaterTime = time;
-			}
-		}
 		if (firstWaterTime == null || lastWaterTime == null)
 			return null;
 		else {

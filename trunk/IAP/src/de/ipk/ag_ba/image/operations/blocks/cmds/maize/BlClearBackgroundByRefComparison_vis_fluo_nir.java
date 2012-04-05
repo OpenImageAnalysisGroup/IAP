@@ -4,6 +4,9 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import java.awt.Color;
+import java.io.File;
+
+import org.ReleaseInfo;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
@@ -25,6 +28,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	
 	@Override
 	protected FlexibleImage processVISmask() {
+		getInput().getImages().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVisMask2.png");
 		if (getInput().getImages().getVis() != null && getInput().getMasks().getVis() == null) {
 			// no reference image create dummy image
 			FlexibleImage in = getInput().getImages().getVis();

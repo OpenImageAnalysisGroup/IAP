@@ -305,7 +305,8 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 						"createDiagrams.r",
 						"diagramIAP.cmd",
 						"diagramIAP.bat",
-						"report.tex"
+						"report.tex",
+						"HSV_Farbtonskala.png"
 				});
 			
 			if (!exportIndividualAngles && !xlsx) {
