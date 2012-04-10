@@ -6,7 +6,7 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 			KN = list(barley = list(boxplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")),
 									spiderplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")))
 			)
-	)				
+	)
 	return(requestList)
 }
 
@@ -55,7 +55,7 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 }
 
 "%readInputDataFile%" <- function(separation, fileName) {
-	loadAndInstallPackages(TRUE, FALSE)
+	#loadAndInstallPackages(TRUE, FALSE)
 	
 	#separation = ";"
 	print(paste("Read input file", fileName))
@@ -109,51 +109,97 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	return(colnames(dataSet)[!colnames(dataSet) %in% withoutColNamesVector])
 }
 
-InstalledPackage  <- function(package) {
-    available  <- suppressMessages(suppressWarnings(sapply(package, require, quietly = TRUE, character.only = TRUE, warn.conflicts = FALSE)))
-    missing  <- package[!available]
-    if (length(missing) > 0) return(FALSE)
-    return(TRUE)
-}
+#overallOutlierDetection <- function(overallList) {
+#	overallList$debug %debug% "overallOutlierDetection()"	
+#	
+#	
+#	workingDataSet <- overallList$iniDataSet[,colnames(overallList$iniDataSet) != c(overallList$treatment, overallList$secondTreatment, overallList$xAxis)]
+#	aq.plot(workingDataSet, alpha=0.1)
+#	
+##	sehr gut
+#	# create data:
+#	set.seed(134)
+#	x <- cbind(rnorm(80), rnorm(80), rnorm(80))
+#	y <- cbind(rnorm(10, 5, 1), rnorm(10, 5, 1), rnorm(10, 5, 1))
+#	z <- rbind(x,y)
+## execute:
+#	aq.plot(z, alpha=0.05)
+#	
+#	
+#	###################
+#
+#	data(humus)
+#	res <-chisq.plot(log(humus[,c("Co","Cu","Ni")]))
+#	res <-chisq.plot(z)
+#	res$outliers # these are the potential outliers
+#	
+#	################
+#	
+#	
+#	# create data:
+#	x <- cbind(rnorm(100), rnorm(100))
+#	y <- cbind(rnorm(10, 5, 1), rnorm(10, 5, 1))
+#	z <- rbind(x,y)
+## execute:
+#	color.plot(z, quan=0.75)
+#	
+#	################
+#	
+#	# create data:
+#	x <- cbind(rnorm(100), rnorm(100))
+#	y <- cbind(rnorm(10, 3, 1), rnorm(10, 3, 1))
+#	z <- rbind(x,y)
+## execute:
+#	dd.plot(z)
+#
+#	##################
+#
+## Geostatistical data:
+#	data(humus) # Load humus data
+#	uni.plot(log(humus[, c("As", "Cd", "Co", "Cu", "Mg", "Pb", "Zn")]),symb=TRUE)
+#}
 
-CRANChoosen  <- function() {
-    return(getOption("repos")["CRAN"] != "@CRAN@")
-}
 
-UsePackage  <- function(package, defaultCRANmirror = "http://cran.at.r-project.org") {
-    if(!InstalledPackage(package)) {
-        options(repos = c(CRAN = defaultCRANmirror))
-        suppressMessages(suppressWarnings(install.packages(package)))
-        if(!InstalledPackage(package)) return(FALSE)
-    }
-    return(TRUE)
-}
-
-loadAndInstallPackages <- function(install=FALSE, useDev=FALSE) {	
-	if (install) {
-		libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych", "fmsb", "plotrix")
-		for(library in libraries) { 
-    		if(!UsePackage(library)) {
-        		stop("Error!", library)
-    		}
+loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALSE, useDev=FALSE) {	
+#	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych", "fmsb", "plotrix")	
+	repos <- "http://cran.r-project.org"
+	libPath <- ".libPaths()[1]"
+	
+	if (install & length(libraries) > 0) {
+		installedPackages <- names(installed.packages()[, 'Package'])
+		ins <- libraries[!libraries %in% installedPackages]
+		
+		if(length(ins) > 0) {
+			install.packages(ins, libs=libPath, repos=repos, dependencies = TRUE)
 		}
+		
 		if (useDev) {
-			install.packages(c("devtools"), repos="http://cran.r-project.org", dependencies = TRUE)
+			install.packages(c("devtools"), libs=libPath, repos=repos, dependencies = TRUE)
 			dev_mode()
 			install_github("ggplot2")
 		}
 	}
-		
-	library("Cairo") # save images (default image)
-	library("RColorBrewer") #color space
-	library("data.table") #fast grouping
-	library("ggplot2") #plotting system (also save images)
-	library("psych")
-	library("fmsb")	#radarchart
-	library("plotrix") # second radarchart -> radial.plot
 	
-	if (useDev) {
-		library("devtools")
+	if(update) {
+		#installedOldPackages <- names(old.packages()[, 'Package'])
+		update.packages(lib.loc = libPath, checkBuilt=TRUE, ask=FALSE,	repos=repos)	
+	}
+	
+	if(length(libraries) > 0) {
+		for(n in libraries) {
+			library(n, character.only = TRUE)
+#			library("Cairo") # save images (default image)
+#			library("RColorBrewer") #color space
+#			library("data.table") #fast grouping
+#			library("ggplot2") #plotting system (also save images)
+#			library("psych")
+#			library("fmsb")	#radarchart
+#			library("plotrix") # second radarchart -> radial.plot
+		}
+	
+		if (useDev) {
+			library("devtools")
+		}	
 	}	
 }
 
@@ -731,6 +777,10 @@ buildRowName <- function(mergeDataSet, groupBy, yName = "value") {
 }
 
 getToPlottedDays <- function(xAxis, changes=NULL) {
+##########
+#xAxis <- xAxisValue
+##########
+	
 	uniqueDays = unique(xAxis)
 	medianPosition = floor(median(1:length(uniqueDays)))
 
@@ -747,6 +797,12 @@ getToPlottedDays <- function(xAxis, changes=NULL) {
 }
 
 setxAxisfactor <- function(xAxisName, xAxisValue, options) {
+##############
+#xAxisName <- overallList$xAxisName
+#xAxisValue <- overallResult$xAxis
+##############
+	
+	
 	if (!is.null(options$daysOfBoxplotNeedsReplace)) {
 		whichDayShouldBePlot = getToPlottedDays(xAxisValue, options$daysOfBoxplotNeedsReplace)
 	} else {
@@ -846,6 +902,12 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 #	iniDataSet = overallList$iniDataSet[columns]
 #	debug = overallList$debug	
 #########################
+#	diagramTyp = "nboxplot"
+#	descriptorList = overallList$nBoxDes
+#	iniDataSet = overallList$iniDataSet[columns]
+#	debug = overallList$debug
+#########################
+
 
 
 	debug %debug% "getResultDataFrame()"
@@ -864,11 +926,12 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 	
 	descriptorName = descriptorName[!is.na(descriptor)]
 	descriptor = descriptor[!is.na(descriptor)]
-	
+
 	
 	if (diagramTyp != "boxplot") {
 		groupedDataFrame = data.table(iniDataSet)
-		key(groupedDataFrame) = c(groupBy, colNames$xAxis)		
+		#key(groupedDataFrame) = c(groupBy, colNames$xAxis)
+		setkeyv(groupedDataFrame,c(groupBy, colNames$xAxis))
 	}
 	
 	if (diagramTyp == "boxplot") {
@@ -1146,6 +1209,12 @@ reduceOverallResult <- function(tempOverallList, imagesIndex) {
 
 
 reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, debug, diagramTyp="nboxplot") {
+####################
+#debug <- overallList$debug
+#diagramTyp <- "nboxplot"
+#####################
+	
+	
 	debug %debug% "reduceWholeOverallResultToOneValue()"
 	
 	if (diagramTyp == "boxplotstacked" || diagramTyp == "spiderplot") {
@@ -1159,7 +1228,7 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 			colNames = c("value")
 		} 
 		
-		if ("primaerTreatment" %in% tempOverallResult) {
+		if ("primaerTreatment" %in% colnames(tempOverallResult)) {
 			standardColumnName = c("name", "primaerTreatment", "xAxis")
 		} else {
 			standardColumnName = c("name", "xAxis")
@@ -1198,6 +1267,15 @@ createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 }
 
 makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot") {
+########
+#overallResult <- overallList$overallResult_nBoxDes
+#overallDescriptor <- overallList$nBoxDes
+#overallColor <- overallList$color_nBox
+#overallDesName <-overallList$nBoxDesName
+#overallFileName <- overallList$imageFileNames_nBoxplots
+#diagramTypSave="nboxplot"
+#############
+	
 	overallList$debug %debug% "makeLinearDiagram()"	
 	print("line plot...")
 	
@@ -1242,17 +1320,28 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 									panel.border = theme_rect(colour="Grey", size=0.1)
 							)
 					
-					if (length(overallColor[[imagesIndex]]) > 25 & length(overallColor[[imagesIndex]]) < 35) {
+					if (length(overallColor[[imagesIndex]]) > 18 & length(overallColor[[imagesIndex]]) < 31) {
 						plot = plot + opts(legend.text = theme_text(size=6), 
 											legend.key.size = unit(0.7, "lines")
 											)
-					} else if(length(overallColor[[imagesIndex]]) >= 35) {
+					} else if(length(overallColor[[imagesIndex]]) >= 31) {
 						plot = plot + opts(legend.text = theme_text(size=4), 
 											legend.key.size = unit(0.4, "lines")
 						)
 					} else {
 						plot = plot + opts(legend.text = theme_text(size=11))
 					}
+					
+					#Überlegen ob das sinn macht!!
+					if(length(unique(overallResult$name)) > 18) {
+						if ("primaerTreatment" %in% colnames(overallResult)) {				
+							plot = plot + facet_wrap(~ primaerTreatment)
+						} else {
+							plot = plot + facet_wrap(~ name)
+						} 
+					}
+					
+				
 								
 	#			print(plot)
 		
@@ -1495,7 +1584,7 @@ makeSpiderPlotDiagram <- function(h, overallResult, overallDescriptor, overallCo
 #	overallColor <- overallList$color_spider
 #	overallDesName <- overallList$boxSpiderDesName
 #	overallFileName <- overallList$imageFileNames_SpiderPlots
-#	options <- overallList$boxOptions
+#	options <- overallList$spiderOptions
 #	diagramTypSave <- "spiderplot"
 	####################	
 	
@@ -1813,7 +1902,7 @@ makeDiagrams <- function(overallList) {
 
 		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 			if (overallList$debug) {print("Spider plot...")}
-			makeSpiderPlotDiagram(h, overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$boxOptions, overallList)
+			makeSpiderPlotDiagram(h, overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
 		} else {
 			print("All values for stacked Boxplot are 'NA'...")
 		}
@@ -1914,6 +2003,7 @@ initRfunction <- function(DEBUG = FALSE) {
 		#options(showWarnCalls = TRUE)
 		#options(showErrorCalls = TRUE)
 		options(warn = 0)
+		#options(warn = 2)
 	} else {	
 		options(error = NULL)
 		#options(showWarnCalls = FALSE)
@@ -1928,6 +2018,10 @@ initRfunction <- function(DEBUG = FALSE) {
 	while(!is.null(dev.list())) {
 		dev.off()
 	}
+	
+	#"psych",
+	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "fmsb", "mvoutlier")
+	loadInstallAndUpdatePackages(libraries, TRUE, TRUE, FALSE)
 }
 
 startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
@@ -2119,7 +2213,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				#spiderplot
 				descriptorSet_spiderplot = c(#"volume.my"
 						"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)",
-						"side.height (mm)$side.width (mm)$side.area (mm^2)$top.area (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)"
+						"side.height (mm)$side.width (mm)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)"
 
 				)
 				
@@ -2130,9 +2224,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 #						"Spiderchart"
 				)	
 
-				#boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
-				spiderOptions= list(typOfGeomBar=c("x", "y"))
-				
+				#spiderOptions= list(typOfGeomBar=c("x", "y"))
+				spiderOptions= list(typOfGeomBar=c("x"))
 				
 				#boxplotStacked
 				descriptorSet_boxplotStacked = c("side.nir.normalized.histogram.bin.", 
@@ -2201,11 +2294,14 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 	}  else if (typOfStartOptions == "test"){
 		
-		treatment <- "Treatment"
-		filterTreatment <- "none"
+		debug <- TRUE
+		initRfunction(debug)
 		
-		secondTreatment <- "Genotype"
-		filterSecondTreatment <- "BCC1367$BCC1391$BCC1529"
+		treatment <- "Treatment"
+		filterTreatment <- "normal bewaessert$Trockentress"
+		
+		secondTreatment <- "Species"
+		filterSecondTreatment <- "BCC_1367_Apex$BCC_1391_Isaria$BCC_1403_Perun$BCC_1433_HeilsFranken$BCC_1441_PflugsIntensiv$Wiebke$BCC_1413_Sissy$BCC_1417_Trumpf"
 		filterXaxis <- "none"
 
 		bgColor <- "transparent"
@@ -2218,7 +2314,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 		saveName <- "test2"
 		yAxisName <- "test2"
-		debug <- TRUE
+		
 		
 		stoppTheCalculation <- FALSE
 		iniDataSet = workingDataSet
@@ -2390,7 +2486,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	#spiderplot
 	descriptorSet_spiderplot = c(#"volume.my"
 			"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)",
-			"side.height (mm)$side.width (mm)$side.area (mm^2)$top.area (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)"
+			"side.height (mm)$side.width (mm)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)"
 	
 	)
 	
@@ -2401,8 +2497,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 #						"Spiderchart"
 	)	
 	
-	#boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
-	spiderOptions= list(typOfGeomBar=c("x", "y"))
+	#spiderOptions= list(typOfGeomBar=c("x", "y"))
+	spiderOptions= list(typOfGeomBar=c("x"))
 	
 	descriptorList <- addDesSet(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet)
 	descriptorSet_boxplotStacked <- descriptorList$desSet
@@ -2493,9 +2589,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						appendix=appendix, stoppTheCalculation=stoppTheCalculation, 
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(),
 						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), user="none", typ="none")	
-	
-	loadAndInstallPackages(FALSE, FALSE)
-	
+		
 	overallList$debug %debug% "Start"
 	
 	overallList = checkTypOfExperiment(overallList)
@@ -2504,17 +2598,20 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 	overallList = overallChangeName(overallList)
 	overallList = changeXAxisName(overallList)
 	overallList = overallPreprocessingOfDescriptor(overallList)
-	
+
+	#####
 #	overallList = preprocessingOfxAxisValue(overallList)
 #	overallList = preprocessingOfTreatment(overallList)
 #	overallList = preprocessingOfSecondTreatment(overallList)
 #	overallList = overallCheckIfDescriptorIsNaOrAllZero(overallList)
 #	overallList = reduceWorkingDataSize(overallList)
 #	overallList = setDefaultAxisNames(overallList)
+#	
+#	overallList = overallOutlierDetection(overallList)
 #	overallList = overallGetResultDataFrame(overallList)
 #	overallList = setColor(overallList) 
 #	makeDiagrams(overallList)
-	
+	#######
 	
 	if (!overallList$stoppTheCalculation) {
 		overallList = preprocessingOfxAxisValue(overallList)
@@ -2525,6 +2622,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 			overallList = reduceWorkingDataSize(overallList)
 			overallList = setDefaultAxisNames(overallList)
 			#print(overallList)
+		#	overallList = overallOutlierDetection(overallList)
 			overallList = overallGetResultDataFrame(overallList)
 			if (!overallList$stoppTheCalculation) {
 				overallList = setColor(overallList) 
