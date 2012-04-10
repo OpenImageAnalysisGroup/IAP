@@ -24,5 +24,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/poi-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="lib" path="lib/mongo-2.7.3.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/IAP Transfer"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

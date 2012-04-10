@@ -98,6 +98,11 @@ public final class ActionIapHome extends AbstractNavigationAction {
 					ico2 = "img/ext/network-workgroup-power.png";
 					ico3 = "img/ext/folder-remote.png";
 				}
+				if (entry.getDesiredIcon() != null) {
+					ico = entry.getDesiredIcon();
+					ico2 = entry.getDesiredIcon();
+					ico3 = entry.getDesiredIcon();
+				}
 				VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, entry.getTargetName(), entry,
 						new String[] {},
 						IAPmain.loadIcon(ico),

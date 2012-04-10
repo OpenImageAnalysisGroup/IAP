@@ -11,6 +11,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import de.ipk.ag_ba.commands.ActionToggleSettingDefaultIsFalse;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.vanted.plugin.VfsFileProtocol;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabAglet;
 
 /**
@@ -25,11 +26,39 @@ public abstract class VirtualFileSystem {
 				"File I/O",
 				"Desktop" + File.separator + "VFS",
 				ReleaseInfo.getDesktopFolder() + File.separator + "VFS"));
+		
+		res.add(new VirtualFileSystemVFS2(
+				VfsFileProtocol.SFTP,
+				"Zhejiang SFTP",
+				"SFTP",
+				"10.71.115.165",
+				"chendijun",
+				"chendijun",
+				"/ipk_test"
+				));
+		
+		res.add(new VirtualFileSystemVFS2(
+				VfsFileProtocol.SFTP,
+				"Localhost SFTP",
+				"SFTP",
+				"localhost",
+				"ssh",
+				"ssh",
+				"/VFS"
+				));
+		
 		VirtualFileSystem vfsUdp = new VirtualFileSystemFolderStorage(
 				"file-udp",
 				"Network UDP Receiver",
 				"Desktop" + File.separator + "UDP",
 				ReleaseInfo.getDesktopFolder() + File.separator + "UDP");
+		
+		VirtualFileSystem vfsUdpOut = new VirtualFileSystemUdp(
+				"udp-out",
+				"Network UDP Broadcaster",
+				"Desktop" + File.separator + "UDP" + File.separator + "Outbox",
+				ReleaseInfo.getDesktopFolder() + File.separator + "UDP" + File.separator + "Outbox");
+		res.add(vfsUdpOut);
 		
 		ActionToggleSettingDefaultIsFalse toggleUdpReceive = new ActionToggleSettingDefaultIsFalse(
 				null, null,
@@ -73,7 +102,8 @@ public abstract class VirtualFileSystem {
 	
 	public void saveExperiment(ExperimentReference experimentReference,
 			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
-		ActionDataExportToVfs a = new ActionDataExportToVfs(null, experimentReference, this);
+		ActionDataExportToVfs a = new ActionDataExportToVfs(null, experimentReference,
+				(VirtualFileSystemVFS2) this);
 		a.performActionCalculateResults(null);
 	}
 	
@@ -88,5 +118,9 @@ public abstract class VirtualFileSystem {
 	
 	public ArrayList<NavigationAction> getAdditionalEntries() {
 		return new ArrayList<NavigationAction>();
+	}
+	
+	public String getDesiredIcon() {
+		return null;
 	}
 }
