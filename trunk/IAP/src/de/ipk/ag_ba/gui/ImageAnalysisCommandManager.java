@@ -14,9 +14,6 @@ import org.StringManipulationTools;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionDataExport;
-import de.ipk.ag_ba.commands.ActionDataExportAsFilesAction;
-import de.ipk.ag_ba.commands.ActionDataExportTar;
 import de.ipk.ag_ba.commands.ActionFileManager;
 import de.ipk.ag_ba.commands.ActionNumericDataReport;
 import de.ipk.ag_ba.commands.ActionNumericDataReportComplete;
@@ -24,14 +21,12 @@ import de.ipk.ag_ba.commands.ActionNumericDataReportSetup;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
 import de.ipk.ag_ba.commands.ActionToggle;
 import de.ipk.ag_ba.commands.CloudIoTestAction;
-import de.ipk.ag_ba.commands.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.ActionCopyCommandList;
 import de.ipk.ag_ba.gui.navigation_actions.ActionCopyToClipboard;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -71,16 +66,6 @@ public class ImageAnalysisCommandManager {
 		actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 		
 		actions.add(new NavigationButton(new ActionCopyToClipboard(m, experimentReference), guiSetting));
-		
-		String hsmf = IAPmain.getHSMfolder();
-		if (hsmf != null)
-			actions.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReference, hsmf), guiSetting));
-		
-		actions.add(new NavigationButton(new ActionDataExport(m, experimentReference), guiSetting));
-		
-		actions.add(new NavigationButton(new ActionDataExportTar(m, experimentReference), guiSetting));
-		
-		actions.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experimentReference), guiSetting));
 		
 		actions.add(new NavigationButton(new ActionPerformanceTest(m, experimentReference), guiSetting));
 		if (analysis) {

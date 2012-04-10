@@ -39,7 +39,8 @@ public abstract class AbstractVfsFile implements VfsFile {
 		return null;
 	}
 	
-	public void delete() {
+	public boolean delete() throws IOException {
+		return false;
 	}
 	
 	public boolean exists() {
