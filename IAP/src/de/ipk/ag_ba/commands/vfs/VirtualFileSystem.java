@@ -21,11 +21,11 @@ public abstract class VirtualFileSystem {
 	
 	public static ArrayList<VirtualFileSystem> getKnown() {
 		ArrayList<VirtualFileSystem> res = new ArrayList<VirtualFileSystem>();
-		res.add(new VirtualFileSystemFolderStorage(
-				"file-desktop",
-				"File I/O",
-				"Desktop" + File.separator + "VFS",
-				ReleaseInfo.getDesktopFolder() + File.separator + "VFS"));
+		// res.add(new VirtualFileSystemFolderStorage(
+		// "file-desktop",
+		// "File I/O",
+		// "Desktop" + File.separator + "VFS",
+		// ReleaseInfo.getDesktopFolder() + File.separator + "VFS"));
 		
 		res.add(new VirtualFileSystemVFS2(
 				VfsFileProtocol.SFTP,
@@ -45,6 +45,16 @@ public abstract class VirtualFileSystem {
 				"ssh",
 				"ssh",
 				"/VFS"
+				));
+		
+		res.add(new VirtualFileSystemVFS2(
+				VfsFileProtocol.LOCAL,
+				"Desktop/VFS",
+				"File I/O",
+				"",
+				null,
+				null,
+				ReleaseInfo.getDesktopFolder() + File.separator + "VFS"
 				));
 		
 		VirtualFileSystem vfsUdp = new VirtualFileSystemFolderStorage(
