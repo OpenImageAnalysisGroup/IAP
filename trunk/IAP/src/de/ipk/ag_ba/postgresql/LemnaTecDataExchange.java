@@ -170,7 +170,13 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					ehi.setImportusergroup("LemnaTec (BGH)");
 				} else
 					if (system == LemnaTecSystem.Maize) {
-						ehi.setExperimenttype(IAPexperimentTypes.MaizeGreenhouse + "");
+						if (name.length() >= 6 && name.toUpperCase().endsWith("RAPS"))
+							ehi.setExperimenttype(IAPexperimentTypes.Raps + "");
+						else
+							if (name.length() >= 6 && name.substring(4, 6).equals("RM"))
+								ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse + "");
+							else
+								ehi.setExperimenttype(IAPexperimentTypes.MaizeGreenhouse + "");
 						ehi.setImportusergroup("LemnaTec (CGH)");
 					} else
 						if (system == LemnaTecSystem.Phytochamber) {
@@ -392,6 +398,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			id2coo.put("MM", "Muraya, Dr. Moses Mahugu (HET)");
 			id2coo.put("KN", "Neumann, Kerstin (GED)");
 			id2coo.put("KW", "Weigelt-Fischer, Dr. Kathleen (HET)");
+			id2coo.put("KWF", "Weigelt-Fischer, Dr. Kathleen (HET)");
 			id2coo.put("BA", "Klukas, Dr. Christian (BA)");
 		}
 		return id2coo.get(kuerzel);
@@ -725,6 +732,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	
 	private static final HashMap<String, Double> blob2angle = new HashMap<String, Double>();
 	
+	@Override
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
 			boolean interactiveGetExperimentSize_notUsedHere,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
@@ -1180,6 +1188,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					+ "WHERE measure_label = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(sqlText);
+			
+			String expType = header.getExperimentType();
+			String species = IAPexperimentTypes.getSpeciesFromExperimentType(expType);
+			
 			ps.setString(1, header.getExperimentName());
 			try {
 				ResultSet rs = ps.executeQuery();
@@ -1196,12 +1208,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					
 					if (!res.containsKey(plantID)) {
 						res.put(plantID, new Condition(null));
-						if (header.getDatabase().contains("BGH_"))
-							res.get(plantID).setSpecies("Barley");
-						if (header.getDatabase().contains("APH_"))
-							res.get(plantID).setSpecies("Arabidopsis");
-						if (header.getDatabase().contains("CGH_"))
-							res.get(plantID).setSpecies("Maize");
+						res.get(plantID).setSpecies(species);
 					}
 					
 					if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart") ||
