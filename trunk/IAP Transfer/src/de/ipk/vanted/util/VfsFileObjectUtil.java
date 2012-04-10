@@ -16,7 +16,7 @@ import de.ipk.vanted.plugin.VfsFileProtocol;
 
 public class VfsFileObjectUtil {
 	private static FileSystemManager fsm = null;
-
+	
 	// create a FileSystemManager object while loading this class
 	static {
 		try {
@@ -25,49 +25,49 @@ public class VfsFileObjectUtil {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
 			String host, String filePath) throws Exception {
 		return VfsFileObjectUtil.createVfsFileObject(protocol, host, filePath,
 				null, null, null);
 	}
-
+	
 	public static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
 			String host, String filePath, String username, String password)
 			throws Exception {
 		return VfsFileObjectUtil.createVfsFileObject(protocol, host, filePath,
 				username, password, null);
 	}
-
+	
 	public static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
 			String host, String filePath, String username, String password,
 			Integer port) throws Exception {
-		if (StringUtils.isBlank(host)) {
+		if (StringUtils.isBlank(host) && protocol != VfsFileProtocol.LOCAL) {
 			throw new Exception("Host name can not be empty!");
 		}
 		String con = "file://";
 		switch (protocol) {
-		case FTP:
-			con = "ftp://";
-			break;
-		case SFTP:
-			con = "sftp://";
-			break;
-		case FTPS:
-			con = "ftps://";
-			break;
-		case WebDAV:
-			con = "webdav://";
-			break;
-		case HTTP:
-			con = "http://";
-			break;
-		case HTTPS:
-			con = "https://";
-			break;
-		default:
-			con = "file://";
-			break;
+			case FTP:
+				con = "ftp://";
+				break;
+			case SFTP:
+				con = "sftp://";
+				break;
+			case FTPS:
+				con = "ftps://";
+				break;
+			case WebDAV:
+				con = "webdav://";
+				break;
+			case HTTP:
+				con = "http://";
+				break;
+			case HTTPS:
+				con = "https://";
+				break;
+			default:
+				con = "file://";
+				break;
 		}
 		if (StringUtils.isNotBlank(username)) {
 			con += username;
@@ -77,7 +77,7 @@ public class VfsFileObjectUtil {
 			con += "@";
 		}
 		con += host;
-
+		
 		if (port != null) {
 			con += ":" + port;
 		}
