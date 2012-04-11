@@ -19,8 +19,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 	private final String user;
 	private final String pass;
 	private final String folder;
+	private final String prefix;
 	
 	public VirtualFileSystemVFS2(
+			String prefix,
 			VfsFileProtocol vfs_type,
 			String description,
 			String protocoll,
@@ -28,6 +30,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 			String user,
 			String pass,
 			String folder) {
+		this.prefix = prefix;
 		this.vfs_type = vfs_type;
 		this.description = description;
 		this.protocoll = protocoll;
@@ -54,7 +57,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 	
 	@Override
 	public String getPrefix() {
-		return "sftp-zju";
+		return prefix;
 	}
 	
 	@Override

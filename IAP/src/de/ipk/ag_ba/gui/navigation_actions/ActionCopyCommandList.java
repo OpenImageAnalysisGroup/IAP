@@ -3,6 +3,7 @@ package de.ipk.ag_ba.gui.navigation_actions;
 import java.util.ArrayList;
 
 import org.SettingsHelperDefaultIsFalse;
+import org.SettingsHelperDefaultIsTrue;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionCopyToMongo;
@@ -10,6 +11,7 @@ import de.ipk.ag_ba.commands.ActionDataExport;
 import de.ipk.ag_ba.commands.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.commands.ActionDataExportTar;
 import de.ipk.ag_ba.commands.hsm.ActionDataExportToHsmFolder;
+import de.ipk.ag_ba.commands.hsm.ActionDataUdpBroadcast;
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
@@ -49,7 +51,7 @@ public class ActionCopyCommandList extends AbstractNavigationAction implements N
 		this.src = src;
 		ml = MongoDB.getMongos();
 		this.addUDPcopy = new SettingsHelperDefaultIsFalse().isEnabled(TabAglet.ENABLE_BROADCAST_SETTING);
-		this.addHSMcopy = true;
+		this.addHSMcopy = new SettingsHelperDefaultIsTrue().isEnabled("hsm");
 		this.vl = VirtualFileSystemFolderStorage.getKnown();
 	}
 	
@@ -73,6 +75,10 @@ public class ActionCopyCommandList extends AbstractNavigationAction implements N
 				VirtualFileSystemVFS2 v = (VirtualFileSystemVFS2) vx;
 				res.add(new NavigationButton(new ActionDataExportToVfs(m, experimentReference, v), guiSetting));
 			}
+		}
+		
+		if (addUDPcopy) {
+			res.add(new NavigationButton(new ActionDataUdpBroadcast(m, experimentReference), guiSetting));
 		}
 		
 		if (addHSMcopy) {

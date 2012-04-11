@@ -144,4 +144,8 @@ public class IAPimages {
 	public static String getNetworkedServers() {
 		return "img/ext/network.png";
 	}
+	
+	public static String getWLAN() {
+		return "img/ext/gpl2/Gnome-Network-Wireless-64.png";
+	}
 }

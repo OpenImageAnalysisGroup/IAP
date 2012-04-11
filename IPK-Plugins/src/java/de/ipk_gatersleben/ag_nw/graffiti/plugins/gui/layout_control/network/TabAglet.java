@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +41,8 @@ public class TabAglet
 		extends InspectorTab implements Runnable {
 	
 	public static String newline = System.getProperty("line.separator");
+	
+	private static TabAglet instance;
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -109,6 +112,7 @@ public class TabAglet
 	public TabAglet() {
 		super();
 		this.title = "Chat";
+		TabAglet.instance = this;
 		initComponents();
 	}
 	
@@ -201,9 +205,9 @@ public class TabAglet
 		if (broadCastTask == null) {
 			myStatusLabel.setText("<html><small>Network functions are disabled");
 		} else {
-			List<?> hosts = broadCastTask.getActiveHosts();
+			List<InetAddress> hosts = broadCastTask.getActiveHosts();
 			String hostList = "";
-			for (Iterator<?> it = hosts.iterator(); it.hasNext();) {
+			for (Iterator<InetAddress> it = hosts.iterator(); it.hasNext();) {
 				String name = it.next().toString();
 				if (name.startsWith("/"))
 					name = name.substring(1);
@@ -274,5 +278,13 @@ public class TabAglet
 			if (sendButton != null)
 				sendButton.setEnabled(false);
 		}
+	}
+	
+	public static TabAglet getInstance() {
+		return instance;
+	}
+	
+	public BroadCastTask getBroadCastTask() {
+		return broadCastTask;
 	}
 }

@@ -94,6 +94,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			properties.put(entry[1], entry[2]);
 		}
 		ExperimentHeader eh = new ExperimentHeader(properties);
+		eh.setDatabaseId(url.getPrefix() + ":index" + File.separator + fileName);
 		return eh;
 	}
 	
@@ -114,7 +115,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		
 		IOurl u = url.getIOurlFor(experimentDirectory + File.separator + fileNameOfExperimentFile);
 		ExperimentInterface md = Experiment.loadFromIOurl(u);
-		
+		md.setHeader(header);
 		return md;
 	}
 	
