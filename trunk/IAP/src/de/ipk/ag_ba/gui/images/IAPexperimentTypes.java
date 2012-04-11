@@ -4,6 +4,7 @@ public enum IAPexperimentTypes {
 	Phytochamber("Arabidopsis", "Arabidopsis"),
 	PhytochamberBlueRubber("Arabidopsis (blue rubber cover)", "Arabidopsis"),
 	BarleyGreenhouse("Barley", "Hordeum vulgare"),
+	BarleyGreenhouseGray("Barley (gray support)", "Hordeum vulgare"),
 	MaizeGreenhouse("Maize", "Zea"),
 	UnknownGreenhouse("LemnaTec (Other)", "Unknown"),
 	AnalysisResults("Analysis Results", "Unknown"),

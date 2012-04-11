@@ -61,6 +61,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	private static final String driver = "org.postgresql.Driver";
 	
 	public LemnaTecDataExchange() {
+		// TODO SETTING
 		user = "postgres";
 		password = "LemnaTec";
 		port = "5432";

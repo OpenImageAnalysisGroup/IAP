@@ -124,6 +124,7 @@ public class MongoDB {
 		return displayName + " (" + databaseHost + ", db " + databaseName + ")";
 	}
 	
+	// TODO SETTING
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
 		
