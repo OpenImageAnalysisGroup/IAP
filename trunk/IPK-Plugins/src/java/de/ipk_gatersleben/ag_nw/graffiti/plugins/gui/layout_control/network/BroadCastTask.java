@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class BroadCastTask extends TimerTask {
 	/**
 	 * Contains byte[] arrays of data to be sent.
 	 */
-	private ArrayList<byte[]> outMessages = new ArrayList<byte[]>();
+	private static ArrayList<byte[]> outMessages = new ArrayList<byte[]>();
 	
 	BroadCastTask(final BroadCastService broadCastService, final Runnable receiver) {
 		this.broadCastService = broadCastService;
@@ -182,5 +183,45 @@ public class BroadCastTask extends TimerTask {
 			ArrayList<InetAddress> result = new ArrayList<InetAddress>(knownHostsAndTime.keySet());
 			return result;
 		}
+	}
+	
+	public void addBinaryMessage(String fileName, byte[] buff, int count) throws UnsupportedEncodingException {
+		fileName = encrypter.encrypt(fileName);
+		byte[] fn = new String("FILENAME:" + fileName + "§§§").getBytes("UTF-8");
+		int maxLen = broadCastService.getMaxBroadCastMessageLen();
+		
+		synchronized (outMessages) {
+			byte[] largeMessage = concat(fn, buff);
+			for (byte[] chunk : split(largeMessage, maxLen))
+				outMessages.add(chunk);
+		}
+	}
+	
+	private ArrayList<byte[]> split(byte[] largeMessage, int maxLen) {
+		ArrayList<byte[]> res = new ArrayList<byte[]>();
+		
+		return res;
+	}
+	
+	byte[] concat(byte[] A, byte[] B) {
+		byte[] C = new byte[A.length + B.length];
+		System.arraycopy(A, 0, C, 0, A.length);
+		System.arraycopy(B, 0, C, A.length, B.length);
+		
+		return C;
+	}
+	
+	public static <T> T[] concatAll(T[] first, T[]... rest) {
+		int totalLength = first.length;
+		for (T[] array : rest) {
+			totalLength += array.length;
+		}
+		T[] result = Arrays.copyOf(first, totalLength);
+		int offset = first.length;
+		for (T[] array : rest) {
+			System.arraycopy(array, 0, result, offset, array.length);
+			offset += array.length;
+		}
+		return result;
 	}
 }

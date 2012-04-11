@@ -86,11 +86,11 @@ public class BroadCastService implements HelperClass {
 		
 		for (int port = udpPortStart; port <= udpPortEnd; port++) {
 			DatagramPacket dp = new DatagramPacket(
-								msg,
-								0,
-								msg.length,
-								InetAddress.getByName(targetIP),
-								port);
+					msg,
+					0,
+					msg.length,
+					InetAddress.getByName(targetIP),
+					port);
 			DatagramSocket ds = new DatagramSocket();
 			ds.send(dp);
 			ds.close();
@@ -178,5 +178,9 @@ public class BroadCastService implements HelperClass {
 	
 	public int getBindPort() {
 		return udpBindPort;
+	}
+	
+	public int getMaxBroadCastMessageLen() {
+		return maxMessageLen;
 	}
 }

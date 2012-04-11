@@ -9,6 +9,7 @@ import org.ReleaseInfo;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.ActionToggleSettingDefaultIsFalse;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.vanted.plugin.VfsFileProtocol;
@@ -28,6 +29,7 @@ public abstract class VirtualFileSystem {
 		// ReleaseInfo.getDesktopFolder() + File.separator + "VFS"));
 		
 		res.add(new VirtualFileSystemVFS2(
+				"zhejiang-sftp",
 				VfsFileProtocol.SFTP,
 				"Zhejiang SFTP",
 				"SFTP",
@@ -38,6 +40,7 @@ public abstract class VirtualFileSystem {
 				));
 		
 		res.add(new VirtualFileSystemVFS2(
+				"localhost-sftp",
 				VfsFileProtocol.SFTP,
 				"Localhost SFTP",
 				"SFTP",
@@ -48,6 +51,7 @@ public abstract class VirtualFileSystem {
 				));
 		
 		res.add(new VirtualFileSystemVFS2(
+				"desktop-vfs",
 				VfsFileProtocol.LOCAL,
 				"Desktop/VFS",
 				"File I/O",
@@ -57,30 +61,36 @@ public abstract class VirtualFileSystem {
 				ReleaseInfo.getDesktopFolder() + File.separator + "VFS"
 				));
 		
-		VirtualFileSystem vfsUdp = new VirtualFileSystemFolderStorage(
-				"file-udp",
+		VirtualFileSystem vfsUdpInbox = new VirtualFileSystemFolderStorage(
+				"udp-in",
 				"Network UDP Receiver",
-				"Desktop" + File.separator + "UDP",
-				ReleaseInfo.getDesktopFolder() + File.separator + "UDP");
+				"Desktop" + File.separator + "UDP" + File.separator + "Inbox",
+				ReleaseInfo.getDesktopFolder() + File.separator + "UDP" + File.separator + "Inbox");
+		vfsUdpInbox.setIcon(IAPimages.getWLAN());
 		
-		VirtualFileSystem vfsUdpOut = new VirtualFileSystemUdp(
-				"udp-out",
-				"Network UDP Broadcaster",
-				"Desktop" + File.separator + "UDP" + File.separator + "Outbox",
-				ReleaseInfo.getDesktopFolder() + File.separator + "UDP" + File.separator + "Outbox");
-		res.add(vfsUdpOut);
+		// VirtualFileSystem vfsUdpOutbox = new VirtualFileSystemUdp(
+		// "udp-out",
+		// "Network UDP Broadcaster",
+		// "Desktop" + File.separator + "UDP" + File.separator + "Outbox",
+		// ReleaseInfo.getDesktopFolder() + File.separator + "UDP" + File.separator + "Outbox");
+		// res.add(vfsUdpOutbox);
 		
 		ActionToggleSettingDefaultIsFalse toggleUdpReceive = new ActionToggleSettingDefaultIsFalse(
 				null, null,
 				"Enable receiving of experiment data by opening a UDP port",
 				"Receive Experiments (UDP)",
 				TabAglet.ENABLE_BROADCAST_SETTING);
-		vfsUdp.addNavigationAction(toggleUdpReceive);
-		res.add(vfsUdp);
+		vfsUdpInbox.addNavigationAction(toggleUdpReceive);
+		res.add(vfsUdpInbox);
 		return res;
 	}
 	
+	private void setIcon(String icon) {
+		this.desiredIcon = icon;
+	}
+	
 	private ArrayList<NavigationAction> additionalNavigationActions = new ArrayList<NavigationAction>();
+	private String desiredIcon = null;
 	
 	private void addNavigationAction(ActionToggleSettingDefaultIsFalse navAction) {
 		additionalNavigationActions.add(navAction);
@@ -131,6 +141,6 @@ public abstract class VirtualFileSystem {
 	}
 	
 	public String getDesiredIcon() {
-		return null;
+		return desiredIcon;
 	}
 }

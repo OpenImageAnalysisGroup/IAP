@@ -7,9 +7,7 @@
 package de.ipk.ag_ba.commands.hsm;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -52,6 +50,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabAglet;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -69,17 +68,15 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 	private int files, knownFiles, errorCount;
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
-	private final String hsmFolder;
 	private boolean includeMainImages = true;
 	private boolean includeReferenceImages = true;
 	private boolean includeAnnotationImages = true;
 	
 	public ActionDataUdpBroadcast(MongoDB m,
-			ExperimentReference experimentReference, String hsmFolder) {
+			ExperimentReference experimentReference) {
 		super("Broadcast dataset to other computers");
 		this.m = m;
 		this.experimentReference = experimentReference;
-		this.hsmFolder = hsmFolder;
 	}
 	
 	@Override
@@ -93,7 +90,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 				"<html>"
 						+ "This commands copies the experiment and its connected binary data to the<br>"
 						+ "all computers, reachable by UDP broadcast messages, which have IAP running<br>"
-						+ "the UDP-receive function enabled and the proper password.<br><br>", new Object[] {
+						+ "and the UDP-receive function enabled.<br><br>", new Object[] {
 						"Copy images", includeMainImages,
 						"Copy reference images", includeReferenceImages,
 						"Copy annotation images", includeAnnotationImages });
@@ -126,7 +123,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return IAPimages.saveToHsmArchive();
+		return IAPimages.getWLAN();
 	}
 	
 	@Override
@@ -153,7 +150,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 			knownFiles = 0;
 			
 			errorCount = 0;
-			
+			String hsmFolder = "";
 			final HSMfolderTargetDataManager hsmManager = new HSMfolderTargetDataManager(
 					hsmFolder);
 			
@@ -249,8 +246,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 						final File targetFile = new File(
 								hsmManager.prepareAndGetDataFileNameAndPath(
 										experiment.getHeader(), t, zefn));
-						boolean exists = targetFile.exists()
-								&& targetFile.length() > 0;
+						boolean exists = false;
 						targetExists = exists;
 						try {
 							fileContent = copyBinaryFileContentToTarget(
@@ -298,8 +294,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 						final File targetFile = new File(
 								hsmManager.prepareAndGetPreviewFileNameAndPath(
 										experiment.getHeader(), t, zefn));
-						boolean exists = targetFile.exists()
-								&& targetFile.length() > 0;
+						boolean exists = false;
 						targetExists = exists;
 						if (!exists) {
 							InputStream is = null;
@@ -395,7 +390,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 					
 					copyBinaryFileContentToTarget(experiment, written,
 							hsmManager, es, bm.getLabelURL(), null, t,
-							targetFile, targetFile.exists(), null);
+							targetFile, false, null);
 					
 				} catch (Exception e) {
 					System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE: "
@@ -461,7 +456,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 					};
 					copyBinaryFileContentToTarget(experiment, written,
 							hsmManager, es, oldRefUrl, null, t, targetFile,
-							targetFile.exists(), postProcess);
+							false, postProcess);
 				} catch (Exception e) {
 					System.out
 							.println("ERROR: HSM DATA TRANSFER AND STORAGE OF OLDREFERENCE: "
@@ -575,15 +570,9 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 												"in_progress_"
 														+ UUID.randomUUID()
 																.toString()));
-								BufferedOutputStream bos = new BufferedOutputStream(
-										new FileOutputStream(f));
-								try {
-									if (in.getCount() > 0)
-										bos.write(in.getBuff(), 0,
-												in.getCount());
-								} finally {
-									bos.close();
-								}
+								if (in.getCount() > 0)
+									TabAglet.getInstance().getBroadCastTask()
+											.addBinaryMessage(f.getAbsolutePath() + File.separator + f.getName(), in.getBuff(), in.getCount());
 								written.addLong(in.getCount());
 								in.close();
 								if (t != null)
@@ -593,6 +582,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 								f.renameTo(targetFile);
 							}
 						}
+						String hsmFolder = "";
 						String fullPath = targetFile.getAbsolutePath();
 						String subPath = fullPath.substring(hsmFolder.length());
 						if (url != null) {
