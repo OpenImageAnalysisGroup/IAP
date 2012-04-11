@@ -302,6 +302,31 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	}{}
 }{}
 
+\resetBoolean
+\checkFileNoReset{side_height__mm__side_width__mm__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
+\checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
+\ifthenelse{\boolean{isFile1}}{
+
+	\resetClear
+	\clearpage
+	\section{Properties - Overview}
+	
+	\checkFile{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
+	\ifthenelse{\boolean{isFile1}}{
+
+		\ownClearPage
+		\subsection{Growth parameters, fluorescence, near-infrared and visible light
+		color}
+		\loadTex{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage}
+	}{
+	
+		\ownClearPage
+		\subsection{Growth parameters, fluorescence, near-infrared and visible light
+		color}
+		\loadTex{side_height__mm__side_width__mm__side_area__px__top_area__px__side_fluspiderOverallImage}
+
+	}	
+}{}
 
 \resetBoolean
 \checkFileNoReset{volume_iap__px3_boxplot.pdf}{}{}
@@ -1271,32 +1296,6 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 			\loadImage{top_hull_fillgrade__percent_nboxplot.pdf}
 		}{}
 	}{}
-}{}
-
-\checkFile{side_height__mm__side_width__mm__side_area__mm2__top_area__mm2__sidespiderOverallImage.tex}{}{}
-\checkFile{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
-\ifthenelse{\boolean{isFile1}}{
-
-	\resetClear
-	\clearpage
-	\section{Spider diagram}
-	
-	\checkFile{side_height__mm__side_width__mm__side_area__mm2__top_area__mm2__sidespiderOverallImage.tex}{}{}
-	\ifthenelse{\boolean{isFile1}}{
-	
-		\ownClearPage
-		\subsection{Spider diagram 1}
-		\loadTex{side_height__mm__side_width__mm__side_area__mm2__top_area__mm2__sidespiderOverallImage}
-	}{}
-	
-	\checkFile{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
-	\ifthenelse{\boolean{isFile1}}{
-	
-		\ownClearPage
-		\subsection{Spider diagram 2}
-		\loadTex{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage}
-	}{}
-	
 }{}
 
 \checkFile{appendixImage.tex}{}{}

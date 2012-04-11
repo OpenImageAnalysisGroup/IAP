@@ -109,55 +109,62 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	return(colnames(dataSet)[!colnames(dataSet) %in% withoutColNamesVector])
 }
 
-#overallOutlierDetection <- function(overallList) {
-#	overallList$debug %debug% "overallOutlierDetection()"	
-#	
-#	
-#	workingDataSet <- overallList$iniDataSet[,colnames(overallList$iniDataSet) != c(overallList$treatment, overallList$secondTreatment, overallList$xAxis)]
-#	aq.plot(workingDataSet, alpha=0.1)
-#	
-##	sehr gut
-#	# create data:
-#	set.seed(134)
-#	x <- cbind(rnorm(80), rnorm(80), rnorm(80))
-#	y <- cbind(rnorm(10, 5, 1), rnorm(10, 5, 1), rnorm(10, 5, 1))
-#	z <- rbind(x,y)
-## execute:
-#	aq.plot(z, alpha=0.05)
-#	
-#	
-#	###################
-#
-#	data(humus)
-#	res <-chisq.plot(log(humus[,c("Co","Cu","Ni")]))
-#	res <-chisq.plot(z)
-#	res$outliers # these are the potential outliers
-#	
-#	################
-#	
-#	
-#	# create data:
-#	x <- cbind(rnorm(100), rnorm(100))
-#	y <- cbind(rnorm(10, 5, 1), rnorm(10, 5, 1))
-#	z <- rbind(x,y)
-## execute:
-#	color.plot(z, quan=0.75)
-#	
-#	################
-#	
-#	# create data:
-#	x <- cbind(rnorm(100), rnorm(100))
-#	y <- cbind(rnorm(10, 3, 1), rnorm(10, 3, 1))
-#	z <- rbind(x,y)
-## execute:
-#	dd.plot(z)
-#
-#	##################
-#
-## Geostatistical data:
-#	data(humus) # Load humus data
-#	uni.plot(log(humus[, c("As", "Cd", "Co", "Cu", "Mg", "Pb", "Zn")]),symb=TRUE)
-#}
+overallOutlierDetection <- function(overallList) {
+	overallList$debug %debug% "overallOutlierDetection()"	
+	
+	
+	workingDataSet <- overallList$iniDataSet[,!colnames(overallList$iniDataSet) %in% c(overallList$treatment, overallList$secondTreatment, overallList$xAxis)]
+	workingDataSet[is.na(workingDataSet)] <- 0
+
+	
+	test <- cbind(overallList$iniDataSet[overallList$xAxis], workingDataSet[,1])
+	test2 <- cbind(workingDataSet[,c(1,21,22)])
+	aq.plot(test2, alpha=0.1)
+	color.plot(test, quan=0.75)
+	
+	
+#	sehr gut
+	# create data:
+	set.seed(134)
+	x <- cbind(rnorm(80), rnorm(80), rnorm(80))
+	y <- cbind(rnorm(10, 5, 1), rnorm(10, 5, 1), rnorm(10, 5, 1))
+	z <- rbind(x,y)
+# execute:
+	aq.plot(z, alpha=0.05)
+	
+	
+	###################
+
+	data(humus)
+	res <-chisq.plot(log(humus[,c("Co","Cu","Ni")]))
+	res <-chisq.plot(z)
+	res$outliers # these are the potential outliers
+	
+	################
+	
+#	geht nur mit zwei dimensionen
+	# create data:
+	x <- cbind(rnorm(100), rnorm(100))
+	y <- cbind(rnorm(10, 5, 1), rnorm(10, 5, 1))
+	z <- rbind(x,y)
+# execute:
+	color.plot(z, quan=0.75)
+	
+	################
+	
+	# create data:
+	x <- cbind(rnorm(100), rnorm(100))
+	y <- cbind(rnorm(10, 3, 1), rnorm(10, 3, 1))
+	z <- rbind(x,y)
+# execute:
+	dd.plot(z)
+
+	##################
+
+# Geostatistical data:
+	data(humus) # Load humus data
+	uni.plot(log(humus[, c("As", "Cd", "Co", "Cu", "Mg", "Pb", "Zn")]),symb=TRUE)
+}
 
 
 loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALSE, useDev=FALSE) {	
@@ -827,7 +834,7 @@ overallGetResultDataFrame <- function(overallList) {
 	colNames = list(colOfXaxis="xAxis", colOfMean="mean", colOfSD="se", colName="name", xAxis=overallList$xAxis)
 	booleanVectorList = buildList(overallList, colNames$colOfXaxis)
 	columnsStandard = c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
-		
+if(TRUE) {		
 	if (sum(!is.na(overallList$nBoxDes)) > 0) {
 		if (overallList$debug) {print("nBoxplot")}
 		columns = c(columnsStandard, check(getVector(overallList$nBoxDes)))
@@ -854,7 +861,8 @@ overallGetResultDataFrame <- function(overallList) {
 	} else {
 		print("All values for stackedBoxplot are 'NA'")
 	}
-	
+}
+
 	if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 		if (overallList$debug) {print("spider plot")}
 		#colNames$colOfMean = check(getVector(overallList$boxSpiderDes))
@@ -1068,8 +1076,8 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray) {
 ######################	
 		
 	if (!as.logical(isGray)) {
-		colorVector = c(brewer.pal(8, "Set1"))
-		#colorVector = c(brewer.pal(7, "Dark2"))
+		#colorVector = c(brewer.pal(8, "Set1"))
+		colorVector = c(brewer.pal(7, "Dark2"))
 		#colorVector = c(brewer.pal(11, "Spectral")) # sometimes very pale colors
 	} else {
 		colorVector = c(brewer.pal(9, "Greys"))
@@ -1586,6 +1594,7 @@ makeSpiderPlotDiagram <- function(h, overallResult, overallDescriptor, overallCo
 #	overallFileName <- overallList$imageFileNames_SpiderPlots
 #	options <- overallList$spiderOptions
 #	diagramTypSave <- "spiderplot"
+#	imagesIndex <- "1"
 	####################	
 	
 	overallList$debug %debug% "makeSpiderPlotDiagram()"
@@ -1598,7 +1607,10 @@ makeSpiderPlotDiagram <- function(h, overallResult, overallDescriptor, overallCo
 		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, diagramTypSave)
 		
 		if (length(overallResult[, 1]) > 0) {
-			PreWorkForMakeBigOverallImageSpin(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave)
+			test <- c("side fluo intensity", "side nir intensity", "side visible hue average value", "top visible hue average value")
+			if(sum(!getVector(overallDesName[[imagesIndex]]) %in% test) > 1) {
+				PreWorkForMakeBigOverallImageSpin(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave)
+			}
 		}
 		#PreWorkForMakeNormalImages(h, overallList)
 	}
@@ -1628,6 +1640,175 @@ PreWorkForMakeBigOverallImageSpin <- function(h, overallResult, overallDescripto
 	}
 }
 
+#
+#linerange
+#plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
+#		geom_line() +
+#		geom_point(aes(color=name), size=3)
+		
+
+plotLineRangeImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
+	################
+#	makeOverallImage = TRUE
+#	legende=TRUE
+#
+#	overallResult <- plotThisValues
+	#################
+	
+	print(overallResult[1,])
+#tempoverallResult <- overallResult
+#overallResult <- tempoverallResult
+	overallList$debug %debug% "plotSpiderImage()"	
+	if (length(overallResult[, 1]) > 0) {		
+		for (positionType in overallList$spiderOptions$typOfGeomBar) {
+			
+#			for(days in unique(overallResult$xAxisfactor)) {
+#				if ("primaerTreatment" %in% colnames(overallResult)) {				
+#						overallResult <- rbind(overallResult, c(NA,NA,2,NA,NA,overallResult$plot[1],days))
+#						
+#					} else {
+#						overallResult <- rbind(overallResult, c(NA,2,NA,NA,overallResult$plot[1],days))
+#					}
+#			}
+			#fill=name,
+			plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
+					geom_line()+
+					geom_point(aes(color=name), size=3)
+			#geom_line(aes())+
+			
+			
+			#geom_bar(width=1, size=0.1)					
+			
+#			if (positionType == "x") {			
+#				plot <- plot + coord_polar(theta="x",expand=TRUE)
+#			} else {
+#				plot <- plot + coord_polar(theta="y", expand=TRUE)
+#			}
+			
+			plot <- plot + 
+					scale_fill_manual(values = overallColor[[imagesIndex]]) +
+					scale_y_continuous(formatter = "comma") +
+					#scale_y_discrete(labels=c(0,0.25,0.5,0.75,1), formatter = "comma") +
+					theme_bw() +
+					opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+							axis.title.x = theme_blank(), 
+							axis.title.y = theme_blank(),
+#									axis.title.y = theme_text(face="bold", size=11, angle=90), 
+							panel.grid.minor = theme_blank(), 
+							panel.border = theme_rect(colour="Grey", size=0.1),
+							axis.text.x = theme_blank()
+					#axis.text.y = theme_blank()
+					) 
+			if (positionType == "y") {
+				plot <- plot + 
+						opts(axis.text.y = theme_blank(),
+								axis.ticks	= theme_blank()	
+						)
+			}	
+			
+			if (!legende) {
+				plot = plot + opts(legend.position="none")
+			} else {
+				plot = plot + 
+						opts(legend.justification = 'bottom', 
+								legend.direction="horizontal",
+								legend.position="bottom",
+								#legend.position=c(0.5,0),
+								legend.title = theme_blank(),
+								legend.key = theme_blank()
+						)
+				
+				
+				if (length(overallColor[[imagesIndex]]) > 3 & length(overallColor[[imagesIndex]]) < 6) {
+					plot = plot + opts(legend.text = theme_text(size=6), 
+							legend.key.size = unit(0.7, "lines")
+					)
+				} else if(length(overallColor[[imagesIndex]]) >= 6) {
+					plot = plot + opts(legend.text = theme_text(size=5), 
+							legend.key.size = unit(0.4, "lines")
+					)
+				} else {
+					plot = plot + opts(legend.text = theme_text(size=11))
+				}	
+			}		
+			
+			if (title != "") {
+				plot = plot + opts(title = title)
+			}
+			
+			if (makeOverallImage) {
+				plot = plot + facet_grid(~ xAxisfactor)
+#				if ("primaerTreatment" %in% colnames(overallResult)) {				
+#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
+#					
+#				} else {
+#					plot = plot + facet_grid(name ~ xAxisfactor)
+#				}
+			}
+			
+			#print(plot)
+			
+			#plot = plot + facet_grid(name ~ xAxisfactor)
+			
+			if (h == 1) {
+				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
+				if (makeOverallImage) {
+					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
+				} else {
+					writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
+				}
+			} else {
+				print(plot)
+			}
+			
+			
+		}
+	}	
+	
+	
+#	ggplot(data=overallResult, aes(x=hist, y=values, fill=hist)) +
+#			geom_bar(width=1)+
+#			geom_bar(width=1, colour="black", show_guid=FALSE)+
+#			coord_polar(theta="x") +
+#		#	xlab(NULL) +
+#		#	ylab("normalized values") +
+#			scale_fill_manual(values = overallColor[[imagesIndex]]) +
+#			scale_y_continuous(formatter = "comma") + 
+#			theme_bw() +
+#			opts( 
+#					plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+#					axis.title.x = theme_blank(), 
+#					axis.title.y = theme_blank(),
+#					#axis.title.x = theme_text(hjust=0, angle=90),
+#					axis.title.y = theme_text(face="bold", size=11, angle=90), 
+#					panel.grid.minor = theme_blank(), 
+#					panel.border = theme_rect(colour="Grey", size=0.1),
+#					axis.text.x = theme_blank()
+#					#axis.text.x = theme_text(hjust=0, angle=90)
+#			) +
+#			#opts(panel.grid.minor = theme_blank())+
+#			#legend.position="bottom",
+#			opts(legend.justification = 'bottom',
+#					#legend.position=c(0.5,0.15),
+#					#legend.direction="horizontal",
+#					legend.direction="vertical",
+#					#legend.position="bottom",
+#					legend.position=c(0.5,0),
+#					legend.title = theme_blank(), 
+#					legend.text = theme_text(size=9),
+#					legend.key.size = unit(0.7, "lines"),
+#					legend.key = theme_blank()
+#			) +
+#			#opts(strip.background = theme_rect(colour = 'purple', fill = 'pink', size = 3, linetype='dashed'))+
+#			#opts(axis.text.x = theme_text(size=6, angle=90)) +
+#			#facet_grid(name ~ xAxisfactor, as.table=TRUE)
+#			facet_grid(primaerTreatment ~ xAxisfactor)
+#			#facet_wrap( name ~ xAxisfactor, nrow=2, drop=FALSE) 
+	
+}
+
+
+
 plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
 ################
 #	makeOverallImage = TRUE
@@ -1636,25 +1817,41 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 #	overallResult <- plotThisValues
 #################
 
-
-
+print(overallResult[1,])
+#tempoverallResult <- overallResult
+#overallResult <- tempoverallResult
 	overallList$debug %debug% "plotSpiderImage()"	
 	if (length(overallResult[, 1]) > 0) {		
 		for (positionType in overallList$spiderOptions$typOfGeomBar) {
 		
-			plot <- ggplot(data=overallResult, aes(x=hist, y=values, fill=hist)) +
-						geom_bar(width=1)
+#			for(days in unique(overallResult$xAxisfactor)) {
+#				if ("primaerTreatment" %in% colnames(overallResult)) {				
+#						overallResult <- rbind(overallResult, c(NA,NA,2,NA,NA,overallResult$plot[1],days))
+#						
+#					} else {
+#						overallResult <- rbind(overallResult, c(NA,2,NA,NA,overallResult$plot[1],days))
+#					}
+#			}
+		#fill=name,
+			plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
+						geom_line(colour="gray")+
+						geom_point(aes(color=name, shape=hist), size=3)
 					
+				
+				
+						#geom_bar(width=1, size=0.1)					
 					
 			if (positionType == "x") {			
-				plot <- plot + coord_polar(theta="x")
+				plot <- plot + coord_polar(theta="x",expand=TRUE)
 			} else {
-				plot <- plot + coord_polar(theta="y")
+				plot <- plot + coord_polar(theta="y", expand=TRUE)
 			}
 				
 				plot <- plot + 
+						scale_shape_manual(values = c(1:length(overallColor[[imagesIndex]]))) +
 						scale_fill_manual(values = overallColor[[imagesIndex]]) +
 						scale_y_continuous(formatter = "comma") +
+						#scale_y_discrete(labels=c(0,0.25,0.5,0.75,1), formatter = "comma") +
 						theme_bw() +
 						opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
 								axis.title.x = theme_blank(), 
@@ -1663,6 +1860,7 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 								panel.grid.minor = theme_blank(), 
 								panel.border = theme_rect(colour="Grey", size=0.1),
 								axis.text.x = theme_blank()
+								#axis.text.y = theme_blank()
 						) 
 			if (positionType == "y") {
 				plot <- plot + 
@@ -1676,7 +1874,7 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 			} else {
 				plot = plot + 
 					   opts(legend.justification = 'bottom', 
-							   legend.direction="vertical",
+							   legend.direction="horizontal",
 							   legend.position="bottom",
 							   #legend.position=c(0.5,0),
 							   legend.title = theme_blank(),
@@ -1689,7 +1887,7 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 							legend.key.size = unit(0.7, "lines")
 					)
 				} else if(length(overallColor[[imagesIndex]]) >= 6) {
-					plot = plot + opts(legend.text = theme_text(size=4), 
+					plot = plot + opts(legend.text = theme_text(size=5), 
 							legend.key.size = unit(0.4, "lines")
 					)
 				} else {
@@ -1702,11 +1900,13 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 			}
 			
 			if (makeOverallImage) {
-				if ("primaerTreatment" %in% colnames(overallResult)) {				
-					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
-				} else {
-					plot = plot + facet_grid(name ~ xAxisfactor)
-				}
+				plot = plot + facet_grid(~ xAxisfactor)
+#				if ("primaerTreatment" %in% colnames(overallResult)) {				
+#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
+#					
+#				} else {
+#					plot = plot + facet_grid(name ~ xAxisfactor)
+#				}
 			}
 			
 			#print(plot)
@@ -1878,7 +2078,7 @@ makeDiagrams <- function(overallList) {
 	run = ifelse(overallList$showResultInR, 2, 1)
 	
 	for (h in 1:run) {
-		
+if(TRUE) {		
 		if (sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {print("nBoxplot...")}
 			makeLinearDiagram(h, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
@@ -1899,7 +2099,7 @@ makeDiagrams <- function(overallList) {
 		} else {
 			print("All values for stacked Boxplot are 'NA'...")
 		}
-
+}
 		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 			if (overallList$debug) {print("Spider plot...")}
 			makeSpiderPlotDiagram(h, overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
@@ -2212,14 +2412,14 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				
 				#spiderplot
 				descriptorSet_spiderplot = c(#"volume.my"
-						"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)",
-						"side.height (mm)$side.width (mm)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)"
+						"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average",
+						"side.height (mm)$side.width (mm)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average"
 
 				)
 				
 				descriptorSetName_spiderplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
-						"height (zoom corrected) (mm)$width (zoom corrected) (mm)$side area (zoom corrected) (mm^2)$top area (zoom corrected) (mm^2)$side fluo intensity$side nir intensity",
-						"height (px)$width (px)$side area (px)$top area (px)$side fluo intensity$side nir intensity"
+						"height (zoom corrected) (mm)$width (zoom corrected) (mm)$side area (zoom corrected) (mm^2)$top area (zoom corrected) (mm^2)$side fluo intensity$side nir intensity$side visible hue average value$top visible hue average value",
+						"height (px)$width (px)$side area (px)$top area (px)$side fluo intensity$side nir intensity$side visible hue average value$top visible hue average value"
 #						"Zoom corrected Spiderchart", 
 #						"Spiderchart"
 				)	
@@ -2485,14 +2685,14 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	
 	#spiderplot
 	descriptorSet_spiderplot = c(#"volume.my"
-			"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)",
-			"side.height (mm)$side.width (mm)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)"
+			"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average",
+			"side.height (mm)$side.width (mm)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average"
 	
 	)
 	
 	descriptorSetName_spiderplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
-			"height (zc) (mm)$width (zc) (mm)$side area (zc) (mm^2)$top area (zc) (mm^2)$side fluo intensity$side nir intensity",
-			"height (px)$width (px)$side area (px)$top area (px)$side fluo intensity$side nir intensity"
+			"height (zc) (mm)$width (zc) (mm)$side area (zc) (mm^2)$top area (zc) (mm^2)$side fluo intensity$side nir intensity$side visible hue average value$top visible hue average value",
+			"height (px)$width (px)$side area (px)$top area (px)$side fluo intensity$side nir intensity$side visible hue average value$top visible hue average value"
 #						"Zoom corrected Spiderchart", 
 #						"Spiderchart"
 	)	
@@ -2607,7 +2807,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #	overallList = reduceWorkingDataSize(overallList)
 #	overallList = setDefaultAxisNames(overallList)
 #	
-#	overallList = overallOutlierDetection(overallList)
+#	#overallList = overallOutlierDetection(overallList)
 #	overallList = overallGetResultDataFrame(overallList)
 #	overallList = setColor(overallList) 
 #	makeDiagrams(overallList)
@@ -2636,5 +2836,5 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))
