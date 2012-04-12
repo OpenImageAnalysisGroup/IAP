@@ -1275,6 +1275,25 @@ createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 	print(paste("create ", typ, " ", actualImage, "/", maxImage, ": '",imageName, "'", sep=""))
 }
 
+renameY <- function(label) {
+	
+	if(length(grep("\\.\\.",label, ignore.case=TRUE)) > 0){
+		label <- sub("\\.\\.", " (",label)
+		label <- paste(substring(label,1,nchar(label)-1),")",sep="")
+	}
+	
+	label <- sub("mm\\.2","mm²",label)	
+	label <- sub("percent", "(%)", label)
+	label <- sub("pixels", "(px)", label)
+	label <- sub("(c p)", "(c/p)", label)
+	label <- gsub("_", "-", label)
+	label <- sub("(relative pix)", "(relative/px)", label)
+	
+	label <- gsub("\\."," ",label)	
+	return(label)		
+}
+
+
 makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot") {
 ########
 #overallResult <- overallList$overallResult_nBoxDes
@@ -1312,8 +1331,16 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 #							print(min(as.numeric(as.character(overallResult$xAxis))))
 #							print(max(as.numeric(as.character(overallResult$xAxis))))
 #							plot <-  plot + 
-							scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis)))) +					
-							ylab(overallDesName[[imagesIndex]]) +
+							scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis))))					
+							
+							if(overallList$appendix) {
+								plot <- plot + ylab(renameY(overallDesName[[imagesIndex]]))
+							} else {
+								plot <- plot + ylab(overallDesName[[imagesIndex]])
+							}
+							
+										
+						plot <- plot +
 							scale_fill_manual(values = overallColor[[imagesIndex]]) +
 							scale_colour_manual(values= overallColor[[imagesIndex]]) +
 							scale_shape_manual(values = c(1:length(overallColor[[imagesIndex]]))) +
@@ -1652,7 +1679,6 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 #	overallResult <- plotThisValues
 #################
 
-print(overallResult[1,])
 #tempoverallResult <- overallResult
 #overallResult <- tempoverallResult
 	overallList$debug %debug% "plotSpiderImage()"	
@@ -2849,5 +2875,5 @@ onlySpider <- FALSE
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))
