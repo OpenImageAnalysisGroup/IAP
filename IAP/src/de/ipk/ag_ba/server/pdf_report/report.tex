@@ -272,7 +272,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \ifthenelse{\boolean{isFile1}}{
 
 	\clearpage
-	\section{\noindent Weight and water consumption}
+	\section{\noindent Weights and water consumption}
 		
 	\checkFile{Weight_A__g_nboxplot.pdf}{Weight_B__g_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
@@ -294,7 +294,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\ifthenelse{\boolean{isFile1}}{
 		\subsection{Watering amounts / consumption}
 		\begin{itemize}
-		\item Consumption of water based of weight measurments.
+		\item Consumption of water based on weight differences.
 		\item Colnum name: Watering (weight-diff)
 		\item Unit: g
 		\end{itemize}
@@ -305,26 +305,28 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \resetBoolean
 \checkFileNoReset{side_height__mm__side_width__mm__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
 \checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
+% \checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
+% \checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
 	\resetClear
 	\clearpage
 	\section{Properties - Overview}
 	
-	\checkFile{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
-	\ifthenelse{\boolean{isFile1}}{
-
+	
+	\resetBoolean
+	\checkFileNoReset{side_height__mm__side_width__mm__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
+	\checkFileNoReset{}{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}
+	\ifthenelse{\boolean{isFile2}}{
 		\ownClearPage
-		\subsection{Growth parameters, fluorescence, near-infrared and visible light
-		color}
+		\subsection{Growth parameters, fluorescence, near-infrared and visible light color (zoom corrected)}
 		\loadTex{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage}
 	}{
-	
-		\ownClearPage
-		\subsection{Growth parameters, fluorescence, near-infrared and visible light
-		color}
-		\loadTex{side_height__mm__side_width__mm__side_area__px__top_area__px__side_fluspiderOverallImage}
-
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPage
+			\subsection{Growth parameters, fluorescence, near-infrared and visible light color}
+			\loadTex{side_height__mm__side_width__mm__side_area__px__top_area__px__side_fluspiderOverallImage}
+		}{}
 	}	
 }{}
 
@@ -350,7 +352,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\ownClearPage
 		\subsection{IAP formula}
 		\begin{itemize}
-		\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area_{average}}$
+		\item Equation: $Biomass_{IAP}=\sqrt{side.area_{average}^{2}*top.area}$
 		\item Column name: volume.iap
 		\end{itemize}
 		\ifthenelse{\boolean{isFile1}}{
@@ -695,7 +697,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 
 	\resetClear
 	\clearpage
-	\section{Visible light color}
+	\section{Visible light color shades}
 	\begin{itemize}
 	\item HUE means the color as color angle of the color circle (e. g. 0$^\circ$
 	= red, 120$^\circ$ = green, 240$^\circ$ = blue)
@@ -714,17 +716,14 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	
 	%%side.vis.hue.average
 		\ownClearPage
-		\subsection{Average HUE}
+		\subsection{Average hue}
 		
 		\ifthenelse{\boolean{isFile1}}{
-			Visible hue average histogram for side view:
 			\loadImage{side_vis_hue_averagenboxplot.pdf}
 		}{}	
 		
 	%%top.vis.hue.average
-		\ifthenelse{\boolean{isFile2}}{
-			Visible hue average histogram for top view:
-			
+		\ifthenelse{\boolean{isFile2}}{		
 			\loadImage{top_vis_hue_averagenboxplot.pdf}
 		}{}
 	}{}
@@ -733,15 +732,15 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\resetBoolean
 	\checkFileNoReset{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
 	\checkFileNoReset{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
-	\checkFileNoReset{}{side_vis_normalized_histogram_ratio_bin_.tex}{}
+	\checkFileNoReset{}{side_vis_normalized_histogram_ratio_bin_stackedOverallImage.tex}{}
 	%\checkFileNoReset{}{side_vis_normalized_histogram_ratio_bin_.tex}{}
 	\ifthenelse{\boolean{isFile2}}{
 				
 		%\checkFile{side_vis_normalized_histogram_ratio_bin_.tex}{}{}
 		\ownClearPage
 		\subsection{Color histogram (zoom corrected)}
-		Visible hue histogram (zoom corrected) for side view:
-		\loadTex{side_vis_normalized_histogram_ratio_bin_}
+		Visible light color histogram (zoom corrected) for side view (hue):
+		\loadTex{side_vis_normalized_histogram_ratio_bin_stackedOverallImage}
 	
 	}{
 		\ifthenelse{\boolean{isFile1}}{
@@ -750,12 +749,12 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 			\subsection{Color histogram}
 			\checkFile{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}
 			\ifthenelse{\boolean{isFile1}}{
-				Visible hue histogram for side view:
+				Visible light color histogram for side view (hue):
 				\loadTex{side_vis_hue_histogram_ratio_bin_stackedOverallImage}
 			}{}	
 			\ifthenelse{\boolean{isFile2}}{
 			
-				Visible hue histogram for top view:
+				Visible light color histogram for top view (hue):
 				
 				\loadTex{top_vis_hue_histogram_ratio_bin_stackedOverallImage}
 			}{}
@@ -767,7 +766,10 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \resetBoolean
 \checkFileNoReset{side_fluo_histogram_bin_stackedOverallImage.tex}{}{}
 \checkFileNoReset{top_fluo_histogram_bin_stackedOverallImage.tex}{}{}
-\checkFileNoReset{side_fluo_normalized_histogram_bin_stackedOverallImage.pdf}{}{}
+\checkFileNoReset{side_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{side_fluo_intensity_average__relative_nboxplot.pdf}{}{}
+\checkFileNoReset{top_fluo_intensity_average__relative___pix_nboxplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
 	\resetClear
@@ -778,18 +780,12 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 		
 		\ownClearPage
-		\subsection{Average Fluo intensity}
+		\subsection{Average fluorescence activity intensity}
 
 		\ifthenelse{\boolean{isFile1}}{
-		
-			Average Fluorescence intensity for side view:
-		
 			\loadImage{side_fluo_intensity_average__relative_nboxplot.pdf}
 		}{}
 		\ifthenelse{\boolean{isFile2}}{
-		
-			Average Fluorescence intensity for top view:
-			
 			\loadImage{top_fluo_intensity_average__relative___pix_nboxplot.pdf}
 		}{}
 	}{}
@@ -873,6 +869,10 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 \checkFileNoReset{side_nir_histogram_bin_stackedOverallImage.tex}{}{}
 \checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}{}
 \checkFileNoReset{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{side_nir_intensity_average__relative_nboxplot.pdf}{}{}
+\checkFileNoReset{top_nir_intensity_average__relative___pix_nboxplot.pdf}{}{}
+
 \ifthenelse{\boolean{isFile1}}{
 
 	\resetClear
@@ -882,15 +882,13 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\checkFile{side_nir_intensity_average__relative_nboxplot.pdf}{top_nir_intensity_average__relative___pix_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 		\ownClearPage
-		\subsection{Average NIR intensity}
-
-		\ifthenelse{\boolean{isFile1}}{
+		\subsection{Average near-infrared intensity}
 		
+		\ifthenelse{\boolean{isFile1}}{	
 			Average NIR intensity for side view:
 			\loadImage{side_nir_intensity_average__relative_nboxplot.pdf}
 		}{}
 		\ifthenelse{\boolean{isFile2}}{
-		
 			Average NIR intensity for top view:
 			\loadImage{top_nir_intensity_average__relative___pix_nboxplot.pdf}
 		}{}
@@ -903,13 +901,7 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\checkFileNoReset{}{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
 	\checkFileNoReset{}{top_nir_histogram_bin_stackedOverallImage.tex}{}
 	\ifthenelse{\boolean{isFile2}}{
-			
-		
-		
-		
-		
-		
-		
+
 			\ownClearPage
 			\subsection{Intensity histogram (zoom corrected)}
 			\begin{itemize}
@@ -1096,15 +1088,15 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 	\clearpage
 	\section{Convex hull}
 
-	In mathematics, the convex hull or convex envelope for a set of points X in a
+	"In mathematics, the convex hull or convex envelope for a set of points X in a
 	real vector space V (for example, usual 2- or 3-dimensional space) is the
 	minimal convex set containing X. When the set X is a finite subset of the
 	plane, we may imagine stretching a rubber band so that it surrounds the entire
 	set X and then releasing it, allowing it to contract; when it becomes taut, it
-	encloses the convex hull of X.
+	encloses the convex hull of X."
 	
  	\begin{tiny}
- 	Wikipedia contributors, "Convex hull,"
+ 	Wikipedia contributors, "Convex hull",
  	Wikipedia, The Free Encyclopedia,
 	\url{http://en.wikipedia.org/w/index.php?title=Convex_hull&oldid=482955324}
 	(accessed March 30, 2012).
@@ -1124,19 +1116,12 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
  		\ownClearPage
  		\subsection{Side}
 
-		\checkFile{side_hull_area__px_nboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
-			\ownClearPageSub
-			\subsubsection{Area}
-			\begin{itemize}
-			\item Area which is enclosed of the convex hull
-			\item Unit: px
-			\end{itemize}
-			\loadImage{side_hull_area__px_nboxplot.pdf}
-		}{}
 
-		\checkFile{side_hull_area_norm__mm_2_nboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
+		\resetBoolean
+		\checkFileNoReset{side_hull_area__px_nboxplot.pdf}{}{}
+		\checkFileNoReset{}{side_hull_area_norm__mm_2_nboxplot.pdf}{}
+		\ifthenelse{\boolean{isFile2}}{
+
 			\ownClearPageSub
 			\subsubsection{Area (zoom corrected)}
 			\begin{itemize}
@@ -1144,21 +1129,24 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 			\item Unit: px
 			\end{itemize}
 			\loadImage{side_hull_area_norm__mm_2_nboxplot.pdf}
-		}{}
+		}{
+			\ifthenelse{\boolean{isFile1}}{
+				\ownClearPageSub
+				\subsubsection{Area}
+				\begin{itemize}
+				\item Area which is enclosed of the convex hull
+				\item Unit: px
+				\end{itemize}
+				\loadImage{side_hull_area__px_nboxplot.pdf}
+			}{}
+		}
+		
 
-		\checkFile{side_hull_pc1nboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
-			\ownClearPageSub
-			\subsubsection{PC1 - maximum distance}
-			\begin{itemize}
-			\item Maximum extension of the plant
-			\item Unit: px
-			\end{itemize}
-			\loadImage{side_hull_pc1nboxplot.pdf}
-		}{}
-
-		\checkFile{side_hull_pc1_normnboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
+		\resetBoolean
+		\checkFileNoReset{side_hull_pc1nboxplot.pdf}{}{}
+		\checkFileNoReset{}{side_hull_pc1_normnboxplot.pdf}{}
+		\ifthenelse{\boolean{isFile2}}{
+		
 			\ownClearPageSub
 			\subsubsection{PC1 - maximum distance (zoom corrected)}
 			\begin{itemize}
@@ -1166,21 +1154,26 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 			\item Unit: mm
 			\end{itemize}
 			\loadImage{side_hull_pc1_normnboxplot.pdf}
-		}{}
+			
+		}{
+			\ifthenelse{\boolean{isFile1}}{
+				
+				\ownClearPageSub
+				\subsubsection{PC1 - maximum distance}
+				\begin{itemize}
+				\item Maximum extension of the plant
+				\item Unit: px
+				\end{itemize}
+				\loadImage{side_hull_pc1nboxplot.pdf}
+			}{}	
+		}
 
-		\checkFile{side_hull_pc2nboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
-			\ownClearPageSub
-			\subsubsection{PC2 - Opposite direction maxmium distance}
-			\begin{itemize}
-			\item Opposite direction of the maximum extension of the plant
-			\item Unit: px
-			\end{itemize}
-			\loadImage{side_hull_pc2nboxplot.pdf}
-		}{}
-
-		\checkFile{side_hull_pc2_normnboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
+		
+		\resetBoolean
+		\checkFileNoReset{side_hull_pc2nboxplot.pdf}{}{}
+		\checkFileNoReset{}{side_hull_pc2_normnboxplot.pdf}{}
+		\ifthenelse{\boolean{isFile2}}{
+			
 			\ownClearPageSub
 			\subsubsection{PC2 - Opposite direction maxmium distance (zoom corrected)}
 			\begin{itemize}
@@ -1188,12 +1181,24 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 			\item Unit: mm
 			\end{itemize}
 			\loadImage{side_hull_pc2_normnboxplot.pdf}
-		}{}
+
+		}{
+			\ifthenelse{\boolean{isFile1}}{
+				\ownClearPageSub
+				\subsubsection{PC2 - Opposite direction maxmium distance}
+				\begin{itemize}
+				\item Opposite direction of the maximum extension of the plant
+				\item Unit: px
+				\end{itemize}
+				\loadImage{side_hull_pc2nboxplot.pdf}
+			}{}
+		}
+				
 
 		\checkFile{side_hull_fillgrade__percent_nboxplot.pdf}{}{}
 		\ifthenelse{\boolean{isFile1}}{
 			\ownClearPageSub
-			\subsubsection{PC2 - Opposite direction maxmium distance}
+			\subsubsection{Fillgrade}
 			\begin{itemize}
 			\item Ratio of the area of the whole convex hull and the area of the plant
 			(green pixel)
@@ -1218,19 +1223,11 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 		\ownClearPage
 		\subsection{Top}
 
-		\checkFile{top_hull_area__px_nboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
-			\ownClearPageSub
-			\subsubsection{Area}
-			\begin{itemize}
-			\item Area which is enclosed of the convex hull
-			\item Unit: px
-			\end{itemize}
-			\loadImage{top_hull_area__px_nboxplot.pdf}
-		}{}
-
-		\checkFile{top_hull_area_norm__mm_2_nboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
+		\resetBoolean
+		\checkFileNoReset{top_hull_area__px_nboxplot.pdf}{}{}
+		\checkFileNoReset{}{top_hull_area_norm__mm_2_nboxplot.pdf}{}
+		\ifthenelse{\boolean{isFile2}}{
+		
 			\ownClearPageSub
 			\subsubsection{Area (zoom corrected)}
 			\begin{itemize}
@@ -1238,21 +1235,24 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 			\item Unit: px
 			\end{itemize}
 			\loadImage{top_hull_area_norm__mm_2_nboxplot.pdf}
-		}{}
+		}{
+			\ifthenelse{\boolean{isFile1}}{
+				\ownClearPageSub
+				\subsubsection{Area}
+				\begin{itemize}
+				\item Area which is enclosed of the convex hull
+				\item Unit: px
+				\end{itemize}
+				\loadImage{top_hull_area__px_nboxplot.pdf}	
+			}{}
+		}
 
-		\checkFile{top_hull_pc1nboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
-			\ownClearPageSub
-			\subsubsection{PC1 - maximum distance}
-			\begin{itemize}
-			\item Maximum extension of the plant
-			\item Unit: px
-			\end{itemize}
-			\loadImage{top_hull_pc1nboxplot.pdf}
-		}{}
 
-		\checkFile{top_hull_pc1_normnboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
+		\resetBoolean
+		\checkFileNoReset{top_hull_pc1nboxplot.pdf}{}{}
+		\checkFileNoReset{}{top_hull_pc1_normnboxplot.pdf}{}
+		\ifthenelse{\boolean{isFile2}}{
+			
 			\ownClearPageSub
 			\subsubsection{PC1 - maximum distance (zoom corrected)}
 			\begin{itemize}
@@ -1260,21 +1260,25 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 			\item Unit: mm
 			\end{itemize}
 			\loadImage{top_hull_pc1_normnboxplot.pdf}
-		}{}
 
-		\checkFile{top_hull_pc2nboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
-			\ownClearPageSub
-			\subsubsection{PC2 - Opposite direction maxmium distance}
-			\begin{itemize}
-			\item Opposite direction of the maximum extension of the plant
-			\item Unit: px
-			\end{itemize}
-			\loadImage{top_hull_pc2nboxplot.pdf}
-		}{}
+		}{
+			\ifthenelse{\boolean{isFile1}}{
+				\ownClearPageSub
+				\subsubsection{PC1 - maximum distance}
+				\begin{itemize}
+				\item Maximum extension of the plant
+				\item Unit: px
+				\end{itemize}
+				\loadImage{top_hull_pc1nboxplot.pdf}
+			}{}
+		}
 
-		\checkFile{top_hull_pc2_normnboxplot.pdf}{}{}
-		\ifthenelse{\boolean{isFile1}}{
+		
+		\resetBoolean
+		\checkFileNoReset{top_hull_pc2nboxplot.pdf}{}{}
+		\checkFileNoReset{}{top_hull_pc2_normnboxplot.pdf}{}
+		\ifthenelse{\boolean{isFile2}}{
+		
 			\ownClearPageSub
 			\subsubsection{PC2 - Opposite direction maxmium distance (zoom corrected)}
 			\begin{itemize}
@@ -1282,12 +1286,23 @@ ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
 			\item Unit: mm
 			\end{itemize}
 			\loadImage{top_hull_pc2_normnboxplot.pdf}
-		}{}
+
+		}{
+			\ifthenelse{\boolean{isFile1}}{
+				\ownClearPageSub
+				\subsubsection{PC2 - Opposite direction maxmium distance}
+				\begin{itemize}
+				\item Opposite direction of the maximum extension of the plant
+				\item Unit: px
+				\end{itemize}
+				\loadImage{top_hull_pc2nboxplot.pdf}
+			}{}
+		}
 
 		\checkFile{top_hull_fillgrade__percent_nboxplot.pdf}{}{}
 		\ifthenelse{\boolean{isFile1}}{
 			\ownClearPageSub
-			\subsubsection{PC2 - Opposite direction maxmium distance}
+			\subsubsection{Fillgrade}
 			\begin{itemize}
 			\item Ratio of the area of the whole convex hull and the area of the plant
 			(``green pixel'')
