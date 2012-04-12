@@ -1282,7 +1282,7 @@ renameY <- function(label) {
 		label <- paste(substring(label,1,nchar(label)-1),")",sep="")
 	}
 	
-	label <- sub("mm\\.2","mm²",label)	
+	label <- sub("mm\\.2","mm^2",label)	
 	label <- sub("percent", "(%)", label)
 	label <- sub("pixels", "(px)", label)
 	label <- sub("(c p)", "(c/p)", label)
