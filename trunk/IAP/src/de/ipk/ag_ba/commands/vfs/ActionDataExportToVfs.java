@@ -71,7 +71,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private boolean includeMainImages = true;
 	private boolean includeReferenceImages = true;
 	private boolean includeAnnotationImages = true;
-	private VirtualFileSystemVFS2 vfs;
+	private final VirtualFileSystemVFS2 vfs;
 	
 	public ActionDataExportToVfs(MongoDB m,
 			ExperimentReference experimentReference, VirtualFileSystemVFS2 vfs) {
@@ -595,7 +595,14 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						if (url != null) {
 							url.setPrefix(vfs.getPrefix());
 							url.setDetail("");
-							url.setFileName(vfs.getResultPathNameForUrl() + "#"
+							String path = hsmManager
+									.prepareAndGetDataFileNameAndPath(
+											experiment.getHeader(), t,
+											targetFile.getName());
+							path = path.substring(hsmManager.getPath().length() + File.separator.length());
+							url.setDetail(path.substring(0, path.lastIndexOf(File.separator)));
+							path = path.substring(path.lastIndexOf(File.separator) + File.separator.length());
+							url.setFileName(path + "#"
 									+ extractLastFileName(url.getFileName()));
 						}
 						if (optPostProcess != null)

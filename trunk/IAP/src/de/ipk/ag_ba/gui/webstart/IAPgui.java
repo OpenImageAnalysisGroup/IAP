@@ -190,7 +190,7 @@ public class IAPgui {
 		for (NavigationButton ne : actionPanel.getEntitySet(target.length() > 0)) {
 			knownEntities.put(ne.getTitle(), ne);
 			if (ne.getTitle().contains("(")) {
-				knownEntities.put(ne.getTitle().substring(0, ne.getTitle().lastIndexOf("(")).trim(), ne);
+				knownEntities.put(MyNavigationPanel.replaceBadChars(ne.getTitle().substring(0, ne.getTitle().lastIndexOf("(")).trim()), ne);
 			}
 		}
 		String thisTarget = target.split("\\.", 2)[0];

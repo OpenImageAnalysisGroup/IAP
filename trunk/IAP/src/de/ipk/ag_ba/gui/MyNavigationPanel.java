@@ -353,11 +353,15 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		for (NavigationButton ne : set) {
 			if (ne.isProcessing())
 				return null;
-			path.add(ne.getTitle());
+			path.add(replaceBadChars(ne.getTitle()));
 			if (ne == finalTarget)
 				break;
 		}
 		return StringManipulationTools.getStringList(path, ".");
+	}
+	
+	public static String replaceBadChars(String title) {
+		return StringManipulationTools.stringReplace(title, ".", "_");
 	}
 	
 	public static String getTargetPath(Collection<NavigationButton> buttons) {
