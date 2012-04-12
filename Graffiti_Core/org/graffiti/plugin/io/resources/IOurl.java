@@ -17,7 +17,7 @@ public class IOurl {
 			prefix = url.substring(0, url.indexOf("://"));
 			url = url.substring(url.indexOf("://") + "://".length());
 		} else
-			prefix = FileSystemHandler.PREFIX;
+			prefix = FileSystemHandler.DEFAULT_PREFIX;
 		if (url.lastIndexOf("/") > 0) {
 			detail = url.substring(0, url.lastIndexOf(SEPERATOR));
 			url = url.substring(url.lastIndexOf(SEPERATOR) + SEPERATOR.length());
