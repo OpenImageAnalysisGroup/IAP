@@ -89,7 +89,7 @@ public abstract class VirtualFileSystem {
 		this.desiredIcon = icon;
 	}
 	
-	private ArrayList<NavigationAction> additionalNavigationActions = new ArrayList<NavigationAction>();
+	private final ArrayList<NavigationAction> additionalNavigationActions = new ArrayList<NavigationAction>();
 	private String desiredIcon = null;
 	
 	private void addNavigationAction(ActionToggleSettingDefaultIsFalse navAction) {
@@ -107,11 +107,6 @@ public abstract class VirtualFileSystem {
 	public abstract String getTargetPathName();
 	
 	public abstract String getPrefix();
-	
-	public String getResultPathNameForUrl() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	/**
 	 * @return List of file names found at root of VFS source
