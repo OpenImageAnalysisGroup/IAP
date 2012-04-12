@@ -1097,7 +1097,8 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray) {
 		for (n in names(descriptorList)) {
 			#if (!is.na(descriptorList[[n]])) {
 			if (sum(!is.na(descriptorList[[n]])) > 0) {
-				colorList[[n]] = colorRampPalette(colorVector)(length(descriptorList[[n]][,1]))
+				#colorList[[n]] = colorRampPalette(colorVector)(length(descriptorList[[n]][,1]))
+				colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
 			} else {
 				#print("All values are 'NA'")
 			}
@@ -1640,12 +1641,182 @@ PreWorkForMakeBigOverallImageSpin <- function(h, overallResult, overallDescripto
 	}
 }
 
+
+
+
+plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
+################
+#	makeOverallImage = TRUE
+#	legende=TRUE
+#
+#	overallResult <- plotThisValues
+#################
+
+print(overallResult[1,])
+#tempoverallResult <- overallResult
+#overallResult <- tempoverallResult
+	overallList$debug %debug% "plotSpiderImage()"	
+	if (length(overallResult[, 1]) > 0) {		
+		for (positionType in overallList$spiderOptions$typOfGeomBar) {
+			#for(typ in )
+#			for(days in unique(overallResult$xAxisfactor)) {
+#				if ("primaerTreatment" %in% colnames(overallResult)) {				
+#						overallResult <- rbind(overallResult, c(NA,NA,2,NA,NA,overallResult$plot[1],days))
+#						
+#					} else {
+#						overallResult <- rbind(overallResult, c(NA,2,NA,NA,overallResult$plot[1],days))
+#					}
+#			}
+		#fill=name,			
+			numberOfHist <- length(unique(overallResult$hist))	
+			plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
+						geom_line(colour="gray")+
+						scale_shape_manual(values = c(1:numberOfHist), name="Property") +
+						geom_point(aes(color=as.character(name), shape=hist), size=3) +
+						scale_colour_manual(name="Condition", values=overallColor[[imagesIndex]])
+					
+				
+				
+						#geom_bar(width=1, size=0.1)					
+					
+			if (positionType == "x") {			
+				plot <- plot + coord_polar(theta="x",expand=TRUE)
+			} else {
+				plot <- plot + coord_polar(theta="y", expand=TRUE)
+			}
+				
+				plot <- plot + 
+						
+						#scale_fill_manual(values = overallColor[[imagesIndex]], name="Condition") +
+						#scale_colour_manual(name="Condition")+
+						#scale_linetype_manual(name="Condition")
+						scale_y_continuous(formatter = "comma") +
+						#scale_y_discrete(labels=c(0,0.25,0.5,0.75,1), formatter = "comma") +
+						theme_bw() +
+						opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+								axis.title.x = theme_blank(), 
+								axis.title.y = theme_blank(),
+#								axis.title.y = theme_text(face="bold", size=11, angle=90), 
+								panel.grid.minor = theme_blank(), 
+								panel.border = theme_rect(colour="Grey", size=0.1),
+								axis.text.x = theme_blank()
+								#axis.text.y = theme_blank()
+						) 
+			if (positionType == "y") {
+				plot <- plot + 
+						opts(axis.text.y = theme_blank(),
+								axis.ticks	= theme_blank()	
+						)
+			}	
+				
+			if (!legende) {
+				plot = plot + opts(legend.position="none")
+			} else {
+				plot = plot + 
+					   opts(#legend.justification = 'bottom', 
+							   legend.direction="vertical",
+							   legend.position="bottom",
+							   #legend.position=c(0.5,0),
+							  # legend.title = theme_blank(),
+							   legend.key = theme_blank()
+			   			)
+				
+				
+#				if (numberOfHist > 3 & numberOfHist < 10) {
+#					plot = plot + opts(legend.text = theme_text(size=6), 
+#							legend.key.size = unit(0.7, "lines")
+#					)
+#				} else if(numberOfHist >= 10) {
+#					plot = plot + opts(legend.text = theme_text(size=5), 
+#							legend.key.size = unit(0.3, "lines")
+#					)
+#				} else {
+#					plot = plot + opts(legend.text = theme_text(size=11))
+#				}	
+			}		
+			
+			if (title != "") {
+				plot = plot + opts(title = title)
+			}
+			
+			if (makeOverallImage) {
+				plot = plot + facet_grid(~ xAxisfactor)
+#				if ("primaerTreatment" %in% colnames(overallResult)) {				
+#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
+#					
+#				} else {
+#					plot = plot + facet_grid(name ~ xAxisfactor)
+#				}
+			}
+			
+			print(plot)
+			
+			#plot = plot + facet_grid(name ~ xAxisfactor)
+			
+			if (h == 1) {
+				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
+				if (makeOverallImage) {
+					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
+				} else {
+					writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
+				}
+			} else {
+				print(plot)
+			}
+		
+		
+		}
+	}	
+		
+		
+#	ggplot(data=overallResult, aes(x=hist, y=values, fill=hist)) +
+#			geom_bar(width=1)+
+#			geom_bar(width=1, colour="black", show_guid=FALSE)+
+#			coord_polar(theta="x") +
+#		#	xlab(NULL) +
+#		#	ylab("normalized values") +
+#			scale_fill_manual(values = overallColor[[imagesIndex]]) +
+#			scale_y_continuous(formatter = "comma") + 
+#			theme_bw() +
+#			opts( 
+#					plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+#					axis.title.x = theme_blank(), 
+#					axis.title.y = theme_blank(),
+#					#axis.title.x = theme_text(hjust=0, angle=90),
+#					axis.title.y = theme_text(face="bold", size=11, angle=90), 
+#					panel.grid.minor = theme_blank(), 
+#					panel.border = theme_rect(colour="Grey", size=0.1),
+#					axis.text.x = theme_blank()
+#					#axis.text.x = theme_text(hjust=0, angle=90)
+#			) +
+#			#opts(panel.grid.minor = theme_blank())+
+#			#legend.position="bottom",
+#			opts(legend.justification = 'bottom',
+#					#legend.position=c(0.5,0.15),
+#					#legend.direction="horizontal",
+#					legend.direction="vertical",
+#					#legend.position="bottom",
+#					legend.position=c(0.5,0),
+#					legend.title = theme_blank(), 
+#					legend.text = theme_text(size=9),
+#					legend.key.size = unit(0.7, "lines"),
+#					legend.key = theme_blank()
+#			) +
+#			#opts(strip.background = theme_rect(colour = 'purple', fill = 'pink', size = 3, linetype='dashed'))+
+#			#opts(axis.text.x = theme_text(size=6, angle=90)) +
+#			#facet_grid(name ~ xAxisfactor, as.table=TRUE)
+#			facet_grid(primaerTreatment ~ xAxisfactor)
+#			#facet_wrap( name ~ xAxisfactor, nrow=2, drop=FALSE) 
+			
+}
+
+
 #
 #linerange
 #plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
 #		geom_line() +
 #		geom_point(aes(color=name), size=3)
-		
+
 
 plotLineRangeImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
 	################
@@ -1805,169 +1976,6 @@ plotLineRangeImage <- function(h, overallList, overallResult, title = "", makeOv
 #			facet_grid(primaerTreatment ~ xAxisfactor)
 #			#facet_wrap( name ~ xAxisfactor, nrow=2, drop=FALSE) 
 	
-}
-
-
-
-plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
-################
-#	makeOverallImage = TRUE
-#	legende=TRUE
-#
-#	overallResult <- plotThisValues
-#################
-
-print(overallResult[1,])
-#tempoverallResult <- overallResult
-#overallResult <- tempoverallResult
-	overallList$debug %debug% "plotSpiderImage()"	
-	if (length(overallResult[, 1]) > 0) {		
-		for (positionType in overallList$spiderOptions$typOfGeomBar) {
-		
-#			for(days in unique(overallResult$xAxisfactor)) {
-#				if ("primaerTreatment" %in% colnames(overallResult)) {				
-#						overallResult <- rbind(overallResult, c(NA,NA,2,NA,NA,overallResult$plot[1],days))
-#						
-#					} else {
-#						overallResult <- rbind(overallResult, c(NA,2,NA,NA,overallResult$plot[1],days))
-#					}
-#			}
-		#fill=name,
-			plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
-						geom_line(colour="gray")+
-						geom_point(aes(color=name, shape=hist), size=3)
-					
-				
-				
-						#geom_bar(width=1, size=0.1)					
-					
-			if (positionType == "x") {			
-				plot <- plot + coord_polar(theta="x",expand=TRUE)
-			} else {
-				plot <- plot + coord_polar(theta="y", expand=TRUE)
-			}
-				
-				plot <- plot + 
-						scale_shape_manual(values = c(1:length(overallColor[[imagesIndex]]))) +
-						scale_fill_manual(values = overallColor[[imagesIndex]]) +
-						scale_y_continuous(formatter = "comma") +
-						#scale_y_discrete(labels=c(0,0.25,0.5,0.75,1), formatter = "comma") +
-						theme_bw() +
-						opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
-								axis.title.x = theme_blank(), 
-								axis.title.y = theme_blank(),
-#								axis.title.y = theme_text(face="bold", size=11, angle=90), 
-								panel.grid.minor = theme_blank(), 
-								panel.border = theme_rect(colour="Grey", size=0.1),
-								axis.text.x = theme_blank()
-								#axis.text.y = theme_blank()
-						) 
-			if (positionType == "y") {
-				plot <- plot + 
-						opts(axis.text.y = theme_blank(),
-								axis.ticks	= theme_blank()	
-						)
-			}	
-				
-			if (!legende) {
-				plot = plot + opts(legend.position="none")
-			} else {
-				plot = plot + 
-					   opts(legend.justification = 'bottom', 
-							   legend.direction="vertical",
-							   legend.position="bottom",
-							   #legend.position=c(0.5,0),
-							  # legend.title = theme_blank(),
-							   legend.key = theme_blank()
-			   			)
-				
-				
-				if (length(overallColor[[imagesIndex]]) > 3 & length(overallColor[[imagesIndex]]) < 6) {
-					plot = plot + opts(legend.text = theme_text(size=6), 
-							legend.key.size = unit(0.7, "lines")
-					)
-				} else if(length(overallColor[[imagesIndex]]) >= 6) {
-					plot = plot + opts(legend.text = theme_text(size=5), 
-							legend.key.size = unit(0.3, "lines")
-					)
-				} else {
-					plot = plot + opts(legend.text = theme_text(size=11))
-				}	
-			}		
-			
-			if (title != "") {
-				plot = plot + opts(title = title)
-			}
-			
-			if (makeOverallImage) {
-				plot = plot + facet_grid(~ xAxisfactor)
-#				if ("primaerTreatment" %in% colnames(overallResult)) {				
-#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
-#					
-#				} else {
-#					plot = plot + facet_grid(name ~ xAxisfactor)
-#				}
-			}
-			
-			#print(plot)
-			
-			#plot = plot + facet_grid(name ~ xAxisfactor)
-			
-			if (h == 1) {
-				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
-				if (makeOverallImage) {
-					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
-				} else {
-					writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
-				}
-			} else {
-				print(plot)
-			}
-		
-		
-		}
-	}	
-		
-		
-#	ggplot(data=overallResult, aes(x=hist, y=values, fill=hist)) +
-#			geom_bar(width=1)+
-#			geom_bar(width=1, colour="black", show_guid=FALSE)+
-#			coord_polar(theta="x") +
-#		#	xlab(NULL) +
-#		#	ylab("normalized values") +
-#			scale_fill_manual(values = overallColor[[imagesIndex]]) +
-#			scale_y_continuous(formatter = "comma") + 
-#			theme_bw() +
-#			opts( 
-#					plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
-#					axis.title.x = theme_blank(), 
-#					axis.title.y = theme_blank(),
-#					#axis.title.x = theme_text(hjust=0, angle=90),
-#					axis.title.y = theme_text(face="bold", size=11, angle=90), 
-#					panel.grid.minor = theme_blank(), 
-#					panel.border = theme_rect(colour="Grey", size=0.1),
-#					axis.text.x = theme_blank()
-#					#axis.text.x = theme_text(hjust=0, angle=90)
-#			) +
-#			#opts(panel.grid.minor = theme_blank())+
-#			#legend.position="bottom",
-#			opts(legend.justification = 'bottom',
-#					#legend.position=c(0.5,0.15),
-#					#legend.direction="horizontal",
-#					legend.direction="vertical",
-#					#legend.position="bottom",
-#					legend.position=c(0.5,0),
-#					legend.title = theme_blank(), 
-#					legend.text = theme_text(size=9),
-#					legend.key.size = unit(0.7, "lines"),
-#					legend.key = theme_blank()
-#			) +
-#			#opts(strip.background = theme_rect(colour = 'purple', fill = 'pink', size = 3, linetype='dashed'))+
-#			#opts(axis.text.x = theme_text(size=6, angle=90)) +
-#			#facet_grid(name ~ xAxisfactor, as.table=TRUE)
-#			facet_grid(primaerTreatment ~ xAxisfactor)
-#			#facet_wrap( name ~ xAxisfactor, nrow=2, drop=FALSE) 
-			
 }
 
 makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot") {
@@ -2723,6 +2731,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		boxSpiderDesName = descriptorSetName_spiderplot
 		
 		appendix <- FALSE
+		
+		onlySpider <- TRUE
 	}
 	
 	secondRun = appendix
