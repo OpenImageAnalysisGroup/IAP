@@ -177,19 +177,19 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 		ins <- libraries[!libraries %in% installedPackages]
 		
 		if(length(ins) > 0) {
-			install.packages(ins, libs=libPath, repos=repos, dependencies = TRUE)
+			#install.packages(ins, libs=libPath, repos=repos, dependencies = TRUE)
 		}
 		
 		if (useDev) {
-			install.packages(c("devtools"), libs=libPath, repos=repos, dependencies = TRUE)
-			dev_mode()
-			install_github("ggplot2")
+			#install.packages(c("devtools"), libs=libPath, repos=repos, dependencies = TRUE)
+			#dev_mode()
+			#install_github("ggplot2")
 		}
 	}
 	
 	if(update) {
 		#installedOldPackages <- names(old.packages()[, 'Package'])
-		update.packages(lib.loc = libPath, checkBuilt=TRUE, ask=FALSE,	repos=repos)	
+		#update.packages(lib.loc = libPath, checkBuilt=TRUE, ask=FALSE,	repos=repos)	
 	}
 	
 	if(length(libraries) > 0) {
@@ -2254,7 +2254,7 @@ initRfunction <- function(DEBUG = FALSE) {
 	}
 	
 	#"psych",
-	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "fmsb", "mvoutlier")
+	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "fmsb") #, "mvoutlier")
 	loadInstallAndUpdatePackages(libraries, TRUE, TRUE, FALSE)
 }
 
