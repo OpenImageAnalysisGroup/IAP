@@ -834,7 +834,7 @@ overallGetResultDataFrame <- function(overallList) {
 	colNames = list(colOfXaxis="xAxis", colOfMean="mean", colOfSD="se", colName="name", xAxis=overallList$xAxis)
 	booleanVectorList = buildList(overallList, colNames$colOfXaxis)
 	columnsStandard = c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
-if(TRUE) {		
+if(!onlySpider) {		
 	if (sum(!is.na(overallList$nBoxDes)) > 0) {
 		if (overallList$debug) {print("nBoxplot")}
 		columns = c(columnsStandard, check(getVector(overallList$nBoxDes)))
@@ -1431,7 +1431,7 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 				if (positionType == "dodge" || positionType == "stack") {
 					name = sub("%", "px", overallDesName[[imagesIndex]])
 				} else {
-					name = overallDesName[[imagesIndex]]
+					name = sub("(zoom corrected) ", "", overallDesName[[imagesIndex]])
 				}
 
 				 	plot = plot + ylab(name) 
@@ -1856,7 +1856,7 @@ print(overallResult[1,])
 						opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
 								axis.title.x = theme_blank(), 
 								axis.title.y = theme_blank(),
-#									axis.title.y = theme_text(face="bold", size=11, angle=90), 
+#								axis.title.y = theme_text(face="bold", size=11, angle=90), 
 								panel.grid.minor = theme_blank(), 
 								panel.border = theme_rect(colour="Grey", size=0.1),
 								axis.text.x = theme_blank()
@@ -1874,10 +1874,10 @@ print(overallResult[1,])
 			} else {
 				plot = plot + 
 					   opts(legend.justification = 'bottom', 
-							   legend.direction="horizontal",
+							   legend.direction="vertical",
 							   legend.position="bottom",
 							   #legend.position=c(0.5,0),
-							   legend.title = theme_blank(),
+							  # legend.title = theme_blank(),
 							   legend.key = theme_blank()
 			   			)
 				
@@ -1888,7 +1888,7 @@ print(overallResult[1,])
 					)
 				} else if(length(overallColor[[imagesIndex]]) >= 6) {
 					plot = plot + opts(legend.text = theme_text(size=5), 
-							legend.key.size = unit(0.4, "lines")
+							legend.key.size = unit(0.3, "lines")
 					)
 				} else {
 					plot = plot + opts(legend.text = theme_text(size=11))
@@ -2078,7 +2078,7 @@ makeDiagrams <- function(overallList) {
 	run = ifelse(overallList$showResultInR, 2, 1)
 	
 	for (h in 1:run) {
-if(TRUE) {		
+if(!onlySpider) {		
 		if (sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {print("nBoxplot...")}
 			makeLinearDiagram(h, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
@@ -2285,7 +2285,9 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 												"top.area.norm (mm^2)", 											
 												"side.fluo.intensity.chlorophyl.average (relative)", 
 												"side.fluo.intensity.phenol.average (relative)", 
-												"side.nir.intensity.average (relative)", 
+												"side.nir.intensity.average (relative)",
+												"top.nir.intensity.average (relative / pix)",
+												
 												"side.leaf.count.median (leafs)", 
 												"side.bloom.count (tassel)", 
 												"side.leaf.length.sum.norm.max (mm)", 
@@ -2335,7 +2337,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 													"top area (zoome corrected) (mm^2)", 
 													"chlorophyl intensity (relative intensity/pixel)", 
 													"fluorescence intensity (relative intensity/pixel)", 
-													"nir intensity (relative intensity/pixel)", 
+													"side nir intensity (relative intensity/pixel)",
+													"top nir intensity (relative intensity/pixel)",
 													"number of leafs", 
 													"number of tassel florets", 
 													"length of leafs plus stem (mm)", 			 
@@ -2831,10 +2834,10 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		}
 	}
 }
-
+onlySpider <- FALSE
 ######### START #########
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", TRUE)
+startOptions("report", FALSE)
 rm(list=ls(all=TRUE))
