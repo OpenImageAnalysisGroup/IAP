@@ -230,6 +230,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			final BinaryMeasurement bm = (BinaryMeasurement) nm;
 			if (bm.getURL() == null)
 				return idx;
+			IOurl unchangedURL = bm.getURL().copy();
 			boolean targetExists = false;
 			Future<MyByteArrayInputStream> fileContent = null;
 			final Long t = nm.getParentSample().getRowId();
@@ -301,13 +302,16 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						targetExists = exists;
 						if (!exists) {
 							InputStream is = null;
+							
+							byte[] previewData = ResourceIOManager.getPreviewImageContent(unchangedURL);
+							if (previewData==null || previewData.length==0)
 							if (fileContent != null) {
 								MyByteArrayInputStream bis = fileContent.get();
 								if (bis != null)
 									is = bis.getNewStream();
 							}
 							try {
-								if (is == null) {
+								if (is == null && (previewData==null || previewData.length==0)) {
 									is = ResourceIOManager
 											.getInputStreamMemoryCached(bm
 													.getURL());
@@ -317,9 +321,14 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 														+ bm.getURL());
 									}
 								}
-								BufferedImage bimage = ImageIO.read(is);
-								MyByteArrayInputStream previewStream = MyImageIOhelper
-										.getPreviewImageStream(bimage);
+								
+								MyByteArrayInputStream previewStream;
+								if (previewData==null || previewData.length==0) {
+									BufferedImage bimage = ImageIO.read(is);
+									previewStream = MyImageIOhelper.getPreviewImageStream(bimage);
+								} else {
+									previewStream = new MyByteArrayInputStream(previewData, previewData.length);
+								}
 								if (previewStream != null)
 									copyBinaryFileContentToTarget(experiment,
 											written, hsmManager, es, null,
@@ -329,10 +338,12 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									System.out
 											.println("ERROR: Preview could not be created or saved.");
 							} finally {
+								if (is!=null)
 								is.close();
 							}
 						}
 					} catch (Exception e) {
+						e.printStackTrace();
 						System.out.println("ERROR PREVIEW STORAGE: "
 								+ e.getMessage() + " // " + zefn
 								+ " // - error is ignored");
@@ -564,7 +575,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				try {
 					try {
 						if (!targetExists) {
-							in = url != null ? ResourceIOManager
+							in = url != null || optUrlContent==null ? ResourceIOManager
 									.getInputStreamMemoryCached(url)
 									: optUrlContent;
 							synchronized (es) {
@@ -608,6 +619,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						if (optPostProcess != null)
 							optPostProcess.run();
 					} catch (Exception e) {
+						e.printStackTrace();
 						System.out.println("ERROR: " + e.getMessage());
 						errorCount++;
 					}

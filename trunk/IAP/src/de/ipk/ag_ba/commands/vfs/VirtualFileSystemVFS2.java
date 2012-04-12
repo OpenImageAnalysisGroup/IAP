@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk.vanted.plugin.VfsFileProtocol;
@@ -38,6 +39,9 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 		this.user = user;
 		this.pass = pass;
 		this.folder = folder;
+		if (this.vfs_type==VfsFileProtocol.LOCAL) {
+			ResourceIOManager.registerIOHandler(new FileSystemHandler(this.prefix, this.folder));
+		}
 	}
 	
 	@Override

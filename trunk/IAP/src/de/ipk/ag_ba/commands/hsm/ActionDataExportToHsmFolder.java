@@ -335,6 +335,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 							}
 						}
 					} catch (Exception e) {
+						e.printStackTrace();
 						System.out.println("ERROR PREVIEW STORAGE: "
 								+ e.getMessage() + " // " + zefn
 								+ " // - error is ignored");
