@@ -830,6 +830,7 @@ setxAxisfactor <- function(xAxisName, xAxisValue, options) {
 
 overallGetResultDataFrame <- function(overallList) {
 	overallList$debug %debug% "overallGetResultDataFrame()"	
+	
 	groupBy = groupByFunction(list(overallList$treatment, overallList$secondTreatment))
 	colNames = list(colOfXaxis="xAxis", colOfMean="mean", colOfSD="se", colName="name", xAxis=overallList$xAxis)
 	booleanVectorList = buildList(overallList, colNames$colOfXaxis)
@@ -1040,7 +1041,7 @@ setColorListHist <- function(descriptorList) {
 	intervalFluo = seq(0, 0.166666666666, by=0.0185185185)
 
 	interval20 = seq(0.025, 0.975, by=0.05)
-	intervalSat20 = rep.int(c(0.8, 1.0), 10)
+	intervalSat20 = 1 #rep.int(c(0.8, 1.0), 10)
 	intervalFluo20 = seq(0, 0.166666666666, by=0.008771929789)
 	
 	if (length(grep("fluo", getVector(descriptorList), ignore.case=TRUE)) > 0) { #rot			
@@ -1099,6 +1100,7 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray) {
 			if (sum(!is.na(descriptorList[[n]])) > 0) {
 				#colorList[[n]] = colorRampPalette(colorVector)(length(descriptorList[[n]][,1]))
 				colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
+				##################### Anpassen huier werden noch zuviel Farbwerte ausgelesen ###############
 			} else {
 				#print("All values are 'NA'")
 			}
@@ -1128,12 +1130,28 @@ normalizeToHundredPercent =  function(whichRows, overallResult) {
 	return(t(apply(overallResult[whichRows, ], 1, function(x, y) {(100*x)/y}, y=colSums(overallResult[whichRows, ]))))
 }
 
-writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", o="") {
+renameYForAppendix <- function(label) {
+	
+	label <- gsub("%","percent", label)
+	label <- gsub("\\^2","$^2$", label)
+	
+	return(label)
+}
+
+writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", o="", isAppendix=FALSE, ylabel="") {
 	fileNameImageFile = preprocessingOfValues(fileNameImageFile, FALSE, "_")
 	fileNameLatexFile = preprocessingOfValues(fileNameLatexFile, FALSE, "_")
 	o = gsub('[[:punct:]]', "_", o)
 	
-	latexText = paste("\\loadImage{", 
+	latexText <- ""
+	
+	if(isAppendix & nchar(ylabel) > 0) {
+		ylabel <- renameYForAppendix(ylabel)
+		latexText = paste(latexText, "\\subsection{",ylabel,"}\n", sep="" )
+	}
+	
+	latexText = paste(latexText,
+					 "\\loadImage{", 
 					   ifelse(fileNameImageFile == "", fileNameLatexFile, fileNameImageFile), 
 					  #ifelse(o == "", "", paste("_", o , sep="")), 
 					   ifelse(o == "", "", o), 
@@ -1289,7 +1307,9 @@ renameY <- function(label) {
 	label <- gsub("_", "-", label)
 	label <- sub("(relative pix)", "(relative/px)", label)
 	
-	label <- gsub("\\."," ",label)	
+	label <- gsub("\\."," ",label)
+	label <- gsub("\\(\\(","(", label)
+	label <- gsub("\\)\\)",")", label)
 	return(label)		
 }
 
@@ -1302,16 +1322,19 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 #overallDesName <-overallList$nBoxDesName
 #overallFileName <- overallList$imageFileNames_nBoxplots
 #diagramTypSave="nboxplot"
+#imageIndex <- "1"
 #############
 	
 	overallList$debug %debug% "makeLinearDiagram()"	
 	print("line plot...")
 	
 	#tempOverallResult =  na.omit(overallResult)
+
 	tempOverallResult =  overallResult
 
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]])) {
+			ylabelForAppendix <- ""
 			createOuputOverview("line plot", imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "nboxplot")
 			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
@@ -1321,9 +1344,16 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 				
 				if (!CheckIfOneColumnHasOnlyValues(overallResult)) {
 
-					plot <-	ggplot(data=overallResult, aes(x=xAxis, y=mean, shape=name)) +
+					plot <-	ggplot(data=overallResult, aes(x=xAxis, y=mean, shape=name)) 
 							#geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="identity", alpha=0.1) +
-							geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1) +
+							
+					if(length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
+						plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), alpha=0.1)
+					} else {
+						plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1)
+					}
+							
+					plot <- plot +	
 							geom_line(aes(color=name), alpha=0.2) +
 							geom_point(aes(color=name), size=3) +
 #							print("drinne")
@@ -1334,7 +1364,8 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 							scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis))))					
 							
 							if(overallList$appendix) {
-								plot <- plot + ylab(renameY(overallDesName[[imagesIndex]]))
+								ylabelForAppendix <- renameY(overallDesName[[imagesIndex]])
+								plot <- plot + ylab(ylabelForAppendix)
 							} else {
 								plot <- plot + ylab(overallDesName[[imagesIndex]])
 							}
@@ -1408,7 +1439,7 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 						print(plot)
 					}
 					if (overallList$appendix) {
-						writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
+						writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave, TRUE, ylabelForAppendix)
 					}
 				} else {
 					print("Only one column has values, create barplot!")
@@ -1677,6 +1708,7 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 #	legende=TRUE
 #
 #	overallResult <- plotThisValues
+#	positionType <- overallList$spiderOptions$typOfGeomBar[1]
 #################
 
 #tempoverallResult <- overallResult
@@ -1693,15 +1725,38 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 #						overallResult <- rbind(overallResult, c(NA,2,NA,NA,overallResult$plot[1],days))
 #					}
 #			}
-		#fill=name,			
-			numberOfHist <- length(unique(overallResult$hist))	
-			plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
-						geom_line(colour="gray")+
-						scale_shape_manual(values = c(1:numberOfHist), name="Property") +
-						geom_point(aes(color=as.character(name), shape=hist), size=3) +
-						scale_colour_manual(name="Condition", values=overallColor[[imagesIndex]])
-					
+		#fill=name,		
+			
+			
+#			ggplot(overallResult, aes(x=hist, y=values, group=primaerTreatment)) + 
+#					geom_line(aes(colour=primaerTreatment)) +
+#					coord_polar() +
+#					facet_grid(~ xAxisfactor)
+			
+			numberOfHist <- length(unique(overallResult$hist))
+			if ("primaerTreatment" %in% colnames(overallResult)) {				
+				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=primaerTreatment))
 				
+			} else {
+				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=name))
+			}
+			plot <- plot +
+					
+					geom_point(aes(color=as.character(name), shape=hist), size=3) +
+					scale_shape_manual(values = c(1:numberOfHist), name="Property") +
+					#coord_polar(theta="x",expand=TRUE) +
+					geom_line(aes(colour=as.character(name))) +
+					#	geom_path()
+						
+						#geom_line(colour="gray") +
+						#scale_shape_manual(values = c(1:numberOfHist), name="Property") +
+						#geom_point(aes(color=as.character(name), shape=hist), size=3) +
+						#scale_colour_brewer(name="Condition", palette="Dark2")
+						scale_colour_manual(name="Condition", values=overallColor[[imagesIndex]])
+						#geom_line(data=overallResult, aes(x=values, y=hist))
+						
+						
+		#c(brewer.pal(7, "Dark2"))
 				
 						#geom_bar(width=1, size=0.1)					
 					
@@ -1712,7 +1767,7 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 			}
 				
 				plot <- plot + 
-						
+						#geom_segment(aes(x=0, xend=1, y=values, yend=0))+
 						#scale_fill_manual(values = overallColor[[imagesIndex]], name="Condition") +
 						#scale_colour_manual(name="Condition")+
 						#scale_linetype_manual(name="Condition")
@@ -1775,8 +1830,8 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 #				}
 			}
 			
-			print(plot)
-			
+		#	print(plot)
+
 			#plot = plot + facet_grid(name ~ xAxisfactor)
 			
 			if (h == 1) {
@@ -2352,7 +2407,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 												"side.hull.fillgrade (percent)",		
 												"top.hull.area (px)",
 												"top.hull.area.norm (mm^2)",
-												"top.hull.pc1 (px)",
+												"top.hull.pc1",
 												"top.hull.pc1.norm",
 												"top.hull.pc2",
 												"top.hull.pc2.norm",
@@ -2368,8 +2423,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 													"height (zoom corrected) (mm)", 
 													"width (zoom corrected) (mm)", 
 													"side area (zoom corrected) (mm^2)", 
-													"top area (zoome corrected) (mm^2)", 
-													"chlorophyl intensity (relative intensity/pixel)", 
+													"top area (zoom corrected) (mm^2)", 
+													"chlorophyll intensity (relative intensity/pixel)", 
 													"fluorescence intensity (relative intensity/pixel)", 
 													"side nir intensity (relative intensity/pixel)",
 													"top nir intensity (relative intensity/pixel)",
@@ -2388,7 +2443,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 													"plant width growth rate (%/day)", 
 													"top area growth rate (%/day)", 
 													"side area growth rate (%/day)", 
-													"volume groeth (visible light images, IAP based formula) (%/day)", 
+													"volume growth (visible light images, IAP based formula) (%/day)", 
 													"height (px)", 
 													"width (px)", 
 													"side area (px)", 
@@ -2436,7 +2491,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 										  	   "width (zoom corrected) (mm)", 
 											   "side area (zoom corrected) (mm^2)", 
 											   "top area (zoom corrected) (mm^2)", 
-											   "digital biomass (flurescence images, IAP formula) (px^3)", 
+											   "digital biomass (fluorescence images, IAP formula) (px^3)", 
 											   "digital biomass (visible light images, IAP formula) (px^3)", 
 											   "digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
 											   "height (px)", 
@@ -2482,17 +2537,17 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 												  
 										  
 				descriptorSetName_boxplotStacked = c("side near-infrared intensities (zoom corrected) (%)", 
-													  "side fluorescence color spectra (%)", 
+													  "side fluorescence colour spectra (%)", 
 													  "top near-infrared intensities (%)", 
 													  "side fluorescence ratio histogram (%)", 
 													  "side near-infrared (zoom corrected) (%)", 
-													  "side fluorescence color spectra (zoom corrected) (%)", 
-													  "side fluoresence color spectra (%)", 
-													  "side visible light color histogram (%)", 
-													  "side visible light ratio histogram (zoom correcte) (%)", 
-													  "top fluorescence color spectra (%)", 
+													  "side fluorescence colour spectra (zoom corrected) (%)", 
+													  "side fluorescence  colour spectra (%)", 
+													  "side visible light colour histogram (%)", 
+													  "side visible light ratio histogram (zoom corrected) (%)", 
+													  "top fluorescence colour spectra (%)", 
 													  "top fluo ratio histogram (%)", 
-													  "NIR top histogramm (%)", 
+													  "NIR top histogram (%)", 
 													  "top visible light color histogram (%)"
 														)
 				
@@ -2713,7 +2768,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 			"side fluorescence color spectra (zoom corrected) (%)", 
 			"side fluoresence color spectra (%)", 
 			"side visible light color histogram (%)", 
-			"side visible light ratio histogram (zoom correcte) (%)", 
+			"side visible light ratio histogram (zoom corrected) (%)", 
 			"top fluorescence color spectra (%)", 
 			"top fluo ratio histogram (%)", 
 			"NIR top histogramm (%)", 
@@ -2758,7 +2813,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 		appendix <- FALSE
 		
-		onlySpider <- TRUE
+		onlySpider <- FALSE
 	}
 	
 	secondRun = appendix
