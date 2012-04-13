@@ -302,7 +302,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			// });
 			if (!xlsx)
 				p.saveScripts(new String[] {
-						"createDiagrams.r",
+						"createDiagrams.R",
 						"diagramIAP.cmd",
 						"diagramIAP.bat",
 						"report.tex",

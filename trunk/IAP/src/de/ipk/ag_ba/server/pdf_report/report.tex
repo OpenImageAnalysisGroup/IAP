@@ -15,7 +15,7 @@
                   
 %%\documentclass[oneside,english]{scrreprt}
 \usepackage[T1]{fontenc}
-\usepackage[latin9]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
+\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
 %%\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
 \usepackage{fixltx2e}
 \usepackage[english]{babel} % Anpassung der Überschriften (chapter, chapitre, Kapitel …) und die richtige Silbentrennung
@@ -255,13 +255,14 @@ Notes\tabularnewline
 \subsection{Experiment factors}
 
 
-\begin{tabular}{|c|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|c|}
 \hline 
-ID & Genotype & Variety & Treatment & Sequence & xyz\tabularnewline
+ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
+\tabularnewline
 \hline 
 \hline 
---ID-- & --Genotype-- & --Variety-- & --Treatment-- & --Sequence-- & --xyz--\tabularnewline
-\hline 
+--factorlist--
+
 \end{tabular}
 
 

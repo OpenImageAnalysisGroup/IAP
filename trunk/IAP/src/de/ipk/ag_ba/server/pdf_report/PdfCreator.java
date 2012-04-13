@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -22,7 +23,9 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class PdfCreator {
@@ -191,15 +194,52 @@ public class PdfCreator {
 		
 		c = StringManipulationTools.stringReplace(c, "--ImagesExp--", safe(experiment.getHeader().getNumberOfFiles() + ""));
 		
+		String st = experiment.getHeader().getSizekb() / 1024 / 1024 + " GB";
+		if (experiment.getHeader().getSizekb() / 1024 < 10000)
+			st = experiment.getHeader().getSizekb() / 1024 + " MB";
+		
 		c = StringManipulationTools.stringReplace(c, "--StorageExp--",
-				safe(experiment.getHeader().getSizekb() + " KB"));
+				st);
 		
 		c = StringManipulationTools.stringReplace(c, "--RemarkExp--",
 				safe(experiment.getHeader().getRemark()));
 		
 		c = StringManipulationTools.stringReplace(c, " // ", " \\tabularnewline ");
 		
+		// --ID-- & --Genotype-- & --Variety-- & --Treatment-- & --Sequence-- & --xyz--\tabularnewline
+		// \hline
+		// %factorlist
+		String rows = StringManipulationTools.getStringList(getConditions(experiment), "\n");
+		c = StringManipulationTools.stringReplace(c, "--factorlist--", rows);
+		
 		TextFile.write(tempDirectory.getAbsolutePath() + File.separator + fn, c);
+	}
+	
+	public TreeSet<String> getConditions(ExperimentInterface e) {
+		TreeSet<String> result = new TreeSet<String>();
+		for (SubstanceInterface si : e)
+			for (ConditionInterface ci : si) {
+				String id = ci.getConditionId() + "";
+				String sp = ci.getSpecies() != null ? ci.getSpecies() : "";
+				String gt = ci.getGenotype() != null ? ci.getGenotype() : "";
+				String v = ci.getVariety() != null ? ci.getVariety() : "";
+				String t = ci.getTreatment() != null ? ci.getTreatment() : "";
+				String s = ci.getSequence() != null ? ci.getSequence() : "";
+				String gc = ci.getGrowthconditions() != null ? ci.getGrowthconditions() : "";
+				boolean first = true;
+				String row = "";
+				for (String inRow : t.split(";")) {
+					if (first) {
+						row = safe(id + " & " + sp + " & " + gt + " & " + v + " & " + inRow + " & " + s + " & " + gc + " \\tabularnewline");
+						first = false;
+					} else {
+						row += safe(" &  &  &  & " + inRow + " & &  \\tabularnewline");
+					}
+				}
+				row += " \\hline";
+				result.add(row);
+			}
+		return result;
 	}
 	
 	private String safe(String name) {
