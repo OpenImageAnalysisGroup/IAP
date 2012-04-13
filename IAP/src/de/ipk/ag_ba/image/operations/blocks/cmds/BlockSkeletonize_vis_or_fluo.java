@@ -516,6 +516,10 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.max", maxLeaflength);
 			if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
 				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm);
+			
+			calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
+					new String[] { "RESULT_side.leaf.length.sum.max", "RESULT_leaf.length.sum.norm.max", "RESULT_side.leaf.length.sum",
+							"RESULT_leaf.length.sum.norm" });
 		}
 	}
 }

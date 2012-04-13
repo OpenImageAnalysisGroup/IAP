@@ -60,7 +60,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class IAPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
 	
-	public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R22_2012-04-13_ratio_fix";
+	public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R23_2012-04-14_relative_leaf_length";
+	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R22_2012-04-13_ratio_fix";
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R21_2012-03-17_trimmed_fluo_vis_hist";
 	
 	static MainFrame mainFrame1;
