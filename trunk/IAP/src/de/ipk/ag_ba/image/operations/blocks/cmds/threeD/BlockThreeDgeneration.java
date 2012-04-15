@@ -96,7 +96,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			}
 			if (pictures.size() > 2) {
 				mg.setRoundViewImages(pictures);
-				mg.calculateModel(optStatus, modeOfOperation, 0);
+				mg.calculateModel(optStatus, modeOfOperation, 0, false);
 				// the cube is a true cube (dim X,Y,Z are equal), the
 				// input images are stretched to the target square
 				// therefore, the actual volume calculation needs to consider

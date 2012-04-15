@@ -296,10 +296,19 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 			status.setCurrentStatusValue(100);
 			
 			mg.setRoundViewImages(pictures);
-			if (true)
-				mg.calculateModel(status, modeOfOperation, 0);
-			else
-				mg.calculateModelMotionScan(status);
+			
+			ModelGenerationMode mgm = ModelGenerationMode.SPACE_CARVING;
+			switch (mgm) {
+				case SPACE_CARVING:
+					mg.calculateModel(status, modeOfOperation, 0, false);
+					return;
+				case MOTION_SCAN:
+					mg.calculateModelMotionScan(status);
+					return;
+				case DEPTH_SCAN:
+					mg.calculateModel(status, modeOfOperation, 0, true);
+					return;
+			}
 			
 			volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResult());
 			
