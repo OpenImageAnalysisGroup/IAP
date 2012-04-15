@@ -319,6 +319,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 			
 			volume.setColorDepth(VolumeColorDepth.RGBA.toString());
 		} catch (OutOfMemoryError e) {
+			e.printStackTrace();
 			MainFrame.showMessageDialog("You have not enough memory! Please select a lower resolution",
 					"Out of Memory Error");
 		}

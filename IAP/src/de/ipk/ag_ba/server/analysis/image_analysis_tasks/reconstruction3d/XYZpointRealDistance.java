@@ -41,7 +41,7 @@ public class XYZpointRealDistance {
 	}
 	
 	/**
-	 * 
+	 * rotate 90 degree, Z-axis is exchanged with Y-axis coordinate
 	 */
 	public void rotateForTopView() {
 		double t = this.y;
