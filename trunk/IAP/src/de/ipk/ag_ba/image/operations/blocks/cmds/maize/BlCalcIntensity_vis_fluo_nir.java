@@ -31,8 +31,6 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	
 	BlockProperty markerDistanceHorizontally = null;
 	
-	FlexibleImage nirSkel = null;
-	
 	@Override
 	protected void prepare() {
 		super.prepare();
@@ -107,7 +105,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		nirSkel = getProperties().getImage("nir_skeleton");
+		FlexibleImage nirSkel = getProperties().getImage("nir_skeleton");
 		if (nirSkel != null) {
 			int nirSkeletonFilledPixels = nirSkel.getIO().countFilledPixels();
 			double nirSkeletonIntensitySum = nirSkel.getIO().intensitySumOfChannel(false, true, false, false);
