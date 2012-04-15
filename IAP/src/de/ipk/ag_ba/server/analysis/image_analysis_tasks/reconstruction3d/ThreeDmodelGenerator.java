@@ -72,7 +72,7 @@ public class ThreeDmodelGenerator {
 	}
 	
 	public void calculateModel(final BackgroundTaskStatusProviderSupportingExternalCall status,
-			GenerationMode colorMode, int maxIndexedColorCount) throws InterruptedException {
+			GenerationMode colorMode, int maxIndexedColorCount, boolean processDepthImages) throws InterruptedException {
 		
 		status.setCurrentStatusText1("Init cube cut (" + maxVoxelPerSide + "x" + maxVoxelPerSide + "x" + maxVoxelPerSide
 				+ ")");
@@ -87,7 +87,8 @@ public class ThreeDmodelGenerator {
 		for (MyPicture p : pictures) {
 			final MyPicture fp = p;
 			wait.add(BackgroundThreadDispatcher.addTask(
-					cuttt2(status, tso, tsoRunCount, fp), "cube cut " + p.getAngle(), 20, 19, false));
+					cuttt2(status, tso, tsoRunCount, fp, processDepthImages),
+					"cube cut " + p.getAngle(), 20, 19, false));
 			
 			if (status.wantsToStop())
 				break;
@@ -158,7 +159,8 @@ public class ThreeDmodelGenerator {
 	}
 	
 	private Runnable cuttt2(final BackgroundTaskStatusProviderSupportingExternalCall status,
-			final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp) {
+			final ThreadSafeOptions tso, final ThreadSafeOptions tsoRunCount, final MyPicture fp,
+			boolean processDepthImages) {
 		return new Runnable() {
 			@Override
 			public void run() {
@@ -470,6 +472,9 @@ public class ThreeDmodelGenerator {
 		return maxVoxelPerSide;
 	}
 	
+	/**
+	 * Does not yet work, just a test-stub.
+	 */
 	public void calculateModelMotionScan(final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		generateNormalizedByteCube(GenerationMode.COLORED_RGBA);
 		final MyPicture p1 = pictures.get(0);
