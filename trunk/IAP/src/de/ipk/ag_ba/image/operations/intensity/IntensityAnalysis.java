@@ -145,30 +145,32 @@ public class IntensityAnalysis {
 						histChlorophyl.getFreqAt(i));
 			}
 			
-			if (optDistHorizontal != null && optRealMarkerDistance != null) {
-				double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
-				for (int i = 0; i < this.n; i++) {
-					result.addValue("normalized.histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
-							histPhenol.getFreqAt(i) * normalize);
+			if (multiLevel) {
+				if (optDistHorizontal != null && optRealMarkerDistance != null) {
+					double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
+					for (int i = 0; i < this.n; i++) {
+						result.addValue(
+								"normalized.histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
+								histPhenol.getFreqAt(i) * normalize);
+					}
 				}
-			}
-			for (int i = 0; i < this.n; i++) {
-				result.addValue(
-						"histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
-						histPhenol.getFreqAt(i));
-			}
-			
-			if (optDistHorizontal != null && optRealMarkerDistance != null) {
-				double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
 				for (int i = 0; i < this.n; i++) {
-					result.addValue("normalized.histogram.ratio.bin." + (i + 1) + "." + histRatio.getBorderLeft(i, 255) + "_" + histRatio.getBorderRight(i, 255),
-							histRatio.getFreqAt(i) * normalize);
+					result.addValue(
+							"histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
+							histPhenol.getFreqAt(i));
 				}
-			}
-			for (int i = 0; i < this.n; i++) {
-				result.addValue(
-						"histogram.ratio.bin." + (i + 1) + "." + histRatio.getBorderLeft(i, 255) + "_" + histRatio.getBorderRight(i, 255),
-						histRatio.getFreqAt(i));
+				if (optDistHorizontal != null && optRealMarkerDistance != null) {
+					double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
+					for (int i = 0; i < this.n; i++) {
+						result.addValue("normalized.histogram.ratio.bin." + (i + 1) + "." + histRatio.getBorderLeft(i, 255) + "_" + histRatio.getBorderRight(i, 255),
+								histRatio.getFreqAt(i) * normalize);
+					}
+				}
+				for (int i = 0; i < this.n; i++) {
+					result.addValue(
+							"histogram.ratio.bin." + (i + 1) + "." + histRatio.getBorderLeft(i, 255) + "_" + histRatio.getBorderRight(i, 255),
+							histRatio.getFreqAt(i));
+				}
 			}
 		}
 		return result;
