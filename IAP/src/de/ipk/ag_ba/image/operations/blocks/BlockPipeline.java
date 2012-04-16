@@ -80,6 +80,26 @@ public class BlockPipeline {
 		
 		int id = pipelineID.addInt(1);
 		
+		// normally each image is analyzed once (i.e. one plant per image)
+		// for arabidopsis trays with 2x3 or 2x4 sections the
+		// pipeline will be executed 6 or 12 times per image
+		// the load-image-block then needs to cut out image 1/6, 2/6, ...
+		// and place the section in the middle of the image for further processing
+		int executionCount = 1;
+		int executionIndex = 0;
+		
+		ImageData abc = input.getImages().getVisInfo();
+		if (abc == null)
+			abc = input.getImages().getFluoInfo();
+		if (abc == null)
+			abc = input.getImages().getNirInfo();
+		if (abc == null)
+			abc = input.getImages().getIrInfo();
+		if (abc != null) {
+			// check plant annotation and determine if this is a arabidopsis 6 or 12 tray
+			
+		}
+		
 		int index = 0;
 		boolean blockProgressOutput = true;
 		
@@ -99,6 +119,7 @@ public class BlockPipeline {
 						+ blockClass.getCanonicalName() + "!");
 				throw e;
 			}
+			
 			block.setInputAndOptions(input, options, settings, index++,
 					debugStack);
 			
