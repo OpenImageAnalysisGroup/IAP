@@ -3,11 +3,13 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.hull;
 import ij.measure.ResultsTable;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ReleaseInfo;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
@@ -33,7 +35,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
-		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMask.png");
+		//getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMask.png");
 		FlexibleImage image = getInput().getMasks().getVis();
 		ImageData info = getInput().getImages().getVisInfo();
 		ImageOperation res = processImage(image, info);

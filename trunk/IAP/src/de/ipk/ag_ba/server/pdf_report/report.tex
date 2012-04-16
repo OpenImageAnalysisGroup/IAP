@@ -30,17 +30,17 @@
  %marginnote,% Für bessere Randnotizen mit \marginnote statt
             % \marginline 
 }
-%\usepackage[tracking=true]{microtype}% 
-            % Microtype ist einfach super, aber lesen Sie
-            % unbedingt die Anleitung um das Folgende zu
-            % verstehen.
-%\DeclareMicrotypeSet*[tracking]{my}% 
-%  { font = */*/*/sc/* }% 
-%\SetTracking{ encoding = *, shape = sc }{ 45 }% Hier wird festgelegt,
-            % dass alle Passagen in Kapitälchen automatisch leicht
-            % gesperrt werden. Das Paket soul, das ich früher empfohlen
-            % habe ist damit für diese Zwecke nicht mehr nötig.
-            %
+% \usepackage[tracking=true]{microtype}% 
+%             % Microtype ist einfach super, aber lesen Sie
+%             % unbedingt die Anleitung um das Folgende zu
+%             % verstehen.
+% \DeclareMicrotypeSet*[tracking]{my}% 
+%   { font = */*/*/sc/* }% 
+% \SetTracking{ encoding = *, shape = sc }{ 45 }% Hier wird festgelegt,
+%             % dass alle Passagen in Kapitälchen automatisch leicht
+%             % gesperrt werden. Das Paket soul, das ich früher empfohlen
+%             % habe ist damit für diese Zwecke nicht mehr nötig.
+%             %
 
 \usepackage{%
   lmodern, % A) Latin Modern Fonts sind die Nachfolger von Computer
@@ -61,6 +61,16 @@
 \usepackage{graphicx}
 %\usepackage{amsmath} 
 \usepackage{ifthen}
+
+% —– Start: Angaben zur Formatierung von Überschriften —– %
+\usepackage{titletoc}
+% \titlecontents{Abschnitt}[Links]{Gesamtformatierung}{Vor dem %
+% Label}{Nach dem Label}{Abstandsfüller & Seitenzahl}[Rechts]
+\titlecontents{subsection}[4.5em]{}{\contentslabel{3em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+\titlecontents{subsubsection}[7.5em]{}{\contentslabel{3.2em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+
+% —– Ende: Angaben zur Formatierung von Überschriften —– %
+
 
 \makeatletter
 
