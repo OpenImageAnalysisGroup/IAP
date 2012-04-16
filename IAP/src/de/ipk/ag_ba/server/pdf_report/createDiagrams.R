@@ -1314,7 +1314,7 @@ renameY <- function(label) {
 }
 
 
-makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot") {
+makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot") {
 ########
 #overallResult <- overallList$overallResult_nBoxDes
 #overallDescriptor <- overallList$nBoxDes
@@ -1322,7 +1322,7 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 #overallDesName <-overallList$nBoxDesName
 #overallFileName <- overallList$imageFileNames_nBoxplots
 #diagramTypSave="nboxplot"
-#imageIndex <- "1"
+#imagesIndex <- "1"
 #############
 	
 	overallList$debug %debug% "makeLinearDiagram()"	
@@ -1348,13 +1348,14 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 							#geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="identity", alpha=0.1) +
 							
 					if(length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
-						plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), alpha=0.1)
+						plot <- plot + geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="smooth", alpha=0.1)
+						#plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), alpha=0.1)
 					} else {
-						plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1)
+						plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1) +
+								geom_line(aes(color=name), alpha=0.2)
 					}
 							
 					plot <- plot +	
-							geom_line(aes(color=name), alpha=0.2) +
 							geom_point(aes(color=name), size=3) +
 #							print("drinne")
 #							print(overallResult$xAxis)
@@ -1410,7 +1411,7 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 					
 				
 								
-	#			print(plot)
+				#	print(plot)
 		
 		##!# nicht löschen, ist die interpolation (alles in dieser if Abfrage mit #!# makiert)
 		##!#				newCoords = seq(min(overallList$filterXaxis, na.rm=TRUE), max(overallList$filterXaxis, na.rm=TRUE), 1)
@@ -1432,12 +1433,8 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 		#			} 
 	
 
+					saveImageFile(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave)
 
-					if (h == 1) {
-						saveImageFile(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave)
-					} else {
-						print(plot)
-					}
 					if (overallList$appendix) {
 						writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave, TRUE, ylabelForAppendix)
 					}
@@ -1448,7 +1445,7 @@ makeLinearDiagram <- function(h, overallResult, overallDescriptor, overallColor,
 					tempXaxisName = overallList$xAxisName
 					overallList$xAxisName = paste(overallList$xAxisName, day)
 					#overallList$overallResult = overallList$overallResult[!is.na(overallList$overallResult$mean), ]
-					makeBarDiagram(h, overallResult, overallDescriptor[imagesIndex], overallColor[imagesIndex], overallDesName[imagesIndex], overallFileName[imagesIndex], overallList, TRUE, diagramTypSave)
+					makeBarDiagram(overallResult, overallDescriptor[imagesIndex], overallColor[imagesIndex], overallDesName[imagesIndex], overallFileName[imagesIndex], overallList, TRUE, diagramTypSave)
 					overallList$xAxisName = tempXaxisName
 				}
 			}
@@ -1467,7 +1464,7 @@ getColor <- function(overallColorIndex, overallResult) {
 }
 
 
-plotStackedImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, minor_breaks=TRUE, overallColor, overallDesName, imagesIndex, overallFileName) {
+plotStackedImage <- function(overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, minor_breaks=TRUE, overallColor, overallDesName, imagesIndex, overallFileName) {
 	overallList$debug %debug% "plotStackedImage()"	
 	if (length(overallResult[, 1]) > 0) {
 
@@ -1546,25 +1543,22 @@ plotStackedImage <- function(h, overallList, overallResult, title = "", makeOver
 				}
 			}
 			
-			if (h == 1) {
-				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
-				if (makeOverallImage) {
-					writeLatexFile(paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
-				} else {
-					writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
-				}
+
+			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
+			if (makeOverallImage) {
+				writeLatexFile(paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
 			} else {
-				print(plot)
+				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
 			}
 		}
 	}
 }
 
-PreWorkForMakeBigOverallImage <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex) {
+PreWorkForMakeBigOverallImage <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex) {
 	overallList$debug %debug% "PreWorkForMakeBigOverallImage()"	
 	groupBy = groupByFunction(list(overallList$treatment, overallList$secondTreatment))
 	if (length(groupBy) == 0 || length(groupBy) == 1) {
-		plotStackedImage(h = h, overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, minor_breaks=FALSE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName)	
+		plotStackedImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, minor_breaks=FALSE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName)	
 	} else {
 		for (value in overallList$filterSecondTreatment) {
 			title = value
@@ -1572,7 +1566,7 @@ PreWorkForMakeBigOverallImage <- function(h, overallResult, overallDescriptor, o
 			booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = plottedName))
 			plotThisValues = overallResult[booleanVector, ]
 		#	plotThisValues = reNameColumn(plotThisValues, "name", "primaerTreatment")
-			plotStackedImage(h, overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, minor_breaks=FALSE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName)
+			plotStackedImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, minor_breaks=FALSE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName)
 		}	 
 	}
 }
@@ -1588,7 +1582,7 @@ PreWorkForMakeNormalImages <- function(h, overallList) {
 	}
 }
 
-makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList) {
+makeBoxplotStackedDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList) {
 	overallList$debug %debug% "makeBoxplotStackedDiagram()"
 	print("stacked barplot...")
 	#overallResult[is.na(overallResult)] = 0
@@ -1600,11 +1594,9 @@ makeBoxplotStackedDiagram <- function(h, overallResult, overallDescriptor, overa
 		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplotstacked")
 
 		if (length(overallResult[, 1]) > 0) {
-			PreWorkForMakeBigOverallImage(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex)
+			PreWorkForMakeBigOverallImage(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex)
 		}
-		#PreWorkForMakeNormalImages(h, overallList)
 	}
-	#return(overallList)
 }	
 
 removeNAsSpider <- function(overallResult, xAxisPosition) {
@@ -1644,7 +1636,7 @@ normalizeEachDescriptor <- function(overallResult) {
 	return(overallResult)
 }
 
-makeSpiderPlotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, options, overallList, diagramTypSave="spiderplot") {
+makeSpiderPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, options, overallList, diagramTypSave="spiderplot") {
 	################
 #	overallResult <- overallList$overallResult_boxSpiderDes
 #	overallDescriptor <- overallList$boxSpiderDes
@@ -1668,7 +1660,7 @@ makeSpiderPlotDiagram <- function(h, overallResult, overallDescriptor, overallCo
 		if (length(overallResult[, 1]) > 0) {
 			test <- c("side fluo intensity", "side nir intensity", "side visible hue average value", "top visible hue average value")
 			if(sum(!getVector(overallDesName[[imagesIndex]]) %in% test) > 1) {
-				PreWorkForMakeBigOverallImageSpin(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave)
+				PreWorkForMakeBigOverallImageSpin(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave)
 			}
 		}
 		#PreWorkForMakeNormalImages(h, overallList)
@@ -1677,7 +1669,7 @@ makeSpiderPlotDiagram <- function(h, overallResult, overallDescriptor, overallCo
 }	
 
 
-PreWorkForMakeBigOverallImageSpin <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave) {
+PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave) {
 	overallList$debug %debug% "PreWorkForMakeBigOverallImageSpin()"	
 	
 	overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName, overallResult$xAxis, options)
@@ -1686,15 +1678,21 @@ PreWorkForMakeBigOverallImageSpin <- function(h, overallResult, overallDescripto
 	groupBy = groupByFunction(list(overallList$treatment, overallList$secondTreatment))
 	
 	if (length(groupBy) == 0 || length(groupBy) == 1) {
-		plotSpiderImage(h = h, overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave=diagramTypSave)	
+		
+		plotSpiderImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave=diagramTypSave)	
+		plotLineRangeImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave="lineRangePlot")	
 	} else {
-		for (value in overallList$filterSecondTreatment) {
+		
+		for (value in overallList$filterSecondTreatment) {			
 			title = value
 			plottedName = overallList$filterTreatment %contactAllWithAll% value
 			booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = plottedName))
 			plotThisValues = overallResult[booleanVector, ]
+			usedOverallColor <- overallColor[[imagesIndex]][1:length(unique(plotThisValues["primaerTreatment"])[,1])]
+			overallColor[[imagesIndex]] <- overallColor[[imagesIndex]][(length(unique(plotThisValues["primaerTreatment"])[,1])+1):length(overallColor[[imagesIndex]])]
 			#	plotThisValues = reNameColumn(plotThisValues, "name", "primaerTreatment")
-			plotSpiderImage(h, overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave=diagramTypSave)
+			plotSpiderImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = usedOverallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave=diagramTypSave)
+			plotLineRangeImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = usedOverallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave="lineRangePlot")
 		}	 
 	}
 }
@@ -1702,11 +1700,14 @@ PreWorkForMakeBigOverallImageSpin <- function(h, overallResult, overallDescripto
 
 
 
-plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
+plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
 ################
+#  overallColor = overallColor[[imagesIndex]]
+#
+#
 #	makeOverallImage = TRUE
 #	legende=TRUE
-#
+#	overallColor <- usedOverallColor 
 #	overallResult <- plotThisValues
 #	positionType <- overallList$spiderOptions$typOfGeomBar[1]
 #################
@@ -1715,51 +1716,24 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 #overallResult <- tempoverallResult
 	overallList$debug %debug% "plotSpiderImage()"	
 	if (length(overallResult[, 1]) > 0) {		
-		for (positionType in overallList$spiderOptions$typOfGeomBar) {
-			#for(typ in )
-#			for(days in unique(overallResult$xAxisfactor)) {
-#				if ("primaerTreatment" %in% colnames(overallResult)) {				
-#						overallResult <- rbind(overallResult, c(NA,NA,2,NA,NA,overallResult$plot[1],days))
-#						
-#					} else {
-#						overallResult <- rbind(overallResult, c(NA,2,NA,NA,overallResult$plot[1],days))
-#					}
-#			}
-		#fill=name,		
-			
-			
-#			ggplot(overallResult, aes(x=hist, y=values, group=primaerTreatment)) + 
-#					geom_line(aes(colour=primaerTreatment)) +
-#					coord_polar() +
-#					facet_grid(~ xAxisfactor)
-			
+		for (positionType in overallList$spiderOptions$typOfGeomBar) {			
 			numberOfHist <- length(unique(overallResult$hist))
 			if ("primaerTreatment" %in% colnames(overallResult)) {				
-				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=primaerTreatment))
+				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=primaerTreatment)) +
+						geom_point(aes(color=as.character(primaerTreatment), shape=hist), size=3) +
+						geom_line(aes(colour=as.character(primaerTreatment))) 
 				
 			} else {
-				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=name))
+				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=name)) +
+						geom_point(aes(color=as.character(name), shape=hist), size=3) +
+						geom_line(aes(colour=as.character(name))) 
 			}
 			plot <- plot +
-					
-					geom_point(aes(color=as.character(name), shape=hist), size=3) +
+					#geom_point(aes(color=as.character(name), shape=hist), size=3) +
 					scale_shape_manual(values = c(1:numberOfHist), name="Property") +
-					#coord_polar(theta="x",expand=TRUE) +
-					geom_line(aes(colour=as.character(name))) +
-					#	geom_path()
-						
-						#geom_line(colour="gray") +
-						#scale_shape_manual(values = c(1:numberOfHist), name="Property") +
-						#geom_point(aes(color=as.character(name), shape=hist), size=3) +
-						#scale_colour_brewer(name="Condition", palette="Dark2")
-						scale_colour_manual(name="Condition", values=overallColor[[imagesIndex]])
-						#geom_line(data=overallResult, aes(x=values, y=hist))
-						
-						
-		#c(brewer.pal(7, "Dark2"))
-				
-						#geom_bar(width=1, size=0.1)					
-					
+					#geom_line(aes(colour=as.character(name))) +
+					scale_colour_manual(name="Condition", values=overallColor)
+
 			if (positionType == "x") {			
 				plot <- plot + coord_polar(theta="x",expand=TRUE)
 			} else {
@@ -1767,12 +1741,7 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 			}
 				
 				plot <- plot + 
-						#geom_segment(aes(x=0, xend=1, y=values, yend=0))+
-						#scale_fill_manual(values = overallColor[[imagesIndex]], name="Condition") +
-						#scale_colour_manual(name="Condition")+
-						#scale_linetype_manual(name="Condition")
 						scale_y_continuous(formatter = "comma") +
-						#scale_y_discrete(labels=c(0,0.25,0.5,0.75,1), formatter = "comma") +
 						theme_bw() +
 						opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
 								axis.title.x = theme_blank(), 
@@ -1831,80 +1800,26 @@ plotSpiderImage <- function(h, overallList, overallResult, title = "", makeOvera
 			}
 			
 		#	print(plot)
-
-			#plot = plot + facet_grid(name ~ xAxisfactor)
 			
-			if (h == 1) {
-				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
-				if (makeOverallImage) {
-					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
-				} else {
-					writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
-				}
+			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
+			if (makeOverallImage) {
+				writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
 			} else {
-				print(plot)
-			}
-		
-		
+				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
+			}		
 		}
-	}	
-		
-		
-#	ggplot(data=overallResult, aes(x=hist, y=values, fill=hist)) +
-#			geom_bar(width=1)+
-#			geom_bar(width=1, colour="black", show_guid=FALSE)+
-#			coord_polar(theta="x") +
-#		#	xlab(NULL) +
-#		#	ylab("normalized values") +
-#			scale_fill_manual(values = overallColor[[imagesIndex]]) +
-#			scale_y_continuous(formatter = "comma") + 
-#			theme_bw() +
-#			opts( 
-#					plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
-#					axis.title.x = theme_blank(), 
-#					axis.title.y = theme_blank(),
-#					#axis.title.x = theme_text(hjust=0, angle=90),
-#					axis.title.y = theme_text(face="bold", size=11, angle=90), 
-#					panel.grid.minor = theme_blank(), 
-#					panel.border = theme_rect(colour="Grey", size=0.1),
-#					axis.text.x = theme_blank()
-#					#axis.text.x = theme_text(hjust=0, angle=90)
-#			) +
-#			#opts(panel.grid.minor = theme_blank())+
-#			#legend.position="bottom",
-#			opts(legend.justification = 'bottom',
-#					#legend.position=c(0.5,0.15),
-#					#legend.direction="horizontal",
-#					legend.direction="vertical",
-#					#legend.position="bottom",
-#					legend.position=c(0.5,0),
-#					legend.title = theme_blank(), 
-#					legend.text = theme_text(size=9),
-#					legend.key.size = unit(0.7, "lines"),
-#					legend.key = theme_blank()
-#			) +
-#			#opts(strip.background = theme_rect(colour = 'purple', fill = 'pink', size = 3, linetype='dashed'))+
-#			#opts(axis.text.x = theme_text(size=6, angle=90)) +
-#			#facet_grid(name ~ xAxisfactor, as.table=TRUE)
-#			facet_grid(primaerTreatment ~ xAxisfactor)
-#			#facet_wrap( name ~ xAxisfactor, nrow=2, drop=FALSE) 
-			
+	}				
 }
 
 
-#
-#linerange
-#plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
-#		geom_line() +
-#		geom_point(aes(color=name), size=3)
 
-
-plotLineRangeImage <- function(h, overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
+plotLineRangeImage <- function(overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
 	################
 #	makeOverallImage = TRUE
 #	legende=TRUE
-#
+#	overallColor <- usedOverallColor
 #	overallResult <- plotThisValues
+#	positionType <- overallList$spiderOptions$typOfGeomBar[1]
 	#################
 	
 	print(overallResult[1,])
@@ -1912,154 +1827,87 @@ plotLineRangeImage <- function(h, overallList, overallResult, title = "", makeOv
 #overallResult <- tempoverallResult
 	overallList$debug %debug% "plotSpiderImage()"	
 	if (length(overallResult[, 1]) > 0) {		
-		for (positionType in overallList$spiderOptions$typOfGeomBar) {
+	
+		plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
+				geom_line() +
+		
+		if ("primaerTreatment" %in% colnames(overallResult)) {				
+			plot <- plot + geom_point(aes(color=as.character(primaerTreatment)), size=3)
 			
-#			for(days in unique(overallResult$xAxisfactor)) {
-#				if ("primaerTreatment" %in% colnames(overallResult)) {				
-#						overallResult <- rbind(overallResult, c(NA,NA,2,NA,NA,overallResult$plot[1],days))
-#						
-#					} else {
-#						overallResult <- rbind(overallResult, c(NA,2,NA,NA,overallResult$plot[1],days))
-#					}
-#			}
-			#fill=name,
-			plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
-					geom_line()+
-					geom_point(aes(color=name), size=3)
-			#geom_line(aes())+
+		} else {
+			plot <- plot + geom_point(aes(color=as.character(name)), size=3)
+		}
+		
+		plot <- plot +
+				scale_colour_manual(values=overallColor) +
+				scale_y_continuous(formatter = "comma") +
+				theme_bw() +
+				opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+						axis.title.x = theme_blank(), 
+						axis.title.y = theme_blank(),
+						axis.text.x = theme_text(angle=90),
+						panel.grid.minor = theme_blank(), 
+						panel.border = theme_rect(colour="Grey", size=0.1)
+						#axis.text.x = theme_blank()
+				#axis.text.y = theme_blank()
+				) 
+		
+		if (!legende) {
+			plot = plot + opts(legend.position="none")
+		} else {
+			plot = plot + 
+					opts(#legend.justification = 'bottom', 
+							legend.direction="horizontal",
+							legend.position="bottom",
+							#legend.position=c(0.5,0),
+							legend.title = theme_blank(),
+							legend.key = theme_blank()
+					)
 			
 			
-			#geom_bar(width=1, size=0.1)					
-			
-#			if (positionType == "x") {			
-#				plot <- plot + coord_polar(theta="x",expand=TRUE)
+#			if (length(overallColor[[imagesIndex]]) > 3 & length(overallColor[[imagesIndex]]) < 6) {
+#				size <- 6
+#				unit <- 0.7
+#			} else if(length(overallColor[[imagesIndex]]) >= 6) {
+#				size <- 5
+#				unit <- 0.4
 #			} else {
-#				plot <- plot + coord_polar(theta="y", expand=TRUE)
+#				size <- 11
+#				unit <- 1.0
 #			}
-			
-			plot <- plot + 
-					scale_fill_manual(values = overallColor[[imagesIndex]]) +
-					scale_y_continuous(formatter = "comma") +
-					#scale_y_discrete(labels=c(0,0.25,0.5,0.75,1), formatter = "comma") +
-					theme_bw() +
-					opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
-							axis.title.x = theme_blank(), 
-							axis.title.y = theme_blank(),
-#									axis.title.y = theme_text(face="bold", size=11, angle=90), 
-							panel.grid.minor = theme_blank(), 
-							panel.border = theme_rect(colour="Grey", size=0.1),
-							axis.text.x = theme_blank()
-					#axis.text.y = theme_blank()
-					) 
-			if (positionType == "y") {
-				plot <- plot + 
-						opts(axis.text.y = theme_blank(),
-								axis.ticks	= theme_blank()	
-						)
-			}	
-			
-			if (!legende) {
-				plot = plot + opts(legend.position="none")
-			} else {
-				plot = plot + 
-						opts(legend.justification = 'bottom', 
-								legend.direction="horizontal",
-								legend.position="bottom",
-								#legend.position=c(0.5,0),
-								legend.title = theme_blank(),
-								legend.key = theme_blank()
-						)
-				
-				
-				if (length(overallColor[[imagesIndex]]) > 3 & length(overallColor[[imagesIndex]]) < 6) {
-					plot = plot + opts(legend.text = theme_text(size=6), 
-							legend.key.size = unit(0.7, "lines")
-					)
-				} else if(length(overallColor[[imagesIndex]]) >= 6) {
-					plot = plot + opts(legend.text = theme_text(size=5), 
-							legend.key.size = unit(0.4, "lines")
-					)
-				} else {
-					plot = plot + opts(legend.text = theme_text(size=11))
-				}	
-			}		
-			
-			if (title != "") {
-				plot = plot + opts(title = title)
-			}
-			
-			if (makeOverallImage) {
-				plot = plot + facet_grid(~ xAxisfactor)
+#			
+#			plot = plot + opts(legend.text = theme_text(size=size), 
+#					legend.key.size = unit(unit, "lines"),
+#					axis.text.x = theme_text(face="bold", size=size, angle=90)
+#			)
+		}		
+		
+		if (title != "") {
+			plot = plot + opts(title = title)
+		}
+		
+		if (makeOverallImage) {
+			plot = plot + facet_grid(~ xAxisfactor)
 #				if ("primaerTreatment" %in% colnames(overallResult)) {				
 #					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
 #					
 #				} else {
 #					plot = plot + facet_grid(name ~ xAxisfactor)
 #				}
-			}
-			
-			#print(plot)
-			
-			#plot = plot + facet_grid(name ~ xAxisfactor)
-			
-			if (h == 1) {
-				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
-				if (makeOverallImage) {
-					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
-				} else {
-					writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
-				}
-			} else {
-				print(plot)
-			}
-			
-			
 		}
-	}	
-	
-	
-#	ggplot(data=overallResult, aes(x=hist, y=values, fill=hist)) +
-#			geom_bar(width=1)+
-#			geom_bar(width=1, colour="black", show_guid=FALSE)+
-#			coord_polar(theta="x") +
-#		#	xlab(NULL) +
-#		#	ylab("normalized values") +
-#			scale_fill_manual(values = overallColor[[imagesIndex]]) +
-#			scale_y_continuous(formatter = "comma") + 
-#			theme_bw() +
-#			opts( 
-#					plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
-#					axis.title.x = theme_blank(), 
-#					axis.title.y = theme_blank(),
-#					#axis.title.x = theme_text(hjust=0, angle=90),
-#					axis.title.y = theme_text(face="bold", size=11, angle=90), 
-#					panel.grid.minor = theme_blank(), 
-#					panel.border = theme_rect(colour="Grey", size=0.1),
-#					axis.text.x = theme_blank()
-#					#axis.text.x = theme_text(hjust=0, angle=90)
-#			) +
-#			#opts(panel.grid.minor = theme_blank())+
-#			#legend.position="bottom",
-#			opts(legend.justification = 'bottom',
-#					#legend.position=c(0.5,0.15),
-#					#legend.direction="horizontal",
-#					legend.direction="vertical",
-#					#legend.position="bottom",
-#					legend.position=c(0.5,0),
-#					legend.title = theme_blank(), 
-#					legend.text = theme_text(size=9),
-#					legend.key.size = unit(0.7, "lines"),
-#					legend.key = theme_blank()
-#			) +
-#			#opts(strip.background = theme_rect(colour = 'purple', fill = 'pink', size = 3, linetype='dashed'))+
-#			#opts(axis.text.x = theme_text(size=6, angle=90)) +
-#			#facet_grid(name ~ xAxisfactor, as.table=TRUE)
-#			facet_grid(primaerTreatment ~ xAxisfactor)
-#			#facet_wrap( name ~ xAxisfactor, nrow=2, drop=FALSE) 
-	
+		
+	#	print(plot)
+		
+		saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
+		if (makeOverallImage) {
+			writeLatexFile(paste(overallFileName[[imagesIndex]], "lineRangeOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
+		} else {
+			writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
+		}	
+	}		
 }
 
-makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot") {
+makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot") {
 	overallList$debug %debug% "makeBarDiagram()"
 
 	tempOverallResult =  overallResult
@@ -2099,11 +1947,8 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 				}
 				#print(myPlot)
 				
-				if (h == 1) {
-					saveImageFile(overallList, myPlot, overallFileName[[imagesIndex]], diagramTypSave)
-				} else {
-					print(myPlot)
-				}
+				saveImageFile(overallList, myPlot, overallFileName[[imagesIndex]], diagramTypSave)
+
 				if (overallList$appendix) {
 					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
 				}
@@ -2112,7 +1957,7 @@ makeBarDiagram <- function(h, overallResult, overallDescriptor, overallColor, ov
 	}
 }
 
-makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, options, overallList, diagramTypSave="boxplot") {	
+makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, options, overallList, diagramTypSave="boxplot") {	
 	overallList$debug %debug% "makeBoxplotDiagram()"
 	print("create boxplot...")
 	tempOverallResult =  na.omit(overallResult)
@@ -2148,11 +1993,8 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 						opts(axis.text.x = theme_text(size=6, angle=90)) +
 						facet_wrap(~ xAxisfactor, drop=FALSE)
 						
-				if (h == 1) {
-					saveImageFile(overallList, myPlot, overallFileName[[imagesIndex]], diagramTypSave)
-				} else {
-					print(myPlot)
-				}
+				saveImageFile(overallList, myPlot, overallFileName[[imagesIndex]], diagramTypSave)
+
 				if (overallList$appendix) {
 					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
 				}
@@ -2164,42 +2006,39 @@ makeBoxplotDiagram <- function(h, overallResult, overallDescriptor, overallColor
 
 makeDiagrams <- function(overallList) {
 	overallList$debug %debug% "makeDiagrams()"
-	run = ifelse(overallList$showResultInR, 2, 1)
-	
-	for (h in 1:run) {
+
 if(!onlySpider) {		
-		if (sum(!is.na(overallList$nBoxDes)) > 0) {
-			if (overallList$debug) {print("nBoxplot...")}
-			makeLinearDiagram(h, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
-		} else {
-			print("All values for nBoxplot are 'NA'")
-		}
-		
-		if (sum(!is.na(overallList$boxDes)) > 0) {
-			if (overallList$debug) {print("Boxplot...")}
-			makeBoxplotDiagram(h, overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$imageFileNames_Boxplots, overallList$boxOptions, overallList)
-		} else {
-			print("All values for Boxplot are 'NA'...")
-		}
-		
-		if (sum(!is.na(overallList$boxStackDes)) > 0) {
-			if (overallList$debug) {print("Stacked Boxplot...")}
-			makeBoxplotStackedDiagram(h, overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
-		} else {
-			print("All values for stacked Boxplot are 'NA'...")
+	if (sum(!is.na(overallList$nBoxDes)) > 0) {
+		if (overallList$debug) {print("nBoxplot...")}
+		makeLinearDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
+	} else {
+		print("All values for nBoxplot are 'NA'")
+	}
+	
+	if (sum(!is.na(overallList$boxDes)) > 0) {
+		if (overallList$debug) {print("Boxplot...")}
+		makeBoxplotDiagram(overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$imageFileNames_Boxplots, overallList$boxOptions, overallList)
+	} else {
+		print("All values for Boxplot are 'NA'...")
+	}
+	
+	if (sum(!is.na(overallList$boxStackDes)) > 0) {
+		if (overallList$debug) {print("Stacked Boxplot...")}
+		makeBoxplotStackedDiagram(overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
+	} else {
+		print("All values for stacked Boxplot are 'NA'...")
 		}
 }
 		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 			if (overallList$debug) {print("Spider plot...")}
-			makeSpiderPlotDiagram(h, overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
-		} else {
-			print("All values for stacked Boxplot are 'NA'...")
-		}
-		
-		if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
-			if (overallList$debug) {print("Barplot...")}
-			makeBarDiagram(h, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots, overallList)
-		}
+		makeSpiderPlotDiagram(overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
+	} else {
+		print("All values for stacked Boxplot are 'NA'...")
+	}
+	
+	if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
+		if (overallList$debug) {print("Barplot...")}
+		makeBarDiagram(h, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots, overallList)
 	}
 }
 
@@ -2324,7 +2163,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	dpi = "90" ##90 ## CK: seems to change nothing for ggplot2 instead the output size should be modified, if needed // 17.2.2012	
 	
 	isGray = FALSE
-	showResultInR = FALSE
+	#showResultInR = FALSE
 	
 	treatment = "Treatment"
 	filterTreatment = "none"
@@ -2590,15 +2429,16 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		initRfunction(debug)
 		
 		treatment <- "Treatment"
-		filterTreatment <- "normal bewaessert$Trockentress"
+		filterTreatment <- "normal$dry"
 		
 		secondTreatment <- "Species"
-		filterSecondTreatment <- "BCC_1367_Apex$BCC_1391_Isaria$BCC_1403_Perun$BCC_1433_HeilsFranken$BCC_1441_PflugsIntensiv$Wiebke$BCC_1413_Sissy$BCC_1417_Trumpf"
+		filterSecondTreatment <- "Fernandez$Athletico"
+		#filterSecondTreatment <- "BCC_1367_Apex$BCC_1391_Isaria$BCC_1403_Perun$BCC_1433_HeilsFranken$BCC_1441_PflugsIntensiv$Wiebke$BCC_1413_Sissy$BCC_1417_Trumpf"
 		filterXaxis <- "none"
 
 		bgColor <- "transparent"
 		isGray="FALSE"
-		showResultInR <- FALSE
+		#showResultInR <- FALSE
 		
 		fileName <- "report.csv"
 		separation <- ";"
@@ -2813,7 +2653,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 		appendix <- FALSE
 		
-		onlySpider <- FALSE
+		onlySpider <- TRUE
 	}
 	
 	secondRun = appendix
@@ -2832,7 +2672,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 									nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions,
 									treatment = treatment, filterTreatment = filterTreatment, 
 									secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
-									showResultInR = showResultInR, xAxisName = xAxisName, debug = debug, appendix=appendix)
+									xAxisName = xAxisName, debug = debug, appendix=appendix)
 				if (secondRun) {
 					appendix = TRUE
 					secondRun = FALSE
@@ -2870,7 +2710,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		nBoxOptions= NULL, boxOptions= NULL, stackedBarOptions = NULL, spiderOptions = NULL,
 		treatment="Treatment", filterTreatment="none", 
 		secondTreatment="none", filterSecondTreatment="none", filterXaxis="none", xAxis="Day (Int)", 
-		showResultInR=FALSE, xAxisName="none", debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE) {		
+		xAxisName="none", debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE) {		
 
 	overallList = list(iniDataSet=iniDataSet, saveFormat=saveFormat, dpi=dpi, isGray=isGray, 
 						nBoxDes = nBoxDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes,
@@ -2879,7 +2719,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions,
 						treatment=treatment, filterTreatment=filterTreatment, 
 						secondTreatment=secondTreatment, filterSecondTreatment=filterSecondTreatment, filterXaxis=filterXaxis, xAxis=xAxis, 
-						showResultInR=showResultInR, xAxisName=xAxisName, debug=debug, 
+						xAxisName=xAxisName, debug=debug, 
 						appendix=appendix, stoppTheCalculation=stoppTheCalculation, 
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(),
 						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), user="none", typ="none")	
@@ -2930,5 +2770,5 @@ onlySpider <- FALSE
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", TRUE)
+startOptions("report", FALSE)
 rm(list=ls(all=TRUE))
