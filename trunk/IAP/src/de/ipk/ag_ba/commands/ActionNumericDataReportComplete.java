@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.JLabel;
 
@@ -33,7 +34,12 @@ import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.pdf_report.PdfCreator;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
  * @author klukas
@@ -79,13 +85,17 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2) {
 		ArrayList<String> res = new ArrayList<String>();
 		boolean appendix = false;
+		boolean ratio = false;
 		for (ThreadSafeOptions tso : divideDatasetBy2) {
 			String s = (String) tso.getParam(0, "");
 			if (tso.getBval(0, false)) {
 				if (s.equals("Appendix"))
 					appendix = true;
 				else
-					res.add(s);
+					if (s.equals("Ratio"))
+						ratio = true;
+					else
+						res.add(s);
 			}
 		}
 		while (res.size() < 2)
@@ -93,6 +103,10 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 		while (res.size() > 2)
 			res.remove(2);
 		if (appendix)
+			res.add("TRUE");
+		else
+			res.add("FALSE");
+		if (ratio)
 			res.add("TRUE");
 		else
 			res.add("FALSE");
@@ -170,6 +184,16 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 		if (SystemAnalysis.isHeadless() && !(targetDirectoryOrTargetFile != null)) {
 			
 		} else {
+			
+			boolean ratio = false;
+			for (ThreadSafeOptions tso : divideDatasetBy) {
+				System.out.println("TOGGLE: " + tso.getParam(0, ""));
+				if (((String) tso.getParam(0, "")).equals("Ratio"))
+					ratio = tso.getBval(0, false);
+			}
+			if (ratio)
+				experiment = calculateRatioDataset(experiment);
+			
 			ArrayList<SnapshotDataIAP> snapshots;
 			StringBuilder csv = new StringBuilder();
 			boolean water = false;
@@ -327,6 +351,116 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				p.openTargetDirectory();
 			}
 		}
+	}
+	
+	private ExperimentInterface calculateRatioDataset(ExperimentInterface experiment) {
+		Experiment res = new Experiment();
+		res.setHeader(experiment.getHeader().clone());
+		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + " (STRESS RATIO)");
+		for (SubstanceInterface si : experiment) {
+			for (ConditionInterface ci : si) {
+				boolean reference = ci.getTreatment() != null && ci.getTreatment().contains("norm");
+				if (reference) {
+					// nothing to do here
+				} else {
+					// search for reference
+					for (ConditionInterface ciPotentialRef : si) {
+						boolean ref = ciPotentialRef.getTreatment() != null && ciPotentialRef.getTreatment().contains("norm");
+						if (ref) {
+							boolean speciesOK = (ci.getSpecies() + "").equals(ciPotentialRef.getSpecies() + "");
+							boolean genotypeOK = (ci.getGenotype() + "").equals(ciPotentialRef.getGenotype() + "");
+							boolean varietyOK = (ci.getVariety() + "").equals(ciPotentialRef.getVariety() + "");
+							boolean growthConditionsOK = (ci.getGrowthconditions() + "").equals(ciPotentialRef.getGrowthconditions() + "");
+							boolean sequenceOK = (ci.getSequence() + "").equals(ciPotentialRef.getSequence() + "");
+							boolean allOK = speciesOK && genotypeOK && varietyOK && growthConditionsOK && sequenceOK;
+							if (allOK) {
+								// found reference for "ci"
+								ConditionInterface ciRef = ciPotentialRef;
+								TreeSet<Integer> timePointsAvailForBoth = new TreeSet<Integer>();
+								for (SampleInterface sample : ci)
+									timePointsAvailForBoth.add(sample.getTime());
+								for (SampleInterface sample : ciRef)
+									if (!timePointsAvailForBoth.contains(sample.getTime()))
+										timePointsAvailForBoth.remove(sample.getTime());
+								
+								// for each "Day (Int)" the average sample value is calculated for
+								// this condition and its reference condition
+								HashMap<Integer, Double> ciSum = new HashMap<Integer, Double>();
+								HashMap<Integer, Integer> ciN = new HashMap<Integer, Integer>();
+								HashMap<Integer, SampleInterface> ciSampleExample = new HashMap<Integer, SampleInterface>();
+								HashMap<Integer, NumericMeasurementInterface> ciValueExample = new HashMap<Integer, NumericMeasurementInterface>();
+								for (SampleInterface sample : ci) {
+									if (timePointsAvailForBoth.contains(sample.getTime())) {
+										Double v = sample.getSampleAverage().getValue();
+										if (v == null || Double.isNaN(v) || Double.isInfinite(v))
+											continue;
+										if (!ciSampleExample.containsKey(sample.getTime()))
+											ciSampleExample.put(sample.getTime(), sample);
+										if (!ciValueExample.containsKey(sample.getTime())) {
+											if (sample.size() > 0) {
+												NumericMeasurementInterface value = sample.iterator().next();
+												ciValueExample.put(sample.getTime(), value);
+											}
+										}
+										Double s = ciSum.get(sample.getTime());
+										if (s == null)
+											s = 0d;
+										s += v;
+										ciSum.put(sample.getTime(), s);
+										if (!ciN.containsKey(sample.getTime()))
+											ciN.put(sample.getTime(), 1);
+										else
+											ciN.put(sample.getTime(), ciN.get(sample.getTime()) + 1);
+									}
+								}
+								
+								HashMap<Integer, Double> ciRefSum = new HashMap<Integer, Double>();
+								HashMap<Integer, Integer> ciRefN = new HashMap<Integer, Integer>();
+								for (SampleInterface sample : ciRef) {
+									if (timePointsAvailForBoth.contains(sample.getTime())) {
+										Double v = sample.getSampleAverage().getValue();
+										if (v == null || Double.isNaN(v) || Double.isInfinite(v))
+											continue;
+										Double s = ciRefSum.get(sample.getTime());
+										if (s == null)
+											s = 0d;
+										s += sample.getSampleAverage().getValue();
+										ciRefSum.put(sample.getTime(), s);
+										if (!ciRefN.containsKey(sample.getTime()))
+											ciRefN.put(sample.getTime(), 1);
+										else
+											ciRefN.put(sample.getTime(), ciRefN.get(sample.getTime()) + 1);
+									}
+								}
+								// divide sample average by average of reference condition
+								// and add the (transformed) result to the result experiment
+								for (Integer time : timePointsAvailForBoth) {
+									if (ciRefSum.get(time) == null || ciSum.get(time) == null)
+										continue;
+									double ciAVG = ciSum.get(time) / ciN.get(time);
+									double ciRefAVG = ciRefSum.get(time) / ciRefN.get(time);
+									double ratio = ciAVG / ciRefAVG;
+									if (!Double.isNaN(ratio) && !Double.isInfinite(ratio)) {
+										SubstanceInterface newS = si.clone();
+										res.add(newS);
+										ConditionInterface newC = ci.clone(newS);
+										newS.add(newC);
+										String newTreatment = ciRef.getTreatment() + " / " + ci.getTreatment();
+										newC.setTreatment(newTreatment);
+										SampleInterface newSample = ciSampleExample.get(time).clone(newC);
+										newC.add(newSample);
+										NumericMeasurementInterface newValue = ciValueExample.get(time).clone(newSample);
+										newSample.add(newValue);
+										newValue.setValue(ratio);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return res;
 	}
 	
 	private boolean filterOut(ArrayList<ThreadSafeOptions> toggles, SnapshotDataIAP s) {
