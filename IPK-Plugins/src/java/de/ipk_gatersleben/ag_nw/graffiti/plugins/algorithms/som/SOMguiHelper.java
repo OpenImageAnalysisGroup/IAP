@@ -193,7 +193,7 @@ public class SOMguiHelper implements HelperClass {
 	private static JFreeChart createChart(CategoryDataset dataset, String title,
 			PlotOrientation orientation, boolean showLegend, String domainAxis,
 			String rangeAxis, boolean showRangeAxis, boolean showCategoryAxis,
-			float outlineBorderWidth, int timePoints, Graph srcGraph) {
+			float outlineBorderWidth, long timePoints, Graph srcGraph) {
 		final JFreeChart chart;
 		if (timePoints > 1) {
 			chart = ChartFactory.createLineChart(title, // chart
@@ -272,7 +272,7 @@ public class SOMguiHelper implements HelperClass {
 			String desc = columns[column];
 			seriesAndTime.add(desc);
 		}
-		HashSet<Integer> timeValues = new HashSet<Integer>();
+		HashSet<Long> timeValues = new HashSet<Long>();
 		for (String sat : seriesAndTime) {
 			// row: time
 			// column: series
@@ -297,7 +297,7 @@ public class SOMguiHelper implements HelperClass {
 			// return new String(serie + "§" + timeUnit + "§" + getZeros(timeValueForComparision, 9)+"§"+replicate);
 			String timeVal = time.substring(time.indexOf("§") + 1, time.lastIndexOf("§"));
 			String timeUnit = time.substring(0, time.indexOf("§"));
-			int ttt = Integer.parseInt(timeVal);
+			long ttt = Long.parseLong(timeVal);
 			timeValues.add(ttt);
 			dataset.add(mean, standardDeviation, series, ttt, false, false, "relative", timeUnit, true, false);
 			// dataset.addValue(som.getWeights()[i][nodeIndex], "som-weights", columns[i].substring(0, columns[i].lastIndexOf("§")));
@@ -315,7 +315,7 @@ public class SOMguiHelper implements HelperClass {
 			String desc = columns[column];
 			seriesAndTime.add(desc);
 		}
-		HashSet<Integer> timeValues = new HashSet<Integer>();
+		HashSet<Long> timeValues = new HashSet<Long>();
 		HashMap<String, Integer> series2seriesID = new HashMap<String, Integer>();
 		for (String sat : seriesAndTime) {
 			// row: time
@@ -337,7 +337,7 @@ public class SOMguiHelper implements HelperClass {
 			String timeUnit = time.substring(0, time.indexOf("§"));
 			String species = series.indexOf("/") >= 0 ? series.substring(0, series.indexOf("/")) : series;
 			String genotype = series.indexOf("/") >= 0 ? series.substring(series.indexOf("/") + 1) : "";
-			int ttt = Integer.parseInt(timeVal);
+			long ttt = Long.parseLong(timeVal);
 			timeValues.add(ttt);
 			for (int column : columnsForThatSeriesAndTime) {
 				String replIdS = columns[column].substring(columns[column].lastIndexOf("§") + 1);
