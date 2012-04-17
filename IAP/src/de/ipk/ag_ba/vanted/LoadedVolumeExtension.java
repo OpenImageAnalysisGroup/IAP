@@ -17,7 +17,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -141,7 +140,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 	}
 	
 	private Runnable getVolumeRotationRunnable(final int i, final int maxCPU, final double rotation,
-						final int[][][] volume2) {
+			final int[][][] volume2) {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
@@ -192,7 +191,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			
 			int res = 200;
 			FileInputStream file = new FileInputStream(
-								"/Users/klukas/Desktop/IAP_reconstruction_1284034033183.argb_volume");
+					"/Users/klukas/Desktop/IAP_reconstruction_1284034033183.argb_volume");
 			
 			boolean high = false;
 			if (high) {
@@ -253,7 +252,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 	}
 	
 	public MyByteArrayInputStream getSideViewGif(int width, int height,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 		ArrayList<String> delayTimes = new ArrayList<String>();
 		
@@ -271,16 +270,16 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			renderSideView(degree, result);
 			result = GravistoService.getScaledImage(result, width, height);
 			images.add(result);
-			fis.addImage("Deg "+degree, new FlexibleImage(result));
+			fis.addImage("Deg " + degree, new FlexibleImage(result));
 			delayTimes.add("" + delay);
 			degree += degreeSteps;
 			if (optStatus != null) {
 				optStatus.setCurrentStatusValueFine(degree * 100d / 360);
-				optStatus.setCurrentStatusText2("Rendered side view ("+degree+"°)");
+				optStatus.setCurrentStatusText2("Rendered side view (" + degree + "°)");
 			}
 		}
 		
-		fis.print("Render (Stack)");
+		// fis.print("Render (Stack)");
 		
 		if (optStatus != null) {
 			optStatus.setCurrentStatusText1("Process side view GIF");
@@ -291,12 +290,12 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		WriteAnimatedGif.saveAnimate(out, images.toArray(new BufferedImage[] {}), delayTimes.toArray(new String[] {}));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValueFine(100);
-
+		
 		if (optStatus != null) {
 			optStatus.setCurrentStatusText1("Side views processed");
 			optStatus.setCurrentStatusText2("");
 		}
-
+		
 		return new MyByteArrayInputStream(out.getBuff(), out.size());
 	}
 	
