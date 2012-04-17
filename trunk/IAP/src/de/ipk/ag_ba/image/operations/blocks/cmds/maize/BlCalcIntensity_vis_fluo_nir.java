@@ -62,7 +62,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			double averageVisB = visibleIntensitySumB / visibleFilledPixels;
 			
 			ResultsTable rt1 = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
-					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE);
+					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE_VIS_ANALYSIS);
 			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".vis.", rt1, getBlockPosition());
 			
 			ResultsTable rt = new ResultsTable();
@@ -95,7 +95,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 			io = getInput().getMasks().getFluo().copy().getIO().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
 					.print("AFTER ERODE", false);
 			ResultsTable rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
-					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_MULTI_LEVEL_RGB); // markerDistanceHorizontally
+					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return getInput().getMasks().getFluo();// io.getImage();
@@ -151,7 +151,7 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 						getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0d);
 				}
 				ResultsTable rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
-						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_GRAY); // markerDistanceHorizontally
+						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_GRAY_NIR_ANALYSIS); // markerDistanceHorizontally
 				
 				if (options == null)
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
