@@ -233,20 +233,20 @@ of the group image analysis.
 
 
 \begin{tabular}{|c|c|c|}
-\hline 
+\hline
 Experiment & --experimentname--\tabularnewline
-\hline 
-\hline 
+\hline
+\hline
 Start & --StartExp--\tabularnewline
-\hline 
+\hline
 End & --EndExp--\tabularnewline
-\hline 
+\hline
 Numeric values & --NumExp-- \tabularnewline
-\hline 
+\hline
 Images & --ImagesExp-- \tabularnewline
-\hline 
+\hline
 Storage & --StorageExp-- \tabularnewline
-\hline 
+\hline
 \end{tabular}
 
 
@@ -314,7 +314,7 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 }{}
 
 \resetBoolean
-\checkFileNoReset{side_height__mm__side_width__mm__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
+\checkFileNoReset{side_height__px__side_width__px__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
 \checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
 % \checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
 % \checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
@@ -326,7 +326,7 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 	
 	
 	\resetBoolean
-	\checkFileNoReset{side_height__mm__side_width__mm__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
+	\checkFileNoReset{side_height__px__side_width__px__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
 	\checkFileNoReset{}{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}
 	\ifthenelse{\boolean{isFile2}}{
 		\ownClearPage
@@ -336,9 +336,25 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 		\ifthenelse{\boolean{isFile1}}{
 			\ownClearPage
 			\subsection{Growth parameters, fluorescence, near-infrared and visible light color}
-			\loadTex{side_height__mm__side_width__mm__side_area__px__top_area__px__side_fluspiderOverallImage}
-		}{}
-	}	
+			\loadTex{side_height__px__side_width__px__side_area__px__top_area__px__side_fluspiderOverallImage}
+			}{}
+	}
+	
+	\resetBoolean
+	\checkFileNoReset{side_height__px__side_width__px__side_area__px__top_area__px__side_flulineRangeOverallImage.tex}{}{}
+	\checkFileNoReset{}{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_alineRangeOverallImage.tex}{}
+	\ifthenelse{\boolean{isFile2}}{
+		\ownClearPage
+		\subsection{Difference within special descriptors (zoom corrected)}
+		\loadTex{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_alineRangeOverallImage}
+	}{
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPage
+			\subsection{Difference within special descriptors}
+			\loadTex{side_height__px__side_width__px__side_area__px__top_area__px__side_flulineRangeOverallImage}
+			}{}
+	}
+		
 }{}
 
 \resetBoolean
@@ -424,12 +440,12 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 
 
 \resetBoolean
-\checkFileNoReset{side_height__mm_boxplot.pdf}{}{}
-\checkFileNoReset{side_height__mm_nboxplot.pdf}{}{}
+\checkFileNoReset{side_height__px_boxplot.pdf}{}{}
+\checkFileNoReset{side_height__px_nboxplot.pdf}{}{}
 \checkFileNoReset{side_height_norm__mm_boxplot.pdf}{}{}
 \checkFileNoReset{side_height_norm__mm_nboxplot.pdf}{}{}
-\checkFileNoReset{side_width__mm_boxplot.pdf}{}{}
-\checkFileNoReset{side_width__mm_nboxplot.pdf}{}{}
+\checkFileNoReset{side_width__px_boxplot.pdf}{}{}
+\checkFileNoReset{side_width__px_nboxplot.pdf}{}{}
 \checkFileNoReset{side_width_norm__mm_boxplot.pdf}{}{}
 \checkFileNoReset{side_width_norm__mm_nboxplot.pdf}{}{}
 \checkFileNoReset{side_area__px_boxplot.pdf}{}{}
@@ -446,8 +462,8 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 	\section{General growth related plant properties}
 		
 	\resetBoolean
-	\checkFileNoReset{side_height__mm_boxplot.pdf}{}{}
-	\checkFileNoReset{side_height__mm_nboxplot.pdf}{}{}
+	\checkFileNoReset{side_height__px_boxplot.pdf}{}{}
+	\checkFileNoReset{side_height__px_nboxplot.pdf}{}{}
 	\checkFileNoReset{}{side_height_norm__mm_boxplot.pdf}{}
 	\checkFileNoReset{}{side_height_norm__mm_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile2}}{
@@ -476,19 +492,19 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 			\item Column name: side.height
 			\item Unit: px
 			\end{itemize}
-			\checkFile{side_height__mm_boxplot.pdf}{side_height__mm_nboxplot.pdf}{}
+			\checkFile{side_height__px_boxplot.pdf}{side_height__px_nboxplot.pdf}{}
 			\ifthenelse{\boolean{isFile1}}{
-				\loadImage{side_height__mm_boxplot.pdf}
+				\loadImage{side_height__px_boxplot.pdf}
 			}{}
 			\ifthenelse{\boolean{isFile2}}{
-				\loadImage{side_height__mm_nboxplot.pdf}
+				\loadImage{side_height__px_nboxplot.pdf}
 			}{}
 		}{}
 	}	
 	
 	\resetBoolean
-	\checkFileNoReset{side_width__mm_boxplot.pdf}{}{}
-	\checkFileNoReset{side_width__mm_nboxplot.pdf}{}{}
+	\checkFileNoReset{side_width__px_boxplot.pdf}{}{}
+	\checkFileNoReset{side_width__px_nboxplot.pdf}{}{}
 	\checkFileNoReset{}{side_width_norm__mm_boxplot.pdf}{}
 	\checkFileNoReset{}{side_width_norm__mm_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile2}}{
@@ -517,12 +533,12 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 			\item Column name: side.width
 			\item Unit: px
 			\end{itemize}
-			\checkFile{side_width__mm_boxplot.pdf}{side_width__mm_nboxplot.pdf}{}
+			\checkFile{side_width__px_boxplot.pdf}{side_width__px_nboxplot.pdf}{}
 			\ifthenelse{\boolean{isFile1}}{
-				\loadImage{side_width__mm_boxplot.pdf}
+				\loadImage{side_width__px_boxplot.pdf}
 			}{}
 			\ifthenelse{\boolean{isFile2}}{	
-				\loadImage{side_width__mm_nboxplot.pdf}
+				\loadImage{side_width__px_nboxplot.pdf}
 			}{}
 		}{}	
 	}
@@ -742,35 +758,41 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 	
 	\resetBoolean
 	\checkFileNoReset{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
-	\checkFileNoReset{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
 	\checkFileNoReset{}{side_vis_normalized_histogram_ratio_bin_stackedOverallImage.tex}{}
-	%\checkFileNoReset{}{side_vis_normalized_histogram_ratio_bin_.tex}{}
 	\ifthenelse{\boolean{isFile2}}{
 				
-		%\checkFile{side_vis_normalized_histogram_ratio_bin_.tex}{}{}
 		\ownClearPage
-		\subsection{Color histogram (zoom corrected)}
-		Visible light color histogram (zoom corrected) for side view (hue):
-		\loadTex{side_vis_normalized_histogram_ratio_bin_stackedOverallImage}
-	
+		\subsection{Color histogram side view (zoom corrected)}
+		%Visible light color histogram (zoom corrected) for side view (hue):
+		\loadTex{side_vis_normalized_histogram_ratio_bin_stackedOverallImage}	
 	}{
 		\ifthenelse{\boolean{isFile1}}{
 		
 			\ownClearPage
-			\subsection{Color histogram}
-			\checkFile{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}
-			\ifthenelse{\boolean{isFile1}}{
-				Visible light color histogram for side view (hue):
-				\loadTex{side_vis_hue_histogram_ratio_bin_stackedOverallImage}
-			}{}	
-			\ifthenelse{\boolean{isFile2}}{
-			
-				Visible light color histogram for top view (hue):
-				
-				\loadTex{top_vis_hue_histogram_ratio_bin_stackedOverallImage}
-			}{}
+			\subsection{Color histogram side view}
+			%Visible light color histogram for side view (hue):
+			\loadTex{side_vis_hue_histogram_ratio_bin_stackedOverallImage}
 		}{}	
-	}	
+	}
+	
+	\resetBoolean
+	\checkFileNoReset{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{}{top_vis_normalized_histogram_ratio_bin_stackedOverallImage.tex}{}
+	\ifthenelse{\boolean{isFile2}}{
+				
+		\ownClearPage
+		\subsection{Color histogram top view (zoom corrected)}
+		%Visible light color histogram (zoom corrected) for side view (hue):
+		\loadTex{top_vis_normalized_histogram_ratio_bin_stackedOverallImage}	
+	}{
+		\ifthenelse{\boolean{isFile1}}{
+		
+			\ownClearPage
+			\subsection{Color histogram top view}
+			%Visible light color histogram for side view (hue):
+			\loadTex{top_vis_hue_histogram_ratio_bin_stackedOverallImage}
+		}{}	
+	}		
 }{}
 
 
@@ -786,6 +808,9 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 	\resetClear
 	\clearpage
 	\section{Fluorescence activity}
+	\begin{itemize}
+	\item Average and histogram of observed fluorescence colors (Fluo)
+	\end{itemize}
 
 	\checkFile{side_fluo_intensity_average__relative_nboxplot.pdf}{top_fluo_intensity_average__relative___pix_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
@@ -801,52 +826,89 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 		}{}
 	}{}
 
+% 	\resetBoolean
+% 	\checkFileNoReset{side_fluo_histogram_bin_stackedOverallImage.tex}{}{}
+% 	\checkFileNoReset{top_fluo_histogram_bin_stackedOverallImage.tex}{}{}
+% 	\checkFileNoReset{}{side_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
+% 	\checkFileNoReset{}{top_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
+% 	\ifthenelse{\boolean{isFile2}}{
+% 
+% 		\ownClearPage
+% 		\subsection{Fluorescence spectra (zoom corrected)}
+% 		\begin{itemize}
+% 		\item Histogram of observed fluorescence colors
+% 		\end{itemize}
+% 		\checkFile{side_fluo_normalized_histogram_bin_stackedOverallImage.tex}{top_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
+% 		\ifthenelse{\boolean{isFile1}}{
+% 			Fluorescence activity distribution (zoom corrected) for side view:
+% 			\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
+% 		}{}
+% 		
+% 		\ifthenelse{\boolean{isFile2}}{
+% 			Fluorescence activity distribution (not zoom corrected) for top view:
+% 			\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
+% 		}{}
+% 	
+% 	}{
+% 		\ifthenelse{\boolean{isFile1}}{
+% 		
+% 			\ownClearPage
+% 			\subsection{Fluorescence spectra}
+% 			\begin{itemize}
+% 			\item Histogram of observed fluorescence colors
+% 			\end{itemize}
+% 			\checkFile{side_fluo_histogram_bin_stackedOverallImage.tex}{top_fluo_histogram_bin_stackedOverallImage.tex}{}
+% 			\ifthenelse{\boolean{isFile1}}{
+% 			
+% 				Fluorescence activity distribution for side view:
+% 				\loadTex{side_fluo_histogram_bin_stackedOverallImage}
+% 			}{}
+% 			\ifthenelse{\boolean{isFile2}}{
+% 			
+% 				Fluorescence activity distribution for top view:
+% 				\loadTex{top_fluo_histogram_bin_stackedOverallImage}
+% 			}{}
+% 		}{}
+% 	}
+
 	\resetBoolean
 	\checkFileNoReset{side_fluo_histogram_bin_stackedOverallImage.tex}{}{}
-	\checkFileNoReset{top_fluo_histogram_bin_stackedOverallImage.tex}{}{}
 	\checkFileNoReset{}{side_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
-	\checkFileNoReset{}{top_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
 	\ifthenelse{\boolean{isFile2}}{
 
 		\ownClearPage
-		\subsection{Fluorescence spectra (zoom corrected)}
-		\begin{itemize}
-		\item Histogram of observed fluorescence colors
-		\end{itemize}
-		\checkFile{side_fluo_normalized_histogram_bin_stackedOverallImage.tex}{top_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
-		\ifthenelse{\boolean{isFile1}}{
-			Fluorescence activity distribution (zoom corrected) for side view:
-			\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
-		}{}
-		
-		\ifthenelse{\boolean{isFile2}}{
-			Fluorescence activity distribution (not zoom corrected) for top view:
-			\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
-		}{}
-	
+		\subsection{Fluorescence spectra side view (zoom corrected)}
+		%Fluorescence activity distribution (zoom corrected) for side view:
+		\loadTex{side_fluo_normalized_histogram_bin_stackedOverallImage}
 	}{
 		\ifthenelse{\boolean{isFile1}}{
 		
 			\ownClearPage
-			\subsection{Fluorescence spectra}
-			\begin{itemize}
-			\item Histogram of observed fluorescence colors
-			\end{itemize}
-			\checkFile{side_fluo_histogram_bin_stackedOverallImage.tex}{top_fluo_histogram_bin_stackedOverallImage.tex}{}
-			\ifthenelse{\boolean{isFile1}}{
-			
-				Fluorescence activity distribution for side view:
-				\loadTex{side_fluo_histogram_bin_stackedOverallImage}
-			}{}
-			\ifthenelse{\boolean{isFile2}}{
-			
-				Fluorescence activity distribution for top view:
-				\loadTex{top_fluo_histogram_bin_stackedOverallImage}
-			}{}
-		}{}
+			\subsection{Fluorescence spectra side view}
+			%Fluorescence activity distribution for side view:
+			\loadTex{side_fluo_histogram_bin_stackedOverallImage}
+		}
 	}
-}{}
+	
+	\resetBoolean
+	\checkFileNoReset{top_fluo_histogram_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{}{top_fluo_normalized_histogram_bin_stackedOverallImage.tex}{}
+	\ifthenelse{\boolean{isFile2}}{
 
+		\ownClearPage
+		\subsection{Fluorescence spectra top view (zoom corrected)}
+		%Fluorescence activity distribution (zoom corrected) for side view:
+		\loadTex{top_fluo_normalized_histogram_bin_stackedOverallImage}
+	}{
+		\ifthenelse{\boolean{isFile1}}{
+		
+			\ownClearPage
+			\subsection{Fluorescence spectra top view}
+			%Fluorescence activity distribution for side view:
+			\loadTex{top_fluo_histogram_bin_stackedOverallImage}
+		}
+	}	
+}{}
 
 %\checkFile{side_fluo_histogram_ratio_bin_1_0_25_side_fluo_histogram_ratio_bin_2_2stackedOverallImage.tex}{top_fluo_histogram_ratio_bin_1_0_25_top_fluo_histogram_ratio_bin_2_25_stackedOverallImage.tex}
 %\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
@@ -889,6 +951,10 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 	\resetClear
 	\clearpage
 	\section{Near-infrared intensity}
+	\begin{itemize}
+	\item Average intensity of near infrared (NIR)
+	\item Represents the water content of the plant
+	\end{itemize}
 	
 	\checkFile{side_nir_intensity_average__relative_nboxplot.pdf}{top_nir_intensity_average__relative___pix_nboxplot.pdf}{}
 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
@@ -908,51 +974,97 @@ ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
 	
 	\resetBoolean
 	\checkFileNoReset{side_nir_histogram_bin_stackedOverallImage.tex}{}{}
-	\checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}{}
 	\checkFileNoReset{}{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
-	\checkFileNoReset{}{top_nir_histogram_bin_stackedOverallImage.tex}{}
 	\ifthenelse{\boolean{isFile2}}{
 
 			\ownClearPage
-			\subsection{Intensity histogram (zoom corrected)}
-			\begin{itemize}
-			\item Average intensity of near infrared (NIR)
-			\item Represents the water content of the plant
-			\end{itemize}
-			
-			\checkFile{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}{}
-			\ifthenelse{\boolean{isFile1}}{
-				NIR intensity distribution for side view (zoom corrected):
-				\loadTex{side_nir_normalized_histogram_bin_stackedOverallImage}
-			}{}
-			\ifthenelse{\boolean{isFile2}}{
-				NIR intensity distribution for top view (not zoom corrected):
-				\loadTex{top_nir_histogram_bin_stackedOverallImage}
-			}{}
-	
+			\subsection{Intensity histogram side view (zoom corrected)}
+			%NIR intensity distribution for side view (zoom corrected):
+			\loadTex{side_nir_normalized_histogram_bin_stackedOverallImage}
 	}{
 		\ifthenelse{\boolean{isFile1}}{
 		
 			\ownClearPage
-			\subsection{Intensity histogram}
+			\subsection{Intensity histogram side view}
+			%NIR intensity distribution for side view:
+			\loadTex{side_nir_histogram_bin_stackedOverallImage}
+		}{}
+	}
+	
+	\resetBoolean
+	\checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{}{top_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
+	\ifthenelse{\boolean{isFile2}}{
+
+			\ownClearPage
+			\subsection{Intensity histogram top view (zoom corrected)}
 			\begin{itemize}
 			\item Average intensity of near infrared (NIR)
 			\item Represents the water content of the plant
 			\end{itemize}
-			\checkFile{side_nir_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}{}
-			\ifthenelse{\boolean{isFile1}}{
-			
-				NIR intensity distribution for side view:
-				\loadTex{side_nir_histogram_bin_stackedOverallImage}
-			}{}
-			\ifthenelse{\boolean{isFile2}}{
-			
-				NIR intensity distribution for top view:
-				\loadTex{top_nir_histogram_bin_stackedOverallImage}
-			}{}
+			%NIR intensity distribution for side view (zoom corrected):
+			\loadTex{top_nir_normalized_histogram_bin_stackedOverallImage}
+	}{
+		\ifthenelse{\boolean{isFile1}}{
+		
+			\ownClearPage
+			\subsection{Intensity histogram top view}
+			\begin{itemize}
+			\item Average intensity of near infrared (NIR)
+			\item Represents the water content of the plant
+			\end{itemize}	
+			%NIR intensity distribution for side view:
+			\loadTex{top_nir_histogram_bin_stackedOverallImage}
 		}{}
 	}
 }{}
+
+% \resetBoolean
+% 	\checkFileNoReset{side_nir_histogram_bin_stackedOverallImage.tex}{}{}
+% 	\checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}{}
+% 	\checkFileNoReset{}{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}
+% 	\checkFileNoReset{}{top_nir_histogram_bin_stackedOverallImage.tex}{}
+% 	\ifthenelse{\boolean{isFile2}}{
+% 
+% 			\ownClearPage
+% 			\subsection{Intensity histogram (zoom corrected)}
+% 			\begin{itemize}
+% 			\item Average intensity of near infrared (NIR)
+% 			\item Represents the water content of the plant
+% 			\end{itemize}
+% 			
+% 			\checkFile{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}{}
+% 			\ifthenelse{\boolean{isFile1}}{
+% 				NIR intensity distribution for side view (zoom corrected):
+% 				\loadTex{side_nir_normalized_histogram_bin_stackedOverallImage}
+% 			}{}
+% 			\ifthenelse{\boolean{isFile2}}{
+% 				NIR intensity distribution for top view (not zoom corrected):
+% 				\loadTex{top_nir_histogram_bin_stackedOverallImage}
+% 			}{}
+% 	
+% 	}{
+% 		\ifthenelse{\boolean{isFile1}}{
+% 		
+% 			\ownClearPage
+% 			\subsection{Intensity histogram}
+% 			\begin{itemize}
+% 			\item Average intensity of near infrared (NIR)
+% 			\item Represents the water content of the plant
+% 			\end{itemize}
+% 			\checkFile{side_nir_histogram_bin_stackedOverallImage.tex}{top_nir_histogram_bin_stackedOverallImage.tex}{}
+% 			\ifthenelse{\boolean{isFile1}}{
+% 			
+% 				NIR intensity distribution for side view:
+% 				\loadTex{side_nir_histogram_bin_stackedOverallImage}
+% 			}{}
+% 			\ifthenelse{\boolean{isFile2}}{
+% 			
+% 				NIR intensity distribution for top view:
+% 				\loadTex{top_nir_histogram_bin_stackedOverallImage}
+% 			}{}
+% 		}{}
+% 	}
 
 
 \resetBoolean
