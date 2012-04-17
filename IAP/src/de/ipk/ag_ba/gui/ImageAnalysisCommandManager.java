@@ -199,11 +199,20 @@ public class ImageAnalysisCommandManager {
 										toggles),
 								guiSetting));
 				
-				ThreadSafeOptions tsoA = new ThreadSafeOptions();
-				tsoA.setParam(0, "Appendix");
-				tsoA.setBval(0, false);
-				toggles.add(tsoA);
-				actions.add(new NavigationButton(new ActionToggle("Plot and include all calculated properties?", "Create Appendix?", tsoA),
+				ThreadSafeOptions tsoCreateAppendix = new ThreadSafeOptions();
+				tsoCreateAppendix.setParam(0, "Appendix");
+				tsoCreateAppendix.setBval(0, false);
+				toggles.add(tsoCreateAppendix);
+				actions.add(new NavigationButton(new ActionToggle("Plot and include all calculated properties?",
+						"Create Appendix?", tsoCreateAppendix),
+						src.getGUIsetting()));
+				
+				ThreadSafeOptions tsoCalculateRatio = new ThreadSafeOptions();
+				tsoCalculateRatio.setParam(0, "Ratio");
+				tsoCalculateRatio.setBval(0, false);
+				toggles.add(tsoCalculateRatio);
+				actions.add(new NavigationButton(new ActionToggle("Îf selected, the condition with highest value sum will be a reference",
+						"Calculate Stress-Reaction?", tsoCalculateRatio),
 						src.getGUIsetting()));
 				
 				for (String c : new String[] {
