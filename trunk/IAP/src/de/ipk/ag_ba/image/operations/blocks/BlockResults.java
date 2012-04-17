@@ -235,9 +235,9 @@ public class BlockResults implements BlockResultSet {
 		res.put("RESULT_VIS_MARKER_POS_2_LEFT_X", "null");
 		res.put("", "");
 		res.put("RESULT_VIS_MARKER_POS_2_RIGHT_X", "null");
-		res.put("side.height", "mm");
+		res.put("side.height", "px");
 		res.put("side.height.norm", "mm");
-		res.put("side.width", "mm");
+		res.put("side.width", "px");
 		res.put("side.width.norm", "mm");
 		res.put("side.fluo.histogram.bin.1.0_36", "px");
 		res.put("side.fluo.histogram.bin.2.36_72", "px");

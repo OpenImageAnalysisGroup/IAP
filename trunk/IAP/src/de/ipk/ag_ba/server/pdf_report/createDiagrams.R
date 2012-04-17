@@ -1130,7 +1130,7 @@ normalizeToHundredPercent =  function(whichRows, overallResult) {
 	return(t(apply(overallResult[whichRows, ], 1, function(x, y) {(100*x)/y}, y=colSums(overallResult[whichRows, ]))))
 }
 
-renameYForAppendix <- function(label) {
+renameYForSubsection <- function(label) {
 	
 	label <- gsub("%","percent", label)
 	label <- gsub("\\^2","$^2$", label)
@@ -1138,17 +1138,28 @@ renameYForAppendix <- function(label) {
 	return(label)
 }
 
-writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", o="", isAppendix=FALSE, ylabel="") {
+writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", o="", ylabel="", subsectionDepth=1) { #insertSubsections=FALSE,
 	fileNameImageFile = preprocessingOfValues(fileNameImageFile, FALSE, "_")
 	fileNameLatexFile = preprocessingOfValues(fileNameLatexFile, FALSE, "_")
 	o = gsub('[[:punct:]]', "_", o)
 	
 	latexText <- ""
 	
-	if(isAppendix & nchar(ylabel) > 0) {
-		ylabel <- renameYForAppendix(ylabel)
-		latexText = paste(latexText, "\\subsection{",ylabel,"}\n", sep="" )
+	if(nchar(ylabel) > 0) {
+		ylabel <- renameYForSubsection(ylabel)
+		if(subsectionDepth == 1) {
+			latexText = paste(latexText, "\\subsection{",ylabel,"}\n", sep="" )
+		} else if(subsectionDepth == 2) {
+			latexText = paste(latexText, "\\subsubsection{",ylabel,"}\n", sep="" )
+		} else if(subsectionDepth == 3) {
+			latexText = paste(latexText, "\\subsubsubsection{",ylabel,"}\n", sep="" )
+		}
 	}
+	
+#	if(insertSubsections & nchar(ylabel) > 0) {
+#		ylabel <- renameYForAppendix(ylabel)
+#		latexText = paste(latexText, "\\subsection{",ylabel,"}\n", sep="" )
+#	}
 	
 	latexText = paste(latexText,
 					 "\\loadImage{", 
@@ -1313,6 +1324,30 @@ renameY <- function(label) {
 	return(label)		
 }
 
+writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFileFirstValue="", writeLatexFileSecondValue="", subSectionTitel="", makeOverallImage=FALSE, isAppendix=FALSE, subsectionDepth=1) {
+	overallList$debug %debug% "writeTheData()"		
+
+	saveImageFile(overallList, plot, fileName, extraString)
+	if (makeOverallImage) {
+		if(subSectionTitel != "") {
+			writeLatexFile(writeLatexFileFirstValue, writeLatexFileSecondValue, ylabel=subSectionTitel, subsectionDepth=subsectionDepth)	
+		} else {
+			writeLatexFile(writeLatexFileFirstValue, writeLatexFileSecondValue)
+		}
+	} 
+	
+#	else {
+#		writeLatexFile(fileName, writeLatexFileSecondValue)	
+#	}
+	
+	if(isAppendix) {
+		if(subSectionTitel != "") {
+			writeLatexFile("appendixImage", fileName, extraString)
+		} else {
+			writeLatexFile("appendixImage", fileName, extraString, ylabel=subSectionTitel, subsectionDepth=subsectionDepth)
+		}
+	}
+}
 
 makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot") {
 ########
@@ -1431,13 +1466,15 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 		#				}
 		##!#				points(overallList$filterXaxis, overallResultWithNaValues, type="p", col=overallList$color[y], pch=y, lty=1, lwd=3 )
 		#			} 
+
+					writeTheData(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave, isAppendix=overallList$appendix, subSectionTitel=ylabelForAppendix, subsectionDepth=1)
 	
-
-					saveImageFile(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave)
-
-					if (overallList$appendix) {
-						writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave, TRUE, ylabelForAppendix)
-					}
+	
+#					saveImageFile(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave)
+#
+#					if (overallList$appendix) {
+#						writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave, TRUE, ylabelForAppendix)
+#					}	
 				} else {
 					print("Only one column has values, create barplot!")
 			
@@ -1543,13 +1580,24 @@ plotStackedImage <- function(overallList, overallResult, title = "", makeOverall
 				}
 			}
 			
-
-			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
-			if (makeOverallImage) {
-				writeLatexFile(paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
-			} else {
-				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
+			subtitle <- ""
+			if(positionType == overallList$stackedBarOptions$typOfGeomBar[1]) {
+				subtitle <- title
 			}
+			
+			
+			writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""), paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""), subtitle, makeOverallImage,subsectionDepth=2)
+			
+#			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
+#			if (makeOverallImage) {
+#				if(title != "") {
+#					writeLatexFile(paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""), TRUE, title)	
+#				} else {
+#					writeLatexFile(paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))
+#				}
+#			} else {
+#				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
+#			}			
 		}
 	}
 }
@@ -1654,22 +1702,23 @@ makeSpiderPlotDiagram <- function(overallResult, overallDescriptor, overallColor
 	tempOverallResult =  na.omit(overallResult)
 	
 	for (imagesIndex in names(overallDescriptor)) {
-		createOuputOverview("spider plot", imagesIndex, length(names(overallDescriptor)), getVector(overallDesName[[imagesIndex]]))
+		createOuputOverview("spider/linerange plot", imagesIndex, length(names(overallDescriptor)), getVector(overallDesName[[imagesIndex]]))
 		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, diagramTypSave)
 		
 		if (length(overallResult[, 1]) > 0) {
 			test <- c("side fluo intensity", "side nir intensity", "side visible hue average value", "top visible hue average value")
 			if(sum(!getVector(overallDesName[[imagesIndex]]) %in% test) > 1) {
-				PreWorkForMakeBigOverallImageSpin(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave)
+				doSpiderPlot <- TRUE
+			} else {
+				doSpiderPlot <- FALSE
 			}
+			PreWorkForMakeBigOverallImageSpin(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave, doSpiderPlot)		
 		}
-		#PreWorkForMakeNormalImages(h, overallList)
 	}
-	#return(overallList)
 }	
 
 
-PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave) {
+PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, options, diagramTypSave, doSpiderPlot) {
 	overallList$debug %debug% "PreWorkForMakeBigOverallImageSpin()"	
 	
 	overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName, overallResult$xAxis, options)
@@ -1679,7 +1728,9 @@ PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, 
 	
 	if (length(groupBy) == 0 || length(groupBy) == 1) {
 		
-		plotSpiderImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave=diagramTypSave)	
+		if(doSpiderPlot) {
+			plotSpiderImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave=diagramTypSave)	
+		}
 		plotLineRangeImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave="lineRangePlot")	
 	} else {
 		
@@ -1690,8 +1741,10 @@ PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, 
 			plotThisValues = overallResult[booleanVector, ]
 			usedOverallColor <- overallColor[[imagesIndex]][1:length(unique(plotThisValues["primaerTreatment"])[,1])]
 			overallColor[[imagesIndex]] <- overallColor[[imagesIndex]][(length(unique(plotThisValues["primaerTreatment"])[,1])+1):length(overallColor[[imagesIndex]])]
-			#	plotThisValues = reNameColumn(plotThisValues, "name", "primaerTreatment")
-			plotSpiderImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = usedOverallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave=diagramTypSave)
+			
+			if(doSpiderPlot) {
+				plotSpiderImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = usedOverallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave=diagramTypSave)
+			}
 			plotLineRangeImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = usedOverallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave="lineRangePlot")
 		}	 
 	}
@@ -1801,17 +1854,27 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 			
 		#	print(plot)
 			
-			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
-			if (makeOverallImage) {
-				writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
-			} else {
-				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
-			}		
+			subtitle <- ""
+			if(positionType == overallList$stackedBarOptions$typOfGeomBar[1] || lenght(overallList$stackedBarOptions$typOfGeomBar) == 1) {
+				subtitle <- titel
+			}
+
+			writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(diagramTypSave, title, positionType, sep=""), paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], diagramTypSave, title, positionType, sep=""), subtitle, makeOverallImage, subsectionDepth=2)
+																													
+#			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste(diagramTypSave, title, positionType, sep=""))
+#			if (makeOverallImage) {
+#				if(title != "") {
+#					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], diagramTypSave, title, positionType, sep=""), TRUE, title)	
+#				} else {
+#					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], diagramTypSave, title, positionType, sep=""))
+#				}
+#			} else {
+#				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], diagramTypSave, positionType, title, sep=""))	
+#			}
+
 		}
 	}				
 }
-
-
 
 plotLineRangeImage <- function(overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
 	################
@@ -1820,16 +1883,17 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 #	overallColor <- usedOverallColor
 #	overallResult <- plotThisValues
 #	positionType <- overallList$spiderOptions$typOfGeomBar[1]
+#	diagramTypSave <- "lineRangePlot"
 	#################
 	
-	print(overallResult[1,])
+	#print(overallResult[1,])
 #tempoverallResult <- overallResult
 #overallResult <- tempoverallResult
-	overallList$debug %debug% "plotSpiderImage()"	
+	overallList$debug %debug% "plotLineRangeImage()"	
 	if (length(overallResult[, 1]) > 0) {		
 	
 		plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
-				geom_line() +
+				geom_line()
 		
 		if ("primaerTreatment" %in% colnames(overallResult)) {				
 			plot <- plot + geom_point(aes(color=as.character(primaerTreatment)), size=3)
@@ -1898,12 +1962,15 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 		
 	#	print(plot)
 		
-		saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
-		if (makeOverallImage) {
-			writeLatexFile(paste(overallFileName[[imagesIndex]], "lineRangeOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))	
-		} else {
-			writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
-		}	
+		writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(diagramTypSave, title, sep=""), paste(overallFileName[[imagesIndex]], "lineRangeOverallImage", sep=""), paste(overallFileName[[imagesIndex]], diagramTypSave, title, sep=""), title, makeOverallImage, subsectionDepth=2)
+
+#		saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste(diagramTypSave, title, sep=""))
+#		if (makeOverallImage) {
+#			writeLatexFile(paste(overallFileName[[imagesIndex]], "lineRangeOverallImage", sep=""), paste(overallFileName[[imagesIndex]], diagramTypSave, title, sep=""))	
+#		} else {
+#			writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], diagramTypSave, title, sep="_"))	
+#		}			
+		
 	}		
 }
 
@@ -1920,12 +1987,12 @@ makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overa
 			
 			if (length(overallResult[, 1]) > 0) {
 				if (isOnlyOneValue) {
-					myPlot = ggplot(data=overallResult, aes(x=name, y=mean))
+					plot = ggplot(data=overallResult, aes(x=name, y=mean))
 				} else {
-					myPlot = ggplot(data=overallResult, aes(x=xAxis, y=mean))
+					plot = ggplot(data=overallResult, aes(x=xAxis, y=mean))
 				}
 				
-				myPlot = myPlot + 						
+				plot = plot + 						
 						geom_bar(stat="identity", aes(fill=name), colour="Grey", size=0.1) +
 						geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
 						#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
@@ -1943,15 +2010,17 @@ makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overa
 						)
 				
 				if (length(overallColor[[imagesIndex]]) > 10) {
-					myPlot = myPlot + opts(axis.text.x = theme_text(size=6, angle=90))
+					plot = plot + opts(axis.text.x = theme_text(size=6, angle=90))
 				}
 				#print(myPlot)
 				
-				saveImageFile(overallList, myPlot, overallFileName[[imagesIndex]], diagramTypSave)
-
-				if (overallList$appendix) {
-					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
-				}
+				writeTheData(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave, title, makeOverallImage, isAppendix=overallList$appendix)
+	
+#				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave)
+#
+#				if (overallList$appendix) {
+#					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
+#				}	
 			}
 		}
 	}
@@ -1974,7 +2043,7 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, o
 				#myPlot = ggplot(overallList$overallResult, aes(factor(name), value, fill=name, colour=name)) + 
 				#myPlot = ggplot(overallResult, aes(factor(name), value, fill=name)) +
 			
-				myPlot = ggplot(overallResult, aes(factor(name), value, fill=name)) +
+				plot = ggplot(overallResult, aes(factor(name), value, fill=name)) +
 						geom_boxplot() +
 						ylab(overallDesName[[imagesIndex]]) +
 						#coord_cartesian(ylim=c(0, max(overallList$overallResult$mean + overallList$overallResult$se + 10, na.rm=TRUE))) +
@@ -1993,11 +2062,13 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, o
 						opts(axis.text.x = theme_text(size=6, angle=90)) +
 						facet_wrap(~ xAxisfactor, drop=FALSE)
 						
-				saveImageFile(overallList, myPlot, overallFileName[[imagesIndex]], diagramTypSave)
-
-				if (overallList$appendix) {
-					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
-				}
+				writeTheData(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave, isAppendix=overallList$appendix)
+				
+#				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave)
+#
+#				if (overallList$appendix) {
+#					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
+#				}					
 			}
 		}
 	}
@@ -2232,8 +2303,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 												"top.area.relative", 
 												"side.area.relative", 
 												"volume.iap.relative", 
-												"side.height (mm)", 
-												"side.width (mm)", 
+												"side.height (px)", 
+												"side.width (px)", 
 												"side.area (px)", 
 												"top.area (px)",
 												############ new #######
@@ -2319,8 +2390,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 										   "volume.fluo.iap", 
 										   "volume.iap (px^3)", 
 										   "volume.lt (px^3)", 
-										   "side.height (mm)", 
-										   "side.width (mm)", 
+										   "side.height (px)", 
+										   "side.width (px)", 
 										   "side.area (px)", 
 										   "top.area (px)"
 											)
@@ -2344,7 +2415,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				#spiderplot
 				descriptorSet_spiderplot = c(#"volume.my"
 						"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average",
-						"side.height (mm)$side.width (mm)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average"
+						"side.height (px)$side.width (px)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average"
 
 				)
 				
@@ -2479,8 +2550,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				"top.area.relative", 
 				"side.area.relative", 
 				"volume.iap.relative", 
-				"side.height (mm)", 
-				"side.width (mm)", 
+				"side.height (px)", 
+				"side.width (px)", 
 				"side.area (px)", 
 				"top.area (px)",
 				"side.hull.area (px)",
@@ -2561,8 +2632,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 			"volume.fluo.iap", 
 			"volume.iap (px^3)", 
 			"volume.lt (px^3)", 
-			"side.height (mm)", 
-			"side.width (mm)", 
+			"side.height (px)", 
+			"side.width (px)", 
 			"side.area (px)", 
 			"top.area (px)"
 	)
@@ -2618,7 +2689,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	#spiderplot
 	descriptorSet_spiderplot = c(#"volume.my"
 			"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average",
-			"side.height (mm)$side.width (mm)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average"
+			"side.height (px)$side.width (px)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average"
 	
 	)
 	
