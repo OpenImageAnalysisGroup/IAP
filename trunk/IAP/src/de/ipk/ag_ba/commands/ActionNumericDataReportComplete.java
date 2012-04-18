@@ -188,8 +188,10 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 					ratio = tso.getBval(0, false);
 			}
 			ConditionFilter cf = this;
-			if (ratio)
+			if (ratio) {
 				experiment = experiment.calc().ratioDataset("norm", cf);
+				experiment.calc().fitThreeStepLinearModel("pc2");
+			}
 			
 			ArrayList<SnapshotDataIAP> snapshots;
 			StringBuilder csv = new StringBuilder();
