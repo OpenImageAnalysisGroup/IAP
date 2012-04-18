@@ -219,13 +219,13 @@ public class PdfCreator {
 		TreeSet<String> result = new TreeSet<String>();
 		for (SubstanceInterface si : e)
 			for (ConditionInterface ci : si) {
-				String id = ci.getConditionId() + "";
-				String sp = ci.getSpecies() != null ? ci.getSpecies() : "";
-				String gt = ci.getGenotype() != null ? ci.getGenotype() : "";
-				String v = ci.getVariety() != null ? ci.getVariety() : "";
-				String t = ci.getTreatment() != null ? ci.getTreatment() : "";
-				String s = ci.getSequence() != null ? ci.getSequence() : "";
-				String gc = ci.getGrowthconditions() != null ? ci.getGrowthconditions() : "";
+				String id = StringManipulationTools.string2Latex(ci.getConditionId() + "");
+				String sp = StringManipulationTools.string2Latex(ci.getSpecies() != null ? ci.getSpecies() : "");
+				String gt = StringManipulationTools.string2Latex(ci.getGenotype() != null ? ci.getGenotype() : "");
+				String v = StringManipulationTools.string2Latex(ci.getVariety() != null ? ci.getVariety() : "");
+				String t = StringManipulationTools.string2Latex(ci.getTreatment() != null ? ci.getTreatment() : "");
+				String s = StringManipulationTools.string2Latex(ci.getSequence() != null ? ci.getSequence() : "");
+				String gc = StringManipulationTools.string2Latex(ci.getGrowthconditions() != null ? ci.getGrowthconditions() : "");
 				boolean first = true;
 				String row = "";
 				for (String inRow : t.split(";")) {
