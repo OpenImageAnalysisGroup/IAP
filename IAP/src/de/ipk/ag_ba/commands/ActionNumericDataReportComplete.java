@@ -33,12 +33,14 @@ import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.pdf_report.PdfCreator;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionFilter;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
 /**
  * @author klukas
  */
-public class ActionNumericDataReportComplete extends AbstractNavigationAction implements SpecialCommandLineSupport {
+public class ActionNumericDataReportComplete extends AbstractNavigationAction implements SpecialCommandLineSupport, ConditionFilter {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
@@ -185,8 +187,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				if (((String) tso.getParam(0, "")).equals("Ratio"))
 					ratio = tso.getBval(0, false);
 			}
+			ConditionFilter cf = this;
 			if (ratio)
-				experiment = experiment.calc().ratioDataset("norm");
+				experiment = experiment.calc().ratioDataset("norm", cf);
 			
 			ArrayList<SnapshotDataIAP> snapshots;
 			StringBuilder csv = new StringBuilder();
@@ -358,6 +361,17 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	}
 	
 	@Override
+	public boolean filterConditionOut(ConditionInterface s) {
+		if (toggles == null)
+			return false;
+		for (ThreadSafeOptions t : toggles) {
+			if (matchCondition(t, s))
+				return true;
+		}
+		return false;
+	}
+	
+	@Override
 	public String getDefaultTooltip() {
 		String res = "<html>" + super.getDefaultTooltip();
 		synchronized (lastOutput) {
@@ -390,6 +404,42 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 					else
 						if (field.equals("Growth condition"))
 							value = s.getGrowthCondition();
+						else
+							if (field.equals("Treatment"))
+								value = s.getTreatment();
+		if (value == null)
+			value = "(not specified)";
+		else
+			if (value.isEmpty())
+				value = "(not specified)";
+		
+		return value.equals(content);
+	}
+	
+	private boolean matchCondition(ThreadSafeOptions t, ConditionInterface s) {
+		if (t.getBval(0, true))
+			return false;
+		// filter is active, check if snapshot matches criteria
+		// e.g. tso.setParam(0, setting); // Condition, Species, Genotype, Variety, Treatment
+		// e.g. tso.setParam(1, c);
+		
+		String field = (String) t.getParam(0, "");
+		String content = (String) t.getParam(1, "");
+		String value = null;
+		if (field.equals("Condition"))
+			value = s.getConditionName();
+		else
+			if (field.equals("Species"))
+				value = s.getSpecies();
+			else
+				if (field.equals("Genotype"))
+					value = s.getGenotype();
+				else
+					if (field.equals("Variety"))
+						value = s.getVariety();
+					else
+						if (field.equals("Growth condition"))
+							value = s.getGrowthconditions();
 						else
 							if (field.equals("Treatment"))
 								value = s.getTreatment();
