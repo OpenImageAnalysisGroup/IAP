@@ -830,55 +830,57 @@ setxAxisfactor <- function(xAxisName, xAxisValue, options) {
 
 overallGetResultDataFrame <- function(overallList) {
 	overallList$debug %debug% "overallGetResultDataFrame()"	
-	
-	groupBy = groupByFunction(list(overallList$treatment, overallList$secondTreatment))
-	colNames = list(colOfXaxis="xAxis", colOfMean="mean", colOfSD="se", colName="name", xAxis=overallList$xAxis)
-	booleanVectorList = buildList(overallList, colNames$colOfXaxis)
-	columnsStandard = c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
-if(!onlySpider) {		
-	if (sum(!is.na(overallList$nBoxDes)) > 0) {
-		if (overallList$debug) {print("nBoxplot")}
-		columns = c(columnsStandard, check(getVector(overallList$nBoxDes)))
-		overallList$overallResult_nBoxDes = getResultDataFrame("nboxplot", overallList$nBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug)
-	} else {
-		print("All values for nBoxplot are 'NA'")
-	}
-	
-	if (sum(!is.na(overallList$boxDes)) > 0) {
-		if (overallList$debug) {print("Boxplot")}
-		colNames$colOfMean = "value"
-		columns = c(columnsStandard, check(getVector(overallList$boxDes)))
-		overallList$overallResult_boxDes = getResultDataFrame("boxplot", overallList$boxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug)
-	} else {
-		print("All values for Boxplot are 'NA'")
-	}
-	
-	if (sum(!is.na(overallList$boxStackDes)) > 0) {
-		if (overallList$debug) {print("stackedBoxplot")}
-		colNames$colOfMean = check(getVector(overallList$boxStackDes))
-		colNames$colOfXaxis = overallList$xAxis
-		columns = c(columnsStandard, check(getVector(overallList$boxStackDes)))
-		overallList$overallResult_boxStackDes = getResultDataFrame("boxplotStacked", overallList$boxStackDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug)
-	} else {
-		print("All values for stackedBoxplot are 'NA'")
-	}
-}
 
-	if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
-		if (overallList$debug) {print("spider plot")}
-		#colNames$colOfMean = check(getVector(overallList$boxSpiderDes))
-		colNames$colOfMean = "value"
-		colNames$colOfXaxis = overallList$xAxis
-		colNames$desNames = overallList$boxSpiderDesName
-		columns = c(columnsStandard, check(getVector(overallList$boxSpiderDes)))
-		overallList$overallResult_boxSpiderDes = getResultDataFrame("spiderplot", overallList$boxSpiderDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug)
-	} else {
-		print("All values for spider plot are 'NA'")
-	}
-	
-	if (is.null(overallList$boxStackDes) && is.null(overallList$boxDes) && is.null(overallList$nBoxDes) && is.null(overallList$boxSpiderDes)) {
-		print("No descriptor set - this run needs to stop!")
-		overallList$stoppTheCalculation = TRUE
+	if(!calculateNothing) {	
+			groupBy = groupByFunction(list(overallList$treatment, overallList$secondTreatment))
+			colNames = list(colOfXaxis="xAxis", colOfMean="mean", colOfSD="se", colName="name", xAxis=overallList$xAxis)
+			booleanVectorList = buildList(overallList, colNames$colOfXaxis)
+			columnsStandard = c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
+		if(!onlySpider) {		
+			if (sum(!is.na(overallList$nBoxDes)) > 0) {
+				if (overallList$debug) {print("nBoxplot")}
+				columns = c(columnsStandard, check(getVector(overallList$nBoxDes)))
+				overallList$overallResult_nBoxDes = getResultDataFrame("nboxplot", overallList$nBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug)
+			} else {
+				print("All values for nBoxplot are 'NA'")
+			}
+			
+			if (sum(!is.na(overallList$boxDes)) > 0) {
+				if (overallList$debug) {print("Boxplot")}
+				colNames$colOfMean = "value"
+				columns = c(columnsStandard, check(getVector(overallList$boxDes)))
+				overallList$overallResult_boxDes = getResultDataFrame("boxplot", overallList$boxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug)
+			} else {
+				print("All values for Boxplot are 'NA'")
+			}
+			
+			if (sum(!is.na(overallList$boxStackDes)) > 0) {
+				if (overallList$debug) {print("stackedBoxplot")}
+				colNames$colOfMean = check(getVector(overallList$boxStackDes))
+				colNames$colOfXaxis = overallList$xAxis
+				columns = c(columnsStandard, check(getVector(overallList$boxStackDes)))
+				overallList$overallResult_boxStackDes = getResultDataFrame("boxplotStacked", overallList$boxStackDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug)
+			} else {
+				print("All values for stackedBoxplot are 'NA'")
+			}
+		}
+		
+			if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
+				if (overallList$debug) {print("spider plot")}
+				#colNames$colOfMean = check(getVector(overallList$boxSpiderDes))
+				colNames$colOfMean = "value"
+				colNames$colOfXaxis = overallList$xAxis
+				colNames$desNames = overallList$boxSpiderDesName
+				columns = c(columnsStandard, check(getVector(overallList$boxSpiderDes)))
+				overallList$overallResult_boxSpiderDes = getResultDataFrame("spiderplot", overallList$boxSpiderDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug)
+			} else {
+				print("All values for spider plot are 'NA'")
+			}
+			
+			if (is.null(overallList$boxStackDes) && is.null(overallList$boxDes) && is.null(overallList$nBoxDes) && is.null(overallList$boxSpiderDes)) {
+				print("No descriptor set - this run needs to stop!")
+				overallList$stoppTheCalculation = TRUE
+			}
 	}
 	return(overallList)
 }
@@ -2077,39 +2079,40 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, o
 
 makeDiagrams <- function(overallList) {
 	overallList$debug %debug% "makeDiagrams()"
-
-if(!onlySpider) {		
-	if (sum(!is.na(overallList$nBoxDes)) > 0) {
-		if (overallList$debug) {print("nBoxplot...")}
-		makeLinearDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
-	} else {
-		print("All values for nBoxplot are 'NA'")
-	}
-	
-	if (sum(!is.na(overallList$boxDes)) > 0) {
-		if (overallList$debug) {print("Boxplot...")}
-		makeBoxplotDiagram(overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$imageFileNames_Boxplots, overallList$boxOptions, overallList)
-	} else {
-		print("All values for Boxplot are 'NA'...")
-	}
-	
-	if (sum(!is.na(overallList$boxStackDes)) > 0) {
-		if (overallList$debug) {print("Stacked Boxplot...")}
-		makeBoxplotStackedDiagram(overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
-	} else {
-		print("All values for stacked Boxplot are 'NA'...")
+	if(!calculateNothing) {	
+		if(!onlySpider) {		
+			if (sum(!is.na(overallList$nBoxDes)) > 0) {
+				if (overallList$debug) {print("nBoxplot...")}
+				makeLinearDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
+			} else {
+				print("All values for nBoxplot are 'NA'")
+			}
+			
+			if (sum(!is.na(overallList$boxDes)) > 0) {
+				if (overallList$debug) {print("Boxplot...")}
+				makeBoxplotDiagram(overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$imageFileNames_Boxplots, overallList$boxOptions, overallList)
+			} else {
+				print("All values for Boxplot are 'NA'...")
+			}
+			
+			if (sum(!is.na(overallList$boxStackDes)) > 0) {
+				if (overallList$debug) {print("Stacked Boxplot...")}
+				makeBoxplotStackedDiagram(overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
+			} else {
+				print("All values for stacked Boxplot are 'NA'...")
+				}
 		}
-}
-		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
-			if (overallList$debug) {print("Spider plot...")}
-		makeSpiderPlotDiagram(overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
-	} else {
-		print("All values for stacked Boxplot are 'NA'...")
-	}
-	
-	if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
-		if (overallList$debug) {print("Barplot...")}
-		makeBarDiagram(h, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots, overallList)
+				if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
+					if (overallList$debug) {print("Spider plot...")}
+				makeSpiderPlotDiagram(overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
+			} else {
+				print("All values for stacked Boxplot are 'NA'...")
+			}
+			
+			if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
+				if (overallList$debug) {print("Barplot...")}
+				makeBarDiagram(h, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots, overallList)
+			}
 	}
 }
 
@@ -2725,6 +2728,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		appendix <- FALSE
 		
 		onlySpider <- TRUE
+		calculateNothing <- TRUE
 	}
 	
 	secondRun = appendix
@@ -2837,6 +2841,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 	}
 }
 onlySpider <- FALSE
+calculateNothing <- FALSE
 ######### START #########
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)

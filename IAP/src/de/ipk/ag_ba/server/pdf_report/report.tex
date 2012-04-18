@@ -61,6 +61,7 @@
 \usepackage{graphicx}
 %\usepackage{amsmath} 
 \usepackage{ifthen}
+\usepackage{longtable}
 
 % —– Start: Angaben zur Formatierung von Überschriften —– %
 \usepackage{titletoc}
@@ -231,49 +232,102 @@ of the group image analysis.
 \section{Experiment info} 
 \subsection{Experiment properties}
 
-
-\begin{tabular}{|c|c|c|}
-\hline
-Experiment & --experimentname--\tabularnewline
-\hline
-\hline
-Start & --StartExp--\tabularnewline
-\hline
-End & --EndExp--\tabularnewline
-\hline
-Numeric values & --NumExp-- \tabularnewline
-\hline
-Images & --ImagesExp-- \tabularnewline
-\hline
-Storage & --StorageExp-- \tabularnewline
-\hline
-\end{tabular}
-
+\begin{center}
+	\begin{tabular}{|c|c|}
+	\hline
+	{\textbf{Experiment}} & --experimentname--\tabularnewline
+	\hline
+	\hline
+	{\textbf{Start}} & --StartExp--\tabularnewline
+	\hline
+	{\textbf{End}} & --EndExp--\tabularnewline
+	\hline
+	{\textbf{Numeric values}} & --NumExp-- \tabularnewline
+	\hline
+	{\textbf{Images}} & --ImagesExp-- \tabularnewline
+	\hline
+	{\textbf{Storage}} & --StorageExp-- \tabularnewline
+	\hline
+	\hline 
+	\end{tabular}
+\end{center}
 
 \subsection{Remarks}
 
-
-\begin{tabular}{|c|c|}
-\hline 
-Notes\tabularnewline
-\hline 
-\hline 
---RemarkExp--\tabularnewline
-\hline 
-\end{tabular}
+\begin{center}
+	\begin{tabular}{|c|}
+	\hline 
+	{\textbf{Notes}}\tabularnewline
+	\hline 
+	\hline 
+	--RemarkExp--\tabularnewline
+	\hline
+	\hline  
+	\end{tabular}
+\end{center}
 
 \subsection{Experiment factors}
 
+\begin{center}
+	\begin{longtable}{|p{1cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|}
+	
+	%This is the header for the first page of the table...
+	
+	\hline
+	{\textbf{ID}} & 
+	{\textbf{Species}} & 
+	{\textbf{Genotype}} & 
+	{\textbf{Variety}} &
+	{\textbf{Treatment}} & 
+	{\textbf{Sequence}} & 
+	{\textbf{Treatment}}
+	\tabularnewline
+	\hline
+	\hline
+	\endfirsthead
+	
+	 %This is the header for the remaining page(s) of the table...
+	 
+	\hline
+	{\textbf{ID}} & 
+	{\textbf{Species}} & 
+	{\textbf{Genotype}} & 
+	{\textbf{Variety}} &
+	{\textbf{Treatment}} & 
+	{\textbf{Sequence}} & 
+	{\textbf{Treatment}}
+	\tabularnewline
+	\hline
+	\hline
+	\endhead
+	
+	%This is the footer for all pages except the last page of the table...
+	
+	\multicolumn{7}{l}{{Continued on Next Page\ldots}} 
+	\tabularnewline
+	\endfoot
+	
+	%This is the footer for the last page of the table...
+	
+	\hline \hline
+	\endlastfoot
 
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline 
-ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
-\tabularnewline
-\hline 
-\hline 
---factorlist--
+	--factorlist--
 
-\end{tabular}
+	\end{longtable}
+\end{center}
+
+% \begin{center}
+% 	\begin{tabular}{|p{1cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|}
+% 	\hline
+% 	ID & Species & Genotype & Variety & Treatment & Sequence & Treatment
+% 	\tabularnewline
+% 	\hline
+% 	\hline
+% 	-##-factorlist--
+% 
+% 	\end{tabular}
+% \end{center}
 
 
 \resetBoolean

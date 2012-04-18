@@ -278,6 +278,26 @@ public class StringManipulationTools implements HelperClass {
 			{ "&hearts;", "\u2665" },
 			{ "&diams;", "\u2666" } };
 	
+	public static final String[][] parse2Latex = {
+			{ "\\", "\\textbackslash" },
+			{ "ä", "\"a" },
+			{ "ö", "\"o" },
+			{ "ü", "\"u" },
+			{ "ß", "\\ss" },
+			// { "_", "\\_" },
+			{ "<", "\\textless" },
+			{ ">", "\\textgreater" },
+			{ "§", "\\S" },
+			{ "$", "\\$" },
+			{ "&", "\\&" },
+			{ "#", "\\#" },
+			{ "{", "\\{" },
+			{ "}", "\\}" },
+			{ "%", "\\%" },
+			{ "~", "\\textasciitilde" },
+			{ "\"", "\"'" },
+			{ "€", "\\texteuro" } };
+	
 	/**
 	 * Replace occurrences of a substring.
 	 * http://ostermiller.org/utils/StringHelper.html
@@ -614,6 +634,19 @@ public class StringManipulationTools implements HelperClass {
 		for (int k = 0; k < htmlNamedEntity2Unicode.length; k++)
 			unicode = stringReplace(unicode, htmlNamedEntity2Unicode[k][0], htmlNamedEntity2Unicode[k][1]);
 		return unicode;
+	}
+	
+	/**
+	 * converts special entities within a string to latex
+	 * 
+	 * @param string
+	 * @return latex string
+	 */
+	public static String string2Latex(String inputString) {
+		String latexString = inputString;
+		for (int k = 0; k < parse2Latex.length; k++)
+			latexString = stringReplace(latexString, parse2Latex[k][0], parse2Latex[k][1]);
+		return latexString;
 	}
 	
 	public static String getFileSystemName(String name) {

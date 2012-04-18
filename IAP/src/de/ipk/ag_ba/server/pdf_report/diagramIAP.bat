@@ -17,3 +17,4 @@ rem del /s report.toc
 pdflatex report.tex
 pdflatex report.tex
 
+rem cmd
