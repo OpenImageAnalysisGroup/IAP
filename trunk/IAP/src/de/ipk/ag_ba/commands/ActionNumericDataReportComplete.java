@@ -440,18 +440,25 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 									double ciAVG = ciSum.get(time) / ciN.get(time);
 									double ciRefAVG = ciRefSum.get(time) / ciRefN.get(time);
 									double ratio = ciAVG / ciRefAVG;
+									double stdDev = 0.05; // todo determine
+									double stdDevRef = 0.05; // todo determine
+									double a = (stdDev / ciAVG) * (stdDev / ciAVG);
+									double b = (stdDevRef / ciRefAVG) * (stdDevRef / ciRefAVG);
+									double ratioStdDev = Math.sqrt(a + b);
 									if (!Double.isNaN(ratio) && !Double.isInfinite(ratio)) {
 										SubstanceInterface newS = si.clone();
 										res.add(newS);
 										ConditionInterface newC = ci.clone(newS);
 										newS.add(newC);
-										String newTreatment = ciRef.getTreatment() + " / " + ci.getTreatment();
+										String newTreatment = ci.getTreatment() + " / " + ciRef.getTreatment();
 										newC.setTreatment(newTreatment);
 										SampleInterface newSample = ciSampleExample.get(time).clone(newC);
 										newC.add(newSample);
 										NumericMeasurementInterface newValue = ciValueExample.get(time).clone(newSample);
 										newSample.add(newValue);
 										newValue.setValue(ratio);
+										newSample.getSampleAverage().setValue(ratio);
+										newSample.getSampleAverage().setStddev(ratioStdDev);
 									}
 								}
 							}
