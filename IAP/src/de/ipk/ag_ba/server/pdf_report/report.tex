@@ -223,7 +223,7 @@ of the group image analysis.
 \newline 
 \small{\textit{Key words and phrases:} image analysis, phenotyping, \textit{Arabidopsis}, barley, maize }
  
-
+\addtocounter{page}{-1}
 \clearpage
 \tableofcontents
 
@@ -370,14 +370,16 @@ of the group image analysis.
 \resetBoolean
 \checkFileNoReset{side_height__px__side_width__px__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
 \checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
-% \checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
-% \checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_aspiderOverallImage.tex}{}{}
+\checkFileNoReset{side_height__px__side_width__px__side_area__px__top_area__px__side_flulineRangeOverallImage.tex}{}{}
+\checkFileNoReset{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_alineRangeOverallImage.tex}{}{}
+\checkFileNoReset{mark1_y__percent_nboxplot.pdf}{}{}
+\checkFileNoReset{mark2_y__percent_nboxplot.pdf}{}{}
+\checkFileNoReset{mark3_y__percent_nboxplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
 	\resetClear
 	\clearpage
-	\section{Properties - Overview}
-	
+	\section{Propertiess - Overview}
 	
 	\resetBoolean
 	\checkFileNoReset{side_height__px__side_width__px__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
@@ -394,21 +396,42 @@ of the group image analysis.
 			}{}
 	}
 	
+% 	\resetBoolean
+% 	\checkFileNoReset{side_height__px__side_width__px__side_area__px__top_area__px__side_flulineRangeOverallImage.tex}{}{}
+% 	\checkFileNoReset{}{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_alineRangeOverallImage.tex}{}
+% 	\ifthenelse{\boolean{isFile2}}{
+% 		\ownClearPage
+% 		\subsection{Difference within special descriptors (zoom corrected)}
+% 		\loadTex{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_alineRangeOverallImage}
+% 	}{
+% 		\ifthenelse{\boolean{isFile1}}{
+% 			\ownClearPage
+% 			\subsection{Difference within special descriptors}
+% 			\loadTex{side_height__px__side_width__px__side_area__px__top_area__px__side_flulineRangeOverallImage}
+% 			}{}
+% 	}
+	
 	\resetBoolean
-	\checkFileNoReset{side_height__px__side_width__px__side_area__px__top_area__px__side_flulineRangeOverallImage.tex}{}{}
-	\checkFileNoReset{}{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_alineRangeOverallImage.tex}{}
-	\ifthenelse{\boolean{isFile2}}{
+	\checkFileNoReset{mark1_y__percent_nboxplot.pdf}{}{}
+	\checkFileNoReset{mark2_y__percent_nboxplot.pdf}{}{}
+	\checkFileNoReset{mark3_y__percent_nboxplot.pdf}{}{}
+	\ifthenelse{\boolean{isFile1}}{
 		\ownClearPage
-		\subsection{Difference within special descriptors (zoom corrected)}
-		\loadTex{side_height_norm__mm__side_width_norm__mm__side_area_norm__mm2__top_alineRangeOverallImage}
-	}{
-		\ifthenelse{\boolean{isFile1}}{
-			\ownClearPage
-			\subsection{Difference within special descriptors}
-			\loadTex{side_height__px__side_width__px__side_area__px__top_area__px__side_flulineRangeOverallImage}
-			}{}
-	}
+		\subsection{Zoom changes}
 		
+		\checkFile{mark1_y__percent_nboxplot.pdf}{mark2_y__percent_nboxplot.pdf}{mark3_y__percent_nboxplot.pdf}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{mark1_y__percent_nboxplot.pdf}
+		}{}
+		
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{mark2_y__percent_nboxplot.pdf}
+		}{}
+		
+		\ifthenelse{\boolean{isFile3}}{
+			\loadImage{mark3_y__percent_nboxplot.pdf}
+		}{}
+	}{}		
 }{}
 
 \resetBoolean

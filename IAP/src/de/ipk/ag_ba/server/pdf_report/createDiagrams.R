@@ -1583,7 +1583,7 @@ plotStackedImage <- function(overallList, overallResult, title = "", makeOverall
 			}
 			
 			subtitle <- ""
-			if(positionType == overallList$stackedBarOptions$typOfGeomBar[1]) {
+			if(positionType == overallList$stackedBarOptions$typOfGeomBar[1] || length(overallList$stackedBarOptions$typOfGeomBar) == 1) {
 				subtitle <- title
 			}
 			
@@ -1857,7 +1857,7 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 		#	print(plot)
 			
 			subtitle <- ""
-			if(positionType == overallList$stackedBarOptions$typOfGeomBar[1] || lenght(overallList$stackedBarOptions$typOfGeomBar) == 1) {
+			if(positionType == overallList$spiderOptions$typOfGeomBar[1] || length(overallList$spiderOptions$typOfGeomBar) == 1) {
 				subtitle <- titel
 			}
 
@@ -2326,7 +2326,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 												"top.hull.pc2.norm",
 												"top.hull.fillgrade (percent)",
 												"side.vis.hue.average",
-												"top.vis.hue.average"
+												"top.vis.hue.average",
+												"mark1.y (percent)",
+												"mark2.y (percent)",
+												"mark3.y (percent)"
 												)
 				
 					descriptorSetName_nBoxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)", "yellow spectra normed to the realtionship between dry and normal"
@@ -2377,7 +2380,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 													"opposite direction of the top maximum extension (zoom corrected) (mm)",
 													"fillgrade of top convex hull (%)",
 													"side visible hue average value",
-													"top visible hue average value"
+													"top visible hue average value",
+													"blue marker position from top (%)",
+													"blue marker position from middle (%)",
+													"blue marker position from bottom  (%)"
 													)		
 				}
 	
@@ -2572,7 +2578,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				"top.hull.pc2.norm",
 				"top.hull.fillgrade (percent)",
 				"side.vis.hue.average",
-				"top.vis.hue.average"
+				"top.vis.hue.average",
+				"mark1.y (percent)",
+				"mark2.y (percent)",
+				"mark3.y (percent)"
 		)
 		
 		descriptorSetName_nBoxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)", "yellow spectra normed to the realtionship between dry and normal"
@@ -2621,7 +2630,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				"opposite direction of the top maximum extension (zoom corrected) (mm)",
 				"fillgrade of top convex hull (%)",
 				"side visible hue average value",
-				"top visible hue average value"
+				"top visible hue average value",
+				"blue marker position from top (%)",
+				"blue marker position from middle (%)",
+				"blue marker position from bottom  (%)"
 		)		
 	
 	nBoxOptions= NULL
@@ -2840,11 +2852,11 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		}
 	}
 }
-onlySpider <- FALSE
+onlySpider <- TRUE
 calculateNothing <- FALSE
 ######### START #########
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))
