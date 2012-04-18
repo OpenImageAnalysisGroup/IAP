@@ -139,4 +139,6 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	public void saveToFile(String string) throws IOException;
 	
 	public TreeSet<String> getTreatmentList();
+	
+	public ExperimentCalculationService calc();
 }

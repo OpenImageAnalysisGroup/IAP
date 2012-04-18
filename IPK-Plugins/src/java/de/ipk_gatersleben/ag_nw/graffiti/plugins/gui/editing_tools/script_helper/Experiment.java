@@ -1048,4 +1048,9 @@ public class Experiment implements ExperimentInterface {
 	public void showXMLtoUser() {
 		ExperimentDataInfoPane.showXMLdata(this);
 	}
+	
+	@Override
+	public ExperimentCalculationService calc() {
+		return new ExperimentCalculationService(this);
+	}
 }
