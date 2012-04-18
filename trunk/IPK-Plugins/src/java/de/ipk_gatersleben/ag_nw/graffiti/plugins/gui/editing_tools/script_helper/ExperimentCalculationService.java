@@ -202,7 +202,8 @@ public class ExperimentCalculationService {
 	
 	public void fitThreeStepLinearModel(String... substances) {
 		String timeUnit = "";
-		for (SubstanceInterface s : experiment) {
+		ArrayList<SubstanceInterface> subList = new ArrayList<SubstanceInterface>(experiment);
+		for (SubstanceInterface s : subList) {
 			for (String valid : substances) {
 				if (s.getName().equals(valid)) {
 					// at least 4 time points need to be available,
