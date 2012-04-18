@@ -12,12 +12,14 @@ public class ExperimentCalculationService {
 		this.experiment = experiment;
 	}
 	
-	public ExperimentInterface ratioDataset(String treatmentReference) {
+	public ExperimentInterface ratioDataset(String treatmentReference, ConditionFilter cf) {
 		Experiment res = new Experiment();
 		res.setHeader(experiment.getHeader().clone());
 		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + " (STRESS RATIO)");
 		for (SubstanceInterface si : experiment) {
 			for (ConditionInterface ci : si) {
+				if (cf.filterConditionOut(ci))
+					continue;
 				boolean reference = ci.getTreatment() != null && ci.getTreatment().contains(treatmentReference);
 				if (reference) {
 					// nothing to do here
