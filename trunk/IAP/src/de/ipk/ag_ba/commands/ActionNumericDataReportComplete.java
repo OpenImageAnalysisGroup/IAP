@@ -386,6 +386,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 								// for each "Day (Int)" the average sample value is calculated for
 								// this condition and its reference condition
 								HashMap<Integer, Double> ciSum = new HashMap<Integer, Double>();
+								HashMap<Integer, ArrayList<Double>> ciValues = new HashMap<Integer, ArrayList<Double>>();
 								HashMap<Integer, Integer> ciN = new HashMap<Integer, Integer>();
 								HashMap<Integer, SampleInterface> ciSampleExample = new HashMap<Integer, SampleInterface>();
 								HashMap<Integer, NumericMeasurementInterface> ciValueExample = new HashMap<Integer, NumericMeasurementInterface>();
@@ -407,14 +408,17 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 											s = 0d;
 										s += v;
 										ciSum.put(sample.getTime(), s);
-										if (!ciN.containsKey(sample.getTime()))
+										if (!ciN.containsKey(sample.getTime())) {
 											ciN.put(sample.getTime(), 1);
-										else
+											ciValues.put(sample.getTime(), new ArrayList<Double>());
+										} else
 											ciN.put(sample.getTime(), ciN.get(sample.getTime()) + 1);
+										ciValues.get(sample.getTime()).add(s);
 									}
 								}
 								
 								HashMap<Integer, Double> ciRefSum = new HashMap<Integer, Double>();
+								HashMap<Integer, ArrayList<Double>> ciRefValues = new HashMap<Integer, ArrayList<Double>>();
 								HashMap<Integer, Integer> ciRefN = new HashMap<Integer, Integer>();
 								for (SampleInterface sample : ciRef) {
 									if (timePointsAvailForBoth.contains(sample.getTime())) {
@@ -426,10 +430,12 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 											s = 0d;
 										s += sample.getSampleAverage().getValue();
 										ciRefSum.put(sample.getTime(), s);
-										if (!ciRefN.containsKey(sample.getTime()))
+										if (!ciRefN.containsKey(sample.getTime())) {
 											ciRefN.put(sample.getTime(), 1);
-										else
+											ciRefValues.put(sample.getTime(), new ArrayList<Double>());
+										} else
 											ciRefN.put(sample.getTime(), ciRefN.get(sample.getTime()) + 1);
+										ciRefValues.get(sample.getTime()).add(s);
 									}
 								}
 								// divide sample average by average of reference condition
@@ -440,8 +446,32 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 									double ciAVG = ciSum.get(time) / ciN.get(time);
 									double ciRefAVG = ciRefSum.get(time) / ciRefN.get(time);
 									double ratio = ciAVG / ciRefAVG;
-									double stdDev = 0.05; // todo determine
-									double stdDevRef = 0.05; // todo determine
+									double stdDev = 0d;
+									{
+										int n = ciValues.get(time).size();
+										if (n > 1) {
+											double avg = ciAVG;
+											double sumDiff = 0;
+											for (Double v : ciValues.get(time)) {
+												sumDiff += (v - avg) * (v - avg);
+											}
+											stdDev = Math.sqrt(sumDiff / (n - 1));
+										}
+									}
+									double stdDevRef = 0d;
+									{
+										int n = ciRefValues.get(time).size();
+										if (n > 1) {
+											double avg = ciRefAVG;
+											double sumDiff = 0;
+											for (Double v : ciRefValues.get(time)) {
+												sumDiff += (v - avg) * (v - avg);
+											}
+											stdDevRef = Math.sqrt(sumDiff / (n - 1));
+										}
+									}
+									
+									// http://www.cartage.org.lb/en/themes/sciences/chemistry/miscellenous/helpfile/erroranalysis/multiplicationdivision/multiplicationdivision.htm
 									double a = (stdDev / ciAVG) * (stdDev / ciAVG);
 									double b = (stdDevRef / ciRefAVG) * (stdDevRef / ciRefAVG);
 									double ratioStdDev = Math.sqrt(a + b);
