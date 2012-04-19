@@ -371,7 +371,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				break;
 			if (ne.isProcessing())
 				return null;
-			path.add(ne.getTitle());
+			path.add(replaceBadChars(ne.getTitle()));
 		}
 		return StringManipulationTools.getStringList(path, ".");
 	}
