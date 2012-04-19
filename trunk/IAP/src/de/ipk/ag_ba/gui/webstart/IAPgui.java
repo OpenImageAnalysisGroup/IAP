@@ -213,8 +213,8 @@ public class IAPgui {
 				button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
 			} else {
 				System.out.println("WARNING: Could not find target action: " + thisTarget);
-				navigationPanel.getEntitySet(false).iterator().next().executeNavigation(
-						PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, null);
+				// navigationPanel.getEntitySet(false).iterator().next().executeNavigation(
+				// PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, null);
 			}
 		}
 	}
