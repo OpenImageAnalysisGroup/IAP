@@ -1330,18 +1330,31 @@ parseString2Latex <- function(text) {
 	text <- gsub("ö", "\"o", text)
 	text <- gsub("ü", "\"u", text)
 	text <- gsub("ß", "\\ss", text)
-	text <- gsub("_", "\\_", text)
-	text <- gsub("<", "\\textless" , text)
-	text <- gsub( ">", "\\textgreater", text)
-	text <- gsub("§", "\\S", text)
-	text <- gsub("$", "\\$", text)
-	text <- gsub("&", "\\&", text)
-	text <- gsub("#", "\\#", text)
+#	text <- gsub("_", "\\_", text)
+#	text <- gsub("<", "\\textless" , text)
+#	text <- gsub( ">", "\\textgreater", text)
+#	text <- gsub("§", "\\S", text)
+#	text <- gsub("$", "\\$", text)
+#	text <- gsub("&", "\\&", text)
+#	text <- gsub("#", "\\#", text)
+#	#text <- gsub("{", "\\{", text)
+#	text <- gsub("}", "\\}", text)
+#	text <- gsub("%", "\\%", text)
+#	text <- gsub("~", "\\textasciitilde", text)
+#	text <- gsub("€", "\\texteuro", text)
+	text <- gsub("ß", "ss", text)
+	text <- gsub("_", " ", text)
+	text <- gsub("<", " " , text)
+	text <- gsub( ">", " ", text)
+	text <- gsub("§", " ", text)
+	text <- gsub("$", " ", text)
+	text <- gsub("&", " ", text)
+	text <- gsub("#", " ", text)
 	#text <- gsub("{", "\\{", text)
-	text <- gsub("}", "\\}", text)
-	text <- gsub("%", "\\%", text)
-	text <- gsub("~", "\\textasciitilde", text)
-	text <- gsub("€", "\\texteuro", text)
+	text <- gsub("}", " ", text)
+	text <- gsub("%", " ", text)
+	text <- gsub("~", " ", text)
+	text <- gsub("€", " ", text)
 	
 	return(text)
 }
@@ -1787,9 +1800,9 @@ PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, 
 #			overallColor[[imagesIndex]] <- overallColor[[imagesIndex]][(length(unique(plotThisValues["primaerTreatment"])[,1])+1):length(overallColor[[imagesIndex]])]
 			
 			if(doSpiderPlot) {
-				plotSpiderImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave=diagramTypSave)
+				plotSpiderImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave=diagramTypSave)
 			}
-			plotLineRangeImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave="lineRangePlot")
+			plotLineRangeImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave="lineRangePlot")
 		}	 
 	}
 }
@@ -1919,11 +1932,11 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 	}				
 }
 
-plotLineRangeImage <- function(overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
+plotLineRangeImage <- function(overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, usedoverallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
 	################
 #	makeOverallImage = TRUE
 #	legende=TRUE
-#	overallColor <- usedOverallColor
+#	usedoverallColor <- overallColor[[imagesIndex]]
 #	overallResult <- plotThisValues
 #	positionType <- overallList$spiderOptions$typOfGeomBar[1]
 #	diagramTypSave <- "lineRangePlot"
@@ -1946,7 +1959,7 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 		}
 		
 		plot <- plot +
-				scale_colour_manual(values=overallColor) +
+				scale_colour_manual(values=usedoverallColor) +
 				scale_y_continuous(formatter = "comma") +
 				theme_bw() +
 				opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
@@ -2780,56 +2793,58 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 		appendix <- FALSE
 		
-		onlySpider <- TRUE
+		onlySpider <- FALSE
 		calculateNothing <- FALSE
 	}
 	
-	secondRun = appendix
-	appendix =  FALSE
-	
-	if (fileName != "error" & (length(descriptorSet_nBoxplot) > 0 || length(descriptorSet_boxplot) > 0 || length(descriptorSet_boxplotStacked) > 0)) {
-		time = system.time({
-			repeat {					
-				if (appendix) 
-					print("Generate diagrams for annotation descriptors...")
-				else
-					print("Generate diagrams for main descriptors...")
-				createDiagrams(iniDataSet = workingDataSet, saveFormat = saveFormat, dpi = dpi, isGray = isGray, 
-									nBoxDes = descriptorSet_nBoxplot, boxDes = descriptorSet_boxplot, boxStackDes = descriptorSet_boxplotStacked, boxSpiderDes = descriptorSet_spiderplot,
-									nBoxDesName = descriptorSetName_nBoxplot, boxDesName = descriptorSetName_boxplot, boxStackDesName = descriptorSetName_boxplotStacked, boxSpiderDesName = descriptorSetName_spiderplot,
-									nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions,
-									treatment = treatment, filterTreatment = filterTreatment, 
-									secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
-									xAxisName = xAxisName, debug = debug, appendix=appendix)
-				if (secondRun) {
-					appendix = TRUE
-					secondRun = FALSE
-					descriptorSet_nBoxplot = descriptorSetAppendix
-					descriptorSetName_nBoxplot = descriptorSetNameAppendix
-					#diagramTypVector = diagramTypVectorAppendix
-					descriptorSet_boxplot = NULL
-					descriptorSetName_boxplot = NULL
-					descriptorSet_boxplotStacked = NULL
-					descriptorSetName_boxplotStacked = NULL
-					descriptorSet_spiderplot = NULL
-					descriptorSetName_spiderplot = NULL
-				} else {
-					break
-				}
-			}
-			checkIfAllNecessaryFilesAreThere()
-		}, TRUE)
+	if (typOfStartOptions != "test"){
+		secondRun = appendix
+		appendix =  FALSE
 		
-		print("Processing finished")		
-		print(time)
-	} else {
-		print("No filename or no descriptor!")
-		checkIfAllNecessaryFilesAreThere()
-	}
-	
-	if(debug) {
-		print(warnings())
-	}
+		if (fileName != "error" & (length(descriptorSet_nBoxplot) > 0 || length(descriptorSet_boxplot) > 0 || length(descriptorSet_boxplotStacked) > 0)) {
+			time = system.time({
+				repeat {					
+					if (appendix) 
+						print("Generate diagrams for annotation descriptors...")
+					else
+						print("Generate diagrams for main descriptors...")
+					createDiagrams(iniDataSet = workingDataSet, saveFormat = saveFormat, dpi = dpi, isGray = isGray, 
+										nBoxDes = descriptorSet_nBoxplot, boxDes = descriptorSet_boxplot, boxStackDes = descriptorSet_boxplotStacked, boxSpiderDes = descriptorSet_spiderplot,
+										nBoxDesName = descriptorSetName_nBoxplot, boxDesName = descriptorSetName_boxplot, boxStackDesName = descriptorSetName_boxplotStacked, boxSpiderDesName = descriptorSetName_spiderplot,
+										nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions,
+										treatment = treatment, filterTreatment = filterTreatment, 
+										secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
+										xAxisName = xAxisName, debug = debug, appendix=appendix)
+					if (secondRun) {
+						appendix = TRUE
+						secondRun = FALSE
+						descriptorSet_nBoxplot = descriptorSetAppendix
+						descriptorSetName_nBoxplot = descriptorSetNameAppendix
+						#diagramTypVector = diagramTypVectorAppendix
+						descriptorSet_boxplot = NULL
+						descriptorSetName_boxplot = NULL
+						descriptorSet_boxplotStacked = NULL
+						descriptorSetName_boxplotStacked = NULL
+						descriptorSet_spiderplot = NULL
+						descriptorSetName_spiderplot = NULL
+					} else {
+						break
+					}
+				}
+				checkIfAllNecessaryFilesAreThere()
+			}, TRUE)
+			
+			print("Processing finished")		
+			print(time)
+		} else {
+			print("No filename or no descriptor!")
+			checkIfAllNecessaryFilesAreThere()
+		}
+		
+		if(debug) {
+			print(warnings())
+		}
+	} 
 }
 
 createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false", 
@@ -2894,11 +2909,11 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 	}
 }
 #sapply(list.files(pattern="[.]R$", path=getwd(), full.names=TRUE), source);
-onlySpider <- FALSE
+onlySpider <- TRUE
 calculateNothing <- FALSE
 ######### START #########
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))
