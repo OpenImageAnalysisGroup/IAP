@@ -190,7 +190,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			ConditionFilter cf = this;
 			if (ratio) {
 				experiment = experiment.calc().ratioDataset("norm", cf);
-				experiment.calc().fitThreeStepLinearModel("side.hull.pc2");
+				experiment.calc().fitThreeStepLinearModel("side.hull.pc2.norm");
 			}
 			
 			ArrayList<SnapshotDataIAP> snapshots;

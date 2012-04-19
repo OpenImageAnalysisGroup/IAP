@@ -2,7 +2,6 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -232,9 +231,9 @@ public class ExperimentCalculationService {
 						double lowestErrorSum = Double.MAX_VALUE;
 						for (int stressStartTimeIndex = 0; stressStartTimeIndex < days.size() - 6; stressStartTimeIndex++) {
 							for (int stressEndTimeIndex = stressStartTimeIndex + 3; stressEndTimeIndex < days.size() - 3; stressEndTimeIndex++) {
-								HashSet<Integer> d1 = getDays(idx2day, 0, stressStartTimeIndex);
-								HashSet<Integer> d2 = getDays(idx2day, stressStartTimeIndex, stressEndTimeIndex);
-								HashSet<Integer> d3 = getDays(idx2day, stressEndTimeIndex, days.size());
+								TreeSet<Integer> d1 = getDays(idx2day, 0, stressStartTimeIndex);
+								TreeSet<Integer> d2 = getDays(idx2day, stressStartTimeIndex, stressEndTimeIndex);
+								TreeSet<Integer> d3 = getDays(idx2day, stressEndTimeIndex, days.size());
 								if (d1.size() > 2 && d2.size() > 2 && d3.size() > 2) {
 									// fit day index 1 to startIdx ==> line segment 1 (normal growth phase)
 									LinearRegressionModel m1 = new LinearRegressionModel(getValues(ci, d1));
@@ -264,6 +263,7 @@ public class ExperimentCalculationService {
 																					// comparison to reference
 							double stressReactionSpeed = bestM2.getM();
 							double stressRecoverySpeed = bestM3.getM();
+							
 							SubstanceInterface sStressStart = addOrCreateSubstance("lm3s_stress_start" + s.getName());
 							ConditionInterface cSST = addOrCreateCondition(sStressStart, ci);
 							addOrCreateSampleAndAddValue(cSST, -1, "-1", timeOfStressStart, timeUnit);
@@ -328,7 +328,7 @@ public class ExperimentCalculationService {
 		return s;
 	}
 	
-	private TreeMap<Integer, Double> getValues(ConditionInterface ci, HashSet<Integer> d1) {
+	private TreeMap<Integer, Double> getValues(ConditionInterface ci, TreeSet<Integer> d1) {
 		TreeMap<Integer, Double> resS = new TreeMap<Integer, Double>();
 		TreeMap<Integer, Integer> resN = new TreeMap<Integer, Integer>();
 		for (SampleInterface si : ci)
@@ -346,8 +346,8 @@ public class ExperimentCalculationService {
 		return res;
 	}
 	
-	private HashSet<Integer> getDays(HashMap<Integer, Integer> idx2day, int start_incl, int end_excl) {
-		HashSet<Integer> res = new HashSet<Integer>();
+	private TreeSet<Integer> getDays(HashMap<Integer, Integer> idx2day, int start_incl, int end_excl) {
+		TreeSet<Integer> res = new TreeSet<Integer>();
 		for (int idx : idx2day.keySet())
 			if (idx >= start_incl && idx < end_excl)
 				res.add(idx2day.get(idx));
