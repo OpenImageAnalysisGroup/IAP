@@ -284,8 +284,8 @@ changeWhenTreatmentNoneAndSecondTreatmentNotNone <- function(listOfTreat, listOf
 checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug) {
 	debug %debug% "Start of checkOfTreatments()"
 	
-	treatment = treatment %exists% args[4]
-	secondTreatment = secondTreatment %exists% args[5]
+	treatment = treatment %exists% args[5]
+	secondTreatment = secondTreatment %exists% args[6]
 	secondTreatment = treatment %checkEqual% secondTreatment
 	
 	listOfTreat = list(treatment=treatment, secondTreatment=secondTreatment)
@@ -1441,7 +1441,7 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 					plot <-	ggplot(data=overallResult, aes(x=xAxis, y=mean, shape=name)) 
 							#geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="identity", alpha=0.1) +
 							
-					if(length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
+					if(length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || overallList$isRatio) {
 						plot <- plot + geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="smooth", alpha=0.1)
 						#plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), alpha=0.1)
 					} else {
@@ -2033,6 +2033,18 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 }
 
 makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot") {
+	########
+#overallResult <- overallList$overallResult_nBoxDes
+#overallDescriptor <- overallList$nBoxDes
+#overallColor <- overallList$color_nBox
+#overallDesName <-overallList$nBoxDesName
+#overallFileName <- overallList$imageFileNames_nBoxplots
+#diagramTypSave="nboxplot"
+#imagesIndex <- "1"
+#isOnlyOneValue <- FALSE
+	#############	
+	
+	
 	overallList$debug %debug% "makeBarDiagram()"
 
 	tempOverallResult =  overallResult
@@ -2070,7 +2082,7 @@ makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overa
 				if (length(overallColor[[imagesIndex]]) > 10) {
 					plot = plot + opts(axis.text.x = theme_text(size=6, angle=90))
 				}
-				#print(myPlot)
+				print(plot)
 				
 				writeTheData(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave, title, makeOverallImage, isAppendix=overallList$appendix)
 	
@@ -2083,6 +2095,83 @@ makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overa
 		}
 	}
 }
+
+
+makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot") {
+	########
+#overallResult <- overallList$overallResult_nBoxDes
+#overallDescriptor <- overallList$nBoxDes
+#overallColor <- overallList$color_nBox
+#overallDesName <-overallList$nBoxDesName
+#overallFileName <- overallList$imageFileNames_nBoxplots
+#diagramTypSave="nboxplot"
+#imagesIndex <- "1"
+#isOnlyOneValue <- FALSE
+	#############	
+	
+	
+	overallList$debug %debug% "makeBarDiagram()"
+	
+	tempOverallResult =  overallResult
+	
+	for (imagesIndex in names(overallDescriptor)) {
+		if (!is.na(overallDescriptor[[imagesIndex]])) {	
+			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "barplot")
+			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
+			overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
+			
+			groupedDataFrame = data.table(overallResult)
+			as.data.frame(groupedDataFrame[, lapply(.SD, max, na.rm=TRUE), by=c(groupBy, colNames$xAxis)])
+						
+			if (length(overallResult[, 1]) > 0) {
+				if (isOnlyOneValue) {
+					plot = ggplot(data=overallResult, aes(x=name, y=mean))
+				} else {
+					plot = ggplot(data=overallResult, aes(x=xAxis, y=mean))
+				}
+				
+			
+				plot = plot + 						
+						geom_bar(stat="identity", aes(fill=name), colour="Grey", size=0.1) +
+					#	geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
+						#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
+						ylab(overallDesName[[imagesIndex]]) +
+						coord_cartesian(ylim=c(max(overallResult$mean)-1000, max(overallResult$mean))) +
+						#coord_cartesian(ylim=c(max(overallResult$mean - overallResult$se -10, na.rm=TRUE), max(overallResult$mean, na.rm=TRUE))) +
+						xlab(overallList$xAxisName) +
+						scale_fill_manual(values = overallColor[[imagesIndex]]) +
+						#coord_flip() +
+						theme_bw() +
+						opts(legend.position="bottom",
+								plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+								axis.title.x = theme_text(face="bold", size=11), 
+								axis.title.y = theme_text(face="bold", size=11, angle=90), 
+								panel.grid.minor = theme_blank(), 
+								panel.border = theme_rect(colour="Grey", size=0.1)
+						) +
+						guides(colour =	guide_legend(nrow = 2, byrow = T)) 
+				
+				if (length(overallColor[[imagesIndex]]) > 10) {
+					plot = plot + opts(axis.text.x = theme_text(size=6, angle=90))
+				}
+				
+			
+				plot = plot + facet_grid(~ name)
+				
+				print(plot)
+				
+				writeTheData(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave, title, makeOverallImage, isAppendix=overallList$appendix)
+				
+#				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave)
+#
+#				if (overallList$appendix) {
+#					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
+#				}	
+			}
+		}
+	}
+}
+
 
 makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, options, overallList, diagramTypSave="boxplot") {	
 	overallList$debug %debug% "makeBoxplotDiagram()"
@@ -2532,9 +2621,9 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				
 				stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
 				#diagramTypVector = c(diagramTypVector, "boxplotStacked", "boxplotStacked")
-					
+				
 				appendix = appendix %exists% args[3]
-
+			
 				if (appendix) {
 					blacklist = buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
 					descriptorSetAppendix = colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet), '%in%', blacklist))[, 1]])
@@ -2554,6 +2643,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 					workingDataSet <- cbind(workingDataSet, noneTreatment=rep.int("average", times = length(workingDataSet[,1])))	
 				}
 
+				isRatio	= isRatio %exits% args[4]
 			} else {
 				fileName = "error"
 			}
@@ -2794,7 +2884,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		boxSpiderDesName = descriptorSetName_spiderplot
 		
 		appendix <- FALSE
-		
+		isRatio <- TRUE
 		onlySpider <- FALSE
 		calculateNothing <- FALSE
 	}
@@ -2816,7 +2906,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 										nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions,
 										treatment = treatment, filterTreatment = filterTreatment, 
 										secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
-										xAxisName = xAxisName, debug = debug, appendix=appendix)
+										xAxisName = xAxisName, debug = debug, appendix=appendix, isRatio=isRatio)
 					if (secondRun) {
 						appendix = TRUE
 						secondRun = FALSE
@@ -2855,7 +2945,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		nBoxOptions= NULL, boxOptions= NULL, stackedBarOptions = NULL, spiderOptions = NULL,
 		treatment="Treatment", filterTreatment="none", 
 		secondTreatment="none", filterSecondTreatment="none", filterXaxis="none", xAxis="Day (Int)", 
-		xAxisName="none", debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE) {		
+		xAxisName="none", debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE, isRatio=FALSE) {		
 
 	overallList = list(iniDataSet=iniDataSet, saveFormat=saveFormat, dpi=dpi, isGray=isGray, 
 						nBoxDes = nBoxDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes,
@@ -2865,7 +2955,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						treatment=treatment, filterTreatment=filterTreatment, 
 						secondTreatment=secondTreatment, filterSecondTreatment=filterSecondTreatment, filterXaxis=filterXaxis, xAxis=xAxis, 
 						xAxisName=xAxisName, debug=debug, 
-						appendix=appendix, stoppTheCalculation=stoppTheCalculation, 
+						appendix=appendix, stoppTheCalculation=stoppTheCalculation, isRatio = isRatio,
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(),
 						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), user="none", typ="none")	
 		
@@ -2917,5 +3007,5 @@ calculateNothing <- FALSE
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))
