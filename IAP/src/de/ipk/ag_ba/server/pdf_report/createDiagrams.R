@@ -1786,9 +1786,9 @@ PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, 
 	if (length(groupBy) == 0 || length(groupBy) == 1) {
 		
 		if(doSpiderPlot) {
-			plotSpiderImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave=diagramTypSave)	
+			plotSpiderImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave=diagramTypSave)	
 		}
-		plotLineRangeImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave="lineRangePlot")	
+		plotLineRangeImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, diagramTypSave="lineRangePlot")	
 	} else {
 		
 		for (value in overallList$filterSecondTreatment) {			
@@ -2909,11 +2909,11 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 	}
 }
 #sapply(list.files(pattern="[.]R$", path=getwd(), full.names=TRUE), source);
-onlySpider <- TRUE
+onlySpider <- FALSE
 calculateNothing <- FALSE
 ######### START #########
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", TRUE)
+startOptions("report", FALSE)
 rm(list=ls(all=TRUE))
