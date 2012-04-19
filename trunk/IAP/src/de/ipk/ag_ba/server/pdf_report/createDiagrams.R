@@ -1323,7 +1323,7 @@ createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 }
 
 parseString2Latex <- function(text) {
-	
+
 	#text <- gsub("\\", "\\textbackslash", text)
 	text <- gsub("\"", "\"'", text)
 	text <- gsub("ä", "\"a", text)
@@ -1355,7 +1355,7 @@ parseString2Latex <- function(text) {
 	text <- gsub("%", " ", text)
 	text <- gsub("~", " ", text)
 	text <- gsub("€", " ", text)
-	
+
 	return(text)
 }
 
@@ -1382,8 +1382,10 @@ renameY <- function(label) {
 writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFileFirstValue="", writeLatexFileSecondValue="", subSectionTitel="", makeOverallImage=FALSE, isAppendix=FALSE, subsectionDepth=1) {
 	overallList$debug %debug% "writeTheData()"		
 
-	subSectionTitel <- parseString2Latex(subSectionTitel)
-	
+	if(subSectionTitel != "") {
+		subSectionTitel <- parseString2Latex(subSectionTitel)
+	}
+
 	saveImageFile(overallList, plot, fileName, extraString)
 	if (makeOverallImage) {
 		if(subSectionTitel != "") {
@@ -1909,7 +1911,7 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 			}
 			
 		#	print(plot)
-			
+
 			subtitle <- ""
 			if(positionType == overallList$spiderOptions$typOfGeomBar[1] || length(overallList$spiderOptions$typOfGeomBar) == 1) {
 				subtitle <- title
