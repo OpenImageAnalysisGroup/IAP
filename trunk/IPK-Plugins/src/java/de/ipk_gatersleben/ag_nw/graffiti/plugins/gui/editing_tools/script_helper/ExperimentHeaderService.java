@@ -27,7 +27,8 @@ public class ExperimentHeaderService {
 		});
 		
 		for (ExperimentHeaderInterface ehi : in) {
-			String key = ehi.getImportusername() + "//" + ehi.getDatabase() + "//" + ehi.getExperimentName();
+			String key;// = ehi.getImportusername() + "//" +
+			key = ehi.getDatabase() + "//" + ehi.getExperimentName();
 			if (!known.containsKey(key)) {
 				known.put(key, ehi);
 				result.add(ehi);
