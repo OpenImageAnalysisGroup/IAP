@@ -304,7 +304,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			if (xlsx) {
 				csv = null;
 				if (status != null)
-					status.setCurrentStatusText2("Save to file");
+					status.setCurrentStatusText2("Save to XLSX file");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
 				p.prepareTempDirectory();
 				if (targetDirectoryOrTargetFile == null)
@@ -318,8 +318,12 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			else {
 				byte[] result = csv.toString().getBytes();
 				csv = null;
+				if (status != null)
+					status.setCurrentStatusText2("Save to CSV file");
 				p.prepareTempDirectory();
 				p.saveReportCSV(result, xlsx);
+				if (status != null)
+					status.setCurrentStatusText2("File saved");
 			}
 			
 			// p.saveScripts(new String[] {
