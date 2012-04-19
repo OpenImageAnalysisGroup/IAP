@@ -189,8 +189,14 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			}
 			ConditionFilter cf = this;
 			if (ratio) {
+				if (status != null)
+					status.setCurrentStatusText2("Calculate stress-ratio");
 				experiment = experiment.calc().ratioDataset("norm", cf);
+				if (status != null)
+					status.setCurrentStatusText2("Calculate 3-segment linear model");
 				experiment.calc().fitThreeStepLinearModel("side.hull.pc2.norm");
+				if (status != null)
+					status.setCurrentStatusText2("Stress analysis finished");
 			}
 			
 			ArrayList<SnapshotDataIAP> snapshots;
