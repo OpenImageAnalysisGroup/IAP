@@ -169,19 +169,27 @@ overallOutlierDetection <- function(overallList) {
 
 loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALSE, useDev=FALSE) {	
 #	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych", "fmsb", "plotrix")	
-	repos <- "http://cran.r-project.org"
-	libPath <- ".libPaths()[1]"
+	repos <- c("http://cran.r-project.org","http://www.rforge.net/")
+	#libPath <- ".libPaths()[1]"
+	libPath <- Sys.getenv("R_LIBS_USER")
 	
 	if (install & length(libraries) > 0) {
-		installedPackages <- names(installed.packages()[, 'Package'])
-		ins <- libraries[!libraries %in% installedPackages]
+		print("... check if need to be installed new packages")
+		for(n in repos) {
+			
+			installedPackages <- names(installed.packages()[, 'Package'])
+			availablePackagesOnTheRepos <- available.packages(contriburl= contrib.url(n))[,1]
+			ins <- libraries[!libraries %in% installedPackages & libraries %in% availablePackagesOnTheRepos]
 		
-		if(length(ins) > 0) {
-			#install.packages(ins, libs=libPath, repos=repos, dependencies = TRUE)
+			if(length(ins) > 0) {
+				print(paste("... following packages will be installed: ", ins, sep=""))
+				install.packages(ins, lib=libPath, repos=n, dependencies = TRUE)
+			}
+		
 		}
 		
 		if (useDev) {
-			#install.packages(c("devtools"), libs=libPath, repos=repos, dependencies = TRUE)
+			#install.packages(c("devtools"), lib=libPath, repos=repos, dependencies = TRUE)
 			#dev_mode()
 			#install_github("ggplot2")
 		}
@@ -189,7 +197,10 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 	
 	if(update) {
 		#installedOldPackages <- names(old.packages()[, 'Package'])
-		#update.packages(lib.loc = libPath, checkBuilt=TRUE, ask=FALSE,	repos=repos)	
+		print("... check for package updates")
+		for(n in repos) {
+			update.packages(lib.loc = libPath, checkBuilt=TRUE, ask=FALSE,	repos=n)
+		}
 	}
 	
 	if(length(libraries) > 0) {
@@ -1101,7 +1112,12 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray) {
 			#if (!is.na(descriptorList[[n]])) {
 			if (sum(!is.na(descriptorList[[n]])) > 0) {
 				#colorList[[n]] = colorRampPalette(colorVector)(length(descriptorList[[n]][,1]))
-				colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
+				#colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
+				if ("primaerTreatment" %in% colnames(overallResult)) {	
+					colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$primaerTreatment)))	
+				} else {
+					colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
+				}
 				##################### Anpassen huier werden noch zuviel Farbwerte ausgelesen ###############
 			} else {
 				#print("All values are 'NA'")
@@ -1306,6 +1322,30 @@ createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 	print(paste("create ", typ, " ", actualImage, "/", maxImage, ": '",imageName, "'", sep=""))
 }
 
+parseString2Latex <- function(text) {
+	
+	#text <- gsub("\\", "\\textbackslash", text)
+	text <- gsub("\"", "\"'", text)
+	text <- gsub("ä", "\"a", text)
+	text <- gsub("ö", "\"o", text)
+	text <- gsub("ü", "\"u", text)
+	text <- gsub("ß", "\\ss", text)
+	text <- gsub("_", "\\_", text)
+	text <- gsub("<", "\\textless" , text)
+	text <- gsub( ">", "\\textgreater", text)
+	text <- gsub("§", "\\S", text)
+	text <- gsub("$", "\\$", text)
+	text <- gsub("&", "\\&", text)
+	text <- gsub("#", "\\#", text)
+	#text <- gsub("{", "\\{", text)
+	text <- gsub("}", "\\}", text)
+	text <- gsub("%", "\\%", text)
+	text <- gsub("~", "\\textasciitilde", text)
+	text <- gsub("€", "\\texteuro", text)
+	
+	return(text)
+}
+
 renameY <- function(label) {
 	
 	if(length(grep("\\.\\.",label, ignore.case=TRUE)) > 0){
@@ -1329,6 +1369,8 @@ renameY <- function(label) {
 writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFileFirstValue="", writeLatexFileSecondValue="", subSectionTitel="", makeOverallImage=FALSE, isAppendix=FALSE, subsectionDepth=1) {
 	overallList$debug %debug% "writeTheData()"		
 
+	subSectionTitel <- parseString2Latex(subSectionTitel)
+	
 	saveImageFile(overallList, plot, fileName, extraString)
 	if (makeOverallImage) {
 		if(subSectionTitel != "") {
@@ -1741,13 +1783,13 @@ PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, 
 			plottedName = overallList$filterTreatment %contactAllWithAll% value
 			booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = plottedName))
 			plotThisValues = overallResult[booleanVector, ]
-			usedOverallColor <- overallColor[[imagesIndex]][1:length(unique(plotThisValues["primaerTreatment"])[,1])]
-			overallColor[[imagesIndex]] <- overallColor[[imagesIndex]][(length(unique(plotThisValues["primaerTreatment"])[,1])+1):length(overallColor[[imagesIndex]])]
+#			usedOverallColor <- overallColor[[imagesIndex]][1:length(unique(plotThisValues["primaerTreatment"])[,1])]
+#			overallColor[[imagesIndex]] <- overallColor[[imagesIndex]][(length(unique(plotThisValues["primaerTreatment"])[,1])+1):length(overallColor[[imagesIndex]])]
 			
 			if(doSpiderPlot) {
-				plotSpiderImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = usedOverallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave=diagramTypSave)
+				plotSpiderImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave=diagramTypSave)
 			}
-			plotLineRangeImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = usedOverallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave="lineRangePlot")
+			plotLineRangeImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, overallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, diagramTypSave="lineRangePlot")
 		}	 
 	}
 }
@@ -1755,14 +1797,13 @@ PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, 
 
 
 
-plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, overallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
+plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, usedoverallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
 ################
-#  overallColor = overallColor[[imagesIndex]]
-#
+##overallColor <- usedOverallColor 
 #
 #	makeOverallImage = TRUE
 #	legende=TRUE
-#	overallColor <- usedOverallColor 
+#	usedoverallColor = overallColor[[imagesIndex]]
 #	overallResult <- plotThisValues
 #	positionType <- overallList$spiderOptions$typOfGeomBar[1]
 #################
@@ -1787,7 +1828,7 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 					#geom_point(aes(color=as.character(name), shape=hist), size=3) +
 					scale_shape_manual(values = c(1:numberOfHist), name="Property") +
 					#geom_line(aes(colour=as.character(name))) +
-					scale_colour_manual(name="Condition", values=overallColor)
+					scale_colour_manual(name="Condition", values=usedoverallColor)
 
 			if (positionType == "x") {			
 				plot <- plot + coord_polar(theta="x",expand=TRUE)
@@ -1858,7 +1899,7 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 			
 			subtitle <- ""
 			if(positionType == overallList$spiderOptions$typOfGeomBar[1] || length(overallList$spiderOptions$typOfGeomBar) == 1) {
-				subtitle <- titel
+				subtitle <- title
 			}
 
 			writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(diagramTypSave, title, positionType, sep=""), paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], diagramTypSave, title, positionType, sep=""), subtitle, makeOverallImage, subsectionDepth=2)
@@ -2223,7 +2264,7 @@ initRfunction <- function(DEBUG = FALSE) {
 	
 	#"psych",
 	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "fmsb") #, "mvoutlier")
-	loadInstallAndUpdatePackages(libraries, TRUE, TRUE, FALSE)
+	loadInstallAndUpdatePackages(libraries, FALSE, FALSE, FALSE)
 }
 
 startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
@@ -2740,7 +2781,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		appendix <- FALSE
 		
 		onlySpider <- TRUE
-		calculateNothing <- TRUE
+		calculateNothing <- FALSE
 	}
 	
 	secondRun = appendix
@@ -2852,7 +2893,8 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		}
 	}
 }
-onlySpider <- TRUE
+#sapply(list.files(pattern="[.]R$", path=getwd(), full.names=TRUE), source);
+onlySpider <- FALSE
 calculateNothing <- FALSE
 ######### START #########
 #rm(list=ls(all=TRUE))
