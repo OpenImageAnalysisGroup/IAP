@@ -279,6 +279,7 @@ public class StringManipulationTools implements HelperClass {
 			{ "&diams;", "\u2666" } };
 	
 	public static final String[][] parse2Latex = {
+			{ "\"", "\"'" },
 			{ "\\", "\\textbackslash" },
 			{ "ä", "\"a" },
 			{ "ö", "\"o" },
@@ -295,7 +296,7 @@ public class StringManipulationTools implements HelperClass {
 			{ "}", "\\}" },
 			{ "%", "\\%" },
 			{ "~", "\\textasciitilde" },
-			{ "\"", "\"'" },
+			
 			{ "€", "\\texteuro" } };
 	
 	/**
