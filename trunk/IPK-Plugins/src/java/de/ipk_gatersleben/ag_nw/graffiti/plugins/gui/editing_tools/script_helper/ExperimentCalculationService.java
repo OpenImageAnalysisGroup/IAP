@@ -19,6 +19,7 @@ public class ExperimentCalculationService {
 		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + " (STRESS RATIO)");
 		for (SubstanceInterface si : experiment) {
 			for (ConditionInterface ci : si) {
+				ci.setExperimentHeader(experiment.getHeader());
 				if (cf.filterConditionOut(ci))
 					continue;
 				boolean reference = ci.getTreatment() != null && ci.getTreatment().contains(treatmentReference);
@@ -200,7 +201,7 @@ public class ExperimentCalculationService {
 	 */
 	
 	public void fitThreeStepLinearModel(String... substances) {
-		String timeUnit = "";
+		String timeUnit = null;
 		ArrayList<SubstanceInterface> subList = new ArrayList<SubstanceInterface>(experiment);
 		for (SubstanceInterface s : subList) {
 			for (String valid : substances) {
@@ -266,23 +267,23 @@ public class ExperimentCalculationService {
 							
 							SubstanceInterface sStressStart = addOrCreateSubstance("lm3s_stress_start" + s.getName());
 							ConditionInterface cSST = addOrCreateCondition(sStressStart, ci);
-							addOrCreateSampleAndAddValue(cSST, -1, "-1", timeOfStressStart, timeUnit);
+							addOrCreateSampleAndAddValue(cSST, -1, timeUnit, timeOfStressStart, timeUnit);
 							
 							SubstanceInterface sStressSpeed = addOrCreateSubstance("lm3s_stress_speed" + s.getName());
 							ConditionInterface cSSP = addOrCreateCondition(sStressSpeed, ci);
-							addOrCreateSampleAndAddValue(cSSP, -1, "-1", stressReactionSpeed, "%/" + timeUnit);
+							addOrCreateSampleAndAddValue(cSSP, -1, timeUnit, stressReactionSpeed, "%/" + timeUnit);
 							
 							SubstanceInterface sStressExtend = addOrCreateSubstance("lm3s_stress_extend" + s.getName());
 							ConditionInterface cSSE = addOrCreateCondition(sStressExtend, ci);
-							addOrCreateSampleAndAddValue(cSSE, -1, "-1", worstStressExtend, "%");
+							addOrCreateSampleAndAddValue(cSSE, -1, timeUnit, worstStressExtend, "%");
 							
 							SubstanceInterface sRecoveryStart = addOrCreateSubstance("lm3s_recovery_start" + s.getName());
 							ConditionInterface cRST = addOrCreateCondition(sRecoveryStart, ci);
-							addOrCreateSampleAndAddValue(cRST, -1, "-1", timeOfRecoveryStart, timeUnit);
+							addOrCreateSampleAndAddValue(cRST, -1, timeUnit, timeOfRecoveryStart, timeUnit);
 							
 							SubstanceInterface sRecoverySpeed = addOrCreateSubstance("lm3s_recovery_speed" + s.getName());
 							ConditionInterface cRSP = addOrCreateCondition(sRecoverySpeed, ci);
-							addOrCreateSampleAndAddValue(cRSP, -1, "-1", stressRecoverySpeed, "%/" + timeUnit);
+							addOrCreateSampleAndAddValue(cRSP, -1, timeUnit, stressRecoverySpeed, "%/" + timeUnit);
 						}
 					}
 				}
