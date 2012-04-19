@@ -228,7 +228,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			System.out.println(SystemAnalysis.getCurrentTime() +
 					">Snapshot data set has been created (" + snapshots.size() + " snapshots)");
 			Workbook wb = xlsx ? new XSSFWorkbook() : null;
-			Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experimentReference.getExperimentName())) : null;
+			Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experiment.getName())) : null;
 			if (sheet != null) {
 				Row row = sheet.createRow(0);
 				int col = 0;
