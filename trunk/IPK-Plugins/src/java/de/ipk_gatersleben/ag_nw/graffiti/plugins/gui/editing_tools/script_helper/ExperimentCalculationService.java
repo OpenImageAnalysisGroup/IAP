@@ -19,8 +19,8 @@ public class ExperimentCalculationService {
 		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + " (STRESS RATIO)");
 		for (SubstanceInterface si : experiment) {
 			for (ConditionInterface ci : si) {
-				// if (cf.filterConditionOut(ci))
-				// continue;
+				if (cf.filterConditionOut(ci))
+					continue;
 				boolean reference = ci.getTreatment() != null && ci.getTreatment().contains(treatmentReference);
 				if (reference) {
 					// nothing to do here

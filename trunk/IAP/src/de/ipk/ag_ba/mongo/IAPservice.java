@@ -609,7 +609,8 @@ public class IAPservice {
 						Long time = s.getRowId();
 						
 						if (time == null)
-							continue;
+							time = (long) s.getTime();
+						// continue;
 						
 						if (!timestampe2snapshot.containsKey(time)) {
 							SnapshotDataIAP ns = new SnapshotDataIAP();
