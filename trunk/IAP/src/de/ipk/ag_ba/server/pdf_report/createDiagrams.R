@@ -3008,5 +3008,5 @@ calculateNothing <- FALSE
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", TRUE)
+startOptions("report", FALSE)
 rm(list=ls(all=TRUE))
