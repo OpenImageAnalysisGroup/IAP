@@ -1381,6 +1381,7 @@ renameY <- function(label) {
 }
 
 writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFileFirstValue="", writeLatexFileSecondValue="", subSectionTitel="", makeOverallImage=FALSE, isAppendix=FALSE, subsectionDepth=1) {
+	
 	overallList$debug %debug% "writeTheData()"		
 
 	if(subSectionTitel != "") {
@@ -1402,9 +1403,9 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 	
 	if(isAppendix) {
 		if(subSectionTitel != "") {
-			writeLatexFile("appendixImage", fileName, extraString)
-		} else {
 			writeLatexFile("appendixImage", fileName, extraString, ylabel=subSectionTitel, subsectionDepth=subsectionDepth)
+		} else {
+			writeLatexFile("appendixImage", fileName, extraString)
 		}
 	}
 }
@@ -1506,7 +1507,7 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 					
 				
 								
-				#	print(plot)
+					#print(plot)
 		
 		##!# nicht löschen, ist die interpolation (alles in dieser if Abfrage mit #!# makiert)
 		##!#				newCoords = seq(min(overallList$filterXaxis, na.rm=TRUE), max(overallList$filterXaxis, na.rm=TRUE), 1)
@@ -2884,7 +2885,26 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		boxSpiderDes <- descriptorSet_spiderplot
 		boxSpiderDesName = descriptorSetName_spiderplot
 		
-		appendix <- FALSE
+		appendix <- TRUE
+		if (appendix) {
+			blacklist = buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
+			descriptorSetAppendix = colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet), '%in%', blacklist))[, 1]])
+			descriptorSetNameAppendix = descriptorSetAppendix
+			#diagramTypVectorAppendix = rep.int("nboxplot", times=length(descriptorSetNameAppendix))		
+			descriptorSet_nBoxplot = descriptorSetAppendix
+			descriptorSetName_nBoxplot = descriptorSetNameAppendix
+			#diagramTypVector = diagramTypVectorAppendix
+			descriptorSet_boxplot = NULL
+			descriptorSetName_boxplot = NULL
+			descriptorSet_boxplotStacked = NULL
+			descriptorSetName_boxplotStacked = NULL
+			descriptorSet_spiderplot = NULL
+			descriptorSetName_spiderplot = NULL
+		}
+		
+		
+		
+		
 		isRatio <- TRUE
 		onlySpider <- FALSE
 		calculateNothing <- FALSE
