@@ -1426,8 +1426,8 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 	
 	#tempOverallResult =  na.omit(overallResult)
 
-	tempOverallResult =  overallResult
-
+	tempOverallResult =  overallResult	
+	
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]])) {
 			ylabelForAppendix <- ""
@@ -1602,7 +1602,7 @@ plotStackedImage <- function(overallList, overallResult, title = "", makeOverall
 					theme_bw() +
 					opts(axis.title.x = theme_text(face="bold", size=11), 
 							axis.title.y = theme_text(face="bold", size=11, angle=90), 
-							plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+							#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
 							#panel.background = theme_rect(linetype = "dotted"), 
 							panel.border = theme_rect(colour="Grey", size=0.1), 
 							strip.background = theme_rect(colour=NA)
@@ -1830,7 +1830,7 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 	overallList$debug %debug% "plotSpiderImage()"	
 	if (length(overallResult[, 1]) > 0) {		
 		for (positionType in overallList$spiderOptions$typOfGeomBar) {			
-			numberOfHist <- length(unique(overallResult$hist))
+ 
 			if ("primaerTreatment" %in% colnames(overallResult)) {				
 				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=primaerTreatment)) +
 						geom_point(aes(color=as.character(primaerTreatment), shape=hist), size=3) +
@@ -1843,7 +1843,7 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 			}
 			plot <- plot +
 					#geom_point(aes(color=as.character(name), shape=hist), size=3) +
-					scale_shape_manual(values = c(1:numberOfHist), name="Property") +
+					scale_shape_manual(values = c(1:length(unique(overallResult$hist))), name="Property") +
 					#geom_line(aes(colour=as.character(name))) +
 					scale_colour_manual(name="Condition", values=usedoverallColor)
 
@@ -1854,9 +1854,9 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 			}
 				
 				plot <- plot + 
-						scale_y_continuous(formatter = "comma") +
+						scale_y_continuous() +
 						theme_bw() +
-						opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+						opts(#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), # Rand geht nicht in ggplot 0.9
 								axis.title.x = theme_blank(), 
 								axis.title.y = theme_blank(),
 #								axis.title.y = theme_text(face="bold", size=11, angle=90), 
@@ -1877,13 +1877,20 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 			} else {
 				plot = plot + 
 					   opts(#legend.justification = 'bottom', 
-							   legend.direction="vertical",
+							  # legend.direction="vertical",
 							   legend.position="bottom",
 							   #legend.position=c(0.5,0),
 							  # legend.title = theme_blank(),
 							   legend.key = theme_blank()
 			   			)
-				
+				#if(as.numeric(sessionInfo()[1]$R.version$minor) > 13 & as.numeric(sessionInfo()[1]$R.version$major) > 1) {
+				if(sessionInfo()$otherPkgs$ggplot2$Version != "0.8.9") {
+					
+					nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$name))	
+					plot <-  plot + guides(col=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T)) 
+					
+					nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$hist))	
+					plot <-  plot + guides(shape=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T))
 				
 #				if (numberOfHist > 3 & numberOfHist < 10) {
 #					plot = plot + opts(legend.text = theme_text(size=6), 
@@ -1895,7 +1902,8 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 #					)
 #				} else {
 #					plot = plot + opts(legend.text = theme_text(size=11))
-#				}	
+#				}
+				}
 			}		
 			
 #			if (title != "") {
@@ -1912,7 +1920,7 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 #				}
 			}
 			
-		#	print(plot)
+			print(plot)
 
 			subtitle <- ""
 			if(positionType == overallList$spiderOptions$typOfGeomBar[1] || length(overallList$spiderOptions$typOfGeomBar) == 1) {
@@ -1935,6 +1943,20 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 		}
 	}				
 }
+
+calculateLegendRowAndColNumber <- function(legendText) {
+	
+	maxLengthOfSet <- max(nchar(as.character(legendText)))
+	if(maxLengthOfSet >= 100) {
+		return(list(nrow=length(legendText), ncol=NULL))
+	} else if (maxLengthOfSet >= 50 & maxLengthOfSet < 100) {
+		return(list(nrow=NULL, ncol=2))
+	} else if (maxLengthOfSet > 20 & maxLengthOfSet < 50) {
+		return(list(nrow=NULL, ncol=4))
+	} else {
+		return(list(nrow=NULL, ncol=floor(150/maxLengthOfSet)))
+	}
+} 
 
 plotLineRangeImage <- function(overallList, overallResult, title = "", makeOverallImage = FALSE, legende=TRUE, usedoverallColor, overallDesName, imagesIndex, overallFileName, diagramTypSave) {
 	################
@@ -1964,9 +1986,9 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 		
 		plot <- plot +
 				scale_colour_manual(values=usedoverallColor) +
-				scale_y_continuous(formatter = "comma") +
+				scale_y_continuous() +
 				theme_bw() +
-				opts(plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+				opts(#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), # Rand geht nicht in ggplot 0.9
 						axis.title.x = theme_blank(), 
 						axis.title.y = theme_blank(),
 						axis.text.x = theme_text(angle=90),
@@ -1981,13 +2003,18 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 		} else {
 			plot = plot + 
 					opts(#legend.justification = 'bottom', 
-							legend.direction="horizontal",
+							#legend.direction="horizontal",
 							legend.position="bottom",
 							#legend.position=c(0.5,0),
 							legend.title = theme_blank(),
 							legend.key = theme_blank()
 					)
 			
+			if(sessionInfo()$otherPkgs$ggplot2$Version != "0.8.9") {
+				
+				nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$name))				
+				plot <-  plot + guides(col=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T)) 
+			}
 			
 #			if (length(overallColor[[imagesIndex]]) > 3 & length(overallColor[[imagesIndex]]) < 6) {
 #				size <- 6
@@ -2020,7 +2047,7 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 #				}
 		}
 		
-	#	print(plot)
+		print(plot)
 		
 		writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(diagramTypSave, title, sep=""), paste(overallFileName[[imagesIndex]], "lineRangeOverallImage", sep=""), paste(overallFileName[[imagesIndex]], diagramTypSave, title, sep=""), title, makeOverallImage, subsectionDepth=2)
 
@@ -2201,7 +2228,7 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, o
 						#stat_summary(fun.data = f, geom = "crossbar", height = 0.1, 	colour = NA, fill = "skyblue", width = 0.8, alpha = 0.5) +
 						theme_bw() +
 						opts(legend.position="none", 
-								plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+								#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
 								axis.title.x = theme_blank(), 
 								axis.title.y = theme_text(face="bold", size=11, angle=90), 
 								panel.grid.minor = theme_blank(), 
@@ -2370,13 +2397,14 @@ initRfunction <- function(DEBUG = FALSE) {
 	
 	#"psych",
 	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "fmsb") #, "mvoutlier")
-	loadInstallAndUpdatePackages(libraries, FALSE, FALSE, FALSE)
+	loadInstallAndUpdatePackages(libraries, TRUE, TRUE, FALSE)
 }
 
 startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	initRfunction(debug)
 	#typOfStartOptions = "test"
 	typOfStartOptions = tolower(typOfStartOptions)
+	print(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, sep=""))
 	
 	args = commandArgs(TRUE)
 
@@ -2905,7 +2933,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 		
 		
-		isRatio <- TRUE
+		isRatio <- FALSE
 		onlySpider <- FALSE
 		calculateNothing <- FALSE
 	}
