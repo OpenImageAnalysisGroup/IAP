@@ -1441,7 +1441,7 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 
 					plot <-	ggplot(data=overallResult, aes(x=xAxis, y=mean, shape=name)) 
 							#geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="identity", alpha=0.1) +
-							
+					
 					if(length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || overallList$isRatio) {
 						plot <- plot + geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="smooth", alpha=0.1)
 						#plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), alpha=0.1)
@@ -2623,7 +2623,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
 				#diagramTypVector = c(diagramTypVector, "boxplotStacked", "boxplotStacked")
 				
-				appendix = appendix %exists% args[3]
+				appendix = as.logical(appendix %exists% args[3])
 			
 				if (appendix) {
 					blacklist = buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
@@ -2644,7 +2644,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 					workingDataSet <- cbind(workingDataSet, noneTreatment=rep.int("average", times = length(workingDataSet[,1])))	
 				}
 
-				isRatio	= isRatio %exists% args[4]
+				isRatio	= as.logical(isRatio %exists% args[4])
 			} else {
 				fileName = "error"
 			}
