@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
+import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -23,8 +24,8 @@ public interface ImageAnalysisBlockFIS {
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
-			TreeMap<Long, TreeMap<String, BlockResultSet>> allResultsForSnapshot,
-			TreeMap<Long, BlockResultSet> summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> allResultsForSnapshot,
+			TreeMap<Long, HashMap<Integer, BlockResultSet>> summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InterruptedException;
 	

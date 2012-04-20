@@ -3,6 +3,7 @@
  *************************************************************************/
 package de.ipk.ag_ba.image.analysis.maize;
 
+import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -10,7 +11,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -23,21 +23,21 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public abstract class AbstractImageProcessor implements ImageProcessor {
 	
-	private final BlockResultSet settings;
+	private final HashMap<Integer, BlockResultSet> settings;
 	
 	public AbstractImageProcessor() {
-		this(new BlockResults());
+		this(new HashMap<Integer, BlockResultSet>());
 	}
 	
-	public AbstractImageProcessor(BlockResults settings) {
+	public AbstractImageProcessor(HashMap<Integer, BlockResultSet> settings) {
 		this.settings = settings;
 	}
 	
-	public FlexibleMaskAndImageSet pipeline(
+	public HashMap<Integer, FlexibleMaskAndImageSet> pipeline(
 			ImageProcessorOptions options,
 			FlexibleImageSet input,
 			int maxThreadsPerImage,
-			FlexibleImageStack debugStack)
+			HashMap<Integer, FlexibleImageStack> debugStack)
 			throws Exception {
 		return pipeline(options, input, null, maxThreadsPerImage, debugStack);
 	}
@@ -48,21 +48,23 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	 * de.ipk.ag_ba.image.structures.FlexibleImageSet, int, de.ipk.ag_ba.image.structures.FlexibleImageStack, boolean, boolean)
 	 */
 	@Override
-	public FlexibleMaskAndImageSet pipeline(
+	public HashMap<Integer, FlexibleMaskAndImageSet> pipeline(
 			ImageProcessorOptions options,
 			FlexibleImageSet input,
 			FlexibleImageSet optInputMasks,
 			int maxThreadsPerImage,
-			FlexibleImageStack debugStack)
+			HashMap<Integer, FlexibleImageStack> debugStack)
 			throws Exception {
 		BlockPipeline pipeline = getPipeline(options);
 		
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
 		
-		FlexibleMaskAndImageSet result = pipeline.execute(options, workset, debugStack, settings, getStatus());
+		HashMap<Integer, FlexibleMaskAndImageSet> result = pipeline.execute(options, workset, debugStack, settings, getStatus());
 		
 		if (debugStack != null)
-			debugStack.addImage("RESULT", result.getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
+			for (Integer key : debugStack.keySet()) {
+				debugStack.get(key).addImage("RESULT", result.get(key).getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
+			}
 		
 		return result;
 	}
@@ -72,18 +74,18 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	 * @see de.ipk.ag_ba.image.analysis.maize.ImageProcessor#getSettings()
 	 */
 	@Override
-	public BlockResultSet getSettings() {
+	public HashMap<Integer, BlockResultSet> getSettings() {
 		return settings;
 	}
 	
 	protected abstract BlockPipeline getPipeline(ImageProcessorOptions options);
 	
 	@Override
-	public TreeMap<Long, BlockResultSet> postProcessPipelineResults(
+	public TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPipelineResults(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
-			TreeMap<Long, TreeMap<String, BlockResultSet>> analysisResults,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InstantiationException,
 			IllegalAccessException, InterruptedException {
 		BlockPipeline pipeline = getPipeline(null);

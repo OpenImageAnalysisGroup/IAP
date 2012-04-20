@@ -323,6 +323,8 @@ public class ImageProcessorOptions {
 	private boolean highResMaize;
 	private boolean isBarley;
 	private boolean isArabidopsis;
+	private int tray_idx;
+	private int tray_cnt;
 	
 	public void setIsMaize(boolean isMaize) {
 		this.isMaize = isMaize;
@@ -360,5 +362,18 @@ public class ImageProcessorOptions {
 	
 	public boolean isArabidopsis() {
 		return isArabidopsis;
+	}
+	
+	public void setTray(int tray_idx, int tray_cnt) {
+		this.tray_idx = tray_idx;
+		this.tray_cnt = tray_cnt;
+	}
+	
+	public int getTrayCnt() {
+		return tray_cnt;
+	}
+	
+	public int getTrayIdx() {
+		return tray_idx;
 	}
 }
