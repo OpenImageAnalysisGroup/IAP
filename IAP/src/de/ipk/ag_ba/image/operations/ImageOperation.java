@@ -4149,4 +4149,28 @@ public class ImageOperation {
 		}
 		return res;
 	}
+	
+	public ImageOperation clearOutsideRectangle(int left, int top, int right, int bottom) {
+		return clearImageLeft(left, BACKGROUND_COLORint).clearImageAbove(top, BACKGROUND_COLORint).clearImageRight(right, BACKGROUND_COLORint)
+				.clearImageBottom(bottom, BACKGROUND_COLORint);
+	}
+	
+	// not tested:
+	// public ImageOperation move(int dx, int dy) {
+	// int[][] image = getImageAs2array();
+	// int w = getWidth();
+	// int h = getHeight();
+	// int[][] res = new int[w][h];
+	// for (int x = 0; x < w; x++)
+	// for (int y = 0; y < h; y++)
+	// res[x][y] = BACKGROUND_COLORint;
+	// for (int x = 0; x < w; x++)
+	// for (int y = 0; y < h; y++) {
+	// if (x - dx >= 0 && x - dx < w)
+	// res[x - dx] = image[x];
+	// if (y - dx >= 0 && y - dy < h)
+	// res[y - dy] = image[y];
+	// }
+	// return new ImageOperation(res);
+	// }
 }

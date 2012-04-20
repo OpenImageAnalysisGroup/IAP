@@ -20,6 +20,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -70,23 +71,17 @@ public class BlockPipeline {
 	
 	private static long lastOutput = 0;
 	
-	public FlexibleMaskAndImageSet execute(ImageProcessorOptions options,
-			FlexibleMaskAndImageSet input, FlexibleImageStack debugStack,
-			BlockResultSet settings,
+	public HashMap<Integer, FlexibleMaskAndImageSet> execute(ImageProcessorOptions options,
+			FlexibleMaskAndImageSet input, HashMap<Integer, FlexibleImageStack> debugStack,
+			HashMap<Integer, BlockResultSet> settings,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
-		
-		long a = System.currentTimeMillis();
-		
-		int id = pipelineID.addInt(1);
-		
 		// normally each image is analyzed once (i.e. one plant per image)
 		// for arabidopsis trays with 2x3 or 2x4 sections the
 		// pipeline will be executed 6 or 12 times per image
 		// the load-image-block then needs to cut out image 1/6, 2/6, ...
 		// and place the section in the middle of the image for further processing
-		int executionCount = 1;
-		int executionIndex = 0;
+		int executionTrayCount = 1;
 		
 		ImageData abc = input.getImages().getVisInfo();
 		if (abc == null)
@@ -95,10 +90,39 @@ public class BlockPipeline {
 			abc = input.getImages().getNirInfo();
 		if (abc == null)
 			abc = input.getImages().getIrInfo();
-		if (abc != null) {
+		if (abc != null && options.getCameraPosition() == CameraPosition.TOP) {
 			// check plant annotation and determine if this is a arabidopsis 6 or 12 tray
-			
+			String t = abc.getParentSample().getParentCondition().getTreatment();
+			if (t != null && t.contains("OAC_2x3")) {
+				executionTrayCount = 6; // 2x3
+			} else
+				if (t != null && t.contains("OAC_4x3")) {
+					executionTrayCount = 12; // 3x4
+				}
 		}
+		
+		HashMap<Integer, FlexibleMaskAndImageSet> res = new HashMap<Integer, FlexibleMaskAndImageSet>();
+		for (int idx = 0; idx < executionTrayCount; idx++) {
+			FlexibleImageStack ds = debugStack != null ? new FlexibleImageStack() : null;
+			BlockResultSet set = new BlockResults();
+			options.setTray(idx, executionTrayCount);
+			res.put(idx, executeInnerCall(options, input, ds, set, status));
+			if (debugStack != null)
+				debugStack.put(idx, ds);
+			settings.put(idx, set);
+		}
+		return res;
+	}
+	
+	private FlexibleMaskAndImageSet executeInnerCall(ImageProcessorOptions options,
+			FlexibleMaskAndImageSet input, FlexibleImageStack debugStack,
+			BlockResultSet settings,
+			BackgroundTaskStatusProviderSupportingExternalCall status)
+			throws Exception {
+		
+		long a = System.currentTimeMillis();
+		
+		int id = pipelineID.addInt(1);
 		
 		int index = 0;
 		boolean blockProgressOutput = true;
@@ -330,10 +354,10 @@ public class BlockPipeline {
 				} else {
 					int idx = 1;
 					int nn = analysisTaskFinal.getForcedDebugStackStorageResult().size();
-					for (FlexibleImageStack fis : analysisTaskFinal
+					for (FlexibleImageStack fisArr : analysisTaskFinal
 							.getForcedDebugStackStorageResult()) {
-						fis.print(analysisTaskFinal.getName() + " // Result " + idx + "/"
-								+ nn, new Runnable() {
+						FlexibleImageStack fis = fisArr;
+						fis.print(analysisTaskFinal.getName() + " // Result " + idx + "/" + nn, new Runnable() {
 							@Override
 							public void run() {
 								analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, m, 0, 1);
@@ -345,8 +369,8 @@ public class BlockPipeline {
 										true);
 							}
 						}, "Re-run Analysis (debug)");
-						idx++;
 					}
+					idx++;
 				}
 			}
 		};
@@ -356,15 +380,15 @@ public class BlockPipeline {
 				true);
 	}
 	
-	public TreeMap<Long, BlockResultSet> postProcessPipelineResultsForAllAngles(
+	public TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPipelineResultsForAllAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
-			TreeMap<Long, TreeMap<String, BlockResultSet>> allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InstantiationException, IllegalAccessException,
 			InterruptedException {
-		TreeMap<Long, BlockResultSet> summaryResult = new TreeMap<Long, BlockResultSet>();
+		TreeMap<Long, HashMap<Integer, BlockResultSet>> summaryResult = new TreeMap<Long, HashMap<Integer, BlockResultSet>>();
 		int index = 0;
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			ImageAnalysisBlockFIS block = blockClass.newInstance();
@@ -372,7 +396,7 @@ public class BlockPipeline {
 			block.postProcessResultsForAllTimesAndAngles(
 					plandID2time2waterData,
 					inSample, inImages,
-					allResultsForSnapshot, summaryResult, optStatus);
+					analysisResults, summaryResult, optStatus);
 		}
 		
 		return summaryResult;

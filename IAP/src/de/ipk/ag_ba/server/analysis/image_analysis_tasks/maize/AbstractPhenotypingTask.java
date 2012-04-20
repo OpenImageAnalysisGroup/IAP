@@ -307,7 +307,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			throws InterruptedException {
 		
 		final TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
-		final TreeMap<Long, TreeMap<String, BlockResultSet>> analysisResults = new TreeMap<Long, TreeMap<String, BlockResultSet>>();
+		final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults = new TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>>();
 		final TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
 		if (imageSetWithSpecificAngle != null) {
 			int threadsToStart = 0;
@@ -340,7 +340,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						public void run() {
 							try {
 								try {
-									BlockResultSet results = processAngleWithinSnapshot(
+									HashMap<Integer, BlockResultSet> results = processAngleWithinSnapshot(
 											imageSetWithSpecificAngle.get(time).get(configAndAngle),
 											maximumThreadCountOnImageLevel, status,
 											workloadEqualAngleSnapshotSets,
@@ -351,7 +351,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 											if (!analysisInput.containsKey(time))
 												analysisInput.put(time, new TreeMap<String, ImageData>());
 											if (!analysisResults.containsKey(time))
-												analysisResults.put(time, new TreeMap<String, BlockResultSet>());
+												analysisResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
 											analysisInput.get(time).put(configAndAngle, inImage);
 											analysisResults.get(time).put(configAndAngle, results);
 										}
@@ -384,7 +384,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ", post-processing)");
 		if (!analysisResults.isEmpty()) {
-			TreeMap<Long, BlockResultSet> postprocessingResults;
+			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {
 				postprocessingResults = getImageProcessor()
 						.postProcessPipelineResults(
@@ -402,38 +402,40 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ")");
 	}
 	
-	private void processVolumeOutput(Sample3D inSample, BlockResultSet analysisResults) {
-		for (String volumeID : analysisResults.getVolumeNames()) {
-			VolumeData v = analysisResults.getVolume(volumeID);
-			if (v != null) {
-				analysisResults.setVolume(volumeID, null);
-				
-				try {
-					StopWatch s = new StopWatch(
-							SystemAnalysis.getCurrentTime() + ">SAVE VOLUME");
-					if (databaseTarget != null) {
-						databaseTarget.saveVolume((LoadedVolume) v, inSample,
-								m, DBTable.SAMPLE, null, null);
-						VolumeData volumeInDatabase = new VolumeData(inSample,
-								v);
-						volumeInDatabase.getURL().setPrefix(
-								databaseTarget.getPrefix());
-						volumeInDatabase.getURL().setDetail(
-								v.getURL().getDetail());
-						output.add(volumeInDatabase);
-					} else {
+	private void processVolumeOutput(Sample3D inSample, HashMap<Integer, BlockResultSet> analysisResultsArray) {
+		for (Integer key : analysisResultsArray.keySet()) {
+			BlockResultSet analysisResults = analysisResultsArray.get(key);
+			for (String volumeID : analysisResults.getVolumeNames()) {
+				VolumeData v = analysisResults.getVolume(volumeID);
+				if (v != null) {
+					analysisResults.setVolume(volumeID, null);
+					
+					try {
+						StopWatch s = new StopWatch(
+								SystemAnalysis.getCurrentTime() + ">SAVE VOLUME");
+						if (databaseTarget != null) {
+							databaseTarget.saveVolume((LoadedVolume) v, inSample,
+									m, DBTable.SAMPLE, null, null);
+							VolumeData volumeInDatabase = new VolumeData(inSample,
+									v);
+							volumeInDatabase.getURL().setPrefix(
+									databaseTarget.getPrefix());
+							volumeInDatabase.getURL().setDetail(
+									v.getURL().getDetail());
+							output.add(volumeInDatabase);
+						} else {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">Volume kept in memory: " + v);
+							output.add(v);
+						}
+						s.printTime();
+					} catch (Exception e) {
 						System.out.println(SystemAnalysis.getCurrentTime()
-								+ ">Volume kept in memory: " + v);
-						output.add(v);
+								+ ">ERROR: Could not save volume data: "
+								+ e.getMessage());
+						e.printStackTrace();
 					}
-					s.printTime();
-				} catch (Exception e) {
-					System.out.println(SystemAnalysis.getCurrentTime()
-							+ ">ERROR: Could not save volume data: "
-							+ e.getMessage());
-					e.printStackTrace();
 				}
-				
 			}
 		}
 	}
@@ -678,58 +680,63 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		preProcessors.add(pre);
 	}
 	
-	private void processStatisticalOutputImages(ImageData inVis, BlockResultSet analysisResults) {
+	private void processStatisticalOutputImages(ImageData inVis, HashMap<Integer, BlockResultSet> analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
 		}
 		
-		for (BlockPropertyValue bpv : analysisResults.getPropertiesSearch("RESULT_")) {
-			if (bpv.getName() == null)
-				continue;
-			
-			NumericMeasurement3D m = new NumericMeasurement3D(inVis,
-					bpv.getName(), inVis.getParentSample().getParentCondition()
-							.getExperimentName()
-							+ " (" + getName() + ")");
-			m.setValue(bpv.getValue());
-			m.setUnit(bpv.getUnit());
-			
-			if (output != null)
-				output.add(m);
+		for (Integer tray : analysisResults.keySet()) {
+			for (BlockPropertyValue bpv : analysisResults.get(tray).getPropertiesSearch("RESULT_")) {
+				if (bpv.getName() == null)
+					continue;
+				
+				NumericMeasurement3D m = new NumericMeasurement3D(inVis,
+						bpv.getName(), inVis.getParentSample().getParentCondition()
+								.getExperimentName()
+								+ " (" + getName() + ")");
+				m.setValue(bpv.getValue());
+				m.setUnit(bpv.getUnit());
+				
+				if (output != null)
+					output.add(m);
+			}
 		}
 	}
 	
 	private void processStatisticalOutputOnGlobalLevel(
 			TreeMap<Long, Sample3D> inSamples,
-			TreeMap<Long, BlockResultSet> analysisResults) {
+			TreeMap<Long, HashMap<Integer, BlockResultSet>> analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 2");
 		}
 		
 		for (Long time : analysisResults.keySet())
-			for (BlockPropertyValue bpv : analysisResults.get(time).getPropertiesSearch("RESULT_")) {
-				if (bpv.getName() == null)
-					continue;
-				
-				NumericMeasurement3D m = new NumericMeasurement3D(
-						new NumericMeasurement(inSamples.get(time)), bpv.getName(), inSamples.get(time)
-								.getParentCondition().getExperimentName()
-								+ " ("
-								+ getName() + ")");
-				
-				if (bpv != null && m != null) {
-					m.setValue(bpv.getValue());
-					m.setUnit(bpv.getUnit());
-					if (inSamples.get(time).size() > 0) {
-						NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
-						m.setReplicateID(template.getReplicateID());
-						m.setQualityAnnotation(template.getQualityAnnotation());
-						m.setPosition(template.getPosition());
-						m.setPositionUnit(template.getPositionUnit());
+			for (Integer tray : analysisResults.get(time).keySet()) {
+				boolean multipleTrays = analysisResults.get(time).keySet().size() > 1;
+				for (BlockPropertyValue bpv : analysisResults.get(time).get(tray).getPropertiesSearch("RESULT_")) {
+					if (bpv.getName() == null)
+						continue;
+					
+					NumericMeasurement3D m = new NumericMeasurement3D(
+							new NumericMeasurement(inSamples.get(time)), bpv.getName(), inSamples.get(time)
+									.getParentCondition().getExperimentName()
+									+ " ("
+									+ getName() + ")");
+					
+					if (bpv != null && m != null) {
+						m.setValue(bpv.getValue());
+						m.setUnit(bpv.getUnit());
+						if (inSamples.get(time).size() > 0) {
+							NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
+							m.setReplicateID(template.getReplicateID());
+							m.setQualityAnnotation(template.getQualityAnnotation() + (multipleTrays ? "_" + tray : ""));
+							m.setPosition(template.getPosition());
+							m.setPositionUnit(template.getPositionUnit());
+						}
+						output.add(m);
 					}
-					output.add(m);
 				}
 			}
 	}
@@ -798,7 +805,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		// s.printTime();
 	}
 	
-	private BlockResultSet processAngleWithinSnapshot(ImageSet id,
+	private HashMap<Integer, BlockResultSet> processAngleWithinSnapshot(ImageSet id,
 			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadSnapshotAngles, int parentPriority)
@@ -831,41 +838,43 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		else
 			options.setCameraPosition(CameraPosition.TOP);
 		
-		FlexibleImageStack debugImageStack = null;
+		HashMap<Integer, FlexibleImageStack> debugImageStack = null;
 		boolean addDebugImages = IAPmain
 				.isSettingEnabled(IAPfeature.SAVE_DEBUG_STACK);
 		if (addDebugImages || forceDebugStack) {
-			debugImageStack = new FlexibleImageStack();
+			debugImageStack = new HashMap<Integer, FlexibleImageStack>();
 		}
 		
-		BlockResultSet analysisResults = null;
+		HashMap<Integer, BlockResultSet> analysisResults = null;
 		
-		FlexibleImage resVis = null, resFluo = null, resNir = null, resIr = null;
 		{
 			ImageProcessor imageProcessor = getImageProcessor();
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
 			
-			FlexibleMaskAndImageSet ret = imageProcessor.pipeline(options,
+			HashMap<Integer, FlexibleMaskAndImageSet> ret = imageProcessor.pipeline(options,
 					input, inputMasks, maximumThreadCountOnImageLevel,
 					debugImageStack);
-			FlexibleImageSet pipelineResult = ret != null ? ret.getImages()
-					: null;
 			
-			if (pipelineResult != null) {
-				resVis = pipelineResult.getVis();
-				resFluo = pipelineResult.getFluo();
-				resNir = pipelineResult.getNir();
-				resIr = pipelineResult.getIr();
-				analysisResults = imageProcessor.getSettings();
+			for (Integer key : ret.keySet()) {
+				FlexibleImageSet pipelineResult = ret != null ? ret.get(key).getImages() : null;
+				if (pipelineResult != null) {
+					FlexibleImage resVis = null, resFluo = null, resNir = null, resIr = null;
+					resVis = pipelineResult.getVis();
+					resFluo = pipelineResult.getFluo();
+					resNir = pipelineResult.getNir();
+					resIr = pipelineResult.getIr();
+					analysisResults = imageProcessor.getSettings();
+					
+					processAndOrSaveTiffImagesOrResultImages(id, inVis, inFluo, inNir, inIr,
+							debugImageStack.get(key), resVis, resFluo, resNir, resIr, parentPriority);
+				}
 			}
 		}
 		
 		if (analysisResults != null) {
 			processStatisticalOutputImages(inVis, analysisResults);
 			
-			processAndOrSaveTiffImagesOrResultImages(id, inVis, inFluo, inNir, inIr,
-					debugImageStack, resVis, resFluo, resNir, resIr, parentPriority);
 		}
 		return analysisResults;
 		// } else {

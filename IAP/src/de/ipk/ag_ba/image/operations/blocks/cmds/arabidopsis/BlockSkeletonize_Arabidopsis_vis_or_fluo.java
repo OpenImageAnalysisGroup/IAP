@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
 
@@ -17,7 +18,6 @@ import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.ImageCanvas;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
-import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -345,97 +345,100 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,
-			TreeMap<Long, BlockResultSet> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		
 		for (Long time : time2inSamples.keySet()) {
-			TreeMap<String, BlockResultSet> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
-			if (!time2summaryResult.containsKey(time))
-				time2summaryResult.put(time, new BlockResults());
-			BlockResultSet summaryResult = time2summaryResult.get(time);
-			Double maxLeafcount = -1d;
-			Double maxLeaflength = -1d;
-			Double maxLeaflengthNorm = -1d;
-			ArrayList<Double> lc = new ArrayList<Double>();
-			
-			Integer a = null;
-			searchLoop: for (String key : allResultsForSnapshot.keySet()) {
-				BlockResultSet rt = allResultsForSnapshot.get(key);
-				for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_top.main.axis.rotation")) {
-					if (v.getValue() != null) {
-						a = v.getValue().intValue();
-						// System.out.println("main.axis.rotation: " + a);
-						break searchLoop;
-					}
-				}
-			}
-			
-			String bestAngle = null;
-			if (a != null) {
-				a = a % 180;
-				Double bestDiff = Double.MAX_VALUE;
-				for (String dc : allResultsForSnapshot.keySet()) {
-					double d = Double.parseDouble(dc.substring(dc.indexOf(";") + ";".length()));
-					if (d >= 0) {
-						double dist = Math.abs(a - d);
-						if (dist < bestDiff) {
-							bestAngle = dc;
-							bestDiff = dist;
+			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+			if (time2summaryResult.get(time) != null)
+				for (Integer tray : time2summaryResult.get(time).keySet()) {
+					if (!time2summaryResult.containsKey(time))
+						time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
+					BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
+					Double maxLeafcount = -1d;
+					Double maxLeaflength = -1d;
+					Double maxLeaflengthNorm = -1d;
+					ArrayList<Double> lc = new ArrayList<Double>();
+					
+					Integer a = null;
+					searchLoop: for (String key : allResultsForSnapshot.keySet()) {
+						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
+						for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_top.main.axis.rotation")) {
+							if (v.getValue() != null) {
+								a = v.getValue().intValue();
+								// System.out.println("main.axis.rotation: " + a);
+								break searchLoop;
+							}
 						}
 					}
-				}
-			}
-			// System.out.println("ANGLES WITHIN SNAPSHOT: " + allResultsForSnapshot.size());
-			for (String keyC : allResultsForSnapshot.keySet()) {
-				BlockResultSet rt = allResultsForSnapshot.get(keyC);
-				
-				if (bestAngle != null && keyC.equals(bestAngle)) {
-					// System.out.println("Best side angle: " + bestAngle);
-					Double cnt = null;
-					for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.count")) {
-						if (v.getValue() != null)
-							cnt = v.getValue();
+					
+					String bestAngle = null;
+					if (a != null) {
+						a = a % 180;
+						Double bestDiff = Double.MAX_VALUE;
+						for (String dc : allResultsForSnapshot.keySet()) {
+							double d = Double.parseDouble(dc.substring(dc.indexOf(";") + ";".length()));
+							if (d >= 0) {
+								double dist = Math.abs(a - d);
+								if (dist < bestDiff) {
+									bestAngle = dc;
+									bestDiff = dist;
+								}
+							}
+						}
 					}
-					if (cnt != null && summaryResult != null) {
-						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.best", cnt);
-						// System.out.println("Leaf count for best side image: " + cnt);
+					// System.out.println("ANGLES WITHIN SNAPSHOT: " + allResultsForSnapshot.size());
+					for (String keyC : allResultsForSnapshot.keySet()) {
+						BlockResultSet rt = allResultsForSnapshot.get(keyC).get(tray);
+						
+						if (bestAngle != null && keyC.equals(bestAngle)) {
+							// System.out.println("Best side angle: " + bestAngle);
+							Double cnt = null;
+							for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.count")) {
+								if (v.getValue() != null)
+									cnt = v.getValue();
+							}
+							if (cnt != null && summaryResult != null) {
+								summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.best", cnt);
+								// System.out.println("Leaf count for best side image: " + cnt);
+							}
+						}
+						
+						for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.count")) {
+							if (v.getValue() != null) {
+								if (v.getValue() > maxLeafcount)
+									maxLeafcount = v.getValue();
+								lc.add(v.getValue());
+							}
+						}
+						for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.length.sum")) {
+							if (v.getValue() != null) {
+								if (v.getValue() > maxLeaflength)
+									maxLeaflength = v.getValue();
+							}
+						}
+						for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.length.sum.norm")) {
+							if (v.getValue() != null) {
+								if (v.getValue() > maxLeaflengthNorm)
+									maxLeaflengthNorm = v.getValue();
+							}
+						}
 					}
-				}
-				
-				for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.count")) {
-					if (v.getValue() != null) {
-						if (v.getValue() > maxLeafcount)
-							maxLeafcount = v.getValue();
-						lc.add(v.getValue());
+					
+					if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
+						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.max", maxLeafcount);
+						// System.out.println("MAX leaf count: " + maxLeafcount);
+						Double[] lca = lc.toArray(new Double[] {});
+						Arrays.sort(lca);
+						Double median = lca[lca.length / 2];
+						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.median", median);
 					}
+					if (maxLeaflength != null && maxLeaflength > 0)
+						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.max", maxLeaflength);
+					if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
+						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm);
 				}
-				for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.length.sum")) {
-					if (v.getValue() != null) {
-						if (v.getValue() > maxLeaflength)
-							maxLeaflength = v.getValue();
-					}
-				}
-				for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.length.sum.norm")) {
-					if (v.getValue() != null) {
-						if (v.getValue() > maxLeaflengthNorm)
-							maxLeaflengthNorm = v.getValue();
-					}
-				}
-			}
-			
-			if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
-				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.max", maxLeafcount);
-				// System.out.println("MAX leaf count: " + maxLeafcount);
-				Double[] lca = lc.toArray(new Double[] {});
-				Arrays.sort(lca);
-				Double median = lca[lca.length / 2];
-				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.median", median);
-			}
-			if (maxLeaflength != null && maxLeaflength > 0)
-				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.max", maxLeaflength);
-			if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
-				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm);
 		}
 	}
 }

@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -278,8 +279,8 @@ public class BlCalcWidthAndHeight_vis extends
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,
-			TreeMap<Long, BlockResultSet> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		super.postProcessResultsForAllTimesAndAngles(plandID2time2waterData,
 				time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus);

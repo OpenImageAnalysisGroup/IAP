@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.analysis.maize;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -41,8 +42,9 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	}
 	
 	@Override
-	public FlexibleMaskAndImageSet pipeline(ImageProcessorOptions options, FlexibleImageSet input, FlexibleImageSet optInputMasks, int maxThreadsPerImage,
-			FlexibleImageStack debugStack) throws Exception {
+	public HashMap<Integer, FlexibleMaskAndImageSet> pipeline(ImageProcessorOptions options, FlexibleImageSet input, FlexibleImageSet optInputMasks,
+			int maxThreadsPerImage,
+			HashMap<Integer, FlexibleImageStack> debugStack) throws Exception {
 		HashSet<Integer> rotationAngles = new HashSet<Integer>();
 		if (input != null && input.getVisInfo() != null && input.getVisInfo().getParentSample() != null) {
 			SampleInterface inSample = input.getVisInfo().getParentSample();
@@ -56,7 +58,7 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 			if (rotationAngles.size() > 3) {
 				// System.out.print(SystemAnalysisExt.getCurrentTime() + ">INFO: START 3D-PROCESSING OF A SAMPLE WITH " + rotationAngles.size()
 				// + " RELATED SIDE ANGLE IMAGES...");
-				FlexibleMaskAndImageSet res = super.pipeline(options, input, optInputMasks, maxThreadsPerImage, debugStack);
+				HashMap<Integer, FlexibleMaskAndImageSet> res = super.pipeline(options, input, optInputMasks, maxThreadsPerImage, debugStack);
 				// System.out.println("OK");
 				return res;
 			}

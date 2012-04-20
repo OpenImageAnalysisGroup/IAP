@@ -5,6 +5,7 @@ import info.StopWatch;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.ReleaseInfo;
 import org.junit.AfterClass;
@@ -26,8 +27,8 @@ import de.ipk.ag_ba.server.task_management.PerformanceTestImages.ImageNames;
 
 public class PerformanceTest {
 	
-	private FlexibleMaskAndImageSet res;
-	private FlexibleImageStack debugStack;
+	private HashMap<Integer, FlexibleMaskAndImageSet> res;
+	private HashMap<Integer, FlexibleImageStack> debugStack;
 	double scale = 1.0;
 	static boolean sleep = false;
 	
@@ -94,10 +95,13 @@ public class PerformanceTest {
 		res = pipeline.pipeline(options, input, ref_input, 2, debugStack);
 		
 		if (debugStack != null) {
-			res.save(ReleaseInfo.getDesktopFolder() + File.separator + "testTestPipelineMaizeSide" + name + "_" + debugInfo + ".tiff");
-			pipeline.getSettings().printAnalysisResults();
-			debugStack.print("Result " + debugInfo, getReRunCode(input, ref_input), "re_Run");
-			debugStack.saveAsLayeredTif(new File(ReleaseInfo.getDesktopFolder() + File.separator + "maizeSide_debugstack" + name + "_" + debugInfo + ".tiff"));
+			for (Integer key : res.keySet()) {
+				res.get(key).save(ReleaseInfo.getDesktopFolder() + File.separator + "testTestPipelineMaizeSide" + name + "_" + debugInfo + "_tray" + key + ".tiff");
+				pipeline.getSettings().get(key).printAnalysisResults();
+				debugStack.get(key).print("Result " + debugInfo + " tray " + key, getReRunCode(input, ref_input), "re_Run");
+				debugStack.get(key).saveAsLayeredTif(
+						new File(ReleaseInfo.getDesktopFolder() + File.separator + "maizeSide_debugstack" + name + "_" + debugInfo + "_tray" + key + ".tiff"));
+			}
 		}
 	}
 	
@@ -109,12 +113,14 @@ public class PerformanceTest {
 				options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 				options.setCameraPosition(CameraPosition.SIDE);
 				MaizeAnalysisPipeline pipeline = new MaizeAnalysisPipeline();
-				debugStack = new FlexibleImageStack();
+				debugStack = new HashMap<Integer, FlexibleImageStack>();
 				try {
 					res = pipeline.pipeline(options, input, ref_input, 2, debugStack);
-					pipeline.getSettings().printAnalysisResults();
-					if (debugStack != null)
-						debugStack.print("Res");
+					for (Integer key : res.keySet()) {
+						pipeline.getSettings().get(key).printAnalysisResults();
+						if (debugStack != null)
+							debugStack.get(key).print("Res Tray " + key);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -144,14 +150,16 @@ public class PerformanceTest {
 		// options.clearAndAddDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 0.5);
 		MaizeAnalysisPipeline maize = new MaizeAnalysisPipeline();
 		
-		debugStack = new FlexibleImageStack();
+		debugStack = new HashMap<Integer, FlexibleImageStack>();
 		
 		res = maize.pipeline(options, input, ref_input, 2, debugStack);
 		
-		res.save(ReleaseInfo.getDesktopFolder() + File.separator + "testTestPipelineMaizeTop.tiff");
-		
-		if (debugStack != null)
-			debugStack.saveAsLayeredTif(new File(ReleaseInfo.getDesktopFolder() + File.separator + "maizeTop_debugstack.tiff"));
+		for (Integer tray : res.keySet()) {
+			res.get(tray).save(ReleaseInfo.getDesktopFolder() + File.separator + "testTestPipelineMaizeTop_tray" + tray + ".tiff");
+			
+			if (debugStack != null)
+				debugStack.get(tray).saveAsLayeredTif(new File(ReleaseInfo.getDesktopFolder() + File.separator + "maizeTop_debugstack_tray" + tray + ".tiff"));
+		}
 	}
 	
 	@AfterClass

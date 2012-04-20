@@ -13,7 +13,6 @@ import org.graffiti.plugin.parameter.Parameter;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
-import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -94,8 +93,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,
-			TreeMap<Long, BlockResultSet> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
 	}
@@ -124,42 +123,44 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	protected void calculateRelativeValues(TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, BlockResultSet>> time2allResultsForSnapshot,
-			TreeMap<Long, BlockResultSet> time2summaryResult, int blockPosition,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult, int blockPosition,
 			String[] desiredProperties) {
 		final long timeForOneDay = 1000 * 60 * 60 * 24;
 		HashMap<String, TreeMap<String, Long>> prop2config2lastHeightAndWidthTime = new HashMap<String, TreeMap<String, Long>>();
 		HashMap<String, TreeMap<String, Double>> prop2config2lastHeightAndWidth = new HashMap<String, TreeMap<String, Double>>();
 		for (Long time : time2inSamples.keySet()) {
-			TreeMap<String, BlockResultSet> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 			if (!time2summaryResult.containsKey(time))
-				time2summaryResult.put(time, new BlockResults());
-			BlockResultSet summaryResult = time2summaryResult.get(time);
-			
+				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
+			HashMap<Integer, BlockResultSet> summaryResultArray = time2summaryResult.get(time);
 			for (String key : allResultsForSnapshot.keySet()) {
-				BlockResultSet rt = allResultsForSnapshot.get(key);
-				for (String property : desiredProperties) {
-					ArrayList<BlockPropertyValue> sr = rt.getPropertiesExactMatch(property);
-					for (BlockPropertyValue v : sr) {
-						if (v.getValue() != null) {
-							if (!prop2config2lastHeightAndWidth.containsKey(property))
-								prop2config2lastHeightAndWidth.put(property, new TreeMap<String, Double>());
-							if (!prop2config2lastHeightAndWidthTime.containsKey(property))
-								prop2config2lastHeightAndWidthTime.put(property, new TreeMap<String, Long>());
-							
-							Double lastWidth = prop2config2lastHeightAndWidth.get(property).get(key);
-							if (lastWidth != null && lastWidth > 0 && prop2config2lastHeightAndWidth.get(property).containsKey(key) &&
-									time - prop2config2lastHeightAndWidthTime.get(property).get(key) > 0) {
+				for (Integer tray : summaryResultArray.keySet()) {
+					BlockResultSet summaryResult = summaryResultArray.get(tray);
+					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
+					for (String property : desiredProperties) {
+						ArrayList<BlockPropertyValue> sr = rt.getPropertiesExactMatch(property);
+						for (BlockPropertyValue v : sr) {
+							if (v.getValue() != null) {
+								if (!prop2config2lastHeightAndWidth.containsKey(property))
+									prop2config2lastHeightAndWidth.put(property, new TreeMap<String, Double>());
+								if (!prop2config2lastHeightAndWidthTime.containsKey(property))
+									prop2config2lastHeightAndWidthTime.put(property, new TreeMap<String, Long>());
+								
+								Double lastWidth = prop2config2lastHeightAndWidth.get(property).get(key);
+								if (lastWidth != null && lastWidth > 0 && prop2config2lastHeightAndWidth.get(property).containsKey(key) &&
+										time - prop2config2lastHeightAndWidthTime.get(property).get(key) > 0) {
+									double width = v.getValue().doubleValue();
+									double ratio = width / lastWidth;
+									double days = (time - prop2config2lastHeightAndWidthTime.get(property).get(key)) / timeForOneDay;
+									double ratioPerDay = Math.pow(ratio, 1 / days);
+									summaryResult.setNumericProperty(blockPosition, property + ".relative", ratioPerDay);
+								}
+								
 								double width = v.getValue().doubleValue();
-								double ratio = width / lastWidth;
-								double days = (time - prop2config2lastHeightAndWidthTime.get(property).get(key)) / timeForOneDay;
-								double ratioPerDay = Math.pow(ratio, 1 / days);
-								summaryResult.setNumericProperty(blockPosition, property + ".relative", ratioPerDay);
+								prop2config2lastHeightAndWidthTime.get(property).put(key, time);
+								prop2config2lastHeightAndWidth.get(property).put(key, width);
 							}
-							
-							double width = v.getValue().doubleValue();
-							prop2config2lastHeightAndWidthTime.get(property).put(key, time);
-							prop2config2lastHeightAndWidth.get(property).put(key, width);
 						}
 					}
 				}
