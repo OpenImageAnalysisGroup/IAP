@@ -283,7 +283,8 @@ changeWhenTreatmentNoneAndSecondTreatmentNotNone <- function(listOfTreat, listOf
 
 checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug) {
 	debug %debug% "Start of checkOfTreatments()"
-	
+	print(args[5])
+	print(args[6])
 	treatment = treatment %exists% args[5]
 	secondTreatment = secondTreatment %exists% args[6]
 	secondTreatment = treatment %checkEqual% secondTreatment
@@ -1896,9 +1897,9 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 #				}	
 			}		
 			
-			if (title != "") {
-				plot = plot + opts(title = title)
-			}
+#			if (title != "") {
+#				plot = plot + opts(title = title)
+#			}
 			
 			if (makeOverallImage) {
 				plot = plot + facet_grid(~ xAxisfactor)
@@ -2377,7 +2378,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	typOfStartOptions = tolower(typOfStartOptions)
 	
 	args = commandArgs(TRUE)
-	
+
 	saveFormat = "pdf"
 	dpi = "90" ##90 ## CK: seems to change nothing for ggplot2 instead the output size should be modified, if needed // 17.2.2012	
 	
@@ -2643,7 +2644,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 					workingDataSet <- cbind(workingDataSet, noneTreatment=rep.int("average", times = length(workingDataSet[,1])))	
 				}
 
-				isRatio	= isRatio %exits% args[4]
+				isRatio	= isRatio %exists% args[4]
 			} else {
 				fileName = "error"
 			}
@@ -3007,5 +3008,5 @@ calculateNothing <- FALSE
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))
