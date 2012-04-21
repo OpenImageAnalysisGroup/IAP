@@ -147,18 +147,27 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		FlexibleImage img = getInput().getImages().getFluo();
-		if (img != null && !multiTray) {
+		if (img != null) {
 			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
-			return img;
+			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
 		FlexibleImage img = getInput().getImages().getNir();
-		if (img != null && !multiTray) {
+		if (img != null) {
 			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
-			return img;
+			return null;
+	}
+	
+	@Override
+	protected FlexibleImage processIRmask() {
+		FlexibleImage img = getInput().getImages().getIr();
+		if (img != null) {
+			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
+		} else
+			return null;
 	}
 }
