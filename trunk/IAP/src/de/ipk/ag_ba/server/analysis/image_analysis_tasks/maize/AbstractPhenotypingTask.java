@@ -686,6 +686,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
 		}
 		
+		boolean multiTray = analysisResults.keySet().size() > 1;
 		for (Integer tray : analysisResults.keySet()) {
 			for (BlockPropertyValue bpv : analysisResults.get(tray).getPropertiesSearch("RESULT_")) {
 				if (bpv.getName() == null)
@@ -697,6 +698,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								+ " (" + getName() + ")");
 				m.setValue(bpv.getValue());
 				m.setUnit(bpv.getUnit());
+				if (multiTray)
+					m.setQualityAnnotation(m.getQualityAnnotation() + "_" + tray);
 				
 				if (output != null)
 					output.add(m);
@@ -867,7 +870,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					analysisResults = imageProcessor.getSettings();
 					
 					processAndOrSaveTiffImagesOrResultImages(id, inVis, inFluo, inNir, inIr,
-							debugImageStack.get(key), resVis, resFluo, resNir, resIr, parentPriority);
+							debugImageStack != null ? debugImageStack.get(key) : null, resVis, resFluo, resNir, resIr, parentPriority);
 				}
 			}
 		}

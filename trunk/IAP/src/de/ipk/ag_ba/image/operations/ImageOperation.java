@@ -3266,6 +3266,8 @@ public class ImageOperation {
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfo) {
 		if (image == null)
 			return null;
+		if (rgbInfo.length == 0)
+			return this;
 		ImageOperation res = null;
 		if (rgbInfo.length > 3 && rgbInfo.length <= 6) {
 			double r1 = brightness / rgbInfo[0];

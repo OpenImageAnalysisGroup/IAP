@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -178,10 +177,10 @@ public class BlockPipeline {
 			updateBlockStatistics(1);
 			
 			if (status != null) {
-				status.setCurrentStatusValueFine(100d * (index / (double) blocks
-						.size()));
+				// status.setCurrentStatusValueFine(100d * (index / (double) blocks.size() / options.getTrayCnt() + 100d / options.getTrayCnt() *
+				// options.getTrayIdx()));
 				try {
-					Set<Integer> times = new TreeSet<Integer>();
+					TreeSet<Integer> times = new TreeSet<Integer>();
 					input.getImages().getVisInfo().getParentSample().getParentCondition().getTimes(times);
 					String timeInfo = "|" + StringManipulationTools.getStringList(times, "|") + "|.";
 					timeInfo = StringManipulationTools.stringReplace(timeInfo,
@@ -191,11 +190,14 @@ public class BlockPipeline {
 					timeInfo = StringManipulationTools.stringReplace(timeInfo, "|", " ");
 					timeInfo = timeInfo.trim();
 					String p = timeInfo + " </b>(" +
-							input.getImages().getVisInfo().getQualityAnnotation() + ")<b>";
+							input.getImages().getVisInfo().getQualityAnnotation() +
+							(options.getTrayCnt() > 1 ?
+									", tray " + (options.getTrayIdx() + 1) + "/" + options.getTrayCnt() + ")<b>"
+									: ")<b>");
 					status.setCurrentStatusText2(p);
 				} catch (Exception e) {
 					status.setCurrentStatusText2("Finished " + index + "/"
-							+ blocks.size());// + "<br>" +"" +
+							+ blocks.size() + " (Error:" + e.getMessage() + ")");// + "<br>" +"" +
 				} // filter(blockClass.getSimpleName()));
 					// status.setCurrentStatusText1(block.getClass().getSimpleName());
 				if (status.wantsToStop())
@@ -208,10 +210,12 @@ public class BlockPipeline {
 		long b = System.currentTimeMillis();
 		
 		if (status != null) {
-			status.setCurrentStatusValueFine(100d * (index / (double) blocks
-					.size()));
+			status.setCurrentStatusValueFine(100d * (options.getTrayIdx() + 1) / options.getTrayCnt());
+			
+			// status.setCurrentStatusValueFine(100d * (index / (double) blocks
+			// .size()));
 			// status.setCurrentStatusText1("Pipeline finished");
-			status.setCurrentStatusText1("T=" + ((b - a) / 1000) + "s");
+			status.setCurrentStatusText2("T=" + ((b - a) / 1000) + "s");
 		}
 		// System.out.print("PET: " + (b - a) / 1000 + "s ");
 		if (pipelineExecutionsWithinCurrentHour % 5 == 0) {

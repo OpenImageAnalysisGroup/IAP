@@ -62,6 +62,7 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	 */
 	private double[] getProbablyWhitePixels(FlexibleImage image, double size, double MarkerPosX, double MarkerPosY, BlockProperty bpleft,
 			BlockProperty bpright) {
+		image = image.getIO().crop().getImage();
 		int width = image.getWidth();
 		int height = image.getHeight();
 		

@@ -16,7 +16,7 @@ import org.junit.Test;
 public class SystemAnalysis {
 	
 	private static boolean fullPower = false;
-	private static boolean halfPower = false;
+	private static boolean halfPower = true;
 	private static int fixedCPUload = 0;
 	
 	/**
