@@ -19,7 +19,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageStack;
  * @author Entzian, Pape, Klukas
  */
 public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
-	boolean debug = true;
+	boolean debug = false;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
