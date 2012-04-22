@@ -113,7 +113,7 @@ public class MongoDB {
 	
 	private static final ArrayList<MongoDB> mongos = initMongoList();
 	
-	private static boolean ensureIndex = false;
+	private static boolean ensureIndex = true;
 	
 	public static ArrayList<MongoDB> getMongos() {
 		return mongos;
@@ -2485,6 +2485,8 @@ public class MongoDB {
 				status.setCurrentStatusText2("Read list of condition IDs");
 				{
 					DBCollection conditions = db.getCollection("conditions");
+					if (ensureIndex)
+						conditions.ensureIndex(new BasicDBObject("_id", 1));
 					long nn = 0, max = conditions.count();
 					status.setCurrentStatusText2("Read list of condition IDs (" + max + ")");
 					DBCursor condCur = conditions.find(new BasicDBObject(), new BasicDBObject("_id", 1));
@@ -2579,8 +2581,7 @@ public class MongoDB {
 					int n = 0;
 					for (String subID : dbIdsOfSubstances) {
 						n++;
-						DBObject del = substances.findOne(new BasicDBObject("_id", new ObjectId(subID)));
-						substances.remove(del, WriteConcern.NONE);
+						substances.remove(new BasicDBObject("_id", new ObjectId(subID)), WriteConcern.NONE);
 						status.setCurrentStatusValueFine(100d / max * n);
 						status.setCurrentStatusText2(n + "/" + max);
 					}

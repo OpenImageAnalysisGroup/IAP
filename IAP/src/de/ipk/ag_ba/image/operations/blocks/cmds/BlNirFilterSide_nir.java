@@ -28,7 +28,9 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 					double f = 0.08;
 					if (options.isBarleyInBarleySystem()) {
 						f = 0.08;
-					}
+					} else
+						if (!options.isArabidopsis())
+							f = 0.15;
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).adaptiveThresholdForGrayscaleImage(50, average,
 							options.getBackground(), f).getImage().print("ADAPT OUT", debug);
 				}
