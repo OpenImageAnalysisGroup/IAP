@@ -15,6 +15,11 @@ public class BlockRemoveSmallClusters_vis extends BlockRemoveSmallClusters_vis_f
 			in = ImageOperation.removeSmallPartsOfImage(true, in, options.getBackground(), 35, 5, NeighbourhoodSetting.NB4, options.getCameraPosition(), null,
 					false);
 		}
+		if (in != null && options.getCameraPosition() == CameraPosition.SIDE) {
+			in.getIO();
+			in = ImageOperation.removeSmallPartsOfImage(true, in, options.getBackground(), 25, 3, NeighbourhoodSetting.NB4, options.getCameraPosition(), null,
+					false);
+		}
 		return in;
 	}
 	
