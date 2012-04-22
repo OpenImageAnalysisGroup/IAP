@@ -3243,7 +3243,7 @@ public class ImageOperation {
 	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {
 		ImageOperation a = new ImageOperation(this.getImage());
-		int s = 3;
+		int s = 5;
 		image.setColor(Color.YELLOW);
 		for (MarkerPair mp : numericResult)
 			if (mp.getLeft() != null)

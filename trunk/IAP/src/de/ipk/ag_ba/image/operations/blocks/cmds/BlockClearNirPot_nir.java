@@ -48,7 +48,10 @@ public class BlockClearNirPot_nir extends AbstractSnapshotAnalysisBlockFIS {
 				}
 				int g = 180;
 				int gray = (0xFF << 24 | (g & 0xFF) << 16) | ((g & 0xFF) << 8) | ((g & 0xFF) << 0);
-				if (maxContinousBlack > 0.1 * w) {
+				double co = 0.1;
+				if (!options.isBarleyInBarleySystem())
+					co = 2;
+				if (maxContinousBlack > co * w) {
 					for (int x = 0; x < w; x++) {
 						nirArray[x][y] = gray;
 					}

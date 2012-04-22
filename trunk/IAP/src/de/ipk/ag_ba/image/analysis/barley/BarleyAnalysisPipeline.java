@@ -53,8 +53,6 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		boolean skelet = true;
 		
 		BlockPipeline p = new BlockPipeline();
-		if (false)
-			return p;
 		p.add(BlLoadImagesIfNeeded_images_masks.class);
 		p.add(BlBalancing_fluo.class);
 		p.add(BlCreateDummyReferenceIfNeeded_vis.class);

@@ -59,7 +59,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 					if (!options.isBarleyInBarleySystem()) {
 						an = 12;
 						bn = 7;
-						offB = 15;
+						offB = 20;// 15;
 						offB2 = 5;
 					} else {
 						an = 150;
@@ -119,9 +119,9 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 				
 				// remove blue markers at the side
 				if (options.getCameraPosition() == CameraPosition.SIDE) {
-					double hhhh = options.isBarleyInBarleySystem() ? 1d : 0.9d;
+					double hhhh = options.isBarleyInBarleySystem() ? 1d : 0.98d;
 					toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or_and_not(
-							new int[] { 110 }, new int[] { 255 },
+							new int[] { 110 }, new int[] { 155 },
 							new int[] { 107 - 5 }, new int[] { 127 + 5 },
 							new int[] { 70 - 5 }, new int[] { 118 },
 							options.getBackground(), Integer.MAX_VALUE, false,
