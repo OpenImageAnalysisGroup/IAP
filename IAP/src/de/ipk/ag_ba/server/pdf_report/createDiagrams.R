@@ -1342,34 +1342,38 @@ renameOfTheTreatments <- function(overallList) {
 	seq <- 0;
 	newTreatmentName <- character()
 	
+	
 	if(overallList$filterTreatment[1] != "none") {
 		FileName <- "conditionsFirstFilter"
-		#writeLatexTable(FileName, numberOfColums=2)
+		writeLatexTable(FileName, c("Short name", "Long Name"))
 		for(n in overallList$filterTreatment) {
 			seq <- seq+1
-			if(nchar(n) > 15) {
-				newTreatmentName <- paste(seq, ". ", substr(n,1,15), " ...", sep="")
+			if(nchar(n) > 10) {
+				newTreatmentName <- paste(seq, ". ", substr(n,1,10), " ...", sep="")
 			} else {
 				newTreatmentName <- paste(seq, ". ", n, sep="")
 			}
+			#print(newTreatmentName)
 			overallList$filterTreatmentRename[[n]] <- newTreatmentName
-			#writeLatexTable(FileName)
+			writeLatexTable(FileName)
 		}
 	}
 
 	if(overallList$filterSecondTreatment[1] != "none") {
 		FileName <- "conditionsSecondFilter"
-		#writeLatexTable(FileName, numberOfColums=2)
+		writeLatexTable(FileName, numberOfColums=2)
 		for(n in overallList$filterSecondTreatment) {
 			seq <- seq+1
-			if(nchar(n) > 15) {
-				newTreatmentName <- paste(seq, ". ", substr(n,1,15), " ...", sep="")
+			if(nchar(n) > 10) {
+				newTreatmentName <- paste(seq, ". ", substr(n,1,10), " ...", sep="")
 			} else {
 				newTreatmentName <- paste(seq, ". ", n, " ...", sep="")
 			}
-			overallList$filterSecondTreatmentRename[[n]] <- newTreatmentName
-			#writeLatexTable(FileName)
+			#print(newTreatmentName)
+			overallList$secondFilterTreatmentRename[[n]] <- newTreatmentName
+			writeLatexTable(FileName)
 		}
+		#print(overallList$filterSecondTreatmentRename)
 	}
 	return(overallList)
 }
@@ -1378,15 +1382,16 @@ replaceTreatmentNames <- function(overallList, columnWhichShouldReplace) {
 	overallList$debug %debug% "replaceTreatmentNames()"
 	
 	columnWhichShouldReplace <- as.character(columnWhichShouldReplace)
-	if(!is.null(overallList$filterTreatmentRename)) {
+	
+	if(overallList$filterSecondTreatment != "none") {
+		for(n in overallList$filterTreatment) {
+			for(k in overallList$filterSecondTreatment) {
+				columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==paste(n,"/",k, sep=""), paste(overallList$filterTreatmentRename[[n]],"/", overallList$secondFilterTreatmentRename[[k]], sep=""))
+			}
+		}
+	} else if(overallList$filterTreatment != "none") {
 		for(n in overallList$filterTreatment) {
 			columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==n, overallList$filterTreatmentRename[[n]])
-		}
-	}
-	
-	if(!is.null(overallList$filterSecondTreatmentRename)) {
-		for(n in overallList$filterSecondTreatment) {
-			columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==n, overallList$filterSecondTreatmentRename[[n]])
 		}
 	}
 	return(as.factor(columnWhichShouldReplace))
@@ -1508,8 +1513,9 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "nboxplot")
 			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
 			overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
+
 			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
-			
+
 			if (length(overallResult[, 1]) > 0) {
 				
 				if (!CheckIfOneColumnHasOnlyValues(overallResult)) {
@@ -1750,8 +1756,9 @@ PreWorkForMakeBigOverallImage <- function(overallResult, overallDescriptor, over
 	if (length(groupBy) == 0 || length(groupBy) == 1) {
 		plotStackedImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, minor_breaks=FALSE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName)	
 	} else {
-		for (value in overallList$filterSecondTreatment) {
+		for (value in overallList$filterSecondTreatment) { 
 			title = overallList$secondFilterTreatmentRename[[value]]
+			#print(title)
 			plottedName = overallList$filterTreatment %contactAllWithAll% value
 			booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = plottedName))
 			plotThisValues = overallResult[booleanVector, ]
@@ -3154,7 +3161,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						appendix=appendix, stoppTheCalculation=stoppTheCalculation, isRatio = isRatio,
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(),
 						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), user="none", typ="none",
-						filterTreatmentRename = list(), filterSecondTreatmentRename = list())	
+						filterTreatmentRename = list(), secondFilterTreatmentRename = list())	
 		
 	overallList$debug %debug% "Start"
 	
