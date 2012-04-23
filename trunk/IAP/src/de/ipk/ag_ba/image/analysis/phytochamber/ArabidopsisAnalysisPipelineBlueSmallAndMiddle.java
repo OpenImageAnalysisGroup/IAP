@@ -21,7 +21,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fl
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLabFilter_Arabidopsis_blue_rubber_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLoadImagesIfNeeded_images;
-import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_vis_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlockSkeletonize_Arabidopsis_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir;
@@ -29,7 +29,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlIntensityConversion_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlUseVisMaskToClearFluo_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProcessors;
 
 /**
@@ -63,8 +62,9 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 		p.add(BlockClearNirPot_nir.class);
 		p.add(BlMedianFilter_fluo.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class);
-		p.add(BlUseVisMaskToClearFluo_fluo.class);
-		p.add(BlUseFluoMaskToClear_Arabidopsis_vis_nir.class);
+		// p.add(BlUseVisMaskToClearFluo_fluo.class);
+		// p.add(BlUseFluoMaskToClear_Arabidopsis_vis_nir.class);
+		p.add(BlUseFluoMaskToClear_Arabidopsis_nir.class);
 		p.add(BlMedianFilter_vis.class);
 		p.add(BlMedianFilter_vis.class);
 		p.add(BlNirFilterSide_nir.class);
@@ -153,8 +153,8 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 30);
 			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 30);
 		} else {
-			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 15);
-			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 15);
+			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 5);
+			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 10);
 		}
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
 		options.addBooleanSetting(Setting.DRAW_SKELETON, true);
