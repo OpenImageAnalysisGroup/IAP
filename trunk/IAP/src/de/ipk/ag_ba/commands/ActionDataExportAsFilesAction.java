@@ -210,10 +210,10 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction impl
 										zefn =
 												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : id.getReplicateID() + "") +
 														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
+														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
 														(id != null ? (id.getPosition() != null ?
 																StringManipulationTools.formatNumber(id.getPosition(), "000")
 																		+ "Grad " : "000Grad") : "") + " " +
-														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
 														gc.get(GregorianCalendar.YEAR) + "-" +
 														(gc.get(GregorianCalendar.MONTH) + 1) + "-" +
 														gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
