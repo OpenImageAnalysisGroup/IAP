@@ -67,10 +67,10 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 		
 		if(allCharacterSeparated["."] > allCharacterSeparated[","]) {
 	#		print("... English version")
-			return(read.csv(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8", encoding="UTF-8"))
+			return(read.csv(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8")) #encoding="UTF-8"
 		} else {
 	#		print("... German version")
-			return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8", encoding="UTF-8"))
+			return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8")) #, encoding="UTF-8"
 		}
 	} else {
 		return(NULL)
@@ -989,6 +989,7 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 	if (diagramTyp == "nboxplot") {
 		iniDataSet = merge(sort=FALSE, groupedDataFrameMean[booleanVector, ], groupedDataFrameSD[booleanVector, ], by = c(groupBy, colNames$colOfXaxis))
 		overallResult = buildRowName(iniDataSet, groupBy)
+		
 	} else	if (diagramTyp == "boxplot") {
 		#|| diagramTyp == "spiderplot"
 		iniDataSet = groupedDataFrameMean[booleanVector, ]
@@ -1015,8 +1016,8 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 		
 	}
 	else {
-		iniDataSet = groupedDataFrameMean[booleanVector, ]		
-		buildRowNameDataSet = buildRowName(iniDataSet, groupBy)
+		iniDataSet <- groupedDataFrameMean[booleanVector, ]	
+		buildRowNameDataSet <- buildRowName(iniDataSet, groupBy)
 		temp = data.frame()
 		
 		for (colNameWichMustBind in buildRowNameDataSet %allColnamesWithoutThisOnes% c(colNames$xAxis, colNames$colName, "primaerTreatment")) {
@@ -1190,6 +1191,20 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", o="", ylabel
 	write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, "tex", sep="."))
 }
 
+
+writeLatexTable <- function(fileName, numberOfColums=-1, colonnames) {
+	latexText <- ""
+	
+	if(numberOfColums != -1) {
+		latexText <- paste(latexText, 
+							"\\begin{tabular}{|",
+							for(n in 1:length(numberOfColums)) {"c|"},
+							"}",
+							"\\hline")
+	}
+}
+
+
 saveImageFile <- function(overallList, plot, fileName, extraString="") {
 	filename = preprocessingOfValues(paste(fileName, extraString, sep=""), FALSE, replaceString = "_")	
 
@@ -1319,6 +1334,64 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 	return(workingDataSet)	
 }
 
+renameOfTheTreatments <- function(overallList) {
+	overallList$debug %debug% "renameOfTheTreatments()"
+	
+#	overallList$filterTreatmentRename <- overallList$filterTreatment
+#	overallList$filterSecondTreatmentRename <- overallList$filterSecondTreatment
+	seq <- 0;
+	newTreatmentName <- character()
+	
+	if(overallList$filterTreatment[1] != "none") {
+		FileName <- "conditionsFirstFilter"
+		#writeLatexTable(FileName, numberOfColums=2)
+		for(n in overallList$filterTreatment) {
+			seq <- seq+1
+			if(nchar(n) > 15) {
+				newTreatmentName <- paste(seq, ". ", substr(n,1,15), " ...", sep="")
+			} else {
+				newTreatmentName <- paste(seq, ". ", n, sep="")
+			}
+			overallList$filterTreatmentRename[[n]] <- newTreatmentName
+			#writeLatexTable(FileName)
+		}
+	}
+
+	if(overallList$filterSecondTreatment[1] != "none") {
+		FileName <- "conditionsSecondFilter"
+		#writeLatexTable(FileName, numberOfColums=2)
+		for(n in overallList$filterSecondTreatment) {
+			seq <- seq+1
+			if(nchar(n) > 15) {
+				newTreatmentName <- paste(seq, ". ", substr(n,1,15), " ...", sep="")
+			} else {
+				newTreatmentName <- paste(seq, ". ", n, " ...", sep="")
+			}
+			overallList$filterSecondTreatmentRename[[n]] <- newTreatmentName
+			#writeLatexTable(FileName)
+		}
+	}
+	return(overallList)
+}
+
+replaceTreatmentNames <- function(overallList, columnWhichShouldReplace) {
+	overallList$debug %debug% "replaceTreatmentNames()"
+	
+	columnWhichShouldReplace <- as.character(columnWhichShouldReplace)
+	if(!is.null(overallList$filterTreatmentRename)) {
+		for(n in overallList$filterTreatment) {
+			columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==n, overallList$filterTreatmentRename[[n]])
+		}
+	}
+	
+	if(!is.null(overallList$filterSecondTreatmentRename)) {
+		for(n in overallList$filterSecondTreatment) {
+			columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==n, overallList$filterSecondTreatmentRename[[n]])
+		}
+	}
+	return(as.factor(columnWhichShouldReplace))
+}
+
 createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 	print(paste("create ", typ, " ", actualImage, "/", maxImage, ": '",imageName, "'", sep=""))
 }
@@ -1435,6 +1508,7 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "nboxplot")
 			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
 			overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
+			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
 			
 			if (length(overallResult[, 1]) > 0) {
 				
@@ -1443,7 +1517,7 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 					plot <-	ggplot(data=overallResult, aes(x=xAxis, y=mean, shape=name)) 
 							#geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="identity", alpha=0.1) +
 					
-					if(length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || overallList$isRatio) {
+					if(length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || overallList$isRatio || length(grep("relative",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || length(grep("average",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
 						plot <- plot + geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="smooth", alpha=0.1)
 						#plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), alpha=0.1)
 					} else {
@@ -1570,6 +1644,12 @@ plotStackedImage <- function(overallList, overallResult, title = "", makeOverall
 			overallList$stackedBarOptions$typOfGeomBar = c("fill")
 		}
 		
+		if ("primaerTreatment" %in% colnames(overallResult)) {
+			overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment)
+		} else {
+			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
+		}
+		
 		for (positionType in overallList$stackedBarOptions$typOfGeomBar) {			
 				if (positionType == "dodge") {				
 					plot = ggplot(overallResult, aes(x=xAxis, y=values, colour=hist)) +
@@ -1665,15 +1745,17 @@ plotStackedImage <- function(overallList, overallResult, title = "", makeOverall
 
 PreWorkForMakeBigOverallImage <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex) {
 	overallList$debug %debug% "PreWorkForMakeBigOverallImage()"	
+		
 	groupBy = groupByFunction(list(overallList$treatment, overallList$secondTreatment))
 	if (length(groupBy) == 0 || length(groupBy) == 1) {
 		plotStackedImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, minor_breaks=FALSE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName)	
 	} else {
 		for (value in overallList$filterSecondTreatment) {
-			title = value
+			title = overallList$secondFilterTreatmentRename[[value]]
 			plottedName = overallList$filterTreatment %contactAllWithAll% value
 			booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = plottedName))
 			plotThisValues = overallResult[booleanVector, ]
+			#overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
 		#	plotThisValues = reNameColumn(plotThisValues, "name", "primaerTreatment")
 			plotStackedImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, minor_breaks=FALSE, overallColor = overallColor, overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName)
 		}	 
@@ -1796,7 +1878,7 @@ PreWorkForMakeBigOverallImageSpin <- function(overallResult, overallDescriptor, 
 	} else {
 		
 		for (value in overallList$filterSecondTreatment) {			
-			title = value
+			title = overallList$secondFilterTreatmentRename[[value]]
 			plottedName = overallList$filterTreatment %contactAllWithAll% value
 			booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = plottedName))
 			plotThisValues = overallResult[booleanVector, ]
@@ -1831,12 +1913,16 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 	if (length(overallResult[, 1]) > 0) {		
 		for (positionType in overallList$spiderOptions$typOfGeomBar) {			
  
-			if ("primaerTreatment" %in% colnames(overallResult)) {				
+			if ("primaerTreatment" %in% colnames(overallResult)) {
+				overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment)
+				
 				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=primaerTreatment)) +
 						geom_point(aes(color=as.character(primaerTreatment), shape=hist), size=3) +
 						geom_line(aes(colour=as.character(primaerTreatment))) 
 				
 			} else {
+				overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
+				
 				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=name)) +
 						geom_point(aes(color=as.character(name), shape=hist), size=3) +
 						geom_line(aes(colour=as.character(name))) 
@@ -1973,7 +2059,13 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 #overallResult <- tempoverallResult
 	overallList$debug %debug% "plotLineRangeImage()"	
 	if (length(overallResult[, 1]) > 0) {		
-	
+		if ("primaerTreatment" %in% colnames(overallResult)) {
+			overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment)
+		} else {
+			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
+		}
+		
+		
 		plot <- ggplot(data=overallResult, aes(x=hist, y=values)) +
 				geom_line()
 		
@@ -2083,6 +2175,8 @@ makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overa
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "barplot")
 			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
 			overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
+			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
+			
 			
 			if (length(overallResult[, 1]) > 0) {
 				if (isOnlyOneValue) {
@@ -2129,6 +2223,9 @@ makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overa
 makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot") {
 	########
 #overallResult <- overallList$overallResult_nBoxDes
+#overallResult <- overallList$overallResult_boxDes
+#overallResult <- overallList$overallResult_boxStackDes
+#overallResult <- overallList$overallResult_boxSpiderDes
 #overallDescriptor <- overallList$nBoxDes
 #overallColor <- overallList$color_nBox
 #overallDesName <-overallList$nBoxDesName
@@ -2137,6 +2234,56 @@ makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor
 #imagesIndex <- "1"
 #isOnlyOneValue <- FALSE
 	#############	
+	
+#	
+	test2$mean1[1:10] <- runif(10,1,10) 
+	test2$mean1[11:20] <- runif(10,20,30) 
+	test2$mean1[21:30] <- runif(10,40,50) 
+	test2$mean1[31:40] <- runif(10,60,70) 
+	test2$mean1[41:50] <- runif(10,80,90) 
+	test2$xAxis[1:10] <- rep.int(1,10) 
+	test2$xAxis[11:20] <- rep.int(4,10) 
+	test2$xAxis[21:30] <- rep.int(8,10) 
+	test2$xAxis[31:40] <- rep.int(11,10) 
+	test2$xAxis[41:50] <- rep.int(20,10) 
+	
+	test3 <- data.frame(xAxis=rep.int(1,10), mean1=rep.int(1,10))
+	test3$xAxis[1:10] <- c(1,2,3,4,5,6,7,8,9,10)
+	test3$mean1[1:10] <- c(5,10,12,14,18,10,11,14,20,25)
+	
+ 	ggplot(data=test2, aes(xAxis, mean1, group=xAxis)) +
+		geom_violin()# +
+		#geom_bar(stat="identity", colour="Grey", size=0.1) +
+		geom_boxplot()
+
+
+ggplot(data=test3, aes(xAxis, mean1)) +
+		#coord_flip()+
+		#geom_bar(stat="identity", alpha=0) +
+		#geom_line() +
+		#geom_smooth(se=FALSE) 
+		geom_area()
+		#geom_polygon()
+		
+		
+		#geom_point() 
+
+
+		ggplot(data=test3, aes(x=xAxis)) +
+				geom_density() +
+				geom_point(aes(x=xAxis, y=mean1)) 
+	
+		test4 <- test3
+		test4$mean1[c(6,7)] <- c(-4,-1)  
+		
+		ggplot(data=test4, aes(xAxis, mean1)) +
+				geom_area()
+		
+	
+set.seed(110)
+dat <- data.frame(x=LETTERS[1:3], y=round(rnorm(90),2))
+ggplot(dat, aes(x=x, y=y)) + geom_violin() + geom_point(shape=21)
+
 	
 	
 	overallList$debug %debug% "makeBarDiagram()"
@@ -2215,7 +2362,7 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, o
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplot")
 			if (length(overallResult[, 1]) > 0) {
 				overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName, overallResult$xAxis, options)	
-			
+				overallResult$name <- replaceTreatmentNames(overallList, overallResult$name)
 				#myPlot = ggplot(overallList$overallResult, aes(factor(name), value, fill=name, colour=name)) + 
 				#myPlot = ggplot(overallResult, aes(factor(name), value, fill=name)) +
 			
@@ -3006,7 +3153,8 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						xAxisName=xAxisName, debug=debug, 
 						appendix=appendix, stoppTheCalculation=stoppTheCalculation, isRatio = isRatio,
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(),
-						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), user="none", typ="none")	
+						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), user="none", typ="none",
+						filterTreatmentRename = list(), filterSecondTreatmentRename = list())	
 		
 	overallList$debug %debug% "Start"
 	
@@ -3021,6 +3169,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #	overallList = preprocessingOfxAxisValue(overallList)
 #	overallList = preprocessingOfTreatment(overallList)
 #	overallList = preprocessingOfSecondTreatment(overallList)
+#	overallList = renameOfTheTreatments(overallList)
 #	overallList = overallCheckIfDescriptorIsNaOrAllZero(overallList)
 #	overallList = reduceWorkingDataSize(overallList)
 #	overallList = setDefaultAxisNames(overallList)
@@ -3035,6 +3184,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		overallList = preprocessingOfxAxisValue(overallList)
 		overallList = preprocessingOfTreatment(overallList)
 		overallList = preprocessingOfSecondTreatment(overallList)
+		overallList = renameOfTheTreatments(overallList)
 		overallList = overallCheckIfDescriptorIsNaOrAllZero(overallList)
 		if (!overallList$stoppTheCalculation) {
 			overallList = reduceWorkingDataSize(overallList)
