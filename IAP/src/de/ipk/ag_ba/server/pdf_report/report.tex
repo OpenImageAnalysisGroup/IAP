@@ -16,7 +16,7 @@
 %%\documentclass[oneside,english]{scrreprt}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
-%%\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
+%\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
 \usepackage{fixltx2e}
 \usepackage[english]{babel} % Anpassung der Überschriften (chapter, chapitre, Kapitel …) und die richtige Silbentrennung
 \usepackage{hyperref}
@@ -158,6 +158,9 @@
 	}
 }
 
+% \usepackage{array}
+% \newcolumntype{C}[1]{>{\begin{center}}p{#1}<{\end{center}}}
+
 % \newboolean{forceClearPage}
 % \setboolean{forceClearPage}{true}
 % 
@@ -231,11 +234,10 @@ of the group image analysis.
 \pagestyle{headings}
 \section{Experiment info} 
 \subsection{Experiment properties}
-
 \begin{center}
-	\begin{tabular}{|c|c|}
+	\begin{tabular}{|p{3cm}|p{13cm}|}
 	\hline
-	{\textbf{Experiment}} & --experimentname--\tabularnewline
+	{\textbf{Experiment}} & --experimentnameShort--\tabularnewline
 	\hline
 	\hline
 	{\textbf{Start}} & --StartExp--\tabularnewline
@@ -253,9 +255,8 @@ of the group image analysis.
 \end{center}
 
 \subsection{Remarks}
-
 \begin{center}
-	\begin{tabular}{|c|}
+	\begin{tabular}{|p{16.5cm}|}
 	\hline 
 	{\textbf{Notes}}\tabularnewline
 	\hline 
@@ -266,8 +267,39 @@ of the group image analysis.
 	\end{tabular}
 \end{center}
 
-\subsection{Experiment factors}
 
+\resetBoolean
+\checkFileNoReset{conditionsFirstFilter.tex}{}{}
+\checkFileNoReset{conditionsSecondFilter.tex}{}{}
+\ifthenelse{\boolean{isFile1}}{
+	\subsection{Experiment factor groups}
+	
+	\checkFile{conditionsFirstFilter.tex}{conditionsSecondFilter.tex}{}
+	\ifthenelse{\boolean{isFile1} \and \boolean{isFile2}}{
+	
+		\subsubsection{Primary filter}
+		\begin{center}
+		\loadTex{conditionsFirstFilter}
+		\end{center}
+		
+		\subsubsection{Secondary filter}
+		\begin{center}
+		\loadTex{conditionsSecondFilter}
+		\end{center}
+	}{
+		\ifthenelse{\boolean{isFile1}}{
+			\begin{center}
+			\loadTex{conditionsFirstFilter}
+			\end{center}
+		}{
+			\begin{center}
+			\loadTex{conditionsSecondFilter}
+			\end{center}	
+		}
+	}
+}
+
+\subsection{Full list of experiment factors}
 \begin{center}
 	\begin{longtable}{|p{0.7cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|}
 	
@@ -280,7 +312,7 @@ of the group image analysis.
 	{\textbf{Variety}} &
 	{\textbf{Treatment}} & 
 	{\textbf{Sequence}} & 
-	{\textbf{Treatment}}
+	{\textbf{Growth conditions}}
 	\tabularnewline
 	\hline
 	\hline
@@ -295,7 +327,7 @@ of the group image analysis.
 	{\textbf{Variety}} &
 	{\textbf{Treatment}} & 
 	{\textbf{Sequence}} & 
-	{\textbf{Treatment}}
+	{\textbf{Growth conditions}}
 	\tabularnewline
 	\hline
 	\hline
