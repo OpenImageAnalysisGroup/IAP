@@ -186,7 +186,17 @@ public class PdfCreator {
 		
 		File fff = new File(tempDirectory.getAbsolutePath() + File.separator + fn);
 		String c = TextFile.read(fff);
-		c = StringManipulationTools.stringReplace(c, "--experimentname--", safe(experiment.getName()));
+		String experimentName = safe(StringManipulationTools.stringReplace(experiment.getName(), ".", " "));
+		
+		c = StringManipulationTools.stringReplace(c, "--experimentname--", experimentName);
+		
+		experimentName = StringManipulationTools.stringReplace(experimentName, "\\textunderscore", "_");
+		if (experimentName.length() > 80) {
+			experimentName = experimentName.substring(0, 80).concat(" ...");
+		}
+		experimentName = StringManipulationTools.stringReplace(experimentName, "_", "\\textunderscore");
+		
+		c = StringManipulationTools.stringReplace(c, "--experimentnameShort--", experimentName);
 		c = StringManipulationTools.stringReplace(c, "--coordinator--", safe(experiment.getCoordinator()));
 		c = StringManipulationTools.stringReplace(c, "--StartExp--", safe(SystemAnalysis.getCurrentTime(experiment.getStartDate().getTime())));
 		c = StringManipulationTools.stringReplace(c, "--EndExp--", safe(SystemAnalysis.getCurrentTime(experiment.getImportDate().getTime())));
@@ -228,7 +238,8 @@ public class PdfCreator {
 				String gc = StringManipulationTools.string2Latex(ci.getGrowthconditions() != null ? ci.getGrowthconditions() : "");
 				boolean first = true;
 				String row = "";
-				for (String inRow : t.split(";")) {
+				// t.split(";")
+				for (String inRow : new String[] { t }) {
 					if (first) {
 						row = safe(id + " & " + sp + " & " + gt + " & " + v + " & " + inRow + " & " + s + " & " + gc + " \\tabularnewline");
 						first = false;
@@ -237,6 +248,10 @@ public class PdfCreator {
 					}
 				}
 				row += " \\hline";
+				row = StringManipulationTools.stringReplace(row, "=", ": ");
+				row = StringManipulationTools.stringReplace(row, "(", " (");
+				row = StringManipulationTools.stringReplace(row, ";", ", ");
+				row = StringManipulationTools.stringReplace(row, "  ", " ");
 				result.add(row);
 			}
 		return result;

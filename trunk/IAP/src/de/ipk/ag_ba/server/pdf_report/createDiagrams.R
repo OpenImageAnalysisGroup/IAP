@@ -540,6 +540,7 @@ changefileName <- function(fileNameVector) {
 preprocessingOfValues <- function(value, isColValue=FALSE, replaceString=".", isColName=FALSE) {
 	if (!is.null(value)) {
 		regExpressionCol = "[^[:alnum:]|^_]|[[:space:]|\\^]"
+		#regExpressionCol = "[^[:alnum:]]|[[:space:]|\\^]"
 		if (isColValue || isColName) {
 			value = strsplit(as.character(value), "$", fixed=TRUE)
 		}
@@ -1192,16 +1193,49 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", o="", ylabel
 }
 
 
-writeLatexTable <- function(fileName, numberOfColums=-1, colonnames) {
+writeLatexTable <- function(fileNameLatexFile, columnName=NULL, value=NULL, columnWidth=NULL) {
 	latexText <- ""
-	
-	if(numberOfColums != -1) {
+
+	if(length(columnName) > 0) {
+		latexText <- "\\begin{tabular}{|"
+		
+		for(n in 1:length(columnName)) {
+			latexText <- paste(latexText, "p{",columnWidth[n],"}|", sep="")
+		}
+		latexText <- paste(latexText, "}", " \\hline ", sep="")
+		
+		for(n in 1:length(columnName)) {
+			latexText <- paste(latexText, "{\\textbf{",
+					parseString2Latex(renameFilterOutput(as.character(columnName[n]))),
+				"}}", sep="")
+			if(n != length(columnName)) {
+				latexText <- paste(latexText, "& ", sep=" ")
+			}
+		}
+		latexText <- paste(latexText,
+							"\\tabularnewline",
+							"\\hline",
+							"\\hline", sep=" ")
+	} else if(length(value) > 0){
+		if(!is.null(value)) {
+			for(n in 1:length(value)) {
+				latexText <- paste(latexText, parseString2Latex(renameFilterOutput(as.character(value[n]))))
+				if(n != length(value)) {
+					latexText <- paste(latexText, " &", sep="")
+				}
+			}
+			latexText <- paste(latexText, "\\tabularnewline")
+		}
+	} else {
 		latexText <- paste(latexText, 
-							"\\begin{tabular}{|",
-							for(n in 1:length(numberOfColums)) {"c|"},
-							"}",
-							"\\hline")
+						"\\hline",
+						"\\hline",
+						"\\end{tabular}", sep=" ")
 	}
+	
+	if(latexText != "") {
+		write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, "tex", sep="."))
+	}	
 }
 
 
@@ -1298,7 +1332,9 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 			colNames = c("mean", "se")
 		} else if (diagramTyp == "boxplot") {
 			colNames = c("value")
-		} 
+		} else if (diagramTyp == "violin") {
+			colNames = c("mean")
+		}
 		
 		if ("primaerTreatment" %in% colnames(tempOverallResult)) {
 			standardColumnName = c("name", "primaerTreatment", "xAxis")
@@ -1337,15 +1373,13 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 renameOfTheTreatments <- function(overallList) {
 	overallList$debug %debug% "renameOfTheTreatments()"
 	
-#	overallList$filterTreatmentRename <- overallList$filterTreatment
-#	overallList$filterSecondTreatmentRename <- overallList$filterSecondTreatment
 	seq <- 0;
 	newTreatmentName <- character()
-	
+	columnName <- c("Short name", "Full Name")
 	
 	if(overallList$filterTreatment[1] != "none") {
 		FileName <- "conditionsFirstFilter"
-		writeLatexTable(FileName, c("Short name", "Long Name"))
+		writeLatexTable(FileName, columnName, columnWidth=c("3cm","13cm"))
 		for(n in overallList$filterTreatment) {
 			seq <- seq+1
 			if(nchar(n) > 10) {
@@ -1353,47 +1387,47 @@ renameOfTheTreatments <- function(overallList) {
 			} else {
 				newTreatmentName <- paste(seq, ". ", n, sep="")
 			}
-			#print(newTreatmentName)
 			overallList$filterTreatmentRename[[n]] <- newTreatmentName
-			writeLatexTable(FileName)
+			writeLatexTable(FileName, value=c(newTreatmentName,n))
 		}
+		writeLatexTable(FileName)
 	}
 
 	if(overallList$filterSecondTreatment[1] != "none") {
 		FileName <- "conditionsSecondFilter"
-		writeLatexTable(FileName, numberOfColums=2)
+		writeLatexTable(FileName, columnName, columnWidth=c("3cm","13cm"))
 		for(n in overallList$filterSecondTreatment) {
 			seq <- seq+1
 			if(nchar(n) > 10) {
 				newTreatmentName <- paste(seq, ". ", substr(n,1,10), " ...", sep="")
 			} else {
-				newTreatmentName <- paste(seq, ". ", n, " ...", sep="")
+				newTreatmentName <- paste(seq, ". ", n, sep="")
 			}
-			#print(newTreatmentName)
 			overallList$secondFilterTreatmentRename[[n]] <- newTreatmentName
-			writeLatexTable(FileName)
+			writeLatexTable(FileName, value=c(newTreatmentName,n))
 		}
-		#print(overallList$filterSecondTreatmentRename)
+		writeLatexTable(FileName)
 	}
 	return(overallList)
 }
 
-replaceTreatmentNames <- function(overallList, columnWhichShouldReplace) {
+replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFirstTreatment=FALSE) {
 	overallList$debug %debug% "replaceTreatmentNames()"
 	
 	columnWhichShouldReplace <- as.character(columnWhichShouldReplace)
 	
-	if(overallList$filterSecondTreatment != "none") {
+	if(overallList$filterSecondTreatment[1] != "none" & !onlyFirstTreatment) {
 		for(n in overallList$filterTreatment) {
 			for(k in overallList$filterSecondTreatment) {
 				columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==paste(n,"/",k, sep=""), paste(overallList$filterTreatmentRename[[n]],"/", overallList$secondFilterTreatmentRename[[k]], sep=""))
 			}
-		}
-	} else if(overallList$filterTreatment != "none") {
+		} 
+	} else if(overallList$filterTreatment[1] != "none") {
 		for(n in overallList$filterTreatment) {
 			columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==n, overallList$filterTreatmentRename[[n]])
 		}
 	}
+	print(unique(columnWhichShouldReplace))
 	return(as.factor(columnWhichShouldReplace))
 }
 
@@ -1403,38 +1437,35 @@ createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 
 parseString2Latex <- function(text) {
 
-	#text <- gsub("\\", "\\textbackslash", text)
-	text <- gsub("\"", "\"'", text)
-	text <- gsub("ä", "\"a", text)
-	text <- gsub("ö", "\"o", text)
-	text <- gsub("ü", "\"u", text)
-	text <- gsub("ß", "\\ss", text)
-#	text <- gsub("_", "\\_", text)
-#	text <- gsub("<", "\\textless" , text)
-#	text <- gsub( ">", "\\textgreater", text)
-#	text <- gsub("§", "\\S", text)
-#	text <- gsub("$", "\\$", text)
-#	text <- gsub("&", "\\&", text)
-#	text <- gsub("#", "\\#", text)
-#	#text <- gsub("{", "\\{", text)
-#	text <- gsub("}", "\\}", text)
-#	text <- gsub("%", "\\%", text)
-#	text <- gsub("~", "\\textasciitilde", text)
-#	text <- gsub("€", "\\texteuro", text)
-	text <- gsub("ß", "ss", text)
-	text <- gsub("_", " ", text)
-	text <- gsub("<", " " , text)
-	text <- gsub( ">", " ", text)
-	text <- gsub("§", " ", text)
-	text <- gsub("$", " ", text)
-	text <- gsub("&", " ", text)
-	text <- gsub("#", " ", text)
-	#text <- gsub("{", "\\{", text)
-	text <- gsub("}", " ", text)
-	text <- gsub("%", " ", text)
-	text <- gsub("~", " ", text)
-	text <- gsub("€", " ", text)
+	##text <- gsub("\\", "\\textbackslash ", text)
+	text <- gsub("{", "\\{ ", text, fixed=TRUE)
+	text <- gsub("}", "\\} ", text, fixed=TRUE)
+	text <- gsub("ä", "{\\\"a}", text, fixed=TRUE)
+	text <- gsub("ö", "{\\\"o}", text, fixed=TRUE)
+	text <- gsub("ü", "{\\\"u}", text, fixed=TRUE)
+	text <- gsub("ß", "{\\ss}", text, fixed=TRUE)
+	text <- gsub("_", "{\\_}", text, fixed=TRUE)
+	text <- gsub("<", "\\textless " , text, fixed=TRUE)
+	text <- gsub(">", "\\textgreater ", text, fixed=TRUE)
+	text <- gsub("§", "\\S ", text, fixed=TRUE)
+	text <- gsub("$", "\\$ ", text, fixed=TRUE)
+	text <- gsub("&", "\\& ", text, fixed=TRUE)
+	text <- gsub("#", "\\# ", text, fixed=TRUE)
+	
+	text <- gsub("%", "\\% ", text, fixed=TRUE)
+	text <- gsub("~", "\\textasciitilde ", text, fixed=TRUE)
+	text <- gsub("€", "\\texteuro ", text, fixed=TRUE)
 
+	return(text)
+}
+
+renameFilterOutput <- function(text) {
+	
+	text <- gsub("=",": ",text, fixed = TRUE)
+	text <- gsub("/", ", ", text, fixed = TRUE)
+	text <- gsub("(", " (", text, fixed = TRUE)
+	text <- gsub("  ", " ", text, fixed = TRUE)
+	
 	return(text)
 }
 
@@ -1651,9 +1682,9 @@ plotStackedImage <- function(overallList, overallResult, title = "", makeOverall
 		}
 		
 		if ("primaerTreatment" %in% colnames(overallResult)) {
-			overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment)
+			overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
 		} else {
-			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
+			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name, TRUE)
 		}
 		
 		for (positionType in overallList$stackedBarOptions$typOfGeomBar) {			
@@ -1921,14 +1952,14 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 		for (positionType in overallList$spiderOptions$typOfGeomBar) {			
  
 			if ("primaerTreatment" %in% colnames(overallResult)) {
-				overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment)
+				overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
 				
 				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=primaerTreatment)) +
 						geom_point(aes(color=as.character(primaerTreatment), shape=hist), size=3) +
 						geom_line(aes(colour=as.character(primaerTreatment))) 
 				
 			} else {
-				overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
+				overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name, TRUE)
 				
 				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=name)) +
 						geom_point(aes(color=as.character(name), shape=hist), size=3) +
@@ -2067,9 +2098,9 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 	overallList$debug %debug% "plotLineRangeImage()"	
 	if (length(overallResult[, 1]) > 0) {		
 		if ("primaerTreatment" %in% colnames(overallResult)) {
-			overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment)
+			overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
 		} else {
-			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
+			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name, TRUE)
 		}
 		
 		
@@ -2227,12 +2258,35 @@ makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overa
 }
 
 
+reCategorized <- function(overallResult) {
+	
+	column <- "name"
+	if ("primaerTreatment" %in% colnames(overallResult)) {	
+		column <- "primaerTreatment"
+	} 
+	
+	for(n in as.character(unique(overallResult[column])))
+		
+		
+		booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = n))
+		
+		lin_interp = function(x, y, length.out=length(overallResult$xAxis)) {
+			approx(x, y, xout=seq(min(x), max(x), length.out=length.out))$y
+		}
+		
+		overallResult$xAxis <- lin_interp(overallResult$xAxis, overallResult$xAxis)
+		overallResult$mean <- lin_interp(overallResult$xAxis, overallResult$mean)
+		
+		catRle = rle(overallResult$mean < 0)
+		overallResult$group = rep.int(1:length(catRle$lengths), times=catRle$lengths)
+
+	return(overallResult)
+}
+
+
 makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot") {
 	########
 #overallResult <- overallList$overallResult_nBoxDes
-#overallResult <- overallList$overallResult_boxDes
-#overallResult <- overallList$overallResult_boxStackDes
-#overallResult <- overallList$overallResult_boxSpiderDes
 #overallDescriptor <- overallList$nBoxDes
 #overallColor <- overallList$color_nBox
 #overallDesName <-overallList$nBoxDesName
@@ -2242,117 +2296,99 @@ makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor
 #isOnlyOneValue <- FALSE
 	#############	
 	
-#	
-	test2$mean1[1:10] <- runif(10,1,10) 
-	test2$mean1[11:20] <- runif(10,20,30) 
-	test2$mean1[21:30] <- runif(10,40,50) 
-	test2$mean1[31:40] <- runif(10,60,70) 
-	test2$mean1[41:50] <- runif(10,80,90) 
-	test2$xAxis[1:10] <- rep.int(1,10) 
-	test2$xAxis[11:20] <- rep.int(4,10) 
-	test2$xAxis[21:30] <- rep.int(8,10) 
-	test2$xAxis[31:40] <- rep.int(11,10) 
-	test2$xAxis[41:50] <- rep.int(20,10) 
-	
-	test3 <- data.frame(xAxis=rep.int(1,10), mean1=rep.int(1,10))
-	test3$xAxis[1:10] <- c(1,2,3,4,5,6,7,8,9,10)
-	test3$mean1[1:10] <- c(5,10,12,14,18,10,11,14,20,25)
-	
- 	ggplot(data=test2, aes(xAxis, mean1, group=xAxis)) +
-		geom_violin()# +
-		#geom_bar(stat="identity", colour="Grey", size=0.1) +
-		geom_boxplot()
-
-
-ggplot(data=test3, aes(xAxis, mean1)) +
-		#coord_flip()+
-		#geom_bar(stat="identity", alpha=0) +
-		#geom_line() +
-		#geom_smooth(se=FALSE) 
-		geom_area()
-		#geom_polygon()
-		
-		
-		#geom_point() 
-
-
-		ggplot(data=test3, aes(x=xAxis)) +
-				geom_density() +
-				geom_point(aes(x=xAxis, y=mean1)) 
-	
-		test4 <- test3
-		test4$mean1[c(6,7)] <- c(-4,-1)  
-		
-		ggplot(data=test4, aes(xAxis, mean1)) +
-				geom_area()
-		
-	
-set.seed(110)
-dat <- data.frame(x=LETTERS[1:3], y=round(rnorm(90),2))
-ggplot(dat, aes(x=x, y=y)) + geom_violin() + geom_point(shape=21)
-
-	
-	
-	overallList$debug %debug% "makeBarDiagram()"
-	
-	tempOverallResult =  overallResult
-	
-	for (imagesIndex in names(overallDescriptor)) {
-		if (!is.na(overallDescriptor[[imagesIndex]])) {	
-			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "barplot")
-			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
-			overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
+#	test3 <- data.frame(xAxis=rep.int(1,10), mean1=rep.int(1,10), category=rep.int(1,10))
+#	test3$xAxis[1:10] <- c(1,2,3,4,5,6,7,8,9,10)
+#	test3$mean1[1:10] <- c(5,10,12,14,18,-5,-3,14,20,25)
+#	test3$category[1:10] <- c("positive","positive","positive","positive","positive","negative","negative","positive","positive","positive")
 			
-			groupedDataFrame = data.table(overallResult)
-			as.data.frame(groupedDataFrame[, lapply(.SD, max, na.rm=TRUE), by=c(groupBy, colNames$xAxis)])
-						
-			if (length(overallResult[, 1]) > 0) {
-				if (isOnlyOneValue) {
-					plot = ggplot(data=overallResult, aes(x=name, y=mean))
-				} else {
-					plot = ggplot(data=overallResult, aes(x=xAxis, y=mean))
-				}
-				
-			
-				plot = plot + 						
-						geom_bar(stat="identity", aes(fill=name), colour="Grey", size=0.1) +
-					#	geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
-						#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
-						ylab(overallDesName[[imagesIndex]]) +
-						coord_cartesian(ylim=c(max(overallResult$mean)-1000, max(overallResult$mean))) +
-						#coord_cartesian(ylim=c(max(overallResult$mean - overallResult$se -10, na.rm=TRUE), max(overallResult$mean, na.rm=TRUE))) +
-						xlab(overallList$xAxisName) +
-						scale_fill_manual(values = overallColor[[imagesIndex]]) +
-						#coord_flip() +
+##########################
+#		df <- data.frame(created=rep.int(1,10), score=rep.int(1,10), category=rep.int(1,10))
+#		df$created[1:10] <- c(1,2,3,4,5,6,7,8,9,10)
+#		df$score[1:10] <- c(5,10,12,14,18,-5,-3,14,20,25)
+#		df$category[1:10] <- c("positive","positive","positive","positive","positive","negative","negative","positive","positive","positive")
+#		
+#		
+#		# Interpolate data
+#		lin_interp = function(x, y, length.out=100) {
+#			approx(x, y, xout=seq(min(x), max(x), length.out=length.out))$y
+#		}
+#		created.interp = lin_interp(df$created, df$created)
+#		score.interp   = lin_interp(df$created, df$score)
+#		df.interp = data.frame(created=created.interp, score=score.interp)
+#		
+## Make a grouping variable for each pos/neg segment
+#		cat.rle = rle(df.interp$score < 0)
+#		df.interp$group = rep.int(1:length(cat.rle$lengths), times=cat.rle$lengths)
+#		
+# Plot
+		ggplot(data = df.interp, aes(x = created, y = score, fill=score>0, group=group)) + geom_area() + scale_fill_manual(values = c('red', 'green'))
+		
+#########################
+
+overallList$debug %debug% "makeViolinPlotDiagram()"	
+print("violin plot...")
+
+tempOverallResult =  overallResult	
+
+for (imagesIndex in names(overallDescriptor)) {
+	if (!is.na(overallDescriptor[[imagesIndex]])) {
+		ylabelForAppendix <- ""
+		createOuputOverview("violin plot", imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
+		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "violin")
+		overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
+		overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
+		overallResult <- reCategorized(overallResult)
+		
+		overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
+		
+		if (length(overallResult[, 1]) > 0) {
+							
+				plot <-	ggplot(data=overallResult, aes(x=xAxis, fill=mean>0, group=group)) +
+						geom_ribbon(aes(ymin=min(mean)-(min(mean)*0.025), ymax=mean)) +
+						scale_fill_manual(values = c('red', 'green'))
+						scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis)))) +					
+						ylab(overallDesName[[imagesIndex]])				
+						#scale_fill_manual(values = overallColor[[imagesIndex]]) +
+						scale_colour_manual(values= overallColor[[imagesIndex]]) +
 						theme_bw() +
-						opts(legend.position="bottom",
-								plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
-								axis.title.x = theme_text(face="bold", size=11), 
+						opts(axis.title.x = theme_text(face="bold", size=11), 
 								axis.title.y = theme_text(face="bold", size=11, angle=90), 
-								panel.grid.minor = theme_blank(), 
+								#panel.grid.major = theme_blank(), # switch off major gridlines
+								#panel.grid.minor = theme_blank(), # switch off minor gridlines
+								legend.position = "right", # manually position the legend (numbers being from 0, 0 at bottom left of whole plot to 1, 1 at top right)
+								legend.title = theme_blank(), # switch off the legend title						
+								#legend.key.size = unit(1.5, "lines"), 
+								legend.key = theme_blank(), # switch off the rectangle around symbols in the legend
 								panel.border = theme_rect(colour="Grey", size=0.1)
-						) +
-						guides(colour =	guide_legend(nrow = 2, byrow = T)) 
+						)
 				
-				if (length(overallColor[[imagesIndex]]) > 10) {
-					plot = plot + opts(axis.text.x = theme_text(size=6, angle=90))
+				if (length(overallColor[[imagesIndex]]) > 18 & length(overallColor[[imagesIndex]]) < 31) {
+					plot = plot + opts(legend.text = theme_text(size=6), 
+							legend.key.size = unit(0.7, "lines")
+					)
+				} else if(length(overallColor[[imagesIndex]]) >= 31) {
+					plot = plot + opts(legend.text = theme_text(size=4), 
+							legend.key.size = unit(0.4, "lines")
+					)
+				} else {
+					plot = plot + opts(legend.text = theme_text(size=11))
 				}
 				
-			
-				plot = plot + facet_grid(~ name)
+				if ("primaerTreatment" %in% colnames(overallResult)) {				
+					plot = plot + facet_wrap(~ primaerTreatment)
+				} else {
+					plot = plot + facet_wrap(~ name)
+				} 
+
 				
 				print(plot)
-				
-				writeTheData(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave, title, makeOverallImage, isAppendix=overallList$appendix)
-				
-#				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave)
-#
-#				if (overallList$appendix) {
-#					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
-#				}	
-			}
+
+				writeTheData(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave, isAppendix=overallList$appendix, subSectionTitel=ylabelForAppendix, subsectionDepth=1)
 		}
 	}
+}
+
+
 }
 
 
@@ -2519,6 +2555,10 @@ buildBlacklist <- function(workingDataSet, descriptorSet) {
 }
 
 initRfunction <- function(DEBUG = FALSE) {
+	#"LC_COLLATE=German_Germany.1252;LC_CTYPE=German_Germany.1252;LC_MONETARY=German_Germany.1252;LC_NUMERIC=C;LC_TIME=German_Germany.1252"
+	#Sys.setlocale(locale="de_DE.ISO8859-15")
+	#Sys.setlocale("LC_ALL", "en_US.UTF-8")
+	
 	if (DEBUG) {
 		options(error = quote({
 			#sink(file="error.txt", split = TRUE);
@@ -3162,7 +3202,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(),
 						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), user="none", typ="none",
 						filterTreatmentRename = list(), secondFilterTreatmentRename = list())	
-		
+				
 	overallList$debug %debug% "Start"
 	
 	overallList = checkTypOfExperiment(overallList)
