@@ -144,7 +144,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 					fis.addImage("step 6", result);
 				// filter background noise
 				double blueCurbWidthBarley0_1 = options.isBarleyInBarleySystem() ? 0.15 : 0.28;
-				double blueCurbHeightEndBarly0_8 = options.isBarleyInBarleySystem() ? 0.71 : 0.7;
+				double blueCurbHeightEndBarly0_8 = options.isBarleyInBarleySystem() ? 0.71 : 0.65;
 				if (options.getCameraPosition() == CameraPosition.SIDE)
 					toBeFiltered = result
 							.getIO()
@@ -175,7 +175,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 											122 + 5,
 											138 + 5, 125 + 5, 113 + 5, 121 + 5, 118 + 5, 121 + 5, 132 + 5, 136 + 5, 134 + 5, 121 + 5, 137 + 10, 122 + 5, 127 + 5,
 											134 + 5, 118 + 5,
-											135},
+											135 },
 									new int[] {
 											110, 117 - 2, 122 - 14, 144 - 5, 124 - 10, 117 - 5, 114 - 4, 100 - 5, 120 - 5, 118 - 5, 121 - 5, 123 - 4, 117 - 5, 116 - 5,
 											106 - 5,
@@ -187,7 +187,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 											113 + 5,
 											96 + 5, 100 + 5, 116 + 5, 109 + 5, 119 + 5, 119 + 5, 111 + 5, 114 + 5, 131 + 5, 105 + 5, 118 + 10, 103 + 5, 99 + 5,
 											128, 133 + 5,
-											105},
+											105 },
 									options.getBackground(), 2, false,
 									// plant colors
 									new int[] {}, new int[] {},
