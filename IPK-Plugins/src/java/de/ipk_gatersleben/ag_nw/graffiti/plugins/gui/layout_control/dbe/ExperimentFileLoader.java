@@ -41,11 +41,11 @@ public class ExperimentFileLoader {
 	public static boolean canLoadFile(File f) {
 		String fileName = f.getName();
 		if (fileName.toUpperCase().endsWith(".XLSX") ||
-							fileName.toUpperCase().endsWith(".XLS") ||
-							fileName.toUpperCase().endsWith(".DAT") ||
-							fileName.toUpperCase().endsWith(".TXT") ||
-							fileName.toUpperCase().endsWith(".BIN") ||
-							fileName.toUpperCase().endsWith(".CSV")) {
+				fileName.toUpperCase().endsWith(".XLS") ||
+				fileName.toUpperCase().endsWith(".DAT") ||
+				fileName.toUpperCase().endsWith(".TXT") ||
+				fileName.toUpperCase().endsWith(".BIN") ||
+				fileName.toUpperCase().endsWith(".CSV")) {
 			
 			if (fileName.toUpperCase().endsWith(".XLS") || fileName.toUpperCase().endsWith(".XLSX")) {
 				TableData td = ExperimentDataFileReader.getExcelTableDataPeak(f, 5);
@@ -96,46 +96,48 @@ public class ExperimentFileLoader {
 			fileList.removeAll(rawTextFiles);
 			
 			final HashMap<File, ArrayList<TextFileColumnInformation>> rawFile2relevantColumns =
-								new HashMap<File, ArrayList<TextFileColumnInformation>>();
+					new HashMap<File, ArrayList<TextFileColumnInformation>>();
 			
 			final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("Process Data...", "");
 			BackgroundTaskHelper.issueSimpleTask("Dataset-Loader", "Process Data...",
-								new Runnable() {
-									public void run() {
-										HashMap<File, TableData> unformatedExcelData = new HashMap<File, TableData>();
-										ExperimentFileLoader.processExcelTemplateFiles(fileList, status, receiver, unformatedExcelData);
-										status.setCurrentStatusText2("");
-										ExperimentFileLoader.processRawAndExpressionTextFiles(keggExpressionFiles, rawTextFiles, unformatedExcelData,
-															rawFile2relevantColumns, status, receiver);
-									}
-								},
-								null, status);
+					new Runnable() {
+						@Override
+						public void run() {
+							HashMap<File, TableData> unformatedExcelData = new HashMap<File, TableData>();
+							ExperimentFileLoader.processExcelTemplateFiles(fileList, status, receiver, unformatedExcelData);
+							status.setCurrentStatusText2("");
+							ExperimentFileLoader.processRawAndExpressionTextFiles(keggExpressionFiles, rawTextFiles, unformatedExcelData,
+									rawFile2relevantColumns, status, receiver);
+						}
+					},
+					null, status);
 		}
 	}
 	
 	public synchronized static void loadExcelFileWithBackGroundService(
-						final ExperimentDataFileReader excelReader,
-						final TableData myData,
-						final File excelFile,
-						final RunnableWithXMLexperimentData finishTask) {
+			final ExperimentDataFileReader excelReader,
+			final TableData myData,
+			final File excelFile,
+			final RunnableWithXMLexperimentData finishTask) {
 		MainFrame.showMessage("Load project data from Excel File...",
-							MessageType.PERMANENT_INFO);
+				MessageType.PERMANENT_INFO);
 		BackgroundTaskHelper excelLoader = new BackgroundTaskHelper(
-							new Runnable() {
-								public void run() {
-									try {
-										ExperimentInterface md = excelReader.getXMLdata(excelFile, myData,
-															new BackgroundTaskStatusProviderSupportingExternalCallImpl("Load Data...", ""));
-										finishTask.setExperimenData(md);
-										finishTask.run();
-									} catch (final Exception err) {
-										ErrorMsg.addErrorMessage(err);
-										finishTask.setExperimenData(null);
-										finishTask.run();
-									}
-								}
-							}, excelReader, "Construct Dataset",
-							(excelFile != null ? "<html>Read Excel File " + excelFile.getName() : "Process Data"), true, false);
+				new Runnable() {
+					@Override
+					public void run() {
+						try {
+							ExperimentInterface md = excelReader.getXMLdata(excelFile, myData,
+									new BackgroundTaskStatusProviderSupportingExternalCallImpl("Load Data...", ""));
+							finishTask.setExperimenData(md);
+							finishTask.run();
+						} catch (final Exception err) {
+							ErrorMsg.addErrorMessage(err);
+							finishTask.setExperimenData(null);
+							finishTask.run();
+						}
+					}
+				}, excelReader, "Construct Dataset",
+				(excelFile != null ? "<html>Read Excel File " + excelFile.getName() : "Process Data"), true, false);
 		excelLoader.startWork(MainFrame.getInstance());
 		if (!SwingUtilities.isEventDispatchThread()) {
 			try {
@@ -147,14 +149,14 @@ public class ExperimentFileLoader {
 	}
 	
 	static void processRawTextFiles(ArrayList<File> rawTextFiles,
-						ArrayList<KeggExpressionDataset> datasets, BackgroundTaskStatusProviderSupportingExternalCall status,
-						HashMap<File, ArrayList<TextFileColumnInformation>> rawTextFile2relevantColumns, HashMap<File, Boolean> transposeContent) {
+			ArrayList<KeggExpressionDataset> datasets, BackgroundTaskStatusProviderSupportingExternalCall status,
+			HashMap<File, ArrayList<TextFileColumnInformation>> rawTextFile2relevantColumns, HashMap<File, Boolean> transposeContent) {
 		for (File kef : rawTextFiles) {
 			if (rawTextFile2relevantColumns.get(kef) == null)
 				continue;
 			status.setCurrentStatusText2("Read content of file: " + kef.getName());
 			TableData expdata = ExperimentDataFileReader.
-								getExcelTableData(kef, -1, rawTextFile2relevantColumns.get(kef), status);
+					getExcelTableData(kef, -1, rawTextFile2relevantColumns.get(kef), status);
 			if (transposeContent.containsKey(kef)) {
 				if (transposeContent.get(kef))
 					expdata = expdata.getTransposedDataset();
@@ -174,7 +176,7 @@ public class ExperimentFileLoader {
 				int colDataSignal = ci.getSignalColumn();
 				Integer colDataSignalQuality = ci.getDetectionColumn();
 				status.setCurrentStatusText2("Process File: " + kef.getName() +
-									", column(s) " + colDataSignal + "/" + (colDataSignalQuality != null ? colDataSignalQuality : "-"));
+						", column(s) " + colDataSignal + "/" + (colDataSignalQuality != null ? colDataSignalQuality : "-"));
 				int headerRow = 1;
 				for (int row = headerRow + 1; row <= expdata.getMaximumRow(); row++) {
 					String geneId;
@@ -200,8 +202,14 @@ public class ExperimentFileLoader {
 											cSig = Double.NaN;
 										else {
 											cSig = null;
-											ErrorMsg.addErrorMessage("Invalid dataformat (non-numeric, non 'n/a', 'na', '-') in column " + colDataSignal + ", row " + row
-																+ ", content: " + val);
+											boolean addNonNumeric = true;
+											if (addNonNumeric) {
+												ked.addDatapoint(geneId, null, null, null, null,
+														Double.NaN, Double.NaN, Double.NaN, Double.NaN, mes_val_s);
+											} else
+												ErrorMsg.addErrorMessage("Invalid dataformat (non-numeric, non 'n/a', 'na', '-') in column " + colDataSignal + ", row "
+														+ row
+														+ ", content: " + val);
 										}
 									} else {
 										cSig = null;
@@ -226,7 +234,7 @@ public class ExperimentFileLoader {
 	}
 	
 	static void processKeggExpressionTextFiles(ArrayList<File> keggExpressionFiles, ArrayList<KeggExpressionDataset> datasets,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		for (File kef : keggExpressionFiles) {
 			status.setCurrentStatusText2("Process File: " + kef.getName());
 			TableData expdata = ExperimentDataFileReader.getExcelTableData(kef, null);
@@ -267,9 +275,9 @@ public class ExperimentFileLoader {
 	}
 	
 	protected static void loadExcelOrBinaryFile(
-						File excelOrBinaryFile,
-						final ExperimentDataPresenter receiver,
-						HashMap<File, TableData> rawTextFilesReceiver) throws JDOMException {
+			File excelOrBinaryFile,
+			final ExperimentDataPresenter receiver,
+			HashMap<File, TableData> rawTextFilesReceiver) throws JDOMException {
 		if (excelOrBinaryFile != null) {
 			final String experimentName = excelOrBinaryFile.getName();
 			if (experimentName.toUpperCase().endsWith(".BIN")) {
@@ -320,36 +328,38 @@ public class ExperimentFileLoader {
 				}
 				if (gefr != null)
 					loadExcelFileWithBackGroundService(
-										gefr,
-										myData,
-										excelOrBinaryFile,
-										new RunnableWithXMLexperimentData() {
-											private ExperimentInterface md = null;
-											
-											/**
-											 * <code>setExperimentData</code> will be
-											 * automatically
-											 * called before this method is called.
-											 * This is a two step solution as the loading
-											 * of the
-											 * data is done in background.
-											 */
-											public void run() {
-												receiver.processReceivedData(myData, experimentName, md, null);
-											}
-											
-											public void setExperimenData(ExperimentInterface md) {
-												this.md = md;
-											}
-										});
+							gefr,
+							myData,
+							excelOrBinaryFile,
+							new RunnableWithXMLexperimentData() {
+								private ExperimentInterface md = null;
+								
+								/**
+								 * <code>setExperimentData</code> will be
+								 * automatically
+								 * called before this method is called.
+								 * This is a two step solution as the loading
+								 * of the
+								 * data is done in background.
+								 */
+								@Override
+								public void run() {
+									receiver.processReceivedData(myData, experimentName, md, null);
+								}
+								
+								@Override
+								public void setExperimenData(ExperimentInterface md) {
+									this.md = md;
+								}
+							});
 			}
 		}
 	}
 	
 	static void processExcelTemplateFiles(final Collection<File> fileList,
-						final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
-						ExperimentDataPresenter receiver,
-						HashMap<File, TableData> rawTextFilesReceiver) {
+			final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
+			ExperimentDataPresenter receiver,
+			HashMap<File, TableData> rawTextFilesReceiver) {
 		synchronized (ExperimentFileLoader.class) {
 			for (File f : fileList) {
 				status.setCurrentStatusText2("Read File: " + f.getName());
@@ -364,12 +374,12 @@ public class ExperimentFileLoader {
 	}
 	
 	private static void processRawAndExpressionTextFiles(
-						final ArrayList<File> keggExpressionFiles,
-						final ArrayList<File> rawTextFiles,
-						final HashMap<File, TableData> unformatedExcelData,
-						final HashMap<File, ArrayList<TextFileColumnInformation>> rawFile2relevantColumns,
-						final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
-						final ExperimentDataPresenter receiver) {
+			final ArrayList<File> keggExpressionFiles,
+			final ArrayList<File> rawTextFiles,
+			final HashMap<File, TableData> unformatedExcelData,
+			final HashMap<File, ArrayList<TextFileColumnInformation>> rawFile2relevantColumns,
+			final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
+			final ExperimentDataPresenter receiver) {
 		synchronized (ExperimentFileLoader.class) {
 			HashMap<File, Boolean> transposeContent = new HashMap<File, Boolean>();
 			rawTextFiles.addAll(unformatedExcelData.keySet());
@@ -382,15 +392,15 @@ public class ExperimentFileLoader {
 					// 2
 					// rows
 					Object[] res = MyInputHelper.getInput(
-										"Raw text file " + rtf.getName() + " has been analyzed.<br>" +
-															"It contains " + expdata.getMaximumCol() + " columns.<br>" +
-															"Different lines, treatments and/or time points should be in separate columns,<br>" +
-															"measured substances should be in different rows.<br>" +
-															"The first column should contain the measured substances identifiers.<br>" +
-															"<br>" +
-															"Optionally you may now transpose the input file content.",
-										"Text file analyzed. Transpose?", new Object[] {
-															"Transpose Content", false
+							"Raw text file " + rtf.getName() + " has been analyzed.<br>" +
+									"It contains " + expdata.getMaximumCol() + " columns.<br>" +
+									"Different lines, treatments and/or time points should be in separate columns,<br>" +
+									"measured substances should be in different rows.<br>" +
+									"The first column should contain the measured substances identifiers.<br>" +
+									"<br>" +
+									"Optionally you may now transpose the input file content.",
+							"Text file analyzed. Transpose?", new Object[] {
+									"Transpose Content", false
 							});
 					if (res == null) {
 						MainFrame.showMessageDialog("File " + rtf.getName() + " will not be processed!", "Information");
@@ -423,20 +433,22 @@ public class ExperimentFileLoader {
 						gefr.setMeasurementUnit(kec.getDesiredMeasurementUnit());
 						final String experimentName = kec.getDesiredExperimentName();
 						loadExcelFileWithBackGroundService(
-											gefr,
-											resultingData,
-											null,
-											new RunnableWithXMLexperimentData() {
-												private ExperimentInterface md = null;
-												
-												public void run() {
-													receiver.processReceivedData(resultingData, experimentName, md, null);
-												}
-												
-												public void setExperimenData(ExperimentInterface md) {
-													this.md = md;
-												}
-											});
+								gefr,
+								resultingData,
+								null,
+								new RunnableWithXMLexperimentData() {
+									private ExperimentInterface md = null;
+									
+									@Override
+									public void run() {
+										receiver.processReceivedData(resultingData, experimentName, md, null);
+									}
+									
+									@Override
+									public void setExperimenData(ExperimentInterface md) {
+										this.md = md;
+									}
+								});
 					}
 				}
 			}
@@ -444,11 +456,11 @@ public class ExperimentFileLoader {
 	}
 	
 	static void processRawStringTableData(String tabledata,
-						ArrayList<KeggExpressionDataset> datasets, BackgroundTaskStatusProviderSupportingExternalCall status,
-						ArrayList<TextFileColumnInformation> relevantColumns) {
+			ArrayList<KeggExpressionDataset> datasets, BackgroundTaskStatusProviderSupportingExternalCall status,
+			ArrayList<TextFileColumnInformation> relevantColumns) {
 		status.setCurrentStatusText2("Analyse Table Data (String)");
 		TableData expdata = ExperimentDataFileReader.
-							getExcelTableData(tabledata, -1, relevantColumns, status);
+				getExcelTableData(tabledata, -1, relevantColumns, status);
 		KeggExpressionReader ker = new KeggExpressionReader(expdata);
 		String organism = ker.getOrganism();
 		// 0404-1(COL_GP_A_7)_Signal 0404-1(COL_GP_A_7)_Detection
@@ -462,7 +474,7 @@ public class ExperimentFileLoader {
 			int colDataSignal = ci.getSignalColumn();
 			Integer colDataSignalQuality = ci.getDetectionColumn();
 			status.setCurrentStatusText2("Process Table Data: " +
-								"column(s) " + colDataSignal + "/" + (colDataSignalQuality != null ? colDataSignalQuality : "-"));
+					"column(s) " + colDataSignal + "/" + (colDataSignalQuality != null ? colDataSignalQuality : "-"));
 			int headerRow = 1;
 			for (int row = headerRow + 1; row <= expdata.getMaximumRow(); row++) {
 				String geneId;
