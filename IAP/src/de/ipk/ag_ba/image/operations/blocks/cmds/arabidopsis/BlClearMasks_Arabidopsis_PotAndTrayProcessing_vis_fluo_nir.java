@@ -67,6 +67,13 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 		Rectangle2D.Double r = getGridPos(options.getTrayIdx(), cols, rows, img.getWidth(), (int) (img.getHeight() * vertFillGrade), img.getWidth() / 2,
 				img.getHeight() / 2);
 		r.y = r.y + offY;
+		
+		double b = 15;
+		r.x += b;
+		r.y += b;
+		r.width -= 2 * b;
+		r.height -= 2 * b;
+		
 		int le = (int) r.getMinX();
 		int to = (int) r.getMinY();
 		int ri = (int) r.getMaxX();

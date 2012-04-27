@@ -118,6 +118,7 @@ public class ImageOperation {
 	/**
 	 * Moves the image content. New clear regions are recolored to the
 	 * background color.
+	 * WARNING: Black input color disappears!
 	 */
 	public ImageOperation translate(double x, double y) {
 		image.getProcessor().translate(x, y);
