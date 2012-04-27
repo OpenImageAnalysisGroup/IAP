@@ -30,7 +30,7 @@ public class KeggExpressionConverter {
 	String coordinator = "experiment coordinator";
 	String startOfExp = "";
 	String timeUnit = "-1";
-	String measurementUnit = "expression";
+	String measurementUnit = "";
 	
 	public KeggExpressionConverter(ArrayList<KeggExpressionDataset> datasets) {
 		this.datasets = datasets;
@@ -97,31 +97,31 @@ public class KeggExpressionConverter {
 			filename2time.put(filename, timePointInput);
 			filename2replicate.put(filename, replicateInput);
 			table.addGuiComponentRow(fnLbl, TableLayout.get3Split(
-								TableLayout.getSplit(organismId, organismInput, 40, 70),
-								timePointInput, replicateInput,
-								TableLayoutConstants.PREFERRED, 30, 30, 10, 5), false);
+					TableLayout.getSplit(organismId, organismInput, 40, 70),
+					timePointInput, replicateInput,
+					TableLayoutConstants.PREFERRED, 30, 30, 10, 5), false);
 		}
 		table.layoutRows();
 		
 		Object[] res = MyInputHelper.getInput("<html>" +
-							"Please specify additional dataset information:<br>" +
-							"* these values are optional<br>" +
-							"time-point and replicate fields need to be filled with<br>" +
-							"whole numbers (0, 1, 2, ...). If no time points need to be<br>" +
-							"specified, enter -1 for all time points and also -1 for the<br>" +
-							"time unit setting.<br>" +
-							"If only one replicate has been measured, enter 1 as its<br>" +
-							"replicate ID, otherwise specify different whole numbers.",
-							"Prepare Dataset",
-							new Object[] {
-												"Experiment - Name", expName,
-												"Coordinator*", coordinator,
-												"Start of Experiment*", "",
-												"Time Unit*", timeUnit,
-												"Measurement Unit*", measurementUnit,
-												"", table
-
-							});
+				"Please specify additional dataset information:<br>" +
+				"* these values are optional<br>" +
+				"time-point and replicate fields need to be filled with<br>" +
+				"whole numbers (0, 1, 2, ...). If no time points need to be<br>" +
+				"specified, enter -1 for all time points and also -1 for the<br>" +
+				"time unit setting.<br>" +
+				"If only one replicate has been measured, enter 1 as its<br>" +
+				"replicate ID, otherwise specify different whole numbers.",
+				"Prepare Dataset",
+				new Object[] {
+						"Experiment - Name", expName,
+						"Coordinator*", coordinator,
+						"Start of Experiment*", "",
+						"Time Unit*", timeUnit,
+						"Measurement Unit*", measurementUnit,
+						"", table
+				
+				});
 		if (res != null) {
 			int i = 0;
 			expName = (String) res[i++];

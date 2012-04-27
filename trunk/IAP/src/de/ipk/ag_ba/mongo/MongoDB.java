@@ -484,15 +484,30 @@ public class MongoDB {
 					BasicDBObject sample = new BasicDBObject(filter(attributes));
 					dbSamples.add(sample);
 					
-					attributes.clear();
-					if (sa.size() > 0) {
-						sa.getSampleAverage().fillAttributeMap(attributes);
-						BasicDBObject dbSampleAverage = new BasicDBObject(filter(attributes));
-						
-						sample.put("average", dbSampleAverage);
+					boolean foundNumeric = false;
+					List<BasicDBObject> dbMeasurements = new ArrayList<BasicDBObject>();
+					for (Measurement m : sa) {
+						if (!(m instanceof BinaryMeasurement)) {
+							if (!foundNumeric && !Double.isNaN(m.getValue()))
+								foundNumeric = true;
+							attributes.clear();
+							m.fillAttributeMap(attributes);
+							BasicDBObject measurement = new BasicDBObject(filter(attributes));
+							dbMeasurements.add(measurement);
+						}
+					} // measurement
+					
+					if (foundNumeric) {
+						// only add sample average if at least one non-NaN numeric value is found
+						attributes.clear();
+						if (sa.size() > 0) {
+							sa.getSampleAverage().fillAttributeMap(attributes);
+							BasicDBObject dbSampleAverage = new BasicDBObject(filter(attributes));
+							
+							sample.put("average", dbSampleAverage);
+						}
 					}
 					
-					List<BasicDBObject> dbMeasurements = new ArrayList<BasicDBObject>();
 					List<BasicDBObject> dbImages = new ArrayList<BasicDBObject>();
 					List<BasicDBObject> dbVolumes = new ArrayList<BasicDBObject>();
 					List<BasicDBObject> dbNetworks = new ArrayList<BasicDBObject>();
@@ -500,14 +515,6 @@ public class MongoDB {
 					Queue<Future<DatabaseStorageResult>> storageResults = new LinkedList<Future<DatabaseStorageResult>>();
 					Queue<ImageData> imageDataQueue = new LinkedList<ImageData>();
 					
-					for (Measurement m : sa) {
-						if (!(m instanceof BinaryMeasurement)) {
-							attributes.clear();
-							m.fillAttributeMap(attributes);
-							BasicDBObject measurement = new BasicDBObject(filter(attributes));
-							dbMeasurements.add(measurement);
-						}
-					} // measurement
 					if (sa instanceof Sample3D) {
 						Sample3D s3 = (Sample3D) sa;
 						for (NumericMeasurementInterface m : s3.getMeasurements(new MeasurementNodeType[] {
@@ -2167,10 +2174,13 @@ public class MongoDB {
 			return map;
 		for (Object key : map.keySet().toArray()) {
 			Object val = map.get(key);
-			if (val == null ||
-					((val instanceof String) && ((String) val).isEmpty())) {
+			if (val == null || ((val instanceof String) && ((String) val).isEmpty())) {
 				map.remove(key);
-			}
+			} else
+				if ((val instanceof Double) && Double.isNaN((Double) val)) {
+					map.remove(key);
+				}
+			
 		}
 		return map;
 	}

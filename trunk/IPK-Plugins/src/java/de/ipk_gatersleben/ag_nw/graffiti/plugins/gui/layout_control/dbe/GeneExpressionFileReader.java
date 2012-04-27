@@ -232,7 +232,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 						if (optMeasurementUnit != null && optMeasurementUnit.length() > 0)
 							averageEntry.setUnit(optMeasurementUnit);
 						else
-							averageEntry.setUnit("expression");
+							averageEntry.setUnit("");
 						averageEntry.setReplicateId(new Integer(replicates.size()));
 						averageEntry.setMin(new Double(ExperimentData.getMinimum(measurements)));
 						averageEntry.setMax(new Double(ExperimentData.getMaximum(measurements)));
@@ -249,7 +249,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 							if (optMeasurementUnit != null && optMeasurementUnit.length() > 0)
 								mesEntry.setUnit(optMeasurementUnit);
 							else
-								mesEntry.setUnit("expression");
+								mesEntry.setUnit("");
 							if (rd.getOptionalQualityAnnotation() != null)
 								mesEntry.setQualityAnnotation(rd.getOptionalQualityAnnotation());
 							mesEntry.setReplicateID(new Integer(rd.getReplicateNumber()));
