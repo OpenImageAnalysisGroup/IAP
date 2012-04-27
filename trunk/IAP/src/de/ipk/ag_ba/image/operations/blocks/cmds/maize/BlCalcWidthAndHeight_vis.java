@@ -9,6 +9,8 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.Vector2d;
 
 import de.ipk.ag_ba.commands.ImageConfiguration;
+import de.ipk.ag_ba.gui.IAPfeature;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -44,31 +46,36 @@ public class BlCalcWidthAndHeight_vis extends
 		
 		boolean useFluo = false;// options.isMaize();
 		
-		int vertYsoilLevel = -1;
-		if (!options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.SIDE) {
-			if (useFluo) {
-				if (getProperties().getNumericProperty(0, 1,
-						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
-					vertYsoilLevel = (int) getProperties()
-							.getNumericProperty(
-									0,
-									1,
-									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO)
-							.getValue();
-			} else {
-				if (getProperties().getNumericProperty(0, 1,
-						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) != null)
-					vertYsoilLevel = (int) getProperties()
-							.getNumericProperty(
-									0,
-									1,
-									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS)
-							.getValue();
-			}
-		}
-		final int vertYsoilLevelF = vertYsoilLevel;
-		
 		FlexibleImage visRes = getInput().getMasks().getVis();
+		
+		int vertYsoilLevel = -1;
+		
+		if (options.getCameraPosition() == CameraPosition.SIDE && options.isHighResMaize() && options.isBarley()
+				&& options.getIntSetting(Setting.FIXED_CROP_BOTTOM_POT_POSITION_VIS) > 0) {
+			vertYsoilLevel = visRes.getHeight() - options.getIntSetting(Setting.FIXED_CROP_BOTTOM_POT_POSITION_VIS);
+		} else
+			if (!options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.SIDE) {
+				if (useFluo) {
+					if (getProperties().getNumericProperty(0, 1,
+							PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
+						vertYsoilLevel = (int) getProperties()
+								.getNumericProperty(
+										0,
+										1,
+										PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO)
+								.getValue();
+				} else {
+					if (getProperties().getNumericProperty(0, 1,
+							PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) != null)
+						vertYsoilLevel = (int) getProperties()
+								.getNumericProperty(
+										0,
+										1,
+										PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS)
+								.getValue();
+				}
+			}
+		final int vertYsoilLevelF = vertYsoilLevel;
 		
 		FlexibleImage img = useFluo ? getInput().getMasks().getFluo()
 				: getInput().getMasks().getVis();
@@ -94,7 +101,7 @@ public class BlCalcWidthAndHeight_vis extends
 					- temp.getTopY())) : null;
 			
 			if (values != null) {
-				boolean drawVerticalHeightBar = true;
+				boolean drawVerticalHeightBar = !IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
 				if (drawVerticalHeightBar)
 					if (!useFluo) {
 						getProperties().addImagePostProcessor(
@@ -121,7 +128,7 @@ public class BlCalcWidthAndHeight_vis extends
 															vertYsoilLevelF, Color.MAGENTA.getRGB(), 0.5, 5)
 													.getImage()
 													.print("DEBUG", debug);
-										else
+										else {
 											visRes = visRes
 													.getIO()
 													.getCanvas()
@@ -130,13 +137,30 @@ public class BlCalcWidthAndHeight_vis extends
 																	/ 2
 																	+ temp.getLeftX(),
 															temp.getTopY() - temp.getBottomY()
-																	+ temp.getTopY(),
+																	+ temp.getTopY() + temp.getBottomY()
+																	- temp.getTopY(),
+															500,
+															10,
+															Color.BLUE.getRGB(), 255)
+													.getImage()
+													.print("DEBUG", debug);
+											visRes = visRes
+													.getIO()
+													.getCanvas()
+													.fillRect(
+															values.x
+																	/ 2
+																	+ temp.getLeftX(),
+															temp.getTopY() - temp.getBottomY()
+																	+ temp.getTopY() + temp.getBottomY()
+																	- temp.getTopY(),
 															10,
 															temp.getBottomY()
 																	- temp.getTopY(),
 															Color.RED.getRGB(), 255)
 													.getImage()
 													.print("DEBUG", debug);
+										}
 										return visRes;
 									}
 									

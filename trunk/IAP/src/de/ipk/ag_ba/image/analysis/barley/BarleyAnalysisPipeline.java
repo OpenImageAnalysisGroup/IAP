@@ -107,6 +107,8 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		
 		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
 		
+		options.setIsArabidopsis(false);
+		options.setIsBarley(true);
 		options.setIsMaize(false);
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
@@ -152,8 +154,8 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1150); // for
 		// Barley
 		
-		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 120); // 20
-		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 120); // 20
+		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 10); // 20
+		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 10); // 20
 		
 		double cut = (0.001d) / 100; // seems to have no effect // ck 19.11.2011
 		options.clearAndAddDoubleSetting(
@@ -162,6 +164,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				cut * 0.2);
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
 		options.addBooleanSetting(Setting.DRAW_SKELETON, true);
+		
+		// barley in Maize sytem
+		options.clearAndAddIntSetting(Setting.FIXED_CROP_BOTTOM_POT_POSITION_VIS, 150);
 	}
 	
 	@Override

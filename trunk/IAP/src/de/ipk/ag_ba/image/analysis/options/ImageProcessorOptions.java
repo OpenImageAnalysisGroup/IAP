@@ -72,7 +72,7 @@ public class ImageProcessorOptions {
 		
 		INPUT_VIS_IMAGE_ROTATION_ANGLE, L_Diff_VIS_SIDE, abDiff_VIS_SIDE,
 		
-		BOTTOM_CUT_OFFSET_VIS, REAL_MARKER_DISTANCE, DRAW_CONVEX_HULL, DRAW_SKELETON;
+		BOTTOM_CUT_OFFSET_VIS, REAL_MARKER_DISTANCE, DRAW_CONVEX_HULL, DRAW_SKELETON, FIXED_CROP_BOTTOM_POT_POSITION_VIS;
 	}
 	
 	public ImageProcessorOptions() {
@@ -294,6 +294,8 @@ public class ImageProcessorOptions {
 		
 		addIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS, 30);
 		addIntSetting(Setting.REAL_MARKER_DISTANCE, 1128);
+		
+		addIntSetting(Setting.FIXED_CROP_BOTTOM_POT_POSITION_VIS, -1);
 	}
 	
 	public void setCameraPosition(CameraPosition cameraTyp) {
@@ -375,5 +377,9 @@ public class ImageProcessorOptions {
 	
 	public int getTrayIdx() {
 		return tray_idx;
+	}
+	
+	public boolean isBarley() {
+		return isBarley;
 	}
 }

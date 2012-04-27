@@ -32,11 +32,11 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 					} else
 						if (!options.isArabidopsis()) {
 							f = 0.11;
-							regionSize = 150;
+							regionSize = 70;
 						}
 					nirMask = nirImage.getIO().print("ADAPT IN", debug).
-						adaptiveThresholdForGrayscaleImage(regionSize, average,
-							options.getBackground(), f).getImage().print("ADAPT OUT", debug);
+							adaptiveThresholdForGrayscaleImage(regionSize, average,
+									options.getBackground(), f).getImage().print("ADAPT OUT", debug);
 				}
 				getInput().getMasks().setNir(nirMask);
 				boolean useNirSkeleton = true;

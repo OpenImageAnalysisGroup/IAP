@@ -32,12 +32,17 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 	protected FlexibleImage processVISmask() {
 		if (getInput().getMasks().getVis() == null || getInput().getMasks().getFluo() == null)
 			return getInput().getMasks().getVis();
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (options.getCameraPosition() == CameraPosition.TOP || (options.isBarley() && !options.isBarleyInBarleySystem())) {
 			if (getInput().getMasks().getFluo() != null) {
-				// apply enlarged FLUO mask to nir
+				// apply enlarged FLUO mask to vis
 				ImageOperation vis = getInput().getMasks().getVis().copy().getIO().print("VISSSS", debug);
-				FlexibleImage mask = getInput().getMasks().getFluo().copy().getIO().blur(options.isMaize() ? 25 : 30).
+				FlexibleImage mask = getInput().getMasks().getFluo().copy().getIO()
+						.blur(options.isMaize() ? 25 : ((options.isBarley() && !options.isBarleyInBarleySystem()) ? 10 : 30)).
 						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred fluo mask", debug).getImage();
+				if (options.isBarley() && !options.isBarleyInBarleySystem())
+					mask = mask.getIO().replaceColors(Color.BLACK.getRGB(), Color.BLUE.getRGB()).translate(0, 20).scale(0.96, 1).getImage();
+				getInput().getMasks().getVis().copy().getIO().or(
+						mask).print("OR operation", debug);
 				return vis.applyMask_ResizeMaskIfNeeded(
 						mask,
 						options.getBackground()).print("FILTERED VIS", debug).getImage();
@@ -81,7 +86,6 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 			return getInput().getImages().getNir();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = getInput().getImages().getNir();
-			
 			return clearImageSide(input, getInput().getMasks().getFluo(), 0.01);
 		}
 		
@@ -167,10 +171,15 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 		if (processedMasks.getFluo() != null) {
 			// apply enlarged VIS mask to nir
 			ImageOperation nir = processedMasks.getNir().copy().getIO().print("NIRRRR", debug);
-			ImageOperation maskIO = processedMasks.getVis().copy().getIO().or(
-					getInput().getMasks().getFluo()
-					).print("OR operation", debug);
-			maskIO = maskIO.blur(20);
+			ImageOperation maskIO =
+					options.isBarley() && !options.isBarleyInBarleySystem() ? getInput().getMasks().getFluo().copy().getIO() :
+							processedMasks.getVis().copy().getIO().or(
+									getInput().getMasks().getFluo()
+									).print("OR operation", debug);
+			if (options.isBarley() && !options.isBarleyInBarleySystem())
+				maskIO = maskIO.blur(10);
+			else
+				maskIO = maskIO.blur(20);
 			FlexibleImage mask = maskIO.binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
 			int gray = new Color(180, 180, 180).getRGB();
 			int back = options.getBackground();
