@@ -68,7 +68,7 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 				img.getHeight() / 2);
 		r.y = r.y + offY;
 		
-		double b = 15;
+		double b = 30;
 		r.x += b;
 		r.y += b;
 		r.width -= 2 * b;
