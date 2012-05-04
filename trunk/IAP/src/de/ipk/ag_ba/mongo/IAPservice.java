@@ -914,17 +914,20 @@ public class IAPservice {
 		IAPmail m = new IAPmail();
 		String host = SystemAnalysisExt.getHostName();
 		host = host.substring(0, host.indexOf("_"));
-		if (!new File(ReleaseInfo.getAppSubdirFolder("watch") + "watch.txt").exists()) {
+		String experimentListFileName = ReleaseInfo.getAppSubdirFolderWithFinalSep("watch") + "experiments.txt";
+		if (!(new File(experimentListFileName).exists())) {
 			TextFile c = new TextFile();
 			c.add("# config format: experiment measurement-label, start weighting (h:mm), end weighting (h:mm),");
 			c.add("# start weighting 2 (h:mm, or 0:00), end weighting 2 (h:mm, or 0:00), delay in minutes,email1:email2:email3:...");
 			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,klukas@ipk-gatersleben.de  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
-			c.write(ReleaseInfo.getAppSubdirFolderWithFinalSep("watch") + "experiments.txt");
-		}
+			// add all experiments from today or yesterday as default entries to file
+			c.write(experimentListFileName);
+		} else
+			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">READ CONFIG FILE " + experimentListFileName + "...");
 		HashSet<String> outOfDateExperiments = new HashSet<String>();
 		while (true) {
 			ArrayList<WatchConfig> configList = new ArrayList<WatchConfig>();
-			TextFile config = new TextFile(ReleaseInfo.getAppSubdirFolderWithFinalSep("watch") + "experiments.txt");
+			TextFile config = new TextFile(experimentListFileName);
 			for (String c : config)
 				if (!c.isEmpty() && !c.startsWith("#"))
 					configList.add(new WatchConfig(c));
@@ -935,7 +938,7 @@ public class IAPservice {
 					smallestTimeFrame = wc.getLastMinutes();
 			boolean foundSomeError = false;
 			if (smallestTimeFrame == Integer.MAX_VALUE) {
-				AttributeHelper.showInBrowser(ReleaseInfo.getAppSubdirFolderWithFinalSep("watch") + "experiments.txt");
+				AttributeHelper.showInBrowser(experimentListFileName);
 			} else {
 				LemnaTecDataExchange lde = new LemnaTecDataExchange();
 				ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
@@ -986,7 +989,7 @@ public class IAPservice {
 									foundSomeError = true;
 									if (!outOfDateExperiments.contains(ehi.getExperimentName())) {
 										for (String target : wc.getMails()) {
-											System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND ERROR MAIL WARNING FOR EXPERIMENT "
+											System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND WARNING MAIL FOR EXPERIMENT "
 													+ ehi.getExperimentName()
 													+ " TO " + target);
 											m.sendEmail(
@@ -1006,7 +1009,7 @@ public class IAPservice {
 									// all OK
 									if (outOfDateExperiments.contains(ehi.getExperimentName())) {
 										for (String target : wc.getMails()) {
-											System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND OK MAIL WARNING FOR EXPERIMENT " + ehi.getExperimentName()
+											System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND INFO MAIL FOR EXPERIMENT " + ehi.getExperimentName()
 													+ " TO " + target);
 											m.sendEmail(
 													"klukas@ipk-gatersleben.de",
@@ -1026,6 +1029,11 @@ public class IAPservice {
 					}
 				}
 			}
+			if (smallestTimeFrame > 24 * 60) {
+				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">UPDATE TIME UNDEFINED, QUITTING");
+				return;
+			}
+			
 			if (!foundSomeError) {
 				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SLEEP " + smallestTimeFrame + " minutes... (ALL OK)");
 				Thread.sleep(smallestTimeFrame * 60 * 1000);
