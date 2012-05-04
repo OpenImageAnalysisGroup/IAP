@@ -125,112 +125,125 @@ public class CloudComputingService {
 			System.out.println("System load    : " + StringManipulationTools.formatNumber(info.getLoad(), "#.#"));
 			System.exit(0);
 		} else
-			if (args.length > 0 && args[0].toLowerCase().startsWith("close") ||
-					(args.length > 1 && args[1].startsWith("close"))) {
-				System.out.println(": close - auto-closing after finishing compute task - " + SystemAnalysis.getNumberOfCPUs());
-				clusterExecutionMode = true;
+			if (args.length > 0 && args[0].toLowerCase().startsWith("watch") ||
+					(args.length > 1 && args[1].startsWith("watch"))) {
+				System.out.println(": watch - monitoring the experiment data progress");
+				try {
+					IAPservice.monitorWeightData();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					System.exit(0);
+				}
 			} else
-				if (args.length > 0 && args[0].toLowerCase().contains("full")) {
-					System.out.println(": full - enabling full CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
-					SystemAnalysis.setUseFullCpuPower(true);
+				if (args.length > 0 && args[0].toLowerCase().startsWith("close") ||
+						(args.length > 1 && args[1].startsWith("close"))) {
+					System.out.println(": close - auto-closing after finishing compute task - " + SystemAnalysis.getNumberOfCPUs());
+					clusterExecutionMode = true;
 				} else
-					if (args.length > 0 && args[0].contains("half")) {
-						SystemAnalysis.setUseHalfCpuPower(true);
-						System.out.println(": half - enabling half CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
+					if (args.length > 0 && args[0].toLowerCase().contains("full")) {
+						System.out.println(": full - enabling full CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
+						SystemAnalysis.setUseFullCpuPower(true);
 					} else
-						if (args.length > 0) {
-							try {
-								Integer i = Integer.parseInt(args[0]);
-								System.out.println(": " + args[0] + " - using " + i + " CPUs");
-								SystemAnalysis.setUseCpu(i);
-							} catch (Exception e) {
-								if ((args[0] + "").toLowerCase().equalsIgnoreCase("clear")) {
-									try {
-										for (MongoDB m : MongoDB.getMongos()) {
-											m.batchClearJobs();
-											System.out.println(":clear - cleared scheduled jobs in database " + m.getDatabaseName());
-										}
-										return;
-									} catch (Exception e1) {
-										e1.printStackTrace();
-									}
-								} else
-									if ((args[0] + "").toLowerCase().startsWith("perf")) {
+						if (args.length > 0 && args[0].contains("half")) {
+							SystemAnalysis.setUseHalfCpuPower(true);
+							System.out.println(": half - enabling half CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
+						} else
+							if (args.length > 0) {
+								try {
+									Integer i = Integer.parseInt(args[0]);
+									System.out.println(": " + args[0] + " - using " + i + " CPUs");
+									SystemAnalysis.setUseCpu(i);
+								} catch (Exception e) {
+									if ((args[0] + "").toLowerCase().equalsIgnoreCase("clear")) {
 										try {
-											System.out.println(":perf - perform performance test (TestPipelineMaize Copy)");
-											
-											StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LabCube construction", false);
-											ImageOperation io = new ImageOperation(new int[][] { { 0, 0 } });
-											if (io != null)
-												s.printTime();
-											
-											StopWatch sw = new StopWatch("IAP performance test", false);
-											PerformanceTest p = new PerformanceTest();
-											p.testPipeline();
-											System.out.println();
-											sw.printTime();
-											Thread.sleep(5 * 60 * 1000);
+											for (MongoDB m : MongoDB.getMongos()) {
+												m.batchClearJobs();
+												System.out.println(":clear - cleared scheduled jobs in database " + m.getDatabaseName());
+											}
+											return;
 										} catch (Exception e1) {
 											e1.printStackTrace();
 										}
-										System.exit(0);
 									} else
-										if ((args[0] + "").toLowerCase().startsWith("back") && !(args[0] + "").toLowerCase().startsWith("backup")) {
-											BackupSupport sb = BackupSupport.getInstance();
-											sb.makeBackup();
+										if ((args[0] + "").toLowerCase().startsWith("perf")) {
+											try {
+												System.out.println(":perf - perform performance test (TestPipelineMaize Copy)");
+												
+												StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LabCube construction", false);
+												ImageOperation io = new ImageOperation(new int[][] { { 0, 0 } });
+												if (io != null)
+													s.printTime();
+												
+												StopWatch sw = new StopWatch("IAP performance test", false);
+												PerformanceTest p = new PerformanceTest();
+												p.testPipeline();
+												System.out.println();
+												sw.printTime();
+												Thread.sleep(5 * 60 * 1000);
+											} catch (Exception e1) {
+												e1.printStackTrace();
+											}
 											System.exit(0);
 										} else
-											if ((args[0] + "").toLowerCase().startsWith("monitor")) {
-												{
-													System.out.println(SystemAnalysis.getCurrentTime()
-															+ ">'monitor' - Report system info to cloud (join, but don't perform calculations)");
-													for (MongoDB m : MongoDB.getMongos()) {
-														CloudComputingService cc = CloudComputingService.getInstance(m);
-														cc.setEnableCalculations(false);
-													}
-												}
-												
+											if ((args[0] + "").toLowerCase().startsWith("back") && !(args[0] + "").toLowerCase().startsWith("backup")) {
+												BackupSupport sb = BackupSupport.getInstance();
+												sb.makeBackup();
+												System.exit(0);
 											} else
-												if ((args[0] + "").toLowerCase().startsWith("backup")) {
+												if ((args[0] + "").toLowerCase().startsWith("monitor")) {
 													{
+														System.out.println(SystemAnalysis.getCurrentTime()
+																+ ">'monitor' - Report system info to cloud (join, but don't perform calculations)");
 														for (MongoDB m : MongoDB.getMongos()) {
 															CloudComputingService cc = CloudComputingService.getInstance(m);
 															cc.setEnableCalculations(false);
 														}
 													}
 													
-													BackupSupport sb = BackupSupport.getInstance();
-													sb.scheduleBackup();
-													sb.makeBackup();
 												} else
-													if ((args[0] + "").toLowerCase().startsWith("close")) {
-														// ignore, has been processed at the start of this method
-													} else {
-														if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
+													if ((args[0] + "").toLowerCase().startsWith("backup")) {
+														{
 															for (MongoDB m : MongoDB.getMongos()) {
-																System.out.println(":merge - about to merge temporary data sets in database " + m.getDatabaseName());
-																merge(m);
-																System.out.println(":merge - ^^^ merged temporary data sets in database " + m.getDatabaseName());
+																CloudComputingService cc = CloudComputingService.getInstance(m);
+																cc.setEnableCalculations(false);
 															}
-															
-															return;
-														} else {
-															System.out.println(": Valid command line parameters:");
-															System.out.println("   'half'    - use half of the CPUs");
-															System.out.println("   'full'    - use all of the CPUs");
-															System.out.println("   'nnn'     - use specified number of CPUs");
-															System.out.println("   'clear'   - clear scheduled tasks");
-															System.out.println("   'merge'   - in case of error (merge interrupted previously), merge temporary results");
-															System.out.println("   'perf'    - perform performance test");
-															System.out.println("   'close'   - close after task completion (cluster execution mode)");
-															System.out.println("   'info'    - Show CPU info");
-															System.out.println("   'monitor' - Report system info to cloud (join, but don't perform calculations)");
-															System.out.println("   'back'    - perform LemnaTec to HSM backup now");
-															System.out.println("   'backup'  - perform LemnaTec to HSM backup now, and then every midnight");
 														}
-													}
+														
+														BackupSupport sb = BackupSupport.getInstance();
+														sb.scheduleBackup();
+														sb.makeBackup();
+													} else
+														if ((args[0] + "").toLowerCase().startsWith("close")) {
+															// ignore, has been processed at the start of this method
+														} else {
+															if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
+																for (MongoDB m : MongoDB.getMongos()) {
+																	System.out.println(":merge - about to merge temporary data sets in database " + m.getDatabaseName());
+																	merge(m);
+																	System.out.println(":merge - ^^^ merged temporary data sets in database " + m.getDatabaseName());
+																}
+																
+																return;
+															} else {
+																System.out.println(": Valid command line parameters:");
+																System.out.println("   'half'    - use half of the CPUs");
+																System.out.println("   'full'    - use all of the CPUs");
+																System.out.println("   'nnn'     - use specified number of CPUs");
+																System.out.println("   'clear'   - clear scheduled tasks");
+																System.out.println("   'merge'   - in case of error (merge interrupted previously), merge temporary results");
+																System.out.println("   'perf'    - perform performance test");
+																System.out.println("   'close'   - close after task completion (cluster execution mode)");
+																System.out.println("   'info'    - Show CPU info");
+																System.out.println("   'monitor' - Report system info to cloud (join, but don't perform calculations)");
+																System.out.println("   'back'    - perform LemnaTec to HSM backup now");
+																System.out.println("   'backup'  - perform LemnaTec to HSM backup now, and then every midnight");
+																System.out
+																		.println("   'watch'   - periodically check the weight data for new data and report missing data by mail");
+															}
+														}
+								}
 							}
-						}
 		SystemInfoExt si = new SystemInfoExt();
 		System.out.println("CPUs (sockets,physical,logical): " +
 				si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +

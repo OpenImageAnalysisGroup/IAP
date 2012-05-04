@@ -15,9 +15,12 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +30,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
@@ -67,17 +71,20 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -899,5 +906,113 @@ public class IAPservice {
 			experiment.setHeader(header);
 		
 		resultReceiver.setExperimenData(experiment);
+	}
+	
+	public static void monitorWeightData() throws IOException, ClassNotFoundException, SQLException, InterruptedException {
+		IAPmail m = new IAPmail();
+		if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + "watch.txt").exists()) {
+			TextFile c = new TextFile();
+			c.add("# config format: experiment measurement-label, start weighting (h:mm), end weighting (h:mm),");
+			c.add("# start weighting 2 (h:mm, or 0:00), end weighting 2 (h:mm, or 0:00), delay in minutes,email1:email2:email3:...");
+			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,klukas@ipk-gatersleben.de  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
+			c.write(ReleaseInfo.getAppFolderWithFinalSep() + "watch.txt");
+		}
+		HashSet<String> outOfDateExperiments = new HashSet<String>();
+		while (true) {
+			ArrayList<WatchConfig> configList = new ArrayList<WatchConfig>();
+			TextFile config = new TextFile(ReleaseInfo.getAppFolderWithFinalSep() + "watch.txt");
+			for (String c : config)
+				if (!c.isEmpty() && !c.startsWith("#"))
+					configList.add(new WatchConfig(c));
+			
+			int smallestTimeFrame = Integer.MAX_VALUE;
+			for (WatchConfig wc : configList)
+				if (wc.getLastMinutes() < smallestTimeFrame)
+					smallestTimeFrame = wc.getLastMinutes();
+			boolean foundSomeError = false;
+			if (smallestTimeFrame == Integer.MAX_VALUE) {
+				AttributeHelper.showInBrowser(ReleaseInfo.getAppFolderWithFinalSep() + "watch.txt");
+			} else {
+				LemnaTecDataExchange lde = new LemnaTecDataExchange();
+				ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
+				for (String database : lde.getDatabases()) {
+					try {
+						el.addAll(lde.getExperimentsInDatabase(null, database));
+					} catch (Exception e) {
+						if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
+							System.out.println(SystemAnalysis.getCurrentTime() + ">Cant process DB " + database + ": " + e.getMessage());
+					}
+				}
+				el = ExperimentHeaderService.filterNewest(el);
+				TreeMap<String, Date> expName2latest = new TreeMap<String, Date>();
+				ArrayList<ExperimentHeaderInterface> del = new ArrayList<ExperimentHeaderInterface>();
+				for (ExperimentHeaderInterface ehi : el) {
+					// check dates and remove old experiments from EL list, which have newer ones in other databases...
+				}
+				for (ExperimentHeaderInterface ehi : el) {
+					for (WatchConfig wc : configList) {
+						if (ehi.getExperimentName() != null && ehi.getExperimentName().equals(wc.getExperimentName())) {
+							String lastUpdateText = (ehi.getImportdate() != null ?
+									" (LAST UPDATE " + SystemAnalysis.getCurrentTime(ehi.getImportdate().getTime()) + ")" : " (NO UPDATE TIME)");
+							System.out.println(SystemAnalysis.getCurrentTime() + ">CHECK " + ehi.getExperimentName() +
+									lastUpdateText + " (expect data from " + wc.h1_st + ":" + wc.minute1_st + " to " + wc.h1_end + ":" + wc.minute1_end + " AND "
+									+ wc.h2_st + ":" + wc.minute2_end + " to " + wc.h2_end + ":" + wc.minute2_end + ")");
+							long startTime1 = wc.getStartTimeForToday1();
+							long startTime2 = wc.getStartTimeForToday2();
+							long endTime1 = wc.getEndTimeForToday1();
+							long endTime2 = wc.getEndTimeForToday2();
+							Date ddd = ehi.getImportdate();
+							if (ddd != null) {
+								boolean m1 = (ddd.getTime() > startTime1 && ddd.getTime() <= endTime1);
+								boolean m2 = (ddd.getTime() > startTime2 && ddd.getTime() <= endTime2);
+								boolean m3 = (new Date().getTime() - ddd.getTime()) > wc.getLastMinutes() * 60 * 1000;
+								if ((m1 || m2) && m3) {
+									// WARN
+									foundSomeError = true;
+									if (!outOfDateExperiments.contains(ehi.getExperimentName())) {
+										for (String target : wc.getMails()) {
+											System.out.println(SystemAnalysis.getCurrentTime() + ">SEND ERROR MAIL WARNING FOR EXPERIMENT " + ehi.getExperimentName()
+													+ " TO " + target);
+											m.sendEmail("klukas@ipk-gatersleben.de", target,
+													"MONITOR SERVICE (STATUS: ERROR) // " + ehi.getExperimentName()
+															+ " shows no progress " + lastUpdateText + " // STARTED BY " + SystemAnalysis.getUserName(),
+													"No new data found for experiment " + ehi.getExperimentName()
+															+ ". Status is currently in error condition!\n\n\nExperiment details:\n\n" +
+															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"));
+										}
+									}
+									outOfDateExperiments.add(ehi.getExperimentName());
+								} else {
+									// all OK
+									if (outOfDateExperiments.contains(ehi.getExperimentName())) {
+										for (String target : wc.getMails()) {
+											System.out.println(SystemAnalysis.getCurrentTime() + ">SEND OK MAIL WARNING FOR EXPERIMENT " + ehi.getExperimentName()
+													+ " TO " + target);
+											m.sendEmail("klukas@ipk-gatersleben.de", target,
+													"MONITOR SERVICE (STATUS: RECOVERED) // " + ehi.getExperimentName()
+															+ " shows progress again " + lastUpdateText + " // STARTED BY " + SystemAnalysis.getUserName(),
+													"After error condition new data has been found for experiment " + ehi.getExperimentName()
+															+ ". Status is now OK!\n\n\nExperiment details:\n\n" +
+															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"));
+										}
+									}
+									outOfDateExperiments.remove(ehi.getExperimentName());
+								}
+							}
+						}
+					}
+					
+				}
+			}
+			if (!foundSomeError) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">SLEEP " + smallestTimeFrame + " minutes... (ALL OK)");
+				Thread.sleep(smallestTimeFrame * 60 * 1000);
+			} else {
+				System.out
+						.println(SystemAnalysis.getCurrentTime() + ">SLEEP 10 minutes... (REDUCED SLEEP TIME BECAUSE OF ERROR CONDITION, WILL CHECK FOR RECOVERY)");
+				Thread.sleep(10 * 60 * 1000);
+			}
+			System.out.println(SystemAnalysis.getCurrentTime() + ">SLEEP FINISHED");
+		}
 	}
 }
