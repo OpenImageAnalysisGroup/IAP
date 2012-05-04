@@ -3,16 +3,18 @@ package de.ipk.ag_ba.mongo;
 import java.util.Date;
 
 public class WatchConfig {
-	String label;
+	String database, label;
 	int h1_st, h2_st, h1_end, h2_end, minute1_st, minute2_st, minute1_end, minute2_end, lastMinutes;
 	
 	String[] mails;
 	
 	WatchConfig(String conf) {
 		String[] parts = conf.split(",");
-		if (parts.length != 7)
+		if (parts.length != 8)
 			throw new UnsupportedOperationException("Invalid config entry (" + conf + "), needs 6 defined parts");
 		int i = 0;
+		
+		database = parts[i++].trim();
 		label = parts[i++].trim();
 		
 		h1_st = Integer.parseInt(parts[i].trim().split(":")[0]);
@@ -73,5 +75,9 @@ public class WatchConfig {
 	
 	public String[] getMails() {
 		return mails;
+	}
+	
+	public String getDatabase() {
+		return database;
 	}
 }
