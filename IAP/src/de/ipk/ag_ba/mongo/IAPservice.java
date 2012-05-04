@@ -914,17 +914,17 @@ public class IAPservice {
 		IAPmail m = new IAPmail();
 		String host = SystemAnalysisExt.getHostName();
 		host = host.substring(0, host.indexOf("_"));
-		if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + "watch.txt").exists()) {
+		if (!new File(ReleaseInfo.getAppSubdirFolder("watch") + "watch.txt").exists()) {
 			TextFile c = new TextFile();
 			c.add("# config format: experiment measurement-label, start weighting (h:mm), end weighting (h:mm),");
 			c.add("# start weighting 2 (h:mm, or 0:00), end weighting 2 (h:mm, or 0:00), delay in minutes,email1:email2:email3:...");
 			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,klukas@ipk-gatersleben.de  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
-			c.write(ReleaseInfo.getAppFolderWithFinalSep() + "watch.txt");
+			c.write(ReleaseInfo.getAppSubdirFolderWithFinalSep("watch") + "experiments.txt");
 		}
 		HashSet<String> outOfDateExperiments = new HashSet<String>();
 		while (true) {
 			ArrayList<WatchConfig> configList = new ArrayList<WatchConfig>();
-			TextFile config = new TextFile(ReleaseInfo.getAppFolderWithFinalSep() + "watch.txt");
+			TextFile config = new TextFile(ReleaseInfo.getAppSubdirFolderWithFinalSep("watch") + "experiments.txt");
 			for (String c : config)
 				if (!c.isEmpty() && !c.startsWith("#"))
 					configList.add(new WatchConfig(c));
@@ -935,7 +935,7 @@ public class IAPservice {
 					smallestTimeFrame = wc.getLastMinutes();
 			boolean foundSomeError = false;
 			if (smallestTimeFrame == Integer.MAX_VALUE) {
-				AttributeHelper.showInBrowser(ReleaseInfo.getAppFolderWithFinalSep() + "watch.txt");
+				AttributeHelper.showInBrowser(ReleaseInfo.getAppSubdirFolderWithFinalSep("watch") + "experiments.txt");
 			} else {
 				LemnaTecDataExchange lde = new LemnaTecDataExchange();
 				ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();

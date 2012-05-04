@@ -19,7 +19,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class IAPmail {
 	
-	private static final String FILE_NAME_MAIL_SERVER_CONFIG = ReleaseInfo.getAppFolderWithFinalSep() + "mail-server.txt";
+	private static final String FILE_NAME_MAIL_SERVER_CONFIG = ReleaseInfo.getAppSubdirFolderWithFinalSep("watch") + "mail-server.txt";
 	
 	// http://www.javapractices.com/topic/TopicAction.do?Id=144
 	public void sendEmail(
@@ -81,7 +81,7 @@ public class IAPmail {
 			tf.add("# mail.user=");
 			tf.add("# mail.store.protocol=");
 			tf.add("# mail.transport.protocol=");
-			tf.add("# mail.smtp.host=");
+			tf.add("mail.smtp.host=mail.ipk-gatersleben.de");
 			tf.add("# mail.smtp.user=");
 			tf.add("# mail.debug=");
 			try {
