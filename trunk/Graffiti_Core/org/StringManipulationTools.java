@@ -769,7 +769,7 @@ public class StringManipulationTools implements HelperClass {
 	
 	/**
 	 * @param d
-	 *           e.g. 3.14159
+	 *           e.g. 3.14159, see http://docs.oracle.com/javase/tutorial/i18n/format/decimalFormat.html
 	 * @param pattern
 	 *           e.g. #.##, e.g. 000.00
 	 * @return e.g. 3.14
