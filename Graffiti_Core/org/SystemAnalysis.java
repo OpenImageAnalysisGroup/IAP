@@ -5,6 +5,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -182,6 +183,11 @@ public class SystemAnalysis {
 	}
 	
 	private static SimpleDateFormat sdf = new SimpleDateFormat();
+	private static DateFormat sdfInclSec = DateFormat.getTimeInstance();
+	
+	public static String getCurrentTimeInclSec() {
+		return sdfInclSec.format(new Date());
+	}
 	
 	public static String getCurrentTime() {
 		return sdf.format(new Date());

@@ -32,6 +32,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -74,6 +75,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -910,6 +912,8 @@ public class IAPservice {
 	
 	public static void monitorWeightData() throws IOException, ClassNotFoundException, SQLException, InterruptedException {
 		IAPmail m = new IAPmail();
+		String host = SystemAnalysisExt.getHostName();
+		host = host.substring(0, host.indexOf("_"));
 		if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + "watch.txt").exists()) {
 			TextFile c = new TextFile();
 			c.add("# config format: experiment measurement-label, start weighting (h:mm), end weighting (h:mm),");
@@ -935,28 +939,39 @@ public class IAPservice {
 			} else {
 				LemnaTecDataExchange lde = new LemnaTecDataExchange();
 				ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
-				for (String database : lde.getDatabases()) {
+				TreeSet<String> validDatabases = new TreeSet<String>();
+				boolean checkAll = false;
+				for (WatchConfig wc : configList) {
+					if (wc.getDatabase().length() > 0)
+						validDatabases.add(wc.getDatabase());
+					else
+						checkAll = true;
+				}
+				ArrayList<String> dbs_toBeChecked = new ArrayList<String>();
+				if (checkAll)
+					dbs_toBeChecked.addAll(lde.getDatabases());
+				else
+					dbs_toBeChecked.addAll(validDatabases);
+				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB CONTENT...");
+				for (String database : dbs_toBeChecked) {
 					try {
 						el.addAll(lde.getExperimentsInDatabase(null, database));
 					} catch (Exception e) {
 						if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
-							System.out.println(SystemAnalysis.getCurrentTime() + ">Cant process DB " + database + ": " + e.getMessage());
+							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Cant process DB " + database + ": " + e.getMessage());
 					}
 				}
-				el = ExperimentHeaderService.filterNewest(el);
-				TreeMap<String, Date> expName2latest = new TreeMap<String, Date>();
-				ArrayList<ExperimentHeaderInterface> del = new ArrayList<ExperimentHeaderInterface>();
-				for (ExperimentHeaderInterface ehi : el) {
-					// check dates and remove old experiments from EL list, which have newer ones in other databases...
-				}
+				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK PROGRESS...");
+				el = ExperimentHeaderService.filterNewest(el, true);
 				for (ExperimentHeaderInterface ehi : el) {
 					for (WatchConfig wc : configList) {
 						if (ehi.getExperimentName() != null && ehi.getExperimentName().equals(wc.getExperimentName())) {
 							String lastUpdateText = (ehi.getImportdate() != null ?
-									" (LAST UPDATE " + SystemAnalysis.getCurrentTime(ehi.getImportdate().getTime()) + ")" : " (NO UPDATE TIME)");
-							System.out.println(SystemAnalysis.getCurrentTime() + ">CHECK " + ehi.getExperimentName() +
-									lastUpdateText + " (expect data from " + wc.h1_st + ":" + wc.minute1_st + " to " + wc.h1_end + ":" + wc.minute1_end + " AND "
-									+ wc.h2_st + ":" + wc.minute2_end + " to " + wc.h2_end + ":" + wc.minute2_end + ")");
+									" (last update " + SystemAnalysis.getCurrentTime(ehi.getImportdate().getTime()) + ")" : " (NO UPDATE TIME)");
+							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK " + ehi.getExperimentName() +
+									lastUpdateText + " (expect data every day from " + wc.h1_st + ":" + ff(wc.minute1_st)
+									+ " to " + wc.h1_end + ":" + ff(wc.minute1_end) + " AND "
+									+ wc.h2_st + ":" + ff(wc.minute2_end) + " to " + wc.h2_end + ":" + ff(wc.minute2_end) + ")");
 							long startTime1 = wc.getStartTimeForToday1();
 							long startTime2 = wc.getStartTimeForToday2();
 							long endTime1 = wc.getEndTimeForToday1();
@@ -971,13 +986,18 @@ public class IAPservice {
 									foundSomeError = true;
 									if (!outOfDateExperiments.contains(ehi.getExperimentName())) {
 										for (String target : wc.getMails()) {
-											System.out.println(SystemAnalysis.getCurrentTime() + ">SEND ERROR MAIL WARNING FOR EXPERIMENT " + ehi.getExperimentName()
+											System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND ERROR MAIL WARNING FOR EXPERIMENT "
+													+ ehi.getExperimentName()
 													+ " TO " + target);
-											m.sendEmail("klukas@ipk-gatersleben.de", target,
-													"MONITOR SERVICE (STATUS: ERROR) // " + ehi.getExperimentName()
-															+ " shows no progress " + lastUpdateText + " // STARTED BY " + SystemAnalysis.getUserName(),
+											m.sendEmail(
+													"klukas@ipk-gatersleben.de",
+													target,
+													"WARNING: " +
+															ehi.getExperimentName()
+															+ " shows no further progress " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
+															+ host,
 													"No new data found for experiment " + ehi.getExperimentName()
-															+ ". Status is currently in error condition!\n\n\nExperiment details:\n\n" +
+															+ ".\n\n\nExperiment details:\n\n" +
 															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"));
 										}
 									}
@@ -986,11 +1006,14 @@ public class IAPservice {
 									// all OK
 									if (outOfDateExperiments.contains(ehi.getExperimentName())) {
 										for (String target : wc.getMails()) {
-											System.out.println(SystemAnalysis.getCurrentTime() + ">SEND OK MAIL WARNING FOR EXPERIMENT " + ehi.getExperimentName()
+											System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND OK MAIL WARNING FOR EXPERIMENT " + ehi.getExperimentName()
 													+ " TO " + target);
-											m.sendEmail("klukas@ipk-gatersleben.de", target,
-													"MONITOR SERVICE (STATUS: RECOVERED) // " + ehi.getExperimentName()
-															+ " shows progress again " + lastUpdateText + " // STARTED BY " + SystemAnalysis.getUserName(),
+											m.sendEmail(
+													"klukas@ipk-gatersleben.de",
+													target,
+													"INFO: " + ehi.getExperimentName()
+															+ " shows progress again " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
+															+ host,
 													"After error condition new data has been found for experiment " + ehi.getExperimentName()
 															+ ". Status is now OK!\n\n\nExperiment details:\n\n" +
 															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"));
@@ -1001,18 +1024,23 @@ public class IAPservice {
 							}
 						}
 					}
-					
 				}
 			}
 			if (!foundSomeError) {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">SLEEP " + smallestTimeFrame + " minutes... (ALL OK)");
+				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SLEEP " + smallestTimeFrame + " minutes... (ALL OK)");
 				Thread.sleep(smallestTimeFrame * 60 * 1000);
 			} else {
+				int wait = smallestTimeFrame < 10 ? smallestTimeFrame : 15;
 				System.out
-						.println(SystemAnalysis.getCurrentTime() + ">SLEEP 10 minutes... (REDUCED SLEEP TIME BECAUSE OF ERROR CONDITION, WILL CHECK FOR RECOVERY)");
-				Thread.sleep(10 * 60 * 1000);
+						.println(SystemAnalysis.getCurrentTimeInclSec()
+								+ ">SLEEP " + wait + " minutes... (WILL CHECK FOR RECOVERY)");
+				Thread.sleep(wait * 60 * 1000);
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">SLEEP FINISHED");
 		}
+	}
+	
+	private static String ff(int t) {
+		return StringManipulationTools.formatNumber(t, "00");
 	}
 }
