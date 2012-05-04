@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
 import org.HelperClass;
+import org.SystemAnalysis;
 import org.graffiti.editor.dialog.DefaultParameterDialog;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -32,10 +33,21 @@ public class MyInputHelper implements HelperClass {
 	 * @return The return value depends on the selected button (OK/Cancel).
 	 */
 	public static Object[] getInput(final Object description, final String title, final Object... parameters) {
+		if (SystemAnalysis.isHeadless()) {
+			System.out.println(">>> " + title + " <<<");
+			System.out.println(description);
+			System.out.println(parameters[0] + ": ");
+			String input = SystemAnalysis.getCommandLineInput();
+			return new Object[] {
+					input
+			};
+		}
+		
 		if (!SwingUtilities.isEventDispatchThread()) {
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setBval(0, false); // finished ?
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					Object[] res = DefaultParameterDialog.getInput(description, title, parameters);
 					tso.setParam(0, res);
@@ -60,7 +72,7 @@ public class MyInputHelper implements HelperClass {
 	public static ArrayList<ArrayList<Object>> getMultipleInput(Object... desc_title_and_params) {
 		if (desc_title_and_params.length % 3 != 0)
 			throw new RuntimeException(
-								"Parameter count needs to be multiple of 3! (description, title, params[], description, title, params[], ...)");
+					"Parameter count needs to be multiple of 3! (description, title, params[], description, title, params[], ...)");
 		ArrayList<ArrayList<Object>> res = new ArrayList<ArrayList<Object>>();
 		int max = desc_title_and_params.length / 3;
 		for (int i = 0; i < max; i++) {

@@ -76,6 +76,7 @@ import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -921,6 +922,32 @@ public class IAPservice {
 			c.add("# start weighting 2 (h:mm, or 0:00), end weighting 2 (h:mm, or 0:00), delay in minutes,email1:email2:email3:...");
 			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,klukas@ipk-gatersleben.de  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
 			// add all experiments from today or yesterday as default entries to file
+			LemnaTecDataExchange lde = new LemnaTecDataExchange();
+			ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
+			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB CONTENT...");
+			for (String database : new LemnaTecDataExchange().getDatabases()) {
+				try {
+					el.addAll(lde.getExperimentsInDatabase(null, database));
+				} catch (Exception e) {
+					if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
+						System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Cant process DB " + database + ": " + e.getMessage());
+				}
+			}
+			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK PROGRESS...");
+			Object[] inp = MyInputHelper.getInput("Please enter the desired mail-addresses:", "Target Mail", new Object[] {
+					"Mail 1:Mail 2", "klukas@ipk-gatersleben.de"
+			});
+			if (inp == null)
+				return;
+			el = ExperimentHeaderService.filterNewest(el, true);
+			for (ExperimentHeaderInterface ehi : el)
+				if (ehi.getImportdate() != null)
+					if (System.currentTimeMillis() - ehi.getImportdate().getTime() < 24 * 60 * 60 * 1000)
+						if (ehi.getExperimentName() != null) {
+							String s = ehi.getDatabase() + "," + ehi.getExperimentName() + ",0:00,23:59,0:00,23:59,30," + (String) inp[0];
+							c.add(s);
+							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">ADD WATCH ENTRY: " + s);
+						}
 			c.write(experimentListFileName);
 		} else
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">READ CONFIG FILE " + experimentListFileName + "...");
