@@ -1001,7 +1001,7 @@ public class IAPservice {
 							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK " + ehi.getExperimentName() +
 									lastUpdateText + " (expect data every day from " + wc.h1_st + ":" + ff(wc.minute1_st)
 									+ " to " + wc.h1_end + ":" + ff(wc.minute1_end) + " AND "
-									+ wc.h2_st + ":" + ff(wc.minute2_end) + " to " + wc.h2_end + ":" + ff(wc.minute2_end) + ")");
+									+ wc.h2_st + ":" + ff(wc.minute2_st) + " to " + wc.h2_end + ":" + ff(wc.minute2_end) + ")");
 							long startTime1 = wc.getStartTimeForToday1();
 							long startTime2 = wc.getStartTimeForToday2();
 							long endTime1 = wc.getEndTimeForToday1();
