@@ -1008,8 +1008,9 @@ public class IAPservice {
 							long endTime2 = wc.getEndTimeForToday2();
 							Date ddd = ehi.getImportdate();
 							if (ddd != null) {
-								boolean m1 = (ddd.getTime() > startTime1 && ddd.getTime() <= endTime1);
-								boolean m2 = (ddd.getTime() > startTime2 && ddd.getTime() <= endTime2);
+								Date dddt = fixSetToday(ddd);
+								boolean m1 = (dddt.getTime() > startTime1 && dddt.getTime() <= endTime1);
+								boolean m2 = (dddt.getTime() > startTime2 && dddt.getTime() <= endTime2);
 								boolean m3 = (new Date().getTime() - ddd.getTime()) > wc.getLastMinutes() * 60 * 1000;
 								if ((m1 || m2) && m3) {
 									// WARN
@@ -1073,6 +1074,15 @@ public class IAPservice {
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">SLEEP FINISHED");
 		}
+	}
+	
+	private static Date fixSetToday(Date ddd) {
+		int h = ddd.getHours();
+		int m = ddd.getMinutes();
+		ddd = new Date();
+		ddd.setHours(h);
+		ddd.setMinutes(m);
+		return ddd;
 	}
 	
 	private static String ff(int t) {
