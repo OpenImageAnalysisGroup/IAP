@@ -112,8 +112,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		return result;
 	}
 	
-	private static HashMap<String, Collection<ExperimentHeaderInterface>> memRes1 = new HashMap<String, Collection<ExperimentHeaderInterface>>();
-	private static long updateTime = -1;
+	// private static HashMap<String, Collection<ExperimentHeaderInterface>> memRes1 = new HashMap<String, Collection<ExperimentHeaderInterface>>();
 	
 	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database) throws ClassNotFoundException, SQLException {
 		return getExperimentsInDatabase(user, database, null);
@@ -126,12 +125,12 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws SQLException, ClassNotFoundException {
-		Collection<ExperimentHeaderInterface> res = memRes1.get(user + ";" + database);
-		if (res == null || System.currentTimeMillis() - updateTime > 2 * 60 * 1000) {
-			res = getExperimentsInDatabaseIC(user, database, optStatus);
-			updateTime = System.currentTimeMillis();
-			memRes1.put(user + ";" + database, res);
-		}
+		Collection<ExperimentHeaderInterface> res = null;// memRes1.get(user + ";" + database);
+		// if (res == null || System.currentTimeMillis() - updateTime > 2 * 60 * 1000) {
+		res = getExperimentsInDatabaseIC(user, database, optStatus);
+		// updateTime = System.currentTimeMillis();
+		// memRes1.put(user + ";" + database, res);
+		// }
 		return res;
 	}
 	
