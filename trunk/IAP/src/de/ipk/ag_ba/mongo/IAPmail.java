@@ -3,17 +3,24 @@ package de.ipk.ag_ba.mongo;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.AttributeHelper;
 import org.ReleaseInfo;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
@@ -23,8 +30,8 @@ public class IAPmail {
 	
 	// http://www.javapractices.com/topic/TopicAction.do?Id=144
 	public void sendEmail(
-			String aFromEmailAddr, String aToEmailAddr,
-			String aSubject, String aBody
+			String aToEmailAddr, String aSubject,
+			String aBody, final String optImageSource, final String fileName
 			) {
 		// Here, no Authenticator argument is used (it is null).
 		// Authenticators are used to prompt the user for user
@@ -35,11 +42,66 @@ public class IAPmail {
 			// the "from" address may be set in code, or set in the
 			// config file under "mail.from" ; here, the latter style is used
 			// message.setFrom( new InternetAddress(aFromEmailAddr) );
-			message.addRecipient(
-					Message.RecipientType.TO, new InternetAddress(aToEmailAddr)
-					);
+			for (String to : aToEmailAddr.split(":"))
+				message.addRecipient(
+						Message.RecipientType.TO, new InternetAddress(to)
+						);
 			message.setSubject(aSubject);
-			message.setText(aBody);
+			
+			if (optImageSource != null && !optImageSource.isEmpty()) {
+				// load remote image and add it to the mail
+				try {
+					Multipart mp = new MimeMultipart();
+					
+					MimeBodyPart img = new MimeBodyPart();
+					img.setDataHandler(new DataHandler(new DataSource() {
+						
+						@Override
+						public OutputStream getOutputStream() throws IOException {
+							return null;
+						}
+						
+						@Override
+						public String getName() {
+							return fileName;
+						}
+						
+						@Override
+						public InputStream getInputStream() throws IOException {
+							try {
+								InputStream is;
+								if (optImageSource.contains("@")) {
+									String userPass = optImageSource.split("@")[0];
+									String urlStr = optImageSource.split("@")[1];
+									String user = userPass.split(":")[0];
+									String pass = userPass.split(":")[1];
+									is = HttpBasicAuth.downloadFileWithAuth(urlStr, user, pass);
+								} else
+									is = new IOurl(optImageSource).getInputStream();
+								return is;
+							} catch (Exception e) {
+								throw new IOException(e.getMessage());
+							}
+						}
+						
+						@Override
+						public String getContentType() {
+							return "image/jpeg";
+						}
+					}));
+					img.setFileName(fileName);
+					mp.addBodyPart(img);
+					MimeBodyPart txt = new MimeBodyPart();
+					txt.setText("\n" + aBody);
+					mp.addBodyPart(txt);
+					message.setContent(mp);
+				} catch (Exception e) {
+					message.setText(aBody + "\n\nWebcam-Image could not be loaded. Eventually the Webcam is turned off.\nError: " + e.getMessage());
+				}
+			} else {
+				message.setText(aBody);
+			}
+			
 			Transport.send(message);
 		} catch (MessagingException ex) {
 			System.err.println("Cannot send email. " + ex);
