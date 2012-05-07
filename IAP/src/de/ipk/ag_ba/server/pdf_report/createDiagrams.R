@@ -2121,11 +2121,11 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 calculateLegendRowAndColNumber <- function(legendText) {
 	
 	maxLengthOfSet <- max(nchar(as.character(legendText)))
-	if(maxLengthOfSet >= 100) {
+	if(maxLengthOfSet >= 75) {
 		return(list(nrow=length(legendText), ncol=NULL))
-	} else if (maxLengthOfSet >= 50 & maxLengthOfSet < 100) {
+	} else if (maxLengthOfSet >= 25 & maxLengthOfSet < 75) {
 		return(list(nrow=NULL, ncol=2))
-	} else if (maxLengthOfSet > 20 & maxLengthOfSet < 50) {
+	} else if (maxLengthOfSet > 10 & maxLengthOfSet < 25) {
 		return(list(nrow=NULL, ncol=4))
 	} else {
 		return(list(nrow=NULL, ncol=floor(150/maxLengthOfSet)))
