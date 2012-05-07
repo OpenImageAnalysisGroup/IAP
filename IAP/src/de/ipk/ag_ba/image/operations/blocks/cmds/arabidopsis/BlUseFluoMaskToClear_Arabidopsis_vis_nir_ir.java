@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
-public class BlUseFluoMaskToClear_Arabidopsis_vis_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlUseFluoMaskToClear_Arabidopsis_vis_nir_ir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	
@@ -185,6 +185,12 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis_nir extends AbstractSnapshotAn
 					back).print("FILTERED NIR MASK", debug).getImage());
 			processedImages.setNir(processedImages.getNir().getIO().applyMask_ResizeMaskIfNeeded(
 					mask, back).print("FILTERED NIR IMAGE", debug).getImage());
+			
+			// if (processedMasks.getIr() != null) {
+			// processedMasks.setIr(processedImages.getIr().getIO().applyMask_ResizeMaskIfNeeded(
+			// mask, back).print("FILTERED IR IMAGE", debug).getImage());
+			// }
+			
 			return;
 		}
 		// }

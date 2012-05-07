@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author klukas
  */
-public class BlCrop_images_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCrop_images_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {
@@ -78,4 +78,25 @@ public class BlCrop_images_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS
 			return null;
 	}
 	
+	@Override
+	protected FlexibleImage processIRimage() {
+		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getIr() != null) {
+			if (options.getCameraPosition() == CameraPosition.TOP) {
+				return getInput().getImages().getIr().crop();
+			} else {
+				int potCut = -1;
+				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) == null) {
+				// potCut = -1;
+				// } else {
+				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
+				// }
+				
+				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) != null)
+				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
+				//
+				return getInput().getImages().getIr().cropAbs(-1, -1, -1, potCut);
+			}
+		} else
+			return null;
+	}
 }

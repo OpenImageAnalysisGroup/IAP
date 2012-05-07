@@ -7,6 +7,7 @@ import java.awt.Color;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.intensity.Histogram.Mode;
+import de.ipk.ag_ba.mongo.IAPservice;
 
 public class IntensityAnalysis {
 	
@@ -62,6 +63,16 @@ public class IntensityAnalysis {
 					minHue = h;
 				if (maxHue == null || h > maxHue)
 					maxHue = h;
+			}
+			if (mode == Mode.MODE_IR_ANALYSIS) {
+				double h = IAPservice.getIRintenstityFromRGB(r_intensityClassic, g_intensityChlorophyl, b_intensityPhenol);
+				sumOfIntensityChlorophyl += h * 255d;
+				histHue.addDataPoint((int) (h * 255), 255);
+				sumOfHue += h;
+				if (minHue == null || h < minHue)
+					minHue = h;
+				if (maxHue == null || h > maxHue)
+					maxHue = h;
 			} else {
 				// double intensityChloro = (255d - g_intensityChlorophyl) / 255d;
 				double intensityPhenol = (255d - b_intensityPhenol) / 255d;
@@ -108,8 +119,10 @@ public class IntensityAnalysis {
 				result.addValue("intensity.phenol.plant_weight_drought_loss", plantImagePixelCnt - weightOfPlant);
 			}
 			
-			result.addValue("filled.pixels", plantImagePixelCnt);
-			result.addValue("filled.percent", (100d * plantImagePixelCnt) / pixels.length);
+			if (mode != Mode.MODE_IR_ANALYSIS) {
+				result.addValue("filled.pixels", plantImagePixelCnt);
+				result.addValue("filled.percent", (100d * plantImagePixelCnt) / pixels.length);
+			}
 			if (mode == Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS) {
 				if (plantImagePixelCnt > 0) {
 					result.addValue("intensity.chlorophyl.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
@@ -120,9 +133,9 @@ public class IntensityAnalysis {
 				}
 				if (sumOfIntensityChlorophyl > 0)
 					result.addValue("intensity.phenol.chlorophyl.ratio", sumOfIntensityPhenol / sumOfIntensityChlorophyl);
-				
 			} else
 				result.addValue("intensity.sum", sumOfIntensityChlorophyl);
+			
 			result.addValue("intensity.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
 			
 			if (optDistHorizontal != null && optRealMarkerDistance != null) {

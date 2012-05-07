@@ -14,7 +14,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancingRoundCamera_vis
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCopyImagesApplyMask_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCreateDummyReferenceIfNeeded_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlLabFilter_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_vis;
@@ -26,7 +26,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.debug.BlLoadImagesIfNeeded_images_masks;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
@@ -83,7 +83,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		// calculation of numeric values
 		p.add(BlCalcMainAxis_vis.class);
 		p.add(BlCalcWidthAndHeight_vis.class);
-		p.add(BlCalcIntensity_vis_fluo_nir.class);
+		p.add(BlCalcIntensity_vis_fluo_nir_ir.class);
 		p.add(BlConvexHull_vis_fluo.class);
 		// postprocessing
 		p.add(BlockRunPostProcessors.class);
@@ -91,7 +91,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 			p.add(BlockDrawSkeleton_vis_fluo.class);
 		
 		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
-		p.add(BlCrop_images_vis_fluo_nir.class);
+		p.add(BlCrop_images_vis_fluo_nir_ir.class);
 		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);
 		
 		return p;

@@ -2863,6 +2863,7 @@ public class ImageOperation {
 	
 	/**
 	 * The sum of the intensities of non-background pixels will be calculated. The intensity (0..1) of the red channel is analyzed.
+	 * If red, green and blue are false, special IR temperature calculations are performed.
 	 * 
 	 * @param b
 	 * @return
@@ -2887,12 +2888,19 @@ public class ImageOperation {
 					res += rf;
 				}
 				if (green) {
-					double rf = ((cg & 0x00ff00) >> 8) / 255.0; // B 0..1
-					res += rf;
+					double gf = ((cg & 0x00ff00) >> 8) / 255.0; // B 0..1
+					res += gf;
 				}
 				if (blue) {
-					double rf = ((cg & 0x0000ff)) / 255.0; // B 0..1
-					res += rf;
+					double bf = ((cg & 0x0000ff)) / 255.0; // B 0..1
+					res += bf;
+				}
+				if (!red && !green && !blue) {
+					// 7-edge-color-cube calcutation
+					int rf = ((cg & 0xff0000) >> 16);
+					int gf = ((cg & 0x00ff00) >> 8);
+					int bf = ((cg & 0x0000ff));
+					res += IAPservice.getIRintenstityFromRGB(rf, gf, bf);
 				}
 			}
 			idx++;
