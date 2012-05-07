@@ -407,6 +407,14 @@ of the group image analysis.
 \checkFileNoReset{mark1_y__percent_nboxplot.pdf}{}{}
 \checkFileNoReset{mark2_y__percent_nboxplot.pdf}{}{}
 \checkFileNoReset{mark3_y__percent_nboxplot.pdf}{}{}
+\checkFileNoReset{side_area_norm__mm2_violinplot.pdf}{}{}
+\checkFileNoReset{top_area_norm__mm2_violinplot.pdf}{}{}
+\checkFileNoReset{side_fluo_intensity_average__relative_violinplot.pdf}{}{}
+\checkFileNoReset{side_nir_intensity_average__relative_violinplot.pdf}{}{}
+\checkFileNoReset{side_width_norm__mm_violinplot.pdf}{}{}
+\checkFileNoReset{side_height_norm__mm_violinplot.pdf}{}{}
+\checkFileNoReset{side_vis_hue_averageviolinplot.pdf}{}{}
+\checkFileNoReset{top_vis_hue_averageviolinplot.pdf}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
 	\resetClear
@@ -463,7 +471,56 @@ of the group image analysis.
 		\ifthenelse{\boolean{isFile3}}{
 			\loadImage{mark3_y__percent_nboxplot.pdf}
 		}{}
-	}{}		
+	}{}
+	
+	\resetBoolean
+	\checkFileNoReset{side_area_norm__mm2_violinplot.pdf}{}{}
+	\checkFileNoReset{top_area_norm__mm2_violinplot.pdf}{}{}
+	\checkFileNoReset{side_fluo_intensity_average__relative_violinplot.pdf}{}{}
+	\checkFileNoReset{side_nir_intensity_average__relative_violinplot.pdf}{}{}
+	\checkFileNoReset{side_width_norm__mm_violinplot.pdf}{}{}
+	\checkFileNoReset{side_height_norm__mm_violinplot.pdf}{}{}
+	\checkFileNoReset{side_vis_hue_averageviolinplot.pdf}{}{}
+	\checkFileNoReset{top_vis_hue_averageviolinplot.pdf}{}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\ownClearPage
+		\subsection{Stress ratio}
+		
+		\checkFile{side_area_norm__mm2_violinplot.pdf}{top_area_norm__mm2_violinplot.pdf}{side_fluo_intensity_average__relative_violinplot.pdf}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{side_area_norm__mm2_violinplot.pdf}
+		}{}
+		
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{top_area_norm__mm2_violinplot.pdf}
+		}{}
+		
+		\ifthenelse{\boolean{isFile3}}{
+			\loadImage{side_fluo_intensity_average__relative_violinplot.pdf}
+		}{}
+	
+		\checkFile{side_nir_intensity_average__relative_violinplot.pdf}{side_width_norm__mm_violinplot.pdf}{side_height_norm__mm_violinplot.pdf}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{side_nir_intensity_average__relative_violinplot.pdf}
+		}{}
+		
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{side_width_norm__mm_violinplot.pdf}
+		}{}
+		
+		\ifthenelse{\boolean{isFile3}}{
+			\loadImage{side_height_norm__mm_violinplot.pdf}
+		}{}
+	
+		\checkFile{side_vis_hue_averageviolinplot.pdf}{top_vis_hue_averageviolinplot.pdf}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{side_vis_hue_averageviolinplot.pdf}
+		}{}
+		
+		\ifthenelse{\boolean{isFile2}}{
+			\loadImage{top_vis_hue_averageviolinplot.pdf}
+		}{}
+	}{}			
 }{}
 
 \resetBoolean
