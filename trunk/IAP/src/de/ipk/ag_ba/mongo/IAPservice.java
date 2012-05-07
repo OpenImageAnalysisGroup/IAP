@@ -9,6 +9,7 @@ package de.ipk.ag_ba.mongo;
 
 import info.StopWatch;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -1104,5 +1105,70 @@ public class IAPservice {
 	
 	private static String ff(int t) {
 		return StringManipulationTools.formatNumber(t, "00");
+	}
+	
+	/**
+	 * @param r
+	 *           0..255
+	 * @param g
+	 *           0..255
+	 * @param b
+	 *           0..255
+	 * @return Intensity (temperature) in the range of 0..1
+	 */
+	public static double getIRintenstityFromRGB(int r, int g, int b) {
+		int i = getIntIRintensity(r, g, b);
+		return i / 1785d;
+	}
+	
+	private static int getIntIRintensity(int r, int g, int b) {
+		if (r == 0 && g == 0)
+			return b;
+		if (r == 0 && b == 255)
+			return 255 + g;
+		if (r == 0 && g == 255)
+			return 3 * 255 - b;
+		if (g == 255 && b == 0)
+			return 3 * 255 + r;
+		if (r == 255 && b == 0)
+			return 5 * 255 - g;
+		if (r == 255 && g == 0)
+			return 5 * 255 + b;
+		if (r == 255 && b == 255)
+			return 7 * 255 - g;
+		if (r == 255 && g == 255)
+			return 7 * 255 + b;
+		throw new UnsupportedOperationException("Invalid RGB values for intensity conversion (" + r + "/" + g + "/" + b + ")");
+	}
+	
+	public static double getIRintenstityFromRGB(int c, int back) {
+		if (c == back)
+			return Double.NaN;
+		else {
+			int r = (c & 0xff0000) >> 16;
+			int g = (c & 0x00ff00) >> 8;
+			int b = (c & 0x0000ff);
+			return getIRintenstityFromRGB(r, g, b);
+		}
+	}
+	
+	public static int getIRintensityDifferenceColor(double d, int back) {
+		if (Double.isNaN(d))
+			return back;
+		else {
+			if (d < 0) {
+				int gray = (int) Math.round(-d * 255);
+				gray = 255 - gray * 30;
+				if (gray < 0) {
+					System.err.println("Too high temp differnence (multiplyer for visualization is too high): " + gray);
+					gray = 0;
+				}
+				return new Color(gray, gray, gray).getRGB();
+			} else {
+				int red = (int) Math.round(d * 255);
+				red = 255 - red;
+				return new Color(red, 0, 0).getRGB();
+			}
+		}
 	}
 }

@@ -102,6 +102,8 @@ public class BlUseFluoMaskToClear_Arabidopsis_nir extends AbstractSnapshotAnalys
 	}
 	
 	private FlexibleImage clearImageTop(FlexibleImage input, FlexibleImage fluo) {
+		if (input == null || fluo == null)
+			return input;
 		ImageOperation ioInput = new ImageOperation(input);
 		int background = options.getBackground();
 		ImageOperation ioFluo = new ImageOperation(fluo);
@@ -137,13 +139,19 @@ public class BlUseFluoMaskToClear_Arabidopsis_nir extends AbstractSnapshotAnalys
 		if (processedMasks.getFluo() != null) {
 			// apply enlarged VIS mask to nir
 			ImageOperation nir = processedMasks.getNir().copy().getIO().print("NIRRRR", debug);
+			ImageOperation ir = processedMasks.getIr().copy().getIO().print("IR", debug);
 			FlexibleImage mask = processedMasks.getFluo().copy().getIO().blur(3).
 					binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
 			processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
 					mask,
 					back).print("FILTERED NIR MASK", debug).getImage());
+			processedMasks.setIr(ir.applyMask_ResizeMaskIfNeeded(
+					mask,
+					back).print("FILTERED IR MASK", debug).getImage());
 			processedImages.setNir(processedImages.getNir().getIO().applyMask_ResizeMaskIfNeeded(
 					mask, back).print("FILTERED NIR IMAGE", debug).getImage());
+			processedImages.setIr(processedImages.getIr().getIO().applyMask_ResizeMaskIfNeeded(
+					mask.getIO().invert().getImage(), back).print("FILTERED IR IMAGE", debug).getImage());
 			return;
 		}
 		// }
@@ -156,9 +164,8 @@ public class BlUseFluoMaskToClear_Arabidopsis_nir extends AbstractSnapshotAnalys
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			FlexibleImage input = processedMasks.getNir();
-			
-			processedMasks.setNir(clearImageTop(input, processedMasks.getFluo()));
+			processedMasks.setNir(clearImageTop(processedMasks.getNir(), processedMasks.getFluo()));
+			processedMasks.setIr(clearImageTop(processedMasks.getIr(), processedMasks.getFluo()));
 			return;
 		}
 	}

@@ -231,4 +231,12 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		FlexibleImage res = new FlexibleImage(in).print("DEBUG", false);
 		return res;
 	}
+	
+	@Override
+	protected FlexibleImage processIRmask() {
+		if (getInput().getImages().getIr() != null)
+			return getInput().getImages().getIr().copy();
+		else
+			return getInput().getMasks().getIr();
+	}
 }

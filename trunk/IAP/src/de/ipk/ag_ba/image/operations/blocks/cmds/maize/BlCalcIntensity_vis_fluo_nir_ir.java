@@ -22,7 +22,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * @author klukas, pape
  *         status: ok, 23.11.2011, c. klukas
  */
-public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -157,6 +157,39 @@ public class BlCalcIntensity_vis_fluo_nir extends AbstractSnapshotAnalysisBlockF
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
 				if (rt != null)
 					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.", rt, getBlockPosition());
+			}
+			return io.getImage();
+		} else
+			return null;
+	}
+	
+	@Override
+	protected FlexibleImage processIRmask() {
+		FlexibleImage irSkel = null;
+		// getProperties().getImage("ir_skeleton");
+		if (getInput().getMasks().getIr() != null)
+			irSkel = getInput().getMasks().getIr().getIO().skeletonize().getImage();
+		if (irSkel != null) {
+			int irSkeletonFilledPixels = irSkel.getIO().countFilledPixels();
+			double irSkeletonIntensitySum = irSkel.getIO().intensitySumOfChannel(false, false, false, false);
+			double avgIrSkel = 1 - irSkeletonIntensitySum / irSkeletonFilledPixels;
+			getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".ir.skeleton.intensity.average", avgIrSkel);
+		}
+		
+		if (getInput().getMasks().getIr() != null) {
+			ImageOperation io = new ImageOperation(getInput().getMasks().getIr());
+			if (getInput().getMasks().getIr().getHeight() > 1) {
+				int irFilledPixels = getInput().getMasks().getIr().getIO().countFilledPixels();
+				double irIntensitySum = getInput().getMasks().getIr().getIO().intensitySumOfChannel(false, false, false, false);
+				double avgIr = 1 - irIntensitySum / irFilledPixels;
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".ir.intensity.average", avgIr);
+				ResultsTable rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
+						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_IR_ANALYSIS); // markerDistanceHorizontally
+				
+				if (options == null)
+					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
+				if (rt != null)
+					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".ir.", rt, getBlockPosition());
 			}
 			return io.getImage();
 		} else

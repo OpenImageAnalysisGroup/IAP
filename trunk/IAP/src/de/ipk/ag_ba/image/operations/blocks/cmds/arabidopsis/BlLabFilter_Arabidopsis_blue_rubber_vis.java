@@ -361,5 +361,9 @@ public class BlLabFilter_Arabidopsis_blue_rubber_vis extends AbstractSnapshotAna
 			FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 		// processedImages.setVis(mod);
+		// if (processedImages.getVis() != null && processedMasks.getVis() != null)
+		// processedImages.setVis(
+		// processedImages.getVis().getIO().applyMask_ResizeMaskIfNeeded(
+		// processedMasks.getVis().getIO().copy().invert().getImage(), options.getBackground()).getImage());
 	}
 }
