@@ -1118,7 +1118,7 @@ public class IAPservice {
 	 */
 	public static double getIRintenstityFromRGB(int r, int g, int b) {
 		int i = getIntIRintensity(r, g, b);
-		return i / 1785d;
+		return i / 1785;
 	}
 	
 	private static int getIntIRintensity(int r, int g, int b) {
