@@ -23,6 +23,8 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
@@ -102,35 +104,71 @@ public class PdfCreator {
 					
 					myRef.setObject(ls_proc);
 					
-					DataInputStream ls_in = new DataInputStream(ls_proc.getInputStream());
-					DataInputStream ls_in2 = new DataInputStream(ls_proc.getErrorStream());
-					
-					String response;
-					while ((response = ls_in.readLine()) != null) {
-						output.put(System.nanoTime(), "INFO:  " + response);
-						System.out.println("INFO:  " + response);
-						if (optStatus != null && response != null && response.trim().length() > 0)
-							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
-						if (optStatus != null && response != null && response.trim().length() > 0)
-							optStatus.setCurrentStatusText2(StringManipulationTools.stringReplace(response, "\"", ""));
-						synchronized (lastOutput) {
-							lastOutput.add(response);
-							while (lastOutput.size() > 20)
-								lastOutput.remove(0);
-						}
+					final DataInputStream ls_in = new DataInputStream(ls_proc.getInputStream());
+					final DataInputStream ls_in2 = new DataInputStream(ls_proc.getErrorStream());
+					MyThread t1 = null;
+					try {
+						t1 = new MyThread(new Runnable() {
+							@Override
+							public void run() {
+								String response;
+								try {
+									while ((response = ls_in.readLine()) != null) {
+										output.put(System.nanoTime(), "INFO:  " + response);
+										System.out.println("INFO:  " + response);
+										if (optStatus != null && response != null && response.trim().length() > 0)
+											optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
+										if (optStatus != null && response != null && response.trim().length() > 0)
+											optStatus.setCurrentStatusText2(StringManipulationTools.stringReplace(response, "\"", ""));
+										synchronized (lastOutput) {
+											lastOutput.add(response);
+											while (lastOutput.size() > 20)
+												lastOutput.remove(0);
+										}
+									}
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}, "PDF OUT");
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
 					}
-					while ((response = ls_in2.readLine()) != null) {
-						output.put(System.nanoTime(), "ERROR: " + response);
-						System.out.println("ERROR: " + response);
-						if (optStatus != null && response != null && response.trim().length() > 0)
-							optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
-						if (optStatus != null && response != null && response.trim().length() > 0)
-							optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": ERROR: " + StringManipulationTools.stringReplace(response, "\"", ""));
-						synchronized (lastOutput) {
-							lastOutput.add(SystemAnalysis.getCurrentTime() + ": ERROR: " + response);
-							while (lastOutput.size() > 20)
-								lastOutput.remove(0);
-						}
+					MyThread t2 = null;
+					try {
+						t2 = new MyThread(new Runnable() {
+							@Override
+							public void run() {
+								String response;
+								try {
+									while ((response = ls_in2.readLine()) != null) {
+										output.put(System.nanoTime(), "ERROR: " + response);
+										System.out.println("ERROR: " + response);
+										if (optStatus != null && response != null && response.trim().length() > 0)
+											optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
+										if (optStatus != null && response != null && response.trim().length() > 0)
+											optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": ERROR: "
+													+ StringManipulationTools.stringReplace(response, "\"", ""));
+										synchronized (lastOutput) {
+											lastOutput.add(SystemAnalysis.getCurrentTime() + ": ERROR: " + response);
+											while (lastOutput.size() > 20)
+												lastOutput.remove(0);
+										}
+									}
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}, "PDF ERR");
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+					try {
+						t1.start();
+						t2.start();
+						BackgroundThreadDispatcher.waitFor(new MyThread[] { t1, t2 });
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 					if (optStatus != null)
 						optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
