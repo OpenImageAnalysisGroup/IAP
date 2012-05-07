@@ -6,7 +6,7 @@ public class WatchConfig {
 	String database, label;
 	int h1_st, h2_st, h1_end, h2_end, minute1_st, minute2_st, minute1_end, minute2_end, lastMinutes;
 	
-	String[] mails;
+	String mails;
 	
 	WatchConfig(String conf) {
 		String[] parts = conf.split(",");
@@ -31,7 +31,7 @@ public class WatchConfig {
 		
 		lastMinutes = Integer.parseInt(parts[i++].trim());
 		
-		mails = parts[i++].split(":");
+		mails = parts[i++];
 	}
 	
 	public int getLastMinutes() {
@@ -73,7 +73,7 @@ public class WatchConfig {
 		}
 	}
 	
-	public String[] getMails() {
+	public String getMails() {
 		return mails;
 	}
 	

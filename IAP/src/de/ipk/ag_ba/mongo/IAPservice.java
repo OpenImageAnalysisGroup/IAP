@@ -1012,43 +1012,58 @@ public class IAPservice {
 								boolean m1 = (dddt.getTime() > startTime1 && dddt.getTime() <= endTime1);
 								boolean m2 = (dddt.getTime() > startTime2 && dddt.getTime() <= endTime2);
 								boolean m3 = (new Date().getTime() - ddd.getTime()) > wc.getLastMinutes() * 60 * 1000;
+								String imageSrc = null;
+								String fileName = null;
+								if (ehi.getDatabase().startsWith("CGH")) {
+									fileName = "maize " + SystemAnalysis.getCurrentTimeInclSec() + ".jpg";
+									imageSrc = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=1280x960&Quality=Clarity";
+								} else
+									if (ehi.getDatabase().startsWith("BGH")) {
+										fileName = "barley " + SystemAnalysis.getCurrentTimeInclSec() + ".jpg";
+										imageSrc = "root:lemnatec@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=" +
+												System.currentTimeMillis();
+									}
+								if (fileName != null)
+									Thread.sleep(1000); // to ensure that each email has a different file name
+									
 								if ((m1 || m2) && m3) {
 									// WARN
 									foundSomeError = true;
 									if (!outOfDateExperiments.contains(ehi.getExperimentName())) {
-										for (String target : wc.getMails()) {
-											System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND WARNING MAIL FOR EXPERIMENT "
-													+ ehi.getExperimentName()
-													+ " TO " + target);
-											m.sendEmail(
-													"klukas@ipk-gatersleben.de",
-													target,
-													"WARNING: " +
-															ehi.getExperimentName()
-															+ " shows no further progress " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
-															+ host,
-													"No new data found for experiment " + ehi.getExperimentName()
-															+ ".\n\n\nExperiment details:\n\n" +
-															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"));
-										}
+										System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND WARNING MAIL FOR EXPERIMENT "
+												+ ehi.getExperimentName()
+												+ " TO " + wc.getMails());
+										m.sendEmail(
+												wc.getMails(),
+												"INFO: " +
+														ehi.getExperimentName()
+														+ " STATUS CHANGE",
+												"WARNING: " + ehi.getExperimentName()
+														+ " shows no further progress " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
+														+ host + "\n\n" +
+														"No new data found for experiment " + ehi.getExperimentName()
+														+ ".\n\n\nExperiment details:\n\n" +
+														StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
+												imageSrc, fileName);
 									}
 									outOfDateExperiments.add(ehi.getExperimentName());
 								} else {
 									// all OK
 									if (outOfDateExperiments.contains(ehi.getExperimentName())) {
-										for (String target : wc.getMails()) {
-											System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND INFO MAIL FOR EXPERIMENT " + ehi.getExperimentName()
-													+ " TO " + target);
-											m.sendEmail(
-													"klukas@ipk-gatersleben.de",
-													target,
-													"INFO: " + ehi.getExperimentName()
-															+ " shows progress again " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
-															+ host,
-													"After error condition new data has been found for experiment " + ehi.getExperimentName()
-															+ ". Status is now OK!\n\n\nExperiment details:\n\n" +
-															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"));
-										}
+										System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND INFO MAIL FOR EXPERIMENT " + ehi.getExperimentName()
+												+ " TO " + wc.getMails());
+										m.sendEmail(
+												wc.getMails(),
+												"INFO: " + ehi.getExperimentName()
+														+ " STATUS CHANGE",
+												"INFO: " + ehi.getExperimentName()
+														+ " shows progress again " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
+														+ host + "\n\n" +
+														"After error condition new data has been found for experiment " + ehi.getExperimentName()
+														+ ". Status is now OK!\n\n\nExperiment details:\n\n" +
+														StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
+												imageSrc, fileName);
+										
 									}
 									outOfDateExperiments.remove(ehi.getExperimentName());
 								}
@@ -1067,6 +1082,8 @@ public class IAPservice {
 				Thread.sleep(smallestTimeFrame * 60 * 1000);
 			} else {
 				int wait = smallestTimeFrame < 10 ? smallestTimeFrame : 15;
+				if (wait < 1)
+					wait = 1;
 				System.out
 						.println(SystemAnalysis.getCurrentTimeInclSec()
 								+ ">SLEEP " + wait + " minutes... (WILL CHECK FOR RECOVERY)");
