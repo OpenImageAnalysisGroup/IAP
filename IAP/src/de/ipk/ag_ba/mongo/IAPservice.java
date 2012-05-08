@@ -1118,7 +1118,7 @@ public class IAPservice {
 	 */
 	public static double getIRintenstityFromRGB(int r, int g, int b) {
 		int i = getIntIRintensity(r, g, b);
-		return i / 1785;
+		return i / (8d * 255d);
 	}
 	
 	private static int getIntIRintensity(int r, int g, int b) {
@@ -1157,8 +1157,7 @@ public class IAPservice {
 			return back;
 		else {
 			if (d < 0) {
-				int gray = (int) Math.round(-d * 255);
-				gray = 255 - gray * 30;
+				int gray = (int) Math.round(255 - (-d * 255) * 20);
 				if (gray < 0) {
 					System.err.println("Too high temp differnence (multiplyer for visualization is too high): " + gray);
 					gray = 0;
@@ -1167,7 +1166,7 @@ public class IAPservice {
 			} else {
 				int red = (int) Math.round(d * 255);
 				red = 255 - red;
-				return new Color(red, 0, 0).getRGB();
+				return new Color(255, 255, 255).getRGB();
 			}
 		}
 	}

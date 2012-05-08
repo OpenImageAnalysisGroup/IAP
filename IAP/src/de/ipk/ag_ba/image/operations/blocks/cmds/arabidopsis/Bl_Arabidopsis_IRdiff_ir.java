@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.mongo.IAPservice;
 
 /**
@@ -27,5 +28,13 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 			return new FlexibleImage(coldRef.getWidth(), coldRef.getHeight(), res);
 		} else
 			return null;
+	}
+	
+	@Override
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		super.postProcess(processedImages, processedMasks);
+		FlexibleImage f = processedImages.getIr();
+		processedImages.setIr(processedMasks.getIr());
+		processedMasks.setIr(f);
 	}
 }
