@@ -15,6 +15,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -194,7 +195,7 @@ public class BatchCmd extends BasicDBObject {
 	}
 	
 	public static DBObject getRunstatusMatcher(CloudAnalysisStatus starting) {
-		return new BasicDBObject("runstatus", starting.toString());
+		return new BasicDBObject("runstatus", starting.toString()).append("release", IAPmain.RELEASE_IAP_IMAGE_ANALYSIS);
 	}
 	
 	public int getCpuTargetUtilization() {

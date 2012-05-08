@@ -242,7 +242,7 @@ public class CloudTaskManager {
 	
 	public void setClusterExecutionModeSingleTaskAndExit(boolean autoClose) {
 		this.autoClose = autoClose;
-		IAPservice.setCloudExecutionMode(autoClose);
+		IAPservice.setGridBatchExecutionMode(autoClose);
 	}
 	
 	public void setDisableProcess(boolean fixedDisableProcess) {
