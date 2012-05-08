@@ -60,7 +60,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class IAPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
 	
-	public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R25_2012-04-27_multi_tray_barley_in_maize";
+	public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R26_2012-05-08_blue_rubber_IR_analysis";
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R24_2012-04-16_remove_not_needed_histograms";
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R23_2012-04-14_relative_leaf_length";
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R22_2012-04-13_ratio_fix";
@@ -398,7 +398,7 @@ public class IAPmain extends JApplet {
 			// these may be changed for interactive applet version !!!
 			switch (feature) {
 				case REMOTE_EXECUTION:
-					return false;
+					return true;
 				case SAVE_DEBUG_STACK:
 					return false;
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
