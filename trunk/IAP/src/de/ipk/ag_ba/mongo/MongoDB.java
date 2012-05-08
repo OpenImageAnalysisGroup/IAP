@@ -9,6 +9,7 @@ package de.ipk.ag_ba.mongo;
 
 import info.StopWatch;
 
+import  de.ipk.ag_ba.gui.webstart.IAPmain;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -398,7 +399,7 @@ public class MongoDB {
 			}
 		});
 		loadGen.setPriority(Thread.MIN_PRIORITY);
-		if (IAPservice.isCloudExecutionModeActive())
+		if (IAPservice.isGridBatchExecutionModeActive())
 			loadGen.start();
 		
 		try {
@@ -1595,7 +1596,7 @@ public class MongoDB {
 				if (res != null) {
 					res.updateTime();
 					res.setHostName(ip);
-					res.setClusterExecutionMode(IAPservice.isCloudExecutionModeActive());
+					res.setClusterExecutionMode(IAPservice.isGridBatchExecutionModeActive());
 					res.setOperatingSystem(SystemAnalysis.getOperatingSystem());
 					res.setBlocksExecutedWithinLastMinute(blocksExecutedWithinLastMinute);
 					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
@@ -1791,7 +1792,8 @@ public class MongoDB {
 						}
 						int claimed = 0;
 						if (addCnt < maxTasks) {
-							loop: for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
+							loop: for (DBObject dbo : collection.find().sort(
+									new BasicDBObject("submission", 1).append("release", IAPmain.RELEASE_IAP_IMAGE_ANALYSIS))) {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (batch.getExperimentHeader() == null)
 									continue;

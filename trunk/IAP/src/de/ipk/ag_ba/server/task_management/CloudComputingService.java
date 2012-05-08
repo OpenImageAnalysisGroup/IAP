@@ -90,20 +90,22 @@ public class CloudComputingService {
 	
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
+		int l =            "***************************************************".length();
 		System.out.println("***************************************************");
-		System.out.println("*                                                 *");
-		System.out.println("*        IAP - Integrated Analysis Platform       *");
-		System.out.println("*                                                 *");
-		System.out.println("*      --  Systems Biology Cloud Computing --     *");
-		System.out.println("*                                                 *");
-		System.out.println("*     (c) 2010-2012 IPK, Group Image Analysis     *");
-		System.out.println("*                                                 *");
+		System.out.println(fillLen("**", l));
+		System.out.println(fillLen("*IAP - Integrated Analysis Platform*", l));
+		System.out.println(fillLen("**", l));
+		System.out.println(fillLen("*--  Systems Biology Cloud Computing --*", l));
+		System.out.println(fillLen("*-- "+IAPmain.RELEASE_IAP_IMAGE_ANALYSIS+" --*", l));
+		System.out.println(fillLen("**", l));
+		System.out.println(fillLen("*(c) 2010-2012 IPK, Group Image Analysis*", l));
+		System.out.println(fillLen("**", l));
 		System.out.println("***************************************************");
-		System.out.println("*                                                 *");
-		System.out.println("*  PI: Dr. Christian Klukas ..................... *");
-		System.out.println("*  Alexander Entzian ............................ *");
-		System.out.println("*  Jean-Michel Pape ............................. *");
-		System.out.println("*                                                 *");
+		System.out.println(fillLen("**", l));
+		System.out.println(fillLenLA("*  PI: Dr. Christian Klukas  *",".",l,2));
+		System.out.println(fillLenLA("*  Dr. Alexander Entzian  *",".",l,2));
+		System.out.println(fillLenLA("*  Jean-Michel Pape  *",".",l,2));
+		System.out.println(fillLen("**", l));
 		System.out.println("***************************************************");
 		SystemAnalysis.simulateHeadless = true;
 		boolean clusterExecutionMode = false;
@@ -281,6 +283,22 @@ public class CloudComputingService {
 		}
 	}
 	
+	private static String fillLen(String string, int len) {
+		while (string.length()<len) {
+			string = string.substring(0, 1)+" "+string.substring(1);
+			if (string.length()<len)
+				string = string.substring(0, string.length()-1)+" "+string.substring(string.length()-1, string.length());
+		}
+		return string;
+	}
+	
+	private static String fillLenLA(String string, String fill, int len, int retainLeft) {
+		while (string.length()<len) {
+			string = string.substring(0, string.length()-retainLeft)+fill+string.substring(string.length()-retainLeft, string.length());
+		}
+		return string;
+	}
+
 	public void setEnableCalculations(boolean enableCloudComputing) {
 		cloudTaskManager.setDisableProcess(!enableCloudComputing);
 	}

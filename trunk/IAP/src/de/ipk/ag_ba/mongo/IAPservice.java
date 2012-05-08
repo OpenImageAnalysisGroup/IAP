@@ -509,11 +509,11 @@ public class IAPservice {
 		return res;
 	}
 	
-	public static void setCloudExecutionMode(boolean autoClose) {
+	public static void setGridBatchExecutionMode(boolean autoClose) {
 		IAPservice.autoClose = autoClose;
 	}
 	
-	public static boolean isCloudExecutionModeActive() {
+	public static boolean isGridBatchExecutionModeActive() {
 		return autoClose;
 	}
 	
