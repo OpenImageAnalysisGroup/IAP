@@ -68,12 +68,12 @@ public class IntensityAnalysis {
 				boolean absoluteIR = false;
 				double h;
 				if (absoluteIR) {
-					h = IAPservice.getIRintenstityFromRGB(r_intensityClassic, g_intensityChlorophyl, b_intensityPhenol);
+					h = IAPservice.getIRintenstityFromRGB(r_intensityClassic, g_intensityChlorophyl, b_intensityPhenol) * 255d;
 				} else {
-					h = r_intensityClassic / 255d;
+					h = (255d - r_intensityClassic);
 				}
-				sumOfIntensityChlorophyl += h * 255d;
-				histHue.addDataPoint((int) (h * 255), 255);
+				sumOfIntensityChlorophyl += h;
+				histHue.addDataPoint((int) h, 255);
 				sumOfHue += h;
 				if (minHue == null || h < minHue)
 					minHue = h;
